@@ -1,1066 +1,1428 @@
+<!-- Finnish up new version of worksheet career section. Begin ship and NPC sections. Weapons sections based on controlling skill -->
+
 <script type="text/worker">
-	//Homeworld effects on Education
-    on("change:techlevel", function() {
-	    getAttrs(["techlevel", "edumod"
+	//Age and terms
+		//Number of terms
+			on("change:repeating_careers:careername", function() {
+	    	getSectionIDs("careername", function(idArray) {
+	            var termNo = idArray.length;
+		    setAttrs({termNo:termNo});
+	    	});
+		})
+
+		//Number of terms if a term is deleted
+			on("remove:repeating_careers", function() {
+	    	getSectionIDs("careername", function(idArray) {
+	            var termNo = idArray.length;
+		    setAttrs({termNo:termNo});
+	    	});
+		})
+
+
+		//Age
+		    on("change:termno", function() {
+		    getAttrs(["termNo", "age"
+					], function(pvalue) {
+				console.log("************ start capacities caclulation ************");
+				var termNo =  parseInt(pvalue.termNo);
+				var adjusted_age =  ((termNo*4)+17);
+				setAttrs({age:adjusted_age});
+		    });
+		});    
+
+	//Homeworld effects
+		//Homeworld effects on Education
+	    on("change:techlevel", function() {
+		    getAttrs(["techlevel", "edumod"
+					], function(pvalue) {
+				console.log("************ start capacities caclulation ************");
+				var techlevel =  parseInt(pvalue.techlevel);
+				var edumod =parseInt(pvalue.edumod) ;
+		if (techlevel < 4) {
+	        edumod = "-2";
+	    } else if (techlevel < 9) {
+	        edumod = "0";
+	    } else if (techlevel < 14) {
+	        edumod = "1";
+	    } else {
+	        edumod = "2";
+	    }
+				setAttrs({edumod});
+		    });
+	    });
+		
+		//Homeworld effects on Charisma
+	    on("change:population", function() {
+		    getAttrs(["population", "chamod"
+					], function(pvalue) {
+				console.log("************ start capacities caclulation ************");
+				var population =  parseInt(pvalue.population);
+				var chamod =parseInt(pvalue.chamod) ;
+		if (population < 6) {
+	        chamod = "-1";
+	    } else if (population < 9) {
+	        chamod = "0";
+	 	} else {
+	        chamod = "1";
+	    }
+				setAttrs({chamod});
+		    });
+	    });
+
+		//Homeworld effects on Agility
+	    on("change:atmosphere", function() {
+		    getAttrs(["atmosphere", "aglmod"
+					], function(pvalue) {
+				console.log("************ start capacities caclulation ************");
+				var atmosphere =  parseInt(pvalue.atmosphere);
+				var aglmod =parseInt(pvalue.aglmod) ;
+		if (atmosphere < 2) {
+	        aglmod = "1";
+	    } else {
+	        aglmod = "0";
+	    }
+				setAttrs({aglmod});
+		    });
+	    });
+
+	    //Homeworld effects on Strength
+	    on("change:planetsize", function() {
+		    getAttrs(["planetsize", "strmod"
+					], function(pvalue) {
+				console.log("************ start capacities caclulation ************");
+				var planetsize =  parseInt(pvalue.planetsize);
+				var strmod =parseInt(pvalue.strmod) ;
+		if (planetsize < 3) {
+	        strmod = "-2";
+	    } else if (planetsize < 5) {
+	        strmod = "-1";
+	    } else if (planetsize < 12) {
+	        strmod = "0";
+	    } else if (planetsize < 16) {
+	        strmod = "1";
+	    } else {
+	        strmod = "2";
+	    }
+				setAttrs({strmod});
+		    });
+	    });
+
+	    
+	    //Homeworld effects on Constitution
+	    on("change:planetsize change:atmosphere change:techlevel", function() {
+		    getAttrs(["planetsize", "conmod", "atmosphere", "techlevel"
+					], function(pvalue) {
+				console.log("************ start capacities caclulation ************");
+				var planetsize =  parseInt(pvalue.planetsize);
+				var atmosphere =  parseInt(pvalue.atmosphere);
+				var techlevel =  parseInt(pvalue.techlevel);
+				var conmod = parseInt(pvalue.conmod) ;
+				var consizemod;
+				var conatmosmod;
+				var contechmod;
+		if (planetsize < 3) {
+	        consizemod = -2;
+	    } else if (planetsize < 5) {
+	        consizemod = -1;
+	    } else if (planetsize < 12) {
+	        consizemod = 0;
+	    } else if (planetsize < 16) {
+	        consizemod = -1;
+	    } else {
+	        consizemod = -2;
+	    }
+		
+		if (atmosphere < 2) {
+	        conatmosmod = 0;
+	    } else if (atmosphere  < 3) {
+	        conatmosmod = -1;
+	    } else if (atmosphere  < 4) {
+	        conatmosmod = 0;
+	    } else if (atmosphere  < 5) {
+	        conatmosmod = -1;
+	    } else if (atmosphere  < 9) {
+	        conatmosmod = 0;
+	    } else if (atmosphere  < 10) {
+	        conatmosmod = -1;
+	    } else {
+	        conatmosmod = 0;
+	    }
+		if (techlevel < 4) {
+	        contechmod = 1;
+	    } else {
+	        contechmod = 0;
+	    }
+				setAttrs({conmod:(contechmod+consizemod+conatmosmod)});
+		    });
+	    });
+
+	//Scripts for credits calculations
+		//cashbasevalue
+	    on("change:techlevel", function() {
+		    getAttrs(["techlevel", "cashbase"
+					], function(pvalue) {
+				console.log("************ start capacities caclulation ************");
+				var techlevel =  parseInt(pvalue.techlevel);
+				var cashbasevalue =parseInt(pvalue.cashbase) ;
+				if (techlevel < 4) {
+	        cashbasevalue = "10";
+	    } else if (techlevel < 6) {
+	        cashbasevalue = "100";
+	    } else if (techlevel < 9) {
+	        cashbasevalue = "500";
+	    } else if (techlevel < 11) {
+	        cashbasevalue = "1000";
+	    } else {
+	        cashbasevalue = "5000";
+	    }
+				setAttrs({cashbase:cashbasevalue});
+		    });
+	    });
+
+		//Total credits
+		on("change:repeating_careers:careercredits", function() {
+	   getSectionIDs("repeating_careers", function(IDArray) {
+	      var fieldNames = [];
+	        for (var i=0; i < IDArray.length; i++) {
+	         fieldNames.push("repeating_careers_" + IDArray[i] + "_careercredits");
+	      }
+
+	        var totalcredits = 0;
+	        getAttrs(fieldNames, function(values) {
+	         for (var i=0; i < IDArray.length; i++) {
+	            total += parseInt(values["repeating_careers_" + IDArray[i] + "_careercredits"])||0;
+	         }
+	         setAttrs({
+	            "credits": totalcredits
+	         });
+	        });
+		   });
+		});
+
+		//check for gambling skill
+		on("change:repeating_intskills:intskillName change:repeating_intskills:intskillValue", function() {
+	   getAttrs(["repeating_intskills_intskillName","repeating_intskills_intskillValue"], function(values) {
+	 
+	        var skill = values.repeating_intskills_intskillName;
+	        skill = skill.toLowerCase();
+	        skill = skill.trim();
+
+	         if (skill === "gambling"){
+	              var gambling_value = parseInt(values.repeating_intskills_intskillValue);
+	               setAttrs({gambling:gambling_value});
+	           }
+	   		});
+		});
+
+		//Determine if gambling or SOC is the highest value
+		on("change:gambling change:soc", function() {
+	    getAttrs(["gambling", "soc"
 				], function(pvalue) {
 			console.log("************ start capacities caclulation ************");
-			var techlevel =  parseInt(pvalue.techlevel);
-			var edumod =parseInt(pvalue.edumod) ;
-	if (techlevel < 4) {
-        edumod = "-2";
-    } else if (techlevel < 9) {
-        edumod = "0";
-    } else if (techlevel < 14) {
-        edumod = "1";
-    } else {
-        edumod = "2";
-    }
-			setAttrs({edumod});
-	    });
-    });
-	
-	//Homeworld effects on Charisma
-    on("change:population", function() {
-	    getAttrs(["population", "chamod"
-				], function(pvalue) {
-			console.log("************ start capacities caclulation ************");
-			var population =  parseInt(pvalue.population);
-			var chamod =parseInt(pvalue.chamod) ;
-	if (population < 6) {
-        chamod = "-1";
-    } else if (population < 9) {
-        chamod = "0";
- 	} else {
-        chamod = "1";
-    }
-			setAttrs({chamod});
-	    });
-    });
-
-	//Homeworld effects on Agility
-    on("change:atmosphere", function() {
-	    getAttrs(["atmosphere", "aglmod"
-				], function(pvalue) {
-			console.log("************ start capacities caclulation ************");
-			var atmosphere =  parseInt(pvalue.atmosphere);
-			var aglmod =parseInt(pvalue.aglmod) ;
-	if (atmosphere < 2) {
-        aglmod = "1";
-    } else {
-        aglmod = "0";
-    }
-			setAttrs({aglmod});
-	    });
-    });
-
-    //Homeworldeffects on Strength
-    on("change:planetsize", function() {
-	    getAttrs(["planetsize", "strmod"
-				], function(pvalue) {
-			console.log("************ start capacities caclulation ************");
-			var planetsize =  parseInt(pvalue.planetsize);
-			var strmod =parseInt(pvalue.strmod) ;
-	if (planetsize < 3) {
-        strmod = "-2";
-    } else if (planetsize < 5) {
-        strmod = "-1";
-    } else if (planetsize < 12) {
-        strmod = "0";
-    } else if (planetsize < 16) {
-        strmod = "1";
-    } else {
-        strmod = "2";
-    }
-			setAttrs({strmod});
-	    });
-    });
-
-    
-    //Homeworld effects on Constitution
-    on("change:planetsize change:atmosphere change:techlevel", function() {
-	    getAttrs(["planetsize", "conmod", "atmosphere", "techlevel"
-				], function(pvalue) {
-			console.log("************ start capacities caclulation ************");
-			var planetsize =  parseInt(pvalue.planetsize);
-			var atmosphere =  parseInt(pvalue.atmosphere);
-			var techlevel =  parseInt(pvalue.techlevel);
-			var conmod = parseInt(pvalue.conmod) ;
-			var consizemod;
-			var conatmosmod;
-			var contechmod;
-	if (planetsize < 3) {
-        consizemod = -2;
-    } else if (planetsize < 5) {
-        consizemod = -1;
-    } else if (planetsize < 12) {
-        consizemod = 0;
-    } else if (planetsize < 16) {
-        consizemod = -1;
-    } else {
-        consizemod = -2;
-    }
-	
-	if (atmosphere < 2) {
-        conatmosmod = 0;
-    } else if (atmosphere  < 3) {
-        conatmosmod = -1;
-    } else if (atmosphere  < 4) {
-        conatmosmod = 0;
-    } else if (atmosphere  < 5) {
-        conatmosmod = -1;
-    } else if (atmosphere  < 9) {
-        conatmosmod = 0;
-    } else if (atmosphere  < 10) {
-        conatmosmod = -1;
-    } else {
-        conatmosmod = 0;
-    }
-	if (techlevel < 4) {
-        contechmod = 1;
-    } else {
-        contechmod = 0;
-    }
-			setAttrs({conmod:(contechmod+consizemod+conatmosmod)});
-	    });
-    });
-
-	//cashbasevalue
-    on("change:techlevel", function() {
-	    getAttrs(["techlevel", "cashbase"
-				], function(pvalue) {
-			console.log("************ start capacities caclulation ************");
-			var techlevel =  parseInt(pvalue.techlevel);
-			var cashbasevalue =parseInt(pvalue.cashbase) ;
-			if (techlevel < 4) {
-        cashbasevalue = "10";
-    } else if (techlevel < 6) {
-        cashbasevalue = "100";
-    } else if (techlevel < 9) {
-        cashbasevalue = "500";
-    } else if (techlevel < 11) {
-        cashbasevalue = "1000";
-    } else {
-        cashbasevalue = "5000";
-    }
-			setAttrs({cashbase:cashbasevalue});
-	    });
-    });
-
-	//Total credits
-	on("change:repeating_careers:careercredits", function() {
-   getSectionIDs("repeating_careers", function(IDArray) {
-      var fieldNames = [];
-        for (var i=0; i < IDArray.length; i++) {
-         fieldNames.push("repeating_careers_" + IDArray[i] + "_careercredits");
-      }
-
-        var totalcredits = 0;
-        getAttrs(fieldNames, function(values) {
-         for (var i=0; i < IDArray.length; i++) {
-            total += parseInt(values["repeating_careers_" + IDArray[i] + "_careercredits"])||0;
-         }
-         setAttrs({
-            "credits": totalcredits
-         });
-        });
-	   });
-	});
-
+			var soc =  parseInt(pvalue.soc);
+			var gambling =parseInt(pvalue.gambling) ;
+			var cashmodifier = 0
+			if (soc < gambling) {
+		        cashmodifier = gambling;
+		    } else {
+		        cashmodifier = soc ;
+		    }
+					setAttrs({cashmodifier});
+			    });
+		    });
+			
 	//Total shipdms
-	on("change:repeating_careers:careershipdm", function() {
-   getSectionIDs("repeating_careers", function(IDArray) {
-      var fieldNames = [];
-        for (var i=0; i < IDArray.length; i++) {
-         fieldNames.push("repeating_careers_" + IDArray[i] + "_careershipdm");
-      }
+		on("change:repeating_careers:careershipdm", function() {
+	   	getSectionIDs("repeating_careers", function(IDArray) {
+	      var fieldNames = [];
+	        for (var i=0; i < IDArray.length; i++) {
+	         fieldNames.push("repeating_careers_" + IDArray[i] + "_careershipdm");
+	      }
 
-        var totalshipdms = 0;
-        getAttrs(fieldNames, function(values) {
-         for (var i=0; i < IDArray.length; i++) {
-            total += parseInt(values["repeating_careers_" + IDArray[i] + "_careershipdm"])||0;
-         }
-         setAttrs({
-            "shipdms": totalshipdms
-         });
-        });
-   	});
-	});
+	        var totalshipdms = 0;
+	        getAttrs(fieldNames, function(values) {
+	         for (var i=0; i < IDArray.length; i++) {
+	            total += parseInt(values["repeating_careers_" + IDArray[i] + "_careershipdm"])||0;
+	         }
+	         setAttrs({
+	            "shipdms": totalshipdms
+	         });
+	        });
+	   	});
+		});
+
+	//Derived values	
+		//check for unarmed martial arts skill
+			on("change:repeating_strskills:strskillName change:repeating_strskills:strskillValue", function() {
+		   getAttrs(["repeating_strskills_strskillName","repeating_strskills_strskillValue"], function(values) {
+		 
+		        var skill = values.repeating_strskills_strskillName;
+		        skill = skill.toLowerCase();
+		        skill = skill.trim();
+
+		         if (skill === "unarmed martial arts"){
+		              var rank = parseInt(values.repeating_strskills_strskillValue);
+		               setAttrs({unarmed_martial_arts:rank});
+		           }
+		   });
+		});
+
+		//unarmed combat damage
+		    on("change:strength change:unarmed_martial_arts", function() {
+			    getAttrs(["strength","unarmed_martial_arts" ,"unarmed_damage"
+						], function(pvalue) {
+					console.log("************ start unarmed combat calc************");
+					var unarmed_skill =  parseInt(pvalue.unarmed_martial_arts);
+					var strength =  parseInt(pvalue.strength);
+					var udamage =  Math.floor((unarmed_skill * strength)/10);
+					console.log("udamage "+udamage);
+					if(udamage < 1){
+						udamage = 1;
+					}
+					setAttrs({unarmed_damage:udamage});
+			    });
+		    });
+
+		//set location hit capacities load and throw range
+		    on("change:strength change:constitution", function() {
+			    getAttrs(["strength", "constitution", "head_scratch","head_slight","head_serious","head_critical",
+				          "head_scratch","head_slight","head_serious","head_critical",
+						  "load","throw_range"
+						], function(pvalue) {
+					console.log("************ start capacities caclulation ************");
+					var constitution =  parseInt(pvalue.constitution);
+					var strength =  parseInt(pvalue.strength);
+					var head_hc =constitution;
+					var chest_hc=(constitution+strength)*3;
+					var other_hc = (constitution+strength)*2;
+					setAttrs({head_scratch: head_hc,head_slight: head_hc*2,head_serious: head_hc*4,head_critical: head_hc*8});
+					setAttrs({chest_scratch: Math.floor(chest_hc*0.5),chest_slight: chest_hc,chest_serious: chest_hc*2,chest_critical: chest_hc*4});  
+					setAttrs({other_scratch: Math.floor(other_hc*0.5),other_slight: other_hc,other_serious: other_hc*2,other_critical: other_hc*4});			
+					setAttrs({load: chest_hc,throw_range:strength*4});
+			    });
+		    });
+
+		//weight
+		    on("change:strength change:agility change:baseweight", function() {
+			    getAttrs(["strength", "agility", "baseweight","weight"
+						], function(pvalue) {
+					console.log("************ start capacities caclulation ************");
+					var agility =  parseInt(pvalue.agility);
+					var strength =  parseInt(pvalue.strength);
+					var baseweight = parseInt(pvalue.baseweight);
+					var adjusted_weight = baseweight+(strength-agility);
+					setAttrs({weight: "" + adjusted_weight + "kgs"});
+			    });
+		    });
+
+	//Determining final attributes
+		//strength
+		    on("change:strbase change:strmod change:age_str_mod", function() {
+			    getAttrs(["strength", "strmod", "strbase", "age_str_mod"
+						], function(pvalue) {
+					console.log("************ start capacities caclulation ************");
+					var strmod =  parseInt(pvalue.strmod);
+					var strbase =  parseInt(pvalue.strbase);
+					var age_str_mod = parseInt(pvalue.age_str_mod);
+					var adjusted_str = strmod+strbase+age_str_mod;
+					setAttrs({strength:adjusted_str});
+			    });
+		    });
 
 
-	//unarmed combat damage
-    on("change:strength change:unarmed_martial_arts", function() {
-	    getAttrs(["strength","unarmed_martial_arts" ,"unarmed_damage"
-				], function(pvalue) {
-			console.log("************ start unarmed combat calc************");
-			var unarmed_skill =  parseInt(pvalue.unarmed_martial_arts);
-			var strength =  parseInt(pvalue.strength);
-			var udamage =  Math.floor((unarmed_skill * strength)/10);
-			console.log("udamage "+udamage);
-			if(udamage < 1){
-				udamage = 1;
-			}
-			setAttrs({unarmed_damage:udamage});
-	    });
-    });
+		//agility
+		    on("change:aglbase change:aglmod change:age_agl_mod", function() {
+			    getAttrs(["agility", "aglmod", "aglbase", "age_agl_mod"
+						], function(pvalue) {
+					console.log("************ start capacities caclulation ************");
+					var aglmod =  parseInt(pvalue.aglmod);
+					var aglbase =  parseInt(pvalue.aglbase);
+					var age_agl_mod = parseInt(pvalue.age_agl_mod);
+					var adjusted_agl = (aglmod+aglbase+age_agl_mod);
+					setAttrs({agility:adjusted_agl});
+			    });
+			});    
 
-	//set location hit capacities load and throw range
-    on("change:strength change:constitution", function() {
-	    getAttrs(["strength", "constitution", "head_scratch","head_slight","head_serious","head_critical",
-		          "head_scratch","head_slight","head_serious","head_critical",
-				  "load","throw_range"
-				], function(pvalue) {
-			console.log("************ start capacities caclulation ************");
-			var constitution =  parseInt(pvalue.constitution);
-			var strength =  parseInt(pvalue.strength);
-			var head_hc =constitution;
-			var chest_hc=(constitution+strength)*3;
-			var other_hc = (constitution+strength)*2;
-			setAttrs({head_scratch: head_hc,head_slight: head_hc*2,head_serious: head_hc*4,head_critical: head_hc*8});
-			setAttrs({chest_scratch: Math.floor(chest_hc*0.5),chest_slight: chest_hc,chest_serious: chest_hc*2,chest_critical: chest_hc*4});  
-			setAttrs({other_scratch: Math.floor(other_hc*0.5),other_slight: other_hc,other_serious: other_hc*2,other_critical: other_hc*4});			
-			setAttrs({load: chest_hc,throw_range:strength*4});
-	    });
-    });
+		//constitution
+		    on("change:conbase change:conmod change:age_con_mod", function() {
+			    getAttrs(["constitution", "conmod", "conbase", "age_con_mod"
+						], function(pvalue) {
+					console.log("************ start capacities caclulation ************");
+					var conmod =  parseInt(pvalue.conmod);
+					var conbase =  parseInt(pvalue.conbase);
+					var age_con_mod =  parseInt(pvalue.age_con_mod);
+					var adjusted_con = (conmod+conbase+age_con_mod);
+					setAttrs({constitution:adjusted_con});
+			    });
+			});
 
-	//weight
-    on("change:strength change:agility change:baseweight", function() {
-	    getAttrs(["strength", "agility", "baseweight","weight"
-				], function(pvalue) {
-			console.log("************ start capacities caclulation ************");
-			var agility =  parseInt(pvalue.agility);
-			var strength =  parseInt(pvalue.strength);
-			var baseweight = parseInt(pvalue.baseweight);
-			var adjusted_weight = baseweight+(strength-agility);
-			setAttrs({weight: "" + adjusted_weight + "kgs"});
-	    });
-    });
+		//Intelligence
+		    on("change:intbase change:age_int_mod", function() {
+			    getAttrs(["intelligence", "age_int_mod", "intbase"
+						], function(pvalue) {
+					console.log("************ start capacities caclulation ************");
+					var age_int_mod =  parseInt(pvalue.age_int_mod);
+					var intbase =  parseInt(pvalue.intbase);
+					var adjusted_int = (age_int_mod+intbase);
+					setAttrs({intelligence:adjusted_int});
+			    });
+			});    
 
-	//strength
-    on("change:strbase change:strmod change:age_str_mod", function() {
-	    getAttrs(["strength", "strmod", "strbase", "age_str_mod"
-				], function(pvalue) {
-			console.log("************ start capacities caclulation ************");
-			var strmod =  parseInt(pvalue.strmod);
-			var strbase =  parseInt(pvalue.strbase);
-			var age_str_mod = parseInt(pvalue.age_str_mod);
-			var adjusted_str = strmod+strbase+age_str_mod;
-			setAttrs({strength:adjusted_str});
-	    });
-    });
+		//education
+		    on("change:edubase change:edumod", function() {
+			    getAttrs(["education", "edumod", "edubase",
+						], function(pvalue) {
+					console.log("************ start capacities caclulation ************");
+					var edumod =  parseInt(pvalue.edumod);
+					var edubase =  parseInt(pvalue.edubase);
+					var adjusted_edu = (edumod+edubase);
+					setAttrs({education:adjusted_edu});
+			    });
+			});
 
-
-	//agility
-    on("change:aglbase change:aglmod change:age_agl_mod", function() {
-	    getAttrs(["agility", "aglmod", "aglbase", "age_agl_mod"
-				], function(pvalue) {
-			console.log("************ start capacities caclulation ************");
-			var aglmod =  parseInt(pvalue.aglmod);
-			var aglbase =  parseInt(pvalue.aglbase);
-			var age_agl_mod = parseInt(pvalue.age_agl_mod);
-			var adjusted_agl = (aglmod+aglbase+age_agl_mod);
-			setAttrs({agility:adjusted_agl});
-	    });
-	});    
-
-	//constitution
-    on("change:conbase change:conmod change:age_con_mod", function() {
-	    getAttrs(["constitution", "conmod", "conbase", "age_con_mod"
-				], function(pvalue) {
-			console.log("************ start capacities caclulation ************");
-			var conmod =  parseInt(pvalue.conmod);
-			var conbase =  parseInt(pvalue.conbase);
-			var age_con_mod =  parseInt(pvalue.age_con_mod);
-			var adjusted_con = (conmod+conbase+age_con_mod);
-			setAttrs({constitution:adjusted_con});
-	    });
-	});
-
-	//Intelligence
-    on("change:intbase change:age_int_mod", function() {
-	    getAttrs(["intelligence", "age_int_mod", "intbase"
-				], function(pvalue) {
-			console.log("************ start capacities caclulation ************");
-			var age_int_mod =  parseInt(pvalue.age_int_mod);
-			var intbase =  parseInt(pvalue.intbase);
-			var adjusted_int = (age_int_mod+intbase);
-			setAttrs({intelligence:adjusted_int});
-	    });
-	});    
-
-	//education
-    on("change:edubase change:edumod", function() {
-	    getAttrs(["education", "edumod", "edubase",
-				], function(pvalue) {
-			console.log("************ start capacities caclulation ************");
-			var edumod =  parseInt(pvalue.edumod);
-			var edubase =  parseInt(pvalue.edubase);
-			var adjusted_edu = (edumod+edubase);
-			setAttrs({education:adjusted_edu});
-	    });
-	});
-
-	//Charisma
-    on("change:chabase change:chamod", function() {
-	    getAttrs(["charisma", "chamod", "chabase"
-				], function(pvalue) {
-			console.log("************ start capacities caclulation ************");
-			var chamod =  parseInt(pvalue.chamod);
-			var chabase =  parseInt(pvalue.chabase);
-			var adjusted_cha = (chamod+chabase);
-			setAttrs({charisma:adjusted_cha});
-	    });
-	});    
+		//Charisma
+		    on("change:chabase change:chamod", function() {
+			    getAttrs(["charisma", "chamod", "chabase"
+						], function(pvalue) {
+					console.log("************ start capacities caclulation ************");
+					var chamod =  parseInt(pvalue.chamod);
+					var chabase =  parseInt(pvalue.chabase);
+					var adjusted_cha = (chamod+chabase);
+					setAttrs({charisma:adjusted_cha});
+			    });
+			});    
 </script>
 
 <!-- Beging character sheet --->
 <div style="width: 100%"> <!-- Header, replace with image -->
 		<h3 style="margin-bottom: 10px;text-align:center;font-size: 3em">Traveller: The New Era</h3>		
 </div>
+<input type="checkbox" name="attr_switch" class="sheet-block_switch" value="1"><span></span><span></span>
+<br>
+<div class="sheet-block_a"> <!-- PC section -->
+	<div><!-- Set up the Tabs -->
+		<input type="radio" class="sheet-tab sheet-tab1" name="attr_core-tab" value="1" title="Basic Info" checked="checked"/> 
+		<span class="sheet-tab sheet-tab1" style='line-height: 40px;'>BASIC INFO</span>
+		<input type="radio" class="sheet-tab sheet-tab2" name="attr_core-tab" value="2" title="Skills" /> 
+		<span class="sheet-tab sheet-tab2" style='line-height: 40px;'>SKILLS</span>
+		<input type="radio" class="sheet-tab sheet-tab3" name="attr_core-tab" value="3" title="Combat" /> 
+		<span class="sheet-tab sheet-tab3" style='line-height: 40px;'>COMBAT</span>
+		<input type="radio" class="sheet-tab sheet-tab4" name="attr_core-tab" value="4" title="Equipment" /><span class="sheet-tab sheet-tab4" style='line-height: 40px;'>EQUIPMENT</span>
+		<input type="radio" class="sheet-tab sheet-tab5" name="attr_core-tab" value="5" title="Worksheet" /><span class="sheet-tab sheet-tab5" style='line-height: 40px;'>WORKSHEET</span> 
+		<!-- End Tab setup -->
+		<div class="sheet-section-core"><!-- Core Tab -->
+			<div class='sheet-3colrow'><!-- Character details -->
+				<div class='sheet-col sheet-details'><!-- Left column: Name, Age, Initative, UPP -->
+					<table>
+						<tr><td><p>Character</p></td><td><input type="text" name="attr_Name"/></td></tr>
+						<tr><td><p>Player</p></td><td><input type="text" name="attr_Player"/></td></tr>
+						<tr><td><p>Homeworld</p></td><td><input type="text" name="attr_Homeworld"/></td></tr>
+						<tr><td><p>Age</p></td><td><input type="text" name="attr_Age"/></td></tr>
+						<tr><td><p>Initiative</p></td><td><input type="number" name="attr_Initative"/></td></tr>
+						<tr><td><p>Initative XP</p></td><td><input type="number" name="attr_InitativeXp"></td></tr>
+						<tr><td><p>Rank</p></td><td><input type="text" name="attr_Rank"/></td></tr>
+					</table>
+				<br>
+					<p><b>Universal Personality Profile</b></p>
+					<table>
+						<tr><td><input type="number" name="attr_Strength"></td><td><input type="number" name="attr_Agility"></td><td><input type="number" name="attr_Constitution"></td><td><input type="number" name="attr_Intelligence"></td><td><input type="number" name="attr_Education"></td><td><input type="number" name="attr_Charisma"></td><td> - </td><td><input type="number" name="attr_Psionic"></td><td> - </td><td><input type="number" name="attr_SOC"></td></tr>
+						<tr><th><p>STR</p></th><th><p>AGL</p></th><th><p>CON</p></th><th><p>INT</p></th><th><p>EDU</p></th><th><p>CHR</p></th><th> - </th><th><p>PSI</p></th><th> - </th><th><p>SOC</p></th></tr>
+					</table>	
+				</div> <!-- End of left column -->
+				<div class='sheet-col sheet-details'><!-- Middle coulumn, Derived values -->
+					<table>
+						<tr><td><p>Weight</p></td><td><input style="text-align: center" type="text" name="attr_Weight"/></td></tr>
+						<tr><td><p>Throw Range</p></td><td><input style="text-align: center" type="text" name="attr_Throw_Range"/></td></tr>	
+						<tr><td><p>Load</p></td><td><input style="text-align: center" type="text" name="attr_Load"/></td></tr>		
+						<tr><td><p>Unarmed Combat Damage</p></td><td><input type="text" style="text-align: center" name="attr_unarmed_damage"/></td></tr>
+					</table>
+				</div>	<!-- End of middle column -->
+				<div class='sheet-col sheet-details'><!-- Right column, Homeworld detalis -->
+	    			<h4>Homeworld data</h4>
+	 				<table>
+						<tr><td><p>Starport</p></td><td><input style="text-align: center; width: 46px" type="text" name="attr_Starport"/></td></tr>
+						<tr><td><p>Size</p></td><td><input style="text-align: center" type="number" name="attr_Planetsize"/></td></tr>
+						<tr><td><p>Atmosphere</p></td><td><input style="text-align: center" type="number" name="attr_Atmosphere"/></td></tr>
+						<tr><td><p>Hydrosphere</p></td><td><input style="text-align: center" type="number" name="attr_Hydrosphere"/></td></tr>
+						<tr><td><p>Population</p></td><td><input style="text-align: center" type="number" name="attr_Population"/></td></tr>
+						<tr><td><p>Government</p></td><td><input style="text-align: center" type="number" name="attr_govlevel"/></td></tr>
+						<tr><td><p>Law Level</p></td><td><input style="text-align: center" type="number" name="attr_Lawlevel"/></td></tr>
+						<tr><td><p>Tech Level</p></td><td><input style="text-align: center" type="number" name="attr_TechLevel"/></td></tr>
+					</table>
+				</div> <!-- End of right column -->
+			</div><!-- End of character details -->	
+			<div class='sheet-2colrow'><!-- Contacts -->
+				<div  class='sheet-col'> <!-- left column, generic contacts -->
+					<h3>Generic Contacts</h3>
+					<fieldset class="repeating_contacts">
+						<select style="display:inline-block;margin-bottom:0px" name="attr_GenericContactType">	
+							<option value="Academic">Academic</option>
+							<option value="Off-world Academic">Off-world Academic</option>
+							<option value="Business">Business</option>
+							<option value="Off-world Business">Off-world Business</option>
+							<option value="Criminal">Criminal</option>
+							<option value="Off-world Criminal">Off-world Criminal</option>
+							<option value="Entertainment">Entertainment</option>
+							<option value="Off-world Entertainment">Off-world Entertainment</option>
+							<option value="Government">Governement</option>
+							<option value="Off-world Governement">Off-world Government</option>
+							<option value="Intelligence Community">Intelligence Community</option>
+							<option value="Off-world Intelligence Community">Off-world Intelligence Community</option>
+							<option value="Journalist">Journalist</option>
+							<option value="Off-world Journalist">Off-world Journalist</option>
+							<option value="Law Enforcement">Law Enforcement</option>
+							<option value="Off-world Law Enforcement">Off-world Law Enforcement</option>
+							<option value="Medical">Medical</option>
+							<option value="Off-world Medical">Off-world Medical</option>
+							<option value="Military">Military</option>
+							<option value="Off-world Military">Off-world Military</option>
+							<option value="Specialist">Specialist</option>
+							<option value="Off-world Specialist">Off-world Specialist</option>
+							<option value="Trader">Trader</option>	
+							<option value="Off-world Trader">Off-world Trader</option>
+							<option value="Wealthy">Wealthy</option>
+							<option value="Off-world Wealthy">Off-world Wealtht</option>
+						</select>
+						<input type="number" value="0" name="attr_GenericContactValue">		
+					</fieldset>
+				</div> <!-- End of left column -->
+				<div  class='sheet-col'> <!-- Right column, solid contacts -->
+					<h3>Solid Contacts</h3>
+						<textarea style="width: 90%" rows="20" name="attr_SolidContacts" ></textarea>
+				</div> <!-- End of right column -->
+			</div> <!-- End of contacts section -->	
+		</div><!-- End of core tab -->
 
-<div><!-- Set up the Tabs -->
-	
-	<input type="radio" class="sheet-tab sheet-tab1" name="attr_core-tab" value="1" title="Basic Info" checked="checked"/> 
-	<span class="sheet-tab sheet-tab1" style='line-height: 40px;'>BASIC INFO</span>
-	<input type="radio" class="sheet-tab sheet-tab2" name="attr_core-tab" value="2" title="Skills" /> 
-	<span class="sheet-tab sheet-tab2" style='line-height: 40px;'>SKILLS</span>
-	<input type="radio" class="sheet-tab sheet-tab3" name="attr_core-tab" value="3" title="Combat" /> 
-	<span class="sheet-tab sheet-tab3" style='line-height: 40px;'>COMBAT</span>
-	<input type="radio" class="sheet-tab sheet-tab4" name="attr_core-tab" value="4" title="Equipment" /><span class="sheet-tab sheet-tab4" style='line-height: 40px;'>EQUIPMENT</span>
-	<input type="radio" class="sheet-tab sheet-tab5" name="attr_core-tab" value="5" title="Worksheet" /><span class="sheet-tab sheet-tab5" style='line-height: 40px;'>WORKSHEET</span>
-	 
-	<!-- End Tab setup -->
-	<div class="sheet-section-core"><!-- Core Tab -->
-		<div class='sheet-3colrow'><!-- Character details -->
-			<div class='sheet-col sheet-details'><!-- Left column: Name, Age, Initative, UPP -->
-				<table>
-					<tr><td><p>Character</p></td><td><input type="text" name="attr_Name"/></td></tr>
-					<tr><td><p>Player</p></td><td><input type="text" name="attr_Player"/></td></tr>
-					<tr><td><p>Homeworld</p></td><td><input type="text" name="attr_Homeworld"/></td></tr>
-					<tr><td><p>Age</p></td><td><input type="text" name="attr_Age"/></td></tr>
-					<tr><td><p>Initiative</p></td><td><input type="number" name="attr_Initative"/></td></tr>
-					<tr><td><p>Initative XP</p></td><td><input type="number" name="attr_InitativeXp"></td></tr>
-					<tr><td><p>Rank</p></td><td><input type="text" name="attr_Rank"/></td></tr>
-				</table>
-			<br>
-				<p><b>Universal Personality Profile</b></p>
-				<table>
-					<tr><td><input type="number" name="attr_Strength"></td><td><input type="number" name="attr_Agility"></td><td><input type="number" name="attr_Constitution"></td><td><input type="number" name="attr_Intelligence"></td><td><input type="number" name="attr_Education"></td><td><input type="number" name="attr_Charisma"></td><td> - </td><td><input type="number" name="attr_Psionic"></td><td> - </td><td><input type="number" name="attr_SOC"></td></tr>
-					<tr><th><p>STR</p></th><th><p>AGL</p></th><th><p>CON</p></th><th><p>INT</p></th><th><p>EDU</p></th><th><p>CHR</p></th><th> - </th><th><p>PSI</p></th><th> - </th><th><p>SOC</p></th></tr>
-				</table>	
-			</div> <!-- End of left column -->
-			<div class='sheet-col sheet-details'><!-- Middle coulumn, Derived values -->
-				<table>
-					<tr><td><p>Weight</p></td><td><input style="text-align: center" type="text" name="attr_Weight"/></td></tr>
-					<tr><td><p>Throw Range</p></td><td><input style="text-align: center" type="text" name="attr_Throw_Range"/></td></tr>	
-					<tr><td><p>Load</p></td><td><input style="text-align: center" type="text" name="attr_Load"/></td></tr>		
-					<tr><td><p>Unarmed Combat Damage</p></td><td><input type="text" style="text-align: center" name="attr_unarmed_damage"/></td></tr>
-				</table>
-			</div>	<!-- End of middle column -->
-			<div class='sheet-col sheet-details'><!-- Right column, Homeworld detalis -->
-    			<h4>Homeworld data</h4>
- 				<table>
-					<tr><td><p>Starport</p></td><td><input style="text-align: center; width: 46px" type="text" name="attr_Starport"/></td></tr>
-					<tr><td><p>Size</p></td><td><input style="text-align: center" type="number" name="attr_Planetsize"/></td></tr>
-					<tr><td><p>Atmosphere</p></td><td><input style="text-align: center" type="number" name="attr_Atmosphere"/></td></tr>
-					<tr><td><p>Hydrosphere</p></td><td><input style="text-align: center" type="number" name="attr_Hydrosphere"/></td></tr>
-					<tr><td><p>Population</p></td><td><input style="text-align: center" type="number" name="attr_Population"/></td></tr>
-					<tr><td><p>Government</p></td><td><input style="text-align: center" type="number" name="attr_govlevel"/></td></tr>
-					<tr><td><p>Law Level</p></td><td><input style="text-align: center" type="number" name="attr_Lawlevel"/></td></tr>
-					<tr><td><p>Tech Level</p></td><td><input style="text-align: center" type="number" name="attr_TechLevel"/></td></tr>
-				</table>
-			</div> <!-- End of right column -->
-		</div><!-- End of character details -->	
-		<div class='sheet-2colrow'><!-- Contacts -->
-			<div  class='sheet-col'> <!-- left column, generic contacts -->
-				<h3>Generic Contacts</h3>
-				<fieldset class="repeating_contacts">
-					<select style="display:inline-block;margin-bottom:0px" name="attr_GenericContactType">	
-						<option value="Academic">Academic</option>
-						<option value="Off-world Academic">Off-world Academic</option>
-						<option value="Business">Business</option>
-						<option value="Off-world Business">Off-world Business</option>
-						<option value="Criminal">Criminal</option>
-						<option value="Off-world Criminal">Off-world Criminal</option>
-						<option value="Entertainment">Entertainment</option>
-						<option value="Off-world Entertainment">Off-world Entertainment</option>
-						<option value="Government">Governement</option>
-						<option value="Off-world Governement">Off-world Government</option>
-						<option value="Intelligence Community">Intelligence Community</option>
-						<option value="Off-world Intelligence Community">Off-world Intelligence Community</option>
-						<option value="Journalist">Journalist</option>
-						<option value="Off-world Journalist">Off-world Journalist</option>
-						<option value="Law Enforcement">Law Enforcement</option>
-						<option value="Off-world Law Enforcement">Off-world Law Enforcement</option>
-						<option value="Medical">Medical</option>
-						<option value="Off-world Medical">Off-world Medical</option>
-						<option value="Military">Military</option>
-						<option value="Off-world Military">Off-world Military</option>
-						<option value="Specialist">Specialist</option>
-						<option value="Off-world Specialist">Off-world Specialist</option>
-						<option value="Trader">Trader</option>	
-						<option value="Off-world Trader">Off-world Trader</option>
-						<option value="Wealthy">Wealthy</option>
-						<option value="Off-world Wealthy">Off-world Wealtht</option>
-					</select>
-					<input type="number" value="0" name="attr_GenericContactValue">		
-				</fieldset>
-			</div> <!-- End of left column -->
-			<div  class='sheet-col'> <!-- Right column, solid contacts -->
-				<h3>Solid Contacts</h3>
-					<textarea style="width: 90%" rows="20" name="attr_SolidContacts" ></textarea>
-			</div> <!-- End of right column -->
-		</div> <!-- End of contacts section -->	
-	</div><!-- End of core tab -->
-
-	<div class="sheet-section-skills"><!-- Skills and attributes tab -->
-		<h2 style="text-align: center">Skills and Attributes</h2>
-		<div class='sheet-2colrow'> <!-- 2 column setup -->
-			<div class='sheet-col'> <!-- Left column, strength, agility and constitution -->
-				<div class="Strength Skills" style="width: 100%"> <!-- Strength skill section headers -->
-           			<span class="span-header center" style="padding: 0px; width: 184px"><b>Strength</b></span>
-        			<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Strength"></span>
-           			<span class="span-header center" style="padding: 0px; width: 30px text-align: right">XP</span>
-          		 	<span class="span-header center" style="padding: 0px; width: 30px">
-           			<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Strength}}}  {{os=[[@{Strength}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Strength}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Strength}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=Strength}}" />
-					</span>
-				</div> <!--End of strength skill section headers -->
-				<br>
-				<fieldset class="repeating_strSkills"> <!-- Repating strength skills -->
-					<select style="display:inline-block;margin-bottom:0px" name="attr_strskillName">
-						<option value="Archery">Archery</option>
-						<option value="Archaic Artillery">Archaic Artillery</option>
-						<option value="Armed Martial Arts (Large Blade)">Armed Martial Arts (Large Blade)</option>
-						<option value="Armed Martial Arts (Small Blade)">Armed Martial Arts (Small Blade)</option>
-						<option value="Armed Martial Arts (Polearm)">Armed Martial Arts (Polearm)</option>
-						<option value="Armed Martial Arts (Large Blade)">Armed Martial Arts (Club)</option>
-						<option value="Autogun">Autogun</option>
-						<option value="Early Firearms">Early Firearms</option>
-						<option value="Energy Weapon (Pistol)">Energy Weapon (Pistol)</option>
-						<option value="Energy Weapon (Rifle)">Energy Weapon (Rifle)</option>
-						<option value="Grenade Launcher">Grenade Launcher</option>
-						<option value="Heavy Artillery">Heavy Artillery</option>
-						<option value="Heavy Gun">Heavy Gun</option>
-						<option value="Mason">Mason</option>
-						<option value="Mechanic">Mechanic</option>
-						<option value="Slug Weapon">Slug Weapon</option>
-						<option value="Thrown Weapon">Thrown Weapon</option>
-						<option value="Unarmed Martial Arts">Unarmed Martial Arts</option>
-					</select>
-					<input type="number" value="0" name="attr_strskillValue"><input type="number" name="attr_strskillXp">
-					<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{strskillValue}}}  {{os=[[((@{strskillValue}+@{Strength})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{strskillValue}+@{Strength})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{strskillValue}+@{Strength})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{strskillName}}}" />
-				</fieldset>	
-				<br>
-				
-				<div class="Agility Skills" style="width: 100%"><!-- Agility skills section headers -->
-           		<span class="span-header center" style="padding: 0px; width: 184px"><b>Agility</b></span>
-        		<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Agility"></span>
-           		<span class="span-header center" style="padding: 0px; width: 30px text-align: right">XP</span>
-           		<span class="span-header center" style="padding: 0px; width: 30px">
-           		<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Agility}}}  {{os=[[@{Agility}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Agility}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Agility}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=Agility}}" />
-				</span>
-				</div> <!-- End of agility skill section headers -->
-				<br>
-				<fieldset class="repeating_aglSkills"> <!-- Repeating agility skills -->
-				<select style="display:inline-block;margin-bottom:0px" name="attr_aglskillName">
-					<option value="Acrobatics">Acrobatics</option>
-					<option value="Dance">Dance</option>
-					<option value="Energy Artillery">Energy Artillery</option>
-					<option value="Energy Weapon">Energy Weapon</option>
-					<option value="Forgery">Forgery</option>
-					<option value="Energy Weapon (Pistol)">Energy Weapon (Pistol)</option>
-					<option value="Energy Weapon (Rifle)">Energy Weapon (Rifle)</option>
-					<option value="Grav Belt">Grav Belt</option>
-					<option value="Ground Vehicle (Wheeled Vehicle)">Ground Vehicle (Wheeled Vehicle)</option>
-					<option value="Ground Vehicle (Tracked)">Ground Vehicle (Tracked)</option>
-					<option value="Hovercraft">Hovercraft</option>
-					<option value="Intrusion">Intrusion</option>
-					<option value="Jeweler">Jeweler</option>
-					<option value="Machinist">Machinist</option>
-					<option value="Muscle Transport (Skates)">Muscle Transport (Skates)</option>
-					<option value="Muscle Transport (Skates)">Muscle Transport (Skis)</option>
-					<option value="Muscle Transport (Skates)">Muscle Transport (Wheels)</option>
-					<option value="Music (Composistion)">Music (Composition)</option>
-					<option value="Music (Strings)">Music (Strings)</option>
-					<option value="Music (Wind)">Music (Wind)</option>
-					<option value="Music (Percussion)">Music (Percussion)</option>
-					<option value="Music (Keyboard)">Music (Keyboard)</option>
-					<option value="Music (Other)">Music (Other)</option>
-					<option value="Pickpocket">Pickpocket</option>
-					<option value="Pilot (Airship)">Pilot (Airship)</option>
-					<option value="Pilot (Fixed-Wing)">Pilot (Fixed Wing)</option>
-					<option value="Pilot (Rotary-Wing)">Pilot (Rotary Wing)</option>
-					<option value="Pilot (Glider)">Pilot (Glider)</option>
-					<option value="Pilot (Interface/Grav)">Pilot (Interface/Grav)</option>
-					<option value="Stealth">Stealth</option>
-					<option value="Tac Missile">Tac Missile</option>
-				</select>
-				<input type="number" value="0" name="attr_aglskillValue"><input type="number" name="attr_aglskillXP">
-				<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{aglskillValue}}}  {{os=[[((@{aglskillValue}+@{Agility})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{aglskillValue}+@{Agility})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{aglskillValue}+@{Agility})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{aglskillName}}}" />
-				</fieldset>	
-				<br>
-				<div class="Constitution Skills" style="width: 100%"> <!-- Constitution skilss section headers -->
-           			<span class="span-header center" style="padding: 0px; width: 184px"><b>Constitution</b></span>
-        			<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Constitution"></span>
-           			<span class="span-header center" style="padding: 0px; width: 30px text-align: right">XP</span>
-           			<span class="span-header center" style="padding: 0px; width: 30px">
-           			<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Constitution}}}  {{os=[[@{Constitution}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Constitution}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Constitution}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=Constitution}}" />
-					</span>
-				</div> <!-- End of consitution skill section headers -->
-				<fieldset class="repeating_conSkills"> <!-- Repeating constitution skills -->
-			 	   	<select style="display:inline-block;margin-bottom:0px" name="attr_conskillName">
-						<option value="Carpenter">Carpenter</option>
-						<option value="Climbing">Climbing</option>
-						<option value="Combat Engineer">Combat Engineer</option>
-						<option value="Environment Suit">Environment Suit</option>
-						<option value="Guard/Hunting Beasts">Guard/Hunting Beasts</option>
-						<option value="High-G Environment">High-G Environment</option>
-						<option value="Large Watercraft">Large Watercraft</option>
-						<option value="Parachute">Parachute</option>
-						<option value="Riding">Riding</option>
-						<option value="Small Watercraft">Small Watercraft</option>
-						<option value="Swimming">Swimming</option>
-						<option value="Zero-G Environment">Zero-G Environment</option>
-					</select>
-					<input type="number" value="0" name="attr_conskillValue"><input type="number" name="attr_conskillXP">
-					<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{conskillValue}}}  {{os=[[((@{conskillValue}+@{Constitution})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{conskillValue}+@{Constitution})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{conskillValue}+@{Constitution})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{conskillName}}}" />
-				</fieldset>
-			</div> <!-- End of left column -->
-			<div style="margin-right:15px" class='sheet-col'> <!-- Right coulmn, intelligence, education, charisma and Psionics -->
-				<div class="Intelligence Skills" style="width: 100%"> <!-- Intelligence skills section headers -->
-            		<span class="span-header center" style="padding: 0px; width: 184px"><b>Intelligence</b></span>
-        			<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Intelligence"></span>
-           			<span class="span-header center" style="padding: 0px; width: 30px text-align: right">XP</span>
-           			<span class="span-header center" style="padding: 0px; width: 30px">
-           			<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Intelligence}}}  {{os=[[@{Intelligence}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Intelligence}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Intelligence}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=Intelligence}}" />
-					</span>
-				</div> <!-- End of intelligence skills section headers -->
-				<br>
-				<fieldset class="repeating_intSkills"> <!-- Repating intelligence skills -->
-			    	<select style="display:inline-block;margin-bottom:0px" name="attr_intskillName">
-						<option value="Farming">Farming</option>
-						<option value="Fleet Tactics">Fleet Tactics</option>
-						<option value="Forward Observer">Forward Observer</option>
-						<option value="Gambling">Gambling</option>
-						<option value="Ground Tactics">Ground Tactics</option>
-						<option value="Interview">Interview</option>
-						<option value="Investigation">Investigation</option>
-						<option value="Navigation">Navigation</option>
-						<option value="Observation">Observation</option>
-						<option value="Painting">Psychology</option>
-						<option value="Research">Research</option>
-						<option value="Sculpture">Sculpture</option>
-						<option value="Sensors">Sensors</option>
-						<option value="Ship Tactics">Ship Tactics</option>
-						<option value="Streetwise">Streetwise</option>
-						<option value="Survey">Survey</option>
-						<option value="Survival">Survival</option>
-						<option value="Tracking">Tracking</option>
-						<option value="Willpower">Willpower</option>
-					</select>
-					<input type="number" value="0" name="attr_intskillValue"><input type="number" name="attr_intskillXP">
-					<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{intskillValue}}}  {{os=[[((@{intskillValue}+@{Intelligence})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{intskillValue}+@{Intelligence})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{intskillValue}+@{Intelligence})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{intskillName}}}" />
-				</fieldset>
-				<div class="Education Skills" style="width: 100%"> <!-- Education skills headers -->
-	            	<span class="span-header center" style="padding: 0px; width: 184px"><b>Education</b></span>
-	        		<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Education"></span>
+		<div class="sheet-section-skills"><!-- Skills and attributes tab -->
+			<h2 style="text-align: center">Skills and Attributes</h2>
+			<div class='sheet-2colrow'> <!-- 2 column setup -->
+				<div class='sheet-col'> <!-- Left column, strength, agility and constitution -->
+					<div class="Strength Skills" style="width: 100%"> <!-- Strength skill section headers -->
+	           			<span class="span-header center" style="padding: 0px; width: 184px"><b>Strength</b></span>
+	        			<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Strength"></span>
+	           			<span class="span-header center" style="padding: 0px; width: 30px text-align: right">XP</span>
+	          		 	<span class="span-header center" style="padding: 0px; width: 30px">
+	           			<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Strength}}}  {{os=[[@{Strength}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Strength}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Strength}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=Strength}}" />
+						</span>
+					</div> <!--End of strength skill section headers -->
+					<br>
+					<fieldset class="repeating_strSkills"> <!-- Repating strength skills -->
+						<select style="display:inline-block;margin-bottom:0px" name="attr_strskillName">
+							<option value="Archery">Archery</option>
+							<option value="Archaic Artillery">Archaic Artillery</option>
+							<option value="Armed Martial Arts (Large Blade)">Armed Martial Arts (Large Blade)</option>
+							<option value="Armed Martial Arts (Small Blade)">Armed Martial Arts (Small Blade)</option>
+							<option value="Armed Martial Arts (Polearm)">Armed Martial Arts (Polearm)</option>
+							<option value="Armed Martial Arts (Large Blade)">Armed Martial Arts (Club)</option>
+							<option value="Autogun">Autogun</option>
+							<option value="Early Firearms">Early Firearms</option>
+							<option value="Energy Weapon (Pistol)">Energy Weapon (Pistol)</option>
+							<option value="Energy Weapon (Rifle)">Energy Weapon (Rifle)</option>
+							<option value="Grenade Launcher">Grenade Launcher</option>
+							<option value="Heavy Artillery">Heavy Artillery</option>
+							<option value="Heavy Gun">Heavy Gun</option>
+							<option value="Mason">Mason</option>
+							<option value="Mechanic">Mechanic</option>
+							<option value="Slug Weapon">Slug Weapon</option>
+							<option value="Thrown Weapon">Thrown Weapon</option>
+							<option value="Unarmed Martial Arts">Unarmed Martial Arts</option>
+						</select>
+						<input type="number" value="0" name="attr_strskillValue"><input type="number" name="attr_strskillXp">
+						<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{strskillValue}}}  {{os=[[((@{strskillValue}+@{Strength})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{strskillValue}+@{Strength})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{strskillValue}+@{Strength})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{strskillName}}}" />
+					</fieldset>	
+					<br>
+					
+					<div class="Agility Skills" style="width: 100%"><!-- Agility skills section headers -->
+	           		<span class="span-header center" style="padding: 0px; width: 184px"><b>Agility</b></span>
+	        		<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Agility"></span>
 	           		<span class="span-header center" style="padding: 0px; width: 30px text-align: right">XP</span>
 	           		<span class="span-header center" style="padding: 0px; width: 30px">
-	           		<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Education}}}  {{os=[[@{Education}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Education}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Education}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=Education}}" />
+	           		<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Agility}}}  {{os=[[@{Agility}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Agility}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Agility}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=Agility}}" />
 					</span>
-				</div> <!-- End of education skills headers -->
-				<br>
-				<fieldset class="repeating_eduSkills"> <!-- Repeating edu skills -->
-				    <select style="display:inline-block;margin-bottom:0px" name="attr_eduskillName">
-						<option value="Admin/Legal">Admin/Legal</option>
-						<option value="Astrogation">Astrogation</option>
-						<option value="Biology">Biology</option>
-						<option value="Chemistry">Chemistry</option>
-						<option value="Communications">Communications</option>
-						<option value="Computer">Computer</option>
-						<option value="Construction">Construction</option>
-						<option value="Electronics">Electronics</option>
-						<option value="Excavation">Excavation</option>
-						<option value="Geology">Geology</option>
-						<option value="Gravitics">Gravitics</option>
-						<option value="Gunnery (Energy Weapon)">Gunnery (Energy Weapon)</option>
-						<option value="Gunnery (Grav Weapon)">Gunnery (Grav Weapon)</option>
-						<option value="Gunnery (Missiles)">Gunnery (Missiles)</option>
-						<option value="History">History</option>
-						<option value="Map">Map</option>
-						<option value="Marketing">Marketing</option>
-						<option value="Medical (Diagnosis)">Medical (Diagnosis)</option>
-						<option value="Medical (Trauma Aid)">Medical (Trauma Aid)</option>
-						<option value="Medical (Surgery)">Medical (Surgery)</option>
-						<option value="Metallurgy">Metallurgy</option>
-						<option value="Meteorology">Meteorology</option>
-						<option value="Physics">Physics</option>
-						<option value="Robotics">Robotics</option>
-						<option value="Screens (Nuclear Dampers)">Screens (Nuclear Dampers)</option>
-						<option value="Screens (Meson Screens)">Screens (Meson Screens)</option>
-						<option value="Screens (Sandcaster)">Screens (Sandcaster)</option>
-						<option value="Screens (Black Globe)">Screens (Black Globe)</option>
-						<option value="Ship's Engineering">Ship's Engineering</option>
-						<option value="Starship Architecture">Starship Architecture</option>
-						<option value="Xeno Biology">Xeno Biology</option>
+					</div> <!-- End of agility skill section headers -->
+					<br>
+					<fieldset class="repeating_aglSkills"> <!-- Repeating agility skills -->
+					<select style="display:inline-block;margin-bottom:0px" name="attr_aglskillName">
+						<option value="Acrobatics">Acrobatics</option>
+						<option value="Dance">Dance</option>
+						<option value="Energy Artillery">Energy Artillery</option>
+						<option value="Energy Weapon">Energy Weapon</option>
+						<option value="Forgery">Forgery</option>
+						<option value="Energy Weapon (Pistol)">Energy Weapon (Pistol)</option>
+						<option value="Energy Weapon (Rifle)">Energy Weapon (Rifle)</option>
+						<option value="Grav Belt">Grav Belt</option>
+						<option value="Ground Vehicle (Wheeled Vehicle)">Ground Vehicle (Wheeled Vehicle)</option>
+						<option value="Ground Vehicle (Tracked)">Ground Vehicle (Tracked)</option>
+						<option value="Hovercraft">Hovercraft</option>
+						<option value="Intrusion">Intrusion</option>
+						<option value="Jeweler">Jeweler</option>
+						<option value="Machinist">Machinist</option>
+						<option value="Muscle Transport (Skates)">Muscle Transport (Skates)</option>
+						<option value="Muscle Transport (Skates)">Muscle Transport (Skis)</option>
+						<option value="Muscle Transport (Skates)">Muscle Transport (Wheels)</option>
+						<option value="Music (Composistion)">Music (Composition)</option>
+						<option value="Music (Strings)">Music (Strings)</option>
+						<option value="Music (Wind)">Music (Wind)</option>
+						<option value="Music (Percussion)">Music (Percussion)</option>
+						<option value="Music (Keyboard)">Music (Keyboard)</option>
+						<option value="Music (Other)">Music (Other)</option>
+						<option value="Pickpocket">Pickpocket</option>
+						<option value="Pilot (Airship)">Pilot (Airship)</option>
+						<option value="Pilot (Fixed-Wing)">Pilot (Fixed Wing)</option>
+						<option value="Pilot (Rotary-Wing)">Pilot (Rotary Wing)</option>
+						<option value="Pilot (Glider)">Pilot (Glider)</option>
+						<option value="Pilot (Interface/Grav)">Pilot (Interface/Grav)</option>
+						<option value="Stealth">Stealth</option>
+						<option value="Tac Missile">Tac Missile</option>
 					</select>
-					<input type="number" value="0" name="attr_eduskillValue"><input type="number" name="attr_eduskillXP">
-					<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{eduskillValue}}}  {{os=[[((@{eduskillValue}+@{Education})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{eduskillValue}+@{Education})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{eduskillValue}+@{Education})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{eduskillName}}}" />
-				</fieldset>
-				<br>
-				<div class="Charisma Skills" style="width: 100%"> <!-- Charisma skills headers -->
-            		<span class="span-header center" style="padding: 0px; width: 184px"><b>Charisma</b></span>
-        			<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Charisma"></span>
-         	  		<span class="span-header center" style="padding: 0px; width: 30px text-align: right">XP</span>
-         	  		<span class="span-header center" style="padding: 0px; width: 30px">
-           			<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Charisma}}}  {{os=[[@{Charisma}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Charisma}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Charisma}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=Charisma}}" />
-					</span>
-				</div> <!-- End of charisma skills headers -->
-				<br>
-				<fieldset class="repeating_chaSkills"> <!-- Repeating Charisma skills -->
-				    <select style="display:inline-block;margin-bottom:0px" name="attr_chaskillName">
-						<option value="Act/Bluff">Act/Bluff</option>
-						<option value="Bargain">Bargain</option>
-						<option value="Bribery">Bribery</option>
-						<option value="Carousing">Carousing</option>
-						<option value="Disguise">Disguise</option>
-						<option value="Instruction">Instruction</option>
-						<option value="Interrogation">Interrogation</option>
-						<option value="Language">Language</option>
-						<option value="Leadership">Leadership</option>
-						<option value="Liaison">Liaison</option>
-						<option value="Persuasion">Persuaison</option>
-						<option value="Recruiting">Recruiting</option>
-						<option value="Service">Service</option>
-						<option value="Song">Song</option>		
-					</select><input type="number" value="0" name="attr_chaskillValue"><input type="number" name="attr_chaskillXP">
-					<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{chaskillValue}}}  {{os=[[((@{chaskillValue}+@{Charisma})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{chaskillValue}+@{Charisma})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{chaskillValue}+@{Charisma})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{chaskillName}}}" />
-				</fieldset>
-				<div class="Psionic Skills" style="width: 100%"> <!-- Psionics headers -->
-          			<span class="span-header center" style="padding: 0px; width: 184px"><b>Psionic</b></span>
-        			<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Psionic"></span>
-         		  	<span class="span-header center" style="padding: 0px; width: 30px text-align: right">XP</span>
-        		   	<span class="span-header center" style="padding: 0px; width: 30px">
-          		 	<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Psionic}}}  {{os=[[@{Psionic}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Psionic}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Psionic}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} 	{{roll=[[1d20]]}} {{skillname=Psionic}}" />
-					</span>
-				</div> <!-- End of psionics headers -->
-				<fieldset class="repeating_psiSkills"> <!-- Repeating psionics skills -->
-			    	<select style="display:inline-block;margin-bottom:0px" name="attr_psiskillName">
-						<option value="Telepathy (Telempathy)">Telepathy (Telempathy)</option>
-						<option value="Telepathy (Project Emotion)">Telepathy (Project Emotion)</option>
-						<option value="Telepathy (Project Thought)">Telepathy (Project Thought)</option>
-						<option value="Telepathy (Willpower Drain)">Telepathy (Willpower Drain)</option>
-						<option value="Telepathy (Life Detection)">Telepathy (Life Detection)</option>
-						<option value="Telepathy (Shield)">Telepathy (Shield)</option>
-						<option value="Telepathy (Probe)">Telepathy (Probe)</option>
-						<option value="Telepathy (Assault)">Telepathy (Assault)</option>
-						<option value="Teleperception (Sense)">Teleperception (Sense)</option>
-						<option value="Teleperception (Clairvoyance)">Teleperception (Clairvoyance)</option>
-						<option value="Teleperception (Clairaudiene)">Teleperception (Clairaudiene)</option>
-						<option value="Telephysics (Cryokinesis)">Telephysics (Cryokinesis)</option>
-						<option value="Telephysics (Pyrokinesis)">Telephysics (Pyrokinesis)</option>
-						<option value="Telephysics (Telekinesis)">Telephysics (Telekinesis)</option>
-						<option value="Teleportation">Teleportation</option>
-						<option value="Self (Suspended Animation)">Self (Suspended Animation)</option>		
-						<option value="Self (Orientation)">Self (Orientation)</option>		
-						<option value="Self (Psionically Enhanced Strength)">Self (Psionically Enhanced Strength)</option>		
-						<option value="Self (Psionically Enhanced Constitution">Self (Psionically Enhanced Constitution</option>		
-						<option value="Self (Regeneration)">Self (Regeneration)</option>		
-						<option value="Computer Empathy">Computer Empathy</option>
-						<option value="Psionic Healing">Psionic Healing</option>
-						<option value="Prescience">Prescience</option>		
-					</select><input type="number" value="0" name="attr_psiskillValue"><input type="number" name="attr_psiskillXP">
-					<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{psiskillValue}}}  {{os=[[((@{psiskillValue}+@{Psionic})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{psiskillValue}+@{Psionic})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{psiskillValue}+@{Psionic})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{psiskillName}}}" />
-				</fieldset>		
-			</div> <!-- End of right column -->
-		</div> <!-- End of 2 column section -->
-	</div> <!-- End of skills and attributes tab -->
+					<input type="number" value="0" name="attr_aglskillValue"><input type="number" name="attr_aglskillXP">
+					<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{aglskillValue}}}  {{os=[[((@{aglskillValue}+@{Agility})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{aglskillValue}+@{Agility})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{aglskillValue}+@{Agility})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{aglskillName}}}" />
+					</fieldset>	
+					<br>
+					<div class="Constitution Skills" style="width: 100%"> <!-- Constitution skilss section headers -->
+	           			<span class="span-header center" style="padding: 0px; width: 184px"><b>Constitution</b></span>
+	        			<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Constitution"></span>
+	           			<span class="span-header center" style="padding: 0px; width: 30px text-align: right">XP</span>
+	           			<span class="span-header center" style="padding: 0px; width: 30px">
+	           			<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Constitution}}}  {{os=[[@{Constitution}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Constitution}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Constitution}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=Constitution}}" />
+						</span>
+					</div> <!-- End of consitution skill section headers -->
+					<fieldset class="repeating_conSkills"> <!-- Repeating constitution skills -->
+				 	   	<select style="display:inline-block;margin-bottom:0px" name="attr_conskillName">
+							<option value="Carpenter">Carpenter</option>
+							<option value="Climbing">Climbing</option>
+							<option value="Combat Engineer">Combat Engineer</option>
+							<option value="Environment Suit">Environment Suit</option>
+							<option value="Guard/Hunting Beasts">Guard/Hunting Beasts</option>
+							<option value="High-G Environment">High-G Environment</option>
+							<option value="Large Watercraft">Large Watercraft</option>
+							<option value="Parachute">Parachute</option>
+							<option value="Riding">Riding</option>
+							<option value="Small Watercraft">Small Watercraft</option>
+							<option value="Swimming">Swimming</option>
+							<option value="Zero-G Environment">Zero-G Environment</option>
+						</select>
+						<input type="number" value="0" name="attr_conskillValue"><input type="number" name="attr_conskillXP">
+						<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{conskillValue}}}  {{os=[[((@{conskillValue}+@{Constitution})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{conskillValue}+@{Constitution})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{conskillValue}+@{Constitution})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{conskillName}}}" />
+					</fieldset>
+				</div> <!-- End of left column -->
+				<div style="margin-right:15px" class='sheet-col'> <!-- Right coulmn, intelligence, education, charisma and Psionics -->
+					<div class="Intelligence Skills" style="width: 100%"> <!-- Intelligence skills section headers -->
+	            		<span class="span-header center" style="padding: 0px; width: 184px"><b>Intelligence</b></span>
+	        			<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Intelligence"></span>
+	           			<span class="span-header center" style="padding: 0px; width: 30px text-align: right">XP</span>
+	           			<span class="span-header center" style="padding: 0px; width: 30px">
+	           			<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Intelligence}}}  {{os=[[@{Intelligence}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Intelligence}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Intelligence}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=Intelligence}}" />
+						</span>
+					</div> <!-- End of intelligence skills section headers -->
+					<br>
+					<fieldset class="repeating_intSkills"> <!-- Repating intelligence skills -->
+				    	<select style="display:inline-block;margin-bottom:0px" name="attr_intskillName">
+							<option value="Farming">Farming</option>
+							<option value="Fleet Tactics">Fleet Tactics</option>
+							<option value="Forward Observer">Forward Observer</option>
+							<option value="Gambling">Gambling</option>
+							<option value="Ground Tactics">Ground Tactics</option>
+							<option value="Interview">Interview</option>
+							<option value="Investigation">Investigation</option>
+							<option value="Navigation">Navigation</option>
+							<option value="Observation">Observation</option>
+							<option value="Painting">Psychology</option>
+							<option value="Research">Research</option>
+							<option value="Sculpture">Sculpture</option>
+							<option value="Sensors">Sensors</option>
+							<option value="Ship Tactics">Ship Tactics</option>
+							<option value="Streetwise">Streetwise</option>
+							<option value="Survey">Survey</option>
+							<option value="Survival">Survival</option>
+							<option value="Tracking">Tracking</option>
+							<option value="Willpower">Willpower</option>
+						</select>
+						<input type="number" value="0" name="attr_intskillValue"><input type="number" name="attr_intskillXP">
+						<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{intskillValue}}}  {{os=[[((@{intskillValue}+@{Intelligence})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{intskillValue}+@{Intelligence})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{intskillValue}+@{Intelligence})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{intskillName}}}" />
+					</fieldset>
+					<div class="Education Skills" style="width: 100%"> <!-- Education skills headers -->
+		            	<span class="span-header center" style="padding: 0px; width: 184px"><b>Education</b></span>
+		        		<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Education"></span>
+		           		<span class="span-header center" style="padding: 0px; width: 30px text-align: right">XP</span>
+		           		<span class="span-header center" style="padding: 0px; width: 30px">
+		           		<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Education}}}  {{os=[[@{Education}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Education}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Education}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=Education}}" />
+						</span>
+					</div> <!-- End of education skills headers -->
+					<br>
+					<fieldset class="repeating_eduSkills"> <!-- Repeating edu skills -->
+					    <select style="display:inline-block;margin-bottom:0px" name="attr_eduskillName">
+							<option value="Admin/Legal">Admin/Legal</option>
+							<option value="Astrogation">Astrogation</option>
+							<option value="Biology">Biology</option>
+							<option value="Chemistry">Chemistry</option>
+							<option value="Communications">Communications</option>
+							<option value="Computer">Computer</option>
+							<option value="Construction">Construction</option>
+							<option value="Electronics">Electronics</option>
+							<option value="Excavation">Excavation</option>
+							<option value="Geology">Geology</option>
+							<option value="Gravitics">Gravitics</option>
+							<option value="Gunnery (Energy Weapon)">Gunnery (Energy Weapon)</option>
+							<option value="Gunnery (Grav Weapon)">Gunnery (Grav Weapon)</option>
+							<option value="Gunnery (Missiles)">Gunnery (Missiles)</option>
+							<option value="History">History</option>
+							<option value="Map">Map</option>
+							<option value="Marketing">Marketing</option>
+							<option value="Medical (Diagnosis)">Medical (Diagnosis)</option>
+							<option value="Medical (Trauma Aid)">Medical (Trauma Aid)</option>
+							<option value="Medical (Surgery)">Medical (Surgery)</option>
+							<option value="Metallurgy">Metallurgy</option>
+							<option value="Meteorology">Meteorology</option>
+							<option value="Physics">Physics</option>
+							<option value="Robotics">Robotics</option>
+							<option value="Screens (Nuclear Dampers)">Screens (Nuclear Dampers)</option>
+							<option value="Screens (Meson Screens)">Screens (Meson Screens)</option>
+							<option value="Screens (Sandcaster)">Screens (Sandcaster)</option>
+							<option value="Screens (Black Globe)">Screens (Black Globe)</option>
+							<option value="Ship's Engineering">Ship's Engineering</option>
+							<option value="Starship Architecture">Starship Architecture</option>
+							<option value="Xeno Biology">Xeno Biology</option>
+						</select>
+						<input type="number" value="0" name="attr_eduskillValue"><input type="number" name="attr_eduskillXP">
+						<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{eduskillValue}}}  {{os=[[((@{eduskillValue}+@{Education})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{eduskillValue}+@{Education})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{eduskillValue}+@{Education})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{eduskillName}}}" />
+					</fieldset>
+					<br>
+					<div class="Charisma Skills" style="width: 100%"> <!-- Charisma skills headers -->
+	            		<span class="span-header center" style="padding: 0px; width: 184px"><b>Charisma</b></span>
+	        			<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Charisma"></span>
+	         	  		<span class="span-header center" style="padding: 0px; width: 30px text-align: right">XP</span>
+	         	  		<span class="span-header center" style="padding: 0px; width: 30px">
+	           			<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Charisma}}}  {{os=[[@{Charisma}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Charisma}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Charisma}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=Charisma}}" />
+						</span>
+					</div> <!-- End of charisma skills headers -->
+					<br>
+					<fieldset class="repeating_chaSkills"> <!-- Repeating Charisma skills -->
+					    <select style="display:inline-block;margin-bottom:0px" name="attr_chaskillName">
+							<option value="Act/Bluff">Act/Bluff</option>
+							<option value="Bargain">Bargain</option>
+							<option value="Bribery">Bribery</option>
+							<option value="Carousing">Carousing</option>
+							<option value="Disguise">Disguise</option>
+							<option value="Instruction">Instruction</option>
+							<option value="Interrogation">Interrogation</option>
+							<option value="Language">Language</option>
+							<option value="Leadership">Leadership</option>
+							<option value="Liaison">Liaison</option>
+							<option value="Persuasion">Persuaison</option>
+							<option value="Recruiting">Recruiting</option>
+							<option value="Service">Service</option>
+							<option value="Song">Song</option>		
+						</select><input type="number" value="0" name="attr_chaskillValue"><input type="number" name="attr_chaskillXP">
+						<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{chaskillValue}}}  {{os=[[((@{chaskillValue}+@{Charisma})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{chaskillValue}+@{Charisma})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{chaskillValue}+@{Charisma})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{chaskillName}}}" />
+					</fieldset>
+					<div class="Psionic Skills" style="width: 100%"> <!-- Psionics headers -->
+	          			<span class="span-header center" style="padding: 0px; width: 184px"><b>Psionic</b></span>
+	        			<span class="span-header center" style="padding: 0px; width: 30px" name="attr_Psionic"></span>
+	         		  	<span class="span-header center" style="padding: 0px; width: 30px text-align: right">XP</span>
+	        		   	<span class="span-header center" style="padding: 0px; width: 30px">
+	          		 	<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{Psionic}}}  {{os=[[@{Psionic}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]}-10]]}} {{cf=[[@{Psionic}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }+10]]}}    {{success=[[@{Psionic}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} 	{{roll=[[1d20]]}} {{skillname=Psionic}}" />
+						</span>
+					</div> <!-- End of psionics headers -->
+					<fieldset class="repeating_psiSkills"> <!-- Repeating psionics skills -->
+				    	<select style="display:inline-block;margin-bottom:0px" name="attr_psiskillName">
+							<option value="Telepathy (Telempathy)">Telepathy (Telempathy)</option>
+							<option value="Telepathy (Project Emotion)">Telepathy (Project Emotion)</option>
+							<option value="Telepathy (Project Thought)">Telepathy (Project Thought)</option>
+							<option value="Telepathy (Willpower Drain)">Telepathy (Willpower Drain)</option>
+							<option value="Telepathy (Life Detection)">Telepathy (Life Detection)</option>
+							<option value="Telepathy (Shield)">Telepathy (Shield)</option>
+							<option value="Telepathy (Probe)">Telepathy (Probe)</option>
+							<option value="Telepathy (Assault)">Telepathy (Assault)</option>
+							<option value="Teleperception (Sense)">Teleperception (Sense)</option>
+							<option value="Teleperception (Clairvoyance)">Teleperception (Clairvoyance)</option>
+							<option value="Teleperception (Clairaudiene)">Teleperception (Clairaudiene)</option>
+							<option value="Telephysics (Cryokinesis)">Telephysics (Cryokinesis)</option>
+							<option value="Telephysics (Pyrokinesis)">Telephysics (Pyrokinesis)</option>
+							<option value="Telephysics (Telekinesis)">Telephysics (Telekinesis)</option>
+							<option value="Teleportation">Teleportation</option>
+							<option value="Self (Suspended Animation)">Self (Suspended Animation)</option>		
+							<option value="Self (Orientation)">Self (Orientation)</option>		
+							<option value="Self (Psionically Enhanced Strength)">Self (Psionically Enhanced Strength)</option>		
+							<option value="Self (Psionically Enhanced Constitution">Self (Psionically Enhanced Constitution</option>		
+							<option value="Self (Regeneration)">Self (Regeneration)</option>		
+							<option value="Computer Empathy">Computer Empathy</option>
+							<option value="Psionic Healing">Psionic Healing</option>
+							<option value="Prescience">Prescience</option>		
+						</select><input type="number" value="0" name="attr_psiskillValue"><input type="number" name="attr_psiskillXP">
+						<button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{psiskillValue}}}  {{os=[[((@{psiskillValue}+@{Psionic})*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[((@{psiskillValue}+@{Psionic})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[(@{psiskillValue}+@{Psionic})*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{psiskillName}}}" />
+					</fieldset>		
+				</div> <!-- End of right column -->
+			</div> <!-- End of 2 column section -->
+		</div> <!-- End of skills and attributes tab -->
 
-	<div class="sheet-section-combat"><!-- Combat Tab --> <!-- No armed martial arts options, possible to add wepon types or assets? -->
-		<div class="weapons" style="width: 100%"> <!-- Ranged weapons headers -->
-            <span class="span-header center" style="padding: 0px; width: 130px">Weapon</span>
-            <span class="span-header center" style="padding: 0px; width: 29px">ROF</span>
-            <span class="span-header center" style="padding: 0px; width: 22px">Dam</span>
-            <span class="span-header center" style="padding: 0px; width: 22px">Pen</span>
-            <span class="span-header center" style="padding: 0px; width: 22px">Mag</span>
-            <span class="span-header center" style="padding: 0px; width: 22px">Blk</span>
-            <span class="span-header center" style="padding: 0px; width: 22px">SS</span>
-            <span class="span-header center" style="padding: 0px; width: 22px">Brst</span>
-            <span class="span-header center" style="padding: 0px; width: 32px">Range</span>
-            <span class="span-header center" style="padding: 0px; width: 22px">Asset</span>
-   		</div> <!-- End of ranged weapons headers -->
-   		<br>
-   		<fieldset class="repeating_weapons"> <!-- Repeating weapons section -->
-            <input type="text" class="fancy" style="width: 164px" name="attr_weaponName" />
-            <input type="number" class="fancy very-narrow" style="width: 50px; margin-left: -4px" name="attr_ROF"/>
-            <input type="number" class="fancy very-narrow" style="width: 43px; margin-left: -4px" name="attr_Dam" />
-            <input type="number" class="fancy very-narrow" style="width: 43px; margin-left: -4px" name="attr_Pen" />
-            <input type="number" class="fancy very-narrow" style="width: 43px; margin-left: -4px" name="attr_Mag" />
-            <input type="number" class="fancy very-narrow" style="width: 45px; margin-left: -4px" name="attr_Blk" />
-            <input type="number" class="fancy very-narrow" style="width: 45px; margin-left: -4px" name="attr_SS" />
-            <input type="number" class="fancy very-narrow" style="width: 45px; margin-left: -4px" name="attr_Brst" />
-            <input type="number" class="fancy very-narrow" style="width: 45px; margin-left: -4px" name="attr_weaponRange" />
-            <input type="number" class="fancy very-narrow" style="width: 45px; margin-left: -4px" name="attr_weaponAsset" />
-            <button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{weaponAsset}}}  {{os=[[(@{weaponAsset}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[(@{weaponAsset}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[@{weaponAsset}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{weaponName}}}" />
-		</fieldset> <!-- End of repeating weapons section -->
-		<div class=sheet-3colrow> <!--- 3 column section --->
-			<div style="padding: 5px; width:100%" class='sheet-col'> <!-- Start of left column, hit capacities, legacy code from twillight sheet --->
-				<h3 style="text-align: center">Hit Capacity<button type="roll" value="value='&{template:Hit-Location} {{roll=[[1d10]]}}" /></h3>
-				<br>
-				<table style="width: 100%">
-					<thead>
-						<tr>
-							<th>Current</th>
-							<th>Scratch</th>
-							<th>Slight</th>						
-							<th>Serious</th>						
-							<th>Critical</th>						
-						</tr>					
-					</thead>
-					<tbody>
-						<tr>
-							<td >Head</td>
-							<td style="text-align: center"><input type="checkbox" name="attr__head_scratch_chk"></td>
-							<td style="text-align: center"><input type="checkbox" name="attr_head_slight_chk" /></td>												
-							<td style="text-align: center"><input type="checkbox" name="attr_head_serious_chk" /></td>						
-							<td style="text-align: center"><input type="checkbox" name="attr_head_critical_chk" /></td>						
-						</tr>
-						<tr>
-							<td><input type="number" name="attr_head_curr" /></td>
-							<td><input READONLY type="number" name="attr_head_scratch" /></td>												
-							<td><input READONLY type="number" name="attr_head_slight" /></td>												
-							<td><input READONLY type="number" name="attr_head_serious" /></td>						
-							<td><input READONLY type="number" name="attr_head_critical" /></td>
-						</tr>
-						<tr><td>Chest</td>
-							<td style="text-align: center"><input type="checkbox" name="attr__chest_scratch_chk"></td>
-							<td style="text-align: center"><input type="checkbox" name="attr_chest_slight_chk" /></td>												
-							<td style="text-align: center"><input type="checkbox" name="attr_chest_serious_chk" /></td>						
-							<td style="text-align: center"><input type="checkbox" name="attr_chest_critical_chk" /></td>					
-						</tr>
-						<tr>
-							<td><input type="number" name="attr_chest_curr" /></td>
-							<td><input READONLY type="number" name="attr_chest_scratch" /></td>												
-							<td><input READONLY type="number" name="attr_chest_slight" /></td>												
-							<td><input READONLY type="number" name="attr_chest_serious" /></td>						
-							<td><input READONLY type="number" name="attr_chest_critical" /></td>
-						</tr>					
-						<tr><td >Abdomen</td>
-							<td style="text-align: center"><input type="checkbox" name="attr__Abdomen_scratch_chk"></td>
-							<td style="text-align: center"><input type="checkbox" name="attr_Abdomen_slight_chk" /></td>												
-							<td style="text-align: center"><input type="checkbox" name="attr_Abdomen_serious_chk" /></td>						
-							<td style="text-align: center"><input type="checkbox" name="attr_Abdomen_critical_chk" /></td>					
-						</tr>					
-						</tr>
-						<tr>
-							<td><input type="number" name="attr_Abdomen_curr" /></td>
-							<td><input READONLY type="number" name="attr_other_scratch" /></td>												
-							<td><input READONLY type="number" name="attr_other_slight" /></td>												
-							<td><input READONLY type="number" name="attr_other_serious" /></td>						
-							<td><input READONLY type="number" name="attr_other_critical" /></td>
-						</tr>	
-						<tr><td >Right Arm</td>
-							<td style="text-align: center"><input type="checkbox" name="attr__right_arm_scratch_chk"></td>
-							<td style="text-align: center"><input type="checkbox" name="attr_right_arm_slight_chk" /></td>												
-							<td style="text-align: center"><input type="checkbox" name="attr_right_arm_serious_chk" /></td>						
-							<td style="text-align: center"><input  type="checkbox" name="attr_right_arm_critical_chk" /></td>						
-						</tr>
-						
-						<tr>
-							<td><input type="number" name="attr_right_arm_curr" /></td>
-							<td><input READONLY type="number" name="attr_other_scratch" /></td>												
-							<td><input READONLY type="number" name="attr_other_slight" /></td>												
-							<td><input READONLY type="number" name="attr_other_serious" /></td>						
-							<td><input READONLY type="number" name="attr_other_critical" /></td>
-						</tr>										
-						<tr><td >Left Arm</td>
-							<td style="text-align: center"><input type="checkbox" name="attr__left_arm_scratch_chk"></td>
-							<td style="text-align: center"><input type="checkbox" name="attr_left_arm_slight_chk" /></td>												
-							<td style="text-align: center"><input type="checkbox" name="attr_left_arm_serious_chk" /></td>						
-							<td style="text-align: center"><input type="checkbox" name="attr_left_arm_critical_chk" /></td>						
-						</tr>
-						<tr>
-							<td><input  type="number" name="attr_left_arm_curr" /></td>
-							<td><input READONLY type="number" name="attr_other_scratch" /></td>												
-							<td><input READONLY type="number" name="attr_other_slight" /></td>												
-							<td><input READONLY type="number" name="attr_other_serious" /></td>						
-							<td><input READONLY type="number" name="attr_other_critical" /></td>
-						</tr>			
-						<tr><td >Right Leg</td>
-							<td style="text-align: center"><input type="checkbox" name="attr_right_leg_scratch_chk"></td>
-							<td style="text-align: center"><input type="checkbox" name="attr_right_leg_slight_chk" /></td>												
-							<td style="text-align: center"><input type="checkbox" name="attr_right_leg_serious_chk" /></td>						
-							<td style="text-align: center"><input  type="checkbox" name="attr_right_leg_critical_chk" /></td>					
-						</tr>
-						<tr>
-							<td><input type="number" name="attr_right_leg_curr" /></td>
-							<td><input READONLY type="number" name="attr_other_scratch" /></td>												
-							<td><input READONLY type="number" name="attr_other_slight" /></td>												
-							<td><input READONLY type="number" name="attr_other_serious" /></td>						
-							<td><input READONLY type="number" name="attr_other_critical" /></td>
-						</tr>	
-						<tr><td >Left Leg</td>
-							<td style="text-align: center"><input type="checkbox" name="attr_left_leg_scratch_chk"></td>
-							<td style="text-align: center"><input type="checkbox" name="attr_left_leg_slight_chk" /></td>												
-							<td style="text-align: center"><input type="checkbox" name="attr_left_leg_serious_chk" /></td>						
-							<td style="text-align: center"><input type="checkbox" name="attr_left_leg_critical_chk" /></td>										
-						</tr>
-						<tr>
-							<td><input type="number" name="attr_left_leg_curr" /></td>
-							<td><input READONLY type="number" name="attr_other_scratch" /></td>												
-							<td><input READONLY type="number" name="attr_other_slight" /></td>												
-							<td><input READONLY type="number" name="attr_other_serious" /></td>						
-							<td><input READONLY type="number" name="attr_other_critical" /></td>
-						</tr>
-					</tbody>
-				</table>
-			</div> <!-- end of left column --->
-		</div> <!-- end of 3 column setup -->	
-	</div> <!-- end of combat tab -->	
-	<div class="sheet-section-equipment"><!-- Equpiment tab -->
-				<TABLE>
-					<td>Credits</td><td><input type="number" name="attr_Credits" style="width: 100px"></td><td>Ship DMs</td><td><input type="number" name="attr_ShipDMs"></td>
-				</TABLE>
-				<h3>Equipment</h3>
-					<textarea style="width: 90%; height: 380px;"  name="attr_Equipment" ></textarea>	
-	</div> <!-- End of equpiment tab -->
-	<div class="sheet-section-worksheet"><!-- Character Creation Worksheet -->
-		<div class="sheet-col"> <!-- Names and instructions -->
-			<p>This page is a tool for creating your character, it will try to guide you through the various stages of the process. You will need acces to a copy of the rulebook for most of this.</p>
-			<p>Use the checkboxes to display adittional information.</p>
-			<br>
-			<h2>1. Name</h2>
-			<p>Character name:</p><input type="text" name="attr_Name">
-			<p>Player name:</p><input type="text" name="attr_Player">
-		</div> <!-- End of names and instructions -->
-		<div> <!-- Homeworld -->
-    		<input type="checkbox" class="sheet-arrow">
-    			<h2>2. Homeworld </h2>
-    				<div class="sheet-body"> <!-- Hidable Homeworld text -->
-						<p>First select your Homeworld</p>
-						<p>Your GM will tell you which worlds are appropriate for your campagin, enter the name of the world below.</p>
+		<div class="sheet-section-combat"><!-- Combat Tab --> <!-- No armed martial arts options, possible to add wepon types or assets? -->
+			<div class="weapons" style="width: 100%"> <!-- Ranged weapons headers -->
+	            <span class="span-header center" style="padding: 0px; width: 130px">Weapon</span>
+	            <span class="span-header center" style="padding: 0px; width: 29px">ROF</span>
+	            <span class="span-header center" style="padding: 0px; width: 22px">Dam</span>
+	            <span class="span-header center" style="padding: 0px; width: 22px">Pen</span>
+	            <span class="span-header center" style="padding: 0px; width: 22px">Mag</span>
+	            <span class="span-header center" style="padding: 0px; width: 22px">Blk</span>
+	            <span class="span-header center" style="padding: 0px; width: 22px">SS</span>
+	            <span class="span-header center" style="padding: 0px; width: 22px">Brst</span>
+	            <span class="span-header center" style="padding: 0px; width: 32px">Range</span>
+	            <span class="span-header center" style="padding: 0px; width: 22px">Asset</span>
+	   		</div> <!-- End of ranged weapons headers -->
+	   		<br>
+	   		<fieldset class="repeating_weapons"> <!-- Repeating weapons section -->
+	            <input type="text" class="fancy" style="width: 164px" name="attr_weaponName" />
+	            <input type="number" class="fancy very-narrow" style="width: 50px; margin-left: -4px" name="attr_ROF"/>
+	            <input type="number" class="fancy very-narrow" style="width: 43px; margin-left: -4px" name="attr_Dam" />
+	            <input type="number" class="fancy very-narrow" style="width: 43px; margin-left: -4px" name="attr_Pen" />
+	            <input type="number" class="fancy very-narrow" style="width: 43px; margin-left: -4px" name="attr_Mag" />
+	            <input type="number" class="fancy very-narrow" style="width: 45px; margin-left: -4px" name="attr_Blk" />
+	            <input type="number" class="fancy very-narrow" style="width: 45px; margin-left: -4px" name="attr_SS" />
+	            <input type="number" class="fancy very-narrow" style="width: 45px; margin-left: -4px" name="attr_Brst" />
+	            <input type="number" class="fancy very-narrow" style="width: 45px; margin-left: -4px" name="attr_weaponRange" />
+	            <input type="number" class="fancy very-narrow" style="width: 45px; margin-left: -4px" name="attr_weaponAsset" />
+	            <button type="roll" value="&{template:skillRoll} {{name=@{Name}}} {{skillvalue=@{weaponAsset}}}  {{os=[[(@{weaponAsset}*?{Difficulty?|Average,[[2]]|Easy,[[4]]|Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]]})-10]]}} {{cf=[[(@{weaponAsset}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] })+10]]}}    {{success=[[@{weaponAsset}*?{Difficulty?| Average,[[2]]|Easy, [[4]] |Difficult,[[1]]|Formidable,[[0.5]]|Impossible,[[0.25]] }]]}} {{roll=[[1d20]]}} {{skillname=@{weaponName}}}" />
+			</fieldset> <!-- End of repeating weapons section -->
+			<div class=sheet-3colrow> <!--- 3 column section --->
+				<div style="padding: 5px; width:100%" class='sheet-col'> <!-- Start of left column, hit capacities, legacy code from twillight sheet --->
+					<h3 style="text-align: center">Hit Capacity<button type="roll" value="value='&{template:Hit-Location} {{roll=[[1d10]]}}" /></h3>
+					<br>
+					<table style="width: 100%">
+						<thead>
+							<tr>
+								<th>Current</th>
+								<th>Scratch</th>
+								<th>Slight</th>						
+								<th>Serious</th>						
+								<th>Critical</th>						
+							</tr>					
+						</thead>
+						<tbody>
+							<tr>
+								<td >Head</td>
+								<td style="text-align: center"><input type="checkbox" name="attr__head_scratch_chk"></td>
+								<td style="text-align: center"><input type="checkbox" name="attr_head_slight_chk" /></td>												
+								<td style="text-align: center"><input type="checkbox" name="attr_head_serious_chk" /></td>						
+								<td style="text-align: center"><input type="checkbox" name="attr_head_critical_chk" /></td>						
+							</tr>
+							<tr>
+								<td><input type="number" name="attr_head_curr" /></td>
+								<td><input READONLY type="number" name="attr_head_scratch" /></td>												
+								<td><input READONLY type="number" name="attr_head_slight" /></td>												
+								<td><input READONLY type="number" name="attr_head_serious" /></td>						
+								<td><input READONLY type="number" name="attr_head_critical" /></td>
+							</tr>
+							<tr><td>Chest</td>
+								<td style="text-align: center"><input type="checkbox" name="attr__chest_scratch_chk"></td>
+								<td style="text-align: center"><input type="checkbox" name="attr_chest_slight_chk" /></td>												
+								<td style="text-align: center"><input type="checkbox" name="attr_chest_serious_chk" /></td>						
+								<td style="text-align: center"><input type="checkbox" name="attr_chest_critical_chk" /></td>					
+							</tr>
+							<tr>
+								<td><input type="number" name="attr_chest_curr" /></td>
+								<td><input READONLY type="number" name="attr_chest_scratch" /></td>												
+								<td><input READONLY type="number" name="attr_chest_slight" /></td>												
+								<td><input READONLY type="number" name="attr_chest_serious" /></td>						
+								<td><input READONLY type="number" name="attr_chest_critical" /></td>
+							</tr>					
+							<tr><td >Abdomen</td>
+								<td style="text-align: center"><input type="checkbox" name="attr__Abdomen_scratch_chk"></td>
+								<td style="text-align: center"><input type="checkbox" name="attr_Abdomen_slight_chk" /></td>												
+								<td style="text-align: center"><input type="checkbox" name="attr_Abdomen_serious_chk" /></td>						
+								<td style="text-align: center"><input type="checkbox" name="attr_Abdomen_critical_chk" /></td>					
+							</tr>					
+							</tr>
+							<tr>
+								<td><input type="number" name="attr_Abdomen_curr" /></td>
+								<td><input READONLY type="number" name="attr_other_scratch" /></td>												
+								<td><input READONLY type="number" name="attr_other_slight" /></td>												
+								<td><input READONLY type="number" name="attr_other_serious" /></td>						
+								<td><input READONLY type="number" name="attr_other_critical" /></td>
+							</tr>	
+							<tr><td >Right Arm</td>
+								<td style="text-align: center"><input type="checkbox" name="attr__right_arm_scratch_chk"></td>
+								<td style="text-align: center"><input type="checkbox" name="attr_right_arm_slight_chk" /></td>												
+								<td style="text-align: center"><input type="checkbox" name="attr_right_arm_serious_chk" /></td>						
+								<td style="text-align: center"><input  type="checkbox" name="attr_right_arm_critical_chk" /></td>						
+							</tr>
+							
+							<tr>
+								<td><input type="number" name="attr_right_arm_curr" /></td>
+								<td><input READONLY type="number" name="attr_other_scratch" /></td>												
+								<td><input READONLY type="number" name="attr_other_slight" /></td>												
+								<td><input READONLY type="number" name="attr_other_serious" /></td>						
+								<td><input READONLY type="number" name="attr_other_critical" /></td>
+							</tr>										
+							<tr><td >Left Arm</td>
+								<td style="text-align: center"><input type="checkbox" name="attr__left_arm_scratch_chk"></td>
+								<td style="text-align: center"><input type="checkbox" name="attr_left_arm_slight_chk" /></td>												
+								<td style="text-align: center"><input type="checkbox" name="attr_left_arm_serious_chk" /></td>						
+								<td style="text-align: center"><input type="checkbox" name="attr_left_arm_critical_chk" /></td>						
+							</tr>
+							<tr>
+								<td><input  type="number" name="attr_left_arm_curr" /></td>
+								<td><input READONLY type="number" name="attr_other_scratch" /></td>												
+								<td><input READONLY type="number" name="attr_other_slight" /></td>												
+								<td><input READONLY type="number" name="attr_other_serious" /></td>						
+								<td><input READONLY type="number" name="attr_other_critical" /></td>
+							</tr>			
+							<tr><td >Right Leg</td>
+								<td style="text-align: center"><input type="checkbox" name="attr_right_leg_scratch_chk"></td>
+								<td style="text-align: center"><input type="checkbox" name="attr_right_leg_slight_chk" /></td>												
+								<td style="text-align: center"><input type="checkbox" name="attr_right_leg_serious_chk" /></td>						
+								<td style="text-align: center"><input  type="checkbox" name="attr_right_leg_critical_chk" /></td>					
+							</tr>
+							<tr>
+								<td><input type="number" name="attr_right_leg_curr" /></td>
+								<td><input READONLY type="number" name="attr_other_scratch" /></td>												
+								<td><input READONLY type="number" name="attr_other_slight" /></td>												
+								<td><input READONLY type="number" name="attr_other_serious" /></td>						
+								<td><input READONLY type="number" name="attr_other_critical" /></td>
+							</tr>	
+							<tr><td >Left Leg</td>
+								<td style="text-align: center"><input type="checkbox" name="attr_left_leg_scratch_chk"></td>
+								<td style="text-align: center"><input type="checkbox" name="attr_left_leg_slight_chk" /></td>												
+								<td style="text-align: center"><input type="checkbox" name="attr_left_leg_serious_chk" /></td>						
+								<td style="text-align: center"><input type="checkbox" name="attr_left_leg_critical_chk" /></td>										
+							</tr>
+							<tr>
+								<td><input type="number" name="attr_left_leg_curr" /></td>
+								<td><input READONLY type="number" name="attr_other_scratch" /></td>												
+								<td><input READONLY type="number" name="attr_other_slight" /></td>												
+								<td><input READONLY type="number" name="attr_other_serious" /></td>						
+								<td><input READONLY type="number" name="attr_other_critical" /></td>
+							</tr>
+						</tbody>
+					</table>
+				</div> <!-- end of left column --->
+			</div> <!-- end of 3 column setup -->	
+		</div> <!-- end of combat tab -->	
+		<div class="sheet-section-equipment"><!-- Equpiment tab -->
+					<TABLE>
+						<td>Credits</td><td><input type="number" name="attr_Credits" style="width: 100px"></td><td>Ship DMs</td><td><input type="number" name="attr_ShipDMs"></td>
+					</TABLE>
+					<h3>Equipment</h3>
+						<textarea style="width: 90%; height: 380px;"  name="attr_Equipment" ></textarea>	
+		</div> <!-- End of equpiment tab -->
+		<div class="sheet-section-worksheet"><!-- Character Creation Worksheet -->
+			<div> <!-- Instructions section --->
+				<p>This page is a tool for creating your character, it will try to guide you through the various stages of the process. You will need acces to a copy of the rulebook for most of this.</p>
+				<p>Use the checkboxes to display adittional information.</p>
+				<input type="checkbox" class="sheet-arrow">
+					<h4>Aout Homeworld </h4>
+		    			<div class="sheet-body"> <!-- Hidable Homeworld text -->
+							<p>First select your Homeworld</p>
+							<p>Your GM will tell you which worlds are appropriate for your campagin, enter the name of the world below.</p>
 							<p><i>Velg verdener fra "People of the Coalition" handouten</i></p>
-						<br>
-						<br>
-						<p>Second find the UWP (Universal World Profile) of the world. You can use travellermap.com and/or check with your GM. Enter the data belov. Note that Traveller uses and "extended hexadecimal" numbersystem where two digit numbers are represented with letters. A=10, B=11 etc. This form is not able to decifer these letters so enter 12 if the UWP states C etc. This does not apply for the first digit, "Starport", which is a letter-code and should entered as a letter.</p>
-							<p><i>Dere finner UWP for verdenen dere har valgt i handoutene Oriflamme Subsector eller Aubaine Subsector. Velg en av de under får å få opp datasheet for den akutelle subsecotren og finn koden i liten skrift - det er den nederste av de to som er akutell. Merk at enkelte systemer har skiftet navn, for eksempel het Aubaine Vras under det tredje imperiet.</i></p>
-						<div> <!-- Hidden image - Oriflamme subsector -->
-						    <input type="checkbox" class="sheet-arrow">
-    						<h4>Oirflamme</h4>
-    							<div class="sheet-body">
-									<img src="https://imgur.com/IyzJCLs.png">
-								</div>
-						</div> <!-- End of hidden image -->
-						<div> <!-- Hidden image - Aubaine subsector -->
-						    <input type="checkbox" class="sheet-arrow">
-    						<h4>Aubaine</h4>
-    							<div class="sheet-body">
-									<img src="https://imgur.com/oJX5Fk8.png">
-								</div>
-						</div> <!-- End of hidden image -->
-					</div> <!-- End of  hidable Homeworld section -->	
-				<p>Homeworld:<input type="text" name="attr_Homeworld"></p>			
-				<table> <!-- Homeworld attributes -->
-					<tr><td><input type="text" name="attr_Starport" style="width: 50px"></td><td><input type="number" name="attr_Planetsize"></td><td><input type="number" name="attr_Atmosphere"></td><td><input type="number" name="attr_Hydrosphere"></td><td><input type="number" name="attr_Population"></td><td><input type="number" name="attr_govlevel"></td><td><input type="number" name="attr_Lawlevel"></td><td><input type="number" name="attr_Techlevel"></td></tr>
-					<tr><th>Starport</th><th>Size</th><th>Atmosphere</th><th>Hydrosphere</th><th>Population</th><th>Government</th><th>Law Level</th><th>Tech Level</th></tr>
-				</table>
-		</div> <!-- End of Homeworld section -->	
-		<div> <!-- Attributes -->
-   			<input type="checkbox" class="sheet-arrow">
-    			<h2>3. Attributes</h2>
-    				<div class="sheet-body"> <!-- Hidden attribute text -->
-						<p>Now we roll for attributes. Roll <button type=roll value="/gmroll 2D6-1">2D6-1</button> six times. You are free to chose which roll is placed at which attribute.</p>
-						<p>Modifiers are based on the UWP of your homeworld and final values are sendt to the character sheet. Note that it is possible to increase attribute values during charter creation or gameplay, but no higher than 2 points. With the maximum homeworld modifer of 2 points the absolute max value for any attribute is 15.</p>
-						<p>Note that with age these numbers might be modified again.</p>
-						<br>
-						<input type="checkbox" class="sheet-arrow">
-    						<h4>Homeworld effects</h4>
-    							<div class="sheet-body"> <!-- Hidden homeworld effects text -->
-									<p> The sheet automatically adjusts attributes according to the following rules:<p>
-									<p>If Homeworld size is 2 or less - subtract 2 from Strenght and Constitution (< 0.3 G)</p>
-									<p>If Homeworld size is 3 or 4 - subrtact 1 from Strenght and Constitution (> 0.3 G < 0.5 G)</p>
-									<p>If Homeworld size is C (12) to F (15) add 1 to Strenght and subtract 1 from Constitution (> 1.5 G < </p>
-									<p>If Homweorld gravity is > 2G add 2 to Strength< and subtract 2 from Constitution </p>
-									<p>If Homweorld atmosphere is 0 add 1 to Agility (Vacuum)</p>
-									<p>If Homeworld atmosphere is 2, 4 or 9 subtract 1 from Constitution (Tainted)</p>
-									<p>If Homeworld population is 5 or lower subtract 1 from Charisma</p>
-									<p>If Homeworld population is 9 or higher add 1 to Charisma</p>
-									<p>If Homeworld tech-level is 3 or lower subtract 2 from Education and add 1 to Constitution</p>
-									<p>If Homeworld tech-level is between 9 and G (13) add 1 to Education</p>
-									<p>If Homeworld tech-level is E (14) or higher add 2 to Education</p>
-								</div> <!-- End of homeworld effects text -->
-					</div> <!-- End of hidden attributes text -->
-				<table>
-					<th colspan="2">Rolled ability</th><th>Modifier</th>
-						<tr><td>Strenght</td><td><input type="number" name="attr_Strbase"></td><td><input type="number" value="0" name="attr_strmod"></td></tr>
-						<tr><td>Agility</td><td><input type="number" name="attr_Aglbase"></td><td><input type="number" value="0" name="attr_aglmod"></td></tr></tr>
-						<tr><td>Constitution</td><td><input type="number" name="attr_Conbase"></td><td><input type="number" value="0" name="attr_conmod"></td></tr></tr>
-						<tr><td>Intelligence</td><td><input type="number" name="attr_Intbase"></td><!--td><input type="number" value="0" name="attr_intmod"></td--></tr>
-						<tr><td>Education</td><td><input type="number" name="attr_Edubase"></td><td><input type="number" value="0" name="attr_edumod"></td></tr></tr>
-						<tr><td>Charisma</td><td><input type="number" name="attr_Chabase"></td><td><input type="number" value="0" name="attr_chamod"></td></tr></tr>
-				</table>
-				<br>
-				<p>Psionics is in most cases left at 0</p>
-					<input type="number" value="0" name="attr_Psionics">
-				<br>
-				<p>Social standing, SOC is determined by a roll of 2D6-1</p>
-					<button type=roll value="/gmroll 2D6-1">2D6-1</button>
-					<input type="number" name="attr_SOC"></p>
-		</div><!-- End of attributes -->
-		<div><!-- Skills and Careers -->
-		    <input type="checkbox" class="sheet-arrow">
-    			<h2>4. Skills and careers</h2>
-    				<div class="sheet-body"> <!-- Hidden text on skills and careers -->
-    					<p>Skills and values are written down as you go along. Adding upp numbers and entering the skills in the Skills-section of the sheet must be done manually.</p>
-						<p>First choose background skills. Four skills with a level of 2 in each from the list at page 23 in the corebook, and make a note of skills and skill levels in the box below. These skills represents childhood hobbies and education. Make not of the requirements and consult the GM if in doubt.</p>
-						<p><i>Disse finnes også som en handout</i></p>
-							<input type="checkbox" class="sheet-arrow">
-    							<h4>Background skills list</h4>
-    								<div class="sheet-body"> <!-- Hidden image -->
-										<img src="https://i.imgur.com/6xmaShL.png">
-									</div> <!-- End of hidden image -->
-						<p>Then check wich default skills that apply. Default skills have value of 0 and are recieved automatically.</p>
-						<div>
-    						<input type="checkbox" class="sheet-arrow">
-  							  <h4>Default skills</h4>
-								<div class="sheet-body"> <!--Hidden text on default skills -->
-									<h4>Default skills</h4>
-										<p>Certain skills are automatically recieved at 0</p>. 
-										<p>If Homeworld atmosphere is 1 (Vacuum): Enviroment Suit</p>
-										<p>If Homeworld hydrosphere is A (10): Swimming</p>
-										<p>If Homeworld size is 0: Zero-G Enviroment</p>
-										<p>If Homeworld size is 8 or higer: High-G Enviroment</p>
-										<p>If Homeworld tech level is between 4 and A (10): Ground Vehicle (Wheeled)</p>
-										<p>If Homeworld tech level is 9 or higher: Computer</p>
-										<p>If Homeworld tech level is B (11) or higher: Pilot (Interface/Grav)</p>
-										<p>All player characters recive Willpower 0</p>
-								</div>
-						</div> <!-- End of hidden text on default skills -->			
-					</div> <!-- End of hidden text on backround skills -->
-					<h4>Background and default skills</h4>
-						<input type="textarea" name="attr_background_default_skills" style="height: 400px">
-			<div> <!-- start of careers text section -->			
-			<input type="checkbox" class="sheet-arrow">
-    			<h3>Choosing careers</h3>
-    				<div class="sheet-body"> <!-- Hidden careers text -->
-						<p>Choosing careers is the main part of Traveller: The New Era character creation. Each career term represent four years.</p>
-						<p>Details for each career is found in the core book. First term skills are detalied in the career description. For special adventure/duty and for subsequent terms the number of skillpoints recieved is based on the term number.</p>
-						<div> <!-- start of term/skills section -->
-						<input type="checkbox" class="sheet-arrow">
-    						<h4>Skill points pr term</h4>
-    							<div class="sheet-body"> <!-- Hidden term/skills table -->
-									<table>
-										<tr><th>Term</th><th>End age</th><th>Skill points</th></tr>
-										<tr><td>1</td><td>21</td><td>4</td></tr>
-										<tr><td>2</td><td>25</td><td>4</td></tr>
-										<tr><td>3</td><td>29</td><td>3</td></tr>
-										<tr><td>4</td><td>33</td><td>2</td></tr>
-										<tr><td>5</td><td>37</td><td>1</td></tr>
-										<tr><td>6</td><td>41</td><td>1</td></tr>
-									</table>
-									<p>And so on.</p>
-								</div> <!-- End of hidden term/skills table -->
-						</div> <!-- End of term/skills section -->
-						<p>Chance for and results of Special Adventure/Duty, Comission and Promotion is detailed in the career descpription. Note that some careers have entry requirements.</p>
-						<p>Ship DMs are described in "other effects" if relevant.</p>
-						<p>Credits should be calculated for each career. Cash Base Values are multiplied with either SOC or gambling skill and is  determined based on Homeworld Tech Level.</p>
-						<div> <!-- start of cash base value section --> 
-						<input type="checkbox" class="sheet-arrow">
-    						<h4>Cash base value</h4>
-    							<div class="sheet-body"> <!-- Hidden cash base value table -->
-									<table>
-										<tr><th>Tech-level</th><th>Cash</th></tr>
-										<tr><td>3-</td><td>Cr10</td></tr>
-										<tr><td>4-5</td><td>Cr100</td></tr>
-										<tr><td>6-8</td><td>Cr500</td></tr>
-										<tr><td>9-A(10)</td><td>Cr1000</td></tr>
-										<tr><td>B(11)+</td><td>Cr5000</td></tr>
-									</table>
-								</div> <!-- End of hidden cash base value table -->
-							</div> <!-- End of cash base value section -->			
-						<br>
-						<p>If the GM allows character generation ends when the player decides to. Alternatively it may end on a roll of <button type="roll" value="/gmroll 2D6">2D6</button> and subtracting 1 for every first term in a new career. If the roll is less than the current number of terms character generation ends.</p>
-					</div> <!-- End of hidden choosing careers text -->
-					<p>Cash Base Value:</p><input type="number" value="0" name="attr_cashbase" style="width: 150px">		
-				<div> <!-- start of individual careers section --> <!-- Calculate number of terms, calculate credtis pr term, choose careers from list, choose skills from repeating section and add them to the skills section -->
-				    <input type="checkbox" class="sheet-arrow">
-    					<h4>Careers</h4>
-   						 	<div class="sheet-body"> <!-- Hidden careers section -->
-   						 		<fieldset class="repeating_careers"> <!-- Repeating careers section -->
-									<table class="careers">
-										<tr><th>Career</th><th>Type</th></tr>
-								        <tr><td><input type="text" name="attr_careername" ></td><td><select name="attr_careertype"><option value="Education">Education</option><option value="civilian">Civilian</option><option value="Military">Military</option></select></td></tr>
-								        <tr><th>Contacts</th><th>Secondary Activity</th></tr>
-								        <tr><td><input type="text" name="attr_careercontacts"></td><td><input type="text" name="attr_secondaryactivity"></td></tr> 
-								        
-								        <tr><th>Comission</th><th>SA/D</th><th>Promotion</th></tr>
-										<td><select name="attr_careercomission" style="width 100px"><option value="No">No</option><option value="Yes">Yes</option></select></td><td><select name="attr_careerspecial" style="width: 60px"><option value="No">No</option><option value="Yes">Yes</option></select></td><td><select name="attr_careerpromotion" style="width: 60px"><option value="No">No</option><option value="Yes">Yes</option></select></td></tr>
-								       
-										<tr><th>Skills</th><th>Other effects?</th></tr>
-									    <tr><td><textarea name="attr_careerskill"></textarea></td><td><textarea name="attr_careerother"></textarea></td></tr>
-    
-									    <tr> <th>Ship DMs</th><th>Ship DM type</th><th>Credits</th></tr>
-										<tr></tr><td><input type="number" name="attr_careershipdm"></td><td><select name="attr_careershipdmtype"><option value="Scout/Courier">Scout/Courier</option><option value="Trader">Trader</option><option value="Yacht">Yacht</option><option value="Lab Ship">Lab Ship</option><option value="Warship">Warship</option></select></td><td><input type="number" name="attr_careercredits" style="width: 100px"></td></tr>
-									</table>
-								</fieldset> <!-- End of repeating careers section -->
-							</div> <!-- End of hidden careers section -->
-				</div> <!-- End of individual careers section -->		
-						<p>Total credits:<input type="number" name="attr_Credits" style="width: 100px"></p>
-						<p>Total Ship DMs: <input type="text" name="attr_ShipDMs"></p>
-		</div> <!-- End of skills and careers section -->		
-		<div> <!-- Age -->
-		    <input type="checkbox" class="sheet-arrow">
-    			<h2>5. Age</h2>
-    				<div class="sheet-body"> <!-- Hidden age text -->
-    					<p>Characters start choosing careers at 17 and each term lasts 4 years. Starting age is the number of careers multiplied by 4 pluss 17.</p>
-						<br>
-						<p>As the characters age certain ablities might be affected. <button type="roll" value="/gmroll 1d15">Roll 1D15</button>. If the roll is lower than the attribute being checked one point is lost. Use the table below to see which ablities are affected.</p>
-						<p>Effects of age might be combated using physical development and/or Anagathics. These are detailed in the core book.</p>
-					    <input type="checkbox" class="sheet-arrow">
-    						<h4>Age Effects table</h4>
-    							<div class="sheet-body"><!--- Hidden age effects table -->
-									<table>
-										<tr><th>Term</th><th>Start Age</th><th>Str</th><th>Agl</th><th>Con</th><th>Int</th></tr>
-										<tr><td>4</td><td>29</td><td>-</td><td>Y</td><td>-</td><td>-</td></tr>
-										<tr><td>5</td><td>33</td><td>-</td><td>Y</td><td>-</td><td>-</td></tr>
-										<tr><td>6</td><td>37</td><td>Y</td><td>Y</td><td>-</td><td>-</td></tr>		
-										<tr><td>7</td><td>41</td><td>Y</td><td>Y</td><td>-</td><td>-</td></tr>
-										<tr><td>8</td><td>45</td><td>Y</td><td>Y</td><td>Y</td><td>-</td></tr>
-										<tr><td>9</td><td>49</td><td>Y</td><td>Y</td><td>Y</td><td>-</td></tr>
-										<tr><td>10</td><td>53</td><td>Y</td><td>Y</td><td>Y</td><td>-</td></tr>
-										<tr><td>11</td><td>57</td><td>Y</td><td>Y</td><td>Y</td><td>-</td></tr>
-										<tr><td>12</td><td>61</td><td>Y</td><td>Y</td><td>Y</td><td>Y</td></tr>
-									</table>
-									<p>And so on.</p>
-								</div> <!-- End of hidden age effects table -->
-						<br>
-					</div> <!-- End of hidden age section -->
-							<p>Age:<input type="number" name="attr_Age"></p>
 							<br>
-							<p>Age modifiers</p>
-							<table>
-								<tr><th>Str</th><th>Agl</th><th>Con</th><th>Int</th></tr>
-								<tr><td><input type="number" value="0" name="attr_Age_Str_Mod"></td><td><input type="number" value="0" name="attr_Age_Agl_Mod"></td><td><input type="number" value="0" name="attr_Age_Con_Mod"></td><td><input type="number" value="0" name="attr_Age_Int_Mod"></td></tr>
-							</table>
-				</div><!-- End of Age section-->					
-		<div> <!-- Final section -->
-    		<input type="checkbox" class="sheet-arrow">
-				<h2>6. A few more things</h2>
-					<div class="sheet-body"> <!-- Hidden final section -->
-					<p>Initative is determined once, depending on a roll and the types of careers you have. If you have any military careers you can roll <button type="roll" value="/gmroll 1D6">1D6</button>, if not roll <button type="roll" value="/gmroll 1d6/2">1D6/2</button> rounded down, but counting 0.5 as 1. Add initive bonuses from "other effects", but civilian bonues only apply for the civillian roll option.</p>
-					<br>
-					<p>To find your weight and unarmed combat damage we need to ask to simple questions.</p>
-					<p>Do you have a skill level in "Unarmed Martial Arts"? Enter the value here, if not leave it at 0. . Remember to adjust if you gain skill levels in play.</p>
-					<br>
-					<p>Choose a base weight. The Core book uses 65kg for women and 80kg for men, but you are free to choose whatever you feel like. This number will be adjustet by your strength and agility.</p>
-					<br>
-					<p>And that's it! Congratulations. Skills must be manually recorded on the "Skills" section of the character sheet.</p>
-					</div><!-- End of hidden section -->	
-			<p>Initative:<input type="number" name="attr_Initative"></p>
-			<p>Unarmed martial arts skill:<input type="number" value="0" name="attr_unarmed_martial_arts"></p>
-			<p>Base weight:<input type="number" name="attr_baseweight"></p>		
-		</div><!-- End of final section -->
-	</div> <!-- End of worksheet tab -->
-</div> <!-- End of tabs section -->
+							<p>Second find the UWP (Universal World Profile) of the world. You can use travellermap.com and/or check with your GM. Enter the data belov. Note that Traveller uses and "extended hexadecimal" numbersystem where two digit numbers are represented with letters. A=10, B=11 etc. This form is not able to decifer these letters so enter 12 if the UWP states C etc. This does not apply for the first digit, "Starport", which is a letter-code and should entered as a letter.</p>
+							<p><i>Dere finner UWP for verdenen dere har valgt i handoutene Oriflamme Subsector eller Aubaine Subsector. Velg en av de under får å få opp datasheet for den akutelle subsecotren og finn koden i liten skrift - det er den nederste av de to som er akutell. Merk at enkelte systemer har skiftet navn, for eksempel het Aubaine Vras under det tredje imperiet.</i></p>
+								<div> <!-- Hidden image - Oriflamme subsector -->
+								    <input type="checkbox" class="sheet-arrow">
+					    				<h4>Oirflamme</h4>
+					    					<div class="sheet-body">
+												<img src="https://imgur.com/IyzJCLs.png">
+											</div>
+								</div> <!-- End of hidden image -->
+								<div> <!-- Hidden image - Aubaine subsector -->
+									<input type="checkbox" class="sheet-arrow">
+					    				<h4>Aubaine</h4>
+					    					<div class="sheet-body">
+													<img src="https://imgur.com/oJX5Fk8.png">
+											</div>
+								</div> <!-- End of hidden image -->
+						</div> <!-- End of  hidable Homeworld section -->	
+				<input type="checkbox" class="sheet-arrow">
+					<h4>About Attributes</h4>
+		    			<div class="sheet-body"> <!-- Hidden attribute text -->
+							<p>Now we roll for attributes. Roll <button type=roll value="/gmroll 2D6-1">2D6-1</button> six times. You are free to chose which roll is placed at which attribute.</p>
+							<p>Modifiers are based on the UWP of your homeworld and final values are sendt to the character sheet. Note that it is possible to increase attribute values during charter creation or gameplay, but no higher than 2 points. With the maximum homeworld modifer of 2 points the absolute max value for any attribute is 15.</p>
+							<p>Note that with age these numbers might be modified again.</p>
+							<br>
+							<input type="checkbox" class="sheet-arrow">
+		    					<h4>Homeworld effects</h4>
+		    						<div class="sheet-body"> <!-- Hidden homeworld effects text -->
+										<p> The sheet automatically adjusts attributes according to the following rules:<p>
+										<p>If Homeworld size is 2 or less - subtract 2 from Strenght and Constitution (< 0.3 G)</p>
+										<p>If Homeworld size is 3 or 4 - subrtact 1 from Strenght and Constitution (> 0.3 G < 0.5 G)</p>
+										<p>If Homeworld size is C (12) to F (15) add 1 to Strenght and subtract 1 from Constitution (> 1.5 G < </p>
+										<p>If Homweorld gravity is > 2G add 2 to Strength< and subtract 2 from Constitution </p>
+										<p>If Homweorld atmosphere is 0 add 1 to Agility (Vacuum)</p>
+										<p>If Homeworld atmosphere is 2, 4 or 9 subtract 1 from Constitution (Tainted)</p>
+										<p>If Homeworld population is 5 or lower subtract 1 from Charisma</p>
+										<p>If Homeworld population is 9 or higher add 1 to Charisma</p>
+										<p>If Homeworld tech-level is 3 or lower subtract 2 from Education and add 1 to Constitution</p>
+										<p>If Homeworld tech-level is between 9 and G (13) add 1 to Education</p>
+										<p>If Homeworld tech-level is E (14) or higher add 2 to Education</p>
+									</div> <!-- End of homeworld effects text -->
+						</div> <!-- End of hidden attributes text -->
+			</div><!-- End of instructions section -->		
+			<div class="sheet-3colrow"> <!-- start of 3 column section -->
+				<div class="sheet-col"> <!-- Names -->
+					<h3>Names</h3>
+					<p>Character name:</p><input type="text" name="attr_Name">
+					<p>Player name:</p><input type="text" name="attr_Player">
+				</div> <!-- End of names and instructions -->
+				<div class="sheet-col"> <!-- Homeworld, middle column -->
+		    			<h3>Homeworld data</h3>
+		    			<p>Homeworld:<input type="text" name="attr_Homeworld"></p>			
+						<table> <!-- Homeworld attributes -->
+							<tr><th>Starport</th><td><input type="text" name="attr_Starport" style="width: 50px"></td> </tr>
+							<tr><th>Size</th><td><input type="number" name="attr_Planetsize"></td></tr>
+							<tr><th>Atmosphere</th><td><input type="number" name="attr_Atmosphere"></td></tr>
+							<tr><th>Hydrosphere</th><td><input type="number" name="attr_Hydrosphere"></td></tr>
+							<tr><th>Population</th><td><input type="number" name="attr_Population"></td></tr>
+							<tr><th>Government</th><td><input type="number" name="attr_govlevel"></td></tr>
+							<tr><th>Law Level</th><td><input type="number" name="attr_Lawlevel"></td></tr>
+							<tr><th>Tech Level</th><td><input type="number" name="attr_Techlevel"></td></tr>
+						</table>
+				</div> <!-- End of Homeworld section -->		
+				<div class="sheet-col"> <!-- Attributes, right column -->
+		   				<h3>Attributes</h3>
+		   				<table>
+							<th colspan="2">Rolled ability</th><th>Modifier</th>
+								<tr><td>Strenght</td><td><input type="number" name="attr_Strbase"></td><td><input type="number" value="0" name="attr_strmod"></td></tr>
+								<tr><td>Agility</td><td><input type="number" name="attr_Aglbase"></td><td><input type="number" value="0" name="attr_aglmod"></td></tr></tr>
+								<tr><td>Constitution</td><td><input type="number" name="attr_Conbase"></td><td><input type="number" value="0" name="attr_conmod"></td></tr></tr>
+								<tr><td>Intelligence</td><td><input type="number" name="attr_Intbase"></td><!--td><input type="number" value="0" name="attr_intmod"></td--></tr>
+								<tr><td>Education</td><td><input type="number" name="attr_Edubase"></td><td><input type="number" value="0" name="attr_edumod"></td></tr></tr>
+								<tr><td>Charisma</td><td><input type="number" name="attr_Chabase"></td><td><input type="number" value="0" name="attr_chamod"></td></tr></tr>
+						</table>
+						<!--br>
+						<p>Psionics is in most cases left at 0</p>
+							<input type="number" value="0" name="attr_Psionics"-->
+						<br>
+						<p>Social standing, SOC is determined by a roll of 2D6-1</p>
+							<button type=roll value="/gmroll 2D6-1">2D6-1</button>
+							<input type="number" name="attr_SOC"></p>
+				</div><!-- End of attributes -->
+			</div><!-- End of 3 column section -->	
+				<div><!-- Skills and Careers -->
+				    <input type="checkbox" class="sheet-arrow">
+		    			<h4>About skills</h4>
+		    				<div class="sheet-body"> <!-- Start of hidden text on skills -->
+		    					<p>Skills and values are written down as you go along in the skills section below. Skills are listed according to their controlling attribute.</p>
+								<p>First choose background skills. Four skills with a level of 2 in each from the list at page 23 in the corebook, and make a note of skills and skill levels in the box below. These skills represents childhood hobbies and education. Make not of the requirements and consult the GM if in doubt.</p>
+								<p><i>Disse finnes også som en handout</i></p>
+									<input type="checkbox" class="sheet-arrow">
+		    							<h4>Background skills list</h4>
+		    								<div class="sheet-body"> <!-- Hidden image -->
+												<img src="https://i.imgur.com/6xmaShL.png">
+											</div> <!-- End of hidden image -->
+								<p>Then check wich default skills that apply. Default skills have value of 0 and are recieved automatically.</p>
+								<div> <!-- Default skills --->
+		    						<input type="checkbox" class="sheet-arrow">
+		  							  <h4>Default skills</h4>
+										<div class="sheet-body"> <!--Hidden text on default skills -->
+											<h4>Default skills</h4>
+												<p>Certain skills are automatically recieved at 0</p>. 
+												<p>If Homeworld atmosphere is 1 (Vacuum): Enviroment Suit</p>
+												<p>If Homeworld hydrosphere is A (10): Swimming</p>
+												<p>If Homeworld size is 0: Zero-G Enviroment</p>
+												<p>If Homeworld size is 8 or higer: High-G Enviroment</p>
+												<p>If Homeworld tech level is between 4 and A (10): Ground Vehicle (Wheeled)</p>
+												<p>If Homeworld tech level is 9 or higher: Computer</p>
+												<p>If Homeworld tech level is B (11) or higher: Pilot (Interface/Grav)</p>
+												<p>All player characters recive Willpower 0</p>
+										</div> <!-- End of hidden text on default skills -->
+								</div> <!-- End of default skills --> 			
+							</div> <!-- End of hidden text on skills -->
+							<!--<h4>Background and default skills</h4>
+								<input type="textarea" name="attr_background_default_skills" style="height: 400px"> -->
+					<div> <!-- start of careers text section -->			
+						<input type="checkbox" class="sheet-arrow">
+			    			<h4>About Careers</h4>
+			    				<div class="sheet-body"> <!-- Hidden careers text -->
+									<p>Choosing careers is the main part of Traveller: The New Era character creation. Each career term represent four years.</p>
+									<p>Details for each career is found in the core book. First term skills are detalied in the career description. For special adventure/duty and for subsequent terms the number of skillpoints recieved is based on the term number.</p>
+									<div> <!-- start of term/skills section -->
+									<input type="checkbox" class="sheet-arrow">
+			    						<h4>Skill points pr term</h4>
+			    							<div class="sheet-body"> <!-- Hidden term/skills table -->
+												<table>
+													<tr><th>Term</th><th>End age</th><th>Skill points</th></tr>
+													<tr><td>1</td><td>21</td><td>4</td></tr>
+													<tr><td>2</td><td>25</td><td>4</td></tr>
+													<tr><td>3</td><td>29</td><td>3</td></tr>
+													<tr><td>4</td><td>33</td><td>2</td></tr>
+													<tr><td>5</td><td>37</td><td>1</td></tr>
+													<tr><td>6</td><td>41</td><td>1</td></tr>
+												</table>
+												<p>And so on.</p>
+											</div> <!-- End of hidden term/skills table -->
+									</div> <!-- End of term/skills section -->
+									<p>Chance for and results of Special Adventure/Duty, Comission and Promotion is detailed in the career descpription. Note that some careers have entry requirements.</p>
+									<p>Ship DMs are described in "other effects" if relevant.</p>
+									<p>Credits should be calculated for each career. Cash Base Values are multiplied with either SOC or gambling skill and is  determined based on Homeworld Tech Level. Your current gambling skill is: <input type="number" name="attr_Gambling"></p>
+									<div> <!-- start of cash base value section --> 
+									<input type="checkbox" class="sheet-arrow">
+			    						<h4>Cash base value</h4>
+			    							<div class="sheet-body"> <!-- Hidden cash base value table -->
+												<table>
+													<tr><th>Tech-level</th><th>Cash</th></tr>
+													<tr><td>3-</td><td>Cr10</td></tr>
+													<tr><td>4-5</td><td>Cr100</td></tr>
+													<tr><td>6-8</td><td>Cr500</td></tr>
+													<tr><td>9-A(10)</td><td>Cr1000</td></tr>
+													<tr><td>B(11)+</td><td>Cr5000</td></tr>
+												</table>
+											</div> <!-- End of hidden cash base value table -->
+										</div> <!-- End of cash base value section -->			
+									<br>
+									<p>Contacts are Off-world on a <button type="roll" value="/gmroll 1d10"></button> on the following table</p>
+										<div> <!-- start of off-world table section-->
+										<input type="checkbox" class="sheet-arrow">
+			    						<h4>Off-world contacts</h4>
+			    							<div class="sheet-body"> <!-- Hidden contact table table -->
+												<table>
+													<tr><th>Region Type</th><th>Nonspecial Term</th><th>Term with special duty</th></tr>
+													<tr><td>Regency</td><td>4+</td><td>2+</td></tr>
+													<tr><td>Old Expanses</td><td>6+</td><td>4+</td></tr>
+													<tr><td>Pocket Empire</td><td>8+</td><td>6+</td></tr>
+													<tr><td>Wilds</td><td>-</td><td>10*</td></tr>
+												</table>
+												<p>*At GMs discretion.</p>
+											</div> <!-- End of hidden off world contacts table -->
+										</div> <!-- End of off world contacts section -->		
+									<p>If the GM allows character generation ends when the player decides to. Alternatively it may end on a roll of <button type="roll" value="/gmroll 2D6">2D6</button> and subtracting 1 for every first term in a new career. If the roll is less than the current number of terms character generation ends.</p>
+								</div> <!-- End of hidden  careers text -->
+					</div> <!-- End of careers text section -->   
+					<h2>Careers:</h2>
+						<p>Credits should be calculated pr term as SOC/Gambling skill might increase or decrease between careers. Mulitply Cash Base Value (based on tech level of Homeworld) and current multiplier (the currently highest value of SOC and Gabling skill) below.</p>		
+				    	<p>Cash Base Value:</p><input type="number" value="0" name="attr_cashbase" style="width: 150px">Current multiplier: <input type="number" value="0" name="attr_cashmodifier"></p>		
+							<div> <!-- start of individual careers section --> <!-- Calculate credits pr term, look at possiblities for caluclating other values based on career name -->
+						    	<fieldset class="repeating_careers"> <!-- Repeating careers section -->
+									<select name="attr_careername">
+										<option value="Undergraduate University">Undergraduate University</option>
+										<option value="Military Academy">Military Academy</option> 
+										<option value="Graduate University">Graduate University</option>
+										<option value="Law Shcool">Law School</option>
+										<option value="Medical School">Medical School</option>
+										<option value="Flight Academy">Flight Academy</option>
+										<option value="Technical School">Technical School</option>
+										<option value="Hiver Technical Academy">Hiver Technical Academy</option>
+										<option value="Athlete">Athlete</option>
+										<option value="Attorney">Attorney</option>
+										<option value="Barbarian">Barbarian</option>
+										<option value="Belter">Belter</option>
+										<option value="Bounty Hunter">Bounty Hunter</option>
+										<option value="Bureaucrat">Bureaucrat</option>
+										<option value="Civil Engineer">Civil Engineer</option>
+										<option value="Civil Pilot">Civil Pilot</option>
+										<option value="Computer Operator/Programmer">Computer Operator Programmer</option>
+										<option value="Corsair">Corsair</option>
+										<option value="Criminal">Criminal</option>
+										<option value="Diplomat">Diplomat</option>
+										<option value="Entertainer">Entertainer</option>
+										<option value="Farmer">Farmer</option>
+										<option value="Hunter/Guide">Hunter/Guide</option>
+										<option value="Journalist">Journalist</option>
+										<option value="Law Enforcement">Law Enforcement</option>
+										<option value="Manager">Manager</option>
+										<option value="Martial Artist">Martial Artist</option>
+										<option value="Mechanic">Mechanic</option>
+										<option value="Medicine">Medicine</option>
+										<option value="Mercenary"></option>
+										<option value="Merchant Marine">Merchant Marine</option>
+										<option value="Prisoner">Prisoner</option>
+										<option value="Professor">Professor</option>
+										<option value="Psionic Researcher">Psionic Researcher</option>
+										<option value="Rebel">Rebel</option>
+										<option value="Scientist">Scientist</option>
+										<option value="Scout">Scout</option>
+										<option value="Tough">Tough</option>
+										<option value="Trader">Trader</option>
+										<option value="Undercover Agent">Undercover Agent</option>
+										<option value="Wealthy Traveller">Wealthy Traveller</option>
+										<option value="Army">Army</option>
+										<option value="Aviation">Aviation</option>
+										<option value="Marines">Marines</option>
+										<option value="Navy">Navy</option>
+										<option value="Special Operations">Special Operations</option>
+										<option value="Wet Navy">Wet Navy</option>
+										</select>	<!-- should be made selectable list -->
+									<input type="checkbox" class="sheet-arrow">
+								 		<div class="sheet-body"> <!-- Hidden careers section -->
+											<table class="careers">
+												<!--<tr><th>Type</th></tr>
+										        <tr><td><select name="attr_careertype" style="width: 120px"><option value="Education">Education</option><option value="civilian">Civilian</option><option value="Military">Military</option></select></td></tr-->
+										        <tr><th>Comission</th><th>Special A/D</th><th>Promotion</th></tr>
+												<tr><td><select name="attr_careercomission" style="width: 140px"><option value="No">No</option><option value="Yes">Yes</option></select></td><td><select name="attr_careerspecial" style="width: 140px"><option value="No">No</option><option value="Yes">Yes</option></select></td><td><select name="attr_careerpromotion" style="width: 140px"><option value="No">No</option><option value="Yes">Yes</option></select></td></tr>
+											    <tr> <th>Ship DMs</th><th>Ship DM type</th><th>Credits</th></tr>
+												<tr><td><input type="number" name="attr_careershipdm" style="width: 140px"></td><td><select name="attr_careershipdmtype" style="width: 140px"><option value="Scout/Courier">Scout/Courier</option><option value="Trader">Trader</option><option value="Yacht">Yacht</option><option value="Lab Ship">Lab Ship</option><option value="Warship">Warship</option></select></td>
+												<td><input type="number" name="attr_careercredits" style="width: 140px" /></td></tr>
+												<tr><th>Secondary Activity</th>
+										        <th>Other effects</th><th>Notes</th></tr>
+                           						 <tr><td><textarea name="attr_secondaryactivity" style="width: 140px"></textarea></td>
+										        <td><textarea name="attr_careerother" style="width: 140px"></textarea></td><td><textarea name="attr_careernotes" style="width: 140px"></textarea></td></tr>		
+											</table>
+										</fieldset> <!-- End of repeating careers section -->
+									</div> <!-- End of hidden careers section -->
+						</div> <!-- End of individual careers section -->		
+					<h3>Skills and other totals:</h3>
+						<div class="sheet-2colrow"> <!-- Start of 2 column section -->
+							<div class="sheet-col"> <!-- Start of left column -->	
+								<h4>Strength skills:</h4>
+									<fieldset class="repeating_strSkills"> <!-- Repating strength skills -->
+										<select style="display:inline-block;margin-bottom:0px" name="attr_strskillName">
+											<option value="Archery">Archery</option>
+											<option value="Archaic Artillery">Archaic Artillery</option>
+											<option value="Armed Martial Arts (Large Blade)">Armed Martial Arts (Large Blade)</option>
+											<option value="Armed Martial Arts (Small Blade)">Armed Martial Arts (Small Blade)</option>
+											<option value="Armed Martial Arts (Polearm)">Armed Martial Arts (Polearm)</option>
+											<option value="Armed Martial Arts (Large Blade)">Armed Martial Arts (Club)</option>
+											<option value="Autogun">Autogun</option>
+											<option value="Early Firearms">Early Firearms</option>
+											<option value="Energy Weapon (Pistol)">Energy Weapon (Pistol)</option>
+											<option value="Energy Weapon (Rifle)">Energy Weapon (Rifle)</option>
+											<option value="Grenade Launcher">Grenade Launcher</option>
+											<option value="Heavy Artillery">Heavy Artillery</option>
+											<option value="Heavy Gun">Heavy Gun</option>
+											<option value="Mason">Mason</option>
+											<option value="Mechanic">Mechanic</option>
+											<option value="Slug Weapon">Slug Weapon</option>
+											<option value="Thrown Weapon">Thrown Weapon</option>
+											<option value="Unarmed Martial Arts">Unarmed Martial Arts</option>
+										</select>
+										<input type="number" value="0" name="attr_strskillValue">
+									</fieldset>
+								<h4>Agility skills:</h4>
+									<fieldset class="repeating_aglSkills"> <!-- Repeating agility skills -->
+										<select style="display:inline-block;margin-bottom:0px" name="attr_aglskillName">
+											<option value="Acrobatics">Acrobatics</option>
+											<option value="Dance">Dance</option>
+											<option value="Energy Artillery">Energy Artillery</option>
+											<option value="Energy Weapon">Energy Weapon</option>
+											<option value="Forgery">Forgery</option>
+											<option value="Energy Weapon (Pistol)">Energy Weapon (Pistol)</option>
+											<option value="Energy Weapon (Rifle)">Energy Weapon (Rifle)</option>
+											<option value="Grav Belt">Grav Belt</option>
+											<option value="Ground Vehicle (Wheeled Vehicle)">Ground Vehicle (Wheeled Vehicle)</option>
+											<option value="Ground Vehicle (Tracked)">Ground Vehicle (Tracked)</option>
+											<option value="Hovercraft">Hovercraft</option>
+											<option value="Intrusion">Intrusion</option>
+											<option value="Jeweler">Jeweler</option>
+											<option value="Machinist">Machinist</option>
+											<option value="Muscle Transport (Skates)">Muscle Transport (Skates)</option>
+											<option value="Muscle Transport (Skis)">Muscle Transport (Skis)</option>
+											<option value="Muscle Transport (Wheels)">Muscle Transport (Wheels)</option>
+											<option value="Music (Composistion)">Music (Composition)</option>
+											<option value="Music (Strings)">Music (Strings)</option>
+											<option value="Music (Wind)">Music (Wind)</option>
+											<option value="Music (Percussion)">Music (Percussion)</option>
+											<option value="Music (Keyboard)">Music (Keyboard)</option>
+											<option value="Music (Other)">Music (Other)</option>
+											<option value="Pickpocket">Pickpocket</option>
+											<option value="Pilot (Airship)">Pilot (Airship)</option>
+											<option value="Pilot (Fixed-Wing)">Pilot (Fixed Wing)</option>
+											<option value="Pilot (Rotary-Wing)">Pilot (Rotary Wing)</option>
+											<option value="Pilot (Glider)">Pilot (Glider)</option>
+											<option value="Pilot (Interface/Grav)">Pilot (Interface/Grav)</option>
+											<option value="Stealth">Stealth</option>
+											<option value="Tac Missile">Tac Missile</option>
+										</select>
+									<input type="number" value="0" name="attr_aglskillValue">
+									</fieldset>
+								<h4>Constitution skills</h4>
+									<fieldset class="repeating_conSkills"> <!-- Repeating constitution skills -->
+								 	   	<select style="display:inline-block;margin-bottom:0px" name="attr_conskillName">
+											<option value="Carpenter">Carpenter</option>
+											<option value="Climbing">Climbing</option>
+											<option value="Combat Engineer">Combat Engineer</option>
+											<option value="Environment Suit">Environment Suit</option>
+											<option value="Guard/Hunting Beasts">Guard/Hunting Beasts</option>
+											<option value="High-G Environment">High-G Environment</option>
+											<option value="Large Watercraft">Large Watercraft</option>
+											<option value="Parachute">Parachute</option>
+											<option value="Riding">Riding</option>
+											<option value="Small Watercraft">Small Watercraft</option>
+											<option value="Swimming">Swimming</option>
+											<option value="Zero-G Environment">Zero-G Environment</option>
+										</select>
+										<input type="number" value="0" name="attr_conskillValue">
+									</fieldset>
+								<h4>Intelligence skills</h4>
+										<fieldset class="repeating_intSkills"> <!-- Repating intelligence skills -->
+									    	<select style="display:inline-block;margin-bottom:0px" name="attr_intskillName">
+												<option value="Farming">Farming</option>
+												<option value="Fleet Tactics">Fleet Tactics</option>
+												<option value="Forward Observer">Forward Observer</option>
+												<option value="Gambling">Gambling</option>
+												<option value="Ground Tactics">Ground Tactics</option>
+												<option value="Interview">Interview</option>
+												<option value="Investigation">Investigation</option>
+												<option value="Navigation">Navigation</option>
+												<option value="Observation">Observation</option>
+												<option value="Painting">Psychology</option>
+												<option value="Research">Research</option>
+												<option value="Sculpture">Sculpture</option>
+												<option value="Sensors">Sensors</option>
+												<option value="Ship Tactics">Ship Tactics</option>
+												<option value="Streetwise">Streetwise</option>
+												<option value="Survey">Survey</option>
+												<option value="Survival">Survival</option>
+												<option value="Tracking">Tracking</option>
+												<option value="Willpower">Willpower</option>
+											</select>
+											<input type="number" value="0" name="attr_intskillValue">
+										</fieldset>
+							</div> <!-- End of left column -->	
+							<div class="sheet-col"> <!-- start of right column -->
+								<h4>Education skills</h4>
+									<fieldset class="repeating_eduSkills"> <!-- Repeating edu skills -->
+									    <select style="display:inline-block;margin-bottom:0px" name="attr_eduskillName">
+											<option value="Admin/Legal">Admin/Legal</option>
+											<option value="Astrogation">Astrogation</option>
+											<option value="Biology">Biology</option>
+											<option value="Chemistry">Chemistry</option>
+											<option value="Communications">Communications</option>
+											<option value="Computer">Computer</option>
+											<option value="Construction">Construction</option>
+											<option value="Electronics">Electronics</option>
+											<option value="Excavation">Excavation</option>
+											<option value="Geology">Geology</option>
+											<option value="Gravitics">Gravitics</option>
+											<option value="Gunnery (Energy Weapon)">Gunnery (Energy Weapon)</option>
+											<option value="Gunnery (Grav Weapon)">Gunnery (Grav Weapon)</option>
+											<option value="Gunnery (Missiles)">Gunnery (Missiles)</option>
+											<option value="History">History</option>
+											<option value="Map">Map</option>
+											<option value="Marketing">Marketing</option>
+											<option value="Medical (Diagnosis)">Medical (Diagnosis)</option>
+											<option value="Medical (Trauma Aid)">Medical (Trauma Aid)</option>
+											<option value="Medical (Surgery)">Medical (Surgery)</option>
+											<option value="Metallurgy">Metallurgy</option>
+											<option value="Meteorology">Meteorology</option>
+											<option value="Physics">Physics</option>
+											<option value="Robotics">Robotics</option>
+											<option value="Screens (Nuclear Dampers)">Screens (Nuclear Dampers)</option>
+											<option value="Screens (Meson Screens)">Screens (Meson Screens)</option>
+											<option value="Screens (Sandcaster)">Screens (Sandcaster)</option>
+											<option value="Screens (Black Globe)">Screens (Black Globe)</option>
+											<option value="Ship's Engineering">Ship's Engineering</option>
+											<option value="Starship Architecture">Starship Architecture</option>
+											<option value="Xeno Biology">Xeno Biology</option>
+										</select>
+										<input type="number" value="0" name="attr_eduskillValue">
+									</fieldset>
+								<h4>Charisma skills</h4>
+									<fieldset class="repeating_chaSkills"> <!-- Repeating Charisma skills -->
+									    <select style="display:inline-block;margin-bottom:0px" name="attr_chaskillName">
+											<option value="Act/Bluff">Act/Bluff</option>
+											<option value="Bargain">Bargain</option>
+											<option value="Bribery">Bribery</option>
+											<option value="Carousing">Carousing</option>
+											<option value="Disguise">Disguise</option>
+											<option value="Instruction">Instruction</option>
+											<option value="Interrogation">Interrogation</option>
+											<option value="Language">Language</option>
+											<option value="Leadership">Leadership</option>
+											<option value="Liaison">Liaison</option>
+											<option value="Persuasion">Persuaison</option>
+											<option value="Recruiting">Recruiting</option>
+											<option value="Service">Service</option>
+											<option value="Song">Song</option>		
+										</select><input type="number" value="0" name="attr_chaskillValue">	
+									</fieldset>			
+								<h4>Contacts:</h4>
+									<fieldset class="repeating_contacts">
+										<select style="display:inline-block;margin-bottom:0px" name="attr_GenericContactType">	
+											<option value="Academic">Academic</option>
+											<option value="Off-world Academic">Off-world Academic</option>
+											<option value="Business">Business</option>
+											<option value="Off-world Business">Off-world Business</option>
+											<option value="Criminal">Criminal</option>
+											<option value="Off-world Criminal">Off-world Criminal</option>
+											<option value="Entertainment">Entertainment</option>
+											<option value="Off-world Entertainment">Off-world Entertainment</option>
+											<option value="Government">Governement</option>
+											<option value="Off-world Governement">Off-world Government</option>
+											<option value="Intelligence Community">Intelligence Community</option>
+											<option value="Off-world Intelligence Community">Off-world Intelligence Community</option>
+											<option value="Journalist">Journalist</option>
+											<option value="Off-world Journalist">Off-world Journalist</option>
+											<option value="Law Enforcement">Law Enforcement</option>
+											<option value="Off-world Law Enforcement">Off-world Law Enforcement</option>
+											<option value="Medical">Medical</option>
+											<option value="Off-world Medical">Off-world Medical</option>
+											<option value="Military">Military</option>
+											<option value="Off-world Military">Off-world Military</option>
+											<option value="Specialist">Specialist</option>
+											<option value="Off-world Specialist">Off-world Specialist</option>
+											<option value="Trader">Trader</option>	
+											<option value="Off-world Trader">Off-world Trader</option>
+											<option value="Wealthy">Wealthy</option>
+											<option value="Off-world Wealthy">Off-world Wealtht</option>
+										</select>
+										<input type="number" value="0" name="attr_GenericContactValue">
+									</fieldset>
+								<p>Total number of terms:<input type="number" name="attr_termNo"></p>
+								<p>Total credits:<input type="number" name="attr_Credits" style="width: 100px"></p>
+								<p>Total Ship DMs: <input type="text" name="attr_ShipDMs"></p>
+								<p>Rank: <input type="text" name="attr_Rank"></p>
+							</div> <!-- End of right column -->
+						</div> <!-- End of 2 column section -->			
+				<div> <!-- Age -->
+				    <input type="checkbox" class="sheet-arrow">
+		    			<h4>About Age effects</h4>
+		    				<div class="sheet-body"> <!-- Hidden age text -->
+		    					<p>Characters start choosing careers at 17 and each term lasts 4 years. Starting age is the number of careers multiplied by 4 pluss 17.</p>
+								<br>
+								<p>As the characters age certain ablities might be affected. <button type="roll" value="/gmroll 1d15">Roll 1D15</button>. If the roll is lower than the attribute being checked one point is lost. Use the table below to see which ablities are affected.</p>
+								<p>Effects of age might be combated using physical development and/or Anagathics. These are detailed in the core book.</p>
+							    <input type="checkbox" class="sheet-arrow">
+		    						<h4>Age Effects table</h4>
+		    							<div class="sheet-body"><!--- Hidden age effects table -->
+											<table>
+												<tr><th>Term</th><th>Start Age</th><th>Str</th><th>Agl</th><th>Con</th><th>Int</th></tr>
+												<tr><td>4</td><td>29</td><td>-</td><td>Y</td><td>-</td><td>-</td></tr>
+												<tr><td>5</td><td>33</td><td>-</td><td>Y</td><td>-</td><td>-</td></tr>
+												<tr><td>6</td><td>37</td><td>Y</td><td>Y</td><td>-</td><td>-</td></tr>		
+												<tr><td>7</td><td>41</td><td>Y</td><td>Y</td><td>-</td><td>-</td></tr>
+												<tr><td>8</td><td>45</td><td>Y</td><td>Y</td><td>Y</td><td>-</td></tr>
+												<tr><td>9</td><td>49</td><td>Y</td><td>Y</td><td>Y</td><td>-</td></tr>
+												<tr><td>10</td><td>53</td><td>Y</td><td>Y</td><td>Y</td><td>-</td></tr>
+												<tr><td>11</td><td>57</td><td>Y</td><td>Y</td><td>Y</td><td>-</td></tr>
+												<tr><td>12</td><td>61</td><td>Y</td><td>Y</td><td>Y</td><td>Y</td></tr>
+											</table>
+											<p>And so on.</p>
+										</div> <!-- End of hidden age effects table -->
+								<br>
+							</div> <!-- End of hidden age section -->
+					<div class="sheet-3colrow"> <!-- Start of 3 column section -->
+						<div class="sheet-col"> <!-- start of left column -->
+									<h4>Age<h4>
+									<p><input type="number" name="attr_Age"></p>
+						</div> <!-- end of left column -->
+						<div class="sheet-col"> <!-- start of middle column -->
+									<h4>Age modifiers</h4>
+									<table>
+										<tr><th>Str</th><th>Agl</th><th>Con</th><th>Int</th></tr>
+										<tr><td><input type="number" value="0" name="attr_Age_Str_Mod"></td><td><input type="number" value="0" name="attr_Age_Agl_Mod"></td><td><input type="number" value="0" name="attr_Age_Con_Mod"></td><td><input type="number" value="0" name="attr_Age_Int_Mod"></td></tr>
+									</table>
+						</div> <!-- end of middle column -->			
+						</div><!-- End of Age section-->					
+				<div class="sheet-col"> <!-- Final section -- right column -->
+		    		<input type="checkbox" class="sheet-arrow">
+						<h4>A few more things</h4>
+							<div class="sheet-body"> <!-- Hidden final section -->
+							<p>Initiative is determined once, depending on a roll and the types of careers you have chosen. If you have any military careers you can roll <button type="roll" value="/gmroll 1D6">1D6</button>, if not roll <button type="roll" value="/gmroll 1d6/2">1D6/2</button> rounded down, but counting 0.5 as 1. Add initiative bonuses from "other effects", but civilian bonues only apply for the civillian roll option.</p>
+							<br>
+							<p>Choose a base weight. The Core book uses 65kg for women and 80kg for men, but you are free to choose whatever you feel like. This number will be adjustet by your strength and agility.</p>
+							<br>
+							<p>And that's it! Congratulations.</p>
+							</div><!-- End of hidden section -->	
+					<p>Initative:<input type="number" name="attr_Initative"></p>
+				<!--	<p>Unarmed martial arts skill:<input type="number" value="0" name="attr_unarmed_martial_arts"></p> -->
+					<p>Base weight:<input type="number" name="attr_baseweight"></p>		
+				</div><!-- End of final section -->
+		</div> <!-- End of worksheet tab -->
+	</div> <!-- End of tabs section -->
+</div> <!-- End of PC section. -->
+<div class="sheet-block_b"> <!-- Ships section -->
+Ships!
+</div>
+
 
 <div><!-- Rolltemplates, legacy from Twillight sheet -->
 	<rolltemplate class="sheet-rolltemplate-melee-damage"> <!-- Melee damage - not used -->
