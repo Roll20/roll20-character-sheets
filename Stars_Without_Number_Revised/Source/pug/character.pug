@@ -1,0 +1,405 @@
+-
+	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
+	const customSkills = {
+		culture_alien: "Culture/Alien/",
+		culture_one: "Culture/",
+		culture_two: "Culture/",
+		culture_three: "Culture/",
+		profession: "Profession/"
+	};
+	const skills = {
+		revised: ["administer", "connect", "exert", "fix", "heal", "know", "lead",
+			"notice", "perform", "pilot", "program", "punch", "shoot", "sneak", "stab",
+			"survive", "talk", "trade", "work"],
+		first: ["artist", "athletics", "bureaucracy", "business", "combat_energy", "combat_gunnery",
+			"combat_primitive", "combat_projectile", "combat_psitech", "combat_unarmed", "computer",
+			"culture_alien", "culture_criminal", "culture_spacer", "culture_traveller", "culture_one",
+			"culture_two", "culture_three", "exosuit", "gambling", "history", "instructor", "language",
+			"leadership", "navigation", "perception", "persuade", "profession", "religion", "science",
+			"security", "stealth", "steward", "survival", "tactics", "tech_astronautic", "tech_maltech",
+			"tech_medical", "tech_postech", "tech_pretech", "tech_psitech", "vehicle_air", "vehicle_grav",
+			"vehicle_land", "vehicle_space", "vehicle_water", "dummy"],
+		psionic: ["biopsionics", "metapsionics", "precognition", "telekinesis", "telepathy", "teleportation"],
+	};
+
+//- We have foci in two locations, so they are outsourced to this mixin
+mixin foci
+	+sectionheader("show_foci", "FOCI")
+	.foci.simple-repsection
+		input(type="hidden", name="attr_show_focus_details", value="1").input-details
+		.class-ability
+			button.display.invisible-button(type="roll", name="roll_Class_ability", value!="&{template:swn-default} {{charname=@{name}}} {{title=^{CLASS_ABILITY}}} {{desc=@{class_ability}}}")
+			.display
+				.name.flex
+					div(data-i18n="CLASS_ABILITY")
+					label.details-button
+						input(type="checkbox", name="attr_show_focus_details", value="1", checked)
+						span(data-i18n="EXPAND")
+				.details
+					span(name="attr_class_ability")
+			.edit
+				.name.flex
+					div(data-i18n="CLASS_ABILITY")
+					label.details-button
+						input(type="checkbox", name="attr_show_focus_details", value="1", checked)
+						span(data-i18n="EXPAND")
+				.details
+					textarea.details(name="attr_class_ability")
+		fieldset.repeating_foci
+			button.display.invisible-button(type="roll", name="roll_Focus", value!="&{template:swn-default} {{charname=@{name}}} {{info=^{FOCUS}}} {{title=@{focus_name}}} {{desc=@{focus_description}}}")
+			.display
+				.name.flex
+					span(name="attr_focus_name")
+					span.level #[span(data-i18n="LEVEL")]-#[span(name="attr_focus_level")]
+				.details
+					span(name="attr_focus_description")
+			.edit.flex-wrap
+				input.name(type="text", name="attr_focus_name", data-i18n-placeholder="FOCUS")
+				input.level(type="number", min="0", name="attr_focus_level", data-i18n-placeholder="LEVEL")
+				textarea.details(name="attr_focus_description", data-i18n-placeholder="DESCRIPTION")
+
+input(type="hidden", name="attr_homebrew_skill_list", value="revised").skills-type
+input(type="hidden", name="attr_setting_super_type", value="psionics").super-type
+input(type="hidden", name="attr_setting_foci_location", value="left").foci-loc
+input(type="hidden", name="attr_setting_skill_query", value="hover").skills-query
+
+//- Core
+.core.core-info.col-1-3
+	.info.flex.core-box-text
+		+text-input("name", "NAME").important
+		+text-input("level", "LEVEL", "no-spinners")(type="number", min="1", value="1").level.center
+		+text-input("class", "CLASS").level-rest
+		+text-input("background", "BACKGROUND").col25
+		+text-input("species_gender", "SPECIES_GENDER").col25
+		+text-input("faction", "FACTION").col25
+		+text-input("homeworld", "HOMEWORLD").col25
+	.saves.core-box
+		h3(data-i18n="SAVING_THROWS")
+		.flex-between
+			+makeSave("physical")
+			+makeSave("mental")
+			+makeSave("evasion")
+			input(type="hidden", name="attr_homebrew_luck_save", value="0").hider
+			+makeSave("luck")
+	.menus.core-box
+		h3(data-i18n="QUICK_MENUS")
+		.menus-content
+			button(type="roll", name="roll_Initiative", data-i18n="INITIATIVE", value!="&{template:swn-default} {{charname=@{name}}} {{title=^{INITIATIVE}}} {{ =[[1d8+@{dexterity_mod} &{tracker}]]}}").unstyled-button
+			input(type="hidden", name="attr_macro_saves", value="[^{PHYSICAL} (v@{save_physical}),](~save_physical) [^{MENTAL} (v@{save_mental}),](~save_mental) [^{EVASION} (v@{save_evasion})](~save_evasion)")
+			button(type="roll", name="roll_Saves_macro", data-i18n="SAVES", value!=`/w &quot;@{character_name}&quot; &{template:swn-default} {{charname=@{name}}} {{title=^{SAVING_THROWS}}} {{buttons=@{macro_saves}}}`).unstyled-button
+			input(type="hidden", name="attr_macro_skills" value="[^{ADMINISTER} (-1),](~skill_administer) [^{CONNECT} (-1),](~skill_connect) [^{EXERT} (-1),](~skill_exert) [^{FIX} (-1),](~skill_fix) [^{HEAL} (-1),](~skill_heal) [^{KNOW} (-1),](~skill_know) [^{LEAD} (-1),](~skill_lead) [^{NOTICE} (-1),](~skill_notice) [^{PERFORM} (-1),](~skill_perform) [^{PILOT} (-1),](~skill_pilot) [^{PROGRAM} (-1),](~skill_program) [^{PUNCH} (-1),](~skill_punch) [^{SHOOT} (-1),](~skill_shoot) [^{SNEAK} (-1),](~skill_sneak) [^{STAB} (-1),](~skill_stab) [^{SURVIVE} (-1),](~skill_survive) [^{TALK} (-1),](~skill_talk) [^{TRADE} (-1),](~skill_trade) [^{WORK} (-1)](~skill_work)")
+			button(type="roll", name="roll_Skills_macro", data-i18n="SKILLS", value!=`/w &quot;@{character_name}&quot; &{template:swn-default} {{charname=@{name}}} {{title=^{SKILLS}}} {{buttons=@{macro_skills}}}`).unstyled-button
+			input(type="hidden", name="attr_macro_weapons")
+			button(type="roll", name="roll_Weapons_macro", data-i18n="WEAPONS", value!=`/w &quot;@{character_name}&quot; &{template:swn-default} {{charname=@{name}}} {{title=^{WEAPONS}}} {{buttons=@{macro_weapons}}}`).unstyled-button
+			input(type="hidden", name="attr_macro_psionics" value="[^{BIOPSIONICS} (-1),](~skill_biopsionics) [^{METAPSIONICS} (-1),](~skill_metapsionics) [^{PRECOGNITION} (-1),](~skill_precognition) [^{TELEKINESIS} (-1),](~skill_telekinesis) [^{TELEPATHY} (-1),](~skill_telepathy) [^{TELEPORTATION} (-1)](~skill_teleportation)")
+			button(type="roll", name="roll_Psionics_macro", data-i18n="PSIONICS", value!=`/w &quot;@{character_name}&quot; &{template:swn-default} {{charname=@{name}}} {{title=^{PSYCHIC_SKILLS_TECHNIQUES}}} {{buttons=@{macro_psionics}}}`).unstyled-button.super-psionics.super
+			input(type="hidden", name="attr_macro_magic")
+			button(type="roll", name="roll_Magic_macro", data-i18n="MAGIC", value!=`/w &quot;@{character_name}&quot; &{template:swn-default} {{charname=@{name}}} {{title=^{SPACE_MAGIC}}} {{buttons=@{macro_magic}}}`).unstyled-button.super-magic.super
+
+//- Stats
+.core.core-stats.col-1-3
+	.main.core-box-text
+		h3(data-i18n="CORE_STATISTICS")
+		.main-content
+			+text-input-duo("HP", "HP_max", false, {value: "0"}).important
+				button.unstyled-button(type="roll", name="roll_HP", data-i18n="HIT_POINTS" value!="&{template:swn-default} {{charname=@{name}}} {{title=^{HIT_POINTS}}} {{ =[[{@{level}d6 + @{level}*@{constitution_mod}[CON] + @{level}*@{extra_hp_query}, @{hp|max} + 1d1}kh1 ]]}} {{info=^{MAXIMUM_HP_1} @{level}d6 + @{level}&ast;[[@{constitution_mod}[CON] + @{extra_hp_query}]] ^{MAXIMUM_HP_2} [[@{hp|max} + 1]]}}")
+			+text-input-duo("strain", "strain_max", "SYSTEM_STRAIN", {value: "10", readonly: true, "data-i18n-title": "CONSTITUTION"})(min="0", value="0")
+			+text-input("strain_permanent", "PERMANENT_STRAIN")(type="number", min="0", value="0").center
+			+text-input-duo("xp", "xp_next", "XP_NEXT_LEVEL", {min: "0", value: "3"})(min="0", value="0")
+			+text-input("AC", "ARMOR_CLASS")(type="number", value="10", readonly, data-i18n-title="AC_DESC").center
+			+text-input("attack_bonus", "ATTACK_BONUS")(type="number", min="0", value="0").center
+			input(type="hidden", name="attr_setting_heroic_enable", value="0").hider
+			+text-input("hp_doom")(type="number").center
+				button.unstyled-button(type="roll", name="roll_Doom", data-i18n="DOOM_DAMAGE", data-i18n-title="DEFY_DOOM", value!="&{template:swn-default} {{charname=@{name}}} {{title=^{DEFYING_DOOM}}} {{^{DOOM_DAMAGE}=[[@{level}d@{doom_size}]]}}")
+	.attributes.core-box
+		table
+			thead
+				tr
+					th
+					th(data-i18n="BASE")
+					th(data-i18n="BONUS")
+					th(data-i18n="MODIFIER")
+			tbody
+				each attr in attributes
+					tr
+						td(data-i18n=attr.toUpperCase(), data-i18n-title=`${attr.toUpperCase()}_DESC`)
+						td
+							input(type="number", name=`attr_${attr}`, value="10").edit
+							span(name=`attr_${attr}`).display
+						td
+							input(type="number", name=`attr_${attr}_bonus`, value="0").edit
+							span(name=`attr_${attr}_bonus`).display
+						td.mod
+							input(type="hidden", name=`attr_${attr}_mod`, value="0").add-plus
+							span(name=`attr_${attr}_mod`)
+	.resources.core-box-text
+		.flex
+			h3(data-i18n="RESOURCES")
+			+text-input("credits", "CREDITS")(type="number", value="0").credits.center.col50
+		fieldset.repeating_resources
+			+text-input-duo("resource_count", "resource_count_max", "").display
+				span(name="attr_resource_name")
+			.flex-center.edit
+				input(type="text", name="attr_resource_name")
+				input(type="number", name="attr_resource_count")
+				span.slash /
+				input(type="number", name="attr_resource_count_max")
+
+.column
+	//- Weapons
+	.section
+		+sectionheader("show_weapons", "WEAPONS")
+		.weapons
+			fieldset.repeating_weapons
+				input(type="hidden", name="attr_weapon_api", value="")
+				input(type="hidden", name="attr_weapon_attack_display", value="")
+				input(type="hidden", name="attr_weapon_damage_display", value="")
+				button(type="roll", name="roll_Attack", value!="&{template:swn-attack} {{charname=@{name}}} {{title=@{weapon_name}}}  {{attack=[[1d20 + @{attack_bonus}[AB] + @{weapon_attack}[Weapon AB] + [[{{@{weapon_skill_bonus},-1}>0}*(@{weapon_skill_bonus}+2) - 2]][Skill] + @{weapon_attribute_mod}[Attribute] @{weapon_burst} @{modifier_query}]]}} {{damage=[[@{weapon_damage} + @{weapon_attribute_mod}[Attribute] + @{weapon_skill_to_damage}[Skill] @{weapon_burst}]]}} {{burst=[[0@{weapon_burst}]]}} @{weapon_shock} {{range=@{weapon_range}}} @{weapon_use_ammo} {{mod=[[0 @{modifier_query}]]}} @{weapon_api}").invisible-button.display
+				.display
+					span.name.space-after
+						span(name="attr_weapon_name").space-after
+						span(name="attr_weapon_attack_display")
+					span
+						| (
+						span(name="attr_weapon_damage_display")
+						input(type="hidden", name="attr_weapon_range", value="").hide-empty
+						span , #[span(data-i18n="RANGE")]:&nbsp;#[span(name="attr_weapon_range")]
+						| )
+					input(type="hidden", name="attr_weapon_use_ammo", value="0").hider
+					span
+						| . #[span(data-i18n="AMMO")]:&nbsp;
+						input(type="number", name="attr_weapon_ammo").inline-input
+						| &nbsp;/&nbsp;
+						span(name="attr_weapon_ammo_max")
+				.edit.flex-wrap.grey-box-bordered
+					+text-input("weapon_name", "NAME").name
+					+text-input("weapon_attack", "ATTACK_BONUS_SHORT")(type="number", value="0").ab.center
+					+fake-text-input("SKILL").skills-either.weapon-skill.center
+						select(name="attr_weapon_skill_bonus")
+							option.skills-revised(value="@{skill_shoot}", data-i18n="SHOOT")
+							option.skills-revised(value="@{skill_punch}", data-i18n="PUNCH")
+							option.skills-revised(value="@{skill_stab}", data-i18n="STAB")
+							option.skills-first(value="@{skill_combat_energy}", data-i18n="COMBAT_ENERGY")
+							option.skills-first(value="@{skill_combat_gunnery}", data-i18n="COMBAT_GUNNERY")
+							option.skills-first(value="@{skill_combat_primitive}", data-i18n="COMBAT_PRIMITIVE")
+							option.skills-first(value="@{skill_combat_projectile}", data-i18n="COMBAT_PROJECTILE")
+							option.skills-first(value="@{skill_combat_psitech}", data-i18n="COMBAT_PSITECH")
+							option.skills-first(value="@{skill_combat_unarmed}", data-i18n="COMBAT_UNARMED")
+							option(value="@{skill_telekinesis}", data-i18n="TELEKINESIS")
+							option(value="0", data-i18n="NONE")
+					+text-input("weapon_skill_bonus", "SKILL_AB").weapon-skill.skills-neither.center
+					+fake-text-input("ATTRIBUTE").attribute.center
+						select(name="attr_weapon_attribute_mod")
+							each attr in attributes
+								option(value=`@{${attr}_mod}`, data-i18n=`${attr.toUpperCase()}_SHORT`)
+					+fake-text-input("BURST").burst.center
+						select(name="attr_weapon_burst")
+							option(value="", data-i18n="NO", selected)
+							option(value="@{burst_query}", data-i18n="ASK")
+							option(value="+ 2[Burst]", data-i18n="ALWAYS")
+					+text-input("weapon_damage", "DAMAGE")(value="0").damage.center
+					+fake-text-input("+SKILL").skill-to-damage.center
+						input(type="checkbox", name="attr_weapon_skill_to_damage", value="@{weapon_skill_bonus}")
+					+text-input("weapon_shock_damage")(value="0").shock-damage.center
+						input(type="checkbox", name="attr_weapon_shock", value!="{{shock=[[@{weapon_shock_damage} + @{weapon_attribute_mod}[Attribute] + @{weapon_skill_to_damage}[Skill]]] ^{SHOCK_DAMAGE_AGAINST_AC_LEQ} @{weapon_shock_ac}!}}")
+						span(data-i18n="SHOCK")
+					+text-input("weapon_shock_ac", "SHOCK_AC")(type="number", value="10").shock-ac.center
+					+text-input("weapon_range", "RANGE").range.center
+					+text-input-duo("weapon_ammo", "weapon_ammo_max", "", {value: "0"}).ammo.center
+						input(type="checkbox", name="attr_weapon_use_ammo", value!="{{ammo=[[0@{weapon_ammo} - (1 @{weapon_burst})]] / @{weapon_ammo|max}}}")
+						span(data-i18n="AMMO")
+
+	//- Foci
+	.section.foci-left
+		+foci
+
+	.section.super
+		+sectionheader("show_psionics", false)
+			span(data-i18n="PSYCHIC_SKILLS_TECHNIQUES").super-psionics-only
+			span(data-i18n="SPACE_MAGIC").super-magic-only
+			span(data-i18n="PSIONICS_AND_SPACE_MAGIC").super-both
+		div
+			.tabs.flex.super-both
+				label
+					input(type="radio", name="attr_tab_super", value="magic")
+					span(data-i18n="SPACE_MAGIC")
+				label
+					input(type="radio", name="attr_tab_super", value="psionics", checked)
+					span(data-i18n="PSYCHIC_SKILLS_TECHNIQUES")
+			input(type="hidden", name="attr_tab_super", value="psionics").tab-input
+			.psionics
+				.skills-psionic.skill-container(data-i18n-list="SKILL_ORDER_PSIONIC")
+					each skill in skills.psionic
+						+makeSkill(skill)
+				.skills-repeating
+					fieldset.repeating_psychic-skills
+						+makeSkill("", true)
+				.psionics-effort.grey-box
+					h3(data-i18n="COMMITTED_EFFORT")
+					+text-input("psionics_committed_effort_scene", "SCENE")(type="number", value="0", min="0").center
+					+text-input("psionics_committed_effort_day", "DAY")(type="number", value="0", min="0").center
+					+text-input("psionics_total_effort", "MAXIMUM")(type="number", value="0", readonly, data-i18n-title="MAXIMUM_EFFORT_DESC").center
+				.techniques.simple-repsection
+					.flex-center
+						h3(data-i18n="PSYCHIC_TECHNIQUES")
+						label.details-button
+							input(type="checkbox", name="attr_show_technique_details", value="1", checked)
+							span(data-i18n="EXPAND")
+					input(type="hidden", name="attr_show_technique_details", value="1").input-details
+					fieldset.repeating_techniques
+						button.display.invisible-button(name="roll_Technique", type="roll", value!="&{template:swn-default} {{charname=@{name}}} {{info=^{PSYCHIC_TECHNIQUE}}} {{title=@{technique_name}}} {{desc=@{technique_description}}}")
+						.display
+							.name #[span(name="attr_technique_name")]
+							.details #[span(name="attr_technique_description")]
+						.edit
+							input.name(type="text", name="attr_technique_name", data-i18n-placeholder="TECHNIQUE")
+							textarea.details(name="attr_technique_description", data-i18n-placeholder="DESCRIPTION")
+			.magic
+				.skill-container
+					+makeSkill("magic")
+					input(type="hidden", name="attr_skill_magic2_name", value="").empty-hider
+					+makeSkill("magic2", true)
+				.skills-repeating
+					fieldset.repeating_magic-skills
+						+makeSkill("", true)
+				.spells.simple-repsection
+					.flex-center
+						h3(data-i18n="SPELLS")
+						label.details-button
+							input(type="checkbox", name="attr_show_spell_details", value="1", checked)
+							span(data-i18n="EXPAND")
+					input(type="hidden", name="attr_show_spell_details", value="1").input-details
+					.flex.edit
+						.name(data-i18n="NAME")
+						.prepared(data-i18n="PREPARED")
+						.damage(data-i18n="DAMAGE")
+					fieldset.repeating_spells
+						button.display.invisible-button(type="roll", name="roll_Spell", value!="&{template:swn-default} {{charname=@{name}}} {{title=@{spell_name}}} {{info=^{SPELL}}} {{desc=@{spell_description}}} {{damage=[[@{spell_damage}]]}}")
+						.display
+							.name.flex-center
+								span(name="attr_spell_name")
+								span.prepared #[span(data-i18n="PREPARED")]:
+								input.prepared(type="number", name="attr_spell_prepared", value="0", min="0")
+							.details #[span(name="attr_spell_description")]
+						.edit.flex-wrap
+							input.name(type="text", name="attr_spell_name")
+							input.prepared(type="number", name="attr_spell_prepared", value="0", min="0")
+							input.damage(type="text", name="attr_spell_damage", value="0")
+							textarea.details(name="attr_spell_description")
+
+.column
+	//- Skills
+	.section
+		+sectionheader("show_skills", "SKILLS")
+		.skills
+			.skills-revised.skill-container(data-i18n-list="SKILL_ORDER_REVISED")
+				each skill in skills.revised
+					+makeSkill(skill)
+				.skill.skill-points
+					.display.flex-center
+						span(data-i18n="UNSPENT_SKILL_POINTS").name
+						span(name="attr_unspent_skill_points").level
+					.edit.flex-center
+						span(data-i18n="UNSPENT_SKILL_POINTS").name
+						input(type="number", min="0", value="0", name="attr_unspent_skill_points").level
+			.skills-first.skill-container(data-i18n-list="SKILL_ORDER_FIRST")
+				each skill in skills.first
+					+makeSkill(skill, !!customSkills[skill], customSkills[skill])
+				.skill.skill-points
+					.display.flex-center
+						span(data-i18n="UNSPENT_SKILL_POINTS").name
+						span(name="attr_unspent_skill_points").level
+					.edit.flex-center
+						span(data-i18n="UNSPENT_SKILL_POINTS").name
+						input(type="number", min="0", value="0", name="attr_unspent_skill_points").level
+			input(type="hidden", name="attr_homebrew_extra_skills", value="0").hider
+			.skills-repeating
+				fieldset.repeating_skills
+					+makeSkill("", true)
+			.skill-blurb.edit(data-i18n="SKILL_BLURB")
+
+	//- Foci
+	.section.foci-right
+		+foci
+
+//- Gear
+.section.col-1-3
+	+sectionheader("show_gear", "GEAR")
+	.gear.halfgrid
+		.equipment.column
+			.grey-box.readied-stowed.flex-center
+				h3(data-i18n="EQUIPMENT")
+				input(type="hidden", name="attr_gear_readied_over", value="0").input-gear-over
+				+text-input-duo("gear_readied", "gear_readied_max", "READIED", {value: "5", readonly: true, "data-i18n-title": "STRENGTH/2"})(value="0", readonly)
+				input(type="hidden", name="attr_gear_stowed_over", value="0").input-gear-over
+				+text-input-duo("gear_stowed", "gear_stowed_max", "STOWED", {value: "10", readonly: true, "data-i18n-title": "STRENGTH"})(value="0", readonly)
+				+text-input("credits", "CREDITS")(value="0", min="0", type="number").center
+				+text-input("credits_owed", "CREDITS_OWED")(value="0", min="0", type="number").center
+			.grey-box
+				fieldset.repeating_weapons
+					.flex
+						input.name(type="text", name="attr_weapon_name", readonly)
+						input.encumbrance(type="number", min="0", value="0", name="attr_weapon_encumbrance", data-i18n-title="ENCUMBRANCE")
+						select.status(name="attr_weapon_status")
+							option(value="", data-i18n="OTHER", selected)
+							option(value="READIED", data-i18n="READIED")
+							option(value="STOWED", data-i18n="STOWED")
+				fieldset.repeating_gear
+					.flex
+						input.name(type="text", name="attr_gear_name", data-i18n-placeholder="ITEM")
+						input.encumbrance(type="number", min="0", value="0", name="attr_gear_encumbrance", data-i18n-title="ENCUMBRANCE")
+						select.status(name="attr_gear_status")
+							option(value="", data-i18n="OTHER", selected)
+							option(value="READIED", data-i18n="READIED")
+							option(value="STOWED", data-i18n="STOWED")
+			.grey-box.other
+				h3(data-i18n="OTHER_EQUIPMENT")
+				textarea(name="attr_gear_other").other-gear
+		.column
+			.armor.grey-box.flex-center
+				h3(data-i18n="ARMOR")
+				+text-input("armor_name", "NAME").name
+				+text-input("armor_ac", "AC")(type="number", value="0").center.ac
+				+text-input("armor_encumbrance", "ENCUMBRANCE_SHORT")(type="number", value="0").center.enc
+				+fake-text-input("TYPE").type.center
+					select(name="attr_armor_type")
+						option(value="none", data-i18n="NONE")
+						option(value="primitive", data-i18n="PRIMITIVE")
+						option(value="street", data-i18n="STREET", selected)
+						option(value="combat", data-i18n="COMBAT")
+						option(value="powered", data-i18n="POWERED")
+			.cyberware.simple-repsection.grey-box
+				.flex-center
+					h3(data-i18n="CYBERWARE")
+					label.details-button
+						input(type="checkbox", name="attr_show_cyberware_details", value="1", checked)
+						span(data-i18n="EXPAND")
+				input(type="hidden", name="attr_show_cyberware_details", value="1").input-details
+				fieldset.repeating_cyberware
+					button.display.invisible-button(name="roll_Cyberware", type="roll", value!="&{template:swn-default} {{charname=@{name}}} {{title=@{cyberware_name}}} {{info=^{CYBERWARE}; @{cyberware_strain} ^{STRAIN}}} {{desc=@{cyberware_description}}}")
+					.display
+						.name.flex-between
+							span(name="attr_cyberware_name")
+							span #[span(name="attr_cyberware_strain")] #[span(data-i18n="STRAIN").lower]
+						.details #[span(name="attr_cyberware_description")]
+					.edit.flex-center
+						input(type="text", name="attr_cyberware_name").name
+						span #[span(data-i18n="STRAIN_COST")]:
+						input(type="number", name="attr_cyberware_strain", value="0").strain
+						textarea(name="attr_cyberware_description", data-i18n-placeholder="DESCRIPTION").details
+
+//- Misc
+.section.col-1-3
+	+sectionheader("show_misc", "MISCELLANEOUS")
+	.misc
+		.thirdsgrid.repeating-flex-row
+			.goals.grey-box.col-1-3
+				h3(data-i18n="GOALS")
+				fieldset.repeating_goals
+					input(type="text", name="attr_goal_name")
+					input(type="number", min="0", data-i18n-placeholder="XP", name="attr_goal_xp")
+			.languages.grey-box
+				h3(data-i18n="LANGUAGES")
+				fieldset.repeating_languages
+					input(type="text", name="attr_language")
+		textarea.notes(name="attr_notes", data-i18n-placeholder="NOTES")
