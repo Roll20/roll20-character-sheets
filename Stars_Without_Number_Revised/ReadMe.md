@@ -46,6 +46,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Added an extra field to put effort that is only committed as long as a power is active.
 * Changed "Total" effort to "Uncommitted", and added auto-calculating.
 * Added the option to enable ammo tracking with ChatSetAttr to the shet default settings.
+* Added a place to track skill points that can only be spent on psionics.
 
 ### 2.1.0
 
