@@ -1058,10 +1058,10 @@
 	};
 
 	const calculateEffort = () => {
-		getAttrs([...effortAttributes, "psionics_total_effort"], v => {
+		getAttrs([...effortAttributes, "psionics_total_effort", "psionics_committed_effort_current", "psionics_committed_effort_scene", "psionics_committed_effort_day"], v => {
 			const attrBonus = Math.max(parseInt(v.wisdom_mod), parseInt(v.constitution_mod)) || 0,
 				skillBonus = Math.max(...skills.psionic.map(x => parseInt(v[`skill_${x}`]) || 0));
-			const psionics_total_effort = 1 + attrBonus + skillBonus + (parseInt(v.psionics_extra_effort) || 0);
+			const psionics_total_effort = 1 + attrBonus + skillBonus + (parseInt(v.psionics_extra_effort) - v.psionics_committed_effort_current - v.psionics_committed_effort_scene - v.psionics_committed_effort_day || 0);
 			mySetAttrs({ psionics_total_effort }, v);
 		});
 	};
@@ -2338,6 +2338,8 @@
 	on("change:level", calculateSaves);
 
 	on(effortAttributes.map(x => `change:${x}`).join(" "), calculateEffort);
+
+	on("change:psionics_committed_effort_current change:psionics_committed_effort_scene change:psionics_committed_effort_day", calculateEffort);
 
 	on("change:armor_ac change:innate_ac", calculateAC);
 
