@@ -45,8 +45,9 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Weapon encumbrance can now be modified in the weapon section. Weapons with 0 encumbrance will no longer be shown in the gear section.
 * Added an extra field to put effort that is only committed as long as a power is active.
 * Changed "Total" effort to "Uncommitted", and added auto-calculating.
-* Added the option to enable ammo tracking with ChatSetAttr to the shet default settings.
+* Added the option to enable ammo tracking with ChatSetAttr to the sheet default settings.
 * Added a place to track skill points that can only be spent on psionics.
+* Changed armor to be a repeating section.
 
 ### 2.1.0
 

@@ -3,12 +3,13 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.2.0-beta1";
+	const sheetVersion = "2.2.0-beta2";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
 		"skill_biopsionics", "skill_precognition", "skill_telepathy", "skill_teleportation",
-		"skill_telekinesis", "skill_metapsionics"
+		"skill_telekinesis", "skill_metapsionics", "psionics_committed_effort_current",
+		"psionics_committed_effort_scene", "psionics_committed_effort_day"
 	];
 	const shipStatEvent = [
 		...["hardpoints", "power", "mass"].map(x => `change:repeating_ship-weapons:weapon_${x}`),
@@ -1058,7 +1059,7 @@
 	};
 
 	const calculateEffort = () => {
-		getAttrs([...effortAttributes, "psionics_total_effort", "psionics_committed_effort_current", "psionics_committed_effort_scene", "psionics_committed_effort_day"], v => {
+		getAttrs([...effortAttributes, "psionics_total_effort"], v => {
 			const attrBonus = Math.max(parseInt(v.wisdom_mod), parseInt(v.constitution_mod)) || 0,
 				skillBonus = Math.max(...skills.psionic.map(x => parseInt(v[`skill_${x}`]) || 0));
 			const psionics_total_effort = 1 + attrBonus + skillBonus + (parseInt(v.psionics_extra_effort) - v.psionics_committed_effort_current - v.psionics_committed_effort_scene - v.psionics_committed_effort_day || 0);
@@ -1067,10 +1068,32 @@
 	};
 
 	const calculateAC = () => {
-		getAttrs(["dexterity_mod", "armor_ac", "innate_ac", "npc", "AC"], v => {
-			const AC = Math.max(parseInt(v.armor_ac) || 0, parseInt(v.innate_ac) || 0) +
-				(parseInt(v.dexterity_mod) || 0);
-			if (v.npc != "1") mySetAttrs({AC}, v);
+		getSectionIDs("repeating_armor", idArray => {
+			const sourceAttrs = [
+				...idArray.map(id => `repeating_armor_${id}_armor_ac`),
+				...idArray.map(id => `repeating_armor_${id}_armor_active`),
+				...idArray.map(id => `repeating_armor_${id}_armor_type`),
+				"npc", "AC", "innate_ac", "dexterity_mod",
+			];
+			getAttrs(sourceAttrs, v => {
+				if (v.npc == "1") return;
+				const baseAC = Math.max(
+					parseInt(v.innate_ac) || 0,
+					...idArray.filter(id => v[`repeating_armor_${id}_armor_active`] === "1")
+						.filter(id => v[`repeating_armor_${id}_armor_type`] !== "shield" )
+						.map(id => parseInt(v[`repeating_armor_${id}_armor_ac`]) || 0)
+				);
+				const shieldAC = Math.max(
+					0,
+					...idArray.filter(id => v[`repeating_armor_${id}_armor_active`] === "1")
+						.filter(id => v[`repeating_armor_${id}_armor_type`] === "shield" )
+						.map(id => parseInt(v[`repeating_armor_${id}_armor_ac`]) || 0)
+				);
+				const AC = (shieldAC > 0 ? shieldAC <= baseAC ? (baseAC + 1) : shieldAC : baseAC)+
+					(parseInt(v.dexterity_mod) || 0);
+
+				mySetAttrs({AC}, v);
+			});
 		});
 	};
 
@@ -1137,37 +1160,48 @@
 	};
 
 	const calculateGearReadiedStowed = () => {
+		const doCalc = (gearIDs, weaponIDs, armorIDs) => {
+			const attrs = [
+				...gearIDs.map(id => `repeating_gear_${id}_gear_encumbrance`),
+				...gearIDs.map(id => `repeating_gear_${id}_gear_status`),
+				...armorIDs.map(id => `repeating_armor_${id}_armor_encumbrance`),
+				...armorIDs.map(id => `repeating_armor_${id}_armor_status`),
+				...weaponIDs.map(id => `repeating_weapons_${id}_weapon_encumbrance`),
+				...weaponIDs.map(id => `repeating_weapons_${id}_weapon_status`),
+				"gear_readied", "gear_readied_max", "gear_readied_over",
+				"gear_stowed", "gear_stowed_max", "gear_stowed_over",
+			];
+			getAttrs(attrs, v => {
+				const [gear_readied, gear_stowed] = armorIDs.reduce((m, id) => {
+					if (v[`repeating_armor_${id}_armor_status`] === "READIED")
+						m[0] += parseInt(v[`repeating_armor_${id}_armor_encumbrance`]) || 0;
+					else if (v[`repeating_armor_${id}_armor_status`] === "STOWED")
+						m[1] += parseInt(v[`repeating_armor_${id}_armor_encumbrance`]) || 0;
+					return m;
+				}, weaponIDs.reduce((m, id) => {
+					if (v[`repeating_weapons_${id}_weapon_status`] === "READIED")
+						m[0] += parseInt(v[`repeating_weapons_${id}_weapon_encumbrance`]) || 0;
+					else if (v[`repeating_weapons_${id}_weapon_status`] === "STOWED")
+						m[1] += parseInt(v[`repeating_weapons_${id}_weapon_encumbrance`]) || 0;
+					return m;
+				}, gearIDs.reduce((m, id) => {
+					if (v[`repeating_gear_${id}_gear_status`] === "READIED")
+						m[0] += parseInt(v[`repeating_gear_${id}_gear_encumbrance`]) || 0;
+					else if (v[`repeating_gear_${id}_gear_status`] === "STOWED")
+						m[1] += parseInt(v[`repeating_gear_${id}_gear_encumbrance`]) || 0;
+					return m;
+				}, [0, 0])));
+				const gear_readied_over = (gear_readied > parseInt(v.gear_readied_max)) ? "1" : "0";
+				const gear_stowed_over = (gear_stowed > parseInt(v.gear_stowed_max)) ? "1" : "0";
+				const setting = {gear_readied, gear_stowed, gear_readied_over, gear_stowed_over};
+
+				mySetAttrs(setting, v, {silent: true});
+			});
+		};
+
 		getSectionIDs("repeating_gear", gearIDs => {
 			getSectionIDs("repeating_weapons", weaponIDs => {
-				const attrs = [
-					...gearIDs.map(id => `repeating_gear_${id}_gear_encumbrance`),
-					...gearIDs.map(id => `repeating_gear_${id}_gear_status`),
-					...weaponIDs.map(id => `repeating_weapons_${id}_weapon_encumbrance`),
-					...weaponIDs.map(id => `repeating_weapons_${id}_weapon_status`),
-					"armor_encumbrance",
-					"gear_readied", "gear_readied_max", "gear_readied_over",
-					"gear_stowed", "gear_stowed_max", "gear_stowed_over",
-				];
-				getAttrs(attrs, v => {
-					const [gear_readied, gear_stowed] = weaponIDs.reduce((m, id) => {
-						if (v[`repeating_weapons_${id}_weapon_status`] === "READIED")
-							m[0] += parseInt(v[`repeating_weapons_${id}_weapon_encumbrance`]) || 0;
-						else if (v[`repeating_weapons_${id}_weapon_status`] === "STOWED")
-							m[1] += parseInt(v[`repeating_weapons_${id}_weapon_encumbrance`]) || 0;
-						return m;
-					}, gearIDs.reduce((m, id) => {
-						if (v[`repeating_gear_${id}_gear_status`] === "READIED")
-							m[0] += parseInt(v[`repeating_gear_${id}_gear_encumbrance`]) || 0;
-						else if (v[`repeating_gear_${id}_gear_status`] === "STOWED")
-							m[1] += parseInt(v[`repeating_gear_${id}_gear_encumbrance`]) || 0;
-						return m;
-					}, [parseInt(v.armor_encumbrance) || 0, 0]));
-					const gear_readied_over = (gear_readied > parseInt(v.gear_readied_max)) ? "1" : "0";
-					const gear_stowed_over = (gear_stowed > parseInt(v.gear_stowed_max)) ? "1" : "0";
-					const setting = {gear_readied, gear_stowed, gear_readied_over, gear_stowed_over};
-
-					mySetAttrs(setting, v, {silent: true});
-				});
+				getSectionIDs("repeating_armor", armorIDs => doCalc(gearIDs, weaponIDs, armorIDs));
 			});
 		});
 	};
@@ -1912,9 +1946,26 @@
 					});
 				});
 			}
+			/** v2.2.0
+			 *  convert single armor line to repeating armor
+			**/
 			else if (major == 2 && minor < 2) {
-				calculateStrDexMod();
-				upgradeSheet(sheetVersion);
+				const upgradeFunction = () => {
+					calculateStrDexMod();
+					calculateEffort();
+					upgradeSheet(sheetVersion);
+				};
+				getAttrs(["armor_name", "armor_ac", "armor_encumbrance", "armor_type"], v => {
+					if (v.armor_ac) {
+						const data = [{
+							armor_ac: v.armor_ac,
+							armor_encumbrance: v.armor_encumbrance || "0",
+							armor_name: v.armor_name || "",
+							armor_type: v.armor_type || ""
+						}];
+						fillRepeatingSectionFromData("armor", data, upgradeFunction);
+					} else upgradeFunction();
+				});
 			}
 			/** Final upgrade clause, always leave this around */
 			else upgradeSheet(sheetVersion, false, true);
@@ -2339,13 +2390,12 @@
 
 	on(effortAttributes.map(x => `change:${x}`).join(" "), calculateEffort);
 
-	on("change:psionics_committed_effort_current change:psionics_committed_effort_scene change:psionics_committed_effort_day", calculateEffort);
-
 	on("change:armor_ac change:innate_ac", calculateAC);
 
 	on("change:strength", calculateGearReadiedStowedMax);
 	on("change:repeating_gear remove:repeating_gear change:armor_encumbrance change:repeating_weapons " +
-		"remove:repeating_weapons change:gear_readied change:gear_stowed", calculateGearReadiedStowed);
+		"remove:repeating_weapons change:gear_readied change:gear_stowed change:repeating_armor " +
+		"remove:repeating_armor", calculateGearReadiedStowed);
 
 	on("change:level change:setting_xp_scheme", calculateNextLevelXP);
 
