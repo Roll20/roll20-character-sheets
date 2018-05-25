@@ -42,6 +42,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 * Added autofill functionality for ship hulls.
 * Added autofill buttons for weapons and ship modules.
+* Weapon encumbrance can now be modified in the weapon section. Weapons with 0 encumbrance will no longer be shown in the gear section.
 
 ### 2.1.0
 
