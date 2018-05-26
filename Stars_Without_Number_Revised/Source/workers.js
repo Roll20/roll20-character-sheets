@@ -996,6 +996,84 @@
 				weapon_range: "1000/2000",
 			},
 		},
+		"armors": {
+			armored_undersuit: {
+				armor_ac: "13",
+				armor_encumbrance: "0",
+			},
+			armored_vacc_suit: {
+				armor_ac: "13",
+				armor_encumbrance: "2",
+			},
+			assault_suit: {
+				armor_ac: "18",
+				armor_encumbrance: "2",
+			},
+			combat_field_uniform: {
+				armor_ac: "16",
+				armor_encumbrance: "1",
+			},
+			cuirass_brigandine_linothorax_half_plate: {
+				armor_ac: "15",
+				armor_encumbrance: "1",
+			},
+			deflector_array: {
+				armor_ac: "18",
+				armor_encumbrance: "0",
+			},
+			field_emitter_panapoly: {
+				armor_ac: "20",
+				armor_encumbrance: "1",
+				armor_encumberence_bonus: "4",
+			},
+			force_pavis: {
+				armor_ac: "15",
+				armor_ac_bonus: "1",
+				armor_encumbrance: "1",
+			},
+			full_plate_layered_mail: {
+				armor_ac: "17",
+				armor_encumbrance: "2",
+			},
+			icarus_harness: {
+				armor_ac: "16",
+				armor_encumbrance: "1",
+			},
+			leather_jacks_thick_hides_quilted_armor: {
+				armor_ac: "13",
+				armor_encumbrance: "1",
+			},
+			secure_clothing: {
+				armor_ac: "13",
+				armor_encumbrance: "1",
+			},
+			security_armor: {
+				armor_ac: "14",
+				armor_encumbrance: "1",
+			},
+			shield: {
+				armor_ac: "13",
+				armor_ac_bonus: "1",
+				armor_encumbrance: "1",
+			},
+			storm_armor: {
+				armor_ac: "19",
+				armor_encumbrance: "2",
+				armor_encumberence_bonus: "4",
+			},
+			vestimentum: {
+				armor_ac: "18",
+				armor_encumbrance: "0",
+			},
+			warpaint: {
+				armor_ac: "12",
+				armor_encumbrance: "0",
+			},
+			woven_body_armor: {
+				armor_ac: "15",
+				armor_encumbrance: "2",
+			}
+		}
 	};
 
 	/* Utility functions */
