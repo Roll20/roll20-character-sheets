@@ -98,7 +98,7 @@
 		[translate("STRIKE_FIGHTER").toLowerCase()]: "strike_fighter",
 		[translate("SHUTTLE").toLowerCase()]: "shuttle",
 	};
-	const autofillSections = ["ship-defenses", "ship-fittings", "ship-weapons", "weapons"];
+	const autofillSections = ["ship-defenses", "ship-fittings", "ship-weapons", "weapons", "armor"];
 	const autofillData = {
 		"hulltypes": {
 			battleship: {
@@ -996,82 +996,100 @@
 				weapon_range: "1000/2000",
 			},
 		},
-		"armors": {
+		"armor": {
 			armored_undersuit: {
 				armor_ac: "13",
 				armor_encumbrance: "0",
+				armor_type: "STREET",
 			},
 			armored_vacc_suit: {
 				armor_ac: "13",
 				armor_encumbrance: "2",
+				armor_type: "STREET",
 			},
 			assault_suit: {
 				armor_ac: "18",
 				armor_encumbrance: "2",
+				armor_type: "POWERED",
 			},
 			combat_field_uniform: {
 				armor_ac: "16",
 				armor_encumbrance: "1",
+				armor_type: "COMBAT",
 			},
 			cuirass_brigandine_linothorax_half_plate: {
 				armor_ac: "15",
 				armor_encumbrance: "1",
+				armor_type: "PRIMITIVE",
 			},
 			deflector_array: {
 				armor_ac: "18",
 				armor_encumbrance: "0",
+				armor_type: "STREET",
 			},
-			field_emitter_panapoly: {
+			field_emitter_panoply: {
 				armor_ac: "20",
 				armor_encumbrance: "1",
-				armor_encumberence_bonus: "4",
+				armor_encumbrance_bonus: "4",
+				armor_type: "POWERED",
 			},
 			force_pavis: {
 				armor_ac: "15",
 				armor_ac_bonus: "1",
 				armor_encumbrance: "1",
+				armor_type: "SHIELD",
 			},
 			full_plate_layered_mail: {
 				armor_ac: "17",
 				armor_encumbrance: "2",
+				armor_type: "PRIMITIVE",
 			},
 			icarus_harness: {
 				armor_ac: "16",
 				armor_encumbrance: "1",
+				armor_type: "COMBAT",
 			},
 			leather_jacks_thick_hides_quilted_armor: {
 				armor_ac: "13",
 				armor_encumbrance: "1",
+				armor_type: "PRIMITIVE",
 			},
 			secure_clothing: {
 				armor_ac: "13",
 				armor_encumbrance: "1",
+				armor_type: "STREET",
 			},
 			security_armor: {
 				armor_ac: "14",
 				armor_encumbrance: "1",
+				armor_type: "COMBAT",
 			},
 			shield: {
 				armor_ac: "13",
 				armor_ac_bonus: "1",
 				armor_encumbrance: "1",
+				armor_type: "SHIELD",
 			},
 			storm_armor: {
 				armor_ac: "19",
 				armor_encumbrance: "2",
-				armor_encumberence_bonus: "4",
+				armor_encumbrance_bonus: "4",
+				armor_type: "POWERED",
 			},
 			vestimentum: {
 				armor_ac: "18",
 				armor_encumbrance: "0",
+				armor_type: "POWERED",
 			},
 			warpaint: {
 				armor_ac: "12",
 				armor_encumbrance: "0",
+				armor_type: "STREET",
 			},
 			woven_body_armor: {
 				armor_ac: "15",
 				armor_encumbrance: "2",
+				armor_type: "COMBAT",
 			}
 		}
 	};
@@ -1158,16 +1176,16 @@
 				const baseAC = Math.max(
 					parseInt(v.innate_ac) || 0,
 					...idArray.filter(id => v[`repeating_armor_${id}_armor_active`] === "1")
-						.filter(id => v[`repeating_armor_${id}_armor_type`] !== "shield" )
+						.filter(id => v[`repeating_armor_${id}_armor_type`] !== "SHIELD" )
 						.map(id => parseInt(v[`repeating_armor_${id}_armor_ac`]) || 0)
 				);
 				const shieldAC = Math.max(
 					0,
 					...idArray.filter(id => v[`repeating_armor_${id}_armor_active`] === "1")
-						.filter(id => v[`repeating_armor_${id}_armor_type`] === "shield" )
+						.filter(id => v[`repeating_armor_${id}_armor_type`] === "SHIELD" )
 						.map(id => parseInt(v[`repeating_armor_${id}_armor_ac`]) || 0)
 				);
-				const AC = (shieldAC > 0 ? shieldAC <= baseAC ? (baseAC + 1) : shieldAC : baseAC)+
+				const AC = (shieldAC > 0 ? shieldAC <= baseAC ? (baseAC + 1) : shieldAC : baseAC) +
 					(parseInt(v.dexterity_mod) || 0);
 
 				mySetAttrs({AC}, v);
@@ -1718,6 +1736,9 @@
 				output.weapon_attribute_mod = "@{dexterity_mod}";
 			}
 		}
+		if (sName === "armor") {
+			if (label) output.armor_name = translate(label.toUpperCase());
+		}
 		return output;
 	};
 	const getAutofillInfo = (sName, v, inputData) => {
@@ -1752,6 +1773,10 @@
 				(data.weapon_shock ? `, ${data.weapon_shock_damage} ${translate("SHOCK_DAMAGE_AGAINST_AC_LEQ")} ${data.weapon_shock_ac}` : "") +
 				`, +${getNamedAttrMod(data.weapon_attribute_mod)}` +
 				(data.weapon_encumbrance ? `, ${translate("ENCUMBRANCE_SHORT")} ${data.weapon_encumbrance}` : "") + ".";
+		}
+		if (sName === "armor") {
+			return `${translate("AC")} ${data.armor_ac}, ${translate(data.armor_type)}, ` +
+			`${translate("ENCUMBRANCE_SHORT")} ${data.armor_encumbrance}.`;
 		}
 	};
 	const generateAutofillRow = (sName) => {
@@ -2039,7 +2064,7 @@
 							armor_ac: v.armor_ac,
 							armor_encumbrance: v.armor_encumbrance || "0",
 							armor_name: v.armor_name || "",
-							armor_type: v.armor_type || ""
+							armor_type: (v.armor_type || "").toUpperCase()
 						}];
 						fillRepeatingSectionFromData("armor", data, upgradeFunction);
 					} else upgradeFunction();
@@ -2468,7 +2493,7 @@
 
 	on(effortAttributes.map(x => `change:${x}`).join(" "), calculateEffort);
 
-	on("change:armor_ac change:innate_ac", calculateAC);
+	on("change:repeating_armor change:innate_ac remove:repeating_armor", calculateAC);
 
 	on("change:strength", calculateGearReadiedStowedMax);
 	on("change:repeating_gear remove:repeating_gear change:armor_encumbrance change:repeating_weapons " +

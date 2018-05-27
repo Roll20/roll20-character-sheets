@@ -102,7 +102,7 @@ input(type="hidden", name="attr_setting_skill_query", value="hover").skills-quer
 		h3(data-i18n="CORE_STATISTICS")
 		.main-content
 			+text-input-duo("HP", "HP_max", false, {value: "0"}).important
-				.sheet-label
+				.label
 					button.unstyled-button(type="roll", name="roll_HP", data-i18n="HIT_POINTS" value!="&{template:swn-default} {{charname=@{name}}} {{title=^{HIT_POINTS}}} {{ =[[{@{level}d6 + @{level}*@{constitution_mod}[CON] + @{level}*@{extra_hp_query}, @{hp|max} + 1d1}kh1 ]]}} {{info=^{MAXIMUM_HP_1} @{level}d6 + @{level}&ast;[[@{constitution_mod}[CON] + @{extra_hp_query}]] ^{MAXIMUM_HP_2} [[@{hp|max} + 1]]}}")
 			+text-input-duo("strain", "strain_max", "SYSTEM_STRAIN", {value: "10", readonly: true, "data-i18n-title": "CONSTITUTION"})(min="0", value="0")
 			+text-input("strain_permanent", "PERMANENT_STRAIN")(type="number", min="0", value="0").center
@@ -402,45 +402,89 @@ input(type="hidden", name="attr_setting_skill_query", value="hover").skills-quer
 				+text-input("credits", "CREDITS")(value="0", min="0", type="number").center
 				+text-input("credits_owed", "CREDITS_OWED")(value="0", min="0", type="number").center
 			.grey-box
+				.table-header.gear-grid
+					.name(data-i18n="NAME")
+					.enc(data-i18n="ENCUMBRANCE_SHORT")
+					.status(data-i18n="STATUS")
 				fieldset.repeating_weapons
 					input(type="hidden", name="attr_weapon_encumbrance", value="0").hider
-					.flex
-						input.name(type="text", name="attr_weapon_name", readonly)
-						input.encumbrance(type="number", value="0", name="attr_weapon_encumbrance", data-i18n-title="ENCUMBRANCE")
-						select.status(name="attr_weapon_status")
-							option(value="", data-i18n="OTHER", selected)
-							option(value="READIED", data-i18n="READIED")
-							option(value="STOWED", data-i18n="STOWED")
+					.gear-grid
+						+text-input("weapon_name")(readonly).name
+						+text-input("weapon_encumbrance")(type="number", value="0").enc
+						+fake-text-input().status
+							select.status(name="attr_weapon_status")
+								option(value="", data-i18n="OTHER", selected)
+								option(value="READIED", data-i18n="READIED")
+								option(value="STOWED", data-i18n="STOWED")
 				fieldset.repeating_gear
-					.flex
-						input.name(type="text", name="attr_gear_name", data-i18n-placeholder="ITEM")
-						input.encumbrance(type="number", value="0", name="attr_gear_encumbrance", data-i18n-title="ENCUMBRANCE")
-						select.status(name="attr_gear_status")
-							option(value="", data-i18n="OTHER", selected)
-							option(value="READIED", data-i18n="READIED")
-							option(value="STOWED", data-i18n="STOWED")
+					.gear-grid
+						+text-input("gear_name")(data-i18n-placeholder="ITEM").name
+						+text-input("gear_encumbrance")(type="number", value="0").enc
+						+fake-text-input().status
+							select.status(name="attr_gear_status")
+								option(value="", data-i18n="OTHER", selected)
+								option(value="READIED", data-i18n="READIED")
+								option(value="STOWED", data-i18n="STOWED")
 			.grey-box.other
 				h3(data-i18n="OTHER_EQUIPMENT")
 				textarea(name="attr_gear_other").other-gear
 		.column
 			.armor.grey-box
-				h3(data-i18n="ARMOR")
+				.flex-center
+					h3(data-i18n="ARMOR")
+					.total-ac  #[span(data-i18n="AC")] #[span(name="attr_AC")]
+				.generate.flex-start.edit
+					select(name="attr_generate_armor_source").generate-source
+						option(value="", data-i18n="CHOOSE_ARMOR", selected)
+						optgroup(data-i18n-label="PRIMITIVE")
+							option(value="shield", data-i18n="SHIELD")
+							option(value="leather_jacks_thick_hides_quilted_armor", data-i18n="LEATHER_JACKS_THICK_HIDES_QUILTED_ARMOR")
+							option(value="cuirass_brigandine_linothorax_half_plate", data-i18n="CUIRASS_BRIGANDINE_LINOTHORAX_HALF_PLATE")
+							option(value="full_plate_layered_mail", data-i18n="FULL_PLATE_LAYERED_MAIL")
+						optgroup(data-i18n-label="STREET")
+							option(value="warpaint", data-i18n="WARPAINT")
+							option(value="armored_undersuit", data-i18n="ARMORED_UNDERSUIT")
+							option(value="secure_clothing", data-i18n="SECURE_CLOTHING")
+							option(value="armored_vacc_suit", data-i18n="ARMORED_VACC_SUIT")
+							option(value="deflector_array", data-i18n="DEFLECTOR_ARRAY")
+						optgroup(data-i18n-label="COMBAT")
+							option(value="force_pavis", data-i18n="FORCE_PAVIS")
+							option(value="security_armor", data-i18n="SECURITY_ARMOR")
+							option(value="woven_body_armor", data-i18n="WOVEN_BODY_ARMOR")
+							option(value="combat_field_uniform", data-i18n="COMBAT_FIELD_UNIFORM")
+							option(value="icarus_harness", data-i18n="ICARUS_HARNESS")
+						optgroup(data-i18n-label="POWERED")
+							option(value="vestimentum", data-i18n="VESTIMENTUM")
+							option(value="assault_suit", data-i18n="ASSAULT_SUIT")
+							option(value="storm_armor", data-i18n="STORM_ARMOR")
+							option(value="field_emitter_panoply", data-i18n="FIELD_EMITTER_PANOPLY")
+					span(name="attr_generate_armor_info").generate-info
+					label.generate-button
+						input(type="checkbox", name="attr_generate_armor_button")
+						span(data-i18n="ADD")
+				.table-header.armor-grid
+					.active.center(data-i18n="ACTIVE?")
+					.name(data-i18n="NAME")
+					.ac(data-i18n="AC")
+					.type(data-i18n="TYPE")
+					.enc(data-i18n="ENCUMBRANCE_SHORT")
+					.status(data-i18n="STATUS")
 				fieldset.repeating_armor
-					.flex-center
-						+fake-text-input("ACTIVE").active.center
+					.armor-grid
+						+fake-text-input().active.center
 							input(type="checkbox", name="attr_armor_active", value="1")
-						+text-input("armor_name", "NAME").name.grow
-						+text-input("armor_ac", "AC")(type="number", value="0").center.ac
-						+fake-text-input("TYPE").type.center
+						+text-input("armor_name").name
+						+text-input("armor_ac")(type="number", value="0").ac
+						+fake-text-input().type
 							select(name="attr_armor_type")
 								option(value="none", data-i18n="NONE")
-								option(value="primitive", data-i18n="PRIMITIVE")
-								option(value="street", data-i18n="STREET", selected)
-								option(value="combat", data-i18n="COMBAT")
-								option(value="powered", data-i18n="POWERED")
-								option(value="shield", data-i18n="SHIELD")
-						+text-input("armor_encumbrance", "ENCUMBRANCE_SHORT")(type="number", value="0").center.enc
-						+fake-text-input("STATUS").status.center
+								option(value="PRIMITIVE", data-i18n="PRIMITIVE")
+								option(value="STREET", data-i18n="STREET", selected)
+								option(value="COMBAT", data-i18n="COMBAT")
+								option(value="POWERED", data-i18n="POWERED")
+								option(value="SHIELD", data-i18n="SHIELD")
+						+text-input("armor_encumbrance")(type="number", value="0").enc
+						+fake-text-input().status
 							select(name="attr_armor_status")
 								option(value="", data-i18n="OTHER", selected)
 								option(value="READIED", data-i18n="READIED")
