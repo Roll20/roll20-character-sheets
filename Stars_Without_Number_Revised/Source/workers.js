@@ -2061,9 +2061,11 @@
 				getAttrs(["armor_name", "armor_ac", "armor_encumbrance", "armor_type"], v => {
 					if (v.armor_ac) {
 						const data = [{
+							armor_active: "1",
 							armor_ac: v.armor_ac,
 							armor_encumbrance: v.armor_encumbrance || "0",
 							armor_name: v.armor_name || "",
+							armor_status: "READIED",
 							armor_type: (v.armor_type || "").toUpperCase()
 						}];
 						fillRepeatingSectionFromData("armor", data, upgradeFunction);
