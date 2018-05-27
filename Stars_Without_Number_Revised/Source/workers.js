@@ -9,7 +9,7 @@
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
 		"skill_biopsionics", "skill_precognition", "skill_telepathy", "skill_teleportation",
 		"skill_telekinesis", "skill_metapsionics", "psionics_committed_effort_current",
-		"psionics_committed_effort_scene", "psionics_committed_effort_day"
+		"psionics_committed_effort_scene", "psionics_committed_effort_day", "class"
 	];
 	const shipStatEvent = [
 		...["hardpoints", "power", "mass"].map(x => `change:repeating_ship-weapons:weapon_${x}`),
@@ -44,44 +44,6 @@
 			"vehicle_land", "vehicle_space", "vehicle_water"],
 		psionic: ["biopsionics", "metapsionics", "precognition", "telekinesis", "telepathy", "teleportation"],
 	};
-	// HD AC AB Damage #attacks move morale skills saves armor_type
-	// TODO: Clean this up into a maintainable format
-	const statblockData = {
-		barbarian_hero: ["6", "16", "8", "Weapon+3", "1", "10m", "11", "3", "12", "PRIMITIVE"],
-		barbarian_tribal: ["1", "12", "2", "Weapon", "1", "10m", "8", "1", "15", "PRIMITIVE"],
-		civilian_security_bot: ["1", "15", "1", "1d8[Stun]", "1", "10m", "12", "1", "15"],
-		companion_bot: ["1", "12", "0", "1d2[Unarmed]", "1", "10m", "6", "1", "15"],
-		elite_fighter: ["3", "16", "4", "Weapon+1", "1", "10m", "10", "2", "14", "COMBAT"],
-		gang_boss: ["3", "14", "4", "Weapon+1", "1", "10m", "9", "2", "15"],
-		gang_member: ["1", "12", "1", "Weapon", "1", "10m", "7", "1", "15"],
-		geneengineered_killer: ["4", "16", "5", "Weapon+1", "1", "15m", "10", "2", "13"],
-		geneengineered_murder_beast: ["10", "18", "10", "1d10", "4", "20m", "12", "3", "10"],
-		greater_lone_predator: ["5", "16", "6", "1d10", "2", "10m", "9", "2", "12"],
-		heavy_warbot: ["6", "18", "8", "2d8[Plasma]", "2", "15m", "10", "2", "12"],
-		heroic_fighter: ["6", "16", "8", "Weapon+3", "1", "10m", "11", "3", "12", "COMBAT"],
-		industrial_work_bot: ["2", "15", "0", "1d10[Crush]", "1", "5", "8", "1", "14"],
-		janitor_bot: ["1", "14", "0", "Unarmed", "1", "5m", "8", "1", "15"],
-		large_aggressive_prey_animal: ["5", "13", "4", "1d10", "1", "15m", "8", "1", "12"],
-		large_pack_hunter: ["2", "14", "2", "1d6", "1", "15m", "9", "1", "14"],
-		legendary_fighter: ["10", "20", "12", "Weapon+4", "2", "10m", "12", "5", "10", "POWERED"],
-		lesser_lone_predator: ["3", "14", "4", "1d8", "2", "15m", "8", "2", "14"],
-		martial_human: ["1", "10", "1", "Weapon", "1", "10m", "8", "1", "15"],
-		military_elite: ["3", "16", "4", "Weapon+1", "1", "10m", "10", "2", "14", "COMBAT"],
-		military_soldier: ["1", "16", "1", "Weapon", "1", "10m", "9", "1", "15", "COMBAT"],
-		normal_human: ["1", "10", "0", "Unarmed", "1", "10m", "6", "1", "15"],
-		peaceful_human: ["1", "10", "0", "Unarmed", "1", "10m", "6", "1", "15"],
-		pirate_king: ["7", "18", "9", "Weapon+2", "1", "10m", "11", "3", "12", "POWERED"],
-		police_officer: ["1", "14", "1", "Weapon", "1", "10m", "8", "1", "15"],
-		repair_bot: ["1", "14", "0", "1d6[Tool]", "1", "10m", "8", "1", "15"],
-		serial_killer: ["6", "12", "8", "Weapon+3", "1", "10m", "12", "3", "12"],
-		skilled_professional: ["1", "10", "0", "Weapon", "1", "10m", "6", "2", "15"],
-		small_pack_hunter: ["1", "13", "1", "1d4", "1", "15m", "8", "1", "15"],
-		small_vicious_beast: ["1hp", "14", "1", "1d2", "1", "10m", "7", "1", "15"],
-		soldier_bot: ["2", "16", "1", "Weapon", "1", "10m", "10", "1", "14"],
-		terrifying_apex_predator: ["8", "16", "8", "1d10", "2", "20m", "9", "2", "11"],
-		veteran_fighter: ["2", "14", "2", "Weapon+1", "1", "10m", "9", "1", "14"],
-		warrior_tyrant: ["8", "20", "10", "Weapon+3", "1", "10m", "11", "3", "11", "POWERED"]
-	};
 	const shipStats = ["ship_ac", "ship_armor", "ship_class", "ship_crew_max", "ship_crew_min",
 	"ship_hardpoints_max", "ship_hp", "ship_hp_max", "ship_mass_max", "ship_power_max", "ship_speed"];
 	const reverseHullTypes = {
@@ -98,8 +60,29 @@
 		[translate("STRIKE_FIGHTER").toLowerCase()]: "strike_fighter",
 		[translate("SHUTTLE").toLowerCase()]: "shuttle",
 	};
-	const autofillSections = ["ship-defenses", "ship-fittings", "ship-weapons", "weapons", "armor", "cyberware"];
+	const reverseClasses= {
+		[translate("ADVENTURER").toLowerCase()]: "adventurer",
+		[translate("EXPERT").toLowerCase()]: "expert",
+		[translate("PSYCHIC").toLowerCase()]: "psychic",
+		[translate("WARRIOR").toLowerCase()]: "warrior",
+	};
+	const autofillSections = ["ship-defenses", "ship-fittings", "ship-weapons", "weapons", "armor", "cyberware", "foci"];
 	const autofillData = {
+		"classes": {
+			adventurer: {
+				class_ability: translate("ADVENTURER_CLASS_ABILITY"),
+			},
+			expert: {
+				class_ability: translate("EXPERT_CLASS_ABILITY"),
+			},
+			psychic: {
+				class_ability: translate("PSYCHIC_CLASS_ABILITY"),
+			},
+			warrior: {
+				attack_bonus: "1",
+				class_ability: translate("WARRIOR_CLASS_ABILITY"),
+			},
+		},
 		"hulltypes": {
 			battleship: {
 				ship_ac: "16",
@@ -245,6 +228,241 @@
 				ship_power_max: "3",
 				ship_speed: "3",
 			},
+		},
+		// HD AC AB Damage #attacks move morale skills saves armor_type
+		// TODO: Clean this up into a maintainable format
+		"statblocks": {
+			barbarian_hero: ["6", "16", "8", "Weapon+3", "1", "10m", "11", "3", "12", "PRIMITIVE"],
+			barbarian_tribal: ["1", "12", "2", "Weapon", "1", "10m", "8", "1", "15", "PRIMITIVE"],
+			civilian_security_bot: ["1", "15", "1", "1d8[Stun]", "1", "10m", "12", "1", "15"],
+			companion_bot: ["1", "12", "0", "1d2[Unarmed]", "1", "10m", "6", "1", "15"],
+			elite_fighter: ["3", "16", "4", "Weapon+1", "1", "10m", "10", "2", "14", "COMBAT"],
+			gang_boss: ["3", "14", "4", "Weapon+1", "1", "10m", "9", "2", "15"],
+			gang_member: ["1", "12", "1", "Weapon", "1", "10m", "7", "1", "15"],
+			geneengineered_killer: ["4", "16", "5", "Weapon+1", "1", "15m", "10", "2", "13"],
+			geneengineered_murder_beast: ["10", "18", "10", "1d10", "4", "20m", "12", "3", "10"],
+			greater_lone_predator: ["5", "16", "6", "1d10", "2", "10m", "9", "2", "12"],
+			heavy_warbot: ["6", "18", "8", "2d8[Plasma]", "2", "15m", "10", "2", "12"],
+			heroic_fighter: ["6", "16", "8", "Weapon+3", "1", "10m", "11", "3", "12", "COMBAT"],
+			industrial_work_bot: ["2", "15", "0", "1d10[Crush]", "1", "5", "8", "1", "14"],
+			janitor_bot: ["1", "14", "0", "Unarmed", "1", "5m", "8", "1", "15"],
+			large_aggressive_prey_animal: ["5", "13", "4", "1d10", "1", "15m", "8", "1", "12"],
+			large_pack_hunter: ["2", "14", "2", "1d6", "1", "15m", "9", "1", "14"],
+			legendary_fighter: ["10", "20", "12", "Weapon+4", "2", "10m", "12", "5", "10", "POWERED"],
+			lesser_lone_predator: ["3", "14", "4", "1d8", "2", "15m", "8", "2", "14"],
+			martial_human: ["1", "10", "1", "Weapon", "1", "10m", "8", "1", "15"],
+			military_elite: ["3", "16", "4", "Weapon+1", "1", "10m", "10", "2", "14", "COMBAT"],
+			military_soldier: ["1", "16", "1", "Weapon", "1", "10m", "9", "1", "15", "COMBAT"],
+			normal_human: ["1", "10", "0", "Unarmed", "1", "10m", "6", "1", "15"],
+			peaceful_human: ["1", "10", "0", "Unarmed", "1", "10m", "6", "1", "15"],
+			pirate_king: ["7", "18", "9", "Weapon+2", "1", "10m", "11", "3", "12", "POWERED"],
+			police_officer: ["1", "14", "1", "Weapon", "1", "10m", "8", "1", "15"],
+			repair_bot: ["1", "14", "0", "1d6[Tool]", "1", "10m", "8", "1", "15"],
+			serial_killer: ["6", "12", "8", "Weapon+3", "1", "10m", "12", "3", "12"],
+			skilled_professional: ["1", "10", "0", "Weapon", "1", "10m", "6", "2", "15"],
+			small_pack_hunter: ["1", "13", "1", "1d4", "1", "15m", "8", "1", "15"],
+			small_vicious_beast: ["1hp", "14", "1", "1d2", "1", "10m", "7", "1", "15"],
+			soldier_bot: ["2", "16", "1", "Weapon", "1", "10m", "10", "1", "14"],
+			terrifying_apex_predator: ["8", "16", "8", "1d10", "2", "20m", "9", "2", "11"],
+			veteran_fighter: ["2", "14", "2", "Weapon+1", "1", "10m", "9", "1", "14"],
+			warrior_tyrant: ["8", "20", "10", "Weapon+3", "1", "10m", "11", "3", "11", "POWERED"]
+		},
+		"armor": {
+			armored_undersuit: {
+				armor_ac: "13",
+				armor_encumbrance: "0",
+				armor_type: "STREET",
+			},
+			armored_vacc_suit: {
+				armor_ac: "13",
+				armor_encumbrance: "2",
+				armor_type: "STREET",
+			},
+			assault_suit: {
+				armor_ac: "18",
+				armor_encumbrance: "2",
+				armor_type: "POWERED",
+			},
+			combat_field_uniform: {
+				armor_ac: "16",
+				armor_encumbrance: "1",
+				armor_type: "COMBAT",
+			},
+			cuirass_brigandine_linothorax_half_plate: {
+				armor_ac: "15",
+				armor_encumbrance: "1",
+				armor_type: "PRIMITIVE",
+			},
+			deflector_array: {
+				armor_ac: "18",
+				armor_encumbrance: "0",
+				armor_type: "STREET",
+			},
+			field_emitter_panoply: {
+				armor_ac: "20",
+				armor_encumbrance: "1",
+				armor_encumbrance_bonus: "4",
+				armor_type: "POWERED",
+			},
+			force_pavis: {
+				armor_ac: "15",
+				armor_ac_bonus: "1",
+				armor_encumbrance: "1",
+				armor_type: "SHIELD",
+			},
+			full_plate_layered_mail: {
+				armor_ac: "17",
+				armor_encumbrance: "2",
+				armor_type: "PRIMITIVE",
+			},
+			icarus_harness: {
+				armor_ac: "16",
+				armor_encumbrance: "1",
+				armor_type: "COMBAT",
+			},
+			leather_jacks_thick_hides_quilted_armor: {
+				armor_ac: "13",
+				armor_encumbrance: "1",
+				armor_type: "PRIMITIVE",
+			},
+			secure_clothing: {
+				armor_ac: "13",
+				armor_encumbrance: "1",
+				armor_type: "STREET",
+			},
+			security_armor: {
+				armor_ac: "14",
+				armor_encumbrance: "1",
+				armor_type: "COMBAT",
+			},
+			shield: {
+				armor_ac: "13",
+				armor_ac_bonus: "1",
+				armor_encumbrance: "1",
+				armor_type: "SHIELD",
+			},
+			storm_armor: {
+				armor_ac: "19",
+				armor_encumbrance: "2",
+				armor_encumbrance_bonus: "4",
+				armor_type: "POWERED",
+			},
+			vestimentum: {
+				armor_ac: "18",
+				armor_encumbrance: "0",
+				armor_type: "POWERED",
+			},
+			warpaint: {
+				armor_ac: "12",
+				armor_encumbrance: "0",
+				armor_type: "STREET",
+			},
+			woven_body_armor: {
+				armor_ac: "15",
+				armor_encumbrance: "2",
+				armor_type: "COMBAT",
+			}
+		},
+		"cyberware": {
+			adrenal_suppression_pump: {
+				cyberware_strain: "1"
+			},
+			bioadaptation_augments: {
+				cyberware_strain: "1"
+			},
+			body_arsenal_array: {
+				cyberware_strain: "1"
+			},
+			body_sculpting: {
+				cyberware_strain: "1"
+			},
+			dermal_armor: {
+				cyberware_strain: "2"
+			},
+			drone_control_link: {
+				cyberware_strain: "1"
+			},
+			eelskin_capacitor_mesh: {
+				cyberware_strain: "1"
+			},
+			gecko_anchors: {
+				cyberware_strain: "1"
+			},
+			ghost_talker_transceiver: {
+				cyberware_strain: "1"
+			},
+			holdout_cavity: {
+				cyberware_strain: "1"
+			},
+			holoskin_emitter: {
+				cyberware_strain: "1"
+			},
+			identity_submersion_trigger: {
+				cyberware_strain: "1"
+			},
+			immunofiltration_systems: {
+				cyberware_strain: "2"
+			},
+			induced_coma_trigger: {
+				cyberware_strain: "1"
+			},
+			neurointruder_alert: {
+				cyberware_strain: "1"
+			},
+			panspectral_optics: {
+				cyberware_strain: "1"
+			},
+			pressure_sheathing: {
+				cyberware_strain: "1"
+			},
+			prosthetic_limb: {
+				cyberware_strain: "1"
+			},
+			revenant_wiring: {
+				cyberware_strain: "3"
+			},
+			slowtime_window: {
+				cyberware_strain: "2"
+			},
+			stabilization_overrides: {
+				cyberware_strain: "2"
+			},
+			tagger_nanites: {
+				cyberware_strain: "1"
+			},
+			toxin_injector: {
+				cyberware_strain: "2"
+			},
+			twitchlock_actuators: {
+				cyberware_strain: "2"
+			},
+		},
+		"foci": {
+			alert: {},
+			armsman: {},
+			assassin: {},
+			authority: {},
+			close_combatant: {},
+			connected: {},
+			die_hard: {},
+			diplomat: {},
+			gunslinger: {},
+			hacker: {},
+			healer: {},
+			henchkeeper: {},
+			ironhide: {},
+			psychic_training: {},
+			savage_fray: {},
+			shocking_assault: {},
+			sniper: {},
+			specialist: {},
+			star_captain: {},
+			starfarer: {},
+			tinker: {},
+			unarmed_combatant: {},
+			unique_gift: {},
+			wanderer: {},
+			wild_psychic_talent: {},
 		},
 		"ship-defenses": {
 			ablative_hull_compartments: {
@@ -951,176 +1169,6 @@
 				weapon_range: "1000/2000",
 			},
 		},
-		"armor": {
-			armored_undersuit: {
-				armor_ac: "13",
-				armor_encumbrance: "0",
-				armor_type: "STREET",
-			},
-			armored_vacc_suit: {
-				armor_ac: "13",
-				armor_encumbrance: "2",
-				armor_type: "STREET",
-			},
-			assault_suit: {
-				armor_ac: "18",
-				armor_encumbrance: "2",
-				armor_type: "POWERED",
-			},
-			combat_field_uniform: {
-				armor_ac: "16",
-				armor_encumbrance: "1",
-				armor_type: "COMBAT",
-			},
-			cuirass_brigandine_linothorax_half_plate: {
-				armor_ac: "15",
-				armor_encumbrance: "1",
-				armor_type: "PRIMITIVE",
-			},
-			deflector_array: {
-				armor_ac: "18",
-				armor_encumbrance: "0",
-				armor_type: "STREET",
-			},
-			field_emitter_panoply: {
-				armor_ac: "20",
-				armor_encumbrance: "1",
-				armor_encumbrance_bonus: "4",
-				armor_type: "POWERED",
-			},
-			force_pavis: {
-				armor_ac: "15",
-				armor_ac_bonus: "1",
-				armor_encumbrance: "1",
-				armor_type: "SHIELD",
-			},
-			full_plate_layered_mail: {
-				armor_ac: "17",
-				armor_encumbrance: "2",
-				armor_type: "PRIMITIVE",
-			},
-			icarus_harness: {
-				armor_ac: "16",
-				armor_encumbrance: "1",
-				armor_type: "COMBAT",
-			},
-			leather_jacks_thick_hides_quilted_armor: {
-				armor_ac: "13",
-				armor_encumbrance: "1",
-				armor_type: "PRIMITIVE",
-			},
-			secure_clothing: {
-				armor_ac: "13",
-				armor_encumbrance: "1",
-				armor_type: "STREET",
-			},
-			security_armor: {
-				armor_ac: "14",
-				armor_encumbrance: "1",
-				armor_type: "COMBAT",
-			},
-			shield: {
-				armor_ac: "13",
-				armor_ac_bonus: "1",
-				armor_encumbrance: "1",
-				armor_type: "SHIELD",
-			},
-			storm_armor: {
-				armor_ac: "19",
-				armor_encumbrance: "2",
-				armor_encumbrance_bonus: "4",
-				armor_type: "POWERED",
-			},
-			vestimentum: {
-				armor_ac: "18",
-				armor_encumbrance: "0",
-				armor_type: "POWERED",
-			},
-			warpaint: {
-				armor_ac: "12",
-				armor_encumbrance: "0",
-				armor_type: "STREET",
-			},
-			woven_body_armor: {
-				armor_ac: "15",
-				armor_encumbrance: "2",
-				armor_type: "COMBAT",
-			}
-		},
-		"cyberware": {
-			adrenal_suppression_pump: {
-				cyberware_strain: "1"
-			},
-			bioadaptation_augments: {
-				cyberware_strain: "1"
-			},
-			body_arsenal_array: {
-				cyberware_strain: "1"
-			},
-			body_sculpting: {
-				cyberware_strain: "1"
-			},
-			dermal_armor: {
-				cyberware_strain: "2"
-			},
-			drone_control_link: {
-				cyberware_strain: "1"
-			},
-			eelskin_capacitor_mesh: {
-				cyberware_strain: "1"
-			},
-			gecko_anchors: {
-				cyberware_strain: "1"
-			},
-			ghost_talker_transceiver: {
-				cyberware_strain: "1"
-			},
-			holdout_cavity: {
-				cyberware_strain: "1"
-			},
-			holoskin_emitter: {
-				cyberware_strain: "1"
-			},
-			identity_submersion_trigger: {
-				cyberware_strain: "1"
-			},
-			immunofiltration_systems: {
-				cyberware_strain: "2"
-			},
-			induced_coma_trigger: {
-				cyberware_strain: "1"
-			},
-			neurointruder_alert: {
-				cyberware_strain: "1"
-			},
-			panspectral_optics: {
-				cyberware_strain: "1"
-			},
-			pressure_sheathing: {
-				cyberware_strain: "1"
-			},
-			prosthetic_limb: {
-				cyberware_strain: "1"
-			},
-			revenant_wiring: {
-				cyberware_strain: "3"
-			},
-			slowtime_window: {
-				cyberware_strain: "2"
-			},
-			stabilization_overrides: {
-				cyberware_strain: "2"
-			},
-			tagger_nanites: {
-				cyberware_strain: "1"
-			},
-			toxin_injector: {
-				cyberware_strain: "2"
-			},
-			twitchlock_actuators: {
-				cyberware_strain: "2"
-			},
-		},
 	};
 
 	/* Utility functions */
@@ -1186,8 +1234,11 @@
 	const calculateEffort = () => {
 		getAttrs([...effortAttributes, "psionics_total_effort"], v => {
 			const attrBonus = Math.max(parseInt(v.wisdom_mod), parseInt(v.constitution_mod)) || 0,
-				skillBonus = Math.max(...skills.psionic.map(x => parseInt(v[`skill_${x}`]) || 0));
-			const psionics_total_effort = 1 + attrBonus + skillBonus + (parseInt(v.psionics_extra_effort) - v.psionics_committed_effort_current - v.psionics_committed_effort_scene - v.psionics_committed_effort_day || 0);
+				skillBonus = Math.max(...skills.psionic.map(x => parseInt(v[`skill_${x}`]) || 0)),
+				minEffort = (reverseClasses[v.class.toLowerCase()] === "psychic") ? 1 : 0;
+			const psionics_total_effort = Math.max(1 + attrBonus + skillBonus, minEffort) + parseInt(v.psionics_extra_effort) -
+				parseInt(v.psionics_committed_effort_current) - parseInt(v.psionics_committed_effort_scene) -
+				parseInt(v.psionics_committed_effort_day);
 			mySetAttrs({ psionics_total_effort }, v);
 		});
 	};
@@ -1469,11 +1520,11 @@
 	/* NPC */
 	const fillNPC = () => {
 		getAttrs(["npc_stat_block"], (v) => {
-			if (v.npc_stat_block && statblockData[v.npc_stat_block]) {
+			if (v.npc_stat_block && autofillData.statblocks[v.npc_stat_block]) {
 				const [
 					HD, AC, npc_attack_bonus, damage, attacks, npc_move,
 					npc_morale, npc_skills, npc_saves, armor_type
-				] = statblockData[v.npc_stat_block];
+				] = autofillData.statblocks[v.npc_stat_block];
 
 				const setting = { AC, npc_attack_bonus, npc_move, npc_morale, npc_skills, npc_saves};
 
@@ -1718,6 +1769,18 @@
 	};
 
 	/* Autofill stuff */
+	const fillClassStats = () => {
+		getAttrs(["class", "class_ability", "attack_bonus"], v => {
+			const label = v.class && reverseClasses[v.class.toLowerCase()];
+			if (label && autofillData.classes.hasOwnProperty(label)) {
+				const data = Object.assign({}, autofillData.classes[label]);
+				Object.keys(data).forEach(key => {
+					if (!(["", "0"].includes(String(v[key])))) delete data[key];
+				});
+				mySetAttrs(data, v);
+			}
+		});
+	};
 	const getShipMultiplier = (shipClass) => {
 		if ((shipClass || "").toLowerCase() === "frigate") return 2;
 		else if ((shipClass || "").toLowerCase() === "cruiser") return 3;
@@ -1778,6 +1841,13 @@
 				output.cyberware_description = translate(`${label.toUpperCase()}_DESC`);
 			}
 		}
+		if (sName === "foci") {
+			if (label) {
+				output.focus_name = translate(label.toUpperCase());
+				output.focus_level = "1";
+				output.focus_description = translate(`${label.toUpperCase()}_DESC`);
+			}
+		}
 		return output;
 	};
 	const getAutofillInfo = (sName, v, inputData, label) => {
@@ -1820,6 +1890,7 @@
 		if (sName === "cyberware") {
 			return `${translate("STRAIN")}: ${data.cyberware_strain}.`;
 		}
+		return "";
 	};
 	const generateAutofillRow = (sName) => {
 		// Event handler for generating a new row when button is pressed
@@ -1839,8 +1910,9 @@
 			const label = v[`generate_${sName}_source`];
 			v.ship_multiplier = getShipMultiplier(v.ship_class);
 			if (label && autofillData[sName].hasOwnProperty(label)) {
-				setAttrs({
-					[`generate_${sName}_info`]: getAutofillInfo(sName, v, autofillData[sName][label], label)
+				const info = getAutofillInfo(sName, v, autofillData[sName][label], label);
+				if (info) setAttrs({
+					[`generate_${sName}_info`]: info
 				});
 			}
 			else setAttrs({[`generate_${sName}_info`]: " "});
@@ -1873,34 +1945,33 @@
 			const translated = translate(attr.toUpperCase());
 			return `${translated},+ @{${attr}_mod}[${translated}]]]&#125;&#125; ` +
 				`{{attribute= + ${translate(`${attr.toUpperCase()}_SHORT`)}&#125;&#125;`;
-		}).concat([`${translate("NONE")},]]&#125;&#125;`]);
+		});
 
-		getAttrs(["attribute_query_none", "setting_skill_query",
+		getAttrs(["attribute_query", "setting_skill_query",
 			...attributes.map(a => `attribute_query_${a.slice(0,3)}`)], v => {
 
 			if (v.setting_skill_query === "hover" || v.setting_skill_query === "hide") {
 				mySetAttrs({
+					attribute_query:     `?{${translate("ATTRIBUTE")}|${[attrQueries[0], ...attrQueries.slice(1)].join("|")}}`,
 					attribute_query_str: `+ @{strength_mod}[${translate("STRENGTH")}]]]}} {{attribute= + ${translate(`STRENGTH_SHORT`)}}}`,
 					attribute_query_dex: `+ @{dexterity_mod}[${translate("DEXTERITY")}]]]}} {{attribute= + ${translate(`DEXTERITY_SHORT`)}}}`,
 					attribute_query_con: `+ @{constitution_mod}[${translate("CONSTITUTION")}]]]}} {{attribute= + ${translate(`CONSTITUTION_SHORT`)}}}`,
 					attribute_query_int: `+ @{intelligence_mod}[${translate("INTELLIGENCE")}]]]}} {{attribute= + ${translate(`INTELLIGENCE_SHORT`)}}}`,
 					attribute_query_wis: `+ @{wisdom_mod}[${translate("WISDOM")}]]]}} {{attribute= + ${translate(`WISDOM_SHORT`)}}}`,
 					attribute_query_cha: `+ @{charisma_mod}[${translate("CHARISMA")}]]]}} {{attribute= + ${translate(`CHARISMA_SHORT`)}}}`,
-					attribute_query_none: `]]}}`,
 				}, v);
 			}
 			else if (v.setting_skill_query === "query") {
 				mySetAttrs({
+					attribute_query:     `?{${translate("ATTRIBUTE")}|${[attrQueries[0], ...attrQueries.slice(1)].join("|")}}`,
 					attribute_query_str: `?{${translate("ATTRIBUTE")}|${[attrQueries[0], ...attrQueries.slice(1)].join("|")}}`,
 					attribute_query_dex: `?{${translate("ATTRIBUTE")}|${[attrQueries[1], attrQueries[0], ...attrQueries.slice(2)].join("|")}}`,
 					attribute_query_con: `?{${translate("ATTRIBUTE")}|${[attrQueries[2], ...attrQueries.slice(0,2), ...attrQueries.slice(3)].join("|")}}`,
 					attribute_query_int: `?{${translate("ATTRIBUTE")}|${[attrQueries[3], ...attrQueries.slice(0,3), ...attrQueries.slice(4)].join("|")}}`,
 					attribute_query_wis: `?{${translate("ATTRIBUTE")}|${[attrQueries[4], ...attrQueries.slice(0,4), ...attrQueries.slice(5)].join("|")}}`,
-					attribute_query_cha: `?{${translate("ATTRIBUTE")}|${[attrQueries[5], ...attrQueries.slice(0,5), attrQueries[6]].join("|")}}`,
-					attribute_query_none: `?{${translate("ATTRIBUTE")}|${[attrQueries[6], ...attrQueries.slice(0,6)].join("|")}}`,
+					attribute_query_cha: `?{${translate("ATTRIBUTE")}|${[attrQueries[5], ...attrQueries.slice(0,5)].join("|")}}`,
 				}, v);
 			}
-
 		});
 	};
 	const handleModifierQuery = () => {
@@ -2095,11 +2166,11 @@
 			 *  convert single armor line to repeating armor
 			**/
 			else if (major == 2 && minor < 2) {
-				const upgradeFunction = () => {
+				const upgradeFunction = _.after(2, () => {
 					calculateStrDexMod();
 					calculateEffort();
 					upgradeSheet(sheetVersion);
-				};
+				});
 				getAttrs(["armor_name", "armor_ac", "armor_encumbrance", "armor_type"], v => {
 					if (v.armor_ac) {
 						const data = [{
@@ -2113,6 +2184,26 @@
 						fillRepeatingSectionFromData("armor", data, upgradeFunction);
 					} else upgradeFunction();
 				});
+				getSectionIDs("repeating_skills", skillIDs => getSectionIDs("repeating_magic-skills", magicIDs => {
+					getSectionIDs("repeating_psychic-skills", psychicIDs => {
+						const sourceAttrs = [
+							...skillIDs.map(id => `repeating_skills_${id}_skill_query`),
+							...magicIDs.map(id => `repeating_magic-skills_${id}_skill_query`),
+							...psychicIDs.map(id => `repeating_psychic-skills_${id}_skill_query`),
+							...skills.revised.map(skill => `skill_${skill}_query`),
+							...skills.first.map(skill => `skill_${skill}_query`),
+							...skills.psionic.map(skill => `skill_${skill}_query`),
+							"skill_magic_query", "skill_magic2_query"
+						];
+						getAttrs(sourceAttrs, v => {
+							const setting = sourceAttrs.reduce((m, attrName) => {
+								if (v[attrName] === "@{attribute_query_none}") m[attrName] = "@{attribute_query}";
+								return m;
+							}, {});
+							mySetAttrs(setting, v, {}, upgradeFunction);
+						});
+					});
+				}));
 			}
 			/** Final upgrade clause, always leave this around */
 			else upgradeSheet(sheetVersion, false, true);
@@ -2523,6 +2614,7 @@
 	});
 
 	/* Character sheet */
+	on("change:class", fillClassStats);
 	attributes.forEach(attr => on(`change:${attr} change:${attr}_bonus`, () => calculateMod(attr)));
 
 	on(weaponDisplayEvent, generateWeaponDisplay);
@@ -2569,6 +2661,12 @@
 		"change:repeating_magic-skills remove:repeating_magic-skills " +
 		"change:skill_magic change:skill_magic2_name change:skill_magic2", buildMagicMenu);
 
+	/* Repeating autofill */
+	autofillSections.forEach(sName => {
+		on(`change:generate_${sName}_source`, () => generateAutofillInfo(sName));
+		on(`change:generate_${sName}_button`, () => generateAutofillRow(sName));
+	});
+
 
 	/* Ship sheet */
 	on("change:ship_hulltype", fillShipStats);
@@ -2576,11 +2674,6 @@
 	on(shipStatEvent, calculateShipStats);
 	on("change:repeating_ship-weapons:weapon_name change:repeating_ship-weapons:weapon_attack_bonus " +
 		"remove:repeating_ship-weapons", buildShipWeaponsMenu);
-
-	autofillSections.forEach(sName => {
-		on(`change:generate_${sName}_source`, () => generateAutofillInfo(sName));
-		on(`change:generate_${sName}_button`, () => generateAutofillRow(sName));
-	});
 
 	/* NPC sheet */
 	on("change:npc_stat_block", fillNPC);
