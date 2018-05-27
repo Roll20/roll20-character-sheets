@@ -305,271 +305,226 @@
 		"ship-fittings": {
 			advanced_lab: {
 				class: "FRIGATE",
-				fitting_effect: translate("ADVANCED_LAB_DESC"),
 				fitting_mass: "2",
 				fitting_power: "1#",
 			},
 			advanced_nav_computer: {
 				class: "FRIGATE",
-				fitting_effect: translate("ADVANCED_NAV_COMPUTER_DESC"),
 				fitting_mass: "0",
 				fitting_power: "1#",
 			},
 			amphibious_operation: {
 				class: "FIGHTER",
-				fitting_effect: translate("AMPHIBIOUS_OPERATION_DESC"),
 				fitting_mass: "1#",
 				fitting_power: "1",
 			},
 			armory: {
 				class: "FRIGATE",
-				fitting_effect: translate("ARMORY_DESC"),
 				fitting_mass: "0",
 				fitting_power: "0",
 			},
 			atmospheric_configuration: {
 				class: "FIGHTER",
-				fitting_effect: translate("ATMOSPHERIC_CONFIGURATION_DESC"),
 				fitting_mass: "1#",
 				fitting_power: "0",
 			},
 			auto_targeting_system: {
 				class: "FIGHTER",
-				fitting_effect: translate("AUTO_TARGETING_SYSTEM_DESC"),
 				fitting_mass: "0",
 				fitting_power: "1",
 			},
 			automation_support: {
 				class: "FIGHTER",
-				fitting_effect: translate("AUTOMATION_SUPPORT_DESC"),
 				fitting_mass: "1",
 				fitting_power: "2",
 			},
 			boarding_tubes: {
 				class: "FRIGATE",
-				fitting_effect: translate("BOARDING_TUBES_DESC"),
 				fitting_mass: "1",
 				fitting_power: "0",
 			},
 			cargo_lighter: {
 				class: "FRIGATE",
-				fitting_effect: translate("CARGO_LIGHTER_DESC"),
 				fitting_mass: "2",
 				fitting_power: "0",
 			},
 			cargo_space: {
 				class: "FIGHTER",
-				fitting_effect: translate("CARGO_SPACE_DESC"),
 				fitting_mass: "1",
 				fitting_power: "0",
 			},
 			cold_sleep_pods: {
 				class: "FRIGATE",
-				fitting_effect: translate("COLD_SLEEP_PODS_DESC"),
 				fitting_mass: "1",
 				fitting_power: "1",
 			},
 			colony_core: {
 				class: "FRIGATE",
-				fitting_effect: translate("COLONY_CORE_DESC"),
 				fitting_mass: "2#",
 				fitting_power: "4",
 			},
 			drill_course_regulator: {
 				class: "FRIGATE",
-				fitting_effect: translate("DRILL_COURSE_REGULATOR_DESC"),
 				fitting_mass: "1",
 				fitting_power: "1#",
 			},
 			spike_drive_2: {
 				class: "FIGHTER",
-				fitting_effect: translate("SPIKE_DRIVE_2_DESC"),
 				fitting_mass: "1#",
 				fitting_power: "1#",
 			},
 			spike_drive_3: {
 				class: "FIGHTER",
-				fitting_effect: translate("SPIKE_DRIVE_3_DESC"),
 				fitting_mass: "2#",
 				fitting_power: "2#",
 			},
 			spike_drive_4: {
 				class: "FRIGATE",
-				fitting_effect: translate("SPIKE_DRIVE_4_DESC"),
 				fitting_mass: "3#",
 				fitting_power: "2#",
 			},
 			spike_drive_5: {
 				class: "FRIGATE",
-				fitting_effect: translate("SPIKE_DRIVE_5_DESC"),
 				fitting_mass: "3#",
 				fitting_power: "3#",
 			},
 			spike_drive_6: {
 				class: "CRUISER",
-				fitting_effect: translate("SPIKE_DRIVE_6_DESC"),
 				fitting_mass: "4#",
 				fitting_power: "3#",
 			},
 			drop_pod: {
 				class: "FRIGATE",
-				fitting_effect: translate("DROP_POD_DESC"),
 				fitting_mass: "2",
 				fitting_power: "0",
 			},
 			emissions_dampers: {
 				class: "FIGHTER",
-				fitting_effect: translate("EMISSIONS_DAMPERS_DESC"),
 				fitting_mass: "1#",
 				fitting_power: "1#",
 			},
 			exodus_bay: {
 				class: "CRUISER",
-				fitting_effect: translate("EXODUS_BAY_DESC"),
 				fitting_mass: "2#",
 				fitting_power: "1#",
 			},
 			extended_life_support: {
 				class: "FIGHTER",
-				fitting_effect: translate("EXTENDED_LIFE_SUPPORT_DESC"),
 				fitting_mass: "1#",
 				fitting_power: "1#",
 			},
 			extended_medbay: {
 				class: "FRIGATE",
-				fitting_effect: translate("EXTENDED_MEDBAY_DESC"),
 				fitting_mass: "1",
 				fitting_power: "1",
 			},
 			extended_store: {
 				class: "FIGHTER",
-				fitting_effect: translate("EXTENDED_STORE_DESC"),
 				fitting_mass: "1#",
 				fitting_power: "0",
 			},
 			fuel_bunkers: {
 				class: "FIGHTER",
-				fitting_effect: translate("FUEL_BUNKERS_DESC"),
 				fitting_mass: "1",
 				fitting_power: "0",
 			},
 			fuel_scoops: {
 				class: "FRIGATE",
-				fitting_effect: translate("FUEL_SCOOPS_DESC"),
 				fitting_mass: "1#",
 				fitting_power: "2",
 			},
 			hydroponic_production: {
 				class: "CRUISER",
-				fitting_effect: translate("HYDROPONIC_PRODUCTION_DESC"),
 				fitting_mass: "2#",
 				fitting_power: "1#",
 			},
 			lifeboats: {
 				class: "FRIGATE",
-				fitting_effect: translate("LIFEBOATS_DESC"),
 				fitting_mass: "1",
 				fitting_power: "0",
 			},
 			luxury_cabins: {
 				class: "FRIGATE",
-				fitting_effect: translate("LUXURY_CABINS_DESC"),
 				fitting_mass: "1#",
 				fitting_power: "1",
 			},
 			mobile_extractor: {
 				class: "FRIGATE",
-				fitting_effect: translate("MOBILE_EXTRACTOR_DESC"),
 				fitting_mass: "1",
 				fitting_power: "2",
 			},
 			mobile_factory: {
 				class: "CRUISER",
-				fitting_effect: translate("MOBILE_FACTORY_DESC"),
 				fitting_mass: "2#",
 				fitting_power: "3",
 			},
 			precognitive_nav_chamber: {
 				class: "FRIGATE",
-				fitting_effect: translate("PRECOGNITIVE_NAV_CHAMBER_DESC"),
 				fitting_mass: "0",
 				fitting_power: "1",
 			},
 			psionic_anchorpoint: {
 				class: "FRIGATE",
-				fitting_effect: translate("PSIONIC_ANCHORPOINT_DESC"),
 				fitting_mass: "0",
 				fitting_power: "3",
 			},
 			sensor_mask: {
 				class: "FRIGATE",
-				fitting_effect: translate("SENSOR_MASK_DESC"),
 				fitting_mass: "0",
 				fitting_power: "1#",
 			},
 			ship_bay_fighter: {
 				class: "CRUISER",
-				fitting_effect: translate("SHIP_BAY_FIGHTER_DESC"),
 				fitting_mass: "2",
 				fitting_power: "0",
 			},
 			ship_bay_frigate: {
 				class: "CAPITAL",
-				fitting_effect: translate("SHIP_BAY_FRIGATE_DESC"),
 				fitting_mass: "4",
 				fitting_power: "1",
 			},
 			ships_locker: {
 				class: "FRIGATE",
-				fitting_effect: translate("SHIPS_LOCKER_DESC"),
 				fitting_mass: "0",
 				fitting_power: "0",
 			},
 			shiptender_mount: {
 				class: "FRIGATE",
-				fitting_effect: translate("SHIPTENDER_MOUNT_DESC"),
 				fitting_mass: "1",
 				fitting_power: "1",
 			},
 			smugglers_hold: {
 				class: "FIGHTER",
-				fitting_effect: translate("SMUGGLERS_HOLD_DESC"),
 				fitting_mass: "1",
 				fitting_power: "0",
 			},
 			survey_sensor_array: {
 				class: "FRIGATE",
-				fitting_effect: translate("SURVEY_SENSOR_ARRAY_DESC"),
 				fitting_mass: "1",
 				fitting_power: "2",
 			},
 			system_drive: {
 				class: "FIGHTER",
-				fitting_effect: translate("SYSTEM_DRIVE_DESC"),
 				fitting_mass: "-2#",
 				fitting_power: "-1#",
 			},
 			teleportation_pads: {
 				class: "FRIGATE",
-				fitting_effect: translate("TELEPORTATION_PADS_DESC"),
 				fitting_mass: "1",
 				fitting_power: "1",
 			},
 			tractor_beams: {
 				class: "FRIGATE",
-				fitting_effect: translate("TRACTOR_BEAMS_DESC"),
 				fitting_mass: "1",
 				fitting_power: "2",
 			},
 			vehicle_transport_fittings: {
 				class: "FRIGATE",
-				fitting_effect: translate("VEHICLE_TRANSPORT_FITTINGS_DESC"),
 				fitting_mass: "1#",
 				fitting_power: "0",
 			},
 			workshop: {
 				class: "FRIGATE",
-				fitting_effect: translate("WORKSHOP_DESC"),
 				fitting_mass: "0.5#",
 				fitting_power: "1",
 			},
@@ -1094,99 +1049,75 @@
 		},
 		"cyberware": {
 			adrenal_suppression_pump: {
-				cyberware_description: translate("ADRENAL_SUPPRESSION_PUMP_DESC"),
 				cyberware_strain: "1"
 			},
 			bioadaptation_augments: {
-				cyberware_description: translate("BIOADAPTATION_AUGMENTS_DESC"),
 				cyberware_strain: "1"
 			},
 			body_arsenal_array: {
-				cyberware_description: translate("BODY_ARSENAL_ARRAY_DESC"),
 				cyberware_strain: "1"
 			},
 			body_sculpting: {
-				cyberware_description: translate("BODY_SCULPTING_DESC"),
 				cyberware_strain: "1"
 			},
 			dermal_armor: {
-				cyberware_description: translate("DERMAL_ARMOR_DESC"),
 				cyberware_strain: "2"
 			},
 			drone_control_link: {
-				cyberware_description: translate("DRONE_CONTROL_LINK_DESC"),
 				cyberware_strain: "1"
 			},
 			eelskin_capacitor_mesh: {
-				cyberware_description: translate("EELSKIN_CAPACITOR_MESH_DESC"),
 				cyberware_strain: "1"
 			},
 			gecko_anchors: {
-				cyberware_description: translate("GECKO_ANCHORS_DESC"),
 				cyberware_strain: "1"
 			},
 			ghost_talker_transceiver: {
-				cyberware_description: translate("GHOST_TALKER_TRANSCEIVER_DESC"),
 				cyberware_strain: "1"
 			},
 			holdout_cavity: {
-				cyberware_description: translate("HOLDOUT_CAVITY_DESC"),
 				cyberware_strain: "1"
 			},
 			holoskin_emitter: {
-				cyberware_description: translate("HOLOSKIN_EMITTER_DESC"),
 				cyberware_strain: "1"
 			},
 			identity_submersion_trigger: {
-				cyberware_description: translate("IDENTITY_SUBMERSION_TRIGGER_DESC"),
 				cyberware_strain: "1"
 			},
 			immunofiltration_systems: {
-				cyberware_description: translate("IMMUNOFILTRATION_SYSTEMS_DESC"),
 				cyberware_strain: "2"
 			},
 			induced_coma_trigger: {
-				cyberware_description: translate("INDUCED_COMA_TRIGGER_DESC"),
 				cyberware_strain: "1"
 			},
 			neurointruder_alert: {
-				cyberware_description: translate("NEUROINTRUDER_ALERT_DESC"),
 				cyberware_strain: "1"
 			},
 			panspectral_optics: {
-				cyberware_description: translate("PANSPECTRAL_OPTICS_DESC"),
 				cyberware_strain: "1"
 			},
 			pressure_sheathing: {
-				cyberware_description: translate("PRESSURE_SHEATHING_DESC"),
 				cyberware_strain: "1"
 			},
 			prosthetic_limb: {
-				cyberware_description: translate("PROSTHETIC_LIMB_DESC"),
 				cyberware_strain: "1"
 			},
 			revenant_wiring: {
-				cyberware_description: translate("REVENANT_WIRING_DESC"),
 				cyberware_strain: "3"
 			},
 			slowtime_window: {
-				cyberware_description: translate("SLOWTIME_WINDOW_DESC"),
 				cyberware_strain: "2"
 			},
 			stabilization_overrides: {
-				cyberware_description: translate("STABILIZATION_OVERRIDES_DESC"),
 				cyberware_strain: "2"
 			},
 			tagger_nanites: {
-				cyberware_description: translate("TAGGER_NANITES_DESC"),
 				cyberware_strain: "1"
 			},
 			toxin_injector: {
-				cyberware_description: translate("TOXIN_INJECTOR_DESC"),
 				cyberware_strain: "2"
 			},
 			twitchlock_actuators: {
-				cyberware_description: translate("TWITCHLOCK_ACTUATORS_DESC"),
 				cyberware_strain: "2"
 			},
 		},
@@ -1804,7 +1735,10 @@
 			}
 		}
 		if (sName === "ship-fittings") {
-			if (label) output.fitting_name = translate(label.toUpperCase());
+			if (label) {
+				output.fitting_name = translate(label.toUpperCase());
+				output.fitting_effect = translate(`${label.toUpperCase()}_DESC`);
+			}
 			if (output.fitting_mass.includes("#")) {
 				output.fitting_mass = String(Math.round(parseFloat(output.fitting_mass) * v.ship_multiplier));
 			}
@@ -1839,12 +1773,15 @@
 			if (label) output.armor_name = translate(label.toUpperCase());
 		}
 		if (sName === "cyberware") {
-			if (label) output.cyberware_name = translate(label.toUpperCase());
+			if (label) {
+				output.cyberware_name = translate(label.toUpperCase());
+				output.cyberware_description = translate(`${label.toUpperCase()}_DESC`);
+			}
 		}
 		return output;
 	};
-	const getAutofillInfo = (sName, v, inputData) => {
-		const data = getAutofillData(sName, v, inputData);
+	const getAutofillInfo = (sName, v, inputData, label) => {
+		const data = getAutofillData(sName, v, inputData, label);
 		// Generates info text from the stored data
 		if (sName === "ship-defenses") {
 			return `${translate(data.class)}+. ${translate("POWER_INIT")}: ${data.defense_power}, ` +
@@ -1903,7 +1840,7 @@
 			v.ship_multiplier = getShipMultiplier(v.ship_class);
 			if (label && autofillData[sName].hasOwnProperty(label)) {
 				setAttrs({
-					[`generate_${sName}_info`]: getAutofillInfo(sName, v, autofillData[sName][label])
+					[`generate_${sName}_info`]: getAutofillInfo(sName, v, autofillData[sName][label], label)
 				});
 			}
 			else setAttrs({[`generate_${sName}_info`]: " "});
