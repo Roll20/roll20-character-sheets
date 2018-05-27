@@ -98,7 +98,7 @@
 		[translate("STRIKE_FIGHTER").toLowerCase()]: "strike_fighter",
 		[translate("SHUTTLE").toLowerCase()]: "shuttle",
 	};
-	const autofillSections = ["ship-defenses", "ship-fittings", "ship-weapons", "weapons", "armor"];
+	const autofillSections = ["ship-defenses", "ship-fittings", "ship-weapons", "weapons", "armor", "cyberware"];
 	const autofillData = {
 		"hulltypes": {
 			battleship: {
@@ -1091,7 +1091,105 @@
 				armor_encumbrance: "2",
 				armor_type: "COMBAT",
 			}
-		}
+		},
+		"cyberware": {
+			adrenal_suppression_pump: {
+				cyberware_description: translate("ADRENAL_SUPPRESSION_PUMP_DESC"),
+				cyberware_strain: "1"
+			},
+			bioadaptation_augments: {
+				cyberware_description: translate("BIOADAPTATION_AUGMENTS_DESC"),
+				cyberware_strain: "1"
+			},
+			body_arsenal_array: {
+				cyberware_description: translate("BODY_ARSENAL_ARRAY_DESC"),
+				cyberware_strain: "1"
+			},
+			body_sculpting: {
+				cyberware_description: translate("BODY_SCULPTING_DESC"),
+				cyberware_strain: "1"
+			},
+			dermal_armor: {
+				cyberware_description: translate("DERMAL_ARMOR_DESC"),
+				cyberware_strain: "2"
+			},
+			drone_control_link: {
+				cyberware_description: translate("DRONE_CONTROL_LINK_DESC"),
+				cyberware_strain: "1"
+			},
+			eelskin_capacitor_mesh: {
+				cyberware_description: translate("EELSKIN_CAPACITOR_MESH_DESC"),
+				cyberware_strain: "1"
+			},
+			gecko_anchors: {
+				cyberware_description: translate("GECKO_ANCHORS_DESC"),
+				cyberware_strain: "1"
+			},
+			ghost_talker_transceiver: {
+				cyberware_description: translate("GHOST_TALKER_TRANSCEIVER_DESC"),
+				cyberware_strain: "1"
+			},
+			holdout_cavity: {
+				cyberware_description: translate("HOLDOUT_CAVITY_DESC"),
+				cyberware_strain: "1"
+			},
+			holoskin_emitter: {
+				cyberware_description: translate("HOLOSKIN_EMITTER_DESC"),
+				cyberware_strain: "1"
+			},
+			identity_submersion_trigger: {
+				cyberware_description: translate("IDENTITY_SUBMERSION_TRIGGER_DESC"),
+				cyberware_strain: "1"
+			},
+			immunofiltration_systems: {
+				cyberware_description: translate("IMMUNOFILTRATION_SYSTEMS_DESC"),
+				cyberware_strain: "2"
+			},
+			induced_coma_trigger: {
+				cyberware_description: translate("INDUCED_COMA_TRIGGER_DESC"),
+				cyberware_strain: "1"
+			},
+			neurointruder_alert: {
+				cyberware_description: translate("NEUROINTRUDER_ALERT_DESC"),
+				cyberware_strain: "1"
+			},
+			panspectral_optics: {
+				cyberware_description: translate("PANSPECTRAL_OPTICS_DESC"),
+				cyberware_strain: "1"
+			},
+			pressure_sheathing: {
+				cyberware_description: translate("PRESSURE_SHEATHING_DESC"),
+				cyberware_strain: "1"
+			},
+			prosthetic_limb: {
+				cyberware_description: translate("PROSTHETIC_LIMB_DESC"),
+				cyberware_strain: "1"
+			},
+			revenant_wiring: {
+				cyberware_description: translate("REVENANT_WIRING_DESC"),
+				cyberware_strain: "3"
+			},
+			slowtime_window: {
+				cyberware_description: translate("SLOWTIME_WINDOW_DESC"),
+				cyberware_strain: "2"
+			},
+			stabilization_overrides: {
+				cyberware_description: translate("STABILIZATION_OVERRIDES_DESC"),
+				cyberware_strain: "2"
+			},
+			tagger_nanites: {
+				cyberware_description: translate("TAGGER_NANITES_DESC"),
+				cyberware_strain: "1"
+			},
+			toxin_injector: {
+				cyberware_description: translate("TOXIN_INJECTOR_DESC"),
+				cyberware_strain: "2"
+			},
+			twitchlock_actuators: {
+				cyberware_description: translate("TWITCHLOCK_ACTUATORS_DESC"),
+				cyberware_strain: "2"
+			},
+		},
 	};
 
 	/* Utility functions */
@@ -1740,6 +1838,9 @@
 		if (sName === "armor") {
 			if (label) output.armor_name = translate(label.toUpperCase());
 		}
+		if (sName === "cyberware") {
+			if (label) output.cyberware_name = translate(label.toUpperCase());
+		}
 		return output;
 	};
 	const getAutofillInfo = (sName, v, inputData) => {
@@ -1778,6 +1879,9 @@
 		if (sName === "armor") {
 			return `${translate("AC")} ${data.armor_ac}, ${translate(data.armor_type)}, ` +
 			`${translate("ENCUMBRANCE_SHORT")} ${data.armor_encumbrance}.`;
+		}
+		if (sName === "cyberware") {
+			return `${translate("STRAIN")}: ${data.cyberware_strain}.`;
 		}
 	};
 	const generateAutofillRow = (sName) => {
