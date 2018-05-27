@@ -20,7 +20,7 @@
 		"remove:repeating_ship-fittings"
 	].join(" ");
 	const weaponSkills = [
-		"skill_shoot", "skill_punch", "skill_stab", "skill_combat_energy",
+		"skill_exert", "skill_punch", "skill_shoot", "skill_stab", "skill_combat_energy",
 		"skill_combat_gunnery", "skill_combat_primitive", "skill_combat_projectile",
 		"skill_combat_psitech", "skill_combat_unarmed", "skill_telekinesis"
 	];
@@ -1420,7 +1420,8 @@
 		// Makes sure that the select for the weapon skill is never in an invalid state.
 		const prefixes = (ids && ids.map(id => `repeating_weapons_${id}`)) || ["repeating_weapons"];
 		getAttrs(["homebrew_skill_list", ...prefixes.map(p => `${p}_weapon_skill_bonus`)], v => {
-			const revisedList = ["@{skill_shoot}", "@{skill_punch}", "@{skill_stab}", "@{skill_telekinesis}", "0"],
+			const revisedList = ["@{skill_exert}", "@{skill_punch}", "@{skill_shoot}", "@{skill_stab}",
+				"@{skill_telekinesis}", "0"],
 				firstList = ["@{skill_combat_energy}", "@{skill_combat_gunnery}", "@{skill_combat_primitive}", "@{skill_combat_projectile}",
 					"@{skill_combat_psitech}", "@{skill_combat_unarmed}", "@{skill_telekinesis}", "0"
 				],

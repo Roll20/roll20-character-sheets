@@ -48,6 +48,8 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Added the option to enable ammo tracking with ChatSetAttr to the sheet default settings.
 * Added a place to track skill points that can only be spent on psionics.
 * Changed armor to be a repeating section.
+* The gear section now has a header.
+* Exert can now be used as a weapon's attack skill.
 
 ### 2.1.0
 
