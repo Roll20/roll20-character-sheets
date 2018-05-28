@@ -66,7 +66,7 @@
 		[translate("PSYCHIC").toLowerCase()]: "psychic",
 		[translate("WARRIOR").toLowerCase()]: "warrior",
 	};
-	const autofillSections = ["ship-defenses", "ship-fittings", "ship-weapons", "weapons", "armor", "cyberware", "foci"];
+	const autofillSections = ["armor", "cyberware", "foci", "ship-defenses", "ship-fittings", "ship-weapons", "techniques", "weapons"];
 	const autofillData = {
 		"classes": {
 			adventurer: {
@@ -906,6 +906,215 @@
 				weapon_qualities: `${translate("AP")} 20, ${translate("CLUMSY")}`,
 			},
 		},
+		"techniques": {
+			accelerated_succor: {
+				level: "3"
+			},
+			alternate_outcome: {
+				level: "2"
+			},
+			anguished_vision: {
+				level: "3"
+			},
+			burdened_apportation: {
+				level: "2"
+			},
+			cloak_powers: {
+				level: "1"
+			},
+			concert_of_minds: {
+				level: "3"
+			},
+			cursed_luck: {
+				level: "3"
+			},
+			deep_intrusion: {
+				level: "4"
+			},
+			destinys_shield: {
+				level: "2"
+			},
+			effortless_apportation: {
+				level: "3"
+			},
+			facile_mind: {
+				level: "1"
+			},
+			far_thought: {
+				level: "2"
+			},
+			flawless_mastery: {
+				level: "4"
+			},
+			force_puppetry: {
+				level: "4"
+			},
+			forced_outcome: {
+				level: "3"
+			},
+			holistic_optimization_patterning: {
+				level: "4"
+			},
+			impact_sump: {
+				level: "2"
+			},
+			impervious_pavis_of_will: {
+				level: "4"
+			},
+			intuitive_response: {
+				level: "1"
+			},
+			invincible_stand: {
+				level: "2"
+			},
+			kinetic_transversal: {
+				level: "1"
+			},
+			major_organ_restoration: {
+				level: "2"
+			},
+			mastered_succor: {
+				level: "1"
+			},
+			memory_editing: {
+				level: "4"
+			},
+			metadimensional_friction: {
+				level: "3"
+			},
+			metamorph: {
+				level: "3"
+			},
+			mindtracing: {
+				level: "1"
+			},
+			neural_trap: {
+				level: "2"
+			},
+			not_my_time: {
+				level: "4"
+			},
+			offensive_apportation: {
+				level: "4"
+			},
+			oracle: {
+				level: "0"
+			},
+			organic_purification_protocols: {
+				level: "1"
+			},
+			perceptive_dislocation: {
+				level: "2"
+			},
+			personal_apportation: {
+				level: "0"
+			},
+			pressure_field: {
+				level: "1"
+			},
+			proficient_apportation: {
+				level: "1"
+			},
+			prophecy: {
+				level: "4"
+			},
+			psychic_refinement: {
+				level: "0"
+			},
+			psychic_static: {
+				level: "2"
+			},
+			psychic_succor: {
+				level: "0"
+			},
+			psychic_tutelage: {
+				level: "3"
+			},
+			quintessential_reconstruction: {
+				level: "4"
+			},
+			reactive_telekinesis: {
+				level: "3"
+			},
+			reflex_response: {
+				level: "3"
+			},
+			remote_repair: {
+				level: "1"
+			},
+			rift_reduplication: {
+				level: "3"
+			},
+			sense_the_need: {
+				level: "1"
+			},
+			slip_field: {
+				level: "2"
+			},
+			spatial_awareness: {
+				level: "1"
+			},
+			spatial_synchrony_mandala: {
+				level: "2"
+			},
+			stutterjump: {
+				level: "3"
+			},
+			suppress_cognition: {
+				level: "2"
+			},
+			surge_momentum: {
+				level: "3"
+			},
+			suspended_manifestation: {
+				level: "2"
+			},
+			synthetic_adaptation: {
+				level: "1"
+			},
+			tangible_force_construct: {
+				level: "3"
+			},
+			telekinetic_armory: {
+				level: "1"
+			},
+			telekinetic_expertise: {
+				level: "2"
+			},
+			telekinetic_flight: {
+				level: "4"
+			},
+			telekinetic_manipulation: {
+				level: "0"
+			},
+			telekinetic_ram: {
+				level: "3"
+			},
+			telepathic_assault: {
+				level: "3"
+			},
+			telepathic_contact: {
+				level: "0"
+			},
+			teratic_overload: {
+				level: "3"
+			},
+			terminal_reflection: {
+				level: "1"
+			},
+			thermokinesis: {
+				level: "2"
+			},
+			tissue_integrity_field: {
+				level: "2"
+			},
+			transmit_thought: {
+				level: "1"
+			},
+			unity_of_thought: {
+				level: "4"
+			},
+		},
 		"weapons": {
 			advanced_bow: {
 				weapon_ammo: "1",
@@ -1295,9 +1504,7 @@
 				[`${attr}_mod`]: String(mod + (parseInt(v[`${attr}_bonus`]) || 0))
 			};
 
-			mySetAttrs(setting, v, {
-				silent: false
-			}, () => {
+			mySetAttrs(setting, v, null, () => {
 				calculateSaves();
 				generateWeaponDisplay();
 				calculateStrDexMod();
@@ -1848,6 +2055,12 @@
 				output.focus_description = translate(`${label.toUpperCase()}_DESC`);
 			}
 		}
+		if (sName === "techniques") {
+			if (label) {
+				output.technique_name = translate(label.toUpperCase());
+				output.technique_description = translate(`${label.toUpperCase()}_DESC`);
+			}
+		}
 		return output;
 	};
 	const getAutofillInfo = (sName, v, inputData, label) => {
@@ -1890,6 +2103,10 @@
 		if (sName === "cyberware") {
 			return `${translate("STRAIN")}: ${data.cyberware_strain}.`;
 		}
+		if (sName === "techniques") {
+			if (data.level === "0") return `${translate("CORE_TECHNIQUE")}.`;
+			else return `${translate("LEVEL")}-${data.level}.`;
+		}
 		return "";
 	};
 	const generateAutofillRow = (sName) => {
@@ -1900,6 +2117,7 @@
 			if (label && autofillData[sName].hasOwnProperty(label)) {
 				const data = getAutofillData(sName, v, autofillData[sName][label], label);
 				delete data.class;
+				delete data.level;
 				fillRepeatingSectionFromData(sName, [data]);
 			}
 		});
@@ -2445,7 +2663,7 @@
 						return row;
 					});
 				fillRepeatingSectionFromData("ship-weapons", data, upgradeFunction);
-				setAttrs(setting, {silent: false}, upgradeFunction);
+				setAttrs(setting, null, upgradeFunction);
 			});
 		});
 		// convert skills
@@ -2504,7 +2722,7 @@
 						m[`repeating_cyberware_${id}_cyberware_name`] = v[`repeating_cyberware_${id}_cyberware`];
 					return m;
 				}, {});
-				setAttrs(setting, {silent: false}, upgradeFunction);
+				setAttrs(setting, null, upgradeFunction);
 			});
 		});
 		// convert goals
@@ -2521,7 +2739,7 @@
 						m[`repeating_goals_${id}_goal_xp`] = v[`repeating_goals_${id}_misc_goal_xp`];
 					return m;
 				}, {});
-				setAttrs(setting, {silent: false}, upgradeFunction);
+				setAttrs(setting, null, upgradeFunction);
 			});
 		});
 		// convert languages
@@ -2532,7 +2750,7 @@
 						m[`repeating_languages_${id}_language`] = v[`repeating_languages_${id}_languages`];
 					return m;
 				}, {});
-				setAttrs(setting, {silent: false}, upgradeFunction);
+				setAttrs(setting, null, upgradeFunction);
 			});
 		});
 		// convert gear status
@@ -2545,7 +2763,7 @@
 						m[`repeating_gear_${id}_gear_status`] = "stowed";
 					return m;
 				}, {});
-				setAttrs(setting, {silent: false}, upgradeFunction);
+				setAttrs(setting, null, upgradeFunction);
 			});
 		});
 		// convert defenses
