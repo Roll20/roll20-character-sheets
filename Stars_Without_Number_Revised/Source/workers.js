@@ -908,211 +908,280 @@
 		},
 		"techniques": {
 			accelerated_succor: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("BIOPSIONICS"),
 			},
 			alternate_outcome: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("PRECOGNITION"),
 			},
 			anguished_vision: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("PRECOGNITION"),
 			},
 			burdened_apportation: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("TELEPORTATION"),
 			},
 			cloak_powers: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("METAPSIONICS"),
 			},
 			concert_of_minds: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("METAPSIONICS"),
 			},
 			cursed_luck: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("PRECOGNITION"),
 			},
 			deep_intrusion: {
-				level: "4"
+				level: "4",
+				technique_discipline: translate("TELEPORTATION"),
 			},
 			destinys_shield: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("PRECOGNITION"),
 			},
 			effortless_apportation: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("TELEPORTATION"),
 			},
 			facile_mind: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("TELEPATHY"),
 			},
 			far_thought: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("TELEPATHY"),
 			},
 			flawless_mastery: {
-				level: "4"
+				level: "4",
+				technique_discipline: translate("METAPSIONICS"),
 			},
 			force_puppetry: {
-				level: "4"
+				level: "4",
+				technique_discipline: translate("TELEKINESIS"),
 			},
 			forced_outcome: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("PRECOGNITION"),
 			},
 			holistic_optimization_patterning: {
-				level: "4"
+				level: "4",
+				technique_discipline: translate("BIOPSIONICS"),
 			},
 			impact_sump: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("TELEKINESIS"),
 			},
 			impervious_pavis_of_will: {
-				level: "4"
+				level: "4",
+				technique_discipline: translate("METAPSIONICS"),
 			},
 			intuitive_response: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("PRECOGNITION"),
 			},
 			invincible_stand: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("BIOPSIONICS"),
 			},
 			kinetic_transversal: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("TELEKINESIS"),
 			},
 			major_organ_restoration: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("BIOPSIONICS"),
 			},
 			mastered_succor: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("BIOPSIONICS"),
 			},
 			memory_editing: {
-				level: "4"
+				level: "4",
+				technique_discipline: translate("TELEPATHY"),
 			},
 			metadimensional_friction: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("METAPSIONICS"),
 			},
 			metamorph: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("BIOPSIONICS"),
 			},
 			mindtracing: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("METAPSIONICS"),
 			},
 			neural_trap: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("METAPSIONICS"),
 			},
 			not_my_time: {
-				level: "4"
+				level: "4",
+				technique_discipline: translate("PRECOGNITION"),
 			},
 			offensive_apportation: {
-				level: "4"
+				level: "4",
+				technique_discipline: translate("TELEPORTATION"),
 			},
 			oracle: {
-				level: "0"
+				level: "0",
+				technique_discipline: translate("PRECOGNITION"),
 			},
 			organic_purification_protocols: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("BIOPSIONICS"),
 			},
 			perceptive_dislocation: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("TELEPORTATION"),
 			},
 			personal_apportation: {
-				level: "0"
+				level: "0",
+				technique_discipline: translate("TELEPORTATION"),
 			},
 			pressure_field: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("TELEKINESIS"),
 			},
 			proficient_apportation: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("TELEPORTATION"),
 			},
 			prophecy: {
-				level: "4"
+				level: "4",
+				technique_discipline: translate("PRECOGNITION"),
 			},
 			psychic_refinement: {
-				level: "0"
+				level: "0",
+				technique_discipline: translate("METAPSIONICS"),
 			},
 			psychic_static: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("METAPSIONICS"),
 			},
 			psychic_succor: {
-				level: "0"
+				level: "0",
+				technique_discipline: translate("BIOPSIONICS"),
 			},
 			psychic_tutelage: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("METAPSIONICS"),
 			},
 			quintessential_reconstruction: {
-				level: "4"
+				level: "4",
+				technique_discipline: translate("BIOPSIONICS"),
 			},
 			reactive_telekinesis: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("TELEKINESIS"),
 			},
 			reflex_response: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("TELEPATHY"),
 			},
 			remote_repair: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("BIOPSIONICS"),
 			},
 			rift_reduplication: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("TELEPORTATION"),
 			},
 			sense_the_need: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("PRECOGNITION"),
 			},
 			slip_field: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("TELEKINESIS"),
 			},
 			spatial_awareness: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("TELEPORTATION"),
 			},
 			spatial_synchrony_mandala: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("TELEPORTATION"),
 			},
 			stutterjump: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("TELEPORTATION"),
 			},
 			suppress_cognition: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("TELEPATHY"),
 			},
 			surge_momentum: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("METAPSIONICS"),
 			},
 			suspended_manifestation: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("METAPSIONICS"),
 			},
 			synthetic_adaptation: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("METAPSIONICS"),
 			},
 			tangible_force_construct: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("TELEKINESIS"),
 			},
 			telekinetic_armory: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("TELEKINESIS"),
 			},
 			telekinetic_expertise: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("TELEKINESIS"),
 			},
 			telekinetic_flight: {
-				level: "4"
+				level: "4",
+				technique_discipline: translate("TELEKINESIS"),
 			},
 			telekinetic_manipulation: {
-				level: "0"
+				level: "0",
+				technique_discipline: translate("TELEKINESIS"),
 			},
 			telekinetic_ram: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("TELEKINESIS"),
 			},
 			telepathic_assault: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("TELEPATHY"),
 			},
 			telepathic_contact: {
-				level: "0"
+				level: "0",
+				technique_discipline: translate("TELEPATHY"),
 			},
 			teratic_overload: {
-				level: "3"
+				level: "3",
+				technique_discipline: translate("BIOPSIONICS"),
 			},
 			terminal_reflection: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("PRECOGNITION"),
 			},
 			thermokinesis: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("TELEKINESIS"),
 			},
 			tissue_integrity_field: {
-				level: "2"
+				level: "2",
+				technique_discipline: translate("BIOPSIONICS"),
 			},
 			transmit_thought: {
-				level: "1"
+				level: "1",
+				technique_discipline: translate("TELEPATHY"),
 			},
 			unity_of_thought: {
-				level: "4"
+				level: "4",
+				technique_discipline: translate("TELEPATHY"),
 			},
 		},
 		"weapons": {
@@ -2382,6 +2451,7 @@
 			}
 			/** v2.2.0
 			 *  convert single armor line to repeating armor
+			 *  Change @{attribute_query_none} to @{attribute_query}
 			**/
 			else if (major == 2 && minor < 2) {
 				const upgradeFunction = _.after(2, () => {
