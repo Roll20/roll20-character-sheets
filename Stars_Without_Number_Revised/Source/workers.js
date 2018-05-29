@@ -3,7 +3,7 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.2.0-beta2";
+	const sheetVersion = "2.2.0-beta3";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -1472,7 +1472,9 @@
 		// Populates the repeating section repeating_${SName} with new
 		// rows from the data array. Every entry of the array is expected
 		// to be an object, and its key/value pairs will be written into
-		// the repeating section as a new row.
+		// the repeating section as a new row. If data is not an array
+		// but a single object, it will be treated like an array with
+		// a single element.
 		callback = callback || (() => {});
 		const createdIDs = [],
 			getRowID = () => {
@@ -1484,7 +1486,7 @@
 					}
 				}
 			};
-		const setting = data.map(o => {
+		const setting = (Array.isArray(data) ? data : [data]).map(o => {
 				const newID = getRowID();
 				return Object.entries(o).reduce((m, [key, value]) => {
 					m[`repeating_${sName}_${newID}_${key}`] = String(value);
@@ -1817,7 +1819,7 @@
 						attack_name: translate("ATTACK"),
 						attack_number: attacks
 					};
-					fillRepeatingSectionFromData("npc-attacks", [ newAttack ]);
+					fillRepeatingSectionFromData("npc-attacks", newAttack);
 				}
 			}
 		});
@@ -2187,7 +2189,7 @@
 				const data = getAutofillData(sName, v, autofillData[sName][label], label);
 				delete data.class;
 				delete data.level;
-				fillRepeatingSectionFromData(sName, [data]);
+				fillRepeatingSectionFromData(sName, data);
 			}
 		});
 	};
@@ -2459,18 +2461,21 @@
 					calculateEffort();
 					upgradeSheet(sheetVersion);
 				});
-				getAttrs(["armor_name", "armor_ac", "armor_encumbrance", "armor_type"], v => {
+				getAttrs(["armor_name", "armor_ac", "armor_encumbrance", "armor_type", "setting_ship_tab_name"], v => {
 					if (v.armor_ac) {
-						const data = [{
+						const data = {
 							armor_active: "1",
 							armor_ac: v.armor_ac,
 							armor_encumbrance: v.armor_encumbrance || "0",
 							armor_name: v.armor_name || "",
 							armor_status: "READIED",
 							armor_type: (v.armor_type || "").toUpperCase()
-						}];
+						};
 						fillRepeatingSectionFromData("armor", data, upgradeFunction);
 					} else upgradeFunction();
+					if (v.setting_ship_tab_name === "MECH") setAttrs({
+						ship_vehicle_type: "MECH"
+					});
 				});
 				getSectionIDs("repeating_skills", skillIDs => getSectionIDs("repeating_magic-skills", magicIDs => {
 					getSectionIDs("repeating_psychic-skills", psychicIDs => {
@@ -2654,11 +2659,11 @@
 
 			// NPC attack
 			if (v.damage) {
-				const newAttack = [{
+				const newAttack = {
 					attack_damage: v.damage,
 					attack_name: translate("ATTACK"),
 					attack_number: v.npc_attacks || "1"
-				}];
+				};
 				fillRepeatingSectionFromData("npc-attacks", newAttack, upgradeFunction);
 			} else upgradeFunction();
 
