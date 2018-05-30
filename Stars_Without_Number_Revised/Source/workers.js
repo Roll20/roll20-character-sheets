@@ -9,7 +9,7 @@
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
 		"skill_biopsionics", "skill_precognition", "skill_telepathy", "skill_teleportation",
 		"skill_telekinesis", "skill_metapsionics", "psionics_committed_effort_current",
-		"psionics_committed_effort_scene", "psionics_committed_effort_day", "class"
+		"psionics_committed_effort_scene", "psionics_committed_effort_day"
 	];
 	const shipStatEvent = [
 		...["hardpoints", "power", "mass"].map(x => `change:repeating_ship-weapons:weapon_${x}`),
@@ -1514,9 +1514,8 @@
 	const calculateEffort = () => {
 		getAttrs([...effortAttributes, "psionics_total_effort"], v => {
 			const attrBonus = Math.max(parseInt(v.wisdom_mod), parseInt(v.constitution_mod)) || 0,
-				skillBonus = Math.max(...skills.psionic.map(x => parseInt(v[`skill_${x}`]) || 0)),
-				minEffort = (reverseClasses[v.class.toLowerCase()] === "psychic") ? 1 : 0;
-			const psionics_total_effort = Math.max(1 + attrBonus + skillBonus, minEffort) + parseInt(v.psionics_extra_effort) -
+				skillBonus = Math.max(...skills.psionic.map(x => parseInt(v[`skill_${x}`]) || 0));
+			const psionics_total_effort = Math.max(1 + attrBonus + skillBonus, 1) + parseInt(v.psionics_extra_effort) -
 				parseInt(v.psionics_committed_effort_current) - parseInt(v.psionics_committed_effort_scene) -
 				parseInt(v.psionics_committed_effort_day);
 			mySetAttrs({ psionics_total_effort }, v);
@@ -2217,14 +2216,15 @@
 			skill_culture_three_name: { trans: `${translate("CULTURE")}/`, default: "Culture/" },
 			skill_profession_name: { trans: `${translate("PROFESSION")}/`, default: "Profession/"},
 		};
-		getAttrs([...Object.keys(specialSkills), "homebrew_skill_list"], v => {
+		getAttrs([...Object.keys(specialSkills), "homebrew_skill_list", "innate_ac_name"], v => {
+			const setting = {};
 			if (v.homebrew_skill_list === "first") {
-				const setting = {};
 				Object.entries(specialSkills).forEach(([name, data]) => {
 					if (v[name] === data.default && v[name] !== data.trans) setting[name] = data.trans;
 				});
-				setAttrs(setting);
 			}
+			setting.innate_ac_name = translate("INNATE_AC");
+			mySetAttrs(setting, v);
 		});
 	};
 	const handleAttributeQueries = () => {
@@ -2915,7 +2915,7 @@
 	on("change:repeating_weapons:weapon_name", () => validateWeaponSkills());
 	on("change:homebrew_skill_list", () => getSectionIDs("repeating_weapons", validateWeaponSkills));
 
-	on("change:strain change:strain_perm", validateStrain);
+	on("change:strain change:strain_permanent", validateStrain);
 	on("change:constitution", calculateMaxStrain);
 
 	on("change:level", calculateSaves);
