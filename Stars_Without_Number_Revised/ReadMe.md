@@ -38,13 +38,14 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 ### 2.2.0
 
 * Added autofill functionality for ship hulls and class ability.
-* Added autofill buttons for armor, cyberware, and foci, ship modules, techniques, and weapons.
+* Added autofill buttons for armor, cyberware, foci, gear, ship modules, techniques, and weapons.
 * Weapon encumbrance can now be modified in the weapon section. Weapons with 0 encumbrance will no longer be shown in the gear section.
 * Added an extra field to put effort that is only committed as long as a power is active.
 * Changed "Total" effort to "Uncommitted", and added auto-calculating. The formula for effort is now more accurate.
 * Added the option to enable ammo tracking with ChatSetAttr to the sheet default settings.
 * Added a place to track skill points that can only be spent on psionics.
 * Added Discipline field to psychic techniques.
+* Added switch Ship/Mech/Custom for the ship tab.
 * Changed armor to be a repeating section.
 * The gear section now has a header.
 * Exert can now be used as a weapon's attack skill.

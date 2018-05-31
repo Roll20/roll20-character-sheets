@@ -66,7 +66,7 @@
 		[translate("PSYCHIC").toLowerCase()]: "psychic",
 		[translate("WARRIOR").toLowerCase()]: "warrior",
 	};
-	const autofillSections = ["armor", "cyberware", "foci", "ship-defenses", "ship-fittings", "ship-weapons", "techniques", "weapons"];
+	const autofillSections = ["armor", "cyberware", "foci", "gear", "ship-defenses", "ship-fittings", "ship-weapons", "techniques", "weapons"];
 	const autofillData = {
 		"classes": {
 			adventurer: {
@@ -463,6 +463,191 @@
 			unique_gift: {},
 			wanderer: {},
 			wild_psychic_talent: {},
+		},
+		"gear": {
+			ammo_20_rounds: {
+				gear_encumbrance: "1#",
+			},
+			ammo_missile: {
+				gear_encumbrance: "1",
+			},
+			atmofilter: {
+				gear_encumbrance: "1",
+			},
+			backpack: {
+				gear_encumbrance: "1",
+			},
+			bezoar: {
+				gear_encumbrance: "0",
+			},
+			binoculars: {
+				gear_encumbrance: "1",
+			},
+			bioscanner: {
+				gear_encumbrance: "1",
+			},
+			black_slab: {
+				gear_encumbrance: "1",
+			},
+			brainwave: {
+				gear_encumbrance: "0",
+			},
+			climbing_harness: {
+				gear_encumbrance: "1",
+			},
+			comm_server: {
+				gear_encumbrance: "3",
+			},
+			compad: {
+				gear_encumbrance: "0",
+			},
+			data_phase_tab: {
+				gear_encumbrance: "1",
+			},
+			data_protocol: {
+				gear_encumbrance: "0",
+			},
+			dataslab: {
+				gear_encumbrance: "1",
+			},
+			field_radio: {
+				gear_encumbrance: "1",
+			},
+			glowbug: {
+				gear_encumbrance: "0",
+			},
+			grapnel_launcher: {
+				gear_encumbrance: "1",
+			},
+			grav_chute: {
+				gear_encumbrance: "1",
+			},
+			grav_harness: {
+				gear_encumbrance: "3",
+			},
+			hush: {
+				gear_encumbrance: "0",
+			},
+			instapanel: {
+				gear_encumbrance: "1#",
+			},
+			lazarus_patch: {
+				gear_encumbrance: "1#",
+			},
+			lift: {
+				gear_encumbrance: "0",
+			},
+			line_shunt: {
+				gear_encumbrance: "0",
+			},
+			low_light_goggles: {
+				gear_encumbrance: "1",
+			},
+			medkit: {
+				gear_encumbrance: "2",
+			},
+			metatool: {
+				gear_encumbrance: "1",
+			},
+			navcomp: {
+				gear_encumbrance: "1",
+			},
+			portabox: {
+				gear_encumbrance: "1",
+			},
+			power_cell_type_a: {
+				gear_encumbrance: "1#",
+			},
+			power_cell_type_b: {
+				gear_encumbrance: "1",
+			},
+			pressure_tent: {
+				gear_encumbrance: "4",
+			},
+			pretech_cosmetic: {
+				gear_encumbrance: "0",
+			},
+			psych: {
+				gear_encumbrance: "0",
+			},
+			rations_1_day: {
+				gear_encumbrance: "1#",
+			},
+			remote_link_unit: {
+				gear_encumbrance: "1",
+			},
+			reverie: {
+				gear_encumbrance: "0",
+			},
+			rope_20_meters: {
+				gear_encumbrance: "2/1",
+			},
+			scout_report: {
+				gear_encumbrance: "0",
+			},
+			solar_recharger: {
+				gear_encumbrance: "3",
+			},
+			spare_parts: {
+				gear_encumbrance: "1#",
+			},
+			squeal: {
+				gear_encumbrance: "0",
+			},
+			stiletto_charge: {
+				gear_encumbrance: "1",
+			},
+			storage_unit: {
+				gear_encumbrance: "3",
+			},
+			survey_scanner: {
+				gear_encumbrance: "1",
+			},
+			survival_kit: {
+				gear_encumbrance: "1",
+			},
+			tailored_antiallergens: {
+				gear_encumbrance: "0",
+			},
+			telekinetic_generator: {
+				gear_encumbrance: "2",
+			},
+			telescoping_pole: {
+				gear_encumbrance: "0",
+			},
+			thermal_flare: {
+				gear_encumbrance: "0",
+			},
+			tightbeam_link_unit: {
+				gear_encumbrance: "1",
+			},
+			toolkit_postech: {
+				gear_encumbrance: "3",
+			},
+			toolkit_pretech: {
+				gear_encumbrance: "1",
+			},
+			trade_goods: {
+				gear_encumbrance: "1#",
+			},
+			trade_metals: {
+				gear_encumbrance: "1#",
+			},
+			translator_torc: {
+				gear_encumbrance: "0",
+			},
+			tsunami: {
+				gear_encumbrance: "0",
+			},
+			vacc_fresher: {
+				gear_encumbrance: "1",
+			},
+			vacc_skin: {
+				gear_encumbrance: "1",
+			},
+			vacc_suit: {
+				gear_encumbrance: "2",
+			},
 		},
 		"ship-defenses": {
 			ablative_hull_compartments: {
@@ -2129,6 +2314,16 @@
 			if (label) {
 				output.technique_name = translate(label.toUpperCase());
 				output.technique_description = translate(`${label.toUpperCase()}_DESC`);
+			}
+		}
+		if (sName === "gear") {
+			if (label) {
+				output.gear_name = translate(label.toUpperCase());
+				output.gear_description = translate(`${label.toUpperCase()}_DESC`);
+			}
+			if (output.gear_encumbrance === "1#") {
+				output.gear_encumbrance = "1";
+				output.gear_description = `${translate("ENCUMBRANCE")} 1/3. ${output.gear_description}`;
 			}
 		}
 		return output;
