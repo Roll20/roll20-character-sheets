@@ -7,6 +7,8 @@
 ### 1.9.8 on 2018 May 31st
 * Default Advantage for NPCs on Primary attribute 1 & 3 fixed
 	- Was the same attribute name, fixed so each seperate
+* Legendary Item display on a new sheet creation by default fixed
+	- Toggled it to "hide" instead of "show"
 
 ### 1.9.7 on 2018 May 27th
 * Made NPC initiative rolls go to the tracker
