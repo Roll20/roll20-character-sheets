@@ -3,7 +3,7 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.2.0-beta3";
+	const sheetVersion = "2.2.0";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -2654,7 +2654,7 @@
 				const upgradeFunction = _.after(2, () => {
 					calculateStrDexMod();
 					calculateEffort();
-					upgradeSheet(sheetVersion);
+					upgradeSheet("2.2.0");
 				});
 				getAttrs(["armor_name", "armor_ac", "armor_encumbrance", "armor_type", "setting_ship_tab_name"], v => {
 					if (v.armor_ac) {
