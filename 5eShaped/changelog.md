@@ -11,6 +11,61 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 18.1.8
+
+### Bug fixes
+- [#717: Custom Coin Text Alignment](https://bitbucket.org/mlenser/5eshaped/issues/717/custom-coin-text-alignment)
+
+## 18.1.7
+
+### Bug fixes
+- Fixed all the new cases raised in [#714: Mordenkainen's Tome of Foes, seems like monster imports fail to get actions](https://bitbucket.org/mlenser/5eshaped/issues/714/mordenkainens-tome-of-foes-seems-like). With Vanakoji's testing this should handle every case it seems (besides some formatting issues that roll20 needs to fix).
+
+## 18.1.6
+
+### Bug fixes
+- Fixed error when modifying anything with a melee weapon caused by refactoring from yesterday.
+
+## 18.1.5
+
+### Bug fixes
+- Fixed all the new cases raised in [#714: Mordenkainen's Tome of Foes, seems like monster imports fail to get actions](https://bitbucket.org/mlenser/5eshaped/issues/714/mordenkainens-tome-of-foes-seems-like). This should fix the vast majority of Mordenkainen.
+
+## 18.1.4
+
+### Bug fixes
+- [#711: Modifiers section not changing attack bonus on display](https://bitbucket.org/mlenser/5eshaped/issues/711/modifiers-section-not-changing-attack)
+- Improved the method to only show NPC skills and saving throws. They show on the sheet and chat macros if they are proficient or if there are modifiers for that specific skill/saving throw.
+
+## 18.1.3
+
+### Bug fixes
+- [#714: Mordenkainen's Tome of Foes, seems like monster imports fail to get actions](https://bitbucket.org/mlenser/5eshaped/issues/714/mordenkainens-tome-of-foes-seems-like)
+
+## 18.1.2
+
+### Bug fixes
+- The spell macro now shows spells from spell level 1 and above.
+
+## 18.1.1
+
+### Bug fixes
+- `Currency` is now generated on upgrade for existing characters and current quantities, weight per coin, and gold equivalent values are upgraded.
+
+## 18.1.0
+
+### Features
+- `Currency` (previously `coins` or `coinage`) is now a repeating section. It defaults to having the 5 currencies of 5e, but their name, acronym, weight, value, and border style can be changed as desired. Additionally more currencies (gems, rocks, or any other currency) can be added as desired. The currency macro now outputs how much of each currency and a total value. Gold is the standard currency as it is in 5e, but that can be changed by changing the values of each currency. So for example the Silver Standard can be used by making Silver's value 1 and the other values as desired. Closes [#689: Silver Standard support](https://bitbucket.org/mlenser/5eshaped/issues/689/silver-standard-support)
+
+## 18.0.0
+
+### Breaking Changes
+This breaking change should be fully handled with the upgrade, but custom scripts may break as the roll template has changed. This will only impact existing roll template outputs and should only matter for those who want a well preserved chat record and for those who make custom macros (not recommended as the sheet should provide all that are needed).
+
+### Features
+- Added support for `spell points` to be called `sorcery`, `psi`, and `ki`. `mana` is already supported. Closes [#295](https://bitbucket.org/mlenser/5eshaped/issues/295/psi-points)
+- Spell points can be customized for each spell level. This will allow each player to set the cost of each level. This supports the UA mystic, allowing them to set level 1 spells to 1 psi, level 2 spells to 2 psi, and so forth.
+
 ## 17.1.1
 
 ### Bug Fixes
