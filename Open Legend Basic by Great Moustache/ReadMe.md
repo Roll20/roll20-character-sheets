@@ -4,6 +4,10 @@
 ## Tell YOUR story
 
 ### Changelog
+### 1.9.7 on 2018 May 27th
+* Made NPC initiative rolls go to the tracker
+	- Oopsie, not sure how I let that slip by
+
 ### 1.9.6 on 2018 May 14th
 * Resist Rolls Updated
 	- Made Resist Roll buttons next to Speed (to match what was on NPC section)
