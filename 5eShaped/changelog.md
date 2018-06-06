@@ -11,6 +11,12 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 18.1.9
+
+### Bug fixes
+- [#723: NPC skill parsing broken for skills with spaces in them](https://bitbucket.org/mlenser/5eshaped/issues/723/npc-skill-parsing-broken-for-skills-with)
+- [#724: Drag-and-drop for crossbow bolts freezes sheet, breaks future imports](https://bitbucket.org/mlenser/5eshaped/issues/724/drag-and-drop-for-crossbow-bolts-freezes)
+
 ## 18.1.8
 
 ### Bug fixes
