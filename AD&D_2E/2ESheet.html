@@ -17,7 +17,9 @@
 				updated worker script so strength is used to populate max weight per movement category<br />
 				changed the weight fields for gear and the coin fields to numeric fields<br />
 				added TheAaronSheet script <br />
-				added workerscript to calculate total gearweight from individual gearweights (only from gear section)<br />
+				added workerscript to calculate total gearweight from individual gear <br />
+				added workerscript to calculate total weaponweight from individual weapons <br />
+				added new fields for total weight / total weapon weight / total gear weight<br />
                 added new Tab for spells with extra fields for spells and scrolls<br />
                   - allow entry of a macro name and Cast Spell button that uses the macro name - (Aqua Alex)<br />
             </p>
@@ -314,7 +316,7 @@
                     </tr>
                 </table>
             </div>
-            Current weight:<input type="number" name="attr_movweighttotal" value="@{gearweighttotal}+1-1" disabled="true">
+            Current weight:<input type="number" name="attr_movweighttotal" class="sheet-nobut" value="@{totalweightCarry}+1-1" disabled="true">
             <br />
             <h4>Player notes</h4>
             <textarea name="attr_pnotes"></textarea>
@@ -914,7 +916,9 @@
                 </table>
             </fieldset>
             <br />
-            Current weight:<input type="number" name="attr_gearweighttotal" class="sheet-nobut"><br />
+			Tot Gear weight:<input type="number" name="attr_gearweighttotal" class="sheet-nobut">
+			Tot Weapon weight:<input type="number" name="attr_weapweighttotal" class="sheet-nobut"><br />
+			Total weight:<input type="number" name="attr_totalweightCarry" class="sheet-nobut"><br />
             <b>Notes</b>
             <textarea name="attr_gearnotes"></textarea>
         </div>
@@ -1663,6 +1667,7 @@
         </div>
     </div>
 </rolltemplate>
+
 <!-- WORKERS -->
 <script type="text/worker">
 
@@ -4212,7 +4217,7 @@ var TAS = TAS || (function(){
     }); //end on("change:Charisma")
 
 	/* sort out total gearweight */
-	on('change:repeating_gear', function(){
+	on('change:repeating_gear:gearweigh change:gearweigh', function(){
 		TAS.repeating('gear')  //<-- The repeating section name
 			.attrs('gearweigh','gearweighttotal')  //<-- the attributes outside the repeating section
 			.fields('gearweigh') //<-- the field (attribute) inside the repeating section
@@ -4223,5 +4228,25 @@ var TAS = TAS || (function(){
 				a.I.gearweighttotal = a.I.gearweigh + m.weigh;  //<-- add the sum and the outside attribute and store it.
 			})
 			.execute(); //<-- cause all the above to run.
+	});
+	
+	/* sort out total weapweight */
+	on('change:repeating_weapons:weapweight change:weapweight', function(){
+		TAS.repeating('weapons')  //<-- The repeating section name
+			.attrs('weapweight','weapweighttotal')  //<-- the attributes outside the repeating section
+			.fields('weapweight') //<-- the field (attribute) inside the repeating section
+			.reduce(function(m,r){
+				m.weigh+=r.I.weapweight; //<-- sum up the ones in the repeating section
+				return m;
+			},{weigh:0},function(m,r,a){
+				a.I.weapweighttotal = a.I.weapweight + m.weigh;  //<-- add the sum and the outside attribute and store it.
+			})
+			.execute(); //<-- cause all the above to run.
+	});
+	
+	on('change:gearweighttotal change:weapweighttotal', function() {
+		getAttrs(["gearweighttotal", "weapweighttotal"], function(values) {
+		setAttrs({ totalweightCarry: ((values.gearweighttotal)+(values.weapweighttotal)) });
+	  });
 	});
 </script>
