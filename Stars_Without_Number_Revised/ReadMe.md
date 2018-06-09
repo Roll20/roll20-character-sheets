@@ -49,6 +49,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Changed armor to be a repeating section.
 * The gear section now has a header.
 * Exert can now be used as a weapon's attack skill.
+* The chat macro for skills is now sorted into trained/untrained ones, the latter of which can be disabled.
 
 ### 2.1.0
 
