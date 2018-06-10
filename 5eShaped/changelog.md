@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 18.1.10
+
+### Bug fixes
+- Fix attachers for NPC actions and reactions. Closes [#726: NPC attachers do not trigger for Actions](https://bitbucket.org/mlenser/5eshaped/issues/726/npc-attachers-do-not-trigger-for-actions)
+
 ## 18.1.9
 
 ### Bug fixes
