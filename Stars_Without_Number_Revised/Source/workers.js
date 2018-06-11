@@ -466,7 +466,7 @@
 		},
 		"gear": {
 			ammo_20_rounds: {
-				gear_encumbrance: "1#",
+				gear_encumbrance: ".33",
 			},
 			ammo_missile: {
 				gear_encumbrance: "1",
@@ -529,10 +529,10 @@
 				gear_encumbrance: "0",
 			},
 			instapanel: {
-				gear_encumbrance: "1#",
+				gear_encumbrance: ".33",
 			},
 			lazarus_patch: {
-				gear_encumbrance: "1#",
+				gear_encumbrance: ".33",
 			},
 			lift: {
 				gear_encumbrance: "0",
@@ -556,7 +556,7 @@
 				gear_encumbrance: "1",
 			},
 			power_cell_type_a: {
-				gear_encumbrance: "1#",
+				gear_encumbrance: ".33",
 			},
 			power_cell_type_b: {
 				gear_encumbrance: "1",
@@ -571,7 +571,7 @@
 				gear_encumbrance: "0",
 			},
 			rations_1_day: {
-				gear_encumbrance: "1#",
+				gear_encumbrance: ".33",
 			},
 			remote_link_unit: {
 				gear_encumbrance: "1",
@@ -589,7 +589,7 @@
 				gear_encumbrance: "3",
 			},
 			spare_parts: {
-				gear_encumbrance: "1#",
+				gear_encumbrance: ".33",
 			},
 			squeal: {
 				gear_encumbrance: "0",
@@ -628,10 +628,10 @@
 				gear_encumbrance: "1",
 			},
 			trade_goods: {
-				gear_encumbrance: "1#",
+				gear_encumbrance: ".33",
 			},
 			trade_metals: {
-				gear_encumbrance: "1#",
+				gear_encumbrance: ".33",
 			},
 			translator_torc: {
 				gear_encumbrance: "0",
@@ -1800,6 +1800,7 @@
 	const calculateGearReadiedStowed = () => {
 		const doCalc = (gearIDs, weaponIDs, armorIDs) => {
 			const attrs = [
+				...gearIDs.map(id => `repeating_gear_${id}_gear_amount`),
 				...gearIDs.map(id => `repeating_gear_${id}_gear_encumbrance`),
 				...gearIDs.map(id => `repeating_gear_${id}_gear_status`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_encumbrance`),
@@ -1807,8 +1808,8 @@
 				...armorIDs.map(id => `repeating_armor_${id}_armor_status`),
 				...weaponIDs.map(id => `repeating_weapons_${id}_weapon_encumbrance`),
 				...weaponIDs.map(id => `repeating_weapons_${id}_weapon_status`),
-				"gear_readied", "gear_readied_max", "gear_readied_over",
-				"gear_stowed", "gear_stowed_max", "gear_stowed_over",
+				"gear_readied", "gear_stowed", "strength", "gear_readied_max",
+				"gear_readied_over", "gear_stowed_over", "gear_stowed_max"
 			];
 			getAttrs(attrs, v => {
 				const [gear_readied, gear_stowed, armor_encumbrance_bonus] = armorIDs.reduce((m, id) => {
@@ -1825,19 +1826,22 @@
 						m[1] += parseInt(v[`repeating_weapons_${id}_weapon_encumbrance`]) || 0;
 					return m;
 				}, gearIDs.reduce((m, id) => {
+					const amount = parseInt(v[`repeating_gear_${id}_gear_amount`]) || 0;
 					if (v[`repeating_gear_${id}_gear_status`] === "READIED")
-						m[0] += parseInt(v[`repeating_gear_${id}_gear_encumbrance`]) || 0;
+						m[0] += Math.ceil(amount*parseFloat(v[`repeating_gear_${id}_gear_encumbrance`])) || 0;
 					else if (v[`repeating_gear_${id}_gear_status`] === "STOWED")
-						m[1] += parseInt(v[`repeating_gear_${id}_gear_encumbrance`]) || 0;
+						m[1] += Math.ceil(amount*parseFloat(v[`repeating_gear_${id}_gear_encumbrance`])) || 0;
 					return m;
 				}, [0, 0, 0])));
-				const gear_readied_over = (gear_readied > parseInt(v.gear_readied_max)) ? "1" : "0";
-				const gear_stowed_over = (gear_stowed > parseInt(v.gear_stowed_max)) ? "1" : "0";
-				const setting = {gear_readied, gear_stowed, gear_readied_over, gear_stowed_over, armor_encumbrance_bonus};
+				const gear_stowed_max = (parseInt(v.strength) || 0) + armor_encumbrance_bonus;
+				const gear_readied_max = Math.floor(gear_stowed_max / 2);
+				const setting = {
+					gear_readied, gear_stowed, gear_readied_max, gear_stowed_max,
+					gear_readied_over: (parseInt(v.gear_readied) > gear_readied_max) ? "1" : "0",
+					gear_stowed_over: (parseInt(v.gear_stowed) > gear_stowed_max) ? "1" : "0",
+				};
 
-				mySetAttrs(setting, v, {silent: true}, () => {
-					calculateGearReadiedStowedMax();
-				});
+				mySetAttrs(setting, v, {silent: true});
 			});
 		};
 
@@ -1845,16 +1849,6 @@
 			getSectionIDs("repeating_weapons", weaponIDs => {
 				getSectionIDs("repeating_armor", armorIDs => doCalc(gearIDs, weaponIDs, armorIDs));
 			});
-		});
-	};
-
-	const calculateGearReadiedStowedMax = () => {
-		getAttrs(["strength", "gear_readied_max", "gear_stowed_max", "armor_encumbrance_bonus"], v => {
-			if (v.strength)
-				mySetAttrs({
-					gear_readied_max: Math.floor((parseInt(v.strength)  + parseInt(v.armor_encumbrance_bonus) || 0) / 2),
-					gear_stowed_max: parseInt(v.strength) + parseInt(v.armor_encumbrance_bonus),
-				}, v);
 		});
 	};
 
@@ -2378,6 +2372,9 @@
 		if (sName === "techniques") {
 			if (data.level === "0") return `${translate("CORE_TECHNIQUE")}.`;
 			else return `${translate("LEVEL")}-${data.level}.`;
+		}
+		if (sName === "gear") {
+			return `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}.`;
 		}
 		return "";
 	};
@@ -3127,10 +3124,8 @@
 
 	on("change:repeating_armor change:innate_ac remove:repeating_armor", calculateAC);
 
-	on("change:strength", calculateGearReadiedStowedMax);
-	on("change:repeating_gear remove:repeating_gear change:armor_encumbrance change:repeating_weapons " +
-		"remove:repeating_weapons change:gear_readied change:gear_stowed change:repeating_armor " +
-		"remove:repeating_armor", calculateGearReadiedStowed);
+	on("change:strength change:repeating_gear remove:repeating_gear change:repeating_weapons " +
+		"remove:repeating_weapons change:repeating_armor remove:repeating_armor", calculateGearReadiedStowed);
 
 	on("change:level change:setting_xp_scheme", calculateNextLevelXP);
 
