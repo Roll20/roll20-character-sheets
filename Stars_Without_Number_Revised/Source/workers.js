@@ -1803,6 +1803,7 @@
 				...gearIDs.map(id => `repeating_gear_${id}_gear_encumbrance`),
 				...gearIDs.map(id => `repeating_gear_${id}_gear_status`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_encumbrance`),
+				...armorIDs.map(id => `repeating_armor_${id}_armor_encumbrance_bonus`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_status`),
 				...weaponIDs.map(id => `repeating_weapons_${id}_weapon_encumbrance`),
 				...weaponIDs.map(id => `repeating_weapons_${id}_weapon_status`),
@@ -1810,10 +1811,11 @@
 				"gear_stowed", "gear_stowed_max", "gear_stowed_over",
 			];
 			getAttrs(attrs, v => {
-				const [gear_readied, gear_stowed] = armorIDs.reduce((m, id) => {
-					if (v[`repeating_armor_${id}_armor_status`] === "READIED")
+				const [gear_readied, gear_stowed, armor_encumbrance_bonus] = armorIDs.reduce((m, id) => {
+					if (v[`repeating_armor_${id}_armor_status`] === "READIED") {
 						m[0] += parseInt(v[`repeating_armor_${id}_armor_encumbrance`]) || 0;
-					else if (v[`repeating_armor_${id}_armor_status`] === "STOWED")
+						m[2] = parseInt(v[`repeating_armor_${id}_armor_encumbrance_bonus`]) || 0;
+					} else if (v[`repeating_armor_${id}_armor_status`] === "STOWED")
 						m[1] += parseInt(v[`repeating_armor_${id}_armor_encumbrance`]) || 0;
 					return m;
 				}, weaponIDs.reduce((m, id) => {
@@ -1831,9 +1833,11 @@
 				}, [0, 0])));
 				const gear_readied_over = (gear_readied > parseInt(v.gear_readied_max)) ? "1" : "0";
 				const gear_stowed_over = (gear_stowed > parseInt(v.gear_stowed_max)) ? "1" : "0";
-				const setting = {gear_readied, gear_stowed, gear_readied_over, gear_stowed_over};
+				const setting = {gear_readied, gear_stowed, gear_readied_over, gear_stowed_over, armor_encumbrance_bonus};
 
-				mySetAttrs(setting, v, {silent: true});
+				mySetAttrs(setting, v, {silent: true}, () => {
+					calculateGearReadiedStowedMax();
+				});
 			});
 		};
 
@@ -1845,11 +1849,11 @@
 	};
 
 	const calculateGearReadiedStowedMax = () => {
-		getAttrs(["strength", "gear_readied_max", "gear_stowed_max"], v => {
+		getAttrs(["strength", "gear_readied_max", "gear_stowed_max", "armor_encumbrance_bonus"], v => {
 			if (v.strength)
 				mySetAttrs({
-					gear_readied_max: Math.floor((parseInt(v.strength) || 0) / 2),
-					gear_stowed_max: v.strength,
+					gear_readied_max: Math.floor((parseInt(v.strength)  + parseInt(v.armor_encumbrance_bonus) || 0) / 2),
+					gear_stowed_max: parseInt(v.strength) + parseInt(v.armor_encumbrance_bonus),
 				}, v);
 		});
 	};
