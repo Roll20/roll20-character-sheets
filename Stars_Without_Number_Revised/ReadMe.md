@@ -6,16 +6,16 @@ This sheet is created for use in Stars Without Number Revised Edition on Roll20.
 
 * [Karlinator](https://github.com/Karlinator)
 * [Jakob](https://github.com/joesinghaus)
+* [Panzer](https://app.roll20.net/users/2223776/panzer)
 
 ### Contributors
 
-* UI Design by [Panzer](https://app.roll20.net/users/2223776/panzer)
 * [MankiGames](https://github.com/MankiGames)
 * [Shadowriku](https://github.com/Shadowriku)
 * [RonaldZ](https://github.com/RonaldZ)
 * [jfredett](https://github.com/jfredett)
 * [CoalPoweredPuppet](https://github.com/CoalPoweredPuppet)
-* [Kevin Searle](https://github.com/kevinsearle)
+* Original First Edition sheet by [Kevin Searle](https://github.com/kevinsearle)
 
 ### QA/Testing
 
@@ -25,7 +25,31 @@ This sheet is created for use in Stars Without Number Revised Edition on Roll20.
 
 Report any problems, suggestions, or features by [creating an issue](https://github.com/Karlinator/roll20-character-sheets/issues) on Github.
 
+## Contributing
+
+* Contributions are welcome at [the GitHub](https://github.com/Karlinator/roll20-character-sheets). Just open a pull request.
+* You will need to install [Node.js](https://nodejs.org), then run the following command in bash/cmd:
+	* npm install -g pug pug-cli sass jstransformer-uglify-es
+	* You may need to restart you computer.
+	* Then just make changes to the files in the Source folder, and use the file "build" or "pug_build.bat" and "sass_build.bat" depending on your OS.
+
 ## Changelog
+
+### 2.2.0
+
+* Added autofill functionality for ship hulls and class ability.
+* Added autofill buttons for armor, cyberware, foci, gear, ship modules, techniques, and weapons.
+* Weapon encumbrance can now be modified in the weapon section. Weapons with 0 encumbrance will no longer be shown in the gear section.
+* Added an extra field to put effort that is only committed as long as a power is active.
+* Changed "Total" effort to "Uncommitted", and added auto-calculating. The formula for effort is now more accurate.
+* Added the option to enable ammo tracking with ChatSetAttr to the sheet default settings.
+* Added a place to track skill points that can only be spent on psionics.
+* Added Discipline field to psychic techniques.
+* Added switch Ship/Mech/Custom for the ship tab.
+* Changed armor to be a repeating section.
+* The gear section now has a header.
+* Exert can now be used as a weapon's attack skill.
+* The chat macro for skills is now sorted into trained/untrained ones, the latter of which can be disabled.
 
 ### 2.1.0
 
