@@ -1812,10 +1812,9 @@
 				"gear_readied_over", "gear_stowed_over", "gear_stowed_max"
 			];
 			getAttrs(attrs, v => {
-				const [gear_readied, gear_stowed, armor_encumbrance_bonus] = armorIDs.reduce((m, id) => {
+				const [gear_readied, gear_stowed] = armorIDs.reduce((m, id) => {
 					if (v[`repeating_armor_${id}_armor_status`] === "READIED") {
 						m[0] += parseInt(v[`repeating_armor_${id}_armor_encumbrance`]) || 0;
-						m[2] += parseInt(v[`repeating_armor_${id}_armor_encumbrance_bonus`]) || 0;
 					} else if (v[`repeating_armor_${id}_armor_status`] === "STOWED")
 						m[1] += parseInt(v[`repeating_armor_${id}_armor_encumbrance`]) || 0;
 					return m;
@@ -1832,7 +1831,12 @@
 					else if (v[`repeating_gear_${id}_gear_status`] === "STOWED")
 						m[1] += Math.ceil(amount*parseFloat(v[`repeating_gear_${id}_gear_encumbrance`])) || 0;
 					return m;
-				}, [0, 0, 0])));
+				}, [0, 0])));
+
+				const armor_encumbrance_bonus = Math.max(0,
+					...armorIDs.filter(id => v[`repeating_armor_${id}_armor_status`] === "READIED")
+						.map(id => parseInt(v[`repeating_armor_${id}_armor_encumbrance_bonus`]) || 0)
+				);
 				const gear_stowed_max = (parseInt(v.strength) || 0) + armor_encumbrance_bonus;
 				const gear_readied_max = Math.floor(gear_stowed_max / 2);
 				const setting = {
