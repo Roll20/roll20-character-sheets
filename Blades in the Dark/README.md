@@ -4,6 +4,9 @@ This is the (compressed) source code for the Blades in the Dark character sheet 
 
 ## Changelog
 
+## 3.6
+* Simpler formula for dice rolls (with legacy transition stuff in the roll template)
+
 ### 3.5
 * Added notes for friends and contacts
 
