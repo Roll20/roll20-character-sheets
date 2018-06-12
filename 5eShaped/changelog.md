@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 18.1.11
+
+### Bug fixes
+- [#728: Error message when using NPC actions](https://bitbucket.org/mlenser/5eshaped/issues/728/error-message-when-using-npc-actions)
+
 ## 18.1.10
 
 ### Bug fixes
