@@ -5,6 +5,21 @@
 
 ### Changelog
 
+### 1.8.9.99 on 2018 April 8th
+* Preview and testing of alternate borders
+	- Will be implemented further in the next release
+
+### 1.8.9.98a on 2018 March 10th
+* Fixed Speed Calculations if Mighty is 0
+    - Was halving speed even if no heavy items
+
+### 1.8.9.98 on 2018 March 4th
+* Fixed a new character sheet not auto calculating Feat & Attribute Point Totals
+* Fixed Speed changes based on Max Heavy amount
+	- Based on Might Score
+* Fixed Speed not calculating when you entered amounts from Feats
+* Changed GUI for Actions, Inventory, etc to be Gray lines instead of Teal
+
 ### 1.8.9.97a on 2018 January 28th
 * Finished improvements to GUI with the Non-essential Notes section.
 
