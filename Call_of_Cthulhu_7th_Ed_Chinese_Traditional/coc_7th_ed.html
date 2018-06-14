@@ -34,7 +34,7 @@
 				<span>不進行私訊</span></td>
 				</tr>
 				<tr>
-				<td><input type="radio" name="attr_roll_display_tell" value="/me 我正在暗骰"/>
+				<td><input type="radio" name="attr_roll_display_tell" value="/me 正在暗骰"/>
 				<span >告訴大家我正在暗骰擲骰</span></td>
 				<td><input type="radio" name="attr_roll_display_tell" value="/me @{roll_display_tell_enter}"/>
 				<span >告訴大家...</span>
@@ -4766,20 +4766,26 @@
 		//roll Display w
 		on("change:roll_display_tell change:roll_display_to change:roll_display_tell_enter change:import_json sheet:opened", function() {
    getAttrs(["roll_display_tell", "roll_display_to"], function(values) {
-   var rolldisplay = values.roll_display_tell + "\n" + values.roll_display_to;
-	  setAttrs({roll_display: rolldisplay
+  if(( values.roll_display_tell == "/me 正在暗骰")||( values.roll_display_tell == "/me @{roll_display_tell_enter}")){
+   var rolldisplay = values.roll_display_tell + " \n" + values.roll_display_to;   
+   }
+   else
+   {
+   var rolldisplay = values.roll_display_to;
+   }
+ 	  setAttrs({roll_display: rolldisplay
 	  });
    });
 });
 
 		on("change:text_kp_enter change:import_json change:roll_display_tell sheet:opened", function() {
    getAttrs(["roll_display_tell", "text_kp_enter"], function(values) {
-   if( values.roll_display_tell == ""){
-   var text_kp =  "/w gm ";
-   }
+     if(( values.roll_display_tell == "/me 正在暗骰")||( values.roll_display_tell == "/me @{roll_display_tell_enter}")){
+	var text_kp = values.roll_display_tell + "\n"+"/w gm ";
+	 }
    else
    {
-   var text_kp = values.roll_display_tell + "\n"+"/w gm ";
+   var text_kp =  "/w gm ";
    }
 	  setAttrs({text_kp: text_kp
 	  });
