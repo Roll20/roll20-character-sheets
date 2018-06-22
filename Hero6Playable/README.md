@@ -1,14 +1,32 @@
 # HeroSystem 6 Playable
 Character sheet for the HeroSystem 6th edition (also known as Champions years ago).
-### Overview
+
+*	[Overview](#overview)
+	*	[What this Character Sheet is Not](#whatitsnot)
+	*	[API Scripts](#apiscripts)
+*	[Usage](#usage)
+	*	[Edit Mode](#editmode)
+*	[Pages](#pages)
+	*	[Core](#core)
+	*	[Combat](#combat)
+	*	[Powers](#powers)
+	*	[Skills](#skills)
+*	[Adding Powers](#addingpowers)
+	*	[Special Cases](#specialcases)
+*	[Buttons](#buttons)
+*	[Sample Usage](#sample)
+
+
+
+## <a id="overview">Overview</a>
 
 This character sheet attempts to automate the complexity of the HeroSystem 6e.  Creating characters in HeroSystem takes a lot of time, and playing the game can also include tedious calculations and dice counting.  As with any Roll20 character sheet, this sheet attempts to make playing the game easier by handling those cumbersome tasks and allowing the player to focus on just playing the game.
 
-### What this Character Sheet is Not
+### <a id="whatitsnot">What this Character Sheet is Not</a>
 
 This character sheet is *not* for use in designing a character--it is only for playing the game.  As such, power costs are only used when they are pertinent to calculating an effect.  You should design your character outside of this sheet.  Use paper and pencil, or one of many downloadable Excel spreadsheet, or the best option I would recommend is the official HeroDesigner application available from the game manufacturer.
 
-### API Scripts
+### <a id="apiscripts">API Scripts</a>
 
 I would recommend using both the [Hero6Playable](https://github.com/Roll20/roll20-api-scripts/tree/master/Hero6Playable) and [Hero6Tracker](https://github.com/Roll20/roll20-api-scripts/tree/master/HeroTracker) api scripts.  The former, Hero6Playable api, was written to work with this character sheet.  The main functions it provides are to count the amount of BODY done with a normal attack, and to compute the DCV you would hit with an attack roll.  While this script is not absolutely necessary to use this character sheet, you would be losing two features that minimize the cumbersome task of dice counting and adding up of bonuses.
 
@@ -19,13 +37,11 @@ You can add the two api's within a game's settings by selecting Settings / API S
 ##### [Hero6Playable](https://github.com/Roll20/roll20-api-scripts/tree/master/Hero6Playable)
 ##### [Hero6Tracker](https://github.com/Roll20/roll20-api-scripts/tree/master/HeroTracker)
 
-## Usage
-
-(if you want hints at how to add specific powers, skip down the part of this document titled "How to Add Specific Powers")
+## <a id="usage">Usage</a>
 
 The character is divided into six pages: Core, Combat, Powers, Skills, Background, and Configuration.  Switching between pages is accomplished via tabs located between the header and the page content.  The configuration tab uses a gear as an icon instead of a text label.  In this Usage section, I will not describe obvious features of the character sheet, such as the hit location chart.  That section just displays information that you should already know if you play HeroSystem games.  Instead, I will concentrate on describing those section that contain die rolls or other interactive features of the character sheet.
 
-#### Edit Mode
+#### <a id="editmode">Edit Mode</a>
 
 The character sheet has two modes:  Play Mode and Edit Mode.  You can switch between modes by clicking the "edit" button located in line with the page tab buttons.
 
@@ -33,9 +49,9 @@ In Play Mode, most fields are display only and roll buttons are active.  The sta
 
 In Edit Mode, user-modifiable fields are unlocked and most roll buttons are deactivated.  The status fields (STUN/BODY/END) are also locked and change to display the max values.
 
-## Pages
+## <a id="pages">Pages</a>
 
-### Core
+### <a id="core">Core</a>
 The Core page contains sections relating to a character's status, defenses, movement, senses, and more.  The general idea is that these are the most common abilities used that are not related to offense.
 
 >#### Characteristics
@@ -72,7 +88,7 @@ Element | Description
 Inc. | This field will be added to the base roll.  This is essentially the Enhanced Perception power.
 Roll | This button will make a Perception roll.
 
-### Combat
+### <a id="combat">Combat</a>
 The Combat page attempts to put every modifier to both OCV and DCV in one place.  The idea was to avoid having to switch between pages.  On the paper and pencil HeroSystem character sheet, Combat Skill Levels and Penalty Skill Levels are listed under Skill, Perks, & Talents.  This character sheet gives these two categories of skill levels their own sections.
 
 >#### Attacks & Maneuvers
@@ -109,7 +125,7 @@ Element | Description
 [checkbox] | If checked, this PSL will be applied to reduce OCV penalties.  There is no mechanism that verifies that a PSL is only applied to a valid attack.  Example: if a character buys +1 RMOD with Atomic Blast, he should only check this box when using that attack.  When the character attempts to use his Cosmic Web entangle attack, the player would need to uncheck this box.
 RMOD, OCV, DCV | Set what ability to which the PSL will apply.  If a character has more than one level, he/she will need to add a separate row for each.  Example: if the character has +3 RMOD with Atomic Blast, he/she should add three rows, each named +1 RMOD with Atomic Blast.  **There is no mechanism that verifies that a PSL is only applied to an ability that is legal for the PSL.  Example: a PSL bought to reduce ranged penalty (RMOD).  It is on the player to only ever check the RMOD box for a PSL of this type**.
 
-### Powers
+### <a id="powers">Powers</a>
 This page details the character's super powers.  Unlike other pages, there is only one section on this page, Powers & Equipment.  This part of the documentation will describe the various fields in this section.  Later in this documentation, I will give instructions on how to set these fields to depict specific powers.
 
 >#### Powers & Equipment
@@ -199,7 +215,7 @@ Activation | If a value is selected for this field, a 3d6 "activation" roll will
 Additional Actions | The contents of this field will be added to the attack roll as a separate chat command.  A typical use of this field would be to add a call to another api.  Example "!setattr --name John --HP\|17"
 Custom Action | If you enter anything into this field, the entire roll for the power will be discarded and replaced with the contents of this field.  This is pretty advanced and you better know what you're doing.
 
-### Skills
+### <a id="skills">Skills</a>
 This page details the character's skills, perks and talents.
 
 >#### Skills
@@ -212,7 +228,7 @@ Roll | This button will make the skill roll.
 >#### Skill Levels
 [checkbox] | If checked, this Skill Level will be applied to all skill rolls.  There is no mechanism that verifies that a Skill Level is only applied to the skills for which it was purchased.  Example: if a character buys +1 with communication skills, he should only check this box when using skills such as Persuasion, Intimidation, Deception, etc.  When the character attempts to use his Stealth skill, the player would need to uncheck this box.
 
-## Adding Powers
+## <a id="addingpowers">Adding Powers</a>
 
 This section of the documentation gives directions for adding basic powers.  The section after this one will give directions for special cases.
 
@@ -250,7 +266,7 @@ This section of the documentation gives directions for adding basic powers.  The
 14) If you have any additional actions (this is rare) that you want to add to the power, enter them into the Additional Action field.  This will be sent as a separate chat command when you use the power.
 15) If you want to completely replace the entire roll action, enter your own chat command into the Custom Action field.  This will discard everyting else.  No automatic attack roll, damage roll, etc.
 
-## Special Cases
+### <a id="specialcases">Special Cases</a>
 
 Not all powers are straightforward.  The following are instructions on how to create certain powers using the available fields present on the character sheet.
 
@@ -384,3 +400,37 @@ Pepper spray combines two different attacks, a 5d6 NND Flash and a 3d6 NND Blast
         generate an attack roll.  Again, uncheck the Hit Loc. checkbox.  Do not set a reserve.
         
 To use this attack, "use" both powers.  The first power will generate the attack roll and expend the charge.  The second power only needs to be used if the first power succeeds in hitting the target.
+
+## <a id="buttons">Buttons</a>
+
+The following buttons are available to make game playing easier
+
+Page | Section | Button | Description
+-|-|-|-
+(Info) | | Pay END | Pressing this button will expend END and reserves for every power that is "on" and also has the "Auto" button checked within the power's detail.  It is intended that at the beginning of a character's phase, the player will set all powers that will be on or off (zero phase action) and then press this button to expend the resources.
+(Info) | |Recover | Pressing this button will increase the character's current STUN and END by the character's REC value.
+(info) | | OCV, OMCV | Pressing these buttons will roll a simple attack roll.
+Core | Characteristics | Roll | These buttons make an attribute roll for the associated attribute (STR, DEX, etc).
+Core | Vital Information | STR END Cost | Pressing this button will expend END for STR.  This button is used when the character uses his STR for something other than an attack.
+Core | Charges / Reserves | Current | Pressing this button will expend 1 charge.
+Core | Charges / Reserves | Max | Pressing this button will refill the reserve.
+Core | Senses | Perception Roll | Pressing this button makes a generic Perception roll.
+Core | Senses | Enhanced Senses Roll | Pressing this button makes a roll with the indicated sense.
+Combat | Combat Modifiers | Hit Location | Pressing on a hit location die roll will roll the indicated dice and determine the location hit.
+Powers | Powers & Equipment | Name | Pressing a power's name will "use" that power.  If the power is not an attack, it will just display the power's name.  If the power is an attack, it will do a full attack roll including damage dice, hit location, etc. as determine by the power's design.
+Powers | Powers & Equipment | Description | Same as "Name" above except that the power's description text will be included in the die roll.
+Powers | Powers & Equipment | END | Expends the resources for the power.
+Skills | Skills | Roll | Pressing this button makes the indicated skill roll.
+
+## <a id="sample">Sample Usage</a>
+
+I would recommend that when setting up your powers, check the "Auto" box for powers that will be "on" during combat.  Powers such as Force Fields, Movement, etc.  Basically, anything that will cost END except attacks.  For most attacks, I would NOT recommend checking that box.  I would manually expend END when I use the attack (see below).  An exception to that is if the power is a constant, such as a character that has a fire shield.  In that case, check the "Auto" box.  You will NOT expend END manually whenever the power is triggered by someone touching the character.
+
+* At the beginning of the character's phase, set all powers that will on or off (these are normally zero phase actions).
+* Press the Pay END button.  This will expend the resources for all powers that are "on".
+* Do the character's movement.
+* If the character is going to perform an attack, select any appropriate maneuver, set the range, and choose a target if appropriate.  If there are any adhoc combat modifiers, add those in the "Other Modifiers" section.
+* Press the END button for the power you're about to use (if the power is constant and you already paid the END at the start of these steps, do not manually expend the END again).
+* Use the power by pressing the power's name.  The output should appear in the chat windows.
+
+I'll repeat this in the briefest of words:  Set powers on/off, Pay END, move, make your combat choices, use the power.
