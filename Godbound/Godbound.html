@@ -7,8 +7,8 @@
 var TAS = TAS || (function(){
     'use strict';
 
-    var version = '0.2.4',
-        lastUpdate = 1457098091,
+    var version = '0.2.5',
+        lastUpdate = 1504710542,
 
         loggingSettings = {
             debug: {
@@ -117,7 +117,7 @@ var TAS = TAS || (function(){
         },
 
         callstackRegistry = [],
-    queuedUpdates = {}, //< Used for delaying saves till the last momment.
+		queuedUpdates = {}, //< Used for delaying saves till the last moment.
 
     complexType = function(o){
         switch(typeof o){
@@ -136,7 +136,7 @@ var TAS = TAS || (function(){
         }
     },
 
-  dataLogger = function(primaryLogger,secondaryLogger,data){
+	dataLogger = function(primaryLogger,secondaryLogger,data){
         _.each(data,function(m){
             var type = complexType(m);
             switch(type){
@@ -162,7 +162,7 @@ var TAS = TAS || (function(){
                     break;
             }
         });
-  },
+	},
 
 
     colorLog = function(options){
@@ -175,15 +175,19 @@ var TAS = TAS || (function(){
             mTxtColor = (options.color && options.color.text) || 'white';
 
         coloredLoggerFunction = function(message){
+            /* eslint-disable no-console */
             console.log(
                 '%c '+label+': %c '+message + ' ',
                 'background-color: '+lBGColor+';color: '+lTxtColor+'; font-weight:bold;',
                 'background-color: '+mBGColor+';color: '+mTxtColor+';'
             ); 
+            /* eslint-enable no-console */
         };
         return function(){
             if('TAS'===key || config.logging[key]){
+                /* eslint-disable no-console */
                dataLogger(coloredLoggerFunction,function(m){console.log(m);},_.toArray(arguments)); 
+                /* eslint-enable no-console */
             }
         };
     },
@@ -222,6 +226,10 @@ var TAS = TAS || (function(){
         );
         config=newconf;
     },
+    
+    isDebugMode = function(){
+        return config.debugMode;
+    },
 
     debugMode = function(){
         config.logging.debug=true;
@@ -230,7 +238,7 @@ var TAS = TAS || (function(){
 
     getCallstack = function(){
         var e = new Error('dummy'),
-            stack = _.map(_.rest(e.stack.replace(/^[^\(]+?[\n$]/gm, '')
+            stack = _.map(_.rest(e.stack.replace(/^[^(]+?[\n$]/gm, '')
             .replace(/^\s+at\s+/gm, '')
             .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
             .split('\n')),function(l){
@@ -278,19 +286,22 @@ var TAS = TAS || (function(){
                 };
             }(callback,context));
         }
-
+        
         callstack = getCallstack();
         callstack.shift();
-
+        
         return (function(cb,ctx,cs,lbl){
             var ctxref=registerCallstack(cs,lbl);
 
             /*jshint -W054 */
             return new Function('cb','ctx','TASlog',
                 "return function TAS_CALLSTACK_"+ctxref+"(){"+
+                    "var start,end;"+
                     "TASlog('Entering: '+(cb.name||'(anonymous function)'));"+
+                    "start=_.now();"+
                     "cb.apply(ctx||{},arguments);"+
-                    "TASlog('Exiting: '+(cb.name||'(anonymous function)'));"+
+                    "end=_.now();"+
+                    "TASlog('Exiting: '+(cb.name||'(anonymous function)')+' :: '+(end-start)+'ms elapsed');"+
                 "};")(cb,ctx,log);
             /*jshint +W054 */
         }(callback,context,callstack,label));
@@ -306,7 +317,7 @@ var TAS = TAS || (function(){
       queuedUpdates = {};
     },
 
-  namesFromArgs = function(args,base){
+	namesFromArgs = function(args,base){
         return _.chain(args)
             .reduce(function(memo,attr){
                 if('string' === typeof attr) {
@@ -318,20 +329,20 @@ var TAS = TAS || (function(){
             },(_.isArray(base) && base) || [])
             .uniq()
             .value();
-  },
+	},
 
-  addId = function(obj,value){
-    Object.defineProperty(obj,'id',{
-      value: value,
-      writeable: false,
-      enumerable: false
-    });
-  },
+	addId = function(obj,value){
+		Object.defineProperty(obj,'id',{
+			value: value,
+			writable: false,
+			enumerable: false
+		});
+	},
 
-  addProp = function(obj,prop,value,fullname){
-    (function(){
+	addProp = function(obj,prop,value,fullname){
+		(function(){
             var pname=(_.contains(['S','F','I','D'],prop) ? '_'+prop : prop),
-          full_pname = fullname || prop,
+                full_pname = fullname || prop,
                 pvalue=value;
 
             _.each(['S','I','F'],function(p){
@@ -360,63 +371,63 @@ var TAS = TAS || (function(){
 
 
             // Raw value
-      Object.defineProperty(obj, pname, {
+			Object.defineProperty(obj, pname, {
                 enumerable: true,
-        set: function(v){
+				set: function(v){
                     if(v!==pvalue) {
                         pvalue=v;
                         prepareUpdate(full_pname,v);
                     }
-        },
-        get: function(){
-          return pvalue;
-        }
-      });
-
+				},
+				get: function(){
+					return pvalue;
+				}
+			});
+            
             // string value
-      Object.defineProperty(obj.S, pname, {
+			Object.defineProperty(obj.S, pname, {
                 enumerable: true,
-        set: function(v){
+				set: function(v){
                     var val=v.toString();
                     if(val !== pvalue) {
                         pvalue=val;
                         prepareUpdate(full_pname,val);
                     }
-        },
-        get: function(){
-          return pvalue.toString();
-        }
-      });
+				},
+				get: function(){
+					return pvalue.toString();
+				}
+			});
 
             // int value
-      Object.defineProperty(obj.I, pname, {
+			Object.defineProperty(obj.I, pname, {
                 enumerable: true,
-        set: function(v){
+				set: function(v){
                     var val=parseInt(v,10) || 0;
                     if(val !== pvalue){
                         pvalue=val;
                         prepareUpdate(full_pname,val);
                     }
-        },
-        get: function(){
-          return parseInt(pvalue,10) || 0;
-        }
-      });
+				},
+				get: function(){
+					return parseInt(pvalue,10) || 0;
+				}
+			});
 
             // float value
-      Object.defineProperty(obj.F, pname, {
+			Object.defineProperty(obj.F, pname, {
                 enumerable: true,
-        set: function(v){
+				set: function(v){
                     var val=parseFloat(v) || 0;
                     if(val !== pvalue) {
                         pvalue=val;
                         prepareUpdate(full_pname,val);
                     }
-        },
-        get: function(){
-          return parseFloat(pvalue) || 0;
-        }
-      });
+				},
+				get: function(){
+					return parseFloat(pvalue) || 0;
+				}
+			});
             _.each(_.range(10),function(d){
                 Object.defineProperty(obj.D[d], pname, {
                     enumerable: true,
@@ -433,104 +444,104 @@ var TAS = TAS || (function(){
                 });
             });
 
-    }());
-  },
-
-  repeating = function( section ) {
-    return (function(s){
-      var sectionName = s,
-        attrNames = [],
-        fieldNames = [],
-        operations = [],
+		}());
+	},
+	
+	repeating = function( section ) {
+		return (function(s){
+			var sectionName = s,
+				attrNames = [],
+				fieldNames = [],
+				operations = [],
                 after = [],
-
-      repAttrs = function TAS_Repeating_Attrs(){
-        attrNames = namesFromArgs(arguments,attrNames);
-        return this;
-      },
-      repFields = function TAS_Repeating_Fields(){
-        fieldNames = namesFromArgs(arguments,fieldNames);
-        return this;
-      },
-      repReduce = function TAS_Repeating_Reduce(func, initial, final, context) { 
-        operations.push({
+			
+			repAttrs = function TAS_Repeating_Attrs(){
+				attrNames = namesFromArgs(arguments,attrNames);
+				return this;
+			},
+			repFields = function TAS_Repeating_Fields(){
+				fieldNames = namesFromArgs(arguments,fieldNames);
+				return this;
+			},
+			repReduce = function TAS_Repeating_Reduce(func, initial, final, context) { 
+				operations.push({
                     type: 'reduce',
                     func: (func && _.isFunction(func) && func) || _.noop,
                     memo: (_.isUndefined(initial) && 0) || initial,
                     final: (final && _.isFunction(final) && final) || _.noop,
                     context: context || {}
                 });
-        return this;
-      },
-      repMap = function TAS_Repeating_Map(func, final, context) {
-        operations.push({
+				return this;
+			},
+			repMap = function TAS_Repeating_Map(func, final, context) {
+				operations.push({
                     type: 'map',
                     func: (func && _.isFunction(func) && func) || _.noop,
                     final: (final && _.isFunction(final) && final) || _.noop,
                     context: context || {}
                 });
-        return this;
-      },
+				return this;
+			},
             repEach = function TAS_Repeating_Each(func, final, context) {
-        operations.push({
+				operations.push({
                     type: 'each',
                     func: (func && _.isFunction(func) && func) || _.noop,
                     final: (final && _.isFunction(final) && final) || _.noop,
                     context: context || {}
                 });
-        return this;
+				return this;
             },
             repTap = function TAS_Repeating_Tap(final, context) {
-        operations.push({
+				operations.push({
                     type: 'tap',
                     final: (final && _.isFunction(final) && final) || _.noop,
                     context: context || {}
                 });
-        return this;
+				return this;
             },
             repAfter = function TAS_Repeating_After(callback,context) {
-        after.push({
+				after.push({
                     callback: (callback && _.isFunction(callback) && callback) || _.noop,
                     context: context || {}
                 });
-        return this;
+				return this;
             },
-      repExecute = function TAS_Repeating_Execute(callback,context){
-        var rowSet = {},
-          attrSet = {},
-          fieldIds = [],
-          fullFieldNames = [];
+			repExecute = function TAS_Repeating_Execute(callback,context){
+				var rowSet = {},
+					attrSet = {},
+					fieldIds = [],
+					fullFieldNames = [];
 
                 repAfter(callback,context);
 
-        // call each operation per row.
-        // call each operation's final
-        getSectionIDs("repeating_"+sectionName,function(ids){
-          fieldIds = ids;
-          fullFieldNames = _.reduce(fieldIds,function(memo,id){
-            return memo.concat(_.map(fieldNames,function(name){
-              return 'repeating_'+sectionName+'_'+id+'_'+name;  
-            }));
-          },[]);
-          getAttrs( _.uniq(attrNames.concat(fullFieldNames)), function(values){
-            _.each(attrNames,function(aname){
-              if(values.hasOwnProperty(aname)){
-                addProp(attrSet,aname,values[aname]);
-              }
-            });
+				// call each operation per row.
+				// call each operation's final
+				getSectionIDs("repeating_"+sectionName,function(ids){
+					fieldIds = ids;
+					fullFieldNames = _.reduce(fieldIds,function(memo,id){
+						return memo.concat(_.map(fieldNames,function(name){
+							return 'repeating_'+sectionName+'_'+id+'_'+name;  
+						}));
+					},[]);
+					getAttrs( _.uniq(attrNames.concat(fullFieldNames)), function(values){
+						_.each(attrNames,function(aname){
+							if(values.hasOwnProperty(aname)){
+								addProp(attrSet,aname,values[aname]);
+							}
+						});
 
-            rowSet = _.reduce(fieldIds,function(memo,id){
-              var r={};
-              addId(r,id);
-              _.each(fieldNames,function(name){
-                var fn = 'repeating_'+sectionName+'_'+id+'_'+name;  
-                addProp(r,name,values[fn],fn);
-              });
+						rowSet = _.reduce(fieldIds,function(memo,id){
+							var r={};
+							addId(r,id);
+							_.each(fieldNames,function(name){
+								var fn = 'repeating_'+sectionName+'_'+id+'_'+name;  
+								addProp(r,name,values[fn],fn);
+							});
 
-              memo[id]=r;
+							memo[id]=r;
 
-              return memo;
-            },{});
+							return memo;
+						},{});
 
                         _.each(operations,function(op){
                             var res;
@@ -568,42 +579,42 @@ var TAS = TAS || (function(){
                         _.each(after,function(op){
                             _.bind(op.callback,op.context)();
                         });
-          });
-        });
-      };
+					});
+				});
+			};
+				
+			return {
+				attrs: repAttrs,
+				attr: repAttrs,
 
-      return {
-        attrs: repAttrs,
-        attr: repAttrs,
+				column: repFields,
+				columns: repFields,
+				field: repFields,
+				fields: repFields,
 
-        column: repFields,
-        columns: repFields,
-        field: repFields,
-        fields: repFields,
+				reduce: repReduce,
+				inject: repReduce,
+				foldl: repReduce,
 
-        reduce: repReduce,
-        inject: repReduce,
-        foldl: repReduce,
+				map: repMap,
+				collect: repMap,
 
-        map: repMap,
-        collect: repMap,
-
-        each: repEach,
+				each: repEach,
                 forEach: repEach,
 
                 tap: repTap,
                 'do': repTap,
 
-        after: repAfter,
-        last: repAfter,
-        done: repAfter,
+				after: repAfter,
+				last: repAfter,
+				done: repAfter,
 
-        execute: repExecute,
-        go: repExecute,
-        run: repExecute
-      };
-    }(section));
-  },
+				execute: repExecute,
+				go: repExecute,
+				run: repExecute
+			};
+		}(section));
+	},
 
 
     repeatingSimpleSum = function(section, field, destination){
@@ -618,14 +629,16 @@ var TAS = TAS || (function(){
             .execute();
     };
 
-  console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  The Aaron Sheet  v'+version+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
-  console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  Last update: '+(new Date(lastUpdate*1000))+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+    /* eslint-disable no-console */
+	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  The Aaron Sheet  v'+version+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  Last update: '+(new Date(lastUpdate*1000))+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+    /* eslint-enable no-console */
 
 
     return {
         /* Repeating Sections */
         repeatingSimpleSum: repeatingSimpleSum,
-    repeating: repeating,
+		repeating: repeating,
 
         /* Configuration */
         config: setConfigOption,
@@ -634,6 +647,7 @@ var TAS = TAS || (function(){
         callback: wrapCallback,
         callstack: logCallstack,
         debugMode: debugMode,
+        isDebugMode: isDebugMode,
         _fn: wrapCallback,
 
         /* Logging */
@@ -673,17 +687,17 @@ var TAS = TAS || (function(){
   });
 
   on("change:repeating_words", function (eventInfo) {
-    TAS.repeatingSimpleSum('words','committed_effort','total_word_committed_effort');
-    TAS.repeatingSimpleSum('words','cost','word_points_spent');
+    TAS.repeatingSimpleSum('words','word_committed_effort','total_word_committed_effort');
+    TAS.repeatingSimpleSum('words','word_cost','word_points_spent');
   });
 
   on("change:repeating_gifts", function (eventInfo) {
-    TAS.repeatingSimpleSum('gifts','committed_effort','total_gift_committed_effort');
-    TAS.repeatingSimpleSum('gifts','cost','gift_points_spent');
+    TAS.repeatingSimpleSum('gifts','gift_committed_effort','total_gift_committed_effort');
+    TAS.repeatingSimpleSum('gifts','gift_cost','gift_points_spent');
   });
 
   on("change:repeating_miracles", function (eventInfo) {
-    TAS.repeatingSimpleSum('miracles','committed_effort','total_miracle_committed_effort');
+    TAS.repeatingSimpleSum('miracles','miracle_committed_effort','total_miracle_committed_effort');
   });
 
   on("change:repeating_npc-tactics", function(eventInfo) {
@@ -778,7 +792,7 @@ var TAS = TAS || (function(){
               Power
               </td>
               <td class='sheet-field-content'>
-                <input type="number" min="0" name="attr_faction_power" class='sheet-faction sheet-input' value="1" readonly="true" />
+                <input type="number" min="0" name="attr_faction_power" class='sheet-faction sheet-input' value="1" readonly />
               </td>
             </tr>
             <tr>
@@ -788,7 +802,7 @@ var TAS = TAS || (function(){
               <td class='sheet-field-content'>
                 <input type="number" min="0" name="attr_faction_cohesion" class='sheet-faction sheet-input sheet-min' value="@{faction_action_die_sides}" />
                 <span class="sheet-faction sheet-separator">/</span>
-                <input type="number" min="0" name="attr_faction_cohesion_max" class='sheet-faction sheet-input sheet-max' value="@{faction_power}" disabled="true" />
+                <input type="number" min="0" name="attr_faction_cohesion_max" class='sheet-faction sheet-input sheet-max' value="@{faction_power}" disabled />
               </td>
             </tr>
             <tr>
@@ -797,9 +811,9 @@ var TAS = TAS || (function(){
               </td>
               <td class='sheet-field-content'>
                 <span class="sheet-values">
-                  <input type="number" min="0" name="attr_faction_trouble" class='sheet-faction sheet-input' value="0" readonly="true" />
+                  <input type="number" min="0" name="attr_faction_trouble" class='sheet-faction sheet-input' value="0" readonly />
                   <span class="sheet-faction sheet-separator">/</span>
-                  <input type="number" min="0" name="attr_faction_trouble_max" class='sheet-faction sheet-input sheet-max' value="@{faction_action_die_sides}" disabled="true" />
+                  <input type="number" min="0" name="attr_faction_trouble_max" class='sheet-faction sheet-input sheet-max' value="@{faction_action_die_sides}" disabled />
                 </span>
               </td>
             </tr>
@@ -820,8 +834,8 @@ var TAS = TAS || (function(){
             <tbody>
               <tr>
                 <td><input type="number" name="attr_faction_dominion_total" class='sheet-faction sheet-input' value="0" /></td>
-                <td><input type="number" name="attr_faction_dominion_spent" class='sheet-faction sheet-input' readonly /></td>
-                <td><input type="number" name="attr_faction_dominion_free" class='sheet-faction sheet-input' value="(@{faction_dominion_total}) - (@{faction_dominion_spent})" disabled="true"/></td>
+                <td><input type="number" name="attr_faction_dominion_spent" class='sheet-faction sheet-input' value="0" readonly /></td>
+                <td><input type="number" name="attr_faction_dominion_free" class='sheet-faction sheet-input' value="(@{faction_dominion_total}) - (@{faction_dominion_spent})" disabled /></td>
               </tr>
             </tbody>
           </table>
@@ -906,10 +920,10 @@ var TAS = TAS || (function(){
                     <input type="number" min="0" name="attr_faction_project_spent" class='sheet-faction sheet-project-element sheet-input sheet-max' value="0" />
                   </td>
                   <td>
-                    <input type="number" min="0" name="attr_faction_project_cost" class='sheet-faction sheet-project-element sheet-input sheet-max' value="(@{faction_project_difficulty}) * (@{faction_project_scope})" disabled="true"/>
+                    <input type="number" min="0" name="attr_faction_project_cost" class='sheet-faction sheet-project-element sheet-input sheet-max' value="(@{faction_project_difficulty}) * (@{faction_project_scope})" disabled />
                   </td>
                   <td>
-                    <input type="number" min="0" name="attr_faction_project_remaining" class='sheet-faction sheet-project-element sheet-input sheet-max' value="(@{faction_project_cost}) - (@{faction_project_spent})" disabled="true"/>
+                    <input type="number" min="0" name="attr_faction_project_remaining" class='sheet-faction sheet-project-element sheet-input sheet-max' value="(@{faction_project_cost}) - (@{faction_project_spent})" disabled />
                   </td>
                 </tr>
               </tbody>
@@ -949,7 +963,7 @@ var TAS = TAS || (function(){
               <span class="sheet-values">
                 <input type="number" min="0" name="attr_npc_hd_current" class='sheet-npc sheet-input sheet-min' value="1" />
                 <span class="sheet-npc sheet-separator">/</span>
-                <input type="number" min="0" name="attr_npc_hd_max" class='sheet-npc sheet-input sheet-max' value="1"/>
+                <input type="number" min="1" name="attr_npc_hd_max" class='sheet-npc sheet-input sheet-max' value="1"/>
               </span>
             </td>
           </tr>
@@ -959,7 +973,7 @@ var TAS = TAS || (function(){
             </td>
             <td class='sheet-field-content'>
               <input type="number" min="1" name="attr_npc_save" class='sheet-npc sheet-input' value="15" />
-              <button type="roll" name="roll_npc_attack" value="&{template:default} {{name=Save by @{character_name}}} {{roll=[[1d20>@{npc_save} + ?{Modifier|0}]]}}" class='sheet-button'></button>
+              <button type="roll" name="roll_npc_save" value="&{template:default} {{name=Save by @{character_name}}} {{roll=[[{1d20 + ?{Modifier|0}}>@{npc_save}]]}}" class='sheet-button'></button>
             </td>
           </tr>
           <tr>
@@ -976,7 +990,7 @@ var TAS = TAS || (function(){
             </td>
             <td class='sheet-field-content'>
               <input type="number" min="1" name="attr_npc_morale" class='sheet-npc sheet-input' value="10" />
-              <button type="roll" name="roll_npc_attack" value="&{template:default} {{name=Morale Check by @{character_name}}} {{roll=[[1d20>@{npc_morale} + ?{Modifier|0}]]}}" class='sheet-button'></button>
+              <button type="roll" name="roll_npc_morale" value="&{template:default} {{name=Morale Check by @{character_name}}} {{roll=[[{1d11+1}>@{npc_morale}]]}}" class='sheet-button'></button>
             </td>
           </tr>
           <tr>
@@ -1012,7 +1026,7 @@ var TAS = TAS || (function(){
             </td>
             <td class='sheet-field-content'>
               <input type="number" name="attr_npc_attack_qty" class='sheet-npc sheet-input' value="0" />
-              <button type="roll" name="roll_npc_attack" value="&{template:default} {{name=Attack by @{character_name}}} {{roll=[[1d20 + @{npc_attack_bonus} + ?{Modifier|0} + ?{Target AC|9}]]}} {{damage=[[@{npc_damage}]] @{npc_damage_type}}}" class='sheet-button'></button>
+              <button type="roll" name="roll_npc_attack" value="&{template:default} {{name=Attack by @{character_name}}} {{roll=[[{1d20 + @{npc_attack_bonus} + ?{Modifier|0} + ?{Target AC|9}}>20]]}} {{damage=[[@{npc_damage} @{npc_damage_type}]]}}" class='sheet-button'></button>
             </td>
           </tr>
         </tbody>
@@ -1058,10 +1072,10 @@ var TAS = TAS || (function(){
               <input type="number" min="0" name="attr_npc_effort_total" class='sheet-npc sheet-input' value="0" />
             </td>
             <td class='sheet-field-content'>
-              <input type="number" min="0" name="attr_npc_effort_spent" class='sheet-npc sheet-input' value="(@{total_npc_committed_effort})" disabled="true"/>
+              <input type="number" min="0" name="attr_npc_effort_spent" class='sheet-npc sheet-input' value="(@{total_npc_committed_effort})" disabled />
             </td>
             <td class='sheet-field-content'>
-              <input type="number" min="0" name="attr_npc_effort_free" class='sheet-npc sheet-input' value="(@{npc_effort_total}) - (@{npc_effort_spent})" disabled="true"/>
+              <input type="number" min="0" name="attr_npc_effort_free" class='sheet-npc sheet-input' value="(@{npc_effort_total}) - (@{npc_effort_spent})" disabled />
             </td>
           </tr>
         </tbody>
@@ -1097,7 +1111,7 @@ var TAS = TAS || (function(){
 
           <div class='sheet-points'>
             <label for="attr_points" class='sheet-field-title'>Points</label>
-            <input type="number" min="1" name="attr_points" class='sheet-core sheet-input-thin sheet-input' value="6 + 2 * (@{adj_level}) - (@{points_spent})" disabled=true />
+            <input type="number" min="1" name="attr_points" class='sheet-core sheet-input-thin sheet-input' value="6 + 2 * (@{adj_level}) - (@{points_spent})" disabled />
           </div>
 
           <div class='sheet-XP'>
@@ -1114,7 +1128,7 @@ var TAS = TAS || (function(){
             <span class="sheet-values">
               <input type="number" min="0" name="attr_hp_current" class='sheet-core sheet-input sheet-min' value="8" />
               <span class="sheet-core sheet-separator">/</span>
-              <input type="number" min="0" name="attr_hp_max" class='sheet-core sheet-input sheet-max' value="8 + 4*(@{adj_level}) + ceiling((@{adj_level}) * (@{con_mod}) / 2)" disabled=true" />
+              <input type="number" min="0" name="attr_hp_max" class='sheet-core sheet-input sheet-max' value="8 + (@{con_mod}) + 4*(@{adj_level}) + ceiling((@{adj_level}) * (@{con_mod}) / 2)" disabled />
             </span>
           </div>
         </div>
@@ -1140,7 +1154,7 @@ var TAS = TAS || (function(){
                 </button>
               </td>
               <td>
-                <button type="roll" name="roll_str_check" value="&{template:default} {{name=Strength Check}} {{roll=[[1d20>@{str_check} + ?{Modifier|0}]]}}" class="sheet-blank-roll-button sheet-button">
+                <button type="roll" name="roll_str_check" value="&{template:default} {{name=Strength Check}} {{roll=[[{1d20+?{Modifier|0}}>@{str_check}]]}}" class="sheet-blank-roll-button sheet-button">
                   <input type="number" class="sheet-input sheet-rollable-value sheet-stats" name="attr_str_check" readonly />
                 </button>
               </td>
@@ -1154,7 +1168,7 @@ var TAS = TAS || (function(){
                 </button>
               </td>
               <td>
-                <button type="roll" name="roll_dex_check" value="&{template:default} {{name=Dexterity Check}} {{roll=[[1d20>@{dex_check} + ?{Modifier|0}]]}}" class="sheet-blank-roll-button sheet-button">
+                <button type="roll" name="roll_dex_check" value="&{template:default} {{name=Dexterity Check}} {{roll=[[{1d20+?{Modifier|0}}>@{dex_check}]]}}" class="sheet-blank-roll-button sheet-button">
                   <input type="number" class="sheet-input sheet-rollable-value sheet-stats" name="attr_dex_check" readonly />
                 </button>
               </td>
@@ -1168,7 +1182,7 @@ var TAS = TAS || (function(){
                 </button>
               </td>
               <td>
-                <button type="roll" name="roll_con_check" value="&{template:default} {{name=Constitution Check}} {{roll=[[1d20>@{con_check} + ?{Modifier|0}]]}}" class="sheet-blank-roll-button sheet-button">
+                <button type="roll" name="roll_con_check" value="&{template:default} {{name=Constitution Check}} {{roll=[[{1d20+?{Modifier|0}}>@{con_check}]]}}" class="sheet-blank-roll-button sheet-button">
                   <input type="number" class="sheet-input sheet-rollable-value sheet-stats" name="attr_con_check" readonly />
                 </button>
               </td>
@@ -1182,7 +1196,7 @@ var TAS = TAS || (function(){
                 </button>
               </td>
               <td>
-                <button type="roll" name="roll_wis_check" value="&{template:default} {{name=Wisdom Check}} {{roll=[[1d20>@{wis_check} + ?{Modifier|0}]]}}" class="sheet-blank-roll-button sheet-button">
+                <button type="roll" name="roll_wis_check" value="&{template:default} {{name=Wisdom Check}} {{roll=[[{1d20+?{Modifier|0}}>@{wis_check}]]}}" class="sheet-blank-roll-button sheet-button">
                   <input type="number" class="sheet-input sheet-rollable-value sheet-stats" name="attr_wis_check" readonly />
                 </button>
               </td>
@@ -1196,7 +1210,7 @@ var TAS = TAS || (function(){
                 </button>
               </td>
               <td>
-                <button type="roll" name="roll_int_check" value="&{template:default} {{name=Intelligence Check}} {{roll=[[1d20>@{int_check} + ?{Modifier|0}]]}}" class="sheet-blank-roll-button sheet-button">
+                <button type="roll" name="roll_int_check" value="&{template:default} {{name=Intelligence Check}} {{roll=[[{1d20+?{Modifier|0}}>@{int_check}]]}}" class="sheet-blank-roll-button sheet-button">
                   <input type="number" class="sheet-input sheet-rollable-value sheet-stats" name="attr_int_check" readonly />
                 </button>
               </td>
@@ -1210,7 +1224,7 @@ var TAS = TAS || (function(){
                 </button>
               </td>
               <td>
-                <button type="roll" name="roll_cha_check" value="&{template:default} {{name=Charisma Check}} {{roll=[[1d20>@{cha_check} + ?{Modifier|0}]]}}" class="sheet-blank-roll-button sheet-button">
+                <button type="roll" name="roll_cha_check" value="&{template:default} {{name=Charisma Check}} {{roll=[[{1d20+?{Modifier|0}}>@{cha_check}]]}}" class="sheet-blank-roll-button sheet-button">
                   <input type="number" class="sheet-input sheet-rollable-value sheet-stats" name="attr_cha_check" readonly />
                 </button>
               </td>
@@ -1234,34 +1248,34 @@ var TAS = TAS || (function(){
           <tbody>
             <tr>
               <td class='sheet-table-field-title'>Hardiness</td>
-              <td><input type="number" name="attr_save_hardiness_base" class='sheet-input sheet-saves' value="((15 - ((@{str_mod}) + (@{con_mod}) + (abs( (@{str_mod}) - (@{con_mod}) ))) / 2) - (@{adj_level}))" disabled="true" /></td>
-              <td><input type="number" name="attr_save_hardiness_mod" class='sheet-input sheet-saves' value="0" /></td>
-              <td><input type="number" name="attr_hardiness_penalty" class='sheet-input sheet-saves' readonly /></td>
+              <td><input type="number" name="attr_save_hardiness_base" class='sheet-input sheet-saves' value="16 - @{level}" disabled /></td>
+              <td><input type="number" name="attr_save_hardiness_mod" class='sheet-input sheet-saves' value="0-(((@{str_mod}) + (@{con_mod}) + (abs( (@{str_mod}) - (@{con_mod}) ))) / 2)" disabled /></td>
+              <td><input type="number" name="attr_hardiness_penalty" class='sheet-input sheet-saves' value="0" readonly /></td>
               <td>
-                <button type="roll" name="roll_hardiness_save" value="&{template:default} {{name=Hardiness Check}} {{roll=[[1d20>@{save_hardiness_final} + ?{Modifier|0}]]}}" class="sheet-blank-roll-button sheet-button">
-                  <input type="number" class="sheet-input sheet-rollable-value sheet-saves" name="attr_save_hardiness_final" value="(@{save_hardiness_base})+(@{save_hardiness_mod})-(@{hardiness_penalty})" disabled=true />
+                <button type="roll" name="roll_hardiness_save" value="&{template:default} {{name=Hardiness Check}} {{roll=[[{1d20-@{save_hardiness_final} + ?{Modifier|0}}>0]]}}" class="sheet-blank-roll-button sheet-button">
+                  <input type="number" class="sheet-input sheet-rollable-value sheet-saves" name="attr_save_hardiness_final" value="((@{save_hardiness_base})+(@{save_hardiness_mod})+(@{hardiness_penalty}))" disabled />
                 </button>
               </td>
             </tr>
             <tr>
               <td class='sheet-table-field-title'>Evasion</td>
-              <td><input type="number" name="attr_save_evasion_base" class='sheet-input sheet-saves' value="((15 - ((@{dex_mod}) + (@{int_mod}) + (abs( (@{dex_mod}) - (@{int_mod}) ))) / 2) - (@{adj_level}))" disabled=true /></td>
-              <td><input type="number" name="attr_save_evasion_mod" class='sheet-input sheet-saves' value="0" /></td>
-              <td><input type="number" name="attr_evasion_penalty" class='sheet-input sheet-saves' readonly /></td>
+              <td><input type="number" name="attr_save_evasion_base" class='sheet-input sheet-saves' value="16 - @{level}" disabled /></td>
+              <td><input type="number" name="attr_save_evasion_mod" class='sheet-input sheet-saves' value="0-(((@{dex_mod}) + (@{int_mod}) + (abs( (@{dex_mod}) - (@{int_mod}) ))) / 2)" disabled /></td>
+              <td><input type="number" name="attr_evasion_penalty" class='sheet-input sheet-saves' value="0" readonly /></td>
               <td>
-                <button type="roll" name="roll_evasion_save" value="&{template:default} {{name=Evasion Check}} {{roll=[[1d20>@{save_evasion_final} + ?{Modifier|0}]]}}" class="sheet-blank-roll-button sheet-button">
-                  <input type="number" class="sheet-input sheet-rollable-value sheet-saves" name="attr_save_evasion_final" value="(@{save_evasion_base})+(@{save_evasion_mod})-(@{evasion_penalty})" disabled=true />
+                <button type="roll" name="roll_evasion_save" value="&{template:default} {{name=Evasion Check}} {{roll=[[{1d20-@{save_evasion_final} + ?{Modifier|0}}>0]]}}" class="sheet-blank-roll-button sheet-button">
+                  <input type="number" class="sheet-input sheet-rollable-value sheet-saves" name="attr_save_evasion_final" value="((@{save_evasion_base})+(@{save_evasion_mod})+(@{evasion_penalty}))" disabled />
                 </button>
               </td>
             </tr>
             <tr>
               <td class='sheet-table-field-title'>Spirit</td>
-              <td><input type="number" name="attr_save_spirit_base" class='sheet-input sheet-saves' value="((15 - ((@{wis_mod}) + (@{cha_mod}) + (abs( (@{wis_mod}) - (@{cha_mod}) ))) / 2) - (@{adj_level}))" disabled=true /></td>
-              <td><input type="number" name="attr_save_spirit_mod" class='sheet-input sheet-saves' value="0" /></td>
-              <td><input type="number" name="attr_spirit_penalty" class='sheet-input sheet-saves' readonly /></td>
+              <td><input type="number" name="attr_save_spirit_base" class='sheet-input sheet-saves' value="16 - @{level}" disabled /></td>
+              <td><input type="number" name="attr_save_spirit_mod" class='sheet-input sheet-saves' value="0-(((@{wis_mod}) + (@{cha_mod}) + (abs( (@{wis_mod}) - (@{cha_mod}) ))) / 2)" disabled /></td>
+              <td><input type="number" name="attr_spirit_penalty" class='sheet-input sheet-saves' value="0" readonly /></td>
               <td>
-                <button type="roll" name="roll_spirit_save" value="&{template:default} {{name=Spirit Check}} {{roll=[[1d20>@{save_spirit_final} + ?{Modifier|0}]]}}" class="sheet-blank-roll-button sheet-button">
-                  <input type="number" class="sheet-input sheet-rollable-value sheet-saves" name="attr_save_spirit_final" value="(@{save_spirit_base})+(@{save_spirit_mod})-(@{spirit_penalty})" disabled=true />
+                <button type="roll" name="roll_spirit_save" value="&{template:default} {{name=Spirit Check}} {{roll=[[{1d20-@{save_spirit_final} + ?{Modifier|0}}>0]]}}" class="sheet-blank-roll-button sheet-button">
+                  <input type="number" class="sheet-input sheet-rollable-value sheet-saves" name="attr_save_spirit_final" value="((@{save_spirit_base})+(@{save_spirit_mod})+(@{spirit_penalty}))" disabled />
                 </button>
               </td>
             </tr>
@@ -1277,34 +1291,33 @@ var TAS = TAS || (function(){
             <th>Total</th>
             <th>Spent</th>
             <th>Free</th>
-            <th>Earned</th>
+			<th>Bonus</th>
           </thead>
           <tbody>
             <tr>
               <td class="sheet-resources-table-element">Effort</td>
-              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_effort_total" class='sheet-resources sheet-input' value="((@{adj_level}) + 2)" disabled=true /></td>
-              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_effort_spent" class='sheet-resources sheet-input' disabled="true" value="((@{total_word_committed_effort}) + (@{total_gift_committed_effort}) + (@{total_miracle_committed_effort}))" /></td>
-              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_effort_free" class='sheet-resources sheet-input' disabled="true" value="((@{effort_total}) - (@{effort_spent}))" /></td>
-              <td class="sheet-resources-table-element"></td>
+              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_effort_total" class='sheet-resources sheet-input' value="((@{adj_level}) + 2 + (@{effort_bonus}))" disabled /></td>
+              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_effort_spent" class='sheet-resources sheet-input' value="((@{total_word_committed_effort}) + (@{total_gift_committed_effort}) + (@{total_miracle_committed_effort}))" disabled /></td>
+              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_effort_free" class='sheet-resources sheet-input' value="((@{effort_total}) - (@{effort_spent}))" disabled /></td>
+              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_effort_bonus" class='sheet-resources sheet-input' value="0" /></td>
             </tr>
             <tr>
               <td class="sheet-resources-table-element">Influence</td>
-              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_influence_total" class='sheet-resources sheet-input' value="((@{adj_level}) + 2)" disabled=true /></td>
+              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_influence_total" class='sheet-resources sheet-input' value="((@{adj_level}) + 2 + (@{influence_bonus}))" disabled /></td>
               <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_influence_spent" class='sheet-resources sheet-input' readonly /></td>
-              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_influence_free" class='sheet-resources sheet-input' disabled="true" value="((@{influence_total}) - (@{influence_spent}))" /></td>
-              <td class="sheet-resources-table-element"></td>
+              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_influence_free" class='sheet-resources sheet-input' value="((@{influence_total}) - (@{influence_spent}))" disabled /></td>
+              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_influence_bonus" class='sheet-resources sheet-input' value="0" /></td>
             </tr>
             <tr>
               <td class="sheet-resources-table-element">Dominion</td>
               <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_dominion_total" class='sheet-resources sheet-input' value="0" /></td>
               <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_dominion_spent" class='sheet-resources sheet-input' readonly /></td>
-              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_dominion_free" class='sheet-resources sheet-input' disabled="true" value="((@{dominion_total}) - (@{dominion_spent}))" /></td>
-              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_dominion_earned" class='sheet-resources sheet-input' value="0" /></td>
+              <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_dominion_free" class='sheet-resources sheet-input' value="((@{dominion_total}) - (@{dominion_spent}))" disabled /></td>
             </tr>
             <tr>
               <td class="sheet-resources-table-element">Wealth</td>
               <td class="sheet-resources-table-element"><input type="number" min="0" name="attr_wealth_total" class='sheet-resources sheet-input' value="0" /></td>
-              <td colspan='3'></td>
+              <!-- <td colspan='3'></td> -->
             </tr>
           </tbody>
         </table>
@@ -1325,11 +1338,11 @@ var TAS = TAS || (function(){
           </div>
           <div class="sheet-armor-shield">
             <label for="attr_armor_shield" class='sheet-field-title'>Shield</label>
-            <input type="number" name="attr_armor_shield" class="sheet-input sheet-armor sheet-armor-shield" value="0" />
+            <input type="checkbox" name="attr_armor_shield" class="sheet-input sheet-armor sheet-armor-shield" value="-1" />
           </div>
           <div class="sheet-armor-net">
             <label for="attr_armor_net" class='sheet-field-title'>Total AC</label>
-            <input type="number" name="attr_armor_net" class="sheet-input sheet-armor sheet-armor-net" value="((@{armor_ac}) + (@{armor_shield}) - (@{dex_mod}))" disabled="true" />
+            <input type="number" name="attr_armor_net" class="sheet-input sheet-armor sheet-armor-net" value="((@{armor_ac}) + (@{armor_shield}) - (@{dex_mod}))" disabled />
           </div>
           <div class="sheet-armor-description">
             <label for="attr_armor-description" class='sheet-field-title'>Description</label>
@@ -1341,15 +1354,15 @@ var TAS = TAS || (function(){
             <div class="sheet-armor-saving-throw-penalty-choices">
               <div class="sheet-armor-saving-throw-penalty-choice">
                 <label for="attr_hardiness_penalty" class='sheet-saving-throw-penalty-element sheet-small-title-label'>Hardiness</label>
-                <input type="checkbox" name="attr_hardiness_penalty" class='sheet-saving-throw-penalty-element sheet-input sheet-penalty sheet-hardiness-penalty' value="-4" />
+                <input type="checkbox" name="attr_hardiness_penalty" class='sheet-saving-throw-penalty-element sheet-input sheet-penalty sheet-hardiness-penalty' value="4" />
               </div>
               <div class="sheet-armor-saving-throw-penalty-choice">
                 <label for="attr_evasion_penalty" class='sheet-saving-throw-penalty-element sheet-small-title-label'>Evasion</label>
-                <input type="checkbox" name="attr_evasion_penalty" class='sheet-saving-throw-penalty-element sheet-input sheet-penalty sheet-evasion-penalty' value="-4" />
+                <input type="checkbox" name="attr_evasion_penalty" class='sheet-saving-throw-penalty-element sheet-input sheet-penalty sheet-evasion-penalty' value="4" />
               </div>
               <div class="sheet-armor-saving-throw-penalty-choice">
                 <label for="attr_spirit_penalty" class='sheet-saving-throw-penalty-element sheet-small-title-label'>Spirit</label>
-                <input type="checkbox" name="attr_spirit_penalty" class='sheet-saving-throw-penalty-element sheet-input sheet-penalty sheet-spirit-penalty' value="-4" />
+                <input type="checkbox" name="attr_spirit_penalty" class='sheet-saving-throw-penalty-element sheet-input sheet-penalty sheet-spirit-penalty' value="4" />
               </div>
             </div>
           </div>
@@ -1359,8 +1372,8 @@ var TAS = TAS || (function(){
       <div class='sheet-weapons' name="sheet-weapons">
         <label for="sheet-weapons" class="sheet-title-label">Weapons</label>
         <div class="sheet-weapons-ab">
-          <label for="attr_weapons_base_ab" class="sheet-field-label sheet-weapons-ab">Base Attack Bonus</label>
-          <input type="number" value="(@{adj_level})" disabled=true name="attr_weapon_base_ab" class='sheet-input sheet-weapons-ab' />
+          <label for="attr_weapon_base_ab" class="sheet-field-label sheet-weapons-ab">Base Attack Bonus</label>
+          <input type="number" value="@{level}" disabled name="attr_weapon_base_ab" class='sheet-input sheet-weapons-ab' />
         </div>
 
         <div class="sheet-weapons-list">
@@ -1381,14 +1394,11 @@ var TAS = TAS || (function(){
                       <option value="@{cha_mod}">CHA</option>
                     </select>
                   </span>
-                  <span class='sheet-weapon-info-ab sheet-weapon-info-element'>
-                    <input type="number" name="attr_weapon_ab" class="sheet-input sheet-weapon-info-ab" placeholder="AB" />
-                  </span>
                   <span class='sheet-weapon-info-damage sheet-weapon-info-element'>
                     <input type="text" name="attr_weapon_damage" class="sheet-input sheet-weapon-info-damage" placeholder="1d6" />
                   </span>
                   <span class='sheet-weapon-info-roll sheet-weapon-info-element'>
-                    <button type="roll" name="roll_weapon" class="sheet-button sheet-weapon-info-roll" value="&{template:default} {{attack=[[1d20 + (@{weapon_base_ab}) + (@{weapon_ab}) + (@{weapon_attribute})  + ?{Attack Modifier|0} + (?{Target AC|9})>20]]}} {{damage=Roll @{weapon_damage} with a @{weapon_attribute} modifier available}} {{name=Attack with @{weapon_name}}}" />
+                    <button type="roll" name="roll_weapon" class="sheet-button sheet-weapon-info-roll" value="&{template:default} {{attack=[[{1d20 + (@{weapon_base_ab}) + (@{weapon_attribute})  + ?{Attack Modifier|0} + (?{Target AC|9})}>20]]}} {{damage=Roll @{weapon_damage} with a +@{weapon_attribute} modifier available}} {{name=Attack with @{weapon_name}}}" />
                   </span>
                 </div>
               </div>
@@ -1425,7 +1435,7 @@ var TAS = TAS || (function(){
               </tr>
               <tr>
                 <td> 10 or more </td>
-                <td> 3 </td>
+                <td> 4 </td>
               </tr>
             </tbody>
           </table>
@@ -1466,9 +1476,9 @@ var TAS = TAS || (function(){
           </div>
           <fieldset class="repeating_words">
             <div class='sheet-table-row'>
-              <input type="text" name="attr_name" value="" class='sheet-input sheet-word-name sheet-power-name'/>
-              <input type="number" name="attr_cost" value="0" class='sheet-input sheet-word sheet-cost sheet-power-cost' min="0"/>
-              <input type="number" name="attr_committed_effort" value="0" class='sheet-input sheet-word sheet-committed-effort sheet-power-effort' min="0"/>
+              <input type="text" name="attr_word_name" value="" class='sheet-input sheet-word-name sheet-power-name'/>
+              <input type="number" name="attr_word_cost" value="0" class='sheet-input sheet-word sheet-cost sheet-power-cost' min="0"/>
+              <input type="number" name="attr_word_committed_effort" value="0" class='sheet-input sheet-word sheet-committed-effort sheet-power-effort' min="0"/>
             </div>
           </fieldset>
         </div>
@@ -1484,9 +1494,9 @@ var TAS = TAS || (function(){
           </div>
           <fieldset class="repeating_gifts">
             <div class='sheet-table-row'>
-              <input type="text" name="attr_name" class='sheet-input sheet-gift-name sheet-power-name' value=""/>
-              <input type="number" name="attr_cost" class='sheet-input sheet-gift sheet-power-cost sheet-cost' value="0" min="0"/>
-              <input type="number" name="attr_committed_effort" class='sheet-input sheet-gift sheet-power-effort sheet-committed-effort'value="0" min="0"/>
+              <input type="text" name="attr_gift_name" class='sheet-input sheet-gift-name sheet-power-name' value=""/>
+              <input type="number" name="attr_gift_cost" class='sheet-input sheet-gift sheet-power-cost sheet-cost' value="0" min="0"/>
+              <input type="number" name="attr_gift_committed_effort" class='sheet-input sheet-gift sheet-power-effort sheet-committed-effort'value="0" min="0"/>
             </div>
           </fieldset>
         </div>
@@ -1501,8 +1511,8 @@ var TAS = TAS || (function(){
           </div>
           <fieldset class="repeating_miracles">
             <div class='sheet-table-row'>
-              <input type="text" name="attr_name" class='sheet-input sheet-miracle-name sheet-power-name' value=""/>
-              <input type="number" name="attr_committed_effort" class='sheet-input sheet-miracle sheet-committed-effort sheet-power-effort'value="0" min="0"/>
+              <input type="text" name="attr_miracle_name" class='sheet-input sheet-miracle-name sheet-power-name' value=""/>
+              <input type="number" name="attr_miracle_committed_effort" class='sheet-input sheet-miracle sheet-committed-effort sheet-power-effort' value="0" min="0"/>
             </div>
           </fieldset>
         </div>
@@ -1561,10 +1571,10 @@ var TAS = TAS || (function(){
                     <input type="number" min="0" name="attr_project_influence_spent" class='sheet-project-element sheet-input sheet-max' value="0" />
                   </td>
                   <td>
-                    <input type="number" min="0" name="attr_project_cost" class='sheet-project-element sheet-input sheet-max' value="(@{project_difficulty}) * (@{project_scope})" disabled="true"/>
+                    <input type="number" min="0" name="attr_project_cost" class='sheet-project-element sheet-input sheet-max' value="(@{project_difficulty}) * (@{project_scope})" disabled />
                   </td>
                   <td>
-                    <input type="number" min="0" name="attr_project_remaining" class='sheet-project-element sheet-input sheet-max' value="(@{project_cost}) - ((@{project_dominion_spent}) + (@{project_influence_spent}))" disabled="true"/>
+                    <input type="number" min="0" name="attr_project_remaining" class='sheet-project-element sheet-input sheet-max' value="(@{project_cost}) - ((@{project_dominion_spent}) + (@{project_influence_spent}))" disabled />
                   </td>
                 </tr>
               </tbody>
@@ -1576,17 +1586,17 @@ var TAS = TAS || (function(){
   </div>
 
   <div style="display: none">
-    <input type="number" name="attr_total_word_committed_effort" readonly/>
-    <input type="number" name="attr_total_gift_committed_effort" readonly/>
-    <input type="number" name="attr_total_miracle_committed_effort" readonly/>
-    <input type="number" name="attr_word_points_spent" readonly/>
-    <input type="number" name="attr_gift_points_spent" readonly/>
+    <input type="number" name="attr_total_word_committed_effort" value="0" readonly />
+    <input type="number" name="attr_total_gift_committed_effort" value="0" readonly />
+    <input type="number" name="attr_total_miracle_committed_effort" value="0" readonly />
+    <input type="number" name="attr_word_points_spent" value="0" readonly />
+    <input type="number" name="attr_gift_points_spent" value="0" readonly />
 
-    <input type="number" name="attr_adj_level" value="(@{level}) - 1" disabled="true"/>
-    <input type="number" name="attr_points_spent" value="((@{word_points_spent}) + (@{gift_points_spent}))" disabled="true"/>
+    <input type="number" name="attr_adj_level" value="(@{level}) - 1" disabled />
+    <input type="number" name="attr_points_spent" value="((@{word_points_spent}) + (@{gift_points_spent}))" disabled />
 
-    <input type="number" name="attr_total_npc_tactics" readonly/>
-    <input type="number" name="attr_total_npc_committed_effort" readonly/>
+    <input type="number" name="attr_total_npc_tactics" value="0" readonly />
+    <input type="number" name="attr_total_npc_committed_effort" value="0" readonly />
   </div>
 
   <div class='sheet-version-container'>
