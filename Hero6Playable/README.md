@@ -5,7 +5,9 @@ Character sheet for the HeroSystem 6th edition (also known as Champions years ag
 	*	[What this Character Sheet is Not](#whatitsnot)
 	*	[API Scripts](#apiscripts)
 *	[Usage](#usage)
+	*	[Turn Sequence](#turnsequence)
 	*	[Edit Mode](#editmode)
+*	[Tip & Tricks](#tips)
 *	[Pages](#pages)
 	*	[Core](#core)
 	*	[Combat](#combat)
@@ -14,7 +16,7 @@ Character sheet for the HeroSystem 6th edition (also known as Champions years ag
 *	[Adding Powers](#addingpowers)
 	*	[Special Cases](#specialcases)
 *	[Buttons](#buttons)
-*	[Sample Usage](#sample)
+*	[Sample Turn](#sample)
 
 
 
@@ -39,7 +41,36 @@ You can add the two api's within a game's settings by selecting Settings / API S
 
 ## <a id="usage">Usage</a>
 
-The character is divided into six pages: Core, Combat, Powers, Skills, Background, and Configuration.  Switching between pages is accomplished via tabs located between the header and the page content.  The configuration tab uses a gear as an icon instead of a text label.  In this Usage section, I will not describe obvious features of the character sheet, such as the hit location chart.  That section just displays information that you should already know if you play HeroSystem games.  Instead, I will concentrate on describing those section that contain die rolls or other interactive features of the character sheet.
+I'm not going to go into great detail in this section.  This is supposed to be the 5 minute description of how to use the character sheet.  Detail will be in the sections that follow.
+
+The character sheet is divided into six pages: Core, Combat, Powers, Skills, Background, and Configuration.  Switching between pages is accomplished via tabs located between the header and the page content.  The configuration tab uses a gear as an icon instead of a text label.
+
+Press the **[edit](#editmode)** button to enter your character.
+
+Fields that have functionality change appearance when you hover over them.  Most have tooltips.  A list of these fields is **[here](#buttons)**.
+
+The sheet was designed to try and minimize how often you switch pages.  The **[Core](#core)** page, hopefully, has all the fields you will use when it is not your turn.  It has your DCV, your defenses, Perception rolls, etc.  The **[Combat](#combat)** page tries to have most of the offense related fields (except the attack power itself) that you will need when it is your turn.
+
+I recommend setting up how you will pay your endurance costs to suit your play style.  There are two ways to pay for endurance, and an additional way to use a reserve (charges).  The first method is to manually hit the **END** button on a power.  That will expend the resources for that one power manually.  If you use this method, you really won't be using the *Pay END* button and the *Auto* checkbox in each power will be irrelevant.  The other method of paying for endurance is to check the **Auto** checkbox within each power that you expect to use each round.  For example, if you have a force field that you have to expend END for each phase, check the **Auto** checkbox.  This ties the power to the **Pay END** button in the info section.  When you hit the **Pay END** button, every power that is both *on* and has the *Auto* checkbox checked will have its resources expended.  Note that both boxes have to be checked.  Here's a brief description why:
+
+An attack power such as a pistol might be checked as *on* because it includes a +1 OCV bonus and you want that bonus to be included in calculations.  However, you do not want the charges (ammo) expended automatically--only when you fire the gun.  So the power will be *on* for the OCV bonus, but you uncheck the *Auto* box so that you have to expend the ammo manually.
+
+A force field power should have the *Auto* button checked.  When you hit the *Pay END* button, the END for all powers that are *on* and set to *auto* will be expended.  So if your character has Flight, Force Field, a constant blast power (flame shield), a radar that costs END, and any number of other powers... all of these would be checked as *Auto*.  Now say on your phase you choose to have your flight and force field on, but not the others.  Check Flight and Force Field as *on* and uncheck the other powers (setting them *off*).  Now when you press the *Pay END* button, the endurance for Flight and Force Field will be expended, but not for the flame shield or radar.
+
+#### <a id="turnsequence">Turn Sequence</a>
+
+This is recommended only.  I'm sure you can tailor this to your own playing style.
+
+* At the beginning of the character's phase, set all powers that will be on or off (these are normally zero phase actions).
+* Press the Pay END button.  This will expend the resources for all powers that are "on".
+* Do the character's movement.
+* If the character is going to perform an attack, select any appropriate maneuver, set the range, and choose a target if appropriate.  If there are any adhoc combat modifiers, add those in the "Other Modifiers" section.
+* Press the END button for the power you're about to use (if the power is constant and you already paid the END at the start of these steps, do not manually expend the END again).
+* Use the power by pressing the power's name.  The output should appear in the chat windows.
+
+I'll repeat this in the briefest of words:  Set powers on/off, Pay END, move, make your combat choices, use the power.
+
+A **[sample turn](#sample)** is at the end of this documentation.
 
 #### <a id="editmode">Edit Mode</a>
 
@@ -48,6 +79,16 @@ The character sheet has two modes:  Play Mode and Edit Mode.  You can switch bet
 In Play Mode, most fields are display only and roll buttons are active.  The status fields (STUN/BODY/END) display the character's current values and can be used to modify the current values.
 
 In Edit Mode, user-modifiable fields are unlocked and most roll buttons are deactivated.  The status fields (STUN/BODY/END) are also locked and change to display the max values.
+
+#### <a id="tips">Tips and Tricks</a>
+
+It is common to perform a half move.  Create two entries in the Powers & Equipment page for movement.  Make one at full cost and make the other at half cost.  That way you can do a half move and expend only half endurance without having to manually adjust your END.
+
+Some skill levels apply to multiple skills, but in gameplay, you will always add the bonus.  Example, if you buy +3 skill levels with communication skills (Acting, Conversation, Persuasion), by rule you can only use those skill levels on one skill at a time--but in practice you can't use more than one of those skills in any given round.  The result is you will always be adding +3 to each of those skills.  In cases such as this, do not bother to add the skill levels to the Skill Levels section.  Just add +3 to the each individual skill.  Same effect and you never have to check/uncheck boxes.
+
+Similarly, if you buy skill levels with a power and those skill levels will only ever apply to that power... then do not add them as Combat Skill Levels.  Instead, add them as Enhancements to the power itself.  So instead of adding +2 RMOD Penalty Skills levels with my Cosmic Blast Rifle, just add the 2 RMOD as a power enhancement to the Cosmic Blast Rifle itself.  Again, now you don't have to check/uncheck boxes.
+
+You can add some pretty nifty effects using the Extra Action field of each power.  Whatever is put into that field will be sent to chat as a separate command when using a power.  If you use the ChatSetAttr api, you could do all sorts of things like turn on a Token's aura when you turn on your "Light" power.  Same api can be used to change your token's image... which you could tie to your Instant Change power, swapping your token's image from a simple civilian to his superhero id.  Be creative.
 
 ## <a id="pages">Pages</a>
 
@@ -422,15 +463,74 @@ Powers | Powers & Equipment | Description | Same as "Name" above except that the
 Powers | Powers & Equipment | END | Expends the resources for the power.
 Skills | Skills | Roll | Pressing this button makes the indicated skill roll.
 
-## <a id="sample">Sample Usage</a>
+## <a id="sample">Sample Turn</a>
 
-I would recommend that when setting up your powers, check the "Auto" box for powers that will be "on" during combat.  Powers such as Force Fields, Movement, etc.  Basically, anything that will cost END except attacks.  For most attacks, I would NOT recommend checking that box.  I would manually expend END when I use the attack (see below).  An exception to that is if the power is a constant, such as a character that has a fire shield.  In that case, check the "Auto" box.  You will NOT expend END manually whenever the power is triggered by someone touching the character.
+This sample includes a bit of description of the character's set up.
 
-* At the beginning of the character's phase, set all powers that will on or off (these are normally zero phase actions).
-* Press the Pay END button.  This will expend the resources for all powers that are "on".
-* Do the character's movement.
-* If the character is going to perform an attack, select any appropriate maneuver, set the range, and choose a target if appropriate.  If there are any adhoc combat modifiers, add those in the "Other Modifiers" section.
-* Press the END button for the power you're about to use (if the power is constant and you already paid the END at the start of these steps, do not manually expend the END again).
-* Use the power by pressing the power's name.  The output should appear in the chat windows.
+Joe has a martial arts character named Rising Sun that can immoliate and use other fire powers.  Here are some of the pertinent powers we will use in this sample.  The actual details of the powers (such as damage dice) aren't relevant here, but I will put the END cost in brackets [].
 
-I'll repeat this in the briefest of words:  Set powers on/off, Pay END, move, make your combat choices, use the power.
+* Martial Arts: Offensive Strike [4]
+* Fire Shield: [3] constant, no range RKA that causes damage to anyone he touches or that touches him.
+* Heat Radiation: [8] constant, no range, area of effect radius, Blast.
+* Solar Flare: [6] no range compound power, Blast + Flash.  We'll say 8d6 Blast and 2d6 Flash.
+* Flight: [2] nothing special, just 20" of flight.
+* Force Field: [2] nothing special.  Just resistant PD and ED that costs END.
+
+His main attack is a Martial Arts Offensive Strike.  If he has his Fire Shield active, any hit he scores will also do the Fire Shield damage.  If he is willing to spend the high END cost, he can turn on a heat shield and make his opponent's life miserable.  Finally, he has the ability to cause a bright burst of fire around him.  This does Blast damage as well as causing a Flash attack.
+
+The set up.
+
+His Martial Arts is set up as a 0pt power that uses STR.  He calls that power "Martial Arts".  Please see [this](#specialcases) section for how to do that.  His Offensive Strike is added as a custom maneuver in the Attacks & Maneuvers section.
+
+So that we can properly expend END during game play, I would recommend checking the *Auto* checkbox for the Fire Shield, Heat Radiation, Flight, and Force Field powers.  Do NOT check the *Auto* checkbox for the Solar Flare power.  We will expend END for that power manually.
+
+Both the Fire Shield and Heat Radiation powers do not use attack rolls.  Set the CV for both of these powers to 'none'.
+
+Create two power entires for Flight.  Create one at the full 20" of movement, and create another with only 10" of movement.  We'll use the 10" copy of flight when we do a half move.
+
+The Solar flare power is a compound power consisting of two different, but linked powers.  I have to create each as a separate power, but because they are used together I'll set them up this way...
+
+I name the first power Solar Flare: Blast.  I just set this one up as a normal attack power.  It has a CV, costs 4 END.  Etc.
+
+I name the second power Solar Flare: Flash.  This one I set up different.  I leave the END cost of 2 alone.  When I use the power(s) I will click the END button on each so that the full 6 END is expended.  Here is where things get different.  I do NOT give the Flash power a combat value (I set it to "none") because I don't want an attack roll.  When I use the power(s), the attack roll will be generated from the first power, Solar Flare: Blast.
+
+So to sum things up... here is how the pertinent powers look
+
+* Martial Arts, [4] END.  Auto is NOT checked.  CV is set to 'OCV'.
+* Fire Shield, [3] END.  Auto is checked.  CV is set to 'none'.
+* Heat Radiation, [8] END.  Auto is checked.  CV is set to 'none'.
+* Solar Flare: Blast, [4] END.  Auto is NOT checked.  CV is set to 'OCV'.
+* Solar Flare: Flash, [2] END.  Auto is NOT checked.  CV is set to 'none'.
+* Flight 20", [2] END.
+* Flight 10", [1] END.
+* Force Field, [2] END.
+
+Now let's conduct a couple phases of combat.
+
+**First Phase**
+
+Rising Sun gets to go first.  At the beginning of his phase, from the Powers & Equipment page, he sets which powers will be *on*.  In game mechanics, this is a zero phase action.  He checks the *on* boxes for the Fire Shield, Flight 10", and Force Field.
+
+He goes to the Core page and presses the *Pay END* button, and 6 END is expended (3 for the fire shield, 1 for the flight, 2 for the force field).
+
+He move 10" up to his opponent and performs an Offensive Strike.  From the Combat page, he selects his custom maneuver, Offensive Strike.  He goes to the Powers page manually expends the END for his Martial Arts by pressing the END button for that power.  Now he attacks by pressing his Martial Arts power.  An attack roll is made and damage dice displayed.  As it turns out, poor Rising Sun missed.
+
+As a quick note, his turn is over, but he leaves the maneuver, Offensive Strike, checked because he will continue to get the +1 it grants to his DCV until his next phase.
+
+His opponent goes and the only part of that phase we'll describe is that his opponent scores a hit.  Which means he takes damage from Rising Sun's Fire Shield.  Rising Sun clicks on his Fire Shield power and damage dice are rolled.  Note that no attack dice are rolled because the CV was set to 'none', and no extra END is expended because this is a constant power and the *Auto* checkbox is unchecked.
+
+**Second Phase**
+
+Things aren't going well for Rising Sun.  He got hit pretty hard and if he takes another hit like that, he'll be out.  So it's either now or never.  At the beginning of his round he does all of the following...
+
+He changes his maneuver to "none".
+He turns on his Heat Radiation.
+He turns off his Flight 10" (he's right next to his opponent, no need to move)
+
+He presses the *Pay END* button and it expends 13 END (3 for the fire shield, 8 for the heat radiation, and 2 for the force field).
+
+His opponent gets affected by the Heat Radiation.  Rising Sun click on that power and damage dice are rolled.  No attack dice or END are expended because the CV is set to 'none', and the *Auto* checkbox is unchecked.
+
+Next, Rising Sun uses hit Solar Flare power.  He click on the END for each of these powers to expend the 6 endurance (4 from the Blast, 2 from the Flash).  He then click on the Solar Flare: Blast power to roll his attack.  This power has a CV of 'OCV' so it rolls attack dice (along with the damage dice), and Rising Sun hits (yay!).  His opponent marks off the damage he takes.  Now the Solar Flare power is a compound power with two *parts* and the Blast was only the first part.  For the second part of the attack, Rising Sun clicks on his Solar Flare: Flash power.  No attack dice are rolled because the CV is set to 'none'.  The effects of the flash are applied to his opponent.
+
+No need to detail the rest of the combat.  We'll leave the fate of Rising Sun to your imagination.
