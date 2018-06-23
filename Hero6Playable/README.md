@@ -513,7 +513,7 @@ Rising Sun gets to go first.  At the beginning of his phase, from the Powers & E
 
 He goes to the Core page and presses the *Pay END* button, and 6 END is expended (3 for the fire shield, 1 for the flight, 2 for the force field).
 
-He move 10" up to his opponent and performs an Offensive Strike.  From the Combat page, he selects his custom maneuver, Offensive Strike.  He goes to the Powers page manually expends the END for his Martial Arts by pressing the END button for that power.  Now he attacks by pressing his Martial Arts power.  An attack roll is made and damage dice displayed.  As it turns out, poor Rising Sun missed.
+He move 10" up to his opponent and performs an Offensive Strike.  From the Combat page, he selects his custom maneuver, Offensive Strike.  He goes to the Powers page and manually expends the END for his Martial Arts by pressing the END button for that power.  Now he attacks by pressing his Martial Arts power.  An attack roll is made and damage dice displayed.  As it turns out, poor Rising Sun missed.
 
 As a quick note, his turn is over, but he leaves the maneuver, Offensive Strike, checked because he will continue to get the +1 it grants to his DCV until his next phase.
 
@@ -521,16 +521,16 @@ His opponent goes and the only part of that phase we'll describe is that his opp
 
 **Second Phase**
 
-Things aren't going well for Rising Sun.  He got hit pretty hard and if he takes another hit like that, he'll be out.  So it's either now or never.  At the beginning of his round he does all of the following...
+Things aren't going well for Rising Sun.  He got hit pretty hard and if he takes another hit like that, he'll be out.  So it's either now or never.  At the beginning of his phase he does all of the following...
 
 He changes his maneuver to "none".
 He turns on his Heat Radiation.
-He turns off his Flight 10" (he's right next to his opponent, no need to move)
+He turns off his Flight 10" (he's right next to his opponent, no need to move).
 
 He presses the *Pay END* button and it expends 13 END (3 for the fire shield, 8 for the heat radiation, and 2 for the force field).
 
 His opponent gets affected by the Heat Radiation.  Rising Sun click on that power and damage dice are rolled.  No attack dice or END are expended because the CV is set to 'none', and the *Auto* checkbox is unchecked.
 
-Next, Rising Sun uses hit Solar Flare power.  He click on the END for each of these powers to expend the 6 endurance (4 from the Blast, 2 from the Flash).  He then click on the Solar Flare: Blast power to roll his attack.  This power has a CV of 'OCV' so it rolls attack dice (along with the damage dice), and Rising Sun hits (yay!).  His opponent marks off the damage he takes.  Now the Solar Flare power is a compound power with two *parts* and the Blast was only the first part.  For the second part of the attack, Rising Sun clicks on his Solar Flare: Flash power.  No attack dice are rolled because the CV is set to 'none'.  The effects of the flash are applied to his opponent.
+Next, Rising Sun uses hit Solar Flare power.  He clicks on the END for each of these powers to expend the 6 endurance (4 from the Blast, 2 from the Flash).  He then clicks on the Solar Flare: Blast power to roll his attack.  This power has a CV of 'OCV' so it rolls attack dice (along with the damage dice), and Rising Sun hits (yay!).  His opponent marks off the damage he takes.  Now the Solar Flare power is a compound power with two *parts* and the Blast was only the first part.  For the second part of the attack, Rising Sun clicks on his Solar Flare: Flash power.  No attack dice are rolled because the CV is set to 'none'.  The effects of the flash are applied to his opponent.
 
 No need to detail the rest of the combat.  We'll leave the fate of Rising Sun to your imagination.
