@@ -3028,7 +3028,7 @@ on("change:repeating_zustaende remove:repeating_zustaende", function(g) {
             var lahm = 0;
             var keineraktiviert = true;
             _.each(idarray, function(currentID, i) {
-                getAttrs(["repeating_zustaende_" + currentID + "_zustandsname", "repeating_zustaende_" + currentID + "_zustandsstufe", "repeating_zustaende_" + currentID + "_zustandonoff"], function(v) {
+                getAttrs(["repeating_zustaende_" + currentID + "_zustandsname", "repeating_zustaende_" + currentID + "_zustandsstufe", "repeating_zustaende_" + currentID + "_zustandonoff", "beweglichkeit", "groessenklasse", "geschwindigkeitmod", "hiddengsw", "hiddengswag", "hiddengswspr", "hiddengswbe", "erschoepft"], function(v) {
                     var zustandsname = v["repeating_zustaende_" + currentID + "_zustandsname"];
                     var zustandsstufe = v["repeating_zustaende_" + currentID + "_zustandsstufe"];
                     var zustandonoff = v["repeating_zustaende_" + currentID + "_zustandonoff"];
@@ -3060,13 +3060,19 @@ on("change:repeating_zustaende remove:repeating_zustaende", function(g) {
                                 });
                                 break;
                             case "lahm":
-                                getAttrs(["lahm", "geschwindigkeit"], function(g) {
-                                    if (+zustandsstufe > 0 && +g.lahm == 0) {
-                                        setAttrs({
-                                            lahm: Math.floor(+g.geschwindigkeit / 2)
-                                        }); 
+                                let lahmAlt = +v.beweglichkeit + +v.groessenklasse + +v.geschwindigkeitmod + +v.hiddengsw + +v.hiddengswag + +v.hiddengswspr - +v.hiddengswbe - +v.erschoepft;
+                                let lahm = 0;
+                                let lahmTemp = 0;
+                                if (zustandsstufe == 0) {
+                                    setAttrs({lahm: +zustandsstufe});
+                                } else if (zustandsstufe > 0) {
+                                    for (var i = 1; i <= +zustandsstufe; i++) {
+                                        lahmTemp = lahmAlt;
+                                        lahmAlt /= 2;
+                                        lahm += (lahmTemp - lahmAlt);
                                     }
-                                });
+                                    setAttrs({lahm: +Math.floor(lahm)});
+                                }
                                 break;
                             default:
                                 break;
