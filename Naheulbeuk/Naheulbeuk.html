@@ -3,7 +3,7 @@
 	var primaryStats = [ "stats_courage", "stats_intelligence", "stats_charisme", "stats_adresse", "stats_force", "stats_attaque", "stats_parade"];
 	// Secondary Stats
 	var secondaryStats = [	"stats_charisme_total", "stats_intelligence_total", "stats_adresse_total", "stats_force_total", "stats_courage_total",
-							"stats_magiepsy_mod", "stats_magiephy_mod", "stats_resimagie_mod", "stats_fouille_mod", "stats_jet_mod" ];
+							"stats_inge_mod", "stats_magiepsy_mod", "stats_magiephy_mod", "stats_resimagie_mod", "stats_fouille_mod", "stats_jet_mod" ];
 	var prStats = {
 		change: [ "repeating_armures:armure_prphy", "repeating_armures:armure_prmag", "prnat" ],
 		remove: [ "repeating_armures" ]
@@ -138,6 +138,7 @@
 	function updateSecondaryStats() {
 		getAttrs( secondaryStats, function( sValues ) {
 			var v = structSafeInt( sValues );
+			var ingeniosite = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_adresse_total" ] ) / 2 );
 			var magiePsy = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_charisme_total" ] ) / 2 );
 			var magiePhy = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_adresse_total" ] ) / 2 );
 			var resiMagie = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_courage_total" ] + v[ "stats_force_total" ] ) / 3 );
@@ -168,6 +169,8 @@
 			}
 
 			setAttrs({
+				"stats_inge": ingeniosite,
+				"stats_inge_total": ingeniosite + v[ "stats_inge_mod" ],
 				"stats_magiepsy": magiePsy,
 				"stats_magiepsy_total": magiePsy + v[ "stats_magiepsy_mod" ],
 				"stats_magiephy": magiePhy,
@@ -894,6 +897,7 @@
 <input type="hidden" name="attr_Stats_Fouille_total" value="0" /> <!-- Intelligence_total + FouilleMod -->
 <input type="hidden" name="attr_Stats_MagiePhy_total" value="0" /> <!-- MagiePhys + MagiePhysMod -->
 <input type="hidden" name="attr_Stats_MagiePsy_total" value="0" /> <!-- MagiePsy + MagiePsyMod -->
+<input type="hidden" name="attr_Stats_Inge_total" value="0" /> <!-- Inge + IngeMod -->
 <input type="hidden" name="attr_Stats_ResiMagie_total" value="0" /> <!-- ResiMagie + ResiMagie_total -->
 <input type="hidden" name="attr_Poids_Materiels" value="0" /> <!-- temp charge du materiel -->
 <input type="hidden" name="attr_Poids_Butins" value="0" /> <!-- temp charge du butin -->
@@ -1034,6 +1038,12 @@
 							</tr>
 							<tr>
 								<td colspan="4">&nbsp;</td>
+							</tr>
+							<tr>
+								<th tile="Chance de réussir une Confection">Ingéniosité<br><span class="sheet-hint">Moyenne INT et AD</span></th>
+								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Inge" value="0" readonly="readonly"></td>
+								<td><input type="number" name="attr_Stats_Inge_mod" value="0"></td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une confection}} {{ Magie Phys=@{Stats_Inge_total} }} {{ Résultat=[[1d20]] }}" name="roll_Ingeniosite" /></td>
 							</tr>
 							<tr>
 								<th tile="Chance de réussir une Magie Physique">Magie Phys.<br><span class="sheet-hint">Moyenne INT et AD</span></th>
