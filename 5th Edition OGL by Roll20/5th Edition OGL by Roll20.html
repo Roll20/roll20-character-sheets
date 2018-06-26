@@ -13011,7 +13011,7 @@
             </div>
         </div>
         <div class="info spell-info-container choice">
-            <div class="sheet-compendium-page sheet-spells-info" accept="CategoryIndex:Spells"></div>
+            <div class="sheet-compendium-page sheet-spells-info" accept="Rules:Spells"></div>
         </div>
         <div class="bottombar">
             <button class="prev" type="back" value="l1-equipment">Back</button>
@@ -13727,7 +13727,8 @@
         return showList;
     };
 
-    var knownSpells = function(mancerdata) {
+    var knownSpells = function() {
+        var mancerdata = getCharmancerData();
         var allSpells = {
             race: false,
             class: false,
@@ -13735,12 +13736,13 @@
             errors: {class: [], race: []}
         };
         var stats = recalcData();
-        var racename = getName("race", mancerdata);
-        var subracename = getName("subrace", mancerdata);
-        var classname = getName("class", mancerdata);
-        var subclassname = getName("subclass", mancerdata);
+        var racename = getName("race", mancerdata, true);
+        var subracename = getName("subrace", mancerdata, true);
+        var classname = getName("class", mancerdata, true);
+        var subclassname = getName("subclass", mancerdata, true);
         var classAbility = mancerdata["l1-class"] && mancerdata["l1-class"].data.class && mancerdata["l1-class"].data.class["Spellcasting Ability"] ? mancerdata["l1-class"].data.class["Spellcasting Ability"] : "";
         var expandedList = {};
+
         //Collect expanded spell lists
         if(mancerdata["l1-class"] && mancerdata["l1-class"].data.subclass && mancerdata["l1-class"].data.subclass["data-Class Spells"]) {
             _.each(mancerdata["l1-class"].data.subclass["data-Class Spells"], function(spell, level) {
@@ -13773,7 +13775,6 @@
                     expandedList[level] = expandedList[level] || [];
                     if(spell.Prepared) {
                         numSpells = Math.max(stats.abilities.totals[spell.Prepared.split("+")[0].toLowerCase()].mod, 0) + parseInt(spell.Prepared.split("+")[1]);
-                        console.log(numSpells);
                     }
                     if(spell.Choice) {
                         numSpells = parseInt(spell.Choice);
@@ -15159,7 +15160,7 @@
     on("page:l1-spells", function(eventinfo) {
         var stats = recalcData();
         var mancerdata = getCharmancerData();
-        var spellData = knownSpells(mancerdata);
+        var spellData = knownSpells();
         var showList = [];
         var hideList = [];
         var set = {};
@@ -15177,64 +15178,66 @@
 
         subracename = getName("subrace", mancerdata) == "" ? "" : " - " + getName("subrace", mancerdata);
         subclassname = getName("subclass", mancerdata) == "" ? "" : " - " + getName("subclass", mancerdata);
+        setAttrs(set, function() {
+            spellData = knownSpells();
+            if(spellData.race) update["race_title"] = getName("race", mancerdata) + subracename;
+            if(spellData.class) update["class_title"] = getName("class", mancerdata) + subclassname;
 
-        if(spellData.race) update["race_title"] = getName("race", mancerdata) + subracename;
-        if(spellData.class) update["class_title"] = getName("class", mancerdata) + subclassname;
-
-        _.each(["race", "class"], function(section) {
-            if(spellData[section]) {
-                showList.push(section + "_row");
-                for(var x=0; x<=1; x++) {
-                    var knownArray = _.pluck(_.where(spellData[section].known, {Level:x}), "Name");
-                    if(knownArray.length > 0) {
-                        showList.push(section + "_level" + x);
-                        update[section + "_level" + x + "_known"] = knownArray.join(", ");
+            _.each(["race", "class"], function(section) {
+                if(spellData[section]) {
+                    showList.push(section + "_row");
+                    for(var x=0; x<=1; x++) {
+                        var knownArray = _.pluck(_.where(spellData[section].known, {Level:x}), "Name");
+                        if(knownArray.length > 0) {
+                            showList.push(section + "_level" + x);
+                            update[section + "_level" + x + "_known"] = knownArray.join(", ");
+                        }
                     }
+                    _.each(spellData[section].choices, function(choice) {
+                        var spellNumber = levelTracker[section][choice.Level];
+                        var choiceName = section + "_level" + choice.Level + "_choice" + spellNumber;
+                        levelTracker[section][choice.Level]++;
+                        showList.push(section + "_level" + choice.Level);
+                        showList.push(choiceName);
+                        set[choiceName + "_casting"] = choice.Ability;
+                        var options = {category: "Spells", disable: spellData.known, show_source: true};
+                        if(choice["Expanded List"]) {
+                            options.add = choice["Expanded List"];
+                        }
+                        var selects = choice.List;
+                        if(typeof choice.List == "string") {
+                            selects = "Category:Spells Classes:*" + choice.List + " Level:" + choice.Level;
+                        }
+                        setCharmancerOptions(choiceName, selects, options)
+                    });
                 }
-                _.each(spellData[section].choices, function(choice) {
-                    var spellNumber = levelTracker[section][choice.Level];
-                    var choiceName = section + "_level" + choice.Level + "_choice" + spellNumber;
-                    levelTracker[section][choice.Level]++;
-                    showList.push(section + "_level" + choice.Level);
-                    showList.push(choiceName);
-                    set[choiceName + "_casting"] = choice.Ability;
-                    var options = {category: "Spells", disable: spellData.known, show_source: true};
-                    if(choice["Expanded List"]) {
-                        options.add = choice["Expanded List"];
+            });
+
+            _.each(levelTracker, function(tracker, section) {
+                var previousSpells = mancerdata["l1-spells"] && mancerdata["l1-spells"].values[section + "_spells"] ? mancerdata["l1-spells"].values[section + "_spells"] : "";
+                if(previousSpells != set[section + "_spells"]) tracker = {"0":1, "1":1}
+                _.each(tracker, function(number, level) {
+                    for(var x = number; x <= 9; x++) {
+                        set[section + "_level" + level + "_choice" + x] = "";
                     }
-                    var selects = choice.List;
-                    if(typeof choice.List == "string") {
-                        selects = "Category:Spells Classes:*" + choice.List + " Level:" + choice.Level;
-                    }
-                    setCharmancerOptions(choiceName, selects, options)
-                });
+                })
+            });
+
+            showList = _.uniq(showList);
+
+            if (!spellData.race && !spellData.class) {
+                showList.push("no_spells");
+                hideList.push("yes_spells");
+            } else {
+                showList.push("spell-info-container");
+                hideList.push("no_spells");
             }
+
+            setCharmancerText(update);
+            showChoices(showList);
+            hideChoices(hideList);
+            setAttrs(set);
         });
-
-        _.each(levelTracker, function(tracker, section) {
-            var previousSpells = mancerdata["l1-spells"] && mancerdata["l1-spells"].values[section + "_spells"] ? mancerdata["l1-spells"].values[section + "_spells"] : "";
-            if(previousSpells != set[section + "_spells"]) tracker = {"0":1, "1":1}
-            _.each(tracker, function(number, level) {
-                for(var x = number; x <= 9; x++) {
-                    set[section + "_level" + level + "_choice" + x] = "";
-                }
-            })
-        });
-
-        showList = _.uniq(showList);
-
-        if (!spellData.race && !spellData.class) {
-            showList.push("no_spells");
-            hideList.push("yes_spells");
-        } else {
-            showList.push("spell-info-container");
-            hideList.push("no_spells");
-        }
-
-        setCharmancerText(update);
-        showChoices(showList);
-        hideChoices(hideList);
-        setAttrs(set);
     });
 
     on("page:l1-feat", function(eventinfo) {
@@ -15318,7 +15321,7 @@
         }
 
         var mancerdata = getCharmancerData();
-        var known = knownSpells(mancerdata).known;
+        var known = knownSpells().known;
 
         for(var x = 1; x<=9; x++) {
             disableCharmancerOptions("race_level0_choice" + x, known, {category: "Spells"});
@@ -15337,7 +15340,7 @@
         var classname = getName("class", mancerdata);
         var subclassname = getName("subclass", mancerdata);
         var bgname = getName("background", mancerdata);
-        var spelldata = knownSpells(mancerdata);
+        var spelldata = knownSpells();
         var raceSpells = spelldata.race ? spelldata.race.choices.length : 0;
         var classSpells = spelldata.class ? spelldata.class.choices.length : 0;
         var ready = true;
@@ -15426,9 +15429,9 @@
                     set["race_info"] += handleMissing("subrace");
                 } else {
                     if(mancerdata["l1-race"].values.subrace == "Rules:Races" && !mancerdata["l1-race"].values.subrace_name) {
-                        set["race_info"] = '<p class="sheet-warning">You need to pick a name for your custom subrace!</p>';
+                        set["race_info"] = '<p class="sheet-warning sheet-needed">You need to pick a name for your custom subrace!</p>';
                     } else {
-                        set["race_info"] += '<p class="sheet-warning">You have not selected a subrace!</p>';
+                        set["race_info"] += '<p class="sheet-warning sheet-needed">You have not selected a subrace!</p>';
                     }
                     ready = false;
                 }
@@ -15436,7 +15439,7 @@
             _.each(spelldata.errors.race, function(error) {
                 switch(error) {
                     case "custom_race_spell_list":
-                        set["race_info"] += '<p class="sheet-warning">You have not selected spell list for your innate spellcasting!</p>';
+                        set["race_info"] += '<p class="sheet-warning sheet-needed">You have not selected spell list for your innate spellcasting!</p>';
                         ready = false;
                         break;
                     default:
@@ -15449,9 +15452,9 @@
             }
         } else {
             if(mancerdata["l1-race"] && mancerdata["l1-race"].values.race == "Rules:Races" && !mancerdata["l1-race"].values.race_name) {
-                set["race_info"] = '<p class="sheet-warning">You need to pick a name for your custom race!</p>';
+                set["race_info"] = '<p class="sheet-warning sheet-needed">You need to pick a name for your custom race!</p>';
             } else {
-                set["race_info"] = '<p class="sheet-warning">You have not selected a race!</p>';
+                set["race_info"] = '<p class="sheet-warning sheet-needed">You have not selected a race!</p>';
             }
             ready = false;
         }
@@ -15490,9 +15493,9 @@
                     set["class_info"] += handleMissing("subclass", mancerdata["l1-class"].data.class["Subclass Name"]);
                 } else {
                     if(mancerdata["l1-class"].values.subclass == "Rules:Classes" && !mancerdata["l1-class"].values.subrace_name) {
-                        set["class_info"] = '<p class="sheet-warning">You need to pick a name for your custom ' + mancerdata["l1-class"].data.class["Subclass Name"] + '!</p>';
+                        set["class_info"] = '<p class="sheet-warning sheet-needed">You need to pick a name for your custom ' + mancerdata["l1-class"].data.class["Subclass Name"] + '!</p>';
                     } else {
-                        set["class_info"] += '<p class="sheet-warning">You have not selected a ' + mancerdata["l1-class"].data.class["Subclass Name"] + '!</p>';
+                        set["class_info"] += '<p class="sheet-warning sheet-needed">You have not selected a ' + mancerdata["l1-class"].data.class["Subclass Name"] + '!</p>';
                     }
                     ready = false;
                 }
@@ -15500,11 +15503,11 @@
             _.each(spelldata.errors.class, function(error) {
                 switch(error) {
                     case "custom_class_spell_list":
-                        set["race_info"] += '<p class="sheet-warning">You have selected a spellcasting ability for your custom class, but you have not selected a spell list.</p>';
+                        set["race_info"] += '<p class="sheet-warning sheet-needed">You have selected a spellcasting ability for your custom class, but you have not selected a spell list.</p>';
                         ready = false;
                         break;
                     case "custom_class_spell_number":
-                        set["race_info"] += '<p class="sheet-warning">You have selected a spellcasting ability for your custom class, but you have not selected a number of spells.</p>';
+                        set["race_info"] += '<p class="sheet-warning sheet-needed">You have selected a spellcasting ability for your custom class, but you have not selected a number of spells.</p>';
                         ready = false;
                         break;
                     default:
@@ -15513,9 +15516,9 @@
             });
         } else {
             if(mancerdata["l1-class"] && mancerdata["l1-class"].values.race == "Rules:Classes" && !mancerdata["l1-class"].values.race_name) {
-                set["class_info"] = '<p class="sheet-warning">You need to pick a name for your custom class!</p>';
+                set["class_info"] = '<p class="sheet-warning sheet-needed">You need to pick a name for your custom class!</p>';
             } else {
-                set["class_info"] = '<p class="sheet-warning">You have not selected a class!</p>';
+                set["class_info"] = '<p class="sheet-warning sheet-needed">You have not selected a class!</p>';
             }
             ready = false;
         }
@@ -15539,13 +15542,13 @@
             _.each(abilityList, function(ability) {
                 if(!mancerdata["l1-abilities"].values[ability.toLowerCase()]) {
                     x++;
-                    set["ability_info"] += '<p class="sheet-warning">You have not selected a score for your ' + ability.toLowerCase() + '!</p>';
+                    set["ability_info"] += '<p class="sheet-warning sheet-needed">You have not selected a score for your ' + ability.toLowerCase() + '!</p>';
                     ready = false;
                 }
             });
             if(x == 6) set["ability_info"] = '<p class="sheet-warning">You have not selected your ability scores!</p>';
         } else {
-            set["ability_info"] = '<p class="sheet-warning">You have not generated your ability scores!</p>';
+            set["ability_info"] = '<p class="sheet-warning sheet-needed">You have not generated your ability scores!</p>';
             ready = false;
         }
 
@@ -15573,7 +15576,7 @@
             }
             set["background_info"] += handleMissing("background");
         } else {
-            set["background_info"] = '<p class="sheet-warning">You have not selected a background!</p>';
+            set["background_info"] = '<p class="sheet-warning sheet-needed">You have not selected a background!</p>';
             ready = false;
         }
 
@@ -15613,28 +15616,81 @@
                 set["equipment_info"] = '<p class="sheet-warning">You selected starting wealth for your equipment, but you don\'t have any gold yet!</p>';
             }
             if(mancerdata["l1-equipment"].values["equipment_class"] != getName("class", mancerdata, true) || (mancerdata["l1-equipment"].values["equipment_background"] != getName("background", mancerdata, true) && mancerdata["l1-equipment"].values["equipment_type"] != "gold")) {
-                set["equipment_info"] = '<p class="sheet-warning">Your equipment options have changed, you\'ll need to choose again.</p>';
+                set["equipment_info"] = '<p class="sheet-warning sheet-needed">Your equipment options have changed, you\'ll need to choose again.</p>';
                 ready = false;
             }
         } else {
-            set["equipment_info"] = '<p class="sheet-warning">You have not selected any equipment!</p>';
+            set["equipment_info"] = '<p class="sheet-warning sheet-needed">You have not selected any equipment!</p>';
             ready = false;
         }
 
+        var spellsready = true;
+        var toDelete = [];
         if(mancerdata["l1-spells"]) {
             prevRace = mancerdata["l1-spells"].values.race_spells || "";
             prevClass = mancerdata["l1-spells"].values.class_spells || "";
+            currentRace = getName("race", mancerdata, true) + getName("subrace", mancerdata, true);
+            currentClass = getName("class", mancerdata, true) + getName("subclass", mancerdata, true);
+            set["spell_info"] = "";
             if((raceSpells + classSpells) == 0) {
-                set["spell_info"] = '<p>The arcane is a mystery to you.</p>';
+                set["spell_info"] += '<p>The arcane is a mystery to you.</p>';
                 deleteCharmancerData(["l1-spells"]);
-            } else if(prevRace != getName("race", mancerdata, true) + getName("subrace", mancerdata, true) || prevClass != getName("class", mancerdata, true) + getName("subclass", mancerdata, true) ||
-                mancerdata["l1-spells"].values.race_number != raceSpells || mancerdata["l1-spells"].values.class_number != classSpells) {
-                set["spell_info"] = '<p class="sheet-warning">Your spell options have changed, you\'ll need to choose again.</p>';
-                ready = false;
+                spellsready = false;
+            } else if(prevRace != currentRace || prevClass != currentClass || mancerdata["l1-spells"].values.race_number != raceSpells || mancerdata["l1-spells"].values.class_number != classSpells) {
+                if(prevRace != currentRace || mancerdata["l1-spells"].values.race_number > raceSpells) {
+                    for(var x = 1; x<=9; x++) {
+                        toDelete.push("race_level0_choice" + x);
+                        toDelete.push("race_level1_choice" + x);
+                    }
+                    if(raceSpells > 0 && mancerdata["l1-spells"].values.race_number > 0) {
+                        set["spell_info"] += '<p class="sheet-warning">Your racial spells were reset because your options have changed.</p>';
+                    }
+                }
+                if(prevClass != currentClass || mancerdata["l1-spells"].values.class_number > classSpells) {
+                    for(var x = 1; x<=9; x++) {
+                        toDelete.push("class_level0_choice" + x);
+                        toDelete.push("class_level1_choice" + x);
+                    }
+                    if(classSpells > 0 && mancerdata["l1-spells"].values.class_number > 0) {
+                        set["spell_info"] += '<p class="sheet-warning">Your class spells were reset because your options have changed.</p>';
+                    }
+                }
+            }
+        } else if((raceSpells + classSpells) > 0) {
+            set["spell_info"] = '<p class="sheet-warning">You haven\'t selected your spells!</p>';
+            spellsready = false
+        } else {
+            set["spell_info"] = '<p>The arcane is a mystery to you.</p>';
+            spellsready = false
+        }
+
+        if(mancerdata["l1-race"] && mancerdata["l1-race"].data.subrace && mancerdata["l1-race"].data.subrace["data-Feats"]) {
+            if(mancerdata["l1-feat"] && mancerdata["l1-feat"].values.feat) {
+                set["feat_info"] = '<p>You\'ve selected the ' + mancerdata["l1-feat"].values.feat.split(":")[1] + ' feat.</p>';
+                set["feat_info"] += handleMissing("feat");
             } else {
-                set["spell_info"] = "";
+                set["feat_info"] = '<p class="sheet-warning">You have access to a feat, but you have not yet selected one!</p>';
+            }
+        } else {
+            set["feat_info"] = '<p>As you exchange your novice notions of the world for experience, a feat may become within reach. Not today, however.</p>';
+            deleteCharmancerData(["l1-feat"]);
+        }
+
+        if(ready) {
+            set.ready_message = "If you're ready to build your " + racename;
+            set.ready_message += subracename == "" ? " " : " (" + subracename + ") ";
+            set.ready_message += subclassname == "" ? classname : classname + " (" + subclassname + ")";
+            set.ready_message += " from a " + bgname + " background, click \"Apply Changes.\"";
+            showChoices(["apply_changes", "ready_text"]);
+        } else {
+            set.ready_message = "Hold on there! You've missed some required fields, which have been marked with a <span class='sheet-needed'></span>.";
+        }
+        //If you're ready to build your race class from a background background, click "Apply Changes."
+        deleteCharmancerData([{"l1-spells":toDelete}], function() {
+            spelldata = knownSpells();
+            if(spellsready) {
                 if (spelldata.known && spelldata.known.length) {
-                    set["spell_info"] = '<p>You know these spells: ' + spelldata.known.join(", ") + '.</p>';
+                    set["spell_info"] += '<p>You know these spells: ' + spelldata.known.join(", ") + '.</p>';
                 }
                 var choices = {"cantrip": [0,0], "spell": [0,0]};
                 _.each(spelldata, function(section) {
@@ -15661,35 +15717,8 @@
                     }
                 });
             }
-        } else if((raceSpells + classSpells) > 0) {
-            set["spell_info"] = '<p class="sheet-warning">You haven\'t selected your spells!</p>';
-        } else {
-            set["spell_info"] = '<p>The arcane is a mystery to you.</p>';
-        }
-
-        if(mancerdata["l1-race"] && mancerdata["l1-race"].data.subrace && mancerdata["l1-race"].data.subrace["data-Feats"]) {
-            if(mancerdata["l1-feat"] && mancerdata["l1-feat"].values.feat) {
-                set["feat_info"] = '<p>You\'ve selected the ' + mancerdata["l1-feat"].values.feat.split(":")[1] + ' feat.</p>';
-                set["feat_info"] += handleMissing("feat");
-            } else {
-                set["feat_info"] = '<p class="sheet-warning">You have access to a feat, but you have not yet selected one!</p>';
-            }
-        } else {
-            set["feat_info"] = '<p>As you exchange your novice notions of the world for experience, a feat may become within reach. Not today, however.</p>';
-            deleteCharmancerData(["l1-feat"]);
-        }
-
-        if(ready) {
-            set.ready_message = "If you're ready to build your " + racename;
-            set.ready_message += subracename == "" ? " " : " (" + subracename + ") ";
-            set.ready_message += subclassname == "" ? classname : classname + " (" + subclassname + ")";
-            set.ready_message += " from a " + bgname + " background, click \"Apply Changes.\"";
-            showChoices(["apply_changes", "ready_text"]);
-        } else {
-            set.ready_message = "Hold on there! You've missed some required fields.";
-        }
-        //If you're ready to build your race class from a background background, click "Apply Changes."
-        setCharmancerText(set);
+            setCharmancerText(set);
+        });
     });
 
 </script>
