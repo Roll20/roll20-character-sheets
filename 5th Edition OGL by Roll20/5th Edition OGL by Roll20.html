@@ -5870,13 +5870,13 @@
         update_attr("constitution");
     });
 
-    on("change:constitution_mod", eventinfo => {
-        getSectionIDs("hpmod", ids => {
-            var hp_attrs = _.map(ids, id => [`repeating_hpmod_${id}_source`, `repeating_hpmod_${id}_mod`]);
-            getAttrs(_.flatten(hp_attrs), attrs => {
+    on("change:constitution_mod", function(eventinfo) {
+        getSectionIDs("hpmod", function(ids) {
+            var hp_attrs = _.map(ids, function(id) { [`repeating_hpmod_${id}_source`, `repeating_hpmod_${id}_mod`]; });
+            getAttrs(_.flatten(hp_attrs), function(attrs) {
                 var update = {};
                 var constitution_mod_found = false;
-                _.each(hp_attrs, element => {
+                _.each(hp_attrs, function(element) {
                     if(attrs[element[0]] === "CON") {
                         update[element[1]] = eventinfo.newValue;
                         constitution_mod_found = true;
@@ -6120,18 +6120,18 @@
         update_attacks(attackid);
     });
 
-    on("change:repeating_damagemod", eventinfo => {
-        getSectionIDs("damagemod", ids => {
+    on("change:repeating_damagemod", function(eventinfo) {
+        getSectionIDs("damagemod", function(ids) {
             if(ids) {
                 var fields = {};
                 var attr_name_list = [];
-                ids.forEach(id => {
+                ids.forEach(function(id) {
                     fields[id] = {};
                     attr_name_list.push(`repeating_damagemod_${id}_global_damage_active_flag`, `repeating_damagemod_${id}_global_damage_rollstring`, `repeating_damagemod_${id}_global_damage_type`);
                 });
-                getAttrs(attr_name_list, attrs => {
+                getAttrs(attr_name_list, function(attrs) {
                     var regex = /^repeating_damagemod_(.+)_global_damage_(active_flag|rollstring|type)$/;
-                    _.each(attrs, (obj, name) => {
+                    _.each(attrs, function(obj, name) {
                         var r = regex.exec(name);
                         if(r) {
                             fields[r[1]][r[2]] = obj;
@@ -6139,7 +6139,7 @@
                     });
 
                     var update = {global_damage_mod_roll: "", global_damage_mod_crit: "", global_damage_mod_type: ""};
-                    _.each(fields, (element) => {
+                    _.each(fields, function(element) {
                         if(element.active_flag != "0") {
                             if(element.rollstring && element.rollstring !== "") { update["global_damage_mod_roll"] += element.rollstring + "+"; }
                             if(element.type && element.type !== "") { update["global_damage_mod_type"] += element.type + "/"; }
@@ -6149,7 +6149,7 @@
                     update["global_damage_mod_type"] = update["global_damage_mod_type"].replace(/\/(?=$)/, '');
                     update["global_damage_mod_crit"] = update["global_damage_mod_roll"].replace(/(?:[+\-*\/%]|\*\*)\s*\d+(?!d\d+)/gi, '');
 
-                    setAttrs(update, {silent:true}, () => {
+                    setAttrs(update, {silent:true}, function() {
                         update_attacks("all");
                     });
                 });
@@ -6157,9 +6157,9 @@
         });
     });
 
-    on("change:global_damage_mod_flag", eventinfo => {
+    on("change:global_damage_mod_flag", function(eventinfo) {
         if(eventinfo.newValue === "1") {
-            getSectionIDs("damagemod", ids => {
+            getSectionIDs("damagemod", function(ids) {
                 if(!ids || ids.length === 0) {
                     var update = {};
                     var rowid = generateRowID();
@@ -6171,9 +6171,9 @@
         }
     });
 
-    on("change:exhaustion_toggle", eventinfo => {
+    on("change:exhaustion_toggle", function(eventinfo) {
         if(eventinfo.newValue !== "0") {
-            getAttrs(["exhaustion_level"], (attrs) => {
+            getAttrs(["exhaustion_level"], function(attrs) {
                 if(!attrs.exhaustion_level || attrs.exhaustion_level === "") {
                     var update = {};
                     update.exhaustion_level = "0";
@@ -6481,10 +6481,10 @@
         if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
             return;
         }
-        _.each(["cantrip", "1", "2", "3", "4", "5", "6", "7", "8", "9"], t => update_spell_abilities(eventinfo, t, () => {
+        _.each(["cantrip", "1", "2", "3", "4", "5", "6", "7", "8", "9"], function(t) { update_spell_abilities(eventinfo, t, function() {
             //update_spell_info();
             update_attacks("spells");
-        }));
+        }); });
     });
 
     on("change:npc_challenge", function() {
@@ -6521,18 +6521,18 @@
         });
     });
 
-    on("change:repeating_skillmod", eventinfo => {
-        getSectionIDs("skillmod", ids => {
+    on("change:repeating_skillmod", function(eventinfo) {
+        getSectionIDs("skillmod", function(ids) {
             if(ids) {
                 var fields = {};
                 var attr_name_list = [];
-                ids.forEach(id => {
+                ids.forEach(function(id) {
                     fields[id] = {};
                     attr_name_list.push(`repeating_skillmod_${id}_global_skill_active_flag`, `repeating_skillmod_${id}_global_skill_rollstring`);
                 });
-                getAttrs(attr_name_list, attrs => {
+                getAttrs(attr_name_list, function(attrs) {
                     var regex = /^repeating_skillmod_(.+)_global_skill_(active_flag|rollstring)$/;
-                    _.each(attrs, (obj, name) => {
+                    _.each(attrs, function(obj, name) {
                         var r = regex.exec(name);
                         if(r) {
                             fields[r[1]][r[2]] = obj;
@@ -6540,7 +6540,7 @@
                     });
 
                     var update = {global_skill_mod: ""};
-                    _.each(fields, (element) => {
+                    _.each(fields, function(element) {
                         if(element.active_flag != "0") {
                             if(element.rollstring && element.rollstring !== "") { update["global_skill_mod"] += element.rollstring + "+"; }
                         }
@@ -6554,9 +6554,9 @@
         });
     });
 
-    on("change:global_skill_mod_flag", eventinfo => {
+    on("change:global_skill_mod_flag", function(eventinfo) {
         if(eventinfo.newValue === "1") {
-            getSectionIDs("skillmod", ids => {
+            getSectionIDs("skillmod", function(ids) {
                 if(!ids || ids.length === 0) {
                     var update = {};
                     var rowid = generateRowID();
@@ -6568,18 +6568,18 @@
         }
     });
 
-    on("change:repeating_savemod", eventinfo => {
-        getSectionIDs("savemod", ids => {
+    on("change:repeating_savemod", function(eventinfo) {
+        getSectionIDs("savemod", function(ids) {
             if(ids) {
                 var fields = {};
                 var attr_name_list = [];
-                ids.forEach(id => {
+                ids.forEach(function(id) {
                     fields[id] = {};
                     attr_name_list.push(`repeating_savemod_${id}_global_save_active_flag`, `repeating_savemod_${id}_global_save_rollstring`);
                 });
-                getAttrs(attr_name_list, attrs => {
+                getAttrs(attr_name_list, function(attrs) {
                     var regex = /^repeating_savemod_(.+)_global_save_(active_flag|rollstring)$/;
-                    _.each(attrs, (obj, name) => {
+                    _.each(attrs, function(obj, name) {
                         var r = regex.exec(name);
                         if(r) {
                             fields[r[1]][r[2]] = obj;
@@ -6587,7 +6587,7 @@
                     });
 
                     var update = {global_save_mod: ""};
-                    _.each(fields, (element) => {
+                    _.each(fields, function(element) {
                         if(element.active_flag != "0") {
                             if(element.rollstring && element.rollstring !== "") { update["global_save_mod"] += element.rollstring + "+"; }
                         }
@@ -6601,9 +6601,9 @@
         });
     });
 
-    on("change:global_save_mod_flag", eventinfo => {
+    on("change:global_save_mod_flag", function(eventinfo) {
         if(eventinfo.newValue === "1") {
-            getSectionIDs("savemod", ids => {
+            getSectionIDs("savemod", function(ids) {
                 if(!ids || ids.length === 0) {
                     var update = {};
                     var rowid = generateRowID();
@@ -6616,17 +6616,17 @@
     });
 
     on("change:repeating_tohitmod", function(eventinfo) {
-        getSectionIDs("tohitmod", ids => {
+        getSectionIDs("tohitmod", function(ids) {
             if(ids) {
                 var fields = {};
                 var attr_name_list = [];
-                ids.forEach(id => {
+                ids.forEach(function(id) {
                     fields[id] = {};
                     attr_name_list.push(`repeating_tohitmod_${id}_global_attack_active_flag`, `repeating_tohitmod_${id}_global_attack_rollstring`);
                 });
-                getAttrs(attr_name_list, attrs => {
+                getAttrs(attr_name_list, function(attrs) {
                     var regex = /^repeating_tohitmod_(.+)_global_attack_(active_flag|rollstring)$/;
-                    _.each(attrs, (obj, name) => {
+                    _.each(attrs, function(obj, name) {
                         var r = regex.exec(name);
                         if(r) {
                             fields[r[1]][r[2]] = obj;
@@ -6634,7 +6634,7 @@
                     });
 
                     var update = {global_attack_mod: ""};
-                    _.each(fields, (element) => {
+                    _.each(fields, function(element) {
                         if(element.active_flag != "0") {
                             if(element.rollstring && element.rollstring !== "") { update["global_attack_mod"] += element.rollstring + "+"; }
                         }
@@ -6648,9 +6648,9 @@
         });
     });
 
-    on("change:global_attack_mod_flag", eventinfo => {
+    on("change:global_attack_mod_flag", function(eventinfo) {
         if(eventinfo.newValue === "1") {
-            getSectionIDs("tohitmod", ids => {
+            getSectionIDs("tohitmod", function(ids) {
                 if(!ids || ids.length === 0) {
                     var update = {};
                     var rowid = generateRowID();
@@ -6684,7 +6684,7 @@
         var resourceid = eventinfo.removedInfo && eventinfo.removedInfo["repeating_inventory_" + itemid + "_itemresourceid"] ? eventinfo.removedInfo["repeating_inventory_" + itemid + "_itemresourceid"] : undefined;
 
         if(attackids) {
-            _.each(attackids.split(","), (value) => remove_attack(value));
+            _.each(attackids.split(","), function(value) { remove_attack(value); });
         }
         if(resourceid) {
             remove_resource(resourceid);
@@ -7176,7 +7176,7 @@
                             make_npc_attack_from_item(generateRowID(), {versatile:2})
                         }
 
-                        callbacks.push(() => check_itemmodifiers(v.drop_modifiers), () => update_npc_action("all"));
+                        callbacks.push(function() { check_itemmodifiers(v.drop_modifiers); }, function() { update_npc_action("all"); });
                     }
                 }
             };
@@ -7485,7 +7485,7 @@
                 if(traitsarray) {
                     if(v.drop_traits) {
                         var traitsobj = {};
-                        traitsarray.forEach(val => traitsobj[val.Name] = val.Desc);
+                        traitsarray.forEach(function(val) { traitsobj[val.Name] = val.Desc; });
                     }
                     else {
                         traitsarray = traitsarray.split("**");
@@ -7524,7 +7524,7 @@
                 if(actionsarray) {
                     if(v.drop_actions) {
                         var actionsobj = {};
-                        actionsarray.forEach(val => actionsobj[val.Name] = val);
+                        actionsarray.forEach(function(val) { actionsobj[val.Name] = val; });
 
                         _.each(actionsobj, function(data, name) {
                             newrowid = generateRowID();
@@ -7626,7 +7626,7 @@
                     update["npcreactionsflag"] = 1;
                     if(v.drop_reactions) {
                         var reactionsobj = {};
-                        reactionsarray.forEach(val => reactionsobj[val.Name] = val.Desc);
+                        reactionsarray.forEach(function(val) { reactionsobj[val.Name] = val.Desc; });
                     }
                     else {
                         reactionsarray = reactionsarray.split("**");
@@ -7649,7 +7649,7 @@
                 if(legendaryactionsarray) {
                     if(v.drop_legendary_actions) {
                         var actionsobj = {};
-                        legendaryactionsarray.forEach(val => actionsobj[val.Name] = val);
+                        legendaryactionsarray.forEach(function(val) { actionsobj[val.Name] = val; });
                         _.each(actionsobj, function(data, name) {
                             newrowid = generateRowID();
                             update["repeating_npcaction-l_" + newrowid + "_npc_options-flag"] = "0";
@@ -7842,7 +7842,7 @@
                 }
                 if(v.drop_traits) {
                     var traits = JSON.parse(v.drop_traits);
-                    _.each(traits, value => {
+                    _.each(traits, function(value) {
                         var id = generateRowID();
                         update["repeating_traits_" + id + "_name"] = value["Name"];
                         update["repeating_traits_" + id + "_description"] = value["Desc"];
@@ -7854,7 +7854,7 @@
                 }
                 if(v.drop_class_saving_throws) {
                     var saves = JSON.parse(v.drop_class_saving_throws);
-                    _.each(saves, value => {
+                    _.each(saves, function(value) {
                         update[value.toLowerCase() + "_save_prof"] = "(@{pb})";
                     });
                 }
@@ -7871,7 +7871,7 @@
                 }
                 if(v.drop_actions) {
                     var actionsobj = {};
-                    JSON.parse(v.drop_actions).forEach(val => actionsobj[val.Name] = val);
+                    JSON.parse(v.drop_actions).forEach(function(val) { actionsobj[val.Name] = val; });
 
                     _.each(actionsobj, function(data, name) {
                         newrowid = generateRowID();
@@ -7915,19 +7915,19 @@
                     var numUses = function(uses_string) {
                         var attribs = ["strength", "dexterity", "constitution", "wisdom", "intelligence", "charisma"];
                         uses_string = uses_string.toLowerCase();
-                        _.each(attribs, attrib => {
+                        _.each(attribs, function(attrib) {
                             var attribMod = Math.floor((parseInt(v[attrib + "_base"]) - 10) / 2);
                             if (attribMod < 0) attribMod = 0;
                             uses_string = uses_string.replace(attrib, attribMod);
                         });
                         var terms = uses_string.split("+");
                         var total = 0;
-                        _.each(terms, term => {
+                        _.each(terms, function(term) {
                             total += parseInt(term);
                         });
                         return total;
                     };
-                    _.each(resources, value => {
+                    _.each(resources, function(value) {
                         if (resource_count == 0) {
                             update["class_resource_name"] = value["Name"];
                             var uses = numUses(value["Uses"]);
@@ -7955,7 +7955,7 @@
                 }
                 if(v.drop_traits) {
                     var traits = JSON.parse(v.drop_traits);
-                    _.each(traits, value => {
+                    _.each(traits, function(value) {
                         var id = generateRowID();
                         update["repeating_traits_" + id + "_name"] = value["Name"];
                         update["repeating_traits_" + id + "_description"] = value["Desc"];
@@ -7998,7 +7998,7 @@
 
                 if(v.drop_actions) {
                     var actionsobj = {};
-                    JSON.parse(v.drop_actions).forEach(val => actionsobj[val.Name] = val);
+                    JSON.parse(v.drop_actions).forEach(function(val) { actionsobj[val.Name] = val; });
 
                     _.each(actionsobj, function(data, name) {
                         newrowid = generateRowID();
@@ -8061,7 +8061,7 @@
                 }
                 if(v.drop_traits) {
                     var traits = JSON.parse(v.drop_traits);
-                    _.each(traits, value => {
+                    _.each(traits, function(value) {
                         var id = generateRowID();
                         update["repeating_traits_" + id + "_name"] = value["Name"];
                         update["repeating_traits_" + id + "_description"] = value["Desc"];
@@ -8299,7 +8299,7 @@
         if(options && options.versatile) {
             var newrowid2 = generateRowID();
             update["repeating_inventory_" + itemid + "_itemattackid"] += "," + newrowid2;
-            setAttrs(update, {}, () => {
+            setAttrs(update, {}, function() {
                 update_attack_from_item(itemid, newrowid, {newattack: true, versatile: "primary"});
                 update_attack_from_item(itemid, newrowid2, {newattack: true, versatile: "secondary"});
             });
@@ -8664,13 +8664,13 @@
                     });
                     getAttrs(attack_attribs, function(v) {
                         var spell_attacks = {};
-                        _.each(_.filter(idarray, id => v["repeating_attack_" + id + "_spellid"] && v["repeating_attack_" + id + "_spellid"] != ""), attack_id => {
+                        _.each(_.filter(idarray, function(id) { v["repeating_attack_" + id + "_spellid"] && v["repeating_attack_" + id + "_spellid"] != ""; }), function(attack_id) {
                             spell_attacks[attack_id] = {
                                 spell_id: v["repeating_attack_" + attack_id + "_spellid"],
                                 spell_lvl: v["repeating_attack_" + attack_id + "_spelllevel"]
                             };
                         });
-                        _.each(spell_attacks, (data, attack_id) => update_attack_from_spell(data.spell_lvl, data.spell_id, attack_id));
+                        _.each(spell_attacks, function(data, attack_id) { update_attack_from_spell(data.spell_lvl, data.spell_id, attack_id); });
                     });
 
                 }
@@ -9842,14 +9842,14 @@
     };
 
     var update_spell_abilities = function(eventinfo, tier, callback) {
-        getSectionIDs("spell-" + tier, ids => {
+        getSectionIDs("spell-" + tier, function(ids) {
             var spell_abilities = [];
-            _.each(ids, id => {
+            _.each(ids, function(id) {
                 spell_abilities.push("repeating_spell-" + tier + "_" + id + "_spell_ability");
             });
-            getAttrs(spell_abilities, attrs => {
+            getAttrs(spell_abilities, function(attrs) {
                 var update = {};
-                _.each(attrs, (val, name) => {
+                _.each(attrs, function(val, name) {
                     if(val === eventinfo.previousValue) {
                         update[name] = eventinfo.newValue;
                     }
@@ -10232,7 +10232,7 @@
 
                 var crit1 = "";
                 if(parsed_dmg1.rolls.length > 0){
-                    parsed_dmg1.rolls.forEach(value => {
+                    parsed_dmg1.rolls.forEach(function(value) {
                         crit1 += parsed_dmg1.array[value] + "+";
                     });
                     crit1 = crit1.substring(0, crit1.length - 1);
@@ -10240,7 +10240,7 @@
 
                 var crit2 = "";
                 if(parsed_dmg2.rolls.length > 0){
-                    parsed_dmg2.rolls.forEach(value => {
+                    parsed_dmg2.rolls.forEach(function(value) {
                         crit2 += parsed_dmg2.array[value] + "+";
                     });
                     crit2 = crit2.substring(0, crit2.length - 1);
@@ -10301,7 +10301,7 @@
         var dice_regex = /(\d+)d(\d+)/i;
         var dice;
 
-        out.array.forEach((value, index, array) => {
+        out.array.forEach(function(value, index, array) {
             if(value === "+") {
                 add = true;
             } else if(value === "-") {
@@ -10321,7 +10321,7 @@
     };
 
     var get_class_level = function(class_name, callback) {
-        getAttrs(["class", "base_level", "multiclass1_flag", "multiclass1", "multiclass1_lvl", "multiclass2_flag", "multiclass2", "multiclass2_lvl", "multiclass3_flag", "multiclass3", "multiclass3_lvl"], attrs => {
+        getAttrs(["class", "base_level", "multiclass1_flag", "multiclass1", "multiclass1_lvl", "multiclass2_flag", "multiclass2", "multiclass2_lvl", "multiclass3_flag", "multiclass3", "multiclass3_lvl"], function(attrs) {
             var regex = new RegExp(class_name, "i");
             if(regex.test(attrs["class"])) {
                 callback(attrs.base_level);
@@ -14711,7 +14711,7 @@
                 charisma: data["l1-abilities"].values.charisma};
 
         if (data["l1-abilities"].values.abilities != "custom" && data["l1-abilities"].values.abilities != "Point Buy") {
-            attribs = attribs.filter(item => item != eventinfo.triggerName);
+            attribs = attribs.filter(function(item) { item != eventinfo.triggerName; });
             _.each(attribs, function(attrib) {
                 if (clearvalue == data["l1-abilities"].values[attrib]) {
                     clearObject[attrib] = "";
