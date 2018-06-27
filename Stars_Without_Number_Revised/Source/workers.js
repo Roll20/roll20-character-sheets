@@ -2628,6 +2628,37 @@
 		}));
 	};
 
+	/* Drones */
+	const calculateDroneAttack = (prefixes) => {
+		const sourceAttrs = prefixes.reduce((m, prefix) => {
+			return m.concat([
+				`${prefix}_drone_weapon1_ab`,
+				`${prefix}_drone_weapon1_active`,
+				`${prefix}_drone_weapon1_attack`,
+				`${prefix}_drone_weapon2_ab`,
+				`${prefix}_drone_weapon2_active`,
+				`${prefix}_drone_weapon2_attack`,
+				`${prefix}_drone_weapon3_ab`,
+				`${prefix}_drone_weapon3_active`,
+				`${prefix}_drone_weapon3_attack`,
+			]);
+		}, ["intelligence_mod", "skill_pilot", "skill_program"]);
+		getAttrs(sourceAttrs, v => {
+			const skillMod = Math.max(parseInt(v.skill_pilot), parseInt(v.skill_program)) || 0,
+				intMod = parseInt(v.intelligence_mod) || 0;
+			
+			const setting = prefixes.reduce((m, prefix) => {
+				[1, 2, 3].filter(num => v[`${prefix}_drone_weapon${num}_active`] === "1")
+					.forEach(num => {
+						m[`${prefix}_drone_weapon${num}_attack`] = skillMod + intMod +
+							parseInt(v[[`${prefix}_drone_weapon${num}_ab`]] || 0);
+					});
+				return m;
+			}, {});
+			mySetAttrs(setting, v);
+		});
+	};
+
 	/**
 	 * Migrations
 	 */
@@ -3240,6 +3271,15 @@
 	on(shipStatEvent, calculateShipStats);
 	on("change:repeating_ship-weapons:weapon_name change:repeating_ship-weapons:weapon_attack_bonus " +
 		"remove:repeating_ship-weapons", buildShipWeaponsMenu);
+
+	/* Drones */
+	on("change:intelligence_mod change:skill_pilot change:skill_program", () => getSectionIDs("repeating_drones", idArray => {
+		calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`));
+	}));
+	on([
+		...[1, 2, 3].map(n => `change:repeating_drones:drone_weapon${n}_ab`),
+		...[1, 2, 3].map(n => `change:repeating_drones:drone_weapon${n}_active`)
+	].join(" "), () => calculateDroneAttack(["repeating_drones"]));
 
 	/* NPC sheet */
 	on("change:npc_stat_block", fillNPC);

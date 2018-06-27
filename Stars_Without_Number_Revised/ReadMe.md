@@ -35,6 +35,11 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ## Changelog
 
+### 2.3.0
+
+* Added drone tab
+* Added quantity for inventory, as well as proper support for Enc-1/3 gear
+
 ### 2.2.0
 
 * Added autofill functionality for ship hulls and class ability.
