@@ -22,6 +22,6 @@ Click on a rune to make a roll for that rune.
 
 In the weapon section * indicates to use the mounts damage bonus and not the players
 
-Default in the weapon section indicates that you using a skill from the same category so using Broadsword  skill with short sword.  It will halve the skill as per the rules.
+Default in the weapon section indicates that you are using a skill from the same category e.g. using Broadsword skill with a short sword.  It will halve the skill as per the rules.
 
 STR and DEX minimuns are not currently supported this maybe added in a future release.
