@@ -1,4 +1,6 @@
-# Runequest Glorantha Quick Start Character Sheet
+# Runequest Glorantha Character Sheet
+
+## Quick Start
 
 This is for the Qucik Start only the category modifiers arenot calculated and is intended only for one shots to demo the new system
 
