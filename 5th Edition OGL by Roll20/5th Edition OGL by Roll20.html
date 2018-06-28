@@ -7898,9 +7898,10 @@
                 if(v.drop_global_damage) {
                     var dmgmod = JSON.parse(v.drop_global_damage);
                     var id = generateRowID();
-                    update["repeating_damagemod_" + id + "global_damage_rollstring"] = `${dmgmod["Uses"]}[${dmgmod["Name"]}]`;
-                    update["repeating_damagemod_" + id + "global_damage_active_flag"] = "1";
-                    update["repeating_damagemod_" + id + "global_damage_type"] = dmgmod["Name"];
+                    update["repeating_damagemod_" + id + "_global_damage_rollstring"] = `${dmgmod["Uses"]}[${dmgmod["Name"]}]`;
+                    update["repeating_damagemod_" + id + "_global_damage_active_flag"] = "1";
+                    update["repeating_damagemod_" + id + "_options-flag"] = "0";
+                    update["repeating_damagemod_" + id + "_global_damage_type"] = dmgmod["Name"];
                     update["global_damage_mod_flag"] = "1";
                 }
                 if(v.drop_actions) {
@@ -10502,12 +10503,16 @@
     var upgrade_to_2_3 = function(doneupdating) {
         getSectionIDs("damagemod", function(ids) {
             var update = {};
-            _.each(ids, function(rId) {
-                update[`repeating_damagemod_${rowid}_options-flag`] = "1";
+            _.each(ids, function(rowid) {
+                update[`repeating_damagemod_${rowid}_options-flag`] = "0";
             });
-            getSectionIDs("attackmod", function(ids) {
+            getSectionIDs("tohitmod", function(ids) {
+                _.each(ids, function(rowid) {
+                    update[`repeating_tohitmod_${rowid}_options-flag`] = "0";
+                });
+                setAttrs(update);
+                doneupdating();
             });
-            setAttrs(update);
         });
     };
 
@@ -10517,7 +10522,7 @@
                 setAttrs({version: "2.1"});
             }
             else {
-                setAttrs({version: "2.2"}, {silent: true}, check_l1_mancer());
+                setAttrs({version: "2.3"}, {silent: true}, check_l1_mancer());
             }
         });
         doneupdating();
@@ -10526,7 +10531,7 @@
     var versioning = function() {
         getAttrs(["version"], function(v) {
             if(v["version"] === "2.3") {
-                //setAttrs({version: "2.3"});
+                setAttrs({version: "2.3"});
                 console.log("5th Edition OGL by Roll20 v" + v["version"]);
                 return;
             }
@@ -10539,8 +10544,8 @@
             else if(v["version"] === "2.2") {
                 console.log("UPGRADING TO v2.3");
                 upgrade_to_2_3(function() {
-                    //setAttrs({version: "2.3"});
-                    //versioning();
+                    setAttrs({version: "2.3"});
+                    versioning();
                 });
             }
             else if(v["version"] === "2.1") {
