@@ -1133,7 +1133,7 @@
                         <span class="label" data-i18n="global-save-u">GLOBAL SAVE MODIFIER</span>
                         <fieldset class="repeating_savemod">
                             <input type="checkbox" name="attr_global_save_active_flag" value="1">
-                            <textarea type="textarea" name="attr_global_save_rollstring" placeholder="1d4[BLESS]" style="width: 125px;"></textarea> 
+                            <textarea type="textarea" name="attr_global_save_rollstring" placeholder="1d4[BLESS]" style="width: 125px;"></textarea>
                         </fieldset>
                     </div>
                     <div class="label">
@@ -1299,7 +1299,7 @@
                     <span class="label" data-i18n="global-skill-u">GLOBAL SKILL MODIFIER</span>
                     <fieldset class="repeating_skillmod">
                         <input type="checkbox" name="attr_global_skill_active_flag" value="1">
-                        <textarea type="textarea" name="attr_global_skill_rollstring" placeholder="1d4[GUIDANCE]"></textarea> 
+                        <textarea type="textarea" name="attr_global_skill_rollstring" placeholder="1d4[GUIDANCE]"></textarea>
                     </fieldset>
                 </div>
                 <div class="label" style="position: absolute; bottom: 0px; width: 100%; text-align: center;">
@@ -1563,7 +1563,7 @@
                     <span class="label" data-i18n="global-attack-u">GLOBAL ATTACK MODIFIER</span>
                     <fieldset class="repeating_tohitmod">
                         <input type="checkbox" name="attr_global_attack_active_flag" value="1">
-                        <textarea type="textarea" name="attr_global_attack_rollstring" placeholder="1d4[BLESS]"></textarea> 
+                        <textarea type="textarea" name="attr_global_attack_rollstring" placeholder="1d4[BLESS]"></textarea>
                     </fieldset>
                 </div>
                 <input type="hidden" class="toggleflag" name="attr_global_damage_mod_flag">
@@ -4561,7 +4561,7 @@
             </div>
             <div class="general_options">
                 <div class="row">
-                    <button type="action" name="act_relaunch_lvl1mancer" data-i18n="relaunch-lvl1mancer-u">LAUNCH LEVEL 1 CHARACTERMANCER (CANNOT BE UNDONE)</button>
+                    <button type="action" name="act_relaunch_lvl1mancer"><img src="https://app.roll20staging.net/public/images/CharactermancerIcon200px.png" style=""></button><span style="width: 190px; margin-left: 10px; display: inline-block;" data-i18n="relaunch-lvl1mancer-u">LAUNCH LEVEL 1 CHARACTERMANCER (CANNOT BE UNDONE)</span>
                 </div>
                 <div class="row title">
                     <span data-i18n="mancer-opts-u">CHARACTERMANCER OPTIONS</span>
@@ -8251,7 +8251,6 @@
         update["drop_itemcount"] = "";
         update["drop_skill_proficiency"] = "";
         update["drop_parent"] = "";
-        update["drop_resources"] = "";
         setAttrs(update, {silent: true});
     };
 
@@ -10742,7 +10741,9 @@
                 pageName = thisPage.name;
                 additionalData = thisPage.data || {};
             }
+
             getCompendiumPage(pageName, function(pageData) {
+                pageName = pageName.indexOf("@@!!@@") > -1 ? pageName.replace(/@@!!@@/g,"") : pageName; // Hacky bugfix to prevent custom names from matching unavailable content
                 currentDrop++;
                 if(typeof pageData == "string") {
                     console.log("Creating custom drop for " + pageName);
@@ -10853,13 +10854,10 @@
         clearset["speed"] = "";
         clearset["gp"] = "";
         clearset["class"] = "";
-        clearset["class_display"] = "";
         clearset["subclass"] = "";
         clearset["hitdietype"] = "";
-        clearset["hitdie_final"] = "";
         clearset["race"] = "";
         clearset["subrace"] = "";
-        clearset["race_display"] = "";
         clearset["alignment"] = "";
         clearset["global_damage_mod_flag"] = "";
         clearset["spellcasting_ability"] = "";
@@ -10868,35 +10866,13 @@
         clearset["cust_hitdietype"] = "";
         clearset["cust_spellslots"] = "";
         clearset["cust_spellcasting_ability"] = "";
-        clearset["tab"] = "core";
-        clearset["ac"] = "";
-        clearset["jack_bonsu"] = "";
-        clearset["jack_attr"] = "";
-        clearset["death_save_bonus"] = "";
-        clearset["weighttotal"] = "";
-        clearset["initiative_bonus"] = "";
-        clearset["hit_dice"] = "";
-        clearset["hit_dice_max"] = "";
-        clearset["base_level"] = "1";
-        clearset["level"] = "1";
-        clearset["pb"] = "";
-        clearset["jack"] = "";
-        clearset["caster_level"] = "";
-        clearset["spell_attack_mod"] = "";
-        clearset["spell_attack_bonus"] = "";
-        clearset["spell_save_dc"] = "";
-        clearset["armorwarningflag"] = "hide";
-        clearset["armorwarning"] = "0";
-        clearset["passive_wisdom"] = "";
         _.each(allSkills, function(skill) {
             clearset[skill + "_prof"] = "";//0
             clearset[skill + "_type"] = "";//1
-            clearset[skill + "_bonus"] = "";
         });
         _.each(allAbilities, function(ability) {
             clearset[ability + "_save_prof"] = "";
-            clearset[ability + "_save_bonus"] = "";
-            clearset[ability + "_bonus"] = "0";
+            clearset[ability + "_base"] = "";
             clearset["cust_" + ability + "_save_prof"] = "";
         });
         clearset["personality_traits"] = "";
@@ -10964,7 +10940,7 @@
         //Set up drops. start with class, subclass, race, subrace, background
         if(data["l1-class"].values["class_name"] && !data["l1-class"].data.class) {
             var customClass = {data: {}};
-            customClass.name = "Classes:" + data["l1-class"].values["class_name"];
+            customClass.name = "Classes:@@!!@@" + data["l1-class"].values["class_name"];
             set["custom_class"] = "1";
             set["cust_classname"] = data["l1-class"].values["class_name"];
             set["cust_hitdietype"] = data["l1-class"].values["custom_hit_die"];
@@ -10996,7 +10972,7 @@
         //set up subclass drop
         if(data["l1-class"].values.subclass && data["l1-class"].values["subclass_name"]) {
             var customSubclass  = {data:{}};
-            customSubclass.name = "Subclasses:" + data["l1-class"].values["subclass_name"];
+            customSubclass.name = "Subclasses:@@!!@@" + data["l1-class"].values["subclass_name"];
             traits = [];
             for(var x = 1; x <= 4; x++) {
                 var trait = {};
@@ -11016,7 +10992,7 @@
         //set up race drop
         if(data["l1-race"].values["race_name"] && !data["l1-race"].data.race) {
             var customRace = {data: {}};
-            customRace.name = "Races:" + data["l1-race"].values["race_name"];
+            customRace.name = "Races:@@!!@@" + data["l1-race"].values["race_name"];
             if(data["l1-race"].values.size) {
                 customRace.data.Size = data["l1-race"].values.size;
             }
@@ -11042,7 +11018,7 @@
         //set up subrace drop
         if(data["l1-race"].values.subrace && data["l1-race"].values["subrace_name"]) {
             var customSubrace = {data: {}};
-            customSubrace.name = "Subraces:" + data["l1-race"].values["subrace_name"];
+            customSubrace.name = "Subraces:@@!!@@" + data["l1-race"].values["subrace_name"];
             customSubrace.data["data-Parent"] = data["l1-race"].values.race.split(":")[1];
             if(data["l1-race"].values.speed) {
                 customSubrace.data.Speed = data["l1-race"].values.speed;
@@ -11070,9 +11046,9 @@
         }
         //set up background drop
         if(data["l1-background"].values.background) {
-            if(data["l1-background"].values.background == "Rules:Backgrounds") {
+            if(data["l1-background"].values.background == "Rules:Spells") {
                 var customBg  = {data:{}};
-                customBg.name = "Backgrounds:" + data["l1-background"].values["background_name"];
+                customBg.name = "Backgrounds:@@!!@@" + data["l1-background"].values["background_name"];
                 if(data["l1-background"].values["custom_background_trait_name"]) {
                     var trait = {};
                     trait.Name = data["l1-background"].values["custom_background_trait_name"];
@@ -11179,13 +11155,10 @@
         //erase all repeating sections
         eraseRepeating(eraseSections, function() {
             //reset remaining attributes, and set ability scores/custom info
-            setAttrs(clearset, {silent:true}, function() {
+            setAttrs(clearset, function() {
                 doAllDrops(allDrops, function() {
                     console.log("DOING THE FINAL SET!!");
                     setAttrs(set, function() {
-                        _.each(allAbilities, function(ability) {
-                            update_attr(ability);
-                        });
                         update_skills(allSkills);
                         update_attacks("all");
                         organize_section_proficiencies();
@@ -11221,6 +11194,7 @@
         <p data-i18n="charmancer-compendium-detail">The Charactermancer currently supports Dungeons &amp; Dragons 5th Edition SRD and the Player's Handbook. You can add the Player's Handbook to your compendium in the Marketplace, or the game owner can share their compendium with everyone in the game.</p>
         <p class="label" data-i18n="get-started">Get started by clicking "Next".</p>
         <div class="bottombar">
+            <button class="prev warning" type="cancel" value="l1-cancel" data-i18n="dont-use-charactermancer-u">DON'T USE CHARACTERMANCER</button>
             <button type="button" data-scroll="#top" class="jump">Back to Top</button>
             <button class="next" type="back" value="l1-race">Next</button>
         </div>
@@ -11325,7 +11299,7 @@
                         <label class="choice custom_race"><span data-i18n="constitution">Constitution:</span>
                             <input class="choice custom_race" type="number" name="comp_race_custom_constitution" value="0" min="-5" max="5">
                         </label>
-                        <label class="choice custom_race"><span data-i18n="intelegence">Intelligence:</span>
+                        <label class="choice custom_race"><span data-i18n="intelligence">Intelligence:</span>
                             <input class="choice custom_race" type="number" name="comp_race_custom_intelligence" value="0" min="-5" max="5">
                         </label>
                         <label class="choice custom_race"><span data-i18n="wisdom">Wisdom:</span>
@@ -11828,14 +11802,14 @@
                         </label>
                     </div>
                     <div class="choice row custom_class">
-                        <label>Saving Throw Proficiency:
+                        <span>Saving Throw Proficiency:
                             <label><input type="checkbox" name="comp_strength_save" value="true">Strength</label>
                             <label><input type="checkbox" name="comp_dexterity_save" value="true">Dexterity</label>
                             <label><input type="checkbox" name="comp_constitution_save" value="true">Constitution</label>
                             <label><input type="checkbox" name="comp_intelligence_save" value="true">Intelligence</label>
                             <label><input type="checkbox" name="comp_wisdom_save" value="true">Wisdom</label>
                             <label><input type="checkbox" name="comp_charisma_save" value="true">Charisma</label>
-                        </label>
+                        </span>
                     </div>
                     <div class="choice row class_possible class_language_row custom_class">
                         <label>Language Proficiencies:
@@ -12502,7 +12476,7 @@
                 <label class="hilite">Choose a Background:
                     <select name="comp_background" accept="Category:Backgrounds" required>
                         <option value="" data-i18n="choose">Choose</option>
-                        <option class="custom" value="Rules:Backgrounds" data-i18n="custom">Custom</option>
+                        <option class="custom" value="Rules:Spells" data-i18n="custom">Custom</option>
                     </select>
                 </label>
                 <div class="choice custom_background">
@@ -12645,7 +12619,7 @@
             </div>
         </div>
         <div class="info">
-            <div class="sheet-compendium-page sheet-background-info" accept="Rules:Backgrounds"></div>
+            <div class="sheet-compendium-page sheet-background-info" accept="Rules:Spells"></div>
         </div>
         <div class="bottombar">
             <button class="prev" type="back" value="l1-abilities">Back</button>
@@ -14731,7 +14705,6 @@
         data = getCharmancerData();
         var attribs = ["strength","dexterity","constitution","intelligence","wisdom","charisma"];
         var clearvalue = eventinfo.newValue;
-        var trigger = _.last(eventinfo.triggerName.split(":"));
         var clearObject = {
                 strength: data["l1-abilities"].values.strength,
                 dexterity: data["l1-abilities"].values.dexterity,
@@ -14741,9 +14714,9 @@
                 charisma: data["l1-abilities"].values.charisma};
 
         if (data["l1-abilities"].values.abilities != "custom" && data["l1-abilities"].values.abilities != "Point Buy") {
-            attribs = _.reject(attribs, function(item) { return item == trigger; });
+            attribs = attribs.filter(function(item) { item != eventinfo.triggerName; });
             _.each(attribs, function(attrib) {
-                if (clearvalue == clearObject[attrib]) {
+                if (clearvalue == data["l1-abilities"].values[attrib]) {
                     clearObject[attrib] = "";
                 }
             });
@@ -14850,7 +14823,7 @@
             reset["custom_background_trait_desc"] = "";
         }
 
-        if(eventinfo.newValue === "Rules:Backgrounds") {
+        if(eventinfo.newValue === "Rules:Spells") {
             //Clears saved data for this field
             getCompendiumPage("");
             setAttrs(reset, function() {
