@@ -6,8 +6,19 @@ This repository is the collection of all the community-contributed character she
 Contributing
 ============
 
-If you want to help improve an existing sheet, just clone this repository, make your changes, and submit a pull request. If you would like to contribute a new sheet for the community to use, just clone this repository and create a new folder with the name of the game system that the sheet is for. Then send a pull request. If you have any questions or aren't familiar with Github or git in general, feel free to drop us a line at team@roll20.net and we can help you get set up.
+Full Character Sheet documentation can be found on the [Roll20 Wiki](https://wiki.roll20.net/Building_Character_Sheets).
 
+## Internationalization &amp; Translations
+
+Help us make these sheets accessible in as many languages as possible. We use [Crowdin](https://crowdin.com/) to crowdsource translations. **The best way to translate an existing character sheet is to become a translator by emailing a request to team@roll20.net.** Character Sheet authors have a number of controls over how the sheet is translated and how the translation is displayed. Full documentation can be found in the [Roll20 Wiki](https://wiki.roll20.net/Character_Sheet_i18n).
+
+## Improving Existing Character Sheets
+
+If you want to help improve an existing sheet, just clone this repository, make your changes, and submit a pull request.
+
+## Creating your own
+
+If you would like to contribute a new sheet for the community to use, just clone this repository and create a new folder with the name of the game system that the sheet is for. Then send a pull request. If you have any questions or aren't familiar with Github or git in general, feel free to drop us a line at team@roll20.net and we can help you get set up.
 **Creating a sheet.json File**
 
 When you are ready to submit your template for **public use**, create a `sheet.json` file in your sheet's folder (see the kitchensink folder for an example sheet.json file). The file has the following fields:
