@@ -10498,6 +10498,9 @@
         });
     };
 
+    var upgrade_to_2_3 = function(doneupdating) {
+    };
+
     var no_version_bugfix = function(doneupdating) {
         getAttrs(["npc","class"], function(v) {
             if(v["npc"] && v["npc"] != "0" || v["class"] && v["class"] != "") {
@@ -10512,14 +10515,21 @@
 
     var versioning = function() {
         getAttrs(["version"], function(v) {
-            if(v["version"] === "2.2") {
-                setAttrs({version: "2.2"});
+            if(v["version"] === "2.3") {
+                setAttrs({version: "2.3"});
                 console.log("5th Edition OGL by Roll20 v" + v["version"]);
                 return;
             }
             else if(!v["version"] || v["version"] === "") {
                 console.log("NO VERSION FOUND");
                 no_version_bugfix(function() {
+                    versioning();
+                });
+            }
+            else if(v["version"] === "2.2") {
+                console.log("UPGRADING TO v2.3");
+                upgrade_to_2_3(function() {
+                    setAttrs({version: "2.3"});
                     versioning();
                 });
             }
