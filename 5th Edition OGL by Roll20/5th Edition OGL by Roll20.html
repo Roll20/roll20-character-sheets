@@ -8251,6 +8251,7 @@
         update["drop_itemcount"] = "";
         update["drop_skill_proficiency"] = "";
         update["drop_parent"] = "";
+        update["drop_resources"] = "";
         setAttrs(update, {silent: true});
     };
 
@@ -10854,10 +10855,13 @@
         clearset["speed"] = "";
         clearset["gp"] = "";
         clearset["class"] = "";
+        clearset["class_display"] = "";
         clearset["subclass"] = "";
         clearset["hitdietype"] = "";
+        clearset["hitdie_final"] = "";
         clearset["race"] = "";
         clearset["subrace"] = "";
+        clearset["race_display"] = "";
         clearset["alignment"] = "";
         clearset["global_damage_mod_flag"] = "";
         clearset["spellcasting_ability"] = "";
@@ -10866,13 +10870,35 @@
         clearset["cust_hitdietype"] = "";
         clearset["cust_spellslots"] = "";
         clearset["cust_spellcasting_ability"] = "";
+        clearset["tab"] = "core";
+        clearset["ac"] = "";
+        clearset["jack_bonsu"] = "";
+        clearset["jack_attr"] = "";
+        clearset["death_save_bonus"] = "";
+        clearset["weighttotal"] = "";
+        clearset["initiative_bonus"] = "";
+        clearset["hit_dice"] = "";
+        clearset["hit_dice_max"] = "";
+        clearset["base_level"] = "1";
+        clearset["level"] = "1";
+        clearset["pb"] = "";
+        clearset["jack"] = "";
+        clearset["caster_level"] = "";
+        clearset["spell_attack_mod"] = "";
+        clearset["spell_attack_bonus"] = "";
+        clearset["spell_save_dc"] = "";
+        clearset["armorwarningflag"] = "hide";
+        clearset["armorwarning"] = "0";
+        clearset["passive_wisdom"] = "";
         _.each(allSkills, function(skill) {
             clearset[skill + "_prof"] = "";//0
             clearset[skill + "_type"] = "";//1
+            clearset[skill + "_bonus"] = "";
         });
         _.each(allAbilities, function(ability) {
             clearset[ability + "_save_prof"] = "";
-            clearset[ability + "_base"] = "";
+            clearset[ability + "_save_bonus"] = "";
+            clearset[ability + "_bonus"] = "0";
             clearset["cust_" + ability + "_save_prof"] = "";
         });
         clearset["personality_traits"] = "";
@@ -11046,7 +11072,7 @@
         }
         //set up background drop
         if(data["l1-background"].values.background) {
-            if(data["l1-background"].values.background == "Rules:Spells") {
+            if(data["l1-background"].values.background == "Rules:Backgrounds") {
                 var customBg  = {data:{}};
                 customBg.name = "Backgrounds:@@!!@@" + data["l1-background"].values["background_name"];
                 if(data["l1-background"].values["custom_background_trait_name"]) {
@@ -11155,10 +11181,13 @@
         //erase all repeating sections
         eraseRepeating(eraseSections, function() {
             //reset remaining attributes, and set ability scores/custom info
-            setAttrs(clearset, function() {
+            setAttrs(clearset, {silent:true}, function() {
                 doAllDrops(allDrops, function() {
                     console.log("DOING THE FINAL SET!!");
                     setAttrs(set, function() {
+                        _.each(allAbilities, function(ability) {
+                            update_attr(ability);
+                        });
                         update_skills(allSkills);
                         update_attacks("all");
                         organize_section_proficiencies();
@@ -12476,7 +12505,7 @@
                 <label class="hilite">Choose a Background:
                     <select name="comp_background" accept="Category:Backgrounds" required>
                         <option value="" data-i18n="choose">Choose</option>
-                        <option class="custom" value="Rules:Spells" data-i18n="custom">Custom</option>
+                        <option class="custom" value="Rules:Backgrounds" data-i18n="custom">Custom</option>
                     </select>
                 </label>
                 <div class="choice custom_background">
@@ -12619,7 +12648,7 @@
             </div>
         </div>
         <div class="info">
-            <div class="sheet-compendium-page sheet-background-info" accept="Rules:Spells"></div>
+            <div class="sheet-compendium-page sheet-background-info" accept="Rules:Backgrounds"></div>
         </div>
         <div class="bottombar">
             <button class="prev" type="back" value="l1-abilities">Back</button>
@@ -14714,9 +14743,9 @@
                 charisma: data["l1-abilities"].values.charisma};
 
         if (data["l1-abilities"].values.abilities != "custom" && data["l1-abilities"].values.abilities != "Point Buy") {
-            attribs = attribs.filter(function(item) { item != eventinfo.triggerName; });
+            attribs = _.reject(attribs, function(item) { return item == eventinfo.triggerName; });
             _.each(attribs, function(attrib) {
-                if (clearvalue == data["l1-abilities"].values[attrib]) {
+                if (clearvalue == clearObject[attrib]) {
                     clearObject[attrib] = "";
                 }
             });
@@ -14823,7 +14852,7 @@
             reset["custom_background_trait_desc"] = "";
         }
 
-        if(eventinfo.newValue === "Rules:Spells") {
+        if(eventinfo.newValue === "Rules:Backgrounds") {
             //Clears saved data for this field
             getCompendiumPage("");
             setAttrs(reset, function() {
