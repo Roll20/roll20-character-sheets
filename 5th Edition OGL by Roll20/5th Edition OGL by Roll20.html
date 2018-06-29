@@ -10826,6 +10826,7 @@
         var stats = getMancerStats(data);
         var spells = getMancerSpells(data);
         var equipment = [];
+        var silentset = {};
         var clearset = {};
         var set = {gp: 0};
         var allDrops = [];
@@ -10837,14 +10838,25 @@
         for(var x=1; x<=9; x++) {
             eraseSections.push("spell-" + x);
         }
-        //Set up first setAttrs to erase some fields
-        clearset["class_resource_name"] = "";
-        clearset["class_resource"] = "";
-        clearset["class_resource_max"] = "";
-        clearset["other_resource_name"] = "";
-        clearset["other_resource"] = "";
-        clearset["other_resource_max"] = "";
-        clearset["other_resource_itemid"] = "";
+        //first set is silent to make sure certain things don't trigger workers
+        silentset["class_resource_name"] = "";
+        silentset["class_resource"] = "";
+        silentset["class_resource_max"] = "";
+        silentset["other_resource_name"] = "";
+        silentset["other_resource"] = "";
+        silentset["other_resource_max"] = "";
+        silentset["other_resource_itemid"] = "";
+        silentset["class"] = "";
+        silentset["class_display"] = "";
+        silentset["subclass"] = "";
+        silentset["hitdietype"] = "";
+        silentset["hitdie_final"] = "";
+        silentset["race"] = "";
+        silentset["subrace"] = "";
+        silentset["race_display"] = "";
+        silentset["custom_class"] = "";
+        silentset["cust_classname"] = "";
+        //Set up setAttrs to erase some fields
         clearset["halflingluck_flag"] = "0";
         clearset["age"] = "";
         clearset["hp"] = "";
@@ -10852,19 +10864,9 @@
         clearset["size"] = "";
         clearset["speed"] = "";
         clearset["gp"] = "";
-        clearset["class"] = "";
-        clearset["class_display"] = "";
-        clearset["subclass"] = "";
-        clearset["hitdietype"] = "";
-        clearset["hitdie_final"] = "";
-        clearset["race"] = "";
-        clearset["subrace"] = "";
-        clearset["race_display"] = "";
         clearset["alignment"] = "";
         clearset["global_damage_mod_flag"] = "";
         clearset["spellcasting_ability"] = "";
-        clearset["custom_class"] = "";
-        clearset["cust_classname"] = "";
         clearset["cust_hitdietype"] = "";
         clearset["cust_spellslots"] = "";
         clearset["cust_spellcasting_ability"] = "";
@@ -11178,21 +11180,21 @@
 
         //erase all repeating sections
         eraseRepeating(eraseSections, function() {
-            //reset remaining attributes, and set ability scores/custom info
-            setAttrs(clearset, {silent:true}, function() {
-                doAllDrops(allDrops, function() {
-                    console.log("DOING THE FINAL SET!!");
-                    setAttrs(set, function() {
-                        _.each(allAbilities, function(ability) {
-                            update_attr(ability);
+            //first set is silent to prevent unwanted sheet workers
+            setAttrs(silentset, {silent:true}, function() {
+                //reset remaining attributes, and set ability scores/custom info
+                setAttrs(clearset, function() {
+                    doAllDrops(allDrops, function() {
+                        console.log("DOING THE FINAL SET!!");
+                        setAttrs(set, function() {
+                            update_skills(allSkills);
+                            update_attacks("all");
+                            organize_section_proficiencies();
+                            if(set["cust_classname"]) {
+                                update_class();
+                            }
+                            finishCharactermancer();
                         });
-                        update_skills(allSkills);
-                        update_attacks("all");
-                        organize_section_proficiencies();
-                        if(set["cust_classname"]) {
-                            update_class();
-                        }
-                        finishCharactermancer();
                     });
                 });
             });
