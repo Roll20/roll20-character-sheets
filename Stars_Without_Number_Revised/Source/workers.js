@@ -1702,15 +1702,22 @@
 	};
 
 	const calculateEffort = () => {
-		getAttrs([...effortAttributes, "psionics_total_effort"], v => {
-			const attrBonus = Math.max(parseInt(v.wisdom_mod), parseInt(v.constitution_mod)) || 0,
-				skillBonus = Math.max(...skills.psionic.map(x => parseInt(v[`skill_${x}`]) || 0));
-			const psionics_total_effort = Math.max(1 + attrBonus + skillBonus, 1) + parseInt(v.psionics_extra_effort) -
-				parseInt(v.psionics_committed_effort_current) - parseInt(v.psionics_committed_effort_scene) -
-				parseInt(v.psionics_committed_effort_day);
-			mySetAttrs({
-				psionics_total_effort
-			}, v);
+		getSectionIDs("repeating_psychic-skills", idArray => {
+			getAttrs([...effortAttributes,
+				"psionics_total_effort",
+				...idArray.map(id => `repeating_psychic-skills_${id}_skill`)], v => {
+				const attrBonus = Math.max(parseInt(v.wisdom_mod), parseInt(v.constitution_mod)) || 0,
+					skillBonus = Math.max(
+						...skills.psionic.map(x => parseInt(v[`skill_${x}`]) || 0),
+						...idArray.map(id => parseInt(v[`repeating_psychic-skills_${id}_skill`]) || 0)
+					);
+				const psionics_total_effort = Math.max(1 + attrBonus + skillBonus, 1) + parseInt(v.psionics_extra_effort) -
+					parseInt(v.psionics_committed_effort_current) - parseInt(v.psionics_committed_effort_scene) -
+					parseInt(v.psionics_committed_effort_day);
+				mySetAttrs({
+					psionics_total_effort
+				}, v);
+			});
 		});
 	};
 
@@ -3225,7 +3232,7 @@
 
 	on("change:level", calculateSaves);
 
-	on(effortAttributes.map(x => `change:${x}`).join(" "), calculateEffort);
+	on([...effortAttributes, "repeating_psychic-skills:skill"].map(x => `change:${x}`).join(" "), calculateEffort);
 
 	on("change:repeating_armor change:innate_ac remove:repeating_armor", calculateAC);
 
