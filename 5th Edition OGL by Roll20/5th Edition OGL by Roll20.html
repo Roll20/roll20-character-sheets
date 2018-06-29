@@ -6155,40 +6155,7 @@
     });
 
     on("change:repeating_damagemod", function(eventinfo) {
-        getSectionIDs("damagemod", function(ids) {
-            if(ids) {
-                var fields = {};
-                var attr_name_list = [];
-                ids.forEach(function(id) {
-                    fields[id] = {};
-                    attr_name_list.push(`repeating_damagemod_${id}_global_damage_active_flag`, `repeating_damagemod_${id}_global_damage_rollstring`, `repeating_damagemod_${id}_global_damage_type`);
-                });
-                getAttrs(attr_name_list, function(attrs) {
-                    var regex = /^repeating_damagemod_(.+)_global_damage_(active_flag|rollstring|type)$/;
-                    _.each(attrs, function(obj, name) {
-                        var r = regex.exec(name);
-                        if(r) {
-                            fields[r[1]][r[2]] = obj;
-                        }
-                    });
-
-                    var update = {global_damage_mod_roll: "", global_damage_mod_crit: "", global_damage_mod_type: ""};
-                    _.each(fields, function(element) {
-                        if(element.active_flag != "0") {
-                            if(element.rollstring && element.rollstring !== "") { update["global_damage_mod_roll"] += element.rollstring + "+"; }
-                            if(element.type && element.type !== "") { update["global_damage_mod_type"] += element.type + "/"; }
-                        }
-                    });
-                    update["global_damage_mod_roll"] = update["global_damage_mod_roll"].replace(/\+(?=$)/, '');
-                    update["global_damage_mod_type"] = update["global_damage_mod_type"].replace(/\/(?=$)/, '');
-                    update["global_damage_mod_crit"] = update["global_damage_mod_roll"].replace(/(?:[+\-*\/%]|\*\*)\s*\d+(?!d\d+)/gi, '');
-
-                    setAttrs(update, {silent:true}, function() {
-                        update_attacks("all");
-                    });
-                });
-            }
-        });
+        update_globaldamage();
     });
 
     on("change:global_damage_mod_flag", function(eventinfo) {
@@ -6557,36 +6524,7 @@
     });
 
     on("change:repeating_skillmod", function(eventinfo) {
-        getSectionIDs("skillmod", function(ids) {
-            if(ids) {
-                var fields = {};
-                var attr_name_list = [];
-                ids.forEach(function(id) {
-                    fields[id] = {};
-                    attr_name_list.push(`repeating_skillmod_${id}_global_skill_active_flag`, `repeating_skillmod_${id}_global_skill_rollstring`);
-                });
-                getAttrs(attr_name_list, function(attrs) {
-                    var regex = /^repeating_skillmod_(.+)_global_skill_(active_flag|rollstring)$/;
-                    _.each(attrs, function(obj, name) {
-                        var r = regex.exec(name);
-                        if(r) {
-                            fields[r[1]][r[2]] = obj;
-                        }
-                    });
-
-                    var update = {global_skill_mod: ""};
-                    _.each(fields, function(element) {
-                        if(element.active_flag != "0") {
-                            if(element.rollstring && element.rollstring !== "") { update["global_skill_mod"] += element.rollstring + "+"; }
-                        }
-                    });
-                    if(update["global_skill_mod"] !== "") {
-                        update["global_skill_mod"] = "[[" + update["global_skill_mod"].replace(/\+(?=$)/, '') + "]]";
-                    }
-                    setAttrs(update, {silent:true});
-                });
-            }
-        });
+        update_globalskills();
     });
 
     on("change:global_skill_mod_flag", function(eventinfo) {
@@ -6604,36 +6542,7 @@
     });
 
     on("change:repeating_savemod", function(eventinfo) {
-        getSectionIDs("savemod", function(ids) {
-            if(ids) {
-                var fields = {};
-                var attr_name_list = [];
-                ids.forEach(function(id) {
-                    fields[id] = {};
-                    attr_name_list.push(`repeating_savemod_${id}_global_save_active_flag`, `repeating_savemod_${id}_global_save_rollstring`);
-                });
-                getAttrs(attr_name_list, function(attrs) {
-                    var regex = /^repeating_savemod_(.+)_global_save_(active_flag|rollstring)$/;
-                    _.each(attrs, function(obj, name) {
-                        var r = regex.exec(name);
-                        if(r) {
-                            fields[r[1]][r[2]] = obj;
-                        }
-                    });
-
-                    var update = {global_save_mod: ""};
-                    _.each(fields, function(element) {
-                        if(element.active_flag != "0") {
-                            if(element.rollstring && element.rollstring !== "") { update["global_save_mod"] += element.rollstring + "+"; }
-                        }
-                    });
-                    if(update["global_save_mod"] !== "") {
-                        update["global_save_mod"] = "[[" + update["global_save_mod"].replace(/\+(?=$)/, '') + "]]";
-                    }
-                    setAttrs(update, {silent:true});
-                });
-            }
-        });
+        update_globalsaves();
     });
 
     on("change:global_save_mod_flag", function(eventinfo) {
@@ -6651,36 +6560,7 @@
     });
 
     on("change:repeating_tohitmod", function(eventinfo) {
-        getSectionIDs("tohitmod", function(ids) {
-            if(ids) {
-                var fields = {};
-                var attr_name_list = [];
-                ids.forEach(function(id) {
-                    fields[id] = {};
-                    attr_name_list.push(`repeating_tohitmod_${id}_global_attack_active_flag`, `repeating_tohitmod_${id}_global_attack_rollstring`);
-                });
-                getAttrs(attr_name_list, function(attrs) {
-                    var regex = /^repeating_tohitmod_(.+)_global_attack_(active_flag|rollstring)$/;
-                    _.each(attrs, function(obj, name) {
-                        var r = regex.exec(name);
-                        if(r) {
-                            fields[r[1]][r[2]] = obj;
-                        }
-                    });
-
-                    var update = {global_attack_mod: ""};
-                    _.each(fields, function(element) {
-                        if(element.active_flag != "0") {
-                            if(element.rollstring && element.rollstring !== "") { update["global_attack_mod"] += element.rollstring + "+"; }
-                        }
-                    });
-                    if(update["global_attack_mod"] !== "") {
-                        update["global_attack_mod"] = "[[" + update["global_attack_mod"].replace(/\+(?=$)/, '') + "]]";
-                    }
-                    setAttrs(update, {silent:true});
-                });
-            }
-        });
+        update_globalattack();
     });
 
     on("change:global_attack_mod_flag", function(eventinfo) {
@@ -8946,7 +8826,6 @@
                     var itemid = v["repeating_attack_" + attackid + "_itemid"];
                     callbacks.push( function() {update_item_from_attack(itemid, attackid);} );
                 }
-
                 setAttrs(update, {silent: true}, function() {callbacks.forEach(function(callback) {callback(); })} );
             });
         });
@@ -10376,6 +10255,149 @@
         });
     };
 
+    var update_globaldamage = function(callback) {
+        getSectionIDs("damagemod", function(ids) {
+            if(ids) {
+                var fields = {};
+                var attr_name_list = [];
+                ids.forEach(function(id) {
+                    fields[id] = {};
+                    attr_name_list.push(`repeating_damagemod_${id}_global_damage_active_flag`, `repeating_damagemod_${id}_global_damage_rollstring`, `repeating_damagemod_${id}_global_damage_type`);
+                });
+                getAttrs(attr_name_list, function(attrs) {
+                    var regex = /^repeating_damagemod_(.+)_global_damage_(active_flag|rollstring|type)$/;
+                    _.each(attrs, function(obj, name) {
+                        var r = regex.exec(name);
+                        if(r) {
+                            fields[r[1]][r[2]] = obj;
+                        }
+                    });
+
+                    var update = {global_damage_mod_roll: "", global_damage_mod_crit: "", global_damage_mod_type: ""};
+                    _.each(fields, function(element) {
+                        if(element.active_flag != "0") {
+                            if(element.rollstring && element.rollstring !== "") { update["global_damage_mod_roll"] += element.rollstring + "+"; }
+                            if(element.type && element.type !== "") { update["global_damage_mod_type"] += element.type + "/"; }
+                        }
+                    });
+                    update["global_damage_mod_roll"] = update["global_damage_mod_roll"].replace(/\+(?=$)/, '');
+                    update["global_damage_mod_type"] = update["global_damage_mod_type"].replace(/\/(?=$)/, '');
+                    update["global_damage_mod_crit"] = update["global_damage_mod_roll"].replace(/(?:[+\-*\/%]|\*\*)\s*\d+(?!d\d+)/gi, '');
+
+                    setAttrs(update, {silent:true}, function() {
+                        update_attacks("all");
+                        if(typeof callback == "function") callback();
+                    });
+                });
+            }
+        });
+    };
+
+    var update_globalattack = function(callback) {
+        getSectionIDs("tohitmod", function(ids) {
+            if(ids) {
+                var fields = {};
+                var attr_name_list = [];
+                ids.forEach(function(id) {
+                    fields[id] = {};
+                    attr_name_list.push(`repeating_tohitmod_${id}_global_attack_active_flag`, `repeating_tohitmod_${id}_global_attack_rollstring`);
+                });
+                getAttrs(attr_name_list, function(attrs) {
+                    var regex = /^repeating_tohitmod_(.+)_global_attack_(active_flag|rollstring)$/;
+                    _.each(attrs, function(obj, name) {
+                        var r = regex.exec(name);
+                        if(r) {
+                            fields[r[1]][r[2]] = obj;
+                        }
+                    });
+
+                    var update = {global_attack_mod: ""};
+                    _.each(fields, function(element) {
+                        if(element.active_flag != "0") {
+                            if(element.rollstring && element.rollstring !== "") { update["global_attack_mod"] += element.rollstring + "+"; }
+                        }
+                    });
+                    if(update["global_attack_mod"] !== "") {
+                        update["global_attack_mod"] = "[[" + update["global_attack_mod"].replace(/\+(?=$)/, '') + "]]";
+                    }
+                    setAttrs(update, {silent:true}, function() {
+                        if(typeof callback == "function") callback();
+                    });
+                });
+            }
+        });
+    };
+
+    var update_globalsaves = function(callback) {
+        getSectionIDs("savemod", function(ids) {
+            if(ids) {
+                var fields = {};
+                var attr_name_list = [];
+                ids.forEach(function(id) {
+                    fields[id] = {};
+                    attr_name_list.push(`repeating_savemod_${id}_global_save_active_flag`, `repeating_savemod_${id}_global_save_rollstring`);
+                });
+                getAttrs(attr_name_list, function(attrs) {
+                    var regex = /^repeating_savemod_(.+)_global_save_(active_flag|rollstring)$/;
+                    _.each(attrs, function(obj, name) {
+                        var r = regex.exec(name);
+                        if(r) {
+                            fields[r[1]][r[2]] = obj;
+                        }
+                    });
+
+                    var update = {global_save_mod: ""};
+                    _.each(fields, function(element) {
+                        if(element.active_flag != "0") {
+                            if(element.rollstring && element.rollstring !== "") { update["global_save_mod"] += element.rollstring + "+"; }
+                        }
+                    });
+                    if(update["global_save_mod"] !== "") {
+                        update["global_save_mod"] = "[[" + update["global_save_mod"].replace(/\+(?=$)/, '') + "]]";
+                    }
+                    setAttrs(update, {silent:true}, function() {
+                        if(typeof callback == "function") callback();
+                    });
+                });
+            }
+        });
+    };
+
+    var update_globalskills = function(callback) {
+        getSectionIDs("skillmod", function(ids) {
+            if(ids) {
+                var fields = {};
+                var attr_name_list = [];
+                ids.forEach(function(id) {
+                    fields[id] = {};
+                    attr_name_list.push(`repeating_skillmod_${id}_global_skill_active_flag`, `repeating_skillmod_${id}_global_skill_rollstring`);
+                });
+                getAttrs(attr_name_list, function(attrs) {
+                    var regex = /^repeating_skillmod_(.+)_global_skill_(active_flag|rollstring)$/;
+                    _.each(attrs, function(obj, name) {
+                        var r = regex.exec(name);
+                        if(r) {
+                            fields[r[1]][r[2]] = obj;
+                        }
+                    });
+
+                    var update = {global_skill_mod: ""};
+                    _.each(fields, function(element) {
+                        if(element.active_flag != "0") {
+                            if(element.rollstring && element.rollstring !== "") { update["global_skill_mod"] += element.rollstring + "+"; }
+                        }
+                    });
+                    if(update["global_skill_mod"] !== "") {
+                        update["global_skill_mod"] = "[[" + update["global_skill_mod"].replace(/\+(?=$)/, '') + "]]";
+                    }
+                    setAttrs(update, {silent:true}, function() {
+                        if(typeof callback == "function") callback();
+                    });
+                });
+            }
+        });
+    };
+
     var check_l1_mancer = function() {
         getAttrs(["class", "base_level", "strength_base","dexterity_base","constitution_base","intelligence_base","wisdom_base","charisma_base","l1mancer_status","version","charactermancer_step"], function(v) {
             if(!v["version"] || parseFloat(v["version"]) < 2.2) {
@@ -10520,6 +10542,16 @@
         });
     };
 
+    var upgrade_to_2_4 = function(doneupdating) {
+        update_globalskills(function() {
+            update_globalsaves(function() {
+                update_globalattack(function() {
+                    update_globaldamage(doneupdating);
+                });
+            });
+        });
+    };
+
     var no_version_bugfix = function(doneupdating) {
         getAttrs(["npc","class"], function(v) {
             if(v["npc"] && v["npc"] != "0" || v["class"] && v["class"] != "") {
@@ -10534,8 +10566,8 @@
 
     var versioning = function(finished) {
         getAttrs(["version"], function(v) {
-            if(v["version"] === "2.3") {
-                setAttrs({version: "2.3"}, function(){
+            if(v["version"] === "2.4") {
+                setAttrs({version: "2.4"}, function(){
                     finished();
                 });
                 console.log("5th Edition OGL by Roll20 v" + v["version"]);
@@ -10544,6 +10576,13 @@
             else if(!v["version"] || v["version"] === "") {
                 console.log("NO VERSION FOUND");
                 no_version_bugfix(function() {
+                    versioning(finished);
+                });
+            }
+            else if(v["version"] === "2.3") {
+                console.log("UPGRADING TO v2.4");
+                upgrade_to_2_4(function() {
+                    setAttrs({version: "2.4"});
                     versioning(finished);
                 });
             }
