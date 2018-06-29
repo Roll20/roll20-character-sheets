@@ -1,1 +1,0 @@
-This is a character sheet for the RPG called Remnants, it's not pretty, but it'll work well... I think. If there's any problems let me know, I can't promis I'll respond immediately, in fact, it may tame a few months deppending on what's going on in my life. My online lame is Grim G.

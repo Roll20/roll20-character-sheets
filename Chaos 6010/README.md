@@ -1,1 +1,0 @@
-This is a roll20 character sheet for Chaos 6010 by Arcanum Syndicate.
