@@ -4594,7 +4594,7 @@
             </div>
             <div class="general_options">
                 <div class="row">
-                    <button type="action" name="act_relaunch_lvl1mancer" style="padding: 0px;"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/5th%20Edition%20OGL%20by%20Roll20/images/CharactermancerIcon200px.png" style="height: 32px; width: 32px"></button><span style="width: 190px; margin-left: 10px; display: inline-block;" data-i18n="relaunch-lvl1mancer-u">LAUNCH LEVEL 1 CHARACTERMANCER (CANNOT BE UNDONE)</span>
+                    <button type="action" name="act_relaunch_lvl1mancer" style="padding: 0px;"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/5th%20Edition%20OGL%20by%20Roll20/images/CharactermancerIcon200px.png" style="height: 32px; width: 32px"></button><span style="width: 180px; margin-left: 10px; display: inline-block;" data-i18n="relaunch-lvl1mancer-u">LAUNCH LEVEL 1 CHARACTERMANCER (CANNOT BE UNDONE)</span>
                 </div>
                 <div class="row title">
                     <span data-i18n="mancer-opts-u">CHARACTERMANCER OPTIONS</span>
@@ -5782,15 +5782,16 @@
 <script type="text/worker">
 
     on("sheet:opened", function(eventinfo) {
-        versioning();
+        versioning(function() {
+            if(eventinfo.sourceType === "sheetworker") {
+                setAttrs({l1mancer_status: "completed"})
+            }
+            else {
+                check_l1_mancer();
+            };
+        });
         // cleanup_drop_fields();
         // v2_old_values_check();
-        if(eventinfo.sourceType === "sheetworker") {
-            setAttrs({l1mancer_status: "completed"})
-        }
-        else {
-            check_l1_mancer();
-        };
     });
 
     on("sheet:compendium-drop", function() {
@@ -10531,45 +10532,47 @@
         doneupdating();
     };
 
-    var versioning = function() {
+    var versioning = function(finished) {
         getAttrs(["version"], function(v) {
             if(v["version"] === "2.3") {
-                setAttrs({version: "2.3"});
+                setAttrs({version: "2.3"}, function(){
+                    finished();
+                });
                 console.log("5th Edition OGL by Roll20 v" + v["version"]);
                 return;
             }
             else if(!v["version"] || v["version"] === "") {
                 console.log("NO VERSION FOUND");
                 no_version_bugfix(function() {
-                    versioning();
+                    versioning(finished);
                 });
             }
             else if(v["version"] === "2.2") {
                 console.log("UPGRADING TO v2.3");
                 upgrade_to_2_3(function() {
                     setAttrs({version: "2.3"});
-                    versioning();
+                    versioning(finished);
                 });
             }
             else if(v["version"] === "2.1") {
                 console.log("UPGRADING TO v2.2");
                 upgrade_to_2_2(function() {
                     setAttrs({version: "2.2"});
-                    versioning();
+                    versioning(finished);
                 });
             }
             else if(v["version"] === "2.0") {
                 console.log("UPGRADING TO v2.1");
                 upgrade_to_2_1(function() {
                     setAttrs({version: "2.1"});
-                    versioning();
+                    versioning(finished);
                 });
             }
             else {
                 console.log("UPGRADING TO v2.0");
                 upgrade_to_2_0(function() {
                     setAttrs({version: "2.0"});
-                    versioning();
+                    versioning(finished);
                 });
             };
         });
