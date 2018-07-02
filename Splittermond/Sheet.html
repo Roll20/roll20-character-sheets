@@ -3012,7 +3012,6 @@ on("change:hiddenschildvtd change:hiddenruestungsvtd change:hiddenruestungssr ch
 on("change:repeating_zustaende remove:repeating_zustaende", function(g) {
     getSectionIDs("zustaende", function(idarray) {
         if (idarray.length == 0) {
-          // keine Zustände vorhanden: Lösche alles
           var deleteAll = {};
           deleteAll["verwundet"] = 0;
           deleteAll["benommen"] = 0;
@@ -3028,7 +3027,7 @@ on("change:repeating_zustaende remove:repeating_zustaende", function(g) {
             var lahm = 0;
             var keineraktiviert = true;
             _.each(idarray, function(currentID, i) {
-                getAttrs(["repeating_zustaende_" + currentID + "_zustandsname", "repeating_zustaende_" + currentID + "_zustandsstufe", "repeating_zustaende_" + currentID + "_zustandonoff"], function(v) {
+                getAttrs(["repeating_zustaende_" + currentID + "_zustandsname", "repeating_zustaende_" + currentID + "_zustandsstufe", "repeating_zustaende_" + currentID + "_zustandonoff", "beweglichkeit", "groessenklasse", "geschwindigkeitmod", "hiddengsw", "hiddengswag", "hiddengswspr", "hiddengswbe", "erschoepft"], function(v) {
                     var zustandsname = v["repeating_zustaende_" + currentID + "_zustandsname"];
                     var zustandsstufe = v["repeating_zustaende_" + currentID + "_zustandsstufe"];
                     var zustandonoff = v["repeating_zustaende_" + currentID + "_zustandonoff"];
@@ -3060,13 +3059,19 @@ on("change:repeating_zustaende remove:repeating_zustaende", function(g) {
                                 });
                                 break;
                             case "lahm":
-                                getAttrs(["lahm", "geschwindigkeit"], function(g) {
-                                    if (+zustandsstufe > 0 && +g.lahm == 0) {
-                                        setAttrs({
-                                            lahm: Math.floor(+g.geschwindigkeit / 2)
-                                        }); 
+                                let lahmAlt = +v.beweglichkeit + +v.groessenklasse + +v.geschwindigkeitmod + +v.hiddengsw + +v.hiddengswag + +v.hiddengswspr - +v.hiddengswbe - +v.erschoepft;
+                                let lahm = 0;
+                                let lahmTemp = 0;
+                                if (zustandsstufe == 0) {
+                                    setAttrs({lahm: +zustandsstufe});
+                                } else if (zustandsstufe > 0) {
+                                    for (var i = 1; i <= +zustandsstufe; i++) {
+                                        lahmTemp = lahmAlt;
+                                        lahmAlt /= 2;
+                                        lahm += (lahmTemp - lahmAlt);
                                     }
-                                });
+                                    setAttrs({lahm: +Math.floor(lahm)});
+                                }
                                 break;
                             default:
                                 break;
@@ -3085,7 +3090,6 @@ on("change:repeating_zustaende remove:repeating_zustaende", function(g) {
             }
         }
    });
-//   setAttrs(update);
 });
 
 on("change:schildonoff change:schildvtd change:schildbe change:schildtickplus change:st1 change:st2", function(info) {
@@ -3499,6 +3503,30 @@ on("change:notizen", function(eventInfo) {
                 case "sr":
                     setAttrs({hiddensr: 0});
                     break;
+                case "lp":
+                    setAttrs({hiddenlp: 0});
+                    break;
+                case "fokus":
+                    setAttrs({hiddenfokus: 0});
+                    break;
+                case "gsw":
+                    setAttrs({hiddengsw: 0});
+                    break;
+                case "gw":
+                    setAttrs({hiddengw: 0});
+                    break;
+                case "kw":
+                    setAttrs({hiddenkw: 0});
+                    break;
+                case "ini":
+                    setAttrs({hiddenini: 0});
+                    break;
+                case "schmerzresistenz":
+                    setAttrs({schmerzresistenz: 0});
+                    break;
+                case "splitterpunkte":
+                    setAttrs({hiddensplitterpunkte: 0});
+                    break;
                 default:
                     setAttrs({notizen: "Syntax-Fehler!"});
             }
@@ -3518,34 +3546,30 @@ on("change:startimport", function(f) {
             }   
             if (!importerror && v.jsonimport != "") {
                 let exp = 0;
-                let splinter = { 
-                	"FLASH":"Der Blitz", "OMEN":"Omen des Schwarzen Mondes", "SIGHT":"Das Zweite Gesicht", "TRABANT":"Freundschaft des Trabanten", "GAMBLER":"Der Spieler", "RICHMAN":"Gunst des Reichen Mannes", "MOONPOWER":"Segen der Mondkraft", "BLOODMOON":"Blutiges Antlitz des Mondes", "GHOSTTHOUGHT":"Geist der Gedanken", "ROCK":"Der Fels"
-                }
-                let races = { 
-                	"alben":"Alb", "gnome":"Gnom", "human":"Mensch", "varg":"Varg", "dwarf":"Zwerg" 
-                }
                 let backgrounds = { 
                 	"custom":"Frei erschaffen", "eremits":"Einsiedler", "academics":"Gelehrte", "ragtag":"Gesindel", "largefarm":"Großbauern", "nobility":"Hochadel", "craftsmen":"Handwerker", "courtier":"Höflinge", "farmer":"Kleinbauern", "warrior":"Kriegsvolk", "artists":"Künstler", "gentry":"Landadel", "magister":"Magistrale", "priests":"Priester", "traveler":"Reisende", "sailor":"Seefahrer", "wizard":"Zauberer" 
                 }
-                let cultures = { 
-                	"custom":"Frei erschaffen", "gulong":"Gulong", "dakardsmyr":"Dakardsmyr", "aitushar":"Aitushar", "mertstaedt":"Mertalischer Städtebund", "dalmreich":"Dalmarisches Reich", "elyrrose":"Elyrea - Rosenorden", "elyrvolk":"Elyrea - Volk", "furgand":"Furgand", "immersomm":"Immersommeralben", "jagodien":"Jagodien", "jagodsklav":"Jogodai - Sklaven", "jagodstamm":"Jogodai - Stammesangehöriger", "midstad":"Midstad", "nyrdfing":"Nyrdfing", "patalis":"Patalis", "selenia":"Selenia", "teleshai":"Teleshai", "termark":"Termark", "tirdurghachan":"Tir Durghachan", "unreich":"Unreich", "vaigarr":"Vaigarr", "waechter":"Wächterbund", "westergrom":"Westergrom", "wintholt":"Wintholt", "zwingard":"Zwingard", "arkuri":"Arkuri", "frynjord":"Frynjord",  "raugarr":"Raugarr", "sadu":"Sadu", "schwertadel":"Schwertalben - Adel", "schwertvolk":"Schwertalben - Volk", "zhoujiang":"Zhoujiang", "daemmeralb":"Dämmeralben", "gotmarkut":"Gotor, Marakatam und Kutakina",	"mahaluu":"Mahaluu", "piriwatu":"Piriwatu", "schaschbar":"Schaschbar", "utarti":"Utarti", "ashurmazaan":"Ashurmazaan", "badashan":"Badashan", "chorrash":"Chorrash", "demerai":"Demerai", "farukhur":"Farukhur", "fedirin":"Fedirin", "feuerlauf":"Feuerläufer", "keshabid":"Keshabid", "pashtar":"Pashtar", "shahandir":"Shahandir", "tarr":"Tarr", "turubar":"Turubar", "keshubim":"Keshubim", "kungaitan":"Kungaitan", "porukala":"Porukala", "puntani":"Puntani", "strominseln":"Stromlandinseln - Inseln", "stromsiprangu":"Stromlandinseln - Siprangu", "afali":"Afali", "albseebund":"Albischer Seebund", "anuu":"Anuu", "borombri":"Borombri", "ioria":"Ioria", "schaedel":"Schädelkorsaren" 
-                }
-                let educations = {
-                    "custom":"Frei erschaffen", "arcanesage":"Arkaner Gelehrter", "circlefirsthouse":"Zirkelmagier des ersten Hauses", "circlethirdhouse":"Zirkelmagier des dritten Hauses", "morkaipriest":"Morkai-Priester", "beastmaster":"Bestienmeister", "asii":"Asii", "bloodrider":"Blutreiter", "shadowsnake":"Schattenschlange", "animalmagician":"Tierzauberer", "elementalist":"Elementarist", "circleelementalist":"Elementarist des Zirkels", "firecaller":"Feuerrufer", "masterofstone":"Steinmeister", "tempesttamer":"Sturmbändiger", "titanchild":"Titanenkinder", "servantofrockandflame":"Diener von Fels und Flamme", "explorer":"Entdecker", "searcherofforefathers":"Ahnensucher", "truthseeker":"Wahrheitsfinder", "wavewalker":"Wogenwanderer", "faithwarrior":"Glaubenskrieger", "baruopriest":"Baruo-Priester", "whitewatcher":"Weißer Wächter", "ghosttearer":"Geistreißer", "shieldmaid":"Schildmaid", "glow_walker":"Glutgänger", "grimman":"Grimmanswachen", "cervaritam":"Cervaritam", "moonwolf":"Mondwolf", "corsairpriest":"Korsarenpriester", "wingguardian":"Schwingenwächter", "border_crosser":"Grenzgänger", "westergrom_resister":"Westergromer Widerständler", "farn_ranger":"Farnischläufer", "tree_settler":"Baumsiedler", "healer":"Heiler", "lifeguardian":"Lebenswächter", "potionmaster":"Trankmeister", "delarain":"Delarain", "ghosthealer":"Geistheiler", "priesthelphand":"Priester der Helfenden Hand", "circlesecondhouse":"Zirkelmagier des zweiten Hauses", "inquisitor":"Inquisitor", "honorguard":"Ehrwächter", "voice_of_ghosts":"Stimme der Geister", "nighthawk":"Nachtfalke", "fighter":"Kämpfer", "weaponsmaster":"Waffenmeister", "fameseeker":"Ruhmsucher", "fang":"Reißzahn", "clanwarrior":"Klankrieger", "sarnburg_defender":"Sarnburger Wehrstreiter", "martial_artist":"Kampfkünstler", "monk_red_phoenix":"Mönch des Roten Phönix", "mountainmonk":"Bergmönch", "circle_student":"Schüler des Kreises", "cultist":"Kultist", "herold_of_doom":"Untergangsverkünder", "ronite":"Ronite", "disciple_dragonfish":"Jünger des Drachenfisch", "lyxapriest":"Lyxa-Priester", "scout":"Kundschafter", "shadowrunner":"Schattenläufer", "seahawk":"Seefalke", "treetopscout":"Wipfelspäher", "pathfinder":"Wegfinder", "sleeples_rider":"Reiter der Schlaflosen", "flamefinder":"Flammenfinder", "magicmediator":"Magischer Unterhändler", "mediator":"Mediator", "discipleoflyxa":"Jünger von Lyxa", "desertsage":"Wüstenweiser", "goden":"Goden", "esmoda_mediator":"Esmodanische Unterhändler", "inspektor_of_symbols":"Inspektor der Zeichen", "mystic":"Mystiker", "deepseeker":"Tiefensucher", "stonefather":"Steinvater/-Mutter", "firedancer":"Feuertänzer", "mysticwarrior":"Mystischer Krieger", "skeftamagi":"Skeftamagi", "bladedancer":"Klingentänzer", "runewarrior":"Runenkrieger", "firemercenary":"Feuersöldner", "lorepriest":"Priester des Wissens", "drakeguardian":"Drakenwächter", "keeperofsecrets":"Hüter der Geheimnisse", "discipleofrahidis":"Jünger Rahidis", "adeshbid":"Adeshbid", "scriptseeker":"Schriftensucher", "yonnuspriest":"Yonnus-Priester", "flying_snake":"Fliegende Schlange", "singer_of_truth":"Wahrsängerinnen", "intriguer":"Ränkeschmied", "legendsinger":"Legendensänger", "waveenvoy":"Wogenbote", "gutterprince":"Gossenprinz", "silvershadow":"Silberschatten", "wise_pusa":"Weise von Pusa", "warrior":"Recke", "wyrmbannknight":"Ritter des Wyrmbann", "swordjudge":"Schwertrichter", "bladeguardian":"Klingenwächter", "sipahi":"Sipahi", "disciple_jord":"Jünger Jords", "kantioku":"Kantioku", "spiderofficer":"Offizier der Spinne", "shadowblade":"Schattenklinge", "protector":"Protector", "streetblade":"Straßenklinge", "stormcorsar":"Sturmkorsar", "preserver_of_web":"Bewahrer des Gewebes", "caransassassin":"Carans Assassinen", "showman":"Schausteller", "minstrel":"Minnesänger", "bard":"Sangesgeselle", "jester":"Hofnarr", "rogue":"Schurke", "goldhand":"Goldhand", "wallstriker":"Mauerstürmer", "trapmaster":"Fallenmeister", "soulguide":"Seelenführer", "galstarsinger":"Galstarsänger", "augur":"Auguren", "ghostseeker":"Geistsucher", "enlightenedone":"Erleuchteter", "animalleader":"Tierführer", "monkeyhand":"Affenhand", "butterflydancer":"Schmetterlingstänzer", "pigeonking":"Taubenkönig", "transformer":"Verwandler", "animalformer":"Tierverwandler", "warlock":"Hexer", "aurifer":"Aurifer", "circlefifthhouse":"Zirkelmagier des fünften Hauses", "ranger":"Waldläufer", "desertranger":"Sandläufer", "tunnelguardian":"Tunnelwächter", "beastcaller":"Bestienrufer", "meng_shou":"Meng Shou", "qin_shou":"Qin Shou", "wandererpriest":"Wanderpriester", "stormcaller":"Sturmrufer", "lunarseeker":"Lunare Sucher", "hammerpriest":"Hammerpriester", "druid":"Druide", "moonshaman":"Mondschamane", "vordanshield":"Vordans Schilde", "servantofape":"Diener des Affen", "zaruszpriestshaman":"Zarusz-Priesterschamane", "drugonjourneyma":"Drugongeselle",                     "wondermaker":"Wunderwerker", "firnbezwinger":"Firnbezwinger", "athanorier":"Athanorier", "daugther_maker":"Tochter des Schaffens" 
-                }
+                setAttrs({
+                   ansehenswert: 0,
+                   kontaktewert: 0,
+                   standwert: 0,
+                   vermoegenswert: 0
+                });
                 getSectionIDs("repeating_ressources", function(idarray) {
                   for(var i=0; i < idarray.length; i++) {
                     removeRepeatingRow("repeating_ressources_" + idarray[i]);
                   }
                 });
-                // TO DO: Set every line to 0 before deleting section
-                getSectionIDs("repeating_staerken", function(idarray) {
-                    for(var i=0; i < idarray.length; i++) {
-                        let update = {};
-                        update["repeating_staerken_" + idarray[i] + "_staerkenwert"] = "0";
-                        setAttrs(update);
-                        //update["repeating_staerken_" + idarray[i] + "_staerke"] = "";
-                    }
+                setAttrs({
+                   hiddenlp: 0,
+                   hiddenfokus: 0,
+                   hiddengsw: 0,
+                   hiddengw: 0,
+                   hiddenkw: 0,
+                   hiddensr: 0,
+                   hiddenini: 0,
+                   schemerzresistenz: 0,
+                   hiddensplitterpunkte: 0
                 });
                 getSectionIDs("repeating_staerken", function(idarray) {
                     for(var i=0; i < idarray.length; i++) {
@@ -3556,6 +3580,16 @@ on("change:startimport", function(f) {
                   for(var i=0; i < idarray.length; i++) {
                     removeRepeatingRow("repeating_schwaechen_" + idarray[i]);
                   }
+                });
+                setAttrs({
+                    hiddenausstrahlungmod: 0,
+                    hiddenbeweglichkeitmod: 0,
+                    hiddenintuitionmod: 0,
+                    hiddenkonstitutionmod: 0,
+                    hiddenmystikmod: 0,
+                    hiddenstaerkemod: 0,
+                    hiddenverstandmod: 0,
+                    hiddenwillenskraftmod: 0
                 });
                 getSectionIDs("repeating_attributmods", function(idarray) {
                   for(var i=0; i < idarray.length; i++) {
@@ -3582,7 +3616,13 @@ on("change:startimport", function(f) {
                     removeRepeatingRow("repeating_fernkampfwaffen_" + idarray[i]);
                   }
                 });
-                // TO DO: Set every line to 0 before deleting section
+                setAttrs({
+                    verwundet: 0,
+                    benommen: 0,
+                    geblendet: 0,
+                    erschoepft: 0,
+                    lahm: 0
+                });
                 getSectionIDs("repeating_zustaende", function(idarray) {
                   for(var i=0; i < idarray.length; i++) {
                     removeRepeatingRow("repeating_zustaende_" + idarray[i]);
@@ -3593,12 +3633,27 @@ on("change:startimport", function(f) {
                     removeRepeatingRow("repeating_zauber_" + idarray[i]);
                   }
                 });
+                setAttrs({
+                    gesamtsr: 0,
+                    gesamtbe: 0,
+                    schildbe: 0
+                });
                 getSectionIDs("repeating_ruestungen", function(idarray) {
                   for(var i=0; i < idarray.length; i++) {
                     removeRepeatingRow("repeating_ruestungen_" + idarray[i]);
                   }
                 });
-                // TO DO: Set every line to 0 before deleting section
+                setAttrs({
+                   hiddeninibr: 0,
+                   hiddenvtdgr: 0,
+                   rt1: 0,
+                   rt2: 0,
+                   st1: 0,
+                   st2: 0,
+                   sw1: 0,
+                   sw2: 0,
+                   hiddengswag: 0
+                });
                 getSectionIDs("repeating_meisterschaften", function(idarray) {
                   for(var i=0; i < idarray.length; i++) {
                     removeRepeatingRow("repeating_meisterschaften_" + idarray[i]);
@@ -3616,21 +3671,24 @@ on("change:startimport", function(f) {
                     default:
                         setAttrs({gender: "Undefiniert"});
                 }
-                setAttrs({mondzeichen: splinter[characterData["-splinter"]]});
-                setAttrs({ausbildung: educations[characterData["-edu"]]});
+                setAttrs({mondzeichen: translateGenesis(characterData["-splinter"])});
+                setAttrs({ausbildung: translateGenesis(characterData["-edu"])});
                 setAttrs({abstammung: backgrounds[characterData["-bground"]]});
-                setAttrs({kultur: cultures[characterData["-culture"]]});
+                setAttrs({abstammung: translateGenesis(characterData["-bground"])});
+                setAttrs({kultur: translateGenesis(characterData["-culture"])});
                 setAttrs({haarfarbe: characterData["hairColor"]});
                 setAttrs({augenfarbe: characterData["eyeColor"]});
                 setAttrs({hautfarbe: characterData["furColor"]});
                 setAttrs({geburtsort: characterData["birthPlace"]});
                 setAttrs({groesse: characterData["size"]});
                 setAttrs({gewicht: characterData["weight"]});
-                setAttrs({rasse: races[characterData["-race"]]});
-                for (var i = 0; i < characterData["rewards"]["reward"].length; i++){
-                    exp += +characterData["rewards"]["reward"][i]["-exp"];
+                setAttrs({rasse: translateGenesis(characterData["-race"])});
+                for (var i = 0; i <= characterData["rewards"]["reward"].length; i++){
+                    //exp += +characterData["rewards"]["reward"][i]["-exp"];
+                    exp++;
                 }
-                setAttrs({epgesamt: +exp});
+                //setAttrs({epgesamt: +exp});
+                setAttrs({notizen: characterData["rewards"]["reward"].length});
                 setAttrs({epeingesetzt: characterData["-expinv"] || 0});
                 for (var i = 0; i < characterData["attributes"]["attr"].length; i++) {
                     switch (characterData["attributes"]["attr"][i]["-id"]) {
@@ -3670,8 +3728,238 @@ on("change:startimport", function(f) {
                             setAttrs({xmlimport: "Fehler: Unbekanntes Attribut."});
                     }
                 }
+                let ressources = {};
+                let newrowid = 0;
+                let description = "";
+                let value = 0;
+                for (var i = 0; i < characterData["resourcerefs"]["resourceref"].length; i++) {
+                    value = characterData["resourcerefs"]["resourceref"][i]["-val"] || 0;
+                    switch (characterData["resourcerefs"]["resourceref"][i]["-ref"]) {
+                        case ("reputation"):
+                            setAttrs({ansehenswert: value});
+                            break;
+                        case ("status"):
+                            setAttrs({standwert: value});
+                            break;
+                        case ("contacts"):
+                            setAttrs({kontaktewert: value});
+                            break;
+                        case ("wealth"):
+                            setAttrs({vermoegenswert: value});
+                            break;
+                        case ("creature"):
+                        case ("relic"):
+                            description = characterData["resourcerefs"]["resourceref"][i]["-description"]
+                            newrowid = generateRowID();
+                            ressources["repeating_ressources_" + newrowid + "_ressourcename"] = translateGenesis(characterData["resourcerefs"]["resourceref"][i]["-ref"]) + " (" + description +")";
+                            ressources["repeating_ressources_" + newrowid + "_ressourcevalue"] = value;
+                            setAttrs(ressources);
+                            break;
+                        default:
+                            newrowid = generateRowID();
+                            ressources["repeating_ressources_" + newrowid + "_ressourcename"] = translateGenesis(characterData["resourcerefs"]["resourceref"][i]["-ref"]);
+                            ressources["repeating_ressources_" + newrowid + "_ressourcevalue"] = value;
+                            setAttrs(ressources);
+                    }
+                }
+                // TODO: Viele Stärken fehlen!
+                for (var i = 0; i < characterData["powerrefs"]["powerref"].length; i++) {
+                    let staerken = {};
+                    value = characterData["powerrefs"]["powerref"][i]["-count"] || 0;
+                    newrowid = generateRowID();
+                    staerken["repeating_staerken_" + newrowid + "_staerke"] = translateGenesis(characterData["powerrefs"]["powerref"][i]["-ref"]);
+                    staerken["repeating_staerken_" + newrowid + "_staerkenwert"] = value;
+                    setAttrs(staerken);
+                }
+                for (var i = 0; i < characterData["weaknesses"]["weakness"].length; i++) {
+                    let schwaechen = {};
+                    let schwaeche = characterData["weaknesses"]["weakness"][i];
+                    newrowid = generateRowID();
+                    schwaeche = schwaeche.charAt(0).toUpperCase() + schwaeche.slice(1);
+                    schwaechen["repeating_schwaechen_" + newrowid + "_schwaeche"] = schwaeche;
+                    setAttrs(schwaechen);
+                }
+                for (var i = 0; i < characterData["languages"]["languageref"].length; i++) {
+                    let language = characterData["languages"]["languageref"][i]["-ref"];
+                    let languages = {};
+                    newrowid = generateRowID();
+                    language = language.charAt(0).toUpperCase() + language.slice(1);
+                    languages["repeating_sprachen_" + newrowid + "_sprache"] = language;
+                    setAttrs(languages);
+                }
+                for (var i = 0; i < characterData["skillvals"]["skillval"].length; i++) {
+                    value = characterData["skillvals"]["skillval"][i]["-val"] || 0;
+                    switch(characterData["skillvals"]["skillval"][i]["-skill"]) {
+                        case ("melee"):
+                            setAttrs({handgemengepunkte: +value});
+                            break;
+                        case ("slashing"):
+                            setAttrs({hiebwaffenpunkte: +value});
+                            break;
+                        case ("chains"):
+                            setAttrs({kettenwaffenpunkte: +value});
+                            break;
+                        case ("blades"):
+                            setAttrs({klingenwaffenpunkte: +value});
+                            break;
+                        case ("longrange"):
+                            setAttrs({schusswaffenpunkte: +value});
+                            break;
+                        case ("staffs"):
+                            setAttrs({stangenwaffenpunkte: +value});
+                            break;
+                        case ("throwing"):
+                            setAttrs({wurfwaffenpunkte: +value});
+                            break;
+                        case ("acrobatics"):
+                            setAttrs({akrobatikpunkte: +value});
+                            break;
+                        case ("alchemy"):
+                            setAttrs({alchemiepunkte: +value});
+                            break;
+                        case ("leadership"):
+                            setAttrs({anfuehrenpunkte: +value});
+                            break;
+                        case ("arcanelore"):
+                            setAttrs({arkanekundepunkte: +value});
+                            break;
+                        case ("athletics"):
+                            setAttrs({athletikpunkte: +value});
+                            break;
+                        case ("performance"):
+                            setAttrs({darbietungpunkte: +value});
+                            break;
+                        case ("diplomacy"):
+                            setAttrs({diplomatiepunkte: +value});
+                            break;
+                        case ("clscraft"):
+                            setAttrs({edelhandwerkpunkte: +value});
+                            break;
+                        case ("empathy"):
+                            setAttrs({empathiepunkte: +value});
+                            break;
+                        case ("determination"):
+                            setAttrs({entschlossenheitpunkte: +value});
+                            break;
+                        case ("dexterity"):
+                            setAttrs({fingerfertigkeitpunkte: +value});
+                            break;
+                        case ("history"):
+                            setAttrs({geschichteundmythenpunkte: +value});
+                            break;
+                        case ("craftmanship"):
+                            setAttrs({handwerkpunkte: +value});
+                            break;
+                        case ("heal"):
+                            setAttrs({heilkundepunkte: +value});
+                            break;
+                        case ("stealth"):
+                            setAttrs({heimlichkeitpunkte: +value});
+                            break;
+                        case ("hunting"):
+                            setAttrs({jagdkunstpunkte: +value});
+                            break;
+                        case ("countrylore"):
+                            setAttrs({laenderkundepunkte: +value});
+                            break;
+                        case ("nature"):
+                            setAttrs({naturkundepunkte: +value});
+                            break;
+                        case ("eloquence"):
+                            setAttrs({redegewandtheitpunkte: +value});
+                            break;
+                        case ("locksntraps"):
+                            setAttrs({schloesserundfallenpunkte: +value});
+                            break;
+                        case ("swim"):
+                            setAttrs({schwimmenpunkte: +value});
+                            break;
+                        case ("seafaring"):
+                            setAttrs({seefahrtpunkte: +value});
+                            break;
+                        case ("streetlore"):
+                            setAttrs({strassenkundepunkte: +value});
+                            break
+                        case ("animals"):
+                            setAttrs({tierfuehrungpunkte: +value});
+                            break;
+                        case ("survival"):
+                            setAttrs({ueberlebenpunkte: +value});
+                            break;
+                        case ("perception"):
+                            setAttrs({wahrnehmungpunkte: +value});
+                            break;
+                        case ("endurance"):
+                            setAttrs({zaehigkeitpunkte: +value});
+                            break;
+                        case ("antimagic"):
+                            setAttrs({bannmagiepunkte: +value});
+                            break;
+                        case ("controlmagic"):
+                            setAttrs({beherrschungsmagiepunkte: +value});
+                            break;
+                        case ("motionmagic"):
+                            setAttrs({bewegungsmagiepunkte: +value});
+                            break;
+                        case ("insightmagic"):
+                            setAttrs({erkenntnismagiepunkte: +value});
+                            break;
+                        case ("stonemagic"):
+                            setAttrs({felsmagiepunkte: +value});
+                            break;
+                        case ("firemagic"):
+                            setAttrs({feuermagiepunkte: +value});
+                            break;
+                        case ("healmagic"):
+                            setAttrs({heilungsmagiepunkte: +value});
+                            break;
+                        case ("illusionmagic"):
+                            setAttrs({illusionsmagiepunkte: +value});
+                            break;
+                        case ("combatmagic"):
+                            setAttrs({kampfmagiepunkte: +value});
+                            break;
+                        case ("lightmagic"):
+                            setAttrs({lichtmagiepunkte: +value});
+                            break;
+                        case ("naturemagic"):
+                            setAttrs({naturmagiepunkte: +value});
+                            break;
+                        case ("shadowmagic"):
+                            setAttrs({schattenmagiepunkte: +value});
+                            break;
+                        case ("fatemagic"):
+                            setAttrs({schicksalsmagiepunkte: +value});
+                            break;
+                        case ("protectionmagic"):
+                            setAttrs({schutzmagiepunkte: +value});
+                            break;
+                        case ("enhancemagic"):
+                            setAttrs({staerkungsmagiepunkte: +value});
+                            break;
+                        case ("deathmagic"):
+                            setAttrs({todesmagiepunkte: +value});
+                            break;
+                        case ("transformationmagic"):
+                            setAttrs({verwandlungsmagiepunkte: +value});
+                            break;
+                        case ("watermagic"):
+                            setAttrs({wassermagiepunkte: +value});
+                            break;
+                        case ("windmagic"):
+                            setAttrs({windmagiepunkte: +value});
+                            break;
+                    }
+                }
+                let items = "";
+                for (var i = 0; i < characterData["carries"]["item"].length; i++) {
+                    let item = characterData["carries"]["item"][i]["-ref"].charAt(0).toUpperCase() + characterData["carries"]["item"][i]["-ref"].slice(1);
+                    let count = characterData["carries"]["item"][i]["count"];
+                    items += item + "\n";
+                }
+                setAttrs({stuff: items});
                 
-                setAttrs({notizen: characterData["notes"]});
+                //setAttrs({notizen: characterData["notes"]});
                 // Finalisierung
                 setAttrs({jsonimport: "Import erfolgreich abgeschlossen."});
                 setAttrs({startimport: 0});
@@ -3681,5 +3969,11 @@ on("change:startimport", function(f) {
         }
     });
 });
+
+function translateGenesis (termToTranslate) {
+    var translations = {"arcanesage":"Arkaner Gelehrter", "circlefirsthouse":"Zirkelmagier des ersten Hauses", "circlethirdhouse":"Zirkelmagier des dritten Hauses", "morkaipriest":"Morkai-Priester", "beastmaster":"Bestienmeister", "asii":"Asii", "bloodrider":"Blutreiter", "shadowsnake":"Schattenschlange", "animalmagician":"Tierzauberer", "elementalist":"Elementarist", "circleelementalist":"Elementarist des Zirkels", "firecaller":"Feuerrufer", "masterofstone":"Steinmeister", "tempesttamer":"Sturmbändiger", "titanchild":"Titanenkinder", "servantofrockandflame":"Diener von Fels und Flamme", "explorer":"Entdecker", "searcherofforefathers":"Ahnensucher", "truthseeker":"Wahrheitsfinder", "wavewalker":"Wogenwanderer", "faithwarrior":"Glaubenskrieger", "baruopriest":"Baruo-Priester", "whitewatcher":"Weißer Wächter", "ghosttearer":"Geistreißer", "shieldmaid":"Schildmaid", "glow_walker":"Glutgänger", "grimman":"Grimmanswachen", "cervaritam":"Cervaritam", "moonwolf":"Mondwolf", "corsairpriest":"Korsarenpriester", "wingguardian":"Schwingenwächter", "border_crosser":"Grenzgänger", "westergrom_resister":"Westergromer Widerständler", "farn_ranger":"Farnischläufer", "tree_settler":"Baumsiedler", "healer":"Heiler", "lifeguardian":"Lebenswächter", "potionmaster":"Trankmeister", "delarain":"Delarain", "ghosthealer":"Geistheiler", "priesthelphand":"Priester der Helfenden Hand", "circlesecondhouse":"Zirkelmagier des zweiten Hauses", "inquisitor":"Inquisitor", "honorguard":"Ehrwächter", "voice_of_ghosts":"Stimme der Geister", "nighthawk":"Nachtfalke", "fighter":"Kämpfer", "weaponsmaster":"Waffenmeister", "fameseeker":"Ruhmsucher", "fang":"Reißzahn", "clanwarrior":"Klankrieger", "sarnburg_defender":"Sarnburger Wehrstreiter", "martial_artist":"Kampfkünstler", "monk_red_phoenix":"Mönch des Roten Phönix", "mountainmonk":"Bergmönch", "circle_student":"Schüler des Kreises", "cultist":"Kultist", "herold_of_doom":"Untergangsverkünder", "ronite":"Ronite", "disciple_dragonfish":"Jünger des Drachenfisch", "lyxapriest":"Lyxa-Priester", "scout":"Kundschafter", "shadowrunner":"Schattenläufer", "seahawk":"Seefalke", "treetopscout":"Wipfelspäher", "pathfinder":"Wegfinder", "sleeples_rider":"Reiter der Schlaflosen", "flamefinder":"Flammenfinder", "magicmediator":"Magischer Unterhändler", "mediator":"Mediator", "discipleoflyxa":"Jünger von Lyxa", "desertsage":"Wüstenweiser", "goden":"Goden", "esmoda_mediator":"Esmodanische Unterhändler", "inspektor_of_symbols":"Inspektor der Zeichen", "mystic":"Mystiker", "deepseeker":"Tiefensucher", "stonefather":"Steinvater/-Mutter", "firedancer":"Feuertänzer", "mysticwarrior":"Mystischer Krieger", "skeftamagi":"Skeftamagi", "bladedancer":"Klingentänzer", "runewarrior":"Runenkrieger", "firemercenary":"Feuersöldner", "lorepriest":"Priester des Wissens", "drakeguardian":"Drakenwächter", "keeperofsecrets":"Hüter der Geheimnisse", "discipleofrahidis":"Jünger Rahidis", "adeshbid":"Adeshbid", "scriptseeker":"Schriftensucher", "yonnuspriest":"Yonnus-Priester", "flying_snake":"Fliegende Schlange", "singer_of_truth":"Wahrsängerinnen", "intriguer":"Ränkeschmied", "legendsinger":"Legendensänger", "waveenvoy":"Wogenbote", "gutterprince":"Gossenprinz", "silvershadow":"Silberschatten", "wise_pusa":"Weise von Pusa", "warrior":"Recke", "wyrmbannknight":"Ritter des Wyrmbann", "swordjudge":"Schwertrichter", "bladeguardian":"Klingenwächter", "sipahi":"Sipahi", "disciple_jord":"Jünger Jords", "kantioku":"Kantioku", "spiderofficer":"Offizier der Spinne", "shadowblade":"Schattenklinge", "protector":"Protector", "streetblade":"Straßenklinge", "stormcorsar":"Sturmkorsar", "preserver_of_web":"Bewahrer des Gewebes", "caransassassin":"Carans Assassinen", "showman":"Schausteller", "minstrel":"Minnesänger", "bard":"Sangesgeselle", "jester":"Hofnarr", "rogue":"Schurke", "goldhand":"Goldhand", "wallstriker":"Mauerstürmer", "trapmaster":"Fallenmeister", "soulguide":"Seelenführer", "galstarsinger":"Galstarsänger", "augur":"Auguren", "ghostseeker":"Geistsucher", "enlightenedone":"Erleuchteter", "animalleader":"Tierführer", "monkeyhand":"Affenhand", "butterflydancer":"Schmetterlingstänzer", "pigeonking":"Taubenkönig", "transformer":"Verwandler", "animalformer":"Tierverwandler", "warlock":"Hexer", "aurifer":"Aurifer", "circlefifthhouse":"Zirkelmagier des fünften Hauses", "ranger":"Waldläufer", "desertranger":"Sandläufer", "tunnelguardian":"Tunnelwächter", "beastcaller":"Bestienrufer", "meng_shou":"Meng Shou", "qin_shou":"Qin Shou", "wandererpriest":"Wanderpriester", "stormcaller":"Sturmrufer", "lunarseeker":"Lunare Sucher", "hammerpriest":"Hammerpriester", "druid":"Druide", "moonshaman":"Mondschamane", "vordanshield":"Vordans Schilde", "servantofape":"Diener des Affen", "zaruszpriestshaman":"Zarusz-Priesterschamane", "drugonjourneyma":"Drugongeselle","wondermaker":"Wunderwerker", "firnbezwinger":"Firnbezwinger", "athanorier":"Athanorier", "daugther_maker":"Tochter des Schaffens","gulong":"Gulong","dakardsmyr":"Dakardsmyr","aitushar":"Aitushar","mertstaedt":"Mertalischer Städtebund","dalmreich":"Dalmarisches Reich","elyrrose":"Elyrea - Rosenorden","elyrvolk":"Elyrea - Volk","furgand":"Furgand","immersomm":"Immersommeralben","jagodien":"Jagodien","jagodsklav":"Jogodai - Sklaven","jagodstamm":"Jogodai - Stammesangehöriger","midstad":"Midstad","nyrdfing":"Nyrdfing","patalis":"Patalis","selenia":"Selenia","teleshai":"Teleshai","termark":"Termark","tirdurghachan":"Tir Durghachan","unreich":"Unreich","vaigarr":"Vaigarr","waechter":"Wächterbund","westergrom":"Westergrom","wintholt":"Wintholt","zwingard":"Zwingard","arkuri":"Arkuri", "frynjord":"Frynjord",  "raugarr":"Raugarr", "sadu":"Sadu", "schwertadel":"Schwertalben - Adel", "schwertvolk":"Schwertalben - Volk", "zhoujiang":"Zhoujiang", "daemmeralb":"Dämmeralben", "gotmarkut":"Gotor, Marakatam und Kutakina",	"mahaluu":"Mahaluu", "piriwatu":"Piriwatu", "schaschbar":"Schaschbar", "utarti":"Utarti", "ashurmazaan":"Ashurmazaan", "badashan":"Badashan", "chorrash":"Chorrash", "demerai":"Demerai", "farukhur":"Farukhur", "fedirin":"Fedirin", "feuerlauf":"Feuerläufer", "keshabid":"Keshabid", "pashtar":"Pashtar", "shahandir":"Shahandir", "tarr":"Tarr", "turubar":"Turubar", "keshubim":"Keshubim", "kungaitan":"Kungaitan", "porukala":"Porukala", "puntani":"Puntani", "strominseln":"Stromlandinseln - Inseln", "stromsiprangu":"Stromlandinseln - Siprangu", "afali":"Afali", "albseebund":"Albischer Seebund", "anuu":"Anuu", "borombri":"Borombri", "ioria":"Ioria","schaedel":"Schädelkorsaren","custom":"Frei erschaffen","eremits":"Einsiedler","academics":"Gelehrte","ragtag":"Gesindel","largefarm":"Großbauern","nobility":"Hochadel","craftsmen":"Handwerker","courtier":"Höflinge",
+    "farmer":"Kleinbauern","warrior":"Kriegsvolk","artists":"Künstler","gentry":"Landadel","magister":"Magistrale","priests":"Priester","traveler":"Reisende","sailor":"Seefahrer","wizard":"Zauberer","alben":"Alb","gnome":"Gnom","human":"Mensch","varg":"Varg","dwarf":"Zwerg","FLASH":"Der Blitz","OMEN":"Omen des Schwarzen Mondes","SIGHT":"Das Zweite Gesicht","TRABANT":"Freundschaft des Trabanten","GAMBLER":"Der Spieler","RICHMAN":"Gunst des Reichen Mannes","MOONPOWER":"Segen der Mondkraft","BLOODMOON":"Blutiges Antlitz des Mondes","GHOSTTHOUGHT":"Geist der Gedanken","ROCK":"Der Fels","reputation":"Ansehen","status":"Stand","contacts":"Kontakte","wealth":"Vermögen","creature":"Kreatur","mentor":"Mentor","rank":"Rang","refuge":"Zuflucht","entourage":"Gefolge","relic":"Relikt","attractive":"Attraktivität","goodhearing":"Scharfes Gehör","lowlight":"Dämmersicht","senseorient":"Orientierungssinn","resistpoison":"Giftresistenz","literate":"Literat","focusregen":"Erhöhte Fokusregeneration","friendfire":"Erwählter der Feuerwesen","priest":"Priester"};
+    return translations[termToTranslate];
+}
 
 </script>
