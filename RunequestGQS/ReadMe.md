@@ -2,6 +2,10 @@
 
 At the top of each version of the sheet is a settings cog if this is clicked there are check  boxes to select which version of the sheet to display.  This will allow for selection of the sheet displayed if for some reason this settings in the Gamer Detaild fail.
 
+## If have a pre-existing Qucik Start from before the full sheet was added the only thing that will transfer is characterisitcs.
+## If you are open the full release versionof the sheet you must allow it to finish adding skills before you close it.  If you do not the skills will be added again.
+
+
 ## Quick Start
 
 This is for the Qucik Start only the category modifiers arenot calculated and is intended only for one shots to demo the new system
