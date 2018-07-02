@@ -4,6 +4,32 @@
 ## Tell YOUR story
 
 ### Changelog
+### 1.9.8 on 2018 May 31st
+* Default Advantage for NPCs on Primary attribute 1 & 3 fixed
+	- Was the same attribute name, fixed so each seperate
+* Legendary Item display on a new sheet creation by default fixed
+	- Toggled it to "hide" instead of "show"
+
+### 1.9.7 on 2018 May 27th
+* Made NPC initiative rolls go to the tracker
+	- Oops, not sure how I let that slip through
+
+### 1.9.6 on 2018 May 14th
+* Resist Rolls Updated
+	- Made Resist Roll buttons next to Speed (to match what was on NPC section)
+	- Updated look of Speed section on character sheet
+
+### 1.9.5 on 2018 May 13th
+* Sheet Type Selection added (and lots of backend coding)
+	- Pick between: Primary Character, NPC/Summons, Alternate Form Tier 1 or 2, Companion Tier 1, 2, or 3
+	- Changes the calculations for Attribute Points & Feat points based on what is selected
+	- Adds some entry fields were applicable (Companion Tier 3 Feat Points Granted)
+	- For NPC, shows a completely different sheet for "Quick" build (useful for summons as well)
+
+### 1.9.3 on 2018 May 10th
+* Fix for "Other Actions" section & Effects
+	- On Load function for Other Actions wasn't doing the Power Levels Correctly
+	- Forgot to make Effects dice explode (all dice in OL explode!!)
 
 ### 1.9.2 on 2018 May 8th
 * Added Whisper to GM option
