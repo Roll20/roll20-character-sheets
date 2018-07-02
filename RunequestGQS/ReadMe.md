@@ -29,8 +29,12 @@ STR and DEX minimuns are not currently supported this maybe added in a future re
 
 ## Version 02.07.2018
 Fixes to  skill roll and melee templates becuase of site changes to css
+
 Fixed no damage shown if exact skill is rolled.
+
 Fixed crush damage on special
-emoved border highlighting on damageR
+
+Removed border highlighting on damage
+
 Fixed some of the fumble calculations (characteristc rolls and weapons).
 
