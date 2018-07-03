@@ -8437,6 +8437,12 @@
                 update["repeating_attack_" + attackid + "_spelllevel"] = lvl;
             }
 
+            if(v["repeating_spell-" + lvl + "_" + spellid + "_spell_ability"] != v.spellcasting_ability) {
+                update["repeating_attack_" + attackid + "_savedc"] = "(" + v["repeating_spell-" + lvl + "_" + spellid + "_spell_ability"] + "8+@{pb})";
+            } else if (v["repeating_spell-" + lvl + "_" + spellid + "_spell_ability"]) {
+                update["repeating_attack_" + attackid + "_savedc"] = "(@{spell_save_dc})";
+            }
+
             if(v["repeating_spell-" + lvl + "_" + spellid + "_spellname"] && v["repeating_spell-" + lvl + "_" + spellid + "_spellname"] != "") {
                 update["repeating_attack_" + attackid + "_atkname"] = v["repeating_spell-" + lvl + "_" + spellid + "_spellname"];
             }
@@ -10546,7 +10552,48 @@
         update_globalskills(function() {
             update_globalsaves(function() {
                 update_globalattack(function() {
-                    update_globaldamage(doneupdating);
+                    update_globaldamage(function() {
+                        getAttrs(["npc", "npcspellcastingflag", "spellcasting_ability"], function(v) {
+                            if(v.npc == "1" && v.npcspellcastingflag == "1") {
+                                getSectionIDs("npctrait", function(secIds) {
+                                    var getList = [];
+                                    _.each(secIds, function(x) {
+                                        getList.push("repeating_npctrait_" + x + "_name");
+                                        getList.push("repeating_npctrait_" + x + "_desc");
+                                    });
+                                    getAttrs(getList, function(traits) {
+                                        var update = {};
+                                        if(v.spellcasting_ability == "0*") {
+                                            var spellSec = "";
+                                            update.spellcasting_ability = "@{intelligence_mod}+";
+                                            _.each(secIds, function(traitId) {
+                                                if(traits["repeating_npctrait_" + traitId + "_name"].toLowerCase().includes("spellcasting.")) spellSec = traitId;
+                                            });
+                                            if(spellSec  != "") {
+                                                var spellcasting = traits["repeating_npctrait_" + spellSec + "_desc"].toLowerCase();
+                                                var lastIndex = 9999;
+                                                _.each(["intelligence", "wisdom", "charisma"], function(ability) {
+                                                    var found = spellcasting.indexOf(ability);
+                                                    if(found > -1 && found < lastIndex) {
+                                                        lastIndex = found;
+                                                        update.spellcasting_ability = "@{" + ability + "_mod}+";
+                                                    }
+                                                });
+                                            }
+                                        }
+                                        setAttrs(update, function() {
+                                            update_challenge();
+                                            doneupdating();
+                                        });
+                                    });
+                                })
+                            } else if(v.npc != "1") {
+                                doneupdating();
+                            } else {
+                                doneupdating();
+                            }
+                        });
+                    });
                 });
             });
         });
