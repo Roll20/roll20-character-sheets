@@ -9,8 +9,18 @@ New features are a minor version.
 
 Bugs fall into the patch category.
 
+## Todo
+ - fix NPC sheets, or remove completly
+ - alle Inhalte Kompendium aufwärts
+ - automatische Berechnungen prüfen / anzeigen was automatisch ist
 
-## 1.0.0
+## 1.1.0 - 04.07.2018
 
 ### Features
- - Creation of the new Character Sheet
+ - Creation of Changelog
+ - Added global option to send rolls to everyone/GM/self
+ - Added global option to make a roll with or with mod
+
+### Bugfixes
+ - fixed the Liturgie & Ritual visual optics
+ - minor unnoted bugfixes
