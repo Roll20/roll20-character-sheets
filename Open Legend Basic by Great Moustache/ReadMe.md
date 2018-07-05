@@ -4,6 +4,66 @@
 ## Tell YOUR story
 
 ### Changelog
+### 1.9.8 on 2018 May 31st
+* Default Advantage for NPCs on Primary attribute 1 & 3 fixed
+	- Was the same attribute name, fixed so each seperate
+* Legendary Item display on a new sheet creation by default fixed
+	- Toggled it to "hide" instead of "show"
+
+### 1.9.7 on 2018 May 27th
+* Made NPC initiative rolls go to the tracker
+	- Oops, not sure how I let that slip through
+
+### 1.9.6 on 2018 May 14th
+* Resist Rolls Updated
+	- Made Resist Roll buttons next to Speed (to match what was on NPC section)
+	- Updated look of Speed section on character sheet
+
+### 1.9.5 on 2018 May 13th
+* Sheet Type Selection added (and lots of backend coding)
+	- Pick between: Primary Character, NPC/Summons, Alternate Form Tier 1 or 2, Companion Tier 1, 2, or 3
+	- Changes the calculations for Attribute Points & Feat points based on what is selected
+	- Adds some entry fields were applicable (Companion Tier 3 Feat Points Granted)
+	- For NPC, shows a completely different sheet for "Quick" build (useful for summons as well)
+
+### 1.9.3 on 2018 May 10th
+* Fix for "Other Actions" section & Effects
+	- On Load function for Other Actions wasn't doing the Power Levels Correctly
+	- Forgot to make Effects dice explode (all dice in OL explode!!)
+
+### 1.9.2 on 2018 May 8th
+* Added Whisper to GM option
+	- Global button to make any roll on the sheet go to the GM only
+	- Public to send to public
+
+### 1.9.1 on 2018 May 8th
+* Made Background Tab for the sheet
+	- Moved Character Info & Beliefs, Goals, Instincts Sections
+	- Added more data fields for the Character Info section
+* GUI Display at Top
+	- Added what type of sheet it is for future updates
+	- Moved OL logo up and smaller along with version
+	- Hidden groundwork for a tab button for whispering rolls to the GM
+
+### 1.9.0 on 2018 May 7th
+* Massive update to Favored & Other Actions sections
+	- Select if action is an Attack (Damaging or Bane), Boon, or Effect
+	- Effect isn't quite fully functional yet in that there is a pop-up that doesn't do anything, but will still roll the dice you choose
+* Backgrounds for the borders updated
+	- Also white background for things sent to chat
+* Prep work for NPC/Alt Form/Companion tabs
+	- Nothing functioning on the user side yet
+* Options Tab added
+	- Just information for now, functionality added in next update
+* Note added to Effects in Actions to clarify what it is and about the pop-up
+
+### 1.8.9.99 on 2018 April 8th
+* Preview and testing of alternate borders
+	- Will be implemented further in the next release
+
+### 1.8.9.98a on 2018 March 10th
+* Fixed Speed Calculations if Mighty is 0
+    - Was halving speed even if no heavy items
 
 ### 1.8.9.98 on 2018 March 4th
 * Fixed a new character sheet not auto calculating Feat & Attribute Point Totals
