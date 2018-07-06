@@ -73,7 +73,8 @@ textarea {
 .sheet-initiative-container select,
 .sheet-class-info input:not([type='checkbox']):not([type=radio]):not([readonly=true]),
 .sheet-class-info select,
-.sheet-arc-shield input{
+.sheet-arc-shield input,
+.sheet-disclaimer{
     background-color:rgba(0, 0, 0,0.75) !important;
     border-radius:5px !important;
     box-shadow:0px 0px 5px #2dafeb,0px 0px 20px #0a4ba1 !important;
@@ -155,8 +156,8 @@ label:hover,
 }
 .sheet-starfinder {
     display:grid;
-    grid-template-columns:[name-container-start pc-start settings-start] 160px [name-container-end nav-start]240px [nav-end] minmax(380px,1fr)[pc-end settings-end];
-    grid-template-rows:[name-container-start nav-start] 60px [name-container-end settings-start nav-end pc-start]120px 0px auto[pc-end settings-end]0px;
+    grid-template-columns:[name-container-start pc-start disclaimer-start settings-start] 160px [name-container-end nav-start]240px [nav-end] minmax(380px,1fr)[pc-end disclaimer-end settings-end];
+    grid-template-rows:[name-container-start nav-start] 60px [name-container-end settings-start nav-end pc-start]120px 0px auto[pc-end settings-end disclaimer-start] auto [disclaimer-end] 0px;
     grid-gap:20px;
     --wedge:7px;
     --backcolor:#01101c;
@@ -167,6 +168,22 @@ label:hover,
     --box-shadow:0px 0px 10px 2px #64BAC9;
     --circlecolor:#707070;
     margin-left:5px;
+}
+.sheet-starfinder .sheet-disclaimer{
+    grid-area:disclaimer;
+    text-shadow:none;
+    color:white;
+    background-color:black !important;
+    border:0px;
+}
+.sheet-starfinder span.sheet-disclaimer{
+    opacity:0;
+    z-index:-5;
+    height:auto;
+}
+.sheet-starfinder textarea.sheet-disclaimer{
+    height:100%;
+    min-height:100%;
 }
 .sheet-starfinder .sheet-section:not(.sheet-initiative-container) {
     font-size:10pt;
@@ -219,7 +236,7 @@ label:hover,
     grid-area:pc;
     position:relative;
     grid-template-columns: [name-container-start tab-container-start header-start]160px [name-container-end ] minmax(292px,1fr) [header-end] 20px [in-play-start] 375px [in-play-end tab-container-end];
-    grid-template-rows: [header-start in-play-start] 160px [header-end in-play-end] 20px [tab-container-start]  1090px [tab-container-end];
+    grid-template-rows: [header-start in-play-start] 160px [header-end in-play-end] 20px [tab-container-start]  auto [tab-container-end];
 }
 .sheet-starfinder > .sheet-pc *,
 .sheet-starfinder > .sheet-settings * {
@@ -296,12 +313,16 @@ label:hover,
     background-color:white;
 }
 .sheet-border.sheet-top-right{
+    -webkit-align-self:start;
+    -webkit-justify-self:end;
     align-self:start;
     justify-self:end;
     top:calc(var(--wedge) / 2 *1.41);
     left:2px;
 }
 .sheet-border.sheet-bottom-left{
+    -webkit-align-self:end;
+    -webkit-justify-self:start;
     align-self:end;
     justify-self:start;
     top:calc(var(--wedge) / 2 *-1.41);
@@ -706,8 +727,8 @@ input[type=radio].sheet-tab-button.sheet-options:checked ~ .sheet-page.sheet-opt
 	display:grid;
 }
 .sheet-page.sheet-core {
-    grid-template-columns:[attribute-start skills-start initiative-start] 245px [attribute-end initiative-end] 20px [health-start] 5px [skills-end] 20px [weapons-start equipment-start] 147px [health-end] 20px [armor-start] 93px [weapons-end equipment-end] 20px [abilities-start] 68px [armor-end] 20px [saves-start xp-start] 182px [xp-end saves-end abilities-end];
-    grid-template-rows:[initiative-start xp-start] 20px [initiative-end xp-end] 20px [attribute-start armor-start saves-start health-start] 158px [health-end attribute-end armor-end saves-end] 20px [skills-start abilities-start weapons-start] minmax(20px,auto) [weapons-end] 20px [equipment-start] 1fr [abilities-end equipment-end skills-end];
+    grid-template-columns:[four-start skills-start initiative-start] 271.667px [initiative-end skills-end] 20px [weapons-start equipment-start] 1fr [weapons-end equipment-end] 20px [abilities-start xp-start] 1fr [xp-end abilities-end];
+    grid-template-rows:[initiative-start xp-start] 20px [initiative-end xp-end] 20px [four-start] 158px [four-end] 20px [skills-start abilities-start weapons-start] minmax(20px,auto) [weapons-end] 20px [equipment-start] 1fr [abilities-end equipment-end skills-end];
     grid-gap:0px;
     align-items:start;
 }
@@ -721,6 +742,12 @@ input[type=radio].sheet-tab-button.sheet-options:checked ~ .sheet-page.sheet-opt
     grid-area:label;
     color:var(--backcolor);
     font-weight:700!important;
+}
+.sheet-page.sheet-core .sheet-four-row{
+    grid-area:four;
+    display:grid;
+    grid-template-columns:[attribute-start] 245px [attribute-end] 1fr [health-start] 171px [health-end] 1fr [armor-start] 182px [armor-end] 1fr [saves-start] 182px [saves-end];
+    grid-template-rows:[attribute-start health-start armor-start saves-start] auto [attribute-end health-end armor-end saves-end];
 }
 .sheet-xp-container .sheet-currxp{
     grid-area:current;
@@ -756,6 +783,7 @@ input[type=radio].sheet-tab-button.sheet-options:checked ~ .sheet-page.sheet-opt
 .sheet-ship .sheet-bottom-section > .sheet-section-container,
 .sheet-ship > .sheet-section-container,
 .sheet-page > .sheet-section-container,
+.sheet-page .sheet-four-row > .sheet-section-container,
 .sheet-settings > .sheet-section-container,
 .sheet-page.sheet-spells > div > .sheet-section-container,
 .sheet-page.sheet-spells > div > .sheet-spell-column > .sheet-section-container{
@@ -3240,35 +3268,17 @@ input.sheet-cr{
     text-shadow:0px 0px 10px #49f5ff,0px 0px 20px #6bf7ff;
     line-height:1.4em;
 }
-.sheet-rolltemplate-sf_generic a[href^="!"],
-.sheet-rolltemplate-sf_attack a[href^="!"],
-.sheet-rolltemplate-sf_spell a[href^="!"],
-.sheet-rolltemplate-sf_ship_attack a[href^="!"],
-.sheet-rolltemplate-sf_generic a[href^="~"],
-.sheet-rolltemplate-sf_attack a[href^="~"],
-.sheet-rolltemplate-sf_spell a[href^="~"],
-.sheet-rolltemplate-sf_ship_attack a[href^="~"],
-.sheet-rolltemplate-sf_generic a[href^="https"],
-.sheet-rolltemplate-sf_attack a[href^="https"],
-.sheet-rolltemplate-sf_spell a[href^="https"],
-.sheet-rolltemplate-sf_ship_attack a[href^="https"]{
+.sheet-rolltemplate-sf_generic a,
+.sheet-rolltemplate-sf_attack a,
+.sheet-rolltemplate-sf_spell a{
     background-color:transparent !important;
     border:0px transparent !important;
     color:white;
     text-shadow:0px 0px 10px #49f5ff,0px 0px 20px #6bf7ff;
 }
-.sheet-rolltemplate-sf_generic a[href^="!"]:hover,
-.sheet-rolltemplate-sf_attack a[href^="!"]:hover,
-.sheet-rolltemplate-sf_spell a[href^="!"]:hover,
-.sheet-rolltemplate-sf_ship_attack a[href^="!"]:hover,
-.sheet-rolltemplate-sf_generic a[href^="~"]:hover,
-.sheet-rolltemplate-sf_attack a[href^="~"]:hover,
-.sheet-rolltemplate-sf_spell a[href^="~"]:hover,
-.sheet-rolltemplate-sf_ship_attack a[href^="~"]:hover,
-.sheet-rolltemplate-sf_generic a[href^="https"]:hover,
-.sheet-rolltemplate-sf_attack a[href^="https"]:hover,
-.sheet-rolltemplate-sf_spell a[href^="https"]:hover,
-.sheet-rolltemplate-sf_ship_attack a[href^="https"]:hover{
+.sheet-rolltemplate-sf_attack a:hover,
+.sheet-rolltemplate-sf_spell a:hover,
+.sheet-rolltemplate-sf_ship_attack a:hover{
     text-shadow:0px 0px 10px #f86f1a,0px 0px 20px #fc6507;
 }
 .sheet-rolltemplate-sf_generic .inlinerollresult.fullcrit,
