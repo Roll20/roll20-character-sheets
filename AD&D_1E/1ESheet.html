@@ -273,7 +273,7 @@
 								<td style="width:22%;" colspan="2"><input type="text" name="attr_WeaponName" title="@{repeating_weapon_$X_WeaponName}" placeholder="Enter Weapon" style="width:100%;" /><br>Weapon</td>
 								<td style="width:11%;"><input type="text" class="sheet-input-small" name="attr_ToHitBonus" title="@{repeating_weapon_$X_ToHitBonus}" value="0" /><br>To-Hit Bonus</td>
 								<td colspan="2" style="width:11%;"><input type="text" class="sheet-input-small" name="attr_MagicBonus" title="@{repeating_weapon_$X_MagicBonus}" value="0" /><br>Magic Bonus</td>
-								<td colspan="2" style="width:11%;"><input type="text" class="sheet-input-small" name="attr_DmgBonus" title="@{repeating_weapon_$X_DmgBonus}" value="0" /><br>DMG Bonus</td>
+								<td colspan="2" style="width:11%;"><input type="text" class="sheet-input-small" name="attr_AttackDmgBonus" title="@{repeating_weapon_$X_AttackDmgBonus}" value="0" /><br>DMG Bonus</td><input type="hidden" name="attr_DmgBonus" value="0" />
 								<td><b title="Include '/w gm to-hit AC table or THACO'?">/w gm?</b><br>
 									<select name="attr_whisper_to-hit" style="width:100%; height:2em;">
 										<option value="&#x00A;/w gm &amp;{template:attacks} {{name=@{character_name}}} {{subtag=To Hit Armor Class}} {{ToHitAC-10to0=[[ @{THAC-10} ]]|[[ @{THAC-9} ]]|[[ @{THAC-8} ]]|[[ @{THAC-7} ]]|[[ @{THAC-6} ]]|[[ @{THAC-5} ]]|[[ @{THAC-4} ]]|[[ @{THAC-3} ]]|[[ @{THAC-2} ]]|[[ @{THAC-1} ]]|[[ @{THAC0} ]]}} {{ToHitAC1to10=[[ @{THAC0} ]]|[[ @{THAC1} ]]|[[ @{THAC2} ]]|[[ @{THAC3} ]]|[[ @{THAC4} ]]|[[ @{THAC5} ]]|[[ @{THAC6} ]]|[[ @{THAC7} ]]|[[ @{THAC8} ]]|[[ @{THAC9} ]]|[[ @{THAC10} ]] }}" selected="">Table</option>
@@ -281,7 +281,7 @@
 										<option value="&nbsp;">no</option>
 									</select>
 								</td>
-								<td><textarea name="attr_macro-text" title="@{repeating_weapon_$X_macro-text}" class="sheet-macro-text" style="width:96%; margin:5px 0 0 0;">&{template:attacks} {{name=@{character_name}}} {{subtag=@{WeaponName}}} {{attack1=[[1d20 + @{ToHitBonus}[BON] + @{MagicBonus}[MAG] + ?{To Hit Modifier?|0}[MOD]) ]]}} {{damage1vsSM=[[@{DamageSmallMedium} + @{DmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{damage1vsL=[[@{DamageLarge} + @{DmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{WeaponNotes=@{WeaponNotes}}} @{whisper_to-hit}</textarea><br>Macro-Text</td>
+								<td><textarea name="attr_macro-text" title="@{repeating_weapon_$X_macro-text}" class="sheet-macro-text" style="width:96%; margin:5px 0 0 0;">&{template:attacks} {{name=@{character_name}}} {{subtag=@{WeaponName}}} {{attack1=[[1d20 + @{ToHitBonus}[BON] + @{MagicBonus}[MAG] + ?{To Hit Modifier?|0}[MOD]) ]]}} {{damage1vsSM=[[@{DamageSmallMedium} + @{AttackDmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{damage1vsL=[[@{DamageLarge} + @{AttackDmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{WeaponNotes=@{WeaponNotes}}} @{whisper_to-hit}</textarea><br>Macro-Text</td>
 							</tr>								
 							<tr>
 								<td><input type="text" class="sheet-input-small" name="attr_DamageSmallMedium" title="@{repeating_weapon_$X_DamageSmallMedium}" value="0" /><br>DMG vs S/M</td>
@@ -708,7 +708,10 @@
 			<div class="sheet-footer">
 				<div class="sheet-table sheet-text-small">
 					<div class="sheet-table-row">
-						<span class="sheet-data sheet-center">Original Author: Adam Ness | Contributions by: Vince, & Roll20 Community. | Version <i>11.24.17'</i></span>
+						<span class="sheet-data sheet-center">Original Author: Adam Ness | Contributions by: Vince, &amp; Roll20 Community. | sheet ver. <input name="attr_sheet_version" type="text" value="0" class="sheet-version" readonly="">
+							&nbsp;<i>4.23.18</i>&nbsp;
+							Recalc: <input name="attr_recalc1" type="checkbox" title="RECALC" style="width: 1.25em;">
+						</span>
 					</div>
 					<div class="sheet-table-row">
 						<span class="sheet-data sheet-center">Questions/feedback? Please use the Character Sheets forum:<input type="text" style="border:none; line-height:12px; width:256px;" value="https://app.roll20.net/forum/category/277980" /></span>		
@@ -718,6 +721,7 @@
 					Background:
 					<input type="checkbox" class="sheet-useBackground" name="attr_background" value="1" title="No background image." checked="checked" />Off
 					<input type="checkbox" class="sheet-useBackground" name="attr_background" value="2" title="Enable background image." />On
+					</div>
 				</div>
 			</div>			
 		
@@ -1503,5 +1507,91 @@ on('change:normal_load change:heavy_load change:very_heavy_load change:max_load 
 	else {setAttrs({current_encumbrance:3}); console.log("===== Encumbrance is Max =====");}
    });
 });
+
+var Sheet = Sheet || (function() {
+
+	var version= 1.10,
+	Debug = false,
+
+// copy DmgBonus value to AttackDmgBonus
+	dmgSwap = function() {
+		getSectionIDs("repeating_weapon", function(idarray) { //Get oldSectionID
+			var update={};
+			_.each(idarray, function(currentID, i) {
+				getAttrs(['repeating_weapon_' + currentID + '_DmgBonus'], function(v) { //Get oldAttribute from FieldID
+					update['repeating_weapon_' + currentID + '_AttackDmgBonus'] = v['repeating_weapon_' + currentID + '_DmgBonus']; //replaces old attribute value with new
+					setAttrs(update,{silent:true}); //Update
+				});
+			});
+		});
+// replace all instances of @{DmgBonus} with @{AttackDmgBonus} in macro-text
+		var update = {}, attrs = [];
+		getSectionIDs("repeating_weapon", function(idarray) {
+			_.each(idarray, function(itemid) {
+				attrs.push("repeating_weapon_" + itemid + "_macro-text");
+			});
+			getAttrs(attrs, function(v) {
+				_.each(idarray, function(id) {
+                    update["repeating_weapon_" + id + "_macro-text"] = v["repeating_weapon_" + id + "_macro-text"].replace(new RegExp('@{DmgBonus}', 'g'), '@{AttackDmgBonus}');
+				});
+				setAttrs(update,{silent:true});
+			});
+		});
+	},
+
+/* recalculateSheet */
+	recalculateSheet = function(oldversion) {
+		if (oldversion < 0.1) {
+//call your functions here
+		dmgSwap();
+		}
+	},
+	
+/* checkForUpdate looks at current version of page in
+ * sheet_version and compares to code Sheet.version calls
+ * recalulateSheet if versions don't match or if recalculate
+ * button was pressed. */
+	checkForUpdate = function() {
+		getAttrs(["sheet_version","sheet_forcesync","recalc1"],function(v){
+			var setter={},currVer=0,setAny=0,recalc=false;
+			currVer=parseFloat(v["sheet_version"],10)||0;
+			console.log("Current sheet data version:"+currVer+", Sheet code version:" + version );
+			
+			if ( currVer!== version ) {
+				recalc=true;
+				setter["sheet_version"]= version;
+				setAny=1;
+			}
+			if (v["recalc1"] && v["recalc1"]!="0" ) {
+				currVer=-1;
+				recalc=true;
+				setter["recalc1"]=0;
+				setAny=1;
+			}
+			if (v["sheet_forcesync"] && v["sheet_forcesync"]!="0" ) {
+				currVer=-1;
+				recalc=true;
+				setter["sheet_forcesync"]=0;
+				setAny=1;
+			}
+			if (setAny) {
+				 setAttrs( setter);
+			}
+			if (recalc) {
+				recalculateSheet(currVer);
+			}
+		});
+	};
+	return {
+		version:version,
+		checkForUpdate:checkForUpdate,
+		dmgSwap:dmgSwap
+	};
+}());
+
+//sheet
+on("sheet:opened",function() {Sheet.checkForUpdate();});
+on("change:recalc1",function() {Sheet.checkForUpdate();});
+console.log("...recalc checking for update");
 
 </script>

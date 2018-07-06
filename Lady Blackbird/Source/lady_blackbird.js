@@ -1,6 +1,7 @@
 "use strict";
 const characterData = {
 	"lady blackbird": {
+		desc: 'An Imperial noble, in disguise, escaping an arranged marriage so she can be with her lover',
 		keysecret: [
 			{
 				name: 'Key of the Paragon',
@@ -47,6 +48,7 @@ const characterData = {
 		],
 	},
 	"naomi bishop": {
+		desc: 'Former pit-fighter and bodyguard to Lady Blackbird',
 		keysecret: [
 			{
 				name: 'Key of the Guardian',
@@ -89,6 +91,7 @@ const characterData = {
 		],
 	},
 	"cyrus vance": {
+		desc: 'An ex-Imperial soldier turned smuggler and soldier-of-fortune, Captain of The Owl',
 		keysecret: [
 			{
 				name: 'Key of the Commander',
@@ -131,6 +134,7 @@ const characterData = {
 		],
 	},
 	"kale arkam": {
+		desc: 'A burglar and petty sorcerer, first mate and mechanic of The Owl',
 		keysecret: [
 			{
 				name: 'Key of Greed',
@@ -173,6 +177,7 @@ const characterData = {
 		],
 	},
 	"snargle": {
+		desc: 'A goblin sky-sailor and pilot of The Owl',
 		keysecret: [
 			{
 				name: 'Key of the Daredevil',
@@ -257,9 +262,10 @@ autoExpandFields.forEach(name => {
 		});
 	});
 });
-on('change:char_name', event => {
+on('change:char_name', () => {
 	getAttrs(['char_name'], v => {
 		if (v.char_name.toLowerCase() in characterData) {
+			setAttrs({char_desc: characterData[v.char_name.toLowerCase()].desc});
 			fillRepeatingSectionFromData('trait', characterData[v.char_name.toLowerCase()].trait);
 			fillRepeatingSectionFromData('keysecret', characterData[v.char_name.toLowerCase()].keysecret);
 		}
