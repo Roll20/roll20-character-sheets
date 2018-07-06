@@ -26,7 +26,7 @@
 ## 1.1.0
  - 06.07.2018 
  
- ## Features 
+ ### Features 
  - Changelog wurde erstellt
  - Globale Option hinzugefügt um Proben an alle/GM/selbst zu senden 
  - Globale Option hinzugefügt um die Frage nach Modifikatoren bei Proben ein/aus zu schalten
@@ -35,9 +35,9 @@
  - Verlinkung auf Anleitung (WIP)
  - Verlinkung auf Bugtracker
  
- ## Inhalt
+ ### Inhalt
  - Allgemeine Sonderfertigkeiten & Berufsgeheimnisse aus VR02 AK ergänzt, inkl. Tooltip Verweise bei den Talenten
 
-### Bugfixes 
+ ### Bugfixes 
  - visuelle Darstellung der Liturgien und Rituale Proben im Chat behoben 
  - mehrere nicht notierte Bugfixes
