@@ -21,8 +21,6 @@ Bugs fall into the patch category.
 
 #### Kapitel 1 - Talente
  * niedrige Priorität: Integrierung von Hilfetools für Verfolgsungsjagd, Soziale Konflikte, Herumfragen, Jagd, Nahrungssuche, Recherche, Herstellung
- * hohe Priorität: Berufgeheimnisse wurden der Auswahlliste bereits hinzugefügt, Anzeige der erlernten muss noch erstellt werden
-	** alle Tooltip
  
 #### Kapitel 3 - Erweiterte Kampfregeln
  * normale Priorität: Trefferzonen-Regeln einbauen
@@ -41,10 +39,13 @@ Bugs fall into the patch category.
  - 06.07.2018 
  
  ## Features 
- - Creation of Versionlog wurde erstellt
+ - Changelog wurde erstellt
  - Globale Option hinzugefügt um Proben an alle/GM/selbst zu senden 
  - Globale Option hinzugefügt um die Frage nach Modifikatoren bei Proben ein/aus zu schalten
  - visuelle Anzeige wofür automatische Berechnungen stattfinden inkl. Tooltip mit Hinweisen, bisher nur bei Aktivierung der Kampfsonderfertigkeiten
+ - Versionsanzeige mit Verlinkung auf den Changelog
+ - Verlinkung auf Anleitung (WIP)
+ - Verlinkung auf Bugtracker
  
  ## Inhalt
  - Allgemeine Sonderfertigkeiten & Berufsgeheimnisse aus VR02 AK ergänzt, inkl. Tooltip Verweise bei den Talenten
