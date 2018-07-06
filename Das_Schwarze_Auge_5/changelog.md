@@ -6,9 +6,6 @@
 ### Überprüfung des bereits integrierten Grundregelwerks
 ### Überprüfung des bereits integrierten Bestiarium I
 ### Integrierung des Aventurischen Kompendiums
-
-#### Kapitel 1 - Talente
- * niedrige Priorität: Integrierung von Hilfetools für Verfolgsungsjagd, Soziale Konflikte, Herumfragen, Jagd, Nahrungssuche, Recherche, Herstellung
  
 #### Kapitel 3 - Erweiterte Kampfregeln
  * normale Priorität: Trefferzonen-Regeln einbauen
