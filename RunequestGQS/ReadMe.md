@@ -30,7 +30,7 @@ In the weapon section * indicates to use the mounts damage bonus and not the pla
 
 Default in the weapon section indicates that you are using a skill from the same category e.g. using Broadsword skill with a short sword.  It will halve the skill as per the rules.
 
-STR and DEX minimuns are not currently supported this maybe added in a future release.
+STR and DEX minimums are not currently supported this maybe added in a future release.
 
 ## Version 10.07.2018
 
