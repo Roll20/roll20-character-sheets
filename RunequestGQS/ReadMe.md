@@ -32,9 +32,13 @@ Default in the weapon section indicates that you are using a skill from the same
 
 STR and DEX minimuns are not currently supported this maybe added in a future release.
 
+## Version 10.07.2018
+
+Prevented skill duplication on the full sheet
+
 
 ## Version 02.07.2018
-Fixes to  skill roll and melee templates becuase of site changes to css
+Fixes to  skill roll and melee templates because of site changes to css
 
 Fixed no damage shown if exact skill is rolled.
 
