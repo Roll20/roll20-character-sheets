@@ -1,13 +1,11 @@
-# HeroSystem 6 Playable
+# HeroSystem 6e
 Character sheet for the HeroSystem 6th edition (also known as Champions years ago).
 
 *	[Overview](#overview)
 	*	[What this Character Sheet is Not](#whatitsnot)
 	*	[API Scripts](#apiscripts)
 *	[Usage](#usage)
-	*	[Turn Sequence](#turnsequence)
 	*	[Edit Mode](#editmode)
-*	[Tip & Tricks](#tips)
 *	[Pages](#pages)
 	*	[Core](#core)
 	*	[Combat](#combat)
@@ -16,7 +14,7 @@ Character sheet for the HeroSystem 6th edition (also known as Champions years ag
 *	[Adding Powers](#addingpowers)
 	*	[Special Cases](#specialcases)
 *	[Buttons](#buttons)
-*	[Sample Turn](#sample)
+*	[Sample Usage](#sample)
 
 
 
@@ -30,47 +28,21 @@ This character sheet is *not* for use in designing a character--it is only for p
 
 ### <a id="apiscripts">API Scripts</a>
 
-I would recommend using both the [Hero6Playable](https://github.com/Roll20/roll20-api-scripts/tree/master/Hero6Playable) and [Hero6Tracker](https://github.com/Roll20/roll20-api-scripts/tree/master/HeroTracker) api scripts.  The former, Hero6Playable api, was written to work with this character sheet.  The main functions it provides are to count the amount of BODY done with a normal attack, and to compute the DCV you would hit with an attack roll.  While this script is not absolutely necessary to use this character sheet, you would be losing two features that minimize the cumbersome task of dice counting and adding up of bonuses.
+	Quick note: you do NOT need the api scripts to use this sheet,
+    but I would recommend them because they add two very useful features.
+
+I would recommend using both the [HeroSystem6e](https://github.com/Roll20/roll20-api-scripts/tree/master/Hero6Playable) and [Hero6Tracker](https://github.com/Roll20/roll20-api-scripts/tree/master/HeroTracker) api scripts.  The former, HeroGames6e api, was written to work with this character sheet.  The main functions it provides are to count the amount of BODY done with a normal attack, and to compute the DCV you would hit with an attack roll.  While this script is not absolutely necessary to use this character sheet, you would be losing two features that minimize the cumbersome task of dice counting and adding up of bonuses.
 
 The second script, HeroTracker, is not directly integrated with this character sheet.  However, it is very useful in managing the Roll20 initiative tracker.
 
 You can add the two api's within a game's settings by selecting Settings / API Scripts.  Alternately, you can download and add them as custom scripts.  If you choose to do the latter, the scripts can be found here:
 
-##### [Hero6Playable](https://github.com/Roll20/roll20-api-scripts/tree/master/Hero6Playable)
+##### [HeroSystem6e](https://github.com/Roll20/roll20-api-scripts/tree/master/Hero6Playable)
 ##### [Hero6Tracker](https://github.com/Roll20/roll20-api-scripts/tree/master/HeroTracker)
 
 ## <a id="usage">Usage</a>
 
-I'm not going to go into great detail in this section.  This is supposed to be the 5 minute description of how to use the character sheet.  Detail will be in the sections that follow.
-
-The character sheet is divided into six pages: Core, Combat, Powers, Skills, Background, and Configuration.  Switching between pages is accomplished via tabs located between the header and the page content.  The configuration tab uses a gear as an icon instead of a text label.
-
-Press the **[edit](#editmode)** button to enter your character.
-
-Fields that have functionality change appearance when you hover over them.  Most have tooltips.  A list of these fields is **[here](#buttons)**.
-
-The sheet was designed to try and minimize how often you switch pages.  The **[Core](#core)** page, hopefully, has all the fields you will use when it is not your turn.  It has your DCV, your defenses, Perception rolls, etc.  The **[Combat](#combat)** page tries to have most of the offense related fields (except the attack power itself) that you will need when it is your turn.
-
-I recommend setting up how you will pay your endurance costs to suit your play style.  There are two ways to pay for endurance, and an additional way to use a reserve (charges).  The first method is to manually hit the **END** button on a power.  That will expend the resources for that one power manually.  If you use this method, you really won't be using the *Pay END* button and the *Auto* checkbox in each power will be irrelevant.  The other method of paying for endurance is to check the **Auto** checkbox within each power that you expect to use each round.  For example, if you have a force field that you have to expend END for each phase, check the **Auto** checkbox.  This ties the power to the **Pay END** button in the info section.  When you hit the **Pay END** button, every power that is both *on* and has the *Auto* checkbox checked will have its resources expended.  Note that both boxes have to be checked.  Here's a brief description why:
-
-An attack power such as a pistol might be checked as *on* because it includes a +1 OCV bonus and you want that bonus to be included in calculations.  However, you do not want the charges (ammo) expended automatically--only when you fire the gun.  So the power will be *on* for the OCV bonus, but you uncheck the *Auto* box so that you have to expend the ammo manually.
-
-A force field power should have the *Auto* button checked.  When you hit the *Pay END* button, the END for all powers that are *on* and set to *auto* will be expended.  So if your character has Flight, Force Field, a constant blast power (flame shield), a radar that costs END, and any number of other powers... all of these would be checked as *Auto*.  Now say on your phase you choose to have your flight and force field on, but not the others.  Check Flight and Force Field as *on* and uncheck the other powers (setting them *off*).  Now when you press the *Pay END* button, the endurance for Flight and Force Field will be expended, but not for the flame shield or radar.
-
-#### <a id="turnsequence">Turn Sequence</a>
-
-This is recommended only.  I'm sure you can tailor this to your own playing style.
-
-* At the beginning of the character's phase, set all powers that will be on or off (these are normally zero phase actions).
-* Press the Pay END button.  This will expend the resources for all powers that are "on".
-* Do the character's movement.
-* If the character is going to perform an attack, select any appropriate maneuver, set the range, and choose a target if appropriate.  If there are any adhoc combat modifiers, add those in the "Other Modifiers" section.
-* Press the END button for the power you're about to use (if the power is constant and you already paid the END at the start of these steps, do not manually expend the END again).
-* Use the power by pressing the power's name.  The output should appear in the chat windows.
-
-I'll repeat this in the briefest of words:  Set powers on/off, Pay END, move, make your combat choices, use the power.
-
-A **[sample turn](#sample)** is at the end of this documentation.
+The character is divided into six pages: Core, Combat, Powers, Skills, Background, and Configuration.  Switching between pages is accomplished via tabs located between the header and the page content.  The configuration tab uses a gear as an icon instead of a text label.  In this Usage section, I will not describe obvious features of the character sheet, such as the hit location chart.  That section just displays information that you should already know if you play HeroSystem games.  Instead, I will concentrate on describing those section that contain die rolls or other interactive features of the character sheet.
 
 #### <a id="editmode">Edit Mode</a>
 
@@ -79,16 +51,6 @@ The character sheet has two modes:  Play Mode and Edit Mode.  You can switch bet
 In Play Mode, most fields are display only and roll buttons are active.  The status fields (STUN/BODY/END) display the character's current values and can be used to modify the current values.
 
 In Edit Mode, user-modifiable fields are unlocked and most roll buttons are deactivated.  The status fields (STUN/BODY/END) are also locked and change to display the max values.
-
-#### <a id="tips">Tips and Tricks</a>
-
-It is common to perform a half move.  Create two entries in the Powers & Equipment page for movement.  Make one at full cost and make the other at half cost.  That way you can do a half move and expend only half endurance without having to manually adjust your END.
-
-Some skill levels apply to multiple skills, but in gameplay, you will always add the bonus.  Example, if you buy +3 skill levels with communication skills (Acting, Conversation, Persuasion), by rule you can only use those skill levels on one skill at a time--but in practice you can't use more than one of those skills in any given round.  The result is you will always be adding +3 to each of those skills.  In cases such as this, do not bother to add the skill levels to the Skill Levels section.  Just add +3 to the each individual skill.  Same effect and you never have to check/uncheck boxes.
-
-Similarly, if you buy skill levels with a power and those skill levels will only ever apply to that power... then do not add them as Combat Skill Levels.  Instead, add them as Enhancements to the power itself.  So instead of adding +2 RMOD Penalty Skills levels with my Cosmic Blast Rifle, just add the 2 RMOD as a power enhancement to the Cosmic Blast Rifle itself.  Again, now you don't have to check/uncheck boxes.
-
-You can add some pretty nifty effects using the Extra Action field of each power.  Whatever is put into that field will be sent to chat as a separate command when using a power.  If you use the ChatSetAttr api, you could do all sorts of things like turn on a Token's aura when you turn on your "Light" power.  Same api can be used to change your token's image... which you could tie to your Instant Change power, swapping your token's image from a simple civilian to his superhero id.  Be creative.
 
 ## <a id="pages">Pages</a>
 
@@ -113,7 +75,7 @@ Element | Description
 STUN, BODY and END | These fields display the stats' current values.  A player can update the value in one of these fields by overwriting the current value, or by entering an amount to be added or subtracting by prefixing a number with +/-.  So, for example, if you enter -5 into the STUN field, it will lower the current value by 5.
 OCV and OMCV | These two fields are buttons that can be clicked to roll a generic attack roll.  Their value is the computed, final value taking into account base characteristic and all combat adjustments from the Combat page.  If you want to know the original OCV or OMCV, refer to the value displayed in the Characteristics section.
 Pay END | This button should be pressed at the beginning of each of the character's phases.  It expends END and charges for all active (checked) powers in the Powers & Equipment section.
-Recover | This button will add the character's REC to his/her current STUN and END, up to thos stat's maximum value.
+Recover | This button will add the character's REC to his/her current STUN and END, up to those stat's maximum value.
 
 >#### Charges / Reserves
 Element | Description
@@ -198,8 +160,8 @@ Name | This field is for information purposes only.  At some future date, it wil
 	A quick note about how endurance cost is calculated.  Normal endurance cost is 1 per 10 active points of
     the power.  If a power has 40 base points and a .5 advantage modifier, the active points will be 60 and
     the endurance cost 6.  However, by rule, the advantage "Reduced Endurance" is not factored in to the
-    active points.  So if you had a power with 40 active points and a .5 advantage modifer that consisted of
-    Invisible Power Effects (+¼) and Reduced Enduranance (+¼), the active points would be displayed as 60,
+    active points.  So if you had a power with 40 active points and a .5 advantage modifier that consisted of
+    Invisible Power Effects (+¼) and Reduced Endurance (+¼), the active points would be displayed as 60,
     however the endurance cost would only be based on 50 (40 base points +¼ for the IPE).  This adjustment
     is taken into account if you select "0 END" or "½ END" from the Cost X field.  Also note that since choosing
     "½ END" requires at least a .25 advantage, and "0 END" requires at least a .5 advantage, if your
@@ -225,7 +187,7 @@ Bonus | The amount the ability will be increased.
     have bought a ½d6 HKA for 10pts.  The attack gets to add STR for +½d6 (10 STR).  And the character gets
     another +½d6 because he has 2 HTH levels (10 active points).  You will see three fields, each displaying
     ½d6, which would appear to total 1½d6, but this is not accurate.  The active points total is 30 (10 for
-    the HKA, +10 for STR, +10 for the HTH levels).  30 active points yeilds 2d6 of damage dice, not 1½d6.
+    the HKA, +10 for STR, +10 for the HTH levels).  30 active points yields 2d6 of damage dice, not 1½d6.
     If you want to accurately check the calculation, convert the dice to active points, total that, and then
     convert back to dice.  You should end up with the same as the Total Dice field.
 
@@ -243,7 +205,7 @@ CV | Select the Combat Value that is used for this attack.  Most powers use OCV.
 Type | This field defines the damage type for the attack.  Most attacks do "STUN & BODY".  Some attack types such as NND attacks only do "STUN" only damage.  If the Type is set to "BODY", the full dice will be counted as body damage (such as Killing Attacks).  If the Type is set to "BODY only" then damage is rolled normally and BODY Effect" is used as a catch all for many powers that do not do direct damage, such as Mind Control.  This is essentially just re-labeled STUN damage. The Type "Luck" follows the rules for the Luck power, counting 1 luck point for every "6" rolled on the effect dice.
 Cost/Die | This field defines how much 1d6 of effect costs.  Example, if the power has 40 base points, and the Cost/Die is set to 5, the result will be 8d6 of effect.  There are two formats for effect dice when the Cost/Die is 15.  By rule, 15pts would result in a full 1d6.  10pts can either be ½d6 or 1d6-1, player's choice.  As such, there are two entries for 15 points:  15 (½d6) and 15 (1d6-1).
 STR | If this box is checked, the character's STR will be added as base points to the attack.  This is normally used for melee weapons.
-Min. | This field sets a minimum STR that is needed to wield a weapon.  Only STR above the minimum will be added to the base points of an attack.  **By rule, if a character does not have enough STR to wield a weapon, he/she is supposed to suffer a penalty to their OCV.  This character sheet does not implement that rule.  You will need to add any OCV penaly using the OCV field of the "Other Modifiers" section**.
+Min. | This field sets a minimum STR that is needed to wield a weapon.  Only STR above the minimum will be added to the base points of an attack.  **By rule, if a character does not have enough STR to wield a weapon, he/she is supposed to suffer a penalty to their OCV.  This character sheet does not implement that rule.  You will need to add any OCV penalty using the OCV field of the "Other Modifiers" section**.
 Killing | If this box is checked, the attack is flagged as a killing attack.  This changes the STUN and BODY multipliers displayed for hit locations.  It has no other effect.
 Hit Loc. | If this box is checked, the attack will also roll for the hit location struck.
 Extra Dice | This field is added to the effect without adjustment from Advantages.  This field can be entered as either a whole number, representing base points, or as a dice representation (1d6, 2d6, etc).  The former will be added to the calculation that generates the Total Dice, while the later will just be appended to the Total Dice as static text.  Example, if you have a simple 30pt attack that generates Total Dice of 6d6, and you enter "10" into this field, the Total Dice will increase to 8d6.  Alternately, you could enter "2d6" into this field and the total Dice will change to 6d6+(2d6).
@@ -305,7 +267,7 @@ This section of the documentation gives directions for adding basic powers.  The
 	* If you want to completely replace the damage dice calculation with your own dice, enter that into the Custom Dice field.
 13) If the power requires an activation roll, select the appropriate value from the Activation dropdown.
 14) If you have any additional actions (this is rare) that you want to add to the power, enter them into the Additional Action field.  This will be sent as a separate chat command when you use the power.
-15) If you want to completely replace the entire roll action, enter your own chat command into the Custom Action field.  This will discard everyting else.  No automatic attack roll, damage roll, etc.
+15) If you want to completely replace the entire roll action, enter your own chat command into the Custom Action field.  This will discard everything else.  No automatic attack roll, damage roll, etc.
 
 ### <a id="specialcases">Special Cases</a>
 
@@ -382,7 +344,7 @@ Attacks that do BODY or BODY only damage cannot be represented with this charact
 
 > Variable Advantage
 
-There is no native way to depict a variable advantage.  Instead, you will need to duplicate the power as separate entries on the Powers page but with different advantages.  So for example, if the character has Blast with Variable Advantage, add the power as a plain Blast on the Powers page; create another Blast but with Armor Piercing; create another Blast with Affects Desolified; etc.  It would be best to predefine your most common versions as to not slow play during a game.
+There is no native way to depict a variable advantage.  Instead, you will need to duplicate the power as separate entries on the Powers page but with different advantages.  So for example, if the character has Blast with Variable Advantage, add the power as a plain Blast on the Powers page; create another Blast but with Armor Piercing; create another Blast with Affects Desolidified; etc.  It would be best to predefine your most common versions as to not slow play during a game.
 
 > Growth and other powers that have more than 4 ability bonuses
 
@@ -463,74 +425,15 @@ Powers | Powers & Equipment | Description | Same as "Name" above except that the
 Powers | Powers & Equipment | END | Expends the resources for the power.
 Skills | Skills | Roll | Pressing this button makes the indicated skill roll.
 
-## <a id="sample">Sample Turn</a>
+## <a id="sample">Sample Usage</a>
 
-This sample includes a bit of description of the character's set up.
+I would recommend that when setting up your powers, check the "Auto" box for powers that will be "on" during combat.  Powers such as Force Fields, Movement, etc.  Basically, anything that will cost END except attacks.  For most attacks, I would NOT recommend checking that box.  I would manually expend END when I use the attack (see below).  An exception to that is if the power is a constant, such as a character that has a fire shield.  In that case, check the "Auto" box.  You will NOT expend END manually whenever the power is triggered by someone touching the character.
 
-Joe has a martial arts character named Rising Sun that can immoliate and use other fire powers.  Here are some of the pertinent powers we will use in this sample.  The actual details of the powers (such as damage dice) aren't relevant here, but I will put the END cost in brackets [].
+* At the beginning of the character's phase, set all powers that will on or off (these are normally zero phase actions).
+* Press the Pay END button.  This will expend the resources for all powers that are "on".
+* Do the character's movement.
+* If the character is going to perform an attack, select any appropriate maneuver, set the range, and choose a target if appropriate.  If there are any adhoc combat modifiers, add those in the "Other Modifiers" section.
+* Press the END button for the power you're about to use (if the power is constant and you already paid the END at the start of these steps, do not manually expend the END again).
+* Use the power by pressing the power's name.  The output should appear in the chat windows.
 
-* Martial Arts: Offensive Strike [4]
-* Fire Shield: [3] constant, no range RKA that causes damage to anyone he touches or that touches him.
-* Heat Radiation: [8] constant, no range, area of effect radius, Blast.
-* Solar Flare: [6] no range compound power, Blast + Flash.  We'll say 8d6 Blast and 2d6 Flash.
-* Flight: [2] nothing special, just 20" of flight.
-* Force Field: [2] nothing special.  Just resistant PD and ED that costs END.
-
-His main attack is a Martial Arts Offensive Strike.  If he has his Fire Shield active, any hit he scores will also do the Fire Shield damage.  If he is willing to spend the high END cost, he can turn on a heat shield and make his opponent's life miserable.  Finally, he has the ability to cause a bright burst of fire around him.  This does Blast damage as well as causing a Flash attack.
-
-The set up.
-
-His Martial Arts is set up as a 0pt power that uses STR.  He calls that power "Martial Arts".  Please see [this](#specialcases) section for how to do that.  His Offensive Strike is added as a custom maneuver in the Attacks & Maneuvers section.
-
-So that we can properly expend END during game play, I would recommend checking the *Auto* checkbox for the Fire Shield, Heat Radiation, Flight, and Force Field powers.  Do NOT check the *Auto* checkbox for the Solar Flare power.  We will expend END for that power manually.
-
-Both the Fire Shield and Heat Radiation powers do not use attack rolls.  Set the CV for both of these powers to 'none'.
-
-Create two power entires for Flight.  Create one at the full 20" of movement, and create another with only 10" of movement.  We'll use the 10" copy of flight when we do a half move.
-
-The Solar flare power is a compound power consisting of two different, but linked powers.  I have to create each as a separate power, but because they are used together I'll set them up this way...
-
-I name the first power Solar Flare: Blast.  I just set this one up as a normal attack power.  It has a CV, costs 4 END.  Etc.
-
-I name the second power Solar Flare: Flash.  This one I set up different.  I leave the END cost of 2 alone.  When I use the power(s) I will click the END button on each so that the full 6 END is expended.  Here is where things get different.  I do NOT give the Flash power a combat value (I set it to "none") because I don't want an attack roll.  When I use the power(s), the attack roll will be generated from the first power, Solar Flare: Blast.
-
-So to sum things up... here is how the pertinent powers look
-
-* Martial Arts, [4] END.  Auto is NOT checked.  CV is set to 'OCV'.
-* Fire Shield, [3] END.  Auto is checked.  CV is set to 'none'.
-* Heat Radiation, [8] END.  Auto is checked.  CV is set to 'none'.
-* Solar Flare: Blast, [4] END.  Auto is NOT checked.  CV is set to 'OCV'.
-* Solar Flare: Flash, [2] END.  Auto is NOT checked.  CV is set to 'none'.
-* Flight 20", [2] END.
-* Flight 10", [1] END.
-* Force Field, [2] END.
-
-Now let's conduct a couple phases of combat.
-
-**First Phase**
-
-Rising Sun gets to go first.  At the beginning of his phase, from the Powers & Equipment page, he sets which powers will be *on*.  In game mechanics, this is a zero phase action.  He checks the *on* boxes for the Fire Shield, Flight 10", and Force Field.
-
-He goes to the Core page and presses the *Pay END* button, and 6 END is expended (3 for the fire shield, 1 for the flight, 2 for the force field).
-
-He move 10" up to his opponent and performs an Offensive Strike.  From the Combat page, he selects his custom maneuver, Offensive Strike.  He goes to the Powers page and manually expends the END for his Martial Arts by pressing the END button for that power.  Now he attacks by pressing his Martial Arts power.  An attack roll is made and damage dice displayed.  As it turns out, poor Rising Sun missed.
-
-As a quick note, his turn is over, but he leaves the maneuver, Offensive Strike, checked because he will continue to get the +1 it grants to his DCV until his next phase.
-
-His opponent goes and the only part of that phase we'll describe is that his opponent scores a hit.  Which means he takes damage from Rising Sun's Fire Shield.  Rising Sun clicks on his Fire Shield power and damage dice are rolled.  Note that no attack dice are rolled because the CV was set to 'none', and no extra END is expended because this is a constant power and the *Auto* checkbox is unchecked.
-
-**Second Phase**
-
-Things aren't going well for Rising Sun.  He got hit pretty hard and if he takes another hit like that, he'll be out.  So it's either now or never.  At the beginning of his phase he does all of the following...
-
-He changes his maneuver to "none".
-He turns on his Heat Radiation.
-He turns off his Flight 10" (he's right next to his opponent, no need to move).
-
-He presses the *Pay END* button and it expends 13 END (3 for the fire shield, 8 for the heat radiation, and 2 for the force field).
-
-His opponent gets affected by the Heat Radiation.  Rising Sun click on that power and damage dice are rolled.  No attack dice or END are expended because the CV is set to 'none', and the *Auto* checkbox is unchecked.
-
-Next, Rising Sun uses hit Solar Flare power.  He clicks on the END for each of these powers to expend the 6 endurance (4 from the Blast, 2 from the Flash).  He then clicks on the Solar Flare: Blast power to roll his attack.  This power has a CV of 'OCV' so it rolls attack dice (along with the damage dice), and Rising Sun hits (yay!).  His opponent marks off the damage he takes.  Now the Solar Flare power is a compound power with two *parts* and the Blast was only the first part.  For the second part of the attack, Rising Sun clicks on his Solar Flare: Flash power.  No attack dice are rolled because the CV is set to 'none'.  The effects of the flash are applied to his opponent.
-
-No need to detail the rest of the combat.  We'll leave the fate of Rising Sun to your imagination.
+I'll repeat this in the briefest of words:  Set powers on/off, Pay END, move, make your combat choices, use the power.
