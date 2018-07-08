@@ -21,7 +21,7 @@
 
  
 ## 1.1.0
- - 06.07.2018 
+ - 08.07.2018 
  
  ### Features 
  - Changelog wurde erstellt
@@ -34,6 +34,20 @@
  
  ### Inhalt
  - Allgemeine Sonderfertigkeiten & Berufsgeheimnisse aus VR02 AK ergänzt, inkl. Tooltip Verweise bei den Talenten
+ - Kampfsonderfertigkeiten aus VR02 AK ergänzt, Fertigkeiten mit Berechnung werden folgend gelistet
+  * Armbrust überdrehen - Nur die Bonus TP, Patzerergebnis muss manuell abgehandelt werden
+  * Ballistischer Schuss - Nur die Erschwernis - Reichweitenerhöhung muss manuell berücksichtigt werden
+  * Beschützer
+  * Betäubungsschlag - Nur die Erschwernis - 
+  * Blindkampf I-II
+  * Eisenhagel I-II - Auswahlfeld für 1./2./3. Wurf. Angriffe und TP müssen separat gewürfelt werden.
+  * Festnageln - Nur die Erschwernis - Bonus TP ab 2. KR muss manuell abgehandelt werden
+  * Gezielter Angriff
+  * Gezielter Schuss
+  * Kampf im Wasser
+  * Meisterliches Ausweichen
+  * Meisterparade - muss unter Passiv eingeschaltet werden, für unbewaffneten Kampf abgeschalten
+
 
  ### Bugfixes 
  - visuelle Darstellung der Liturgien und Rituale Proben im Chat behoben 
