@@ -35,6 +35,9 @@ STR and DEX minimums are not currently supported this maybe added in a future re
 ## Version 10.07.2018
 
 Prevented skill duplication on the full sheet
+Added buttonto add strike rankto turn order
+Completed Fumble calculation fixes
+Add Tab for Family andHolding information
 
 
 ## Version 02.07.2018
