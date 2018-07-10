@@ -4,11 +4,7 @@
 ## Tell YOUR story
 
 ### Changelog
-### 1.9.8a on 2018 July 6th
-* Quick Fix of layout due to Roll20 Char-o-mancer update changing default padding/spacing for all charactersheets across the site
-	- Next update should be v2.0 of sheet with improved layout and borders (might be awhile)
-
-	### 1.9.8 on 2018 May 31st
+### 1.9.8 on 2018 May 31st
 * Default Advantage for NPCs on Primary attribute 1 & 3 fixed
 	- Was the same attribute name, fixed so each seperate
 * Legendary Item display on a new sheet creation by default fixed
