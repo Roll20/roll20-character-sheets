@@ -1,5 +1,5 @@
 ## 1.1.0
- - 09.07.2018 
+ - 10.07.2018 
  
  ### Features 
  - Changelog wurde erstellt
@@ -15,12 +15,14 @@
  - Kampfsonderfertigkeiten aus VR02 AK ergänzt, Vermerkung von Automatischen Berechnungen in der Aktivierungsliste
  - FK-Talent Feuerspeien aus VR02 AK ergänzt
  - Auflistung der Kampfstile und erw. Kampf-SF aus VR02 VK ergänzt
+ - Zaubertricks aus VR03 AM1 ergänzt
+ - Der allgemeine Magietab wurde in Zaubertricks umgenannt, Magische Sonderfertigkeiten haben Ihren eigenen Tab erhalten, Auswahl der Tradition & Leiteigenschaft ist nun von allen Magie Tabs ersichtlich
  - Kampfstile und erw. Kampf-SF aus VR02 AK sind aktivierbar, automatische Berechnungen folgen
  - Kampfstile bis Hruruzat sind mit Berechnung implementiert
 
  ### Bugfixes 
  - visuelle Darstellung der Liturgien und Rituale Proben im Chat behoben 
  - Inkludierung von Manöver Modifikationen aus der Passierschlag AT entfernt
- - mehrere nicht notierte Bugfixes
  - Fehler in der HTML-Syntax gehoben
  - doppelte Einträge im CSS entfernt / optimiert
+ - weitere nicht notierte Bugfixes
