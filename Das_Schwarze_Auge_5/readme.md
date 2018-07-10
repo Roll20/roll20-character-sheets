@@ -20,5 +20,5 @@ Aktuell veröffentliche ich fast täglich neue Versionen. Die aktuelle Version i
 
 ### Kontakt
 
-[Discord] https://discord.gg/KT5qj9
-Email: (gebhardthbs@web.de)
+* [Discord](https://discord.gg/KT5qj9)
+* Email: (gebhardthbs@web.de)
