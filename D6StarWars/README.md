@@ -9,9 +9,17 @@ The text areas are expandable for additional info.
 Wiki page for the sheet:
 		--------------->https://wiki.roll20.net/Star_Wars_WEG_D6_character_sheet<-------------
 
+		
+Version 1.6 (2018-07-10):
+	-sheet customization menu added with these options:
+		-pc/npc sheet switch 							(condenced basic info block & equipment sections)
+		-hide/show gmroll buttons option 				(these rolls are whispered to GM)
+		-show/hide options for Force, Background & Equipment section
+	-Fixed Force Emptiness tracker						(now able to change it's strength according to DSP)
+	-minor formatting
+	-some code cleanup
 
-Recent improvements (2017-2018):
-
+Prior v1.6:
 	-Weapon section roll fixed (2018-02)
 	-Vehicle/Ship text blocks have been added to the bottom of the sheet(2018-02)
 	-"Lightsaber Combat" option added to the Force section so you can have your attack and damage rolls preset for "Lightsaber Combat" (2018-02)
