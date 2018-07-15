@@ -41,6 +41,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Added drone tab
 * Added weapon descriptions
 * Added quantity for inventory, as well as proper support for Enc-1/3 gear
+* Mech weapons now have range instead of ammo
 
 ### 2.2.0
 
