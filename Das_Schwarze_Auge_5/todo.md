@@ -18,14 +18,13 @@
  * Unterlaufen fehlt
  * zufällige Trefferzonen Treffer
  * Befehlssonderfertigkeiten
- * Kampfstil- und erweiterte Kampfsonderfertigkeiten um Tooltips ergänzen
  * Zauberzeichen prüfen
  
 ### Verbesserungen
  * Spezialmanöver die auf Raufen AT basieren Raufen statt Waffe als Basiswert einstellen.
 
 ### Bugfixes
- * aktuell sind sind keine Bugs bekannt ♪~
+ * L+S Mod wird nicht berücksichtigt
 
 ### Aventurische Magie II
  * einige wenige Zauber wurden bereits hinzufegügt, auf Korrekheit überprüfen und ergänzen
