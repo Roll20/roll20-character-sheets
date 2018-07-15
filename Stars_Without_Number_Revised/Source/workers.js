@@ -87,6 +87,86 @@
 				class_ability: translate("WARRIOR_CLASS_ABILITY"),
 			},
 		},
+		"drones": {
+			alecto: {
+				drone_AC: "18",
+				drone_enc: "4",
+				drone_HP: "30",
+				drone_num_fittings: "4",
+				drone_range: "5000 km",
+			},
+			cuttlefish: {
+				drone_AC: "13",
+				drone_enc: "2",
+				drone_HP: "10",
+				drone_num_fittings: "5",
+				drone_range: "1 km",
+			},
+			ghostwalker: {
+				drone_AC: "15",
+				drone_enc: "3",
+				drone_fitting_1_desc: translate("SENSOR_TRANSPARENCY_DESC"),
+				drone_fitting_1_name: translate("SENSOR_TRANSPARENCY"),
+				drone_HP: "1",
+				drone_num_fittings: "3",
+				drone_range: "5 km",
+			},
+			pax: {
+				drone_AC: "16",
+				drone_enc: "4",
+				drone_HP: "20",
+				drone_num_fittings: "4",
+				drone_range: "100 km",
+			},
+			primitve_drone: {
+				drone_AC: "12",
+				drone_enc: "2",
+				drone_HP: "1",
+				drone_num_fittings: "1",
+				drone_range: "500 m",
+			},
+			sleeper: {
+				drone_AC: "12",
+				drone_enc: "2",
+				drone_fitting_1_desc: translate("STATIONKEEPING_DESC"),
+				drone_fitting_1_name: translate("STATIONKEEPING"),
+				drone_HP: "8",
+				drone_num_fittings: "5",
+				drone_range: "100 km",
+			},
+			stalker: {
+				drone_AC: "13",
+				drone_enc: "2",
+				drone_HP: "5",
+				drone_num_fittings: "3",
+				drone_range: "2 km",
+			},
+			void_hawk: {
+				drone_AC: "14",
+				drone_enc: "6",
+				drone_HP: "15",
+				drone_num_fittings: "4",
+				drone_range: "100 km",
+			},
+		},
+		"droneFittings": [
+			"ammo_unit",
+			"bomber",
+			"environmental_power",
+			"expert_system",
+			"extended_flight",
+			"grav_muffles",
+			"heavy_lift",
+			"holoskin",
+			"medical_support",
+			"observation_suite",
+			"racing_gravitics",
+			"reinforced_structure",
+			"sensor_transparency",
+			"stationkeeping",
+			"suicide_charge",
+			"weapon_fitting"
+		],
 		"hulltypes": {
 			battleship: {
 				ship_ac: "16",
@@ -2347,7 +2427,10 @@
 			}
 		}
 		if (sName === "weapons") {
-			if (label) output.weapon_name = translate(label.toUpperCase());
+			if (label) {
+				output.weapon_name = translate(label.toUpperCase());
+				output.weapon_description = translate(`${label.toUpperCase()}_DESC`);
+			}
 			if (output.weapon_ammo) {
 				output.weapon_ammo_max = output.weapon_ammo;
 				output.weapon_use_ammo = "{{ammo=[[0@{weapon_ammo} - (1 @{weapon_burst})]] / @{weapon_ammo|max}}}";
@@ -2363,7 +2446,10 @@
 			}
 		}
 		if (sName === "armor") {
-			if (label) output.armor_name = translate(label.toUpperCase());
+			if (label) {
+				output.armor_name = translate(label.toUpperCase());
+				output.armor_description = translate(`${label.toUpperCase()}_DESC`);
+			}
 		}
 		if (sName === "cyberware") {
 			if (label) {
@@ -2646,6 +2732,31 @@
 	};
 
 	/* Drones */
+	const fillDroneStats = () => {
+		// This must be run from a repeating event, otherwise it will not know where to draw the data from.
+		getAttrs(["repeating_drones_drone_model"], v => {
+			const model = (v.repeating_drones_drone_model || "").toLowerCase().trim().replace(/ /g, "_");
+			if (autofillData.drones.hasOwnProperty(model)) {
+				const setting = Object.entries(autofillData.drones[model]).reduce((m, [key, value]) => {
+					m[`repeating_drones_${key}`] = value;
+					return m;
+				}, {});
+				setting.repeating_drones_drone_HP_max = setting.repeating_drones_drone_HP;
+				setAttrs(setting);
+			}
+		});
+	};
+	const fillDroneFitting = (num) => {
+		const prefix = `repeating_drones_drone_fitting_${num}`;
+		getAttrs([`${prefix}_desc`, `${prefix}_name`], v => {
+			const fittingName = (v[`${prefix}_name`] || "").toLowerCase().trim().replace(/ /g, "_");
+			if (v[`${prefix}_desc`] == "" && autofillData.droneFittings.includes(fittingName)) {
+				setAttrs({
+					[`${prefix}_desc`]: translate(`${fittingName.toUpperCase()}_DESC`)
+				});
+			}
+		});
+	};
 	const calculateDroneAttack = (prefixes) => {
 		const sourceAttrs = prefixes.reduce((m, prefix) => {
 			return m.concat([
@@ -3290,6 +3401,10 @@
 		"remove:repeating_ship-weapons", buildShipWeaponsMenu);
 
 	/* Drones */
+	[1,2,3,4,5].forEach(num => {
+		on(`change:repeating_drones:drone_fitting_${num}_name`, () => fillDroneFitting(num));
+	});
+	on("change:repeating_drones:drone_model", fillDroneStats);
 	on("change:intelligence_mod change:skill_pilot change:skill_program", () => getSectionIDs("repeating_drones", idArray => {
 		calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`));
 	}));
