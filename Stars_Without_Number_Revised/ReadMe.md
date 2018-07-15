@@ -10,6 +10,7 @@ This sheet is created for use in Stars Without Number Revised Edition on Roll20.
 
 ### Contributors
 
+* [Victor M. Suarez](https://github.com/svmnotn)
 * [MankiGames](https://github.com/MankiGames)
 * [Shadowriku](https://github.com/Shadowriku)
 * [RonaldZ](https://github.com/RonaldZ)
