@@ -1411,6 +1411,11 @@
 				weapon_encumbrance: "1",
 				weapon_range: "5/15",
 			},
+			demo_charge: {
+				weapon_damage: "3d10",
+				weapon_encumbrance: "1",
+				weapon_range: "20/40",
+			},
 			distortion_cannon: {
 				weapon_attack: "1",
 				weapon_ammo: "6",
@@ -1634,6 +1639,11 @@
 				weapon_ammo: "5",
 				weapon_damage: "5d12",
 				weapon_range: "1000/2000",
+			},
+			wheatcutter_belt: {
+				weapon_ammo: "5",
+				weapon_damage: "2d12",
+				weapon_range: "10/20",
 			},
 		},
 	};
@@ -2653,7 +2663,7 @@
 		getAttrs(sourceAttrs, v => {
 			const skillMod = Math.max(parseInt(v.skill_pilot), parseInt(v.skill_program)) || 0,
 				intMod = parseInt(v.intelligence_mod) || 0;
-			
+
 			const setting = prefixes.reduce((m, prefix) => {
 				[1, 2, 3].filter(num => v[`${prefix}_drone_weapon${num}_active`] === "1")
 					.forEach(num => {
