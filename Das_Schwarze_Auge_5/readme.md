@@ -6,6 +6,10 @@ Aktuell findet Ihr hier eine Erklärung der kürzlich eingeführten Features sow
 
 ### Neue Features
 
+![Neue Features](https://i.imgur.com/4n5EHku.png)
+ * **Spezialmanöver:** Spezialmanöver haben nun (fast) alle ein eigenes Makro für die Chatausgabe. Dabei werden automatisch Erschwernisse bei der Berechnung berücksichtigt. Außerdem sind diese mit Basismanövern sofern dies Regeltechnisch geht kombinierbar. Spezialmanöver mit besonderen TP Berechnungen haben dafür auch ein eigenes Makro erhalten. Dieses Feature wird in Zukunft auch auf andere Teile des Bogens erweitert.
+ * **Tooltips:** Spezialmanöver haben Tooltips mit den Informationen aus der Regelwiki erhalten.
+
 ![Neue Features](https://i.imgur.com/GpYN42a.png)
  * **Changelog/Anleitung/Bugtracker:** Mit einem Click wird euch der Link für den Changelog / Readme / Bugtracker im Chat angezeigt
  * **Chatausgabe:** Je nach Auswahl werden eure Proben im Chat für alle, dich und den GM oder nur für dich sichtbar
