@@ -1,9 +1,9 @@
 ## 1.1.0
- - 12.07.2018
+ - 17.07.2018
 
  ### Features
  - Automatische Berechnungen werden nun mit der Zeit von Auto-Calc Feldern in Worker Sheets umgewandelt, dies hat zur Folge das kompliziertere Berechnungen möglich sind.
- - Sonderfertigkeiten haben nun (fast) alle ein eigenes Makro für die Chatausgabe. Dabei werden automatisch Erschwernisse bei der Berechnung berücksichtigt. Außerdem sind diese mit Basismanövern sofern dies Regeltechnisch geht kombinierbar. Spezialmanöver mit besonderen TP Berechnungen haben dafür auch ein eigenes Makro erhalten. Dieses Feature wird in Zukunft auch auf andere Teile des Bogens erweitert.
+ - Spezialmanöver haben nun (fast) alle ein eigenes Makro für die Chatausgabe. Dabei werden automatisch Erschwernisse bei der Berechnung berücksichtigt. Außerdem sind diese mit Basismanövern sofern dies Regeltechnisch geht kombinierbar. Spezialmanöver mit besonderen TP Berechnungen haben dafür auch ein eigenes Makro erhalten. Dieses Feature wird in Zukunft auch auf andere Teile des Bogens erweitert.
  - Tooltips wurden mit aus der Regelwiki verfügbaren Informationen erweitert. Aktuell betrifft dies nur die Spezialmanöver. Dieses Feature wird in Zukunft auch auf andere Teile des Bogens erweitert.
 
  ### Inhalte
@@ -13,6 +13,7 @@
  - Toolstips für Kampfstile eingefügt
  - Basis- & Spezialmanöver aus VR01 GRW, VR02 AK und VS01 AB1 wurden inkl. Berechnungen integriert
  - Kampfstile aus VR02 AK wurden inkl Berechnungen integriert
+ - Spezialmanöver die einen Haltegriff vorraussetzen wurden zur leichteren Übersicht mit einem Handsymbol markiert.
 
  ### Bugfixes
  - Anzeige Fehler im Sonderfertigkeitentab behoben
