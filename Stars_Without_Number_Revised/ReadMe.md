@@ -29,15 +29,16 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 * Contributions are welcome at [the GitHub](https://github.com/Karlinator/roll20-character-sheets). Just open a pull request.
 * You will need to install [Node.js](https://nodejs.org), then run the following command in bash/cmd:
-	* npm install -g pug pug-cli sass jstransformer-uglify-es
-	* You may need to restart you computer.
-	* Then just make changes to the files in the Source folder, and use the file "build" or "pug_build.bat" and "sass_build.bat" depending on your OS.
+  * npm install -g pug pug-cli sass jstransformer-uglify-es
+  * You may need to restart you computer.
+  * Then just make changes to the files in the Source folder, and use the file "build" or "pug_build.bat" and "sass_build.bat" depending on your OS.
 
 ## Changelog
 
 ### 2.3.0
 
 * Added drone tab
+* Added weapon descriptions
 * Added quantity for inventory, as well as proper support for Enc-1/3 gear
 
 ### 2.2.0
@@ -59,17 +60,17 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 ### 2.1.0
 
 * Additions
-	* Added option to disable modifier queries globally.
-	* Added button to roll hit points.
-	* Added weapon encumbrance tracking.
-	* Added ammo maximum for weapons.
-	* Weapon shock damage can now be toggled independent of base being 0 (for Unarmed Combatant).
-	* Added option for automatic ammo reduction (requires ChatSetAttr).
+  * Added option to disable modifier queries globally.
+  * Added button to roll hit points.
+  * Added weapon encumbrance tracking.
+  * Added ammo maximum for weapons.
+  * Weapon shock damage can now be toggled independent of base being 0 (for Unarmed Combatant).
+  * Added option for automatic ammo reduction (requires ChatSetAttr).
 * Bugfixes
-	* Attribute modifiers are now recalculated upon conversion from v1.6.2.
-	* Roll templates are no longer cut off when chat avatars are disabled.
-	* New NPC attacks should now receive the correct attack bonus.
-	* Line breaks in foci/technique/spell/cyberware descriptions now render correctly.
+  * Attribute modifiers are now recalculated upon conversion from v1.6.2.
+  * Roll templates are no longer cut off when chat avatars are disabled.
+  * New NPC attacks should now receive the correct attack bonus.
+  * Line breaks in foci/technique/spell/cyberware descriptions now render correctly.
 
 ### 2.0.1
 
@@ -79,14 +80,14 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 ### 2.0.0
 
 * New, overhauled version of the sheet (rewritten in pug and sass)
-	* Complete sheet HTML/CSS has been re-done for a more compact look
-	* Edit/Display mode toggle at the top of the sheet
-	* Roll template overhauled
-	* Many attributes were renamed or otherwise reorganized (seamless conversion)
-	* Chat menus for easy access to all sheet macros
-	* Ship sheet now has tracking for power/mass/hardpoints, as well as weapon attacks
-	* NPC sheet now has repeating sections for attacks and special abilities
-	* Added i18n support
+  * Complete sheet HTML/CSS has been re-done for a more compact look
+  * Edit/Display mode toggle at the top of the sheet
+  * Roll template overhauled
+  * Many attributes were renamed or otherwise reorganized (seamless conversion)
+  * Chat menus for easy access to all sheet macros
+  * Ship sheet now has tracking for power/mass/hardpoints, as well as weapon attacks
+  * NPC sheet now has repeating sections for attacks and special abilities
+  * Added i18n support
 
 ### 1.6.2
 
