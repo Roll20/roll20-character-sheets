@@ -3,7 +3,7 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.3.0-beta1";
+	const sheetVersion = "2.3.0";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -2515,7 +2515,7 @@
 		if (sName === "armor") {
 			if (label) {
 				output.armor_name = translate(label.toUpperCase());
-				output.armor_description = translate(`${label.toUpperCase()}_DESC`);
+				output.armor_description = translate(`${label.toUpperCase()}_DESC`) || "";
 			}
 		}
 		if (sName === "cyberware") {
