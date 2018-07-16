@@ -382,6 +382,11 @@
 				armor_encumbrance: "0",
 				armor_type: "STREET",
 			},
+			executive_security_suit: {
+				armor_ac: "15",
+				armor_encumbrance: "0",
+				armor_type: "ARTIFACT",
+			},
 			field_emitter_panoply: {
 				armor_ac: "20",
 				armor_encumbrance: "1",
@@ -399,6 +404,11 @@
 				armor_encumbrance: "2",
 				armor_type: "PRIMITIVE",
 			},
+			ghost_mantle: {
+				armor_ac: "15",
+				armor_encumbrance: "0",
+				armor_type: "ARTIFACT",
+			},
 			icarus_harness: {
 				armor_ac: "16",
 				armor_encumbrance: "1",
@@ -408,6 +418,16 @@
 				armor_ac: "13",
 				armor_encumbrance: "1",
 				armor_type: "PRIMITIVE",
+			},
+			polyplast_carapace: {
+				armor_ac: "18",
+				armor_encumbrance: "1",
+				armor_type: "ARTIFACT",
+			},
+			psitech_combat_suit: {
+				armor_ac: "16",
+				armor_encumbrance: "0",
+				armor_type: "ARTIFACT",
 			},
 			secure_clothing: {
 				armor_ac: "13",
@@ -430,6 +450,23 @@
 				armor_encumbrance: "2",
 				armor_encumbrance_bonus: "4",
 				armor_type: "POWERED",
+			},
+			stutterjump_suit: {
+				armor_ac: "18",
+				armor_encumbrance: "0",
+				armor_type: "ARTIFACT",
+			},
+			tempest_assault_array: {
+				armor_ac: "20",
+				armor_encumbrance: "1",
+				armor_encumbrance_bonus: "4",
+				armor_type: "ARTIFACT",
+			},
+			titan_powered_armor: {
+				armor_ac: "21",
+				armor_encumbrance: "2",
+				armor_encumbrance_bonus: "4",
+				armor_type: "ARTIFACT",
 			},
 			vestimentum: {
 				armor_ac: "18",
@@ -549,6 +586,9 @@
 			wild_psychic_talent: {},
 		},
 		"gear": {
+			ai_companion: {
+				gear_encumbrance: "0",
+			},
 			ammo_20_rounds: {
 				gear_encumbrance: "1#",
 			},
@@ -615,6 +655,12 @@
 			instapanel: {
 				gear_encumbrance: "1#",
 			},
+			integrity_stims: {
+				gear_encumbrance: "0",
+			},
+			juggernaut_stims: {
+				gear_encumbrance: "0",
+			},
 			lazarus_patch: {
 				gear_encumbrance: "1#",
 			},
@@ -633,10 +679,22 @@
 			metatool: {
 				gear_encumbrance: "1",
 			},
+			micropurgator_stims: {
+				gear_encumbrance: "0",
+			},
+			mindwall_helmet: {
+				gear_encumbrance: "0",
+			},
 			navcomp: {
 				gear_encumbrance: "1",
 			},
+			polymorphic_nanites: {
+				gear_encumbrance: "1",
+			},
 			portabox: {
+				gear_encumbrance: "1",
+			},
+			pseudonuke: {
 				gear_encumbrance: "1",
 			},
 			power_cell_type_a: {
@@ -656,6 +714,9 @@
 			},
 			rations_1_day: {
 				gear_encumbrance: "1#",
+			},
+			redivivus_sheath: {
+				gear_encumbrance: "1",
 			},
 			remote_link_unit: {
 				gear_encumbrance: "1",
@@ -689,6 +750,9 @@
 			},
 			survival_kit: {
 				gear_encumbrance: "1",
+			},
+			system_reset_inductor: {
+				gear_encumbrance: "0",
 			},
 			tailored_antiallergens: {
 				gear_encumbrance: "0",
@@ -731,6 +795,9 @@
 			},
 			vacc_suit: {
 				gear_encumbrance: "2",
+			},
+			wideawake_serum: {
+				gear_encumbrance: "0",
 			},
 		},
 		"ship-defenses": {
