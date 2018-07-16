@@ -9423,7 +9423,10 @@
     };
 
     var update_class = function() {
-        getAttrs(["class","base_level","custom_class","cust_classname","cust_hitdietype","cust_spellcasting_ability","cust_strength_save_prof","cust_dexterity_save_prof","cust_constitution_save_prof","cust_intelligence_save_prof","cust_wisdom_save_prof","cust_charisma_save_prof","strength_save_prof","dexterity_save_prof","constitution_save_prof","intelligence_save_prof","wisdom_save_prof","charisma_save_prof","subclass","multiclass1","multiclass1_subclass","multiclass2","multiclass2_subclass","multiclass3","multiclass3_subclass"], function(v) {
+        getAttrs(["class","base_level","custom_class","cust_classname","cust_hitdietype","cust_spellcasting_ability","cust_strength_save_prof","cust_dexterity_save_prof","cust_constitution_save_prof","cust_intelligence_save_prof","cust_wisdom_save_prof","cust_charisma_save_prof","strength_save_prof","dexterity_save_prof","constitution_save_prof","intelligence_save_prof","wisdom_save_prof","charisma_save_prof","subclass","multiclass1","multiclass1_subclass","multiclass2","multiclass2_subclass","multiclass3","multiclass3_subclass","npc"], function(v) {
+            if(v.npc && v.npc == "1") {
+                return;
+            }
             if(v.custom_class && v.custom_class != "0") {
                 setAttrs({
                     hitdietype: v.cust_hitdietype,
@@ -10518,6 +10521,24 @@
 
     };
 
+    var clear_npc_spell_attacks = function(complete) {
+        getSectionIDs("repeating_attack", function(attack_ids) {
+            var getList = [];
+            var done = false;
+            _.each(attack_ids, function(id) {
+                getList.push(`repeating_attack_${id}_spellid`);
+            });
+            getAttrs(getList, function(v) {
+                _.each(attack_ids, function(id) {
+                    if (v[`repeating_attack_${id}_spellid`] && v[`repeating_attack_${id}_spellid`].indexOf("npc_") != -1) {
+                        removeRepeatingRow(`repeating_attack_${id}`);
+                    }
+                });
+                complete();
+            });
+        });
+    }
+
     var upgrade_to_2_0 = function(doneupdating) {
         getAttrs(["npc","strength","dexterity","constitution","intelligence","wisdom","charisma","strength_base","dexterity_base","constitution_base","intelligence_base","wisdom_base","charisma_base","deathsavemod","death_save_mod","npc_str_save","npc_dex_save","npc_con_save","npc_int_save","npc_wis_save","npc_cha_save","npc_str_save_base","npc_dex_save_base","npc_con_save_base","npc_int_save_base","npc_wis_save_base","npc_cha_save_base","npc_acrobatics_base", "npc_animal_handling_base", "npc_arcana_base", "npc_athletics_base", "npc_deception_base", "npc_history_base", "npc_insight_base", "npc_intimidation_base", "npc_investigation_base", "npc_medicine_base", "npc_nature_base", "npc_perception_base", "npc_performance_base", "npc_persuasion_base", "npc_religion_base", "npc_sleight_of_hand_base", "npc_stealth_base", "npc_survival_base", "npc_acrobatics", "npc_animal_handling", "npc_arcana", "npc_athletics", "npc_deception", "npc_history", "npc_insight", "npc_intimidation", "npc_investigation", "npc_medicine", "npc_nature", "npc_perception", "npc_performance", "npc_persuasion", "npc_religion", "npc_sleight_of_hand", "npc_stealth", "npc_survival"], function(v) {
             var update = {};
@@ -10613,92 +10634,109 @@
     };
 
     var upgrade_to_2_4 = function(doneupdating) {
-        update_globalskills(function() {
-            update_globalsaves(function() {
-                update_globalattack(function() {
-                    update_globaldamage(function() {
-                        getAttrs(["npc", "npcspellcastingflag", "spellcasting_ability"], function(v) {
-                            if(v.npc == "1" && v.npcspellcastingflag == "1") {
-                                getSectionIDs("npctrait", function(secIds) {
-                                    var getList = [];
-                                    _.each(secIds, function(x) {
-                                        getList.push("repeating_npctrait_" + x + "_name");
-                                        getList.push("repeating_npctrait_" + x + "_desc");
-                                    });
-                                    getAttrs(getList, function(traits) {
-                                        var update = {};
-                                        if(v.spellcasting_ability == "0*") {
-                                            var spellSec = "";
-                                            update.spellcasting_ability = "@{intelligence_mod}+";
-                                            _.each(secIds, function(traitId) {
-                                                if(traits["repeating_npctrait_" + traitId + "_name"].toLowerCase().includes("spellcasting.")) spellSec = traitId;
-                                            });
-                                            if(spellSec  != "") {
-                                                var spellcasting = traits["repeating_npctrait_" + spellSec + "_desc"].toLowerCase();
-                                                var lastIndex = 9999;
-                                                _.each(["intelligence", "wisdom", "charisma"], function(ability) {
-                                                    var found = spellcasting.indexOf(ability);
-                                                    if(found > -1 && found < lastIndex) {
-                                                        lastIndex = found;
-                                                        update.spellcasting_ability = "@{" + ability + "_mod}+";
-                                                    }
+        clear_npc_spell_attacks(function() {
+            update_globalskills(function() {
+                update_globalsaves(function() {
+                    update_globalattack(function() {
+                        update_globaldamage(function() {
+                            getAttrs(["npc", "npcspellcastingflag", "spellcasting_ability", "caster_level", "level_calculations"], function(v) {
+                                if(v.npc == "1" && v.npcspellcastingflag == "1") {
+                                    getSectionIDs("npctrait", function(secIds) {
+                                        var getList = [];
+                                        _.each(secIds, function(x) {
+                                            getList.push("repeating_npctrait_" + x + "_name");
+                                            getList.push("repeating_npctrait_" + x + "_desc");
+                                        });
+                                        getAttrs(getList, function(traits) {
+                                            var update = {};
+                                            if(v.spellcasting_ability == "0*" || v.caster_level == "0") {
+                                                var spellSec = "";
+                                                update.spellcasting_ability = "@{intelligence_mod}+";
+                                                _.each(secIds, function(traitId) {
+                                                    if(traits["repeating_npctrait_" + traitId + "_name"].toLowerCase().includes("spellcasting.")) spellSec = traitId;
                                                 });
-                                            }
-                                        }
-                                        setAttrs(update, function() {
-                                            // Set all spells without a given modifier to 'spell'
-                                            var spgetList = [];
-                                            getSectionIDs("spell-cantrip", function(secIds0) {
-                                                _.each(secIds0, function(x) {
-                                                    spgetList.push("repeating_spell-cantrip_" + x + "_spell_ability");
-                                                });
-                                                getSectionIDs("spell-1", function(secIds1) {
-                                                    _.each(secIds1, function(x) {
-                                                        spgetList.push("repeating_spell-1_" + x + "_spell_ability");
-                                                    });
-                                                    getSectionIDs("spell-2", function(secIds2) {
-                                                        _.each(secIds2, function(x) {
-                                                            spgetList.push("repeating_spell-2_" + x + "_spell_ability");
+                                                if(spellSec  != "") {
+                                                    var spellcasting = traits["repeating_npctrait_" + spellSec + "_desc"].toLowerCase();
+                                                    if (v.spellcasting_ability == "0*") {
+                                                        var lastIndex = 9999;
+                                                        _.each(["intelligence", "wisdom", "charisma"], function(ability) {
+                                                            var found = spellcasting.indexOf(ability);
+                                                            if(found > -1 && found < lastIndex) {
+                                                                lastIndex = found;
+                                                                update.spellcasting_ability = "@{" + ability + "_mod}+";
+                                                            }
                                                         });
-                                                        getSectionIDs("spell-3", function(secIds3) {
-                                                            _.each(secIds3, function(x) {
-                                                                spgetList.push("repeating_spell-3_" + x + "_spell_ability");
+                                                    }
+                                                    if (v.caster_level == "0") {
+                                                        var foundLevelidx = spellcasting.search(/(\d|\d\d)(st|nd|rd|th)/);
+                                                        if (foundLevelidx) {
+                                                            var level = parseInt(spellcasting.substring(foundLevelidx, foundLevelidx+4));
+                                                            console.log(`Found spellcasting level ${level} in trait, setting caster_level...`);
+                                                            update.caster_level = level;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            setAttrs(update, function() {
+                                                // Recalculate spell slots in case NPC level was restored
+                                                if(!v["level_calculations"] || v["level_calculations"] == "on") {
+                                                    update_spell_slots();
+                                                };
+                                                // Set all spells without a given modifier to 'spell'
+                                                var spgetList = [];
+                                                getSectionIDs("spell-cantrip", function(secIds0) {
+                                                    _.each(secIds0, function(x) {
+                                                        spgetList.push("repeating_spell-cantrip_" + x + "_spell_ability");
+                                                    });
+                                                    getSectionIDs("spell-1", function(secIds1) {
+                                                        _.each(secIds1, function(x) {
+                                                            spgetList.push("repeating_spell-1_" + x + "_spell_ability");
+                                                        });
+                                                        getSectionIDs("spell-2", function(secIds2) {
+                                                            _.each(secIds2, function(x) {
+                                                                spgetList.push("repeating_spell-2_" + x + "_spell_ability");
                                                             });
-                                                            getSectionIDs("spell-4", function(secIds4) {
-                                                                _.each(secIds4, function(x) {
-                                                                    spgetList.push("repeating_spell-4_" + x + "_spell_ability");
+                                                            getSectionIDs("spell-3", function(secIds3) {
+                                                                _.each(secIds3, function(x) {
+                                                                    spgetList.push("repeating_spell-3_" + x + "_spell_ability");
                                                                 });
-                                                                getSectionIDs("spell-5", function(secIds5) {
-                                                                    _.each(secIds5, function(x) {
-                                                                        spgetList.push("repeating_spell-5_" + x + "_spell_ability");
+                                                                getSectionIDs("spell-4", function(secIds4) {
+                                                                    _.each(secIds4, function(x) {
+                                                                        spgetList.push("repeating_spell-4_" + x + "_spell_ability");
                                                                     });
-                                                                    getSectionIDs("spell-6", function(secIds6) {
-                                                                        _.each(secIds6, function(x) {
-                                                                            spgetList.push("repeating_spell-6_" + x + "_spell_ability");
+                                                                    getSectionIDs("spell-5", function(secIds5) {
+                                                                        _.each(secIds5, function(x) {
+                                                                            spgetList.push("repeating_spell-5_" + x + "_spell_ability");
                                                                         });
-                                                                        getSectionIDs("spell-7", function(secIds7) {
-                                                                            _.each(secIds7, function(x) {
-                                                                                spgetList.push("repeating_spell-7_" + x + "_spell_ability");
+                                                                        getSectionIDs("spell-6", function(secIds6) {
+                                                                            _.each(secIds6, function(x) {
+                                                                                spgetList.push("repeating_spell-6_" + x + "_spell_ability");
                                                                             });
-                                                                            getSectionIDs("spell-8", function(secIds8) {
-                                                                                _.each(secIds8, function(x) {
-                                                                                    spgetList.push("repeating_spell-8_" + x + "_spell_ability");
+                                                                            getSectionIDs("spell-7", function(secIds7) {
+                                                                                _.each(secIds7, function(x) {
+                                                                                    spgetList.push("repeating_spell-7_" + x + "_spell_ability");
                                                                                 });
-                                                                                getSectionIDs("spell-9", function(secIds9) {
-                                                                                    _.each(secIds9, function(x) {
-                                                                                        spgetList.push("repeating_spell-9_" + x + "_spell_ability");
+                                                                                getSectionIDs("spell-8", function(secIds8) {
+                                                                                    _.each(secIds8, function(x) {
+                                                                                        spgetList.push("repeating_spell-8_" + x + "_spell_ability");
                                                                                     });
-                                                                                    getAttrs(spgetList, function(spellAbilities) {
-                                                                                        spupdate = {};
-                                                                                        _.each(spellAbilities, function(ability, attributeName) {
-                                                                                            if (ability == "0*") {
-                                                                                                console.log("UPDATING SPELL: " + attributeName);
-                                                                                                spupdate[attributeName] = "spell";
-                                                                                            }
+                                                                                    getSectionIDs("spell-9", function(secIds9) {
+                                                                                        _.each(secIds9, function(x) {
+                                                                                            spgetList.push("repeating_spell-9_" + x + "_spell_ability");
                                                                                         });
-                                                                                        setAttrs(spupdate, function() {
-                                                                                            update_challenge();
-                                                                                            doneupdating();
+                                                                                        getAttrs(spgetList, function(spellAbilities) {
+                                                                                            spupdate = {};
+                                                                                            _.each(spellAbilities, function(ability, attributeName) {
+                                                                                                if (ability == "0*") {
+                                                                                                    console.log("UPDATING SPELL: " + attributeName);
+                                                                                                    spupdate[attributeName] = "spell";
+                                                                                                }
+                                                                                            });
+                                                                                            setAttrs(spupdate, function() {
+                                                                                                update_attacks("spells");
+                                                                                                update_challenge();
+                                                                                                doneupdating();
+                                                                                            });
                                                                                         });
                                                                                     });
                                                                                 });
@@ -10713,12 +10751,12 @@
                                             });
                                         });
                                     });
-                                });
-                            } else if(v.npc != "1") {
-                                doneupdating();
-                            } else {
-                                doneupdating();
-                            }
+                                } else if(v.npc != "1") {
+                                    doneupdating();
+                                } else {
+                                    doneupdating();
+                                }
+                            });
                         });
                     });
                 });
@@ -11510,7 +11548,7 @@
             <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-spells" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
-            <p class="warning" data-i18n="charmancer-discard-warning">Discard and Exit will cause all choices to be lost.</p>
+            <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
         </div>
     </div>
 </charmancer>
@@ -12027,7 +12065,7 @@
             <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-spells" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue" data-i18n="continue-charmancer">Continue Charactermancer</button>
-            <p class="warning">Discard and Exit will cause all choices to be lost.</p>
+            <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard any choices made and let you edit your character sheet directly.</span></p>
         </div>
 
         <input type="hidden" name="comp_has_subrace">
@@ -12571,7 +12609,7 @@
             <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-spells" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
-            <p class="warning">Discard and Exit will cause all choices to be lost.</p>
+            <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
         </div>
     </div>
 </charmancer>
@@ -12728,7 +12766,7 @@
             <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-spells" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
-            <p class="warning">Discard and Exit will cause all choices to be lost.</p>
+            <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
         </div>
     </div>
 </charmancer>
@@ -12938,7 +12976,7 @@
             <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-spells" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
-            <p class="warning">Discard and Exit will cause all choices to be lost.</p>
+            <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
         </div>
 
         <input type="hidden" name="comp_background_detail_choice_array">
@@ -13115,7 +13153,7 @@
             <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-spells" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
-            <p class="warning">Discard and Exit will cause all choices to be lost.</p>
+            <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
         </div>
     </div>
 </charmancer>
@@ -13333,7 +13371,7 @@
             <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-spells" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
-            <p class="warning">Discard and Exit will cause all choices to be lost.</p>
+            <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
         </div>
 
         <input type="hidden" name="comp_race_spells">
@@ -13426,6 +13464,7 @@
                 <div class="choice row feat_prereq feat_possible">
                     <label class="warning">Prerequisite:
                         <p class="feat_prerequisite feat_text"></p>
+                        <p class="feat_text"><span data-i18n="feat-pre-check"></span>Look carefully! Prerequisites are not checked automatically.</p>
                     </label>
                 </div>
                 <div class="choice row feat_ability feat_possible">
@@ -13583,7 +13622,7 @@
             <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-feat" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
-            <p class="warning">Discard and Exit will cause all choices to be lost.</p>
+            <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
         </div>
 
     </div>
@@ -13683,7 +13722,7 @@
             <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-spells" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
-            <p class="warning">Discard and Exit will cause all choices to be lost.</p>
+            <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
         </div>
     </div>
 </charmancer>
