@@ -9,6 +9,24 @@ The text areas are expandable for additional info.
 Wiki page for the sheet:
 		--------------->https://wiki.roll20.net/Star_Wars_WEG_D6_character_sheet<-------------
 
+Version 1.68 (2018-07-10):
+	Layout:
+	-remove empty gap on top of sheet
+	-improved layout in most sections
+	-added some tooltip info to menu settings
+	-Moved Backgorund section under Equipment Section
+	-Sheet version number & sheet type is now shown in corner
+	Fixes:
+	-corrected Lightsaber Combat dmg roll
+	-Force Emptiness bonus is now properly reduced by number of DSP
+	New Feature:
+	-added Resist Pain Force power(with sheet worker)
+	Other:
+	-code cleanup of some rolls
+	-removed all sheetworkers that where Gumshoe inmort and unnecessary 
+	-updated preview
+
+
 		
 Version 1.6 (2018-07-10):
 	-sheet customization menu added with these options:
