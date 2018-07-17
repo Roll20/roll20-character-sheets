@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 18.1.13
+
+### Bug fixes
+- [#738: Overlapping UI in NPC sheet](https://bitbucket.org/mlenser/5eshaped/issues/738/overlapping-ui-in-npc-sheet)
+
 ## 18.1.12
 
 ### Bug fixes
@@ -18,7 +23,6 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 - [#743: Incorrect assumption about OGL HP format breaks some imports](https://bitbucket.org/mlenser/5eshaped/issues/743/incorrect-assumption-about-ogl-hp-format)
 - [#744: TypeError on OGL conversion](https://bitbucket.org/mlenser/5eshaped/issues/744/typeerror-on-ogl-conversion)
 - [#745: Consider not using npc_name from OGL to set character name](https://bitbucket.org/mlenser/5eshaped/issues/745/consider-not-using-npc_name-from-ogl-to)
-
 
 ## 18.1.11
 
