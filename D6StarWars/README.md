@@ -9,7 +9,7 @@ The text areas are expandable for additional info.
 Wiki page for the sheet:
 		--------------->https://wiki.roll20.net/Star_Wars_WEG_D6_character_sheet<-------------
 
-Version 1.68 (2018-07-10):
+Version 1.68 (2018-07-17):
 	Layout:
 	-remove empty gap on top of sheet
 	-improved layout in most sections
