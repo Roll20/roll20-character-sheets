@@ -31,13 +31,13 @@ This character sheet is *not* for use in designing a character--it is only for p
 	Quick note: you do NOT need the api scripts to use this sheet,
     but I would recommend them because they add two very useful features.
 
-I would recommend using both the [HeroSystem6e](https://github.com/Roll20/roll20-api-scripts/tree/master/Hero6Playable) and [Hero6Tracker](https://github.com/Roll20/roll20-api-scripts/tree/master/HeroTracker) api scripts.  The former, HeroGames6e api, was written to work with this character sheet.  The main functions it provides are to count the amount of BODY done with a normal attack, and to compute the DCV you would hit with an attack roll.  While this script is not absolutely necessary to use this character sheet, you would be losing two features that minimize the cumbersome task of dice counting and adding up of bonuses.
+I would recommend using both the [HeroSystem6e](https://github.com/Roll20/roll20-api-scripts/tree/master/HeroSystem6e) and [Hero6Tracker](https://github.com/Roll20/roll20-api-scripts/tree/master/HeroTracker) api scripts.  The former, HeroGames6e api, was written to work with this character sheet.  The main functions it provides are to count the amount of BODY done with a normal attack, and to compute the DCV you would hit with an attack roll.  While this script is not absolutely necessary to use this character sheet, you would be losing two features that minimize the cumbersome task of dice counting and adding up of bonuses.
 
 The second script, HeroTracker, is not directly integrated with this character sheet.  However, it is very useful in managing the Roll20 initiative tracker.
 
 You can add the two api's within a game's settings by selecting Settings / API Scripts.  Alternately, you can download and add them as custom scripts.  If you choose to do the latter, the scripts can be found here:
 
-##### [HeroSystem6e](https://github.com/Roll20/roll20-api-scripts/tree/master/Hero6Playable)
+##### [HeroSystem6e](https://github.com/Roll20/roll20-api-scripts/tree/master/HeroSystem6e)
 ##### [Hero6Tracker](https://github.com/Roll20/roll20-api-scripts/tree/master/HeroTracker)
 
 ## <a id="usage">Usage</a>
@@ -153,19 +153,19 @@ Lim. | The limitations for the power.  This number is used to compute the real c
 ##### Framework
 Element | Description
 -|-
-Type | Sets the power as either a Power Framework or a Slot of a Power Framework.  This is primarily informational only.  It affects the computation for Real Cost.  If this field is set to be a framework slot, the Real Cost will be formatted using a suffix of "f" or "v" for a Multipower Slot, or enclosed within parenthesis for a VPP Slot.  **Note that a VPP Framework cannot have advantages or disadvantages.  If you have a value other than zero in either the Adv. or Lim. fields for a VPP Framework, the Real Cost will be displayed as "???"**.
+Type | Sets the power as either a Power Framework or a Slot of a Power Framework.  This is primarily informational only.  It affects the computation for Real Cost.  If this field is set to be a framework slot, the Real Cost will be formatted using a suffix of "f" or "v" for a Multipower Slot, or enclosed within parenthesis for a VPP Slot.  **Note that a VPP Framework cannot have advantages or disadvantages.  If you have a value other than zero in either the Adv. or Lim. fields for a VPP Framework, the Real Cost will be displayed as "???" to indicate the error**.
 Name | This field is for information purposes only.  At some future date, it will be used to validate that a character has not assigned more active points to a framework than are allowed.
 
 ##### Endurance
-	A quick note about how endurance cost is calculated.  Normal endurance cost is 1 per 10 active points of
-    the power.  If a power has 40 base points and a .5 advantage modifier, the active points will be 60 and
-    the endurance cost 6.  However, by rule, the advantage "Reduced Endurance" is not factored in to the
-    active points.  So if you had a power with 40 active points and a .5 advantage modifier that consisted of
-    Invisible Power Effects (+¼) and Reduced Endurance (+¼), the active points would be displayed as 60,
-    however the endurance cost would only be based on 50 (40 base points +¼ for the IPE).  This adjustment
-    is taken into account if you select "0 END" or "½ END" from the Cost X field.  Also note that since choosing
-    "½ END" requires at least a .25 advantage, and "0 END" requires at least a .5 advantage, if your
-    advantage modifier is set below the required level the real cost of the power will be set to "???".
+	A quick note about how endurance cost is calculated.  Normal endurance cost is 1 per 10 active points of the
+    power.  If a power has 40 base points and a .5 advantage modifier, the active points will be 60 and the
+    endurance cost 6.  However, by rule, the advantage "Reduced Endurance" is not factored in to the active
+    points.  So if you had a power with 40 active points and a .5 advantage modifier that consisted of Invisible
+    Power Effects (+¼) and Reduced Endurance (+¼), the active points would be displayed as 60, however the
+    endurance cost would only be based on 50 (40 base points +¼ for the IPE).  This adjustment is taken into
+    account if you select "0 END" or "½ END" from the Cost X field.  Also note that since choosing "½ END"
+    requires at least a .25 advantage, and "0 END" requires at least a .5 advantage, if your advantage modifier
+    is set below the required level the real cost of the power will be set to "???" to indicate the error.
     
 Element | Description
 -|-
