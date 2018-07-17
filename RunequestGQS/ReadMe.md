@@ -2,6 +2,12 @@
 
 At the top of each version of the sheet is a settings cog if this is clicked there are check  boxes to select which version of the sheet to display.  This will allow for selection of the sheet displayed if for some reason this settings in the Gamer Detaild fail.
 
+## If you have a pre-existing Quick Start character from before the full sheet was added the only things that will transfer are characterisitcs.
+~~## If you open the full release version of the sheet you must allow it to finish adding skills before you close it.  If you do not the skills will be added again.~~
+
+## If the default in game settings is set to a QS sheet and  you then change it to a full sheet in the configuration you will have to close the sheet and open it again for the skills to be added.
+
+
 ## Quick Start
 
 This is for the Qucik Start only the category modifiers arenot calculated and is intended only for one shots to demo the new system
@@ -24,4 +30,27 @@ In the weapon section * indicates to use the mounts damage bonus and not the pla
 
 Default in the weapon section indicates that you are using a skill from the same category e.g. using Broadsword skill with a short sword.  It will halve the skill as per the rules.
 
-STR and DEX minimuns are not currently supported this maybe added in a future release.
+STR and DEX minimums are not currently supported this maybe added in a future release.
+
+## Version 10.07.2018
+
+Prevented skill duplication on the full sheet
+
+Added buttonto add strike rankto turn order
+
+Completed fumble calculation fixes
+
+Add Tab for family and holding information
+
+
+## Version 02.07.2018
+Fixes to  skill roll and melee templates because of site changes to css
+
+Fixed no damage shown if exact skill is rolled.
+
+Fixed crush damage on special
+
+Removed border highlighting on damage
+
+Fixed some of the fumble calculations (characteristc rolls and weapons).
+

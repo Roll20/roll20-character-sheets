@@ -3,7 +3,7 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.2.0";
+	const sheetVersion = "2.3.0";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -25,15 +25,17 @@
 		"skill_combat_psitech", "skill_combat_unarmed", "skill_telekinesis"
 	];
 	const weaponDisplayEvent = [
-		...["attack", "name", "skill_bonus", "attribute_mod", "damage", "shock","shock_damage",
-		"shock_ac", "skill_to_damage"].map(x => `change:repeating_weapons:weapon_${x}`),
+		...["attack", "name", "skill_bonus", "attribute_mod", "damage", "shock", "shock_damage",
+			"shock_ac", "skill_to_damage"
+		].map(x => `change:repeating_weapons:weapon_${x}`),
 		"remove:repeating_weapons", "change:attack_bonus",
 		...weaponSkills.map(name => `change:${name}`),
 	].join(" ");
 	const skills = {
 		revised: ["administer", "connect", "exert", "fix", "heal", "know", "lead",
 			"notice", "perform", "pilot", "program", "punch", "shoot", "sneak", "stab",
-			"survive", "talk", "trade", "work"],
+			"survive", "talk", "trade", "work"
+		],
 		first: ["artist", "athletics", "bureaucracy", "business", "combat_energy", "combat_gunnery",
 			"combat_primitive", "combat_projectile", "combat_psitech", "combat_unarmed", "computer",
 			"culture_alien", "culture_criminal", "culture_spacer", "culture_traveller", "culture_one",
@@ -41,11 +43,13 @@
 			"leadership", "navigation", "perception", "persuade", "profession", "religion", "science",
 			"security", "stealth", "steward", "survival", "tactics", "tech_astronautic", "tech_maltech",
 			"tech_medical", "tech_postech", "tech_pretech", "tech_psitech", "vehicle_air", "vehicle_grav",
-			"vehicle_land", "vehicle_space", "vehicle_water"],
+			"vehicle_land", "vehicle_space", "vehicle_water"
+		],
 		psionic: ["biopsionics", "metapsionics", "precognition", "telekinesis", "telepathy", "teleportation"],
 	};
 	const shipStats = ["ship_ac", "ship_armor", "ship_class", "ship_crew_max", "ship_crew_min",
-	"ship_hardpoints_max", "ship_hp", "ship_hp_max", "ship_mass_max", "ship_power_max", "ship_speed"];
+		"ship_hardpoints_max", "ship_hp", "ship_hp_max", "ship_mass_max", "ship_power_max", "ship_speed"
+	];
 	const reverseHullTypes = {
 		[translate("BATTLESHIP").toLowerCase()]: "battleship",
 		[translate("BULK_FREIGHTER").toLowerCase()]: "bulk_freighter",
@@ -60,7 +64,7 @@
 		[translate("STRIKE_FIGHTER").toLowerCase()]: "strike_fighter",
 		[translate("SHUTTLE").toLowerCase()]: "shuttle",
 	};
-	const reverseClasses= {
+	const reverseClasses = {
 		[translate("ADVENTURER").toLowerCase()]: "adventurer",
 		[translate("EXPERT").toLowerCase()]: "expert",
 		[translate("PSYCHIC").toLowerCase()]: "psychic",
@@ -83,6 +87,86 @@
 				class_ability: translate("WARRIOR_CLASS_ABILITY"),
 			},
 		},
+		"drones": {
+			alecto: {
+				drone_AC: "18",
+				drone_enc: "4",
+				drone_HP: "30",
+				drone_num_fittings: "4",
+				drone_range: "5000 km",
+			},
+			cuttlefish: {
+				drone_AC: "13",
+				drone_enc: "2",
+				drone_HP: "10",
+				drone_num_fittings: "5",
+				drone_range: "1 km",
+			},
+			ghostwalker: {
+				drone_AC: "15",
+				drone_enc: "3",
+				drone_fitting_1_desc: translate("SENSOR_TRANSPARENCY_DESC"),
+				drone_fitting_1_name: translate("SENSOR_TRANSPARENCY"),
+				drone_HP: "1",
+				drone_num_fittings: "3",
+				drone_range: "5 km",
+			},
+			pax: {
+				drone_AC: "16",
+				drone_enc: "4",
+				drone_HP: "20",
+				drone_num_fittings: "4",
+				drone_range: "100 km",
+			},
+			primitve_drone: {
+				drone_AC: "12",
+				drone_enc: "2",
+				drone_HP: "1",
+				drone_num_fittings: "1",
+				drone_range: "500 m",
+			},
+			sleeper: {
+				drone_AC: "12",
+				drone_enc: "2",
+				drone_fitting_1_desc: translate("STATIONKEEPING_DESC"),
+				drone_fitting_1_name: translate("STATIONKEEPING"),
+				drone_HP: "8",
+				drone_num_fittings: "5",
+				drone_range: "100 km",
+			},
+			stalker: {
+				drone_AC: "13",
+				drone_enc: "2",
+				drone_HP: "5",
+				drone_num_fittings: "3",
+				drone_range: "2 km",
+			},
+			void_hawk: {
+				drone_AC: "14",
+				drone_enc: "6",
+				drone_HP: "15",
+				drone_num_fittings: "4",
+				drone_range: "100 km",
+			},
+		},
+		"droneFittings": [
+			"ammo_unit",
+			"bomber",
+			"environmental_power",
+			"expert_system",
+			"extended_flight",
+			"grav_muffles",
+			"heavy_lift",
+			"holoskin",
+			"medical_support",
+			"observation_suite",
+			"racing_gravitics",
+			"reinforced_structure",
+			"sensor_transparency",
+			"stationkeeping",
+			"suicide_charge",
+			"weapon_fitting"
+		],
 		"hulltypes": {
 			battleship: {
 				ship_ac: "16",
@@ -298,6 +382,11 @@
 				armor_encumbrance: "0",
 				armor_type: "STREET",
 			},
+			executive_security_suit: {
+				armor_ac: "15",
+				armor_encumbrance: "0",
+				armor_type: "ARTIFACT",
+			},
 			field_emitter_panoply: {
 				armor_ac: "20",
 				armor_encumbrance: "1",
@@ -315,6 +404,11 @@
 				armor_encumbrance: "2",
 				armor_type: "PRIMITIVE",
 			},
+			ghost_mantle: {
+				armor_ac: "15",
+				armor_encumbrance: "0",
+				armor_type: "ARTIFACT",
+			},
 			icarus_harness: {
 				armor_ac: "16",
 				armor_encumbrance: "1",
@@ -324,6 +418,16 @@
 				armor_ac: "13",
 				armor_encumbrance: "1",
 				armor_type: "PRIMITIVE",
+			},
+			polyplast_carapace: {
+				armor_ac: "18",
+				armor_encumbrance: "1",
+				armor_type: "ARTIFACT",
+			},
+			psitech_combat_suit: {
+				armor_ac: "16",
+				armor_encumbrance: "0",
+				armor_type: "ARTIFACT",
 			},
 			secure_clothing: {
 				armor_ac: "13",
@@ -346,6 +450,23 @@
 				armor_encumbrance: "2",
 				armor_encumbrance_bonus: "4",
 				armor_type: "POWERED",
+			},
+			stutterjump_suit: {
+				armor_ac: "18",
+				armor_encumbrance: "0",
+				armor_type: "ARTIFACT",
+			},
+			tempest_assault_array: {
+				armor_ac: "20",
+				armor_encumbrance: "1",
+				armor_encumbrance_bonus: "4",
+				armor_type: "ARTIFACT",
+			},
+			titan_powered_armor: {
+				armor_ac: "21",
+				armor_encumbrance: "2",
+				armor_encumbrance_bonus: "4",
+				armor_type: "ARTIFACT",
 			},
 			vestimentum: {
 				armor_ac: "18",
@@ -465,6 +586,9 @@
 			wild_psychic_talent: {},
 		},
 		"gear": {
+			ai_companion: {
+				gear_encumbrance: "0",
+			},
 			ammo_20_rounds: {
 				gear_encumbrance: "1#",
 			},
@@ -531,6 +655,12 @@
 			instapanel: {
 				gear_encumbrance: "1#",
 			},
+			integrity_stims: {
+				gear_encumbrance: "0",
+			},
+			juggernaut_stims: {
+				gear_encumbrance: "0",
+			},
 			lazarus_patch: {
 				gear_encumbrance: "1#",
 			},
@@ -549,10 +679,22 @@
 			metatool: {
 				gear_encumbrance: "1",
 			},
+			micropurgator_stims: {
+				gear_encumbrance: "0",
+			},
+			mindwall_helmet: {
+				gear_encumbrance: "0",
+			},
 			navcomp: {
 				gear_encumbrance: "1",
 			},
+			polymorphic_nanites: {
+				gear_encumbrance: "1",
+			},
 			portabox: {
+				gear_encumbrance: "1",
+			},
+			pseudonuke: {
 				gear_encumbrance: "1",
 			},
 			power_cell_type_a: {
@@ -572,6 +714,9 @@
 			},
 			rations_1_day: {
 				gear_encumbrance: "1#",
+			},
+			redivivus_sheath: {
+				gear_encumbrance: "1",
 			},
 			remote_link_unit: {
 				gear_encumbrance: "1",
@@ -605,6 +750,9 @@
 			},
 			survival_kit: {
 				gear_encumbrance: "1",
+			},
+			system_reset_inductor: {
+				gear_encumbrance: "0",
 			},
 			tailored_antiallergens: {
 				gear_encumbrance: "0",
@@ -647,6 +795,9 @@
 			},
 			vacc_suit: {
 				gear_encumbrance: "2",
+			},
+			wideawake_serum: {
+				gear_encumbrance: "0",
 			},
 		},
 		"ship-defenses": {
@@ -1407,6 +1558,11 @@
 				weapon_encumbrance: "1",
 				weapon_range: "5/15",
 			},
+			demo_charge: {
+				weapon_damage: "3d10",
+				weapon_encumbrance: "1",
+				weapon_range: "20/40",
+			},
 			distortion_cannon: {
 				weapon_attack: "1",
 				weapon_ammo: "6",
@@ -1631,6 +1787,11 @@
 				weapon_damage: "5d12",
 				weapon_range: "1000/2000",
 			},
+			wheatcutter_belt: {
+				weapon_ammo: "5",
+				weapon_damage: "2d12",
+				weapon_range: "10/20",
+			},
 		},
 	};
 
@@ -1649,7 +1810,7 @@
 		// set values unnecessarily (it's expensive) and to reduce bloat
 		// in the Attributes & Abilities tab.
 		Object.keys(setting).forEach(k => {
-			if (String(values[k]) === String(setting[k])) delete setting[k];
+			if (`${values[k]}` === `${setting[k]}`) delete setting[k];
 		});
 		setAttrs(setting, ...rest);
 	};
@@ -1672,19 +1833,20 @@
 				}
 			};
 		const setting = (Array.isArray(data) ? data : [data]).map(o => {
-				const newID = getRowID();
-				return Object.entries(o).reduce((m, [key, value]) => {
-					m[`repeating_${sName}_${newID}_${key}`] = String(value);
-					return m;
-				}, {});
-			}).reduce((m, o) => Object.assign(m, o), {});
+			const newID = getRowID();
+			return Object.entries(o).reduce((m, [key, value]) => {
+				m[`repeating_${sName}_${newID}_${key}`] = `${value}`;
+				return m;
+			}, {});
+		}).reduce((m, o) => Object.assign(m, o), {});
 		setAttrs(setting, {}, callback);
 	};
 
 	/* Calculations */
 	const calculateSaves = () => {
 		getAttrs([...attributes.map(attr => `${attr}_mod`), "level",
-			"homebrew_luck_save", "save_physical", "save_mental", "save_evasion", "save_luck"], v => {
+			"homebrew_luck_save", "save_physical", "save_mental", "save_evasion", "save_luck"
+		], v => {
 			const base = 16 - (parseInt(v.level) || 1);
 			const setting = {
 				save_physical: base - (Math.max(parseInt(v.strength_mod), parseInt(v.constitution_mod)) || 0),
@@ -1697,13 +1859,22 @@
 	};
 
 	const calculateEffort = () => {
-		getAttrs([...effortAttributes, "psionics_total_effort"], v => {
-			const attrBonus = Math.max(parseInt(v.wisdom_mod), parseInt(v.constitution_mod)) || 0,
-				skillBonus = Math.max(...skills.psionic.map(x => parseInt(v[`skill_${x}`]) || 0));
-			const psionics_total_effort = Math.max(1 + attrBonus + skillBonus, 1) + parseInt(v.psionics_extra_effort) -
-				parseInt(v.psionics_committed_effort_current) - parseInt(v.psionics_committed_effort_scene) -
-				parseInt(v.psionics_committed_effort_day);
-			mySetAttrs({ psionics_total_effort }, v);
+		getSectionIDs("repeating_psychic-skills", idArray => {
+			getAttrs([...effortAttributes,
+				"psionics_total_effort",
+				...idArray.map(id => `repeating_psychic-skills_${id}_skill`)], v => {
+				const attrBonus = Math.max(parseInt(v.wisdom_mod), parseInt(v.constitution_mod)) || 0,
+					skillBonus = Math.max(
+						...skills.psionic.map(x => parseInt(v[`skill_${x}`]) || 0),
+						...idArray.map(id => parseInt(v[`repeating_psychic-skills_${id}_skill`]) || 0)
+					);
+				const psionics_total_effort = Math.max(1 + attrBonus + skillBonus, 1) + parseInt(v.psionics_extra_effort) -
+					parseInt(v.psionics_committed_effort_current) - parseInt(v.psionics_committed_effort_scene) -
+					parseInt(v.psionics_committed_effort_day);
+				mySetAttrs({
+					psionics_total_effort
+				}, v);
+			});
 		});
 	};
 
@@ -1720,19 +1891,21 @@
 				const baseAC = Math.max(
 					parseInt(v.innate_ac) || 0,
 					...idArray.filter(id => v[`repeating_armor_${id}_armor_active`] === "1")
-						.filter(id => v[`repeating_armor_${id}_armor_type`] !== "SHIELD" )
+						.filter(id => v[`repeating_armor_${id}_armor_type`] !== "SHIELD")
 						.map(id => parseInt(v[`repeating_armor_${id}_armor_ac`]) || 0)
 				);
 				const shieldAC = Math.max(
 					0,
 					...idArray.filter(id => v[`repeating_armor_${id}_armor_active`] === "1")
-						.filter(id => v[`repeating_armor_${id}_armor_type`] === "SHIELD" )
+						.filter(id => v[`repeating_armor_${id}_armor_type`] === "SHIELD")
 						.map(id => parseInt(v[`repeating_armor_${id}_armor_ac`]) || 0)
 				);
 				const AC = (shieldAC > 0 ? shieldAC <= baseAC ? (baseAC + 1) : shieldAC : baseAC) +
 					(parseInt(v.dexterity_mod) || 0);
 
-				mySetAttrs({AC}, v);
+				mySetAttrs({
+					AC
+				}, v);
 			});
 		});
 	};
@@ -1756,7 +1929,7 @@
 			})(parseInt(v[attr]) || 10);
 
 			const setting = {
-				[`${attr}_mod`]: String(mod + (parseInt(v[`${attr}_bonus`]) || 0))
+				[`${attr}_mod`]: `${mod + (parseInt(v[`${attr}_bonus`]) || 0)}`
 			};
 
 			mySetAttrs(setting, v, null, () => {
@@ -1770,7 +1943,9 @@
 	const calculateStrDexMod = () => {
 		getAttrs(["str_dex_mod", "strength_mod", "dexterity_mod"], v => {
 			const str_dex_mod = Math.max(parseInt(v.strength_mod), parseInt(v.dexterity_mod));
-			mySetAttrs({str_dex_mod}, v);
+			mySetAttrs({
+				str_dex_mod
+			}, v);
 		});
 	};
 
@@ -1782,14 +1957,12 @@
 					setAttrs({
 						xp_next: xp[v.level]
 					});
-				}
-				else {
+				} else {
 					setAttrs({
 						xp_next: 93 + ((v.level - 9) * 24)
 					});
 				}
-			}
-			else if (v.setting_xp_scheme === "money") {
+			} else if (v.setting_xp_scheme === "money") {
 				setAttrs({
 					xp_next: 2500 * (2 * v.level)
 				});
@@ -1800,20 +1973,22 @@
 	const calculateGearReadiedStowed = () => {
 		const doCalc = (gearIDs, weaponIDs, armorIDs) => {
 			const attrs = [
+				...gearIDs.map(id => `repeating_gear_${id}_gear_amount`),
 				...gearIDs.map(id => `repeating_gear_${id}_gear_encumbrance`),
 				...gearIDs.map(id => `repeating_gear_${id}_gear_status`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_encumbrance`),
+				...armorIDs.map(id => `repeating_armor_${id}_armor_encumbrance_bonus`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_status`),
 				...weaponIDs.map(id => `repeating_weapons_${id}_weapon_encumbrance`),
 				...weaponIDs.map(id => `repeating_weapons_${id}_weapon_status`),
-				"gear_readied", "gear_readied_max", "gear_readied_over",
-				"gear_stowed", "gear_stowed_max", "gear_stowed_over",
+				"gear_readied", "gear_stowed", "strength", "gear_readied_max",
+				"gear_readied_over", "gear_stowed_over", "gear_stowed_max"
 			];
 			getAttrs(attrs, v => {
 				const [gear_readied, gear_stowed] = armorIDs.reduce((m, id) => {
-					if (v[`repeating_armor_${id}_armor_status`] === "READIED")
+					if (v[`repeating_armor_${id}_armor_status`] === "READIED") {
 						m[0] += parseInt(v[`repeating_armor_${id}_armor_encumbrance`]) || 0;
-					else if (v[`repeating_armor_${id}_armor_status`] === "STOWED")
+					} else if (v[`repeating_armor_${id}_armor_status`] === "STOWED")
 						m[1] += parseInt(v[`repeating_armor_${id}_armor_encumbrance`]) || 0;
 					return m;
 				}, weaponIDs.reduce((m, id) => {
@@ -1823,17 +1998,32 @@
 						m[1] += parseInt(v[`repeating_weapons_${id}_weapon_encumbrance`]) || 0;
 					return m;
 				}, gearIDs.reduce((m, id) => {
+					const amount = parseInt(v[`repeating_gear_${id}_gear_amount`]) || 0;
 					if (v[`repeating_gear_${id}_gear_status`] === "READIED")
-						m[0] += parseInt(v[`repeating_gear_${id}_gear_encumbrance`]) || 0;
+						m[0] += Math.ceil(amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`])) || 0;
 					else if (v[`repeating_gear_${id}_gear_status`] === "STOWED")
-						m[1] += parseInt(v[`repeating_gear_${id}_gear_encumbrance`]) || 0;
+						m[1] += Math.ceil(amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`])) || 0;
 					return m;
 				}, [0, 0])));
-				const gear_readied_over = (gear_readied > parseInt(v.gear_readied_max)) ? "1" : "0";
-				const gear_stowed_over = (gear_stowed > parseInt(v.gear_stowed_max)) ? "1" : "0";
-				const setting = {gear_readied, gear_stowed, gear_readied_over, gear_stowed_over};
 
-				mySetAttrs(setting, v, {silent: true});
+				const armor_encumbrance_bonus = Math.max(0,
+					...armorIDs.filter(id => v[`repeating_armor_${id}_armor_status`] === "READIED")
+						.map(id => parseInt(v[`repeating_armor_${id}_armor_encumbrance_bonus`]) || 0)
+				);
+				const gear_stowed_max = (parseInt(v.strength) || 0) + armor_encumbrance_bonus;
+				const gear_readied_max = Math.floor(gear_stowed_max / 2);
+				const setting = {
+					gear_readied,
+					gear_stowed,
+					gear_readied_max,
+					gear_stowed_max,
+					gear_readied_over: (parseInt(v.gear_readied) > gear_readied_max) ? "1" : "0",
+					gear_stowed_over: (parseInt(v.gear_stowed) > gear_stowed_max) ? "1" : "0",
+				};
+
+				mySetAttrs(setting, v, {
+					silent: true
+				});
 			});
 		};
 
@@ -1841,16 +2031,6 @@
 			getSectionIDs("repeating_weapons", weaponIDs => {
 				getSectionIDs("repeating_armor", armorIDs => doCalc(gearIDs, weaponIDs, armorIDs));
 			});
-		});
-	};
-
-	const calculateGearReadiedStowedMax = () => {
-		getAttrs(["strength", "gear_readied_max", "gear_stowed_max"], v => {
-			if (v.strength)
-				mySetAttrs({
-					gear_readied_max: Math.floor((parseInt(v.strength) || 0) / 2),
-					gear_stowed_max: v.strength,
-				}, v);
 		});
 	};
 
@@ -1888,9 +2068,9 @@
 					const weaponDamage = (v[`${prefix}_weapon_damage`] === "0") ? "" : v[`${prefix}_weapon_damage`];
 					const shockString = (v[`${prefix}_weapon_shock`] !== "0") ? `, ${
 						(parseInt(v[`${prefix}_weapon_shock_damage`])||0) + damageBonus
-						}\xa0${translate("SHOCK").toLowerCase()}${
-							v[`${prefix}_weapon_shock_ac`] ? ` ${translate("VS_AC_LEQ")} ${v[`${prefix}_weapon_shock_ac`]}` : ""
-						}` : "";
+					}\xa0${translate("SHOCK").toLowerCase()}${
+						v[`${prefix}_weapon_shock_ac`] ? ` ${translate("VS_AC_LEQ")} ${v[`${prefix}_weapon_shock_ac`]}` : ""
+					}` : "";
 
 					const attack = baseAttackBonus + (parseInt(v[`${prefix}_weapon_attack`]) || 0) +
 						((skillBonus === -1) ? -2 : skillBonus) + attrBonus;
@@ -1913,21 +2093,23 @@
 	};
 
 	const handleAmmoAPI = (sName) => {
-		const formula = (sName === "weapons") ? "[[-1 - @{weapon_burst}]]" : "-1" ;
+		const formula = (sName === "weapons") ? "[[-1 - @{weapon_burst}]]" : "-1";
 		getSectionIDs(`repeating_${sName}`, idArray => {
 			getAttrs([
 				"setting_use_ammo",
 				...idArray.map(id => `repeating_${sName}_${id}_weapon_use_ammo`),
 				...idArray.map(id => `repeating_${sName}_${id}_weapon_api`)
-				], v => {
+			], v => {
 				const setting = idArray.reduce((m, id) => {
 					m[`repeating_${sName}_${id}_weapon_api`] =
 						(v.setting_use_ammo === "1" && v[`repeating_${sName}_${id}_weapon_use_ammo`] !== "0") ?
-						`\n!modattr --mute --charid @{character_id} --repeating_${sName}_${id}_weapon_ammo|${formula}`
-						: "";
+							`\n!modattr --mute --charid @{character_id} --repeating_${sName}_${id}_weapon_ammo|${formula}` :
+							"";
 					return m;
 				}, {});
-				mySetAttrs(setting, v, { silent: true });
+				mySetAttrs(setting, v, {
+					silent: true
+				});
 			});
 		});
 	};
@@ -1937,8 +2119,12 @@
 	 */
 	const validateTab = () => {
 		getAttrs(["tab", "npc"], v => {
-			if (v.tab === "character" && v.npc === "1") setAttrs({tab: "npc"});
-			if (v.tab === "npc" && v.npc === "0") setAttrs({tab: "character"});
+			if (v.tab === "character" && v.npc === "1") setAttrs({
+				tab: "npc"
+			});
+			if (v.tab === "npc" && v.npc === "0") setAttrs({
+				tab: "character"
+			});
 		});
 	};
 	const validateSuperTab = () => {
@@ -1955,7 +2141,9 @@
 				permanentStrain = parseInt(v.strain_permanent) || 0,
 				strain = Math.min(parseInt(v.strain_max), Math.max(currentStrain, permanentStrain));
 
-			if (strain !== currentStrain) setAttrs({ strain });
+			if (strain !== currentStrain) setAttrs({
+				strain
+			});
 		});
 	};
 	const validateWeaponSkills = (ids) => {
@@ -1963,7 +2151,8 @@
 		const prefixes = (ids && ids.map(id => `repeating_weapons_${id}`)) || ["repeating_weapons"];
 		getAttrs(["homebrew_skill_list", ...prefixes.map(p => `${p}_weapon_skill_bonus`)], v => {
 			const revisedList = ["@{skill_exert}", "@{skill_punch}", "@{skill_shoot}", "@{skill_stab}",
-				"@{skill_telekinesis}", "0"],
+					"@{skill_telekinesis}", "0"
+				],
 				firstList = ["@{skill_combat_energy}", "@{skill_combat_gunnery}", "@{skill_combat_primitive}", "@{skill_combat_projectile}",
 					"@{skill_combat_psitech}", "@{skill_combat_unarmed}", "@{skill_telekinesis}", "0"
 				],
@@ -1988,7 +2177,14 @@
 					npc_morale, npc_skills, npc_saves, armor_type
 				] = autofillData.statblocks[v.npc_stat_block];
 
-				const setting = { AC, npc_attack_bonus, npc_move, npc_morale, npc_skills, npc_saves};
+				const setting = {
+					AC,
+					npc_attack_bonus,
+					npc_move,
+					npc_morale,
+					npc_skills,
+					npc_saves
+				};
 
 				if (armor_type) setting.npc_armor_type = armor_type;
 				if (HD.includes("hp")) setting.HP = HD.replace("hp", "");
@@ -1996,7 +2192,7 @@
 
 				setAttrs(setting);
 
-				if(damage !== "Unarmed") {
+				if (damage !== "Unarmed") {
 					const newAttack = {
 						attack_ab: npc_attack_bonus,
 						attack_damage: damage,
@@ -2010,7 +2206,7 @@
 	};
 	const addNPCAttackBonus = () => {
 		getAttrs(["repeating_npc-attacks_attack_ab", "npc_attack_bonus"], v => {
-			if (String(v["repeating_npc-attacks_attack_ab"]) === "0") {
+			if (`${v["repeating_npc-attacks_attack_ab"]}` === "0") {
 				setAttrs({
 					["repeating_npc-attacks_attack_ab"]: v.npc_attack_bonus
 				});
@@ -2027,7 +2223,7 @@
 				const setting = idArray.reduce((m, id) => {
 					if (v.npc_roll_full_attack === "1") {
 						const num = parseInt(v[`repeating_npc-attacks_${id}_attack_number`]) || 1;
-						const macro = [2,3,4].map(n => {
+						const macro = [2, 3, 4].map(n => {
 							if (n <= num)
 								return `{{attack${n}=[[1d20 + @{attack_ab} @{attack_burst} @{modifier_query}]]}} ` +
 									`{{damage${n}=[[@{attack_damage} @{attack_burst}]]}} `;
@@ -2076,12 +2272,14 @@
 	/* End helper functions */
 	const buildSaveMenu = () => {
 		getAttrs(["homebrew_luck_save", "macro_saves"], v => {
-			const macro_saves = buildLink(`^{PHYSICAL} (v@{save_physical})`, ("save_physical")) + " " +
-				buildLink(`^{MENTAL} (v@{save_mental})`, ("save_mental")) + " " +
-				buildLink(`^{EVASION} (v@{save_evasion})`, ("save_evasion"), v.homebrew_luck_save !== "1") +
+			const macro_saves = buildLink("^{PHYSICAL} (v@{save_physical})", ("save_physical")) + " " +
+				buildLink("^{MENTAL} (v@{save_mental})", ("save_mental")) + " " +
+				buildLink("^{EVASION} (v@{save_evasion})", ("save_evasion"), v.homebrew_luck_save !== "1") +
 				((v.homebrew_luck_save === "1") ?
-					(" " + buildLink(`^{LUCK} (v@{save_luck})`, ("save_luck"), true)) : "");
-			mySetAttrs({ macro_saves }, v);
+					(" " + buildLink("^{LUCK} (v@{save_luck})", ("save_luck"), true)) : "");
+			mySetAttrs({
+				macro_saves
+			}, v);
 		});
 	};
 	const buildSkillMenu = () => {
@@ -2101,14 +2299,16 @@
 					idArray.filter(id => v[`repeating_skills_${id}_skill`] !== "-1").length;
 
 				const macro_skills = `${[
-						...skillList.filter(skill => v[`skill_${skill}`] !== "-1").map(skillToMacro(v)),
-						...idArray.filter(id => v[`repeating_skills_${id}_skill`] !== "-1").map(idToSkillMacro(v, "skills"))
-					].map(buildSkillMacro).join(" ")}${v.setting_show_untrained_skills === "1" ? `${
-						hasSkills ? `\n\n**^{UNTRAINED}**\n` : ""}${[
-						...skillList.filter(skill => v[`skill_${skill}`] === "-1").map(skillToMacro(v)),
-						...idArray.filter(id => v[`repeating_skills_${id}_skill`] === "-1").map(idToSkillMacro(v, "skills"))
-					].map(buildSkillMacro).join(" ")}` : ""}`;
-				mySetAttrs({ macro_skills }, v);
+					...skillList.filter(skill => v[`skill_${skill}`] !== "-1").map(skillToMacro(v)),
+					...idArray.filter(id => v[`repeating_skills_${id}_skill`] !== "-1").map(idToSkillMacro(v, "skills"))
+				].map(buildSkillMacro).join(" ")}${v.setting_show_untrained_skills === "1" ? `${
+					hasSkills ? "\n\n**^{UNTRAINED}**\n" : ""}${[
+					...skillList.filter(skill => v[`skill_${skill}`] === "-1").map(skillToMacro(v)),
+					...idArray.filter(id => v[`repeating_skills_${id}_skill`] === "-1").map(idToSkillMacro(v, "skills"))
+				].map(buildSkillMacro).join(" ")}` : ""}`;
+				mySetAttrs({
+					macro_skills
+				}, v);
 			});
 		});
 	};
@@ -2126,13 +2326,15 @@
 				getAttrs(sourceAttrs, v => {
 					if (v.setting_super_type == "magic" || v.setting_super_type == "neither") return;
 					const macro_psionics = `${[
-							...skills.psionic.filter(skill => v[`skill_${skill}`] !== "-1").map(skillToMacro(v)),
-							...skillIDs.filter(id => v[`repeating_psychic-skills_${id}_skill`] !== "-1")
-								.map(idToSkillMacro(v, "psychic-skills"))
-						].map(buildSkillMacro).join(" ")}${(techniqueIDs.length ? "\n\n" : "")}${
+						...skills.psionic.filter(skill => v[`skill_${skill}`] !== "-1").map(skillToMacro(v)),
+						...skillIDs.filter(id => v[`repeating_psychic-skills_${id}_skill`] !== "-1")
+							.map(idToSkillMacro(v, "psychic-skills"))
+					].map(buildSkillMacro).join(" ")}${(techniqueIDs.length ? "\n\n" : "")}${
 						techniqueIDs.map((id, index, allIDs) => buildLink(v[`repeating_techniques_${id}_technique_name`],
 							`repeating_techniques_${id}_technique`, index + 1 === allIDs.length)).join(" ")}`;
-					mySetAttrs({ macro_psionics }, v);
+					mySetAttrs({
+						macro_psionics
+					}, v);
 				});
 			});
 		});
@@ -2150,12 +2352,14 @@
 				getAttrs(sourceAttrs, v => {
 					if (v.setting_super_type == "psionics" || v.setting_super_type == "neither") return;
 					const macro_magic = `${[
-							...(v.skill_magic2_name ? ["magic", "magic2"] : ["magic"]).map(skillToMacro(v)),
-							...skillIDs.map(idToSkillMacro(v, "magic-skills"))
-						].map(buildSkillMacro).join(" ")}${spellIDs.length ? "\n\n" : ""}${
+						...(v.skill_magic2_name ? ["magic", "magic2"] : ["magic"]).map(skillToMacro(v)),
+						...skillIDs.map(idToSkillMacro(v, "magic-skills"))
+					].map(buildSkillMacro).join(" ")}${spellIDs.length ? "\n\n" : ""}${
 						spellIDs.map(id => buildLink(v[`repeating_spells_${id}_spell_name`], `repeating_spells_${id}_spell`))
-						.join(" ")}`;
-					mySetAttrs({ macro_magic }, v);
+							.join(" ")}`;
+					mySetAttrs({
+						macro_magic
+					}, v);
 				});
 			});
 		});
@@ -2173,7 +2377,9 @@
 						` ${sign(v[`repeating_ship-weapons_${id}_weapon_attack_bonus`])}`;
 					return buildLink(title, `repeating_ship-weapons_${id}_attack`, index + 1 === idArray.length);
 				}).join(" ");
-				mySetAttrs({ macro_ship_weapons }, v);
+				mySetAttrs({
+					macro_ship_weapons
+				}, v);
 			});
 		});
 	};
@@ -2193,7 +2399,9 @@
 							` (${v[`repeating_npc-attacks_${id}_attack_number`]} attacks)` : "");
 					return buildLink(title, `repeating_npc-attacks_${id}_attack`, index + 1 === idArray.length);
 				}).join(" ");
-				mySetAttrs({ macro_npc_attacks }, v);
+				mySetAttrs({
+					macro_npc_attacks
+				}, v);
 			});
 		});
 	};
@@ -2206,9 +2414,11 @@
 			getAttrs(sourceAttrs, v => {
 				const macro_npc_abilities = idArray.map((id, index) => {
 					return buildLink(v[`repeating_npc-abilities_${id}_ability_name`],
-						`repeating_npc-abilities_${id}_ability`,index + 1 === idArray.length);
+						`repeating_npc-abilities_${id}_ability`, index + 1 === idArray.length);
 				}).join(" ");
-				mySetAttrs({ macro_npc_abilities }, v);
+				mySetAttrs({
+					macro_npc_abilities
+				}, v);
 			});
 		});
 	};
@@ -2222,14 +2432,16 @@
 		getAttrs(sourceAttrs, v => {
 			if (v.npc !== "1") return;
 			const macroList = [
-				`[**^{SAVES}** v@{npc_saves},](~npc_save) [**^{SKILLS}** +@{npc_skills},](~npc_skill) `,
-				`[**^{MORALE}** v@{npc_morale}](~npc_morale)\n`,
-				`[**^{INITIATIVE}** d8,](~npc_initiative) [**^{REACTION}** 2d6,](~npc_reaction) `,
-				`**Move** @{npc_move}\n`
+				"[**^{SAVES}** v@{npc_saves},](~npc_save) [**^{SKILLS}** +@{npc_skills},](~npc_skill) ",
+				"[**^{MORALE}** v@{npc_morale}](~npc_morale)\n",
+				"[**^{INITIATIVE}** d8,](~npc_initiative) [**^{REACTION}** 2d6,](~npc_reaction) ",
+				"**Move** @{npc_move}\n"
 			];
-		if (v.macro_npc_attacks) macroList.push("\n**Attacks:** @{macro_npc_attacks}");
-		if (v.macro_npc_abilities) macroList.push("\n**Abilities:** @{macro_npc_abilities}");
-		mySetAttrs({ macro_statblock: macroList.join("")}, v);
+			if (v.macro_npc_attacks) macroList.push("\n**Attacks:** @{macro_npc_attacks}");
+			if (v.macro_npc_abilities) macroList.push("\n**Abilities:** @{macro_npc_abilities}");
+			mySetAttrs({
+				macro_statblock: macroList.join("")
+			}, v);
 		});
 	};
 
@@ -2240,7 +2452,7 @@
 			if (label && autofillData.classes.hasOwnProperty(label)) {
 				const data = Object.assign({}, autofillData.classes[label]);
 				Object.keys(data).forEach(key => {
-					if (!(["", "0"].includes(String(v[key])))) delete data[key];
+					if (!(["", "0"].includes(`${v[key]}`))) delete data[key];
 				});
 				mySetAttrs(data, v);
 			}
@@ -2259,7 +2471,7 @@
 		if (sName === "ship-defenses") {
 			if (label) output.defense_name = translate(label.toUpperCase());
 			if (output.defense_mass.includes("#")) {
-				output.defense_mass = String(parseInt(output.defense_mass) * v.ship_multiplier);
+				output.defense_mass = `${parseInt(output.defense_mass) * v.ship_multiplier}`;
 			}
 		}
 		if (sName === "ship-fittings") {
@@ -2268,10 +2480,10 @@
 				output.fitting_effect = translate(`${label.toUpperCase()}_DESC`);
 			}
 			if (output.fitting_mass.includes("#")) {
-				output.fitting_mass = String(Math.round(parseFloat(output.fitting_mass) * v.ship_multiplier));
+				output.fitting_mass = `${Math.round(parseFloat(output.fitting_mass) * v.ship_multiplier)}`;
 			}
 			if (output.fitting_power.includes("#")) {
-				output.fitting_power = String(parseInt(output.fitting_power) * v.ship_multiplier);
+				output.fitting_power = `${parseInt(output.fitting_power) * v.ship_multiplier}`;
 			}
 		}
 		if (sName === "ship-weapons") {
@@ -2282,7 +2494,10 @@
 			}
 		}
 		if (sName === "weapons") {
-			if (label) output.weapon_name = translate(label.toUpperCase());
+			if (label) {
+				output.weapon_name = translate(label.toUpperCase());
+				output.weapon_description = translate(`${label.toUpperCase()}_DESC`);
+			}
 			if (output.weapon_ammo) {
 				output.weapon_ammo_max = output.weapon_ammo;
 				output.weapon_use_ammo = "{{ammo=[[0@{weapon_ammo} - (1 @{weapon_burst})]] / @{weapon_ammo|max}}}";
@@ -2298,7 +2513,10 @@
 			}
 		}
 		if (sName === "armor") {
-			if (label) output.armor_name = translate(label.toUpperCase());
+			if (label) {
+				output.armor_name = translate(label.toUpperCase());
+				output.armor_description = translate(`${label.toUpperCase()}_DESC`) || "";
+			}
 		}
 		if (sName === "cyberware") {
 			if (label) {
@@ -2325,8 +2543,7 @@
 				output.gear_description = translate(`${label.toUpperCase()}_DESC`);
 			}
 			if (output.gear_encumbrance === "1#") {
-				output.gear_encumbrance = "1";
-				output.gear_description = `${translate("ENCUMBRANCE")} 1/3. ${output.gear_description}`;
+				output.gear_encumbrance = ".33";
 			}
 		}
 		return output;
@@ -2335,20 +2552,21 @@
 		const data = getAutofillData(sName, v, inputData, label);
 		// Generates info text from the stored data
 		if (sName === "ship-defenses") {
-			return `${translate(data.class)}+. ${translate("POWER_INIT")}: ${data.defense_power}, ` +
-				`${translate("MASS_INIT")}: ${data.defense_mass}. ${data.defense_effect}`;
+			return `${translate(data.class)}+. ${translate("POWER_INIT")}: ${data.defense_power}, ${
+				translate("MASS_INIT")}: ${data.defense_mass}. ${data.defense_effect}`;
 		}
 		if (sName === "ship-fittings") {
-			return `${translate(data.class)}+. ${translate("POWER_INIT")}: ${data.fitting_power}, ` +
-				`${translate("MASS_INIT")}: ${data.fitting_mass}. ${data.fitting_effect}`;
+			return `${translate(data.class)}+. ${translate("POWER_INIT")}: ${data.fitting_power}, ${
+				translate("MASS_INIT")}: ${data.fitting_mass}. ${data.fitting_effect}`;
 		}
 		if (sName === "ship-weapons") {
-			return `${translate(data.class)}+. ` +
-				`${translate("POWER_INIT")}: ${data.weapon_power}, ` +
-				`${translate("MASS_INIT")}: ${data.weapon_mass}, ` +
-				`${translate("HARDPOINTS_INIT")}: ${data.weapon_hardpoints}. ` +
-				`${translate("DAMAGE_SHORT")} ${data.weapon_damage}. ` +
-				`${data.weapon_qualities}${(data.weapon_ammo ? `, ${translate("AMMO")}: ${data.weapon_ammo}`: "")}.`;
+			return `${translate(data.class)}+. ${
+				translate("POWER_INIT")}: ${data.weapon_power}, ${
+				translate("MASS_INIT")}: ${data.weapon_mass}, ${
+				translate("HARDPOINTS_INIT")}: ${data.weapon_hardpoints}. ${
+				translate("DAMAGE_SHORT")} ${data.weapon_damage}. ${
+				data.weapon_qualities}${
+				(data.weapon_ammo ? `, ${translate("AMMO")}: ${data.weapon_ammo}`: "")}.`;
 		}
 		if (sName === "weapons") {
 			const getNamedAttrMod = expr => {
@@ -2356,17 +2574,17 @@
 				else if (expr === "@{strength_mod}") return translate("STRENGTH_SHORT");
 				else if (expr === "@{str_dex_mod}") return translate("STR_DEX");
 			};
-			return `${translate("DAMAGE_SHORT")} ${data.weapon_damage}${data.weapon_burst ? ` (${translate("BURST")})` : ""}` +
-				(data.weapon_ab ? `, ${translate("ATTACK_BONUS_SHORT")} +${data.weapon_ab}`: "") +
-				(data.weapon_range ? `, ${translate("RANGE")} ${data.weapon_range}`: "") +
-				(data.weapon_ammo ? `, ${translate("AMMO")} ${data.weapon_ammo}`: "") +
-				(data.weapon_shock ? `, ${data.weapon_shock_damage} ${translate("SHOCK_DAMAGE_AGAINST_AC_LEQ")} ${data.weapon_shock_ac}` : "") +
-				`, +${getNamedAttrMod(data.weapon_attribute_mod)}` +
-				(data.weapon_encumbrance ? `, ${translate("ENCUMBRANCE_SHORT")} ${data.weapon_encumbrance}` : "") + ".";
+			return `${translate("DAMAGE_SHORT")} ${data.weapon_damage}${data.weapon_burst ? ` (${translate("BURST")})` : ""}${
+				data.weapon_ab ? `, ${translate("ATTACK_BONUS_SHORT")} +${data.weapon_ab}` : ""}${
+				data.weapon_range ? `, ${translate("RANGE")} ${data.weapon_range}` : ""}${
+				data.weapon_ammo ? `, ${translate("AMMO")} ${data.weapon_ammo}` : ""}${
+				data.weapon_shock ? `, ${data.weapon_shock_damage} ${translate("SHOCK_DAMAGE_AGAINST_AC_LEQ")} ${data.weapon_shock_ac}` : ""}${
+				", +"}${getNamedAttrMod(data.weapon_attribute_mod)}${
+				data.weapon_encumbrance ? `, ${translate("ENCUMBRANCE_SHORT")} ${data.weapon_encumbrance}` : ""}.`;
 		}
 		if (sName === "armor") {
-			return `${translate("AC")} ${data.armor_ac}, ${translate(data.armor_type)}, ` +
-			`${translate("ENCUMBRANCE_SHORT")} ${data.armor_encumbrance}.`;
+			return `${translate("AC")} ${data.armor_ac}, ${translate(data.armor_type)
+			}, ${translate("ENCUMBRANCE_SHORT")} ${data.armor_encumbrance}.`;
 		}
 		if (sName === "cyberware") {
 			return `${translate("STRAIN")}: ${data.cyberware_strain}.`;
@@ -2374,6 +2592,9 @@
 		if (sName === "techniques") {
 			if (data.level === "0") return `${translate("CORE_TECHNIQUE")}.`;
 			else return `${translate("LEVEL")}-${data.level}.`;
+		}
+		if (sName === "gear") {
+			return `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}.`;
 		}
 		return "";
 	};
@@ -2400,19 +2621,35 @@
 				if (info) setAttrs({
 					[`generate_${sName}_info`]: info
 				});
-			}
-			else setAttrs({[`generate_${sName}_info`]: " "});
+			} else setAttrs({
+				[`generate_${sName}_info`]: " "
+			});
 		});
 	};
 
 	/* Translations */
 	const setTranslatedDefaults = () => {
 		const specialSkills = {
-			skill_culture_alien_name: { trans: `${translate("CULTURE_ALIEN")}/`, default: "Culture/Alien/" },
-			skill_culture_one_name: { trans: `${translate("CULTURE")}/`, default: "Culture/" },
-			skill_culture_two_name: { trans: `${translate("CULTURE")}/`, default: "Culture/" },
-			skill_culture_three_name: { trans: `${translate("CULTURE")}/`, default: "Culture/" },
-			skill_profession_name: { trans: `${translate("PROFESSION")}/`, default: "Profession/"},
+			skill_culture_alien_name: {
+				trans: `${translate("CULTURE_ALIEN")}/`,
+				default: "Culture/Alien/"
+			},
+			skill_culture_one_name: {
+				trans: `${translate("CULTURE")}/`,
+				default: "Culture/"
+			},
+			skill_culture_two_name: {
+				trans: `${translate("CULTURE")}/`,
+				default: "Culture/"
+			},
+			skill_culture_three_name: {
+				trans: `${translate("CULTURE")}/`,
+				default: "Culture/"
+			},
+			skill_profession_name: {
+				trans: `${translate("PROFESSION")}/`,
+				default: "Profession/"
+			},
 		};
 		getAttrs([...Object.keys(specialSkills), "homebrew_skill_list", "innate_ac_name"], v => {
 			const setting = {};
@@ -2435,22 +2672,22 @@
 		});
 
 		getAttrs(["attribute_query", "setting_skill_query",
-			...attributes.map(a => `attribute_query_${a.slice(0,3)}`)], v => {
+			...attributes.map(a => `attribute_query_${a.slice(0,3)}`)
+		], v => {
 
 			if (v.setting_skill_query === "hover" || v.setting_skill_query === "hide") {
 				mySetAttrs({
-					attribute_query:     `?{${translate("ATTRIBUTE")}|${[attrQueries[0], ...attrQueries.slice(1)].join("|")}}`,
-					attribute_query_str: `+ @{strength_mod}[${translate("STRENGTH")}]]]}} {{attribute= + ${translate(`STRENGTH_SHORT`)}}}`,
-					attribute_query_dex: `+ @{dexterity_mod}[${translate("DEXTERITY")}]]]}} {{attribute= + ${translate(`DEXTERITY_SHORT`)}}}`,
-					attribute_query_con: `+ @{constitution_mod}[${translate("CONSTITUTION")}]]]}} {{attribute= + ${translate(`CONSTITUTION_SHORT`)}}}`,
-					attribute_query_int: `+ @{intelligence_mod}[${translate("INTELLIGENCE")}]]]}} {{attribute= + ${translate(`INTELLIGENCE_SHORT`)}}}`,
-					attribute_query_wis: `+ @{wisdom_mod}[${translate("WISDOM")}]]]}} {{attribute= + ${translate(`WISDOM_SHORT`)}}}`,
-					attribute_query_cha: `+ @{charisma_mod}[${translate("CHARISMA")}]]]}} {{attribute= + ${translate(`CHARISMA_SHORT`)}}}`,
+					attribute_query: `?{${translate("ATTRIBUTE")}|${[attrQueries[0], ...attrQueries.slice(1)].join("|")}}`,
+					attribute_query_str: `+ @{strength_mod}[${translate("STRENGTH")}]]]}} {{attribute= + ${translate("STRENGTH_SHORT")}}}`,
+					attribute_query_dex: `+ @{dexterity_mod}[${translate("DEXTERITY")}]]]}} {{attribute= + ${translate("DEXTERITY_SHORT")}}}`,
+					attribute_query_con: `+ @{constitution_mod}[${translate("CONSTITUTION")}]]]}} {{attribute= + ${translate("CONSTITUTION_SHORT")}}}`,
+					attribute_query_int: `+ @{intelligence_mod}[${translate("INTELLIGENCE")}]]]}} {{attribute= + ${translate("INTELLIGENCE_SHORT")}}}`,
+					attribute_query_wis: `+ @{wisdom_mod}[${translate("WISDOM")}]]]}} {{attribute= + ${translate("WISDOM_SHORT")}}}`,
+					attribute_query_cha: `+ @{charisma_mod}[${translate("CHARISMA")}]]]}} {{attribute= + ${translate("CHARISMA_SHORT")}}}`,
 				}, v);
-			}
-			else if (v.setting_skill_query === "query") {
+			} else if (v.setting_skill_query === "query") {
 				mySetAttrs({
-					attribute_query:     `?{${translate("ATTRIBUTE")}|${[attrQueries[0], ...attrQueries.slice(1)].join("|")}}`,
+					attribute_query: `?{${translate("ATTRIBUTE")}|${[attrQueries[0], ...attrQueries.slice(1)].join("|")}}`,
 					attribute_query_str: `?{${translate("ATTRIBUTE")}|${[attrQueries[0], ...attrQueries.slice(1)].join("|")}}`,
 					attribute_query_dex: `?{${translate("ATTRIBUTE")}|${[attrQueries[1], attrQueries[0], ...attrQueries.slice(2)].join("|")}}`,
 					attribute_query_con: `?{${translate("ATTRIBUTE")}|${[attrQueries[2], ...attrQueries.slice(0,2), ...attrQueries.slice(3)].join("|")}}`,
@@ -2463,18 +2700,19 @@
 	};
 	const handleModifierQuery = () => {
 		getAttrs(["modifier_query", "setting_modifier_query"], v => {
-			if (String(v.setting_modifier_query) === "1") {
+			if (`${v.setting_modifier_query}` === "1") {
 				mySetAttrs({
 					modifier_query: `+ ?{${translate("MODIFIER")}|0}[${translate("MODIFIER_SHORT")}]`,
 				}, v);
-			}
-			else mySetAttrs({modifier_query: " "}, v);
+			} else mySetAttrs({
+				modifier_query: " "
+			}, v);
 		});
 	};
 	const setTranslatedQueries = () => {
 		getAttrs(["burst_query", "extra_hp_query", "translation_numdice", "proficient_query", "skill_name_query"], v => {
 			const setting = {
-				burst_query: `?{${translate("BURST")}|${translate("YES")},+ 2[${translate("BURST")}]|${translate("NO")},&` + `#` + `32;}`,
+				burst_query: `?{${translate("BURST")}|${translate("YES")},+ 2[${translate("BURST")}]|${translate("NO")},&` + "#" + "32;}",
 				extra_hp_query: `?{${translate("EXTRA_HP_QUERY")}|0}[${translate("BONUS")}]`,
 				proficient_query: `?{${translate("PROFICIENT")}|${translate("YES")}, @{npc_skills}|${translate("NO")}, 0}[${translate("SKILL")}]`,
 				skill_name_query: `?{${translate("SKILL_NAME")}|${translate("SKILL")}}`,
@@ -2503,12 +2741,20 @@
 		// for filtering ship modules according to class.
 		getAttrs(["ship_class", "ship_class_normalised"], v => {
 			if (["fighter", translate("FIGHTER").toLowerCase()].includes(v.ship_class.toLowerCase()))
-				setAttrs({ship_class_normalised: "fighter"});
+				setAttrs({
+					ship_class_normalised: "fighter"
+				});
 			else if (["frigate", translate("FRIGATE").toLowerCase()].includes(v.ship_class.toLowerCase()))
-				setAttrs({ship_class_normalised: "frigate"});
+				setAttrs({
+					ship_class_normalised: "frigate"
+				});
 			else if (["cruiser", translate("CRUISER").toLowerCase()].includes(v.ship_class.toLowerCase()))
-				setAttrs({ship_class_normalised: "cruiser"});
-			else mySetAttrs({ship_class_normalised: ""}, v);
+				setAttrs({
+					ship_class_normalised: "cruiser"
+				});
+			else mySetAttrs({
+				ship_class_normalised: ""
+			}, v);
 		});
 	};
 	const calculateShipStats = () => {
@@ -2552,6 +2798,62 @@
 		}));
 	};
 
+	/* Drones */
+	const fillDroneStats = () => {
+		// This must be run from a repeating event, otherwise it will not know where to draw the data from.
+		getAttrs(["repeating_drones_drone_model"], v => {
+			const model = (v.repeating_drones_drone_model || "").toLowerCase().trim().replace(/ /g, "_");
+			if (autofillData.drones.hasOwnProperty(model)) {
+				const setting = Object.entries(autofillData.drones[model]).reduce((m, [key, value]) => {
+					m[`repeating_drones_${key}`] = value;
+					return m;
+				}, {});
+				setting.repeating_drones_drone_HP_max = setting.repeating_drones_drone_HP;
+				setAttrs(setting);
+			}
+		});
+	};
+	const fillDroneFitting = (num) => {
+		const prefix = `repeating_drones_drone_fitting_${num}`;
+		getAttrs([`${prefix}_desc`, `${prefix}_name`], v => {
+			const fittingName = (v[`${prefix}_name`] || "").toLowerCase().trim().replace(/ /g, "_");
+			if (v[`${prefix}_desc`] == "" && autofillData.droneFittings.includes(fittingName)) {
+				setAttrs({
+					[`${prefix}_desc`]: translate(`${fittingName.toUpperCase()}_DESC`)
+				});
+			}
+		});
+	};
+	const calculateDroneAttack = (prefixes) => {
+		const sourceAttrs = prefixes.reduce((m, prefix) => {
+			return m.concat([
+				`${prefix}_drone_weapon1_ab`,
+				`${prefix}_drone_weapon1_active`,
+				`${prefix}_drone_weapon1_attack`,
+				`${prefix}_drone_weapon2_ab`,
+				`${prefix}_drone_weapon2_active`,
+				`${prefix}_drone_weapon2_attack`,
+				`${prefix}_drone_weapon3_ab`,
+				`${prefix}_drone_weapon3_active`,
+				`${prefix}_drone_weapon3_attack`,
+			]);
+		}, ["intelligence_mod", "skill_pilot", "skill_program"]);
+		getAttrs(sourceAttrs, v => {
+			const skillMod = Math.max(parseInt(v.skill_pilot), parseInt(v.skill_program)) || 0,
+				intMod = parseInt(v.intelligence_mod) || 0;
+
+			const setting = prefixes.reduce((m, prefix) => {
+				[1, 2, 3].filter(num => v[`${prefix}_drone_weapon${num}_active`] === "1")
+					.forEach(num => {
+						m[`${prefix}_drone_weapon${num}_attack`] = skillMod + intMod +
+							parseInt(v[[`${prefix}_drone_weapon${num}_ab`]] || 0);
+					});
+				return m;
+			}, {});
+			mySetAttrs(setting, v);
+		});
+	};
+
 	/**
 	 * Migrations
 	 */
@@ -2576,7 +2878,7 @@
 			 *  convert old format for burst settings for weapons and attacks
 			 *  set ammo and shock checkboxes to reasonable values
 			 *  convert old format for gear readied/stowed
-			**/
+			 **/
 			if (major == 2 && minor < 1) {
 				const upgradeFunction = _.after(4, () => {
 					// recalculate these things just to be sure, in case the v1.6.2 update
@@ -2604,9 +2906,9 @@
 								m[`repeating_weapons_${id}_weapon_burst`] = "+ 2[Burst]";
 							if (v[`repeating_weapons_${id}_weapon_shock_damage`] !== "0")
 								m[`repeating_weapons_${id}_weapon_shock`] = "{{shock=[[@{weapon_shock_damage} + @{weapon_attribute_mod}[Attribute] + @{weapon_skill_to_damage}[Skill]]] ^{SHOCK_DAMAGE_AGAINST_AC_LEQ} @{weapon_shock_ac}!}}";
-							if (v[`repeating_weapons_${id}_weapon_ammo`] &&
-									v[`repeating_weapons_${id}_weapon_ammo`] !== "0")
+							if (v[`repeating_weapons_${id}_weapon_ammo`] && v[`repeating_weapons_${id}_weapon_ammo`] !== "0") {
 								m[`repeating_weapons_${id}_weapon_use_ammo`] = "{{ammo=[[0@{weapon_ammo} - (1 @{weapon_burst})]] / @{weapon_ammo|max}}}";
+							}
 							return m;
 						}, {});
 						setAttrs(setting, {}, upgradeFunction);
@@ -2615,10 +2917,9 @@
 				getSectionIDs("repeating_ship-weapons", idArray => {
 					getAttrs(idArray.map(id => `repeating_ship-weapons_${id}_weapon_ammo_max`), v => {
 						const setting = idArray.reduce((m, id) => {
-							if (v[`repeating_ship-weapons_${id}_weapon_ammo_max`] &&
-								v[`repeating_ship-weapons_${id}_weapon_ammo_max`] !== "0")
-								m[`repeating_ship-weapons_${id}_weapon_use_ammo`] =
-									"{{ammo=[[@{weapon_ammo} - 1]] / @{weapon_ammo_max}}}";
+							if (v[`repeating_ship-weapons_${id}_weapon_ammo_max`] && v[`repeating_ship-weapons_${id}_weapon_ammo_max`] !== "0") {
+								m[`repeating_ship-weapons_${id}_weapon_use_ammo`] = "{{ammo=[[@{weapon_ammo} - 1]] / @{weapon_ammo_max}}}";
+							}
 							return m;
 						}, {});
 						setAttrs(setting, {}, upgradeFunction);
@@ -2650,7 +2951,7 @@
 			/** v2.2.0
 			 *  convert single armor line to repeating armor
 			 *  Change @{attribute_query_none} to @{attribute_query}
-			**/
+			 **/
 			else if (major == 2 && minor < 2) {
 				const upgradeFunction = _.after(2, () => {
 					calculateStrDexMod();
@@ -2813,7 +3114,7 @@
 			...customConversionAttrs,
 		], v => {
 			const setting = Object.entries(attrConversionData).reduce((m, [oldName, newName]) => {
-				if (v[oldName] && v[oldName] !== "" && String(v[newName]) !== String(v[oldName]))
+				if (v[oldName] && v[oldName] !== "" && `${v[newName]}` !== `${v[oldName]}`)
 					m[newName] = v[oldName];
 				return m;
 			}, {});
@@ -2849,9 +3150,9 @@
 			fillRepeatingSectionFromData("resources", customCounterData, upgradeFunction);
 
 			// Tab
-			if (String(v.tab) === "1" || String(v.tab) === "4") setting.tab = "character";
-			if (String(v.tab) === "2") setting.tab = "ship";
-			if (String(v.tab) === "3") {
+			if (`${v.tab}` === "1" || `${v.tab}` === "4") setting.tab = "character";
+			if (`${v.tab}` === "2") setting.tab = "ship";
+			if (`${v.tab}` === "3") {
 				setting.tab = "character";
 				setting.npc = "1";
 			}
@@ -3031,9 +3332,9 @@
 		getSectionIDs("repeating_gear", idArray => {
 			getAttrs(idArray.map(id => `repeating_gear_${id}_gear_readied`), v => {
 				const setting = idArray.reduce((m, id) => {
-					if (String(v[`repeating_gear_${id}_gear_readied`]) === "1")
+					if (`${v[`repeating_gear_${id}_gear_readied`]}` === "1")
 						m[`repeating_gear_${id}_gear_status`] = "readied";
-					else if (String(v[`repeating_gear_${id}_gear_readied`]) === "2")
+					else if (`${v[`repeating_gear_${id}_gear_readied`]}` === "2")
 						m[`repeating_gear_${id}_gear_status`] = "stowed";
 					return m;
 				}, {});
@@ -3119,14 +3420,12 @@
 
 	on("change:level", calculateSaves);
 
-	on(effortAttributes.map(x => `change:${x}`).join(" "), calculateEffort);
+	on([...effortAttributes, "repeating_psychic-skills:skill"].map(x => `change:${x}`).join(" "), calculateEffort);
 
 	on("change:repeating_armor change:innate_ac remove:repeating_armor", calculateAC);
 
-	on("change:strength", calculateGearReadiedStowedMax);
-	on("change:repeating_gear remove:repeating_gear change:armor_encumbrance change:repeating_weapons " +
-		"remove:repeating_weapons change:gear_readied change:gear_stowed change:repeating_armor " +
-		"remove:repeating_armor", calculateGearReadiedStowed);
+	on("change:strength change:repeating_gear remove:repeating_gear change:repeating_weapons " +
+		"remove:repeating_weapons change:repeating_armor remove:repeating_armor", calculateGearReadiedStowed);
 
 	on("change:level change:setting_xp_scheme", calculateNextLevelXP);
 
@@ -3167,6 +3466,19 @@
 	on(shipStatEvent, calculateShipStats);
 	on("change:repeating_ship-weapons:weapon_name change:repeating_ship-weapons:weapon_attack_bonus " +
 		"remove:repeating_ship-weapons", buildShipWeaponsMenu);
+
+	/* Drones */
+	[1,2,3,4,5].forEach(num => {
+		on(`change:repeating_drones:drone_fitting_${num}_name`, () => fillDroneFitting(num));
+	});
+	on("change:repeating_drones:drone_model", fillDroneStats);
+	on("change:intelligence_mod change:skill_pilot change:skill_program", () => getSectionIDs("repeating_drones", idArray => {
+		calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`));
+	}));
+	on([
+		...[1, 2, 3].map(n => `change:repeating_drones:drone_weapon${n}_ab`),
+		...[1, 2, 3].map(n => `change:repeating_drones:drone_weapon${n}_active`)
+	].join(" "), () => calculateDroneAttack(["repeating_drones"]));
 
 	/* NPC sheet */
 	on("change:npc_stat_block", fillNPC);
