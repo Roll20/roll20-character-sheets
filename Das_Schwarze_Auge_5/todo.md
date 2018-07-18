@@ -5,6 +5,9 @@
  * Aventurische Magie I
  * Aventurisches Bestiarium I
 
+### Dokumentation
+ * 
+
 ### Features
  * Anzeige der automatischen Berechungen auch für Vor- und Nachteile sowie an anderen Stellen
  * Anzeige des Quellbuches + Seite (Tooltip?)
@@ -27,7 +30,7 @@
  * L+S Mod wird nicht berücksichtigt
 
 ### Aventurische Magie II
- * einige wenige Zauber wurden bereits hinzufegügt, auf Korrekheit überprüfen und ergänzen
+ * einige wenige Zauber wurden bereits hinzugefügt, auf Korrekheit überprüfen und ergänzen
 
 ### Testen von eingebauten Inhalten
  * aktuell muss nichts getestet werden ♪~

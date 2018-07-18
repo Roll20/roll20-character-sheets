@@ -1,3 +1,20 @@
+## 1.2.0
+ - 24.07.2018
+
+ ### Features
+ - Initiative Wurf wurde um 2 Nachkommastellen die dem INI-Basiswert entsprechen ergänzt. Also INI 12 entspricht nun 12.12 + 1W6. Sollten Durch würfeln identische Werte entstehen sind diese nun eher unterscheidbar. Zusätzlich ist dies auf 4 Nachkommastellen durch einen W99 erweiterbar. Dafür geht unter der Konfiguration auf den neuen Tab 'Hausregeln' auf die entsprechende Option. Weitere Informationen dazu findet man in der [Anfrage des Features](https://github.com/Meteox/roll20-character-sheets/issues/5)
+ - Die unnützen "Max" Felder für Eigenschaften wurden gegen Mod Felder ausgetauscht. Damit sind nun temporäre Modifikationen der Werte abbildbar
+ - Berechnungen für Dunkelsicht wurden implementiert, dabei wurden die Attributsnamen für Dunkelsicht verändert. Der Vorteil muss erneut ausgewählt werden sofern ihr über diesen verfügt.
+
+ ### Inhalte
+ - Vorteile Tab wurde überarbeitet, beinhaltet nun Toolstips mit Infos aus der Regelwiki & Angaben ob automatische Berechnungen stattfinden
+
+ ### Visuelles
+ - Fehlender Abstand im Talentbereich zwischen den Spalten BE und Stg. wurde hinzugefügt
+
+ ### Bugfixes
+
+
 ## 1.1.0
  - 17.07.2018
 
