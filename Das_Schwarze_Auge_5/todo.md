@@ -22,6 +22,8 @@
  * zufällige Trefferzonen Treffer
  * Befehlssonderfertigkeiten
  * Zauberzeichen prüfen
+ * Sichtmod Stufe IV fehlt
+ * Scharfschütze (JS Array?)
  
 ### Verbesserungen
  * Spezialmanöver die auf Raufen AT basieren Raufen statt Waffe als Basiswert einstellen.
