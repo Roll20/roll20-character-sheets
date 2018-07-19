@@ -11,6 +11,19 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 19.0.0
+
+### Breaking Changes
+- Removed my custom classes (only one, called `Summoner`) and my psionic classes (`Psion` and `Soulknife`) from the sheet. If you have custom classes then use the custom name field for the class.
+
+### Features
+- Settings page cleaned up after latest Roll20 changes. It has also been reorganized to match the PC sheet sections (skills, saving throws, etc).
+- [#750: Always show NPC saving throws](https://bitbucket.org/mlenser/5eshaped/issues/750/always-show-npc-saving-throws)
+
+### Bug fixes
+- [#729: NPC skill proficiencies are lost during conversion from OGL sheet](https://bitbucket.org/mlenser/5eshaped/issues/729/npc-skill-proficiencies-are-lost-during)
+- NPC skills should never expand in to the right column now
+
 ## 18.1.13
 
 ### Bug fixes
