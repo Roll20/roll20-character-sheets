@@ -49,6 +49,10 @@ This will create `13th_Age-neovatar.[css|html]` that you can copy and paste into
 
 ### Changelog
 
+**1.8.0:**
+* Added @tier_dmg_mult attribute, calculated by helper
+* Use tier ability damage bonus multiplier in basic attacks
+
 **1.7.0:**
 
 * Repeating section items now can be dragged to macro quick bar

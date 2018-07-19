@@ -6,16 +6,29 @@ This repository is the collection of all the community-contributed character she
 Contributing
 ============
 
-If you want to help improve an existing sheet, just clone this repository, make your changes, and submit a pull request. If you would like to contribute a new sheet for the community to use, just clone this repository and create a new folder with the name of the game system that the sheet is for. Then send a pull request. If you have any questions or aren't familiar with Github or git in general, feel free to drop us a line at team@roll20.net and we can help you get set up.
+Full Character Sheet documentation can be found on the [Roll20 Wiki](https://wiki.roll20.net/Building_Character_Sheets).
 
+## Internationalization &amp; Translations
+
+Help us make these sheets accessible in as many languages as possible. We use [Crowdin](https://crowdin.com/) to crowdsource translations. **The best way to translate an existing character sheet is to become a translator by emailing a request to team@roll20.net.** Character Sheet authors have a number of controls over how the sheet is translated and how the translation is displayed. Full documentation can be found in the [Roll20 Wiki](https://wiki.roll20.net/Character_Sheet_i18n).
+
+## Improving Existing Character Sheets
+
+If you want to help improve an existing sheet, just clone this repository, make your changes, and submit a pull request.
+
+## Creating your own
+
+If you would like to contribute a new sheet for the community to use, just clone this repository and create a new folder with the name of the game system that the sheet is for. Then send a pull request. If you have any questions or aren't familiar with Github or git in general, feel free to drop us a line at team@roll20.net and we can help you get set up.
 **Creating a sheet.json File**
 
 When you are ready to submit your template for **public use**, create a `sheet.json` file in your sheet's folder (see the kitchensink folder for an example sheet.json file). The file has the following fields:
 
-* `html`: The name of the HTML file for the sheet (e.g. `kitchensink.html`)
+* `html`: The name of the HTML file for the sheet (e.g. `kitchensink.html`) 
 * `css`: The name of the CSS file for the sheet (e.g. `kitchensink.css`)
 * `authors`: A simple string telling who contributed toward the sheet (e.g. `Riley Dutton`)
 * `roll20userid`: A simple string telling the Roll20 User ID's of the authors (e.g. `1` or `45672,145678`). Just used so we know who to credit internally, won't be shown publicly on the site.
+* `patreon`: Place the URL for a Patreon campaign here, and it will appear under your sheet's description when selected.  (e.g. `"https://www.patreon.com/<name>"`)
+* `tipeee`: Place the URL for a Tipeee here, and it will appear under your sheet's description when selected.  (e.g. `"https://www.tipeee.com/<name>"`)
 * `preview`: The name of an image file which should be included in your sheet folder showing a preview/screenshot of the sheet (will be displayed in-app at 500x500 resolution) (e.g. `kitchensink.png`)
 * `instructions`: Markdown-formatted instructions for using the sheet. If there are any particular setup steps, special rolls you want to make the player aware of, etc., this is the place to put that info. Try to be succinct.
 
@@ -48,6 +61,10 @@ Whenever possible, use standard names for attributes, spelled out. For example, 
 **No Character Creation or Advancement**
 
 Due to copyright restrctions, please don't attempt to include functionality for advancing a character automatically to the next level or creating a new character from scratch automatically. It's fine to have attributes that auto-calculate based on other attributes (including the current level). We'll let you know if your submitted sheet violates this rule.
+
+
+**Don't Use Reserved HTML**
+Your HTML file must **not** have a <head> or <body> tag, or your character sheet may not load in the virtual tabletop.
 
 License
 =======
