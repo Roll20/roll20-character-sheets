@@ -35,6 +35,7 @@ STR and DEX minimums are not currently supported this maybe added in a future re
 ## Version 24.07.2018
 
 Fixed typos
+
 Added Charisma to Otherworld creatures.
 
 ## Version 10.07.2018
