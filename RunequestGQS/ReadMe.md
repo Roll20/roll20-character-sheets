@@ -32,6 +32,11 @@ Default in the weapon section indicates that you are using a skill from the same
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
+## Version 24.07.2018
+
+Fixed typos
+Added Charisma to Otherworld creatures.
+
 ## Version 10.07.2018
 
 Prevented skill duplication on the full sheet
