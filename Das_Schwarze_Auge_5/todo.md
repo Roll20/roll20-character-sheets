@@ -9,9 +9,6 @@
  * 
 
 ### Features
- * Anzeige der automatischen Berechungen auch für Vor- und Nachteile sowie an anderen Stellen
- * Anzeige des Quellbuches + Seite (Tooltip?)
- * Inventar Anzahlanzeige
  * Kampf zu Pferd / Streitwagen (eigenen Tab erstellen?)
 
 ### Inhalte
