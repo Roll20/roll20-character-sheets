@@ -1,9 +1,9 @@
-/* global getAttrs, setAttrs, getSectionIDs, generateRowID, on ,removeRepeatingRow, _, getTranslationByKey */
+/* global getAttrs, setAttrs, getSectionIDs, generateRowID, on, removeRepeatingRow, _, getTranslationByKey */
 (function () {
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.3.0";
+	const sheetVersion = "2.3.1";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -2054,6 +2054,7 @@
 				...attributes.map(attr => `${attr}_mod`),
 				...weaponSkills,
 				"attack_bonus",
+				"str_dex_mod",
 				"macro_weapons"
 			];
 			getAttrs(sourceAttrs, v => {
@@ -2837,15 +2838,17 @@
 				`${prefix}_drone_weapon3_active`,
 				`${prefix}_drone_weapon3_attack`,
 			]);
-		}, ["intelligence_mod", "skill_pilot", "skill_program"]);
+		}, ["attack_bonus", "intelligence_mod", "skill_pilot", "skill_program"]);
 		getAttrs(sourceAttrs, v => {
 			const skillMod = Math.max(parseInt(v.skill_pilot), parseInt(v.skill_program)) || 0,
-				intMod = parseInt(v.intelligence_mod) || 0;
+				intMod = parseInt(v.intelligence_mod) || 0,
+				attackBonus = parseInt(v.attack_bonus) || 0;
 
 			const setting = prefixes.reduce((m, prefix) => {
 				[1, 2, 3].filter(num => v[`${prefix}_drone_weapon${num}_active`] === "1")
 					.forEach(num => {
-						m[`${prefix}_drone_weapon${num}_attack`] = skillMod + intMod +
+						m[`${prefix}_drone_weapon${num}_attack`] = intMod +
+							((skillMod === -1) ? -2 : skillMod) + attackBonus +
 							parseInt(v[[`${prefix}_drone_weapon${num}_ab`]] || 0);
 					});
 				return m;
@@ -2871,7 +2874,7 @@
 	const upgradeSheet = (version, firstTime = false, finalTime = false) => {
 		// Any version upgrade code should go here
 		const performUpgrade = (version) => {
-			const [major, minor] = version.split(".").map(x => parseInt(x));
+			const [major, minor, patch] = version.split(".").map(x => parseInt(x));
 			console.log(`Upgrading from version ${version}.`);
 
 			/** v2.1.0
@@ -2997,6 +3000,15 @@
 						});
 					});
 				}));
+			}
+			/** v2.3.1
+			 *  Regenerate drone and weapon ABs
+			 **/
+			else if (major == 2 && (minor < 3 || (minor == 3 && patch == 0))) {
+				generateWeaponDisplay();
+				getSectionIDs("repeating_drones", idArray => {
+					calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`));
+				});
 			}
 			/** Final upgrade clause, always leave this around */
 			else upgradeSheet(sheetVersion, false, true);
@@ -3472,9 +3484,10 @@
 		on(`change:repeating_drones:drone_fitting_${num}_name`, () => fillDroneFitting(num));
 	});
 	on("change:repeating_drones:drone_model", fillDroneStats);
-	on("change:intelligence_mod change:skill_pilot change:skill_program", () => getSectionIDs("repeating_drones", idArray => {
-		calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`));
-	}));
+	on("change:attack_bonus change:intelligence_mod change:skill_pilot change:skill_program",
+		() => getSectionIDs("repeating_drones", idArray => {
+			calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`));
+		}));
 	on([
 		...[1, 2, 3].map(n => `change:repeating_drones:drone_weapon${n}_ab`),
 		...[1, 2, 3].map(n => `change:repeating_drones:drone_weapon${n}_active`)

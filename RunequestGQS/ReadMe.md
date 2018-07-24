@@ -1,6 +1,6 @@
 # Runequest Glorantha Character Sheet
 
-At the top of each version of the sheet is a settings cog if this is clicked there are check  boxes to select which version of the sheet to display.  This will allow for selection of the sheet displayed if for some reason this settings in the Gamer Detaild fail.
+At the top of each version of the sheet is a settings cog if this is clicked there are check  boxes to select which version of the sheet to display.  This will allow for selection of the sheet displayed if for some reason this settings in the Game Details fails.
 
 ## If you have a pre-existing Quick Start character from before the full sheet was added the only things that will transfer are characterisitcs.
 ~~## If you open the full release version of the sheet you must allow it to finish adding skills before you close it.  If you do not the skills will be added again.~~
@@ -31,6 +31,12 @@ In the weapon section * indicates to use the mounts damage bonus and not the pla
 Default in the weapon section indicates that you are using a skill from the same category e.g. using Broadsword skill with a short sword.  It will halve the skill as per the rules.
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
+
+## Version 24.07.2018
+
+Fixed typos
+
+Added Charisma to Otherworld creatures.
 
 ## Version 10.07.2018
 
