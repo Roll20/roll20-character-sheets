@@ -2,14 +2,14 @@
 
 This is a multi-purpose sheet for both characters (default view) and threats based on the quickstart rules (subject to change).  
 
-Character information is organized into multiple tabs; the Advancement tab is a placeholder roughly based on the FFG WH40k RPG system. 
+This Wrath & Glory character sheet provides dice automation for inline dice rolls for any user and is integrated with the Wrath & Glory dice roller API for mentor level gamemasters. 
 
-This Wrath & Glory character sheet is an API enabled character sheet for mentor level gamemasters. It requires the WrathAndGlory_DieRoller.js included in the API Scripts folder at the github repository located at: https://github.com/Roll20/roll20-api-scripts/tree/master/Wrath%20And%20Glory
+Please note that the inline dice roll macros do not fully enable the type of dice rolls made in the Wrath & Glory system.  Users will need to hover over the inline roll results to count the number of successes (4 or 5 = 1 success; a 6 = an exalted icon that may be shifted to 2 successes).  At this point it does not add modifiers to the rolls for inline dice.
 
 If you have any questions, comments, or feedback (all welcome) please contact Barry at btsnyder@gmail.com
 
 ### Current Version
-Version 1.0 (July 18th, 2018) 
+Version 1.0 (July 26th, 2018) 
 
 ### Thanks	
 Many thanks to my players (Dave, Brian, Charles, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes in the middle of play) over the past several weeks.
@@ -18,8 +18,8 @@ Many thanks to my players (Dave, Brian, Charles, Matt, and Tyler) for their pati
 
 1. Update on full release of the rules in August.
 2. Automate all calculated fields.
-3. Add simple dice rolls for those who do not have a mentor level account.
+3. Add modifiers to inline rolls.
 	
 ### Changelog
 
-** July 10th, 2018: version 1.0 submitted to Roll20** 
+** July 26th, 2018: version 1.0 submitted to Roll20** 
