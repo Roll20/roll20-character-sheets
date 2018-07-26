@@ -9,6 +9,10 @@ The text areas are expandable for additional info.
 Wiki page for the sheet:
 		--------------->https://wiki.roll20.net/Star_Wars_WEG_D6_character_sheet<-------------
 
+Version 1.71 (2018-07-31):
+	Fix:
+	-Corrected Force Emptiness to scale properly with DarkSidePoints	
+		
 Version 1.70 (2018-07-24):
 	Layout:
 	-Made wound tracker wider
