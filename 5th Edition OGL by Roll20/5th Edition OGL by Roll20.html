@@ -10900,6 +10900,8 @@
                 var update = {};
                 var callbacks = [];
                 var profNames = [];
+                var totalDrops = dropArray.length;
+                var x = 0;
                 callbacks.push(update_class);
                 callbacks.push(update_race_display);
 
@@ -10909,12 +10911,14 @@
                     profNames = _.uniq(profNames.concat(dropUpdate.prof_names));
                     update = _.extend(dropUpdate.update, update);
                     x++;
+                    setCharmancerText({"mancer_progress" :'<div style="width: ' + (parseInt(x/totalDrops*70) + 20) + '%"></div>'});
                 });
 
                 callbacks.push( function() {update_ac();} );
                 callbacks.push( function() {update_weight();} );
                 callbacks.push(callback);
                 setAttrs(update, {silent: true}, function() {
+                    setCharmancerText({"mancer_progress" :'<div style="width: 95%"></div>'});
                     _.each(callbacks, function(callback) {
                         callback();
                     });
@@ -11378,14 +11382,19 @@
 
         //erase all repeating sections
         eraseRepeating(eraseSections, function() {
+            setCharmancerText({"mancer_progress" :'<div style="width: 5%"></div>'});
             //first set is silent to prevent unwanted sheet workers
             setAttrs(silentset, {silent:true}, function() {
+                setCharmancerText({"mancer_progress" :'<div style="width: 10%"></div>'});
                 //reset remaining attributes, and set ability scores/custom info
                 setAttrs(clearset, function() {
+                    setCharmancerText({"mancer_progress" :'<div style="width: 15%"></div>'});
                     getAllPages(allDrops, function() {
+                        setCharmancerText({"mancer_progress" :'<div style="width: 20%"></div>'});
                         doAllDrops(allPageData, function() {
                             console.log("DOING THE FINAL SET!!");
                             setAttrs(set, function() {
+                                setCharmancerText({"mancer_progress" :'<div style="width: 100%"></div>'});
                                 organize_section_proficiencies();
                                 update_skills(allSkills);
                                 update_attacks("all");
@@ -13616,11 +13625,8 @@
         <div class="">
             <h1>Building your character...</h1>
         </div>
-        <div class="">
-            <h2>Adding your <span class='mancer_category'></span></h2>
-        </div>
-        <div class="">
-            <h3><span class='mancer_progress'></span></h3>
+        <div class="mancer_progress">
+            <div style="width: 0%"></div>
         </div>
         <input type="hidden" name='attr_mancer_category'>
         <input type="hidden" name='attr_mancer_progress'>
