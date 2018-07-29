@@ -15,7 +15,6 @@
  * Nutzung von Parierwaffen
  * Waffenwurf einbauen ... wie auf die Mods eingehen? Verweis auf FK Tab?
  * Frontalangriff einbauen - Niederrennen + Lanzenangriff
- * Unterlaufen fehlt
  * zufällige Trefferzonen Treffer
  * Befehlssonderfertigkeiten
  * Zauberzeichen prüfen
