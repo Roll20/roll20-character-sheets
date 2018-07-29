@@ -61,7 +61,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 27);
+/******/ 	return __webpack_require__(__webpack_require__.s = 28);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -251,8 +251,12 @@ var formatPBProfDice = exports.formatPBProfDice = function formatPBProfDice(data
   data.pb_display = data.pb;
 };
 
-var cleanName = exports.cleanName = function cleanName(name) {
-  return name.replace(/“/g, '"').replace(/”/g, '"').replace(/'/g, '’');
+var clean = exports.clean = function clean(content) {
+  return content.trim().replace(/\u00a0/g, '').replace(/\u2060/g, '').replace('.  ', '. ').replace(/'/g, '’').replace(/‒/g, '-').replace(/−/g, '-').replace(/(\d+)(?:[-—−])(\d+)/g, '$1–$2').replace(/"([^"]*)"/g, '“$1”').trim();
+};
+
+var cleanContent = exports.cleanContent = function cleanContent(content) {
+  return clean(content).replace(/.*(\\n)/, '').trim().replace(/.*(\\n)/, '').trim().replace(/\n\s•/g, '\n•').replace(/\*\*\n\t/g, '**').replace(/\*\*\n\n/g, '**').replace(/\*\*\n/g, '**').replace(/\*\*([a-zA-Z0-9()\-–—−\s/\\’]+)[:.]?\s*[:.]?\*\*[:.]?\s*[:.]?([A-Z])/g, '**$1.** $2').replace(/\s\s\n\n/g, '\n\n').trim().trim();
 };
 
 var capitalize = exports.capitalize = function capitalize(string) {
@@ -263,7 +267,7 @@ var capitalize = exports.capitalize = function capitalize(string) {
 
 var showSign = exports.showSign = function showSign(value) {
   if (value >= 0) {
-    value = '+' + value;
+    return '+' + value;
   }
   return value;
 };
@@ -321,13 +325,10 @@ var round = exports.round = function round(n) {
 };
 
 var addArithmeticOperator = exports.addArithmeticOperator = function addArithmeticOperator(number) {
-  var value = number;
   if (number < 0) {
-    value = ' - ' + Math.abs(number);
-  } else {
-    value = ' + ' + number;
+    return ' - ' + Math.abs(number);
   }
-  return value;
+  return ' + ' + number;
 };
 
 var addTo = exports.addTo = function addTo(variable, value) {
@@ -756,7 +757,7 @@ var HIT_DIE = [20, 12, 10, 8, 6, 4, 2, 0];
 var REGEX = {
   diceAndDie: /(?:(\d+)(d\d+))?/,
   openParenthesis: /\s?\(?/,
-  plusMinusBonus: /\s?((?:\+|-)\s?\d+?)?\s?/,
+  plusMinusBonus: /\s?((?:[+-])\s?\d+?)?\s?/,
   singleNumber: /(\d+)?/
 };
 var REPEATING_FIELDS = {
@@ -1379,7 +1380,7 @@ var setupActions = exports.setupActions = function setupActions() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setupSpells = exports.parseSpellFromSRDWithServer = exports.parseSpellFromSRD = exports.parseLevel = exports.cleanContent = exports.findSpellcasting = exports.updateHasSpellPoints = exports.updateHasWarlockSlots = exports.updateHasSpellSlots = exports.setSpellSlots = exports.updateSpellSlots = exports.generateHigherLevelQueries = exports.updateWarlockSlotsRemaining = exports.updateWarlockSlots = exports.updateSpellSlotsRemaining = exports.countSpells = exports.updateSpells = exports.updateSpellsChatMacro = exports.updateDCAndAttack = undefined;
+exports.setupSpells = exports.parseSpellFromSRDWithServer = exports.parseSpellFromSRD = exports.parseLevel = exports.findSpellcasting = exports.updateHasSpellPoints = exports.updateHasWarlockSlots = exports.updateHasSpellSlots = exports.setSpellSlots = exports.updateSpellSlots = exports.generateHigherLevelQueries = exports.updateWarlockSlotsRemaining = exports.updateWarlockSlots = exports.updateSpellSlotsRemaining = exports.countSpells = exports.updateSpells = exports.updateSpellsChatMacro = exports.updateDCAndAttack = undefined;
 
 var _constants = __webpack_require__(2);
 
@@ -1776,7 +1777,7 @@ var updateSpells = exports.updateSpells = function updateSpells() {
         } else {
           var spellLevel = (0, _utilities.getLevelOfRepeatingString)(repString);
           if (data[repString + '_name'].includes('\'')) {
-            data[repString + '_name'] = (0, _utilities.cleanName)(data[repString + '_name']);
+            data[repString + '_name'] = (0, _utilities.clean)(data[repString + '_name']);
           }
           if ((0, _utilities.isUndefinedOrEmpty)(data[repString + '_spell_level'])) {
             data[repString + '_spell_level'] = (0, _utilities.ordinalSpellLevel)(spellLevel);
@@ -2363,10 +2364,6 @@ var findSpellcasting = exports.findSpellcasting = function findSpellcasting(repe
   });
 };
 
-var cleanContent = exports.cleanContent = function cleanContent(content) {
-  return content.replace(/“/g, '"').replace(/”/g, '"').replace(/'/g, '’').replace(/\*\*\n\t/g, '**').replace(/\*\*\n/g, '**').replace(/\*\*([a-zA-Z0-9()\-\s/\\’\u2013]+)[:.]?\s*[:.]?\*\*[:.]?\s*[:.]?([A-Z])/g, '**$1.** $2').replace(/\s\s\n\n/g, '\n\n');
-};
-
 var parseRepeatFromName = function parseRepeatFromName(data, repString) {
   var repeatableSpells = ['acid fog', 'aggressive thundercloud', 'animate objects', 'astral construct', 'blade barrier', 'burst with light', 'call lightning', 'chaos bolt', 'cloud of daggers', 'cloudkill', 'concussive onslaught', 'cordon of arrows', 'dust devil', 'ego whip', 'eldritch blast', 'evard’s black tentacles', 'black tentacles', 'flaming sphere', 'guardian of faith', 'heat metal', 'hex', 'hunger of hadar', 'hunter’s mark', 'ice slick', 'immolation', 'incendiary cloud', 'insect plague', 'investiture of flame', 'investiture of ice', 'investiture of stone', 'investiture of wind', 'maelstrom', 'maximilian’s earthen grasp', 'earthen grasp', 'melf’s minute meteors', 'minute meteors', 'moonbeam', 'mordenkainen’s faithful hound', 'faithful hound', 'mordenkainen’s sword', 'arcane sword', 'earthen grasp', 'phantasmal killer', 'scorching ray', 'searing smite', 'spirit guardians', 'spiritual weapon', 'storm sphere', 'sunbeam', 'tsunami', 'vampiric touch', 'wall of fire', 'wall of ice', 'wall of thorns', 'whirlwind', 'wind wall', 'witch bolt'];
 
@@ -2384,7 +2381,7 @@ var getLevel = function getLevel(data) {
 
 var parseName = function parseName(data, repString) {
   if (data.name_from_srd) {
-    data[repString + '_name'] = (0, _utilities.cleanName)(data.name_from_srd);
+    data[repString + '_name'] = (0, _utilities.clean)(data.name_from_srd);
   }
 };
 
@@ -2433,7 +2430,7 @@ var parseComponents = function parseComponents(data, repString) {
 
 var parseMaterials = function parseMaterials(data, repString) {
   if (data.material_from_srd) {
-    data[repString + '_materials'] = cleanContent(data.material_from_srd);
+    data[repString + '_materials'] = (0, _utilities.clean)(data.material_from_srd);
   }
 };
 
@@ -2450,7 +2447,7 @@ var parseDuration = function parseDuration(data, repString) {
 
 var parseContent = function parseContent(data, repString) {
   if (data.content_from_srd) {
-    data[repString + '_content'] = cleanContent(data.content_from_srd);
+    data[repString + '_content'] = (0, _utilities.cleanContent)(data.content_from_srd);
     var spellHigherLevelRegex = /((?:This spell’?s damage increases|At Higher Levels|When you cast this spell using).*)/gi;
     var spellHigherLevelResult = spellHigherLevelRegex.exec(data[repString + '_content']);
     if (spellHigherLevelResult) {
@@ -3025,7 +3022,7 @@ var setupAbilityChecks = exports.setupAbilityChecks = function setupAbilityCheck
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setupEquipment = exports.updateCarryingCapacity = exports.updateCurrency = exports.parseItemFromSRDWithServer = exports.updateEquipment = exports.updateArmor = exports.updateWeight = exports.parseItemFromSRD = exports.cleanContent = undefined;
+exports.setupEquipment = exports.updateCarryingCapacity = exports.updateCurrency = exports.parseItemFromSRDWithServer = exports.updateEquipment = exports.updateArmor = exports.updateWeight = exports.parseItemFromSRD = undefined;
 
 var _constants = __webpack_require__(2);
 
@@ -3048,10 +3045,6 @@ var _server = __webpack_require__(1);
 var _processing = __webpack_require__(9);
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global on:false, generateRowID:false, getTranslationByKey:false */
-
-var cleanContent = exports.cleanContent = function cleanContent(content) {
-  return content.trim().replace(/.*(\\n)/, '').trim().replace(/.*(\\n)/, '').trim().replace(/.*(\\n)/, '').replace('.  ', '. ').replace(/“/g, '"').replace(/”/g, '"').replace(/'/g, '’').replace(/\*\*\n\t/g, '**').replace(/\*\*\n/g, '**').replace(/\*\*([a-zA-Z0-9()\-\s/\\’\u2013]+)[:.]?\s*[:.]?\*\*[:.]?\s*[:.]?([A-Z])/g, '**$1.** $2').replace(/\s\s\n\n/g, '\n\n').trim().trim();
-};
 
 var parseAttackType = function parseAttackType(data, repString) {
   data[repString + '_attack_toggle'] = 1;
@@ -3305,7 +3298,7 @@ var parseItemType = function parseItemType(data, repString) {
 
 var parseContent = function parseContent(data, repString) {
   if (data.content_from_srd) {
-    data[repString + '_content'] = cleanContent(data.content_from_srd);
+    data[repString + '_content'] = (0, _utilities.cleanContent)(data.content_from_srd);
   }
 };
 
@@ -3325,7 +3318,7 @@ var parseStandardFields = function parseStandardFields(data, repString) {
 var fromSrd = ['category_from_srd', 'name_from_srd', 'item_type_from_srd', 'damage_from_srd', 'damage_type_from_srd', 'secondary_damage_from_srd', 'modifiers_from_srd', 'properties_from_srd', 'range_from_srd', 'reach_from_srd', 'weight_from_srd', 'ac_from_srd', 'stealth_from_srd', 'content_from_srd'];
 
 var parseItemFromSRD = exports.parseItemFromSRD = function parseItemFromSRD(data, processData) {
-  data.name_from_srd = (0, _utilities.cleanName)(data.name_from_srd) || '';
+  data.name_from_srd = (0, _utilities.clean)(data.name_from_srd) || '';
 
   if (['Melee Weapon', 'Ranged Weapon'].includes(data.item_type_from_srd)) {
     processData.section = (0, _utilities.exists)(data.is_npc) ? 'action' : 'offense';
@@ -4911,7 +4904,7 @@ var parseDamage = exports.parseDamage = function parseDamage(data, repString, pr
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setupNPC = exports.parseMonsterFromSRDWithServer = exports.parseMonsterFromSRD = exports.monsterDroppedOnTabletop = exports.parseHP = exports.parseSRDContentSection = exports.cleanContent = undefined;
+exports.setupNPC = exports.parseMonsterFromSRDWithServer = exports.parseMonsterFromSRD = exports.monsterDroppedOnTabletop = exports.parseSkills = exports.parseHP = exports.parseSRDContentSection = exports.cleanNPCContent = exports.updateHP = undefined;
 
 var _utilities = __webpack_require__(0);
 
@@ -4925,7 +4918,7 @@ var _actions = __webpack_require__(4);
 
 var _hitDice = __webpack_require__(11);
 
-var _resistances = __webpack_require__(22);
+var _resistances = __webpack_require__(23);
 
 var _processing = __webpack_require__(9);
 
@@ -4933,11 +4926,13 @@ var _proficiencyBonus = __webpack_require__(19);
 
 var _server = __webpack_require__(1);
 
-var _senses = __webpack_require__(23);
+var _senses = __webpack_require__(24);
 
-var _speeds = __webpack_require__(24);
+var _speeds = __webpack_require__(25);
 
 var _spells = __webpack_require__(5);
+
+var _attachers = __webpack_require__(20);
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global on:false, generateRowID:false, setDefaultToken:false */
 
@@ -5035,50 +5030,52 @@ var updateChallenge = function updateChallenge(callback) {
   });
 };
 
-var updateHP = function updateHP(data) {
+var updateHP = exports.updateHP = function updateHP(data) {
   var hdNum = parseFloat(data.hit_dice);
   var hdSize = parseInt(data.hit_die.replace('d', ''), 10);
-  var hdAverage = Math.floor(hdSize / 2 + 0.5);
+  var hdAverage = Math.floor(hdSize / 2) + 0.5;
   var conMod = (0, _abilities.getAbilityMod)(data, 'constitution');
+  var bonusHP = 0;
 
   data.HP = Math.floor(hdNum * hdAverage);
   data.hp_formula = hdNum + 'd' + hdSize;
 
   if (conMod !== 0) {
-    var bonusHP = hdNum * conMod;
-    data.HP += bonusHP;
-    data.hp_formula += (0, _utilities.addArithmeticOperator)(bonusHP);
+    bonusHP += hdNum * conMod;
   }
 
   if ((0, _utilities.exists)(data.hp_extra)) {
-    var regex = /(?:(\+|-)\s?)?(\d+)(?:d(\d+))?/gi;
+    if (typeof data.hp_extra === 'string') {
+      data.hp_extra = data.hp_extra.toString().replace(/-/g, '-').replace(/—/g, '-').replace(/−/g, '-');
+    }
+    var regex = /(?:([+-])\s?)?(\d+)(?:d(\d+))?/gi;
     var splitFormula = void 0;
 
     while ((splitFormula = regex.exec(data.hp_extra)) !== null) {
       if (!splitFormula || !splitFormula[2]) {
         console.error('Character doesn’t have valid hp formula');
+      } else if (!splitFormula[3]) {
+        bonusHP += parseInt('' + (splitFormula[1] || '') + splitFormula[2], 10);
       } else {
-        var amount = 0;
+        var extraHdNum = parseInt(splitFormula[2], 10);
+        var extraHdSize = parseInt(splitFormula[3], 10);
+        var extraHdAverage = extraHdSize / 2 + 0.5;
 
-        if (!splitFormula[3]) {
-          amount = parseInt(splitFormula[2], 10);
-        } else {
-          var extraHdNum = parseInt(splitFormula[2], 10);
-          var extraHdSize = parseInt(splitFormula[3], 10);
-          var extraHdAverage = extraHdSize / 2 + 0.5;
-          amount = Math.floor(extraHdNum * extraHdAverage);
-        }
-
+        var amount = Math.floor(extraHdNum * extraHdAverage);
         if (!splitFormula[1] || splitFormula[1] === '+') {
           data.HP += amount;
-          data.hp_formula += ' + ' + amount;
+          data.hp_formula += ' + ' + extraHdNum + 'd' + extraHdSize;
         } else if (splitFormula[1] === '-') {
           data.HP -= amount;
-          data.hp_formula += ' - ' + amount;
+          data.hp_formula += ' - ' + extraHdNum + 'd' + extraHdSize;
         }
       }
       data.hp_extra.toString().replace(splitFormula[0], '');
     }
+  }
+  if (bonusHP) {
+    data.HP += bonusHP;
+    data.hp_formula += (0, _utilities.addArithmeticOperator)(bonusHP);
   }
 
   if (data.HP) {
@@ -5130,12 +5127,8 @@ var turnOnSlotsIfItsNotSet = function turnOnSlotsIfItsNotSet() {
   });
 };
 
-var cleanName = function cleanName(name) {
-  return name.replace(/“/g, '"').replace(/”/g, '"').replace(/'/g, '’');
-};
-
-var cleanContent = exports.cleanContent = function cleanContent(content) {
-  return content.trim().replace(/.*(\\n)/, '').trim().replace(/.*(\\n)/, '').trim().replace(/\u00a0/g, '').replace(/\u2060/g, '').replace(/\+ (\d+) to hit/g, '+$1 to hit').replace(/Hit:(\d+)/g, 'Hit: $1').replace(/.*(\\n)/, '').replace('.  ', '. ').replace(/“/g, '"').replace(/”/g, '"').replace(/'/g, '’').replace(/\*\*\n\t/g, '**').replace(/\*\*\n\n/g, '**').replace(/\*\*\n/g, '**').replace(/\*\*([a-zA-Z0-9()\-\s/\\’\u2013]+)[:.]?\s*[:.]?\*\*[:.]?\s*[:.]?([A-Z])/g, '**$1.** $2').replace(/\s\s\n\n/g, '\n\n').replace(/\sLegendary Actions\s*\n/g, '\n Legendary Actions\n').replace(/\sReactions\s*\n/g, '\n Reactions\n').replace(/\s\sActions\s*\n\n/g, '\n Actions\n\n').replace(/^(?:\s?Actions\s*\n)/g, 'content \n Actions\n').replace(/^(?:\s?Traits\s*\n)/g, 'content \n Traits\n').replace(/\sTraits\s*\n/g, '\n Traits\n').replace(/\sRegional Effects\s*\n/g, '\n Regional Effects\n').replace(/\sLair Actions\s*\n/g, '\n Lair Actions\n').trim().trim().replace('reach ft.', '').trim().replace(/\sft.\//, '/') // bandit and salamander
+var cleanNPCContent = exports.cleanNPCContent = function cleanNPCContent(content) {
+  return (0, _utilities.cleanContent)(content).replace(/\+ (\d+) to hit/g, '+$1 to hit').replace(/Hit:(\d+)/g, 'Hit: $1').replace(/.*(\\n)/, '').replace(/\sLegendary Actions\s*\n/g, '\n Legendary Actions\n').replace(/\sReactions\s*\n/g, '\n Reactions\n').replace(/\s\sActions\s*\n\n/g, '\n Actions\n\n').replace(/^(?:\s?Actions\s*\n)/g, 'content \n Actions\n').replace(/^(?:\s?Traits\s*\n)/g, 'content \n Traits\n').replace(/\sTraits\s*\n/g, '\n Traits\n').replace(/\sRegional Effects\s*\n/g, '\n Regional Effects\n').replace(/\sLair Actions\s*\n/g, '\n Lair Actions\n').trim().trim().replace('reach ft.', '').trim().replace(/\sft.\//, '/') // bandit and salamander
   .replace(/ \n\n[A-z].*/g, '').trim();
 };
 
@@ -5144,7 +5137,7 @@ var parseSizeTypeAlignment = function parseSizeTypeAlignment(data) {
     data.size = data.size_from_srd.toUpperCase();
   }
   if (data.type_from_srd) {
-    data.type = cleanName(data.type_from_srd.toLowerCase());
+    data.type = (0, _utilities.clean)(data.type_from_srd.toLowerCase());
   }
   if (data.alignment_from_srd) {
     data.alignment = data.alignment_from_srd.toLowerCase();
@@ -5203,7 +5196,7 @@ var parseSRDContentSection = exports.parseSRDContentSection = function parseSRDC
           data[repString + '_content_toggle'] = 1;
           data[repString + '_toggle_details'] = 0;
         } else {
-          console.error('Character doesn\'t have a valid ' + name + ' format');
+          console.error('Character doesn\u2019t have a valid ' + name + ' format');
         }
       }
     }
@@ -5212,8 +5205,8 @@ var parseSRDContentSection = exports.parseSRDContentSection = function parseSRDC
 
 var parseHP = exports.parseHP = function parseHP(data) {
   if (data.hp_from_srd) {
-    data.hp_from_srd = data.hp_from_srd.replace(/—/g, '-').replace(/–/g, '-').replace(/\u2012/g, '-');
-    var match = data.hp_from_srd.match(/\((\d+)d(\d+)(?:\s?(\+|-)\s?(\d+))?\)/i);
+    data.hp_from_srd = data.hp_from_srd.replace(/-/g, '-').replace(/—/g, '-').replace(/−/g, '-').replace(/‒/g, '-');
+    var match = data.hp_from_srd.match(/\((\d+)d(\d+)(?:\s?([+-])\s?(\d+))?\)/i);
     if (!match || !match[1] || !match[2]) {
       console.error('Character doesn’t have valid HP/HD format');
     } else {
@@ -5327,7 +5320,36 @@ var parseSavingThrows = function parseSavingThrows(data) {
   }
 };
 
-var parseSkills = function parseSkills(data, repStrings) {
+var makeSkillAttacher = function makeSkillAttacher(_ref) {
+  var data = _ref.data,
+      skillName = _ref.skillName,
+      text = _ref.text;
+
+  var repString = 'repeating_attacher_' + generateRowID();
+  data[repString + '_skill_attacher'] = 'on';
+  data[repString + '_name'] = skillName + ' bonus';
+  data[repString + '_freetext'] = text;
+};
+
+var parseExpertiseAsAdvantage = function parseExpertiseAsAdvantage(_ref2) {
+  var data = _ref2.data,
+      repStringNew = _ref2.repStringNew;
+
+  if (data.dice_system === '2d10') {
+    data[repStringNew + '_skill_d20'] = '3d10kh2';
+  } else if (data.dice_system === '3d6') {
+    data[repStringNew + '_skill_d20'] = '4d6kh3';
+  } else {
+    data[repStringNew + '_skill_d20'] = '2d20kh1';
+  }
+  data[repStringNew + '_proficiency'] = 'proficient';
+};
+
+var getSkillNameFromList = function getSkillNameFromList(skillName) {
+  return Object.keys(_constants.SKILLS).indexOf(skillName.toUpperCase());
+};
+
+var parseSkills = exports.parseSkills = function parseSkills(data, repStrings) {
   var skillsObj = {};
   var expertise = data.pb * 2;
 
@@ -5340,40 +5362,44 @@ var parseSkills = function parseSkills(data, repStrings) {
       };
     });
 
-    var re = /([\w\s]+)\s?((?:\+|-)\d+)/gi;
+    var re = /([\w\s]+)\s?((?:[+-])\d+)(?:\s?\(([^)]+)\))?/gi;
     var match = void 0;
     var modifierRepString = 'repeating_modifier_' + generateRowID();
     while ((match = re.exec(data.skills_from_srd)) !== null) {
       if (match && match[1] && match[2]) {
         var skillName = match[1].trim();
+        console.log();
         if (skillsObj[skillName] && skillsObj[skillName].id) {
           var skillId = skillsObj[skillName].id;
           var repStringNew = 'repeating_skill_' + skillId;
           var abilityValue = (0, _abilities.getAbilityMod)(data, skillsObj[skillName].ability);
           var skillBonus = parseInt(match[2], 10) - abilityValue;
+          if (match[3]) {
+            makeSkillAttacher({
+              data: data,
+              skillName: skillName,
+              text: match[3]
+            });
+          }
 
           if (skillBonus >= expertise) {
             if ((0, _utilities.exists)(data.expertise_as_advantage)) {
-              if (data.dice_system === '2d10') {
-                data[repStringNew + '_skill_d20'] = '3d10kh2';
-              } else if (data.dice_system === '3d6') {
-                data[repStringNew + '_skill_d20'] = '4d6kh3';
-              } else {
-                data[repStringNew + '_skill_d20'] = '2d20kh1';
-              }
-              data[repStringNew + '_proficiency'] = 'proficient';
+              parseExpertiseAsAdvantage({
+                data: data,
+                repStringNew: repStringNew
+              });
             } else {
               data[repStringNew + '_proficiency'] = 'expertise';
             }
             if (skillBonus > expertise) {
               data[modifierRepString + '_name'] = 'Skill import modifiers';
-              data[modifierRepString + '_skill_' + Object.keys(_constants.SKILLS).indexOf(skillName.toUpperCase()) + '_modifier'] = skillBonus - expertise;
+              data[modifierRepString + '_skill_' + getSkillNameFromList(skillName) + '_modifier'] = skillBonus - expertise;
             }
           } else if (skillBonus >= data.pb) {
             data[repStringNew + '_proficiency'] = 'proficient';
             if (skillBonus > data.pb) {
               data[modifierRepString + '_name'] = 'Skill import modifiers';
-              data[modifierRepString + '_skill_' + Object.keys(_constants.SKILLS).indexOf(skillName.toUpperCase()) + '_modifier'] = skillBonus - data.pb;
+              data[modifierRepString + '_skill_' + getSkillNameFromList(skillName) + '_modifier'] = skillBonus - data.pb;
             }
           }
         } else {
@@ -5443,7 +5469,7 @@ var parseMonsterFromSRD = exports.parseMonsterFromSRD = function parseMonsterFro
 
   if (data.name_from_srd) {
     // TODO fix character name
-    data.character_name = cleanName(data.name_from_srd);
+    data.character_name = (0, _utilities.clean)(data.name_from_srd);
   }
   parseSizeTypeAlignment(data);
   parseAC(data);
@@ -5457,7 +5483,7 @@ var parseMonsterFromSRD = exports.parseMonsterFromSRD = function parseMonsterFro
   parseSenses(data);
 
   if (data.content_from_srd) {
-    data.content_from_srd = cleanContent(data.content_from_srd);
+    data.content_from_srd = cleanNPCContent(data.content_from_srd);
     parseSRDContentSection(data, 'Legendary Actions', 'legendaryaction');
     parseSRDContentSection(data, 'Reactions', 'reaction');
     parseSRDContentSection(data, 'Actions', 'action');
@@ -5500,6 +5526,7 @@ var parseMonsterFromSRDWithServer = exports.parseMonsterFromSRDWithServer = func
         (0, _actions.updateAllActions)();
         (0, _resistances.updateDamageResistances)();
         (0, _spells.findSpellcasting)();
+        (0, _attachers.updateAttachers)();
       },
       serverCallCallback: function serverCallCallback() {
         (0, _processing.clearProcessing)();
@@ -5827,9 +5854,10 @@ var parseRechargeFromSRD = function parseRechargeFromSRD(data, repString) {
   var rechargeShortRestRegex = /\s*?\(Recharges\safter\sa\s(.*)\)/gi;
   var rechargeDayRegex = /\s*?\((\d+)\/Day\)/gi;
   var rechargeTurnRegex = /\s*?\((\d+)\/Turn\)/gi;
-  var rechargeRangeRegex = /\s*?\(Recharge\s*?(\d+)-(\d+)\)/gi;
+  var rechargeRangeRegex = /\s*?\(Recharge\s*?(\d+)–(\d+)\)/gi;
   var rechargeValueRegex = /\s*?\(Recharge\s*?(\d+)\)/gi;
   if ((0, _utilities.exists)(data[repString + '_name']) && typeof data[repString + '_name'] === 'string') {
+    data[repString + '_name'] = (0, _utilities.clean)(data[repString + '_name']);
     var rechargeShortRestResult = rechargeShortRestRegex.exec(data[repString + '_name']);
     var rechargeDayResult = rechargeDayRegex.exec(data[repString + '_name']);
     var rechargeTurnResult = rechargeTurnRegex.exec(data[repString + '_name']);
@@ -5867,6 +5895,7 @@ var parseRechargeFromSRD = function parseRechargeFromSRD(data, repString) {
 var parseCostFromSRD = exports.parseCostFromSRD = function parseCostFromSRD(data, repString) {
   var costRegex = /\s*?\(Costs\s(\d+)\sActions\)/gi;
   if ((0, _utilities.exists)(data[repString + '_name'])) {
+    data[repString + '_name'] = (0, _utilities.clean)(data[repString + '_name']);
     var costResult = costRegex.exec(data[repString + '_name']);
     if (costResult && costResult[1]) {
       data[repString + '_cost'] = 'COSTS_' + costResult[1] + '_ACTIONS';
@@ -6223,11 +6252,89 @@ var setupProficiencyBonus = exports.setupProficiencyBonus = function setupProfic
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.setupAttachers = exports.updateAttachers = undefined;
+
+var _constants = __webpack_require__(2);
+
+var _server = __webpack_require__(1);
+
+var _utilities = __webpack_require__(0);
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global on:false */
+
+var updateAttachers = exports.updateAttachers = function updateAttachers() {
+  var collectionArray = [].concat(_toConsumableArray(_constants.ACTION_TYPES), ['initiative', 'death_saving_throw', 'hit_dice', 'spell', 'skill', 'crit'], _toConsumableArray(_constants.ABILITIES.map(function (ability) {
+    return ability + '_check';
+  })), _toConsumableArray(_constants.ALL_SAVING_THROWS.map(function (savingThrow) {
+    return savingThrow + '_saving_throw';
+  })));
+
+  for (var level = 0; level <= 9; level += 1) {
+    collectionArray.push('spell_level_' + level);
+  }
+
+  (0, _server.getSetItems)('attachers.update', {
+    collectionArray: collectionArray.map(function (attacher) {
+      return 'attacher_' + attacher;
+    }),
+    collectionArrayRepeatingSections: [{
+      collectionArrayAddItems: ['name', 'freetext', 'freeform'].concat(_toConsumableArray(collectionArray.map(function (attacher) {
+        return attacher + '_attacher';
+      }))),
+      name: 'repeating_attacher'
+    }],
+    process: function process(data, repStrings) {
+      collectionArray.forEach(function (itemToPush) {
+        data['attacher_' + itemToPush] = '';
+      });
+      repStrings.forEach(function (repString) {
+        collectionArray.forEach(function (itemToPush) {
+          var attacher = data[repString + '_' + itemToPush + '_attacher'];
+          if ((0, _utilities.exists)(attacher) && attacher === 'on') {
+            var attacherName = data[repString + '_name'] || '';
+
+            var freeText = data[repString + '_freetext'];
+            if ((0, _utilities.exists)(attacherName) && (0, _utilities.exists)(freeText)) {
+              var critAttacher = data[repString + '_crit_attacher'];
+              if (critAttacher === 'on') {
+                data['attacher_' + itemToPush] += '{{crit_name=' + attacherName + '}} ';
+                data['attacher_' + itemToPush] += '{{crit_text=' + freeText + '}} ';
+              } else {
+                data['attacher_' + itemToPush] += '{{' + attacherName + '=' + freeText + '}} ';
+              }
+            }
+            var freeForm = data[repString + '_freeform'];
+            if ((0, _utilities.exists)(freeForm)) {
+              data['attacher_' + itemToPush] += freeForm + ' ';
+            }
+          }
+        });
+      });
+    }
+  });
+};
+
+var setupAttachers = exports.setupAttachers = function setupAttachers() {
+  on('change:repeating_attacher remove:repeating_attacher', function () {
+    updateAttachers();
+  });
+};
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.setupClasses = exports.updateLevels = undefined;
 
 var _constants = __webpack_require__(2);
 
-var _classFeatures = __webpack_require__(21);
+var _classFeatures = __webpack_require__(22);
 
 var _hitDice = __webpack_require__(11);
 
@@ -6506,7 +6613,7 @@ var setupClasses = exports.setupClasses = function setupClasses() {
 };
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7113,7 +7220,7 @@ var setupClassFeature = exports.setupClassFeature = function setupClassFeature()
 };
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7164,7 +7271,7 @@ var setupResistances = exports.setupResistances = function setupResistances() {
 };
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7222,7 +7329,7 @@ var setupSenses = exports.setupSenses = function setupSenses() {
 };
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7284,7 +7391,7 @@ var setupSpeeds = exports.setupSpeeds = function setupSpeeds() {
 };
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7488,7 +7595,7 @@ var setupModifiers = exports.setupModifiers = function setupModifiers() {
 };
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7611,7 +7718,7 @@ var setupSettings = exports.setupSettings = function setupSettings() {
 };
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7625,11 +7732,11 @@ var _actions = __webpack_require__(4);
 
 var _armorClass = __webpack_require__(18);
 
-var _attachers = __webpack_require__(28);
+var _attachers = __webpack_require__(20);
 
-var _classes = __webpack_require__(20);
+var _classes = __webpack_require__(21);
 
-var _classFeatures = __webpack_require__(21);
+var _classFeatures = __webpack_require__(22);
 
 var _conditions = __webpack_require__(30);
 
@@ -7641,7 +7748,7 @@ var _hitPoints = __webpack_require__(31);
 
 var _initialize = __webpack_require__(32);
 
-var _modifiers = __webpack_require__(25);
+var _modifiers = __webpack_require__(26);
 
 var _npc = __webpack_require__(14);
 
@@ -7651,17 +7758,17 @@ var _proficiencyBonus = __webpack_require__(19);
 
 var _RacialTraits = __webpack_require__(36);
 
-var _resistances = __webpack_require__(22);
+var _resistances = __webpack_require__(23);
 
 var _rest = __webpack_require__(37);
 
 var _savingThrows = __webpack_require__(8);
 
-var _senses = __webpack_require__(23);
+var _senses = __webpack_require__(24);
 
-var _settings = __webpack_require__(26);
+var _settings = __webpack_require__(27);
 
-var _speeds = __webpack_require__(24);
+var _speeds = __webpack_require__(25);
 
 var _spells = __webpack_require__(5);
 
@@ -7695,84 +7802,6 @@ var _compendiumDrop = __webpack_require__(39);
 (0, _spells.setupSpells)();
 (0, _ImportData.setupImportData)();
 (0, _compendiumDrop.listenForCompendiumDrop)();
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.setupAttachers = undefined;
-
-var _constants = __webpack_require__(2);
-
-var _server = __webpack_require__(1);
-
-var _utilities = __webpack_require__(0);
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global on:false */
-
-var updateAttachers = function updateAttachers() {
-  var collectionArray = [].concat(_toConsumableArray(_constants.ACTION_TYPES), ['initiative', 'death_saving_throw', 'hit_dice', 'spell', 'skill', 'crit'], _toConsumableArray(_constants.ABILITIES.map(function (ability) {
-    return ability + '_check';
-  })), _toConsumableArray(_constants.ALL_SAVING_THROWS.map(function (savingThrow) {
-    return savingThrow + '_saving_throw';
-  })));
-
-  for (var level = 0; level <= 9; level += 1) {
-    collectionArray.push('spell_level_' + level);
-  }
-
-  (0, _server.getSetItems)('attachers.update', {
-    collectionArray: collectionArray.map(function (attacher) {
-      return 'attacher_' + attacher;
-    }),
-    collectionArrayRepeatingSections: [{
-      collectionArrayAddItems: ['name', 'freetext', 'freeform'].concat(_toConsumableArray(collectionArray.map(function (attacher) {
-        return attacher + '_attacher';
-      }))),
-      name: 'repeating_attacher'
-    }],
-    process: function process(data, repStrings) {
-      collectionArray.forEach(function (itemToPush) {
-        data['attacher_' + itemToPush] = '';
-      });
-      repStrings.forEach(function (repString) {
-        collectionArray.forEach(function (itemToPush) {
-          var attacher = data[repString + '_' + itemToPush + '_attacher'];
-          if ((0, _utilities.exists)(attacher) && attacher === 'on') {
-            var attacherName = data[repString + '_name'] || '';
-
-            var freeText = data[repString + '_freetext'];
-            if ((0, _utilities.exists)(attacherName) && (0, _utilities.exists)(freeText)) {
-              var critAttacher = data[repString + '_crit_attacher'];
-              if (critAttacher === 'on') {
-                data['attacher_' + itemToPush] += '{{crit_name=' + attacherName + '}} ';
-                data['attacher_' + itemToPush] += '{{crit_text=' + freeText + '}} ';
-              } else {
-                data['attacher_' + itemToPush] += '{{' + attacherName + '=' + freeText + '}} ';
-              }
-            }
-            var freeForm = data[repString + '_freeform'];
-            if ((0, _utilities.exists)(freeForm)) {
-              data['attacher_' + itemToPush] += freeForm + ' ';
-            }
-          }
-        });
-      });
-    }
-  });
-};
-
-var setupAttachers = exports.setupAttachers = function setupAttachers() {
-  on('change:repeating_attacher remove:repeating_attacher', function () {
-    updateAttachers();
-  });
-};
 
 /***/ }),
 /* 29 */
@@ -8676,7 +8705,7 @@ var convertFromOGL = exports.convertFromOGL = function convertFromOGL() {
 
 /*
  NPC Convcersion
- * weapons like "3 (1d6-1) bludgeoning damage plus 3 (1d6) poison damage" aren't converting both damages
+ * weapons like "3 (1d6-1) bludgeoning damage plus 3 (1d6) poison damage" aren’t converting both damages
 
  PC Conversion:
  * convert "attacks" to repeating attacks
@@ -8703,17 +8732,17 @@ var _abilityChecks = __webpack_require__(6);
 
 var _savingThrows = __webpack_require__(8);
 
-var _classes = __webpack_require__(20);
+var _classes = __webpack_require__(21);
 
 var _hitDice = __webpack_require__(11);
 
-var _modifiers = __webpack_require__(25);
+var _modifiers = __webpack_require__(26);
 
 var _processing = __webpack_require__(9);
 
 var _server = __webpack_require__(1);
 
-var _settings = __webpack_require__(26);
+var _settings = __webpack_require__(27);
 
 var _utilities = __webpack_require__(0);
 
@@ -8969,7 +8998,7 @@ var upgradeSheet = exports.upgradeSheet = function upgradeSheet(sheetVersion) {
 /* 35 */
 /***/ (function(module, exports) {
 
-module.exports = {"name":"5eShaped","version":"19.0.0","bin":"./","description":"5e Shaped character sheet for Roll20.net","main":"gulpfile.js","devDependencies":{"babel-core":"^6.26.3","babel-eslint":"^8.2.6","babel-loader":"^7.1.5","babel-preset-es2015":"^6.24.0","cache-loader":"^1.2.2","chai":"^4.1.2","chai-spies":"^1.0.0","cross-env":"^5.2.0","eslint":"^4.19.1","eslint-config-airbnb":"^17.0.0","eslint-plugin-import":"^2.13.0","eslint-plugin-jsx-a11y":"^6.1.1","eslint-plugin-react":"^7.10.0","gulp":"^3.9.1","gulp-autoprefixer":"^5.0.0","gulp-clean-css":"^3.9.4","gulp-concat":"^2.6.0","gulp-file-include":"^2.0.1","gulp-htmlmin":"^4.0.0","gulp-if":"^2.0.2","gulp-json-sort":"^1.0.0","gulp-nunjucks-render":"^2.2.2","gulp-rename":"^1.3.0","gulp-replace-task":"^0.11.0","gulp-sass":"^4.0.1","gulp-tap":"^1.0.1","gulp-util":"^3.0.8","gulp-wrapper":"1.0.0","husky":"^0.14.3","istanbul-instrumenter-loader":"^3.0.1","json-loader":"^0.5.7","lint-staged":"^7.2.0","mocha":"^5.2.0","mocha-webpack":"^1.1.0","nyc":"^12.0.2","request":"2.87.0","sass-lint":"^1.12.1","sinon":"^6.1.3","streamqueue":"^1.1.2","webpack-node-externals":"^1.7.2","webpack-stream":"^4.0.3"},"repository":{"type":"git","url":"https://bitbucket.org/mlenser/5eshaped/"},"scripts":{"coverage":"cross-env NODE_ENV=coverage nyc npm test","lint":"eslint ./sheet/**/*.js","sass-lint":"sass-lint ./sheet/**/*.scss -v -q","precommit":"lint-staged","test":"mocha-webpack --opts test/mocha.webpack.opts","version-bump-patch":"npm version patch --no-git-tag-version","version-bump-minor":"npm version minor --no-git-tag-version","version-bump-major":"npm version major --no-git-tag-version"},"lint-staged":{"*.js":["git add","yarn run lint","yarn run test"]},"nyc":{"extension":[".js"],"all":true,"instrument":false,"sourceMap":false,"reporter":["lcov","text-summary","text"]},"author":"Mark Lenser (Kryx)","private":true}
+module.exports = {"name":"5eShaped","version":"19.1.0","bin":"./","description":"5e Shaped character sheet for Roll20.net","main":"gulpfile.js","devDependencies":{"babel-core":"^6.26.3","babel-eslint":"^8.2.6","babel-loader":"^7.1.5","babel-preset-es2015":"^6.24.0","cache-loader":"^1.2.2","chai":"^4.1.2","chai-spies":"^1.0.0","cross-env":"^5.2.0","eslint":"^4.19.1","eslint-config-airbnb":"^17.0.0","eslint-plugin-import":"^2.13.0","eslint-plugin-jsx-a11y":"^6.1.1","eslint-plugin-react":"^7.10.0","gulp":"^3.9.1","gulp-autoprefixer":"^5.0.0","gulp-clean-css":"^3.9.4","gulp-concat":"^2.6.0","gulp-file-include":"^2.0.1","gulp-htmlmin":"^4.0.0","gulp-if":"^2.0.2","gulp-json-sort":"^1.0.0","gulp-nunjucks-render":"^2.2.2","gulp-rename":"^1.3.0","gulp-replace-task":"^0.11.0","gulp-sass":"^4.0.1","gulp-tap":"^1.0.1","gulp-util":"^3.0.8","gulp-wrapper":"1.0.0","husky":"^0.14.3","istanbul-instrumenter-loader":"^3.0.1","json-loader":"^0.5.7","lint-staged":"^7.2.0","mocha":"^5.2.0","mocha-webpack":"^1.1.0","nyc":"^12.0.2","request":"2.87.0","sass-lint":"^1.12.1","sinon":"^6.1.3","streamqueue":"^1.1.2","webpack-node-externals":"^1.7.2","webpack-stream":"^4.0.3"},"repository":{"type":"git","url":"https://bitbucket.org/mlenser/5eshaped/"},"scripts":{"coverage":"cross-env NODE_ENV=coverage nyc npm test","lint":"eslint ./sheet/**/*.js","sass-lint":"sass-lint ./sheet/**/*.scss -v -q","precommit":"lint-staged","test":"mocha-webpack --opts test/mocha.webpack.opts","version-bump-patch":"npm version patch --no-git-tag-version","version-bump-minor":"npm version minor --no-git-tag-version","version-bump-major":"npm version major --no-git-tag-version"},"lint-staged":{"*.js":["git add","yarn run lint","yarn run test"]},"nyc":{"extension":[".js"],"all":true,"instrument":false,"sourceMap":false,"reporter":["lcov","text-summary","text"]},"author":"Mark Lenser (Kryx)","private":true}
 
 /***/ }),
 /* 36 */
