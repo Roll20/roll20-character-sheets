@@ -6,4 +6,6 @@ that were left behind fend for themselves, doing the best they can.
 
 Engine Heart official web site: http://www.viralgamespublishing.com/2.html
 
+Icon graphics used with permission from Viral Games.
+
 Please enjoy!
