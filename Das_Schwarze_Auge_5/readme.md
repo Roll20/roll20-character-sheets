@@ -7,7 +7,7 @@ Aktuell findet Ihr hier eine Erklärung der kürzlich eingeführten Features sow
 ### Neue Features
 
 ![Beidhändiger Kampf](https://i.imgur.com/8ytS1Zu.png)
- * **Nebenhandwaffen**: Nebenhandwaffen wurden hinzugefügt. Diese können wie Schilde und Fernkampfwaffen unter den Anzeige Optionen eingeblendet werden. Die Aktivierung erfolgt wie bei Schilden. Berechnungen für falsche Hand und den Vorteil Beidhändigkeit sind hinterlegt
+ * **Nebenhandwaffen**: Nebenhandwaffen wurden hinzugefügt. Diese können wie Schilde und Fernkampfwaffen unter den Anzeige Optionen eingeblendet werden. Die Aktivierung erfolgt wie bei Schilden. Berechnungen für falsche Hand und den Vorteil Beidhändigkeit sind hinterlegt. Parierwaffen sind aktuell noch nicht abbildbar.
  * **Beidhändiger Kampf:** Sobald eine Nebenwaffe ausgerüstet ist besteht die Möglichkeit mit der Schaltfläche 'Beidhändiger Kampf' eben jenen zu aktivieren. Abzüge durch Angriff mit 2 Waffen und Sonderfertigkeiten die dies Modifizieren werden berücksichtigt.
  
 ![Spezialmanöver](https://i.imgur.com/4n5EHku.png)
