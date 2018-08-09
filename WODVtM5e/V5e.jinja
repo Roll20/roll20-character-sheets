@@ -1,0 +1,293 @@
+{%- macro prop_table_header() %}
+<thead>
+  <tr>
+    <th></th>
+    <td>Base</td>
+    <td>Xp</td>
+    <td>Total</td>
+  </tr>
+</thead>
+{%- endmacro -%}
+
+{%- macro prop_table(name, start, min, max, nameable) %}
+<tr>
+  {% set pretty_name = name|replace("_", " ")|title %}
+  {%- if nameable %}
+  <th><input class="prop_name" name="attr_{{ name }}_name" title="{{ pretty_name }} name" value="" type="text" /></th>
+  {%- else %}
+  <th>{{ pretty_name }}</th>
+  {%- endif %}
+  <td><input class="prop_val" name="attr_{{ name }}_base" value="{{start}}" title="{{ pretty_name }} base" min="{{min}}" max="{{max}}" type="number" /></td>
+  <td><input class="prop_val" name="attr_{{ name }}_xp" value="0" title="{{ pretty_name }} xp" min="{{min}}" max="{{max}}" type="number" /></td>
+  <td>
+    <input class="prop_result" name="attr_{{ name }}" value="0" type="hidden" />
+    <input class="prop_result" name="attr_{{ name }}_disp" value="@{{'{'}}{{ name }}{{'}'}}" type="number" title="{{ pretty_name }} total" disabled="true" />
+  </td>
+</tr>
+{%- endmacro %}
+
+{%- macro prop_radio(name, val, min, max, nameable) -%}
+{% set pretty_name = name|replace("_", " ")|title %}
+<tr>
+  {%- if(nameable) %}
+  <th><input class="prop_val" name="attr_{{ name }}_name" value="" title="{{ pretty_name }} name" type="text" /></th>
+  {%- else %}
+  <th>{{ pretty_name }}</th>
+  {%- endif %}
+  {%- for i in range(min, max+1) %}
+  <td><input class="prop_val" name="attr_{{ name }}_radio" value="{{ i }}" title="{{ pretty_name }} total" type="radio" {% if (i==val) %}checked{% endif %}/></td>
+  {%- endfor %}
+</tr>
+{%- endmacro %}
+
+{%- macro prop_multi_table(type, data) %}
+{% set pretty_type = type|replace("_", " ")|title %}
+<div class="sheet-divcol">
+  <h3 style="display: inline-block;">{{ pretty_type }}</h3>
+  <input title="details" name="attr_{{ type }}_switch" style="width: 1em;float: right;" type="checkbox" class="sheet-block-switch">
+  <br />
+  <div class="sheet-block-a">
+    <table summary="{{ pretty_type }} basic table">
+      <thead>
+        <tr>
+          <td></td>
+          {%- for i in range(data.val_min, data.val_max+1) %}
+          <td>{{ i }}</td>
+          {%- endfor %}
+        </tr>
+      </thead>
+      {%- for name in data.fields %}
+      {{ prop_radio(name, data.val_start, data.val_min, data.val_max, data.nameable)|indent(6) }}
+      {%- endfor %}
+    </table>
+  </div>
+  <div class="sheet-block-b">
+    <table summary="{{type}} detail table">
+      {{- prop_table_header()|indent(8) -}}
+      {%- for name in data.fields -%}
+      {{ prop_table(name, data.val_start, data.val_min, data.val_max, data.nameable)|indent(6) }}
+      {%- endfor %}
+      <tr>
+        <th style="font-style: italic; border-top: 0.1em solid #4d4d4d;">Cost</th>
+      {% for name in ["base", "xp"] %}
+        <input name="attr_{{ type }}_{{ name }}" value="0" type="hidden" />
+        <td style="border-top: 0.1em solid #4d4d4d;"><input name="attr_{{ type }}_{{ name }}_disp" title="{{ pretty_type }} {{ name }}"
+        value="@{{'{'}}{{ type }}_{{ name }}{{'}'}}" type="number" disabled="true"/></td>
+      {% endfor %}
+        <td></td>
+      </tr>
+    </table>
+  </div>
+</div>
+{%- endmacro -%}
+
+{%- macro prop_multi_table_repeating(type, data) %}
+{% set pretty_type = type|replace("_", " ")|title %}
+<div class="sheet-divcol">
+  <h3 style="display: inline-block;">{{ pretty_type }}</h3>
+  <input title="details" name="attr_{{ type }}_switch" style="width: 1em;float: right;" type="checkbox" class="sheet-block-switch"/>
+  <br />
+  <div class="sheet-block-a">
+    <table summary="{{ pretty_type }} basic table">
+      <thead>
+        <tr>
+          <td></td>
+          {%- for i in range(data.val_min, data.val_max+1) %}
+          <td>{{ i }}</td>
+          {%- endfor %}
+        </tr>
+      </thead>
+    </table>
+    <fieldset class="repeating_{{ type }}">
+      <table summary="{{type}} basic table">
+        {{ prop_radio("", data.val_start, data.val_min, data.val_max, data.nameable)|indent(6) }}
+      </table>
+    </fieldset>
+  </div>
+  <div class="sheet-block-b">
+    <table summary="{{ pretty_type }} detail table">
+      {{- prop_table_header()|indent(8) -}}
+    </table>
+    <fieldset class="repeating_{{ type }}">
+      <table summary="{{ pretty_type }} detail table">
+      {{ prop_table("", data.val_start, data.val_min, data.val_max, true)|indent(6) }}
+      </table>
+    </fieldset>
+    <table summary="{{ pretty_type }} detail table">
+      <tr >
+        <th style="font-style: italic; border-top: solid; border-width: 1px 0;">Cost</th>
+      {% for name in ["base", "xp"] %}
+        <input name="attr_{{ type }}_{{ name }}" value="0" type="hidden" />
+        <td style="border-top: solid; border-width: 1px 0;"><input name="attr_{{ type }}_{{ name }}_disp" title="{{ pretty_type }} {{ name }}"
+        value="@{{'{'}}{{ type }}_{{ name }}{{'}'}}" type="number" disabled="true"/></td>
+      {% endfor %}
+        <td></td>
+      </tr>
+    </table>
+  </div>
+</div>
+{%- endmacro -%}
+
+<!DOCTYPE html>
+<!-- V5e.html is generated by V5e.py, so don't EDIT it -->
+
+<head>
+  <title>{{ d.title }} {{ d.subtitle }}</title>
+  <link rel="stylesheet" type="text/css" href="V5e.css">
+</head>
+
+<body>
+
+<div class="sheet-page">
+
+  <!-- Title -->
+  <div style="display: inline-block;">
+    <h1>{{ d.title }}</h1>
+    <h4>{{ d.subtitle }}</h4>
+  </div>
+  <br />
+
+  <!-- Basics -->
+  <div class="sheet-divrow" style="display: inline-block;">
+    <h2 style="display: inline-block;">Basics</h2>
+    <input title="hide" name="attr_basics_switch" style="width: 1em;display: inline-block;" type="checkbox" class="sheet-block-switch"/>
+    <br />
+    <div class="sheet-block-a">
+      {%- for col in d.header %}
+      <div class="sheet-divcol">
+        <table>
+          {%- for field in d.header[col].fields %}
+          <tr>
+            <th style="width: 7em">{{ field|title }}:</th>
+            <td><input class="prop_val" title="{{ field }}" type="text" name="attr_{{ field }}"/></td>
+          </tr>
+          {%- endfor %}
+        </table>
+      </div>
+      {%- endfor %}
+    </div>
+    <div class="sheet-block-b">
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="sheet-divrow">
+    <h2 style="display: inline-block;">Stats</h2>
+    <input title="hide" name="attr_stats_switch" style="width: 1em;display: inline-block;" type="checkbox" class="sheet-block-switch"/>
+    <br />
+    <div class="sheet-block-a">
+      <div class="sheet-divcol">
+        <h3>Misc</h3>
+        <table >
+          <input name="attr_total_xp" value="0" type="hidden"/>
+          <tr>
+            <th>Xp</th>
+            <td><input name="attr_total_xp_disp" value="@{total_xp}" title="xp spent" type="number" disabled="true"/></td>
+            <td>/</td>
+            <td><input name="attr_xp_avail" value="0" title="xp available" type="number"/></td>
+          </tr>
+          <tr>
+            <th>Hunger</th>
+            <td><input name="attr_hunger" value="0" title="hunger" type="number"/></td>
+            <td>/</td>
+            <td><input name="attr_hunger_max" value="5" title="hunger max" type="number" disabled="true"/></td>
+          </tr>
+          <tr>
+            <th>Humanity</th>
+            <td><input name="attr_humanity" value="0" title="humanity" type="number"/></td>
+            <td>/</td>
+            <td><input name="attr_humanity_max" value="10" title="humanity max" type="number" disabled="true"/></td>
+          </tr>
+        </table>
+      </div>
+      <div class="sheet-divcol">
+        <h3>Health</h3>
+        <div style="width: 9em; display:inline-block;">
+          <table>
+            {% for type in ["superficial", "aggravated"] %}
+            <tr>
+              <th>{{ type|replace("_", " ")|title }}</th>
+              <td><input name="attr_dmg_{{ type }}" value="0" min="0" title="{{ type }} damage" type="number"/></td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <th>Level</th>
+              <input name="attr_health" value="0" type="hidden"/>
+              <td><input name="attr_health_disp" value="@{health}" title="health" type="number" disabled="true"/></td>
+              <td>/</td>
+              <td><input name="attr_health_levels" value="7" min="0" title="health levels" type="number"/></td>
+            </tr>
+            <tr>
+              <th>State</th>
+              <input name="attr_health_state" value="OK" type="hidden"/>
+              <td colspan="3"><input name="attr_health_state_disp" value="@{health_state}" title="health state" type="text" disabled="true"/></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div class="sheet-divcol">
+        <h3>Willpower</h3>
+        <div style="width: 9em; display:inline-block;">
+          <table>
+            {% for type in ["superficial", "aggravated"] %}
+            <tr>
+              <th>{{ type|replace("_", " ")|title }}</th>
+              <td><input name="attr_will_{{ type }}" value="0" min="0" title="{{ type }} damage" type="number"/></td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <th>Level</th>
+              <input name="attr_health" value="0" type="hidden"/>
+              <td><input name="attr_will_disp" value="@{will}" title="will" type="number" disabled="true"/></td>
+              <td>/</td>
+              <td><input name="attr_will_levels" value="7" min="0" title="will levels" type="number"/></td>
+            </tr>
+            <tr>
+              <th>State</th>
+              <input name="attr_will_state" value="OK" type="hidden"/>
+              <td colspan="3"><input name="attr_will_state_disp" value="@{will_state}" title="will state" type="text" disabled="true"/></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-block-b">
+    </div>
+  </div>
+
+  <!-- Character Sheet Sections -->
+  {%- for section in d.sections.fields %}
+  <!-- Section {{ section|replace("_", " ")|title }} -->
+  <div class="sheet-divrow">
+    <h2 style="display: inline-block;">{{ section|replace("_", " ")|title }}</h2>
+    {% for name in ["base", "xp"] %}
+    <input name="attr_{{ section }}_{{ name }}" value="0" type="hidden" />
+    {% endfor %}
+    <input title="hide" name="attr_{{ section }}_switch" style="width: 1em;display: inline-block;" type="checkbox" class="sheet-block-switch">
+    <br />
+    <div class="sheet-block-a">
+      {%- set sect_data = d.sections.fields[section] %}
+      {% for type in sect_data.fields -%}
+        {%- set type_data = sect_data.fields[type] %}
+        {%- if type_data.field_type == "repeating_bar" %}
+          {{ prop_multi_table_repeating(type, type_data)|indent(4) }}
+        {%- else %}
+          {{ prop_multi_table(type, type_data)|indent(4) }}
+        {%- endif %}
+      {%- endfor %}
+    </div>
+    <div class="sheet-block-b">
+    </div>
+  </div>
+  {% endfor %}
+
+</div>
+
+<script type="text/worker">
+const data = JSON.parse('{{ d.json_txt }}');
+{{ d.worker_js }}
+</script>
+
+</body>
+
+<!-- vim: set et ft=html fenc=utf-8 ff=dos sts=0 sw=4 ts=4 : -->
