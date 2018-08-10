@@ -4634,6 +4634,8 @@
 <!-- COMPENDIUM DROP CATCHERS -->
 <input type="hidden" name="attr_drop_category" accept="Category">
 <input type="hidden" name="attr_drop_name" accept="Name">
+<input type="hidden" name="attr_drop_data" accept="data">
+
 <input type="hidden" name="attr_drop_weight" accept="Weight">
 <input type="hidden" name="attr_drop_properties" accept="Properties">
 <input type="hidden" name="attr_drop_modifiers" accept="Modifiers">
@@ -6201,6 +6203,15 @@
                     setAttrs(update);
                 }
             });
+        } else {
+            getSectionIDs("damagemod", function(ids) {
+                console.log(ids);
+                var update = {};
+                _.each(ids, function(rowid) {
+                    update[`repeating_damagemod_${rowid}_global_damage_active_flag`] = "0";
+                });
+                setAttrs(update);
+            });
         }
     });
 
@@ -6551,7 +6562,7 @@
         });
     });
 
-    on("change:repeating_skillmod", function(eventinfo) {
+    on("change:repeating_skillmod remove:repeating_skillmod", function(eventinfo) {
         update_globalskills();
     });
 
@@ -6566,10 +6577,19 @@
                     setAttrs(update);
                 }
             });
+        } else {
+            getSectionIDs("skillmod", function(ids) {
+                var update = {};
+                var rowid = generateRowID();
+                _.each(ids, function(rowid) {
+                    update[`repeating_skillmod_${rowid}_global_skill_active_flag`] = "0";
+                });
+                setAttrs(update);
+            });
         }
     });
 
-    on("change:repeating_savemod", function(eventinfo) {
+    on("change:repeating_savemod remove:repeating_savemod", function(eventinfo) {
         update_globalsaves();
     });
 
@@ -6584,10 +6604,19 @@
                     setAttrs(update);
                 }
             });
+        } else {
+            getSectionIDs("savemod", function(ids) {
+                var update = {};
+                var rowid = generateRowID();
+                _.each(ids, function(rowid) {
+                    update[`repeating_savemod_${rowid}_global_save_active_flag`] = "0";
+                });
+                setAttrs(update);
+            });
         }
     });
 
-    on("change:repeating_tohitmod", function(eventinfo) {
+    on("change:repeating_tohitmod remove:repeating_tohitmod", function(eventinfo) {
         update_globalattack();
     });
 
@@ -6601,6 +6630,15 @@
                     update[`repeating_tohitmod_${rowid}_global_attack_active_flag`] = "1";
                     setAttrs(update);
                 }
+            });
+        } else {
+            getSectionIDs("tohitmod", function(ids) {
+                var update = {};
+                var rowid = generateRowID();
+                _.each(ids, function(rowid) {
+                    update[`repeating_tohitmod_${rowid}_global_attack_active_flag`] = "0";
+                });
+                setAttrs(update);
             });
         }
     });
@@ -6992,8 +7030,14 @@
         var update = {};
         var id = generateRowID();
 
-        getAttrs(["drop_name", "drop_weight", "drop_properties", "drop_modifiers", "drop_content", "drop_itemtype", "drop_damage", "drop_damagetype", "drop_damage2", "drop_damagetype2", "drop_alt_damage", "drop_alt_damagetype", "drop_alt_damage2", "drop_alt_damagetype2", "drop_range", "drop_ac", "drop_spellritualflag", "drop_spellschool", "drop_spellcastingtime", "drop_spelltarget", "drop_spellcomp", "drop_spellcomp_materials", "drop_spellconcentrationflag", "drop_spellduration", "drop_spellhealing", "drop_spelldmgmod", "drop_spellsave", "drop_spellsavesuccess", "drop_spellhldie", "drop_spellhldietype", "drop_spellhlbonus", "drop_spelllevel", "drop_spell_damage_progression", "drop_spell_ability", "drop_attack_type", "drop_speed", "drop_str", "drop_dex", "drop_con", "drop_int", "drop_wis", "drop_cha", "drop_vulnerabilities", "drop_resistances", "drop_immunities", "drop_condition_immunities", "drop_languages", "drop_challenge_rating", "drop_size", "drop_type", "drop_alignment", "drop_hp", "drop_saving_throws", "drop_senses", "drop_passive_perception", "drop_skills", "drop_token_size", "character_id", "drop_actions", "drop_legendary_actions", "drop_legendary_actions_desc", "drop_reactions", "drop_traits", "npc_legendary_actions", "strength_mod", "dexterity_mod", "npc", "spellcasting_ability", "drop_toolbonus_base", "drop_itemcount", "drop_armor_prof", "drop_hit_die", "drop_weapon_prof", "drop_spellcasting_ability", "drop_class_saving_throws", "base_level", "drop_language_prof", "drop_tool_prof", "drop_spell_ability", "drop_skill_proficiency", "drop_parent", "drop_hp_per_level", "drop_class_spells", "drop_global_damage", "drop_feature_name", "drop_feature_description", "drop_resources", "drop_spellhldesc", "drop_spelldesc", "strength_base", "dexterity_base", "constitution_base", "wisdom_base", "intelligence_base", "charisma_base"], function(v) {
+        getAttrs(["drop_name", "drop_data", "drop_weight", "drop_properties", "drop_modifiers", "drop_content", "drop_itemtype", "drop_damage", "drop_damagetype", "drop_damage2", "drop_damagetype2", "drop_alt_damage", "drop_alt_damagetype", "drop_alt_damage2", "drop_alt_damagetype2", "drop_range", "drop_ac", "drop_spellritualflag", "drop_spellschool", "drop_spellcastingtime", "drop_spelltarget", "drop_spellcomp", "drop_spellcomp_materials", "drop_spellconcentrationflag", "drop_spellduration", "drop_spellhealing", "drop_spelldmgmod", "drop_spellsave", "drop_spellsavesuccess", "drop_spellhldie", "drop_spellhldietype", "drop_spellhlbonus", "drop_spelllevel", "drop_spell_damage_progression", "drop_spell_ability", "drop_attack_type", "drop_speed", "drop_str", "drop_dex", "drop_con", "drop_int", "drop_wis", "drop_cha", "drop_vulnerabilities", "drop_resistances", "drop_immunities", "drop_condition_immunities", "drop_languages", "drop_challenge_rating", "drop_size", "drop_type", "drop_alignment", "drop_hp", "drop_saving_throws", "drop_senses", "drop_passive_perception", "drop_skills", "drop_token_size", "character_id", "drop_actions", "drop_legendary_actions", "drop_legendary_actions_desc", "drop_reactions", "drop_traits", "npc_legendary_actions", "strength_mod", "dexterity_mod", "npc", "spellcasting_ability", "drop_toolbonus_base", "drop_itemcount", "drop_armor_prof", "drop_hit_die", "drop_weapon_prof", "drop_spellcasting_ability", "drop_class_saving_throws", "base_level", "drop_language_prof", "drop_tool_prof", "drop_spell_ability", "drop_skill_proficiency", "drop_parent", "drop_hp_per_level", "drop_class_spells", "drop_global_damage", "drop_feature_name", "drop_feature_description", "drop_resources", "drop_spellhldesc", "drop_spelldesc", "strength_base", "dexterity_base", "constitution_base", "wisdom_base", "intelligence_base", "charisma_base"], function(v) {
             id = generateRowID();
+            var data = v.drop_data;
+            try {
+                data = JSON.parse(data);
+            } catch(e) {
+                data = {};
+            }
             if(category === "Items") {
                 if(v["npc"] === "0") {
                     update["tab"] = "core";
@@ -8112,6 +8156,7 @@
         var update = {};
         update["drop_category"] = "";
         update["drop_name"] = "";
+        update["drop_data"] = "";
         update["drop_weight"] = "";
         update["drop_properties"] = "";
         update["drop_modifiers"] = "";
@@ -12682,7 +12727,7 @@
             <div class="row choice abilities_possible abilities_rollstats">
                 <p>Select your choices:</p>
                 <p>
-                    <button type="roll" name="roll_rollstats" value="&{template:mancerroll} {{title=Roll for Stats}} {{r1=[[4d6dl1]]}} {{r2=[[4d6dl1]]}} {{r3=[[4d6dl1]]}} {{r4=[[4d6dl1]]}} {{r5=[[4d6dl1]]}} {{r6=[[4d6dl1]]}}"><span data-i18n="standard-roll">(4d6, drop lowest)</span></button>
+                    <button type="roll" name="roll_rollstats" value="@{wtype}&{template:mancerroll} {{title=Roll for Stats}} {{r1=[[4d6dl1]]}} {{r2=[[4d6dl1]]}} {{r3=[[4d6dl1]]}} {{r4=[[4d6dl1]]}} {{r5=[[4d6dl1]]}} {{r6=[[4d6dl1]]}}"><span data-i18n="standard-roll">(4d6, drop lowest)</span></button>
                     <button type="action" name="act_clearstats"><span data-i18n="clear-abilities">Clear</span></button>
                 </p>
             </div>
@@ -15201,7 +15246,7 @@
                     title = title || name.split("_")[1];
                     title = title[0].toUpperCase() + title.substring(1);
                     if(title == "Personality") title += " Trait"
-                    set["roll_" + name + "_roll"] = "&{template:mancerroll} {{title=" + title + "}} {{r1=[[1d" + data.length + "]]}}";
+                    set["roll_" + name + "_roll"] = "@{wtype}&{template:mancerroll} {{title=" + title + "}} {{r1=[[1d" + data.length + "]]}}";
                     set[name + "_array"] = JSON.stringify({name: title, array: data});
                     setAttrs(set);
                 };
@@ -15330,7 +15375,7 @@
         if(baseName.slice(0, -1) == "background_personality_choice") {
             var num = baseName.substr(-1) == "1" ? "2" : "1";
             var set = {};
-            set["roll_" + baseName.slice(0, -1) + num + "_roll"] = "&{template:mancerroll} {{title=" + choices.name + "}} {{r1=[[1d" + choices.array.length + "r" + (index + 1) + "]]}}";
+            set["roll_" + baseName.slice(0, -1) + num + "_roll"] = "@{wtype}&{template:mancerroll} {{title=" + choices.name + "}} {{r1=[[1d" + choices.array.length + "r" + (index + 1) + "]]}}";
             setAttrs(set);
         }
     });
@@ -15412,10 +15457,10 @@
                 var startingGold = data["l1-class"].data.class && data["l1-class"].data.class["Starting Gold"] ? data["l1-class"].data.class["Starting Gold"] : false;
                 if(startingGold) {
                     update["starting_gold_btn_label"] = startingGold;
-                    update_attr["roll_starting_gold"] = "&{template:mancerroll} {{title=Starting Gold}} {{r1=[[" + startingGold.replace("x", "*") + "]]}}";
+                    update_attr["roll_starting_gold"] = "@{wtype}&{template:mancerroll} {{title=Starting Gold}} {{r1=[[" + startingGold.replace("x", "*") + "]]}}";
                     showList.push("random_gold_option");
                 } else {
-                    update_attr["roll_starting_gold"] = "&{template:mancerroll} {{title=Starting Gold}} {{r1=[[0]]}}";
+                    update_attr["roll_starting_gold"] = "@{wtype}&{template:mancerroll} {{title=Starting Gold}} {{r1=[[0]]}}";
                     update_attr["equipment_type"] = "class";
                     equipmentType = "class";
                     hideList.push("equipment_type", "gold_option");
