@@ -13614,30 +13614,55 @@
             <p class="label">Race</p>
             <div class="race_info">
             </div>
+            <div class="choice returnblock race_button">
+                <span data-i18n="return-to:">Return to: </span>
+                <button class="step" type="back" value="l1-race" data-i18n="race-u">RACE</button>
+            </div>
         </div>
         <div class="summary">
             <p class="label">Class</p>
             <div class="class_info">
+            </div>
+            <div class="choice returnblock class_button">
+                <span data-i18n="return-to:">Return to: </span>
+                <button class="step" type="back" value="l1-class" data-i18n="class-u">CLASS</button>
             </div>
         </div>
         <div class="summary">
             <p class="label">Abilities</p>
             <div class="ability_info">
             </div>
+            <div class="choice returnblock abilities_button">
+                <span data-i18n="return-to:">Return to: </span>
+                <button class="step" type="back" value="l1-abilities" data-i18n="abilities-u">ABILITIES</button>
+            </div>
         </div>
         <div class="summary">
             <p class="label">Background</p>
+                <button class="step choice background_button" type="back" value="l1-background" data-i18n="background-u">BACKGROUND</button>
             <div class="background_info">
+            </div>
+            <div class="choice returnblock background_button">
+                <span data-i18n="return-to:">Return to: </span>
+                <button class="step" type="back" value="l1-background" data-i18n="background-u">BACKGROUND</button>
             </div>
         </div>
         <div class="summary">
             <p class="label">Equipment</p>
             <div class="equipment_info">
             </div>
+            <div class="choice returnblock equipment_button">
+                <span data-i18n="return-to:">Return to: </span>
+                <button class="step" type="back" value="l1-equipment" data-i18n="equipment-u">EQUIPMENT</button>
+            </div>
         </div>
         <div class="summary">
             <p class="label">Spells</p>
             <div class="spell_info">
+            </div>
+            <div class="choice returnblock spells_button">
+                <span data-i18n="return-to:">Return to: </span>
+                <button class="step" type="back" value="l1-spells" data-i18n="spells-u">SPELLS</button>
             </div>
         </div>
         <div class="summary">
@@ -15681,7 +15706,7 @@
                 if(type == "ability") {
                     type = 'ability score increase'
                 }
-                warnings += '<p class="sheet-warning">You\'re ' + sectionName;
+                warnings += '<p class="sheet-warning">Your ' + sectionName;
                 if(type == "expertise") {
                     warnings += " gives you expertise in ";
                     warnings += number[0] > 1 ? 'up to ' + number[0] + ' skills' : " a skill";
@@ -15714,6 +15739,7 @@
                         set["race_info"] += '<p class="sheet-warning sheet-needed">You have not selected a subrace!</p>';
                     }
                     ready = false;
+                    showChoices(["race_button"]);
                 }
             }
             _.each(spelldata.errors.race, function(error) {
@@ -15737,6 +15763,7 @@
                 set["race_info"] = '<p class="sheet-warning sheet-needed">You have not selected a race!</p>';
             }
             ready = false;
+            showChoices(["race_button"]);
         }
 
         if(mancerdata["l1-class"] && classname) {
@@ -15778,6 +15805,7 @@
                         set["class_info"] += '<p class="sheet-warning sheet-needed">You have not selected a ' + mancerdata["l1-class"].data.class["Subclass Name"] + '!</p>';
                     }
                     ready = false;
+                    showChoices(["class_button"]);
                 }
             }
             _.each(spelldata.errors.class, function(error) {
@@ -15785,10 +15813,12 @@
                     case "custom_class_spell_list":
                         set["race_info"] += '<p class="sheet-warning sheet-needed">You have selected a spellcasting ability for your custom class, but you have not selected a spell list.</p>';
                         ready = false;
+                        showChoices(["class_button"]);
                         break;
                     case "custom_class_spell_number":
                         set["race_info"] += '<p class="sheet-warning sheet-needed">You have selected a spellcasting ability for your custom class, but you have not selected a number of spells.</p>';
                         ready = false;
+                        showChoices(["class_button"]);
                         break;
                     default:
                         console.log("Unknown class spell error: " + error);
@@ -15801,6 +15831,7 @@
                 set["class_info"] = '<p class="sheet-warning sheet-needed">You have not selected a class!</p>';
             }
             ready = false;
+            showChoices(["class_button"]);
         }
 
         if(mancerdata["l1-abilities"] && mancerdata["l1-abilities"].values.abilities) {
@@ -15824,12 +15855,14 @@
                     x++;
                     set["ability_info"] += '<p class="sheet-warning sheet-needed">You have not selected a score for your ' + ability.toLowerCase() + '!</p>';
                     ready = false;
+                    showChoices(["abilities_button"]);
                 }
             });
             if(x == 6) set["ability_info"] = '<p class="sheet-warning">You have not selected your ability scores!</p>';
         } else {
             set["ability_info"] = '<p class="sheet-warning sheet-needed">You have not generated your ability scores!</p>';
             ready = false;
+            showChoices(["abilities_button"]);
         }
 
         if(mancerdata["l1-background"] && bgname) {
@@ -15858,6 +15891,7 @@
         } else {
             set["background_info"] = '<p class="sheet-warning sheet-needed">You have not selected a background!</p>';
             ready = false;
+            showChoices(["background_button"]);
         }
 
         if(mancerdata["l1-equipment"] && mancerdata["l1-equipment"].values["equipment_type"]) {
@@ -15898,10 +15932,12 @@
             if(mancerdata["l1-equipment"].values["equipment_class"] != getName("class", mancerdata, true) || (mancerdata["l1-equipment"].values["equipment_background"] != getName("background", mancerdata, true) && mancerdata["l1-equipment"].values["equipment_type"] != "gold")) {
                 set["equipment_info"] = '<p class="sheet-warning sheet-needed">Your equipment options have changed, you\'ll need to choose again.</p>';
                 ready = false;
+                showChoices(["equipment_button"]);
             }
         } else {
             set["equipment_info"] = '<p class="sheet-warning sheet-needed">You have not selected any equipment!</p>';
             ready = false;
+            showChoices(["equipment_button"]);
         }
 
         var spellsready = true;
@@ -15938,7 +15974,8 @@
             }
         } else if((raceSpells + classSpells) > 0) {
             set["spell_info"] = '<p class="sheet-warning">You haven\'t selected your spells!</p>';
-            spellsready = false
+            spellsready = false;
+            showChoices(["spells_button"]);
         } else {
             set["spell_info"] = '<p>The arcane is a mystery to you.</p>';
             spellsready = false
