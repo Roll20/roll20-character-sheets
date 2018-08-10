@@ -1,4 +1,5 @@
 <input class="version" name="attr_version" type="text" value="0">
+<input name="attr_sheet_type" type="hidden" value="pc" />
 <input name="attr_fate" type="hidden" value="0" />
 <input name="attr_favor" type="hidden" value="0" />
 <input name="attr_glory" type="hidden" value="0" />
@@ -48,7 +49,7 @@
                 <option class="center" value="minion">Minion Name</option>
                 <option class="center" value="gm">GM Sheet</option>
             </select>
-            <input class="character-name" name="attr_name" type="text" />
+            <input class="character-name" name="attr_character_name" type="text" />
         </div>
     </div>
     <div class="npc-grid npc-strife">
@@ -1084,7 +1085,7 @@
                 <option class="center" value="minion">Minion Name</option>
                 <option class="center" value="gm">GM Sheet</option>
             </select>
-            <input class="character-name" name="attr_name" type="text" />
+            <input class="character-name" name="attr_character_name" type="text" />
         </div>
     </div>
     <div class="minion-grid minion-strife">
@@ -1354,7 +1355,7 @@
                 <option class="center" value="gm">GM Sheet</option>
             </select>
 
-            <input class="character-name pc-name" name="attr_name" type="text" />
+            <input class="character-name pc-name" name="attr_character_name" type="text" />
         </div>
         <div class="column lineage">
             <label class="lineage">Lineage</label>
@@ -1364,7 +1365,6 @@
             <div class="spacer" ></div>
                 <label class="pc-name-die">Name Die</label>
                 <div class="impairment">
-                    <input name="attr_name_active" type="hidden" value="6" />
                     <select class="die" name="attr_name_die">
                         <option class="center" value="d4">d4</option>
                         <option class="center" selected value="d6">d6</option>
@@ -2729,8 +2729,21 @@
         
     </div>
 </div>
-
+<!--value="1d[[@{arete_die} - 2 * (@{arete_impair_1} + @{arete_impair_1} + @{arete_impair_1} + @{arete_impair_4})]] -->
 <script type="text/worker">
+
+on("sheet:opened", function () {
+    getAttrs(['sheet_type','name'], function(values) {
+        let type = values.sheet_type;
+        console.log("==========Sheet Type: " + type);
+        if(type !== 'gm' && type !== 'npc' && type !== 'minion') {
+            setAttrs({
+        	   "sheet_type": 'pc'
+            });    
+        }
+    });
+});
+
 
 const names = ['name','arete','battle','craft','sport','armor','insight','grace','might','spirit','heal','lore','music','orate',
                 'athletics','cunning','hunt','wrestle','aim','shield','spear','sword'];
@@ -2742,15 +2755,10 @@ names.forEach(function (name) {
             mods += parseInt(values[name + '_impair_3'])||0;
             mods += parseInt(values[name + '_impair_4'])||0;
             /*let die = parseInt(values[name + '_die'])||0; */
-            console.log("=======DIE: ");
             let dieString = values[name + '_die'];
-            console.log("=======DIE String: " + dieString);
             let dieParts = dieString.split("+");
-            console.log("=======DIE Parts: " + dieParts.join(" - "));
             let die = parseInt(dieParts[0].replace("d",""))||0;
-            console.log("=======DIE die: " + die);
             let bonus = (dieParts.length === 1 ? 0 : parseInt(dieParts[1])||0 );
-            console.log("=======DIE bonus: " + bonus);
             die = die - 2* mods;
             if (die < 4) die = 0;
             setAttrs({
@@ -2876,7 +2884,7 @@ on("sheet:opened", function () {
         if(!v["version"] || v["version"] === "" || v["version"] === "0") {
             console.log("============== Upgrading Sheet To Version 1.0 ==============");
             upgrade0to1();
-            console.log("============== Seeting Sheet Version to 1.0 ==============");
+            console.log("============== Setting Sheet Version to 1.0 ==============");
             setAttrs({version: "1.0"});
         }
         if(v["version"] === "1.0") {
@@ -2887,10 +2895,31 @@ on("sheet:opened", function () {
 });
 var upgrade0to1 = function() {
     console.log("============== Moving Weapons to Repeating Field ==============");
-    getAttrs(['weapon_bow_dice','weapon_bow_range','weapon_javelin_dice','weapon_javelin_range','weapon_shield_dice',
-            'weapon_sword_dice','weapon_sword_range','weapon_spear_dice','weapon_spear_range'], function(v) {
+    let attributes = ['weapon_bow_dice','weapon_bow_range','weapon_javelin_dice','weapon_javelin_range','weapon_shield_dice',
+            'weapon_sword_dice','weapon_sword_range','weapon_spear_dice','weapon_spear_range',
+            'character_lineage','character_heroic_trait','character_heroic_trait_bonus',
+            'fate_1','fate_2','fate_3','fate_4','fate_5','fate_6','fate_7','fate_8',
+            'fate_9','fate_10','fate_11','fate_12','fate_13','fate_14','fate_15','fate_16',
+            'quests_1','quests_2','quests_3','quests_4','quests_5','quests_6','quests_7','quests_8',
+            'quests_9','quests_10','quests_11','quests_12','quests_13','quests_14','quests_15','quests_16',
+            'favor_1','favor_2','favor_3','favor_4','favor_5','favor_6','favor_7','favor_8',
+            'favor_9','favor_10','favor_11','favor_12','favor_13','favor_14',
+            'glory_1','glory_2','glory_3','glory_4','glory_5','glory_6','glory_7','glory_8','glory_9','glory_10',
+            'wound_1','wound_2','wound_3','wound_4','wound_5','wound_6',
+            'character_armor_helmet','character_armor_breastplate','character_armor_greaves'];
+    const baseAttributes = ['name','armor','insight','grace','might','spirit','heal','lore','music','orate',
+                'athletics','cunning','hunt','wrestle','aim','shield','spear','sword'];
+    for(let i = 0; i < baseAttributes.length; i++) {
+        attributes.push('character_' + baseAttributes[i] + '_dtype');
+        attributes.push('character_' + baseAttributes[i] + '_dtype_tlc');
+        attributes.push('character_' + baseAttributes[i] + '_dtype_trc');
+        attributes.push('character_' + baseAttributes[i] + '_dtype_blc');
+        attributes.push('character_' + baseAttributes[i] + '_dtype_brc');
+    }
+    //let attributes = buildAttributes();
+    getAttrs(attributes, function(v) {
         
-        console.log("======= Bow: " + v.weapon_bow_dice);
+        /* converting weapons */
         let newRows = {};
         if (v.weapon_bow_dice !== undefined || v.weapon_bow_range !== undefined) {
             let newrowid = generateRowID();
@@ -2922,8 +2951,65 @@ var upgrade0to1 = function() {
             newRows["repeating_weapons_" + newrowid + "_weapon_dice"] = (v.weapon_sword_dice === undefined ? "2d6" : v.weapon_sword_dice );
             newRows["repeating_weapons_" + newrowid + "_weapon_range"] = (v.weapon_sword_range === undefined ? "1" : v.weapon_sword_range);
         }
+        
+        console.log("============== Updating Ability Scores ==============");
+        if (v.character_lineage !== undefined) newRows['lineage'] = v.character_lineage;
+        if (v.character_heroic_trait !== undefined) newRows['heroic_trait'] = v.character_heroic_trait;
+        if (v.character_heroic_trait_bonus !== undefined) newRows['heroic_trait_bonus'] = v.character_heroic_trait_bonus;
+        newRows['sheet_type'] = 'pc';
+        
+        for(let i = 0; i < baseAttributes.length; i++) {
+            if(v['character_' + baseAttributes[i] + '_dtype'] !== undefined)  
+                newRows[baseAttributes[i] + "_die"] = v['character_' + baseAttributes[i] + '_dtype'];
+               
+            if(v['character_' + baseAttributes[i] + '_dtype_tlc'] === 'on')  
+                newRows[baseAttributes[i] + "_impair_1"] = 1;
+            if(v['character_' + baseAttributes[i] + '_dtype_trc'] === 'on')  
+                newRows[baseAttributes[i] + "_impair_2"] = 1;
+            if(v['character_' + baseAttributes[i] + '_dtype_brc'] === 'on')  
+                newRows[baseAttributes[i] + "_impair_3"] = 1;
+            if(v['character_' + baseAttributes[i] + '_dtype_blc'] === 'on')  
+                newRows[baseAttributes[i] + "_impair_4"] = 1; 
+                //newRows[baseAttributes[i] + "_impair_1"] = v['character_' + baseAttributes[i] + '_dtype_tlc'];
+                //newRows[baseAttributes[i] + "_impair_2"] = v['character_' + baseAttributes[i] + '_dtype_trc'];
+                //newRows[baseAttributes[i] + "_impair_4"] = v['character_' + baseAttributes[i] + '_dtype_blc'];
+                //newRows[baseAttributes[i] + "_impair_3"] = v['character_' + baseAttributes[i] + '_dtype_brc'];
+        }
+        console.log("============== Quests, Fate, Favor, Glory ==============");
+        let boxes = ['fate_1','fate_2','fate_3','fate_4','fate_5','fate_6','fate_7','fate_8',
+        'fate_9','fate_10','fate_11','fate_12','fate_13','fate_14','fate_15','fate_16'];
+        for(let i = 0; i < boxes.length; i++) {
+            if(v[boxes[i]] === 'on') newRows[boxes[i]] = i+1;
+        }
+        boxes = ['quests_1','quests_2','quests_3','quests_4','quests_5','quests_6','quests_7','quests_8',
+        'quests_9','quests_10','quests_11','quests_12','quests_13','quests_14','quests_15','quests_16'];
+        for(let i = 0; i < boxes.length; i++) {
+            if(v[boxes[i]] === 'on') newRows[boxes[i]] = i+1;
+        }
+        
+        boxes = ['favor_1','favor_2','favor_3','favor_4','favor_5','favor_6','favor_7','favor_8',
+        'favor_9','favor_10','favor_11','favor_12','favor_13','favor_14'];
+        for(let i = 0; i < boxes.length; i++) {
+            if(v[boxes[i]] === 'on') newRows[boxes[i]] = i+1;
+        }
+        
+        boxes = ['glory_1','glory_2','glory_3','glory_4','glory_5','glory_6','glory_7','glory_8','glory_9','glory_10'];
+        for(let i = 0; i < boxes.length; i++) {
+            if(v[boxes[i]] === 'on') newRows[boxes[i]] = i+1;
+        }
+        if(v['wound_1'] === 'on') newRows['wound_1'] = 1;
+        if(v['wound_2'] === 'on') newRows['wound_2'] = 1;
+        if(v['wound_3'] === 'on') newRows['wound_3'] = 2;
+        if(v['wound_4'] === 'on') newRows['wound_4'] = 1;
+        if(v['wound_5'] === 'on') newRows['wound_5'] = 2;
+        if(v['wound_6'] === 'on') newRows['wound_6'] = 4;
+        if(v['character_armor_helmet'] === 'on') newRows['armor_helmet'] = 1;
+        if(v['character_armor_breastplate'] === 'on') newRows['armor_breastplate'] = 1;
+        if(v['character_armor_greaves'] === 'on') newRows['armor_greaves'] = 1;
+        console.log("============== Saving Attributes ==============");
         setAttrs(newRows);
     });
 };
+
 
 </script>
