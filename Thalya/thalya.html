@@ -1,0 +1,2486 @@
+<script type="text/worker">
+	/* ---- BEGIN: TheAaronSheet.js ---- */
+	// Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
+	// By:       The Aaron, Arcane Scriptomancer
+	// Contact:  https://app.roll20.net/users/104025/the-aaron
+
+	var TAS = TAS || (function(){
+	'use strict';
+
+	var version = '0.2.4',
+		lastUpdate = 1457098091,
+
+		loggingSettings = {
+			debug: {
+				key:     'debug',
+				title:   'DEBUG',
+				color: {
+					bgLabel: '#7732A2',
+					label:   '#F2EF40',
+					bgText:  '#FFFEB7',
+					text:    '#7732A2'
+				}
+			},
+			error: {
+				key:     'error',
+				title:   'Error',
+				color: {
+					bgLabel: '#C11713',
+					label:   'white',
+					bgText:  '#C11713',
+					text:    'white'
+				}
+			},
+			warn: {
+				key:     'warn',
+				title:   'Warning',
+				color: {
+					bgLabel: '#F29140',
+					label:   'white',
+					bgText:  '#FFD8B7',
+					text:    'black'
+				}
+			},
+			info: {
+				key:     'info',
+				title:   'Info',
+				color: {
+					bgLabel: '#413FA9',
+					label:   'white',
+					bgText:  '#B3B2EB',
+					text:    'black'
+				}
+			},
+			notice: {
+				key:     'notice',
+				title:   'Notice',
+				color: {
+					bgLabel: '#33C133',
+					label:   'white',
+					bgText:  '#ADF1AD',
+					text:    'black'
+				}
+			},
+			log: {
+				key:     'log',
+				title:   'Log',
+				color: {
+					bgLabel: '#f2f240',
+					label:   'black',
+					bgText:  '#ffff90',
+					text:    'black'
+				}
+			},
+			callstack: {
+				key:     'TAS',
+				title:   'function',
+				color: {
+					bgLabel: '#413FA9',
+					label:   'white',
+					bgText:  '#B3B2EB',
+					text:    'black'
+				}
+			},
+			callstack_async: {
+				key:     'TAS',
+				title:   'ASYNC CALL',
+				color: {
+					bgLabel: '#413FA9',
+					label:   'white',
+					bgText:  '#413FA9',
+					text:    'white'
+				}
+			},
+			TAS: {
+				key:     'TAS',
+				title:   'TAS',
+				color: {
+					bgLabel: 'grey',
+					label:   'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)',
+					bgText:  'grey',
+					text:    'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)'
+				}
+			}
+		},
+
+
+		config = {
+			debugMode: false,
+			logging: {
+				log: true,
+				notice: true,
+				info: true,
+				warn: true,
+				error: true,
+				debug: false
+			}
+		},
+
+		callstackRegistry = [],
+		queuedUpdates = {}, //< Used for delaying saves till the last momment.
+
+	complexType = function(o){
+		switch(typeof o){
+			case 'string':
+				return 'string';
+			case 'boolean':
+				return 'boolean';
+			case 'number':
+				return (_.isNaN(o) ? 'NaN' : (o.toString().match(/\./) ? 'decimal' : 'integer'));
+			case 'function':
+				return 'function: '+(o.name ? o.name+'()' : '(anonymous)');
+			case 'object':
+				return (_.isArray(o) ? 'array' : (_.isArguments(o) ? 'arguments' : ( _.isNull(o) ? 'null' : 'object')));
+			default:
+				return typeof o;
+		}
+	},
+
+	dataLogger = function(primaryLogger,secondaryLogger,data){
+		_.each(data,function(m){
+			var type = complexType(m);
+			switch(type){
+				case 'string':
+					primaryLogger(m);
+					break;
+				case 'undefined':
+				case 'null':
+				case 'NaN':
+					primaryLogger('['+type+']');
+					break;
+				case 'number':
+				case 'not a number':
+				case 'integer':
+				case 'decimal':
+				case 'boolean':
+					primaryLogger('['+type+']: '+m);
+					break;
+				default:
+					primaryLogger('['+type+']:=========================================');
+					secondaryLogger(m);
+					primaryLogger('=========================================================');
+					break;
+			}
+		});
+	},
+
+
+	colorLog = function(options){
+		var coloredLoggerFunction,
+			key = options.key,
+			label = options.title || 'TAS',
+			lBGColor = (options.color && options.color.bgLabel) || 'blue',
+			lTxtColor = (options.color && options.color.label) || 'white',
+			mBGColor = (options.color && options.color.bgText) || 'blue',
+			mTxtColor = (options.color && options.color.text) || 'white';
+
+		coloredLoggerFunction = function(message){
+			console.log(
+				'%c '+label+': %c '+message + ' ',
+				'background-color: '+lBGColor+';color: '+lTxtColor+'; font-weight:bold;',
+				'background-color: '+mBGColor+';color: '+mTxtColor+';'
+			); 
+		};
+		return function(){
+			if('TAS'===key || config.logging[key]){
+			   dataLogger(coloredLoggerFunction,function(m){console.log(m);},_.toArray(arguments)); 
+			}
+		};
+	},
+
+	logDebug  = colorLog(loggingSettings.debug),
+	logError  = colorLog(loggingSettings.error),
+	logWarn   = colorLog(loggingSettings.warn),
+	logInfo   = colorLog(loggingSettings.info),
+	logNotice = colorLog(loggingSettings.notice),
+	logLog    = colorLog(loggingSettings.log),
+	log       = colorLog(loggingSettings.TAS),
+	logCS     = colorLog(loggingSettings.callstack),
+	logCSA    = colorLog(loggingSettings.callstack_async),
+
+	registerCallstack = function(callstack,label){
+		var idx=_.findIndex(callstackRegistry,function(o){
+			return (_.difference(o.stack,callstack).length === _.difference(callstack,o.stack).length) &&
+				_.difference(o.stack,callstack).length === 0 &&
+				o.label === label;
+		});
+		if(-1 === idx){
+			idx=callstackRegistry.length;
+			callstackRegistry.push({
+				stack: callstack,
+				label: label
+			});
+		}
+		return idx;
+	},
+
+	setConfigOption = function(options){
+		var newconf =_.defaults(options,config);
+		newconf.logging=_.defaults(
+			(options && options.logging)||{},
+			config.logging
+		);
+		config=newconf;
+	},
+
+	debugMode = function(){
+		config.logging.debug=true;
+		config.debugMode = true;
+	},
+
+	getCallstack = function(){
+		var e = new Error('dummy'),
+			stack = _.map(_.rest(e.stack.replace(/^[^\(]+?[\n$]/gm, '')
+			.replace(/^\s+at\s+/gm, '')
+			.replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
+			.split('\n')),function(l){
+				return l.replace(/\s+.*$/,'');
+			});
+		return stack;
+	},
+	logCallstackSub = function(cs){
+		var matches, csa;
+		_.find(cs,function(line){
+			matches = line.match(/TAS_CALLSTACK_(\d+)/);
+			if(matches){
+			   csa=callstackRegistry[matches[1]];
+			   logCSA( '===================='+(csa.label ? '> '+csa.label+' <' : '')+'====================');
+			   logCallstackSub(csa.stack);
+			   return true;
+			} 
+			logCS(line);
+			return false;
+		});
+	},
+	logCallstack = function(){
+		var cs;
+		if(config.debugMode){
+			cs = getCallstack();
+			cs.shift();
+			log('==============================> CALLSTACK <==============================');
+			logCallstackSub(cs);
+			log('=========================================================================');
+		}
+	},
+
+
+	wrapCallback = function (label, callback, context){
+		var callstack;
+		if('function' === typeof label){
+			context=callback;
+			callback=label;
+			label=undefined;
+		}
+		if(!config.debugMode){
+			return (function(cb,ctx){
+				return function(){
+					cb.apply(ctx||{},arguments);
+				};
+			}(callback,context));
+		}
+		
+		callstack = getCallstack();
+		callstack.shift();
+		
+		return (function(cb,ctx,cs,lbl){
+			var ctxref=registerCallstack(cs,lbl);
+
+			/*jshint -W054 */
+			return new Function('cb','ctx','TASlog',
+				"return function TAS_CALLSTACK_"+ctxref+"(){"+
+					"TASlog('Entering: '+(cb.name||'(anonymous function)'));"+
+					"cb.apply(ctx||{},arguments);"+
+					"TASlog('Exiting: '+(cb.name||'(anonymous function)'));"+
+				"};")(cb,ctx,log);
+			/*jshint +W054 */
+		}(callback,context,callstack,label));
+	},
+
+
+	prepareUpdate = function( attribute, value ){
+		queuedUpdates[attribute]=value;
+	},
+
+	applyQueuedUpdates = function() {
+	  setAttrs(queuedUpdates);
+	  queuedUpdates = {};
+	},
+
+	namesFromArgs = function(args,base){
+		return _.chain(args)
+			.reduce(function(memo,attr){
+				if('string' === typeof attr) {
+					memo.push(attr);
+				} else if(_.isArray(args) || _.isArguments(args)){
+					memo = namesFromArgs(attr,memo);
+				}
+				return memo;
+			},(_.isArray(base) && base) || [])
+			.uniq()
+			.value();
+	},
+
+	addId = function(obj,value){
+		Object.defineProperty(obj,'id',{
+			value: value,
+			writeable: false,
+			enumerable: false
+		});
+	},
+
+	addProp = function(obj,prop,value,fullname){
+		(function(){
+			var pname=(_.contains(['S','F','I','D'],prop) ? '_'+prop : prop),
+				full_pname = fullname || prop,
+				pvalue=value;
+
+			_.each(['S','I','F'],function(p){
+				if( !_.has(obj,p)){
+					Object.defineProperty(obj, p, {
+						value: {},
+						enumerable: false,
+						readonly: true
+					});
+				}
+			});
+			if( !_.has(obj,'D')){
+				Object.defineProperty(obj, 'D', {
+					value: _.reduce(_.range(10),function(m,d){
+							Object.defineProperty(m, d, {
+								value: {},
+								enumerable: true,
+								readonly: true
+							});
+							return m;
+						},{}),
+					enumerable: false,
+					readonly: true
+				});
+			}
+
+
+			// Raw value
+			Object.defineProperty(obj, pname, {
+				enumerable: true,
+				set: function(v){
+					if(v!==pvalue) {
+						pvalue=v;
+						prepareUpdate(full_pname,v);
+					}
+				},
+				get: function(){
+					return pvalue;
+				}
+			});
+			
+			// string value
+			Object.defineProperty(obj.S, pname, {
+				enumerable: true,
+				set: function(v){
+					var val=v.toString();
+					if(val !== pvalue) {
+						pvalue=val;
+						prepareUpdate(full_pname,val);
+					}
+				},
+				get: function(){
+					return pvalue.toString();
+				}
+			});
+
+			// int value
+			Object.defineProperty(obj.I, pname, {
+				enumerable: true,
+				set: function(v){
+					var val=parseInt(v,10) || 0;
+					if(val !== pvalue){
+						pvalue=val;
+						prepareUpdate(full_pname,val);
+					}
+				},
+				get: function(){
+					return parseInt(pvalue,10) || 0;
+				}
+			});
+
+			// float value
+			Object.defineProperty(obj.F, pname, {
+				enumerable: true,
+				set: function(v){
+					var val=parseFloat(v) || 0;
+					if(val !== pvalue) {
+						pvalue=val;
+						prepareUpdate(full_pname,val);
+					}
+				},
+				get: function(){
+					return parseFloat(pvalue) || 0;
+				}
+			});
+			_.each(_.range(10),function(d){
+				Object.defineProperty(obj.D[d], pname, {
+					enumerable: true,
+					set: function(v){
+						var val=(parseFloat(v) || 0).toFixed(d);
+						if(val !== pvalue){
+							pvalue=val;
+							prepareUpdate(full_pname,val);
+						}
+					},
+					get: function(){
+						return (parseFloat(pvalue) || 0).toFixed(d);
+					}
+				});
+			});
+
+		}());
+	},
+
+	repeating = function( section ) {
+		return (function(s){
+			var sectionName = s,
+				attrNames = [],
+				fieldNames = [],
+				operations = [],
+				after = [],
+			
+			repAttrs = function TAS_Repeating_Attrs(){
+				attrNames = namesFromArgs(arguments,attrNames);
+				return this;
+			},
+			repFields = function TAS_Repeating_Fields(){
+				fieldNames = namesFromArgs(arguments,fieldNames);
+				return this;
+			},
+			repReduce = function TAS_Repeating_Reduce(func, initial, final, context) { 
+				operations.push({
+					type: 'reduce',
+					func: (func && _.isFunction(func) && func) || _.noop,
+					memo: (_.isUndefined(initial) && 0) || initial,
+					final: (final && _.isFunction(final) && final) || _.noop,
+					context: context || {}
+				});
+				return this;
+			},
+			repMap = function TAS_Repeating_Map(func, final, context) {
+				operations.push({
+					type: 'map',
+					func: (func && _.isFunction(func) && func) || _.noop,
+					final: (final && _.isFunction(final) && final) || _.noop,
+					context: context || {}
+				});
+				return this;
+			},
+			repEach = function TAS_Repeating_Each(func, final, context) {
+				operations.push({
+					type: 'each',
+					func: (func && _.isFunction(func) && func) || _.noop,
+					final: (final && _.isFunction(final) && final) || _.noop,
+					context: context || {}
+				});
+				return this;
+			},
+			repTap = function TAS_Repeating_Tap(final, context) {
+				operations.push({
+					type: 'tap',
+					final: (final && _.isFunction(final) && final) || _.noop,
+					context: context || {}
+				});
+				return this;
+			},
+			repAfter = function TAS_Repeating_After(callback,context) {
+				after.push({
+					callback: (callback && _.isFunction(callback) && callback) || _.noop,
+					context: context || {}
+				});
+				return this;
+			},
+			repExecute = function TAS_Repeating_Execute(callback,context){
+				var rowSet = {},
+					attrSet = {},
+					fieldIds = [],
+					fullFieldNames = [];
+
+				repAfter(callback,context);
+
+				// call each operation per row.
+				// call each operation's final
+				getSectionIDs("repeating_"+sectionName,function(ids){
+					fieldIds = ids;
+					fullFieldNames = _.reduce(fieldIds,function(memo,id){
+						return memo.concat(_.map(fieldNames,function(name){
+							return 'repeating_'+sectionName+'_'+id+'_'+name;  
+						}));
+					},[]);
+					getAttrs( _.uniq(attrNames.concat(fullFieldNames)), function(values){
+						_.each(attrNames,function(aname){
+							if(values.hasOwnProperty(aname)){
+								addProp(attrSet,aname,values[aname]);
+							}
+						});
+
+						rowSet = _.reduce(fieldIds,function(memo,id){
+							var r={};
+							addId(r,id);
+							_.each(fieldNames,function(name){
+								var fn = 'repeating_'+sectionName+'_'+id+'_'+name;  
+								addProp(r,name,values[fn],fn);
+							});
+
+							memo[id]=r;
+
+							return memo;
+						},{});
+
+						_.each(operations,function(op){
+							var res;
+							switch(op.type){
+								case 'tap':
+									_.bind(op.final,op.context,rowSet,attrSet)();
+									break;
+
+								case 'each':
+									_.each(rowSet,function(r){
+										_.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
+									});
+									_.bind(op.final,op.context,rowSet,attrSet)();
+									break;
+
+								case 'map':
+									res = _.map(rowSet,function(r){
+										return _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
+									});
+									_.bind(op.final,op.context,res,rowSet,attrSet)();
+									break;
+
+								case 'reduce':
+									res = op.memo;
+									_.each(rowSet,function(r){
+										res = _.bind(op.func,op.context,res,r,attrSet,r.id,rowSet)();
+									});
+									_.bind(op.final,op.context,res,rowSet,attrSet)();
+									break;
+							}
+						});
+
+						// finalize attrs
+						applyQueuedUpdates();
+						_.each(after,function(op){
+							_.bind(op.callback,op.context)();
+						});
+					});
+				});
+			};
+				
+			return {
+				attrs: repAttrs,
+				attr: repAttrs,
+
+				column: repFields,
+				columns: repFields,
+				field: repFields,
+				fields: repFields,
+
+				reduce: repReduce,
+				inject: repReduce,
+				foldl: repReduce,
+
+				map: repMap,
+				collect: repMap,
+
+				each: repEach,
+				forEach: repEach,
+
+				tap: repTap,
+				'do': repTap,
+
+				after: repAfter,
+				last: repAfter,
+				done: repAfter,
+
+				execute: repExecute,
+				go: repExecute,
+				run: repExecute
+			};
+		}(section));
+	},
+
+
+	repeatingSimpleSum = function(section, field, destination){
+		repeating(section)
+			.attr(destination)
+			.field(field)
+			.reduce(function(m,r){
+				return m + (r.F[field]);
+			},0,function(t,r,a){
+				a.S[destination]=t;
+			})
+			.execute();
+	};
+
+	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  The Aaron Sheet  v'+version+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  Last update: '+(new Date(lastUpdate*1000))+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+
+
+	return {
+		/* Repeating Sections */
+		repeatingSimpleSum: repeatingSimpleSum,
+		repeating: repeating,
+
+		/* Configuration */
+		config: setConfigOption,
+
+		/* Debugging */
+		callback: wrapCallback,
+		callstack: logCallstack,
+		debugMode: debugMode,
+		_fn: wrapCallback,
+
+		/* Logging */
+		debug: logDebug,
+		error: logError,
+		warn: logWarn,
+		info: logInfo,
+		notice: logNotice,
+		log: logLog
+	};
+	}());
+
+	/* ---- END: TheAaronSheet.js ---- */
+	
+	on(
+	"change:repeating_listeSortsHermetiques:sortHermetiquePrepare remove:repeating_listeSortsHermetiques"
+	, function() 
+	{
+		TAS.repeatingSimpleSum("listeSortsHermetiques", "sortHermetiquePrepare", "sortsHermetiquesPrepareTotal");
+	});
+</script>
+	
+	<img src="http://img4.hostingpics.net/pics/610633symboleThalya2.png" alt="Thalya" style="float:left;" />
+	<table class="enTete" style="margin-left:auto;margin-bottom:10px">
+		<tr class="upDown">
+			<td colspan="5"></td>
+		</tr>
+		<tr>
+			<th  style="width:14%" class="left padding-left">Nom</th>
+			<td style="width:31%">
+				<input type="text" name="attr_character_name" />
+			</td>
+			<td style="width:2%"></td>
+			<th style="width:22%"class="left">Concept</th>
+			<td style="width:31%" class="padding-right">
+				<input type="text" name="attr_concept" />
+			</td>
+		</tr>
+		<tr>
+			<th class="left padding-left">Race</th>
+			<td>
+				<input type="text" name="attr_race" />
+			</td>
+			<td></td>
+			<th class="left">Guilde des Métiers</th>
+			<td class="padding-right">
+				<input type="text" name="attr_guildeMetiers" />
+			</td>
+		</tr>
+		<tr>
+			<th class="left padding-left">Âge</th>
+			<td>
+				<input type="text" name="attr_age" />
+			</td>
+			<td></td>
+			<th class="left">Guilde Divine</th>
+			<td class="padding-right">
+				<input type="text" name="attr_guildeDivine" />
+			</td>
+		</tr>
+		<tr class="upDown">
+			<td colspan="5"></td>
+		</tr>
+	</table>
+<div style="text-align:center">
+	<input type="radio" name="attr_tab" class="tab tab1" value="1" checked="checked" /><span title="Principal" class="tab tab1"></span>
+	<input type="radio" name="attr_tab" class="tab tab2" value="2" /><span title="Combat" class="tab tab2"></span>
+	<input type="radio" name="attr_tab" class="tab tab3" value="3" /><span title="Inventaire" class="tab tab3"></span>
+	<input type="radio" name="attr_tab" class="tab tab4" value="4" /><span title="Magie" class="tab tab4"></span>
+	<input type="radio" name="attr_tab" class="tab tab5" value="5" /><span title="Historique" class="tab tab5"></span>
+	<div class="tab1 tab-content" style="margin-top:10px">
+		<div class="sheet-2colrow">
+			<div class="sheet-col">
+				<table>
+					<tr>
+						<th colspan="3"><h1>Caractéristiques</h1></th>
+					</tr>
+					<tr>
+						<th style="width:15%" class="left padding-left">Force</th>
+						<td style="width:10%"><input type="number" name="attr_valueForce" style="width:100%" class="center" value="1" min="1" /></td>
+						<td class="padding-right"><input type="text" name="attr_traitForce" /></td>
+					</tr>
+					<tr>
+						<th style="width:15%" class="left padding-left">Réflexes</th>
+						<td style="width:10%"><input type="number" name="attr_valueReflexes" style="width:100%" class="center" value="1" min="1" /></td>
+						<td class="padding-right"><input type="text" name="attr_traitReflexes" /></td>
+					</tr>
+					<tr>
+						<th style="width:15%" class="left padding-left">Volonté</th>
+						<td style="width:10%"><input type="number" name="attr_valueVolonte" style="width:100%" class="center" value="1" min="1" /></td>
+						<td class="padding-right"><input type="text" name="attr_traitVolonte" /></td>
+					</tr>
+					<tr>
+						<th style="width:15%" class="left padding-left">Intellect</th>
+						<td style="width:10%"><input type="number" name="attr_valueIntellect" style="width:100%" class="center" value="1" min="1" /></td>
+						<td class="padding-right"><input type="text" name="attr_traitIntellect" /></td>
+					</tr>
+					<tr class="upDown">
+						<th colspan="2"></th>
+					</tr>
+				</table>
+			</div>
+			<div class="sheet-col">
+				<table>
+					<tr>
+						<th colspan="2"><h3>Destinée</h3></th>
+					</tr>
+					<tr>
+						<th class="padding-left">Actuel</th>
+						<th class="padding-right">Maximum</th>
+					</tr>
+					<tr>
+						<td class="padding-left">
+							<input type="number" name="attr_destinee" value="0" style="width:100%" class="center" />
+						</td>
+						<td class="padding-right">
+							<input type="number" name="attr_destinee_max" value="0" style="width:100%" class="center" />
+						</td>
+					</tr>
+					<tr class="upDown">
+						<th colspan="2"></th>
+					</tr>
+				</table>
+				<table class="margeTop">
+					<tr>
+						<th colspan="2"><h3>Chaos</h3></th>
+					</tr>
+					<tr>
+						<th class="padding-left" style="width:20%">Niveau</th>
+						<th class="padding-right">Description</th>
+					</tr>
+					<tr>
+						<td class="padding-left">
+							<input type="number" name="attr_chaosNiveau" value="0" style="width:100%" class="center" />
+						</td>
+						<td class="padding-right">
+							<input type="text" name="attr_chaosDescription"/>
+						</td>
+					</tr>
+					<tr class="upDown">
+						<th colspan="2"></th>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="sheet-2colrow margeTop">
+			<div class="sheet-col">
+				<div class="competenceConditionPhysique">
+					<table>
+						<tr>
+							<th colspan="4">Condition Physique</th>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_conditionPhysique_1" value="Condition Physique" />
+							</td>
+							<td style="width:10%">
+								<input type="number" name="attr_valueConditionPhysique_1" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracConditionPhysique_1">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetConditionPhysique_1" type="roll" value="&{template:base} {{nom=@{conditionPhysique_1}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracConditionPhysique_1}+@{valueConditionPhysique_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_conditionPhysique_2" />
+							</td>
+							<td>
+								<input type="number" name="attr_valueConditionPhysique_2" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracConditionPhysique_2">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetConditionPhysique_2" type="roll" value="&{template:base} {{nom=@{conditionPhysique_2}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracConditionPhysique_2}+@{valueConditionPhysique_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr class="upDown">
+							<th></th>
+						</tr>
+					</table>
+				</div>
+				<div class="competenceInteraction">
+					<table class="margeTop">
+						<tr>
+							<th colspan="4">Interaction</th>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_interaction_1" value="Interaction" />
+							</td>
+							<td style="width:10%">
+								<input type="number" name="attr_valueInteraction_1" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracInteraction_1">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetInteraction_1" type="roll" value="&{template:base} {{nom=@{interaction_1}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracInteraction_1}+@{valueInteraction_1}]]}}  {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_interaction_2" />
+							</td>
+							<td>
+								<input type="number" name="attr_valueInteraction_2" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracInteraction_2">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetInteraction_2" type="roll" value="&{template:base} {{nom=@{interaction_2}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracInteraction_2}+@{valueInteraction_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr class="upDown">
+							<th></th>
+						</tr>
+					</table>
+				</div>
+				<div class="competenceSubterfuge">
+					<table class="margeTop">
+						<tr>
+							<th colspan="4">Subterfuge</th>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_subterfuge_1" value="Subterfuge" />
+							</td>
+							<td style="width:10%">
+								<input type="number" name="attr_valueSubterfuge_1" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracSubterfuge_1">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetSubterfuge_1" type="roll" value="&{template:base} {{nom=@{subterfuge_1}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracSubterfuge_1}+@{valueSubterfuge_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_subterfuge_2" />
+							</td>
+							<td>
+								<input type="number" name="attr_valueSubterfuge_2" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracSubterfuge_2">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetSubterfuge_2" type="roll" value="&{template:base} {{nom=@{subterfuge_2}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracSubterfuge_2}+@{valueSubterfuge_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr class="upDown">
+							<th></th>
+						</tr>
+					</table>
+				</div>
+				<div class="competenceProfession">
+					<table class="margeTop">
+						<tr>
+							<th colspan="4">Profession</th>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_profession_1" value="Profession" />
+							</td>
+							<td style="width:10%">
+								<input type="number" name="attr_valueProfession_1" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracProfession_1">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetProfession_1" type="roll" value="&{template:base} {{nom=@{profession_1}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracProfession_1}+@{valueProfession_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_profession_2" />
+							</td>
+							<td>
+								<input type="number" name="attr_valueProfession_2" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracProfession_2">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetProfession_2" type="roll" value="&{template:base} {{nom=@{profession_2}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracProfession_2}+@{valueProfession_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr class="upDown">
+							<th></th>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<div class="sheet-col">
+				<div class="competenceCombat">
+					<table>
+						<tr>
+							<th colspan="4">Combat</th>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_combat_1" value="Combat" />
+							</td>
+							<td style="width:10%">
+								<input type="number" name="attr_valueCombat_1" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracCombat_1">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetCombat_1" type="roll" value="&{template:base} {{nom=@{combat_1}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracCombat_1}+@{valueCombat_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_combat_2" />
+							</td>
+							<td>
+								<input type="number" name="attr_valueCombat_2" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracCombat_2">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetCombat_2" type="roll" value="&{template:base} {{nom=@{combat_2}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracCombat_2}+@{valueCombat_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr class="upDown">
+							<th></th>
+						</tr>
+					</table>
+				</div>
+				<div class="competencePerception">
+					<table class="margeTop">
+						<tr>
+							<th colspan="4">Perception</th>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_perception_1" value="Perception" />
+							</td>
+							<td style="width:10%">
+								<input type="number" name="attr_valuePerception_1" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracPerception_1">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetPerception_1" type="roll" value="&{template:base} {{nom=@{perception_1}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracPerception_1}+@{valuePerception_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_perception_2" />
+							</td>
+							<td>
+								<input type="number" name="attr_valuePerception_2" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracPerception_2">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetPerception_2" type="roll" value="&{template:base} {{nom=@{perception_2}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracPerception_2}+@{valuePerception_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr class="upDown">
+							<th></th>
+						</tr>
+					</table>
+				</div>
+				<div class="competenceCulture">
+					<table class="margeTop">
+						<tr>
+							<th colspan="4">Culture</th>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_culture_1" value="Culture" />
+							</td>
+							<td style="width:10%">
+								<input type="number" name="attr_valueCulture_1" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracCulture_1">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetCulture_1" type="roll" value="&{template:base} {{nom=@{culture_1}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracCulture_1}+@{valueCulture_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_culture_2" />
+							</td>
+							<td>
+								<input type="number" name="attr_valueCulture_2" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracCulture_2">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetCulture_2" type="roll" value="&{template:base} {{nom=@{culture_2}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracCulture_2}+@{valueCulture_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr class="upDown">
+							<th></th>
+						</tr>
+					</table>
+				</div>
+				<div class="competenceArcane">
+					<table class="margeTop">
+						<tr>
+							<th colspan="4">Arcane</th>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_arcane_1" value="Arcane" />
+							</td>
+							<td style="width:10%">
+								<input type="number" name="attr_valueArcane_1" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracArcane_1">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetArcane_1" type="roll" value="&{template:base} {{nom=@{arcane_1}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracArcane_1}+@{valueArcane_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr>
+							<td class="padding-left">
+								<input type="text" name="attr_arcane_2" />
+							</td>
+							<td>
+								<input type="number" name="attr_valueArcane_2" value="0" style="width:100%" class="center" />
+							</td>
+							<td>
+								<select name="attr_valueCaracArcane_2">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</td>
+							<td>
+								<button name="attr_jetArcane_2" type="roll" value="&{template:base} {{nom=@{arcane_2}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracArcane_2}+@{valueArcane_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</td>
+						</tr>
+						<tr class="upDown">
+							<th></th>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tab2 tab-content" style="margin-top:10px">
+		<table>
+			<tr>
+				<th colspan="6" class="center"><h3>Armes de mêlée</h3></th>
+			</tr>
+			<tr>
+				<th style="width:30%" class="padding-left">Nom</th>
+				<th style="width:20%">Compétence</th>
+				<th style="width:15">Bonus Magique<br/>(Toucher)</th>
+				<th style="width:15%">Dégâts</th>
+				<th style="width:15%">Bonus Magique<br/>(Dégâts)</th>
+				<th style="width:5%"></th>
+			</tr>
+			<tr>
+				<td class="padding-left"><input type="text" name="attr_armeMelee_1" /></td>
+				<td>
+					<div class="child">
+						<span name="attr_combat_1" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W1" value="1" checked="true" />
+						<label class="l1"><span name="attr_combat_1"></span></label>
+						
+						<span name="attr_combat_2" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W1" value="2" />
+						<label class="l2"><span name="attr_combat_2" class="c2"></span></label>
+						
+						<span name="attr_combat_3" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W1" value="3" />
+						<label class="l3"><span name="attr_combat_3"></span></label>
+						
+						<div class="1" style="width:100%"><span name="attr_combat_1"></span><span style="float:right">▼</span></div>
+						<div class="2" style="width:100%"><span name="attr_combat_2"></span><span style="float:right">▼</span></div>
+						<div class="3" style="width:100%"><span name="attr_combat_3"></span><span style="float:right">▼</span></div>
+					</div>
+				</td>
+				<td>
+					<input type="number" name="attr_BMTM_1" style="width:100%" class="center" value="0" />
+				</td>
+				<td>
+					<select name="attr_armeMelee_1_Degats">
+						<option value="1">1</option>
+						<option value="m">m</option>
+						<option value="C">C</option>
+						<option value="M">M</option>
+						<option value="mC">mC</option>
+						<option value="mM">mM</option>
+						<option value="CM">CM</option>
+						<option value="mCM">mCM</option>
+					</select>
+				</td>
+				<td>
+					<input type="number" name="attr_BMDM_1" style="width:100%" class="center" value="0" />
+				</td>
+				<td>
+					<input type="checkbox" name="attr_selectComp_W1" value="1" style="display:none;" class="C1" checked="true" />
+					<input type="checkbox" name="attr_selectComp_W1" value="2" style="display:none;" class="C2" />
+					<input type="checkbox" name="attr_selectComp_W1" value="3" style="display:none;" class="C3" />
+					<span class="C1">
+						<button name="attr_jetArmeMelee_1_C1" type="roll" value="&{template:combat} {{nom=@{armeMelee_1}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueReflexes}+@{valueCombat_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}} {{degats=@{armeMelee_1_Degats}}} {{BMT=[[@{BMTM_1}]]}} {{BMD=[[@{BMDM_1}]]}} {{BD=[[floor((@{valueCombat_1}+@{valueForce})/4)]]}}" />
+					</span>
+					<span class="C2">
+						<button name="attr_jetArmeMelee_1_C2" type="roll" value="&{template:combat} {{nom=@{armeMelee_1}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueReflexes}+@{valueCombat_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}} {{degats=@{armeMelee_1_Degats}}} {{BMT=[[@{BMTM_1}]]}} {{BMD=[[@{BMDM_1}]]}} {{BD=[[floor((@{valueCombat_2}+@{valueForce})/4)]]}}" />
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="padding-left"><input type="text" name="attr_armeMelee_2" /></td>
+				<td>
+					<div class="child">
+						<span name="attr_combat_1" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W2" value="1" checked="true" />
+						<label class="l1"><span name="attr_combat_1"></span></label>
+						<span name="attr_combat_2" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W2" value="2" />
+						<label class="l2"><span name="attr_combat_2" class="c2"></span></label>
+						<span name="attr_combat_3" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W2" value="3" />
+						<label class="l3"><span name="attr_combat_3"></span></label>
+						<div class="1" style="width:100%"><span name="attr_combat_1"></span><span style="float:right">▼</span></div>
+						<div class="2" style="width:100%"><span name="attr_combat_2"></span><span style="float:right">▼</span></div>
+						<div class="3" style="width:100%"><span name="attr_combat_3"></span><span style="float:right">▼</span></div>
+					</div>
+				</td>
+				<td>
+					<input type="number" name="attr_BMTM_2" style="width:100%" class="center" value="0" />
+				</td>
+				<td>
+					<select name="attr_armeMelee_2_Degats">
+						<option value="1">1</option>
+						<option value="m">m</option>
+						<option value="C">C</option>
+						<option value="M">M</option>
+						<option value="mC">mC</option>
+						<option value="mM">mM</option>
+						<option value="CM">CM</option>
+						<option value="mCM">mCM</option>
+					</select>
+				</td>
+				<td>
+					<input type="number" name="attr_BMDM_2" style="width:100%" class="center" value="0" />
+				</td>
+				<td>
+					<input type="checkbox" name="attr_selectComp_W2" value="1" style="display:none;" class="C1" checked="true" />
+					<input type="checkbox" name="attr_selectComp_W2" value="2" style="display:none;" class="C2" />
+					<input type="checkbox" name="attr_selectComp_W2" value="3" style="display:none;" class="C3" />
+					<span class="C1">
+						<button name="attr_jetArmeMelee_2_C1" type="roll" value="&{template:combat} {{nom=@{armeMelee_2}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueReflexes}+@{valueCombat_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}} {{degats=@{armeMelee_2_Degats}}} {{BMT=[[@{BMTM_2}]]}} {{BMD=[[@{BMDM_2}]]}} {{BD=[[floor((@{valueCombat_1}+@{valueForce})/4)]]}}" />
+					</span>
+					<span class="C2">
+						<button name="attr_jetArmeMelee_2_C2" type="roll" value="&{template:combat} {{nom=@{armeMelee_2}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueReflexes}+@{valueCombat_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}} {{degats=@{armeMelee_2_Degats}}} {{BMT=[[@{BMTM_2}]]}} {{BMD=[[@{BMDM_2}]]}} {{BD=[[floor((@{valueCombat_2}+@{valueForce})/4)]]}}" />
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="padding-left"><input type="text" name="attr_armeMelee_3" /></td>
+				<td>
+					<div class="child">
+						<span name="attr_combat_1" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W3" value="1" checked="true" />
+						<label class="l1"><span name="attr_combat_1"></span></label>
+						<span name="attr_combat_2" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W3" value="2" />
+						<label class="l2"><span name="attr_combat_2" class="c2"></span></label>
+						<span name="attr_combat_3" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W3" value="3" />
+						<label class="l3"><span name="attr_combat_3"></span></label>
+						<div class="1" style="width:100%"><span name="attr_combat_1"></span><span style="float:right">▼</span></div>
+						<div class="2" style="width:100%"><span name="attr_combat_2"></span><span style="float:right">▼</span></div>
+						<div class="3" style="width:100%"><span name="attr_combat_3"></span><span style="float:right">▼</span></div>
+					</div>
+				</td>
+				<td>
+					<input type="number" name="attr_BMTM_3" style="width:100%" class="center" value="0" />
+				</td>
+				<td>
+					<select name="attr_armeMelee_3_Degats">
+						<option value="1">1</option>
+						<option value="m">m</option>
+						<option value="C">C</option>
+						<option value="M">M</option>
+						<option value="mC">mC</option>
+						<option value="mM">mM</option>
+						<option value="CM">CM</option>
+						<option value="mCM">mCM</option>
+					</select>
+				</td>
+				<td>
+					<input type="number" name="attr_BMDM_3" style="width:100%" class="center" value="0" />
+				</td>
+				<td>
+					<input type="checkbox" name="attr_selectComp_W3" value="1" style="display:none;" class="C1" checked="true" />
+					<input type="checkbox" name="attr_selectComp_W3" value="2" style="display:none;" class="C2" />
+					<input type="checkbox" name="attr_selectComp_W3" value="3" style="display:none;" class="C3" />
+					<span class="C1">
+						<button name="attr_jetArmeMelee_3_C1" type="roll" value="&{template:combat} {{nom=@{armeMelee_3}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueReflexes}+@{valueCombat_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}} {{degats=@{armeMelee_3_Degats}}} {{BMT=[[@{BMTM_3}]]}} {{BMD=[[@{BMDM_3}]]}} {{BD=[[floor((@{valueCombat_1}+@{valueForce})/4)]]}}" />
+					</span>
+					<span class="C2">
+						<button name="attr_jetArmeMelee_3_C2" type="roll" value="&{template:combat} {{nom=@{armeMelee_3}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueReflexes}+@{valueCombat_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}} {{degats=@{armeMelee_3_Degats}}} {{BMT=[[@{BMTM_3}]]}} {{BMD=[[@{BMDM_3}]]}} {{BD=[[floor((@{valueCombat_2}+@{valueForce})/4)]]}}" />
+					</span>
+				</td>
+			</tr>
+			<tr class="upDown">
+			</tr>
+		</table>
+		<table class="margeTop">
+			<tr>
+				<th colspan="6" class="center"><h3>Armes à distance</h3></th>
+			</tr>
+			<tr>
+				<th style="width:30%" class="padding-left">Nom</th>
+				<th style="width:20%">Compétence</th>
+				<th style="width:15">Bonus Magique<br/>(Toucher)</th>
+				<th style="width:15%">Dégâts</th>
+				<th style="width:15%">Bonus Magique<br/>(Dégâts)</th>
+				<th style="width:5%"></th>
+			</tr>
+			<tr>
+				<td class="padding-left"><input type="text" name="attr_armeDistance_1" /></td>
+				<td>
+					<div class="child">
+						<span name="attr_combat_1" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W4" value="1" checked="true" />
+						<label class="l1"><span name="attr_combat_1"></span></label>
+						<span name="attr_combat_2" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W4" value="2" />
+						<label class="l2"><span name="attr_combat_2" class="c2"></span></label>
+						<span name="attr_combat_3" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W4" value="3" />
+						<label class="l3"><span name="attr_combat_3"></span></label>
+						<div class="1" style="width:100%"><span name="attr_combat_1"></span><span style="float:right">▼</span></div>
+						<div class="2" style="width:100%"><span name="attr_combat_2"></span><span style="float:right">▼</span></div>
+						<div class="3" style="width:100%"><span name="attr_combat_3"></span><span style="float:right">▼</span></div>
+					</div>
+				</td>
+				<td>
+					<input type="number" name="attr_BMTD_1" style="width:100%" class="center" value="0" />
+				</td>
+				<td>
+					<select name="attr_armeDistance_1_Degats">
+						<option value="1">1</option>
+						<option value="m">m</option>
+						<option value="C">C</option>
+						<option value="M">M</option>
+						<option value="mC">mC</option>
+						<option value="mM">mM</option>
+						<option value="CM">CM</option>
+						<option value="mCM">mCM</option>
+					</select>
+				</td>
+				<td>
+					<input type="number" name="attr_BMDD_1" style="width:100%" class="center" value="0" />
+				</td>
+				<td>
+					<input type="checkbox" name="attr_selectComp_W4" value="1" style="display:none;" class="C1" checked="true" />
+					<input type="checkbox" name="attr_selectComp_W4" value="2" style="display:none;" class="C2" />
+					<input type="checkbox" name="attr_selectComp_W4" value="3" style="display:none;" class="C3" />
+					<span class="C1">
+						<button name="attr_jetArmeDistance_1_C1" type="roll" value="&{template:combat} {{nom=@{armeDistance_1}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueReflexes}+@{valueCombat_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}} {{degats=@{armeDistance_1_Degats}}} {{BMT=[[@{BMTD_1}]]}} {{BMD=[[@{BMDD_1}]]}} {{BD=[[floor((@{valueCombat_1})/4)]]}}" />
+					</span>
+					<span class="C2">
+						<button name="attr_jetArmeDistance_1_C2" type="roll" value="&{template:combat} {{nom=@{armeDistance_1}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueReflexes}+@{valueCombat_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}} {{degats=@{armeDistance_1_Degats}}} {{BMT=[[@{BMTD_1}]]}} {{BMD=[[@{BMDD_1}]]}} {{BD=[[floor((@{valueCombat_2})/4)]]}}" />
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="padding-left"><input type="text" name="attr_armeDistance_2" /></td>
+				<td>
+					<div class="child">
+						<span name="attr_combat_1" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W5" value="1" checked="true" />
+						<label class="l1"><span name="attr_combat_1"></span></label>
+						<span name="attr_combat_2" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W5" value="2" />
+						<label class="l2"><span name="attr_combat_2" class="c2"></span></label>
+						<span name="attr_combat_3" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W5" value="3" />
+						<label class="l3"><span name="attr_combat_3"></span></label>
+						<div class="1" style="width:100%"><span name="attr_combat_1"></span><span style="float:right">▼</span></div>
+						<div class="2" style="width:100%"><span name="attr_combat_2"></span><span style="float:right">▼</span></div>
+						<div class="3" style="width:100%"><span name="attr_combat_3"></span><span style="float:right">▼</span></div>
+					</div>
+				</td>
+				<td>
+					<input type="number" name="attr_BMTD_2" style="width:100%" class="center" value="0" />
+				</td>
+				<td>
+					<select name="attr_armeDistance_2_Degats">
+						<option value="1">1</option>
+						<option value="m">m</option>
+						<option value="C">C</option>
+						<option value="M">M</option>
+						<option value="mC">mC</option>
+						<option value="mM">mM</option>
+						<option value="CM">CM</option>
+						<option value="mCM">mCM</option>
+					</select>
+				</td>
+				<td>
+					<input type="number" name="attr_BMDD_2" style="width:100%" class="center" value="0" />
+				</td>
+				<td>
+					<input type="checkbox" name="attr_selectComp_W5" value="1" style="display:none;" class="C1" checked="true" />
+					<input type="checkbox" name="attr_selectComp_W5" value="2" style="display:none;" class="C2" />
+					<input type="checkbox" name="attr_selectComp_W5" value="3" style="display:none;" class="C3" />
+					<span class="C1">
+						<button name="attr_jetArmeDistance_2_C1" type="roll" value="&{template:combat} {{nom=@{armeDistance_2}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueReflexes}+@{valueCombat_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}} {{degats=@{armeDistance_2_Degats}}} {{BMT=[[@{BMTD_2}]]}} {{BMD=[[@{BMDD_2}]]}} {{BD=[[floor((@{valueCombat_1})/4)]]}}" />
+					</span>
+					<span class="C2">
+						<button name="attr_jetArmeDistance_2_C2" type="roll" value="&{template:combat} {{nom=@{armeDistance_2}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueReflexes}+@{valueCombat_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}} {{degats=@{armeDistance_2_Degats}}} {{BMT=[[@{BMTD_2}]]}} {{BMD=[[@{BMDD_2}]]}} {{BD=[[floor((@{valueCombat_2})/4)]]}}" />
+					</span>
+				</td>
+			</tr>
+			<tr>
+				<td class="padding-left"><input type="text" name="attr_armeDistance_3" /></td>
+				<td>
+					<div class="child">
+						<span name="attr_combat_1" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W6" value="1" checked="true" />
+						<label class="l1"><span name="attr_combat_1"></span></label>
+						<span name="attr_combat_2" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W6" value="2" />
+						<label class="l2"><span name="attr_combat_2" class="c2"></span></label>
+						<span name="attr_combat_3" style="display:none;" class="disableInput"></span>
+						<input type="radio" name="attr_selectComp_W6" value="3" />
+						<label class="l3"><span name="attr_combat_3"></span></label>
+						<div class="1" style="width:100%"><span name="attr_combat_1"></span><span style="float:right">▼</span></div>
+						<div class="2" style="width:100%"><span name="attr_combat_2"></span><span style="float:right">▼</span></div>
+						<div class="3" style="width:100%"><span name="attr_combat_3"></span><span style="float:right">▼</span></div>
+					</div>
+				</td>
+				<td>
+					<input type="number" name="attr_BMTD_3" style="width:100%" class="center" value="0" />
+				</td>
+				<td>
+					<select name="attr_armeDistance_3_Degats">
+						<option value="1">1</option>
+						<option value="m">m</option>
+						<option value="C">C</option>
+						<option value="M">M</option>
+						<option value="mC">mC</option>
+						<option value="mM">mM</option>
+						<option value="CM">CM</option>
+						<option value="mCM">mCM</option>
+					</select>
+				</td>
+				<td>
+					<input type="number" name="attr_BMDD_3" style="width:100%" class="center" value="0" />
+				</td>
+				<td>
+					<input type="checkbox" name="attr_selectComp_W6" value="1" style="display:none;" class="C1" checked="true" />
+					<input type="checkbox" name="attr_selectComp_W6" value="2" style="display:none;" class="C2" />
+					<input type="checkbox" name="attr_selectComp_W6" value="3" style="display:none;" class="C3" />
+					<span class="C1">
+						<button name="attr_jetArmeDistance_3_C1" type="roll" value="&{template:combat} {{nom=@{armeDistance_3}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueReflexes}+@{valueCombat_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}} {{degats=@{armeDistance_3_Degats}}} {{BMT=[[@{BMTD_3}]]}} {{BMD=[[@{BMDD_3}]]}} {{BD=[[floor((@{valueCombat_1})/4)]]}}" />
+					</span>
+					<span class="C2">
+						<button name="attr_jetArmeDistance_3_C2" type="roll" value="&{template:combat} {{nom=@{armeDistance_3}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueReflexes}+@{valueCombat_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}} {{degats=@{armeDistance_3_Degats}}} {{BMT=[[@{BMTD_3}]]}} {{BMD=[[@{BMDD_3}]]}} {{BD=[[floor((@{valueCombat_2})/4)]]}}" />
+					</span>
+				</td>
+			</tr>
+			<tr class="upDown">
+			</tr>
+		</table>
+		<div class="sheet-2colrow margeTop">
+			<div class="sheet-col">
+				<table>
+					<tr>
+						<th colspan="2" class="center"><h3>Initiative</h3></th>
+					</tr>
+					<tr>
+						<td class="padding-left">
+							<input type="number" style="width:100%" name="attr_initiative" value="@{valueReflexes}+floor((@{valueIntellect}/2))" class="center" disabled />
+						</td>
+						<td style="width:5%">
+							<button name="attr_jetInitiative" type="roll" value="&{template:base} {{nom=Initiative}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{initiative}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+						</td>
+					</tr>
+					<tr class="upDown">
+					</tr>
+				</table>
+				<table class="margeTop">
+					<tr>
+						<th colspan="3" class="center"><h3>Défense</h3></th>
+					</tr>
+					<tr>
+						<td class="center padding-left" style="width:40%"><b>Compétence</b></td>
+						<td class="center" style="width:30%"><b>Standard</b></td>
+						<td class="center padding-right" style="width:30%"><b>Au dépourvu</b></td>
+					</tr>
+					<tr>
+						<td class="padding-left">
+							<div class="child">
+								<span name="attr_combat_1" style="display:none;" class="disableInputSpe1"></span>
+								<input type="radio" name="attr_selectComp_D" class="disabled1" value="1" checked="true" />
+								<label class="l1"><span name="attr_combat_1"></span></label>
+								
+								<span name="attr_combat_2" style="display:none;" class="disableInputSpe2"></span>
+								<input type="radio" name="attr_selectComp_D" class="disabled2" value="2" />
+								<label class="l2"><span name="attr_combat_2"></span></label>
+								
+								<span name="attr_conditionPhysique_1" style="display:none;" class="disableInputSpe3"></span>
+								<input type="radio" name="attr_selectComp_D" class="disabled3" value="3" />
+								<label class="l3"><span name="attr_conditionPhysique_1"></span></label>
+								
+								<span name="attr_conditionPhysique_2" style="display:none;" class="disableInputSpe4"></span>
+								<input type="radio" name="attr_selectComp_D" class="disabled4" value="4" />
+								<label class="l4"><span name="attr_conditionPhysique_2"></span></label>
+								
+								<div class="1" style="width:100%"><span name="attr_combat_1"></span><span style="float:right">▼</span></div>
+								<div class="2" style="width:100%"><span name="attr_combat_2"></span><span style="float:right">▼</span></div>
+								<div class="3" style="width:100%"><span name="attr_conditionPhysique_1"></span><span style="float:right">▼</span></div>
+								<div class="4" style="width:100%"><span name="attr_conditionPhysique_2"></span><span style="float:right">▼</span></div>
+							</div>
+						</td>
+						<td>
+							<input type="checkbox" name="attr_selectComp_D" value="1" checked="true" class="C1" />
+							<input type="checkbox" name="attr_selectComp_D" value="2" class="C2" />
+							<input type="checkbox" name="attr_selectComp_D" value="3" class="C3" />
+							<input type="checkbox" name="attr_selectComp_D" value="4" class="C4" />
+							<span class="C1">
+								<input type="number" style="width:100%" name="attr_defense_S_C1" value="@{valueReflexes}+@{valueCombat_1}+5-@{etatSante}" class="center" disabled />
+							</span>
+							<span class="C2">
+								<input type="number" style="width:100%" name="attr_defense_S_C2" value="@{valueReflexes}+@{valueCombat_2}+5-@{etatSante}" class="center" disabled />
+							</span>
+							<span class="C3">
+								<input type="number" style="width:100%" name="attr_defense_S_C3" value="@{valueReflexes}+@{valueConditionPhysique_1}+5-@{etatSante}" class="center" disabled />
+							</span>
+							<span class="C4">
+								<input type="number" style="width:100%" name="attr_defense_S_C4" value="@{valueReflexes}+@{valueConditionPhysique_2}+5-@{etatSante}" class="center" disabled />
+							</span>
+						</td>
+						<td class="padding-right">
+							<input type="checkbox" name="attr_selectComp_D" value="1" checked="true" class="C1" />
+							<input type="checkbox" name="attr_selectComp_D" value="2" class="C2" />
+							<input type="checkbox" name="attr_selectComp_D" value="3" class="C3" />
+							<input type="checkbox" name="attr_selectComp_D" value="4" class="C4" />
+							<span class="C1">
+								<input type="number" style="width:100%" name="attr_defense_D_C1" value="@{valueReflexes}+@{valueCombat_1}+3-@{etatSante}" class="center" disabled />
+							</span>
+							<span class="C2">
+								<input type="number" style="width:100%" name="attr_defense_D_C2" value="@{valueReflexes}+@{valueCombat_2}+3-@{etatSante}" class="center" disabled />
+							</span>
+							<span class="C3">
+								<input type="number" style="width:100%" name="attr_defense_D_C3" value="@{valueReflexes}+@{valueConditionPhysique_1}+3-@{etatSante}" class="center" disabled />
+							</span>
+							<span class="C4">
+								<input type="number" style="width:100%" name="attr_defense_D_C4" value="@{valueReflexes}+@{valueConditionPhysique_2}+3-@{etatSante}" class="center" disabled />
+							</span>
+						</td>
+					</tr>
+					<tr class="upDown">
+					</tr>
+				</table>
+				<table class="margeTop">
+					<tr>
+						<th colspan="2" class="center"><h3>Endurance</h3></th>
+					</tr>
+					<tr>
+						<td class="padding-left">
+							<input type="number" style="width:100%" name="attr_endurance" value="@{valueForce}+floor((@{valueVolonte}/2))" class="center" disabled />
+						</td>
+						<td style="width:5%">
+							<button name="attr_jetEndurance" type="roll" value="&{template:base} {{nom=Endurance}} {{carac=[[@{endurance}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+						</td>
+					</tr>
+					<tr class="upDown">
+					</tr>
+				</table>
+			</div>
+			<div class="sheet-col">
+				<input type="number" name="attr_valueRDTotal_Max_1" value="(((@{porteResistance_1} + @{porteResistance_2}) + abs(@{porteResistance_1} - @{porteResistance_2})) / 2)" style="display:none" disabled />
+				<input type="number" name="attr_valueRDTotal_Max_2" value="(((@{valueRDTotal_Max_1} + @{porteResistance_3}) + abs(@{valueRDTotal_Max_1} - @{porteResistance_3})) / 2)" style="display:none" disabled />
+				<table>
+					<tr>
+						<th colspan="3"><h3 style="display:inline;margin-left:40px;">Résistance aux dégâts</h3><input type="number" name="attr_RDTotal" value="@{valueRDTotal_Max_2}" class="RDTotal center" style="width:40px;" disabled /></th>
+					</tr>
+					<tr>
+						<th style="width:55%;" class="center padding-left">Armure</th>
+						<th style="width:15%;" class="center">Bonus</th>
+						<th style="width:30%;min-width:120px;" class="center"></th>
+					</tr>
+					<tr>
+						<td class="padding-left">
+							<input type="text" name="attr_resistance_1" />
+						</td>
+						<td>
+							<input type="number" name="attr_valueResistance_1" value="0" style="width:100%" class="center" />
+						</td>
+						<td class="center padding-right">
+							<input type="checkbox" name="attr_porteResistance_1" value="@{valueResistance_1}" class="armureEquipe" /><span class="armureEquipe" title="Équipé"></span>
+						</td>
+					</tr>
+					<tr>
+						<td class="padding-left">
+							<input type="text" name="attr_resistance_2" />
+						</td>
+						<td>
+							<input type="number" name="attr_valueResistance_2" value="0" style="width:100%" class="center" />
+						</td>
+						<td class="center padding-right">
+							<input type="checkbox" name="attr_porteResistance_2" value="@{valueResistance_2}" class="armureEquipe" /><span class="armureEquipe" title="Équipé"></span>
+						</td>
+					</tr>
+					<tr>
+						<td class="padding-left">
+							<input type="text" name="attr_resistance_3" />
+						</td>
+						<td>
+							<input type="number" name="attr_valueResistance_3" value="0" style="width:100%" class="center" />
+						</td>
+						<td class="center padding-right">
+							<input type="checkbox" name="attr_porteResistance_3" value="@{valueResistance_3}" class="armureEquipe" /><span class="armureEquipe" title="Équipé"></span>
+						</td>
+					</tr>
+					<tr class="upDown">
+					</tr>
+				</table>
+				<table class="margeTop">
+					<tr>
+						<th colspan="2"><h3>Résistance</h3></th>
+					</tr>
+					<tr>
+						<th class="padding-left">Actuel</th>
+						<th class="padding-right">Maximum</th>
+					</tr>
+					<tr>
+						<td class="padding-left">
+							<input type="number" name="attr_pv" class="center" style="width:100%" value="0" />
+						</td>
+						<td class="padding-right">
+							<input type="number" name="attr_pv_max" class="center" style="width:100%" value="(@{endurance})*3" disabled />
+						</td>
+					</tr>
+					<tr>
+						<th colspan="2">Etat de Santé</th>
+					</tr>
+					<tr>
+						<td>
+							<input type="radio" name="attr_etatSante" class="etatSante" value="0" checked /><span title="Sain" class="etatSante"></span>
+						</td>
+						<td>
+							<input type="radio" name="attr_etatSante" class="etatSante" value="2" checked /><span title="Blessé" class="etatSante"></span>
+						</td>
+					</tr>
+					<tr class="upDown">
+					</tr>
+					<tr>
+						<td>
+							<input type="radio" name="attr_etatSante" class="etatSante" value="5" checked /><span title="Handicapé" class="etatSante"></span>
+						</td>
+						<td>
+							<input type="radio" name="attr_etatSante" class="etatSante" value="(1-1)" checked /><span title="Mourant" class="etatSante"></span>
+						</td>
+					</tr>
+					<tr class="upDown">
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab3 tab-content" style="margin-top:10px">
+		<div class="sheet-2colrow">
+			<div class="sheet-col">
+				<table>
+					<tr>
+						<th class="center"><h3>Gold</h3></th>
+					</tr>
+					<tr>
+						<td class="padding-left padding-right">
+							<input type="number" name="attr_gold" value="0" class="center" style="width:100%" />
+						</td>
+					</tr>
+					<tr	class="upDown">
+					</tr>
+				</table>
+			</div>
+		</div>
+		<table class="margeTop">
+			<tr>
+				<th colspan="2"><h3>Inventaire</h3></th>
+			</tr>
+			<tr>
+				<td style="width:50%;vertical-align:top;" class="padding-left">
+					<fieldset class="repeating_inv1">
+						<table style="box-shadow:none;">
+							<tr>
+								<td style="width:85%"><input type="text" name="attr_nomObjet1" /></td>
+								<td style="width:15%"><input type="text" name="attr_valObjet1" /></td>
+							</tr>
+						</table>
+					</fieldset>
+				</td>
+				<td style="width:50%;vertical-align:top;" class="padding-right">
+					<fieldset class="repeating_inv2">
+						<table style="box-shadow:none;">
+							<tr>
+								<td style="width:85%"><input type="text" name="attr_nomObjet2" /></td>
+								<td style="width:15%"><input type="text" name="attr_valObjet2" /></td>
+							</tr>
+						</table>
+					</fieldset>
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="tab4 tab-content" style="margin-top:10px">
+		<div class="sheet-2colrow">
+			<div class="sheet-col">
+				<h1>Magie Hermétique</h1>
+				<table class="margeTop">
+					<tr>
+						<th colspan="2"><h3>Préparations</h3></th>
+					</tr>
+					<tr>
+						<th class="center padding-left">Sorts préparés</th>
+						<th class="center padding-right">Sorts préparés maximum</th>
+					</tr>
+					<tr>
+						<td class="padding-left">
+							<input type="number" name="attr_sortsHermetiquePréparés" class="center" value="@{sortsHermetiquesPrepareTotal}" style="width:100%" disabled />
+						</td>
+						<td class="padding-right">
+							<input type="number" name="attr_sortsHermetiquePréparés_max" class="center" value="floor((@{valueVolonte}+@{valueIntellect})/2)" style="width:100%" disabled />
+						</td>
+					</tr>
+					<tr class="upDown">
+					</tr>
+				</table>
+				<input type="number" name="attr_sortsHermetiquesPrepareTotal" value="0" class="center" style="width:100%;display:none;" readonly />
+				<table class="margeTop">
+					<tr>
+						<th><h3>Sorts</h3></th>
+					</tr>
+					<tr>
+						<td>
+							<span name="attr_combat_2" class="disableInputSorts_2C"></span>
+							<div class="test_1C">
+								<fieldset class="repeating_listeSortsHermetiques">
+									<table style="background-color:#9393F6;box-shadow:none;margin-bottom:20px;">
+										<tr>
+											<th colspan="5" class="padding-left padding-right"><input type="text" name="attr_sortHermetiqueNom" class="center" style="border-top-left-radius:10px;border-top-right-radius:10px;"/></th>
+										</tr>
+										<tr>
+											<th colspan="5" class="center padding-left padding-right">Effets</th>
+										</tr>
+										<tr>
+											<td colspan="5" class="padding-left padding-right">
+												<textarea class="justify" name="attr_sortHermetiqueEffet" style="height:50px;width:100%;padding:0px;margin:0px;"></textarea>
+											</td>
+										</tr>
+										<tr style="height:30px;">
+											<td colspan="2" class="padding-left" style="width:50%">
+												<input type="radio" name="attr_sortHermetiqueWJet" class="sorts" style="margin-left:-10px;" value="1" ><span title="Avec jet" class="sorts"></span>
+											</td>
+											<td colspan="3" style="width:50%">
+												<input type="radio" name="attr_sortHermetiqueWJet" class="sorts" style="margin-left:-10px;" value="0" checked ><span title="Sans jet" class="sorts"></span>
+											</td>
+											<td></td>
+										</tr>
+										<tr>
+											<td colspan="2" class="padding-left" style="width:50%">
+												<input type="checkbox" name="attr_sortHermetiquePrepare" class="sortsPrepare" style="margin-left:-10px;" value="1" /><span title="Préparé" class="sortsPrepare"></span>
+											</td>
+											<td colspan="2" style="width:45%">
+												<input type="checkbox" name="attr_sortHermetiqueWJet" class="sortsHiddenComp" value="0" style="display:none;" checked />
+												<div class="childSorts">
+													<input type="checkbox" name="attr_selectComp_SH" value="2" />
+													<input type="radio" name="attr_selectComp_SH" value="1" checked />
+													<label class="l1"><input type="text" name="attr_combatSorts_1" value="Aucune" style="display:inline-block;margin-bottom:2px;" class="childInputText" disabled /></label>
+													<div class="1Sorts" style="width:100%"><input type="text" name="attr_combatSorts_1" value="Aucune" style="display:inline-block;" class="childInputTextChoice" disabled /><span style="float:right">▼</span></div>
+													
+													<input type="radio" name="attr_selectComp_SH" value="2" />
+													<label class="l2"><input type="text" name="attr_combatSorts_2" value="@{combat_1}" style="display:inline-block;margin-bottom:2px;" class="childInputText" disabled /></label>
+													<div class="2Sorts" style="width:100%"><input type="text" name="attr_combatSorts_2" value="@{combat_1}" style="display:inline-block;" class="childInputTextChoice" disabled /><span style="float:right">▼</span></div>
+												
+													<div class="0Sorts" style="width:100%"><input type="text" name="attr_combatSorts_0" value="Aucune" style="display:inline-block;" class="childInputTextChoice" disabled /><span style="float:right">▼</span></div>
+												</div>
+											</td>
+											<td class="padding-right" style="width:5%">
+												<input type="checkbox" name="attr_sortHermetiqueWJet" class="sortsHiddenComp" value="0" style="display:none;" checked />
+												<div class="sortsHiddenJet">
+													<input type="checkbox" name="attr_selectComp_SH" value="1" class="RC1" checked />
+													<input type="checkbox" name="attr_selectComp_SH" value="2" class="RC2" />
+													<span class="RC0">
+														<button name="attr_sortHermetique_C1" type="roll" value="&{template:sort} {{nom=@{sortHermetiqueNom}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{effets=@{sortHermetiqueEffet}}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />											
+													</span>
+													<span class="RC1">
+														<button name="attr_sortHermetique_C1" type="roll" value="&{template:sort} {{nom=@{sortHermetiqueNom}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{effets=@{sortHermetiqueEffet}}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />											
+													</span>
+													<span class="RC2">
+														<button name="attr_sortHermetique_C2" type="roll" value="&{template:sort} {{nom=@{sortHermetiqueNom}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{effets=@{sortHermetiqueEffet}}} {{carac=[[@{valueReflexes}+@{valueCombat_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />											
+													</span>
+												</div>
+											</td>
+										</tr>
+									</table>
+								</fieldset>
+							</div>
+							<div class="test_2C">
+								<fieldset class="repeating_listeSortsHermetiques">
+									<table style="background-color:#9393F6;box-shadow:none;margin-bottom:20px;">
+										<tr>
+											<th colspan="5" class="padding-left padding-right"><input type="text" name="attr_sortHermetiqueNom" class="center" style="border-top-left-radius:10px;border-top-right-radius:10px;"></th>
+										</tr>
+										<tr>
+											<th colspan="5" class="center padding-left padding-right">Effets</th>
+										</tr>
+										<tr>
+											<td colspan="5" class="padding-left padding-right">
+												<textarea class="justify" name="attr_sortHermetiqueEffet" style="height:50px;width:100%;padding:0px;margin:0px;"></textarea>
+											</td>
+										</tr>
+										<tr style="height:30px;">
+											<td colspan="2" class="padding-left" style="width:50%">
+												<input type="radio" name="attr_sortHermetiqueWJet" class="sorts" style="margin-left:-10px;" value="1" /><span title="Avec jet" class="sorts"></span>
+											</td>
+											<td colspan="3" style="width:50%">
+												<input type="radio" name="attr_sortHermetiqueWJet" class="sorts" style="margin-left:-10px;" value="0" checked /><span title="Sans jet" class="sorts"></span>
+											</td>
+											<td></td>
+										</tr>
+										<tr>
+											<td colspan="2" class="padding-left" style="width:50%">
+												<input type="checkbox" name="attr_sortHermetiquePrepare" class="sortsPrepare" style="margin-left:-10px;" value="1" /><span title="Préparé" class="sortsPrepare"></span>
+											</td>
+											<td colspan="2" style="width:45%">
+												<input type="checkbox" name="attr_sortHermetiqueWJet" class="sortsHiddenComp" value="0" style="display:none;" checked />
+												<div class="childSorts">
+													<input type="checkbox" name="attr_selectComp_SH" style="display:none;" value="2" />
+													<input type="checkbox" name="attr_selectComp_SH" style="display:none;" value="3" />
+													<input type="radio" name="attr_selectComp_SH" value="1" checked />
+													<label class="l1"><input type="text" name="attr_combatSorts_1" value="Aucune" style="display:inline-block;margin-bottom:2px;" class="childInputText" disabled /></label>
+													<div class="1Sorts" style="width:100%"><input type="text" name="attr_combatSorts_1" value="Aucune" style="display:inline-block;" class="childInputTextChoice" disabled /><span style="float:right">▼</span></div>
+													
+													<input type="radio" name="attr_selectComp_SH" value="2" />
+													<label class="l2"><input type="text" name="attr_combatSorts_2" value="@{combat_1}" style="display:inline-block;margin-bottom:2px;" class="childInputText" disabled /></label>
+													<div class="2Sorts" style="width:100%"><input type="text" name="attr_combatSorts_2" value="@{combat_1}" style="display:inline-block;" class="childInputTextChoice" disabled /><span style="float:right">▼</span></div>
+												
+													<input type="radio" name="attr_selectComp_SH" value="3" />
+													<label class="l3"><input type="text" name="attr_combatSorts_3" value="@{combat_2}" style="display:inline-block;margin-bottom:2px;" class="childInputText" disabled /></label>
+													<div class="3Sorts" style="width:100%"><input type="text" name="attr_combatSorts_3" value="@{combat_2}" style="display:inline-block;" class="childInputTextChoice" disabled /><span style="float:right">▼</span></div>
+												
+													<div class="0Sorts" style="width:100%"><input type="text" name="attr_combatSorts_0" value="Aucune" style="display:inline-block;" class="childInputTextChoice" disabled /><span style="float:right">▼</span></div>
+												</div>
+											</td>
+											<td class="padding-right" style="width:5%">
+												<input type="checkbox" name="attr_sortHermetiqueWJet" class="sortsHiddenComp" value="0" style="display:none;" checked />
+												<div class="sortsHiddenJet">
+													<input type="checkbox" name="attr_selectComp_SH" value="1" class="RC1" checked />
+													<input type="checkbox" name="attr_selectComp_SH" value="2" class="RC2" />
+													<input type="checkbox" name="attr_selectComp_SH" value="3" class="RC3" />
+													<span class="RC0">
+														<button name="attr_sortHermetique_C0" type="roll" value="&{template:sort} {{nom=@{sortHermetiqueNom}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{effets=@{sortHermetiqueEffet}}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />											
+													</span>
+													<span class="RC1">
+														<button name="attr_sortHermetique_C1" type="roll" value="&{template:sort} {{nom=@{sortHermetiqueNom}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{effets=@{sortHermetiqueEffet}}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />											
+													</span>
+													<span class="RC2">
+														<button name="attr_sortHermetique_C2" type="roll" value="&{template:sort} {{nom=@{sortHermetiqueNom}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{effets=@{sortHermetiqueEffet}}} {{carac=[[@{valueReflexes}+@{valueCombat_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />											
+													</span>
+													<span class="RC3">
+														<button name="attr_sortHermetique_C3" type="roll" value="&{template:sort} {{nom=@{sortHermetiqueNom}}} {{malus=[[ [[@{etatSante} ]] ]]}} {{effets=@{sortHermetiqueEffet}}} {{carac=[[@{valueReflexes}+@{valueCombat_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />											
+													</span>
+												</div>
+											</td>
+										</tr>
+									</table>
+								</fieldset>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="sheet-col">
+				<h1>Magie Sauvage</h1>
+				<table class="margeTop">
+					<tr>
+						<th colspan="3"><h3>Points de Magie</h3></th>
+					</tr>
+					<tr>
+						<th class="padding-left">Actuel</th>
+						<th>Maximum</th>
+						<th class="padding-right">Bonus</th>
+					</tr>
+					<tr>
+						<td class="padding-left"><input type="number" class="center" name="attr_pointsMagie" value="0" style="width:100%" /></td>
+						<td><input type="number" class="center" name="attr_pointsMagie_max" value="(@{valueVolonte}*2)+@{pointsMagie_bonus}" style="width:100%" disabled /></td>
+						<td class="padding-right"><input type="number" class="center" name="attr_pointsMagie_bonus" value="0" style="width:100%" /></td>
+					</tr>
+					<tr class="upDown">
+					</tr>
+				</table>
+				<table class="margeTop">
+					<tr>
+						<th colspan="3"><h3>Lancer un sort</h3></th>
+					</tr>
+					<tr>
+						<th class="padding-left" style="width:50%">Compétence</th>
+						<th style="width:40%">Caractéristique</th>
+						<th style="width:10%"></th>
+					</tr>
+					<tr>
+						<td class="padding-left">
+							<div class="child">
+								<span name="attr_arcane_1" style="display:none;" class="disableInput"></span>
+								<input type="radio" name="attr_selectComp_MS" value="1" checked />
+								<label class="l1"><span name="attr_arcane_1"></span></label>
+								<span name="attr_arcane_2" style="display:none;" class="disableInput"></span>
+								<input type="radio" name="attr_selectComp_MS" value="2" />
+								<label class="l2"><span name="attr_arcane_2"></span></label>
+								<div class="1" style="width:100%"><span name="attr_arcane_1"></span><span style="float:right">▼</span></div>
+								<div class="2" style="width:100%"><span name="attr_arcane_2"></span><span style="float:right">▼</span></div>
+							</div>
+						</td>
+						<td>
+							<input type="checkbox" name="attr_selectComp_MS" value="1" class="C1" checked />
+							<input type="checkbox" name="attr_selectComp_MS" value="2" class="C2" />
+							<span class="C1">
+								<select name="attr_valueCaracArcane_1">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</span>
+							<span class="C2">
+								<select name="attr_valueCaracArcane_2">
+									<option value="@{valueForce}">Force</option>
+									<option value="@{valueReflexes}">Réflexes</option>
+									<option value="@{valueVolonte}">Volonté</option>
+									<option value="@{valueIntellect}">Intellect</option>
+								</select>
+							</span>
+						</td>
+						<td class="padding-right">
+							<input type="checkbox" name="attr_selectComp_MS" value="1" class="C1" checked />
+							<input type="checkbox" name="attr_selectComp_MS" value="2" class="C2" />
+							<span class="C1">
+								<button type="roll" name="attr_magieSauvage_C1" value="&{template:sort} {{nom=Magie Sauvage}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracArcane_1}+@{valueArcane_1}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</span>
+							<span class="C2">
+								<button type="roll" name="attr_magieSauvage_C2" value="&{template:sort} {{nom=Magie Sauvage}} {{malus=[[ [[@{etatSante} ]] ]]}} {{carac=[[@{valueCaracArcane_2}+@{valueArcane_2}]]}} {{jet1=[[1D10]]}} {{jet2=[[1D10]]}} {{jet3=[[1D10]]}}" />
+							</span>
+						</td>
+					</tr>
+					<tr class="upDown">
+					</tr>
+				</table>
+				<table class="margeTop">
+					<tr>
+						<th colspan="2"><h3>Résistance</h3></th>
+					</tr>
+					<tr>
+						<th class="padding-left">Actuel</th>
+						<th class="padding-right">Maximum</th>
+					</tr>
+					<tr>
+						<td class="padding-left">
+							<input type="number" name="attr_pv" class="center" style="width:100%" value="0" />
+						</td>
+						<td class="padding-right">
+							<input type="number" name="attr_pv_max" class="center" style="width:100%" value="(@{endurance})*3" disabled />
+						</td>
+					</tr>
+					<tr class="upDown">
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div class="tab5 tab-content" style="margin-top:10px">
+		<div class="sheet-2colrow">
+			<div class="sheet-col">
+				<table>
+					<tr>
+						<th><h3>Faits Marquants</h3></th>
+					</tr>
+					<tr>
+						<td class="padding-left padding-right roundCornerAddModify">
+							<fieldset class="repeating_listeFaitsMarquants">
+								<table style="box-shadow:none;">
+									<tr>
+										<td><input type="text" name="attr_faitsMarquants" /></td>
+									</tr>
+								</table>
+							</fieldset>
+						</td>
+					</tr>
+				</table>
+				<table class="margeTop">
+					<tr>
+						<th><h3>Séquelles</h3></th>
+					</tr>
+					<tr>
+						<td class="padding-left padding-right roundCornerAddModify">
+							<fieldset class="repeating_listeSequelles">
+								<table style="box-shadow:none;">
+									<tr>
+										<td><input type="text" name="attr_sequelles" /></td>
+									</tr>
+								</table>
+							</fieldset>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div class="sheet-col">
+				<table>
+					<tr>
+						<th><h3>Complications</h3></th>
+					</tr>
+					<tr>
+						<td class="padding-left padding-right roundCornerAddModify">
+							<fieldset class="repeating_listeComplications">
+								<table style="box-shadow:none;">
+									<tr>
+										<td><input type="text" name="attr_complications" /></td>
+									</tr>
+								</table>
+							</fieldset>
+						</td>
+					</tr>
+				</table>
+				<table class="margeTop">
+					<tr>
+						<th><h3>Notes</h3></th>
+					</tr>
+					<tr>
+						<td class="padding-left padding-right roundCornerAddModify">
+							<fieldset class="repeating_listeNotes">
+								<table style="box-shadow:none;">
+									<tr>
+										<td><textarea name="attr_notes"  style="width:100%;height:60px;margin:0px;padding:0px;"></textarea></td>
+									</tr>
+								</table>
+							</fieldset>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<rolltemplate class="sheet-rolltemplate-base">
+	<table>
+		<tr class="upDown">
+			<th colspan="3" class="center">{{nom}}</th>
+		</tr>
+		<tr class="impair upDown">
+			<td class="padding-left title">Score</td>
+			<td></td>
+			<td class="center">{{carac}}</td>
+		</tr>
+		{{#rollGreater() malus 0}}
+		<tr>
+			<td class="padding-left"><h6>-Malus</h6></td>
+			<td></td>
+			<td class="center"><h6>{{malus}}</h6></td>
+		</tr>
+		{{/rollGreater() malus 0}}
+		<tr class="upDown" style="border-top:1px solid #999;">
+			<th colspan="3" class="center">Jet</th>
+		</tr>
+		<tr class="impair upDown">
+			<td class="padding-left title">Majeur (M)</td>
+			<td style="width:20%"></td>
+			<td class="center" style="width:30%">
+			{{#rollBetween() jet1 jet2 10}}
+				{{#rollBetween() jet1 jet3 10}}
+					{{jet1}}
+				{{/rollBetween() jet1 jet3 10}}
+			{{/rollBetween() jet1 jet2 10}}
+			
+			{{#^rollTotal() jet1 jet2}}
+				{{#rollBetween() jet2 jet1 10}}
+					{{#rollBetween() jet2 jet3 10}}
+						{{jet2}}
+					{{/rollBetween() jet2 jet3 10}}
+				{{/rollBetween() jet2 jet1 10}}
+			{{/^rollTotal() jet1 jet2}}
+			
+			{{#^rollTotal() jet1 jet3}}
+				{{#rollBetween() jet3 jet1 10}}
+					{{#rollBetween() jet3 jet2 10}}
+						{{#^rollTotal() jet3 jet2}}
+							{{jet3}}
+						{{/^rollTotal() jet3 jet2}}
+					{{/rollBetween() jet3 jet2 10}}
+				{{/rollBetween() jet3 jet1 10}}
+			{{/^rollTotal() jet1 jet3}}
+			</td>
+		</tr>
+		<tr class="upDown">
+			<td class="padding-left title">Central (C)</td>
+			<td></td>
+			<td class="center">
+			{{#rollBetween() jet2 jet1 jet3}}
+				{{jet2}}
+			{{/rollBetween() jet2 jet1 jet3}}
+			{{#^rollBetween() jet2 jet1 jet3}}
+				{{#rollBetween() jet2 jet3 jet1}}
+						{{jet2}}
+				{{/rollBetween() jet2 jet3 jet1}}
+			{{/^rollBetween() jet2 jet1 jet3}}
+			
+			{{#rollBetween() jet1 jet2 jet3}}
+				{{#^rollTotal() jet1 jet3}}
+					{{#^rollTotal() jet1 jet2}}
+						{{jet1}}
+					{{/^rollTotal() jet1 jet2}}
+				{{/^rollTotal() jet1 jet3}}
+			{{/rollBetween() jet1 jet2 jet3}}
+			{{#rollBetween() jet1 jet3 jet2}}
+				{{#^rollTotal() jet1 jet2}}
+						{{jet1}}
+				{{/^rollTotal() jet1 jet2}}
+			{{/rollBetween() jet1 jet3 jet2}}
+
+			{{#rollBetween() jet3 jet1 jet2}}
+				{{#^rollTotal() jet3 jet2}}
+					{{#^rollTotal() jet3 jet1}}
+						{{jet3}}
+					{{/^rollTotal() jet3 jet1}}
+				{{/^rollTotal() jet3 jet2}}
+			{{/rollBetween() jet3 jet1 jet2}}
+			{{#rollBetween() jet3 jet2 jet1}}
+				{{#^rollTotal() jet3 jet2}}
+					{{jet3}}
+				{{/^rollTotal() jet3 jet2}}
+			{{/rollBetween() jet3 jet2 jet1}}
+			</td>
+		</tr>
+		<tr class="impair upDown">
+			<td class="padding-left title">Mineur (m)</td>
+			<td></td>
+			<td class="center">
+			{{#rollBetween() jet3 0 jet2}}
+				{{#rollBetween() jet3 0 jet1}}
+					{{jet3}}
+				{{/rollBetween() jet3 0 jet1}}
+			{{/rollBetween() jet3 0 jet2}}
+			
+			{{#^rollTotal() jet3 jet2}}
+				{{#rollBetween() jet2 0 jet1}}
+					{{#rollBetween() jet2 0 jet3}}
+						{{jet2}}
+					{{/rollBetween() jet2 0 jet3}}
+				{{/rollBetween() jet2 0 jet1}}
+			{{/^rollTotal() jet3 jet2}}
+			
+			{{#^rollTotal() jet3 jet1}}
+				{{#rollBetween() jet1 0 jet3}}
+					{{#rollBetween() jet1 0 jet2}}
+						{{#^rollTotal() jet1 jet2}}
+							{{jet1}}
+						{{/^rollTotal() jet1 jet2}}
+					{{/rollBetween() jet1 0 jet2}}
+				{{/rollBetween() jet1 0 jet3}}
+			{{/^rollTotal() jet3 jet1}}
+			</td>
+		</tr>
+		<tr class="upDown">
+		</tr>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-combat">
+	<table>
+		<tr class="upDown">
+			<th colspan="3" class="center">{{nom}}</th>
+		</tr>
+		
+		<tr class="impair upDown">
+			<td class="padding-left title">Score</td>
+			<td></td>
+			<td class="center">{{carac}}</td>
+		</tr>
+		{{#rollGreater() malus 0}}
+		<tr>
+			<td class="padding-left"><h6>-Malus</h6></td>
+			<td></td>
+			<td class="center"><h6>{{malus}}</h6></td>
+		</tr>
+		{{/rollGreater() malus 0}}
+		{{#rollGreater() BMT 0}}
+		<tr>
+			<td class="padding-left"><h6>+Bonus Magique</h6></td>
+			<td></td>
+			<td class="center"><h6>{{BMT}}</h6></td>
+		</tr>
+		{{/rollGreater() BMT 0}}
+		<tr class="upDown" style="border-top:1px solid #999;">
+			<th colspan="3" class="center">Jet</th>
+		</tr>
+		<tr class="impair upDown">
+			<td class="padding-left title">Majeur (M)</td>
+			<td style="width:20%"></td>
+			<td class="center" style="width:30%">
+			{{#rollBetween() jet1 jet2 10}}
+				{{#rollBetween() jet1 jet3 10}}
+					{{jet1}}
+				{{/rollBetween() jet1 jet3 10}}
+			{{/rollBetween() jet1 jet2 10}}
+			
+			{{#^rollTotal() jet1 jet2}}
+				{{#rollBetween() jet2 jet1 10}}
+					{{#rollBetween() jet2 jet3 10}}
+						{{jet2}}
+					{{/rollBetween() jet2 jet3 10}}
+				{{/rollBetween() jet2 jet1 10}}
+			{{/^rollTotal() jet1 jet2}}
+			
+			{{#^rollTotal() jet1 jet3}}
+				{{#rollBetween() jet3 jet1 10}}
+					{{#rollBetween() jet3 jet2 10}}
+						{{#^rollTotal() jet3 jet2}}
+							{{jet3}}
+						{{/^rollTotal() jet3 jet2}}
+					{{/rollBetween() jet3 jet2 10}}
+				{{/rollBetween() jet3 jet1 10}}
+			{{/^rollTotal() jet1 jet3}}
+			</td>
+		</tr>
+		<tr class="upDown">
+			<td class="padding-left title">Central (C)</td>
+			<td></td>
+			<td class="center">
+			{{#rollBetween() jet2 jet1 jet3}}
+				{{jet2}}
+			{{/rollBetween() jet2 jet1 jet3}}
+			{{#^rollBetween() jet2 jet1 jet3}}
+				{{#rollBetween() jet2 jet3 jet1}}
+						{{jet2}}
+				{{/rollBetween() jet2 jet3 jet1}}
+			{{/^rollBetween() jet2 jet1 jet3}}
+			
+			{{#rollBetween() jet1 jet2 jet3}}
+				{{#^rollTotal() jet1 jet3}}
+					{{#^rollTotal() jet1 jet2}}
+						{{jet1}}
+					{{/^rollTotal() jet1 jet2}}
+				{{/^rollTotal() jet1 jet3}}
+			{{/rollBetween() jet1 jet2 jet3}}
+			{{#rollBetween() jet1 jet3 jet2}}
+				{{#^rollTotal() jet1 jet2}}
+						{{jet1}}
+				{{/^rollTotal() jet1 jet2}}
+			{{/rollBetween() jet1 jet3 jet2}}
+
+			{{#rollBetween() jet3 jet1 jet2}}
+				{{#^rollTotal() jet3 jet2}}
+					{{#^rollTotal() jet3 jet1}}
+						{{jet3}}
+					{{/^rollTotal() jet3 jet1}}
+				{{/^rollTotal() jet3 jet2}}
+			{{/rollBetween() jet3 jet1 jet2}}
+			{{#rollBetween() jet3 jet2 jet1}}
+				{{#^rollTotal() jet3 jet2}}
+					{{jet3}}
+				{{/^rollTotal() jet3 jet2}}
+			{{/rollBetween() jet3 jet2 jet1}}
+			</td>
+		</tr>
+		<tr class="impair upDown">
+			<td class="padding-left title">Mineur (m)</td>
+			<td></td>
+			<td class="center">
+			{{#rollBetween() jet3 0 jet2}}
+				{{#rollBetween() jet3 0 jet1}}
+					{{jet3}}
+				{{/rollBetween() jet3 0 jet1}}
+			{{/rollBetween() jet3 0 jet2}}
+			
+			{{#^rollTotal() jet3 jet2}}
+				{{#rollBetween() jet2 0 jet1}}
+					{{#rollBetween() jet2 0 jet3}}
+						{{jet2}}
+					{{/rollBetween() jet2 0 jet3}}
+				{{/rollBetween() jet2 0 jet1}}
+			{{/^rollTotal() jet3 jet2}}
+			
+			{{#^rollTotal() jet3 jet1}}
+				{{#rollBetween() jet1 0 jet3}}
+					{{#rollBetween() jet1 0 jet2}}
+						{{#^rollTotal() jet1 jet2}}
+							{{jet1}}
+						{{/^rollTotal() jet1 jet2}}
+					{{/rollBetween() jet1 0 jet2}}
+				{{/rollBetween() jet1 0 jet3}}
+			{{/^rollTotal() jet3 jet1}}
+			</td>
+		</tr>
+		<tr class="upDown" style="border-top:1px solid #999;">
+			<th colspan="3" class="center">Dégâts</th>
+		</tr>
+		<tr class="impair upDown">
+			<td class="padding-left title">Dégâts</td>
+			<td></td>
+			<td class="center"><b>{{degats}}</b></td>
+		</tr>
+		{{#rollGreater() BD 0}}
+		<tr class="upDown">
+			<td class="padding-left" colspan="2"><h6>+Bonus de dégâts</h6></td>
+			<td class="center"><h6>{{BD}}</h6></td>
+		</tr>
+		{{/rollGreater() BD 0}}
+		{{#rollGreater() BMD 0}}
+		<tr>
+			<td class="padding-left"><h6>+Bonus Magique</h6></td>
+			<td></td>
+			<td class="center"><h6>{{BMD}}</h6></td>
+		</tr>
+		{{/rollGreater() BMD 0}}
+		<tr class="upDown">
+			<td colspan="2"></td>
+		</tr>
+	</table>
+</rolltemplate>
+
+
+<rolltemplate class="sheet-rolltemplate-sort">
+	<table>
+		<tr class="upDown">
+			<th colspan="3" class="center">{{nom}}</th>
+		</tr>
+		{{#carac}}
+			<tr class="impair upDown">
+				<td class="padding-left title">Score</td>
+				<td></td>
+				<td class="center">{{carac}}</td>
+			</tr>
+			{{#rollGreater() malus 0}}
+				<tr>
+					<td class="padding-left"><h6>-Malus</h6></td>
+					<td></td>
+					<td class="center"><h6>{{malus}}</h6></td>
+				</tr>
+			{{/rollGreater() malus 0}}
+		{{/carac}}
+		<tr class="upDown" style="border-top:1px solid #999;">
+			<th colspan="3" class="center">Jet</th>
+		</tr>
+		<tr class="impair upDown">
+			<td class="padding-left title">Majeur (M)</td>
+			<td style="width:20%"></td>
+			<td class="center" style="width:30%">
+			{{#rollBetween() jet1 jet2 10}}
+				{{#rollBetween() jet1 jet3 10}}
+					{{jet1}}
+				{{/rollBetween() jet1 jet3 10}}
+			{{/rollBetween() jet1 jet2 10}}
+			
+			{{#^rollTotal() jet1 jet2}}
+				{{#rollBetween() jet2 jet1 10}}
+					{{#rollBetween() jet2 jet3 10}}
+						{{jet2}}
+					{{/rollBetween() jet2 jet3 10}}
+				{{/rollBetween() jet2 jet1 10}}
+			{{/^rollTotal() jet1 jet2}}
+			
+			{{#^rollTotal() jet1 jet3}}
+				{{#rollBetween() jet3 jet1 10}}
+					{{#rollBetween() jet3 jet2 10}}
+						{{#^rollTotal() jet3 jet2}}
+							{{jet3}}
+						{{/^rollTotal() jet3 jet2}}
+					{{/rollBetween() jet3 jet2 10}}
+				{{/rollBetween() jet3 jet1 10}}
+			{{/^rollTotal() jet1 jet3}}
+			</td>
+		</tr>
+		<tr class="upDown">
+			<td class="padding-left title">Central (C)</td>
+			<td></td>
+			<td class="center">
+			{{#rollBetween() jet2 jet1 jet3}}
+				{{jet2}}
+			{{/rollBetween() jet2 jet1 jet3}}
+			{{#^rollBetween() jet2 jet1 jet3}}
+				{{#rollBetween() jet2 jet3 jet1}}
+						{{jet2}}
+				{{/rollBetween() jet2 jet3 jet1}}
+			{{/^rollBetween() jet2 jet1 jet3}}
+			
+			{{#rollBetween() jet1 jet2 jet3}}
+				{{#^rollTotal() jet1 jet3}}
+					{{#^rollTotal() jet1 jet2}}
+						{{jet1}}
+					{{/^rollTotal() jet1 jet2}}
+				{{/^rollTotal() jet1 jet3}}
+			{{/rollBetween() jet1 jet2 jet3}}
+			{{#rollBetween() jet1 jet3 jet2}}
+				{{#^rollTotal() jet1 jet2}}
+						{{jet1}}
+				{{/^rollTotal() jet1 jet2}}
+			{{/rollBetween() jet1 jet3 jet2}}
+
+			{{#rollBetween() jet3 jet1 jet2}}
+				{{#^rollTotal() jet3 jet2}}
+					{{#^rollTotal() jet3 jet1}}
+						{{jet3}}
+					{{/^rollTotal() jet3 jet1}}
+				{{/^rollTotal() jet3 jet2}}
+			{{/rollBetween() jet3 jet1 jet2}}
+			{{#rollBetween() jet3 jet2 jet1}}
+				{{#^rollTotal() jet3 jet2}}
+					{{jet3}}
+				{{/^rollTotal() jet3 jet2}}
+			{{/rollBetween() jet3 jet2 jet1}}
+			</td>
+		</tr>
+		<tr class="impair upDown">
+			<td class="padding-left title">Mineur (m)</td>
+			<td></td>
+			<td class="center">
+			{{#rollBetween() jet3 0 jet2}}
+				{{#rollBetween() jet3 0 jet1}}
+					{{jet3}}
+				{{/rollBetween() jet3 0 jet1}}
+			{{/rollBetween() jet3 0 jet2}}
+			
+			{{#^rollTotal() jet3 jet2}}
+				{{#rollBetween() jet2 0 jet1}}
+					{{#rollBetween() jet2 0 jet3}}
+						{{jet2}}
+					{{/rollBetween() jet2 0 jet3}}
+				{{/rollBetween() jet2 0 jet1}}
+			{{/^rollTotal() jet3 jet2}}
+			
+			{{#^rollTotal() jet3 jet1}}
+				{{#rollBetween() jet1 0 jet3}}
+					{{#rollBetween() jet1 0 jet2}}
+						{{#^rollTotal() jet1 jet2}}
+							{{jet1}}
+						{{/^rollTotal() jet1 jet2}}
+					{{/rollBetween() jet1 0 jet2}}
+				{{/rollBetween() jet1 0 jet3}}
+			{{/^rollTotal() jet3 jet1}}
+			</td>
+		</tr>
+		{{#effets}}
+			<tr class="upDown" style="border-top:1px solid #999;">
+				<th colspan="3" class="center">Effets</th>
+			</tr>
+			<tr class="impair padding-left padding-right">
+				<td colspan="3" class="justify" style="max-width:10px;"><b>{{effets}}</b></td>
+			</tr>
+		{{/effets}}
+		<tr class="upDown">
+			<td colspan="2"></td>
+		</tr>
+	</table>
+</rolltemplate>

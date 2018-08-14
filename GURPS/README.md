@@ -4,6 +4,7 @@ Styling is inspired primarily by GCS, but also with some influence from the offi
 
 
 TODO
- - Implement auto-calc for the point summary (if possible).
- - Automatic encumberance calculation, or at least highlighting.
- - Automatic stat reduction at low HP/FP
+ - Allow for free native language [DONE]
+ - Add option for Language talent to reduce cost.
+ - Populate Swing and Thrust damage based on Striking ST.
+

@@ -25,6 +25,6 @@ Le jet d'initiative ajoute le pion sélectionné au Turn Order, avec la valeur d
 
 # Notes de version
 
-##v1.0 (2016-10-06)
+## v1.0 (2016-10-06)
 
 Création de la feuille.
