@@ -1,6 +1,14 @@
 Character sheet for Weaver Dice, based on the superhero webserial by John C. "Wildbow" McCrae,
 converted from the original sheet to Roll20 by Andreas J. Help to improve the sheet is welcome.
 
+Version 1.0:
+-fix Health tracker, doesn't reset any more
+-added "Stat modifier" lable over stat placement, for clarity
+-made "notes" textfields in gear& other repeating sections wider
+-made most large textboxes smaller
+-some visual corrections
+-code cleanup, removed duplicate code& some renaming
+
 Version 0.9:
 
 -basic stat tracking capabilities, dynamicly expanding sections for gear and other lists 
