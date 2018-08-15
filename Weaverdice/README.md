@@ -1,5 +1,5 @@
-Character sheet for Weaver Dice, based on the superhero webserial by John C. "Wildbow" McCrae,
-converted from the original sheet to Roll20 by Andreas J. Help to improve the sheet is welcome.
+Character sheet for WeaverDice, based on the superhero webserial by John C. "Wildbow" McCrae
+Any improvement to the sheet are welcome.
 
 Version 1.0:
 -fix Health tracker, doesn't reset any more
