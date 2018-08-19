@@ -12,13 +12,17 @@ Good source for all things D6 Star wars related, including fanmade conversions o
 **--------------->[http://www.d6holocron.com/](http://www.d6holocron.com/)<-------------**
 
 ## Sheet Versions
+
+### Version 1.72 (2018-08-22)
+
+- Readme formatting
 		
-### Version 1.71 (2018-07-31):
+### Version 1.71 (2018-07-31)
 **Fix:**
 
 - Corrected Force Emptiness to scale properly with DarkSidePoints	
 		
-### Version 1.70 (2018-07-24):
+### Version 1.70 (2018-07-24)
 **Layout:**
 
 - Made wound tracker wider
@@ -29,7 +33,7 @@ Good source for all things D6 Star wars related, including fanmade conversions o
 
 - Under Force skills, space for powers and their roll buttons added
 		
-### Version 1.68 (2018-07-17):
+### Version 1.68 (2018-07-17)
 **Layout:**
 
 - remove empty gap on top of sheet
@@ -60,7 +64,7 @@ Good source for all things D6 Star wars related, including fanmade conversions o
 	
 - updated preview
 		
-### Version 1.6 (2018-07-10):
+### Version 1.6 (2018-07-10)
 
 - sheet customization menu added with these options:
 	
@@ -76,7 +80,7 @@ Good source for all things D6 Star wars related, including fanmade conversions o
 	
 - some code cleanup
 
-### Prior v1.6:
+### Prior v1.6
 
 - Weapon section roll fixed (2018-02)
 	
