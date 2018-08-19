@@ -1,6 +1,9 @@
 Character sheet for WeaverDice, based on the superhero webserial by John C. "Wildbow" McCrae
 Any improvement to the sheet are welcome.
 
+Version 1.2:
+-skill rolls added, with minor options
+
 Version 1.0:
 -fix Health tracker, doesn't reset any more
 -added "Stat modifier" lable over stat placement, for clarity
