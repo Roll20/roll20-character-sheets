@@ -51,6 +51,8 @@ Updates:
     16. Added a new column to skills with an assist roll; assist rolls do not include wrath dice.
     17. Created a view for vehicles and voidships; these views include fields for entering a pool of dice for rolls. Players can also make the appropriate tests from their character sheet.
 
+Note:  No existing attributes were changed or removed.  Existing functionality was expanded.
+
 Fixes:
     1. Toggling of Use Inline Dice vs API.  When checked and then unchecked, everytime the sheet would be reopened it was defaulting to checked.  It should open to the value it closed on... checked or unchecked.
 
@@ -58,3 +60,4 @@ Fixes:
 - resubmitted on August 6th due to roll20 packaging error.
 
 ### Known Issues
+1. Inline rolls do not show two successes on a 2 and die modifier is not added; this functionality is not core within the Roll20 capabilities and an expanded formula needs to be created.
