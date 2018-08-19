@@ -9,7 +9,9 @@ Any improvements to the sheet are welcome.
 
 - skill rolls added, with minor options
 
-- skill descriptions to 6 rows
+- expand skill descriptions to 6 rows
+
+- change default stat modifier to zero, as is the baseline for PCs
 
 ### Version 1.0:
 
