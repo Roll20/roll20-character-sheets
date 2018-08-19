@@ -1,36 +1,64 @@
-Character sheet for WeaverDice, based on the superhero webserial by John C. "Wildbow" McCrae
-Any improvement to the sheet are welcome.
+# Character sheet for WeaverDice
+*based on the superhero webserial Worm by John C. "Wildbow" McCrae*
 
-Version 1.2:
--skill rolls added, with minor options
+Any improvements to the sheet are welcome.
 
-Version 1.0:
--fix Health tracker, doesn't reset any more
--added "Stat modifier" lable over stat placement, for clarity
--made "notes" textfields in gear& other repeating sections wider
--made most large textboxes smaller
--some visual corrections
--code cleanup, removed duplicate code& some renaming
 
-Version 0.9:
 
--basic stat tracking capabilities, dynamicly expanding sections for gear and other lists 
--stats can be rolled directly from the sheet
--Cape name moved to be in more in the center
--no help yet with character creation rolls yet
--buttons to roll for skills have not been implemented, as the way skills improve in WD is complex to implement
+### Version 1.2:
 
-Possible future improvements:
--implement quick buttons and options to roll skills from sheet
--create power-generation and luck tables so character creation can be made quicker in Roll20
--make the layout more flexible to resizing, it's still quite crude atm
+- skill rolls added, with minor options
 
-Rulebook: 			https://docs.google.com/document/d/1e-H--GkPrbJq4WRNYndBnjjLjE7-2kOZkjwltkP1Ong/
-Online charsheet: 	https://docs.google.com/document/d/15peMSA3fdp9EK9urwvYps4Q0z06EQ6iJdVggD81a2bg/
-Getting Started: 	https://docs.google.com/document/d/1Py-zQBE94hm8Iu0Oqoy_p_svALXYkKVpTiq-i7PwCwE/
+- skill descriptions to 6 rows
 
-Character Creation Guide https://docs.google.com/document/d/1Eo7AZpjm-mIQBVxXpjvxgNoHMpSBa9M0onzhYaX-HDU/
+### Version 1.0:
 
-IRC-channel 	 https://kiwiirc.com/client/irc.parahumans.net/#weaverdice
-Worm Web serial: https://parahumans.wordpress.com/
-Sureddit:		 https://www.reddit.com/r/Weaverdice/
+- fix Health tracker, doesn't reset any more
+
+- added "Stat modifier" lable over stat placement, for clarity
+
+- made "notes" textfields in gear& other repeating sections wider
+
+- made most large textboxes smaller
+
+- some visual corrections
+
+- code cleanup, removed duplicate code& some renaming
+
+### Version 0.9:
+
+- basic stat tracking capabilities, dynamicly expanding sections for gear and other lists
+
+- stats can be rolled directly from the sheet
+
+- Cape name moved to be in more in the center
+
+- no help yet with character creation rolls yet
+
+- buttons to roll for skills have not been implemented, as the way skills improve in WD is complex to implement
+
+## Possible future improvements:
+
+- implement all skill options
+
+- create power-generation and luck tables so character creation can be made quicker in Roll20
+
+- make the layout more flexible to resizing, it's still quite crude atm
+
+## WeaverDice Resources
+
+**Rulebook:** 				https://docs.google.com/document/d/1e-H--GkPrbJq4WRNYndBnjjLjE7-2kOZkjwltkP1Ong/
+
+**Online charsheet:** 		https://docs.google.com/document/d/15peMSA3fdp9EK9urwvYps4Q0z06EQ6iJdVggD81a2bg/
+
+**Getting Started:** 		https://docs.google.com/document/d/1Py-zQBE94hm8Iu0Oqoy_p_svALXYkKVpTiq-i7PwCwE/
+
+**Character Creation Guide**https://docs.google.com/document/d/1Eo7AZpjm-mIQBVxXpjvxgNoHMpSBa9M0onzhYaX-HDU/
+
+## Community links
+
+**IRC-channel** 	 		https://kiwiirc.com/client/irc.parahumans.net/#weaverdice
+
+**Worm Web serial:** 		https://parahumans.wordpress.com/
+
+**Sureddit:**		 		https://www.reddit.com/r/Weaverdice/
