@@ -1,4 +1,5 @@
 <input class="monster_confirm_flag" type="hidden" name="attr_monster_confirm_flag">
+<input class="mancer_confirm_flag" type="hidden" name="attr_mancer_confirm_flag">
 <div class="licensecontainer compendium-drop-target monsters">
 
 <input class="npc_toggle" name="attr_npc" type="hidden" value="0">
@@ -4733,6 +4734,18 @@
     </div>
 </div>
 
+<div class="mancer_confirm">
+    <span data-i18n="do_you_want_mancer">Do you want to use the Charactermancer to create this character?</span>
+    <div style="margin-top: 20px;">
+        <div style="position: relative; display: inline-block; margin-right: 25px;">
+            <input class="yes" type="checkbox" name="attr_mancer_confirm"><span class="yes" data-i18n="yes">Yes</span>
+        </div>
+        <div style="position: relative; display: inline-block;">
+            <input class="yes" type="checkbox" name="attr_mancer_cancel"><span class="yes" data-i18n="no">No</span>
+        </div>
+    </div>
+</div>
+
 <!-- ROLL TEMPLATES -->
 <div class="rolltemplates">
     <rolltemplate class="sheet-rolltemplate-simple">
@@ -6574,6 +6587,16 @@
         setAttrs(update, {silent: true});
     });
 
+    on("change:mancer_confirm", function(eventinfo) {
+        setAttrs({mancer_confirm_flag: "", charactermancer_step: "l1-welcome"});
+        check_l1_mancer();
+    });
+
+    on("change:mancer_cancel", function(eventinfo) {
+        setAttrs({mancer_confirm_flag: "", l1mancer_status: "completed"});
+        check_l1_mancer();
+    });
+
     on("change:passiveperceptionmod", function(eventinfo) {
         update_passive_perception();
     });
@@ -6651,7 +6674,7 @@
     on("clicked:relaunch_lvl1mancer", function(eventinfo) {
         getAttrs(["l1mancer_status"], function(v) {
             if(v["l1mancer_status"] === "completed") {
-                setAttrs({l1mancer_status: ""});
+                setAttrs({l1mancer_status: "relaunch"});
             }
             check_l1_mancer();
         });
@@ -10357,7 +10380,11 @@
                 startCharactermancer(v["charactermancer_step"]);
             }
             else {
-                startCharactermancer("l1-welcome");
+                if(v["l1mancer_status"] && v["l1mancer_status"] === "relaunch") {
+                    startCharactermancer("l1-welcome");
+                } else {
+                    setAttrs({mancer_confirm_flag: 1});
+                }
             }
         });
     };
