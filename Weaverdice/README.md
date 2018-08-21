@@ -3,6 +3,11 @@
 
 Any improvements to the sheet are welcome.
 
+### Version 1.3:
+
+- skill rolls improved, added option for using stat bonus andskill bonus to rolls,plus a field to custom the roll. Default "k1" keeps highest dice
+
+- adds sheet version in the corner
 
 
 ### Version 1.2:
