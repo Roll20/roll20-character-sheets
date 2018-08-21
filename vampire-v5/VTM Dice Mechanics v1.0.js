@@ -476,7 +476,7 @@ var processScriptTabs = function (argv, who, dc) {
 					sendChat("The best thing about Hero Quest!", "https://www.youtube.com/watch?v=Cx8sl2uC46A");
 					break;
 				case "lupine":
-					sendChat("Some players (and character sheet designers)...", "https://youtu.be/ERDUbAv8Qz0?t=44s");
+					//sendChat("Some players (and character sheet designers)...", "");
 					break;
 				default:
 					processVampireDiceScript(argv[0], dc);
