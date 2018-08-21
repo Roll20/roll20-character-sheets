@@ -80,6 +80,8 @@
     <span class="sheet-tab sheet-tab1">Stats &amp; Skills</span>
 <input type="radio" name="attr_tab" class="sheet-tab sheet-tab2" value="2" title="Powers, Advantages & Equipment"/>
     <span class="sheet-tab sheet-tab2">Powers, Advantages &amp; Equipment</span>
+<input type="radio" name="attr_tab" class="sheet-tab sheet-tab3" value="3" title="Import Data"/>
+    <span class="sheet-tab sheet-tab3">Import Data</span>
 
 <div class="sheet-tab-content sheet-tab1">
     <div class="sheet-2colrow">
@@ -196,7 +198,7 @@
     					<span class="sheet-table-data">&nbsp;</span>
     					<span class="sheet-table-data"><b>AGL</b></span>
     					<span class="sheet-table-data">&nbsp;</span>
-    					<span class="sheet-table-data"><input type="number" name="attr_dodge" title="dodge" value="(@{dodge-points} + @{agility-total} + @{dodge-misc})" disabled/></span>
+    					<span class="sheet-table-data"><input type="number" name="attr_dodge" title="dodge" value="(@{dodge-points} + @{agility-total} + @{dodge-misc} + @{Total_Defenses_Mod})" disabled/></span>
     					<span class="sheet-table-data"><b>=</b></span>
     					<span class="sheet-table-data"><input type="number" name="attr_dodge-points" title="dodge-points" value="0"/></span>
     					<span class="sheet-table-data"><b>+</b></span>
@@ -210,7 +212,7 @@
     					<span class="sheet-table-data">&nbsp;</span>
     					<span class="sheet-table-data"><b>FGT</b></span>
     					<span class="sheet-table-data">&nbsp;</span>
-    					<span class="sheet-table-data"><input type="number" name="attr_parry" title="parry" value="(@{parry-points} + @{fighting-total} + @{parry-misc})" disabled/></span>
+    					<span class="sheet-table-data"><input type="number" name="attr_parry" title="parry" value="(@{parry-points} + @{fighting-total} + @{parry-misc} + @{Total_Defenses_Mod})" disabled/></span>
     					<span class="sheet-table-data"><b>=</b></span>
     					<span class="sheet-table-data"><input type="number" name="attr_parry-points" title="parry-points" value="0"/></span>
     					<span class="sheet-table-data"><b>+</b></span>
@@ -267,7 +269,7 @@
             <div class="sheet-section-offense" style="border-style:solid;border-width:2px;">
             	<span class="sheet-table-data"><b>Offense</b></span>
     			<br>
-    			<span class="sheet-table-data"><button type="roll" name="roll_Initiative" title="Initiative" value="@{who-initiative} rolls for initiative!&#x00A;@{who-initiative} Result: [[@{die_type} + @{initiative} &amp;{tracker}]]&#x00A;@{who-initiative} Dodge: [[@{dodge}]]&#x00A;@{who-initiative} Agility: [[@{agility-total}]]&#x00A;@{who-initiative} Awareness: [[@{awareness-total}]]"></button></span>
+    			<span class="sheet-table-data"><button type="roll" name="roll_Initiative" title="Initiative" value="@{who-initiative} &{template:default} {{name= @{character_name}'s Initiative}} {{Result: [[@{die_type} + @{initiative} &amp;{tracker}]]}}"></button></span>
     			<span class="sheet-table-data"><b>Initiative:</b></span>
     			<span class="sheet-table-data"><input type="number" name="attr_initiative" title="initiative" value="(@{initiative-misc} + @{agility-total})" disabled/></span>
     			<span class="sheet-table-data"><b>=</b></span>
@@ -277,21 +279,70 @@
     			<br>
     			<fieldset class="repeating_attacks">
     				<span class="sheet-table-data"><button type="roll" name="roll_attack-roll" title="repeating_attack_X_attack-roll (NOT USABLE IN MACROS)" value="@{macro-text}"></button></span>
-    				<span class="sheet-table-data"><input type="text" name="attr_name" title="repeating_attack_X_name" value="Name"/></span>
-    				<span class="sheet-table-data"><input type="number" name="attr_bonus" title="repeating_attack_X_bonus" value="0"/></span>
-    				<span class="sheet-table-data"><input type="text" name="attr_effect" title="repeating_attack_X_effect" value="Effect"/></span>
+    				<span class="sheet-table-data"><input type="text" name="attr_name" title="Attack Name" value="Name"/></span>
+    				<span class="sheet-table-data"><input type="number" name="attr_bonus" title="Attack Bonus" value="0"/></span>
+					<span class="sheet-table-data"><input type="number" name="attr_crit_rate" title="Crit Target" value="20"/></span>
+					<span class="sheet-table-data"><input type="number" name="attr_effect_ranks" title="Effect Ranks" value="0"/></span>
+					<span class="sheet-table-data">
+						<select name="attr_save_base" title="Save Type">
+							<option value="15" selected>Toughness</option>
+							<option value="10">Fortitude</option>
+							<option value="10">Will</option></span>
+    				<span class="sheet-table-data"><input type="text" name="attr_effect" title="Effect Names" value="Effect notes go here"/></span>
     				<span style="font-size:10px;"><b>Show Macro Text?&nbsp;&nbsp;</b></span>
     				<input type="checkbox" class="sheet-macro-show" title="repeating_attacks_X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
-    				<textarea class="sheet-macro" title="repeating_attacks_X_macro-text" name="attr_macro-text">@{who-combat} is attacking with @{name}!&#x00A;@{who-combat} Result: [[@{die_type} + @{bonus}]]&#x00A;@{who-combat} Effect: @{effect}</textarea>
+    				<textarea class="sheet-macro" title="repeating_attacks_X_macro-text" name="attr_macro-text">@{who-combat} &{template:default} {{name= @{name}}} {{Result=[[@{die_type}cs>@{crit_rate} + @{bonus} + @{Total_Attack_Mod}]] }} {{Effect= DC [[@{save_base} + @{effect_ranks} + @{Total_Effect_Mod}]]}} {{Notes= @{effect}}}</textarea>
     			</fieldset>
     		</div>
             <br>
-            <div class="sheet-section-notes" style="border-style:solid;border-width:2px;">
-            	<span class="sheet-table-data"><b>Notes & Conditions</b></span>
-    			<br>
-    			<textarea style="height:100px" name="attr_notes" title="notes"></textarea><br>
+				<div class="sheet-section-modifiers" style="border-style:solid;border-width:2px;">
+					<div class="sheet-table">
+    					<div class="sheet-table-row">
+    						<span class="sheet-table-header" style="width:40%; font-size:10px;">Name</span>
+							<span class="sheet-table-header" style="width:20%; font-size:10px;">Attack</span>
+    						<span class="sheet-table-header" style="width:20%; font-size:10px;">Defense</span>
+    						<span class="sheet-table-header" style="width:%; font-size:10px;">Effect</span>
+    					</div>
+   						<div class="sheet-table-row">
+    							<!-- <span class="sheet-table-data" style="width:5%;"><button type="roll" name="roll_Insight-Check" title="Insight-Check" value="@{who-skill} Insight check: [[@{die_type} + @{Insight}]]"></button></span> -->
+    							<span class="sheet-table-data" style="width:85%;"><b>Accurate Attack</b></span>
+								<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_AccAtk_Attack" title="Accurate-Attack Attack Bonus" value="0"/></span>
+								<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_AccAtk_Defenses" title="Accurate-Attack Defense Bonus" value="0" disabled/></span>
+								<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_AccAtk_Effect" title="Accurate Attack Effect Penalty" value="(-1)*@{AccAtk_Attack}" disabled/></span>
+   						</div>
+   						<div class="sheet-table-row">
+    							<span class="sheet-table-data" style="width:85%;"><b>All-out Attack</b></span>
+								<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_AOAtk_Attack" title="All-out Attack Attack Bonus" value="0"/></span>
+    							<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_AOAtk_Defenses" title="All0out Attack Defense Penalty" value="(-1)*@{AOAtk_Attack}" disabled/></span>
+								<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_AOAtk_Effect" title="All-out Attack Effect Bonus" value="0" disabled/></span>
+   						</div>
+						<div class="sheet-table-row">
+    							<span class="sheet-table-data" style="width:85%;"><b>Defensive Attack</b></span>
+								<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_DefAtk_Attack" title="Defensive Attack Attack Penalty" value="(-1)*@{DefAtk_Defenses}" disabled/></span>
+    							<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_DefAtk_Defenses" title="Defensive Attack Defense Bonus" value="0" /></span>
+								<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_DefAtk_Effect" title="Defensive Attack Effect Penalty" value="0"disabled/></span>
+   						</div>
+						<div class="sheet-table-row">
+    							<span class="sheet-table-data" style="width:85%;"><b>Power Attack</b></span>
+								<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_PwrAtk_Attack" title="Power Attack-Attack Penalty" value="0"/></span>
+    							<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_PwrAtk_Defenses" title="Power Attack Defense Bonus" value="0" disabled/></span>
+								<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_PwrAtk_Effect" title="Power Attack Effect Bonus" value="(-1)*@{PwrAtk_Attack}" disabled/></span>
+   						</div>
+						<div class="sheet-table-row">
+    							<span class="sheet-table-data" style="width:85%;"><b>Conditions</b></span>
+								<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_Cnd_Attack" title="Condition Attack Modifier" value="0"/></span>
+    							<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_Cnd_Defenses" title="Condition Defense Modifier" value="0" disabled/></span>
+								<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_Cnd_Effect" title="Condition Effect Modifier" value="0" /></span>
+   						</div>
+						<div class="sheet-table-row">
+    							<span class="sheet-table-data" style="width:85%;"><b>Totals</b></span>
+								<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_Total_Attack_Mod" title="Combined Attack Modifier" value="(@{AccAtk_Attack} + @{AOAtk_Attack} + @{DefAtk_Attack} + @{PwrAtk_Attack} + @{Cnd_Attack})" disabled/></span>
+    							<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_Total_Defenses_Mod" title="Combined Defense Modifier" value="(@{AccAtk_Defenses} + @{AOAtk_Defenses} + @{DefAtk_Defenses} + @{PwrAtk_Defenses} + @{Cnd_Defenses})" disabled/></span>
+								<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_Total_Effect_Mod" title="Combined Effect Modifier" value="(@{AccAtk_Effect} + @{AOAtk_Effect} + @{DefAtk_Effect} + @{PwrAtk_Effect} + @{Cnd_Effect})" disabled/></span>
+   						</div>
+					</div>
+				</div>
     		</div>
-    	</div>
         <div class="sheet-col">
             <div class="sheet-section-skills" style="border-style:solid;border-width:2px;">
         		<div class="sheet-table">
@@ -545,77 +596,14 @@
     					<span class="sheet-table-data"><input type="number" name="attr_total-skill-ranks" title="total-skill-ranks" value="(@{Acrobatics-ranks} + @{Athletics-ranks} + @{Close-Combat-1-ranks}+ @{Close-Combat-2-ranks} + @{Close-Combat-3-ranks} + @{Deception-ranks} + @{Expertise-1-ranks} + @{Expertise-2-ranks} + @{Expertise-3-ranks} + @{Expertise-4-ranks} + @{Insight-ranks} + @{Intimidation-ranks} + @{Investigation-ranks} + @{Perception-ranks} + @{Persuasion-ranks} + @{Ranged-Combat-1-ranks} + @{Ranged-Combat-2-ranks} + @{Ranged-Combat-3-ranks} + @{Sleight-of-hand-ranks} + @{Stealth-ranks} + @{Technology-ranks} + @{Treatment-ranks} + @{Vehicles-ranks})" disabled/></span>
     					<span class="sheet-table-data" style="width:5%;"></span>
     				</div></div>
+            <div class="sheet-section-notes" style="border-style:solid;border-width:2px;">
+            	<span class="sheet-table-data"><b>Notes & Conditions</b></span>
+    			<br>
+    			<textarea style="height:100px" name="attr_notes" title="notes"></textarea><br>
     		</div>
-    		<div style="border-style:solid;border-width:2px;">
-    		    <div class="sheet-table-row">
-		            <span class="sheet-table-data"><b>Roll Target - Stats: </b></span>
-		            <span class="sheet-table-data">
-                        <label class="sheet-small-label1">
-                            <select name="attr_who-stat" title="@{who-stat}">
-                                <option value="@{character_name}'s">Public</option>
-                                <option value="/em 's" selected>Public Emote</option>
-                                <option value="/w gm @{character_name}'s">Whisper GM</option>
-                                <option value="/w @{character_name}">Whisper Self</option>
-                            </select>
-                        </label>
-                    </span>
-                </div>
-                <div class="sheet-table-row">
-		            <span class="sheet-table-data"><b>Roll Target - Combat: </b></span>
-		            <span class="sheet-table-data">
-                        <label class="sheet-small-label1">
-                            <select name="attr_who-combat" title="@{who-combat}">
-                                <option value="@{character_name}'s">Public</option>
-                                <option value="/em 's" selected>Public Emote</option>
-                                <option value="/w gm @{character_name}'s">Whisper GM</option>
-                                <option value="/w @{character_name}">Whisper Self</option>
-                            </select>
-                        </label>
-                    </span>
-                </div>
-                <div class="sheet-table-row">
-		            <span class="sheet-table-data"><b>Roll Target - Initiative: </b></span>
-		            <span class="sheet-table-data">
-                        <label class="sheet-small-label1">
-                            <select name="attr_who-initiative" title="@{who-initiative}">
-                                <option value="@{character_name}">Public</option>
-                                <option value="/em">Public Emote</option>
-                                <option value="/w gm @{character_name}" selected>Whisper GM</option>
-                                <option value="/w @{character_name}">Whisper Self</option>
-                            </select>
-                        </label>
-                    </span>
-                </div>
-                <div class="sheet-table-row">
-		            <span class="sheet-table-data"><b>Roll Target - Skill: </b></span>
-		            <span class="sheet-table-data">
-                        <label class="sheet-small-label1">
-                            <select name="attr_who-skill" title="@{who-skill}">
-                                <option value="@{character_name}'s">Public</option>
-                                <option value="/em 's" selected>Public Emote</option>
-                                <option value="/w gm @{character_name}'s">Whisper GM</option>
-                                <option value="/w @{character_name}">Whisper Self</option>
-                            </select>
-                        </label>
-                    </span>
-                </div>
-				<div style="border-style:solid;border-width:2px;">
-    				<div class="sheet-table-row">
-						<span class="sheet-table-data"><b>Dice Roll Type: </b></span>
-						<span class="sheet-table-data">
-							<label class="sheet-small-label1">
-								<select name="attr_die_type" title="@{die_type}">
-									<option value="1d20" selected>Standard 1d20</option>
-									<option value="3d20k2dh1">3d20 Gamematers Guide</option>
-									<option value="3d6cs>16">Sum 3d6</option>
-								</select>
-							</label>
-						</span>
-					</div>
-				</div>
-            </div>
+    		</div>
+		</div>
         </div>
-    </div>
     <br>
     <div class="sheet-section-complications" style="border-style:solid;border-width:2px;">
     	<span class="sheet-table-data"><b>Motivations & Complications</b></span>
@@ -624,6 +612,7 @@
 			<span class="sheet-table-data"><input type="text" name="attr_name" title="repeating_complication_X_name" value="Name"/></span>
 			<textarea name="attr_description" title="repeating_complication_X_description" style="height:90px;">Description</textarea>
 		</fieldset>
+	</div>
 	</div>
 </div>
 
@@ -680,3 +669,79 @@
         </div>
 	</div>
 </div>
+	<div class="sheet-tab-content sheet-tab3">
+		<!-- <div class="sheet-col"> -->
+			<div class="sheet-section-notes" style="border-style:solid;border-width:2px;">
+    			<span class="sheet-table-data"><b>Import XML</b></span>
+    			<br>
+    			<textarea style="height:10em" name="attr_import_xml" title="import_xml"></textarea><br>
+			</div>
+			<div style="border-style:solid;border-width:2px;">
+    			<div class="sheet-table-row">
+					<span class="sheet-table-data"><b>Roll Target - Stats: </b></span>
+					<span class="sheet-table-data">
+					<label class="sheet-small-label1">
+						<select name="attr_who-stat" title="@{who-stat}">
+							<option value="@{character_name}'s">Public</option>
+							<option value="/em 's" selected>Public Emote</option>
+							<option value="/w gm @{character_name}'s">Whisper GM</option>
+							<option value="/w @{character_name}">Whisper Self</option>
+						</select>
+					</label>
+					</span>
+				</div>
+				<div class="sheet-table-row">
+					<span class="sheet-table-data"><b>Roll Target - Combat: </b></span>
+					<span class="sheet-table-data">
+						<label class="sheet-small-label1">
+							<select name="attr_who-combat" title="@{who-combat}">
+							<option value="@{character_name}'s">Public</option>
+							<option value="/em 's" selected>Public Emote</option>
+							<option value="/w gm @{character_name}'s">Whisper GM</option>
+							<option value="/w @{character_name}">Whisper Self</option>
+							</select>
+						</label>
+					</span>
+				</div>
+				<div class="sheet-table-row">
+					<span class="sheet-table-data"><b>Roll Target - Initiative: </b></span>
+					<span class="sheet-table-data">
+						<label class="sheet-small-label1">
+							<select name="attr_who-initiative" title="@{who-initiative}">
+							<option value=" ">Public</option>
+							<option value="/w gm " selected>Whisper GM</option>
+							<option value="/w @{character_name}">Whisper Self</option>
+							</select>
+						</label>
+					</span>
+				</div>
+				<div class="sheet-table-row">
+					<span class="sheet-table-data"><b>Roll Target - Skill: </b></span>
+					<span class="sheet-table-data">
+						<label class="sheet-small-label1">
+							<select name="attr_who-skill" title="@{who-skill}">
+							<option value="@{character_name}'s">Public</option>
+							<option value="/em 's" selected>Public Emote</option>
+							<option value="/w gm @{character_name}'s">Whisper GM</option>
+							<option value="/w @{character_name}">Whisper Self</option>
+							</select>
+						</label>
+					</span>
+				</div>
+				<div style="border-style:solid;border-width:2px;">
+    				<div class="sheet-table-row">
+						<span class="sheet-table-data"><b>Dice Roll Type: </b></span>
+						<span class="sheet-table-data">
+							<label class="sheet-small-label1">
+								<select name="attr_die_type" title="@{die_type}">
+								<option value="1d20" selected>Standard 1d20</option>
+								<option value="3d20k2dh1">3d20 Gamematers Guide</option>
+								<option value="3d6cs>16">Sum 3d6</option>
+								</select>
+							</label>
+						</span>
+					</div>
+				</div>
+			</div>
+		<!-- </div> -->
+	</div>
