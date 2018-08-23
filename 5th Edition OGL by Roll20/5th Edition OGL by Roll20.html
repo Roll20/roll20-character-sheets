@@ -1378,6 +1378,24 @@
                     <span class="label" data-i18n="speed-u">SPEED</span>
                 </div>
             </div>
+            <input type="hidden" class="toggleflag" name="attr_global_ac_mod_flag">
+            <div class="hp hidden">
+                <div class="textarea globalattack">
+                    <fieldset class="repeating_acmod">
+                        <div class="global-mod">
+                            <input type="checkbox" name="attr_options-flag" class="options-flag" checked="checked" style="top: -15px;"><span>y</span>
+                            <input type="checkbox" name="attr_global_ac_active_flag" value="1" class="active-flag">
+                            <div class="options">
+                                <textarea type="textarea" name="attr_global_ac_val" placeholder="1[DEFENSE]"></textarea>
+                            </div>
+                            <div class="display">
+                                <span class="title" name="attr_global_ac_val"></span>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <span class="label" data-i18n="global-ac-u">GLOBAL AC MODIFIER</span>
+            </div>
             <div class="hp">
                 <div class="top">
                     <span data-i18n="hp-max-u">Hit Point Maximum</span>
@@ -1645,9 +1663,20 @@
                 <div class="complex">
                     <input type="hidden" class="warningflag" name="attr_armorwarningflag">
                     <div class="warning">
-                        <span data-i18n="warning-armor-sets-u">
+                        <span>
                             <input type="checkbox" name="attr_armorwarning" value="hide">
-                            WARNING - MULTIPLE SETS OF ARMOR OR SHIELDS HAVE BEEN ADDED AND AC IS NOT CORRECTLY CALCULATED. UNEQUIP THE ARMOR PIECE FROM THE ITEM DETAILS.
+                            <span data-i18n="warning-armor-sets-u">
+                                WARNING - MULTIPLE SETS OF ARMOR OR SHIELDS HAVE BEEN ADDED AND AC IS NOT CORRECTLY CALCULATED. UNEQUIP THE ARMOR PIECE FROM THE ITEM DETAILS.
+                            </span>
+                        </span>
+                    </div>
+                    <input type="hidden" class="warningflag" name="attr_customacwarningflag">
+                    <div class="warning">
+                        <span>
+                            <input type="checkbox" name="attr_customacwarning" value="hide">
+                            <span data-i18n="warning-customac-u">
+                                ATTENTION - YOUR CUSTOM AC CALCULATION IS NOT BEING USED AS YOU HAVE ARMOR EQUIPPED. IF YOU WANT TO USE YOUR CUSTOM AC, UNEQUIP THE ARMOR PIECE FROM THE ITEM DETAILS.
+                            </span>
                         </span>
                     </div>
                     <div class="header" style="height: auto;">
@@ -4277,7 +4306,6 @@
                         <option value="@{d20}" selected="selected" data-i18n="norm">Normal</option>
                         <option value="{@{d20},@{d20}}kh1" data-i18n="adv">Advantage</option>
                         <option value="{@{d20},@{d20}}kl1" data-i18n="disadv">Disadvantage</option>
-<!--                         <option value="?{Advantage?|Normal Roll,&#64;&#123;d20&#125;|Advantage,&#123;&#64;&#123;d20&#125;&#44;&#64;&#123;d20&#125;&#125;kh1|Disadvantage,&#123;&#64;&#123;d20&#125;&#44;&#64;&#123;d20&#125;&#125;kl1}" data-i18n="query-roll-adv">Query Advantage</option> -->
                     </select>
                 </div>
                 <div class="row">
@@ -4543,6 +4571,10 @@
                 <div class="row">
                     <input type="checkbox" name="attr_global_damage_mod_flag" value="1">
                     <span data-i18n="show-global-damage-field-u">SHOW GLOBAL DAMAGE MODIFIER FIELD</span>
+                </div>
+                <div class="row">
+                    <input type="checkbox" name="attr_global_ac_mod_flag" value="1">
+                    <span data-i18n="show-global-ac-field-u">SHOW GLOBAL AC MODIFIER FIELD</span>
                 </div>
                 <div class="row">
                     <span data-i18n="add-char-to-templates:-u">ADD CHARACTER NAME TO TEMPLATES:</span>
@@ -6562,6 +6594,29 @@
                 var rowid = generateRowID();
                 _.each(ids, function(rowid) {
                     update[`repeating_tohitmod_${rowid}_global_attack_active_flag`] = "0";
+                });
+                setAttrs(update);
+            });
+        }
+    });
+
+    on("change:global_ac_mod_flag", function(eventinfo) {
+        if(eventinfo.newValue === "1") {
+            getSectionIDs("acmod", function(ids) {
+                if(!ids || ids.length === 0) {
+                    var update = {};
+                    var rowid = generateRowID();
+                    update[`repeating_acmod_${rowid}_global_ac_val`] = "1[DEFENSE]";
+                    update[`repeating_acmod_${rowid}_global_ac_active_flag`] = "1";
+                    setAttrs(update);
+                }
+            });
+        } else {
+            getSectionIDs("acmod", function(ids) {
+                var update = {};
+                var rowid = generateRowID();
+                _.each(ids, function(rowid) {
+                    update[`repeating_acmod_${rowid}_global_ac_active_flag`] = "0";
                 });
                 setAttrs(update);
             });
@@ -9157,98 +9212,109 @@
             if(v.custom_ac_flag === "2") {
                 return;
             }
-            else if(v.custom_ac_flag === "1") {
-                getAttrs(["custom_ac_base","custom_ac_part1","custom_ac_part2","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod"], function(b) {
-                    var base = isNaN(parseInt(b.custom_ac_base, 10)) === false ? parseInt(b.custom_ac_base, 10) : 10;
-                    var part1attr = b.custom_ac_part1.toLowerCase();
-                    var part2attr = b.custom_ac_part2.toLowerCase();
-                    var part1 = part1attr === "none" ? 0 : b[part1attr + "_mod"];
-                    var part2 = part2attr === "none" ? 0 : b[part2attr + "_mod"];
-                    var total = base + part1 + part2;
-                    setAttrs({ac: total});
-                });
-            }
             else {
                 var update = {};
-                var ac_attrs = ["simpleinventory","dexterity_mod","globalacmod"];
-                getSectionIDs("repeating_inventory", function(idarray) {
-                    _.each(idarray, function(currentID, i) {
-                        ac_attrs.push("repeating_inventory_" + currentID + "_equipped");
-                        ac_attrs.push("repeating_inventory_" + currentID + "_itemmodifiers");
+                var ac_attrs = ["simpleinventory","custom_ac_base","custom_ac_part1","custom_ac_part2","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod","globalacmod"];
+                getSectionIDs("repeating_acmod", function(acidarray) {
+                    _.each(acidarray, function(currentID, i) {
+                        ac_attrs.push("repeating_acmod_" + currentID + "_global_ac_val");
+                        ac_attrs.push("repeating_acmod_" + currentID + "_global_ac_active_flag");
                     });
-                    getAttrs(ac_attrs, function(b) {
-                        var globalacmod = isNaN(parseInt(b.globalacmod, 10)) === false ? parseInt(b.globalacmod, 10) : 0;
-                        var dexmod = +b["dexterity_mod"];
-                        var total = 10 + dexmod;
-                        var armorcount = 0;
-                        var shieldcount = 0;
-                        var armoritems = [];
-                        if(b.simpleinventory === "complex") {
-                            _.each(idarray, function(currentID, i) {
-                                if(b["repeating_inventory_" + currentID + "_equipped"] && b["repeating_inventory_" + currentID + "_equipped"] === "1" && b["repeating_inventory_" + currentID + "_itemmodifiers"] && b["repeating_inventory_" + currentID + "_itemmodifiers"].toLowerCase().indexOf("ac") > -1) {
-                                    var mods = b["repeating_inventory_" + currentID + "_itemmodifiers"].split(",");
-                                    var ac = 0;
-                                    var type = "mod";
-                                    _.each(mods, function(mod) {
-                                        if(mod.substring(0,10) === "Item Type:") {
-                                            type = mod.substring(11, mod.length).trim().toLowerCase();
-                                        }
-                                        if(mod.toLowerCase().indexOf("ac:") > -1 || mod.toLowerCase().indexOf("ac +") > -1 || mod.toLowerCase().indexOf("ac+") > -1) {
-                                            var regex = mod.replace(/[^0-9]/g, "");
-                                            var bonus = regex && regex.length > 0 && isNaN(parseInt(regex,10)) === false ? parseInt(regex,10) : 0;
-                                            ac = ac + bonus;
-                                        }
-                                        if(mod.toLowerCase().indexOf("ac -") > -1 || mod.toLowerCase().indexOf("ac-") > -1) {
-                                            var regex = mod.replace(/[^0-9]/g, "");
-                                            var bonus = regex && regex.length > 0 && isNaN(parseInt(regex,10)) === false ? parseInt(regex,10) : 0;
-                                            ac = ac - bonus;
-                                        }
-                                    });
-                                    armoritems.push({type: type, ac: ac});
-                                }
-                            });
-                            armorcount = armoritems.filter(function(item){ return item["type"].indexOf("armor") > -1 }).length;
-                            shieldcount = armoritems.filter(function(item){ return item["type"].indexOf("shield") > -1 }).length;
-                            var base = dexmod;
-                            var armorac = 10;
-                            var shieldac = 0;
-                            var modac = 0;
+                    getSectionIDs("repeating_inventory", function(idarray) {
+                        _.each(idarray, function(currentID, i) {
+                            ac_attrs.push("repeating_inventory_" + currentID + "_equipped");
+                            ac_attrs.push("repeating_inventory_" + currentID + "_itemmodifiers");
+                        });
+                        getAttrs(ac_attrs, function(b) {
+                            var custom_total = 0;
+                            if(v.custom_ac_flag === "1") {
+                                var base = isNaN(parseInt(b.custom_ac_base, 10)) === false ? parseInt(b.custom_ac_base, 10) : 10;
+                                var part1attr = b.custom_ac_part1.toLowerCase();
+                                var part2attr = b.custom_ac_part2.toLowerCase();
+                                var part1 = part1attr === "none" ? 0 : b[part1attr + "_mod"];
+                                var part2 = part2attr === "none" ? 0 : b[part2attr + "_mod"];
+                                custom_total = base + part1 + part2;
+                            }
+                            var globalacmod = isNaN(parseInt(b.globalacmod, 10)) === false ? parseInt(b.globalacmod, 10) : 0;
+                            var dexmod = +b["dexterity_mod"];
+                            var total = 10 + dexmod;
+                            var armorcount = 0;
+                            var shieldcount = 0;
+                            var armoritems = [];
+                            if(b.simpleinventory === "complex") {
+                                _.each(idarray, function(currentID, i) {
+                                    if(b["repeating_inventory_" + currentID + "_equipped"] && b["repeating_inventory_" + currentID + "_equipped"] === "1" && b["repeating_inventory_" + currentID + "_itemmodifiers"] && b["repeating_inventory_" + currentID + "_itemmodifiers"].toLowerCase().indexOf("ac") > -1) {
+                                        var mods = b["repeating_inventory_" + currentID + "_itemmodifiers"].split(",");
+                                        var ac = 0;
+                                        var type = "mod";
+                                        _.each(mods, function(mod) {
+                                            if(mod.substring(0,10) === "Item Type:") {
+                                                type = mod.substring(11, mod.length).trim().toLowerCase();
+                                            }
+                                            if(mod.toLowerCase().indexOf("ac:") > -1 || mod.toLowerCase().indexOf("ac +") > -1 || mod.toLowerCase().indexOf("ac+") > -1) {
+                                                var regex = mod.replace(/[^0-9]/g, "");
+                                                var bonus = regex && regex.length > 0 && isNaN(parseInt(regex,10)) === false ? parseInt(regex,10) : 0;
+                                                ac = ac + bonus;
+                                            }
+                                            if(mod.toLowerCase().indexOf("ac -") > -1 || mod.toLowerCase().indexOf("ac-") > -1) {
+                                                var regex = mod.replace(/[^0-9]/g, "");
+                                                var bonus = regex && regex.length > 0 && isNaN(parseInt(regex,10)) === false ? parseInt(regex,10) : 0;
+                                                ac = ac - bonus;
+                                            }
+                                        });
+                                        armoritems.push({type: type, ac: ac});
+                                    }
+                                });
+                                armorcount = armoritems.filter(function(item){ return item["type"].indexOf("armor") > -1 }).length;
+                                shieldcount = armoritems.filter(function(item){ return item["type"].indexOf("shield") > -1 }).length;
+                                var base = dexmod;
+                                var armorac = 10;
+                                var shieldac = 0;
+                                var modac = 0;
 
-                            _.each(armoritems, function(item) {
-                                if(item["type"].indexOf("light armor") > -1) {
-                                    armorac = item["ac"];
-                                    base = dexmod;
-                                }
-                                else if(item["type"].indexOf("medium armor") > -1) {
-                                    armorac = item["ac"];
-                                    base = Math.min(dexmod, 2);
-                                }
-                                else if(item["type"].indexOf("heavy armor") > -1) {
-                                    armorac = item["ac"];
-                                    base = 0;
-                                }
-                                else if(item["type"].indexOf("shield") > -1) {
-                                    shieldac = item["ac"];
+                                _.each(armoritems, function(item) {
+                                    if(item["type"].indexOf("light armor") > -1) {
+                                        armorac = item["ac"];
+                                        base = dexmod;
+                                    }
+                                    else if(item["type"].indexOf("medium armor") > -1) {
+                                        armorac = item["ac"];
+                                        base = Math.min(dexmod, 2);
+                                    }
+                                    else if(item["type"].indexOf("heavy armor") > -1) {
+                                        armorac = item["ac"];
+                                        base = 0;
+                                    }
+                                    else if(item["type"].indexOf("shield") > -1) {
+                                        shieldac = item["ac"];
+                                    }
+                                    else {
+                                        modac = modac + item["ac"]
+                                    }
+                                });
+
+                                total = base + armorac + shieldac + modac;
+
+                            };
+                            update["armorwarningflag"] = "hide";
+                            update["customacwarningflag"] = "hide";
+                            update["armorwarning"] = "0";
+                            update["customacwarning"] = "0";
+                            if(armorcount > 1 || shieldcount > 1) {
+                                update["armorwarningflag"] = "show";
+                            }
+                            update["ac"] = total + globalacmod;
+                            if(custom_total > 0) {
+                                if(armorcount > 0) {
+                                    update["customacwarningflag"] = "show";
                                 }
                                 else {
-                                    modac = modac + item["ac"]
+                                    update["ac"] = custom_total + globalacmod;
                                 }
-                            })
-
-                            total = base + armorac + shieldac + modac;
-
-                        };
-                        if(armorcount > 1 || shieldcount > 1) {
-                            update["armorwarningflag"] = "show";
-                            update["armorwarning"] = "0";
-                        }
-                        else {
-                            update["armorwarningflag"] = "hide";
-                            update["armorwarning"] = "0";
-                        }
-                        console.log("total: " + total);
-                        update["ac"] = total + globalacmod;
-                        setAttrs(update, {silent: true});
+                            }
+                            console.log("total: " + total);
+                            setAttrs(update, {silent: true});
+                        });
                     });
                 });
             };
@@ -11152,6 +11218,8 @@
         clearset["spell_save_dc"] = "";
         clearset["armorwarningflag"] = "hide";
         clearset["armorwarning"] = "0";
+        clearset["customacwarningflag"] = "hide";
+        clearset["customacwarning"] = "0";
         clearset["passive_wisdom"] = "";
         _.each(allSkills, function(skill) {
             clearset[skill + "_prof"] = "";//0
