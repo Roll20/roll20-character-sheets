@@ -1,6 +1,14 @@
-Character sheet for Changeling, 20th Anniversary Edition, by White Wolf Publishing.
+#Changeling, 20th Anniversary Edition Roll20 Character Sheet
 
 Any help improving the sheet are welcome.
+
+# To-Do list
+
+- some text bits are missing translations tags 
+
+- border graphics and more thematic fonts
+
+# Version History
 
 ## Version 0.5(2018-08-28)
 
