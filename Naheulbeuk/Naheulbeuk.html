@@ -953,7 +953,7 @@
 		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_equipement" value="equipement" title="Equipement" /><span class="sheet-tab">Equipement</span>
 		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_magie" value="magie" title="Compétences" /><span class="sheet-tab">Magie</span>
 		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_inventaire" value="inventaire" title="Inventaire" /><span class="sheet-tab">Inventaire</span>
-		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_craft" value="craft" title="Fabrication" /><span class="sheet-tab">Craft</span>
+		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_craft" value="craft" title="Fabrication" /><span class="sheet-tab">Artisanat</span>
 		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_compagnons" value="compagnons" title="Compagnons" /><span class="sheet-tab">Compagnons</span>
 		<br />
 		<br />
@@ -2280,12 +2280,6 @@
 
 		<!-- TAB Craft -->
 		<div class="sheet-tab_craft">
-			<span class="sheet-hint"><b>Règles de confection :</b><br>
-			Si Spécialiste, dispose d'un bonus ou d'un malus au jet en fonction de l'Ingéniosité (moy. Int et AD) et de la Difficulté. <br>
-			Si non spécialiste, le bonus difficulté ne compte pas, le jet est systématiquement Malussé !<br>
-			Le jet peut bénéficier d'un bonus assistant, malus météo, bonus atelier...</span>
-			<br clear="all">
-			<br>
 			<input class="sheet-display sheet-display-reparation" name="attr_displayReparation" value="1" checked="checked" type="checkbox">
 			<h2 class="sheet-display">Réparations</h2>
 			<div class="sheet-display-reparation">
@@ -2295,14 +2289,14 @@
 							<th style="border-right:1px dotted white;" nowrap="">Qualité ?</th>
 							<th style="border-right:1px dotted white;">Spécialiste ?</th>
 							<th style="border-right:1px dotted white;">Difficulté</th>
-							<th style="border-right:1px dotted white;">Bonus / Malus</th>
+							<th style="border-right:1px dotted white;">Mod.</th>
 							<th>Épreuve</th>
 						</tr>
 					</thead>
 					<tr>
 						<td style="text-align:center;">
 							<select name="attr_Reparation_Qualite">
-								<option value="0" selected=""></option>
+								<option value="0" selected="selected"></option>
 								<option value="1">Matériel perrave</option>
 								<option value="2">Matériel de base</option>
 								<option value="3">Matériel de correct</option>
@@ -2312,38 +2306,42 @@
 							</select>
 						</td>
 						<td style="text-align:center;">
-							<input type="checkbox" name="attr_Repration_Specialiste">
+							<input type="checkbox" name="attr_Reparation_Specialiste">
 						</td>
 						<td style="text-align:center;">
-							<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Jet" value="0" readonly="readonly">
+							<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Reparation_Difficulte" value="0" readonly="readonly">
 						</td>
 						<td style="text-align:center;">
-							<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Jet" value="0" readonly="readonly">
+							<input type="number" class="sheet-shortInput" name="attr_Reparation_Mod" value="0">
 						</td>
 						<td style="text-align:center;">
-							<button type="roll" value="@{displayJet}"> Réparation </button>
+							<input type="hidden" name="attr_Reparation_Bonus" value="0">
+							<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de réparer un objet }} {{ Ingéniosité=@{stats_inge_total} + [[ @{reparation_bonus} + @{reparation_mod} ]] }} {{ Résultat = [[1d20]] }}"> Réparation </button>
 						</td>
 					</tr>
 				</table>
 			</div>
 			<br clear="all">
-			<br>
 			<input class="sheet-display sheet-display-confection" name="attr_displayConfection" value="1" checked="checked" type="checkbox">
 			<h2 class="sheet-display">Confection rapide</h2>
-			<div class="sheet-display-reparation">
+			<div class="sheet-display-confection">
 				<table width="100%">
 					<thead>
 						<tr>
 							<th style="border-right:1px dotted white;">Difficulté</th>
+							<th style="border-right:1px dotted white;">Mod.</th>
 							<th>Épreuve</th>
 						</tr>
 					</thead>
 					<tr>
 						<td style="text-align:center;">
-							<input type="text" class="sheet-shortInput" name="attr_Stats_Jet" value="0" readonly="readonly">
+							<input type="number" class="sheet-shortInput" name="attr_Confection_Difficulte" value="0">
 						</td>
 						<td style="text-align:center;">
-							<button type="roll" value="@{displayJet}"> Confection </button>
+							<input type="number" class="sheet-shortInput" name="attr_Confection_Mod" value="0">
+						</td>
+						<td style="text-align:center;">
+							<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de confectionner un objet }} {{ Ingéniosité=@{stats_inge_total} + [[ @{confection_difficulte} - @{stats_inge_total} + @{confection_mod} ]] }} {{ Résultat = [[1d20]] }}"> Confection </button>
 						</td>
 					</tr>
 				</table>
@@ -2386,8 +2384,8 @@
 										</tr>
 									</thead>
 									<tr>
-										<td style="text-align:center;"><input type="checkbox" name="attr_Recette_Specialiste" value="" /></td>
-										<td style="text-align:center"><input type="text" class="sheet-noBorder" name="attr_Recette_Niveau" value="" /></td>
+										<td style="text-align:center;"><input type="checkbox" name="attr_Recette_Specialiste" value="1" /></td>
+										<td style="text-align:center"><input type="number" name="attr_Recette_Niveau" value="" /></td>
 									</tr>
 									<thead>
 										<tr>
@@ -2407,17 +2405,17 @@
 									</thead>
 									<tr>
 										<td style="text-align:center;"><textarea name="attr_Recette_Materiaux"></textarea></td>
-										<td style="text-align:center"><textarea name="attr_Recette_MateriauxS"></textarea></td>
+										<td style="text-align:center"><textarea name="attr_Recette_MateriauxSpe"></textarea></td>
 									</tr>
 									<thead>
 										<tr>
 											<th style="border-right:1px dotted white;">Assistant</th>
-											<th>Non-spécialiste</th>
+											<th></th>
 										</tr>
 									</thead>
 									<tr>
 										<td style="text-align:center;"><textarea name="attr_Recette_Assistant"></textarea></td>
-										<td style="text-align:center"><textarea name="attr_Recette_nonSpecialiste"></textarea></td>
+										<td style="text-align:center"></td>
 									</tr>
 								</table>
 							</div>
@@ -2428,22 +2426,23 @@
 										<tr>
 											<th style="width:25%; border-right:1px dotted white;">Difficulté</th>
 											<th style="width:25%; border-right:1px dotted white;">Malus non-spécialiste</th>
-											<th style="width:25%; border-right:1px dotted white;">Mod. Assistant</th>
+											<th style="width:25%; border-right:1px dotted white;">Mod.</th>
 											<th style="width:25%"></th>
 										</tr>
 									</thead>
 									<tr>
 										<td style="text-align:center;">
-											<input type="text" class="sheet-shortInput" name="attr_Recette_EpreuveLanceur_mod" value="0" />
+											<input type="number" class="sheet-shortInput" name="attr_Recette_Difficulte" value="0" />
 										</td>
 										<td style="text-align:center;">
-											<input type="text" class="sheet-shortInput" name="attr_Recette_EpreuveLanceur_mod" value="0" />
+											<input type="number" class="sheet-shortInput" name="attr_Recette_MalusSpecialiste" value="0" />
 										</td>
 										<td style="text-align:center;">
-											<input type="text" class="sheet-shortInput" name="attr_Recette_EpreuveLanceur_mod" value="0" />
+											<input type="number" class="sheet-shortInput" name="attr_Recette_Mod" value="0" />
 										</td>
 										<td style="text-align:center; ">
-											<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} se concentre pour lancer @{Recette_Nom} }} {{ Épreuve=@{Recette_EpreuveLanceur_Jet} + [[@{Recette_EpreuveLanceur_mod}]] }} {{ Résultat = [[1d20]] }}"> Confection </button>
+											<input type="hidden" name="attr_Recette_Bonus" value="0" />
+											<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de créer un(e) @{Recette_Nom} }} {{ Ingéniosité=@{stats_inge_total} + [[ @{recette_bonus} + @{recette_epreuveMod} ]] }} {{ Résultat = [[1d20]] }}"> Confection </button>
 										</td>
 									</tr>
 								</table>
@@ -2478,6 +2477,10 @@
 					<br clear="all" />
 				</fieldset>
 			</div>
+			<span class="sheet-hint"><b>Règles de réparation / Confection :</b><br>
+			Si le personnage est Spécialiste (ex: Un forgeron qui répare une épée ou un ébéniste qui travail un arc), il peut disposer d'un bonus ou d'un malus au jet en fonction de son Ingéniosité (moy. Int et AD) et de la Difficulté (en fonction de la qualité de l'objet) suivant cette formule : Ingéniosité - Difficulté = Bonus (ou Malus) au jet. <br>
+			Si le personnage n'est pas spécialiste, il ne peut avoir de bonus, le jet est systématiquement malussé celons la difficulté !<br>
+			Le personnage peut bénéficier d'un bonus grâce à un assistant, des outils de qualité ou un atelier mais aussi d'un malus à cause d'un handicap, de la météo...</span>
 		</div>
 
 		<!-- TAB Compagnons -->
