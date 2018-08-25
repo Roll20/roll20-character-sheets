@@ -4,12 +4,12 @@
 
 While this sheet is designed to be as intuitive as possible and to aid in stream lining your game there are several key features which are worth being aware of.
 
-1. Custom fonts. While the sheet as default fonts it is also programmed to use custom fonts. If you want access to them , when in your game click the shield icon in the right of your address bar and select to allow the script.
-2. Inline vs API rolling. If your ST is a Roll20 Pro-account holder they should have access to the API script, in this case we highly recommend you ensure the check box at the top of each character sheet (just below the tabs) is checked. This will unlock a number of different features including banners, re-rolls, custom dice displayed that will make you gaming experience a lot more streamlined. Unfortunately this functionality can not be ported to Inline rolling due to programmatic restraints.
+1. Custom fonts. While the sheet as default fonts it is also programmed to use custom fonts. If you want access to them, when in your game click the shield icon in the right of your address bar and select to allow the script.
+2. Inline vs API rolling. If your ST is a Roll20 Pro-account holder they should have access to the API script, in this case we highly recommend you ensure the check box at the top of each character sheet (just below the tabs) is checked. This will unlock a number of different features including banners, re-rolls, custom dice displayed that will make you gaming experience a lot more streamlined. Unfortunately this functionality cannot be ported to Inline rolling due to programmatic restraints.
 
 Notes on Inline rolls.
 1. Many of the buttons on the sheet will do much of the rolling for you, either calculating how many dice you need or aiding you with selection. In cases where Hunger dice are used (Attribute, Ability, Discipline rolls). If you dice pool is 3, but your hunger is 4, then 4 hunger dice will be rolled and the number of successes may be misleading. By hovering your mouse over the number of successes you can determine what dice rolls were made and you can take the first 3. This is not an issue for the API rolls.
-2. To find out exactly what dice have been rolled, hover the mouse over the number of successes. In rolls where the Hunger dice are used  (Attribute, Ability, Discipline rolls) if you fail, check to see if you rolled a 1 on the Hunger dice. If this is the case then consult the rules to determine how to proceed (Page 207, 208). Further, in this case the number of vampire dice will be negative, please ignore this.
+2. To find out exactly what dice have been rolled, hover the mouse over the number of successes. In rolls where the Hunger dice are used (Attribute, Ability, Discipline rolls) if you fail, check to see if you rolled a 1 on the Hunger dice. If this is the case then consult the rules to determine how to proceed (Page 207, 208). Further, in this case the number of vampire dice will be negative, please ignore this.
 3. If the number on number of successes is green, you may have rolled a critical success. Hover the mouse over and count how many 10's a rolled to determine if you rolled a critical (Page 120) or a messy critical success (Page 206, 207). Please note, the extra 2 successes for a Crit are not automatically added.
 
 
@@ -32,7 +32,7 @@ Extra notes:
 
 There are two sections in the Custom Rolls section currently. The top section is for people with access to the API, the bottom is for those with Inline rolling.  This is a great section to store all your individual discipline rolls or any rolls you make often.
 There are a couple points to note about this section.  
-1. Disciplines can't be refered to in the drop down, so please use the section below where you can enter a value. (This is a coding restraint, I've yet to overcome).
+1. Disciplines can't be referred to in the drop down, so please use the section below where you can enter a value. (This is a coding restraint, I've yet to overcome).
 2. Clicking the Hunger checkbox will apply Hunger to your roll
 3. Clicking the Blood Potency checkbox will apply Blood Potency according to discipline rules (Page 216)
 
@@ -46,7 +46,7 @@ The final button is where you can store all your Coterie information. I highly r
 Author: Momtahan K. | UserID: 117780  
 Design: Martinez A. | UserID: 143652  
 Design Contributor: Obi | UserID: 95940  
-Kudos to: Andreas J. (UserID: 1223200), Matt Zaldivar, Brian Shields, Benjamin Bandelow, for their stirling work which provided a basis for this sheet, and espcially to Konrad J. (UserID: 77736), who's Hero Quest Dice Roller has been invaluable. Special thanks to Beta testers Chros G.(326614) and Jordan L.(46186). Many thanks to BigWhoop (UserID: 2124413) for his work on the first version of Obi's sheet. Massive thanks to Barry Snyder for helping us with API-to-Non-API Toggling through explination and use of his code examples.
+Kudos to: Andreas J. (UserID: 1223200), Matt Zaldivar, Brian Shields, Benjamin Bandelow, for their stirling work which provided a basis for this sheet, and espcially to Konrad J. (UserID: 77736), who's Hero Quest Dice Roller has been invaluable. Special thanks to Beta testers Chros G.(326614) and Jordan L.(46186). Many thanks to BigWhoop (UserID: 2124413) for his work on the first version of Obi's sheet. Massive thanks to Barry Snyder (UserID: 399162) for helping us with API-to-Non-API Toggling through explication and use of his code examples.
 
 A very special thank to https://game-icons.net The below icons were used and are licensed under a Creative Commons Attribution 3.0 Unported License. Water fountain icon - by Delapouite under CC BY 3.0 Oppression icon - by Lorc under CC BY 3.0 Prayer icon - by Lorc under CC BY 3.0 Ent Mouth icon - by Lorc under CC BY 3.0 Spattericon - by Lorc under CC BY 3.0 Wolverine claws icon - by Lorc under CC BY 3.0 Half heart icon - by Lorc under CC BY 3.0 Embraced energy iconby Lorc under CC BY 3.0
 
@@ -63,7 +63,7 @@ In the event you only have access to these files and need to do so manually.
 7. You are now good to go ^_^!
 
 Notes: 
-The Banners folder contains many of the images made (in part) by Martinez A. with use of the stiring work available at https://game-icons.net  (See Kudos)
+The Banners folder contains many of the images made (in part) by Martinez A. with use of the sterling work available at https://game-icons.net  (See Kudos)
 
 Please note this is version 1.0, a set of updates are in progress.
 
