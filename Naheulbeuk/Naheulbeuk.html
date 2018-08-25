@@ -54,6 +54,9 @@
 		updateXP();
 	});
 	// Ammos
+	on("change:repeating_armes:arme_range", function( e ) {
+		updateWeaponRange( e );
+	});
 	on("change:repeating_armes:munition_nom", function( e ) {
 		updateAmmo( e );
 	});
@@ -309,17 +312,37 @@
 		});
 	}
 
+	function updateWeaponRange( eventInfo ) {
+		var range_selected = eventInfo[ "newValue" ];
+		var idWeapon = eventInfo[ "sourceAttribute" ].split( '_' )[2];
+		getAttrs( [ 'stats_attaque_total', 'stats_jet_total' ] , function( v ) {
+			var sWeapon = {
+				'repeating_weapon_' + idWeapon + '_arme_munition_display' : 0,
+				'repeating_weapon_' + idWeapon + '_arme_jet' : v[ 'stats_attaque_total' ]
+			}
+
+			if( range_selected === 'Dist.' ) {
+				sWeapon = {
+					'repeating_weapon_' + idWeapon + '_arme_munition_display' : 1,
+					'repeating_weapon_' + idWeapon + '_arme_jet' : v[ 'stats_jet_total' ]
+				}
+			}
+
+			setAttrs( sWeapon, { silent: true } );
+		}
+	}
+
 	function updateAmmo( eventInfo ) {
 		var ammo_selected = eventInfo[ "newValue" ];
 		var idWeapon = eventInfo[ "sourceAttribute" ].split( '_' )[2];
 		var idAmmo = 0;
-		var sAmmo = {
-			'repeating_munitions_' + idWeapon + 'munition_degats' : 0,
-			'repeating_munitions_' + idWeapon + '_munition_modAd' : 0,
-			'repeating_munitions_' + idWeapon + '_munition_nom' : ''
+		var sWeapon = {
+			'repeating_armes_' + idWeapon + 'munition_degats' : 0,
+			'repeating_armes_' + idWeapon + '_munition_modAd' : 0,
+			'repeating_armes_' + idWeapon + '_munition_nom' : ''
 		};
 
-		setAttrs( sAmmo, { silent: true } );
+		setAttrs( sWeapon, { silent: true } );
 
 		getSectionIDs( "repeating_munitions", function(idarray) {
 			getAttrs( [ ...idarray.map(id => `repeating_munitions_${id}_munition_nom`) ], function( sValues ) {
@@ -327,13 +350,13 @@
 					if( ammo_selected === sValues[`repeating_munitions_${idarray[i]}_munition_nom`] ) {
 						var idAmmo = idarray[i];
 						getAttrs( [ `repeating_munitions_${idAmmo}_munition_modAd`, `repeating_munitions_${idAmmo}_munition_degats` ], function( v ) {
-							sAmmo = {
-								'repeating_munitions_' + idWeapon + 'munition_degats' : v[ `repeating_munitions_${idAmmo}_munition_degats` ],
-								'repeating_munitions_' + idWeapon + '_munition_modAd' : v[ `repeating_munitions_${idAmmo}_munition_modAd` ],
-								'repeating_munitions_' + idWeapon + '_munition_nom' : ammo_selected
+							sWeapon = {
+								'repeating_armes_' + idWeapon + 'munition_degats' : v[ `repeating_munitions_${idAmmo}_munition_degats` ],
+								'repeating_armes_' + idWeapon + '_munition_modAd' : v[ `repeating_munitions_${idAmmo}_munition_modAd` ],
+								'repeating_armes_' + idWeapon + '_munition_nom' : ammo_selected
 							};
 
-							setAttrs( sAmmo, { silent: true } );
+							setAttrs( sWeapon, { silent: true } );
 						});
 					}
 				}
@@ -1440,10 +1463,11 @@
 							<input type="text" class="sheet-noBorder" name="attr_Arme_Nom" value="" />
 						</div>
 						<div class="sheet-col" style="width: 70px;">
-							<select name="attr_Arme_Jet">
-								<option value="@{Stats_Attaque_total}" selected="selected">Mélée</option>
-								<option value="[[@{Stats_Jet_total} - @{munition_modAd}]]">Dist.</option>
+							<select name="attr_arme_range">
+								<option value="Mélée" selected="selected">Mélée</option>
+								<option value="Dist.">Dist.</option>
 							</select>
+							<input type="hidden" name="attr_Arme_Jet" value="@{Stats_Attaque_total}">
 						</div>
 						<div class="sheet-col" style="width: 70px;">
 							<input type="number" name="attr_Arme_AT" value="0" />
@@ -1458,12 +1482,12 @@
 							<input type="text" class="sheet-shortInput" name="attr_Arme_RUP" value="" />
 						</div>
 						<div class="sheet-col" style="width: 170px;">
-							<button type="roll" value="@{displayJet} &{template:default} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{ AT=@{Arme_Jet} + @{Arme_At} }} {{ Résultat=[[1d20]] }}"> AT </button>
+							<button type="roll" value="@{displayJet} &{template:default} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{ AT=@{Arme_Jet} + [[ @{Arme_At} + @{munition_modAd} ]] }} {{ Résultat=[[1d20]] }}"> AT </button>
 							<button type="roll" value="@{displayJet} &{template:default} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{ PRD=@{Stats_Parade_total} + @{Arme_PRD} }} {{ Résultat=[[1d20]] }}"> PRD </button>
 							<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{ Dégats=[[@{Arme_Degats} + @{munition_degats} + @{BonusDegatsForce}]] }}"> Dégats </button>
 						</div>
 						<br clear="all" />
-						<input type="checkbox" class="sheet-hidden sheet-display-arme_munition" name="attr_Arme_Munition_display" value="1">
+						<input type="checkbox" class="sheet-hidden sheet-display-arme_munition" name="attr_Arme_Munition_display" value=1>
 						<div class="sheet-display-arme_munition">
 							<div class="sheet-col" style="width: 100px; padding-top: 5px;">
 								<b>Munition</b>
