@@ -95,6 +95,19 @@
 	on("change:tab_ecolemagie change:tab_niveaumagie", function() {
 		displayMagicSpells();
 	});
+	// Crating
+	on("change:reparation_qualite change:reparation_specialiste", function( e ) {
+		var idRow = e[ 'sourceAttribute' ].split('-')[1];
+		updateRepair( idRow );
+	});
+	on("change:repeating_recettes:recette_specialiste change:repeating_recettes:recette_difficulte change:repeating_recettes:recette_malusspecialiste", function() {
+		updateRecipe();
+	});
+	on("change:stats_inge_total", function() {
+		updateRepair();
+		updateRecipes();
+	});
+
 	// export
 	on("change:export_start", function() {
 		start_export();
@@ -429,6 +442,95 @@
 				}
 				setAttrs( sDisplay, { silent: true } );
 			});
+		});
+	}
+
+	function updateRepair() {
+		getAttrs( [ "reparation_qualite", "reparation_specialiste", "stats_inge_total" ], function( sValues ) {
+			var v = structSafeInt( sValues );
+			var reparation_difficulte = 0;
+			var reparation_malusSpecialiste = 0;
+			var requiredLevel = 1;
+
+			if( v[ "reparation_qualite" ] === 1 ) { // Matos perrave
+				reparation_difficulte = 6;
+				reparation_malusSpecialiste = -2;
+				requiredLevel = 1;
+			} else if( v[ "reparation_qualite" ] === 2 ) { // Matos de base
+				reparation_difficulte = 8;
+				reparation_malusSpecialiste = -2;
+				requiredLevel = 1;
+			} else if( v[ "reparation_qualite" ] === 3 ) { // Matos correct
+				reparation_difficulte = 10;
+				reparation_malusSpecialiste = -4;
+				requiredLevel = 2;
+			} else if( v[ "reparation_qualite" ] === 4 ) { // Matos de qualité
+				reparation_difficulte = 12;
+				reparation_malusSpecialiste = -6;
+				requiredLevel = 3;
+			} else if( v[ "reparation_qualite" ] === 5 ) { // Matos de luxe
+				reparation_difficulte = 14;
+				reparation_malusSpecialiste = -20;
+				requiredLevel = 5;
+			} else if( v[ "reparation_qualite" ] === 6 ) { // Matos d'artisan
+				reparation_difficulte = 16;
+				reparation_malusSpecialiste = -20;
+				requiredLevel = 5;
+			}
+
+			var reparation_bonus = v[ "stats_inge_total" ] - v[ "reparation_difficulte" ];
+
+			// bonus only for specialists
+			if( !v[ "reparation_specialiste" ] ) {
+				if( reparation_bonus > 0 ) {
+					reparation_bonus = 0;
+				}
+
+				reparation_bonus += reparation_malusSpecialiste;
+			}
+
+			// Check required level
+			if( requiredLevel > personnage_niveau ) {
+				reparation_bonus = -20;
+			}
+
+			// Impossible task
+			if( reparation_bonus <= -20 ) {
+				reparation_difficulte = "Impossible";
+			}
+
+			setAttrs({
+				"reparation_difficulte": reparation_difficulte,
+				"reparation_bonus": reparation_bonus
+			});
+		});
+	}
+
+	function updateRecipe( idRow ) {
+		getAttrs( [ 'stats_inge_total',
+					`repeating_recettes_${idRow}_recette_specialiste`, `repeating_recettes_${idRow}_recette_difficulte`, `repeating_recettes_${idRow}_recette_malusspecialiste`
+				  ], function ( sValues ) {
+			var v = structSafeInt( sValues );
+
+			var recette_bonus = v[ "stats_inge_total" ] - v[ `repeating_recettes_${idRow}_recette_difficulte` ];
+
+			if( !v[ `repeating_recettes_${idRow}_recette_specialiste` ] ) {
+				if( recette_bonus > 0 ) {
+					recette_bonus = 0;
+				}
+
+				recette_bonus += `repeating_recettes_${idRow}_recette_malusspecialiste`;
+			}
+
+			setAttrs( { 'repeating_recettes_' + idRow + 'recette_bonus' : recette_bonus } );
+		});
+	}
+
+	function updateRecipes() {
+		getSectionIDs( "repeating_recettes", function(idArray) {
+			for( var i in idArray ) {
+				updateRecipe( idArray[ i ] );
+			}
 		});
 	}
 
