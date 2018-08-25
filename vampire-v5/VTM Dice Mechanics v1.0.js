@@ -325,10 +325,10 @@ function processVampireDiceScript(run, dc) {
 	if (run.rouseStatRoll) {
 		if (diceTotals.successScore > 0) {
 			outputMessage += "{{Beast=" + '<img src="https://imgur.com/Ixo45II.png" title="Rousing Success" height="20" width="228"/>' + endTemplateSection;
-			
+
 		} else {
 			outputMessage += "{{Beast=" + '<img src="https://imgur.com/CNIoBl7.png" title="Hunger Gain" height="20" width="228"/>' + endTemplateSection;
-			
+
 		}
 	} else if (run.frenzyRoll) {
 		outputMessage += "{{Successes=" + diceTotals.successScore + endTemplateSection;
@@ -340,16 +340,20 @@ function processVampireDiceScript(run, dc) {
 		} else {
 			outputMessage += "{{Beast=" + '<img src="https://imgur.com/T99pn59.png" title="Frenzy" height="20" width="228"/>' + endTemplateSection;
 		}
-	} else if(run.humanityRoll) {
+	} else if (run.humanityRoll) {
 		outputMessage += "{{Successes=" + diceTotals.successScore + endTemplateSection;
 		if (diceTotals.successScore > 0) {
 			outputMessage += "{{Beast=" + '<img src="https://imgur.com/heUJvKA.png" title="Guilty" height="20" width="228"/>' + endTemplateSection;
-			
 		} else {
 			outputMessage += "{{Beast=" + '<img src="https://imgur.com/VezR8Zw.png" title="Innocent" height="20" width="228"/>' + endTemplateSection;
-			
+
 		}
 
+		if (vtmGlobal.luckydice) {
+			let lastResort = '<img src="https://imgur.com/B2nn1cs.png" title="Miss" height="20" width="228"/>';
+			outputMessage += "{{Fate=" + lastResort + endTemplateSection;
+			vtmGlobal.luckydice = false;
+		}
 	} else {
 		outputMessage = addRollDeclarations(diceTotals, outputMessage, endTemplateSection, thebeast);
 	}
@@ -368,7 +372,7 @@ function addRollDeclarations(diceTotals, outputMessage, endTemplateSection, theb
 	let critBonus = Math.floor((diceTotals.critScore + diceTotals.muddyCritScore) / 2.0) * 2.0;
 	outputMessage += "{{Successes=" + (diceTotals.successScore + critBonus) + endTemplateSection;
 
-	
+
 	if (diceTotals.successScore == 0 && vtmGlobal.luckydice) {
 		let lastResort = '<img src="https://imgur.com/B2nn1cs.png" title="Miss" height="20" width="228"/>';
 		outputMessage += "{{Fate=" + lastResort + endTemplateSection;
@@ -395,16 +399,16 @@ function addRollDeclarations(diceTotals, outputMessage, endTemplateSection, theb
 
 	if (diceTotals.failScore >= 5) {
 		outputMessage += "{{Beast=" + thebeast + endTemplateSection;
-	//	outputMessage += "{{BeastTaunt=" + "I do say dear boy, I may be a mite bit peckish." + endTemplateSection;
+		//	outputMessage += "{{BeastTaunt=" + "I do say dear boy, I may be a mite bit peckish." + endTemplateSection;
 	} else if (diceTotals.failScore >= 3) {
 		outputMessage += "{{Beast=" + thebeast + endTemplateSection;
-	//	outputMessage += "{{BeastTaunt=" + "BLOOD BLOOD GIVE ME BLOOD!! I MUST FEED!" + endTemplateSection;
+		//	outputMessage += "{{BeastTaunt=" + "BLOOD BLOOD GIVE ME BLOOD!! I MUST FEED!" + endTemplateSection;
 	} else if (diceTotals.failScore >= 2) {
 		outputMessage += "{{Beast=" + thebeast + endTemplateSection;
-	//	outputMessage += "{{BeastTaunt=" + "Let the vitae flow!" + endTemplateSection;
+		//	outputMessage += "{{BeastTaunt=" + "Let the vitae flow!" + endTemplateSection;
 	} else if (diceTotals.failScore >= 1) {
 		outputMessage += "{{Beast=" + thebeast + endTemplateSection;
-	//	outputMessage += "{{BeastTaunt=" + "Feed Me! (Hunger causes you to be distracted)" + endTemplateSection;
+		//	outputMessage += "{{BeastTaunt=" + "Feed Me! (Hunger causes you to be distracted)" + endTemplateSection;
 	}
 
 	return outputMessage;
@@ -599,8 +603,14 @@ function handleSimpleRoll(input) {
 }
 
 function handleHumanityRoll(input) {
+	let dice = input.willpower;
+	if (dice <= 0) {
+		vtmGlobal.luckydice = true;
+		dice = 1;
+	}
+
 	var run = {
-		blackDice: input.willpower,
+		blackDice: dice,
 		redDice: 0,
 		user: input.user,
 		rollname: input.rollname,
@@ -696,7 +706,7 @@ function calculateVariables(argv, who) {
 			let totalHumanity = updateMultiboxValue(totalValue);
 			let missingHumanity = totalValue - totalHumanity;
 			missingHumanity = updateMultiboxValue1(missingHumanity);
-			input.willpower = missingHumanity/16.0;
+			input.willpower = missingHumanity / 16.0;
 		}
 	}
 
@@ -784,7 +794,7 @@ on("chat:message", function (msg) {
 
 	log("New roll");
 	log(msg);
-	
+
 
 	if (_.has(msg, 'inlinerolls')) {
 		msg = performInlineRolls(msg);
@@ -795,7 +805,7 @@ on("chat:message", function (msg) {
 
 	var chatCommand = msg.content;
 	vtmGlobal.reroll = chatCommand.replace(/\"/g, '&quot;');
-	
+
 	var argv = [].concat.apply([], chatCommand.split('"').map(function (v, i) {
 		return i % 2 ? v : v.split(' ')
 	})).filter(Boolean);
