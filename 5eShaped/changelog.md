@@ -11,6 +11,20 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 19.1.1
+
+### Bug fixes
+- [#754: Incorrect assumption that all innate spellcasting groups will end with "each"](https://bitbucket.org/mlenser/5eshaped/issues/757/incorrect-assumption-that-all-innate)
+
+
+## 19.1.0
+
+### Features
+- The sheet now supports some newer script edge-case features such as Anubian’s stealth being higher in sand.
+
+### Bug fixes
+- [#752: NPC Average HP's not calculating properly](https://bitbucket.org/mlenser/5eshaped/issues/752/npc-average-hps-not-calculating-properly)
+
 ## 19.0.0
 
 ### Breaking Changes
