@@ -53,6 +53,10 @@
 	on("change:personnage_niveau", function() {
 		updateXP();
 	});
+	// Ammos
+	on("change:repeating_armes:munition_nom", function( e ) {
+		updateAmmo( e );
+	});
 	// Total golds
 	on("change:richesse_or change:richesse_argent change:richesse_cuivre", function() {
 		updatePO();
@@ -301,6 +305,38 @@
 
 			setAttrs({
 				"personnage_xp_max": safeInt( levelAndXP[ level ], { silent : true} )
+			});
+		});
+	}
+
+	function updateAmmo( eventInfo ) {
+		var ammo_selected = eventInfo[ "newValue" ];
+		var idWeapon = eventInfo[ "sourceAttribute" ].split( '_' )[2];
+		var idAmmo = 0;
+		var sAmmo = {
+			'repeating_munitions_' + idWeapon + 'munition_degats' : 0,
+			'repeating_munitions_' + idWeapon + '_munition_modAd' : 0,
+			'repeating_munitions_' + idWeapon + '_munition_nom' : ''
+		};
+
+		setAttrs( sAmmo, { silent: true } );
+
+		getSectionIDs( "repeating_munitions", function(idarray) {
+			getAttrs( [ ...idarray.map(id => `repeating_munitions_${id}_munition_nom`) ], function( sValues ) {
+				for( var i in idarray ) {
+					if( ammo_selected === sValues[`repeating_munitions_${idarray[i]}_munition_nom`] ) {
+						var idAmmo = idarray[i];
+						getAttrs( [ `repeating_munitions_${idAmmo}_munition_modAd`, `repeating_munitions_${idAmmo}_munition_degats` ], function( v ) {
+							sAmmo = {
+								'repeating_munitions_' + idWeapon + 'munition_degats' : v[ `repeating_munitions_${idAmmo}_munition_degats` ],
+								'repeating_munitions_' + idWeapon + '_munition_modAd' : v[ `repeating_munitions_${idAmmo}_munition_modAd` ],
+								'repeating_munitions_' + idWeapon + '_munition_nom' : ammo_selected
+							};
+
+							setAttrs( sAmmo, { silent: true } );
+						});
+					}
+				}
 			});
 		});
 	}
@@ -1406,7 +1442,7 @@
 						<div class="sheet-col" style="width: 70px;">
 							<select name="attr_Arme_Jet">
 								<option value="@{Stats_Attaque_total}" selected="selected">Mélée</option>
-								<option value="@{Stats_Jet_total}">Dist.</option>
+								<option value="[[@{Stats_Jet_total} - @{munition_modAd}]]">Dist.</option>
 							</select>
 						</div>
 						<div class="sheet-col" style="width: 70px;">
@@ -1424,19 +1460,37 @@
 						<div class="sheet-col" style="width: 170px;">
 							<button type="roll" value="@{displayJet} &{template:default} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{ AT=@{Arme_Jet} + @{Arme_At} }} {{ Résultat=[[1d20]] }}"> AT </button>
 							<button type="roll" value="@{displayJet} &{template:default} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{ PRD=@{Stats_Parade_total} + @{Arme_PRD} }} {{ Résultat=[[1d20]] }}"> PRD </button>
-							<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{ Dégats=[[@{Arme_Degats} + @{BonusDegatsForce}]] }}"> Dégats </button>
+							<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{ Dégats=[[@{Arme_Degats} + @{munition_degats} + @{BonusDegatsForce}]] }}"> Dégats </button>
 						</div>
 						<br clear="all" />
+						<input type="checkbox" class="sheet-hidden sheet-display-arme_munition" name="attr_Arme_Munition_display" value="1">
+						<div class="sheet-display-arme_munition">
+							<div class="sheet-col" style="width: 100px; padding-top: 5px;">
+								<b>Munition</b>
+							</div>
+							<div class="sheet-col" style="width: 230px;">
+								<input type="text" class="sheet-noBorder" name="attr_munition_nom" value="" />
+							</div>
+							<div class="sheet-col" style="width: 70px;">
+								<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_munition_modAd" value="0" readonly="readonly" />
+							</div>
+							<div class="sheet-col" style="width: 70px;">
+							</div>
+							<div class="sheet-col" style="width: 70px;">
+								<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_munition_degats" value="0" readonly="readonly" />
+							</div>
+							<br clear="all">
+						</div>
 						<div class="sheet-col" style="width: 100px;padding-top: 5px;">
 							<b>Bonus / Effets</b>
 						</div>
-						<div class="sheet-col" style="width: 250px;">
+						<div class="sheet-col" style="width: 230px;">
 							<input type="text" class="sheet-noBorder" name="attr_Arme_Effet" value="" />
 						</div>
-						<div class="sheet-col" style="width: 150px;padding-top: 5px; text-align:right">
+						<div class="sheet-col" style="width: 145px;padding-top: 5px; text-align:right">
 							<b>Notes et détails</b>
 						</div>
-						<div class="sheet-col" style="width: 250px;">
+						<div class="sheet-col" style="width: 290px;">
 							<input type="text" class="sheet-noBorder" name="attr_Arme_Note" value="" />
 						</div>
 					</div>
