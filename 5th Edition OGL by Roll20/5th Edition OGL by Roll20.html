@@ -1380,16 +1380,17 @@
             </div>
             <input type="hidden" class="toggleflag" name="attr_global_ac_mod_flag">
             <div class="hp hidden">
-                <div class="textarea globalattack">
+                <div class="textarea globalattack acmod">
                     <fieldset class="repeating_acmod">
                         <div class="global-mod">
                             <input type="checkbox" name="attr_options-flag" class="options-flag" checked="checked" style="top: -15px;"><span>y</span>
                             <input type="checkbox" name="attr_global_ac_active_flag" value="1" class="active-flag">
                             <div class="options">
-                                <textarea type="textarea" name="attr_global_ac_val" placeholder="1[DEFENSE]"></textarea>
+                                <label>Value: <input type="number" name="attr_global_ac_val" placeholder="1"></label>
+                                <label>Name: <input type="text" name="attr_global_ac_name" placeholder="Defense"></label>
                             </div>
                             <div class="display">
-                                <span class="title" name="attr_global_ac_val"></span>
+                                <span class="title"><span name="attr_global_ac_val"></span> [<span name="attr_global_ac_name"></span>]</span>
                             </div>
                         </div>
                     </fieldset>
@@ -1664,7 +1665,7 @@
                     <input type="hidden" class="warningflag" name="attr_armorwarningflag">
                     <div class="warning">
                         <span>
-                            <input type="checkbox" name="attr_armorwarning" value="hide">
+                            <label><input type="checkbox" name="attr_armorwarningflag" value="hide">*</label>
                             <span data-i18n="warning-armor-sets-u">
                                 WARNING - MULTIPLE SETS OF ARMOR OR SHIELDS HAVE BEEN ADDED AND AC IS NOT CORRECTLY CALCULATED. UNEQUIP THE ARMOR PIECE FROM THE ITEM DETAILS.
                             </span>
@@ -1673,7 +1674,7 @@
                     <input type="hidden" class="warningflag" name="attr_customacwarningflag">
                     <div class="warning">
                         <span>
-                            <input type="checkbox" name="attr_customacwarning" value="hide">
+                            <label><input type="checkbox" name="attr_customacwarningflag" value="hide">*</label>
                             <span data-i18n="warning-customac-u">
                                 ATTENTION - YOUR CUSTOM AC CALCULATION IS NOT BEING USED AS YOU HAVE ARMOR EQUIPPED. IF YOU WANT TO USE YOUR CUSTOM AC, UNEQUIP THE ARMOR PIECE FROM THE ITEM DETAILS.
                             </span>
@@ -4309,12 +4310,8 @@
                     </select>
                 </div>
                 <div class="row">
-                     <input type="checkbox" name="attr_init_tiebreaker" value="@{dexterity}/100">
+                    <input type="checkbox" name="attr_init_tiebreaker" value="@{dexterity}/100">
                     <span data-i18n="add-dex-tiebreaker-u">ADD DEX TIEBREAKER TO INITIATIVE</span>
-                </div>
-                <div class="row">
-                    <span data-i18n="glob-ac-mod:-u">GLOBAL ARMOR CLASS MODIFIER:</span>
-                    <input type="text" class="num" name="attr_globalacmod" placeholder="0" value="0">
                 </div>
                 <div class="row">
                     <span data-i18n="armor-class-tracking:-u">ARMOR CLASS TRACKING:</span>
@@ -4347,7 +4344,10 @@
                         <option value="Intelligence" data-i18n="int-u">INT</option>
                         <option value="Wisdom" data-i18n="wis-u">WIS</option>
                         <option value="Charisma" data-i18n="cha-u">CHA</option>
-                    </select>
+                    </select><br>
+                    <input type="checkbox" name="attr_custom_ac_shield" value="yes" checked>
+                    <span data-i18n="allow-shields-u">ALLOW SHIELDS?</span>
+                    <hr style="margin: 2px">
                 </div>
                 <div class="row">
                     <span data-i18n="hpmods:-u">HP MODIFIERS:</span>
@@ -6336,7 +6336,7 @@
         });
     });
 
-    on("change:globalacmod change:custom_ac_flag change:custom_ac_base change:custom_ac_part1 change:custom_ac_part2", function(eventinfo) {
+    on("change:custom_ac_flag change:custom_ac_base change:custom_ac_part1 change:custom_ac_part2 change:custom_ac_shield", function(eventinfo) {
         if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
             return;
         }
@@ -6609,7 +6609,8 @@
                 if(!ids || ids.length === 0) {
                     var update = {};
                     var rowid = generateRowID();
-                    update[`repeating_acmod_${rowid}_global_ac_val`] = "1[DEFENSE]";
+                    update[`repeating_acmod_${rowid}_global_ac_val`] = "1";
+                    update[`repeating_acmod_${rowid}_global_ac_name`] = "Defense";
                     update[`repeating_acmod_${rowid}_global_ac_active_flag`] = "1";
                     setAttrs(update);
                 }
@@ -6624,6 +6625,10 @@
                 setAttrs(update);
             });
         }
+    });
+
+    on("change:repeating_acmod remove:repeating_acmod", function(eventinfo) {
+        update_ac();
     });
 
     on("change:confirm", function(eventinfo) {
@@ -9225,7 +9230,7 @@
             }
             else {
                 var update = {};
-                var ac_attrs = ["simpleinventory","custom_ac_base","custom_ac_part1","custom_ac_part2","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod","globalacmod"];
+                var ac_attrs = ["simpleinventory","custom_ac_base","custom_ac_part1","custom_ac_part2","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod", "custom_ac_shield"];
                 getSectionIDs("repeating_acmod", function(acidarray) {
                     _.each(acidarray, function(currentID, i) {
                         ac_attrs.push("repeating_acmod_" + currentID + "_global_ac_val");
@@ -9242,11 +9247,16 @@
                                 var base = isNaN(parseInt(b.custom_ac_base, 10)) === false ? parseInt(b.custom_ac_base, 10) : 10;
                                 var part1attr = b.custom_ac_part1.toLowerCase();
                                 var part2attr = b.custom_ac_part2.toLowerCase();
-                                var part1 = part1attr === "none" ? 0 : b[part1attr + "_mod"];
-                                var part2 = part2attr === "none" ? 0 : b[part2attr + "_mod"];
+                                var part1 = part1attr === "none" ? 0 : parseInt(b[part1attr + "_mod"], 10);
+                                var part2 = part2attr === "none" ? 0 : parseInt(b[part2attr + "_mod"], 10);
                                 custom_total = base + part1 + part2;
                             }
-                            var globalacmod = isNaN(parseInt(b.globalacmod, 10)) === false ? parseInt(b.globalacmod, 10) : 0;
+                            var globalacmod = 0;
+                            _.each(acidarray, function(currentID, i) {
+                                if(b["repeating_acmod_" + currentID + "_global_ac_active_flag"] == "1") {
+                                    globalacmod += parseInt(b["repeating_acmod_" + currentID + "_global_ac_val"], 10);
+                                }
+                            });
                             var dexmod = +b["dexterity_mod"];
                             var total = 10 + dexmod;
                             var armorcount = 0;
@@ -9309,18 +9319,16 @@
                             };
                             update["armorwarningflag"] = "hide";
                             update["customacwarningflag"] = "hide";
-                            update["armorwarning"] = "0";
-                            update["customacwarning"] = "0";
                             if(armorcount > 1 || shieldcount > 1) {
                                 update["armorwarningflag"] = "show";
                             }
                             update["ac"] = total + globalacmod;
                             if(custom_total > 0) {
-                                if(armorcount > 0) {
+                                if(armorcount > 0 || (shieldcount > 0 && b.custom_ac_shield != "yes")) {
                                     update["customacwarningflag"] = "show";
                                 }
                                 else {
-                                    update["ac"] = custom_total + globalacmod;
+                                    update["ac"] = b.custom_ac_shield == "yes" ? custom_total + shieldac + globalacmod + modac : custom_total + globalacmod + modac;
                                 }
                             }
                             console.log("total: " + total);
@@ -10743,6 +10751,24 @@
         });
     };
 
+    var upgrade_to_2_5 = function(doneupdating) {
+        getAttrs(["globalacmod"], function(v) {
+            var update = {};
+            if(v.globalacmod && v.globalacmod != "0") {
+                var rowid = generateRowID();
+                update[`repeating_acmod_${rowid}_global_ac_val`] = parseInt(v.globalacmod);
+                update[`repeating_acmod_${rowid}_global_ac_name`] = "GLOBAL ARMOR CLASS MODIFIER";
+                update[`repeating_acmod_${rowid}_global_ac_active_flag`] = "1";
+                update[`repeating_acmod_${rowid}_options-flag`] = "0";
+                update["global_ac_mod_flag"] = "1";
+            }
+            setAttrs(update, {silent: true}, function() {
+                update_ac();
+                doneupdating();
+            });
+        });
+    };
+
     var no_version_bugfix = function(doneupdating) {
         getAttrs(["npc","class"], function(v) {
             if(v["npc"] && v["npc"] != "0" || v["class"] && v["class"] != "") {
@@ -10757,8 +10783,8 @@
 
     var versioning = function(finished) {
         getAttrs(["version"], function(v) {
-            if(v["version"] === "2.4") {
-                setAttrs({version: "2.4"}, function(){
+            if(v["version"] === "2.5") {
+                setAttrs({version: "2.5"}, function(){
                     finished();
                 });
                 console.log("5th Edition OGL by Roll20 v" + v["version"]);
@@ -10770,39 +10796,52 @@
                     versioning(finished);
                 });
             }
+            else if(v["version"] === "2.4") {
+                console.log("UPGRADING TO v2.5");
+                upgrade_to_2_5(function() {
+                    setAttrs({version: "2.5"}, function() {
+                        versioning(finished);
+                    });
+                });
+            }
             else if(v["version"] === "2.3") {
                 console.log("UPGRADING TO v2.4");
                 upgrade_to_2_4(function() {
-                    setAttrs({version: "2.4"});
-                    versioning(finished);
+                    setAttrs({version: "2.4"}, function() {
+                        versioning(finished);
+                    });
                 });
             }
             else if(v["version"] === "2.2") {
                 console.log("UPGRADING TO v2.3");
                 upgrade_to_2_3(function() {
-                    setAttrs({version: "2.3"});
-                    versioning(finished);
+                    setAttrs({version: "2.3"}, function() {
+                        versioning(finished);
+                    });
                 });
             }
             else if(v["version"] === "2.1") {
                 console.log("UPGRADING TO v2.2");
                 upgrade_to_2_2(function() {
-                    setAttrs({version: "2.2"});
-                    versioning(finished);
+                    setAttrs({version: "2.2"}, function() {
+                        versioning(finished);
+                    });
                 });
             }
             else if(v["version"] === "2.0") {
                 console.log("UPGRADING TO v2.1");
                 upgrade_to_2_1(function() {
-                    setAttrs({version: "2.1"});
-                    versioning(finished);
+                    setAttrs({version: "2.1"}, function() {
+                        versioning(finished);
+                    });
                 });
             }
             else {
                 console.log("UPGRADING TO v2.0");
                 upgrade_to_2_0(function() {
-                    setAttrs({version: "2.0"});
-                    versioning(finished);
+                    setAttrs({version: "2.0"}, function() {
+                        versioning(finished);
+                    });
                 });
             };
         });
@@ -11228,9 +11267,7 @@
         clearset["spell_attack_bonus"] = "";
         clearset["spell_save_dc"] = "";
         clearset["armorwarningflag"] = "hide";
-        clearset["armorwarning"] = "0";
         clearset["customacwarningflag"] = "hide";
-        clearset["customacwarning"] = "0";
         clearset["passive_wisdom"] = "";
         _.each(allSkills, function(skill) {
             clearset[skill + "_prof"] = "";//0
