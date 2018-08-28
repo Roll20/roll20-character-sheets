@@ -15289,6 +15289,23 @@
         changeCompendiumPage("sheet-spells-info", spell_name, "card_only");
     });
 
+    var setRollButton = function(name, data, title, hold) {
+        var set = {};
+        var holdstring = hold ? "r" + hold : "";
+        title = title || name.split("_")[1];
+        title = title[0].toUpperCase() + title.substring(1);
+        if(title == "Personality") title += " Trait";
+        var roll = "@{wtype}&{template:mancerroll} {{title=" + title + "}} {{c1=[[1d" + data.length + holdstring +"]]}}";
+        _.each(data, function(trait, x) {
+            roll += ' {{option' + (x+1) + '=' + trait + '}}';
+        });
+        set["roll_" + name + "_roll"] = roll;
+        if(!hold) {
+            set[name + "_array"] = JSON.stringify({name: title, array: data});
+        }
+        setAttrs(set);
+    };
+
     on("mancerchange:background", function(eventinfo) {
         changeCompendiumPage("sheet-background-info", eventinfo.newValue);
 
@@ -15342,19 +15359,6 @@
                 var possibles = ["background_feature"];
                 var data = p["data"];
                 var hideList = [];
-                var setRollButton = function(name, data, title) {
-                    var set = {};
-                    title = title || name.split("_")[1];
-                    title = title[0].toUpperCase() + title.substring(1);
-                    if(title == "Personality") title += " Trait"
-                    var roll = "@{wtype}&{template:mancerroll} {{title=" + title + "}} {{c1=[[1d" + data.length + "]]}}"
-                    _.each(data, function(trait, x) {
-                        roll += ' {{option' + (x+1) + '=' + trait + '}}'
-                    })
-                    set["roll_" + name + "_roll"] = roll;
-                    set[name + "_array"] = JSON.stringify({name: title, array: data});
-                    setAttrs(set);
-                };
 
                 _.each(proficiencyList, function(type){
                     possibles.push("background_" + type.toLowerCase() + "s");
@@ -15479,9 +15483,7 @@
         setCharmancerOptions(baseName, choices.array, {selected: choices.array[index]});
         if(baseName.slice(0, -1) == "background_personality_choice") {
             var num = baseName.substr(-1) == "1" ? "2" : "1";
-            var set = {};
-            set["roll_" + baseName.slice(0, -1) + num + "_roll"] = "@{wtype}&{template:mancerroll} {{title=" + choices.name + "}} {{r1=[[1d" + choices.array.length + "r" + (index + 1) + "]]}}";
-            setAttrs(set);
+            setRollButton(baseName.slice(0, -1) + num, choices.array, choices.name, index + 1);
         }
     });
 
