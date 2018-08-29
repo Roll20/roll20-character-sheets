@@ -47,18 +47,18 @@
 // !vtm will w# a# m#	// Rolling for willpower w# is the number of willpower dice a# is the number of dice associated with an attribute, m# is a dice modifier to apply. Example !vtm atr a2 w2 m3 
 // !vtm will p# a# m#	// Rolling for willpower p# is an odd number. By and large you should not use it unless you are creating your own multi-state health/willpower boxes. In such cases please look at the html to see how I have implemented it.
 // !vtm roll w# r#      // Is a straight roll, the w# represents the number of black die, the r# represents the number of red die to roll Example !vtm roll w2 r2
-// Example !vtm roll w5 r1 c"Prince Wolf" will roll 5 black die, 1 red die and the character will have the name - Prince Wolf
-// !vtm frenzy a# m# s# // The frenzy roll is a strange one. The dice pool is equal to the value associate with a# (which should be your composure) plus the modifier m#. Unlike other rolls a success is considered if you roll less than the value assocaited with s#. Thus type !vtm frenzy a3 m2 s7 gives a dice pool of 5 and a success is considered if you roll LESS than 7 (i.e. 6 or less).
 // Note: For anyone reading the code, to make the frenzy roll work I had to invert the DC thus asking the play to roll less than 7 is instead interpretted as asking the player to roll 5 or higher (these are probabilistically equal statements).
 // !vtm rouse          // Rolls one single rouse dice. Success on 6+
 // !vtm reroll w#      // Used for will power re-roll # is the number of die to roll
 // !vtm frenzy p# o# q# // Rolls for frenzy. This is used to add 1/3 humanity (rounded down) to willpower, to roll. As mentioned previously p# is a special case and the number of dice rolled is not equal to the number you enter. Unless you are looking at multistate boxes, don't use this. o# is similar but for humanity. q# Should be used to set the difficulty of the Frenzy roll
 // !vtm humanity x# m# // Used for humanity roll. x# is under a similar constraint as p# and o# due to multistate checkbox issues once again.
-// An extra variable (c"custom name") may be added to any of these rolls to display a custom name in the roll template
+//
+// Optional Flags:
+// An extra variable (c"custom name ") may be added to any of these rolls to display a custom name in the roll template. Note: As a coding querk please have a space after the name but before the close in the speech marks.
+// Example !vtm roll w5 r1 c"Prince Wolf " will roll 5 black die, 1 red die and the character will have the name - Prince Wolf
 // An extra variable (t"custom name") may be added to any of these rolls to display the roll type. This is text below the custom name
 // Adding b# to a skill roll will add the value/2.0 to the number of vampire dice. This is used for blood potency when handling disciplines
-// If needs be botht he Frenzy and Humanity Roll can be updated to use real values. For now however I'm going to leave it.
-
+// If needs be both the Frenzy and Humanity Roll can be updated to use real values. For now however I'm going to leave it.
 
 var vtmCONSTANTS = {
 	VTMCOMMAND: "!vtm",
