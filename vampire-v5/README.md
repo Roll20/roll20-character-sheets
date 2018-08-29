@@ -52,6 +52,15 @@ A very special thank to https://game-icons.net The below icons were used and are
 
 
 ## Installation instructions.
+If you have access to Roll20
+1. Select the Vampire the Masquerade 5th Edition character sheet.
+2. Go to Settings -> API Settings
+3. If the "Vampire The Masquerade 5th Edition Dice Mechanics" API is available and uploaded to Roll20, select it in the dropdown menu. You are now good to go. If not, go to step 4.
+4. Click New Script and call it hq.js (any name will do, but its a nice nod to Konrad's work)
+5. Copy the contents VTM Dice Mechanics.js in the hq.js window and press save.
+7. You are now good to go ^_^!
+
+
 In the event you only have access to these files and need to do so manually.  
 
 1. Create your new Roll20.
