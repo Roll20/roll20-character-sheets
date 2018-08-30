@@ -1,4 +1,4 @@
-// Vampire the Masquerade 5e Alpha Dice Mechanics by Momtahan K.
+// Vampire the Masquerade 5e Dice Mechanics by Momtahan K (Version 1.1).
 //
 // The following code is an adaptation of that produced by Roll20 user Konrad J. for "Hero Quest Dice Mechanics". 
 // Many thanks for providing this code free to use.
@@ -733,6 +733,7 @@ function calculateVariables(argv, who) {
 	return input;
 }
 
+// Used for multistate checkboxes
 function updateMultiboxValue(totalValue) {
 	let value = totalValue;
 	value = scaleMultiboxValue(value, 3616);
@@ -741,6 +742,7 @@ function updateMultiboxValue(totalValue) {
 	return value;
 }
 
+// Used for multistate checkboxes
 function updateMultiboxValue1(totalValue) {
 	let value = totalValue;
 	value = scaleMultiboxValue(value, 3616);
@@ -760,6 +762,7 @@ function scaleMultiboxValue(value, scaleNumber) {
 	return value;
 }
 
+// Decides how to distribute dice based on the type of roll
 function calculateRunScript(input) {
 	if (input.type === "atr" || input.type === "skill") {
 		return handleSkillRoll(input);

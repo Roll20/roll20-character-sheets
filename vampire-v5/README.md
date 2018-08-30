@@ -1,4 +1,4 @@
-# Character sheet for Vampire The Maquerade, 5th Edition (v1.0)
+# Character sheet for Vampire The Maquerade, 5th Edition (v1.1)
 
 ## User Guide (Please read)
 
@@ -79,3 +79,12 @@ Please note this is version 1.0, a set of updates are in progress.
 ## Bugs and Updates
 
 If you think anything is missing or you see any bugs, please message me via my [Roll20 Account](https://app.roll20.net/users/117780/ Roll20 Account)
+
+## Versions
+
+### Version 1.1
+Bug fixing to ensure the names are correctly displayed. 
+Added the capacity to roll humanity.
+Attribute has been renamed to traits.
+Some images have been linked to the Roll20 archieve
+Updated user guide.
