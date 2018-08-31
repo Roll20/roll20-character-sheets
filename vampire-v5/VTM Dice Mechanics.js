@@ -325,18 +325,14 @@ function processVampireDiceScript(run, dc) {
 
 	if (run.rouseStatRoll) {
 		if (diceTotals.successScore > 0) {
-			outputMessage += "{{Beast=" + '<img src="https://imgur.com/Ixo45II.png" title="Rousing Success" height="20" width="228"/>' + endTemplateSection;
-
+			outputMessage += "{{Beast=" + '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/RousingSuccess.png" title="Rousing Success" height="20" width="228"/>' + endTemplateSection;
 		} else {
-			outputMessage += "{{Beast=" + '<img src="https://imgur.com/CNIoBl7.png" title="Hunger Gain" height="20" width="228"/>' + endTemplateSection;
+			outputMessage += "{{Beast=" + '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/HungerGain.png" title="Hunger Gain" height="20" width="228"/>' + endTemplateSection;
 
 		}
 	} else if (run.frenzyRoll) {
 		outputMessage += "{{Successes=" + diceTotals.successScore + endTemplateSection;
-		log("Frenzy");
-		log(diceTotals.successScore + " " + run.difficulty);
 		if (diceTotals.successScore >= run.difficulty) {
-			log("boop");
 			outputMessage += "{{Beast=" + '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/FrenzyRestrained.png" title="Frenzy Restrained" height="20" width="228"/>' + endTemplateSection;
 		} else {
 			outputMessage += "{{Beast=" + '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/Frenzy.png" title="Frenzy" height="20" width="228"/>' + endTemplateSection;
@@ -344,21 +340,21 @@ function processVampireDiceScript(run, dc) {
 	} else if (run.remorseRoll) {
 		outputMessage += "{{Successes=" + diceTotals.successScore + endTemplateSection;
 		if (diceTotals.successScore > 0) {
-			outputMessage += "{{Beast=" + '<img src="https://imgur.com/heUJvKA.png" title="Guilty" height="20" width="228"/>' + endTemplateSection;
+			outputMessage += "{{Beast=" + '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/HumanityPass.png" title="Guilty" height="20" width="228"/>' + endTemplateSection;
 		} else {
 			outputMessage += "{{Beast=" + '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/HumanityFail.png" title="Innocent" height="20" width="228"/>' + endTemplateSection;
 
 		}
 
 		if (vtmGlobal.luckydice) {
-			let lastResort = '<img src="https://imgur.com/B2nn1cs.png" title="Miss" height="20" width="228"/>';
+			let lastResort = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/lastresort.png" title="Miss" height="20" width="228"/>';
 			outputMessage += "{{Fate=" + lastResort + endTemplateSection;
-			vtmGlobal.luckydice = false;
 		}
 	} else {
 		outputMessage = addRollDeclarations(diceTotals, outputMessage, endTemplateSection, thebeast);
 	}
 
+	vtmGlobal.luckydice = false;
 	outputMessage += "{{Reroll=[Reroll](" + vtmGlobal.reroll + ")" + endTemplateSection;
 
 	log("Output");
@@ -375,19 +371,17 @@ function addRollDeclarations(diceTotals, outputMessage, endTemplateSection, theb
 
 
 	if (diceTotals.successScore == 0 && vtmGlobal.luckydice) {
-		let lastResort = '<img src="https://imgur.com/B2nn1cs.png" title="Miss" height="20" width="228"/>';
+		let lastResort = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/lastresort.png" title="Miss" height="20" width="228"/>';
 		outputMessage += "{{Fate=" + lastResort + endTemplateSection;
 		let miss = '<img src="https://imgur.com/l8jqvvp.png" title="Miss" height="20" width="228"/>';
 		outputMessage += "{{Miss=" + miss + endTemplateSection;
-		vtmGlobal.luckydice = false;
 	} else if (diceTotals.successScore == 0) {
 		//outputMessage += "{{Fate=" + "Total failure" + endTemplateSection;
 		let miss = '<img src="https://imgur.com/l8jqvvp.png" title="Miss" height="20" width="228"/>';
 		outputMessage += "{{Miss=" + miss + endTemplateSection;
-		vtmGlobal.luckydice = false;
 	} else if (vtmGlobal.luckydice) {
-		let lastResort = '<img src="https://imgur.com/B2nn1cs.png" title="Miss" height="20" width="228"/>';
-		vtmGlobal.luckydice = false;
+		let lastResort = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/lastresort.png" title="Miss" height="20" width="228"/>';
+		outputMessage += "{{Fate=" + lastResort + endTemplateSection;
 	}
 
 	if ((diceTotals.muddyCritScore >= 2) || (diceTotals.muddyCritScore === 1 && (diceTotals.critScore >= 1))) {
