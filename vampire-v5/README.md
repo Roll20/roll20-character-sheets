@@ -80,6 +80,8 @@ Please note this is version 1.0, a set of updates are in progress.
 
 If you think anything is missing or you see any bugs, please message me via my [Roll20 Account](https://app.roll20.net/users/117780/ Roll20 Account)
 
+The issue with Inline rolls is known about and will be fixed by 11/09/18
+
 ## Versions
 
 ### Version 1.1
