@@ -1,4 +1,4 @@
-<script type="text/worker">
+﻿<script type="text/worker">
 	// Primary Stats
 	var primaryStats = [ "stats_courage", "stats_intelligence", "stats_charisme", "stats_adresse", "stats_force", "stats_attaque", "stats_parade"];
 	// Secondary Stats
@@ -53,7 +53,7 @@
 	on("change:personnage_niveau", function() {
 		updateXP();
 	});
-	// Ammos
+	// Ammos & Weapons
 	on("change:repeating_armes:arme_range", function( e ) {
 		updateWeaponRange( e );
 	});
@@ -103,12 +103,12 @@
 		displayMagicSpells();
 	});
 	// Crating
-	on("change:reparation_qualite change:reparation_specialiste", function( e ) {
-		var idRow = e[ 'sourceAttribute' ].split('-')[1];
-		updateRepair( idRow );
+	on("change:reparation_qualite change:reparation_specialiste", function( ) {
+		updateRepair();
 	});
-	on("change:repeating_recettes:recette_specialiste change:repeating_recettes:recette_difficulte change:repeating_recettes:recette_malusspecialiste", function() {
-		updateRecipe();
+	on("change:repeating_recettes:recette_specialiste change:repeating_recettes:recette_difficulte change:repeating_recettes:recette_malusspecialiste", function( e ) {
+		var idRow = e[ 'sourceAttribute' ].split('_')[2];
+		updateRecipe( idRow );
 	});
 	on("change:stats_inge_total", function() {
 		updateRepair();
@@ -132,7 +132,7 @@
 	function safeInt( val ) { return parseInt( val, 10 ) || 0;	}
 
 	function structSafeInt( v ) {
-		for( attr in v ) {
+		for( var attr in v ) {
 			v[ attr ] = safeInt( v[ attr ] );
 		}
 		return v;
@@ -141,7 +141,7 @@
 	function safeFloat( val ) { return parseFloat( val ) || 0;	}
 
 	function structSafeFloat( v ) {
-		for( attr in v ) {
+		for( var attr in v ) {
 			v[ attr ] = safeFloat( v[ attr ] );
 		}
 		return v;
@@ -315,32 +315,31 @@
 	function updateWeaponRange( eventInfo ) {
 		var range_selected = eventInfo[ "newValue" ];
 		var idWeapon = eventInfo[ "sourceAttribute" ].split( '_' )[2];
+		var sWeapon = {};
+
 		getAttrs( [ 'stats_attaque_total', 'stats_jet_total' ] , function( v ) {
-			var sWeapon = {
-				'repeating_weapon_' + idWeapon + '_arme_munition_display' : 0,
-				'repeating_weapon_' + idWeapon + '_arme_jet' : v[ 'stats_attaque_total' ]
-			}
+
+			sWeapon[ 'repeating_armes_' + idWeapon + '_arme_munition_display' ] = 0;
+			sWeapon[ 'repeating_armes_' + idWeapon + '_arme_jet' ] = v[ 'stats_attaque_total' ];
 
 			if( range_selected === 'Dist.' ) {
-				sWeapon = {
-					'repeating_weapon_' + idWeapon + '_arme_munition_display' : 1,
-					'repeating_weapon_' + idWeapon + '_arme_jet' : v[ 'stats_jet_total' ]
-				}
+				sWeapon[ 'repeating_armes_' + idWeapon + '_arme_munition_display' ] = 1;
+				sWeapon[ 'repeating_armes_' + idWeapon + '_arme_jet' ] = v[ 'stats_jet_total' ];
 			}
 
 			setAttrs( sWeapon, { silent: true } );
-		}
+		});
 	}
 
 	function updateAmmo( eventInfo ) {
 		var ammo_selected = eventInfo[ "newValue" ];
 		var idWeapon = eventInfo[ "sourceAttribute" ].split( '_' )[2];
 		var idAmmo = 0;
-		var sWeapon = {
-			'repeating_armes_' + idWeapon + 'munition_degats' : 0,
-			'repeating_armes_' + idWeapon + '_munition_modAd' : 0,
-			'repeating_armes_' + idWeapon + '_munition_nom' : ''
-		};
+		var sWeapon = {};
+
+		sWeapon[ 'repeating_armes_' + idWeapon + '_munition_degats' ] = 0;
+		sWeapon[ 'repeating_armes_' + idWeapon + '_munition_modAd' ] = 0;
+		sWeapon[ 'repeating_armes_' + idWeapon + '_munition_nom' ] = '';
 
 		setAttrs( sWeapon, { silent: true } );
 
@@ -350,11 +349,9 @@
 					if( ammo_selected === sValues[`repeating_munitions_${idarray[i]}_munition_nom`] ) {
 						var idAmmo = idarray[i];
 						getAttrs( [ `repeating_munitions_${idAmmo}_munition_modAd`, `repeating_munitions_${idAmmo}_munition_degats` ], function( v ) {
-							sWeapon = {
-								'repeating_armes_' + idWeapon + 'munition_degats' : v[ `repeating_munitions_${idAmmo}_munition_degats` ],
-								'repeating_armes_' + idWeapon + '_munition_modAd' : v[ `repeating_munitions_${idAmmo}_munition_modAd` ],
-								'repeating_armes_' + idWeapon + '_munition_nom' : ammo_selected
-							};
+							sWeapon[ 'repeating_armes_' + idWeapon + '_munition_degats' ] = v[ `repeating_munitions_${idAmmo}_munition_degats` ];
+							sWeapon[ 'repeating_armes_' + idWeapon + '_munition_modAd' ] = v[ `repeating_munitions_${idAmmo}_munition_modAd` ];
+							sWeapon[ 'repeating_armes_' + idWeapon + '_munition_nom' ] = ammo_selected;
 
 							setAttrs( sWeapon, { silent: true } );
 						});
@@ -505,11 +502,13 @@
 	}
 
 	function updateRepair() {
-		getAttrs( [ "reparation_qualite", "reparation_specialiste", "stats_inge_total" ], function( sValues ) {
+		getAttrs( [ "reparation_qualite", "reparation_specialiste", "stats_inge_total", "personnage_niveau" ], function( sValues ) {
+
 			var v = structSafeInt( sValues );
 			var reparation_difficulte = 0;
 			var reparation_malusSpecialiste = 0;
 			var requiredLevel = 1;
+			var reparation_impossible = 0;
 
 			if( v[ "reparation_qualite" ] === 1 ) { // Matos perrave
 				reparation_difficulte = 6;
@@ -537,51 +536,56 @@
 				requiredLevel = 5;
 			}
 
-			var reparation_bonus = v[ "stats_inge_total" ] - v[ "reparation_difficulte" ];
-
+			var reparation_bonus = v[ "stats_inge_total" ] - reparation_difficulte;
 			// bonus only for specialists
-			if( !v[ "reparation_specialiste" ] ) {
+			if( v[ "reparation_specialiste" ] === 0 ) {
 				if( reparation_bonus > 0 ) {
 					reparation_bonus = 0;
 				}
 
-				reparation_bonus += reparation_malusSpecialiste;
+				reparation_bonus = reparation_bonus + reparation_malusSpecialiste;
 			}
 
 			// Check required level
-			if( requiredLevel > personnage_niveau ) {
+			var charLevel = v[ "personnage_niveau" ] || 1;
+			if( requiredLevel > charLevel ) {
 				reparation_bonus = -20;
 			}
 
 			// Impossible task
 			if( reparation_bonus <= -20 ) {
-				reparation_difficulte = "Impossible";
+				reparation_impossible = 1;
 			}
 
 			setAttrs({
 				"reparation_difficulte": reparation_difficulte,
-				"reparation_bonus": reparation_bonus
+				"reparation_bonus": reparation_bonus,
+				"reparation_impossible": reparation_impossible
 			});
 		});
 	}
 
 	function updateRecipe( idRow ) {
+		var sRecette = {};
+		var recette_bonus = 0;
+
 		getAttrs( [ 'stats_inge_total',
 					`repeating_recettes_${idRow}_recette_specialiste`, `repeating_recettes_${idRow}_recette_difficulte`, `repeating_recettes_${idRow}_recette_malusspecialiste`
 				  ], function ( sValues ) {
 			var v = structSafeInt( sValues );
 
-			var recette_bonus = v[ "stats_inge_total" ] - v[ `repeating_recettes_${idRow}_recette_difficulte` ];
+			recette_bonus = v[ "stats_inge_total" ] - v[ `repeating_recettes_${idRow}_recette_difficulte` ];
 
-			if( !v[ `repeating_recettes_${idRow}_recette_specialiste` ] ) {
+			if( v[ `repeating_recettes_${idRow}_recette_specialiste` ] === 0 ) {
 				if( recette_bonus > 0 ) {
 					recette_bonus = 0;
 				}
 
-				recette_bonus += `repeating_recettes_${idRow}_recette_malusspecialiste`;
+				recette_bonus = recette_bonus + v[ `repeating_recettes_${idRow}_recette_malusspecialiste` ];
 			}
 
-			setAttrs( { 'repeating_recettes_' + idRow + 'recette_bonus' : recette_bonus } );
+			sRecette[ `repeating_recettes_${idRow}_recette_bonus` ] = recette_bonus;
+			setAttrs( sRecette );
 		});
 	}
 
