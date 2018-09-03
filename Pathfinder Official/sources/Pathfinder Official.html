@@ -2240,7 +2240,7 @@
                                     <option value="combat" data-i18n="combat">Combat</option>
                                     <option value="critical" data-i18n="critical">Critical</option>
                                     <option value="grit" data-i18n="grit">Grit</option>
-                                    <option value="item creation" data-i18n="item-creation">Item creation</option>
+                                    <option value="item creation" data-i18n="item creation">Item creation</option>
                                     <option value="metamagic" data-i18n="metamagic">Metamagic</option>
                                     <option value="monster" data-i18n="monster">Monster</option>
                                     <option value="panache" data-i18n="panache">Panache</option>
@@ -5081,7 +5081,7 @@
                                     <option value="combat" data-i18n="combat">Combat</option>
                                     <option value="critical" data-i18n="critical">Critical</option>
                                     <option value="grit" data-i18n="grit">Grit</option>
-                                    <option value="item-creation" data-i18n="item-creation">Item creation</option>
+                                    <option value="item creation" data-i18n="item creation">Item creation</option>
                                     <option value="metamagic" data-i18n="metamagic">Metamagic</option>
                                     <option value="panache" data-i18n="panache">Panache</option>
                                     <option value="performance" data-i18n="performance">Performance</option>
@@ -9382,7 +9382,9 @@
                 if(mancerdata["l1-race"].values.race_feat_choice) {
                     FeatsToLoad.push(mancerdata["l1-race"].values.race_feat_choice);
                 } else if(mancerdata["l1-race"].data.race["data-Feats"]) {
-
+                    _.each(mancerdata["l1-race"].data.race["data-Feats"].split(","),(feat) => {
+                        FeatsToLoad.push("Feats:" + feat.trim());
+                    });
                 }
                 // Spell-like abilities
                 if(mancerdata["l1-race"].data.race["data-Spell-like abilities"]) {
@@ -9431,8 +9433,8 @@
             charUpd["class1_name"] = mancerdata["l1-class"].values.class.replace("Classes:","");
             charUpd["class"] = charUpd["class1_name"] + " 1";
             // Alignment
-            if(mancerdata["l1-class"].values.alignment_choice) {
-                charUpd["alignment"] = mancerdata["l1-class"].values.alignment_choice.toLowerCase();
+            if(mancerdata["l1-class"].values.class_alignment_choice) {
+                charUpd["alignment"] = mancerdata["l1-class"].values.class_alignment_choice.toLowerCase();
             }
             // Static data
             if(mancerdata["l1-class"].data && mancerdata["l1-class"].data.class) {
@@ -10166,7 +10168,7 @@
                 var spl = e.sourceAttribute.substr(0, e.sourceAttribute.length - 19);
                 var update = {};
                 var val = e.newValue.toLowerCase().trim();
-                var feattypes = ["general","combat","critical","grit","item-creation","metamagic","monster","panache","performance","style","teamwork"];
+                var feattypes = ["general","combat","critical","grit","item creation","metamagic","monster","panache","performance","style","teamwork"];
                 if(feattypes.includes(val)) {update[spl + "type"] = val;}
                 else {update[spl + "type"] = "misc";}
                 setAttrs(update,{silent: true});
@@ -11585,24 +11587,29 @@
             let featObj = {};
             let newrowid = generateRowID();
             let featname = "";
+            let featname2 = "";
             let featRepsec = "repeating_feats";
-            if(obj.indexOf("(") === -1) {
-                featname = obj.trim();
-            } else {
-                featname = obj.split("(")[0].trim();
+            featname = obj.trim().replace("Feats:","").trim();
+            if(obj.indexOf("(") != -1) {
+                featname2 = obj.split("(")[0].trim().replace("Feats:","").trim();
             }
-            featname = featname.replace("Feats:","");
-            featObj[repsec + newrowid + "_name"] = obj.trim().replace("Feats:","");
+            featObj[repsec + newrowid + "_name"] = featname;
             featObj[repsec + newrowid + "_options-flag"] = 0;
-            featObj[repsec + newrowid + "_fromcompendium"] = "Feats:" + featname;
             featObj[repsec + newrowid + "_type"] = "misc";
             if(! _.isEmpty(cdatarr)) {
-                let cdata = cdatarr.find(o => ((o.data["Feat Name"]) && (o.data["Feat Name"].toLowerCase() === featname.toLowerCase()) && (o.data["Category"] === "Feats")));
-                if (pfoglobals_debug_mode) {console.log("*** DEBUG drop_add_feats cdata: " + JSON.stringify(cdata,null,"  "));}
-                if((typeof cdata !== "undefined") && (cdata.id)) {
+                let cdata = cdatarr.find(o => ((o.data["Feat Name"]) && (o.data["Feat Name"].toLowerCase().trim() === featname.toLowerCase()) && (o.data["Category"] === "Feats")));
+                if((!(cdata && cdata.id  && cdata.data))  && featname2.length) {
+                    if (pfoglobals_debug_mode) {console.log("*** DEBUG drop_add_feats 2nd search with: " + featname2);}
+                    cdata = cdatarr.find(o => ((o.data["Feat Name"]) && (o.data["Feat Name"].toLowerCase().trim() === featname2.toLowerCase()) && (o.data["Category"] === "Feats")));
+                }
+                if(cdata && cdata.id && cdata.data) {
+                    if (pfoglobals_debug_mode) {console.log("*** DEBUG drop_add_feats cdata: " + JSON.stringify(cdata,null,"  "));}
+                    if(cdata.data["Feat Name"]) {
+                        featObj[repsec + newrowid + "_fromcompendium"] = "Feats:" + cdata["name"];
+                    }
                     if(cdata.data["Feat Type"]) {
                         let featType = cdata.data["Feat Type"].toLowerCase().trim();
-                        if(["general","combat","critical","grit","item-creation","metamagic","monster","panache","performance","style","teamwork"].includes(featType)) {
+                        if(["general","combat","critical","grit","item creation","metamagic","monster","panache","performance","style","teamwork"].includes(featType)) {
                             featObj[repsec + newrowid + "_type"] = featType;
                             if(featType == "metamagic") {
                                 featRepsec = "repeating_metamagic";
@@ -11623,6 +11630,8 @@
                     if(cdata.data["data-description"]) {
                         featObj[repsec + newrowid + "_description"] = cdata.data["data-description"];
                     }
+                } else if(pfoglobals_debug_mode) {
+                    console.log("*** DEBUG drop_add_feats feat not found with " + featname + " or " + featname2 + " in " + JSON.stringify(cdatarr,null,"  "));
                 }
             }
             _.each(Object.keys(featObj),(key) => {
@@ -11653,11 +11662,11 @@
                     }
                 }
                 update[repsec + newrowid + "_options-flag"] = 0;
-                update[repsec + newrowid + "_fromcompendium"] = "Spells:" + obj.name;
                 if(! _.isEmpty(cdatarr)) {
-                    var cdata = cdatarr.find(o => (o.name.toLowerCase() === obj.name.replace("Spells:","").toLowerCase() && o.data["Category"] === "Spells"));
+                    var cdata = cdatarr.find(o => (o.name.toLowerCase().trim() === obj.name.replace("Spells:","").toLowerCase().trim() && o.data["Category"] === "Spells"));
                     // console.log("*** DEBUG drop_add_spells cdata :" + JSON.stringify(cdata,null,"  "));
-                    if((! _.isEmpty(cdata)) && (typeof cdata.id !== "undefined")) {
+                    if(cdata && cdata.id  && cdata.data) {
+                        update[repsec + newrowid + "_fromcompendium"] = "Spells:" + cdata["name"];
                         if(cdata.data["School"]) {
                             update[repsec + newrowid + "_spellschool"] = cdata.data["School"];
                         }
@@ -11796,7 +11805,7 @@
                 }
                 // getting data from Spell source of the ability, if any
                 if(obj["Spell"] || obj["Spell-source"]) {
-                    update[repsec + newrowid + "_fromcompendium"] = "Spells:" + obj["Spell"];
+                    // update[repsec + newrowid + "_fromcompendium"] = "Spells:" + obj["Spell"];
                     if(! _.isEmpty(cdatarr)) {
                         let zespell = "";
                         if(isPc) {
@@ -11804,8 +11813,9 @@
                         } else {
                             zespell = obj["Spell"];
                         }
-                        var cdata = cdatarr.find(o => (o.name.toLowerCase() === zespell.toLowerCase() &&  o.data["Category"] === "Spells"));
-                        if((typeof cdata !== "undefined") && (cdata.id)) {
+                        var cdata = cdatarr.find(o => (o.name.toLowerCase().trim() === zespell.toLowerCase().trim() &&  o.data["Category"] === "Spells"));
+                        if(cdata && cdata.id  && cdata.data) {
+                            update[repsec + newrowid + "_fromcompendium"] = "Spells:" + cdata["name"];
                             if(cdata.data["School"]) {
                                 update[repsec + newrowid + "_spellschool"] = cdata.data["School"];
                             }
@@ -16296,7 +16306,7 @@
 </rolltemplate>
 <!-- Mancer Workers -->
 <script type="text/worker">
-    const mncrDebugMode = false;
+    const mncrDebugMode = true;
 
     const mncrAbilities = ["strength","dexterity","constitution","intelligence","wisdom","charisma"];
     const mncrGetList = true;
