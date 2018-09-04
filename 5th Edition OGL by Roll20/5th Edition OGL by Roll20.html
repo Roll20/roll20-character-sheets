@@ -1,4 +1,5 @@
 <input class="monster_confirm_flag" type="hidden" name="attr_monster_confirm_flag">
+<input class="mancer_confirm_flag" type="hidden" name="attr_mancer_confirm_flag">
 <div class="licensecontainer compendium-drop-target monsters">
 
 <input class="npc_toggle" name="attr_npc" type="hidden" value="0">
@@ -1377,6 +1378,25 @@
                     <span class="label" data-i18n="speed-u">SPEED</span>
                 </div>
             </div>
+            <input type="hidden" class="toggleflag" name="attr_global_ac_mod_flag">
+            <div class="hp hidden">
+                <div class="textarea globalattack acmod">
+                    <fieldset class="repeating_acmod">
+                        <div class="global-mod">
+                            <input type="checkbox" name="attr_options-flag" class="options-flag" checked="checked" style="top: -15px;"><span>y</span>
+                            <input type="checkbox" name="attr_global_ac_active_flag" value="1" class="active-flag">
+                            <div class="options">
+                                <label>Value: <input type="number" name="attr_global_ac_val" placeholder="1"></label>
+                                <label>Name: <input type="text" name="attr_global_ac_name" placeholder="Defense"></label>
+                            </div>
+                            <div class="display">
+                                <span class="title"><span name="attr_global_ac_val"></span> [<span name="attr_global_ac_name"></span>]</span>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <span class="label" data-i18n="global-ac-u">GLOBAL AC MODIFIER</span>
+            </div>
             <div class="hp">
                 <div class="top">
                     <span data-i18n="hp-max-u">Hit Point Maximum</span>
@@ -1644,9 +1664,20 @@
                 <div class="complex">
                     <input type="hidden" class="warningflag" name="attr_armorwarningflag">
                     <div class="warning">
-                        <span data-i18n="warning-armor-sets-u">
-                            <input type="checkbox" name="attr_armorwarning" value="hide">
-                            WARNING - MULTIPLE SETS OF ARMOR OR SHIELDS HAVE BEEN ADDED AND AC IS NOT CORRECTLY CALCULATED. UNEQUIP THE ARMOR PIECE FROM THE ITEM DETAILS.
+                        <span>
+                            <label><input type="checkbox" name="attr_armorwarningflag" value="hide">*</label>
+                            <span data-i18n="warning-armor-sets-u">
+                                WARNING - MULTIPLE SETS OF ARMOR OR SHIELDS HAVE BEEN ADDED AND AC IS NOT CORRECTLY CALCULATED. UNEQUIP THE ARMOR PIECE FROM THE ITEM DETAILS.
+                            </span>
+                        </span>
+                    </div>
+                    <input type="hidden" class="warningflag" name="attr_customacwarningflag">
+                    <div class="warning">
+                        <span>
+                            <label><input type="checkbox" name="attr_customacwarningflag" value="hide">*</label>
+                            <span data-i18n="warning-customac-u">
+                                ATTENTION - YOUR CUSTOM AC CALCULATION IS NOT BEING USED AS YOU HAVE ARMOR EQUIPPED. IF YOU WANT TO USE YOUR CUSTOM AC, UNEQUIP THE ARMOR PIECE FROM THE ITEM DETAILS.
+                            </span>
                         </span>
                     </div>
                     <div class="header" style="height: auto;">
@@ -4276,16 +4307,11 @@
                         <option value="@{d20}" selected="selected" data-i18n="norm">Normal</option>
                         <option value="{@{d20},@{d20}}kh1" data-i18n="adv">Advantage</option>
                         <option value="{@{d20},@{d20}}kl1" data-i18n="disadv">Disadvantage</option>
-<!--                         <option value="?{Advantage?|Normal Roll,&#64;&#123;d20&#125;|Advantage,&#123;&#64;&#123;d20&#125;&#44;&#64;&#123;d20&#125;&#125;kh1|Disadvantage,&#123;&#64;&#123;d20&#125;&#44;&#64;&#123;d20&#125;&#125;kl1}" data-i18n="query-roll-adv">Query Advantage</option> -->
                     </select>
                 </div>
                 <div class="row">
-                     <input type="checkbox" name="attr_init_tiebreaker" value="@{dexterity}/100">
+                    <input type="checkbox" name="attr_init_tiebreaker" value="@{dexterity}/100">
                     <span data-i18n="add-dex-tiebreaker-u">ADD DEX TIEBREAKER TO INITIATIVE</span>
-                </div>
-                <div class="row">
-                    <span data-i18n="glob-ac-mod:-u">GLOBAL ARMOR CLASS MODIFIER:</span>
-                    <input type="text" class="num" name="attr_globalacmod" placeholder="0" value="0">
                 </div>
                 <div class="row">
                     <span data-i18n="armor-class-tracking:-u">ARMOR CLASS TRACKING:</span>
@@ -4318,7 +4344,10 @@
                         <option value="Intelligence" data-i18n="int-u">INT</option>
                         <option value="Wisdom" data-i18n="wis-u">WIS</option>
                         <option value="Charisma" data-i18n="cha-u">CHA</option>
-                    </select>
+                    </select><br>
+                    <input type="checkbox" name="attr_custom_ac_shield" value="yes" checked>
+                    <span data-i18n="allow-shields-u">ALLOW SHIELDS?</span>
+                    <hr style="margin: 2px">
                 </div>
                 <div class="row">
                     <span data-i18n="hpmods:-u">HP MODIFIERS:</span>
@@ -4544,6 +4573,10 @@
                     <span data-i18n="show-global-damage-field-u">SHOW GLOBAL DAMAGE MODIFIER FIELD</span>
                 </div>
                 <div class="row">
+                    <input type="checkbox" name="attr_global_ac_mod_flag" value="1">
+                    <span data-i18n="show-global-ac-field-u">SHOW GLOBAL AC MODIFIER FIELD</span>
+                </div>
+                <div class="row">
                     <span data-i18n="add-char-to-templates:-u">ADD CHARACTER NAME TO TEMPLATES:</span>
                     <select class="dtype" name="attr_charname_output">
                         <option value="{{charname=@{character_name}}}" data-i18n="on">On</option>
@@ -4729,6 +4762,21 @@
         </div>
         <div style="position: relative; display: inline-block;">
             <input class="cancel" type="checkbox" name="attr_cancel"><span class="cancel" data-i18n="cancel">Cancel</span>
+        </div>
+    </div>
+</div>
+
+<div class="mancer_confirm">
+    <span style="line-height: 25px" data-i18n="do_you_want_mancer">How do  you want to create this character?</span>
+    <div style="margin-top: 20px;">
+        <div style="position: relative; display: inline-block; width:130px;">
+            <input class="yes" type="checkbox" style="width:130px;" name="attr_mancer_confirm"><span class="yes" style="width:130px;" data-i18n="mancer-confirm-yes">Use the Charactermancer</span>
+        </div>
+        <div style="position: relative; display: inline-block; width:80px;">
+            <input class="yes" style="width:80px;" type="checkbox" name="attr_mancer_npc"><span class="yes" style="width:80px;" data-i18n="npc-new">Create an NPC</span>
+        </div>
+        <div style="position: relative; display: inline-block; width:90px;">
+            <input class="yes" type="checkbox" style="width:90px;" name="attr_mancer_cancel"><span class="yes" style="width:90px;" data-i18n="manual">Edit sheet direclty</span>
         </div>
     </div>
 </div>
@@ -6288,7 +6336,7 @@
         });
     });
 
-    on("change:globalacmod change:custom_ac_flag change:custom_ac_base change:custom_ac_part1 change:custom_ac_part2", function(eventinfo) {
+    on("change:custom_ac_flag change:custom_ac_base change:custom_ac_part1 change:custom_ac_part2 change:custom_ac_shield", function(eventinfo) {
         if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
             return;
         }
@@ -6555,6 +6603,34 @@
         }
     });
 
+    on("change:global_ac_mod_flag", function(eventinfo) {
+        if(eventinfo.newValue === "1") {
+            getSectionIDs("acmod", function(ids) {
+                if(!ids || ids.length === 0) {
+                    var update = {};
+                    var rowid = generateRowID();
+                    update[`repeating_acmod_${rowid}_global_ac_val`] = "1";
+                    update[`repeating_acmod_${rowid}_global_ac_name`] = "Defense";
+                    update[`repeating_acmod_${rowid}_global_ac_active_flag`] = "1";
+                    setAttrs(update);
+                }
+            });
+        } else {
+            getSectionIDs("acmod", function(ids) {
+                var update = {};
+                var rowid = generateRowID();
+                _.each(ids, function(rowid) {
+                    update[`repeating_acmod_${rowid}_global_ac_active_flag`] = "0";
+                });
+                setAttrs(update);
+            });
+        }
+    });
+
+    on("change:repeating_acmod remove:repeating_acmod", function(eventinfo) {
+        update_ac();
+    });
+
     on("change:confirm", function(eventinfo) {
         setAttrs({monster_confirm_flag: ""});
         getAttrs(["drop_category"], function(v) {
@@ -6572,6 +6648,24 @@
         update["drop_data"] = "";
         update["drop_content"] = "";
         setAttrs(update, {silent: true});
+    });
+
+    on("change:mancer_confirm", function(eventinfo) {
+        setAttrs({mancer_confirm_flag: "", charactermancer_step: "l1-welcome"}, function() {
+            check_l1_mancer();
+        });
+    });
+
+    on("change:mancer_cancel", function(eventinfo) {
+        setAttrs({mancer_confirm_flag: "", l1mancer_status: "completed"}, function() {
+            check_l1_mancer();
+        });
+    });
+
+    on("change:mancer_npc", function(eventinfo) {
+        setAttrs({mancer_confirm_flag: "", l1mancer_status: "completed", npc: "1"}, function() {
+            check_l1_mancer();
+        });
     });
 
     on("change:passiveperceptionmod", function(eventinfo) {
@@ -6651,7 +6745,7 @@
     on("clicked:relaunch_lvl1mancer", function(eventinfo) {
         getAttrs(["l1mancer_status"], function(v) {
             if(v["l1mancer_status"] === "completed") {
-                setAttrs({l1mancer_status: ""});
+                setAttrs({l1mancer_status: "relaunch"});
             }
             check_l1_mancer();
         });
@@ -8507,7 +8601,7 @@
                         attack_attribs.push("repeating_attack_" + id + "_spellid", "repeating_attack_" + id + "_spelllevel");
                     });
                     getAttrs(attack_attribs, function(v) {
-                        var filteredIds = _.filter(idarray, function(id) { 
+                        var filteredIds = _.filter(idarray, function(id) {
                             return v["repeating_attack_" + id + "_spellid"] && v["repeating_attack_" + id + "_spellid"] != "";
                         });
                         var spell_attacks = {};
@@ -9134,98 +9228,112 @@
             if(v.custom_ac_flag === "2") {
                 return;
             }
-            else if(v.custom_ac_flag === "1") {
-                getAttrs(["custom_ac_base","custom_ac_part1","custom_ac_part2","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod"], function(b) {
-                    var base = isNaN(parseInt(b.custom_ac_base, 10)) === false ? parseInt(b.custom_ac_base, 10) : 10;
-                    var part1attr = b.custom_ac_part1.toLowerCase();
-                    var part2attr = b.custom_ac_part2.toLowerCase();
-                    var part1 = part1attr === "none" ? 0 : b[part1attr + "_mod"];
-                    var part2 = part2attr === "none" ? 0 : b[part2attr + "_mod"];
-                    var total = base + part1 + part2;
-                    setAttrs({ac: total});
-                });
-            }
             else {
                 var update = {};
-                var ac_attrs = ["simpleinventory","dexterity_mod","globalacmod"];
-                getSectionIDs("repeating_inventory", function(idarray) {
-                    _.each(idarray, function(currentID, i) {
-                        ac_attrs.push("repeating_inventory_" + currentID + "_equipped");
-                        ac_attrs.push("repeating_inventory_" + currentID + "_itemmodifiers");
+                var ac_attrs = ["simpleinventory","custom_ac_base","custom_ac_part1","custom_ac_part2","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod", "custom_ac_shield"];
+                getSectionIDs("repeating_acmod", function(acidarray) {
+                    _.each(acidarray, function(currentID, i) {
+                        ac_attrs.push("repeating_acmod_" + currentID + "_global_ac_val");
+                        ac_attrs.push("repeating_acmod_" + currentID + "_global_ac_active_flag");
                     });
-                    getAttrs(ac_attrs, function(b) {
-                        var globalacmod = isNaN(parseInt(b.globalacmod, 10)) === false ? parseInt(b.globalacmod, 10) : 0;
-                        var dexmod = +b["dexterity_mod"];
-                        var total = 10 + dexmod;
-                        var armorcount = 0;
-                        var shieldcount = 0;
-                        var armoritems = [];
-                        if(b.simpleinventory === "complex") {
-                            _.each(idarray, function(currentID, i) {
-                                if(b["repeating_inventory_" + currentID + "_equipped"] && b["repeating_inventory_" + currentID + "_equipped"] === "1" && b["repeating_inventory_" + currentID + "_itemmodifiers"] && b["repeating_inventory_" + currentID + "_itemmodifiers"].toLowerCase().indexOf("ac") > -1) {
-                                    var mods = b["repeating_inventory_" + currentID + "_itemmodifiers"].split(",");
-                                    var ac = 0;
-                                    var type = "mod";
-                                    _.each(mods, function(mod) {
-                                        if(mod.substring(0,10) === "Item Type:") {
-                                            type = mod.substring(11, mod.length).trim().toLowerCase();
-                                        }
-                                        if(mod.toLowerCase().indexOf("ac:") > -1 || mod.toLowerCase().indexOf("ac +") > -1 || mod.toLowerCase().indexOf("ac+") > -1) {
-                                            var regex = mod.replace(/[^0-9]/g, "");
-                                            var bonus = regex && regex.length > 0 && isNaN(parseInt(regex,10)) === false ? parseInt(regex,10) : 0;
-                                            ac = ac + bonus;
-                                        }
-                                        if(mod.toLowerCase().indexOf("ac -") > -1 || mod.toLowerCase().indexOf("ac-") > -1) {
-                                            var regex = mod.replace(/[^0-9]/g, "");
-                                            var bonus = regex && regex.length > 0 && isNaN(parseInt(regex,10)) === false ? parseInt(regex,10) : 0;
-                                            ac = ac - bonus;
-                                        }
-                                    });
-                                    armoritems.push({type: type, ac: ac});
+                    getSectionIDs("repeating_inventory", function(idarray) {
+                        _.each(idarray, function(currentID, i) {
+                            ac_attrs.push("repeating_inventory_" + currentID + "_equipped");
+                            ac_attrs.push("repeating_inventory_" + currentID + "_itemmodifiers");
+                        });
+                        getAttrs(ac_attrs, function(b) {
+                            var custom_total = 0;
+                            if(v.custom_ac_flag === "1") {
+                                var base = isNaN(parseInt(b.custom_ac_base, 10)) === false ? parseInt(b.custom_ac_base, 10) : 10;
+                                var part1attr = b.custom_ac_part1.toLowerCase();
+                                var part2attr = b.custom_ac_part2.toLowerCase();
+                                var part1 = part1attr === "none" ? 0 : parseInt(b[part1attr + "_mod"], 10);
+                                var part2 = part2attr === "none" ? 0 : parseInt(b[part2attr + "_mod"], 10);
+                                custom_total = base + part1 + part2;
+                            }
+                            var globalacmod = 0;
+                            _.each(acidarray, function(currentID, i) {
+                                if(b["repeating_acmod_" + currentID + "_global_ac_active_flag"] == "1") {
+                                    globalacmod += parseInt(b["repeating_acmod_" + currentID + "_global_ac_val"], 10);
                                 }
                             });
-                            armorcount = armoritems.filter(function(item){ return item["type"].indexOf("armor") > -1 }).length;
-                            shieldcount = armoritems.filter(function(item){ return item["type"].indexOf("shield") > -1 }).length;
-                            var base = dexmod;
-                            var armorac = 10;
-                            var shieldac = 0;
-                            var modac = 0;
+                            var dexmod = +b["dexterity_mod"];
+                            var total = 10 + dexmod;
+                            var armorcount = 0;
+                            var shieldcount = 0;
+                            var armoritems = [];
+                            if(b.simpleinventory === "complex") {
+                                _.each(idarray, function(currentID, i) {
+                                    if(b["repeating_inventory_" + currentID + "_equipped"] && b["repeating_inventory_" + currentID + "_equipped"] === "1" && b["repeating_inventory_" + currentID + "_itemmodifiers"] && b["repeating_inventory_" + currentID + "_itemmodifiers"].toLowerCase().indexOf("ac") > -1) {
+                                        var mods = b["repeating_inventory_" + currentID + "_itemmodifiers"].split(",");
+                                        var ac = 0;
+                                        var type = "mod";
+                                        _.each(mods, function(mod) {
+                                            if(mod.substring(0,10) === "Item Type:") {
+                                                type = mod.substring(11, mod.length).trim().toLowerCase();
+                                            }
+                                            if(mod.toLowerCase().indexOf("ac:") > -1 || mod.toLowerCase().indexOf("ac +") > -1 || mod.toLowerCase().indexOf("ac+") > -1) {
+                                                var regex = mod.replace(/[^0-9]/g, "");
+                                                var bonus = regex && regex.length > 0 && isNaN(parseInt(regex,10)) === false ? parseInt(regex,10) : 0;
+                                                ac = ac + bonus;
+                                            }
+                                            if(mod.toLowerCase().indexOf("ac -") > -1 || mod.toLowerCase().indexOf("ac-") > -1) {
+                                                var regex = mod.replace(/[^0-9]/g, "");
+                                                var bonus = regex && regex.length > 0 && isNaN(parseInt(regex,10)) === false ? parseInt(regex,10) : 0;
+                                                ac = ac - bonus;
+                                            }
+                                        });
+                                        armoritems.push({type: type, ac: ac});
+                                    }
+                                });
+                                armorcount = armoritems.filter(function(item){ return item["type"].indexOf("armor") > -1 }).length;
+                                shieldcount = armoritems.filter(function(item){ return item["type"].indexOf("shield") > -1 }).length;
+                                var base = dexmod;
+                                var armorac = 10;
+                                var shieldac = 0;
+                                var modac = 0;
 
-                            _.each(armoritems, function(item) {
-                                if(item["type"].indexOf("light armor") > -1) {
-                                    armorac = item["ac"];
-                                    base = dexmod;
-                                }
-                                else if(item["type"].indexOf("medium armor") > -1) {
-                                    armorac = item["ac"];
-                                    base = Math.min(dexmod, 2);
-                                }
-                                else if(item["type"].indexOf("heavy armor") > -1) {
-                                    armorac = item["ac"];
-                                    base = 0;
-                                }
-                                else if(item["type"].indexOf("shield") > -1) {
-                                    shieldac = item["ac"];
+                                _.each(armoritems, function(item) {
+                                    if(item["type"].indexOf("light armor") > -1) {
+                                        armorac = item["ac"];
+                                        base = dexmod;
+                                    }
+                                    else if(item["type"].indexOf("medium armor") > -1) {
+                                        armorac = item["ac"];
+                                        base = Math.min(dexmod, 2);
+                                    }
+                                    else if(item["type"].indexOf("heavy armor") > -1) {
+                                        armorac = item["ac"];
+                                        base = 0;
+                                    }
+                                    else if(item["type"].indexOf("shield") > -1) {
+                                        shieldac = item["ac"];
+                                    }
+                                    else {
+                                        modac = modac + item["ac"]
+                                    }
+                                });
+
+                                total = base + armorac + shieldac + modac;
+
+                            };
+                            update["armorwarningflag"] = "hide";
+                            update["customacwarningflag"] = "hide";
+                            if(armorcount > 1 || shieldcount > 1) {
+                                update["armorwarningflag"] = "show";
+                            }
+                            update["ac"] = total + globalacmod;
+                            if(custom_total > 0) {
+                                if(armorcount > 0 || (shieldcount > 0 && b.custom_ac_shield != "yes")) {
+                                    update["customacwarningflag"] = "show";
                                 }
                                 else {
-                                    modac = modac + item["ac"]
+                                    update["ac"] = b.custom_ac_shield == "yes" ? custom_total + shieldac + globalacmod + modac : custom_total + globalacmod + modac;
                                 }
-                            })
-
-                            total = base + armorac + shieldac + modac;
-
-                        };
-                        if(armorcount > 1 || shieldcount > 1) {
-                            update["armorwarningflag"] = "show";
-                            update["armorwarning"] = "0";
-                        }
-                        else {
-                            update["armorwarningflag"] = "hide";
-                            update["armorwarning"] = "0";
-                        }
-                        console.log("total: " + total);
-                        update["ac"] = total + globalacmod;
-                        setAttrs(update, {silent: true});
+                            }
+                            console.log("total: " + total);
+                            setAttrs(update, {silent: true});
+                        });
                     });
                 });
             };
@@ -10357,7 +10465,11 @@
                 startCharactermancer(v["charactermancer_step"]);
             }
             else {
-                startCharactermancer("l1-welcome");
+                if(v["l1mancer_status"] && v["l1mancer_status"] === "relaunch") {
+                    startCharactermancer("l1-welcome");
+                } else {
+                    setAttrs({mancer_confirm_flag: 1});
+                }
             }
         });
     };
@@ -10639,6 +10751,24 @@
         });
     };
 
+    var upgrade_to_2_5 = function(doneupdating) {
+        getAttrs(["globalacmod"], function(v) {
+            var update = {};
+            if(v.globalacmod && v.globalacmod != "0") {
+                var rowid = generateRowID();
+                update[`repeating_acmod_${rowid}_global_ac_val`] = parseInt(v.globalacmod);
+                update[`repeating_acmod_${rowid}_global_ac_name`] = "GLOBAL ARMOR CLASS MODIFIER";
+                update[`repeating_acmod_${rowid}_global_ac_active_flag`] = "1";
+                update[`repeating_acmod_${rowid}_options-flag`] = "0";
+                update["global_ac_mod_flag"] = "1";
+            }
+            setAttrs(update, {silent: true}, function() {
+                update_ac();
+                doneupdating();
+            });
+        });
+    };
+
     var no_version_bugfix = function(doneupdating) {
         getAttrs(["npc","class"], function(v) {
             if(v["npc"] && v["npc"] != "0" || v["class"] && v["class"] != "") {
@@ -10653,8 +10783,8 @@
 
     var versioning = function(finished) {
         getAttrs(["version"], function(v) {
-            if(v["version"] === "2.4") {
-                setAttrs({version: "2.4"}, function(){
+            if(v["version"] === "2.5") {
+                setAttrs({version: "2.5"}, function(){
                     finished();
                 });
                 console.log("5th Edition OGL by Roll20 v" + v["version"]);
@@ -10666,39 +10796,52 @@
                     versioning(finished);
                 });
             }
+            else if(v["version"] === "2.4") {
+                console.log("UPGRADING TO v2.5");
+                upgrade_to_2_5(function() {
+                    setAttrs({version: "2.5"}, function() {
+                        versioning(finished);
+                    });
+                });
+            }
             else if(v["version"] === "2.3") {
                 console.log("UPGRADING TO v2.4");
                 upgrade_to_2_4(function() {
-                    setAttrs({version: "2.4"});
-                    versioning(finished);
+                    setAttrs({version: "2.4"}, function() {
+                        versioning(finished);
+                    });
                 });
             }
             else if(v["version"] === "2.2") {
                 console.log("UPGRADING TO v2.3");
                 upgrade_to_2_3(function() {
-                    setAttrs({version: "2.3"});
-                    versioning(finished);
+                    setAttrs({version: "2.3"}, function() {
+                        versioning(finished);
+                    });
                 });
             }
             else if(v["version"] === "2.1") {
                 console.log("UPGRADING TO v2.2");
                 upgrade_to_2_2(function() {
-                    setAttrs({version: "2.2"});
-                    versioning(finished);
+                    setAttrs({version: "2.2"}, function() {
+                        versioning(finished);
+                    });
                 });
             }
             else if(v["version"] === "2.0") {
                 console.log("UPGRADING TO v2.1");
                 upgrade_to_2_1(function() {
-                    setAttrs({version: "2.1"});
-                    versioning(finished);
+                    setAttrs({version: "2.1"}, function() {
+                        versioning(finished);
+                    });
                 });
             }
             else {
                 console.log("UPGRADING TO v2.0");
                 upgrade_to_2_0(function() {
-                    setAttrs({version: "2.0"});
-                    versioning(finished);
+                    setAttrs({version: "2.0"}, function() {
+                        versioning(finished);
+                    });
                 });
             };
         });
@@ -11124,7 +11267,7 @@
         clearset["spell_attack_bonus"] = "";
         clearset["spell_save_dc"] = "";
         clearset["armorwarningflag"] = "hide";
-        clearset["armorwarning"] = "0";
+        clearset["customacwarningflag"] = "hide";
         clearset["passive_wisdom"] = "";
         _.each(allSkills, function(skill) {
             clearset[skill + "_prof"] = "";//0
@@ -11462,11 +11605,19 @@
             <li><button class="step" type="back" value="l1-summary" data-i18n="review-u">REVIEW</button></li>
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel-u">CANCEL</button></li>
         </ol>
+        <div class="logos">
+            <span class="charmancer-logo"></span>
+            <span class="compendium-logo"></span>
+        </div>
         <p class="label" data-i18n="charmancer-welcome">Welcome to the Charactermancer!</p>
         <p data-i18n="charmancer-what-is">The Charactermancer is step-by-step process that makes building a character simple and streamlined. Changes are saved as you progress, but have no fear. The character sheet is only updated when you have completed your review.</p>
         <p class="label" data-i18n="charmancer-compendium">Your Compendium Awaits.</p>
         <p data-i18n="charmancer-compendium-detail">The Charactermancer currently supports Dungeons &amp; Dragons 5th Edition SRD and the Player's Handbook. You can add the Player's Handbook to your compendium in the Marketplace, or the game owner can share their compendium with everyone in the game.</p>
         <p class="label" data-i18n="get-started">Get started by clicking "Next".</p>
+        <!-- <p class="label" data-i18n="">Expand your Compendium!</p>
+        <div class="expansions">
+            <p>[ All the compendium expansions here as marketplace cards]</p>
+        </div> -->
         <div class="bottombar">
             <button class="prev" type="cancel" value="l1-cancel" data-i18n="opt-out-u">OPT OUT</button>
             <button type="button" data-scroll="#top" class="jump">Back to Top</button>
@@ -11497,29 +11648,31 @@
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel-u">CANCEL</button></li>
         </ol>
         <div class="topbar">
-            <div class="sheet-attr-container">
-                <h4 data-i18n="strength">Strength</h4>
-                <span class="strength_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="dexterity">Dexterity</h4>
-                <span class="dexterity_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="constitution">Constitution</h4>
-                <span class="constitution_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="intelligence">Intelligence</h4>
-                <span class="intelligence_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="wisdom">Wisdom</h4>
-                <span class="wisdom_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="charisma">Charisma</h4>
-                <span class="charisma_total">-</span>
+            <div class="topbar-container">
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="strength">Strength</h4>
+                    <span class="strength_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="dexterity">Dexterity</h4>
+                    <span class="dexterity_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="constitution">Constitution</h4>
+                    <span class="constitution_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="intelligence">Intelligence</h4>
+                    <span class="intelligence_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="wisdom">Wisdom</h4>
+                    <span class="wisdom_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="charisma">Charisma</h4>
+                    <span class="charisma_total">-</span>
+                </div>
             </div>
             <div class="meta-info-container">
                 <span class="label"><span data-i18n="hp">Hit Points</span>: <span class="hit_points"></span></span>
@@ -12016,29 +12169,31 @@
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel" data-i18n="cancel-u">EXIT</button></li>
         </ol>
         <div class="topbar">
-            <div class="sheet-attr-container">
-                <h4 data-i18n="strength">Strength</h4>
-                <span class="strength_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="dexterity">Dexterity</h4>
-                <span class="dexterity_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="constitution">Constitution</h4>
-                <span class="constitution_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="intelligence">Intelligence</h4>
-                <span class="intelligence_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="wisdom">Wisdom</h4>
-                <span class="wisdom_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="charisma">Charisma</h4>
-                <span class="charisma_total">-</span>
+            <div class="topbar-container">
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="strength">Strength</h4>
+                    <span class="strength_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="dexterity">Dexterity</h4>
+                    <span class="dexterity_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="constitution">Constitution</h4>
+                    <span class="constitution_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="intelligence">Intelligence</h4>
+                    <span class="intelligence_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="wisdom">Wisdom</h4>
+                    <span class="wisdom_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="charisma">Charisma</h4>
+                    <span class="charisma_total">-</span>
+                </div>
             </div>
             <div class="meta-info-container">
                 <span class="label"><span data-i18n="hp">Hit Points</span>: <span class="hit_points"></span></span>
@@ -12558,29 +12713,31 @@
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel" data-i18n="cancel-u">EXIT</button></li>
         </ol>
         <div class="topbar">
-            <div class="sheet-attr-container">
-                <h4 data-i18n="strength">Strength</h4>
-                <span class="strength_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="dexterity">Dexterity</h4>
-                <span class="dexterity_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="constitution">Constitution</h4>
-                <span class="constitution_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="intelligence">Intelligence</h4>
-                <span class="intelligence_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="wisdom">Wisdom</h4>
-                <span class="wisdom_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="charisma">Charisma</h4>
-                <span class="charisma_total">-</span>
+            <div class="topbar-container">
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="strength">Strength</h4>
+                    <span class="strength_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="dexterity">Dexterity</h4>
+                    <span class="dexterity_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="constitution">Constitution</h4>
+                    <span class="constitution_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="intelligence">Intelligence</h4>
+                    <span class="intelligence_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="wisdom">Wisdom</h4>
+                    <span class="wisdom_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="charisma">Charisma</h4>
+                    <span class="charisma_total">-</span>
+                </div>
             </div>
             <div class="meta-info-container">
                 <span class="label"><span data-i18n="hp">Hit Points</span>: <span class="hit_points"></span></span>
@@ -12720,29 +12877,31 @@
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel" data-i18n="cancel-u">EXIT</button></li>
         </ol>
         <div class="topbar">
-            <div class="sheet-attr-container">
-                <h4 data-i18n="strength">Strength</h4>
-                <span class="strength_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="dexterity">Dexterity</h4>
-                <span class="dexterity_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="constitution">Constitution</h4>
-                <span class="constitution_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="intelligence">Intelligence</h4>
-                <span class="intelligence_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="wisdom">Wisdom</h4>
-                <span class="wisdom_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="charisma">Charisma</h4>
-                <span class="charisma_total">-</span>
+            <div class="topbar-container">
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="strength">Strength</h4>
+                    <span class="strength_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="dexterity">Dexterity</h4>
+                    <span class="dexterity_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="constitution">Constitution</h4>
+                    <span class="constitution_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="intelligence">Intelligence</h4>
+                    <span class="intelligence_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="wisdom">Wisdom</h4>
+                    <span class="wisdom_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="charisma">Charisma</h4>
+                    <span class="charisma_total">-</span>
+                </div>
             </div>
             <div class="meta-info-container">
                 <span class="label"><span data-i18n="hp">Hit Points</span>: <span class="hit_points"></span></span>
@@ -12938,29 +13097,31 @@
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel" data-i18n="cancel-u">EXIT</button></li>
         </ol>
         <div class="topbar">
-            <div class="sheet-attr-container">
-                <h4 data-i18n="strength">Strength</h4>
-                <span class="strength_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="dexterity">Dexterity</h4>
-                <span class="dexterity_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="constitution">Constitution</h4>
-                <span class="constitution_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="intelligence">Intelligence</h4>
-                <span class="intelligence_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="wisdom">Wisdom</h4>
-                <span class="wisdom_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="charisma">Charisma</h4>
-                <span class="charisma_total">-</span>
+            <div class="topbar-container">
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="strength">Strength</h4>
+                    <span class="strength_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="dexterity">Dexterity</h4>
+                    <span class="dexterity_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="constitution">Constitution</h4>
+                    <span class="constitution_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="intelligence">Intelligence</h4>
+                    <span class="intelligence_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="wisdom">Wisdom</h4>
+                    <span class="wisdom_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="charisma">Charisma</h4>
+                    <span class="charisma_total">-</span>
+                </div>
             </div>
             <div class="meta-info-container">
                 <span class="label"><span data-i18n="hp">Hit Points</span>: <span class="hit_points"></span></span>
@@ -13131,29 +13292,31 @@
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel" data-i18n="cancel-u">EXIT</button></li>
         </ol>
         <div class="topbar">
-            <div class="sheet-attr-container">
-                <h4 data-i18n="strength">Strength</h4>
-                <span class="strength_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="dexterity">Dexterity</h4>
-                <span class="dexterity_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="constitution">Constitution</h4>
-                <span class="constitution_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="intelligence">Intelligence</h4>
-                <span class="intelligence_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="wisdom">Wisdom</h4>
-                <span class="wisdom_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="charisma">Charisma</h4>
-                <span class="charisma_total">-</span>
+            <div class="topbar-container">
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="strength">Strength</h4>
+                    <span class="strength_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="dexterity">Dexterity</h4>
+                    <span class="dexterity_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="constitution">Constitution</h4>
+                    <span class="constitution_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="intelligence">Intelligence</h4>
+                    <span class="intelligence_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="wisdom">Wisdom</h4>
+                    <span class="wisdom_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="charisma">Charisma</h4>
+                    <span class="charisma_total">-</span>
+                </div>
             </div>
             <div class="meta-info-container">
                 <span class="label"><span data-i18n="hp">Hit Points</span>: <span class="hit_points"></span></span>
@@ -13376,29 +13539,31 @@
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel" data-i18n="cancel-u">EXIT</button></li>
         </ol>
         <div class="topbar">
-            <div class="sheet-attr-container">
-                <h4 data-i18n="strength">Strength</h4>
-                <span class="strength_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="dexterity">Dexterity</h4>
-                <span class="dexterity_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="constitution">Constitution</h4>
-                <span class="constitution_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="intelligence">Intelligence</h4>
-                <span class="intelligence_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="wisdom">Wisdom</h4>
-                <span class="wisdom_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4 data-i18n="charisma">Charisma</h4>
-                <span class="charisma_total">-</span>
+            <div class="topbar-container">
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="strength">Strength</h4>
+                    <span class="strength_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="dexterity">Dexterity</h4>
+                    <span class="dexterity_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="constitution">Constitution</h4>
+                    <span class="constitution_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="intelligence">Intelligence</h4>
+                    <span class="intelligence_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="wisdom">Wisdom</h4>
+                    <span class="wisdom_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4 data-i18n="charisma">Charisma</h4>
+                    <span class="charisma_total">-</span>
+                </div>
             </div>
             <div class="meta-info-container">
                 <span class="label"><span data-i18n="hp">Hit Points</span>: <span class="hit_points"></span></span>
@@ -13601,29 +13766,31 @@
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel" data-i18n="cancel-u">EXIT</button></li>
         </ol>
         <div class="topbar">
-            <div class="sheet-attr-container">
-                <h4>Strength</h4>
-                <span class="strength_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4>Dexterity</h4>
-                <span class="dexterity_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4>Constitution</h4>
-                <span class="constitution_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4>Intelligence</h4>
-                <span class="intelligence_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4>Wisdom</h4>
-                <span class="wisdom_total">-</span>
-            </div>
-            <div class="sheet-attr-container">
-                <h4>Charisma</h4>
-                <span class="charisma_total">-</span>
+            <div class="topbar-container">
+                <div class="sheet-attr-container">
+                    <h4>Strength</h4>
+                    <span class="strength_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4>Dexterity</h4>
+                    <span class="dexterity_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4>Constitution</h4>
+                    <span class="constitution_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4>Intelligence</h4>
+                    <span class="intelligence_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4>Wisdom</h4>
+                    <span class="wisdom_total">-</span>
+                </div>
+                <div class="sheet-attr-container">
+                    <h4>Charisma</h4>
+                    <span class="charisma_total">-</span>
+                </div>
             </div>
             <div class="meta-info-container">
                 <span class="label"><span data-i18n="hp">Hit Points</span>: <span class="hit_points"></span></span>
@@ -13634,63 +13801,65 @@
         <p class="choice ready_text">The only choice left is to press on or turn back. If you're editing an existing character, all your existing data will be lost into the void when you apply your changes.</p>
         <p class="label ready_message"></p>
         <p class="label">Review your choices:</p>
-        <div class="summary">
-            <p class="label">Race</p>
-            <div class="race_info">
+        <div class="summary-container">
+            <div class="summary">
+                <p class="label">Race</p>
+                <div class="race_info">
+                </div>
+                <div class="choice returnblock race_button">
+                    <span data-i18n="return-to:">Return to: </span>
+                    <button class="step" type="back" value="l1-race" data-i18n="race-u">RACE</button>
+                </div>
             </div>
-            <div class="choice returnblock race_button">
-                <span data-i18n="return-to:">Return to: </span>
-                <button class="step" type="back" value="l1-race" data-i18n="race-u">RACE</button>
+            <div class="summary">
+                <p class="label">Class</p>
+                <div class="class_info">
+                </div>
+                <div class="choice returnblock class_button">
+                    <span data-i18n="return-to:">Return to: </span>
+                    <button class="step" type="back" value="l1-class" data-i18n="class-u">CLASS</button>
+                </div>
             </div>
-        </div>
-        <div class="summary">
-            <p class="label">Class</p>
-            <div class="class_info">
+            <div class="summary">
+                <p class="label">Abilities</p>
+                <div class="ability_info">
+                </div>
+                <div class="choice returnblock abilities_button">
+                    <span data-i18n="return-to:">Return to: </span>
+                    <button class="step" type="back" value="l1-abilities" data-i18n="abilities-u">ABILITIES</button>
+                </div>
             </div>
-            <div class="choice returnblock class_button">
-                <span data-i18n="return-to:">Return to: </span>
-                <button class="step" type="back" value="l1-class" data-i18n="class-u">CLASS</button>
+            <div class="summary">
+                <p class="label">Background</p>
+                <div class="background_info">
+                </div>
+                <div class="choice returnblock background_button">
+                    <span data-i18n="return-to:">Return to: </span>
+                    <button class="step" type="back" value="l1-background" data-i18n="background-u">BACKGROUND</button>
+                </div>
             </div>
-        </div>
-        <div class="summary">
-            <p class="label">Abilities</p>
-            <div class="ability_info">
+            <div class="summary">
+                <p class="label">Equipment</p>
+                <div class="equipment_info">
+                </div>
+                <div class="choice returnblock equipment_button">
+                    <span data-i18n="return-to:">Return to: </span>
+                    <button class="step" type="back" value="l1-equipment" data-i18n="equipment-u">EQUIPMENT</button>
+                </div>
             </div>
-            <div class="choice returnblock abilities_button">
-                <span data-i18n="return-to:">Return to: </span>
-                <button class="step" type="back" value="l1-abilities" data-i18n="abilities-u">ABILITIES</button>
+            <div class="summary">
+                <p class="label">Spells</p>
+                <div class="spell_info">
+                </div>
+                <div class="choice returnblock spells_button">
+                    <span data-i18n="return-to:">Return to: </span>
+                    <button class="step" type="back" value="l1-spells" data-i18n="spells-u">SPELLS</button>
+                </div>
             </div>
-        </div>
-        <div class="summary">
-            <p class="label">Background</p>
-            <div class="background_info">
-            </div>
-            <div class="choice returnblock background_button">
-                <span data-i18n="return-to:">Return to: </span>
-                <button class="step" type="back" value="l1-background" data-i18n="background-u">BACKGROUND</button>
-            </div>
-        </div>
-        <div class="summary">
-            <p class="label">Equipment</p>
-            <div class="equipment_info">
-            </div>
-            <div class="choice returnblock equipment_button">
-                <span data-i18n="return-to:">Return to: </span>
-                <button class="step" type="back" value="l1-equipment" data-i18n="equipment-u">EQUIPMENT</button>
-            </div>
-        </div>
-        <div class="summary">
-            <p class="label">Spells</p>
-            <div class="spell_info">
-            </div>
-            <div class="choice returnblock spells_button">
-                <span data-i18n="return-to:">Return to: </span>
-                <button class="step" type="back" value="l1-spells" data-i18n="spells-u">SPELLS</button>
-            </div>
-        </div>
-        <div class="summary">
-            <p class="label">Feats</p>
-            <div class="feat_info">
+            <div class="summary">
+                <p class="label">Feats</p>
+                <div class="feat_info">
+                </div>
             </div>
         </div>
 
