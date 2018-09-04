@@ -2240,7 +2240,7 @@
                                     <option value="combat" data-i18n="combat">Combat</option>
                                     <option value="critical" data-i18n="critical">Critical</option>
                                     <option value="grit" data-i18n="grit">Grit</option>
-                                    <option value="item creation" data-i18n="item-creation">Item creation</option>
+                                    <option value="item creation" data-i18n="item creation">Item creation</option>
                                     <option value="metamagic" data-i18n="metamagic">Metamagic</option>
                                     <option value="monster" data-i18n="monster">Monster</option>
                                     <option value="panache" data-i18n="panache">Panache</option>
@@ -5081,7 +5081,7 @@
                                     <option value="combat" data-i18n="combat">Combat</option>
                                     <option value="critical" data-i18n="critical">Critical</option>
                                     <option value="grit" data-i18n="grit">Grit</option>
-                                    <option value="item-creation" data-i18n="item-creation">Item creation</option>
+                                    <option value="item creation" data-i18n="item creation">Item creation</option>
                                     <option value="metamagic" data-i18n="metamagic">Metamagic</option>
                                     <option value="panache" data-i18n="panache">Panache</option>
                                     <option value="performance" data-i18n="performance">Performance</option>
@@ -7437,6 +7437,11 @@
                                         <input type="radio" name="attr_timesperday" class="pseudocheck" value="per-day" title="@{repeating_spell-like_$id_timesperday}" /><span></span>
                                         <span class="lbl" data-i18n="per-day">per day</span>
                                         <input type="number" class="nospin underlined spsml" name="attr_perday_max" value="1" title="@{repeating_spell-like_$id_perday_max}" />
+                                        <span class="lbl std right" data-i18n="type:">Type:</span>
+                                        <div class="autoex std">
+                                            <span name="attr_spelltype"></span>
+                                            <textarea name="attr_spelltype" class="underlined" spellcheck="false" data-i18n-placeholder="type" placeholder="Type" title="@{repeating_spell-like_$id_type}"></textarea>
+                                        </div>
                                     </div>
                                     <div class="myrow grtopbrd">
                                         <span class="lbl std right" data-i18n="school:">School:</span>
@@ -8001,7 +8006,7 @@
                 </div>
             </div> <!-- END SKILLS -->
         </div>
-        <div class="col1third"> <!-- ROLLS and MISC -->
+        <div class="col1third"> <!-- ROLLS, MISC and MANCER -->
             <div class="blacklabel pnty">
                 <img class="brdleft" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Official/img/brdleft.png" />
                 <span class="big only" data-i18n="rolls">Rolls</span>
@@ -8036,7 +8041,23 @@
                 <span class="big only" data-i18n="misc-u">MISC</span>
                 <img class="brdright" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Official/img/brdright.png" />
             </div>
-            <div class="bordered titled inbox"><input class="pseudocheck" type="checkbox" name="attr_npc" value="1" title="@{npc}" /><span></span><span data-i18n="npc-monster-statblock">NPC/Monster Statblock</span></div>
+            <div class="bordered titled inbox">
+                <input class="pseudocheck" type="checkbox" name="attr_npc" value="1" title="@{npc}" /><span></span><span data-i18n="npc-monster-statblock">NPC/Monster Statblock</span>
+            </div>
+            <div class="blacklabel pnty">
+                <img class="brdleft" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Official/img/brdleft.png" />
+                <span class="big only">Charactermancer</span>
+                <img class="brdright" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Official/img/brdright.png" />
+            </div>
+            <div class="bordered titled inbox">
+                <div class="myrow center">
+                    <button type="action" class="myrol" name="act_relaunch_lvl1mancer">
+                        <img style="height: 32px; width: 32px" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/5th%20Edition%20OGL%20by%20Roll20/images/CharactermancerIcon200px.png" />
+                    </button>
+                    <span data-i18n="relaunch-lvl1mancer">Launch Level 1 Charactermancer</span>
+                    <span data-i18n="cannot-be-undone-u">(CANNOT BE UNDONE)</span>
+                </div>
+            </div>
             <div class="topspace myrow right">
                 <span data-i18n="version">Version</span>
                 <span name="attr_version"></span>
@@ -8396,6 +8417,12 @@
                 {{savedc}}
             </div>
         {{/save}}
+        {{#powertype}}
+            <div class="myrow">
+                <span class="lbl bold" data-i18n="type:">Type:</span>
+                <span class="notes inl">{{powertype}}</span>
+            </div>
+        {{/powertype}}
         {{#school}}
             <div class="myrow">
                 <span class="lbl bold" data-i18n="school:">School:</span>
@@ -9031,7 +9058,7 @@
 <!-- SHEET WORKERS -->
 <script type="text/worker">
     /* === GLOBAL VARIABLES === */
-    var pfoglobals_currentversion = 1.14;
+    var pfoglobals_currentversion = 1.15;
     var pfoglobals_i18n_obj = {};
     var pfoglobals_debug_mode = 0;
     var pfoglobals_initdone = 0;
@@ -9054,7 +9081,7 @@
     const pfoglobals_atk_fields = ["npc","strength_oneandahalf_mod","strength_half_mod","dexterity_oneandahalf_mod","dexterity_half_mod","melee_mod","ranged_mod","cmb_mod","bab","bab_max","rollmod_attack","rollnotes_attack","rollmod_damage","whispertype","rollshowchar","bab_multi","melee_multi","ranged_multi","cmb_multi"].concat(pfoglobals_mods);
     const pfoglobals_spell_attr = ["spelllevel","spellcaster","spellname","spellschool","spellclasslevel","spellcastingtime","spellrange","spellarea","spelltargets","spelleffect","spellduration","spellsaveflag","spellsave","spelldc_mod","spellresistanceflag","spellresistance","spellatkflag","spellatktype","spellatkmod","spellatkcritrange","spelldmgcritmulti","spelldmgflag","spelldmg","spelldmgtype","spelldmg2flag","spelldmg2","spelldmg2type","spelldescflag","spelldesc","notes"];
     const pfoglobals_spell_only_attr = ["spellcomponent"];
-    const pfoglobals_spell_like_attr = ["timesperday","perday_max"];
+    const pfoglobals_spell_like_attr = ["spelltype","timesperday","perday_max"];
     var pfoglobals_repsec_spell = [];
     const pfoglobals_spell_fields = ["melee_mod","ranged_mod","cmb_mod","rollmod_attack","rollnotes_spell","rollmod_damage","whispertype","rollshowchar","caster1_level", "caster2_level","caster1_flag","caster2_flag","caster1_class","caster2_class","armor_spell_failure","caster1_spell_failure","caster2_spell_failure","npc","caster1_concentration_roll","caster2_concentration_roll","caster1_dc_level_0","caster1_dc_level_1","caster1_dc_level_2","caster1_dc_level_3","caster1_dc_level_4","caster1_dc_level_5","caster1_dc_level_6","caster1_dc_level_7","caster1_dc_level_8","caster1_dc_level_9","caster2_dc_level_0","caster2_dc_level_1","caster2_dc_level_2","caster2_dc_level_3","caster2_dc_level_4","caster2_dc_level_5","caster2_dc_level_6","caster2_dc_level_7","caster2_dc_level_8","caster2_dc_level_9"].concat(pfoglobals_mods);
     const pfoglobals_concentration_fields = ["npc","caster1_level","caster1_ability","caster1_ability_mod","caster1_concentration_misc","caster1_concentration_bonus","caster2_level","caster2_ability","caster2_ability_mod","caster2_concentration_misc","caster2_concentration_bonus"].concat(pfoglobals_mods);
@@ -9115,17 +9142,15 @@
     });
     on("clicked:cancel", () => {
         showChoices(["cancel-prompt"]);
-        // console.log(getCharmancerData());
-        // console.log(recalcData());
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG Mancer cancel: " + JSON.stringify(getCharmancerData(),null,"  "));}
     });
     on("clicked:continue", () => {
         hideChoices(["cancel-prompt"]);
     });
     on("mancerfinish:l1-mancer", (eventinfo) => {
         // === VARIABLES ===
-        // console.log("*** Mancer finish: " + JSON.stringify(eventinfo,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG Mancer finish: " + JSON.stringify(eventinfo,null,"  "));}
         const mncrAbilities = pfoglobals_abilities;
-        const mncrGetList = true;
         var mancerdata = eventinfo.data;
         var charUpd = {};
         var bRaceData = false;
@@ -9139,23 +9164,94 @@
         var allSkillBonus = "";
         var skillBonusNotes = {};
         var finalspeed = 0;
+        var allRepSecs = ["attacks","skillcraft","skillknowledge","skillperform","skillprofession","skillcustom","acitems","gear","feats","abilities","spell-like","metamagic"];
+        for(var i = 0; i < 10; i++) {allRepSecs.push("spell-" + i);}
 
         // === INIT ===
+        setCharmancerText({"mancer_category":"Resetting Attributes","mancer_progress" :'<div style="width: 4%"></div>'});
         charUpd["npc"] = 0;
         charUpd["tabcurrent"] = "tabmain";
         charUpd["l1mancer_status"] = "completed";
-        var toResetAsChar = ["languages","ac_notes","fortitude_notes","reflex_notes","will_notes","caster1_spells_notes","initiative_notes","speed_notes"];
+            // -- Reset to empty string
+        var toResetAsChar = ["class1_name","class2_name","class3_name","languages","senses","ac_notes","fortitude_notes","reflex_notes","will_notes","caster1_class","caster2_class","caster1_spells_notes","caster2_spells_notes","initiative_notes","speed_notes","encumbrance_display","encumbrance_load_notes","misc_notes","background","bab_notes","cmb_notes","melee_notes","ranged_notes","cmd_notes","sr_notes"];
         toResetAsChar = toResetAsChar.concat(pfoglobals_skill_list.map((sk) => sk + "_notes"));
         toResetAsChar = toResetAsChar.concat(pfoglobals_abilities.map((sk) => sk + "_notes"));
         _.each(toResetAsChar,(attr) => {
             charUpd[attr] = "";
         });
-        var toResetAsZero = ["initiative_misc"];
+            // -- Reset to zero
+        var toResetAsZero = ["caster_flag","class2_level","class3_level","initiative_misc","money_cp","money_sp","money_gp","money_pp","xp",""];
+        for(var i = 1; i < 4; i++) {
+            toResetAsZero.push("class" + i + "_bab","class" + i + "_fortitude","class" + i + "_reflex","class" + i + "_will");
+        }
+        for(var j = 1; j < 3; j++) {
+            for(var i = 0; i < 10; i++) {
+                toResetAsZero.push("caster" + j + "_spells_known_level_" + i, "caster" + j + "_spells_perday_level_" + i, "caster" + j + "_spells_bonus_level_" + i, "caster" + j + "_spells_prepared_level_" + i, "caster" + j + "_spells_total_level_" + i, "caster" + j + "_dc_level_" + i, "caster" + j + "_dcbonus_level_" + i,"caster_spells_flag_level_" + i);
+            }
+        }
         toResetAsZero = toResetAsZero.concat(pfoglobals_skill_list.map((sk) => sk + "_ranks"));
         toResetAsZero = toResetAsZero.concat(pfoglobals_skill_list.map((sk) => sk + "_misc"));
+        toResetAsZero = toResetAsZero.concat(pfoglobals_abilities,pfoglobals_abilities_fields,pfoglobals_mods,pfoglobals_initiative_fields,["ac_condition_nobonus","ac_ability_mod","encumbrance_ability_maximum","ac_ability_maximum","ac_secab_monk"],pfoglobals_ac_fields,pfoglobals_babs_fields,pfoglobals_skill_fields,["caster1_flag","caster2_flag","caster1_level","caster1_ability_mod","caster1_concentration_misc","caster1_concentration_bonus","caster2_level","caster2_ability_mod","caster2_concentration_misc","caster2_concentration_bonus"],["encumbrance_load_bonus","encumbrance_size","encumbrance_gear_weight","encumbrance_load_light","encumbrance_load_medium","encumbrance_load_heavy","encumbrance"],["encumbrance","speed_notmodified","speed_encumbrance","speed_armor","speed_base","speed_bonus","speed_run_factor","speed_condition_multiplier","speed_condition_norun","speed_condition_nospeed"],pfoglobals_conditions,["armor_spell_failure","caster1_ability_mod","caster1_dc_misc","caster2_ability_mod","caster2_dc_misc"]);
+        toResetAsZero = _.uniq(toResetAsZero);
         _.each(toResetAsZero,(attr) => {
             charUpd[attr] = 0;
         });
+            // -- Reset to One
+        var toResetAsOne = ["class1_level","level","class_favored","encumbrance_load_multiplier","caster1_spell_failure","caster2_spell_failure"];
+        _.each(toResetAsOne,(attr) => {
+            charUpd[attr] = 1;
+        });
+            // -- Reset to default value
+        charUpd["class2_hitdietype"] = 8;
+        charUpd["class3_hitdietype"] = 8;
+        charUpd["xp_max"] = 2000;
+        charUpd["encumbrance_run_factor"] = 4;
+        charUpd["armor_run_factor"] = 4;
+        charUpd["ac_ability_primary"] = "dexterity";
+        charUpd["ac_ability_secondary"] = "";
+        charUpd["fortitude_ability"] = "constitution";
+        charUpd["reflex_ability"] = "dexterity";
+        charUpd["will_ability"] = "wisdom";
+        charUpd["cmb_ability"] = "strength";
+        charUpd["melee_ability"] = "strength";
+        charUpd["ranged_ability"] = "dexterity";
+        charUpd["acrobatics_ability"] = "dexterity";
+        charUpd["appraise_ability"] = "intelligence";
+        charUpd["bluff_ability"] = "charisma";
+        charUpd["climb_ability"] = "strength";
+        charUpd["craft_ability"] = "intelligence";
+        charUpd["diplomacy_ability"] = "charisma";
+        charUpd["disable_device_ability"] = "dexterity";
+        charUpd["disguise_ability"] = "charisma";
+        charUpd["escape_artist_ability"] = "dexterity";
+        charUpd["fly_ability"] = "dexterity";
+        charUpd["handle_animal_ability"] = "charisma";
+        charUpd["heal_ability"] = "wisdom";
+        charUpd["intimidate_ability"] = "charisma";
+        charUpd["knowledge_arcana_ability"] = "intelligence";
+        charUpd["knowledge_dungeoneering_ability"] = "intelligence";
+        charUpd["knowledge_engineering_ability"] = "intelligence";
+        charUpd["knowledge_geography_ability"] = "intelligence";
+        charUpd["knowledge_history_ability"] = "intelligence";
+        charUpd["knowledge_local_ability"] = "intelligence";
+        charUpd["knowledge_nature_ability"] = "intelligence";
+        charUpd["knowledge_nobility_ability"] = "intelligence";
+        charUpd["knowledge_planes_ability"] = "intelligence";
+        charUpd["knowledge_religion_ability"] = "intelligence";
+        charUpd["linguistics_ability"] = "intelligence";
+        charUpd["perception_ability"] = "wisdom";
+        charUpd["perform_ability"] = "charisma";
+        charUpd["profession_ability"] = "wisdom";
+        charUpd["ride_ability"] = "dexterity";
+        charUpd["sense_motive_ability"] = "wisdom";
+        charUpd["sleight_of_hand_ability"] = "dexterity";
+        charUpd["spellcraft_ability"] = "intelligence";
+        charUpd["stealth_ability"] = "dexterity";
+        charUpd["survival_ability"] = "wisdom";
+        charUpd["swim_ability"] = "strength";
+        charUpd["use_magic_device_ability"] = "charisma";
+        charUpd["caster1_ability"] = "intelligence";
+        charUpd["caster2_ability"] = "intelligence";
 
         // === FUNCTIONS ===
         var calc_abilities = function(data) {
@@ -9286,7 +9382,9 @@
                 if(mancerdata["l1-race"].values.race_feat_choice) {
                     FeatsToLoad.push(mancerdata["l1-race"].values.race_feat_choice);
                 } else if(mancerdata["l1-race"].data.race["data-Feats"]) {
-
+                    _.each(mancerdata["l1-race"].data.race["data-Feats"].split(","),(feat) => {
+                        FeatsToLoad.push("Feats:" + feat.trim());
+                    });
                 }
                 // Spell-like abilities
                 if(mancerdata["l1-race"].data.race["data-Spell-like abilities"]) {
@@ -9335,8 +9433,8 @@
             charUpd["class1_name"] = mancerdata["l1-class"].values.class.replace("Classes:","");
             charUpd["class"] = charUpd["class1_name"] + " 1";
             // Alignment
-            if(mancerdata["l1-class"].values.alignment_choice) {
-                charUpd["alignment"] = mancerdata["l1-class"].values.alignment_choice.toLowerCase();
+            if(mancerdata["l1-class"].values.class_alignment_choice) {
+                charUpd["alignment"] = mancerdata["l1-class"].values.class_alignment_choice.toLowerCase();
             }
             // Static data
             if(mancerdata["l1-class"].data && mancerdata["l1-class"].data.class) {
@@ -9611,7 +9709,7 @@
         });
 
         // === 6.SKILLS
-        setCharmancerText({"mancer_category":"Calculation Skills","mancer_progress" :'<div style="width: 48%"></div>'});
+        setCharmancerText({"mancer_category":"Calculation Skills","mancer_progress" :'<div style="width: 44%"></div>'});
         // Class skills
         if(allClassSkills.length) {
             _.each(allClassSkills.split(","), (cls) => {
@@ -9670,8 +9768,8 @@
         }
 
         // === 7.TRAITS ===
-        setCharmancerText({"mancer_category":"Adding Traits","mancer_progress" :'<div style="width: 56%"></div>'});
-        // console.log("*** MancerFinish traits: " + JSON.stringify(allTraits,null,"  "));
+        setCharmancerText({"mancer_category":"Adding Traits","mancer_progress" :'<div style="width: 48%"></div>'});
+        if (pfoglobals_debug_mode) {console.log("*** MancerFinish traits: " + JSON.stringify(allTraits,null,"  "));}
         _.each(allTraits, (trait) => {
             if(trait["Name"]) {
                 let sec = "repeating_abilities_" + generateRowID() + "_";
@@ -9701,70 +9799,68 @@
         // === 11.ATTACKS === (special Monk ... one day)
             // TODO
 
-        setCharmancerText({"mancer_category":"Loading Data","mancer_progress" :'<div style="width: 64%"></div>'});
-        // Loading Compendium Pages
-        let allCompendiumPages = [];
-        allCompendiumPages = allCompendiumPages.concat(FeatsToLoad,SpellsToLoad);
-        getCompendiumPage(allCompendiumPages,(compendiumdata) => {
-            if(Array.isArray(compendiumdata)) {
-                var cdatarr = compendiumdata;
-            } else {
-                var cdatarr = [];
-                cdatarr.push(compendiumdata);
-            }
-            // === 8.FEATS ===
-            setCharmancerText({"mancer_category":"Adding Feats","mancer_progress" :'<div style="width: 72%"></div>'});
-            // console.log("*** MancerFinish feats: " + FeatsToLoad);
-            if(FeatsToLoad.length) {
-                _.extend(charUpd,drop_add_feats(FeatsToLoad,cdatarr));
-            }
+        setCharmancerText({"mancer_category":"Erasing Old Data","mancer_progress" :'<div style="width: 56%"></div>'});
+        erase_repsec_ids(allRepSecs, () => {
+            setCharmancerText({"mancer_category":"Loading New Data","mancer_progress" :'<div style="width: 64%"></div>'});
+            // Loading Compendium Pages
+            let allCompendiumPages = [];
+            allCompendiumPages = allCompendiumPages.concat(FeatsToLoad,SpellsToLoad);
+            getCompendiumPage(allCompendiumPages,(compendiumdata) => {
+                if(Array.isArray(compendiumdata)) {
+                    var cdatarr = compendiumdata;
+                } else {
+                    var cdatarr = [];
+                    cdatarr.push(compendiumdata);
+                }
+                // === 8.FEATS ===
+                setCharmancerText({"mancer_category":"Adding Feats","mancer_progress" :'<div style="width: 72%"></div>'});
+                if (pfoglobals_debug_mode) {console.log("*** MancerFinish feats: " + FeatsToLoad);}
+                if(FeatsToLoad.length) {
+                    _.extend(charUpd,drop_add_feats(FeatsToLoad,cdatarr));
+                }
 
-            // === 9.SPELL LIKE ABILITIES ===
-            setCharmancerText({"mancer_category":"Adding Powers","mancer_progress" :'<div style="width: 80%"></div>'});
-            console.log("*** MancerFinish powers: " + JSON.stringify(allPowers,null,"  "));
-            if(allPowers.length) {
-                let tmpObj = drop_add_spellike(allPowers,cdatarr,charUpd,true);
-                _.extend(charUpd,tmpObj);
-            }
+                // === 9.SPELL LIKE ABILITIES ===
+                setCharmancerText({"mancer_category":"Adding Powers","mancer_progress" :'<div style="width: 80%"></div>'});
+                if (pfoglobals_debug_mode) {console.log("*** MancerFinish powers: " + JSON.stringify(allPowers,null,"  "));}
+                if(allPowers.length) {
+                    let tmpObj = drop_add_spellike(allPowers,cdatarr,charUpd,true);
+                    _.extend(charUpd,tmpObj);
+                }
 
-            // === 10.SPELLS ===
-            setCharmancerText({"mancer_category":"Adding Spells","mancer_progress" :'<div style="width: 88%"></div>'});
-            // console.log("*** MancerFinish spells: " + JSON.stringify(SpellsToLoad,null,"  ") + " " + JSON.stringify(allSpells,null,"  "));
-            if(SpellsToLoad.length) {
-                _.extend(charUpd,drop_add_spells(allSpells,cdatarr,{},true));
-            }
+                // === 10.SPELLS ===
+                setCharmancerText({"mancer_category":"Adding Spells","mancer_progress" :'<div style="width: 88%"></div>'});
+                if (pfoglobals_debug_mode) {console.log("*** MancerFinish spells: " + JSON.stringify(SpellsToLoad,null,"  ") + " " + JSON.stringify(allSpells,null,"  "));}
+                if(SpellsToLoad.length) {
+                    _.extend(charUpd,drop_add_spells(allSpells,cdatarr,{},true));
+                }
 
-            console.log("*** DEBUG MancerFinish UPDATE: " + JSON.stringify(charUpd,null,"  "));
-            // === 12.FINAL ===
-            setAttrs(charUpd,{silent: true},() => {
-                setCharmancerText({"mancer_category":"Global update","mancer_progress" :'<div style="width: 100%"></div>'});
-                le_big_stuff("all",false,() => {
-                    update_coins_weight();
-                    console.log("*** DEBUG MancerFinish FINISH!");
-                    finishCharactermancer();
+                if (pfoglobals_debug_mode) {console.log("*** DEBUG MancerFinish UPDATE: " + JSON.stringify(charUpd,null,"  "));}
+                // === 12.FINAL ===
+                setAttrs(charUpd,{silent: true},() => {
+                    setCharmancerText({"mancer_category":"Global update","mancer_progress" :'<div style="width: 100%"></div>'});
+                    le_big_stuff("all",false,() => {
+                        update_coins_weight();
+                        if (pfoglobals_debug_mode) {console.log("*** DEBUG MancerFinish FINISH!");}
+                        finishCharactermancer();
+                    });
                 });
+            });
+        });
+    });
+    on("clicked:relaunch_lvl1mancer", (eventinfo) => {
+        getAttrs(["l1mancer_status"], (v) => {
+            var update = {};
+            if(v["l1mancer_status"] === "completed") {
+                update["l1mancer_status"] = "";
+            }
+            setAttrs(update, {silent: true}, () => {
+                check_l1_mancer();
             });
         });
     });
 
     // === Drop
     on("sheet:compendium-drop", () => {
-        console.log("*** DEBUG compendium-drop");
-        var default_attr = {};
-        default_attr["bar1_value"] = 1;
-        default_attr["bar1_max"] = 10;
-        default_attr["bar3_link"] = "ac";
-        setDefaultToken(default_attr);
-        /*
-        getAttrs(["hp","hp_max"], (v) => {
-            var default_attr = {};
-            default_attr["bar1_value"] = parseInt(v.hp) || 1;
-            default_attr["bar1_max"] = parseInt(v.hp_max) || 1;
-            default_attr["bar3_link"] = "ac";
-            setDefaultToken(default_attr);
-        });
-        */
-        /*
         getAttrs(["hp_max","ac","size","cd_bar1_v","cd_bar1_m","cd_bar1_l","cd_bar2_v","cd_bar2_m","cd_bar2_l","cd_bar3_v","cd_bar3_m","cd_bar3_l"], (v) => {
             // TOKEN handling
             var default_attr = {};
@@ -9810,11 +9906,8 @@
                 }
                 else {default_attr["bar3_link"] = "ac";}
                 setDefaultToken(default_attr);
-                // TEST
-
             });
         });
-        */
     });
 
     // === Generals
@@ -10075,7 +10168,7 @@
                 var spl = e.sourceAttribute.substr(0, e.sourceAttribute.length - 19);
                 var update = {};
                 var val = e.newValue.toLowerCase().trim();
-                var feattypes = ["general","combat","critical","grit","item-creation","metamagic","monster","panache","performance","style","teamwork"];
+                var feattypes = ["general","combat","critical","grit","item creation","metamagic","monster","panache","performance","style","teamwork"];
                 if(feattypes.includes(val)) {update[spl + "type"] = val;}
                 else {update[spl + "type"] = "misc";}
                 setAttrs(update,{silent: true});
@@ -10439,7 +10532,7 @@
         update_spells(9,spellid);
     });
     // --- PC/NPC Spell-like abilities
-    on("change:repeating_spell-like:spellname change:repeating_spell-like:spellschool change:repeating_spell-like:spellclasslevel change:repeating_spell-like:spellcastingtime change:repeating_spell-like:spellrange change:repeating_spell-like:spellarea change:repeating_spell-like:spelltargets change:repeating_spell-like:spelleffect change:repeating_spell-like:spellduration change:repeating_spell-like:spellsaveflag change:repeating_spell-like:spellsave change:repeating_spell-like:spelldc_mod change:repeating_spell-like:spellresistanceflag change:repeating_spell-like:spellresistance change:repeating_spell-like:spellatkflag change:repeating_spell-like:spellatktype change:repeating_spell-like:spellatkmod change:repeating_spell-like:spellatkcritrange change:repeating_spell-like:spelldmgcritmulti change:repeating_spell-like:spelldmgflag change:repeating_spell-like:spelldmg change:repeating_spell-like:spelldmgtype change:repeating_spell-like:spelldmg2flag change:repeating_spell-like:spelldmg2 change:repeating_spell-like:spelldmg2type change:repeating_spell-like:spelldescflag change:repeating_spell-like:spelldesc change:repeating_spell-like:notes change:repeating_spell-like:timesperday change:repeating_spell-like:perday_max", (e) => {
+    on("change:repeating_spell-like:spellname change:repeating_spell-like:spelltype change:repeating_spell-like:spellschool change:repeating_spell-like:spellclasslevel change:repeating_spell-like:spellcastingtime change:repeating_spell-like:spellrange change:repeating_spell-like:spellarea change:repeating_spell-like:spelltargets change:repeating_spell-like:spelleffect change:repeating_spell-like:spellduration change:repeating_spell-like:spellsaveflag change:repeating_spell-like:spellsave change:repeating_spell-like:spelldc_mod change:repeating_spell-like:spellresistanceflag change:repeating_spell-like:spellresistance change:repeating_spell-like:spellatkflag change:repeating_spell-like:spellatktype change:repeating_spell-like:spellatkmod change:repeating_spell-like:spellatkcritrange change:repeating_spell-like:spelldmgcritmulti change:repeating_spell-like:spelldmgflag change:repeating_spell-like:spelldmg change:repeating_spell-like:spelldmgtype change:repeating_spell-like:spelldmg2flag change:repeating_spell-like:spelldmg2 change:repeating_spell-like:spelldmg2type change:repeating_spell-like:spelldescflag change:repeating_spell-like:spelldesc change:repeating_spell-like:notes change:repeating_spell-like:timesperday change:repeating_spell-like:perday_max", (e) => {
         var spellid = e.sourceAttribute.substring(21, 41);
         update_spells("like",spellid);
     });
@@ -10499,7 +10592,7 @@
                 cdata = {};
             }
             if(! _.isEmpty(cdata)) {
-                console.log("*** DEBUG change:npcdrop_data: " + JSON.stringify(cdata,null,"  "));
+                if (pfoglobals_debug_mode) {console.log("*** DEBUG change:npcdrop_data: " + JSON.stringify(cdata,null,"  "));}
                 var category = cdata["Category"].toLowerCase();
                 if(category == "bestiary") {
                     setAttrs({"npc": 1,"options-flag-npc": 0,"build-flag-npc": 1},{silent: true}, ()=>{
@@ -10521,7 +10614,7 @@
                 cdata = {};
             }
             if(! _.isEmpty(cdata)) {
-                // console.log("*** DEBUG change:npcsplike_data: " + JSON.stringify(cdata,null,"  "));
+                if (pfoglobals_debug_mode) {console.log("*** DEBUG change:npcsplike_data: " + JSON.stringify(cdata,null,"  "));}
                 var category = cdata["Category"].toLowerCase();
                 if(category == "spells") {
                     getAttrs(["npcsplike_name","npcsplike_uniq"], (v) => {
@@ -10551,7 +10644,7 @@
                         _.extend(update,tmpupd);
 
                         var spellid = Object.keys(tmpupd)[0].substring(21, 41);
-                        // console.log("*** DEBUG change:npcdrop_data spellid: " + spellid);
+                        if (pfoglobals_debug_mode) {console.log("*** DEBUG change:npcsplike_data spellid: " + spellid);}
 
                         setAttrs(update,{silent: true},() => {
                             update_spells("like",spellid);
@@ -10571,11 +10664,11 @@
                 cdata = {};
             }
             if(! _.isEmpty(cdata)) {
-                // console.log("*** DEBUG change:npcsplX_data: " + JSON.stringify(cdata,null,"  "));
+                if (pfoglobals_debug_mode) {console.log("*** DEBUG change:npcsplX_data: " + JSON.stringify(cdata,null,"  "));}
                 var category = cdata["Category"].toLowerCase();
                 if(category == "spells") {
                     var level = e.sourceAttribute.substring(6, 7);
-                    // console.log("*** DEBUG change:npcsplX_data level: " + level);
+                    if (pfoglobals_debug_mode) {console.log("*** DEBUG change:npcsplX_data level: " + level);}
                     getAttrs(["npcspl" + level + "_name","npcspl" + level + "_uniq"], (v) => {
                         var objs = [];
                         var obj = {};
@@ -10602,7 +10695,7 @@
                         _.extend(update,tmpupd);
 
                         var spellid = Object.keys(tmpupd)[0].substring(18, 38);
-                        // console.log("*** DEBUG change:npcsplX_data spellid: " + spellid);
+                        if (pfoglobals_debug_mode) {console.log("*** DEBUG change:npcsplX_data spellid: " + spellid);}
 
                         setAttrs(update,{silent: true},() => {
                             update_spells(level,spellid);
@@ -10614,7 +10707,7 @@
 
     });
     on("change:npcfeat_data", (e) => {
-        // console.log("*** DEBUG change:npcfeat_data e: " + JSON.stringify(e,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG change:npcfeat_data e: " + JSON.stringify(e,null,"  "));}
         if(typeof e.newValue !== "undefined") {
             var cdata;
             try{
@@ -10624,11 +10717,11 @@
                 cdata = {};
             }
             if(! _.isEmpty(cdata)) {
-                // console.log("*** DEBUG change:npcfeat_data: " + JSON.stringify(cdata,null,"  "));
+                if (pfoglobals_debug_mode) {console.log("*** DEBUG change:npcfeat_data: " + JSON.stringify(cdata,null,"  "));}
                 var category = cdata["Category"].toLowerCase();
                 if(category == "feats") {
                     getAttrs(["npcfeat_name","npcfeat_uniq"], (v) => {
-                        // console.log("*** DEBUG change:npcfeat_data v: " + JSON.stringify(v,null,"  "));
+                        if (pfoglobals_debug_mode) {console.log("*** DEBUG change:npcfeat_data v: " + JSON.stringify(v,null,"  "));}
                         var objs = [];
                         var page = {};
                         var pages = [];
@@ -10650,7 +10743,7 @@
                         tmpupd = drop_add_feats(objs,pages);
                         _.extend(update,tmpupd);
 
-                        // console.log("*** DEBUG change:npcfeat_data update: " + JSON.stringify(update,null,"  "));
+                        if (pfoglobals_debug_mode) {console.log("*** DEBUG change:npcfeat_data update: " + JSON.stringify(update,null,"  "));}
                         setAttrs(update,{silent: true});
                     });
                 }
@@ -10662,7 +10755,7 @@
 
     // -- NPC creation Functions
     var update_npc_drop = function(cdata, attrs) {
-        // console.log("*** DEBUG update_npc_drop cdata: " + JSON.stringify(cdata,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG update_npc_drop cdata: " + JSON.stringify(cdata,null,"  "));}
         var update = {};
         var tmpobj = {};
         var doUpdateSpells = false;
@@ -11227,7 +11320,7 @@
             } else {
                 objfeats = [];
             }
-            // console.log("*** DEBUG feats parsing: " + objfeats);
+            if (pfoglobals_debug_mode) {console.log("*** DEBUG update_npc_drop feats parsing: " + objfeats);}
             _.each(objfeats, (obj) => {
                 var featname = "";
                 if(obj.indexOf("(") === -1) {
@@ -11247,7 +11340,7 @@
                 var cdatarr = [];
                 cdatarr.push(compendiumdata);
             }
-            // console.log("*** DEBUG getCompendiumPage: " + cdatarr);
+            if (pfoglobals_debug_mode) {console.log("*** DEBUG update_npc_drop getCompendiumPage: " + cdatarr);}
             if(objspells.length) {
                 tmpobj = drop_add_spells(objspells,cdatarr,update,false);
                 _.extend(update, tmpobj);
@@ -11266,7 +11359,7 @@
         });
     };
     var npcdrop_add_attacks = function(objs,values) {
-        // console.log("*** DEBUG npcdrop_add_attacks: " + JSON.stringify(objs,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG npcdrop_add_attacks objs: " + JSON.stringify(objs,null,"  "));}
         var update = {};
         var meleecount = 0;
         var rangedcount = 0;
@@ -11349,14 +11442,11 @@
             update["meleeattacks_flag"] = 0;
             update["rangedattacks_flag"] = 0;
         }
-        // returnObj["update"] = update;
-        // console.log("*** DEBUG npcdrop_add_attacks callbacks: " + callbacks);
-        // returnObj["callbacks"] = callbacks;
-        // console.log("*** DEBUG npcdrop_add_attacks: " + JSON.stringify(returnObj,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG npcdrop_add_attacks update: " + JSON.stringify(update,null,"  "));}
         return update;
     };
     var npcdrop_add_special_attacks = function(objs) {
-        // console.log("*** DEBUG npcdrop_add_special_attacks: " + JSON.stringify(objs,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG npcdrop_add_special_attacks objs: " + JSON.stringify(objs,null,"  "));}
         var update = {};
         var repsec = "repeating_npcatk-special_";
         _.each(objs, (obj) => {
@@ -11437,11 +11527,11 @@
         } else {
             update["specialattacks_flag"] = 0;
         }
-        // console.log("*** DEBUG npcdrop_add_special_attacks: " + JSON.stringify(update,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG npcdrop_add_special_attacks update: " + JSON.stringify(update,null,"  "));}
         return update;
     };
     var npcdrop_add_specabs = function(objs) {
-        // console.log("*** DEBUG npcdrop_add_specabs: " + JSON.stringify(objs,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG npcdrop_add_specabs objs: " + JSON.stringify(objs,null,"  "));}
         var update = {};
         var repsec = "repeating_abilities_";
         _.each(objs, (obj) => {
@@ -11465,7 +11555,7 @@
         } else {
             update["special_abilities_flag"] = 0;
         }
-        // console.log("*** DEBUG npcdrop_add_specabs update :" + JSON.stringify(update,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG npcdrop_add_specabs update :" + JSON.stringify(update,null,"  "));}
         return update;
     };
     var calc_npc_skill_display = function(skill,value,note) {
@@ -11489,53 +11579,70 @@
 
     // === DROP / COMPENDIUM
     var drop_add_feats = function(objs,cdatarr) {
-        // console.log("*** DEBUG drop_add_feats cdatarr :" + cdatarr + " / " + JSON.stringify(cdatarr,null,"  "));
-        var update = {};
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG drop_add_feats objs :" + JSON.stringify(objs,null,"  "));}
+        let update = {};
         // return update;
-        var repsec = "repeating_feats_";
+        let repsec = "_";
         _.each(objs, (obj) => {
-            var newrowid = generateRowID();
-            var featname = "";
-            if(obj.indexOf("(") === -1) {
-                featname = obj.trim();
-            } else {
-                featname = obj.split("(")[0].trim();
+            let featObj = {};
+            let newrowid = generateRowID();
+            let featname = "";
+            let featname2 = "";
+            let featRepsec = "repeating_feats";
+            featname = obj.trim().replace("Feats:","").trim();
+            if(obj.indexOf("(") != -1) {
+                featname2 = obj.split("(")[0].trim().replace("Feats:","").trim();
             }
-            featname = featname.replace("Feats:","");
-            update[repsec + newrowid + "_name"] = obj.trim().replace("Feats:","");
-            update[repsec + newrowid + "_options-flag"] = 0;
-            update[repsec + newrowid + "_fromcompendium"] = "Feats:" + featname;
+            featObj[repsec + newrowid + "_name"] = featname;
+            featObj[repsec + newrowid + "_options-flag"] = 0;
+            featObj[repsec + newrowid + "_type"] = "misc";
             if(! _.isEmpty(cdatarr)) {
-                var cdata = cdatarr.find(o => ((o.data["Feat Name"]) && (o.data["Feat Name"].toLowerCase() === featname.toLowerCase()) && (o.data["Category"] === "Feats")));
-                // console.log("*** DEBUG drop_add_feats cdata :" + JSON.stringify(cdata,null,"  "));
-                if((typeof cdata !== "undefined") && (cdata.id)) {
+                let cdata = cdatarr.find(o => ((o.data["Feat Name"]) && (o.data["Feat Name"].toLowerCase().trim() === featname.toLowerCase()) && (o.data["Category"] === "Feats")));
+                if((!(cdata && cdata.id  && cdata.data))  && featname2.length) {
+                    if (pfoglobals_debug_mode) {console.log("*** DEBUG drop_add_feats 2nd search with: " + featname2);}
+                    cdata = cdatarr.find(o => ((o.data["Feat Name"]) && (o.data["Feat Name"].toLowerCase().trim() === featname2.toLowerCase()) && (o.data["Category"] === "Feats")));
+                }
+                if(cdata && cdata.id && cdata.data) {
+                    if (pfoglobals_debug_mode) {console.log("*** DEBUG drop_add_feats cdata: " + JSON.stringify(cdata,null,"  "));}
+                    if(cdata.data["Feat Name"]) {
+                        featObj[repsec + newrowid + "_fromcompendium"] = "Feats:" + cdata["name"];
+                    }
                     if(cdata.data["Feat Type"]) {
-                        if(["general","combat","critical","grit","item-creation","metamagic","monster","panache","performance","style","teamwork"].includes(cdata.data["Feat Type"].toLowerCase().trim())) {
-                            update[repsec + newrowid + "_type"] = cdata.data["Feat Type"].toLowerCase().trim();
+                        let featType = cdata.data["Feat Type"].toLowerCase().trim();
+                        if(["general","combat","critical","grit","item creation","metamagic","monster","panache","performance","style","teamwork"].includes(featType)) {
+                            featObj[repsec + newrowid + "_type"] = featType;
+                            if(featType == "metamagic") {
+                                featRepsec = "repeating_metamagic";
+                            }
                         } else {
-                            update[repsec + newrowid + "_type"] = "misc";
+                            featObj[repsec + newrowid + "_type"] = "misc";
                         }
                     }
                     if(cdata.data["Prerequisites"]) {
-                        update[repsec + newrowid + "_prerequisites"] = cdata.data["Prerequisites"];
+                        featObj[repsec + newrowid + "_prerequisites"] = cdata.data["Prerequisites"];
                     }
                     if(cdata.data["Benefit"]) {
-                        update[repsec + newrowid + "_benefits"] = cdata.data["Benefit"];
+                        featObj[repsec + newrowid + "_benefits"] = cdata.data["Benefit"];
                     }
                     if(cdata.data["Normal"]) {
-                        update[repsec + newrowid + "_normal"] = cdata.data["Normal"];
+                        featObj[repsec + newrowid + "_normal"] = cdata.data["Normal"];
                     }
                     if(cdata.data["data-description"]) {
-                        update[repsec + newrowid + "_description"] = cdata.data["data-description"];
+                        featObj[repsec + newrowid + "_description"] = cdata.data["data-description"];
                     }
+                } else if(pfoglobals_debug_mode) {
+                    console.log("*** DEBUG drop_add_feats feat not found with " + featname + " or " + featname2 + " in " + JSON.stringify(cdatarr,null,"  "));
                 }
             }
+            _.each(Object.keys(featObj),(key) => {
+                update[featRepsec + key] = featObj[key];
+            });
         });
-        // console.log("*** DEBUG drop_add_feats update :" + JSON.stringify(update,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG drop_add_feats update :" + JSON.stringify(update,null,"  "));}
         return update;
     };
     var drop_add_spells = function(objs, cdatarr, values, isPc = false) {
-        // console.log("*** DEBUG drop_add_spells objs : " + JSON.stringify(objs,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG drop_add_spells objs: " + JSON.stringify(objs,null,"  "));}
         var update = {};
         var baserepsec = "repeating_spell";
         _.each(objs, (obj) => {
@@ -11555,11 +11662,11 @@
                     }
                 }
                 update[repsec + newrowid + "_options-flag"] = 0;
-                update[repsec + newrowid + "_fromcompendium"] = "Spells:" + obj.name;
                 if(! _.isEmpty(cdatarr)) {
-                    var cdata = cdatarr.find(o => (o.name.toLowerCase() === obj.name.replace("Spells:","").toLowerCase() && o.data["Category"] === "Spells"));
+                    var cdata = cdatarr.find(o => (o.name.toLowerCase().trim() === obj.name.replace("Spells:","").toLowerCase().trim() && o.data["Category"] === "Spells"));
                     // console.log("*** DEBUG drop_add_spells cdata :" + JSON.stringify(cdata,null,"  "));
-                    if((! _.isEmpty(cdata)) && (typeof cdata.id !== "undefined")) {
+                    if(cdata && cdata.id  && cdata.data) {
+                        update[repsec + newrowid + "_fromcompendium"] = "Spells:" + cdata["name"];
                         if(cdata.data["School"]) {
                             update[repsec + newrowid + "_spellschool"] = cdata.data["School"];
                         }
@@ -11647,11 +11754,11 @@
                 _.extend(update,calc_spell(level,newrowid,tmpvalues));
             }
         });
-        // console.log("*** DEBUG drop_add_spells update :" + JSON.stringify(update,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG drop_add_spells update: " + JSON.stringify(update,null,"  "));}
         return update;
     };
     var drop_add_spellike = function(objs,cdatarr,values, isPc = false) {
-        // console.log("*** DEBUG drop_add_spellike: " + JSON.stringify(objs,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG drop_add_spellike: " + JSON.stringify(objs,null,"  "));}
         var update = {};
         var repsec = "repeating_spell-like_";
         _.each(objs, (obj) => {
@@ -11698,7 +11805,7 @@
                 }
                 // getting data from Spell source of the ability, if any
                 if(obj["Spell"] || obj["Spell-source"]) {
-                    update[repsec + newrowid + "_fromcompendium"] = "Spells:" + obj["Spell"];
+                    // update[repsec + newrowid + "_fromcompendium"] = "Spells:" + obj["Spell"];
                     if(! _.isEmpty(cdatarr)) {
                         let zespell = "";
                         if(isPc) {
@@ -11706,8 +11813,9 @@
                         } else {
                             zespell = obj["Spell"];
                         }
-                        var cdata = cdatarr.find(o => (o.name.toLowerCase() === zespell.toLowerCase() &&  o.data["Category"] === "Spells"));
-                        if((typeof cdata !== "undefined") && (cdata.id)) {
+                        var cdata = cdatarr.find(o => (o.name.toLowerCase().trim() === zespell.toLowerCase().trim() &&  o.data["Category"] === "Spells"));
+                        if(cdata && cdata.id  && cdata.data) {
+                            update[repsec + newrowid + "_fromcompendium"] = "Spells:" + cdata["name"];
                             if(cdata.data["School"]) {
                                 update[repsec + newrowid + "_spellschool"] = cdata.data["School"];
                             }
@@ -11783,7 +11891,7 @@
                 // Completing or replacing data for PC (race/class/subclass feature)
                 if(isPc) {
                     if(obj["Type"]) {
-                        update[repsec + newrowid + "_type"] = obj["Type"];
+                        update[repsec + newrowid + "_spelltype"] = obj["Type"];
                     }
                     if(obj["Casting-time"]) {
                         update[repsec + newrowid + "_spellcastingtime"] = obj["Casting-time"];
@@ -11843,7 +11951,7 @@
                             update[repsec + newrowid + "_spelldmg"] = obj["Damage"].split("+")[0];
                             if(obj["Damage"].split("+")[1].toLowerCase().indexOf("for every two") != -1) {
                                 // 1d6 + 1 point for every two cleric levels
-                                update[repsec + newrowid + "_spelldmg"] += "+[[floor(@{test|caster1_level}/2)]]";
+                                update[repsec + newrowid + "_spelldmg"] += "+[[floor(@{caster1_level}/2)]]";
                             } else {
                                 update[repsec + newrowid + "_spelldmg"] += obj["Damage"].split("+")[1].replace(/[^\d\-\+\s]/gi, "").trim();
                             }
@@ -11866,7 +11974,7 @@
                 _.extend(update,calc_spell("like",newrowid,tmpvalues));
             }
         });
-        // console.log("*** DEBUG drop_add_spellike update :" + JSON.stringify(update,null,"  "));
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG drop_add_spellike update :" + JSON.stringify(update,null,"  "));}
         return update;
     };
 
@@ -12670,7 +12778,6 @@
                 fixskill_fields.push(...pfoglobals_skill_attr.map((skillattr) => skillname + "_" + skillattr));
             });
             var fields  = get_repsec_fields(repsec_agr,fixskill_fields);
-            // DEBUG if (pfoglobals_debug_mode) {console.log("*** DEBUG update_all_skills fields:" + fields);}
             getAttrs(fields, (v) => {
                 // Listing all skills to update
                 var skills_array = [];
@@ -12743,7 +12850,6 @@
         get_repsec_ids(JSON.parse(JSON.stringify(pfoglobals_repsec_skills)), (repsec_agr) => {
             var fields  = get_repsec_fields(repsec_agr,[...pfoglobals_skill_list.map((skill) => skill + "_ranks")])
                 .filter(fld => fld.slice(-5) == "ranks");
-            // DEBUG if (pfoglobals_debug_mode) {console.log("*** DEBUG update_skills_ranks fields: " + fields);}
             getAttrs(fields, (v) => {
                 var ranks = 0;
                 _.each(fields, (fld)=>{
@@ -12799,7 +12905,7 @@
         update["speed_run"] = run;
         update["speed_swim"] = fourth;
         update["speed_climb"] = fourth;
-        // DEBUG if (pfoglobals_debug_mode) {console.log("*** DEBUG calc_speed update: " + JSON.stringify(update,null,"  "));}
+        if (pfoglobals_debug_mode) {console.log("*** DEBUG calc_speed update: " + JSON.stringify(update,null,"  "));}
         return update;
     };
     var calc_reduced_speed = function(basespeed) {
@@ -13075,7 +13181,6 @@
         }
     };
     var do_update_spell = function(level, attributename = "", repsec_agr, debug_start) {
-        // DEBUG         if (pfoglobals_debug_mode) {console.log("*** DEBUG do_update_spell: " + level + " / " + attributename + " / " + JSON.stringify(repsec_agr,null,"  "));}
         if (pfoglobals_debug_mode) {console.log("*** DEBUG do_update_spell: " + level + " / " + attributename);}
         var spell_attribs = get_repsec_fields(repsec_agr, pfoglobals_spell_fields);
         getAttrs(spell_attribs, (v) => {
@@ -13183,6 +13288,12 @@
         // caster class
         if ((v.npc !== "1") && (csterflag1 == "1") && (csterflag2 == "1") && (typeof v.caster1_class !== "undefined") && (typeof v.caster2_class !== "undefined")) {
             rollbase += "{{casterclass=" + ((cster == "1") ? v.caster1_class : v.caster2_class) + "}}";
+        }
+        // type (spell-like)
+        if (spell_level == "like") {
+            if(v["repeating_spell-" + spell_level + "_" + spellid + "_spelltype"]) {
+                rollbase += "{{powertype=" + v["repeating_spell-" + spell_level + "_" + spellid + "_spelltype"] + "}}";
+            }
         }
         // school
         if(v["repeating_spell-" + spell_level + "_" + spellid + "_spellschool"]) {
@@ -13687,7 +13798,6 @@
         // Parameters: Source (like pfoglobals_repsec_spell), callback function, Aggregate ([{section:string, ids:[ids], attrs:[attribute]}])
         // Courtesy of Scott C. :)
         var currsection = repsec_array.shift();
-        // DEBUG if (pfoglobals_debug_mode) {console.log("*** DEBUG get_repsec_ids:" + currsection + " / " + JSON.stringify(currsection,null,"  "));}
         if (pfoglobals_debug_mode) {console.log("*** DEBUG get_repsec_ids section: " + currsection.section);}
         repsec_agr = repsec_agr || [];
         getSectionIDs('repeating_' + currsection.section, (itemsids)=>{
@@ -13706,7 +13816,6 @@
     var get_repsec_fields = function(repsec_agr, other_attrs = []) {
         // Returns an array of attribute names from several repeating sections and optional other standard attributes
         // Parameters: Reapting section Aggregate ([{section:string, ids:[ids], attrs:[attributes]}]), [other attributes names]
-        // DEBUG if (pfoglobals_debug_mode) {console.log("*** DEBUG get_repsec_fields repsec_agr: " + JSON.stringify(repsec_agr,null,"  "));}
         var fields = [], repsecfields = [];
         _.each(repsec_agr, (current_section)=>{
             // DEBUG console.log("*** DEBUG get_repsec_fields section: " + current_section.section);
@@ -13719,12 +13828,25 @@
             });
         });
         fields = repsecfields.concat(other_attrs);
-        // DEBUG if (pfoglobals_debug_mode) {console.log("*** DEBUG get_repsec_fields: " + fields);}
         return fields;
     };
     var toTitleCase = function(str) {
         return str.replace(/\w\S*/g, function(txt){
             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    };
+    var erase_repsec_ids = function(sectionArray, callback) {
+        var thisSection = sectionArray.shift();
+        getSectionIDs(thisSection, (itemids) => {
+            _.each(itemids, (item) => {
+                removeRepeatingRow("repeating_" + thisSection + "_" + item);
+            });
+            if(sectionArray.length > 0) {
+                erase_repsec_ids(sectionArray, callback);
+            } else {
+                callback();
+            }
+
         });
     };
 
@@ -14119,11 +14241,15 @@
                         versioning();
                     });
                 });
-            } else {
+            } else if (vrs < 1.14) {
                 update_to_1_14(() => {
                     setAttrs({"version": "1.14"}, {silent: true}, () => {
                         versioning();
                     });
+                });
+            } else {
+                setAttrs({"version": pfoglobals_currentversion}, {silent: true}, () => {
+                    versioning();
                 });
             }
         });
@@ -14628,7 +14754,7 @@
                     </label>
                 </div>
                 <div class="choice row race_feats custom_race">
-                    <label>
+                    <label class="hilite">
                         <span class="title" data-18n="bonus-feats:">Bonus Feats:</span>
                         <select class="choice race_feat_choice_row custom_race" name="comp_race_feat_choice">
                             <option value="" data-i18n="choose">Choose</option>
@@ -14873,7 +14999,7 @@
                     </label>
                 </div>
                 <div class="choice row class_bonusfeats_row custom_class"> <!-- Bonus Feats -->
-                    <label>
+                    <label class="hilite">
                         <span class="title" data-18n="bonus-feats:">Bonus Feats:</span>
                         <div class="choice class_feat_choice_row custom_class">
                             <select name="comp_class_feat_choice">
@@ -15643,7 +15769,7 @@
                 <div class="row">
                     <label class="hilite">
                         <span class="title" data-18n="choose-feat">Choose a Feat:</span>
-                        <select name="comp_feat_lvl1_1" class="feat_lvl1_1" required>
+                        <select name="comp_feat_lvl1_1" class="choice feat_lvl1_1" required>
                             <option value="" data-i18n="choose">Choose</option>
                         </select>
                         <button type="action" name="act_info_feat_lvl1_1" class="mancer_info">i</button>
@@ -16070,7 +16196,11 @@
         <div class="bottombar">
             <div class="nav back"><button type="back" value="l1-spells" data-18n="back">Back</button></div>
             <div class="nav cancel"><button type="action" name="act_cancel" data-18n="cancel">Cancel</button></div>
-            <div class="nav next"><button type="finish" value="l1-mancer" data-18n="apply">Apply</button></div>
+            <div class="nav next">
+                <input type="hidden" class="apply" name="comp_mancer_apply" value="0" />
+                <button class="apply" type="finish" value="l1-mancer" data-18n="apply">Apply</button>
+                <button class="apply not" data-18n="apply">Apply</button>
+            </div>
         </div>
         <div class="choice cancel-prompt">
             <p class="label" data-18n="mancer-cancel-question">Which Path to follow, Adventurer?</p>
@@ -16090,9 +16220,6 @@
             <img class="logo r20" src="https://raw.githubusercontent.com/NathaTerrien/roll20-wip/master/_tests/roll20logo_small.png" />
         </div>
 
-        <!-- <div style="text-align: center;width: 100%;margin:30px;">
-            <h1 style="color:#BE202E;">Building your character...</h1>
-        </div> -->
         <div class="steps center">
             <div class="step here">
                 <span>Building your character...</span>
@@ -16179,19 +16306,26 @@
 </rolltemplate>
 <!-- Mancer Workers -->
 <script type="text/worker">
+    const mncrDebugMode = true;
+
     const mncrAbilities = ["strength","dexterity","constitution","intelligence","wisdom","charisma"];
     const mncrGetList = true;
     const mncrCostOfScore = {"7":"-4","8":"-2","9":"-1","10":"0","11":"1","12":"2","13":"3","14":"5","15":"7","16":"10","17":"13","18":"17"};
     const mncrDicepoolChoices = ["3","4","5","6","7","8", "9", "10", "11", "12", "13"];
 
     // === ABILITIES ===
+    on("page:l1-abilities", () => {
+        recalcData("abilities");
+    });
     on("mancerchange:abilities", (eventinfo) => {
         var data = getCharmancerData();
         var initHide = ["abilities_possible"];
         var attribs = ["strength","dexterity","constitution","intelligence","wisdom","charisma"];
         var pointbuyChoices = ["7","8", "9", "10", "11", "12", "13", "14", "15","16","17","18"];
         var pointbuysPoints = {"purchase_low":10,"purchase_standard":15,"purchase_high":20,"purchase_epic":25};
+
         hideChoices(initHide);
+        recalcData("abilities");
 
         if (["standard","classic","heroic"].includes(data["l1-abilities"].values.abilities)) {
             showChoices(["abilities_" + data["l1-abilities"].values.abilities]);
@@ -16406,6 +16540,9 @@
     };
 
     // === RACE ===
+    on("page:l1-race", () => {
+        recalcData("race");
+    });
     on("mancerchange:race", (eventinfo) => {
         hideChoices();
 
@@ -16440,7 +16577,7 @@
                     var data = p["data"];
                     var abilities_scores = calc_abilities(mancerdata);
 
-                    // console.log("*** DEBUG race raw data:" + JSON.stringify(data,null,"  "));
+                    if(mncrDebugMode) {console.log("*** DEBUG race raw data:" + JSON.stringify(data,null,"  "));}
 
                     if(!(eventinfo.newValue === "" || eventinfo.newValue === undefined)) {
                         showList.push("race_always");
@@ -16554,7 +16691,9 @@
                             if(!showList["race_feat_choice_row"]) {
                                 showList.push("race_feat_choice_row");
                             }
-                            setCharmancerOptions("race_feat_choice", "Category:Feats");
+                            setCharmancerOptions("race_feat_choice", "Category:Feats",{"category": "Feats"},() => {
+                                disableCharmancerOptions("race_feat_choice",get_feats(mancerdata));
+                            });
                         } else {
                             update["race_feat_display"] = data["data-Feats"];
                         }
@@ -16633,8 +16772,13 @@
     });
 
     // === CLASS ===
+    on("page:l1-class", () => {
+        recalcData("class");
+    });
     on("mancerchange:class", (eventinfo) => {
         hideChoices();
+        recalcData("class");
+
         var reset = {};
 
         if(!(eventinfo.newValue === "" || eventinfo.newValue === undefined)) {
@@ -16703,7 +16847,6 @@
     });
     on("clicked:info_class_feat1 clicked:info_class_feat2 clicked:info_class_feat3 clicked:info_class_feat4", (eventinfo) => {
         // console.log("*** DEBUG clicked:info_class_featX: " + JSON.stringify(eventinfo,null,"  "));
-        // "triggerName": "clicked:info_class_feat1"
         var data = getCharmancerData();
         if (data["l1-class"] && data["l1-class"].data && data["l1-class"].data.class && data["l1-class"].data.class["data-Bonus Feats"]) {
             var featz = data["l1-class"].data.class["data-Bonus Feats"];
@@ -16779,7 +16922,7 @@
                     var values = {};
                     var tmpint = 0;
 
-                    // console.log("*** DEBUG class raw data:" + JSON.stringify(data,null,"  "));
+                    if(mncrDebugMode) {console.log("*** DEBUG class raw data:" + JSON.stringify(data,null,"  "));}
 
                     if(!(eventinfo.newValue === "" || eventinfo.newValue === undefined)) {
                         showList.push("class_always");
@@ -16800,16 +16943,15 @@
                                 aligarray.push(el.trim());
                             }
                         });
-                        // if(aligarray.length > 1) {
-                            // console.log("*** DEBUG class alignment choices: " + aligarray);
-                            if(!showList["class_alignment_choice"]) {
-                                showList.push("class_alignment_choice");
-                            }
-                            setCharmancerOptions("class_alignment_choice",aligarray);
-                        /* } else {
-                            update["class_alignment_display"] = data["data-Alignment Choice"];
-                            values["class_alignment_choice"] = data["data-Alignment Choice"].trim();
-                        }*/
+                        var options = {};
+                        if(aligarray.length == 1) {
+                            options["selected"] = data["data-Alignment Choice"].trim();
+                        }
+                        // console.log("*** DEBUG class alignment choices: " + aligarray);
+                        if(!showList["class_alignment_choice"]) {
+                            showList.push("class_alignment_choice");
+                        }
+                        setCharmancerOptions("class_alignment_choice",aligarray,options);
                     }
 
                     if(data["data-Class skills"]) {
@@ -16884,28 +17026,28 @@
                     if(data["data-Bonus Feats"] || data["data-Bonus Feats Choice"]) {
                         showList.push("class_bonusfeats_row");
                         if(data["data-Bonus Feats"]) {
-                            if(data["data-Bonus Feats"].indexOf(",") == -1) {
-                                showList.push("class_feat1_row");
-                                update["class_feat1"] = data["data-Bonus Feats"];
-                            } else {
-                                tmpint = 0;
-                                _.each(data["data-Bonus Feats"].split(","), (feat) => {
-                                    tmpint++;
-                                    showList.push("class_feat" + tmpint +  "_row");
-                                    update["class_feat" + tmpint] = feat.trim();
-                                });
-                            }
+                            tmpint = 0;
+                            _.each(data["data-Bonus Feats"].split(","), (feat) => {
+                                tmpint++;
+                                showList.push("class_feat" + tmpint +  "_row");
+                                update["class_feat" + tmpint] = feat.trim();
+                            });
                         }
                         if(data["data-Bonus Feats Choice"]) {
+                            let options = {"category": "Feats"};
                             showList.push("class_feat_choice_row");
                             if(data["data-Bonus Feats Choice"].indexOf(",") !== -1) {
                                 var featquery = [];
                                 _.each(data["data-Bonus Feats Choice"].split(","), (feat) => {
                                     featquery.push(feat.trim());
                                 });
-                                setCharmancerOptions("class_feat_choice", featquery);
+                                setCharmancerOptions("class_feat_choice", featquery, options, () => {
+                                    disableCharmancerOptions("class_feat_choice", get_feats(mancerdata));
+                                });
                             } else {
-                                setCharmancerOptions("class_feat_choice", data["data-Bonus Feats Choice"]);
+                                setCharmancerOptions("class_feat_choice", data["data-Bonus Feats Choice"], options, () => {
+                                    disableCharmancerOptions("class_feat_choice", get_feats(mancerdata));
+                                });
                             }
                         }
                     }
@@ -16986,7 +17128,7 @@
         }
     };
     var update_subclasses = function(nber, subclass, sourceType) {
-        // console.log("*** DEBUG subclass " + nber + " :" + subclass);
+        if(mncrDebugMode) {console.log("*** DEBUG subclass " + nber + " :" + subclass);}
         var update = {};
         var reset = {};
         var values = {};
@@ -17009,7 +17151,7 @@
             setAttrs(reset,{silent:true}, () => {
                 var data = dta["data"];
 
-                // console.log("*** DEBUG suclass " + nber + " raw data:" + JSON.stringify(data,null,"  "));
+                if(mncrDebugMode) {console.log("*** DEBUG suclass " + nber + " raw data:" + JSON.stringify(data,null,"  "));}
 
                 showList.push("subclass" + nber + "_detail");
 
@@ -17134,7 +17276,7 @@
     };
 
     // === SKILLS ===
-    on("page: page:l1-skills", () => {
+    on("page:l1-skills", () => {
         recalcData("skills");
     });
     on("mancerchange:acrobatics_ranks mancerchange:appraise_ranks mancerchange:bluff_ranks mancerchange:climb_ranks mancerchange:craft_ranks mancerchange:diplomacy_ranks mancerchange:disable_device_ranks mancerchange:disguise_ranks mancerchange:escape_artist_ranks mancerchange:fly_ranks mancerchange:handle_animal_ranks mancerchange:heal_ranks mancerchange:intimidate_ranks mancerchange:knowledge_arcana_ranks mancerchange:knowledge_dungeoneering_ranks mancerchange:knowledge_engineering_ranks mancerchange:knowledge_geography_ranks mancerchange:knowledge_history_ranks mancerchange:knowledge_local_ranks mancerchange:knowledge_nature_ranks mancerchange:knowledge_nobility_ranks mancerchange:knowledge_planes_ranks mancerchange:knowledge_religion_ranks mancerchange:linguistics_ranks mancerchange:perception_ranks mancerchange:perform_ranks mancerchange:profession_ranks mancerchange:ride_ranks mancerchange:sense_motive_ranks mancerchange:sleight_of_hand_ranks mancerchange:spellcraft_ranks mancerchange:stealth_ranks mancerchange:survival_ranks mancerchange:swim_ranks mancerchange:use_magic_device_ranks", () => {
@@ -17155,78 +17297,64 @@
         hideChoices();
 
         var update = {};
-        var showList = [];
+        var showList = ["feat_lvl1_1"];
         var data = getCharmancerData();
-        var choices = [];
 
+        // Race
         if(data["l1-race"]) {
             if(data["l1-race"].values.race_feat_choice) {
                 showList.push("race_feats");
                 update["race_feat_display"] = data["l1-race"].values.race_feat_choice.replace("Feats:","");
-                choices.push(data["l1-race"].values.race_feat_choice);
             } else if(data["l1-race"].data && data["l1-race"].data.race && data["l1-race"].data.race["data-Feats"] && data["l1-race"].data.race["data-Feats"] != "Any") {
                 showList.push("race_feats");
                 update["race_feat_display"] = data["l1-race"].data.race["data-Feats"];
-                choices.push("Feats:" + data["l1-race"].data.race["data-Feats"]);
             }
         }
 
+        // Class
         if(data["l1-class"]) {
             if(data["l1-class"].values.class_feat_choice) {
                 showList.push("class_bonusfeats_row","class_feat_choice_row");
-                update["class_feat_choice_display "] = data["l1-class"].values.class_feat_choice.replace("Feats:","");
-                choices.push(data["l1-class"].values.class_feat_choice);
+                update["class_feat_choice_display"] = data["l1-class"].values.class_feat_choice.replace("Feats:","");
             }
             if(data["l1-class"].data && data["l1-class"].data.class && data["l1-class"].data.class["data-Bonus Feats"]) {
                 showList.push("class_bonusfeats_row");
                 if(data["l1-class"].data.class["data-Bonus Feats"]) {
-                    if(data["l1-class"].data.class["data-Bonus Feats"].indexOf(",") == -1) {
-                        showList.push("class_feat1_row");
-                        update["class_feat1"] = data["l1-class"].data.class["data-Bonus Feats"];
-                        choices.push("Feats:" + data["l1-class"].data.class["data-Bonus Feats"]);
-
-                    } else {
-                        tmpint = 0;
-                        _.each(data["l1-class"].data.class["data-Bonus Feats"].split(","), (feat) => {
-                            tmpint++;
-                            showList.push("class_feat" + tmpint +  "_row");
-                            update["class_feat" + tmpint] = feat.trim();
-                            choices.push("Feats:" + feat.trim());
-                        });
-                    }
+                    tmpint = 0;
+                    _.each(data["l1-class"].data.class["data-Bonus Feats"].split(","), (feat) => {
+                        tmpint++;
+                        showList.push("class_feat" + tmpint +  "_row");
+                        update["class_feat" + tmpint] = feat.trim();
+                    });
                 }
             }
+            // Subclass 1
             if(data["l1-class"].values.class_subclass1){
                 if(data["l1-class"].data && data["l1-class"].data.class_subclass1 && data["l1-class"].data.class_subclass1["data-Bonus Feat"]) {
                     showList.push("subclass_feats_row","subclass1_bonusfeat_row");
                     update["subclass1_name"] = data["l1-class"].values.class_subclass1.replace("Subclasses:","");
                     update["subclass1_bonusfeat1"] = data["l1-class"].data.class_subclass1["data-Bonus Feat"].split(",")[0].trim();
-                    choices.push("Feats:" + update["subclass1_bonusfeat1"]);
                     if(data["l1-class"].data.class_subclass1["data-Bonus Feat"].split(",").length > 1) {
                         update["subclass1_bonusfeat2"] = data["l1-class"].data.class_subclass1["data-Bonus Feat"].split(",")[1].trim();
                         showList.push("subclass1_bonusfeat2_row");
-                        choices.push("Feats:" + update["subclass1_bonusfeat2"]);
                     }
                 }
             }
+            // Subclass 2
             if(data["l1-class"].values.class_subclass2){
                 if(data["l1-class"].data && data["l1-class"].data.class_subclass2 && data["l1-class"].data.class_subclass2["data-Bonus Feat"]) {
                     showList.push("subclass_feats_row","subclass2_bonusfeat_row");
                     update["subclass2_name"] = data["l1-class"].values.class_subclass2.replace("Subclasses:","");
                     update["subclass2_bonusfeat1"] = data["l1-class"].data.class_subclass2["data-Bonus Feat"].split(",")[0].trim();
-                    choices.push("Feats:" + update["subclass2_bonusfeat1"]);
                     if(data["l1-class"].data.class_subclass2["data-Bonus Feat"].split(",").length > 1) {
                         update["subclass2_bonusfeat2"] = data["l1-class"].data.class_subclass2["data-Bonus Feat"].split(",")[1].trim();
                         showList.push("subclass2_bonusfeat2_row");
-                        choices.push("Feats:" + update["subclass2_bonusfeat2"]);
                     }
                 }
             }
         }
-        var settings = {};
-        settings["disable"] = choices;
-        setCharmancerOptions("feat_lvl1_1", "Category:Feats", settings, () => {
-            disableCharmancerOptions("feat_lvl1_1", choices);
+        setCharmancerOptions("feat_lvl1_1", "Category:Feats", {}, () => {
+            disableCharmancerOptions("feat_lvl1_1", get_feats(data));
             setCharmancerText(update);
             showChoices(showList);
             recalcData("feats");
@@ -17433,6 +17561,7 @@
 
         hideChoices();
         var update = {};
+        var values = {}
         var showList = [];
         var nogo = false;
         var data = getCharmancerData();
@@ -17729,16 +17858,69 @@
         if(nogo) {
             showList.push("sum_req_sum");
             update["sum_req_sum"] = "You have missed some required fields";
+            values["mancer_apply"] = "0";
         } else {
             showList.push("sum_sum");
             update["sum_sum"] = "If you are ready to build your character, click <b>APPLY</b>.";
+            values["mancer_apply"] = "1";
         }
-
-        setCharmancerText(update);
-        showChoices(showList);
+        setAttrs(values,{silent: true}, () => {
+            setCharmancerText(update);
+            showChoices(showList);
+        });
     });
 
     // === GENERAL FUNCTIONS
+    var get_feats = function(data) {
+        // -- Feat already gained or selected
+        var choices = [];
+
+        // Race
+        if(data["l1-race"]) {
+            if(data["l1-race"].values.race_feat_choice) {
+                choices.push(format_compendium_category("Feats",data["l1-race"].values.race_feat_choice));
+            } else if(data["l1-race"].data && data["l1-race"].data.race && data["l1-race"].data.race["data-Feats"] && data["l1-race"].data.race["data-Feats"] != "Any") {
+                _.each(data["l1-race"].data.race["data-Feats"].split(","), (feat) => {
+                    choices.push(format_compendium_category("Feats",feat.trim()));
+                });
+            }
+        }
+
+        // Class
+        if(data["l1-class"]) {
+            if(data["l1-class"].values.class_feat_choice) {
+                choices.push(format_compendium_category("Feats",data["l1-class"].values.class_feat_choice));
+            }
+            if(data["l1-class"].data && data["l1-class"].data.class && data["l1-class"].data.class["data-Bonus Feats"]) {
+                _.each(data["l1-class"].data.class["data-Bonus Feats"].split(","), (feat) => {
+                    choices.push(format_compendium_category("Feats",feat.trim()));
+                });
+            }
+            if(data["l1-class"].values.class_subclass1
+                && data["l1-class"].data && data["l1-class"].data.class_subclass1 && data["l1-class"].data.class_subclass1["data-Bonus Feat"]){
+                _.each(data["l1-class"].data.class_subclass1["data-Bonus Feat"].split(","), (feat) => {
+                    choices.push(format_compendium_category("Feats",feat.trim()));
+                });
+            }
+            if(data["l1-class"].values.class_subclass2
+                && data["l1-class"].data && data["l1-class"].data.class_subclass2 && data["l1-class"].data.class_subclass2["data-Bonus Feat"]) {
+                _.each(data["l1-class"].data.class_subclass2["data-Bonus Feat"].split(","), (feat) => {
+                    choices.push(format_compendium_category("Feats",feat.trim()));
+                });
+            }
+        }
+
+        // Level 1 Feat
+        if(data["l1-feats"] && data["l1-feats"].values["feat_lvl1_1"]) {
+            choices.push(format_compendium_category("Feats",data["l1-feats"].values["feat_lvl1_1"]));
+        }
+
+        if(mncrDebugMode) {console.log("*** DEBUG get_feats: " + choices);}
+        return choices;
+    };
+    var format_compendium_category = function(category,value) {
+        return (value.indexOf(category + ":") == -1 ? (category + ":") : "") + value.trim();
+    };
     var calc_abilities = function(data) {
         var abilities_scores = {};
         // --- Preparing ability scores detailed array
@@ -17793,7 +17975,7 @@
         var update = {};
         var returnObj = {};
 
-        console.log("*** DEBUG recalcData before:" + JSON.stringify(data,null,"  "));
+        if(mncrDebugMode) {console.log("*** DEBUG recalcData before:" + JSON.stringify(data,null,"  "));}
 
         // === ABILITIES SCORES ===
         var abilities_scores = calc_abilities(data);
@@ -17808,7 +17990,7 @@
         // Abilities mods
         var ability_mods = calc_abilities_mod(abilities_scores);
 
-        // console.log("*** DEBUG recalcData abilities_scores: " + JSON.stringify(abilities_scores,null,"  "));
+        if(mncrDebugMode) {console.log("*** DEBUG recalcData abilities_scores: " + JSON.stringify(abilities_scores,null,"  "));}
 
         // === SAVES ===
         var saves_array = [{"name": "fortitude","ability": "constitution"},{"name": "reflex","ability": "dexterity"},{"name": "will","ability": "wisdom"}];
@@ -17865,14 +18047,13 @@
         // Final Saves calculation
         _.each(saves_array, (save) => {
             saves_scores[save.name].total = (parseInt(saves_scores[save.name].base) || 0) + (parseInt(saves_scores[save.name].race) || 0) + (parseInt(saves_scores[save.name].class) || 0) + (parseInt(saves_scores[save.name].subclass) || 0) + (parseInt(saves_scores[save.name].misc) || 0);
-            // console.log("*** DEBUG recalcData " + ability + " total: " + score + " = " + abilities_scores[ability].base + " + " + abilities_scores[ability].race);
             if(saves_scores[save.name].total !== 0) {
                 update[save.name + "_total"] = saves_scores[save.name].total;
             } else {
                 update[save.name + "_total"] = "-";
             }
         });
-        // console.log("*** DEBUG recalcData saves_score: " + JSON.stringify(saves_scores,null,"  "));
+        if(mncrDebugMode) {console.log("*** DEBUG recalcData saves_score: " + JSON.stringify(saves_scores,null,"  "));}
 
         // === HIT POINTS ===
         var hp = parseInt(ability_mods["constitution"]) || 0;
