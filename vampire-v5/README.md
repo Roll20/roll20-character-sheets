@@ -1,4 +1,4 @@
-# Character sheet for Vampire The Maquerade, 5th Edition (v1.0)
+# Character sheet for Vampire The Maquerade, 5th Edition (v1.1)
 
 ## User Guide (Please read)
 
@@ -52,6 +52,15 @@ A very special thank to https://game-icons.net The below icons were used and are
 
 
 ## Installation instructions.
+If you have access to Roll20
+1. Select the Vampire the Masquerade 5th Edition character sheet.
+2. Go to Settings -> API Settings
+3. If the "Vampire The Masquerade 5th Edition Dice Mechanics" API is available and uploaded to Roll20, select it in the dropdown menu. You are now good to go. If not, go to step 4.
+4. Click New Script and call it hq.js (any name will do, but its a nice nod to Konrad's work)
+5. Copy the contents VTM Dice Mechanics.js in the hq.js window and press save.
+7. You are now good to go ^_^!
+
+
 In the event you only have access to these files and need to do so manually.  
 
 1. Create your new Roll20.
@@ -70,3 +79,14 @@ Please note this is version 1.0, a set of updates are in progress.
 ## Bugs and Updates
 
 If you think anything is missing or you see any bugs, please message me via my [Roll20 Account](https://app.roll20.net/users/117780/ Roll20 Account)
+
+The issue with Inline rolls is known about and will be fixed by 11/09/18
+
+## Versions
+
+### Version 1.1
+Bug fixing to ensure the names are correctly displayed. 
+Added the capacity to roll humanity.
+Attribute has been renamed to traits.
+Some images have been linked to the Roll20 archieve
+Updated user guide.
