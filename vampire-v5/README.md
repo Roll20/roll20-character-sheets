@@ -1,14 +1,15 @@
-# Character sheet for Vampire The Maquerade, 5th Edition (v1.1)
+# Character sheet for Vampire The Maquerade, 5th Edition (v1.2)
 
 ## User Guide (Please read)
 
 While this sheet is designed to be as intuitive as possible and to aid in stream lining your game there are several key features which are worth being aware of.
 
 1. Custom fonts. While the sheet as default fonts it is also programmed to use custom fonts. If you want access to them, when in your game click the shield icon in the right of your address bar and select to allow the script.
-2. Inline vs API rolling. If your ST is a Roll20 Pro-account holder they should have access to the API script, in this case we highly recommend you ensure the check box at the top of each character sheet (just below the tabs) is checked. This will unlock a number of different features including banners, re-rolls, custom dice displayed that will make you gaming experience a lot more streamlined. Unfortunately this functionality cannot be ported to Inline rolling due to programmatic restraints.
+2. Inline vs API rolling. If your ST is a Roll20 Pro-account holder they should have access to the "Vampire The Masquerade 5th Edition Dice Mechanics" API script, in this case we highly recommend you ensure the check box at the top of each character sheet (just below the tabs) is checked. This will unlock a number of different features including banners, re-rolls, custom dice displayed that will make you gaming experience a lot more streamlined. Unfortunately this functionality cannot be ported to Inline rolling due to programmatic restraints.
+3. (Pro-account holders) To install the API script: Go to Settings -> API Settings. If the "Vampire The Masquerade 5th Edition Dice Mechanics" API is available and uploaded to Roll20, select it in the dropdown menu and press save. You are now good to go. If it is not, please perform the following extra steps. Click New Script and call it hq.js (any name will do, but its a nice nod to Konrad's work). Copy the contents VTM Dice Mechanics.js (as found alongside this character sheet in the Roll20 Github repository) in the hq.js window and press save. That's it
 
 Notes on Inline rolls.
-1. Many of the buttons on the sheet will do much of the rolling for you, either calculating how many dice you need or aiding you with selection. In cases where Hunger dice are used (Attribute, Ability, Discipline rolls). If you dice pool is 3, but your hunger is 4, then 4 hunger dice will be rolled and the number of successes may be misleading. By hovering your mouse over the number of successes you can determine what dice rolls were made and you can take the first 3. This is not an issue for the API rolls.
+1. Many of the buttons on the sheet will do much of the rolling for you, either calculating how many dice you need or aiding you with selection.
 2. To find out exactly what dice have been rolled, hover the mouse over the number of successes. In rolls where the Hunger dice are used (Attribute, Ability, Discipline rolls) if you fail, check to see if you rolled a 1 on the Hunger dice. If this is the case then consult the rules to determine how to proceed (Page 207, 208). Further, in this case the number of vampire dice will be negative, please ignore this.
 3. If the number on number of successes is green, you may have rolled a critical success. Hover the mouse over and count how many 10's a rolled to determine if you rolled a critical (Page 120) or a messy critical success (Page 206, 207). Please note, the extra 2 successes for a Crit are not automatically added.
 
@@ -80,9 +81,11 @@ Please note this is version 1.0, a set of updates are in progress.
 
 If you think anything is missing or you see any bugs, please message me via my [Roll20 Account](https://app.roll20.net/users/117780/ Roll20 Account)
 
-The issue with Inline rolls is known about and will be fixed by 11/09/18
-
 ## Versions
+
+### Version 1.2
+Fixed inline rolls so they now display hunger and vampire dice correctly if hunger dice pool is greater than the initial dice pool.
+Fixed Predator Rolls
 
 ### Version 1.1
 Bug fixing to ensure the names are correctly displayed. 

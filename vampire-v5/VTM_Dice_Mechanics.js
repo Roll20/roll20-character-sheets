@@ -1,4 +1,4 @@
-// Vampire the Masquerade 5e Dice Mechanics by Momtahan K (Version 1.1).
+// Vampire the Masquerade 5e Dice Mechanics by Momtahan K (Version 1.2).
 //
 // The following code is an adaptation of that produced by Roll20 user Konrad J. for "Hero Quest Dice Mechanics". 
 // Many thanks for providing this code free to use.
@@ -7,7 +7,7 @@
 // Portions of the materials are the copyrights and trademarks of White Wolf Publishing AB, and are used with permission. All rights reserved. For more in formation please visit whitewolf.com
 //
 // With the exception of materials under the copyright of White Wolf all extra code should be considered under
-// GNU General Public License v3 or later (GPL-3.0-or-later) Copyright 2018
+// GNU General Public License v3 or later (GPL-3.0-or-later) Copyright 2018 held my Momtahan.K
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,6 +25,12 @@
 // This license MUST be copied on to any derivative work.
 // Effectively feel free to use, edit and modify the code to your hearts content. As I understand it this will only cause an issue if you 
 // try to use it for commerical gain. This has been added to ensure the community benefits from it.
+
+// Versions
+// Version 1.2
+// Updated images to a different location
+// Version 1.1
+// Bug fixes and updated images to a different location
 
 
 // Guide to use the code
