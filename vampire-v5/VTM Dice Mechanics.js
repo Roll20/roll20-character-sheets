@@ -321,7 +321,7 @@ function processVampireDiceScript(run, dc) {
 		}
 	}
 
-	let thebeast = '<img src="https://imgur.com/ARnnOE6.png" title="The Beast" height="20" width="228"/>';
+	let thebeast = '<img src="https://raw.githubusercontent.com/Kirintale/roll20-character-sheets/master/vampire-v5/Banners/TheBeast.png" title="The Beast" height="20" width="228"/>';
 
 	if (run.rouseStatRoll) {
 		if (diceTotals.successScore > 0) {
@@ -373,11 +373,11 @@ function addRollDeclarations(diceTotals, outputMessage, endTemplateSection, theb
 	if (diceTotals.successScore == 0 && vtmGlobal.luckydice) {
 		let lastResort = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/lastresort.png" title="Miss" height="20" width="228"/>';
 		outputMessage += "{{Fate=" + lastResort + endTemplateSection;
-		let miss = '<img src="https://imgur.com/l8jqvvp.png" title="Miss" height="20" width="228"/>';
+		let miss = '<img src="https://raw.githubusercontent.com/Kirintale/roll20-character-sheets/master/vampire-v5/Banners/MissFail.png" title="Miss" height="20" width="228"/>';
 		outputMessage += "{{Miss=" + miss + endTemplateSection;
 	} else if (diceTotals.successScore == 0) {
 		//outputMessage += "{{Fate=" + "Total failure" + endTemplateSection;
-		let miss = '<img src="https://imgur.com/l8jqvvp.png" title="Miss" height="20" width="228"/>';
+		let miss = '<img src="https://raw.githubusercontent.com/Kirintale/roll20-character-sheets/master/vampire-v5/Banners/MissFail.png" title="Miss" height="20" width="228"/>';
 		outputMessage += "{{Miss=" + miss + endTemplateSection;
 	} else if (vtmGlobal.luckydice) {
 		let lastResort = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/lastresort.png" title="Miss" height="20" width="228"/>';
@@ -385,10 +385,10 @@ function addRollDeclarations(diceTotals, outputMessage, endTemplateSection, theb
 	}
 
 	if ((diceTotals.muddyCritScore >= 2) || (diceTotals.muddyCritScore === 1 && (diceTotals.critScore >= 1))) {
-		let messy = '<img src="https://imgur.com/RB68YQO.png" title="Messy" height="20" width="228"/>';
+		let messy = '<img src="https://raw.githubusercontent.com/Kirintale/roll20-character-sheets/master/vampire-v5/Banners/MessyCritical.png" title="Messy" height="20" width="228"/>';
 		outputMessage += "{{Messy=" + messy + endTemplateSection;
 	} else if (diceTotals.critScore >= 2) {
-		let crit = '<img src="https://imgur.com/ja9Dvq5.png" title="Crit" height="20" width="228"/>';
+		let crit = '<img src="https://raw.githubusercontent.com/Kirintale/roll20-character-sheets/master/vampire-v5/Banners/CriticalHit.png" title="Crit" height="20" width="228"/>';
 		outputMessage += "{{Crit=" + crit + endTemplateSection;
 	}
 
