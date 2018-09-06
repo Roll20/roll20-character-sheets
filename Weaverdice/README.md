@@ -3,9 +3,16 @@
 
 Any improvements to the sheet are welcome.
 
+### Version 1.32(2018-8-28):
+
+- skill rolls improved, added option for using stat bonus andskill bonus to rolls,plus a field to custom the roll. Default "k1" keeps highest dice
+
+- Stat value added above the stat modifier
+
+- adds sheet version in the corner
 
 
-### Version 1.2:
+### Version 1.2(2018-08-22):
 
 - skill rolls added, with minor options
 
@@ -13,7 +20,7 @@ Any improvements to the sheet are welcome.
 
 - change default stat modifier to zero, as is the baseline for PCs
 
-### Version 1.0:
+### Version 1.0(2018-06):
 
 - fix Health tracker, doesn't reset any more
 
