@@ -4,6 +4,9 @@ This is the (compressed) source code for the Blades in the Dark character sheet 
 
 ## Changelog
 
+### 3.2
+* Added proper vampire traumas (thanks Jeffrey Lamb)
+
 ### 3.1
 * Fixed font for the Korean localization
 * Alchemicals now have a renameable title, and bandoliers can be hidden
