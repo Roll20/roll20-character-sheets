@@ -1,5 +1,9 @@
 # Character sheet for Vampire The Maquerade, 5th Edition (v1.2)
 
+## Known Bugs
+
+When running with the API script, if a player has double speech marks (\") in their name this can cause issues, single ones (') work fine.
+
 ## User Guide (Please read)
 
 While this sheet is designed to be as intuitive as possible and to aid in stream lining your game there are several key features which are worth being aware of.
