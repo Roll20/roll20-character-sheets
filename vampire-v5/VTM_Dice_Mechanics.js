@@ -604,6 +604,7 @@ function handleSimpleRoll(input) {
 }
 
 function handleRemorseRoll(input) {
+	log("remorse roll");
 	let dice = input.willpower + input.modifier;
 	if (dice <= 0) {
 		vtmGlobal.luckydice = true;
@@ -617,11 +618,13 @@ function handleRemorseRoll(input) {
 		rollname: input.rollname,
 		remorseRoll: true
 	};
+	log(run);
 
 	return ["!vtm", run];
 }
 
 function handleHumanityRoll(input) {
+	log("humanity roll")
 	let dice = input.skill + input.modifier;
 	if (dice <= 0) {
 		vtmGlobal.luckydice = true;
@@ -721,6 +724,7 @@ function calculateVariables(argv, who) {
 			let value = parseInt(entry.substring(1), 10);
 			input.difficulty = value;
 		} else if (input.type === "remorse") {
+			log ("remorse variable")
 			// Used for remorse rolls
 			let totalValue = parseInt(entry.substring(1), 10);
 			let totalRemorse = updateMultiboxValue(totalValue);
