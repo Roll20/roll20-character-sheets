@@ -13,6 +13,10 @@ Good source for all things D6 Star wars related, including fanmade conversions o
 
 ## Sheet Versions
 
+### Version 1.73:
+
+- Force Emptiness sheet worker simplified (courtesy to **G G**)
+
 ### Version 1.72 (2018-08-22)
 
 - Readme formatting
