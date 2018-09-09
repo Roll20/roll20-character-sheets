@@ -17,7 +17,7 @@ Good source for all things D6 Star wars related, including fanmade conversions o
 
 - Force Emptiness sheet worker simplified (courtesy to **G G**)
 
-- simplified npc/ pc toggle 
+- simplified npc/ pc toggle (code cleanup)
 
 - remove redundant "sheet-" from all classes in html
 
