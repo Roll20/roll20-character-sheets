@@ -28,7 +28,7 @@
 
 // Versions
 // Version 1.2
-// Updated images to a different location
+// Updated images to a different location. Fixed bugs where players name would not appear for specific rolls. Fixed bug in which speech marks in a players name would cause issues.
 // Version 1.1
 // Bug fixes and updated images to a different location
 
@@ -61,9 +61,9 @@
 // !vtm humanity o# m# // Used for humanity roll. 
 //
 // Optional Flags:
-// An extra variable (c"custom name ") may be added to any of these rolls to display a custom name in the roll template. Note: As a coding querk please have a space after the name but before the close in the speech marks.
-// Example !vtm roll w5 r1 c"Prince Wolf " will roll 5 black die, 1 red die and the character will have the name - Prince Wolf
-// An extra variable (t"custom name") may be added to any of these rolls to display the roll type. This is text below the custom name
+// An extra variable (c~custom name ~) may be added to any of these rolls to display a custom name in the roll template. Note: As a coding querk please have a space after the name but before the close in the tilde.
+// Example !vtm roll w5 r1 c~Prince Wolf ~ will roll 5 black die, 1 red die and the character will have the name - Prince Wolf
+// An extra variable (t~custom name~) may be added to any of these rolls to display the roll type. This is text below the custom name
 // Adding b# to a skill roll will add the value/2.0 to the number of vampire dice. This is used for blood potency when handling disciplines
 // If needs be both the Frenzy, Remorse and Humanity Roll can be updated to use real values. For now however I'm going to leave it.
 
@@ -506,6 +506,8 @@ function performInlineRolls(msg) {
 };
 
 function handleSkillRoll(input) {
+	log("Atr/Skill Roll");
+	log(input);
 	let hunger = input.hunger;
 	let dicepool = input.attribute + input.modifier;
 	if (input.type === "skill") {
@@ -593,6 +595,8 @@ function handleFrenzyRoll(input) {
 }
 
 function handleSimpleRoll(input) {
+	log("Simple Roll");
+	log(input);
 	var run = {
 		blackDice: input.willpower,
 		redDice: input.hunger,
@@ -604,7 +608,8 @@ function handleSimpleRoll(input) {
 }
 
 function handleRemorseRoll(input) {
-	log("remorse roll");
+	log("Remorse Roll");
+	log(input);
 	let dice = input.willpower + input.modifier;
 	if (dice <= 0) {
 		vtmGlobal.luckydice = true;
@@ -618,13 +623,13 @@ function handleRemorseRoll(input) {
 		rollname: input.rollname,
 		remorseRoll: true
 	};
-	log(run);
 
 	return ["!vtm", run];
 }
 
 function handleHumanityRoll(input) {
-	log("humanity roll")
+	log("Humanity Roll")
+	log(run);
 	let dice = input.skill + input.modifier;
 	if (dice <= 0) {
 		vtmGlobal.luckydice = true;
@@ -637,8 +642,6 @@ function handleHumanityRoll(input) {
 		user: input.user,
 		rollname: input.rollname
 	};
-	log("humanity");
-	log(run);
 
 	return ["!vtm", run];
 }
@@ -724,7 +727,7 @@ function calculateVariables(argv, who) {
 			let value = parseInt(entry.substring(1), 10);
 			input.difficulty = value;
 		} else if (input.type === "remorse") {
-			log ("remorse variable")
+			log("remorse variable")
 			// Used for remorse rolls
 			let totalValue = parseInt(entry.substring(1), 10);
 			let totalRemorse = updateMultiboxValue(totalValue);
@@ -833,9 +836,9 @@ on("chat:message", function (msg) {
 	log(msg);
 
 	var chatCommand = msg.content;
-	vtmGlobal.reroll = chatCommand.replace(/\"/g, '&quot;');
+	vtmGlobal.reroll = chatCommand.replace(/\"/g, '&quot;').replace(/\~/g, '&#126;');
 
-	var argv = [].concat.apply([], chatCommand.split('"').map(function (v, i) {
+	var argv = [].concat.apply([], chatCommand.split('~').map(function (v, i) {
 		return i % 2 ? v : v.split(' ')
 	})).filter(Boolean);
 	log("Post Splitting");
@@ -846,8 +849,6 @@ on("chat:message", function (msg) {
 			let input = calculateVariables(argv, msg.who);
 			let run = calculateRunScript(input);
 			let dc = calculateDc(run);
-			log("Process roll");
-			log(run);
 			return processScriptTabs(run, msg.who, dc);
 		} else if (argv[1] === "log" || argv[1] === "graphics" || argv[1] === "test" || argv[1] === "hero" || argv[1] === "lupine") {
 			return processScriptTabs(argv, msg.who, baseDc());
