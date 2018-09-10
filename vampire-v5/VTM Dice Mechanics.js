@@ -1,4 +1,4 @@
-// Vampire the Masquerade 5e Alpha Dice Mechanics by Momtahan K.
+// Vampire the Masquerade 5e Dice Mechanics by Momtahan K (Version 1.1).
 //
 // The following code is an adaptation of that produced by Roll20 user Konrad J. for "Hero Quest Dice Mechanics". 
 // Many thanks for providing this code free to use.
@@ -47,18 +47,19 @@
 // !vtm will w# a# m#	// Rolling for willpower w# is the number of willpower dice a# is the number of dice associated with an attribute, m# is a dice modifier to apply. Example !vtm atr a2 w2 m3 
 // !vtm will p# a# m#	// Rolling for willpower p# is an odd number. By and large you should not use it unless you are creating your own multi-state health/willpower boxes. In such cases please look at the html to see how I have implemented it.
 // !vtm roll w# r#      // Is a straight roll, the w# represents the number of black die, the r# represents the number of red die to roll Example !vtm roll w2 r2
-// Example !vtm roll w5 r1 c"Prince Wolf" will roll 5 black die, 1 red die and the character will have the name - Prince Wolf
-// !vtm frenzy a# m# s# // The frenzy roll is a strange one. The dice pool is equal to the value associate with a# (which should be your composure) plus the modifier m#. Unlike other rolls a success is considered if you roll less than the value assocaited with s#. Thus type !vtm frenzy a3 m2 s7 gives a dice pool of 5 and a success is considered if you roll LESS than 7 (i.e. 6 or less).
 // Note: For anyone reading the code, to make the frenzy roll work I had to invert the DC thus asking the play to roll less than 7 is instead interpretted as asking the player to roll 5 or higher (these are probabilistically equal statements).
 // !vtm rouse          // Rolls one single rouse dice. Success on 6+
 // !vtm reroll w#      // Used for will power re-roll # is the number of die to roll
 // !vtm frenzy p# o# q# // Rolls for frenzy. This is used to add 1/3 humanity (rounded down) to willpower, to roll. As mentioned previously p# is a special case and the number of dice rolled is not equal to the number you enter. Unless you are looking at multistate boxes, don't use this. o# is similar but for humanity. q# Should be used to set the difficulty of the Frenzy roll
-// !vtm humanity x# m# // Used for humanity roll. x# is under a similar constraint as p# and o# due to multistate checkbox issues once again.
-// An extra variable (c"custom name") may be added to any of these rolls to display a custom name in the roll template
+// !vtm remorse x# m# // Used for remorse roll. x# is under a similar constraint as p# and o# due to multistate checkbox issues once again.
+// !vtm humanity o# m# // Used for humanity roll. 
+//
+// Optional Flags:
+// An extra variable (c"custom name ") may be added to any of these rolls to display a custom name in the roll template. Note: As a coding querk please have a space after the name but before the close in the speech marks.
+// Example !vtm roll w5 r1 c"Prince Wolf " will roll 5 black die, 1 red die and the character will have the name - Prince Wolf
 // An extra variable (t"custom name") may be added to any of these rolls to display the roll type. This is text below the custom name
 // Adding b# to a skill roll will add the value/2.0 to the number of vampire dice. This is used for blood potency when handling disciplines
-// If needs be botht he Frenzy and Humanity Roll can be updated to use real values. For now however I'm going to leave it.
-
+// If needs be both the Frenzy, Remorse and Humanity Roll can be updated to use real values. For now however I'm going to leave it.
 
 var vtmCONSTANTS = {
 	VTMCOMMAND: "!vtm",
@@ -324,40 +325,36 @@ function processVampireDiceScript(run, dc) {
 
 	if (run.rouseStatRoll) {
 		if (diceTotals.successScore > 0) {
-			outputMessage += "{{Beast=" + '<img src="https://imgur.com/Ixo45II.png" title="Rousing Success" height="20" width="228"/>' + endTemplateSection;
-
+			outputMessage += "{{Beast=" + '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/RousingSuccess.png" title="Rousing Success" height="20" width="228"/>' + endTemplateSection;
 		} else {
-			outputMessage += "{{Beast=" + '<img src="https://imgur.com/CNIoBl7.png" title="Hunger Gain" height="20" width="228"/>' + endTemplateSection;
+			outputMessage += "{{Beast=" + '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/HungerGain.png" title="Hunger Gain" height="20" width="228"/>' + endTemplateSection;
 
 		}
 	} else if (run.frenzyRoll) {
 		outputMessage += "{{Successes=" + diceTotals.successScore + endTemplateSection;
-		log("Frenzy");
-		log(diceTotals.successScore + " " + run.difficulty);
 		if (diceTotals.successScore >= run.difficulty) {
-			log("boop");
-			outputMessage += "{{Beast=" + '<img src="https://imgur.com/OMND2l5.png" title="Frenzy Restrained" height="20" width="228"/>' + endTemplateSection;
+			outputMessage += "{{Beast=" + '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/FrenzyRestrained.png" title="Frenzy Restrained" height="20" width="228"/>' + endTemplateSection;
 		} else {
-			outputMessage += "{{Beast=" + '<img src="https://imgur.com/T99pn59.png" title="Frenzy" height="20" width="228"/>' + endTemplateSection;
+			outputMessage += "{{Beast=" + '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/Frenzy.png" title="Frenzy" height="20" width="228"/>' + endTemplateSection;
 		}
-	} else if (run.humanityRoll) {
+	} else if (run.remorseRoll) {
 		outputMessage += "{{Successes=" + diceTotals.successScore + endTemplateSection;
 		if (diceTotals.successScore > 0) {
-			outputMessage += "{{Beast=" + '<img src="https://imgur.com/heUJvKA.png" title="Guilty" height="20" width="228"/>' + endTemplateSection;
+			outputMessage += "{{Beast=" + '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/HumanityPass.png" title="Guilty" height="20" width="228"/>' + endTemplateSection;
 		} else {
-			outputMessage += "{{Beast=" + '<img src="https://imgur.com/VezR8Zw.png" title="Innocent" height="20" width="228"/>' + endTemplateSection;
+			outputMessage += "{{Beast=" + '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/HumanityFail.png" title="Innocent" height="20" width="228"/>' + endTemplateSection;
 
 		}
 
 		if (vtmGlobal.luckydice) {
-			let lastResort = '<img src="https://imgur.com/B2nn1cs.png" title="Miss" height="20" width="228"/>';
+			let lastResort = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/lastresort.png" title="Miss" height="20" width="228"/>';
 			outputMessage += "{{Fate=" + lastResort + endTemplateSection;
-			vtmGlobal.luckydice = false;
 		}
 	} else {
 		outputMessage = addRollDeclarations(diceTotals, outputMessage, endTemplateSection, thebeast);
 	}
 
+	vtmGlobal.luckydice = false;
 	outputMessage += "{{Reroll=[Reroll](" + vtmGlobal.reroll + ")" + endTemplateSection;
 
 	log("Output");
@@ -374,19 +371,17 @@ function addRollDeclarations(diceTotals, outputMessage, endTemplateSection, theb
 
 
 	if (diceTotals.successScore == 0 && vtmGlobal.luckydice) {
-		let lastResort = '<img src="https://imgur.com/B2nn1cs.png" title="Miss" height="20" width="228"/>';
+		let lastResort = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/lastresort.png" title="Miss" height="20" width="228"/>';
 		outputMessage += "{{Fate=" + lastResort + endTemplateSection;
 		let miss = '<img src="https://imgur.com/l8jqvvp.png" title="Miss" height="20" width="228"/>';
 		outputMessage += "{{Miss=" + miss + endTemplateSection;
-		vtmGlobal.luckydice = false;
 	} else if (diceTotals.successScore == 0) {
 		//outputMessage += "{{Fate=" + "Total failure" + endTemplateSection;
 		let miss = '<img src="https://imgur.com/l8jqvvp.png" title="Miss" height="20" width="228"/>';
 		outputMessage += "{{Miss=" + miss + endTemplateSection;
-		vtmGlobal.luckydice = false;
 	} else if (vtmGlobal.luckydice) {
-		let lastResort = '<img src="https://imgur.com/B2nn1cs.png" title="Miss" height="20" width="228"/>';
-		vtmGlobal.luckydice = false;
+		let lastResort = '<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/vampire-v5/Banners/lastresort.png" title="Miss" height="20" width="228"/>';
+		outputMessage += "{{Fate=" + lastResort + endTemplateSection;
 	}
 
 	if ((diceTotals.muddyCritScore >= 2) || (diceTotals.muddyCritScore === 1 && (diceTotals.critScore >= 1))) {
@@ -602,8 +597,8 @@ function handleSimpleRoll(input) {
 	return ["!vtm", run];
 }
 
-function handleHumanityRoll(input) {
-	let dice = input.willpower;
+function handleRemorseRoll(input) {
+	let dice = input.willpower + input.modifier;
 	if (dice <= 0) {
 		vtmGlobal.luckydice = true;
 		dice = 1;
@@ -614,8 +609,27 @@ function handleHumanityRoll(input) {
 		redDice: 0,
 		user: input.user,
 		rollname: input.rollname,
-		humanityRoll: true
+		remorseRoll: true
 	};
+
+	return ["!vtm", run];
+}
+
+function handleHumanityRoll(input) {
+	let dice = input.skill + input.modifier;
+	if (dice <= 0) {
+		vtmGlobal.luckydice = true;
+		dice = 1;
+	}
+
+	var run = {
+		blackDice: dice,
+		redDice: 0,
+		user: input.user,
+		rollname: input.rollname
+	};
+	log("humanity");
+	log(run);
 
 	return ["!vtm", run];
 }
@@ -700,19 +714,20 @@ function calculateVariables(argv, who) {
 			// The number of successes required (used for only certain rolls)
 			let value = parseInt(entry.substring(1), 10);
 			input.difficulty = value;
-		} else if (input.type === "humanity") {
-			// Used for humanity rolls
+		} else if (input.type === "remorse") {
+			// Used for remorse rolls
 			let totalValue = parseInt(entry.substring(1), 10);
-			let totalHumanity = updateMultiboxValue(totalValue);
-			let missingHumanity = totalValue - totalHumanity;
-			missingHumanity = updateMultiboxValue1(missingHumanity);
-			input.willpower = missingHumanity / 16.0;
+			let totalRemorse = updateMultiboxValue(totalValue);
+			let missingRemorse = totalValue - totalRemorse;
+			missingRemorse = updateMultiboxValue1(missingRemorse);
+			input.willpower = missingRemorse / 16.0;
 		}
 	}
 
 	return input;
 }
 
+// Used for multistate checkboxes
 function updateMultiboxValue(totalValue) {
 	let value = totalValue;
 	value = scaleMultiboxValue(value, 3616);
@@ -721,6 +736,7 @@ function updateMultiboxValue(totalValue) {
 	return value;
 }
 
+// Used for multistate checkboxes
 function updateMultiboxValue1(totalValue) {
 	let value = totalValue;
 	value = scaleMultiboxValue(value, 3616);
@@ -740,6 +756,7 @@ function scaleMultiboxValue(value, scaleNumber) {
 	return value;
 }
 
+// Decides how to distribute dice based on the type of roll
 function calculateRunScript(input) {
 	if (input.type === "atr" || input.type === "skill") {
 		return handleSkillRoll(input);
@@ -749,6 +766,8 @@ function calculateRunScript(input) {
 		return handleRouseRoll(input);
 	} else if (input.type === "frenzy") {
 		return handleFrenzyRoll(input);
+	} else if (input.type === "remorse") {
+		return handleRemorseRoll(input);
 	} else if (input.type === "humanity") {
 		return handleHumanityRoll(input);
 	} else {
@@ -813,7 +832,7 @@ on("chat:message", function (msg) {
 	log(argv);
 
 	try {
-		if (argv[1] === "skill" || argv[1] === "atr" || argv[1] === "will" || argv[1] === "roll" || argv[1] === "rouse" || argv[1] === "frenzy" || argv[1] === "reroll" || argv[1] === "humanity") {
+		if (argv[1] === "skill" || argv[1] === "atr" || argv[1] === "will" || argv[1] === "roll" || argv[1] === "rouse" || argv[1] === "frenzy" || argv[1] === "reroll" || argv[1] === "remorse" || argv[1] === "humanity") {
 			let input = calculateVariables(argv, msg.who);
 			let run = calculateRunScript(input);
 			let dc = calculateDc(run);

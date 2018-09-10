@@ -11,11 +11,25 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 19.1.3
+
+### Bug fixes
+- [#766: Warlock spell slots not updating when level changed](https://bitbucket.org/mlenser/5eshaped/issues/766/warlock-spell-slots-not-updating-when)
+- [#767: Higher level spell queries are not updated as spells are expended](https://bitbucket.org/mlenser/5eshaped/issues/767/higher-level-spell-queries-are-not-updated)
+
+## 19.1.2
+
+### Bug fixes
+- [#758: New SRD Content cleanup code breaks lair actions and regional effects import from script](https://bitbucket.org/mlenser/5eshaped/issues/758/new-srd-content-cleanup-code-breaks-lair)
+- [#759: Race condition with updating actions on import](https://bitbucket.org/mlenser/5eshaped/issues/759/race-condition-with-updating-actions-on)
+- Fixed Goblin Spider parsing
+- [#761: Spellcasting trait parse has invalid destructuring usage](https://bitbucket.org/mlenser/5eshaped/issues/761/spellcasting-trait-parse-has-invalid)
+- [#765: Fix for #759 broke more stuff](https://bitbucket.org/mlenser/5eshaped/issues/765/fix-for-759-broke-more-stuff)
+
 ## 19.1.1
 
 ### Bug fixes
 - [#754: Incorrect assumption that all innate spellcasting groups will end with "each"](https://bitbucket.org/mlenser/5eshaped/issues/757/incorrect-assumption-that-all-innate)
-
 
 ## 19.1.0
 
