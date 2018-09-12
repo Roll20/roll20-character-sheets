@@ -32,6 +32,10 @@ Default in the weapon section indicates that you are using a skill from the same
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
+
+## Version 06.09.2018
+ Fixed issues with category modifiers over 20.
+
 ## Version 24.07.2018
 
 Fixed typos
