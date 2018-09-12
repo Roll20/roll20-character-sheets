@@ -3,6 +3,10 @@
 
 Any improvements to the sheet are welcome.
 
+### Version 1.40(2018-9-18):
+
+- Roll Templates added (blue, red, green, black versions of the default template)
+
 ### Version 1.33(2018-9-11):
 
 - fixed skill rolls to display correct skill name when rolled, previously showed name of the first skill 
