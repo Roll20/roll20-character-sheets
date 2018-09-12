@@ -1,4 +1,6 @@
-### Version 1.73 (2018-09-17):
+### Version 1.80 (2018-09-17):
+
+- Roll Templates added (Blue, red, green, black versions of the default)
 
 - Force Emptiness sheet worker simplified (courtesy to **G G**)
 
