@@ -126,7 +126,7 @@
                 </td>
             </tr>    
             <tr>
-                <td rowspan="6" class="rolldisplay">
+                <td rowspan="7" class="rolldisplay">
                     <textarea type="text" name="attr_rolldisplay"></textarea>
                 </td>
                 <td>
@@ -150,6 +150,12 @@
                 <td>
                     <input type="radio" class="sheet-attr" name="attr_rolltype_select" value="8-Again" />
                     <span class="sheet-attr">8-Again</span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="radio" class="sheet-attr" name="attr_rolltype_select" value="Don't Reroll 10s" />
+                    <span class="sheet-attr">Don't Reroll 10s</span>
                 </td>
             </tr>
             <tr>
@@ -190,6 +196,8 @@
         <option value="wits">Wits</option>
         <option value="dexterity">Dexterity</option>
         <option value="lowest_plus_athletics">Lowest + Athletics</option>
+        <option value="lowest_plus_brawl">Lowest + Brawl</option>
+        <option value="lowest_plus_weaponry">Lowest + Weaponry</option>
     </select><br><br>
     <span>Base Size: </span><input type="number" name="attr_base_size" value="5" />
     <input type="checkbox" class="sheet-normal" name="attr_giant" value="1" /><span></span><span> Giant</span>
@@ -3173,26 +3181,32 @@
     }
 
     var updateDefense = function(eventInfo) {
-        getAttrs(["athletics", "dexterity", "wits"], function(v) {
+        getAttrs(["athletics", "brawl", "dexterity", "weaponry", "wits"], function(v) {
             var athletics = parseInt(v.athletics, 10);
             var dexterity = parseInt(v.dexterity, 10);
             var wits = parseInt(v.wits, 10);
             var defense;
             switch (eventInfo.newValue) {
-                case "lowest": 
-                    defense = Math.min(dexterity, wits); 
+                case "lowest":
+                    defense = Math.min(dexterity, wits);
                     break;
-                case "highest": 
-                    defense = Math.max(dexterity, wits); 
+                case "highest":
+                    defense = Math.max(dexterity, wits);
                     break;
-                case "wits": 
-                    defense = wits; 
+                case "wits":
+                    defense = wits;
                     break;
-                case "dexterity": 
-                    defense = dexterity; 
+                case "dexterity":
+                    defense = dexterity;
                     break;
-                case "lowest_plus_athletics": 
-                    defense = Math.min(dexterity, wits) + athletics; 
+                case "lowest_plus_athletics":
+                    defense = Math.min(dexterity, wits) + athletics;
+                    break;
+                case "lowest_plus_brawl":
+                    defense = Math.min(dexterity, wits) + brawl;
+                    break;
+                case "lowest_plus_weaponry":
+                    defense = Math.min(dexterity, wits) + weaponry;
                     break;
             }
             setAttrs({defense_base: defense});
@@ -3289,6 +3303,9 @@
                     break;
                 case "8-Again": 
                     value = ")d10!>8cs>8}>8]]}} {{8again=1}}"; 
+                    break;
+                case "Don't Reroll 10s":
+                    value = ")d10cs>10}>8]]}}";
                     break;
                 case "Rote": 
                     value = ")d10ro<7}>8]]}}"; 
