@@ -30,8 +30,18 @@ In the weapon section * indicates to use the mounts damage bonus and not the pla
 
 Default in the weapon section indicates that you are using a skill from the same category e.g. using Broadsword skill with a short sword.  It will halve the skill as per the rules.
 
+To remove the experience checkbox from a killadda- at the start of the name e.g. -Animal Lore. To add the experience add a + to the start of a skill name e.g. +Animal Lore
+
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
+## NPC Sheet
+
+
+## Version 186.09.2018
+
+Add the ability to add or remove the experience checkbox
+
+Added an NPC sheet  accessible from the configuration on the first tab of each sheet version. 
 
 ## Version 06.09.2018
  Fixed issues with category modifiers over 20.
