@@ -10,7 +10,7 @@ At the top of each version of the sheet is a settings cog if this is clicked the
 
 ## Quick Start
 
-This is for the Qucik Start only the category modifiers arenot calculated and is intended only for one shots to demo the new system
+This is for the Qucik Start only the category modifiers are not calculated and is intended only for one shots to demo the new system
 
 One thing to note is the way the damage per location works.  Instead of just knocking  points down as damage is taken there is a damage box so you can put in wounds as they are taken so that you can apply first aid separately.  So if you take a 2 wound and then a 4 point the damage box  should look like 2+4. Make sure there is no trailing + signs, so don't have it look like 3+5+ .  There is a separate box in the hit point section for damage to total hit points such as bleeding and poison. 
 
