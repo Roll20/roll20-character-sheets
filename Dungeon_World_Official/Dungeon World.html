@@ -12,6 +12,7 @@
 <input type="hidden" name="attr_equipment_armor" value="0">
 <input type="hidden" name="attr_equipment_armormod" value="0">
 <input type="hidden" name="attr_equipment_totalarmor" value="0">
+<input type="hidden" name="attr_bond_query" value="(0)[Other Bond]">
 
 <!-- 
 <input type="hidden" name="attr_level0_name" value="@{rotename}">
@@ -386,7 +387,7 @@
                           <div class="flex-row flex-left">
 							<input class="enable-mod" type="checkbox" name="attr_barbdice_on" value="1" />
 							<span>
-								<span class="label">Roll 1d6+1d8 for Moves </span>
+								<span class="label" data-i18n="roll1d61d8formoves">Roll 1d6+1d8 for Moves </span>
 							</span>
 						</div>
 						<div class="flex-row flex-left">
@@ -455,6 +456,7 @@
 								<option value="@{wisdom_mod}[wisdom]" data-i18n="wis-u">WIS</option>
 								<option value="@{charisma_mod}[charisma]" data-i18n="cha-u">CHA</option>
 								<option value="@{statmod_query}" data-i18n="ask-u">ASK</option>
+								<option value="@{bond_query}" data-i18n="bond-u">BOND</option>
 							</select>
 							<span class="label moveroll"> + </span>
 							<input class="moveroll" type="number" name="attr_movemod" value="0" />
@@ -515,7 +517,7 @@
 					<div class="gear-expansion">
 						<span class="label" data-i18n="gear-name">Gear Name:</span>
 						<input type="text" name="attr_gearname_base" value="" accept="Name" />
-						<span class="label">Gear Tags:</span>
+						<span class="label" data-i18n="gear-tags">Gear Tags:</span>
 						<input type="text" name="attr_gear_tags" value="" accept="Tags" />
 						<div class="flex-row">
 							<span>
@@ -973,7 +975,8 @@ var dwMoves = {
 		trigger: "When you consult your accumulated knowledge about something",
 		roll: "INT",
 		success: "The GM will tell you something interesting and useful about the subject relevant to your situation.",
-		partial: "The GM might ask you \"How do you know this?\" Tell them the truth, now."
+		partial: "The GM will only tell you something interesting - it's on you to make it useful.",
+		details: "The GM might ask you \"How do you know this?\" Tell them the truth, now."
 	},
 	aidorinterfere: {
 		class: "Basic",
@@ -2847,6 +2850,45 @@ on("change:repeating_gmods", function(eventInfo) {
 		});
 	});
 
+});
+
+on("change:repeating_bonds", function(eventInfo) {
+	getSectionIDs("repeating_bonds", function(ids) {
+	    if (ids.length == 0){
+	        setAttrs({
+	            bond_query: "(0)[Other Bond]"
+	        });
+	        return;
+	    }
+	    
+	    var attrs = [];
+	    for(var i=0; i < ids.length; i++) {
+	        var attr = "repeating_bonds_" + ids[i] + "_bond_simple";
+			attrs.push(attr);
+	    }
+	    console.log(ids);
+	    
+	    getAttrs(attrs, function(v) {
+	        var bonds = {};
+	        _.each(v, function(val, attrName) {
+	            if (val in bonds){
+	                bonds[val] += 1;
+	            }else{
+	                bonds[val] = 1;
+	            }
+	        });
+	        
+	        var query = "?{Bond";
+	        _.each(bonds, function(count, name) {
+	            query = query.concat(`|${name}, (${count})[Bonds with ${name}]`);
+	        });
+	        query = query.concat("|Other, (0)[Other Bond]}");
+	        
+	        setAttrs({
+	            bond_query: query
+	        });
+	    });
+	});
 });
 
 // Move Drop

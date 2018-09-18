@@ -9,7 +9,6 @@
 	margin:auto;
 	border-style:double;
 	border-width:5px;
-	padding:5px;
 }
 
 .sheet-wrapper input[type="number"]::-webkit-outer-spin-button,
@@ -32,8 +31,14 @@ hr {
 }
 
 .charsheet .inlinerollresult {
-    background-color:none;
+    background-color:transparent;
     text-decoration:none;
+    vertical-align:middle;
+}
+
+.textchatcontainer span.inlinerollresult.fullfail {
+    border:none;
+    color:red;
 }
 
 ::-webkit-input-placeholder  { font-style:oblique; font-size:10px; color:gray;}
@@ -41,9 +46,25 @@ input::-moz-placeholder { font-style:oblique; font-size:10px; color:gray;}
 input[type="number"]::-moz-placeholder { font-style:oblique; font-size:7px; text-align:center; color:gray;}
 textarea::-moz-placeholder { font-style:oblique; font-size:10px; color:gray;}
 
+/*Tooltip formatting*/
+.sheet-tooltip {
+    position:absolute;
+    background-color:white;
+    border:2px solid black;
+    border-radius:4px;
+    padding:3px;
+    font-size:9px;
+    text-align:center;
+    visibility:hidden;
+    color:black;
+    width:100px;
+    z-index:1;
+}
+
 /*header formatting*/
 .sheet-logo {
     width:120px;
+    margin:5px;
 }
 
 .sheet-player {
@@ -128,51 +149,88 @@ input[type="checkbox"].sheet-ispcornpc:not(:checked) ~ .sheet-npccharsheet {
     display:block;
 }
 
-.sheet-buttonforgenericroll {
-    width:50px;
-    height:50px;
-    position:relative;
-    margin-top:-15px;
-    bottom:13px;
-    float:right;
-    color:#805500;
-    font-size:35px;
-    background-color:transparent;
-}
-
+.sheet-buttonforgenericroll,
 .sheet-buttonforresistanceroll {
-    width:50px;
-    height:50px;
     position:relative;
-    right:30px;
-    bottom:12px;
+    display:inline-block;
+    width:45px;
+    height:45px;
+    bottom:85px;
+    left:485px;
+    margin-bottom:-45px;
+    z-index:3;
+}
+
+.sheet-buttonforgenericroll button[type="roll"],
+.sheet-buttonforresistanceroll button[type="roll"] {
     color:#805500;
-    font-size:35px;
+    height:40px;
+    width:40px;
+    font-size:33px;
     background-color:transparent;
 }
 
-button[type=roll].sheet-buttonforgenericroll {
-    background-color:transparent;
-    position:relative;
-    width:50px;
-    height:50px;
-    padding-top:15px;
+.sheet-buttonforgenericroll:hover .sheet-tooltip {
+    visibility:visible;
+    top:38px;
+    right:-33px;
 }
 
-button[type=roll].sheet-buttonforresistanceroll::before, { 
+.sheet-buttonforgenericroll .sheet-tooltip::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%; /* At the bottom of the tooltip */
+    left: 50%;
+    margin-left: -7px;
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent transparent black transparent;
+}
+
+.sheet-buttonforresistanceroll:hover .sheet-tooltip {
+    visibility:visible;
+    left:-31px;
+    top:38px;
+}
+
+.sheet-buttonforresistanceroll .sheet-tooltip::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%; /* At the bottom of the tooltip */
+    left: 50%;
+    margin-left: -7px;
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent transparent black transparent;
+}
+
+.sheet-buttonforresistanceroll button[type=roll]::before { 
     content: 'T';
 }
 
-button[type=roll].sheet-buttonforgenericroll::before, { 
-    content: '0';
+.sheet-buttonforgenericroll button[type=roll]::before { 
+    content: 't';
 }
 
-.sheet-textforbigdices {
-    font-size:9px;
-    font-weight:900;
+/*Initiative button formatting*/
+.sheet-buttonforinitiative {
     position:relative;
-    right:26.7px;
-    bottom:16px;
+    left:570px;
+    bottom:35px;
+    margin-bottom:-50px;
+    width:55px;
+    height:35px;
+    font-size:9px;
+}
+
+.sheet-buttonforinitiativeroll {
+    width:55px;
+    height:35px;
+    border-radius:15px;
+}
+
+button[type=roll].sheet-buttonforinitiativeroll::before { 
+    content: '';
 }
 
 /*tab selection formmating*/
@@ -195,7 +253,7 @@ button[type=roll].sheet-buttonforgenericroll::before, {
 }
 
 input[type="radio"].sheet-tab { /*hide checkbox*/
-    opacity: 0;
+    opacity:0;
     -webkit-transform: scale(2);
     -moz-transform: scale(2);
     -ms-transform: scale(2);
@@ -240,8 +298,15 @@ input.sheet-tab-skills:checked ~ div.sheet-tab-skills,
 input.sheet-tab-combat:checked ~ div.sheet-tab-combat,
 input.sheet-tab-magic:checked ~ div.sheet-tab-magic,
 input.sheet-tab-itens:checked ~ div.sheet-tab-itens { 
-    display: block; 
-    
+    display: block;
+}
+
+/*Two collumns general formatting*/
+.sheet-separatedCollumns {
+    display:inline-block;
+    margin:0px;
+    margin-left:4px;
+    vertical-align:top;
 }
 
 /*basic informations formatting*/
@@ -258,29 +323,44 @@ input.sheet-tab-itens:checked ~ div.sheet-tab-itens {
     border-bottom:1px solid black;
 }
 
-.sheet-textalign {
+.sheet-textalign,
+.sheet-initiativealign {
     display:inline-block;
-    width:30%;
 }
 
-.sheet-inputexp {
+.sheet-textalign {
+    width:81px;
+}
+
+.sheet-initiativealign {
+    font-size:9px;
+}
+
+.sheet-inputexp,
+.sheet-inputinitiative {
     border-bottom:1px solid black;
     margin-right:0px;
     font-size:16px;
     text-align:center;
     font-weight:bold;
 }
-/*Phase formatting*/
+
+.sheet-inputinitiative {
+    font-size:12px;
+}
+/*Phase and actual condition formatting*/
 .sheet-estagioline {
-    text-align:center;
+    text-align:left;
     margin-top:10px;
     margin-bottom:5px;
+    margin-left:30px;
 }
 
 .sheet-estagiolabel {
     font-weight:bold;
     color: black;
-    text-align:center;
+    text-align:left;
+    margin-left:7px;
     font-size:8px;
 }
 
@@ -293,17 +373,81 @@ input.sheet-tab-itens:checked ~ div.sheet-tab-itens {
     font-size:25px;
     width:40px;
     height:40px;
+    z-index:2;
 }
 
 .sheet-inputexpline {
     margin-bottom:-31px;
+    z-index: 1;
+}
+
+.sheet-actualconditionscontainer {
+    width:500px;
+    text-align:center;
+    position:relative;
+    bottom:15px;
+    margin:auto;
+    margin-top:-120px;
+    padding:7px;
+    z-index:1;
+}
+
+.sheet-secondaryicons {
+    position:relative;
+    margin-right:-53px;
+    margin-left:40px;
+}
+
+.sheet-reviewline {
+    display:inline-block;
+    position:relative;
+    text-align:center;
+    bottom:7px;
+}
+
+.sheet-reviewline span.sheet-secondarytotalshow {
+    position:relative;
+    top:18px;
+    right:26px;
+    font-size:9px;
+    font-style:italic;
+}
+
+.sheet-reviewline label.sheet-secondaryattrshow {
+    position:relative;
+    width:50px;
+    height:10px;
+    padding:0px;
+    margin-bottom:-13px;
+    text-align:center;
+    font-size:8px;
+    z-index:0;
+}
+
+.sheet-reviewline input[type='number'] {
+    background-color:transparent;
+    border-color:transparent;
+    border:none;
+    outline:none;
+    box-shadow:none;
+    text-align:center;
+    font-weight:bold;
+    position:relative;
+    top:5px;
+    width:50px;
+    height:40px;
+    font-size:20px;
+    outline:none;
 }
 
 /*attributes collumns formatting*/
 .sheet-col-align {
 	display: inline-block;
-	-webkit-align-content:center;
+	-webkit-align-content:left;
 	vertical-align:center;
+	margin-left:4px;
+	padding-left:5px;
+	width:310px;
 }
 
 .sheet-attributeinput {
@@ -335,26 +479,34 @@ input.sheet-tab-itens:checked ~ div.sheet-tab-itens {
 }
 
 .sheet-row-text {
-    width:200px;
+    width:180px;
     font-size:13px;
+    margin-left:10px;
+    margin-right:-10px;
 }
 
 .sheet-row-inputspace {
     width:30px;
 }
 
-.sheet-row-button {
-    width:30px;
+.sheet-row-button button[type="roll"] {
+    width:28px;
 }
 
 .sheet-blocksheader h3 {
-    background-color: black;
+    background-color: #303030;
+    background: linear-gradient(to bottom, #404040, #181818);
     color: white;
     text-align:center;
     border:2.00px solid black;
-    border-radius:5%;
+    border-radius:3px;
     margin-bottom:8px;
     margin-top:11px;
+}
+
+.sheet-basicheader {
+    width:310px;
+    margin-left:8px;
 }
 
 .sheet-defativasub {
@@ -373,16 +525,6 @@ input.sheet-tab-itens:checked ~ div.sheet-tab-itens {
 }
 
 /*Characterizations and behavior formatting */
-.sheet-charbehaveblock h3{
-   background-color:black;
-   color:white;
-   text-align:center;
-   border:1.00px solid black;
-   border-radius:5%;
-   margin-top:6.0px;
-   margin-bottom:11px;
-}
-
 .sheet-characterizationhint,
 .sheet-characterizationcost {
     display:inline-block;
@@ -441,6 +583,28 @@ input.sheet-tab-itens:checked ~ div.sheet-tab-itens {
     text-align:center;
 }    
 /*Skills tab formatting start*/
+/*Skill basic information row*/
+.sheet-tabheader_left,
+.sheet-tabheader_right {
+    display:inline-block;
+    width:305px;
+    margin-bottom:7px;
+}
+
+.sheet-tabheader_left input[type='number'],
+.sheet-tabheader_right input[type='number'] {
+    width:36px;
+    height:30px;
+    border:1px solid black;
+    text-align:center;
+    padding:0px;
+}
+
+.sheet-tabheader_right {
+    margin-left:34px;
+}
+
+
 /*Skill table formatting*/
 .sheet-skillgroup {
     border:1px dashed black;
@@ -449,12 +613,14 @@ input.sheet-tab-itens:checked ~ div.sheet-tab-itens {
 
 .sheet-skilgrouptitle {
     background-color:black;
+    background: linear-gradient(to bottom, #404040, #181818);
     padding-bottom:4.0px;
 }
 
 .sheet-skillgroupcolor {
     color:white;
     font-weight:bold;
+    margin-left:7px;
 }
 
 .sheet-skillinformation {
@@ -495,6 +661,65 @@ input.sheet-tab-itens:checked ~ div.sheet-tab-itens {
     text-align:center;
 }
 
+input[type='text'].sheet-skillespecialization {
+    position:relative;
+    bottom:3.5px;
+    height:22px;
+    width:300px;
+    margin-left:5px;
+    font-size:10px;
+    display:none;
+}
+
+textarea.sheet-skillespecialization {
+    position:relative;
+    height:55px;
+    width:290px;
+    margin-left:5px;
+    font-size:10px;
+    display:none;
+}
+
+input[type='checkbox'].sheet-skillname  {
+    width:145px;
+    height:20px;
+    margin-right:-145px;
+    opacity:0;
+    z-index:1;
+}
+
+.sheet-labeltoshowskill {
+    display:inline-block;
+    width:135px;
+    margin-left:5px;
+    margin-top:-20px;
+    font-size:12px;
+    letter-spacing:-0.75px;
+}
+
+
+input[type='checkbox']:checked.sheet-skillname  + label::before{
+    font-size:11px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+input[type='checkbox'].sheet-skillname  + label::before {
+    font-size:11px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+input[type='checkbox']:checked.sheet-skillname  + label.sheet-labeltoshowskill::before {content:'⇓';}
+
+input[type='checkbox'].sheet-skillname  + label.sheet-labeltoshowskill::before {content:'•';}
+
+
+input[type='checkbox']:checked.sheet-skillname ~ .sheet-skillextrarow > input[type='text'].sheet-skillespecialization,
+input[type='checkbox']:checked.sheet-skillname ~ .sheet-skillextrarow > textarea.sheet-skillespecialization {
+    display:block;
+}
+
 .sheet-skillline2 {
     background-color:rgba(245,245,245,1);
     margin-top:1.5px;
@@ -507,7 +732,11 @@ input.sheet-tab-itens:checked ~ div.sheet-tab-itens {
     margin-bottom:1.5px;
 }
 
-/*Skill table formattin end*/
+.sheet-iconsdescription {
+    font-size:10px;
+}
+
+/*Skill table formatting end*/
 /*Language section formattin start*/
 .sheet-languagestart {
     position:relative;
@@ -598,26 +827,12 @@ input.sheet-tab-itens:checked ~ div.sheet-tab-itens {
     border-radius:2.6px;
 }
 /*End of skill page formatting*/
+
 /*Start of combat page formatting*/
-/*Combat header formatting*/
-.sheet-combatheader {
-    border-top:2px solid black;
-    border-bottom:2px solid black;
-    margin-bottom:10px;
-}
-
-.sheet-combatheaderrow {
-    display:inline-block;
-    
-}
-
-.sheet-textforcombatheader {
-    margin-left:40px;
-}
-
 /*weapon group formatting*/
 .sheet-weapongroupleft {
     background-color:black;
+    background: linear-gradient(to bottom, #404040, #181818);
     border-radius:3px;
     margin-bottom:5px;
 }
@@ -670,6 +885,25 @@ input.sheet-tab-itens:checked ~ div.sheet-tab-itens {
     bottom:7px;
 }
 
+label.sheet-weapongroup:hover .sheet-tooltip {
+    visibility:visible;
+    z-index:1;
+    width:126px;
+    right:-53px;
+    bottom:25px;
+}
+
+label.sheet-weapongroup .sheet-tooltip::after {
+    content: " ";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -7px;
+    border-width: 7px;
+    border-style: solid;
+    border-color: gray transparent transparent transparent;
+}
+
 /*tables from combat start*/
 .sheet-weapongrouptable {
     background-color:white;
@@ -699,27 +933,27 @@ input.sheet-tab-itens:checked ~ div.sheet-tab-itens {
 .sheet-weapontablerow8,
 .sheet-weapontablerow9,
 .sheet-weapontablerow10,
-.sheet-weapontablerow11,
-.sheet-weapontablerow12,
-.sheet-weapontablerow13 {
+.sheet-weapontablerow11 {
     display:inline-block;
 }
 
 .sheet-tablebody .sheet-weapontablerow1,
-.sheet-tablebody input.sheet-weapontablerow1, {
+.sheet-tablebody input.sheet-weapontablerow1 {
     width:202px;
 }
 
 select.sheet-weapontablerow2 {
     width:35px;
+    height:26px;
     -webkit-appearance:none;
     -moz-appearance:none;
     appearance:none;
     border:1px solid black;
-    margin:1px;
     text-align:center;
     font-size:9px;
+    margin:1px;
     margin-left:-1px;
+    padding:0px;
 }
 
 .sheet-weapontype {
@@ -747,27 +981,45 @@ select.sheet-weapontablerow2 {
     width:30px;
 }
 
-.sheet-tablebody .sheet-weapontablerow9, .sheet-tablebody input.sheet-weapontablerow9,
-.sheet-tablebody .sheet-weapontablerow10, .sheet-tablebody input.sheet-weapontablerow10,
-.sheet-tablebody .sheet-weapontablerow11, .sheet-tablebody input.sheet-weapontablerow11,
-.sheet-tablebody .sheet-weapontablerow12, .sheet-tablebody input.sheet-weapontablerow12 {
+.sheet-weapontablerow9 {
+    width:110px;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    appearance:none;
+    text-align:center;
+    font-size:9px;
+    margin-left:-1px;
+}
+
+select.sheet-weapontablerow9 {
+    position:relative;
+    border:1px solid black;
+    height:27px;
+    margin-top:2px;
+    padding:0px;
+    vertical-align:top;
+}
+
+.sheet-tablebody .sheet-weapontablerow10, .sheet-tablebody input.sheet-weapontablerow10 {
     width:35px;    
 }
 
-.sheet-tablebody .sheet-weapontablerow13, .sheet-tablebody input.sheet-weapontablerow13 {
+.sheet-tablebody .sheet-weapontablerow11, .sheet-tablebody input.sheet-weapontablerow11 {
     width:25px;
 }
 
-.repeating_weaponselection button[type="roll"] {
-    width: 25px;
+button[type="roll"].sheet-weapontablerow11 {
+    position:relative;
+    width: 15px;
+    height:32px;
+    top:5px;
     background-color:default;
 }
 
-
 .repcontainer[data-groupname="repeating_weaponselection"] > .repitem button[type="roll"] {
-    margin-left:0px;
-    margin-top:1px;
-    margin-right:-3px;
+    margin-left:-3px;
+    margin-top:-5px;
+    margin-right:-4px;
 }
 
 .sheet-selectedweapons {
@@ -785,7 +1037,171 @@ select.sheet-weapontablerow2 {
 
 .sheet-weapontablefirstline {
     background-color:black;
+    background: linear-gradient(to bottom, #404040, #181818);
 }
+
+.sheet-weapontablerow1,
+.sheet-weapontablerow2,
+select.sheet-weapontablerow2,
+.sheet-weapontablerow3,
+.sheet-weapontablerow4,
+.sheet-weapontablerow5,
+.sheet-weapontablerow6,
+.sheet-weapontablerow7,
+.sheet-weapontablerow8,
+.sheet-weapontablerow9,
+.sheet-weapontablerow10,
+.sheet-weapontablerow11 {
+    margin-top:-5px;
+}
+
+label.sheet-weaponbonus:hover .sheet-tooltip,
+label.sheet-weapontotal:hover .sheet-tooltip,
+label.sheet-weaponL:hover .sheet-tooltip,
+label.sheet-weaponM:hover .sheet-tooltip,
+label.sheet-weaponP:hover .sheet-tooltip {
+    visibility:visible;
+    width:150px;
+    z-index:1;
+}
+
+label.sheet-damageandbonus:hover .sheet-tooltip {
+    visibility:visible;
+    width:150px;
+    z-index:1;
+    position:absolute;
+    top:25px;
+    left:-45px;
+}
+
+label.sheet-damageandbonus .sheet-tooltip::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%; /* At the top of the tooltip */
+    left: 50%;
+    margin-left: -7px;
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent transparent gray transparent;
+}
+
+label.sheet-damageandbonus2 .sheet-tooltip::after {
+    left:42%;
+}
+
+    /*show weapon damages*/
+.repcontainer[data-groupname="repeating_weaponselection"] > .repitem input[type="checkbox"] {
+    opacity: 0;
+    width: 35px;
+    height: 16px;
+    position: relative;
+    margin-right: -33px;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.repcontainer[data-groupname="repeating_weaponselection"] > .repitem input[type="checkbox"] + span::before {
+    line-height: 14px;
+    text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    content: "─";
+    width: 35px;
+    height: 14px;
+    font-size: 12px;
+}
+
+.repcontainer[data-groupname="repeating_weaponselection"] > .repitem input[type="checkbox"]:checked + span::before {
+    font-family:pictos;
+    content: "`";
+}
+
+.repcontainer[data-groupname="repeating_weaponselection"] > .repitem {
+    border:1px solid black;
+    border-radius:3px;
+    margin-bottom:4px;
+    padding-bottom:-5px;
+}
+
+/*weapon damages block*/
+.sheet-weapontablelinehidden {
+    display:none;
+    margin-bottom:-4px;
+}
+
+.repcontainer[data-groupname="repeating_weaponselection"] > .repitem input[type="checkbox"]:checked ~ .sheet-weapontablelinehidden {
+    display:block;
+}
+
+.sheet-weapontablerow12,
+.sheet-weapontablerow13,
+.sheet-weapontablerow14,
+.sheet-weapontablerow15,
+.sheet-weapontablerow16,
+.sheet-weapontablerow17,
+.sheet-weapontablerow18,
+.sheet-weapontablerow19,
+.sheet-weapontablerow20,
+.sheet-weapontablerow21,
+.sheet-weapontablerow22,
+.sheet-weapontablerow23, 
+.sheet-weapontablerow24, 
+.sheet-weapontablerow25, 
+.sheet-weapontablerow26 {
+    display:inline-block;
+    margin-top:-5px;
+}
+
+.sheet-weapontablerow27,
+.sheet-weapontablerow28 {
+    display:inline-block;
+}
+
+.sheet-weapontablerow27 {
+    color:white;
+    width:73px;
+    height:24px;
+    font-size:11px;
+    border-radius:3px;
+    margin-bottom:5px;
+    text-align:center;
+    vertical-align:top;
+}
+
+.sheet-weapontablerow28 {
+    width:530px;
+    height:15px;
+    font-size:11px;
+}
+
+.sheet-weapontablerow12,
+.sheet-weapontablerow21 {
+    height:26px;
+    border:1px solid black;
+    border-radius:3px;
+    position:relative;
+    top:-5px;
+}
+
+input[type="number"].sheet-weapontablerow22 {
+    width:40px;
+}
+
+input[type="number"].sheet-weapontablerow13,
+input[type="number"].sheet-weapontablerow14,
+input[type="number"].sheet-weapontablerow15,
+input[type="number"].sheet-weapontablerow16,
+input[type="number"].sheet-weapontablerow17,
+input[type="number"].sheet-weapontablerow18,
+input[type="number"].sheet-weapontablerow19,
+input[type="number"].sheet-weapontablerow20,
+input[type="number"].sheet-weapontablerow23,
+input[type="number"].sheet-weapontablerow24,
+input[type="number"].sheet-weapontablerow25,
+input[type="number"].sheet-weapontablerow26 {
+    width:34px;
+}
+
 /*Weapon table end*/
 /*Tec start*/
 .sheet-combattecblock {
@@ -911,6 +1327,7 @@ select.sheet-tectablerow6.sheet-inputtecproperty {
 
 .sheet-tectablefirstline {
     background-color:black;
+    background: linear-gradient(to bottom, #404040, #181818);
 }
 
 button[type=roll].sheet-showtecinformation::before { 
@@ -968,7 +1385,7 @@ button[type=roll].sheet-showtecinformation::before {
 /*Tec end*/
 /*Improved tec start*/
 .sheet-improvedtechniquecolumn {
-    width:64%;
+    width:400px;
 }
 
 .sheet-improvedtechniquegroup {
@@ -979,7 +1396,9 @@ button[type=roll].sheet-showtecinformation::before {
     border-right: 2.2px solid black;
     border-radius:3px;
     position:relative;
-    padding:3px;
+    padding-left:3px;
+    padding-bottom:3px;
+    padding-right:0px;
     font-size:15px;
     margin-top:11px;
 }
@@ -996,11 +1415,12 @@ button[type=roll].sheet-showtecinformation::before {
     display:inline-block;
     background-color:white;
     margin-left:4px;
-    margin-right:-8px;
+    margin-right:-5px;
+    border-radius:3px;
 }
 
 .sheet-ittablerow1 {
-    width:158px;
+    width:150px;
 }
 
 .sheet-ittablerow2,
@@ -1009,13 +1429,7 @@ input[type="number"] .sheet-ittablerow2 {
 }
 
 .sheet-ittablerow3 {
-    width:211px;
-}
-
-.sheet-improvedtec {
-    color:white;
-    text-align:center;
-    font-size:1em;
+    width:195px;
 }
 
 .sheet-inputitproperty {
@@ -1027,6 +1441,14 @@ input[type="number"] .sheet-ittablerow2 {
 
 .sheet-ittablefirstline {
     background-color:black;
+    background: linear-gradient(to bottom, #404040, #181818);
+}
+
+.sheet-ittablefirstline label {
+    color:white;
+    text-align:center;
+    padding:0px;
+    font-size:0.95em;
 }
 
 .repcontainer[data-groupname="repeating_improvedtechniques"] > .repitem {
@@ -1036,8 +1458,8 @@ input[type="number"] .sheet-ittablerow2 {
 /*Improved tec end*/
 /*Improved weapon group start*/
 .sheet-improvedgroupcolumn {
-    width:33%;
-    margin-left:2%;
+    width:210px;
+    margin-left:15px;
 }
 
 .sheet-alignimprovedgroupcolumn {
@@ -1052,7 +1474,8 @@ input[type="number"] .sheet-ittablerow2 {
     border-left: 2.2px solid black;
     border-right: 2.2px solid black;
     border-radius:3px;
-    padding:3px;
+    padding-left:3px;
+    padding-top:3px;
     font-size:15px;
     margin-top:11px;
 }
@@ -1075,7 +1498,7 @@ input[type="number"].sheet-igtablerow2{
 
 .sheet-igtablerow3,
 input[type="number"].sheet-igtablerow3{
-    width:55px;
+    width:50px;
 }
 
 .sheet-improvedgroup {
@@ -1094,6 +1517,7 @@ input[type="number"].sheet-igtablerow3{
 
 .sheet-igtablefirstline {
     background-color:black;
+    background: linear-gradient(to bottom, #404040, #181818);
 }
 
 .repcontainer[data-groupname="repeating_improvedtechniques"] > .repitem {
@@ -1110,7 +1534,7 @@ input[type="number"].sheet-igtablerow3{
     position:relative;
     padding:3px;
     font-size:15px;
-    width:98.5%;
+    width:522px;
     margin-top:11px;
 }
 
@@ -1163,6 +1587,7 @@ input[type="number"].sheet-igtablerow3{
 
 .sheet-armortablefirstline {
     background-color:black;
+    background: linear-gradient(to bottom, #404040, #181818);
 }
 
 .repcontainer[data-groupname="repeating_defenseselection"] > .repitem {
@@ -1170,9 +1595,11 @@ input[type="number"].sheet-igtablerow3{
 }
 /*Defensive equipment end*/
 /*Combat page end*/
+
 /*Magic page start*/
 .sheet-magicheader {
     background-color:black;
+    background: linear-gradient(to bottom, #404040, #181818);
     color:white;
     border-radius:1.15px;
     padding:5.5px;
@@ -1182,9 +1609,18 @@ input[type="number"].sheet-igtablerow3{
     font-size:14px;
 }
 
+.repcontainer[data-groupname="repeating_magiclist"] > .repitem {
+    background-color:rgba(245,245,245,1);
+}
+
+.sheet-magiclistfirstrow {
+    margin:0px;
+}
+
 .sheet-magiclistfirstrow label {
     display:inline-block;
     background-color:black;
+    background: linear-gradient(to bottom, #404040, #181818);
     color:white;
     font-size:10px;
     text-align:center;
@@ -1194,6 +1630,7 @@ input[type="number"].sheet-igtablerow3{
     padding-top:3px;
     margin:0px;
     margin-top:5px;
+    border-radius:3px;
 }
 
 input.sheet-magiccolumntext,
@@ -1231,127 +1668,107 @@ input[type="number"].sheet-magiclistinput {
 
 label.sheet-magiccolumnshortdescription,
 input.sheet-magiccolumnshortdescription {
-    width:248px;
+    width:254px;
+    margin-right:0px;
     line-height:22px;
     padding:0px;
     padding-bottom:3px;
     padding-top:3px;
 }
 
-.sheet-magiclisteffects {
+.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[type="checkbox"],
+.sheet-magiclistopendescription,
+.sheet-magicdurationtext,
+.sheet-magicdurationtextinput,
+.sheet-magicevocationtext,
+.sheet-magicreachtext {
     display:inline-block;
+    margin-top:3px;
 }
 
-.sheet-magiclisteffects,
-.sheet-magiclisteffectsspan {
-    width:70px;
-    font-size:11px;
-    margin:10px;
-    text-align:center;
+label.sheet-magicevocationtext {
+    margin-left:10px;
 }
 
-.sheet-magiclisteffectsspan {
-    border:1px solid black;
+label.sheet-magicdurationtext,
+label.sheet-magicevocationtext,
+label.sheet-magicreachtext {
+    width:60px;
+    height:20px;
+    background: linear-gradient(to bottom, #404040, #181818);
+    color:white;
+    font-weight:bold;
+    font-size:10px;
+    border: 2px solid black;
     border-radius:3px;
-    background-color:whitesmoke;
     padding:2px;
+    padding-left:4px;
+    z-index:1;
 }
 
-.repcontainer[data-groupname="repeating_magiclist"] {
+input[type="text"].sheet-magicdurationtextinput,
+input[type="text"].sheet-magicevocationtext,
+input[type="text"].sheet-magicreachtext {
     padding:0px;
-    margin-left:3px;
+    padding-left:4px;
+    height:28px;
+    width:99px;
+    border:1px solid black;
+    margin-left:-1px;
+    z-index:0;
+}
+
+label.sheet-magiclistopendescription {
+    position:relative;
+    width:50px;
+    height:20px;
+    border:2px solid black;
+    border-radius:5px;
+    padding-bottom:11px;
+    padding-top:4px;
+    margin-left:-56px;
+    text-align:center;
+    background-color:gainsboro;
+    cursor:pointer;
+    z-index:1;
 }
 
 .repcontainer[data-groupname="repeating_magiclist"] > .repitem input[type="checkbox"] {
-    margin-left:-100px;
-    width:50px;
-    transform:scale(1.5);
+    position:relative;
+    width:45px;
+    height:20px;
+    transform:scale(1.6);
+    margin-top:-2px;
+    margin-left:12px;
     opacity:0;
+    z-index:2;
 }
-
-.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[name="attr_showmagiceffect1"] {
-    position:relative;
-    left:-355px;
-}
-
-.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[name="attr_showmagiceffect2"] {
-    position:relative;
-    left:-223px;
-}
-
-.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[name="attr_showmagiceffect3"] {
-    position:relative;
-    left:-90px;
-}
-
-.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[name="attr_showmagiceffect4"] {
-    position:relative;
-    left:45px;
-}
-
-.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[name="attr_showmagiceffect5"] {
-    position:relative;
-    left:178px;
-}
-
-.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[type="checkbox"]:checked + span {
-    border-top:2px solid black;
-    border-radius:3px;
-    font-weight:500;
-    background-color:Gainsboro;
-}
-
-.sheet-magiclistlongeffect,
-.sheet-magicextrainformation {
-    display:inline-block;
-}
-
-.sheet-magiclistlongeffect {
-    height:70px;
-    padding:3px;
-    width:550.7px;
-    margin-top:5px;
-    margin-bottom:10px;
-    margin-left:10px;
-    border:1px solid black;
-}
-
-.sheet-magicextrainformation {
-    width:50px;
-    margin-left:10px;
-}
-
-.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[type="number"].sheet-magiclistlongeffectlevel {
-    position:relative;
-    border:1px solid black;
-    text-align:center;
-    margin-top:5px;
-    width:35px;
-    height:35px;
-    font-size:16px;
-    padding:3px;
+    
+.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[type="checkbox"]:checked ~ label.sheet-magiclistopendescription {
     font-weight:900;
-}
-
-.sheet-magiclistlongeffecthelper {
-    text-align:center;
-    position:relative;
-    bottom:15px;
-    left:2px;
-    color:black;
-    font-weight:900;
-    font-size:7px;
-    letter-spacing:-0.8px;
+    background-color:white;
+    text-decoration:underline;
+    border-bottom:none;
+    border-radius:5px 5px 0px 0px;
 }
 
 .sheet-showmagicinformation {
     position:relative;
-    width:30px;
-    height:30px;
+    width:20px;
+    height:20px;
+}
+
+.sheet-magiclistlongeffect {
+    border: 2px solid black;
+    margin-top:-13px;
+    margin-left:2px;
+    margin-right:2px;
+    padding:2px;
+    height:130px;
+    z-index:0;
 }
 
 .sheet-expandablemagicinformation {
-    margin-top:10px;
     margin-right:5px;
     margin-bottom:5px;
     border-top:1px solid white;
@@ -1360,25 +1777,12 @@ input.sheet-magiccolumnshortdescription {
     display:none;
 }
 
-.repcontainer[data-groupname="repeating_magiclist"] > .repitem {
-    border:2px solid black;
-    border-radius:4px;
-    margin-bottom:4px;
-    margin-top:7px;
-    margin-right:-10px;
-    padding-left:5px;
-    background-color:rgba(245,245,245,1);
-}
-
-.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[name="attr_showmagiceffect1"]:checked ~ div.sheet-magiceffect1,
-.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[name="attr_showmagiceffect2"]:checked ~ div.sheet-magiceffect2,
-.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[name="attr_showmagiceffect3"]:checked ~ div.sheet-magiceffect3,
-.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[name="attr_showmagiceffect4"]:checked ~ div.sheet-magiceffect4,
-.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[name="attr_showmagiceffect5"]:checked ~ div.sheet-magiceffect5 {
+.repcontainer[data-groupname="repeating_magiclist"] > .repitem input[name="attr_showmagiceffect"]:checked ~ div.sheet-expandablemagicinformation {
     display:block;
 }
 
 /*Magic page end
+
 Itens page beggining*/
 .sheet-itensrow {
     display:inline-block;
@@ -1444,9 +1848,44 @@ input[type="number"].sheet-objetcvalue {
 
 /*Formatting of the NPC Sheet - Begginning*/
 
+/*Buttons*/
+.sheet-buttonfornpc {
+    width:40px;
+    height:40px;
+    display:inline-block;
+    position:relative;
+    left:108px;
+    bottom:5px;
+}
+
+button.sheet-buttonfornpcrfrm {
+    width:40px;
+    height:40px;
+    border-radius:7px;
+    
+}
+
+button[type=roll].sheet-buttonfornpcrfrm::before { 
+    content: '0';
+    font-size:30px;
+    margin-right:-23px;
+    position:relative;
+    bottom:-5px;
+    color:gray;
+    z-index:0;
+}
+
+
+span.sheet-textfornpcbutton {
+    font-size:15px;
+    position:relative;
+    bottom:2px;
+    font-weight:bold;
+}
+
 /*Basic data*/
 .sheet-npc_basicdatagroup {
-    margin-left:50px;
+    margin-left:11px;
 }
 
 .sheet-npc_basicdata {
@@ -1470,6 +1909,7 @@ input[type="number"].sheet-objetcvalue {
 input.sheet-npc_basic {
     font-weight:bold;
     color:black;
+    width:30px;
 }
 
 .sheet-npc_name {
@@ -1478,10 +1918,25 @@ input.sheet-npc_basic {
     position:relative;
 }
 
-.sheet-npc_type {
+.sheet-npc_type,
+.sheet-npc_initiative {
     display:inline;
     margin-bottom:5px;
     position:relative;
+}
+
+label.sheet-npc_initiative {
+    margin-left:25px;
+}
+
+span.sheet-npc_initiative {
+    font-weight:bold;
+}
+
+input[type="number"].sheet-npc_initiative {
+    border:1px solid black;
+    text-align:center;
+    font-weight:bold;
 }
 
 input.sheet-npc_name {
@@ -1496,7 +1951,34 @@ input.sheet-npc_type {
 }
 
 /*NPC attack table*/
-.sheet-npc_attacktable {
+.sheet-npc_attacktableheader1,
+.sheet-npc_attacktableheader2 {
+    display:inline-block;
+    vertical-align:middle;
+}
+
+.sheet-npc_attacktableheader1 {
+    width:196px;
+    padding:5px;
+    background-color:rgb(70,70,70);
+    color:white;
+    font-weight:bold;
+    border-radius:3px;
+    margin-left:44px;
+    margin-right:2px;
+}
+
+.sheet-npc_attacktableheader2 {
+    width:26px;
+    height:28px;
+    padding:0px;
+    font-size:10px;
+    border-radius:3px;
+    background-color:rgb(70,70,70);
+    color:white;
+}
+
+.sheet-npc-attacktable {
     margin-bottom:10px;
     margin-top:5px;
 }
@@ -1505,6 +1987,12 @@ input.sheet-npc_type {
     border:1.5px solid black;
     margin-bottom:3px;
     text-align:center;
+}
+
+input[type="number"].sheet-npc_attacktableinput {
+    width:28px;
+    padding-right:0px;
+    padding-left:0px;
 }
 
 button.sheet-npc_attacktableinput {
@@ -1584,13 +2072,13 @@ button.sheet-npc_attacktableinput {
     font-weight:800;
 }
 
-.sheet-npc_skillname {
+.sheet-npc-skillname {
     display:inline-block;
     border:1.5px solid black;
     width:180px;
 }
 
-.sheet-npc_skillnameinput {
+.sheet-npc-skillname option {
     width:70px;
     border:2px solid black;
     border-radius:5px;
@@ -1603,15 +2091,16 @@ button.sheet-npc_attacktableinput {
     bottom:5px;
 }
 
-input.sheet-npc_skillname.sheet-npc_skilladjustline { text-align:center; }
+input.sheet-npc-skillname.sheet-npc_skilladjustline { text-align:center; }
 
-input.sheet-npc_skillname.sheet-npc_skilladjustline.sheet-npc_skillextra { width:380px; }
+input.sheet-npc-skillname.sheet-npc_skilladjustline.sheet-npc_skillextra { width:380px; }
 
 /*NPCs powers formatting*/
 .sheet-npc_powername {
     display:inline-block;
     border:1.5px solid black;
     width:180px;
+    vertical-align:top;
 }
 
 input.sheet-npc_powername { text-align:center; }
@@ -1623,25 +2112,28 @@ textarea.sheet-npc_powername.sheet-npc_powerextra {
 
 /*Início da formatação do Roll Template
 Cabeçalho*/
-.sheet-rolltemplate-tagmar_rolagem_completa .inlinerollresult {
+.sheet-rolltemplate-tagmar_rolagem_completa .inlinerollresult,
+.sheet-rolltemplate-tagmar_teste_de_resistencia .inlinerollresult {
     background-color:transparent;
     font-weight:normal;
     border:none;
     width:50px;
 }
 
-.sheet-rolltemplate-tagmar_rolagem_completa table {
+.sheet-rolltemplate-tagmar_rolagem_completa table,
+.sheet-rolltemplate-tagmar_teste_de_resistencia table {
 	border: 4px double black;
     background-color:GhostWhite;
     width:220px;
     margin-bottom:3px;
 }
 
-.sheet-rolltemplate-tagmar_rolagem_completa th {
+.sheet-rolltemplate-tagmar_rolagem_completa th,
+.sheet-rolltemplate-tagmar_teste_de_resistencia th {
     background-color:GhostWhite;
     height:30px;
     text-align:left;
-    border-bottom:;
+    /* border-bottom:; */
 }
 
 .sheet-rolltemplate-title_1 {
@@ -1659,12 +2151,16 @@ Cabeçalho*/
 
 .sheet-rolltemplate-title_skill {
     color:black;
-    font-size:16px;
+    font-size:14px;
     font-weight:bold;
     padding-top:7px;
     padding-bottom:7px;
     font-variant: petite-caps;
     letter-spacing:-0.075em;
+}
+
+.sheet-rolltemplate-skilltype {
+    height:11px;
 }
 
 .sheet-rolltemplate-title_battle {
@@ -1674,6 +2170,7 @@ Cabeçalho*/
     padding-top:7px;
     padding-bottom:7px;
     font-variant: petite-caps;
+    letter-spacing:-1px;
 }
 
 .sheet-rolltemplate-title_pre_battle {
@@ -1696,22 +2193,16 @@ Cabeçalho*/
 .sheet-rolltemplate-subheader,
 .sheet-rolltemplate-subheadercharname {
     color:black;
-    font-size:11px;
+    font-size:12px;
     text-align:left;
     font-weight:bold;
     padding-bottom:5px;
 }
-
-.sheet-rolltemplate-subheadercharname {
-    font-size:14px;
-    font-style:italic;
-}
-
 .sheet-rolltemplate-rolltextformat {
     font-style:italic;
+    font-size:12px;
     margin-top:12px;
     margin-bottom:10px;
-    font-variant: small-caps;
 }
 
 .sheet-rolltemplate-columnoftest .inlinerollresult {
@@ -1722,31 +2213,80 @@ Cabeçalho*/
     font-size:14px;
 }
 
+
+.sheet-rolltemplate-d20showresult {
+    position:relative;
+    font-family: dicefontd20;
+    font-size:38px;
+    font-weight:bold;
+    color:silver;
+    vertical-align:middle;
+    text-align:center;
+    opacity:50%;
+    z-index:1;
+    width:50px;
+}
+
 .sheet-rolltemplate-diceresultformatting .inlinerollresult {
-    background-color:#F0F0F0;
-    border:3px solid black;
+    position:relative;
+    background-color:transparent;
+    /*border:3px solid black;*/
     border-radius:50%;
     padding:2px;
+    margin-left:-50px;
     font-size:18px;
+    font-weight:bold;
+    z-index:2;
+    width:50px;
+}
+
+.sheet-rolltemplate-diceresultformatting {
+    text-align:center;
 }
 
 .sheet-rolltemplate-rolltextformat,
 .sheet-rolltemplate-columnoftest,
-.sheet-rolltemplate-diceresultformatting {
-    display:inline;
+.sheet-rolltemplate-diceresultformatting,
+.sheet-rolltemplate-d20showresult {
+    display:inline-block;
 }
 
-label .sheet-rolltemplate-diceresultformatting{
+label.sheet-rolltemplate-diceresultformatting{
     width:25px;
 }
 
-label .sheet-rolltemplate-columnoftest {
+label.sheet-rolltemplate-columnoftest {
     width:25px;
 }
 
-.sheet-rolltemplate-skillrow {
-    font-size:12px;
+.sheet-rolltemplate-magicdetails {
+    font-size:11px;
+}
+
+.sheet-rolltemplate-skillspecializationheader,
+.sheet-rolltemplate-skillspecializationheader span {
+    font-size:10px;
+    height:30px;
+    vertical-align:bottom;
+}
+
+.sheet-rolltemplate-skillspecialization,
+.sheet-rolltemplate-skillspecialization span {
     font-weight:bold;
+    margin-left:15px;
+}
+
+.sheet-rolltemplate-perfectskillheader,
+.sheet-rolltemplate-perfectskillheader span {
+    font-size:11px;
+    font-weight:bold;
+}
+
+.sheet-rolltemplate-perfectskilllist,
+.sheet-rolltemplate-perfectskilllist span {
+    font-size:11px;
+    font-style:italic;
+    text-indent:5px;
 }
 
 .sheet-rolltemplate-color {
@@ -1767,32 +2307,49 @@ label .sheet-rolltemplate-columnoftest {
     line-height:35px;
 }
 
+.sheet-rolltemplate-danoausente,
+.sheet-rolltemplate-dano00format,
 .sheet-rolltemplate-dano25format,
 .sheet-rolltemplate-dano50format,
 .sheet-rolltemplate-dano75format,
-.sheet-rolltemplate-dano100format {
+.sheet-rolltemplate-dano100format,
+.sheet-rolltemplate-dano125format {
     text-align:center;
     font-weight:bold;
 }
 
+.sheet-rolltemplate-danoausente {
+    color:gray;
+    font-weight:100;
+    font-style:italic;
+}
+
+.sheet-rolltemplate-dano00format {
+    color:white;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    font-weight:lighter;
+}
+
 .sheet-rolltemplate-dano25format {
-    color:yellow;
-    text-shadow: 0px 0px 3px black;
+    color:#CCCC00;
+    /*text-shadow: -0.5px 0 black, 0 0.5px black, 0.5px 0 black, 0 -0.5px black;*/
 }
 
 .sheet-rolltemplate-dano50format {
-    color:orange;
-    text-shadow: 1px 1px 3px black;
+    color:#e67300;
+    /*text-shadow: -0.5px 0 #202020, 0 0.5px #202020, 0.5px 0 #202020, 0 -0.5px #202020;*/
 }
 
 .sheet-rolltemplate-dano75format {
     color:red;
-    text-shadow: 0px 0px 1px gray;
 }
 
 .sheet-rolltemplate-dano100format {
     color:blue;
-    text-shadow: 0px 0px 2px white;
+}
+
+.sheet-rolltemplate-dano125format {
+    color:darkblue;
 }
 
 .sheet-rolltemplate-green,
@@ -1803,12 +2360,12 @@ label .sheet-rolltemplate-columnoftest {
 .sheet-rolltemplate-blue,
 .sheet-rolltemplate-darkblue,
 .sheet-rolltemplate-gray {
-    border:2px ridge #181818;
+    border:2px solid black;
     border-radius:10px;
     padding:8px;
     text-align:center;
     font-weight:bold;
-    box-shadow: inset 0px 0px 4.2px 2.1px rgba(0,0,0,0.1);
+    /*box-shadow: inset 0px 0px 4.2px 2.1px rgba(0,0,0,0.1);*/
 }
 
 .sheet-rolltemplate-green {
@@ -1851,7 +2408,7 @@ label .sheet-rolltemplate-columnoftest {
 .sheet-rolltemplate-subinformation {
     font-weight:900;
     font-size:12px;
-    text-decoration:underline;
+    /*text-decoration:underline;*/
     margin:2px;
 }
 
@@ -1922,4 +2479,55 @@ label .sheet-rolltemplate-columnoftest {
     padding:8px;
     border:2px double black;
     border-radius:7px;
+}
+
+/*Início da formatação do rolltemplate da iniciativa*/
+.sheet-rolltemplate-tagmar_iniciativa {
+    border-left:3px solid black;
+    border-bottom:2px dashed black;
+    border-top:2px dashed black;
+    border-right:1px dotted black;
+    border-radius:20px 0px 0px 20px;
+    background-color:whitesmoke;
+    width:220px;
+}
+
+.sheet-rolltemplate-initiative_firstline {
+    background-color:white;
+    border-bottom:1px dashed gray;
+    font-size:16px;
+    font-weight:900;
+    text-align:left;
+    padding-top:7px;
+    padding-bottom:7px;
+    margin-left:15px;
+    margin-right:25px;
+}
+
+.sheet-rolltemplate-initiative_secondline {
+    font-size:14px;
+    text-align:left;
+    margin-top:7px;
+    margin-bottom:7px;
+    margin-left:15px;
+}
+
+.sheet-rolltemplate-initiative_thirdline {
+    font-size:18px;
+    font-weight:bold;
+    text-align:center;
+    margin-top:12px;
+    margin-bottom:12px;
+}
+
+.sheet-rolltemplate-tagmar_iniciativa .inlinerollresult {
+    background-color:darkred;
+    color:white;
+    border:2px solid gray;
+    border-radius:50%;
+    display:block;
+    width:24px;
+    height:24px;
+    margin:auto;
+    padding:4px;
 }
