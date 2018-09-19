@@ -11703,7 +11703,6 @@
 <charmancer class="sheet-repeating-choose">
     <select name="comp_choice">
         <option value="" data-i18n="choose"></option>
-        <option class="custom" value="custom" data-i18n="custom"></option>
     </select>
 </charmancer>
 
@@ -14245,7 +14244,10 @@
             reset["race_name"] = "";
             reset["subrace_name"] = "";
             reset["has_subrace"] = "";
-            clearRepeatingSections("prof_holder");
+            _.each(getCharmancerData().repeating, function(repid) {
+                console.log(repid);
+            });
+            //clearRepeatingSections("prof_holder");
         }
 
         if(eventinfo.newValue === "Rules:Races") {
@@ -14293,6 +14295,7 @@
                     }
 
                     //showList = showList.concat(handleProficiencies(data, "race", eventinfo.sourceType));
+                    //<option class="custom" value="custom" data-i18n="custom"></option>
                     _.each(proficiencyList, function(prof) {
                         if(data["data-" + prof + " Proficiency"]) {
                             addRepeatingSection("prof_holder", "row", function(rowid) {
@@ -14307,8 +14310,14 @@
                                 _.each(json, function(v,k) {
                                     if(k.split(" ")[0] == "Choice") {
                                         addRepeatingSection(rowid + " label", "choose", "race_" + prof.toLowerCase(), function(id) {
+                                            if(prof == "Language") {
+                                                var customupdate = {};
+                                                console.log("WORKING ON IT")
+                                                customupdate[id + " select"] = '<option value="" data-i18n="choose"></option><option class="custom" value="custom" data-i18n="custom"></option>';
+                                                setCharmancerText(customupdate);
+                                            }
                                             //console.log(id);
-                                            setCharmancerOptions(id + "_choice", "Category:Proficiencies \"Type:" + prof + "\"");
+                                            //setCharmancerOptions(id + "_choice", "Category:Proficiencies \"Type:" + prof + "\"");
                                         });
                                     }
                                 });
