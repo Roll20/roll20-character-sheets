@@ -1,4 +1,4 @@
-# Character sheet for Vampire The Maquerade, 5th Edition (v1.2)
+# Character sheet for Vampire The Maquerade, 5th Edition (v1.2.1)
 
 ## Known Bugs
 
@@ -49,6 +49,9 @@ Please note this is version 1.2, a set of updates are in progress.
 If you think anything is missing or you see any bugs, please message me via my [Roll20 Account](https://app.roll20.net/users/117780/)
 
 ## Versions
+
+### Version 1.2.1
+Bug fixes
 
 ### Version 1.2
 Fixed inline rolls so they now display hunger and vampire dice correctly if hunger dice pool is greater than the initial dice pool.
