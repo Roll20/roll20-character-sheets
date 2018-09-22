@@ -1,3 +1,9 @@
+### Version 1.41(2018-9-25):
+
+- crit fails/successes add back to skill rolls(roll of highest/lowest shows red/green)
+
+- readme fix
+
 ### Version 1.40(2018-9-18):
 
 - Roll Templates added (blue, red, green, black versions of the default template)
