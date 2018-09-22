@@ -2,6 +2,8 @@
 
 - crit fails/successes add back to skill rolls(roll of highest/lowest shows red/green)
 
+- skill rolls now use blue roll template
+
 - readme fix
 
 ### Version 1.40(2018-9-18):
