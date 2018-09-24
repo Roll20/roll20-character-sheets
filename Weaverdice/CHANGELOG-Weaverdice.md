@@ -2,7 +2,7 @@
 
 - crit fails/successes add back to skill rolls(roll of highest/lowest shows red/green)
 
-- skill rolls now use blue roll template
+- skill rolls now use blue roll template, attribute use red
 
 - readme fix
 
