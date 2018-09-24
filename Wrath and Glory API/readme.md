@@ -1,3 +1,4 @@
+
 # WH40k Wrath & Glory (Advanced API) Character Sheet
 
 This is a multi-purpose sheet for both characters (default view) and NPC's based on the quickstart rules (subject to change).  
@@ -73,3 +74,4 @@ Fixes:
 
 ### Known Issues
 1. Inline rolls do not show two successes on a 6 and die modifier is not added; this functionality is not core within the Roll20 capabilities and an expanded formula needs to be created.
+

@@ -271,7 +271,7 @@ var clean = exports.clean = function clean(content) {
 };
 
 var cleanContent = exports.cleanContent = function cleanContent(content) {
-  return clean(content).replace(/.*(\\n)/, '').trim().replace(/.*(\\n)/, '').trim().replace(/\n\s•/g, '\n•').replace(/\*\*\n\t/g, '**').replace(/\*\*\n\n/g, '**').replace(/\*\*\n/g, '**').replace(/\*\*([a-zA-Z0-9()\-–—−\s/\\’]+)[:.]?\s*[:.]?\*\*[:.]?\s*[:.]?([A-Z])/g, '**$1.** $2').replace(/\s\s\n\n/g, '\n\n').trim().trim();
+  return clean(content).replace(/.*(\\n)/, '').trim().replace(/.*(\\n)/, '').trim().replace(/\n\s•/g, '\n•').replace(/\*\*\n\t/g, '**').replace(/\*\*\n\n/g, '**').replace(/\*\*\n/g, '**').replace(/\*\*([a-zA-Z0-9()\-–—−\s/\\’]+)[:.]?\s*[:.]?\*\*[:.]?\s*[:.]?([A-Z])/g, '**$1.** $2').replace(/\s\s\n\n/g, '\n\n').trim();
 };
 
 var capitalize = exports.capitalize = function capitalize(string) {
@@ -910,19 +910,19 @@ exports.setupAbilities = exports.updateAbilitiesWithServer = exports.getFormatte
 
 var _constants = __webpack_require__(2);
 
-var _abilityChecks = __webpack_require__(8);
+var _abilityChecks = __webpack_require__(10);
 
 var _actions = __webpack_require__(4);
 
-var _equipment = __webpack_require__(9);
+var _equipment = __webpack_require__(7);
 
-var _hitDice = __webpack_require__(12);
+var _hitDice = __webpack_require__(15);
 
 var _savingThrows = __webpack_require__(6);
 
 var _server = __webpack_require__(1);
 
-var _skills = __webpack_require__(7);
+var _skills = __webpack_require__(9);
 
 var _spells = __webpack_require__(5);
 
@@ -1028,7 +1028,11 @@ var updateAbilities = function updateAbilities(data) {
   return abilitiesUpdated;
 };
 
-var updateAbilitiesWithServer = exports.updateAbilitiesWithServer = function updateAbilitiesWithServer(callback) {
+var updateAbilitiesWithServer = exports.updateAbilitiesWithServer = function updateAbilitiesWithServer() {
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      callback = _ref.callback,
+      forceUpdate = _ref.forceUpdate;
+
   var abilitiesUpdated = void 0;
   (0, _server.getSetItems)('updateAbilitiesWithServer', {
     collectionArray: [].concat(_toConsumableArray(_constants.FIELDS.abilityScores), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
@@ -1045,16 +1049,16 @@ var updateAbilitiesWithServer = exports.updateAbilitiesWithServer = function upd
       if (callback) {
         callback();
       }
-      if (abilitiesUpdated.length > 0) {
+      if (abilitiesUpdated.length > 0 || forceUpdate) {
         (0, _skills.updateSkill)();
         (0, _abilityChecks.updateAbilityChecks)();
         (0, _actions.updateAllActions)();
         // updateProvidedAttacks();
         (0, _equipment.updateArmor)();
-        if (abilitiesUpdated.includes('strength')) {
+        if (abilitiesUpdated.includes('strength') || forceUpdate) {
           (0, _equipment.updateCarryingCapacity)();
         }
-        if (abilitiesUpdated.includes('constitution')) {
+        if (abilitiesUpdated.includes('constitution') || forceUpdate) {
           (0, _hitDice.updateHitDice)();
         }
         (0, _spells.updateSpells)();
@@ -1090,11 +1094,11 @@ var _constants = __webpack_require__(2);
 
 var _abilities = __webpack_require__(3);
 
-var _actionComponents = __webpack_require__(13);
+var _actionComponents = __webpack_require__(12);
 
-var _attack = __webpack_require__(14);
+var _attack = __webpack_require__(13);
 
-var _equipment = __webpack_require__(9);
+var _equipment = __webpack_require__(7);
 
 var _heal = __webpack_require__(17);
 
@@ -1398,19 +1402,17 @@ var setupActions = exports.setupActions = function setupActions() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setupSpells = exports.parseSpellFromSRDWithServer = exports.parseSpellFromSRD = exports.parseLevel = exports.findSpellcasting = exports.updateHasSpellPoints = exports.updateHasWarlockSlots = exports.updateHasSpellSlots = exports.setSpellSlots = exports.updateSpellSlots = exports.generateHigherLevelQueries = exports.updateWarlockSlotsRemaining = exports.updateWarlockSlots = exports.updateSpellSlotsRemaining = exports.countSpells = exports.updateSpells = exports.updateSpellsChatMacro = exports.updateDCAndAttack = undefined;
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+exports.setupSpells = exports.parseSpellFromSRDWithServer = exports.parseSpellFromSRD = exports.parseLevel = exports.findSpellcasting = exports.parseSpellcastingLevel = exports.updateHasSpellPoints = exports.updateHasWarlockSlots = exports.updateHasSpellSlots = exports.setSpellSlots = exports.updateSpellSlots = exports.generateHigherLevelQueries = exports.updateWarlockSlotsRemaining = exports.updateWarlockSlots = exports.updateSpellSlotsRemaining = exports.countSpells = exports.updateSpells = exports.updateSpellsChatMacro = exports.updateDCAndAttack = undefined;
 
 var _constants = __webpack_require__(2);
 
 var _abilities = __webpack_require__(3);
 
-var _actionComponents = __webpack_require__(13);
+var _actionComponents = __webpack_require__(12);
 
 var _actions = __webpack_require__(4);
 
-var _attack = __webpack_require__(14);
+var _attack = __webpack_require__(13);
 
 var _distance = __webpack_require__(11);
 
@@ -1422,7 +1424,7 @@ var _server = __webpack_require__(1);
 
 var _utilities = __webpack_require__(0);
 
-var _processing = __webpack_require__(10);
+var _processing = __webpack_require__(8);
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global on:false, generateRowID:false, removeRepeatingRow:false, getTranslationByKey:false */
 
@@ -1902,8 +1904,9 @@ var generateHigherLevelQueries = exports.generateHigherLevelQueries = function g
   }
 };
 
-var updateSpellSlots = exports.updateSpellSlots = function updateSpellSlots(_ref3) {
-  var higherLevelQueries = _ref3.higherLevelQueries,
+var updateSpellSlots = exports.updateSpellSlots = function updateSpellSlots() {
+  var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      higherLevelQueries = _ref3.higherLevelQueries,
       _ref3$levelsToUpdate = _ref3.levelsToUpdate,
       levelsToUpdate = _ref3$levelsToUpdate === undefined ? _constants.SPELL_LEVELS : _ref3$levelsToUpdate,
       spellSlots = _ref3.spellSlots,
@@ -1966,6 +1969,7 @@ var setSpellSlots = exports.setSpellSlots = function setSpellSlots() {
   };
 
   (0, _server.getSetItems)('setSpellSlots', {
+    alwaysExecuteCallback: true,
     collectionArray: ['caster_level', 'caster_type', 'show_spells'].concat(_toConsumableArray(_constants.SPELL_LEVELS.map(function (spellLevel) {
       return 'spell_level_' + spellLevel + '_slots';
     })), _toConsumableArray(_constants.SPELL_LEVELS.map(function (spellLevel) {
@@ -1981,9 +1985,8 @@ var setSpellSlots = exports.setSpellSlots = function setSpellSlots() {
     }))),
     process: function process(data) {
       var casterLevel = parseInt(data.caster_level || 0, 10);
-      var casterType = data.caster_type;
 
-      if (casterType === 'full') {
+      if (data.caster_type === 'full') {
         if (casterLevel >= 3) {
           levels[1] = 4;
         } else if (casterLevel === 2) {
@@ -2031,7 +2034,7 @@ var setSpellSlots = exports.setSpellSlots = function setSpellSlots() {
         if (casterLevel >= 17) {
           levels[9] = 1;
         }
-      } else if (casterType === 'half') {
+      } else if (data.caster_type === 'half') {
         if (casterLevel >= 5) {
           levels[1] = 4;
         } else if (casterLevel >= 3) {
@@ -2061,7 +2064,7 @@ var setSpellSlots = exports.setSpellSlots = function setSpellSlots() {
         } else if (casterLevel >= 17) {
           levels[5] = 1;
         }
-      } else if (casterType === 'third') {
+      } else if (data.caster_type === 'third') {
         if (casterLevel >= 7) {
           levels[1] = 4;
         } else if (casterLevel >= 4) {
@@ -2194,62 +2197,62 @@ var parseSpellsPerLevel = function parseSpellsPerLevel(data, repStrings, spellsT
   });
 };
 
+var parseSpellcastingLevel = exports.parseSpellcastingLevel = function parseSpellcastingLevel(data, traitContent) {
+  if (traitContent) {
+    var spellcastingLevelRegex = /(\d+)(?:st|dn|rd|th)-level spellcaster/i;
+    var spellcastingLevelSearch = spellcastingLevelRegex.exec(traitContent);
+    if (spellcastingLevelSearch && spellcastingLevelSearch[1]) {
+      data.caster_level = spellcastingLevelSearch[1];
+      data.spellcaster_level = (0, _utilities.ordinalSpellLevel)(spellcastingLevelSearch[1]);
+    }
+  }
+};
+
+var parseSpellcastingClass = function parseSpellcastingClass(data, traitContent) {
+  if (traitContent) {
+    var spellcastingClassRegex = /(?:following (\w+) spells prepared)|(?:spells prepared from the (\w+) spell list)/i;
+    var spellcastingClassSearch = spellcastingClassRegex.exec(traitContent);
+    if (spellcastingClassSearch) {
+      if (spellcastingClassSearch[1]) {
+        data.spellcasting_class = spellcastingClassSearch[1].toUpperCase();
+      }
+      if (spellcastingClassSearch[2]) {
+        data.spellcasting_class = spellcastingClassSearch[2].toUpperCase();
+      }
+    }
+  }
+};
+
 var parseSpellcastingFromTraits = function parseSpellcastingFromTraits(data, repStrings, traitContent) {
   data.spell_slots_toggle = 1;
   data.spellcasting = 1;
 
   var cantripsRegex = /Cantrips.*:\s(.*)/gi;
   var spellcastingRegex = /(\d+)\w+\slevel\s\((\d+)\s?slot(?:s)?\):?\s?(.*)/gi;
-  var spellcastingLevelRegex = /(\d+)(?:st|dn|rd|th)-level spellcaster/i;
-  var spellcastingClassRegex = /following (\w+) spells prepared/i;
-  var spellcastingClassRegexSecond = /following spells prepared from the (\w+) spell list/i;
 
-  var spellsToParseObj = {};
-  var cantripsSearch = cantripsRegex.exec(traitContent);
-  if (cantripsSearch && cantripsSearch[1]) {
-    spellsToParseObj[0] = {
-      spells: cantripsSearch[1]
-    };
-  }
-  var match = void 0;
-  while ((match = spellcastingRegex.exec(traitContent)) !== null) {
-    if (match && match[1] && match[2] && match[3]) {
-      spellsToParseObj[match[1]] = {
-        slots: match[2],
-        spells: match[3]
+  if (traitContent) {
+    var spellsToParseObj = {};
+    var cantripsSearch = cantripsRegex.exec(traitContent);
+    if (cantripsSearch && cantripsSearch[1]) {
+      spellsToParseObj[0] = {
+        spells: cantripsSearch[1]
       };
     }
-  }
-  if ((0, _utilities.objIsNotEmpty)(spellsToParseObj)) {
-    parseSpellsPerLevel(data, repStrings, spellsToParseObj);
-  }
-
-  var _spellcastingLevelReg = spellcastingLevelRegex.exec(traitContent),
-      _spellcastingLevelReg2 = _slicedToArray(_spellcastingLevelReg, 2),
-      spellcastingLevelSearch = _spellcastingLevelReg2[0],
-      casterLevel = _spellcastingLevelReg2[1];
-
-  if (spellcastingLevelSearch && casterLevel) {
-    data.caster_level = casterLevel;
-    data.spellcaster_level = (0, _utilities.ordinalSpellLevel)(casterLevel);
-  }
-
-  var _spellcastingClassReg = spellcastingClassRegex.exec(traitContent),
-      _spellcastingClassReg2 = _slicedToArray(_spellcastingClassReg, 2),
-      spellcastingClassSearch = _spellcastingClassReg2[0],
-      spellcastingClass = _spellcastingClassReg2[1];
-
-  if (spellcastingClassSearch && spellcastingClass) {
-    data.spellcasting_class = spellcastingClass.toUpperCase();
-  } else {
-    var _spellcastingClassReg3 = spellcastingClassRegexSecond.exec(traitContent),
-        _spellcastingClassReg4 = _slicedToArray(_spellcastingClassReg3, 2),
-        spellcastingClassSearchSecond = _spellcastingClassReg4[0],
-        spellcastingClassSecond = _spellcastingClassReg4[1];
-
-    if (spellcastingClassSearchSecond && spellcastingClassSecond) {
-      data.spellcasting_class = spellcastingClassSecond.toUpperCase();
+    var match = void 0;
+    while ((match = spellcastingRegex.exec(traitContent)) !== null) {
+      if (match && match[1] && match[2] && match[3]) {
+        spellsToParseObj[match[1]] = {
+          slots: match[2],
+          spells: match[3]
+        };
+      }
     }
+    if ((0, _utilities.objIsNotEmpty)(spellsToParseObj)) {
+      parseSpellsPerLevel(data, repStrings, spellsToParseObj);
+    }
+
+    parseSpellcastingLevel(data, traitContent);
+    parseSpellcastingClass(data, traitContent);
   }
 };
 
@@ -2370,7 +2373,7 @@ var findSpellcasting = exports.findSpellcasting = function findSpellcasting(repe
           if ((0, _utilities.isUndefinedOrEmpty)(data[repString + '_name'])) {
             deleteItem = true;
             removeRepeatingRow(repString);
-          } else if (data[repString + '_name'] && data[repString + '_name'].includes('Spellcasting')) {
+          } else if (data[repString + '_name'] && data[repString + '_name'].includes('Spellcasting') && data[repString + '_content']) {
             data.show_spells = 1;
             parseSpellcastingAbilityFromTraits(data, repString);
 
@@ -2633,7 +2636,7 @@ var setupSpells = exports.setupSpells = function setupSpells() {
     });
     on('change:spell_level_' + spellLevel + '_slots change:spell_level_' + spellLevel + '_slots_expended', function () {
       updateSpellSlots({
-        levelsToUpdate: [spellLevel],
+        higherLevelQueries: true,
         spellSlots: true
       });
     });
@@ -2921,415 +2924,6 @@ var setupSavingThrows = exports.setupSavingThrows = function setupSavingThrows()
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setupSkills = exports.generateSkills = exports.updateSkillToggle = exports.updateSkill = undefined;
-
-var _constants = __webpack_require__(2);
-
-var _abilities = __webpack_require__(3);
-
-var _abilityChecks = __webpack_require__(8);
-
-var _server = __webpack_require__(1);
-
-var _utilities = __webpack_require__(0);
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global on:false, generateRowID:false, getTranslationByKey:false, removeRepeatingRow:false */
-
-var updateSkill = exports.updateSkill = function updateSkill() {
-  var collectionArray = [].concat(_toConsumableArray(_constants.FIELDS.pb), _toConsumableArray(_constants.FIELDS.abilityScores), _toConsumableArray(_constants.FIELDS.d20), _toConsumableArray(_constants.FIELDS.abilityCheckModifier), ['class_feature_bard_jack_of_all_trades_toggle', 'class_feature_fighter_champion_remarkable_athlete_toggle', 'class_feature_rogue_reliable_talent_toggle', 'show_passive_skills'], _toConsumableArray(_constants.ABILITIES.map(function (ability) {
-    return ability + '_check_modifier';
-  })), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
-    return ability + '_check_modifier_dice';
-  })));
-  for (var i = 0; i <= 23; i += 1) {
-    collectionArray.push('skill_' + i + '_modifier');
-    collectionArray.push('skill_' + i + '_modifier_dice');
-    collectionArray.push('skill_' + i + '_passive_modifier');
-  }
-  (0, _server.getSetItems)('abilityChecks.updateSkill', {
-    collectionArray: collectionArray,
-    collectionArrayRepeatingSections: [{
-      collectionArrayAddItems: ['ability', 'formula', 'name', 'passive_total', 'proficiency', 'skill_d20', 'skill_d20_wrap', 'show', 'storage_name', 'total', 'total_with_sign'],
-      name: 'repeating_skill'
-    }],
-    process: function process(data, repStrings) {
-      var i = 0;
-      data.show_skills = false;
-      repStrings.forEach(function (repString) {
-        if (data[repString + '_name'] === '') {
-          removeRepeatingRow(repString);
-        } else {
-          data[repString + '_ability'] = (0, _abilities.getFormattedAbility)(data[repString + '_ability']);
-
-          var obj = {
-            skill: 0,
-            skillFormula: ''
-          };
-          var proficiency = data[repString + '_proficiency'];
-          if (!proficiency || proficiency === 'unproficient') {
-            if ((data[repString + '_ability'] === 'STR' || data[repString + '_ability'] === 'DEX' || data[repString + '_ability'] === 'CON') && (0, _utilities.exists)(data.class_feature_fighter_champion_remarkable_athlete_toggle)) {
-              var remarkableAthlete = (0, _utilities.getHalfPB)(data, 'roundUp');
-              if ((0, _utilities.exists)(remarkableAthlete) && !isNaN(remarkableAthlete)) {
-                obj.skill += remarkableAthlete;
-              }
-              obj.skillFormula = (0, _utilities.addTo)(obj.skillFormula, remarkableAthlete + '[' + getTranslationByKey('CLASS_FEATURE_FIGHTER_CHAMPION_REMARKABLE_ATHLETE').toLowerCase() + ']');
-            } else if ((0, _utilities.exists)(data.class_feature_bard_jack_of_all_trades_toggle)) {
-              var jackOfAllTrades = (0, _utilities.getHalfPB)(data);
-              if ((0, _utilities.exists)(jackOfAllTrades) && !isNaN(jackOfAllTrades)) {
-                obj.skill += jackOfAllTrades;
-              }
-              obj.skillFormula = (0, _utilities.addTo)(obj.skillFormula, jackOfAllTrades + '[' + getTranslationByKey('CLASS_FEATURE_BARD_JACK_OF_ALL_TRADES').toLowerCase() + ']');
-            }
-            if ((0, _utilities.exists)(data[repString + '_skill_d20_wrap'])) {
-              data[repString + '_skill_d20_wrap'] = '@{skill_d20}@{d20_mod}';
-            }
-          } else if (proficiency === 'proficient' || proficiency === 'expertise') {
-            if ((0, _utilities.exists)(data.class_feature_rogue_reliable_talent_toggle)) {
-              data[repString + '_skill_d20_wrap'] = '{@{skill_d20}@{d20_mod}, 0d0+10}kh1[' + getTranslationByKey('CLASS_FEATURE_ROGUE_RELIABLE_TALENT').toLowerCase() + ']';
-            } else if ((0, _utilities.exists)(data[repString + '_skill_d20_wrap'])) {
-              data[repString + '_skill_d20_wrap'] = '@{skill_d20}@{d20_mod}';
-            }
-            if (proficiency === 'proficient') {
-              var pb = (0, _utilities.getPB)(data);
-              if ((0, _utilities.exists)(pb) && !isNaN(pb)) {
-                obj.skill += pb;
-              }
-              obj.skillFormula = (0, _utilities.addTo)(obj.skillFormula, pb + '[' + getTranslationByKey('PROFICIENT').toLowerCase() + ']');
-            } else if (proficiency === 'expertise') {
-              var expertise = (0, _utilities.getExpertise)(data);
-              if ((0, _utilities.exists)(expertise) && !isNaN(expertise)) {
-                obj.skill += expertise;
-              }
-              obj.skillFormula = (0, _utilities.addTo)(obj.skillFormula, expertise + '[' + getTranslationByKey('EXPERTISE').toLowerCase() + ']');
-            }
-          }
-
-          if ((0, _utilities.exists)(data[repString + '_ability'])) {
-            var abilityValue = (0, _abilities.getAbilityMod)(data, data[repString + '_ability']);
-            if ((0, _utilities.exists)(abilityValue)) {
-              obj.skill += abilityValue;
-            }
-            obj.skillFormula = (0, _utilities.addTo)(obj.skillFormula, abilityValue + '[' + getTranslationByKey(data[repString + '_ability']).toLowerCase() + ']');
-
-            (0, _utilities.addModifier)(data, obj, (0, _abilities.getAbilityNameFromShortName)(data[repString + '_ability']), 'skill', 'skillFormula', getTranslationByKey(data[repString + '_ability']).toLowerCase() + ' ' + getTranslationByKey('CHECK_MODIFIER').toLowerCase());
-          }
-
-          (0, _utilities.addModifier)(data, obj, 'skill_' + i, 'skill', 'skillFormula', '' + getTranslationByKey('MODIFIER').toLowerCase());
-          (0, _utilities.addModifier)(data, obj, 'ability_check', 'skill', 'skillFormula', '' + getTranslationByKey('ABILITY_CHECK_MODIFIER').toLowerCase());
-
-          data[repString + '_show'] = proficiency === 'proficient' || proficiency === 'expertise' || (0, _utilities.exists)(data['skill_' + i + '_modifier']) || (0, _utilities.exists)(data['skill_' + i + '_modifier_dice']) || (0, _utilities.exists)(data['skill_' + i + '_passive_modifier']);
-          if (data[repString + '_show']) {
-            data.show_skills = true;
-          }
-
-          var advantageOrDisadvantage = 0;
-
-          if (data[repString + '_skill_d20'] && data[repString + '_skill_d20'].includes('kh1')) {
-            advantageOrDisadvantage = 5;
-          } else if (data[repString + '_skill_d20'] && data[repString + '_skill_d20'].includes('kl1')) {
-            advantageOrDisadvantage = -5;
-          }
-          data[repString + '_total'] = obj.skill;
-          var storageNameOrName = data[repString + '_storage_name'] || data[repString + '_name'];
-          data[storageNameOrName.toLowerCase()] = obj.skill;
-
-          if ((0, _utilities.exists)(data.show_passive_skills)) {
-            data[repString + '_passive'] = 10 + obj.skill + advantageOrDisadvantage;
-            if ((0, _utilities.exists)(data['skill_' + i + '_passive_modifier']) && !isNaN(data['skill_' + i + '_passive_modifier'])) {
-              data[repString + '_passive'] += parseFloat(data['skill_' + i + '_passive_modifier']);
-            }
-            if (storageNameOrName) {
-              data['passive_' + storageNameOrName.toLowerCase()] = data[repString + '_passive'];
-            }
-          }
-          data[repString + '_total_with_sign'] = (0, _utilities.showSign)(obj.skill);
-          data[repString + '_formula'] = '{{@{' + repString + '_skill_d20}=1}} {{roll1=[[@{' + repString + '_skill_d20_wrap} + ' + obj.skillFormula + ']]}}';
-          if (data.shaped_d20 === '1d20') {
-            data[repString + '_formula'] += ' {{roll2=[[@{' + repString + '_skill_d20_wrap} + ' + obj.skillFormula + ']]}}';
-          }
-        }
-        i += 1;
-      });
-    },
-    processCallback: function processCallback() {
-      (0, _abilityChecks.updateAbilityChecksMacro)();
-    }
-  });
-};
-
-var updateSkillToggle = exports.updateSkillToggle = function updateSkillToggle(repeatingInfo) {
-  (0, _server.getSetItems)('abilityChecks.updateSkillToggle', {
-    collectionArrayRepeatingSections: [{
-      collectionArrayAddItems: ['proficiency'],
-      name: 'repeating_skill',
-      repeatingInfo: repeatingInfo
-    }],
-    process: function process(data, repStrings) {
-      repStrings.forEach(function (repString) {
-        if (data[repString + '_proficiency'] === '' || data[repString + '_proficiency'] === 'unproficient') {
-          data[repString + '_proficiency'] = 'proficient';
-        } else if (data[repString + '_proficiency'] === 'proficient') {
-          data[repString + '_proficiency'] = 'expertise';
-        } else if (data[repString + '_proficiency'] === 'expertise') {
-          data[repString + '_proficiency'] = 'unproficient';
-        }
-      });
-    },
-    processCallback: function processCallback() {
-      updateSkill();
-    }
-  });
-};
-
-var generateSkills = exports.generateSkills = function generateSkills(replace) {
-  (0, _server.getSetItems)('initialize.generateSkills', {
-    collectionArrayRepeatingSections: [{
-      collectionArrayAddItems: ['storage_name', 'name', 'ability', 'proficiency', 'skill_d20'],
-      name: 'repeating_skill'
-    }],
-    process: function process(data, repStrings) {
-      var sortedSkills = [];
-      Object.keys(_constants.SKILLS).forEach(function (skill) {
-        sortedSkills.push({
-          ability: _constants.SKILLS[skill],
-          name: skill,
-          translation: getTranslationByKey(skill)
-        });
-      });
-      sortedSkills.sort(function (a, b) {
-        if (a.translation.toLowerCase() < b.translation.toLowerCase()) {
-          return -1;
-        }
-        if (a.translation.toLowerCase() > b.translation.toLowerCase()) {
-          return 1;
-        }
-        return 0;
-      });
-      if (replace) {
-        repStrings.forEach(function (repString) {
-          var skillFound = sortedSkills.find(function (skill) {
-            return skill.name === data[repString + '_storage_name'];
-          });
-
-          if (skillFound) {
-            if (data[repString + '_proficiency']) {
-              skillFound.proficiency = data[repString + '_proficiency'];
-            }
-            if (data[repString + '_skill_d20']) {
-              skillFound.skillD20 = data[repString + '_skill_d20'];
-            }
-          }
-          removeRepeatingRow(repString);
-        });
-      }
-      sortedSkills.forEach(function (skill) {
-        var skillId = void 0;
-
-        if (replace) {
-          skillId = generateRowID();
-        } else {
-          skillId = (0, _utilities.getSkillIdByStorageName)(data, repStrings, skill.name);
-          if (!skillId) {
-            skillId = generateRowID();
-          }
-        }
-        var repString = 'repeating_skill_' + skillId;
-        data[repString + '_storage_name'] = skill.name;
-        data[repString + '_name'] = getTranslationByKey(skill.name);
-        data[repString + '_ability'] = (0, _abilities.getFormattedAbility)(_constants.SKILLS[skill.name]);
-        if (replace) {
-          if (skill.proficiency) {
-            data[repString + '_proficiency'] = skill.proficiency;
-          }
-          if (skill.skillD20) {
-            data[repString + '_skill_d20'] = skill.skillD20;
-          }
-        }
-      });
-    },
-    processCallback: function processCallback() {
-      updateSkill();
-    }
-  });
-};
-
-var setupSkills = exports.setupSkills = function setupSkills() {
-  on('change:generate_skills', function () {
-    generateSkills();
-  });
-  on('change:regenerate_skills', function () {
-    generateSkills('replace');
-  });
-  on('change:show_passive_skills', function () {
-    updateSkill();
-  });
-  on('change:repeating_skill', function (eventInfo) {
-    var repeatingInfo = (0, _utilities.getRepeatingInfo)('repeating_skill', eventInfo);
-    if (repeatingInfo && repeatingInfo.field === 'prof_toggle') {
-      updateSkillToggle(repeatingInfo);
-    }
-    if (repeatingInfo && repeatingInfo.field !== 'prof_toggle' && repeatingInfo.field !== 'total' && repeatingInfo.field !== 'total_with_sign' && repeatingInfo.field !== 'passive_total' && repeatingInfo.field !== 'passive_total_with_sign' && repeatingInfo.field !== 'formula') {
-      updateSkill();
-    }
-  });
-  var updateSkillWatch = [].concat(_toConsumableArray(_constants.FIELDS.pb), _toConsumableArray(_constants.ABILITIES), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
-    return ability + '_check_formula';
-  })), ['class_feature_bard_jack_of_all_trades_toggle', 'class_feature_fighter_champion_remarkable_athlete_toggle', 'class_feature_rogue_reliable_talent_toggle']).map(function (ability) {
-    return 'change:' + ability;
-  }).join(' ');
-  on(updateSkillWatch, function () {
-    updateSkill();
-  });
-};
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.setupAbilityChecks = exports.updateAbilityChecks = exports.updateAbilityChecksMacro = undefined;
-
-var _constants = __webpack_require__(2);
-
-var _abilities = __webpack_require__(3);
-
-var _initiative = __webpack_require__(31);
-
-var _server = __webpack_require__(1);
-
-var _utilities = __webpack_require__(0);
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global on:false, getTranslationByKey:false */
-
-var updateAbilityChecksMacro = exports.updateAbilityChecksMacro = function updateAbilityChecksMacro() {
-  (0, _server.getSetItems)('abilityChecks.updateMacro', {
-    collectionArray: [].concat(_toConsumableArray(_constants.FIELDS.d20), ['ability_checks_query_var', 'ability_checks_macro_var', 'honor_toggle', 'is_npc', 'sanity_toggle', 'skills_macro_var'], _toConsumableArray(_constants.ABILITIES.map(function (ability) {
-      return ability + '_check_formula';
-    })), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
-      return ability + '_check_mod_with_sign';
-    }))),
-    collectionArrayRepeatingSections: [{
-      collectionArrayAddItems: ['ability', 'formula', 'name', 'show', 'total_with_sign'],
-      name: 'repeating_skill'
-    }],
-    process: function process(data, repStrings) {
-      var macroArray = [];
-      var skillsMacroArray = [];
-      var queryArray = [];
-      data.skills_macro_var = '';
-
-      _constants.ABILITIES.forEach(function (ability) {
-        if ((ability !== 'honor' || ability === 'honor' && (0, _utilities.exists)(data.honor_toggle)) && (ability !== 'sanity' || ability === 'sanity' && (0, _utilities.exists)(data.sanity_toggle))) {
-          var total = data[ability + '_check_mod_with_sign'] || '+0';
-          var abilityCheckFormula = data[ability + '_check_formula'] ? data[ability + '_check_formula'].replace(/}}/g, '&#125;&#125;') : '';
-          macroArray.push('[' + getTranslationByKey(ability.toUpperCase()) + ' ' + total + '](~shaped_' + ability + '_check)');
-          var abilityCheckQuery = getTranslationByKey(ability.toUpperCase()) + ' ' + total + ',{{title=' + getTranslationByKey(ability.toUpperCase()) + ' ' + getTranslationByKey('CHECK') + '&#125;&#125; ' + abilityCheckFormula;
-          queryArray.push(abilityCheckQuery);
-        }
-      });
-      repStrings.forEach(function (repString) {
-        if (!(0, _utilities.exists)(data.is_npc) || data[repString + '_show']) {
-          var total = data[repString + '_total_with_sign'] || '+0';
-          var skillButton = '[' + data[repString + '_name'] + ' ' + total + '](~' + repString + '_skill)';
-          var skillFormula = data[repString + '_formula'] ? data[repString + '_formula'].replace(/}}/g, '&#125;&#125;') : '';
-          macroArray.push(skillButton);
-          skillsMacroArray.push(skillButton);
-          var abilityCheckQuery = data[repString + '_name'] + ' (' + getTranslationByKey((0, _abilities.getAbilityShortName)(data[repString + '_ability']).toUpperCase()) + ') ' + total + ', {{title=' + data[repString + '_name'] + ' (' + getTranslationByKey((0, _abilities.getAbilityShortName)(data[repString + '_ability']).toUpperCase()) + ')&#125;&#125; ' + skillFormula;
-          queryArray.push(abilityCheckQuery);
-        }
-      });
-      data.ability_checks_macro_var = macroArray.join(', ');
-      data.skills_macro_var = skillsMacroArray.join(', ');
-      data.ability_checks_query_var = '?{Ability Check|' + queryArray.join('|') + '}';
-    }
-  });
-};
-
-var updateAbilityChecksInner = function updateAbilityChecksInner(data) {
-  _constants.ABILITIES.forEach(function (ability) {
-    var obj = {
-      abilityCheck: data[ability + '_mod'],
-      abilityCheckFormula: ''
-    };
-
-    obj.abilityCheckFormula = (0, _utilities.addTo)(obj.abilityCheckFormula, (0, _abilities.getAbilityMod)(data, ability) + '[' + getTranslationByKey((0, _abilities.getAbilityShortName)(ability).toUpperCase()).toLowerCase() + ']');
-
-    if ((ability === 'strength' || ability === 'dexterity' || ability === 'constitution') && (0, _utilities.exists)(data.class_feature_fighter_champion_remarkable_athlete_toggle)) {
-      var remarkableAthlete = (0, _utilities.getHalfPB)(data, 'roundUp');
-      if ((0, _utilities.exists)(remarkableAthlete) && !isNaN(remarkableAthlete)) {
-        obj.abilityCheck += remarkableAthlete;
-      }
-      obj.abilityCheckFormula = (0, _utilities.addTo)(obj.abilityCheckFormula, remarkableAthlete + '[' + getTranslationByKey('CLASS_FEATURE_FIGHTER_CHAMPION_REMARKABLE_ATHLETE').toLowerCase() + ']');
-    } else if ((0, _utilities.exists)(data.class_feature_bard_jack_of_all_trades_toggle)) {
-      var jackOfAllTrades = (0, _utilities.getHalfPB)(data);
-      if ((0, _utilities.exists)(jackOfAllTrades) && !isNaN(jackOfAllTrades)) {
-        obj.abilityCheck += jackOfAllTrades;
-      }
-      obj.abilityCheckFormula = (0, _utilities.addTo)(obj.abilityCheckFormula, jackOfAllTrades + '[' + getTranslationByKey('CLASS_FEATURE_BARD_JACK_OF_ALL_TRADES').toLowerCase() + ']');
-    }
-
-    (0, _utilities.addModifier)(data, obj, 'ability_check', 'abilityCheck', 'abilityCheckFormula', '' + getTranslationByKey('ABILITY_CHECK_MODIFIER').toLowerCase());
-    (0, _utilities.addModifier)(data, obj, ability + '_check', 'abilityCheck', 'abilityCheckFormula', getTranslationByKey(ability.toUpperCase()).toLowerCase() + ' ' + getTranslationByKey('CHECK_MODIFIER').toLowerCase());
-
-    data[ability + '_check_formula'] = '{{roll1=[[@{shaped_d20}@{d20_mod} + ' + obj.abilityCheckFormula + ']]}}';
-    if (data.shaped_d20 === '1d20') {
-      data[ability + '_check_formula'] += ' {{roll2=[[@{shaped_d20}@{d20_mod} + ' + obj.abilityCheckFormula + ']]}}';
-    }
-    data[ability + '_check_mod_with_sign'] = (0, _utilities.showSign)(obj.abilityCheck);
-  });
-};
-
-var updateAbilityChecks = exports.updateAbilityChecks = function updateAbilityChecks() {
-  (0, _server.getSetItems)('abilityChecks.update', {
-    collectionArray: [].concat(_toConsumableArray(_constants.FIELDS.pb), _toConsumableArray(_constants.FIELDS.abilityScores), _toConsumableArray(_constants.FIELDS.d20), _toConsumableArray(_constants.FIELDS.abilityCheckModifier), ['initiative', 'initiative_ability', 'initiative_formula', 'initiative_modifier', 'initiative_modifier_dice', 'initiative_to_tracker', 'initiative_tie_breaker', 'class_feature_bard_jack_of_all_trades_toggle', 'class_feature_fighter_champion_remarkable_athlete_toggle'], _toConsumableArray(_constants.ABILITIES.map(function (ability) {
-      return ability + '_mod';
-    })), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
-      return ability + '_check_modifier';
-    })), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
-      return ability + '_check_modifier_dice';
-    })), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
-      return ability + '_check_mod_with_sign';
-    })), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
-      return ability + '_check_formula';
-    }))),
-    process: function process(data) {
-      updateAbilityChecksInner(data);
-      (0, _initiative.updateInitiative)(data);
-    },
-    processCallback: function processCallback() {
-      updateAbilityChecksMacro();
-    }
-  });
-};
-
-var setupAbilityChecks = exports.setupAbilityChecks = function setupAbilityChecks() {
-  var abilityCheckWatch = [].concat(_toConsumableArray(_constants.FIELDS.pb), _toConsumableArray(_constants.ABILITIES), ['initiative_ability', 'initiative_to_tracker', 'initiative_tie_breaker', 'class_feature_bard_jack_of_all_trades_toggle', 'class_feature_fighter_champion_remarkable_athlete_toggle']);
-
-  on(abilityCheckWatch.map(function (field) {
-    return 'change:' + field;
-  }).join(' '), function () {
-    updateAbilityChecks();
-  });
-  on('change:_reporder_repeating_skill remove:repeating_skill change:honor_toggle change:sanity_toggle', function () {
-    updateAbilityChecksMacro();
-  });
-};
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.setupEquipment = exports.updateCarryingCapacity = exports.parseItemFromSRDWithServer = exports.updateEquipment = exports.updateArmor = exports.updateWeight = exports.parseItemFromSRD = undefined;
 
 var _constants = __webpack_require__(2);
@@ -3338,19 +2932,19 @@ var _utilities = __webpack_require__(0);
 
 var _abilities = __webpack_require__(3);
 
-var _actionComponents = __webpack_require__(13);
+var _actionComponents = __webpack_require__(12);
 
 var _actions = __webpack_require__(4);
 
 var _armorClass = __webpack_require__(19);
 
-var _attack = __webpack_require__(14);
+var _attack = __webpack_require__(13);
 
-var _damage = __webpack_require__(15);
+var _damage = __webpack_require__(14);
 
 var _server = __webpack_require__(1);
 
-var _processing = __webpack_require__(10);
+var _processing = __webpack_require__(8);
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global on:false, generateRowID:false, getTranslationByKey:false */
 
@@ -3994,7 +3588,7 @@ var setupEquipment = exports.setupEquipment = function setupEquipment() {
 };
 
 /***/ }),
-/* 10 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4073,6 +3667,415 @@ var setupProcessing = exports.setupProcessing = function setupProcessing() {
 };
 
 /***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setupSkills = exports.generateSkills = exports.updateSkillToggle = exports.updateSkill = undefined;
+
+var _constants = __webpack_require__(2);
+
+var _abilities = __webpack_require__(3);
+
+var _abilityChecks = __webpack_require__(10);
+
+var _server = __webpack_require__(1);
+
+var _utilities = __webpack_require__(0);
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global on:false, generateRowID:false, getTranslationByKey:false, removeRepeatingRow:false */
+
+var updateSkill = exports.updateSkill = function updateSkill() {
+  var collectionArray = [].concat(_toConsumableArray(_constants.FIELDS.pb), _toConsumableArray(_constants.FIELDS.abilityScores), _toConsumableArray(_constants.FIELDS.d20), _toConsumableArray(_constants.FIELDS.abilityCheckModifier), ['class_feature_bard_jack_of_all_trades_toggle', 'class_feature_fighter_champion_remarkable_athlete_toggle', 'class_feature_rogue_reliable_talent_toggle', 'show_passive_skills'], _toConsumableArray(_constants.ABILITIES.map(function (ability) {
+    return ability + '_check_modifier';
+  })), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
+    return ability + '_check_modifier_dice';
+  })));
+  for (var i = 0; i <= 23; i += 1) {
+    collectionArray.push('skill_' + i + '_modifier');
+    collectionArray.push('skill_' + i + '_modifier_dice');
+    collectionArray.push('skill_' + i + '_passive_modifier');
+  }
+  (0, _server.getSetItems)('abilityChecks.updateSkill', {
+    collectionArray: collectionArray,
+    collectionArrayRepeatingSections: [{
+      collectionArrayAddItems: ['ability', 'formula', 'name', 'passive_total', 'proficiency', 'skill_d20', 'skill_d20_wrap', 'show', 'storage_name', 'total', 'total_with_sign'],
+      name: 'repeating_skill'
+    }],
+    process: function process(data, repStrings) {
+      var i = 0;
+      data.show_skills = false;
+      repStrings.forEach(function (repString) {
+        if (data[repString + '_name'] === '') {
+          removeRepeatingRow(repString);
+        } else {
+          data[repString + '_ability'] = (0, _abilities.getFormattedAbility)(data[repString + '_ability']);
+
+          var obj = {
+            skill: 0,
+            skillFormula: ''
+          };
+          var proficiency = data[repString + '_proficiency'];
+          if (!proficiency || proficiency === 'unproficient') {
+            if ((data[repString + '_ability'] === 'STR' || data[repString + '_ability'] === 'DEX' || data[repString + '_ability'] === 'CON') && (0, _utilities.exists)(data.class_feature_fighter_champion_remarkable_athlete_toggle)) {
+              var remarkableAthlete = (0, _utilities.getHalfPB)(data, 'roundUp');
+              if ((0, _utilities.exists)(remarkableAthlete) && !isNaN(remarkableAthlete)) {
+                obj.skill += remarkableAthlete;
+              }
+              obj.skillFormula = (0, _utilities.addTo)(obj.skillFormula, remarkableAthlete + '[' + getTranslationByKey('CLASS_FEATURE_FIGHTER_CHAMPION_REMARKABLE_ATHLETE').toLowerCase() + ']');
+            } else if ((0, _utilities.exists)(data.class_feature_bard_jack_of_all_trades_toggle)) {
+              var jackOfAllTrades = (0, _utilities.getHalfPB)(data);
+              if ((0, _utilities.exists)(jackOfAllTrades) && !isNaN(jackOfAllTrades)) {
+                obj.skill += jackOfAllTrades;
+              }
+              obj.skillFormula = (0, _utilities.addTo)(obj.skillFormula, jackOfAllTrades + '[' + getTranslationByKey('CLASS_FEATURE_BARD_JACK_OF_ALL_TRADES').toLowerCase() + ']');
+            }
+            if ((0, _utilities.exists)(data[repString + '_skill_d20_wrap'])) {
+              data[repString + '_skill_d20_wrap'] = '@{skill_d20}@{d20_mod}';
+            }
+          } else if (proficiency === 'proficient' || proficiency === 'expertise') {
+            if ((0, _utilities.exists)(data.class_feature_rogue_reliable_talent_toggle)) {
+              data[repString + '_skill_d20_wrap'] = '{@{skill_d20}@{d20_mod}, 0d0+10}kh1[' + getTranslationByKey('CLASS_FEATURE_ROGUE_RELIABLE_TALENT').toLowerCase() + ']';
+            } else if ((0, _utilities.exists)(data[repString + '_skill_d20_wrap'])) {
+              data[repString + '_skill_d20_wrap'] = '@{skill_d20}@{d20_mod}';
+            }
+            if (proficiency === 'proficient') {
+              var pb = (0, _utilities.getPB)(data);
+              if ((0, _utilities.exists)(pb) && !isNaN(pb)) {
+                obj.skill += pb;
+              }
+              obj.skillFormula = (0, _utilities.addTo)(obj.skillFormula, pb + '[' + getTranslationByKey('PROFICIENT').toLowerCase() + ']');
+            } else if (proficiency === 'expertise') {
+              var expertise = (0, _utilities.getExpertise)(data);
+              if ((0, _utilities.exists)(expertise) && !isNaN(expertise)) {
+                obj.skill += expertise;
+              }
+              obj.skillFormula = (0, _utilities.addTo)(obj.skillFormula, expertise + '[' + getTranslationByKey('EXPERTISE').toLowerCase() + ']');
+            }
+          }
+
+          if ((0, _utilities.exists)(data[repString + '_ability'])) {
+            var abilityValue = (0, _abilities.getAbilityMod)(data, data[repString + '_ability']);
+            if ((0, _utilities.exists)(abilityValue)) {
+              obj.skill += abilityValue;
+            }
+            obj.skillFormula = (0, _utilities.addTo)(obj.skillFormula, abilityValue + '[' + getTranslationByKey(data[repString + '_ability']).toLowerCase() + ']');
+
+            (0, _utilities.addModifier)(data, obj, (0, _abilities.getAbilityNameFromShortName)(data[repString + '_ability']), 'skill', 'skillFormula', getTranslationByKey(data[repString + '_ability']).toLowerCase() + ' ' + getTranslationByKey('CHECK_MODIFIER').toLowerCase());
+          }
+
+          (0, _utilities.addModifier)(data, obj, 'skill_' + i, 'skill', 'skillFormula', '' + getTranslationByKey('MODIFIER').toLowerCase());
+          (0, _utilities.addModifier)(data, obj, 'ability_check', 'skill', 'skillFormula', '' + getTranslationByKey('ABILITY_CHECK_MODIFIER').toLowerCase());
+
+          data[repString + '_show'] = proficiency === 'proficient' || proficiency === 'expertise' || (0, _utilities.exists)(data['skill_' + i + '_modifier']) || (0, _utilities.exists)(data['skill_' + i + '_modifier_dice']) || (0, _utilities.exists)(data['skill_' + i + '_passive_modifier']);
+          if (data[repString + '_show']) {
+            data.show_skills = true;
+          }
+
+          var advantageOrDisadvantage = 0;
+
+          if (data[repString + '_skill_d20'] && data[repString + '_skill_d20'].includes('kh1')) {
+            advantageOrDisadvantage = 5;
+          } else if (data[repString + '_skill_d20'] && data[repString + '_skill_d20'].includes('kl1')) {
+            advantageOrDisadvantage = -5;
+          }
+          data[repString + '_total'] = obj.skill;
+          var storageNameOrName = data[repString + '_storage_name'] || data[repString + '_name'];
+          data[storageNameOrName.toLowerCase()] = obj.skill;
+
+          if ((0, _utilities.exists)(data.show_passive_skills)) {
+            data[repString + '_passive'] = 10 + obj.skill + advantageOrDisadvantage;
+            if ((0, _utilities.exists)(data['skill_' + i + '_passive_modifier']) && !isNaN(data['skill_' + i + '_passive_modifier'])) {
+              data[repString + '_passive'] += parseFloat(data['skill_' + i + '_passive_modifier']);
+            }
+            if (storageNameOrName) {
+              data['passive_' + storageNameOrName.toLowerCase()] = data[repString + '_passive'];
+            }
+          }
+          data[repString + '_total_with_sign'] = (0, _utilities.showSign)(obj.skill);
+          data[repString + '_formula'] = '{{@{' + repString + '_skill_d20}=1}} {{roll1=[[@{' + repString + '_skill_d20_wrap} + ' + obj.skillFormula + ']]}}';
+          if (data.shaped_d20 === '1d20') {
+            data[repString + '_formula'] += ' {{roll2=[[@{' + repString + '_skill_d20_wrap} + ' + obj.skillFormula + ']]}}';
+          }
+        }
+        i += 1;
+      });
+    },
+    processCallback: function processCallback() {
+      (0, _abilityChecks.updateAbilityChecksMacro)();
+    }
+  });
+};
+
+var updateSkillToggle = exports.updateSkillToggle = function updateSkillToggle(repeatingInfo) {
+  (0, _server.getSetItems)('abilityChecks.updateSkillToggle', {
+    collectionArrayRepeatingSections: [{
+      collectionArrayAddItems: ['proficiency'],
+      name: 'repeating_skill',
+      repeatingInfo: repeatingInfo
+    }],
+    process: function process(data, repStrings) {
+      repStrings.forEach(function (repString) {
+        if (data[repString + '_proficiency'] === '' || data[repString + '_proficiency'] === 'unproficient') {
+          data[repString + '_proficiency'] = 'proficient';
+        } else if (data[repString + '_proficiency'] === 'proficient') {
+          data[repString + '_proficiency'] = 'expertise';
+        } else if (data[repString + '_proficiency'] === 'expertise') {
+          data[repString + '_proficiency'] = 'unproficient';
+        }
+      });
+    },
+    processCallback: function processCallback() {
+      updateSkill();
+    }
+  });
+};
+
+var generateSkills = exports.generateSkills = function generateSkills(replace) {
+  (0, _server.getSetItems)('initialize.generateSkills', {
+    collectionArrayRepeatingSections: [{
+      collectionArrayAddItems: ['storage_name', 'name', 'ability', 'proficiency', 'skill_d20'],
+      name: 'repeating_skill'
+    }],
+    process: function process(data, repStrings) {
+      var sortedSkills = [];
+      Object.keys(_constants.SKILLS).forEach(function (skill) {
+        sortedSkills.push({
+          ability: _constants.SKILLS[skill],
+          name: skill,
+          translation: getTranslationByKey(skill)
+        });
+      });
+      sortedSkills.sort(function (a, b) {
+        if (a.translation.toLowerCase() < b.translation.toLowerCase()) {
+          return -1;
+        }
+        if (a.translation.toLowerCase() > b.translation.toLowerCase()) {
+          return 1;
+        }
+        return 0;
+      });
+      if (replace) {
+        repStrings.forEach(function (repString) {
+          var skillFound = sortedSkills.find(function (skill) {
+            return skill.name === data[repString + '_storage_name'];
+          });
+
+          if (skillFound) {
+            if (data[repString + '_proficiency']) {
+              skillFound.proficiency = data[repString + '_proficiency'];
+            }
+            if (data[repString + '_skill_d20']) {
+              skillFound.skillD20 = data[repString + '_skill_d20'];
+            }
+          }
+          removeRepeatingRow(repString);
+        });
+      }
+      sortedSkills.forEach(function (skill) {
+        var skillId = void 0;
+
+        if (replace) {
+          skillId = generateRowID();
+        } else {
+          skillId = (0, _utilities.getSkillIdByStorageName)(data, repStrings, skill.name);
+          if (!skillId) {
+            skillId = generateRowID();
+          }
+        }
+        var repString = 'repeating_skill_' + skillId;
+        data[repString + '_storage_name'] = skill.name;
+        data[repString + '_name'] = getTranslationByKey(skill.name);
+        data[repString + '_ability'] = (0, _abilities.getFormattedAbility)(_constants.SKILLS[skill.name]);
+        if (replace) {
+          if (skill.proficiency) {
+            data[repString + '_proficiency'] = skill.proficiency;
+          }
+          if (skill.skillD20) {
+            data[repString + '_skill_d20'] = skill.skillD20;
+          }
+        }
+      });
+    },
+    processCallback: function processCallback() {
+      updateSkill();
+    }
+  });
+};
+
+var setupSkills = exports.setupSkills = function setupSkills() {
+  on('change:generate_skills', function () {
+    generateSkills();
+  });
+  on('change:regenerate_skills', function () {
+    generateSkills('replace');
+  });
+  on('change:show_passive_skills', function () {
+    updateSkill();
+  });
+  on('change:repeating_skill', function (eventInfo) {
+    var repeatingInfo = (0, _utilities.getRepeatingInfo)('repeating_skill', eventInfo);
+    if (repeatingInfo && repeatingInfo.field === 'prof_toggle') {
+      updateSkillToggle(repeatingInfo);
+    }
+    if (repeatingInfo && repeatingInfo.field !== 'prof_toggle' && repeatingInfo.field !== 'total' && repeatingInfo.field !== 'total_with_sign' && repeatingInfo.field !== 'passive_total' && repeatingInfo.field !== 'passive_total_with_sign' && repeatingInfo.field !== 'formula') {
+      updateSkill();
+    }
+  });
+  var updateSkillWatch = [].concat(_toConsumableArray(_constants.FIELDS.pb), _toConsumableArray(_constants.ABILITIES), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
+    return ability + '_check_formula';
+  })), ['class_feature_bard_jack_of_all_trades_toggle', 'class_feature_fighter_champion_remarkable_athlete_toggle', 'class_feature_rogue_reliable_talent_toggle']).map(function (ability) {
+    return 'change:' + ability;
+  }).join(' ');
+  on(updateSkillWatch, function () {
+    updateSkill();
+  });
+};
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setupAbilityChecks = exports.updateAbilityChecks = exports.updateAbilityChecksMacro = undefined;
+
+var _constants = __webpack_require__(2);
+
+var _abilities = __webpack_require__(3);
+
+var _initiative = __webpack_require__(31);
+
+var _server = __webpack_require__(1);
+
+var _utilities = __webpack_require__(0);
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global on:false, getTranslationByKey:false */
+
+var updateAbilityChecksMacro = exports.updateAbilityChecksMacro = function updateAbilityChecksMacro() {
+  (0, _server.getSetItems)('abilityChecks.updateMacro', {
+    collectionArray: [].concat(_toConsumableArray(_constants.FIELDS.d20), ['ability_checks_query_var', 'ability_checks_macro_var', 'honor_toggle', 'is_npc', 'sanity_toggle', 'skills_macro_var'], _toConsumableArray(_constants.ABILITIES.map(function (ability) {
+      return ability + '_check_formula';
+    })), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
+      return ability + '_check_mod_with_sign';
+    }))),
+    collectionArrayRepeatingSections: [{
+      collectionArrayAddItems: ['ability', 'formula', 'name', 'show', 'total_with_sign'],
+      name: 'repeating_skill'
+    }],
+    process: function process(data, repStrings) {
+      var macroArray = [];
+      var skillsMacroArray = [];
+      var queryArray = [];
+      data.skills_macro_var = '';
+
+      _constants.ABILITIES.forEach(function (ability) {
+        if ((ability !== 'honor' || ability === 'honor' && (0, _utilities.exists)(data.honor_toggle)) && (ability !== 'sanity' || ability === 'sanity' && (0, _utilities.exists)(data.sanity_toggle))) {
+          var total = data[ability + '_check_mod_with_sign'] || '+0';
+          var abilityCheckFormula = data[ability + '_check_formula'] ? data[ability + '_check_formula'].replace(/}}/g, '&#125;&#125;') : '';
+          macroArray.push('[' + getTranslationByKey(ability.toUpperCase()) + ' ' + total + '](~shaped_' + ability + '_check)');
+          var abilityCheckQuery = getTranslationByKey(ability.toUpperCase()) + ' ' + total + ',{{title=' + getTranslationByKey(ability.toUpperCase()) + ' ' + getTranslationByKey('CHECK') + '&#125;&#125; ' + abilityCheckFormula;
+          queryArray.push(abilityCheckQuery);
+        }
+      });
+      repStrings.forEach(function (repString) {
+        if (!(0, _utilities.exists)(data.is_npc) || data[repString + '_show']) {
+          var total = data[repString + '_total_with_sign'] || '+0';
+          var skillButton = '[' + data[repString + '_name'] + ' ' + total + '](~' + repString + '_skill)';
+          var skillFormula = data[repString + '_formula'] ? data[repString + '_formula'].replace(/}}/g, '&#125;&#125;') : '';
+          macroArray.push(skillButton);
+          skillsMacroArray.push(skillButton);
+          var abilityCheckQuery = data[repString + '_name'] + ' (' + getTranslationByKey((0, _abilities.getAbilityShortName)(data[repString + '_ability']).toUpperCase()) + ') ' + total + ', {{title=' + data[repString + '_name'] + ' (' + getTranslationByKey((0, _abilities.getAbilityShortName)(data[repString + '_ability']).toUpperCase()) + ')&#125;&#125; ' + skillFormula;
+          queryArray.push(abilityCheckQuery);
+        }
+      });
+      data.ability_checks_macro_var = macroArray.join(', ');
+      data.skills_macro_var = skillsMacroArray.join(', ');
+      data.ability_checks_query_var = '?{Ability Check|' + queryArray.join('|') + '}';
+    }
+  });
+};
+
+var updateAbilityChecksInner = function updateAbilityChecksInner(data) {
+  _constants.ABILITIES.forEach(function (ability) {
+    var obj = {
+      abilityCheck: data[ability + '_mod'],
+      abilityCheckFormula: ''
+    };
+
+    obj.abilityCheckFormula = (0, _utilities.addTo)(obj.abilityCheckFormula, (0, _abilities.getAbilityMod)(data, ability) + '[' + getTranslationByKey((0, _abilities.getAbilityShortName)(ability).toUpperCase()).toLowerCase() + ']');
+
+    if ((ability === 'strength' || ability === 'dexterity' || ability === 'constitution') && (0, _utilities.exists)(data.class_feature_fighter_champion_remarkable_athlete_toggle)) {
+      var remarkableAthlete = (0, _utilities.getHalfPB)(data, 'roundUp');
+      if ((0, _utilities.exists)(remarkableAthlete) && !isNaN(remarkableAthlete)) {
+        obj.abilityCheck += remarkableAthlete;
+      }
+      obj.abilityCheckFormula = (0, _utilities.addTo)(obj.abilityCheckFormula, remarkableAthlete + '[' + getTranslationByKey('CLASS_FEATURE_FIGHTER_CHAMPION_REMARKABLE_ATHLETE').toLowerCase() + ']');
+    } else if ((0, _utilities.exists)(data.class_feature_bard_jack_of_all_trades_toggle)) {
+      var jackOfAllTrades = (0, _utilities.getHalfPB)(data);
+      if ((0, _utilities.exists)(jackOfAllTrades) && !isNaN(jackOfAllTrades)) {
+        obj.abilityCheck += jackOfAllTrades;
+      }
+      obj.abilityCheckFormula = (0, _utilities.addTo)(obj.abilityCheckFormula, jackOfAllTrades + '[' + getTranslationByKey('CLASS_FEATURE_BARD_JACK_OF_ALL_TRADES').toLowerCase() + ']');
+    }
+
+    (0, _utilities.addModifier)(data, obj, 'ability_check', 'abilityCheck', 'abilityCheckFormula', '' + getTranslationByKey('ABILITY_CHECK_MODIFIER').toLowerCase());
+    (0, _utilities.addModifier)(data, obj, ability + '_check', 'abilityCheck', 'abilityCheckFormula', getTranslationByKey(ability.toUpperCase()).toLowerCase() + ' ' + getTranslationByKey('CHECK_MODIFIER').toLowerCase());
+
+    data[ability + '_check_formula'] = '{{roll1=[[@{shaped_d20}@{d20_mod} + ' + obj.abilityCheckFormula + ']]}}';
+    if (data.shaped_d20 === '1d20') {
+      data[ability + '_check_formula'] += ' {{roll2=[[@{shaped_d20}@{d20_mod} + ' + obj.abilityCheckFormula + ']]}}';
+    }
+    data[ability + '_check_mod_with_sign'] = (0, _utilities.showSign)(obj.abilityCheck);
+  });
+};
+
+var updateAbilityChecks = exports.updateAbilityChecks = function updateAbilityChecks() {
+  (0, _server.getSetItems)('abilityChecks.update', {
+    collectionArray: [].concat(_toConsumableArray(_constants.FIELDS.pb), _toConsumableArray(_constants.FIELDS.abilityScores), _toConsumableArray(_constants.FIELDS.d20), _toConsumableArray(_constants.FIELDS.abilityCheckModifier), ['initiative', 'initiative_ability', 'initiative_formula', 'initiative_modifier', 'initiative_modifier_dice', 'initiative_to_tracker', 'initiative_tie_breaker', 'class_feature_bard_jack_of_all_trades_toggle', 'class_feature_fighter_champion_remarkable_athlete_toggle'], _toConsumableArray(_constants.ABILITIES.map(function (ability) {
+      return ability + '_mod';
+    })), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
+      return ability + '_check_modifier';
+    })), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
+      return ability + '_check_modifier_dice';
+    })), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
+      return ability + '_check_mod_with_sign';
+    })), _toConsumableArray(_constants.ABILITIES.map(function (ability) {
+      return ability + '_check_formula';
+    }))),
+    process: function process(data) {
+      updateAbilityChecksInner(data);
+      (0, _initiative.updateInitiative)(data);
+    },
+    processCallback: function processCallback() {
+      updateAbilityChecksMacro();
+    }
+  });
+};
+
+var setupAbilityChecks = exports.setupAbilityChecks = function setupAbilityChecks() {
+  var abilityCheckWatch = [].concat(_toConsumableArray(_constants.FIELDS.pb), _toConsumableArray(_constants.ABILITIES), ['initiative_ability', 'initiative_to_tracker', 'initiative_tie_breaker', 'class_feature_bard_jack_of_all_trades_toggle', 'class_feature_fighter_champion_remarkable_athlete_toggle']);
+
+  on(abilityCheckWatch.map(function (field) {
+    return 'change:' + field;
+  }).join(' '), function () {
+    updateAbilityChecks();
+  });
+  on('change:_reporder_repeating_skill remove:repeating_skill change:honor_toggle change:sanity_toggle', function () {
+    updateAbilityChecksMacro();
+  });
+};
+
+/***/ }),
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4141,122 +4144,17 @@ var convertDistance = exports.convertDistance = function convertDistance(data, f
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.setupHitDice = exports.updateHitDice = undefined;
-
-var _constants = __webpack_require__(2);
-
-var _abilities = __webpack_require__(3);
-
-var _server = __webpack_require__(1);
-
-var _utilities = __webpack_require__(0);
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global on:false, getTranslationByKey:false */
-
-var updateHitDice = exports.updateHitDice = function updateHitDice() {
-  (0, _server.getSetItems)('hitDice.update', {
-    collectionArray: [].concat(_toConsumableArray(_constants.FIELDS.abilityScores), ['hit_dice', 'hit_die'], _toConsumableArray(_constants.HIT_DIE.map(function (hitDie) {
-      return 'hd_d' + hitDie;
-    })), _toConsumableArray(_constants.HIT_DIE.map(function (hitDie) {
-      return 'hd_d' + hitDie + '_max';
-    })), _toConsumableArray(_constants.HIT_DIE.map(function (hitDie) {
-      return 'hd_d' + hitDie + '_query';
-    })), _toConsumableArray(_constants.HIT_DIE.map(function (hitDie) {
-      return 'hd_d' + hitDie + '_formula';
-    }))),
-    collectionArrayRepeatingSections: [{
-      collectionArrayAddItems: ['name', 'hd', 'level'],
-      name: 'repeating_class'
-    }],
-    process: function process(data, repStrings) {
-      _constants.HIT_DIE.forEach(function (hitDie) {
-        if ((0, _utilities.exists)(data['hd_d' + hitDie + '_max'])) {
-          data['hd_d' + hitDie + '_max'] = 0;
-        }
-      });
-
-      var monsterHitDice = parseInt(data.hit_dice || 0, 10);
-      var monsterHitDie = data.hit_die;
-      if (monsterHitDice && monsterHitDie) {
-        data['hd_' + monsterHitDie] = monsterHitDice;
-        data['hd_' + monsterHitDie + '_max'] = monsterHitDice;
-      }
-
-      repStrings.forEach(function (repString) {
-        if (data[repString + '_hd'] && data[repString + '_name'] !== 0 && data[repString + '_name'] !== '0' && data[repString + '_level']) {
-          if ((0, _utilities.isUndefinedOrEmpty)(data['hd_' + data[repString + '_hd'] + '_max'])) {
-            data['hd_' + data[repString + '_hd'] + '_max'] = 0;
-          }
-          data['hd_' + data[repString + '_hd'] + '_max'] += parseInt(data[repString + '_level'] || 0, 10);
-        }
-      });
-      var conMod = (0, _abilities.getAbilityMod)(data, 'constitution');
-
-      _constants.HIT_DIE.forEach(function (hitDie) {
-        if ((0, _utilities.exists)(data['hd_d' + hitDie + '_max'])) {
-          if ((0, _utilities.isUndefinedOrEmpty)(data['hd_d' + hitDie])) {
-            data['hd_d' + hitDie] = data['hd_d' + hitDie + '_max'];
-          }
-          data['hd_d' + hitDie + '_query'] = '?{HD';
-          if (data['hd_d' + hitDie] > 0) {
-            for (var x = 1; x <= data['hd_d' + hitDie]; x += 1) {
-              data['hd_d' + hitDie + '_query'] += '|' + x;
-            }
-          } else {
-            data['hd_d' + hitDie + '_query'] += '|0';
-          }
-
-          data['hd_d' + hitDie + '_query'] += '}';
-
-          data['hd_d' + hitDie + '_formula'] = '{{roll1=[[{(' + data['hd_d' + hitDie + '_query'] + ')d' + hitDie + ' + (' + data['hd_d' + hitDie + '_query'] + ' * ' + conMod + ')[' + getTranslationByKey('HIT_DICE').toLowerCase() + ' * ' + getTranslationByKey('CON').toLowerCase() + '], 0d0}kh1[minimum of 0]]]}}';
-        } else {
-          if ((0, _utilities.exists)(data['hd_d' + hitDie])) {
-            data['hd_d' + hitDie] = 0;
-          }
-          if ((0, _utilities.exists)(data['hd_d' + hitDie + '_query'])) {
-            data['hd_d' + hitDie + '_query'] = '';
-          }
-          if ((0, _utilities.exists)(data['hd_d' + hitDie + '_formula'])) {
-            data['hd_d' + hitDie + '_formula'] = '';
-          }
-        }
-      });
-    }
-  });
-};
-
-var setupHitDice = exports.setupHitDice = function setupHitDice() {
-  var hdWatch = ['hit_dice', 'hit_die'].concat(_toConsumableArray(_constants.HIT_DIE.map(function (hitDie) {
-    return 'hd_d' + hitDie + '_max';
-  }))).map(function (field) {
-    return 'change:' + field;
-  }).join(' ');
-  on(hdWatch, function () {
-    updateHitDice();
-  });
-};
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.parseActionComponents = exports.parseCostFromSRD = exports.changeWeightSystem = exports.weighActionComponents = exports.updateUsesForChatMacro = exports.updateCost = exports.updateRecharge = exports.updateUses = exports.updateExtras = exports.updateContent = exports.updateOtherDamage = exports.updateAmmo = exports.parseAttackType = undefined;
 
 var _constants = __webpack_require__(2);
 
 var _abilities = __webpack_require__(3);
 
-var _attack = __webpack_require__(14);
+var _attack = __webpack_require__(13);
 
 var _distance = __webpack_require__(11);
 
-var _damage = __webpack_require__(15);
+var _damage = __webpack_require__(14);
 
 var _heal = __webpack_require__(17);
 
@@ -4596,7 +4494,7 @@ var parseActionComponents = exports.parseActionComponents = function parseAction
 };
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4609,7 +4507,7 @@ exports.parseAttack = exports.parseToHit = exports.parseReachAndRange = exports.
 
 var _abilities = __webpack_require__(3);
 
-var _damage = __webpack_require__(15);
+var _damage = __webpack_require__(14);
 
 var _distance = __webpack_require__(11);
 
@@ -4645,8 +4543,9 @@ var attackToggled = function attackToggled(data, repString, repeatingInfo) {
   }
 };
 
-var addAbility = exports.addAbility = function addAbility(_ref) {
-  var data = _ref.data,
+var addAbility = exports.addAbility = function addAbility() {
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      data = _ref.data,
       repString = _ref.repString,
       attackData = _ref.attackData,
       repeatingInfo = _ref.repeatingInfo,
@@ -4896,7 +4795,7 @@ var parseAttack = exports.parseAttack = function parseAttack(data, repString) {
 };
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5302,6 +5201,111 @@ var parseDamage = exports.parseDamage = function parseDamage(data, repString, pr
 };
 
 /***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setupHitDice = exports.updateHitDice = undefined;
+
+var _constants = __webpack_require__(2);
+
+var _abilities = __webpack_require__(3);
+
+var _server = __webpack_require__(1);
+
+var _utilities = __webpack_require__(0);
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } } /* global on:false, getTranslationByKey:false */
+
+var updateHitDice = exports.updateHitDice = function updateHitDice() {
+  (0, _server.getSetItems)('hitDice.update', {
+    collectionArray: [].concat(_toConsumableArray(_constants.FIELDS.abilityScores), ['hit_dice', 'hit_die'], _toConsumableArray(_constants.HIT_DIE.map(function (hitDie) {
+      return 'hd_d' + hitDie;
+    })), _toConsumableArray(_constants.HIT_DIE.map(function (hitDie) {
+      return 'hd_d' + hitDie + '_max';
+    })), _toConsumableArray(_constants.HIT_DIE.map(function (hitDie) {
+      return 'hd_d' + hitDie + '_query';
+    })), _toConsumableArray(_constants.HIT_DIE.map(function (hitDie) {
+      return 'hd_d' + hitDie + '_formula';
+    }))),
+    collectionArrayRepeatingSections: [{
+      collectionArrayAddItems: ['name', 'hd', 'level'],
+      name: 'repeating_class'
+    }],
+    process: function process(data, repStrings) {
+      _constants.HIT_DIE.forEach(function (hitDie) {
+        if ((0, _utilities.exists)(data['hd_d' + hitDie + '_max'])) {
+          data['hd_d' + hitDie + '_max'] = 0;
+        }
+      });
+
+      var monsterHitDice = parseInt(data.hit_dice || 0, 10);
+      var monsterHitDie = data.hit_die;
+      if (monsterHitDice && monsterHitDie) {
+        data['hd_' + monsterHitDie] = monsterHitDice;
+        data['hd_' + monsterHitDie + '_max'] = monsterHitDice;
+      }
+
+      repStrings.forEach(function (repString) {
+        if (data[repString + '_hd'] && data[repString + '_name'] !== 0 && data[repString + '_name'] !== '0' && data[repString + '_level']) {
+          if ((0, _utilities.isUndefinedOrEmpty)(data['hd_' + data[repString + '_hd'] + '_max'])) {
+            data['hd_' + data[repString + '_hd'] + '_max'] = 0;
+          }
+          data['hd_' + data[repString + '_hd'] + '_max'] += parseInt(data[repString + '_level'] || 0, 10);
+        }
+      });
+      var conMod = (0, _abilities.getAbilityMod)(data, 'constitution');
+
+      _constants.HIT_DIE.forEach(function (hitDie) {
+        if ((0, _utilities.exists)(data['hd_d' + hitDie + '_max'])) {
+          if ((0, _utilities.isUndefinedOrEmpty)(data['hd_d' + hitDie])) {
+            data['hd_d' + hitDie] = data['hd_d' + hitDie + '_max'];
+          }
+          data['hd_d' + hitDie + '_query'] = '?{HD';
+          if (data['hd_d' + hitDie] > 0) {
+            for (var x = 1; x <= data['hd_d' + hitDie]; x += 1) {
+              data['hd_d' + hitDie + '_query'] += '|' + x;
+            }
+          } else {
+            data['hd_d' + hitDie + '_query'] += '|0';
+          }
+
+          data['hd_d' + hitDie + '_query'] += '}';
+
+          data['hd_d' + hitDie + '_formula'] = '{{roll1=[[{(' + data['hd_d' + hitDie + '_query'] + ')d' + hitDie + ' + (' + data['hd_d' + hitDie + '_query'] + ' * ' + conMod + ')[' + getTranslationByKey('HIT_DICE').toLowerCase() + ' * ' + getTranslationByKey('CON').toLowerCase() + '], 0d0}kh1[minimum of 0]]]}}';
+        } else {
+          if ((0, _utilities.exists)(data['hd_d' + hitDie])) {
+            data['hd_d' + hitDie] = 0;
+          }
+          if ((0, _utilities.exists)(data['hd_d' + hitDie + '_query'])) {
+            data['hd_d' + hitDie + '_query'] = '';
+          }
+          if ((0, _utilities.exists)(data['hd_d' + hitDie + '_formula'])) {
+            data['hd_d' + hitDie + '_formula'] = '';
+          }
+        }
+      });
+    }
+  });
+};
+
+var setupHitDice = exports.setupHitDice = function setupHitDice() {
+  var hdWatch = ['hit_dice', 'hit_die'].concat(_toConsumableArray(_constants.HIT_DIE.map(function (hitDie) {
+    return 'hd_d' + hitDie + '_max';
+  }))).map(function (field) {
+    return 'change:' + field;
+  }).join(' ');
+  on(hdWatch, function () {
+    updateHitDice();
+  });
+};
+
+/***/ }),
 /* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5317,25 +5321,17 @@ var _utilities = __webpack_require__(0);
 
 var _constants = __webpack_require__(2);
 
-var _abilityChecks = __webpack_require__(8);
-
 var _abilities = __webpack_require__(3);
-
-var _actions = __webpack_require__(4);
-
-var _hitDice = __webpack_require__(12);
 
 var _resistances = __webpack_require__(25);
 
-var _processing = __webpack_require__(10);
+var _processing = __webpack_require__(8);
 
 var _proficiencyBonus = __webpack_require__(20);
 
 var _server = __webpack_require__(1);
 
 var _senses = __webpack_require__(26);
-
-var _skills = __webpack_require__(7);
 
 var _speeds = __webpack_require__(27);
 
@@ -5543,7 +5539,7 @@ var turnOnSlotsIfItsNotSet = function turnOnSlotsIfItsNotSet() {
 };
 
 var cleanNPCContent = exports.cleanNPCContent = function cleanNPCContent(content) {
-  return (0, _utilities.cleanContent)(content).replace(/\+ (\d+) to hit/g, '+$1 to hit').replace(/Hit:(\d+)/g, 'Hit: $1').replace(/.*(\\n)/, '').replace(/\sLegendary Actions\s*\n/g, '\n Legendary Actions\n').replace(/\sReactions\s*\n/g, '\n Reactions\n').replace(/\s\sActions\s*\n\n/g, '\n Actions\n\n').replace(/^(?:\s?Actions\s*\n)/g, 'content \n Actions\n').replace(/^(?:\s?Traits\s*\n)/g, 'content \n Traits\n').replace(/\sTraits\s*\n/g, '\n Traits\n').replace(/\sRegional Effects\s*\n/g, '\n Regional Effects\n').replace(/\sLair Actions\s*\n/g, '\n Lair Actions\n').trim().trim().replace('reach ft.', '').trim().replace(/\sft.\//, '/') // bandit and salamander
+  return (0, _utilities.cleanContent)(content).replace(/\+ (\d+) to hit/g, '+$1 to hit').replace(/Hit:(\d+)/g, 'Hit: $1').replace(/.*(\\n)/, '').replace(/\s(Legendary Actions|Reactions|Traits|Regional Effects|Lair Actions)\s*\n/g, '\n $1\n').replace(/\s\sActions\s*\n\n/g, '\n Actions\n\n').replace(/^(?:\s?(Legendary Actions|Reactions|Actions|Traits|Regional Effects|Lair Actions))/g, 'content \n $1').trim().replace('reach ft.', '').trim().replace(/\sft.\//, '/') // bandit and salamander
   .replace(/ \n\n[A-z].*/g, '').trim();
 };
 
@@ -5735,8 +5731,9 @@ var parseSavingThrows = function parseSavingThrows(data) {
   }
 };
 
-var makeSkillAttacher = function makeSkillAttacher(_ref) {
-  var data = _ref.data,
+var makeSkillAttacher = function makeSkillAttacher() {
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      data = _ref.data,
       skillName = _ref.skillName,
       text = _ref.text;
 
@@ -5746,8 +5743,9 @@ var makeSkillAttacher = function makeSkillAttacher(_ref) {
   data[repString + '_freetext'] = text;
 };
 
-var parseExpertiseAsAdvantage = function parseExpertiseAsAdvantage(_ref2) {
-  var data = _ref2.data,
+var parseExpertiseAsAdvantage = function parseExpertiseAsAdvantage() {
+  var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      data = _ref2.data,
       repStringNew = _ref2.repStringNew;
 
   if (data.dice_system === '2d10') {
@@ -5931,15 +5929,13 @@ var parseMonsterFromSRDWithServer = exports.parseMonsterFromSRDWithServer = func
         });
       },
       processCallback: function processCallback() {
-        (0, _abilities.updateAbilitiesWithServer)();
-        (0, _skills.updateSkill)();
-        (0, _abilityChecks.updateAbilityChecks)();
-        (0, _hitDice.updateHitDice)();
+        (0, _abilities.updateAbilitiesWithServer)({
+          callback: _spells.findSpellcasting,
+          forceUpdate: true
+        });
         (0, _speeds.updateSpeeds)();
         (0, _senses.updateSenses)();
-        (0, _actions.updateAllActions)();
         (0, _resistances.updateDamageResistances)();
-        (0, _spells.findSpellcasting)();
         (0, _attachers.updateAttachers)();
       },
       serverCallCallback: function serverCallCallback() {
@@ -6073,7 +6069,7 @@ var _constants = __webpack_require__(2);
 
 var _abilities = __webpack_require__(3);
 
-var _damage = __webpack_require__(15);
+var _damage = __webpack_require__(14);
 
 var _utilities = __webpack_require__(0);
 
@@ -6313,11 +6309,11 @@ var _constants = __webpack_require__(2);
 
 var _server = __webpack_require__(1);
 
-var _equipment = __webpack_require__(9);
+var _equipment = __webpack_require__(7);
 
 var _utilities = __webpack_require__(0);
 
-var _actionComponents = __webpack_require__(13);
+var _actionComponents = __webpack_require__(12);
 
 var updateCurrency = exports.updateCurrency = function updateCurrency() {
   (0, _server.getSetItems)('updateCurrency', {
@@ -6472,7 +6468,7 @@ var _constants = __webpack_require__(2);
 
 var _classFeatures = __webpack_require__(24);
 
-var _hitDice = __webpack_require__(12);
+var _hitDice = __webpack_require__(15);
 
 var _proficiencyBonus = __webpack_require__(20);
 
@@ -6766,7 +6762,7 @@ var _abilities = __webpack_require__(3);
 
 var _actions = __webpack_require__(4);
 
-var _equipment = __webpack_require__(9);
+var _equipment = __webpack_require__(7);
 
 var _features = __webpack_require__(32);
 
@@ -7542,7 +7538,7 @@ var _constants = __webpack_require__(2);
 
 var _abilities = __webpack_require__(3);
 
-var _abilityChecks = __webpack_require__(8);
+var _abilityChecks = __webpack_require__(10);
 
 var _actions = __webpack_require__(4);
 
@@ -7552,7 +7548,7 @@ var _savingThrows = __webpack_require__(6);
 
 var _server = __webpack_require__(1);
 
-var _skills = __webpack_require__(7);
+var _skills = __webpack_require__(9);
 
 var _spells = __webpack_require__(5);
 
@@ -7748,7 +7744,7 @@ var _constants = __webpack_require__(2);
 
 var _abilities = __webpack_require__(3);
 
-var _abilityChecks = __webpack_require__(8);
+var _abilityChecks = __webpack_require__(10);
 
 var _actions = __webpack_require__(4);
 
@@ -7756,7 +7752,7 @@ var _savingThrows = __webpack_require__(6);
 
 var _server = __webpack_require__(1);
 
-var _skills = __webpack_require__(7);
+var _skills = __webpack_require__(9);
 
 var _spells = __webpack_require__(5);
 
@@ -7866,7 +7862,7 @@ var setupSettings = exports.setupSettings = function setupSettings() {
 
 var _abilities = __webpack_require__(3);
 
-var _abilityChecks = __webpack_require__(8);
+var _abilityChecks = __webpack_require__(10);
 
 var _actions = __webpack_require__(4);
 
@@ -7882,9 +7878,9 @@ var _conditions = __webpack_require__(33);
 
 var _currency = __webpack_require__(21);
 
-var _equipment = __webpack_require__(9);
+var _equipment = __webpack_require__(7);
 
-var _hitDice = __webpack_require__(12);
+var _hitDice = __webpack_require__(15);
 
 var _hitPoints = __webpack_require__(34);
 
@@ -7894,7 +7890,7 @@ var _modifiers = __webpack_require__(28);
 
 var _npc = __webpack_require__(16);
 
-var _processing = __webpack_require__(10);
+var _processing = __webpack_require__(8);
 
 var _proficiencyBonus = __webpack_require__(20);
 
@@ -7910,7 +7906,7 @@ var _senses = __webpack_require__(26);
 
 var _settings = __webpack_require__(29);
 
-var _skills = __webpack_require__(7);
+var _skills = __webpack_require__(9);
 
 var _speeds = __webpack_require__(27);
 
@@ -8258,7 +8254,7 @@ var _currency = __webpack_require__(21);
 
 var _server = __webpack_require__(1);
 
-var _skills = __webpack_require__(7);
+var _skills = __webpack_require__(9);
 
 var _upgrade = __webpack_require__(37);
 
@@ -8335,7 +8331,7 @@ var _abilities = __webpack_require__(3);
 
 var _npc = __webpack_require__(16);
 
-var _processing = __webpack_require__(10);
+var _processing = __webpack_require__(8);
 
 var _server = __webpack_require__(1);
 
@@ -8866,11 +8862,11 @@ var _currency = __webpack_require__(21);
 
 var _classes = __webpack_require__(23);
 
-var _hitDice = __webpack_require__(12);
+var _hitDice = __webpack_require__(15);
 
 var _modifiers = __webpack_require__(28);
 
-var _processing = __webpack_require__(10);
+var _processing = __webpack_require__(8);
 
 var _savingThrows = __webpack_require__(6);
 
@@ -8880,7 +8876,7 @@ var _settings = __webpack_require__(29);
 
 var _utilities = __webpack_require__(0);
 
-var _skills = __webpack_require__(7);
+var _skills = __webpack_require__(9);
 
 var _spells = __webpack_require__(5);
 
@@ -9132,7 +9128,7 @@ var upgradeSheet = exports.upgradeSheet = function upgradeSheet(sheetVersion) {
 /* 38 */
 /***/ (function(module, exports) {
 
-module.exports = {"name":"5eShaped","version":"19.1.1","bin":"./","description":"5e Shaped character sheet for Roll20.net","main":"gulpfile.js","devDependencies":{"babel-core":"^6.26.3","babel-eslint":"^8.2.6","babel-loader":"^7.1.5","babel-preset-es2015":"^6.24.0","cache-loader":"^1.2.2","chai":"^4.1.2","chai-spies":"^1.0.0","cross-env":"^5.2.0","eslint":"^4.19.1","eslint-config-airbnb":"^17.0.0","eslint-plugin-import":"^2.13.0","eslint-plugin-jsx-a11y":"^6.1.1","eslint-plugin-react":"^7.10.0","gulp":"^3.9.1","gulp-autoprefixer":"^5.0.0","gulp-clean-css":"^3.9.4","gulp-concat":"^2.6.0","gulp-file-include":"^2.0.1","gulp-htmlmin":"^4.0.0","gulp-if":"^2.0.2","gulp-json-sort":"^1.0.0","gulp-nunjucks-render":"^2.2.2","gulp-rename":"^1.4.0","gulp-replace-task":"^0.11.0","gulp-sass":"^4.0.1","gulp-tap":"^1.0.1","gulp-util":"^3.0.8","gulp-wrapper":"1.0.0","husky":"^0.14.3","istanbul-instrumenter-loader":"^3.0.1","json-loader":"^0.5.7","lint-staged":"^7.2.0","mocha":"^5.2.0","mocha-webpack":"^1.1.0","nyc":"^12.0.2","request":"2.87.0","sass-lint":"^1.12.1","sinon":"^6.1.4","streamqueue":"^1.1.2","webpack-node-externals":"^1.7.2","webpack-stream":"^4.0.3"},"repository":{"type":"git","url":"https://bitbucket.org/mlenser/5eshaped/"},"scripts":{"coverage":"cross-env NODE_ENV=coverage nyc npm test","lint":"eslint ./sheet/**/*.js","sass-lint":"sass-lint ./sheet/**/*.scss -v -q","precommit":"lint-staged","test":"mocha-webpack --opts test/mocha.webpack.opts","version-bump-patch":"npm version patch --no-git-tag-version","version-bump-minor":"npm version minor --no-git-tag-version","version-bump-major":"npm version major --no-git-tag-version"},"lint-staged":{"*.js":["git add","yarn run lint","yarn run test"]},"nyc":{"extension":[".js"],"all":true,"instrument":false,"sourceMap":false,"reporter":["lcov","text-summary","text"]},"author":"Mark Lenser (Kryx)","private":true}
+module.exports = {"name":"5eShaped","version":"19.1.3","bin":"./","description":"5e Shaped character sheet for Roll20.net","main":"gulpfile.js","devDependencies":{"babel-core":"^6.26.3","babel-eslint":"^8.2.6","babel-loader":"^7.1.5","babel-preset-es2015":"^6.24.0","cache-loader":"^1.2.2","chai":"^4.1.2","chai-spies":"^1.0.0","cross-env":"^5.2.0","eslint":"^4.19.1","eslint-config-airbnb":"^17.1.0","eslint-plugin-import":"^2.14.0","eslint-plugin-jsx-a11y":"^6.1.1","eslint-plugin-react":"^7.11.1","gulp":"^3.9.1","gulp-autoprefixer":"^5.0.0","gulp-clean-css":"^3.10.0","gulp-concat":"^2.6.0","gulp-file-include":"^2.0.1","gulp-htmlmin":"^4.0.0","gulp-if":"^2.0.2","gulp-json-sort":"^1.0.0","gulp-nunjucks-render":"^2.2.2","gulp-rename":"^1.4.0","gulp-replace-task":"^0.11.0","gulp-sass":"^4.0.1","gulp-tap":"^1.0.1","gulp-util":"^3.0.8","gulp-wrapper":"1.0.0","husky":"^0.14.3","istanbul-instrumenter-loader":"^3.0.1","json-loader":"^0.5.7","lint-staged":"^7.2.2","mocha":"^5.2.0","mocha-webpack":"^1.1.0","nyc":"^12.0.2","request":"2.88.0","sass-lint":"^1.12.1","sinon":"^6.1.5","streamqueue":"^1.1.2","webpack-node-externals":"^1.7.2","webpack-stream":"^4.0.3"},"repository":{"type":"git","url":"https://bitbucket.org/mlenser/5eshaped/"},"scripts":{"coverage":"cross-env NODE_ENV=coverage nyc npm test","lint":"eslint ./sheet/**/*.js","sass-lint":"sass-lint ./sheet/**/*.scss -v -q","precommit":"lint-staged","test":"mocha-webpack --opts test/mocha.webpack.opts","version-bump-patch":"npm version patch --no-git-tag-version","version-bump-minor":"npm version minor --no-git-tag-version","version-bump-major":"npm version major --no-git-tag-version"},"lint-staged":{"*.js":["git add","yarn run lint","yarn run test"]},"nyc":{"extension":[".js"],"all":true,"instrument":false,"sourceMap":false,"reporter":["lcov","text-summary","text"]},"author":"Mark Lenser (Kryx)","private":true}
 
 /***/ }),
 /* 39 */
@@ -9464,7 +9460,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.listenForCompendiumDrop = undefined;
 
-var _equipment = __webpack_require__(9);
+var _equipment = __webpack_require__(7);
 
 var _npc = __webpack_require__(16);
 
