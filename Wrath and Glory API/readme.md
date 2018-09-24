@@ -40,7 +40,7 @@ Updates:
 1. Fixed all attack rolls using the API (character, NPC, Vehicle, Voidship); the feed to the API was not subtracting a die for Wrath from the pool being rolled.
 2. Modified Corruption line under mental/social traits to list level of corruption and DN per page 367 of core rulebook.
 3. Added Resist Corruption line under mental/social traits after the Corruption Rating
-4. Created onload section for automated updates to Corruption.
+4. Fixed Mission BP not being added to totals.
 
 ** August 20th, 2018: version 2.0 - Base Rule Alignment Changes** 
 
