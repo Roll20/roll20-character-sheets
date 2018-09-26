@@ -1,0 +1,242 @@
+<div class="sheet-section-basic sheet-section">
+<table >
+<tbody>
+<tr >
+<td ><img  style="width: 132px; text-align: left;" class="sheet-logo" src="http://aventurasbizarras.com/wp/wp-content/uploads/2016/09/Hitos-Logo.png" /></td>
+<td ><label>Nombre</label> <input style="width: 125px; text-align: left;"type="text" name="attr_character_name" /></td>
+<td ><label>Concepto</label> <input style="width: 225px; text-align: left;" type="text" name="attr_Concepto" /></td>
+<td ><label>Cita</label> <input style="width: 225px; text-align: left;" type="text" name="attr_Cita" /></td>
+<td ><label>Drama</label> <input  style="width: 40px; text-align: left;" type="number" name="attr_Drama_ACTUAL" />/<input  style="width: 40px; text-align: left;" type="number" name="attr_Drama" /></td></tr>
+</tbody>
+</table>
+</div>
+
+
+<div class="sheet-break"></div>
+<div class="sheet-section-aspects sheet-section">
+<div class="sheet-header">ASPECTOS</div>
+<div class="sheet-repitem"><input type="text" name="attr_Complicacion" placeholder="Complicacion" /></div>
+<div class="sheet-repitem"><input type="text" name="attr_Hito" placeholder="Hito" /></div>
+<fieldset class="repeating_Aspects"><input type="text" name="attr_Aspect" /></fieldset></div>
+
+
+<div class="sheet-section-stunts sheet-section sheet-half">
+<div class="sheet-header">VALORES</div>
+
+<table style="width: 410px;">
+<tbody>
+<tr>
+<td><strong>AGUANTE</strong></td>
+<td style="text-align: right; "><button style="width: 33px;" type="roll" value="/r {3d10dh1}kh1+ floor(@{aguante}) "></button></td>
+<td style="text-align: right;"><input style="width: 40px;" disabled="true"  name="attr_aguante" type="number" value="round(@{VOLUNTAD}/2)+@{FORTALEZA}"  /></td>
+<td><strong>&nbsp; &nbsp;&nbsp; &nbsp;ENTEREZA</strong></td>
+<td style="text-align: right; width: 60px;">&nbsp;</td>
+<td style="text-align: right;"><input style="width: 40px;"  disabled="true"  name="attr_ENTEREZA" type="number" value="round(@{INTELECTO} / 2) + @{VOLUNTAD}" /></td>
+</tr>
+<tr>
+<td style="text-align: right;">PUNTOS RR&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+<td style="text-align: right;"><input style="width: 40px;"  name="attr_RESISTENCIA" type="number" value="[[(@{aguante})*3]]" /></td>
+<td style="text-align: right;"><input style="width: 40px;"  disabled="true" name="attr_RESISTENCIA_max" type="number" value="[[(@{aguante})*3]]" /></td>
+<td style="text-align: right;">SALUD MENTAL</td>
+<td style="text-align: right;"><input style="width: 40px;" name="attr_SALUD_MENTAL" type="number" value="[[(@{ENTEREZA})*3]]" /></td>
+<td style="text-align: right;"><input style="width: 40px;"  disabled="true" name="attr_SALUD_MENTAL_max" type="number" value="[[(@{ENTEREZA})*3]]" /></td>
+</tr>
+</tbody>
+</table>
+
+<table style="width: 410px;">
+<tbody>
+<tr>
+<td style="width: 125px; text-align: right;">Estado Fisico &nbsp;&nbsp; &nbsp;</td>
+<td style="text-align: right;"><input style="width: 85px;" readonly name="attr_fisico" type="text"  /></td>
+        <script type="text/worker">
+        on("change:RESISTENCIA change:FORTALEZA change:VOLUNTAD change:aguante", function() {
+           getAttrs(["RESISTENCIA","FORTALEZA","VOLUNTAD", "aguante"], function(values) {
+                let aguante = parseInt(values.aguante)||0;
+                let RESISTENCIA = parseInt(values.RESISTENCIA)||0;
+                let VOLUNTAD = parseInt(values.VOLUNTAD)||0; 
+                let FORTALEZA = parseInt(values.FORTALEZA)||0;    
+                let status = "SANO";
+                if(RESISTENCIA <=  Math.round( (VOLUNTAD/2+FORTALEZA)*2)   ) status = "HERIDO";
+                if(RESISTENCIA <=  Math.round( (VOLUNTAD/2+FORTALEZA)*1)   ) status = "INCAPACITADO";
+                if(RESISTENCIA <= 0) status = "MORIBUNDO";
+                setAttrs({                            
+                    fisico:status
+                });
+          });
+        });
+        </script>
+        
+<td style="width: 150px; text-align: right;">Estado Mental&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;</td>
+<td style="text-align: right;"><input style="width: 85px;" readonly name="attr_Estado_Mental" type="text"  /></td>
+<script type="text/worker">
+        on("change:SALUD_MENTAL change:VOLUNTAD change:INTELECTO change:aguante", function() {
+           getAttrs(["SALUD_MENTAL","VOLUNTAD","INTELECTO", "aguante"], function(values) {
+                let aguante = parseInt(values.aguante)||0;
+                let SALUD_MENTAL = parseInt(values.SALUD_MENTAL)||0;
+                let INTELECTO = parseInt(values.INTELECTO)||0; 
+                let VOLUNTAD = parseInt(values.VOLUNTAD)||0;    
+                let status = "CUERDO";
+                if(SALUD_MENTAL <=  Math.round( (INTELECTO/2+VOLUNTAD)*2)   ) status = "ALTERADO";
+                if(SALUD_MENTAL <=  Math.round( (INTELECTO/2+VOLUNTAD)*1)   ) status = "TRASTORNADO";
+                if(SALUD_MENTAL <= 0) status = "ELOQUECIDO";
+                setAttrs({                            
+                    Estado_Mental:status
+                });
+          });
+        });
+        </script>
+</tr>
+</tbody>
+</table>
+
+
+
+<div class="sheet-break"></div>
+<div class="sheet-section-aspects sheet-section">
+<div >Secuelas y Trastornos</div>
+<fieldset class="repeating_Aspects"><input type="text" name="attr_Aspect" /></fieldset></div>
+                                                          
+                                                          
+<table>
+<tbody>
+<td style=" width: 112px;"><strong>DEGENERACIÓN</strong></td>
+<td style=" width: 40px;"></td>
+<td ><input style="width: 40px;" name="attr_DEGENERACIÓN" type="number" value="0" /></td>
+<td ><input style="width: 220px;" name="attr_DEGENERACIÓN_ESTADO" type="text" value="Estado Actual" /></td>
+
+</tbody>
+</table>
+
+</div> 
+
+<div class="sheet-section-Specialisations sheet-section sheet-half">
+	<div class="sheet-header">COMBATE</div>
+<table style="height: 100%;">
+<tbody>
+<tr>
+<td><strong>INICIATIVA</strong></td>
+<td ><button style="width: 40px;" type="roll" value="/r {3d10dh1}kh1+ floor(@{INTELECTO} / 2) + @{REFLEJOS} "></button></td>
+<td><strong>ATAQUE</strong></td>
+<td ><button style="width: 40px;" type="roll" value="/r {3d10dh1}kh1 + @{REFLEJOS} + @{COMBATE}"></button></td>
+<td ><strong>DEFENSA</strong></td>
+<td ><button style="width: 40px;" type="roll" value="/r {3d10dh1}kh1 + @{REFLEJOS} +5 + ?{Atletismo / Combate|@{ATLETISMO}|@{COMBATE}} "></button></td>
+</tr>
+<tr>
+<tr>
+<td ><strong>DAÑO CaC</strong></td>
+<td ><strong><input style="width: 40px;" name="attr_INICIATIVA" type="number" value="round((@{FORTALEZA}+@{COMBATE}) / 4)" disabled="true"/></strong></td>
+<td  style="width: 100px;" ><strong>DAÑO DIS</strong></td>
+<td ><strong><input style="width: 40px;" name="attr_INICIATIVA" type="number" value="round(@{COMBATE} / 4)" disabled="true"/></strong></td>
+<td  style="width: 100px;" ><strong>DESPREVENIDO</strong></td>
+<td ><button style="width: 40px;" type="roll" value="/r {3d10dh1}kh1 + @{REFLEJOS} +5 + ?{Atletismo / Combate|@{ATLETISMO}|@{COMBATE}} -2"></button></td>
+</tr>
+</tbody>
+</table>
+
+<table width="630">
+<tbody>
+<tr><td >Arma</td><td >Daño</td></tr>
+</tbody>
+</table>
+
+
+<table style="height: 100%;">
+<tbody>
+<tr>
+<input class="sheet-invisible" style="width: 310px;" name="attr_arma1" type="text" /> 
+<input class="sheet-invisible" style="width: 100px;" name="attr_daño1" type="text" />
+</tr>
+<tr>
+<input class="sheet-invisible" style="width: 310px;" name="attr_arma2" type="text" /> 
+<input class="sheet-invisible" style="width: 100px;" name="attr_daño2" type="text" />
+</tr>
+<tr>
+<input class="sheet-invisible" style="width: 310px;" name="attr_arma3" type="text" /> 
+<input class="sheet-invisible" style="width: 100px;" name="attr_daño3" type="text" />
+</tr>
+</tbody>
+</table>
+                    
+
+</div>
+
+
+
+<div class="sheet-section-aspects sheet-section">
+<div class="sheet-header">CARACTERISTICAS</div></div>
+<table style="width: 100%;">
+<tbody>
+<tr>
+<td ><strong>FORTALEZA</strong></td>
+<td ><input type="number" name="attr_FORTALEZA" value="0" /><input style="width: 280px;" type="text" placeholder="Concepto" /></td>
+<td ><strong>VOLUNTAD</strong></td>
+<td ><input type="number" name="attr_VOLUNTAD" value="0" /><input style="width: 280px;" type="text" placeholder="Concepto" /></td>
+</tr>
+<tr>
+<td ><strong>REFLEJOS</strong></td>
+<td ><input type="number" name="attr_REFLEJOS" value="0" /><input style="width: 280px;" type="text" placeholder="Concepto" /></td>
+<td ><strong>INTELECTO</strong></td>
+<td ><input type="number" name="attr_INTELECTO" value="0" /><input style="width: 280px;" type="text" placeholder="Concepto" /></td>
+</tr>
+</tbody>
+</table>
+
+<div class="sheet-section-aspects sheet-section">
+<div class="sheet-header">HABILIDADES</div></div>
+<table style="width: 100%; height: 204px;">
+<tbody>
+<tr >
+<td ><strong>ATLETISMO</strong></td>
+<td ><input style="width: 35px;" type="number" name="attr_ATLETISMO" value="0" /><input style="width: 250px;" type="text"  />
+<button type="roll" value="/r {3d10dh1}kh1+?{Bonus Característica|0}+ @{ATLETISMO}"></button></td>
+<td ><strong>PERCEPCIÓN</strong></td>
+<td ><input style="width: 35px;" type="number" name="attr_PERCEPCIÓN" value="0" /><input style="width: 250px;" type="text"  />
+<button type="roll" value="/r {3d10dh1}kh1+?{Bonus Característica|0}+ @{PERCEPCIÓN}"></button></td>
+</tr>
+<tr >
+<td ><strong>COMBATE</strong></td>
+<td ><input style="width: 35px;" type="number" name="attr_COMBATE" value="0" /><input style="width: 250px;" type="text"  />
+<button type="roll" value="/r {3d10dh1}kh1+?{Bonus Característica|0}+ @{COMBATE}"></button></td>
+<td ><strong>SUBTERFUGIO</strong></td>
+<td ><input style="width: 35px;" type="number" name="attr_SUBTERFUGIO" value="0" /><input style="width: 250px;" type="text"  />
+<button type="roll" value="/r {3d10dh1}kh1+?{Bonus Característica|0}+ @{SUBTERFUGIO}"></button></td>
+</tr>
+<tr >
+<td ><strong>COMUNICACIÓN</strong></td>
+<td ><input style="width: 35px;" type="number" name="attr_COMUNICACIÓN" value="0" /><input style="width: 250px;" type="text"  />
+<button type="roll" value="/r {3d10dh1}kh1+?{Bonus Característica|0}+ @{COMUNICACIÓN}"></button></td>
+<td ><strong>CULTURA</strong></td>
+<td ><input style="width: 35px;" type="number" name="attr_CULTURA" value="0" /><input style="width: 250px;" type="text"  />
+<button type="roll" value="/r {3d10dh1}kh1+?{Bonus Característica|0}+ @{CULTURA}"></button></td>
+</tr>
+<tr >
+<td ><strong>PROFESIÓN</strong></td>
+<td ><input style="width: 35px;" type="number" name="attr_PROFESIÓN" value="0" /><input style="width: 250px;" type="text"  />
+<button type="roll" value="/r {3d10dh1}kh1+?{Bonus Característica|0}+ @{PROFESIÓN}"></button></td>
+<td ><strong>CULTURISMO</strong></td>
+<td ><input style="width: 35px;" type="number" name="attr_CULTURISMO" value="0" /><input style="width: 250px;" type="text"  />
+<button type="roll" value="/r {3d10dh1}kh1+?{Bonus Característica|0}+ @{CULTURISMO}"></button></td>
+</tr>
+<tr >
+<td ><strong>BRUJERÍA</strong></td>
+<td ><input style="width: 35px;" type="number" name="attr_BRUJERÍA" value="0" /><input style="width: 250px;" type="text"  />
+<button type="roll" value="/r {3d10dh1}kh1+?{Bonus Característica|0}+ @{BRUJERÍA}"></button></td>
+<td ><strong>PSI</strong></td>
+<td ><input style="width: 35px;" type="number" name="attr_PSI" value="0" /><input style="width: 250px;" type="text"  />
+<button type="roll" value="/r {3d10dh1}kh1+?{Bonus Característica|0}+ @{PSI}"></button></td>
+</tr>
+<tr >
+<td ><strong>ARCANAS</strong></td>
+<td ><input style="width: 35px;" type="number" name="attr_ARCANAS" value="0" /><input style="width: 250px;" type="text"  />
+<button type="roll" value="/r {3d10dh1}kh1+?{Bonus Característica|0}+ @{ARCANAS}"></button></td>
+<td ><strong>OTRAS</strong></td>
+<td ><input style="width: 35px;" type="number" name="attr_OTRAS" value="0" /><input style="width: 250px;" type="text"  />
+<button type="roll" value="/r {3d10dh1}kh1+?{Bonus Característica|0}+ @{OTRAS}"></button></td>
+</tr>
+</tbody>
+</table>
+
+	<div class="sheet-header">PODERES, ESPECIALIDADES & NOTAS</div>
+	<textarea style="height: 212px;" name="attr_Extra"></textarea>
+ 
