@@ -7080,39 +7080,51 @@
                 content: v.drop_content
             };
             var category = page.data["Category"];
+            var repeating = {prof_names: [], traits: []}
 
-            if(category === "Proficiencies" || page.data["data-Language Proficiency"] || page.data["data-Weapon Proficiency"] || page.data["data-Armor Proficiency"] || page.data["data-Tool Proficiency"]) {
-                getSectionIDs("proficiencies", function(ids) {
-                    var idArray = [];
+            getSectionIDs("proficiencies", function(ids) {
+                var idArray = [];
+                _.each(ids, function(sectionId) {
+                    idArray.push("repeating_proficiencies_" + sectionId + "_name");
+                });
+                getSectionIDs("tool", function(ids) {
                     _.each(ids, function(sectionId) {
-                        idArray.push("repeating_proficiencies_" + sectionId + "_name");
+                        idArray.push("repeating_tool_" + sectionId + "_toolname");
                     });
-                    getSectionIDs("tool", function(ids) {
+                    getSectionIDs("traits", function(ids) {
                         _.each(ids, function(sectionId) {
-                            idArray.push("repeating_tool_" + sectionId + "_toolname");
+                            var trait = {};
+                            idArray = idArray.concat(["repeating_traits_" + sectionId + "_name", "repeating_traits_" + sectionId + "_source", "repeating_traits_" + sectionId + "_source_type"])
                         });
                         getAttrs(idArray, function(vals) {
-                            var prof_names = [];
-                            _.each(vals, function(value) {
-                                prof_names.push(value.toLowerCase());
+                            var traitstemp = {};
+                            _.each(vals, function(value, name) {
+                                if(name.split("_")[1] == "proficiencies" || name.split("_")[1] == "tool") {
+                                    repeating.prof_names.push(value.toLowerCase());
+                                } else if (name.split("_")[1] == "traits") {
+                                    traitstemp[name.split("_")[2]] = traitstemp[name.split("_")[2]] ? traitstemp[name.split("_")[2]] : {};
+                                    traitstemp[name.split("_")[2]][_.last(name.split("_"))] = value;
+                                }
                             });
+                            _.each(traitstemp, function(v, k) {
+                                var trait = _.clone(v);
+                                trait.id = k;
+                                repeating.traits.push(trait);
+                            })
 
-                            var results = processDrop(page, v, prof_names);
+                            var results = processDrop(page, v, repeating);
                             setAttrs(results.update, {silent: true}, function() {results.callbacks.forEach(function(callback) {callback(); })} );
 
                         });
                     });
                 });
-            } else {
-                var prof_names = [];
-                var results = processDrop(page, v, prof_names);
-                setAttrs(results.update, {silent: true}, function() {results.callbacks.forEach(function(callback) {callback(); })} );
-            }
+            });
+
         });
 
     };
 
-    var processDrop = function(page, currentData, prof_names, looped) {
+    var processDrop = function(page, currentData, repeating, looped) {
         var category = page.data["Category"];
         var callbacks = [];
         var update = {};
@@ -7126,6 +7138,7 @@
             }
             return result;
         };
+        repeating.traits = repeating.traits ? repeating.traits : [];
         update["drop_category"] = "";
         update["drop_name"] = "";
         update["drop_data"] = "";
@@ -7797,32 +7810,48 @@
         }
         if(category === "Feats") {
             update["tab"] = "core";
-            if(page.name) {update["repeating_traits_" + id + "_name"] = page.name};
-            if(page.content) {update["repeating_traits_" + id + "_description"] = page.content};
-            update["repeating_traits_" + id + "_source"] = "Feat";
-            update["repeating_traits_" + id + "_source_type"] = page.data["Properties"] ? page.data["Properties"] : "";
-            update["repeating_traits_" + id + "_options-flag"] = "0";
-            update["repeating_traits_" + id + "_display_flag"] = "on";
+            var match = {name: page.name};
+            var existing = _.findWhere(repeating.traits, match);
+            var newrowid = generateRowID();
+            if(existing) {
+                newrowid = existing.id;
+                existing.name = page.name;
+                existing.source = "Feat";
+                existing.type = page.data["Properties"] ? page.data["Properties"] : "";
+            } else {
+                var newtrait = {};
+                newtrait.id = newrowid;
+                newtrait.name = page.name;
+                newtrait.source = "Feat";
+                newtrait.type = page.data["Properties"] ? page.data["Properties"] : "";
+                repeating.traits.push(newtrait);
+            }
+            if(page.name) {update["repeating_traits_" + newrowid + "_name"] = page.name};
+            if(page.content) {update["repeating_traits_" + newrowid + "_description"] = page.content};
+            update["repeating_traits_" + newrowid + "_source"] = "Feat";
+            update["repeating_traits_" + newrowid + "_source_type"] = page.data["Properties"] ? page.data["Properties"] : "";
+            update["repeating_traits_" + newrowid + "_options-flag"] = "0";
+            update["repeating_traits_" + newrowid + "_display_flag"] = "on";
         }
         if(category === "Proficiencies") {
             var newrowid = generateRowID();
             var type = page.data["Type"] || "";
             if(type.toLowerCase() === "language" || type.toLowerCase() === "armor"
                 || type.toLowerCase() === "weapon" || type.toLowerCase() === "other") {
-                if( prof_names.indexOf(page.name.toLowerCase()) == -1 ) {
+                if( repeating.prof_names.indexOf(page.name.toLowerCase()) == -1 ) {
                     update["repeating_proficiencies_" + newrowid + "_prof_type"] = type.replace("custom", "").toUpperCase();
                     update["repeating_proficiencies_" + newrowid + "_name"] = page.name;
                     update["repeating_proficiencies_" + newrowid + "_options-flag"] = 0;
-                    prof_names.push(page.name.toLowerCase());
+                    repeating.prof_names.push(page.name.toLowerCase());
                 };
             }
             else if(type.toLowerCase() === "tool" || type.toLowerCase() === "skillcustom") {
-                if( prof_names.indexOf(page.name.toLowerCase()) == -1 ) {
+                if( repeating.prof_names.indexOf(page.name.toLowerCase()) == -1 ) {
                     update["repeating_tool_" + newrowid + "_toolname"] = page.name;
                     update["repeating_tool_" + newrowid + "_toolattr_base"] = "?{Attribute?|Strength,@{strength_mod}|Dexterity,@{dexterity_mod}|Constitution,@{constitution_mod}|Intelligence,@{intelligence_mod}|Wisdom,@{wisdom_mod}|Charisma,@{charisma_mod}}";
                     update["repeating_tool_" + newrowid + "_options-flag"] = 0;
                     if(page.data["toolbonus_base"]) { update["repeating_tool_" + newrowid + "_toolbonus_base"] = page.data["toolbonus_base"] };
-                    prof_names.push(page.name.toLowerCase());
+                    repeating.prof_names.push(page.name.toLowerCase());
                     callbacks.push( function() {update_tool(newrowid);} );
                 };
             }
@@ -7872,18 +7901,6 @@
                 update["base_level"] = currentData.base_level ? currentData.base_level : "1";
                 update["hit_dice_max"] = update["base_level"] + page.data["Hit Die"];
                 update["hit_dice"] = update["base_level"];
-            }
-            if(page.data["data-Traits"]) {
-                var traits = jsonparse(page.data["data-Traits"]);
-                _.each(traits, function(value) {
-                    var id = generateRowID();
-                    update["repeating_traits_" + id + "_name"] = value["Name"];
-                    update["repeating_traits_" + id + "_description"] = value["Desc"];
-                    update["repeating_traits_" + id + "_source"] = "Class";
-                    update["repeating_traits_" + id + "_source_type"] = page.name ? page.name : "";
-                    update["repeating_traits_" + id + "_options-flag"] = "0";
-                    update["repeating_traits_" + id + "_display_flag"] = "on";
-                });
             }
             if(page.data["data-Saving Throws"]) {
                 var saves = jsonparse(page.data["data-Saving Throws"]);
@@ -8000,18 +8017,6 @@
                 update["repeating_hpmod_" + id + "_mod"] = page.data["data-HP per level"];
                 update["repeating_hpmod_" + id + "_source"] = page.name ? page.name : "Subclass";
             }
-            if(page.data["data-Traits"]) {
-                var traits = jsonparse(page.data["data-Traits"]);
-                _.each(traits, function(value) {
-                    var id = generateRowID();
-                    update["repeating_traits_" + id + "_name"] = value["Name"];
-                    update["repeating_traits_" + id + "_description"] = value["Desc"];
-                    update["repeating_traits_" + id + "_source"] = "Class";
-                    update["repeating_traits_" + id + "_source_type"] = page.name ? page.name : "";
-                    update["repeating_traits_" + id + "_options-flag"] = "0";
-                    update["repeating_traits_" + id + "_display_flag"] = "on";
-                });
-            }
             if(!looped) {
                 callbacks.push(update_class);
             }
@@ -8029,21 +8034,6 @@
             };
             if(page.data["Speed"]) {update["speed"] = page.data["Speed"]};
             if(page.data["Size"]) {update["size"] = page.data["Size"]};
-
-            if(page.data["data-Traits"]) {
-                var trait_array = jsonparse(page.data["data-Traits"]);
-                if(trait_array && trait_array.length) {
-                    _.each(trait_array, function(trait) {
-                        newrowid = generateRowID();
-                        update["repeating_traits_" + newrowid + "_name"] = trait["Name"];
-                        update["repeating_traits_" + newrowid + "_description"] = trait["Desc"];
-                        update["repeating_traits_" + newrowid + "_source"] = "Racial";
-                        update["repeating_traits_" + newrowid + "_source_type"] = page.name;
-                        update["repeating_traits_" + newrowid + "_options-flag"] = 0;
-                        update["repeating_traits_" + newrowid + "_display_flag"] = "on";
-                    });
-                };
-            };
 
             if(page.data["data-Actions"]) {
                 var actionsobj = {};
@@ -8110,20 +8100,8 @@
                 update["repeating_traits_" + id + "_options-flag"] = "0";
                 update["repeating_traits_" + id + "_display_flag"] = "on";
             }
-            if(page.data["data-Traits"]) {
-                var traits = jsonparse(page.data["data-Traits"]);
-                _.each(traits, function(value) {
-                    var id = generateRowID();
-                    update["repeating_traits_" + id + "_name"] = value["Name"];
-                    update["repeating_traits_" + id + "_description"] = value["Desc"];
-                    update["repeating_traits_" + id + "_source"] = "Background";
-                    update["repeating_traits_" + id + "_source_type"] = page.name ? page.name : "";
-                    update["repeating_traits_" + id + "_options-flag"] = "0";
-                    update["repeating_traits_" + id + "_display_flag"] = "on";
-                });
-            }
         }
-        //This one is just a catch-all for proficiencies, as they are formated the same regardless of the category
+        //This one is just a catch-all for proficiencies and traits, as they are formated the same regardless of the category
         if(["Races", "Subraces", "Classes", "Subclasses", "Backgrounds"].indexOf(category) != -1) {
             if(page.data["data-Skill Proficiency"]) {
                 var skill_array = jsonparse(page.data["data-Skill Proficiency"]);
@@ -8139,12 +8117,12 @@
                     var lang_array = jsonparse(page.data["data-Language Proficiency"]);
                     if(lang_array["Proficiencies"] && lang_array["Proficiencies"].length) {
                         _.each(lang_array["Proficiencies"], function(prof) {
-                            if( prof_names.indexOf(prof.toLowerCase()) == -1 ) {
+                            if( repeating.prof_names.indexOf(prof.toLowerCase()) == -1 ) {
                                 newrowid = generateRowID();
                                 update["repeating_proficiencies_" + newrowid + "_prof_type"] = "LANGUAGE";
                                 update["repeating_proficiencies_" + newrowid + "_name"] = prof;
                                 update["repeating_proficiencies_" + newrowid + "_options-flag"] = 0;
-                                prof_names.push(prof.toLowerCase());
+                                repeating.prof_names.push(prof.toLowerCase());
                             }
                         });
                     }
@@ -8153,12 +8131,12 @@
                     var weap_array = jsonparse(page.data["data-Weapon Proficiency"]);
                     if(weap_array["Proficiencies"] && weap_array["Proficiencies"].length) {
                         _.each(weap_array["Proficiencies"], function(prof) {
-                            if( prof_names.indexOf(prof.toLowerCase()) == -1 ) {
+                            if( repeating.prof_names.indexOf(prof.toLowerCase()) == -1 ) {
                                 newrowid = generateRowID();
                                 update["repeating_proficiencies_" + newrowid + "_prof_type"] = "WEAPON";
                                 update["repeating_proficiencies_" + newrowid + "_name"] = prof;
                                 update["repeating_proficiencies_" + newrowid + "_options-flag"] = 0;
-                                prof_names.push(prof.toLowerCase());
+                                repeating.prof_names.push(prof.toLowerCase());
                             }
                         });
                     }
@@ -8167,12 +8145,12 @@
                     var armor_array = jsonparse(page.data["data-Armor Proficiency"]);
                     if(armor_array["Proficiencies"] && armor_array["Proficiencies"].length) {
                         _.each(armor_array["Proficiencies"], function(prof) {
-                            if( prof_names.indexOf(prof.toLowerCase()) == -1 ) {
+                            if( repeating.prof_names.indexOf(prof.toLowerCase()) == -1 ) {
                                 newrowid = generateRowID();
                                 update["repeating_proficiencies_" + newrowid + "_prof_type"] = "ARMOR";
                                 update["repeating_proficiencies_" + newrowid + "_name"] = prof;
                                 update["repeating_proficiencies_" + newrowid + "_options-flag"] = 0;
-                                prof_names.push(prof.toLowerCase());
+                                repeating.prof_names.push(prof.toLowerCase());
                             }
                         });
                     }
@@ -8181,23 +8159,69 @@
                     var tool_array = jsonparse(page.data["data-Tool Proficiency"]);
                     if(tool_array["Proficiencies"] && tool_array["Proficiencies"].length) {
                         _.each(tool_array["Proficiencies"], function(prof) {
-                            if( prof_names.indexOf(prof.toLowerCase()) == -1 ) {
+                            if( repeating.prof_names.indexOf(prof.toLowerCase()) == -1 ) {
                                 newrowid = generateRowID();
                                 update["repeating_tool_" + newrowid + "_toolname"] = prof;
                                 update["repeating_tool_" + newrowid + "_toolattr_base"] = "?{Attribute?|Strength,@{strength_mod}|Dexterity,@{dexterity_mod}|Constitution,@{constitution_mod}|Intelligence,@{intelligence_mod}|Wisdom,@{wisdom_mod}|Charisma,@{charisma_mod}}";
                                 update["repeating_tool_" + newrowid + "_options-flag"] = 0;
-                                prof_names.push(prof.toLowerCase());
+                                repeating.prof_names.push(prof.toLowerCase());
                                 callbacks.push( function() {update_tool(newrowid);} );
                             }
                         });
                     }
                 };
             }
+            // "Background", "Racial", "Class"
+            if(page.data["data-Traits"]) {
+                var traitsource = "";
+                switch (category) {
+                    case "Races":
+                    case "Subraces":
+                        traitsource = "Racial";
+                        break;
+                    case "Classes":
+                    case "Subclasses":
+                        traitsource = "Class";
+                        break;
+                    default:
+                        traitsource = "Background";
+                }
+                var trait_array = jsonparse(page.data["data-Traits"]);
+                if(trait_array && trait_array.length) {
+                    _.each(trait_array, function(trait) {
+                        var match = {name: trait["Name"], type: page.name};
+                        if(trait["Replace"]) {
+                            match = {name: trait["Replace"]};
+                        }
+                        var existing = _.findWhere(repeating.traits, match);
+                        if(existing) {
+                            newrowid = existing.id;
+                            existing.name = trait["Name"];
+                            existing.source = traitsource;
+                            existing.type = page.name;
+                        } else {
+                            var newtrait = {};
+                            newrowid = generateRowID();
+                            newtrait.id = newrowid;
+                            newtrait.name = trait["Name"];
+                            newtrait.source = traitsource;
+                            newtrait.type = page.name;
+                            repeating.traits.push(newtrait);
+                        }
+                        update["repeating_traits_" + newrowid + "_name"] = trait["Name"];
+                        update["repeating_traits_" + newrowid + "_description"] = trait["Desc"];
+                        update["repeating_traits_" + newrowid + "_source"] = traitsource;
+                        update["repeating_traits_" + newrowid + "_source_type"] = page.name ? page.name : "";
+                        update["repeating_traits_" + newrowid + "_options-flag"] = 0;
+                        update["repeating_traits_" + newrowid + "_display_flag"] = "on";
+                    });
+                };
+            };
         }
 
         return {
             update: update,
-            prof_names: prof_names,
+            repeating: repeating,
             callbacks: callbacks
         };
     };
@@ -11118,7 +11142,7 @@
                 v.npc = "0";
                 var update = {};
                 var callbacks = [];
-                var profNames = [];
+                var repeating = {prof_names: []}
                 var totalDrops = dropArray.length;
                 var x = 0;
                 callbacks.push(update_class);
@@ -11126,10 +11150,10 @@
 
                 _.each(dropArray, function(page) {
                     page.data.Category = page.data.Category.replace("@@!!@@", "");
-                    var dropUpdate = processDrop(page, v, profNames, true);
+                    var dropUpdate = processDrop(page, v, repeating, true);
                     callbacks = callbacks.concat(dropUpdate.callbacks);
-                    profNames = _.uniq(profNames.concat(dropUpdate.prof_names));
-                    update = _.extend(dropUpdate.update, update);
+                    repeating.prof_names = _.uniq(repeating.prof_names.concat(dropUpdate.prof_names));
+                    update = _.extend(update, dropUpdate.update);
                     x++;
                     setCharmancerText({"mancer_progress" :'<div style="width: ' + (parseInt(x/totalDrops*70) + 20) + '%"></div>'});
                 });

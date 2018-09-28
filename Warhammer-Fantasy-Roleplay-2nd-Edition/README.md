@@ -4,6 +4,17 @@ This sheet is created for use in Warhammer 2nd Edition games, based on the chara
 
 ## Features / Changelog
 
+- v2.1.0
+  - Major
+    - Weapons
+      * Ulric's Fury moved to a separate button to more easily conform with core rules
+      * Column that shows Strength Bonus added to melee weapons for clarity
+    - Spellbook
+      * New tab for rituals
+    - Settings
+      * Added option for initiative houserule (Agility Bonus instead of Agility Characteristic)
+  - Minor
+    * Fixed bug that applied Agility Bonus instead of Agility Characteristic
 - v2.0.0
   - Major
     - General
