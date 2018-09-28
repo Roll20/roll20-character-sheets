@@ -3260,6 +3260,7 @@
                                             <option value="cmb" data-i18n="cmb-u">CMB</option>
                                             <option value="bab" data-i18n="bab-full">BAB Full</option>
                                             <option value="bab_max" data-i18n="bab-max">BAB Max</option>
+                                            <option value="fob" data-i18n="fob">Flurry of Blows</option>
                                             <option value="0">-</option>
                                         </select>
                                         <span class="lbl">+</span> <select class="underlined" name="attr_atktype2" title="@{repeating_attacks_$id_atktype2}">
@@ -9234,7 +9235,7 @@
     const pfoglobals_ac_fields = ["npc","ac_bonus","ac_ability_mod","ac_armor","ac_shield","ac_size","ac_natural","ac_deflection","ac_misc","ac_dodge","ac_touch_bonus","ac_flatfooted_bonus","ac_natural_bonus","ac_deflection_bonus","ac_dodge_bonus","ac_noflatflooted","ac_touchshield","ac_condition","ac_secab_monk","ac_ff_ability_mod"];
     const pfoglobals_save_attr = ["base","ability","ability_mod","misc","bonus"];
     const pfoglobals_save_fields = ["fortitude_base","fortitude_ability","fortitude_ability_mod","fortitude_misc","fortitude_bonus","reflex_base","reflex_ability","reflex_ability_mod","reflex_misc","reflex_bonus","will_base","will_ability","will_ability_mod","will_misc","will_bonus"].concat(pfoglobals_mods);
-    const pfoglobals_babs_fields = ["npc","bab","bab_multi","bab_size","cmb_size","cmb_ability","cmb_ability_mod","cmb_misc","cmb_bonus","melee_ability","melee_ability_mod","melee_misc","melee_bonus","ranged_ability","ranged_ability_mod","ranged_misc","ranged_bonus","ac_ability_mod","ac_dodge_bonus","ac_dodge","ac_deflection_bonus","ac_deflection","cmd_misc","cmd_bonus","cmd_condition","ac_condition_nobonus"].concat(pfoglobals_mods);
+    const pfoglobals_babs_fields = ["npc","bab","bab_multi","bab_size","cmb_size","cmb_ability","cmb_ability_mod","cmb_misc","cmb_bonus","melee_ability","melee_ability_mod","melee_misc","melee_bonus","ranged_ability","ranged_ability_mod","ranged_misc","ranged_bonus","ac_ability_mod","ac_dodge_bonus","ac_dodge","ac_deflection_bonus","ac_deflection","cmd_misc","cmd_bonus","cmd_condition","ac_condition_nobonus","class1_name","class2_name","class3_name","class1_bab","class2_bab","class3_bab","class1_level","class2_level","class3_level"].concat(pfoglobals_mods);
     const pfoglobals_skill_list = ["acrobatics","appraise","bluff","climb","craft","diplomacy","disable_device","disguise","escape_artist","fly","handle_animal","heal","intimidate","knowledge_arcana","knowledge_dungeoneering","knowledge_engineering","knowledge_geography","knowledge_history","knowledge_local","knowledge_nature","knowledge_nobility","knowledge_planes","knowledge_religion","linguistics","perception","perform","profession","ride","sense_motive","sleight_of_hand","spellcraft","stealth","survival","swim","use_magic_device"];
     const pfoglobals_skill_attr = ["classkill","ability","ability_mod","ranks","misc","bonus","armor_penalty"];
     const pfoglobals_skill_fields = ["skill_check_penalty","armor_check_penalty","encumbrance_check_penalty"].concat(pfoglobals_mods);
@@ -9242,7 +9243,7 @@
     var pfoglobals_repsec_skills = [{section:"skillcraft",attrs:pfoglobals_skill_attr},{section:"skillknowledge",attrs:pfoglobals_skill_attr},{section:"skillperform",attrs:pfoglobals_skill_attr},{section:"skillprofession",attrs:pfoglobals_skill_attr},{section:"skillcustom",attrs:pfoglobals_skill_attr}];
     const pfoglobals_atk_attr = ["atkname","atkflag","atktype","atktype2","atkmod","atkvs","atkcritrange","atkrange","dmgflag","dmgbase","dmgattr","dmgmod","dmgcritmulti","dmgtype","dmgbonusdice","dmg2flag","dmg2base","dmg2attr","dmg2mod","dmg2critmulti","dmg2type","dmg2bonusdice","descflag","atkdesc","notes"];
     var pfoglobals_repsec_atk = [{section:"attacks",attrs:pfoglobals_atk_attr}];
-    const pfoglobals_atk_fields = ["npc","strength_oneandahalf_mod","strength_half_mod","dexterity_oneandahalf_mod","dexterity_half_mod","melee_mod","ranged_mod","cmb_mod","bab","bab_max","rollmod_attack","rollnotes_attack","rollmod_damage","whispertype","rollshowchar","bab_multi","melee_multi","ranged_multi","cmb_multi"].concat(pfoglobals_mods);
+    const pfoglobals_atk_fields = ["npc","strength_oneandahalf_mod","strength_half_mod","dexterity_oneandahalf_mod","dexterity_half_mod","melee_mod","ranged_mod","cmb_mod","bab","bab_max","fob","rollmod_attack","rollnotes_attack","rollmod_damage","whispertype","rollshowchar","bab_multi","melee_multi","ranged_multi","cmb_multi","fob_multi"].concat(pfoglobals_mods);
     const pfoglobals_spell_attr = ["spelllevel","spellcaster","spellname","spellschool","spellclasslevel","spellcastingtime","spellrange","spellarea","spelltargets","spelleffect","spellduration","spellsaveflag","spellsave","spelldc_mod","spellresistanceflag","spellresistance","spellatkflag","spellatktype","spellatkmod","spellatkcritrange","spelldmgcritmulti","spelldmgflag","spelldmg","spelldmgtype","spelldmg2flag","spelldmg2","spelldmg2type","spelldescflag","spelldesc","notes"];
     const pfoglobals_spell_only_attr = ["spellcomponent"];
     const pfoglobals_spell_like_attr = ["spelltype","timesperday","perday_max"];
@@ -9989,7 +9990,11 @@
 
     // === Generals
     on("change:npc", (e) => {
-        if((typeof e.newValue == "undefined") || (e.newValue !== "1")) {
+        if(pfoglobals_debug_mode) {
+            console.log("*** DEBUG change:npc:"); // + JSON.stringify(e,null,"  "));
+            console.table(e);
+        }
+        if( (e.sourceType == "player") && ((!e.newValue) || (e.newValue && e.newValue != "1")) ) {
             le_big_stuff("all");
         }
     });
@@ -12472,6 +12477,11 @@
                 setAttrs(update,{silent: false},() => {
                     if(attr == "level") {
                         update_class_names(attr);
+                        getAttrs(pfoglobals_babs_fields, (values) => {
+                            setAttrs(calc_fob(values),{silent: true},() => {
+                                update_attacks("all");
+                            });
+                        });
                     }
                 });
             }
@@ -12700,7 +12710,7 @@
     };
     const calc_babs_all = function(v) {
         // babs for multi attack array
-        var bab = parseInt(v.bab) || 0, update = {}, babarray = [], obj_multi = {}, obj_cmb = {}, obj_melee = {}, obj_ranged = {}, obj_cmd = {} ;
+        var bab = parseInt(v.bab) || 0, update = {}, babarray = [], obj_multi = {}, obj_cmb = {}, obj_melee = {}, obj_ranged = {}, obj_cmd = {}, obj_fob = {};
         var multi = bab;
         do {
             babarray.push(multi);
@@ -12712,7 +12722,8 @@
         obj_melee = calc_babs("melee",v);
         obj_ranged = calc_babs("ranged",v);
         obj_cmd = calc_cmd(v);
-        _.extend(update,obj_multi,obj_cmb,obj_melee,obj_ranged,obj_cmd);
+        obj_fob = calc_fob(v);
+        _.extend(update,obj_multi,obj_cmb,obj_melee,obj_ranged,obj_cmd,obj_fob);
         // DEBUG
         if (pfoglobals_debug_mode) {console.log("*** DEBUG update_babs_all " + JSON.stringify(update));}
         return update;
@@ -12749,6 +12760,46 @@
         update[attr + "_multi"] = atkarray;
         return update;
     };
+    const calc_fob = function(v) {
+        // Flurry of Blows Attack Bonus calculation
+        // ["class1_name","class2_name","class3_name","class1_bab","class2_bab","class3_bab","class1_level","class2_level","class3_level"]
+        let lvl = 0;
+        let bab = 0;
+        let fob = 0;
+        let multi = 0;
+        let farray = [];
+        let fobarray = [];
+        let monkclass = 0;
+        let mod = (parseInt(v.melee_ability_mod) || 0) + (parseInt(v.melee_misc) || 0) + (parseInt(v.melee_bonus) || 0);
+        for(let i = 1; i < 4; i++) {
+            if(v["class" + i + "_name"].match(/monk/i) && !monkclass) {
+                lvl = parseInt(v["class" + i + "_level"]) || 1;
+                monkclass = i;
+            } else {
+                bab += parseInt(v["class" + i + "_bab"]) || 0;
+            }
+        }
+        if(lvl > 0) {
+            fob = bab + lvl;
+            multi = fob;
+            do {
+                farray.push(multi);
+                multi = multi - 5;
+            } while (multi > 0);
+            _.each(farray, (f) => {
+                fobarray.push(f - 2, f - 2);
+            });
+            if(fobarray.length > 2) { // PF weirdness
+                fobarray.splice(-1,1);
+            }
+        } else {
+            fobarray.push(0);
+        }
+        let update = {};
+        update["fob"] = fob;
+        update["fob_multi"] = fobarray;
+        return update;
+    }
 
     // === WEAPONS/ATTACKS
     const update_attacks = function(update_id) {
@@ -12792,11 +12843,31 @@
                 if (pfoglobals_debug_mode) {console.log("*** DEBUG calc_attacks ids: " + attackid);}
                 if( (attributename.length === 0) || (attributename == "all") || ((v["repeating_attacks_" + attackid + "_atktype"] && v["repeating_attacks_" + attackid + "_atktype"].includes(attributename)) || (v["repeating_attacks_" + attackid + "_atktype2"] && v["repeating_attacks_" + attackid + "_atktype2"].includes(attributename)) || (v["repeating_attacks_" + attackid + "_dmgattr"] && v["repeating_attacks_" + attackid + "_dmgattr"].includes(attributename)) || (v["repeating_attacks_" + attackid + "_dmg2attr"] && v["repeating_attacks_" + attackid + "_dmg2attr"].includes(attributename))) ) {
                     if (pfoglobals_debug_mode) {console.log("*** DEBUG UPDATING ATTACK: " + attackid);}
+
                     var i = 0, tmpint = 0, stemp = "", atkbonus = 0, atkbonusdisplay = "-", atkbonusdisplay1 = " ", atkbonusdisplay2 = " ", atkbonusdisplay3 = " ", atkdmg = "", atkdmgbonus = 0, atkdmg2bonus = 0, atkdmgdisplay = "-", atkdmg2display = "-", atkdisplay = " ", rollbase = "", rollatk = " ", rollatk1 = " ", rollatk2 = " ", rollatk3 = " ", rolldmg = "", rolldmgonly = "", rolltype = "", rollnotes = "", conditions = "", condatknotes = "", conddmgnotes = "", atktype = 0, atktypearray = [];
                     var atkname = v["repeating_attacks_" + attackid + "_atkname"];
                     var atkflag = v["repeating_attacks_" + attackid + "_atkflag"];
-                    if ((v["repeating_attacks_" + attackid + "_atktype"] == "bab") || (v["repeating_attacks_" + attackid + "_atktype"] == "bab_max"))  {atktype = parseInt(v.bab) || 0;}
-                    else {atktype = parseInt(v[v["repeating_attacks_" + attackid + "_atktype"] + "_mod"]) || 0;}
+
+                    // Base atk bonus
+                    if ((v["repeating_attacks_" + attackid + "_atktype"] == "bab") || (v["repeating_attacks_" + attackid + "_atktype"] == "bab_max"))  {
+                        atktype = parseInt(v.bab) || 0;
+                    } else {
+                        atktype = parseInt(v[v["repeating_attacks_" + attackid + "_atktype"] + "_mod"]) || 0;
+                    }
+                    // Multi attack base handling
+                    if (["bab","melee","ranged","cmb","fob"].includes(v["repeating_attacks_" + attackid + "_atktype"])) {
+                        var multi = "";
+                        if(v[v["repeating_attacks_" + attackid + "_atktype"] + "_multi"]) {
+                            multi = v[v["repeating_attacks_" + attackid + "_atktype"] + "_multi"];
+                        } else {
+                            multi = atktype;
+                        }
+                        atktypearray = JSON.parse("[" + multi + "]");
+                    }
+                    if (v["repeating_attacks_" + attackid + "_atktype"] == "fob") {
+                        atktype = parseInt(atktypearray[0]) || parseInt(v.fob) || 0;
+                    }
+
                     var atktype2 = parseInt(v[v["repeating_attacks_" + attackid + "_atktype2"] + "_mod"]) || 0;
                     var atkmod = v["repeating_attacks_" + attackid + "_atkmod"];
                     var atkvs = v["repeating_attacks_" + attackid + "_atkvs"];
@@ -12821,17 +12892,12 @@
                     var descflag = v["repeating_attacks_" + attackid + "_descflag"];
                     var atkdesc = v["repeating_attacks_" + attackid + "_atkdesc"];
                     var atknotes = v["repeating_attacks_" + attackid + "_notes"];
+
                     // Handling empty values
                     if (!atkmod.length) {atkmod = "0";}
                     if (!dmgmod.length) {dmgmod = "0";}
                     if (!dmg2mod.length) {dmg2mod = "0";}
-                    // Multi attack base handling
-                    if (["bab","melee","ranged","cmb"].includes(v["repeating_attacks_" + attackid + "_atktype"])) {
-                        var multi = "";
-                        if(typeof v[v["repeating_attacks_" + attackid + "_atktype"] + "_multi"] !== "undefined") {multi = v[v["repeating_attacks_" + attackid + "_atktype"] + "_multi"];}
-                        else {multi = atktype;}
-                        atktypearray = JSON.parse("[" + multi + "]");
-                    }
+
                     // == Display handling
                     atkbonus = atktype + atktype2 + (parseInt(atkmod) || 0);
                     atkdmgbonus = dmgattr + (parseInt(dmgmod) || 0);
@@ -12839,11 +12905,16 @@
                     if(atkflag != "0") {
                         atkdisplay ="";
                         if (v["repeating_attacks_" + attackid + "_atktype"] != "0") {
-                            if(v["repeating_attacks_" + attackid + "_atktype"] == "bab_max") {atkdisplay += pfoglobals_i18n_obj["bab"];}
-                            else {atkdisplay += pfoglobals_i18n_obj[v["repeating_attacks_" + attackid + "_atktype"]];}
+                            if(v["repeating_attacks_" + attackid + "_atktype"] == "bab_max") {
+                                atkdisplay += pfoglobals_i18n_obj["bab"];
+                            } else {
+                                atkdisplay += pfoglobals_i18n_obj[v["repeating_attacks_" + attackid + "_atktype"]];
+                            }
                         }
                         if (v["repeating_attacks_" + attackid + "_atktype2"] != "0") {
-                            if (atkdisplay.trim().length >0) {atkdisplay += "+";}
+                            if (atkdisplay.trim().length >0) {
+                                atkdisplay += "+";
+                            }
                             atkdisplay += pfoglobals_i18n_obj[v["repeating_attacks_" + attackid + "_atktype2"]];
                         }
                         atkdisplay = "(" + atkdisplay + " " + pfoglobals_i18n_obj["vs"] + " " + pfoglobals_i18n_obj[atkvs] + ")";
@@ -12876,10 +12947,18 @@
                     update["repeating_attacks_" + attackid + "_atkbonusdisplay3"] = atkbonusdisplay3;
                     update["repeating_attacks_" + attackid + "_atkdmgdisplay"] = atkdmgdisplay;
                     update["repeating_attacks_" + attackid + "_atkdmgdisplay2"] = atkdmg2display;
+
                     // == Rolls handling
-                    if(descflag != "0") {atkdesc = "{{descflag=[[1]]}}{{desc=" + atkdesc + "}}";} // desc
-                    if(v["rollnotes_attack"] != "0") {rollnotes = "{{shownotes=[[1]]}}{{notes=" + atknotes + "}}";} // notes
-                    if(atkrange.length != 0) {atkrange = "{{range=" + atkrange + "}}";} // range
+                    if(descflag != "0") {  // desc
+                        atkdesc = "{{descflag=[[1]]}}{{desc=" + atkdesc + "}}";
+                    }
+                    if(v["rollnotes_attack"] != "0") { // notes
+                        rollnotes = "{{shownotes=[[1]]}}{{notes=" + atknotes + "}}";
+                    }
+                    if(atkrange.length != 0) { // range
+                        atkrange = "{{range=" + atkrange + "}}";
+                    }
+
                     // roll attack
                     if(atkflag != "0") {
                         stemp = atktype + "[" + pfoglobals_i18n_obj[v["repeating_attacks_" + attackid + "_atktype"]] + "]+"
@@ -12924,6 +13003,7 @@
                         conditions += "{{conditionsflag=[[@{attack_condition}]]}} {{conditions=@{conditions_display}}}";
                         condatknotes += ((v["repeating_attacks_" + attackid + "_atktype"] == "cmb") ? "@{cmb_condition_note}" : "") + "@{attack_condition_note}";
                     }
+
                     // roll damage
                     if( (dmgflag != "0") || (dmg2flag != "0") ) {
                         rolltype += "damage";
@@ -12994,13 +13074,26 @@
                         rollbase += rolldmg;
                         conddmgnotes += "@{damage_condition_note}"; // conditions
                     }
+
                     // final rolls values
-                    if (rollbase.trim().length > 0) {rollbase = "@{whispertype} &{template:pc" + "}{{name=" + atkname + "}}{{type=" + rolltype + "}}{{showchar=@{rollshowchar}}}{{charname=@{character_name}}}" + rollbase + conditions + "{{conditionsnote=" + condatknotes + conddmgnotes + "}}";}
-                    if (rollatk.trim().length > 0) {rollatk = "@{whispertype} &{template:pc" + "}{{name=" + atkname + "}}{{type=attack}}{{showchar=@{rollshowchar}}}{{charname=@{character_name}}}" + atkflag + atkrange + rollatk + conditions + "{{conditionsnote=" + condatknotes + "}}";}
-                    if (rollatk1.trim().length > 0) {rollatk1 = "@{whispertype} &{template:pc" + "}{{smallname=" + atkname + "}}{{type=attack}}{{showchar=@{rollshowchar}}}{{charname=@{character_name}}}" + atkflag + rollatk1 + conditions + "{{conditionsnote=" + condatknotes + "}}";}
-                    if (rollatk2.trim().length > 0) {rollatk2 = "@{whispertype} &{template:pc" + "}{{smallname=" + atkname + "}}{{type=attack}}{{showchar=@{rollshowchar}}}{{charname=@{character_name}}}" + atkflag + rollatk2 + conditions + "{{conditionsnote=" + condatknotes + "}}";}
-                    if (rollatk3.trim().length > 0) {rollatk3 = "@{whispertype} &{template:pc" + "}{{smallname=" + atkname + "}}{{type=attack}}{{showchar=@{rollshowchar}}}{{charname=@{character_name}}}" + atkflag + rollatk3 + conditions + "{{conditionsnote=" + condatknotes + "}}";}
-                    if (rolldmg.trim().length > 0) {rolldmgonly = "@{whispertype} &{template:pc" + "}{{smallname=" + atkname + "}}{{type=damage}}{{showchar=@{rollshowchar}}}{{charname=@{character_name}}}" + rolldmgonly + "{{conditionsnote=" + conddmgnotes + "}}";}
+                    if (rollbase.trim().length > 0) {
+                        rollbase = "@{whispertype} &{template:pc" + "}{{name=" + atkname + "}}{{type=" + rolltype + "}}{{showchar=@{rollshowchar}}}{{charname=@{character_name}}}" + rollbase + conditions + "{{conditionsnote=" + condatknotes + conddmgnotes + "}}";
+                    }
+                    if (rollatk.trim().length > 0) {
+                        rollatk = "@{whispertype} &{template:pc" + "}{{name=" + atkname + "}}{{type=attack}}{{showchar=@{rollshowchar}}}{{charname=@{character_name}}}" + atkflag + atkrange + rollatk + conditions + "{{conditionsnote=" + condatknotes + "}}";
+                    }
+                    if (rollatk1.trim().length > 0) {
+                        rollatk1 = "@{whispertype} &{template:pc" + "}{{smallname=" + atkname + "}}{{type=attack}}{{showchar=@{rollshowchar}}}{{charname=@{character_name}}}" + atkflag + rollatk1 + conditions + "{{conditionsnote=" + condatknotes + "}}";
+                    }
+                    if (rollatk2.trim().length > 0) {
+                        rollatk2 = "@{whispertype} &{template:pc" + "}{{smallname=" + atkname + "}}{{type=attack}}{{showchar=@{rollshowchar}}}{{charname=@{character_name}}}" + atkflag + rollatk2 + conditions + "{{conditionsnote=" + condatknotes + "}}";
+                    }
+                    if (rollatk3.trim().length > 0) {
+                        rollatk3 = "@{whispertype} &{template:pc" + "}{{smallname=" + atkname + "}}{{type=attack}}{{showchar=@{rollshowchar}}}{{charname=@{character_name}}}" + atkflag + rollatk3 + conditions + "{{conditionsnote=" + condatknotes + "}}";
+                    }
+                    if (rolldmg.trim().length > 0) {
+                        rolldmgonly = "@{whispertype} &{template:pc" + "}{{smallname=" + atkname + "}}{{type=damage}}{{showchar=@{rollshowchar}}}{{charname=@{character_name}}}" + rolldmgonly + "{{conditionsnote=" + conddmgnotes + "}}";
+                    }
                     update["repeating_attacks_" + attackid + "_rollbase"] = rollbase;
                     update["repeating_attacks_" + attackid + "_rollbase_atk"] = rollatk;
                     update["repeating_attacks_" + attackid + "_rollbase_atk1"] = rollatk1;
@@ -14243,6 +14336,7 @@
         pfoglobals_i18n_obj["melee"] = getTranslationByKey("melee");
         pfoglobals_i18n_obj["ranged"] = getTranslationByKey("ranged");
         pfoglobals_i18n_obj["cmb"] = getTranslationByKey("cmb-u");
+        pfoglobals_i18n_obj["fob"] = getTranslationByKey("fob");
         pfoglobals_i18n_obj["cmd"] = getTranslationByKey("cmd-u");
         pfoglobals_i18n_obj["ac"] = getTranslationByKey("ac-u");
         pfoglobals_i18n_obj["touch"] = getTranslationByKey("touch");
