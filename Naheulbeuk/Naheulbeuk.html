@@ -1,9 +1,9 @@
-<script type="text/worker">
+﻿<script type="text/worker">
 	// Primary Stats
 	var primaryStats = [ "stats_courage", "stats_intelligence", "stats_charisme", "stats_adresse", "stats_force", "stats_attaque", "stats_parade"];
 	// Secondary Stats
 	var secondaryStats = [	"stats_charisme_total", "stats_intelligence_total", "stats_adresse_total", "stats_force_total", "stats_courage_total",
-							"stats_magiepsy_mod", "stats_magiephy_mod", "stats_resimagie_mod", "stats_fouille_mod", "stats_jet_mod" ];
+							"stats_inge_mod", "stats_magiepsy_mod", "stats_magiephy_mod", "stats_resimagie_mod", "stats_fouille_mod", "stats_jet_mod" ];
 	var prStats = {
 		change: [ "repeating_armures:armure_prphy", "repeating_armures:armure_prmag", "prnat" ],
 		remove: [ "repeating_armures" ]
@@ -53,6 +53,19 @@
 	on("change:personnage_niveau", function() {
 		updateXP();
 	});
+	// Ammos & Weapons
+	on("change:repeating_armes:munition_nom", function( e ) {
+		if( e[ "sourceType"] === "player" ) {
+			updateAmmo( e );
+		}
+	});
+	on("change:repeating_armes:arme_portee change:repeating_armes:arme_at change:repeating_armes:arme_degats change:repeating_armes:arme_bonusforce change:repeating_armes:munition_modad change:repeating_armes:munition_degats", function( e ) {
+		var idRow = e[ "sourceAttribute" ].split( '_' )[2];
+		updateWeapon( idRow );
+	});
+	on("change:stats_jet_total change:stats_attaque_total change:bonusdegatsforce", function( e ) {
+		updateWeapons();
+	});
 	// Total golds
 	on("change:richesse_or change:richesse_argent change:richesse_cuivre", function() {
 		updatePO();
@@ -95,6 +108,19 @@
 	on("change:tab_ecolemagie change:tab_niveaumagie", function() {
 		displayMagicSpells();
 	});
+	// Crating
+	on("change:reparation_qualite change:reparation_specialiste", function( ) {
+		updateRepair();
+	});
+	on("change:repeating_recettes:recette_specialiste change:repeating_recettes:recette_difficulte change:repeating_recettes:recette_malusspecialiste", function( e ) {
+		var idRow = e[ 'sourceAttribute' ].split('_')[2];
+		updateRecipe( idRow );
+	});
+	on("change:stats_inge_total", function() {
+		updateRepair();
+		updateRecipes();
+	});
+
 	// export
 	on("change:export_start", function() {
 		start_export();
@@ -112,7 +138,7 @@
 	function safeInt( val ) { return parseInt( val, 10 ) || 0;	}
 
 	function structSafeInt( v ) {
-		for( attr in v ) {
+		for( var attr in v ) {
 			v[ attr ] = safeInt( v[ attr ] );
 		}
 		return v;
@@ -121,7 +147,7 @@
 	function safeFloat( val ) { return parseFloat( val ) || 0;	}
 
 	function structSafeFloat( v ) {
-		for( attr in v ) {
+		for( var attr in v ) {
 			v[ attr ] = safeFloat( v[ attr ] );
 		}
 		return v;
@@ -138,6 +164,7 @@
 	function updateSecondaryStats() {
 		getAttrs( secondaryStats, function( sValues ) {
 			var v = structSafeInt( sValues );
+			var ingeniosite = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_adresse_total" ] ) / 2 );
 			var magiePsy = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_charisme_total" ] ) / 2 );
 			var magiePhy = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_adresse_total" ] ) / 2 );
 			var resiMagie = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_courage_total" ] + v[ "stats_force_total" ] ) / 3 );
@@ -168,6 +195,8 @@
 			}
 
 			setAttrs({
+				"stats_inge": ingeniosite,
+				"stats_inge_total": ingeniosite + v[ "stats_inge_mod" ],
 				"stats_magiepsy": magiePsy,
 				"stats_magiepsy_total": magiePsy + v[ "stats_magiepsy_mod" ],
 				"stats_magiephy": magiePhy,
@@ -285,6 +314,77 @@
 
 			setAttrs({
 				"personnage_xp_max": safeInt( levelAndXP[ level ], { silent : true} )
+			});
+		});
+	}
+
+	function updateWeapon( idRow ) {
+		var sWeapon = {};
+
+		getAttrs( [
+					`repeating_armes_${idRow}_arme_portee`, `repeating_armes_${idRow}_arme_at`, `repeating_armes_${idRow}_arme_degats`, `repeating_armes_${idRow}_arme_bonusforce`,
+					`repeating_armes_${idRow}_munition_modAd`, `repeating_armes_${idRow}_munition_degats`,
+					"stats_jet_total", "stats_attaque_total", "bonusdegatsforce"
+				] , function( v ) {
+
+			sWeapon[ 'repeating_armes_' + idRow + '_arme_munition_display' ] = 0;
+			sWeapon[ 'repeating_armes_' + idRow + '_arme_totalat' ] = safeInt( v[ "stats_attaque_total" ] ) + safeInt( v[ `repeating_armes_${idRow}_arme_at` ] );
+			sWeapon[ 'repeating_armes_' + idRow + '_arme_totaldegats' ] = v[ `repeating_armes_${idRow}_arme_degats` ];
+
+			if( v[ `repeating_armes_${idRow}_arme_portee` ] === 'Dist.' ) {
+				sWeapon[ 'repeating_armes_' + idRow + '_arme_munition_display' ] = 1;
+				sWeapon[ 'repeating_armes_' + idRow + '_arme_totalat' ] = safeInt( v[ "stats_jet_total" ] ) + safeInt( v[ `repeating_armes_${idRow}_arme_at` ] ) + safeInt( v[ `repeating_armes_${idRow}_munition_modAd` ] );
+				sWeapon[ 'repeating_armes_' + idRow + '_arme_totaldegats' ] = v[ `repeating_armes_${idRow}_arme_degats` ] + " + " + v[ `repeating_armes_${idRow}_munition_degats` ];
+			}
+
+			if( v[ `repeating_armes_${idRow}_arme_bonusforce` ] === "1" ) {
+				sWeapon[ 'repeating_armes_' + idRow + '_arme_totaldegats' ] += " + " + v[ "bonusdegatsforce" ];
+			}
+
+			console.log(v);
+			console.log(sWeapon);
+
+			setAttrs( sWeapon, { silent: true } );
+		});
+	}
+
+	function updateWeapons() {
+		getSectionIDs( "repeating_armes", function(idArray) {
+			for( var i in idArray ) {
+				updateWeapon( idArray[ i ] );
+			}
+		});
+	}
+
+	function updateAmmo( eventInfo ) {
+		var ammo_selected = eventInfo[ "newValue" ];
+		var idRow = eventInfo[ "sourceAttribute" ].split( '_' )[2];
+		var idAmmo = 0;
+		var sWeapon = {};
+
+		sWeapon[ 'repeating_armes_' + idRow + '_munition_degats' ] = "";
+		sWeapon[ 'repeating_armes_' + idRow + '_munition_modAd' ] = 0;
+		sWeapon[ 'repeating_armes_' + idRow + '_munition_nom' ] = "";
+
+		getSectionIDs( "repeating_munitions", function(idarray) {
+			getAttrs( [ ...idarray.map(id => `repeating_munitions_${id}_munition_nom`) ], function( sValues ) {
+				for( var i in idarray ) {
+					if( ammo_selected === sValues[`repeating_munitions_${idarray[i]}_munition_nom`] ) {
+						idAmmo = idarray[i];
+					}
+				}
+
+				if( idAmmo != 0 ) {
+					getAttrs( [ `repeating_munitions_${idAmmo}_munition_modAd`, `repeating_munitions_${idAmmo}_munition_degats` ], function( v ) {
+						sWeapon[ 'repeating_armes_' + idRow + '_munition_degats' ] = v[ `repeating_munitions_${idAmmo}_munition_degats` ];
+						sWeapon[ 'repeating_armes_' + idRow + '_munition_modAd' ] = v[ `repeating_munitions_${idAmmo}_munition_modAd` ];
+						sWeapon[ 'repeating_armes_' + idRow + '_munition_nom' ] = ammo_selected;
+
+						setAttrs( sWeapon );
+					});
+				} else {
+					setAttrs( sWeapon );
+				}
 			});
 		});
 	}
@@ -407,7 +507,7 @@
 		});
 	}
 
-	function displayMagicSpells( eventInfo ) {
+	function displayMagicSpells() {
 		var sDisplay = {};
 
 		getSectionIDs( "repeating_magies", function(idarray) {
@@ -429,6 +529,102 @@
 		});
 	}
 
+	function updateRepair() {
+		getAttrs( [ "reparation_qualite", "reparation_specialiste", "stats_inge_total", "personnage_niveau" ], function( sValues ) {
+
+			var v = structSafeInt( sValues );
+			var reparation_difficulte = 0;
+			var reparation_malusSpecialiste = 0;
+			var requiredLevel = 1;
+			var reparation_impossible = 0;
+
+			if( v[ "reparation_qualite" ] === 1 ) { // Matos perrave
+				reparation_difficulte = 6;
+				reparation_malusSpecialiste = -2;
+				requiredLevel = 1;
+			} else if( v[ "reparation_qualite" ] === 2 ) { // Matos de base
+				reparation_difficulte = 8;
+				reparation_malusSpecialiste = -2;
+				requiredLevel = 1;
+			} else if( v[ "reparation_qualite" ] === 3 ) { // Matos correct
+				reparation_difficulte = 10;
+				reparation_malusSpecialiste = -4;
+				requiredLevel = 2;
+			} else if( v[ "reparation_qualite" ] === 4 ) { // Matos de qualité
+				reparation_difficulte = 12;
+				reparation_malusSpecialiste = -6;
+				requiredLevel = 3;
+			} else if( v[ "reparation_qualite" ] === 5 ) { // Matos de luxe
+				reparation_difficulte = 14;
+				reparation_malusSpecialiste = -20;
+				requiredLevel = 5;
+			} else if( v[ "reparation_qualite" ] === 6 ) { // Matos d'artisan
+				reparation_difficulte = 16;
+				reparation_malusSpecialiste = -20;
+				requiredLevel = 5;
+			}
+
+			var reparation_bonus = v[ "stats_inge_total" ] - reparation_difficulte;
+			// bonus only for specialists
+			if( v[ "reparation_specialiste" ] === 0 ) {
+				if( reparation_bonus > 0 ) {
+					reparation_bonus = 0;
+				}
+
+				reparation_bonus = reparation_bonus + reparation_malusSpecialiste;
+			}
+
+			// Check required level
+			var charLevel = v[ "personnage_niveau" ] || 1;
+			if( requiredLevel > charLevel ) {
+				reparation_bonus = -20;
+			}
+
+			// Impossible task
+			if( reparation_bonus <= -20 ) {
+				reparation_impossible = 1;
+			}
+
+			setAttrs({
+				"reparation_difficulte": reparation_difficulte,
+				"reparation_bonus": reparation_bonus,
+				"reparation_impossible": reparation_impossible
+			});
+		});
+	}
+
+	function updateRecipe( idRow ) {
+		var sRecette = {};
+		var recette_bonus = 0;
+
+		getAttrs( [ 'stats_inge_total',
+					`repeating_recettes_${idRow}_recette_specialiste`, `repeating_recettes_${idRow}_recette_difficulte`, `repeating_recettes_${idRow}_recette_malusspecialiste`
+				  ], function ( sValues ) {
+			var v = structSafeInt( sValues );
+
+			recette_bonus = v[ "stats_inge_total" ] - v[ `repeating_recettes_${idRow}_recette_difficulte` ];
+
+			if( v[ `repeating_recettes_${idRow}_recette_specialiste` ] === 0 ) {
+				if( recette_bonus > 0 ) {
+					recette_bonus = 0;
+				}
+
+				recette_bonus = recette_bonus + v[ `repeating_recettes_${idRow}_recette_malusspecialiste` ];
+			}
+
+			sRecette[ `repeating_recettes_${idRow}_recette_bonus` ] = recette_bonus;
+			setAttrs( sRecette );
+		});
+	}
+
+	function updateRecipes() {
+		getSectionIDs( "repeating_recettes", function(idArray) {
+			for( var i in idArray ) {
+				updateRecipe( idArray[ i ] );
+			}
+		});
+	}
+
 	function start_export() {
 		var sJson = {};
 		var dataBase = {
@@ -437,21 +633,23 @@
 						"personnage_langue", "personnage_vision", "personnage_nyctalopie", "personnage_ouie", "personnage_odorat", "personnage_charge_max",
 						"pr_tete", "pr_bras", "pr_torse", "pr_bouclier", "pr_jambes", "pr_pieds", "pr_mains", "prnat",
 						"bivouac_couverture", "bivouac_couverture_recup", "bivouac_matelas", "bivouac_matelas_recup", "bivouac_tente", "bivouac_tente_recup",
-						"stats_courage", "stats_courage_mod", "stats_intelligence", "stats_intelligence_mod", "stats_charisme", "stats_charisme_mod", "stats_adresse", "stats_adresse_mod", "stats_force", "stats_force_mod",
+						"stats_courage", "stats_courage_mod", "stats_intelligence", "stats_intelligence_mod", "stats_charisme", "stats_charisme_mod", "stats_adresse", "stats_adresse_mod", "stats_force", "stats_force_mod", "stats_inge", "stats_inge_mod",
 						"stats_attaque", "stats_attaque_mod", "stats_parade", "stats_parade_mod", "stats_jet_mod", "stats_esquive_mod", "stats_fouille_mod", "stats_magiephy_mod", "stats_magiepsy_mod", "stats_resimagie_mod",
 						"richesse_or", "richesse_argent", "richesse_cuivre", "richesse_berylium", "richesse_thritil", "richesse_billet10", "richesse_billet50", "richesse_billet100", "richesse_billet500", "richesse_billet1000",
 						"displayJet"
 			],
 			"repeating": [
 				{ zone:"competences", attr: ["competence_nom", "competence_effet", "competence_epreuve", "competence_jet", "competence_mod"] },
-				{ zone:"armes", attr: ["arme_nom", "arme_jet", "arme_at", "arme_prd", "arme_degats", "arme_rup", "arme_effet", "arme_note"] },
+				{ zone:"armes", attr: ["arme_nom", "arme_portee", "arme_at", "arme_prd", "arme_degats", "arme_rup", "arme_munition_display", "munition_nom", "munition_modad", "munition_degats", "arme_effet", "arme_note", "arme_bonusforce" ] },
 				{ zone:"armures", attr: ["armure_nom", "armure_prphy", "armure_prmag", "armure_rup", "armure_effet"] },
 				{ zone:"sacs", attr: ["sac_nom", "sac_charge_max"] },
 				{ zone:"materiels", attr: ["materiel_nom", "materiel_poids"] },
+				{ zone:"recettes", attr: ["recette_nom", "recette_effet", "recette_specialiste", "recette_niveau", "recette_duree", "recette_outils", "recette_materiaux", "recette_materiauxspe", "recette_assistant", "recette_difficulte", "recette_malusspecialiste", "recette_mod", "recette_resultats", "recette_prix"] },
+				{ zone:"ape", attr: ["ape_nom", "ape_note", "ape_effet", "ape_occurence"] },
 				{ zone:"gemmes", attr: ["gemme_nom", "gemme_ug"] },
 				{ zone:"potions", attr: ["conso_nom", "conso_count", "conso_effet"] },
-				{ zone:"coupsspeciaux", attr: ["coupspecial_nom", "coupspecial_jet", "coupspecial_mod", "coupspecial_degats"] },
-				{ zone:"munitions", attr: ["munition_nom", "munition_count", "munition_degats", "munition_rup", "munition_effet"] },
+				{ zone:"coupsspeciaux", attr: ["coupspecial_nom", "coupspecial_jet", "coupspecial_mod", "coupspecial_degats", "coupspecial_utilisation","coupspecial_echec","coupspecial_effet", "coupspecial_note", "coupspecial_condition", "coupspecial_critique", "coupspecial_fumble" ] },
+				{ zone:"munitions", attr: ["munition_nom", "munition_modad", "munition_count", "munition_degats", "munition_rup", "munition_effet"] },
 				{ zone:"vetements", attr: ["vetement_nom", "vetement_effet"] },
 				{ zone:"bourses", attr: ["bourse_nom", "bourse_charge_max"] },
 				{ zone:"butins", attr: ["butin_nom", "butin_poids"] },
@@ -606,18 +804,21 @@
 		getAttrs( [ "version" ], function( v ) {
 			var vrs = parseFloat( v[ "version" ] ) || 1.0;
 			console.log("Détection de la version : " + vrs );
-			if( vrs == 2.1 ) {
-				// uptodate
-				return;
-			} else if( vrs < 2.0 ) {
+			if( vrs < 2.0 ) {
 				getAttrs( [ "level", "valattaque", "valparade", "class", "race", "experience" ], function( v ) {
 					if( v[ "level" ] != undefined || v[ "valattaque" ] != undefined || v[ "valparade" ] != undefined || v[ "class" ] != undefined || v[ "race" ] != undefined || v[ "experience" ] != undefined  ) {
 						console.log( "Début du process d'import..." );
 						update_process();
 					}
 					console.log( "Mise à jour de la version..." );
-					setAttrs( { "version" : 2.1 } );
+					setAttrs( { "version" : 2.4 } );
 				});
+			} else if( vrs < 2.4 ) {
+				// uptodate
+				updateSecondaryStats();
+				updateWeapon();
+				setAttrs( { "version" : 2.4 } );
+				return;
 			}
 			console.log( "ok" );
 		});
@@ -804,7 +1005,7 @@
 </script>
 
 <rolltemplate class="sheet-rolltemplate-magie">
-	<table>
+	<table class="sheet-rolltemplate-table">
 		<tr><th>{{name}}</th></tr>
 		<tr>
 			<td><span class="tcat">Ecole </span>{{magie_ecole}} - <span class="tcat">Niveau </span>{{magie_niveau}}</td>
@@ -877,6 +1078,40 @@
 	</table>
 </rolltemplate>
 
+<rolltemplate class="sheet-rolltemplate-recette">
+	<table class="sheet-rolltemplate-table">
+		<tr><th>{{recette_nom}}</th></tr>
+		<tr><td>{{recette_effet}}</td></tr>
+		<tr>
+			<td><span class="tcat">Niveau : </span>à partir du niveau {{recette_niveau}}</td>
+		</tr>
+		<tr>
+			<td><span class="tcat">Caractéristiques : </span>{{recette_resultats}}</td>
+		</tr>
+		<tr><td><hr></td></tr>
+		<tr>
+			<td><span class="tcat">Matériaux : </span>{{recette_materiaux}}</td>
+		</tr>
+		{{#recette_materiauxspe}}
+			<tr>
+				<td><span class="tcat">+Matériaux spéciaux : </span>{{recette_materiauxspe}}</td>
+			</tr>
+		{{/recette_materiauxspe}}
+		<tr>
+			<td><span class="tcat">Temps de confection : </span>{{recette_duree}}</td>
+		</tr>
+		<tr>
+			<td><span class="tcat">Outils : </span>{{recette_outils}}</td>
+		</tr>
+		<tr>
+			<td><span class="tcat">Difficulté : </span>{{recette_difficulte}} (+{{recette_xp}} XP en cas de réussite)</td>
+		</tr>
+		<tr>
+			<td><span class="tcat">Prix : </span>{{recette_prix}}</td>
+		</tr>
+	</table>
+</rolltemplate>
+
 <!-- Version N# --->
 <input type="hidden" name="attr_version" value="0">
 <!-- AutoCalc fields for sheet worker--->
@@ -894,6 +1129,7 @@
 <input type="hidden" name="attr_Stats_Fouille_total" value="0" /> <!-- Intelligence_total + FouilleMod -->
 <input type="hidden" name="attr_Stats_MagiePhy_total" value="0" /> <!-- MagiePhys + MagiePhysMod -->
 <input type="hidden" name="attr_Stats_MagiePsy_total" value="0" /> <!-- MagiePsy + MagiePsyMod -->
+<input type="hidden" name="attr_Stats_Inge_total" value="0" /> <!-- Inge + IngeMod -->
 <input type="hidden" name="attr_Stats_ResiMagie_total" value="0" /> <!-- ResiMagie + ResiMagie_total -->
 <input type="hidden" name="attr_Poids_Materiels" value="0" /> <!-- temp charge du materiel -->
 <input type="hidden" name="attr_Poids_Butins" value="0" /> <!-- temp charge du butin -->
@@ -938,17 +1174,18 @@
 			</div>
 		</div>
 	</div>
-	<input type="checkbox" class="sheet-display-pnj" name="attr_tab_pnj" value="1" title="Personnage Non Joueur" /><span class="display-pnj"></span>
+	<input type="checkbox" class="sheet-display-pnj" name="attr_tab_pnj" value="1" title="Personnage Non Joueur" /><span class="sheet-display-pnj"></span>
 	<input type="checkbox" class="sheet-display-reglages" name="attr_tab_reglages" value="1" title="Réglages" /><span class="sheet-cog sheet-display-reglages">y</span>
 
 	<br clear="all" />
 
 	<div class="sheet-body sheet-pj">
-		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_caracteristiques" value="caracteristiques" title="Caractéristiques" checked="checked" /><span class="tab">Caractéristiques</span>
+		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_caracteristiques" value="caracteristiques" title="Caractéristiques" checked="checked" /><span class="sheet-tab">Caractéristiques</span>
 		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_competences" value="competences" title="Compétences" /><span class="sheet-tab">Compétences</span>
 		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_equipement" value="equipement" title="Equipement" /><span class="sheet-tab">Equipement</span>
 		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_magie" value="magie" title="Compétences" /><span class="sheet-tab">Magie</span>
 		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_inventaire" value="inventaire" title="Inventaire" /><span class="sheet-tab">Inventaire</span>
+		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_craft" value="craft" title="Fabrication" /><span class="sheet-tab">Artisanat</span>
 		<input type="radio" name="attr_tab_nav" class="sheet-tab sheet-tab_compagnons" value="compagnons" title="Compagnons" /><span class="sheet-tab">Compagnons</span>
 		<br />
 		<br />
@@ -1034,6 +1271,12 @@
 							</tr>
 							<tr>
 								<td colspan="4">&nbsp;</td>
+							</tr>
+							<tr>
+								<th tile="Chance de réussir une Confection">Ingéniosité<br><span class="sheet-hint">Moyenne INT et AD</span></th>
+								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Inge" value="0" readonly="readonly"></td>
+								<td><input type="number" name="attr_Stats_Inge_mod" value="0"></td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une confection}} {{ Magie Phys=@{Stats_Inge_total} }} {{ Résultat=[[1d20]] }}" name="roll_Ingeniosite" /></td>
 							</tr>
 							<tr>
 								<th tile="Chance de réussir une Magie Physique">Magie Phys.<br><span class="sheet-hint">Moyenne INT et AD</span></th>
@@ -1193,7 +1436,7 @@
 			<div class="sheet-competences">
 				<h2>Compétences</h2>
 				<div class="sheet-tableth">
-					<div class="sheet-col" style="width: 236px;">Compétence</div>
+					<div class="sheet-col" style="width: 226px;">Compétence</div>
 					<div class="sheet-col" style="width: 216px;">Effets</div>
 					<div class="sheet-col" style="width: 66px;">Épreuve ?</div>
 					<div class="sheet-col" style="width: 66px;">Stat.</div>
@@ -1201,31 +1444,33 @@
 					<div class="sheet-col" style="width: 76px;">Épreuve</div>
 				</div>
 				<fieldset class="repeating_competences">
-					<div class="sheet-row">
-						<div class="sheet-col" style="width: 240px;height: 37px">
-							<input type="text" class="sheet-noBorder" name="attr_Competence_Nom" value="" />
-						</div>
-						<div class="sheet-col" style="width: 240px;">
-							<input type="text" class="sheet-noBorder" name="attr_Competence_Effet" value="" />
-						</div>
-						<div class="sheet-col" style="width: 330px;">
-							<input type="checkbox" class="sheet-display-competenceEpreuve" name="attr_Competence_Epreuve" value="1" />
-							<div class="sheet-display-competenceEpreuve">
-								<div class="sheet-col" style="width: 50px;"></div>
-								<div class="sheet-col" style="width: 70px;">
-									<select name="attr_Competence_Jet">
-										<option value="COU : @{Stats_Courage_total}">COU</option>
-										<option value="INT : @{Stats_Intelligence_total}">INT</option>
-										<option value="CHA : @{Stats_Charisme_total}">CHA</option>
-										<option value="AD : @{Stats_Adresse_total}">AD</option>
-										<option value="FO : @{Stats_Force_total}">FO</option>
-									</select>
-								</div>
-								<div class="sheet-col" style="width: 90px;">
-									<input type="number" name="attr_Competence_mod" value="0" />
-								</div>
-								<div class="sheet-col" style="width: 80px;">
-									<button type="roll" value="@{displayJet} &{template:default} {{name=Épreuve de @{Competence_Nom} par @{Personnage_Nom} }} {{Épreuve=@{Competence_Jet} + @{Competence_mod} }} {{ Résultat=[[1d20]] }}" name="roll_Competences"> Épreuve</button>
+					<div class="sheet-group">
+						<div class="sheet-row">
+							<div class="sheet-col" style="width: 230px;">
+								<input type="text" class="sheet-noBorder" name="attr_Competence_Nom" value="" />
+							</div>
+							<div class="sheet-col" style="width: 240px;">
+								<input type="text" class="sheet-noBorder" name="attr_Competence_Effet" value="" />
+							</div>
+							<div class="sheet-col" style="width: 330px;">
+								<input type="checkbox" class="sheet-display-competenceEpreuve" name="attr_Competence_Epreuve" value="1" />
+								<div class="sheet-display-competenceEpreuve">
+									<div class="sheet-col" style="width: 50px;"></div>
+									<div class="sheet-col" style="width: 70px;">
+										<select name="attr_Competence_Jet">
+											<option value="COU : @{Stats_Courage_total}">COU</option>
+											<option value="INT : @{Stats_Intelligence_total}">INT</option>
+											<option value="CHA : @{Stats_Charisme_total}">CHA</option>
+											<option value="AD : @{Stats_Adresse_total}">AD</option>
+											<option value="FO : @{Stats_Force_total}">FO</option>
+										</select>
+									</div>
+									<div class="sheet-col" style="width: 90px;">
+										<input type="number" name="attr_Competence_mod" value="0" />
+									</div>
+									<div class="sheet-col" style="width: 80px;">
+										<button type="roll" value="@{displayJet} &{template:default} {{name=Épreuve de @{Competence_Nom} par @{Personnage_Nom} }} {{Épreuve=@{Competence_Jet} + @{Competence_mod} }} {{ Résultat=[[1d20]] }}" name="roll_Competences"> Épreuve</button>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -1235,35 +1480,86 @@
 			<br />
 			<div class="sheet-coupsspeciaux">
 				<h2>Coups spéciaux</h2>
-				<div class="sheet-tableth">
-					<div class="sheet-col" style="width: 236px;">Coup</div>
-					<div class="sheet-col" style="width: 76px;">Stat.</div>
-					<div class="sheet-col" style="width: 86px;">Mod.</div>
-					<div class="sheet-col" style="width: 86px;">Dégats</div>
-					<div class="sheet-col" style="width: 166px;">Jets</div>
-				</div>
 				<fieldset class="repeating_coupsSpeciaux">
-					<div class="sheet-row">
-						<div class="sheet-col" style="width: 250px;">
-							<input type="text" class="sheet-noBorder" name="attr_CoupSpecial_Nom" value="" />
+					<div class="sheet-group">
+						<div class="sheet-row">
+							<div class="sheet-col" style="width: 500px;">
+								<input type="text" class="sheet-noBorder" name="attr_CoupSpecial_Nom" value="" />
+							</div>
+							<div class="sheet-col" style="width: 200px;">
+								<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} prépare son coup spécial @{CoupSpecial_Nom} }} {{ Épreuve=@{CoupSpecial_Jet} + @{CoupSpecial_mod} }} {{ Résultat=[[1d20]] }}" > Épreuve</button>
+								<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{CoupSpecial_Nom}}} {{ Dégats=[[@{CoupSpecial_Degats}]] }}" > Dégats</button>
+							</div>
 						</div>
-						<div class="sheet-col" style="width: 80px;">
-							<select name="attr_CoupSpecial_Jet">
-								<option value="AT : @{Stats_Attaque_total}">AT</option>
-								<option value="AD : @{Stats_Adresse_total}">AD</option>
-								<option value="FO : @{Stats_Force_total}">FO</option>
-								<option value="AD/FO : [[ceil((@{Stats_Force_total}+@{Stats_Adresse_total})/2)]]">AD/FO</option>
-							</select>
+						<input type="checkbox" name="attr_CoupSpecial_config" class="sheet-config-flag" value="1" /><span class="sheet-cog">y</span>
+						<div class="sheet-config">
+							<br>
+							<div class="sheet-row">
+								<div class="sheet-col" style="width: 110px;"><b>Utilisation :</b></div>
+								<div class="sheet-col" style="width: 270px;"><input type="text" class="sheet-noBorder" name="attr_CoupSpecial_utilisation"></div>
+								<div class="sheet-col" style="width: 110px; margin-left: 5px;"><b>Echec :</b></div>
+								<div class="sheet-col" style="width: 270px;"><input type="text" class="sheet-noBorder" name="attr_CoupSpecial_echec"></div>
+							</div>
+							<hr>
+							<div class="sheet-row">
+								<div class="sheet-col" style="width: 110px;"><b>Effets :</b></div>
+								<div class="sheet-col" style="width: 270px;"><input type="text" class="sheet-noBorder" name="attr_CoupSpecial_effet"></div>
+								<div class="sheet-col" style="width: 110px; margin-left: 5px;"><b>Notes :</b></div>
+								<div class="sheet-col" style="width: 270px;"><input type="text" class="sheet-noBorder" name="attr_CoupSpecial_note"></div>
+							</div>
+							<div class="sheet-row">
+								<div class="sheet-col" style="width: 110px;"><b>Epreuve :</b></div>
+								<div class="sheet-col" style="width: 270px;">
+									<select name="attr_CoupSpecial_Jet">
+										<option value="AT : @{Stats_Attaque_total}">AT</option>
+										<option value="AD : @{Stats_Adresse_total}">AD</option>
+										<option value="FO : @{Stats_Force_total}">FO</option>
+										<option value="AD/FO : [[ceil((@{Stats_Force_total}+@{Stats_Adresse_total})/2)]]">AD/FO</option>
+									</select>
+									<input type="number" name="attr_CoupSpecial_Mod" value="0" />
+								</div>
+								<div class="sheet-col" style="width: 110px; margin-left: 5px;"><b>Conditions :</b></div>
+								<div class="sheet-col" style="width: 270px;"><input type="text" class="sheet-noBorder" name="attr_CoupSpecial_condition"></div>
+							</div>
+							<div class="sheet-row">
+								<div class="sheet-col" style="width: 110px;"><b>Dégats :</b></div>
+								<div class="sheet-col" style="width: 270px;"><input type="text" class="sheet-shortInput" name="attr_CoupSpecial_Degats" value="1d6" /></div>
+							</div>
+							<hr>
+							<div class="sheet-row">
+								<div class="sheet-col" style="width: 110px;"><b>Critique :</b></div>
+								<div class="sheet-col" style="width: 270px;"><input type="text" class="sheet-noBorder" name="attr_CoupSpecial_critique"></div>
+								<div class="sheet-col" style="width: 110px; margin-left: 5px;"><b>Echec critique :</b></div>
+								<div class="sheet-col" style="width: 270px;"><input type="text" class="sheet-noBorder" name="attr_CoupSpecial_fumble"></div>
+							</div>
 						</div>
-						<div class="sheet-col" style="width: 90px;">
-							<input type="number" name="attr_CoupSpecial_mod" value="0" />
-						</div>
-						<div class="sheet-col" style="width: 90px;">
-							<input type="text" class="sheet-shortInput" name="attr_CoupSpecial_Degats" value="1d6" />
-						</div>
-						<div class="sheet-col" style="width: 270px;">
-							<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} prépare son coup spécial @{CoupSpecial_Nom} }} {{ Épreuve=@{CoupSpecial_Jet} + @{CoupSpecial_mod} }} {{ Résultat=[[1d20]] }}" > Épreuve</button>
-							<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{CoupSpecial_Nom}}} {{ Dégats=[[@{CoupSpecial_Degats}+@{BonusDegatsForce}]] }}" > Dégats</button>
+					</fieldset>
+				</fieldset>
+			</div>
+			<br />
+			<div class="sheet-ape">
+				<h2>Aptitudes Parfois Étranges</h2>
+				<div class="sheet-tableth">
+					<div class="sheet-col" style="width: 146px;">Nom</div>
+					<div class="sheet-col" style="width: 326px;">Description et Conditions</div>
+					<div class="sheet-col" style="width: 206px;">Bonus</div>
+					<div class="sheet-col" style="width: 86px;">Occurences</div>
+				</div>
+				<fieldset class="repeating_ape">
+					<div class="sheet-group">
+						<div class="sheet-row">
+							<div class="sheet-col" style="width: 200px;">
+								<input type="text" class="sheet-noBorder" name="attr_ape_nom" value="" />
+							</div>
+							<div class="sheet-col" style="width: 300px;">
+								<input type="text" class="sheet-noBorder" name="attr_ape_note" value="" />
+							</div>
+							<div class="sheet-col" style="width: 200px;">
+								<input type="text" class="sheet-noBorder" name="attr_ape_effet" value="" />
+							</div>
+							<div class="sheet-col" style="width: 90px;">
+								<input type="number" name="attr_ape_occurence" value="1" min=1 max=3 step=1 />
+							</div>
 						</div>
 					</div>
 				</fieldset>
@@ -1277,88 +1573,139 @@
 				<div class="sheet-tableth">
 					<div class="sheet-col" style="width: 256px;">Arme</div>
 					<div class="sheet-col" style="width: 66px;">Portée</div>
-					<div class="sheet-col" style="width: 66px;">Mod. AT</div>
-					<div class="sheet-col" style="width: 66px;">Mod. PRD</div>
-					<div class="sheet-col" style="width: 66px;">Dégats</div>
-					<div class="sheet-col" style="width: 66px;">RUP.</div>
+					<div class="sheet-col" style="width: 66px;">AT</div>
+					<div class="sheet-col" style="width: 66px;">PRD</div>
+					<div class="sheet-col" style="width: 96px;">Dégats</div>
 					<div class="sheet-col" style="width: 166px;">Jets</div>
 				</div>
 
 				<fieldset class="repeating_armes">
+					<div class="sheet-group">
+						<div class="sheet-row">
+							<div class="sheet-col" style="width: 260px;">
+								<input type="text" class="sheet-noBorder" name="attr_Arme_Nom" value="" />
+							</div>
+							<div class="sheet-col" style="width: 70px;">
+								<select name="attr_Arme_Portee">
+									<option value="Mélée" selected="selected">Mélée</option>
+									<option value="Dist.">Dist.</option>
+								</select>
+							</div>
+							<div class="sheet-col" style="width: 70px;">
+								<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Arme_TotalAT" value="0" readonly="readonly" />
+							</div>
+							<div class="sheet-col" style="width: 70px;">
+								<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Arme_TotalPRD" value="@{Stats_Parade_total}+@{Arme_PRD}" readonly="readonly" disabled="true" />
+							</div>
+							<div class="sheet-col" style="width: 100px;">
+								<input type="text" class="sheet-autoCalc" name="attr_Arme_TotalDegats" value="1d6" readonly="readonly" style="width: 100px;" />
+							</div>
+							<div class="sheet-col" style="width: 170px;">
+								<button type="roll" value="@{displayJet} &{template:default} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{ AT= @{Arme_TotalAT} }} {{ Résultat=[[1d20]] }}"> AT </button>
+								<button type="roll" value="@{displayJet} &{template:default} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{ PRD=@{Arme_TotalPRD} }} {{ Résultat=[[1d20]] }}"> PRD </button>
+								<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{ Dégats= [[ @{Arme_TotalDegats} ]] }}"> Dégats </button>
+							</div>
+						</div>
+						<input type="checkbox" name="attr_CoupSpecial_config" class="sheet-config-flag" value="1" /><span class="sheet-cog">y</span>
+						<div class="sheet-config">
+							<div class="sheet-row">
+								<div class="sheet-col" style="width: 110px;"><b>Mod. AT :</b></div>
+								<div class="sheet-col" style="width: 70px;">
+									<input type="number" name="attr_Arme_AT" value="0" />
+								</div>
+								<div class="sheet-col" style="width: 110px; text-align: right;"><b>Mod. PRD :</b></div>
+								<div class="sheet-col" style="width: 70px;">
+									<input type="number" name="attr_Arme_PRD" value="0" />
+								</div>
+								<div class="sheet-col" style="width: 110px; text-align: right;"><b>Dégats :</b></div>
+								<div class="sheet-col" style="width: 70px;">
+									<input type="text" class="sheet-shortInput" name="attr_Arme_Degats" value="1d6" />
+								</div>
+								<div class="sheet-col" style="width: 110px; text-align: right;"><b>RUP :</b></div>
+								<div class="sheet-col" style="width: 70px;">
+									<input type="text" class="sheet-shortInput" name="attr_Arme_RUP" value="" />
+								</div>
+							</div>
 
-					<div class="sheet-row" style="background-color: #eee;padding: 5px; border-radius: 10px;">
-						<div class="sheet-col" style="width: 260px;">
-							<input type="text" class="sheet-noBorder" name="attr_Arme_Nom" value="" />
-						</div>
-						<div class="sheet-col" style="width: 70px;">
-							<select name="attr_Arme_Jet">
-								<option value="@{Stats_Attaque_total}" selected="selected">Mélée</option>
-								<option value="@{Stats_Jet_total}">Dist.</option>
-							</select>
-						</div>
-						<div class="sheet-col" style="width: 70px;">
-							<input type="number" name="attr_Arme_AT" value="0" />
-						</div>
-						<div class="sheet-col" style="width: 70px;">
-							<input type="number" name="attr_Arme_PRD" value="0" />
-						</div>
-						<div class="sheet-col" style="width: 70px;">
-							<input type="text" class="sheet-shortInput" name="attr_Arme_Degats" value="1d6" />
-						</div>
-						<div class="sheet-col" style="width: 70px;">
-							<input type="text" class="sheet-shortInput" name="attr_Arme_RUP" value="" />
-						</div>
-						<div class="sheet-col" style="width: 170px;">
-							<button type="roll" value="@{displayJet} &{template:default} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{ AT=@{Arme_Jet} + @{Arme_At} }} {{ Résultat=[[1d20]] }}"> AT </button>
-							<button type="roll" value="@{displayJet} &{template:default} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{ PRD=@{Stats_Parade_total} + @{Arme_PRD} }} {{ Résultat=[[1d20]] }}"> PRD </button>
-							<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{ Dégats=[[@{Arme_Degats} + @{BonusDegatsForce}]] }}"> Dégats </button>
-						</div>
-						<br clear="all" />
-						<div class="sheet-col" style="width: 100px;padding-top: 5px;">
-							<b>Bonus / Effets</b>
-						</div>
-						<div class="sheet-col" style="width: 250px;">
-							<input type="text" class="sheet-noBorder" name="attr_Arme_Effet" value="" />
-						</div>
-						<div class="sheet-col" style="width: 150px;padding-top: 5px; text-align:right">
-							<b>Notes et détails</b>
-						</div>
-						<div class="sheet-col" style="width: 250px;">
-							<input type="text" class="sheet-noBorder" name="attr_Arme_Note" value="" />
+							<input type="checkbox" class="sheet-hidden sheet-display-arme_munition" name="attr_Arme_Munition_display" value=1>
+							<div class="sheet-display-arme_munition">
+
+								<div class="sheet-row">
+									<div class="sheet-col" style="width: 110px;"><b>Bonus Force ? :</b></div>
+									<div class="sheet-col" style="width: 70px;"><input type="checkbox" name="attr_Arme_bonusForce" value="1" checked="checked"></div>
+								</div>
+
+								<div class="sheet-row ">
+									<div class="sheet-col" style="width: 110px;"><b>Munition : </b></div>
+									<div class="sheet-col" style="width: 250px;">
+										<input type="text" class="sheet-noBorder" name="attr_munition_nom" value="" />
+									</div>
+									<div class="sheet-col" style="width: 110px; text-align: right;"><b>Mod. AD : </b></div>
+									<div class="sheet-col" style="width: 70px;">
+										<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_munition_modAd" value="0" readonly="readonly" />
+									</div>
+									<div class="sheet-col" style="width: 110px; text-align: right;"><b>Dégats : </b></div>
+									<div class="sheet-col" style="width: 70px;">
+										<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_munition_degats" value="0" readonly="readonly" />
+									</div>
+								</div>
+							</div>
+
+							<div class="sheet-row">
+								<div class="sheet-col" style="width: 110px;">
+									<b>Bonus / Effets : </b>
+								</div>
+								<div class="sheet-col" style="width: 650px;">
+									<input type="text" class="sheet-noBorder" name="attr_Arme_Effet" value="" />
+								</div>
+							</div>
+							<div class="sheet-row">
+								<div class="sheet-col" style="width: 110px;">
+									<b>Notes: </b>
+								</div>
+								<div class="sheet-col" style="width: 650px;">
+									<input type="text" class="sheet-noBorder" name="attr_Arme_Note" value="" />
+								</div>
+							</div>
 						</div>
 					</div>
-					<br clear="all" />
 				</fieldset>
 				<br>
-				<span class="sheet-hint">Le Bonus / Malus aux dégats octroyé par la Force est inclus automatiquement dans les jets de dégats : <input class="sheet-shortInput sheet-autoCalc" name="attr_BonusDegatsForce" value="0" readonly="readonly" type="text"></span>
+				<span class="sheet-hint">Le Bonus / Malus aux dégats octroyé par la Force : <input class="sheet-shortInput sheet-autoCalc" name="attr_BonusDegatsForce" value="0" readonly="readonly" type="text"></span>
 			</div>
 			<br />
 			<div class="sheet-munitions">
-				<input type="checkbox" class="sheet-display display-munitions" name="attr_displayMunitions" value="1" checked="checked" /><h2 class="sheet-display">Munitions</h2>
+				<input type="checkbox" class="sheet-display sheet-display-munitions" name="attr_displayMunitions" value="1" checked="checked" /><h2 class="sheet-display">Munitions</h2>
 				<div class="sheet-display-munitions">
 					<div class="sheet-tableth">
-						<div class="sheet-col" style="width: 296px;"></div>
+						<div class="sheet-col" style="width: 260px;"></div>
 						<div class="sheet-col" style="width: 66px;">Nb.</div>
+						<div class="sheet-col" style="width: 66px;">Mod. AD</div>
 						<div class="sheet-col" style="width: 66px;">Dégats</div>
 						<div class="sheet-col" style="width: 66px;">RUP.</div>
-						<div class="sheet-col" style="width: 246px;">Bonus / Effets</div>
+						<div class="sheet-col" style="width: 216px;">Bonus / Effets</div>
 					</div>
 					<fieldset class="repeating_munitions">
-						<div class="sheet-row">
-							<div class="sheet-col" style="width: 300px;">
-								<input type="text" class="sheet-noBorder" name="attr_Munition_Nom" value="" />
-							</div>
-							<div class="sheet-col" style="width: 70px;">
-								<input type="number" name="attr_Munition_Count" value="" />
-							</div>
-							<div class="sheet-col" style="width: 70px;">
-								<input type="text" class="sheet-shortInput" name="attr_Munition_Degats" value="" />
-							</div>
-							<div class="sheet-col" style="width: 70px;">
-								<input type="text" class="sheet-shortInput" name="attr_Munition_RUP" value="" />
-							</div>
-							<div class="sheet-col" style="width: 250px;">
-								<input type="text" class="sheet-noBorder" name="attr_Munition_Effet" value="" />
+						<div class="sheet-group">
+							<div class="sheet-row">
+								<div class="sheet-col" style="width: 260px;">
+									<input type="text" class="sheet-noBorder" name="attr_Munition_Nom" value="" />
+								</div>
+								<div class="sheet-col" style="width: 70px;">
+									<input type="number" name="attr_Munition_Count" value="" />
+								</div>
+								<div class="sheet-col" style="width: 70px;">
+									<input type="number" class="sheet-shortInput" name="attr_Munition_ModAd" value="" />
+								</div>
+								<div class="sheet-col" style="width: 70px;">
+									<input type="text" class="sheet-shortInput" name="attr_Munition_Degats" value="" />
+								</div>
+								<div class="sheet-col" style="width: 70px;">
+									<input type="text" class="sheet-shortInput" name="attr_Munition_RUP" value="" />
+								</div>
+								<div class="sheet-col" style="width: 220px;">
+									<input type="text" class="sheet-noBorder" name="attr_Munition_Effet" value="" />
+								</div>
 							</div>
 						</div>
 					</fieldset>
@@ -1366,7 +1713,7 @@
 			</div>
 			<br />
 			<div class="sheet-bagues">
-				<input type="checkbox" class="sheet-display display-bagues" name="attr_displayBagues" value="1" checked="checked" /><h2 class="sheet-display">Objets chargés (Bagues, Pendentifs, Broches...)</h2>
+				<input type="checkbox" class="sheet-display sheet-display-bagues" name="attr_displayBagues" value="1" checked="checked" /><h2 class="sheet-display">Objets chargés (Bagues, Pendentifs, Broches...)</h2>
 				<div class="sheet-display-bagues">
 					<div class="sheet-tableth">
 						<div class="sheet-col" style="width: 296px;"></div>
@@ -1374,15 +1721,17 @@
 						<div class="sheet-col" style="width: 246px;">Bonus / Effets</div>
 					</div>
 					<fieldset class="repeating_bagues">
-						<div class="sheet-row">
-							<div class="sheet-col" style="width: 300px;">
-								<input type="text" class="sheet-noBorder" name="attr_Bague_Nom" value="" />
-							</div>
-							<div class="sheet-col" style="width: 70px;">
-								<input type="number" name="attr_Bague_Count" value="" />
-							</div>
-							<div class="sheet-col" style="width: 250px;">
-								<input type="text" class="sheet-noBorder" name="attr_Bague_Bonus" value="" />
+						<div class="sheet-group">
+							<div class="sheet-row">
+								<div class="sheet-col" style="width: 300px;">
+									<input type="text" class="sheet-noBorder" name="attr_Bague_Nom" value="" />
+								</div>
+								<div class="sheet-col" style="width: 70px;">
+									<input type="number" name="attr_Bague_Count" value="" />
+								</div>
+								<div class="sheet-col" style="width: 400px;">
+									<input type="text" class="sheet-noBorder" name="attr_Bague_Bonus" value="" />
+								</div>
 							</div>
 						</div>
 					</fieldset>
@@ -1400,21 +1749,23 @@
 					<div class="sheet-col" style="width: 296px;">Bonus / Effets</div>
 				</div>
 				<fieldset class="repeating_armures">
-					<div class="sheet-row">
-						<div class="sheet-col" style="width: 260px;">
-							<input type="text" class="sheet-noBorder" name="attr_Armure_Nom" value="" />
-						</div>
-						<div class="sheet-col" style="width: 70px;">
-							<input type="number" name="attr_Armure_PRPhy" value="0" />
-						</div>
-						<div class="sheet-col" style="width: 70px;">
-							<input type="number" name="attr_Armure_PRMag" value="0" />
-						</div>
-						<div class="sheet-col" style="width: 70px;">
-							<input type="text" class="sheet-shortInput" name="attr_Armure_RUP" value="" />
-						</div>
-						<div class="sheet-col" style="width: 300px;">
-							<input type="text" class="sheet-noBorder" name="attr_Armure_Effet" value="" />
+					<div class="sheet-group">
+						<div class="sheet-row">
+							<div class="sheet-col" style="width: 260px;">
+								<input type="text" class="sheet-noBorder" name="attr_Armure_Nom" value="" />
+							</div>
+							<div class="sheet-col" style="width: 70px;">
+								<input type="number" name="attr_Armure_PRPhy" value="0" />
+							</div>
+							<div class="sheet-col" style="width: 70px;">
+								<input type="number" name="attr_Armure_PRMag" value="0" />
+							</div>
+							<div class="sheet-col" style="width: 70px;">
+								<input type="text" class="sheet-shortInput" name="attr_Armure_RUP" value="" />
+							</div>
+							<div class="sheet-col" style="width: 300px;">
+								<input type="text" class="sheet-noBorder" name="attr_Armure_Effet" value="" />
+							</div>
 						</div>
 					</div>
 				</fieldset>
@@ -1427,7 +1778,6 @@
 						<table style="margin:auto;">
 							<tr>
 								<td></td>
-
 								<th>Tête</th>
 								<td></td>
 							</tr>
@@ -1518,6 +1868,7 @@
 					</fieldset>
 				</div>
 			</div>
+			<br clear="all" />
 		</div>
 
 		<!-- TAB Magie -->
@@ -1560,15 +1911,15 @@
 							<b>Ajouter un sort :</b><br />
 							<ol>
 								<li>Créez un nouveau sort</li>
-								<li>Inscrivez l'école de magie du sort (attention l'école de magie doit éxister dans la liste de gauche !)</li>
+								<li>Inscrivez l'école de magie du sort (attention l'école de magie doit exister dans la liste de gauche !)</li>
 								<li>Sélectionnez le niveau du sort</li>
 								<li>Configurez votre sort (portée, épreuve, dégats...), il sera automatiquement associé à l'école et au niveau séléctionnés en cas de filtre.</li>
 							</ol>
 							<br />
 							<b>Mon sort a disparu ? :</b><br />
 							<ol>
-								<li>Cochez la case "Toutes les écoles de magies"</li>
-								<li>Vérifiez que l'école du sort est bien <b><u>strictement identique</u></b> à une des écoles de magies</li>
+								<li>Cochez la case "Toutes les écoles de magie"</li>
+								<li>Vérifiez que l'école du sort est bien <b><u>strictement identique</u></b> à une des écoles de magie</li>
 							</ol>
 						</div>
 					</div>
@@ -1637,7 +1988,7 @@
 								</select>
 							</div>
 							<div class="sheet-col" style="width: 100px;">
-								<button type="roll" value="@{displayJet} &{template:magie} {{name=@{magie_nom}}} {{magie_ecole=@{magie_ecole}}} {{magie_niveau=@{magie_niveau}}} {{magie_display_epreuve=@{Magie_EpreuveLanceur_Jet}}}  {{magie_display_resistance=@{Magie_EpreuveCible_Jet}}} {{magie_incantation=@{magie_incantation}}} {{magie_duree=@{magie_duree}}} {{magie_cout=@{magie_cout}}} {{magie_portee=@{magie_portee}}} {{magie_effet=@{magie_effet}}} {{magie_ingre=@{magie_ingre}}} {{magie_aireeffet=@{magie_aireeffet}}} {{magie_soin=@{magie_soin}}} {{magie_degats=@{Magie_Degats}}} {{magie_bonusint=[[@{MagieBonusInt}]]}} {{magie_epreuve=@{Magie_EpreuveLanceur_Jet} + @{Magie_EpreuveLanceur_mod}}} {{magie_resistance=@{Magie_EpreuveCible_Jet} + @{Magie_EpreuveCible_mod}}} {{creature_ev=@{creature_ev}}} {{creature_int=@{creature_int}}} {{creature_at=@{creature_at}}} {{creature_def=@{creature_def}}} {{creature_cou=@{creature_cou}}} {{creature_pr=@{creature_pr}}} {{creature_xp=@{creature_xp}}} {{creature_resimagie=@{creature_resimagie}}} {{creature_degats=@{creature_degats}}} {{magie_epreuveappel_mod=@{magie_epreuveappel_mod}}} {{magie_epreuvecontrol_mod=@{magie_epreuvecontrol_mod}}} {{magie_epreuverevocation_mod=@{magie_epreuverevocation_mod}}}"> Grimmoire </button>
+								<button type="roll" value="@{displayJet} &{template:magie} {{name=@{magie_nom}}} {{magie_ecole=@{magie_ecole}}} {{magie_niveau=@{magie_niveau}}} {{magie_display_epreuve=@{Magie_EpreuveLanceur_Jet}}}  {{magie_display_resistance=@{Magie_EpreuveCible_Jet}}} {{magie_incantation=@{magie_incantation}}} {{magie_duree=@{magie_duree}}} {{magie_cout=@{magie_cout}}} {{magie_portee=@{magie_portee}}} {{magie_effet=@{magie_effet}}} {{magie_ingre=@{magie_ingre}}} {{magie_aireeffet=@{magie_aireeffet}}} {{magie_soin=@{magie_soin}}} {{magie_degats=@{Magie_Degats}}} {{magie_bonusint=[[@{MagieBonusInt}]]}} {{magie_epreuve=@{Magie_EpreuveLanceur_Jet} + @{Magie_EpreuveLanceur_mod}}} {{magie_resistance=@{Magie_EpreuveCible_Jet} + @{Magie_EpreuveCible_mod}}} {{creature_ev=@{creature_ev}}} {{creature_int=@{creature_int}}} {{creature_at=@{creature_at}}} {{creature_def=@{creature_def}}} {{creature_cou=@{creature_cou}}} {{creature_pr=@{creature_pr}}} {{creature_xp=@{creature_xp}}} {{creature_resimagie=@{creature_resimagie}}} {{creature_degats=@{creature_degats}}} {{magie_epreuveappel_mod=@{magie_epreuveappel_mod}}} {{magie_epreuvecontrol_mod=@{magie_epreuvecontrol_mod}}} {{magie_epreuverevocation_mod=@{magie_epreuverevocation_mod}}}"> Grimoire </button>
 							</div>
 							<br clear="all" />
 							<br />
@@ -2266,120 +2617,325 @@
 			<br />
 		</div>
 
+		<!-- TAB Craft -->
+		<div class="sheet-tab_craft">
+			<input class="sheet-display sheet-display-reparation" name="attr_displayReparation" value="1" checked="checked" type="checkbox">
+			<h2 class="sheet-display">Réparations</h2>
+			<div class="sheet-display-reparation">
+				<table width="100%">
+					<thead>
+						<tr>
+							<th style="border-right:1px dotted white;" nowrap="">Qualité ?</th>
+							<th style="border-right:1px dotted white;">Spécialiste ?</th>
+							<th style="border-right:1px dotted white;">Mod.</th>
+							<th>Épreuve</th>
+						</tr>
+					</thead>
+					<tr>
+						<td style="text-align:center;">
+							<select name="attr_Reparation_Qualite">
+								<option value="0" selected="selected"></option>
+								<option value="1">Matériel perrave</option>
+								<option value="2">Matériel de base</option>
+								<option value="3">Matériel de correct</option>
+								<option value="4">Matériel de qualité</option>
+								<option value="5">Matériel de luxe</option>
+								<option value="6">Matériel d'artisan</option>
+							</select>
+						</td>
+						<td style="text-align:center;">
+							<input type="checkbox" name="attr_Reparation_Specialiste" value="1">
+						</td>
+						<td style="text-align:center;">
+							<input type="number" class="sheet-shortInput" name="attr_Reparation_Mod" value="0">
+						</td>
+						<td style="text-align:center;">
+							<input type="hidden" name="attr_Reparation_Bonus" value="0">
+							<input type="hidden" name="attr_Reparation_Difficulte" value="0">
+							<input type="checkbox" name="attr_Reparation_impossible" value="1" class="sheet-hidden sheet-reparation-impossible">
+							<div class="sheet-reparation-epreuve">
+								<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de réparer un objet }} {{ Difficulté = @{reparation_difficulte} }}{{ Ingéniosité= [[ @{stats_inge_total} + @{reparation_bonus} + @{reparation_mod} ]] }} {{ Résultat = [[1d20]] }}"> Réparation </button>
+							</div>
+							<div class="sheet-reparation-impossible">
+								<span class="sheet-hint">Réparation impossible</span>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<br clear="all">
+			<input class="sheet-display sheet-display-confection" name="attr_displayConfection" value="1" checked="checked" type="checkbox">
+			<h2 class="sheet-display">Confection rapide</h2>
+			<div class="sheet-display-confection">
+				<table width="100%">
+					<thead>
+						<tr>
+							<th style="border-right:1px dotted white;">Difficulté</th>
+							<th style="border-right:1px dotted white;">Mod.</th>
+							<th>Épreuve</th>
+						</tr>
+					</thead>
+					<tr>
+						<td style="text-align:center;">
+							<input type="number" class="sheet-shortInput" name="attr_Confection_Difficulte" value="0">
+						</td>
+						<td style="text-align:center;">
+							<input type="number" class="sheet-shortInput" name="attr_Confection_Mod" value="0">
+						</td>
+						<td style="text-align:center;">
+							<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de fabriquer un objet }} {{ Ingéniosité=[[ @{stats_inge_total} + ( @{stats_inge_total} - @{confection_difficulte} ) + @{confection_mod} ]] }} {{ Résultat = [[1d20]] }}"> Confection </button>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<br clear="all">
+			<input class="sheet-display sheet-display-recettes" name="attr_displayRecettes" value="1" checked="checked" type="checkbox">
+			<h2 class="sheet-display">Recettes</h2>
+			<div class="sheet-display-recettes">
+				<fieldset class="repeating_recettes">
+					<div class="sheet-recette-filtre">
+						<div class="sheet-col" style="width: 200px;">
+							<input type="text" class="sheet-noBorder" name="attr_Recette_Nom" value="" />
+						</div>
+						<div class="sheet-col" style="width: 70px; padding-top: 5px; text-align:right;">
+							<b>Desc. </b>
+						</div>
+						<div class="sheet-col" style="width: 400px;">
+							<input type="text" class="sheet-noBorder" name="attr_Recette_effet" value="" />
+						</div>
+
+						<div class="sheet-col" style="width: 100px; text-align:right;">
+							<button type="roll" value="@{displayJet} &{template:recette} {{recette_nom=@{recette_nom}}} {{recette_effet=@{recette_effet}}} {{recette_niveau=@{recette_niveau}}} {{recette_resultats=@{recette_resultats}}}  {{recette_materiaux=@{recette_materiaux}}} {{recette_materiauxspe=@{recette_materiauxspe}}} {{recette_duree=@{recette_duree}}} {{recette_outils=@{recette_outils}}} {{recette_difficulte=@{recette_difficulte}}} {{recette_xp=@{recette_xp}}} {{recette_prix=@{recette_prix}}}"> Recette </button>
+						</div>
+						<br clear="all" />
+						<br />
+						<div>
+							<input type="checkbox" class="sheet-display-recette sheet-display-recette-preparation"  name="attr_Recette_Display_Preparation" value="1" /> <span class="sheet-display-recette">Préparation</span>
+							<input type="checkbox" class="sheet-display-recette sheet-display-recette-epreuve"  name="attr_Recette_Display_Epreuve" value="1" /> <span class="sheet-display-recette">Épreuve</span>
+							<input type="checkbox" class="sheet-display-recette sheet-display-recette-results"  name="attr_Recette_Display_Results" value="1" /> <span class="sheet-display-recette">Résultats</span>
+							<br clear="all" />
+
+							<div class="sheet-display-recette-preparation">
+								<br />
+								<table width="100%">
+									<thead>
+										<tr>
+											<th style="border-right:1px dotted white; width: 49%">Temps de confection</th>
+											<th colspan="3">Outils</th>
+										</tr>
+									</thead>
+									<tr>
+										<td style="text-align:center;"><input type="text" class="sheet-noBorder" name="attr_Recette_Duree" value="" /></td>
+										<td colspan="3" style="text-align:center"><input type="text" class="sheet-noBorder" name="attr_Recette_Outils" value="" /></td>
+									</tr>
+									<thead>
+										<tr>
+											<th style="border-right:1px dotted white;">Matériaux</th>
+											<th colspan="3">Matériaux spéciaux</th>
+										</tr>
+									</thead>
+									<tr>
+										<td style="text-align:center;"><textarea name="attr_Recette_Materiaux"></textarea></td>
+										<td colspan="3" style="text-align:center"><textarea name="attr_Recette_MateriauxSpe"></textarea></td>
+									</tr>
+									<thead>
+										<tr>
+											<th style="border-right:1px dotted white; width: 49%">Assistant</th>
+											<th style="border-right:1px dotted white;">Spécialiste ?</th>
+											<th style="border-right:1px dotted white;">Niveau requis</th>
+											<th style="border-right:1px dotted white;">XP</th>
+										</tr>
+									</thead>
+									<tr>
+										<td style="text-align:center;"><textarea name="attr_Recette_Assistant"></textarea></td>
+										<td style="text-align:center;"><input type="checkbox" name="attr_Recette_Specialiste" value="1" /></td>
+										<td style="text-align:center"><input type="number" name="attr_Recette_Niveau" value="1" /></td>
+										<td style="text-align:center"><input type="number" name="attr_Recette_Xp" value="0" /></td>
+									</tr>
+								</table>
+							</div>
+							<div class="sheet-display-recette-epreuve">
+								<br />
+								<table width="100%">
+									<thead>
+										<tr>
+											<th style="width:25%; border-right:1px dotted white;">Difficulté</th>
+											<th style="width:25%; border-right:1px dotted white;">Malus non-spécialiste</th>
+											<th style="width:25%; border-right:1px dotted white;">Mod.</th>
+											<th style="width:25%"></th>
+										</tr>
+									</thead>
+									<tr>
+										<td style="text-align:center;">
+											<input type="number" class="sheet-shortInput" name="attr_Recette_Difficulte" value="0" />
+										</td>
+										<td style="text-align:center;">
+											<input type="number" class="sheet-shortInput" name="attr_Recette_MalusSpecialiste" value="0" />
+										</td>
+										<td style="text-align:center;">
+											<input type="number" class="sheet-shortInput" name="attr_Recette_Mod" value="0" />
+										</td>
+										<td style="text-align:center; ">
+											<input type="hidden" name="attr_Recette_Bonus" value="0" />
+											<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de fabriquer un(e) @{Recette_Nom} }} {{ Ingéniosité=[[ @{stats_inge_total} + @{recette_bonus} + @{recette_mod} ]] }} {{ Résultat = [[1d20]] }}"> Confection </button>
+										</td>
+									</tr>
+								</table>
+							</div>
+							<div class="sheet-display-recette-results">
+								<br />
+								<table width="100%">
+									<thead>
+										<tr>
+											<th>Résultats</th>
+										</tr>
+									</thead>
+									<tr>
+										<td>
+											<textarea name="attr_Recette_Resultats"></textarea>
+										</td>
+									</tr>
+									<thead>
+										<tr>
+											<th>Prix</th>
+										</tr>
+									</thead>
+									<tr>
+										<td style="text-align:center;">
+											<input type="text" class="sheet-noBorder" name="attr_Recette_Prix" value="" />
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
+					</div>
+					<br clear="all" />
+				</fieldset>
+			</div>
+			<span class="sheet-hint"><b>Règles de réparation / Confection :</b><br>
+			Si le personnage est Spécialiste (ex: Un forgeron qui répare une épée ou un ébéniste qui travail un arc), il peut disposer d'un bonus ou d'un malus au jet en fonction de son Ingéniosité (moy. Int et AD) et de la Difficulté (en fonction de la qualité de l'objet) suivant cette formule : Ingéniosité - Difficulté = Bonus (ou Malus) au jet. <br>
+			Si le personnage n'est pas spécialiste, il ne peut avoir de bonus, le jet est systématiquement malussé celons la difficulté !<br>
+			Le personnage peut bénéficier d'un bonus grâce à un assistant, des outils de qualité ou un atelier mais aussi d'un malus à cause d'un handicap, de la météo...</span>
+		</div>
+
 		<!-- TAB Compagnons -->
 		<div class="sheet-tab_compagnons">
 			<fieldset class="repeating_compagnons">
-				<div class="sheet-col-float" style="width:10%">Nom :</div>
-				<div class="sheet-col-float" style="width:30%"><input type="text" name="attr_Compagnon_Nom" class="sheet-noBorder"></div>
-				<div class="sheet-col-float" style="width:10%">Type :</div>
-				<div class="sheet-col-float" style="width:30%"><input type="text" name="attr_Compagnon_Type" class="sheet-noBorder"></div>
-				<input type="checkbox" class="sheet-display-monture" name="attr_Compagnon_display" value="1" checked="checked" /> <span class="sheet-display-monture">Afficher</span>
-				<br clear="all" />
-				<div class="sheet-display-monture">
-					<div class="sheet-col-float" style="width:300px;">
-						<div class="sheet-monture_stats">
-							<h2>Caractéristiques</h2>
-							<table width="100%">
-								<tr>
-									<th colspan="2">Énergie vitale</th>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_EV" value="" /></td>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_EV_max" value="" /></td>
-								</tr>
-								<tr>
-									<th>COU</th>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Cou" value="" /></td>
-									<th style="text-align:center;">AT</th>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_AT" value="" /></td>
-								</tr>
-								<tr>
-									<th>Esquive</th>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Esquive" value="" /></td>
-									<th style="text-align:center;">PRD</th>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_PRD" value="" /></td>
-								</tr>
-								<tr>
-									<th>Charge</th>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Charge" value="" /></td>
-									<th style="text-align:center;">Charge Max</th>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Charge_max" value="" /></td>
-								</tr>
-								<tr>
-									<th>PR</th>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_PR" value="" /></td>
-									<th style="text-align:center;">Résist. Magie</th>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_ResiMagie" value="" /></td>
-								</tr>
-							</table>
-						</div>
-						<div class="sheet-monture_deplacement">
-							<br>
-							<h2>Déplacement</h2>
-							<table width="100%">
-								<thead>
+				<div class="sheet-group">
+					<div class="sheet-row">
+						<div class="sheet-col" style="width:10%"><b>Nom :</b></div>
+						<div class="sheet-col" style="width:30%"><input type="text" name="attr_Compagnon_Nom" class="sheet-noBorder"></div>
+						<div class="sheet-col" style="width:10%">Type :</div>
+						<div class="sheet-col" style="width:30%"><input type="text" name="attr_Compagnon_Type" class="sheet-noBorder"></div>
+					</div>
+					<input type="checkbox" name="attr_Compagnon_display" class="sheet-config-flag" value="1" /><span class="sheet-cog">y</span>
+					<div class="sheet-config">
+						<div class="sheet-col-float" style="width:290px;">
+							<div class="sheet-monture_stats">
+								<h2>Caractéristiques</h2>
+								<table width="100%">
 									<tr>
-										<td></td>
-										<th>Sol</th>
-										<th>Air</th>
-										<td></td>
+										<th colspan="2">Énergie vitale</th>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_EV" value="" /></td>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_EV_max" value="" /></td>
 									</tr>
-								</thead>
-								<tr>
-									<th>Assault</th>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Assaut_sol" value="0" /></td>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Assaut_air" value="0" /></td>
-									<td><span class="sheet-hint">M</span></td>
-								</tr>
-								<tr>
-									<th>Charge</th>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Charge_sol" value="0" /></td>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Charge_air" value="0" /></td>
-									<td><span class="sheet-hint">M</span></td>
-								</tr>
-								<tr>
-									<th>Voyage</th>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Voyage_sol" value="0" /></td>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Voyage_air" value="0" /></td>
-									<td><span class="sheet-hint">KM/H</span></td>
-								</tr>
-								<tr>
-									<th>Voyage</th>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Jour_sol" value="0" /></td>
-									<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Jour_air" value="0" /></td>
-									<td><span class="sheet-hint">KM/J</span></td>
-								</tr>
-							</table>
+									<tr>
+										<th>COU</th>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Cou" value="" /></td>
+										<th style="text-align:center;">AT</th>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_AT" value="" /></td>
+									</tr>
+									<tr>
+										<th>Esquive</th>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Esquive" value="" /></td>
+										<th style="text-align:center;">PRD</th>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_PRD" value="" /></td>
+									</tr>
+									<tr>
+										<th>Charge</th>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Charge" value="" /></td>
+										<th style="text-align:center;">Charge Max</th>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Charge_max" value="" /></td>
+									</tr>
+									<tr>
+										<th>PR</th>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_PR" value="" /></td>
+										<th style="text-align:center;">Résist. Magie</th>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_ResiMagie" value="" /></td>
+									</tr>
+								</table>
+							</div>
+							<div class="sheet-monture_deplacement">
+								<br>
+								<h2>Déplacement</h2>
+								<table width="100%">
+									<thead>
+										<tr>
+											<td></td>
+											<th>Sol</th>
+											<th>Air</th>
+											<td></td>
+										</tr>
+									</thead>
+									<tr>
+										<th>Assault</th>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Assaut_sol" value="0" /></td>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Assaut_air" value="0" /></td>
+										<td><span class="sheet-hint">M</span></td>
+									</tr>
+									<tr>
+										<th>Charge</th>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Charge_sol" value="0" /></td>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Charge_air" value="0" /></td>
+										<td><span class="sheet-hint">M</span></td>
+									</tr>
+									<tr>
+										<th>Voyage</th>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Voyage_sol" value="0" /></td>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Voyage_air" value="0" /></td>
+										<td><span class="sheet-hint">KM/H</span></td>
+									</tr>
+									<tr>
+										<th>Voyage</th>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Jour_sol" value="0" /></td>
+										<td><input type="number" class="sheet-shortInput" name="attr_Compagnon_Deplacement_Jour_air" value="0" /></td>
+										<td><span class="sheet-hint">KM/J</span></td>
+									</tr>
+								</table>
+							</div>
 						</div>
-					</div>
-					<div class="sheet-col-float" style="width:500px;">
-						<div class="sheet-monture_combat">
-							<h2>Combat</h2>
-							<textarea name="attr_Compagnon_Combat"></textarea>
+						<div class="sheet-col-float" style="width:500px;">
+							<div class="sheet-monture_combat">
+								<h2>Combat</h2>
+								<textarea name="attr_Compagnon_Combat"></textarea>
+							</div>
+							<div class="sheet-monture_entretien">
+								<h2>Entretien</h2>
+								<textarea name="attr_Compagnon_Entretien"></textarea>
+							</div>
+							<div class="sheet-monture_autres">
+								<h2>Autres</h2>
+								<textarea name="attr_Compagnon_Autres"></textarea>
+							</div>
 						</div>
-						<div class="sheet-monture_entretien">
-							<h2>Entretien</h2>
-							<textarea name="attr_Compagnon_Entretien"></textarea>
+						<br clear="all">
+						<br>
+						<div class="sheet-monture_materiel">
+							<h2>Matériel</h2>
+							<div class="sheet-col-float" style="width:32%;">
+								<input type="text" class="sheet-noBorder" name="attr_Compagnon_Materiel1_Nom" value="Sac N°1">
+								<textarea name="attr_Compagnon_Materiel1"></textarea>
+							</div>
+							<div class="sheet-col-float" style="width:32%;">
+								<input type="text" class="sheet-noBorder" name="attr_Compagnon_Materiel2_Nom" value="Sac N°2">
+								<textarea name="attr_Compagnon_Materiel2"></textarea>
+							</div>
+							<div class="sheet-col-float" style="width:32%;">
+								<input type="text" class="sheet-noBorder" name="attr_Compagnon_Materiel3_Nom" value="Sac N°3">
+								<textarea name="attr_Compagnon_Materiel3"></textarea>
+							</div>
 						</div>
-						<div class="sheet-monture_autres">
-							<h2>Autres</h2>
-							<textarea name="attr_Compagnon_Autres"></textarea>
-						</div>
-					</div>
-					<br clear="all">
-					<br>
-					<div class="sheet-monture_materiel">
-						<h2>Matériel</h2>
-						<div class="sheet-col-float" style="width:32%;">
-							<input type="text" class="sheet-noBorder" name="attr_Compagnon_Materiel1_Nom" value="Sac N°1">
-							<textarea name="attr_Compagnon_Materiel1"></textarea>
-						</div>
-						<div class="sheet-col-float" style="width:32%;">
-							<input type="text" class="sheet-noBorder" name="attr_Compagnon_Materiel2_Nom" value="Sac N°2">
-							<textarea name="attr_Compagnon_Materiel2"></textarea>
-						</div>
-						<div class="sheet-col-float" style="width:32%;">
-							<input type="text" class="sheet-noBorder" name="attr_Compagnon_Materiel3_Nom" value="Sac N°3">
-							<textarea name="attr_Compagnon_Materiel3"></textarea>
-						</div>
+						<br clear="all">
 					</div>
 				</div>
 			</fieldset>
@@ -2387,7 +2943,7 @@
 	</div>
 	<!-- TAB Reglages -->
 	<div class="sheet-body sheet-reglages">
-		<h2>Réglages (v2.2)</h2>
+		<h2>Réglages (v2.4)</h2>
 		<p>
 			<input type="checkbox" name="attr_displayJet" value="/w gm"> Envoyer les jets au MJ uniquement
 			<br />
@@ -2440,11 +2996,11 @@
 					<td><input type="number" name="attr_Stats_Force" value="0"></td>
 					<td><input type="number" name="attr_Stats_Attaque" value="8"></td>
 					<td><input type="number" name="attr_Stats_Parade" value="10"></td>
-					<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Jet" value="0" readonly="readonly"></td>
-					<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Esquive" value="0" readonly="readonly"></td>
-					<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_MagiePhy" value="0" readonly="readonly"></td>
-					<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_MagiePsy" value="0" readonly="readonly"></td>
-					<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_ResiMagie" value="0" readonly="readonly"></td>
+					<td><input type="number" name="attr_Stats_Jet" value="0"></td>
+					<td><input type="number" name="attr_Stats_Esquive" value="0"></td>
+					<td><input type="number" name="attr_Stats_MagiePhy" value="0"></td>
+					<td><input type="number" name="attr_Stats_MagiePsy" value="0"></td>
+					<td><input type="number" name="attr_Stats_ResiMagie" value="0"></td>
 				</tr>
 			</tbody>
 		</table>
@@ -2617,6 +3173,30 @@
 		</div>
 		<br clear="all" />
 		<br />
+		<div class="sheet-traits">
+			<h2>Traits spéciaux</h2>
+			<div class="sheet-tableth">
+				<div class="sheet-col" style="width: 176px;">Nom</div>
+				<div class="sheet-col" style="width: 546px;">Effet</div>
+			</div>
+			<fieldset class="repeating_traits">
+				<div class="sheet-row">
+					<div class="sheet-col" style="width: 180px;">
+						<input type="text" class="sheet-noBorder" name="attr_trait_nom" value="" />
+					</div>
+					<div class="sheet-col" style="width: 550px;">
+						<input type="text" class="sheet-noBorder" name="attr_trait_effet" value="" />
+					</div>
+				</div>
+			</fieldset>
+		</div>
+		<br clear="all" />
+		<br />
+		<div class="sheet-notes">
+			<h2>Notes</h2>
+			<textarea name="attr_Personnage_Notes"></textarea>
+		</div>
+		<br clear="all" />
 		<div class="sheet-butins">
 			<h2>Butins</h2>
 			<textarea name="attr_Personnage_Butins"></textarea>
