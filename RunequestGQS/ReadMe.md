@@ -34,7 +34,7 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
-## NPC Sheet
+
 
 
 
