@@ -38,7 +38,7 @@ STR and DEX minimums are not currently supported this maybe added in a future re
 
 
 
-## Version 02/10/2018
+## Version 02.10.2018
 
 Fixed expeirence boxes removed for sheets added before 18.09.2018 update.
 
