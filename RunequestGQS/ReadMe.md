@@ -30,7 +30,7 @@ In the weapon section * indicates to use the mounts damage bonus and not the pla
 
 Default in the weapon section indicates that you are using a skill from the same category e.g. using Broadsword skill with a short sword.  It will halve the skill as per the rules.
 
-To remove the experience checkbox from a killadda- at the start of the name e.g. -Animal Lore. To add the experience add a + to the start of a skill name e.g. +Animal Lore
+To remove the experience checkbox from a skill add a - at the start of the name e.g. -Animal Lore. To add the experience checkbox  add a + to the start of a skill name e.g. +Animal Lore
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
