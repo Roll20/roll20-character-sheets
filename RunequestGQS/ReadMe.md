@@ -40,9 +40,8 @@ STR and DEX minimums are not currently supported this maybe added in a future re
 
 ## Version 02.10.2018
 
-Fixed expeirence boxes removed for sheets added before 18.09.2018 update.
-
-
+Fixed experience boxes removed for sheets added before 18.09.2018 update.
+     
 ## Version 18.09.2018
 
 Add the ability to add or remove the experience checkbox
