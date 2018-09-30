@@ -37,7 +37,7 @@ STR and DEX minimums are not currently supported this maybe added in a future re
 ## NPC Sheet
 
 
-## Version 186.09.2018
+## Version 18.09.2018
 
 Add the ability to add or remove the experience checkbox
 
