@@ -9,26 +9,38 @@ Please note that the inline dice roll macros do not fully enable the type of dic
 If you have any questions, comments, or feedback (all welcome) please contact Barry at btsnyder@gmail.com
 
 ### Current Version
-Version 2.0 (August 20th, 2018) 
+Version 2.1 (September 23rd, 2018) 
 
 ### Thanks	
 Many thanks to my players (Dave, Brian, Charles, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes in the middle of play) over the past several weeks.
 
+Many thanks to the following individuals who reported defects to the sheet: 
+1. Morback.
+
+
 ### Planned Releases
 
-v3.0. Redo NPC Layout with an order close to the core rulebook stat block. [early September]
+v3.0. Redo NPC Layout with an order close to the core rulebook stat block. 
 
-v4.0. Refine Inline rolls [late September]
+v4.0. Refine Inline rolls 
     - Add modifiers to each roll
     - a 6 = two successes
 
-v5.0. Automate all calculated fields for performance and speed of character creation. [October]
+v5.0. Automate all calculated fields for performance and speed of character creation. 
     - includes automated calculation of traits
     - validate impact on NPC where the same fields are not RO
     - when auto-calculating, need to allow the use of STR for Fel for influence for orks, and intellect in place of Fel for Mechanicus
 
 	
 ### Changelog
+
+** September 23rd, 2018: version 2.1 - Fixes** 
+
+Updates:
+1. Fixed all attack rolls using the API (character, NPC, Vehicle, Voidship); the feed to the API was not subtracting a die for Wrath from the pool being rolled.
+2. Modified Corruption line under mental/social traits to list level of corruption and DN per page 367 of core rulebook.
+3. Added Resist Corruption line under mental/social traits after the Corruption Rating
+4. Fixed Mission BP not being added to totals.
 
 ** August 20th, 2018: version 2.0 - Base Rule Alignment Changes** 
 

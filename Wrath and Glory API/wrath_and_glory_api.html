@@ -1,4 +1,5 @@
-<!-- WRATH & GLORY Multi-tab character sheet integrated with the Wrath & Glory API Die Roller -->
+<!-- WRATH & GLORY Multi-tab character sheet integrated with the Wrath & Glory API Die Roller  -->
+<!-- Version: 2.1 -->
 <!-- Begin Character sheets with Background -->
 <div class="wrapper">
 
@@ -95,11 +96,11 @@
 						<table>
 							<tr>
 								<td class="sheet-width-W25"><span class="sheet-background sheet-pad-text">Framework:</span></td>
-								<td class="sheet-width-W75"><input class="sheet-width-W95"  type="text" name="attr_framework"title="Character framework."/></td>
+								<td class="sheet-width-W75"><input class="sheet-width-W95" type="text" name="attr_framework" title="Character framework."/></td>
 							</tr>
 							<tr>
 								<td class="sheet-width-W25"><span class="sheet-background sheet-pad-text">Species/Gender:</span></td>
-								<td class="sheet-width-W75"><input class="sheet-width-W95"  type="text" name="attr_species" title="Character species and gender."/></td>
+								<td class="sheet-width-W75"><input class="sheet-width-W95" type="text" name="attr_species" title="Character species and gender."/></td>
 							</tr>
 						</table>
 				</div> 		
@@ -319,21 +320,29 @@
 							</tr>
 							<tr>
 								<td><H5>Corruption</H5></td>									
-								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_CorrBase" value="0" title="Base Corruption rating."/></td> 
-								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_CorrMod" value="0" title="Modifier to base Corruption rating."/></td> 
-								<td class="sheet-center"><span class="sheet-circle"><input type="number"  type="number" name="attr_CorrAdj" disabled="true" value="((@{CorrBase} + @{CorrMod}))"  title="Adjusted (Base + Modifier) Corruption."/></span></td> 
-								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_CorrBonusRoll" value="0" title="Number of Bonus Dice added to the Corruption roll."/></td> 
+								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_CorrBase" value="0" title="Total Corruption Points"/></td> 
+								<td class="sheet-center"><span class="sheet-background sheet-pad-text">Level:</span></td>
+								<td class="sheet-left" colspan="2"><input class="sheet-width-W100" type="text" readonly name="attr_CorrLevel" title="Level of Corruption."/></td>
+								<td class="sheet-center" colspan="1"><span class="sheet-background sheet-pad-text">DN:</span></td>
+								<td class="sheet-left"><span class="sheet-circle"><input type="text" readonly name="attr_CorrResistDN" title="DN to resist Corruption; Base of 3 + Modifier from Corruption Level"/></span></td>
+							</tr>
+							<tr>
+								<td><H5>Resist Corr</H5></td>									
+								<td class="sheet-center"><span class="sheet-circle"><input type="number"  name="attr_ResistBase" disabled="true" value="((@{ConvAdj}))"  title="Base number used for resisting corruption; equal to adjusted conviction."/></td> 
+								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_CorrMod" value="0" title="Modifier to base resist corruption roll."/></td> 
+								<td class="sheet-center"><span class="sheet-circle"><input type="number"  name="attr_CorrAdj" disabled="true" value="((@{ResistBase} + @{CorrMod}))"  title="Adjusted (Base + Modifier) Resist Corruption."/></span></td> 
+								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_CorrBonusRoll" value="0" title="Number of Bonus Dice added to the Resist Corruption roll."/></td> 
 								<td class="sheet-center"><input class="sheet-spin-button" type="number" name="attr_CorrRollMod" value="0" title="Modifier to the result of the die roll."/></td> 
 								<td class="sheet-center">
 									<button class="sheet-diebutton-api" type="roll" 
-										title="Click to make a Corruption test." 
-										value="!wag {{[[[[@{CorrAdj} + @{CorrBonusRoll} - 1]]d6]]}} {{[[1d6]]}} --Name|@{character_name} --Trait|Corruption --Modifier|@{CorrRollMod}"
-										name="roll_corruption" style="font-size: 175%;">
+										title="Click to make a Resist Corruption test." 
+										value="!wag {{[[[[@{CorrAdj} + @{CorrBonusRoll} - 1]]d6]]}} {{[[1d6]]}} --Name|@{character_name} --Test|Resist Corruption --Modifier|@{CorrRollMod}"
+										name="roll_resistcorruption" style="font-size: 175%;">
 									</button>
 									<button class="sheet-diebutton-simple" type="roll"
-											title="Click to make a Corruption test." 
-											value="&{template:roll_dicepool} {{name=@{character_name} makes a Corruption test}} {{dice=[[@{CorrAdj} + @{CorrBonusRoll}]]}} {{roll=[[[[@{CorrAdj} + @{CorrBonusRoll} - {1}]]d6>4]]}} {{wrath=[[1d6]]}}"
-											name="roll_dice4corruption" style="font-size: 175%;">
+											title="Click to make a Resist Corruption test." 
+											value="&{template:roll_dicepool} {{name=@{character_name} makes a Resist Corruption test}} {{dice=[[@{CorrAdj} + @{CorrBonusRoll}]]}} {{roll=[[[[@{CorrAdj} + @{CorrBonusRoll} - {1}]]d6>4]]}} {{wrath=[[1d6]]}}"
+											name="roll_dice4resistcorruption" style="font-size: 175%;">
 									</button>	
 								</td>
 							</tr>
@@ -1498,7 +1507,7 @@
 							<td class="sheet-width-W4 sheet-center">
 								<button class="sheet-diebutton-api sheet-diebutton-attack" type="roll" 
 										title="Click to make an Attack roll." 
-										value="!wag {{[[[[@{wpnAttkSkill} + @{wpnAttBD}]]d6]]}} {{[[1d6]]}} --Name|@{character_name} --Attack with|@{Weapon} --Bonus Dice|@{wpnAttBD} --Modifier|@{wpnAttMod}"
+										value="!wag {{[[[[@{wpnAttkSkill} + @{wpnAttBD} - 1]]d6]]}} {{[[1d6]]}} --Name|@{character_name} --Attack with|@{Weapon} --Bonus Dice|@{wpnAttBD} --Modifier|@{wpnAttMod}"
 										name="roll_repeatingWeaponattack" style="font-size: 175%;">
 								</button>
 								<button class="sheet-diebutton-simple sheet-diebutton-attack" type="roll"
@@ -1879,7 +1888,7 @@
 						<td class="sheet-small-textblock "><H3>BP Award</H3></td>
 					</tr>
 				</table>
-				<fieldset class="repeating_Mission"> 
+				<fieldset class="repeating_serial"> 
 					<table>
 						<tr>		
 							<td class="sheet-verylarge-textblock"><input class="sheet-width-W100" type="text" name="attr_MissionName" title="name of the Mission" placeholder="Mission Name" /></td>
@@ -2426,7 +2435,7 @@
 								<td class="sheet-width-W4 sheet-center">
 									<button class="sheet-diebutton-attack sheet-diebutton-api" type="roll" 
 										title="Click to make an Attack test with '+@{Weapon}+'." 
-										value="!wag {{[[[[@{wpnAttkSkill} + @{wpnAttBD}]]d6]]}} {{[[1d6]]}} --Name|@{character_name} --Attack|@{Weapon} --Bonus Dice|@{wpnAttBD} --Modifier|@{wpnAttMod}"
+										value="!wag {{[[[[@{wpnAttkSkill} + @{wpnAttBD} - 1]]d6]]}} {{[[1d6]]}} --Name|@{character_name} --Attack|@{Weapon} --Bonus Dice|@{wpnAttBD} --Modifier|@{wpnAttMod}"
 										name="roll_NPCWeaponAttackTest" style="font-size: 175%;">
 									</button>
 									<button class="sheet-diebutton-attack sheet-diebutton-simple" type="roll"
@@ -2696,7 +2705,7 @@
 								<td class="sheet-width-W30 sheet-center">
 									<button class="sheet-diebutton-api" type="roll" 
 											title="Click to make a vehicle test." 
-											value="!wag {{[[[[@{vehDicePool} + @{vehCombatBD}]]d6]]}} {{[[1d6]]}} --Vehicle|@{vehName} --Test|@{vehicleTest} --Modifier|@{vehCombatRollMod}"
+											value="!wag {{[[[[@{vehDicePool} + @{vehCombatBD} - 1]]d6]]}} {{[[1d6]]}} --Vehicle|@{vehName} --Test|@{vehicleTest} --Modifier|@{vehCombatRollMod}"
 											name="roll_vehicleTest" style="font-size: 175%;">
 									</button>
 									<button class="sheet-diebutton-simple" type="roll"
@@ -2782,7 +2791,7 @@
 								<td class="sheet-width-W5 sheet-center">
 									<button class="sheet-diebutton-api sheet-diebutton-attack" type="roll" 
 											title="Click to make an Attack roll with '+@{vehWeapon}+'." 
-											value="!wag {{[[[[@{vehwpnPool} + @{vehwpnAttBD}]]d6]]}} {{[[1d6]]}} --Name|@{vehName} --Attack with|@{vehWeapon} --Bonus Dice|@{vehwpnAttBD} --Modifier|@{vehwpnAttMod}"
+											value="!wag {{[[[[@{vehwpnPool} + @{vehwpnAttBD} - 1]]d6]]}} {{[[1d6]]}} --Name|@{vehName} --Attack with|@{vehWeapon} --Bonus Dice|@{vehwpnAttBD} --Modifier|@{vehwpnAttMod}"
 											name="roll_repeatingVehWeaponAttack" style="font-size: 175%;">
 									</button>
 									<button class="sheet-diebutton-simple sheet-diebutton-attack" type="roll"
@@ -2919,7 +2928,7 @@
 									<td class="sheet-width-W10 sheet-center">
 										<button class="sheet-diebutton-api" type="roll" 
 												title="Click to make a Voidship test." 
-												value="!wag {{[[[[@{voidDicePool} + @{voidCombatBD}]]d6]]}} {{[[1d6]]}} --Voidship|@{voidName} --Test|@{voidTest} --Modifier|@{voidCombatRollMod}"
+												value="!wag {{[[[[@{voidDicePool} + @{voidCombatBD} - 1]]d6]]}} {{[[1d6]]}} --Voidship|@{voidName} --Test|@{voidTest} --Modifier|@{voidCombatRollMod}"
 												name="roll_voidTest" style="font-size: 175%;">
 										</button>
 										<button class="sheet-diebutton-simple" type="roll"
@@ -3005,7 +3014,7 @@
 									<td class="sheet-width-W5 sheet-center">
 										<button class="sheet-diebutton-api sheet-diebutton-attack" type="roll" 
 												title="Click to make an Attack roll with '+@{voidWeapon}+'." 
-												value="!wag {{[[[[@{voidwpnPool} + @{voidwpnAttBD}]]d6]]}} {{[[1d6]]}} --Name|@{voidName} --Attack with|@{voidWeapon} --Bonus Dice|@{voidwpnAttBD} --Modifier|@{voidwpnAttMod}"
+												value="!wag {{[[[[@{voidwpnPool} + @{voidwpnAttBD} - 1]]d6]]}} {{[[1d6]]}} --Name|@{voidName} --Attack with|@{voidWeapon} --Bonus Dice|@{voidwpnAttBD} --Modifier|@{voidwpnAttMod}"
 												name="roll_repeatingvoidWeaponAttack" style="font-size: 175%;">
 										</button>
 										<button class="sheet-diebutton-simple sheet-diebutton-attack" type="roll"
@@ -3039,7 +3048,7 @@
 		
 	<!-- ************************************** Hidden Fields for Sheet Workers ************************************** -->
 	<div>
-		<!-- For debugging sheet workers
+		<!-- For debugging sheet workers 
 		field names<input readonly name="attr_testA"/>
 		checked B4<input readonly name="attr_testB"/>
 		checked after<input readonly name="attr_testC"/>
@@ -3109,7 +3118,40 @@
 	
 	<!-- ************************************** Script Workers ************************************** -->
 	<script type="text/worker">
+		
+		//******************************** Open Sheet ************************************************ 
+		//******************************************************************************************** 
 	
+		// EXECUTE: When the sheet is opened, update score fields for anyone using an older sheet.
+		on('sheet:opened',function(){
+			// Update corruption labels
+			getAttrs(["corrbase"], function(values) {
+				var corruption = (values.corrbase)*1;
+				corruption = Math.max(0,corruption); 								// corruption does not go below 0; throws an error on the lookup if below 0
+				corruption = Math.min(30,corruption);								// corruption does not go above 30; throws an error on the lookup if above 30
+				var label = lookup_corruption_lvl(corruption);
+				var dn = lookup_corruption_dn(corruption);
+				
+				setAttrs({CorrLevel:label});
+				setAttrs({CorrResistDN:dn});
+			});
+		});
+		
+		//******************************** Update Corruption Labels ********************************** 
+		//******************************************************************************************** 
+		on("change:corrbase", function() {
+			getAttrs(["corrbase"], function(values) {
+				var corruption = (values.corrbase)*1;
+				corruption = Math.max(0,corruption); 								// corruption does not go below 0; throws an error on the lookup if below 0
+				corruption = Math.min(30,corruption);								// corruption does not go above 30; throws an error on the lookup if above 30
+				var label = lookup_corruption_lvl(corruption);
+				var dn = lookup_corruption_dn(corruption);
+				
+				setAttrs({CorrLevel:label});
+				setAttrs({CorrResistDN:dn});
+			});
+		});
+
 		//******************************** Update WPN +STR if weapon is melee ************************ 
 		//******************************************************************************************** 
 		on("change:repeating_weapon:meleewpn", function() {
@@ -3217,7 +3259,105 @@
 					
 			});
 		});
-			
-	
+
+
+		//******************************** Lookup Tables ********************************************* 
+		//********************************************************************************************		
 		
+		// FUNCTION: lookup table for corruption dn
+		var lookup_corruption_lvl = function(corruption) {
+			switch(corruption) {
+                case 0:
+				case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5: return "0 pure";
+						break;
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10: return "1 tarnished";
+						 break;
+                case 11: 
+                case 12:
+                case 13:
+                case 14: 
+                case 15: return "2 contaminated";
+						 break;
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20: return "3 tainted";
+						 break;
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25: return "4 defiled";
+						 break;
+                case 26: return "5 chaos spawn";
+						 break;
+                case 27: return "5 chaos spawn";
+						 break;
+                case 28: return "5 chaos spawn";
+						 break;
+                case 29: return "5 chaos spawn";
+						 break;
+                case 30: return "5 chaos spawn";
+						 break;
+				case "default": return "5 chaos spawn";
+			};	
+		};
+					
+		// FUNCTION: lookup table for corruption label
+		var lookup_corruption_dn = function(corruption) {
+			switch(corruption) {
+                case 0:
+				case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5: return 3;
+						break;
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10: return 4;
+						 break;
+                case 11: 
+                case 12:
+                case 13:
+                case 14: 
+                case 15: return 5;
+						 break;
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20: return 6;
+						 break;
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25: return 7; 
+						 break;
+                case 26: return "--"; 
+						 break;
+                case 27: return "--"; 
+						 break;
+                case 28: return "--"; 
+						 break;
+                case 29: return "--"; 
+						 break;
+                case 30: return "--"; 
+						 break;
+				case "default": return "--";
+			};	
+		};			
+	
 	</script>
