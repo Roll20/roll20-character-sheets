@@ -41,29 +41,29 @@ Guidelines
 
 Here are a few guidelines that you should follow when contributing sheets for the community:
 
-**Make it Familiar**
+## Make it Familiar
 
 The sheet for each game type should be familiar to players who are used to seeing the paper version of that sheet. It shouldn't be identical or violate any copyright, but it also shouldn't be laid out in such a crazy way that players will have a hard time understanding how to use it. **Design for ease of use first and foremost.** Along those lines, keep your UI changes simple -- please don't change the basic functionality of how a checkbox works, for example.
 
-**Add Rolls**
+## Add Rolls
 
 The best sheets not only keep track of character stats, they have most of the rolls for the game system embedded in them. This makes it much easier for new players to play the game (just "click on that button on the sheet" versus "Make a macro, okay put slash roll one dee twenty..."). While you don't have to include every roll in the whole system, including the most common ones where appropriate can really help elevate your sheet to the next level.
 
-**Don't Duplicate Work**
+## Don't Duplicate Work
 
 We only need one sheet for each system. For some major systems like Pathfinder or D&D, we may allow more than one sheet if they are different enough, but contact us in advance before you spend a lot of time working on a new sheet for a game we already have a sheet for. We should focus on improving existing sheets, not creating totally new ones. Along those lines, this is a community effort, so if you want to help improve an existing sheet, just jump in and do so.
 
-**Use Standard Attribute Names**
+## Use Standard Attribute Names
 
 Whenever possible, use standard names for attributes, spelled out. For example, "Intelligence", "Strength", and "Wisdom". This is important so that if a Character is imported into a game with a different sheet, most of the values will be able to transition. If the attribute names are all different, then nothing can be imported. Your best bet is to look at existing sheets and whenever possible use the same attribute names that are already in use.
 
 
-**No Character Creation or Advancement**
+## No Character Creation or Advancement
 
 Due to copyright restrctions, please don't attempt to include functionality for advancing a character automatically to the next level or creating a new character from scratch automatically. It's fine to have attributes that auto-calculate based on other attributes (including the current level). We'll let you know if your submitted sheet violates this rule.
 
 
-**Don't Use Reserved HTML**
+## Don't Use Reserved HTML
 Your HTML file must **not** have a <head> or <body> tag, or your character sheet may not load in the virtual tabletop.
 
 License
