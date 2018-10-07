@@ -50,6 +50,8 @@ If you think anything is missing or you see any bugs, please message me via my [
 
 ### Version 2.0
 Updated so Powers is now displayed by click the arrow next to it, rather than it merely being written in. The Powers now have a "Details" next to each so you can trigger a description.
+Attributes now go up to 7 to enable the pre-gen characters in the book to be made. Note "Exceptional Skills" in the book are complete dicepools.
+Bug fix that adding new Coterie Members added Shared Background
 
 ### Version 1.2.1
 Bug fixes
