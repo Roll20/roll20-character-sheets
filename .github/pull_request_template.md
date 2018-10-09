@@ -1,6 +1,4 @@
-## Name 
-
-Include the name of the sheet you made changes to in the title.
+*Include the name of the sheet you made changes to in the title.
 
 ## Changes
 
