@@ -1,3 +1,11 @@
+## 1.2.3
+ - 09.10.2018
+
+ ### Fixes
+ - Versionsnummer korrigiert
+ - editierbarer Eigenschaftsbasiswert ist nun auch im NPC Sheet ersichtlich
+
+
 ## 1.2.2
  - 26.09.2018
 
