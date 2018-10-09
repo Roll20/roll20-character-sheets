@@ -3920,8 +3920,39 @@ on("change:startimport", function(f) {
                         setAttrs(culturelores);
                     }
                 }
+                var masteries = {};
                 for (var i = 0; i < characterData["skillvals"]["skillval"].length; i++) {
                     value = characterData["skillvals"]["skillval"][i]["-val"] || 0;
+                    
+                    if (typeof characterData["skillvals"]["skillval"][i]["masterref"] !== "undefined") {
+                        if (!Array.isArray(characterData["skillvals"]["skillval"][i]["masterref"])) {
+                                if (typeof characterData["skillvals"]["skillval"][i]["masterref"]["-ref"] !== "undefined") {
+                                    let mastery = characterData["skillvals"]["skillval"][i]["masterref"]["-ref"].split(/\/(.+)/)[1].split(/\/(.+)/)[0];
+                                    masteries["repeating_meisterschaften_" + newrowid + "_meisterschaftsname"] = mastery;
+                                    masteries["repeating_meisterschaften_" + newrowid + "_meisterschaftsfertigkeit"] = translateGenesis(characterData["skillvals"]["skillval"][i]["-skill"]);
+                                    masteries["repeating_meisterschaften_" + newrowid + "_meisterschaftsschwelle"] = 1;
+                                } else if (typeof characterData["skillvals"]["skillval"][i]["masterref"]["-spec"] !== "undefined") {
+                                    let mastery = characterData["skillvals"]["skillval"][i]["masterref"]["-spec"].split(/\/(.+)/)[1].split(/\/(.+)/)[0];
+                                    masteries["repeating_meisterschaften_" + newrowid + "_meisterschaftsname"] = "Schwerpunkt: " + mastery;
+                                    masteries["repeating_meisterschaften_" + newrowid + "_meisterschaftsfertigkeit"] = translateGenesis(characterData["skillvals"]["skillval"][i]["-skill"]);
+                                    masteries["repeating_meisterschaften_" + newrowid + "_meisterschaftsschwelle"] = 1; 
+                                }
+                        } else if (Array.isArray(characterData["skillvals"]["skillval"][i]["masterref"])) {
+                            for (var j = 0; j < characterData["skillvals"]["skillval"][i]["masterref"].length; j++) {
+                                if (typeof characterData["skillvals"]["skillval"][i]["masterref"][j]["-ref"] !== "undefined") {
+                                    let mastery = characterData["skillvals"]["skillval"][i]["masterref"][j]["-ref"].split(/\/(.+)/)[1].split(/\/(.+)/)[0];
+                                    masteries["repeating_meisterschaften_" + newrowid + "_meisterschaftsname"] = mastery;
+                                    masteries["repeating_meisterschaften_" + newrowid + "_meisterschaftsfertigkeit"] = translateGenesis(characterData["skillvals"]["skillval"][i]["-skill"]);
+                                    masteries["repeating_meisterschaften_" + newrowid + "_meisterschaftsschwelle"] = 1;
+                                } else if (typeof characterData["skillvals"]["skillval"][i]["masterref"][j]["-spec"] !== "undefined") {
+                                    let mastery = characterData["skillvals"]["skillval"][i]["masterref"][j]["-spec"].split(/\/(.+)/)[1].split(/\/(.+)/)[0];
+                                    masteries["repeating_meisterschaften_" + newrowid + "_meisterschaftsname"] = "Schwerpunkt: " + mastery;
+                                    masteries["repeating_meisterschaften_" + newrowid + "_meisterschaftsfertigkeit"] = translateGenesis(characterData["skillvals"]["skillval"][i]["-skill"]);
+                                    masteries["repeating_meisterschaften_" + newrowid + "_meisterschaftsschwelle"] = 1;
+                                }
+                            }
+                        }
+                    } 
                     switch(characterData["skillvals"]["skillval"][i]["-skill"]) {
                         case ("melee"):
                             setAttrs({handgemengepunkte: +value});
