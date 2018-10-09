@@ -8,7 +8,7 @@ Contributing
 
 Full Character Sheet documentation can be found on the [Roll20 Wiki](https://wiki.roll20.net/Building_Character_Sheets).
 
-Pull requests are processed weekly and should be **submitted no later than 6am PST Mondays**, roughly 13:00-14:00 UTC. Earlier submissions are encouraged to allow for peer review from other contributors. On Monday, a Roll20 staff member will review the content to ensure it meets the standards documented here and on the Roll20 Wiki. Comments, concerns, and changes as a result of review will need to be addressed no later than 6am PST on Tuesdays to ensure the pull request can be merged into the repository for the scheduled code push Tuesday morning. This schedule is a general best practice and may be subject to change without notice due to circumstance. 
+Pull requests are processed weekly and should be **submitted no later than 6am PST Mondays**, roughly 13:00-14:00 UTC. Earlier submissions are encouraged to allow for peer review from other contributors. On Monday, a Roll20 staff member will review the content to ensure it meets the standards documented here and on the Roll20 Wiki. Comments, concerns, and changes as a result of review will need to be addressed before the pull request can be merged into the repository. This schedule is a general best practice and is subject to changes or delays.
 
 ## Internationalization &amp; Translations
 
@@ -16,11 +16,12 @@ Help us make these sheets accessible in as many languages as possible. We use [C
 
 ## Improving Existing Character Sheets
 
-If you want to help improve an existing sheet, just clone this repository. make your changes, and submit a pull request.
+If you want to help improve an existing sheet just clone this repository, make your changes, and submit a pull request. When updating existing character sheets if you are doing significant attribute name changes it is a best practice to write a sheet worker to migrate the existing input data over to the new attribute names so that players will not lose their data.
 
 ## Creating your own
 
-If you would like to contribute a new sheet for the community to use, just clone this repository and create a new folder with the name of the game system that the sheet is for. Then send a pull request. If you have any questions or aren't familiar with Github or git in general, feel free to drop us a line at team@roll20.net and we can help you get set up.
+If you would like to contribute a new sheet for the community to use, just clone this repository and create a new folder with the name of the game system that the sheet is for. Please use complete titles where possible for folder names and avoid acronyms or abbreviations. Add the necessary files to this folder then submit a pull request. If you have any questions, feel free to drop us a line at team@roll20.net and we can help you get set up.
+
 **Creating a sheet.json File**
 
 When you are ready to submit your template for **public use**, create a `sheet.json` file in your sheet's folder (see the kitchensink folder for an example sheet.json file). This file is required to be named `sheet.json`. The file has the following fields:
@@ -57,7 +58,7 @@ As a general rule we only need one sheet for each system. For some major games l
 
 ##Use Standard Attribute Names##
 
-Whenever possible, use standard names for attributes, spelled out. For example, "Intelligence", "Strength", and "Wisdom". This is important so that if a Character is imported into a game with a different sheet, most of the values will be able to transition. If the attribute names are all different, then nothing can be imported. Your best bet is to look at existing sheets and whenever possible use the same attribute names that are already in use. Additionally when updating existing character sheets if you are doing significant attribute name changes it is a best practice to write a sheet worker to migrate the existing input data over to the new attribute names so that players will not lose their data.
+Whenever possible, use standard names for attributes, spelled out. For example, "Intelligence", "Strength", and "Wisdom". This is important so that if a Character is imported into a game with a different sheet, most of the values will be able to transition. If the attribute names are all different, then nothing can be imported. Your best bet is to look at existing sheets and whenever possible use the same attribute names that are already in use.
 
 ##No Character Creation or Advancement##
 
@@ -65,7 +66,7 @@ Due to copyright restrictions, please don't attempt to include functionality for
 
 ##APIs Cannot Be Required By Default##
 
-API companions are a welcome supplement for a character sheets but sheets are expected to have basic functionality without an API. Sheets on the approved.yaml are available to be used at all subscriptions levels on Roll20 yet APIs access is only available to Pro members, for this reason sheets are expected to be able to usable without a requiring a companion API.
+API companions are a welcome supplement for a character sheets but sheets are expected to have basic functionality without an API. This is to ensure accessible & functionality to community members at all of subscription levels.
 
 ##Don't Use Reserved HTML##
 
@@ -77,7 +78,7 @@ All .css & .html files must use Unix line endings, LF.
 
 ##Indy and Homebrew Rules Must Be Readily Available##
 
-Custom sheets can be submitted for independent games and homebrew content. The latter will need to ensure they are not violating copyright for their respective game system. In both cases the rules need to be readily available to the public. 
+Sheets can be submitted for independent games and homebrew content. The latter will need to ensure they are not violating copyright for their respective game system. In both cases the rules need to be readily available to the public. 
 
 License
 =======
