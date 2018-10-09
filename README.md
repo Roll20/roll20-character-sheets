@@ -44,7 +44,7 @@ Guidelines
 
 Here are a few guidelines that you should follow when contributing sheets for the community:
 
-## #Make it Familiar
+### Make it Familiar
 
 The sheet for each game type should be familiar to players who are used to seeing the paper version of that sheet. It need not be identical to the paper version and should avoid violating any copyright, but it also shouldn't be laid out in such a crazy way that players will have a hard time understanding how to use it. **Design for ease of use first and foremost.** Along those lines, keep your UI changes simple -- please don't change the basic functionality of how a checkbox works, for example.
 
