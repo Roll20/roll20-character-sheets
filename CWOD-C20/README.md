@@ -10,6 +10,12 @@ Any help improving the sheet are welcome.
 
 # Version History
 
+## Version 0.6(2018-09-04)
+
+- fix Nightmare Imbalance attribute
+
+- fix logo url
+
 ## Version 0.5(2018-08-28)
 
 - second "bruised" health box added
