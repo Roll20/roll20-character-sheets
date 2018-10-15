@@ -52,7 +52,7 @@ Skills are straight forward for entry. Select the skill from the drop down, inpu
 
 *Note: If you select duplicate skills from the drop down menu the sheet workers are going to use the last skill selected. So if you enter the same skill twice it will use the last one you have made a change to. If you find yourself in this scenario the fix is easy, simply make a change to the skill entry you want to use. For example open the skill's settings and add text to Notes textfield like "Please fix me". This will trigger the sheet worker and it should update your hidden skill attributes.*
 
-###Core
+### Core
 
 The Core tab houses most of your standard useful data.
 
@@ -195,7 +195,7 @@ NPCs are intended to be simplified stat blocks. If you are making an NPC that is
 
 ### General NPC Guidelines
 
-###Goon
+### Goon
 
 New goons sheets should intiatilly open to the settings pages.
 
