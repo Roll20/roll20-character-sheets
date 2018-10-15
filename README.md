@@ -64,7 +64,8 @@ Due to copyright restrctions, please don't attempt to include functionality for 
 
 
 **Don't Use Reserved HTML**
-Your HTML file must **not** have a <head> or <body> tag, or your character sheet may not load in the virtual tabletop.
+
+Your HTML file must **not** have a `<head>` or `<body>` tag, or your character sheet may not load in the virtual tabletop.
 
 License
 =======
