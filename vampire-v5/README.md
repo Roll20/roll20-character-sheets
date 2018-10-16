@@ -1,4 +1,4 @@
-# Character sheet for Vampire The Maquerade, 5th Edition (v2.0)
+# Character sheet for Vampire The Maquerade, 5th Edition (v2.1)
 
 ## Known Bugs
 
@@ -47,6 +47,11 @@ The Banners folder contains many of the images made (in part) by Martinez A. wit
 If you think anything is missing or you see any bugs, please message me via my [Roll20 Account](https://app.roll20.net/users/117780/)
 
 ## Versions
+
+### Version 2.1
+Major bug fix. The last build was broken. Included bug fix.
+Also made it so Powers can now be Attribute, Attribute. Added ----- as divider.
+Added Warning about upgrading to Version 2 from Version 1
 
 ### Version 2.0
 Updated so Powers is now displayed by click the arrow next to it, rather than it merely being written in. The Powers now have a "Details" next to each so you can trigger a description.
