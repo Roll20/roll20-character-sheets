@@ -34,7 +34,10 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
-
+## Version 15.10.2018
+ Fixed issues with NPC sheet
+ 
+ Added Sprul-Pa Hit locations
 
 
 
