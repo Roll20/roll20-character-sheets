@@ -1803,6 +1803,15 @@
 					<div class="sheet-cell sheet-col3">Skill</div>
 				</div> <!-- .sheet-header -->
 				<div class="sheet-row sheet-row-stats sheet-row-standard">
+					<div class="sheet-cell sheet-col0">Apply Combat Reflexes to Dodge Modifier</div>
+					<div class="sheet-cell sheet-col1">&nbsp;</div>
+					<div class="sheet-cell sheet-col2">&nbsp;</div>
+					<div class="sheet-cell sheet-col3">
+						<input type="checkbox" class="sheet-boolean" name="attr_combat_reflexes" value="1" />
+					</div>
+					<div class="sheet-cell sheet-col4">&nbsp;</div>
+				</div> <!-- .sheet-row -->
+				<div class="sheet-row sheet-row-stats sheet-row-standard">
 					<div class="sheet-cell sheet-col0">Dodge</div>
 					<div class="sheet-cell sheet-col1">Dodge</div>
 					<div class="sheet-cell sheet-col2"></div>
@@ -1815,7 +1824,7 @@
 					<div class="sheet-cell sheet-col0">Dodge and Retreat</div>
 					<div class="sheet-cell sheet-col1">Dodge</div>
 					<div class="sheet-cell sheet-col2"></div>
-					<div class="sheet-cell sheet-col3"><input type="text" name="attr_ad_dodge_skill" value="@{current_dodge} + 3" disabled="disabled" /></div>
+					<div class="sheet-cell sheet-col3"><input type="text" name="attr_ad_dodge_retreat_skill" value="@{current_dodge} + 3" disabled="disabled" /></div>
 					<div class="sheet-cell sheet-col4">
 						<button type="roll" value="@{roll} [[3d6]] @{VS} Dodge and Retreat [[@{current_dodge} + @{modifier} + 3]]" name="roll_vsDodgeRetreat" />
 					</div>
@@ -2583,9 +2592,7 @@
 	</div>
 </div>
 
-
-<!--<script type="text/worker">-->
-<script>
+<script type="text/worker">
 
 	var noop = function () {}; // do nothing.
 
@@ -3408,5 +3415,54 @@
 
 		return damageTable;
 
-	} 
+	}
+
+	// check for combat reflexes toggle box
+	on('change:combat_reflexes', function(e){
+
+		updateActiveDefenses();
+
+	});
+
+	/**
+	* Get combat reflexes. Update active defenses
+	*/
+	function updateActiveDefenses(callback) {
+
+		// get combat reflexes and dodge_mod
+		getAttrs(['combat_reflexes', 'dodge_mod'], function(values) {
+
+			callback = callback || noop;
+
+			// + means to convert variable to number
+			var chkCombatReflexes = +values.combat_reflexes;
+
+			var modifier = 0;
+
+			if (chkCombatReflexes == 1) {
+				modifier = 1;
+			} else {
+				modifier = -1;
+			}
+
+			// update the base defenses
+			var orig_dodge_mod = 0;
+
+			if (isNaN(values.dodge_mod)) {
+				orig_dodge_mod = 0;
+			} else {
+				orig_dodge_mod = values.dodge_mod;
+			}
+
+			var new_dodge_mod = orig_dodge_mod + modifier;
+
+			// set thrust and swing
+			setAttrs({ 
+				dodge_mod: new_dodge_mod
+			});
+
+		});
+
+	}
+
 </script>
