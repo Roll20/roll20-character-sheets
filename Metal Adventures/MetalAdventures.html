@@ -979,7 +979,7 @@
 					<div class="flex-grow1 flex-right">
 						<input type="number" name="attr_pnjIndemne_sup">
 						<input type="number" name="attr_pnjIndemne">
-						<input type="number" name="attr_pnjIndemne_max">
+						<input type="number" name="attr_pnjIndemne_max" readonly>
 					</div>
 				</div>
 				<div class="row">
@@ -987,7 +987,7 @@
 					<div class="flex-grow1 flex-right">
 						<input type="number" name="attr_pnjBlesseLeger_sup" value="0">
 						<input type="number" name="attr_pnjBlesseLeger" value="0">
-						<input type="number" name="attr_pnjBlesseLeger_max">
+						<input type="number" name="attr_pnjBlesseLeger_max" readonly>
 					</div>
 				</div>
 				<div class="row">
@@ -995,7 +995,7 @@
 					<div class="flex-grow1 flex-right">
 						<input type="number" name="attr_pnjBlesseGrave_sup" value="0">
 						<input type="number" name="attr_pnjBlesseGrave" value="0">
-						<input type="number" name="attr_pnjBlesseGrave_max">
+						<input type="number" name="attr_pnjBlesseGrave_max" readonly>
 					</div>
 				</div>
 				<div class="row">
@@ -1003,7 +1003,7 @@
 					<div class="flex-grow1 flex-right">
 						<input type="number" name="attr_pnjMort_sup" value="0">
 						<input type="number" name="attr_pnjMort" value="0">
-						<input type="number" name="attr_pnjMort_max">
+						<input type="number" name="attr_pnjMort_max" readonly>
 					</div>
 				</div>
 			</fieldset>
@@ -1206,16 +1206,24 @@ on("change:pnjTrempePointBase change:pnjTrempePoint", function() {
    });
 });
 
-<!-- on("change:pnjTrempePointBase change:pnjSurviePointBase", function() {
-    getAttrs(["pnjTrempePointBase", "pnjSurviePointBase"], function(values) {
-       setAttrs({
-			Indemne_max: +values.pnjTrempePointBase + +values.pnjSurviePointBase,
-			BlesseLeger_max: +values.pnjTrempePointBase + +values.pnjSurviePointBase,
-			BlesseGrave_max: +values.pnjTrempePointBase + +values.pnjSurviePointBase,
-			Mort_max: +values.pnjTrempePointBase + +values.pnjSurviePointBase,
-		});
+on("change:pnjTrempePointBase change:pnjSurviePointBase change:repeating_pnjSante", function() {
+	getSectionIDs("repeating_pnjSante", function(idarray) {
+		_.each(idarray, function(pid) {
+			var section = "repeating_pnjSante_" + pid;
+			getAttrs(["pnjTrempePointBase", "pnjSurviePointBase"], function(values) {
+				var value = +values.pnjTrempePointBase + +values.pnjSurviePointBase;
+
+				var obj = {};
+				obj[section+"_pnjIndemne_max"] = value;
+				obj[section+"_pnjBlesseLeger_max"] = value;
+				obj[section+"_pnjBlesseGrave_max"] = value;
+				obj[section+"_pnjMort_max"] = value;
+				
+				setAttrs(obj);
+            });
+        });
    });
-}); -->
+});
 
 <!----------------------------------------------------------------------------------------------------->
 
