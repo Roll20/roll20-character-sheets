@@ -105,7 +105,8 @@ function _updateTalents(prefix) {
   if(_tickDowngrade(prefix) || _tickUpgrade(prefix))
     return;
 
-  parseAttrs([prefix + '_dice', prefix + '_trait', prefix + '_updowngrade', 'body_equation', 'mind_equation', 'charm_equation'], values => {
+  parseAttrs([prefix + '_name', prefix + '_dice', prefix + '_trait', prefix + '_updowngrade', 'body_equation', 'mind_equation', 'charm_equation'], values => {
+    var talentName = values[prefix + '_name'];
     var talentDice = values[prefix + '_dice'];
 
     var trait = values[prefix + '_trait'];
@@ -114,17 +115,20 @@ function _updateTalents(prefix) {
     var updown = parseInt(values[prefix + '_updowngrade']) || 0;
 
     // Apply upgrades/downgrades to talent dice.
+    var talentDiceModified = talentDice;
     if(talentDice && updown)
-      talentDice = getUpDowngradedRoll(talentDice, updown);
+      talentDiceModified = getUpDowngradedRoll(talentDice, updown);
 
-    if(talentDice === 'null')
+    if(talentDiceModified === 'null')
       setAttrs({
-        [prefix + '_equation']: 0
+        [prefix + '_equation']: 0,
+        [prefix + '_readOnlyView']: `${talentName}(n/a)`
       });
     else {
       //var traitDice = values[trait];
       setAttrs({
-        [prefix + '_equation']: `{${talentDice},${traitDice}}k1`
+        [prefix + '_equation']: `{${talentDiceModified},${traitDice}}k1`,
+        [prefix + '_readOnlyView']: `${talentName}(${talentDice})`
       });
     }
   });
