@@ -1,6 +1,13 @@
 # Roll20 Character sheet for 'Shadow of the Demon Lord' by [Robert Schwalb](http://schwalbentertainment.com)
 
 ## Change log
+
+### Version 6 
+* Styling cleanup, using CSS grid instead of Flexbox in some key places
+* Added a rest button
+* Removed legacy conversion code
+* Made some adjustments to adapt to changed Roll20 base CSS
+
 ### Version 5
 * Align everything left on main tab
 * Alleviate some display issues with odd number of spells
