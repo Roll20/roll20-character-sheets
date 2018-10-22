@@ -1,4 +1,3 @@
-
 <div class="sheet-wrapper">
 	<!-- HIDDEN FIELDS -->
 	<input type="hidden" name="attr_10" value="10" disabled="disabled" />
@@ -1803,7 +1802,7 @@
 					<div class="sheet-cell sheet-col3">Skill</div>
 				</div> <!-- .sheet-header -->
 				<div class="sheet-row sheet-row-stats sheet-row-standard">
-					<div class="sheet-cell sheet-col0">Apply Combat Reflexes to Dodge Modifier</div>
+					<div class="sheet-cell sheet-col0">Apply Combat Reflexes to Dodge and Fear Modifiers</div>
 					<div class="sheet-cell sheet-col1">&nbsp;</div>
 					<div class="sheet-cell sheet-col2">&nbsp;</div>
 					<div class="sheet-cell sheet-col3">
@@ -2364,6 +2363,16 @@
 	<p>If there are others that are working on or wish to work on this sheet, lets coordinate using the Roll20 
             Forum for now (Like Tom and I are doing) - perhaps later we can use GitHub.</p>
 
+	<h4>Version: 1.4.2</h4>
+	
+	<p>Pull Request: 3/7/2018</p>
+	<ul>
+		<li>Changed damage roll icons to red explosion to easily identify the difference from the skill roll icon</li>
+		<li>Update thrust and swing damage when striking ST is updated</li>
+		<li>Ability to enter values for Unspent points</li>
+		<li>When combat reflexes is toggled, update the dodge and fear check modifiers on the general tab</li>
+	</ul>
+	
 	<h4>Version: 1.4.1</h4>
 
 	<p>Pull Request: ##/##/2018</p>
@@ -2371,15 +2380,6 @@
 	<ul>
 		<li>Changes, Fixes, and Adds made by Mike W (UserID: 1414610</li>
 		<li>Fixed Encumbrance Table calculations to always allow for a Minimum Move of 1 and a Minimum Dodge of 1.</li>
-		<li></li>
-		<li ></li>
-		<li ></li>
-		<li></li>
-		<li></li>
-		<li></li>
-		<li ></li>
-		<li ></li>
-		<li></li>
 	</ul>
  
 	<h4>Version: 1.4.0</h4>
@@ -2434,15 +2434,15 @@
             
 	<ul>
 		<li>Changes, Fixes, and Adds made by Mike W (UserID: 1414610</li>
-		<li>Fixed alignment issue with the Notes field Under Skills not Left Justified � Cosmetic Only </li>
-		<li>Changed Hit Location box to have an additional Header identifying User Created Locations � Cosmetic Only</li>
+		<li>Fixed alignment issue with the Notes field Under Skills not Left Justified - Cosmetic Only </li>
+		<li>Changed Hit Location box to have an additional Header identifying User Created Locations - Cosmetic Only</li>
 		<li>Changed all fields in the Hit Location box to be editable. This will enable you to change the name of any of the default Locations and the To Hit Penalty - Request from Valter (User id: 285013)</li>
 		<li> Fixed Bug where some Hit Locations did not save their DR values</li>
 		<li>Removed and Deleted the CR Label and attr_control_rating for Advantages. The correct terminology is Self-control Number and this is not used for Advantages</li>
 		<li>Added an attribute for Native Language. Nothing fancy just a direct input - Requested by Flemmerr (User id: 1515009)</li>
-		<li>Added the Recoil attribute to the chat results for the Ranged Attacks macro � Cosmetic only</li>
-		<l>Changed the Label of �Disadvantages� to �Disadvantages (&Quirks)� � Cosmetic Only </li>
-		<l>Changed the Label of �Advantages� to �Advantages (& Perks)� � Cosmetic Only </li>
+		<li>Added the Recoil attribute to the chat results for the Ranged Attacks macro - Cosmetic only</li>
+		<li>Changed the Label of "Disadvantages" to "Disadvantages (& Quirks)" - Cosmetic Only </li>
+		<li>Changed the Label of "Advantages" to "Advantages (& Perks)" - Cosmetic Only </li>
 		<li>Fixed many miscellaneous issues to existing table fieldsets</li>
 	</ul>
 
@@ -2482,31 +2482,6 @@
 		<li>Added a Tool Tip for Pen header in Hit Location</li>
 		<li>Requested by Mike W (@mike-w) (UserID: 1414610) see: https://app.roll20.net/forum/post/6572120/</li>
 	</ul>
-            
-	<h4>Version: 1.3.4</h4>
-            
-	<p>Pull Request: 3/7/2018</p>
-	<ul>
-		<li>Changes made by MadCoder https://github.com/MadCoder253/roll20-character-sheets/issues</li>
-                <li>Add Revision History Tab</li>
-                <li>Changed roll buttons to use dicefontd6 (requested by Mike W 
-                (@mike-w) (UserID: 1414610) see: https://app.roll20.net/forum/post/5845539/</li>
-                <li>Fix lift & encumbrance rounding error for low ST. Round to whole number. 
-                (requested by Lucy (@lucy) (UserID: 359497) see: https://app.roll20.net/forum/permalink/5142954/</li>
-	</ul>
-            
-	<h4>Version 1.3.3</h4>
-            
-	<p>Pull Request: 3/1/2018</p>
-            
-	<ul>
-		<li>Changes made by MadCoder https://github.com/MadCoder253/roll20-character-sheets/issues</li>
-                <li>Restyled tabs to work with Firefox and MS Edge</li>
-                <li>Traits tab -> disadvantages section: slight changes to column spacing</li>
-                <li>Combat tab -> Ranged attacks section: slight changes to column spacing and abbreviate titles</li>
-                <li>Skills Tab -> Techniques section: slight changes to column spacing</li>
-                <li>Added URL to GURPS roll20 wiki</li>
-            </ul>
 
         </div>
 		
@@ -2596,7 +2571,7 @@
 
 	var noop = function () {}; // do nothing.
 
-	var version = '1.4.1';
+	var version = '1.4.2';
 
 	var modCascade = true;
 	var modCascadeAll = true;
@@ -3429,36 +3404,60 @@
 	*/
 	function updateActiveDefenses(callback) {
 
-		// get combat reflexes and dodge_mod
-		getAttrs(['combat_reflexes', 'dodge_mod'], function(values) {
+		// get the defense values
+		getAttrs(['combat_reflexes', 'dodge_mod', 'fear_check_mod'], function(values) {
 
 			callback = callback || noop;
 
 			// + means to convert variable to number
 			var chkCombatReflexes = +values.combat_reflexes;
 
-			var modifier = 0;
+			var modDodge = 0;
+
+			var modFear = 0;
 
 			if (chkCombatReflexes == 1) {
-				modifier = 1;
+				
+				modDodge = 1;
+
+				modFear = 2;
+
 			} else {
-				modifier = -1;
+				
+				modDodge = -1;
+
+				modFear = -2;
+
 			}
 
-			// update the base defenses
+			// update dodge modifier
 			var orig_dodge_mod = 0;
 
 			if (isNaN(values.dodge_mod)) {
 				orig_dodge_mod = 0;
 			} else {
-				orig_dodge_mod = values.dodge_mod;
+				orig_dodge_mod = +values.dodge_mod;
 			}
 
-			var new_dodge_mod = orig_dodge_mod + modifier;
+			var new_dodge_mod = orig_dodge_mod +  modDodge;
+
+			// update fear check
+			var orig_fear_check_mod = 0;
+
+			if (isNaN(values.fear_check_mod)) {
+				orig_fear_check_mod = 0;
+			} else {
+				orig_fear_check_mod = +values.fear_check_mod;
+			}
+			
+			var new_fear_check_mod = orig_fear_check_mod + modFear;
+
+			// update 
 
 			// set thrust and swing
 			setAttrs({ 
-				dodge_mod: new_dodge_mod
+				dodge_mod: new_dodge_mod,
+				fear_check_mod: new_fear_check_mod
 			});
 
 		});
