@@ -7067,7 +7067,7 @@
 
     var handle_drop = function(category, eventinfo) {
 
-        getAttrs(["drop_name", "drop_data", "drop_content", "character_id", "npc_legendary_actions", "strength_mod", "dexterity_mod", "npc", "base_level", "strength_base", "dexterity_base", "constitution_base", "wisdom_base", "intelligence_base", "charisma_base"], function(v) {
+        getAttrs(["drop_name", "drop_data", "drop_content", "character_id", "npc_legendary_actions", "strength_mod", "dexterity_mod", "npc", "base_level", "strength_base", "dexterity_base", "constitution_base", "wisdom_base", "intelligence_base", "charisma_base", "class_resource_name", "other_resource_name"], function(v) {
             var pagedata = {};
             try {
                 pagedata = JSON.parse(v.drop_data);
@@ -7080,7 +7080,7 @@
                 content: v.drop_content
             };
             var category = page.data["Category"];
-            var repeating = {prof_names: [], traits: []}
+            var repeating = {prof_names: [], traits: [], resources: {}}
 
             getSectionIDs("proficiencies", function(ids) {
                 var idArray = [];
@@ -7096,25 +7096,32 @@
                             var trait = {};
                             idArray = idArray.concat(["repeating_traits_" + sectionId + "_name", "repeating_traits_" + sectionId + "_source", "repeating_traits_" + sectionId + "_source_type"])
                         });
-                        getAttrs(idArray, function(vals) {
-                            var traitstemp = {};
-                            _.each(vals, function(value, name) {
-                                if(name.split("_")[1] == "proficiencies" || name.split("_")[1] == "tool") {
-                                    repeating.prof_names.push(value.toLowerCase());
-                                } else if (name.split("_")[1] == "traits") {
-                                    traitstemp[name.split("_")[2]] = traitstemp[name.split("_")[2]] ? traitstemp[name.split("_")[2]] : {};
-                                    traitstemp[name.split("_")[2]][_.last(name.split("_"))] = value;
-                                }
+                        getSectionIDs("resource", function(ids) {
+                            _.each(ids, function(sectionId) {
+                                idArray.push("repeating_resource_" + sectionId + "_resource_left_name");
+                                idArray.push("repeating_resource_" + sectionId + "_resource_right_name");
                             });
-                            _.each(traitstemp, function(v, k) {
-                                var trait = _.clone(v);
-                                trait.id = k;
-                                repeating.traits.push(trait);
-                            })
-
-                            var results = processDrop(page, v, repeating);
-                            setAttrs(results.update, {silent: true}, function() {results.callbacks.forEach(function(callback) {callback(); })} );
-
+                            getAttrs(idArray, function(vals) {
+                                var traitstemp = {};
+                                _.each(vals, function(value, name) {
+                                    if(name.split("_")[1] == "proficiencies" || name.split("_")[1] == "tool") {
+                                        repeating.prof_names.push(value.toLowerCase());
+                                    } else if (name.split("_")[1] == "traits") {
+                                        traitstemp[name.split("_")[2]] = traitstemp[name.split("_")[2]] ? traitstemp[name.split("_")[2]] : {};
+                                        traitstemp[name.split("_")[2]][_.last(name.split("_"))] = value;
+                                    } else if (name.split("_")[1] == "resource") {
+                                        repeating.resources[name.split("_")[2]] = repeating.resources[name.split("_")[2]] ? repeating.resources[name.split("_")[2]] : {};
+                                        repeating.resources[name.split("_")[2]][name.split("_")[4]] = value;
+                                    }
+                                });
+                                _.each(traitstemp, function(v, k) {
+                                    var trait = _.clone(v);
+                                    trait.id = k;
+                                    repeating.traits.push(trait);
+                                });
+                                var results = processDrop(page, v, repeating);
+                                setAttrs(results.update, {silent: true}, function() {results.callbacks.forEach(function(callback) {callback(); })} );
+                            });
                         });
                     });
                 });
@@ -7170,7 +7177,7 @@
         var callbacks = [];
         var update = {};
         var id = generateRowID();
-        var blobs = [];
+        var blobs = {};
         repeating.traits = repeating.traits ? repeating.traits : [];
         update["drop_category"] = "";
         update["drop_name"] = "";
@@ -7945,13 +7952,14 @@
 
         if(page.data.theseblobs) {
             _.each(page.data.theseblobs, function(blobname) {
-                if(page.data.blobs[blobname]) blobs.push({name: blobname, data: page.data.blobs[blobname]});
+                if(page.data.blobs[blobname]) blobs[blobname] = page.data.blobs[blobname];
             });
-            console.log(blobs);
         } else {
             blobs = filterBlobs(page.data.blobs, {"Level": "1"});
         }
         _.each(blobs, function(blob, blobname) {
+            console.log(blobname);
+            console.log(blob);
             if(blob["Traits"]) {
                 var traitsource = "";
                 switch (category) {
@@ -7990,7 +7998,7 @@
                                 repeating.traits.push(newtrait);
                             }
                             update["repeating_traits_" + newrowid + "_name"] = trait["Name"];
-                            update["repeating_traits_" + newrowid + "_description"] = trait["Desc"];
+                            update["repeating_traits_" + newrowid + "_description"] = trait["Desc"] ? trait["Desc"] : "";
                             update["repeating_traits_" + newrowid + "_source"] = traitsource;
                             update["repeating_traits_" + newrowid + "_source_type"] = page.name ? page.name : "";
                             update["repeating_traits_" + newrowid + "_options-flag"] = 0;
@@ -8126,7 +8134,6 @@
             };
             if(blob["Resources"]) {
                 var resources = jsonparse(blob["Resources"]);
-                var resource_count = 0;
                 var numUses = function(uses_string) {
                     var attribs = ["strength", "dexterity", "constitution", "wisdom", "intelligence", "charisma"];
                     uses_string = uses_string.toLowerCase();
@@ -8143,51 +8150,64 @@
                     return total;
                 };
                 _.each(resources, function(value) {
-                    if (resource_count == 0) {
-                        update["class_resource_name"] = value["Name"];
-                        var uses = numUses(value["Uses"]);
-                        update["class_resource"] = uses;
-                        update["class_resource_max"] = uses;
-                        resource_count++;
-                    } else if (resource_count == 1) {
-                        update["other_resource_name"] = value["Name"];
-                        var uses = numUses(value["Uses"]);
-                        update["other_resource"] = uses;
-                        update["other_resource_max"] = uses;
-                        resource_count++;
+                    var section = "";
+                    if(currentData["class_resource_name"] == "" || currentData["class_resource_name"] == value["Name"]) {
+                        section = "class_resource";
+                        currentData["class_resource_name"] = value["Name"];
+                    } else if (currentData["other_resource_name"] == "" || currentData["other_resource_name"] == value["Name"]) {
+                        section = "other_resource";
+                        currentData["other_resource_name"] = value["Name"];
+                    } else {
+                        _.each(repeating.resources, function(resource, id) {
+                            if(resource.left == "" && section == "" || resource.left == value["Name"]) {
+                                section = "repeating_resource_" + id + "_resource_left";
+                            }
+                            if(resource.right == "" && section == "" || resource.left == value["Name"]) {
+                                section = "repeating_resource_" + id + "_resource_right";
+                            }
+                        })
                     }
+                    if(section == "") {
+                        var id = generateRowID();
+                        section = "repeating_resource_" + id + "_resource_left";
+                        repeating.resources[id] = {left: value["Name"], right: ""};
+                    }
+                    update[section + "_name"] = value["Name"];
+                    var uses = numUses(value["Uses"]);
+                    update[section] = uses;
+                    update[section + "_max"] = uses;
                 });
             };
             if(blob["Custom AC"]) {
                 var customac = jsonparse(blob["Custom AC"]);
                 update["custom_ac_flag"] = "1";
                 update["custom_ac_base"] = customac.Base;
-                update["custom_ac_part1"] = customac.Attribute1;
-                update["custom_ac_part2"] = customac.Attribute2;
+                update["custom_ac_part1"] = customac["Attribute 1"];
+                update["custom_ac_part2"] = customac["Attribute 2"] ? customac["Attribute 2"] : "";
                 update["custom_ac_shield"] = customac.Shields;
                 if(!looped) {
                     callbacks.push( function() {update_ac();} )
                 }
             };
-            if(blobs["Hit Points Per Level"] && blobs["Hit Points Per Level"] !== "") {
+            if(blob["Hit Points Per Level"] && blob["Hit Points Per Level"] !== "") {
                 var id = generateRowID();
-                update["repeating_hpmod_" + id + "_mod"] = blobs["Hit Points Per Level"];
+                update["repeating_hpmod_" + id + "_mod"] = blob["Hit Points Per Level"];
                 update["repeating_hpmod_" + id + "_source"] = page.name ? page.name : "Subclass";
             };
-            if(blobs["Global AC Mod"]) {
+            if(blob["Global AC Mod"]) {
                 var globalac = jsonparse(blob["Global AC Mod"]);
                 var id = generateRowID();
                 update["repeating_acmod_" + id + "_global_ac_val"] = globalac.Bonus;
-                update["repeating_acmod_" + id + "_global_damage_active_flag"] = "1";
+                update["repeating_acmod_" + id + "_global_ac_active_flag"] = "1";
                 update["repeating_acmod_" + id + "_options-flag"] = "0";
                 update["repeating_acmod_" + id + "_global_ac_name"] = globalac.Name;
                 update["global_ac_mod_flag"] = "1";
             };
-            if(blobs["Global Attack"]) {
+            if(blob["Global Attack"]) {
                 var globalattack = jsonparse(blob["Global Attack"]);
                 var id = generateRowID();
-                update["repeating_tohitmod_" + id + "_global_attack_rollstring"] = `${globalattack["Damage"]}[${globalattack["Name"]}]`;
-                update["repeating_tohitmod_" + id + "_global_damage_active_flag"] = "1";
+                update["repeating_tohitmod_" + id + "_global_attack_rollstring"] = `${globalattack["Bonus"]}[${globalattack["Name"]}]`;
+                update["repeating_tohitmod_" + id + "_global_attack_active_flag"] = "1";
                 update["repeating_tohitmod_" + id + "_options-flag"] = "0";
                 update["global_attack_mod_flag"] = "1";
             }
@@ -9466,7 +9486,6 @@
                         update["intelligence_save_prof"] = 0;
                         update["wisdom_save_prof"] = 0;
                         update["charisma_save_prof"] = 0;
-                        update["class_resource_name"] = "";
                         break;
                     case "Barbarian":
                         update["hitdietype"] = 12;
@@ -9477,7 +9496,6 @@
                         update["intelligence_save_prof"] = 0;
                         update["wisdom_save_prof"] = 0;
                         update["charisma_save_prof"] = 0;
-                        update["class_resource_name"] = "Rage";
                         break;
                     case "Bard":
                         update["hitdietype"] = 8;
@@ -9488,7 +9506,6 @@
                         update["intelligence_save_prof"] = 0;
                         update["wisdom_save_prof"] = 0;
                         update["charisma_save_prof"] = "(@{pb})";
-                        update["class_resource_name"] = "Bardic Inspiration";
                         break;
                     case "Cleric":
                         update["hitdietype"] = 8;
@@ -9499,7 +9516,6 @@
                         update["intelligence_save_prof"] = 0;
                         update["wisdom_save_prof"] = "(@{pb})";
                         update["charisma_save_prof"] = "(@{pb})";
-                        update["class_resource_name"] = "Channel Divinity";
                         break;
                     case "Druid":
                         update["hitdietype"] = 8;
@@ -9510,7 +9526,6 @@
                         update["intelligence_save_prof"] = "(@{pb})";
                         update["wisdom_save_prof"] = "(@{pb})";
                         update["charisma_save_prof"] = 0;
-                        update["class_resource_name"] = "Wild Shape";
                         break;
                     case "Fighter":
                         update["hitdietype"] = 10;
@@ -9521,7 +9536,6 @@
                         update["intelligence_save_prof"] = 0;
                         update["wisdom_save_prof"] = 0;
                         update["charisma_save_prof"] = 0;
-                        update["class_resource_name"] = "Second Wind";
                         break;
                     case "Monk":
                         update["hitdietype"] = 8;
@@ -9532,7 +9546,6 @@
                         update["intelligence_save_prof"] = 0;
                         update["wisdom_save_prof"] = 0;
                         update["charisma_save_prof"] = 0;
-                        update["class_resource_name"] = "Ki";
                         break;
                     case "Paladin":
                         update["hitdietype"] = 10;
@@ -9543,7 +9556,6 @@
                         update["intelligence_save_prof"] = 0;
                         update["wisdom_save_prof"] = "(@{pb})";
                         update["charisma_save_prof"] = "(@{pb})";
-                        update["class_resource_name"] = "Divine Sense";
                         break;
                     case "Ranger":
                         update["hitdietype"] = 10;
@@ -9554,7 +9566,6 @@
                         update["intelligence_save_prof"] = 0;
                         update["wisdom_save_prof"] = 0;
                         update["charisma_save_prof"] = 0;
-                        update["class_resource_name"] = "";
                         break;
                     case "Rogue":
                         update["hitdietype"] = 8;
@@ -9575,7 +9586,6 @@
                         update["intelligence_save_prof"] = 0;
                         update["wisdom_save_prof"] = 0;
                         update["charisma_save_prof"] = "(@{pb})";
-                        update["class_resource_name"] = "Sorcery Points";
                         break;
                     case "Warlock":
                         update["hitdietype"] = 8;
@@ -9586,7 +9596,6 @@
                         update["intelligence_save_prof"] = 0;
                         update["wisdom_save_prof"] = "(@{pb})";
                         update["charisma_save_prof"] = "(@{pb})";
-                        update["class_resource_name"] = "Spell Slots";
                         break;
                     case "Wizard":
                         update["hitdietype"] = 6;
@@ -11431,6 +11440,7 @@
                         repupdate[rowid + " label span"] = "<input type=\"text\" name=\"comp_" + rowid + "_trait_input\">";
                         repupdate[rowid + " label span"] += "<input type=\"hidden\" name=\"comp_" + rowid + "_trait_name\" value=\"" + (trait.Name ? trait.Name : "") + "\">";
                         repupdate[rowid + " label span"] += "<input type=\"hidden\" name=\"comp_" + rowid + "_trait_desc\" value=\"" + (trait.Desc ? trait.Desc : "") + "\">";
+                        repupdate[rowid + " label span"] += "<input type=\"hidden\" name=\"comp_" + rowid + "_trait_section\" value=\"" + section + "\">";
                     } else {
                         repupdate[rowid + " label span"] = trait.Name;
                         repupdate[rowid + " label p"] = trait.Desc;
@@ -12964,7 +12974,7 @@
                     if(id.split("_")[2] == section && id.split("_")[3] == "feature") {
                         var featurename = page.values[id + "_info"];
                         if(page.values[id + "_choice"]) {
-                            warnings += '<p>Your ' + featurename + ' is ' + page.values[id + "_choice"] + '.</p>'
+                            warnings += '<p>Your ' + featurename + ' is ' + _.last(page.values[id + "_choice"].split(":")) + '.</p>'
                         } else {
                             warnings += '<p class="sheet-warning">Your have not chosen a ' + featurename + '.</p>';
                         };
@@ -13354,9 +13364,11 @@
                 });
                 v.base_level = "1";
                 v.npc = "0";
+                v["class_resource_name"] = "";
+                v["other_resource_name"] = "";
                 var update = {};
                 var callbacks = [];
-                var repeating = {prof_names: []}
+                var repeating = {prof_names: [], traits: [], resources: {}};
                 var totalDrops = dropArray.length;
                 var x = 0;
                 callbacks.push(update_class);
@@ -13375,6 +13387,7 @@
                 callbacks.push( function() {update_ac();} );
                 callbacks.push( function() {update_weight();} );
                 callbacks.push(callback);
+                console.log(update);
                 setAttrs(update, {silent: true}, function() {
                     setCharmancerText({"mancer_progress" :'<div style="width: 95%"></div>'});
                     _.each(callbacks, function(callback) {
@@ -13500,14 +13513,14 @@
         var silentset = {};
         var silentattrs = ["class_resource_name", "class_resource", "class_resource_max", "other_resource_name", "other_resource", "other_resource_max", "other_resource_itemid", "class", "class_display", "subclass", "hitdietype", "hitdie_final", "race", "subrace", "race_display", "custom_class", "cust_classname"];
         var clearset = {};
-        var clearattrs = ["age", "hp", "hp_max", "size", "speed", "gp", "alignment", "global_damage_mod_flag", "spellcasting_ability", "cust_hitdietype", "cust_spellslots", "cust_spellcasting_ability", "ac", "jack_bonsu", "jack_attr", "death_save_bonus", "weighttotal", "initiative_bonus", "hit_dice", "hit_dice_max", "pb", "jack", "caster_level", "spell_attack_mod", "spell_attack_bonus", "spell_save_dc", "passive_wisdom", "custom_ac_base", "custom_ac_part1", "custom_ac_part2", "custom_ac_shield", "background"];
+        var clearattrs = ["age", "hp", "hp_max", "size", "speed", "gp", "alignment", "global_damage_mod_flag", "spellcasting_ability", "cust_hitdietype", "cust_spellslots", "cust_spellcasting_ability", "ac", "jack_bonsu", "jack_attr", "death_save_bonus", "weighttotal", "initiative_bonus", "hit_dice", "hit_dice_max", "pb", "jack", "caster_level", "spell_attack_mod", "spell_attack_bonus", "spell_save_dc", "passive_wisdom", "custom_ac_base", "custom_ac_part1", "custom_ac_part2", "custom_ac_shield", "background", "global_ac_mod_flag", "global_attack_mod_flag"];
         var set = {gp: 0};
         var allDrops = [];
         var currentDrop = 0;
         var totalDrops = 1;
         var allSkills = ["athletics", "acrobatics", "sleight_of_hand", "stealth", "arcana", "history", "investigation", "nature", "religion", "animal_handling", "insight", "medicine", "perception", "survival","deception", "intimidation", "performance", "persuasion"];
         var allAbilities = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
-        var eraseSections = ["attack", "inventory", "traits", "resource", "proficiencies", "tool", "damagemod", "spell-cantrip"];
+        var eraseSections = ["attack", "inventory", "traits", "resource", "proficiencies", "tool", "damagemod", "spell-cantrip", "hpmod", "acmod", "tohitmod"];
         for(var x=1; x<=9; x++) {
             eraseSections.push("spell-" + x);
         }
@@ -13525,6 +13538,8 @@
         clearset["level"] = "1";
         clearset["armorwarningflag"] = "hide";
         clearset["customacwarningflag"] = "hide";
+        clearset["custom_ac_flag"] = "0";
+        clearset["custom_attack_flag"] = "0";
         clearset["custom_ac_flag"] = "0";
         _.each(allSkills, function(skill) {
             clearset[skill + "_prof"] = "";//0
@@ -13545,10 +13560,24 @@
         _.each(stats.totals, function(scores, name) {
             clearset[name + "_base"] = scores.total;
         });
+        // Build new blobs for traits with inputs
+        _.each(data, function(slide, pagename) {
+            _.each(slide.values, function(value, name) {
+                if(name.substr(-11) == "trait_input") {
+                    var section = name.substring(0, name.length - 6);
+                    var thisblob = {};
+                    var thistrait = {};
+                    thistrait.Name = slide.values[section + "_name"].replace(/{{Input}}/g, value);
+                    thistrait.Desc = slide.values[section + "_desc"] ? slide.values[section + "_desc"].replace(/{{Input}}/g, value) : "";
+                    thisblob.Traits = JSON.stringify([thistrait]);
+                    blobs.names[slide.values[section + "_section"]].push(section);
+                    slide.data[slide.values[section + "_section"]].blobs[section] = thisblob;
+                }
+            })
+        });
         //Set up drops. start with class, subclass, race, subrace, background
-        //this is for custom and should be able to stay the same
         if(data["l1-class"].values["class_name"] && !data["l1-class"].data.class) {
-            var customClass = {data: {}};
+            var customClass = {name: data["l1-class"].values["class_name"], data: {blobs:{}}};
             customClass.name = "Classes@@!!@@:" + data["l1-class"].values["class_name"];
             set["custom_class"] = "1";
             set["cust_classname"] = data["l1-class"].values["class_name"];
@@ -13567,14 +13596,17 @@
                 }
             }
             if(traits.length > 0) {
-                customClass.data["data-Traits"] = JSON.stringify(traits);
+                customClass.data.theseblobs = ["customclassblob"];
+                customClass.data.blobs.customclassblob = {Traits: JSON.stringify(traits)};
+                //customClass.data["data-Traits"] = JSON.stringify(traits);
             }
             _.each(allAbilities, function(ability) {
                 if(data["l1-class"].values[ability.toLowerCase() + "_save"]) {
                     set["cust_" + ability + "_save_prof"] = "(@{pb})";
                 }
             });
-            allDrops.push(customClass);
+            //allDrops.push(customClass);
+            allPageData.push(customClass);
         } else {
             //allDrops.push(data["l1-class"].values.class);
             var thisdata = {name: _.last(data["l1-class"].values.class.split(":")), data: data["l1-class"].data.class};
@@ -13601,7 +13633,7 @@
         } else if(data["l1-class"].values.subclass) {
             //allDrops.push(data["l1-class"].values.subclass);
             var thisdata = {name: _.last(data["l1-class"].values.subclass.split(":")), data: data["l1-class"].data.subclass};
-            thisdata.data.theseblobs = blobs.names.class;
+            thisdata.data.theseblobs = blobs.names.subclass;
             allPageData.push(thisdata);
         };
         //set up race drop
@@ -13630,7 +13662,7 @@
         } else {
             //allDrops.push(data["l1-race"].values.race);
             var thisdata = {name: _.last(data["l1-race"].values.race.split(":")), data: data["l1-race"].data.race};
-            thisdata.data.theseblobs = blobs.names.class;
+            thisdata.data.theseblobs = blobs.names.race;
             allPageData.push(thisdata);
         }
         //set up subrace drop
@@ -13657,7 +13689,7 @@
         } else if(data["l1-race"].values.subrace) {
             //allDrops.push(data["l1-race"].values.subrace);
             var thisdata = {name: _.last(data["l1-race"].values.subrace.split(":")), data: data["l1-race"].data.subrace};
-            thisdata.data.theseblobs = blobs.names.class;
+            thisdata.data.theseblobs = blobs.names.subrace;
             allPageData.push(thisdata);
         };
         //set up feat drop
@@ -13680,7 +13712,7 @@
             } else {
                 //allDrops.push(data["l1-background"].values.background);
                 var thisdata = {name: _.last(data["l1-background"].values.background.split(":")), data: data["l1-background"].data.background};
-                thisdata.data.theseblobs = blobs.names.class;
+                thisdata.data.theseblobs = blobs.names.background;
                 allPageData.push(thisdata);
             }
         }
@@ -13762,16 +13794,12 @@
         }
         allDrops = allDrops.concat(makeItemData(equipment));
         totalDrops += allDrops.length;
-
         _.each(allPageData, function(page) {
             allDrops = allDrops.concat(getOtherDrops(page.data));
         });
 
-        console.log(blobs);
-
-        //getAllPages(allDrops, function() {});
         //erase all repeating sections
-        /*eraseRepeating(eraseSections, function() {
+        eraseRepeating(eraseSections, function() {
             setCharmancerText({"mancer_progress" :'<div style="width: 5%"></div>'});
             //first set is silent to prevent unwanted sheet workers
             setAttrs(silentset, {silent:true}, function() {
