@@ -5,7 +5,9 @@
 ### Version 6 
 * Styling cleanup, using CSS grid instead of Flexbox in some key places
 * Added a rest button
+* Made rolling weapon damage optional (or available on extra click)
 * Removed legacy conversion code
+* Sheet worker refactored and cleaned up
 * Made some adjustments to adapt to changed Roll20 base CSS
 
 ### Version 5

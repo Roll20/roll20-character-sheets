@@ -154,9 +154,28 @@ const handleHealthChange = () => {
 };
 
 // Handle display attributes for weapons
-const calcWeaponMod = (prefix) => {
-  getAttrs([...statMods, `${prefix}_attribute`], v => {
-    setAttr(`${prefix}_mod`, v[v[`${prefix}_attribute`] + "_mod"]);
+const calcWeaponMod = (prefixes) => {
+  getAttrs([...statMods, ...prefixes.map(prefix => `${prefix}_attribute`)], v => {
+    const setting = prefixes.reduce((m, prefix) => {
+      m[`${prefix}_mod`] = v[v[`${prefix}_attribute`] + "_mod"];
+      return m;
+    }, {});
+    setAttrs(setting);
+  });
+};
+const calcWeaponDamage = (prefixes) => {
+  getAttrs([...prefixes.map(prefix => `${prefix}_damage`), "setting_roll_weapon_damage", "global_damage_bonus", "setting_show_damage_button"], v => {
+    const setting = prefixes.reduce((m, prefix) => {
+      if (v[`${prefix}_damage`] == "" || (v.setting_roll_weapon_damage === "0" && v.setting_show_damage_button === "0")) {
+        m[`${prefix}_damage_formula`] = "";
+      } else if (v.setting_roll_weapon_damage == "0") {
+        m[`${prefix}_damage_formula`] = "{{damage=1}} {{damageroll=[@{weapon_damage}](~repeating_weapons_damage)}}";
+      } else {
+        m[`${prefix}_damage_formula`] = "{{damage=1}} {{damageroll=[[@{weapon_damage} + @{global_damage_bonus}[global bonus]]]}}";
+      }
+      return m;
+    }, {});
+    setAttrs(setting);
   });
 };
 
@@ -237,10 +256,14 @@ const getSpellCastings = (rk, pwr, exp) => {
   }
   else if (rank === 0) return String(power + expertise + 1);
 };
-const calcSpellCastings = (prefix) => {
-  getAttrs([`${prefix}_rank`, "power", "setting_auto_spell_castings", "setting_spell_expertise"], v => {
+const calcSpellCastings = (prefixes) => {
+  getAttrs([...prefixes.map(prefix =>`${prefix}_rank`), "power", "setting_auto_spell_castings", "setting_spell_expertise"], v => {
     if (v.setting_auto_spell_castings === "1") {
-      setAttr(`${prefix}_castings_max`, getSpellCastings(v[`${prefix}_rank`], v.power, v.setting_spell_expertise));
+      const setting = prefixes.reduce((m, prefix) => {
+        m[`${prefix}_castings_max`] = getSpellCastings(v[`${prefix}_rank`], v.power, v.setting_spell_expertise);
+        return m;
+      }, {});
+      setAttrs(setting);
     }
   });
 };
@@ -436,9 +459,26 @@ const sanitizeTab = () => getAttrs(["npc", "tab"], v => {
   else if (v.npc === "0" && !["main", "equipment_talents", "spells", "background"].includes(v.tab)) setAttr("tab", "main");
 });
 
+const updateSheet = version => {
+  if (version < 6) {
+    getSectionIDs("repeating_weapons", idArray => {
+      calcWeaponDamage(idArray.map(id => `repeating_weapons_${id}_weapon`));
+    });
+  }
+};
+
 // Register events
 on("sheet:opened", () => {
-  setAttr("version", "6");
+  getAttrs(["version"], v => {
+    const version = parseInt(v.version);
+    if (version && version < 6) {
+      updateSheet(5);
+    }
+    setAttrs({
+      version: "6",
+      character_sheet: "Shadow of the Demon Lord v6",
+    });
+  });
   setBoonsBanesQuery();
   setWhisperQuery();
 });
@@ -455,12 +495,18 @@ register(["health", "healing_rate_divisor"], handleHealthChange);
 
 // Repeating talents, weapons, attacks
 register(["repeating_talents:talent_attack_mod"], () => updateTalentAttack("repeating_talents_talent"));
-register(["repeating_weapons:weapon_attribute"], () => calcWeaponMod("repeating_weapons_weapon"));
+register(["repeating_weapons:weapon_attribute"], () => calcWeaponMod(["repeating_weapons_weapon"]));
 register(statMods, () => {
   getSectionIDs("repeating_weapons", idArray => {
-    idArray.forEach(id => calcWeaponMod(`repeating_weapons_${id}_weapon`));
+    calcWeaponMod(idArray.map(id => `repeating_weapons_${id}_weapon`));
   });
 });
+register(["setting_roll_weapon_damage", "global_damage_bonus", "setting_show_damage_button"], () => {
+  getSectionIDs("repeating_weapons", idArray => {
+    calcWeaponDamage(idArray.map(id => `repeating_weapons_${id}_weapon`));
+  });
+});
+register(["repeating_weapons"], () => calcWeaponDamage(["repeating_weapons_weapon"]));
 register(["change:repeating_attacks:attack_range"], () => updateNpcAttack("repeating_attacks_attack"));
 ["weapon", "attack"].forEach(sName => {
   register([`repeating_${sName}s:${sName}_boons`], () => {
@@ -476,10 +522,10 @@ register(["repeating_spells:spell_sacrifice"], calcSacrificeQuery);
 register(["repeating_spells:spell_attack_mod"], () => updateSpellAttack("repeating_spells_spell"));
 register(["power", "setting_auto_spell_castings", "setting_spell_expertise"], () => {
   getSectionIDs("repeating_spells", idArray => {
-    idArray.forEach(id => calcSpellCastings(`repeating_spells_${id}_spell`));
+    calcSpellCastings(idArray.map(id => `repeating_spells_${id}_spell`));
   });
 });
-register(["repeating_spells:spell_rank"], () => calcSpellCastings("repeating_spells_spell"));
+register(["repeating_spells:spell_rank"], () => calcSpellCastings(["repeating_spells_spell"]));
 register(["repeating_spells", "remove:repeating_spells"], buildSpellBook);
 
 // Reset and resting
