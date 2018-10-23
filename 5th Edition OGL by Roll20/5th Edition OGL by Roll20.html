@@ -11574,7 +11574,7 @@
                     setAttrs(toset);
                     current++;
                     repids.push(id);
-                    if(current >= total) clearRepeating(repids, page);
+                    if(current >= total) clearRepeating(repids, page, "customrow");
                 });
             });
         });
@@ -11592,17 +11592,18 @@
                     setAttrs(toset);
                     current++;
                     repids.push(id);
-                    if(current >= total) clearRepeating(repids, page);
+                    if(current >= total) clearRepeating(repids, page, "customrow");
                 });
             });
         });
     }
 
-    var clearRepeating = function(repids, page) {
-        //This function removes all repeating sections that aren't in the repids array (except for the topbar)
+    var clearRepeating = function(repids, page, match) {
+        //This function removes all repeating sections that aren't in the repids array (except for the topbar).
+        //The optional third argument will only remove certain types of repeating sections
         var mancerdata = getCharmancerData();
         _.each(mancerdata[page].repeating, function(repid) {
-            if(_.last(repid.split("_")) != "topbar" && !repids.includes(repid)) clearRepeatingSectionById(repid);
+            if(_.last(repid.split("_")) != "topbar" && !repids.includes(repid) && (!match || match && repid.includes(match))) clearRepeatingSectionById(repid);
         });
     }
 
@@ -12037,7 +12038,7 @@
             reset["custom_subclass_spell_number"] = "0";
             reset["custom_subclass_spell_list"] = "";
             reset["subclass_name"] = "";
-            clearRepeatingSections("sublcass_holder");
+            clearRepeatingSections("subclass_holder");
         }
 
         if(eventinfo.newValue === "Rules:Classes") {
@@ -12045,7 +12046,6 @@
             getCompendiumPage("");
             setAttrs(reset, function() {
                 var mancerdata = getCharmancerData();
-                var update = {"subclass_text": ""};
                 var options = eventinfo.sourceType == "player" ? {selected: ""} : {};
                 var subclassname = mancerdata["l1-class"].data.class["Subclass Name"];
                 showChoices(["custom_subclass"]);
@@ -12054,10 +12054,7 @@
                 } else {
                     showChoices(["custom_class_spells"]);
                 }
-                update["custom_feature_name"] = "Custom " + subclassname + " Features";
-                update["custom_subclass_name"] = "Custom " + subclassname + " Name";
                 addCustomSections("Subclass");
-                setCharmancerText(update);
             });
         } else {
             hideChoices(["custom_subclass"]);
@@ -13509,6 +13506,7 @@
         var profs = getProficiencies(data, "finish");
         var spells = knownSpells(data);
         var blobs = getRelevantBlobs(data);
+        var customtraits = {race: [], subrace: [], class: [], subclass: [], background: []};
         var equipment = [];
         var silentset = {};
         var silentattrs = ["class_resource_name", "class_resource", "class_resource_max", "other_resource_name", "other_resource", "other_resource_max", "other_resource_itemid", "class", "class_display", "subclass", "hitdietype", "hitdie_final", "race", "subrace", "race_display", "custom_class", "cust_classname"];
@@ -13560,25 +13558,37 @@
         _.each(stats.totals, function(scores, name) {
             clearset[name + "_base"] = scores.total;
         });
-        // Build new blobs for traits with inputs
+        // Build new blobs for traits with inputs, collect custom traits and languages
         _.each(data, function(slide, pagename) {
             _.each(slide.values, function(value, name) {
                 if(name.substr(-11) == "trait_input") {
-                    var section = name.substring(0, name.length - 6);
+                    var sectionid = name.substring(0, name.length - 6);
                     var thisblob = {};
                     var thistrait = {};
-                    thistrait.Name = slide.values[section + "_name"].replace(/{{Input}}/g, value);
-                    thistrait.Desc = slide.values[section + "_desc"] ? slide.values[section + "_desc"].replace(/{{Input}}/g, value) : "";
+                    thistrait.Name = slide.values[sectionid + "_name"].replace(/{{Input}}/g, value);
+                    thistrait.Desc = slide.values[sectionid + "_desc"] ? slide.values[sectionid + "_desc"].replace(/{{Input}}/g, value) : "";
                     thisblob.Traits = JSON.stringify([thistrait]);
-                    blobs.names[slide.values[section + "_section"]].push(section);
-                    slide.data[slide.values[section + "_section"]].blobs[section] = thisblob;
+                    blobs.names[slide.values[sectionid + "_section"]].push(sectionid);
+                    slide.data[slide.values[sectionid + "_section"]].blobs[sectionid] = thisblob;
+                }
+                if(name.split("_")[2] == "custom" && name.substr(-10) == "trait_name") {
+                    var sectionid = name.substring(0, name.length - 5);
+                    var thistrait = {};
+                    thistrait.Name = slide.values[sectionid + "_name"];
+                    thistrait.Desc = slide.values[sectionid + "_desc"] ? slide.values[sectionid + "_desc"] : "";
+                    customtraits[name.split("_")[3]].push(thistrait);
+                }
+                if(value == "custom" && name.substr(-18) == "proficiency_choice") {
+                    var sectionid = name.substring(0, name.length - 7);
+                    if(slide.values[sectionid + "_custom"] && slide.values[sectionid + "_type"]) {
+                        profs.all[slide.values[sectionid + "_type"]].push(slide.values[sectionid + "_custom"])
+                    }
                 }
             })
         });
         //Set up drops. start with class, subclass, race, subrace, background
         if(data["l1-class"].values["class_name"] && !data["l1-class"].data.class) {
-            var customClass = {name: data["l1-class"].values["class_name"], data: {blobs:{}}};
-            customClass.name = "Classes@@!!@@:" + data["l1-class"].values["class_name"];
+            var customClass = {name: data["l1-class"].values["class_name"], data: {Category: "Classes", blobs:{}}};
             set["custom_class"] = "1";
             set["cust_classname"] = data["l1-class"].values["class_name"];
             set["cust_hitdietype"] = data["l1-class"].values["custom_hit_die"];
@@ -13586,26 +13596,15 @@
                 set["cust_spellslots"] = "full";
                 set["cust_spellcasting_ability"] = "@{" + data["l1-class"].values["custom_class_spell_ability"].toLowerCase() + "_mod}+";
             }
-            traits = [];
-            for(var x = 1; x <= 4; x++) {
-                var trait = {};
-                if(data["l1-class"].values["custom_class_trait_name_" + x]) {
-                    trait.Name = data["l1-class"].values["custom_class_trait_name_" + x];
-                    trait.Desc = data["l1-class"].values["custom_class_trait_desc_" + x] || "";
-                    traits.push(trait);
-                }
-            }
-            if(traits.length > 0) {
-                customClass.data.theseblobs = ["customclassblob"];
-                customClass.data.blobs.customclassblob = {Traits: JSON.stringify(traits)};
-                //customClass.data["data-Traits"] = JSON.stringify(traits);
+            if(customtraits.class.length > 0) {
+                customClass.data.theseblobs = ["customblob"];
+                customClass.data.blobs.customblob = {Traits: JSON.stringify(customtraits.class)};
             }
             _.each(allAbilities, function(ability) {
                 if(data["l1-class"].values[ability.toLowerCase() + "_save"]) {
                     set["cust_" + ability + "_save_prof"] = "(@{pb})";
                 }
             });
-            //allDrops.push(customClass);
             allPageData.push(customClass);
         } else {
             //allDrops.push(data["l1-class"].values.class);
@@ -13615,21 +13614,12 @@
         };
         //set up subclass drop
         if(data["l1-class"].values.subclass && data["l1-class"].values["subclass_name"]) {
-            var customSubclass  = {data:{}};
-            customSubclass.name = "Subclasses@@!!@@:" + data["l1-class"].values["subclass_name"];
-            traits = [];
-            for(var x = 1; x <= 4; x++) {
-                var trait = {};
-                if(data["l1-class"].values["custom_class_trait_name_" + x]) {
-                    trait.Name = data["l1-class"].values["custom_class_trait_name_" + x];
-                    trait.Desc = data["l1-class"].values["custom_class_trait_desc_" + x] || "";
-                    traits.push(trait);
-                }
+            var customSubclass  = {name: data["l1-class"].values["subclass_name"], data: {Category: "Subclasses", blobs:{}}};
+            if(customtraits.subclass.length > 0) {
+                customSubclass.data.theseblobs = ["customblob"];
+                customSubclass.data.blobs.customblob = {Traits: JSON.stringify(customtraits.subclass)};
             }
-            if(traits.length > 0) {
-                customSubclass.data["data-Traits"] = JSON.stringify(traits);
-            }
-            allDrops.push(customSubclass);
+            allPageData.push(customSubclass);
         } else if(data["l1-class"].values.subclass) {
             //allDrops.push(data["l1-class"].values.subclass);
             var thisdata = {name: _.last(data["l1-class"].values.subclass.split(":")), data: data["l1-class"].data.subclass};
@@ -13638,27 +13628,18 @@
         };
         //set up race drop
         if(data["l1-race"].values["race_name"] && !data["l1-race"].data.race) {
-            var customRace = {data: {}};
-            customRace.name = "Races@@!!@@:" + data["l1-race"].values["race_name"];
+            var customRace = {name: data["l1-race"].values["race_name"], data: {Category: "Races", blobs:{}}};
             if(data["l1-race"].values.size) {
                 customRace.data.Size = data["l1-race"].values.size;
             }
             if(data["l1-race"].values.speed) {
                 customRace.data.Speed = data["l1-race"].values.speed;
             }
-            traits = [];
-            for(var x = 1; x <= 4; x++) {
-                var trait = {};
-                if(data["l1-race"].values["custom_race_trait_name_" + x]) {
-                    trait.Name = data["l1-race"].values["custom_race_trait_name_" + x];
-                    trait.Desc = data["l1-race"].values["custom_race_trait_desc_" + x] || "";
-                    traits.push(trait);
-                }
+            if(customtraits.race.length > 0) {
+                customRace.data.theseblobs = ["customblob"];
+                customRace.data.blobs.customblob = {Traits: JSON.stringify(customtraits.race)};
             }
-            if(traits.length > 0) {
-                customRace.data["data-Traits"] = JSON.stringify(traits);
-            }
-            allDrops.push(customRace);
+            allPageData.push(customRace);
         } else {
             //allDrops.push(data["l1-race"].values.race);
             var thisdata = {name: _.last(data["l1-race"].values.race.split(":")), data: data["l1-race"].data.race};
@@ -13667,25 +13648,16 @@
         }
         //set up subrace drop
         if(data["l1-race"].values.subrace && data["l1-race"].values["subrace_name"]) {
-            var customSubrace = {data: {}};
-            customSubrace.name = "Subraces@@!!@@:" + data["l1-race"].values["subrace_name"];
+            var customSubrace = {name: data["l1-race"].values["subrace_name"], data: {Category: "Subraces", blobs:{}}};
             customSubrace.data["data-Parent"] = data["l1-race"].values.race.split(":")[1];
             if(data["l1-race"].values.speed) {
                 customSubrace.data.Speed = data["l1-race"].values.speed;
             }
-            traits = [];
-            for(var x = 1; x <= 4; x++) {
-                var trait = {};
-                if(data["l1-race"].values["custom_race_trait_name_" + x]) {
-                    trait.Name = data["l1-race"].values["custom_race_trait_name_" + x];
-                    trait.Desc = data["l1-race"].values["custom_race_trait_desc_" + x] || "";
-                    traits.push(trait);
-                }
+            if(customtraits.subrace.length > 0) {
+                customSubrace.data.theseblobs = ["customblob"];
+                customSubrace.data.blobs.customblob = {Traits: JSON.stringify(customtraits.subrace)};
             }
-            if(traits.length > 0) {
-                customSubrace.data["data-Traits"] = JSON.stringify(traits);
-            }
-            allDrops.push(customSubrace);
+            allPageData.push(customSubrace);
         } else if(data["l1-race"].values.subrace) {
             //allDrops.push(data["l1-race"].values.subrace);
             var thisdata = {name: _.last(data["l1-race"].values.subrace.split(":")), data: data["l1-race"].data.subrace};
@@ -13700,17 +13672,13 @@
         //set up background drop
         if(data["l1-background"].values.background) {
             if(data["l1-background"].values.background == "Rules:Backgrounds") {
-                var customBg  = {data:{}};
-                customBg.name = "Backgrounds@@!!@@:" + data["l1-background"].values["background_name"];
-                if(data["l1-background"].values["custom_background_trait_name"]) {
-                    var trait = {};
-                    trait.Name = data["l1-background"].values["custom_background_trait_name"];
-                    trait.Desc = data["l1-background"].values["custom_background_trait_desc"] || "";
-                    customBg.data["data-Traits"] = JSON.stringify([trait]);
+                var customBg  = {name: data["l1-background"].values["background_name"], data: {Category: "Backgrounds", blobs:{}}};
+                if(customtraits.background.length > 0) {
+                    customBg.data.theseblobs = ["customblob"];
+                    customBg.data.blobs.customblob = {Traits: JSON.stringify(customtraits.background)};
                 }
-                allDrops.push(customBg);
+                allPageData.push(customBg);
             } else {
-                //allDrops.push(data["l1-background"].values.background);
                 var thisdata = {name: _.last(data["l1-background"].values.background.split(":")), data: data["l1-background"].data.background};
                 thisdata.data.theseblobs = blobs.names.background;
                 allPageData.push(thisdata);
@@ -14230,74 +14198,6 @@
                             </div>
                         </div>
                         <div class="subclass_holder holder"></div>
-                    </div>
-                    <div class="choice row custom_class custom_subclass">
-                        <label>Other (Custom) Proficiencies:
-                            <div class="custom_prof_choice1">
-                                <select class="custom_class_prof_type_choice2" name="comp_custom_class_prof_type_choice1">
-                                    <option value="" data-i18n="choose">Choose</option>
-                                    <option value="armor">Armor</option>
-                                    <option value="weapon">Weapon</option>
-                                    <option value="tool">Tool</option>
-                                    <option value="skill">Skill</option>
-                                    <option value="other">Other</option>
-                                </select>
-                                <input type="text" class="custom_class_prof_name_choice1" name="comp_custom_class_prof_name_choice1">
-                            </div>
-                            <div class="choice custom_prof_choice2">
-                                <select class="custom_class_prof_type_choice2" name="comp_custom_class_prof_type_choice2">
-                                    <option value="" data-i18n="choose">Choose</option>
-                                    <option value="armor">Armor</option>
-                                    <option value="weapon">Weapon</option>
-                                    <option value="tool">Tool</option>
-                                    <option value="skill">Skill</option>
-                                    <option value="other">Other</option>
-                                </select>
-                                <input type="text" class="custom_class_prof_name_choice2" name="comp_custom_class_prof_name_choice2">
-                            </div>
-                            <div class="choice custom_prof_choice3">
-                                <select class="custom_class_prof_type_choice3" name="comp_custom_class_prof_type_choice3">
-                                    <option value="" data-i18n="choose">Choose</option>
-                                    <option value="armor">Armor</option>
-                                    <option value="weapon">Weapon</option>
-                                    <option value="tool">Tool</option>
-                                    <option value="skill">Skill</option>
-                                    <option value="other">Other</option>
-                                </select>
-                                <input type="text" class="custom_class_prof_name_choice3" name="comp_custom_class_prof_name_choice3">
-                            </div>
-                            <div class="choice custom_prof_choice4">
-                                <select class="custom_class_prof_type_choice4" name="comp_custom_class_prof_type_choice4">
-                                    <option value="" data-i18n="choose">Choose</option>
-                                    <option value="armor">Armor</option>
-                                    <option value="weapon">Weapon</option>
-                                    <option value="tool">Tool</option>
-                                    <option value="skill">Skill</option>
-                                    <option value="other">Other</option>
-                                </select>
-                                <input type="text" class="custom_class_prof_name_choice4" name="comp_custom_class_prof_name_choice4">
-                            </div>
-                        </label>
-                    </div>
-                    <div class="choice row custom_class custom_subclass">
-                        <label><span class="custom_feature_name">Custom Class Features:</span>
-                            <div class="custom_trait_1">
-                                <input type="text" name="comp_custom_class_trait_name_1">
-                                <textarea name="comp_custom_class_trait_desc_1"></textarea>
-                            </div>
-                            <div class="choice custom_trait_2">
-                                <input type="text" name="comp_custom_class_trait_name_2">
-                                <textarea name="comp_custom_class_trait_desc_2"></textarea>
-                            </div>
-                            <div class="choice custom_trait_3">
-                                <input type="text" name="comp_custom_class_trait_name_3">
-                                <textarea name="comp_custom_class_trait_desc_3"></textarea>
-                            </div>
-                            <div class="choice custom_trait_4">
-                                <input type="text" name="comp_custom_class_trait_name_4">
-                                <textarea name="comp_custom_class_trait_desc_4"></textarea>
-                            </div>
-                        </label>
                     </div>
                     <div class="choice row custom_class custom_class_spells">
                         <label>Spellcasting Ability:
