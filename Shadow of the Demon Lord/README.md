@@ -5,6 +5,7 @@
 ### Version 6 
 * Styling cleanup, using CSS grid instead of Flexbox in some key places
 * Added a rest button
+* Added insanity and corruption on the NPC sheet
 * Made rolling weapon damage optional (or available on extra click)
 * Removed legacy conversion code
 * Sheet worker refactored and cleaned up

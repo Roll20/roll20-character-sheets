@@ -6,6 +6,7 @@ const setAttr = (attr, value) => {
     [attr]: value,
   });
 };
+const translate = (x) => `${getTranslationByKey(x)}`;
 const register = (events, callback) => {
   on(events.map(x => {
     if (x !== "sheet:opened" && x.indexOf("remove:") !== 0) {
@@ -41,8 +42,7 @@ const calcSpellFilters = () => {
         const attrs = spellIDs.reduce((m, id) => {
           if (!activeTraditions.length || activeTraditions.includes(v[`repeating_spells_${id}_spell_tradition`].toLowerCase())) {
             m[`repeating_spells_${id}_spell_hide`] = "0";
-          }
-          else {
+          } else {
             m[`repeating_spells_${id}_spell_hide`] = "1";
           }
           return m;
@@ -83,18 +83,15 @@ const calcDefense = () => {
       }, {});
       if ((v.affliction_defenseless === "1" || v.affliction_unconscious === "1") && (v.npc === "0" || v.setting_npc_afflictions === "1")) {
         attrs.defense = "5";
-      }
-      else if (autoDefense && idArray.filter(id => (v[`repeating_defense_${id}_defense_check`] === "1")).length === 0) {
+      } else if (autoDefense && idArray.filter(id => (v[`repeating_defense_${id}_defense_check`] === "1")).length === 0) {
         attrs.defense = v.agility;
-      }
-      else if (autoDefense) {
+      } else if (autoDefense) {
         const totalDefense = Math.min(idArray.reduce((m, id) => {
           if (v[`repeating_defense_${id}_defense_check`] === "1") m += attrs[`repeating_defense_${id}_defense_total`];
           return m;
         }, 0), 25);
         attrs.defense = String(totalDefense);
-      }
-      else {
+      } else {
         attrs.defense = v.defense_input;
       }
       setAttrs(attrs);
@@ -103,7 +100,9 @@ const calcDefense = () => {
 };
 const handleBasicEquipment = () => {
   getAttrs(["setting_basic_equipment", "auto_defense"], v => {
-    if (v.setting_basic_equipment === "1" && v.auto_defense === "1") setAttr("auto_defense", "0");
+    if (v.setting_basic_equipment === "1" && v.auto_defense === "1") {
+      setAttr("auto_defense", "0");
+    }
   });
 };
 
@@ -217,18 +216,17 @@ const updateNpcAttack = (prefix) => {
 // Boon display
 const calcBoonsDisplay = (prefix) => {
   getAttrs([`${prefix}_boons`], v => {
+    let boonsDisplay;
     if (v[`${prefix}_boons`] === "1") {
-      setAttr(`${prefix}_boons_display`, "1 " + getTranslationByKey("BOON").toLowerCase());
+      boonsDisplay = `1 ${translate("BOON").toLowerCase()}`;
+    } else if (v[`${prefix}_boons`] === "-1") {
+      boonsDisplay = `1 ${translate("BANE").toLowerCase()}`;
+    } else if (parseInt(v[`${prefix}_boons`]) <= -2) {
+      boonsDisplay = `${-parseInt(v[`${prefix}_boons`])} ${translate("BANES").toLowerCase()}`;
+    } else {
+      boonsDisplay = `${v[`${prefix}_boons`]} ${translate("BOONS").toLowerCase()}`;
     }
-    else if (v[`${prefix}_boons`] === "-1") {
-      setAttr(`${prefix}_boons_display`, "1 " + getTranslationByKey("BANE").toLowerCase());
-    }
-    else if (parseInt(v[`${prefix}_boons`]) <= -2) {
-      setAttr(`${prefix}_boons_display`, -parseInt(v[`${prefix}_boons`]) + " " + getTranslationByKey("BANES").toLowerCase());
-    }
-    else {
-      setAttr(`${prefix}_boons_display`, v[`${prefix}_boons`] + " " + getTranslationByKey("BOONS").toLowerCase());
-    }
+    setAttr(`${prefix}_boons_display`, boonsDisplay);
   });
 };
 
@@ -238,23 +236,24 @@ const getSpellCastings = (rk, pwr, exp) => {
     power = parseInt(pwr) || 0,
     expertise = parseInt(exp) || 0;
 
-  if (power < rank) return "0";
-  else if (rank >= 6) return "1";
-  else if (rank === 5) {
+  if (power < rank) {
+    return "0";
+  } else if (rank >= 6) {
+    return "1";
+  } else if (rank === 5) {
     if (power >= 8) return "2";
     else return "1";
-  }
-  else if (rank >= 2) {
+  } else if (rank >= 2) {
     if ((power - rank) >= 6) return "3";
     else if ((power - rank) >= 2) return "2";
     else return "1";
+  } else if (rank === 1) {
+    if (power >= 5) return `${3 + expertise}`;
+    else if (power >= 2) return `${2 + expertise}`;
+    else return `${1 + expertise}`;
+  } else if (rank === 0) {
+    return `${power + expertise + 1}`;
   }
-  else if (rank === 1) {
-    if (power >= 5) return String(3 + expertise);
-    else if (power >= 2) return String(2 + expertise);
-    else return String(1 + expertise);
-  }
-  else if (rank === 0) return String(power + expertise + 1);
 };
 const calcSpellCastings = (prefixes) => {
   getAttrs([...prefixes.map(prefix =>`${prefix}_rank`), "power", "setting_auto_spell_castings", "setting_spell_expertise"], v => {
@@ -303,7 +302,10 @@ const rest = () => {
       setAttrs({ damage });
 
       for (let i = 0; i < 1e9; i++) {
-        // nothing
+        /* 
+           We count to a billion.
+           Delaying would be better, but breaks sheet workers.
+        */
       }
       setAttrs({
         rest: "0"
@@ -313,15 +315,12 @@ const rest = () => {
 };
 
 // Handle banes from afflictions
-const baneAfflictions = ["diseased", "fatigued", "frightened", "impaired", "poisoned"];
+const baneAfflictions = ["diseased", "fatigued", "frightened", "impaired", "poisoned"].map(x => `affliction_${x}`);
 const calcBaneAfflictions = () => {
-  getAttrs([...baneAfflictions.map(x => `affliction_${x}`), "npc", "setting_npc_afflictions"], v => {
-    if (v.npc === "0" || v.setting_npc_afflictions === "1") {
-      setAttr("banes_from_afflictions", baneAfflictions.reduce((m, k) => (m + (parseInt(v[`affliction_${k}`]) || 0)), 0));
-    }
-    else {
-      setAttr("banes_from_afflictions", "0");
-    }
+  getAttrs([...baneAfflictions, "npc", "setting_npc_afflictions"], v => {
+    const banes_from_afflictions = (v.npc === "0" || v.setting_npc_afflictions === "1") ?
+      baneAfflictions.reduce((m, k) => (m + (parseInt(v[k]) || 0)), 0) : "0";
+    setAttrs({banes_from_afflictions});
   });
 };
 const handleAsleepChange = (event) => {
@@ -340,20 +339,17 @@ const calcDisplaySpeed = () => {
     const active = v.npc === "0" || v.setting_npc_afflictions === "1";
     if (active && (v.affliction_blinded === "1" || v.affliction_immobilized === "1" || v.affliction_slowed === "1")) {
       attrs.auto_speed = "1";
-    }
-    else attrs.auto_speed = "0";
+    } else attrs.auto_speed = "0";
 
-    if (active && v.affliction_immobilized === "1") attrs.speed_display = "0";
-    else if (active && (v.affliction_blinded === "1" && v.affliction_slowed === "1")) {
+    if (active && v.affliction_immobilized === "1") {
+      attrs.speed_display = "0";
+    } else if (active && (v.affliction_blinded === "1" && v.affliction_slowed === "1")) {
       attrs.speed_display = (v.speed === "0" || v.speed === "1") ? "0" : "1";
-    }
-    else if (active && v.affliction_blinded === "1") {
+    } else if (active && v.affliction_blinded === "1") {
       attrs.speed_display = String(Math.min(2, parseInt(v.speed) || 0));
-    }
-    else if (active && v.affliction_slowed === "1") {
+    } else if (active && v.affliction_slowed === "1") {
       attrs.speed_display = String(Math.floor((parseInt(v.speed) || 0) / 2));
-    }
-    else attrs.speed_display = v.speed;
+    } else attrs.speed_display = v.speed;
     setAttrs(attrs);
   });
 };
@@ -361,25 +357,21 @@ const calcDisplaySpeed = () => {
 // Weapon/attack against display
 const updateAgainst = (prefix) => {
   getAttrs([`${prefix}_against`], v => {
-    const dName = `${prefix}_against_display`;
+    let versus;
     if (v[`${prefix}_against`].toLowerCase().indexOf("strength") >= 0) {
-      setAttr(dName, `${getTranslationByKey("VS")} ${getTranslationByKey("STRENGTH")}`);
+      versus = `${translate("VS")} ${translate("STRENGTH")}`;
+    } else if (v[`${prefix}_against`].toLowerCase().indexOf("agility") >= 0) {
+      versus = `${translate("VS")} ${translate("AGILITY")}`;
+    } else if (v[`${prefix}_against`].toLowerCase().indexOf("intellect") >= 0) {
+      versus = `${translate("VS")} ${translate("INTELLECT")}`;
+    } else if (v[`${prefix}_against`].toLowerCase().indexOf("will") >= 0) {
+      versus = `${translate("VS")} ${translate("WILL")}`;
+    } else if (v[`${prefix}_against`].toLowerCase().indexOf("perception") >= 0) {
+      versus = `${translate("VS")} ${translate("PERCEPTION")}`;
+    } else {
+      versus = "";
     }
-    else if (v[`${prefix}_against`].toLowerCase().indexOf("agility") >= 0) {
-      setAttr(dName, `${getTranslationByKey("VS")} ${getTranslationByKey("AGILITY")}`);
-    }
-    else if (v[`${prefix}_against`].toLowerCase().indexOf("intellect") >= 0) {
-      setAttr(dName, `${getTranslationByKey("VS")} ${getTranslationByKey("INTELLECT")}`);
-    }
-    else if (v[`${prefix}_against`].toLowerCase().indexOf("will") >= 0) {
-      setAttr(dName, `${getTranslationByKey("VS")} ${getTranslationByKey("WILL")}`);
-    }
-    else if (v[`${prefix}_against`].toLowerCase().indexOf("perception") >= 0) {
-      setAttr(dName, `${getTranslationByKey("VS")} ${getTranslationByKey("PERCEPTION")}`);
-    }
-    else {
-      setAttr(dName, "");
-    }
+    setAttr(`${prefix}_against_display`, versus);
   });
 };
 
@@ -398,7 +390,7 @@ const buildSpellBook = () => {
     getAttrs(spellAttrs, v => {
       const outputString = [...new Set(idArray
         .map(id => v[`repeating_spells_${id}_spell_tradition`] || "")
-        .map(x => x.slice(0, 1).toUpperCase() + x.slice(1).toLowerCase())
+        .map(x => `${x.slice(0, 1).toUpperCase()}${x.slice(1).toLowerCase()}`)
       )].sort()
         .map(tradition => {
           const spellIDs = idArray.filter(id => {
@@ -413,12 +405,11 @@ const buildSpellBook = () => {
               else return 0;
             })
               .map(id => {
-                return "[" + v[`repeating_spells_${id}_spell_name`] + " (" +
-                  (getTranslationByKey(v[`repeating_spells_${id}_spell_type`]) || "") + " " +
-                  (v[`repeating_spells_${id}_spell_rank`] || 0) + ", " +
-                  (v[`repeating_spells_${id}_spell_castings`] || 0) + "/" +
-                  (v[`repeating_spells_${id}_spell_castings_max`] || 0) + ")](~" +
-                  v.character_id + `|repeating_spells_${id}_cast)`;
+                const prefix = `repeating_spells_${id}`;
+                return `[${v[`${prefix}_spell_name`]} (${
+                  translate(v[`${prefix}_spell_type`])} ${v[`${prefix}_spell_rank`] || 0}, ${
+                  v[`${prefix}_spell_castings`] || 0}/${v[`${prefix}_spell_castings_max`] || 0
+                })](~${v.character_id}|${prefix}_cast)`;
               }).join(", ");
         }).filter(x => !!x).join("\n");
       setAttr("spells_macro_var", outputString);
@@ -429,20 +420,20 @@ const buildSpellBook = () => {
 // Queries
 const calcSacrificeQuery = () => {
   getAttrs(["repeating_spells_spell_sacrifice"], v => {
-    const query = v.repeating_spells_spell_sacrifice ? `{{?{${getTranslationByKey("SACRIFICE_SPELL")}|${getTranslationByKey("NO")},` +
-      `sacrifice=|${getTranslationByKey("YES")},sacrifice=@{spell_sacrifice}}}}` : "";
+    const query = v.repeating_spells_spell_sacrifice ? `{{?{${translate("SACRIFICE_SPELL")}|${translate("NO")},` +
+      `sacrifice=|${translate("YES")},sacrifice=@{spell_sacrifice}}}}` : "";
     setAttr("repeating_spells_spell_sacrifice_query", query);
   });
 };
 const setBoonsBanesQuery = () => {
   getAttrs(["boons_banes_query"], v => {
-    const newValue = `?{#(${getTranslationByKey("BOONS_BANES")})|0}`;
+    const newValue = `?{#(${translate("BOONS_BANES")})|0}`;
     if (newValue !== v.boons_banes_query) setAttr("boons_banes_query", newValue);
   });
 };
 const setWhisperQuery = () => {
   getAttrs(["whisper_query"], v => {
-    const newValue = `?{${getTranslationByKey("OUTPUT")}|${getTranslationByKey("PUBLIC")}, |${getTranslationByKey("WHISPERED_TO_GM")},/w GM}`;
+    const newValue = `?{${translate("OUTPUT")}|${translate("PUBLIC")}, |${translate("WHISPERED_TO_GM")},/w GM}`;
     if (newValue !== v.whisper_query) setAttr("whisper_query", newValue);
   });
 };
@@ -455,8 +446,11 @@ const setNPCSectionPresence = (sName) => {
 };
 
 const sanitizeTab = () => getAttrs(["npc", "tab"], v => {
-  if (v.npc === "1" && !["npc", "spells"].includes(v.tab)) setAttr("tab", "npc");
-  else if (v.npc === "0" && !["main", "equipment_talents", "spells", "background"].includes(v.tab)) setAttr("tab", "main");
+  if (v.npc === "1" && !["npc", "spells"].includes(v.tab)) {
+    setAttr("tab", "npc");
+  } else if (v.npc === "0" && !["main", "equipment_talents", "spells", "background"].includes(v.tab)) {
+    setAttr("tab", "main");
+  }
 });
 
 const updateSheet = version => {
