@@ -112,7 +112,7 @@
 			<input type="hidden" name="attr_comp_damagedie" accept="Base Damage">
 			<input type="hidden" name="attr_comp_classmoves" accept="data-Basic Moves">
 			<input type="hidden" name="attr_comp_load" accept="Load">
-			<input type="text" name="attr_character_class" accept="Name">
+			<input type="text" name="attr_character_class">
 		</div>
 	</div>
 </div>
@@ -725,6 +725,20 @@
 </div>
 <!-- End Container div -->
 
+<input type="checkbox" class="tip-confirm-flag" name="attr_tip_confirm_flag" value="1">
+<div class="class-tip">
+	<button type="action" class="cancel-button" name="act_cancelclass">&#128473;</button>
+	<h3><span data-i18n="getting-started">Getting Started</span></h3>
+	<p><span data-i18n="getting-started-class-tip">Welcome to the Dungeon World Character Sheet by Roll20!  To get started, drag a class from the compendium or select one from the choices below:</span></p>
+	<button type="action" name="act_bard" data-i18n="Bard">Bard</button>
+	<button type="action" name="act_cleric" data-i18n="Cleric">Cleric</button>
+	<button type="action" name="act_druid" data-i18n="Druid">Druid</button>
+	<button type="action" name="act_fighter" data-i18n="Fighter">Fighter</button>
+	<button type="action" name="act_paladin" data-i18n="Paladin">Paladin</button>
+	<button type="action" name="act_ranger" data-i18n="Ranger">Ranger</button>
+	<button type="action" name="act_thief" data-i18n="Thief">Thief</button>
+	<button type="action" name="act_wizard" data-i18n="Wizard">Wizard</button>
+</div>
 
 <div class="compendium_warning">
 	<span data-i18n="accepting-drop-u">ACCEPTING DROP FROM COMPENDIUM</span>
@@ -2275,6 +2289,57 @@ var dwMoves = {
 
 // ---- Start worker scripts ----- //
 
+
+on("sheet:opened", function() {
+	getAttrs(["character_class", "isNPC"], function(v) {
+		if (v.isNPC != "1") {
+			update = {};
+			if (v.character_class == null || v.character_class == "") {
+				update["tip_confirm_flag"] = "0";
+			} else {
+				update["tip_confirm_flag"] = "1";
+			}
+			setAttrs(update);
+		}
+	});
+});
+
+on("clicked:bard", function(eventinfo) {
+	setupClass("Bard");
+});
+
+on("clicked:cleric", function(eventinfo) {
+	setupClass("Cleric");
+});
+
+on("clicked:druid", function(eventinfo) {
+	setupClass("Druid");
+});
+
+on("clicked:fighter", function(eventinfo) {
+	setupClass("Fighter");
+});
+
+on("clicked:paladin", function(eventinfo) {
+	setupClass("Paladin");
+});
+
+on("clicked:ranger", function(eventinfo) {
+	setupClass("Ranger");
+});
+
+on("clicked:thief", function(eventinfo) {
+	setupClass("Thief");
+});
+
+on("clicked:wizard", function(eventinfo) {
+	setupClass("Wizard");
+});
+
+on("clicked:cancelclass", function(eventinfo) {
+	setAttrs({tip_confirm_flag: 1}, "silent");
+});
+
 on("change:strength change:debil_weak", function() {
 	getAttrs(["strength", "debil_weak"], function(values) {
 		setAttrs({
@@ -2330,8 +2395,16 @@ on("change:page", function() {
 });
 
 on("change:isNPC", function () {
-	getAttrs(["isNPC"], function(v) {
-		setAttrs({calc_isNPC: v.isNPC});
+	getAttrs(["isNPC", "character_class"], function(v) {
+		if (v.isNPC == "1") {
+			setAttrs({calc_isNPC: v.isNPC, tip_confirm_flag: 1});
+		} else {
+			if (v.character_class == null || v.character_class == "") {
+				setAttrs({calc_isNPC: v.isNPC, tip_confirm_flag: 0});
+			} else {
+				setAttrs({calc_isNPC: v.isNPC, tip_confirm_flag: 1});
+			}
+		}
 	});
 })
 
@@ -3055,7 +3128,7 @@ on("change:comp_NPC_moves", function() {
 // ------------------------------------------ //
 // -- Main Class Drop Compilation Function -- //
 // ------------------------------------------ //
-/*
+
 on("change:comp_name", function() {
 	getAttrs(["populate_moves", "comp_name", "comp_damagedie", "comp_classmoves", "comp_load", "strength_mod"], function(v) {
 		if (v.comp_name != "dropped") {
@@ -3063,7 +3136,9 @@ on("change:comp_name", function() {
 			// Populate all basic moves.
 			if (v.populate_moves == "all") {
 				addBasicMoves();
-				setAttrs({populate_moves: "classonly"});
+				setAttrs({
+					populate_moves: "classonly"
+				});
 			}
 
 			// Populate the Class's starting moves
@@ -3079,11 +3154,26 @@ on("change:comp_name", function() {
 					damagedie: v.comp_damagedie
 				});
 			}
+			setAttrs({character_class: v.comp_name});
 		}
 	});
-	setAttrs({comp_name: "dropped"}, "silent");
+	setAttrs({comp_name: "dropped", tip_confirm_flag: 1}, "silent");
 });
-*/
 
+// Classname is the name of the Compendium Page.
+var setupClass = function(classname) {
+	getCompendiumPage(classname, function(page) {
+		if (page["data"]) {
+			var update = {};
+			var data = page["data"];
+			update["character_class"] = classname;
+			update["comp_name"] = classname;
+			update["comp_damagedie"] = data["Base Damage"];
+			update["comp_classmoves"] = data["data-Basic Moves"];
+			update["comp_load"] = data["Load"];
+			setAttrs(update);
+		}
+	});
+};
 
 </script>
