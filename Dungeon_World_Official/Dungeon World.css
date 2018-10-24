@@ -4,6 +4,7 @@
 	background-color: rgb(230, 231, 233);
 	height: auto;
 	border: 1px solid rgb(35, 31, 32);
+	min-width: 820px;
 }
 
 .charsheet .sheet-container label {
@@ -30,7 +31,64 @@
 }
 
 .sheet-compendium-drop-target.dropping {
-	background-color: yellow;
+	opacity: 0.5;
+	transition: opacity .15s ease-in-out;
+	-moz-transition: opacity .15s ease-in-out;
+	-webkit-transition: opacity .15s ease-in-out;
+	background-color: transparent;
+}
+
+.sheet-compendium_warning {
+	display: none;
+}
+
+.sheet-tip-confirm-flag {
+	display: none;
+}
+
+.sheet-tip-confirm-flag:checked ~ .sheet-class-tip {
+	display: none;
+}
+
+.sheet-tip-confirm-flag:not(:checked) ~ .sheet-class-tip {
+	display: block;
+	position: absolute;
+	top: 12.8em;
+	left: 10.7em;
+	background: white;
+	z-index: 99;
+	border: 2px solid black;
+	border-radius: 6px;
+	padding: 5px;
+	width: 701px;
+	height: 85px;
+}
+
+.sheet-class-tip .sheet-cancel-button {
+	float: right;
+}
+
+.sheet-class-tip button[type=action] {
+	color: black;
+}
+
+.sheet-class-tip button[type=action]:hover {
+	border-color: #6e9ec6;
+}
+
+.sheet-container.active-drop-target.dropping ~ .sheet-compendium_warning {
+	display: block;
+	position: fixed;
+	top: 50%;
+	background: white;
+	left: 50%;
+	z-index: 100;
+	border: 2px solid black;
+	width: 300px;
+	height: 85px;
+	text-align: center;
+	margin: -70px 0 0 -170px;
+	padding-top: 20px;
 }
 
 /* start npcstuff */
@@ -656,12 +714,15 @@ input[type=number]::-webkit-outer-spin-button {
 
 .sheet-dw-stat-header input {
     border-style: none;
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid black;
     box-shadow: none;
+    margin-bottom: 5px;
+    width: 25px !important;
     background: none;
     color: inherit;
     text-align: right;
     align-self: flex-end;
+    padding-bottom: 0px;
 }
 
 button input[disabled=true] {
@@ -724,8 +785,8 @@ button span {
 	width: 16px;
 	height: 16px;
 	position: relative;
-	top: -5px;
-	left: 5px;
+	top: -2px;
+	left: 4px;
 	margin: -10px;
 	cursor: pointer;
 	z-index: 1;
@@ -749,7 +810,7 @@ button span {
 	display: inline-block;
 	line-height: 14px;
 	text-align: center;
-	content: "+";
+	content: "◂";
 }
 
 .sheet-bond-expansion textarea {
@@ -761,7 +822,7 @@ button span {
 .sheet-spells .sheet-expand-spell:checked + span::before,
 .sheet-gear .sheet-expand-gear:checked + span::before,
 .sheet-gmod .sheet-expand-gmod:checked + span::before {
-	content: "-";
+	content: "▾";
 }
 
 
@@ -834,7 +895,8 @@ button span {
 }
 
 .sheet-toggler input[type=radio] + span,
-.sheet-toggler input[type=checkbox] + span {
+.sheet-toggler input[type=checkbox] + span,
+button[type=action] {
 	border: 1px solid rgb(35, 31, 32);
 	border-radius: 6px;
 	padding: 1px 6px;
@@ -843,6 +905,26 @@ button span {
 	text-align: center;
 	font-size: 0.8em;
 	font-weight: bold;
+}
+
+.sheet-nav-tabs {
+	margin-left: +6px;
+}
+
+.sheet-nav-tabs .sheet-toggler input[type=radio] + span {
+	border-radius: 2px;
+	font-size: 0.9em;
+	padding-top: 0.2em;
+}
+
+.sheet-nav-tabs .sheet-toggler input[type=radio]:checked + span {
+	background-color: unset;
+	background-image: linear-gradient(#ffffffb8, transparent);
+	border-bottom-color: transparent;
+}
+
+.sheet-nav-tabs .sheet-toggler input[type=radio]:focus + span {
+	border-bottom-color: transparent;
 }
 
 .sheet-toggler input[type=radio]:checked + span,
@@ -979,7 +1061,11 @@ button span {
 	flex-wrap: wrap;
 	text-align: right;
 	margin-top: 5px;
-    padding-right: 20px;
+	padding-right: 20px;
+}
+
+.sheet-move-expansion {
+	text-align: left;
 }
 
 .sheet-move-expansion input[type="text"],
@@ -1001,6 +1087,11 @@ button span {
 	font-size: 0.8em;
 	width: calc(100% - 115px);
 	height: 3em;
+}
+
+.sheet-move-expansion textarea {
+	width: calc(100% - 20px);
+	margin-top: 0px;
 }
 
 .sheet-move-expansion input[type="number"],
@@ -1136,11 +1227,18 @@ textarea.sheet-gear-details {
 }
 
 .sheet-gmod {
+	/*
 	background-color: white;
 	border: 1px solid black;
+	*/
 	padding: 2px;
-	margin-left: 0.2em;
-	width: 20em;
+	margin-left: 0.3em;
+	width: calc(100% - 1.2em);
+}
+
+.sheet-gmod .repitem {
+	width: calc(100% - 5%);
+	margin-left: 0.5em;
 }
 
 /* Roll Templates */
@@ -1220,16 +1318,16 @@ textarea.sheet-gear-details {
 /* Notes Fields */
 
 .sheet-notes{
-    border-radius: 0;
-    box-shadow: none;
-    border: 1px solid;
-    min-height: 28px;
-    padding: 5px;
-    width:49%;
-    box-sizing: border-box;
-    resize:vertical;
-    display:inline-block;
+	border-radius: 0;
+	box-shadow: none;
+	border: 1px solid;
+	min-height: 28px;
+	padding: 5px;
+	width:49%;
+	box-sizing: border-box;
+	resize:vertical;
+	display:inline-block;
 }
 .sheet-notes2{
-    margin-left:10px;
+	margin-left:10px;
 }
