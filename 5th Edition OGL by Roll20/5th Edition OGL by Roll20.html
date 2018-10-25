@@ -1131,7 +1131,7 @@
                     </div>
                     <input type="hidden" class="toggleflag" name="attr_global_save_mod_flag">
                     <div class="hidden textarea globalattack">
-                        <span class="label" data-i18n="global-save-u">GLOBAL SAVE MODIFIER</span>
+                        <span class="label" data-i18n="global-save-u" style="position: relative; padding-bottom: 5px;">GLOBAL SAVE MODIFIER</span>
                         <fieldset class="repeating_savemod">
                             <div class="global-mod">
                                 <input type="checkbox" name="attr_options-flag" class="options-flag" checked="checked" style="top: -15px;"><span>y</span>
@@ -1378,25 +1378,6 @@
                     <span class="label" data-i18n="speed-u">SPEED</span>
                 </div>
             </div>
-            <input type="hidden" class="toggleflag" name="attr_global_ac_mod_flag">
-            <div class="hp hidden">
-                <div class="textarea globalattack acmod">
-                    <fieldset class="repeating_acmod">
-                        <div class="global-mod">
-                            <input type="checkbox" name="attr_options-flag" class="options-flag" checked="checked" style="top: -15px;"><span>y</span>
-                            <input type="checkbox" name="attr_global_ac_active_flag" value="1" class="active-flag">
-                            <div class="options">
-                                <label>Value: <input type="number" name="attr_global_ac_val" placeholder="1"></label>
-                                <label>Name: <input type="text" name="attr_global_ac_name" placeholder="Defense"></label>
-                            </div>
-                            <div class="display">
-                                <span class="title"><span name="attr_global_ac_val"></span> [<span name="attr_global_ac_name"></span>]</span>
-                            </div>
-                        </div>
-                    </fieldset>
-                </div>
-                <span class="label" data-i18n="global-ac-u">GLOBAL AC MODIFIER</span>
-            </div>
             <div class="hp">
                 <div class="top">
                     <span data-i18n="hp-max-u">Hit Point Maximum</span>
@@ -1627,7 +1608,7 @@
                                     <input type="text" name="attr_global_damage_type" value="">
                                 </div>
                             </div>
-                            <div class="display" style="margin-bottom: 2px;">
+                            <div class="display" style="margin-bottom: 2px; width: 85%">
                                 <span class="title" name="attr_global_damage_rollstring" style="width: 110px; padding-right: 0px;"></span>
                                 <span class="subheader" name="attr_global_damage_type" style="padding-right: 0px;"></span>
                             </div>
@@ -1635,6 +1616,25 @@
                     </fieldset>
                 </div>
                 <span class="label" style="margin-top: 0px; position: absolute; bottom: 0px;" data-i18n="atk-spellcasting-u">ATTACKS & SPELLCASTING</span>
+            </div>
+            <input type="hidden" class="toggleflag" name="attr_global_ac_mod_flag">
+            <div class="equipment hidden">
+                <div class="textarea globalattack acmod">
+                    <fieldset class="repeating_acmod">
+                        <div class="global-mod">
+                            <input type="checkbox" name="attr_options-flag" class="options-flag" checked="checked" style="top: -15px;"><span>y</span>
+                            <input type="checkbox" name="attr_global_ac_active_flag" value="1" class="active-flag">
+                            <div class="options">
+                                <label>Value: <input type="number" name="attr_global_ac_val" placeholder="1"></label>
+                                <label>Name: <input type="text" name="attr_global_ac_name" placeholder="Defense"></label>
+                            </div>
+                            <div class="display">
+                                <span class="title"><span name="attr_global_ac_val"></span> [<span name="attr_global_ac_name"></span>]</span>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <span class="label" data-i18n="global-ac-u">GLOBAL AC MODIFIER</span>
             </div>
             <div class="equipment">
                 <div class="money">
@@ -1784,7 +1784,7 @@
                     </div>
                 </div>
                 <fieldset class="repeating_resource">
-                    <div class="hdice-dsaves-container" style="width: 246px; margin-top: 10px;">
+                    <div class="hdice-dsaves-container" style="width: 246px;">
                         <div class="subcontainer" style="height: 64px; width: 119px;">
                             <div class="top">
                                 <span data-i18n="total">Total</span>
@@ -7121,6 +7121,7 @@
                                 });
                                 var results = processDrop(page, v, repeating);
                                 setAttrs(results.update, {silent: true}, function() {results.callbacks.forEach(function(callback) {callback(); })} );
+                                //setAttrs({drop_category: ""}, {silent: true});
                             });
                         });
                     });
@@ -11431,7 +11432,8 @@
                 });
             }
         };
-        var handleTraits = function(traits, subsection) {
+        var handleTraits = function(blob, subsection) {
+            var traits = JSON.parse(blob.Traits);
             subsection = subsection ? subsection : element;
             _.each(traits, function(trait) {
                 addRepeatingSection(subsection, "row", function(rowid) {
@@ -11446,6 +11448,7 @@
                         repupdate[rowid + " label p"] = trait.Desc;
                     }
                     setCharmancerText(repupdate);
+                    handleProficiencies(blob, rowid);
                 });
             });
         };
@@ -11514,11 +11517,11 @@
                         repupdate[rowid + " label p"] = blob.Description ? blob.Description : "";
                         setCharmancerText(repupdate);
                     }
-                    handleTraits(traitsObj, rowid);
+                    handleTraits(blob, rowid);
                     handleProficiencies(blob, rowid);
                 });
             } else {
-                handleTraits(traitsObj);
+                handleTraits(blob);
             }
         });
     };
@@ -12355,11 +12358,23 @@
         var update_attr = {};
         var showList = [];
         var hideList = [];
+        var allBlobs = getRelevantBlobs(data);
         var equipmentType = data["l1-equipment"] && data["l1-equipment"].values.equipment_type ? data["l1-equipment"].values.equipment_type : "";
         var handleChoices = function(type) {
             var equipment = {};
             if(data["l1-" + type] && data["l1-" + type].data[type] && data["l1-" + type].data[type]["data-Equipment"]) {
                 equipment = data["l1-" + type].data[type]["data-Equipment"];
+            };
+            if(allBlobs.sorted[type]) {
+                _.each(allBlobs.sorted[type], function(blob) {
+                    if(blob.Equipment) {
+                        var blobstuff = blob.Equipment;
+                        try {
+                            blobstuff = JSON.parse(blob.Equipment);
+                        } catch (e) {}
+                        equipment.default = equipment.default ? equipment.default.concat(blobstuff) : blobstuff;
+                    }
+                });
             };
             _.each(equipment, function(feature, num) {
                 if(num === "default") {
@@ -12494,9 +12509,6 @@
         var data = getCharmancerData();
         var class_string = getName("class", data, true);
         var background_string = getName("background", data, true);
-        var class_equipment = data && data["l1-equipment"] && data["l1-equipment"].values.equipment_class ? data["l1-equipment"].values.equipment_class : undefined;
-        var background_equipment = data && data["l1-equipment"] && data["l1-equipment"].values.equipment_background ? data["l1-class"].values.equipment_background : undefined;
-
         if(eventinfo.sourceType == "player") {
             if(eventinfo.newValue === "" || eventinfo.newValue === undefined) {
                 hideList.push("gold_option", "class_option", "background_gold_option");
@@ -12510,7 +12522,6 @@
                 hideList.push("gold_option", "background_gold_option");
             }
         }
-
         showChoices(showList);
         hideChoices(hideList);
     });
@@ -13432,8 +13443,9 @@
             getCompendiumPage(getNames, function(data) {
                 var nextGet = [];
                 _.each(data, function(page, index) {
-                    if(pageArray[index].data) {
-                        page.data = _.extend(page.data, pageArray[index].data);
+                    var pagedata = _.findWhere(pageArray, {name: page.data.Category + ":" + page.name});
+                    if(pagedata && pagedata.data) {
+                        page.data = _.extend(page.data, pagedata.data);
                     }
                     if(!page.id) page.data.Source = "Charactermancer";
                     page.name = page.name.replace(/@@!!@@/g,""); // Hacky bugfix to prevent custom names from matching unavailable content
@@ -13713,6 +13725,15 @@
                     equipment = equipment.concat(val.split(" and "));
                 }
             });
+            _.each(blobs.all, function(blob) {
+                if(blob.Equipment) {
+                    var blobstuff = blob.Equipment;
+                    try {
+                        blobstuff = JSON.parse(blob.Equipment);
+                    } catch (e) {}
+                    equipment = equipment.concat(blobstuff);
+                }
+            })
         }
 
         //Set up the final setAttrs()
