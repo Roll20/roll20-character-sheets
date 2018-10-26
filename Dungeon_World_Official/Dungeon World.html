@@ -106,12 +106,12 @@
 			</div>
 		</div>
 
-		<div class="class-container compendium-drop-target">
+		<div class="class-container">
 			<span class="label" data-i18n="char-class-u">CLASS</span>
-			<input type="hidden" name="attr_comp_name" accept="Name">
-			<input type="hidden" name="attr_comp_damagedie" accept="Base Damage">
-			<input type="hidden" name="attr_comp_classmoves" accept="data-Basic Moves">
-			<input type="hidden" name="attr_comp_load" accept="Load">
+			<input type="hidden" name="attr_comp_name">
+			<input type="hidden" name="attr_comp_damagedie">
+			<input type="hidden" name="attr_comp_classmoves">
+			<input type="hidden" name="attr_comp_load">
 			<input type="text" name="attr_character_class">
 		</div>
 	</div>
@@ -3077,31 +3077,13 @@ var handle_drop = function(category, eventinfo) {
 			} else if (category === "Spells") {
 				addSpell(v.drop_name);
 			} else if (category === "Classes") {
-				getAttrs(["populate_moves", "comp_name", "comp_damagedie", "comp_classmoves", "comp_load", "strength_mod"], function(v) {
-					if (v.comp_name != "dropped") {
-					
-						// Populate all basic moves.
-						if (v.populate_moves == "all") {
-							addBasicMoves();
-							setAttrs({populate_moves: "classonly"});
-						}
-
-						// Populate the Class's starting moves
-						if (v.populate_moves == "all" || v.populate_moves == "classonly") {
-							var startingMoves = []
-							startingMoves = JSON.parse(v.comp_classmoves);
-
-							for (var i = 0, len = startingMoves.length; i < len; i++) {
-								addMove(shortName(startingMoves[i]));
-							}
-
-							setAttrs({
-								damagedie: v.comp_damagedie
-							});
-						}
-					}
-				});
-				setAttrs({comp_name: "dropped"}, "silent");
+				var update = {};
+				update["comp_name"] = v.drop_name;
+				update["comp_damagedie"] = pagedata["Base Damage"];
+				update["comp_classmoves"] = pagedata["data-Basic Moves"];
+				update["comp_load"] = pagedata["Load"];
+				setAttrs(update);
+				//setAttrs({comp_name: "dropped"}, "silent");
 			}
 		});
 	});
