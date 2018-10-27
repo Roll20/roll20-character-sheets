@@ -296,6 +296,14 @@
             });
         }
         
+        on("change:repeating_power:name", function(eventInfo) {
+            if(eventInfo.sourceType !== "sheetworker"
+                //These values are only ever equal when the attribute is first set.
+                && eventInfo.newValue == eventInfo.previousValue) {
+                var rowID = eventInfo.sourceAttribute.substr("repeating_power_".length, 20);
+                recountPowers(rowID);
+            }
+        });
         on("change:repeating_power:ranks change:repeating_power:points-per-rank "
                 + "change:repeating_power:misc-points change:repeating_power:alternate-effect", function(eventInfo) {
             if(eventInfo.sourceType !== "sheetworker") {
@@ -323,7 +331,9 @@
                 setAttrs({"equipment-points":0}, function() {
                     recountAdvantages(recountEquipment);
                 });
-            } else if(eventInfo.newValue.toLowerCase() === "equipment") {
+            } else if(eventInfo.newValue.toLowerCase() === "equipment"
+                || eventInfo.sourceType !== "sheetworker"
+                && eventInfo.newValue == eventInfo.previousValue) {
                 recountAdvantages(recountEquipment);
             }
         });
@@ -372,6 +382,13 @@
             }
         });
         
+        
+        on("change:repeating_equipment:name", function(eventInfo) {
+            if(eventInfo.sourceType !== "sheetworker"
+                && eventInfo.newValue == eventInfo.previousValue) {
+                recountEquipment();
+            }
+        });
         on("change:repeating_equipment:cost remove:repeating_equipment", function(eventInfo) {
             if(eventInfo.sourceType !== "sheetworker") {
                 recountEquipment();
@@ -1035,7 +1052,7 @@
     			<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_ranks" title="repeating_power_X_ranks" value="1"/></span>
     			<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_points-per-rank" title="repeating_power_X_points-per-rank" value="1"/></span>
     			<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_misc-points" title="repeating_power_X_misc-points" value="0"/></span>
-    			<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_total-cost" title="repeating_power_X_total-cost" value="((@{ranks} * @{points-per-rank}) + @{misc-points})" /></span>
+    			<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_total-cost" title="repeating_power_X_total-cost" value="1" /></span>
     			<span style="font-size:10px;"><b>&nbsp;Options&nbsp;&nbsp;</b></span>
         		<input type="checkbox" class="sheet-macro-show" title="repeating_attacks_X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
     			<div class="sheet-macro">
