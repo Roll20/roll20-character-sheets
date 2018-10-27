@@ -461,7 +461,7 @@ const updateSheet = version => {
   }
   if (version < 7) {
     getSectionIDs("repeating_attacks", idArray => {
-      idArray.forEach(id => updateNpcAttack(`repeating_attacks_${id}`));
+      idArray.forEach(id => updateNpcAttack(`repeating_attacks_${id}_attack`));
     });
   }
 };
