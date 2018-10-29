@@ -557,7 +557,7 @@
 							<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
 							<div class="settings">
 								<div class="skills-row">
-									<input type="hidden" name="attr_dicepool" />
+									<input type="hidden" name="attr_dicepool"/>
 									<input type="text" name="attr_skill" placeholder="Knowledge skill name" title="Knowledge skill name" />
 									<input type="number" name="attr_rating" placeholder="0" title="Skill rating" />
 									<div class="settings-row">
@@ -3867,54 +3867,95 @@ on("change:repeating_weapon", function() {
 	});
 
 
-//Repeating Range & Melee weapons dicepools
-	on("change:repeating_range", function() {
-		getAttrs(["repeating_range_dicepool_modifier", "repeating_range_spec", "repeating_range_primary", "repeating_range_weapon", "repeating_range_damage", "repeating_range_acc",
-			"repeating_range_ap", "repeating_range_mode", "repeating_range_recoil", "repeating_range_ammo", "repeating_range_skill"], function(v){
-			const mod = parseInt(v.repeating_range_dicepool_modifier) || 0;
-			const spec = parseInt(v.repeating_range_spec) || 0;
-			let update = {};
+//REFACTORED Range & MELEE UPDATES
+   ['repeating_range',
+    'repeating_melee',
+    ].forEach(weap => {
+        on(`change:${weap}`, function(eventInfo) {
+            const source = eventInfo.sourceAttribute;
+            const newV = eventInfo.newValue;
+            const type = weap.slice(-5);
 
-			update["repeating_range_dicepool"] = mod + spec;
+            //Setting this here for now to ensure dicepool attribute gets updated
+            //Move this for the Version 1.2
+        	getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`], function(v) {
+        		const mod = parseInt(v[`${weap}_dicepool_modifier`]) || 0;
+				const spec = parseInt(v[`${weap}_spec`]) || 0;
+				const tot = mod + spec;
 
-			if (v.repeating_range_primary === "primary") {
-				update["primary_range_weapon"] = v.repeating_range_weapon;
-				update["primary_range_weapon_dicepool"] = mod + spec;
-				if (v.repeating_range_skill) {update["primary_range_weapon_skill"] = v.repeating_range_skill};
-				if (v.repeating_range_damage) {update["primary_range_weapon_damage"] = v.repeating_range_damage};
-				if (v.repeating_range_acc) {update["primary_range_weapon_acc"] = v.repeating_range_acc};
-				if (v.repeating_range_ap) {update["primary_range_weapon_ap"] = v.repeating_range_ap};
-				if (v.repeating_range_mode) {update["primary_range_weapon_mode"] = v.repeating_range_mode};
-				if (v.repeating_range_recoil) {update["primary_range_weapon_recoil"] = v.repeating_range_recoil};
-				if (v.repeating_range_ammo) {update["primary_range_weapon_ammo"] = v.repeating_range_ammo};
-			};
+				setAttrs({[`${weap}_dicepool`]: tot});
+        	});
 
-			setAttrs(update);
-		});
-	});
+            if (source.includes('primary')) {
+                if (newV === 'primary') {
+                	//Shared attributes names. 
+                	let array = ["dicepool", "weapon", "damage", "acc", "ap", "skill"];
+                	//Add the range or melee specific ones
+                	(type === "range") ? array.push("ammo", "mode", "recoil") : array.push("reach");
+                	//Add the repeating section to the begining of each attribute
+                	let attrs = [];
+			        for(var i=0; i < array.length; i++) {
+			            attrs.push(`${weap}_` + array[i]);
+		        	};
 
-	on("change:repeating_melee", function() {
-		getAttrs(["repeating_dicepool_modifier", "repeating_melee_spec", "repeating_melee_primary", "repeating_melee_weapon", "repeating_melee_damage", "repeating_melee_acc",
-			"repeating_melee_ap", "repeating_melee_reach", "repeating_melee_skill"], function(v){
-			const mod = parseInt(v.repeating_melee_dicepool_modifier) || 0;
-			const spec = parseInt(v.repeating_melee_spec) || 0;
-			let update = {};
+	                getAttrs(attrs, function(v) {
+	                	let update = {};
+	                	//Primary weapon name does not follow the naming scheme.
+	                	update[`primary_${type}_weapon`] = v[`${weap}_weapon`];
 
-			update["repeating_melee_dicepool"] = mod + spec;
+	                	_.each(array, function(value) {
+	                		if (value != undefined || value != "weapon") {
+	                			update[`primary_${type}_weapon_${value}`] = v[`${weap}_${value}`];
+	                		};
+	                	});
 
-			if (v.repeating_melee_primary === "primary") {
-				update["primary_melee_weapon"] = v.repeating_melee_weapon;
-				update["primary_melee_weapon_dicepool"] = mod + spec;
-				if (v.repeating_melee_skill) {update["primary_melee_weapon_skill"] = v.repeating_melee_skill};
-				if (v.repeating_melee_damage) {update["primary_melee_weapon_damage"] = v.repeating_melee_damage};
-				if (v.repeating_melee_acc) {update["primary_melee_weapon_acc"] = v.repeating_melee_acc};
-				if (v.repeating_melee_ap) {update["primary_melee_weapon_ap"] = v.repeating_melee_ap};
-				if (v.repeating_melee_reach) {update["primary_melee_weapon_reach"] = v.repeating_melee_reach};
-			};
+	                	setAttrs(update);
+	                });
 
-			setAttrs(update);
-		});
-	});		
+					//Set the other repeating_weapon primary flags to 0 aka unchecked
+		            getSectionIDs(`${weap}`, function(ids) {
+				        let IDs = [];
+				        let update = {};
+
+				        for(var i=0; i < ids.length; i++) {
+				            IDs.push(`${weap}_` + ids[i] + "_primary");
+			        	};
+
+			        	IDs.forEach(id => {
+			        		if (id != source) {
+			        			update[`${id}`] = 0;
+			        		};
+			        	});
+
+			        	setAttrs(update);
+			        });
+	            };
+           	} else if (source.includes('dicepool') || source.includes('weapon') || source.includes('damage') || source.includes('acc') || source.includes('ap') || source.includes('skill') || source.includes('reach') || source.includes('ammo') || source.includes('mode') || source.includes('recoil')) {
+				getAttrs([`${weap}_primary`, `${source}`], function(v) {
+					if (v[`${weap}_primary`] === 'primary') {
+						let update = {};
+						//This whole process needs refactored in the future. Its working for now.
+						switch (true) {
+							case /weapon/.test(source): update[`primary_${type}_weapon`] = v[`${source}`]; break;
+							case /damage/.test(source): update[`primary_${type}_weapon_damage`] = v[`${source}`]; break;
+							case /dicepool/.test(source): update[`primary_${type}_weapon_dicepool`] = v[`${source}`]; break;
+							case /acc/.test(source): update[`primary_${type}_weapon_acc`] = v[`${source}`]; break;
+							case /ap/.test(source): update[`primary_${type}_weapon_ap`] = v[`${source}`]; break;
+							case /skill/.test(source): update[`primary_${type}_weapon_skill`] = v[`${source}`]; break;
+							case /reach/.test(source): update[`primary_${type}_weapon_reach`] = v[`${source}`]; break;
+							case /ammo/.test(source): update[`primary_${type}_weapon_ammo`] = v[`${source}`]; break;
+							case /mode/.test(source): update[`primary_${type}_weapon_mode`] = v[`${source}`]; break;
+							case /recoil/.test(source): update[`primary_${type}_weapon_recoil`] = v[`${source}`]; break;
+							default: console.log(`Source  ${source} was invalid`);}
+
+						setAttrs(update);
+					};
+				});
+            } else {
+                 console.log("Change was not relevant.");
+            };
+        });
+    });
 
 //Repeating IDs & Lifestyles Section Display
 	on("change:repeating_lifestyle", function() {
