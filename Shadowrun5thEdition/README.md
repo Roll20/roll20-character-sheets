@@ -27,7 +27,7 @@ This sheet will work with Firefox but its best suited for Chrome.
 
 ### AI Support
 
-AI are not supported inherently but the sheet can be used for them. User the Cyberdeck in the Matrix tab to set your Matrix Attributes. Mental attributes can be entered as normal. Depth can be tracked in the Misc input in the Personal Data section. Be sure to select Emerged in the Options tab to give yourself access to the Resonance input in the Attributes section. Weakness & Powers can be tracked in the Other Abilities under the Magic tab or entered in Qualities.
+AI are not supported inherently but the sheet can be used for them. User the Cyberdeck in the Matrix tab to set your Matrix Attributes. Mental attributes can be entered as normal. Depth can be tracked in the Misc input in the Personal Data section. Weakness & Powers can be tracked in the Other Abilities under the Magic tab or entered in Qualities.
 
 ### Attributes
 
