@@ -42,7 +42,7 @@ PLEASE VERIFY YOUR SHEET.JSON IS VALID JSON at http://jsonlint.com before you su
 Guidelines
 ==========
 
-The former guidelines found here have been moved and expanded on in the [Roll20 Wiki: Building Character Sheets](https://wiki.roll20.net/Building_Character_Sheets).
+The former guidelines found here have been moved and expanded on in the [Roll20 Wiki: Building Character Sheets](https://wiki.roll20.net/Building_Character_Sheets#Roll20_Character_Sheets_Repository).
 
 
 License

@@ -1,3 +1,413 @@
+<script type="text/worker">
+    function clearLog() {
+        setAttrs({"output-message": "", "hide-output": "1"}, {silent: true});
+    }
+    
+    function log(value) {
+        setAttrs({"output-message": value, "hide-output": "0"}, {silent: true});
+        console.log(value);
+    };
+    
+    function pluralize(count, thing, singular, plural) {
+        if(!singular) {
+            singular = "";
+        }
+        if(!plural) {
+            plural = "s";
+        }
+        
+        return count + " " + thing
+            + (count == 1 ? singular : plural);
+    }
+    
+    try {
+        var equipmentRowID = null;
+        
+        /**
+         * @param repeatingName - The word that comes after "repeating_" in the
+         * attribute name. For instance, if you want to find
+         * "repeating_equipment_$0_name", then this should be "equipment".
+         * 
+         * @param suffixes - An array of words identifying which parts of the
+         * repeating attribute you want. For instance, if you want
+         * "repeating_equipment_$0_name" and "repeating_equipment_$0_description",
+         * then this should be ["name", "description"].
+         * 
+         * @param callback - A function that takes an array of objects. This
+         * will be called once the attributes have been found. Each object in
+         * the array will contain a property for each string in suffixes, mapped
+         * to the value of that attribute. The objects won't be in order, but
+         * they will include the repeating section id. If you passed the values
+         * mentioned above, then this might return the following array:
+         * [
+         *     {id:"ABC", name:"Sword", description:""},
+         *     {id:"DEF", name:"Shield", description:"A simple wooden buckler."}
+         * ]
+         */
+        function getRepeatingAttributes(repeatingName, suffixes, callback) {
+            getSectionIDs("repeating_" + repeatingName, function(idArray) {
+                var attributeNames = [];
+                for(var suffix of suffixes) {
+                    for(var id of idArray) {
+                        attributeNames.push("repeating_" + repeatingName
+                            + "_" + id + "_" + suffix);
+                    }
+                }
+                
+                getAttrs(attributeNames, function(attributes) {
+                    var result = [];
+                    for(var id of idArray) {
+                        var attributeSection = {id:id};
+                        result.push(attributeSection);
+                        
+                        for(var suffix of suffixes) {
+                            attributeSection[suffix] = attributes["repeating_"
+                                + repeatingName + "_" + id + "_" + suffix];
+                        }
+                    }
+                    
+                    callback(result);
+                });
+            });
+        }
+        /**
+         * Like getRepeatingAttributes, but puts the array in order.
+         */
+        function getRepeatingAttributesOrdered(repeatingName, suffixes, callback) {
+            getRepeatingAttributes(repeatingName, suffixes, function(attributes) {
+                getSectionIDsOrdered(repeatingName, function(idsOrdered) {
+                    var result = [];
+                    
+                    for(var id of idsOrdered) {
+                        for(var attribute of attributes) {
+                            if(attribute.id === id) {
+                                result.push(attribute);
+                                break;
+                            }
+                        }
+                    }
+                    
+                    callback(result);
+                });
+            }, true);
+        }
+        
+        function recountAll() {
+            console.log("Recounting everything:");
+            recountPowers(true);
+            recountAdvantages(recountEquipment);
+        }
+        
+        /**
+         * @param calculateCost - Set this to true if all powers should be
+         * calculated, or to a row ID if you only want to recalculate one. Make
+         * sure to convert the row ID to lowercase if it isn't already (this
+         * will happen automatically if you extract it from eventInfo).
+         */
+        function recountPowers(calculateCost, doneCallback) {
+            var suffixes;
+            if(calculateCost) {
+                suffixes = ["ranks", "points-per-rank", "misc-points", "total-cost",
+                    "alternate-effect"];
+            } else {
+                suffixes = ["total-cost"];
+            }
+            
+            getRepeatingAttributesOrdered("power", suffixes, function(powers) {
+                var total = 0;
+                for(var power of powers) {
+                    if(calculateCost === true || calculateCost === power.id.toLowerCase()) {
+                        power["total-cost"] = calculatePowerCost(powers, power);
+                    }
+                    total += parseInt(power["total-cost"]);
+                }
+                setAttrs({"power-points": total}, {silent: true});
+                console.log("Spent " + pluralize(total, "point") + " on powers.");
+                
+                if(doneCallback) {
+                    doneCallback();
+                }
+            });
+        }
+        
+        /**
+         * Given a complete array of ordered powers and one entry out of that
+         * array, calculates the total cost of that power. This updates the
+         * attribute (asynchronously), and also updates the power object
+         * in-place.
+         */
+        function calculatePowerCost(orderedPowers, power) {
+            var total = parseInt(power.ranks) * parseFloat(power["points-per-rank"])
+                + parseInt(power["misc-points"]);
+            
+            //If this is an alternate effect, find the effect it's based
+            //on and make sure this is cheaper (or the same price).
+            if(power["alternate-effect"] === "1" || power["alternate-effect"] === "2") {
+                var index = orderedPowers.indexOf(power);
+                if(index < 0) {
+                    return parseInt(power["total-cost"]);
+                } else if(index == 0) {
+                    log("Your first power can't be an alternate effect. Try rearranging your powers.");
+                    let values = {};
+                    values["repeating_power_" + power.id + "_alternate-effect"] = "0";
+                    setAttrs(values, {silent: true});
+                    return parseInt(power["total-cost"]);
+                }
+                
+                for(var i = index - 1; i >= 0; i--) {
+                    let effectStatus = orderedPowers[i]["alternate-effect"];
+                    if(effectStatus !== "1" && effectStatus !== "2") {
+                        //Check the cost.
+                        if(total > parseInt(orderedPowers[i]["total-cost"])) {
+                            log("An alternate effect can't cost more than the primary effect. (Current cost: "
+                                + total + ", maximum allowed cost: " + orderedPowers[i]["total-cost"] + ".)");
+                            break;
+                        } else {
+                            //Success!
+                            let values = {};
+                            values["repeating_power_" + power.id + "_total-cost"] =
+                                power["total-cost"] = power["alternate-effect"];
+                            setAttrs(values, {silent: true});
+                            return parseInt(power["total-cost"]);
+                        }
+                    } else if(i == 0) {
+                        log("Your first power can't be an alternate effect. Try rearranging your powers.");
+                    }
+                }
+                
+                //If none was found or if the cost was wrong,
+                //then this isn't a valid alternate effect.
+                let values = {};
+                values["repeating_power_" + power.id + "_alternate-effect"] = "0";
+                setAttrs(values, {silent: true});
+            }
+            
+            let values = {};
+            values["repeating_power_" + power.id + "_total-cost"] = "" + Math.ceil(total);
+            setAttrs(values, {silent: true});
+            
+            console.log("Power " + orderedPowers.indexOf(power) + " costs " + Math.ceil(total));
+            
+            return Math.ceil(total);
+        }
+        
+        function recountAdvantages(doneCallback) {
+            getAttrs(["Wealth"], function(dict) {
+                var wealth = 8;
+                if(dict["Wealth"]) {
+                    wealth = parseInt(dict["Wealth"]);
+                }
+                if(!wealth || wealth < 0) {
+                    wealth = 0;
+                    setAttrs({Wealth:0});
+                }
+                
+                getRepeatingAttributes("advantage", ["name", "ranks"], function(advantages) {
+                    var total = Math.ceil(wealth / 4) - 2;
+                    equipmentRowID = null;
+                    
+                    for(var advantage of advantages) {
+                        total += parseInt(advantage.ranks);
+                        
+                        if(advantage.name && advantage.name.toLowerCase() === "equipment") {
+                            equipmentRowID = advantage.id;
+                            
+                            var ranks = parseInt(advantage.ranks);
+                            if(ranks) {
+                                setAttrs({"equipment-points":ranks * 5}, {silent: true});
+                            } else {
+                                setAttrs({"equipment-points":5}, {silent: true});
+                            }
+                        }
+                    }
+                    
+                    setAttrs({"advantage-points": total}, {silent: true});
+                    
+                    console.log("Spent " + pluralize(total, "point") + " on advantages.");
+                    
+                    if(doneCallback) {
+                        doneCallback();
+                    }
+                });
+            });
+        }
+        
+        function recountEquipment(doneCallback) {
+            getRepeatingAttributes("equipment", ["cost"], function(equipment) {
+                var total = 0;
+                
+                for(var e of equipment) {
+                    total += parseInt(e.cost);
+                }
+                
+                getAttrs(["equipment-points"], function(attr) {
+                    var maximum = 0;
+                    if(attr["equipment-points"]) {
+                        maximum = parseInt(attr["equipment-points"]);
+                    }
+                    
+                    if(total > maximum) {
+                        var ranks = Math.ceil(total / 5);
+                        log("Buying " + pluralize(total, "point") + " of equipment requires "
+                            + pluralize(ranks, "rank") + " of the Equipment advantage.");
+                    } else {
+                        getAttrs(["output-message"], function(dict) {
+                            if(dict["output-message"].endsWith(" of the Equipment advantage.")) {
+                                clearLog();
+                            }
+                        });
+                    }
+                    
+                    if(doneCallback) {
+                        doneCallback();
+                    }
+                });
+            });
+        }
+        
+        on("sheet:opened", function() {
+            clearLog();
+            
+            getAttrs(["equipment-points"], function(attr) {
+                if(!attr["equipment-points"]) {
+                    recountAll();
+                } else {
+                    getRepeatingAttributes("advantage", ["name"], function(advantages) {
+                        for(var advantage of advantages) {
+                            if(advantage.name.toLowerCase() === "equipment") {
+                                equipmentRowID = advantage.id;
+                                break;
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        
+        function getSectionIDsOrdered(sectionName, callback) {
+            'use strict';
+            getAttrs([`_reporder_repeating_${sectionName}`], function(v) {
+                getSectionIDs(sectionName, function(idArray) {
+                    let reporderArray = v[`_reporder_repeating_${sectionName}`]
+                        ? v[`_reporder_repeating_${sectionName}`].toLowerCase().split(',') : [],
+                    ids = [...new Set(reporderArray.filter(x => idArray.includes(x)).concat(idArray))];
+                    callback(ids);
+                });
+            });
+        }
+        
+        on("change:repeating_power:name", function(eventInfo) {
+            if(eventInfo.sourceType !== "sheetworker"
+                //These values are only ever equal when the attribute is first set.
+                && eventInfo.newValue == eventInfo.previousValue) {
+                var rowID = eventInfo.sourceAttribute.substr("repeating_power_".length, 20);
+                recountPowers(rowID);
+            }
+        });
+        on("change:repeating_power:ranks change:repeating_power:points-per-rank "
+                + "change:repeating_power:misc-points change:repeating_power:alternate-effect", function(eventInfo) {
+            if(eventInfo.sourceType !== "sheetworker") {
+                var rowID = eventInfo.sourceAttribute.substr("repeating_power_".length, 20);
+                recountPowers(rowID);
+            }
+        });
+        on("change:repeating_power:total-cost remove:repeating_power", function(eventInfo) {
+            if(eventInfo.sourceType !== "sheetworker") {
+                recountPowers();
+            }
+        });
+        
+        on("change:repeating_advantage:ranks", function(eventInfo) {
+            if(eventInfo.sourceType !== "sheetworker") {
+                if(eventInfo.sourceAttribute.toLowerCase().indexOf(equipmentRowID) >= 0) {
+                    recountAdvantages(recountEquipment);
+                } else {
+                    recountAdvantages();
+                }
+            }
+        });
+        on("change:repeating_advantage:name", function(eventInfo) {
+            if(eventInfo.previousValue.toLowerCase() === "equipment") {
+                setAttrs({"equipment-points":0}, function() {
+                    recountAdvantages(recountEquipment);
+                });
+            } else if(eventInfo.newValue.toLowerCase() === "equipment"
+                || eventInfo.sourceType !== "sheetworker"
+                && eventInfo.newValue == eventInfo.previousValue) {
+                recountAdvantages(recountEquipment);
+            }
+        });
+        on("remove:repeating_advantage", function(eventInfo) {
+            if(eventInfo.sourceAttribute.toLowerCase().indexOf(equipmentRowID) >= 0) {
+                setAttrs({"equipment-points":0}, function() {
+                    recountAdvantages(recountEquipment);
+                });
+            } else {
+                recountAdvantages();
+            }
+        });
+        
+        on("change:Wealth", function(eventInfo) {
+            if(eventInfo.sourceType !== "sheetworker") {
+                if(eventInfo.newValue !== undefined) {
+                    onGotNewValue({Wealth:eventInfo.newValue});
+                } else {
+                    getAttrs(["Wealth"], onGotNewValue);
+                }
+                
+                function onGotNewValue(data) {
+                    var wealth = parseInt(data["Wealth"]);
+                    
+                    var description;
+                    if(wealth <= 0) {
+                        description = "Impoverished";
+                    } else if(wealth <= 4) {
+                        description = "Struggling";
+                    } else if(wealth <= 10) {
+                        description = "Middle Class";
+                    } else if(wealth <= 15) {
+                        description = "Affluent";
+                    } else if(wealth <= 20) {
+                        description = "Wealthy";
+                    } else if(wealth <= 30) {
+                        description = "Rich";
+                    } else {
+                        description = "Filthy Rich";
+                    }
+                    
+                    setAttrs({"wealth-description": description}, {silent: true});
+                    
+                    recountAll();
+                }
+            }
+        });
+        
+        
+        on("change:repeating_equipment:name", function(eventInfo) {
+            if(eventInfo.sourceType !== "sheetworker"
+                && eventInfo.newValue == eventInfo.previousValue) {
+                recountEquipment();
+            }
+        });
+        on("change:repeating_equipment:cost remove:repeating_equipment", function(eventInfo) {
+            if(eventInfo.sourceType !== "sheetworker") {
+                recountEquipment();
+            }
+        });
+        
+        on("change:output-message", function(eventInfo) {
+            if(eventInfo.sourceType !== "sheetworker") {
+                clearLog();
+            }
+        });
+    } catch(e) {
+        log("Encountered an error: " + e);
+    }
+</script>
+
+<input class="sheet-hide-output" type="checkbox" name="attr_hide-output" value="1" checked="true" /><span></span>
+<input class="sheet-output-message" type="text" name="attr_output-message" title="output-message" />
+
 <div class="sheet-row" style="text-align:center;">
     <img src="http://i.imgur.com/LGn0z0t.jpg" style="max-height: 100px;" title="Mutants and Masterminds Character Sheet"/>
     <br>
@@ -639,10 +1049,17 @@
     		<fieldset class="repeating_power">
     		    <span class="sheet-table-data"><button type="roll" name="attr_adv" title="adv" value="@{who-effects} &amp;{template:default} {{name=@{character_name} - @{name}}} {{@{description}}}" class="btn ui-draggable"></button></span>
     			<span class="sheet-table-data" style="width:100%"><input type="text" name="attr_name" title="repeating_power_X_name" value="Name"/></span>
-    			<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_ranks" title="repeating_power_X_ranks" value="0"/></span>
-    			<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_points-per-rank" title="repeating_power_X_points-per-rank" value="0"/></span>
+    			<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_ranks" title="repeating_power_X_ranks" value="1"/></span>
+    			<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_points-per-rank" title="repeating_power_X_points-per-rank" value="1"/></span>
     			<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_misc-points" title="repeating_power_X_misc-points" value="0"/></span>
-    			<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_total-cost" title="repeating_power_X_total-cost" value="((@{ranks} * @{points-per-rank}) + @{misc-points})" disabled/></span>
+    			<span class="sheet-table-data" style="width:5%;"><input type="number" name="attr_total-cost" title="repeating_power_X_total-cost" value="1" /></span>
+    			<span style="font-size:10px;"><b>&nbsp;Options&nbsp;&nbsp;</b></span>
+        		<input type="checkbox" class="sheet-macro-show" title="repeating_attacks_X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
+    			<div class="sheet-macro">
+        			<label class="sheet-table-checkbox"><input type="radio" name="attr_alternate-effect" title="repeating_power_X_alternate-effect" value="0" checked="true" /><span>Normal power</span></label>
+        			<label class="sheet-table-checkbox"><input type="radio" name="attr_alternate-effect" title="repeating_power_X_alternate-effect" value="1" /><span>Alternate effect</span></label>
+        			<label class="sheet-table-checkbox"><input type="radio" name="attr_alternate-effect" title="repeating_power_X_dynamic-alternate-effect" value="2" /><span>Dynamic alternate effect</span></label>
+        		</div>
     			<textarea name="attr_description" title="repeating_power_X_description" style="height:90px;">Description</textarea>
     			<hr>
     		</fieldset>
@@ -654,12 +1071,23 @@
             <span class="sheet-table-data" style="height:36px;"><b>&nbsp;Advantages</b></span>
             <fieldset class="repeating_advantage">
                 <span class="sheet-table-data"><button type="roll" name="attr_adv" title="adv" value="@{who-effects} &amp;{template:default} {{name=@{character_name} - @{name}}} {{@{description}}}" class="btn ui-draggable"></button></span>
-                <span class="sheet-table-data"><input type="number" name="attr_ranks" title="repeating_advantage_X_ranks" value="0"/></span>
+                <span class="sheet-table-data"><input type="number" name="attr_ranks" title="repeating_advantage_X_ranks" value="1"/></span>
                 <span class="sheet-table-data"><input type="text" name="attr_name" title="repeating_advantage_X_name" value="Name"/></span>
                 <textarea name="attr_description" title="repeating_advantage_X_description" style="height:90px;">Description</textarea>
                 <hr>
             </fieldset>
         </div>
+        <br>
+        <input type="checkbox" class="sheet-secret-macro-show" name="attr_use-wealth-rules" value="1"/><span></span>
+        <div class="sheet-macro">
+            <div class="sheet-section-wealth" style="border-style:solid;border-width:2px;">
+            	<span class="sheet-table-data" style="height:36px;"><b>&nbsp;Wealth</b></span>
+    			<br>
+    			<span class="sheet-table-data"><button type="roll" name="roll_Wealth" title="Wealth-Check" value="@{who-skill} Wealth check: [[@{die_type} + @{Wealth}]]"></button></span>
+    			<span class="sheet-table-data"><input type="number" name="attr_Wealth" title="Wealth" value="8"/></span>
+    			<span class="sheet-table-data"><input class="sheet-no-border" type="text" name="attr_wealth-description" value="Middle Class" /></span>
+    		</div>
+    	</div>
         <br>
     </div>
     <div class="sheet-tab-content sheet-tab13 sheet-tab99">
@@ -667,6 +1095,7 @@
     		<span class="sheet-table-data" style="height:36px;"><b>&nbsp;Equipment, Vehicles, and Headquarters</b></span>
     		<fieldset class="repeating_equipment">
     		    <span class="sheet-table-data"><button type="roll" name="attr_adv" title="adv" value="@{who-effects} &amp;{template:default} {{name=@{character_name} - @{name}}} {{@{description}}}" class="btn ui-draggable"></button></span>
+    			<span class="sheet-table-data"><input type="number" name="attr_cost" title="repeating_equipment_X_cost" value="1"/></span>
     			<span class="sheet-table-data"><input type="text" name="attr_name" title="repeating_equipment_X_name" value="Name"/></span>
     			<textarea name="attr_description" title="repeating_equipment_X_description" style="height:90px;">Description</textarea>
     			<hr>
