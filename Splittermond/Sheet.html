@@ -1317,13 +1317,16 @@
                         <tr>
                             <td colspan="3">
                                 <fieldset class="repeating_zustaende">
-                                        <select name="attr_zustandsname" style="width: 40%; font-weight: bold; background-color:#81BEF7; font-size:10px;">  
-                                            <optgroup style="font-size:10px;">
+                                        <select name="attr_zustandsname" style="width: 40%; font-weight: bold; background-color:#81BEF7; font-size:12px;">  
+                                            <optgroup style="font-size:12px;">
                                                 <option value="nothing" selected="selected">---------------</option>
                                                 <option value="benommen">Benommen</option>
+                                                <option value="bewusstlos">Bewusstlos</option>
                                                 <option value="erschoepft">Ersch&ouml;pft</option>
                                                 <option value="geblendet">Geblendet</option>
                                                 <option value="lahm">Lahm</option>
+                                                <option value="sterbendw">Sterbend (Wunden)</option>
+                                                <option value="totw">Tot (Wunden)</option>
                                                 <option value="verwundet">Verwundet</option>
                                             </optgroup>
                                         </select>
@@ -1347,7 +1350,6 @@
                             <td width="28%" style="background-color:#81BEF7;"><input align="center" type="checkbox" value='1' name="attr_schadene" style="font-weight: bold; background-color:#81BEF7; font-size:10px;">&nbsp;Ersch&ouml;pfen</input></td>
                             <td width="28%" style="background-color:#81BEF7;"><input align="center" type="checkbox" value='1' name="attr_schadenk" style="font-weight: bold; background-color:#81BEF7; font-size:10px;">&nbsp;Kanalisieren</input></td>
                         </tr>
-                        <tr>
                     </table>
                 </td> 
             </tr>
@@ -5527,16 +5529,43 @@ function createNSCFromTemplate (template) {
 }
 
 on("change:schadenv change:schadene change:schadenk", function(f) {
-    getAttrs(["schadenv", "schadene", "schadenk", "schadenum", "lebenspunkte_k", "lebenspunkte_e", "lebenspunkte_v", "lebenspunkte_t"], function(v) {
+    getAttrs(["schadenv", "schadene", "schadenk", "schadenum", "lebenspunkte_k", "lebenspunkte_e", "lebenspunkte_v", "lebenspunkte_t", "lebenspunkte"], function(v) {
         let dmg = +v.schadenum;
         let lp_t = +v.lebenspunkte_t;
         if (v.schadenv == true) {
             let lp_v = +v.lebenspunkte_v;
+            let s2 = (+v.lebenspunkte * 4) + 1;
+            let s3b = +v.lebenspunkte * 5;
+            let dead = (+v.lebenspunkte * 6) + 1;
+            var newrowattrs = {};
+            if (+lp_t >= +v.lebenspunkte && (+lp_v + +dmg) >= +s2) {
+                let newrowid = generateRowID();
+                newrowattrs["repeating_zustaende_" + newrowid + "_zustandsname"] = "sterbendw";
+                newrowattrs["repeating_zustaende_" + newrowid + "_zustandsstufe"] = 2;
+                newrowattrs["repeating_zustaende_" + newrowid + "_zustandonoff"] = true;
+            }
+            if (+lp_t > 0 && (+lp_v + +dmg) >= +s3b) {
+                let newrowid = generateRowID();
+                newrowattrs["repeating_zustaende_" + newrowid + "_zustandsname"] = "sterbendw";
+                newrowattrs["repeating_zustaende_" + newrowid + "_zustandsstufe"] = 3;
+                newrowattrs["repeating_zustaende_" + newrowid + "_zustandonoff"] = true;
+                newrowid = generateRowID();
+                newrowattrs["repeating_zustaende_" + newrowid + "_zustandsname"] = "bewusstlos";
+                newrowattrs["repeating_zustaende_" + newrowid + "_zustandsstufe"] = 1;
+                newrowattrs["repeating_zustaende_" + newrowid + "_zustandonoff"] = true;
+            }
+            if (+lp_v + +dmg >= dead) {
+                let newrowid = generateRowID();
+                newrowattrs["repeating_zustaende_" + newrowid + "_zustandsname"] = "totw";
+                newrowattrs["repeating_zustaende_" + newrowid + "_zustandsstufe"] = 1;
+                newrowattrs["repeating_zustaende_" + newrowid + "_zustandonoff"] = true;
+            }
+            setAttrs(newrowattrs);
             setAttrs({
-               lebenspunkte_v: +lp_v + +dmg,
-               lebenspunkte_t: +lp_t - +dmg,
-               schadenv: false,
-               schadenum: 0
+                lebenspunkte_v: +lp_v + +dmg,
+                lebenspunkte_t: +lp_t - +dmg,
+                schadenv: false,
+                schadenum: 0
             });
         } else if (v.schadene == true) {
             let lp_e = +v.lebenspunkte_e;
@@ -5590,6 +5619,7 @@ on("change:fokusv change:fokuse change:fokusk change:fokuskzue", function(f) {
             let fok_k = +v.fokus_k;
             let fok_e = +v.fokus_e;
             setAttrs({
+                notizen: "bla",
                fokus_k: +fok_k - +fok,
                fokus_e: +fok_e + +fok,
                fokuskzue: false,
