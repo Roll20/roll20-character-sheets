@@ -1,1063 +1,1468 @@
-<input type="radio" class="isPC" value="1" name="attr_pc" checked> <span data-i18n="character-sheet" style="color:white">Rollperson</span>
-<input type="radio" class="isNPC" value="0" name="attr_pc" checked> <span data-i18n="spaceship-sheet" style="color:white">Skepp</span>
+<!-- Begin Tabs -->
+<input type="radio" checked="checked" class="tab tab1" name="attr_Core-Tab" value="1" title="Character">
+<span class="tab tab1" style="line-height: 40px;" data-i18n="tab-character">Character</span>
 
-<rolltemplate class="sheet-rolltemplate-coriolis">
-    <table class="sheet-skill-roll">
-		<tr><th>{{name}}</th></tr>
+<input type="radio" class="tab tab2" name="attr_Core-Tab" value="2" title="Character Notes">
+<span class="tab tab2" style="line-height: 40px;" data-i18n="tab-characternotes">Character Notes</span>
 
-        {{#rollTotal() advanced 0}}
-        <tr class="sheet-fail">
-            <td data-i18n="rolltemplate-autofail">Saknar FV i en kvalificerad färdighet. Du misslyckas automatiskt.</td>
-        </tr>
-        {{/rollTotal() advanced 0}}
+<input type="radio" class="tab tab3" name="attr_Core-Tab" value="3" title="Spaceship">
+<span class="tab tab3" style="line-height: 40px;" data-i18n="tab-spaceship">Spaceship</span>
 
-        {{#rollLess() roll 1}}
-		<tr class="sheet-fail">
-			<td><span class="sheet-roll">{{roll}}</span> <span data-i18n="rolltemplate-fail">Misslyckande</span></td>
-		</tr>
-        {{/rollLess() roll 1}}
+<input type="radio" class="tab tab4" name="attr_Core-Tab" value="4" title="Spaceship-Notes">
+<span class="tab tab4" style="line-height: 40px;" data-i18n="tab-spaceshipnotes">Spaceship Notes</span>
 
-        {{#rollBetween() roll 1 2}}
-		<tr class="sheet-success">
-			<td><span class="sheet-roll">{{roll}}</span> <span data-i18n="rolltemplate-success">Knapp framgång</span></td>
-		</tr>
-        {{/rollBetween() roll 1 2}}
+<!-- <input type="radio" class="tab tab5" name="attr_Core-Tab" value="5" title="Scripts"> --> <!-- HIDDEN SCIRPTS -->
+<!-- <span class="tab tab2" style="line-height: 40px;" data-i18n="tab-scripts">Scripts</span> --> <!-- HIDDEN SCIRPTS -->
 
-        {{#rollGreater() roll 2}}
-		<tr class="sheet-great-success">
-			<td><span class="sheet-roll">{{roll}}</span> <span data-i18n="rolltemplate-greatsuccess">Stor framgång</span></td>
-		</tr>
-        {{/rollGreater() roll 2}}
-    </table>
-</rolltemplate>
+<br><br>
+<!-- End Tabs -->
 
-<!--
-Weapon roll work in progress
-<rolltemplate class="sheet-rolltemplate-coriolis-combat">
-    <table class="sheet-skill-roll">
-		<tr><th>Avståndsstrid</th></tr>
-		<tr><td>Vapen: {{name}}</td></tr>
-		<tr><td>Räckvidd: {{range}}, Kritisk skada: {{crit}}</td></tr>
+<!--    *************************   Character Sheet *************************   -->
+<div class="section-character">
 
-        <tr>
-            <td>
-                Tärningsmodifikationer:<br>
-                Skjutvapen: {{skill}}<br>
-                Vapenbonus: {{bonus}}<br>
-                Avstånd: {{distance}}<br>
-                Skott: {{shot}}<br>
-                Totalt: {{ total }}<br>
-            </td>
-        </tr>
+    <!-- VERSION -->
+    <div class="hidden">
+        <input type="hidden" name="attr_version"> <!-- VERSION -->
+    </div>
 
-        {{#rollLess() roll 1}}
-		<tr class="sheet-fail">
-			<td><span class="sheet-roll">{{roll}}</span> Miss</td>
-		</tr>
-        {{/rollLess() roll 1}}
+    <!-- HEADER -->
+    <div class="header">
+        <br><span data-i18n="title-character-u">CHARACTER SHEET</span><br><br>
+        <img src="https://i.imgur.com/bwY1i2A.png" alt="Logo">
+    </div><br>
 
-        {{#rollGreater() roll 0}}
-		<tr class="sheet-success">
-			<td><span class="sheet-roll">{{roll}}</span> Träff</td>
-		</tr>
-		<tr class="sheet-success">
-			<td>Skada: <strong>{{damage}}</strong></td>
-		</tr>
-        {{/rollGreater() roll 0}}
+    <!-- MAIN -->
+    <div class="wrapper">
 
-        {{#rollGreater() roll 1}}
-        <tr class="sheet-great-success">
-            <td>Kritisk skada</td>
-        </tr>
-        {{/rollGreater() roll 1}}
-    </table>
-</rolltemplate>
--->
+        <!-- MODIFIERS -->
+        <div class="1colrow" style="width: 35%; position:relative; left:34.3%">
 
-<div class="sheet-character-sheet sheet-pc">
-    <div class="sheet-header">
-        <p data-i18n="character-sheet">Rollformul&auml;r</p>
-          <img src="http://i.imgur.com/u6o4OBZ.png" alt="Logo">
-    </div><BR><BR>
+            <div class="col">
 
-    <table class="sheet-ti">
-        <tr>
-            <td valign="top">
-                <!-- Grundegenskaper -->
-                <table class="sheet-table-thin sheet-table-graphic">
-                    <tr class="sheet-table-dark sheet-bb">
-                        <td colspan="2">
-                            <h3 data-i18n="attributes">Grundegenskaper</h3>
-                        </td>
-                    </tr>
-                    <tr class="sheet-table-bb">
-                        <td>
-                            <h4 data-i18n="strength">Styrka</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{strength}}} {{roll=[[@{sty}d6>6]]}}' name='roll_strength'></button>
-                            <input type="number" name="attr_sty" value="0">
-                        </td>
-                    </tr>
-                    <tr class="sheet-table-bb">
-                        <td>
-                            <h4 data-i18n="agility">Kyla</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{agility}}} {{roll=[[@{kyl}d6>6]]}}' name='roll_agility'></button>
-                            <input type="number" name="attr_kyl" value="0">
-                        </td>
-                    </tr>
-                    <tr class="sheet-table-bb">
-                        <td>
-                            <h4 data-i18n="wits">Sk&auml;rpa</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{wits}}} {{roll=[[@{skp}d6>6]]}}' name='roll_wits'></button>
-                            <input type="number" name="attr_skp" value="0">
-                        </td>
-                    </tr>
-                    <tr class="sheet-table-">
-                        <td>
-                            <h4 data-i18n="empathy">K&auml;nsla</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{empathy}}} {{roll=[[@{kns}d6>6]]}}' name='roll_empathy'></button>
-                            <input type="number" name="attr_kns" value="0">
-                        </td>
-                    </tr>
-                </table>
+                <div class="table-border table-graphic-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item"><h1 data-i18n="modifiers-u">MODIFIERS</h1></div>
+                    </div>
+                    <div class="row">
+    					<div class="item" style="width:76%"><h2 data-i18n="modifiers-positive">Positive</h2></div>
+    					<div class="item" style="width:24%"><input type="number" name="attr_modifier-pos" value="0"></div>
+                    </div>
+                    <div class="row">
+    					<div class="item" style="width:76%"><h2 data-i18n="modifiers-negative">Negative</h2></div>
+    					<div class="item" style="width:24%"><input type="number" name="attr_modifier-neg" value="0"></div>
+                    </div>
+                </div><br>
 
-                <!-- Trauma -->
-                <table class="sheet-table-thin sheet-table-graphic">
-                    <tr>
-                        <td class="sheet-table-dark" colspan="2">
-                            <h3 data-i18n="trauma">Trauma</h3>
-                		</td>
-                	</tr>
-                    <tr>
-                        <td class="sheet-table-invis2">
-                            <h5 data-i18n="hit-points">Kroppspo&auml;ng (sty+kyl)</h5><h5 data-i18n="strength-agility"><!---(sty+kyl)---></h5>
-                        </td>
-                        <td class="value">
-                            <input type="number" name="attr_kp" value="@{sty}+@{kyl}" disabled="true">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="sheet-bb" colspan="2" align="center" valign="center">
-                            <p class="sheet-flex">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="sheet-table-light sheet-bb" colspan="2">
-                            <h5 data-i18n="critical-injuries">Kritiska Skador</h5>
-                            <fieldset class="repeating_krits">
-                                <table>
-                                    <tr class="sheet-bb">
-                                        <td>
-                                            <input type="text" name="attr_krit-skador" value="0">
-                                        </td>
-                                    </tr>
-                                </table>
-                            </fieldset>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="sheet-table-invis2">
-                            <h5 data-i18n="mind-points">Stresspo&auml;ng (shp+kns)</h5><h5 data-i18n="wits-empathy"><!---(shp+kns)---></h5>
-                        </td>
-                        <td class="value">
-                            <input type="number" name="attr_sp" value="@{skp}+@{kns}" disabled="true">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="sheet-table-invis2" colspan="2" align="center"valign="center">
-                            <p class="sheet-flex">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                                <input type="checkbox" class="sheet-cb-small" value="0">
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-            <td colspan="2" valign="top">
-                <!-- info -->
-                <table class="sheet-table-wide">
-                    <tr class="sheet-table-light sheet-bb">
-                        <td>
-                            <h5 data-i18n="character-name">Namn</h5>
-                    	</td>
-                        <td class="sheet-table-light sheet-bb">
-                            <input type="text" name="attr_namn">
-                        </td>
-                        <td class="sheet-table-light sheet-bb sheet-bl">
-                            <h5 data-i18n="background">Bakgrund</h5>
-                        </td>
-                        <td class="sheet-table-light sheet-bb">
-                            <input type="text" name="attr_bakgrund">
-                        </td>
-                	</tr>
-                    <tr class="sheet-table-light sheet-bb">
-                        <td>
-                            <h5 data-i18n="concept">Koncept</h5>
-                    	</td>
-                        <td>
-                            <input type="text" name="attr_koncept">
-                        </td>
-                        <td class="sheet-bl">
-                            <h5 data-i18n="icon">Ikon</h5>
-                        </td>
-                        <td>
-                            <input type="text" name="attr_ikon">
-                        </td>
-                	</tr>
-                    <tr class="sheet-table-light sheet-bb">
-                        <td>
-                            <h5 data-i18n="group-concept">Gruppkoncept</h5>
-                    	</td>
-                        <td>
-                            <input type="text" name="attr_gruppkoncept">
-                        </td>
+            </div>
 
-                        <!---- REPUTATION----->
+        </div><br>
 
-                      <td  class="sheet-table-graphic sheet-bl">
+        <!-- CHARACTER INFORMATION TOP -->
+        <div class="2colrow-tight-left">
 
-                            <h5 data-i18n="reputation">Anseende</h5>
+            <!-- Left Column-->
+            <div class="col">
 
-                        <td class="sheet-table-graphic2 value">
+                <!-- Left Column Attributes -->
+                <div class="table-border table-graphic-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item"><h1 data-i18n="attributes-u">ATTRIBUTES</h1></div>
+                    </div>
+                    <div class="row">
+    					<div class="item" style="width:64%"><h2 data-i18n="attributes-strength">Strength</h2></div>
+    					<div class="item" style="width:12%"><button type="roll" name="roll_strength" value="&{template:coriolis} {{isNotAdvanced=1}} {{name=^{attributes-strength}}} {{roll=[[(@{strength} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{strength} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+    					<div class="item" style="width:24%"><input type="number" name="attr_strength" value="0"></div>
+                    </div>
+                    <div class="row">
+    					<div class="item" style="width:64%"><h2 data-i18n="attributes-agility">Agility</h2></div>
+    					<div class="item" style="width:12%"><button type="roll" name="roll_agility" value="&{template:coriolis} {{isNotAdvanced=1}} {{name=^{attributes-agility}}} {{roll=[[(@{agility} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{strength} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}" ></button></div>
+    					<div class="item" style="width:24%"><input type="number" name="attr_agility" value="0"></div>
+                    </div>
+                    <div class="row">
+    					<div class="item" style="width:64%"><h2 data-i18n="attributes-wits">Wits</h2></div>
+    					<div class="item" style="width:12%"><button type="roll" name="roll_wits" value="&{template:coriolis} {{isNotAdvanced=1}} {{name=^{attributes-wits}}} {{roll=[[(@{wits} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{strength} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+    					<div class="item" style="width:24%"><input type="number" name="attr_wits" value="0"></div>
+                    </div>
+                    <div class="row">
+    					<div class="item" style="width:64%"><h2 data-i18n="attributes-empathy">Empathy</h2></div>
+    					<div class="item" style="width:12%"><button type="roll" name="roll_empathy" value="&{template:coriolis} {{isNotAdvanced=1}} {{name=^{attributes-empathy}}} {{roll=[[(@{empathy} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{strength} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+    					<div class="item" style="width:24%"><input type="number" name="attr_empathy" value="0"></div>
+                    </div>
+                </div><br>
 
-                            <input type="number" name="attr_anseende">
-                        </td>
-                	</tr>
+                <!-- Left Column Trauma -->
+                <div class="table-border table-graphic-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item"><h1 data-i18n="character-trauma-u">TRAUMA</h1></div>
+                    </div>
+                    <div class="row" style="border-bottom: none">
+    					<div class="item" style="width:76%"><h2 data-i18n="character-trauma-hitpoints-strength-plus-agility">Hit Points (Str+Agi)</h2></div>
+    					<div class="item" style="width:24%"><input type="number" name="attr_hitpoints" value="0"></div>
+                    </div>
+    		        <div class="row">
+                        <div class="flex-checkbox custom-checkbox">
+                            <input type="checkbox" name="attr_hitpoints-check1" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_hitpoints-check2" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_hitpoints-check3" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_hitpoints-check4" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_hitpoints-check5" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_hitpoints-check6" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_hitpoints-check7" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_hitpoints-check8" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_hitpoints-check9" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_hitpoints-check10" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_hitpoints-check11" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_hitpoints-check12" class="cb-small" value="1"><span></span>
+                        </div>
+            		</div>
+            		<div class="row table-background-light">
+    					<div class="item"><h3 data-i18n="character-trauma-critical-injuries">Critical Injuries:</h3></div>
+            		</div>
+        		    <fieldset class="repeating_crits">
+        		        <div class="row table-background-light">
+    					    <div class="item" style="width:100%"><input type="text" name="attr_crit-injury"></div>
+    					</div>
+					</fieldset>
+                    <div class="row" style="border-bottom: none">
+    					<div class="item" style="width:76%"><h2 data-i18n="character-trauma-mindpoints-wits-plus-empathy">Mind points (Wits+Emp)</h2></div>
+    					<div class="item" style="width:24%"><input type="number" name="attr_mindpoints" value="0"></div>
+                    </div>
+    		        <div class="row">
+                        <div class="flex-checkbox custom-checkbox">
+                            <input type="checkbox" name="attr_mindpoints-check1" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_mindpoints-check2" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_mindpoints-check3" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_mindpoints-check4" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_mindpoints-check5" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_mindpoints-check6" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_mindpoints-check7" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_mindpoints-check8" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_mindpoints-check9" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_mindpoints-check10" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_mindpoints-check11" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_mindpoints-check12" class="cb-small" value="1"><span></span>
+                        </div>
+            		</div>
 
+                </div><br>
 
+            </div>
 
-                    <tr  class="sheet-table-light">
-                        <td>
-                            <h5 data-i18n="personal-problem">Pers. Problem</h5>
-                        </td>
-                        <td colspan ="3">
-                            <input type="text" name="attr_pers_problem">
-                        </td>
-                    </tr>
-                </table>
+            <!-- Right Column -->
+            <div class="col">
 
-                <!-- utseende -->
-                <table class="sheet-table-wide">
-                    <tr>
-                        <td class="sheet-table-dark" colspan="2">
-                            <h3 data-i18n="appearance">Utseende</h3>
-                    	</td>
-                	</tr>
-                    <tr class="sheet-table-light sheet-bb">
-                        <td>
-                            <h5 data-i18n="face">Ansikte</h5>
-                        </td>
-                        <td>
-                            <input type="text" name="attr_ansikte">
-                        </td>
-                    </tr>
-                    <tr class="sheet-table-light">
-                        <td>
-                            <h5 data-i18n="clothing">Kl&auml;dsel</h5>
-                        </td>
-                        <td>
-                            <input type="text" name="attr_kladsel">
-                        </td>
-                    </tr>
-                </table>
+                <!-- Right Column Basic Info -->
+                <div class="table-border table-background-light">
+    				<div class="row">
+    					<div class="item" style="width:15%"><h3 data-i18n="name">Name:</h3></div>
+    					<div class="item" style="width:35%"><input type="text" name="attr_name"></div>
+    					<div class="item" style="width:20%; border-left: 1px solid #61574b"><h3 data-i18n="character-background">Background:</h3></div>
+    					<div class="item" style="width:30%"><input type="text" name="attr_background"></div>
+    				</div>
+    				<div class="row">
+    					<div class="item" style="width:15%"><h3 data-i18n="character-concept">Concept:</h3></div>
+    					<div class="item" style="width:35%"><input type="text" name="attr_concept"></div>
+    					<div class="item" style="width:20%; border-left: 1px solid #61574b"><h3 data-i18n="character-icon">Icon:</h3></div>
+    					<div class="item" style="width:30%"><input type="text" name="attr_icon"></div>
+    				</div>
+    				<div class="row">
+    					<div class="item" style="width:25%"><h3 data-i18n="character-group-concept">Group concept:</h3></div>
+    					<div class="item" style="width:25%"><input type="text" name="attr_groupconcept"></div>
+    					<div class="item table-graphic-light" style="width:38.2%; border-left: 1px solid #61574b; border-bottom: 1px solid #61574b"><h3 data-i18n="character-reputation">Reputation:</h3></div>
+    					<div class="item table-graphic-light" style="width:12%; border-bottom: 1px solid #61574b"><input type="number" name="attr_reputation" value="0"></div>
+    				</div>
+    				<div class="row">
+    					<div class="item" style="width:25%"><h3 data-i18n="character-personal-problem">Personal Problem:</h3></div>
+    					<div class="item" style="width:75%"><input type="text" name="attr_personal_problem"></div>
+    				</div>
+				</div><br>
 
-                <!-- relationer -->
-                <table class="sheet-table-wide sheet-table-graphic">
-                    <tr>
-                        <td class="sheet-table-dark">
-                            <h3 data-i18n="relationships">Relationer</h3>
-                		</td>
-                        <td class="sheet-table-dark">
-                            <h6 data-i18n="buddy">N&auml;rst&aring;ende</h6>
-                        </td>
-                	</tr>
-                    <tr class="sheet-table-graphic sheet-bb">
-                        <td colspan="2">
-                            <fieldset class="repeating_relations">
-                                <table>
-                                    <tr class="sheet-bb">
-                                        <td class="sheet-table-light">
-                                            <h5 data-i18n="character">Rollperson</h5>
-                                        </td>
-                                        <td class="sheet-table-light">
-                                            <input type="text" name="attr_relation" >
-                                        </td>
-                                        <td class="sheet-table-invis sheet-bl" align="center" valign="center">
-                                            <input type="checkbox" name="attr_narstaende">
-                                        </td>
-                                    </tr>
-                                </table>
-                            </fieldset>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-    <table class="sheet-ti">
-        <tr>
-            <td colspan="2">
-                <table class="sheet-ti"><tr><td>
-                <!-- Str&aring;lningspo&auml;ng -->
-                <table class="sheet-table-thin">
-                    <tr>
-                        <td class="sheet-table-dark">
-                            <h3 data-i18n="radiation">Str&aring;lningspo&auml;ng</h3>
-                		</td>
-                	</tr>
-                    <tr>
-                        <td class="sheet-table-graphic" align="center"valign="center">
-                            <p class="sheet-flex">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_stp1" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_stp2" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_stp3" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_stp4" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_stp5" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_stp6" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_stp7" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_stp8" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_stp9" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_stp10" value="1">
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-                </td>
-                <td>
-                <!-- Erfarenhet -->
-                <table class="sheet-table-thin">
-                    <tr>
-                        <td class="sheet-table-dark">
-                            <h3 data-i18n="experience">Erfarenhet</h3>
-                		</td>
-                	</tr>
-                    <tr>
-                        <td class="sheet-table-graphic" align="center"valign="center">
-                            <p class="sheet-flex">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_erf1" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_erf2" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_erf3" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_erf4" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_erf5" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_erf6" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_erf7" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_erf8" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_erf9" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_erf10" value="1">
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-                </td></tr></table>
-                <!-- F&auml;rdigheter -->
-                <table class="sheet-table-wide sheet-table-graphic">
-                    <tr class="sheet-table-dark sheet-bb">
-                        <td>
-                            <h3 data-i18n="skills">F&auml;rdigheterr</h3>
-                    	</td>
-                        <td>
-                            <h6 data-i18n="general">Allm&auml;na</h6>
-                        </td>
-                        <td colspan="2">
-                            <h6 style="text-align:right" data-i18n="advanced">Kvalificerade</h6>
-                        </td>
-                	</tr>
-                    <tr class="sheet-bb">
-                        <td>
-                            <h4 data-i18n="force">Kraftprov (sty)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{force}}} {{roll=[[@{kraftprov}d6>6[^{force}]+@{sty}d6>6[^{strength}]]]}}' name='roll_force'></button>
-                            <input type="number" name="attr_kraftprov" value="0">
-                        </td>
-                        <td>
-                            <h4 data-i18n="command">Bef&auml;l (kns)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{command}}} {{advanced=[[@{befal}>0]]}} {{roll=[[@{befal}d6>6[^{command}]+@{kns}d6>6[^{empathy}]]]}}' name='roll_command'></button>
-                            <input type="number" name="attr_befal" value="0">
-                        </td>
-                    </tr>
-                    <tr class="sheet-bb">
-                        <td>
-                            <h4 data-i18n="manipulation">Manipulera (kns)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{manipulation}}} {{roll=[[@{manipulera}d6>6[^{manipulation}]+@{kns}d6>6[^{empathy}]]]}}' name='roll_manipulation'></button>
-                            <input type="number" name="attr_manipulera" value="0">
-                        </td>
-                        <td>
-                            <h4 data-i18n="datadjinn"> Data Djinn (skp)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{datadjinn}}} {{advanced=[[@{datadjinn}>0]]}} {{roll=[[@{datadjinn}d6>6[^{datadjinn}]+@{skp}d6>6[^{wits}]]]}}' name='roll_datadjinn'></button>
-                            <input type="number" name="attr_datadjinn" value="0">
-                        </td>
-                    </tr>
-                    <tr class="sheet-bb">
-                        <td>
-                            <h4 data-i18n="melee-combat">N&auml;rkamp (sty)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{melee-combat}}} {{roll=[[@{narkamp}d6>6[^{melee-combat}]+@{sty}d6>6[^{strength}]]]}}' name='roll_melee-combat'></button>
-                            <input type="number" name="attr_narkamp" value="0">
-                        </td>
-                        <td>
-                            <h4 data-i18n="culture">Horisontens kultur (kns)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{culture}}} {{advanced=[[@{horisontens_kultur}>0]]}} {{roll=[[@{horisontens_kultur}d6>6[^{culture}]+@{kns}d6>6[^{empathy}]]]}}' name='roll_culture'></button>
-                            <input type="number" name="attr_horisontens_kultur" value="0">
-                        </td>
-                    </tr>
-                    <tr class="sheet-bb">
-                        <td>
-                            <h4 data-i18n="dexterity">R&ouml;rlighet (kyl)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{dexterity}}} {{roll=[[@{rorlighet}d6>6[^{dexterity}]+@{kyl}d6>6[^{agility}]]]}}' name='roll_dexterity'></button>
-                            <input type="number" name="attr_rorlighet" value="0">
-                        </td>
-                        <td>
-                            <h4 data-i18n="medicurgy">Medikurgi (skp)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{medicurgy}}} {{advanced=[[@{medikurgi}>0]]}} {{roll=[[@{medikurgi}d6>6[^{medicurgy}]+@{skp}d6>6[^{wits}]]]}}' name='roll_str'></button>
-                            <input type="number" name="attr_medikurgi" value="0">
-                        </td>
-                    </tr>
-                    <tr class="sheet-bb">
-                        <td>
-                            <h4 data-i18n="ranged-combat">Skjutvapen (kyl)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{ranged-combat}}} {{roll=[[@{skjutvape}d6>6[^{ranged-combat}]+@{kyl}d6>6[^{agility}]]]}}' name='roll_ranged-combat'></button>
-                            <input type="number" name="attr_skjutvape" value="0">
-                        </td>
-                        <td>
-                            <h4 data-i18n="mystic-powers">Mystiska Krafter (kns)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{mystic-powers}}} {{advanced=[[@{mystiska_krafter}>0]]}} {{roll=[[@{mystiska_krafter}d6>6[Mystic Powers]+@{kns}d6>6[^{empathy}]]]}}' name='roll_mystic-powers'></button>
-                            <input type="number" name="attr_mystiska_krafter" value="0">
-                        </td>
-                    </tr>
-                    <tr class="sheet-bb">
-                        <td>
-                            <h4 data-i18n="infiltration">Smyga (kyl)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{infiltration}}} {{roll=[[@{smyga}d6>6[^{infiltration}]+@{kyl}d6>6[^{agility}]]]}}' name='roll_infiltration'></button>
-                            <input type="number" name="attr_smyga" value="0">
-                        </td>
-                        <td>
-                            <h4 data-i18n="skill-pilot">Pilot (kyl)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{skill-pilot}}} {{advanced=[[@{pilot}>0]]}} {{roll=[[@{pilot}d6>6[^{skill-pilot}]+@{kyl}d6>6[^{agility}]]]}}' name='roll_skill-pilot'></button>
-                            <input type="number" name="attr_pilot" value="0">
-                        </td>
-                    </tr>
-                    <tr class="sheet-bb">
-                        <td>
-                            <h4 data-i18n="observation">Spaning (skp)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{observation}}} {{roll=[[@{spaning}d6>6[^{observation}]+@{skp}d6>6[^{wits}]]]}}' name='roll_observation'></button>
-                            <input type="number" name="attr_spaning" value="0">
-                        </td>
-                        <td>
-                            <h4 data-i18n="technology">Teknologi (skp)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{technology}}} {{advanced=[[@{teknologi}>0]]}} {{roll=[[@{teknologi}d6>6[^{technology}]+@{skp}d6>6[^{wits}]]]}}' name='roll_technology'></button>
-                            <input type="number" name="attr_teknologi" value="0">
-                        </td>
-                    </tr>
-                    <tr class="sheet-bb">
-                        <td>
-                            <h4 data-i18n="survival">&Ouml;verlevnad (skp)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{survival}}} {{roll=[[@{overlevnad}d6>6[^{survival}]+@{skp}d6>6[^{wits}]]]}}' name='roll_survival'></button>
-                            <input type="number" name="attr_overlevnad" value="0">
-                        </td>
-                        <td>
-                            <h4 data-i18n="science">Vetenskap (skp)</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <button type='roll' value='&{template:coriolis} {{name=^{science}}} {{advanced=[[@{vetenskap}>0]]}} {{roll=[[@{vetenskap}d6>6[^{science}]+@{skp}d6>6[^{wits}]]]}}' name='roll_science'></button>
-                            <input type="number" name="attr_vetenskap" value="0">
-                        </td>
-                    </tr>
-                </table>
+                <!-- Right Column Appereance -->
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item"><h1 data-i18n="appearance-u">APPEREANCE</h1></div>
+                    </div>
+    				<div class="row">
+    					<div class="item" style="width:15%"><h3 data-i18n="appearance-face">Face:</h3></div>
+    					<div class="item" style="width:85%"><input type="text" name="attr_face"></div>
+    				</div>
+    				<div class="row">
+    					<div class="item" style="width:15%"><h3 data-i18n="appearance-clothing">Clothing:</h3></div>
+    					<div class="item" style="width:85%"><input type="text" name="attr_clothing"></div>
+    				</div>
+    			</div><br>
 
-                <!-- Rustning -->
-                <table class="sheet-table-wide">
-                    <tr class="sheet-table-dark">
-                        <td>
-                            <h3 data-i18n="character-armour">Rustning</h3>
-                        </td>
-                        <td>
-                            <h6 data-i18n="armour-rating">Skydd</h6>
-                        </td>
-                        <td>
-                            <h6 data-i18n="armour-comment">&Ouml;vrigt</h6>
-                        </td>
-                	</tr>
-                    <tr class="sheet-table-light">
-                        <td>
-                           <input type="text" name="attr_rustning">
-                        </td>
-                        <td>
-                            <input type="number" name="attr_rustning_skydd">
-                        </td>
-                        <td>
-                            <input type="text" name="attr_rustning_ovrigt" >
-                        </td>
-                	</tr>
-                </table>
-            </td>
-            <td valign="top">
-                <!-- Talanger -->
-                <table class="sheet-table-thin">
-                    <tr>
-                        <td class="sheet-table-dark">
-                            <h3 data-i18n="talents">Talanger</h3>
-                		</td>
-                	</tr>
-                    <tr>
-                        <td class="sheet-table-light sheet-bb">
-                            <fieldset class="repeating_talanger">
-                                <table>
-                                    <tr class="sheet-bb">
-                                        <td>
-                                            <input type="text" name="attr_talang">
-                                        </td>
-                                    </tr>
-                                </table>
-                            </fieldset>
-                        </td>
-                    </tr>
-                </table>
+    			<!-- Right Column Relationships -->
+    			<div class="table-border table-background-light">
+    			    <div class="row table-graphic-dark">
+    			        <div class="item" style="width:88.2%"><h1 data-i18n="character-relationships-u">RELATIONSHIPS</h1></div>
+    			        <div class="item" style="width:12.2%; border-left: 1px solid #61574b"><h4 data-i18n="character-relationships-buddy-u">BUDDY</h4></div>
+    			    </div>
+        		    <fieldset class="repeating_relationships">
+        		        <div class="row table-background-light">
+        		            <div class="item" style="width:15%"><input type="text" name="attr_relationship_pc" value="'Name'"></div>
+        		            <div class="item" style="width:2%; padding:0"><h3>:</h3></div>
+                            <div class="item" style="width:71.2%"><input type="text" name="attr_relationship" value="'Description'"></div>
+                            <div class="item  table-graphic-light" style="width:12.2%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b">
+                                <div class="flex-checkbox custom-checkbox" style="width:45%; position:relative; left:15px">
+                                    <input type="checkbox" name="attr_buddy" value="1"><span></span>
+                                </div>
+                            </div>
+    					</div>
+					</fieldset>
+    			</div>
+            </div>
 
-                <!-- Utrustning -->
-                <table class="sheet-table-thin">
-                    <tr class="sheet-table-dark">
-                        <td>
-                            <h3 data-i18n="gear">Utrustning</h3>
-                		</td>
-                        <td>
-                            <h6 data-i18n="gear-bonus">Bonus</h6>
-                        </td>
-                	</tr>
-                    <tr class="sheet-table-light">
-                        <td colspan="2">
-                            <fieldset class="repeating_utrustning">
-                                <table>
-                                    <tr>
-                                        <td>
-                                            <input type="text" name="attr_utrustning" >
-                                        </td>
-                                        <td>
-                                            <input type="number" name="attr_utrustning_bonus" value="0">
-                                        </td>
-                                    </tr>
-                                </table>
-                            </fieldset>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-    <!-- Vapen -->
-    <table class="sheet-table-widest sheet-weapons">
-        <tr class="sheet-table-dark">
-            <td>
-                <h3 data-i18n="character-weapons">Vapen</h3>
-        	</td>
-            <td>
-                <h6 data-i18n="character-weapons-bonus">Bonus</h6>
-            </td>
-            <td>
-                <h6 data-i18n="character-weapons-init">Init</h6>
-            </td>
-            <td>
-                <h6 data-i18n="character-weapons-damage">Skada</h6>
-            </td>
-            <td>
-                <h6 data-i18n="character-weapons-crit">Krit</h6>
-            </td>
-            <td>
-                <h6 data-i18n="character-weapons-range">R&auml;ckvidd</h6>
-            </td>
-            <td>
-                <h6 data-i18n="character-weapons-comments">&Ouml;vrigt</h6>
-            </td>
-            <td>
-                <h6 data-i18n="character-weapons-reloads">Omladdning</h6>
-            </td>
-    	</tr>
-        <tr class="sheet-table-light">
-            <td colspan="8">
-                <fieldset class="repeating_vapen">
-                    <table>
-                        <tr>
-                            <td>
-                                <input type="text" name="attr_vapen" >
-                            </td>
-                            <td>
-                                <input type="number" name="attr_vapen_bonus" value="0">
-                            </td>
-                            <td>
-                                <input type="number" name="attr_vapen_init" value="0">
-                            </td>
-                            <td>
-                                <input type="number" name="attr_vapen_skada" value="0">
-                            </td>
-                            <td>
-                                <input type="number" name="attr_vapen_krit" value="0" >
-                            </td>
-                            <td>
-                                <input type="text" name="attr_vapen_rackvidd" >
-                            </td>
-                            <td>
-                                <input type="text" name="attr_vapen_ovrigt" >
-                            </td>
-                            <td>
-                                <p class="sheet-flex">
-                                    <input type="checkbox" class="sheet-cb-small">
-                                    <input type="checkbox" class="sheet-cb-small">
-                                    <input type="checkbox" class="sheet-cb-small">
-                                    <input type="checkbox" class="sheet-cb-small">
-                                    <input type="checkbox" class="sheet-cb-small">
-                                </p>
-                            </td>
-                        </tr>
-                        <!-- Weapon roll VIP
-                        <tr>
-                            <td colspan="8" class="sheet-weapon-roller">
-                                <button type='roll' value='&{template:coriolis-combat} {{name=@{vapen}}} {{total=@{total_roll}}} {{shot=@{shot}}} {{bonus=@{vapen_bonus}}} {{damage=@{vapen_skada}}} {{crit=@{vapen_krit}}} {{range=@{vapen_rackvidd}}} {{distance=@{distance}}} {{skill=@{skjutvapen}}} {{roll=[[@{total_roll}d6>6]]}}' name='roll_shoot'></button>
+        </div><br>
 
-                                <select name="attr_shot">
-                                    <option value="0">Skott: 2 HP</option>
-                                      <option value="2">Välriktat: 3 HP</option>
-                                      <option value="-2">Snabbskott: 1 HP</option>
-                                      <option value="-2">Automateld: 2 HP</option>
-                                </select>
-                                <select name="attr_distance">
-                                      <option value="0">Kort</option>
-                                      <option value="-3">Närstrid</option>
-                                      <option value="3">Nära</option>
-                                      <option value="-1">Långt</option>
-                                      <option value="-2">Extremt</option>
-                                      <option value="-3">Bortom räckvidd</option>
-                                </select>
-                                <span class="sheet-calc">
-                                    Skjutvapen:
-                                    <input type="text" class="sheet-weapon-calc" name="attr_calc1" value="@{skjutvapen}" disabled="true">
-                                </span>
-                                <span class="sheet-calc">
-                                    Vapenbonus:
-                                    <input type="text" class="sheet-weapon-calc" name="attr_calc2" value="@{vapen_bonus}" disabled="true">
-                                </span>
-                                <span class="sheet-calc">
-                                    Skott:
-                                    <input type="text" class="sheet-weapon-calc" name="attr_calc3" value="@{shot} " disabled="true">
-                                </span>
-                                <span class="sheet-calc">
-                                    Avstånd:
-                                    <input type="text" class="sheet-weapon-calc" name="attr_calc4" value="@{distance}" disabled="true">
-                                </span>
-                                <span class="sheet-calc">
-                                    Totalt:
-                                    <input type="text" class="sheet-weapon-calc" name="attr_total_roll" value="@{skjutvapen} + @{vapen_bonus} + @{shot} + @{distance}" disabled="true">
-                                </span>
-                            </td>
-                        </tr>
-                        -->
-                    </table>
-                </fieldset>
-            </td>
-        </tr>
-    </table>
+        <!-- CHARACTER INFORMATION BOTTOM -->
+        <div class="2colrow-tight-right">
+
+            <!-- Left Column -->
+            <div class="col">
+
+                <!-- Left Column Radiation/Experience -->
+                <div>
+                    <div class="col table-border table-graphic-light" style="width: 49.2%; margin-left: 0em">
+                        <div class="row table-graphic-dark">
+                            <div class="item"><h1 data-i18n="radiation-u">RADIATION</h1></div>
+                        </div>
+                        <div class="row" style="border:none">
+                            <div class="flex-radio radio-fill">
+                                <input type="radio" name="attr_permrad" value="0" checked="checked"/>reset
+                                <input type="radio" name="attr_permrad" value="1" style="margin-left: -10px;"><span></span>
+                                <input type="radio" name="attr_permrad" value="2"><span></span>
+                                <input type="radio" name="attr_permrad" value="3"><span></span>
+                                <input type="radio" name="attr_permrad" value="4"><span></span>
+                                <input type="radio" name="attr_permrad" value="5"><span></span>
+                                <input type="radio" name="attr_permrad" value="6"><span></span>
+                                <input type="radio" name="attr_permrad" value="7"><span></span>
+                                <input type="radio" name="attr_permrad" value="8"><span></span>
+                                <input type="radio" name="attr_permrad" value="9"><span></span>
+                                <input type="radio" name="attr_permrad" value="10"><span></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="flex-checkbox custom-checkbox">
+                                <input type="checkbox" name="attr_rad0" value="1">
+                                <input type="checkbox" name="attr_rad1" value="1" style="margin-left: 20px;"><span></span>
+                                <input type="checkbox" name="attr_rad2" value="1"><span></span>
+                                <input type="checkbox" name="attr_rad3" value="1"><span></span>
+                                <input type="checkbox" name="attr_rad4" value="1"><span></span>
+                                <input type="checkbox" name="attr_rad5" value="1"><span></span>
+                                <input type="checkbox" name="attr_rad6" value="1"><span></span>
+                                <input type="checkbox" name="attr_rad7" value="1"><span></span>
+                                <input type="checkbox" name="attr_rad8" value="1"><span></span>
+                                <input type="checkbox" name="attr_rad9" value="1"><span></span>
+                                <input type="checkbox" name="attr_rad10" value="1"><span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col table-border table-graphic-light" style="width: 48.8%">
+                        <div class="row table-graphic-dark">
+                            <div class="item"><h1 data-i18n="experience-u">EXPERIENCE</h1></div>
+                        </div>
+                        <div class="row" style="border:none">
+                            <div class="flex-checkbox custom-checkbox">
+                                <input type="checkbox" class="cb-small" name="attr_exp1" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp2" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp3" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp4" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp5" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp6" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp7" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp8" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp9" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp10" value="1"><span></span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="flex-checkbox custom-checkbox">
+                                <input type="checkbox" class="cb-small" name="attr_exp11" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp12" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp13" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp14" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp15" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp16" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp17" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp18" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp19" value="1"><span></span>
+                                <input type="checkbox" class="cb-small" name="attr_exp20" value="1"><span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div><br>
+
+                <!-- Left Column Skills -->
+                <div class="table-border table-graphic-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item" style="width:32%"><h1 data-i18n="character-skills-u">SKILLS</h1></div>
+                        <div class="item" style="width:6%"></div>
+                        <div class="item" style="width:12%"><h4 data-i18n="character-skills-general-u">GENERAL</h4></div>
+                        <div class="item" style="width:32%"></div>
+                        <div class="item" style="width:6%"></div>
+                        <div class="item" style="width:12%"><h4 data-i18n="character-skills-advanced-u">ADVANCED</h4></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-dexterity-agility">Dexterity (Agi)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_dexterity" value="&{template:coriolis} {{isNotAdvanced=1}} {{name=^{character-skills-dexterity-agility}}} {{roll=[[(@{agility} + @{dexterity} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{agility} + @{dexterity} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_dexterity" value="0"></div>
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-command-empathy">Command (Emp)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_command" value="&{template:coriolis} {{isAdvanced=1}} {{name=^{character-skills-command-empathy}}} {{advanced-skill=[[@{command}>0]]}} {{roll=[[(@{empathy} + @{command} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{empathy} + @{command} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_command" value="0"></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-force-strength">Force (Str)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_force" value="&{template:coriolis} {{isNotAdvanced=1}} {{name=^{character-skills-force-strength}}} {{roll=[[(@{strength} + @{force} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{strength} + @{force} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_force" value="0"></div>
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-culture-empathy">Culture (Emp)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_culture" value="&{template:coriolis} {{isAdvanced=1}} {{name=^{character-skills-culture-empathy}}} {{advanced-skill=[[@{culture}>0]]}} {{roll=[[(@{empathy} + @{culture} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{empathy} + @{culture} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_culture" value="0"></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-infiltration-agility">Infiltration (Agi)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_infiltration" value="&{template:coriolis} {{isNotAdvanced=1}} {{name=^{character-skills-infiltration-agility}}} {{roll=[[(@{agility} + @{infiltration} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{agility} + @{infiltration} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_infiltration" value="0"></div>
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-datadjinn-wits">Data Djinn (Wit)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_datadjinn" value="&{template:coriolis} {{isAdvanced=1}} {{name=^{character-skills-datadjinn-wits}}} {{advanced-skill=[[@{datadjinn}>0]]}} {{roll=[[(@{wits} + @{datadjinn} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{wits} + @{datadjinn} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_datadjinn" value="0"></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-manipulation-empathy">Manipulation (Emp)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_manipulation" value="&{template:coriolis} {{isNotAdvanced=1}} {{name=^{character-skills-manipulation-empathy}}} {{roll=[[(@{empathy} + @{manipulation} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{empathy} + @{manipulation} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_manipulation" value="0"></div>
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-medicurgy-wits">Medicurgy (Wit)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_medicurgy" value="&{template:coriolis} {{isAdvanced=1}} {{name=^{character-skills-medicurgy-wits}}} {{advanced-skill=[[@{medicurgy}>0]]}} {{roll=[[(@{wits} + @{medicurgy} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{wits} + @{medicurgy} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_medicurgy" value="0"></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-meleecombat-strength">Melee Combat (Str)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_melee-combat" value="&{template:coriolis} {{isNotAdvanced=1}} {{name=^{character-skills-meleecombat-strength}}} {{roll=[[(@{strength} + @{melee-combat} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{strength} + @{melee-combat} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_melee-combat" value="0"></div>
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-mysticpowers-empathy">Mystic Powers (Emp)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_mystic-powers" value="&{template:coriolis} {{isAdvanced=1}} {{name=^{character-skills-mysticpowers-empathy}}} {{advanced-skill=[[@{mystic-powers}>0]]}} {{roll=[[(@{empathy} + @{mystic-powers} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{empathy} + @{mystic-powers} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_mystic-powers" value="0"></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-observation-wits">Observation (Wit)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_observation" value="&{template:coriolis} {{isNotAdvanced=1}} {{name=^{character-skills-observation-wits}}} {{roll=[[(@{wits} + @{observation} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[@{wits} + @{observation} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_observation" value="0"></div>
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-pilot-agility">Pilot (Agi)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_pilot" value="&{template:coriolis} {{isAdvanced=1}} {{name=^{character-skills-pilot-agility}}} {{advanced-skill=[[@{pilot}>0]]}} {{roll=[[(@{agility} + @{pilot} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{agility} + @{pilot} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_pilot" value="0"></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-rangedcombat-agility">Ranged Combat (Agi)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_ranged-combat" value="&{template:coriolis} {{isNotAdvanced=1}} {{name=^{character-skills-rangedcombat-agility}}} {{roll=[[(@{agility} + @{ranged-combat} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{agility} + @{ranged-combat} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_ranged-combat" value="0"></div>
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-science-wits">Science (Wit)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_science" value="&{template:coriolis} {{isAdvanced=1}} {{name=^{character-skills-science-wits}}} {{advanced-skill=[[@{science}>0]]}} {{roll=[[(@{wits} + @{science} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{wits} + @{science} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_science" value="0"></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-survival-wits">Survival (Wit)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_survival" value="&{template:coriolis} {{isNotAdvanced=1}} {{name=^{character-skills-survival-wits}}} {{roll=[[(@{wits} + @{survival} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{wits} + @{survival} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_survival" value="0"></div>
+                        <div class="item" style="width:32%"><h2 data-i18n="character-skills-technology-wits">Technology (Wit)</h2></div>
+                        <div class="item" style="width:6%"><button type="roll" name="roll_technology" value="&{template:coriolis} {{isAdvanced=1}} {{name=^{character-skills-technology-wits}}} {{advanced-skill=[[@{technology}>0]]}} {{roll=[[(@{wits} + @{technology} + @{modifier-pos} - @{modifier-neg})d6>6]]}} {{pool=[[(@{wits} + @{technology} + @{modifier-pos} - @{modifier-neg})>0]]}} {{reroll=[[2d6>6]]}}"></button></div>
+                        <div class="item" style="width:12%; text-align:right"><input type="number" name="attr_technology" value="0"></div>
+                    </div>
+                </div><br>
+
+                <!-- Left Column Weapons -->
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item" style="width:23.3%"><h1 data-i18n="weapons-u">WEAPONS</h1></div>
+                        <div class="item" style="width:7%; border-left: 1px solid #61574b"><h4 data-i18n="bonus-u">BONUS</h4></div>
+                        <div class="item" style="width:7%; border-left: 1px solid #61574b"><h4 data-i18n="init-initiative-u">INIT</h4></div>
+                        <div class="item" style="width:9%; border-left: 1px solid #61574b"><h4 data-i18n="weapons-damage-u">DAMAGE</h4></div>
+                        <div class="item" style="width:7%; border-left: 1px solid #61574b"><h4 data-i18n="weapons-crit-critical-u">CRIT</h4></div>
+                        <div class="item" style="width:12%; border-left: 1px solid #61574b"><h4 data-i18n="weapons-range-u">RANGE</h4></div>
+                        <div class="item" style="width:25%; border-left: 1px solid #61574b"><h4 style="text-align:left" data-i18n="comments-u">COMMENTS</h4></div>
+                        <div class="item" style="width:10%; border-left: 1px solid #61574b"><h4 data-i18n="weapons-reloads-u">RELOADS</h4></div>
+                    </div>
+        		    <fieldset class="repeating_weapon">
+        		        <div class="row table-background-light" style="height:3em">
+        		            <div class="item" style="width:23.3%; height:3em"><input type="text" name="attr_weapon"></div>
+                            <div class="item" style="width:7%; height:3em; border-left: 1px solid #61574b"><input type="text" name="attr_weapon_bonus" style="text-align:center"></div>
+                            <div class="item" style="width:7%; height:3em; border-left: 1px solid #61574b"><input type="text" name="attr_weapon_init" style="text-align:center"></div>
+                            <div class="item" style="width:9%; height:3em; border-left: 1px solid #61574b"><input type="text" name="attr_weapon_damage" style="text-align:center"></div>
+                            <div class="item" style="width:7%; height:3em; border-left: 1px solid #61574b"><input type="text" name="attr_weapon_crit" style="text-align:center"></div>
+                            <div class="item" style="width:12%; height:3em; border-left: 1px solid #61574b"><input type="text" name="attr_weapon_range" style="text-align:center"></div>
+                            <div class="item" style="width:25%; height:3em; border-left: 1px solid #61574b"><input type="text" name="attr_weapon_comments"></div>
+                            <div class="item table-graphic-light" style="width:10%; height:3em; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b">
+                                <div class="flex-reloads-checkbox reloads-checkbox" style="height:1.5em; position:relative; left:-2.5px">
+                                    <input type="checkbox" class="cb-small" name="attr_reload1" value="1"><span></span>
+                                    <input type="checkbox" class="cb-small" name="attr_reload2" value="1"><span></span>
+                                    <input type="checkbox" class="cb-small" name="attr_reload3" value="1"><span></span>
+                                </div>
+                                <div class="flex-reloads-checkbox reloads-checkbox" style="height:1.5em; position:relative; left:-2.5px">
+                                    <input type="checkbox" class="cb-small" name="attr_reload4" value="1"><span></span>
+                                    <input type="checkbox" class="cb-small" name="attr_reload5" value="1"><span></span>
+                                    <input type="checkbox" class="cb-small" name="attr_reload6" value="1"><span></span>
+                                </div>
+                            </div>
+                        </div>
+        			</fieldset>
+                </div><br>
+
+            </div>
+
+            <!-- Right Column -->
+            <div class="col">
+
+                <!-- Right Column Talents -->
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item"><h1 data-i18n="character-skills-talents-u">TALENTS</h1></div>
+                    </div>
+                    <div>
+        		    <fieldset class="repeating_talents">
+        		        <div class="row table-background-light">
+    					    <div class="item" style="width:100%"><input type="text" name="attr_talent"></div>
+    					</div>
+					</fieldset>
+                    </div>
+                </div><br>
+
+                <!-- Right Column Carry -->
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+    			        <div class="item" style="width:30%"><h1 data-i18n="carry-u">CARRY</h1></div>
+    			        <div class="item" style="width:25%"><input type="number" name="attr_carry" value="0"></div>
+    			        <div class="item" style="width:20%"><h1 data-i18n="carry-max-u">MAX</h1></div>
+    			        <div class="item" style="width:25%"><input type="number" name="attr_carry-max" value="0"></div>
+                    </div>
+                </div><br>
+
+                <!-- Right Column Gear -->
+    			<div class="table-border table-background-light">
+    			    <div class="row table-graphic-dark">
+    			        <div class="item" style="width:75%"><h1 data-i18n="inventory-gear-u">GEAR</h1></div>
+    			        <div class="item" style="width:25%; border-left: 1px solid #61574b"><h4 data-i18n="bonus-u">BONUS</h4></div>
+    			    </div>
+        		    <fieldset class="repeating_gear">
+        		        <div class="row table-background-light">
+        		            <div class="item" style="width:75%"><input type="text" name="attr_gear"></div>
+                            <div class="item" style="width:25%; border-left: 1px solid #61574b"><input type="text" name="attr_gear_bonus"></div>
+    					</div>
+					</fieldset>
+    			</div><br>
+
+                <!-- Right Column Armor -->
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item" style="width:50%"><h1 data-i18n="armor-u">ARMOR</h1></div>
+                        <div class="item" style="width:20%; border-left: 1px solid #61574b"><h4 data-i18n="armor-rating-u">RATING</h4></div>
+                        <div class="item" style="width:30%; border-left: 1px solid #61574b"><h4 style="text-align: left" data-i18n="comment-u">COMMENT</h4></div>
+                    </div>
+    		        <div class="row table-background-light">
+    		            <div class="item" style="width:50%"><input type="text" name="attr_armor"></div>
+                        <div class="item" style="width:20%; border-left: 1px solid #61574b"><input type="text" name="attr_armor_rating" style="text-align:center"></div>
+                        <div class="item" style="width:30%; border-left: 1px solid #61574b"><input type="text" name="attr_armor_comments"></div>
+					</div>
+                </div><br>
+            </div>
+
+        </div><br>
+
+    </div><br>
+
 </div>
 
-<div class="sheet-character-sheet sheet-npc">
-    <!-- Label! -->
-    <div class="sheet-header">
-        <p data-i18n="spaceship-sheet">Skeppsformul&auml;r</p>
-         <img src="http://i.imgur.com/u6o4OBZ.png" alt="Logo">
-    </div><BR><BR>
-    <table class="sheet-ti">
-        <tr>
-            <td>
-                <!-- info -->
-                <table class="sheet-table-wide sheet-table-light">
-                    <tr class="sheet-bb">
-                        <td>
-                            <h5 data-i18n="spaceship-name">Namn</h5>
-                        </td>
-                        <td colspan="3">
-                            <input type="text" name="attr_skepp-namn">
-                        </td>
-                    </tr>
-                    <tr class="sheet-bb">
-                        <td>
-                            <h5 data-i18n="class-type">Skeppstyp</h5>
-                        </td>
-                        <td>
-                            <input type="text" name="attr_skepp-typ">
-                        </td>
-                        <td>
-                            <h5 data-i18n="shipyard">Varv</h5>
-                        </td>
-                        <td>
-                            <input type="text" name="attr_skepp-varv">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <h5 data-i18n="problem">Problem</h5>
-                        </td>
-                        <td colspan="3">
-                            <input type="text" name="attr_skepp-problem">
-                        </td>
-                    </tr>
-                </table>
-                <!-- data -->
-                <table class="sheet-table-wide sheet-table-graphic">
-                    <tr>
-                        <td colspan="4" class="sheet-table-dark">
-                            <h3 data-i18n="data">Data</h3>
-                        </td>
-                    </tr>
-                    <tr class="sheet-table-invis2 sheet-bb">
-                        <td>
-                            <h4 data-i18n="maneuverability">Man&ouml;verf&ouml;rm&aring;ga</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <input type="number" name="attr_skepp-manoverformaga" value="0">
-                        </td>
-                        <td>
-                            <h4 data-i18n="signature">Signatur</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <input type="number" name="attr_skepp-signatur" value="0">
-                        </td>
-                    </tr>
-                    <tr class="sheet-table-invis2">
-                        <td>
-                            <h4 data-i18n="speed">Hastighet</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <input type="number" name="attr_skepp-hastighet" value="0">
-                        </td>
-                        <td>
-                            <h4 data-i18n="ship-armour">Pansar</h4>
-                        </td>
-                        <td class="sheet-value">
-                            <input type="number" name="attr_skepp-pansar" value="0">
-                        </td>
-                    </tr>
-                </table>
+<!--    *************************   Character Notes *************************   -->
+<div class="section-characternotes">
 
-                <!-- moduler -->
-                <table class="sheet-table-wide sheet-table-graphic">
-                    <tr>
-                        <td class="sheet-table-dark">
-                            <h3 data-i18n="modules">Moduler</h3>
-                        </td>
-                        <td class="sheet-table-dark">
-                            <h6 data-i18n="disabled">Utslagen</h6>
-                        </td>
-                    </tr>
-                    <tr class="sheet-table-graphic">
-                        <td colspan="2">
-                            <fieldset class="repeating_skeppsmoduler">
-                                <table>
-                                    <tr class="sheet-bb">
-                                        <td class="sheet-table-light">
-                                            <input type="text" name="attr_skeppsmodul" >
-                                        </td>
-                                        <td class="sheet-table-invis sheet-bl" align="center" valign="center">
-                                        <input type="checkbox" name="attr_utslagen" value="0">
-                                        </td>
-                                    </tr>
-                                </table>
-                            </fieldset>
-                        </td>
-                    </tr>
-                    <tr class="sheet-table-invis2">
-                        <td>
-                            <h4 data-i18n="max-modules">Max Moduler</h4>
-                        </td>
-                        <td>
-                            <input type="number" style="float: right;" namn="attr_skepp-max-modulerderp" value="0">
-                        </td>
-                    </tr>
-                </table>
-            </td>
-            <td valign="top">
-                <!-- energipo&auml;ng -->
-                <table class="sheet-table-thin sheet-table-graphic">
-                    <tr>
-                        <td class="sheet-table-dark">
-                            <h3 data-i18n="energy-points">Energipo&auml;ng</h3>
-                    	</td>
-                	</tr>
-                    <tr>
-                        <td class="sheet-table-invis2" align="center"valign="center">
-                            <p class="sheet-flex">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-energi1" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-energi2" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-energi3" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-energi4" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-energi5" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-energi6" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-energi7" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-energi8" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-energi9" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-energi10" value="1">
-                            </p>
-                        </td>
-                    </tr>
-                </table>
+    <!-- HEADER -->
+    <div class="header">
+        <br><span data-i18n="title-characternotes-u">CHARACTER NOTES</span><br><br>
+        <img src="https://i.imgur.com/bwY1i2A.png" alt="Logo">
+    </div><br>
 
-                <!-- kroppspo&auml;ng -->
-                <table class="sheet-table-thin sheet-table-graphic">
-                    <tr class="sheet-table-dark sheet-bb">
-                        <td>
-                            <h3 data-i18n="hull-points">Kroppspo&auml;ng</h3>
-                        </td>
-                	</tr>
-                    <tr>
-                        <td class="sheet-table-invis2" align="center"valign="center">
-                            <p class="sheet-flex">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp1" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp2" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp3" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp4" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp5" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp6" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp7" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp8" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp9" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp10" value="1">
-                            </p>
-                            <p class="sheet-flex">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp11" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp12" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp13" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp14" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp15" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp16" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp17" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp18" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp19" value="1">
-                                <input type="checkbox" class="sheet-cb-small" name="attr_skepp-kp20" value="1">
-                            </p>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="sheet-table-light sheet-bb">
-                            <h5 data-i18n="critical-damage">Kritiska Skador</h5>
-                            <fieldset class="repeating_skepp-krits">
-                                <table>
-                                    <tr class="sheet-bb">
-                                        <td>
-                                            <input type="text" name="attr_skepp-krit-skador">
-                                        </td>
-                                    </tr>
-                                </table>
-                            </fieldset>
-                        </td>
-                    </tr>
-                </table>
+    <!-- MAIN -->
+    <div class="wrapper">
 
-                <!-- tillval -->
-                <table class="sheet-table-thin">
-                    <tr class="sheet-table-dark">
-                        <td>
-                            <h3 data-i18n="features">Tillval</h3>
-                    	</td>
-                        <td>
-                            <h6 data-i18n="bonus">Bonus</h6>
-                        </td>
-                	</tr>
-                    <tr class="sheet-table-light">
-                        <td colspan="2">
-                            <fieldset class="repeating_skepp-tillval">
-                                <table>
-                                    <tr>
-                                        <td>
-                                            <input type="text" name="attr_skepp-tillvalsnamn" >
-                                        </td>
-                                        <td>
-                                            <input type="number" name="attr_skepp-tillval-bonus" value="0">
-                                        </td>
-                                    </tr>
-                                </table>
-                            </fieldset>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-    <table class="sheet-table-widest ti" >
-        <tr align="center" valign="center">
-            <td align="right" valign="center">
-                <!-- Kapten -->
-                <table class="sheet-table-thin">
-                    <tr class="sheet-table-dark">
-                        <td class="sheet-bl"><h3 data-i18n="captain">Kapten</h3></td>
-                        <td><h6 data-i18n="skill-level">fv</h6></td>
-                    </tr>
-                    <tr class="sheet-table-light">
-                        <td class="sheet-bl"><input type="text" ></td>
-                        <td><input type="number" value="0"></td>
-                    </tr>
-                </table>
-            </td>
-            <td align="left" valign="center">
-                <!-- Pilot -->
-                <table class="sheet-table-thin">
-                    <tr class="sheet-table-dark">
-                        <td class="sheet-bl"><h3 data-i18n="pilot">Pilot</h3></td>
-                        <td><h6 data-i18n="skill-level">fv</h6></td>
-                    </tr>
-                    <tr class="sheet-table-light">
-                        <td class="sheet-bl"><input type="text" ></td>
-                        <td><input type="number" value="0"></td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-    <table class="sheet-table-widest ti">
-        <tr>
-            <td>
-                <!-- Sensoroperat&ouml;r -->
-                <table class="sheet-table-thin">
-                    <tr class="sheet-table-dark">
-                        <td class="sheet-bl"><h3 data-i18n="sensor-op">Sensor op.</h3></td>
-                        <td><h6 data-i18n="skill-level">fv</h6></td>
-                    </tr>
-                    <tr class="sheet-table-light">
-                        <td class="sheet-bl"><input type="text" ></td>
-                        <td><input type="number" value="0"></td>
-                    </tr>
-                </table>
-            </td>
-            <td>
-                <!-- Skytt -->
-                <table class="sheet-table-thin">
-                    <tr class="sheet-table-dark">
-                        <td class="sheet-bl"><h3 data-i18n="gunner">Skytt</h3></td>
-                        <td><h6 data-i18n="skill-level">fv</h6></td>
-                    </tr>
-                    <tr class="sheet-table-light">
-                        <td class="sheet-bl"><input type="text" ></td>
-                        <td><input type="number" value="0"></td>
-                    </tr>
-                </table>
-            </td>
-            <td>
-                <!-- Tekniker -->
-                <table class="sheet-table-thin">
-                    <tr class="sheet-table-dark">
-                        <td class="sheet-bl"><h3 data-i18n="engineer">Tekniker</h3></td>
-                        <td><h6 data-i18n="skill-level">fv</h6></td>
-                    </tr>
-                    <tr class="sheet-table-light">
-                        <td class="sheet-bl"><input type="text" ></td>
-                        <td><input type="number" value="0"></td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-    <!-- Vapensystem -->
-    <table class="sheet-table-widest sheet-ship-weapons">
-        <tr class="sheet-table-dark">
-            <td>
-                <h3 data-i18n="ship-weapons">Vapensystem</h3>
-            </td>
-            <td>
-                <h6 data-i18n="ship-weapons-bonus">Bonus</h6>
-            </td>
-            <td>
-                <h6 data-i18n="ship-weapons-range">R&auml;ckvidd</h6>
-            </td>
-            <td>
-                <h6 data-i18n="ship-weapons-damage">Skada</h6>
-            </td>
-            <td>
-                <h6 data-i18n="ship-weapons-crit">Krit</h6>
-            </td>
-            <td>
-                <h6 data-i18n="ship-weapons-comments">&Ouml;vrigt</h6>
-            </td>
-    	</tr>
-        <tr class="sheet-table-light">
-            <td colspan="6">
-                <fieldset class="repeating_skepp-vapen">
-                    <table>
-                        <tr>
-                            <td>
-                                <input type="text" name="attr_skepp-vapensystem">
-                            </td>
-                            <td>
-                                <input type="number" name="attr_skepp-vapensystem-bonus" value="0">
-                            </td>
-                            <td>
-                                <input type="text" name="attr_skepp-vapensystem-r&auml;ckvidd">
-                            </td>
-                            <td>
-                                <input type="number" name="attr_skepp-vapensystem-skada" value="0">
-                            </td>
-                            <td>
-                                <input type="number" name="attr_skepp-vapensystem-krit" value="0">
-                            </td>
-                            <td>
-                                <input type="text" name="attr_skepp-vapensystem-ovrigt">
-                            </td>
-                        </tr>
-                    </table>
-                </fieldset>
-            </td>
-        </tr>
-    </table>
+        <!-- TOP -->
+        <div class="1colrow">
+
+            <div class="col">
+
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item" style="width:30%"><h1 data-i18n="people-u">PEOPLE I'VE MET</h1></div>
+                        <div class="item" style="width:15%; border-left: 1px solid #61574b"><h4 style="text-align:left" data-i18n="people-concept-u">CONCEPT</h4></div>
+                        <div class="item" style="width:55%; border-left: 1px solid #61574b"><h4 style="text-align:left" data-i18n="notes-u">NOTES</h4></div>
+                    </div>
+        		    <fieldset class="repeating_character-logs">
+        		        <div class="row table-background-light">
+        		            <div class="item" style="width:30%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><input type="text" name="attr_character-log-people"></div>
+        		            <div class="item" style="width:15%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><input type="text" name="attr_character-log-concept"></div>
+        		            <div class="item" style="width:55%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><input type="text" name="attr_character-log-notes"></div>
+                        </div>
+        			</fieldset>
+                </div><br>
+
+            </div>
+
+        </div><br>
+
+        <!-- MIDDLE -->
+        <div class="2colrow-split">
+
+            <!-- LEFT SIDE -->
+            <div class="col">
+
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item"><h1 data-i18n="characternotes-cabin-u">MY CABIN</h1></div>
+                    </div>
+                    <div class="row" style="border-bottom: none">
+                        <div class="item"><h3 data-i18n="characternotes-cabin-description">Description:</h3></div>
+                    </div>
+                    <div><textarea class="textbox" name="attr_cabin-description" style="border-bottom: 1px solid #61574b; min-height: 3em; height: 3em; min-width: 98%; max-width: 98%;"></textarea></div>
+                    <div class="row" style="border-bottom: none">
+                        <div class="item"><h3 data-i18n="characternotes-cabin-gear">Gear:</h3></div>
+                    </div>
+                    <div><textarea class="textbox" name="attr_cabin-gear" style="border-bottom: 1px solid #61574b; min-height: 3em; height: 3em; min-width: 98%; max-width: 98%;"></textarea></div>
+                    <div class="row" style="border-bottom: none">
+                        <div class="item"><h3 data-i18n="characternotes-cabin-other">Other:</h3></div>
+                    </div>
+                    <div><textarea class="textbox" name="attr_cabin-other" style="border-bottom: 1px solid #61574b; min-height: 3em; height: 3em; min-width: 98%; max-width: 98%;"></textarea></div>
+                </div><br>
+
+            </div>
+
+            <!-- RIGHT SIDE -->
+            <div class="col">
+
+    			<div class="table-border table-background-light">
+    				<div class="row table-graphic-dark">
+    					<div class="item" style="width:50.6%; border-bottom: 1px solid #61574b"><h1 data-i18n="tiny-items-u">TINY ITEMS</h1></div>
+    					<div class="item table-graphic-light" style="width:20%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><h3 data-i18n="characternotes-money-birr-u">Birr:</h3></div>
+    					<div class="item table-graphic-light" style="width:30%; border-bottom: 1px solid #61574b;"><input type="number" name="attr_birr" style="width:8em; text-align:right; padding-right:1em" value="0"></div>
+    				</div>
+                    <div><textarea class="textbox" name="attr_tiny-items" style="border-bottom: 1px solid #61574b; min-height: 18em; height: 18em; min-width: 98%; max-width: 98%;"></textarea></div>
+    			</div><br>
+
+            </div>
+
+        </div><br>
+
+        <!-- BOTTOM -->
+        <div class="1colrow">
+
+            <div class="col">
+
+				<div class="table-border table-background-light">
+					<div class="row table-graphic-dark">
+						<div class="item" style="width:50.5%"><h1 data-i18n="notes-u">NOTES</h1></div>
+					</div>
+                    <div><textarea class="textbox" name="attr_notes" style="border-bottom: 1px solid #61574b; min-height: 18em; height: 18em; min-width: 98%; max-width: 98%;"></textarea></div>
+				</div><br>
+
+            </div>
+
+        </div>
+
+    </div><br>
+
 </div>
+
+<!--    *************************   Spaceship Sheet *************************   -->
+<div class="section-spaceship">
+
+    <!-- HEADER -->
+    <div class="header">
+        <br><span data-i18n="title-spaceship-u">SPACESHIP SHEET</span><br><br>
+        <img src="https://i.imgur.com/bwY1i2A.png" alt="Logo">
+    </div><br>
+
+    <!-- MAIN -->
+    <div class="wrapper">
+
+        <!-- TOP -->
+        <div class="2colrow-tight-right">
+
+            <!-- Left Side -->
+            <div class="col">
+
+                <!-- Left Side Basic Info -->
+                <div class="table-border table-background-light">
+    				<div class="row">
+    					<div class="item" style="width:10%"><h3 data-i18n="name">Name:</h3></div>
+    					<div class="item" style="width:90%"><input type="text" name="attr_spaceship-name"></div>
+    				</div>
+    				<div class="row">
+    					<div class="item" style="width:20%"><h3 data-i18n="spaceship-class">Class & Type:</h3></div>
+    					<div class="item" style="width:30%"><input type="text" name="attr_spaceship-type"></div>
+    					<div class="item" style="width:20%; border-left: 1px solid #61574b"><h3 data-i18n="spaceship-shipyard">Shipyard:</h3></div>
+    					<div class="item" style="width:30%"><input type="text" name="attr_spaceship-yard"></div>
+    				</div>
+    				<div class="row">
+    					<div class="item" style="width:20%"><h3 data-i18n="spaceship-problem">Problem:</h3></div>
+    					<div class="item" style="width:30%"><input type="text" name="attr_spaceship-problem"></div>
+    					<div class="item" style="width:20%; border-left: 1px solid #61574b"><h3 data-i18n="spaceship-debt">Debt:</h3></div>
+    					<div class="item" style="width:30%"><input type="text" name="attr_spaceship-debt"></div>
+    				</div>
+    			</div><br>
+
+                <!-- Left side Data -->
+                <div class="table-border table-graphic-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item"><h1 data-i18n="spaceship-data-u">DATA</h1></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:32%"><h2 data-i18n="spaceship-data-maneuverability">Maneuverability</h2></div>
+                        <div class="item" style="width:6%"></div>
+                        <div class="item" style="width:12%"><input type="number" name="attr_spaceship-maneuverability" value="0"></div>
+                        <div class="item" style="width:32%"><h2 data-i18n="spaceship-data-signature">Signature</h2></div>
+                        <div class="item" style="width:6%"></div>
+                        <div class="item" style="width:12%"><input type="number" name="attr_spaceship-signature" value="0"></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:32%"><h2 data-i18n="spaceship-data-speed">Speed</h2></div>
+                        <div class="item" style="width:6%"></div>
+                        <div class="item" style="width:12%"><input type="number" name="attr_spaceship-speed" value="0"></div>
+                        <div class="item" style="width:32%"><h2 data-i18n="spaceship-data-armor">Armor</h2></div>
+                        <div class="item" style="width:6%"></div>
+                        <div class="item" style="width:12%"><input type="number" name="attr_spaceship-armor" value="0"></div>
+                    </div>
+                </div><br>
+
+                <!-- Left Side Modules -->
+    			<div class="table-border table-background-light">
+    			    <div class="row table-graphic-dark">
+    			        <div class="item" style="width:88.2%"><h1 data-i18n="spaceship-modules-u">MODULES</h1></div>
+    			        <div class="item" style="width:12.2%; border-left: 1px solid #61574b"><h4 data-i18n="spaceship-modules-disabled-u">DISABLED</h4></div>
+    			    </div>
+        		    <fieldset class="repeating_spaceship-modules">
+        		        <div class="row table-background-light">
+        		            <div class="item" style="width:88.2%"><input type="text" name="attr_spaceship-module"></div>
+                            <div class="item table-graphic-light" style="width:12.2%; border-left: 1px solid #61574b;border-bottom: 1px solid #61574b">
+                                <div class="flex-checkbox custom-checkbox" style="width:45%; position:relative; left:12px; top:-5px">
+                                    <input type="checkbox" name="attr_disabled" value="1"><span></span>
+                                </div>
+                            </div>
+    					</div>
+    				</fieldset>
+    				<div class="row table-graphic-light">
+    				    <div class="item" style="width:88%"><h2 data-i18n="spaceship-modules-maximum">Maximum number of modules</h2></div>
+    				    <div class="item" style="width:12%"><input type="number" name="attr_spaceship-modules-max" value="0"></div>
+    				</div>
+    			</div><br>
+
+            </div>
+
+            <!-- Right Side -->
+            <div class="col">
+
+                <!-- Right Side Energy Points -->
+                <div class="table-border table-graphic-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item" style="width:73%"><h1 data-i18n="spaceship-energypoints-u">ENERGY POINTS</h1></div>
+                        <div class="item" style="width:27%"><input type="number" name="attr_spaceship-energypoints" value="0"></div>
+                    </div>
+                    <div class="row">
+                        <div class="flex-checkbox custom-checkbox">
+                            <input type="checkbox" name="attr_ep1" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_ep2" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_ep3" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_ep4" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_ep5" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_ep6" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_ep7" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_ep8" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_ep9" class="cb-small" value="1"><span></span>
+                            <input type="checkbox" name="attr_ep10" class="cb-small" value="1"><span></span>
+                        </div>
+                    </div>
+                </div><br>
+
+                <!-- Right Side Hull Points -->
+                <div class="table-border table-graphic-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item" style="width:73%"><h1 data-i18n="spaceship-hullpoints-u">HULL POINTS</h1></div>
+                        <div class="item" style="width:27%"><input type="number" name="attr_spaceship-hullpoints" value="0"></div>
+                    </div>
+                    <div class="row" style="border:none">
+                        <div class="flex-checkbox custom-checkbox">
+							<input type="checkbox" class="cb-small" name="attr_space-hp1" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp2" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp3" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp4" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp5" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp6" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp7" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp8" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp9" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp10" value="1"><span></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="flex-checkbox custom-checkbox">
+							<input type="checkbox" class="cb-small" name="attr_space-hp11" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp12" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp13" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp14" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp15" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp16" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp17" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp18" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp19" value="1"><span></span>
+							<input type="checkbox" class="cb-small" name="attr_space-hp20" value="1"><span></span>
+                        </div>
+                    </div>
+            		<div class="row table-background-light">
+    					<div class="item"><h3 data-i18n="spaceship-hullpoints-criticaldamage">Critical Damage:</h3></div>
+            		</div>
+        		    <fieldset class="repeating_spaceship-crits">
+        		        <div class="row table-background-light">
+    					    <div class="item" style="width:100%"><input type="text" name="attr_spaceship-crit-damage"></div>
+    					</div>
+					</fieldset>
+                </div><br>
+
+                <!-- Right Side Features -->
+    			<div class="table-border table-background-light">
+    			    <div class="row table-graphic-dark">
+    			        <div class="item" style="width:75%"><h1 data-i18n="spaceship-features-u">FEATURES</h1></div>
+    			        <div class="item" style="width:25%; border-left: 1px solid #61574b"><h4 data-i18n="bonus-u">BONUS</h4></div>
+    			    </div>
+        		    <fieldset class="repeating_spaceship-features">
+        		        <div class="row table-background-light">
+        		            <div class="item" style="width:75%"><input type="text" name="attr_spaceship-features-name"></div>
+                            <div class="item" style="width:25%; border-left: 1px solid #61574b"><input type="text" name="attr_spaceship-features-bonus"></div>
+    					</div>
+					</fieldset>
+    			</div><br>
+
+            </div>
+
+        </div><br>
+
+        <!-- MIDDLE, Two -->
+        <div class="2colrow-split" style="text-align:center">
+
+            <!-- Middle, Two, Captain -->
+            <div class="col" style="margin-left:auto; width:30%">
+
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item" style="width:71%"><h1 data-i18n="spaceship-captain-u">CAPTAIN</h1></div>
+                        <div class="item" style="width:30%; border-left: 1px solid #61574b"><h4 data-i18n="spaceship-skill-level-u">SKILL LEVEL</h4></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:71%"><input type="text" name="attr_role-captain"></div>
+                        <div class="item table-graphic-light" style="width:30%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><input type="number" name="attr_captainskill" value="0"></div>
+                    </div>
+                </div><br>
+
+            </div>
+
+            <!-- Middle, Two, Pilot -->
+            <div class="col" style="margin-right:auto; width:30%">
+
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item" style="width:71%"><h1 data-i18n="spaceship-pilot-u">PILOT</h1></div>
+                        <div class="item" style="width:30%; border-left: 1px solid #61574b"><h4 data-i18n="spaceship-skill-level-u">SKILL LEVEL</h4></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:71%"><input type="text" name="attr_role-pilot"></div>
+                        <div class="item table-graphic-light" style="width:30%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><input type="number" name="attr_pilotskill" value="0"></div>
+                    </div>
+                </div><br>
+
+            </div>
+
+        </div><br>
+
+        <!-- MIDDLE, Three -->
+        <div class="" style="text-align:center">
+
+            <!-- Middle, Three, Sensor Operator -->
+            <div class="col" style="margin-left:auto; width:30%">
+
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item" style="width:71%"><h1 data-i18n="spaceship-sensor-operator-u">SENSOR OPERATOR</h1></div>
+                        <div class="item" style="width:30%; border-left: 1px solid #61574b"><h4 data-i18n="spaceship-skill-level-u">SKILL LEVEL</h4></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:71%"><input type="text" name="attr_role-sensoroperator"></div>
+                        <div class="item table-graphic-light" style="width:30%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><input type="number" name="attr_sensoroperatorskill" value="0"></div>
+                    </div>
+                </div><br>
+
+            </div>
+
+            <!-- Middle, Three, Gunner -->
+            <div class="col" style="width:30%">
+
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item" style="width:71%"><h1 data-i18n="spaceship-gunner-u">GUNNER</h1></div>
+                        <div class="item" style="width:30%; border-left: 1px solid #61574b"><h4 data-i18n="spaceship-skill-level-u">SKILL LEVEL</h4></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:71%"><input type="text" name="attr_role-gunner"></div>
+                        <div class="item table-graphic-light" style="width:30%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><input type="number" name="attr_gunnerskill" value="0"></div>
+                    </div>
+                </div><br>
+
+            </div>
+
+            <!-- Middle, Three Engineer -->
+            <div class="col" style="margin-right:auto; width:30%">
+
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item" style="width:71%"><h1 data-i18n="spaceship-engineer-u">ENGINEER</h1></div>
+                        <div class="item" style="width:30%; border-left: 1px solid #61574b"><h4 data-i18n="spaceship-skill-level-u">SKILL LEVEL</h4></div>
+                    </div>
+                    <div class="row">
+                        <div class="item" style="width:71%"><input type="text" name="attr_role-engineer"></div>
+                        <div class="item table-graphic-light" style="width:30%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><input type="number" name="attr_engineerskill" value="0"></div>
+                    </div>
+                </div><br>
+
+            </div>
+
+        </div><br>
+
+        <!-- BOTTOM -->
+        <div class="1colrow">
+
+            <div class="col">
+
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item" style="width:25.3%"><h1 data-i18n="weapons-u">WEAPONS</h1></div>
+                        <div class="item" style="width:8%; border-left: 1px solid #61574b"><h4 data-i18n="bonus-u">BONUS</h4></div>
+                        <div class="item" style="width:8%; border-left: 1px solid #61574b"><h4 data-i18n="weapons-damage-u">DAMAGE</h4></div>
+                        <div class="item" style="width:8%; border-left: 1px solid #61574b"><h4 data-i18n="weapons-crit-critical-u">CRIT</h4></div>
+                        <div class="item" style="width:8%; border-left: 1px solid #61574b"><h4 data-i18n="weapons-range-u">RANGE</h4></div>
+                        <div class="item" style="width:20%; border-left: 1px solid #61574b"><h4 style="text-align:left" data-i18n="comments-u">COMMENTS</h4></div>
+                    </div>
+        		    <fieldset class="repeating_spaceship-weapons">
+        		        <div class="row table-background-light">
+        		            <div class="item" style="width:25.3%"><input type="text" name="attr_spaceship-weaponsystem"></div>
+                            <div class="item" style="width:8%; border-left: 1px solid #61574b"><input type="text" name="attr_spaceship-weaponsystem-bonus" style="text-align:center"></div>
+                            <div class="item" style="width:8%; border-left: 1px solid #61574b"><input type="text" name="attr_spaceship-weaponsystem-damage" style="text-align:center"></div>
+                            <div class="item" style="width:8%; border-left: 1px solid #61574b"><input type="text" name="attr_spaceship-weaponsystem-crit" style="text-align:center"></div>
+                            <div class="item" style="width:8%; border-left: 1px solid #61574b"><input type="text" name="attr_spaceship-weaponsystem-range" style="text-align:center"></div>
+                            <div class="item" style="width:20%; border-left: 1px solid #61574b"><input type="text" name="attr_spaceship-weaponsystem-comments"></div>
+                        </div>
+        			</fieldset>
+                </div><br>
+
+            </div>
+
+        </div><br>
+
+    </div><br>
+
+</div>
+
+<!--    *************************   Spaceship Notes *************************   -->
+<div class="section-spaceshipnotes">
+
+    <!-- HEADER -->
+    <div class="header">
+        <br><span data-i18n="title-spaceshipnotes-u">SPACESHIP NOTES</span><br><br>
+        <img src="https://i.imgur.com/bwY1i2A.png" alt="Logo">
+    </div><br>
+
+    <!-- MAIN -->
+    <div class="wrapper">
+
+        <!-- TOP -->
+        <div class="2colrow-tight-right">
+
+            <!-- Left Side -->
+            <div class="col">
+
+                <!-- Left Side Modules -->
+    			<div class="table-border table-background-light">
+    			    <div class="row table-graphic-dark">
+    			        <div class="item" style="width:88.2%"><h1 data-i18n="spaceship-modules-u">MODULES</h1></div>
+    			        <div class="item" style="width:12%; border-left: 1px solid #61574b"><h4 data-i18n="spaceship-modules-disabled-u">DISABLED</h4></div>
+    			    </div>
+        		    <fieldset class="repeating_spaceshipnotes-modules">
+        		        <div class="row table-background-light">
+        		            <div class="item" style="width:88.2%"><input type="text" name="attr_spaceshipnotes-module"></div>
+                            <div class="item table-graphic-light" style="width:12.2%; border-left: 1px solid #61574b;border-bottom: 1px solid #61574b">
+                                <div class="flex-checkbox custom-checkbox" style="width:45%; position:relative; left:12px; top:-5px">
+                                    <input type="checkbox" name="attr_spaceshipnotes-disabled" value="1"><span></span>
+                                </div>
+                            </div>
+    					</div>
+    				</fieldset>
+    			</div><br>
+
+            </div>
+
+            <!-- Right Side -->
+            <div class="col">
+
+                <!-- Right Side Features -->
+    			<div class="table-border table-background-light">
+    			    <div class="row table-graphic-dark">
+    			        <div class="item" style="width:75%"><h1 data-i18n="spaceship-features-u">FEATURES</h1></div>
+    			        <div class="item" style="width:25%; border-left: 1px solid #61574b"><h4 data-i18n="bonus-u">BONUS</h4></div>
+    			    </div>
+        		    <fieldset class="repeating_spaceshipnotes-features">
+        		        <div class="row table-background-light">
+        		            <div class="item" style="width:75%"><input type="text" name="attr_spaceshipnotes-features-name"></div>
+                            <div class="item" style="width:25%; border-left: 1px solid #61574b"><input type="text" name="attr_spaceshipnotes-features-bonus"></div>
+    					</div>
+					</fieldset>
+    			</div><br>
+
+            </div>
+
+        </div><br>
+
+        <!-- MIDDLE -->
+        <div class="1colrow">
+
+            <div class="col">
+
+                <div class="table-border table-background-light">
+                    <div class="row table-graphic-dark">
+                        <div class="item" style="width:20%"><h1 data-i18n="spaceshipnotes-log-u">SHIP'S LOG</h1></div>
+                        <div class="item" style="width:20%; border-left: 1px solid #61574b"><h4 style="text-align:left; line-height: 6em" data-i18n="spaceshipnotes-log-coriolis-cycles-segment-u">CC/SEGMENT</h4></div>
+                        <div class="item" style="width:20%; border-left: 1px solid #61574b"><h4 style="text-align:left; line-height: 6em" data-i18n="spaceshipnotes-log-route-u">ROUTE</h4></div>
+                        <div class="item" style="width:20%; border-left: 1px solid #61574b"><h4 style="text-align:left; line-height: 6em" data-i18n="spaceshipnotes-log-danger-u">DANGER</h4></div>
+                        <div class="item" style="width:20%; border-left: 1px solid #61574b"><h4 style="text-align:left; line-height: 6em" data-i18n="notes-u">NOTES</h4></div>
+                    </div>
+        		    <fieldset class="repeating_logs">
+        		        <div class="row table-background-light">
+        		            <div class="item" style="width:20%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><input type="text" name="attr_spaceship-logs" value="'Destination'"></div>
+        		            <div class="item" style="width:20%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><input type="text" name="attr_spaceship-logs-segment"></div>
+        		            <div class="item" style="width:20%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><input type="text" name="attr_spaceship-logs-route"></div>
+        		            <div class="item" style="width:20%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><input type="text" name="attr_spaceship-logs-danger"></div>
+        		            <div class="item" style="width:20%; border-bottom: 1px solid #61574b; border-left: 1px solid #61574b"><input type="text" name="attr_spaceship-logs-notes"></div>
+                        </div>
+        			</fieldset>
+                </div><br>
+
+            </div>
+
+        </div><br>
+
+        <!-- BOTTOM -->
+        <div class="1colrow">
+
+            <div class="col">
+
+                <!-- Cargo and Gear -->
+    			<div class="table-border table-background-light">
+    				<div class="row table-graphic-dark">
+    					<div class="item"><h1 data-i18n="spaceshipnotes-cargo-u">CARGO AND GEAR</h1></div>
+    				</div>
+                    <div><textarea class="textbox" name="attr_cargo" style="border-bottom: 1px solid #61574b; min-height: 30em; height: 18.5em; min-width: 98%; max-width: 98%;"></textarea></div>
+    			</div><br>
+
+    		</div>
+
+        </div><br>
+
+    </div><br>
+
+</div>
+
+<!--    *************************   Hidden test  *************************   -->
+<div class="section-scripts">
+  <rolltemplate class="sheet-rolltemplate-coriolis">
+    <table class="sheet-skill-roll">
+    	<tr>
+			<th>
+				{{name}}
+			</th>
+		</tr>
+
+	    {{#isNotAdvanced}}
+	        {{#rollLess() pool 1}}
+        		<tr class="sheet-reroll">
+        		    <td><span data-i18n="rolltemplate-dice-pool">Dice pool is 0 or less.<br> Rolling 2d6 instead.</span></td>
+        		</tr>
+
+            	{{#rollLess() reroll 2}}
+        			<tr class="sheet-fail">
+        				<td><span class="sheet-roll">{{reroll}}</span><span style="padding-left: 20px" data-i18n="rolltemplate-fail">Failure.</span></td>
+        			</tr>
+        		{{/rollLess() reroll 2}}
+
+        		{{#rollGreater() reroll 1}}
+        				<tr class="sheet-great-success">
+        				<td><span class="sheet-roll">{{reroll}}</span><span style="padding-left: 20px" data-i18n="rolltemplate-limitedsuccess">Limited Success.</span></td>
+        				</tr>
+        		{{/rollGreater() reroll 1}}
+    	    {{/rollLess() pool 1}}
+
+    	    {{#rollGreater() pool 0}}
+        		{{#rollLess() roll 1}}
+        				<tr class="sheet-fail">
+        					<td><span class="sheet-roll">{{roll}}</span><span style="padding-left: 20px" data-i18n="rolltemplate-fail">Failure.</span></td>
+        				</tr>
+        	    {{/rollLess() roll 1}}
+
+        	    {{#rollBetween() roll 1 2}}
+        				<tr class="sheet-success">
+        					<td><span class="sheet-roll">{{roll}}</span><span style="padding-left: 20px" data-i18n="rolltemplate-limitedsuccess">Limited Success.</span></td>
+        				</tr>
+        	    {{/rollBetween() roll 1 2}}
+
+        	    {{#rollGreater() roll 2}}
+        				<tr class="sheet-great-success">
+        					<td><span class="sheet-roll">{{roll}}</span><span style="padding-left: 20px" data-i18n="rolltemplate-criticalsuccess">Critical Success.</span></td>
+        				</tr>
+        	    {{/rollGreater() roll 2}}
+    		{{/rollGreater() pool 0}}
+	    {{/isNotAdvanced}}
+
+	    {{#isAdvanced}}
+    		{{#rollLess() advanced-skill 1}}
+              <tr class="sheet-reroll">
+                  <td data-i18n="rolltemplate-autofail">Missing skill point in advanced skill. Automatic fail.</td>
+              </tr>
+            {{/rollLess() advanced-skill 1}}
+
+            {{#rollGreater() advanced-skill 0}}
+                {{#rollLess() pool 1}}
+            		<tr class="sheet-reroll">
+            		    <td><span data-i18n="rolltemplate-dice-pool">Dice pool is 0 or less.<br> Rolling 2d6 instead.</span></td>
+            		</tr>
+
+                	{{#rollLess() reroll 2}}
+            			<tr class="sheet-fail">
+            				<td><span class="sheet-roll">{{reroll}}</span><span style="padding-left: 20px" data-i18n="rolltemplate-fail">Failure.</span></td>
+            			</tr>
+            		{{/rollLess() reroll 2}}
+
+            		{{#rollGreater() reroll 1}}
+            				<tr class="sheet-great-success">
+            				<td><span class="sheet-roll">{{reroll}}</span><span style="padding-left: 20px" data-i18n="rolltemplate-limitedsuccess">Limited Success.</span></td>
+            				</tr>
+            		{{/rollGreater() reroll 1}}
+        	    {{/rollLess() pool 1}}
+
+        	    {{#rollGreater() pool 0}}
+            		{{#rollLess() roll 1}}
+            				<tr class="sheet-fail">
+            					<td><span class="sheet-roll">{{roll}}</span><span style="padding-left: 20px" data-i18n="rolltemplate-fail">Failure.</span></td>
+            				</tr>
+            	    {{/rollLess() roll 1}}
+
+            	    {{#rollBetween() roll 1 2}}
+            				<tr class="sheet-success">
+            					<td><span class="sheet-roll">{{roll}}</span><span style="padding-left: 20px" data-i18n="rolltemplate-limitedsuccess">Limited Success.</span></td>
+            				</tr>
+            	    {{/rollBetween() roll 1 2}}
+
+            	    {{#rollGreater() roll 2}}
+            				<tr class="sheet-great-success">
+            					<td><span class="sheet-roll">{{roll}}</span><span style="padding-left: 20px" data-i18n="rolltemplate-criticalsuccess">Critical Success.</span></td>
+            				</tr>
+            	    {{/rollGreater() roll 2}}
+        		{{/rollGreater() pool 0}}
+            {{/rollGreater() advanced-skill 0}}
+        {{/isAdvanced}}
+
+    </table>
+  </rolltemplate>
+</div><br>
+
+<!--    *************************   WORKERS  *************************   -->
+<script type="text/worker">
+
+    on("sheet:opened", function() {
+        console.log("** Coriolis Third Horizon Character Sheet 2.5 by Nicolaj G. **")
+        versioning();
+    });
+
+    on("change:strength change:agility", function() {
+        update_hitpoints("strength", "agility");
+    });
+
+    on("change:wits change:empathy", function() {
+        update_mindpoints("wits", "empathy");
+    });
+
+    on("change:strength", function() {
+        update_carryMAX("strength");
+    });
+
+    var versioning = function() {
+        console.log("Version Checking...")
+        getAttrs(["version"], function(v) {
+            if(v.version == undefined || v.version == "") {
+                console.log("** UPGRADING TO v2.0 **");
+
+                upgrade_to_2_0()
+                setAttrs({version: 2.0});
+
+                console.log("** DONE UPGRADING TO v2.0 **");
+            }
+            if(v.version == 2.0) {
+                console.log("** UPGRADING TO v2.5 **");
+
+                upgrade_to_2_5()
+                setAttrs({version: 2.5});
+
+                console.log("** DONE UPGRADING TO v2.5 **");
+            }
+            else {
+                console.log("** Coriolis v2.5 by Nicolaj G. **");
+                return;
+            }
+        });
+    };
+
+    var upgrade_to_2_0 = function() {
+
+        update_number("pc", "sheetstyle");
+        update_number("sty", "strength");
+        update_number("kyl", "agility");
+        update_number("skp", "wits");
+        update_number("kns", "empathy");
+        update_number("rorlighet", "dexterity");
+        update_number("befal", "command");
+        update_number("kraftprov", "force");
+        update_number("horisontens_kultur", "culture");
+        update_number("smyga", "infiltration");
+        update_number("datadjinn", "datadjinn");
+        update_number("manipulera", "manipulation");
+        update_number("medikurgi", "medicurgy");
+        update_number("narkamp", "melee-combat");
+        update_number("mystiska_krafter", "mystic-powers");
+        update_number("spaning", "observation");
+        update_number("pilot", "pilot");
+        update_number("skjutvape", "ranged-combat");
+        update_number("vetenskap", "science");
+        update_number("overlevnad", "survival");
+        update_number("rustning_skydd", "armor_rating");
+        update_number("skepp-manoverformaga", "spaceship-maneuverability");
+        update_number("skepp-signatur", "spaceship-signature");
+        update_number("skepp-hastighet", "spaceship-speed");
+        update_number("skepp-pansar", "spaceship-armor");
+        update_number("skepp-max-modulerderp", "spaceship-modules-max");
+        update_number("captainnum", "captainskill");
+        update_number("pilotnum", "pilotskill");
+        update_number("sensoroperatornum", "sensoroperatorskill");
+        update_number("gunnernum", "gunnerskill");
+        update_number("engineernum", "engineerskill");
+        update_number("teknologi", "technology");
+        update_number("teknologi", "technology");
+        update_number("teknologi", "technology");
+        update_number("teknologi", "technology");
+        update_number("teknologi", "technology");
+        update_number("teknologi", "technology");
+
+        update_text("namn", "name");
+        update_text("bakgrund", "background");
+        update_text("koncept", "concept");
+        update_text("ikon", "icon");
+        update_text("gruppkoncept", "groupconcept");
+        update_text("pers_problem", "personal_problem");
+        update_text("anseende", "reputation");
+        update_text("ansikte", "face");
+        update_text("rustning", "armor");
+        update_text("rustning_ovrigt", "armor_comments");
+        update_text("skepp-namn", "spaceship-name");
+        update_text("skepp-typ", "spaceship-type");
+        update_text("skepp-varv", "spaceship-yard");
+        update_text("skepp-problem", "spaceship-problem");
+        update_text("captain", "captain");
+        update_text("sensoroperator", "sensoroperator");
+        update_text("gunner", "gunner");
+        update_text("engineer", "engineer");
+        update_text("kladsel", "clothing");
+
+        update_checkbox("trauma", "hitpoints-check", 12)
+        update_checkbox("mind", "mindpoints-check", 12)
+        update_checkbox("stp", "rad", 10)
+        update_checkbox("erf", "exp", 20)
+        update_checkbox("skepp-energi", "ep", 10)
+        update_checkbox("skepp-kp", "space-hp", 20)
+
+        update_repeating("repeating_krits", "repeating_crits", "krit-skador", "crit-injury");
+        update_repeating("repeating_talanger", "repeating_talents", "talang", "talent");
+        update_repeating("repeating_skepp-krits", "repeating_spaceship-crits", "skepp-krit-skador", "spaceship-crit-damage");
+        update_repeating("repeating_utrustning", "repeating_gear", "utrustning", "gear", "utrustning_bonus", "gear_bonus");
+        update_repeating("repeating_skepp-tillval", "repeating_spaceship-features", "skepp-tillvalsnamn", "spaceship-features-name", "skepp-tillval-bonus", "spaceship-features-bonus"); //2
+
+        update_hitpoints("strength", "agility");
+        update_mindpoints("wits", "empathy");
+        update_carryMAX("strength");
+
+        update_relationships();
+        update_weapons();
+        update_spaceship_module();
+        update_spaceship_weaponsystem();
+     };
+
+    var upgrade_to_2_5 = function() {
+
+        oldRepeating = "repeating_talents";
+        oldAttribute = "items";
+        newAttribute = "tiny-items";
+
+        getSectionIDs(oldRepeating, function(idArray) {
+            var update = {};
+            update[newAttribute] = "";
+            _.each(idArray, function(currentID) {
+                getAttrs([oldRepeating + "_" + currentID + "_" + oldAttribute], function(v) {
+                    if(v[oldRepeating + "_" + currentID + "_" + oldAttribute]) {
+                        var newrowid = generateRowID();
+                        update[newAttribute] += v[oldRepeating + "_" + currentID + "_" + oldAttribute] + "\n";
+                        setAttrs(update);
+                    }
+                });
+            });
+        });
+
+    };
+
+    var update_text = function(oldAttribute, newAttribute) {
+        console.log("Updating Text from: " + oldAttribute + " to: " + newAttribute);
+
+        getAttrs([oldAttribute], function(v) {
+            if(v[oldAttribute]) {
+                var update = {};
+                update[newAttribute] = v[oldAttribute];
+                setAttrs(update, {silent: true});
+            }
+        });
+    }
+
+    var update_number = function(oldAttribute, newAttribute) {
+        console.log("Updating number from: " + oldAttribute + " to: " + newAttribute);
+
+        getAttrs([oldAttribute], function(v) {
+            if(v[oldAttribute]) {
+                var update = {};
+                update[newAttribute] = parseInt(v[oldAttribute], 10);
+                setAttrs(update, {silent: true});
+            }
+        });
+    }
+
+    var update_checkbox = function(oldAttribute, newAttribute, numberOfAttributes) {
+        console.log("Updating checkbox from: " + oldAttribute + " to: " + newAttribute);
+        var array = [];
+
+        for(var i = 1; i <= numberOfAttributes; i++) {
+            array.push(oldAttribute + i);
+        }
+
+        getAttrs(array, function(v) {
+            for(var i = 1; i <= numberOfAttributes; i++) {
+                var update = {};
+
+                if( isNaN(parseInt(v[oldAttribute + i], 10)) ) {
+                    update[newAttribute + i] = 0;
+                    console.log(oldAttribute + i + " Is NaN. Updating " + newAttribute + i + " with 0")
+                    setAttrs(update, {silent: true});
+                }
+                else {
+                    update[newAttribute + i] = 1;
+                    console.log(oldAttribute + i + " Is aN. Updating " + newAttribute + i + " with 1")
+                    setAttrs(update, {silent: true});
+                }
+            }
+        });
+    }
+
+    var update_repeating = function(oldRepeating, newRepeating, oldField1, newField1, oldField2, newField2) {
+        console.log("Updating repeating from: " + oldRepeating + " to: " + newRepeating);
+
+        getSectionIDs(oldRepeating, function(idArray) {
+            if(!oldField2) {
+                var update={};
+                _.each(idArray, function(currentID) {
+                    getAttrs([oldRepeating + "_" + currentID + "_" + oldField1], function(v) {
+                        if(v[oldRepeating + "_" + currentID + "_" + oldField1]) {
+                            var newrowid = generateRowID();
+                            update[newRepeating + "_" + newrowid + "_" + newField1] = v[oldRepeating + "_" + currentID + "_" + oldField1];
+                            setAttrs(update);
+                        }
+                    });
+                });
+            }
+
+            if(oldField2) {
+                var update={};
+                _.each(idArray, function(currentID) {
+                    getAttrs([oldRepeating + "_" + currentID + "_" + oldField1, oldRepeating + "_" + currentID + "_" + oldField2], function(v) {
+                        if(v[oldRepeating + "_" + currentID + "_" + oldField1]) {
+                            var newrowid = generateRowID();
+                            update[newRepeating + "_" + newrowid + "_" + newField1] = v[oldRepeating + "_" + currentID + "_" + oldField1];
+                            setAttrs(update);
+
+                            if(v[oldRepeating + "_" + currentID + "_" + oldField2]) {
+                                update[newRepeating + "_" + newrowid + "_" + newField2] = v[oldRepeating + "_" + currentID + "_" + oldField2];
+                                setAttrs(update);
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    }
+
+    //relationship, buddy
+    var update_relationships = function() {
+        console.log("Updating repeating from: repeating_relations to: repeating_relationships");
+        getSectionIDs("repeating_relations", function(idarray) {
+            var update={};
+            _.each(idarray, function(currentID) {
+                getAttrs(["repeating_relations" + "_" + currentID + "_" + "relation", "repeating_relations" + "_" + currentID + "_" + "narstaende"], function(v) {
+                    var newrowid = generateRowID();
+                    if(v["repeating_relations" + "_" + currentID + "_" + "relation"]) {
+                        update["repeating_relationships" + "_" + newrowid + "_" + "relationship_pc"] = v["repeating_relations" + "_" + currentID + "_" + "relation"];
+                        setAttrs(update);
+
+                        if(v["repeating_relations" + "_" + currentID + "_" + "narstaende"]) {
+                            update["repeating_relationships" + "_" + newrowid + "_" + "buddy"] = 1;
+                            setAttrs(update, {silent: true});
+                        }
+                    }
+                });
+            });
+        });
+    }
+
+    //weapon, weapon_bonus, weapon_init, weapon_damage, weapon_crit, weapon_range, weapon_comments
+    var update_weapons = function() {
+        console.log("Updating repeating from: repeating_vapen to: repeating_weapon");
+        getSectionIDs("repeating_vapen", function(idarray) {
+            var update={};
+            _.each(idarray, function(currentID) {
+                getAttrs(["repeating_vapen" + "_" + currentID + "_" + "vapen", "repeating_vapen" + "_" + currentID + "_" + "vapen_bonus", "repeating_vapen" + "_" + currentID + "_" + "vapen_init", "repeating_vapen" + "_" + currentID + "_" + "vapen_skada", "repeating_vapen" + "_" + currentID + "_" + "vapen_krit", "repeating_vapen" + "_" + currentID + "_" + "vapen_rackvidd", "repeating_vapen" + "_" + currentID + "_" + "vapen_ovrigt", "repeating_vapen" + "_" + currentID + "_" + "reload1", "repeating_vapen" + "_" + currentID + "_" + "reload2", "repeating_vapen" + "_" + currentID + "_" + "reload3", "repeating_vapen" + "_" + currentID + "_" + "reload4", "repeating_vapen" + "_" + currentID + "_" + "reload5", "repeating_vapen" + "_" + currentID + "_" + "reload6"], function(v) {
+                    var newrowid = generateRowID();
+                    if(v["repeating_vapen" + "_" + currentID + "_" + "vapen"]) {
+                        update["repeating_weapon" + "_" + newrowid + "_" + "weapon"] = v["repeating_vapen" + "_" + currentID + "_" + "vapen"];
+                        setAttrs(update);
+                        update["repeating_weapon" + "_" + newrowid + "_" + "weapon_bonus"] = v["repeating_vapen" + "_" + currentID + "_" + "vapen_bonus"];
+                        setAttrs(update);
+                        update["repeating_weapon" + "_" + newrowid + "_" + "weapon_init"] = v["repeating_vapen" + "_" + currentID + "_" + "vapen_init"];
+                        setAttrs(update);
+                        update["repeating_weapon" + "_" + newrowid + "_" + "weapon_damage"] = v["repeating_vapen" + "_" + currentID + "_" + "vapen_skada"];
+                        setAttrs(update);
+                        update["repeating_weapon" + "_" + newrowid + "_" + "weapon_crit"] = v["repeating_vapen" + "_" + currentID + "_" + "vapen_krit"];
+                        setAttrs(update);
+                        update["repeating_weapon" + "_" + newrowid + "_" + "weapon_range"] = v["repeating_vapen" + "_" + currentID + "_" + "vapen_rackvidd"];
+                        setAttrs(update);
+                        update["repeating_weapon" + "_" + newrowid + "_" + "weapon_comments"] = v["repeating_vapen" + "_" + currentID + "_" + "vapen_ovrigt"];
+                        setAttrs(update);
+
+                        for(var i = 1; i <= 6; i++) {
+                            if( isNaN(parseInt(v["repeating_vapen" + "_" + currentID + "_" + "reload" + i],10)) ) {
+                                update["repeating_weapon" + "_" + newrowid + "_" + "reload" + i] = 0;
+                                setAttrs(update, {silent: true});
+                            }
+                            else {
+                                update["repeating_weapon" + "_" + newrowid + "_" + "reload" + i] = 1;
+                                setAttrs(update, {silent: true});
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    }
+
+    //spaceship_module
+    var update_spaceship_module = function() {
+        console.log("Updating repeating from: repeating_skeppsmoduler to: repeating_spaceship-modules");
+        getSectionIDs("repeating_skeppsmoduler", function(idarray) {
+            var update={};
+            _.each(idarray, function(currentID) {
+                getAttrs(["repeating_skeppsmoduler" + "_" + currentID + "_" + "skeppsmodul", "repeating_skeppsmoduler" + "_" + currentID + "_" + "utslagen"], function(v) {
+                    var newrowid = generateRowID();
+                    if(v["repeating_skeppsmoduler" + "_" + currentID + "_" + "skeppsmodul"]) {
+                        update["repeating_spaceship-modules" + "_" + newrowid + "_" + "spaceship-module"] = v["repeating_skeppsmoduler" + "_" + currentID + "_" + "skeppsmodul"];
+                        setAttrs(update);
+
+                        if( isNaN(parseInt(v["repeating_skeppsmoduler" + "_" + currentID + "_" + "utslagen"],10)) ) {
+                            update["repeating_spaceship-modules" + "_" + newrowid + "_" + "disabled"] = 0;
+                            setAttrs(update, {silent: true});
+                        }
+                        else if(parseInt(v["repeating_skeppsmoduler" + "_" + currentID + "_" + "utslagen"],10) === 0) { // Checking for 0, since original sheet set this value to 0 if checked
+                            update["repeating_spaceship-modules" + "_" + newrowid + "_" + "disabled"] = 1;
+                            setAttrs(update, {silent: true});
+                        }
+                    }
+                });
+            });
+        });
+    }
+
+    //spaceship-weaponsystem, spaceship-weaponsystem-bonus, spaceship-weaponsystem-damage, spaceship-weaponsystem-crit, spaceship-weaponsystem-range, spaceship-weaponsystem-comments
+    var update_spaceship_weaponsystem = function() {
+    console.log("Updating repeating from: repeating_skepp-vapen to: repeating_spaceship-weapons");
+    getSectionIDs("repeating_skepp-vapen", function(idarray) {
+            var update={};
+            _.each(idarray, function(currentID) {
+                getAttrs(["repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem", "repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-bonus", "repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-r&auml;ckvidd", "repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-skada", "repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-krit", "repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-ovrigt"], function(v) {
+                    var newrowid = generateRowID();
+                    if(v["repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem"]) {
+                            update["repeating_spaceship-weapons" + "_" + newrowid + "_" + "spaceship-weaponsystem"] = v["repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem"];
+                            setAttrs(update);
+                        if(v["repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-bonus"]) {
+                            update["repeating_spaceship-weapons" + "_" + newrowid + "_" + "spaceship-weaponsystem-bonus"] = v["repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-bonus"];
+                            setAttrs(update);
+                        }
+                        if(v["repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-skada"]) {
+                            update["repeating_spaceship-weapons" + "_" + newrowid + "_" + "spaceship-weaponsystem-damage"] = v["repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-skada"];
+                            setAttrs(update);
+                        }
+                        if(v["repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-krit"]) {
+                            update["repeating_spaceship-weapons" + "_" + newrowid + "_" + "spaceship-weaponsystem-crit"] = v["repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-krit"];
+                            setAttrs(update);
+                        }
+                        if(v["repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-r&auml;ckvidd"]) {
+                            update["repeating_spaceship-weapons" + "_" + newrowid + "_" + "spaceship-weaponsystem-range"] = v["repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-r&auml;ckvidd"];
+                            setAttrs(update);
+                        }
+                        if(v["repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-ovrigt"]) {
+                            update["repeating_spaceship-weapons" + "_" + newrowid + "_" + "spaceship-weaponsystem-comments"] = v["repeating_skepp-vapen" + "_" + currentID + "_" + "skepp-vapensystem-ovrigt"];
+                            setAttrs(update);
+                        }
+                    }
+                });
+            });
+        });
+    }
+
+    var update_hitpoints = function(par_Strength, par_Agility) {
+        console.log("Updating hitpoints");
+            getAttrs([par_Strength, par_Agility], function(v) {
+                setAttrs({
+                    "hitpoints": parseInt(v[par_Strength],10) + parseInt(v[par_Agility],10)
+                });
+            });
+    }
+
+    var update_mindpoints = function(par_Wits, par_Empathy) {
+        console.log("Updating mindpoints");
+            getAttrs([par_Wits, par_Empathy], function(v) {
+                setAttrs({
+                    "mindpoints": parseInt(v[par_Wits],10) + parseInt(v[par_Empathy],10)
+                });
+            });
+    }
+
+    var update_carryMAX = function(par_Strength) {
+        console.log("Updating carryMAX");
+            getAttrs([par_Strength], function(v) {
+                setAttrs({
+                    "carry-max": parseInt((v[par_Strength]*2),10)
+                });
+            });
+    }
+
+</script>

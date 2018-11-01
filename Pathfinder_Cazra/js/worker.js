@@ -150,13 +150,17 @@ onChangeParse(['bab', 'size'], values => {
 onChangeParse(['str_mod', 'dex_mod', 'con_mod', 'int_mod', 'wis_mod', 'cha_mod'], values => {
   getSectionIDs('repeating_attacks', ids => {
     _.each(ids, id => {
+      var prefix = 'repeating_attacks_' + id + '_attack';
       var repAbility = 'repeating_attacks_' + id + '_attack_ability';
 
-      parseAttrs([repAbility], attackValues => {
-        var repAbilityMod = 'repeating_attacks_' + id + '_attack_ability_mod';
-        var abilityMod = attackValues[repAbility] + '_mod';
+      var attrNames = _.map(['ability'], name => {
+        return prefix + '_' + name;
+      });
+      parseAttrs(attrNames, attackValues => {
+        var abilityModName = attackValues[repAbility] + '_mod';
+
         setAttrs({
-          [repAbilityMod]: values[abilityMod]
+          [prefix + '_ability_mod']: values[abilityModName]
         });
       });
     });
@@ -180,7 +184,6 @@ on('change:repeating_attacks', (evt) => {
       });
       attrNames = attrNames.concat(['str_mod', 'dex_mod', 'con_mod', 'int_mod', 'wis_mod', 'cha_mod']);
       parseAttrs(attrNames, values => {
-        var repAbilityMod = 'repeating_attacks_' + id + '_attack_ability_mod';
         var abilityModName = values[repAbility] + '_mod';
 
         setAttrs({
@@ -309,7 +312,7 @@ onChangeParse(['spell_dc_base'], values => {
 
 on('sheet:opened', () => {
   setAttrs({
-    character_sheet: 'Pathfinder_Simple v1.4.0'
+    character_sheet: 'Pathfinder_Simple v1.6.0'
   });
 
   forceUpdate([

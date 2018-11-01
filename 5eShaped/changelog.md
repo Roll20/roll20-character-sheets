@@ -11,6 +11,682 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 19.1.3
+
+### Bug fixes
+- [#766: Warlock spell slots not updating when level changed](https://bitbucket.org/mlenser/5eshaped/issues/766/warlock-spell-slots-not-updating-when)
+- [#767: Higher level spell queries are not updated as spells are expended](https://bitbucket.org/mlenser/5eshaped/issues/767/higher-level-spell-queries-are-not-updated)
+
+## 19.1.2
+
+### Bug fixes
+- [#758: New SRD Content cleanup code breaks lair actions and regional effects import from script](https://bitbucket.org/mlenser/5eshaped/issues/758/new-srd-content-cleanup-code-breaks-lair)
+- [#759: Race condition with updating actions on import](https://bitbucket.org/mlenser/5eshaped/issues/759/race-condition-with-updating-actions-on)
+- Fixed Goblin Spider parsing
+- [#761: Spellcasting trait parse has invalid destructuring usage](https://bitbucket.org/mlenser/5eshaped/issues/761/spellcasting-trait-parse-has-invalid)
+- [#765: Fix for #759 broke more stuff](https://bitbucket.org/mlenser/5eshaped/issues/765/fix-for-759-broke-more-stuff)
+
+## 19.1.1
+
+### Bug fixes
+- [#754: Incorrect assumption that all innate spellcasting groups will end with "each"](https://bitbucket.org/mlenser/5eshaped/issues/757/incorrect-assumption-that-all-innate)
+
+## 19.1.0
+
+### Features
+- The sheet now supports some newer script edge-case features such as Anubian’s stealth being higher in sand.
+
+### Bug fixes
+- [#752: NPC Average HP's not calculating properly](https://bitbucket.org/mlenser/5eshaped/issues/752/npc-average-hps-not-calculating-properly)
+
+## 19.0.0
+
+### Breaking Changes
+- Removed my custom classes (only one, called `Summoner`) and my psionic classes (`Psion` and `Soulknife`) from the sheet. If you have custom classes then use the custom name field for the class.
+
+### Features
+- Settings page cleaned up after latest Roll20 changes. It has also been reorganized to match the PC sheet sections (skills, saving throws, etc).
+- [#750: Always show NPC saving throws](https://bitbucket.org/mlenser/5eshaped/issues/750/always-show-npc-saving-throws)
+
+### Bug fixes
+- [#729: NPC skill proficiencies are lost during conversion from OGL sheet](https://bitbucket.org/mlenser/5eshaped/issues/729/npc-skill-proficiencies-are-lost-during)
+- NPC skills should never expand in to the right column now
+
+## 18.1.13
+
+### Bug fixes
+- [#738: Overlapping UI in NPC sheet](https://bitbucket.org/mlenser/5eshaped/issues/738/overlapping-ui-in-npc-sheet)
+
+## 18.1.12
+
+### Bug fixes
+- [#733: Class traits with damage do not check damage option by default](https://bitbucket.org/mlenser/5eshaped/issues/733/class-traits-with-damage-do-not-check)
+- [#743: Incorrect assumption about OGL HP format breaks some imports](https://bitbucket.org/mlenser/5eshaped/issues/743/incorrect-assumption-about-ogl-hp-format)
+- [#744: TypeError on OGL conversion](https://bitbucket.org/mlenser/5eshaped/issues/744/typeerror-on-ogl-conversion)
+- [#745: Consider not using npc_name from OGL to set character name](https://bitbucket.org/mlenser/5eshaped/issues/745/consider-not-using-npc_name-from-ogl-to)
+
+## 18.1.11
+
+### Bug fixes
+- [#728: Error message when using NPC actions](https://bitbucket.org/mlenser/5eshaped/issues/728/error-message-when-using-npc-actions)
+
+## 18.1.10
+
+### Bug fixes
+- Fix attachers for NPC actions and reactions. Closes [#726: NPC attachers do not trigger for Actions](https://bitbucket.org/mlenser/5eshaped/issues/726/npc-attachers-do-not-trigger-for-actions)
+
+## 18.1.9
+
+### Bug fixes
+- [#723: NPC skill parsing broken for skills with spaces in them](https://bitbucket.org/mlenser/5eshaped/issues/723/npc-skill-parsing-broken-for-skills-with)
+- [#724: Drag-and-drop for crossbow bolts freezes sheet, breaks future imports](https://bitbucket.org/mlenser/5eshaped/issues/724/drag-and-drop-for-crossbow-bolts-freezes)
+
+## 18.1.8
+
+### Bug fixes
+- [#717: Custom Coin Text Alignment](https://bitbucket.org/mlenser/5eshaped/issues/717/custom-coin-text-alignment)
+
+## 18.1.7
+
+### Bug fixes
+- Fixed all the new cases raised in [#714: Mordenkainen's Tome of Foes, seems like monster imports fail to get actions](https://bitbucket.org/mlenser/5eshaped/issues/714/mordenkainens-tome-of-foes-seems-like). With Vanakoji's testing this should handle every case it seems (besides some formatting issues that roll20 needs to fix).
+
+## 18.1.6
+
+### Bug fixes
+- Fixed error when modifying anything with a melee weapon caused by refactoring from yesterday.
+
+## 18.1.5
+
+### Bug fixes
+- Fixed all the new cases raised in [#714: Mordenkainen's Tome of Foes, seems like monster imports fail to get actions](https://bitbucket.org/mlenser/5eshaped/issues/714/mordenkainens-tome-of-foes-seems-like). This should fix the vast majority of Mordenkainen.
+
+## 18.1.4
+
+### Bug fixes
+- [#711: Modifiers section not changing attack bonus on display](https://bitbucket.org/mlenser/5eshaped/issues/711/modifiers-section-not-changing-attack)
+- Improved the method to only show NPC skills and saving throws. They show on the sheet and chat macros if they are proficient or if there are modifiers for that specific skill/saving throw.
+
+## 18.1.3
+
+### Bug fixes
+- [#714: Mordenkainen's Tome of Foes, seems like monster imports fail to get actions](https://bitbucket.org/mlenser/5eshaped/issues/714/mordenkainens-tome-of-foes-seems-like)
+
+## 18.1.2
+
+### Bug fixes
+- The spell macro now shows spells from spell level 1 and above.
+
+## 18.1.1
+
+### Bug fixes
+- `Currency` is now generated on upgrade for existing characters and current quantities, weight per coin, and gold equivalent values are upgraded.
+
+## 18.1.0
+
+### Features
+- `Currency` (previously `coins` or `coinage`) is now a repeating section. It defaults to having the 5 currencies of 5e, but their name, acronym, weight, value, and border style can be changed as desired. Additionally more currencies (gems, rocks, or any other currency) can be added as desired. The currency macro now outputs how much of each currency and a total value. Gold is the standard currency as it is in 5e, but that can be changed by changing the values of each currency. So for example the Silver Standard can be used by making Silver's value 1 and the other values as desired. Closes [#689: Silver Standard support](https://bitbucket.org/mlenser/5eshaped/issues/689/silver-standard-support)
+
+## 18.0.0
+
+### Breaking Changes
+This breaking change should be fully handled with the upgrade, but custom scripts may break as the roll template has changed. This will only impact existing roll template outputs and should only matter for those who want a well preserved chat record and for those who make custom macros (not recommended as the sheet should provide all that are needed).
+
+### Features
+- Added support for `spell points` to be called `sorcery`, `psi`, and `ki`. `mana` is already supported. Closes [#295](https://bitbucket.org/mlenser/5eshaped/issues/295/psi-points)
+- Spell points can be customized for each spell level. This will allow each player to set the cost of each level. This supports the UA mystic, allowing them to set level 1 spells to 1 psi, level 2 spells to 2 psi, and so forth.
+
+## 17.1.1
+
+### Bug Fixes
+* Added parsing to fix poor formatting of some Tome of Beasts creatures. Closes [#709: Tome of Beasts Monster imports not importing correctly](https://bitbucket.org/mlenser/5eshaped/issues/709/tome-of-beasts-monster-imports-not)
+
+## 17.1.0
+
+### Features
+* Added a myriad of attachers. Closes [#708: Add attacher functionality to NPC Actions](https://bitbucket.org/mlenser/5eshaped/issues/708/add-attacher-functionality-to-npc-actions)
+
+### Bug Fixes
+* [#707: D&D 5e (5eShaped) Brutal Critical error](https://bitbucket.org/mlenser/5eshaped/issues/707/d-d-5e-5eshaped-brutal-critical-error)
+
+## 17.0.6
+
+### Bug Fixes
+* [#697: NPC right column overlaps left column in edit mode](https://bitbucket.org/mlenser/5eshaped/issues/697/npc-right-column-overlaps-left-column-in)
+* [#704: Princes of the Apocalypse Module fails to convert creature attacks actions](https://bitbucket.org/mlenser/5eshaped/issues/704/princes-of-the-apocalypse-module-fails-to)
+
+## 17.0.5
+
+### Bug Fixes
+* [#693: Tooltips for carry capacity and push/drag cut off at default sheet size](https://bitbucket.org/mlenser/5eshaped/issues/693/tooltips-for-carry-capacity-and-push-drag)
+* [#691: Feature uses tied to modifiers aren't being read](https://bitbucket.org/mlenser/5eshaped/issues/691/feature-uses-tied-to-modifiers-arent-being)
+* [#692: Repeat attack / damage needs some point of reference](https://bitbucket.org/mlenser/5eshaped/issues/692/repeat-attack-damage-needs-some-point-of)
+
+## 17.0.4
+
+### Bug Fixes
+* [#686: Spell tooltips do not respect newlines in the spell's description](https://bitbucket.org/mlenser/5eshaped/issues/686/spell-tooltips-do-not-respect-newlines-in)
+* [#687: Attacks and Traits are blank when](https://bitbucket.org/mlenser/5eshaped/issues/687/attacks-and-traits-are-blank-when)
+
+## 17.0.3
+
+### Bug Fixes
+* Monsters imported from the script now correctly output their content. Closes [#682: Imported Actions/Traits don't send content to chat](https://bitbucket.org/mlenser/5eshaped/issues/682/imported-actions-traits-dont-send-content)
+* Skill rows that run out of room now cause the name to shrink better, primarily on firefox. Closes [#684: Formatting Skills error](https://bitbucket.org/mlenser/5eshaped/issues/684/formatting-skills-error)
+
+## 17.0.2
+
+### Bug Fixes
+* [#675: Warlock slots not generating](https://bitbucket.org/mlenser/5eshaped/issues/675/warlock-slots-not-generating-v-1701)
+* Spells known and spells chat macro now update when dragging a spell from the SRD. Closes [#677: Spells Macro Not Updating](https://bitbucket.org/mlenser/5eshaped/issues/677/spells-macro-not-updating)
+
+## 17.0.1
+
+### Bug Fixes
+* `Roll 2` now indicates to the user that it is a legacy feature that does not work with all sheet features.
+* [#672: coin weight calculation resulting in high decimal values](https://bitbucket.org/mlenser/5eshaped/issues/672/coin-weight-calculation-resulting-in-high)
+* Spells manually changed in any way resulted in an error which prevented the scripts from running properly. This has been fixed. Closes [#674: Adding custom spells does not output description to chat or use spell slot](https://bitbucket.org/mlenser/5eshaped/issues/674/adding-custom-spells-does-not-output)
+
+## 17.0.0
+
+### Breaking Changes
+* Spells now track the number of slots expended instead of the remaining slots. This aligns with the paper and OGL sheets. Upgrades should handle this change for you.
+* NPC saving throws and skills will only show proficient/expertise items while in presentation mode. Closes [#669: Don't generate skills by default that have no proficiency or expertise on NPC sheets](https://bitbucket.org/mlenser/5eshaped/issues/669/dont-generate-skills-by-default-that-have)
+
+### Features
+* Spell UI has been updated with bubbles for spell slots and new UI wrappers.
+* Spells now have tooltips to display the full contents of the spell. Closes [#374: Enable 'condense' toggling for spells on a more granular basis](https://bitbucket.org/mlenser/5eshaped/issues/374/enable-condense-toggling-for-spells-on-a)
+* NPC skills will now show in a grid layout in edit mode.
+* Falling to 0 hp now sets the unconscious condition. Gaining HP removes it. Closes [#3: Conditions](https://bitbucket.org/mlenser/5eshaped/issues/3/conditions)
+* Cleaned up the Stablock macro to translate the size of PCs/NPCs. Race will now show instead of type for PCs. Offense and utility added for PCs as well.
+* Settings page reorganized.
+
+### Bug Fixes
+* [#670: Not assigning a weight value to equipment completely breaks weight calculations](https://bitbucket.org/mlenser/5eshaped/issues/670/not-assigning-a-weight-value-to-equipment)
+
+## 16.1.2
+
+### Bug Fixes
+* [#572: Modifiers adding a second time on critical damage](https://bitbucket.org/mlenser/5eshaped/issues/572/modifiers-adding-a-second-time-on-critical)
+
+## 16.1.1
+
+### Bug Fixes
+* [#664: Spelling errors in translation.json](https://bitbucket.org/mlenser/5eshaped/issues/664/spelling-errors-in-translationjson)
+* [#663: Saving Throw Bonus Formatting Error](https://bitbucket.org/mlenser/5eshaped/issues/663/saving-throw-bonus-formatting-error)
+* Crit range is shown by default as turning it on wasn’t intuitive enough.
+
+## 16.1.0
+
+### Features
+* Shaped sheet can now process OGL spells from PC sheets or NPC sheets (only NPC sheets from the Curse of Strahd module and newer use this format for spells). Closes [#659: NPC Spells not converting from OGL to Shaped](https://bitbucket.org/mlenser/5eshaped/issues/659/npc-spells-not-converting-from-ogl-to)
+
+### UI Adjustments
+* The sheet is a bit wider now and no longer assumes my stylish CSS so it should fit on the default width (~888px depending on browser) without a horizontal scrollbar.
+* Firefox UI cleaned up. Closes [#661: Tie bar behind exhastion states not centered](https://bitbucket.org/mlenser/5eshaped/issues/661/tie-bar-behind-exhastion-states-not)
+
+## 16.0.0
+
+### Breaking Changes
+* Importing data from the compendium, script, or OGL content has been completely revamped to use the same system for as much as possible.
+
+### Features
+* [#656: Missing comma in Modifiers -> Saving throw](https://bitbucket.org/mlenser/5eshaped/issues/656/missing-comma-in-modifiers-saving-throw)
+* Conditions have been added.
+
+### Bug Fixes
+* [#654: Magic Missile](https://bitbucket.org/mlenser/5eshaped/issues/654/magic-missile)
+* New characters sheets will be created with edit mode enabled
+* [#655: OGL skills do not convert](https://bitbucket.org/mlenser/5eshaped/issues/655/ogl-skills-do-not-convert)
+* OGL conversion, Compendium drop, and Script import of monsters, spells, and items should be fully working (update the script to 12.0.0)
+  * A processing notification now shows while these items are processing, regardless of origin
+* [#38: Spell Save DC Not calculating properly in !shaped-spells](https://bitbucket.org/mlenser/5eshapedscript/issues/38/spell-save-dc-not-calculating-properly-in)
+* Weapons dropped on a NPC sheet are added as actions
+
+### UI Adjustments
+* Styled boxes have been added
+* Tabs renamed to "Character"/"NPC", "Spells", and the cog.
+* "Character" tab for PCs will now show the appearance and backstory details below the normal sheet
+* "All" option removed as it is now only useful for showing settings below other sheets which doesn't have much value
+* Repeating buttons restyled a bit
+* PC Core page column widths adjusted a bit
+* Font sizes adjusted to match the new UI
+* Passive skills moved to the core page and restyled
+
+## 15.7.4
+
+### Bug Fixes
+* Fix parsing of single quotes that I broke as part of 15.7.3
+
+## 15.7.3
+
+### Bug Fixes
+* [#652: Tome of Beasts characters have errors on import](https://bitbucket.org/mlenser/5eshaped/issues/652/tome-of-beasts-characters-have-errors-on). Tome of Beast format variations parsed away to the expected format.
+
+## 15.7.2
+
+### Bug Fixes
+* Fix attack and damage components caused by a rename of `attackTypeChanged`
+
+## 15.7.1
+
+### Bug Fixes
+* [#640: Carrying Capacity Not displayed](https://bitbucket.org/mlenser/5eshaped/issues/640/carrying-capacity-not-displayed). Also fixes carrying capacity not being updated when Strength changes and hit dice not updating on Constitution changes.
+* [#648: Spell Macro not showing Cantrips in chat](https://bitbucket.org/mlenser/5eshaped/issues/648/spell-macro-not-showing-cantrips-in-chat)
+* [#645: Modify state should revert when character sheet editing is turned off](https://bitbucket.org/mlenser/5eshaped/issues/645/modify-state-should-revert-when-character)
+* [#646: Unable to change Casting Stat for Compendium Imported Spells](https://bitbucket.org/mlenser/5eshaped/issues/646/unable-to-change-casting-stat-for)
+* Attacks will default to having the correct attack and damage ability modifier selected based on the section they are created from (Offense, Spell, etc).
+* A spell’s saving throw ability modifier can now be set to use no ability modifier.
+
+## 15.7.0
+
+### Features
+
+* `Mana` setting now replaces `Spell points` wording with `Mana`
+* `Advantage+` and `Disadvantage-` have been added to handle cases of rolling an extra dice for all the possible dice systems. With d20 for example `Advantage+` would be `3d20kh1`
+
+## 15.6.0
+
+### Features
+
+* Death saving throw output now supports `death_saving_throw_chances` by outputting X / 3 or X / 5. All custom death saving throw macros must include `{{death_saving_throw_chances=@{death_saving_throw_chances}}}`.
+
+## 15.5.9
+
+### Bug Fixes
+
+* [#633: Hit dice and level field not displaying properly for sheets from versions before 15.5.5](https://bitbucket.org/mlenser/5eshaped/issues/633/hit-dice-and-level-field-not-displaying)
+* [#631: Delay/No Response to using Short and Long Rest buttons](https://bitbucket.org/mlenser/5eshaped/issues/631/delay-no-response-to-using-short-and-long)
+
+## 15.5.8
+
+### Bug Fixes
+
+* [#621: Suggestion to add a blank magic school.](https://bitbucket.org/mlenser/5eshaped/issues/621/suggestion-to-add-a-blank-magic-school)
+* [#625: Changing caster type (full/half, etc) has no effect.](https://bitbucket.org/mlenser/5eshaped/issues/625/changing-caster-type-full-half-etc-has-no)
+* [#624: Spell Save DC Not Calculating Properly](https://bitbucket.org/mlenser/5eshaped/issues/624/spell-save-dc-not-calculating-properly)
+* Adjusted Hit dice to use the current amount for the query instead of the maximum. Along with solving the `base_dc` issues elsewhere it seems [#626: Monk HD not updating correctly](https://bitbucket.org/mlenser/5eshaped/issues/626/monk-hd-not-updating-correctly) is solved, but I'm unsure.
+
+## 15.5.7
+
+### Bug Fixes
+
+* [#27: Armor class does not import](https://bitbucket.org/mlenser/5eshapedscript/issues/27/armor-class-does-not-import)
+* Import of spells without an attack or save (Magic Missile) now properly sets the damage on by default. Closes [#618: Multiple NPC Spellcasting Issues](https://bitbucket.org/mlenser/5eshaped/issues/618/multiple-npc-spellcasting-issues)
+
+## 15.5.6
+
+### Bug Fixes
+
+* Large testing and fixing process which resolves many script issues when using version 11.3.2 of the script: [#15: Issues with actions on character import](https://bitbucket.org/mlenser/5eshapedscript/issues/15/issues-with-actions-on-character-import), [#16: NPC - API Import](https://bitbucket.org/mlenser/5eshapedscript/issues/16/npc-api-import), [#17: !shaped-expand-spells --all not working](https://bitbucket.org/mlenser/5eshapedscript/issues/17/shaped-expand-spells-all-not-working), and [#20: OGL Conversion: !shaped-update-character](https://bitbucket.org/mlenser/5eshapedscript/issues/20/ogl-conversion-shaped-update-character).
+
+## 15.5.5
+
+### Bug Fixes
+
+* [#611: Ammo weight not being tracked](https://bitbucket.org/mlenser/5eshaped/issues/611/ammo-weight-not-being-tracked)
+
+## 15.5.4
+
+### Bug Fixes
+
+* [#606: SRD Weapon drag incorrect](https://bitbucket.org/mlenser/5eshaped/issues/606/srd-weapon-drag-incorrect)
+* [#604: Actions issue upon monster import](https://bitbucket.org/mlenser/5eshaped/issues/604/actions-issue-upon-monster-import)
+* [#601: Racial Traits (Description and Slots Police)](https://bitbucket.org/mlenser/5eshaped/issues/601/racial-traits-description-and-slots-police)
+* [#602: When picking he psion spell components (Mental, Auditory, Visual etc.) the choice resets.](https://bitbucket.org/mlenser/5eshaped/issues/602/when-picking-he-psion-spell-components)
+* [#574: Every Monster Compendium Spear Multiplying](https://bitbucket.org/mlenser/5eshaped/issues/574/every-monster-compendium-spear-multiplying) NPC parsing of these has been turned off for now unless they come from the SRD. I'd like to have them work, but this is better than the sheet being overloaded. It looks like another change that roll20 made that steve mentioned. Blah.
+
+## 15.5.3
+
+### Bug Fixes
+
+* Actions should now work, mostly. I've checked the following types:
+  * Actions with an attack (Guiding Bolt)
+  * Actions with a saving throw (Fireball)
+  * Actions without an attack or saving throw(Magic Missile)
+  * Actions with a heal (Cure Wounds)
+
+## 15.5.2
+
+### Bug Fixes
+
+* [#598: HP display is broken](https://bitbucket.org/mlenser/5eshaped/issues/598/hp-display-is-broken)
+* Some of [#597: Actions issues](https://bitbucket.org/mlenser/5eshaped/issues/597/actions-issues)
+
+## 15.5.1
+
+### Bug Fixes
+
+* [#594: Ability Scores not updating and crashing the page.](https://bitbucket.org/mlenser/5eshaped/issues/594/ability-scores-not-updating-and-crashing)
+* A myriad of other bugs involved in the [Roll20 breaking change](https://app.roll20.net/forum/permalink/5498180/) in their API. The sheet is still very laggy and I could use significant help identifying issues.
+
+## 15.5.0
+
+### Features
+
+* [#578: Provide skill totals](https://bitbucket.org/mlenser/5eshaped/issues/578/provide-skill-totals) will now make the total of each skill available for other resources like scripts. The attribute will be named as the skill is, so `Perception`, `Athletics`, etc. It will be the total modifier (without any + or - sign).
+
+### Bug Fixes
+
+* [#579: Multiple erroring classes are added and cannot be deleted](https://bitbucket.org/mlenser/5eshaped/issues/579/multiple-erroring-classes-are-added-and). It should automatically populate spellcasting now as well. I remember reading something about a change to repeating sections from roll20. Perhaps that was the cause of this as this area hasn't been touched in a while - hard to say.
+
+## 15.4.0
+
+### Features
+
+* Cleaned up the styling around the heart as users were often confused what it meant:
+
+![alt text](http://i.imgur.com/0f8z8k1.jpg "Heart")
+
+### Bug Fixes
+
+* [#566: Automatically roll damage should still show the "Hit" and "Saving throw failure" buttons](https://bitbucket.org/mlenser/5eshaped/issues/566/automatically-roll-damage-should-still)
+
+## 15.3.0
+
+### Features
+
+* All repeating section rolling buttons should now use `roll` instead of words like `action`. For example: `%{repeating_action_ID_action}` is now `%{repeating_action_ID_roll}`. All old names will still work, but all documentaton will be updated to these new names so it is easier for users to understand.
+
+## 15.2.0
+
+### Features
+
+* Added some fields to the roll template to better support `!shaped-spells` and `!shaped-monsters` so that it sends less data.
+
+## 15.1.1
+
+### Bug Fixes
+
+* [#550: Modifier dice damage bugs critical damage](https://bitbucket.org/mlenser/5eshaped/issues/550/modifier-dice-damage-bugs-critical-damage)
+* [#549: Offense attacher displays on utility items](https://bitbucket.org/mlenser/5eshaped/issues/549/offense-attacher-displays-on-utility-items)
+* [#558: Stealth Disadvantage on Armour doesn't go away when not equipped](https://bitbucket.org/mlenser/5eshaped/issues/558/stealth-disadvantage-on-armour-doesnt-go)
+* [#555: Uses parsing of equipment has some bugs](https://bitbucket.org/mlenser/5eshaped/issues/555/uses-parsing-of-equipment-has-some-bugs)
+* Updated documentation link to the new wiki and added a link on the version (goes to changelog)
+
+## 15.1.0
+
+### Features
+
+* Alternate dice system of 2d10 and 3d6 can be used in place of a d20 now
+* Saving throws can now have either 3 or 5 chances
+* Added styling necessary for the script's new `!shaped` command
+
+## 15.0.2
+
+### Bug Fixes
+
+* [#539: "extra on crit" doesn't work on secondary damage](https://bitbucket.org/mlenser/5eshaped/issues/539/extra-on-crit-doesnt-work-on-secondary)
+* [#541: Spell uses are not recharged on a rest](https://bitbucket.org/mlenser/5eshaped/issues/541/spell-uses-are-not-recharged-on-a-rest)
+* [#540: Inventory quantities do not convert when upgrading from 11.3.3 to 15.0.1](https://bitbucket.org/mlenser/5eshaped/issues/540/inventory-quantities-do-not-convert-when) fixed as part of the 14.0.0 upgrade
+
+## 15.0.1
+
+### Bug Fixes
+
+* [#519: Ammo added to multiple items when trying to add it to 1 item](https://bitbucket.org/mlenser/5eshaped/issues/519/ammo-added-to-multiple-items-when-trying)
+
+## 15.0.0
+
+### Breaking Changes
+
+* `MELEE_OR_RANGED_WEAPON_ATTACK`s will now be treated as either melee or ranged and the parses will split them out to different weapons as I do for versatile. This is to ensure that the right damage bonuses are being used and ammo is being used properly. All existing items will remain working, but it'll parse all new items. Closes [#533: savage attacks half-orc](https://bitbucket.org/mlenser/5eshaped/issues/533/savage-attacks-half-orc)
+
+### Bug Fixes
+
+* Fixed Versatile parsing.
+* [#524: Modifiers not reading attribute macros 14.2.4](https://bitbucket.org/mlenser/5eshaped/issues/524/modifiers-not-reading-attribute-macros)
+* [#526: On the equipment tab the carrying capacity / weight area is justified oddly](https://bitbucket.org/mlenser/5eshaped/issues/526/on-the-equipment-tab-the-carrying-capacity)
+* [#520: Empty utility/offence macro shows last deleted entry](https://bitbucket.org/mlenser/5eshaped/issues/520/empty-utility-offence-macro-shows-last)
+* [#531: Formatting of spell title line gets distorted with recharge](https://bitbucket.org/mlenser/5eshaped/issues/531/formatting-of-spell-title-line-gets)
+
+## 14.3.0
+
+### Features
+
+* Added setting to recover hit dice on a short rest. It includes all, half, fourth, and none. Fourth is there to work with the DMG healing surge rule that allows 1/4th of hit dice to be recovered on a short rest.
+
+### Bug Fixes
+
+* All sections that use freeform have changed the way that they do in order to always ensure that freeform comes last even when there are asynchronous calls like finding ammo. Closes [#515: fx with target no longer works](https://bitbucket.org/mlenser/5eshaped/issues/515/fx-with-target-no-longer-works)
+
+## 14.2.4
+
+### Bug Fixes
+
+* Fixed a bug where prepared_matters_var was not set on new character. Old characters can re-toggle that value on the spells section to have the chat output correct. Closes. [#513: Spell preparation still bugged?](https://bitbucket.org/mlenser/5eshaped/issues/513/spell-preparation-still-bugged)
+* Rests will now output a message even if they have not recharged anything: "Nothing recharged". Closes [#514: Short rest doesn't output anything if there's nothing to recharge](https://bitbucket.org/mlenser/5eshaped/issues/514/short-rest-doesnt-output-anything-if)
+* [#512: Script-imported spell issues](https://bitbucket.org/mlenser/5eshaped/issues/512/companion-script-imported-spell-issues)
+
+## 14.2.3
+
+### Bug Fixes
+
+* The way that proficiency bonus updates all its dependencies has been changed. This should make it so that all of its dependencies only update when the proficiency bonus actually updates instead of it always updating when it could've possibly updated. Closes [#509: NPC prof bonus not updated when decreasing CR](https://bitbucket.org/mlenser/5eshaped/issues/509/npc-prof-bonus-not-updated-when-decreasing)
+* [#510: NPC caster level not being taken into account as appropriate without updates](https://bitbucket.org/mlenser/5eshaped/issues/510/npc-caster-level-not-being-taken-into)
+* [#508: Prepared spell highlighting on the sheet](https://bitbucket.org/mlenser/5eshaped/issues/508/prepared-spell-highlighting-on-the-sheet)
+
+## 14.2.2
+
+### Bug Fixes
+
+* [#506: Spells still broken and items in 14.2.1](https://bitbucket.org/mlenser/5eshaped/issues/506/spells-still-broken-and-items-in-1421)
+* [#507: Magical armor not adding the bonus to AC](https://bitbucket.org/mlenser/5eshaped/issues/507/magical-armor-not-adding-the-bonus-to-ac)
+
+## 14.2.1
+
+### Bug Fixes
+
+* [#504: New spells are broken due to a Javascript error](https://bitbucket.org/mlenser/5eshaped/issues/504/new-spells-are-broken-due-to-a-javascript)
+* Cleaned up my release cycle so that the process is streamlined and another developer could pick it up if that ever happens
+
+## 14.2.0
+
+### Features
+
+* Added a macro to output all resistances and immunities
+* Changing an attack type from melee to ranged or vice versa will now update the attack and damage abilities as appropriate. It can be changed afterwards if houserules are desired.
+* Changing an armor type will now update the dexterity as appropriate. It can be changed afterwards if houserules are desired. Closes [#468: Dex mod retained when upgrading armor to Plate Armor from Leather Armor](https://bitbucket.org/mlenser/5eshaped/issues/468/dex-mod-retained-when-upgrading-armor-to)
+* Acid, Alchemist's Fire, Antitoxin, Ball Bearings, Caltrops, Chalk, Healer's Kit, Holy Water, Ink, Oil, Perfume, Basic Poison, Rations, Iron Spikes, and Waterskin will be parsed to have uses when dragged from the SRD or typed in.
+* Items with charges (such as Wand of Magic Missiles) will be parsed to have uses and recharge manually
+* Added a "add common items" button to the equipment section to automatically add Backpack, Bedroll, Traveler's Clothes, Rations, Waterskin, Mess Kit, Tinderbox, and a Healer's Kit
+
+### Bug Fixes
+
+* Armor is never calculated on a per repeating item basis to avoid any AC calculation issues. Closes [#502: Armor not adding in 14.1.1](https://bitbucket.org/mlenser/5eshaped/issues/502/armor-not-adding-in-1411)
+
+## 14.1.1
+
+### Bug Fixes
+
+* `Offense` is included in the equipment tab again
+* [#499: Equipment weight does not recalculate](https://bitbucket.org/mlenser/5eshaped/issues/499/equipment-weight-does-not-recalculate)
+
+## 14.1.0
+
+### Features
+
+* `uses_max` will now only show if there is a recharge value. This makes items like potions and other consumables or even non-consumables much more logical sense. I have removed `uses_max` from all sections unless the recharge is set. This will capture the most common case of the `uses_max` being automatically added by me. The other case of an item being manually recharged will have its `uses_max` removed as well and that will need to be manually turned back on.
+* `weight_per_use` is a toggle, not a separate field. It has been upgraded.
+* Parsed ammo from SRD for all PHB weapons like Longbow, Dart, Net, Crossbow, Handaxe, Dagger, Javelin, etc. Weight is set appropriately. Closes [#8: Auto populate ammo when dragging ranged weapons from the SRD](https://bitbucket.org/mlenser/5eshaped/issues/8/auto-populate-ammo-when-dragging-ranged)
+
+### Bug Fixes
+
+* Weight for `Offense`, `Utility`, `Equipment`, and `Armor` will now update the total properly when an individual item is adjusted. Closes [#493: Weight Totals Incorrect](https://bitbucket.org/mlenser/5eshaped/issues/493/weight-totals-incorrect). An upgrade should force calculate the weight of each of these sections.
+* Any item with qty upgraded as part of 14.0.0 will no longer have its `weight` transferred to `weight_per_use`. Existing characters will need to manually adjust the values (and remove `uses_max`). Closes [#495: Item quantity/weight after upgrade to 14.0.x](https://bitbucket.org/mlenser/5eshaped/issues/495/item-quantity-weight-after-upgrade-to-140x).
+
+## 14.0.2
+
+### Bug Fixes
+
+* Healing now works for `Utility` items and Other Damage now works for `Offense`.
+* Potion of Healing and other items with a specific wording will now be parsed to heal.
+
+## 14.0.1
+
+### Bug Fixes
+
+* [#491: Ammo missing from Offense items](https://bitbucket.org/mlenser/5eshaped/issues/491/ammo-missing-from-offense-items)
+* Completely revamped hit dice to handle an edge case of 3 or more classes including 7 different hit dice in one character while using the "Half" recovery default rule. Closes [#489: Long Rest button doesn't recover hit dice properly](https://bitbucket.org/mlenser/5eshaped/issues/489/long-rest-button-doesnt-recover-hit-dice)
+
+## 14.0.0
+
+### Breaking Changes
+
+*There are several breaking changes with regards to the script in this version. See [Ammo qty renamed to "uses"](https://github.com/symposion/roll20-shaped-scripts/issues/489) and [Attacks have been renamed "Offense"](https://github.com/symposion/roll20-shaped-scripts/issues/491). Meaning ammo will likely not auto subtract until it is fixed as well as the attacks token action needing to be updated to offense.*
+
+* qty has been removed everywhere on the sheet including ammo which may break ammo reduction. I have upgraded qty for ammo and equipment, but not attacks.
+* Attacks have been renamed `Offense` and they no longer require an attack. `Utility` has been added below `Offense` and it contains healing and content. In some upcoming versions I will add some SRD importing data to utility. Closes [#168: Expand Equipment](https://bitbucket.org/mlenser/5eshaped/issues/168/expand-equipment)
+* Quick removed from equipment and armor. Armor never needed it and equipment only needed it because the utility section didn't exist.
+* passive skills are now named `passive_SKILLNAME`. For example: `passive_perception`.
+
+### Features
+
+* Potions will now automatically add uses and base their weight on uses
+* [#375: Spell uses](https://bitbucket.org/mlenser/5eshaped/issues/375/spell-uses), though they are not editable in presentation mode and the script needs to add functionality to support them
+* [#483: Skill list sorting for different languages](https://bitbucket.org/mlenser/5eshaped/issues/483/skill-list-sorting-for-different-languages)
+
+## 13.0.1
+
+### Bug Fixes
+
+* Fixed javascript errors that occur on new characters
+* [#488: Initiative modifier transferred incompletely on upgrade](https://bitbucket.org/mlenser/5eshaped/issues/488/initiative-modifier-transferred)
+* [#487: Upon upgrade, Light Armor loses its type](https://bitbucket.org/mlenser/5eshaped/issues/487/upon-upgrade-light-armor-loses-its-type)
+* [#486: Modifiers: Ability checks double bonus from ability for passive](https://bitbucket.org/mlenser/5eshaped/issues/486/modifiers-ability-checks-double-bonus-from)
+* Initiative second ability moved to Modifiers and upgraded
+* [#485: Skill modifier and initiative modifier dice does not apply](https://bitbucket.org/mlenser/5eshaped/issues/485/skill-modifier-and-initiative-modifier)
+
+## 13.0.0
+
+### Breaking Changes
+
+* Bonuses for ability scores, ability checks, initiative, saving throws, and ***skills*** have been moved to the `Modifiers` section. Closes [#478: Ability modifier for specific skills?](https://bitbucket.org/mlenser/5eshaped/issues/478/ability-modifier-for-specific-skills) and opens the door to doing [#59: Make attachers work for skills](https://bitbucket.org/mlenser/5eshaped/issues/59/make-attachers-work-for-skills) in the same way.
+* All repeating section macros will now be ordered based on the order that is shown on the sheet. Closes [#185: Regenerate Repeating Section macros when order being changed](https://bitbucket.org/mlenser/5eshaped/issues/185/regenerate-repeating-section-macros-when)
+
+### Bug Fixes
+
+* [#482: "Attack:" should be "Roll:"](https://bitbucket.org/mlenser/5eshaped/issues/482/attack-should-be-roll)
+* [#480: Attack and damage modifiers don't apply to spells](https://bitbucket.org/mlenser/5eshaped/issues/480/attack-and-damage-modifiers-dont-apply-to)
+* Hit points heart is refactored to no longer use Roll20's font to create the heart as it didn't render correctly on iOS.
+* [#477: Ability modifier does not reliably toggle](https://bitbucket.org/mlenser/5eshaped/issues/477/ability-modifier-does-not-reliably-toggle)
+
+## 12.0.4
+
+### Bug Fixes
+
+* Styling cleanups
+* Modifiers now toggle the section on upgrade from the old "Bonuses & Penalties".
+
+## 12.0.3
+
+### Bug Fixes
+
+* [#472: Ability check addition in modifiers doesn't seem to add to anything](https://bitbucket.org/mlenser/5eshaped/issues/472/ability-check-addition-in-modifiers-doesnt)
+* [#471: Extra 0 (or number) on ability scores](https://bitbucket.org/mlenser/5eshaped/issues/471/extra-0-or-number-on-ability-scores)
+* [#475: Statblock macro displays unmodified Ability scores](https://bitbucket.org/mlenser/5eshaped/issues/475/statblock-macro-displays-unmodified)
+* [#476: Modifiers: check boxes inside the modifier not honored](https://bitbucket.org/mlenser/5eshaped/issues/476/modifiers-check-boxes-inside-the-modifier)
+* [#461: Long Rest does not do Multiclass Hit Dice correctly](https://bitbucket.org/mlenser/5eshaped/issues/461/long-rest-does-not-do-multiclass-hit-dice)
+* [#473: Spell Repeat does not work unless the spell can be cast at a higher level](https://bitbucket.org/mlenser/5eshaped/issues/473/spell-repeat-does-not-work-unless-the)
+
+## 12.0.2
+
+### Bug Fixes
+
+* [#469: Modifiers: AC not being added](https://bitbucket.org/mlenser/5eshaped/issues/469/modifiers-ac-not-being-added)
+* Parse attack type from SRD after changing the way they are stored to translations.
+* Parsed Melee or Ranged Weapon attack for weapons like dagger.
+* [#470: Modifiers: Ability Score does nothing](https://bitbucket.org/mlenser/5eshaped/issues/470/modifiers-ability-score-does-nothing)
+* [#467: Multiple modifiers of the same type cause "double plus" on rolls, making the rolls 0](https://bitbucket.org/mlenser/5eshaped/issues/467/multiple-modifiers-of-the-same-type-cause)
+* [#462: Spell repeat button with no slots remaining](https://bitbucket.org/mlenser/5eshaped/issues/462/spell-repeat-button-with-no-slots)
+
+## 12.0.1
+
+### Bug Fixes
+
+* [#466: AC values wrong](https://bitbucket.org/mlenser/5eshaped/issues/466/ac-values-wrong)
+
+## 12.0.0
+
+### Breaking Changes
+
+* Modifiers have replaced global bonuses. Modifiers are much more expressive:
+
+![alt text](http://i.imgur.com/16kXDWe.png "Modifiers")
+
+### Features
+
+* The defense and equipment section's styling has been revamped to more closely match the system used by Attacks, Actions, Class Features, etc.
+* Items in the defense section can now handle unarmored defense. This and the modifiers expansion closes [#367: Add back "other" armor type that doesn't do any calculations](https://bitbucket.org/mlenser/5eshaped/issues/367/add-back-other-armor-type-that-doesnt-do)
+
+![alt text](http://i.imgur.com/7cZdsjt.png "New armor")
+
+* Removed Expand/Contract in favor of a tab for "Spells", "Equipment", and "Features". In technical implementation these are showing the sections on the core page in an expanded way.
+* Added an output toggle to the navigation which allows for quick whispering of abilities, spells, attacks, etc. Closes [#446: Easier method to output a roll to GM](https://bitbucket.org/mlenser/5eshaped/issues/446/easier-method-to-output-a-roll-to-gm)
+
+![alt text](http://i.imgur.com/HjDx2Jf.png "New nav")
+
+### Bug Fixes
+
+* Refactored edit mode detection to use the similar value="1" that I use elsewhere. We'll see if this has any impact on the issue that some people have with it.
+* Repeat for spells now correctly hides the content (seems there may have been a change on roll20's end that broke this).
+* [#457: Hitpoint output adding 0 to end of current HP](https://bitbucket.org/mlenser/5eshaped/issues/457/hitpoint-output-adding-0-to-end-of-current)
+* [#458: Issue with Spiritual Weapon Higher Level Dice](https://bitbucket.org/mlenser/5eshaped/issues/458/issue-with-spiritual-weapon-higher-level)
+* [#355: Reduced number of skills causes overlap between stats and damage resistances section](https://bitbucket.org/mlenser/5eshaped/issues/355/reduced-number-of-skills-causes-overlap)
+
+## 11.6.0
+
+### UI Changes
+
+* Senses are now in the first row like speeds.
+* Both speeds and senses have a toggle to show the "other" speeds/senses. The defaults shown are "Speed" and "Darkvision".
+* Temp hp and hit point maximum reduced now default to 0.
+* Hit point divider is now a straight line.
+
+### Bug Fixes
+
+* [#450: Missing space between Spell Level and Spell School](https://bitbucket.org/mlenser/5eshaped/issues/450/missing-space-between-spell-level-and)
+
+## 11.5.0
+
+### UI Changes
+
+* Conditions have been hidden from the sheet as their current setup has never really been fully supported.
+* Hit points have been moved to after speed to better match the paper sheet. Temporary hit points and hit point maximum reduced have been moved inside the heart.
+* Burrow, Climb, Fly, and Swim have been moved to the first line of the core page for better visibility. They only show in presentation mode when they have content.
+
+![alt text](http://i.imgur.com/AXgeFlr.png "new core")
+![alt text](http://i.imgur.com/JBBdhdo.png "new core fly")
+![alt text](http://i.imgur.com/q2iCzCX.png "new core edit")
+
+
+### Bug Fixes
+
+* Fixed a config for the script. See the first item at [the script's 9.1.0 release](https://app.roll20.net/forum/permalink/4912230/)
+
+## 11.4.1
+
+### Bug Fixes
+
+* [#442: Hit Dice should restore a minimum of 1 when using "half" recovery](#442: Hit Dice should restore a minimum of 1 when using "half" recovery)
+
+## 11.4.0
+
+### Features
+
+* Added a second ability to initiative for archetypes that allow you to add a second ability modifier to initiative.
+* Attack type "Ranged Spell Attack" or "Melee Weapon Attack" is now a link to an attack/action/etc's attack so it can be repeated.
+
+### UI Changes
+
+* "Save failure" now reads as "Saving throw failure". Same for success.
+
+### Bug Fixes
+
+* [#441: global damage bonus not being applied](https://bitbucket.org/mlenser/5eshaped/issues/441/global-damage-bonus-not-being-applied)
+* [#437: Settings > House Rules > HPs recovered on long rest value doesn't stick](https://bitbucket.org/mlenser/5eshaped/issues/437/settings-house-rules-hps-recovered-on-long)
+* [#444: Elder Brain Lair Actions don't import](https://bitbucket.org/mlenser/5eshaped/issues/444/elder-brain-lair-actions-dont-import)
+
 ## 11.3.3
 
 ### Bug Fixes
@@ -94,7 +770,7 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 
 * [#391: Other second damage not in the blue damage area of the template](https://bitbucket.org/mlenser/5eshaped/issues/391/other-second-damage-not-in-the-blue-damage)
 
-### UI Change
+### UI Changes
 
 * Styling for the import message
 * Styling for !shaped-config
@@ -103,15 +779,15 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 
 ### Bug Fixes
 
+### UI Changes
+
+* [#207: second damage roll template](https://bitbucket.org/mlenser/5eshaped/issues/207/second-damage-roll-template)
+
 * Added default higher level queries
 * A spell changing to another level now ensures that the filter for that level is turned on.
 * Freeform is now at the end of repeats as well. Referencing [#379: Spell repeat does not work with freeform if there is a new line in freeform](https://bitbucket.org/mlenser/5eshaped/issues/379/spell-repeat-does-not-work-with-freeform)
 * [#388: Click to roll damage does not work if the output is from the shaped chat macros](https://bitbucket.org/mlenser/5eshaped/issues/388/click-to-roll-damage-does-not-work-if-the)
 * [#389: Click to roll damage cannot determine a crit on attack](https://bitbucket.org/mlenser/5eshaped/issues/389/click-to-roll-damage-cannot-determine-a)
-
-### UI Change
-
-* [#207: second damage roll template](https://bitbucket.org/mlenser/5eshaped/issues/207/second-damage-roll-template)
 
 ## 11.0.0
 
