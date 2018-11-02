@@ -3,7 +3,7 @@
 
 Any improvements to the sheet are welcome.
 
-## [Changelog](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Weaverdice/CHANGELOG-Weaverdice.md)
+## [Changelog](https://github.com/Roll20/roll20-character-sheets/blob/master/Weaverdice/CHANGELOG-Weaverdice.md)
 
 ## Possible future improvements:
 
@@ -27,7 +27,6 @@ Resources | Link
 
 Community | Link
 ------- | ---------------
-
 **IRC-channel** | https://kiwiirc.com/client/irc.parahumans.net/#weaverdice
 **Worm Web serial:** | https://parahumans.wordpress.com/
-**Sureddit:** | https://www.reddit.com/r/Weaverdice/
+**Subreddit:** | https://www.reddit.com/r/Weaverdice/
