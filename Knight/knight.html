@@ -2844,15 +2844,17 @@
 	<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Knight/knightLogo.png" class="logo" width="350" height="49">
 	<div class="topLine">
 		<div class="selector">
-			<input type="checkbox" name="attr_fichePNJ" class="4waybox hidden" value="3" />
+			<input type="checkbox" name="attr_fichePNJ" class="4waybox hidden" value="4" />
 			<input type="radio" name="attr_fichePNJ" class="4waybox" value="0" title="Fiche PJ" checked />
 			<input type="radio" name="attr_fichePNJ" class="4waybox" value="1" title="Fiche PNJ" />
 			<input type="radio" name="attr_fichePNJ" class="4waybox" value="2" title="Fiche Creature" />
 			<input type="radio" name="attr_fichePNJ" class="4waybox" value="3" title="Fiche Bande" />
+			<input type="radio" name="attr_fichePNJ" class="4waybox" value="4" title="Fiche Vehicule" />
 			<span title="Fiche PJ">Fiche PJ</span>
 			<span title="Fiche PNJ">Fiche PNJ</span>
 			<span title="Fiche Creature">Fiche Créature</span>
 			<span title="Fiche Bande">Fiche Bande</span>
+			<span title="Fiche Vehicule">Fiche Véhicule</span>
 		</div>
 		<label class="sheet-settings-checkbox">
 			<input name="attr_show_settings" value="1" type="checkbox">
@@ -2871,7 +2873,7 @@
 				</select>
 			</label>
 		</div>
-		<div>
+		<div class="fichePJ fichePNJ ficheBande ficheCreature">
 			<label>
 				<span>Afficher lors d'un jet :</span> 
 				<select name="attr_name">
@@ -2904,6 +2906,12 @@
 				<span>Inclure un onglet pour incarner l'IA d'un autre joueur.</span> 
 			</label>
 		</div>
+		<div class="fichePJ">
+			<label>
+				<input type="checkbox" name="attr_tabVehicule" value="1">
+				<span>Inclure un onglet pour gérer le véhicule.</span> 
+			</label>
+		</div>
 		<div class="fichePNJ">
 			<label>
 				<input type="checkbox" name="attr_tabModule" value="1">
@@ -2921,6 +2929,7 @@
 	<input type="hidden" name="attr_tabCapaciteHeroique" class="capaciteHeroique heroisme" value="0">
 	<input type="hidden" name="attr_tabIA" class="IA" value="0">
 	<input type="hidden" name="attr_tabIAI" class="IAI" value="0">
+	<input type="hidden" name="attr_tabVehicule" class="vehicule" value="0">
 	<input type="hidden" name="attr_tabModule" class="Modules" value="0">
 	<input type="hidden" name="attr_capaciteFanMade" class="fanMade" value="0">
 	<input type="hidden" name="attr_armure" class="armureListe" value="sans" />
@@ -2970,10 +2979,12 @@
 	<input type="hidden" name="attr_bonusDefense" value="0" readonly />
 	
 	<div class="menu buttonContainerFlexStart">
-		<label>
-			<input type="radio" name="attr_tab" value="1" checked="checked">
-			<span title="Dossier"></span>
-		</label>
+		<div class="fichePJ fichePNJ ficheCreature ficheBande">
+			<label>
+				<input type="radio" name="attr_tab" value="1" checked="checked">
+				<span title="Dossier"></span>
+			</label>
+		</div>
 		<div class="fichePJ fichePNJ ficheCreature ficheBande">
 			<label>
 				<input type="radio" name="attr_tab" value="2" />
@@ -3021,6 +3032,18 @@
 			<label class="limiteArmure heroisme">
 				<input type="radio" name="attr_tab" value="8" />
 				<span title="Héroïsme"></span>
+			</label>
+		</div>
+		<div class="fichePJ ficheVehicule">
+			<label class="limiteArmure vehicule">
+				<input type="radio" name="attr_tab" value="10" />
+				<span title="Véhicule"></span>
+			</label>
+		</div>
+		<div class="ficheVehicule">
+			<label class="limiteArmure vehicule">
+				<input type="radio" name="attr_tab" value="11" />
+				<span title="Equipage"></span>
 			</label>
 		</div>
 	</div>
@@ -3099,52 +3122,52 @@
 					</div>
 					
 					<div class="mainBlock Separation">
-					<div>
-						<h4 class="titre">Bonus/Malus aux Jets</h4>
-						<input type="number" name="attr_jetModifDes" class="center" value="0" />
+						<div>
+							<h4 class="titre">Bonus/Malus aux Jets</h4>
+							<input type="number" name="attr_jetModifDes" class="center" value="0" />
+						</div>
+						<div>
+							<h4 class="titre bouton">Jet
+								<button name="attr_jetBase" type="roll" class="boutonBase" value="@{jetGM} &{template:simple} {{Nom=@{name}}}  @{caracteristique1} @{jetModifDes}+ @{caracteristique2} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} @{rogueGhost} {{taille=[[@{barbarianGoliath}]]}} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}}" />
+							</h4>
+							<select name="attr_caracteristique1" class="textCenter">
+								<option value="{{bonusWarrOD1=[[0]]}} {{bonusBarb1=[[0]]}}  {{OD1=[[0]]}} {{jet=[[ {[[{0+" selected></option>
+								<option value="{{carac1=Déplacement}} {{bonusWarrOD1=[[@{warriorSoldierA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{deplOD}]]}} {{jet=[[ {[[{@{deplacement}+">Déplacement</option>
+								<option value="{{carac1=Force}} {{bonusWarrOD1=[[@{warriorSoldierA}]]}} {{bonusBarb1=[[@{barbarianGoliath}]]}} {{OD1=[[@{forOD}]]}} {{jet=[[ {[[{@{force}+">Force</option>
+								<option value="{{carac1=Endurance}} {{bonusWarrOD1=[[@{warriorSoldierA}]]}} {{bonusBarb1=[[@{barbarianGoliath}]]}} {{OD1=[[@{endOD}]]}} {{jet=[[ {[[{@{endurance}+">Endurance</option>
+								<option value="{{carac1=Hargne}} {{bonusWarrOD1=[[@{warriorHunterA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{hargneOD}]]}} {{jet=[[ {[[{@{hargne}+">Hargne</option>
+								<option value="{{carac1=Combat}} {{bonusWarrOD1=[[@{warriorHunterA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{combOD}]]}} {{jet=[[ {[[{@{combat}+">Combat</option>
+								<option value="{{carac1=Instinct}} {{bonusWarrOD1=[[@{warriorHunterA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{instOD}]]}} {{jet=[[ {[[{@{instinct}+">Instinct</option>
+								<option value="{{carac1=Tir}} {{bonusWarrOD1=[[@{warriorScholarA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{tirOD}]]}} {{jet=[[ {[[{@{tir}+">Tir</option>
+								<option value="{{carac1=Savoir}} {{bonusWarrOD1=[[@{warriorScholarA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{savoirOD}]]}} {{jet=[[ {[[{@{savoir}+">Savoir</option>
+								<option value="{{carac1=Technique}} {{bonusWarrOD1=[[@{warriorScholarA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{technOD}]]}} {{jet=[[ {[[{@{technique}+">Technique</option>
+								<option value="{{carac1=Aura}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+">Aura</option>
+								<option value="{{carac1=Parole}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{paroleOD}]]}} {{jet=[[ {[[{@{parole}+">Parole</option>
+								<option value="{{carac1=Sang-Froid}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{sfOD}]]}} {{jet=[[ {[[{@{sf}+">Sang-Froid</option>
+								<option value="{{carac1=Discrétion}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{discrOD}]]}} {{jet=[[ {[[{@{discretion}+">Discrétion</option>
+								<option value="{{carac1=Perception}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{percOD}]]}} {{jet=[[ {[[{@{perception}+">Perception</option>
+								<option value="{{carac1=Dextérité}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{dextOD}]]}} {{jet=[[ {[[{@{dexterite}+">Dextérité</option>
+							</select>
+							<select name="attr_caracteristique2" class="textCenter">
+								<option value="0, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[0]]}} {{bonusWarrOD2=[[0]]}} {{bonusBarb2=[[0]]}}" selected></option>
+								<option value="@{deplacement}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{deplOD}]]}} {{bonusWarrOD2=[[@{warriorSoldierA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Déplacement}}">Déplacement</option>
+								<option value="@{force}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{forOD}]]}} {{bonusWarrOD2=[[@{warriorSoldierA}]]}} {{bonusBarb2=[[@{barbarianGoliath}]]}} {{carac2=Force}}">Force</option>
+								<option value="@{endurance}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{endOD}]]}} {{bonusWarrOD2=[[@{warriorSoldierA}]]}} {{bonusBarb2=[[@{barbarianGoliath}]]}} {{carac2=Endurance}}">Endurance</option>
+								<option value="@{hargne}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{hargneOD}]]}} {{bonusWarrOD2=[[@{warriorHunterA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Hargne}}">Hargne</option>
+								<option value="@{combat}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{combOD}]]}} {{bonusWarrOD2=[[@{warriorHunterA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Combat}}">Combat</option>
+								<option value="@{instinct}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{instOD}]]}} {{bonusWarrOD2=[[@{warriorHunterA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Instinct}}">Instinct</option>
+								<option value="@{tir}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{tirOD}]]}} {{bonusWarrOD2=[[@{warriorScholarA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Tir}}">Tir</option>
+								<option value="@{savoir}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{savoirOD}]]}} {{bonusWarrOD2=[[@{warriorScholarA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Savoir}}">Savoir</option>
+								<option value="@{technique}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{technOD}]]}} {{bonusWarrOD2=[[@{warriorScholarA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Technique}}">Technique</option>
+								<option value="@{aura}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{auraOD}]]}} {{bonusWarrOD2=[[@{warriorHeraldA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Aura}}">Aura</option>
+								<option value="@{parole}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{paroleOD}]]}} {{bonusWarrOD2=[[@{warriorHeraldA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Parole}}">Parole</option>
+								<option value="@{sf}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{sfOD}]]}} {{bonusWarrOD2=[[@{warriorHeraldA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Sang-Froid}}">Sang-Froid</option>
+								<option value="@{discretion}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{discrOD}]]}} {{bonusWarrOD2=[[@{warriorScoutA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Discrétion}}">Discrétion</option>
+								<option value="@{perception}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{percOD}]]}} {{bonusWarrOD2=[[@{warriorScoutA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Perception}}">Perception</option>
+								<option value="@{dexterite}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{dextOD}]]}} {{bonusWarrOD2=[[@{warriorScoutA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Dextérité}}">Dextérité</option>
+							</select>
+						</div>
 					</div>
-					<div>
-						<h4 class="titre bouton">Jet
-							<button name="attr_jetBase" type="roll" class="boutonBase" value="@{jetGM} &{template:simple} {{Nom=@{name}}}  @{caracteristique1} @{jetModifDes}+ @{caracteristique2} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} @{rogueGhost} {{taille=[[@{barbarianGoliath}]]}} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}}" />
-						</h4>
-						<select name="attr_caracteristique1" class="textCenter">
-							<option value="{{bonusWarrOD1=[[0]]}} {{bonusBarb1=[[0]]}}  {{OD1=[[0]]}} {{jet=[[ {[[{0+" selected></option>
-							<option value="{{carac1=Déplacement}} {{bonusWarrOD1=[[@{warriorSoldierA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{deplOD}]]}} {{jet=[[ {[[{@{deplacement}+">Déplacement</option>
-							<option value="{{carac1=Force}} {{bonusWarrOD1=[[@{warriorSoldierA}]]}} {{bonusBarb1=[[@{barbarianGoliath}]]}} {{OD1=[[@{forOD}]]}} {{jet=[[ {[[{@{force}+">Force</option>
-							<option value="{{carac1=Endurance}} {{bonusWarrOD1=[[@{warriorSoldierA}]]}} {{bonusBarb1=[[@{barbarianGoliath}]]}} {{OD1=[[@{endOD}]]}} {{jet=[[ {[[{@{endurance}+">Endurance</option>
-							<option value="{{carac1=Hargne}} {{bonusWarrOD1=[[@{warriorHunterA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{hargneOD}]]}} {{jet=[[ {[[{@{hargne}+">Hargne</option>
-							<option value="{{carac1=Combat}} {{bonusWarrOD1=[[@{warriorHunterA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{combOD}]]}} {{jet=[[ {[[{@{combat}+">Combat</option>
-							<option value="{{carac1=Instinct}} {{bonusWarrOD1=[[@{warriorHunterA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{instOD}]]}} {{jet=[[ {[[{@{instinct}+">Instinct</option>
-							<option value="{{carac1=Tir}} {{bonusWarrOD1=[[@{warriorScholarA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{tirOD}]]}} {{jet=[[ {[[{@{tir}+">Tir</option>
-							<option value="{{carac1=Savoir}} {{bonusWarrOD1=[[@{warriorScholarA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{savoirOD}]]}} {{jet=[[ {[[{@{savoir}+">Savoir</option>
-							<option value="{{carac1=Technique}} {{bonusWarrOD1=[[@{warriorScholarA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{technOD}]]}} {{jet=[[ {[[{@{technique}+">Technique</option>
-							<option value="{{carac1=Aura}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+">Aura</option>
-							<option value="{{carac1=Parole}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{paroleOD}]]}} {{jet=[[ {[[{@{parole}+">Parole</option>
-							<option value="{{carac1=Sang-Froid}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{sfOD}]]}} {{jet=[[ {[[{@{sf}+">Sang-Froid</option>
-							<option value="{{carac1=Discrétion}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{discrOD}]]}} {{jet=[[ {[[{@{discretion}+">Discrétion</option>
-							<option value="{{carac1=Perception}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{percOD}]]}} {{jet=[[ {[[{@{perception}+">Perception</option>
-							<option value="{{carac1=Dextérité}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{dextOD}]]}} {{jet=[[ {[[{@{dexterite}+">Dextérité</option>
-						</select>
-						<select name="attr_caracteristique2" class="textCenter">
-							<option value="0, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[0]]}} {{bonusWarrOD2=[[0]]}} {{bonusBarb2=[[0]]}}" selected></option>
-							<option value="@{deplacement}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{deplOD}]]}} {{bonusWarrOD2=[[@{warriorSoldierA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Déplacement}}">Déplacement</option>
-							<option value="@{force}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{forOD}]]}} {{bonusWarrOD2=[[@{warriorSoldierA}]]}} {{bonusBarb2=[[@{barbarianGoliath}]]}} {{carac2=Force}}">Force</option>
-							<option value="@{endurance}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{endOD}]]}} {{bonusWarrOD2=[[@{warriorSoldierA}]]}} {{bonusBarb2=[[@{barbarianGoliath}]]}} {{carac2=Endurance}}">Endurance</option>
-							<option value="@{hargne}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{hargneOD}]]}} {{bonusWarrOD2=[[@{warriorHunterA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Hargne}}">Hargne</option>
-							<option value="@{combat}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{combOD}]]}} {{bonusWarrOD2=[[@{warriorHunterA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Combat}}">Combat</option>
-							<option value="@{instinct}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{instOD}]]}} {{bonusWarrOD2=[[@{warriorHunterA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Instinct}}">Instinct</option>
-							<option value="@{tir}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{tirOD}]]}} {{bonusWarrOD2=[[@{warriorScholarA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Tir}}">Tir</option>
-							<option value="@{savoir}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{savoirOD}]]}} {{bonusWarrOD2=[[@{warriorScholarA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Savoir}}">Savoir</option>
-							<option value="@{technique}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{technOD}]]}} {{bonusWarrOD2=[[@{warriorScholarA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Technique}}">Technique</option>
-							<option value="@{aura}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{auraOD}]]}} {{bonusWarrOD2=[[@{warriorHeraldA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Aura}}">Aura</option>
-							<option value="@{parole}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{paroleOD}]]}} {{bonusWarrOD2=[[@{warriorHeraldA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Parole}}">Parole</option>
-							<option value="@{sf}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{sfOD}]]}} {{bonusWarrOD2=[[@{warriorHeraldA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Sang-Froid}}">Sang-Froid</option>
-							<option value="@{discretion}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{discrOD}]]}} {{bonusWarrOD2=[[@{warriorScoutA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Discrétion}}">Discrétion</option>
-							<option value="@{perception}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{percOD}]]}} {{bonusWarrOD2=[[@{warriorScoutA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Perception}}">Perception</option>
-							<option value="@{dexterite}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{dextOD}]]}} {{bonusWarrOD2=[[@{warriorScoutA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Dextérité}}">Dextérité</option>
-						</select>
-					</div>
-				</div>
 
 					<div class="limiteArmure Guardian Barbarian Bard Druid Monk Necromancer Paladin Priest Psion Ranger Rogue Sorcerer Warmaster Warrior Wizard mainBlock4WayCol1Large adjustement5px Separation blockArmure">
 						<div>
@@ -14737,6 +14760,1027 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 		</div>
 	</div>
 
+	<div class="tab-content tab10 Vehicule">
+		<div class='sheet-2colrow'>
+			<div class="sheet-col">
+				<div class="fichePJ">
+					<div class="mainBlock Separation">
+						<div>
+							<h4 class="titre">Véhicule</h4>
+						</div>
+						<div>
+							<h4>Véhicule</h4>
+							<input type="text" class="left" name="attr_vehicule_name" value="Moto Steed" />
+						</div>
+						<div>
+							<h4>Manoeuvrabilité</h4>
+							<input type="number" class="textCenter" name="attr_vehicule_manoeuvrabilite" value="3" />
+						</div>
+						<div>
+							<h4>Vitesse</h4>
+							<input type="number" class="textCenter" name="attr_vehicule_vitesse" value="3" />
+						</div>
+						<div>
+							<h4>Équipage</h4>
+							<input type="number" class="textCenter" name="attr_vehicule_equipage" value="1" />
+						</div>
+					</div>
+					<div class="mainBlock Separation">
+						<div>
+							<h4 class="titre">Bonus/Malus aux Jets</h4>
+							<input type="number" name="attr_jetModifDes" class="center" value="0" />
+						</div>
+						<div>
+							<h4 class="titre bouton">Pilotage
+								<button name="attr_jetPilotage" type="roll" class="boutonBase" value="@{jetGM} &{template:simple} {{Nom=@{name}}} {{Special=Pilotage de @{vehicule_name}}}  @{caracteristique1} @{jetModifDes}+@{vehicule_manoeuvrabilite}+ @{caracteristique2} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} @{rogueGhost} {{taille=[[@{barbarianGoliath}]]}} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}}" />
+							</h4>
+							<select name="attr_caracteristique1" class="textCenter">
+								<option value="{{bonusWarrOD1=[[0]]}} {{bonusBarb1=[[0]]}}  {{OD1=[[0]]}} {{jet=[[ {[[{0+" selected></option>
+								<option value="{{carac1=Déplacement}} {{bonusWarrOD1=[[@{warriorSoldierA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{deplOD}]]}} {{jet=[[ {[[{@{deplacement}+">Déplacement</option>
+								<option value="{{carac1=Force}} {{bonusWarrOD1=[[@{warriorSoldierA}]]}} {{bonusBarb1=[[@{barbarianGoliath}]]}} {{OD1=[[@{forOD}]]}} {{jet=[[ {[[{@{force}+">Force</option>
+								<option value="{{carac1=Endurance}} {{bonusWarrOD1=[[@{warriorSoldierA}]]}} {{bonusBarb1=[[@{barbarianGoliath}]]}} {{OD1=[[@{endOD}]]}} {{jet=[[ {[[{@{endurance}+">Endurance</option>
+								<option value="{{carac1=Hargne}} {{bonusWarrOD1=[[@{warriorHunterA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{hargneOD}]]}} {{jet=[[ {[[{@{hargne}+">Hargne</option>
+								<option value="{{carac1=Combat}} {{bonusWarrOD1=[[@{warriorHunterA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{combOD}]]}} {{jet=[[ {[[{@{combat}+">Combat</option>
+								<option value="{{carac1=Instinct}} {{bonusWarrOD1=[[@{warriorHunterA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{instOD}]]}} {{jet=[[ {[[{@{instinct}+">Instinct</option>
+								<option value="{{carac1=Tir}} {{bonusWarrOD1=[[@{warriorScholarA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{tirOD}]]}} {{jet=[[ {[[{@{tir}+">Tir</option>
+								<option value="{{carac1=Savoir}} {{bonusWarrOD1=[[@{warriorScholarA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{savoirOD}]]}} {{jet=[[ {[[{@{savoir}+">Savoir</option>
+								<option value="{{carac1=Technique}} {{bonusWarrOD1=[[@{warriorScholarA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{technOD}]]}} {{jet=[[ {[[{@{technique}+">Technique</option>
+								<option value="{{carac1=Aura}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+">Aura</option>
+								<option value="{{carac1=Parole}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{paroleOD}]]}} {{jet=[[ {[[{@{parole}+">Parole</option>
+								<option value="{{carac1=Sang-Froid}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{sfOD}]]}} {{jet=[[ {[[{@{sf}+">Sang-Froid</option>
+								<option value="{{carac1=Discrétion}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{discrOD}]]}} {{jet=[[ {[[{@{discretion}+">Discrétion</option>
+								<option value="{{carac1=Perception}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{percOD}]]}} {{jet=[[ {[[{@{perception}+">Perception</option>
+								<option value="{{carac1=Dextérité}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{dextOD}]]}} {{jet=[[ {[[{@{dexterite}+">Dextérité</option>
+							</select>
+							<select name="attr_caracteristique2" class="textCenter">
+								<option value="0, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[0]]}} {{bonusWarrOD2=[[0]]}} {{bonusBarb2=[[0]]}}" selected></option>
+								<option value="@{deplacement}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{deplOD}]]}} {{bonusWarrOD2=[[@{warriorSoldierA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Déplacement}}">Déplacement</option>
+								<option value="@{force}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{forOD}]]}} {{bonusWarrOD2=[[@{warriorSoldierA}]]}} {{bonusBarb2=[[@{barbarianGoliath}]]}} {{carac2=Force}}">Force</option>
+								<option value="@{endurance}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{endOD}]]}} {{bonusWarrOD2=[[@{warriorSoldierA}]]}} {{bonusBarb2=[[@{barbarianGoliath}]]}} {{carac2=Endurance}}">Endurance</option>
+								<option value="@{hargne}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{hargneOD}]]}} {{bonusWarrOD2=[[@{warriorHunterA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Hargne}}">Hargne</option>
+								<option value="@{combat}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{combOD}]]}} {{bonusWarrOD2=[[@{warriorHunterA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Combat}}">Combat</option>
+								<option value="@{instinct}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{instOD}]]}} {{bonusWarrOD2=[[@{warriorHunterA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Instinct}}">Instinct</option>
+								<option value="@{tir}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{tirOD}]]}} {{bonusWarrOD2=[[@{warriorScholarA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Tir}}">Tir</option>
+								<option value="@{savoir}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{savoirOD}]]}} {{bonusWarrOD2=[[@{warriorScholarA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Savoir}}">Savoir</option>
+								<option value="@{technique}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{technOD}]]}} {{bonusWarrOD2=[[@{warriorScholarA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Technique}}">Technique</option>
+								<option value="@{aura}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{auraOD}]]}} {{bonusWarrOD2=[[@{warriorHeraldA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Aura}}">Aura</option>
+								<option value="@{parole}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{paroleOD}]]}} {{bonusWarrOD2=[[@{warriorHeraldA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Parole}}">Parole</option>
+								<option value="@{sf}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{sfOD}]]}} {{bonusWarrOD2=[[@{warriorHeraldA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Sang-Froid}}">Sang-Froid</option>
+								<option value="@{discretion}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{discrOD}]]}} {{bonusWarrOD2=[[@{warriorScoutA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Discrétion}}">Discrétion</option>
+								<option value="@{perception}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{percOD}]]}} {{bonusWarrOD2=[[@{warriorScoutA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Perception}}">Perception</option>
+								<option value="@{dexterite}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{dextOD}]]}} {{bonusWarrOD2=[[@{warriorScoutA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Dextérité}}">Dextérité</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="ficheVehicule">
+					<div class="mainBlock Separation">
+						<div>
+							<h4 class="titre">Véhicule</h4>
+						</div>
+						<div>
+							<h4>Véhicule</h4>
+							<input type="text" class="left" name="attr_character_name" />
+						</div>
+						<div>
+							<h4>Manoeuvrabilité</h4>
+							<input type="number" class="textCenter" name="attr_vehicule_manoeuvrabilite" value="3" />
+						</div>
+						<div>
+							<h4>Vitesse</h4>
+							<input type="number" class="textCenter" name="attr_vehicule_vitesse" value="3" />
+						</div>
+						<div>
+							<h4>Équipage</h4>
+							<input type="number" class="textCenter" name="attr_vehicule_equipage" value="1" />
+						</div>
+					</div>
+					<div class="mainBlock2Way Separation">
+						<div>
+							<h4 class="titre">Bonus/Malus aux Jets</h4>
+							<input type="number" name="attr_jetModifDes" class="center" value="0" />
+						</div>
+						<div>
+							<h4 class="titre bouton">Pilotage
+								<button name="attr_jetVehicule" type="roll" class="boutonBase" value="@{jetGM} &{template:vehicule} {{Nom=@{character_name}}} {{Special=Pilotage}}  {{jet=[[ {[[ {[[@{desVehicule}+@{jetModifDes}+@{vehicule_manoeuvrabilite}]], 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD=[[@{ODVehicule}]]}} {{situationnel=[[@{jetModifDes}]]}}" />
+							</h4>
+						</div>
+						<div>
+							<h4 class="textCenterWPadding">Dés</h4>
+							<h4 class="textCenterWPadding">OD</h4>
+						</div>
+						<div>
+							<input type="number" name="attr_desVehicule" value="0" />
+							<input type="number" name="attr_ODVehicule" value="0" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="sheet-col">
+				<div class="mainBlock3Way Separation">
+					<div>
+						<h4 class="titre">Protections et Énergie</h4>
+						<h4 class="3wayHeaderBlank">Actuel</h4>
+						<h4>Maximum</h4>
+					</div>
+					<div>
+						<h4 class="textLeft">Armure</h4>
+						<input type="number" class="textCenter" name="attr_armureVehicule" min="0" value="30" />
+						<input type="number" class="textCenter" name="attr_armureVehicule_max" min="0" value="30" />
+					</div>
+					<div>
+						<h4 class="textLeft">Energie</h4>
+						<input type="number" class="textCenter" name="attr_energieVehicule" min="0" value="30" />
+						<input type="number" class="textCenter" name="attr_energieVehicule_max" min="0" value="30" />
+					</div>
+					<div>
+						<h4 class="textLeft">Champ de force</h4>
+						<input type="number" class="textCenter" name="attr_cdfVehicule" min="0" value="0" />
+						<input type="number" class="textCenter" name="attr_cdfVehicule_max" min="0" value="0" />
+					</div>
+				</div>
+				<div class="fichePJ">
+					<div class="mainBlock Separation">
+						<div>
+							<h4 class="titre">Style de Combat</h4>
+						</div>
+						<div>	
+							<select name="attr_styleCombat" class="full">
+								<option value="standard" selected>Standard</option>
+								<option value="couvert">À Couvert</option>
+								<option value="agressif">Agressif</option>
+								<option value="akimbo">Akimbo</option>
+								<option value="ambidextre">Ambidextre</option>
+								<option value="defensif">Défensif</option>
+							</select>
+						</div>
+						<div>
+							<textarea name="attr_styleCombatDescr" readonly ></textarea>
+						</div>
+					</div>
+				</div>
+				<div class="ficheVehicule">
+					<div class="mainBlock Separation">
+						<div>
+							<h4 class="titre">Défense</h4>
+						</div>
+						<div>
+							<input type="number" name="attr_defenseTotalVehicule" value="0" class="center" />
+						</div>
+						
+						<div>
+							<h4 class="titre">Réaction</h4>
+						</div>
+						<div>
+							<input type="number" name="attr_reactionTotalVehicule" value="0" class="center" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="marginBodyCorrection1">
+			<div class="fichePJ">
+				<div class="mainBlock6Way Separation blockArmure">
+					<div>
+						<h4 class="titre">Armes</h4>
+					</div>
+					<div>
+						<h4 class="width25">Arme</h4>
+						<h4 class="width1388">Dégâts</h4>
+						<h4 class="width1388">Violence</h4>
+						<h4 class="width1388">Portée</h4>
+						<h4 class="double">Jet</h4>
+					</div>
+					<fieldset class="repeating_armeDistVehicule">
+						<input type="hidden" name="attr_armeDistOptions" class="armeDistOptions" value="0">
+						<div class="subBlockFieldset">
+							<input type="text" name="attr_ArmeDist" class="left width25" />
+							<div class="block1388">
+								<input type="number" name="attr_armeDistDegat" class="textCenter" value="0" />
+								<b>D6+</b>
+								<input type="number" name="attr_armeDistBDegat" class="textCenter" value="0" />
+							</div>
+							<div class="block1388">
+								<input type="number" name="attr_armeDistViolence" class="textCenter" value="0" />
+								<b>D6+</b>
+								<input type="number" name="attr_armeDistBViolence" class="textCenter" value="0" />
+							</div>
+							<select name="attr_armeDistPortee" class="textCenter width1388">
+								<option value="Contact" selected>Contact</option>
+								<option value="Courte">Courte</option>
+								<option value="Moyenne">Moyenne</option>
+								<option value="Longue">Longue</option>
+								<option value="Lointaine">Lointaine</option>
+							</select>
+							<div class="blockButton">
+								<select name="attr_caracteristique1Equipement">
+									<option value="{{bonusWarrOD1=[[0]]}} {{bonusBarb1=[[0]]}}  {{OD1=[[0]]}} {{jet=[[ {[[{0+" selected></option>
+									<option value="{{carac1=Déplacement}} {{bonusWarrOD1=[[@{warriorSoldierA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{deplOD}]]}} {{jet=[[ {[[{@{deplacement}+">Déplacement</option>
+									<option value="{{carac1=Force}} {{bonusWarrOD1=[[@{warriorSoldierA}]]}} {{bonusBarb1=[[@{barbarianGoliath}]]}} {{OD1=[[@{forOD}]]}} {{jet=[[ {[[{@{force}+">Force</option>
+									<option value="{{carac1=Endurance}} {{bonusWarrOD1=[[@{warriorSoldierA}]]}} {{bonusBarb1=[[@{barbarianGoliath}]]}} {{OD1=[[@{endOD}]]}} {{jet=[[ {[[{@{endurance}+">Endurance</option>
+									<option value="{{carac1=Hargne}} {{bonusWarrOD1=[[@{warriorHunterA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{hargneOD}]]}} {{jet=[[ {[[{@{hargne}+">Hargne</option>
+									<option value="{{carac1=Combat}} {{bonusWarrOD1=[[@{warriorHunterA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{combOD}]]}} {{jet=[[ {[[{@{combat}+">Combat</option>
+									<option value="{{carac1=Instinct}} {{bonusWarrOD1=[[@{warriorHunterA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{instOD}]]}} {{jet=[[ {[[{@{instinct}+">Instinct</option>
+									<option value="{{carac1=Tir}} {{bonusWarrOD1=[[@{warriorScholarA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{tirOD}]]}} {{jet=[[ {[[{@{tir}+">Tir</option>
+									<option value="{{carac1=Savoir}} {{bonusWarrOD1=[[@{warriorScholarA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{savoirOD}]]}} {{jet=[[ {[[{@{savoir}+">Savoir</option>
+									<option value="{{carac1=Technique}} {{bonusWarrOD1=[[@{warriorScholarA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{technOD}]]}} {{jet=[[ {[[{@{technique}+">Technique</option>
+									<option value="{{carac1=Aura}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+">Aura</option>
+									<option value="{{carac1=Parole}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{paroleOD}]]}} {{jet=[[ {[[{@{parole}+">Parole</option>
+									<option value="{{carac1=Sang-Froid}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{sfOD}]]}} {{jet=[[ {[[{@{sf}+">Sang-Froid</option>
+									<option value="{{carac1=Discrétion}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{discrOD}]]}} {{jet=[[ {[[{@{discretion}+">Discrétion</option>
+									<option value="{{carac1=Perception}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{percOD}]]}} {{jet=[[ {[[{@{perception}+">Perception</option>
+									<option value="{{carac1=Dextérité}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{dextOD}]]}} {{jet=[[ {[[{@{dexterite}+">Dextérité</option>
+								</select>
+								<select name="attr_caracteristique2Equipement">
+									<option value="0, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[0]]}} {{bonusWarrOD2=[[0]]}} {{bonusBarb2=[[0]]}}" selected></option>
+									<option value="@{deplacement}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{deplOD}]]}} {{bonusWarrOD2=[[@{warriorSoldierA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Déplacement}}">Déplacement</option>
+									<option value="@{force}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{forOD}]]}} {{bonusWarrOD2=[[@{warriorSoldierA}]]}} {{bonusBarb2=[[@{barbarianGoliath}]]}} {{carac2=Force}}">Force</option>
+									<option value="@{endurance}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{endOD}]]}} {{bonusWarrOD2=[[@{warriorSoldierA}]]}} {{bonusBarb2=[[@{barbarianGoliath}]]}} {{carac2=Endurance}}">Endurance</option>
+									<option value="@{hargne}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{hargneOD}]]}} {{bonusWarrOD2=[[@{warriorHunterA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Hargne}}">Hargne</option>
+									<option value="@{combat}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{combOD}]]}} {{bonusWarrOD2=[[@{warriorHunterA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Combat}}">Combat</option>
+									<option value="@{instinct}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{instOD}]]}} {{bonusWarrOD2=[[@{warriorHunterA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Instinct}}">Instinct</option>
+									<option value="@{tir}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{tirOD}]]}} {{bonusWarrOD2=[[@{warriorScholarA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Tir}}">Tir</option>
+									<option value="@{savoir}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{savoirOD}]]}} {{bonusWarrOD2=[[@{warriorScholarA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Savoir}}">Savoir</option>
+									<option value="@{technique}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{technOD}]]}} {{bonusWarrOD2=[[@{warriorScholarA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Technique}}">Technique</option>
+									<option value="@{aura}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{auraOD}]]}} {{bonusWarrOD2=[[@{warriorHeraldA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Aura}}">Aura</option>
+									<option value="@{parole}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{paroleOD}]]}} {{bonusWarrOD2=[[@{warriorHeraldA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Parole}}">Parole</option>
+									<option value="@{sf}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{sfOD}]]}} {{bonusWarrOD2=[[@{warriorHeraldA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Sang-Froid}}">Sang-Froid</option>
+									<option value="@{discretion}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{discrOD}]]}} {{bonusWarrOD2=[[@{warriorScoutA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Discrétion}}">Discrétion</option>
+									<option value="@{perception}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{percOD}]]}} {{bonusWarrOD2=[[@{warriorScoutA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Perception}}">Perception</option>
+									<option value="@{dexterite}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{dextOD}]]}} {{bonusWarrOD2=[[@{warriorScoutA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Dextérité}}">Dextérité</option>
+								</select>
+								
+								<!-- Les dégâts de l'arme -->
+								<input type="hidden" name="attr_degats" value="{{Degats=[[ [[{ [[@{armeDistDegat}-@{chargeurGrappes}-@{munitionsIEM}]], 0}kh1]]d6+@{armeDistBDegat}]]}}" />
+								<!-- La violence de l'arme -->
+								<input type="hidden" name="attr_violence" value="{{Violence=[[ [[{ [[@{armeDistViolence}-@{chargeurExplosives}-@{munitionsIEM}]], 0}kh1]]d6+@{armeDistBViolence}]]}}" />
+								<!-- Les styles -->
+								<input type="hidden" name="attr_styles" value="{{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}}" />
+								<input type="hidden" name="attr_stylesDB" value="{{styleDgtBM=[[ [[@{armeDistDegat}+@{chargeurExplosives}-@{chargeurGrappes}-@{munitionsIEM}+@{revetementOmega}]]d6 ]]}}" />
+								<input type="hidden" name="attr_stylesVB" value="{{styleViolBM=[[ [[(floor([[@{armeDistViolence}-@{chargeurExplosives}+@{chargeurGrappes}-@{munitionsIEM}]]/2))]]d6]]}}" />
+								<!-- Les effets -->
+								<input type="hidden" name="attr_listeEffets" value="@{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{parasitage} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{discrOD}]]}} {{silencieuxWOD=[[@{discretion}]]}} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin}" />
+								<!-- Les améliorations -->
+								<input type="hidden" name="attr_listeAmeliorations" value="{{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission} {{chargeurGrappes=[[1D6]]}} {{ballesGrappes=[[@{chargeurGrappes}]]}} {{chargeurExplosives=[[1D6]]}} {{ballesExplosives=[[@{chargeurExplosives}]]}} @{pointeurLaser} @{lunetteIntelligente} @{canonLong} @{munitionsSubsoniques} @{protectionArme} @{structureElement} @{munitionsHyperVelocite} @{munitionsDrone} {{munitionsNonLetales=[[@{munitionsNonLetales}]]}} {{munitionsIEM=[[@{munitionsIEM}]]}} @{interfaceGuidage} @{jumelage} {{chambreDouble=[[ceil(@{chambreDouble})]]}} @{systemeRefroidissement} {{revetementOmega=[[@{revetementOmega}D6]]}}" />
+								<!-- Les cas spéciaux (Ghost...) -->
+								<input type="hidden" name="attr_speciaux" value="@{warmasterImpGPersonnel} @{rogueGhost} {{modeGhostTotal=[[{[[@{discretion}]]d6cs2cs4cs6cf1cf3cf5s%2}=0+[[@{discrOD}]] ]]}} {{modeGhostDmg=[[@{discrOD}+@{discretion}]]}}" />
+								<!-- La gestion des OD spéciaux au jet. -->
+								<input type="hidden" name="attr_listeOD" value="@{akimboDistanceODBonus} @{ambidextrieDistanceODBonus} @{discretionDegatsBonus}" />
+
+								<button type="roll" name="attr_jetDistance" value="@{jetGM} &{template:distance} {{Nom=@{name}}} {{Arme=@{ArmeDist}}} {{Portee=@{armeDistPortee}}} @{caracteristique1Equipement} @{jetModifDes}-[[{floor(@{cadence}), floor(@{chambreDouble})}kh1]] @{atkBM}+ @{caracteristique2Equipement} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} @{degats} @{violence} @{styles} @{stylesDB} @{stylesVB} @{listeEffets} @{listeAmeliorations} @{listeOD} @{speciaux} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}}" />
+							</div>
+						</div>
+						<div class="mainBlock2Onglets blockArmure">
+							<label>
+								<input type="checkbox" name="attr_armeDistOptions" value="1">
+								<span title="Effets"></span>
+							</label>
+							<label>
+								<input type="checkbox" name="attr_armeDistOptions" value="2">
+								<span title="Améliorations d'armes"></span>
+							</label>
+						</div>
+						<div class="limiteArmure mainBlockOptionsArmes armeDistEffets">
+							<label class="simple">
+								<input type="checkbox" name="attr_antiAnatheme" value="{{antiAnathème=Anti Anathème}}" />
+								<span title="Anti Anathème"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_antiVehicule" value="{{antiVehicule=Anti Véhicule}} " />
+								<span title="Anti Véhicule"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_artillerie" value="{{artillerie=Artillerie}}" />
+								<span title="Artillerie"></span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_assassin" value="{{assassin=[[@{assassinValue}d6]]}} " />
+								<span title="Assassin"></span>
+								<input type="number" name="attr_assassinValue" class="center" value="0" />
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_assistanceAttaque" value="{{assistanceAttaque=Assistance à l'attaque}}" />
+								<span title="Assistance à l'attaque"></span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_barrage" value="{{barrage=Barrage @{barrageValue}}} " />
+								<span title="Barrage">
+									<input type="number" name="attr_barrageValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_cadence" value="[[?{Plusieurs cibles ?|Oui, 3.5|Non, 0.5}]]" />
+								<span title="Cadence">
+									<input type="number" name="attr_cadenceValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_chargeur" value="{{chargeur=Chargeur @{chargeurValue}}} " />
+								<span title="Chargeur">
+									<input type="number" name="attr_chargeurValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_choc" value="{{choc=Choc @{chocValue}}}" />
+								<span title="Choc">
+									<input type="number" name="attr_chocValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_defense" value="{{defense=Défense @{defenseValue}}}" />
+								<span title="Défense">
+									<input type="number" name="attr_defenseValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_degatContinue" value="{{degatContinus=Dégâts Continus @{degatContinueValue} ([[1D6]] Tours)}}" />
+								<span title="Dégâts Continus">
+									<input type="number" name="attr_degatContinueValue" class="center" size="2" value="0" />
+								</span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_deuxMains" value="{{deuxMains=Deux Mains}}" />
+								<span title="Deux Mains"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_demoralisant" value="{{demoralisant=Démoralisant}}" />
+								<span title="Démoralisant"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_designation" value="{{designation=Désignation}}" />
+								<span title="Désignation"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_destructeur" value="{{destructeur=[[2D6]]}}" />
+								<span title="Destructeur"></span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_dispersion" value="{{dispersion=Dispersion @{dispersionValue}}} " />
+								<span title="Dispersion">
+									<input type="number" name="attr_dispersionValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_enChaine" value="{{enChaine=En Chaîne}}" />
+								<span title="En Chaîne"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_esperance" value="{{esperance=Espérance}}" />
+								<span title="Espérance"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_fureur" value="{{fureur=[[4D6]]}}" />
+								<span title="Fureur"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_ignoreArmure" value="{{ignoreArmure=Ignore Armure}}" />
+								<span title="Ignore Armure"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_ignoreCdF" value="{{ignoreCdF=Ignore Champs de Force}}" />
+								<span title="Ignore CdF"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_akimbo" value="{{effetAkimbo=[[{2d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}" />
+								<span title="Jumelé (Akimbo)"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_ambidextrie" value="{{effetAmbidextrie=[[{2d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}" />
+								<span title="Jumelé (Ambidextrie)"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_leste" value="{{leste=[[@{force}]]}}" />
+								<span title="Lesté"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_lourd" value="{{lourd=Lourd}}" />
+								<span title="Lourd"></span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_lumiere" value="{{lumiere=Lumière @{lumiereValue}}}" />
+								<span title="Lumière">
+									<input type="number" name="attr_lumiereValue" class="center" size="2" value="0" />
+								</span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_meurtrier" value="{{meurtrier=[[2D6]]}}" />
+								<span title="Meurtrier"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_obliteration" value="{{obliteration=Oblitération}}" />
+								<span title="Oblitération"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{orfevrerieWarrior=[[@{dexterite}+@{dextOD}+@{warriorScoutA}]]}}" />
+								<span title="Orfèvrerie"></span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_parasitage" value="{{parasitage=Parasitage @{parasitageValue}}}" />
+								<span title="Parasitage">
+									<input type="number" name="attr_parasitageValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_penetrant" value="{{penetrant=Pénétrant @{penetrantValue}}}" />
+								<span title="Pénétrant">
+									<input type="number" name="attr_penetrantValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_perceArmure" value="{{perceArmure=Perce Armure @{perceArmureValue}}}" />
+								<span title="Perce Armure">
+									<input type="number" name="attr_perceArmureValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}} {{precisionWarrior=[[@{tir}+@{tirOD}+@{warriorScholarA}]]}}" />
+								<span title="Précision"></span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_reaction" value="{{reaction=Réaction @{reactionValue}}}" />
+								<span title="Réaction">
+									<input type="number" name="attr_reactionValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_silencieux" value="{{silencieux=Silencieux}}" />
+								<span title="Silencieux"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_soumission" value="{{soumission=Soumission}}" />
+								<span title="Soumission"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_tenebricite" value="{{tenebricide=Ténébricide}}" />
+								<span title="Ténébricide"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_tirRafale" value="{{tirRafale=Tir en Rafale}}" />
+								<span title="Tir en Rafale"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_tirSecurite" value="{{tirSecurite=[[{3d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}" />
+								<span title="Tir en Sécurité"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_ultraViolence" value="{{ultraviolence=[[2D6]]}}" />
+								<span title="Ultraviolence"></span>
+							</label>
+						</div>
+						<div class="limiteArmure mainBlockOptionsArmes armeDistAmeliorations">
+							<label class="simple">
+								<input type="checkbox" name="attr_chargeurGrappes" value="1" />
+								<span title="Balles grappes"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_canonLong" value="{{canonLongM=1}} {{canonLongC=Canon Long (Portée Courte : +3 Difficulté)}}" />
+								<span title="Canon Long"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_canonRaccourci" value="{{canonRaccourci=Canon Raccourci (Portée Courte : Dispersion 3 / Sinon : +3 Difficulté)}}" />
+								<span title="Canon Raccourci"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_chambreDouble" value="[[?{Plusieurs cibles ?|Oui, 3.5|Non, 0.5}]]" />
+								<span title="Chambre Double"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_interfaceGuidage" value="{{Interface de guidage (Tir en Sécurité)}}" />
+								<span title="Interface de guidage"></span>
+							</label>
+							<label class="doubleTexte">
+								<input type="checkbox" name="attr_jumelage" value="{{jumelage=Jumelage (@{jumelageValue})}}" />
+								<span title="Jumelage :">
+									<input type="text" name="attr_jumelageValue" class="center" />
+								</span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_lunetteIntelligente" value="{{lunetteIntelligente=Lunette Intelligente (+1 Portée)}}" />
+								<span title="Lunette Intelligente"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_munitionsHyperVelocite" value="{{munitionsHyperVelocite=Munitions à Hyper Velocite (Assistance à l'Attaque)}}" />
+								<span title="Munitions à Hyper Vélocité"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_munitionsDrone" value="{{munitionsDrone=3}}" />
+								<span title="Munitions Drones"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_chargeurExplosives" value="1" />
+								<span title="Munitions Explosives"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_munitionsIEM" value="1" />
+								<span title="Munitions IEM"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_munitionsNonLetales" value="2" />
+								<span title="Munitions N. Létales"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_munitionsSubsoniques" value="{{munitionsSubsoniques=Munitions Subsoniques (Silencieux)}}" />
+								<span title="Munitions Subson."></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_pointeurLaser" value="{{pointeurLaser=1}} " />
+								<span title="Pointeur Laser"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_protectionArme" value="{{protectionArme=Protection d'Arme (Reaction +2)}}" />
+								<span title="Protection d'Arme"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_revetementOmega" value="2" />
+								<span title="Revêtement Omega"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_structureElement" value="{{structureElement=Structure en Élément}}" />
+								<span title="Structure en Élément"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_systemeRefroidissement" value="{{systemeRefroidissement=Système de Refroidissement (Tir en Rafale + Barrage 1)}}" />
+								<span title="Système de Refroid."></span>
+							</label>
+						</div>
+					</fieldset>
+				</div>
+			</div>
+			<div class="ficheVehicule">
+				<div class="mainBlock6Way Separation blockArmure">
+					<div>
+						<h4 class="titre">Armes</h4>
+					</div>
+					<div>
+						<h4 class="width25">Arme</h4>
+						<h4 class="width15">Dégâts</h4>
+						<h4 class="width15">Violence</h4>
+						<h4 class="width15">Portée</h4>
+						<h4 class="width15">Attaque</h4>
+						<h4 class="width15WithButton">Overdrives</h4>
+					</div>
+					<fieldset class="repeating_armeAutre">
+						<input type="hidden" name="attr_armeAutreOptions" class="armeAutreOptions" value="0">
+						<div class="subBlockFieldset">
+							<input type="text" name="attr_ArmeAutre" class="left width25" />
+							<div class="block15">
+								<input type="number" name="attr_armeAutreDegat" class="textCenter" value="0" />
+								<b>D6+</b>
+								<input type="number" name="attr_armeAutreBDegat" class="textCenter" value="0" />
+							</div>
+							<div class="block15">
+								<input type="number" name="attr_armeAutreViolence" class="textCenter" value="0" />
+								<b>D6+</b>
+								<input type="number" name="attr_armeAutreBViolence" class="textCenter" value="0" />
+							</div>
+							<select name="attr_armeAutrePortee" class="textCenter width15">
+								<option value="Contact" selected>Contact</option>
+								<option value="Courte">Courte</option>
+								<option value="Moyenne">Moyenne</option>
+								<option value="Longue">Longue</option>
+								<option value="Lointaine">Lointaine</option>
+							</select>
+							<div class="block15">
+								<input type="text" name="attr_armeAttaqueAutre" class="right width15 solo" value="0" />
+								<b>D6+</b>
+							</div>
+							<div class="block15Button">
+								<input type="text" name="attr_armeODAutre" class="textCenter" value="0" />
+								<button type="roll" name="attr_jetArmeVehicule" value="@{jetGM} &{template:autre} {{Nom=@{character_name}}} {{Arme=@{ArmeAutre}}} {{ODAA=[[@{armeODAutre}]]}} {{jet=[[{[[{@{armeAttaqueAutre}-[[{floor(@{cadence}), floor(@{chambreDouble})}kh1]], 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{Degats=[[ [[@{armeAutreDegat}-@{chargeurGrappes}-@{munitionsIEM}]]d6+@{armeAutreBDegat}]]}} {{Violence=[[ [[@{armeAutreViolence}-@{chargeurExplosives}-@{munitionsIEM}]]d6+@{armeAutreBViolence}]]}} {{Portee=@{armeAutrePortee}}} @{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{parasitage} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission} {{chargeurGrappes=[[1D6]]}} {{ballesGrappes=[[@{chargeurGrappes}]]}} {{chargeurExplosives=[[1D6]]}} {{ballesExplosives=[[@{chargeurExplosives}]]}} @{pointeurLaser} @{lunetteIntelligente} @{canonLong} @{munitionsSubsoniques} @{protectionArme} @{structureElement} @{munitionsHyperVelocite} @{munitionsDrone} {{munitionsNonLetales=[[@{munitionsNonLetales}]]}} {{munitionsIEM=[[@{munitionsIEM}]]}} @{interfaceGuidage} @{jumelage} {{chambreDouble=[[ceil(@{chambreDouble})]]}} @{systemeRefroidissement} {{revetementOmega=[[@{revetementOmega}D6]]}}" />
+							</div>
+						</div>
+						<div class="mainBlock2Onglets blockArmure">
+							<label>
+								<input type="checkbox" name="attr_armeAutreOptions" value="1">
+								<span title="Effets"></span>
+							</label>
+							<label>
+								<input type="checkbox" name="attr_armeAutreOptions" value="2">
+								<span title="Améliorations d'armes"></span>
+							</label>
+						</div>
+						<div class="limiteArmure mainBlockOptionsArmes armeAutreEffets">
+							<label class="simple">
+								<input type="checkbox" name="attr_antiAnatheme" value="{{antiAnathème=Anti Anathème}}" />
+								<span title="Anti Anathème"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_antiVehicule" value="{{antiVehicule=Anti Véhicule}} " />
+								<span title="Anti Véhicule"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_artillerie" value="{{artillerie=Artillerie}}" />
+								<span title="Artillerie"></span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_assassin" value="{{assassin=[[@{assassinValue}d6]]}} " />
+								<span title="Assassin">
+									<input type="number" name="attr_assassinValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_assistanceAttaque" value="{{assistanceAttaque=Assistance à l'attaque}}" />
+								<span title="Assistance à l'attaque"></span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_barrage" value="{{barrage=Barrage @{barrageValue}}} " />
+								<span title="Barrage">
+									<input type="number" name="attr_barrageValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_cadence" value="[[?{Plusieurs cibles ?|Oui, 3.5|Non, 0.5}]]" />
+								<span title="Cadence">
+									<input type="number" name="attr_cadenceValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_chargeur" value="{{chargeur=Chargeur @{chargeurValue}}} " />
+								<span title="Chargeur">
+									<input type="number" name="attr_chargeurValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_choc" value="{{choc=Choc @{chocValue}}}" />
+								<span title="Choc">
+									<input type="number" name="attr_chocValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_defense" value="{{defense=Défense @{defenseValue}}}" />
+								<span title="Défense">
+									<input type="number" name="attr_defenseValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_degatContinue" value="{{degatContinus=Dégâts Continus @{degatContinueValue} ([[1D6]] Tours)}}" />
+								<span title="Dégâts Continus">
+									<input type="number" name="attr_degatContinueValue" class="center" size="2" value="0" />
+								</span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_deuxMains" value="{{deuxMains=Deux Mains}}" />
+								<span title="Deux Mains"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_demoralisant" value="{{demoralisant=Démoralisant}}" />
+								<span title="Démoralisant"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_designation" value="{{designation=Désignation}}" />
+								<span title="Désignation"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_destructeur" value="{{destructeur=[[2D6]]}}" />
+								<span title="Destructeur"></span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_dispersion" value="{{dispersion=Dispersion @{dispersionValue}}} " />
+								<span title="Dispersion">
+									<input type="number" name="attr_dispersionValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_enChaine" value="{{enChaine=En Chaîne}}" />
+								<span title="En Chaîne"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_esperance" value="{{esperance=Espérance}}" />
+								<span title="Espérance"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_fureur" value="{{fureur=[[4D6]]}}" />
+								<span title="Fureur"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_ignoreArmure" value="{{ignoreArmure=Ignore Armure}}" />
+								<span title="Ignore Armure"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_ignoreCdF" value="{{ignoreCdF=Ignore Champs de Force}}" />
+								<span title="Ignore CdF"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_akimbo" value="{{effetAkimbo=[[{2d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}" />
+								<span title="Jumelé (Akimbo)"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_ambidextrie" value="{{effetAmbidextrie=[[{2d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}" />
+								<span title="Jumelé (Ambidextrie)"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_leste" value="{{leste=[[@{force}]]}}" />
+								<span title="Lesté"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_lourd" value="{{lourd=Lourd}}" />
+								<span title="Lourd"></span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_lumiere" value="{{lumiere=Lumière @{lumiereValue}}}" />
+								<span title="Lumière">
+									<input type="number" name="attr_lumiereValue" class="center" size="2" value="0" />
+								</span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_meurtrier" value="{{meurtrier=[[2D6]]}}" />
+								<span title="Meurtrier"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_obliteration" value="{{obliteration=Oblitération}}" />
+								<span title="Oblitération"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{orfevrerieWarrior=[[@{dexterite}+@{dextOD}+@{warriorScoutA}]]}}" />
+								<span title="Orfèvrerie"></span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_parasitage" value="{{parasitage=Parasitage @{parasitageValue}}}" />
+								<span title="Parasitage">
+									<input type="number" name="attr_parasitageValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_penetrant" value="{{penetrant=Pénétrant @{penetrantValue}}}" />
+								<span title="Pénétrant">
+									<input type="number" name="attr_penetrantValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_perceArmure" value="{{perceArmure=Perce Armure @{perceArmureValue}}}" />
+								<span title="Perce Armure">
+									<input type="number" name="attr_perceArmureValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}} {{precisionWarrior=[[@{tir}+@{tirOD}+@{warriorScholarA}]]}}" />
+								<span title="Précision"></span>
+							</label>
+							<label class="double">
+								<input type="checkbox" name="attr_reaction" value="{{reaction=Réaction @{reactionValue}}}" />
+								<span title="Réaction">
+									<input type="number" name="attr_reactionValue" class="center" value="0" />
+								</span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_silencieux" value="{{silencieux=Silencieux}}" />
+								<span title="Silencieux"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_soumission" value="{{soumission=Soumission}}" />
+								<span title="Soumission"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_tenebricite" value="{{tenebricide=Ténébricide}}" />
+								<span title="Ténébricide"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_tirRafale" value="{{tirRafale=Tir en Rafale}}" />
+								<span title="Tir en Rafale"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_tirSecurite" value="{{tirSecurite=[[{3d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}" />
+								<span title="Tir en Sécurité"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_ultraViolence" value="{{ultraviolence=[[2D6]]}}" />
+								<span title="Ultraviolence"></span>
+							</label>
+						</div>
+						<div class="limiteArmure mainBlockOptionsArmes armeAutreAmeliorations">
+							<label class="simple">
+								<input type="checkbox" name="attr_chargeurGrappes" value="1" />
+								<span title="Balles grappes"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_canonLong" value="{{canonLongM=1}} {{canonLongC=Canon Long (Portée Courte : +3 Difficulté)}}" />
+								<span title="Canon Long"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_canonRaccourci" value="{{canonRaccourci=Canon Raccourci (Portée Courte : Dispersion 3 / Sinon : +3 Difficulté)}}" />
+								<span title="Canon Raccourci"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_chambreDouble" value="[[?{Plusieurs cibles ?|Oui, 3.5|Non, 0.5}]]" />
+								<span title="Chambre Double"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_interfaceGuidage" value="{{Interface de guidage (Tir en Sécurité)}}" />
+								<span title="Interface de guidage"></span>
+							</label>
+							<label class="doubleTexte">
+								<input type="checkbox" name="attr_jumelage" value="{{jumelage=Jumelage (@{jumelageValue})}}" />
+								<span title="Jumelage :"></span>
+								<input type="text" name="attr_jumelageValue" class="center" />
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_lunetteIntelligente" value="{{lunetteIntelligente=Lunette Intelligente (+1 Portée)}}" />
+								<span title="Lunette Intelligente"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_munitionsHyperVelocite" value="{{munitionsHyperVelocite=Munitions à Hyper Velocite (Assistance à l'Attaque)}}" />
+								<span title="Munitions à Hyper Vélocité"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_munitionsDrone" value="{{munitionsDrone=3}}" />
+								<span title="Munitions Drones"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_chargeurExplosives" value="1" />
+								<span title="Munitions Explosives"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_munitionsIEM" value="1" />
+								<span title="Munitions IEM"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_munitionsNonLetales" value="2" />
+								<span title="Munitions N. Létales"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_munitionsSubsoniques" value="{{munitionsSubsoniques=Munitions Subsoniques (Silencieux)}}" />
+								<span title="Munitions Subson."></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_pointeurLaser" value="{{pointeurLaser=1}} " />
+								<span title="Pointeur Laser"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_protectionArme" value="{{protectionArme=Protection d'Arme (Reaction +2)}}" />
+								<span title="Protection d'Arme"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_revetementOmega" value="2" />
+								<span title="Revêtement Omega"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_structureElement" value="{{structureElement=Structure en Élément}}" />
+								<span title="Structure en Élément"></span>
+							</label>
+							<label class="simple">
+								<input type="checkbox" name="attr_systemeRefroidissement" value="{{systemeRefroidissement=Système de Refroidissement (Tir en Rafale + Barrage 1)}}" />
+								<span title="Système de Refroid."></span>
+							</label>
+						</div>
+					</fieldset>
+				</div>
+			</div>
+		</div>
+		<div class="mainFlex3Block marginBodyCorrection1">
+			<div class="mainBlock">
+				<div>
+					<h4 class="titre">Notes</h4>
+				</div>
+				<fieldset class="repeating_notesJoueurVehicule">
+					<textarea name="attr_notesJoueurVehicule" class="largeTextarea"></textarea>
+				</fieldset>
+			</div>
+			<div class="mainBlock">
+				<div>
+					<h4 class="titre">Effet des armes</h4>
+				</div>
+				<div>
+					<select name="attr_effetArmes" class="full">
+						<option value="" selected></option>
+						<option value="Ignore la valeur de bouclier et de chair exceptionnel de la créature prise pour cible. Les PA de la cible puis ses PS sont directement touché.">Anti-Anathème</option>
+						<option value="Si l'arme tire sur un véhicule ou un colosse elle inflige ses dégâts normaux et n'a pas besoin d'infliger des tranches de 10 points de dégâts pour en infliger 1 à ces énormes ennemi.">Anti-Véhicule</option>
+						<option value="L'arme peut tirée sans ligne de vue ni malus de portée sur une cible préalablement désignée. La cible ne bénéficie d'aucun bonus de couvert, tant que la balle peut l'atteindre.">Artillerie</option>
+						<option value="Ajoute XD6 aux dégâts lors des attaques surprises.">Assassin X</option>
+						<option value="Chaque réussite au dessus du score de réaction ou de défense de la cible permet de lui infliger 1 point de dégât ou de violence supplémentaire.">Assistance à l'attaque</option>
+						<option value="Il est possible de sacrifier ses dégâts ou sa violence pour diminuer la défense et la réaction de la bande ou du PNJ ciblé d'un nombre de points égal à X jusqu'au début du prochain tour. Aucun test d'attaque n'est nécessaire.">Barrage X</option>
+						<option value="L’arme est très rapide et peut cibler X adversaires par action de combat au lieu d’un seul. Une attaque doit être réalisée pour chacune des cibles, avec 3 dés de malus. Chacune des cibles ne peut être distante de plus de 2 mètres.">Cadence X</option>
+						<option value="Définie le nombre de munition et d'utilisation par mission de l'objet.">Chargeur X</option>
+						<option value="Si le jet de toucher avec l'arme est supérieur au score de chair de la cible celle ci perd ses X prochaine actions. Cette effet ne fonctionne pas contre les bandes. Effet non cumulable.">Choc X</option>
+						<option value="L'utilisateur bénéficie d'un bonus en défense ou en réaction de X lorsqu'il utilise cette arme ou module.">Défense X / Réaction X</option>
+						<option value="L'arme inflige X dégâts tous les tours durant 1D6 tour.">Dégâts Continus X</option>
+						<option value="Avec une attaque réussie, l'arme enlève 2 points au score de débordement du tour actuel. L'effet ne dure qu'un tour et nécessite d'être renouvelé chaque tour.">Démoralisant</option>
+						<option value="L'arme permet de désigner une cible une fois part tour. Son utilisateur et ses alliés possède un bonus d'une réussite automatique pour touché la cible et ignore les échecs critiques. La cible demeure désigner durant toute la scène ou toute la phase de conflit. Effet non cumulable.">Désignation</option>
+						<option value="Si l'arme inflige des dégâts a une armure on ajoute 2D6 au total des dégâts.">Destructeur</option>
+						<option value="Utiliser à une main une arme possédant cet effet est impossible, l'arme étant trop lourde ou possédant trop de recul pour toucher efficacement.">Deux Mains</option>
+						<option value="L'arme peut toucher un nombre X d'ennemis distant de moins de deux mètres les uns des autres. N'affecte pas les bandes.">Dispersion X</option>
+						<option value="Si le PJ tue un hostile ou un salopard avec cette arme, il peut effectuer, au prix de 3PE, au même tour et a la même initiative une autre attaque contre un autre hostile ou un autre salopard à portée. Applicable plusieurs fois si l'ennemi suivant est tué.">En Chaîne</option>
+						<option value="Permet d'échanger les dégâts de l'arme contre l'effet Espérance. Toute personne désespérée touchée par l'attaque peut effectuer un test de Bête (ou Hargne/Sang-Froid) difficulté 5 pour combattre le désespoir. Chaque attaque supplémentaire sur une même personne fait baisser la difficulté de 1. Si le test est réussi, le déséspéré a vaincu le désespoir et n'est plus un ennemi. Sur une Bande, cela a le même effet, mais en baissant simplement la cohésion. Si elle tombe à 0, la bande reprend espoir.">Espérance</option>
+						<option value="Si l'arme est utilisée contre une cible ayant un score de chair de 10 ou plus la violence de l'arme est augmenté de 4D6.">Fureur</option>
+						<option value="L’arme ignore purement et simplement la valeur de points d’armure d’un adversaire. La santé de la cible est directement touchée si les dégâts passent le CdF ou le bouclier.">Ignore Armure</option>
+						<option value="L'arme ignore purement et simplement le champ de force de l'adversaire.">Ignore Champs de Force</option>
+						<option value="Lorsqu’on utilise deux exemplaires de cette arme en style akimbo, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3).">Jumelé (Akimbo)</option>
+						<option value="Lorsqu’on utilise deux armes disposant de cet effet en style ambidextre, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3)">Jumelé (Ambidextrie)</option>
+						<option value="Lorsque l'arme est utilisé son utilisateur ajoute sa force multipliée par deux lorsqu'il calcul ses dégâts. Seuls les personnages ayant un score de Force de 4 ou supérieur, ou un overdrive de Force peuvent utiliser une arme avec cet effet.">Lesté</option>
+						<option value="Lorsqu'il utilise une arme avec cet effet, le personnage perd son action de déplacement. De même, s'il a déjà bougé, il ne peut pas frapper avec une arme possédant cet effet. Les armes Lourdes sont également à Deux Mains.">Lourd</option>
+						<option value="Quand l'arme frappe une créature ou une bande de l'anathème ses scores de défense et de réaction sont réduits d'une valeur X durant le tour suivant. Non cumulatif.">Lumière X</option>
+						<option value="Si l'arme impact la santé de la cible on ajoute 2d6 au dégâts. Il suffit qu'un seul point de dégâts touche la santé pour que cela s'applique.">Meurtrier</option>
+						<option value="Inflige toujours le maximum de dégâts. Si combiné avec Dispersion, chaque cible touchée subit le maximum de dégâts également.">Oblitération</option>
+						<option value="Lors du calcul de dégâts de cette arme l'utilisateur ajoute sa dextérité au total + 1 point de dégâts par overdrive.">Orfèvrerie</option>
+						<option value="Cet effet s’applique uniquement aux méta-armures, exosquelettes, robots, véhicules, créatures de la Machine et tous les ennemis possé- dant la capacité sensibilité IEM. L’ennemi du type désigné perd automatiquement ses X prochaines actions.">Parasitage X</option>
+						<option value="L'arme ignore une valeur X du champ de force de la cible. Ne fonctionne pas contre un score de bouclier.">Pénétrant X</option>
+						<option value="L’arme ignore une certaine valeur d’armure, X représentant cette valeur. Si la valeur est égale ou supérieure aux points d’armure de l’ennemi, le total de PA est simplement ignoré et la santé est directement touchée.">Perce Armure X</option>
+						<option value="Lors du calcul de dégâts de cette arme l'utilisateur ajoute son tir au total + 1 point de dégâts par overdrive.">Précision</option>
+						<option value="Le personnage ne peut être repéré par un PNJ lorsqu'il utilise l’arme. Lors d'une attaque surprise, d'une invisibilité, d'un mode Ghost ou d'un mode Changeling, la Discrétion + OD est ajoutée aux dégâts.">Silencieux</option>
+						<option value="Après avoir touché sa cible avec un effet soumission, l’attaquant peut soumettre sa cible physiquement et l’empêcher de se déplacer ou d’attaquer qui que ce soit d’autre que l’attaquant, et ce au contact. Pour se libérer de l’effet soumission, la cible touchée doit, à son tour, réussir un test base Déplacement ou Combat (aspect Chair ou Bête) dont la difficulté est définie par le nombre de réussites de l’attaquant. Si la cible n’a pas pu se libérer à son tour, l’attaquant peut maintenir la soumission sans relancer les dés et infliger des dégâts normalement, ou relancer un test d’attaque afin de renforcer sa prise. Si le jet est à nouveau réussi, les dégâts sont infligés sans prendre en considération tout éventuel champ de force ou bouclier (pour les créatures de l’Anathème). L’effet soumission ne peut impacter les colosses tel quel mais peut tout de même être pris en compte par le MJ.">Soumission</option>
+						<option value="L’équipement a été pensé pour anéantir les créatures de l’Anathème et uniquement celles ci. Contre des ennemis humains (de n’importe quel type), il n’inflige que la moitié de ses dés de dégâts et de ses dés de violence.">Ténébricide</option>
+						<option value="Lors du calcul des dégâts, il est possible, une fois par attaque, d’annuler tous les résultats et de relancer les dés. Le nouveau résultat remplace le premier et doit être conservé. Il n’est pas possible de prendre la moyenne des dégâts en utilisant cet effet.">Tir en rafale</option>
+						<option value="Le personnage peut tirer a couvert sans subir de malus au tir.">Tir en sécurité</option>
+						<option value="Lorsque l'arme est utilisé contre une bande avec une valeur de chair de moins de 10, la violence est augmentée de 2D6.">Ultraviolence</option>
+					</select>
+				</div>
+				<div>
+					<textarea name="attr_effetArmes" class="largeTextarea" readonly></textarea>
+				</div>
+			</div>
+			<div class="mainBlock">
+				<div>
+					<h4 class="titre">Amélioration (structurelle) des armes</h4>
+				</div>
+				<div>
+					<select name="attr_ameliorationArmes" class="full">
+						<option value="" selected></option>
+						<option value="À portée courte ou inférieure, l’arme possède l’effet dispersion 3. En revanche, à portée moyenne ou supérieure, la difficulté des tirs est augmentée de 3 (comme si la réaction des ennemis était augmentée de 3 points).">Canon raccourci</option>
+						<option value="L’arme gagne à chaque tour l’effet cadence 2.">Chambre double</option>
+						<option value="L’arme voit sa violence augmenter de 1D6, en revanche, ses dégâts diminuent de 1D6. Ne peut être posé sur des armes de type lance-flammes, laser, arbalète ou lance-grenade.">Chargeur et balles grappes</option>
+						<option value="L’arme voit ses dégâts augmenter de 1D6, en revanche, sa violence diminue de 1D6. Ne peut être posé sur des armes de type lance-flammes, laser, arbalète ou lance-grenade.">Chargeur et munitions explosives</option>
+						<option value="Les dégâts et la violence des grenades intelligentes sont augmentés de 2D6 (sauf pour les grenades flashbang et IEM qui ne font pas de dégâts). Ne peut être ajouté qu'aux grenades. Ne peut être pris qu'une fois.">Grenades intelligentes avancées</option>
+						<option value="L’arme gagne l’effet tir en sécurité. Ne convient qu'aux armes tirant des balles, des grenades, des missiles ou des roquettes.">Interface de guidage</option>
+						<option value="Les armes gagnent l’effet jumelage (akimbo) ou jumelage (ambidextrie) selon qu’elles sont identiques ou différentes.">Jumelage</option>
+						<option value="Les armes à deux mains ou lourdes voient leur portée augmenter d’un niveau, sans malus. Ne peut être appliqué aux armes de type lance-flammes.">Lunette intelligente</option>
+						<option value="L’armure bénéficie de l’effet assistance à l’attaque. Cependant, ce nouveau système est lourd et pèse sur l’arme. Les armes à une main sont ainsi considérées comme des armes à deux mains et les armes à deux mains comme des armes lourdes (cela ne veut pas dire que vous pouvez y ajouter plus d’améliorations, simplement que vous en subissez les malus). Ne peut être appliqué sur les armes lourdes ou de type laser.">Munitions à Hyper Vélocité</option>
+						<option value="L’amélioration confère un bonus de 3 réussites automatiques au tir contre une cible. Ne peut être appliqué sur des armes de type lance-flammes.">Munitions drones</option>
+						<option value="L’arme gagne l’effet parasitage 2, mais perd 1D6 de dégâts et de violence. Ne peut être appliqué sur des armes de type lance-flammes, laser, arbalète ou lance-grenade.">Munitions IEM</option>
+						<option value="Les tirs de l’arme ne peuvent pas tuer la cible. Ne peut être appliqué sur des armes de type lance-flammes, laser, arbalète ou lance-grenade.">Munitions non létales</option>
+						<option value="L’arme possède l’effet silencieux. Ne peut être appliqué sur des armes de type lance-flammes, laser ou lance-grenade.">Munitions subsoniques</option>
+						<option value="L’arme procure une réussite automatique au tireur. Ne peut être appliqué sur des armes de type lance-flammes.">Pointeur laser</option>
+						<option value="La réaction du tireur est augmentée de 2. L'arme doit être à Deux Mains ou Lourde.">Protection d'arme</option>
+						<option value="L’arme gagne l’effet assassin 2.">Revêtement Omega</option>
+						<option value="L’arme est indestructible. Elle ne peut pas être brisée, broyée, cassée, démantelée, brûlée, etc.">Structure en Element Alpha</option>
+						<option value="L’arme concernée gagne l’effet tir en rafale et barrage 1. Une arme légère gagne l’effet deux mains, une arme à deux mains gagne l’effet lourd. N'est disponible que pour les armes de type balles, fléchettes, lasers et soniques.">Système de refroidissement</option>
+					</select>
+				</div>
+				<div>
+					<textarea name="attr_ameliorationArmes" class="largeTextarea" readonly></textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="tab-content tab11 Equipage">
+		<div class="mainFlex3Block marginBodyCorrection1">
+			<div class="mainBlock repeatingSpecial">
+				<div>
+					<h4 class="titre">Equipage</h4>
+				</div>
+				<fieldset class="repeating_equipage1">
+					<div>
+						<h4>Nom</h4>
+						<input type="text" name="attr_nomEquipage" />
+					</div>
+					<div>
+						<h4>Poste</h4>
+						<input type="text" name="attr_posteEquipage" />
+					</div>
+					<div>
+						<textarea name="attr_notesEquipage"></textarea>
+					</div>
+				</fieldset>
+			</div>
+			
+			<div class="mainBlock">
+				<div>
+					<h4 class="titre">Equipage</h4>
+				</div>
+				<fieldset class="repeating_equipage2">
+					<div>
+						<h4>Nom</h4>
+						<input type="text" name="attr_nomEquipage" />
+					</div>
+					<div>
+						<h4>Poste</h4>
+						<input type="text" name="attr_posteEquipage" />
+					</div>
+					<div>
+						<textarea name="attr_notesEquipage"></textarea>
+					</div>
+				</fieldset>
+			</div>
+		
+			<div class="mainBlock">
+				<div>
+					<h4 class="titre">Equipage</h4>
+				</div>
+				<fieldset class="repeating_equipage3">
+					<div>
+						<h4>Nom</h4>
+						<input type="text" name="attr_nomEquipage" />
+					</div>
+					<div>
+						<h4>Poste</h4>
+						<input type="text" name="attr_posteEquipage" />
+					</div>
+					<div>
+						<textarea name="attr_notesEquipage"></textarea>
+					</div>
+				</fieldset>
+			</div>
+		</div>
+	</div>
 </div>
 
 <rolltemplate class="sheet-rolltemplate-simple">
@@ -18327,5 +19371,32 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 			<h4 class="W80">Debordement</h4>
 			<h4 class="W20 textCenter">{{Debordement}}</h4>
 		</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-vehicule">
+	<div class="mainBlock">
+		<div class="fondSombre">
+			<h4 class="titre">{{Nom}}</h4>
+		</div>
+		{{#Special}}
+			<div>
+				<h5 class="center">{{Special}}</h5>
+			</div>
+		{{/Special}}
+		{{#^rollTotal() situationnel 0}}
+			<div>
+				<h5 class="W80">Malus/Bonus</h5>
+				<h5 class="W20 textCenter">{{situationnel}}</h5>
+			</div>
+		{{/^rollTotal() situationnel 0}}
+		<div>
+			<h4 class="W80">Succès</h4>
+			<h4 class="W20 textCenter">{{jet}}</h4>
+		</div>
+		<div>
+			<h5 class="W80">+OD</h5>
+			<h5 class="W20 textCenter">{{OD}}</h5>
+		</div>	
 	</div>
 </rolltemplate>
