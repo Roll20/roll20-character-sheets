@@ -9,7 +9,7 @@ Please note that the inline dice roll macros do not fully enable the type of dic
 If you have any questions, comments, or feedback (all welcome) please contact Barry at btsnyder@gmail.com
 
 ### Current Version
-Version 2.3 (October 28th, 2018) 
+Version 2.4 (November 4th, 2018) 
 
 ### Thanks	
 Many thanks to my players (Dave, Brian, Charles, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes in the middle of play) over the past several weeks.
@@ -17,9 +17,11 @@ Many thanks to my players (Dave, Brian, Charles, Matt, and Tyler) for their pati
 Many thanks to the following individuals who reported defects and provided improvements: 
 1. Morback: extra die on rolls + implement force to add 1/2 willpower to weapon DR + corruption level and roll changes
 2. Zoraste: update wounds to include wounds_max for token bar linking + notes field for Gear + minor spelling errors + request for private rolls + contributed code for automating trait calculations
-
+3. Fenrir: new layout was his work; full contributions in the API.
 
 ### Planned Releases
+
+Next: Overhaul of inline dice rolls!
 
 v2.0. Automate all calculated fields for performance and speed of character creation. 
     - includes automated calculation of traits
@@ -35,6 +37,13 @@ v4.0. Refine Inline rolls
     - a 6 = two successes
 
 ### Changelog
+
+** November 4th, 2018: version 2.4 - API Message Layout Changes** 
+
+Updates:
+1. API calls to the Wrath & Glory die roller will now use a different layout; the labels are inversed and a slight tweak made to font settings.
+2. API calls will now calculate damage.  The previous DR is replaced with a Damage label and it will show Total Damage and in Parenthesis DR & Successes.
+3. Fixed a labeling issue in the inline dice rolls.
 
 ** October 28th, 2018: version 2.3 - Private Rolls & Background** 
 
