@@ -1918,6 +1918,33 @@
 		});
 	};
 
+	const calculatePermanentStrain = () => {
+		getAttrs(["cyberware_strain_total", "strain_permanent_extra", "strain_permanent"], v => {
+			const permStrain = parseInt(v.cyberware_strain_total) + parseInt(v.strain_permanent_extra);
+			mySetAttrs({
+				strain_permanent: permStrain
+			}, v);
+		});
+	};
+
+	const calculateCyberwareStrain = () => {
+		//Loop through the cyberware and add up the strain.
+		getSectionIDs("repeating_cyberware", idArray => {
+			const sourceAttrs = [
+				...idArray.map(id => `repeating_cyberware${id}_cyberware_strain`),
+				"cyberware_strain_total"
+			];
+			getAttrs(sourceAttrs, v => {
+				const cyberwareStrain = Math.max(
+					...idArray.map(id => parseInt(v[`repeating_cyberware${id}_cyberware_strain`]) || 0)
+				);
+				mySetAttrs({
+					cyberware_strain_total: cyberwareStrain
+				}, v);
+			});
+		});
+	};
+
 	const calculateMod = (attr) => {
 		getAttrs([attr, `${attr}_bonus`, `${attr}_mod`], v => {
 			const mod = (value => {
@@ -3429,6 +3456,8 @@
 
 	on("change:strain change:strain_permanent", validateStrain);
 	on("change:constitution", calculateMaxStrain);
+	on("change:repeating_cyberware", calculateCyberwareStrain);
+	on("change:strain_permanent_extra change:cyberware_strain_total", calculatePermanentStrain);
 
 	on("change:level", calculateSaves);
 
