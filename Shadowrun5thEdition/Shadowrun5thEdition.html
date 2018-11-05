@@ -3745,8 +3745,7 @@ on("change:repeating_weapon", function() {
     ].forEach(field => {
         // Attach listener
         on(`change:${field}`, function(eventInfo) {
-        	console.log(eventInfo);
-
+        
         	const source = eventInfo.sourceAttribute;
         	const type = eventInfo.sourceType;
 
@@ -3799,8 +3798,6 @@ on("change:repeating_weapon", function() {
                     let removeGroup = (lowercase.includes("group")) ? lowercase.slice(0, -6) : lowercase;
                     let skillSet = (removeGroup.includes(" ")) ? removeGroup.replace(/ /g,"") : removeGroup;
 
-                    console.log(`${skillSet} WAS SET TO ${bas}`);
-
                     setAttrs({
                        [`${skillSet}`]: bas
                     });
@@ -3811,6 +3808,20 @@ on("change:repeating_weapon", function() {
         });
     });
 
+   	//Setting the Default attribute name for default skill
+	on("change:default_attribute", function() {
+		getAttrs(["default_attribute", "default_display"], function(v) {
+			const display = (v.default_display);
+			const attribute = (v.default_attribute);
+			let update = {};
+
+			//This sets a hidden input with the Attribute name so the roll template can use it to indicate what attribute was rolled
+			let attributeNew = attribute.slice(2, -1);
+			if (attributeNew != display) {update["default_display"] = attributeNew;};
+
+			setAttrs(update);
+		});
+	});
 
 //REFACTORED Range & MELEE UPDATES
    ['repeating_range',
@@ -3821,8 +3832,7 @@ on("change:repeating_weapon", function() {
             const newV = eventInfo.newValue;
             const type = weap.slice(-5);
 
-            //Setting this here for now to ensure dicepool attribute gets updated
-            //Move this for the Version 1.2
+            //Setting this here for now to ensure dicepool attribute gets updated. Remove in a future update
         	getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`], function(v) {
         		const mod = parseInt(v[`${weap}_dicepool_modifier`]) || 0;
 				const spec = parseInt(v[`${weap}_spec`]) || 0;
