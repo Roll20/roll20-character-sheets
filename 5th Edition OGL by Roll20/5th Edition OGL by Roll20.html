@@ -13998,6 +13998,32 @@
             });
         });
     });
+
+    on("page:lp-spells", function(eventinfo) {
+        getCompendiumQuery("Category:Spells Classes:*Wizard|*Bard Level:1|2|3", function(data) {
+            var byLevel = {};
+            var classes = ["Wizard", "Bard"];
+            _.each(data, function(spell) {
+                byLevel[spell.data.Level] = byLevel[spell.data.Level] || [];
+                byLevel[spell.data.Level].push(spell);
+            });
+            addRepeatingSection("choices", "row", "spellsrow", function(spellsrow) {
+                _.each(byLevel, function(level, x) {
+                    /*addRepeatingSection(spellsrow, "spell-holder", "spell-holder-" + x, function(levelrow) {
+                        var update = {};
+                        update[levelrow + " label span"] = "Level " + x " Spells";
+                        setCharmancerText(update);
+                        _.each(_.sortBy(level, "name"), function(spell) {
+                            addRepeatingSection(levelrow + " div", "spell-item", function(spellid) {
+                                var update = {};
+                                update[spellid + " .name"] = spell.name;
+                            });
+                        });
+                    });*/
+                });
+            });
+        });
+    });
 </script>
 
 <!-- CHARACTERMANCERS -->
@@ -14080,6 +14106,20 @@
     </label>
     <span style="display:none"></span>
     <button type="action" class="custom_add_action" name="act_action">Add another feature</button>
+</charmancer>
+
+<charmancer class="sheet-repeating-spell-holder">
+    <label><span></span><input type="checkbox"></label>
+    <div></div>
+</charmancer>
+
+<charmancer class="sheet-repeating-spell-item">
+    <div>
+        <input type="checkbox" name="comp_checked">
+        <span class="name"></span>
+        <span class="classes"></span>
+        <button type="action" class="mancer_info" name="act_info">i</button>
+    </div>
 </charmancer>
 
 <charmancer class="sheet-charmancer-l1-welcome">
@@ -15238,7 +15278,7 @@
                 <h3 class="levels_1">
                     <input type="hidden" name="comp_class1">
                     <input type="hidden" name="comp_currentlevel1">
-                    <!--<select class="choice" name="comp_lp-class1" accept="Category:Classes">
+                    <!--<select class="choice" name="comp_class1" accept="Category:Classes">
                         <option value="" data-i18n="choose">Choose</option>
                         <option class="custom" value="Rules:Classes" data-i18n="custom">Custom</option>
                     </select>-->
@@ -15247,7 +15287,7 @@
                     <input type="number" class="addinglevel" name="comp_addlevel1"> =
                     <span class="resultlevel"></span>
                 </h3>
-                <h4 class="class2_features_title choice">Class Features (<span class="range"></span>)</h4>
+                <h4 class="class1_features_title choice">Class Features (<span class="range"></span>)</h4>
                 <select class="choice subclass1" name="comp_subclass1">
                     <option value="" data-i18n="choose">Choose</option>
                     <option class="custom" value="Rules:Classes" data-i18n="custom">Custom</option>
