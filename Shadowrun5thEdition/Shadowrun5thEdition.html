@@ -30,7 +30,7 @@
 		</div>
 		<div class="tab-sheet" title="Sheet Type">
 			<select name="attr_sheet_type">
-				<option value="goon" data-i18n="goon">Goon</option>
+				<option value="grunt" data-i18n="grunt">Grunt</option>
 				<option value="host" data-i18n="host">Host</option>
 				<option value="sprite" data-i18n="sprite">Sprite</option>
 				<option value="vehicle" data-i18n="vehicle">Vehicle</option>
@@ -1607,7 +1607,7 @@
 						<div class="settings">
 							<div>
 								<input type="text" name="attr_name" placeholder="Old Crow" title="Contact name" />
-								<input type="number" name="attr_loyalty" min="1"placeholder="3" title="Loyalty" />
+								<input type="number" name="attr_loyalty" min="1" placeholder="3" title="Loyalty" />
 								<input type="number" name="attr_connection" min="1" placeholder="8" title="Connection" />
 								<input type="number" name="attr_favors" placeholder="+2" title="Favors" />
 								<h3 data-i18n="notes">Notes</h3>
@@ -2403,8 +2403,8 @@
 			</div><!-- ~~~~~~~~ End of  Skills ~~~~~~~~ -->
 			<div class="sprite skills">
 				<div class="skill-box"><label data-i18n="skills">Skills</label><span class="colon">: </span>
-					<fieldset class="repeating_active repeat-section">
-						<div class="npc-repeating">
+					<fieldset class="repeating_active">
+						<div class="npc-repeating repeat-section">
 							<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
 							<button type="roll" value="@{gm_toggle} &{template:sRun}{{header=@{skill}}}{{base=Level}}{{dice=[[(@{level}+@{level}+@{modifier_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Level Roll"><span name="attr_display"></span></button><span>,</span>
 							<div class="settings">
@@ -3009,6 +3009,18 @@
 
 <!--Sheet Worker-->
 <script type="text/worker">
+//Sheet open
+//This updating grunts to Grunts per the change in styling. This can be removed later. 3 Nov 2018
+on('sheet:opened', function() {
+	getAttrs(["sheet_type"], function(v) {
+		if (v.sheet_type === "grunt") {
+			setAttrs({
+				sheet_type: "grunt"
+			});
+		};
+	});
+})
+
 //Watch for Updates and Run the needed functions
 	on("change:body", function() {
 		update_liftCarry();
@@ -3726,146 +3738,90 @@ on("change:repeating_weapon", function() {
 		});
 	});
 
-//Repeating active skills for PC sheet
-	on("change:repeating_active", function() {
-		getAttrs(["repeating_active_skill", "repeating_active_specialization", "repeating_active_display", "repeating_active_display_specialization", "repeating_active_rating", "repeating_active_rating_modifier", "repeating_active_display_rating",
-			"repeating_active_attribute", "repeating_active_display_attribute"], function(v) {
-			const skill = (v.repeating_active_skill);
-			const specialization = (v.repeating_active_specialization);
-			const rank = parseInt(v.repeating_active_rating) || 0;
-			const rankmodifier = parseInt(v.repeating_active_rating_modifier) || 0;
-			const attribute = (v.repeating_active_attribute);
-			let update = {};
+//REFACTORED Skills
+  	[	'repeating_active',
+		'repeating_knowledge',
+		'repeating_language'
+    ].forEach(field => {
+        // Attach listener
+        on(`change:${field}`, function(eventInfo) {
+        
+        	const source = eventInfo.sourceAttribute;
+        	const type = eventInfo.sourceType;
 
-			let displayNew = ((skill).length > 0 && (skill).length <= 20) ? skill : ((skill).length > 20 ) ? (skill).slice(0, 20) + "..." : " ";
-			if (displayNew != v.repeating_active_display) {update["repeating_active_display"] = displayNew;};
+        	if (source.includes("rating")) {
+        		getAttrs([`${field}_rating`, `${field}_rating_modifier`], function(v) {
+        			const bas = parseInt(v[`${field}_rating`]) || 0;
+					const mod = parseInt(v[`${field}_rating_modifier`]) || 0;
+					const tot = bas + mod;
 
-			let specDisplayNew = ((specialization).length > 0 && (specialization).length <= 20) ? "(" + specialization + ")" : ((specialization).length > 20 ) ? "(" + (specialization).slice(0, 20) + "..." + ")" : " ";	
-			if (specDisplayNew != v.repeating_active_display_specialization) {update["repeating_active_display_specialization"] = specDisplayNew;};
+                    setAttrs({
+                        [`${field}_dicepool`]: tot,
+                        [`${field}_display_rating`]: mod === 0 ? bas : `${bas} (${tot})`
+                    });
+        		});
+        	} else if (source.includes("attribute") && type === "player") {
+        		getAttrs([`${source}`], function(v) {;
+        			const attr = v[`${source}`].slice(2, -1);
+        			setAttrs({
+                       [`${field}_display_attribute`]: attr
+                    });
+        		});
+        	} else if (source.includes("specialization") && type === "player")  {	
+        		getAttrs([`${source}`], function(v) {
+        			const bas = v[`${source}`];
+        			const size = bas.length;
 
-			let rankDisplayNew = (rankmodifier != "" || rankmodifier > 0) ? rank + " (" + (rank + rankmodifier) + ")" : rank;
-			if (rankDisplayNew != v.repeating_active_display_rating) {update["repeating_active_display_rating"] = rankDisplayNew;};
+        			let display = (size > 0 && size <= 20) ? `(${bas})` : (size > 20 ) ? "(" + bas.slice(0, 20) + "...)" : " ";
 
-			let dicepoolNew = rank + rankmodifier;
-			if (dicepoolNew != v.repeating_active_dicepool) {update["repeating_active_dicepool"] = dicepoolNew;};
+        			setAttrs({
+                       [`${field}_display_specialization`]: display
+                    });
+        		});
+        	} else if (source.includes("skill")) {
+                getAttrs([`${source}`], function(v) {
+                    const bas = v[`${source}`];
+                    const size = bas.length;
 
-			//This sets a hidden input with the appropraite Attribute name so the roll template can use it to indicate what attribute was rolled
-			let attributeNew = attribute.slice(2, -1);
-			if (attributeNew != v.repeating_active_display_attribute) {update["repeating_active_display_attribute"] = attributeNew;};
+                    let display = (size > 0 && size <= 20) ? bas : (size > 20 ) ? bas.slice(0, 20) + "..." : " ";
 
-			//This will take the dice pool calculated for the repeating active skills and will set static skill attribute located in the NPC section. 
-			if (skill) {
-				let lowercase = skill.toLowerCase();
-				let removeGroup = (lowercase.includes("group")) ? lowercase.slice(0, -6) : lowercase;
-				let skillSet = (removeGroup.includes(" ")) ? removeGroup.replace(/ /g,"") : removeGroup;
+                    setAttrs({
+                       [`${field}_display`]: display
+                    });
+                });
+            } else if (source.includes("dicepool")) {
+                getAttrs([`${source}`, `${field}_skill`], function(v) {
+                    const bas = v[`${source}`];
+                    const skill = v[`${field}_skill`];
 
-				{update[skillSet] = dicepoolNew;};
-			};
+                    let lowercase = skill.toLowerCase();
+                    let removeGroup = (lowercase.includes("group")) ? lowercase.slice(0, -6) : lowercase;
+                    let skillSet = (removeGroup.includes(" ")) ? removeGroup.replace(/ /g,"") : removeGroup;
 
-			setAttrs(update);
-		});
-	});
+                    setAttrs({
+                       [`${skillSet}`]: bas
+                    });
+                });
+        	}  else  {
+        		console.log(`Change to ${field} did not set attr`);
+        	};
+        });
+    });
 
-	//Repeating knowledge for PC sheet
-	on("change:repeating_knowledge", function() {
-		getAttrs(["repeating_knowledge_skill", "repeating_knowledge_specialization", "repeating_knowledge_display", "repeating_knowledge_display_specialization", "repeating_knowledge_rating", "repeating_knowledge_rating_modifier", "repeating_knowledge_display_rating",
-			"repeating_knowledge_attribute", "repeating_knowledge_display_attribute"], function(v) {
-			const skill = (v.repeating_knowledge_skill);
-			const specialization = (v.repeating_knowledge_specialization);
-			const rank = parseInt(v.repeating_knowledge_rating) || 0;
-			const rankmodifier = parseInt(v.repeating_knowledge_rating_modifier) || 0;
-			const attribute = (v.repeating_knowledge_attribute);
-			let update = {};
-
-			let displayNew = ((skill).length > 0 && (skill).length <= 20) ? skill : ((skill).length > 20 ) ? (skill).slice(0, 20) + "..." : " ";
-			if (displayNew != v.repeating_knowledge_display) {update["repeating_knowledge_display"] = displayNew;};
-
-			let specDisplayNew = ((specialization).length > 0 && (specialization).length <= 20) ? "(" + specialization + ")" : ((specialization).length > 20 ) ? "(" + (specialization).slice(0, 20) + "..." + ")" : " ";	
-			if (specDisplayNew != v.repeating_knowledge_display_specialization) {update["repeating_knowledge_display_specialization"] = specDisplayNew;};
-
-			let rankDisplayNew = (rankmodifier != "" || rankmodifier > 0) ? rank + " (" + (rank + rankmodifier) + ")" : rank;
-			if (rankDisplayNew != v.repeating_knowledge_display_rating) {update["repeating_knowledge_display_rating"] = rankDisplayNew;};
-
-			let dicepoolNew = rank + rankmodifier;
-			if (dicepoolNew != v.repeating_knowledge_dicepool) {update["repeating_knowledge_dicepool"] = dicepoolNew;};
-
-			switch (attribute) {
-				case '@{body}': attributeNew = "Body"; break;
-				case '@{agility}': attributeNew = "Agility"; break;
-				case '@{reaction}': attributeNew = "Reaction"; break;
-				case '@{strength}': attributeNew = "Strength"; break;
-				case '@{willpower}': attributeNew = "Willpower"; break;
-				case '@{logic}': attributeNew = "Logic"; break;
-				case '@{intuition}': attributeNew = "Intuition"; break;
-				case '@{charisma}': attributeNew = "Charisma"; break;
-				case '@{magic}': attributeNew = "Magic"; break;
-				case '@{resonance}': attributeNew = "Resonance"; break;
-				default: attributeNew = "Invalid";
-			}
-			if (attributeNew != v.repeating_knowledge_display_attribute) {update["repeating_knowledge_display_attribute"] = attributeNew;};
-
-			setAttrs(update);
-		});
-	});
-
-//Repeating language for PC sheet
-	on("change:repeating_language", function() {
-		getAttrs(["repeating_language_skill", "repeating_language_specialization", "repeating_language_display", "repeating_language_display_specialization", "repeating_language_rating", "repeating_language_rating_modifier", "repeating_language_display_rating",
-			"repeating_language_attribute", "repeating_language_display_attribute"], function(v) {
-			const skill = (v.repeating_language_skill);
-			const specialization = (v.repeating_language_specialization);
-			const rank = parseInt(v.repeating_language_rating) || 0;
-			const rankmodifier = parseInt(v.repeating_language_rating_modifier) || 0;
-			const attribute = (v.repeating_language_attribute);
-			let update = {};
-
-			let displayNew = ((skill).length > 0 && (skill).length <= 20) ? skill : ((skill).length > 20 ) ? (skill).slice(0, 20) + "..." : " ";
-			if (displayNew != v.repeating_language_display) {update["repeating_language_display"] = displayNew;};
-
-			let specDisplayNew = ((specialization).length > 0 && (specialization).length <= 20) ? "(" + specialization + ")" : ((specialization).length > 20 ) ? "(" + (specialization).slice(0, 20) + "..." + ")" : " ";	
-			if (specDisplayNew != v.repeating_language_display_specialization) {update["repeating_language_display_specialization"] = specDisplayNew;};
-
-			let rankNew = (rank != "" || rank != 0) ? rank : "N";
-			let rankDisplayNew = (rankmodifier != "" || rankmodifier > 0) ? rankNew + " (" + (rankNew + rankmodifier) + ")" : rankNew;
-			if (rankDisplayNew != v.repeating_language_display_rating) {update["repeating_language_display_rating"] = rankDisplayNew;};
-
-			let dicepoolNew = rank + rankmodifier;
-			if (dicepoolNew != v.repeating_language_dicepool) {update["repeating_language_dicepool"] = dicepoolNew;};
-
-			switch (attribute) {
-				case '@{body}': attributeNew = "Body"; break;
-				case '@{agility}': attributeNew = "Agility"; break;
-				case '@{reaction}': attributeNew = "Reaction"; break;
-				case '@{strength}': attributeNew = "Strength"; break;
-				case '@{willpower}': attributeNew = "Willpower"; break;
-				case '@{logic}': attributeNew = "Logic"; break;
-				case '@{intuition}': attributeNew = "Intuition"; break;
-				case '@{charisma}': attributeNew = "Charisma"; break;
-				case '@{magic}': attributeNew = "Magic"; break;
-				case '@{resonance}': attributeNew = "Resonance"; break;
-				default: attributeNew = "Invalid";
-			}
-			if (attributeNew != v.repeating_language_display_attribute) {update["repeating_language_display_attribute"] = attributeNew;};
-
-			setAttrs(update);
-		});
-	});
-
-	//Setting the Default attribute name for default skill
+   	//Setting the Default attribute name for default skill
 	on("change:default_attribute", function() {
 		getAttrs(["default_attribute", "default_display"], function(v) {
 			const display = (v.default_display);
 			const attribute = (v.default_attribute);
 			let update = {};
 
-			//This sets a hidden input with the appropraite Attribute name so the roll template can use it to indicate what attribute was rolled
+			//This sets a hidden input with the Attribute name so the roll template can use it to indicate what attribute was rolled
 			let attributeNew = attribute.slice(2, -1);
 			if (attributeNew != display) {update["default_display"] = attributeNew;};
 
 			setAttrs(update);
 		});
 	});
-
 
 //REFACTORED Range & MELEE UPDATES
    ['repeating_range',
@@ -3876,8 +3832,7 @@ on("change:repeating_weapon", function() {
             const newV = eventInfo.newValue;
             const type = weap.slice(-5);
 
-            //Setting this here for now to ensure dicepool attribute gets updated
-            //Move this for the Version 1.2
+            //Setting this here for now to ensure dicepool attribute gets updated. Remove in a future update
         	getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`], function(v) {
         		const mod = parseInt(v[`${weap}_dicepool_modifier`]) || 0;
 				const spec = parseInt(v[`${weap}_spec`]) || 0;
@@ -4063,5 +4018,6 @@ on("change:repeating_weapon", function() {
             });
         });
     });
+
 
 	</script>
