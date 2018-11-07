@@ -35,4 +35,3 @@ Aktuell veröffentliche ich fast täglich neue Versionen. Die aktuelle Version i
 
 * [Discord](https://discord.gg/KT5qj9)
 * Email: (gebhardthbs@web.de)
-* [Patreon](https://www.patreon.com/user?u=118076)

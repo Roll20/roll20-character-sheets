@@ -10,7 +10,7 @@ At the top of each version of the sheet is a settings cog if this is clicked the
 
 ## Quick Start
 
-This is for the Qucik Start only the category modifiers are not calculated and is intended only for one shots to demo the new system
+This is for the Qucik Start only the category modifiers arenot calculated and is intended only for one shots to demo the new system
 
 One thing to note is the way the damage per location works.  Instead of just knocking  points down as damage is taken there is a damage box so you can put in wounds as they are taken so that you can apply first aid separately.  So if you take a 2 wound and then a 4 point the damage box  should look like 2+4. Make sure there is no trailing + signs, so don't have it look like 3+5+ .  There is a separate box in the hit point section for damage to total hit points such as bleeding and poison. 
 
@@ -30,26 +30,8 @@ In the weapon section * indicates to use the mounts damage bonus and not the pla
 
 Default in the weapon section indicates that you are using a skill from the same category e.g. using Broadsword skill with a short sword.  It will halve the skill as per the rules.
 
-To remove the experience checkbox from a skill add a - at the start of the name e.g. -Animal Lore. To add the experience checkbox  add a + to the start of a skill name e.g. +Animal Lore
-
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
-## Version 15.10.2018
- Fixed issues with NPC sheet
- 
- Added Sprul-Pa Hit locations
-
-
-
-## Version 02.10.2018
-
-Fixed experience boxes removed for sheets added before 18.09.2018 update.
-     
-## Version 18.09.2018
-
-Add the ability to add or remove the experience checkbox
-
-Added an NPC sheet  accessible from the configuration on the first tab of each sheet version. 
 
 ## Version 06.09.2018
  Fixed issues with category modifiers over 20.

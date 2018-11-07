@@ -9,60 +9,26 @@ Please note that the inline dice roll macros do not fully enable the type of dic
 If you have any questions, comments, or feedback (all welcome) please contact Barry at btsnyder@gmail.com
 
 ### Current Version
-Version 2.2 (October 14th, 2018) 
+Version 2.0 (August 20th, 2018) 
 
 ### Thanks	
 Many thanks to my players (Dave, Brian, Charles, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes in the middle of play) over the past several weeks.
 
-Many thanks to the following individuals who reported defects and provided improvements: 
-1. Morback: extra die on rolls + implement force to add 1/2 willpower to weapon DR + corruption level and roll changes
-2. Dean: update wounds to include wounds_max for token bar linking + notes field for Gear + minor spelling errors
-
-
 ### Planned Releases
 
-v2.0. Automate all calculated fields for performance and speed of character creation. 
-    - includes automated calculation of traits
-    - validate impact on NPC where the same fields are not RO
-    - when auto-calculating, need to allow the use of STR for Fel for influence for orks, and intellect in place of Fel for Mechanicus
-	
-v3.0. Redo NPC Layout with an order close to the core rulebook stat block. 
+v3.0. Redo NPC Layout with an order close to the core rulebook stat block. [early September]
 
-v4.0. Refine Inline rolls 
+v4.0. Refine Inline rolls [late September]
     - Add modifiers to each roll
     - a 6 = two successes
 
+v5.0. Automate all calculated fields for performance and speed of character creation. [October]
+    - includes automated calculation of traits
+    - validate impact on NPC where the same fields are not RO
+    - when auto-calculating, need to allow the use of STR for Fel for influence for orks, and intellect in place of Fel for Mechanicus
 
 	
 ### Changelog
-
-** October 14th, 2018: version 2.2 - Enhancements & Fixes** 
-
-Updates:
-1. Fixed minor types [Thanks to Dean for the catch]
-2. Fixed label on Persuasion roll - when rolled it said Persuasion Assist when it should have been persuasion.
-3. Roll Glory now uses API or inline dice rolling.
-4. Added hover text to skills for quick reference on use.
-5. Removed woundscurrent and shockcurrent and added wounds_max and shock_max so token bars operate properly [Thanks to Dean for the suggestion]
-6. Created script to update wounds and shock based on existing scores in woundscurrent and shockcurrent
-7. Added a gear tooltip to the gear and assets for PC's [Thanks to Dean for the suggestion]
-8. added a quantity field to gear [Thanks to Dean for the suggestion]
-9. Auto calculate wounds_max and shock_max; wounds = modified toughness + tier + mod; shock = modified willpower + tier + mod.  Both shock and wounds will also calculate off of custom tier.
-10. Added a Mod field to shock and wounds to update values from abilities, powers, etc.
-11. Added check on tier; when not set to custom the value is changed to 0.
-12. Added Lightly wounded value.
-13. Auto Generate light and heavy wounded values.
-14. Salvo needs to be a text field to allow for --; -- has specific rules implementations.  Field originally allowed only numeric characters.
-15. If a psyker (added as a checkbox under keywords) and a weapon is a force weapon add 1/2 Base Willpower to DR.  If the character is not a psyker and the weapon is a force weapon -2 to DR. [Thanks to Morback for the suggestion]
-16. For PC & NPC sheets: Onload of a character sheet with current version, automatically update all weapon DR's, corruption levels, wound, shock, light wounded, heavy wounded.
-
-** September 23rd, 2018: version 2.1 - Fixes** 
-
-Updates:
-1. Fixed all attack rolls using the API (character, NPC, Vehicle, Voidship); the feed to the API was not subtracting a die for Wrath from the pool being rolled.
-2. Modified Corruption line under mental/social traits to list level of corruption and DN per page 367 of core rulebook.
-3. Added Resist Corruption line under mental/social traits after the Corruption Rating
-4. Fixed Mission BP not being added to totals.
 
 ** August 20th, 2018: version 2.0 - Base Rule Alignment Changes** 
 
@@ -88,7 +54,7 @@ Updates:
 Note:  No existing attributes were changed or removed.  Existing functionality was expanded.
 
 Fixes:
-    1. Toggling of Use Inline Dice vs API.  When checked and then unchecked, every time the sheet would be reopened it was defaulting to checked.  It should open to the value it closed on... checked or unchecked.
+    1. Toggling of Use Inline Dice vs API.  When checked and then unchecked, everytime the sheet would be reopened it was defaulting to checked.  It should open to the value it closed on... checked or unchecked.
 
 ** July 26th, 2018: version 1.0 submitted to Roll20** 
 - resubmitted on August 6th due to roll20 packaging error.
