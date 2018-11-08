@@ -12664,7 +12664,7 @@
         }
     });
 
-    on("page:l1-welcome page:l1-class page:l1-race page:l1-abilities page:l1-background page:l1-equipment page:l1-spells page:l1-feat page:l1-summary", function(eventinfo) {
+    on("page:l1-welcome page:l1-class page:l1-race page:l1-abilities page:l1-background page:l1-equipment page:l1-spells page:l1-feat page:l1-bio page:l1-summary", function(eventinfo) {
         var mancerdata = getCharmancerData();
         var buttons = "";
         var buttoninfo = {
@@ -12676,6 +12676,7 @@
             equipment: "equipment-u",
             spells: "spells-u",
             feat: "feats-u",
+            bio: "bio-u",
             summary: "review-u"
         }
         _.each(buttoninfo, function(translation, page) {
@@ -12948,6 +12949,43 @@
         });
     });
 
+    /* BIO PAGE */
+    on("page:l1-bio", function(eventinfo) {
+        const attrs = ["age", "character_name", "eyes", "hair", "height", "weight", "skin"];
+        const mancerdata = getCharmancerData();
+        const biodata = mancerdata["l1-bio"] || undefined;
+        const race = getName("race");
+
+        //Check for any data that has already been filled in and populate the Bio slide
+        if (biodata === undefined) {
+            getAttrs(attrs, function(v) {
+                let update = {};
+
+                _.each(attrs, function(value) {
+                    if (v[`${value}`] != "" || v[`${value}`] != undefined) {
+                        update[`${value}`] = v[`${value}`];
+                    };
+                });
+
+                setAttrs(update);
+            });
+        };
+
+        //Set the previous_race so the Summary page can offer a warning if needed
+        if (biodata === undefined || biodata.values["previous_race"] === undefined || biodata.values["previous_race"] != race) {
+
+            setAttrs({
+                previous_race: race
+            });
+        };
+
+        if (mancerdata["l1-race"] != undefined) {
+             const raceInfo = mancerdata["l1-race"].values.race;
+             changeCompendiumPage("sheet-race-info", raceInfo);
+        };
+    });
+
+    /* SUMMARY PAGE */
     on("page:l1-summary", function() {
         var mancerdata = getCharmancerData();
         var profdata = getProficiencies(mancerdata);
@@ -13046,9 +13084,46 @@
             return warnings;
         };
 
+        ///Show the bio info we need to put in places
+        if(mancerdata["l1-bio"]) {
+            let length = Object.keys(mancerdata["l1-bio"].values).length;
+            set["bio_info"] = "";
+
+            //Check if race has changed since entering data and add a warning
+            if(length < 2) {
+                set["bio_info"] += '<p>You have not added new information to the Bio tab.</p>';
+            } else {
+                if(mancerdata["l1-bio"].values.character_name) {
+                    set["bio_info"] += '<p>Your name is ' + mancerdata["l1-bio"].values.character_name + '.</p>';};
+
+                if(mancerdata["l1-bio"].values.age) {
+                    set["bio_info"] += '<p>Your age is ' + mancerdata["l1-bio"].values.age + '.</p>';};
+                
+                if(mancerdata["l1-bio"].values["height"]) {
+                    set["bio_info"] += '<p>Your height is ' + mancerdata["l1-bio"].values["height"] + '.</p>';};
+                
+                if(mancerdata["l1-bio"].values.weight) {
+                    set["bio_info"] += '<p>Your weight is ' + mancerdata["l1-bio"].values.weight + '.</p>';};
+                
+                if(mancerdata["l1-bio"].values.eyes) {
+                    set["bio_info"] += '<p>Your eye color is ' + mancerdata["l1-bio"].values.eyes + '.</p>';};
+                
+                if(mancerdata["l1-bio"].values.hair) {
+                    set["bio_info"] += '<p>Your hair is ' + mancerdata["l1-bio"].values.hair + '.</p>';};
+                
+                if(mancerdata["l1-bio"].values.skin) {
+                    set["bio_info"] += '<p>Your skin is ' + mancerdata["l1-bio"].values.skin + '.</p>';};
+
+                if (mancerdata["l1-bio"].values.previous_race != racename) {
+                    setCharmancerText({
+                        race_warning: '<p class="sheet-warning">Each race has unique look and different names. You might want to adjust your choices to reflect your race.</p>'
+                    });
+                };
+            };
+        };
+
         if(mancerdata["l1-race"] && racename) {
             set["race_info"] = '<p>Your race is ' + racename + '</p>';
-            if(!mancerdata["l1-race"].values.age) set["race_info"] += '<p class="sheet-warning">You haven\'t entered an age for your character.</p>';
             if(!mancerdata["l1-race"].values.alignment) set["race_info"] += '<p class="sheet-warning">You haven\'t chosen your alignment.</p>';
             set["race_info"] += handleMissing("race");
             if(mancerdata["l1-race"].values["has_subrace"] == "true") {
@@ -13529,7 +13604,7 @@
         var silentset = {};
         var silentattrs = ["class_resource_name", "class_resource", "class_resource_max", "other_resource_name", "other_resource", "other_resource_max", "other_resource_itemid", "class", "class_display", "subclass", "hitdietype", "hitdie_final", "race", "subrace", "race_display", "custom_class", "cust_classname"];
         var clearset = {};
-        var clearattrs = ["age", "hp", "hp_max", "size", "speed", "gp", "alignment", "global_damage_mod_flag", "spellcasting_ability", "cust_hitdietype", "cust_spellslots", "cust_spellcasting_ability", "ac", "jack_bonsu", "jack_attr", "death_save_bonus", "weighttotal", "initiative_bonus", "hit_dice", "hit_dice_max", "pb", "jack", "caster_level", "spell_attack_mod", "spell_attack_bonus", "spell_save_dc", "passive_wisdom", "custom_ac_base", "custom_ac_part1", "custom_ac_part2", "custom_ac_shield", "background", "global_ac_mod_flag", "global_attack_mod_flag"];
+        var clearattrs = ["hp", "hp_max", "size", "speed", "gp", "alignment", "global_damage_mod_flag", "spellcasting_ability", "cust_hitdietype", "cust_spellslots", "cust_spellcasting_ability", "ac", "jack_bonsu", "jack_attr", "death_save_bonus", "weighttotal", "initiative_bonus", "hit_dice", "hit_dice_max", "pb", "jack", "caster_level", "spell_attack_mod", "spell_attack_bonus", "spell_save_dc", "passive_wisdom", "custom_ac_base", "custom_ac_part1", "custom_ac_part2", "custom_ac_shield", "background", "global_ac_mod_flag", "global_attack_mod_flag"];
         var set = {gp: 0};
         var allDrops = [];
         var currentDrop = 0;
@@ -13742,7 +13817,6 @@
 
         //Set up the final setAttrs()
         set["alignment"] = data["l1-race"].values.alignment || "";
-        set["age"] = data["l1-race"].values.age || "";
         set["hp"] = stats.hp;
         set["hp_max"] = stats.hp;
         set["l1mancer_status"] = "completed";
@@ -13756,6 +13830,12 @@
         } else if(data["l1-equipment"].values["equipment_type"] == "gold" && data["l1-equipment"].values["starting_gold"]) {
             set["gp"] = parseInt(data["l1-equipment"].values["starting_gold"]);
         }
+        //Add the bio info
+        _.each(["character_name", "age", "height", "weight", "eyes", "hair", "skin"], function(type) {
+            if(data["l1-bio"].values[type]) {
+                set[type] = data["l1-bio"].values[type] || "";
+            }
+        });
         //Add skill proficiencies
         _.each(_.uniq(profs.all.Skill.concat(profs.all.Expertise)), function(prof) {
             var profName = prof.toLowerCase().replace(" " , "_");
@@ -13998,11 +14078,6 @@
                         <label class="choice custom_race"><span data-i18n="charisma">Charisma:</span>
                             <input class="choice custom_race" type="number" name="comp_race_custom_charisma" value="0" min="-5" max="5">
                         </label>
-                    </label>
-                </div>
-                <div class="choice row race_always custom_race">
-                    <label><span data-i18n="age">Age:</span>
-                        <input type="number" name="comp_age" min="0">
                     </label>
                 </div>
                 <div class="choice row race_always custom_race">
@@ -14912,7 +14987,7 @@
         <div class="bottombar">
             <button class="prev" type="back" value="l1-spells">Back</button>
             <button type="button" data-scroll="#top" class="jump">Back to Top</button>
-            <button class="next" type="back" value="l1-summary">Next</button>
+            <button class="next" type="back" value="l1-bio">Next</button>
         </div>
         <div class="choice cancel-prompt">
             <p class="label">Where would you like to go, Traveler?</p>
@@ -14922,6 +14997,69 @@
             <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
         </div>
 
+    </div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-l1-bio">
+    <div class="charmancer container">
+        <ol class="steps">
+        </ol>
+        <div class="topbar-holder"></div>
+        <div class="choices">
+            <input type="hidden" name="comp_previous_race" value="">
+            <div>
+                <div class="row">
+                    <label><span data-i18n="char-name-u">Name</span>
+                        <input type="text" name="comp_character_name">
+                    </label>
+                </div>
+                <div class="row">
+                    <label><span data-i18n="age-u">Age</span>
+                        <input type="text" name="comp_age">
+                    </label>
+                </div>
+                <div class="row">
+                    <label><span data-i18n="height-u">Height</span>
+                        <input type="text" name="comp_height">
+                    </label>
+                </div>
+                <div class="row">
+                    <label><span data-i18n="weight-u">Weight</span>
+                        <input type="text" name="comp_weight">
+                    </label>
+                </div>
+                <div class="row">
+                    <label><span data-i18n="eye-u">Eyes</span>
+                        <input type="text" name="comp_eyes">
+                    </label>
+                </div>
+                <div class="row">
+                    <label><span data-i18n="hair-u"">Hair</span>
+                        <input type="text" name="comp_hair">
+                    </label>
+                </div>
+                <div class="row">
+                    <label><span data-i18n="skin-u">Skin</span>
+                        <input type="text" name="comp_skin" min="0">
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="info">
+            <div class="sheet-compendium-page sheet-race-info" accept="Rules:Races"></div>
+        </div>
+        <div class="bottombar">
+            <button class="prev" type="back" value="l1-feat">Back</button>
+            <button type="button" data-scroll="#top" class="jump">Back to Top</button>
+            <button class="next" type="back" value="l1-summary">Next</button>
+        </div>
+        <div class="choice cancel-prompt">
+            <p class="label">Where would you like to go, Traveler?</p>
+            <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
+            <button type="cancel" value="l1-bio" data-i18n="save_progress_and_exit">Save and Exit</button>
+            <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
+            <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
+        </div>
     </div>
 </charmancer>
 
@@ -14993,10 +15131,16 @@
                 <div class="feat_info">
                 </div>
             </div>
+            <div class="summary">
+                <p class="label">Bio</p>
+                <div class="race_warning"></div>
+                <div class="bio_info">
+                </div>
+            </div>
         </div>
 
         <div class="bottombar">
-            <button class="prev" type="back" value="l1-spells">Back</button>
+            <button class="prev" type="back" value="l1-bio">Back</button>
             <button type="button" data-scroll="#top" class="jump">Back to Top</button>
             <button class="next choice apply_changes" type="finish" value="l1-mancer">Apply Changes</button>
         </div>
