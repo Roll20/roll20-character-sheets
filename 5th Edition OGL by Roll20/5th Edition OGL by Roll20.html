@@ -11789,13 +11789,14 @@
             clearRepeatingSections("race_holder");
             clearRepeatingSections("subrace_holder");
         }
-
         if(eventinfo.newValue === "Rules:Races") {
             //Clears saved data for this field
             getCompendiumPage("");
+            console.log("SETTING ATTRS!");
             setAttrs(reset, function() {
                 var update = {"race_text": ""};
-                var options = eventinfo.sourceType == "player" ? {selected: ""} : {}
+                var options = eventinfo.sourceType == "player" ? {selected: ""} : {};
+                console.log("SHOWING CHOICES!")
                 showChoices(["custom_race"]);
                 setCharmancerText(update);
                 addCustomSections("Race");
@@ -12677,6 +12678,7 @@
     });
 
     on(changeListeners, function(eventinfo) {
+        console.log(eventinfo);
         recalcData();
     });
 
@@ -14000,29 +14002,54 @@
     });
 
     on("page:lp-spells", function(eventinfo) {
-        getCompendiumQuery("Category:Spells Classes:*Wizard|*Bard Level:1|2|3", function(data) {
+        getCompendiumQuery(["Category:Spells Classes:*Wizard Level:0|1|2|3|4|5|6|7|8|9", "Category:Spells Classes:*Bard Level:0|1|2|3|4|5|6", "Category:Spells Classes:*Cleric Level:0|1|2|3", "Category:Spells Classes:*Druid Level:0|1|2"], function(data) {
             var byLevel = {};
-            var classes = ["Wizard", "Bard"];
+            var classes = ["Wizard", "Bard", "Cleric", "Druid"];
+            console.log(data.length);
             _.each(data, function(spell) {
                 byLevel[spell.data.Level] = byLevel[spell.data.Level] || [];
-                byLevel[spell.data.Level].push(spell);
+                byLevel[spell.data.Level].push({
+                    name: spell.name,
+                    classes: spell.data.Classes.split(",").map(x => x.trim())
+                });
             });
             addRepeatingSection("choices", "row", "spellsrow", function(spellsrow) {
-                _.each(byLevel, function(level, x) {
-                    /*addRepeatingSection(spellsrow, "spell-holder", "spell-holder-" + x, function(levelrow) {
+                _.each(byLevel, function(spells, x) {
+                    addRepeatingSection(spellsrow, "spell-holder", "spell-holder-" + x, function(levelrow) {
                         var update = {};
-                        update[levelrow + " label span"] = "Level " + x " Spells";
+                        update[levelrow + " label span"] = x == "0" ? "Cantrips" : "Level " + x;
+                        if(x == "0") {
+                            var set = {};
+                            set[levelrow + "_show"] = "1";
+                            update[levelrow + " .sheet-controller"] = "1";
+                            setAttrs(set, {silent: true});
+                        }
                         setCharmancerText(update);
-                        _.each(_.sortBy(level, "name"), function(spell) {
-                            addRepeatingSection(levelrow + " div", "spell-item", function(spellid) {
+                        spells = _.sortBy(spells, "name");
+                        _.each(spells, function(spell) {
+                            addRepeatingSection(levelrow + " .sheet-container", "spell-item", function(spellid) {
                                 var update = {};
-                                update[spellid + " .name"] = spell.name;
+                                update[spellid + " .sheet-name"] = spell.name;
+                                update[spellid + " .sheet-classes"] = "";
+                                _.each(classes, function(thisclass, y) {
+                                    if(spell.classes.includes(thisclass)) {
+                                        update[spellid + " .sheet-classes"] += "<span class=\"class" + y + "\">" + thisclass + "</span>";
+                                    }
+                                })
+                                setCharmancerText(update);
                             });
                         });
-                    });*/
+                    });
                 });
             });
         });
+    });
+
+    on("mancerchange:repeating_spellsrow", function(eventinfo) {
+        console.table(eventinfo);
+        var update = {};
+        update[eventinfo.sourceSection + " .sheet-controller"] = eventinfo.newValue || "";
+        setCharmancerText(update);
     });
 </script>
 
@@ -14109,17 +14136,18 @@
 </charmancer>
 
 <charmancer class="sheet-repeating-spell-holder">
-    <label><span></span><input type="checkbox"></label>
-    <div></div>
+    <label class="spellheader"><span class="title"></span><input type="checkbox" name="comp_show" value="1"></label>
+    <span class="controller" style="display: none"></span>
+    <div class="container"></div>
 </charmancer>
 
 <charmancer class="sheet-repeating-spell-item">
-    <div>
-        <input type="checkbox" name="comp_checked">
+    <label class="nostyle">
+        <input type="checkbox" class="spellcheck" name="comp_checked" value="1">
         <span class="name"></span>
         <span class="classes"></span>
-        <button type="action" class="mancer_info" name="act_info">i</button>
-    </div>
+    </label>
+    <button type="action" class="mancer_info" name="act_info">i</button>
 </charmancer>
 
 <charmancer class="sheet-charmancer-l1-welcome">
@@ -15374,10 +15402,10 @@
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel-u">CANCEL</button></li>
         </ol>
         <div class="topbar-holder"></div>
-        <div class="choices">
+        <div class="choices spellslide">
         </div>
 
-        <div class="info">
+        <div class="info spellslide">
             <div class="sheet-compendium-page sheet-class-info" accept="Rules:Classes"></div>
         </div>
         <div class="bottombar">
