@@ -11,6 +11,11 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 19.1.5
+
+### Bug fixes
+- [#775: Spell data not converting for NPCs and Monster spellcasters on premade campaign](https://bitbucket.org/mlenser/5eshaped/issues/775/spell-data-not-converting-for-npcs-and)
+
 ## 19.1.4
 
 ### Bug fixes
