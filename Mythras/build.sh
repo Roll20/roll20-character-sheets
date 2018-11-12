@@ -1,27 +1,34 @@
 #!/bin/bash
 
 # Validate Javascript
-echo "Javascript validation:"
+echo "### Javascript validation:"
 acorn --silent templates/scripts/base.js
 
-# Compile files
-./render_templates.py
+# CSS Validation
+echo ""
+echo "### CSS validation:"
+css-validator ./Mythras.css 2>&1 | grep -v "unknown vendor exten"
+
+# Translation Validation
+echo ""
+echo "### Translation JSON Validation:"
+cat ./translation.json | json_verify
+
+# Validate sheet.json
+echo ""
+echo "### sheet.json validation:"
+cat ./sheet.json | json_verify
 
 # HTML
-read -p "<Enter to copy HTML>"
-cat ./Mythras2.html | xclip -selection clipboard
+read -p "<Enter to compile and copy HTML>"
+./render_templates.py
+cat ./Mythras.html | xclip -selection clipboard
 
 # CSS
-echo ""
-echo "CSS validation:"
-css-validator ./Mythras.css 2>&1 | grep -v "unknown vendor exten"
 read -p "<Enter to copy CSS>"
 cat ./Mythras.css | xclip -selection clipboard
 
 # Translations
-echo ""
-echo "Translation JSON Validation:"
-cat ./translation.json | json_verify
 read -p "<Enter to copy translations>"
 cat ./translation.json | xclip -selection clipboard
 

@@ -9,6 +9,6 @@ env = Environment(
 
 html_template = env.get_template('base.html')
 
-with open('./Mythras2.html', 'w') as f:
+with open('./Mythras.html', 'w') as f:
     f.write(html_template.render())
 f.closed
