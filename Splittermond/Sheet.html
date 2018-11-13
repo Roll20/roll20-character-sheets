@@ -582,7 +582,9 @@
                             <td>Lebenspunkte</td>
                             <td><input type=number style="width: 4em; font-weight: bold; text-align: center" name="attr_lebenspunkte" value=0 readonly="true"></td>
                             <td><input type=number style="width: 4em; font-weight: bold; text-align: center" name="attr_lebenspunktemod" value=0></td>
-                            <td><input type=hidden name="attr_hiddenlp" value=0></td>
+                            <input type=hidden name="attr_hiddenlp" value=0>
+                            <input type=hidden name="attr_hiddenfokreg" value=0>
+                            <input type=hidden name="attr_hiddenlifereg" value=0>
                         </tr>
                         <tr bgcolor="#81BEF7">
                             <td>Fokus</td>
@@ -2983,6 +2985,16 @@ on("change:repeating_staerken:staerkenwert change:repeating_staerken:staerke", f
                         hiddensplitterpunkte: +staerkenwert * 2
                     })
                     break;
+                case "erhöhte fokusregeneration":
+                    setAttrs({
+                        hiddenfokreg: +staerkenwert
+                    })
+                    break;
+                case "erhöhte lebensregeneration":
+                    setAttrs({
+                        hiddenlifereg: +staerkenwert
+                    })
+                    break;
             }
         } else if (!(staerkenwert) && (staerke != "")) {
             setAttrs({
@@ -3038,7 +3050,7 @@ on("remove:repeating_staerken", function(eventInfo) {
 });
 
 on("change:stcopy2", function(eventInfo) {
-    getAttrs(["stcopy2", "stcopy1", "hiddenlp", "hiddenfokus", "hiddengsw", "hiddengw", "hiddenkw", "hiddensr", "hiddenini", "schmerzresistenz", "hiddensplitterpunkte"], function(v) {
+    getAttrs(["stcopy2", "stcopy1", "hiddenlp", "hiddenfokus", "hiddengsw", "hiddengw", "hiddenkw", "hiddensr", "hiddenini", "schmerzresistenz", "hiddensplitterpunkte", "hiddenfokreg", "hiddenlifereg"], function(v) {
         var stcopytemp1 = v.stcopy1.toString().split(",");
         var stcopytemp2 = v.stcopy2;
         var countmatch = stcopytemp2.toString().match(/^\d+/g);
@@ -3087,6 +3099,14 @@ on("change:stcopy2", function(eventInfo) {
                 } else if (temp[0].toLowerCase() == "zusätzliche splitterpunkte" && v.hiddensplitterpunkte > 0) {
                     setAttrs({
                         hiddensplitterpunkte: 0
+                    });
+                } else if (temp[0].toLowerCase() == "erhöhte fokusregeneration" && v.hiddenfokreg > 0) {
+                    setAttrs({
+                        hiddenfokreg: 0
+                    });
+                } else if (temp[0].toLowerCase() == "erhöhte lebensregeneration" && v.hiddenlifereg > 0) {
+                    setAttrs({
+                        hiddenlifereg: 0
                     });
                 } 
             }
@@ -5806,7 +5826,7 @@ on("change:verschnaufpause change:ruhephase", function(f) {
             });
         }
     });
-    getAttrs(["fokus_k", "fokus_e", "fokus_v", "fokus_t", "lebenspunkte_k", "lebenspunkte_e", "lebenspunkte_v", "lebenspunkte_t", "regbonus", "verschnaufpause", "ruhephase", "konstitution", "willenskraft", "lebenspunkte", "fokus"], function(v) {
+    getAttrs(["fokus_k", "fokus_e", "fokus_v", "fokus_t", "lebenspunkte_k", "lebenspunkte_e", "lebenspunkte_v", "lebenspunkte_t", "regbonus", "verschnaufpause", "ruhephase", "konstitution", "willenskraft", "lebenspunkte", "fokus", "hiddenfokreg", "hiddenlifereg"], function(v) {
         let fokus_t = +v.fokus_t;
         let fokus_v = +v.fokus_v;
         let fokus_e = +v.fokus_e;
@@ -5817,7 +5837,11 @@ on("change:verschnaufpause change:ruhephase", function(f) {
         let lp_k = +v.lebenspunkte_k;
         let kon = +v.konstitution;
         let wil = +v.willenskraft;
+        let lifereg = +v.hiddenlifereg;
+        let fokreg = +v.hiddenfokreg;
         let regbonus = +v.regbonus;
+        let konbonus = 2;
+        let wilbonus = 2;
         setAttrs({
            lebenspunkte_t: +lp_t + +lp_e,
            lebenspunkte_e: 0,
@@ -5828,10 +5852,16 @@ on("change:verschnaufpause change:ruhephase", function(f) {
         lp_t += +lp_e;
         fokus_t += fokus_e;
         if (v.ruhephase == true) {
-            let lpges = Math.min(+lp_t + +regbonus + (+kon * 2), (+v.lebenspunkte * 5 - +lp_k));
-            let lpv = Math.max(+lp_v - +regbonus - (+kon *2), 0);
-            let fokges = Math.min(+fokus_t + (+wil * 2), +v.fokus);
-            let fokv = Math.max(+fokus_v - (+wil * 2), 0);
+            if (lifereg == 1) {
+                konbonus = 3;
+            } 
+            if (fokreg == 1) {
+                wilbonus = 3;
+            }
+            let lpges = Math.min(+lp_t + +regbonus + (+kon * +konbonus), (+v.lebenspunkte * 5 - +lp_k));    
+            let lpv = Math.max(+lp_v - +regbonus - (+kon * +konbonus), 0);
+            let fokges = Math.min(+fokus_t + (+wil * +wilbonus), +v.fokus);    
+            let fokv = Math.max(+fokus_v - (+wil * +wilbonus), 0);
             setAttrs({
                 lebenspunkte_t: +lpges,
                 lebenspunkte_v: +lpv,
