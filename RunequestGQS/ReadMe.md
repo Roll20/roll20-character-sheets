@@ -45,7 +45,7 @@ Peacefull Cut changed to Peaceful Cut
 Customs (local)  tickbox removed 
 
 
-Added the ability to add more weapons to the npcsheet
+Added the ability to add more weapons to the npc sheet
 
 
 ## Version 15.10.2018
