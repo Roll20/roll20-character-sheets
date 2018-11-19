@@ -34,6 +34,20 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
+## Version 19.11.2018
+
+Disguise starting skill changed to 05
+
+The Spirit Lore starting skill changed to 00
+
+Peacefull Cut changed to Peaceful Cut
+
+Customs (local)  tickbox removed 
+
+
+Added the ability to add more weapons to the npcsheet
+
+
 ## Version 15.10.2018
  Fixed issues with NPC sheet
  
