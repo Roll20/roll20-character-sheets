@@ -1,4 +1,64 @@
+<!-- **** SCRIPTS / SHEET WORKERS -->
+<script type="text/worker">
+    on('sheet:opened',function(){
+        // **** Gestion transition de version
+        getAttrs(["VERSION"], function(values) {
+            var verfdp = parseInt(values.VERSION) || 0;
+            if (verfdp == 0) {
+                // Version 1.3 vers 2.0
+                getAttrs(["FOR_SUP","DEX_SUP","CON_SUP","INT_SUP","PER_SUP","CHA_SUP"], function(jets) {
+                    var sfor, sdex, scon, sint, sper, scha = "";
+                    if ( jets.FOR_SUP == "2" ){
+                        sfor = "@{JETSUP}";
+                    } else {
+                        sfor = "@{JETNORMAL}";
+                    }
+                    if ( jets.DEX_SUP == "2" ){
+                        sdex = "@{JETSUP}";
+                    } else {
+                        sdex = "@{JETNORMAL}";
+                    }
+                    if ( jets.CON_SUP == "2" ){
+                        scon = "@{JETSUP}";
+                    } else {
+                        scon = "@{JETNORMAL}";
+                    }
+                    if ( jets.INT_SUP == "2" ){
+                        sint = "@{JETSUP}";
+                    } else {
+                        sint = "@{JETNORMAL}";
+                    }
+                    if ( jets.PER_SUP == "2" ){
+                        sper = "@{JETSUP}";
+                    } else {
+                        sper = "@{JETNORMAL}";
+                    }
+                    if ( jets.CHA_SUP == "2" ){
+                        scha = "@{JETSUP}";
+                    } else {
+                        scha = "@{JETNORMAL}";
+                    }
+                    setAttrs({
+                        FOR_SUP: sfor,
+                        DEX_SUP: sdex,
+                        CON_SUP: scon,
+                        INT_SUP: sint,
+                        PER_SUP: sper,
+                        CHA_SUP: scha,
+                        VERSION: "2.0"
+                    });
+                });
+            }
+        });
+    });
+</script>
 <div class="sheet-mainBg"> <!-- FDP -->
+    <!-- INPUT HIDDEN TYPE DE JETS -->
+    <input type="hidden" name="attr_VERSION" value="2.0" />
+    <input type="hidden" name="attr_JETNORMAL" value="1d@{ETATDE}" />
+    <input type="hidden" name="attr_JETSUP" value="2d@{ETATDE}kh1" />
+    <input type="hidden" name="attr_JETSUPHERO" value="{2d@{ETATDE}kh1, 0d20+10}kh1" />
+    <!-- FIN Type de jets -->
     <div><!-- Identité -->
         <table  class="sheet-tabsep">
             <tr>
@@ -39,82 +99,96 @@
                             <td class="sheet-textfat">Test</td>
                         </tr>
                         <tr>
-                            <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_FOR" title="Jet de Force" value="&{template:co1} {{name=Force}} {{subtags=Caract&eacute;ristique}} {{carac=[[{@{FOR_SUP}d20cs20cf1}kh1+[[@{FOR_TEST}]]]]}}"> FOR</button></td>
+                            <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_FOR" title="Jet de Force" value="&{template:co1} {{perso=@{character_name}}} {{name=Force}} {{subtags=Caract&eacute;ristique}} {{carac=[[ @{FOR_SUP}[Dé] + [[@{FOR_TEST}]][Bonus] ]] }}"> FOR</button></td>
                             <td class="sheet-boxinputlight">
                                 <select class="sheet-selectmin" name="attr_FOR_SUP" title="Caractéristique Normale ou Supérieure (Règle optionnelle page 138)">
-                                    <option value="1" selected>N Normale</option>
-                                    <option value="2">S Supérieure</option>
+                                    <option value="@{JETNORMAL}" selected>N Normale</option>
+                                    <option value="@{JETSUP}">S Supérieure OU Héroïque</option>
+                                    <option value="@{JETSUPHERO}">H Supérieure ET Héroïque</option>
                                 </select>
                             </td>
-                            <td class="sheet-boxinput"><input type="number" name="attr_FORCE" title="Force" value="10" min="0" max="30"/></td>
+                            <td class="sheet-boxinput"><input type="number" name="attr_FORCE" title="Force" value="10" min="0" /></td>
                             <td class="sheet-boxinputlight"><input type="number" name="attr_FOR" value="floor((@{FORCE}-10)/2)" disabled /></td>
                             <td class="sheet-boxinput"><input type="number" name="attr_FOR_BONUS" title="Bonus au Test" value="0" /></td>
                             <td class="sheet-boxinputlight"><input type="number" name="attr_FOR_TEST" value="@{FOR}+@{FOR_BONUS}" disabled /></td>
                         </tr>
                         <tr>
-                            <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_DEX" title="Jet de Dext&eacute;rit&eacute;" value="&{template:co1} {{name=Dext&eacute;rit&eacute;}} {{subtags=Caract&eacute;ristique}} {{carac=[[{@{DEX_SUP}d20cs20cf1}kh1+[[@{DEX_TEST}]]]]}}"> DEX</button></td>
+                            <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_DEX" title="Jet de Dext&eacute;rit&eacute;" value="&{template:co1} {{perso=@{character_name}}} {{name=Dext&eacute;rit&eacute;}} {{subtags=Caract&eacute;ristique}} {{carac=[[ @{DEX_SUP}[Dé] + [[@{DEX_TEST}]][Bonus] ]] }}"> DEX</button></td>
                             <td class="sheet-boxinputlight">
                                 <select class="sheet-selectmin" name="attr_DEX_SUP" title="Caractéristique Normale ou Supérieure (Règle optionnelle page 138)">
-                                    <option value="1" selected>N Normale</option>
-                                    <option value="2">S Supérieure</option>
+                                    <option value="@{JETNORMAL}" selected>N Normale</option>
+                                    <option value="@{JETSUP}">S Supérieure OU Héroïque</option>
+                                    <option value="@{JETSUPHERO}">H Supérieure ET Héroïque</option>
                                 </select>
                             </td>
-                            <td class="sheet-boxinput"><input type="number" name="attr_DEXTERITE" title="Dext&eacute;rit&eacute;" value="10" min="0" max="30" /></td>
+                            <td class="sheet-boxinput"><input type="number" name="attr_DEXTERITE" title="Dext&eacute;rit&eacute;" value="10" min="0"  /></td>
                             <td class="sheet-boxinputlight"><input type="number" name="attr_DEX" value="floor((@{DEXTERITE}-10)/2)" disabled /></td>
                             <td class="sheet-boxinput"><input type="number" name="attr_DEX_BONUS" title="Bonus au Test" value="0" /></td>
                             <td class="sheet-boxinputlight"><input type="number" name="attr_DEX_TEST" value="@{DEX}+@{DEX_BONUS}" disabled /></td>
                         </tr>
                         <tr>
-                            <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_CON" title="Jet de Constitution" value="&{template:co1} {{name=Constitution}} {{subtags=Caract&eacute;ristique}} {{carac=[[{@{CON_SUP}d20cs20cf1}kh1+[[@{CON_TEST}]]]]}}"> CON</button></td>
+                            <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_CON" title="Jet de Constitution" value="&{template:co1} {{perso=@{character_name}}} {{name=Constitution}} {{subtags=Caract&eacute;ristique}} {{carac=[[ @{CON_SUP}[Dé] + [[@{CON_TEST}]][Bonus] ]] }}"> CON</button></td>
                             <td class="sheet-boxinputlight">
                                 <select class="sheet-selectmin" name="attr_CON_SUP" title="Caractéristique Normale ou Supérieure (Règle optionnelle page 138)">
-                                    <option value="1" selected>N Normale</option>
-                                    <option value="2">S Supérieure</option>
+                                    <option value="@{JETNORMAL}" selected>N Normale</option>
+                                    <option value="@{JETSUP}">S Supérieure OU Héroïque</option>
+                                    <option value="@{JETSUPHERO}">H Supérieure ET Héroïque</option>
                                 </select>
                             </td>
-                            <td class="sheet-boxinput"><input type="number" name="attr_CONSTITUTION" title="Constitution" value="10" min="0" max="30" /></td>
+                            <td class="sheet-boxinput"><input type="number" name="attr_CONSTITUTION" title="Constitution" value="10" min="0"  /></td>
                             <td class="sheet-boxinputlight"><input type="number" name="attr_CON" value="floor((@{CONSTITUTION}-10)/2)" disabled /></td>
                             <td class="sheet-boxinput"><input type="number" name="attr_CON_BONUS" title="Bonus au Test" value="0" /></td>
                             <td class="sheet-boxinputlight"><input type="number" name="attr_CON_TEST" value="@{CON}+@{CON_BONUS}" disabled /></td>
                         </tr>
                         <tr>
-                            <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_INT" title="Jet d'Intelligence" value="&{template:co1} {{name=Intelligence}} {{subtags=Caract&eacute;ristique}} {{carac=[[{@{INT_SUP}d20cs20cf1}kh1+[[@{INT_TEST}]]]]}}"> INT</button></td>
+                            <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_INT" title="Jet d'Intelligence" value="&{template:co1} {{perso=@{character_name}}} {{name=Intelligence}} {{subtags=Caract&eacute;ristique}} {{carac=[[ @{INT_SUP}[Dé] + [[@{INT_TEST}]][Bonus] ]] }}"> INT</button></td>
                             <td class="sheet-boxinputlight">
                                 <select class="sheet-selectmin" name="attr_INT_SUP" title="Caractéristique Normale ou Supérieure (Règle optionnelle page 138)">
-                                    <option value="1" selected>N Normale</option>
-                                    <option value="2">S Supérieure</option>
+                                    <<option value="@{JETNORMAL}" selected>N Normale</option>
+                                    <option value="@{JETSUP}">S Supérieure OU Héroïque</option>
+                                    <option value="@{JETSUPHERO}">H Supérieure ET Héroïque</option>
                                 </select>
                             </td>
-                            <td class="sheet-boxinput"><input type="number" name="attr_INTELLIGENCE" title="Intelligence" value="10" min="0" max="30" /></td>
+                            <td class="sheet-boxinput"><input type="number" name="attr_INTELLIGENCE" title="Intelligence" value="10" min="0"  /></td>
                             <td class="sheet-boxinputlight"><input type="number" name="attr_INT" value="floor((@{INTELLIGENCE}-10)/2)" disabled /></td>
                             <td class="sheet-boxinput"><input type="number" name="attr_INT_BONUS" title="Bonus au Test" value="0" /></td>
                             <td class="sheet-boxinputlight"><input type="number" name="attr_INT_TEST" value="@{INT}+@{INT_BONUS}" disabled /></td>
                         </tr>
                         <tr>
-                            <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_PER" title="Jet de Perception" value="&{template:co1} {{name=Perception}} {{subtags=Caract&eacute;ristique}} {{carac=[[{@{PER_SUP}d20cs20cf1}kh1+[[@{PER_TEST}]]]]}}"> PER</button></td>
+                            <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_PER" title="Jet de Perception" value="&{template:co1} {{perso=@{character_name}}} {{name=Perception}} {{subtags=Caract&eacute;ristique}} {{carac=[[ @{PER_SUP}[Dé] + [[@{PER_TEST}]][Bonus] ]] }}"> PER</button></td>
                             <td class="sheet-boxinputlight">
                                 <select class="sheet-selectmin" name="attr_PER_SUP" title="Caractéristique Normale ou Supérieure (Règle optionnelle page 138)">
-                                    <option value="1" selected>N Normale</option>
-                                    <option value="2">S Supérieure</option>
+                                    <option value="@{JETNORMAL}" selected>N Normale</option>
+                                    <option value="@{JETSUP}">S Supérieure OU Héroïque</option>
+                                    <option value="@{JETSUPHERO}">H Supérieure ET Héroïque</option>
                                 </select>
                             </td>
-                            <td class="sheet-boxinput"><input type="number" name="attr_PERCEPTION" title="Perception" value="10" min="0" max="30" /></td>
+                            <td class="sheet-boxinput"><input type="number" name="attr_PERCEPTION" title="Perception" value="10" min="0"  /></td>
                             <td class="sheet-boxinputlight"><input type="number" name="attr_PER" value="floor((@{PERCEPTION}-10)/2)" disabled /></td>
                             <td class="sheet-boxinput"><input type="number" name="attr_PER_BONUS" title="Bonus au Test" value="0" /></td>
                             <td class="sheet-boxinputlight"><input type="number" name="attr_PER_TEST" value="@{PER}+@{PER_BONUS}" disabled /></td>
                         </tr>
                         <tr>
-                            <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_CHA" title="Jet de Charisme" value="&{template:co1} {{name=Charisme}} {{subtags=Caract&eacute;ristique}} {{carac=[[{@{CHA_SUP}d20cs20cf1}kh1+[[@{CHA_TEST}]]]]}}"> CHA</button></td>
+                            <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_CHA" title="Jet de Charisme" value="&{template:co1} {{perso=@{character_name}}} {{name=Charisme}} {{subtags=Caract&eacute;ristique}} {{carac=[[ @{CHA_SUP}[Dé] + [[@{CHA_TEST}]][Bonus] ]] }}"> CHA</button></td>
                             <td class="sheet-boxinputlight">
                                 <select class="sheet-selectmin" name="attr_CHA_SUP" title="Caractéristique Normale ou Supérieure (Règle optionnelle page 138)">
-                                    <option value="1" selected>N Normale</option>
-                                    <option value="2">S Supérieure</option>
+                                    <option value="@{JETNORMAL}" selected>N Normale</option>
+                                    <option value="@{JETSUP}">S Supérieure OU Héroïque</option>
+                                    <option value="@{JETSUPHERO}">H Supérieure ET Héroïque</option>
                                 </select>
                             </td>
-                            <td class="sheet-boxinput"><input type="number" name="attr_CHARISME" title="Charisme" value="10" min="0" max="30" /></td>
+                            <td class="sheet-boxinput"><input type="number" name="attr_CHARISME" title="Charisme" value="10" min="0"  /></td>
                             <td class="sheet-boxinputlight"><input type="number" name="attr_CHA" value="floor((@{CHARISME}-10)/2)" disabled /></td>
                             <td class="sheet-boxinput"><input type="number" name="attr_CHA_BONUS" title="Bonus au Test" value="0" /></td>
                             <td class="sheet-boxinputlight"><input type="number" name="attr_CHA_TEST" value="@{CHA}+@{CHA_BONUS}" disabled /></td>
+                        </tr>
+                        <tr>
+                            <td class="sheet-textfat">Condition</td>
+                            <td class="sheet-boxinputlight" COLSPAN="5">
+                                <input type="radio" name="attr_ETATDE" value="20" checked >Normal (d20)</input>
+                                &nbsp;
+                                <input type="radio" name="attr_ETATDE" value="12" >Affaibli (d12)</input>
+                            </td>
                         </tr>
                     </table> <!-- FIN Caracs -->
                     <table class="sheet-tabsep" style="margin-top: 20px;"> <!-- Chance -->
@@ -145,7 +219,7 @@
                                         <td class="sheet-textfat">Total</td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_CAC" title="Jet d'attaque au contact" value="&{template:co1} {{name=Au Contact}} {{subtags=Attaque}} {{attaque=[[1d20cs20cf1+[[@{ATKCAC}]]]]}}"> AU CONTACT</button></td>
+                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_CAC" title="Jet d'attaque au contact" value="&{template:co1} {{perso=@{character_name}}} {{name=Au Contact}} {{subtags=Attaque}} {{attaque=[[ 1d@{ETATDE}cs20cf1[Dé] + [[@{ATKCAC}]][Bonus] ]] }}"> AU CONTACT</button></td>
                                         <td class="sheet-boxinputlight"><input type="number" name="attr_ATKCAC_BASE" value="0" title="Score de base" /></td>
                                         <td class="sheet-boxinput">
                                             <select class="sheet-carac" name="attr_ATKCAC_CARAC" size="1">
@@ -161,7 +235,7 @@
                                         <td class="sheet-boxinputlight"><input type="number" name="attr_ATKCAC" value="@{ATKCAC_BASE}+@{ATKCAC_CARAC}+@{ATKCAC_DIV}" disabled /></td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_TIR" title="Jet d'attaque à distance" value="&{template:co1} {{name=&Agrave; Distance}} {{subtags=Attaque}} {{attaque=[[1d20cs20cf1+[[@{ATKTIR}]]]]}}"> &Agrave; DISTANCE</button></td>
+                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_TIR" title="Jet d'attaque à distance" value="&{template:co1} {{perso=@{character_name}}} {{name=&Agrave; Distance}} {{subtags=Attaque}} {{attaque=[[ 1d@{ETATDE}cs20cf1[Dé] + [[@{ATKTIR}]][Bonus] ]] }}"> &Agrave; DISTANCE</button></td>
                                         <td class="sheet-boxinputlight"><input type="number" name="attr_ATKTIR_BASE" value="0" title="Score de base" /></td>
                                         <td class="sheet-boxinput">
                                             <select class="sheet-carac" name="attr_ATKTIR_CARAC" size="1">
@@ -177,7 +251,7 @@
                                         <td class="sheet-boxinputlight"><input type="number" name="attr_ATKTIR" value="@{ATKTIR_BASE}+@{ATKTIR_CARAC}+@{ATKTIR_DIV}" disabled /></td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_PSYINFLU" title="Jet d'attaque psychique : Influence" value="&{template:co1} {{name=Psychique (Influence)}} {{subtags=Attaque}} {{attaque=[[1d20cs20cf1+[[@{ATKPSYINFLU}]]]]}}"> PSY Influence</button></td>
+                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_PSYINFLU" title="Jet d'attaque psychique : Influence" value="&{template:co1} {{perso=@{character_name}}} {{name=Psychique (Influence)}} {{subtags=Attaque}} {{attaque=[[1d@{ETATDE}cs20cf1[Dé] + [[@{ATKPSYINFLU}]][Bonus] ]]}}"> PSY Influence</button></td>
                                         <td class="sheet-boxinputlight"><input type="number" name="attr_ATKPSY_BASE" value="0" title="Score de base" /></td>
                                         <td class="sheet-boxinput">
                                             <select class="sheet-carac" name="attr_ATKPSYINFLU_CARAC" size="1">
@@ -193,7 +267,7 @@
                                         <td class="sheet-boxinputlight"><input type="number" name="attr_ATKPSYINFLU" value="@{ATKPSY_BASE}+@{ATKPSYINFLU_CARAC}+@{ATKPSYINFLU_DIV}" disabled /></td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_PSYINTUI" title="Jet d'attaque psychique : Intuition" value="&{template:co1} {{name=Psychique (Intuition)}} {{subtags=Attaque}} {{attaque=[[1d20cs20cf1+[[@{ATKPSYINTUI}]]]]}}"> PSY Intuition</button></td>
+                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_PSYINTUI" title="Jet d'attaque psychique : Intuition" value="&{template:co1} {{perso=@{character_name}}} {{name=Psychique (Intuition)}} {{subtags=Attaque}} {{attaque=[[1d@{ETATDE}cs20cf1[Dé] + [[@{ATKPSYINTUI}]][Bonus] ]]}}"> PSY Intuition</button></td>
                                         <td class="sheet-boxinputlight"><span name="attr_ATKPSY_BASE" title="Score de base"></span></td>
                                         <td class="sheet-boxinput">
                                             <select class="sheet-carac" name="attr_ATKPSYINTUI_CARAC" size="1">
@@ -209,8 +283,8 @@
                                         <td class="sheet-boxinputlight"><input type="number" name="attr_ATKPSYINTUI" value="@{ATKPSY_BASE}+@{ATKPSYINTUI_CARAC}+@{ATKPSYINTUI_DIV}" disabled /></td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_INIT" title="Initiative" value="&{template:co1} {{name=Initiative}} {{subtags=Combat}} {{carac=[[@{INIT} &{tracker}]]}}"> INITIATIVE</button></td>
-                                        <td>&nbsp;</td>
+                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_INIT" title="Initiative" value="&{template:co1} {{perso=@{character_name}}} {{name=Initiative}} {{subtags=Combat}} {{carac=[[@{INIT}[Init.] + @{INIT_VAR}[Dé(s)] &{tracker}]]}}"> INITIATIVE</button></td>
+                                        <td class="sheet-textbase">Variable&nbsp;<input type="checkbox" name="attr_INIT_VAR" value="[[1d6!]]" checked="true" /></td>
                                         <td class="sheet-boxinputlight"><input type="number" name="attr_INIT_CARAC" value="@{DEXTERITE}" disabled /></td>
                                         <td class="sheet-boxinput"><input type="number" name="attr_INIT_DIV" title="Bonus divers" value="0" /></td>
                                         <td class="sheet-boxinputlight"><input type="number" name="attr_INIT" value="@{INIT_CARAC}+@{INIT_DIV}" disabled /></td>
@@ -223,7 +297,7 @@
                                         <td class="sheet-textfat" colspan="2">VITALIT&Eacute;</td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_DV" title="Jet de D&eacute; de Vie" value="&{template:co1} {{name=Dé de Vie}} {{subtags=Vitalit&eacute;}} {{DV=[[1d@{DV}+[[@{CON}]]]]}}"> DV</button></td>
+                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_DV" title="Jet de D&eacute; de Vie" value="&{template:co1} {{perso=@{character_name}}} {{name=Dé de Vie}} {{subtags=Vitalit&eacute;}} {{DV=[[1d@{DV}[DV] + [[@{CON}]][Mod. CON] ]]}}"> DV</button></td>
                                         <td class="sheet-boxinput">
                                             <select class="sheet-carac" name="attr_DV" size="1" title="D&eacute; de Vie">
                                                 <option value="0" selected >-</option>
@@ -236,7 +310,7 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_RECUP" title="Jet de Récupération" value="&{template:co1} {{name=Récupération}} {{subtags=Vitalit&eacute;}} {{RECUP=[[1d@{DV}+@{NIVEAU}+[[@{CON}]]]]}}"> PV</button></td>
+                                        <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_RECUP" title="Jet de Récupération" value="&{template:co1} {{perso=@{character_name}}} {{name=Récupération}} {{subtags=Vitalit&eacute;}} {{RECUP=[[1d@{DV}[DV] + @{NIVEAU}[Niveau] + [[@{CON}]][Mod. CON] ]]}}"> PV</button></td>
                                         <td class="sheet-boxinput"><input type="number" name="attr_PV_max" title="Points de Vie maximum"  value="0" /></td>
                                     </tr>
                                     <tr>
@@ -305,72 +379,105 @@
                         <tr>
                             <td class="sheet-boxinputleft">
                                 <span class="sheet-textbasesmall">TRAITS</span><br/>
-                                <textarea name="attr_TRAITS" style="height:10em;"></textarea>
+                                <textarea name="attr_TRAITS" style="height:5em;"></textarea>
                             </td>
                         </tr>
                     </table>
                 </td> <!-- FIN Capa Race -->
-                <td style="vertical-align:top;"> <!-- Armes -->
+                <td style="vertical-align:top;"> <!-- Divers -->
                     <table class="sheet-tabsep">
                         <tr>
-                            <td class="sheet-textfatleft">ARME</td>
-                            <td class="sheet-textbase" style="width:150px;">ATTAQUE</td>
-                            <td class="sheet-textbase" style="width:210px;">DM</td>
+                            <td class="sheet-boxinputleft">
+                                <span class="sheet-textbasesmall">DIVERS</span><br/>
+                                <textarea name="attr_DIVERS" style="height:5em;"></textarea>
+                            </td>
                         </tr>
                     </table>
-                    <fieldset class="repeating_armes">
-                        <table  class="sheet-tabsep">
-                            <tr>
-                                <td>
-                                    <button type="roll" class="sheet-neutre" name="JetArme" value="&{template:co1} {{name=@{armenom}}} {{subtags=Attaque}} {{attaque=[[1d20cs>@{armecrit}cf1+[[@{armeatk}]]+@{armeatkdiv}]]}} {{degats=[[@{armedmnbde}d@{armedmde}+[[@{armedmcar}]]+@{armedmdiv}]]}}" />
-                                </td>
-                                <td class="sheet-boxinputleft" style="width:100%;">
-                                    <input type="text" name="attr_armenom" style="font-weight: bold;" placeholder="Nom de l'arme"/>
-                                </td>
-                                <td class="sheet-boxinputleft">
-                                        <select class="sheet-carac" style="width: 97px;" name="attr_armeatk" size="1">
-                                            <option value="@{ATKCAC}" selected>CONTACT</option>
-                                            <option value="@{ATKTIR}">DISTANCE</option>
-                                            <option value="@{ATKPSYINFLU}">PSY Influence</option>
-                                            <option value="@{ATKPSYINTUI}">PSY Intuition</option>
-                                        </select>+<input type="number" style="width:32px;" name="attr_armeatkdiv" value="0" title="Bonus d'attaque divers" />
-                                </td>
-                                <td class="sheet-boxinputleft">
-                                    <input type="number" style="width:32px;" name="attr_armedmnbde" value="1" title="Nombre de d&eacute;s de dommage" />
-                                    <select class="sheet-carac"  style="width:55px;" name="attr_armedmde" size="1" title="D&eacute; de dommage">
-                                        <option value="4" selected>d4</option>
-                                        <option value="6">d6</option>
-                                        <option value="8">d8</option>
-                                        <option value="10">d10</option>
-                                        <option value="12">d12</option>
-                                    </select>+<select class="sheet-carac" style="width:57px;" name="attr_armedmcar" size="1" title="Modificateur aux dommages">
-                                        <option value="0">-</option>
-                                        <option value="@{FOR}" selected>FOR</option>
-                                        <option value="@{DEX}">DEX</option>
-                                        <option value="@{CON}">CON</option>
-                                        <option value="@{INT}">INT</option>
-                                        <option value="@{PER}">PER</option>
-                                        <option value="@{CHA}">CHA</option>
-                                    </select>+<input type="number" style="width:32px;" name="attr_armedmdiv" value="0" title="Bonus de dommage divers" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="sheet-textbase" style="text-align: right;" COLSPAN="2">
-                                    Crit.<input type="number" name="attr_armecrit" min="2" max="20" value="20" />
-                                    &nbsp;
-                                    SP&Eacute;CIAL
-                                </td>
-                                <td class="sheet-boxinputleft" COLSPAN="2">
-                                    <input type="text" name="attr_armespec" />
-                                </td>
-                            </tr>
-                        </table>
-                    </fieldset>
                 </td> <!-- FIN Armes -->
             </tr>
         </table>
     </div> <!-- FIN Caracs + combat + PV + défense  -->
     <img class="sheet-imghr" src="https://raw.githubusercontent.com/NathaTerrien/roll20-wip/master/ChroniquesGalactiques/cog_hr.png" />
+	<div> <!-- Armes -->
+		<table class="sheet-tabsep">
+			<tr>
+				<td class="sheet-textfatleft" style="width:153px;">ARMES / ATTAQUES</td>
+				<td class="sheet-textbase" style="width:145px;">ATTAQUE</td>
+				<td class="sheet-textbase" style="width:20px;">CRIT.</td>
+				<td class="sheet-textbase" style="width:194px;">DM</td>
+				<td class="sheet-textbase" style="width:50px;">PORTÉE</td>
+				<td class="sheet-textbase" style="widht:100%;">SPÉCIAL</td>
+			</tr>
+        </table>
+		<div style="max-height:170px;overflow-y:scroll;">
+			<fieldset class="repeating_armes">
+				<table  class="sheet-tabsep">
+					<tr>
+						<td>
+							<button type="roll" class="sheet-neutre" name="JetArme" value="&{template:co1} {{perso=@{character_name}}} {{name=@{armenom}}} {{subtags=Attaque}} {{desc=@{armejetn}}} {{attaque=[[@{armejetd}cs>@{armecrit}cf<@{armeinct}[Dé] + [[@{armeatk}]][Attaque] + @{armeatkdiv}[Bonus] ]]}} {{degats=[[@{armedmnbde}d@{armedmde}[Dé DM] + [[@{armedmcar}]][Mod.DM] + @{armedmdiv}[Bonus DM] ]]}} {{special=@{armespec}}}" />
+						</td>
+						<td class="sheet-boxinputleft" style="min-width:130px;">
+							<input type="text" name="attr_armenom" style="font-weight: bold;" placeholder="Arme/attaque"/>
+						</td>
+						<td class="sheet-boxinputleft">
+								<select class="sheet-carac" style="width: 87px;" name="attr_armeatk" size="1">
+									<option value="@{ATKCAC}" selected>CONTACT</option>
+									<option value="@{ATKTIR}">DISTANCE</option>
+									<option value="@{ATKMAG}">MAGIE</option>
+								</select>+<input type="number" style="width:32px;" name="attr_armeatkdiv" value="0" title="Bonus d'attaque divers" />
+						</td>
+						<td class="sheet-boxinputleft" style="text-align: right;">
+							<input type="number" name="attr_armecrit" style="width:32px;" min="2" max="20" value="20" title="Seuil de Critique (par défaut 20)" />
+						</td>
+						<td class="sheet-boxinputleft">
+							<input type="number" style="width:32px;" name="attr_armedmnbde" value="1" title="Nombre de dés de dommage" />
+							<select class="sheet-carac"  style="width:47px;" name="attr_armedmde" size="1" title="Dé de dommage">
+								<option value="4" selected>d4</option>
+								<option value="6">d6</option>
+								<option value="8">d8</option>
+								<option value="10">d10</option>
+								<option value="12">d12</option>
+							</select>+<select class="sheet-carac" style="width:52px;" name="attr_armedmcar" size="1" title="Modificateur aux dommages">
+								<option value="0">-</option>
+								<option value="@{FOR}" selected>FOR</option>
+								<option value="@{DEX}">DEX</option>
+								<option value="@{CON}">CON</option>
+								<option value="@{INT}">INT</option>
+								<option value="@{SAG}">SAG</option>
+								<option value="@{CHA}">CHA</option>
+							</select>+<input type="number" style="width:32px;" name="attr_armedmdiv" value="0" title="Bonus de dommage divers" />
+						</td>
+					</tr>
+					<td class="sheet-boxinputleft" style="min-width:50px;">
+						<input type="text" name="attr_armeportee" placeholder="Portée" title="Portée" />
+					</td>
+					<td class="sheet-boxinputleft" style="width:100%;">
+						<textarea name="attr_armespec" placeholder="Notes, capacités spéciales, effet ..." title="Notes, capacités spéciales, effet ..."></textarea>
+					</td>
+					<tr>
+						<td>&nbsp;</td>
+						<td class="sheet-boxinputleft">
+							<input type="text" name="attr_armejetn" style="font-weight: bold;" placeholder="Nom de l'attaque" title="Nom de l'attaque si jet spécial ..." />
+						</td>
+						<td class="sheet-boxinputleft">&nbsp;Type de jet
+							<select class="sheet-carac" style="width: 65px;" name="attr_armejetd" size="1" title="Jet d'attaque : 'Risque' = avec d12, 'Expert' = meilleur de deux d20">
+								<option value="1d@{ETATDE}" selected>Normal</option>
+								<option value="1d12">Risque (d12)</option>
+								<option value="2d20kh1">Expert (2 d20)</option>
+							</select>
+						</td>
+						<td class="sheet-boxinputleft">
+							<input type="number" style="width:32px;" name="attr_armeinct" min="1" max="20" value="1" title="Seuil d'incident de tir (par défaut 1)" />
+						</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+					</tr>
+				</table>
+            </fieldset>
+		</div> 
+	</div>
+	<img class="sheet-imghr" src="https://raw.githubusercontent.com/NathaTerrien/roll20-wip/master/ChroniquesGalactiques/cog_hr.png" />
     <div> <!-- Voies -->
         <table>
             <tr><td class="sheet-textfatleft" COLSPAN="5">CAPACIT&Eacute;S DU PERSONNAGE</td></tr>
@@ -471,7 +578,7 @@
             <table  class="sheet-tabsep">
                 <tr>
                     <td>
-                        <button type="roll" class="sheet-neutre" name="JETCAPA" value="&{template:co1} {{name=@{jetcapanom}}} {{subtags=Capacité}} {{carac=[[@{jetcapanbde}d@{jetcapade}+[[@{jetcapacarac}]]+@{jetcapadiv}]]}} {{desc=@{jetcapadesc}}}" />
+                        <button type="roll" class="sheet-neutre" name="JETCAPA" value="&{template:co1} {{perso=@{character_name}}} {{name=@{jetcapanom}}} {{subtags=Capacité}} {{carac=[[@{jetcapanbde}d@{jetcapade}@{jetcapatypjet} + [[@{jetcapacarac}]] + @{jetcapadiv}]] }} {{desc=@{jetcapadesc}}}" />
                     </td>
                     <td class="sheet-boxinputleft" style="min-width:200px;">
                         <input type="text" name="attr_jetcapanom" style="font-weight: bold;" placeholder="Nom du Jet de capacité" />
@@ -481,21 +588,37 @@
                     </td>
                     <td class="sheet-boxinputleft">
                         <input type="number" style="width:32px;" name="attr_jetcapanbde" value="1" title="Nombre de dés" />
-                        <select class="sheet-carac"  style="width:55px;" name="attr_jetcapade" size="1" title="Dé">
+                        <select class="sheet-carac"  style="width:50px;" name="attr_jetcapade" size="1" title="Dé (d20 => d12 si Affaibli)">
                             <option value="4">d4</option>
                             <option value="6">d6</option>
                             <option value="8">d8</option>
                             <option value="10">d10</option>
                             <option value="12">d12</option>
-                            <option value="20" selected>d20</option>
-                        </select>+<select class="sheet-carac" style="width:57px;" name="attr_jetcapacarac" size="1" title="Modificateur du jet">
+                            <option value="@{ETATDE}" selected>d20</option>
+                        </select>
+                        (<select class="sheet-carac" style="width:30px;" name="attr_jetcapatypjet" size="1" title="Option du jet : normal, meilleur dé, moins bon dé">
+                            <option value="">N - Normal</option>
+                            <option value="kh1">S - Garder le meilleur dé</option>
+                            <option value="kl1">I - Garder le moins bon dé</option>
+                        </select>)
+						+<select class="sheet-carac" style="width:50px;" name="attr_jetcapacarac" size="1" title="Modificateur du jet">
                             <option value="0">-</option>
-                            <option value="@{FOR}" selected>FOR</option>
-                            <option value="@{DEX}">DEX</option>
-                            <option value="@{CON}">CON</option>
-                            <option value="@{INT}">INT</option>
-                            <option value="@{PER}">PER</option>
-                            <option value="@{CHA}">CHA</option>
+                            <optgroup label="Mod. de base">
+                                <option value="@{FOR}" selected>FOR</option>
+                                <option value="@{DEX}">DEX</option>
+                                <option value="@{CON}">CON</option>
+                                <option value="@{INT}">INT</option>
+                                <option value="@{PER}">PER</option>
+                                <option value="@{CHA}">CHA</option>
+                            </optgroup>
+                                <optgroup label="Mod. de test">
+                                <option value="@{FOR_TEST}">FOR</option>
+                                <option value="@{DEX_TEST}">DEX</option>
+                                <option value="@{CON_TEST}">CON</option>
+                                <option value="@{INT_TEST}">INT</option>
+                                <option value="@{PER_TEST}">PER</option>
+                                <option value="@{CHA_TEST}">CHA</option>
+                            </optgroup>
                         </select>+<input type="number" style="width:32px;" name="attr_jetcapadiv" value="0" title="Bonus divers" />
                     </td>
                     <td class="sheet-textbase"  style="text-align: right;">
@@ -517,7 +640,6 @@
                     <span class="textbase">Crédits&nbsp;:</span>&nbsp;
                     <input type="text" style="width:320px;" name="attr_RICHESSE" placeholder="Rien ? C'est la pauvret&eacute; !" />
                 </div>
-                </table>
                 <fieldset class="repeating_equipement">
                     <div class="sheet-boxvoie">
                         <input type="text" style="width:310px;" name="attr_equip-nom" title="&Eacute;quipement" />
@@ -527,10 +649,20 @@
                 </fieldset>
             </div>
             <div class="sheet-col">
-                <table>
-                    <tr><td class="sheet-boxtitre">&Eacute;QUIPEMENT : Divers</td></tr>
-                    <tr><td class="sheet-boxinputleft"><textarea name="attr_equip-div" style="height:10em;" title="&Eacute;QUIPEMENT DIVERS"></textarea></td></tr>
-                </table>            </div>
+                <div class="sheet-boxtitre">&Eacute;QUIPEMENT : Personnel</div>
+                <fieldset class="repeating_materiel">
+                    <div class="sheet-boxvoie">
+                        <input type="text" name="attr_mater-nom" title="&Eacute;quipement" />
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <img class="sheet-imghr" src="https://raw.githubusercontent.com/NathaTerrien/roll20-wip/master/ChroniquesGalactiques/cog_hr.png" />
+        <div class="sheet-row">
+            <table>
+                <tr><td class="sheet-boxtitre">&Eacute;QUIPEMENT : Divers</td></tr>
+                <tr><td class="sheet-boxinputleft"><textarea name="attr_equip-div" style="height:10em;" title="&Eacute;QUIPEMENT DIVERS"></textarea></td></tr>
+            </table>
         </div>
         <img class="sheet-imghr" src="https://raw.githubusercontent.com/NathaTerrien/roll20-wip/master/ChroniquesGalactiques/cog_hr.png" />
         <div class="sheet-row">
@@ -545,6 +677,9 @@
 <rolltemplate class="sheet-rolltemplate-co1">
     <table>
         <tr>
+            <th colspan="2" style="text-align: center;">{{perso}}</th>
+        </tr>
+        <tr>
             <td class="subheader">{{subtags}}</td>
             <th>{{name}}</th>
         </tr>
@@ -553,6 +688,13 @@
                 <img class="sheet-imghr" src="https://raw.githubusercontent.com/NathaTerrien/roll20-wip/master/ChroniquesGalactiques/cog_hr.png" />
             </td>
         </tr>
+        {{#desc}}
+            <tr>
+                <td colspan="2" style="white-space:normal;">
+                    <div class="desc">{{desc}}</div>
+                </td>
+            </tr>
+        {{/desc}}
         {{#DV}}
             <tr>
                 <td class="tcat">PV gagnés</td>
@@ -571,15 +713,25 @@
                 <td>{{carac}}</td>
             </tr>
         {{/carac}}
-        {{#desc}}
+        {{#test}}
             <tr>
-                <td colspan="2" style="white-space:normal;">
-                    <div style="max-height: 150px; overflow-y: auto;">
-                        {{desc}}
-                    </div>
-                </td>
+                <td colspan="2">{{test}}</td>
             </tr>
-        {{/desc}}
+            {{#rollWasCrit() test}}
+                <tr>
+                    <td colspan="2" style="color:green;">
+                        <div class="desc"><b>{{test_crit}}</b></div>
+                    </td>
+                </tr>
+            {{/rollWasCrit() test}}
+            {{#rollWasFumble() test}}
+                <tr>
+                    <td colspan="2" style="color:red;">
+                        <div class="desc"><b>{{test_fumble}}</b></div>
+                    </td>
+                </tr>
+            {{/rollWasFumble() test}}
+        {{/test}}
         {{#attaque}}
             {{#rollWasCrit() attaque}}
                 <tr>
@@ -608,6 +760,23 @@
                 </tr>
             {{/degats}}
         {{/attaque}}
+        {{#special}}
+            <tr>
+                <td colspan="2" class="subheader" style="text-align:left;">Spécial</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="white-space:normal;">
+                    <div class="desc">{{special}}</div>
+                </td>
+            </tr>
+        {{/special}}
+        {{#text}}
+            <tr>
+                <td colspan="2" style="white-space:normal;">
+                    <div style="text-align:justify; text-justify:inter-word;">{{text}}</div>
+                </td>
+            </tr>
+        {{/text}}
         <tr>
             <td COLSPAN="2">
                 <img class="sheet-imghr" src="https://raw.githubusercontent.com/NathaTerrien/roll20-wip/master/ChroniquesGalactiques/cog_hr.png" />
