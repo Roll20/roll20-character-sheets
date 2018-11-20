@@ -9685,6 +9685,7 @@ This pattern can be found at https://regexr.com/3mi9v
                     profs = {
                         soldier:{armor:['heavy_armor'],weapons:['basic_melee','small_arm','advanced_melee','heavy_weapon','sniper','grenade','longarm']},
                         solarian:{armor:[],weapons:['basic_melee','small_arm','advanced_melee']},
+                        solarion:{armor:[],weapons:['basic_melee','small_arm','advanced_melee']},
                         envoy:{armor:[],weapons:['basic_melee','small_arm','grenade']},
                         mechanic:{armor:[],weapons:['basic_melee','small_arm','grenade']},
                         mystic:{armor:[],weapons:['basic_melee','small_arm']},
@@ -9694,12 +9695,14 @@ This pattern can be found at https://regexr.com/3mi9v
                 if(!/soldier|solari[ao]n|envoy|mystic|operative|mechanic|technomancer/i.test(p1)){
                     p1='mystic';
                 }
-                _.each(profs[p1.trim().toLowerCase()].weapons,(prof)=>{
-                    setObj[prof+'_proficiency']=profLevel;
-                });
-                _.each(profs[p1.trim().toLowerCase()].armor,(prof)=>{
-                    setObj[prof+'_proficiency']='yes';
-                });
+                if(profs[p1.trim().toLowerCase()]){
+                    _.each(profs[p1.trim().toLowerCase()].weapons,(prof)=>{
+                        setObj[prof+'_proficiency']=profLevel;
+                    });
+                    _.each(profs[p1.trim().toLowerCase()].armor,(prof)=>{
+                        setObj[prof+'_proficiency']='yes';
+                    });
+                }
             });
             TAS.log('Starfinder HUD upgraded to Starfinder (Official)');
             return [attributes,setObj];
@@ -11390,7 +11393,9 @@ This pattern can be found at https://regexr.com/3mi9v
                         }else{
                             objName = attr;
                         }
-                        memo[trig]=JSON.parse(JSON.stringify(objSwitch[attributes.sheet_type][objName]));
+                        if(objSwitch[attributes.sheet_type][objName]){
+                            memo[trig]=JSON.parse(JSON.stringify(objSwitch[attributes.sheet_type][objName]));
+                        }
                     });
                     return memo;
                 },{}),
