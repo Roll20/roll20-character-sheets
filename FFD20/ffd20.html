@@ -210,7 +210,7 @@ on("change:is-undead change:con-mod change:cha-mod change:level change:class-0-h
 		    "class-3-hp": class3,
 		    "class-fc-hp": classFC,
 		    "total-hp": total,
-		    "hp_max": total + (parseInt(values["is-undead"] ? values["cha-mod"] : values["con-mod"]) * parseInt(values["level"]))
+		    "hp_max": total + (parseInt(values["is-undead"] == "undead" ? values["cha-mod"] : values["con-mod"]) * parseInt(values["level"]))
 		});
 	});
 });
@@ -420,11 +420,13 @@ on("change:is-undead change:con-mod change:cha-mod change:total-fort change:fort
 	    if (values["sheet-type"] == "character") {
     	    var enhance = parseInt(values["fort-enhance"]) || 0;
     	    var misc = parseInt(values["fort-misc"]) || 0;
-    	    var temp = parseInt(values["fort-temp"]) || 0;
-    	    var total = parseInt(values["is-undead"] ? values["cha-mod"] : values["con-mod"]) + parseInt(values["total-fort"]) + enhance + misc + temp;
+			var temp = parseInt(values["fort-temp"]) || 0;
+			var ability = parseInt(values["is-undead"] == "undead" ? values["cha-mod"] : values["con-mod"]) || 0;
+    	    var total = parseInt(values["is-undead"] == "undead" ? values["cha-mod"] : values["con-mod"]) + parseInt(values["total-fort"]) + enhance + misc + temp;
             setAttrs({
                 "fort": total,
-                "fort-enhance": enhance,
+				"fort-enhance": enhance,
+				"fort-ability": ability,
                 "fort-misc": misc,
                 "fort-temp": temp
             });
@@ -3393,7 +3395,7 @@ on("change:repeating_spells-9 remove:repeating_spells-9", function() {
                                 <td class="sheet-label-left">Fortitude</td>
                                 <td><input class="sheet-total" title="Fortitude saving throw total bonus" type="number" name="attr_fort" value="0" readonly></td>
                                 <td><input title="Fortitude base value" type="number" name="attr_total-fort" value="0" readonly></td>
-                                <td><input title="Fortitude ability value" type="number" name="attr_con-mod" value="0" readonly></td>
+                                <td><input title="Fortitude ability value" type="number" name="attr_fort-ability" value="0" readonly></td>
                                 <td><input title="Fortitude enhance value" type="number" name="attr_fort-enhance" value="0"></td>
                                 <td><input title="Fortitude misc value" type="number" name="attr_fort-misc" value="0"></td>
                                 <td><input title="Fortitude temp value" type="number" name="attr_fort-temp" value="0"></td>
