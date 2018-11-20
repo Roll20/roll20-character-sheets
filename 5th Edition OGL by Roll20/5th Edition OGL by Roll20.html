@@ -14260,6 +14260,8 @@
         var newcantrips = 0;
         var newspells = 0;
         var replace = 0;
+        var totallevel = 0;
+        var spellmaxlevel = 0;
         var spelldata = mancerdata["lp-welcome"].values["spellinfo"] ? JSON.parse(mancerdata["lp-welcome"].values["spellinfo"]) : {};
         var abilities = mancerdata["lp-welcome"].values["abilities"] ? JSON.parse(mancerdata["lp-welcome"].values["abilities"]) : {};
         _.each(spelldata, function(spell, repid) {
@@ -14269,16 +14271,11 @@
                 knownspells++;
             }
         });
-        console.log(abilities);
-        var knownlist = _.pluck(spelldata, "spellname");
-        if(knownlist) {
-            queries.push("Category:Spells Name:" + knownlist.join("|"));
-        }
         for(var x=1;x<=4;x++) {
             if(mancerdata["lp-levels"].data["class" + x]) {
-                var thisclass = {class: _.last(mancerdata["lp-levels"].values["class" + x].split(":"))};
-                var prevlevel = parseInt(mancerdata["lp-levels"].values["currentlevel" + x]);
-                var thislevel = parseInt(mancerdata["lp-levels"].values["addlevel" + x]) + prevlevel;
+                var prevlevel = parseInt(mancerdata["lp-levels"].values["class" + x + "_currentlevel"]);
+                var thislevel = parseInt(mancerdata["lp-levels"].values["class" + x + "_addlevel"]) + prevlevel;
+                var thisclass = {class: _.last(mancerdata["lp-levels"].values["class" + x].split(":")), number: x, newlevel: thislevel};
                 var toSwap = mancerdata["lp-levels"].data["class" + x]["data-Spell Replace"] ? parseInt(mancerdata["lp-levels"].data["class" + x]["data-Spell Replace"]) : 0;
                 var prevknown = 0;
                 var currentknown = 0;
@@ -14286,14 +14283,17 @@
                 var currentcantrips = 0;
                 var spelladd = 0;
                 thisclass.list = thisclass.class;
-                _.each(["class", "subclass"], function(section) {
-                    if(mancerdata["lp-levels"].data[section + x]) {
-                        if(mancerdata["lp-levels"].data[section + x]["data-Spell List"]) thisclass.list = mancerdata["lp-levels"].data[section + x]["data-Spell List"];
-                        _.each(mancerdata["lp-levels"].data[section + x].blobs, function(blob) {
+                totallevel += thislevel;
+                _.each(["", "_subclass"], function(section) {
+                    var dataname = "class" + x + section;
+                    if(mancerdata["lp-levels"].data[dataname]) {
+                        if(mancerdata["lp-levels"].data[dataname]["data-Spell List"]) thisclass.list = mancerdata["lp-levels"].data[dataname]["data-Spell List"];
+                        _.each(mancerdata["lp-levels"].data[dataname].blobs, function(blob) {
                             if(blob.Level == thislevel) {
                                 if(blob["Spell Slots"]) {
                                     var slots = JSON.parse(blob["Spell Slots"]);
                                     thisclass.maxlevel = JSON.parse(_.last(_.last(_.keys(slots).sort()).split(" ")));
+                                    spellmaxlevel = Math.max(thisclass.maxlevel, spellmaxlevel);
                                 }
                                 if(blob["Spells Known"]) {
                                     currentknown = parseInt(blob["Spells Known"]);
@@ -14324,8 +14324,8 @@
                                     prevcantrips = parseInt(blob.Cantrips);
                                 }
                             }
-                            if(mancerdata["lp-levels"].data[section + x]["data-Spell Add"]) {
-                                spelladd = parseInt(mancerdata["lp-levels"].data[section + x]["data-Spell Add"]);
+                            if(mancerdata["lp-levels"].data[dataname]["data-Spell Add"]) {
+                                spelladd = parseInt(mancerdata["lp-levels"].data[dataname]["data-Spell Add"]);
                             }
                         });
                     }
@@ -14334,18 +14334,49 @@
                 if(thisclass.prepared) thisclass.newspells = thisclass.prepared;
                 thisclass.newcantrips = currentcantrips - prevcantrips;
                 thisclass.replace = toSwap * (thislevel - prevlevel);
-                if(thisclass.maxlevel) classes.push(thisclass);
+                classes.push(thisclass);
             }
         }
-        console.log(classes);
-        _.each(classes, function(thisclass) {
-            thisquery = "Category:Spells Classes:*" + thisclass.list + " Level:";
-            if(thisclass.cantrips) thisquery += "0|"
-            for(var x = 1; x <= thisclass.maxlevel; x++) {
-                thisquery += x;
-                if(x != thisclass.maxlevel) thisquery += "|";
+        var knownlist = _.pluck(spelldata, "spellname");
+        _.each(mancerdata, function(page, pagename) {
+            if(pagename.split("-")[0] == "lp") {
+                _.each(page.data, function(data, dataname) {
+                    var thislevel = 0;
+                    if(dataname.substring(0,5) == "class") {
+                        thislevel = _.findWhere(classes, {number: parseInt(dataname[5])}).newlevel;
+                    } else {
+                        thislevel = totallevel;
+                    }
+                    _.each(data.blobs, function(blob, blobname) {
+                        if((parseInt(blob.Level) <= thislevel || blob.Level == "all") && blob.Multiclass != "no") {
+                            if(blob.Spells) {
+                                var blobspells = JSON.parse(blob.Spells);
+                                _.each(blobspells, function(thisspell) {
+                                    if(parseInt(thisspell.Level) <= spellmaxlevel) {
+                                        if(thisspell["Expanded List"]) {
+                                            knownlist = knownlist.concat(thisspell["Expanded List"]);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                })
             }
-            queries.push(thisquery);
+        });
+        if(knownlist) {
+            queries.push("Category:Spells Name:" + knownlist.join("|"));
+        }
+        _.each(classes, function(thisclass) {
+            if(thisclass.maxlevel) {
+                thisquery = "Category:Spells Classes:*" + thisclass.list + " Level:";
+                if(thisclass.cantrips) thisquery += "0|"
+                for(var x = 1; x <= thisclass.maxlevel; x++) {
+                    thisquery += x;
+                    if(x != thisclass.maxlevel) thisquery += "|";
+                }
+                queries.push(thisquery);
+            }
         });
         newcantrips = classes[0].newcantrips;
         newspells = classes[0].newspells;
@@ -14407,8 +14438,8 @@
                                 });
                                 _.each(spelldata, function(thisspell) {
                                     if(thisspell.spellname == spell.name) {
+                                        toSet[spellid + "_checked"] = "1";
                                         if(!classes[0].prepared || x == "0") {
-                                            toSet[spellid + "_checked"] = "1";
                                             toSet[spellid + "_existing"] = "true";
                                             if(x == "0" || replace == 0) update[spellid + " .sheet-hardlock"] = "locked";
                                         }
@@ -15972,7 +16003,7 @@
                     </div>
                     <div>
                         <h4 class="subclass1_features_title choice" style="display: inline;">Subclass Features: </h4>
-                        <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe --->
+                        <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
                         <div>There needs to be a list of sub class features here.</div>
                     </div>
                 </div>
