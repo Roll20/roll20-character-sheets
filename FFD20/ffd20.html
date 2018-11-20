@@ -194,8 +194,8 @@ on("change:cha-base change:cha-enhance change:cha-misc change:cha-temp", functio
 	});
 });
 
-on("change:con-mod change:level change:class-0-hp change:class-1-hp change:class-2-hp change:class-3-hp change:class-fc-hp", function() {
-	getAttrs(["con-mod", "level", "class-0-hp", "class-1-hp", "class-2-hp", "class-3-hp", "hp-temp", "class-fc-hp"], function(values) {
+on("change:is-undead change:con-mod change:cha-mod change:level change:class-0-hp change:class-1-hp change:class-2-hp change:class-3-hp change:class-fc-hp", function() {
+	getAttrs(["is-undead", "con-mod", "cha-mod", "level", "class-0-hp", "class-1-hp", "class-2-hp", "class-3-hp", "hp-temp", "class-fc-hp"], function(values) {
 	    var class0 = parseInt(values["class-0-hp"]) || 0;
 	    var class1 = parseInt(values["class-1-hp"]) || 0;
 	    var class2 = parseInt(values["class-2-hp"]) || 0;
@@ -210,7 +210,7 @@ on("change:con-mod change:level change:class-0-hp change:class-1-hp change:class
 		    "class-3-hp": class3,
 		    "class-fc-hp": classFC,
 		    "total-hp": total,
-		    "hp_max": total + (parseInt(values["con-mod"]) * parseInt(values["level"]))
+		    "hp_max": total + (parseInt(values["is-undead"] ? values["cha-mod"] : values["con-mod"]) * parseInt(values["level"]))
 		});
 	});
 });
@@ -415,13 +415,13 @@ var bonusMP = [
 ];
 
 
-on("change:con-mod change:total-fort change:fort-enhance change:fort-misc change:fort-temp", function() {
-	getAttrs(["con-mod", "total-fort", "fort-enhance", "fort-misc", "fort-temp", "sheet-type"], function(values) {
+on("change:is-undead change:con-mod change:cha-mod change:total-fort change:fort-enhance change:fort-misc change:fort-temp", function() {
+	getAttrs(["is-undead", "cha-mod", "con-mod", "total-fort", "fort-enhance", "fort-misc", "fort-temp", "sheet-type"], function(values) {
 	    if (values["sheet-type"] == "character") {
     	    var enhance = parseInt(values["fort-enhance"]) || 0;
     	    var misc = parseInt(values["fort-misc"]) || 0;
     	    var temp = parseInt(values["fort-temp"]) || 0;
-    	    var total = parseInt(values["con-mod"]) + parseInt(values["total-fort"]) + enhance + misc + temp;
+    	    var total = parseInt(values["is-undead"] ? values["cha-mod"] : values["con-mod"]) + parseInt(values["total-fort"]) + enhance + misc + temp;
             setAttrs({
                 "fort": total,
                 "fort-enhance": enhance,
@@ -869,7 +869,7 @@ change:ac-shield-weight change:ac-natural-weight change:ac-deflection-weight cha
             "ac-armor-penalty": parseInt(values["ac-armor-penalty"]) || 0,
             "ac-shield-penalty": parseInt(values["ac-shield-penalty"]) || 0,
             "ac-dodge-bonus": acDodgeBonus,
-            "ac-armor-maxdex": parseFloat(values["ac-armor-maxdex"]) || 0,
+            "ac-armor-maxdex": parseInt(values["ac-armor-maxdex"]) || 0,
             "ac-shield-maxdex": parseInt(values["ac-shield-maxdex"]) || 0,
             "ac-armor-sf": parseInt(values["ac-armor-sf"]) || 0,
             "ac-shield-sf": parseInt(values["ac-shield-sf"]) || 0,
@@ -2981,7 +2981,7 @@ on("change:repeating_spells-9 remove:repeating_spells-9", function() {
             <table>
                 <tr>
                     <td class="sheet-label-left" style="width: 50px; color: black;">Name</td>
-                    <td><input title="Character name" type="text" name="attr_character_name" style="font-family: "Tahoma", "Arial";"></td>
+                    <td><input title="Character name" type="text" name="attr_character_name" style="font-family: 'Tahoma', 'Arial';"></td>
                     <td class="sheet-label-top" style="width: 50px; color: black;">Sheet Type</td>
                     <td style="width: 120px;"><select name="attr_character_sheet_type">
                         <option value="Character" selected>Character</option>
@@ -2990,7 +2990,7 @@ on("change:repeating_spells-9 remove:repeating_spells-9", function() {
                 </tr>
                 <tr>
                     <td class="sheet-label-left" style="width: 50px; color: black;"><span name="attr_character_race_type">Race</span></td>
-                    <td><input type="text" name="attr_character_race" style="font-family: "Tahoma", "Arial";"></td>
+                    <td><input type="text" name="attr_character_race" style="font-family: 'Tahoma', 'Arial';"></td>
                     <td class="sheet-label-top" style="width: 50px; color: black;">Alignment</td>
                     <td style="width: 120px;"><select name="attr_character_alignment">
                         <option value="---" selected>---</option>
@@ -3007,7 +3007,7 @@ on("change:repeating_spells-9 remove:repeating_spells-9", function() {
                 </tr>
                 <tr>
                     <td class="sheet-label-left" style="width: 50px; color: black;">Deity</td>
-                    <td><input type="text" name="attr_character_deity" style="font-family: "Tahoma", "Arial";"></td>
+                    <td><input type="text" name="attr_character_deity" style="font-family: 'Tahoma', 'Arial';"></td>
                     <td class="sheet-label-left" style="width: 50px; color: black;">Size</td>
                     <td style="width: 120px;"><select name="attr_size">
                         <option value="Fine">Fine</option>
@@ -3020,9 +3020,17 @@ on("change:repeating_spells-9 remove:repeating_spells-9", function() {
                         <option value="Gargantuan">Gargantuan</option>
                         <option value="Colossal">Colossal</option>
                     </select></td>
-                </tr>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<div style="margin-left: 1px; padding-left: 4px; height: 28px; font-size: 80%; float: left;">Viladin's FFD20: http://www.finalfantasyd20.com<br>Sheet created by Azurift (Azurift88@gmail.com) -- v1.2.1 11/17/2018</div>
+					</td>
+					<td>Undead</td>
+					<td>
+						<div style="float: right; width: 40%; height: 100%;"><input type="checkbox" title="Check this box if your character is undead" name="attr_is-undead" value="undead"></div>
+					</td>
+				</tr>
             </table>
-            <div style="margin-left: 1px; padding-left: 4px; height: 28px; font-size: 80%;">Viladin's FFD20: http://www.finalfantasyd20.com<br>Sheet created by Azurift (Azurift88@gmail.com) -- v1.2 5/22/2018</div>
         </div>
         <div class="sheet-logo-section" style="float: right; width: 50%; display:table-cell; vertical-align:middle; text-align: center;">
             <img src="http://www.finalfantasyd20.com/ffd20/images/ffd20-logo.png" alt="FFD20 Logo" height="100" width="400">
