@@ -1,50 +1,63 @@
-    // ##### Functions #####
-    // Characteristic Functions
+    // ##### Auto Calc #####
+    // STR Auto Calc
     var calc_str = function() {
         getAttrs(["str_base", "str_training", "str_ageing", "str_other", "str_temp"], function(v) {
             setAttrs({str: parseInt(v.str_base) + parseInt(v.str_training) + parseInt(v.str_ageing) + parseInt(v.str_other) + parseInt(v.str_temp)});
         });
     };
+    on("change:str_base change:str_training change:str_ageing change:str_other change:str_temp", function() { calc_str(); });
     
+    // CON Auto Calc
     var calc_con = function() {
         getAttrs(["con_base", "con_training", "con_ageing", "con_other", "con_temp"], function(v) {
             setAttrs({con: parseInt(v.con_base) + parseInt(v.con_training) + parseInt(v.con_ageing) + parseInt(v.con_other) + parseInt(v.con_temp)});
         });
     };
+    on("change:con_base change:con_training change:con_ageing change:con_other change:con_temp", function() { calc_con(); });
     
+    // SIZ Auto Calc
     var calc_siz = function() {
         getAttrs(["siz_base", "siz_other", "siz_temp"], function(v) {
             setAttrs({siz: parseInt(v.siz_base) + parseInt(v.siz_other) + parseInt(v.siz_temp)});
         });
     };
+    on("change:siz_base change:siz_other change:siz_temp", function() { calc_siz(); });
     
+    // DEX Auto Calc
     var calc_dex = function() {
         getAttrs(["dex_base", "dex_training", "dex_ageing", "dex_other", "dex_temp"], function(v) {
             setAttrs({dex: parseInt(v.dex_base) + parseInt(v.dex_training) + parseInt(v.dex_ageing) + parseInt(v.dex_other) + parseInt(v.dex_temp)});
         });
     };
+    on("change:dex_base change:dex_training change:dex_ageing change:dex_other change:dex_temp", function() { calc_dex(); });
     
+    // INT Auto Calc
     var calc_int = function() {
         getAttrs(["int_base", "int_training", "int_ageing", "int_other", "int_temp"], function(v) {
             setAttrs({int: parseInt(v.int_base) + parseInt(v.int_training) + parseInt(v.int_ageing) + parseInt(v.int_other) + parseInt(v.int_temp)});
         });
     };
+    on("change:int_base change:int_training change:int_ageing change:int_other change:int_temp", function() { calc_int(); });
     
+    // POW Auto Calc
     var calc_pow = function() {
         getAttrs(["pow_base", "pow_training", "pow_ageing", "pow_other", "pow_temp"], function(v) {
             setAttrs({pow: parseInt(v.pow_base) + parseInt(v.pow_training) + parseInt(v.pow_ageing) + parseInt(v.pow_other) + parseInt(v.pow_temp)});
         });
     };
+    on("change:pow_base change:pow_training change:pow_ageing change:pow_other change:pow_temp", function() { calc_pow(); });
     
+    // CHA Auto Calc
     var calc_cha = function() {
         getAttrs(["cha_base", "cha_training", "cha_ageing", "cha_other", "cha_temp"], function(v) {
             setAttrs({cha: parseInt(v.cha_base) + parseInt(v.cha_training) + parseInt(v.cha_ageing) + parseInt(v.cha_other) + parseInt(v.cha_temp)});
         });
     };
+    on("change:cha_base change:cha_training change:cha_ageing change:cha_other change:cha_temp", function() { calc_cha(); });
     
-    // Attribute Functions
+    // Action Points Auto Calc
     var calc_action_points = function() {
-        getAttrs(["dex", "int", "pow", "action_points_temp", "action_points_other", "action_points_add_one", "fatigue", "spirit", "action_points_calc"], function(v) {
+        getAttrs(["dex", "int", "pow", "action_points_temp", "action_points_other", "action_points_add_one", "fatigue", "spirit", "action_points_calc", "action_points", "action_points_max", "action_points_mook1", "action_points_mook2", "action_points_mook3", "action_points_mook4", "action_points_mook5", "action_points_mook6", "action_points_mook7", "action_points_mook8", "action_points_mook9", "action_points_mook10"], function(v) {
             if (v["action_points_calc"] == "set_2") {
                 var base_value = 2;
             } else if (v["action_points_calc"] == "set_3") {
@@ -60,32 +73,48 @@
             var fatigue = parseInt(v.fatigue);
             if (fatigue > 5) {
                 var action_points_fatigue = getTranslationByKey("no-penalty-u");
-                var action_points = base_value + parseInt(v.action_points_add_one) + parseInt(v.action_points_temp) + parseInt(v.action_points_other);
+                var new_action_points_max = base_value + parseInt(v.action_points_add_one) + parseInt(v.action_points_temp) + parseInt(v.action_points_other);
             } else if (fatigue == 5) {
                 var action_points_fatigue = "-1";
-                var action_points = base_value + parseInt(v.action_points_add_one) + parseInt(v.action_points_temp) + parseInt(v.action_points_other) - 1;
+                var new_action_points_max = base_value + parseInt(v.action_points_add_one) + parseInt(v.action_points_temp) + parseInt(v.action_points_other) - 1;
             } else if (fatigue == 4) {
                 var action_points_fatigue = "-2";
-                var action_points = base_value + parseInt(v.action_points_add_one) + parseInt(v.action_points_temp) + parseInt(v.action_points_other) - 2;
+                var new_action_points_max = base_value + parseInt(v.action_points_add_one) + parseInt(v.action_points_temp) + parseInt(v.action_points_other) - 2;
             } else if (fatigue == 3) {
                 var action_points_fatigue = "-3";
-                var action_points = base_value + parseInt(v.action_points_add_one) + parseInt(v.action_points_temp) + parseInt(v.action_points_other) - 3;
+                var new_action_points_max = base_value + parseInt(v.action_points_add_one) + parseInt(v.action_points_temp) + parseInt(v.action_points_other) - 3;
             } else {
                 var action_points_fatigue = getTranslationByKey("no-activities-possible-u");
-                var action_points = 0;
+                var new_action_points_max = 0;
             }
             
-            if (action_points < 0) {
-                action_points = 0;
+            if (new_action_points_max < 0) {
+                new_action_points_max = 0;
             }
+
+            diff_action_points_max = new_action_points_max - parseInt(v.action_points_max);
             setAttrs({
-                action_points_max: action_points,
+                action_points_max: new_action_points_max,
                 action_points_fatigue: action_points_fatigue,
-                action_points_base: base_value
+                action_points_base: base_value,
+                action_points: parseInt(v.action_points) + diff_action_points_max,
+                action_points_mook1: parseInt(v.action_points_mook1) + diff_action_points_max,
+                action_points_mook2: parseInt(v.action_points_mook2) + diff_action_points_max,
+                action_points_mook3: parseInt(v.action_points_mook3) + diff_action_points_max,
+                action_points_mook4: parseInt(v.action_points_mook4) + diff_action_points_max,
+                action_points_mook5: parseInt(v.action_points_mook5) + diff_action_points_max,
+                action_points_mook6: parseInt(v.action_points_mook6) + diff_action_points_max,
+                action_points_mook7: parseInt(v.action_points_mook7) + diff_action_points_max,
+                action_points_mook8: parseInt(v.action_points_mook8) + diff_action_points_max,
+                action_points_mook9: parseInt(v.action_points_mook9) + diff_action_points_max,
+                action_points_mook10: parseInt(v.action_points_mook10) + diff_action_points_max,
             });
         });
     };
-    
+    on("change:dex change:int change:pow change:action_points_temp change:action_points_add_one change:action_points_other change:fatigue change:spirit change:action_points_calc", function() { calc_action_points(); });
+
+
+    // Spirit Damage Auto Calc
     var calc_spirit_damage = function() {
 		getAttrs(["willpower_experience", "willpower_other", "willpower_augment", "binding_learned", "binding_base", "binding_experience", "binding_other", "binding_augment", "pow", "cha"], function(values) {
 		    var pow = parseInt(values.pow);
@@ -138,7 +167,9 @@
 			});
 		});
     };
+    on("change:willpower_experience change:willpower_other change:willpower_augment change:binding_learned change:binding_base change:binding_experience change:binding_other change:binding_augment change:pow change:cha", function() { calc_spirit_damage(); });
     
+    // Damage Mod Auto Calc
     var calc_damage_mod = function() {
 		getAttrs(["str", "siz", "pow", "damage_mod_add_pow", "damage_mod_other", "damage_mod_temp"], function(values) {
 			if (values.damage_mod_add_pow == 1) {
@@ -159,7 +190,9 @@
 			});
 		});
     };
+    on("change:str change:siz change:pow change:damage_mod_add_pow change:damage_mod_other change:damage_mod_temp", function() { calc_damage_mod(); });
     
+    // Experience Mod Auto Calc
     var calc_experience_mod = function() {
         getAttrs(["cha", "experience_mod_other", "experience_mod_temp"], function(v) {
             var base_value = Math.ceil(parseInt(v.cha)/6)-2;
@@ -170,7 +203,9 @@
 			});
         });
     };
+    on("change:cha change:experience_mod_temp change:experience_mod_other", function() { calc_experience_mod(); });
 
+    // Healing Rate Auto Calc
     var calc_healing_rate = function() { 
         getAttrs(["con", "healing_rate_other", "healing_rate_temp", "healing_rate_double"], function(v) {
             if (v.healing_rate_double == "1") {
@@ -185,7 +220,9 @@
             });
         });
     };
+    on("change:healing_rate_temp change:healing_rate_other change:con change:healing_rate_double", function() { calc_healing_rate(); });
     
+    // Initiative Auto Calc
     var calc_initiative = function() {
         getAttrs(["dex", "int", "cha", "initiative_bonus_temp", "armor_penalty", "fatigue", "initiative_bonus_other", "spirit"], function(v) {
             if(v["spirit"] == "1") {
@@ -222,40 +259,175 @@
             });
         });
     };
-    
+    on("change:dex change:int change:cha change:initiative_bonus_temp change:armor_penalty change:fatigue change:initiative_bonus_other change:spirit", function() { calc_initiative(); });
+
+    // Spirit Intensity Auto Calc
     var calc_spirit_intensity = function() {
         getAttrs(["pow"], function(v) {
             setAttrs({ spirit_intensity: Math.ceil(parseInt(v.pow)/6) });
         });
     };
+    on("change:pow", function() { calc_spirit_intensity(); });
     
+    // Luck Points Auto Calc
     var calc_luck_points = function() {
-        getAttrs(["pow", "luck_points_temp", "luck_points_other", "luck_points_rank", "rank"], function(v) {
+        getAttrs(["pow", "luck_points_temp", "luck_points_other", "luck_points_rank", "rank", "luck_points", "luck_points_max"], function(v) {
             if (v.luck_points_rank == "1") {
                 var base_value = Math.ceil(parseInt(v.pow)/6) + parseInt(v.rank);
             } else {
                 var base_value = Math.ceil(parseInt(v.pow)/6);
             }
+
+            var new_luck_points_max = base_value + parseInt(v.luck_points_temp) + parseInt(v.luck_points_other);
+            var diff_luck_points_max = new_luck_points_max - parseInt(v.luck_points_max);
             setAttrs({
                 luck_points_base: base_value,
-                luck_points_max: base_value + parseInt(v.luck_points_temp) + parseInt(v.luck_points_other)
+                luck_points_max: new_luck_points_max,
+                luck_points: parseInt(v.luck_points) + diff_luck_points_max,
             });
         });
     };
+    on("change:pow change:luck_points_temp change:luck_points_other change:luck_points_rank change:rank", function() { calc_luck_points(); });
+
     
+    // Magic Points Auto Calc
     var calc_magic_points = function() {
-        getAttrs(["pow", "magic_points_temp", "magic_points_other", "prana_points_temp", "prana_points_other", "power_points_temp", "power_points_other"], function(v) {
+        getAttrs(["pow", "magic_points_temp", "magic_points_other", "magic_points", "magic_points_max", "magic_points_mook1", "magic_points_mook2", "magic_points_mook3", "magic_points_mook4", "magic_points_mook5", "magic_points_mook6", "magic_points_mook7", "magic_points_mook8", "magic_points_mook9", "magic_points_mook10"], function(v) {
+            var new_magic_points_max = parseInt(v.pow) + parseInt(v.magic_points_temp) + parseInt(v.magic_points_other);
+            var diff_magic_points_max = new_magic_points_max - parseInt(v.magic_points_max);
+
             setAttrs({
                 magic_points_base: parseInt(v.pow),
-                magic_points_max: parseInt(v.pow) + parseInt(v.magic_points_temp) + parseInt(v.magic_points_other),
-                prana_points_base: parseInt(v.pow),
-                prana_points_max: parseInt(v.pow) + parseInt(v.prana_points_temp) + parseInt(v.prana_points_other),
-                power_points_base: parseInt(v.pow),
-                power_points_max: parseInt(v.pow) + parseInt(v.power_points_temp) + parseInt(v.power_points_other)
+                magic_points_max: new_magic_points_max,
+                magic_points: parseInt(v.magic_points) + diff_magic_points_max,
+                magic_points_mook1: parseInt(v.magic_points_mook1) + diff_magic_points_max,
+                magic_points_mook2: parseInt(v.magic_points_mook2) + diff_magic_points_max,
+                magic_points_mook3: parseInt(v.magic_points_mook3) + diff_magic_points_max,
+                magic_points_mook4: parseInt(v.magic_points_mook4) + diff_magic_points_max,
+                magic_points_mook5: parseInt(v.magic_points_mook5) + diff_magic_points_max,
+                magic_points_mook6: parseInt(v.magic_points_mook6) + diff_magic_points_max,
+                magic_points_mook7: parseInt(v.magic_points_mook7) + diff_magic_points_max,
+                magic_points_mook8: parseInt(v.magic_points_mook8) + diff_magic_points_max,
+                magic_points_mook9: parseInt(v.magic_points_mook9) + diff_magic_points_max,
+                magic_points_mook10: parseInt(v.magic_points_mook10) + diff_magic_points_max,
             });
         });
     };
+    on("change:pow change:magic_points_temp change:magic_points_other", function() { calc_magic_points(); });
+
+    // Movement Auto Calc
+    var calc_movement = function() {
+        getAttrs(["fatigue", "movement_rate_species", "movement_rate_enc", "movement_rate_species_swim", "movement_rate_species_fly", "movement_rate_other", "movement_rate_temp", "armor_penalty"], function(v) {
+            var step1_land_movement = parseInt(v.movement_rate_species) + parseInt(v.movement_rate_other) + parseInt(v.movement_rate_temp);
+            var step1_swim_movement = parseInt(v.movement_rate_species_swim) + parseInt(v.movement_rate_other) + parseInt(v.movement_rate_temp);
+            var step1_fly_movement = parseInt(v.movement_rate_species_fly) + parseInt(v.movement_rate_other) + parseInt(v.movement_rate_temp);
+
+            var fatigue = parseInt(v.fatigue);
+            if (fatigue >= 8) {
+                var step2_land_movement = step1_land_movement;
+                var step2_swim_movement = step1_swim_movement;
+                var step2_fly_movement = step1_fly_movement;
+                var movement_rate_fatigue = "+0";
+            } else if (fatigue == 7 ) {
+                var step2_land_movement = step1_land_movement - 1;
+                var step2_swim_movement = step1_swim_movement - 1;
+                var step2_fly_movement = step1_fly_movement - 1;
+                var movement_rate_fatigue = "-1";
+            } else if (fatigue == 6 ) {
+                var step2_land_movement = step1_land_movement - 2;
+                var step2_swim_movement = step1_swim_movement - 2;
+                var step2_fly_movement = step1_fly_movement - 2;
+                var movement_rate_fatigue = "-2";
+            } else if (fatigue >= 4 ) {
+                var step2_land_movement = Math.ceil(step1_land_movement / 2);
+                var step2_swim_movement = Math.ceil(step1_swim_movement / 2);
+                var step2_fly_movement = Math.ceil(step1_fly_movement / 2);
+                var movement_rate_fatigue = "*.5";
+            } else {
+                var step2_land_movement = 0;
+                var step2_swim_movement = 0;
+                var step2_fly_movement = 0;
+                var movement_rate_fatigue = "*0";
+            }
+            
+            if (v.movement_rate_enc == "+0") {
+                var step3_land_movement = step2_land_movement;
+                var step3_swim_movement = step2_swim_movement;
+                var step3_fly_movement = step2_fly_movement;
+            } else if (v.movement_rate_enc == "-2") {
+                var step3_land_movement = step2_land_movement - 2;
+                var step3_swim_movement = step2_swim_movement - 2;
+                var step3_fly_movement = step2_fly_movement - 2;
+            } else if (v.movement_rate_enc == "*.5") {
+                var step3_land_movement = Math.ceil(step2_land_movement / 2);
+                var step3_swim_movement = Math.ceil(step2_swim_movement / 2);
+                var step3_fly_movement = Math.ceil(step2_fly_movement / 2);
+            } else {
+                var step3_land_movement = 0;
+                var step3_swim_movement = 0;
+                var step3_fly_movement = 0;
+            }
+            
+            setAttrs({
+                movement_rate_fatigue: movement_rate_fatigue,
+                movement_rate: step3_land_movement,
+                walk_speed: step3_land_movement,
+            });
+        });
+    }
+    on("change:fatigue change:movement_rate_species change:movement_rate_enc change:movement_rate_species_swim change:movement_rate_species_fly change:movement_rate_other change:movement_rate_temp change:armor_penalty", function() { calc_movement(); });
+
+    // Power Points Auto Calc
+    var calc_power_points = function() {
+        getAttrs(["pow", "power_points_temp", "power_points_other", "power_points", "power_points_max", "power_points_mook1", "power_points_mook2", "power_points_mook3", "power_points_mook4", "power_points_mook5", "power_points_mook6", "power_points_mook7", "power_points_mook8", "power_points_mook9", "power_points_mook10"], function(v) {
+            var new_power_points_max = parseInt(v.pow) + parseInt(v.power_points_temp) + parseInt(v.power_points_other);
+            var diff_power_points_max = new_power_points_max - parseInt(v.power_points_max);
+
+            setAttrs({
+                power_points_base: parseInt(v.pow),
+                power_points_max: new_power_points_max,
+                power_points: parseInt(v.power_points) + diff_power_points_max,
+                power_points_mook1: parseInt(v.power_points_mook1) + diff_power_points_max,
+                power_points_mook2: parseInt(v.power_points_mook2) + diff_power_points_max,
+                power_points_mook3: parseInt(v.power_points_mook3) + diff_power_points_max,
+                power_points_mook4: parseInt(v.power_points_mook4) + diff_power_points_max,
+                power_points_mook5: parseInt(v.power_points_mook5) + diff_power_points_max,
+                power_points_mook6: parseInt(v.power_points_mook6) + diff_power_points_max,
+                power_points_mook7: parseInt(v.power_points_mook7) + diff_power_points_max,
+                power_points_mook8: parseInt(v.power_points_mook8) + diff_power_points_max,
+                power_points_mook9: parseInt(v.power_points_mook9) + diff_power_points_max,
+                power_points_mook10: parseInt(v.power_points_mook10) + diff_power_points_max,
+            });
+        });
+    };
+    on("change:pow change:power_points_temp change:power_points_other", function() { calc_power_points(); });
+
+    // Prana Points Auto Calc
+    var calc_prana_points = function() {
+        getAttrs(["pow", "prana_points_temp", "prana_points_other", "prana_points", "prana_points_max", "prana_points_mook1", "prana_points_mook2", "prana_points_mook3", "prana_points_mook4", "prana_points_mook5", "prana_points_mook6", "prana_points_mook7", "prana_points_mook8", "prana_points_mook9", "prana_points_mook10"], function(v) {
+            var new_prana_points_max = parseInt(v.pow) + parseInt(v.prana_points_temp) + parseInt(v.prana_points_other);
+            var diff_prana_points_max = new_prana_points_max - parseInt(v.prana_points_max);
+
+            setAttrs({
+                prana_points_base: parseInt(v.pow),
+                prana_points_max: new_prana_points_max,
+                prana_points: parseInt(v.prana_points) + diff_prana_points_max,
+                prana_points_mook1: parseInt(v.prana_points_mook1) + diff_prana_points_max,
+                prana_points_mook2: parseInt(v.prana_points_mook2) + diff_prana_points_max,
+                prana_points_mook3: parseInt(v.prana_points_mook3) + diff_prana_points_max,
+                prana_points_mook4: parseInt(v.prana_points_mook4) + diff_prana_points_max,
+                prana_points_mook5: parseInt(v.prana_points_mook5) + diff_prana_points_max,
+                prana_points_mook6: parseInt(v.prana_points_mook6) + diff_prana_points_max,
+                prana_points_mook7: parseInt(v.prana_points_mook7) + diff_prana_points_max,
+                prana_points_mook8: parseInt(v.prana_points_mook8) + diff_prana_points_max,
+                prana_points_mook9: parseInt(v.prana_points_mook9) + diff_prana_points_max,
+                prana_points_mook10: parseInt(v.prana_points_mook10) + diff_prana_points_max,
+            });
+        });
+    };
+    on("change:pow change:prana_points_temp change:prana_points_other", function() { calc_prana_points(); });
     
+    // Tenacity Auto Calc
     var calc_tenacity = function() {
         var total_dependency_score = 0;
         var tenacity_dependencies = 0;
@@ -273,16 +445,31 @@
                 });
             }
             
-            getAttrs(["pow", "tenacity_temp", "tenacity_other", "apply_dependencies_penalty"], function(val) {
+            getAttrs(["pow", "tenacity_temp", "tenacity_other", "apply_dependencies_penalty", "tenacity_max", "tenacity", "tenacity_mook1", "tenacity_mook2", "tenacity_mook3", "tenacity_mook4", "tenacity_mook5", "tenacity_mook6", "tenacity_mook7", "tenacity_mook8", "tenacity_mook9", "tenacity_mook10"], function(val) {
+                var new_tenacity_max = parseInt(val.pow) + parseInt(val.tenacity_temp) + parseInt(val.tenacity_other) + (tenacity_dependencies*parseInt(val.apply_dependencies_penalty));
+                var diff_tenacity_max = new_tenacity_max - parseInt(val.tenacity_max);
                 setAttrs({
                     tenacity_dependencies: tenacity_dependencies,
                     tenacity_base: parseInt(val.pow),
-                    tenacity_max: parseInt(val.pow) + parseInt(val.tenacity_temp) + parseInt(val.tenacity_other) + (tenacity_dependencies*parseInt(val.apply_dependencies_penalty))
+                    tenacity_max: new_tenacity_max,
+                    tenacity: parseInt(v.tenacity) + diff_tenacity_max,
+                    tenacity_mook1: parseInt(v.tenacity_mook1) + diff_tenacity_max,
+                    tenacity_mook2: parseInt(v.tenacity_mook2) + diff_tenacity_max,
+                    tenacity_mook3: parseInt(v.tenacity_mook3) + diff_tenacity_max,
+                    tenacity_mook4: parseInt(v.tenacity_mook4) + diff_tenacity_max,
+                    tenacity_mook5: parseInt(v.tenacity_mook5) + diff_tenacity_max,
+                    tenacity_mook6: parseInt(v.tenacity_mook6) + diff_tenacity_max,
+                    tenacity_mook7: parseInt(v.tenacity_mook7) + diff_tenacity_max,
+                    tenacity_mook8: parseInt(v.tenacity_mook8) + diff_tenacity_max,
+                    tenacity_mook9: parseInt(v.tenacity_mook9) + diff_tenacity_max,
+                    tenacity_mook10: parseInt(v.tenacity_mook10) + diff_tenacity_max,
                 });
             });
         });
     };
+    on("change:pow change:tenacity_temp change:tenacity_other change:apply_dependencies_penalty change:repeating_dependency remove:repeating_dependency", function() { calc_tenacity(); });
 
+    // HP Auto Calc
     var calc_hp_max_base = function() {
         getAttrs(["con", "siz", "pow", "hp_use_pow"], function(v) {
             base_value = Math.ceil( (parseInt(v.con) + parseInt(v.siz) + (parseInt(v.pow) * parseInt(v.hp_use_pow)))/5 );
@@ -292,8 +479,150 @@
             });
         });
     };
+    on("change:con change:siz change:pow change:hp_use_pow", function() { calc_hp_max_base(); });
 
+    var calc_location_hp = function(location) {
+        var hp_max_base_mod = location + "_hp_max_base_mod";
+        var hp_max_other = location + "_hp_max_other";
+        var current_hp = location + "_hp";
+        var current_hp_mook1 = location + "_hp_mook1";
+        var current_hp_mook2 = location + "_hp_mook2";
+        var current_hp_mook3 = location + "_hp_mook3";
+        var current_hp_mook4 = location + "_hp_mook4";
+        var current_hp_mook5 = location + "_hp_mook5";
+        var current_hp_mook6 = location + "_hp_mook6";
+        var current_hp_mook7 = location + "_hp_mook7";
+        var current_hp_mook8 = location + "_hp_mook8";
+        var current_hp_mook9 = location + "_hp_mook9";
+        var current_hp_mook10 = location + "_hp_mook10";
+        var current_hp_max = location + "_hp_max";
+
+        getAttrs(["hp_max_base", "all_hp_temp", hp_max_base_mod, hp_max_other, current_hp, current_hp_mook1, current_hp_mook2, current_hp_mook3, current_hp_mook4, current_hp_mook5, current_hp_mook6, current_hp_mook7, current_hp_mook8, current_hp_mook9, current_hp_mook10, current_hp_max], function(v) {
+            setObj = {};
+
+            new_hp_max = parseInt(v["hp_max_base"]) + parseInt(v[hp_max_base_mod]) + parseInt(v[hp_max_other]) + parseInt(v["all_hp_temp"]);
+            diff_hp_max = new_hp_max - parseInt(v[current_hp_max]);
+            setObj[location + "_hp"] = parseInt(v[current_hp]) + diff_hp_max;
+            setObj[location + "_hp_mook1"] = parseInt(v[current_hp_mook1]) + diff_hp_max;
+            setObj[location + "_hp_mook2"] = parseInt(v[current_hp_mook2]) + diff_hp_max;
+            setObj[location + "_hp_mook3"] = parseInt(v[current_hp_mook3]) + diff_hp_max;
+            setObj[location + "_hp_mook4"] = parseInt(v[current_hp_mook4]) + diff_hp_max;
+            setObj[location + "_hp_mook5"] = parseInt(v[current_hp_mook5]) + diff_hp_max;
+            setObj[location + "_hp_mook6"] = parseInt(v[current_hp_mook6]) + diff_hp_max;
+            setObj[location + "_hp_mook7"] = parseInt(v[current_hp_mook7]) + diff_hp_max;
+            setObj[location + "_hp_mook8"] = parseInt(v[current_hp_mook8]) + diff_hp_max;
+            setObj[location + "_hp_mook9"] = parseInt(v[current_hp_mook9]) + diff_hp_max;
+            setObj[location + "_hp_mook10"] = parseInt(v[current_hp_mook10]) + diff_hp_max;
+            setObj[location + "_hp_max"] = new_hp_max;
+
+            setAttrs(setObj);
+        });
+    };
+    on("change:hp_max_base change:location1_hp_max_base_mod change:location1_hp_max_other change:all_hp_temp", function() { calc_location_hp("location1"); });
+    on("change:hp_max_base change:location2_hp_max_base_mod change:location2_hp_max_other change:all_hp_temp", function() { calc_location_hp("location2"); });
+    on("change:hp_max_base change:location3_hp_max_base_mod change:location3_hp_max_other change:all_hp_temp", function() { calc_location_hp("location3"); });
+    on("change:hp_max_base change:location4_hp_max_base_mod change:location4_hp_max_other change:all_hp_temp", function() { calc_location_hp("location4"); });
+    on("change:hp_max_base change:location5_hp_max_base_mod change:location5_hp_max_other change:all_hp_temp", function() { calc_location_hp("location5"); });
+    on("change:hp_max_base change:location6_hp_max_base_mod change:location6_hp_max_other change:all_hp_temp", function() { calc_location_hp("location6"); });
+    on("change:hp_max_base change:location7_hp_max_base_mod change:location7_hp_max_other change:all_hp_temp", function() { calc_location_hp("location7"); });
+    on("change:hp_max_base change:location8_hp_max_base_mod change:location8_hp_max_other change:all_hp_temp", function() { calc_location_hp("location8"); });
+    on("change:hp_max_base change:location9_hp_max_base_mod change:location9_hp_max_other change:all_hp_temp", function() { calc_location_hp("location9"); });
+    on("change:hp_max_base change:location10_hp_max_base_mod change:location10_hp_max_other change:all_hp_temp", function() { calc_location_hp("location10"); });
+    on("change:hp_max_base change:location11_hp_max_base_mod change:location11_hp_max_other change:all_hp_temp", function() { calc_location_hp("location11"); });
+    on("change:hp_max_base change:location12_hp_max_base_mod change:location12_hp_max_other change:all_hp_temp", function() { calc_location_hp("location12"); });
+
+    // Simplified HP Auto Calc
+    var calc_simplified_hp = function() {
+        getAttrs(["con", "siz", "pow", "hp_use_pow", "simplified_hp_max_other", "all_hp_temp", "simplified_hp", "simplified_hp_max"], function(v) {
+            base_value = Math.ceil( (parseInt(v.con) + parseInt(v.siz) + (parseInt(v.pow) * parseInt(v.hp_use_pow)))/2 );
+            new_hp_max = base_value + parseInt(v.simplified_hp_max_other) + parseInt(v.all_hp_temp);
+            diff_hp_max = new_hp_max - parseInt(v.simplified_hp_max);
+
+            setAttrs({
+                simplified_hp_max_base: base_value,
+                simplified_hp_max: new_hp_max,
+                simplified_hp: parseInt(v.simplified_hp) + diff_hp_max,
+            });
+        });
+    }
+    on("change:con change:siz change:pow change:hp_use_pow change:simplified_hp_max_other change:all_hp_temp", function() { calc_simplified_hp(); });
+
+    // Fatigue Auto Calc
+    var calc_fatigue = function() {
+        getAttrs(["fatigue", "healing_rate"], function(values) {
+            var healing_rate = parseInt(values.healing_rate);
+            if (values.fatigue == "9") {
+                setAttrs({
+                    fatigue_skills: '0',
+                    movement_rate_fatigue: '+0',
+                    fatigue_recovery: 0,
+                });
+            } else if (values.fatigue == "8") {
+                setAttrs({
+                    fatigue_skills: '1',
+                    movement_rate_fatigue: '+0',
+                    fatigue_recovery: .25 / healing_rate,
+                });
+            } else if (values.fatigue == "7") {
+                setAttrs({
+                    fatigue_skills: '1',
+                    movement_rate_fatigue: '-1',
+                    fatigue_recovery: 3 / healing_rate,
+                });
+            } else if (values.fatigue == "6") {
+                setAttrs({
+                    fatigue_skills: '2',
+                    movement_rate_fatigue: '-2',
+                    fatigue_recovery: 6 / healing_rate,
+                });
+            } else if (values.fatigue == "5") {
+                setAttrs({
+                    fatigue_skills: '2',
+                    movement_rate_fatigue: '*.5',
+                    fatigue_recovery: 12 / healing_rate,
+                });
+            } else if (values.fatigue == "4") {
+                setAttrs({
+                    fatigue_skills: '3',
+                    movement_rate_fatigue: '*.5',
+                    fatigue_recovery: 18  / healing_rate,
+                });
+            } else if (values.fatigue == "3") {
+                setAttrs({
+                    fatigue_skills: '3',
+                    movement_rate_fatigue: '*0',
+                    fatigue_recovery: 24 / healing_rate,
+                });
+            } else if (values.fatigue == "2") {
+                setAttrs({
+                    fatigue_skills: '4',
+                    movement_rate_fatigue: '*0',
+                    fatigue_recovery: 36 / healing_rate,
+                });
+            } else if (values.fatigue == "1") {
+                setAttrs({
+                    fatigue_skills: '5',
+                    movement_rate_fatigue: '*0',
+                    fatigue_recovery: 48 / healing_rate,
+                });
+            } else if (values.fatigue == "0") {
+                setAttrs({
+                    fatigue_skills: '5',
+                    movement_rate_fatigue: '*0',
+                    fatigue_recovery: "-"
+                });
+            } else {
+                setAttrs({
+                    fatigue_skills: '0',
+                    movement_rate_fatigue: '+0',
+                    fatigue_recovery: 0,
+                });
+            } 
+        });
+    }
+    on("change:fatigue change:healing_rate", function() { calc_fatigue(); });
     
+    // Upgrade Functions
     function upgrade_1_0_to_1_1() {
         console.log("converting strike_rank to initiative_bonus");
         var newattrs = {};
@@ -1240,30 +1569,7 @@
 	
 	
 	
-	// ##### Triggers #####
-	// Characteristic Triggers
-	on("change:str_base change:str_training change:str_ageing change:str_other change:str_temp", function() { calc_str(); });
-	on("change:con_base change:con_training change:con_ageing change:con_other change:con_temp", function() { calc_con(); });
-	on("change:siz_base change:siz_other change:siz_temp", function() { calc_siz(); });
-	on("change:dex_base change:dex_training change:dex_ageing change:dex_other change:dex_temp", function() { calc_dex(); });
-	on("change:int_base change:int_training change:int_ageing change:int_other change:int_temp", function() { calc_int(); });
-	on("change:pow_base change:pow_training change:pow_ageing change:pow_other change:pow_temp", function() { calc_pow(); });
-	on("change:cha_base change:cha_training change:cha_ageing change:cha_other change:cha_temp", function() { calc_cha(); });
 	
-	// Attribute Triggers
-	on("change:dex change:int change:pow change:action_points_temp change:action_points_add_one change:action_points_other change:fatigue change:spirit change:action_points_calc", function() { calc_action_points(); });
-	on("change:willpower_experience change:willpower_other change:willpower_augment change:binding_learned change:binding_base change:binding_experience change:binding_other change:binding_augment change:pow change:cha", function() { calc_spirit_damage(); });
-	on("change:str change:siz change:pow change:damage_mod_add_pow change:damage_mod_other change:damage_mod_temp", function() { calc_damage_mod(); });
-	on("change:cha change:experience_mod_temp change:experience_mod_other", function() { calc_experience_mod(); });
-    on("change:healing_rate_temp change:healing_rate_other change:con change:healing_rate_double", function() { calc_healing_rate(); });
-    on("change:dex change:int change:cha change:initiative_bonus_temp change:armor_penalty change:fatigue change:initiative_bonus_other change:spirit", function() { calc_initiative(); });
-    on("change:pow", function() { calc_spirit_intensity(); });
-    on("change:pow change:luck_points_temp change:luck_points_other change:luck_points_rank change:rank", function() { calc_luck_points(); });
-    on("change:pow change:magic_points_temp change:magic_points_other", function() { calc_magic_points(); });
-    on("change:pow change:tenacity_temp change:tenacity_other change:apply_dependencies_penalty change:repeating_dependency remove:repeating_dependency", function() { calc_tenacity(); });
-
-    // HP Triggers
-    on("change:con change:siz change:pow change:hp_use_pow", function() { calc_hp_max_base(); });
 	
 	//Simplified combat sets hit locations
 	on("change:simplified_combat_enabled", function() {
@@ -1328,37 +1634,38 @@
 	
 	// Hit Locations
 	on("change:hit_locations", function() {
-	    getAttrs(["hit_locations"], function(values) {
-	        
+	    getAttrs(["hit_locations", "hp_max_base"], function(values) {
+            var negative_hp_max_base = 0 - parseInt(values.hp_max_base);
+
 	        if (values.hit_locations === "rabble") {
 	            setAttrs({
 				    location1_table_start: 1, location1_table_end: 20, location1_name: getTranslationByKey('hit-points-u'), location1_hp_max_base_mod: 0,
-                    location2_table_start: 0, location2_table_end: 0, location2_name: " ", location2_hp_max_base_mod: 0,
-                    location3_table_start: 0, location3_table_end: 0, location3_name: " ", location3_hp_max_base_mod: 0,
-                    location4_table_start: 0, location4_table_end: 0, location4_name: " ", location4_hp_max_base_mod: 0,
-                    location5_table_start: 0, location5_table_end: 0, location5_name: " ", location5_hp_max_base_mod: 0,
-                    location6_table_start: 0, location6_table_end: 0, location6_name: " ", location6_hp_max_base_mod: 0,
-                    location7_table_start: 0, location7_table_end: 0, location7_name: " ", location7_hp_max_base_mod: 0,
-                    location8_table_start: 0, location8_table_end: 0, location8_name: " ", location8_hp_max_base_mod: 0,
-                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: 0,
-                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location2_table_start: 0, location2_table_end: 0, location2_name: " ", location2_hp_max_base_mod: negative_hp_max_base,
+                    location3_table_start: 0, location3_table_end: 0, location3_name: " ", location3_hp_max_base_mod: negative_hp_max_base,
+                    location4_table_start: 0, location4_table_end: 0, location4_name: " ", location4_hp_max_base_mod: negative_hp_max_base,
+                    location5_table_start: 0, location5_table_end: 0, location5_name: " ", location5_hp_max_base_mod: negative_hp_max_base,
+                    location6_table_start: 0, location6_table_end: 0, location6_name: " ", location6_hp_max_base_mod: negative_hp_max_base,
+                    location7_table_start: 0, location7_table_end: 0, location7_name: " ", location7_hp_max_base_mod: negative_hp_max_base,
+                    location8_table_start: 0, location8_table_end: 0, location8_name: " ", location8_hp_max_base_mod: negative_hp_max_base,
+                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: negative_hp_max_base,
+                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: negative_hp_max_base,
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "simplified") {
 	            setAttrs({
 				    location1_table_start: 1, location1_table_end: 20, location1_name: getTranslationByKey('hit-points-u'), location1_hp_max_base_mod: 0,
-                    location2_table_start: 0, location2_table_end: 0, location2_name: " ", location2_hp_max_base_mod: 0,
-                    location3_table_start: 0, location3_table_end: 0, location3_name: " ", location3_hp_max_base_mod: 0,
-                    location4_table_start: 0, location4_table_end: 0, location4_name: " ", location4_hp_max_base_mod: 0,
-                    location5_table_start: 0, location5_table_end: 0, location5_name: " ", location5_hp_max_base_mod: 0,
-                    location6_table_start: 0, location6_table_end: 0, location6_name: " ", location6_hp_max_base_mod: 0,
-                    location7_table_start: 0, location7_table_end: 0, location7_name: " ", location7_hp_max_base_mod: 0,
-                    location8_table_start: 0, location8_table_end: 0, location8_name: " ", location8_hp_max_base_mod: 0,
-                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: 0,
-                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location2_table_start: 0, location2_table_end: 0, location2_name: " ", location2_hp_max_base_mod: negative_hp_max_base,
+                    location3_table_start: 0, location3_table_end: 0, location3_name: " ", location3_hp_max_base_mod: negative_hp_max_base,
+                    location4_table_start: 0, location4_table_end: 0, location4_name: " ", location4_hp_max_base_mod: negative_hp_max_base,
+                    location5_table_start: 0, location5_table_end: 0, location5_name: " ", location5_hp_max_base_mod: negative_hp_max_base,
+                    location6_table_start: 0, location6_table_end: 0, location6_name: " ", location6_hp_max_base_mod: negative_hp_max_base,
+                    location7_table_start: 0, location7_table_end: 0, location7_name: " ", location7_hp_max_base_mod: negative_hp_max_base,
+                    location8_table_start: 0, location8_table_end: 0, location8_name: " ", location8_hp_max_base_mod: negative_hp_max_base,
+                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: negative_hp_max_base,
+                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: negative_hp_max_base,
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "arachnid") {
 	            setAttrs({
@@ -1372,8 +1679,8 @@
                     location8_table_start: 15, location8_table_end: 16, location8_name: getTranslationByKey('front-right-leg-u'), location8_hp_max_base_mod: -1,
                     location9_table_start: 17, location9_table_end: 18, location9_name: getTranslationByKey('front-left-leg-u'), location9_hp_max_base_mod: -1,
                     location10_table_start: 19, location10_table_end: 20, location10_name: getTranslationByKey('cephalothorax-u'), location10_hp_max_base_mod: 1,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: "", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: "", location12_hp_max_base_mod: 0
+                    location11_table_start: 0, location11_table_end: 0, location11_name: "", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: "", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "humanoid") {
 	            setAttrs({
@@ -1384,11 +1691,11 @@
                     location5_table_start: 13, location5_table_end: 15, location5_name: getTranslationByKey('right-arm-u'), location5_hp_max_base_mod: -1,
                     location6_table_start: 16, location6_table_end: 18, location6_name: getTranslationByKey('left-arm-u'), location6_hp_max_base_mod: -1,
                     location7_table_start: 19, location7_table_end: 20, location7_name: getTranslationByKey('head-u'), location7_hp_max_base_mod: 0,
-                    location8_table_start: 0, location8_table_end: 0, location8_name: " ", location8_hp_max_base_mod: 0,
-                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: 0,
-                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location8_table_start: 0, location8_table_end: 0, location8_name: " ", location8_hp_max_base_mod: negative_hp_max_base,
+                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: negative_hp_max_base,
+                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: negative_hp_max_base,
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "centaurid") {
 	            setAttrs({
@@ -1402,8 +1709,8 @@
                     location8_table_start: 17, location8_table_end: 17, location8_name: getTranslationByKey('right-arm-u'), location8_hp_max_base_mod: -4,
                     location9_table_start: 18, location9_table_end: 18, location9_name: getTranslationByKey('left-arm-u'), location9_hp_max_base_mod: -4,
                     location10_table_start: 19, location10_table_end: 20, location10_name: getTranslationByKey('head-u'), location10_hp_max_base_mod: -3,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "decapoda") {
 	            setAttrs({
@@ -1444,11 +1751,11 @@
                     location5_table_start: 15, location5_table_end: 16, location5_name: getTranslationByKey('right-fin-u'), location5_hp_max_base_mod: -1,
                     location6_table_start: 17, location6_table_end: 18, location6_name: getTranslationByKey('left-fin-u'), location6_hp_max_base_mod: -1,
                     location7_table_start: 19, location7_table_end: 20, location7_name: getTranslationByKey('head-u'), location7_hp_max_base_mod: 0,
-                    location8_table_start: 0, location8_table_end: 0, location8_name: " ", location8_hp_max_base_mod: 0,
-                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: 0,
-                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location8_table_start: 0, location8_table_end: 0, location8_name: " ", location8_hp_max_base_mod: negative_hp_max_base,
+                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: negative_hp_max_base,
+                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: negative_hp_max_base,
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "draconic") {
 	            setAttrs({
@@ -1462,8 +1769,8 @@
                     location8_table_start: 15, location8_table_end: 16, location8_name: getTranslationByKey('front-right-leg-u'), location8_hp_max_base_mod: 0,
                     location9_table_start: 17, location9_table_end: 18, location9_name: getTranslationByKey('front-left-leg-u'), location9_hp_max_base_mod: 0,
                     location10_table_start: 19, location10_table_end: 20, location10_name: getTranslationByKey('head-u'), location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "insect") {
 	            setAttrs({
@@ -1476,9 +1783,9 @@
                     location7_table_start: 14, location7_table_end: 14, location7_name: getTranslationByKey('front-right-leg-u'), location7_hp_max_base_mod: -1,
                     location8_table_start: 15, location8_table_end: 15, location8_name: getTranslationByKey('front-left-leg-u'), location8_hp_max_base_mod: -1,
                     location9_table_start: 16, location9_table_end: 20, location9_name: getTranslationByKey('head-u'), location9_hp_max_base_mod: 0,
-                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: negative_hp_max_base,
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "octopodiform") {
 	            setAttrs({
@@ -1492,8 +1799,8 @@
                     location8_table_start: 15, location8_table_end: 16, location8_name: getTranslationByKey('tentacle-8-u'), location8_hp_max_base_mod: 0,
                     location9_table_start: 17, location9_table_end: 18, location9_name: getTranslationByKey('body-u'), location9_hp_max_base_mod: 1,
                     location10_table_start: 19, location10_table_end: 20, location10_name: getTranslationByKey('head-u'), location10_hp_max_base_mod: 2,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "pachyderm") {
 	            setAttrs({
@@ -1505,10 +1812,10 @@
                     location6_table_start: 15, location6_table_end: 16, location6_name: getTranslationByKey('front-left-leg-u'), location6_hp_max_base_mod: 0,
                     location7_table_start: 17, location7_table_end: 17, location7_name: getTranslationByKey('trunk-u'), location7_hp_max_base_mod: -1,
                     location8_table_start: 18, location8_table_end: 20, location8_name: getTranslationByKey('head-u'), location8_hp_max_base_mod: 0,
-                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: 0,
-                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: negative_hp_max_base,
+                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: negative_hp_max_base,
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "quadruped") {
 	            setAttrs({
@@ -1519,11 +1826,11 @@
                     location5_table_start: 11, location5_table_end: 13, location5_name: getTranslationByKey('front-right-leg-u'), location5_hp_max_base_mod: 0,
                     location6_table_start: 14, location6_table_end: 16, location6_name: getTranslationByKey('front-left-leg-u'), location6_hp_max_base_mod: 0,
                     location7_table_start: 17, location7_table_end: 20, location7_name: getTranslationByKey('head-u'), location7_hp_max_base_mod: 0,
-                    location8_table_start: 0, location8_table_end: 0, location8_name: " ", location8_hp_max_base_mod: 0,
-                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: 0,
-                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location8_table_start: 0, location8_table_end: 0, location8_name: " ", location8_hp_max_base_mod: negative_hp_max_base,
+                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: negative_hp_max_base,
+                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: negative_hp_max_base,
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "serpentine") {
 	            setAttrs({
@@ -1536,9 +1843,9 @@
                     location7_table_start: 15, location7_table_end: 16, location7_name: getTranslationByKey('rear-fore-length-u'), location7_hp_max_base_mod: 0,
                     location8_table_start: 17, location8_table_end: 18, location8_name: getTranslationByKey('mid-fore-length-u'), location8_hp_max_base_mod: 0,
                     location9_table_start: 19, location9_table_end: 20, location9_name: getTranslationByKey('head-u'), location9_hp_max_base_mod: 0,
-                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: negative_hp_max_base,
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "tailed_arachnid") {
 	            setAttrs({
@@ -1553,7 +1860,7 @@
                     location9_table_start: 13, location9_table_end: 15, location9_name: getTranslationByKey('right-pincer-u'), location9_hp_max_base_mod: 0,
                     location10_table_start: 16, location10_table_end: 18, location10_name: getTranslationByKey('left-pincer-u'), location10_hp_max_base_mod: 0,
                     location11_table_start: 19, location11_table_end: 20, location11_name: getTranslationByKey('cephalothorax-u'), location11_hp_max_base_mod: 2,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "tailed_biped") {
 	            setAttrs({
@@ -1565,10 +1872,10 @@
                     location6_table_start: 15, location6_table_end: 16, location6_name: getTranslationByKey('right-arm-u'), location6_hp_max_base_mod: -1,
                     location7_table_start: 17, location7_table_end: 18, location7_name: getTranslationByKey('left-arm-u'), location7_hp_max_base_mod: -1,
                     location8_table_start: 19, location8_table_end: 20, location8_name: getTranslationByKey('head-u'), location8_hp_max_base_mod: 0,
-                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: 0,
-                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: negative_hp_max_base,
+                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: negative_hp_max_base,
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "tailed_quadruped") {
 	            setAttrs({
@@ -1580,10 +1887,10 @@
                     location6_table_start: 15, location6_table_end: 16, location6_name: getTranslationByKey('front-right-leg-u'), location6_hp_max_base_mod: -1,
                     location7_table_start: 17, location7_table_end: 18, location7_name: getTranslationByKey('front-left-leg-u'), location7_hp_max_base_mod: -1,
                     location8_table_start: 19, location8_table_end: 20, location8_name: getTranslationByKey('head-u'), location8_hp_max_base_mod: 0,
-                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: 0,
-                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location9_table_start: 0, location9_table_end: 0, location9_name: " ", location9_hp_max_base_mod: negative_hp_max_base,
+                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: negative_hp_max_base,
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "winged_biped") {
 	            setAttrs({
@@ -1596,9 +1903,9 @@
                     location7_table_start: 15, location7_table_end: 16, location7_name: getTranslationByKey('right-arm-u'), location7_hp_max_base_mod: -1,
                     location8_table_start: 17, location8_table_end: 18, location8_name: getTranslationByKey('left-arm-u'), location8_hp_max_base_mod: -1,
                     location9_table_start: 19, location9_table_end: 20, location9_name: getTranslationByKey('head-u'), location9_hp_max_base_mod: 0,
-                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: negative_hp_max_base,
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "winged_insect") {
 	            setAttrs({
@@ -1613,7 +1920,7 @@
                     location9_table_start: 15, location9_table_end: 16, location9_name: getTranslationByKey('front-right-leg-u'), location9_hp_max_base_mod: -1,
                     location10_table_start: 17, location10_table_end: 18, location10_name: getTranslationByKey('front-left-leg-u'), location10_hp_max_base_mod: -1,
                     location11_table_start: 19, location11_table_end: 20, location11_name: getTranslationByKey('head-u'), location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else if (values.hit_locations === "winged_quadruped") {
 	            setAttrs({
@@ -1626,24 +1933,24 @@
                     location7_table_start: 15, location7_table_end: 16, location7_name: getTranslationByKey('front-right-leg-u'), location7_hp_max_base_mod: 0,
                     location8_table_start: 17, location8_table_end: 18, location8_name: getTranslationByKey('front-left-leg-u'), location8_hp_max_base_mod: 0,
                     location9_table_start: 19, location9_table_end: 20, location9_name: getTranslationByKey('head-u'), location9_hp_max_base_mod: 0,
-                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: 0
+                    location10_table_start: 0, location10_table_end: 0, location10_name: " ", location10_hp_max_base_mod: negative_hp_max_base,
+                    location11_table_start: 0, location11_table_end: 0, location11_name: " ", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: " ", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        } else {
 	            setAttrs({
-				    location1_table_start: 0, location1_table_end: 0, location1_name: "", location1_hp_max_base_mod: 0,
-                    location2_table_start: 0, location2_table_end: 0, location2_name: "", location2_hp_max_base_mod: 0,
-                    location3_table_start: 0, location3_table_end: 0, location3_name: "", location3_hp_max_base_mod: 0,
-                    location4_table_start: 0, location4_table_end: 0, location4_name: "", location4_hp_max_base_mod: 0,
-                    location5_table_start: 0, location5_table_end: 0, location5_name: "", location5_hp_max_base_mod: 0,
-                    location6_table_start: 0, location6_table_end: 0, location6_name: "", location6_hp_max_base_mod: 0,
-                    location7_table_start: 0, location7_table_end: 0, location7_name: "", location7_hp_max_base_mod: 0,
-                    location8_table_start: 0, location8_table_end: 0, location8_name: "", location8_hp_max_base_mod: 0,
-                    location9_table_start: 0, location9_table_end: 0, location9_name: "", location9_hp_max_base_mod: 0,
-                    location10_table_start: 0, location10_table_end: 0, location10_name: "", location10_hp_max_base_mod: 0,
-                    location11_table_start: 0, location11_table_end: 0, location11_name: "", location11_hp_max_base_mod: 0,
-                    location12_table_start: 0, location12_table_end: 0, location12_name: "", location12_hp_max_base_mod: 0
+				    location1_table_start: 0, location1_table_end: 0, location1_name: "", location1_hp_max_base_mod: negative_hp_max_base,
+                    location2_table_start: 0, location2_table_end: 0, location2_name: "", location2_hp_max_base_mod: negative_hp_max_base,
+                    location3_table_start: 0, location3_table_end: 0, location3_name: "", location3_hp_max_base_mod: negative_hp_max_base,
+                    location4_table_start: 0, location4_table_end: 0, location4_name: "", location4_hp_max_base_mod: negative_hp_max_base,
+                    location5_table_start: 0, location5_table_end: 0, location5_name: "", location5_hp_max_base_mod: negative_hp_max_base,
+                    location6_table_start: 0, location6_table_end: 0, location6_name: "", location6_hp_max_base_mod: negative_hp_max_base,
+                    location7_table_start: 0, location7_table_end: 0, location7_name: "", location7_hp_max_base_mod: negative_hp_max_base,
+                    location8_table_start: 0, location8_table_end: 0, location8_name: "", location8_hp_max_base_mod: negative_hp_max_base,
+                    location9_table_start: 0, location9_table_end: 0, location9_name: "", location9_hp_max_base_mod: negative_hp_max_base,
+                    location10_table_start: 0, location10_table_end: 0, location10_name: "", location10_hp_max_base_mod: negative_hp_max_base,
+                    location11_table_start: 0, location11_table_end: 0, location11_name: "", location11_hp_max_base_mod: negative_hp_max_base,
+                    location12_table_start: 0, location12_table_end: 0, location12_name: "", location12_hp_max_base_mod: negative_hp_max_base
 			    });
 	        }
 	    });
@@ -2150,102 +2457,6 @@
 					ship_repair_mod: '-',
 				});
 			}  
-		});
-	});
-
-    // Fatigue
-	on("change:fatigue change:healing_rate", function() {
-		getAttrs(["fatigue", "healing_rate"], function(values) {
-			var healing_rate = parseInt(values.healing_rate);
-			if (values.fatigue == "9") {
-				setAttrs({
-					fatigue_skills: '0',
-					movement_rate_fatigue: '+0',
-					//initiative_bonus_fatigue: 0,
-					//action_points_fatigue: '+0',
-					fatigue_recovery: 0,
-				});
-			} else if (values.fatigue == "8") {
-				setAttrs({
-					fatigue_skills: '1',
-					movement_rate_fatigue: '+0',
-					//initiative_bonus_fatigue: 0,
-					//action_points_fatigue: '+0',
-					fatigue_recovery: .25 / healing_rate,
-				});
-			} else if (values.fatigue == "7") {
-				setAttrs({
-					fatigue_skills: '1',
-					movement_rate_fatigue: '-1',
-					//initiative_bonus_fatigue: 0,
-					//action_points_fatigue: '+0',
-					fatigue_recovery: 3 / healing_rate,
-				});
-			} else if (values.fatigue == "6") {
-				setAttrs({
-					fatigue_skills: '2',
-					movement_rate_fatigue: '-2',
-					//initiative_bonus_fatigue: -2,
-					//action_points_fatigue: '+0',
-					fatigue_recovery: 6 / healing_rate,
-				});
-			} else if (values.fatigue == "5") {
-				setAttrs({
-					fatigue_skills: '2',
-					movement_rate_fatigue: '*.5',
-					//initiative_bonus_fatigue: -4,
-					//action_points_fatigue: '-1',
-					fatigue_recovery: 12 / healing_rate,
-				});
-			} else if (values.fatigue == "4") {
-				setAttrs({
-					fatigue_skills: '3',
-					movement_rate_fatigue: '*.5',
-					//initiative_bonus_fatigue: -6,
-					//action_points_fatigue: '-2',
-					fatigue_recovery: 18  / healing_rate,
-				});
-			} else if (values.fatigue == "3") {
-				setAttrs({
-					fatigue_skills: '3',
-					movement_rate_fatigue: '*0',
-					//initiative_bonus_fatigue: -8,
-					//action_points_fatigue: '-3',
-					fatigue_recovery: 24 / healing_rate,
-				});
-			} else if (values.fatigue == "2") {
-				setAttrs({
-					fatigue_skills: '4',
-					movement_rate_fatigue: '*0',
-					//initiative_bonus_fatigue: -99,
-					//action_points_fatigue: '*0',
-					fatigue_recovery: 36 / healing_rate,
-				});
-			} else if (values.fatigue == "1") {
-				setAttrs({
-					fatigue_skills: '5',
-					movement_rate_fatigue: '*0',
-					//initiative_bonus_fatigue: -99,
-					//action_points_fatigue: '*0',
-					fatigue_recovery: 48 / healing_rate,
-				});
-			} else if (values.fatigue == "0") {
-				setAttrs({
-					fatigue_skills: '5',
-					movement_rate_fatigue: '*0',
-					//initiative_bonus_fatigue: -99,
-					//action_points_fatigue: '*0',
-					fatigue_recovery: "-"
-				});
-			} else {
-				setAttrs({
-					fatigue_skills: '0',
-					movement_rate_fatigue: '+0',
-					//initiative_bonus_fatigue: 0,
-					//action_points_fatigue: '+0',
-					fatigue_recovery: 0,
-				});
-			} 
 		});
 	});
 	
