@@ -5804,13 +5804,48 @@
 
     on("sheet:opened", function(eventinfo) {
         versioning(function() {
-            if(eventinfo.sourceType === "sheetworker") {
-                setAttrs({l1mancer_status: "completed"})
+            var getInfo = function(sections, callback, results) {
+                results =  results || {};
+                if(sections.length > 0) {
+                    var section = sections.pop();
+                    getSectionIDs(section, function(ids) {
+                        results[section] = ids;
+                        getInfo(sections, callback, results);
+                    });
+                } else {
+                    callback(results);
+                }
             }
-            else {
-                check_l1_mancer();
-                check_lp_mancer();
-            };
+            var spellSections = ["spell-cantrip"];
+            for(var x=1; x<=9; x++) {
+                spellSections.push("spell-" + x);
+            }
+
+            getInfo(spellSections, function(results) {
+                var getList = ["character_id"];
+                _.each(results, function(sectionids, sectionname) {
+                    _.each(sectionids, function(spellid) {
+                        getList.push("repeating_" + sectionname + "_" + spellid + "_rollcontent");
+                    });
+                });
+                getAttrs(getList, function(attrs) {
+                    var set = {};
+                    _.each(attrs, function(data, name) {
+                        if(data.length === 68 && data.split("|")[0].substr(2) !== attrs["character_id"]) {
+                            set[name] = "%{" + attrs["character_id"] + data.substr(22);
+                        }
+                    });
+                    setAttrs(set, function() {
+                        if(eventinfo.sourceType === "sheetworker") {
+                            setAttrs({l1mancer_status: "completed"})
+                        }
+                        else {
+                            check_l1_mancer();
+                            check_lp_mancer();
+                        };
+                    });
+                });
+            });
         });
     });
 
@@ -13662,6 +13697,7 @@
         var allSkills = ["athletics", "acrobatics", "sleight_of_hand", "stealth", "arcana", "history", "investigation", "nature", "religion", "animal_handling", "insight", "medicine", "perception", "survival","deception", "intimidation", "performance", "persuasion"];
         var allAbilities = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
         var eraseSections = ["attack", "inventory", "traits", "resource", "proficiencies", "tool", "damagemod", "spell-cantrip", "hpmod", "acmod", "tohitmod"];
+        console.log(blobs);
         for(var x=1; x<=9; x++) {
             eraseSections.push("spell-" + x);
         }
@@ -13942,6 +13978,7 @@
                             console.log("DOING THE FINAL SET!!");
                             setAttrs(set, function() {
                                 setCharmancerText({"mancer_progress" :'<div style="width: 100%"></div>'});
+                                update_class();
                                 organize_section_proficiencies();
                                 update_skills(allSkills);
                                 update_attacks("all");
@@ -14000,7 +14037,7 @@
                 setAttrs({spellinfo: JSON.stringify(spellInfo)});
             });
             getAttrs(["strength", "strength_mod", "dexterity", "dexterity_mod", "constitution", "constitution_mod", "intelligence", "intelligence_mod", "wisdom", "wisdom_mod", "charisma", "charisma_mod"], function(attrs) {
-                setAttrs({abilities: JSON.stringify(attrs)});
+                setAttrs({previous_abilities: JSON.stringify(attrs)});
             });
 
         });
@@ -14013,7 +14050,7 @@
             const mancerdata = getCharmancerData();
             const leveldata = mancerdata["lp-levels"].values || undefined;
             let set = {};
-            if(!leveldata["class1"]) set["class1"] = "Classes:" + v.class;
+            if(!leveldata["class1"]) set["class1_select"] = "Classes:" + v.class;
             if(!leveldata["class1_currentlevel"]) set["class1_currentlevel"] = v.base_level;
 
             for (x = 1; x <= 3; x++) {
@@ -14030,6 +14067,12 @@
         });
     });
 
+    on("mancerchange:class1_select mancerchange:class2_select mancerchange:class3_select mancerchange:class4_select", function(eventinfo) {
+        let update = {};
+        update[eventinfo.sourceAttribute.substr(0,6)] = eventinfo.newValue;
+        setAttrs(update);
+    })
+
     on("mancerchange:class1 mancerchange:class2 mancerchange:class3 mancerchange:class4", function(eventinfo) {
         const mancerdata = getCharmancerData();
         const leveldata = mancerdata["lp-levels"].values;
@@ -14041,7 +14084,7 @@
             let update = {}; //Not being used
             const class_name = eventinfo.newValue && eventinfo.newValue.split(":").length > 1 && eventinfo.newValue.split(":")[0] === "Classes" ? eventinfo.newValue.split(":")[1] : false;
             set[`${levelclass}_addlevel`] = leveldata[`${levelclass}_addlevel`] ? leveldata[`${levelclass}_addlevel`] : 0;
-            set[`${levelclass}_select`] = leveldata[`${levelclass}`]; //This is working for class 1 but its ugly and I don't like it
+            //set[`${levelclass}_select`] = leveldata[`${levelclass}`]; //This is working for class 1 but its ugly and I don't like it
             set[`${levelclass}_hitdie`] = data["Hit Die"];
             update["subclass1-name"] = data["Subclass Name"]; //Not being used
             if(class_name) {
@@ -14078,9 +14121,9 @@
         const mancerdata = getCharmancerData();
         const leveldata = mancerdata["lp-levels"];
         const levelclass = eventinfo.sourceAttribute.slice(0, 6);
-        const currentlevel = parseInt(leveldata[`${levelclass}_currentlevel`]);
+        const currentlevel = parseInt(leveldata.values[`${levelclass}_currentlevel`]);
         const resultlevel = parseInt(eventinfo.newValue) + currentlevel;
-        const subclasslevel = leveldata.data[`${levelclass}`]["data-Subclass Level"] ? parseInt(leveldata.data[`${levelclass}`]["data-Subclass Level"]) : 1;
+        const subclasslevel = leveldata.data[`${levelclass}`] ? parseInt(leveldata.data[`${levelclass}`]["data-Subclass Level"]) : 1;
         
         let update = {}; //Not being used
         update["levels_1 .sheet-resultlevel"] = resultlevel; //Not being used
@@ -14262,8 +14305,9 @@
         var replace = 0;
         var totallevel = 0;
         var spellmaxlevel = 0;
+        var prepared = true;
         var spelldata = mancerdata["lp-welcome"].values["spellinfo"] ? JSON.parse(mancerdata["lp-welcome"].values["spellinfo"]) : {};
-        var abilities = mancerdata["lp-welcome"].values["abilities"] ? JSON.parse(mancerdata["lp-welcome"].values["abilities"]) : {};
+        var abilities = mancerdata["lp-welcome"].values["previous_abilities"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_abilities"]) : {};
         _.each(spelldata, function(spell, repid) {
             if(repid.includes("cantrip")) {
                 knowncantrips++;
@@ -14273,8 +14317,10 @@
         });
         for(var x=1;x<=4;x++) {
             if(mancerdata["lp-levels"].data["class" + x]) {
-                var prevlevel = parseInt(mancerdata["lp-levels"].values["class" + x + "_currentlevel"]);
+                var prevlevel = mancerdata["lp-levels"].values["class" + x + "_currentlevel"] ? parseInt(mancerdata["lp-levels"].values["class" + x + "_currentlevel"]) : 0;
+                console.log("class" + x + ": " + prevlevel)
                 var thislevel = parseInt(mancerdata["lp-levels"].values["class" + x + "_addlevel"]) + prevlevel;
+                console.log("class" + x + ": " + thislevel)
                 var thisclass = {class: _.last(mancerdata["lp-levels"].values["class" + x].split(":")), number: x, newlevel: thislevel};
                 var toSwap = mancerdata["lp-levels"].data["class" + x]["data-Spell Replace"] ? parseInt(mancerdata["lp-levels"].data["class" + x]["data-Spell Replace"]) : 0;
                 var prevknown = 0;
@@ -14284,6 +14330,7 @@
                 var spelladd = 0;
                 thisclass.list = thisclass.class;
                 totallevel += thislevel;
+                thisclass.newspells = 0;
                 _.each(["", "_subclass"], function(section) {
                     var dataname = "class" + x + section;
                     if(mancerdata["lp-levels"].data[dataname]) {
@@ -14315,13 +14362,14 @@
                                     thisclass.prepared = Math.max(thisclass.prepared, 1);
                                 }
                             }
-                            if(blob.Level == prevlevel) {
+                            if(blob.Level == prevlevel || (prevlevel === 0 && blob.Level == 1)) {
                                 if(blob["Spells Known"]) {
-                                    prevknown = parseInt(blob["Spells Known"]);
+                                    prevknown = prevlevel === 0 ? 0 : parseInt(blob["Spells Known"]);
+                                    if(prevlevel === 0) thisclass.newspells = parseInt(blob["Spells Known"]);
                                 }
                                 if(blob.Cantrips) {
                                     thisclass.cantrips = true;
-                                    prevcantrips = parseInt(blob.Cantrips);
+                                    prevcantrips = prevlevel === 0 ? 0 : parseInt(blob.Cantrips);
                                 }
                             }
                             if(mancerdata["lp-levels"].data[dataname]["data-Spell Add"]) {
@@ -14330,7 +14378,11 @@
                         });
                     }
                 });
-                thisclass.newspells = spelladd ? spelladd * (thislevel - prevlevel) : currentknown - prevknown;
+                if(spelladd) {
+                    thisclass.newspells += prevlevel === 0 ? spelladd * (thislevel - prevlevel -1) : spelladd * (thislevel - prevlevel);
+                } else {
+                    thisclass.newspells = currentknown - prevknown;
+                }
                 if(thisclass.prepared) thisclass.newspells = thisclass.prepared;
                 thisclass.newcantrips = currentcantrips - prevcantrips;
                 thisclass.replace = toSwap * (thislevel - prevlevel);
@@ -14368,7 +14420,11 @@
             queries.push("Category:Spells Name:" + knownlist.join("|"));
         }
         _.each(classes, function(thisclass) {
-            if(thisclass.maxlevel) {
+            if(thisclass.maxlevel || thisclass.newcantrips) {
+                newcantrips += thisclass.newcantrips;
+                newspells += thisclass.newspells;
+                replace += thisclass.replace;
+                if(!thisclass.prepared) prepared = false;
                 thisquery = "Category:Spells Classes:*" + thisclass.list + " Level:";
                 if(thisclass.cantrips) thisquery += "0|"
                 for(var x = 1; x <= thisclass.maxlevel; x++) {
@@ -14378,16 +14434,21 @@
                 queries.push(thisquery);
             }
         });
-        newcantrips = classes[0].newcantrips;
-        newspells = classes[0].newspells;
-        replace = classes[0].replace;
         var toSet = {};
         toSet.knowncantrips = knowncantrips;
         toSet.knownspells = knownspells;
         toSet.newcantrips = newcantrips;
         toSet.newspells = newspells;
         toSet.replace = replace;
+        console.log(classes);
         setAttrs(toSet);
+        var update = {};
+        update["spells-summary"] = "";
+        if(newcantrips != 0 || knowncantrips != 0) update["spells-summary"] = "<p class=\"level_0\">Cantrips: <span></span></p>";
+        _.times(spellmaxlevel, function(x) {
+            update["spells-summary"] += "<p class=\"level_" + (x + 1) + "\">Level " + (x + 1) + ": <span></span></p>";
+        });
+        setCharmancerText(update);
         getCompendiumQuery(queries, function(data) {
             var byLevel = {};
             _.each(data, function(spell) {
@@ -14439,7 +14500,7 @@
                                 _.each(spelldata, function(thisspell) {
                                     if(thisspell.spellname == spell.name) {
                                         toSet[spellid + "_checked"] = "1";
-                                        if(!classes[0].prepared || x == "0") {
+                                        if(!prepared || x == "0") {
                                             toSet[spellid + "_existing"] = "true";
                                             if(x == "0" || replace == 0) update[spellid + " .sheet-hardlock"] = "locked";
                                         }
@@ -14452,7 +14513,7 @@
                                     }
                                 });
                                 setCharmancerText(update);
-                                setAttrs(toSet, {silent: true});
+                                setAttrs(toSet, {silent: true}, function() {updateSpellSummary()});
                             });
                         });
                     });
@@ -14460,6 +14521,27 @@
             });
         });
     });
+
+    var updateSpellSummary = function() {
+        var mancerdata = getCharmancerData();
+        var update = [];
+        _.each(mancerdata["lp-spells"].repeating, function(repid) {
+            if(mancerdata["lp-spells"].values[repid + "_existing"]) {
+                var selector = "spells-summary .sheet-level_" + mancerdata["lp-spells"].values[repid + "_level"] + " span";
+                update[selector] = update[selector] || "";
+                update[selector] += mancerdata["lp-spells"].values[repid + "_checked"] ? "<span>" : "<span class=\"removed\">";
+                update[selector] += mancerdata["lp-spells"].values[repid + "_name"] + "</span>";
+            }
+        });
+        _.each(mancerdata["lp-spells"].repeating, function(repid) {
+            if(mancerdata["lp-spells"].values[repid + "_checked"] && !mancerdata["lp-spells"].values[repid + "_existing"]) {
+                var selector = "spells-summary .sheet-level_" + mancerdata["lp-spells"].values[repid + "_level"] + " span";
+                update[selector] = update[selector] || "";
+                update[selector] += "<span class=\"new\">" + mancerdata["lp-spells"].values[repid + "_name"] + "</span>";
+            }
+        });
+        setCharmancerText(update);
+    }
 
     on("clicked:repeating_spell-item_info", function(eventinfo) {
         console.table(eventinfo);
@@ -14474,6 +14556,7 @@
             update[eventinfo.sourceSection + " .sheet-controller"] = eventinfo.newValue || "";
             setCharmancerText(update);
         } else {
+            updateSpellSummary();
             var mancerdata = getCharmancerData();
             var sections = [];
             var allowed = 0;
@@ -14621,8 +14704,8 @@
     <label class="spellheader"><span class="title"></span><input type="checkbox" name="comp_show" value="1"><span class="number"></span></label>
     <span class="controller" style="display: none"></span>
     <div class="container"></div>
-    <p class="spellstext"></p>
-    <p class="replacetext"></p>
+    <div class="spellstext"></div>
+    <div class="replacetext"></div>
 </charmancer>
 
 <charmancer class="sheet-repeating-spell-item">
@@ -15847,7 +15930,7 @@
             <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
         </div>
         <input type="hidden" name="comp_spellinfo">
-        <input type="hidden" name="comp_abilities">
+        <input type="hidden" name="comp_previous_abilities">
     </div>
 </charmancer>
 
@@ -15898,7 +15981,7 @@
                     </div>
                     <div>
                         <h4 class="subclass1_features_title choice" style="display: inline;">Subclass Features: </h4>
-                        <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe --->
+                        <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
                         <div>There needs to be a list of sub class features here.</div>
                     </div>
                 </div>
@@ -15933,7 +16016,7 @@
                     </div>
                     <div>
                         <h4 class="subclass1_features_title choice" style="display: inline;">Subclass Features: </h4>
-                        <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe --->
+                        <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
                         <div>There needs to be a list of sub class features here.</div>
                     </div>
                 </div>
@@ -15968,7 +16051,7 @@
                     </div>
                     <div>
                         <h4 class="subclass1_features_title choice" style="display: inline;">Subclass Features: </h4>
-                        <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe --->
+                        <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
                         <div>There needs to be a list of sub class features here.</div>
                     </div>
                 </div>
@@ -16090,10 +16173,12 @@
         </ol>
         <div class="topbar-holder"></div>
         <div class="choices spellslide">
+            <p class="instructions">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ut est consectetur, lacinia justo in, lacinia libero. Etiam fermentum risus non sem hendrerit elementum. Nulla vel pulvinar est.</p>
+            <p class="spells-summary"></p>
         </div>
 
         <div class="info spellslide">
-            <div class="sheet-compendium-page sheet-spells-info" accept="Rules:Classes"></div>
+            <div class="sheet-compendium-page sheet-spells-info" accept="Rules:Spells"></div>
         </div>
         <div class="bottombar">
             <button class="prev" type="back" value="lp-asi">Back</button>
