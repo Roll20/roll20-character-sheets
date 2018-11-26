@@ -14102,7 +14102,7 @@
             setCharmancerText(update); //Not being used
             setAttrs(set);
             update_levels_message();
-            update_rollhp_button(levelclass);
+            update_hp(levelclass);
 
             //Remove this later
             //console.log(eventinfo);
@@ -14133,10 +14133,10 @@
             showChoices([`sub${levelclass}`]);
         } else {
             hideChoices([`sub${levelclass}`]);
-        }
+        };
 
         update_levels_message();
-        update_rollhp_button(levelclass);
+        update_hp(levelclass);
 
         //Remove later
         //console.log("ADD LEVEL TRIGGERED: ");
@@ -14144,41 +14144,95 @@
         //console.log(leveldata);
     });
 
-    const update_rollhp_button = function (levelclass) {
+    const update_hp = function (levelclass) {
         const mancerdata = getCharmancerData();
         const leveldata = mancerdata["lp-levels"].values;
         const hitdie = leveldata[`${levelclass}_hitdie`];
         const levels = leveldata[`${levelclass}_addlevel`] || 0;
 
-        if (levels) {
+        if (levels && hitdie) {
             getAttrs(["constitution_mod"], function(v) {
                 const conmod = parseInt(v.constitution_mod) || 0;
                 const conbonus = conmod * levels;
+
+                //Set the Roll for HP button
                 let update = {};
                 update[`${levelclass}_rollhp`] = `<button type="roll" name="roll_${levelclass}_rollhp" value="@{wtype}&{template:mancerroll} {{title=Roll for HP}} {{r1=[[${levels}${hitdie}+${conbonus}]]}}">Roll</button>`;
                 setCharmancerText(update);
+
+                //Total up the average HP
+                let set = {};
+                const size = hitdie.slice(1);
+                let num = [];
+                let sum = 0;
+
+                for(x = 1; x <= size; x++) {
+                   num.push(x);
+                };
+
+                for(var i = 0; i < num.length; i++) {
+                    sum += num[i];
+                }
+
+                let avg = Math.ceil(sum / num.length);
+                let hp = avg * levels + conbonus;
+
+                set[`${levelclass}_averagehp`] = hp;
+                setAttrs(set);
+
+                console.log(":+:+:+:  5E LEVEL LOGS: HP SIZE :+:+:+: ");
+                console.log(`The sum is ${sum} and the die size was ${size}. The Average is ${avg}. Which makes the hp equal to ${hp}`);
+                console.log(":^:^:^:  END 5E LEVEL LOGS: HP SIZE :^:^:^: ");
+
+               /* let average = (num) => Math.ceil(num.reduce((a, b) => a + b) / num.length);
+                console.log(average(num));*/
             });
         };
-
-        //Remove later
-        //console.log("ROLL HP BUTTON: ");
-        //console.log(leveldata);
-        //console.log(levelclass);
     };
+
+    on("mancerchange:class1_addhpAverage mancerchange:class2_addhpAverage mancerchange:class3_addhpAverage mancerchange:class4_addhpAverage mancerchange:class1_averagehp mancerchange:class2_averagehp mancerchange:class3_averagehp mancerchange:class4_averagehp", function(eventinfo) {
+        const mancerdata = getCharmancerData();
+        const leveldata = mancerdata["lp-levels"].values;
+        const levelclass = eventinfo.sourceAttribute.slice(0, 6);
+        const hp = leveldata[`${levelclass}_averagehp`];
+        let set = {};
+
+        console.log(":+:+:+:  5E LEVEL LOGS: AVERAGE HP CHECKBOX :+:+:+: ");
+        console.log(hp);
+        console.log(eventinfo);
+        console.log(leveldata);
+        console.log(":^:^:^:  END 5E LEVEL LOGS: HP :^:^:^: ");
+
+        if (leveldata[`${levelclass}_addhpAverage`] === "on") {
+            console.log("CHECKBOX WAS CHECKED");
+            set[`${levelclass}_addhp`] = hp;
+        } else if (eventinfo.sourceType === "player") {
+            console.log("CHECKBOX WAS NOT CHECKED");
+            set[`${levelclass}_addhp`] = "";
+        } else {
+            console.log("CHECKBOX ELSE TRIGGERED");
+        };
+
+        setAttrs(set);
+    });
+
 
     //Roll HP 1
     on("mancerroll:class1_rollhp mancerroll:class2_rollhp mancerroll:class3_rollhp mancerroll:class4_rollhp", function(eventinfo) {
+        const mancerdata = getCharmancerData();
+        const leveldata = mancerdata["lp-levels"].values;
         const levelclass = eventinfo.sourceAttribute.slice(0, 6);
         const result = eventinfo.roll["0"].result;
         let set = {};
         set[`${levelclass}_addhp`] = result;
 
-        setAttrs(set);
+        if (leveldata[`${levelclass}_addhpAverage`] === "on") {
+            set[`${levelclass}_addhpAverage`] = "";
+        };
 
-        //Remove logs later
-        //console.log("ROLL HP TRIGGER!");
-        //console.log(eventinfo.roll["0"].result);
-        //console.log(eventinfo);
+        console.log(set);
+
+        setAttrs(set);
     });
 
     //Build a function to update the level & class each time they change
@@ -15954,6 +16008,7 @@
                     <input type="hidden" name="comp_class1" />
                     <input type="hidden" name="comp_class1_currentlevel" />
                     <input type="hidden" name="comp_class1_hitdie" />
+                    <input type="hidden" name="comp_class1_averagehp" />
                     <div>
                        <select name="comp_class1_select" accept="Category:Classes" style="display: inline; width: 70%;">
                             <option value="" data-i18n="choose">Choose</option>
@@ -15967,8 +16022,8 @@
                         <div class="class1_rollhp" style="display: inline;">
                             <button type="roll" name="roll_class1_rollhp" value="" title="You must input a level increase to this class">Roll</button>
                         </div>
-                        <input type="checkbox" name="comp_class1_addhpAverge" /><span>Average</span>
-                        <input type="checkbox" name="comp_class1_addhpLevel" /><span>By level</span>s
+                        <input type="checkbox" name="comp_class1_addhpAverage" /><span>Average</span>
+                        <input type="checkbox" name="comp_class1_addhpLevel" /><span>By level</span>
                     </div>
                     <div>
                         <h4 class="class1_features_title choice" style="display: inline;">Class Features: </h4>
@@ -15989,6 +16044,7 @@
                     <input type="hidden" name="comp_class2" />
                     <input type="hidden" name="comp_class2_currentlevel" />
                     <input type="hidden" name="comp_class2_hitdie" />
+                    <input type="hidden" name="comp_class2_averagehp" />
                     <div>
                        <select name="comp_class2_select" accept="Category:Classes" style="display: inline; width: 70%;">
                             <option value="" data-i18n="choose">Choose</option>
@@ -16002,7 +16058,7 @@
                         <div class="class2_rollhp" style="display: inline;">
                             <button type="roll" name="roll_class2_rollhp" value="" title="You must input a level increase to this class">Roll</button>
                         </div>
-                        <input type="checkbox" name="comp_class2_addhpAverge" /><span>Average</span>
+                        <input type="checkbox" name="comp_class2_addhpAverage" /><span>Average</span>
                         <input type="checkbox" name="comp_class2_addhpLevel" /><span>By level</span>s
                     </div>
                     <div>
@@ -16024,6 +16080,7 @@
                     <input type="hidden" name="comp_class3" />
                     <input type="hidden" name="comp_class3_currentlevel" />
                     <input type="hidden" name="comp_class3_hitdie" />
+                    <input type="hidden" name="comp_class3_averagehp" />
                     <div>
                        <select name="comp_class3_select" accept="Category:Classes" style="display: inline; width: 70%;">
                             <option value="" data-i18n="choose">Choose</option>
@@ -16037,7 +16094,7 @@
                         <div class="class3_rollhp" style="display: inline;">
                             <button type="roll" name="roll_class3_rollhp" value="" title="You must input a level increase to this class">Roll</button>
                         </div>
-                        <input type="checkbox" name="comp_class3_addhpAverge" /><span>Average</span>
+                        <input type="checkbox" name="comp_class3_addhpAverage" /><span>Average</span>
                         <input type="checkbox" name="comp_class3_addhpLevel" /><span>By level</span>s
                     </div>
                     <div>
@@ -16059,6 +16116,7 @@
                     <input type="hidden" name="comp_class4" />
                     <input type="hidden" name="comp_class4_currentlevel" />
                     <input type="hidden" name="comp_class4_hitdie" />
+                    <input type="hidden" name="comp_class4_averagehp" />
                     <div>
                        <select name="comp_class4_select" accept="Category:Classes" style="display: inline; width: 70%;">
                             <option value="" data-i18n="choose">Choose</option>
@@ -16072,7 +16130,7 @@
                         <div class="class4_rollhp" style="display: inline;">
                             <button type="roll" name="roll_class4_rollhp" value="" title="You must input a level increase to this class">Roll</button>
                         </div>
-                        <input type="checkbox" name="comp_class4_addhpAverge" /><span>Average</span>
+                        <input type="checkbox" name="comp_class4_addhpAverage" /><span>Average</span>
                         <input type="checkbox" name="comp_class4_addhpLevel" /><span>By level</span>s
                     </div>
                     <div>
