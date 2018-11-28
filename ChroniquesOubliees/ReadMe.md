@@ -9,9 +9,13 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-1.9 [Screenshot](co_v2.png)
+2.0 [Screenshot](co_v2.png)
 
 # Notes de version
+## v2.0 (2018-11-19)
+
+* Ajout de tabs pour gagner de la place
+* Possibilité d'afficher 3 voies de plus
 
 ## v1.9 (2017-10-02)
 
