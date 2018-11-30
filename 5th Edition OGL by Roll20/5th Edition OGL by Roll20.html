@@ -14372,9 +14372,7 @@
         for(var x=1;x<=4;x++) {
             if(mancerdata["lp-levels"].data["class" + x]) {
                 var prevlevel = mancerdata["lp-levels"].values["class" + x + "_currentlevel"] ? parseInt(mancerdata["lp-levels"].values["class" + x + "_currentlevel"]) : 0;
-                console.log("class" + x + ": " + prevlevel)
                 var thislevel = parseInt(mancerdata["lp-levels"].values["class" + x + "_addlevel"]) + prevlevel;
-                console.log("class" + x + ": " + thislevel)
                 var thisclass = {class: _.last(mancerdata["lp-levels"].values["class" + x].split(":")), number: x, newlevel: thislevel};
                 var toSwap = mancerdata["lp-levels"].data["class" + x]["data-Spell Replace"] ? parseInt(mancerdata["lp-levels"].data["class" + x]["data-Spell Replace"]) : 0;
                 var prevknown = 0;
@@ -14475,7 +14473,7 @@
         }
         _.each(classes, function(thisclass) {
             if(thisclass.maxlevel || thisclass.newcantrips) {
-                newcantrips += thisclass.newcantrips;
+                newcantrips += thisclass.newcantrips || 0;
                 newspells += thisclass.newspells;
                 replace += thisclass.replace;
                 if(!thisclass.prepared) prepared = false;
@@ -14494,15 +14492,23 @@
         toSet.newcantrips = newcantrips;
         toSet.newspells = newspells;
         toSet.replace = replace;
-        console.log(classes);
         setAttrs(toSet);
         var update = {};
         update["spells-summary"] = "";
-        if(newcantrips != 0 || knowncantrips != 0) update["spells-summary"] = "<p class=\"level_0\">Cantrips: <span></span></p>";
+        if(newcantrips != 0 || knowncantrips != 0) update["spells-summary"] = "<div class=\"level_0\"><div class=\"title\">Cantrips: </div><div class=\"list\"></div></div>";
         _.times(spellmaxlevel, function(x) {
-            update["spells-summary"] += "<p class=\"level_" + (x + 1) + "\">Level " + (x + 1) + ": <span></span></p>";
+            update["spells-summary"] += "<div class=\"level_" + (x + 1) + "\"><div class=\"title\">Level " + (x + 1) + ": </div><div class=\"list\"></div></div>";
         });
+        if(classes.length > 1) {
+            update["cantripinfo"] = "";
+            _.each(classes, function(thisclass) {
+                if(thisclass.newspells) {
+                    update["cantripinfo"] += "<p>You can add " + thisclass.newcantrips + " " + thisclass.class + " cantrips.</p>";
+                }
+            });
+        }
         setCharmancerText(update);
+        var spellnumber = 0;
         getCompendiumQuery(queries, function(data) {
             var byLevel = {};
             _.each(data, function(spell) {
@@ -14513,34 +14519,52 @@
                         classes: spell.data.Classes.split(",").map(x => x.trim()),
                         level: parseInt(spell.data.Level)
                     });
+                    spellnumber++;
                 }
             });
             addRepeatingSection("choices", "row", "spellsrow", function(spellsrow) {
+                var toSet = {};
+                var update = {};
                 _.each(byLevel, function(spells, x) {
                     addRepeatingSection(spellsrow, "spell-holder", "spell-holder-" + x, function(levelrow) {
-                        var update = {};
                         if(x == "0") {
                             if(newspells > 0) {
-                                update[levelrow + " .sheet-spellstext .sheet-summary"] = "You can add " + newspells + " new spells.";
+                                if(classes.length > 1) {
+                                    update[levelrow + " .sheet-spellstext .sheet-summary"] = "";
+                                    _.each(classes, function(thisclass) {
+                                        if(thisclass.newspells) {
+                                            update[levelrow + " .sheet-spellstext .sheet-summary"] += "<p>You can add " + thisclass.newspells + " " + thisclass.class + " spells.</p>";
+                                        }
+                                    });
+                                } else {
+                                    update[levelrow + " .sheet-spellstext .sheet-summary"] = "<p>You can add " + newspells + " new spells.</p>";
+                                }
                             }
                             if(replace > 0) {
-                                update[levelrow + " .sheet-replacetext .sheet-summary"] = "You can replace " + replace + " spells.";
+                                if(classes.length > 1) {
+                                    update[levelrow + " .sheet-replacetext .sheet-summary"] = "";
+                                    _.each(classes, function(thisclass) {
+                                        if(thisclass.replace) {
+                                            update[levelrow + " .sheet-replacetext .sheet-summary"] += "<p>You can replace " + thisclass.replace + " " + thisclass.class + " spells.</p>";
+                                        }
+                                    });
+                                } else {
+                                    update[levelrow + " .sheet-replacetext .sheet-summary"] = "<p>You can replace " + replace + " spells.</p>";
+                                }
+                                showChoices([levelrow + " .sheet-replace-info"]);
                             }
-                            update[levelrow + " label .sheet-number"] = knowncantrips + "/" + (knowncantrips + newcantrips);
+                        } else {
+                            update[levelrow + " .sheet-spellinfo"] = "";
                         }
                         update[levelrow + " label .sheet-title"] = x == "0" ? "Cantrips" : "Level " + x;
+                        update[levelrow + " label .sheet-title"] += "<span class=\"choice\">r</span>"
                         if(x == "0" && thisclass.newcantrips == 0) {
-                            var set = {};
-                            set[levelrow + "_show"] = "1";
+                            toSet[levelrow + "_show"] = "1";
                             update[levelrow + " .sheet-controller"] = "1";
-                            setAttrs(set, {silent: true});
                         }
-                        setCharmancerText(update);
                         spells = _.sortBy(spells, "name");
                         _.each(spells, function(spell) {
                             addRepeatingSection(levelrow + " .sheet-container", "spell-item", function(spellid) {
-                                var update = {};
-                                var toSet = {};
                                 toSet[spellid + "_name"] = spell.name;
                                 toSet[spellid + "_level"] = x;
                                 update[spellid + " .sheet-name"] = spell.name;
@@ -14566,8 +14590,11 @@
                                         }
                                     }
                                 });
-                                setCharmancerText(update);
-                                setAttrs(toSet, {silent: true}, function() {updateSpellSummary()});
+                                spellnumber--;
+                                if(spellnumber <= 0) {
+                                    setCharmancerText(update);
+                                    setAttrs(toSet, {silent: true}, updateSpellSummary("all"));
+                                }
                             });
                         });
                     });
@@ -14576,38 +14603,47 @@
         });
     });
 
-    var updateSpellSummary = function(sourcelevel) {
-        var mancerdata = getCharmancerData();
+    var updateSpellSummary = function(sourcelevel, data) {
+        var mancerdata = data || getCharmancerData();
         var spellpage = mancerdata["lp-spells"];
-        var replist = spellpage.repeating;
-        var cantripsection = replist.find((x) => {return x.includes("-spell-holder-0")});
-        var update = [];
+        var replist = spellpage.repeating || [];
+        var cantripsection = replist.find((x) => {return x.includes("_spell-holder-0")});
+        var update = {};
         var sections = [];
+        var perlevel = {};
         var allowed = 0;
         var allowedreplace = 0;
-        sourcelevel = sourcelevel || "all";
+        //sourcelevel = sourcelevel === undefined ? "all" : sourcelevel;
+        //first, list spells you already know
         _.each(replist, function(repid) {
             if(spellpage.values[repid + "_existing"]) {
-                var selector = "spells-summary .sheet-level_" + spellpage.values[repid + "_level"] + " span";
+                var selector = "spells-summary .sheet-level_" + spellpage.values[repid + "_level"] + " .sheet-list";
                 update[selector] = update[selector] || "";
                 update[selector] += spellpage.values[repid + "_checked"] ? "<span>" : "<span class=\"removed\">";
                 update[selector] += spellpage.values[repid + "_name"] + "</span>";
             }
+        });
+        //then, list new spells you've checked
+        _.each(replist, function(repid) {
             if(spellpage.values[repid + "_checked"] && !spellpage.values[repid + "_existing"]) {
-                var selector = "spells-summary .sheet-level_" + spellpage.values[repid + "_level"] + " span";
+                var selector = "spells-summary .sheet-level_" + spellpage.values[repid + "_level"] + " .sheet-list";
                 update[selector] = update[selector] || "";
                 update[selector] += "<span class=\"new\">" + spellpage.values[repid + "_name"] + "</span>";
             }
         });
         if(sourcelevel == "0") {
             sections.push(cantripsection);
-            allowed = spellpage.values.newcantrips;
+            allowed = spellpage.values.newcantrips || 0;
         } else {
+            update[cantripsection + " .sheet-spellstext .sheet-levels"] = "";
             for(var x=1; x <= 9; x++) {
-                var thissection = replist.find((x) => {return x.includes("-spell-holder-" + x)});
+                var thissection = replist.find((y) => {return y.includes("_spell-holder-" + x)});
                 allowed = spellpage.values.newspells;
                 allowedreplace = spellpage.values.replace;
-                if(thissection) sections.push(thissection);
+                if(thissection) {
+                    perlevel[x + ""] = {number: 0, section: thissection, replaced: false};
+                    sections.push(thissection);
+                }
             }
         }
         getRepeatingSections(replist.find((x) => {return x.includes("spellsrow")}), function(repeating) {
@@ -14623,9 +14659,11 @@
             _.each(spellids, function(id) {
                 if(spellpage.values[id + "_checked"] && !spellpage.values[id + "_existing"]) {
                     newspells++;
+                    if(perlevel[spellpage.values[id + "_level"]]) perlevel[spellpage.values[id + "_level"]].number++;
                 }
                 if(!spellpage.values[id + "_checked"] && spellpage.values[id + "_existing"]) {
                     replaced++;
+                    if(perlevel[spellpage.values[id + "_level"]]) perlevel[spellpage.values[id + "_level"]].replaced = true;
                 }
             });
             //now lock/unlock spells depending on if we've selected as many as we're allowed
@@ -14635,21 +14673,28 @@
                 }
             });
             if(sourcelevel == "0") {
-                update[cantripsection + " label .sheet-number"] = (spellpage.values.knowncantrips + newspells) + "/" + (spellpage.values.knowncantrips + spellpage.values.newcantrips);
+                update[cantripsection + " label .sheet-number"] = (spellpage.values.knowncantrips + newspells) + " / " + (spellpage.values.knowncantrips + allowed);
             } else {
-                //update[cantripsection + " .sheet-spellstext .sheet-summary"] = "You can add " + (allowed + replaced - newspells) + " new spells.";
+                update[cantripsection + " .sheet-spellstext .sheet-total"] = newspells + " / " + (allowed + replaced) + " new spells added.";
                 if(allowedreplace > 0) {
-                    //update[cantripsection + " .sheet-replacetext .sheet-summary"] = "You can replace " + (allowedreplace - replaced) + " spells.";
+                    update[cantripsection + " .sheet-replacetext .sheet-total"] = replaced + " / " + allowedreplace + " spells replaced.";
                 }
+                _.each(perlevel, function(info, level) {
+                    update[cantripsection + " .sheet-spellstext .sheet-levels"] += "<p>" + info.number + " Level " + level + " spells added.</p>";
+                    if(info.number > 0) update[info.section + " label .sheet-number"] = "+" + info.number;
+                    if(info.replaced) {
+                        showChoices([info.section + " .sheet-spellheader .sheet-title span"]);
+                    } else {
+                        hideChoices([info.section + " .sheet-spellheader .sheet-title span"]);
+                    }
+                });
             }
             setCharmancerText(update);
-            setAttrs(toSet);
-            if(sourcelevel == "all") updateSpellSummary("0");
+            setAttrs(toSet, function() {if(sourcelevel == "all") updateSpellSummary("0")});
         });
-    }
+    };
 
     on("clicked:repeating_spell-item_info", function(eventinfo) {
-        console.table(eventinfo);
         var mancerdata = getCharmancerData();
         changeCompendiumPage("sheet-spells-info", "Spells:" + mancerdata["lp-spells"].values[eventinfo.sourceSection + "_name"], "card_only");
     });
@@ -14661,7 +14706,7 @@
             update[eventinfo.sourceSection + " .sheet-controller"] = eventinfo.newValue || "";
             setCharmancerText(update);
         } else {
-            updateSpellSummary(mancerdata["lp-spells"].values[eventinfo.sourceSection + "_level"]);
+            updateSpellSummary(mancerdata["lp-spells"].values[eventinfo.sourceSection + "_level"], mancerdata);
         }
     });
 </script>
@@ -14761,7 +14806,7 @@
         <div class="replacetext">
             <div class="summary"></div>
             <div class="total"></div>
-            <div class="replace-info">Removed spells will be marked with a <span>r</span> symbol so you can find it easily if you change your mind.</div>
+            <div class="replace-info choice">Removed spells will be marked with a <span>r</span> symbol so you can find it easily if you change your mind.</div>
         </div>
     </div>
 </charmancer>
@@ -16237,6 +16282,7 @@
         <div class="choices spellslide">
             <p class="instructions">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ut est consectetur, lacinia justo in, lacinia libero. Etiam fermentum risus non sem hendrerit elementum. Nulla vel pulvinar est.</p>
             <p class="spells-summary"></p>
+            <div class="cantripinfo"></div>
         </div>
 
         <div class="info spellslide">
