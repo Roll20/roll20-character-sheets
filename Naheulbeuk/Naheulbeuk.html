@@ -811,13 +811,13 @@
 						update_process();
 					}
 					console.log( "Mise à jour de la version..." );
-					setAttrs( { "version" : 2.4 } );
+					setAttrs( { "version" : 2.5 } );
 				});
 			} else if( vrs < 2.4 ) {
 				// uptodate
 				updateSecondaryStats();
 				updateWeapons();
-				setAttrs( { "version" : 2.4 } );
+				setAttrs( { "version" : 2.5 } );
 				return;
 			}
 			console.log( "ok" );
@@ -1045,6 +1045,7 @@
 				<td><span class="tcat">Resistance </span>{{magie_resistance}}</td>
 			</tr>
 		{{/magie_display_resistance}}
+		<tr><td><hr></td></tr>
 		{{#magie_soin}}
 			<tr>
 				<td><span class="tcat">Soin </span>{{magie_soin}}</td>
@@ -1059,12 +1060,14 @@
 			<td>{{magie_effet}}</td>
 		</tr>
 		{{#magie_ingre}}
+			<tr><td><hr></td></tr>
 			<tr>
 				<td><span class="tcat">Ingrédients </span><br>{{magie_ingre}}</td>
 			</tr>
 		{{/magie_ingre}}
 
 		{{#creature_ev}}
+			<tr><td><hr></td></tr>
 			<tr><th>Créature invoquée :</th></tr>
 			<tr><td><span class="tcat">EV </span>{{creature_ev}} - <span class="tcat">INT </span>{{creature_int}}</td></tr>
 			<tr><td><span class="tcat">AT </span>{{creature_at}} - <span class="tcat">PRD/ESQ </span>{{creature_def}}</td><tr>
@@ -1075,6 +1078,13 @@
 			<tr><td><span class="tcat">Contrôle </span>Magie PSY + {{magie_epreuvecontrol_mod}}</td><tr>
 			<tr><td><span class="tcat">Révocation </span>Magie PSY + {{magie_epreuverevocation_mod}}</td><tr>
 		{{/creature_ev}}
+
+		{{#magie_notes}}
+			<tr><td><hr></td></tr>
+			<tr>
+				<td><span class="tcat">Notes : </span><br>{{magie_notes}}</td>
+			</tr>
+		{{/magie_notes}}
 	</table>
 </rolltemplate>
 
@@ -1112,6 +1122,43 @@
 	</table>
 </rolltemplate>
 
+
+<rolltemplate class="sheet-rolltemplate-coupSpecial">
+	<table class="sheet-rolltemplate-table">
+		<tr><th>{{name}}</th></tr>
+		<tr>
+			<td><span class="tcat">Utilisation : </span>{{coupspecial_utilisation}}</td>
+		</tr>
+		<tr>
+			<td><span class="tcat">- En cas d'échec, </span>{{coupspecial_echec}}</td>
+		</tr>
+		<tr><td><hr></td></tr>
+		<tr>
+			<td><span class="tcat">Effets : </span>{{coupspecial_effet}}</td>
+		</tr>
+		{{#coupspecial_condition}}
+		<tr>
+			<td><span class="tcat">Conditions : </span>{{coupspecial_condition}}</td>
+		</tr>
+		{{/coupspecial_condition}}
+		<tr>
+			<td><span class="tcat">Dégats : </span>{{#coupspecial_degats_arme}}Dégats de l'arme + {{/coupspecial_degats_arme}}{{coupspecial_degats}}</td>
+		</tr>
+		{{#coupspecial_note}}
+		<tr>
+			<td><span class="tcat">- </span>{{coupspecial_note}}</td>
+		</tr>
+		{{/coupspecial_note}}
+		<tr><td><hr></td></tr>
+		<tr>
+			<td><span class="tcat">En cas d'échec critique : </span><br />{{coupspecial_fumble}}</td>
+		</tr>
+		<tr>
+			<td><span class="tcat">Reussite critique : </span>{{coupspecial_critique}}</td>
+		</tr>
+	</table>
+</rolltemplate>
+
 <!-- Version N# --->
 <input type="hidden" name="attr_version" value="0">
 <!-- AutoCalc fields for sheet worker--->
@@ -1140,7 +1187,7 @@
 
 	<div class="sheet-header">
 		<div class="sheet-col-float" style="width:150px">
-			<img src="https://www.dropbox.com/s/j8lz0dbrxmxbeqs/logo.png?raw=1" />
+			<img src="https://i49.servimg.com/u/f49/19/87/23/15/logo10.png" />
 		</div>
 		<div class="sheet-col-float" style="width:600px">
 			<div class="sheet-col-float">Nom : </div>
@@ -1407,20 +1454,20 @@
 						<td style="text-align:center;">
 							<select name="attr_Confrontation_jet">
 								<option value="" selected="selected"></option>
-								<option value="COU : @{Stats_Courage_total}">COU</option>
-								<option value="INT : @{Stats_Intelligence_total}">INT</option>
-								<option value="CHA : @{Stats_Charisme_total}">CHA</option>
-								<option value="AD : @{Stats_Adresse_total}">AD</option>
-								<option value="FO : @{Stats_Force_total}">FO</option>
-								<option value="AT : @{Stats_Attaque_total}">AT</option>
-								<option value="PRD : @{Stats_Parade_total}">PRD</option>
-								<option value="Magie Phy. : @{Stats_MagiePhy_total}">Magie Phy.</option>
-								<option value="Magie Psy. : @{Stats_MagiePsy_total}">Magie Psy.</option>
-								<option value="Résist. Magie : @{Stats_MagiePsy_total}">Résist. Magie</option>
+								<option value="COU : [[ @{Stats_Courage_total} + @{Confrontation_mod} ]]">COU</option>
+								<option value="INT : [[ @{Stats_Intelligence_total} + @{Confrontation_mod} ]]">INT</option>
+								<option value="CHA : [[ @{Stats_Charisme_total} + @{Confrontation_mod} ]]">CHA</option>
+								<option value="AD : [[ @{Stats_Adresse_total} + @{Confrontation_mod} ]]">AD</option>
+								<option value="FO : [[ @{Stats_Force_total} + @{Confrontation_mod} ]]">FO</option>
+								<option value="AT : [[ @{Stats_Attaque_total} + @{Confrontation_mod} ]]">AT</option>
+								<option value="PRD : [[ @{Stats_Parade_total} + @{Confrontation_mod} ]]">PRD</option>
+								<option value="Magie Phy. : [[ @{Stats_MagiePhy_total} + @{Confrontation_mod} ]]">Magie Phy.</option>
+								<option value="Magie Psy. : [[ @{Stats_MagiePsy_total} + @{Confrontation_mod} ]]">Magie Psy.</option>
+								<option value="Résist. Magie : [[ @{Stats_MagiePsy_total} + @{Confrontation_mod} ]]">Résist. Magie</option>
 							</select>
 						</td>
 						<td style="text-align:center;"><input type="text" class="sheet-shortInput" name="attr_Confrontation_mod" value="2d6"></td>
-						<td><button type="roll" value="@{displayJet} &{template:default} {{name=Confrontation de @{Personnage_Nom} }} {{ Résultat = @{Confrontation_jet} + [[@{Confrontation_mod}]] }}" name="roll_Confrontation" /></td>
+						<td><button type="roll" value="@{displayJet} &{template:default} {{name=Confrontation de @{Personnage_Nom} }} {{ Résultat = @{Confrontation_jet} }}" name="roll_Confrontation" /></td>
 					</tr>
 				</table>
 			</div>
@@ -1458,18 +1505,18 @@
 									<div class="sheet-col" style="width: 50px;"></div>
 									<div class="sheet-col" style="width: 70px;">
 										<select name="attr_Competence_Jet">
-											<option value="COU : @{Stats_Courage_total}">COU</option>
-											<option value="INT : @{Stats_Intelligence_total}">INT</option>
-											<option value="CHA : @{Stats_Charisme_total}">CHA</option>
-											<option value="AD : @{Stats_Adresse_total}">AD</option>
-											<option value="FO : @{Stats_Force_total}">FO</option>
+											<option value="COU : [[ @{Stats_Courage_total} + @{Competence_mod} ]]">COU</option>
+											<option value="INT : [[ @{Stats_Intelligence_total} + @{Competence_mod} ]]">INT</option>
+											<option value="CHA : [[ @{Stats_Charisme_total} + @{Competence_mod} ]]">CHA</option>
+											<option value="AD : [[ @{Stats_Adresse_total} + @{Competence_mod} ]]">AD</option>
+											<option value="FO : [[ @{Stats_Force_total} + @{Competence_mod} ]]">FO</option>
 										</select>
 									</div>
 									<div class="sheet-col" style="width: 90px;">
 										<input type="number" name="attr_Competence_mod" value="0" />
 									</div>
 									<div class="sheet-col" style="width: 80px;">
-										<button type="roll" value="@{displayJet} &{template:default} {{name=Épreuve de @{Competence_Nom} par @{Personnage_Nom} }} {{Épreuve=@{Competence_Jet} + @{Competence_mod} }} {{ Résultat=[[1d20]] }}" name="roll_Competences"> Épreuve</button>
+										<button type="roll" value="@{displayJet} &{template:default} {{name=Épreuve de @{Competence_Nom} par @{Personnage_Nom} }} {{Épreuve=@{Competence_Jet} }} {{ Résultat=[[1d20]] }}" name="roll_Competences"> Épreuve</button>
 									</div>
 								</div>
 							</div>
@@ -1486,9 +1533,10 @@
 							<div class="sheet-col" style="width: 500px;">
 								<input type="text" class="sheet-noBorder" name="attr_CoupSpecial_Nom" value="" />
 							</div>
-							<div class="sheet-col" style="width: 200px;">
-								<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} prépare son coup spécial @{CoupSpecial_Nom} }} {{ Épreuve=@{CoupSpecial_Jet} + @{CoupSpecial_mod} }} {{ Résultat=[[1d20]] }}" > Épreuve</button>
-								<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{CoupSpecial_Nom}}} {{ Dégats=[[@{CoupSpecial_Degats}]] }}" > Dégats</button>
+							<div class="sheet-col" style="width: 300px;">
+								<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} prépare son coup spécial @{CoupSpecial_Nom} }} {{ Épreuve=@{CoupSpecial_Jet} }} {{ Résultat=[[1d20]] }}" > Épreuve</button>
+								<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{CoupSpecial_Nom}}} {{ Dégats=[[@{CoupSpecial_Degats} + @{CoupSpecial_Degats_arme}]] }}" > Dégats</button>
+								<button type="roll" class="sheet-rollGrimoire" value="@{displayJet} &{template:coupSpecial} {{name=@{coupspecial_nom}}} {{coupspecial_jet=@{coupspecial_jet}}} {{coupspecial_degats=@{coupspecial_degats}}} {{coupspecial_degats_arme=@{coupspecial_degats_arme}}} {{coupspecial_utilisation=@{coupspecial_utilisation}}} {{coupspecial_echec=@{coupspecial_echec}}} {{coupspecial_effet=@{coupspecial_effet}}} {{coupspecial_note=@{coupspecial_note}}} {{coupspecial_condition=@{coupspecial_condition}}} {{coupspecial_critique=@{coupspecial_critique}}} {{coupspecial_fumble=@{coupspecial_fumble}}}"> Grimoire </button>
 							</div>
 						</div>
 						<input type="checkbox" name="attr_CoupSpecial_config" class="sheet-config-flag" value="1" /><span class="sheet-cog">y</span>
@@ -1511,10 +1559,13 @@
 								<div class="sheet-col" style="width: 110px;"><b>Epreuve :</b></div>
 								<div class="sheet-col" style="width: 270px;">
 									<select name="attr_CoupSpecial_Jet">
-										<option value="AT : @{Stats_Attaque_total}">AT</option>
-										<option value="AD : @{Stats_Adresse_total}">AD</option>
-										<option value="FO : @{Stats_Force_total}">FO</option>
-										<option value="AD/FO : [[ceil((@{Stats_Force_total}+@{Stats_Adresse_total})/2)]]">AD/FO</option>
+										<option value="AT : [[ @{Stats_Attaque_total} + @{CoupSpecial_Mod} ]]">AT</option>
+										<option value="PRD : [[ @{Stats_Parade_total} + @{CoupSpecial_Mod} ]]">PRD</option>
+										<option value="ESQ : [[ @{Stats_Esquive_total} + @{CoupSpecial_Mod} ]]">ESQ</option>
+										<option value="FO : [[ @{Stats_Force_total} + @{CoupSpecial_Mod} ]]">FO</option>
+										<option value="AD : [[ @{Stats_Adresse_total} + @{CoupSpecial_Mod} ]]">AD</option>
+										<option value="JET : [[ @{Stats_Jet_total} + @{CoupSpecial_Mod} ]]">JET</option>
+										<option value="AD/FO : [[ ceil((@{Stats_Force_total}+@{Stats_Adresse_total})/2) + @{CoupSpecial_Mod} ]] ">AD/FO</option>
 									</select>
 									<input type="number" name="attr_CoupSpecial_Mod" value="0" />
 								</div>
@@ -1524,6 +1575,9 @@
 							<div class="sheet-row">
 								<div class="sheet-col" style="width: 110px;"><b>Dégats :</b></div>
 								<div class="sheet-col" style="width: 270px;"><input type="text" class="sheet-shortInput" name="attr_CoupSpecial_Degats" value="1d6" /></div>
+								<div class="sheet-col" style="width: 150px;"><b>+ Dégats de l'arme :</b></div>
+								<div class="sheet-col" style="width: 230px;"><input type="text" class="sheet-shortInput" name="attr_CoupSpecial_Degats_arme" value="" /></div>
+
 							</div>
 							<hr>
 							<div class="sheet-row">
@@ -1988,7 +2042,7 @@
 								</select>
 							</div>
 							<div class="sheet-col" style="width: 100px;">
-								<button type="roll" value="@{displayJet} &{template:magie} {{name=@{magie_nom}}} {{magie_ecole=@{magie_ecole}}} {{magie_niveau=@{magie_niveau}}} {{magie_display_epreuve=@{Magie_EpreuveLanceur_Jet}}}  {{magie_display_resistance=@{Magie_EpreuveCible_Jet}}} {{magie_incantation=@{magie_incantation}}} {{magie_duree=@{magie_duree}}} {{magie_cout=@{magie_cout}}} {{magie_portee=@{magie_portee}}} {{magie_effet=@{magie_effet}}} {{magie_ingre=@{magie_ingre}}} {{magie_aireeffet=@{magie_aireeffet}}} {{magie_soin=@{magie_soin}}} {{magie_degats=@{Magie_Degats}}} {{magie_bonusint=[[@{MagieBonusInt}]]}} {{magie_epreuve=@{Magie_EpreuveLanceur_Jet} + @{Magie_EpreuveLanceur_mod}}} {{magie_resistance=@{Magie_EpreuveCible_Jet} + @{Magie_EpreuveCible_mod}}} {{creature_ev=@{creature_ev}}} {{creature_int=@{creature_int}}} {{creature_at=@{creature_at}}} {{creature_def=@{creature_def}}} {{creature_cou=@{creature_cou}}} {{creature_pr=@{creature_pr}}} {{creature_xp=@{creature_xp}}} {{creature_resimagie=@{creature_resimagie}}} {{creature_degats=@{creature_degats}}} {{magie_epreuveappel_mod=@{magie_epreuveappel_mod}}} {{magie_epreuvecontrol_mod=@{magie_epreuvecontrol_mod}}} {{magie_epreuverevocation_mod=@{magie_epreuverevocation_mod}}}"> Grimoire </button>
+								<button type="roll" class="sheet-rollGrimoire" value="@{displayJet} &{template:magie} {{name=@{magie_nom}}} {{magie_ecole=@{magie_ecole}}} {{magie_niveau=@{magie_niveau}}} {{magie_display_epreuve=@{Magie_EpreuveLanceur_Jet}}}  {{magie_display_resistance=@{Magie_EpreuveCible_Jet}}} {{magie_incantation=@{magie_incantation}}} {{magie_duree=@{magie_duree}}} {{magie_cout=@{magie_cout}}} {{magie_portee=@{magie_portee}}} {{magie_effet=@{magie_effet}}} {{magie_ingre=@{magie_ingre}}} {{magie_aireeffet=@{magie_aireeffet}}} {{magie_soin=@{magie_soin}}} {{magie_degats=@{Magie_Degats}}} {{magie_bonusint=[[@{MagieBonusInt}]]}} {{magie_epreuve=@{Magie_EpreuveLanceur_Jet} }} {{magie_resistance=@{Magie_EpreuveCible_Jet} + @{Magie_EpreuveCible_mod}}} {{creature_ev=@{creature_ev}}} {{creature_int=@{creature_int}}} {{creature_at=@{creature_at}}} {{creature_def=@{creature_def}}} {{creature_cou=@{creature_cou}}} {{creature_pr=@{creature_pr}}} {{creature_xp=@{creature_xp}}} {{creature_resimagie=@{creature_resimagie}}} {{creature_degats=@{creature_degats}}} {{magie_epreuveappel_mod=@{magie_epreuveappel_mod}}} {{magie_epreuvecontrol_mod=@{magie_epreuvecontrol_mod}}} {{magie_epreuverevocation_mod=@{magie_epreuverevocation_mod}}} {{magie_notes=@{magie_notes}}}"> Grimoire </button>
 							</div>
 							<br clear="all" />
 							<br />
@@ -2058,22 +2112,22 @@
 											<td style="text-align:center;">
 												<select name="attr_Magie_EpreuveLanceur_Jet">
 													<option value="" selected="selected"></option>
-													<option value="Magie Phy. : @{Stats_MagiePhy_total}">Magie Phy.</option>
-													<option value="Magie Psy. : @{Stats_MagiePsy_total}">Magie Psy.</option>
-													<option value="INT : @{Stats_Intelligence_total}">INT</option>
-													<option value="COU : @{Stats_Courage_total}">COU</option>
-													<option value="CHA : @{Stats_Charisme_total}">CHA</option>
-													<option value="AD : @{Stats_Adresse_total}">AD</option>
-													<option value="FO : @{Stats_Force_total}">FO</option>
-													<option value="AT : @{Stats_Attaque_total}">AT</option>
-													<option value="PRD : @{Stats_Parade_total}">PRD</option>
+													<option value="Magie Phy. : [[ @{Stats_MagiePhy_total} + @{magie_EpreuveLanceur_mod} ]]">Magie Phy.</option>
+													<option value="Magie Psy. : [[ @{Stats_MagiePsy_total} + @{magie_EpreuveLanceur_mod} ]]">Magie Psy.</option>
+													<option value="INT : [[ @{Stats_Intelligence_total} + @{magie_EpreuveLanceur_mod} ]]">INT</option>
+													<option value="COU : [[ @{Stats_Courage_total} + @{magie_EpreuveLanceur_mod} ]]">COU</option>
+													<option value="CHA : [[ @{Stats_Charisme_total} + @{magie_EpreuveLanceur_mod} ]]">CHA</option>
+													<option value="AD : [[ @{Stats_Adresse_total} + @{magie_EpreuveLanceur_mod} ]]">AD</option>
+													<option value="FO : [[ @{Stats_Force_total} + @{magie_EpreuveLanceur_mod} ]]">FO</option>
+													<option value="AT : [[ @{Stats_Attaque_total} + @{magie_EpreuveLanceur_mod} ]]">AT</option>
+													<option value="PRD : [[ @{Stats_Parade_total} + @{magie_EpreuveLanceur_mod} ]]">PRD</option>
 												</select>
 											</td>
 											<td style="text-align:center;">
 												<input type="text" class="sheet-shortInput" name="attr_Magie_EpreuveLanceur_mod" value="0" />
 											</td>
 											<td style="text-align:center; ">
-												<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} se concentre pour lancer @{Magie_Nom} }} {{ Épreuve=@{Magie_EpreuveLanceur_Jet} + [[@{Magie_EpreuveLanceur_mod}]] }} {{ Résultat = [[1d20]] }}"> Épreuve </button>
+												<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} se concentre pour lancer @{Magie_Nom} }} {{ Épreuve=@{Magie_EpreuveLanceur_Jet} }} {{ Résultat = [[1d20]] }}"> Épreuve </button>
 											</td>
 											<td style="text-align:center;">
 												<select name="attr_Magie_EpreuveCible_Jet">
@@ -2092,7 +2146,7 @@
 												<input type="text" class="sheet-shortInput" name="attr_Magie_EpreuveCible_mod" value="0" />
 											</td>
 											<td style="text-align:center;">
-												<button type="roll" value="@{displayJet} &{template:default} {{name=Confrontation magique}} {{ @{Personnage_Nom}=@{Magie_EpreuveLanceur_Jet} + [[@{Magie_EpreuveLanceur_mod}]] }} {{ Cible = @{Magie_EpreuveCible_Jet} + @{Magie_EpreuveCible_mod} }}"> Confrontation </button>
+												<button type="roll" value="@{displayJet} &{template:default} {{name=Confrontation magique}} {{ @{Personnage_Nom}=@{Magie_EpreuveLanceur_Jet} }} {{ Cible = @{Magie_EpreuveCible_Jet} + @{Magie_EpreuveCible_mod} }}"> Confrontation </button>
 											</td>
 										</tr>
 									</table>
@@ -2705,7 +2759,7 @@
 						</div>
 
 						<div class="sheet-col" style="width: 100px; text-align:right;">
-							<button type="roll" value="@{displayJet} &{template:recette} {{recette_nom=@{recette_nom}}} {{recette_effet=@{recette_effet}}} {{recette_niveau=@{recette_niveau}}} {{recette_resultats=@{recette_resultats}}}  {{recette_materiaux=@{recette_materiaux}}} {{recette_materiauxspe=@{recette_materiauxspe}}} {{recette_duree=@{recette_duree}}} {{recette_outils=@{recette_outils}}} {{recette_difficulte=@{recette_difficulte}}} {{recette_xp=@{recette_xp}}} {{recette_prix=@{recette_prix}}}"> Recette </button>
+							<button type="roll" class="sheet-rollGrimoire" value="@{displayJet} &{template:recette} {{recette_nom=@{recette_nom}}} {{recette_effet=@{recette_effet}}} {{recette_niveau=@{recette_niveau}}} {{recette_resultats=@{recette_resultats}}}  {{recette_materiaux=@{recette_materiaux}}} {{recette_materiauxspe=@{recette_materiauxspe}}} {{recette_duree=@{recette_duree}}} {{recette_outils=@{recette_outils}}} {{recette_difficulte=@{recette_difficulte}}} {{recette_xp=@{recette_xp}}} {{recette_prix=@{recette_prix}}}"> Recette </button>
 						</div>
 						<br clear="all" />
 						<br />
@@ -2943,7 +2997,7 @@
 	</div>
 	<!-- TAB Reglages -->
 	<div class="sheet-body sheet-reglages">
-		<h2>Réglages (v2.4)</h2>
+		<h2>Réglages (v2.5)</h2>
 		<p>
 			<input type="checkbox" name="attr_displayJet" value="/w gm"> Envoyer les jets au MJ uniquement
 			<br />
@@ -3069,7 +3123,7 @@
 						<b>Rajouter le PNJ dans le Turn Order :</b><br />
 						<textarea class="sheet-code" rows="1">[[@{selected|Stats_Courage} &{tracker}]]</textarea>
 						<b>Faire attaquer le PNJ avec son Arme N°1 :</b><br />
-						<textarea class="sheet-code" rows="1">@{selected|displayJet} &{template:default} {{name=Attaque de @{selected|Personnage_Nom} avec @{selected|repeating_PNJarmes_$0_Arme_Nom} }} {{ Cible = @{target|Personnage_Nom} }} {{ AT=@{selected|repeating_PNJarmes_$0_Arme_Jet} + @{selected|repeating_PNJarmes_$0_Arme_At} }} {{ Résultat=[[1d20]] }}</textarea>
+						<textarea class="sheet-code" rows="1">@{selected|displayJet} &{template:default} {{name=Attaque de @{selected|Personnage_Nom} avec @{selected|repeating_PNJarmes_$0_Arme_Nom} }} {{ Cible = @{target|Personnage_Nom} }} {{ AT=@{selected|repeating_PNJarmes_$0_Arme_Jet} }} {{ Résultat=[[1d20]] }}</textarea>
 						<b>Faire parer le PNJ avec son Arme N°1 :</b><br />
 						<textarea class="sheet-code" rows="1">@{selected|displayJet} &{template:default} {{name=Parade de @{selected|Personnage_Nom} avec @{selected|repeating_PNJarmes_$0_Arme_Nom} }} {{ PRD=@{selected|Stats_Parade_total} + @{selected|repeating_PNJarmes_$0_Arme_PRD} }} {{ Résultat=[[1d20]] }}</textarea>
 						<b>Dégats de l'Arme N°1 :</b><br />
@@ -3100,8 +3154,8 @@
 					</div>
 					<div class="sheet-col" style="width: 70px;">
 						<select name="attr_Arme_Jet">
-							<option value="@{Stats_Attaque_total}" selected="selected">Mélée</option>
-							<option value="@{Stats_Jet_total}">Dist.</option>
+							<option value="[[ @{Stats_Attaque_total} + @{Arme_AT} ]]" selected="selected">Mélée</option>
+							<option value="[[ @{Stats_Jet_total} + @{Arme_AT} ]]">Dist.</option>
 						</select>
 					</div>
 					<div class="sheet-col" style="width: 70px;">
@@ -3117,7 +3171,7 @@
 						<input type="text" class="sheet-shortInput" name="attr_Arme_RUP" value="" />
 					</div>
 					<div class="sheet-col" style="width: 180px;">
-						<button type="roll" value="@{displayJet} &{template:default} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{ AT=@{Arme_Jet} + @{Arme_At} }} {{ Résultat=[[1d20]] }}"> AT </button>
+						<button type="roll" value="@{displayJet} &{template:default} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{ AT=@{Arme_Jet} }} {{ Résultat=[[1d20]] }}"> AT </button>
 						<button type="roll" value="@{displayJet} &{template:default} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{ PRD=@{Stats_Parade_total} + @{Arme_PRD} }} {{ Résultat=[[1d20]] }}"> PRD </button>
 						<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{ Dégats=[[@{Arme_Degats} + @{BonusDegatsForce}]] }}"> Dégats </button>
 					</div>
