@@ -67,7 +67,7 @@
 		updateWeapons();
 	});
 	// Total golds
-	on("change:richesse_or change:richesse_argent change:richesse_cuivre", function() {
+	on("change:richesse_or change:richesse_argent change:richesse_cuivre change:richesse_berylium change:richesse_thritil change:richesse_billet10 change:richesse_billet50 change:richesse_billet100 change:richesse_billet500 change:richesse_billet1000", function() {
 		updatePO();
 	});
 	// total repeating section weight
@@ -411,10 +411,18 @@
 	}
 
 	function updatePO() {
-		getAttrs( ["richesse_or","richesse_argent","richesse_cuivre"], function( sValues ) {
+		getAttrs( [	"richesse_or","richesse_argent","richesse_cuivre",
+					"richesse_berylium","richesse_thritil",
+					"richesse_billet10","richesse_billet50","richesse_billet100","richesse_billet500","richesse_billet1000" ], 
+				function( sValues ) {
 			var v = structSafeInt( sValues );
+			var richesse_total = v[ "richesse_or" ] + Math.floor( v[ "richesse_argent" ] * 0.1 ) + Math.floor( v[ "richesse_cuivre" ] * 0.01 );
+			richesse_total += ( v[ "richesse_berylium" ] * 500 ) + ( v[ "richesse_thritil" ] * 100 );
+			richesse_total += ( v[ "richesse_billet10" ] * 10 ) + ( v[ "richesse_billet50" ] * 50 ) + ( v[ "richesse_billet100" ] * 100 ) + ( v[ "richesse_billet500" ] * 500 ) + ( v[ "richesse_billet1000" ] * 1000 );
+			
 			setAttrs({
-				"poids_bourses": v[ "richesse_or" ] + v[ "richesse_argent" ] + v[ "richesse_cuivre" ]
+				"poids_bourses": v[ "richesse_or" ] + v[ "richesse_argent" ] + v[ "richesse_cuivre" ],
+				"richesse_total": richesse_total
 			});
 		});
 	}
@@ -2332,6 +2340,13 @@
 						<th>Billets 1000</th>
 						<td><input type="number" name="attr_Richesse_Billet1000" value="0" /></td>
 					</tr>
+                    <tr>
+						<td colspan="2">&nbsp;</td>
+					</tr>
+                    <tr>
+                    	<th>Total (en Or)</th>
+                        <td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Richesse_Total" value="0" readonly="readonly"></td>
+                    </tr>
 				</table>
 			</div>
 			<div class="sheet-col-float">
