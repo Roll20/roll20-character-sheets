@@ -1,14 +1,16 @@
 # Runequest Glorantha Character Sheet
 
-At the top of each version of the sheet is a settings cog if this is clicked there are check  boxes to select which version of the sheet to display.  This will allow for selection of the sheet displayed if for some reason this settings in the Gamer Detaild fail.
+At the top of each version of the sheet is a settings cog if this is clicked there are check  boxes to select which version of the sheet to display.  This will allow for selection of the sheet displayed if for some reason this settings in the Game Details fails.
 
 ## If you have a pre-existing Quick Start character from before the full sheet was added the only things that will transfer are characterisitcs.
-## If you are open the full release version of the sheet you must allow it to finish adding skills before you close it.  If you do not the skills will be added again.
+~~## If you open the full release version of the sheet you must allow it to finish adding skills before you close it.  If you do not the skills will be added again.~~
+
+## If the default in game settings is set to a QS sheet and  you then change it to a full sheet in the configuration you will have to close the sheet and open it again for the skills to be added.
 
 
 ## Quick Start
 
-This is for the Qucik Start only the category modifiers arenot calculated and is intended only for one shots to demo the new system
+This is for the Qucik Start only the category modifiers are not calculated and is intended only for one shots to demo the new system
 
 One thing to note is the way the damage per location works.  Instead of just knocking  points down as damage is taken there is a damage box so you can put in wounds as they are taken so that you can apply first aid separately.  So if you take a 2 wound and then a 4 point the damage box  should look like 2+4. Make sure there is no trailing + signs, so don't have it look like 3+5+ .  There is a separate box in the hit point section for damage to total hit points such as bleeding and poison. 
 
@@ -28,11 +30,63 @@ In the weapon section * indicates to use the mounts damage bonus and not the pla
 
 Default in the weapon section indicates that you are using a skill from the same category e.g. using Broadsword skill with a short sword.  It will halve the skill as per the rules.
 
-STR and DEX minimuns are not currently supported this maybe added in a future release.
+To remove the experience checkbox from a skill add a - at the start of the name e.g. -Animal Lore. To add the experience checkbox  add a + to the start of a skill name e.g. +Animal Lore
+
+STR and DEX minimums are not currently supported this maybe added in a future release.
+
+## Version 19.11.2018
+
+Disguise starting skill changed to 05
+
+The Spirit Lore starting skill changed to 00
+
+Peacefull Cut changed to Peaceful Cut
+
+Customs (local)  tickbox removed 
+
+
+Added the ability to add more weapons to the npc sheet
+
+
+## Version 15.10.2018
+ Fixed issues with NPC sheet
+ 
+ Added Sprul-Pa Hit locations
+
+
+
+## Version 02.10.2018
+
+Fixed experience boxes removed for sheets added before 18.09.2018 update.
+     
+## Version 18.09.2018
+
+Add the ability to add or remove the experience checkbox
+
+Added an NPC sheet  accessible from the configuration on the first tab of each sheet version. 
+
+## Version 06.09.2018
+ Fixed issues with category modifiers over 20.
+
+## Version 24.07.2018
+
+Fixed typos
+
+Added Charisma to Otherworld creatures.
+
+## Version 10.07.2018
+
+Prevented skill duplication on the full sheet
+
+Added buttonto add strike rankto turn order
+
+Completed fumble calculation fixes
+
+Add Tab for family and holding information
 
 
 ## Version 02.07.2018
-Fixes to  skill roll and melee templates becuase of site changes to css
+Fixes to  skill roll and melee templates because of site changes to css
 
 Fixed no damage shown if exact skill is rolled.
 

@@ -16,7 +16,7 @@ module.exports = function(grunt) {
             files: [
                 {src: 'src/index.html', dest: 'testbed/index.html'},
                 {src: 'src/13th_Age-neovatar.css', dest: 'testbed/13th_Age-neovatar.css'},
-                {src: 'src/editor.css', dest: 'testbed/editor.css'},
+                {src: 'src/app.css', dest: 'testbed/app.css'},
                 {src: 'src/base.css', dest: 'testbed/base.css'},
             ]
         },

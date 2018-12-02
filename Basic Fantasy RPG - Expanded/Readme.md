@@ -60,6 +60,12 @@ September - Updates to the sheet listed below
           Saving throws: Split Saving throw "Spells" off to it's own field due to some races and class options having a specific modifier for that save.
           
 October - Fixed various errors in the spellbook code and removed non-bfrpg fields in the saving throw section.
+
+-2018-
+
+July - Uploaded the Basic Fantasy logo and will be changing the code to reflect it.
+
+Sept - Added light and heavy load limit fields, changed the layout of the encumbrance section, changed armor drop down text due to an issue of it not saving properly, changed the logo code to display image again.
           
 **Credit Where Credit is Due**
 The CSS and much of the layout is lifted from the work of allenmaher's BECMI sheet who lifted the excellent work of John Myles (@Actoba on roll20) and the 5e Dungeons and Dragons sheet.
