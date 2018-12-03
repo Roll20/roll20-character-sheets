@@ -1131,7 +1131,6 @@
 	</table>
 </rolltemplate>
 
-
 <rolltemplate class="sheet-rolltemplate-coupSpecial">
 	<table class="sheet-rolltemplate-table">
 		<tr><th>{{name}}</th></tr>
@@ -1165,6 +1164,82 @@
 		<tr>
 			<td><span class="tcat">Reussite critique : </span>{{coupspecial_critique}}</td>
 		</tr>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-atk">
+	<table class="sheet-rolltemplate-default">
+		<caption>{{name}}</caption>
+        <tbody>
+            <tr>
+                <td>AT</td>
+                <td>{{at}}</td>
+            </tr>
+			{{#rollGreater() display_effets 0}}
+            <tr>
+                <td>Effets</td>
+                <td>{{effets}}</td>
+            </tr>
+			{{/rollGreater() display_effets 0}}
+			{{#rollGreater() display_notes 0}}
+            <tr>
+                <td>Notes</td>
+                <td>{{notes}}</td>
+            </tr>
+			{{/rollGreater() display_notes 0}}
+            <tr>
+                <td>Résultat</td>
+                <td>{{results}}</td>
+            </tr>
+            <tr>
+            	<td>{{btn_degats}}</td>
+            	<td>
+                	{{#rollWasCrit() results }}{{btn_critique}}{{/rollWasCrit() results }}
+                    {{#rollWasFumble() results }}{{btn_fumble}}{{/rollWasFumble() results }}
+                </td>
+            </tr>
+		</tbody>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-prd">
+	<table class="sheet-rolltemplate-default">
+		<caption>{{name}}</caption>
+        <tbody>
+            <tr>
+                <td>PRD</td>
+                <td>{{prd}}</td>
+            </tr>
+            <tr>
+                <td>Résultat</td>
+                <td>{{results}}</td>
+            </tr>
+            <tr>
+            	<td></td>
+            	<td>
+                	{{#rollWasCrit() results }}{{btn_critique}}{{/rollWasCrit() results }}
+                    {{#rollWasFumble() results }}{{btn_fumble}}{{/rollWasFumble() results }}
+                </td>
+            </tr>
+		</tbody>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-dmg">
+	<table class="sheet-rolltemplate-default">
+		<caption>{{name}}</caption>
+        <tbody>
+            <tr>
+                <td>Dégats</td>
+                <td>{{dmg}} ({{typeDegat}})</td>
+            </tr>
+			{{#munition}}
+            <tr>
+                <td>Munition</td>
+                <td>{{munition}}</td>
+            </tr>
+			{{/munition}}
+		</tbody>
 	</table>
 </rolltemplate>
 
@@ -1657,6 +1732,11 @@
 		<div class="sheet-tab_equipement">
 			<div class="sheet-armes">
 				<h2>Armement & Baston</h2>
+                <button type="roll" style="display: none" name="roll_confirmation_fumble_atk" value="@{displayJet} &{template:default} {{name=Maladresse attaque ou parade de @{Personnage_Nom}}} {{ Résolution=[[1d20]] }}"></button>
+                <button type="roll" style="display: none" name="roll_confirmation_crit_prd" value="@{displayJet} &{template:default} {{name=Parade critique de @{Personnage_Nom}}} {{ Résolution=[[1d20]] }}"></button>
+                <button type="roll" style="display: none" name="roll_confirmation_crit_tranchant" value="@{displayJet} &{template:default} {{name=Attaque critique tranchante de @{Personnage_Nom} }} {{ Résolution=[[1d20]] }}"></button>
+                <button type="roll" style="display: none" name="roll_confirmation_crit_contondant" value="@{displayJet} &{template:default} {{name=Attaque critique contondante de @{Personnage_Nom} }} {{ Résolution=[[1d20]] }}"></button>
+                <button type="roll" style="display: none" name="roll_confirmation_crit_projectile" value="@{displayJet} &{template:default} {{name=Attaque critique au projectile de @{Personnage_Nom} }} {{ Résolution=[[1d20]] }}"></button>
 				<div class="sheet-tableth">
 					<div class="sheet-col" style="width: 256px;">Arme</div>
 					<div class="sheet-col" style="width: 66px;">Portée</div>
@@ -1688,9 +1768,9 @@
 								<input type="text" class="sheet-autoCalc" name="attr_Arme_TotalDegats" value="1d6" readonly style="width: 100px;" />
 							</div>
 							<div class="sheet-col" style="width: 170px;">
-								<button type="roll" value="@{displayJet} &{template:default} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{ AT= @{Arme_TotalAT} }} {{ Résultat=[[1d20]] }}"> AT </button>
-								<button type="roll" value="@{displayJet} &{template:default} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{ PRD=@{Arme_TotalPRD} }} {{ Résultat=[[1d20]] }}"> PRD </button>
-								<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{ Dégats= [[ @{Arme_TotalDegats} ]] }}"> Dégats </button>
+								<button type="roll" value="@{displayJet} &{template:atk} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{at=@{Arme_TotalAT} }} {{notes=@{Arme_Note} }} {{effets= @{Arme_Effet} }} {{portee= @{arme_portee} }} {{display_effets= [[@{arme_Effet_display}]] }} {{display_notes= [[@{Arme_Note_display}]] }} {{btn_critique= [Critique](~@{Personnage_Nom}|confirmation_crit_@{Arme_typeDegat}) }} {{btn_fumble= [Fumble](~@{Personnage_Nom}|confirmation_fumble_atk) }} {{results=[[1d20cs<@{Arme_Critique}cf>@{Arme_Fumble}]] }} {{btn_degats=[Dégats](~repeating_armes_rollDegats)}}"> AT </button>
+								<button type="roll" value="@{displayJet} &{template:prd} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{prd=@{Arme_TotalPRD} }} {{results=[[1d20cs<@{Arme_Critique}cf>@{Arme_Fumble}]] }} {{btn_critique= [Critique](~@{Personnage_Nom}|confirmation_crit_prd) }} {{btn_fumble=[Fumble](~@{Personnage_Nom}|confirmation_fumble_atk) }}"> PRD </button>
+								<button type="roll" class="sheet-rollDegats" name="roll_rollDegats" value="@{displayJet} &{template:dmg} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{dmg= [[ @{Arme_TotalDegats} ]] }} {{munition=@{munition_nom}}} {{typeDegat=@{Arme_typeDegat}}}"> Dégats </button>
 							</div>
 						</div>
 						<input type="checkbox" name="attr_CoupSpecial_config" class="sheet-config-flag" value="1" /><span class="sheet-cog">y</span>
@@ -1704,15 +1784,34 @@
 								<div class="sheet-col" style="width: 70px;">
 									<input type="number" name="attr_Arme_PRD" value="0" />
 								</div>
-								<div class="sheet-col" style="width: 110px; text-align: right;"><b>Dégats :</b></div>
-								<div class="sheet-col" style="width: 70px;">
-									<input type="text" class="sheet-shortInput" name="attr_Arme_Degats" value="1d6" />
-								</div>
 								<div class="sheet-col" style="width: 110px; text-align: right;"><b>RUP :</b></div>
 								<div class="sheet-col" style="width: 70px;">
 									<input type="text" class="sheet-shortInput" name="attr_Arme_RUP" value="" />
 								</div>
 							</div>
+                            
+                            <div class="sheet-row">
+                            	<div class="sheet-col" style="width: 110px;"><b>Dégats :</b></div>
+								<div class="sheet-col" style="width: 70px;">
+									<input type="text" class="sheet-shortInput" name="attr_Arme_Degats" value="1d6" />
+								</div>
+                            	<div class="sheet-col" style="width: 110px; text-align: right;"><b>Types de dégats :</b></div>
+								<div class="sheet-col" style="width: 70px;">
+									<select name="attr_Arme_typeDegat">
+                                    	<option value="tranchant">Tranchant</option>
+                                    	<option value="contondant">Contondant</option>
+                                    	<option value="projectile">Projectile</option>
+                                    </select>
+								</div>
+                            	<div class="sheet-col" style="width: 110px; text-align: right;"><b>Critique :</b></div>
+								<div class="sheet-col" style="width: 70px;">
+									<input type="number" name="attr_Arme_Critique" value="1" />
+								</div>
+                            	<div class="sheet-col" style="width: 110px; text-align: right;"><b>Fumble :</b></div>
+								<div class="sheet-col" style="width: 70px;">
+									<input type="number" name="attr_Arme_Fumble" value="20" />
+								</div>
+                            </div>
 
 							<input type="checkbox" class="sheet-hidden sheet-display-arme_munition" name="attr_Arme_Munition_display" value=1>
 							<div class="sheet-display-arme_munition">
@@ -1745,14 +1844,21 @@
 								<div class="sheet-col" style="width: 650px;">
 									<input type="text" class="sheet-noBorder" name="attr_Arme_Effet" value="" />
 								</div>
+                                <div class="sheet-col" style="width:20px;">
+                                	<input type="checkbox" name="attr_Arme_Effet_display" value="1" title="Afficher dans le chat">
+                                </div>
 							</div>
+                            
 							<div class="sheet-row">
 								<div class="sheet-col" style="width: 110px;">
-									<b>Notes: </b>
+									<b>Notes : </b>
 								</div>
 								<div class="sheet-col" style="width: 650px;">
-									<input type="text" class="sheet-noBorder" name="attr_Arme_Note" value="" />
+									<input type="text" class="sheet-noBorder" name="attr_Arme_Note" value="" /> 
 								</div>
+                                <div class="sheet-col" style="width:20px;">
+                                	<input type="checkbox" name="attr_Arme_Note_display" value="1" title="Afficher dans le chat">
+                                </div>
 							</div>
 						</div>
 					</div>
