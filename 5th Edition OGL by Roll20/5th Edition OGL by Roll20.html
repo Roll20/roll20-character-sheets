@@ -11576,16 +11576,14 @@
             });
         });
         _.each(sorted.other, function(blob, name) {
-            if(blob.Description) {
-                addRepeatingSection(element, "row", function(rowid) {
-                    var title = blob.Title ? blob.Title : name;
-                    var repupdate = {};
-                    repupdate[rowid + " label span"] = "" + title;
-                    repupdate[rowid + " label p"] = "" + blob.Description;
-                    setCharmancerText(repupdate);
-                    handleProficiencies(blob, rowid);
-                });
-            }
+            addRepeatingSection(element, "row", function(rowid) {
+                var title = blob.Title ? blob.Title : name;
+                var repupdate = {};
+                repupdate[rowid + " label span"] = "" + title;
+                if(blob.Description) repupdate[rowid + " label p"] = "" + blob.Description;
+                setCharmancerText(repupdate);
+                handleProficiencies(blob, rowid);
+            });
         });
         _.each(sorted.traits, function(blob, name) {
             var traitsObj = JSON.parse(blob.Traits);
@@ -13998,6 +13996,58 @@
     /*********************************************************************/
     /******                 LEVEL UP MANCER WORKERS                 ******/
     /*********************************************************************/
+    //Helper function to update the text in the top bar
+    var recalcLpData = function() {
+        var mancerdata = getCharmancerData();
+        var abilities = getAbilityTotals(mancerdata);
+        var update = {};
+        _.each(abilityList, function(ability) {
+            var selector = "attr-container .sheet-" + ability.toLowerCase() + "_total";
+            update[selector] = abilities[ability.toLowerCase()] + " | " + abilities[ability.toLowerCase() + "_mod"];
+        });
+        setCharmancerText(update);
+    };
+    //Helper function to get ability totals, including asi
+    var getAbilityTotals = function(mancerdata) {
+        mancerdata = mancerdata || getCharmancerData();
+        var abilities = mancerdata["lp-welcome"].values["previous_abilities"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_abilities"]) : {};
+        var lcAbilities = abilityList.map(function(x) {return x.toLowerCase()});
+        if(mancerdata["lp-asi"]) {
+            _.each(mancerdata["lp-asi"].repeating, function(repid) {
+                if(repid.substr(31) == "asi-row" && mancerdata["lp-asi"].values[repid + "_switch"] != "feat") {
+                    _.each(lcAbilities, function(ability) {
+                        abilities[ability] += mancerdata["lp-asi"].values[repid + "_" + ability] ? parseInt(mancerdata["lp-asi"].values[repid + "_" + ability]) : 0;
+                        abilities[ability + "_mod"] = Math.floor((abilities[ability] - 10)/2);
+                    });
+                }
+            });
+        }
+        return abilities;
+    }
+    //Worker for every page to add topbar/buttons
+    on("page:lp-welcome page:lp-levels page:lp-choices page:lp-asi page:lp-spells page:lp-summary", function(eventinfo) {
+        var mancerdata = getCharmancerData();
+        var buttons = "";
+        var buttoninfo = {
+            welcome: "charmancer-start",
+            levels: "levels-u",
+            choices: "choices-u",
+            asi: "asi-u",
+            spells: "spells-u",
+            summary: "review-u"
+        }
+        _.each(buttoninfo, function(translation, page) {
+            var here = "lp-" + page == eventinfo.triggerName;
+            buttons += "<li><button class=\"step" + (here ? " here" : "") + "\" type=\"" + (here ? "here" : "back") + "\" value=\"lp-" + page + "\" data-i18n=\"" + translation + "\"></button></li>";
+        });
+        buttons += "<li><button class=\"exit\" type=\"action\" name=\"act_cancel\" data-i18n=\"cancel-u\">CANCEL</button></li>";
+        setCharmancerText({steps: buttons});
+        if(eventinfo.triggerName != "lp-welcome") {
+            addRepeatingSection("topbar-holder", "leveler-topbar");
+            recalcLpData();
+            getProficiencies(mancerdata, eventinfo.currentStep);
+        }
+    });
 
     on("page:lp-welcome", function(eventinfo) {
         var getInfo = function(sections, callback, results) {
@@ -14041,7 +14091,7 @@
             });
 
         });
-    })
+    });
 
     //DEV 1378
     on("page:lp-levels", function(eventinfo) {
@@ -14071,7 +14121,7 @@
         let update = {};
         update[eventinfo.sourceAttribute.substr(0,6)] = eventinfo.newValue;
         setAttrs(update);
-    })
+    });
 
     on("mancerchange:class1 mancerchange:class2 mancerchange:class3 mancerchange:class4", function(eventinfo) {
         const mancerdata = getCharmancerData();
@@ -14263,13 +14313,19 @@
 
     on("page:lp-choices", function(eventinfo) {
         var mancerdata = getCharmancerData();
-        var leveling = {class1: {}};
-        leveling.class1.class = mancerdata["lp-levels"].data["class1"];
-        leveling.class1.subclass = mancerdata["lp-levels"].data["subclass1"] || false;
-        leveling.class1.classname = _.last(mancerdata["lp-levels"].values["class1"].split(":"));
-        leveling.class1.subclassname = mancerdata["lp-levels"].values["subclass1"] ? _.last(mancerdata["lp-levels"].values["subclass1"].split(":")) : false;
-        leveling.class1.currentlevel = parseInt(mancerdata["lp-levels"].values["currentlevel1"]);
-        leveling.class1.addlevel = parseInt(mancerdata["lp-levels"].values["addlevel1"]);
+        var leveling = {};
+        for(var x=1; x<=4; x++) {
+            if(mancerdata["lp-levels"].data["class" + x]) {
+                var thisclass = {};
+                thisclass.class = mancerdata["lp-levels"].data["class" + x];
+                thisclass.subclass = mancerdata["lp-levels"].data["class" + x + "_subclass"] || false;
+                thisclass.classname = _.last(mancerdata["lp-levels"].values["class" + x].split(":"));
+                thisclass.subclassname = mancerdata["lp-levels"].values["class" + x + "_subclass"] ? _.last(mancerdata["lp-levels"].values["class" + x + "_subclass"].split(":")) : false;
+                thisclass.currentlevel = parseInt(mancerdata["lp-levels"].values["class" + x + "_currentlevel"]);
+                thisclass.addlevel = parseInt(mancerdata["lp-levels"].values["class" + x + "_addlevel"]);
+                leveling["class" + x] = thisclass;
+            }
+        }
         _.each(leveling, function(data, name) {
             var classNum = name[name.length -1];
             addRepeatingSection("choices", "row", function(classrow) {
@@ -14295,12 +14351,15 @@
                     }
                 });
                 var remove = {class: [], subclass: []};
+                //Figure out which blobs are just the same feature at a different level, add them to a list to remove
                 _.each(allblobs, function(blobs, section) {
                     _.each(blobs, function(blob, name) {
                         var basename = name.split("(")[0];
                         blob.Level = parseInt(blob.Level);
                         blob.parentSection = section;
-                        if(basename.trim().toLowerCase() != "proficiencies") {
+                        if(basename.trim().toLowerCase() == "spell slots") {
+                            remove[section].push(name);
+                        } else if(basename.trim().toLowerCase() != "proficiencies") {
                             _.each(allblobs, function(otherblobs, othersection) {
                                 _.each(otherblobs, function(otherblob, othername) {
                                     if(name != othername && basename == othername.split("(")[0]) {
@@ -14315,11 +14374,13 @@
                         }
                     });
                 });
+                //remove any blobs that are the same feau
                 _.each(remove, function(removeArray, section) {
                     _.each(_.uniq(removeArray), function(thisblob) {
                         delete allblobs[section][thisblob];
                     });
                 });
+                //here we build the final list of blobs that will be added
                 var filteredblobs = [];
                 _.each(allblobs, function(blobs, section) {
                     _.each(blobs, function(blob, name) {
@@ -14341,6 +14402,39 @@
     });
 
     on("page:lp-asi", function(eventinfo) {
+        var mancerdata = getCharmancerData();
+        var leveling = {};
+        var asis = [];
+        var update = {};
+        for(var x=1; x<=4; x++) {
+            if(mancerdata["lp-levels"].data["class" + x]) {
+                var thisclass = {};
+                thisclass.class = mancerdata["lp-levels"].data["class" + x];
+                thisclass.classname = _.last(mancerdata["lp-levels"].values["class" + x].split(":"));
+                thisclass.currentlevel = parseInt(mancerdata["lp-levels"].values["class" + x + "_currentlevel"]);
+                thisclass.addlevel = parseInt(mancerdata["lp-levels"].values["class" + x + "_addlevel"]);
+                leveling["class" + x] = thisclass;
+            }
+        }
+        _.each(leveling, function(data) {
+            var asi = data.class["data-Ability Score Levels"];
+            _.times(data.addlevel, function(x) {
+                var thislevel = data.currentlevel + x + 1;
+                if(asi.includes("" + thislevel)) {
+                    asis.push(data.classname + " Level " + thislevel);
+                }
+            });
+        });
+        console.log(asis);
+        _.each(asis, function(asi) {
+            addRepeatingSection("choices", "asi-row", function(rowid) {
+                update[rowid + " .sheet-title"] = "Ability Score Increase: " + asi;
+                setCharmancerOptions(rowid + "_feat", "Category:Feats");
+                if(asi == _.last(asis)) {
+                    setCharmancerText(update);
+                }
+            })
+        })
     });
 
     on("page:lp-spells", function(eventinfo) {
@@ -14361,7 +14455,7 @@
         var spellmaxlevel = 0;
         var prepared = true;
         var spelldata = mancerdata["lp-welcome"].values["spellinfo"] ? JSON.parse(mancerdata["lp-welcome"].values["spellinfo"]) : {};
-        var abilities = mancerdata["lp-welcome"].values["previous_abilities"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_abilities"]) : {};
+        var abilities = getAbilityTotals(mancerdata);
         _.each(spelldata, function(spell, repid) {
             if(repid.includes("cantrip")) {
                 knowncantrips++;
@@ -14673,7 +14767,8 @@
                 }
             });
             if(sourcelevel == "0") {
-                update[cantripsection + " label .sheet-number"] = (spellpage.values.knowncantrips + newspells) + " / " + (spellpage.values.knowncantrips + allowed);
+                var known = spellpage.values.knowncantrips || 0;
+                update[cantripsection + " label .sheet-number"] = (known + newspells) + " / " + (known + allowed);
             } else {
                 update[cantripsection + " .sheet-spellstext .sheet-total"] = newspells + " / " + (allowed + replaced) + " new spells added.";
                 if(allowedreplace > 0) {
@@ -14709,6 +14804,61 @@
             updateSpellSummary(mancerdata["lp-spells"].values[eventinfo.sourceSection + "_level"], mancerdata);
         }
     });
+
+    on("mancerchange:repeating_asi-row", function(eventinfo) {
+        var trigger = eventinfo.sourceAttribute.substr(39);
+        if(trigger == "switch") {
+            var update = {};
+            update[eventinfo.sourceSection + " .sheet-switch"] = eventinfo.newValue == "feat" ? "feat" : "";
+            setCharmancerText(update);
+        } else if(trigger == "feat") {
+
+        } else {
+            updateAbilityLock(eventinfo.sourceSection);
+        }
+        recalcLpData();
+    });
+
+    on("clicked:repeating_asi-row", function(eventinfo) {
+        var mancerdata = getCharmancerData();
+        var thischange = eventinfo.sourceAttribute.substr(0, eventinfo.sourceAttribute.length - 2);
+        var currentvalue = mancerdata["lp-asi"].values[thischange] ? parseInt(mancerdata["lp-asi"].values[thischange]) : 0;
+        var totalincrease = 0;
+        var update = {};
+        var lockinfo = {};
+        _.each(abilityList, function(ability) {
+            var thisincrease = mancerdata["lp-asi"].values[eventinfo.sourceSection + "_" + ability.toLowerCase()] || 0;
+            totalincrease += parseInt(thisincrease);
+        });
+        if(_.last(eventinfo.sourceAttribute) == "u" && totalincrease < 2 && currentvalue < 2) {
+            update[thischange] = currentvalue + 1;
+            mancerdata["lp-asi"].values[thischange] = currentvalue + 1;
+        } else if(_.last(eventinfo.sourceAttribute) == "d" && currentvalue > 0) {
+            update[thischange] = currentvalue - 1;
+            mancerdata["lp-asi"].values[thischange] = currentvalue - 1;
+        }
+        setAttrs(update, function() {
+            recalcLpData();
+        });
+    });
+
+    var updateAbilityLock = function(sourceSection, mancerdata) {
+        mancerdata = mancerdata || getCharmancerData();
+        var totalincrease = 0;
+        var update = {};
+        //First, get the total increase for this section
+        _.each(abilityList, function(ability) {
+            var thisincrease = mancerdata["lp-asi"].values[sourceSection + "_" + ability.toLowerCase()] || 0;
+            totalincrease += parseInt(thisincrease);
+        });
+        //Then, figure out what to lock
+        _.each(abilityList, function(ability) {
+            var thisincrease = mancerdata["lp-asi"].values[sourceSection + "_" + ability.toLowerCase()] || 0;
+            update[sourceSection + " .sheet-" + ability.toLowerCase() + "_lock-down"] = thisincrease > 0 ? "" : "lock";
+            update[sourceSection + " .sheet-" + ability.toLowerCase() + "_lock-up"] = thisincrease < 2 && totalincrease < 2 ? "" : "lock";
+        });
+        setCharmancerText(update);
+    };
 </script>
 
 <!-- CHARACTERMANCER REPEATING SECTIONS -->
@@ -14743,6 +14893,40 @@
         <span class="label"><span data-i18n="hp">Hit Points</span>: <span class="hit_points"></span></span>
         <span class="choice label class_suggested_abilities_container"><span data-i18n="suggested-abilities">Suggested Abilities: </span><span class="label class_suggested_abilities"></span></span>
         <span class="choice label class_spellcasting_ability_container"><span data-i18n="class-spellcasting">Class Spellcasting Ability: </span><span class="label class_spellcasting_ability"></span></span>
+    </div>
+</charmancer>
+
+<charmancer class="sheet-repeating-leveler-topbar">
+    <div class="topbar-container">
+        <div class="sheet-attr-container">
+            <h4 data-i18n="strength">Strength</h4>
+            <span class="strength_total">-</span>
+        </div>
+        <div class="sheet-attr-container">
+            <h4 data-i18n="dexterity">Dexterity</h4>
+            <span class="dexterity_total">-</span>
+        </div>
+        <div class="sheet-attr-container">
+            <h4 data-i18n="constitution">Constitution</h4>
+            <span class="constitution_total">-</span>
+        </div>
+        <div class="sheet-attr-container">
+            <h4 data-i18n="intelligence">Intelligence</h4>
+            <span class="intelligence_total">-</span>
+        </div>
+        <div class="sheet-attr-container">
+            <h4 data-i18n="wisdom">Wisdom</h4>
+            <span class="wisdom_total">-</span>
+        </div>
+        <div class="sheet-attr-container">
+            <h4 data-i18n="charisma">Charisma</h4>
+            <span class="charisma_total">-</span>
+        </div>
+    </div>
+    <div class="meta-info-container">
+        <span class="label"><span data-i18n="hp">Hit Points</span>: <span class="hit_points"></span></span>
+        <span class="choice label spelldc_container"><span data-i18n="spelldc">Spellcasting DC: </span><span class="label class_spelldc"></span></span>
+        <span class="label class_list"></span>
     </div>
 </charmancer>
 
@@ -14823,6 +15007,91 @@
     <button type="action" class="mancer_info" name="act_info">i</button>
     <input type="hidden" name="comp_name">
     <input type="hidden" name="comp_level">
+</charmancer>
+
+<charmancer class="sheet-repeating-asi-row">
+    <h4 class="title"></h4>
+    <span class="switch" style="display: none"></span>
+    <div class="switch-container">
+        <label class="switch-tab asi-tab">
+            <input type="radio" name="comp_switch" value="asi">
+            Ability Score
+        </label>
+        <label class="switch-tab feat-tab">
+            <input type="radio" name="comp_switch" value="feat">
+            Feat
+        </label>
+    </div>
+    <div class="asi">
+        <p>You can increase two of your abilities by 1, or one of your abilities by 2</p>
+        <div class="abilities-holder">
+            <div>
+                <span class="strength_lock-up lock-up" style="display:none"></span>
+                <span class="strength_lock-down lock-down" style="display:none">lock</span>
+                <span>+</span><input type="text" name="comp_strength" value="0" disabled>
+                <div>
+                    <button type="action" class="spinner up-spinner" name="act_strength_u">+</button>
+                    <button type="action" class="spinner down-spinner" name="act_strength_d">-</button>
+                </div>
+                <h5 data-i18n="strength">Strength</h5>
+            </div>
+            <div>
+                <span class="dexterity_lock-up lock-up" style="display:none"></span>
+                <span class="dexterity_lock-down lock-down" style="display:none">lock</span>
+                <span>+</span><input type="text" name="comp_dexterity" value="0" disabled>
+                <div>
+                    <button type="action" class="spinner up-spinner" name="act_dexterity_u">+</button>
+                    <button type="action" class="spinner down-spinner" name="act_dexterity_d">-</button>
+                </div>
+                <h5 data-i18n="dexterity">Dexterity</h5>
+            </div>
+            <div>
+                <span class="constitution_lock-up lock-up" style="display:none"></span>
+                <span class="constitution_lock-down lock-down" style="display:none">lock</span>
+                <span>+</span><input type="text" name="comp_constitution" value="0" disabled>
+                <div>
+                    <button type="action" class="spinner up-spinner" name="act_constitution_u">+</button>
+                    <button type="action" class="spinner down-spinner" name="act_constitution_d">-</button>
+                </div>
+                <h5 data-i18n="constitution">Constitution</h5>
+            </div>
+            <div>
+                <span class="intelligence_lock-up lock-up" style="display:none"></span>
+                <span class="intelligence_lock-down lock-down" style="display:none">lock</span>
+                <span>+</span><input type="text" name="comp_intelligence" value="0" disabled>
+                <div>
+                    <button type="action" class="spinner up-spinner" name="act_intelligence_u">+</button>
+                    <button type="action" class="spinner down-spinner" name="act_intelligence_d">-</button>
+                </div>
+                <h5 data-i18n="intelligence">Intelligence</h5>
+            </div>
+            <div>
+                <span class="wisdom_lock-up lock-up" style="display:none"></span>
+                <span class="wisdom_lock-down lock-down" style="display:none">lock</span>
+                <span>+</span><input type="text" name="comp_wisdom" value="0" disabled>
+                <div>
+                    <button type="action" class="spinner up-spinner" name="act_wisdom_u">+</button>
+                    <button type="action" class="spinner down-spinner" name="act_wisdom_d">-</button>
+                </div>
+                <h5 data-i18n="wisdom">Wisdom</h5>
+            </div>
+            <div>
+                <span class="charisma_lock-up lock-up" style="display:none"></span>
+                <span class="charisma_lock-down lock-down" style="display:none">lock</span>
+                <span>+</span><input type="text" name="comp_charisma" value="0" disabled>
+                <div>
+                    <button type="action" class="spinner up-spinner" name="act_charisma_u">+</button>
+                    <button type="action" class="spinner down-spinner" name="act_charisma_d">-</button>
+                </div>
+                <h5 data-i18n="charisma">Charisma</h5>
+            </div>
+        </div>
+    </div>
+    <div class="feat">
+        <select name="comp_feat">
+            <option value="" data-i18n="choose">Choose</option>
+        </select>
+    </div>
 </charmancer>
 
 <!-- CHARACTERMANCER SLIDES -->
@@ -16009,7 +16278,7 @@
 
 <charmancer class="sheet-charmancer-lp-welcome">
     <div class="charmancer container">
-        <ol class="steps">
+        <ol class="steps lp-steps">
         </ol>
         <div class="logos">
             <span class="charmancer-logo"></span>
@@ -16040,7 +16309,7 @@
 <!-- DEV  1378-->
 <charmancer class="sheet-charmancer-lp-levels">
     <div class="charmancer container">
-        <ol class="steps">
+        <ol class="steps lp-steps">
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel-u">CANCEL</button></li>
         </ol>
     <!-- Remove the inline style later -->
@@ -16221,7 +16490,7 @@
 
 <charmancer class="sheet-charmancer-lp-choices">
     <div class="charmancer container">
-        <ol class="steps">
+        <ol class="steps lp-steps">
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel-u">CANCEL</button></li>
         </ol>
         <div class="topbar-holder"></div>
@@ -16248,7 +16517,7 @@
 
 <charmancer class="sheet-charmancer-lp-asi">
     <div class="charmancer container">
-        <ol class="steps">
+        <ol class="steps lp-steps">
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel-u">CANCEL</button></li>
         </ol>
         <div class="topbar-holder"></div>
@@ -16256,7 +16525,7 @@
         </div>
 
         <div class="info">
-            <div class="sheet-compendium-page sheet-class-info" accept="Rules:Classes"></div>
+            <div class="sheet-compendium-page sheet-class-info" accept="Rules:Ability Scores"></div>
         </div>
         <div class="bottombar">
             <button class="prev" type="back" value="lp-choices">Back</button>
@@ -16275,7 +16544,7 @@
 
 <charmancer class="sheet-charmancer-lp-spells">
     <div class="charmancer container">
-        <ol class="steps">
+        <ol class="steps lp-steps">
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel-u">CANCEL</button></li>
         </ol>
         <div class="topbar-holder"></div>
