@@ -17,6 +17,10 @@ The Monster sheet type is meant for monsters, to be used exclusively by the DM. 
 
 ### Changelog
 
+__Version 1.2.1 (released 11/17/2018)__
+
+*	Undead characters now are supported. Use toggle at the top of the page to change Fortitude and hit point calculations from using Con to Cha
+
 __Version 1.2 (released 5/22/2018)__
 
 Even smaller update. Had to make some necessary changes -- hopefully I can get around to beefing up this sheet soon!
