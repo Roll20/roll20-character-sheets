@@ -5791,12 +5791,47 @@
 
     on("sheet:opened", function(eventinfo) {
         versioning(function() {
-            if(eventinfo.sourceType === "sheetworker") {
-                setAttrs({l1mancer_status: "completed"})
+            var getInfo = function(sections, callback, results) {
+                results =  results || {};
+                if(sections.length > 0) {
+                    var section = sections.pop();
+                    getSectionIDs(section, function(ids) {
+                        results[section] = ids;
+                        getInfo(sections, callback, results);
+                    });
+                } else {
+                    callback(results);
+                }
             }
-            else {
-                check_l1_mancer();
-            };
+            var spellSections = ["spell-cantrip"];
+            for(var x=1; x<=9; x++) {
+                spellSections.push("spell-" + x);
+            }
+
+            getInfo(spellSections, function(results) {
+                var getList = ["character_id"];
+                _.each(results, function(sectionids, sectionname) {
+                    _.each(sectionids, function(spellid) {
+                        getList.push("repeating_" + sectionname + "_" + spellid + "_rollcontent");
+                    });
+                });
+                getAttrs(getList, function(attrs) {
+                    var set = {};
+                    _.each(attrs, function(data, name) {
+                        if(data.length === 68 && data.split("|")[0].substr(2) !== attrs["character_id"]) {
+                            set[name] = "%{" + attrs["character_id"] + data.substr(22);
+                        }
+                    });
+                    setAttrs(set, function() {
+                        if(eventinfo.sourceType === "sheetworker") {
+                            setAttrs({l1mancer_status: "completed"})
+                        }
+                        else {
+                            check_l1_mancer();
+                        };
+                    });
+                });
+            });
         });
     });
 
