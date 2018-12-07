@@ -14099,18 +14099,19 @@
         getAttrs(["class", "base_level", "multiclass1_flag", "multiclass2_flag", "multiclass3_flag", "multiclass1", "multiclass1_lvl", "multiclass2", "multiclass2_lvl", "multiclass3", "multiclass3_lvl", "subclass_level", "subclass", "multiclass1_subclass", "multiclass2_subclass", "multiclass3_subclass"], function(v) {
             const mancerdata = getCharmancerData();
             const leveldata  = mancerdata["lp-levels"].values || undefined;
-            const class1     = v.class;
+            const class1     = v.class, subclass1 = v.subclass;
             let set          = {};
             let update       = {};
             
             set["class1_currentlevel"] = v.base_level;
-            set["class1"] = "Classes:" + class1;
-            if (v.subclass) { set["subclass1"] = v.subclass };
-
             update["class1_selector"] = `<div style="width:20%; display: inherit;">${class1}</div>`;
+            if (v.subclass) { 
+                update[`subclass1_selector`] = `<div>${subclass1}</div>`;
+                set["class1_subclass"] = v.subclass1; 
+            };
             
             const multiclass = parseInt(v[`multiclass1_flag`]) + parseInt(v[`multiclass2_flag`]) + parseInt(v[`multiclass3_flag`]);
-            set["multiclass"] = multiclass; //This needs to change. It shouldn't update every time the page loads.
+            set["multiclass"] = (!mancerdata["lp-levels"].values["multiclass"]) ? multiclass : mancerdata["lp-levels"].values["multiclass"];
             set["multiclass_initial"] = multiclass;
 
             for (x = 1; x <= 3; x++) {
@@ -14133,11 +14134,10 @@
             setCharmancerText(update);
             update_levels();
 
-            changeCompendiumPage("sheet-levels-info", ["Classes:"] + v.class);
+            changeCompendiumPage("sheet-levels-info", ["Classes:"] + class1);
 
-            console.log("===== 5E LEVEL LOGS: PAGE OPEN =====");
+            console.log("===== LP Levels Slide was Opened =====");
             console.log(set);
-            console.log("=====  END 5E LEVEL END ===== ");
         });
     });
 
@@ -14145,40 +14145,44 @@
         const mancerdata= getCharmancerData();
         const leveldata = mancerdata["lp-levels"];
         const levelclass= eventinfo.sourceAttribute;
+        console.log(eventinfo);
 
         getCompendiumPage(eventinfo.newValue, function(p) {
-            const data       = p.data;
-            let set          = {};
-            const class_name = eventinfo.newValue && eventinfo.newValue.split(":").length > 1 && eventinfo.newValue.split(":")[0] === "Classes" ? eventinfo.newValue.split(":")[1] : false;
+            const data          = p.data;
+            let set             = {};
+            let update          = {};
+            const class_name    = eventinfo.newValue && eventinfo.newValue.split(":").length > 1 && eventinfo.newValue.split(":")[0] === "Classes" ? eventinfo.newValue.split(":")[1] : false;
+            const subclass_name = data["Subclass Name"];
             
             if (levelclass === "class1") {
                 set[`${levelclass}_addlevel`] = leveldata.values[`${levelclass}_addlevel`] ? leveldata.values[`${levelclass}_addlevel`] : 1;
             } else {
-                set[`${levelclass}_addlevel`] = leveldata.values[`${levelclass}_addlevel`] ? leveldata.values[`${levelclass}_addlevel`] : "";
+                set[`${levelclass}_addlevel`] = leveldata.values[`${levelclass}_addlevel`] ? leveldata.values[`${levelclass}_addlevel`] : 0;
             };
 
             set[`${levelclass}_hitdie`] = data["Hit Die"];
-
-          if(class_name) {
+            update[`sub${levelclass}_name`] = `<h5>${subclass_name}</h5>`;
+            if(class_name) {
                 var subOptions = {show_source: true};
 
                 (eventinfo.sourceType != "player") ? subOptions.silent = true : subOptions.selected = "";
 
                 setCharmancerOptions(levelclass + "_subclass","Category:Subclasses data-Parent:" + class_name, subOptions, function(values) {
-                    if (values.length) showChoices(["subclass"]);
                 });
-            }; 
-            
-            //let update = {}; //Not being used
-            //ßsetCharmancerText(update); //Not being used
+            };
 
+            const presets = [leveldata.values.class1, leveldata.values.class2, leveldata.values.class3, leveldata.values.class4];
+            for (x = 2; x <= 4; x++) {
+                disableCharmancerOptions(`class${x}`, presets);
+            };
+
+            setCharmancerText(update);
             setAttrs(set);
             update_levels();
             update_hp(levelclass);
 
-            console.log(`===== 5E LEVEL LOGS: CHANGE ${levelclass} =====`);
+            console.log(`${levelclass} the ${class_name} was changed`);
             console.log(leveldata);
-            console.log(`=====  END 5E LEVEL LOGS END for ${levelclass} ===== `);
         });
     });
 
@@ -14192,25 +14196,30 @@
     });
 
    on("mancerchange:class1_addlevel mancerchange:class2_addlevel mancerchange:class3_addlevel mancerchange:class4_addlevel", function(eventinfo) {
-        const mancerdata     = getCharmancerData();
-        const leveldata      = mancerdata["lp-levels"];
-        const levelclass     = eventinfo.sourceAttribute.slice(0, 6);
-        const classlevel     = (parseInt(eventinfo.newValue) || 0) + (parseInt(leveldata.values[`${levelclass}_currentlevel`]) || 0);
-        const subclasslevel  = (leveldata.data[`${levelclass}`]["data-Subclass Level"]) ? parseInt(leveldata.data[`${levelclass}`]["data-Subclass Level"]) : 1;
-        let set              = {};
+        const mancerdata    = getCharmancerData();
+        const leveldata     = mancerdata["lp-levels"];
+        const levelclass    = eventinfo.sourceAttribute.slice(0, 6);
+        const classlevel    = (parseInt(eventinfo.newValue) || 0) + (parseInt(leveldata.values[`${levelclass}_currentlevel`]) || 0);
+        const subclasslevel = (leveldata.data[`${levelclass}`]["data-Subclass Level"]) ? parseInt(leveldata.data[`${levelclass}`]["data-Subclass Level"]) : 1;
+        let set             = {};
+        let update          = {};
 
         set[`${levelclass}_classlevel`] = classlevel;
-        (classlevel >= subclasslevel)  ? showChoices([`sub${levelclass}`]) : hideChoices([`sub${levelclass}`]); //This isn't hiding choices like it should
+       if (classlevel >= subclasslevel)  {
+            update[`sub${levelclass}_warning`] = ``;
+            showChoices([`sub${levelclass}`]);
+       } else {
+            update[`sub${levelclass}_warning`] = `<p>You receive a subclass at level ${subclasslevel}. Your total level is ${classlevel}.</p>`;
+            hideChoices([`sub${levelclass}`]);
+       };
 
-        
-
+        setCharmancerText(update);
         setAttrs(set);
         update_levels();
         update_hp(levelclass);
 
-        console.log(`===== 5E LEVEL LOGS: ADD LEVEL for ${levelclass} =====`);
         console.log(`Subclass requires level ${subclasslevel}. The class level is ${classlevel}.`);
-        console.log(`=====  END 5E LEVEL END for ${levelclass} ===== `);
+        console.log(leveldata);
     });
 
     //Calculate the Average HP and store if for use later. Update the Roll button as needed
@@ -14219,47 +14228,29 @@
         const leveldata = mancerdata["lp-levels"].values, hitdie = leveldata[`${levelclass}_hitdie`], levels = leveldata[`${levelclass}_addlevel`] || 0;
 
         if (levels && hitdie) {
-            getAttrs(["constitution_mod"], function(v) {
-                const conmod = parseInt(v.constitution_mod) || 0, conbonus = conmod * levels;
+            //Set the Roll for HP button
+            let update = {};
+            update[`${levelclass}_rollhp`] = `<button type="roll" name="roll_${levelclass}_rollhp" value="@{wtype}&{template:mancerroll} {{title=Roll for HP}} {{r1=[[${levels}${hitdie}]]}}">Roll</button>`;
+            setCharmancerText(update);
 
-                //Set the Roll for HP button
-                let update = {};
-                update[`${levelclass}_rollhp`] = `<button type="roll" name="roll_${levelclass}_rollhp" value="@{wtype}&{template:mancerroll} {{title=Roll for HP}} {{r1=[[${levels}${hitdie}+${conbonus}]]}}">Roll</button>`;
-                setCharmancerText(update);
+            //Total up the average HP
+            const size = hitdie.slice(1);
+            let num = [], sum = 0, set = {};
 
-                //Total up the average HP
-                const size = hitdie.slice(1);
-                let num = [], sum = 0, set = {};
+            for(x = 1; x <= size; x++) {
+               num.push(x);
+            };
 
-                for(x = 1; x <= size; x++) {
-                   num.push(x);
-                };
+            for(i = 0; i < num.length; i++) {
+                sum += num[i];
+            };
 
-                for(i = 0; i < num.length; i++) {
-                    sum += num[i];
-                };
+            let avg = Math.ceil(sum / num.length), hp = avg * levels;
 
-                let avg = Math.ceil(sum / num.length), hp = avg * levels + conbonus;
-
-                set[`${levelclass}_averagehp`] = hp;
-                setAttrs(set);
-
-                //console.log("===== 5E LEVEL LOGS: HP SIZE =====");
-                //console.log(`The sum is ${sum} and the die size was ${size}. The Average is ${avg}. Which makes the hp equal to ${hp}`);
-                //console.log("=====  END 5E LEVEL LOGS: HP SIZE ===== ");
-            });
+            set[`${levelclass}_averagehp`] = hp;
+            setAttrs(set);
         };
     };
-
-    on("mancerchange:class1_addhpAverage mancerchange:class2_addhpAverage mancerchange:class3_addhpAverage mancerchange:class4_addhpAverage mancerchange:class1_averagehp mancerchange:class2_averagehp mancerchange:class3_averagehp mancerchange:class4_averagehp", function(eventinfo) {
-        const mancerdata= getCharmancerData();
-        const leveldata = mancerdata["lp-levels"].values, levelclass = eventinfo.sourceAttribute.slice(0, 6), hp = leveldata[`${levelclass}_averagehp`];
-        let set         = {};
-
-        (leveldata[`${levelclass}_addhpAverage`] === "on") ? set[`${levelclass}_addhp`] = hp : (eventinfo.sourceType === "player") ? set[`${levelclass}_addhp`] = "" : false;
-
-        setAttrs(set);
-    });
 
     //Roll HP 1
     on("mancerroll:class1_rollhp mancerroll:class2_rollhp mancerroll:class3_rollhp mancerroll:class4_rollhp", function(eventinfo) {
@@ -14307,37 +14298,64 @@
         //console.log("=====  END 5E LEVEL LOGS: HP BY LEVEL ===== ");
     });
 
-    on("mancerchange:multiclass_add mancerchange:multiclass_remove", function(eventinfo) {
+    on("clicked:multiclass_add clicked:multiclass_remove", function(eventinfo) {
         const mancerdata = getCharmancerData();
-        const leveldata  = mancerdata["lp-levels"].values;
+        const leveldata  = mancerdata["lp-levels"];
         let set          = {};
 
+        console.log(eventinfo);
+
         if (eventinfo.sourceAttribute === "multiclass_add") {
-            (leveldata["multiclass"] < 3) ? set["multiclass"] = leveldata["multiclass"] + 1 : false;
+            (leveldata.values["multiclass"] < 3) ? set["multiclass"] = leveldata.values["multiclass"] + 1 : false;
+            console.log(leveldata.values["multiclass"]);
         } else {
-            (leveldata["multiclass"] > leveldata["multiclass_initial"]) ? set["multiclass"] = leveldata["multiclass"] - 1 : false;
+
+            if (leveldata.values["multiclass"] > leveldata.values["multiclass_initial"]) {
+                set["multiclass"] = leveldata.values["multiclass"] - 1;
+            } else {
+                false
+            };
+
+            console.log(leveldata.values["multiclass"]);
         };
 
         setAttrs(set);
     });
 
+    on("clicked:class1_addhpAverage clicked:class2_addhpAverage clicked:class3_addhpAverage clicked:class4_addhpAverage", function(eventinfo) {
+        const mancerdata= getCharmancerData();
+        const leveldata = mancerdata["lp-levels"], levelclass = eventinfo.sourceAttribute.slice(0, 6), hp = leveldata.values[`${levelclass}_averagehp`];
+
+        setAttrs({
+            [`${levelclass}_addhp`]: hp
+        });
+    });
+
     //Build a function to update the level & class each time they change
-    //Does not yet work with multiclass yet
     const update_levels = () => {
         const mancerdata     = getCharmancerData();
-        const leveldata      = mancerdata["lp-levels"].values;
-        const class1levels   = parseInt(leveldata["class1_classlevel"]) || 0, class2levels = parseInt(leveldata["class2_classlevel"]) || 0, class3levels = parseInt(leveldata["class3_classlevel"]) || 0, class4levels = parseInt(leveldata["class4_classlevel"]) || 0;
+        const leveldata      = mancerdata["lp-levels"];
+        const class1levels   = parseInt(leveldata.values["class1_classlevel"]) || 0, class2levels = parseInt(leveldata.values["class2_classlevel"]) || 0, class3levels = parseInt(leveldata.values["class3_classlevel"]) || 0, class4levels = parseInt(leveldata.values["class4_classlevel"]) || 0;
         const characterlevel = class1levels + class2levels + class3levels + class4levels;
+        let update = {};
+        let set    = {};
+        let start  = [];
+        let end    = [];
+        let increase = [];
 
-        const class1       = (leveldata["class1"]) ? leveldata["class1"].split(":")[1] : "";
-        const currentlevel = (leveldata["class1_currentlevel"]) ? leveldata["class1_currentlevel"] : "";
-        const add1         = (leveldata["class1_addlevel"] > 0) ? " | Leveler increase of " + class1 + " " + leveldata["class1_addlevel"] : "";
-        const total        = (leveldata["class1_addlevel"]) ? parseInt(leveldata["class1_addlevel"]) + parseInt(currentlevel) : "";
-        let update         = {};
-        let set            = {};
+        for (x = 1; x <= 4; x++) {
+            let name    = (leveldata.values[`class${x}`]) ? leveldata.values[`class${x}`].slice(8) : "";
+            let current = parseInt(leveldata.values[`class${x}_currentlevel`]) || 0;
+            let add     = parseInt(leveldata.values[`class${x}_addlevel`]) || 0;
+            let lvl     = parseInt(leveldata.values[`class${x}_classlevel`]) || 0;
 
-        update["levels_message"] = `<p>Character Levels: Started as a level ${currentlevel} ${class1} ${add1}</p>`;
-        update["levels_message"] += `<p>Character will be level ${characterlevel} (${class1} ${total})</p>`;
+            (current > 0) ? start.push(`${name} ${current}`) : false;
+            (add > 0) ? increase.push(`${name} ${add}`) : false;
+            (lvl > 0) ? end.push(`${name} ${lvl}`): false;
+        };
+
+        update["levels_message"] = `<p>Character Levels: Started as a level ${start} | ${increase}</p>`;
+        update["levels_message"] += `<p>Character will be level ${characterlevel} (${end})</p>`;
 
         set[`characterlevel`]    = characterlevel;
 
@@ -16341,7 +16359,7 @@
     </div>
 </charmancer>
 
-<!-- DEV  1378-->
+<!-- DEV  1378 -->
 <charmancer class="sheet-charmancer-lp-levels">
     <div class="charmancer container">
         <ol class="steps lp-steps">
@@ -16350,7 +16368,7 @@
     <!-- Remove the inline style later -->
         <div class="topbar-holder"></div>
         <div style="width: 100%;">
-            <p>First paragraph which will contain instructions.</p>
+            <p>This is a placeholder for future text.</p>
         </div>
         <div style="width: 100%; font-weight: bold;">
             <div class="levels_message"></div>
@@ -16366,8 +16384,8 @@
                 <input type="hidden" name="comp_class1_hitdie" />
                 <input type="hidden" name="comp_class1_averagehp" />
                 <div>
-                    <div class="class1_selector" style="display: inline;">
-                       <select name="comp_class1" style="width: 70%;" value="">
+                    <div class="class1_selector">
+                       <select name="comp_class1" value="">
                         </select>
                     </div>
                     <input type="number" class="addinglevel" min="0" name="comp_class1_addlevel" value="1 " />
@@ -16376,9 +16394,9 @@
                     <h3>HP</h3>
                     <input type="number" class="" name="comp_class1_addhp">
                     <div class="class1_rollhp" style="display: inline;">
-                        <button type="roll" name="roll_class1_rollhp" value="" title="You must input a level increase to this class">Roll</button>
+                        <button type="roll" name="roll_class1_rollhp" value="" title="">Roll</button>
                     </div>
-                    <input type="checkbox" name="comp_class1_addhpAverage" /><span>Average</span>
+                     <button type="action" name="act_class1_addhpAverage" value="" title="">Average</button>
                    <!-- <input type="checkbox" name="comp_class1_hpbyLevel" /><span>By level</span> Put on hold -->
                 </div>
                 <div class="by-levels" style="margin-left: 11%;">
@@ -16386,16 +16404,17 @@
                 <div>
                     <h4 class="class1_features_title choice" style="display: inline;">Class Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
-                    <div accept="">There needs to be a list of features here.</div>
-                    <select class="choice subclass1" name="comp_class1_subclass" style="display: inline;">
+                    <div>This text is a placeholder.</div>
+                    <div class="subclass1_name"></div>
+                    <div class="subclass1_warning"></div>
+                    <select class="choice subclass1" name="comp_class1_subclass">
                         <option value="" data-i18n="choose">Choose</option>
-                        <option class="custom" value="Rules:Classes" data-i18n="custom">Custom</option>
                     </select>
                 </div>
                 <div>
                     <h4 class="subclass1_features_title choice" style="display: inline;">Subclass Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe --->
-                    <div>There needs to be a list of sub class features here.</div>
+                    <div>This text is a placeholder.</div>
                 </div>
             </div>
             <div class="row">
@@ -16405,7 +16424,10 @@
                 <input type="hidden" name="comp_class2_hitdie" />
                 <input type="hidden" name="comp_class2_averagehp" />
                 <div style="display: inline;">
-                    <div class="class2_selector" style="display: inline;">
+                    <div class="class2_selector">
+                        <select class="multiclass_select" name="comp_class2" accept="Category:Classes" style="width: 70%;" value="">
+                            <option value="" data-i18n="choose">Choose</option>
+                        </select>
                     </div>
                     <input type="number" class="addinglevel" min="0" name="comp_class2_addlevel" />
                 </div>
@@ -16415,21 +16437,23 @@
                     <div class="class2_rollhp" style="display: inline;">
                         <button type="roll" name="roll_class2_rollhp" value="" title="You must input a level increase to this class">Roll</button>
                     </div>
-                    <input type="checkbox" name="comp_class2_addhpAverage" /><span>Average</span>
+                    <button type="action" name="act_class2_addhpAverage" value="" title="">Average</button>
                   <!--  <input type="checkbox" name="comp_class2_addhpLevel" /><span>By level</span> Put on hold -->
                 </div>
                 <div>
                     <h4 class="class2_features_title choice" style="display: inline;">Class Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
-                    <div accept="">There needs to be a list of features here.</div>
-                    <select class="choice subclass2" name="comp_class2_subclass" style="display: inline;">
+                    <div>This text is a placeholder.</div>
+                    <div class="subclass2_name"></div>
+                    <div class="subclass2_warning"></div>
+                    <select class="choice subclass2" name="comp_class2_subclass">
                         <option value="" data-i18n="choose">Choose</option>
                     </select>
                 </div>
                 <div>
                     <h4 class="subclass2_features_title choice" style="display: inline;">Subclass Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe --->
-                    <div>There needs to be a list of sub class features here.</div>
+                     <div>This text is a placeholder.</div>
                 </div>
             </div>
             <div class="row">
@@ -16440,8 +16464,8 @@
                 <input type="hidden" name="comp_class3_averagehp" />
                 <div>
                     <div style="display: inline;">
-                        <div class="class3_selector" style="display: inline;">
-                           <select name="comp_class3" accept="Category:Classes" style="width: 70%;" value="">
+                        <div class="class3_selector">
+                           <select class="multiclass_select" name="comp_class3" accept="Category:Classes" style="width: 70%;" value="">
                                 <option value="" data-i18n="choose">Choose</option>
                             </select>
                         </div>
@@ -16454,21 +16478,23 @@
                     <div class="class3_rollhp" style="display: inline;">
                         <button type="roll" name="roll_class3_rollhp" value="" title="You must input a level increase to this class">Roll</button>
                     </div>
-                    <input type="checkbox" name="comp_class3_addhpAverage" /><span>Average</span>
+                    <button type="action" name="act_class3_addhpAverage" value="" title="">Average</button>
                     <!--<input type="checkbox" name="comp_class3_addhpLevel" /><span>By level</span> Put on hold-->
                 </div>
                 <div>
                     <h4 class="class3_features_title choice" style="display: inline;">Class Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
-                    <div accept="">There needs to be a list of features here.</div>
-                    <select class="choice subclass3" name="comp_class3_subclass" style="display: inline;">
+                    <div>This text is a placeholder.</div>
+                    <div class="subclass3_name"></div>
+                    <div class="subclass3_warning"></div>
+                    <select class="choice subclass3" name="comp_class3_subclass">
                         <option value="" data-i18n="choose">Choose</option>
                     </select>
                 </div>
                 <div>
                     <h4 class="subclass3_features_title choice" style="display: inline;">Subclass Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe --->
-                    <div>There needs to be a list of sub class features here.</div>
+                    <div>This text is a placeholder.</div>
                 </div>
             </div>
             <div class="row">
@@ -16478,8 +16504,8 @@
                 <input type="hidden" name="comp_class4_hitdie" />
                 <input type="hidden" name="comp_class4_averagehp" />
                 <div>
-                    <div class="class4_selector" style="display: inline;">
-                       <select name="comp_class4" accept="Category:Classes" style="width: 70%;">
+                    <div class="class4_selector">
+                       <select class="multiclass_select" name="comp_class4" accept="Category:Classes" style="width: 70%;">
                             <option value="" data-i18n="choose">Choose</option>
                         </select>
                     </div>
@@ -16491,31 +16517,28 @@
                     <div class="class4_rollhp" style="display: inline;">
                         <button type="roll" name="roll_class4_rollhp" value="" title="You must input a level increase to this class">Roll</button>
                     </div>
-                    <input type="checkbox" name="comp_class4_addhpAverage" /><span>Average</span>
+                    <button type="action" name="act_class4_addhpAverage" value="" title="">Average</button>
                     <!--<input type="checkbox" name="comp_class4_addhpLevel" /><span>By level</span> Put on hold-->
                 </div>
                 <div>
                     <h4 class="class4_features_title choice" style="display: inline;">Class Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
-                    <div accept="">There needs to be a list of features here.</div>
-                    <select class="choice subclass4" name="comp_class4_subclass" style="display: inline;">
+                    <div>This text is a placeholder.</div>
+                    <div class="subclass4_name"></div>
+                    <div class="subclass4_warning"></div>
+                    <select class="choice subclass4" name="comp_class4_subclass">
                         <option value="" data-i18n="choose">Choose</option>
-                        <option class="custom" value="Rules:Classes" data-i18n="custom">Custom</option>
                     </select>
                 </div>
                 <div>
                     <h4 class="subclass4_features_title choice" style="display: inline;">Subclass Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
-                    <div>There needs to be a list of sub class features here.</div>
+                    <div>This text is a placeholder.</div>
                 </div>
             </div>
             <div>
-                <div style="display: inline; height: 30px; width: 30px; border: 1px solid black;">
-                    <input type="checkbox" name="comp_multiclass_add" /><span>+</span>
-                </div>
-                <div style="display: inline; height: 30px; width: 30px; border: 1px solid black;">
-                    <input type="checkbox" name="comp_multiclass_remove" /><span>-</span>
-                </div>
+                <button type="action" name="act_multiclass_add" />+</button>
+                <button type="action" name="act_multiclass_remove" />-</button>
             </div>
         </div>
         <div class="info">
