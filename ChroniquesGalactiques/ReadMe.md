@@ -9,9 +9,33 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-editions.fr/catalogue.php?id=207) #17,18 et 19.
 
 # Version courante
-2.0 [Screenshot](cog_v2.png)
+3.1 [Screenshot](cog_v3.png)
 
 # Notes de version
+## v3.1 (2018-12-03)
+* Ajout du d3 au selecteur des dés de dommages
+* Ajout d'un groupe de dés de dommages "sans limite" (armes à feu)
+* Ajout de deux options d'attaque sur la deuxième ligne : relance (reroll et reroll once) et seuil de relance (à indiquer sous la forme  d'un seuil -- relance des 1 par défaut).
+* Réorganisation de la section Etats préjudiciables
+* Ajout d'un état "Poisse" consistant à lancer deux d20 et garder le moins bon
+* Modification des jets de dés de la fiche pour tenir compte de l'état "Poisse"
+ Type des jets avec poisse :
+ * Jet de carac normal : moins bon de deux d20 (au lieu d'un d20)
+ * Jet de carac supérieur OU héroïque : un seul d20 (au lieu du meilleur de deux d20)
+ * Jet de carac supérieur ET héroïque : meilleur de deux d20 (pas de minimum à 10)
+ * Jet d'attaque normal : moins bon de deux d20 (au lieu d'un d20)
+ * Jet d'attaque risqué : moins bon de deux d12 (au lieu d'un d12)
+ * Jet d'attaque expert : un seul d20 (au lieu du meilleur de deux d20)
+
+## v3.0 (2018-11-29)
+* Réorganisation de la fiche de personnage avec des onglets Caractéristiques, Capacités, Equipement, Configuration
+* Remplacement des champs Divers sur les attributs par des champs calculés via sheet-workers
+* Affichage des options d'attaque avec pictogramme d'engrenage
+* Affichage jusqu'à 9 voies
+* Gestion de 5 buffs/debuffs par attributs
+* Support des états préjudiciables aveuglé/étourdi/renversé/surpris avec pénalités aux attributs correspondants
+* Ajout d'un onglet Vaisseau avec attributs et jets de dés spécifiques aux vaisseaux spatiaux
+
 ## v2.0 (2018-10-23)
 * Prise en compte des caractéristiques supérieures et héroïques
 * État affaibli ou normal
