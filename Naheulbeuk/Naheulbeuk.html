@@ -9,6 +9,10 @@
 	var tempStats = [	"stats_courage", "stats_intelligence", "stats_charisme", "stats_adresse", "stats_force",
 						"stats_attaque", "stats_parade", "stats_jet", "stats_esquive", "stats_fouille", 
 						"stats_inge", "stats_magiephy", "stats_magiepsy", "stats_resimagie" ];
+	// Buff Stats
+	var buffStats = [	"condition_courage", "condition_intelligence", "condition_charisme", "condition_adresse", "condition_force",
+						"condition_attaque", "condition_parade", "condition_jet", "condition_esquive", 
+						"condition_magiephy", "condition_magiepsy", "condition_resimagie" ];
 	var prStats = {
 		change: [ "repeating_armures:armure_prphy", "repeating_armures:armure_prmag", "prnat" ],
 		remove: [ "repeating_armures" ]
@@ -129,7 +133,10 @@
 		updateRepair();
 		updateRecipes();
 	});
-
+	// Buff / Debuff
+	on("change:repeating_conditions:condition_actif remove:repeating_conditions " + buffStats.map( stat => `change:repeating_conditions:${stat}` ).join(" "), function(e) {
+		updateBuffs();
+	});
 	// export
 	on("change:export_start", function() {
 		start_export();
@@ -164,7 +171,6 @@
 
 	function updatePrimaryStat( attr ) {
 		getAttrs( [ attr, `${attr}_mod`, `${attr}_temp_total` ], function( v ) {
-			console.log(v);
 			setAttrs({
 				[ `${attr}_total` ]: safeInt( v[ attr ] ) + safeInt( v[ attr + "_mod" ] ) + safeInt( v[ attr + "_temp_total" ] )
 			});
@@ -234,6 +240,38 @@
 		});
 	}		
 		
+	function updateBuffs() {
+		var aBuffs = [];
+		var sBuffs = {};
+		var statName ='';
+		var keyName ='';
+		
+		getSectionIDs( "repeating_conditions", function(idArray) {
+			getAttrs( [ ...idArray.map(id => `repeating_conditions_${id}_condition_actif`) ], function( sValues ) {
+				for( var i in idArray ) {
+					if( sValues[ `repeating_conditions_${idArray[i]}_condition_actif`] === "1" ) {
+						for( var j in buffStats ) {
+							aBuffs.push("repeating_conditions_" + idArray[i] + "_" + buffStats[j] );
+						}
+					}
+				}
+				
+				getAttrs(aBuffs, function(values) {
+					var v = structSafeInt( values );
+					for( var key in v ) {
+						statName = key.split('_')[4];
+						keyName = "stats_" + statName + "_buff";
+						if( sBuffs[ keyName ] != undefined ) {
+							sBuffs[ keyName ] += v[ key ];
+						} else {
+							sBuffs[ keyName ] = v[ key ];
+						}
+					}
+					setAttrs( sBuffs );
+				});
+			});
+		});
+	}
 
 	function updateDeplacement() {
 		getAttrs( [ "stats_force_total", "deplacementrapide", "deplacementrapide_duree", "deplacementsprint", "deplacementsprint_duree", "prphy" ], function( sValues ) {
@@ -2265,18 +2303,18 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td><input type="number" name="attr_temp_courage" value="0"></td>
-                                            <td><input type="number" name="attr_temp_intelligence" value="0"></td>
-                                            <td><input type="number" name="attr_temp_charisme" value="0"></td>
-                                            <td><input type="number" name="attr_temp_adresse" value="0"></td>
-                                            <td><input type="number" name="attr_temp_force" value="0"></td>
-                                            <td><input type="number" name="attr_temp_attaque" value="0"></td>
-                                            <td><input type="number" name="attr_temp_parade" value="0"></td>
-                                            <td><input type="number" name="attr_temp_jet" value="0"></td>
-                                            <td><input type="number" name="attr_temp_esquive" value="0"></td>
-                                            <td><input type="number" name="attr_temp_magiePhy" value="0"></td>
-                                            <td><input type="number" name="attr_temp_magiePsy" value="0"></td>
-                                            <td><input type="number" name="attr_temp_resiMagie" value="0"></td>
+                                            <td><input type="number" name="attr_condition_courage" value="0"></td>
+                                            <td><input type="number" name="attr_condition_intelligence" value="0"></td>
+                                            <td><input type="number" name="attr_condition_charisme" value="0"></td>
+                                            <td><input type="number" name="attr_condition_adresse" value="0"></td>
+                                            <td><input type="number" name="attr_condition_force" value="0"></td>
+                                            <td><input type="number" name="attr_condition_attaque" value="0"></td>
+                                            <td><input type="number" name="attr_condition_parade" value="0"></td>
+                                            <td><input type="number" name="attr_condition_jet" value="0"></td>
+                                            <td><input type="number" name="attr_condition_esquive" value="0"></td>
+                                            <td><input type="number" name="attr_condition_magiephy" value="0"></td>
+                                            <td><input type="number" name="attr_condition_magiepsy" value="0"></td>
+                                            <td><input type="number" name="attr_condition_resimagie" value="0"></td>
                                         </tr>
                                     </tbody>
                                 </table>
