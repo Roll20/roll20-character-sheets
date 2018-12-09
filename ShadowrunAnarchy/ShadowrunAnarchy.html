@@ -503,7 +503,7 @@
 	<input type="hidden" class="npc-toggle" name="attr_npc_toggle" />
 	<div class="npc">
 		<div class="toggle">
-			<input type="checkbox" class="options-flag" name="attr_npc_options_toggle" checked="checked" /><span>y</span>
+			<input type="checkbox" class="options-flag" name="attr_npc_options_toggle" checked="checked" /><span style="display:inline-block">y</span>
 			<div class="options">
 				<h1 data-i18n="npcoptions">NPC Options</h1>
 				<div class="row">
@@ -900,16 +900,16 @@
 	    	<div class="sheet-template-header">
 	    		{{#header}}{{header}}{{/header}}{{#spec}}<br /> <span> ({{spec}})</span>{{/spec}}<br />
 	    		{{#attr}}<span>{{attr}}</span>{{/attr}}
-	    		{{#rollLess() wound 0}}<span> ♦ Wounds</span>{{/rollLess() wound 0}}
-	    		{{#rollLess() mod 0}}<span> ♦ Modifier</span>{{/rollLess() mod 0}}
-	    		{{#rollGreater() mod 0}}<span> ♦ Modifier</span>{{/rollGreater() mod 0}}
-	    		{{#rollGreater() edge 0}}<span> ♦ Edge</span>{{/rollGreater() edge 0}}
+	    		{{#rollLess() wound 0}}<span> ♦ </span><span data-i18n="wounds">Wounds</span>{{/rollLess() wound 0}}
+	    		{{#rollLess() mod 0}}<span> ♦ </span><span data-i18n="modifier">Modifier</span>{{/rollLess() mod 0}}
+	    		{{#rollGreater() mod 0}}<span> ♦ </span><span data-i18n="modifier">Modifier</span>{{/rollGreater() mod 0}}
+	    		{{#rollGreater() edge 0}}<span> ♦ </span><span data-i18n="edge">Edge</span>{{/rollGreater() edge 0}}
 	    	</div>
 	    	<div class="sheet-template-row">
 	    		{{#dice}}{{dice}}{{/dice}}
-	    		{{#rollTotal() glitch 1}}GLITCH! {{glitch}}{{/rollTotal() glitch 1}}
-	    		{{#rollBetween() glitch 2 4}}No consequence...{{glitch}}{{/rollBetween() glitch 2 4}}
-	    		{{#rollBetween() glitch 5 6}}EXPLOIT! {{glitch}}{{/rollBetween() glitch 5 6}}
+	    		{{#rollTotal() glitch 1}}<span data-i18n="glitch">GLITCH!</span> {{glitch}}{{/rollTotal() glitch 1}}
+	    		{{#rollBetween() glitch 2 4}}<span data-i18n="nocons">No consequence...</span> {{glitch}}{{/rollBetween() glitch 2 4}}
+	    		{{#rollBetween() glitch 5 6}}<span data-i18n="exploit">EXPLOIT! </span>{{glitch}}{{/rollBetween() glitch 5 6}}
 	    		{{#desc}}<span class="sheet-template-desc">{{desc}}</span>{{/desc}}
 	    	</div>
 	    </div>
@@ -1004,63 +1004,47 @@ on("change:edge_toggle", function() {
 });
 
     //Set the Attribute to a name for the Roll Template
-on("change:repeating_skills:skill_attribute", function() {
-   getAttrs(["repeating_skills_skill_attribute"], function(v) {
-        console.log(v.repeating_skills_skill_attribute);
-        switch (v.repeating_skills_skill_attribute) {
-            case '@{strength}':
-                setAttrs({
-                  repeating_skills_attribute_name: "Strength" 
-                });
-                break;
-            case '@{agility}':
-                setAttrs({
-                  repeating_skills_attribute_name: "Agility" 
-                });
-                break;
-            case '@{willpower}':
-                setAttrs({
-                  repeating_skills_attribute_name: "Willpower" 
-                });
-                break;
-            case '@{logic}':
-                setAttrs({
-                  repeating_skills_attribute_name: "Logic" 
-                });
-                break;
-            case '@{charisma}':
-                setAttrs({
-                  repeating_skills_attribute_name: "Charisma" 
-                });
-                break;
-            case '@{edge}':
-                setAttrs({
-                  repeating_skills_attribute_name: "Edge" 
-                });
-                break;
-            case '0':
-                setAttrs({
-                  repeating_skills_attribute_name: "Knowledge" 
-                });
-                break;    
-            default:
-                setAttrs({
-                  repeating_skills_attribute_name: "Null Attribute" 
-                });
-        }
+on("change:repeating_skills:skill_attribute", function(eventinfo) {
+	const skill = eventinfo.newValue;
+    switch (skill) {
+        case '@{strength}':
+        	attr = "Strength"
+            break;
+        case '@{agility}':
+        	attr = "Agility"
+            break;
+        case '@{willpower}':
+       		attr = "Willpower"
+            break;
+        case '@{logic}':
+        	attr = "Logic"
+            break;
+        case '@{charisma}':
+        	attr = "Charisma"
+            break;
+        case '@{edge}':
+        	attr = "Edge"
+            break;
+        case '0':
+        	attr = "Knowledge"
+            break;    
+        default:
+        	attr = "Null Attribute"
+    }
+
+   setAttrs({
+      repeating_skills_attribute_name: attr
    });
 });
 
     //Put () around Skill specializations
-on("change:repeating_skills:skill_specalization", function() {
-    getAttrs(["repeating_skills_skill_specalization"], function(v){
-        var ski = "(" + (v.repeating_skills_skill_specalization) + ")";
-        var emp = "";
-        if (v.repeating_skills_skill_specalization === '') {
-        	setAttrs({repeating_skills_skill_spec_display: emp});
-        } else {setAttrs({repeating_skills_skill_spec_display: ski});
-        };
-    });
+on("change:repeating_skills:skill_specalization", function(eventinfo) {
+	const ski = eventinfo.newValue;
+	const spec = (ski) ? `(${ski})` : "";
+
+	setAttrs({
+		repeating_skills_skill_spec_display: spec
+	});
 });
 
 	//NPC Skill Toggles
@@ -1105,9 +1089,6 @@ on("change:repeating_skills", function() {
 	getAttrs(["repeating_skills_skill", "repeating_skills_skill_specalization"], function(v) {
 		const skill = (v.repeating_skills_skill);
 		const spec = (v.repeating_skills_skill_specalization);
-
-		console.log(skill.length + "skill");
-		console.log(spec.length + "spec");
 
 		if (spec === "") {
 
