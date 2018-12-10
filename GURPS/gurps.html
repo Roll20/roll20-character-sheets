@@ -581,16 +581,20 @@
 					<div class="sheet-cell sheet-col1">
 					    <input type="checkbox" name="attr_flight_checked" value="1" class="sheet-boolean" />
 					</div>
+					<div class="sheet-cell sheet-col2">
+						&nbsp;
+					</div>
+					<div class="sheet-cell sheet-col3">
+						<input type="number" name="attr_flight_points" value="0" class="editable" />
+					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-basic-move">
 					<div class="sheet-cell sheet-col0 sheet-label">
 						<div class="sheet-popup">Air Mv</div>
 						<span class="sheet-tooltip">
-							Air Move = Basic Speed * 2
+							Bas Air Move = Basic Speed * 2 = <input class="sheet-inline" type="number" name="attr_basic_air_move_unmodified" readonly="readonly">
 							<br />
 							2pts/level, you can use up and down arrows
-							<br />
-							Unmodified: <input class="sheet-inline" type="number" name="attr_basic_air_move_unmodified" readonly="readonly">
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
@@ -610,7 +614,8 @@
 							Enhanced Air Move<br />
 							Modifier box: steps of .5, you can use up and down arrows.<br />
 							Points box: 10 points per half-level, you can use up and down arrows.<br />
-							Each level doubles top air move. Half-level is a multiple of 1.5.
+							Each level doubles top air move. Half-level is a multiple of 1.5.<br />
+							Level: <span name="attr_enhanced_air_move_level" value="0"></span>
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
@@ -1049,7 +1054,7 @@
 						Attributes
 					</div>
 					<div class="sheet-cell sheet-col1">
-						<input type="text" name="attr_att_points" value="@{strength_points} + @{dexterity_points} + @{intelligence_points} + @{health_points} + @{perception_points} + @{vision_points} + @{hearing_points} + @{taste_smell_points} + @{touch_points} + @{willpower_points} + @{fear_check_points} + @{hit_points_points} + @{fatigue_points_points} + @{energy_points_points} + @{user_pool1_points} + @{user_pool2_points} + @{basic_speed_points} + @{basic_move_points} + @{striking_st_points} + @{lift_st_points} + @{enhanced_ground_move_points}" disabled="disabled" />
+						<input type="text" name="attr_att_points" value="@{strength_points} + @{dexterity_points} + @{intelligence_points} + @{health_points} + @{perception_points} + @{vision_points} + @{hearing_points} + @{taste_smell_points} + @{touch_points} + @{willpower_points} + @{fear_check_points} + @{hit_points_points} + @{fatigue_points_points} + @{energy_points_points} + @{user_pool1_points} + @{user_pool2_points} + @{basic_speed_points} + @{basic_move_points} + @{striking_st_points} + @{lift_st_points} + @{enhanced_ground_move_points} + @{flight_points} + @{basic_air_move_points} + @{enhanced_air_move_points} + @{enhanced_air_move_points}" disabled="disabled" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-traits">
@@ -4181,64 +4186,122 @@
         
     } 
     
-    on("change:flight_checked", function(e) {
+    // check for changes that affect flight speed
+    on("change:flight_checked change:basic_speed change:basic_air_move_points change:basic_air_move_mod change:enhanced_air_level change:enhanced_air_move_points", function(e) {
         
         updateFlightValues();
         
     });
     
+    /**
+     * Update flight values, including encumbered and current speed
+     * 
+     * @return void
+     */
     function updateFlightValues() {
         
-        console.log("updateFlightValues");
-     
-        getAttrs(["flight_checked", "basic_speed", "enhanced_air_level", "basic_air_move", "basic_air_move_mod", "basic_air_move_points"], function(values) {
+        getAttrs(["flight_checked", "basic_speed", "enhanced_air_level", "basic_air_move", "basic_air_move_mod", "basic_air_move_points", "enhanced_air_level", "enhanced_air_move_points"], function(values) {
+            
+            // + sign converts value to a number
+            var airMovePoints = +values.basic_air_move_points;
+            
+            // ensure valid airMovePoints
+            if (airMovePoints < 0) {
+                airMovePoints = 0;
+            }
+            
+            var basicAirMoveMod = +values.basic_air_move_mod;
+            
+            // ensure valid basicAirMoveMod
+            if (basicAirMoveMod < 0) {
+                basicAirMoveMod = 0;    
+            }
             
             var airMoveUnmodified = 0;
             
             var airMove = 0;
             
-            var airMovePointsModifier = 0;
+            var airModifierFromPoints = 0;
             
-            var enhancedAirMove = 0;
+            var baseEnhancedAirMove = "";
+            
+            var enhancedAirLevel = 0;
+            
+            var enhancedEnteredLevel = +values.enhanced_air_level;
+            
+            // ensure valid enhancedEnteredLevel
+            if (enhancedEnteredLevel < 0) {
+                enhancedEnteredLevel = 0;
+            }    
+            
+            var enhancedEnteredPoints = +values.enhanced_air_move_points;
+            
+            // ensure valid enhancedEnteredPoints
+            if (enhancedEnteredPoints < 0) {
+                enhancedEnteredPoints = 0;
+            }
+            
+            var enhancedAirLevelFromPoints = 0;
+            
+            var totalEnhancedLevel = 0;
             
             // if flight is checked, calculate the values
             if (values.flight_checked == 1) {
                 
+                //----------------
+                // calculate air move
                 airMoveUnmodified = +values.basic_speed * 2;
                 
                 // base is basis_speed * 2
                 airMove = +values.basic_speed * 2;
                 
                 // add air move modifier
-                // NOTE: adding plus sign right before variable forces 
-                //       javascript to treat it as a number
-                airMove = airMove + (+values.basic_air_move_mod);
+                airMove = airMove + basicAirMoveMod;
                 
-                // add/subtract points applied to air move
-                // 2 pts = 1 move. 
-                airMovePointsModifier = +values.basic_air_move_points/2;
+                // make sure airMovePoints is multiple of 2
+                // https://stackoverflow.com/questions/18953384/javascript-round-up-to-the-next-multiple-of-5 
+                airMovePoints = Math.ceil(airMovePoints / 2) * 2;    
                 
-                airMove = airMove + airMovePointsModifier;
+                airModifierFromPoints = airMovePoints/2;
                 
-                enhancedAirMove = airMove * 2;
+                // add in the air move from spent points
+                airMove = airMove + airModifierFromPoints;
+                
+                //-----------------
+                // calculate top air speed
+                // make sure groundPoints is multiple of 10
+                // https://stackoverflow.com/questions/18953384/javascript-round-up-to-the-next-multiple-of-5 
+                enhancedEnteredPoints = Math.ceil(enhancedEnteredPoints / 10) * 10;
+                
+                enhancedAirLevelFromPoints = enhancedEnteredPoints / 20;
+                
+                // make sure enhancedEnteredLevel is multiple of .5
+                // https://stackoverflow.com/questions/25209849/javascript-round-up-to-nearest-5 
+                enhancedEnteredLevel = Math.ceil(enhancedEnteredLevel * 2) / 2;
+                
+                totalEnhancedLevel = enhancedEnteredLevel + enhancedAirLevelFromPoints;
+                
+                baseEnhancedAirMove = getEnhancedValue(airMove, totalEnhancedLevel);
                 
             } else {
                 
                 airMove = 0;
                 
-                enhancedAirMove = 0;
+                baseEnhancedAirMove = 0;
             }
             
             // set air moves
             setAttrs({
                 "basic_air_move": airMove, 
-                "enhanced_air_move": enhancedAirMove,
-                "basic_air_move_unmodified": airMoveUnmodified
+                "basic_air_move_unmodified": airMoveUnmodified, 
+                "enhanced_air_move": baseEnhancedAirMove,
+                "enhanced_air_move_level": totalEnhancedLevel
             });
                 
             
         });
         
     }
-
+    
+   
 </script>
