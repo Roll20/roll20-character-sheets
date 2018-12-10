@@ -31,7 +31,16 @@ module.exports = function(grunt) {
             {
               pattern: /\.((?!charsheet)[^ .\n]+)(?=.+\{)/g,
               replacement: function(match, p1) {
-                return '.sheet-' + p1;
+                if(p1 === 'itemcontrol' || p1 === 'repcontainer' || p1 === 'repcontrol' || p1 === 'repitem')
+                  return '.' + p1;
+                else
+                  return '.sheet-' + p1;
+              }
+            },
+            {
+              pattern: /#([^ .\n]+)(?=.+\{)/g,
+              replacement: function(match, p1) {
+                return `#sheet-${p1}`;
               }
             }
           ]
