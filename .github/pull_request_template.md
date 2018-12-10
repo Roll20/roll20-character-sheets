@@ -1,18 +1,13 @@
-*Include the name of the sheet you made changes to in the title.*
-
-## Changes
+## Changes / Comments
 
 *Provide a few comments about what you have changed.*
 
 
-## Additional comments
-
-
-*Anything else we should know?.*
-
 
 
 ## Roll20 Requests
+
+*Include the name of the sheet you made changes to in the title.*
 
 - If changes fix a bug or resolves a feature request, be sure to link to that issue. 
 - For pull request that change multiple sheets please confirm these changes are intentional for all sheets. This will help us catch unintended submissions.
