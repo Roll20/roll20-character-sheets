@@ -11111,7 +11111,15 @@
         var allProficiencies = {"Weapon": [], "Armor": [], "Skill": [], "Tool": [], "Language": [], "Expertise": []};
         var toSet = {};
         var mancerdata = data || getCharmancerData();
-        var blobs = getRelevantBlobs(mancerdata, "1", "l1");
+        var thismancer = currentSlide ? currentSlide.split("-")[0] : "l1";
+        var blobs = {};
+        if(thismancer == "l1") {
+            blobs = getRelevantBlobs(mancerdata, "1", "l1");
+        } else {
+            blobs = getAllLpBlobs(data, true);
+            allProficiencies = data["lp-welcome"].values["previous_proficiencies"] ? JSON.parse(data["lp-welcome"].values["previous_proficiencies"]) : allProficiencies;
+        }
+        currentSlide = currentSlide == "lp-finish" ? "finish" : currentSlide;
         //For this first part, we're only concerned with choices that have already been made
         //Get all of the "automatic" proficiencies
         _.each(blobs.sorted, function(blobarray, section) {
@@ -11128,40 +11136,46 @@
             });
         });
         //Gather all of the chosen proficiencies
-        _.each(mancerdata, function(slide) {
-            _.each(proficiencyList, function(prof) {
+        _.each(mancerdata, function(slide, slidename) {
+            if(slidename.split("-")[0] == thismancer) {
+                _.each(proficiencyList, function(prof) {
+                    _.each(slide.values, function(value, name) {
+                        if(name.split("_")[3] == prof.toLowerCase() && name.split("_")[4] == "choice") {
+                            if(value != "custom") allProficiencies[prof].push(value.split(":")[1]);
+                        }
+                    });
+                });
+                //Get a list of chosen expertise
                 _.each(slide.values, function(value, name) {
-                    if(name.split("_")[3] == prof.toLowerCase() && name.split("_")[4] == "choice") {
-                        if(value != "custom") allProficiencies[prof].push(value.split(":")[1]);
+                    if(name.substr(-16) == "expertise_choice") {
+                        allProficiencies.Expertise.push(value.split(":")[1]);
                     }
                 });
-            });
-            //Get a list of chosen expertise
-            _.each(slide.values, function(value, name) {
-                if(name.substr(-16) == "expertise_choice") {
-                    allProficiencies.Expertise.push(value.split(":")[1]);
-                }
-            });
+            }
         });
         //Gather proficiencies from custom choices
-        _.each(mancerdata, function(slide) {
-            _.each(slide.values, function(value, name) {
-                if(name.substr(-18) == "proficiency_choice") {
-                    if(value != "custom") allProficiencies[slide.values[name.replace("choice", "type")]].push(value.split(":")[1]);
-                }
-            });
+        _.each(mancerdata, function(slide, slidename) {
+            if(slidename.split("-")[0] == thismancer) {
+                _.each(slide.values, function(value, name) {
+                    if(name.substr(-18) == "proficiency_choice") {
+                        if(value != "custom") allProficiencies[slide.values[name.replace("choice", "type")]].push(value.split(":")[1]);
+                    }
+                });
+            }
         });
         //If the expertise choice is from the "known" list, make sure the choice is still available
         //Reset to "" if not available. Don't do this if we're applying changes
         if(currentSlide != "finish") {
-            _.each(mancerdata, function(slide) {
-                _.each(slide.values, function(value, name) {
-                    if(name.substr(-16) == "expertise_choice" && slide.values[name.replace("choice", "info")]) {
-                        if(!(allProficiencies.Skill.includes(value.split(":")[1]) || allProficiencies.Tool.includes(value.split(":")[1]))) {
-                            toSet[name] = "";
+            _.each(mancerdata, function(slide, slidename) {
+                if(slidename.split("-")[0] == thismancer) {
+                    _.each(slide.values, function(value, name) {
+                        if(name.substr(-16) == "expertise_choice" && slide.values[name.replace("choice", "info")]) {
+                            if(!(allProficiencies.Skill.includes(value.split(":")[1]) || allProficiencies.Tool.includes(value.split(":")[1]))) {
+                                toSet[name] = "";
+                            }
                         }
-                    }
-                });
+                    });
+                }
             });
             setAttrs(toSet);
         }
@@ -11397,9 +11411,11 @@
         return _.last(result.split(":"));
     };
 
-    var filterBlobs = function(blobs, filters, multiclass) {
-        var remove = multiclass ? "no" : "yes";
+    var filterBlobs = function(blobs, filters) {
+        var remove = filters.multiclass ? "no" : "yes";
         var results = {};
+        delete filters.multiclass;
+        delete filters.slide;
         _.each(blobs, function(blob, name) {
             var match = true;
             _.each(filters, function(v, k) {
@@ -11530,14 +11546,13 @@
         var element = element ? element : section + "_holder";
         var sorted = {choices: {}, traits: {}, other: {}};
         var mancerdata = getCharmancerData();
-        var profdata = getProficiencies(mancerdata);
-        var displayblobs = {};
+        var profdata = getProficiencies(mancerdata, filters.slide);
+        var filtered = {};
         if(thisblob) {
-            displayblobs[thisblob] = blobs[thisblob];
+            filtered[thisblob] = blobs[thisblob];
         } else {
-            displayblobs = blobs;
+            filtered = filterBlobs(blobs, filters);
         }
-        var filtered = filterBlobs(displayblobs, filters);
         _.each(filtered, function(blob, name) {
             if(name.split(" ")[0] == "Proficiencies") {
                 sorted.proficiencies = blob;
@@ -12617,7 +12632,14 @@
         var proficiencies = getProficiencies(mancerdata, eventinfo.currentStep);
         var section = eventinfo.sourceSection.split("_")[2].split("-")[0];
         var type = eventinfo.sourceSection.split("_")[3];
-        var sourcepage = eventinfo.currentStep.split("-")[0] == "lp" ? "lp-levels" : eventinfo.currentStep;
+        var sourcepage = eventinfo.currentStep;
+        if(eventinfo.currentStep.split("-")[0] == "lp") {
+            var sectioninfo = eventinfo.sourceSection.split("_")[2].split("--")[0].split("-");
+            sourcepage = "lp-levels";
+            section = "class" + sectioninfo[1];
+            if(sectioninfo[0] == "subclass") section += "_subclass";
+            console.log(section);
+        }
         var pagedata = mancerdata[sourcepage].data[section];
         if(_.last(eventinfo.sourceAttribute.split("_")) == "choice") {
             if(type == "feature") {
@@ -13693,7 +13715,7 @@
         var currentDrop = 0;
         var totalDrops = 1;
         var allSkills = ["athletics", "acrobatics", "sleight_of_hand", "stealth", "arcana", "history", "investigation", "nature", "religion", "animal_handling", "insight", "medicine", "perception", "survival","deception", "intimidation", "performance", "persuasion"];
-        var allAbilities = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
+        var allAbilities = abilityList.map(function(x) {return x.toLowerCase()});
         var eraseSections = ["attack", "inventory", "traits", "resource", "proficiencies", "tool", "damagemod", "spell-cantrip", "hpmod", "acmod", "tohitmod"];
         console.log(blobs);
         for(var x=1; x<=9; x++) {
@@ -14012,6 +14034,12 @@
         mancerdata = mancerdata || getCharmancerData();
         var abilities = mancerdata["lp-welcome"].values["previous_abilities"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_abilities"]) : {};
         var lcAbilities = abilityList.map(function(x) {return x.toLowerCase()});
+        //Set previous scores first
+        _.each(lcAbilities, function(ability) {
+            abilities[ability + "_previous"] = abilities[ability];
+            abilities[ability + "_previous_mod"] = abilities[ability + "_mod"];
+        });
+        //Now add asi if it exists
         if(mancerdata["lp-asi"]) {
             _.each(mancerdata["lp-asi"].repeating, function(repid) {
                 if(repid.substr(31) == "asi-row" && mancerdata["lp-asi"].values[repid + "_switch"] != "feat") {
@@ -14042,7 +14070,7 @@
         });
         buttons += "<li><button class=\"exit\" type=\"action\" name=\"act_cancel\" data-i18n=\"cancel-u\">CANCEL</button></li>";
         setCharmancerText({steps: buttons});
-        if(eventinfo.triggerName != "lp-welcome") {
+        if(eventinfo.triggerName != "lp-welcome" && eventinfo.triggerName != "lp-summary") {
             addRepeatingSection("topbar-holder", "leveler-topbar");
             recalcLpData();
             getProficiencies(mancerdata, eventinfo.currentStep);
@@ -14061,8 +14089,16 @@
             } else {
                 callback(results);
             }
-        }
+        };
+        var capitalize = function(string) {
+            return string.split(" ").map((x) => {
+                x = x.toLowerCase();
+                return x[0].toUpperCase() + x.substr(1, x.length);
+            }).join(" ");
+        };
         var spellSections = ["spell-cantrip"];
+        var allSkills = ["athletics", "acrobatics", "sleight_of_hand", "stealth", "arcana", "history", "investigation", "nature", "religion", "animal_handling", "insight", "medicine", "perception", "survival","deception", "intimidation", "performance", "persuasion"];
+        var skillget = [];
         for(var x=1; x<=9; x++) {
             spellSections.push("spell-" + x);
         }
@@ -14086,183 +14122,216 @@
                 });
                 setAttrs({spellinfo: JSON.stringify(spellInfo)});
             });
-            getAttrs(["strength", "strength_mod", "dexterity", "dexterity_mod", "constitution", "constitution_mod", "intelligence", "intelligence_mod", "wisdom", "wisdom_mod", "charisma", "charisma_mod"], function(attrs) {
-                setAttrs({previous_abilities: JSON.stringify(attrs)});
+        });
+        getAttrs(["strength", "strength_mod", "dexterity", "dexterity_mod", "constitution", "constitution_mod", "intelligence", "intelligence_mod", "wisdom", "wisdom_mod", "charisma", "charisma_mod"], function(attrs) {
+            setAttrs({previous_abilities: JSON.stringify(attrs)});
+        });
+        getAttrs(["class", "subclass", "base_level", "multiclass1_flag", "multiclass2_flag", "multiclass3_flag", "multiclass1", "multiclass1_lvl", "multiclass1_subclass", "multiclass2", "multiclass2_lvl", "multiclass2_subclass", "multiclass3", "multiclass3_lvl", "multiclass3_subclass", "hp_max"], function(v) {
+            setAttrs({previous_attributes: JSON.stringify(v)});
+        });
+        _.each(allSkills, function(skill) {
+            skillget.push(skill + "_prof");
+            skillget.push(skill + "_type");
+        });
+        getAttrs(skillget, function(v) {
+            var proficiencies = {"Weapon": [], "Armor": [], "Skill": [], "Tool": [], "Language": [], "Expertise": []};
+            _.each(allSkills, function(skill) {
+                if(v[skill + "_prof"] !== "0") {
+                    proficiencies.Skill.push(capitalize(skill.replace(/_/g, " ")));
+                }
+                if(v[skill + "_type"] !== "1" && v[skill + "_prof"] !== "0") {
+                    proficiencies.Skill.push(capitalize(skill.replace(/_/g, " ")));
+                }
             });
-
+            getSectionIDs("tool", function(ids) {
+                var getList = [];
+                _.each(ids, function(id) {
+                    getList.push("repeating_tool_" + id + "_toolname");
+                    getList.push("repeating_tool_" + id + "_toolbonus_base");
+                });
+                getAttrs(getList, function(v) {
+                    _.each(ids, function(id) {
+                        proficiencies.Tool.push(v["repeating_tool_" + id + "_toolname"]);
+                        if(v["repeating_tool_" + id + "_toolbonus_base"] == "(@{pb}*2)") {
+                            proficiencies.Expertise.push(v["repeating_tool_" + id + "_toolname"]);
+                        };
+                    });
+                    getSectionIDs("proficiencies", function(ids) {
+                        var getList = [];
+                        _.each(ids, function(id) {
+                            getList.push("repeating_proficiencies_" + id + "_name");
+                            getList.push("repeating_proficiencies_" + id + "_prof_type");
+                        });
+                        getAttrs(getList, function(v) {
+                            _.each(ids, function(id) {
+                                proficiencies[capitalize(v["repeating_proficiencies_" + id + "_prof_type"])].push(v["repeating_proficiencies_" + id + "_name"]);
+                            });
+                            setAttrs({previous_proficiencies: JSON.stringify(proficiencies)});
+                        });
+                    });
+                });
+            });
         });
     });
 
     //DEV 1378
     on("page:lp-levels", function(eventinfo) {
         deleteCharmancerData(["lp-choices"]);
-        getAttrs(["class", "base_level", "multiclass1_flag", "multiclass2_flag", "multiclass3_flag", "multiclass1", "multiclass1_lvl", "multiclass2", "multiclass2_lvl", "multiclass3", "multiclass3_lvl"], function(v) {
+        getAttrs(["class", "base_level", "multiclass1_flag", "multiclass2_flag", "multiclass3_flag", "multiclass1", "multiclass1_lvl", "multiclass2", "multiclass2_lvl", "multiclass3", "multiclass3_lvl", "subclass_level", "subclass", "multiclass1_subclass", "multiclass2_subclass", "multiclass3_subclass"], function(v) {
             const mancerdata = getCharmancerData();
             const leveldata  = mancerdata["lp-levels"].values || undefined;
-            const class1     = v.class;
+            const class1     = v.class, subclass1 = v.subclass;
             let set          = {};
             let update       = {};
             
-            if(!leveldata["class1_currentlevel"]) set["class1_currentlevel"] = v.base_level;
-            if(!leveldata["class1"]) {
-                set["class1"] = "Classes:" + v.class
-                update["class1_selector"] = `<select name="comp_class1" style="width: 70%;" value="">
-                    <option value="Classes:${class1}" data-i18n="${class1}" selected>${class1}</option>
-                </select>`;
+            set["class1_currentlevel"] = v.base_level;
+            update["class1_selector"] = `<div style="width:20%; display: inherit;">${class1}</div>`;
+            if (v.subclass) { 
+                update[`subclass1_selector`] = `<div>${subclass1}</div>`;
+                set["class1_subclass"] = v.subclass1; 
             };
+            
+            const multiclass = parseInt(v[`multiclass1_flag`]) + parseInt(v[`multiclass2_flag`]) + parseInt(v[`multiclass3_flag`]);
+            set["multiclass"] = (!mancerdata["lp-levels"].values["multiclass"]) ? multiclass : mancerdata["lp-levels"].values["multiclass"];
+            set["multiclass_initial"] = multiclass;
 
-            if(!leveldata["multiclass_initial"]) {
-                const multiclass = parseInt(v[`multiclass1_flag`]) + parseInt(v[`multiclass2_flag`]) + parseInt(v[`multiclass3_flag`]);
-                set["multiclass"] = multiclass;
-                set["multiclass_initial"] = multiclass;
+            for (x = 1; x <= 3; x++) {
+                const x1 = x + 1;
+                if(v[`multiclass${x}_flag`] === "1") {
+                    const classes = v[`multiclass${x}`];
+                    set[`class${x1}`] = "Classes:" + v[`multiclass${x}`];
+                    set[`class${x1}_currentlevel`] = v[`multiclass${x}_lvl`];
+                    update[`class${x1}_selector`] = `<div style="width:20%; display: inherit;">${classes}</div>`;
 
-                for (x = 1; x <= 3; x++) {
-                    const x1 = x + 1;
-                    if(v[`multiclass${x}_flag`] === "1" && !leveldata[`class${x1}`]) {
-                        const classes = v[`multiclass${x}`];
-
-                        set[`class${x1}`] = "Classes:" + v[`multiclass${x}`];
-                        set[`class${x1}_currentlevel`] = v[`multiclass${x}_lvl`];
-
-                        update[`class${x1}_selector`] = `<select name="comp_class${x1}" style="width: 70%;" value="">
-                         <option value="Classes:${classes}" data-i18n="${classes}" selected>${classes}</option>
-                        </select>`;
+                    if (v[`multiclass${x}_subclass`]) {
+                        set[`class${x1}_subclass`] = v[`multiclass${x}_subclass`];
                     };
+                } else  {
+                    set[`class${x1}_currentlevel`] = 0;
                 };
             };
 
             setAttrs(set);
             setCharmancerText(update);
-            update_levels_message();
+            update_levels();
 
-            changeCompendiumPage("sheet-levels-info", ["Classes:"] + v.class);
+            changeCompendiumPage("sheet-levels-info", ["Classes:"] + class1);
 
-            //console.log("===== 5E LEVEL LOGS: PAGE OPEN =====");
-            //console.log(eventinfo);
-            //console.log(leveldata);
-            //console.log(set);
-            //console.log("=====  END 5E LEVEL END ===== ");
+            console.log("===== LP Levels Slide was Opened =====");
+            console.log(set);
         });
     });
 
     on("mancerchange:class1 mancerchange:class2 mancerchange:class3 mancerchange:class4", function(eventinfo) {
         const mancerdata= getCharmancerData();
-        const leveldata = mancerdata["lp-levels"].values;
+        const leveldata = mancerdata["lp-levels"];
         const levelclass= eventinfo.sourceAttribute;
+        console.log(eventinfo);
 
         getCompendiumPage(eventinfo.newValue, function(p) {
-            const data       = p.data;
-            let set          = {};
-            const class_name = eventinfo.newValue && eventinfo.newValue.split(":").length > 1 && eventinfo.newValue.split(":")[0] === "Classes" ? eventinfo.newValue.split(":")[1] : false;
+            const data          = p.data;
+            let set             = {};
+            let update          = {};
+            const class_name    = eventinfo.newValue && eventinfo.newValue.split(":").length > 1 && eventinfo.newValue.split(":")[0] === "Classes" ? eventinfo.newValue.split(":")[1] : false;
+            const subclass_name = data["Subclass Name"];
             
-            set[`${levelclass}_addlevel`] = leveldata[`${levelclass}_addlevel`] ? leveldata[`${levelclass}_addlevel`] : "";
-            set[`${levelclass}_hitdie`] = data["Hit Die"];
+            if (levelclass === "class1") {
+                set[`${levelclass}_addlevel`] = leveldata.values[`${levelclass}_addlevel`] ? leveldata.values[`${levelclass}_addlevel`] : 1;
+            } else {
+                set[`${levelclass}_addlevel`] = leveldata.values[`${levelclass}_addlevel`] ? leveldata.values[`${levelclass}_addlevel`] : 0;
+            };
 
-           if(class_name) {
+            set[`${levelclass}_hitdie`] = data["Hit Die"];
+            update[`sub${levelclass}_name`] = `<h5>${subclass_name}</h5>`;
+            if(class_name) {
                 var subOptions = {show_source: true};
 
                 (eventinfo.sourceType != "player") ? subOptions.silent = true : subOptions.selected = "";
 
                 setCharmancerOptions(levelclass + "_subclass","Category:Subclasses data-Parent:" + class_name, subOptions, function(values) {
-                    if (values.length) showChoices(["subclass"]);
                 });
             };
-            
-            let update = {}; //Not being used
-            setCharmancerText(update); //Not being used
 
+            const presets = [leveldata.values.class1, leveldata.values.class2, leveldata.values.class3, leveldata.values.class4];
+            for (x = 2; x <= 4; x++) {
+                disableCharmancerOptions(`class${x}`, presets);
+            };
+
+            setCharmancerText(update);
             setAttrs(set);
-            update_levels_message();
+            update_levels();
             update_hp(levelclass);
 
-            //console.log(`===== 5E LEVEL LOGS: CHANGE ${levelclass} =====`);
-            //console.log(leveldata);
-            //console.log(set);
-            //console.log(`=====  END 5E LEVEL LOGS END for ${levelclass} ===== `);
+            console.log(`${levelclass} the ${class_name} was changed`);
+            console.log(leveldata);
         });
     });
 
     //This needs to change is some manner
     on("mancerchange:class1_subclass", function(eventinfo) {
         var mancerdata = getCharmancerData();
-        changeCompendiumPage("sheet-levels-info", eventinfo.newValue);
+
+        (eventinfo.sourceType === "player") ? changeCompendiumPage("sheet-levels-info", eventinfo.newValue) : false;
         getCompendiumPage(eventinfo.newValue, function(p) {
         });
     });
 
    on("mancerchange:class1_addlevel mancerchange:class2_addlevel mancerchange:class3_addlevel mancerchange:class4_addlevel", function(eventinfo) {
-        const mancerdata  = getCharmancerData();
-        const leveldata   = mancerdata["lp-levels"];
-        const levelclass  = eventinfo.sourceAttribute.slice(0, 6);
-        const currentlevel= parseInt(leveldata.values[`${levelclass}_currentlevel`]);
-        const resultlevel = parseInt(eventinfo.newValue) + currentlevel;
+        const mancerdata    = getCharmancerData();
+        const leveldata     = mancerdata["lp-levels"];
+        const levelclass    = eventinfo.sourceAttribute.slice(0, 6);
+        const classlevel    = (parseInt(eventinfo.newValue) || 0) + (parseInt(leveldata.values[`${levelclass}_currentlevel`]) || 0);
         const subclasslevel = (leveldata.data[`${levelclass}`]["data-Subclass Level"]) ? parseInt(leveldata.data[`${levelclass}`]["data-Subclass Level"]) : 1;
-        (currentlevel < subclasslevel && resultlevel >= subclasslevel) ? showChoices([`sub${levelclass}`]) : hideChoices([`sub${levelclass}`]);
-    
-        update_levels_message();
+        let set             = {};
+        let update          = {};
+
+        set[`${levelclass}_classlevel`] = classlevel;
+       if (classlevel >= subclasslevel)  {
+            update[`sub${levelclass}_warning`] = ``;
+            showChoices([`sub${levelclass}`]);
+       } else {
+            update[`sub${levelclass}_warning`] = `<p>You receive a subclass at level ${subclasslevel}. Your total level is ${classlevel}.</p>`;
+            hideChoices([`sub${levelclass}`]);
+       };
+
+        setCharmancerText(update);
+        setAttrs(set);
+        update_levels();
         update_hp(levelclass);
 
-       /* console.log(`===== 5E LEVEL LOGS: ADD LEVEL for ${levelclass} =====`);
-        console.log(`Subclass requires level ${subclasslevel}. The class started at ${currentlevel} and will be ${resultlevel}.`);
-        console.log(`=====  END 5E LEVEL END for ${levelclass} ===== `);*/
+        console.log(`Subclass requires level ${subclasslevel}. The class level is ${classlevel}.`);
+        console.log(leveldata);
     });
 
-    //Calculate the Average HP and store if for use later
-    //Update the Roll button as needed
-    //Does not yet work with By Level checkbox
+    //Calculate the Average HP and store if for use later. Update the Roll button as needed
     const update_hp = (levelclass) => {
         const mancerdata = getCharmancerData();
         const leveldata = mancerdata["lp-levels"].values, hitdie = leveldata[`${levelclass}_hitdie`], levels = leveldata[`${levelclass}_addlevel`] || 0;
 
         if (levels && hitdie) {
-            getAttrs(["constitution_mod"], function(v) {
-                const conmod = parseInt(v.constitution_mod) || 0, conbonus = conmod * levels;
+            //Set the Roll for HP button
+            let update = {};
+            update[`${levelclass}_rollhp`] = `<button type="roll" name="roll_${levelclass}_rollhp" value="@{wtype}&{template:mancerroll} {{title=Roll for HP}} {{r1=[[${levels}${hitdie}]]}}">Roll</button>`;
+            setCharmancerText(update);
 
-                //Set the Roll for HP button
-                let update = {};
-                update[`${levelclass}_rollhp`] = `<button type="roll" name="roll_${levelclass}_rollhp" value="@{wtype}&{template:mancerroll} {{title=Roll for HP}} {{r1=[[${levels}${hitdie}+${conbonus}]]}}">Roll</button>`;
-                setCharmancerText(update);
+            //Total up the average HP
+            const size = hitdie.slice(1);
+            let num = [], sum = 0, set = {};
 
-                //Total up the average HP
-                const size = hitdie.slice(1);
-                let num = [], sum = 0, set = {};
+            for(x = 1; x <= size; x++) {
+               num.push(x);
+            };
 
-                for(x = 1; x <= size; x++) {
-                   num.push(x);
-                };
+            for(i = 0; i < num.length; i++) {
+                sum += num[i];
+            };
 
-                for(i = 0; i < num.length; i++) {
-                    sum += num[i];
-                };
+            let avg = Math.ceil(sum / num.length), hp = avg * levels;
 
-                let avg = Math.ceil(sum / num.length), hp = avg * levels + conbonus;
-
-                set[`${levelclass}_averagehp`] = hp;
-                setAttrs(set);
-
-                //console.log("===== 5E LEVEL LOGS: HP SIZE =====");
-                //console.log(`The sum is ${sum} and the die size was ${size}. The Average is ${avg}. Which makes the hp equal to ${hp}`);
-                //console.log("=====  END 5E LEVEL LOGS: HP SIZE ===== ");
-            });
+            set[`${levelclass}_averagehp`] = hp;
+            setAttrs(set);
         };
     };
-
-    on("mancerchange:class1_addhpAverage mancerchange:class2_addhpAverage mancerchange:class3_addhpAverage mancerchange:class4_addhpAverage mancerchange:class1_averagehp mancerchange:class2_averagehp mancerchange:class3_averagehp mancerchange:class4_averagehp", function(eventinfo) {
-        const mancerdata= getCharmancerData();
-        const leveldata = mancerdata["lp-levels"].values, levelclass = eventinfo.sourceAttribute.slice(0, 6), hp = leveldata[`${levelclass}_averagehp`];
-        let set         = {};
-
-        //REMOVE LATER
-        //console.log("===== 5E LEVEL LOGS: AVERAGE HP CHECKBOX =====");
-        //console.log(hp);
-        //console.log(eventinfo);
-        console.log(leveldata);
-        //console.log("=====  END 5E LEVEL LOGS: HP ===== ");
-
-        (leveldata[`${levelclass}_addhpAverage`] === "on") ? set[`${levelclass}_addhp`] = hp : (eventinfo.sourceType === "player") ? set[`${levelclass}_addhp`] = "" : false;
-
-        setAttrs(set);
-    });
 
     //Roll HP 1
     on("mancerroll:class1_rollhp mancerroll:class2_rollhp mancerroll:class3_rollhp mancerroll:class4_rollhp", function(eventinfo) {
@@ -14276,6 +14345,7 @@
         setAttrs(set);
     });
 
+    //Put on hold for now
     on("mancerchange:class1_hpbyLevel mancerchange:class1_addlevel", function(eventinfo) {
         const mancerdata = getCharmancerData();
         const leveldata  = mancerdata["lp-levels"].values;
@@ -14309,46 +14379,74 @@
         //console.log("=====  END 5E LEVEL LOGS: HP BY LEVEL ===== ");
     });
 
-    on("mancerchange:multiclass_add mancerchange:multiclass_remove", function(eventinfo) {
+    on("clicked:multiclass_add clicked:multiclass_remove", function(eventinfo) {
         const mancerdata = getCharmancerData();
-        const leveldata  = mancerdata["lp-levels"].values;
+        const leveldata  = mancerdata["lp-levels"];
         let set          = {};
 
+        console.log(eventinfo);
+
         if (eventinfo.sourceAttribute === "multiclass_add") {
-            (leveldata["multiclass"] < 3) ? set["multiclass"] = leveldata["multiclass"] + 1 : false;
+            (leveldata.values["multiclass"] < 3) ? set["multiclass"] = leveldata.values["multiclass"] + 1 : false;
+            console.log(leveldata.values["multiclass"]);
         } else {
-            (leveldata["multiclass"] > leveldata["multiclass_initial"]) ? set["multiclass"] = leveldata["multiclass"] - 1 : false;
+
+            if (leveldata.values["multiclass"] > leveldata.values["multiclass_initial"]) {
+                set["multiclass"] = leveldata.values["multiclass"] - 1;
+            } else {
+                false
+            };
+
+            console.log(leveldata.values["multiclass"]);
         };
 
         setAttrs(set);
     });
 
+    on("clicked:class1_addhpAverage clicked:class2_addhpAverage clicked:class3_addhpAverage clicked:class4_addhpAverage", function(eventinfo) {
+        const mancerdata= getCharmancerData();
+        const leveldata = mancerdata["lp-levels"], levelclass = eventinfo.sourceAttribute.slice(0, 6), hp = leveldata.values[`${levelclass}_averagehp`];
+
+        setAttrs({
+            [`${levelclass}_addhp`]: hp
+        });
+    });
+
     //Build a function to update the level & class each time they change
-    //Does not yet work with multiclass
-    const update_levels_message = () => {
-        const mancerdata  = getCharmancerData();
-        const leveldata   = mancerdata["lp-levels"].values;
-                          //This all needs to be updated later with loops & an array to do each class.
-        const class1      = (leveldata["class1"]) ? leveldata["class1"].split(":")[1] : "";
-        const currentlevel= (leveldata["class1_currentlevel"]) ? leveldata["class1_currentlevel"] : "";
-        const add1        = (leveldata["class1_addlevel"] > currentlevel) ? " | Leveler increase of " + class1 + " " + leveldata["class1_addlevel"] : "";
-        const total       = (leveldata["class1_addlevel"]) ? parseInt(leveldata["class1_addlevel"]) + parseInt(currentlevel) : "";
-        let update        = {};
+    const update_levels = () => {
+        const mancerdata     = getCharmancerData();
+        const leveldata      = mancerdata["lp-levels"];
+        const class1levels   = parseInt(leveldata.values["class1_classlevel"]) || 0, class2levels = parseInt(leveldata.values["class2_classlevel"]) || 0, class3levels = parseInt(leveldata.values["class3_classlevel"]) || 0, class4levels = parseInt(leveldata.values["class4_classlevel"]) || 0;
+        const characterlevel = class1levels + class2levels + class3levels + class4levels;
+        let update = {};
+        let set    = {};
+        let start  = [];
+        let end    = [];
+        let increase = [];
 
-        //Remove logs later
-        //console.log("UPDATE LEVEL MESSAGE TRIGGER!");
-        //console.log(leveldata);
+        for (x = 1; x <= 4; x++) {
+            let name    = (leveldata.values[`class${x}`]) ? leveldata.values[`class${x}`].slice(8) : "";
+            let current = parseInt(leveldata.values[`class${x}_currentlevel`]) || 0;
+            let add     = parseInt(leveldata.values[`class${x}_addlevel`]) || 0;
+            let lvl     = parseInt(leveldata.values[`class${x}_classlevel`]) || 0;
 
-        update["levels_message"] = `<p>Character Levels: Started as a level ${currentlevel} ${class1} ${add1}</p>`;
+            (current > 0) ? start.push(`${name} ${current}`) : false;
+            (add > 0) ? increase.push(`${name} ${add}`) : false;
+            (lvl > 0) ? end.push(`${name} ${lvl}`): false;
+        };
 
-        (leveldata["class1_addlevel"] > currentlevel) ? update["levels_message"] += `<p>Character will be level ${total} (${class1} ${total})</p>` : false;
+        update["levels_message"] = `<p>Character Levels: Started as a level ${start} | ${increase}</p>`;
+        update["levels_message"] += `<p>Character will be level ${characterlevel} (${end})</p>`;
 
+        set[`characterlevel`]    = characterlevel;
+
+        setAttrs(set);
         setCharmancerText(update);
     };
     //END DEV 1378
 
-    on("page:lp-choices", function(eventinfo) {
-        var mancerdata = getCharmancerData();
+    var getLevelingData = function(mancerdata) {
+        mancerdata = mancerdata || getCharmancerData();
         var leveling = {};
         for(var x=1; x<=4; x++) {
             if(mancerdata["lp-levels"].data["class" + x]) {
@@ -14357,81 +14455,145 @@
                 thisclass.subclass = mancerdata["lp-levels"].data["class" + x + "_subclass"] || false;
                 thisclass.classname = _.last(mancerdata["lp-levels"].values["class" + x].split(":"));
                 thisclass.subclassname = mancerdata["lp-levels"].values["class" + x + "_subclass"] ? _.last(mancerdata["lp-levels"].values["class" + x + "_subclass"].split(":")) : false;
-                thisclass.currentlevel = parseInt(mancerdata["lp-levels"].values["class" + x + "_currentlevel"]);
+                thisclass.currentlevel = mancerdata["lp-levels"].values["class" + x + "_currentlevel"] ? parseInt(mancerdata["lp-levels"].values["class" + x + "_currentlevel"]) : 0;
                 thisclass.addlevel = parseInt(mancerdata["lp-levels"].values["class" + x + "_addlevel"]);
+                thisclass.classnumber = x;
                 leveling["class" + x] = thisclass;
             }
         }
+        return leveling;
+    };
+
+    var getLpBlobs = function(data, include_asi) {
+        var asi = data.class["data-Ability Score Levels"];
+        var allblobs = {class: {}, subclass: {}};
+        _.times(data.addlevel, function(x) {
+            var thislevel = data.currentlevel + x + 1;
+            allblobs.class = _.extend(allblobs.class, filterBlobs(data.class.blobs, {"Level": "" + thislevel, multiclass: true}));
+            allblobs.subclass = _.extend(allblobs.subclass, filterBlobs(data.subclass.blobs, {"Level": "" + thislevel, multiclass: true}));
+            if(asi.includes("" + thislevel) && include_asi) {
+                allblobs.class["Ability Score Increase - Level " + thislevel] = {Level: thislevel, parentSection: "class"};
+                data.class.blobs["Ability Score Increase - Level " + thislevel] = {
+                    Level: thislevel,
+                    Title: ("Ability Score Increase - Level " + thislevel)
+                };
+            }
+        });
+        var remove = {class: [], subclass: []};
+        //Figure out which blobs are just the same feature at a different level, add them to a list to remove
+        _.each(allblobs, function(blobs, section) {
+            _.each(blobs, function(blob, name) {
+                var basename = name.split("(")[0];
+                blob.Level = parseInt(blob.Level);
+                if(basename.trim().toLowerCase() == "spell slots") {
+                    remove[section].push(name);
+                } else if(basename.trim().toLowerCase() != "proficiencies") {
+                    _.each(allblobs, function(otherblobs, othersection) {
+                        _.each(otherblobs, function(otherblob, othername) {
+                            if(name != othername && basename == othername.split("(")[0]) {
+                                if(blob.Level > parseInt(otherblob.Level)) {
+                                    remove[section].push(othername);
+                                } else {
+                                    remove[section].push(name);
+                                }
+                            }
+                        })
+                    });
+                }
+            });
+        });
+        //remove any blobs that are the same feature
+        _.each(remove, function(removeArray, section) {
+            _.each(_.uniq(removeArray), function(thisblob) {
+                delete allblobs[section][thisblob];
+            });
+        });
+        //here we build the final list of blobs that will be added
+        var filteredblobs = {class: [], subclass: []};;
+        _.each(allblobs, function(blobs, section) {
+            _.each(blobs, function(blob, name) {
+                var thisblob = {
+                    Level: blob.Level,
+                    name: name
+                };
+                filteredblobs[section].push(thisblob);
+            });
+        });
+        _.each(filteredblobs, function(bloblist) {
+            bloblist = _.sortBy(bloblist, "Level");
+        })
+        filteredblobs.allblobs = _.extend(data.class.blobs, data.subclass.blobs);
+        return filteredblobs;
+    };
+
+    var getAllLpBlobs = function(mancerdata, choices) {
+        mancerdata = mancerdata || getCharmancerData();
+        var leveldata = getLevelingData(mancerdata);
+        var blobs = {all: [], sorted: {}, names: {}};
+        _.each(leveldata, function(level, name) {
+            var theseblobs = getLpBlobs(level, true);
+            blobs.names[name] = _.pluck(theseblobs.class, "name") || [];
+            if(mancerdata["lp-choices"] && choices) {
+                _.each(mancerdata["lp-choices"].values, function(value, id) {
+                    if((value + "").split(":")[0] == "Blob" && id.split("_")[2].split("--")[0] == "class-" + level.classnumber) {
+                        blobs.names[name].push(value.split(":")[1]);
+                    };
+                });
+            };
+            _.each(blobs.names[name], function(blobname){
+                _.each(filterBlobs(level.class.blobs, {"name": blobname, multiclass: true}), function(blob, blobname) {
+                    blobs.all.push(blob);
+                    blobs.sorted[name] = blobs.sorted[name] ? blobs.sorted[name] : [];
+                    blobs.sorted[name].push(blob);
+                });
+            });
+            if(level.subclass) {
+                blobs.names[name + "_subclass"] = _.pluck(theseblobs.subclass, "name") || [];
+                if(mancerdata["lp-choices"] && choices) {
+                    _.each(mancerdata["lp-choices"].values, function(value, id) {
+                        if((value + "").split(":")[0] == "Blob" && id.split("_")[2].split("--")[0] == "subclass-" + level.classnumber) {
+                            blobs.names[name + "_subclass"].push(value.split(":")[1]);
+                        };
+                    });
+                };
+                _.each(blobs.names[name + "_subclass"], function(blobname){
+                    _.each(filterBlobs(level.subclass.blobs, {"name": blobname, multiclass: true}), function(blob, blobname) {
+                        blobs.all.push(blob);
+                        blobs.sorted[name + "_subclass"] = blobs.sorted[name + "_subclass"] ? blobs.sorted[name + "_subclass"] : [];
+                        blobs.sorted[name + "_subclass"].push(blob);
+                    });
+                });
+            }
+        });
+        return blobs;
+    };
+
+    on("page:lp-choices", function(eventinfo) {
+        var mancerdata = getCharmancerData();
+        var leveling = getLevelingData(mancerdata);
         _.each(leveling, function(data, name) {
-            var classNum = name[name.length -1];
+            var x = data.classnumber;
+            var blobs = getLpBlobs(data, true);
             addRepeatingSection("choices", "row", function(classrow) {
-                var asi = data.class["data-Ability Score Levels"];
                 var classname = data.subclassname ? data.subclassname + " " + data.classname : data.classname;
                 var update = {};
                 update[classrow] = "<h2>" + classname;
                 update[classrow] += data.addlevel > 1 ? " Levels " + (data.currentlevel + 1) + " - " + (data.currentlevel + data.addlevel) : " Level " + (data.currentlevel + 1);
                 update[classrow] += "</h2>";
                 setCharmancerText(update);
-                var allblobs = {class: {}, subclass: {}};
-                _.times(data.addlevel, function(x) {
-                    var thislevel = data.currentlevel + x + 1;
-                    allblobs.class = _.extend(allblobs.class, filterBlobs(data.class.blobs, {"Level": "" + thislevel}, true));
-                    allblobs.subclass = _.extend(allblobs.subclass, filterBlobs(data.subclass.blobs, {"Level": "" + thislevel}, true));
-                    if(asi.includes("" + thislevel)) {
-                        allblobs.class["Ability Score Increase - Level " + thislevel] = {Level: thislevel, parentSection: "class"};
-                        data.class.blobs["Ability Score Increase - Level " + thislevel] = {
-                            Level: thislevel,
-                            Title: ("Ability Score Increase - Level " + thislevel),
-                            parentSection: "class"
-                        };
+                _.each(blobs.class, function(x) { x.parentSection = "class" });
+                _.each(blobs.subclass, function(x) { x.parentSection = "subclass" });
+                var filteredblobs = _.sortBy(blobs.class.concat(blobs.subclass), "Level");
+                var resorted = [];
+                _.each(filteredblobs, function(blob) {
+                    if(blob.name.split(" ")[0] == "Proficiencies") {
+                        resorted.unshift(blob);
+                    } else {
+                        resorted.push(blob);
                     }
                 });
-                var remove = {class: [], subclass: []};
-                //Figure out which blobs are just the same feature at a different level, add them to a list to remove
-                _.each(allblobs, function(blobs, section) {
-                    _.each(blobs, function(blob, name) {
-                        var basename = name.split("(")[0];
-                        blob.Level = parseInt(blob.Level);
-                        blob.parentSection = section;
-                        if(basename.trim().toLowerCase() == "spell slots") {
-                            remove[section].push(name);
-                        } else if(basename.trim().toLowerCase() != "proficiencies") {
-                            _.each(allblobs, function(otherblobs, othersection) {
-                                _.each(otherblobs, function(otherblob, othername) {
-                                    if(name != othername && basename == othername.split("(")[0]) {
-                                        if(blob.Level > parseInt(otherblob.Level)) {
-                                            remove[section].push(othername);
-                                        } else {
-                                            remove[section].push(name);
-                                        }
-                                    }
-                                })
-                            });
-                        }
-                    });
-                });
-                //remove any blobs that are the same feau
-                _.each(remove, function(removeArray, section) {
-                    _.each(_.uniq(removeArray), function(thisblob) {
-                        delete allblobs[section][thisblob];
-                    });
-                });
-                //here we build the final list of blobs that will be added
-                var filteredblobs = [];
-                _.each(allblobs, function(blobs, section) {
-                    _.each(blobs, function(blob, name) {
-                        var thisblob = {
-                            Level: blob.Level,
-                            parentSection: blob.parentSection,
-                            name: name
-                        };
-                        filteredblobs.push(thisblob);
-                    });
-                });
-                allblobs = _.extend(data.class.blobs, data.subclass.blobs);
-                filteredblobs = _.sortBy(filteredblobs, "Level");
-                _.each(filteredblobs, function(blob) {
-                    handleBlobs(allblobs, {}, blob.parentSection + "1-" + blob.Level, classrow, blob.name);
+                _.each(resorted, function(blob) {
+                    handleBlobs(blobs.allblobs, {multiclass: true, slide: "lp-choices"}, blob.parentSection + "-" + x + "--" + blob.Level, classrow, blob.name);
                 });
             });
         });
@@ -14895,6 +15057,387 @@
         });
         setCharmancerText(update);
     };
+
+    on("page:lp-summary", function() {
+        var mancerdata = getCharmancerData();
+        var abilities = getAbilityTotals(mancerdata);
+        var previous = mancerdata["lp-welcome"].values["previous_attributes"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_attributes"]) : {};
+        var spelldata = mancerdata["lp-welcome"].values["spellinfo"] ? JSON.parse(mancerdata["lp-welcome"].values["spellinfo"]) : {};
+        var lcAbilities = abilityList.map(function(x) {return x.toLowerCase()});
+        var update = {};
+        update["before div"] = "<div class=\"row\"><p>Class: <span>";
+        if(previous.subclass) update["before div"] += previous.subclass + " ";
+        update["before div"] += previous.class + " " + previous.base_level;
+        for(var x=1; x<=3; x++) {
+            if(previous["multiclass" + x + "_flag"] != "0") {
+                update["before div"] += ", " + previous["multiclass" + x] + " " + previous["multiclass" + x + "_lvl"];
+            }
+        };
+        update["before div"] += "</span></p>";
+        update["before div"] += "<p>Hit Points: <span>" + previous.hp_max + "</span></p></div>";
+        update["before div"] += "<div class=\"row\"><div class=\"ability-row\">";
+        _.each(lcAbilities, function(ability) {
+            update["before div"] += "<div><h5 data-i18n=\"" + ability.substr(0,3) + "-u\"></h5>";
+            update["before div"] += "<span class=\"score\">" + abilities[ability + "_previous"] + "</span> ";
+            update["before div"] += "(<span class=\"mod\">";
+            update["before div"] += abilities[ability + "_previous_mod"] >= 0 ? "+" + abilities[ability + "_previous_mod"] : abilities[ability + "_previous_mod"];
+            update["before div"] += "</span>)</div>";
+        });
+        update["before div"] += "</div></div><div class=\"row\"></div>";
+        update["after div"] = "<div class=\"row\"><p class=\"highlight\">Class: <span>";
+        for(var x=1; x<=4; x++) {
+            if(mancerdata["lp-levels"].values["class" + x]) {
+                if(x !== 1) update["after div"] += ", "
+                if(mancerdata["lp-levels"].values["class" + x + "_subclass"]) {
+                    if((x == 1 && !previous.subclass) || (x != 1 && previous["multiclass" + x + "_flag"] != "0" && !previous["multiclass" + x + "_subclass"])) {
+                        update["after div"] += "<span class=\"highlight\">";
+                    } else {
+                        update["after div"] += "<span>";
+                    }
+                    update["after div"] += mancerdata["lp-levels"].values["class" + x + "_subclass"].split(":")[1] + " </span>";
+                }
+                if(x != 1 && previous["multiclass" + x + "_flag"] != "0" && !previous["multiclass" + x + "_subclass"]) {
+                    update["after div"] += "<span class=\"highlight\">";
+                } else {
+                    update["after div"] += "<span>";
+                }
+                update["after div"] += mancerdata["lp-levels"].values["class" + x].split(":")[1] + " </span>";
+                if(mancerdata["lp-levels"].values["class" + x + "_addlevel"]) {
+                    update["after div"] += "<span class=\"highlight\">";
+                } else {
+                    update["after div"] += "<span>";
+                }
+                var prevlevel = 0;
+                if(x == 1) {
+                    prevlevel = parseInt(previous["base_level"]);
+                } else {
+                    prevlevel = previous["multiclass" + x + "_flag"] == "0" ? 0 : parseInt(previous["multiclass" + x + "_lvl"])
+                }
+                update["after div"] += (prevlevel + parseInt(mancerdata["lp-levels"].values["class" + x + "_addlevel"])) + " </span>";
+            }
+        };
+        update["after div"] += "</span></p>";
+        update["after div"] += "<p class=\"highlight\">Hit Points: <span class=\"highlight\">" + (previous.hp_max) + "</span></p></div>";
+        update["after div"] += "<div class=\"row\"><div class=\"ability-row\">";
+        _.each(lcAbilities, function(ability) {
+            update["after div"] += abilities[ability] == abilities[ability + "_previous"] ? "<div>" : "<div class=\"highlight\">"
+            update["after div"] += "<h5 data-i18n=\"" + ability.substr(0,3) + "-u\"></h5><span>";
+            update["after div"] += abilities[ability] == abilities[ability + "_previous"] ? "<span class=\"score\">" : "<span class=\"score highlight\">";
+            update["after div"] += abilities[ability] + "</span> (";
+            update["after div"] += abilities[ability + "_mod"] == abilities[ability + "_previous_mod"] ? "<span class=\"mod\">" : "<span class=\"mod highlight\">";
+            update["after div"] += abilities[ability + "_mod"] >= 0 ? "+" + abilities[ability + "_mod"] : abilities[ability + "_mod"];
+            update["after div"] += "</span>)</span></div>";
+        });
+        update["after div"] += "</div></div><div class=\"row\"></div>";
+        setCharmancerText(update);
+        showChoices(["apply_changes"]);
+        console.log(mancerdata["lp-levels"].values);
+        console.log(abilities);
+        console.log(previous);
+    });
+
+    on("mancerfinish:lp-mancer", function(eventinfo) {
+        console.log("****************************************");
+        console.log("******  STARTING FINISH FUNCTION  ******");
+        console.log("****************************************");
+        var doAllDrops = function(dropArray, callback) {
+            getAttrs(["character_id"], function(v) {
+                _.each(stats.totals, function(scores, name) {
+                    v[name + "_base"] = scores.total;
+                    v[name + "_mod"] = scores.mod;
+                });
+                v.base_level = "1";
+                v.npc = "0";
+                v["class_resource_name"] = "";
+                v["other_resource_name"] = "";
+                var update = {};
+                var callbacks = [];
+                var repeating = {prof_names: [], traits: [], resources: {}};
+                var totalDrops = dropArray.length;
+                var x = 0;
+                callbacks.push(update_class);
+                callbacks.push(update_race_display);
+
+                _.each(dropArray, function(page) {
+                    page.data.Category = page.data.Category.replace("@@!!@@", "");
+                    var dropUpdate = processDrop(page, v, repeating, true);
+                    callbacks = callbacks.concat(dropUpdate.callbacks);
+                    repeating.prof_names = _.uniq(repeating.prof_names.concat(dropUpdate.prof_names));
+                    update = _.extend(update, dropUpdate.update);
+                    x++;
+                    setCharmancerText({"mancer_progress" :'<div style="width: ' + (parseInt(x/totalDrops*70) + 20) + '%"></div>'});
+                });
+
+                callbacks.push( function() {update_ac();} );
+                callbacks.push( function() {update_weight();} );
+                callbacks.push(callback);
+                console.log(update);
+                setAttrs(update, {silent: true}, function() {
+                    setCharmancerText({"mancer_progress" :'<div style="width: 95%"></div>'});
+                    _.each(callbacks, function(callback) {
+                        callback();
+                    });
+                });
+            });
+        };
+        var getOtherDrops = function(pagedata) {
+            var results = [];
+            if(pagedata["data-Equipment"]) {
+                console.log("ADDING ADDITIONAL ITEMS:");
+                var json = {};
+                try {
+                    json = JSON.parse(pagedata["data-Equipment"]);
+                } catch(e) {
+                    json = pagedata["data-Equipment"];
+                }
+                var newItems = makeItemData(json.default);
+                results = results.concat(newItems);
+            }
+            if(pagedata["data-Bundle"]) {
+                console.log("ADDING ADDITIONAL ITEMS (FROM BUNDLE):");
+                var json = {};
+                try {
+                    json = JSON.parse(pagedata["data-Bundle"]);
+                } catch(e) {
+                    json = pagedata["data-Bundle"];
+                }
+                var newItems = makeItemData(json);
+                results = results.concat(newItems);
+            }
+            return results;
+        };
+        var getAllPages = function(pageArray, callback) {
+            var getNames = [];
+            _.each(pageArray, function(page){
+                if(page.name) {
+                    getNames.push(page.name);
+                } else {
+                    getNames.push(page);
+                }
+            });
+            getCompendiumPage(getNames, function(data) {
+                var nextGet = [];
+                _.each(data, function(page, index) {
+                    var pagedata = false;
+                    _.each(pageArray, function(arrayData) {
+                        if(arrayData.name.toLowerCase() == (page.data.Category + ":" + page.name).toLowerCase()) {
+                            pagedata = arrayData;
+                        }
+                    });
+                    if(pagedata && pagedata.data) {
+                        page.data = _.extend(page.data, pagedata.data);
+                    }
+                    if(!page.id) page.data.Source = "Charactermancer";
+                    page.name = page.name.replace(/@@!!@@/g,""); // Hacky bugfix to prevent custom names from matching unavailable content
+                    nextGet = nextGet.concat(getOtherDrops(page.data));
+                    if(page.data["data-Starting Gold"] && !noEquipmentDrop) {
+                        set["gp"] += parseInt(page.data["data-Starting Gold"]);
+                    }
+                    allPageData.push(page);
+                });
+
+                if(nextGet.length > 0) {
+                    console.log("DOING ANOTHER GET!!");
+                    getAllPages(nextGet, callback);
+                } else {
+                    callback();
+                }
+
+            });
+        };
+        var startTime = Date.now();
+        var allPageData = [];
+        var data = eventinfo.data;
+        var leveldata = getLevelingData(data);
+        var abilities = getAbilityTotals(data);
+        var previous = data["lp-welcome"].values["previous_attributes"] ? JSON.parse(data["lp-welcome"].values["previous_attributes"]) : {};
+        var spelldata = data["lp-welcome"].values["spellinfo"] ? JSON.parse(data["lp-welcome"].values["spellinfo"]) : {};
+        var blobs = getAllLpBlobs(data, true);
+        var customtraits = {race: [], subrace: [], class: [], subclass: [], background: []};
+        var profs = getProficiencies(data, "lp-finish");
+        var loudset = {};
+        var set = {};
+        var allDrops = [];
+        var currentDrop = 0;
+        var totalDrops = 1;
+        var allSkills = ["athletics", "acrobatics", "sleight_of_hand", "stealth", "arcana", "history", "investigation", "nature", "religion", "animal_handling", "insight", "medicine", "perception", "survival","deception", "intimidation", "performance", "persuasion"];
+        var allAbilities = abilityList.map(function(x) {return x.toLowerCase()});
+        console.log(data);
+        console.log(abilities);
+        console.log(blobs);
+        console.log(leveldata);
+        _.each(leveldata, function(level, name) {
+            var theseblobs = getLpBlobs(level);
+            var mc = "multiclass" + (level.classnumber - 1);
+            var thisclass = {name: level.classname, data: level.class};
+            //if this is an mc class, add mc data
+            if(name != "class1") thisclass.data.multiclass = mc;
+            thisclass.data.theseblobs = blobs.names[name];
+            allDrops.push(thisclass);
+            if(level.subclass) {
+                var thissubclass = {name: level.subclassname, data: level.subclass};
+                //if this is an mc subclass, add mc data
+                if(name != "class1") thissubclass.data.multiclass = mc;
+                thissubclass.data.theseblobs = blobs.names[name + "_subclass"];
+                allDrops.push(thissubclass);
+            }
+            //set up the setAttrs for this class
+            if(name === "class1") {
+                set["base_level"] = parseInt(previous["base_level"]) + level.addlevel;
+            } else {
+                set[mc + "_lvl"] = previous[mc + "_flag"] === "0" ? level.addlevel : parseInt(previous[mc + "_lvl"]) + level.addlevel;
+            }
+        });
+        //console.log(spelldata);
+        // Build new blobs for traits with inputs, collect custom traits and languages
+        _.each(["lp-choices", "lp-asi"], function(pagename) {
+            var slide = data[pagename];
+            _.each(slide.values, function(value, name) {
+                if(name.substr(-11) == "trait_input") {
+                    var sectionid = name.substring(0, name.length - 6);
+                    var thisblob = {};
+                    var thistrait = {};
+                    thistrait.Name = slide.values[sectionid + "_name"].replace(/{{Input}}/g, value);
+                    thistrait.Desc = slide.values[sectionid + "_desc"] ? slide.values[sectionid + "_desc"].replace(/{{Input}}/g, value) : "";
+                    thisblob.Traits = JSON.stringify([thistrait]);
+                    blobs.names[slide.values[sectionid + "_section"]].push(sectionid);
+                    slide.data[slide.values[sectionid + "_section"]].blobs[sectionid] = thisblob;
+                }
+                if(name.split("_")[2] == "custom" && name.substr(-10) == "trait_name") {
+                    var sectionid = name.substring(0, name.length - 5);
+                    var thistrait = {};
+                    thistrait.Name = slide.values[sectionid + "_name"];
+                    thistrait.Desc = slide.values[sectionid + "_desc"] ? slide.values[sectionid + "_desc"] : "";
+                    customtraits[name.split("_")[3]].push(thistrait);
+                }
+                if(value == "custom" && name.substr(-18) == "proficiency_choice") {
+                    var sectionid = name.substring(0, name.length - 7);
+                    if(slide.values[sectionid + "_custom"] && slide.values[sectionid + "_type"]) {
+                        profs.all[slide.values[sectionid + "_type"]].push(slide.values[sectionid + "_custom"])
+                    }
+                }
+            });
+        });
+        //Set up proficiency drops
+        _.each(["Armor", "Language", "Tool", "Weapon"], function(proftype) {
+            _.each(profs.all[proftype], function(prof) {
+                var profdata = {name: "Proficiencies:" + prof, data: {Type: proftype}}
+                if(profs.all.Expertise.indexOf(prof) != -1) {
+                    profdata.data["toolbonus_base"] = "(@{pb}*2)";
+                    allDrops.unshift(profdata);
+                } else {
+                    allDrops.push(profdata);
+                }
+            });
+        });
+        //Set up expertise drops
+        _.each(_.uniq(profs.all.Skill.concat(profs.all.Expertise)), function(prof) {
+            var profName = prof.toLowerCase().replace(" " , "_");
+            set[profName + "_prof"] = "(@{pb}*@{" + profName + "_type})";
+            if(profs.all.Expertise.indexOf(prof) != -1) {
+                set[profName + "_type"] = 2;
+            }
+        });
+        //Set up Ability scores
+        console.log(set);
+        _.each(allAbilities, function(ability) {
+            loudset[ability + "_base"] = abilities[ability];
+        });
+        /*
+        //Set up drops. start with class, subclass, race, subrace, background
+        //set up feat drop
+        if(data["l1-feat"] && data["l1-feat"].values.feat) {
+            var feat = {name: data["l1-feat"].values.feat, data: {Properties: "1st Level"}};
+            allDrops.push(feat);
+        }
+        //set up background drop
+        if(data["l1-background"].values.background) {
+            if(data["l1-background"].values.background == "Rules:Backgrounds") {
+                var customBg  = {name: data["l1-background"].values["background_name"], data: {Category: "Backgrounds", blobs:{}}};
+                if(customtraits.background.length > 0) {
+                    customBg.data.theseblobs = ["customblob"];
+                    customBg.data.blobs.customblob = {Traits: JSON.stringify(customtraits.background)};
+                }
+                allPageData.push(customBg);
+            } else {
+                var thisdata = {name: _.last(data["l1-background"].values.background.split(":")), data: data["l1-background"].data.background};
+                thisdata.data.theseblobs = blobs.names.background;
+                allPageData.push(thisdata);
+            }
+        }
+
+        //Now add proficiency drops
+
+        //Next, add spell drops
+        _.each(spells.all, function(spell) {
+            var spelldata = {name: "Spells:" + spell.Name};
+            spelldata.data = {"spellcasting_ability": "@{" + spell.Ability.toLowerCase() + "_mod}+"};
+            if(spell.Source) {
+                spelldata.data.spellsource = spell.Source
+            };
+            allDrops.push(spelldata);
+        });
+
+        //Set up the final setAttrs()
+        set["alignment"] = data["l1-race"].values.alignment || "";
+        set["hp"] = stats.hp;
+        set["hp_max"] = stats.hp;
+        set["l1mancer_status"] = "completed";
+        set["options-class-selection"] = "0";
+        if(data["l1-equipment"].values["equipment_type"] == "class") {
+            _.each(data["l1-equipment"].values, function(val, name) {
+                if(name.includes("class_equipment_choice")) {
+                    equipment = equipment.concat(val.split(" and "));
+                }
+            });
+        } else if(data["l1-equipment"].values["equipment_type"] == "gold" && data["l1-equipment"].values["starting_gold"]) {
+            set["gp"] = parseInt(data["l1-equipment"].values["starting_gold"]);
+        }
+        //Add the bio info
+        if(data["l1-bio"]) {
+            _.each(["character_name", "age", "height", "weight", "eyes", "hair", "skin"], function(type) {
+                if(data["l1-bio"].values[type]) {
+                    set[type] = data["l1-bio"].values[type] || "";
+                }
+            });
+        }
+        allDrops = allDrops.concat(makeItemData(equipment));
+        totalDrops += allDrops.length;
+        _.each(allPageData, function(page) {
+            allDrops = allDrops.concat(getOtherDrops(page.data));
+        });
+
+        //erase all repeating sections
+        eraseRepeating(eraseSections, function() {
+            setCharmancerText({"mancer_progress" :'<div style="width: 5%"></div>'});
+            //first set is silent to prevent unwanted sheet workers
+            setAttrs(silentset, {silent:true}, function() {
+                setCharmancerText({"mancer_progress" :'<div style="width: 10%"></div>'});
+                //reset remaining attributes, and set ability scores/custom info
+                setAttrs(clearset, function() {
+                    setCharmancerText({"mancer_progress" :'<div style="width: 15%"></div>'});
+                    getAllPages(allDrops, function() {
+                        setCharmancerText({"mancer_progress" :'<div style="width: 20%"></div>'});
+                        doAllDrops(allPageData, function() {
+                            console.log("DOING THE FINAL SET!!");
+                            setAttrs(set, function() {
+                                setCharmancerText({"mancer_progress" :'<div style="width: 100%"></div>'});
+                                update_class();
+                                organize_section_proficiencies();
+                                update_skills(allSkills);
+                                update_attacks("all");
+                                var endTime = Date.now();
+                                console.log("Elapsed time: ");
+                                console.log((endTime-startTime)/1000);
+                                //finishCharactermancer();
+                            });
+                        });
+                    });
+                });
+            });
+        });
+        /* */
+    });
 </script>
 
 <!-- CHARACTERMANCER REPEATING SECTIONS -->
@@ -16339,10 +16882,12 @@
         </div>
         <input type="hidden" name="comp_spellinfo">
         <input type="hidden" name="comp_previous_abilities">
+        <input type="hidden" name="comp_previous_attributes">
+        <input type="hidden" name="comp_previous_proficiencies">
     </div>
 </charmancer>
 
-<!-- DEV  1378-->
+<!-- DEV  1378 -->
 <charmancer class="sheet-charmancer-lp-levels">
     <div class="charmancer container">
         <ol class="steps lp-steps">
@@ -16351,7 +16896,7 @@
     <!-- Remove the inline style later -->
         <div class="topbar-holder"></div>
         <div style="width: 100%;">
-            <p>First paragraph which will contain instructions.</p>
+            <p>This is a placeholder for future text.</p>
         </div>
         <div style="width: 100%; font-weight: bold;">
             <div class="levels_message"></div>
@@ -16359,86 +16904,96 @@
         <div class="choices levels-multiclass">
             <input type="hidden" class="hide-multiclass" name="comp_multiclass" min="0" max="3" />
             <input type="hidden" name="comp_multiclass_initial" min="0" max="3" />
+            <input type="hidden" name="comp_characterlevel" />
             <div class="row">
                 <input type="hidden" name="comp_class1" />
                 <input type="hidden" name="comp_class1_currentlevel" />
+                <input type="hidden" name="comp_class1_classlevel" />
                 <input type="hidden" name="comp_class1_hitdie" />
                 <input type="hidden" name="comp_class1_averagehp" />
                 <div>
-                    <div class="class1_selector" style="display: inline;">
-                       <select name="comp_class1" style="width: 70%;" value="">
+                    <div class="class1_selector">
+                       <select name="comp_class1" value="">
                         </select>
                     </div>
                     <input type="number" class="addinglevel" min="0" name="comp_class1_addlevel" value="1 " />
                 </div>
                 <div>
-                    <h3 style="display: inline-block; width: 10%">HP</h3>
+                    <h3>HP</h3>
                     <input type="number" class="" name="comp_class1_addhp">
                     <div class="class1_rollhp" style="display: inline;">
-                        <button type="roll" name="roll_class1_rollhp" value="" title="You must input a level increase to this class">Roll</button>
+                        <button type="roll" name="roll_class1_rollhp" value="" title="">Roll</button>
                     </div>
-                    <input type="checkbox" name="comp_class1_addhpAverage" /><span>Average</span>
-                    <input type="checkbox" name="comp_class1_hpbyLevel" /><span>By level</span>
+                     <button type="action" name="act_class1_addhpAverage" value="" title="">Average</button>
+                   <!-- <input type="checkbox" name="comp_class1_hpbyLevel" /><span>By level</span> Put on hold -->
                 </div>
                 <div class="by-levels" style="margin-left: 11%;">
                 </div>
                 <div>
                     <h4 class="class1_features_title choice" style="display: inline;">Class Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
-                    <div accept="">There needs to be a list of features here.</div>
-                    <select class="choice subclass1" name="comp_class1_subclass" style="display: inline;">
+                    <div>This text is a placeholder.</div>
+                    <div class="subclass1_name"></div>
+                    <div class="subclass1_warning"></div>
+                    <select class="choice subclass1" name="comp_class1_subclass">
                         <option value="" data-i18n="choose">Choose</option>
-                        <option class="custom" value="Rules:Classes" data-i18n="custom">Custom</option>
                     </select>
                 </div>
                 <div>
                     <h4 class="subclass1_features_title choice" style="display: inline;">Subclass Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe --->
-                    <div>There needs to be a list of sub class features here.</div>
+                    <div>This text is a placeholder.</div>
                 </div>
             </div>
             <div class="row">
                 <input type="hidden" name="comp_class2" value="" />
                 <input type="hidden" name="comp_class2_currentlevel" />
+                <input type="hidden" name="comp_class2_classlevel" />
                 <input type="hidden" name="comp_class2_hitdie" />
                 <input type="hidden" name="comp_class2_averagehp" />
                 <div style="display: inline;">
-                    <div class="class2_selector" style="display: inline;">
+                    <div class="class2_selector">
+                        <select class="multiclass_select" name="comp_class2" accept="Category:Classes" style="width: 70%;" value="">
+                            <option value="" data-i18n="choose">Choose</option>
+                        </select>
                     </div>
                     <input type="number" class="addinglevel" min="0" name="comp_class2_addlevel" />
                 </div>
                 <div>
-                    <h3 style="display: inline-block; width: 10%">HP</h3>
+                    <h3>HP</h3>
                     <input type="number" class="" name="comp_class2_addhp">
                     <div class="class2_rollhp" style="display: inline;">
                         <button type="roll" name="roll_class2_rollhp" value="" title="You must input a level increase to this class">Roll</button>
                     </div>
-                    <input type="checkbox" name="comp_class2_addhpAverage" /><span>Average</span>
-                    <input type="checkbox" name="comp_class2_addhpLevel" /><span>By level</span>s
+                    <button type="action" name="act_class2_addhpAverage" value="" title="">Average</button>
+                  <!--  <input type="checkbox" name="comp_class2_addhpLevel" /><span>By level</span> Put on hold -->
                 </div>
                 <div>
                     <h4 class="class2_features_title choice" style="display: inline;">Class Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
-                    <div accept="">There needs to be a list of features here.</div>
-                    <select class="choice subclass2" name="comp_class2_subclass" style="display: inline;">
+                    <div>This text is a placeholder.</div>
+                    <div class="subclass2_name"></div>
+                    <div class="subclass2_warning"></div>
+                    <select class="choice subclass2" name="comp_class2_subclass">
                         <option value="" data-i18n="choose">Choose</option>
                     </select>
                 </div>
                 <div>
                     <h4 class="subclass2_features_title choice" style="display: inline;">Subclass Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe --->
-                    <div>There needs to be a list of sub class features here.</div>
+                     <div>This text is a placeholder.</div>
                 </div>
             </div>
             <div class="row">
                 <input type="hidden" name="comp_class3" value="" />
                 <input type="hidden" name="comp_class3_currentlevel" />
+                <input type="hidden" name="comp_class3_classlevel" />
                 <input type="hidden" name="comp_class3_hitdie" />
                 <input type="hidden" name="comp_class3_averagehp" />
                 <div>
                     <div style="display: inline;">
-                        <div class="class3_selector" style="display: inline;">
-                           <select name="comp_class3" accept="Category:Classes" style="width: 70%;" value="">
+                        <div class="class3_selector">
+                           <select class="multiclass_select" name="comp_class3" accept="Category:Classes" style="width: 70%;" value="">
                                 <option value="" data-i18n="choose">Choose</option>
                             </select>
                         </div>
@@ -16446,72 +17001,72 @@
                     <input type="number" class="addinglevel" min="0" name="comp_class3_addlevel" />
                 </div>
                 <div>
-                    <h3 style="display: inline-block; width: 10%">HP</h3>
+                    <h3>HP</h3>
                     <input type="number" class="" name="comp_class3_addhp">
                     <div class="class3_rollhp" style="display: inline;">
                         <button type="roll" name="roll_class3_rollhp" value="" title="You must input a level increase to this class">Roll</button>
                     </div>
-                    <input type="checkbox" name="comp_class3_addhpAverage" /><span>Average</span>
-                    <input type="checkbox" name="comp_class3_addhpLevel" /><span>By level</span>s
+                    <button type="action" name="act_class3_addhpAverage" value="" title="">Average</button>
+                    <!--<input type="checkbox" name="comp_class3_addhpLevel" /><span>By level</span> Put on hold-->
                 </div>
                 <div>
                     <h4 class="class3_features_title choice" style="display: inline;">Class Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
-                    <div accept="">There needs to be a list of features here.</div>
-                    <select class="choice subclass3" name="comp_class3_subclass" style="display: inline;">
+                    <div>This text is a placeholder.</div>
+                    <div class="subclass3_name"></div>
+                    <div class="subclass3_warning"></div>
+                    <select class="choice subclass3" name="comp_class3_subclass">
                         <option value="" data-i18n="choose">Choose</option>
                     </select>
                 </div>
                 <div>
                     <h4 class="subclass3_features_title choice" style="display: inline;">Subclass Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe --->
-                    <div>There needs to be a list of sub class features here.</div>
+                    <div>This text is a placeholder.</div>
                 </div>
             </div>
             <div class="row">
                 <input type="hidden" name="comp_class4" value="" />
                 <input type="hidden" name="comp_class4_currentlevel" />
+                <input type="hidden" name="comp_class4_classlevel" />
                 <input type="hidden" name="comp_class4_hitdie" />
                 <input type="hidden" name="comp_class4_averagehp" />
                 <div>
-                    <div class="class4_selector" style="display: inline;">
-                       <select name="comp_class4" accept="Category:Classes" style="width: 70%;">
+                    <div class="class4_selector">
+                       <select class="multiclass_select" name="comp_class4" accept="Category:Classes" style="width: 70%;">
                             <option value="" data-i18n="choose">Choose</option>
                         </select>
                     </div>
                     <input type="number" class="addinglevel" min="0" name="comp_class4_addlevel" />
                 </div>
                 <div>
-                    <h3 style="display: inline-block; width: 10%">HP</h3>
+                    <h3>HP</h3>
                     <input type="number" class="" name="comp_class4_addhp">
                     <div class="class4_rollhp" style="display: inline;">
                         <button type="roll" name="roll_class4_rollhp" value="" title="You must input a level increase to this class">Roll</button>
                     </div>
-                    <input type="checkbox" name="comp_class4_addhpAverage" /><span>Average</span>
-                    <input type="checkbox" name="comp_class4_addhpLevel" /><span>By level</span>s
+                    <button type="action" name="act_class4_addhpAverage" value="" title="">Average</button>
+                    <!--<input type="checkbox" name="comp_class4_addhpLevel" /><span>By level</span> Put on hold-->
                 </div>
                 <div>
                     <h4 class="class4_features_title choice" style="display: inline;">Class Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
-                    <div accept="">There needs to be a list of features here.</div>
-                    <select class="choice subclass4" name="comp_class4_subclass" style="display: inline;">
+                    <div>This text is a placeholder.</div>
+                    <div class="subclass4_name"></div>
+                    <div class="subclass4_warning"></div>
+                    <select class="choice subclass4" name="comp_class4_subclass">
                         <option value="" data-i18n="choose">Choose</option>
-                        <option class="custom" value="Rules:Classes" data-i18n="custom">Custom</option>
                     </select>
                 </div>
                 <div>
                     <h4 class="subclass4_features_title choice" style="display: inline;">Subclass Features: </h4>
                     <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
-                    <div>There needs to be a list of sub class features here.</div>
+                    <div>This text is a placeholder.</div>
                 </div>
             </div>
             <div>
-                <div style="display: inline; height: 30px; width: 30px; border: 1px solid black;">
-                    <input type="checkbox" name="comp_multiclass_add" /><span>+</span>
-                </div>
-                <div style="display: inline; height: 30px; width: 30px; border: 1px solid black;">
-                    <input type="checkbox" name="comp_multiclass_remove" /><span>-</span>
-                </div>
+                <button type="action" name="act_multiclass_add" />+</button>
+                <button type="action" name="act_multiclass_remove" />-</button>
             </div>
         </div>
         <div class="info">
@@ -16605,7 +17160,7 @@
         <div class="bottombar">
             <button class="prev" type="back" value="lp-asi">Back</button>
             <button type="button" data-scroll="#top" class="jump">Back to Top</button>
-            <button class="next" type="back" value="lp-levels">Next</button>
+            <button class="next" type="back" value="lp-summary">Next</button>
         </div>
         <div class="choice cancel-prompt">
             <p class="label">Where would you like to go, Traveler?</p>
@@ -16620,5 +17175,37 @@
         <input type="hidden" name="comp_newcantrips">
         <input type="hidden" name="comp_newspells">
         <input type="hidden" name="comp_replace">
+    </div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-lp-summary">
+    <div class="charmancer container">
+        <ol class="steps lp-steps">
+            <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel-u">CANCEL</button></li>
+        </ol>
+        <div class="topbar-holder"></div>
+        <div class="lp-summary">
+            <div class="before">
+                <h2>Before Leveling</h2>
+                <div></div>
+            </div>
+            <div class="after">
+                <h2>After Leveling</h2>
+                <div></div>
+            </div>
+        </div>
+
+        <div class="bottombar">
+            <button class="prev" type="back" value="lp-spells">Back</button>
+            <button type="button" data-scroll="#top" class="jump">Back to Top</button>
+            <button class="next choice apply_changes" type="finish" value="lp-mancer">Apply Changes</button>
+        </div>
+        <div class="choice cancel-prompt">
+            <p class="label">Where would you like to go, Traveler?</p>
+            <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
+            <button type="cancel" value="l1-class" data-i18n="save_progress_and_exit">Save and Exit</button>
+            <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
+            <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
+        </div>
     </div>
 </charmancer>
