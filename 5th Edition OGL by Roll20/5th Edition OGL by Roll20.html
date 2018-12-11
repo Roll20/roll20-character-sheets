@@ -4760,6 +4760,7 @@
 <input type='hidden' name='attr_lvl9_slots_total' value='0'>
 
 <input type='hidden' name='attr_l1mancer_status' value=''>
+<input type='hidden' name='attr_lpmancer_status' value=''>
 
 </div>
 
@@ -6830,7 +6831,9 @@
     });
 
     on("clicked:launch_lvl+mancer", function(eventinfo) {
-        startCharactermancer("lp-welcome");
+        setAttrs({lpmancer_status: "active"}, function() {
+            startCharactermancer("lp-welcome");
+        });
     });
 
     var update_attr = function(attr) {
@@ -7118,6 +7121,71 @@
         });
     };
 
+    var get_repeating_data = function(callback) {
+        var getallrepeating = function(getobj, thiscallback, attrlist) {
+            attrlist = attrlist || [];
+            var thisget = getobj.pop();
+            getSectionIDs(thisget.name, function(ids) {
+                _.each(ids, function(sectionId) {
+                    _.each(thisget.list, function(attr) {
+                        attrlist.push("repeating_" + thisget.name + "_" + sectionId + "_" + attr);
+                    });
+                });
+                if(getobj.length > 0) {
+                    getallrepeating(getobj, thiscallback, attrlist);
+                } else {
+                    getAttrs(attrlist, function(vals) {
+                        thiscallback(vals);
+                    });
+                };
+            });
+        };
+        var repeating = {prof_names: [], traits: [], resources: {}};
+        var getList = [
+            {name: "proficiencies", list: ["name"]},
+            {name: "tool", list: ["toolname"]},
+            {name: "traits", list: ["name", "source", "source_type"]},
+            {name: "resource", list: ["left_name", "right_name"]},
+            {name: "spell-cantrip", list: ["spellname", "spellattackid"]},
+            {name: "savemod", list: ["global_save_rollstring"]},
+            {name: "tohitmod", list: ["global_attack_rollstring"]},
+            {name: "damagemod", list: ["global_damage_type"]},
+            {name: "acmod", list: ["global_ac_name"]},
+            {name: "skillmod", list: ["global_skill_rollstring"]},
+            {name: "attack", list: ["atkname", "spellid"]}
+        ];
+        for(var x=1; x<=9; x++) {
+            getList.push({ name: "spell-" + x, list: ["spellname", "spellattackid"] });
+        }
+        getallrepeating(getList, function(vals) {
+            var traitstemp = {};
+            _.each(vals, function(value, name) {
+                if(name.split("_")[1] == "proficiencies" || name.split("_")[1] == "tool") {
+                    repeating.prof_names.push(value.toLowerCase());
+                } else if (name.split("_")[1] == "traits") {
+                    traitstemp[name.split("_")[2]] = traitstemp[name.split("_")[2]] ? traitstemp[name.split("_")[2]] : {};
+                    traitstemp[name.split("_")[2]][_.last(name.split("_"))] = value;
+                } else if (name.split("_")[1] == "resource") {
+                    repeating.resources[name.split("_")[2]] = repeating.resources[name.split("_")[2]] ? repeating.resources[name.split("_")[2]] : {};
+                    repeating.resources[name.split("_")[2]][name.split("_")[4]] = value;
+                } else if (name.split("_")[1].split("-")[0] == "spell") {
+                    repeating[name.split("_")[1]] = repeating[name.split("_")[1]] || {};
+                    repeating[name.split("_")[1]][name.split("_")[2]] = repeating[name.split("_")[1]][name.split("_")[2]] || {};
+                    repeating[name.split("_")[1]][name.split("_")[2]][name.split("_")[3]] = value;
+                } else {
+                    repeating[name.split("_")[1]] = repeating[name.split("_")[1]] || {};
+                    repeating[name.split("_")[1]][name.split("_")[2]] = value;
+                }
+            });
+            _.each(traitstemp, function(v, k) {
+                var trait = _.clone(v);
+                trait.id = k;
+                repeating.traits.push(trait);
+            });
+            callback(repeating);
+        });
+    };
+
     var handle_drop = function(category, eventinfo) {
 
         getAttrs(["drop_name", "drop_data", "drop_content", "character_id", "npc_legendary_actions", "strength_mod", "dexterity_mod", "npc", "base_level", "strength_base", "dexterity_base", "constitution_base", "wisdom_base", "intelligence_base", "charisma_base", "class_resource_name", "other_resource_name"], function(v) {
@@ -7133,52 +7201,9 @@
                 content: v.drop_content
             };
             var category = page.data["Category"];
-            var repeating = {prof_names: [], traits: [], resources: {}}
-
-            getSectionIDs("proficiencies", function(ids) {
-                var idArray = [];
-                _.each(ids, function(sectionId) {
-                    idArray.push("repeating_proficiencies_" + sectionId + "_name");
-                });
-                getSectionIDs("tool", function(ids) {
-                    _.each(ids, function(sectionId) {
-                        idArray.push("repeating_tool_" + sectionId + "_toolname");
-                    });
-                    getSectionIDs("traits", function(ids) {
-                        _.each(ids, function(sectionId) {
-                            var trait = {};
-                            idArray = idArray.concat(["repeating_traits_" + sectionId + "_name", "repeating_traits_" + sectionId + "_source", "repeating_traits_" + sectionId + "_source_type"])
-                        });
-                        getSectionIDs("resource", function(ids) {
-                            _.each(ids, function(sectionId) {
-                                idArray.push("repeating_resource_" + sectionId + "_resource_left_name");
-                                idArray.push("repeating_resource_" + sectionId + "_resource_right_name");
-                            });
-                            getAttrs(idArray, function(vals) {
-                                var traitstemp = {};
-                                _.each(vals, function(value, name) {
-                                    if(name.split("_")[1] == "proficiencies" || name.split("_")[1] == "tool") {
-                                        repeating.prof_names.push(value.toLowerCase());
-                                    } else if (name.split("_")[1] == "traits") {
-                                        traitstemp[name.split("_")[2]] = traitstemp[name.split("_")[2]] ? traitstemp[name.split("_")[2]] : {};
-                                        traitstemp[name.split("_")[2]][_.last(name.split("_"))] = value;
-                                    } else if (name.split("_")[1] == "resource") {
-                                        repeating.resources[name.split("_")[2]] = repeating.resources[name.split("_")[2]] ? repeating.resources[name.split("_")[2]] : {};
-                                        repeating.resources[name.split("_")[2]][name.split("_")[4]] = value;
-                                    }
-                                });
-                                _.each(traitstemp, function(v, k) {
-                                    var trait = _.clone(v);
-                                    trait.id = k;
-                                    repeating.traits.push(trait);
-                                });
-                                var results = processDrop(page, v, repeating);
-                                setAttrs(results.update, {silent: true}, function() {results.callbacks.forEach(function(callback) {callback(); })} );
-                                //setAttrs({drop_category: ""}, {silent: true});
-                            });
-                        });
-                    });
-                });
+            get_repeating_data(function(repeating) {
+                var results = processDrop(page, v, repeating);
+                setAttrs(results.update, {silent: true}, function() {results.callbacks.forEach(function(callback) {callback(); })} );
             });
 
         });
@@ -7374,6 +7399,13 @@
         };
         if(category === "Spells") {
             var lvl = page.data["Level"] && page.data["Level"] > 0 ? page.data["Level"] : "cantrip";
+            if(repeating["spell-" + lvl]) {
+                _.each(repeating["spell-" + lvl], function(spell, spellid) {
+                    if(spell.spellname.toLowerCase() === page.name.toLowerCase()) {
+                        id = spellid;
+                    }
+                });
+            }
             update["repeating_spell-" + lvl + "_" + id + "_spelllevel"] = lvl;
             if(page.data["spellcasting_ability"]) {
                 update["repeating_spell-" + lvl + "_" + id + "_spell_ability"] = page.data["spellcasting_ability"];
@@ -7960,11 +7992,19 @@
         };
         if(category === "Classes") {
             update["tab"] = "core";
-            if(page.name && page.name !== "") { update["class"] = page.name; }
-            if(page.data["Hit Die"] && page.data["Hit Die"] !== "") {
-                update["base_level"] = currentData.base_level ? currentData.base_level : "1";
-                update["hit_dice_max"] = update["base_level"] + page.data["Hit Die"];
-                update["hit_dice"] = update["base_level"];
+            if(page.data.multiclass) {
+                if(page.name && page.name !== "") { update[page.data.multiclass] = page.name; }
+                update[page.data.multiclass + "_flag"] = "1";
+            } else {
+                if(page.name && page.name !== "") { update["class"] = page.name; }
+                if(page.data["Hit Die"] && page.data["Hit Die"] !== "") {
+                    update["base_level"] = currentData.base_level ? currentData.base_level : "1";
+                    update["hit_dice_max"] = update["base_level"] + page.data["Hit Die"];
+                    update["hit_dice"] = update["base_level"];
+                }
+                if(page.data["Spellcasting Ability"] && page.data["Spellcasting Ability"] !== "") {
+                    update["spellcasting_ability"] = "+@{" + page.data["Spellcasting Ability"].toLowerCase() + "}";
+                }
             }
             if(page.data["data-Saving Throws"]) {
                 var saves = jsonparse(page.data["data-Saving Throws"]);
@@ -7972,16 +8012,17 @@
                     update[value.toLowerCase() + "_save_prof"] = "(@{pb})";
                 });
             }
-            if(page.data["Spellcasting Ability"] && page.data["Spellcasting Ability"] !== "") {
-                update["spellcasting_ability"] = "+@{" + page.data["Spellcasting Ability"].toLowerCase() + "}";
-            }
 
             if(!looped) {
                 callbacks.push(update_class);
             }
         };
         if(category === "Subclasses") {
-            if(page.name && page.name !== "") { update["subclass"] = page.name; };
+            if(page.data.multiclass) {
+                if(page.name && page.name !== "") { update[page.data.multiclass + "_subclass"] = page.name; }
+            } else {
+                if(page.name && page.name !== "") { update["subclass"] = page.name; };
+            }
             if(!looped) {
                 callbacks.push(update_class);
             };
@@ -8016,8 +8057,6 @@
             blobs = filterBlobs(page.data.blobs, {"Level": "1"});
         }
         _.each(blobs, function(blob, blobname) {
-            console.log(blobname);
-            console.log(blob);
             if(blob["Traits"]) {
                 var traitsource = "";
                 switch (category) {
@@ -10429,6 +10468,7 @@
                     });
 
                     var update = {global_damage_mod_roll: "", global_damage_mod_crit: "", global_damage_mod_type: ""};
+                    console.log("GLOBALDAMAGE");
                     _.each(fields, function(element) {
                         if(element.active_flag != "0") {
                             if(element.rollstring && element.rollstring !== "") { update["global_damage_mod_roll"] += element.rollstring + "+"; }
@@ -10471,6 +10511,7 @@
                     });
 
                     var update = {global_attack_mod: ""};
+                    console.log("GLOBALATTACK");
                     _.each(fields, function(element) {
                         if(element.active_flag != "0") {
                             if(element.rollstring && element.rollstring !== "") { update["global_attack_mod"] += element.rollstring + "+"; }
@@ -10581,7 +10622,7 @@
 
     var check_lp_mancer = function() {
         getAttrs(["class", "base_level", "strength_base","dexterity_base","constitution_base","intelligence_base","wisdom_base","charisma_base","l1mancer_status", "lpmancer_status","version","charactermancer_step"], function(v) {
-            if(!v["lpmancer_status"] && v["charactermancer_step"] && v["charactermancer_step"].split("-")[0] == "lp") {
+            if(v["lpmancer_status"] === "active" && v["charactermancer_step"] && v["charactermancer_step"].split("-")[0] == "lp") {
                 startCharactermancer(v["charactermancer_step"]);
             }
         });
@@ -10971,6 +11012,14 @@
         }
         else if(eventinfo["value"].substring(0,3) === "l1-") {
             update["l1mancer_status"] = eventinfo["value"];
+        }
+        else if(eventinfo["value"] === "lp-welcome" || eventinfo["value"] === "lp-cancel") {
+            update["lpmancer_status"] = "";
+            update["charactermancer_step"] = "lp-welcome";
+            deleteCharmancerData(["lp-welcome", "lp-levels", "lp-choices", "lp-asi", "lp-spells","lp-summary"]);
+        }
+        else if(eventinfo["value"].substring(0,3) === "lp-") {
+            update["charactermancer_step"] = "lp-welcome";
         };
 
         setAttrs(update);
@@ -11111,7 +11160,7 @@
         var allProficiencies = {"Weapon": [], "Armor": [], "Skill": [], "Tool": [], "Language": [], "Expertise": []};
         var toSet = {};
         var mancerdata = data || getCharmancerData();
-        var thismancer = currentSlide ? currentSlide.split("-")[0] : "l1";
+        var thismancer = currentSlide && currentSlide != "finish" ? currentSlide.split("-")[0] : "l1";
         var blobs = {};
         if(thismancer == "l1") {
             blobs = getRelevantBlobs(mancerdata, "1", "l1");
@@ -11425,7 +11474,7 @@
                     if(blob[k] != v) match = false;
                 }
             });
-            if(match) results[name] = blob;
+            if(match && name.split("(")[0].toLowerCase() != "spell slots") results[name] = blob;
         });
         _.each(results, function(blob, name) {
             if(blob.Multiclass == remove) {
@@ -14027,6 +14076,7 @@
             var selector = "attr-container .sheet-" + ability.toLowerCase() + "_total";
             update[selector] = abilities[ability.toLowerCase()] + " | " + abilities[ability.toLowerCase() + "_mod"];
         });
+        update["hit_points"] = getHpTotal(mancerdata);
         setCharmancerText(update);
     };
     //Helper function to get ability totals, including asi
@@ -14051,7 +14101,28 @@
             });
         }
         return abilities;
-    }
+    };
+    //Helper function to get hp total
+    var getHpTotal = function(mancerdata) {
+        mancerdata = mancerdata || getCharmancerData();
+        var abilities = getAbilityTotals(mancerdata);
+        var previous = mancerdata["lp-welcome"].values["previous_attributes"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_attributes"]) : {};
+        var newhp = 0;
+        var additionalhp = 0;
+        var totalpreviouslevel = parseInt(previous["base_level"]);
+        for(var x=1; x<=3; x++) {
+            if(previous["multiclass" + x + "_flag"] != "0") totalpreviouslevel += parseInt(previous["multiclass" + x + "_lvl"]);
+        };
+        if(mancerdata["lp-levels"]) {
+            for(var x=1; x<=4; x++) {
+                var classlvl = mancerdata["lp-levels"].values["class" + x + "_addlevel"] ? parseInt(mancerdata["lp-levels"].values["class" + x + "_addlevel"]) : 0;
+                var classhp = mancerdata["lp-levels"].values["class" + x + "_addhp"] ? parseInt(mancerdata["lp-levels"].values["class" + x + "_addhp"]) : 0;
+                newhp += classhp > 0 ? classhp + (classlvl * abilities["constitution_mod"]) : 0;
+            };
+        };
+        additionalhp = totalpreviouslevel * (abilities["constitution_mod"] - abilities["constitution_previous_mod"])
+        return parseInt(previous["hp_max"]) + newhp + additionalhp;
+    };
     //Worker for every page to add topbar/buttons
     on("page:lp-welcome page:lp-levels page:lp-choices page:lp-asi page:lp-spells page:lp-summary", function(eventinfo) {
         var mancerdata = getCharmancerData();
@@ -14126,7 +14197,7 @@
         getAttrs(["strength", "strength_mod", "dexterity", "dexterity_mod", "constitution", "constitution_mod", "intelligence", "intelligence_mod", "wisdom", "wisdom_mod", "charisma", "charisma_mod"], function(attrs) {
             setAttrs({previous_abilities: JSON.stringify(attrs)});
         });
-        getAttrs(["class", "subclass", "base_level", "multiclass1_flag", "multiclass2_flag", "multiclass3_flag", "multiclass1", "multiclass1_lvl", "multiclass1_subclass", "multiclass2", "multiclass2_lvl", "multiclass2_subclass", "multiclass3", "multiclass3_lvl", "multiclass3_subclass", "hp_max"], function(v) {
+        getAttrs(["class", "subclass", "base_level", "multiclass1_flag", "multiclass2_flag", "multiclass3_flag", "multiclass1", "multiclass1_lvl", "multiclass1_subclass", "multiclass2", "multiclass2_lvl", "multiclass2_subclass", "multiclass3", "multiclass3_lvl", "multiclass3_subclass", "hp_max", "class_resource_name", "other_resource_name"], function(v) {
             setAttrs({previous_attributes: JSON.stringify(v)});
         });
         _.each(allSkills, function(skill) {
@@ -14172,6 +14243,10 @@
                 });
             });
         });
+        get_repeating_data(function(repeating) {
+            console.log(repeating);
+            setAttrs({previous_repeating: JSON.stringify(repeating)});
+        });
     });
 
     //DEV 1378
@@ -14183,8 +14258,9 @@
             const class1     = v.class, subclass1 = v.subclass;
             let set          = {};
             let update       = {};
-            
+
             set["class1_currentlevel"] = v.base_level;
+            set["class1"] = `Classes:${class1}`;
             update["class1_selector"] = `<div style="width:20%; display: inherit;">${class1}</div>`;
             if (v.subclass) { 
                 update[`subclass1_selector`] = `<div>${subclass1}</div>`;
@@ -14268,7 +14344,7 @@
     });
 
     //This needs to change is some manner
-    on("mancerchange:class1_subclass", function(eventinfo) {
+    on("mancerchange:class1_subclass mancerchange:class2_subclass mancerchange:class3_subclass mancerchange:class4_subclass", function(eventinfo) {
         var mancerdata = getCharmancerData();
 
         (eventinfo.sourceType === "player") ? changeCompendiumPage("sheet-levels-info", eventinfo.newValue) : false;
@@ -14329,7 +14405,7 @@
             let avg = Math.ceil(sum / num.length), hp = avg * levels;
 
             set[`${levelclass}_averagehp`] = hp;
-            setAttrs(set);
+            setAttrs(set, function() {recalcLpData()});
         };
     };
 
@@ -14342,7 +14418,7 @@
         set[`${levelclass}_addhp`] = result;
         if (leveldata[`${levelclass}_addhpAverage`] === "on") {set[`${levelclass}_addhpAverage`] = "" };
 
-        setAttrs(set);
+        setAttrs(set, function() {recalcLpData()});
     });
 
     //Put on hold for now
@@ -14409,7 +14485,7 @@
 
         setAttrs({
             [`${levelclass}_addhp`]: hp
-        });
+        }, function() {recalcLpData()});
     });
 
     //Build a function to update the level & class each time they change
@@ -14661,6 +14737,7 @@
                 knownspells++;
             }
         });
+        //Gather pell data about each class
         for(var x=1;x<=4;x++) {
             if(mancerdata["lp-levels"].data["class" + x]) {
                 var prevlevel = mancerdata["lp-levels"].values["class" + x + "_currentlevel"] ? parseInt(mancerdata["lp-levels"].values["class" + x + "_currentlevel"]) : 0;
@@ -14733,7 +14810,9 @@
                 classes.push(thisclass);
             }
         }
+        console.log(classes);
         var knownlist = _.pluck(spelldata, "spellname");
+        //Look through all the data to see if there's any expanded lists
         _.each(mancerdata, function(page, pagename) {
             if(pagename.split("-")[0] == "lp") {
                 _.each(page.data, function(data, dataname) {
@@ -15117,7 +15196,7 @@
             }
         };
         update["after div"] += "</span></p>";
-        update["after div"] += "<p class=\"highlight\">Hit Points: <span class=\"highlight\">" + (previous.hp_max) + "</span></p></div>";
+        update["after div"] += "<p class=\"highlight\">Hit Points: <span class=\"highlight\">" + getHpTotal(mancerdata) + "</span></p></div>";
         update["after div"] += "<div class=\"row\"><div class=\"ability-row\">";
         _.each(lcAbilities, function(ability) {
             update["after div"] += abilities[ability] == abilities[ability + "_previous"] ? "<div>" : "<div class=\"highlight\">"
@@ -15142,17 +15221,16 @@
         console.log("****************************************");
         var doAllDrops = function(dropArray, callback) {
             getAttrs(["character_id"], function(v) {
-                _.each(stats.totals, function(scores, name) {
-                    v[name + "_base"] = scores.total;
-                    v[name + "_mod"] = scores.mod;
+                _.each(allAbilities, function(ability) {
+                    v[ability + "_base"] = abilities[ability];
+                    v[ability + "_mod"] = abilities[ability];
                 });
-                v.base_level = "1";
+                v.base_level = initial["base_level"];
                 v.npc = "0";
-                v["class_resource_name"] = "";
-                v["other_resource_name"] = "";
+                v["class_resource_name"] = previous["class_resource_name"];
+                v["other_resource_name"] = previous["other_resource_name"];
                 var update = {};
                 var callbacks = [];
-                var repeating = {prof_names: [], traits: [], resources: {}};
                 var totalDrops = dropArray.length;
                 var x = 0;
                 callbacks.push(update_class);
@@ -15177,7 +15255,7 @@
                     _.each(callbacks, function(callback) {
                         callback();
                     });
-                });
+                });/**/
             });
         };
         var getOtherDrops = function(pagedata) {
@@ -15251,21 +15329,24 @@
         var leveldata = getLevelingData(data);
         var abilities = getAbilityTotals(data);
         var previous = data["lp-welcome"].values["previous_attributes"] ? JSON.parse(data["lp-welcome"].values["previous_attributes"]) : {};
+        var repeating = data["lp-welcome"].values["previous_repeating"] ? JSON.parse(data["lp-welcome"].values["previous_repeating"]) : {};
         var spelldata = data["lp-welcome"].values["spellinfo"] ? JSON.parse(data["lp-welcome"].values["spellinfo"]) : {};
         var blobs = getAllLpBlobs(data, true);
         var customtraits = {race: [], subrace: [], class: [], subclass: [], background: []};
         var profs = getProficiencies(data, "lp-finish");
+        var removesections = [];
         var loudset = {};
         var set = {};
+        var initial = {};
         var allDrops = [];
         var currentDrop = 0;
         var totalDrops = 1;
         var allSkills = ["athletics", "acrobatics", "sleight_of_hand", "stealth", "arcana", "history", "investigation", "nature", "religion", "animal_handling", "insight", "medicine", "perception", "survival","deception", "intimidation", "performance", "persuasion"];
         var allAbilities = abilityList.map(function(x) {return x.toLowerCase()});
         console.log(data);
-        console.log(abilities);
-        console.log(blobs);
-        console.log(leveldata);
+        console.log(spelldata);
+        console.log(repeating);
+        set["lp-mancer_status"] = "";
         _.each(leveldata, function(level, name) {
             var theseblobs = getLpBlobs(level);
             var mc = "multiclass" + (level.classnumber - 1);
@@ -15273,50 +15354,51 @@
             //if this is an mc class, add mc data
             if(name != "class1") thisclass.data.multiclass = mc;
             thisclass.data.theseblobs = blobs.names[name];
-            allDrops.push(thisclass);
+            allPageData.push(thisclass);
             if(level.subclass) {
                 var thissubclass = {name: level.subclassname, data: level.subclass};
                 //if this is an mc subclass, add mc data
                 if(name != "class1") thissubclass.data.multiclass = mc;
                 thissubclass.data.theseblobs = blobs.names[name + "_subclass"];
-                allDrops.push(thissubclass);
+                allPageData.push(thissubclass);
             }
             //set up the setAttrs for this class
             if(name === "class1") {
                 set["base_level"] = parseInt(previous["base_level"]) + level.addlevel;
             } else {
-                set[mc + "_lvl"] = previous[mc + "_flag"] === "0" ? level.addlevel : parseInt(previous[mc + "_lvl"]) + level.addlevel;
+                initial[mc + "_lvl"] = previous[mc + "_flag"] === "0" ? level.addlevel : parseInt(previous[mc + "_lvl"]) + level.addlevel;
             }
         });
-        //console.log(spelldata);
         // Build new blobs for traits with inputs, collect custom traits and languages
         _.each(["lp-choices", "lp-asi"], function(pagename) {
             var slide = data[pagename];
-            _.each(slide.values, function(value, name) {
-                if(name.substr(-11) == "trait_input") {
-                    var sectionid = name.substring(0, name.length - 6);
-                    var thisblob = {};
-                    var thistrait = {};
-                    thistrait.Name = slide.values[sectionid + "_name"].replace(/{{Input}}/g, value);
-                    thistrait.Desc = slide.values[sectionid + "_desc"] ? slide.values[sectionid + "_desc"].replace(/{{Input}}/g, value) : "";
-                    thisblob.Traits = JSON.stringify([thistrait]);
-                    blobs.names[slide.values[sectionid + "_section"]].push(sectionid);
-                    slide.data[slide.values[sectionid + "_section"]].blobs[sectionid] = thisblob;
-                }
-                if(name.split("_")[2] == "custom" && name.substr(-10) == "trait_name") {
-                    var sectionid = name.substring(0, name.length - 5);
-                    var thistrait = {};
-                    thistrait.Name = slide.values[sectionid + "_name"];
-                    thistrait.Desc = slide.values[sectionid + "_desc"] ? slide.values[sectionid + "_desc"] : "";
-                    customtraits[name.split("_")[3]].push(thistrait);
-                }
-                if(value == "custom" && name.substr(-18) == "proficiency_choice") {
-                    var sectionid = name.substring(0, name.length - 7);
-                    if(slide.values[sectionid + "_custom"] && slide.values[sectionid + "_type"]) {
-                        profs.all[slide.values[sectionid + "_type"]].push(slide.values[sectionid + "_custom"])
+            if(slide) {
+                _.each(slide.values, function(value, name) {
+                    if(name.substr(-11) == "trait_input") {
+                        var sectionid = name.substring(0, name.length - 6);
+                        var thisblob = {};
+                        var thistrait = {};
+                        thistrait.Name = slide.values[sectionid + "_name"].replace(/{{Input}}/g, value);
+                        thistrait.Desc = slide.values[sectionid + "_desc"] ? slide.values[sectionid + "_desc"].replace(/{{Input}}/g, value) : "";
+                        thisblob.Traits = JSON.stringify([thistrait]);
+                        blobs.names[slide.values[sectionid + "_section"]].push(sectionid);
+                        slide.data[slide.values[sectionid + "_section"]].blobs[sectionid] = thisblob;
                     }
-                }
-            });
+                    if(name.split("_")[2] == "custom" && name.substr(-10) == "trait_name") {
+                        var sectionid = name.substring(0, name.length - 5);
+                        var thistrait = {};
+                        thistrait.Name = slide.values[sectionid + "_name"];
+                        thistrait.Desc = slide.values[sectionid + "_desc"] ? slide.values[sectionid + "_desc"] : "";
+                        customtraits[name.split("_")[3]].push(thistrait);
+                    }
+                    if(value == "custom" && name.substr(-18) == "proficiency_choice") {
+                        var sectionid = name.substring(0, name.length - 7);
+                        if(slide.values[sectionid + "_custom"] && slide.values[sectionid + "_type"]) {
+                            profs.all[slide.values[sectionid + "_type"]].push(slide.values[sectionid + "_custom"])
+                        }
+                    }
+                });
+            }
         });
         //Set up proficiency drops
         _.each(["Armor", "Language", "Tool", "Weapon"], function(proftype) {
@@ -15333,104 +15415,62 @@
         //Set up expertise drops
         _.each(_.uniq(profs.all.Skill.concat(profs.all.Expertise)), function(prof) {
             var profName = prof.toLowerCase().replace(" " , "_");
-            set[profName + "_prof"] = "(@{pb}*@{" + profName + "_type})";
+            initial[profName + "_prof"] = "(@{pb}*@{" + profName + "_type})";
             if(profs.all.Expertise.indexOf(prof) != -1) {
                 set[profName + "_type"] = 2;
             }
         });
         //Set up Ability scores
-        console.log(set);
+        initial["hp"] = getHpTotal(data);
+        initial["hp_max"] = initial["hp"];
         _.each(allAbilities, function(ability) {
             loudset[ability + "_base"] = abilities[ability];
         });
-        /*
-        //Set up drops. start with class, subclass, race, subrace, background
-        //set up feat drop
-        if(data["l1-feat"] && data["l1-feat"].values.feat) {
-            var feat = {name: data["l1-feat"].values.feat, data: {Properties: "1st Level"}};
-            allDrops.push(feat);
-        }
-        //set up background drop
-        if(data["l1-background"].values.background) {
-            if(data["l1-background"].values.background == "Rules:Backgrounds") {
-                var customBg  = {name: data["l1-background"].values["background_name"], data: {Category: "Backgrounds", blobs:{}}};
-                if(customtraits.background.length > 0) {
-                    customBg.data.theseblobs = ["customblob"];
-                    customBg.data.blobs.customblob = {Traits: JSON.stringify(customtraits.background)};
+        //Set up spell drops
+        if(data["lp-spells"]) {
+            _.each(data["lp-spells"].repeating, function(repid) {
+                if(data["lp-spells"].values[repid + "_checked"] && !data["lp-spells"].values[repid + "_existing"]) {
+                    var spelldata = {name: "Spells:" + data["lp-spells"].values[repid + "_name"], data: {}};
+                    allDrops.push(spelldata);
                 }
-                allPageData.push(customBg);
-            } else {
-                var thisdata = {name: _.last(data["l1-background"].values.background.split(":")), data: data["l1-background"].data.background};
-                thisdata.data.theseblobs = blobs.names.background;
-                allPageData.push(thisdata);
-            }
-        }
-
-        //Now add proficiency drops
-
-        //Next, add spell drops
-        _.each(spells.all, function(spell) {
-            var spelldata = {name: "Spells:" + spell.Name};
-            spelldata.data = {"spellcasting_ability": "@{" + spell.Ability.toLowerCase() + "_mod}+"};
-            if(spell.Source) {
-                spelldata.data.spellsource = spell.Source
-            };
-            allDrops.push(spelldata);
-        });
-
-        //Set up the final setAttrs()
-        set["alignment"] = data["l1-race"].values.alignment || "";
-        set["hp"] = stats.hp;
-        set["hp_max"] = stats.hp;
-        set["l1mancer_status"] = "completed";
-        set["options-class-selection"] = "0";
-        if(data["l1-equipment"].values["equipment_type"] == "class") {
-            _.each(data["l1-equipment"].values, function(val, name) {
-                if(name.includes("class_equipment_choice")) {
-                    equipment = equipment.concat(val.split(" and "));
+                if(data["lp-spells"].values[repid + "_existing"] && !data["lp-spells"].values[repid + "_checked"]) {
+                    var lvl = data["lp-spells"].values[repid + "_level"];
+                    var id = "";
+                    _.each(repeating["spell-" + lvl], function(spell, spellid) {
+                        if(spell.spellname.toLowerCase() == data["lp-spells"].values[repid + "_name"].toLowerCase()) {
+                            id = spellid;
+                            if(spell.spellattackid) removesections.push("repeating_attack_" + spell.spellattackid);
+                        };
+                    });
+                    removesections.push("repeating_spell-" + lvl + "_" + id);
                 }
             });
-        } else if(data["l1-equipment"].values["equipment_type"] == "gold" && data["l1-equipment"].values["starting_gold"]) {
-            set["gp"] = parseInt(data["l1-equipment"].values["starting_gold"]);
-        }
-        //Add the bio info
-        if(data["l1-bio"]) {
-            _.each(["character_name", "age", "height", "weight", "eyes", "hair", "skin"], function(type) {
-                if(data["l1-bio"].values[type]) {
-                    set[type] = data["l1-bio"].values[type] || "";
-                }
-            });
-        }
-        allDrops = allDrops.concat(makeItemData(equipment));
-        totalDrops += allDrops.length;
-        _.each(allPageData, function(page) {
-            allDrops = allDrops.concat(getOtherDrops(page.data));
+        };
+        _.each(removesections, function(rowid) {
+            removeRepeatingRow(rowid);
         });
-
-        //erase all repeating sections
-        eraseRepeating(eraseSections, function() {
-            setCharmancerText({"mancer_progress" :'<div style="width: 5%"></div>'});
-            //first set is silent to prevent unwanted sheet workers
-            setAttrs(silentset, {silent:true}, function() {
-                setCharmancerText({"mancer_progress" :'<div style="width: 10%"></div>'});
-                //reset remaining attributes, and set ability scores/custom info
-                setAttrs(clearset, function() {
-                    setCharmancerText({"mancer_progress" :'<div style="width: 15%"></div>'});
-                    getAllPages(allDrops, function() {
-                        setCharmancerText({"mancer_progress" :'<div style="width: 20%"></div>'});
-                        doAllDrops(allPageData, function() {
-                            console.log("DOING THE FINAL SET!!");
-                            setAttrs(set, function() {
-                                setCharmancerText({"mancer_progress" :'<div style="width: 100%"></div>'});
-                                update_class();
-                                organize_section_proficiencies();
-                                update_skills(allSkills);
-                                update_attacks("all");
-                                var endTime = Date.now();
-                                console.log("Elapsed time: ");
-                                console.log((endTime-startTime)/1000);
-                                //finishCharactermancer();
-                            });
+        setCharmancerText({"mancer_progress" :'<div style="width: 5%"></div>'});
+        //first set is silent to prevent unwanted sheet workers
+        setAttrs(initial, {silent:true}, function() {
+            setCharmancerText({"mancer_progress" :'<div style="width: 10%"></div>'});
+            //reset remaining attributes, and set ability scores/custom info
+            setAttrs(loudset, function() {
+                setCharmancerText({"mancer_progress" :'<div style="width: 15%"></div>'});
+                getAllPages(allDrops, function() {
+                    setCharmancerText({"mancer_progress" :'<div style="width: 20%"></div>'});
+                    console.log(allPageData);
+                    doAllDrops(allPageData, function() {
+                        console.log("DOING THE FINAL SET!!");
+                        setAttrs(set, function() {
+                            setCharmancerText({"mancer_progress" :'<div style="width: 100%"></div>'});
+                            update_class();
+                            organize_section_proficiencies();
+                            update_skills(allSkills);
+                            update_attacks("all");
+                            var endTime = Date.now();
+                            console.log("Elapsed time: ");
+                            console.log((endTime-startTime)/1000);
+                            finishCharactermancer();
                         });
                     });
                 });
@@ -16869,13 +16909,13 @@
         <p data-i18n="charmancer-compendium-detail">The Charactermancer currently supports Dungeons &amp; Dragons 5th Edition SRD and the Player's Handbook. You can add the Player's Handbook to your compendium in the Marketplace, or the game owner can share their compendium with everyone in the game.</p>
         <p class="label" data-i18n="get-started">Get started by clicking "Next".</p>
         <div class="bottombar">
-            <button class="prev" type="cancel" value="l1-cancel" data-i18n="opt-out-u">OPT OUT</button>
+            <button class="prev" type="cancel" value="lp-cancel" data-i18n="opt-out-u">OPT OUT</button>
             <button type="button" data-scroll="#top" class="jump">Back to Top</button>
             <button class="next" type="back" value="lp-levels">Next</button>
         </div>
         <div class="choice cancel-prompt">
             <p class="label" data-i18n="charmancer-cancel-heading">Where would you like to go, traveler?</p>
-            <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
+            <button class="warning" type="cancel" value="lp-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
             <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
@@ -16884,6 +16924,10 @@
         <input type="hidden" name="comp_previous_abilities">
         <input type="hidden" name="comp_previous_attributes">
         <input type="hidden" name="comp_previous_proficiencies">
+        <input type="hidden" name="comp_previous_repeating">
+        <input type="hidden" name="comp_race">
+        <input type="hidden" name="comp_subrace">
+        <input type="hidden" name="comp_background">
     </div>
 </charmancer>
 
@@ -16941,7 +16985,7 @@
                 </div>
                 <div>
                     <h4 class="subclass1_features_title choice" style="display: inline;">Subclass Features: </h4>
-                    <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe --->
+                    <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
                     <div>This text is a placeholder.</div>
                 </div>
             </div>
@@ -16980,7 +17024,7 @@
                 </div>
                 <div>
                     <h4 class="subclass2_features_title choice" style="display: inline;">Subclass Features: </h4>
-                    <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe --->
+                    <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
                      <div>This text is a placeholder.</div>
                 </div>
             </div>
@@ -17021,7 +17065,7 @@
                 </div>
                 <div>
                     <h4 class="subclass3_features_title choice" style="display: inline;">Subclass Features: </h4>
-                    <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe --->
+                    <button type="action" name="" class="mancer_info">i</button><!-- Updated button to change iframe -->
                     <div>This text is a placeholder.</div>
                 </div>
             </div>
@@ -17079,7 +17123,7 @@
         </div>
         <div class="choice cancel-prompt">
             <p class="label">Where would you like to go, Traveler?</p>
-            <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
+            <button class="warning" type="cancel" value="lp-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-class" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
             <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
@@ -17107,7 +17151,7 @@
         </div>
         <div class="choice cancel-prompt">
             <p class="label">Where would you like to go, Traveler?</p>
-            <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
+            <button class="warning" type="cancel" value="lp-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-class" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
             <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
@@ -17134,7 +17178,7 @@
         </div>
         <div class="choice cancel-prompt">
             <p class="label">Where would you like to go, Traveler?</p>
-            <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
+            <button class="warning" type="cancel" value="lp-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-class" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
             <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
@@ -17164,7 +17208,7 @@
         </div>
         <div class="choice cancel-prompt">
             <p class="label">Where would you like to go, Traveler?</p>
-            <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
+            <button class="warning" type="cancel" value="lp-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-class" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
             <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
@@ -17202,7 +17246,7 @@
         </div>
         <div class="choice cancel-prompt">
             <p class="label">Where would you like to go, Traveler?</p>
-            <button class="warning" type="cancel" value="l1-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
+            <button class="warning" type="cancel" value="lp-cancel" data-i18n="cancel_charactermancer">Discard and exit</button>
             <button type="cancel" value="l1-class" data-i18n="save_progress_and_exit">Save and Exit</button>
             <button type="action" name="act_continue"><span data-i18n="continue-charmancer">Continue Charactermancer</span></button>
             <p class="warning"><span data-i18n="charmancer-discard-warning">Discard and Exit will discard all choices you’ve made in Charactermancer and let you edit your character sheet directly.</span></p>
