@@ -3,23 +3,14 @@
 	var primaryStats = [ "stats_courage", "stats_intelligence", "stats_charisme", "stats_adresse", "stats_force", "stats_attaque", "stats_parade"];
 	// Secondary Stats
 	var secondaryStats = [	"stats_charisme_total", "stats_intelligence_total", "stats_adresse_total", "stats_force_total", "stats_courage_total",
-							"stats_inge_mod", "stats_magiepsy_mod", "stats_magiephy_mod", "stats_resimagie_mod", "stats_fouille_mod", "stats_jet_mod",
-							"stats_inge_temp_total", "stats_magiepsy_temp_total", "stats_magiephy_temp_total", "stats_resimagie_temp_total", "stats_fouille_temp_total", "stats_jet_temp_total" ];
-	// Temp Stats
-	var tempStats = [	"stats_courage", "stats_intelligence", "stats_charisme", "stats_adresse", "stats_force",
-						"stats_attaque", "stats_parade", "stats_jet", "stats_esquive", "stats_fouille",
-						"stats_inge", "stats_magiephy", "stats_magiepsy", "stats_resimagie" ];
-	// Buff Stats
-	var buffStats = [	"condition_courage", "condition_intelligence", "condition_charisme", "condition_adresse", "condition_force",
-						"condition_attaque", "condition_parade", "condition_jet", "condition_esquive",
-						"condition_magiephy", "condition_magiepsy", "condition_resimagie" ];
+							"stats_inge_mod", "stats_magiepsy_mod", "stats_magiephy_mod", "stats_resimagie_mod", "stats_fouille_mod", "stats_jet_mod" ];
 	var prStats = {
 		change: [ "repeating_armures:armure_prphy", "repeating_armures:armure_prmag", "prnat" ],
 		remove: [ "repeating_armures" ]
 	};
 	// items weight
 	var weightStats = [	"richesse_berylium", "richesse_thritil", "poids_bourses",
-						"poids_materiels", "poids_butins", "poids_livres", "poids_bouffes", "personnage_charge_max", "poids_sacs_max" ];
+						"poids_materiels", "poids_butins", "poids_livres", "poids_bouffes", "personnage_charge_max", "poids_sacs_max"  ];
 	// repeating items sections
 	var weightSections = {
 		change: [ "repeating_materiels:materiel_poids", "repeating_butins:butin_poids", "repeating_bouffes:bouffe_poids", "repeating_livres" ],
@@ -31,7 +22,7 @@
 		remove: [ "repeating_sacs", "repeating_bourses" ]
 	}
 
-	var levelAndXP = [	0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500,
+	var levelAndXP = [ 	0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500,
 						5500, 6600, 7800, 9100, 10500, 12000, 13600, 15300, 17100, 19000,
 						21000, 24000, 29000, 35000, 45000, 60000 ];
 
@@ -39,16 +30,12 @@
 		EVENTS
 	----------*/
 	// Primary Stats
-	on( primaryStats.map( stat => `change:${stat} change:${stat}_mod change:${stat}_temp_total` ).join(" "), function(e) {
-		updatePrimaryStat( e.sourceAttribute.replace( "_mod", "" ).replace( "_temp_total", "" ) );
+	on( primaryStats.map( stat => `change:${stat} change:${stat}_mod` ).join(" "), function(e) {
+		updatePrimaryStat( e.sourceAttribute.replace( "_mod", "" ) );
 	});
 	// Secondary Stats & Secondary Mods
 	on( secondaryStats.map( stat => `change:${stat}` ).join(" "), function() {
 		updateSecondaryStats();
-	});
-	// Temp Stats
-	on( tempStats.map( stat => `change:${stat}_temp change:${stat}_buff` ).join(" "), function(e) {
-		updateTempStat( e.sourceAttribute.replace( "_temp", "" ).replace( "_buff", "" ) );
 	});
 	// PR Physique et magique
 	on( prStats[ "change" ].map( stat => `change:${stat}` ).join(" ") + " " + prStats[ "remove" ].map( stat => `remove:${stat}` ).join(" "), function() {
@@ -59,7 +46,7 @@
 		updateDeplacement();
 	});
 	// Equive
-	on("change:stats_adresse_total change:prphy change:stats_esquive_mod change:stats_esquive_temp_total change:personnage_surcharge", function() {
+	on("change:stats_adresse_total change:prphy change:stats_esquive_mod change:personnage_surcharge", function() {
 		updateEsquive();
 	});
 	// Level
@@ -80,7 +67,7 @@
 		updateWeapons();
 	});
 	// Total golds
-	on("change:richesse_or change:richesse_argent change:richesse_cuivre change:richesse_berylium change:richesse_thritil change:richesse_billet10 change:richesse_billet50 change:richesse_billet100 change:richesse_billet500 change:richesse_billet1000", function() {
+	on("change:richesse_or change:richesse_argent change:richesse_cuivre", function() {
 		updatePO();
 	});
 	// total repeating section weight
@@ -133,10 +120,7 @@
 		updateRepair();
 		updateRecipes();
 	});
-	// Buff / Debuff
-	on("change:repeating_conditions:condition_actif remove:repeating_conditions " + buffStats.map( stat => `change:repeating_conditions:${stat}` ).join(" "), function(e) {
-		updateBuffs();
-	});
+
 	// export
 	on("change:export_start", function() {
 		start_export();
@@ -170,9 +154,9 @@
 	}
 
 	function updatePrimaryStat( attr ) {
-		getAttrs( [ attr, `${attr}_mod`, `${attr}_temp_total` ], function( v ) {
+		getAttrs( [ attr, `${attr}_mod` ], function( v ) {
 			setAttrs({
-				[ `${attr}_total` ]: safeInt( v[ attr ] ) + safeInt( v[ attr + "_mod" ] ) + safeInt( v[ attr + "_temp_total" ] )
+				[ `${attr}_total` ]: safeInt( v[ attr ] ) + safeInt( v[ attr + "_mod" ] )
 			});
 		});
 	}
@@ -212,63 +196,22 @@
 
 			setAttrs({
 				"stats_inge": ingeniosite,
-				"stats_inge_total": ingeniosite + v[ "stats_inge_mod" ] + v[ "stats_inge_temp_total" ],
+				"stats_inge_total": ingeniosite + v[ "stats_inge_mod" ],
 				"stats_magiepsy": magiePsy,
-				"stats_magiepsy_total": magiePsy + v[ "stats_magiepsy_mod" ] + v[ "stats_magiepsy_temp_total" ],
+				"stats_magiepsy_total": magiePsy + v[ "stats_magiepsy_mod" ],
 				"stats_magiephy": magiePhy,
-				"stats_magiephy_total": magiePhy + v[ "stats_magiephy_mod" ] + v[ "stats_magiephy_temp_total" ],
+				"stats_magiephy_total": magiePhy + v[ "stats_magiephy_mod" ],
 				"stats_resimagie": resiMagie,
-				"stats_resimagie_total": resiMagie + v[ "stats_resimagie_mod" ] + v[ "stats_resimagie_temp_total" ],
+				"stats_resimagie_total": resiMagie + v[ "stats_resimagie_mod" ],
 				"stats_fouille": v[ "stats_intelligence_total"],
-				"stats_fouille_total": v[ "stats_intelligence_total"] + v[ "stats_fouille_mod" ] + v[ "stats_fouille_temp_total" ],
+				"stats_fouille_total": v[ "stats_intelligence_total"] + v[ "stats_fouille_mod" ],
 				"bonusintel": bonusIntel,
 				"bonusdegatsintel": bonusDegatsIntel,
 				"stats_jet": v[ "stats_adresse_total" ],
-				"stats_jet_total": v[ "stats_adresse_total" ] + v[ "stats_jet_mod" ] + v[ "stats_jet_temp_total" ],
+				"stats_jet_total": v[ "stats_adresse_total" ] + v[ "stats_jet_mod" ],
 				"bonusadresse": bonusAdresse,
 				"bonusforce": bonusForce,
 				"bonusdegatsforce": bonusDegatsForce
-			});
-		});
-	}
-
-	function updateTempStat( attr ) {
-		getAttrs( [ `${attr}_temp`, `${attr}_buff` ], function( v ) {
-			setAttrs({
-				[ `${attr}_temp_total` ]: safeInt( v[ attr + "_temp" ] ) + safeInt( v[ attr + "_buff" ] )
-			});
-		});
-	}
-
-	function updateBuffs() {
-		var aBuffs = [];
-		var sBuffs = {};
-		var statName ='';
-		var keyName ='';
-
-		getSectionIDs( "repeating_conditions", function(idArray) {
-			getAttrs( [ ...idArray.map(id => `repeating_conditions_${id}_condition_actif`) ], function( sValues ) {
-				for( var i in idArray ) {
-					if( sValues[ `repeating_conditions_${idArray[i]}_condition_actif`] === "1" ) {
-						for( var j in buffStats ) {
-							aBuffs.push("repeating_conditions_" + idArray[i] + "_" + buffStats[j] );
-						}
-					}
-				}
-
-				getAttrs(aBuffs, function(values) {
-					var v = structSafeInt( values );
-					for( var key in v ) {
-						statName = key.split('_')[4];
-						keyName = "stats_" + statName + "_buff";
-						if( sBuffs[ keyName ] != undefined ) {
-							sBuffs[ keyName ] += v[ key ];
-						} else {
-							sBuffs[ keyName ] = v[ key ];
-						}
-					}
-					setAttrs( sBuffs );
-				});
 			});
 		});
 	}
@@ -330,7 +273,7 @@
 	}
 
 	function updateEsquive() {
-		getAttrs( [ "stats_adresse_total", "stats_esquive_mod", "stats_esquive_temp_total", "prphy", "personnage_surcharge" ], function( sValues ) {
+		getAttrs( [ "stats_adresse_total", "stats_esquive_mod", "prphy", "personnage_surcharge" ], function( sValues ) {
 			var v = structSafeInt( sValues );
 			var esquive = v[ "stats_adresse_total" ];
 			var prPhy = v[ "prphy" ];
@@ -352,7 +295,7 @@
 			}
 
 			// surcharge vs Esquive
-			if( surcharge === 4 ) {
+			if( surcharge === 4  ) {
 				esquive += -2;
 			} else if( surcharge === 5 ) {
 				esquive = 0;
@@ -360,7 +303,7 @@
 
 			setAttrs({
 				"stats_esquive": esquive,
-				"stats_esquive_total": esquive + v[ "stats_esquive_mod" ] + v[ "stats_esquive_temp_total" ]
+				"stats_esquive_total": esquive + v[ "stats_esquive_mod" ]
 			}, { silent: true });
 		});
 	}
@@ -397,6 +340,9 @@
 			if( v[ `repeating_armes_${idRow}_arme_bonusforce` ] === "1" ) {
 				sWeapon[ 'repeating_armes_' + idRow + '_arme_totaldegats' ] += " + " + v[ "bonusdegatsforce" ];
 			}
+
+			console.log(v);
+			console.log(sWeapon);
 
 			setAttrs( sWeapon, { silent: true } );
 		});
@@ -465,18 +411,10 @@
 	}
 
 	function updatePO() {
-		getAttrs( [	"richesse_or","richesse_argent","richesse_cuivre",
-					"richesse_berylium","richesse_thritil",
-					"richesse_billet10","richesse_billet50","richesse_billet100","richesse_billet500","richesse_billet1000" ],
-				function( sValues ) {
+		getAttrs( ["richesse_or","richesse_argent","richesse_cuivre"], function( sValues ) {
 			var v = structSafeInt( sValues );
-			var richesse_total = v[ "richesse_or" ] + Math.floor( v[ "richesse_argent" ] * 0.1 ) + Math.floor( v[ "richesse_cuivre" ] * 0.01 );
-			richesse_total += ( v[ "richesse_berylium" ] * 500 ) + ( v[ "richesse_thritil" ] * 100 );
-			richesse_total += ( v[ "richesse_billet10" ] * 10 ) + ( v[ "richesse_billet50" ] * 50 ) + ( v[ "richesse_billet100" ] * 100 ) + ( v[ "richesse_billet500" ] * 500 ) + ( v[ "richesse_billet1000" ] * 1000 );
-
 			setAttrs({
-				"poids_bourses": v[ "richesse_or" ] + v[ "richesse_argent" ] + v[ "richesse_cuivre" ],
-				"richesse_total": richesse_total
+				"poids_bourses": v[ "richesse_or" ] + v[ "richesse_argent" ] + v[ "richesse_cuivre" ]
 			});
 		});
 	}
@@ -580,7 +518,7 @@
 				var cur_level = v[ "tab_niveaumagie" ];
 
 				for( var i in idarray ) {
-					if( ( v[ `repeating_magies_${idarray[ i ]}_magie_ecole` ].trim().toLowerCase() === cur_ecole || cur_ecole === "all" ) && ( v[ `repeating_magies_${idarray[ i ]}_magie_niveau` ] === cur_level || cur_level === "all" ) ) {
+					if( ( v[ `repeating_magies_${idarray[ i ]}_magie_ecole` ].trim().toLowerCase() ===  cur_ecole || cur_ecole === "all" ) && ( v[ `repeating_magies_${idarray[ i ]}_magie_niveau` ] ===  cur_level || cur_level === "all" ) ) {
 						sDisplay[ `repeating_magies_${idarray[ i ]}_magie_filtre` ] = 1;
 					} else {
 						sDisplay[ `repeating_magies_${idarray[ i ]}_magie_filtre` ] = 0;
@@ -661,7 +599,7 @@
 
 		getAttrs( [ 'stats_inge_total',
 					`repeating_recettes_${idRow}_recette_specialiste`, `repeating_recettes_${idRow}_recette_difficulte`, `repeating_recettes_${idRow}_recette_malusspecialiste`
-				], function ( sValues ) {
+				  ], function ( sValues ) {
 			var v = structSafeInt( sValues );
 
 			recette_bonus = v[ "stats_inge_total" ] - v[ `repeating_recettes_${idRow}_recette_difficulte` ];
@@ -695,22 +633,22 @@
 						"personnage_langue", "personnage_vision", "personnage_nyctalopie", "personnage_ouie", "personnage_odorat", "personnage_charge_max",
 						"pr_tete", "pr_bras", "pr_torse", "pr_bouclier", "pr_jambes", "pr_pieds", "pr_mains", "prnat",
 						"bivouac_couverture", "bivouac_couverture_recup", "bivouac_matelas", "bivouac_matelas_recup", "bivouac_tente", "bivouac_tente_recup",
-						"stats_courage", "stats_courage_mod", "stats_courage_temp", "stats_intelligence", "stats_intelligence_mod", "stats_intelligence_temp", "stats_charisme", "stats_charisme_mod", "stats_charisme_temp", "stats_adresse", "stats_adresse_mod", "stats_adresse_temp", "stats_force", "stats_force_mod", "stats_force_temp", "stats_inge", "stats_inge_mod", "stats_inge_temp",
-						"stats_attaque", "stats_attaque_mod", "stats_attaque_temp", "stats_parade", "stats_parade_mod", "stats_parade_temp", "stats_jet_mod", "stats_jet_temp", "stats_esquive_mod", "stats_esquive_temp", "stats_fouille_mod", "stats_fouille_temp", "stats_magiephy_mod", "stats_magiephy_temp", "stats_magiepsy_mod", "stats_magiepsy_temp", "stats_resimagie_mod", "stats_resimagie_temp",
-						"richesse_or", "richesse_argent", "richesse_cuivre", "richesse_berylium", "richesse_thritil", "richesse_billet10", "richesse_billet50", "richesse_billet100", "richesse_billet500", "richesse_billet1000", "richesse_enbanque",
-						"displayjet", "displaycriteffets" ],
+						"stats_courage", "stats_courage_mod", "stats_intelligence", "stats_intelligence_mod", "stats_charisme", "stats_charisme_mod", "stats_adresse", "stats_adresse_mod", "stats_force", "stats_force_mod", "stats_inge", "stats_inge_mod",
+						"stats_attaque", "stats_attaque_mod", "stats_parade", "stats_parade_mod", "stats_jet_mod", "stats_esquive_mod", "stats_fouille_mod", "stats_magiephy_mod", "stats_magiepsy_mod", "stats_resimagie_mod",
+						"richesse_or", "richesse_argent", "richesse_cuivre", "richesse_berylium", "richesse_thritil", "richesse_billet10", "richesse_billet50", "richesse_billet100", "richesse_billet500", "richesse_billet1000",
+						"displayJet"
+			],
 			"repeating": [
 				{ zone:"competences", attr: ["competence_nom", "competence_effet", "competence_epreuve", "competence_jet", "competence_mod"] },
-				{ zone:"armes", attr: ["arme_nom", "arme_portee", "arme_at", "arme_prd", "arme_degats", "arme_rup", "arme_munition_display", "munition_nom", "munition_modad", "munition_degats", "arme_effet", "arme_note", "arme_bonusforce", "arme_note_display", "arme_bonusforce", "arme_critique", "arme_fumble", "arme_effet_display" ] },
+				{ zone:"armes", attr: ["arme_nom", "arme_portee", "arme_at", "arme_prd", "arme_degats", "arme_rup", "arme_munition_display", "munition_nom", "munition_modad", "munition_degats", "arme_effet", "arme_note", "arme_bonusforce" ] },
 				{ zone:"armures", attr: ["armure_nom", "armure_prphy", "armure_prmag", "armure_rup", "armure_effet"] },
 				{ zone:"sacs", attr: ["sac_nom", "sac_charge_max"] },
 				{ zone:"materiels", attr: ["materiel_nom", "materiel_poids"] },
 				{ zone:"recettes", attr: ["recette_nom", "recette_effet", "recette_specialiste", "recette_niveau", "recette_duree", "recette_outils", "recette_materiaux", "recette_materiauxspe", "recette_assistant", "recette_difficulte", "recette_malusspecialiste", "recette_mod", "recette_resultats", "recette_prix"] },
 				{ zone:"ape", attr: ["ape_nom", "ape_note", "ape_effet", "ape_occurence"] },
-				{ zone:"conditions", attr: ["condition_provenance", "condition_nom", "condition_effet", "condition_actif", "condition_courage", "condition_intelligence", "condition_charisme", "condition_adresse", "condition_force", "condition_attaque", "condition_parade", "condition_jet", "condition_esquive", "condition_magiephy", "condition_magiepsy", "condition_resimagie"] },
 				{ zone:"gemmes", attr: ["gemme_nom", "gemme_ug"] },
 				{ zone:"potions", attr: ["conso_nom", "conso_count", "conso_effet"] },
-				{ zone:"coupsspeciaux", attr: ["coupspecial_nom", "coupspecial_jet", "coupspecial_mod", "coupspecial_degats", "coupspecial_degats_arme", "coupspecial_utilisation", "coupspecial_echec", "coupspecial_effet", "coupspecial_note", "coupspecial_condition", "coupspecial_critique", "coupspecial_fumble" ] },
+				{ zone:"coupsspeciaux", attr: ["coupspecial_nom", "coupspecial_jet", "coupspecial_mod", "coupspecial_degats", "coupspecial_utilisation","coupspecial_echec","coupspecial_effet", "coupspecial_note", "coupspecial_condition", "coupspecial_critique", "coupspecial_fumble" ] },
 				{ zone:"munitions", attr: ["munition_nom", "munition_modad", "munition_count", "munition_degats", "munition_rup", "munition_effet"] },
 				{ zone:"vetements", attr: ["vetement_nom", "vetement_effet"] },
 				{ zone:"bourses", attr: ["bourse_nom", "bourse_charge_max"] },
@@ -815,8 +753,8 @@
 
 				if( err === "" ) {
 					// reset sheet repeating section
-					var aSections = [	"antidotes","ape","armes","armures","bagues","bouffes","bourses","butins","compagnons","competences","conditions","coupsspeciaux","ecolesmagie",
-										"gemmes","ingre","livres","magies","materiels","munitions","poisons","potions","quetes","recettes","reliques","sacs","vetements" ];
+					var aSections = [	"competences","armes","armures","sacs","materiels","gemmes","potions","coupsspeciaux","munitions","vetements","bourses",
+										"butins", "quetes","poisons","bagues","ecolesmagie","reliques","bouffes","livres","antidotes","magies","ingre","compagnons" ];
 					for( var i in aSections ) {
 						var section = `repeating_${aSections[ i ]}`;
 						(function( section ) {
@@ -868,18 +806,18 @@
 			console.log("Détection de la version : " + vrs );
 			if( vrs < 2.0 ) {
 				getAttrs( [ "level", "valattaque", "valparade", "class", "race", "experience" ], function( v ) {
-					if( v[ "level" ] != undefined || v[ "valattaque" ] != undefined || v[ "valparade" ] != undefined || v[ "class" ] != undefined || v[ "race" ] != undefined || v[ "experience" ] != undefined ) {
+					if( v[ "level" ] != undefined || v[ "valattaque" ] != undefined || v[ "valparade" ] != undefined || v[ "class" ] != undefined || v[ "race" ] != undefined || v[ "experience" ] != undefined  ) {
 						console.log( "Début du process d'import..." );
 						update_process();
 					}
 					console.log( "Mise à jour de la version..." );
-					setAttrs( { "version" : 2.6 } );
+					setAttrs( { "version" : 2.5 } );
 				});
 			} else if( vrs < 2.4 ) {
 				// uptodate
 				updateSecondaryStats();
 				updateWeapons();
-				setAttrs( { "version" : 2.6 } );
+				setAttrs( { "version" : 2.5 } );
 				return;
 			}
 			console.log( "ok" );
@@ -1184,6 +1122,7 @@
 	</table>
 </rolltemplate>
 
+
 <rolltemplate class="sheet-rolltemplate-coupSpecial">
 	<table class="sheet-rolltemplate-table">
 		<tr><th>{{name}}</th></tr>
@@ -1220,551 +1159,25 @@
 	</table>
 </rolltemplate>
 
-<rolltemplate class="sheet-rolltemplate-atk">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>AT</td>
-				<td>{{at}}</td>
-			</tr>
-			{{#rollGreater() display_effets 0}}
-			<tr>
-				<td>Effets</td>
-				<td>{{effets}}</td>
-			</tr>
-			{{/rollGreater() display_effets 0}}
-			{{#rollGreater() display_notes 0}}
-			<tr>
-				<td>Notes</td>
-				<td>{{notes}}</td>
-			</tr>
-			{{/rollGreater() display_notes 0}}
-			<tr>
-				<td>Résultat</td>
-				<td>{{results}}</td>
-			</tr>
-			<tr>
-				<td>{{btn_degats}}</td>
-				<td>
-					{{#rollWasCrit() results }}{{btn_critique}}{{/rollWasCrit() results }}
-					{{#rollWasFumble() results }}{{btn_fumble}}{{/rollWasFumble() results }}
-				</td>
-			</tr>
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-prd">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>PRD</td>
-				<td>{{prd}}</td>
-			</tr>
-			<tr>
-				<td>Résultat</td>
-				<td>{{results}}</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td>
-					{{#rollWasCrit() results }}{{btn_critique}}{{/rollWasCrit() results }}
-					{{#rollWasFumble() results }}{{btn_fumble}}{{/rollWasFumble() results }}
-				</td>
-			</tr>
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-dmg">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Dégats</td>
-				<td>{{dmg}} ({{typeDegat}})</td>
-			</tr>
-			{{#munition}}
-			<tr>
-				<td>Munition</td>
-				<td>{{munition}}</td>
-			</tr>
-			{{/munition}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-crit_tranchant">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Résolution</td>
-				<td>{{results}}</td>
-			</tr>
-			{{#rollTotal() displayEffets 1}}
-				{{#rollBetween() results 1 2}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Incision profonde</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +1</td></tr>
-				{{/rollBetween() results 1 2}}
-				{{#rollBetween() results 3 4}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Incision vraiment profonde</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +2</td></tr>
-				{{/rollBetween() results 3 4}}
-				{{#rollBetween() results 5 6}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Plaie impressionnate et dommages à l'armure</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +3</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure concernée PR -1</td></tr>
-				{{/rollBetween() results 5 6}}
-				{{#rollBetween() results 7 8}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis et dommages à l'armure</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +4</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure PR -2</td></tr>
-				{{/rollBetween() results 7 8}}
-				{{#rollBetween() results 9 10}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis de bourrin et dommages à l'armure</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure concernée PR -3</td></tr>
-				{{/rollBetween() results 9 10}}
-				{{#rollTotal() results 11}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Une partie de l'armure est détruite</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure concernée PR = 0</td></tr>
-				{{/rollTotal() results 11}}
-				{{#rollTotal() results 12}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Oeil crevé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD-1 | CHA -3 | AT -1 | PRD -2</td></tr>
-				{{/rollTotal() results 12}}
-				{{#rollTotal() results 13}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Main droite tranchée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +6</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -1 | FO -2 | AT -5 | PRD -6</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Main gauche tranchée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +6</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -1 | AT -2 | PRD -3</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 13}}
-				{{#rollTotal() results 14}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Pied droit tranché</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +6</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | 50% MV | AT -2 | PRD -2</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Pied gauche tranché</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +6</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | 50% MV | AT -2 | PRD -2</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 14}}
-				{{#rollTotal() results 15}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Bras droit tranché</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +7</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -4 | FO -4 | AT -5 | PRD -6 | CHA -5</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Bras gauche tranché</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +7</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -2 | FO -2 | AT -3 | PRD -4</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 15}}
-				{{#rollTotal() results 16}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Jambe droite tranchée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +8</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -3 | FO -3 | AT -4 | PRD -6 | 25% MV</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Jambe gauche tranchée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +8</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -3 | FO -3 | AT -4 | PRD -6 | 25% MV</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 16}}
-				{{#rollTotal() results 17}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Organes génitaux endommagés</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
-				{{/rollTotal() results 17}}
-				{{#rollTotal() results 18}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Organes vital endommagé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +9</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
-				{{/rollTotal() results 18}}
-				{{#rollTotal() results 19}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Blessure au coeur</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 19}}
-				{{#rollTotal() results 20}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Blessure grave à la tête</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 20}}
-			{{/rollTotal() displayEffets 1}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-crit_contondant">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Résolution</td>
-				<td>{{results}}</td>
-			</tr>
-			{{#rollTotal() displayEffets 1}}
-				{{#rollBetween() results 1 2}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Ématome impressionnant</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +1</td></tr>
-				{{/rollBetween() results 1 2}}
-				{{#rollBetween() results 3 4}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Ématome et luxation d'un membre</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-				{{/rollBetween() results 3 4}}
-				{{#rollBetween() results 5 6}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Fracture de côte</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-				{{/rollBetween() results 5 6}}
-				{{#rollBetween() results 7 8}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis et dommages à l'armure</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +4</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure PR -1</td></tr>
-				{{/rollBetween() results 7 8}}
-				{{#rollBetween() results 9 10}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis de bourrin et dommages à l'armure</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +5 </td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure PR -2</td></tr>
-				{{/rollBetween() results 9 10}}
-				{{#rollTotal() results 11}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Une partie de l'armure est détruite ()</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure concernée PR=0</td></tr>
-				{{/rollTotal() results 11}}
-				{{#rollTotal() results 12}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Luxation du genou (Dégâts +3 / AD -2 | MV 50% | AT -1 | PRD -2)</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +9</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
-				{{/rollTotal() results 12}}
-				{{#rollTotal() results 13}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Main droite cassée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -1 | FO -2 | AT -5 | PRD -6</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Main gauche cassée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -1 | AT -2 | PRD -3</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 13}}
-				{{#rollTotal() results 14}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Pied droit écrasé</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | 50% MV | AT -2 | PRD -2</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Pied gauche écrasé</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | 50% MV | AT -2 | PRD -2</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 14}}
-				{{#rollTotal() results 15}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Bras droit cassé ( / )</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -2 | FO -4 | AT -5 | PRD -6</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Bras gauche cassé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -2 | AT -2 | PRD -3</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 15}}
-				{{#rollTotal() results 16}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Jambe droite cassée</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -3 | FO -3 | AT -4 | PRD -6 | MV 25%</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Jambe gauche cassée</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -3 | FO -3 | AT -4 | PRD -6 | MV 25%</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 16}}
-				{{#rollTotal() results 17}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Organes génitaux écrasés</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -5 | MV 50%</td></tr>
-				{{/rollTotal() results 17}}
-				{{#rollTotal() results 18}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Assommé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Inconscient</td></tr>
-				{{/rollTotal() results 18}}
-				{{#rollTotal() results 19}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Fracture ouverte du crâne</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 19}}
-				{{#rollTotal() results 20}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Ecrasement violent d'un organe vital</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 20}}
-			{{/rollTotal() displayEffets 1}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-crit_projectile">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Résolution</td>
-				<td>{{results}}</td>
-			</tr>
-			{{#rollTotal() displayEffets 1}}
-				{{#rollBetween() results 1 2}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile bien placé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +1</td></tr>
-				{{/rollBetween() results 1 2}}
-				{{#rollBetween() results 3 4}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile magistralement placé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +2</td></tr>
-				{{/rollBetween() results 3 4}}
-				{{#rollBetween() results 5 6}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile dans une articulation du bras</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AT -2 | PRD -2</td></tr>
-				{{/rollBetween() results 5 6}}
-				{{#rollBetween() results 7 8}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile dans une articulation de la jambe</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">MV 50%</td></tr>
-				{{/rollBetween() results 7 8}}
-				{{#rollBetween() results 9 11}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile dans un poumon</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +3</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Toutes caracs -1</td></tr>
-				{{/rollBetween() results 9 11}}
-				{{#rollBetween() results 12 16}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile de maître</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts +5</td></tr>
-				{{/rollBetween() results 12 16}}
-				{{#rollTotal() results 17}}
-					<tr><td colspan="2" class="sheet-td-noFirst">En plein dans les organes génitaux, bien fait !</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
-				{{/rollTotal() results 17}}
-				{{#rollTotal() results 18}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Organe vital endommagé !</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
-				{{/rollTotal() results 18}}
-				{{#rollTotal() results 19}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coeur transpercé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 19}}
-				{{#rollTotal() results 20}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Oeil et cerveau transpercé, bien fait !</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 20}}
-			{{/rollTotal() displayEffets 1}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-crit_pugilat">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Résolution</td>
-				<td>{{results}}</td>
-			</tr>
-			{{#rollTotal() displayEffets 1}}
-				{{#rollBetween() results 1 2}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Ématome impressionnant</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +1</td></tr>
-				{{/rollBetween() results 1 2}}
-				{{#rollBetween() results 3 4}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Ématome et luxation d'un membre</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +2</td></tr>
-				{{/rollBetween() results 3 4}}
-				{{#rollBetween() results 5 6}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Fracture du nez, hémorragie nasale</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-				{{/rollBetween() results 5 6}}
-				{{#rollBetween() results 7 8}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Fracture de côte</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
-				{{/rollBetween() results 7 8}}
-				{{#rollBetween() results 9 10}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis de bourrin dans la tempe</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +2</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Cible étourdie 3 assauts</td></tr>
-				{{/rollBetween() results 9 10}}
-				{{#rollTotal() results 11}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis au sternum</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Cible étourdie 4 assauts</td></tr>
-				{{/rollTotal() results 11}}
-				{{#rollTotal() results 12}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Luxation du genou</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts +3</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | MV 50% | AT -1 | PRD -2</td></tr>
-				{{/rollTotal() results 12}}
-				{{#rollTotal() results 13}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Main droite cassée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -1 | FO -2 | AT -5 | PRD -6</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Main gauche cassée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -1 | AT -2 | PRD -3</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 13}}
-				{{#rollTotal() results 14}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Mâchoire brisée</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts +3</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Incapacité à parler</td></tr>
-				{{/rollTotal() results 14}}
-				{{#rollTotal() results 15}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Bras droit cassé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -2 | FO -4 | AT -5 | PRD -6</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Bras gauche cassé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -2 | AT -2 | PRD -3</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 15}}
-				{{#rollBetween() results 16 17}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Organes génitaux écrasés, houlala</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Cible étourdie 3 assauts</td></tr>
-				{{/rollBetween() results 16 17}}
-				{{#rollBetween() results 18 19}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Assommé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Inconscient</td></tr>
-				{{/rollBetween() results 18 19}}
-				{{#rollTotal() results 20}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Enfoncement du nez dans le cerveau</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 20}}
-			{{/rollTotal() displayEffets 1}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-fumble_atk">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Résolution</td>
-				<td>{{results}}</td>
-			</tr>
-			{{#rollTotal() displayEffets 1}}
-				{{#rollBetween() results 1 2}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Rattrape son erreur in extramis</td></tr>
-				{{/rollBetween() results 1 2}}
-				{{#rollBetween() results 3 5}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Trèbuche et chute maladroitement</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Rate 2 assauts</td></tr>
-				{{/rollBetween() results 3 5}}
-				{{#rollBetween() results 6 7}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Frappe un allié proche vers la gauche</td></tr>
-				{{/rollBetween() results 6 7}}
-				{{#rollBetween() results 8 9}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Frappe un allié proche vers la droite</td></tr>
-				{{/rollBetween() results 8 9}}
-				{{#rollBetween() results 10 12}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Lâche son arme comme un loser</td></tr>
-				{{/rollBetween() results 10 12}}
-				{{#rollBetween() results 13 15}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Casse son arme</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Voir point de rupture</td></tr>
-				{{/rollBetween() results 13 15}}
-				{{#rollBetween() results 16 18}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Se blesse tout seul comme un cake</td></tr>
-				{{/rollBetween() results 16 18}}
-				{{#rollTotal() results 19}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Se blesse très sévèrement de façcon atroce et douloureuse</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts critique</td></tr>
-				{{/rollTotal() results 19}}
-				{{#rollTotal() results 20}}
-					{{#rollBetween() subresults 1 2}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Perd un oeil</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -1 | CHA -3 | AT -1 | PRD -2</td></tr>
-					{{/rollBetween() subresults 1 2}}
-					{{#rollBetween() subresults 3 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Perd un doigt</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2</td></tr>
-					{{/rollBetween() subresults 3 6}}
-				{{/rollTotal() results 20}}
-			{{/rollTotal() displayEffets 1}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-
-<rolltemplate class="sheet-rolltemplate-crit_prd">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Résolution</td>
-				<td>{{results}}</td>
-			</tr>
-			{{#rollTotal() displayEffets 1}}
-				{{#rollBetween() results 1 2}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Mais non en fait : la parade était normale</td></tr>
-				{{/rollBetween() results 1 2}}
-				{{#rollBetween() results 3 5}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile magistralement placé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +2</td></tr>
-				{{/rollBetween() results 3 5}}
-				{{#rollBetween() results 6 7}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi trébuche</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Il subit 1 attaque imparable</td></tr>
-				{{/rollBetween() results 6 7}}
-				{{#rollBetween() results 8 9}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi tombe</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Il subit 2 attaques imparables</td></tr>
-				{{/rollBetween() results 8 9}}
-				{{#rollBetween() results 10 12}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi lâche son arme à 1D6 mètres</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Il combat à mains nues</td></tr>
-				{{/rollBetween() results 10 12}}
-				{{#rollBetween() results 13 15}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi casse son arme</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Il combat à mains nues</td></tr>
-				{{/rollBetween() results 13 15}}
-				{{#rollBetween() results 16 18}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi reçoit un coup de votre arme</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Il subit des dégâts</td></tr>
-				{{/rollBetween() results 16 18}}
-				{{#rollTotal() results 19}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi subit un coup critique avec votre arme</td></tr>
-				{{/rollTotal() results 19}}
-				{{#rollTotal() results 20}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi, ce loser, subit un coup critique avec son arme</td></tr>
-				{{/rollTotal() results 20}}
-			{{/rollTotal() displayEffets 1}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-<!-- Version N# -->
+<!-- Version N# --->
 <input type="hidden" name="attr_version" value="0">
-<!-- AutoCalc fields for sheet worker-->
+<!-- AutoCalc fields for sheet worker--->
+<input type="hidden" name="attr_Stats_Courage_total" value="0" /> <!-- Courage + CourageMod -->
+<input type="hidden" name="attr_Stats_Intelligence_total" value="0" /> <!-- Intelligence + IntelligenceMod -->
+<input type="hidden" name="attr_bonusDegatsIntel" value="0" /> <!-- Force + ForceMod -->
+<input type="hidden" name="attr_Stats_Charisme_total" value="0" /> <!-- Charisme + CharismeMod -->
+<input type="hidden" name="attr_Stats_Adresse_total" value="0" /> <!-- Adresse + AdresseMod -->
+<input type="hidden" name="attr_Stats_Force_total" value="0" /> <!-- Force + ForceMod -->
+<input type="hidden" name="attr_bonusDegatsForce" value="0" /> <!-- Force + ForceMod -->
+<input type="hidden" name="attr_Stats_Attaque_total" value="8" /> <!-- Attaque + AttaqueMod -->
+<input type="hidden" name="attr_Stats_Parade_total" value="10" /> <!-- Parade + ParadeMod -->
+<input type="hidden" name="attr_Stats_Jet_total" value="0" /> <!-- Adresse_total + JetMod -->
+<input type="hidden" name="attr_Stats_Esquive_total" value="0" /> <!-- AD_total + EsquiveMod --->
+<input type="hidden" name="attr_Stats_Fouille_total" value="0" /> <!-- Intelligence_total + FouilleMod -->
+<input type="hidden" name="attr_Stats_MagiePhy_total" value="0" /> <!-- MagiePhys + MagiePhysMod -->
+<input type="hidden" name="attr_Stats_MagiePsy_total" value="0" /> <!-- MagiePsy + MagiePsyMod -->
+<input type="hidden" name="attr_Stats_Inge_total" value="0" /> <!-- Inge + IngeMod -->
+<input type="hidden" name="attr_Stats_ResiMagie_total" value="0" /> <!-- ResiMagie + ResiMagie_total -->
 <input type="hidden" name="attr_Poids_Materiels" value="0" /> <!-- temp charge du materiel -->
 <input type="hidden" name="attr_Poids_Butins" value="0" /> <!-- temp charge du butin -->
 <input type="hidden" name="attr_Poids_Livres" value="0" /> <!-- temp charge des livres -->
@@ -1774,7 +1187,7 @@
 
 	<div class="sheet-header">
 		<div class="sheet-col-float" style="width:150px">
-			<img src="https://i49.servimg.com/u/f49/19/87/23/15/logo10.png" alt="Le Donjon de Naheulbeuk" />
+			<img src="https://i49.servimg.com/u/f49/19/87/23/15/logo10.png" />
 		</div>
 		<div class="sheet-col-float" style="width:600px">
 			<div class="sheet-col-float">Nom : </div>
@@ -1804,7 +1217,7 @@
 			</div>
 			<div class="sheet-col-float">Poids : </div>
 			<div class="sheet-col-float" style="width:92px;">
-				<input type="text" class="sheet-noBorder" name="attr_Personnage_Poids">
+				<input type="text"  class="sheet-noBorder"name="attr_Personnage_Poids">
 			</div>
 		</div>
 	</div>
@@ -1826,179 +1239,109 @@
 
 		<!-- TAB Caractéristiques -->
 		<div class="sheet-tab_caracteristiques">
-			<div class="sheet-col-float" style="width:366px;">
+			<div class="sheet-col-float" style="width:360px;">
 				<div class="sheet-stats">
 					<h2>Caractéristiques</h2>
 					<table>
 						<thead>
 							<tr>
 								<th width="130"></th>
-								<th width="70">Tot.</th>
-								<th width="70">Base</th>
+								<th width="70">Score</th>
 								<th width="70">Mod.</th>
-								<th width="70">Temp.</th>
+								<th width="70">Épreuve</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr>
-								<th title="La bravoure du personnage face au danger et à la mort, ainsi que sa rapidité à se décider"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve de Courage }} {{ Courage=@{Stats_Courage_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_Courage"> Courage</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Courage_total" value="0" readonly></td>
+								<th title="La bravoure du personnage face au danger et à la mort, ainsi que sa rapidité à se décider">Courage</th>
+
 								<td><input type="number" name="attr_Stats_Courage" value="0"></td>
 								<td><input type="number" name="attr_Stats_Courage_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_Courage_temp" value="0">
-									<input type="hidden" name="attr_Stats_Courage_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Courage_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve de Courage }} {{ Courage=@{Stats_Courage_total} }} {{ Résultat=[[1d20]] }}" name="roll_Courage" /></td>
 							</tr>
 							<tr>
-								<th title="La capacité à réfléchir et l'érudition"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve d'Intelligence }} {{ Intelligence=@{Stats_Intelligence_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_Intelligence"> Intelligence</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Intelligence_total" value="0" readonly></td>
+								<th title="La capacité à réfléchir et l'érudition">Intelligence</th>
 								<td><input type="number" name="attr_Stats_Intelligence" value="0"></td>
 								<td><input type="number" name="attr_Stats_Intelligence_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_Intelligence_temp" value="0">
-									<input type="hidden" name="attr_Stats_Intelligence_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Intelligence_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve d'Intelligence }} {{ Intelligence=@{Stats_Intelligence_total} }} {{ Résultat=[[1d20]] }}" name="roll_Intelligence" /></td>
 							</tr>
 							<tr>
-								<th title="La beauté physique et la capacité à convaincre les autres"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve de Charisme}} {{ Charisme=@{Stats_Charisme_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_Charisme"> Charisme</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Charisme_total" value="0" readonly></td>
+								<th title="La beauté physique et la capacité à convaincre les autres">Charisme</th>
 								<td><input type="number" name="attr_Stats_Charisme" value="0"></td>
 								<td><input type="number" name="attr_Stats_Charisme_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_Charisme_temp" value="0">
-									<input type="hidden" name="attr_Stats_Charisme_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Charisme_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve de Charisme}} {{ Charisme=@{Stats_Charisme_total} }} {{ Résultat=[[1d20]] }}" name="roll_Charisme" /></td>
 							</tr>
 							<tr>
-								<th title="L'agilité, la souplesse et la précision"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve d'Adresse}} {{ Adresse=@{Stats_Adresse_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_Adresse"> Adresse</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Adresse_total" value="0" readonly></td>
+								<th title="L'agilité, la souplesse et la précision">Adresse</th>
 								<td><input type="number" name="attr_Stats_Adresse" value="0"></td>
 								<td><input type="number" name="attr_Stats_Adresse_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_Adresse_temp" value="0">
-									<input type="hidden" name="attr_Stats_Adresse_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Adresse_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve d'Adresse}} {{ Adresse=@{Stats_Adresse_total} }} {{ Résultat=[[1d20]] }}" name="roll_Adresse" /></td>
 							</tr>
 							<tr>
-								<th title="La capacité musculaire du personnage, qui influe sur la résistance"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve de Force}} {{ Force=@{Stats_Force_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_Force"> Force</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Force_total" value="0" readonly></td>
+								<th title="La capacité musculaire du personnage, qui influe sur la résistance">Force</th>
 								<td><input type="number" name="attr_Stats_Force" value="0"></td>
 								<td><input type="number" name="attr_Stats_Force_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_Force_temp" value="0">
-									<input type="hidden" name="attr_Stats_Force_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Force_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve de Force}} {{ Force=@{Stats_Force_total} }} {{ Résultat=[[1d20]] }}" name="roll_Force" /></td>
 							</tr>
 							<tr>
 								<td colspan="4">&nbsp;</td>
 							</tr>
 							<tr>
-								<th title="Chance de toucher son adversaire"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Attaque }} {{ Attaque=@{Stats_Attaque_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_Attaque"> Attaque</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Attaque_total" value="0" readonly></td>
+								<th title="Chance de toucher son adversaire">Attaque</th>
 								<td><input type="number" name="attr_Stats_Attaque" value="8"></td>
 								<td><input type="number" name="attr_Stats_Attaque_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_Attaque_temp" value="0">
-									<input type="hidden" name="attr_Stats_Attaque_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Attaque_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Attaque }} {{ Attaque=@{Stats_Attaque_total} }} {{ Résultat=[[1d20]] }}" name="roll_Attaque" /></td>
 							</tr>
 							<tr>
-								<th title="Chance de Parer son adversaire"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Parade }} {{ Parade=@{Stats_Parade_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_Parade"> Parade</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Parade_total" value="0" readonly></td>
+								<th title="Chance de Parer son adversaire">Parade</th>
 								<td><input type="number" name="attr_Stats_Parade" value="10"></td>
 								<td><input type="number" name="attr_Stats_Parade_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_Parade_temp" value="0">
-									<input type="hidden" name="attr_Stats_Parade_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Parade_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Parade }} {{ Parade=@{Stats_Parade_total} }} {{ Résultat=[[1d20]] }}" name="roll_Parade" /></td>
 							</tr>
 							<tr>
-								<th title="Chance de toucher avec les armes à distance"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Attaque à distance }} {{ Jet=@{Stats_Jet_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_Jet"> Jet</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Jet_total" value="0" readonly></td>
-								<td title="Calculée en fonction de l'Adresse"><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Jet" value="0" readonly></td>
+								<th title="Chance de toucher avec les armes à distance">Jet</th>
+								<td title="Calculée en fonction de l'Adresse"><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Jet" value="0" readonly="readonly"></td>
 								<td><input type="number" name="attr_Stats_Jet_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_Jet_temp" value="0">
-									<input type="hidden" name="attr_Stats_Jet_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Jet_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Attaque à distance }} {{ Jet=@{Stats_Jet_total} }} {{ Résultat=[[1d20]] }}" name="roll_Jet" /></td>
 							</tr>
 							<tr>
-								<th title="Le héros qui Esquive va se déplacer rapidement d'environ 2 mètres"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Esquive }} {{ Esquive=@{Stats_Esquive_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_Esquive"> Esquive</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Esquive_total" value="0" readonly></td>
-								<td title="Calculée en fonction de l'Adresse, la PR phy et l'encombrement"><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Esquive" value="0" readonly></td>
+								<th title="Le héros qui Esquive va se déplacer rapidement d'environ 2 mètres">Esquive</th>
+								<td title="Calculée en fonction de l'Adresse, la PR phy et l'encombrement"><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Esquive" value="0" readonly="readonly"></td>
 								<td><input type="number" name="attr_Stats_Esquive_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_Esquive_temp" value="0">
-									<input type="hidden" name="attr_Stats_Esquive_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Esquive_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Esquive }} {{ Esquive=@{Stats_Esquive_total} }} {{ Résultat=[[1d20]] }}" name="roll_Esquive" /></td>
 							</tr>
 							<tr>
-								<th title="Change de trouver des objets / indices"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} commence à Fouiller }} {{ Fouille=@{Stats_Fouille_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_Fouille"> Fouille</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Fouille_total" value="0" readonly></td>
-								<td title="Calculée en fonction de l'Intelligence"><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Fouille" value="0" readonly></td>
+								<th title="Change de trouver des objets / indices">Fouille</th>
+								<td title="Calculée en fonction de l'Intelligence"><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Fouille" value="0" readonly="readonly"></td>
 								<td><input type="number" name="attr_Stats_Fouille_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_Fouille_temp" value="0">
-									<input type="hidden" name="attr_Stats_Fouille_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Fouille_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} commence à Fouiller }} {{ Fouille=@{Stats_Fouille_total} }} {{ Résultat=[[1d20]] }}" name="roll_Fouille" /></td>
 							</tr>
 							<tr>
 								<td colspan="4">&nbsp;</td>
 							</tr>
 							<tr>
-								<th title="Chance de réussir une Confection"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une confection}} {{ Magie&nbsp;Phys=@{Stats_Inge_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_Ingeniosite"> Ingéniosité</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Inge_total" value="0" readonly></td>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Inge" value="0" readonly></td>
+								<th tile="Chance de réussir une Confection">Ingéniosité<br><span class="sheet-hint">Moyenne INT et AD</span></th>
+								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Inge" value="0" readonly="readonly"></td>
 								<td><input type="number" name="attr_Stats_Inge_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_Inge_temp" value="0">
-									<input type="hidden" name="attr_Stats_Inge_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_Inge_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une confection}} {{ Magie Phys=@{Stats_Inge_total} }} {{ Résultat=[[1d20]] }}" name="roll_Ingeniosite" /></td>
 							</tr>
 							<tr>
-								<th title="Chance de réussir une Magie Physique"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} concentre sa Magie}} {{ Magie&nbsp;Phys=@{Stats_MagiePhy_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_MagiePhys"> Magie Phys.</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_MagiePhy_total" value="0" readonly></td>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_MagiePhy" value="0" readonly></td>
+								<th tile="Chance de réussir une Magie Physique">Magie Phys.<br><span class="sheet-hint">Moyenne INT et AD</span></th>
+								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_MagiePhy" value="0" readonly="readonly"></td>
 								<td><input type="number" name="attr_Stats_MagiePhy_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_MagiePhy_temp" value="0">
-									<input type="hidden" name="attr_Stats_MagiePhy_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_MagiePhy_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} concentre sa Magie}} {{ Magie Phys=@{Stats_MagiePhy_total} }} {{ Résultat=[[1d20]] }}" name="roll_MagiePhys" /></td>
 							</tr>
 							<tr>
-								<th title="Chance de réussir une Magie Psychique"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} concentre sa Magie }} {{ Magie&nbsp;Psy=@{Stats_MagiePsy_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_MagiePsy"> Magie Psy.</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_MagiePsy_total" value="0" readonly></td>
-								<td title="Calculée en fonction de l'Int"><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_MagiePsy" value="0" readonly></td>
+								<th tile="Chance de réussir une Magie Psychique">Magie Psy.<br><span class="sheet-hint">Moyenne INT et CHA</span></th>
+								<td tile="Calculée en fonction de l'Int"><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_MagiePsy" value="0" readonly="readonly"></td>
 								<td><input type="number" name="attr_Stats_MagiePsy_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_MagiePsy_temp" value="0">
-									<input type="hidden" name="attr_Stats_MagiePsy_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_MagiePsy_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} concentre sa Magie }} {{ Magie Psy=@{Stats_MagiePsy_total} }} {{ Résultat=[[1d20]] }}" name="roll_MagiePsy" /></td>
 							</tr>
 							<tr>
-								<th title="Chance de résister à la Magie"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de résiter à la Magie}} {{ Résist.&nbsp;Magie=@{Stats_ResiMagie_total} }} {{ Résultat=[[1d20cs<1cf>20]] }}" name="roll_ResistMagie"> Résist. Magie</button></th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_ResiMagie_total" value="0" readonly></td>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_ResiMagie" value="0" readonly></td>
+								<th>Résist. Magie<br><span class="sheet-hint">Moyenne COU, INT et FO</span></th>
+								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_ResiMagie" value="0" readonly="readonly"></td>
 								<td><input type="number" name="attr_Stats_ResiMagie_mod" value="0"></td>
-								<td class="sheet-spin">
-									<input type="number" name="attr_Stats_ResiMagie_temp" value="0">
-									<input type="hidden" name="attr_Stats_ResiMagie_buff" value="0">
-									<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Stats_ResiMagie_temp_total" value="0" readonly>
-								</td>
+								<td style="text-align:center;"><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de résiter à la Magie}} {{ Résist. Magie=@{Stats_ResiMagie_total} }} {{ Résultat=[[1d20]] }}" name="roll_ResistMagie" /></td>
 							</tr>
 						</tbody>
 					</table>
@@ -2031,7 +1374,7 @@
 					<div class="sheet-hex sheet-hex-3" style="background-color: #766344; width: 100px; height: 57px">
 						<div class="sheet-inner">
 							<h4>Niveau</h4>
-							<input type="number" class="sheet-square" name="attr_Personnage_Niveau" min="1" step="1" value="1" />
+							<input type="number" class="sheet-square" name="attr_Personnage_Niveau" min="1" step="1" value="1"  />
 						</div>
 						<div class="sheet-corner-1"></div>
 						<div class="sheet-corner-2"></div>
@@ -2087,19 +1430,19 @@
 					<table>
 						<tr>
 							<th>Rapide</th>
-							<td title="Calculée en fonction de la PR Phy."><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_DeplacementRapide" value="8" readonly /> m / assault</td>
+							<td title="Calculée en fonction de la PR Phy."><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_DeplacementRapide" value="8" readonly="readonly" /> m / assault</td>
 						</tr>
 						<tr>
 							<th>Durée</th>
-							<td title="Calculée en fonction de la Force"><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_DeplacementRapide_Duree" value="20" readonly /> sec</td>
+							<td title="Calculée en fonction de la Force"><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_DeplacementRapide_Duree" value="20" readonly="readonly" /> sec</td>
 						</tr>
 						<tr>
 							<th>Sprint (*)</th>
-							<td title="Calculée en fonction de la PR Phy."><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_DeplacementSprint" value="12" readonly /> m / assault</td>
+							<td title="Calculée en fonction de la PR Phy."><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_DeplacementSprint" value="12" readonly="readonly" /> m / assault</td>
 						</tr>
 						<tr>
 							<th>Durée</th>
-							<td title="Calculée en fonction de la Force"><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_DeplacementSprint_Duree" value="5" readonly /> sec</td>
+							<td title="Calculée en fonction de la Force"><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_DeplacementSprint_Duree" value="5" readonly="readonly" /> sec</td>
 						</tr>
 					</table>
 					<span class="sheet-hint">* Après un assaut en déplacement rapide, on est considéré comme lancé et on peut sprinter.</span>
@@ -2124,7 +1467,7 @@
 							</select>
 						</td>
 						<td style="text-align:center;"><input type="text" class="sheet-shortInput" name="attr_Confrontation_mod" value="2d6"></td>
-						<td><button type="roll" value="@{displayJet} &{template:default} {{name=Confrontation de @{Personnage_Nom} }} {{ Résultat = @{Confrontation_jet} }}" name="roll_Confrontation"></button></td>
+						<td><button type="roll" value="@{displayJet} &{template:default} {{name=Confrontation de @{Personnage_Nom} }} {{ Résultat = @{Confrontation_jet} }}" name="roll_Confrontation" /></td>
 					</tr>
 				</table>
 			</div>
@@ -2135,10 +1478,10 @@
 			<span class="sheet-hint" style="display:block" name="attr_BonusForce"></span>
 		</div>
 
-		<!-- TAB Compétences -->
+		<!-- TAB Compétences --->
 		<div class="sheet-tab_competences">
 			<div class="sheet-competences">
-				<input type="checkbox" class="sheet-display sheet-display-competences" name="attr_displayCompetences" value="1" checked="checked"><h2 class="sheet-display">Compétences</h2>
+				<h2>Compétences</h2>
 				<div class="sheet-tableth">
 					<div class="sheet-col" style="width: 226px;">Compétence</div>
 					<div class="sheet-col" style="width: 216px;">Effets</div>
@@ -2173,23 +1516,15 @@
 										<input type="number" name="attr_Competence_mod" value="0" />
 									</div>
 									<div class="sheet-col" style="width: 80px;">
-										<button type="roll" value="@{rollCompetence}"> Épreuve</button>
+										<button type="roll" value="@{displayJet} &{template:default} {{name=Épreuve de @{Competence_Nom} par @{Personnage_Nom} }} {{Épreuve=@{Competence_Jet} }} {{ Résultat=[[1d20]] }}" name="roll_Competences"> Épreuve</button>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<input type="checkbox" class="sheet-display-competenceEpreuve" name="attr_Competence_Epreuve" value="1" style="display:none" />
-					<div class="sheet-col sheet-btnRoll">
-						<button type="roll" value="@{rollCompetence}" name="roll_competence"> <span name="attr_Competence_Nom"></span></button>
-					</div>
-					<div class="sheet-col sheet-noRoll">
-						<span name="attr_Competence_Nom"></span>
-					</div>
-					<input type="hidden" name="attr_rollCompetence" value="@{displayJet} &{template:default} {{name=Épreuve de @{Competence_Nom} par @{Personnage_Nom} }} {{Épreuve=@{Competence_Jet} }} {{ Résultat=[[1d20cs<1cf>20]] }}">
 				</fieldset>
 			</div>
-			<br clear="all"/>
+			<br />
 			<div class="sheet-coupsspeciaux">
 				<h2>Coups spéciaux</h2>
 				<fieldset class="repeating_coupsSpeciaux">
@@ -2199,7 +1534,7 @@
 								<input type="text" class="sheet-noBorder" name="attr_CoupSpecial_Nom" value="" />
 							</div>
 							<div class="sheet-col" style="width: 300px;">
-								<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} prépare son coup spécial @{CoupSpecial_Nom} }} {{ Épreuve=@{CoupSpecial_Jet} }} {{ Résultat=[[1d20cs<1cf>20]] }}" > Épreuve</button>
+								<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} prépare son coup spécial @{CoupSpecial_Nom} }} {{ Épreuve=@{CoupSpecial_Jet} }} {{ Résultat=[[1d20]] }}" > Épreuve</button>
 								<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{CoupSpecial_Nom}}} {{ Dégats=[[@{CoupSpecial_Degats} + @{CoupSpecial_Degats_arme}]] }}" > Dégats</button>
 								<button type="roll" class="sheet-rollGrimoire" value="@{displayJet} &{template:coupSpecial} {{name=@{coupspecial_nom}}} {{coupspecial_jet=@{coupspecial_jet}}} {{coupspecial_degats=@{coupspecial_degats}}} {{coupspecial_degats_arme=@{coupspecial_degats_arme}}} {{coupspecial_utilisation=@{coupspecial_utilisation}}} {{coupspecial_echec=@{coupspecial_echec}}} {{coupspecial_effet=@{coupspecial_effet}}} {{coupspecial_note=@{coupspecial_note}}} {{coupspecial_condition=@{coupspecial_condition}}} {{coupspecial_critique=@{coupspecial_critique}}} {{coupspecial_fumble=@{coupspecial_fumble}}}"> Grimoire </button>
 							</div>
@@ -2252,74 +1587,7 @@
 								<div class="sheet-col" style="width: 270px;"><input type="text" class="sheet-noBorder" name="attr_CoupSpecial_fumble"></div>
 							</div>
 						</div>
-					</div>
-				</fieldset>
-			</div>
-			<br />
-			<div class="sheet-ape">
-				<h2>Traits particuliers (Débilibeuks / Mankdebols / Mutations / Maladies / Malédictions...)</h2>
-				<div class="sheet-tableth">
-					<div class="sheet-col" style="width: 146px;">Provenance</div>
-					<div class="sheet-col" style="width: 146px;">Nom</div>
-					<div class="sheet-col" style="width: 446px;">Effets</div>
-					<div class="sheet-col" style="width: 46px;">Actif ?</div>
-				</div>
-				<fieldset class="repeating_conditions">
-					<div class="sheet-group">
-						<div class="sheet-row">
-							<div class="sheet-col" style="width: 150px;">
-								<input type="text" class="sheet-noBorder" name="attr_condition_provenance" value="" />
-							</div>
-							<div class="sheet-col" style="width: 150px;">
-								<input type="text" class="sheet-noBorder" name="attr_condition_nom" value="" />
-							</div>
-							<div class="sheet-col" style="width: 450px;">
-								<input type="text" class="sheet-noBorder" name="attr_condition_effet" value="" />
-							</div>
-							<div class="sheet-col" style="width: 50px;text-align:center">
-								<input type="checkbox" name="attr_condition_actif" value="1" />
-							</div>
-						</div>
-						<input type="checkbox" name="attr_condition_config" class="sheet-config-flag" value="1" /><span class="sheet-cog">y</span>
-						<div class="sheet-config">
-							<div class="sheet-row">
-								<table style="width: 100%">
-									<thead>
-										<tr>
-											<th>COU</th>
-											<th>INT</th>
-											<th>CHA</th>
-											<th>AD</th>
-											<th>FO</th>
-											<th>AT</th>
-											<th>PRD</th>
-											<th>JET</th>
-											<th>ESQ</th>
-											<th>MPhy</th>
-											<th>MPsy</th>
-											<th>RM</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<td><input type="number" name="attr_condition_courage" value="0"></td>
-											<td><input type="number" name="attr_condition_intelligence" value="0"></td>
-											<td><input type="number" name="attr_condition_charisme" value="0"></td>
-											<td><input type="number" name="attr_condition_adresse" value="0"></td>
-											<td><input type="number" name="attr_condition_force" value="0"></td>
-											<td><input type="number" name="attr_condition_attaque" value="0"></td>
-											<td><input type="number" name="attr_condition_parade" value="0"></td>
-											<td><input type="number" name="attr_condition_jet" value="0"></td>
-											<td><input type="number" name="attr_condition_esquive" value="0"></td>
-											<td><input type="number" name="attr_condition_magiephy" value="0"></td>
-											<td><input type="number" name="attr_condition_magiepsy" value="0"></td>
-											<td><input type="number" name="attr_condition_resimagie" value="0"></td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-					</div>
+					</fieldset>
 				</fieldset>
 			</div>
 			<br />
@@ -2352,16 +1620,10 @@
 			</div>
 		</div>
 
-		<!-- TAB Equipement -->
+		<!-- TAB Equipement --->
 		<div class="sheet-tab_equipement">
 			<div class="sheet-armes">
 				<h2>Armement & Baston</h2>
-				<button type="roll" style="display: none" name="roll_confirmation_fumble_atk" value="@{displayJet} &{template:fumble_atk} {{name=Maladresse attaque ou parade de @{Personnage_Nom}}} {{results=[[1d20cs<1cf>20]]}} {{subresults=[[1d6]]}} {{displayEffets=[[@{displayCritEffets}]]}}"></button>
-				<button type="roll" style="display: none" name="roll_confirmation_crit_prd" value="@{displayJet} &{template:crit_prd} {{name=Parade critique de @{Personnage_Nom}}} {{results=[[1d20cs<1cf>20]]}} {{displayEffets=[[@{displayCritEffets}]]}}"></button>
-				<button type="roll" style="display: none" name="roll_confirmation_crit_tranchant" value="@{displayJet} &{template:crit_tranchant} {{name=Attaque critique tranchante de @{Personnage_Nom}}} {{results=[[1d20cs<1cf>20]]}} {{subresults=[[1d6]]}} {{displayEffets=[[@{displayCritEffets}]]}}"></button>
-				<button type="roll" style="display: none" name="roll_confirmation_crit_contondant" value="@{displayJet} &{template:crit_contondant} {{name=Attaque critique contondante de @{Personnage_Nom}}} {{results=[[1d20cs<1cf>20]]}} {{subresults=[[1d6]]}} {{displayEffets=[[@{displayCritEffets}]]}}"></button>
-				<button type="roll" style="display: none" name="roll_confirmation_crit_projectile" value="@{displayJet} &{template:crit_projectile} {{name=Attaque critique au projectile de @{Personnage_Nom}}} {{results=[[1d20cs<1cf>20]]}} {{displayEffets=[[@{displayCritEffets}]]}}"></button>
-				<button type="roll" style="display: none" name="roll_confirmation_crit_pugilat" value="@{displayJet} &{template:crit_pugilat} {{name=Attaque critique à mains nues de @{Personnage_Nom}}} {{results=[[1d20cs<1cf>20]]}} {{subresults=[[1d6]]}} {{displayEffets=[[@{displayCritEffets}]]}}"></button>
 				<div class="sheet-tableth">
 					<div class="sheet-col" style="width: 256px;">Arme</div>
 					<div class="sheet-col" style="width: 66px;">Portée</div>
@@ -2384,21 +1646,21 @@
 								</select>
 							</div>
 							<div class="sheet-col" style="width: 70px;">
-								<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Arme_TotalAT" value="0" readonly />
+								<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Arme_TotalAT" value="0" readonly="readonly" />
 							</div>
 							<div class="sheet-col" style="width: 70px;">
-								<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Arme_TotalPRD" value="@{Stats_Parade_total}+@{Arme_PRD}" readonly disabled="true" />
+								<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Arme_TotalPRD" value="@{Stats_Parade_total}+@{Arme_PRD}" readonly="readonly" disabled="true" />
 							</div>
 							<div class="sheet-col" style="width: 100px;">
-								<input type="text" class="sheet-autoCalc" name="attr_Arme_TotalDegats" value="1d6" readonly style="width: 100px;" />
+								<input type="text" class="sheet-autoCalc" name="attr_Arme_TotalDegats" value="1d6" readonly="readonly" style="width: 100px;" />
 							</div>
 							<div class="sheet-col" style="width: 170px;">
-								<button type="roll" value="@{displayJet} &{template:atk} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{at=@{Arme_TotalAT} }} {{notes=@{Arme_Note} }} {{effets= @{Arme_Effet} }} {{portee= @{arme_portee} }} {{display_effets= [[@{arme_Effet_display}]] }} {{display_notes= [[@{Arme_Note_display}]] }} {{btn_critique= [Critique](~@{Personnage_Nom}|confirmation_crit_@{Arme_typeDegat}) }} {{btn_fumble= [Fumble](~@{Personnage_Nom}|confirmation_fumble_atk) }} {{results=[[1d20cs<@{Arme_Critique}cf>@{Arme_Fumble}]] }} {{btn_degats=[Dégats](~repeating_armes_rollDegats)}}"> AT </button>
-								<button type="roll" value="@{displayJet} &{template:prd} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{prd=@{Arme_TotalPRD} }} {{results=[[1d20cs<@{Arme_Critique}cf>@{Arme_Fumble}]] }} {{btn_critique= [Critique](~@{Personnage_Nom}|confirmation_crit_prd) }} {{btn_fumble=[Fumble](~@{Personnage_Nom}|confirmation_fumble_atk) }}"> PRD </button>
-								<button type="roll" class="sheet-rollDegats" name="roll_rollDegats" value="@{displayJet} &{template:dmg} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{dmg= [[ @{Arme_TotalDegats} ]] }} {{munition=@{munition_nom}}} {{typeDegat=@{Arme_typeDegat}}}"> Dégats </button>
+								<button type="roll" value="@{displayJet} &{template:default} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{ AT= @{Arme_TotalAT} }} {{ Résultat=[[1d20]] }}"> AT </button>
+								<button type="roll" value="@{displayJet} &{template:default} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{ PRD=@{Arme_TotalPRD} }} {{ Résultat=[[1d20]] }}"> PRD </button>
+								<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{ Dégats= [[ @{Arme_TotalDegats} ]] }}"> Dégats </button>
 							</div>
 						</div>
-						<input type="checkbox" name="attr_Arme_config" class="sheet-config-flag" value="1" /><span class="sheet-cog">y</span>
+						<input type="checkbox" name="attr_CoupSpecial_config" class="sheet-config-flag" value="1" /><span class="sheet-cog">y</span>
 						<div class="sheet-config">
 							<div class="sheet-row">
 								<div class="sheet-col" style="width: 110px;"><b>Mod. AT :</b></div>
@@ -2409,33 +1671,13 @@
 								<div class="sheet-col" style="width: 70px;">
 									<input type="number" name="attr_Arme_PRD" value="0" />
 								</div>
-								<div class="sheet-col" style="width: 110px; text-align: right;"><b>RUP :</b></div>
-								<div class="sheet-col" style="width: 70px;">
-									<input type="text" class="sheet-shortInput" name="attr_Arme_RUP" value="" />
-								</div>
-							</div>
-
-							<div class="sheet-row">
-								<div class="sheet-col" style="width: 110px;"><b>Dégats :</b></div>
+								<div class="sheet-col" style="width: 110px; text-align: right;"><b>Dégats :</b></div>
 								<div class="sheet-col" style="width: 70px;">
 									<input type="text" class="sheet-shortInput" name="attr_Arme_Degats" value="1d6" />
 								</div>
-								<div class="sheet-col" style="width: 110px; text-align: right;"><b>Types de dégats :</b></div>
+								<div class="sheet-col" style="width: 110px; text-align: right;"><b>RUP :</b></div>
 								<div class="sheet-col" style="width: 70px;">
-									<select name="attr_Arme_typeDegat">
-										<option value="tranchant">Tranchant</option>
-										<option value="contondant">Contondant</option>
-										<option value="projectile">Projectile</option>
-										<option value="pugilat">Main nue</option>
-									</select>
-								</div>
-								<div class="sheet-col" style="width: 110px; text-align: right;"><b>Critique :</b></div>
-								<div class="sheet-col" style="width: 70px;">
-									<input type="number" name="attr_Arme_Critique" value="1" />
-								</div>
-								<div class="sheet-col" style="width: 110px; text-align: right;"><b>Fumble :</b></div>
-								<div class="sheet-col" style="width: 70px;">
-									<input type="number" name="attr_Arme_Fumble" value="20" />
+									<input type="text" class="sheet-shortInput" name="attr_Arme_RUP" value="" />
 								</div>
 							</div>
 
@@ -2454,11 +1696,11 @@
 									</div>
 									<div class="sheet-col" style="width: 110px; text-align: right;"><b>Mod. AD : </b></div>
 									<div class="sheet-col" style="width: 70px;">
-										<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_munition_modAd" value="0" readonly />
+										<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_munition_modAd" value="0" readonly="readonly" />
 									</div>
 									<div class="sheet-col" style="width: 110px; text-align: right;"><b>Dégats : </b></div>
 									<div class="sheet-col" style="width: 70px;">
-										<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_munition_degats" value="0" readonly />
+										<input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_munition_degats" value="0" readonly="readonly" />
 									</div>
 								</div>
 							</div>
@@ -2470,27 +1712,20 @@
 								<div class="sheet-col" style="width: 650px;">
 									<input type="text" class="sheet-noBorder" name="attr_Arme_Effet" value="" />
 								</div>
-								<div class="sheet-col" style="width:20px;">
-									<input type="checkbox" name="attr_Arme_Effet_display" value="1" title="Afficher dans le chat">
-								</div>
 							</div>
-
 							<div class="sheet-row">
 								<div class="sheet-col" style="width: 110px;">
-									<b>Notes : </b>
+									<b>Notes: </b>
 								</div>
 								<div class="sheet-col" style="width: 650px;">
 									<input type="text" class="sheet-noBorder" name="attr_Arme_Note" value="" />
-								</div>
-								<div class="sheet-col" style="width:20px;">
-									<input type="checkbox" name="attr_Arme_Note_display" value="1" title="Afficher dans le chat">
 								</div>
 							</div>
 						</div>
 					</div>
 				</fieldset>
 				<br>
-				<span class="sheet-hint">Le Bonus / Malus aux dégats octroyé par la Force : <input class="sheet-shortInput sheet-autoCalc" name="attr_BonusDegatsForce" value="0" readonly type="text"></span>
+				<span class="sheet-hint">Le Bonus / Malus aux dégats octroyé par la Force : <input class="sheet-shortInput sheet-autoCalc" name="attr_BonusDegatsForce" value="0" readonly="readonly" type="text"></span>
 			</div>
 			<br />
 			<div class="sheet-munitions">
@@ -2614,7 +1849,7 @@
 							</tr>
 							<tr>
 								<th style="text-align:center;">Mains</th>
-								<td rowspan="2" style="text-align:center;"><input type="number" class="sheet-square" name="attr_PR_Torse" value="0" /></td>
+								<td rowspan="2" style="text-align:center;"><input type="number" class="sheet-square" name="attr_PR_Torse" value="0" /></td>.
 								<th style="text-align:center;">Bouclier</th>
 							</tr>
 							<tr>
@@ -2639,9 +1874,7 @@
 					<div class="sheet-col-float" style="width:60%;">
 						<table>
 							<thead>
-								<tr>
-									<th colspan="2">PR détaillée</th>
-								</tr>
+								<th colspan="2">PR détaillée</th>
 							</thead>
 							<tr>
 								<th title="Protection par l'Origine ou Compétences - Protège toutes les localisations du corps">PR Naturelle</th>
@@ -2649,11 +1882,11 @@
 							</tr>
 							<tr>
 								<th title="Protection par l'Armure">PR Physique</th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_PRPhy" value="0" readonly /></td>
+								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_PRPhy" value="0" readonly="readonly" /></td>
 							</tr>
 							<tr>
 								<th title="Protection par la Magie - Protège toutes les localisations du corps">PR Magique</th>
-								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_PRMag" value="0" readonly /></td>
+								<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_PRMag" value="0" readonly="readonly" /></td>
 							</tr>
 							<tr>
 								<td colspan="2"><span class="sheet-hint">PR : Valeur de protection</span></td>
@@ -2663,12 +1896,10 @@
 					<div class="sheet-col-float" style="width:30%;">
 						<table style="width:100%;">
 							<thead>
-								<tr>
-									<th>PR Totale</th>
-								</tr>
+								<th>PR Totale</th>
 							</thead>
 							<tr>
-								<td style="text-align:center;"><input type="text" class="sheet-square sheet-autoCalc" name="attr_PR" value="0" readonly /></td>
+								<td style="text-align:center;"><input type="text" class="sheet-square sheet-autoCalc" name="attr_PR" value="0" readonly="readonly" /></td>
 							</tr>
 						</table>
 					</div>
@@ -2770,7 +2001,7 @@
 				<br />
 				<br />
 
-				<span class="sheet-hint">Bonus d'intelligence aux dégats : <input class="sheet-shortInput sheet-autoCalc" name="attr_bonusDegatsIntel" value="0" readonly type="text"></span>
+				<span class="sheet-hint">Bonus d'intelligence aux dégats : <input class="sheet-shortInput sheet-autoCalc" name="attr_bonusDegatsIntel" value="0" readonly="readonly" type="text"></span>
 				<span class="sheet-hint">Bonus d'équipement aux dégats : <input class="sheet-shortInput" name="attr_bonusDegatsSorts" value="0" type="text"></span>
 
 				<br />
@@ -2811,18 +2042,18 @@
 								</select>
 							</div>
 							<div class="sheet-col" style="width: 100px;">
-								<button type="roll" class="sheet-rollGrimoire" value="@{displayJet} &{template:magie} {{name=@{magie_nom}}} {{magie_ecole=@{magie_ecole}}} {{magie_niveau=@{magie_niveau}}} {{magie_display_epreuve=@{Magie_EpreuveLanceur_Jet}}} {{magie_display_resistance=@{Magie_EpreuveCible_Jet}}} {{magie_incantation=@{magie_incantation}}} {{magie_duree=@{magie_duree}}} {{magie_cout=@{magie_cout}}} {{magie_portee=@{magie_portee}}} {{magie_effet=@{magie_effet}}} {{magie_ingre=@{magie_ingre}}} {{magie_aireeffet=@{magie_aireeffet}}} {{magie_soin=@{magie_soin}}} {{magie_degats=@{Magie_Degats}}} {{magie_bonusint=[[@{MagieBonusInt}]]}} {{magie_epreuve=@{Magie_EpreuveLanceur_Jet} }} {{magie_resistance=@{Magie_EpreuveCible_Jet} + @{Magie_EpreuveCible_mod}}} {{creature_ev=@{creature_ev}}} {{creature_int=@{creature_int}}} {{creature_at=@{creature_at}}} {{creature_def=@{creature_def}}} {{creature_cou=@{creature_cou}}} {{creature_pr=@{creature_pr}}} {{creature_xp=@{creature_xp}}} {{creature_resimagie=@{creature_resimagie}}} {{creature_degats=@{creature_degats}}} {{magie_epreuveappel_mod=@{magie_epreuveappel_mod}}} {{magie_epreuvecontrol_mod=@{magie_epreuvecontrol_mod}}} {{magie_epreuverevocation_mod=@{magie_epreuverevocation_mod}}} {{magie_notes=@{magie_notes}}}"> Grimoire </button>
+								<button type="roll" class="sheet-rollGrimoire" value="@{displayJet} &{template:magie} {{name=@{magie_nom}}} {{magie_ecole=@{magie_ecole}}} {{magie_niveau=@{magie_niveau}}} {{magie_display_epreuve=@{Magie_EpreuveLanceur_Jet}}}  {{magie_display_resistance=@{Magie_EpreuveCible_Jet}}} {{magie_incantation=@{magie_incantation}}} {{magie_duree=@{magie_duree}}} {{magie_cout=@{magie_cout}}} {{magie_portee=@{magie_portee}}} {{magie_effet=@{magie_effet}}} {{magie_ingre=@{magie_ingre}}} {{magie_aireeffet=@{magie_aireeffet}}} {{magie_soin=@{magie_soin}}} {{magie_degats=@{Magie_Degats}}} {{magie_bonusint=[[@{MagieBonusInt}]]}} {{magie_epreuve=@{Magie_EpreuveLanceur_Jet} }} {{magie_resistance=@{Magie_EpreuveCible_Jet} + @{Magie_EpreuveCible_mod}}} {{creature_ev=@{creature_ev}}} {{creature_int=@{creature_int}}} {{creature_at=@{creature_at}}} {{creature_def=@{creature_def}}} {{creature_cou=@{creature_cou}}} {{creature_pr=@{creature_pr}}} {{creature_xp=@{creature_xp}}} {{creature_resimagie=@{creature_resimagie}}} {{creature_degats=@{creature_degats}}} {{magie_epreuveappel_mod=@{magie_epreuveappel_mod}}} {{magie_epreuvecontrol_mod=@{magie_epreuvecontrol_mod}}} {{magie_epreuverevocation_mod=@{magie_epreuverevocation_mod}}} {{magie_notes=@{magie_notes}}}"> Grimoire </button>
 							</div>
 							<br clear="all" />
 							<br />
 							<div>
-								<input type="checkbox" class="sheet-display-magie sheet-display-magie-incantation" name="attr_Magie_Display_Incantation" value="1" /> <span class="sheet-display-magie">Incantation</span>
-								<input type="checkbox" class="sheet-display-magie sheet-display-magie-epreuve" name="attr_Magie_Display_Epreuve" value="1" /> <span class="sheet-display-magie">Épreuves</span>
-								<input type="checkbox" class="sheet-display-magie sheet-display-magie-soins" name="attr_Magie_Display_Soins" value="1" /> <span class="sheet-display-magie">Soins</span>
-								<input type="checkbox" class="sheet-display-magie sheet-display-magie-degats" name="attr_Magie_Display_Degats" value="1" /> <span class="sheet-display-magie">Dégats</span>
-								<input type="checkbox" class="sheet-display-magie sheet-display-magie-effet" name="attr_Magie_Display_Effet" value="1" /> <span class="sheet-display-magie">Effets</span>
-								<input type="checkbox" class="sheet-display-magie sheet-display-magie-ingre" name="attr_Magie_Display_Ingre" value="1" /> <span class="sheet-display-magie">Ingré.</span>
-								<input type="checkbox" class="sheet-display-magie sheet-display-magie-creature" name="attr_Magie_Display_Creature" value="1" /> <span class="sheet-display-magie">Créature</span>
+								<input type="checkbox" class="sheet-display-magie sheet-display-magie-incantation"  name="attr_Magie_Display_Incantation" value="1" /> <span class="sheet-display-magie">Incantation</span>
+								<input type="checkbox" class="sheet-display-magie sheet-display-magie-epreuve"  name="attr_Magie_Display_Epreuve" value="1" /> <span class="sheet-display-magie">Épreuves</span>
+								<input type="checkbox" class="sheet-display-magie sheet-display-magie-soins"  name="attr_Magie_Display_Soins" value="1" /> <span class="sheet-display-magie">Soins</span>
+								<input type="checkbox" class="sheet-display-magie sheet-display-magie-degats"  name="attr_Magie_Display_Degats" value="1" /> <span class="sheet-display-magie">Dégats</span>
+								<input type="checkbox" class="sheet-display-magie sheet-display-magie-effet"  name="attr_Magie_Display_Effet" value="1" /> <span class="sheet-display-magie">Effets</span>
+								<input type="checkbox" class="sheet-display-magie sheet-display-magie-ingre"  name="attr_Magie_Display_Ingre" value="1" /> <span class="sheet-display-magie">Ingré.</span>
+								<input type="checkbox" class="sheet-display-magie sheet-display-magie-creature"  name="attr_Magie_Display_Creature" value="1" /> <span class="sheet-display-magie">Créature</span>
 								<br clear="all" />
 								<div class="sheet-display-magie-incantation">
 									<br />
@@ -2848,10 +2079,8 @@
 											<td style="text-align:center"><input type="text" class="sheet-noBorder" name="attr_Magie_AireEffet" value="" /></td>
 										</tr>
 										<thead>
-											<tr>
-												<th style="border-right:1px dotted white;">Cout</th>
-												<th>Notes</th>
-											</tr>
+											<th style="border-right:1px dotted white;">Cout</th>
+											<th>Notes</th>
 										</thead>
 										<tr>
 											<td style="text-align:center;"><input type="text" class="sheet-noBorder" name="attr_Magie_Cout" value="" /></td>
@@ -2877,7 +2106,7 @@
 											</tr>
 										</thead>
 										<tr>
-											<td colspan="6"></td>
+											<td colspan="5"></td>
 										</tr>
 										<tr>
 											<td style="text-align:center;">
@@ -2898,7 +2127,7 @@
 												<input type="text" class="sheet-shortInput" name="attr_Magie_EpreuveLanceur_mod" value="0" />
 											</td>
 											<td style="text-align:center; ">
-												<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} se concentre pour lancer @{Magie_Nom} }} {{ Épreuve=@{Magie_EpreuveLanceur_Jet} }} {{ Résultat = [[1d20cs<1cf>20]] }}"> Épreuve </button>
+												<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} se concentre pour lancer @{Magie_Nom} }} {{ Épreuve=@{Magie_EpreuveLanceur_Jet} }} {{ Résultat = [[1d20]] }}"> Épreuve </button>
 											</td>
 											<td style="text-align:center;">
 												<select name="attr_Magie_EpreuveCible_Jet">
@@ -2953,7 +2182,7 @@
 										</td>
 										<td style="text-align:center;">
 											<input type="text" class="sheet-shortInput" name="attr_Magie_Degats" value="" placeholder="1d6" />
-											<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{Magie_Nom}}} {{Dégats = [[@{Magie_Degats} + @{magieBonusInt} + @{bonusDegatsSorts}]] }}"> Dégats </button>
+											<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{Magie_Nom}}} {{Dégats = [[@{Magie_Degats} + @{magieBonusInt} + @{bonusDegatsSorts}]]  }}"> Dégats </button>
 										</td>
 									</tr>
 									</table>
@@ -3019,7 +2248,7 @@
 											<td style="text-align:center; ">
 												Magie Psy.
 												<input type="number" name="attr_Magie_EpreuveAppel_mod" value="0" />
-												<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente d'appeler @{Magie_Nom} }} {{Épreuve=@{Stats_MagiePsy_total} + [[@{Magie_EpreuveAppel_mod}]] }} {{ Résultat = [[1d20cs<1cf>20]] }}"> Épreuve </button>
+												<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente d'appeler @{Magie_Nom} }} {{Épreuve=@{Stats_MagiePsy_total} + [[@{Magie_EpreuveAppel_mod}]] }} {{ Résultat = [[1d20]] }}"> Épreuve </button>
 											</td>
 											<td style="text-align:center; ">
 												Magie Psy.
@@ -3097,17 +2326,6 @@
 						<th>Billets 1000</th>
 						<td><input type="number" name="attr_Richesse_Billet1000" value="0" /></td>
 					</tr>
-					<tr>
-						<td colspan="2">&nbsp;</td>
-					</tr>
-					<tr>
-						<th>Total (en Or)</th>
-						<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_Richesse_Total" value="0" readonly></td>
-					</tr>
-					<tr>
-						<th>Banque (en Or)</th>
-						<td><input type="number" name="attr_Richesse_EnBanque" value="0" /></td>
-					</tr>
 				</table>
 			</div>
 			<div class="sheet-col-float">
@@ -3150,52 +2368,18 @@
 					<tr>
 						<th title="Selon Origine du personnage">Charge max</th>
 						<td><input type="text" class="sheet-shortInput" name="attr_Personnage_Charge_max" value="0" /> </td>
-						<td> Kg</td>
-						<td><input type="checkbox" name="attr_modal_HowToChargeMax" class="sheet-modal" value="1"><span class="sheet-cog">?</span>
-							<div class="sheet-modal-wrapper">
-								<div class="sheet-modal" style="height: 300px">
-									<div class="sheet-modal_header">
-										<h2>La charge max ? <span class="sheet-close">*</span><input type="checkbox" class="sheet-modal" name="attr_modal_HowToChargeMax" value="1"></h2>
-									</div>
-									<div class="sheet-modal_body">
-										<p>La charge max dépend de l'Origine et / ou du Métier du personnage :</p>
-										<ul>
-											<li>Gnôme : 2 kilos</li>
-											<li>Gobelin : 10 kilos</li>
-											<li>Semi-Homme : 10 kilos</li>
-											<li>Haut Elfe : 10 kilos</li>
-											<li>Elfe Sylvain : 10 kilos</li>
-											<li>Elfe Noir : 15 kilos</li>
-											<li>Demi-Elfe : 15 kilos</li>
-											<li>Mage : 10 kilos (ou moins selon origine)</li>
-										</ul>
-										<p>Pour les autres Origines / Métiers, la charge max dépendra de la Force</p>
-										<ul>
-											<li>FO 8 : 10 kilos</li>
-											<li>FO 9 : 15 kilos</li>
-											<li>FO 10 : 20 kilos</li>
-											<li>FO 11 : 25 kilos</li>
-											<li>FO 12 : 30 kilos</li>
-											<li>FO 13 : 35 kilos</li>
-											<li>FO 14 : 40 kilos</li>
-											<li>FO 15 : 45 kilos</li>
-										</ul>
-										<p>Attention, au dela de 50 kilos le personnage ne pourra plus bouger (sauf Ogre, à l'appréciation du MJ).</b>
-									</div>
-								</div>
-							</div>
-						</td>
+						<td colspan="2">Kg</td>
 					</tr>
 					<tr>
 						<th>Bourses</th>
-						<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_poids_Bourses" value="0" readonly /></td>
-						<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_poids_Bourses_max" value="0" readonly /></td>
+						<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_poids_Bourses" value="0" readonly="readonly" /></td>
+						<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_poids_Bourses_max" value="0" readonly="readonly" /></td>
 						<td>Pièces</td>
 					</tr>
 					<tr>
 						<th>Sacs</th>
-						<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_poids_Sacs" value="0" readonly /></td>
-						<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_poids_Sacs_max" value="0" readonly /> </td>
+						<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_poids_Sacs" value="0" readonly="readonly" /></td>
+						<td><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_poids_Sacs_max" value="0" readonly="readonly" /> </td>
 						<td>Kg</td>
 					</tr>
 					<tr>
@@ -3495,7 +2679,7 @@
 				<table width="100%">
 					<thead>
 						<tr>
-							<th style="border-right:1px dotted white;" nowrap>Qualité ?</th>
+							<th style="border-right:1px dotted white;" nowrap="">Qualité ?</th>
 							<th style="border-right:1px dotted white;">Spécialiste ?</th>
 							<th style="border-right:1px dotted white;">Mod.</th>
 							<th>Épreuve</th>
@@ -3524,7 +2708,7 @@
 							<input type="hidden" name="attr_Reparation_Difficulte" value="0">
 							<input type="checkbox" name="attr_Reparation_impossible" value="1" class="sheet-hidden sheet-reparation-impossible">
 							<div class="sheet-reparation-epreuve">
-								<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de réparer un objet }} {{ Difficulté = @{reparation_difficulte} }}{{ Ingéniosité= [[ @{stats_inge_total} + @{reparation_bonus} + @{reparation_mod} ]] }} {{ Résultat = [[1d20cs<1cf>20]] }}"> Réparation </button>
+								<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de réparer un objet }} {{ Difficulté = @{reparation_difficulte} }}{{ Ingéniosité= [[ @{stats_inge_total} + @{reparation_bonus} + @{reparation_mod} ]] }} {{ Résultat = [[1d20]] }}"> Réparation </button>
 							</div>
 							<div class="sheet-reparation-impossible">
 								<span class="sheet-hint">Réparation impossible</span>
@@ -3553,7 +2737,7 @@
 							<input type="number" class="sheet-shortInput" name="attr_Confection_Mod" value="0">
 						</td>
 						<td style="text-align:center;">
-							<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de fabriquer un objet }} {{ Ingéniosité=[[ @{stats_inge_total} + ( @{stats_inge_total} - @{confection_difficulte} ) + @{confection_mod} ]] }} {{ Résultat = [[1d20cs<1cf>20]] }}"> Confection </button>
+							<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de fabriquer un objet }} {{ Ingéniosité=[[ @{stats_inge_total} + ( @{stats_inge_total} - @{confection_difficulte} ) + @{confection_mod} ]] }} {{ Résultat = [[1d20]] }}"> Confection </button>
 						</td>
 					</tr>
 				</table>
@@ -3575,14 +2759,14 @@
 						</div>
 
 						<div class="sheet-col" style="width: 100px; text-align:right;">
-							<button type="roll" class="sheet-rollGrimoire" value="@{displayJet} &{template:recette} {{recette_nom=@{recette_nom}}} {{recette_effet=@{recette_effet}}} {{recette_niveau=@{recette_niveau}}} {{recette_resultats=@{recette_resultats}}} {{recette_materiaux=@{recette_materiaux}}} {{recette_materiauxspe=@{recette_materiauxspe}}} {{recette_duree=@{recette_duree}}} {{recette_outils=@{recette_outils}}} {{recette_difficulte=@{recette_difficulte}}} {{recette_xp=@{recette_xp}}} {{recette_prix=@{recette_prix}}}"> Recette </button>
+							<button type="roll" class="sheet-rollGrimoire" value="@{displayJet} &{template:recette} {{recette_nom=@{recette_nom}}} {{recette_effet=@{recette_effet}}} {{recette_niveau=@{recette_niveau}}} {{recette_resultats=@{recette_resultats}}}  {{recette_materiaux=@{recette_materiaux}}} {{recette_materiauxspe=@{recette_materiauxspe}}} {{recette_duree=@{recette_duree}}} {{recette_outils=@{recette_outils}}} {{recette_difficulte=@{recette_difficulte}}} {{recette_xp=@{recette_xp}}} {{recette_prix=@{recette_prix}}}"> Recette </button>
 						</div>
 						<br clear="all" />
 						<br />
 						<div>
-							<input type="checkbox" class="sheet-display-recette sheet-display-recette-preparation" name="attr_Recette_Display_Preparation" value="1" /> <span class="sheet-display-recette">Préparation</span>
-							<input type="checkbox" class="sheet-display-recette sheet-display-recette-epreuve" name="attr_Recette_Display_Epreuve" value="1" /> <span class="sheet-display-recette">Épreuve</span>
-							<input type="checkbox" class="sheet-display-recette sheet-display-recette-results" name="attr_Recette_Display_Results" value="1" /> <span class="sheet-display-recette">Résultats</span>
+							<input type="checkbox" class="sheet-display-recette sheet-display-recette-preparation"  name="attr_Recette_Display_Preparation" value="1" /> <span class="sheet-display-recette">Préparation</span>
+							<input type="checkbox" class="sheet-display-recette sheet-display-recette-epreuve"  name="attr_Recette_Display_Epreuve" value="1" /> <span class="sheet-display-recette">Épreuve</span>
+							<input type="checkbox" class="sheet-display-recette sheet-display-recette-results"  name="attr_Recette_Display_Results" value="1" /> <span class="sheet-display-recette">Résultats</span>
 							<br clear="all" />
 
 							<div class="sheet-display-recette-preparation">
@@ -3647,7 +2831,7 @@
 										</td>
 										<td style="text-align:center; ">
 											<input type="hidden" name="attr_Recette_Bonus" value="0" />
-											<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de fabriquer un(e) @{Recette_Nom} }} {{ Ingéniosité=[[ @{stats_inge_total} + @{recette_bonus} + @{recette_mod} ]] }} {{ Résultat = [[1d20cs<1cf>20]] }}"> Confection </button>
+											<button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de fabriquer un(e) @{Recette_Nom} }} {{ Ingéniosité=[[ @{stats_inge_total} + @{recette_bonus} + @{recette_mod} ]] }} {{ Résultat = [[1d20]] }}"> Confection </button>
 										</td>
 									</tr>
 								</table>
@@ -3813,22 +2997,13 @@
 	</div>
 	<!-- TAB Reglages -->
 	<div class="sheet-body sheet-reglages">
-		<h2>Réglages (v2.6)</h2>
-		<div class="sheet-col-float" style="width:45%;">
-			<p>
-				<input type="checkbox" name="attr_displayJet" value="/w gm"> Envoyer les jets au MJ uniquement
-				<br />
-				<span class="sheet-hint">Cochez cette option pour que tous les jets soient cachés aux autres joueurs.</span>
-			</p>
-		</div>
-		<div class="sheet-col-float" style="width:45%; float:right">
-			<p>
-				<input type="checkbox" name="attr_displayCritEffets" value="1"> Afficher les effets des Critiques / Fumbles
-				<br />
-				<span class="sheet-hint">Cochez cette option pour que les effets des Critiques / Fumbles soient affichés en plus de la confirmation.</span>
-			</p>
-		</div>
-		<br clear="all" />
+		<h2>Réglages (v2.5)</h2>
+		<p>
+			<input type="checkbox" name="attr_displayJet" value="/w gm"> Envoyer les jets au MJ uniquement
+			<br />
+			<span class="sheet-hint">Cochez cette option pour que tous les jets soient cachés aux autres joueurs.</span>
+		</p>
+		<br />
 		<div class="sheet-col-float" style="width:45%;">
 			<h2>Sauvegarder</h2>
 			<textarea name="attr_json_export"></textarea>
@@ -3852,18 +3027,18 @@
 		<table style="width:100%">
 			<thead>
 				<tr>
-					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve de Courage }} {{ Courage=@{Stats_Courage} }} {{ Résultat=[[1d20cs<1cf>20]] }}"> COU</button></th>
-					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve d'Intelligence }} {{ Intelligence=@{Stats_Intelligence} }} {{ Résultat=[[1d20cs<1cf>20]] }}"> INT</button></th>
-					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve de Charisme}} {{ Charisme=@{Stats_Charisme} }} {{ Résultat=[[1d20cs<1cf>20]] }}"> CHA</button></th>
-					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve d'Adresse}} {{ Adresse=@{Stats_Adresse} }} {{ Résultat=[[1d20cs<1cf>20]] }}"> AD</button></th>
-					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve de Force}} {{ Force=@{Stats_Force} }} {{ Résultat=[[1d20cs<1cf>20]] }}"> FO</button></th>
-					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Attaque }} {{ Attaque=@{Stats_Attaque} }} {{ Résultat=[[1d20cs<1cf>20]] }}"> AT</button></th>
-					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Parade }} {{ Parade=@{Stats_Parade} }} {{ Résultat=[[1d20cs<1cf>20]] }}"> PRD</button></th>
-					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Attaque à distance }} {{ Jet=@{Stats_Jet} }} {{ Résultat=[[1d20cs<1cf>20]] }}"> JET</button></th>
-					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Esquive }} {{ Esquive=@{Stats_Esquive} }} {{ Résultat=[[1d20cs<1cf>20]] }}"> ESQ</button></th>
-					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} concentre sa Magie}} {{ Magie&nbsp;Phys=@{Stats_MagiePhy} }} {{ Résultat=[[1d20cs<1cf>20]] }} "> MPhy</button></th>
-					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} concentre sa Magie}} {{ Magie&nbsp;Psy=@{Stats_MagiePsy} }} {{ Résultat=[[1d20cs<1cf>20]] }}"> MPsy</button></th>
-					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de résiter à la Magie}} {{ Résist.&nbsp;Magie=@{Stats_ResiMagie} }} {{ Résultat=[[1d20cs<1cf>20]] }} "> RM</button></th>
+					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve de Courage }} {{ Courage=@{Stats_Courage} }} {{ Résultat=[[1d20]] }}"> COU</button></th>
+					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve d'Intelligence }} {{ Intelligence=@{Stats_Intelligence} }} {{ Résultat=[[1d20]] }}"> INT</button></th>
+					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve de Charisme}} {{ Charisme=@{Stats_Charisme} }} {{ Résultat=[[1d20]] }}"> CHA</button></th>
+					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve d'Adresse}} {{ Adresse=@{Stats_Adresse} }} {{ Résultat=[[1d20]] }}"> AD</button></th>
+					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une épreuve de Force}} {{ Force=@{Stats_Force} }} {{ Résultat=[[1d20]] }}"> FO</button></th>
+					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Attaque }} {{ Attaque=@{Stats_Attaque} }} {{ Résultat=[[1d20]] }}"> AT</button></th>
+					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Parade }} {{ Parade=@{Stats_Parade} }} {{ Résultat=[[1d20]] }}"> PRD</button></th>
+					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Attaque à distance }} {{ Jet=@{Stats_Jet} }} {{ Résultat=[[1d20]] }}"> JET</button></th>
+					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente une Esquive }} {{ Esquive=@{Stats_Esquive} }} {{ Résultat=[[1d20]] }}"> ESQ</button></th>
+					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} concentre sa Magie}} {{ Magie Phys=@{Stats_MagiePhy} }} {{ Résultat=[[1d20]] }} "> MPhy</button></th>
+					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} concentre sa Magie}} {{ Magie Psy=@{Stats_MagiePsy} }} {{ Résultat=[[1d20]] }}"> MPsy</button></th>
+					<th><button type="roll" value="@{displayJet} &{template:default} {{name=@{Personnage_Nom} tente de résiter à la Magie}} {{ Résist. Magie=@{Stats_ResiMagie} }} {{ Résultat=[[1d20]] }} "> RM</button></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -3905,7 +3080,7 @@
 						<th colspan="3">Energie Astrale (EA)</th>
 					</tr>
 				</thead>
-				<tr>
+				</tr>
 					<td><input type="number" name="attr_EA" value="0" step="1"></td>
 					<td>/</td>
 					<td><input type="number" name="attr_EA_max" value="0" min="0" step="1"></td>
@@ -3919,7 +3094,7 @@
 						<th>Niveau</th>
 					</tr>
 				</thead>
-				<tr>
+				</tr>
 					<td><input type="number" name="attr_Personnage_Niveau" value="0" step="1"></td>
 				</tr>
 			</table>
@@ -3931,7 +3106,7 @@
 						<th>XP</th>
 					</tr>
 				</thead>
-				<tr>
+				</tr>
 					<td><input type="number" name="attr_Personnage_XP" value="0" step="1"></td>
 				</tr>
 			</table>
@@ -3946,11 +3121,11 @@
 					<div class="sheet-modal_body">
 						Il est possible d'ajouter ces macros en tant que "Token action" (Action de Pion) pour fluidifier les combats.<br /><br />
 						<b>Rajouter le PNJ dans le Turn Order :</b><br />
-						<textarea class="sheet-code" rows="1">[[@{selected|Stats_Courage} &{tracker}]] </textarea>
+						<textarea class="sheet-code" rows="1">[[@{selected|Stats_Courage} &{tracker}]]</textarea>
 						<b>Faire attaquer le PNJ avec son Arme N°1 :</b><br />
-						<textarea class="sheet-code" rows="1">@{selected|displayJet} &{template:default} {{name=Attaque de @{selected|Personnage_Nom} avec @{selected|repeating_PNJarmes_$0_Arme_Nom} }} {{ Cible = @{target|Personnage_Nom} }} {{ AT=@{selected|repeating_PNJarmes_$0_Arme_Jet} }} {{ Résultat=[[1d20cs<1cf>20]] }}</textarea>
+						<textarea class="sheet-code" rows="1">@{selected|displayJet} &{template:default} {{name=Attaque de @{selected|Personnage_Nom} avec @{selected|repeating_PNJarmes_$0_Arme_Nom} }} {{ Cible = @{target|Personnage_Nom} }} {{ AT=@{selected|repeating_PNJarmes_$0_Arme_Jet} }} {{ Résultat=[[1d20]] }}</textarea>
 						<b>Faire parer le PNJ avec son Arme N°1 :</b><br />
-						<textarea class="sheet-code" rows="1">@{selected|displayJet} &{template:default} {{name=Parade de @{selected|Personnage_Nom} avec @{selected|repeating_PNJarmes_$0_Arme_Nom} }} {{ PRD=@{selected|Stats_Parade_total} + @{selected|repeating_PNJarmes_$0_Arme_PRD} }} {{ Résultat=[[1d20cs<1cf>20]] }}</textarea>
+						<textarea class="sheet-code" rows="1">@{selected|displayJet} &{template:default} {{name=Parade de @{selected|Personnage_Nom} avec @{selected|repeating_PNJarmes_$0_Arme_Nom} }} {{ PRD=@{selected|Stats_Parade_total} + @{selected|repeating_PNJarmes_$0_Arme_PRD} }} {{ Résultat=[[1d20]] }}</textarea>
 						<b>Dégats de l'Arme N°1 :</b><br />
 						<textarea class="sheet-code" rows="1">@{selected|displayJet} &{template:default} {{name=Dégats de @{selected|Personnage_Nom} avec @{selected|repeating_PNJarmes_$0_Arme_Nom}}} {{ Cible = @{target|Personnage_Nom} }} {{ Dégats=[[@{selected|repeating_PNJarmes_$0_Arme_Degats} + @{selected|BonusDegatsForce}]] }}</textarea>
 						<span class="sheet-hint">Pour utiliser l'armre N°2, remplacer $0 par $1 et ainsi de suite.</span>
@@ -3996,8 +3171,8 @@
 						<input type="text" class="sheet-shortInput" name="attr_Arme_RUP" value="" />
 					</div>
 					<div class="sheet-col" style="width: 180px;">
-						<button type="roll" value="@{displayJet} &{template:default} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{ AT=@{Arme_Jet} }} {{ Résultat=[[1d20cs<1cf>20]] }}"> AT </button>
-						<button type="roll" value="@{displayJet} &{template:default} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{ PRD=[[@{Stats_Parade_total} + @{Arme_PRD}]] }} {{ Résultat=[[1d20cs<1cf>20]] }}"> PRD </button>
+						<button type="roll" value="@{displayJet} &{template:default} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{ AT=@{Arme_Jet} }} {{ Résultat=[[1d20]] }}"> AT </button>
+						<button type="roll" value="@{displayJet} &{template:default} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{ PRD=@{Stats_Parade_total} + @{Arme_PRD} }} {{ Résultat=[[1d20]] }}"> PRD </button>
 						<button type="roll" class="sheet-rollDegats" value="@{displayJet} &{template:default} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{ Dégats=[[@{Arme_Degats} + @{BonusDegatsForce}]] }}"> Dégats </button>
 					</div>
 				</div>
@@ -4036,12 +3211,10 @@
 			<div class="sheet-col-float" style="width:48%;">
 				<table style="width:100%; text-align:center;">
 					<thead>
-						<tr>
-							<th>PR Naturelle</th>
-							<th>PR Physique</th>
-							<th>PR Magique</th>
-							<th>PR Totale</th>
-						</tr>
+						<th>PR Naturelle</th>
+						<th>PR Physique</th>
+						<th>PR Magique</th>
+						<th>PR Totale</th>
 					</thead>
 					<tr>
 						<td style="text-align:center;"><input type="number" name="attr_PRNat" value="0" /></td>
