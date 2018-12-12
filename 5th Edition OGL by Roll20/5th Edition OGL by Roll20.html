@@ -14252,64 +14252,61 @@
     //DEV 1378
     on("page:lp-levels", function(eventinfo) {
         deleteCharmancerData(["lp-choices"]);
-        getAttrs(["class", "base_level", "multiclass1_flag", "multiclass2_flag", "multiclass3_flag", "multiclass1", "multiclass1_lvl", "multiclass2", "multiclass2_lvl", "multiclass3", "multiclass3_lvl", "subclass_level", "subclass", "multiclass1_subclass", "multiclass2_subclass", "multiclass3_subclass"], function(v) {
-            const mancerdata = getCharmancerData();
-            const leveldata  = mancerdata["lp-levels"].values || undefined;
-            const class1     = v.class, subclass1 = v.subclass;
-            let set          = {};
-            let update       = {};
+        const mancerdata = getCharmancerData();
+        const previous   = mancerdata["lp-welcome"].values["previous_attributes"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_attributes"]) : {};
+        let set          = {};
+        let update       = {};
+        
+        set["class1"] = 'Classes:' + previous["class"];
+        set["class1_currentlevel"] = previous["base_level"];
+        update["class1_selector"] = `<div style="width:20%; display: inherit;">` + previous["class"] + `</div>`;
 
-            set["class1_currentlevel"] = v.base_level;
-            set["class1"] = `Classes:${class1}`;
-            update["class1_selector"] = `<div style="width:20%; display: inherit;">${class1}</div>`;
-            if (v.subclass) { 
-                update[`subclass1_selector`] = `<div>${subclass1}</div>`;
-                set["class1_subclass"] = v.subclass1; 
-            };
-            
-            const multiclass = parseInt(v[`multiclass1_flag`]) + parseInt(v[`multiclass2_flag`]) + parseInt(v[`multiclass3_flag`]);
-            set["multiclass"] = (!mancerdata["lp-levels"].values["multiclass"]) ? multiclass : mancerdata["lp-levels"].values["multiclass"];
-            set["multiclass_initial"] = multiclass;
+        if (previous["subclass"]) { 
+            update[`subclass1_selector`] = `<div>` + previous["subclass"] + `</div>`;
+            set["class1_subclass"] = previous["subclass"]; 
+        };
+        
+        const multiclass = parseInt(previous["multiclass1_flag"]) + parseInt(previous["multiclass2_flag"]) + parseInt(previous["multiclass3_flag"]);
+        set["multiclass"] = (!mancerdata["lp-levels"].values["multiclass"]) ? multiclass : mancerdata["lp-levels"].values["multiclass"];
+        set["multiclass_initial"] = multiclass;
 
-            for (x = 1; x <= 3; x++) {
-                const x1 = x + 1;
-                if(v[`multiclass${x}_flag`] === "1") {
-                    const classes = v[`multiclass${x}`];
-                    set[`class${x1}`] = "Classes:" + v[`multiclass${x}`];
-                    set[`class${x1}_currentlevel`] = v[`multiclass${x}_lvl`];
-                    update[`class${x1}_selector`] = `<div style="width:20%; display: inherit;">${classes}</div>`;
+        for (x = 1; x <= 3; x++) {
+            const x1 = x + 1;
+            if(previous[`multiclass${x}_flag`] === "1") {
+                const classes = previous[`multiclass${x}`];
+                set[`class${x1}`] = "Classes:" + previous[`multiclass${x}`];
+                set[`class${x1}_currentlevel`] = previous[`multiclass${x}_lvl`];
+                update[`class${x1}_selector`] = `<div style="width:20%; display: inherit;">${classes}</div>`;
 
-                    if (v[`multiclass${x}_subclass`]) {
-                        set[`class${x1}_subclass`] = v[`multiclass${x}_subclass`];
-                    };
-                } else  {
-                    set[`class${x1}_currentlevel`] = 0;
+                if (previous[`multiclass${x}_subclass`]) {
+                    set[`class${x1}_subclass`] =  previous[`multiclass${x}_subclass`];
                 };
+            } else  {
+                set[`class${x1}_currentlevel`] = 0;
             };
+        };
 
-            setAttrs(set);
-            setCharmancerText(update);
-            update_levels();
+        setAttrs(set);
+        setCharmancerText(update);
+        update_levels();
 
-            changeCompendiumPage("sheet-levels-info", ["Classes:"] + class1);
+        changeCompendiumPage("sheet-levels-info", ["Classes:"] + previous["class"]);
 
-            console.log("===== LP Levels Slide was Opened =====");
-            console.log(set);
-        });
+        console.log("===== LP Levels Slide was Opened =====");
+        console.log(set);
     });
 
     on("mancerchange:class1 mancerchange:class2 mancerchange:class3 mancerchange:class4", function(eventinfo) {
         const mancerdata= getCharmancerData();
         const leveldata = mancerdata["lp-levels"];
         const levelclass= eventinfo.sourceAttribute;
-        console.log(eventinfo);
 
         getCompendiumPage(eventinfo.newValue, function(p) {
             const data          = p.data;
-            let set             = {};
-            let update          = {};
             const class_name    = eventinfo.newValue && eventinfo.newValue.split(":").length > 1 && eventinfo.newValue.split(":")[0] === "Classes" ? eventinfo.newValue.split(":")[1] : false;
             const subclass_name = data["Subclass Name"];
+            let set             = {};
+            let update          = {};
             
             if (levelclass === "class1") {
                 set[`${levelclass}_addlevel`] = leveldata.values[`${levelclass}_addlevel`] ? leveldata.values[`${levelclass}_addlevel`] : 1;
@@ -14319,6 +14316,7 @@
 
             set[`${levelclass}_hitdie`] = data["Hit Die"];
             update[`sub${levelclass}_name`] = `<h5>${subclass_name}</h5>`;
+
             if(class_name) {
                 var subOptions = {show_source: true};
 
@@ -14337,14 +14335,11 @@
             setAttrs(set);
             update_levels();
             update_hp(levelclass);
-
-            console.log(`${levelclass} the ${class_name} was changed`);
-            console.log(leveldata);
         });
     });
 
     //This needs to change is some manner
-    on("mancerchange:class1_subclass mancerchange:class2_subclass mancerchange:class3_subclass mancerchange:class4_subclass", function(eventinfo) {
+    on("mancerchange:class1_subclass", function(eventinfo) {
         var mancerdata = getCharmancerData();
 
         (eventinfo.sourceType === "player") ? changeCompendiumPage("sheet-levels-info", eventinfo.newValue) : false;
@@ -14362,21 +14357,21 @@
         let update          = {};
 
         set[`${levelclass}_classlevel`] = classlevel;
-       if (classlevel >= subclasslevel)  {
+        if (classlevel >= subclasslevel)  {
             update[`sub${levelclass}_warning`] = ``;
             showChoices([`sub${levelclass}`]);
-       } else {
+        } else {
             update[`sub${levelclass}_warning`] = `<p>You receive a subclass at level ${subclasslevel}. Your total level is ${classlevel}.</p>`;
             hideChoices([`sub${levelclass}`]);
-       };
+        };
+
+        update[`${levelclass}_update`] = leveldata.values[`${levelclass}_currentlevel`] + ` + `;
+        update[`${levelclass}_tot`] = `= ${classlevel}`;
 
         setCharmancerText(update);
         setAttrs(set);
         update_levels();
         update_hp(levelclass);
-
-        console.log(`Subclass requires level ${subclasslevel}. The class level is ${classlevel}.`);
-        console.log(leveldata);
     });
 
     //Calculate the Average HP and store if for use later. Update the Roll button as needed
@@ -14405,7 +14400,7 @@
             let avg = Math.ceil(sum / num.length), hp = avg * levels;
 
             set[`${levelclass}_averagehp`] = hp;
-            setAttrs(set, function() {recalcLpData()});
+            setAttrs(set);
         };
     };
 
@@ -14418,7 +14413,7 @@
         set[`${levelclass}_addhp`] = result;
         if (leveldata[`${levelclass}_addhpAverage`] === "on") {set[`${levelclass}_addhpAverage`] = "" };
 
-        setAttrs(set, function() {recalcLpData()});
+        setAttrs(set);
     });
 
     //Put on hold for now
@@ -14447,36 +14442,37 @@
         };
 
         setCharmancerText(update);
-
-        //REMOVE LATER
-        //console.log("===== 5E LEVEL LOGS: HP BY LEVEL =====");
-        //console.log(eventinfo);
-        //console.log(leveldata);
-        //console.log("=====  END 5E LEVEL LOGS: HP BY LEVEL ===== ");
     });
 
     on("clicked:multiclass_add clicked:multiclass_remove", function(eventinfo) {
         const mancerdata = getCharmancerData();
         const leveldata  = mancerdata["lp-levels"];
         let set          = {};
-
-        console.log(eventinfo);
+        let update       = {};
 
         if (eventinfo.sourceAttribute === "multiclass_add") {
-            (leveldata.values["multiclass"] < 3) ? set["multiclass"] = leveldata.values["multiclass"] + 1 : false;
-            console.log(leveldata.values["multiclass"]);
+            (leveldata.values["multiclass"] < 3) ? set["multiclass"] = parseInt(leveldata.values["multiclass"]) + 1 : false;
+            update["add_multiclass"] = `<button type="action" name="act_multiclass_add" disabled>+</button>`;
         } else {
-
             if (leveldata.values["multiclass"] > leveldata.values["multiclass_initial"]) {
-                set["multiclass"] = leveldata.values["multiclass"] - 1;
+                set["multiclass"] = parseInt(leveldata.values["multiclass"]) - 1;
+                update["add_multiclass"] = `<button type="action" name="act_multiclass_add">+</button>`;
             } else {
                 false
             };
-
-            console.log(leveldata.values["multiclass"]);
         };
 
         setAttrs(set);
+        setCharmancerText(update);
+    });
+
+    on("mancerchange:multiclass", function () {
+        const mancerdata = getCharmancerData();
+        const tot  = parseInt(mancerdata["lp-levels"].values["multiclass"]) + 1;
+        let update = {};
+
+        update["multiclass_message"] = `Multiclass (${tot}/4)`;
+        setCharmancerText(update);
     });
 
     on("clicked:class1_addhpAverage clicked:class2_addhpAverage clicked:class3_addhpAverage clicked:class4_addhpAverage", function(eventinfo) {
@@ -14485,7 +14481,7 @@
 
         setAttrs({
             [`${levelclass}_addhp`]: hp
-        }, function() {recalcLpData()});
+        });
     });
 
     //Build a function to update the level & class each time they change
@@ -14511,9 +14507,7 @@
             (lvl > 0) ? end.push(`${name} ${lvl}`): false;
         };
 
-        update["levels_message"] = `<p>Character Levels: Started as a level ${start} | ${increase}</p>`;
-        update["levels_message"] += `<p>Character will be level ${characterlevel} (${end})</p>`;
-
+        update["levels_message"] = `<p>Character will be level ${characterlevel} (${end})</p>`;
         set[`characterlevel`]    = characterlevel;
 
         setAttrs(set);
