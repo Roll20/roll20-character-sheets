@@ -503,7 +503,7 @@
 	<input type="hidden" class="npc-toggle" name="attr_npc_toggle" />
 	<div class="npc">
 		<div class="toggle">
-			<input type="checkbox" class="options-flag" name="attr_npc_options_toggle" checked="checked" /><span>y</span>
+			<input type="checkbox" class="options-flag" name="attr_npc_options_toggle" checked="checked" /><span style="display:inline-block">y</span>
 			<div class="options">
 				<h1 data-i18n="npcoptions">NPC Options</h1>
 				<div class="row">
@@ -599,7 +599,7 @@
 				<div class="npc-body">
 					<div class="indent-row"><span class="bolder caps" data-i18n="skills" style="font-weight: bolder">SKILLS</span><span>: </span>
 						<!-- ~~~~~~~~ astralcombat  ~~~~~~~~ -->
-						<input type="hidden" class="optional-flag0" name="attr_astralcombat_flag" value="0">
+						<input type="hidden" class="optional-flag0" name="attr_astral_combat_flag" value="0">
 						<span class="optional"><button type="roll" value="@{gm_toggle} &{template:sAnarchy}{{header=Astral Combat}}{{attr=Willpower}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}@{modifier_toggle}{{edge=[[@{edge_toggle}]]}}{{dice=[[(@{astral_combat}+@{willpower}+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>@{edge_threshold}cs0]]}}"><span data-i18n="astralcombat">Astral Combat</span><span> </span><span name="attr_astral_combat"></span><span>+W</span></button>,</span>
 						<!-- ~~~~~~~~ Athletics  ~~~~~~~~ -->
 						<input type="hidden" class="optional-flag0" name="attr_athletics_flag" value="0">
@@ -890,7 +890,7 @@
 </div>
 
 <input type="hidden" class="npc-toggle" name="attr_npc_toggle" />
-<div class="footer" data-i18n="topps">The Topps Company, Inc. has sole ownership of the names, logo, artwork, marks, photographs, sounds, audio, video and/or any proprietary material used in connection with the game Shadowrun. The Topps Company, Inc. has granted permission to use such names, logos, artwork, marks and/or any proprietary materials for promotional and informational purposes on its website but does not endorse, and is not affiliated with any official capacity whatsoever.<br />Sheet: Version 1.6</div>
+<div class="footer" data-i18n="topps">The Topps Company, Inc. has sole ownership of the names, logo, artwork, marks, photographs, sounds, audio, video and/or any proprietary material used in connection with the game Shadowrun. The Topps Company, Inc. has granted permission to use such names, logos, artwork, marks and/or any proprietary materials for promotional and informational purposes on its website but does not endorse, and is not affiliated with any official capacity whatsoever.<br />Sheet: Version 1.7</div>
 
 
 <div class="rolltemplates">
@@ -900,16 +900,16 @@
 	    	<div class="sheet-template-header">
 	    		{{#header}}{{header}}{{/header}}{{#spec}}<br /> <span> ({{spec}})</span>{{/spec}}<br />
 	    		{{#attr}}<span>{{attr}}</span>{{/attr}}
-	    		{{#rollLess() wound 0}}<span> ♦ Wounds</span>{{/rollLess() wound 0}}
-	    		{{#rollLess() mod 0}}<span> ♦ Modifier</span>{{/rollLess() mod 0}}
-	    		{{#rollGreater() mod 0}}<span> ♦ Modifier</span>{{/rollGreater() mod 0}}
-	    		{{#rollGreater() edge 0}}<span> ♦ Edge</span>{{/rollGreater() edge 0}}
+	    		{{#rollLess() wound 0}}<span> ♦ </span><span data-i18n="wounds">Wounds</span>{{/rollLess() wound 0}}
+	    		{{#rollLess() mod 0}}<span> ♦ </span><span data-i18n="modifier">Modifier</span>{{/rollLess() mod 0}}
+	    		{{#rollGreater() mod 0}}<span> ♦ </span><span data-i18n="modifier">Modifier</span>{{/rollGreater() mod 0}}
+	    		{{#rollGreater() edge 0}}<span> ♦ </span><span data-i18n="edge">Edge</span>{{/rollGreater() edge 0}}
 	    	</div>
 	    	<div class="sheet-template-row">
 	    		{{#dice}}{{dice}}{{/dice}}
-	    		{{#rollTotal() glitch 1}}GLITCH! {{glitch}}{{/rollTotal() glitch 1}}
-	    		{{#rollBetween() glitch 2 4}}No consequence...{{glitch}}{{/rollBetween() glitch 2 4}}
-	    		{{#rollBetween() glitch 5 6}}EXPLOIT! {{glitch}}{{/rollBetween() glitch 5 6}}
+	    		{{#rollTotal() glitch 1}}<span data-i18n="glitch">GLITCH!</span> {{glitch}}{{/rollTotal() glitch 1}}
+	    		{{#rollBetween() glitch 2 4}}<span data-i18n="nocons">No consequence...</span> {{glitch}}{{/rollBetween() glitch 2 4}}
+	    		{{#rollBetween() glitch 5 6}}<span data-i18n="exploit">EXPLOIT! </span>{{glitch}}{{/rollBetween() glitch 5 6}}
 	    		{{#desc}}<span class="sheet-template-desc">{{desc}}</span>{{/desc}}
 	    	</div>
 	    </div>
@@ -920,133 +920,55 @@
 <!--Sheet Worker-->
 <script type="text/worker">
 
-     //Update Armor bubbles & NPC Armor bubbles
-on("change:armor", function (){
-    getAttrs(["armor"], function (v) {
-        var attrs = {};
-        var armor = parseInt(v.armor) || 0;
-        for (i = 1; i <= armor; i += 1) {
-            attrs["armor_".concat(i, "_enabled")] = "true";
-        }
-        for (i = armor + 1; i <= 15; i += 1) {
-            attrs["armor_".concat(i)] = 0;
-            attrs["armor_".concat(i, "_enabled")] = "false";
-        }
-        setAttrs(attrs);
-    });
+on('sheet:opened', function() {
+	getAttrs(["astral_combat"], function(v) {
+		const skl = parseInt(v.astral_combat) || 0;
+		if (skl > 0) {
+			setAttrs({
+				astral_combat_flag: 1
+			});
+		};
+	});
 });
 
-on("change:armor", function (){
-    getAttrs(["armor"], function (v) {
-        var attrs = {};
-        var armor = parseInt(v.armor) || 0;
-        for (i = 1; i <= armor; i += 1) {
-            attrs["npc_armor_".concat(i, "_enabled")] = "true";
-        }
-        for (i = armor + 1; i <= 15; i += 1) {
-            attrs["npc_armor_".concat(i)] = 0;
-            attrs["npc_armor_".concat(i, "_enabled")] = "false";
-        }
-        setAttrs(attrs);
-    });
-});
+  //UPDATE THE TRACKS
+["armor",
+"physical_max",
+"stun_max",
+"edge"
+].forEach(attr => {
+    on(`change:${attr}`, function(eventinfo) {
+    	getAttrs([`${attr}`], function (v) {
+    		const name = (attr === "edge") ? "edge" : (attr.includes("max")) ? attr.slice(0, -4) : "armor";
+			const stat = parseInt(v[`${attr}`]) || 0;
+			const max  = (attr === "edge") ? 6 : 15;
+			let set    = {};
 
-     //Update Edge Track
-on("change:edge", function (){
-    getAttrs(["edge"], function (v) {
-        var attrs = {};
-        var edge = parseInt(v.edge) || 0;
-        for (i = 1; i <= edge; i += 1) {
-            attrs["edge_".concat(i, "_enabled")] = "true";
-        }
-        for (i = edge + 1; i <= 6; i += 1) {
-            attrs["edge_".concat(i)] = 0;
-            attrs["edge_".concat(i, "_enabled")] = "false";
-        }
-        setAttrs(attrs);
+		    for (i = 1; i <= stat; i += 1) {
+		        set[`${name}_`.concat(i, "_enabled")] = "true";
+		        set[`npc_${name}_`.concat(i, "_enabled")] = "true";
+		    }
+
+		    for (i = stat + 1; i <= max; i += 1) {
+		        set[`${name}_`.concat(i)] = 0;
+		        set[`${name}_`.concat(i, "_enabled")] = "false";
+		        set[`npc_${name}_`.concat(i)] = 0;
+		        set[`npc_${name}_`.concat(i, "_enabled")] = "false";
+		    }
+
+	    	setAttrs(set);
+    	});
     });
-});
+ });
 
     //Configure Max Physical & Stun Track 
-on("change:strength", function() {
-    getAttrs(["strength"], function(v){
-        var str = parseInt(v.strength) || 0;
-        var tot = Math.floor(str/2) + 8;
-        setAttrs({
-            physical_max: tot
-        });
-    });
-});
+on("change:strength change:willpower", function(eventinfo) {
+	const attr = parseInt(eventinfo.newValue) || 0;
+	const tot = Math.ceil(attr/2) + 8;
+	const change = (eventinfo.sourceAttribute === "strength") ? "physical_max" : "stun_max";
 
-on("change:willpower", function() {
-    getAttrs(["willpower"], function(v){
-        var wil = parseInt(v.willpower) || 0;
-        var tot = Math.floor(wil/2) + 8;
-        setAttrs({
-            stun_max: tot
-        });
-    });
-});
-
-     //Update physical & stun bubbles
-on("change:physical_max", function (){
-    getAttrs(["physical_max"], function (v) {
-        var attrs = {};
-        var physical = parseInt(v.physical_max) || 0;
-        for (i = 1; i <= physical; i += 1) {
-            attrs["npc_physical_".concat(i, "_enabled")] = "true";
-        }
-        for (i = physical + 1; i <= 15; i += 1) {
-            attrs["npc_physical_".concat(i)] = 0;
-            attrs["npc_physical_".concat(i, "_enabled")] = "false";
-        }
-        setAttrs(attrs);
-    });
-});
-
-on("change:stun_max", function (){
-    getAttrs(["stun_max"], function (v) {
-        var attrs = {};
-        var stun = parseInt(v.stun_max) || 0;
-        for (i = 1; i <= stun; i += 1) {
-            attrs["npc_stun_".concat(i, "_enabled")] = "true";
-        }
-        for (i = stun + 1; i <= 15; i += 1) {
-            attrs["npc_stun_".concat(i)] = 0;
-            attrs["npc_stun_".concat(i, "_enabled")] = "false";
-        }
-        setAttrs(attrs);
-    });
-});
-
-     //Update physical & stun bubbles for NPCs
-on("change:physical_max", function (){
-    getAttrs(["physical_max"], function (v) {
-        var attrs = {};
-        var physical = parseInt(v.physical_max) || 0;
-        for (i = 1; i <= physical; i += 1) {
-            attrs["physical_".concat(i, "_enabled")] = "true";
-        }
-        for (i = physical + 1; i <= 15; i += 1) {
-            attrs["physical_".concat(i)] = 0;
-            attrs["physical_".concat(i, "_enabled")] = "false";
-        }
-        setAttrs(attrs);
-    });
-});
-
-on("change:stun_max", function (){
-    getAttrs(["stun_max"], function (v) {
-        var attrs = {};
-        var stun = parseInt(v.stun_max) || 0;
-        for (i = 1; i <= stun; i += 1) {
-            attrs["stun_".concat(i, "_enabled")] = "true";
-        }
-        for (i = stun + 1; i <= 15; i += 1) {
-            attrs["stun_".concat(i)] = 0;
-            attrs["stun_".concat(i, "_enabled")] = "false";
-        }
-        setAttrs(attrs);
+     setAttrs({
+        [`${change}`]: tot
     });
 });
 
@@ -1064,244 +986,109 @@ on("change:edge_toggle", function() {
     });
 });
 
-	//Wound Modifiers for PC & NPC
-on("change:physical change:stun", function() {
-	getAttrs(["physical", "stun"], function(v){
-		var phy = parseInt(v.physical) || 0;
-		var stu = parseInt(v.stun) || 0;
-		var tot = Math.floor(phy/3) + Math.floor(stu/3);
-		var wou = "-" + tot;
-		setAttrs({
-            wounds: wou
-        });
-	});
-});
+//Wound Modifiers for PC & NPC
+["physical", "stun", "npc_physical", "npc_stun"].forEach(attr => {
+	on(`change:${attr}`, function (eventinfo) {
+		const source = eventinfo.sourceAttribute;
+		const otherattr = (source === "physical") ? "stun" : (source === "stun") ? "physical" : (source == "npc_physical") ? "npc_stun" : "npc_physical";
 
-on("change:npc_physical change:npc_stun", function() {
-	getAttrs(["npc_physical", "npc_stun"], function(v){
-		var phy = parseInt(v.npc_physical) || 0;
-		var stu = parseInt(v.npc_stun) || 0;
-		var tot = Math.floor(phy/3) + Math.floor(stu/3);
-		var wou = "-" + tot;
-		setAttrs({
-            wounds: wou
-        });
+		getAttrs([`${attr}`, `${otherattr}`], function (v) {
+			const phy = parseInt(v.npc_physical) || 0;
+			const stu = parseInt(v.npc_stun) || 0;
+			const tot = Math.floor(phy/3) + Math.floor(stu/3);
+			setAttrs({
+	            wounds: [`-${tot}`]
+	        });
+		});
 	});
 });
 
     //Set the Attribute to a name for the Roll Template
-on("change:repeating_skills:skill_attribute", function() {
-   getAttrs(["repeating_skills_skill_attribute"], function(v) {
-        console.log(v.repeating_skills_skill_attribute);
-        switch (v.repeating_skills_skill_attribute) {
-            case '@{strength}':
-                setAttrs({
-                  repeating_skills_attribute_name: "Strength" 
-                });
-                break;
-            case '@{agility}':
-                setAttrs({
-                  repeating_skills_attribute_name: "Agility" 
-                });
-                break;
-            case '@{willpower}':
-                setAttrs({
-                  repeating_skills_attribute_name: "Willpower" 
-                });
-                break;
-            case '@{logic}':
-                setAttrs({
-                  repeating_skills_attribute_name: "Logic" 
-                });
-                break;
-            case '@{charisma}':
-                setAttrs({
-                  repeating_skills_attribute_name: "Charisma" 
-                });
-                break;
-            case '@{edge}':
-                setAttrs({
-                  repeating_skills_attribute_name: "Edge" 
-                });
-                break;
-            case '0':
-                setAttrs({
-                  repeating_skills_attribute_name: "Knowledge" 
-                });
-                break;    
-            default:
-                setAttrs({
-                  repeating_skills_attribute_name: "Null Attribute" 
-                });
-        }
+on("change:repeating_skills:skill_attribute", function(eventinfo) {
+	const skill = eventinfo.newValue;
+    switch (skill) {
+        case '@{strength}':
+        	attr = "Strength"
+            break;
+        case '@{agility}':
+        	attr = "Agility"
+            break;
+        case '@{willpower}':
+       		attr = "Willpower"
+            break;
+        case '@{logic}':
+        	attr = "Logic"
+            break;
+        case '@{charisma}':
+        	attr = "Charisma"
+            break;
+        case '@{edge}':
+        	attr = "Edge"
+            break;
+        case '0':
+        	attr = "Knowledge"
+            break;    
+        default:
+        	attr = "Null Attribute"
+    }
+
+   setAttrs({
+      repeating_skills_attribute_name: attr
    });
 });
 
     //Put () around Skill specializations
-on("change:repeating_skills:skill_specalization", function() {
-    getAttrs(["repeating_skills_skill_specalization"], function(v){
-        var ski = "(" + (v.repeating_skills_skill_specalization) + ")";
-        var emp = "";
-        if (v.repeating_skills_skill_specalization === '') {
-        	setAttrs({repeating_skills_skill_spec_display: emp});
-        } else {setAttrs({repeating_skills_skill_spec_display: ski});
-        };
-    });
+on("change:repeating_skills:skill_specalization", function(eventinfo) {
+	const ski = eventinfo.newValue;
+	const spec = (ski) ? `(${ski})` : "";
+
+	setAttrs({
+		repeating_skills_skill_spec_display: spec
+	});
 });
 
 	//NPC Skill Toggles
-on("change:astral_combat", function() {
-	getAttrs(["astral_combat"], function(v){
-	var skl = parseInt(v.astral_combat) || 0;
-	if (skl > 0) {setAttrs({astralcombat_flag: 1});} else {
-	setAttrs({astralcombat_flag: 0});}});});
+[	'astral_combat',
+	'athletics',
+	'biotech',
+	'close_combat',
+	'con',
+	'conjuring',
+	'disguise',
+	'electronics',
+	'engineering',
+	'escape_artist',
+	'firearms',
+	'hacking',
+	'heavy_weapons',
+	'intimidation',
+	'negotiation',
+	'piloting_ground',
+	'piloting_other',
+	'projectile_weapons',
+	'sorcery',
+	'stealth',
+	'survival',
+	'tasking',
+	'tracking',
+	'vehicle_weapons'
+].forEach(attr => {
+    on(`change:${attr}`, function(eventinfo) {
+		const skl  = parseInt(eventinfo.newValue) || 0;
+		const flag = (skl > 0) ? 1 : 0;
 
-on("change:athletics", function() {
-	getAttrs(["athletics"], function(v){
-	var skl = parseInt(v.athletics) || 0;
-	if (skl > 0) {setAttrs({athletics_flag: 1});} else {
-	setAttrs({athletics_flag: 0});}});});
+    	setAttrs({
+    		[`${attr}_flag`]: flag
+    	}); 
+    });
+});
 
-on("change:biotech", function() {
-	getAttrs(["biotech"], function(v){
-	var skl = parseInt(v.biotech) || 0;
-	if (skl > 0) {setAttrs({biotech_flag: 1});} else {
-	setAttrs({biotech_flag: 0});}});});
-
-on("change:close_combat", function() {
-	getAttrs(["close_combat"], function(v){
-	var skl = parseInt(v.close_combat) || 0;
-	if (skl > 0) {setAttrs({close_combat_flag: 1});} else {
-	setAttrs({close_combat_flag: 0});}});});
-
-on("change:con", function() {
-	getAttrs(["con"], function(v){
-	var skl = parseInt(v.con) || 0;
-	if (skl > 0) {setAttrs({con_flag: 1});} else {
-	setAttrs({con_flag: 0});}});});
-
-on("change:conjuring", function() {
-	getAttrs(["conjuring"], function(v){
-	var skl = parseInt(v.conjuring) || 0;
-	if (skl > 0) {setAttrs({conjuring_flag: 1});} else {
-	setAttrs({conjuring_flag: 0});}});});
-
-on("change:disguise", function() {
-	getAttrs(["disguise"], function(v){
-	var skl = parseInt(v.disguise) || 0;
-	if (skl > 0) {setAttrs({disguise_flag: 1});} else {
-	setAttrs({disguise_flag: 0});}});});
-
-on("change:electronics", function() {
-	getAttrs(["electronics"], function(v){
-	var skl = parseInt(v.electronics) || 0;
-	if (skl > 0) {setAttrs({electronics_flag: 1});} else {
-	setAttrs({electronics_flag: 0});}});});
-
-on("change:engineering", function() {
-	getAttrs(["engineering"], function(v){
-	var skl = parseInt(v.engineering) || 0;
-	if (skl > 0) {setAttrs({engineering_flag: 1});} else {
-	setAttrs({engineering_flag: 0});}});});
-
-on("change:escape_artist", function() {
-	getAttrs(["escape_artist"], function(v){
-	var skl = parseInt(v.escape_artist) || 0;
-	if (skl > 0) {setAttrs({escape_artist_flag: 1});} else {
-	setAttrs({escape_artist_flag: 0});}});});
-
-on("change:firearms", function() {
-	getAttrs(["firearms"], function(v){
-	var skl = parseInt(v.firearms) || 0;
-	if (skl > 0) {setAttrs({firearms_flag: 1});} else {
-	setAttrs({firearms_flag: 0});}});});
-
-on("change:hacking", function() {
-	getAttrs(["hacking"], function(v){
-	var skl = parseInt(v.hacking) || 0;
-	if (skl > 0) {setAttrs({hacking_flag: 1});} else {
-	setAttrs({hacking_flag: 0});}});});
-
-on("change:heavy_weapons", function() {
-	getAttrs(["heavy_weapons"], function(v){
-	var skl = parseInt(v.heavy_weapons) || 0;
-	if (skl > 0) {setAttrs({heavy_weapons_flag: 1});} else {
-	setAttrs({heavy_weapons_flag: 0});}});});
-
-on("change:intimidation", function() {
-	getAttrs(["intimidation"], function(v){
-	var skl = parseInt(v.intimidation) || 0;
-	if (skl > 0) {setAttrs({intimidation_flag: 1});} else {
-	setAttrs({intimidation_flag: 0});}});});
-
-on("change:negotiation", function() {
-	getAttrs(["negotiation"], function(v){
-	var skl = parseInt(v.negotiation) || 0;
-	if (skl > 0) {setAttrs({negotiation_flag: 1});} else {
-	setAttrs({negotiation_flag: 0});}});});
-
-on("change:piloting_ground", function() {
-	getAttrs(["piloting_ground"], function(v){
-	var skl = parseInt(v.piloting_ground) || 0;
-	if (skl > 0) {setAttrs({piloting_ground_flag: 1});} else {
-	setAttrs({piloting_ground_flag: 0});}});});
-
-on("change:piloting_other", function() {
-	getAttrs(["piloting_other"], function(v){
-	var skl = parseInt(v.piloting_other) || 0;
-	if (skl > 0) {setAttrs({piloting_other_flag: 1});} else {
-	setAttrs({piloting_other_flag: 0});}});});
-
-on("change:projectile_weapons", function() {
-	getAttrs(["projectile_weapons"], function(v){
-	var skl = parseInt(v.projectile_weapons) || 0;
-	if (skl > 0) {setAttrs({projectile_weapons_flag: 1});} else {
-	setAttrs({projectile_weapons_flag: 0});}});});
-
-on("change:sorcery", function() {
-	getAttrs(["sorcery"], function(v){
-	var skl = parseInt(v.sorcery) || 0;
-	if (skl > 0) {setAttrs({sorcery_flag: 1});} else {
-	setAttrs({sorcery_flag: 0});}});});
-
-on("change:stealth", function() {
-	getAttrs(["stealth"], function(v){
-	var skl = parseInt(v.stealth) || 0;
-	if (skl > 0) {setAttrs({stealth_flag: 1});} else {
-	setAttrs({stealth_flag: 0});}});});
-
-on("change:survival", function() {
-	getAttrs(["survival"], function(v){
-	var skl = parseInt(v.survival) || 0;
-	if (skl > 0) {setAttrs({survival_flag: 1});} else {
-	setAttrs({survival_flag: 0});}});});
-
-on("change:tasking", function() {
-	getAttrs(["tasking"], function(v){
-	var skl = parseInt(v.tasking) || 0;
-	if (skl > 0) {setAttrs({tasking_flag: 1});} else {
-	setAttrs({tasking_flag: 0});}});});
-
-on("change:tracking", function() {
-	getAttrs(["tracking"], function(v){
-	var skl = parseInt(v.tracking) || 0;
-	if (skl > 0) {setAttrs({tracking_flag: 1});} else {
-	setAttrs({tracking_flag: 0});}});});
-
-on("change:vehicle_weapons", function() {
-	getAttrs(["vehicle_weapons"], function(v){
-	var skl = parseInt(v.vehicle_weapons) || 0;
-	if (skl > 0) {setAttrs({vehicle_weapons_flag: 1});} else {
-	setAttrs({vehicle_weapons_flag: 0});}});});
 
 	//Repeating active for PC sheet
 on("change:repeating_skills", function() {
 	getAttrs(["repeating_skills_skill", "repeating_skills_skill_specalization"], function(v) {
 		const skill = (v.repeating_skills_skill);
 		const spec = (v.repeating_skills_skill_specalization);
-
-		console.log(skill.length + "skill");
-		console.log(spec.length + "spec");
 
 		if (spec === "") {
 
