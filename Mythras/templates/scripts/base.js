@@ -116,11 +116,11 @@
 
     // Spirit Damage Auto Calc
     var calc_spirit_damage = function() {
-		getAttrs(["willpower_experience", "willpower_other", "willpower_augment", "binding_learned", "binding_base", "binding_experience", "binding_other", "binding_augment", "pow", "cha"], function(values) {
+		getAttrs(["willpower_experience", "willpower_other", "willpower_temp", "binding_learned", "binding_base", "binding_experience", "binding_other", "binding_temp", "pow", "cha"], function(values) {
 		    var pow = parseInt(values.pow);
 		    var cha = parseInt(values.cha);
-		    var binding = (parseInt(values.binding_learned) * (pow + cha)) + parseInt(values.binding_experience) + parseInt(values.binding_other) + parseInt(values.binding_augment);
-		    var willpower = pow + pow + parseInt(values.willpower_experience) + parseInt(values.willpower_other) + parseInt(values.willpower_augment);
+		    var binding = (parseInt(values.binding_learned) * (pow + cha)) + parseInt(values.binding_experience) + parseInt(values.binding_other) + parseInt(values.binding_temp);
+		    var willpower = pow + pow + parseInt(values.willpower_experience) + parseInt(values.willpower_other) + parseInt(values.willpower_temp);
 		    if ((willpower/2) > binding) {
 		        var spirit_damage_table_value = Math.ceil((willpower/2)/20);
 		    } else {
@@ -167,7 +167,7 @@
 			});
 		});
     };
-    on("change:willpower_experience change:willpower_other change:willpower_augment change:binding_learned change:binding_base change:binding_experience change:binding_other change:binding_augment change:pow change:cha", function() { calc_spirit_damage(); });
+    on("change:willpower_experience change:willpower_other change:willpower_temp change:binding_learned change:binding_base change:binding_experience change:binding_other change:binding_temp change:pow change:cha", function() { calc_spirit_damage(); });
     
     // Damage Mod Auto Calc
     var calc_damage_mod = function() {
@@ -315,12 +315,16 @@
     };
     on("change:pow change:magic_points_temp change:magic_points_other", function() { calc_magic_points(); });
 
-    // Movement Auto Calc
+    // Movement Auto Calc 
     var calc_movement = function() {
-        getAttrs(["fatigue", "movement_rate_species", "movement_rate_enc", "movement_rate_species_swim", "movement_rate_species_fly", "movement_rate_other", "movement_rate_temp", "armor_penalty"], function(v) {
+        getAttrs(["height", "fatigue", "movement_rate_species", "movement_rate_enc", "movement_rate_species_swim", "movement_rate_species_fly", "movement_rate_other", "movement_rate_temp", "armor_penalty", "athletics_experience", "athletics_other", "athletics_temp", "str", "dex", "con", "swim_experience", "swim_other", "swim_temp"], function(v) {
+            var swim_no_penalty = (parseInt(v.str) + parseInt(v.con) + parseInt(v.swim_experience)+parseInt(v.swim_other)+parseInt(v.swim_temp));
             var step1_land_movement = parseInt(v.movement_rate_species) + parseInt(v.movement_rate_other) + parseInt(v.movement_rate_temp);
-            var step1_swim_movement = parseInt(v.movement_rate_species_swim) + parseInt(v.movement_rate_other) + parseInt(v.movement_rate_temp);
+            var step1_swim_movement = parseInt(v.movement_rate_species_swim) + parseInt(v.movement_rate_other) + parseInt(v.movement_rate_temp) + Math.floor(swim_no_penalty/20);
             var step1_fly_movement = parseInt(v.movement_rate_species_fly) + parseInt(v.movement_rate_other) + parseInt(v.movement_rate_temp);
+            var athletics_no_penalty = (parseInt(v.str)+parseInt(v.dex)+parseInt(v.athletics_experience)+parseInt(v.athletics_other)+parseInt(v.athletics_temp));
+            var armor_penalty = parseInt(v.armor_penalty);
+            var height = parseInt(v.height);
 
             var fatigue = parseInt(v.fatigue);
             if (fatigue >= 8) {
@@ -367,15 +371,78 @@
                 var step3_swim_movement = 0;
                 var step3_fly_movement = 0;
             }
+
+            var run = ((step3_land_movement+(Math.floor((athletics_no_penalty/25)*.5)))*3)+armor_penalty;
+            if (run < step3_land_movement) {
+                run = step3_land_movement;
+            }
+
+            var spirit = ((step3_land_movement+(Math.floor(athletics_no_penalty/25)))*5)+armor_penalty;
+            if (spirit < step3_land_movement) {
+                spirit = step3_land_movement;
+            }
+
+            var climb_rough = step3_land_movement+Math.ceil(armor_penalty/2);
+            if (climb_rough < 0) {
+                climb_rough = 0;
+            }
+
+            var climb_steep = step3_land_movement+armor_penalty;
+            if (climb_steep < 0) {
+                climb_steep = 0;
+            }
+
+            var climb_sheer = step3_land_movement+(armor_penalty*2);
+            if (climb_sheer < 0) {
+                climb_sheer = 0;
+            }
+
+            // Rules say minium is one step, per google that is .762 meters, so if we adjust to cm set minium to height-100cm to account for short characters like halfling or dwarves
+            var running_jump_horizontal = Math.ceil((((height/100)*2)+Math.floor(athletics_no_penalty/20))+(armor_penalty/2));
+            if (running_jump_horizontal < 1) {
+                running_jump_horizontal = 1;
+            }
+            var running_jump_vertical = Math.ceil(((((height/100)*.5)+(Math.floor(athletics_no_penalty/20)*.2))+(armor_penalty/2))*100);
+            if (running_jump_vertical < 20) {
+                running_jump_vertical = 20;
+            }
+            var standing_jump_horizontal = Math.ceil((height/100)+(armor_penalty/4));
+            if (standing_jump_horizontal < 1) {
+                standing_jump_horizontal = 1;
+            }
+            var standing_jump_vertical = Math.ceil((((height/100)*.25)+(armor_penalty/4))*100);
+            if (standing_jump_vertical < 20) {
+                standing_jump_vertical = 20;
+            }
+
+            var swim_sink = Math.ceil((step3_swim_movement/2)+armor_penalty);
+            if (swim_sink > 0) {
+                var step4_swim_movement = step3_swim_movement;
+            } else if (swim_sink == 0) {
+                var step4_swim_movement = getTranslationByKey("float-u");
+            } else {
+                var step4_swim_movement = getTranslationByKey("sink-u");
+            }
             
             setAttrs({
                 movement_rate_fatigue: movement_rate_fatigue,
                 movement_rate: step3_land_movement,
-                walk_speed: step3_land_movement,
+                walk_move: step3_land_movement,
+                run_move: run,
+                sprint_move: spirit,
+                climb_rough_move: climb_rough,
+                climb_steep_move: climb_steep,
+                climb_sheer_move: climb_sheer,
+                fly_move: step3_fly_movement,
+                running_jump_horizontal_move: running_jump_horizontal,
+                running_jump_vertical_move: running_jump_vertical,
+                standing_jump_horizontal_move: standing_jump_horizontal,
+                standing_jump_vertical_move: standing_jump_vertical,
+                swim_move: step4_swim_movement, 
             });
         });
     }
-    on("change:fatigue change:movement_rate_species change:movement_rate_enc change:movement_rate_species_swim change:movement_rate_species_fly change:movement_rate_other change:movement_rate_temp change:armor_penalty", function() { calc_movement(); });
+    on("change:height change:fatigue change:movement_rate_species change:movement_rate_enc change:movement_rate_species_swim change:movement_rate_species_fly change:movement_rate_other change:movement_rate_temp change:armor_penalty change:str change:dex change:con change:athletics_experience change:athletics_other change:athletics_temp change:swim_experience change:swim_other change:swim_temp", function() { calc_movement(); });
 
     // Power Points Auto Calc
     var calc_power_points = function() {
@@ -469,7 +536,7 @@
     };
     on("change:pow change:tenacity_temp change:tenacity_other change:apply_dependencies_penalty change:repeating_dependency remove:repeating_dependency", function() { calc_tenacity(); });
 
-    // HP Auto Calc
+    // HP & Armor Auto Calc
     var calc_hp_max_base = function() {
         getAttrs(["con", "siz", "pow", "hp_use_pow"], function(v) {
             base_value = Math.ceil( (parseInt(v.con) + parseInt(v.siz) + (parseInt(v.pow) * parseInt(v.hp_use_pow)))/5 );
@@ -485,6 +552,9 @@
         var hp_max_base_mod = location + "_hp_max_base_mod";
         var hp_max_other = location + "_hp_max_other";
         var current_hp = location + "_hp";
+        var armor_equipped = location + "_armor_equipped";
+        var armor_ap = location + "_armor_ap";
+        var other_ap = location + "_other_ap";
         var current_hp_mook1 = location + "_hp_mook1";
         var current_hp_mook2 = location + "_hp_mook2";
         var current_hp_mook3 = location + "_hp_mook3";
@@ -497,12 +567,13 @@
         var current_hp_mook10 = location + "_hp_mook10";
         var current_hp_max = location + "_hp_max";
 
-        getAttrs(["hp_max_base", "all_hp_temp", hp_max_base_mod, hp_max_other, current_hp, current_hp_mook1, current_hp_mook2, current_hp_mook3, current_hp_mook4, current_hp_mook5, current_hp_mook6, current_hp_mook7, current_hp_mook8, current_hp_mook9, current_hp_mook10, current_hp_max], function(v) {
+        getAttrs(["all_armor_temp", "hp_max_base", "all_hp_temp", armor_equipped, armor_ap, other_ap, hp_max_base_mod, hp_max_other, current_hp, current_hp_mook1, current_hp_mook2, current_hp_mook3, current_hp_mook4, current_hp_mook5, current_hp_mook6, current_hp_mook7, current_hp_mook8, current_hp_mook9, current_hp_mook10, current_hp_max], function(v) {
             setObj = {};
 
             new_hp_max = parseInt(v["hp_max_base"]) + parseInt(v[hp_max_base_mod]) + parseInt(v[hp_max_other]) + parseInt(v["all_hp_temp"]);
             diff_hp_max = new_hp_max - parseInt(v[current_hp_max]);
             setObj[location + "_hp"] = parseInt(v[current_hp]) + diff_hp_max;
+            setObj[location + "_ap"] = parseInt(v[armor_ap]) * parseInt(v[armor_equipped]) + parseInt(v[other_ap]) + parseInt(v["all_armor_temp"]);
             setObj[location + "_hp_mook1"] = parseInt(v[current_hp_mook1]) + diff_hp_max;
             setObj[location + "_hp_mook2"] = parseInt(v[current_hp_mook2]) + diff_hp_max;
             setObj[location + "_hp_mook3"] = parseInt(v[current_hp_mook3]) + diff_hp_max;
@@ -518,18 +589,18 @@
             setAttrs(setObj);
         });
     };
-    on("change:hp_max_base change:location1_hp_max_base_mod change:location1_hp_max_other change:all_hp_temp", function() { calc_location_hp("location1"); });
-    on("change:hp_max_base change:location2_hp_max_base_mod change:location2_hp_max_other change:all_hp_temp", function() { calc_location_hp("location2"); });
-    on("change:hp_max_base change:location3_hp_max_base_mod change:location3_hp_max_other change:all_hp_temp", function() { calc_location_hp("location3"); });
-    on("change:hp_max_base change:location4_hp_max_base_mod change:location4_hp_max_other change:all_hp_temp", function() { calc_location_hp("location4"); });
-    on("change:hp_max_base change:location5_hp_max_base_mod change:location5_hp_max_other change:all_hp_temp", function() { calc_location_hp("location5"); });
-    on("change:hp_max_base change:location6_hp_max_base_mod change:location6_hp_max_other change:all_hp_temp", function() { calc_location_hp("location6"); });
-    on("change:hp_max_base change:location7_hp_max_base_mod change:location7_hp_max_other change:all_hp_temp", function() { calc_location_hp("location7"); });
-    on("change:hp_max_base change:location8_hp_max_base_mod change:location8_hp_max_other change:all_hp_temp", function() { calc_location_hp("location8"); });
-    on("change:hp_max_base change:location9_hp_max_base_mod change:location9_hp_max_other change:all_hp_temp", function() { calc_location_hp("location9"); });
-    on("change:hp_max_base change:location10_hp_max_base_mod change:location10_hp_max_other change:all_hp_temp", function() { calc_location_hp("location10"); });
-    on("change:hp_max_base change:location11_hp_max_base_mod change:location11_hp_max_other change:all_hp_temp", function() { calc_location_hp("location11"); });
-    on("change:hp_max_base change:location12_hp_max_base_mod change:location12_hp_max_other change:all_hp_temp", function() { calc_location_hp("location12"); });
+    on("change:hp_max_base change:location1_armor_ap change:location1_armor_equipped change:location1_other_ap change:location1_hp_max_base_mod change:location1_hp_max_other change:all_hp_temp change:all_armor_temp", function() { calc_location_hp("location1"); });
+    on("change:hp_max_base change:location2_armor_ap change:location2_armor_equipped change:location2_other_ap change:location2_hp_max_base_mod change:location2_hp_max_other change:all_hp_temp change:all_armor_temp", function() { calc_location_hp("location2"); });
+    on("change:hp_max_base change:location3_armor_ap change:location3_armor_equipped change:location3_other_ap change:location3_hp_max_base_mod change:location3_hp_max_other change:all_hp_temp change:all_armor_temp", function() { calc_location_hp("location3"); });
+    on("change:hp_max_base change:location4_armor_ap change:location4_armor_equipped change:location4_other_ap change:location4_hp_max_base_mod change:location4_hp_max_other change:all_hp_temp change:all_armor_temp", function() { calc_location_hp("location4"); });
+    on("change:hp_max_base change:location5_armor_ap change:location5_armor_equipped change:location5_other_ap change:location5_hp_max_base_mod change:location5_hp_max_other change:all_hp_temp change:all_armor_temp", function() { calc_location_hp("location5"); });
+    on("change:hp_max_base change:location6_armor_ap change:location6_armor_equipped change:location6_other_ap change:location6_hp_max_base_mod change:location6_hp_max_other change:all_hp_temp change:all_armor_temp", function() { calc_location_hp("location6"); });
+    on("change:hp_max_base change:location7_armor_ap change:location7_armor_equipped change:location7_other_ap change:location7_hp_max_base_mod change:location7_hp_max_other change:all_hp_temp change:all_armor_temp", function() { calc_location_hp("location7"); });
+    on("change:hp_max_base change:location8_armor_ap change:location8_armor_equipped change:location8_other_ap change:location8_hp_max_base_mod change:location8_hp_max_other change:all_hp_temp change:all_armor_temp", function() { calc_location_hp("location8"); });
+    on("change:hp_max_base change:location9_armor_ap change:location9_armor_equipped change:location9_other_ap change:location9_hp_max_base_mod change:location9_hp_max_other change:all_hp_temp change:all_armor_temp", function() { calc_location_hp("location9"); });
+    on("change:hp_max_base change:location10_armor_ap change:location10_armor_equipped change:location10_other_ap change:location10_hp_max_base_mod change:location10_hp_max_other change:all_hp_temp change:all_armor_temp", function() { calc_location_hp("location10"); });
+    on("change:hp_max_base change:location11_armor_ap change:location11_armor_equipped change:location11_other_ap change:location11_hp_max_base_mod change:location11_hp_max_other change:all_hp_temp change:all_armor_temp", function() { calc_location_hp("location11"); });
+    on("change:hp_max_base change:location12_armor_ap change:location12_armor_equipped change:location12_other_ap change:location12_hp_max_base_mod change:location12_hp_max_other change:all_hp_temp change:all_armor_temp", function() { calc_location_hp("location12"); });
 
     // Simplified HP Auto Calc
     var calc_simplified_hp = function() {
@@ -621,6 +692,29 @@
         });
     }
     on("change:fatigue change:healing_rate", function() { calc_fatigue(); });
+
+    // Known Skills Auto Calc
+    var calc_known_skill = function(skill_name) {
+        var skill_base = skill_name + "_base";
+        var skill_xp = skill_name + "_experience";
+        var skill_temp = skill_name + "_temp";
+        var skill_other = skill_name + "_other";
+        var skill_penalty = skill_name + "_penalty";
+
+        getAttrs(["str", "con", "siz", "dex", "int", "pow", "cha", skill_xp, skill_temp, skill_other, skill_penalty], function(v) {
+            setObj = {};
+
+            if (skill_name == "athletics") {
+                base_value = parseInt(v.str) + parseInt(v.dex)
+            }
+
+            setObj[skill_name + "_base"] = base_value;
+            setObj[skill_name] = base_value + parseInt(v[skill_xp]) + parseInt(v[skill_temp]) + parseInt(v[skill_other]) + parseInt(v[skill_penalty]);
+
+            setAttrs(setObj);
+        });
+    };
+    //on("change:str change:dex change:athletics_experience change:athletics_other change:athletics_temp change:athletics_penalty", function() { calc_standard_skill("athletics"); });
     
     // Upgrade Functions
     function upgrade_1_0_to_1_1() {
@@ -2460,7 +2554,7 @@
 		});
 	});
 	
-	// Encumbrance
+	// Encumbrance Auto Calc
 	on("change:avg_species_siz change:str change:effective_armor_enc change:shields_enc change:melee_weapons_enc change:missile_weapons_enc change:firearms_enc change:loadout_enc change:pack_enc change:pack_equipped change:currency_enc change:encumbrance_temp", function() {
 	    getAttrs(["avg_species_siz", "str", "effective_armor_enc", "shields_enc", "melee_weapons_enc", "missile_weapons_enc", "firearms_enc", "loadout_enc", "pack_enc", "pack_equipped", "currency_enc", "encumbrance_temp"], function(v) {
 	        var str = parseInt(v.str);
@@ -2506,6 +2600,7 @@
 	            });
 	        } else {
 	            setAttrs({
+                    encumbrance_current: enc,
 	                encumbrance_load: normalTranslation,
 	                encumbrance_skills: "0",
 	                encumbrance_move: normalTranslation,
@@ -2519,9 +2614,12 @@
 	});
 	
 	// Armor ENC
-	on("change:location11_armor_equipped change:location11_armor_enc change:location10_armor_equipped change:location10_armor_enc change:half_effective_armor_enc change:location9_armor_equipped change:location9_armor_enc change:location8_armor_equipped change:location_armor_enc change:location7_armor_equipped change:location7_armor_enc change:location6_armor_equipped change:location6_armor_enc change:location5_armor_equipped change:location5_armor_enc change:location4_armor_equipped change:location4_armor_enc change:location3_armor_equipped change:location3_armor_enc change:location2_armor_equipped change:location2_armor_enc change:location1_armor_equipped change:location1_armor_enc", function() {
-	    getAttrs(["location11_armor_equipped", "location11_armor_enc", "location10_armor_equipped", "location10_armor_enc", "half_effective_armor_enc", "location9_armor_equipped", "location9_armor_enc", "location8_armor_equipped", "location8_armor_enc", "location7_armor_equipped", "location7_armor_enc", "location6_armor_equipped", "location6_armor_enc", "location5_armor_equipped", "location5_armor_enc", "location4_armor_equipped", "location4_armor_enc", "location3_armor_equipped", "location3_armor_enc", "location2_armor_equipped", "location2_armor_enc", "location1_armor_equipped", "location1_armor_enc"], function(v) {
+	on("change:location12_armor_equipped change:location12_armor_enc change:location11_armor_equipped change:location11_armor_enc change:location10_armor_equipped change:location10_armor_enc change:half_effective_armor_enc change:location9_armor_equipped change:location9_armor_enc change:location8_armor_equipped change:location_armor_enc change:location7_armor_equipped change:location7_armor_enc change:location6_armor_equipped change:location6_armor_enc change:location5_armor_equipped change:location5_armor_enc change:location4_armor_equipped change:location4_armor_enc change:location3_armor_equipped change:location3_armor_enc change:location2_armor_equipped change:location2_armor_enc change:location1_armor_equipped change:location1_armor_enc", function() {
+	    getAttrs(["location12_armor_equipped", "location12_armor_enc", "location11_armor_equipped", "location11_armor_enc", "location10_armor_equipped", "location10_armor_enc", "half_effective_armor_enc", "location9_armor_equipped", "location9_armor_enc", "location8_armor_equipped", "location8_armor_enc", "location7_armor_equipped", "location7_armor_enc", "location6_armor_equipped", "location6_armor_enc", "location5_armor_equipped", "location5_armor_enc", "location4_armor_equipped", "location4_armor_enc", "location3_armor_equipped", "location3_armor_enc", "location2_armor_equipped", "location2_armor_enc", "location1_armor_equipped", "location1_armor_enc"], function(v) {
 	        var total_armor_enc = 0;
+            if (v.location12_armor_equipped == '1') {
+                total_armor_enc = total_armor_enc + parseFloat(v.location12_armor_enc);
+            }
 	        if (v.location11_armor_equipped == '1') {
 	            total_armor_enc = total_armor_enc + parseFloat(v.location11_armor_enc);
 	        }
