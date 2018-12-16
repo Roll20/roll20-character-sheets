@@ -693,6 +693,27 @@
     }
     on("change:fatigue change:healing_rate", function() { calc_fatigue(); });
 
+    var calc_status = function() {
+        getAttrs(["status_base", "status_experience", "status_temp", "status_other", "status_penalty", "herculean_mod"], function(v) {
+            var std = parseInt(v.status_base) + parseInt(v.status.experience) + parseInt(v.status_temp) + parseInt(v.status_temp);
+            var veasy = std * 2;
+            var easy = Math.ceil(std * 1.5);
+            var hard = Math.ceil(std * (2/3));
+            var form = Math.ceil(std * .5);
+            var herc = Math.ceil(std * herc_mod);
+
+            setAttrs({
+                status: std + parseInt(v.status_penalty),
+                status_very_easy: veasy + parseInt(v.status_penalty),
+                status_easy: easy + parseInt(v.status_penalty),
+                status_hard: hard + parseInt(v.status_penalty),
+                status_formidable: form + parseInt(v.status_penalty),
+                status_herculean: herc + parseInt(v.status_penalty),
+            });
+        });
+    }
+    on("change:status_base change:status_experience change:status_temp change:status_other change:status_penalty change:herculean_mod", function() { calc_status(); });
+
     // Known Skills Auto Calc
     var calc_known_skill = function(skill_name) {
         var skill_base = skill_name + "_base";
@@ -700,21 +721,105 @@
         var skill_temp = skill_name + "_temp";
         var skill_other = skill_name + "_other";
         var skill_penalty = skill_name + "_penalty";
+        var skill_veasy = skill_name + "_very_easy";
+        var skill_easy = skill_name + "_easy";
+        var skill_hard = skill_name + "_hard";
+        var skill_form = skill_name + "_formidable";
+        var skill_herc = skill_name + "_herculean";
 
-        getAttrs(["str", "con", "siz", "dex", "int", "pow", "cha", skill_xp, skill_temp, skill_other, skill_penalty], function(v) {
+        getAttrs(["str", "con", "siz", "dex", "int", "pow", "cha", skill_xp, skill_temp, skill_other, skill_penalty, "herculean_mod"], function(v) {
             setObj = {};
 
             if (skill_name == "athletics") {
-                base_value = parseInt(v.str) + parseInt(v.dex)
-            }
+                var base_value = parseInt(v.str) + parseInt(v.dex);
+            } else if (skill_name == "boating") {
+                var base_value = parseInt(v.str) + parseInt(v.con);
+            } else if (skill_name == "brawn") {
+                var base_value = parseInt(v.str) + parseInt(v.siz);
+            } else if (skill_name == "conceal") {
+                var base_value = parseInt(v.dex) + parseInt(v.pow);
+            } else if (skill_name == "customs") {
+                var base_value = parseInt(v.int) + parseInt(v.int);
+            } else if (skill_name == "dance") {
+                var base_value = parseInt(v.dex) + parseInt(v.cha);
+            } else if (skill_name == "deceit") {
+                var base_value = parseInt(v.int) + parseInt(v.cha);
+            } else if (skill_name == "drive") {
+                var base_value = parseInt(v.dex) + parseInt(v.pow);
+            } else if (skill_name == "endurance") {
+                var base_value = parseInt(v.con) + parseInt(v.con);
+            } else if (skill_name == "evade") {
+                var base_value = parseInt(v.dex) + parseInt(v.dex);
+            } else if (skill_name == "first_aid") {
+                var base_value = parseInt(v.int) + parseInt(v.dex);
+            } else if (skill_name == "home_parallel") {
+                var base_value = parseInt(v.int) + parseInt(v.int);
+            } else if (skill_name == "influence") {
+                var base_value = parseInt(v.cha) + parseInt(v.cha);
+            } else if (skill_name == "insight") {
+                var base_value = parseInt(v.int) + parseInt(v.pow);
+            } else if (skill_name == "locale") {
+                var base_value = parseInt(v.int) + parseInt(v.int);
+            } else if (skill_name == "perception") {
+                var base_value = parseInt(v.int) + parseInt(v.pow);
+            } else if (skill_name == "ride") {
+                var base_value = parseInt(v.dex) + parseInt(v.pow);
+            } else if (skill_name == "sing") {
+                var base_value = parseInt(v.cha) + parseInt(v.pow);
+            } else if (skill_name == "stealth") {
+                var base_value = parseInt(v.int) + parseInt(v.dex);
+            } else if (skill_name == "superstition") {
+                var base_value = 21 - parseInt(v.int) + parseInt(v.pow);
+            } else if (skill_name == "swim") {
+                var base_value = parseInt(v.str) + parseInt(v.con);
+            } else if (skill_name == "unarmed") {
+                var base_value = parseInt(v.str) + parseInt(v.dex);
+            } else if (skill_name == "willpower") {
+                var base_value = parseInt(v.pow) + parseInt(v.pow);
+            } 
 
-            setObj[skill_name + "_base"] = base_value;
-            setObj[skill_name] = base_value + parseInt(v[skill_xp]) + parseInt(v[skill_temp]) + parseInt(v[skill_other]) + parseInt(v[skill_penalty]);
+            var herc_mod = parseFloat(v.herculean_mod);
+            var std = base_value + parseInt(v[skill_xp]) + parseInt(v[skill_temp]) + parseInt(v[skill_other]);
+            var veasy = std * 2;
+            var easy = Math.ceil(std * 1.5);
+            var hard = Math.ceil(std * (2/3));
+            var form = Math.ceil(std * .5);
+            var herc = Math.ceil(std * herc_mod);
+
+            setObj[skill_veasy] = veasy + parseInt(v[skill_penalty]);
+            setObj[skill_easy] = easy + parseInt(v[skill_penalty]); 
+            setObj[skill_name] = std + parseInt(v[skill_penalty]);
+            setObj[skill_hard] = hard + parseInt(v[skill_penalty]);
+            setObj[skill_form] = form + parseInt(v[skill_penalty]);
+            setObj[skill_herc] = herc + parseInt(v[skill_penalty]);
 
             setAttrs(setObj);
         });
     };
-    //on("change:str change:dex change:athletics_experience change:athletics_other change:athletics_temp change:athletics_penalty", function() { calc_standard_skill("athletics"); });
+    on("change:str change:dex change:athletics_experience change:athletics_other change:athletics_temp change:athletics_penalty change:herculean_mod ", function() { calc_known_skill("athletics"); });
+    on("change:str change:con change:boating_experience change:boating_other change:boating_temp change:boating_penalty change:herculean_mod ", function() { calc_known_skill("boating"); });
+    on("change:str change:siz change:brawn_experience change:brawn_other change:brawn_temp change:brawn_penalty change:herculean_mod ", function() { calc_known_skill("brawn"); });
+    on("change:dex change:pow change:conceal_experience change:conceal_other change:conceal_temp change:conceal_penalty change:herculean_mod ", function() { calc_known_skill("conceal"); });
+    on("change:int change:customs_experience change:customs_other change:customs_temp change:customs_penalty change:herculean_mod ", function() { calc_known_skill("customs"); });
+    on("change:dex change:cha change:dance_experience change:dance_other change:dance_temp change:dance_penalty change:herculean_mod ", function() { calc_known_skill("dance"); });
+    on("change:int change:cha change:deceit_experience change:deceit_other change:deceit_temp change:deceit_penalty change:herculean_mod ", function() { calc_known_skill("deceit"); });
+    on("change:dex change:pow change:drive_experience change:drive_other change:drive_temp change:drive_penalty change:herculean_mod ", function() { calc_known_skill("drive"); });
+    on("change:con change:endurance_experience change:endurance_other change:endurance_temp change:endurance_penalty change:herculean_mod ", function() { calc_known_skill("endurance"); });
+    on("change:dex change:evade_experience change:evade_other change:evade_temp change:evade_penalty change:herculean_mod ", function() { calc_known_skill("evade"); });
+    on("change:int change:dex change:first_aid_experience change:first_aid_other change:first_aid_temp change:first_aid_penalty change:herculean_mod ", function() { calc_known_skill("first_aid"); });
+    on("change:int change:home_parallel_experience change:home_parallel_other change:home_parallel_temp change:home_parallel_penalty change:herculean_mod ", function() { calc_known_skill("home_parallel"); });
+    on("change:cha change:influence_experience change:influence_other change:influence_temp change:influence_penalty change:herculean_mod ", function() { calc_known_skill("influence"); });
+    on("change:int change:pow change:insight_experience change:insight_other change:insight_temp change:insight_penalty change:herculean_mod ", function() { calc_known_skill("insight"); });
+    on("change:int change:locale_experience change:locale_other change:locale_temp change:locale_penalty change:herculean_mod ", function() { calc_known_skill("locale"); });
+    on("change:int change:pow change:perception_experience change:perception_other change:perception_temp change:perception_penalty change:herculean_mod ", function() { calc_known_skill("perception"); });
+    on("change:dex change:pow change:ride_experience change:ride_other change:ride_temp change:ride_penalty change:herculean_mod ", function() { calc_known_skill("ride"); });
+    on("change:cha change:pow change:sing_experience change:sing_other change:sing_temp change:sing_penalty change:herculean_mod ", function() { calc_known_skill("sing"); });
+    on("change:int change:dex change:stealth_experience change:stealth_other change:stealth_temp change:stealth_penalty change:herculean_mod ", function() { calc_known_skill("stealth"); });
+    on("change:int change:pow change:superstition_experience change:superstition_other change:superstition_temp change:superstition_penalty change:herculean_mod ", function() { calc_known_skill("superstition"); });
+    on("change:str change:con change:swim_experience change:swim_other change:swim_temp change:swim_penalty change:herculean_mod ", function() { calc_known_skill("swim"); });
+    on("change:str change:dex change:unarmed_experience change:unarmed_other change:unarmed_temp change:unarmed_penalty change:herculean_mod ", function() { calc_known_skill("unarmed"); });
+    on("change:pow change:willpower_experience change:willpower_other change:willpower_temp change:willpower_penalty change:herculean_mod ", function() { calc_known_skill("willpower"); });
+
     
     // Upgrade Functions
     function upgrade_1_0_to_1_1() {
@@ -1259,7 +1364,7 @@
     }
     
     var campaign_options = function() {
-        getAttrs(["setting_option", "luck_points_rank_option", "vehicle_type_option", "extended_conflict_enabled_option", "simplified_combat_enabled_option", "action_points_calc_option", "tenacity_enabled_option", "luther_arkwright_style_option", "m_space_style_option", "boating_standard_option", "status_standard_option", "superstition_standard_option", "linguistics_enabled_option", "dependencies_enabled_option", "firearms_enabled_option", "reach_enabled_option", "affiliations_enabled_option", "ms_psionics_enabled_option", "roman_magic_enabled_option", "arcane_magic_enabled_option", "divine_magic_enabled_option", "folk_magic_enabled_option", "fae_powers_enabled_option", "folk_magic_range_multiplier_option", "animism_enabled_option", "mysticism_enabled_option", "mythras_psionics_enabled_option", "sorcery_enabled_option", "theism_enabled_option", "max_devotional_pool_based_on_option"], function(v) {
+        getAttrs(["setting_option", "luck_points_rank_option", "herculean_mod_option", "vehicle_type_option", "extended_conflict_enabled_option", "simplified_combat_enabled_option", "action_points_calc_option", "tenacity_enabled_option", "luther_arkwright_style_option", "m_space_style_option", "boating_standard_option", "status_standard_option", "superstition_standard_option", "linguistics_enabled_option", "dependencies_enabled_option", "firearms_enabled_option", "reach_enabled_option", "affiliations_enabled_option", "ms_psionics_enabled_option", "roman_magic_enabled_option", "arcane_magic_enabled_option", "divine_magic_enabled_option", "folk_magic_enabled_option", "fae_powers_enabled_option", "folk_magic_range_multiplier_option", "animism_enabled_option", "mysticism_enabled_option", "mythras_psionics_enabled_option", "sorcery_enabled_option", "theism_enabled_option", "max_devotional_pool_based_on_option"], function(v) {
             var newoptions = {};
             // Default Setting Configs
             var setting_configs = {
@@ -1267,6 +1372,7 @@
                 extended_conflict_enabled: "0",
                 simplified_combat_enabled: "0",
                 action_points_calc: "calculate",
+                herculean_mod: ".1",
                 luck_points_rank: "0",
                 tenacity_enabled: "0",
                 boating_standard: "1",
@@ -1316,6 +1422,7 @@
                 setting_configs["sorcery_enabled"] = "0";
                 setting_configs["theism_enabled"] = "0";
             } else if(v["setting_option"] === "m-space") {
+                setting_configs["herculean_mod"] = ".2";
                 setting_configs["sheet_style"] = "m-space";
                 setting_configs["extended_conflict_enabled"] = "1",
                 setting_configs["action_points_calc"] = "set_2";
@@ -1363,6 +1470,7 @@
             } else if(v["setting_option"] === "mythras_imperative") {
                 setting_configs["action_points_calc"] = "set_2";
                 setting_configs["reach_enabled"] = "0";
+                setting_configs["herculean_mod"] = ".2";
             } else {}
             
             // Sheet Style
@@ -1408,6 +1516,13 @@
                 newoptions["tenacity_enabled"] = setting_configs["tenacity_enabled"];
             } else {
                 newoptions["tenacity_enabled"] = v["tenacity_enabled_option"];
+            }
+
+            // Herculean Modifier
+            if(v["herculean_mod_option"] === "default") {
+                newoptions["herculean_mod"] = setting_configs["herculean_mod"];
+            } else {
+                newoptions["herculean_mod"] = v["herculean_mod_option"];
             }
             
             // Boating Standard
@@ -4582,7 +4697,7 @@
     });
     
     //Set campaign options if any change
-    on("change:setting_option change:vehicle_type_option change:extended_conflict_enabled_option change:simplified_combat_enabled_option change:luck_points_rank_option change:action_points_calc_option change:tenacity_enabled_option change:status_standard_option change:superstition_standard_option change:boating_standard_option change:linguistics_enabled_option change:dependencies_enabled_option change:firearms_enabled_option change:reach_enabled_option change:affiliations_enabled_option change:roman_magic_enabled_option change:arcane_magic_enabled_option change:divine_magic_enabled_option change:fae_powers_enabled_option change:folk_magic_enabled_option change:folk_magic_range_multiplier_option change:animism_enabled_option change:mysticism_enabled_option change:mythras_psionics_enabled_option change:ms_psionics_enabled_option change:sorcery_enabled_option change:theism_enabled_option change:max_devotional_pool_based_on_option", function() {
+    on("change:setting_option change:vehicle_type_option change:extended_conflict_enabled_option change:simplified_combat_enabled_option change:luck_points_rank_option change:herculean_mod_option change:action_points_calc_option change:tenacity_enabled_option change:status_standard_option change:superstition_standard_option change:boating_standard_option change:linguistics_enabled_option change:dependencies_enabled_option change:firearms_enabled_option change:reach_enabled_option change:affiliations_enabled_option change:roman_magic_enabled_option change:arcane_magic_enabled_option change:divine_magic_enabled_option change:fae_powers_enabled_option change:folk_magic_enabled_option change:folk_magic_range_multiplier_option change:animism_enabled_option change:mysticism_enabled_option change:mythras_psionics_enabled_option change:ms_psionics_enabled_option change:sorcery_enabled_option change:theism_enabled_option change:max_devotional_pool_based_on_option", function() {
         console.log("Setting campaign options")
         campaign_options();
     });
