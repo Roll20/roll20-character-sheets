@@ -14297,7 +14297,6 @@
         set["class1"] = 'Classes:' + previous["class"];
         set["class1_currentlevel"] = previous["base_level"];
         update["class1_selector"] = `<div style="width:20%; display: inherit;">` + previous["class"] + `</div>`;
-
         if (previous["subclass"]) { 
             update[`subclass1_selector`] = `<div>` + previous["subclass"] + `</div>`;
             set["class1_subclass"] = previous["subclass"]; 
@@ -14315,6 +14314,7 @@
                 update[`class${x1}_selector`] = `<div style="width:20%; display: inherit;">${classes}</div>`;
                 if (previous[`multiclass${x}_subclass`]) {
                     set[`class${x1}_subclass`] =  previous[`multiclass${x}_subclass`];
+                    update[`subclass${x1}_selector`] = `<div>` + previous[`multiclass${x}_subclass`] + `</div>`;
                 };
             } else  {
                 set[`class${x1}_currentlevel`] = 0;
@@ -14368,7 +14368,12 @@
         });
     });
 
-   on("mancerchange:class1_addlevel mancerchange:class2_addlevel mancerchange:class3_addlevel mancerchange:class4_addlevel", function(eventinfo) {
+    on("mancerchange:class1_subclass mancerchange:class2_subclass mancerchange:class3_subclass mancerchange:class4_subclass", function(eventinfo) {
+        console.log("GETTING SUBCLASS!")
+        getCompendiumPage(eventinfo.newValue);
+    });
+
+    on("mancerchange:class1_addlevel mancerchange:class2_addlevel mancerchange:class3_addlevel mancerchange:class4_addlevel", function(eventinfo) {
         const mancerdata    = getCharmancerData();
         const leveldata     = mancerdata["lp-levels"];
         const levelclass    = eventinfo.sourceAttribute.slice(0, 6);
@@ -14456,7 +14461,7 @@
 
         set[`${levelclass}_addhp`] = result;
 
-        setAttrs(set);
+        setAttrs(set, function() { recalcLpData(); });
     });
 
     //Put on hold for now
@@ -14526,7 +14531,7 @@
 
         setAttrs({
             [`${levelclass}_addhp`]: hp
-        });
+        }, function() { recalcLpData(); });
     });
 
     on("clicked:class1 clicked:class2 clicked:class3 clicked:class4 clicked:class1_subclass clicked:class2_subclass clicked:class3_subclass clicked:class4_subclass", function(eventinfo) {
@@ -15345,7 +15350,6 @@
                 callbacks.push( function() {update_ac();} );
                 callbacks.push( function() {update_weight();} );
                 callbacks.push(callback);
-                console.log(update);
                 setAttrs(update, {silent: true}, function() {
                     setCharmancerText({"mancer_progress" :'<div style="width: 95%"></div>'});
                     _.each(callbacks, function(callback) {
@@ -15557,7 +15561,6 @@
                 setCharmancerText({"mancer_progress" :'<div style="width: 15%"></div>'});
                 getAllPages(allDrops, function() {
                     setCharmancerText({"mancer_progress" :'<div style="width: 20%"></div>'});
-                    console.log(allPageData);
                     doAllDrops(allPageData, function() {
                         console.log("DOING THE FINAL SET!!");
                         setAttrs(set, function() {
@@ -17053,7 +17056,7 @@
             <div class="row">
                 <div>
                     <div class="class1_selector">
-                       <select name="comp_class1" value="">
+                        <select name="comp_class1" value="">
                         </select>
                     </div>
                     <div class="levels-message">
@@ -17068,7 +17071,7 @@
                     <div class="class1_rollhp" style="display: inline;">
                         <button type="roll" name="roll_class1_rollhp" value="" title="">Roll</button>
                     </div>
-                     <button type="action" name="act_class1_addhpAverage" value="" title="">Average</button>
+                    <button type="action" name="act_class1_addhpAverage" value="" title="">Average</button>
                    <!-- <input type="checkbox" name="comp_class1_hpbyLevel" /><span>By level</span> Put on hold -->
                 </div>
                 <div class="by-levels" style="margin-left: 11%;">
@@ -17079,9 +17082,11 @@
                     <div>This text is a placeholder.</div>
                     <div class="subclass1_name"></div>
                     <div class="subclass1_warning"></div>
-                    <select class="choice subclass1" name="comp_class1_subclass">
-                        <option value="" data-i18n="choose">Choose</option>
-                    </select>
+                    <div class="subclass1_selector">
+                        <select class="choice subclass1" name="comp_class1_subclass">
+                            <option value="" data-i18n="choose">Choose</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <h3 class="subclass1_features_title choice" style="display: inline;">Subclass Features: </h3>
@@ -17117,14 +17122,16 @@
                     <div>This text is a placeholder.</div>
                     <div class="subclass2_name"></div>
                     <div class="subclass2_warning"></div>
-                    <select class="choice subclass2" name="comp_class2_subclass">
-                        <option value="" data-i18n="choose">Choose</option>
-                    </select>
+                    <div class="subclass2_selector">
+                        <select class="choice subclass2" name="comp_class2_subclass">
+                            <option value="" data-i18n="choose">Choose</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <h3 class="subclass2_features_title choice" style="display: inline;">Subclass Features: </h3>
                     <button type="action" name="act_class2_subclass" class="mancer_info">i</button>
-                     <div>This text is a placeholder.</div>
+                    <div>This text is a placeholder.</div>
                 </div>
             </div>
             <div class="row">
@@ -17157,9 +17164,11 @@
                     <div>This text is a placeholder.</div>
                     <div class="subclass3_name"></div>
                     <div class="subclass3_warning"></div>
-                    <select class="choice subclass3" name="comp_class3_subclass">
-                        <option value="" data-i18n="choose">Choose</option>
-                    </select>
+                    <div class="subclass3_selector">
+                        <select class="choice subclass3" name="comp_class3_subclass">
+                            <option value="" data-i18n="choose">Choose</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <h3 class="subclass3_features_title choice" style="display: inline;">Subclass Features: </h3>
@@ -17195,9 +17204,11 @@
                     <div>This text is a placeholder.</div>
                     <div class="subclass4_name"></div>
                     <div class="subclass4_warning"></div>
-                    <select class="choice subclass4" name="comp_class4_subclass">
-                        <option value="" data-i18n="choose">Choose</option>
-                    </select>
+                    <div class="subclass4_selector">
+                        <select class="choice subclass4" name="comp_class4_subclass">
+                            <option value="" data-i18n="choose">Choose</option>
+                        </select>
+                    </div>
                 </div>
                 <div>
                     <h3 class="subclass4_features_title choice" style="display: inline;">Subclass Features: </h3>
@@ -17228,21 +17239,25 @@
         </div>
         <input type="hidden" name="comp_characterlevel" />
         <input type="hidden" name="comp_class1" />
+        <input type="hidden" name="comp_class1_subclass" />
         <input type="hidden" name="comp_class1_currentlevel" />
         <input type="hidden" name="comp_class1_classlevel" />
         <input type="hidden" name="comp_class1_hitdie" />
         <input type="hidden" name="comp_class1_averagehp" />
-        <input type="hidden" name="comp_class2"  />
+        <input type="hidden" name="comp_class2" />
+        <input type="hidden" name="comp_class2_subclass" />
         <input type="hidden" name="comp_class2_currentlevel" />
         <input type="hidden" name="comp_class2_classlevel" />
         <input type="hidden" name="comp_class2_hitdie" />
         <input type="hidden" name="comp_class2_averagehp" />
-        <input type="hidden" name="comp_class3"  />
+        <input type="hidden" name="comp_class3" />
+        <input type="hidden" name="comp_class3_subclass" />
         <input type="hidden" name="comp_class3_currentlevel" />
         <input type="hidden" name="comp_class3_classlevel" />
         <input type="hidden" name="comp_class3_hitdie" />
         <input type="hidden" name="comp_class3_averagehp" />
         <input type="hidden" name="comp_class4" />
+        <input type="hidden" name="comp_class4_subclass" />
         <input type="hidden" name="comp_class4_currentlevel" />
         <input type="hidden" name="comp_class4_classlevel" />
         <input type="hidden" name="comp_class4_hitdie" />
