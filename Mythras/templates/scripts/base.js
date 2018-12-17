@@ -757,6 +757,8 @@
 
             if (skill_name == "superstition") {
                 var base_value = 21 - char1_value + char2_value;
+            } else if (skill_name.startsWith("repeating_affiliation")) {
+                var base_value = parseInt(v[skill_base]);
             } else if (skill_name == "status") {
                 var base_value = parseInt(v[skill_base]);
             } else {
@@ -827,19 +829,112 @@
     on("change:con change:pow change:trance_experience change:trance_other change:trance_temp change:trance_penalty change:herculean_mod ", function() { calc_skill("trance", "@{con}", "@{pow}"); });
     on("change:str change:dex change:unarmed_experience change:unarmed_other change:unarmed_temp change:unarmed_penalty change:herculean_mod ", function() { calc_skill("unarmed", "@{str}", "@{dex}"); });
     on("change:pow change:willpower_experience change:willpower_other change:willpower_temp change:willpower_penalty change:herculean_mod ", function() { calc_skill("willpower", "@{pow}", "@{pow}"); });
+    // Repeating Language Auto Calc
+    on("change:repeating_language", function(event_info) { calc_skill(event_info.triggerName, "@{int}", "@{cha}"); });
+    on("change:int change:cha change:herculean_mod", function() {
+        getSectionIDs("repeating_language", function(idarray) {
+            if(idarray.length > 0) {
+                _.each(idarray, function(currentID, i) {
+                    calc_skill("repeating_language_" + currentID, "@{int}", "@{cha}");
+                });
+            }
+        });
+    });
+    // Repeating M-Space Psionic Power Auto Calc
+    on("change:repeating_psionicpower", function(event_info) { calc_skill(event_info.triggerName, "@{pow}", "@{pow}"); });
+    on("change:pow change:herculean_mod", function() {
+        getSectionIDs("repeating_psionicpower", function(idarray) {
+            if(idarray.length > 0) {
+                _.each(idarray, function(currentID, i) {
+                    calc_skill("repeating_psionicpower_" + currentID, "@{pow}", "@{pow}");
+                });
+            }
+        });
+    });
+    // Repeating Mysticism Path Auto Calc
+    on("change:repeating_path", function(event_info) { calc_skill(event_info.triggerName, "@{pow}", "@{con}"); });
+    on("change:pow change:con change:herculean_mod", function() {
+        getSectionIDs("repeating_path", function(idarray) {
+            if(idarray.length > 0) {
+                _.each(idarray, function(currentID, i) {
+                    calc_skill("repeating_path_" + currentID, "@{pow}", "@{con}");
+                });
+            }
+        });
+    });
+    // Repeating Psionics Discipline Auto Calc
+    on("change:repeating_discipline", function(event_info) { calc_skill(event_info.triggerName, "@{pow}", "@{pow}"); });
+    on("change:pow change:herculean_mod", function() {
+        getSectionIDs("repeating_discipline", function(idarray) {
+            if(idarray.length > 0) {
+                _.each(idarray, function(currentID, i) {
+                    calc_skill("repeating_discipline_" + currentID, "@{pow}", "@{pow}");
+                });
+            }
+        });
+    });
+    // Repeating Theism Devotion Auto Calc
+    on("change:repeating_devotion", function(event_info) { calc_skill(event_info.triggerName, "@{pow}", "@{cha}"); });
+    on("change:pow change:cha change:herculean_mod", function() {
+        getSectionIDs("repeating_devotion", function(idarray) {
+            if(idarray.length > 0) {
+                _.each(idarray, function(currentID, i) {
+                    calc_skill("repeating_devotion_" + currentID, "@{pow}", "@{cha}");
+                });
+            }
+        });
+    });
+    // Repeating Affliation Auto Calc
+    on("change:repeating_affiliation", function(event_info) { calc_skill(event_info.triggerName, "0", "0"); });
 
     // Unknown Repeating Skills Auto Calc
-    on("change:repeating_combatstyle change:repeating_standardskill change:repeating_professionalskill", function(event_info) {
-        // languages affiliations paths invocations devotions mspace-paths disciplines
+    on("change:repeating_combatstyle change:repeating_standardskill change:repeating_professionalskill change:repeating_invocation", function(event_info) {
+        //mspace-paths(rename) disciplines(rename)
         var char1 = event_info.triggerName + "_char1";
         var char2 = event_info.triggerName + "_char2";
         getAttrs([char1, char2], function(v) {
             calc_skill(event_info.triggerName, v[char1], v[char2]);
         });
     });
-
-    // Cycle all unknown repeating skills when a char or herculean_mod is updated because that effects everything
-    // 
+    on("change:str change:con change:siz change:dex change:int change:cha change:pow change:herculean_mod", function() {
+        getSectionIDs("repeating_combatstyle", function(idarray) {
+            if(idarray.length > 0) {
+                _.each(idarray, function(currentID, i) {
+                    var char1 = "repeating_combatstyle_" + currentID + "_char1";
+                    var char2 = "repeating_combatstyle_" + currentID + "_char2";
+                    calc_skill("repeating_combatstyle_" + currentID, v[char1], v[char2]);
+                });
+            }
+        });
+        getSectionIDs("repeating_standardskill", function(idarray) {
+            if(idarray.length > 0) {
+                _.each(idarray, function(currentID, i) {
+                    var char1 = "repeating_standardskill_" + currentID + "_char1";
+                    var char2 = "repeating_standardskill_" + currentID + "_char2";
+                    calc_skill("repeating_standardskill_" + currentID, v[char1], v[char2]);
+                });
+            }
+        });
+        getSectionIDs("repeating_professionalskill", function(idarray) {
+            if(idarray.length > 0) {
+                _.each(idarray, function(currentID, i) {
+                    var char1 = "repeating_professionalskill_" + currentID + "_char1";
+                    var char2 = "repeating_professionalskill_" + currentID + "_char2";
+                    calc_skill("repeating_professionalskill_" + currentID, v[char1], v[char2]);
+                });
+            }
+        });
+        getSectionIDs("repeating_invocation", function(idarray) {
+            if(idarray.length > 0) {
+                _.each(idarray, function(currentID, i) {
+                    var char1 = "repeating_invocation_" + currentID + "_char1";
+                    var char2 = "repeating_invocation_" + currentID + "_char2";
+                    calc_skill("repeating_invocation_" + currentID, v[char1], v[char2]);
+                });
+            }
+        });
+    });
+    
 
     // Passions and Dependencies Auto Calc
     var calc_passion = function(skill_name) {
