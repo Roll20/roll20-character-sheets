@@ -1,1768 +1,4 @@
-﻿<script type="text/worker">
-	// Primary Stats
-	var primaryStats = [ "stats_courage", "stats_intelligence", "stats_charisme", "stats_adresse", "stats_force", "stats_attaque", "stats_parade"];
-	// Secondary Stats
-	var secondaryStats = [	"stats_charisme_total", "stats_intelligence_total", "stats_adresse_total", "stats_force_total", "stats_courage_total",
-							"stats_inge_mod", "stats_magiepsy_mod", "stats_magiephy_mod", "stats_resimagie_mod", "stats_fouille_mod", "stats_jet_mod",
-							"stats_inge_temp_total", "stats_magiepsy_temp_total", "stats_magiephy_temp_total", "stats_resimagie_temp_total", "stats_fouille_temp_total", "stats_jet_temp_total" ];
-	// Temp Stats
-	var tempStats = [	"stats_courage", "stats_intelligence", "stats_charisme", "stats_adresse", "stats_force",
-						"stats_attaque", "stats_parade", "stats_jet", "stats_esquive", "stats_fouille",
-						"stats_inge", "stats_magiephy", "stats_magiepsy", "stats_resimagie" ];
-	// Buff Stats
-	var buffStats = [	"condition_courage", "condition_intelligence", "condition_charisme", "condition_adresse", "condition_force",
-						"condition_attaque", "condition_parade", "condition_jet", "condition_esquive",
-						"condition_magiephy", "condition_magiepsy", "condition_resimagie" ];
-	var prStats = {
-		change: [ "repeating_armures:armure_prphy", "repeating_armures:armure_prmag", "prnat" ],
-		remove: [ "repeating_armures" ]
-	};
-	// items weight
-	var weightStats = [	"richesse_berylium", "richesse_thritil", "poids_bourses",
-						"poids_materiels", "poids_butins", "poids_livres", "poids_bouffes", "personnage_charge_max", "poids_sacs_max" ];
-	// repeating items sections
-	var weightSections = {
-		change: [ "repeating_materiels:materiel_poids", "repeating_butins:butin_poids", "repeating_bouffes:bouffe_poids", "repeating_livres" ],
-		remove: [ "repeating_materiels", "repeating_butins", "repeating_bouffes", "repeating_livres" ]
-	};
-	// max available weight
-	var weightStats_max = {
-		change: [ "repeating_sacs:sac_charge_max", "repeating_bourses:bourse_charge_max" ],
-		remove: [ "repeating_sacs", "repeating_bourses" ]
-	}
-
-	var levelAndXP = [	0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500,
-						5500, 6600, 7800, 9100, 10500, 12000, 13600, 15300, 17100, 19000,
-						21000, 24000, 29000, 35000, 45000, 60000 ];
-
-	/*---------
-		EVENTS
-	----------*/
-	// Primary Stats
-	on( primaryStats.map( stat => `change:${stat} change:${stat}_mod change:${stat}_temp_total` ).join(" "), function(e) {
-		updatePrimaryStat( e.sourceAttribute.replace( "_mod", "" ).replace( "_temp_total", "" ) );
-	});
-	// Secondary Stats & Secondary Mods
-	on( secondaryStats.map( stat => `change:${stat}` ).join(" "), function() {
-		updateSecondaryStats();
-	});
-	// Temp Stats
-	on( tempStats.map( stat => `change:${stat}_temp change:${stat}_buff` ).join(" "), function(e) {
-		updateTempStat( e.sourceAttribute.replace( "_temp", "" ).replace( "_buff", "" ) );
-	});
-	// PR Physique et magique
-	on( prStats[ "change" ].map( stat => `change:${stat}` ).join(" ") + " " + prStats[ "remove" ].map( stat => `remove:${stat}` ).join(" "), function() {
-		updatePR();
-	});
-	// Déplacement
-	on("change:prphy change:stats_force_total", function() {
-		updateDeplacement();
-	});
-	// Equive
-	on("change:stats_adresse_total change:prphy change:stats_esquive_mod change:stats_esquive_temp_total change:personnage_surcharge", function() {
-		updateEsquive();
-	});
-	// Level
-	on("change:personnage_niveau", function() {
-		updateXP();
-	});
-	// Ammos & Weapons
-	on("change:repeating_armes:munition_nom", function( e ) {
-		if( e[ "sourceType"] === "player" ) {
-			updateAmmo( e );
-		}
-	});
-	on("change:repeating_armes:arme_portee change:repeating_armes:arme_at change:repeating_armes:arme_degats change:repeating_armes:arme_bonusforce change:repeating_armes:munition_modad change:repeating_armes:munition_degats", function( e ) {
-		var idRow = e[ "sourceAttribute" ].split( '_' )[2];
-		updateWeapon( idRow );
-	});
-	on("change:stats_jet_total change:stats_attaque_total change:bonusdegatsforce", function( e ) {
-		updateWeapons();
-	});
-	// Total golds
-	on("change:richesse_or change:richesse_argent change:richesse_cuivre change:richesse_berylium change:richesse_thritil change:richesse_billet10 change:richesse_billet50 change:richesse_billet100 change:richesse_billet500 change:richesse_billet1000", function() {
-		updatePO();
-	});
-	// total repeating section weight
-	on( weightSections[ "change" ].map( stat => `change:${stat}` ).join(" ") + " " + weightSections[ "remove" ].map( stat => `remove:${stat}` ).join(" "), function( e ) {
-		var section = e[ 'sourceAttribute' ].split('-')[0];
-
-		if( section === "repeating_materiels_" ) {
-			updateRSSum( "repeating_materiels", "materiel_poids", "poids_materiels" );
-		} else if( section === "repeating_butins_" ) {
-			updateRSSum( "repeating_butins", "butin_poids", "poids_butins" );
-		} else if( section === "repeating_bouffes_" ) {
-			updateRSSum( "repeating_bouffes", "bouffe_poids", "poids_bouffes" );
-		} else if( section === "repeating_livres_" ) {
-			updateLivresCharge();
-		}
-	});
-	// total weight
-	on( weightStats.map( stat => `change:${stat}` ).join(" "), function() {
-		updateCharge();
-	});
-	// max available weight
-	on( weightStats_max[ "change" ].map( stat => `change:${stat}` ).join(" ") + " " + weightStats_max[ "remove" ].map( stat => `remove:${stat}` ).join(" "), function( e ) {
-		var section = e[ 'sourceAttribute' ].split('-')[0];
-
-		if( section === "repeating_sacs_" ) {
-			updateRSSum( "repeating_sacs", "sac_charge_max", "poids_sacs_max" );
-		} else if( section === "repeating_bourses_" ) {
-			updateRSSum( "repeating_bourses", "bourse_charge_max", "poids_bourses_max" );
-		}
-	});
-	// change magic school tab
-	on("change:repeating_ecolesmagie:ecolemagie_selected change:ecolemagie_selectall", function( e ) {
-		if( e[ "sourceType"] === "player" ) {
-			updateMagicSchoolTab( e );
-		}
-	});
-	// change magic Filter
-	on("change:tab_ecolemagie change:tab_niveaumagie", function() {
-		displayMagicSpells();
-	});
-	// Crating
-	on("change:reparation_qualite change:reparation_specialiste", function( ) {
-		updateRepair();
-	});
-	on("change:repeating_recettes:recette_specialiste change:repeating_recettes:recette_difficulte change:repeating_recettes:recette_malusspecialiste", function( e ) {
-		var idRow = e[ 'sourceAttribute' ].split('_')[2];
-		updateRecipe( idRow );
-	});
-	on("change:stats_inge_total", function() {
-		updateRepair();
-		updateRecipes();
-	});
-	// Buff / Debuff
-	on("change:repeating_conditions:condition_actif remove:repeating_conditions " + buffStats.map( stat => `change:repeating_conditions:${stat}` ).join(" "), function(e) {
-		updateBuffs();
-	});
-	// export
-	on("change:export_start", function() {
-		start_export();
-	});
-	on("change:import_start", function( e ) {
-		start_import();
-	});
-	on("change:tab_reglages sheet:opened", function( e ) {
-		reset_export();
-	});
-
-	/*------------
-		FUNCTIONS
-	-------------*/
-	function safeInt( val ) { return parseInt( val, 10 ) || 0;	}
-
-	function structSafeInt( v ) {
-		for( var attr in v ) {
-			v[ attr ] = safeInt( v[ attr ] );
-		}
-		return v;
-	}
-
-	function safeFloat( val ) { return parseFloat( val ) || 0;	}
-
-	function structSafeFloat( v ) {
-		for( var attr in v ) {
-			v[ attr ] = safeFloat( v[ attr ] );
-		}
-		return v;
-	}
-
-	function updatePrimaryStat( attr ) {
-		getAttrs( [ attr, `${attr}_mod`, `${attr}_temp_total` ], function( v ) {
-			setAttrs({
-				[ `${attr}_total` ]: safeInt( v[ attr ] ) + safeInt( v[ attr + "_mod" ] ) + safeInt( v[ attr + "_temp_total" ] )
-			});
-		});
-	}
-
-	function updateSecondaryStats() {
-		getAttrs( secondaryStats, function( sValues ) {
-			var v = structSafeInt( sValues );
-			var ingeniosite = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_adresse_total" ] ) / 2 );
-			var magiePsy = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_charisme_total" ] ) / 2 );
-			var magiePhy = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_adresse_total" ] ) / 2 );
-			var resiMagie = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_courage_total" ] + v[ "stats_force_total" ] ) / 3 );
-
-			var bonusIntel = " ";
-			var bonusDegatsIntel = 0;
-			var bonusAdresse = " ";
-			var bonusForce = " ";
-			var bonusDegatsForce = 0;
-
-			if( v[ "stats_intelligence_total" ] > 12 ) {
-				bonusIntel = "Pour chaque point d'Intelligence supérieur à 12 : +1 point de dégâts des sorts (selon sortilège).";
-				bonusDegatsIntel = v[ "stats_intelligence_total" ] - 12;
-			}
-
-			if( v[ "stats_adresse_total" ] > 12 ) {
-				bonusAdresse = "Adresse supérieure à 12 : +1 à l'Attaque OU à la Parade (un seul point quel que soit le score).";
-			} else if( v[ "stats_adresse_total" ] <= 8 ) {
-				bonusAdresse = "Adresse à 8 ou inférieur : -1 à l'Attaque OU à la Parade.";
-			}
-
-			if( v[ "stats_force_total" ] > 12 ) {
-				bonusForce = "Pour chaque point de Force supérieur à 12 : +1 Point d'Impact.";
-				bonusDegatsForce = v[ "stats_force_total" ] - 12;
-			} else if( v[ "stats_force_total" ] <= 8 ) {
-				bonusForce = "Force de 8 ou inférieure : -1 Point d'Impact.";
-				bonusDegatsForce = -1;
-			}
-
-			setAttrs({
-				"stats_inge": ingeniosite,
-				"stats_inge_total": ingeniosite + v[ "stats_inge_mod" ] + v[ "stats_inge_temp_total" ],
-				"stats_magiepsy": magiePsy,
-				"stats_magiepsy_total": magiePsy + v[ "stats_magiepsy_mod" ] + v[ "stats_magiepsy_temp_total" ],
-				"stats_magiephy": magiePhy,
-				"stats_magiephy_total": magiePhy + v[ "stats_magiephy_mod" ] + v[ "stats_magiephy_temp_total" ],
-				"stats_resimagie": resiMagie,
-				"stats_resimagie_total": resiMagie + v[ "stats_resimagie_mod" ] + v[ "stats_resimagie_temp_total" ],
-				"stats_fouille": v[ "stats_intelligence_total"],
-				"stats_fouille_total": v[ "stats_intelligence_total"] + v[ "stats_fouille_mod" ] + v[ "stats_fouille_temp_total" ],
-				"bonusintel": bonusIntel,
-				"bonusdegatsintel": bonusDegatsIntel,
-				"stats_jet": v[ "stats_adresse_total" ],
-				"stats_jet_total": v[ "stats_adresse_total" ] + v[ "stats_jet_mod" ] + v[ "stats_jet_temp_total" ],
-				"bonusadresse": bonusAdresse,
-				"bonusforce": bonusForce,
-				"bonusdegatsforce": bonusDegatsForce
-			});
-		});
-	}
-
-	function updateTempStat( attr ) {
-		getAttrs( [ `${attr}_temp`, `${attr}_buff` ], function( v ) {
-			setAttrs({
-				[ `${attr}_temp_total` ]: safeInt( v[ attr + "_temp" ] ) + safeInt( v[ attr + "_buff" ] )
-			});
-		});
-	}
-
-	function updateBuffs() {
-		var aBuffs = [];
-		var sBuffs = {};
-		var statName ='';
-		var keyName ='';
-
-		getSectionIDs( "repeating_conditions", function(idArray) {
-			getAttrs( [ ...idArray.map(id => `repeating_conditions_${id}_condition_actif`) ], function( sValues ) {
-				for( var i in idArray ) {
-					if( sValues[ `repeating_conditions_${idArray[i]}_condition_actif`] === "1" ) {
-						for( var j in buffStats ) {
-							aBuffs.push("repeating_conditions_" + idArray[i] + "_" + buffStats[j] );
-						}
-					}
-				}
-
-				getAttrs(aBuffs, function(values) {
-					var v = structSafeInt( values );
-					for( var key in v ) {
-						statName = key.split('_')[4];
-						keyName = "stats_" + statName + "_buff";
-						if( sBuffs[ keyName ] != undefined ) {
-							sBuffs[ keyName ] += v[ key ];
-						} else {
-							sBuffs[ keyName ] = v[ key ];
-						}
-					}
-					setAttrs( sBuffs );
-				});
-			});
-		});
-	}
-
-	function updateDeplacement() {
-		getAttrs( [ "stats_force_total", "deplacementrapide", "deplacementrapide_duree", "deplacementsprint", "deplacementsprint_duree", "prphy" ], function( sValues ) {
-			var v = structSafeInt( sValues );
-			var prPhy = v[ "prphy" ];
-			var deplacementRapide = v[ "deplacementrapide" ];
-			var deplacementRapideDuree = v[ "deplacementrapide_duree" ];
-			var deplacementSprint = v[ "deplacementsprint" ];
-			var deplacementSprintDuree = v[ "deplacementsprint_duree" ];
-
-			// PR vs Déplacement
-			if( prPhy === 0 || prPhy === 1 ) {
-				deplacementRapide = 8;
-				deplacementRapideDuree = v[ "stats_force_total" ] * 20;
-				deplacementSprint = 12;
-				deplacementSprintDuree = v[ "stats_force_total" ] * 5;
-			} else if( prPhy === 2 ) {
-				deplacementRapide = 6;
-				deplacementRapideDuree = v[ "stats_force_total" ] * 18;
-				deplacementSprint = 10;
-				deplacementSprintDuree = v[ "stats_force_total" ] * 4;
-			} else if( prPhy === 3 || prPhy === 4 ) {
-				deplacementRapide = 4;
-				deplacementRapideDuree = v[ "stats_force_total" ] * 15;
-				deplacementSprint = 8;
-				deplacementSprintDuree = v[ "stats_force_total" ] * 4;
-			} else if( prPhy === 5 ) {
-				deplacementRapide = 4;
-				deplacementRapideDuree = v[ "stats_force_total" ] * 10;
-				deplacementSprint = 6;
-				deplacementSprintDuree = v[ "stats_force_total" ] * 3;
-			} else if( prPhy === 6 ) {
-				deplacementRapide = 3;
-				deplacementRapideDuree = v[ "stats_force_total" ] * 8;
-				deplacementSprint = 4;
-				deplacementSprintDuree = v[ "stats_force_total" ] * 3;
-			} else if( prPhy === 7 ) {
-				deplacementRapide = 2;
-				deplacementRapideDuree = v[ "stats_force_total" ] * 7;
-				deplacementSprint = 3;
-				deplacementSprintDuree = v[ "stats_force_total" ] * 2;
-			} else if( prPhy > 7 ) {
-				deplacementRapide = 1;
-				deplacementRapideDuree = v[ "stats_force_total" ] * 5;
-				deplacementSprint = 2;
-				deplacementSprintDuree = v[ "stats_force_total" ] * 2;
-			}
-
-			setAttrs({
-				"deplacementrapide": deplacementRapide,
-				"deplacementrapide_duree": deplacementRapideDuree,
-				"deplacementsprint": deplacementSprint,
-				"deplacementsprint_duree": deplacementSprintDuree
-			}, { silent: true });
-		});
-	}
-
-	function updateEsquive() {
-		getAttrs( [ "stats_adresse_total", "stats_esquive_mod", "stats_esquive_temp_total", "prphy", "personnage_surcharge" ], function( sValues ) {
-			var v = structSafeInt( sValues );
-			var esquive = v[ "stats_adresse_total" ];
-			var prPhy = v[ "prphy" ];
-			var surcharge = v[ "personnage_surcharge" ];
-
-			// PR vs Esquive
-			if( prPhy === 0 || prPhy === 1 ) {
-				esquive += 1;
-			} else if( prPhy === 3 || prPhy === 4 ) {
-				esquive += - 2;
-			} else if( prPhy === 5 ) {
-				esquive += -4;
-			} else if( prPhy === 6 ) {
-				esquive += - 5;
-			} else if( prPhy === 7 ) {
-				esquive += - 6;
-			} else if( prPhy > 7 ) {
-				esquive = 0;
-			}
-
-			// surcharge vs Esquive
-			if( surcharge === 4 ) {
-				esquive += -2;
-			} else if( surcharge === 5 ) {
-				esquive = 0;
-			}
-
-			setAttrs({
-				"stats_esquive": esquive,
-				"stats_esquive_total": esquive + v[ "stats_esquive_mod" ] + v[ "stats_esquive_temp_total" ]
-			}, { silent: true });
-		});
-	}
-
-	function updateXP() {
-		getAttrs( [ "personnage_niveau" ], function( v ) {
-			var level = safeInt( v[ "personnage_niveau" ] );
-
-			setAttrs({
-				"personnage_xp_max": safeInt( levelAndXP[ level ], { silent : true} )
-			});
-		});
-	}
-
-	function updateWeapon( idRow ) {
-		var sWeapon = {};
-
-		getAttrs( [
-					`repeating_armes_${idRow}_arme_portee`, `repeating_armes_${idRow}_arme_at`, `repeating_armes_${idRow}_arme_degats`, `repeating_armes_${idRow}_arme_bonusforce`,
-					`repeating_armes_${idRow}_munition_modAd`, `repeating_armes_${idRow}_munition_degats`,
-					"stats_jet_total", "stats_attaque_total", "bonusdegatsforce"
-				] , function( v ) {
-
-			sWeapon[ 'repeating_armes_' + idRow + '_arme_munition_display' ] = 0;
-			sWeapon[ 'repeating_armes_' + idRow + '_arme_totalat' ] = safeInt( v[ "stats_attaque_total" ] ) + safeInt( v[ `repeating_armes_${idRow}_arme_at` ] );
-			sWeapon[ 'repeating_armes_' + idRow + '_arme_totaldegats' ] = v[ `repeating_armes_${idRow}_arme_degats` ];
-
-			if( v[ `repeating_armes_${idRow}_arme_portee` ] === 'Dist.' ) {
-				sWeapon[ 'repeating_armes_' + idRow + '_arme_munition_display' ] = 1;
-				sWeapon[ 'repeating_armes_' + idRow + '_arme_totalat' ] = safeInt( v[ "stats_jet_total" ] ) + safeInt( v[ `repeating_armes_${idRow}_arme_at` ] ) + safeInt( v[ `repeating_armes_${idRow}_munition_modAd` ] );
-				sWeapon[ 'repeating_armes_' + idRow + '_arme_totaldegats' ] = v[ `repeating_armes_${idRow}_arme_degats` ] + " + " + v[ `repeating_armes_${idRow}_munition_degats` ];
-			}
-
-			if( v[ `repeating_armes_${idRow}_arme_bonusforce` ] === "1" ) {
-				sWeapon[ 'repeating_armes_' + idRow + '_arme_totaldegats' ] += " + " + v[ "bonusdegatsforce" ];
-			}
-
-			setAttrs( sWeapon, { silent: true } );
-		});
-	}
-
-	function updateWeapons() {
-		getSectionIDs( "repeating_armes", function(idArray) {
-			for( var i in idArray ) {
-				updateWeapon( idArray[ i ] );
-			}
-		});
-	}
-
-	function updateAmmo( eventInfo ) {
-		var ammo_selected = eventInfo[ "newValue" ];
-		var idRow = eventInfo[ "sourceAttribute" ].split( '_' )[2];
-		var idAmmo = 0;
-		var sWeapon = {};
-
-		sWeapon[ 'repeating_armes_' + idRow + '_munition_degats' ] = "";
-		sWeapon[ 'repeating_armes_' + idRow + '_munition_modAd' ] = 0;
-		sWeapon[ 'repeating_armes_' + idRow + '_munition_nom' ] = "";
-
-		getSectionIDs( "repeating_munitions", function(idarray) {
-			getAttrs( [ ...idarray.map(id => `repeating_munitions_${id}_munition_nom`) ], function( sValues ) {
-				for( var i in idarray ) {
-					if( ammo_selected === sValues[`repeating_munitions_${idarray[i]}_munition_nom`] ) {
-						idAmmo = idarray[i];
-					}
-				}
-
-				if( idAmmo != 0 ) {
-					getAttrs( [ `repeating_munitions_${idAmmo}_munition_modAd`, `repeating_munitions_${idAmmo}_munition_degats` ], function( v ) {
-						sWeapon[ 'repeating_armes_' + idRow + '_munition_degats' ] = v[ `repeating_munitions_${idAmmo}_munition_degats` ];
-						sWeapon[ 'repeating_armes_' + idRow + '_munition_modAd' ] = v[ `repeating_munitions_${idAmmo}_munition_modAd` ];
-						sWeapon[ 'repeating_armes_' + idRow + '_munition_nom' ] = ammo_selected;
-
-						setAttrs( sWeapon );
-					});
-				} else {
-					setAttrs( sWeapon );
-				}
-			});
-		});
-	}
-
-	function updatePR() {
-		var prPhy = 0;
-		var prMag = 0;
-		getSectionIDs( "repeating_armures", function(idarray) {
-			getAttrs( [ "prnat", ...idarray.map(id => `repeating_armures_${id}_armure_prphy`), ...idarray.map(id => `repeating_armures_${id}_armure_prmag`) ], function( sValues ) {
-				var v = structSafeInt( sValues );
-
-				for( var i in idarray) {
-					prPhy += v[`repeating_armures_${idarray[i]}_armure_prphy`];
-					prMag += v[`repeating_armures_${idarray[i]}_armure_prmag`];
-				}
-
-				setAttrs({
-					"prphy": prPhy,
-					"prmag": prMag,
-					"pr": prPhy + prMag + v[ "prnat" ]
-				});
-			});
-		});
-	}
-
-	function updatePO() {
-		getAttrs( [	"richesse_or","richesse_argent","richesse_cuivre",
-					"richesse_berylium","richesse_thritil",
-					"richesse_billet10","richesse_billet50","richesse_billet100","richesse_billet500","richesse_billet1000" ],
-				function( sValues ) {
-			var v = structSafeInt( sValues );
-			var richesse_total = v[ "richesse_or" ] + Math.floor( v[ "richesse_argent" ] * 0.1 ) + Math.floor( v[ "richesse_cuivre" ] * 0.01 );
-			richesse_total += ( v[ "richesse_berylium" ] * 500 ) + ( v[ "richesse_thritil" ] * 100 );
-			richesse_total += ( v[ "richesse_billet10" ] * 10 ) + ( v[ "richesse_billet50" ] * 50 ) + ( v[ "richesse_billet100" ] * 100 ) + ( v[ "richesse_billet500" ] * 500 ) + ( v[ "richesse_billet1000" ] * 1000 );
-
-			setAttrs({
-				"poids_bourses": v[ "richesse_or" ] + v[ "richesse_argent" ] + v[ "richesse_cuivre" ],
-				"richesse_total": richesse_total
-			});
-		});
-	}
-
-	function updateCharge() {
-		getAttrs( weightStats, function( sValues ) {
-			var v = structSafeFloat( sValues );
-			var boursesCharge = Math.floor( v[ "poids_bourses" ] * 0.1 ) * 0.1;
-			var lingotsCharge = ( Math.floor( v[ "richesse_berylium" ] * 5 ) * 0.1 ) + ( Math.floor( v[ "richesse_thritil" ] * 3 ) * 0.1 );
-
-			var livresCharge = v[ "poids_livres" ] * 0.5;
-			var matosCharge = v[ "poids_materiels" ] + v[ "poids_butins" ] + v[ "poids_bouffes" ];
-			var sacsCharge = ( boursesCharge + lingotsCharge + matosCharge + livresCharge ).toFixed( 1 );
-
-			// Charge vs Encombrement
-			var charCharge_max = v["personnage_charge_max" ];
-			var sacsCharge_max= v[ "poids_sacs_max" ];
-			var percentCharge = Math.floor( sacsCharge * 100 / sacsCharge_max );
-			var surcharge = 0;
-
-			if( sacsCharge >= charCharge_max ) {
-				surcharge = 5; // Equipement très encombrant
-			} else if( percentCharge >= 90 ) {
-				surcharge = 4; // Sacs plein
-			} else if( percentCharge >= 75 ) {
-				surcharge = 3; // Sacs preque plein
-			} else if( percentCharge >= 50 ) {
-				surcharge = 2; // Sacs moitié plein
-			} else if( percentCharge >= 25 ) {
-				surcharge = 1; // Sacs pas trop plein
-			}
-
-			setAttrs({
-				"poids_sacs": sacsCharge,
-				"personnage_surcharge": surcharge
-			});
-		});
-	}
-
-	function updateRSSum( section, attr, total ) {
-		var sum = 0;
-		getSectionIDs( section, function(idarray) {
-			getAttrs( [ ...idarray.map(id => `${section}_${id}_${attr}`) ], function( sValues ) {
-				var v = structSafeFloat( sValues );
-				for( var i in idarray ) {
-					sum += v[`${section}_${idarray[i]}_${attr}`];
-				}
-				setAttrs({
-					[ total ]: sum
-				});
-			});
-
-		});
-	}
-
-	function updateLivresCharge() {
-		getSectionIDs( 'repeating_livres', function(idarray) {
-			setAttrs({
-				"poids_livres": safeInt( idarray.length )
-			});
-		});
-	}
-
-	function updateMagicSchoolTab( eventInfo ) {
-		var sTabs = {};
-		var selected = "all";
-
-		getSectionIDs( "repeating_ecolesmagie", function(idarray) {
-			for( var i in idarray ) {
-				sTabs[ `repeating_ecolesmagie_${idarray[ i ]}_ecolemagie_selected` ] = 0;
-			}
-
-			if( eventInfo[ "sourceAttribute" ] === "ecolemagie_selectall" )
-			{
-				setAttrs( {"tab_ecolemagie": "all" } );
-				sTabs[ "ecolemagie_selectall" ] = 1;
-			}
-			else
-			{
-				var field = eventInfo[ "sourceAttribute" ].replace( "_selected", "" );
-				getAttrs( [ field ], function( v ) {
-					setAttrs( { "tab_ecolemagie": v[ field ] } );
-				});
-
-				sTabs[ eventInfo[ "sourceAttribute" ] ] = 1;
-				sTabs[ "ecolemagie_selectall" ] = 0;
-			}
-
-			setAttrs( sTabs, { silent: true } );
-		});
-	}
-
-	function displayMagicSpells() {
-		var sDisplay = {};
-
-		getSectionIDs( "repeating_magies", function(idarray) {
-			getAttrs( [ "tab_ecolemagie", "tab_niveaumagie",
-						...idarray.map(id => `repeating_magies_${id}_magie_ecole`),
-						...idarray.map(id => `repeating_magies_${id}_magie_niveau`) ], function( v ) {
-				var cur_ecole = v[ "tab_ecolemagie" ].trim().toLowerCase();
-				var cur_level = v[ "tab_niveaumagie" ];
-
-				for( var i in idarray ) {
-					if( ( v[ `repeating_magies_${idarray[ i ]}_magie_ecole` ].trim().toLowerCase() === cur_ecole || cur_ecole === "all" ) && ( v[ `repeating_magies_${idarray[ i ]}_magie_niveau` ] === cur_level || cur_level === "all" ) ) {
-						sDisplay[ `repeating_magies_${idarray[ i ]}_magie_filtre` ] = 1;
-					} else {
-						sDisplay[ `repeating_magies_${idarray[ i ]}_magie_filtre` ] = 0;
-					}
-				}
-				setAttrs( sDisplay, { silent: true } );
-			});
-		});
-	}
-
-	function updateRepair() {
-		getAttrs( [ "reparation_qualite", "reparation_specialiste", "stats_inge_total", "personnage_niveau" ], function( sValues ) {
-
-			var v = structSafeInt( sValues );
-			var reparation_difficulte = 0;
-			var reparation_malusSpecialiste = 0;
-			var requiredLevel = 1;
-			var reparation_impossible = 0;
-
-			if( v[ "reparation_qualite" ] === 1 ) { // Matos perrave
-				reparation_difficulte = 6;
-				reparation_malusSpecialiste = -2;
-				requiredLevel = 1;
-			} else if( v[ "reparation_qualite" ] === 2 ) { // Matos de base
-				reparation_difficulte = 8;
-				reparation_malusSpecialiste = -2;
-				requiredLevel = 1;
-			} else if( v[ "reparation_qualite" ] === 3 ) { // Matos correct
-				reparation_difficulte = 10;
-				reparation_malusSpecialiste = -4;
-				requiredLevel = 2;
-			} else if( v[ "reparation_qualite" ] === 4 ) { // Matos de qualité
-				reparation_difficulte = 12;
-				reparation_malusSpecialiste = -6;
-				requiredLevel = 3;
-			} else if( v[ "reparation_qualite" ] === 5 ) { // Matos de luxe
-				reparation_difficulte = 14;
-				reparation_malusSpecialiste = -20;
-				requiredLevel = 5;
-			} else if( v[ "reparation_qualite" ] === 6 ) { // Matos d'artisan
-				reparation_difficulte = 16;
-				reparation_malusSpecialiste = -20;
-				requiredLevel = 5;
-			}
-
-			var reparation_bonus = v[ "stats_inge_total" ] - reparation_difficulte;
-			// bonus only for specialists
-			if( v[ "reparation_specialiste" ] === 0 ) {
-				if( reparation_bonus > 0 ) {
-					reparation_bonus = 0;
-				}
-
-				reparation_bonus = reparation_bonus + reparation_malusSpecialiste;
-			}
-
-			// Check required level
-			var charLevel = v[ "personnage_niveau" ] || 1;
-			if( requiredLevel > charLevel ) {
-				reparation_bonus = -20;
-			}
-
-			// Impossible task
-			if( reparation_bonus <= -20 ) {
-				reparation_impossible = 1;
-			}
-
-			setAttrs({
-				"reparation_difficulte": reparation_difficulte,
-				"reparation_bonus": reparation_bonus,
-				"reparation_impossible": reparation_impossible
-			});
-		});
-	}
-
-	function updateRecipe( idRow ) {
-		var sRecette = {};
-		var recette_bonus = 0;
-
-		getAttrs( [ 'stats_inge_total',
-					`repeating_recettes_${idRow}_recette_specialiste`, `repeating_recettes_${idRow}_recette_difficulte`, `repeating_recettes_${idRow}_recette_malusspecialiste`
-				], function ( sValues ) {
-			var v = structSafeInt( sValues );
-
-			recette_bonus = v[ "stats_inge_total" ] - v[ `repeating_recettes_${idRow}_recette_difficulte` ];
-
-			if( v[ `repeating_recettes_${idRow}_recette_specialiste` ] === 0 ) {
-				if( recette_bonus > 0 ) {
-					recette_bonus = 0;
-				}
-
-				recette_bonus = recette_bonus + v[ `repeating_recettes_${idRow}_recette_malusspecialiste` ];
-			}
-
-			sRecette[ `repeating_recettes_${idRow}_recette_bonus` ] = recette_bonus;
-			setAttrs( sRecette );
-		});
-	}
-
-	function updateRecipes() {
-		getSectionIDs( "repeating_recettes", function(idArray) {
-			for( var i in idArray ) {
-				updateRecipe( idArray[ i ] );
-			}
-		});
-	}
-
-	function start_export() {
-		var sJson = {};
-		var dataBase = {
-			"simple": [ "personnage_nom", "personnage_origine", "personnage_metiers", "personnage_sex", "personnage_age", "personnage_poids", "personnage_taille",
-						"ev", "ev_max", "ea", "ea_max", "personnage_niveau", "personnage_xp", "personnage_pointdestin", "bonusdegatssorts",
-						"personnage_langue", "personnage_vision", "personnage_nyctalopie", "personnage_ouie", "personnage_odorat", "personnage_charge_max",
-						"pr_tete", "pr_bras", "pr_torse", "pr_bouclier", "pr_jambes", "pr_pieds", "pr_mains", "prnat",
-						"bivouac_couverture", "bivouac_couverture_recup", "bivouac_matelas", "bivouac_matelas_recup", "bivouac_tente", "bivouac_tente_recup",
-						"stats_courage", "stats_courage_mod", "stats_courage_temp", "stats_intelligence", "stats_intelligence_mod", "stats_intelligence_temp", "stats_charisme", "stats_charisme_mod", "stats_charisme_temp", "stats_adresse", "stats_adresse_mod", "stats_adresse_temp", "stats_force", "stats_force_mod", "stats_force_temp", "stats_inge", "stats_inge_mod", "stats_inge_temp",
-						"stats_attaque", "stats_attaque_mod", "stats_attaque_temp", "stats_parade", "stats_parade_mod", "stats_parade_temp", "stats_jet_mod", "stats_jet_temp", "stats_esquive_mod", "stats_esquive_temp", "stats_fouille_mod", "stats_fouille_temp", "stats_magiephy_mod", "stats_magiephy_temp", "stats_magiepsy_mod", "stats_magiepsy_temp", "stats_resimagie_mod", "stats_resimagie_temp",
-						"richesse_or", "richesse_argent", "richesse_cuivre", "richesse_berylium", "richesse_thritil", "richesse_billet10", "richesse_billet50", "richesse_billet100", "richesse_billet500", "richesse_billet1000", "richesse_enbanque",
-						"displayjet", "displaycriteffets" ],
-			"repeating": [
-				{ zone:"competences", attr: ["competence_nom", "competence_effet", "competence_epreuve", "competence_jet", "competence_mod"] },
-				{ zone:"armes", attr: ["arme_nom", "arme_portee", "arme_at", "arme_prd", "arme_degats", "arme_rup", "arme_munition_display", "munition_nom", "munition_modad", "munition_degats", "arme_effet", "arme_note", "arme_bonusforce", "arme_note_display", "arme_bonusforce", "arme_critique", "arme_fumble", "arme_effet_display" ] },
-				{ zone:"armures", attr: ["armure_nom", "armure_prphy", "armure_prmag", "armure_rup", "armure_effet"] },
-				{ zone:"sacs", attr: ["sac_nom", "sac_charge_max"] },
-				{ zone:"materiels", attr: ["materiel_nom", "materiel_poids"] },
-				{ zone:"recettes", attr: ["recette_nom", "recette_effet", "recette_specialiste", "recette_niveau", "recette_duree", "recette_outils", "recette_materiaux", "recette_materiauxspe", "recette_assistant", "recette_difficulte", "recette_malusspecialiste", "recette_mod", "recette_resultats", "recette_prix"] },
-				{ zone:"ape", attr: ["ape_nom", "ape_note", "ape_effet", "ape_occurence"] },
-				{ zone:"conditions", attr: ["condition_provenance", "condition_nom", "condition_effet", "condition_actif", "condition_courage", "condition_intelligence", "condition_charisme", "condition_adresse", "condition_force", "condition_attaque", "condition_parade", "condition_jet", "condition_esquive", "condition_magiephy", "condition_magiepsy", "condition_resimagie"] },
-				{ zone:"gemmes", attr: ["gemme_nom", "gemme_ug"] },
-				{ zone:"potions", attr: ["conso_nom", "conso_count", "conso_effet"] },
-				{ zone:"coupsspeciaux", attr: ["coupspecial_nom", "coupspecial_jet", "coupspecial_mod", "coupspecial_degats", "coupspecial_degats_arme", "coupspecial_utilisation", "coupspecial_echec", "coupspecial_effet", "coupspecial_note", "coupspecial_condition", "coupspecial_critique", "coupspecial_fumble" ] },
-				{ zone:"munitions", attr: ["munition_nom", "munition_modad", "munition_count", "munition_degats", "munition_rup", "munition_effet"] },
-				{ zone:"vetements", attr: ["vetement_nom", "vetement_effet"] },
-				{ zone:"bourses", attr: ["bourse_nom", "bourse_charge_max"] },
-				{ zone:"butins", attr: ["butin_nom", "butin_poids"] },
-				{ zone:"quetes", attr: ["quete_nom"] },
-				{ zone:"poisons", attr: ["conso_nom", "conso_count", "conso_effet"] },
-				{ zone:"bagues", attr: ["bague_nom", "bague_count", "bague_bonus"] },
-				{ zone:"ecolesmagie", attr: ["ecolemagie"] },
-				{ zone:"reliques", attr: ["relique_nom", "relique_effet"] },
-				{ zone:"bouffes", attr: ["bouffe_nom", "bouffe_poids"] },
-				{ zone:"livres", attr: ["livre_nom"] },
-				{ zone:"antidotes", attr: ["conso_nom", "conso_count", "conso_effet"] },
-				{ zone:"magies", attr: ["magie_ecole", "magie_niveau", "magie_nom", "magie_incantation", "magie_duree", "magie_cout", "magie_portee", "magie_aireeffet", "magie_notes", "magie_epreuvelanceur_jet", "magie_epreuvelanceur_mod", "magie_epreuvecible_jet", "magie_epreuvecible_mod", "magie_soin", "magie_degats", "magiebonusint", "magie_effet", "magie_ingre", "creature_ev", "creature_int", "creature_at", "creature_def", "creature_cou", "creature_pr", "creature_xp", "creature_resimagie", "creature_degats", "magie_epreuveappel_mod", "magie_epreuvecontrol_mod", "magie_epreuverevocation_mod"] },
-				{ zone:"ingre", attr: ["ingre_nom", "ingre_count"] },
-				{ zone:"compagnons", attr: ["compagnon_nom", "compagnon_type", "compagnon_ev", "compagnon_ev_max", "compagnon_cou", "compagnon_at", "compagnon_esquive", "compagnon_prd", "compagnon_charge", "compagnon_charge", "compagnon_pr", "compagnon_resimagie", "compagnon_deplacement_assaut_sol", "compagnon_deplacement_assaut_air", "compagnon_deplacement_charge_sol", "compagnon_deplacement_charge_air", "compagnon_deplacement_voyage_sol", "compagnon_deplacement_voyage_air", "compagnon_deplacement_jour_sol", "compagnon_deplacement_jour_air", "compagnon_combat", "compagnon_entretien", "compagnon_autres", "compagnon_materiel1_nom", "compagnon_materiel2_nom", "compagnon_materiel3_nom", "compagnon_materiel1", "compagnon_materiel2", "compagnon_materiel3"] }
-			]
-		};
-		// get all simple values
-		getAttrs( dataBase.simple, function( v ) {
-			sJson = v;
-			// Get repeating values with recursive function to avoid asynch problems
-			getRepeatingFields( dataBase.repeating, 0, sJson );
-		});
-	}
-
-	function getRepeatingFields( dataBase, i, sJson ) {
-		var _aAttr = [];
-		var zone = dataBase[ i ][ "zone" ];
-		var attr = dataBase[ i ][ "attr" ];
-		var i = i + 1;
-
-		// get sections ids
-		getSectionIDs( `repeating_${zone}`, function( idarray ) {
-			if ( idarray.length > 0 ) {
-				for( var j in attr ) {
-					_aAttr.push( ...idarray.map(id => `repeating_${zone}_${id}_${attr[ j ]}`) );
-				}
-				// get all attrs for all sections ids
-				getAttrs( _aAttr, function ( v ) {
-					var sSection = {};
-					// reassemble attrs by id
-					for( var key in v ) {
-						var id = key.split( '_' )[2];
-						// replace the id by a placeholder "rowID" cause we can't import existing ids
-						var attr_name = key.replace( id, 'rowID' );
-
-						if( sSection[ id ] === undefined ) {
-							sSection[ id ] = {};
-						}
-						sSection[ id ][ attr_name ] = v[ key ];
-					}
-					// add an array with all attrs for each sections
-					sJson[ zone ] = [];
-					for( var id in sSection) {
-						sJson[ zone ].push( sSection[ id ] );
-					}
-					if( dataBase.length > i ) {
-						// call recursively getRepeatingFields depending on dataBase.repeating.length
-						getRepeatingFields( dataBase, i, sJson);
-					} else if( dataBase.length === i ) {
-						// or call finish function
-						updateExportJson( sJson );
-					}
-				});
-			} else {
-				if( dataBase.length > i ) {
-					getRepeatingFields( dataBase, i, sJson);
-				} else if( dataBase.length === i ) {
-					updateExportJson( sJson );
-				}
-			}
-		});
-	}
-
-	function updateExportJson( sJson ) {
-		// stringify all our simple and repeating attrs / values
-		setAttrs( {
-			"json_export" : JSON.stringify( sJson ),
-			"export_start": 0
-		}, { silent: true } );
-	}
-
-	function reset_export() {
-		setAttrs( {
-			"json_export" : "",
-			"export_start": 0
-		}, { silent: true } );
-	}
-
-	function start_import() {
-		var err = "";
-
-		getAttrs( [ "json_import", "import_start" ], function ( v ) {
-			if( v[ "import_start" ] === "1" )
-			{
-				// open json
-				try {
-					var sJson = JSON.parse( v[ "json_import" ] );
-				} catch(e) {
-					err = "Données non valides";
-				}
-
-				if( err === "" ) {
-					// reset sheet repeating section
-					var aSections = [	"antidotes","ape","armes","armures","bagues","bouffes","bourses","butins","compagnons","competences","conditions","coupsspeciaux","ecolesmagie",
-										"gemmes","ingre","livres","magies","materiels","munitions","poisons","potions","quetes","recettes","reliques","sacs","vetements" ];
-					for( var i in aSections ) {
-						var section = `repeating_${aSections[ i ]}`;
-						(function( section ) {
-							getSectionIDs( section, function(idarray) {
-								for( var j in idarray ) {
-									removeRepeatingRow( `${section}_${idarray[ j ]}` );
-								}
-							});
-						})(section);
-					}
-
-					var sAttrs = {};
-					for( var i in sJson ) {
-						if( sJson[ i ] instanceof Array ) {
-							// import repeating values
-							for( var j in sJson[ i ] ) {
-								var newid = generateRowID();
-								for( var k in sJson[ i ][ j ] ) {
-									// replace placeholder 'rowid' by a new generatedID to create rows
-									sAttrs[ k.replace( 'rowID', newid ) ] = sJson[ i ][ j ][ k ];
-								}
-							}
-						} else {
-							// Import simple values
-							sAttrs[ i ] = sJson[ i ];
-						}
-					}
-					setAttrs( sAttrs );
-				}
-
-				setAttrs( {
-					"json_import": err,
-					"import_start": 0
-				}, { silent: true } );
-			}
-		});
-	}
-
-	/*----------------
-	Version handling
-	----------------*/
-	on("sheet:opened", function() {
-		detect_version();
-	});
-
-	function detect_version() {
-		getAttrs( [ "version" ], function( v ) {
-			var vrs = parseFloat( v[ "version" ] ) || 1.0;
-			console.log("Détection de la version : " + vrs );
-			if( vrs < 2.0 ) {
-				getAttrs( [ "level", "valattaque", "valparade", "class", "race", "experience" ], function( v ) {
-					if( v[ "level" ] != undefined || v[ "valattaque" ] != undefined || v[ "valparade" ] != undefined || v[ "class" ] != undefined || v[ "race" ] != undefined || v[ "experience" ] != undefined ) {
-						console.log( "Début du process d'import..." );
-						update_process();
-					}
-					console.log( "Mise à jour de la version..." );
-					setAttrs( { "version" : 2.6 } );
-				});
-			} else if( vrs < 2.4 ) {
-				// uptodate
-				updateSecondaryStats();
-				updateWeapons();
-				setAttrs( { "version" : 2.6 } );
-				return;
-			}
-			console.log( "ok" );
-		});
-	}
-
-	function update_process() {
-		var _aNewAttr = [];
-		var _aOldAttr = [];
-		var _sNewValues = {};
-
-		// sheet2.0 attr "Character"
-		_aNewAttr = _aNewAttr.concat( [ "personnage_nom", "personnage_niveau","personnage_xp","personnage_metiers","personnage_origine","personnage_pointdestin","personnage_langue" ] );
-		_aOldAttr = _aOldAttr.concat( [ "charactername", "level","experience","class","race","pointdestin","langue" ] );
-
-		// sheet2.0 attr "stats"
-		_aNewAttr = _aNewAttr.concat( [ "stats_courage", "stats_intelligence","stats_charisme","stats_adresse","stats_force" ] );
-		_aOldAttr = _aOldAttr.concat( [ "courage","intelligence","charisme","adresse","force" ] );
-
-		// sheet2.0 attr "stats_mod"
-		_aNewAttr = _aNewAttr.concat( [ "stats_courage_mod", "stats_intelligence_mod","stats_charisme_mod","stats_adresse_mod","stats_force_mod" ] );
-		_aOldAttr = _aOldAttr.concat( [ "couragemod", "intelligencemod","charismemod","adressemod","forcemod" ] );
-
-		// Sheet2.0 attr "richesses"
-		_aNewAttr = _aNewAttr.concat( [ "richesse_or","richesse_argent" ] );
-		_aOldAttr = _aOldAttr.concat( [ "po","pa" ] );
-
-		// sheet2.0 attr "Combat"
-		_aNewAttr = _aNewAttr.concat( [ "ev_max","ea_max","stats_attaque","stats_attaque_mod","stats_parade","stats_parade_mod" ] );
-		_aOldAttr = _aOldAttr.concat( [ "evmax","eamax","ValAttaque","ValAttaqueMod","ValParade","ValParadeMod" ] );
-
-		// sheet2.0 attr "magie"
-		_aNewAttr = _aNewAttr.concat( [ "stats_magiephy","stats_magiephy_mod","stats_magiepsy","stats_magiepsy_mod","stats_resimagie","stats_resimagie_mod" ] );
-		_aOldAttr = _aOldAttr.concat( [ "magiephy","magiephymod","magiepsy","magiepsymod","resimagie","resimagiemod" ] );
-
-		// Sheet2.0 attr "arme"
-		_aNewAttr = _aNewAttr.concat( [ "repeating_butins_rowID_butin_nom","repeating_butins_rowID_butin_nom","repeating_butins_rowID_butin_nom","repeating_butins_rowID_butin_nom" ] );
-		_aOldAttr = _aOldAttr.concat( [ "arme01","arme02","arme03","arme04" ] );
-
-		// Sheet2.0 attr "armures"
-		_aNewAttr = _aNewAttr.concat( [ "repeating_armures_rowID_armure_nom","repeating_armures_rowID_armure_nom","repeating_armures_rowID_armure_nom","repeating_armures_rowID_armure_nom" ] );
-		_aOldAttr = _aOldAttr.concat( [ "equip01","equip02","equip03","equip04" ] );
-
-		// Sheet2.0 attr "Inventaire"
-		_aNewAttr = _aNewAttr.concat( [ "repeating_materiels_rowID_materiel_nom","repeating_materiels_rowID_materiel_nom","repeating_materiels_rowID_materiel_nom","repeating_materiels_rowID_materiel_nom" ] );
-		_aOldAttr = _aOldAttr.concat( [ "inv01","inv02","inv03","inv04" ] );
-
-		// Sheet2.0 attr "Compétences"
-		_aNewAttr = _aNewAttr.concat( [ "repeating_competences_rowID_competence_nom","repeating_competences_rowID_competence_nom","repeating_competences_rowID_competence_nom","repeating_competences_rowID_competence_nom" ] );
-		_aOldAttr = _aOldAttr.concat( [ "raceability01","raceability02","raceability03","raceability04" ] );
-
-		// Sheet2.0 attr "Compétences"
-		_aNewAttr = _aNewAttr.concat( [ "repeating_competences_rowID_competence_nom","repeating_competences_rowID_competence_nom","repeating_competences_rowID_competence_nom","repeating_competences_rowID_competence_nom" ] );
-		_aOldAttr = _aOldAttr.concat( [ "classability01","classability02","classability03","classability04" ] );
-
-		// Get the old attr values
-		getAttrs( _aOldAttr, function( v ) {
-			// Each new attr take the value of the old attr
-			for( var i in _aNewAttr ) {
-				var _oldAttr = _aOldAttr[ i ];
-				var _newAttr = _aNewAttr[ i ];
-				var _oldValue = v[ _oldAttr ];
-
-				if( _oldValue != undefined ) {
-					// If the new attr is a repeating row > get a rowId
-					if( _newAttr.indexOf( "_rowID_" ) !== -1 ) {
-						_newAttr = _newAttr.replace( "rowID", generateRowID() );
-					}
-
-					_sNewValues[ _newAttr ] = _oldValue;
-				}
-			}
-			// Update
-			setAttrs( _sNewValues );
-		});
-
-		// old sheet sections attr to new sheet sections attr
-		_sNewValues = {};
-		var _aOldSections = [
-			{
-				oldSection: "cac",
-				newSection: "armes",
-				oldAttr: [ "armenom", "armeat", "armeprd", "armedes", "armedegats" ],
-				newAttr: [ "arme_nom", "arme_at", "arme_prd", "arme_degats", "arme_degats" ]
-			},
-			{
-				oldSection: "arme",
-				newSection: "butins",
-				oldAttr: [ "armes" ],
-				newAttr: [ "butin_nom" ]
-			},
-			{
-				oldSection: "equipement",
-				newSection: "armures",
-				oldAttr: [ "equipement" ],
-				newAttr: [ "armure_nom" ]
-			},
-			{
-				oldSection: "inventaire",
-				newSection: "materiels",
-				oldAttr: [ "inventaire" ],
-				newAttr: [ "materiel_nom" ]
-			},
-			{
-				oldSection: "compin",
-				newSection: "competences",
-				oldAttr: [ "compin" ],
-				newAttr: [ "competence_nom" ]
-			},
-			{
-				oldSection: "classabilities",
-				newSection: "competences",
-				oldAttr: [ "classabilities" ],
-				newAttr: [ "competence_nom" ]
-			},
-			{
-				oldSection: "spells",
-				newSection: "magies",
-				oldAttr: [ "sortnom_1","magietype","sortdesattaque_1","sortdesbonusattaque_1","sortdegatdes_1","sortdegatbonus_1","sortcout_1" ],
-				newAttr: [ "magie_nom","magie_epreuvelanceur_jet","magie_epreuvelanceur_mod","magie_epreuvelanceur_mod","magie_degats","magie_degats","magie_cout" ]
-			},
-			{
-				oldSection: "spells",
-				newSection: "magies",
-				oldAttr: [ "creaturenom_1","invocbonus_1","invoccontrole_1","invocrevoc_1","invoccout_1" ],
-				newAttr: [ "magie_nom","magie_epreuveappel_mod","magie_epreuvecontrol_mod","magie_epreuverevocation_mod","magie_cout" ]
-			}
-		];
-
-		for( var i in _aOldSections ) {
-			// Get Old section IDs
-			convertRS( _aOldSections[ i ] );
-		}
-	}
-
-	function convertRS( sOldSections ) {
-		var _oldSection = "repeating_" + sOldSections[ "oldSection" ];
-		var _newSection = "repeating_" + sOldSections[ "newSection" ];
-		var _aOldAttr = [];
-
-		// get sections id of the old Section
-		getSectionIDs( _oldSection, function( idarray ) {
-			if ( idarray.length > 0 ) {
-				_aOldAttr = [];
-
-				// create an array with all attr combine with all ids of the section
-				for( var i_oldAttr in sOldSections[ "oldAttr" ] ) {
-					_oldAttr = sOldSections[ "oldAttr" ][ i_oldAttr ];
-					_aOldAttr.push( ...idarray.map(id => `${_oldSection}_${id}_${_oldAttr}`) );
-				}
-
-				// get all values for a section
-				getAttrs( _aOldAttr, function (v) {
-					var _sNewValues = {}
-					for( var i_idarray in idarray ) {
-
-						// Create new rows in new section
-						var newrowid = generateRowID();
-						var _oldSectionID = _oldSection + "_" + idarray[ i_idarray ] + "_";
-						var _newSectionID = _newSection + "_" + newrowid + "_";
-
-						for( var i_attr in sOldSections[ "newAttr" ] ) {
-							// Each new attr take the value of the old attr
-							var _oldAttr = _oldSectionID + sOldSections[ "oldAttr" ][ i_attr ];
-							var _newAttr = _newSectionID + sOldSections[ "newAttr" ][ i_attr ];
-							var _oldValue = v[ _oldAttr ];
-
-							if( _oldValue != undefined ) {
-								// exceptions
-								if( sOldSections[ "oldAttr" ][ i_attr ] === "armedes" || sOldSections[ "oldAttr" ][ i_attr ] === "SortDesAttaque_1" || sOldSections[ "oldAttr" ][ i_attr ] === "SortDegatDes_1" ) {
-									_sNewValues[ _newAttr ] = _oldValue + "d6";
-								} else if( sOldSections[ "oldAttr" ][ i_attr ] === "armedegats" || sOldSections[ "oldAttr" ][ i_attr ] === "SortDesBonusAttaque_1" || sOldSections[ "oldAttr" ][ i_attr ] === "SortDegatBonus_1" ) {
-									_sNewValues[ _newAttr ] = ( _sNewValues[ _newAttr ] || "1d6" ) + "+" + _oldValue;
-								} else {
-									_sNewValues[ _newAttr ] = _oldValue;
-								}
-							}
-						}
-					}
-					setAttrs( _sNewValues );
-				});
-			}
-		});
-	}
-</script>
-
-<rolltemplate class="sheet-rolltemplate-magie">
-	<table class="sheet-rolltemplate-table">
-		<tr><th>{{name}}</th></tr>
-		<tr>
-			<td><span class="tcat">Ecole </span>{{magie_ecole}} - <span class="tcat">Niveau </span>{{magie_niveau}}</td>
-		</tr>
-		{{#magie_incantation}}
-			<tr>
-				<td><span class="tcat">Incantation </span>{{magie_incantation}}</td>
-			</tr>
-		{{/magie_incantation}}
-		{{#magie_duree}}
-			<tr>
-				<td><span class="tcat">Durée </span>{{magie_duree}}</td>
-			</tr>
-		{{/magie_duree}}
-		{{#magie_cout}}
-			<tr>
-				<td><span class="tcat">Coût </span>{{magie_cout}}</td>
-			</tr>
-		{{/magie_cout}}
-		{{#magie_portee}}
-			<tr>
-				<td><span class="tcat">Portée </span>{{magie_portee}}</td>
-			</tr>
-		{{/magie_portee}}
-		{{#magie_aireeffet}}
-			<tr>
-				<td><span class="tcat">Aire d’effet </span>{{magie_aireeffet}}</td>
-			</tr>
-		{{/magie_aireeffet}}
-		{{#magie_display_epreuve}}
-			<tr>
-				<td><span class="tcat">Épreuve </span>{{magie_epreuve}}</td>
-			</tr>
-		{{/magie_display_epreuve}}
-		{{#magie_display_resistance}}
-			<tr>
-				<td><span class="tcat">Resistance </span>{{magie_resistance}}</td>
-			</tr>
-		{{/magie_display_resistance}}
-		<tr><td><hr></td></tr>
-		{{#magie_soin}}
-			<tr>
-				<td><span class="tcat">Soin </span>{{magie_soin}}</td>
-			</tr>
-		{{/magie_soin}}
-		{{#magie_degats}}
-			<tr>
-				<td><span class="tcat">Dégats </span>{{magie_degats}} {{#rollGreater() magie_bonusint 0}}+ Bonus Int{{/rollGreater() magie_bonusint 0}}</td>
-			</tr>
-		{{/magie_degats}}
-		<tr>
-			<td>{{magie_effet}}</td>
-		</tr>
-		{{#magie_ingre}}
-			<tr><td><hr></td></tr>
-			<tr>
-				<td><span class="tcat">Ingrédients </span><br>{{magie_ingre}}</td>
-			</tr>
-		{{/magie_ingre}}
-
-		{{#creature_ev}}
-			<tr><td><hr></td></tr>
-			<tr><th>Créature invoquée :</th></tr>
-			<tr><td><span class="tcat">EV </span>{{creature_ev}} - <span class="tcat">INT </span>{{creature_int}}</td></tr>
-			<tr><td><span class="tcat">AT </span>{{creature_at}} - <span class="tcat">PRD/ESQ </span>{{creature_def}}</td><tr>
-			<tr><td><span class="tcat">COU </span>{{creature_cou}} - <span class="tcat">RM </span>{{creature_resimagie}}</td><tr>
-			<tr><td><span class="tcat">XP </span>{{creature_xp}} - <span class="tcat">PR </span>{{creature_pr}}</td><tr>
-			<tr><td><span class="tcat">Dégats </span>{{creature_degats}}</td><tr>
-			<tr><td><span class="tcat">Appel </span>Magie PSY + {{magie_epreuveappel_mod}}</td><tr>
-			<tr><td><span class="tcat">Contrôle </span>Magie PSY + {{magie_epreuvecontrol_mod}}</td><tr>
-			<tr><td><span class="tcat">Révocation </span>Magie PSY + {{magie_epreuverevocation_mod}}</td><tr>
-		{{/creature_ev}}
-
-		{{#magie_notes}}
-			<tr><td><hr></td></tr>
-			<tr>
-				<td><span class="tcat">Notes : </span><br>{{magie_notes}}</td>
-			</tr>
-		{{/magie_notes}}
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-recette">
-	<table class="sheet-rolltemplate-table">
-		<tr><th>{{recette_nom}}</th></tr>
-		<tr><td>{{recette_effet}}</td></tr>
-		<tr>
-			<td><span class="tcat">Niveau : </span>à partir du niveau {{recette_niveau}}</td>
-		</tr>
-		<tr>
-			<td><span class="tcat">Caractéristiques : </span>{{recette_resultats}}</td>
-		</tr>
-		<tr><td><hr></td></tr>
-		<tr>
-			<td><span class="tcat">Matériaux : </span>{{recette_materiaux}}</td>
-		</tr>
-		{{#recette_materiauxspe}}
-			<tr>
-				<td><span class="tcat">+Matériaux spéciaux : </span>{{recette_materiauxspe}}</td>
-			</tr>
-		{{/recette_materiauxspe}}
-		<tr>
-			<td><span class="tcat">Temps de confection : </span>{{recette_duree}}</td>
-		</tr>
-		<tr>
-			<td><span class="tcat">Outils : </span>{{recette_outils}}</td>
-		</tr>
-		<tr>
-			<td><span class="tcat">Difficulté : </span>{{recette_difficulte}} (+{{recette_xp}} XP en cas de réussite)</td>
-		</tr>
-		<tr>
-			<td><span class="tcat">Prix : </span>{{recette_prix}}</td>
-		</tr>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-coupSpecial">
-	<table class="sheet-rolltemplate-table">
-		<tr><th>{{name}}</th></tr>
-		<tr>
-			<td><span class="tcat">Utilisation : </span>{{coupspecial_utilisation}}</td>
-		</tr>
-		<tr>
-			<td><span class="tcat">- En cas d'échec, </span>{{coupspecial_echec}}</td>
-		</tr>
-		<tr><td><hr></td></tr>
-		<tr>
-			<td><span class="tcat">Effets : </span>{{coupspecial_effet}}</td>
-		</tr>
-		{{#coupspecial_condition}}
-		<tr>
-			<td><span class="tcat">Conditions : </span>{{coupspecial_condition}}</td>
-		</tr>
-		{{/coupspecial_condition}}
-		<tr>
-			<td><span class="tcat">Dégats : </span>{{#coupspecial_degats_arme}}Dégats de l'arme + {{/coupspecial_degats_arme}}{{coupspecial_degats}}</td>
-		</tr>
-		{{#coupspecial_note}}
-		<tr>
-			<td><span class="tcat">- </span>{{coupspecial_note}}</td>
-		</tr>
-		{{/coupspecial_note}}
-		<tr><td><hr></td></tr>
-		<tr>
-			<td><span class="tcat">En cas d'échec critique : </span><br />{{coupspecial_fumble}}</td>
-		</tr>
-		<tr>
-			<td><span class="tcat">Reussite critique : </span>{{coupspecial_critique}}</td>
-		</tr>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-atk">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>AT</td>
-				<td>{{at}}</td>
-			</tr>
-			{{#rollGreater() display_effets 0}}
-			<tr>
-				<td>Effets</td>
-				<td>{{effets}}</td>
-			</tr>
-			{{/rollGreater() display_effets 0}}
-			{{#rollGreater() display_notes 0}}
-			<tr>
-				<td>Notes</td>
-				<td>{{notes}}</td>
-			</tr>
-			{{/rollGreater() display_notes 0}}
-			<tr>
-				<td>Résultat</td>
-				<td>{{results}}</td>
-			</tr>
-			<tr>
-				<td>{{btn_degats}}</td>
-				<td>
-					{{#rollWasCrit() results }}{{btn_critique}}{{/rollWasCrit() results }}
-					{{#rollWasFumble() results }}{{btn_fumble}}{{/rollWasFumble() results }}
-				</td>
-			</tr>
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-prd">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>PRD</td>
-				<td>{{prd}}</td>
-			</tr>
-			<tr>
-				<td>Résultat</td>
-				<td>{{results}}</td>
-			</tr>
-			<tr>
-				<td></td>
-				<td>
-					{{#rollWasCrit() results }}{{btn_critique}}{{/rollWasCrit() results }}
-					{{#rollWasFumble() results }}{{btn_fumble}}{{/rollWasFumble() results }}
-				</td>
-			</tr>
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-dmg">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Dégats</td>
-				<td>{{dmg}} ({{typeDegat}})</td>
-			</tr>
-			{{#munition}}
-			<tr>
-				<td>Munition</td>
-				<td>{{munition}}</td>
-			</tr>
-			{{/munition}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-crit_tranchant">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Résolution</td>
-				<td>{{results}}</td>
-			</tr>
-			{{#rollTotal() displayEffets 1}}
-				{{#rollBetween() results 1 2}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Incision profonde</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +1</td></tr>
-				{{/rollBetween() results 1 2}}
-				{{#rollBetween() results 3 4}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Incision vraiment profonde</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +2</td></tr>
-				{{/rollBetween() results 3 4}}
-				{{#rollBetween() results 5 6}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Plaie impressionnate et dommages à l'armure</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +3</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure concernée PR -1</td></tr>
-				{{/rollBetween() results 5 6}}
-				{{#rollBetween() results 7 8}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis et dommages à l'armure</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +4</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure PR -2</td></tr>
-				{{/rollBetween() results 7 8}}
-				{{#rollBetween() results 9 10}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis de bourrin et dommages à l'armure</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure concernée PR -3</td></tr>
-				{{/rollBetween() results 9 10}}
-				{{#rollTotal() results 11}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Une partie de l'armure est détruite</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure concernée PR = 0</td></tr>
-				{{/rollTotal() results 11}}
-				{{#rollTotal() results 12}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Oeil crevé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD-1 | CHA -3 | AT -1 | PRD -2</td></tr>
-				{{/rollTotal() results 12}}
-				{{#rollTotal() results 13}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Main droite tranchée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +6</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -1 | FO -2 | AT -5 | PRD -6</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Main gauche tranchée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +6</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -1 | AT -2 | PRD -3</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 13}}
-				{{#rollTotal() results 14}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Pied droit tranché</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +6</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | 50% MV | AT -2 | PRD -2</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Pied gauche tranché</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +6</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | 50% MV | AT -2 | PRD -2</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 14}}
-				{{#rollTotal() results 15}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Bras droit tranché</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +7</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -4 | FO -4 | AT -5 | PRD -6 | CHA -5</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Bras gauche tranché</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +7</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -2 | FO -2 | AT -3 | PRD -4</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 15}}
-				{{#rollTotal() results 16}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Jambe droite tranchée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +8</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -3 | FO -3 | AT -4 | PRD -6 | 25% MV</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Jambe gauche tranchée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +8</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -3 | FO -3 | AT -4 | PRD -6 | 25% MV</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 16}}
-				{{#rollTotal() results 17}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Organes génitaux endommagés</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
-				{{/rollTotal() results 17}}
-				{{#rollTotal() results 18}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Organes vital endommagé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +9</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
-				{{/rollTotal() results 18}}
-				{{#rollTotal() results 19}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Blessure au coeur</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 19}}
-				{{#rollTotal() results 20}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Blessure grave à la tête</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 20}}
-			{{/rollTotal() displayEffets 1}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-crit_contondant">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Résolution</td>
-				<td>{{results}}</td>
-			</tr>
-			{{#rollTotal() displayEffets 1}}
-				{{#rollBetween() results 1 2}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Ématome impressionnant</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +1</td></tr>
-				{{/rollBetween() results 1 2}}
-				{{#rollBetween() results 3 4}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Ématome et luxation d'un membre</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-				{{/rollBetween() results 3 4}}
-				{{#rollBetween() results 5 6}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Fracture de côte</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-				{{/rollBetween() results 5 6}}
-				{{#rollBetween() results 7 8}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis et dommages à l'armure</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +4</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure PR -1</td></tr>
-				{{/rollBetween() results 7 8}}
-				{{#rollBetween() results 9 10}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis de bourrin et dommages à l'armure</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +5 </td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure PR -2</td></tr>
-				{{/rollBetween() results 9 10}}
-				{{#rollTotal() results 11}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Une partie de l'armure est détruite ()</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure concernée PR=0</td></tr>
-				{{/rollTotal() results 11}}
-				{{#rollTotal() results 12}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Luxation du genou (Dégâts +3 / AD -2 | MV 50% | AT -1 | PRD -2)</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +9</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
-				{{/rollTotal() results 12}}
-				{{#rollTotal() results 13}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Main droite cassée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -1 | FO -2 | AT -5 | PRD -6</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Main gauche cassée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -1 | AT -2 | PRD -3</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 13}}
-				{{#rollTotal() results 14}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Pied droit écrasé</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | 50% MV | AT -2 | PRD -2</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Pied gauche écrasé</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | 50% MV | AT -2 | PRD -2</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 14}}
-				{{#rollTotal() results 15}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Bras droit cassé ( / )</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -2 | FO -4 | AT -5 | PRD -6</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Bras gauche cassé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -2 | AT -2 | PRD -3</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 15}}
-				{{#rollTotal() results 16}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Jambe droite cassée</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -3 | FO -3 | AT -4 | PRD -6 | MV 25%</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Jambe gauche cassée</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -3 | FO -3 | AT -4 | PRD -6 | MV 25%</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 16}}
-				{{#rollTotal() results 17}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Organes génitaux écrasés</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -5 | MV 50%</td></tr>
-				{{/rollTotal() results 17}}
-				{{#rollTotal() results 18}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Assommé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Inconscient</td></tr>
-				{{/rollTotal() results 18}}
-				{{#rollTotal() results 19}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Fracture ouverte du crâne</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 19}}
-				{{#rollTotal() results 20}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Ecrasement violent d'un organe vital</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 20}}
-			{{/rollTotal() displayEffets 1}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-crit_projectile">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Résolution</td>
-				<td>{{results}}</td>
-			</tr>
-			{{#rollTotal() displayEffets 1}}
-				{{#rollBetween() results 1 2}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile bien placé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +1</td></tr>
-				{{/rollBetween() results 1 2}}
-				{{#rollBetween() results 3 4}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile magistralement placé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +2</td></tr>
-				{{/rollBetween() results 3 4}}
-				{{#rollBetween() results 5 6}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile dans une articulation du bras</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AT -2 | PRD -2</td></tr>
-				{{/rollBetween() results 5 6}}
-				{{#rollBetween() results 7 8}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile dans une articulation de la jambe</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">MV 50%</td></tr>
-				{{/rollBetween() results 7 8}}
-				{{#rollBetween() results 9 11}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile dans un poumon</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +3</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Toutes caracs -1</td></tr>
-				{{/rollBetween() results 9 11}}
-				{{#rollBetween() results 12 16}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile de maître</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts +5</td></tr>
-				{{/rollBetween() results 12 16}}
-				{{#rollTotal() results 17}}
-					<tr><td colspan="2" class="sheet-td-noFirst">En plein dans les organes génitaux, bien fait !</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
-				{{/rollTotal() results 17}}
-				{{#rollTotal() results 18}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Organe vital endommagé !</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
-				{{/rollTotal() results 18}}
-				{{#rollTotal() results 19}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coeur transpercé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 19}}
-				{{#rollTotal() results 20}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Oeil et cerveau transpercé, bien fait !</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 20}}
-			{{/rollTotal() displayEffets 1}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-crit_pugilat">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Résolution</td>
-				<td>{{results}}</td>
-			</tr>
-			{{#rollTotal() displayEffets 1}}
-				{{#rollBetween() results 1 2}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Ématome impressionnant</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +1</td></tr>
-				{{/rollBetween() results 1 2}}
-				{{#rollBetween() results 3 4}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Ématome et luxation d'un membre</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +2</td></tr>
-				{{/rollBetween() results 3 4}}
-				{{#rollBetween() results 5 6}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Fracture du nez, hémorragie nasale</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-				{{/rollBetween() results 5 6}}
-				{{#rollBetween() results 7 8}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Fracture de côte</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
-				{{/rollBetween() results 7 8}}
-				{{#rollBetween() results 9 10}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis de bourrin dans la tempe</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +2</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Cible étourdie 3 assauts</td></tr>
-				{{/rollBetween() results 9 10}}
-				{{#rollTotal() results 11}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis au sternum</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Cible étourdie 4 assauts</td></tr>
-				{{/rollTotal() results 11}}
-				{{#rollTotal() results 12}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Luxation du genou</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts +3</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | MV 50% | AT -1 | PRD -2</td></tr>
-				{{/rollTotal() results 12}}
-				{{#rollTotal() results 13}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Main droite cassée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -1 | FO -2 | AT -5 | PRD -6</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Main gauche cassée</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -1 | AT -2 | PRD -3</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 13}}
-				{{#rollTotal() results 14}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Mâchoire brisée</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts +3</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Incapacité à parler</td></tr>
-				{{/rollTotal() results 14}}
-				{{#rollTotal() results 15}}
-					{{#rollBetween() subresults 1 3}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Bras droit cassé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -2 | FO -4 | AT -5 | PRD -6</td></tr>
-					{{/rollBetween() subresults 1 3}}
-					{{#rollBetween() subresults 4 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Bras gauche cassé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -2 | AT -2 | PRD -3</td></tr>
-					{{/rollBetween() subresults 4 6}}
-				{{/rollTotal() results 15}}
-				{{#rollBetween() results 16 17}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Organes génitaux écrasés, houlala</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +5</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Cible étourdie 3 assauts</td></tr>
-				{{/rollBetween() results 16 17}}
-				{{#rollBetween() results 18 19}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Assommé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Inconscient</td></tr>
-				{{/rollBetween() results 18 19}}
-				{{#rollTotal() results 20}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Enfoncement du nez dans le cerveau</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
-				{{/rollTotal() results 20}}
-			{{/rollTotal() displayEffets 1}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-<rolltemplate class="sheet-rolltemplate-fumble_atk">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Résolution</td>
-				<td>{{results}}</td>
-			</tr>
-			{{#rollTotal() displayEffets 1}}
-				{{#rollBetween() results 1 2}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Rattrape son erreur in extramis</td></tr>
-				{{/rollBetween() results 1 2}}
-				{{#rollBetween() results 3 5}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Trèbuche et chute maladroitement</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Rate 2 assauts</td></tr>
-				{{/rollBetween() results 3 5}}
-				{{#rollBetween() results 6 7}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Frappe un allié proche vers la gauche</td></tr>
-				{{/rollBetween() results 6 7}}
-				{{#rollBetween() results 8 9}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Frappe un allié proche vers la droite</td></tr>
-				{{/rollBetween() results 8 9}}
-				{{#rollBetween() results 10 12}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Lâche son arme comme un loser</td></tr>
-				{{/rollBetween() results 10 12}}
-				{{#rollBetween() results 13 15}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Casse son arme</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Voir point de rupture</td></tr>
-				{{/rollBetween() results 13 15}}
-				{{#rollBetween() results 16 18}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Se blesse tout seul comme un cake</td></tr>
-				{{/rollBetween() results 16 18}}
-				{{#rollTotal() results 19}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Se blesse très sévèrement de façcon atroce et douloureuse</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts critique</td></tr>
-				{{/rollTotal() results 19}}
-				{{#rollTotal() results 20}}
-					{{#rollBetween() subresults 1 2}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Perd un oeil</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -1 | CHA -3 | AT -1 | PRD -2</td></tr>
-					{{/rollBetween() subresults 1 2}}
-					{{#rollBetween() subresults 3 6}}
-						<tr><td colspan="2" class="sheet-td-noFirst">Perd un doigt</td></tr>
-						<tr><td colspan="2" class="sheet-td-noFirst">AD -2</td></tr>
-					{{/rollBetween() subresults 3 6}}
-				{{/rollTotal() results 20}}
-			{{/rollTotal() displayEffets 1}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-
-<rolltemplate class="sheet-rolltemplate-crit_prd">
-	<table class="sheet-rolltemplate-default">
-		<caption>{{name}}</caption>
-		<tbody>
-			<tr>
-				<td>Résolution</td>
-				<td>{{results}}</td>
-			</tr>
-			{{#rollTotal() displayEffets 1}}
-				{{#rollBetween() results 1 2}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Mais non en fait : la parade était normale</td></tr>
-				{{/rollBetween() results 1 2}}
-				{{#rollBetween() results 3 5}}
-					<tr><td colspan="2" class="sheet-td-noFirst">Projectile magistralement placé</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +2</td></tr>
-				{{/rollBetween() results 3 5}}
-				{{#rollBetween() results 6 7}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi trébuche</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Il subit 1 attaque imparable</td></tr>
-				{{/rollBetween() results 6 7}}
-				{{#rollBetween() results 8 9}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi tombe</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Il subit 2 attaques imparables</td></tr>
-				{{/rollBetween() results 8 9}}
-				{{#rollBetween() results 10 12}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi lâche son arme à 1D6 mètres</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Il combat à mains nues</td></tr>
-				{{/rollBetween() results 10 12}}
-				{{#rollBetween() results 13 15}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi casse son arme</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Il combat à mains nues</td></tr>
-				{{/rollBetween() results 13 15}}
-				{{#rollBetween() results 16 18}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi reçoit un coup de votre arme</td></tr>
-					<tr><td colspan="2" class="sheet-td-noFirst">Il subit des dégâts</td></tr>
-				{{/rollBetween() results 16 18}}
-				{{#rollTotal() results 19}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi subit un coup critique avec votre arme</td></tr>
-				{{/rollTotal() results 19}}
-				{{#rollTotal() results 20}}
-					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi, ce loser, subit un coup critique avec son arme</td></tr>
-				{{/rollTotal() results 20}}
-			{{/rollTotal() displayEffets 1}}
-		</tbody>
-	</table>
-</rolltemplate>
-
-<!-- Version N# -->
+﻿<!-- Version N# -->
 <input type="hidden" name="attr_version" value="0">
 <!-- AutoCalc fields for sheet worker-->
 <input type="hidden" name="attr_Poids_Materiels" value="0" /> <!-- temp charge du materiel -->
@@ -4084,3 +2320,1766 @@
 		</div>
 	</div>
 </div>
+
+<script type="text/worker">
+	// Primary Stats
+	var primaryStats = [ "stats_courage", "stats_intelligence", "stats_charisme", "stats_adresse", "stats_force", "stats_attaque", "stats_parade"];
+	// Secondary Stats
+	var secondaryStats = [	"stats_charisme_total", "stats_intelligence_total", "stats_adresse_total", "stats_force_total", "stats_courage_total",
+							"stats_inge_mod", "stats_magiepsy_mod", "stats_magiephy_mod", "stats_resimagie_mod", "stats_fouille_mod", "stats_jet_mod",
+							"stats_inge_temp_total", "stats_magiepsy_temp_total", "stats_magiephy_temp_total", "stats_resimagie_temp_total", "stats_fouille_temp_total", "stats_jet_temp_total" ];
+	// Temp Stats
+	var tempStats = [	"stats_courage", "stats_intelligence", "stats_charisme", "stats_adresse", "stats_force",
+						"stats_attaque", "stats_parade", "stats_jet", "stats_esquive", "stats_fouille",
+						"stats_inge", "stats_magiephy", "stats_magiepsy", "stats_resimagie" ];
+	// Buff Stats
+	var buffStats = [	"condition_courage", "condition_intelligence", "condition_charisme", "condition_adresse", "condition_force",
+						"condition_attaque", "condition_parade", "condition_jet", "condition_esquive",
+						"condition_magiephy", "condition_magiepsy", "condition_resimagie" ];
+	var prStats = {
+		change: [ "repeating_armures:armure_prphy", "repeating_armures:armure_prmag", "prnat" ],
+		remove: [ "repeating_armures" ]
+	};
+	// items weight
+	var weightStats = [	"richesse_berylium", "richesse_thritil", "poids_bourses",
+						"poids_materiels", "poids_butins", "poids_livres", "poids_bouffes", "personnage_charge_max", "poids_sacs_max" ];
+	// repeating items sections
+	var weightSections = {
+		change: [ "repeating_materiels:materiel_poids", "repeating_butins:butin_poids", "repeating_bouffes:bouffe_poids", "repeating_livres" ],
+		remove: [ "repeating_materiels", "repeating_butins", "repeating_bouffes", "repeating_livres" ]
+	};
+	// max available weight
+	var weightStats_max = {
+		change: [ "repeating_sacs:sac_charge_max", "repeating_bourses:bourse_charge_max" ],
+		remove: [ "repeating_sacs", "repeating_bourses" ]
+	}
+
+	var levelAndXP = [	0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500,
+						5500, 6600, 7800, 9100, 10500, 12000, 13600, 15300, 17100, 19000,
+						21000, 24000, 29000, 35000, 45000, 60000 ];
+
+	/*---------
+		EVENTS
+	----------*/
+	// Primary Stats
+	on( primaryStats.map( stat => `change:${stat} change:${stat}_mod change:${stat}_temp_total` ).join(" "), function(e) {
+		updatePrimaryStat( e.sourceAttribute.replace( "_mod", "" ).replace( "_temp_total", "" ) );
+	});
+	// Secondary Stats & Secondary Mods
+	on( secondaryStats.map( stat => `change:${stat}` ).join(" "), function() {
+		updateSecondaryStats();
+	});
+	// Temp Stats
+	on( tempStats.map( stat => `change:${stat}_temp change:${stat}_buff` ).join(" "), function(e) {
+		updateTempStat( e.sourceAttribute.replace( "_temp", "" ).replace( "_buff", "" ) );
+	});
+	// PR Physique et magique
+	on( prStats[ "change" ].map( stat => `change:${stat}` ).join(" ") + " " + prStats[ "remove" ].map( stat => `remove:${stat}` ).join(" "), function() {
+		updatePR();
+	});
+	// Déplacement
+	on("change:prphy change:stats_force_total", function() {
+		updateDeplacement();
+	});
+	// Equive
+	on("change:stats_adresse_total change:prphy change:stats_esquive_mod change:stats_esquive_temp_total change:personnage_surcharge", function() {
+		updateEsquive();
+	});
+	// Level
+	on("change:personnage_niveau", function() {
+		updateXP();
+	});
+	// Ammos & Weapons
+	on("change:repeating_armes:munition_nom", function( e ) {
+		if( e[ "sourceType"] === "player" ) {
+			updateAmmo( e );
+		}
+	});
+	on("change:repeating_armes:arme_portee change:repeating_armes:arme_at change:repeating_armes:arme_degats change:repeating_armes:arme_bonusforce change:repeating_armes:munition_modad change:repeating_armes:munition_degats", function( e ) {
+		var idRow = e[ "sourceAttribute" ].split( '_' )[2];
+		updateWeapon( idRow );
+	});
+	on("change:stats_jet_total change:stats_attaque_total change:bonusdegatsforce", function( e ) {
+		updateWeapons();
+	});
+	// Total golds
+	on("change:richesse_or change:richesse_argent change:richesse_cuivre change:richesse_berylium change:richesse_thritil change:richesse_billet10 change:richesse_billet50 change:richesse_billet100 change:richesse_billet500 change:richesse_billet1000", function() {
+		updatePO();
+	});
+	// total repeating section weight
+	on( weightSections[ "change" ].map( stat => `change:${stat}` ).join(" ") + " " + weightSections[ "remove" ].map( stat => `remove:${stat}` ).join(" "), function( e ) {
+		var section = e[ 'sourceAttribute' ].split('-')[0];
+
+		if( section === "repeating_materiels_" ) {
+			updateRSSum( "repeating_materiels", "materiel_poids", "poids_materiels" );
+		} else if( section === "repeating_butins_" ) {
+			updateRSSum( "repeating_butins", "butin_poids", "poids_butins" );
+		} else if( section === "repeating_bouffes_" ) {
+			updateRSSum( "repeating_bouffes", "bouffe_poids", "poids_bouffes" );
+		} else if( section === "repeating_livres_" ) {
+			updateLivresCharge();
+		}
+	});
+	// total weight
+	on( weightStats.map( stat => `change:${stat}` ).join(" "), function() {
+		updateCharge();
+	});
+	// max available weight
+	on( weightStats_max[ "change" ].map( stat => `change:${stat}` ).join(" ") + " " + weightStats_max[ "remove" ].map( stat => `remove:${stat}` ).join(" "), function( e ) {
+		var section = e[ 'sourceAttribute' ].split('-')[0];
+
+		if( section === "repeating_sacs_" ) {
+			updateRSSum( "repeating_sacs", "sac_charge_max", "poids_sacs_max" );
+		} else if( section === "repeating_bourses_" ) {
+			updateRSSum( "repeating_bourses", "bourse_charge_max", "poids_bourses_max" );
+		}
+	});
+	// change magic school tab
+	on("change:repeating_ecolesmagie:ecolemagie_selected change:ecolemagie_selectall", function( e ) {
+		if( e[ "sourceType"] === "player" ) {
+			updateMagicSchoolTab( e );
+		}
+	});
+	// change magic Filter
+	on("change:tab_ecolemagie change:tab_niveaumagie", function() {
+		displayMagicSpells();
+	});
+	// Crating
+	on("change:reparation_qualite change:reparation_specialiste", function( ) {
+		updateRepair();
+	});
+	on("change:repeating_recettes:recette_specialiste change:repeating_recettes:recette_difficulte change:repeating_recettes:recette_malusspecialiste", function( e ) {
+		var idRow = e[ 'sourceAttribute' ].split('_')[2];
+		updateRecipe( idRow );
+	});
+	on("change:stats_inge_total", function() {
+		updateRepair();
+		updateRecipes();
+	});
+	// Buff / Debuff
+	on("change:repeating_conditions:condition_actif remove:repeating_conditions " + buffStats.map( stat => `change:repeating_conditions:${stat}` ).join(" "), function(e) {
+		updateBuffs();
+	});
+	// export
+	on("change:export_start", function() {
+		start_export();
+	});
+	on("change:import_start", function( e ) {
+		start_import();
+	});
+	on("change:tab_reglages sheet:opened", function( e ) {
+		reset_export();
+	});
+
+	/*------------
+		FUNCTIONS
+	-------------*/
+	function safeInt( val ) { return parseInt( val, 10 ) || 0;	}
+
+	function structSafeInt( v ) {
+		for( var attr in v ) {
+			v[ attr ] = safeInt( v[ attr ] );
+		}
+		return v;
+	}
+
+	function safeFloat( val ) { return parseFloat( val ) || 0;	}
+
+	function structSafeFloat( v ) {
+		for( var attr in v ) {
+			v[ attr ] = safeFloat( v[ attr ] );
+		}
+		return v;
+	}
+
+	function updatePrimaryStat( attr ) {
+		getAttrs( [ attr, `${attr}_mod`, `${attr}_temp_total` ], function( v ) {
+			setAttrs({
+				[ `${attr}_total` ]: safeInt( v[ attr ] ) + safeInt( v[ attr + "_mod" ] ) + safeInt( v[ attr + "_temp_total" ] )
+			});
+		});
+	}
+
+	function updateSecondaryStats() {
+		getAttrs( secondaryStats, function( sValues ) {
+			var v = structSafeInt( sValues );
+			var ingeniosite = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_adresse_total" ] ) / 2 );
+			var magiePsy = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_charisme_total" ] ) / 2 );
+			var magiePhy = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_adresse_total" ] ) / 2 );
+			var resiMagie = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_courage_total" ] + v[ "stats_force_total" ] ) / 3 );
+
+			var bonusIntel = " ";
+			var bonusDegatsIntel = 0;
+			var bonusAdresse = " ";
+			var bonusForce = " ";
+			var bonusDegatsForce = 0;
+
+			if( v[ "stats_intelligence_total" ] > 12 ) {
+				bonusIntel = "Pour chaque point d'Intelligence supérieur à 12 : +1 point de dégâts des sorts (selon sortilège).";
+				bonusDegatsIntel = v[ "stats_intelligence_total" ] - 12;
+			}
+
+			if( v[ "stats_adresse_total" ] > 12 ) {
+				bonusAdresse = "Adresse supérieure à 12 : +1 à l'Attaque OU à la Parade (un seul point quel que soit le score).";
+			} else if( v[ "stats_adresse_total" ] <= 8 ) {
+				bonusAdresse = "Adresse à 8 ou inférieur : -1 à l'Attaque OU à la Parade.";
+			}
+
+			if( v[ "stats_force_total" ] > 12 ) {
+				bonusForce = "Pour chaque point de Force supérieur à 12 : +1 Point d'Impact.";
+				bonusDegatsForce = v[ "stats_force_total" ] - 12;
+			} else if( v[ "stats_force_total" ] <= 8 ) {
+				bonusForce = "Force de 8 ou inférieure : -1 Point d'Impact.";
+				bonusDegatsForce = -1;
+			}
+
+			setAttrs({
+				"stats_inge": ingeniosite,
+				"stats_inge_total": ingeniosite + v[ "stats_inge_mod" ] + v[ "stats_inge_temp_total" ],
+				"stats_magiepsy": magiePsy,
+				"stats_magiepsy_total": magiePsy + v[ "stats_magiepsy_mod" ] + v[ "stats_magiepsy_temp_total" ],
+				"stats_magiephy": magiePhy,
+				"stats_magiephy_total": magiePhy + v[ "stats_magiephy_mod" ] + v[ "stats_magiephy_temp_total" ],
+				"stats_resimagie": resiMagie,
+				"stats_resimagie_total": resiMagie + v[ "stats_resimagie_mod" ] + v[ "stats_resimagie_temp_total" ],
+				"stats_fouille": v[ "stats_intelligence_total"],
+				"stats_fouille_total": v[ "stats_intelligence_total"] + v[ "stats_fouille_mod" ] + v[ "stats_fouille_temp_total" ],
+				"bonusintel": bonusIntel,
+				"bonusdegatsintel": bonusDegatsIntel,
+				"stats_jet": v[ "stats_adresse_total" ],
+				"stats_jet_total": v[ "stats_adresse_total" ] + v[ "stats_jet_mod" ] + v[ "stats_jet_temp_total" ],
+				"bonusadresse": bonusAdresse,
+				"bonusforce": bonusForce,
+				"bonusdegatsforce": bonusDegatsForce
+			});
+		});
+	}
+
+	function updateTempStat( attr ) {
+		getAttrs( [ `${attr}_temp`, `${attr}_buff` ], function( v ) {
+			setAttrs({
+				[ `${attr}_temp_total` ]: safeInt( v[ attr + "_temp" ] ) + safeInt( v[ attr + "_buff" ] )
+			});
+		});
+	}
+
+	function updateBuffs() {
+		var aBuffs = [];
+		var sBuffs = {};
+		var statName ='';
+		var keyName ='';
+
+		getSectionIDs( "repeating_conditions", function(idArray) {
+			getAttrs( [ ...idArray.map(id => `repeating_conditions_${id}_condition_actif`) ], function( sValues ) {
+				for( var i in idArray ) {
+					if( sValues[ `repeating_conditions_${idArray[i]}_condition_actif`] === "1" ) {
+						for( var j in buffStats ) {
+							aBuffs.push("repeating_conditions_" + idArray[i] + "_" + buffStats[j] );
+						}
+					}
+				}
+
+				getAttrs(aBuffs, function(values) {
+					var v = structSafeInt( values );
+					for( var key in v ) {
+						statName = key.split('_')[4];
+						keyName = "stats_" + statName + "_buff";
+						if( sBuffs[ keyName ] != undefined ) {
+							sBuffs[ keyName ] += v[ key ];
+						} else {
+							sBuffs[ keyName ] = v[ key ];
+						}
+					}
+					setAttrs( sBuffs );
+				});
+			});
+		});
+	}
+
+	function updateDeplacement() {
+		getAttrs( [ "stats_force_total", "deplacementrapide", "deplacementrapide_duree", "deplacementsprint", "deplacementsprint_duree", "prphy" ], function( sValues ) {
+			var v = structSafeInt( sValues );
+			var prPhy = v[ "prphy" ];
+			var deplacementRapide = v[ "deplacementrapide" ];
+			var deplacementRapideDuree = v[ "deplacementrapide_duree" ];
+			var deplacementSprint = v[ "deplacementsprint" ];
+			var deplacementSprintDuree = v[ "deplacementsprint_duree" ];
+
+			// PR vs Déplacement
+			if( prPhy === 0 || prPhy === 1 ) {
+				deplacementRapide = 8;
+				deplacementRapideDuree = v[ "stats_force_total" ] * 20;
+				deplacementSprint = 12;
+				deplacementSprintDuree = v[ "stats_force_total" ] * 5;
+			} else if( prPhy === 2 ) {
+				deplacementRapide = 6;
+				deplacementRapideDuree = v[ "stats_force_total" ] * 18;
+				deplacementSprint = 10;
+				deplacementSprintDuree = v[ "stats_force_total" ] * 4;
+			} else if( prPhy === 3 || prPhy === 4 ) {
+				deplacementRapide = 4;
+				deplacementRapideDuree = v[ "stats_force_total" ] * 15;
+				deplacementSprint = 8;
+				deplacementSprintDuree = v[ "stats_force_total" ] * 4;
+			} else if( prPhy === 5 ) {
+				deplacementRapide = 4;
+				deplacementRapideDuree = v[ "stats_force_total" ] * 10;
+				deplacementSprint = 6;
+				deplacementSprintDuree = v[ "stats_force_total" ] * 3;
+			} else if( prPhy === 6 ) {
+				deplacementRapide = 3;
+				deplacementRapideDuree = v[ "stats_force_total" ] * 8;
+				deplacementSprint = 4;
+				deplacementSprintDuree = v[ "stats_force_total" ] * 3;
+			} else if( prPhy === 7 ) {
+				deplacementRapide = 2;
+				deplacementRapideDuree = v[ "stats_force_total" ] * 7;
+				deplacementSprint = 3;
+				deplacementSprintDuree = v[ "stats_force_total" ] * 2;
+			} else if( prPhy > 7 ) {
+				deplacementRapide = 1;
+				deplacementRapideDuree = v[ "stats_force_total" ] * 5;
+				deplacementSprint = 2;
+				deplacementSprintDuree = v[ "stats_force_total" ] * 2;
+			}
+
+			setAttrs({
+				"deplacementrapide": deplacementRapide,
+				"deplacementrapide_duree": deplacementRapideDuree,
+				"deplacementsprint": deplacementSprint,
+				"deplacementsprint_duree": deplacementSprintDuree
+			}, { silent: true });
+		});
+	}
+
+	function updateEsquive() {
+		getAttrs( [ "stats_adresse_total", "stats_esquive_mod", "stats_esquive_temp_total", "prphy", "personnage_surcharge" ], function( sValues ) {
+			var v = structSafeInt( sValues );
+			var esquive = v[ "stats_adresse_total" ];
+			var prPhy = v[ "prphy" ];
+			var surcharge = v[ "personnage_surcharge" ];
+
+			// PR vs Esquive
+			if( prPhy === 0 || prPhy === 1 ) {
+				esquive += 1;
+			} else if( prPhy === 3 || prPhy === 4 ) {
+				esquive += - 2;
+			} else if( prPhy === 5 ) {
+				esquive += -4;
+			} else if( prPhy === 6 ) {
+				esquive += - 5;
+			} else if( prPhy === 7 ) {
+				esquive += - 6;
+			} else if( prPhy > 7 ) {
+				esquive = 0;
+			}
+
+			// surcharge vs Esquive
+			if( surcharge === 4 ) {
+				esquive += -2;
+			} else if( surcharge === 5 ) {
+				esquive = 0;
+			}
+
+			setAttrs({
+				"stats_esquive": esquive,
+				"stats_esquive_total": esquive + v[ "stats_esquive_mod" ] + v[ "stats_esquive_temp_total" ]
+			}, { silent: true });
+		});
+	}
+
+	function updateXP() {
+		getAttrs( [ "personnage_niveau" ], function( v ) {
+			var level = safeInt( v[ "personnage_niveau" ] );
+
+			setAttrs({
+				"personnage_xp_max": safeInt( levelAndXP[ level ], { silent : true} )
+			});
+		});
+	}
+
+	function updateWeapon( idRow ) {
+		var sWeapon = {};
+
+		getAttrs( [
+					`repeating_armes_${idRow}_arme_portee`, `repeating_armes_${idRow}_arme_at`, `repeating_armes_${idRow}_arme_degats`, `repeating_armes_${idRow}_arme_bonusforce`,
+					`repeating_armes_${idRow}_munition_modAd`, `repeating_armes_${idRow}_munition_degats`,
+					"stats_jet_total", "stats_attaque_total", "bonusdegatsforce"
+				] , function( v ) {
+
+			sWeapon[ 'repeating_armes_' + idRow + '_arme_munition_display' ] = 0;
+			sWeapon[ 'repeating_armes_' + idRow + '_arme_totalat' ] = safeInt( v[ "stats_attaque_total" ] ) + safeInt( v[ `repeating_armes_${idRow}_arme_at` ] );
+			sWeapon[ 'repeating_armes_' + idRow + '_arme_totaldegats' ] = v[ `repeating_armes_${idRow}_arme_degats` ];
+
+			if( v[ `repeating_armes_${idRow}_arme_portee` ] === 'Dist.' ) {
+				sWeapon[ 'repeating_armes_' + idRow + '_arme_munition_display' ] = 1;
+				sWeapon[ 'repeating_armes_' + idRow + '_arme_totalat' ] = safeInt( v[ "stats_jet_total" ] ) + safeInt( v[ `repeating_armes_${idRow}_arme_at` ] ) + safeInt( v[ `repeating_armes_${idRow}_munition_modAd` ] );
+				sWeapon[ 'repeating_armes_' + idRow + '_arme_totaldegats' ] = v[ `repeating_armes_${idRow}_arme_degats` ] + " + " + v[ `repeating_armes_${idRow}_munition_degats` ];
+			}
+
+			if( v[ `repeating_armes_${idRow}_arme_bonusforce` ] === "1" ) {
+				sWeapon[ 'repeating_armes_' + idRow + '_arme_totaldegats' ] += " + " + v[ "bonusdegatsforce" ];
+			}
+
+			setAttrs( sWeapon, { silent: true } );
+		});
+	}
+
+	function updateWeapons() {
+		getSectionIDs( "repeating_armes", function(idArray) {
+			for( var i in idArray ) {
+				updateWeapon( idArray[ i ] );
+			}
+		});
+	}
+
+	function updateAmmo( eventInfo ) {
+		var ammo_selected = eventInfo[ "newValue" ];
+		var idRow = eventInfo[ "sourceAttribute" ].split( '_' )[2];
+		var idAmmo = 0;
+		var sWeapon = {};
+
+		sWeapon[ 'repeating_armes_' + idRow + '_munition_degats' ] = "";
+		sWeapon[ 'repeating_armes_' + idRow + '_munition_modAd' ] = 0;
+		sWeapon[ 'repeating_armes_' + idRow + '_munition_nom' ] = "";
+
+		getSectionIDs( "repeating_munitions", function(idarray) {
+			getAttrs( [ ...idarray.map(id => `repeating_munitions_${id}_munition_nom`) ], function( sValues ) {
+				for( var i in idarray ) {
+					if( ammo_selected === sValues[`repeating_munitions_${idarray[i]}_munition_nom`] ) {
+						idAmmo = idarray[i];
+					}
+				}
+
+				if( idAmmo != 0 ) {
+					getAttrs( [ `repeating_munitions_${idAmmo}_munition_modAd`, `repeating_munitions_${idAmmo}_munition_degats` ], function( v ) {
+						sWeapon[ 'repeating_armes_' + idRow + '_munition_degats' ] = v[ `repeating_munitions_${idAmmo}_munition_degats` ];
+						sWeapon[ 'repeating_armes_' + idRow + '_munition_modAd' ] = v[ `repeating_munitions_${idAmmo}_munition_modAd` ];
+						sWeapon[ 'repeating_armes_' + idRow + '_munition_nom' ] = ammo_selected;
+
+						setAttrs( sWeapon );
+					});
+				} else {
+					setAttrs( sWeapon );
+				}
+			});
+		});
+	}
+
+	function updatePR() {
+		var prPhy = 0;
+		var prMag = 0;
+		getSectionIDs( "repeating_armures", function(idarray) {
+			getAttrs( [ "prnat", ...idarray.map(id => `repeating_armures_${id}_armure_prphy`), ...idarray.map(id => `repeating_armures_${id}_armure_prmag`) ], function( sValues ) {
+				var v = structSafeInt( sValues );
+
+				for( var i in idarray) {
+					prPhy += v[`repeating_armures_${idarray[i]}_armure_prphy`];
+					prMag += v[`repeating_armures_${idarray[i]}_armure_prmag`];
+				}
+
+				setAttrs({
+					"prphy": prPhy,
+					"prmag": prMag,
+					"pr": prPhy + prMag + v[ "prnat" ]
+				});
+			});
+		});
+	}
+
+	function updatePO() {
+		getAttrs( [	"richesse_or","richesse_argent","richesse_cuivre",
+					"richesse_berylium","richesse_thritil",
+					"richesse_billet10","richesse_billet50","richesse_billet100","richesse_billet500","richesse_billet1000" ],
+				function( sValues ) {
+			var v = structSafeInt( sValues );
+			var richesse_total = v[ "richesse_or" ] + Math.floor( v[ "richesse_argent" ] * 0.1 ) + Math.floor( v[ "richesse_cuivre" ] * 0.01 );
+			richesse_total += ( v[ "richesse_berylium" ] * 500 ) + ( v[ "richesse_thritil" ] * 100 );
+			richesse_total += ( v[ "richesse_billet10" ] * 10 ) + ( v[ "richesse_billet50" ] * 50 ) + ( v[ "richesse_billet100" ] * 100 ) + ( v[ "richesse_billet500" ] * 500 ) + ( v[ "richesse_billet1000" ] * 1000 );
+
+			setAttrs({
+				"poids_bourses": v[ "richesse_or" ] + v[ "richesse_argent" ] + v[ "richesse_cuivre" ],
+				"richesse_total": richesse_total
+			});
+		});
+	}
+
+	function updateCharge() {
+		getAttrs( weightStats, function( sValues ) {
+			var v = structSafeFloat( sValues );
+			var boursesCharge = Math.floor( v[ "poids_bourses" ] * 0.1 ) * 0.1;
+			var lingotsCharge = ( Math.floor( v[ "richesse_berylium" ] * 5 ) * 0.1 ) + ( Math.floor( v[ "richesse_thritil" ] * 3 ) * 0.1 );
+
+			var livresCharge = v[ "poids_livres" ] * 0.5;
+			var matosCharge = v[ "poids_materiels" ] + v[ "poids_butins" ] + v[ "poids_bouffes" ];
+			var sacsCharge = ( boursesCharge + lingotsCharge + matosCharge + livresCharge ).toFixed( 1 );
+
+			// Charge vs Encombrement
+			var charCharge_max = v["personnage_charge_max" ];
+			var sacsCharge_max= v[ "poids_sacs_max" ];
+			var percentCharge = Math.floor( sacsCharge * 100 / sacsCharge_max );
+			var surcharge = 0;
+
+			if( sacsCharge >= charCharge_max ) {
+				surcharge = 5; // Equipement très encombrant
+			} else if( percentCharge >= 90 ) {
+				surcharge = 4; // Sacs plein
+			} else if( percentCharge >= 75 ) {
+				surcharge = 3; // Sacs preque plein
+			} else if( percentCharge >= 50 ) {
+				surcharge = 2; // Sacs moitié plein
+			} else if( percentCharge >= 25 ) {
+				surcharge = 1; // Sacs pas trop plein
+			}
+
+			setAttrs({
+				"poids_sacs": sacsCharge,
+				"personnage_surcharge": surcharge
+			});
+		});
+	}
+
+	function updateRSSum( section, attr, total ) {
+		var sum = 0;
+		getSectionIDs( section, function(idarray) {
+			getAttrs( [ ...idarray.map(id => `${section}_${id}_${attr}`) ], function( sValues ) {
+				var v = structSafeFloat( sValues );
+				for( var i in idarray ) {
+					sum += v[`${section}_${idarray[i]}_${attr}`];
+				}
+				setAttrs({
+					[ total ]: sum
+				});
+			});
+
+		});
+	}
+
+	function updateLivresCharge() {
+		getSectionIDs( 'repeating_livres', function(idarray) {
+			setAttrs({
+				"poids_livres": safeInt( idarray.length )
+			});
+		});
+	}
+
+	function updateMagicSchoolTab( eventInfo ) {
+		var sTabs = {};
+		var selected = "all";
+
+		getSectionIDs( "repeating_ecolesmagie", function(idarray) {
+			for( var i in idarray ) {
+				sTabs[ `repeating_ecolesmagie_${idarray[ i ]}_ecolemagie_selected` ] = 0;
+			}
+
+			if( eventInfo[ "sourceAttribute" ] === "ecolemagie_selectall" )
+			{
+				setAttrs( {"tab_ecolemagie": "all" } );
+				sTabs[ "ecolemagie_selectall" ] = 1;
+			}
+			else
+			{
+				var field = eventInfo[ "sourceAttribute" ].replace( "_selected", "" );
+				getAttrs( [ field ], function( v ) {
+					setAttrs( { "tab_ecolemagie": v[ field ] } );
+				});
+
+				sTabs[ eventInfo[ "sourceAttribute" ] ] = 1;
+				sTabs[ "ecolemagie_selectall" ] = 0;
+			}
+
+			setAttrs( sTabs, { silent: true } );
+		});
+	}
+
+	function displayMagicSpells() {
+		var sDisplay = {};
+
+		getSectionIDs( "repeating_magies", function(idarray) {
+			getAttrs( [ "tab_ecolemagie", "tab_niveaumagie",
+						...idarray.map(id => `repeating_magies_${id}_magie_ecole`),
+						...idarray.map(id => `repeating_magies_${id}_magie_niveau`) ], function( v ) {
+				var cur_ecole = v[ "tab_ecolemagie" ].trim().toLowerCase();
+				var cur_level = v[ "tab_niveaumagie" ];
+
+				for( var i in idarray ) {
+					if( ( v[ `repeating_magies_${idarray[ i ]}_magie_ecole` ].trim().toLowerCase() === cur_ecole || cur_ecole === "all" ) && ( v[ `repeating_magies_${idarray[ i ]}_magie_niveau` ] === cur_level || cur_level === "all" ) ) {
+						sDisplay[ `repeating_magies_${idarray[ i ]}_magie_filtre` ] = 1;
+					} else {
+						sDisplay[ `repeating_magies_${idarray[ i ]}_magie_filtre` ] = 0;
+					}
+				}
+				setAttrs( sDisplay, { silent: true } );
+			});
+		});
+	}
+
+	function updateRepair() {
+		getAttrs( [ "reparation_qualite", "reparation_specialiste", "stats_inge_total", "personnage_niveau" ], function( sValues ) {
+
+			var v = structSafeInt( sValues );
+			var reparation_difficulte = 0;
+			var reparation_malusSpecialiste = 0;
+			var requiredLevel = 1;
+			var reparation_impossible = 0;
+
+			if( v[ "reparation_qualite" ] === 1 ) { // Matos perrave
+				reparation_difficulte = 6;
+				reparation_malusSpecialiste = -2;
+				requiredLevel = 1;
+			} else if( v[ "reparation_qualite" ] === 2 ) { // Matos de base
+				reparation_difficulte = 8;
+				reparation_malusSpecialiste = -2;
+				requiredLevel = 1;
+			} else if( v[ "reparation_qualite" ] === 3 ) { // Matos correct
+				reparation_difficulte = 10;
+				reparation_malusSpecialiste = -4;
+				requiredLevel = 2;
+			} else if( v[ "reparation_qualite" ] === 4 ) { // Matos de qualité
+				reparation_difficulte = 12;
+				reparation_malusSpecialiste = -6;
+				requiredLevel = 3;
+			} else if( v[ "reparation_qualite" ] === 5 ) { // Matos de luxe
+				reparation_difficulte = 14;
+				reparation_malusSpecialiste = -20;
+				requiredLevel = 5;
+			} else if( v[ "reparation_qualite" ] === 6 ) { // Matos d'artisan
+				reparation_difficulte = 16;
+				reparation_malusSpecialiste = -20;
+				requiredLevel = 5;
+			}
+
+			var reparation_bonus = v[ "stats_inge_total" ] - reparation_difficulte;
+			// bonus only for specialists
+			if( v[ "reparation_specialiste" ] === 0 ) {
+				if( reparation_bonus > 0 ) {
+					reparation_bonus = 0;
+				}
+
+				reparation_bonus = reparation_bonus + reparation_malusSpecialiste;
+			}
+
+			// Check required level
+			var charLevel = v[ "personnage_niveau" ] || 1;
+			if( requiredLevel > charLevel ) {
+				reparation_bonus = -20;
+			}
+
+			// Impossible task
+			if( reparation_bonus <= -20 ) {
+				reparation_impossible = 1;
+			}
+
+			setAttrs({
+				"reparation_difficulte": reparation_difficulte,
+				"reparation_bonus": reparation_bonus,
+				"reparation_impossible": reparation_impossible
+			});
+		});
+	}
+
+	function updateRecipe( idRow ) {
+		var sRecette = {};
+		var recette_bonus = 0;
+
+		getAttrs( [ 'stats_inge_total',
+					`repeating_recettes_${idRow}_recette_specialiste`, `repeating_recettes_${idRow}_recette_difficulte`, `repeating_recettes_${idRow}_recette_malusspecialiste`
+				], function ( sValues ) {
+			var v = structSafeInt( sValues );
+
+			recette_bonus = v[ "stats_inge_total" ] - v[ `repeating_recettes_${idRow}_recette_difficulte` ];
+
+			if( v[ `repeating_recettes_${idRow}_recette_specialiste` ] === 0 ) {
+				if( recette_bonus > 0 ) {
+					recette_bonus = 0;
+				}
+
+				recette_bonus = recette_bonus + v[ `repeating_recettes_${idRow}_recette_malusspecialiste` ];
+			}
+
+			sRecette[ `repeating_recettes_${idRow}_recette_bonus` ] = recette_bonus;
+			setAttrs( sRecette );
+		});
+	}
+
+	function updateRecipes() {
+		getSectionIDs( "repeating_recettes", function(idArray) {
+			for( var i in idArray ) {
+				updateRecipe( idArray[ i ] );
+			}
+		});
+	}
+
+	function start_export() {
+		var sJson = {};
+		var dataBase = {
+			"simple": [ "personnage_nom", "personnage_origine", "personnage_metiers", "personnage_sex", "personnage_age", "personnage_poids", "personnage_taille",
+						"ev", "ev_max", "ea", "ea_max", "personnage_niveau", "personnage_xp", "personnage_pointdestin", "bonusdegatssorts",
+						"personnage_langue", "personnage_vision", "personnage_nyctalopie", "personnage_ouie", "personnage_odorat", "personnage_charge_max",
+						"pr_tete", "pr_bras", "pr_torse", "pr_bouclier", "pr_jambes", "pr_pieds", "pr_mains", "prnat",
+						"bivouac_couverture", "bivouac_couverture_recup", "bivouac_matelas", "bivouac_matelas_recup", "bivouac_tente", "bivouac_tente_recup",
+						"stats_courage", "stats_courage_mod", "stats_courage_temp", "stats_intelligence", "stats_intelligence_mod", "stats_intelligence_temp", "stats_charisme", "stats_charisme_mod", "stats_charisme_temp", "stats_adresse", "stats_adresse_mod", "stats_adresse_temp", "stats_force", "stats_force_mod", "stats_force_temp", "stats_inge", "stats_inge_mod", "stats_inge_temp",
+						"stats_attaque", "stats_attaque_mod", "stats_attaque_temp", "stats_parade", "stats_parade_mod", "stats_parade_temp", "stats_jet_mod", "stats_jet_temp", "stats_esquive_mod", "stats_esquive_temp", "stats_fouille_mod", "stats_fouille_temp", "stats_magiephy_mod", "stats_magiephy_temp", "stats_magiepsy_mod", "stats_magiepsy_temp", "stats_resimagie_mod", "stats_resimagie_temp",
+						"richesse_or", "richesse_argent", "richesse_cuivre", "richesse_berylium", "richesse_thritil", "richesse_billet10", "richesse_billet50", "richesse_billet100", "richesse_billet500", "richesse_billet1000", "richesse_enbanque",
+						"displayjet", "displaycriteffets" ],
+			"repeating": [
+				{ zone:"competences", attr: ["competence_nom", "competence_effet", "competence_epreuve", "competence_jet", "competence_mod"] },
+				{ zone:"armes", attr: ["arme_nom", "arme_portee", "arme_at", "arme_prd", "arme_degats", "arme_rup", "arme_munition_display", "munition_nom", "munition_modad", "munition_degats", "arme_effet", "arme_note", "arme_bonusforce", "arme_note_display", "arme_bonusforce", "arme_critique", "arme_fumble", "arme_effet_display" ] },
+				{ zone:"armures", attr: ["armure_nom", "armure_prphy", "armure_prmag", "armure_rup", "armure_effet"] },
+				{ zone:"sacs", attr: ["sac_nom", "sac_charge_max"] },
+				{ zone:"materiels", attr: ["materiel_nom", "materiel_poids"] },
+				{ zone:"recettes", attr: ["recette_nom", "recette_effet", "recette_specialiste", "recette_niveau", "recette_duree", "recette_outils", "recette_materiaux", "recette_materiauxspe", "recette_assistant", "recette_difficulte", "recette_malusspecialiste", "recette_mod", "recette_resultats", "recette_prix"] },
+				{ zone:"ape", attr: ["ape_nom", "ape_note", "ape_effet", "ape_occurence"] },
+				{ zone:"conditions", attr: ["condition_provenance", "condition_nom", "condition_effet", "condition_actif", "condition_courage", "condition_intelligence", "condition_charisme", "condition_adresse", "condition_force", "condition_attaque", "condition_parade", "condition_jet", "condition_esquive", "condition_magiephy", "condition_magiepsy", "condition_resimagie"] },
+				{ zone:"gemmes", attr: ["gemme_nom", "gemme_ug"] },
+				{ zone:"potions", attr: ["conso_nom", "conso_count", "conso_effet"] },
+				{ zone:"coupsspeciaux", attr: ["coupspecial_nom", "coupspecial_jet", "coupspecial_mod", "coupspecial_degats", "coupspecial_degats_arme", "coupspecial_utilisation", "coupspecial_echec", "coupspecial_effet", "coupspecial_note", "coupspecial_condition", "coupspecial_critique", "coupspecial_fumble" ] },
+				{ zone:"munitions", attr: ["munition_nom", "munition_modad", "munition_count", "munition_degats", "munition_rup", "munition_effet"] },
+				{ zone:"vetements", attr: ["vetement_nom", "vetement_effet"] },
+				{ zone:"bourses", attr: ["bourse_nom", "bourse_charge_max"] },
+				{ zone:"butins", attr: ["butin_nom", "butin_poids"] },
+				{ zone:"quetes", attr: ["quete_nom"] },
+				{ zone:"poisons", attr: ["conso_nom", "conso_count", "conso_effet"] },
+				{ zone:"bagues", attr: ["bague_nom", "bague_count", "bague_bonus"] },
+				{ zone:"ecolesmagie", attr: ["ecolemagie"] },
+				{ zone:"reliques", attr: ["relique_nom", "relique_effet"] },
+				{ zone:"bouffes", attr: ["bouffe_nom", "bouffe_poids"] },
+				{ zone:"livres", attr: ["livre_nom"] },
+				{ zone:"antidotes", attr: ["conso_nom", "conso_count", "conso_effet"] },
+				{ zone:"magies", attr: ["magie_ecole", "magie_niveau", "magie_nom", "magie_incantation", "magie_duree", "magie_cout", "magie_portee", "magie_aireeffet", "magie_notes", "magie_epreuvelanceur_jet", "magie_epreuvelanceur_mod", "magie_epreuvecible_jet", "magie_epreuvecible_mod", "magie_soin", "magie_degats", "magiebonusint", "magie_effet", "magie_ingre", "creature_ev", "creature_int", "creature_at", "creature_def", "creature_cou", "creature_pr", "creature_xp", "creature_resimagie", "creature_degats", "magie_epreuveappel_mod", "magie_epreuvecontrol_mod", "magie_epreuverevocation_mod"] },
+				{ zone:"ingre", attr: ["ingre_nom", "ingre_count"] },
+				{ zone:"compagnons", attr: ["compagnon_nom", "compagnon_type", "compagnon_ev", "compagnon_ev_max", "compagnon_cou", "compagnon_at", "compagnon_esquive", "compagnon_prd", "compagnon_charge", "compagnon_charge", "compagnon_pr", "compagnon_resimagie", "compagnon_deplacement_assaut_sol", "compagnon_deplacement_assaut_air", "compagnon_deplacement_charge_sol", "compagnon_deplacement_charge_air", "compagnon_deplacement_voyage_sol", "compagnon_deplacement_voyage_air", "compagnon_deplacement_jour_sol", "compagnon_deplacement_jour_air", "compagnon_combat", "compagnon_entretien", "compagnon_autres", "compagnon_materiel1_nom", "compagnon_materiel2_nom", "compagnon_materiel3_nom", "compagnon_materiel1", "compagnon_materiel2", "compagnon_materiel3"] }
+			]
+		};
+		// get all simple values
+		getAttrs( dataBase.simple, function( v ) {
+			sJson = v;
+			// Get repeating values with recursive function to avoid asynch problems
+			getRepeatingFields( dataBase.repeating, 0, sJson );
+		});
+	}
+
+	function getRepeatingFields( dataBase, i, sJson ) {
+		var _aAttr = [];
+		var zone = dataBase[ i ][ "zone" ];
+		var attr = dataBase[ i ][ "attr" ];
+		var i = i + 1;
+
+		// get sections ids
+		getSectionIDs( `repeating_${zone}`, function( idarray ) {
+			if ( idarray.length > 0 ) {
+				for( var j in attr ) {
+					_aAttr.push( ...idarray.map(id => `repeating_${zone}_${id}_${attr[ j ]}`) );
+				}
+				// get all attrs for all sections ids
+				getAttrs( _aAttr, function ( v ) {
+					var sSection = {};
+					// reassemble attrs by id
+					for( var key in v ) {
+						var id = key.split( '_' )[2];
+						// replace the id by a placeholder "rowID" cause we can't import existing ids
+						var attr_name = key.replace( id, 'rowID' );
+
+						if( sSection[ id ] === undefined ) {
+							sSection[ id ] = {};
+						}
+						sSection[ id ][ attr_name ] = v[ key ];
+					}
+					// add an array with all attrs for each sections
+					sJson[ zone ] = [];
+					for( var id in sSection) {
+						sJson[ zone ].push( sSection[ id ] );
+					}
+					if( dataBase.length > i ) {
+						// call recursively getRepeatingFields depending on dataBase.repeating.length
+						getRepeatingFields( dataBase, i, sJson);
+					} else if( dataBase.length === i ) {
+						// or call finish function
+						updateExportJson( sJson );
+					}
+				});
+			} else {
+				if( dataBase.length > i ) {
+					getRepeatingFields( dataBase, i, sJson);
+				} else if( dataBase.length === i ) {
+					updateExportJson( sJson );
+				}
+			}
+		});
+	}
+
+	function updateExportJson( sJson ) {
+		// stringify all our simple and repeating attrs / values
+		setAttrs( {
+			"json_export" : JSON.stringify( sJson ),
+			"export_start": 0
+		}, { silent: true } );
+	}
+
+	function reset_export() {
+		setAttrs( {
+			"json_export" : "",
+			"export_start": 0
+		}, { silent: true } );
+	}
+
+	function start_import() {
+		var err = "";
+
+		getAttrs( [ "json_import", "import_start" ], function ( v ) {
+			if( v[ "import_start" ] === "1" )
+			{
+				// open json
+				try {
+					var sJson = JSON.parse( v[ "json_import" ] );
+				} catch(e) {
+					err = "Données non valides";
+				}
+
+				if( err === "" ) {
+					// reset sheet repeating section
+					var aSections = [	"antidotes","ape","armes","armures","bagues","bouffes","bourses","butins","compagnons","competences","conditions","coupsspeciaux","ecolesmagie",
+										"gemmes","ingre","livres","magies","materiels","munitions","poisons","potions","quetes","recettes","reliques","sacs","vetements" ];
+					for( var i in aSections ) {
+						var section = `repeating_${aSections[ i ]}`;
+						(function( section ) {
+							getSectionIDs( section, function(idarray) {
+								for( var j in idarray ) {
+									removeRepeatingRow( `${section}_${idarray[ j ]}` );
+								}
+							});
+						})(section);
+					}
+
+					var sAttrs = {};
+					for( var i in sJson ) {
+						if( sJson[ i ] instanceof Array ) {
+							// import repeating values
+							for( var j in sJson[ i ] ) {
+								var newid = generateRowID();
+								for( var k in sJson[ i ][ j ] ) {
+									// replace placeholder 'rowid' by a new generatedID to create rows
+									sAttrs[ k.replace( 'rowID', newid ) ] = sJson[ i ][ j ][ k ];
+								}
+							}
+						} else {
+							// Import simple values
+							sAttrs[ i ] = sJson[ i ];
+						}
+					}
+					setAttrs( sAttrs );
+				}
+
+				setAttrs( {
+					"json_import": err,
+					"import_start": 0
+				}, { silent: true } );
+			}
+		});
+	}
+
+	/*----------------
+	Version handling
+	----------------*/
+	on("sheet:opened", function() {
+		detect_version();
+	});
+
+	function detect_version() {
+		getAttrs( [ "version" ], function( v ) {
+			var vrs = parseFloat( v[ "version" ] ) || 1.0;
+			console.log("Détection de la version : " + vrs );
+			if( vrs < 2.0 ) {
+				getAttrs( [ "level", "valattaque", "valparade", "class", "race", "experience" ], function( v ) {
+					if( v[ "level" ] != undefined || v[ "valattaque" ] != undefined || v[ "valparade" ] != undefined || v[ "class" ] != undefined || v[ "race" ] != undefined || v[ "experience" ] != undefined ) {
+						console.log( "Début du process d'import..." );
+						update_process();
+					}
+					console.log( "Mise à jour de la version..." );
+					setAttrs( { "version" : 2.6 } );
+				});
+			} else if( vrs < 2.4 ) {
+				// uptodate
+				updateSecondaryStats();
+				updateWeapons();
+				setAttrs( { "version" : 2.6 } );
+				return;
+			}
+			console.log( "ok" );
+		});
+	}
+
+	function update_process() {
+		var _aNewAttr = [];
+		var _aOldAttr = [];
+		var _sNewValues = {};
+
+		// sheet2.0 attr "Character"
+		_aNewAttr = _aNewAttr.concat( [ "personnage_nom", "personnage_niveau","personnage_xp","personnage_metiers","personnage_origine","personnage_pointdestin","personnage_langue" ] );
+		_aOldAttr = _aOldAttr.concat( [ "charactername", "level","experience","class","race","pointdestin","langue" ] );
+
+		// sheet2.0 attr "stats"
+		_aNewAttr = _aNewAttr.concat( [ "stats_courage", "stats_intelligence","stats_charisme","stats_adresse","stats_force" ] );
+		_aOldAttr = _aOldAttr.concat( [ "courage","intelligence","charisme","adresse","force" ] );
+
+		// sheet2.0 attr "stats_mod"
+		_aNewAttr = _aNewAttr.concat( [ "stats_courage_mod", "stats_intelligence_mod","stats_charisme_mod","stats_adresse_mod","stats_force_mod" ] );
+		_aOldAttr = _aOldAttr.concat( [ "couragemod", "intelligencemod","charismemod","adressemod","forcemod" ] );
+
+		// Sheet2.0 attr "richesses"
+		_aNewAttr = _aNewAttr.concat( [ "richesse_or","richesse_argent" ] );
+		_aOldAttr = _aOldAttr.concat( [ "po","pa" ] );
+
+		// sheet2.0 attr "Combat"
+		_aNewAttr = _aNewAttr.concat( [ "ev_max","ea_max","stats_attaque","stats_attaque_mod","stats_parade","stats_parade_mod" ] );
+		_aOldAttr = _aOldAttr.concat( [ "evmax","eamax","ValAttaque","ValAttaqueMod","ValParade","ValParadeMod" ] );
+
+		// sheet2.0 attr "magie"
+		_aNewAttr = _aNewAttr.concat( [ "stats_magiephy","stats_magiephy_mod","stats_magiepsy","stats_magiepsy_mod","stats_resimagie","stats_resimagie_mod" ] );
+		_aOldAttr = _aOldAttr.concat( [ "magiephy","magiephymod","magiepsy","magiepsymod","resimagie","resimagiemod" ] );
+
+		// Sheet2.0 attr "arme"
+		_aNewAttr = _aNewAttr.concat( [ "repeating_butins_rowID_butin_nom","repeating_butins_rowID_butin_nom","repeating_butins_rowID_butin_nom","repeating_butins_rowID_butin_nom" ] );
+		_aOldAttr = _aOldAttr.concat( [ "arme01","arme02","arme03","arme04" ] );
+
+		// Sheet2.0 attr "armures"
+		_aNewAttr = _aNewAttr.concat( [ "repeating_armures_rowID_armure_nom","repeating_armures_rowID_armure_nom","repeating_armures_rowID_armure_nom","repeating_armures_rowID_armure_nom" ] );
+		_aOldAttr = _aOldAttr.concat( [ "equip01","equip02","equip03","equip04" ] );
+
+		// Sheet2.0 attr "Inventaire"
+		_aNewAttr = _aNewAttr.concat( [ "repeating_materiels_rowID_materiel_nom","repeating_materiels_rowID_materiel_nom","repeating_materiels_rowID_materiel_nom","repeating_materiels_rowID_materiel_nom" ] );
+		_aOldAttr = _aOldAttr.concat( [ "inv01","inv02","inv03","inv04" ] );
+
+		// Sheet2.0 attr "Compétences"
+		_aNewAttr = _aNewAttr.concat( [ "repeating_competences_rowID_competence_nom","repeating_competences_rowID_competence_nom","repeating_competences_rowID_competence_nom","repeating_competences_rowID_competence_nom" ] );
+		_aOldAttr = _aOldAttr.concat( [ "raceability01","raceability02","raceability03","raceability04" ] );
+
+		// Sheet2.0 attr "Compétences"
+		_aNewAttr = _aNewAttr.concat( [ "repeating_competences_rowID_competence_nom","repeating_competences_rowID_competence_nom","repeating_competences_rowID_competence_nom","repeating_competences_rowID_competence_nom" ] );
+		_aOldAttr = _aOldAttr.concat( [ "classability01","classability02","classability03","classability04" ] );
+
+		// Get the old attr values
+		getAttrs( _aOldAttr, function( v ) {
+			// Each new attr take the value of the old attr
+			for( var i in _aNewAttr ) {
+				var _oldAttr = _aOldAttr[ i ];
+				var _newAttr = _aNewAttr[ i ];
+				var _oldValue = v[ _oldAttr ];
+
+				if( _oldValue != undefined ) {
+					// If the new attr is a repeating row > get a rowId
+					if( _newAttr.indexOf( "_rowID_" ) !== -1 ) {
+						_newAttr = _newAttr.replace( "rowID", generateRowID() );
+					}
+
+					_sNewValues[ _newAttr ] = _oldValue;
+				}
+			}
+			// Update
+			setAttrs( _sNewValues );
+		});
+
+		// old sheet sections attr to new sheet sections attr
+		_sNewValues = {};
+		var _aOldSections = [
+			{
+				oldSection: "cac",
+				newSection: "armes",
+				oldAttr: [ "armenom", "armeat", "armeprd", "armedes", "armedegats" ],
+				newAttr: [ "arme_nom", "arme_at", "arme_prd", "arme_degats", "arme_degats" ]
+			},
+			{
+				oldSection: "arme",
+				newSection: "butins",
+				oldAttr: [ "armes" ],
+				newAttr: [ "butin_nom" ]
+			},
+			{
+				oldSection: "equipement",
+				newSection: "armures",
+				oldAttr: [ "equipement" ],
+				newAttr: [ "armure_nom" ]
+			},
+			{
+				oldSection: "inventaire",
+				newSection: "materiels",
+				oldAttr: [ "inventaire" ],
+				newAttr: [ "materiel_nom" ]
+			},
+			{
+				oldSection: "compin",
+				newSection: "competences",
+				oldAttr: [ "compin" ],
+				newAttr: [ "competence_nom" ]
+			},
+			{
+				oldSection: "classabilities",
+				newSection: "competences",
+				oldAttr: [ "classabilities" ],
+				newAttr: [ "competence_nom" ]
+			},
+			{
+				oldSection: "spells",
+				newSection: "magies",
+				oldAttr: [ "sortnom_1","magietype","sortdesattaque_1","sortdesbonusattaque_1","sortdegatdes_1","sortdegatbonus_1","sortcout_1" ],
+				newAttr: [ "magie_nom","magie_epreuvelanceur_jet","magie_epreuvelanceur_mod","magie_epreuvelanceur_mod","magie_degats","magie_degats","magie_cout" ]
+			},
+			{
+				oldSection: "spells",
+				newSection: "magies",
+				oldAttr: [ "creaturenom_1","invocbonus_1","invoccontrole_1","invocrevoc_1","invoccout_1" ],
+				newAttr: [ "magie_nom","magie_epreuveappel_mod","magie_epreuvecontrol_mod","magie_epreuverevocation_mod","magie_cout" ]
+			}
+		];
+
+		for( var i in _aOldSections ) {
+			// Get Old section IDs
+			convertRS( _aOldSections[ i ] );
+		}
+	}
+
+	function convertRS( sOldSections ) {
+		var _oldSection = "repeating_" + sOldSections[ "oldSection" ];
+		var _newSection = "repeating_" + sOldSections[ "newSection" ];
+		var _aOldAttr = [];
+
+		// get sections id of the old Section
+		getSectionIDs( _oldSection, function( idarray ) {
+			if ( idarray.length > 0 ) {
+				_aOldAttr = [];
+
+				// create an array with all attr combine with all ids of the section
+				for( var i_oldAttr in sOldSections[ "oldAttr" ] ) {
+					_oldAttr = sOldSections[ "oldAttr" ][ i_oldAttr ];
+					_aOldAttr.push( ...idarray.map(id => `${_oldSection}_${id}_${_oldAttr}`) );
+				}
+
+				// get all values for a section
+				getAttrs( _aOldAttr, function (v) {
+					var _sNewValues = {}
+					for( var i_idarray in idarray ) {
+
+						// Create new rows in new section
+						var newrowid = generateRowID();
+						var _oldSectionID = _oldSection + "_" + idarray[ i_idarray ] + "_";
+						var _newSectionID = _newSection + "_" + newrowid + "_";
+
+						for( var i_attr in sOldSections[ "newAttr" ] ) {
+							// Each new attr take the value of the old attr
+							var _oldAttr = _oldSectionID + sOldSections[ "oldAttr" ][ i_attr ];
+							var _newAttr = _newSectionID + sOldSections[ "newAttr" ][ i_attr ];
+							var _oldValue = v[ _oldAttr ];
+
+							if( _oldValue != undefined ) {
+								// exceptions
+								if( sOldSections[ "oldAttr" ][ i_attr ] === "armedes" || sOldSections[ "oldAttr" ][ i_attr ] === "SortDesAttaque_1" || sOldSections[ "oldAttr" ][ i_attr ] === "SortDegatDes_1" ) {
+									_sNewValues[ _newAttr ] = _oldValue + "d6";
+								} else if( sOldSections[ "oldAttr" ][ i_attr ] === "armedegats" || sOldSections[ "oldAttr" ][ i_attr ] === "SortDesBonusAttaque_1" || sOldSections[ "oldAttr" ][ i_attr ] === "SortDegatBonus_1" ) {
+									_sNewValues[ _newAttr ] = ( _sNewValues[ _newAttr ] || "1d6" ) + "+" + _oldValue;
+								} else {
+									_sNewValues[ _newAttr ] = _oldValue;
+								}
+							}
+						}
+					}
+					setAttrs( _sNewValues );
+				});
+			}
+		});
+	}
+</script>
+
+<rolltemplate class="sheet-rolltemplate-magie">
+	<table class="sheet-rolltemplate-table">
+		<tr><th>{{name}}</th></tr>
+		<tr>
+			<td><span class="tcat">Ecole </span>{{magie_ecole}} - <span class="tcat">Niveau </span>{{magie_niveau}}</td>
+		</tr>
+		{{#magie_incantation}}
+			<tr>
+				<td><span class="tcat">Incantation </span>{{magie_incantation}}</td>
+			</tr>
+		{{/magie_incantation}}
+		{{#magie_duree}}
+			<tr>
+				<td><span class="tcat">Durée </span>{{magie_duree}}</td>
+			</tr>
+		{{/magie_duree}}
+		{{#magie_cout}}
+			<tr>
+				<td><span class="tcat">Coût </span>{{magie_cout}}</td>
+			</tr>
+		{{/magie_cout}}
+		{{#magie_portee}}
+			<tr>
+				<td><span class="tcat">Portée </span>{{magie_portee}}</td>
+			</tr>
+		{{/magie_portee}}
+		{{#magie_aireeffet}}
+			<tr>
+				<td><span class="tcat">Aire d’effet </span>{{magie_aireeffet}}</td>
+			</tr>
+		{{/magie_aireeffet}}
+		{{#magie_display_epreuve}}
+			<tr>
+				<td><span class="tcat">Épreuve </span>{{magie_epreuve}}</td>
+			</tr>
+		{{/magie_display_epreuve}}
+		{{#magie_display_resistance}}
+			<tr>
+				<td><span class="tcat">Resistance </span>{{magie_resistance}}</td>
+			</tr>
+		{{/magie_display_resistance}}
+		<tr><td><hr></td></tr>
+		{{#magie_soin}}
+			<tr>
+				<td><span class="tcat">Soin </span>{{magie_soin}}</td>
+			</tr>
+		{{/magie_soin}}
+		{{#magie_degats}}
+			<tr>
+				<td><span class="tcat">Dégats </span>{{magie_degats}} {{#rollGreater() magie_bonusint 0}}+ Bonus Int{{/rollGreater() magie_bonusint 0}}</td>
+			</tr>
+		{{/magie_degats}}
+		<tr>
+			<td>{{magie_effet}}</td>
+		</tr>
+		{{#magie_ingre}}
+			<tr><td><hr></td></tr>
+			<tr>
+				<td><span class="tcat">Ingrédients </span><br>{{magie_ingre}}</td>
+			</tr>
+		{{/magie_ingre}}
+
+		{{#creature_ev}}
+			<tr><td><hr></td></tr>
+			<tr><th>Créature invoquée :</th></tr>
+			<tr><td><span class="tcat">EV </span>{{creature_ev}} - <span class="tcat">INT </span>{{creature_int}}</td></tr>
+			<tr><td><span class="tcat">AT </span>{{creature_at}} - <span class="tcat">PRD/ESQ </span>{{creature_def}}</td><tr>
+			<tr><td><span class="tcat">COU </span>{{creature_cou}} - <span class="tcat">RM </span>{{creature_resimagie}}</td><tr>
+			<tr><td><span class="tcat">XP </span>{{creature_xp}} - <span class="tcat">PR </span>{{creature_pr}}</td><tr>
+			<tr><td><span class="tcat">Dégats </span>{{creature_degats}}</td><tr>
+			<tr><td><span class="tcat">Appel </span>Magie PSY + {{magie_epreuveappel_mod}}</td><tr>
+			<tr><td><span class="tcat">Contrôle </span>Magie PSY + {{magie_epreuvecontrol_mod}}</td><tr>
+			<tr><td><span class="tcat">Révocation </span>Magie PSY + {{magie_epreuverevocation_mod}}</td><tr>
+		{{/creature_ev}}
+
+		{{#magie_notes}}
+			<tr><td><hr></td></tr>
+			<tr>
+				<td><span class="tcat">Notes : </span><br>{{magie_notes}}</td>
+			</tr>
+		{{/magie_notes}}
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-recette">
+	<table class="sheet-rolltemplate-table">
+		<tr><th>{{recette_nom}}</th></tr>
+		<tr><td>{{recette_effet}}</td></tr>
+		<tr>
+			<td><span class="tcat">Niveau : </span>à partir du niveau {{recette_niveau}}</td>
+		</tr>
+		<tr>
+			<td><span class="tcat">Caractéristiques : </span>{{recette_resultats}}</td>
+		</tr>
+		<tr><td><hr></td></tr>
+		<tr>
+			<td><span class="tcat">Matériaux : </span>{{recette_materiaux}}</td>
+		</tr>
+		{{#recette_materiauxspe}}
+			<tr>
+				<td><span class="tcat">+Matériaux spéciaux : </span>{{recette_materiauxspe}}</td>
+			</tr>
+		{{/recette_materiauxspe}}
+		<tr>
+			<td><span class="tcat">Temps de confection : </span>{{recette_duree}}</td>
+		</tr>
+		<tr>
+			<td><span class="tcat">Outils : </span>{{recette_outils}}</td>
+		</tr>
+		<tr>
+			<td><span class="tcat">Difficulté : </span>{{recette_difficulte}} (+{{recette_xp}} XP en cas de réussite)</td>
+		</tr>
+		<tr>
+			<td><span class="tcat">Prix : </span>{{recette_prix}}</td>
+		</tr>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-coupSpecial">
+	<table class="sheet-rolltemplate-table">
+		<tr><th>{{name}}</th></tr>
+		<tr>
+			<td><span class="tcat">Utilisation : </span>{{coupspecial_utilisation}}</td>
+		</tr>
+		<tr>
+			<td><span class="tcat">- En cas d'échec, </span>{{coupspecial_echec}}</td>
+		</tr>
+		<tr><td><hr></td></tr>
+		<tr>
+			<td><span class="tcat">Effets : </span>{{coupspecial_effet}}</td>
+		</tr>
+		{{#coupspecial_condition}}
+		<tr>
+			<td><span class="tcat">Conditions : </span>{{coupspecial_condition}}</td>
+		</tr>
+		{{/coupspecial_condition}}
+		<tr>
+			<td><span class="tcat">Dégats : </span>{{#coupspecial_degats_arme}}Dégats de l'arme + {{/coupspecial_degats_arme}}{{coupspecial_degats}}</td>
+		</tr>
+		{{#coupspecial_note}}
+		<tr>
+			<td><span class="tcat">- </span>{{coupspecial_note}}</td>
+		</tr>
+		{{/coupspecial_note}}
+		<tr><td><hr></td></tr>
+		<tr>
+			<td><span class="tcat">En cas d'échec critique : </span><br />{{coupspecial_fumble}}</td>
+		</tr>
+		<tr>
+			<td><span class="tcat">Reussite critique : </span>{{coupspecial_critique}}</td>
+		</tr>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-atk">
+	<table class="sheet-rolltemplate-default">
+		<caption>{{name}}</caption>
+		<tbody>
+			<tr>
+				<td>AT</td>
+				<td>{{at}}</td>
+			</tr>
+			{{#rollGreater() display_effets 0}}
+			<tr>
+				<td>Effets</td>
+				<td>{{effets}}</td>
+			</tr>
+			{{/rollGreater() display_effets 0}}
+			{{#rollGreater() display_notes 0}}
+			<tr>
+				<td>Notes</td>
+				<td>{{notes}}</td>
+			</tr>
+			{{/rollGreater() display_notes 0}}
+			<tr>
+				<td>Résultat</td>
+				<td>{{results}}</td>
+			</tr>
+			<tr>
+				<td>{{btn_degats}}</td>
+				<td>
+					{{#rollWasCrit() results }}{{btn_critique}}{{/rollWasCrit() results }}
+					{{#rollWasFumble() results }}{{btn_fumble}}{{/rollWasFumble() results }}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-prd">
+	<table class="sheet-rolltemplate-default">
+		<caption>{{name}}</caption>
+		<tbody>
+			<tr>
+				<td>PRD</td>
+				<td>{{prd}}</td>
+			</tr>
+			<tr>
+				<td>Résultat</td>
+				<td>{{results}}</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					{{#rollWasCrit() results }}{{btn_critique}}{{/rollWasCrit() results }}
+					{{#rollWasFumble() results }}{{btn_fumble}}{{/rollWasFumble() results }}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-dmg">
+	<table class="sheet-rolltemplate-default">
+		<caption>{{name}}</caption>
+		<tbody>
+			<tr>
+				<td>Dégats</td>
+				<td>{{dmg}} ({{typeDegat}})</td>
+			</tr>
+			{{#munition}}
+			<tr>
+				<td>Munition</td>
+				<td>{{munition}}</td>
+			</tr>
+			{{/munition}}
+		</tbody>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-crit_tranchant">
+	<table class="sheet-rolltemplate-default">
+		<caption>{{name}}</caption>
+		<tbody>
+			<tr>
+				<td>Résolution</td>
+				<td>{{results}}</td>
+			</tr>
+			{{#rollTotal() displayEffets 1}}
+				{{#rollBetween() results 1 2}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Incision profonde</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +1</td></tr>
+				{{/rollBetween() results 1 2}}
+				{{#rollBetween() results 3 4}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Incision vraiment profonde</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +2</td></tr>
+				{{/rollBetween() results 3 4}}
+				{{#rollBetween() results 5 6}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Plaie impressionnate et dommages à l'armure</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +3</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure concernée PR -1</td></tr>
+				{{/rollBetween() results 5 6}}
+				{{#rollBetween() results 7 8}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis et dommages à l'armure</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +4</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure PR -2</td></tr>
+				{{/rollBetween() results 7 8}}
+				{{#rollBetween() results 9 10}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis de bourrin et dommages à l'armure</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +5</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure concernée PR -3</td></tr>
+				{{/rollBetween() results 9 10}}
+				{{#rollTotal() results 11}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Une partie de l'armure est détruite</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure concernée PR = 0</td></tr>
+				{{/rollTotal() results 11}}
+				{{#rollTotal() results 12}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Oeil crevé</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">AD-1 | CHA -3 | AT -1 | PRD -2</td></tr>
+				{{/rollTotal() results 12}}
+				{{#rollTotal() results 13}}
+					{{#rollBetween() subresults 1 3}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Main droite tranchée</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +6</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -1 | FO -2 | AT -5 | PRD -6</td></tr>
+					{{/rollBetween() subresults 1 3}}
+					{{#rollBetween() subresults 4 6}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Main gauche tranchée</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +6</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -1 | AT -2 | PRD -3</td></tr>
+					{{/rollBetween() subresults 4 6}}
+				{{/rollTotal() results 13}}
+				{{#rollTotal() results 14}}
+					{{#rollBetween() subresults 1 3}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Pied droit tranché</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +6</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | 50% MV | AT -2 | PRD -2</td></tr>
+					{{/rollBetween() subresults 1 3}}
+					{{#rollBetween() subresults 4 6}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Pied gauche tranché</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +6</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | 50% MV | AT -2 | PRD -2</td></tr>
+					{{/rollBetween() subresults 4 6}}
+				{{/rollTotal() results 14}}
+				{{#rollTotal() results 15}}
+					{{#rollBetween() subresults 1 3}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Bras droit tranché</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +7</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -4 | FO -4 | AT -5 | PRD -6 | CHA -5</td></tr>
+					{{/rollBetween() subresults 1 3}}
+					{{#rollBetween() subresults 4 6}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Bras gauche tranché</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +7</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -2 | FO -2 | AT -3 | PRD -4</td></tr>
+					{{/rollBetween() subresults 4 6}}
+				{{/rollTotal() results 15}}
+				{{#rollTotal() results 16}}
+					{{#rollBetween() subresults 1 3}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Jambe droite tranchée</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +8</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -3 | FO -3 | AT -4 | PRD -6 | 25% MV</td></tr>
+					{{/rollBetween() subresults 1 3}}
+					{{#rollBetween() subresults 4 6}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Jambe gauche tranchée</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +8</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -3 | FO -3 | AT -4 | PRD -6 | 25% MV</td></tr>
+					{{/rollBetween() subresults 4 6}}
+				{{/rollTotal() results 16}}
+				{{#rollTotal() results 17}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Organes génitaux endommagés</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
+				{{/rollTotal() results 17}}
+				{{#rollTotal() results 18}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Organes vital endommagé</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +9</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
+				{{/rollTotal() results 18}}
+				{{#rollTotal() results 19}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Blessure au coeur</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
+				{{/rollTotal() results 19}}
+				{{#rollTotal() results 20}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Blessure grave à la tête</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
+				{{/rollTotal() results 20}}
+			{{/rollTotal() displayEffets 1}}
+		</tbody>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-crit_contondant">
+	<table class="sheet-rolltemplate-default">
+		<caption>{{name}}</caption>
+		<tbody>
+			<tr>
+				<td>Résolution</td>
+				<td>{{results}}</td>
+			</tr>
+			{{#rollTotal() displayEffets 1}}
+				{{#rollBetween() results 1 2}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Ématome impressionnant</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +1</td></tr>
+				{{/rollBetween() results 1 2}}
+				{{#rollBetween() results 3 4}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Ématome et luxation d'un membre</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
+				{{/rollBetween() results 3 4}}
+				{{#rollBetween() results 5 6}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Fracture de côte</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
+				{{/rollBetween() results 5 6}}
+				{{#rollBetween() results 7 8}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis et dommages à l'armure</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +4</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure PR -1</td></tr>
+				{{/rollBetween() results 7 8}}
+				{{#rollBetween() results 9 10}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis de bourrin et dommages à l'armure</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +5 </td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure PR -2</td></tr>
+				{{/rollBetween() results 9 10}}
+				{{#rollTotal() results 11}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Une partie de l'armure est détruite ()</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Pièce d'armure concernée PR=0</td></tr>
+				{{/rollTotal() results 11}}
+				{{#rollTotal() results 12}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Luxation du genou (Dégâts +3 / AD -2 | MV 50% | AT -1 | PRD -2)</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +9</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
+				{{/rollTotal() results 12}}
+				{{#rollTotal() results 13}}
+					{{#rollBetween() subresults 1 3}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Main droite cassée</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -1 | FO -2 | AT -5 | PRD -6</td></tr>
+					{{/rollBetween() subresults 1 3}}
+					{{#rollBetween() subresults 4 6}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Main gauche cassée</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -1 | AT -2 | PRD -3</td></tr>
+					{{/rollBetween() subresults 4 6}}
+				{{/rollTotal() results 13}}
+				{{#rollTotal() results 14}}
+					{{#rollBetween() subresults 1 3}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Pied droit écrasé</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | 50% MV | AT -2 | PRD -2</td></tr>
+					{{/rollBetween() subresults 1 3}}
+					{{#rollBetween() subresults 4 6}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Pied gauche écrasé</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | 50% MV | AT -2 | PRD -2</td></tr>
+					{{/rollBetween() subresults 4 6}}
+				{{/rollTotal() results 14}}
+				{{#rollTotal() results 15}}
+					{{#rollBetween() subresults 1 3}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Bras droit cassé ( / )</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -2 | FO -4 | AT -5 | PRD -6</td></tr>
+					{{/rollBetween() subresults 1 3}}
+					{{#rollBetween() subresults 4 6}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Bras gauche cassé</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -2 | AT -2 | PRD -3</td></tr>
+					{{/rollBetween() subresults 4 6}}
+				{{/rollTotal() results 15}}
+				{{#rollTotal() results 16}}
+					{{#rollBetween() subresults 1 3}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Jambe droite cassée</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -3 | FO -3 | AT -4 | PRD -6 | MV 25%</td></tr>
+					{{/rollBetween() subresults 1 3}}
+					{{#rollBetween() subresults 4 6}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Jambe gauche cassée</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -3 | FO -3 | AT -4 | PRD -6 | MV 25%</td></tr>
+					{{/rollBetween() subresults 4 6}}
+				{{/rollTotal() results 16}}
+				{{#rollTotal() results 17}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Organes génitaux écrasés</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -5 | MV 50%</td></tr>
+				{{/rollTotal() results 17}}
+				{{#rollTotal() results 18}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Assommé</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Inconscient</td></tr>
+				{{/rollTotal() results 18}}
+				{{#rollTotal() results 19}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Fracture ouverte du crâne</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
+				{{/rollTotal() results 19}}
+				{{#rollTotal() results 20}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Ecrasement violent d'un organe vital</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
+				{{/rollTotal() results 20}}
+			{{/rollTotal() displayEffets 1}}
+		</tbody>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-crit_projectile">
+	<table class="sheet-rolltemplate-default">
+		<caption>{{name}}</caption>
+		<tbody>
+			<tr>
+				<td>Résolution</td>
+				<td>{{results}}</td>
+			</tr>
+			{{#rollTotal() displayEffets 1}}
+				{{#rollBetween() results 1 2}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Projectile bien placé</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +1</td></tr>
+				{{/rollBetween() results 1 2}}
+				{{#rollBetween() results 3 4}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Projectile magistralement placé</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +2</td></tr>
+				{{/rollBetween() results 3 4}}
+				{{#rollBetween() results 5 6}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Projectile dans une articulation du bras</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">AT -2 | PRD -2</td></tr>
+				{{/rollBetween() results 5 6}}
+				{{#rollBetween() results 7 8}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Projectile dans une articulation de la jambe</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">MV 50%</td></tr>
+				{{/rollBetween() results 7 8}}
+				{{#rollBetween() results 9 11}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Projectile dans un poumon</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +3</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Toutes caracs -1</td></tr>
+				{{/rollBetween() results 9 11}}
+				{{#rollBetween() results 12 16}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Projectile de maître</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts +5</td></tr>
+				{{/rollBetween() results 12 16}}
+				{{#rollTotal() results 17}}
+					<tr><td colspan="2" class="sheet-td-noFirst">En plein dans les organes génitaux, bien fait !</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +5</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
+				{{/rollTotal() results 17}}
+				{{#rollTotal() results 18}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Organe vital endommagé !</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts +5</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Perd 1d6PV chaque minute</td></tr>
+				{{/rollTotal() results 18}}
+				{{#rollTotal() results 19}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Coeur transpercé</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
+				{{/rollTotal() results 19}}
+				{{#rollTotal() results 20}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Oeil et cerveau transpercé, bien fait !</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
+				{{/rollTotal() results 20}}
+			{{/rollTotal() displayEffets 1}}
+		</tbody>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-crit_pugilat">
+	<table class="sheet-rolltemplate-default">
+		<caption>{{name}}</caption>
+		<tbody>
+			<tr>
+				<td>Résolution</td>
+				<td>{{results}}</td>
+			</tr>
+			{{#rollTotal() displayEffets 1}}
+				{{#rollBetween() results 1 2}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Ématome impressionnant</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +1</td></tr>
+				{{/rollBetween() results 1 2}}
+				{{#rollBetween() results 3 4}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Ématome et luxation d'un membre</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +2</td></tr>
+				{{/rollBetween() results 3 4}}
+				{{#rollBetween() results 5 6}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Fracture du nez, hémorragie nasale</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
+				{{/rollBetween() results 5 6}}
+				{{#rollBetween() results 7 8}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Fracture de côte</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
+				{{/rollBetween() results 7 8}}
+				{{#rollBetween() results 9 10}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis de bourrin dans la tempe</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +2</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Cible étourdie 3 assauts</td></tr>
+				{{/rollBetween() results 9 10}}
+				{{#rollTotal() results 11}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Coup précis au sternum</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Cible étourdie 4 assauts</td></tr>
+				{{/rollTotal() results 11}}
+				{{#rollTotal() results 12}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Luxation du genou</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts +3</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | MV 50% | AT -1 | PRD -2</td></tr>
+				{{/rollTotal() results 12}}
+				{{#rollTotal() results 13}}
+					{{#rollBetween() subresults 1 3}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Main droite cassée</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -1 | FO -2 | AT -5 | PRD -6</td></tr>
+					{{/rollBetween() subresults 1 3}}
+					{{#rollBetween() subresults 4 6}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Main gauche cassée</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">Dégats +3</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -1 | AT -2 | PRD -3</td></tr>
+					{{/rollBetween() subresults 4 6}}
+				{{/rollTotal() results 13}}
+				{{#rollTotal() results 14}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Mâchoire brisée</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts +3</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Incapacité à parler</td></tr>
+				{{/rollTotal() results 14}}
+				{{#rollTotal() results 15}}
+					{{#rollBetween() subresults 1 3}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Bras droit cassé</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">AD -4 | COU -2 | FO -4 | AT -5 | PRD -6</td></tr>
+					{{/rollBetween() subresults 1 3}}
+					{{#rollBetween() subresults 4 6}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Bras gauche cassé</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +4</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">AD -2 | COU -1 | FO -2 | AT -2 | PRD -3</td></tr>
+					{{/rollBetween() subresults 4 6}}
+				{{/rollTotal() results 15}}
+				{{#rollBetween() results 16 17}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Organes génitaux écrasés, houlala</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Degâts +5</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Cible étourdie 3 assauts</td></tr>
+				{{/rollBetween() results 16 17}}
+				{{#rollBetween() results 18 19}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Assommé</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Inconscient</td></tr>
+				{{/rollBetween() results 18 19}}
+				{{#rollTotal() results 20}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Enfoncement du nez dans le cerveau</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Décès</td></tr>
+				{{/rollTotal() results 20}}
+			{{/rollTotal() displayEffets 1}}
+		</tbody>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-fumble_atk">
+	<table class="sheet-rolltemplate-default">
+		<caption>{{name}}</caption>
+		<tbody>
+			<tr>
+				<td>Résolution</td>
+				<td>{{results}}</td>
+			</tr>
+			{{#rollTotal() displayEffets 1}}
+				{{#rollBetween() results 1 2}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Rattrape son erreur in extramis</td></tr>
+				{{/rollBetween() results 1 2}}
+				{{#rollBetween() results 3 5}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Trèbuche et chute maladroitement</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Rate 2 assauts</td></tr>
+				{{/rollBetween() results 3 5}}
+				{{#rollBetween() results 6 7}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Frappe un allié proche vers la gauche</td></tr>
+				{{/rollBetween() results 6 7}}
+				{{#rollBetween() results 8 9}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Frappe un allié proche vers la droite</td></tr>
+				{{/rollBetween() results 8 9}}
+				{{#rollBetween() results 10 12}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Lâche son arme comme un loser</td></tr>
+				{{/rollBetween() results 10 12}}
+				{{#rollBetween() results 13 15}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Casse son arme</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Voir point de rupture</td></tr>
+				{{/rollBetween() results 13 15}}
+				{{#rollBetween() results 16 18}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Se blesse tout seul comme un cake</td></tr>
+				{{/rollBetween() results 16 18}}
+				{{#rollTotal() results 19}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Se blesse très sévèrement de façcon atroce et douloureuse</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégâts critique</td></tr>
+				{{/rollTotal() results 19}}
+				{{#rollTotal() results 20}}
+					{{#rollBetween() subresults 1 2}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Perd un oeil</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -1 | CHA -3 | AT -1 | PRD -2</td></tr>
+					{{/rollBetween() subresults 1 2}}
+					{{#rollBetween() subresults 3 6}}
+						<tr><td colspan="2" class="sheet-td-noFirst">Perd un doigt</td></tr>
+						<tr><td colspan="2" class="sheet-td-noFirst">AD -2</td></tr>
+					{{/rollBetween() subresults 3 6}}
+				{{/rollTotal() results 20}}
+			{{/rollTotal() displayEffets 1}}
+		</tbody>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-crit_prd">
+	<table class="sheet-rolltemplate-default">
+		<caption>{{name}}</caption>
+		<tbody>
+			<tr>
+				<td>Résolution</td>
+				<td>{{results}}</td>
+			</tr>
+			{{#rollTotal() displayEffets 1}}
+				{{#rollBetween() results 1 2}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Mais non en fait : la parade était normale</td></tr>
+				{{/rollBetween() results 1 2}}
+				{{#rollBetween() results 3 5}}
+					<tr><td colspan="2" class="sheet-td-noFirst">Projectile magistralement placé</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Dégats +2</td></tr>
+				{{/rollBetween() results 3 5}}
+				{{#rollBetween() results 6 7}}
+					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi trébuche</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Il subit 1 attaque imparable</td></tr>
+				{{/rollBetween() results 6 7}}
+				{{#rollBetween() results 8 9}}
+					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi tombe</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Il subit 2 attaques imparables</td></tr>
+				{{/rollBetween() results 8 9}}
+				{{#rollBetween() results 10 12}}
+					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi lâche son arme à 1D6 mètres</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Il combat à mains nues</td></tr>
+				{{/rollBetween() results 10 12}}
+				{{#rollBetween() results 13 15}}
+					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi casse son arme</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Il combat à mains nues</td></tr>
+				{{/rollBetween() results 13 15}}
+				{{#rollBetween() results 16 18}}
+					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi reçoit un coup de votre arme</td></tr>
+					<tr><td colspan="2" class="sheet-td-noFirst">Il subit des dégâts</td></tr>
+				{{/rollBetween() results 16 18}}
+				{{#rollTotal() results 19}}
+					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi subit un coup critique avec votre arme</td></tr>
+				{{/rollTotal() results 19}}
+				{{#rollTotal() results 20}}
+					<tr><td colspan="2" class="sheet-td-noFirst">L'ennemi, ce loser, subit un coup critique avec son arme</td></tr>
+				{{/rollTotal() results 20}}
+			{{/rollTotal() displayEffets 1}}
+		</tbody>
+	</table>
+</rolltemplate>
