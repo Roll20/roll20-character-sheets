@@ -14426,7 +14426,7 @@
         if (levels && hitdie) {
             //Set the Roll for HP button
             let update = {};
-            update[`${levelclass}_rollhp`] = `<button type="roll" name="roll_${levelclass}_rollhp" value="@{wtype}&{template:mancerroll} {{title=Roll for HP}} {{r1=[[${levels}${hitdie}]]}}">Roll</button>`;
+            update[`${levelclass}_rollhp`] = `<button type="roll" name="roll_${levelclass}_rollhp" value="@{wtype}&{template:mancerroll} {{title=Roll for HP}} {{r1=[[${levels}${hitdie}]]}}{{desc=""}}>Roll</button>`;
             setCharmancerText(update);
 
             //Total up the average HP
@@ -14455,6 +14455,7 @@
         let set = {};
 
         set[`${levelclass}_addhp`] = result;
+        set[`${levelclass}_hp_flag`] = "roll";
 
         setAttrs(set);
     });
@@ -14505,8 +14506,6 @@
             };
         };
 
-        console.log(update);
-
         setAttrs(set);
         setCharmancerText(update);
     });
@@ -14523,10 +14522,12 @@
     on("clicked:class1_addhpAverage clicked:class2_addhpAverage clicked:class3_addhpAverage clicked:class4_addhpAverage", function(eventinfo) {
         const mancerdata= getCharmancerData();
         const leveldata = mancerdata["lp-levels"], levelclass = eventinfo.sourceAttribute.slice(0, 6), hp = leveldata.values[`${levelclass}_averagehp`];
+        let set          = {};
 
-        setAttrs({
-            [`${levelclass}_addhp`]: hp
-        });
+        set[`${levelclass}_addhp`] = hp;
+        set[`${levelclass}_hp_flag`] = "average";
+
+        setAttrs(set);
     });
 
     on("clicked:class1 clicked:class2 clicked:class3 clicked:class4 clicked:class1_subclass clicked:class2_subclass clicked:class3_subclass clicked:class4_subclass", function(eventinfo) {
@@ -17064,7 +17065,8 @@
                 </div>
                 <div>
                     <h2>HP</h2>
-                    <input type="number" class="" name="comp_class1_addhp">
+                    <input type="number" class="" name="comp_class1_addhp" />
+                    <input type="hidden" class="hp-flag" name="comp_class1_hp_flag" value="" />
                     <div class="class1_rollhp" style="display: inline;">
                         <button type="roll" name="roll_class1_rollhp" value="" title="">Roll</button>
                     </div>
@@ -17104,7 +17106,8 @@
                 </div>
                 <div>
                     <h2>HP</h2>
-                    <input type="number" name="comp_class2_addhp">
+                    <input type="number" name="comp_class2_addhp" />
+                    <input type="hidden" class="hp-flag" name="comp_class2_hp_flag" value="" />
                     <div class="class2_rollhp" style="display: inline;">
                         <button type="roll" name="roll_class2_rollhp" value="" title="You must input a level increase to this class">Roll</button>
                     </div>
@@ -17144,7 +17147,8 @@
                 </div>
                 <div>
                     <h2>HP</h2>
-                    <input type="number" class="" name="comp_class3_addhp">
+                    <input type="number" class="" name="comp_class3_addhp" />
+                    <input type="hidden" class="hp-flag" name="comp_class3_hp_flag" value="" />
                     <div class="class3_rollhp" style="display: inline;">
                         <button type="roll" name="roll_class3_rollhp" value="" title="You must input a level increase to this class">Roll</button>
                     </div>
@@ -17182,7 +17186,8 @@
                 </div>
                 <div>
                     <h2>HP</h2>
-                    <input type="number" class="" name="comp_class4_addhp">
+                    <input type="number" class="" name="comp_class4_addhp" />
+                    <input type="hidden" class="hp-flag" name="comp_class4_hp_flag" value="" />
                     <div class="class4_rollhp" style="display: inline;">
                         <button type="roll" name="roll_class4_rollhp" value="" title="You must input a level increase to this class">Roll</button>
                     </div>
