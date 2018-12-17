@@ -11195,7 +11195,7 @@
         if(thismancer == "l1") {
             blobs = getRelevantBlobs(mancerdata, "1", "l1");
         } else {
-            blobs = getAllLpBlobs(data, true);
+            blobs = getAllLpBlobs(data, true, false);
             allProficiencies = data["lp-welcome"].values["previous_proficiencies"] ? JSON.parse(data["lp-welcome"].values["previous_proficiencies"]) : allProficiencies;
         }
         currentSlide = currentSlide == "lp-finish" ? "finish" : currentSlide;
@@ -14166,7 +14166,7 @@
         var buttoninfo = {
             welcome: "charmancer-start",
             levels: "levels-u",
-            choices: "choices-u",
+            choices: "features-u",
             asi: "asi-u",
             spells: "spells-u",
             summary: "review-u"
@@ -14303,7 +14303,7 @@
         };
         
         const multiclass = parseInt(previous["multiclass1_flag"]) + parseInt(previous["multiclass2_flag"]) + parseInt(previous["multiclass3_flag"]);
-        set["multiclass"] = (!mancerdata["lp-levels"].values["multiclass"]) ? multiclass : mancerdata["lp-levels"].values["multiclass"];
+        set["multiclass"] = mancerdata["lp-levels"] && mancerdata["lp-levels"].values["multiclass"] ? mancerdata["lp-levels"].values["multiclass"] : multiclass;
         set["multiclass_initial"] = multiclass;
 
         for (x = 1; x <= 3; x++) {
@@ -14630,13 +14630,13 @@
         return filteredblobs;
     };
 
-    var getAllLpBlobs = function(mancerdata, choices) {
+    var getAllLpBlobs = function(mancerdata, choices, include_asi) {
         mancerdata = mancerdata || getCharmancerData();
         var leveldata = getLevelingData(mancerdata);
         var blobs = {all: [], sorted: {}, names: {}};
         _.each(leveldata, function(level) {
             var name = "class" + level.classnumber;
-            var theseblobs = getLpBlobs(level, true);
+            var theseblobs = getLpBlobs(level, include_asi);
             blobs.names[name] = _.pluck(theseblobs.class, "name") || [];
             if(mancerdata["lp-choices"] && choices) {
                 _.each(mancerdata["lp-choices"].values, function(value, id) {
@@ -14707,10 +14707,11 @@
 
     on("page:lp-asi", function(eventinfo) {
         var mancerdata = getCharmancerData();
-        var leveling = {};
+        var leveling = getLevelingData(mancerdata);
         var asis = [];
         var update = {};
-        for(var x=1; x<=4; x++) {
+        var multiclass = mancerdata["lp-levels"].values.multiclass ? parseInt(mancerdata["lp-levels"].values.multiclass) : 0;
+        for(var x=1; x<=multiclass + 1; x++) {
             if(mancerdata["lp-levels"].data["class" + x]) {
                 var thisclass = {};
                 thisclass.class = mancerdata["lp-levels"].data["class" + x];
@@ -14729,7 +14730,6 @@
                 }
             });
         });
-        console.log(asis);
         _.each(asis, function(asi) {
             addRepeatingSection("choices", "asi-row", function(rowid) {
                 update[rowid + " .sheet-title"] = "Ability Score Increase: " + asi;
@@ -15148,7 +15148,10 @@
                 var known = spellpage.values.knowncantrips || 0;
                 update[cantripsection + " label .sheet-number"] = (known + newspells) + " / " + (known + allowed);
             } else {
-                update[cantripsection + " .sheet-spellstext .sheet-total"] = newspells + " / " + (allowed + replaced) + " new spells added.";
+                update[cantripsection + " .sheet-spellstext .sheet-total"] = newspells + " / " + (allowed + replaced) + " spells chosen.";
+                if(replaced > 0) {
+                    update[cantripsection + " .sheet-spellstext .sheet-total"] += "<br>(" + allowed + " new, " + replaced + " replaced)";
+                }
                 if(allowedreplace > 0) {
                     update[cantripsection + " .sheet-replacetext .sheet-total"] = replaced + " / " + allowedreplace + " spells replaced.";
                 }
@@ -15431,7 +15434,7 @@
         var previous = data["lp-welcome"].values["previous_attributes"] ? JSON.parse(data["lp-welcome"].values["previous_attributes"]) : {};
         var repeating = data["lp-welcome"].values["previous_repeating"] ? JSON.parse(data["lp-welcome"].values["previous_repeating"]) : {};
         var spelldata = data["lp-welcome"].values["spellinfo"] ? JSON.parse(data["lp-welcome"].values["spellinfo"]) : {};
-        var blobs = getAllLpBlobs(data, true);
+        var blobs = getAllLpBlobs(data, true, true);
         var customtraits = {race: [], subrace: [], class: [], subclass: [], background: []};
         var profs = getProficiencies(data, "lp-finish");
         var removesections = [];
@@ -15711,8 +15714,8 @@
         </div>
         <div class="replacetext">
             <div class="summary"></div>
-            <div class="total"></div>
             <div class="replace-info choice">Removed spells will be marked with a <span>r</span> symbol so you can find it easily if you change your mind.</div>
+            <div class="total"></div>
         </div>
     </div>
 </charmancer>
