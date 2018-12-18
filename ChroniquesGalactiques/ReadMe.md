@@ -9,9 +9,15 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-editions.fr/catalogue.php?id=207) #17,18 et 19.
 
 # Version courante
-3.1 [Screenshot](cog_v3.png)
+3.2 [Screenshot](cog_v3.png)
 
 # Notes de version
+## v3.2 (2018-12-11)
+* Ajout de la section répétable des "Autres traits" avec un bouton d'affichage murmuré dans le chat
+* Corrections et ajustements divers (typo, erreurs de noms d'attributs, espaces surnuméraires dans les macros)
+* Ajout d'une classe de bouton 'output' représenté par une bulle d'aide
+* Ajout d'une classe d'affichage 'text' pour utilisation dans le roll template (texte sans limite de scrolling, avec police à 90%, en italique et justifié)
+
 ## v3.1 (2018-12-03)
 * Ajout du d3 au selecteur des dés de dommages
 * Ajout d'un groupe de dés de dommages "sans limite" (armes à feu)
