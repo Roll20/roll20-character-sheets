@@ -694,7 +694,7 @@
     on("change:fatigue change:healing_rate", function() { calc_fatigue(); });
 
     //Skills Auto Calc
-    var calc_skill = function(skill_name, char1, char2) {
+    var calc_skill = function(skill_name, char1, char2, learned) {
         var skill_base = skill_name + "_base";
         var skill_xp = skill_name + "_experience";
         var skill_temp = skill_name + "_temp";
@@ -766,7 +766,7 @@
             }
 
             var herc_mod = parseFloat(v.herculean_mod);
-            var std = base_value + parseInt(v[skill_xp]) + parseInt(v[skill_temp]) + parseInt(v[skill_other]);
+            var std = (base_value + parseInt(v[skill_xp]) + parseInt(v[skill_temp]) + parseInt(v[skill_other])) * parseInt(learned);
             var veasy = std * 2;
             var easy = Math.ceil(std * 1.5);
             var hard = Math.ceil(std * (2/3));
@@ -786,47 +786,119 @@
     };
 
     // Known Skills Auto Calc
-    on("change:pow change:int change:arcane_casting_experience change:arcane_casting_other change:arcane_casting_temp change:arcane_casting_penalty change:herculean_mod ", function() { calc_skill("arcane_casting", "@{int}", "@{pow}"); });
-    on("change:int change:arcane_knowledge_experience change:arcane_knowledge_other change:arcane_knowledge_temp change:arcane_knowledge_penalty change:herculean_mod ", function() { calc_skill("arcane_knowledge", "@{int}", "@{int}"); });
+    on("change:pow change:int change:arcane_casting_experience change:arcane_casting_other change:arcane_casting_temp change:arcane_casting_penalty change:arcane_casting_learned change:herculean_mod ", function() {
+        getAttrs(["arcane_casting_learned"], function(v) {
+            calc_skill("arcane_casting", "@{int}", "@{pow}", v.arcane_casting_learned);
+        });
+    });
+    on("change:int change:arcane_knowledge_experience change:arcane_knowledge_other change:arcane_knowledge_temp change:arcane_knowledge_penalty change:arcane_knowledge_learnedchange:herculean_mod ", function() {
+        getAttrs(["arcane_knowledge_learned"], function(v) {
+            calc_skill("arcane_knowledge", "@{int}", "@{int}", v.arcane_knowledge_learned);
+        });    
+    });
     on("change:str change:dex change:athletics_experience change:athletics_other change:athletics_temp change:athletics_penalty change:herculean_mod ", function() { calc_skill("athletics", "@{str}", "@{dex}"); });
-    on("change:cha change:pow change:binding_experience change:binding_other change:binding_temp change:binding_penalty change:herculean_mod ", function() { calc_skill("binding", "@{cha}", "@{pow}"); });
+    on("change:cha change:pow change:binding_experience change:binding_other change:binding_temp change:binding_penalty change:binding_learned change:herculean_mod ", function() {
+        getAttrs(["binding_learned"], function(v) {
+            calc_skill("binding", "@{cha}", "@{pow}", v.binding_learned);
+        });    
+    });
     on("change:str change:con change:boating_experience change:boating_other change:boating_temp change:boating_penalty change:herculean_mod ", function() { calc_skill("boating", "@{str}", "@{con}"); });
     on("change:str change:siz change:brawn_experience change:brawn_other change:brawn_temp change:brawn_penalty change:herculean_mod ", function() { calc_skill("brawn", "@{str}", "@{siz}"); });
-    on("change:cha change:int change:channel_experience change:channel_other change:channel_temp change:channel_penalty change:herculean_mod ", function() { calc_skill("channel", "@{cha}", "@{int}"); });
+    on("change:cha change:int change:channel_experience change:channel_other change:channel_temp change:channel_penalty change:channel_learned change:herculean_mod ", function() {
+        getAttrs(["channel_learned"], function(v) {
+            calc_skill("channel", "@{cha}", "@{int}", v.channel_learned);
+        });    
+    });
     on("change:dex change:pow change:conceal_experience change:conceal_other change:conceal_temp change:conceal_penalty change:herculean_mod ", function() { calc_skill("conceal", "@{dex}", "@{pow}"); });
-    on("change:pow change:cha change:cursing_experience change:cursing_other change:cursing_temp change:cursing_penalty change:herculean_mod ", function() { calc_skill("cursing", "@{pow}", "@{cha}"); });
+    on("change:pow change:cha change:cursing_experience change:cursing_other change:cursing_temp change:cursing_penalty change:cursing_learned change:herculean_mod ", function() {
+        getAttrs(["cursing_learned"], function(v) {
+            calc_skill("cursing", "@{pow}", "@{cha}", v.cursing_learned);
+        });    
+    });
     on("change:int change:customs_experience change:customs_other change:customs_temp change:customs_penalty change:herculean_mod ", function() { calc_skill("customs", "@{int}", "@{int}"); });
     on("change:dex change:cha change:dance_experience change:dance_other change:dance_temp change:dance_penalty change:herculean_mod ", function() { calc_skill("dance", "@{cha}", "@{dex}"); });
     on("change:int change:cha change:deceit_experience change:deceit_other change:deceit_temp change:deceit_penalty change:herculean_mod ", function() { calc_skill("deceit", "@{int}", "@{cha}"); });
-    on("change:pow change:int change:divination_experience change:divination_other change:divination_temp change:divination_penalty change:herculean_mod ", function() { calc_skill("divination", "@{int}", "@{pow}"); });
+    on("change:pow change:int change:divination_experience change:divination_other change:divination_temp change:divination_penalty change:herculean_mod ", function() {
+        getAttrs(["divination_learned"], function(v) {
+            calc_skill("divination", "@{pow}", "@{int}", v.divination_learned);
+        });    
+    });
     on("change:dex change:pow change:drive_experience change:drive_other change:drive_temp change:drive_penalty change:herculean_mod ", function() { calc_skill("drive", "@{dex}", "@{pow}"); });
     on("change:con change:endurance_experience change:endurance_other change:endurance_temp change:endurance_penalty change:herculean_mod ", function() { calc_skill("endurance", "@{con}", "@{con}"); });
     on("change:dex change:evade_experience change:evade_other change:evade_temp change:evade_penalty change:herculean_mod ", function() { calc_skill("evade", "@{dex}", "@{dex}"); });
-    on("change:cha change:int change:exhort_experience change:exhort_other change:exhort_temp change:exhort_penalty change:herculean_mod ", function() { calc_skill("exhort", "@{cha}", "@{int}"); });
-    on("change:cha change:pow change:fata_experience change:fata_other change:fata_temp change:fata_penalty change:herculean_mod ", function() { calc_skill("fata", "@{cha}", "@{pow}"); });
+    on("change:cha change:int change:exhort_experience change:exhort_other change:exhort_temp change:exhort_penalty change:herculean_mod ", function() {
+        getAttrs(["exhort_learned"], function(v) {
+            calc_skill("exhort", "@{cha}", "@{int}", v.exhort_learned);
+        });    
+    });
+    on("change:cha change:pow change:fata_experience change:fata_other change:fata_temp change:fata_penalty change:herculean_mod ", function() {
+        getAttrs(["fata_learned"], function(v) {
+            calc_skill("fata", "@{cha}", "@{pow}", v.fata_learned);
+        });    
+    });
     on("change:int change:dex change:first_aid_experience change:first_aid_other change:first_aid_temp change:first_aid_penalty change:herculean_mod ", function() { calc_skill("first_aid", "@{int}", "@{dex}"); });
-    on("change:cha change:pow change:folk_magic_experience change:folk_magic_other change:folk_magic_temp change:folk_magic_penalty change:herculean_mod ", function() { calc_skill("folk_magic", "@{pow}", "@{cha}"); });
+    on("change:cha change:pow change:folk_magic_experience change:folk_magic_other change:folk_magic_temp change:folk_magic_penalty change:herculean_mod ", function() {
+        getAttrs(["folk_magic_learned"], function(v) {
+            calc_skill("folk_magic", "@{cha}", "@{pow}", v.folk_magic_learned);
+        });    
+    });
     on("change:int change:home_parallel_experience change:home_parallel_other change:home_parallel_temp change:home_parallel_penalty change:herculean_mod ", function() { calc_skill("home_parallel", "@{int}", "@{int}"); });
     on("change:cha change:influence_experience change:influence_other change:influence_temp change:influence_penalty change:herculean_mod ", function() { calc_skill("influence", "@{cha}", "@{cha}"); });
     on("change:int change:pow change:insight_experience change:insight_other change:insight_temp change:insight_penalty change:herculean_mod ", function() { calc_skill("insight", "@{int}", "@{pow}"); });
-    on("change:int change:cha change:linguistics_experience change:linguistics_other change:linguistics_temp change:linguistics_penalty change:herculean_mod ", function() { calc_skill("linguistics", "@{int}", "@{cha}"); });
+    on("change:int change:cha change:linguistics_experience change:linguistics_other change:linguistics_temp change:linguistics_penalty change:herculean_mod ", function() {
+        getAttrs(["linguistics_learned"], function(v) {
+            calc_skill("linguistics", "@{cha}", "@{int}", v.linguistics_learned);
+        });    
+    });
     on("change:int change:locale_experience change:locale_other change:locale_temp change:locale_penalty change:herculean_mod ", function() { calc_skill("locale", "@{int}", "@{int}"); });
-    on("change:int change:con change:meditation_experience change:meditation_other change:meditation_temp change:meditation_penalty change:herculean_mod ", function() { calc_skill("meditation", "@{int}", "@{con}"); });
+    on("change:int change:con change:meditation_experience change:meditation_other change:meditation_temp change:meditation_penalty change:herculean_mod ", function() {
+        getAttrs(["meditation_learned"], function(v) {
+            calc_skill("meditation", "@{con}", "@{int}", v.meditation_learned);
+        });    
+    });
     on("change:int change:cha change:native_tongue_experience change:native_tongue_other change:native_tongue_temp change:native_tongue_penalty change:herculean_mod ", function() { calc_skill("native_tongue", "@{int}", "@{cha}"); });
-    on("change:cha change:int change:necromancy_experience change:necromancy_other change:necromancy_temp change:necromancy_penalty change:herculean_mod ", function() { calc_skill("necromancy", "@{int}", "@{cha}"); });
-    on("change:int change:pharmacy_experience change:pharmacy_other change:pharmacy_temp change:pharmacy_penalty change:herculean_mod ", function() { calc_skill("pharmacy", "@{int}", "@{int}"); });
-    on("change:cha change:pow change:piety_experience change:piety_other change:piety_temp change:piety_penalty change:herculean_mod ", function() { calc_skill("piety", "@{cha}", "@{pow}"); });
+    on("change:cha change:int change:necromancy_experience change:necromancy_other change:necromancy_temp change:necromancy_penalty change:herculean_mod ", function() {
+        getAttrs(["necromancy_learned"], function(v) {
+            calc_skill("necromancy", "@{cha}", "@{int}", v.necromancy_learned);
+        });    
+    });
+    on("change:int change:pharmacy_experience change:pharmacy_other change:pharmacy_temp change:pharmacy_penalty change:herculean_mod ", function() {
+        getAttrs(["pharmacy_learned"], function(v) {
+            calc_skill("pharmacy", "@{int}", "@{int}", v.pharmacy_learned);
+        });    
+    });
+    on("change:cha change:pow change:piety_experience change:piety_other change:piety_temp change:piety_penalty change:herculean_mod ", function() {
+        getAttrs(["piety_learned"], function(v) {
+            calc_skill("piety", "@{cha}", "@{pow}", v.piety_learned);
+        });    
+    });
     on("change:int change:pow change:perception_experience change:perception_other change:perception_temp change:perception_penalty change:herculean_mod ", function() { calc_skill("perception", "@{int}", "@{pow}"); });
     on("change:dex change:pow change:ride_experience change:ride_other change:ride_temp change:ride_penalty change:herculean_mod ", function() { calc_skill("ride", "@{dex}", "@{pow}"); });
-    on("change:con change:pow change:shape_shifting_experience change:shape_shifting_other change:shape_shifting_temp change:shape_shifting_penalty change:herculean_mod ", function() { calc_skill("shape_shifting", "@{con}", "@{pow}"); });
-    on("change:int change:pow change:shaping_experience change:shaping_other change:shaping_temp change:shaping_penalty change:herculean_mod ", function() { calc_skill("shaping", "@{int}", "@{pow}"); });
+    on("change:con change:pow change:shape_shifting_experience change:shape_shifting_other change:shape_shifting_temp change:shape_shifting_penalty change:herculean_mod ", function() {
+        getAttrs(["shape_shifting_learned"], function(v) {
+            calc_skill("shape_shifting", "@{con}", "@{pow}", v.shape_shifting_learned);
+        });    
+    });
+    on("change:int change:pow change:shaping_experience change:shaping_other change:shaping_temp change:shaping_penalty change:herculean_mod ", function() {
+        getAttrs(["shaping_learned"], function(v) {
+            calc_skill("shaping", "@{int}", "@{pow}", v.shaping_learned);
+        });    
+    });
     on("change:cha change:pow change:sing_experience change:sing_other change:sing_temp change:sing_penalty change:herculean_mod ", function() { calc_skill("sing", "@{cha}", "@{pow}"); });
     on("change:status_base change:status_experience change:status_temp change:status_other change:status_penalty change:herculean_mod", function() { calc_skill("status", "0", "0"); });
     on("change:int change:dex change:stealth_experience change:stealth_other change:stealth_temp change:stealth_penalty change:herculean_mod ", function() { calc_skill("stealth", "@{int}", "@{dex}"); });
     on("change:int change:pow change:superstition_experience change:superstition_other change:superstition_temp change:superstition_penalty change:herculean_mod ", function() { calc_skill("superstition", "@{int}", "@{pow}"); });
     on("change:str change:con change:swim_experience change:swim_other change:swim_temp change:swim_penalty change:herculean_mod ", function() { calc_skill("swim", "@{str}", "@{con}"); });
-    on("change:pow change:theology_experience change:theology_other change:theology_temp change:theology_penalty change:herculean_mod ", function() { calc_skill("theology", "@{pow}", "@{pow}"); });
-    on("change:con change:pow change:trance_experience change:trance_other change:trance_temp change:trance_penalty change:herculean_mod ", function() { calc_skill("trance", "@{con}", "@{pow}"); });
+    on("change:pow change:theology_experience change:theology_other change:theology_temp change:theology_penalty change:herculean_mod ", function() {
+        getAttrs(["theology_learned"], function(v) {
+            calc_skill("theology", "@{pow}", "@{pow}", v.theology_learned);
+        });    
+    });
+    on("change:con change:pow change:trance_experience change:trance_other change:trance_temp change:trance_penalty change:herculean_mod ", function() {
+        getAttrs(["trance_learned"], function(v) {
+            calc_skill("trance", "@{con}", "@{pow}", v.trance_learned);
+        });    
+    });
     on("change:str change:dex change:unarmed_experience change:unarmed_other change:unarmed_temp change:unarmed_penalty change:herculean_mod ", function() { calc_skill("unarmed", "@{str}", "@{dex}"); });
     on("change:pow change:willpower_experience change:willpower_other change:willpower_temp change:willpower_penalty change:herculean_mod ", function() { calc_skill("willpower", "@{pow}", "@{pow}"); });
     // Repeating Language Auto Calc
@@ -886,55 +958,62 @@
     });
     // Repeating Affliation Auto Calc
     on("change:repeating_affiliation", function(event_info) { calc_skill(event_info.triggerName, "0", "0"); });
-
-    // Unknown Repeating Skills Auto Calc
-    on("change:repeating_combatstyle change:repeating_standardskill change:repeating_professionalskill change:repeating_invocation", function(event_info) {
-        //mspace-paths(rename) disciplines(rename)
-        var char1 = event_info.triggerName + "_char1";
-        var char2 = event_info.triggerName + "_char2";
-        getAttrs([char1, char2], function(v) {
-            calc_skill(event_info.triggerName, v[char1], v[char2]);
-        });
-    });
-    on("change:str change:con change:siz change:dex change:int change:cha change:pow change:herculean_mod", function() {
+    // Repeating Combat Style Auto Calc
+    on("change:str change:con change:siz change:dex change:int change:cha change:pow change:herculean_mod change:repeating_combatstyle", function() {
         getSectionIDs("repeating_combatstyle", function(idarray) {
             if(idarray.length > 0) {
                 _.each(idarray, function(currentID, i) {
                     var char1 = "repeating_combatstyle_" + currentID + "_char1";
                     var char2 = "repeating_combatstyle_" + currentID + "_char2";
-                    calc_skill("repeating_combatstyle_" + currentID, v[char1], v[char2]);
+                    getAttrs([char1, char2], function(v) {
+                        calc_skill("repeating_combatstyle_" + currentID, v[char1], v[char2]);
+                    });
                 });
             }
         });
+    });
+    // Repeating Standard Skill Auto Calc
+    on("change:str change:con change:siz change:dex change:int change:cha change:pow change:herculean_mod change:repeating_standardskill", function() {
         getSectionIDs("repeating_standardskill", function(idarray) {
             if(idarray.length > 0) {
                 _.each(idarray, function(currentID, i) {
                     var char1 = "repeating_standardskill_" + currentID + "_char1";
                     var char2 = "repeating_standardskill_" + currentID + "_char2";
-                    calc_skill("repeating_standardskill_" + currentID, v[char1], v[char2]);
+                    getAttrs([char1, char2], function(v) {
+                        calc_skill("repeating_standardskill_" + currentID, v[char1], v[char2]);
+                    });
                 });
             }
         });
+    });
+    // Repeating Professional Skill Auto Calc
+    on("change:str change:con change:siz change:dex change:int change:cha change:pow change:herculean_mod change:repeating_professionalskill", function() {
         getSectionIDs("repeating_professionalskill", function(idarray) {
             if(idarray.length > 0) {
                 _.each(idarray, function(currentID, i) {
                     var char1 = "repeating_professionalskill_" + currentID + "_char1";
                     var char2 = "repeating_professionalskill_" + currentID + "_char2";
-                    calc_skill("repeating_professionalskill_" + currentID, v[char1], v[char2]);
+                    getAttrs([char1, char2], function(v) {
+                        calc_skill("repeating_professionalskill_" + currentID, v[char1], v[char2]);
+                    });
                 });
             }
         });
+    });
+    // Repeating Invocation Auto Calc
+    on("change:str change:con change:siz change:dex change:int change:cha change:pow change:herculean_mod change:repeating_invocation", function() {
         getSectionIDs("repeating_invocation", function(idarray) {
             if(idarray.length > 0) {
                 _.each(idarray, function(currentID, i) {
                     var char1 = "repeating_invocation_" + currentID + "_char1";
                     var char2 = "repeating_invocation_" + currentID + "_char2";
-                    calc_skill("repeating_invocation_" + currentID, v[char1], v[char2]);
+                    getAttrs([char1, char2], function(v) {
+                        calc_skill("repeating_invocation_" + currentID, v[char1], v[char2]);
+                    });
                 });
             }
         });
     });
-    
 
     // Passions and Dependencies Auto Calc
     var calc_passion = function(skill_name) {
@@ -1391,6 +1470,68 @@
             newattrs["hp_use_pow"] = v.hit_locations_robust;
             
             setAttrs(newattrs);
+        });
+
+        getSectionIDs("repeating_mspower", function(idarray) {
+            for(var i=0; i < idarray.length; i++) {
+                var id = idarray[i];
+
+                var old_fumbled = "repeating_mspower_" + id + "_fumbled";
+                var old_trained = "repeating_mspower_" + id + "_trained";
+                var old_augment = "repeating_mspower_" + id + "_augment";
+                var old_penalty = "repeating_mspower_" + id + "_penalty";
+                var old_sphere = "repeating_mspower_" + id + "_sphere";
+                var old_arc = "repeating_mspower_" + id + "_arc";
+                var old_details = "repeating_mspower_" + id + "_details";
+                var old_experience = "repeating_mspower_" + id + "_experience";
+                var old_other = "repeating_mspower_" + id + "_other";
+                var old_cost = "repeating_mspower_" + id + "_cost";
+                var old_description = "repeating_mspower_" + id + "_description";
+                getAttrs([old_fumbled, old_trained, old_augment, old_penalty, old_sphere, old_arc, old_details, old_experience, old_other, old_cost, old_description], function(v) {
+                    var newrowid = generateRowID();
+                    var newrowattrs = {};
+                    newrowattrs["repeating_psionicpower_" + newrowid + "_fumbled"] = v[old_fumbled];
+                    newrowattrs["repeating_psionicpower_" + newrowid + "_trained"] = v[old_trained];
+                    newrowattrs["repeating_psionicpower_" + newrowid + "_temp"] = v[old_augment];
+                    newrowattrs["repeating_psionicpower_" + newrowid + "_penalty"] = v[old_penalty];
+                    newrowattrs["repeating_psionicpower_" + newrowid + "_sphere"] = v[old_sphere];
+                    newrowattrs["repeating_psionicpower_" + newrowid + "_arc"] = v[old_arc];
+                    newrowattrs["repeating_psionicpower_" + newrowid + "_details"] = v[old_details];
+                    newrowattrs["repeating_psionicpower_" + newrowid + "_experience"] = v[old_experience];
+                    newrowattrs["repeating_psionicpower_" + newrowid + "_other"] = v[old_other];
+                    newrowattrs["repeating_psionicpower_" + newrowid + "_cost"] = v[old_cost];
+                    newrowattrs["repeating_psionicpower_" + newrowid + "_description"] = v[old_description];
+                    setAttrs(newrowattrs);
+                });
+            }
+        });
+
+        getSectionIDs("repeating_ladiscipline", function(idarray) {
+            for(var i=0; i < idarray.length; i++) {
+                var id = idarray[i];
+
+                var old_fumbled = "repeating_ladiscipline_" + id + "_fumbled";
+                var old_trained = "repeating_ladiscipline_" + id + "_trained";
+                var old_augment = "repeating_ladiscipline_" + id + "_augment";
+                var old_penalty = "repeating_ladiscipline_" + id + "_penalty";
+                var old_details = "repeating_ladiscipline_" + id + "_details";
+                var old_experience = "repeating_ladiscipline_" + id + "_experience";
+                var old_other = "repeating_ladiscipline_" + id + "_other";
+                var old_discipline_talents = "repeating_ladiscipline_" + id + "_discipline_talents";
+                getAttrs([old_fumbled, old_trained, old_augment, old_penalty, old_details, old_experience, old_other, old_discipline_talents], function(v) {
+                    var newrowid = generateRowID();
+                    var newrowattrs = {};
+                    newrowattrs["repeating_discipline_" + newrowid + "_fumbled"] = v[old_fumbled];
+                    newrowattrs["repeating_discipline_" + newrowid + "_trained"] = v[old_trained];
+                    newrowattrs["repeating_discipline_" + newrowid + "_temp"] = v[old_augment];
+                    newrowattrs["repeating_discipline_" + newrowid + "_penalty"] = v[old_penalty];
+                    newrowattrs["repeating_discipline_" + newrowid + "_details"] = v[old_details];
+                    newrowattrs["repeating_discipline_" + newrowid + "_experience"] = v[old_experience];
+                    newrowattrs["repeating_discipline_" + newrowid + "_other"] = v[old_other];
+                    newrowattrs["repeating_discipline_" + newrowid + "_discipline_talents"] = v[old_discipline_talents];
+                    setAttrs(newrowattrs);
+                });
+            }
         });
         
         calc_str();
@@ -4161,7 +4302,6 @@
 	                    skillattrs["repeating_combatstyle_" + skillid + "_char1"] = "@{pow}";
 	                    skillattrs["repeating_combatstyle_" + skillid + "_char2"] = "@{cha}";
 	                    skillattrs["repeating_combatstyle_" + skillid + "_experience"] = skillValue - pow - cha;
-	                    skillattrs["repeating_combatstyle_" + skillid + "_encumbered"] = 0;
 	                    skillattrs["repeating_combatstyle_" + skillid + "_details"] = 0;
 	                    skillattrs["binding_learned"] = "1";
 	                    skillattrs["binding_experience"] = skillValue - pow - cha;
@@ -4313,63 +4453,54 @@
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - cha - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{cha}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "acrobatics") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - str - dex;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{str}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{dex}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 1;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "astrogation") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "bureaucracy") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "command") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "commerce") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "comms") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "computers") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "courtesy") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "demolitions") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
@@ -4383,217 +4514,186 @@
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "electronics") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - dex - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{dex}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 1;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "engineering") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "forgery") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - pow;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{pow}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "gambling") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - pow;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{pow}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "healing") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - pow;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{pow}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "law") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "linguistics") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "lockpicking") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - dex - dex;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{dex}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{dex}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 1;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "lycanthropy") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - con - pow;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{con}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{pow}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "mechanisms") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - dex - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{dex}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 1;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "medicine") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - pow;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{pow}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "navigation") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - pow;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{pow}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "oratory") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - pow - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{pow}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "pilot") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - dex - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{dex}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 1;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "probabilities") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "politics") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "research") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - pow;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{pow}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "rhetoric") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - pow - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{pow}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "seamanship") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - con;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{con}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "seduction") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "sensors") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - pow;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{pow}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "sleight") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - dex - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{dex}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 1;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "streetwise") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - pow - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{pow}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "survival") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - pow - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{pow}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "teach") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "track") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - con;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{con}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase().indexOf("art") !== -1) {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - pow - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{pow}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase().indexOf("craft") !== -1) {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - dex - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{dex}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 1;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase().indexOf("culture") !== -1) {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase().indexOf("knowledge") !== -1) {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase().indexOf("language") !== -1) {
 	                    skillattrs["repeating_language_" + skillid + "_name"] = skillKey;
@@ -4604,28 +4704,24 @@
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase().indexOf("lore") !== -1) {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase().indexOf("musicianship") !== -1) {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - dex - cha;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{dex}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{cha}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 1;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase().indexOf("science") !== -1) {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - int;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{int}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase().indexOf("passion") !== -1) {
 	                    skillattrs["repeating_passion_" + skillid + "_name"] = skillKey;
