@@ -7,6 +7,13 @@ Versions have three numbers Major.Minor.Release
 
 **Release**: Indicates bugfixes and minor UI changes only.
 
+## 2.0.1
+
+### Bug fixes and minor changes
+* reinstate translations overwritten by initial merge to Roll20 master
+* add roll20userid details for sheet authors
+* change asset locations to reference roll20 master repository, not fork
+
 ## 2.0
 
 *Update by the **Fellowship of the Roll20 Character Sheet**. This is intended to be as close as possible to the formatting of the print version of the 'The One Ring' character sheet, while still fully compatible with version 1.0.0 of the sheet, and with data from the 'Anneau Unique' and 'Der Eine Ring' sheets.*
