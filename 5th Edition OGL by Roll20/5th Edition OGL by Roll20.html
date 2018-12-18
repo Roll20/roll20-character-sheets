@@ -8337,6 +8337,15 @@
                 update["repeating_tohitmod_" + id + "_global_attack_active_flag"] = "1";
                 update["repeating_tohitmod_" + id + "_options-flag"] = "0";
                 update["global_attack_mod_flag"] = "1";
+            };
+            if(blob["Initiative"]) {
+                if(blob["Initiative"].toLowerCase() === "advantage") {
+                    update["initiative_style"] = "{@{d20},@{d20}}kh1";
+                } else if (blob["Initiative"].toLowerCase() === "disadvantage") {
+                    update["initiative_style"] = "{@{d20},@{d20}}kl1";
+                } else {
+                    update.initmod = blob["Initiative"];
+                }
             }
         });
 
@@ -11292,6 +11301,9 @@
                 }
             });
         };
+        _.each(allProficiencies, function(section, name) {
+            allProficiencies[name] = _.without(section, "");
+        });
         return({auto: auto, all: allProficiencies});
     };
 
@@ -14311,7 +14323,7 @@
             if(previous[`multiclass${x}_flag`] === "1") {
                 set[`class${x1}`] = "Classes:" + previous[`multiclass${x}`];
                 set[`class${x1}_currentlevel`] = previous[`multiclass${x}_lvl`];
-                update[`class${x1}_selector`] = `<div style="width:20%; display: inherit;">${classes}</div>`;
+                update[`class${x1}_selector`] = `<div style="width:20%; display: inherit;">${previous[`multiclass${x}`]}</div>`;
                 if (previous[`multiclass${x}_subclass`]) {
                     set[`class${x1}_subclass`] = "Subclass:" + previous[`multiclass${x}_subclass`];
                     update[`subclass${x1}_selector`] = `<div>` + previous[`multiclass${x}_subclass`] + `</div>`;
@@ -15507,13 +15519,15 @@
         //Set up proficiency drops
         _.each(["Armor", "Language", "Tool", "Weapon"], function(proftype) {
             _.each(profs.all[proftype], function(prof) {
-                var profdata = {name: "Proficiencies:" + prof, data: {Type: proftype}}
-                if(profs.all.Expertise.indexOf(prof) != -1) {
-                    profdata.data["toolbonus_base"] = "(@{pb}*2)";
-                    allDrops.unshift(profdata);
-                } else {
-                    allDrops.push(profdata);
-                }
+                if(prof) {
+                    var profdata = {name: "Proficiencies:" + prof, data: {Type: proftype}}
+                    if(profs.all.Expertise.indexOf(prof) != -1) {
+                        profdata.data["toolbonus_base"] = "(@{pb}*2)";
+                        allDrops.unshift(profdata);
+                    } else {
+                        allDrops.push(profdata);
+                    }
+                };
             });
         });
         //Set up expertise drops
@@ -15550,6 +15564,26 @@
                     });
                     removesections.push("repeating_spell-" + lvl + "_" + id);
                 }
+            });
+        } else {
+            //If there was no spell page, need to drop any new "known" spells
+            _.each(blobs.sorted, function(section, name) {
+                _.each(section, function(blob) {
+                    if(blob.Spells) {
+                        spells = JSON.parse(blob.Spells);
+                        _.each(spells, function(spell) {
+                            if(spell.Known) {
+                                _.each(spell.Known, function(spellname) {
+                                    var spelldata = {name: "Spells:" + spellname, data: {}};
+                                    var thisclass = name.substring(0,5) === "class" ? _.last(data["lp-levels"].values[name.split("_")[0]].split(":")) : "Racial";
+                                    if(spell.Ability) spelldata.data["spellcasting_ability"] = spell.Ability;
+                                    spelldata.data["spellclass"] = thisclass;
+                                    allDrops.push(spelldata);
+                                })
+                            }
+                        })
+                    }
+                })
             });
         };
         //unset charmancer step
