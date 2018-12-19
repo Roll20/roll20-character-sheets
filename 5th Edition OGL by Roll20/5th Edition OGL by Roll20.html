@@ -12774,7 +12774,6 @@
             sourcepage = "lp-levels";
             section = "class" + sectioninfo[1];
             if(sectioninfo[0] == "subclass") section += "_subclass";
-            console.log(section);
         }
         var pagedata = mancerdata[sourcepage].data[section];
         if(_.last(eventinfo.sourceAttribute.split("_")) == "choice") {
@@ -14250,7 +14249,7 @@
         setCharmancerText({steps: buttons});
         if(eventinfo.triggerName != "lp-welcome" && eventinfo.triggerName != "lp-summary") {
             addRepeatingSection("topbar-holder", "leveler-topbar");
-            recalcLpData();
+            if(eventinfo.triggerName != "lp-choices") recalcLpData();
             getProficiencies(mancerdata, eventinfo.currentStep);
         }
     });
@@ -14757,7 +14756,6 @@
     on("page:lp-choices", function(eventinfo) {
         var mancerdata = getCharmancerData();
         var leveling = getLevelingData(mancerdata);
-        console.log(leveling);
         _.each(leveling, function(data) {
             var x = data.classnumber;
             var blobs = getLpBlobs(data, true);
@@ -14779,8 +14777,11 @@
                         resorted.push(blob);
                     }
                 });
-                _.each(resorted, function(blob) {
+                _.each(resorted, function(blob, y) {
                     handleBlobs(blobs.allblobs, {multiclass: true, slide: "lp-choices"}, blob.parentSection + "-" + x + "--" + blob.Level, classrow, blob.name);
+                    if(y === (resorted.length -1)) {
+                        recalcLpData();
+                    }
                 });
             });
         });
@@ -14907,7 +14908,7 @@
                 knownspells++;
             }
         });
-        //Gather pell data about each class
+        //Gather spell data about each class
         _.each(leveldata, function(level) {
             var prevlevel = level.currentlevel;
             var thislevel = level.addlevel + prevlevel;
@@ -15620,7 +15621,7 @@
             loudset[ability + "_maximum"] = abilities[ability + "_maximum"];
         });
         //Set up spell drops
-        if(data["lp-spells"]) {
+        if(data["lp-spells"] && data["lp-spells"].newspells) {
             _.each(data["lp-spells"].repeating, function(repid) {
                 if(data["lp-spells"].values[repid + "_checked"]) {
                     var spelldata = {name: "Spells:" + data["lp-spells"].values[repid + "_name"], data: {}};
@@ -15654,11 +15655,11 @@
                                     if(spell.Ability) spelldata.data["spellcasting_ability"] = spell.Ability;
                                     spelldata.data["spellclass"] = thisclass;
                                     allDrops.push(spelldata);
-                                })
-                            }
-                        })
-                    }
-                })
+                                });
+                            };
+                        });
+                    };
+                });
             });
         };
         //unset charmancer step
