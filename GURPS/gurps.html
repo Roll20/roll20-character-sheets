@@ -683,6 +683,94 @@
 						<input type="number" name="attr_enhanced_water_move_points" value="0" step="10" class="editable" />
 					</div>
 				</div> <!-- .sheet-row -->
+				<div class="sheet-row sheet-row-flight-advantage sheet-hr">
+				    <div class="sheet-cell sheet-col0 sheet-label">
+						<div class="sheet-popup">Jump</div>
+						<span class="sheet-tooltip">
+						    Jump Skill. If entered, use Jump skill/2 instead of Basic Move.
+						</span>
+					</div>
+					<div class="sheet-cell sheet-col2">
+					    <input type="text" name="attr_jump_skill" value="" class="editable" />
+					</div>
+					<div class="sheet-cell sheet-col1">
+						&nbsp;
+					</div>
+					<div class="sheet-cell sheet-col3">
+					    &nbsp;
+					</div>
+				</div> <!-- .sheet-row -->
+				<div class="sheet-row sheet-row-basic-move">
+					<div class="sheet-cell sheet-col0 sheet-label">
+						<div class="sheet-popup">Use ST</div>
+						<span class="sheet-tooltip">
+							If Basic Lift (<input type="text" name="display_jump_basic_lift" value="@{simple_lift}" disabled="disabled" />) > body weight, use ST/4 instead of Move or Jump skill. 
+						</span>
+					</div>
+					<div class="sheet-cell sheet-col1">
+						<input type="checkbox" name="attr_use_st_for_jump" value="1" class="sheet-boolean" />
+					</div>
+					<div class="sheet-cell sheet-col2">
+                        &nbsp;
+					</div>
+					<div class="sheet-cell sheet-col3">
+						&nbsp;
+					</div>
+				</div> <!-- .sheet-row -->
+				<div class="sheet-row sheet-row-enhanced-air">
+					<div class="sheet-cell sheet-col0 sheet-label">
+						<div class="sheet-popup">Super</div>
+						<span class="sheet-tooltip">
+							Super Jump<br />
+							Modifier box: steps of 1, you can use up and down arrows.<br />
+							Points box: 10 points per level, you can use up and down arrows.<br />
+							Each level doubles jump.
+						</span>
+					</div>
+					<div class="sheet-cell sheet-col1">
+						<input type="number" name="attr_super_jump_level" value="0" readonly="readonly">
+					</div>
+					<div class="sheet-cell sheet-col2">
+					    <input type="number" name="attr_super_jump_entered_level" value="0" step="1" class="editable" />
+					</div>
+					<div class="sheet-cell sheet-col3">
+						<input type="number" name="attr_super_jump_points" value="0" step="10" class="editable" />
+					</div>
+				</div> <!-- .sheet-row -->
+				<div class="sheet-row sheet-row-basic-move">
+					<div class="sheet-cell sheet-col0 sheet-label">
+						<div class="sheet-popup">Broad</div>
+						<span class="sheet-tooltip">
+							Broad Jump Distance after concentrating two seconds.<br />
+						</span>
+					</div>
+					<div class="sheet-cell sheet-col1">
+						<input type="number" name="attr_broad_jump_distance" value="0" readonly="readonly">
+					</div>
+					<div class="sheet-cell sheet-col2">
+                        &nbsp;
+					</div>
+					<div class="sheet-cell sheet-col3">
+						&nbsp;
+					</div>
+				</div> <!-- .sheet-row -->
+				<div class="sheet-row sheet-row-basic-move">
+					<div class="sheet-cell sheet-col0 sheet-label">
+						<div class="sheet-popup">High</div>
+						<span class="sheet-tooltip">
+							High Jump Distance after concentrating two seconds.<br />
+						</span>
+					</div>
+					<div class="sheet-cell sheet-col1">
+						<input type="number" name="attr_high_jump_distance" value="0" readonly="readonly">
+					</div>
+					<div class="sheet-cell sheet-col2">
+                        &nbsp;
+					</div>
+					<div class="sheet-cell sheet-col3">
+						&nbsp;
+					</div>
+				</div> <!-- .sheet-row -->
 			</div> <!-- .sheet-table -->
 		</div> <!-- .sheet-box .sheet-attributes -->
 
@@ -4694,6 +4782,139 @@
                 "water_4": encumberedDisplayMove4,
                 "water_5": encumberedDisplayMove5,
                 "current_water": currentWaterMove
+            });
+                
+            
+        });
+        
+    }
+    
+    // check for changes that affect jump distance
+    on("change:use_st_for_jump change:jump_skill change:basic_move change:super_jump_entered_level change:super_jump_points change:strength change:encumbrance_level change:hit_points change:fatigue_points", function(e) {
+        
+        updateJumpDistanceValues();
+        
+    });
+    
+    /**
+     * Update jump distance values
+     */
+    function updateJumpDistanceValues() {
+        
+        getAttrs(["use_st_for_jump", "jump_skill", "basic_move", "super_jump_entered_level", "super_jump_points", "strength", 
+                  "encumbrance_level", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max"], function(values) {
+            
+            var jumpSkill = +values.jump_skill;
+            
+            if (jumpSkill < 0) {
+                jumpSkill = 0;
+            }
+            
+            var jumpST = +values.strength;
+            
+            if (jumpST < 0) {
+                jumpST = 0;
+            }
+            
+            // + sign converts value to a number
+            var superJumpPoints = +values.super_jump_points;
+            
+            // ensure valid superJumpPoints
+            if (superJumpPoints < 0) {
+                superJumpPoints = 0;
+            }
+            
+            var superJumpEnteredLevel = +values.super_jump_entered_level;
+            
+            if (superJumpEnteredLevel < 0) {
+                superJumpEnteredLevel = 0;
+            }
+            
+            var basicMove = +values.basic_move;
+            
+            // ensure valid basicWaterMoveMod
+            if (basicMove < 0) {
+                basicMove = 0;    
+            }
+            
+            var jumpBroad = 0;
+            
+            var jumpHigh = 0;
+            
+            var encumberedDisplayMove0 = "";
+            
+            var encumberedDisplayMove1 = "";
+            
+            var encumberedDisplayMove2 = "";
+            
+            var encumberedDisplayMove3 = "";
+            
+            var encumberedDisplayMove4 = "";
+            
+            var encumberedDisplayMove5 = "";
+            
+            var totalSuperJumpLevel = 0;
+            
+            var injuryFatigueMoveModifier = 1;
+            
+            // calculate broad and high jump
+            if (jumpSkill > 0) {
+                
+                jumpBroad = Math.floor(jumpSkill/2);
+                
+                if (jumpBroad < 0) {
+                    jumpBroad = 1;
+                }
+                
+                jumpBroad = (jumpBroad * 2) - 3;
+                
+                jumpHigh = Math.floor(jumpSkill/2);
+                
+                if (jumpHigh < 0) {
+                    jumpHigh = 1;
+                }
+                
+                jumpHigh = (6 * jumpHigh) - 10;
+                
+                // convert to feet
+                jumpHigh = Math.floor(jumpHigh / 12);
+                
+            } else if (values.use_st_for_jump == "1") {
+                
+                jumpBroad = Math.floor(jumpST/4);
+                
+                if (jumpBroad < 0) {
+                    jumpBroad = 1;
+                }
+                
+                jumpBroad = (jumpBroad * 2) - 3;
+                
+                jumpHigh = Math.floor(jumpST/4);
+                
+                if (jumpHigh < 0) {
+                    jumpHigh = 1;
+                }
+                
+                jumpHigh = (6 * jumpHigh) - 10;
+                
+                // convert to feet
+                jumpHigh = Math.floor(jumpHigh / 12);
+                
+            } else {
+                
+                jumpBroad = (basicMove * 2) - 3;
+                
+                jumpHigh = (6 * basicMove) - 10;
+                
+                // convert to feet
+                jumpHigh = Math.floor(jumpHigh / 12);
+                
+            }
+            
+            // set water moves
+            setAttrs({
+                "broad_jump_distance": jumpBroad, 
+                "high_jump_distance": jumpHigh
             });
                 
             
