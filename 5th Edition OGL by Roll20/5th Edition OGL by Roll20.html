@@ -8364,6 +8364,9 @@
                 } else {
                     update["speed"] = parseInt(blob["Speed"]);
                 }
+            };
+            if(blob["Jack of All Trades"]) {
+                update["jack_of_all_trades"] = "@{jack}";
             }
         });
 
@@ -11236,20 +11239,17 @@
         return allAbilities;
     };
 
-    var getProficiencies = function(data, currentSlide) {
+    var getProficiencies = function(data, currentSlide, blobs) {
         //Disables taken proficiency choices, returns proficiency info
         var auto = {};
         var allProficiencies = {"Weapon": [], "Armor": [], "Skill": [], "Tool": [], "Language": [], "Expertise": []};
         var toSet = {};
         var mancerdata = data || getCharmancerData();
         var thismancer = currentSlide && currentSlide != "finish" ? currentSlide.split("-")[0] : "l1";
-        var blobs = {};
-        if(thismancer == "l1") {
-            blobs = getRelevantBlobs(mancerdata, "1", "l1");
-        } else {
-            blobs = getAllLpBlobs(data, true, false);
-            allProficiencies = data["lp-welcome"].values["previous_proficiencies"] ? JSON.parse(data["lp-welcome"].values["previous_proficiencies"]) : allProficiencies;
+        if(!blobs) {
+            blobs = thismancer == "l1" ? blobs = getRelevantBlobs(mancerdata, "1", "l1") : blobs = getAllLpBlobs(data, true, true);
         }
+        if(thismancer !== "l1") allProficiencies = data["lp-welcome"].values["previous_proficiencies"] ? JSON.parse(data["lp-welcome"].values["previous_proficiencies"]) : allProficiencies;
         currentSlide = currentSlide == "lp-finish" ? "finish" : currentSlide;
         //For this first part, we're only concerned with choices that have already been made
         //Get all of the "automatic" proficiencies
@@ -11661,20 +11661,22 @@
             var traits = JSON.parse(blob.Traits);
             subsection = subsection ? subsection : element;
             _.each(traits, function(trait) {
-                addRepeatingSection(subsection, "row", function(rowid) {
-                    var repupdate = {};
-                    if(trait.Input) {
-                        repupdate[rowid + " label span"] = "<input type=\"text\" name=\"comp_" + rowid + "_trait_input\">";
-                        repupdate[rowid + " label span"] += "<input type=\"hidden\" name=\"comp_" + rowid + "_trait_name\" value=\"" + (trait.Name ? trait.Name : "") + "\">";
-                        repupdate[rowid + " label span"] += "<input type=\"hidden\" name=\"comp_" + rowid + "_trait_desc\" value=\"" + (trait.Desc ? trait.Desc : "") + "\">";
-                        repupdate[rowid + " label span"] += "<input type=\"hidden\" name=\"comp_" + rowid + "_trait_section\" value=\"" + section + "\">";
-                    } else {
-                        repupdate[rowid + " label span"] = trait.Name;
-                        repupdate[rowid + " label p"] = trait.Desc;
-                    }
-                    setCharmancerText(repupdate);
-                    handleProficiencies(blob, rowid);
-                });
+                if(!trait.Hide) {
+                    addRepeatingSection(subsection, "row", function(rowid) {
+                        var repupdate = {};
+                        if(trait.Input) {
+                            repupdate[rowid + " label span"] = "<input type=\"text\" name=\"comp_" + rowid + "_trait_input\">";
+                            repupdate[rowid + " label span"] += "<input type=\"hidden\" name=\"comp_" + rowid + "_trait_name\" value=\"" + (trait.Name ? trait.Name : "") + "\">";
+                            repupdate[rowid + " label span"] += "<input type=\"hidden\" name=\"comp_" + rowid + "_trait_desc\" value=\"" + (trait.Desc ? trait.Desc : "") + "\">";
+                            repupdate[rowid + " label span"] += "<input type=\"hidden\" name=\"comp_" + rowid + "_trait_section\" value=\"" + section + "\">";
+                        } else {
+                            repupdate[rowid + " label span"] = trait.Name;
+                            repupdate[rowid + " label p"] = trait.Desc;
+                        }
+                        setCharmancerText(repupdate);
+                        handleProficiencies(blob, rowid);
+                    });
+                };
             });
         };
         var element = element ? element : section + "_holder";
@@ -14173,9 +14175,9 @@
         setCharmancerText(update);
     };
     //Helper function to get ability totals, including asi
-    var getAbilityTotals = function(mancerdata) {
+    var getAbilityTotals = function(mancerdata, blobs) {
         mancerdata = mancerdata || getCharmancerData();
-        var blobs = getAllLpBlobs(mancerdata, true, true);
+        blobs = blobs || getAllLpBlobs(mancerdata, true, true);
         var abilities = mancerdata["lp-welcome"].values["previous_abilities"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_abilities"]) : {};
         var lcAbilities = abilityList.map(function(x) {return x.toLowerCase()});
         //Set previous scores first
@@ -14212,10 +14214,10 @@
         return abilities;
     };
     //Helper function to get hp total
-    var getHpTotal = function(mancerdata) {
+    var getHpTotal = function(mancerdata, blobs) {
         mancerdata = mancerdata || getCharmancerData();
         var leveldata = getLevelingData(mancerdata);
-        var abilities = getAbilityTotals(mancerdata);
+        var abilities = getAbilityTotals(mancerdata, blobs);
         var previous = mancerdata["lp-welcome"].values["previous_attributes"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_attributes"]) : {};
         var newhp = 0;
         var additionalhp = 0;
@@ -14392,7 +14394,7 @@
             };
         };
 
-        setAttrs(set);
+        setAttrs(set, () => { update_hp(true) });
         setCharmancerText(update);
 
         changeCompendiumPage("sheet-levels-info", ["Classes:"] + previous["class"]);
@@ -14435,7 +14437,7 @@
 
             setCharmancerText(update);
             setAttrs(set);
-            update_hp(levelclass);
+            //update_hp();
         });
     });
 
@@ -14467,8 +14469,7 @@
         update[`${levelclass}_tot`]    = `= level ${classlevel}`;
 
         setCharmancerText(update);
-        setAttrs(set, function() { recalcLpData(); });
-        update_hp(levelclass);
+        setAttrs(set, function() { update_hp(); });
     });
 
     //Build a function to update the level & class each time they change
@@ -14494,36 +14495,137 @@
         setCharmancerText(update);
     });
 
-    //Calculate the Average HP and store if for use later. Update the Roll button as needed
-    const update_hp = (levelclass) => {
+    const recalcHpByLevel = (section) => {
+        console.log(section ? `RECALC HP: ${section}` : "RECALC HP: ALL");
         const mancerdata = getCharmancerData();
-        const leveldata = mancerdata["lp-levels"].values, hitdie = leveldata[`${levelclass}_hitdie`], levels = leveldata[`${levelclass}_addlevel`] || 0;
+        const leveldata = mancerdata["lp-levels"].values;
+        const repeating = mancerdata["lp-levels"].repeating || [];
+        let set = {};
+        const sections = section ? [section] : ["class1", "class2", "class3", "class4"];
 
-        if (levels && hitdie) {
-            //Set the Roll for HP button
-            let update = {};
-            update[`${levelclass}_rollhp`] = `<button type="roll" name="roll_${levelclass}_rollhp" value="@{wtype}&{template:mancerroll} {{title=Roll for HP}} {{r1=[[${levels}${hitdie}]]}}">Roll</button>`;
-            setCharmancerText(update);
-
-            //Total up the average HP
-            const size = hitdie.slice(1);
-            let num = [], sum = 0, set = {};
-
-            for(x = 1; x <= size; x++) {
-               num.push(x);
-            };
-
-            for(i = 0; i < num.length; i++) {
-                sum += num[i];
-            };
-
-            let avg = Math.ceil(sum / num.length), hp = avg * levels;
-
-            (!mancerdata["lp-levels"].values[`${levelclass}_addhp`]) ? set[`${levelclass}_addhp`] = hp : false;
-            set[`${levelclass}_averagehp`] = hp;
-            setAttrs(set);
-        };
+        _.each(sections, (levelclass) => {
+            let thishp = 0;
+            _.each(repeating, function(repid) {
+                if(repid.split("_")[2].split("-")[0] == levelclass && leveldata[`${repid}_result`]) {
+                    thishp += parseInt(leveldata[`${repid}_result`]);
+                }
+            });
+            set[`${levelclass}_addhp`] = thishp;
+        });
+        setAttrs(set, () => {recalcLpData()});
     };
+
+    //Calculate the Average HP and store if for use later. Update the Roll button as needed
+    const update_hp = (firstTime) => {
+        const updateByLevel = (firstTime) => {
+            console.log("TEST HERE");
+            const mancerdata = getCharmancerData();
+            const leveldata = mancerdata["lp-levels"].values;
+            const repeating = mancerdata["lp-levels"].repeating || [];
+
+            for(let classnum=1; classnum<=4; classnum++) {
+                const levelclass = `class${classnum}`, hitdie = leveldata[`${levelclass}_hitdie`],
+                    current = leveldata[`${levelclass}_currentlevel`] ? parseInt(leveldata[`${levelclass}_currentlevel`]) : 0,
+                    addlevel = leveldata[`${levelclass}_addlevel`] ? parseInt(leveldata[`${levelclass}_addlevel`]) : 0;
+                let levelarray = [], addarray = [], removearray = [], existing = [], average = getDieAvg(hitdie);
+                for(let x = current+1; x<=current+addlevel; x++) {
+                    levelarray.push(`${levelclass}-${x}`);
+                }
+                addarray = levelarray;
+                if(!firstTime) {
+                    _.each(repeating, function(id) {
+                        addarray = _.without(addarray, id.split("_")[2]);
+                    });
+                }
+                _.each(repeating, function(id) {
+                    if(id.split("_")[2].split("-")[0] == levelclass && !levelarray.includes(id.split("_")[2]) && !existing.includes(id.split("_")[2])) {
+                        removearray.push(id);
+                        existing.push(id.split("_")[2]);
+                    }
+                });
+                if(addarray.length > 0) {
+                    let set = {}, update = {}, rowid = "";
+                    _.each(repeating, function(repid) {
+                        if(repid.split("_")[2] == `${levelclass}hprow`) rowid = repid;
+                    });
+                    _.each(addarray, function(repname) {
+                        addRepeatingSection(rowid, "hpbylevel", repname, function(repid) {
+                            if(!leveldata[`${repid}_result`]) set[`${repid}_result`] = average;
+                            set[`roll_${repid}_rollhp`] = `@{wtype}&{template:mancerroll} {{title=Roll for HP Level ${_.last(repname.split("-"))}}} {{r1=[[1${hitdie}]]}}`;
+                            update[`${repid} label`] = `Level ${_.last(repname.split("-"))}`;
+                            if(repname == _.last(addarray)) {
+                                setCharmancerText(update);
+                                setAttrs(set, () => {
+                                    clearRepeatingSectionById(removearray, () => {
+                                        recalcHpByLevel(levelclass);
+                                    });
+                                });
+                            }
+                        });
+                    });
+                } else {
+                    clearRepeatingSectionById(removearray, () => {
+                        recalcHpByLevel(levelclass);
+                    });
+                }
+            };
+        };
+        const mancerdata = getCharmancerData();
+        const leveldata = mancerdata["lp-levels"].values;
+        const repeating = mancerdata["lp-levels"].repeating || [];
+        let set = {};
+
+        for(let classnum=1; classnum<=4; classnum++) {
+            const levelclass = `class${classnum}`, hitdie = leveldata[`${levelclass}_hitdie`], levels = leveldata[`${levelclass}_addlevel`] || 0;
+            if (levels && hitdie) {
+                set[`roll_${levelclass}_rollhp`] = `@{wtype}&{template:mancerroll} {{title=Roll for HP}} {{r1=[[${levels}${hitdie}]]}}`;
+            };
+        };
+        setAttrs(set);
+        if(firstTime) {
+            addRepeatingSection("class1_by-levels", "row", "class1hprow", function() {
+                addRepeatingSection("class2_by-levels", "row", "class2hprow", function() {
+                    addRepeatingSection("class3_by-levels", "row", "class3hprow", function() {
+                        addRepeatingSection("class4_by-levels", "row", "class4hprow", function() {
+                            updateByLevel(true);
+                        });
+                    });
+                });
+            });
+        } else {
+            updateByLevel(false);
+        }
+    };
+
+    const getDieAvg = (hitdie) => {
+        if(!hitdie) return 0;
+        const size = hitdie.slice(1);
+        let num = [], sum = 0;
+        for(x = 1; x <= size; x++) {
+           num.push(x);
+        };
+
+        for(i = 0; i < num.length; i++) {
+            sum += num[i];
+        };
+
+        return Math.ceil(sum / num.length)
+    };
+
+    on("mancerroll:repeating_class1hprow mancerroll:repeating_class2hprow mancerroll:repeating_class3hprow mancerroll:repeating_class4hprow", function(eventinfo) {
+        let set = {};
+        set[`${eventinfo.sourceSection}_result`] = eventinfo.roll[0].result;
+        set[`${eventinfo.sourceSection}_rollflag`] = "roll";
+        setAttrs(set, () => {recalcHpByLevel()})
+    });
+
+    on("clicked:repeating_class1hprow clicked:repeating_class2hprow clicked:repeating_class3hprow clicked:repeating_class4hprow", function(eventinfo) {
+        const mancerdata = getCharmancerData();
+        let set = {};
+        set[`${eventinfo.sourceSection}_result`] = getDieAvg(mancerdata["lp-levels"].values[`${eventinfo.sourceSection.split("_")[2].split("-")[0]}_hitdie`]);
+        set[`${eventinfo.sourceSection}_rollflag`] = "";
+        setAttrs(set, () => {recalcHpByLevel()})
+    });
 
     //Roll HP 1
     on("mancerroll:class1_rollhp mancerroll:class2_rollhp mancerroll:class3_rollhp mancerroll:class4_rollhp", function(eventinfo) {
@@ -14535,34 +14637,6 @@
         set[`${levelclass}_hp_flag`] = "roll";
 
         setAttrs(set, function() { recalcLpData(); });
-    });
-
-    //Put on hold for now
-    on("mancerchange:class1_hpbyLevel mancerchange:class1_addlevel", function(eventinfo) {
-        const mancerdata = getCharmancerData();
-        const leveldata  = mancerdata["lp-levels"].values;
-        const levelclass = eventinfo.sourceAttribute.slice(0, 6);
-        const addlevel   = leveldata[`${levelclass}_addlevel`];
-        let update       = {};
-
-        if (eventinfo.newValue === "on" || leveldata[`${levelclass}_hpbyLevel`] === "on") {
-            update["by-levels"] = "";
-            for(x = 2; x <= addlevel; x++) {
-                const hp = parseInt(leveldata[`${levelclass}_addhp${x}`]) || 0;
-                update["by-levels"] += 
-                `<div style="width: 100%;">
-                    <input type="number" class="" name="comp_${levelclass}_addhp${x}">
-                    <div class="${levelclass}_rollhp" style="display: inline;">
-                        <button type="roll" name="roll_${levelclass}_rollhp${x}" value="${hp}" title="">Roll</button>
-                    </div>
-                    <input type="checkbox" name="comp_${levelclass}_addhpAverage${x}" /><span>Average</span>
-                </div>`;
-            };
-        } else {
-           update["by-levels"] = "";
-        };
-
-        setCharmancerText(update);
     });
 
     on("clicked:multiclass_add clicked:multiclass_remove", function(eventinfo) {
@@ -14663,6 +14737,8 @@
                 };
             }
         });
+        allblobs.class = _.extend(allblobs.class, filterBlobs(data.class.blobs, {"Level": "every", multiclass: true}));
+        allblobs.subclass = _.extend(allblobs.subclass, filterBlobs(data.subclass.blobs, {"Level": "every", multiclass: true}));
         var remove = {class: [], subclass: []};
         //Figure out which blobs are just the same feature at a different level, add them to a list to remove
         _.each(allblobs, function(blobs, section) {
@@ -15520,14 +15596,14 @@
         var startTime = Date.now();
         var allPageData = [];
         var data = eventinfo.data;
+        var blobs = getAllLpBlobs(data, true, true);
         var leveldata = getLevelingData(data);
-        var abilities = getAbilityTotals(data);
+        var abilities = getAbilityTotals(data, blobs);
         var previous = data["lp-welcome"].values["previous_attributes"] ? JSON.parse(data["lp-welcome"].values["previous_attributes"]) : {};
         var repeating = data["lp-welcome"].values["previous_repeating"] ? JSON.parse(data["lp-welcome"].values["previous_repeating"]) : {};
         var spelldata = data["lp-welcome"].values["spellinfo"] ? JSON.parse(data["lp-welcome"].values["spellinfo"]) : {};
-        var blobs = getAllLpBlobs(data, true, true);
         var customtraits = {race: [], subrace: [], class: [], subclass: [], background: []};
-        var profs = getProficiencies(data, "lp-finish");
+        var profs = getProficiencies(data, "lp-finish", blobs);
         var removesections = [];
         var loudset = {};
         var set = {};
@@ -15540,7 +15616,6 @@
         set["lp-mancer_status"] = "";
         _.each(leveldata, function(level) {
             var name = "class" + level.classnumber;
-            var theseblobs = getLpBlobs(level);
             var mc = "multiclass" + (level.classnumber - 1);
             var thisclass = {name: level.classname, data: level.class};
             //if this is an mc class, add mc data
@@ -15552,6 +15627,7 @@
                 //if this is an mc subclass, add mc data
                 if(name != "class1") thissubclass.data.multiclass = mc;
                 thissubclass.data.theseblobs = blobs.names[name + "_subclass"];
+                allPageData.push(thissubclass);
             }
             //set up the setAttrs for this class
             if(name === "class1") {
@@ -15614,7 +15690,7 @@
             }
         });
         //Set up Ability scores
-        initial["hp"] = getHpTotal(data);
+        initial["hp"] = getHpTotal(data, blobs);
         initial["hp_max"] = initial["hp"];
         _.each(allAbilities, function(ability) {
             loudset[ability + "_base"] = abilities[ability];
@@ -15932,6 +16008,14 @@
             <option value="" data-i18n="choose">Choose</option>
         </select>
     </div>
+</charmancer>
+
+<charmancer class="sheet-repeating-hpbylevel">
+    <input type="checkbox" name="comp_rollflag" value="roll" style="display:none">
+    <label></label>
+    <input type="number" class="" name="comp_result" min="0">
+    <button type="roll" name="roll_rollhp" value="" title="">Roll</button>
+    <button type="action" name="act_average" value="" title="">Average</button>
 </charmancer>
 
 <!-- CHARACTERMANCER SLIDES -->
@@ -17191,8 +17275,7 @@
                     <button type="action" name="act_class1_addhpAverage" value="" title="">Average</button>
                    <!-- <input type="checkbox" name="comp_class1_hpbyLevel" /><span>By level</span> Put on hold -->
                 </div>
-                <div class="by-levels" style="margin-left: 11%;">
-                </div>
+                <div class="class1_by-levels" style="margin-left: 11%;"></div>
                 <div>
                     <h3 class="class1_features_title choice" style="display: inline;">Class Features: </h3>
                     <button type="action" name="act_class1" class="mancer_info">i</button>
@@ -17234,6 +17317,7 @@
                     <button type="action" name="act_class2_addhpAverage" value="" title="">Average</button>
                   <!--  <input type="checkbox" name="comp_class2_addhpLevel" /><span>By level</span> Put on hold -->
                 </div>
+                <div class="class2_by-levels" style="margin-left: 11%;"></div>
                 <div>
                     <h3 class="class2_features_title choice" style="display: inline;">Class Features: </h3>
                     <button type="action" name="act_class2" class="mancer_info">i</button>
@@ -17277,6 +17361,7 @@
                     <button type="action" name="act_class3_addhpAverage" value="" title="">Average</button>
                     <!--<input type="checkbox" name="comp_class3_addhpLevel" /><span>By level</span> Put on hold-->
                 </div>
+                <div class="class3_by-levels" style="margin-left: 11%;"></div>
                 <div>
                     <h3 class="class3_features_title choice" style="display: inline;">Class Features: </h3>
                     <button type="action" name="act_class3" class="mancer_info">i</button>
@@ -17318,6 +17403,7 @@
                     <button type="action" name="act_class4_addhpAverage" value="" title="">Average</button>
                     <!--<input type="checkbox" name="comp_class4_addhpLevel" /><span>By level</span> Put on hold-->
                 </div>
+                <div class="class3_by-levels" style="margin-left: 11%;"></div>
                 <div>
                     <h3 class="class4_features_title choice" style="display: inline;">Class Features: </h3>
                     <button type="action" name="act_class4" class="mancer_info">i</button>
