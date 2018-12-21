@@ -433,7 +433,6 @@
             <div class="topspace myrow bold greybg padindent"> <span data-i18n="tab-configuration">Configuration</span> </div>  <!-- input CONFIGURATION -->
             <div class="myrow">
                 <span class="lbl bold" data-i18n="general">General</span>
-                <label class="labelcheck" title="@{npc}"><input type="checkbox" name="attr_npc" value="1" /><span class="lbl" data-i18n="npc-monster-statblock">NPC/Monster Statblock</span></label>
                 <label class="labelcheck" title="@{special_abilities_flag}"><input type="checkbox" name="attr_special_abilities_flag" value="1" /><span class="lbl" data-i18n="show-special-abilities">Show Special Abilities</span></label>
                 <label class="labelcheck" title="@{ecology_flag}"><input type="checkbox" name="attr_ecology_flag" value="1" checked="checked" /><span class="lbl" data-i18n="show-ecology">Show Ecology</span></label>
             </div>
@@ -455,6 +454,13 @@
                 <label class="labelcheck" title="@{rollmod_skill}"><input type="checkbox" name="attr_rollmod_skill" value="?{@{ask_modifier}|0}" /><span data-i18n="skill-rolls">Skill Rolls</span></label>
                 <label class="labelcheck" title="@{rollmod_attack}"><input type="checkbox" name="attr_rollmod_attack" value="?{@{ask_atk_modifier}|0}" /><span data-i18n="attack-rolls">Attack & CMB Rolls</span></label>
                 <label class="labelcheck" title="@{rollmod_damage}"><input type="checkbox" name="attr_rollmod_damage" value="?{@{ask_dmg_modifier}|0}" /><span data-i18n="damage-rolls">Damage Rolls</span></label>
+            </div>
+            <div class="myrow grtopbrd center">
+                <button type="action" class="myrol" name="act_npc_to_pc" data-i18n-title="reset-to-pc" title="Reset to PC">
+                    <span style="font-family: Pictos; font-size: 1.35em;">;</span>
+                    <span data-i18n="reset-to-pc">Reset to PC (Player Character).</span>
+                    <span data-i18n="erase_data_character">This will erase all data from the character.</span>
+                </button>
             </div>
         </div>   <!-- END NPC options / base entry -->
         <div class="npc-display">  <!-- Display HEAD INFO -->
@@ -8807,10 +8813,6 @@
                         <span data-i18n="recalc-u">RECALC</span>
                     </button>
                 </div>
-                <label class="labelcheck" title="@{npc_confirm_flag}">
-                    <input type="checkbox" name="attr_npc_confirm_flag" value="1" checked="checked" />
-                    <span data-i18n="npc-monster-statblock">NPC/Monster Statblock</span>
-                </label>
             </div>
             <div class="blacklabel pnty">
                 <img class="brdleft" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Official/img/brdleft.png" />
@@ -8821,9 +8823,14 @@
                 <div class="myrow center">
                     <button type="action" class="myrol border" name="act_relaunch_lvl1mancer">
                         <img style="height: 32px; width: 32px" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Official/img/CharactermancerIcon200px.png" />
+                        <span data-i18n="relaunch-lvl1mancer">Launch Level 1 Charactermancer</span>
                     </button>
-                    <span data-i18n="relaunch-lvl1mancer">Launch Level 1 Charactermancer</span>
-                    <span data-i18n="cannot-be-undone-u">(CANNOT BE UNDONE)</span>
+                </div>
+                <div class="myrow grtopbrd center">
+                    <button type="action" class="myrol border" name="act_pc_to_npc" data-i18n-title="reset-to-npc" title="Reset to PC">
+                        <span style="font-family: Pictos; font-size: 1.35em;">;</span>
+                        <span data-i18n="reset-to-npc">Reset to NPC (Monster/Non Player Character).</span>
+                    </button>
                 </div>
             </div>
             <div class="topspace myrow right">
@@ -9513,13 +9520,16 @@
 
     // === NPC
     on("clicked:npc_confirm", () => {
-        setAttrs({"npc_confirm_flag": 0,"npc": 1});
+        pfom.reset_to_xpc(1);
     });
     on("clicked:npc_cancel", () => {
         setAttrs({"npc_confirm_flag": 0});
     });
-    on("change:npc", (e) => {
-        pfom.pc_npc_change(e);
+    on("clicked:npc_to_pc", () => {
+        pfom.reset_to_xpc(0);
+    });
+    on("clicked:pc_to_npc", () => {
+        setAttrs({"npc_confirm_flag": 1});
     });
     // --- NPC Attacks Display and Roll
     on("change:repeating_npcatk-melee:atkname change:repeating_npcatk-melee:atkmod change:repeating_npcatk-melee:multipleatk_flag change:repeating_npcatk-melee:atkmod2 change:repeating_npcatk-melee:atkmod3 change:repeating_npcatk-melee:atkmod4 change:repeating_npcatk-melee:atkmod5 change:repeating_npcatk-melee:atkmod6 change:repeating_npcatk-melee:atkmod7 change:repeating_npcatk-melee:atkmod8 change:repeating_npcatk-melee:atkmod9 change:repeating_npcatk-melee:atkcritrange change:repeating_npcatk-melee:dmgflag change:repeating_npcatk-melee:dmgbase change:repeating_npcatk-melee:dmgtype change:repeating_npcatk-melee:dmgcritmulti change:repeating_npcatk-melee:dmg2flag change:repeating_npcatk-melee:dmg2base change:repeating_npcatk-melee:dmg2type change:repeating_npcatk-melee:dmg2critmulti", (e) => {
@@ -9725,7 +9735,7 @@
     var pfom = (function () {
         /* === GLOBAL VARIABLES === */
 
-        const pfoglobals_currentversion = 1.22;
+        const pfoglobals_currentversion = 1.23;
         var pfoglobals_i18n_obj = (function () {
             var obj = {};
             obj["strength"] = getTranslationByKey("str-u");
@@ -9880,26 +9890,22 @@
                 versioning();
             }
         };
-        const pc_npc_change = function(e) {
-            if((!e.triggerType) || (e.triggerType && e.triggerType != "compendium")) { // Change made by the player
-                setAttrs({initialize_character_flag: 1}, {silent: true}, () => {
-                    getAttrs(["npc","version"], (v) => {
-                        // console.log("*** DEBUG change:npc: (value: " + v.npc + ")" + JSON.stringify(e,null,"  "));
-                        erase_repsec_ids(JSON.parse(JSON.stringify(pfoglobals_allrepsecs)), () => { // delete repeating sections
-                            setAttrs(calc_reset_character(), {silent: true}, () => { // reset other attributes
-                                if(v.npc && v.npc != "1") { // revert from NPC to PC
-                                    if((!v.version) || (v.version && (v.version != pfoglobals_currentversion))) {
-                                        versioning(); // apply versioning for PC
-                                    } else {
-                                        le_big_stuff("all"); // recalculate all for PC
-                                    }
-                                }
-                                setAttrs({initialize_character_flag: 0}, {silent: true});
-                            });
-                        });
+        const reset_to_xpc = function(npcvalue) { // 0 = PC, 1 = NPC
+            // reset and revert from NPC to PC or PC to NPC
+            setAttrs({initialize_character_flag: 1, npc: npcvalue}, {silent: true}, () => {
+                erase_repsec_ids(JSON.parse(JSON.stringify(pfoglobals_allrepsecs)), () => { // delete repeating sections
+                    setAttrs(calc_reset_character(), {silent: true}, (npcvalue) => { // reset other attributes
+                        if(npcvalue == 0) {
+                            le_big_stuff("all", {}, () => {
+                                versioning();
+                                setAttrs({initialize_character_flag: 0, npc_confirm_flag: 0}, {silent: true});
+                            }); // recalculate all for PC
+                        } else {
+                            setAttrs({initialize_character_flag: 0, npc_confirm_flag: 0, version: pfoglobals_currentversion}, {silent: true});
+                        }
                     });
                 });
-            }
+            });
         };
         const mancer_finish = function(eventinfo) {
 
@@ -14506,7 +14512,7 @@
             let update = {};
 
             // -- Reset to empty string
-            let toResetAsChar = ["race","class","class1_name","class2_name","class3_name","languages","senses","ac_notes","fortitude_notes","reflex_notes","will_notes","caster1_class","caster2_class","caster1_spells_notes","caster2_spells_notes","initiative_notes","speed_notes","encumbrance_display","encumbrance_load_notes","misc_notes","background","bab_notes","cmb_notes","melee_notes","ranged_notes","cmd_notes","sr_notes","craft_name","perform_name","profession_name","npc_alignment","aura","hd_roll","saves_modifiers","defensive_abilities","npc_type","npc_dr","immune","resist","weaknesses","npc_speed","space","reach","npc_spellabilities_notes","npc_spells_notes","tactics","skills_racial_modifiers","skills_notes","sq","combat_gear","environment","organization","npcdrop_name","npcdrop_uniq","npcdrop_category","npcdrop_data","npc_icon_type","npc_icon_terrain","npc_icon_climate","npc_cr","npc_mr"];
+            let toResetAsChar = ["race","class","class1_name","class2_name","class3_name","languages","senses","ac_notes","fortitude_notes","reflex_notes","will_notes","caster1_class","caster2_class","caster1_spells_notes","caster2_spells_notes","initiative_notes","speed_notes","encumbrance_display","encumbrance_load_notes","misc_notes","background","bab_notes","cmb_notes","melee_notes","ranged_notes","cmd_notes","sr_notes","craft_name","perform_name","profession_name","npc_alignment","aura","hd_roll","saves_modifiers","defensive_abilities","npc_type","npc_dr","immune","resist","weaknesses","npc_speed","space","reach","npc_spellabilities_notes","npc_spells_notes","tactics","skills_racial_modifiers","skills_notes","sq","combat_gear","environment","organization","npcdrop_name","npcdrop_uniq","npcdrop_category","npcdrop_data","npc_icon_type","npc_icon_terrain","npc_icon_climate","npc_cr","npc_mr","treasure"];
             toResetAsChar = toResetAsChar.concat(pfoglobals_abilities.map((ablt) => `${ablt}_notes`));
             toResetAsChar = toResetAsChar.concat(pfoglobals_skill_list.map((sk) => `${sk}_notes`));
             toResetAsChar = toResetAsChar.concat(pfoglobals_skill_list.map((sk) => `${sk}_display`));
@@ -14515,7 +14521,7 @@
             });
 
             // -- Reset to zero
-            var toResetAsZero = ["hp_base","hp_base_max","hp","hp_max","mancer_confirm_flag","caster_flag","class1_level","class2_level","class3_level","initiative_misc","money_cp","money_sp","money_gp","money_pp","xp","sr","spells_flag","spellabilities_flag"];
+            var toResetAsZero = ["hp_base","hp_base_max","hp","hp_max","mancer_confirm_flag","caster_flag","class1_level","class2_level","class3_level","money_cp","money_sp","money_gp","money_pp","xp","sr","spells_flag","spellabilities_flag"];
             for(var i = 1; i < 4; i++) {
                 toResetAsZero.push(`class${i}_bab`,`class${i}_fortitude`,`class${i}_reflex`,`class${i}_will`,`class${i}_skillranks_base`,`class${i}_speed`);
             }
@@ -14529,6 +14535,7 @@
             toResetAsZero = toResetAsZero.concat(pfoglobals_abilities.map((ablt) => `${ablt}_bonus`));
             toResetAsZero = toResetAsZero.concat(pfoglobals_abilities.map((ablt) => `${ablt}_condition`));
 
+            toResetAsZero = toResetAsZero.concat(pfoglobals_skill_list);
             toResetAsZero = toResetAsZero.concat(pfoglobals_skill_list.map((sk) => `${sk}_classkill`));
             toResetAsZero = toResetAsZero.concat(pfoglobals_skill_list.map((sk) => `${sk}_ability_mod`));
             toResetAsZero = toResetAsZero.concat(pfoglobals_skill_list.map((sk) => `${sk}_ranks`));
@@ -14536,7 +14543,7 @@
             toResetAsZero = toResetAsZero.concat(pfoglobals_skill_list.map((sk) => `${sk}_bonus`));
             toResetAsZero = toResetAsZero.concat(pfoglobals_skill_list.map((sk) => `${sk}_flag`));
 
-            toResetAsZero = toResetAsZero.concat(pfoglobals_mods,["initiative_misc","initiative_bonus"],["fortitude_base","fortitude_ability_mod","fortitude_misc","fortitude_bonus","reflex_base","reflex_ability_mod","reflex_misc","reflex_bonus","will_base","will_ability_mod","will_misc","will_bonus"],["encumbrance_ability_maximum"],["ac_condition_nobonus","ac_bonus","ac_ability_mod","ac_armor","ac_shield","ac_size","ac_natural_items","ac_deflection_items","ac_misc","ac_dodge_items","ac_touch_items","ac_flatfooted_items","ac_natural_bonus","ac_deflection_bonus","ac_dodge_bonus","ac_noflatflooted","ac_touchshield","ac_condition","ac_secab_monk","ac_ff_ability_mod"],["bab","bab_max","bab_multi","bab_size","cmb_mod","cmb_size","cmb_ability_mod","cmb_misc","cmb_bonus","melee_mod","melee_ability_mod","melee_misc","melee_bonus","ranged_mod","ranged_ability_mod","ranged_misc","ranged_bonus","cmd_misc","cmd_bonus","cmd_condition","fob","fob_multi"],pfoglobals_skill_fields,["caster1_flag","caster2_flag","caster1_level","caster1_ability_mod","caster1_concentration","caster1_concentration_misc","caster1_concentration_bonus","caster2_level","caster2_ability_mod","caster2_concentration","caster2_concentration_misc","caster2_concentration_bonus"],["encumbrance_load_bonus","stealth_size","encumbrance_size","fly_size","encumbrance_gear_weight","encumbrance_load_light","encumbrance_load_medium","encumbrance_load_heavy","encumbrance"],["encumbrance","speed_notmodified","speed_bonus","speed_condition_multiplier","speed_condition_norun","speed_condition_nospeed","speed_class"],pfoglobals_conditions,["armor_spell_failure","caster1_dc_misc","caster2_dc_misc"]);
+            toResetAsZero = toResetAsZero.concat(pfoglobals_mods,["initiative","initiative_misc","initiative_bonus"],["fortitude","fortitude_base","fortitude_ability_mod","fortitude_misc","fortitude_bonus","reflex","reflex_base","reflex_ability_mod","reflex_misc","reflex_bonus","will","will_base","will_ability_mod","will_misc","will_bonus"],["encumbrance_ability_maximum"],["ac_condition_nobonus","ac_bonus","ac_ability_mod","ac_armor","ac_shield","ac_size","ac_natural_items","ac_deflection_items","ac_misc","ac_dodge_items","ac_touch_items","ac_flatfooted_items","ac_natural_bonus","ac_deflection_bonus","ac_dodge_bonus","ac_noflatflooted","ac_touchshield","ac_condition","ac_secab_monk","ac_ff_ability_mod"],["bab","bab_max","bab_multi","bab_size","cmb_mod","cmb_size","cmb_ability_mod","cmb_misc","cmb_bonus","melee_mod","melee_ability_mod","melee_misc","melee_bonus","ranged_mod","ranged_ability_mod","ranged_misc","ranged_bonus","cmd_misc","cmd_bonus","cmd_condition","fob","fob_multi"],pfoglobals_skill_fields,["caster1_flag","caster2_flag","caster1_level","caster1_ability_mod","caster1_concentration","caster1_concentration_misc","caster1_concentration_bonus","caster2_level","caster2_ability_mod","caster2_concentration","caster2_concentration_misc","caster2_concentration_bonus"],["encumbrance_load_bonus","stealth_size","encumbrance_size","fly_size","encumbrance_gear_weight","encumbrance_load_light","encumbrance_load_medium","encumbrance_load_heavy","encumbrance"],["encumbrance","speed_notmodified","speed_bonus","speed_condition_multiplier","speed_condition_norun","speed_condition_nospeed","speed_class"],pfoglobals_conditions,["armor_spell_failure","caster1_dc_misc","caster2_dc_misc"]);
 
             toResetAsZero = _.uniq(toResetAsZero);
             _.each(toResetAsZero,(attr) => {
@@ -15011,7 +15018,7 @@
             pc_drop_spell: pc_drop_spell,
             le_big_stuff: le_big_stuff,
             mancer_finish: mancer_finish,
-            pc_npc_change: pc_npc_change,
+            reset_to_xpc: reset_to_xpc,
             sheet_open: sheet_open,
             update_ac: update_ac,
             update_ac_ability: update_ac_ability,
