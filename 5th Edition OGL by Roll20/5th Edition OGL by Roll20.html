@@ -7167,7 +7167,7 @@
             {name: "proficiencies", list: ["name"]},
             {name: "tool", list: ["toolname"]},
             {name: "traits", list: ["name", "source", "source_type"]},
-            {name: "resource", list: ["left_name", "right_name"]},
+            {name: "resource", list: ["resource_left_name", "resource_right_name"]},
             {name: "spell-cantrip", list: ["spellname", "spellattackid"]},
             {name: "savemod", list: ["global_save_rollstring"]},
             {name: "tohitmod", list: ["global_attack_rollstring"]},
@@ -8257,7 +8257,7 @@
                     if(name.toLowerCase() === dmgmod["Name"].toLowerCase()) id = rowid;
                 });
                 update["repeating_damagemod_" + id + "_global_damage_rollstring"] = `${dmgmod["Damage"]}[${dmgmod["Name"]}]`;
-                update["repeating_damagemod_" + id + "_global_damage_active_flag"] = "1";
+                if(dmgmod["Active"] !== "false") update["repeating_damagemod_" + id + "_global_damage_active_flag"] = "1";
                 update["repeating_damagemod_" + id + "_options-flag"] = "0";
                 update["repeating_damagemod_" + id + "_global_damage_type"] = dmgmod["Name"];
                 update["global_damage_mod_flag"] = "1";
@@ -8283,21 +8283,19 @@
                     var section = "";
                     if(currentData["class_resource_name"] == "" || currentData["class_resource_name"] == value["Name"]) {
                         section = "class_resource";
-                        currentData["class_resource_name"] = value["Name"];
                     } else if (currentData["other_resource_name"] == "" || currentData["other_resource_name"] == value["Name"]) {
                         section = "other_resource";
-                        currentData["other_resource_name"] = value["Name"];
                     } else {
                         _.each(repeating.resource, function(resource, id) {
                             if(resource.left == "" && section == "" || resource.left == value["Name"]) {
                                 section = "repeating_resource_" + id + "_resource_left";
                             }
-                            if(resource.right == "" && section == "" || resource.left == value["Name"]) {
+                            if(resource.right == "" && section == "" || resource.right == value["Name"]) {
                                 section = "repeating_resource_" + id + "_resource_right";
                             }
                         })
                     }
-                    if(section == "") {
+                    if(section === "") {
                         var id = generateRowID();
                         section = "repeating_resource_" + id + "_resource_left";
                         repeating.resource[id] = {left: value["Name"], right: ""};
@@ -8333,7 +8331,7 @@
                 var globalac = jsonparse(blob["Global AC Mod"]);
                 var id = generateRowID();
                 update["repeating_acmod_" + id + "_global_ac_val"] = globalac.Bonus;
-                update["repeating_acmod_" + id + "_global_ac_active_flag"] = "1";
+                if(globalac["Active"] !== "false") update["repeating_acmod_" + id + "_global_ac_active_flag"] = "1";
                 update["repeating_acmod_" + id + "_options-flag"] = "0";
                 update["repeating_acmod_" + id + "_global_ac_name"] = globalac.Name;
                 update["global_ac_mod_flag"] = "1";
@@ -8342,7 +8340,7 @@
                 var globalattack = jsonparse(blob["Global Attack"]);
                 var id = generateRowID();
                 update["repeating_tohitmod_" + id + "_global_attack_rollstring"] = `${globalattack["Bonus"]}[${globalattack["Name"]}]`;
-                update["repeating_tohitmod_" + id + "_global_attack_active_flag"] = "1";
+                if(globalattack["Active"] !== "false") update["repeating_tohitmod_" + id + "_global_attack_active_flag"] = "1";
                 update["repeating_tohitmod_" + id + "_options-flag"] = "0";
                 update["global_attack_mod_flag"] = "1";
             };
@@ -11707,6 +11705,7 @@
                 var title = blob.Title ? blob.Title : name;
                 var choice = blob.Choice;
                 var settings = {};
+                let choicenum = blob["Choice Number"] ? parseInt(blob["Choice Number"]) : 1;
                 if(blob.Choice.split(":")[0] == "Blob") {
                     choice = Object.keys(filterBlobs(blobs, {Group: blob.Choice.split(":")[1]}));
                     settings.category = "Blob";
@@ -11717,12 +11716,14 @@
                     repupdate[rowid + " label p"] = blob.Description;
                 }
                 setCharmancerText(repupdate);
-                addRepeatingSection(rowid + " label", "choose", section + "_feature", function(id) {
-                    var info = {};
-                    info[id + "_info"] = title;
-                    setAttrs(info);
-                    setCharmancerOptions(id + "_choice", choice, settings);
-                });
+                for(let x=1; x<=choicenum; x++) {
+                    addRepeatingSection(rowid + " label", "choose", section + "_feature", function(id) {
+                        var info = {};
+                        info[id + "_info"] = title;
+                        setAttrs(info);
+                        setCharmancerOptions(id + "_choice", choice, settings);
+                    });
+                }
                 handleProficiencies(blob, rowid);
             });
         });
@@ -14163,15 +14164,15 @@
     /******                 LEVEL UP MANCER WORKERS                 ******/
     /*********************************************************************/
     //Helper function to update the text in the top bar
-    var recalcLpData = function() {
+    var recalcLpData = function(blobs) {
         var mancerdata = getCharmancerData();
-        var abilities = getAbilityTotals(mancerdata);
+        var abilities = getAbilityTotals(mancerdata, blobs);
         var update = {};
         _.each(abilityList, function(ability) {
             var selector = "attr-container .sheet-" + ability.toLowerCase() + "_total";
             update[selector] = abilities[ability.toLowerCase()] + " | " + abilities[ability.toLowerCase() + "_mod"];
         });
-        update["hit_points"] = getHpTotal(mancerdata);
+        update["hit_points"] = getHpTotal(mancerdata, blobs, abilities);
         setCharmancerText(update);
     };
     //Helper function to get ability totals, including asi
@@ -14214,10 +14215,10 @@
         return abilities;
     };
     //Helper function to get hp total
-    var getHpTotal = function(mancerdata, blobs) {
+    var getHpTotal = function(mancerdata, blobs, abilities) {
         mancerdata = mancerdata || getCharmancerData();
         var leveldata = getLevelingData(mancerdata);
-        var abilities = getAbilityTotals(mancerdata, blobs);
+        var abilities = abilities || getAbilityTotals(mancerdata, blobs);
         var previous = mancerdata["lp-welcome"].values["previous_attributes"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_attributes"]) : {};
         var newhp = 0;
         var additionalhp = 0;
@@ -14251,7 +14252,7 @@
         setCharmancerText({steps: buttons});
         if(eventinfo.triggerName != "lp-welcome" && eventinfo.triggerName != "lp-summary") {
             addRepeatingSection("topbar-holder", "leveler-topbar");
-            if(eventinfo.triggerName != "lp-choices") recalcLpData();
+            if(eventinfo.triggerName != "lp-choices" && eventinfo.triggerName != "lp-spells") recalcLpData();
             getProficiencies(mancerdata, eventinfo.currentStep);
         }
     });
@@ -14907,7 +14908,6 @@
         var spelldata = {};
         var totallevel = 0;
         var prevtotallevel = 0;
-        console.log(previousspells);
         _.each(previousspells, function(spell) {
             spelldata[spell.spellname] = {level: spell.spelllevel};
             if(spell.spellclass && spell.spellclass.toLowerCase() == "racial") spelldata[spell.spellname].known = "Racial";
@@ -14916,7 +14916,6 @@
             totallevel += level.currentlevel + level.addlevel;
             prevtotallevel += level.currentlevel;
         });
-        console.log(leveldata);
         //Gather known spells
         _.each(mancerdata, function(page, pagename) {
             if(pagename.split("-")[0] == "lp") {
@@ -14936,13 +14935,8 @@
                             if(blob.Spells) {
                                 var blobspells = JSON.parse(blob.Spells);
                                 _.each(blobspells, function(blobspell) {
-                                    console.log(thislevel);
-                                    console.log(parseInt(blob.Level));
-                                    console.log(blobspell);
                                     if(blobspell.Known) {
                                         _.each(blobspell.Known, function(spell) {
-                                            console.log(spell);
-                                            console.log(spelldata[spell]);
                                             if(parseInt(blob.Level) >= prevlevel || spelldata[spell]) {
                                                 spelldata[spell] = spelldata[spell] || {level: blobspell.Level};
                                                 spelldata[spell].known = blobspell.Source || data.Category.substring(0, data.Category.length - 1);
@@ -14957,13 +14951,13 @@
             }
         });
         /**/
-        console.log(spelldata);
         return spelldata;
-    }
+    };
 
     on("page:lp-spells", function(eventinfo) {
         var mancerdata = getCharmancerData();
         var queries = [];
+        var blobs = getAllLpBlobs(mancerdata, true, false);
         var leveldata = getLevelingData(mancerdata);
         var classes = [];
         var knowncantrips = 0;
@@ -14976,7 +14970,7 @@
         var prepared = true;
         var prevspells = mancerdata["lp-welcome"].values["spellinfo"] ? JSON.parse(mancerdata["lp-welcome"].values["spellinfo"]) : {};
         var spelldata = getKnownLpSpells(mancerdata);
-        var abilities = getAbilityTotals(mancerdata);
+        var abilities = getAbilityTotals(mancerdata, blobs);
         _.each(spelldata, function(spell, spellname) {
             if(spell.level == "cantrip") {
                 knowncantrips++;
@@ -14984,6 +14978,7 @@
                 knownspells++;
             }
         });
+        recalcLpData(blobs);
         //Gather spell data about each class
         _.each(leveldata, function(level) {
             var prevlevel = level.currentlevel;
@@ -15053,6 +15048,22 @@
             if(thisclass.prepared) thisclass.newspells = thisclass.prepared;
             thisclass.newcantrips = currentcantrips - prevcantrips;
             thisclass.replace = toSwap * (thislevel - prevlevel);
+            _.each(["", "_subclass"], function(section) {
+                if(blobs.sorted[`class${level.classnumber}${section}`]) {
+                    _.each(blobs.sorted[`class${level.classnumber}${section}`], function(blob) {
+                        if(blob.Spells) {
+                            let spells = JSON.parse(blob.Spells);
+                            _.each(spells, function(spell) {
+                                if(spell.Choose === "any" && spell.Level === "0") {
+                                    thisclass.newcantrips += 1;
+                                } else if(spell.Choose === "any") {
+                                    thisclass.newspells += 1;
+                                }
+                            });
+                        }
+                    });
+                }
+            });
             if(thisclass.newcantrips || thisclass.newspells) classes.push(thisclass);
         });
         if(classes.length > 0) {
@@ -15520,6 +15531,8 @@
                 callbacks.push( function() {update_ac();} );
                 callbacks.push( function() {update_weight();} );
                 callbacks.push(callback);
+                console.log(repeating);
+                console.log(update);
                 setAttrs(update, {silent: true}, function() {
                     setCharmancerText({"mancer_progress" :'<div style="width: 95%"></div>'});
                     _.each(callbacks, function(callback) {
@@ -15614,6 +15627,7 @@
         var allSkills = ["athletics", "acrobatics", "sleight_of_hand", "stealth", "arcana", "history", "investigation", "nature", "religion", "animal_handling", "insight", "medicine", "perception", "survival","deception", "intimidation", "performance", "persuasion"];
         var allAbilities = abilityList.map(function(x) {return x.toLowerCase()});
         set["lp-mancer_status"] = "";
+        console.log(blobs);
         _.each(leveldata, function(level) {
             var name = "class" + level.classnumber;
             var mc = "multiclass" + (level.classnumber - 1);
