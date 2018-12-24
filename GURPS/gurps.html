@@ -759,7 +759,9 @@
 					<div class="sheet-cell sheet-col0 sheet-label">
 						<div class="sheet-popup">Broad</div>
 						<span class="sheet-tooltip">
-							Standing Broad Jump Distance. 1st box is feet, 2nd box is yards.<br />
+							Standing Broad Jump Distance.<br />
+							Formula = (2 x Stat To use) - 3 feet<br />
+					 		Stat to use: <input type="text" name="attr_standing_broad_jump_stat_to_use" value="" readonly="readonly" class="textInline width-wide" /><br />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
@@ -776,10 +778,10 @@
 					<div class="sheet-cell sheet-col0 sheet-label">
 						<div class="sheet-popup">Run</div>
 						<span class="sheet-tooltip">
-							Running Broad Jump. 1st box is yards run, 2nd box is feet, 3rd box is yards.<br />
+							Running Broad Jump.<br />
+							Formula = (2 x Stat To use) - 3 feet<br />
+					 		Stat to use: <input type="text" name="attr_running_broad_jump_stat_to_use" value="" readonly="readonly" class="textInline width-wide" /><br />
 							Max running broad jump distance is twice standing broad jump distance.<br />
-							NOTE: Enhanced ground move replaces distance run<br />
-							Enhanced Ground Move = <input type="text" name="attr_display_enhanced_move" value="@{enhanced_ground_move}" disabled="disabled" class="textInline" /><br />
 							Basic Set Campaigns Page 352.
 						</span>
 					</div>
@@ -797,7 +799,9 @@
 					<div class="sheet-cell sheet-col0 sheet-label">
 						<div class="sheet-popup">High</div>
 						<span class="sheet-tooltip">
-							High Jump Distance. 1st box is feet, 2nd box is yards.<br />
+							High Jump Distance.<br />
+							Formula = (6 x Stat To use) - 10 inches<br />
+					 		Stat to use: <input type="text" name="attr_standing_high_jump_stat_to_use" value="" readonly="readonly" class="textInline width-wide" />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
@@ -814,10 +818,10 @@
 					<div class="sheet-cell sheet-col0 sheet-label">
 						<div class="sheet-popup">Run</div>
 						<span class="sheet-tooltip">
-							Running High Jump. 1st box is yards run, 2nd box is feet, 3rd box is yards.<br />
+							Running High Jump.<br />
+							Formula = (6 x Stat To use) - 10 inches<br />
+					 		Stat to use: <input type="text" name="attr_running_high_jump_stat_to_use" value="" readonly="readonly" class="textInline width-wide" /><br />
 							Max running high jump distance is twice standing high jump distance.<br />
-							NOTE: Enhanced ground move replaces distance run<br />
-							Enhanced Ground Move = <input type="text" name="attr_display_enhanced_move" value="@{enhanced_ground_move}" disabled="disabled" class="textInline" /><br />
 							Basic Set Campaigns Page 352.
 						</span>
 					</div>
@@ -4992,8 +4996,15 @@
             
             var finalJumpMoveSpeed = 0;
             
+            var statUsedForJump = "";
+            
+            var statUsedForRunningJump = "";
+            
             // calculate broad and high jump
             if (jumpSkill > 0) {
+                
+                // -------------
+                // USE JUMP SKILL
                 
                 // calc. standing broad jump
                 jumpBroadFeet = Math.floor(jumpSkill/2);
@@ -5001,6 +5012,8 @@
                 if (jumpBroadFeet <= 0) {
                     jumpBroadFeet = 1;
                 }
+                
+                statUsedForJump = "Jump Skill/2 = " + jumpBroadFeet;
                 
                 jumpBroadFeet = (jumpBroadFeet * 2) - 3;
                 
@@ -5011,11 +5024,17 @@
                 // calc. running broad jump
                 if (enhancedGroundMove > Math.floor(jumpSkill/2)) {
                     
+                    // use enhanced move instead of jump skill
+                    statUsedForRunningJump = "Basic Move * (2 ^ Enh MV Mod)";
+                    
                     runningMoveToUse = enhancedGroundMove;
                     
                     runningHighMoveToUse = enhancedGroundMove;
                     
                 } else {
+                    
+                    // use jump skill for running jump
+                    statUsedForRunningJump = statUsedForJump + " + Yards Run";
                     
                     runningMoveToUse = Math.floor(jumpSkill/2) + runningJumpYardsMoved;
                     
@@ -5062,10 +5081,20 @@
                 runningHighJumpFeet = Math.floor(runningHighJumpFeet / 12);
                 
                 if (runningHighJumpFeet <= 0) {
+                    
                     runningHighJumpFeet = 1;
+                    
+                } else if (runningHighJumpFeet > jumpHighFeet * 2) {
+                    
+                    // can't be greater than twice standing broad jump
+                    runningHighJumpFeet = jumpHighFeet * 2;
+                    
                 }
                 
             } else if (values.use_st_for_jump == "1") {
+                
+                //-------------------------------
+                // USE Strength to determine jump
                 
                 // calc. standing broad jump
                 jumpBroadFeet = Math.floor(jumpST/4);
@@ -5073,6 +5102,8 @@
                 if (jumpBroadFeet <= 0) {
                     jumpBroadFeet = 1;
                 }
+                
+                statUsedForJump = "ST / 4 = " + jumpBroadFeet;
                 
                 jumpBroadFeet = (jumpBroadFeet * 2) - 3;
                 
@@ -5083,11 +5114,16 @@
                 // calc. running broad jump
                 if (enhancedGroundMove > Math.floor(jumpST/4)) {
                     
+                    // use enhanced move instead of strength
+                    statUsedForRunningJump = "Basic Move * (2 ^ Enh MV Mod)";
+                    
                     runningMoveToUse = enhancedGroundMove;
                     
                     runningHighMoveToUse = enhancedGroundMove;
                     
                 } else {
+                    
+                    statUsedForRunningJump = statUsedForJump + " + Yards Run";
                     
                     runningMoveToUse = Math.floor(jumpST/4) + runningJumpYardsMoved;
                     
@@ -5133,10 +5169,21 @@
                 runningHighJumpFeet = Math.floor(runningHighJumpFeet / 12);
                 
                 if (runningHighJumpFeet <= 0) {
+                
                     runningHighJumpFeet = 1;
+                    
+                } else if (runningHighJumpFeet > jumpHighFeet * 2) {
+                    
+                    // can't be greater than twice standing broad jump
+                    runningHighJumpFeet = jumpHighFeet * 2;
+                    
                 }
                 
             } else {
+                
+                //---------------
+                // USE Basic Move
+                statUsedForJump = "Basic Move = " + basicMove;
                 
                 // calc. standing broad jump
                 jumpBroadFeet = (basicMove * 2) - 3;
@@ -5148,15 +5195,20 @@
                 // calc. running broad jump
                 if (enhancedGroundMove > basicMove) {
                     
+                    // use enhanced move instead of strength
+                    statUsedForRunningJump = "Basic Move * (2 ^ Enh MV Mod)";
+                    
                     runningMoveToUse = enhancedGroundMove;
                     
                     runningHighMoveToUse = enhancedGroundMove;
                     
                 } else {
                     
+                    statUsedForRunningJump = statUsedForJump + " + Yards Run";
+                    
                     runningMoveToUse = basicMove + runningJumpYardsMoved;
                     
-                    runningHighMoveToUse = Math.floor(jumpST/2) + runningHighJumpYardsMoved;
+                    runningHighMoveToUse = basicMove + runningHighJumpYardsMoved;
                     
                 }
                 
@@ -5198,10 +5250,27 @@
                 runningHighJumpFeet = Math.floor(runningHighJumpFeet / 12);
                 
                 if (runningHighJumpFeet <= 0) {
+                    
                     runningHighJumpFeet = 1;
+                    
+                } else if (runningHighJumpFeet > jumpHighFeet * 2) {
+                    
+                    // can't be greater than twice standing broad jump
+                    runningHighJumpFeet = jumpHighFeet * 2;
+                    
                 }
                 
             }
+            
+            console.log("basicMove:", basicMove);
+            
+            console.log("runningHighJumpYardsMoved:", runningHighJumpYardsMoved);
+            
+            console.log("runningHighMoveToUse:", runningHighMoveToUse);
+            
+            console.log("statUsedForJump:", statUsedForJump);
+            
+            console.log("statUsedForRunningJump:", statUsedForRunningJump);
             
             // If no concentration, divide distance by 2
             if (values.jump_concentration != "1") {
@@ -5308,6 +5377,10 @@
                 "running_jump_distance_yards": runningBroadJumpYards,
                 "running_high_jump_distance_feet": runningHighJumpFeet,
                 "running_high_jump_distance_yards": runningHighJumpYards,
+                "standing_broad_jump_stat_to_use": statUsedForJump,
+                "running_broad_jump_stat_to_use": statUsedForRunningJump,
+                "standing_high_jump_stat_to_use": statUsedForJump,
+                "running_high_jump_stat_to_use": statUsedForRunningJump,
                 "jump_move_speed": finalJumpMoveSpeed
             });
             
