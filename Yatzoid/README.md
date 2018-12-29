@@ -5,4 +5,4 @@ Any problems can be sent to:
 Contact@yatzoid.com
 
 Or Join our discord channel:
-discord.gg/w8kNRgd
+http://discord.gg/w8kNRgd
