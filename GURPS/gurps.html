@@ -349,7 +349,7 @@
 						<input type="number" name="attr_basic_speed_points" value="0" step="5" />
 					</div>
 					<div class="sheet-cell sheet-col4">
-						<button class="sheet-roll-tracker" type="roll" value="/em has a speed of [[@{basic_speed} &{tracker}]]" name="roll_init" />
+						<button class="sheet-roll-tracker" type="roll" value="/em @{selected|token_name} has a speed of [[@{basic_speed} &{tracker}]]. Added to tracker." name="roll_init" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-basic-move">
@@ -3148,7 +3148,7 @@
 
 	var noop = function () {}; // do nothing.
 
-	var version = "1.4.8";
+	var version = "1.0.5";
 
 	var modCascade = true;
 	var modCascadeAll = true;
@@ -3229,10 +3229,23 @@
 			modCascade: modCascade,
 			modCascadeAll: modCascadeAll
 		});
+		
+		// last thing to update is movement
+		var thenMovementStats = _.after(1, function () {
+		    
+            // last thing to update is movement tables
+		    updateToggleUnspentCheckBox();
+            updateDiceDamageIcons();
+            updateEnhancedMove();
+            updateFlightValues();
+            updateWaterMoveValues();
+            updateJumpDistanceValues();
+		    
+		});
 
 		// After move, dodge, encumbrance, HP, and FP
-		var thenCurrentMoveDodge = _.after(5, function () {
-			updateMoveDodge();
+		var thenCurrentMoveDodge = _.after(2, function () {
+			updateMoveDodge(thenMovementStats);
 		});
 
 		// After DX and HT
@@ -3568,8 +3581,9 @@
 		updateMoveDodge();
 	});
 	// Update encumbered/injured move and dodge
-	function updateMoveDodge() {
+	function updateMoveDodge(callback) {
 		console.log('***** UPDATE MOVE/DODGE *****');
+		callback = callback || noop;
 		getAttrs(['encumbrance_level', 'dodge', 'basic_move', 'hit_points', 'hit_points_max', 'fatigue_points', 'fatigue_points_max', 'strength_base', 'strength_mod'], function(v) {
 			var dodge = +v.dodge;
 			var move = +v.basic_move;
@@ -3597,7 +3611,7 @@
 				current_move: move,
 				current_dodge: dodge,
 				strength: strength
-			});
+			}, {silent: false}, callback);
 		});
 	}
 
@@ -4059,9 +4073,10 @@
      */
     function updateToggleUnspentCheckBox() {
         
-         getAttrs(['use_unspent_box'], function(values) {
+        console.log('***** TOGGLE UNSPENT BOX *****');
+        getAttrs(['use_unspent_box'], function(values) {
 
-			setAttrs({ 
+		    setAttrs({ 
 				toggle_unspent_points: values.use_unspent_box
 			});
 			
@@ -4082,6 +4097,8 @@
      */
     function updateDiceDamageIcons() {
         
+        console.log('***** UPDATE DICE DAMAGE *****');
+		    
         updateThrustSwingDamageIcons();
         
         updateRepeatingDamageDice("repeating_melee");
@@ -4153,6 +4170,8 @@
      */
     function updateEnhancedMove() {
         
+        console.log('***** UPDATE ENHANCED MOVE *****');
+		    
         getAttrs(["enhanced_ground_move_mod", "enhanced_ground_move_points", "basic_move", "encumbrance_level", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max"], function(values) {
 
             // + sign converts value to a number
@@ -4431,6 +4450,8 @@
      */
     function updateFlightValues() {
         
+        console.log('***** UPDATE FLIGHT VALUES *****');
+		    
         getAttrs(["flight_checked", "basic_speed", "enhanced_air_level", "basic_air_move", "basic_air_move_mod", 
                   "basic_air_move_points", "enhanced_air_level", "enhanced_air_move_points", 
                   "encumbrance_level", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max"], function(values) {
@@ -4621,6 +4642,8 @@
      */
     function updateWaterMoveValues() {
         
+        console.log('***** UPDATE WATER MOVE VALUES *****');
+		    
         getAttrs(["amphibious_checked", "basic_move", "enhanced_water_level", "basic_water_move", "basic_water_move_mod", 
                   "basic_water_move_points", "enhanced_water_level", "enhanced_water_move_points", 
                   "encumbrance_level", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max"], function(values) {
@@ -4899,6 +4922,8 @@
      */
     function updateJumpDistanceValues() {
         
+        console.log('***** UPDATE JUMP VALUES *****');
+		    
         getAttrs(["use_st_for_jump", "jump_skill", "basic_move", "enhanced_ground_move", "super_jump_entered_level", 
                   "super_jump_points", "strength", "jump_concentration", "running_jump_yards_moved", "running_high_jump_yards_moved", 
                   "encumbrance_level", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max"], function(values) {
@@ -5261,16 +5286,6 @@
                 }
                 
             }
-            
-            console.log("basicMove:", basicMove);
-            
-            console.log("runningHighJumpYardsMoved:", runningHighJumpYardsMoved);
-            
-            console.log("runningHighMoveToUse:", runningHighMoveToUse);
-            
-            console.log("statUsedForJump:", statUsedForJump);
-            
-            console.log("statUsedForRunningJump:", statUsedForRunningJump);
             
             // If no concentration, divide distance by 2
             if (values.jump_concentration != "1") {
