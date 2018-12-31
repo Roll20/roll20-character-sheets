@@ -5581,16 +5581,34 @@
                                 <input type="hidden" name="attr_fromcompendium" class="fromcompendium" value="" />
                                 <button class="myrol" type="compendium" name="attr_fromcompendium" data-i18n-title="open-compendium-item" title="Open Compendium Item"></button>
                                 <input type="text" name="attr_name" class="underlined item" spellcheck="false" title="@{repeating_gear_$id_name}" />
-                                <button class="myrol" style="height:1.3em; vertical-align:bottom; font-family:Pictos;font-size: 1.3em;" type="roll" name="rollShowGear" value="@{whispertype} &{template:pc} {{smallname=^{gear}: @{name}}} {{type=feat}} {{showchar=@{rollshowchar}}} {{charname=@{character_name}}} {{descflag=1}} {{desc=@{notes}}} {{shownotes=[[1]]}} {{notes=^{quantity}:[[@{quantity}]] ^{weight}:[[@{weight_total}]]}}" data-i18n-title="show-chat" title="Show in chat">E</button>
+                                <button class="myrol" style="height:1.3em; vertical-align:bottom; font-family:Pictos;font-size: 1.3em;" type="roll" name="rollShowGear" value="@{whispertype} &{template:pc} {{smallname=^{gear}: @{name}}} {{type=feat}} {{showchar=@{rollshowchar}}} {{charname=@{character_name}}} {{special=@{special}}} {{cost=@{cost}}} {{slot=@{slot}}} {{descflag=1}} {{desc=@{notes}}} {{shownotes=[[1]]}} {{notes=^{quantity}:[[@{quantity}]] ^{weight}:[[@{weight_total}]]}}" data-i18n-title="show-chat" title="Show in chat">E</button>
                                 <input type="number" name="attr_quantity" step="0.01" min="0" value="1" class="nospin underlined sml" spellcheck="false" title="@{repeating_gear_$id_quantity}" />
                                 <input type="number" name="attr_weight" step="0.01" min="0" value="0" class="nospin underlined sml margindent" spellcheck="false" title="@{repeating_gear_$id_weight}" />
                                 <input type="hidden" name="attr_weight_total" value="0" />
                                 <span class="pseudoattr greybg right underlined total" tabindex="0" name="attr_weight_total" title="@{repeating_gear_$id_weight_total}"></span>
                             </div>
-                            <div class="options right">
-                                <div class="autoex">
-                                    <span name="attr_notes"></span>
-                                    <textarea name="attr_notes" spellcheck="false" data-i18n-placeholder="notes" placeholder="Notes" title="@{repeating_gear_$id_notes}"></textarea>
+                            <div class="options" style="text-align: left;">
+                                <div class="myrow">
+                                    <span class="lbl std right" data-i18n="cost:">Cost:</span>
+                                    <input type="text" name="attr_cost" value="" spellcheck="false" class="underlined" title="@{repeating_gear_$id_cost}" />
+                                </div>
+                                <div class="myrow">
+                                    <span class="lbl std right" data-i18n="slot:">Slot:</span>
+                                    <input type="text" name="attr_slot" value="" spellcheck="false" class="underlined" title="@{repeating_gear_$id_slot}" />
+                                </div>
+                                <div class="myrow">
+                                    <span class="lbl std right" data-i18n="special:">Special:</span>
+                                    <div class="autoex std">
+                                        <span name="attr_special"></span>
+                                        <textarea name="attr_special" class="underlined" spellcheck="false" title="@{repeating_gear_$id_special}"></textarea>
+                                    </div>
+                                </div>
+                                <div class="myrow">
+                                    <span class="lbl std right" data-i18n="description:">Description:</span>
+                                    <div class="autoex std">
+                                        <span name="attr_notes"></span>
+                                        <textarea name="attr_notes" class="underlined" spellcheck="false" data-i18n-placeholder="notes" placeholder="Notes" title="@{repeating_gear_$id_notes}"></textarea>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -9735,7 +9753,7 @@
     var pfom = (function () {
         /* === GLOBAL VARIABLES === */
 
-        const pfoglobals_currentversion = 1.23;
+        const pfoglobals_currentversion = 1.24;
         var pfoglobals_i18n_obj = (function () {
             var obj = {};
             obj["strength"] = getTranslationByKey("str-u");
@@ -11833,9 +11851,10 @@
                         } else if(cdata["content"]) {
                             featObj[`${repsec}${newrowid}_description`] = cdata["content"];
                         }
-                    } else {
-                        console.log("*** DEBUG drop_add_feats feat not found with " + featname + " or " + featname2 + " in " + JSON.stringify(cdatarr,null,"  "));
                     }
+                    /* else {
+                        console.log("*** DEBUG drop_add_feats feat not found with " + featname + " or " + featname2 + " in " + JSON.stringify(cdatarr,null,"  "));
+                    } */
                 }
                 _.each(Object.keys(featObj),(key) => {
                     update[featRepsec + key] = featObj[key];
@@ -12232,6 +12251,8 @@
             let update = {}, repsec = `repeating_gear_${generateRowID()}_`;
             update[`${repsec}fromcompendium`] = cdata["uniqueName"];
             update[`${repsec}name`] = cdata["Name"];
+            update[`${repsec}cost`] = (cdata["Cost"] || "");
+            update[`${repsec}special`] = (cdata["Special"] || "");
             update[`${repsec}quantity`] = 1;
             update[`${repsec}weight`] = parseInt((cdata["Weight"] || "0").replace(/\D+/g, ""));
             update[`${repsec}weight_total`] = update[`${repsec}weight`];
@@ -12291,6 +12312,7 @@
             }
             update[`${repsec}dmgtype`] = (cdata["Damage Type"] || "");
             update[`${repsec}dmgcritmulti`] = (parseInt((cdata["Critical Damage"] || "").replace(/\D+/g, "")) || 2);
+            update[`${repsec}notes`] = (cdata["Special"] || "");
             return update;
         };
 
@@ -14060,7 +14082,7 @@
                             .toLowerCase()
                             .split(/[\n|\;]/g)
                             .map((str) => {
-                                let strParts = str.match(/((?:\+|\-)?.*?(?=(?:[a-z\s]+)?\s+to\s+))(?:\s+([a-z\s]+))?\s+to\s+([^(\n|\,|$)]+)/i);
+                                let strParts = str.match(/((?:\+|\-)?.*?(?=(?:[a-z\s]+)?\s+to\s+))(?:\s+([a-z\s]+))?(?:\s+to\s+)([^;\n$]+)/i);
                                 if (strParts && strParts[1] && strParts[3]) {
                                     // Building buff object
                                     let formula = "", type = "", tmpstat = "", objarray = [];
@@ -14074,7 +14096,7 @@
                                     tmpstat = strParts[3]; // maybe an alias
                                     // Checking if stat is buffable
                                     if(tmpstat in buffables) { //alias is a buffable stat
-                                        obj["stat"] = tmpstat;
+                                        // obj["stat"] = tmpstat;
                                         objarray.push({"stat": tmpstat,"value":formula, "type": type});
                                     } else {
                                         // Gathering all buffable stats from the alias
@@ -15709,6 +15731,18 @@
                 {{concentration}}
             </div>
         {{/concentration}}
+        {{#cost}}
+            <div class="myrow">
+                <span class="lbl bold" data-i18n="cost:">Cost:</span>
+                <span class="notes inl">{{cost}}</span>
+            </div>
+        {{/cost}}
+        {{#slot}}
+            <div class="myrow">
+                <span class="lbl bold" data-i18n="slot:">Slot:</span>
+                <span class="notes inl">{{slot}}</span>
+            </div>
+        {{/slot}}
     </div>
     {{#descflag}}
         {{#desc}}
