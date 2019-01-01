@@ -3670,6 +3670,36 @@ var ArmorPerception = function() {
 	});
 };
 
+// ====== Functions ====== \\
+var ArmorPerception = function() {
+	getAttrs(["ArmorWornCheck", "ArmorPerception","ArmorPerception_max", "PerceptionMisc"], function(v) {
+		ArmorPerception_max = parseInt(v["ArmorPerception_max"]);
+		PerceptionMisc = parseInt(v["PerceptionMisc"]);
+		
+		console.log("ArmorPerception_max = " + ArmorPerception_max + '\n' + 
+				"PerceptionMisc = " + PerceptionMisc);	
+		if(v["ArmorWornCheck"] == "1") {
+			switch (v["ArmorPerception"]) {
+				case "None":
+					perception = 0;
+					break;
+				case "Standard":
+					perception = 2;
+					break;
+				case "Superior":
+					perception = 5;
+					break;		
+			};
+			if (ArmorPerception_max > perception) {console.log("Old bonus greater than new"); newPerception = PerceptionMisc+ perception - ArmorPerception_max}
+			else if (ArmorPerception_max < perception) {console.log("New bonus greater than old"); newPerception = PerceptionMisc+ perception - ArmorPerception_max}
+			else {console.log("Bonus is the same"); return;}			
+		}
+		else {perception = 0; newPerception = PerceptionMisc+ perception - ArmorPerception_max;};
+		console.log("New Perception = " + newPerception )
+		setAttrs({"PerceptionMisc": newPerception, "ArmorPerception_max": perception});
+	});
+};
+
 var ArmorUpdate = function() {
 	getAttrs(["ArmorWornCheck", "ArmorDefense", "ImpArmorDefense", "ArmorProf", "ArmorRef", "level", "ArmorType", "ArmorDex", "DEX", "RefMod"], function(v) {
 
@@ -3682,7 +3712,28 @@ var ArmorUpdate = function() {
 	//Defenses	
 	ImpArmorDefense = parseInt(v["level"]) + Math.floor(parseInt(v["ArmorRef"]/ 2))
 	if (v["ArmorProf"] == "0") {setAttrs({"ArmorDefense": "0", "ImpArmorDefense": "0" });}
+
+	//Determine which Dex mod to use
+	dexMod = Math.floor((parseInt(v["DEX"],10) - 10) / 2);
+	console.log("==== Dex Mod for Defenses ====");
+	if(v["ArmorWornCheck"] == "1" && (v["RefMod"] == "@{dex|max}" || v["RefMod"] == "@{ArmorDex}") && v["ArmorDex"] >= dexMod) {
+		console.log("== Armor Dex ("+v["ArmorDex"]+") >= DexMod ("+dexMod+") ==" + '\n' + "RefMod = @{dex|max}");
+		setAttrs({"RefMod": "@{dex|max}"});
+	}
+	else if(v["ArmorWornCheck"] == "1" && (v["RefMod"] == "@{dex|max}" || v["RefMod"] == "@{ArmorDex}") && v["ArmorDex"] < dexMod) {
+		console.log("== Armor Dex ("+v["ArmorDex"]+") < DexMod ("+dexMod+") ==" + '\n' + "RefMod = @{ArmorDex}");
+		setAttrs({"RefMod": "@{ArmorDex}"});
+	}
+	else if(v["ArmorWornCheck"] != "1" && v["RefMod"] == "@{ArmorDex}") {console.log("RefMod = @{dex|max}");
+		setAttrs({"RefMod": "@{dex|max}"});
+	}
+	else{console.log("== NO OPTIONS ==" + '\n' + "dexmod = " +dexMod + '\n' + "ArmorDex = " +v["ArmorDex"] + "\nRefMod = " + v["RefMod"]);
+	}	
+
+	if (v["ArmorWornCheck"] == "0") {setAttrs({"ArmorType_max": "0"});}	
 	
+	else {
+
 	if(v["ArmorWornCheck"] == "1") { //If Armor is being Worn	
 		setAttrs({"ArmorCarry": "1"}); // Armor is Carried
 		if(v["ArmorProf"] == "1") { //if Proficient
@@ -3736,22 +3787,8 @@ var ArmorUpdate = function() {
 			"FortLevel_max": armorFortitude,
 			"ArmorType_max": armorPenalty
 		});	
-	
-	//Determine which Dex mod to use
-	dexMod = Math.floor((parseInt(v["DEX"],10) - 10) / 2);
-	console.log("==== Dex Mod for Defenses ====");
-	if(v["ArmorWornCheck"] == "1" && (v["RefMod"] == "@{dex|max}" || v["RefMod"] == "@{ArmorDex}") && v["ArmorDex"] >= dexMod) {
-		console.log("== Armor Dex ("+v["ArmorDex"]+") >= DexMod ("+dexMod+") ==" + '\n' + "RefMod = @{dex|max}");
-		setAttrs({"RefMod": "@{dex|max}"});
+		
 	}
-	else if(v["ArmorWornCheck"] == "1" && (v["RefMod"] == "@{dex|max}" || v["RefMod"] == "@{ArmorDex}") && v["ArmorDex"] < dexMod) {
-		console.log("== Armor Dex ("+v["ArmorDex"]+") < DexMod ("+dexMod+") ==" + '\n' + "RefMod = @{ArmorDex}");
-		setAttrs({"RefMod": "@{ArmorDex}"});
-	}
-	else if(v["ArmorWornCheck"] != "1" && v["RefMod"] == "@{ArmorDex}") {console.log("RefMod = @{dex|max}");
-		setAttrs({"RefMod": "@{dex|max}"});
-	}
-	else{console.log("== NO OPTIONS ==" + '\n' + "dexmod = " +dexMod + '\n' + "ArmorDex = " +v["ArmorDex"] + "\nRefMod = " + v["RefMod"]);}
 	}); //End 
 };
 
