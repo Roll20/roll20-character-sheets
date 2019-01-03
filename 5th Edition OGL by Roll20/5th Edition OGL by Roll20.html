@@ -15027,7 +15027,7 @@
             var theseblobs = getLpBlobs(level, include_asi, true);
             pickBlobs(theseblobs[name], level[name].blobs, name, name);
             if(level["sub" + name]) {
-                pickBlobs(theseblobs["sub" + name], level["sub" + name].blobs, name + "_subclass", "sub" + name);
+                pickBlobs(theseblobs["sub" + name], level["sub" + name].blobs, "sub" + name, "sub" + name);
             };
         });
         return blobs;
@@ -15863,6 +15863,7 @@
         var data = eventinfo.data;
         var blobs = getAllLpBlobs(data, true);
         var leveldata = getLevelingData(data);
+        var racedata = getLpRaceData(data, leveldata);
         var abilities = getAbilityTotals(data, blobs);
         var previous = data["lp-welcome"].values["previous_attributes"] ? JSON.parse(data["lp-welcome"].values["previous_attributes"]) : {};
         var repeating = data["lp-welcome"].values["previous_repeating"] ? JSON.parse(data["lp-welcome"].values["previous_repeating"]) : {};
@@ -15901,6 +15902,17 @@
             } else {
                 initial[mc + "_lvl"] = previous[mc + "_flag"] === "0" ? level.addlevel : parseInt(previous[mc + "_lvl"]) + level.addlevel;
             }
+        });
+        _.each(racedata, function(level, label) {
+            _.each(["", "sub"], function(prefix) {
+                let section = prefix + label;
+                if(previous[section] && blobs.names[section] && blobs.names[section].length > 0) {
+                    let thisDrop = {name: previous[section], data: {Category: section[0].toUpperCase() + section.substring(1, section.length) + "s"}};
+                    thisDrop.data.blobs = data["lp-welcome"].data["lp-" + section].blobs;
+                    thisDrop.data.theseblobs = blobs.names[section];
+                    allPageData.push(thisDrop);
+                }
+            });
         });
         // Build new blobs for traits with inputs, collect custom traits and languages
         _.each(["lp-choices", "lp-asi"], function(pagename) {
