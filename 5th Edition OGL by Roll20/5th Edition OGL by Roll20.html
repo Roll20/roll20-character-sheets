@@ -14370,9 +14370,9 @@
         additionalhp = totalpreviouslevel * (abilities["constitution_mod"] - abilities["constitution_previous_mod"])
         return parseInt(previous["hp_max"]) + newhp + additionalhp;
     };
-    //Worker for every page to add topbar/buttons
-    on("page:lp-welcome page:lp-levels page:lp-choices page:lp-asi page:lp-spells page:lp-summary", function(eventinfo) {
-        var mancerdata = getCharmancerData();
+
+    var recalcButtons = function(mancerdata, thispage) {
+        mancerdata = mancerdata || getCharmancerData();
         var buttons = "";
         var buttoninfo = {
             welcome: "charmancer-start",
@@ -14383,11 +14383,24 @@
             summary: "review-u"
         }
         _.each(buttoninfo, function(translation, page) {
-            var here = "lp-" + page == eventinfo.triggerName;
-            buttons += "<li><button class=\"step" + (here ? " here" : "") + "\" type=\"" + (here ? "here" : "back") + "\" value=\"lp-" + page + "\" data-i18n=\"" + translation + "\"></button></li>";
+            let here = "lp-" + page == thispage;
+            let disabled = false;
+            if(!here && page !== "levels" && thispage === "lp-welcome") disabled = true;
+            if(mancerdata["lp-levels"]) {
+                if (!here && page === "asi" && mancerdata["lp-levels"].values.asi !== "true") disabled = true;
+                if (!here && page === "spells" && mancerdata["lp-levels"].values.spells !== "true") disabled = true;
+            }
+            buttons += "<li><button class=\"step" + (here ? " here" : "");
+            if(disabled) buttons += " disabled";
+            buttons += "\" type=\"" + (here ? "here" : "back") + "\" value=\"lp-" + page + "\" data-i18n=\"" + translation + "\"></button></li>";
         });
         buttons += "<li><button class=\"exit\" type=\"action\" name=\"act_cancel\" data-i18n=\"cancel-u\">CANCEL</button></li>";
         setCharmancerText({steps: buttons});
+    }
+    //Worker for every page to add topbar/buttons
+    on("page:lp-welcome page:lp-levels page:lp-choices page:lp-asi page:lp-spells page:lp-summary", function(eventinfo) {
+        var mancerdata = getCharmancerData();
+        recalcButtons(mancerdata, eventinfo.triggerName);
         if(eventinfo.triggerName != "lp-welcome" && eventinfo.triggerName != "lp-summary") {
             addRepeatingSection("topbar-holder", "leveler-topbar");
             if(eventinfo.triggerName != "lp-choices" && eventinfo.triggerName != "lp-spells") recalcLpData();
@@ -14595,17 +14608,21 @@
     });
 
     on("mancerchange:class1_subclass mancerchange:class2_subclass mancerchange:class3_subclass mancerchange:class4_subclass", function(eventinfo) {
-        getCompendiumPage(eventinfo.newValue);
+        getCompendiumPage(eventinfo.newValue, function(data) {
+            updateClassLevel(undefined, eventinfo.sourceAttribute.slice(0, 6));
+        });
     });
 
     on("mancerchange:class1_addlevel mancerchange:class2_addlevel mancerchange:class3_addlevel mancerchange:class4_addlevel", function(eventinfo) {
         const mancerdata    = getCharmancerData();
         const leveldata     = mancerdata["lp-levels"];
-        const levelclass    = eventinfo.sourceAttribute.slice(0, 6);
+        const levelclass = eventinfo.sourceAttribute.slice(0, 6);
         const classlevel    = (parseInt(eventinfo.newValue) || 0) + (parseInt(leveldata.values[`${levelclass}_currentlevel`]) || 0);
         const subclasslevel = (leveldata.data[`${levelclass}`] && leveldata.data[`${levelclass}`]["data-Subclass Level"]) ? parseInt(leveldata.data[`${levelclass}`]["data-Subclass Level"]) : 3;
         let set             = {};
         let update          = {};
+
+        updateClassLevel(mancerdata, levelclass);
 
         set[`${levelclass}_classlevel`] = classlevel;
         if (classlevel >= subclasslevel)  {
@@ -14621,9 +14638,49 @@
         update[`${levelclass}_tot`]    = `= level ${classlevel}`;
 
         setCharmancerText(update);
-        setAttrs(set, function() { update_hp(); });
+        setAttrs(set);
     });
 
+    const updateClassLevel = function(mancerdata, levelclass) {
+        mancerdata     = mancerdata || getCharmancerData();
+        const leveling = getLevelingData(mancerdata);
+        const blobs    = getAllLpBlobs(mancerdata, true);
+        const spells   = getNewSpells(mancerdata, leveling, blobs);
+        let set        = {};
+        let update     = {};
+        let asi        = false;
+
+        for(let x = 0; x <= 4; x++) {
+            update["class" + x + "_features"] = "";
+            update["subclass" + x + "_features"] = "";
+        }
+
+        _.each(leveling, function(thislevel) {
+            _.each(["", "sub"], function(prefix) {
+                let thiskey = "class" + thislevel.classnumber;
+                let final = [];
+                if(prefix === "sub") thiskey += "_subclass";
+                _.each(blobs.names[thiskey], function(blobname) {
+                    if(blobname.substr(0,30) == "Ability Score Increase - Level") {
+                        asi = true;
+                        final.push("Ability Score Increase");
+                    } else {
+                        final.push(thislevel[prefix + "class"].blobs[blobname].Title || blobname);
+                    }
+                });
+                update[prefix + "class" + thislevel.classnumber + "_features"] = _.uniq(final).join(", ");
+            });
+        });
+
+        set.asi = asi.toString();
+        set.spells = spells.toString();
+
+        setCharmancerText(update);
+        setAttrs(set, function() {
+            update_hp();
+            recalcButtons(undefined, "lp-levels");
+        });
+    };
     //Build a function to update the level & class each time they change
     on("mancerchange:class1_classlevel mancerchange:class2_classlevel mancerchange:class3_classlevel mancerchange:class4_classlevel", function(eventinfo) {
         const mancerdata     = getCharmancerData();
@@ -15197,6 +15254,78 @@
         return spelldata;
     };
 
+    var getNewSpells = function(mancerdata, leveldata, blobs) {
+        mancerdata = mancerdata || getCharmancerData();
+        leveldata = leveldata || getCharmancerData();
+        blobs = blobs || getAllLpBlobs(mancerdata, false);
+        var result = false;
+        _.each(leveldata, function(level) {
+            var prevlevel = level.currentlevel;
+            var thislevel = level.addlevel + prevlevel;
+            var thisclass = {class: level.classname, number: level.classnumber, newlevel: thislevel, additional: []};
+            var prevknown = 0;
+            var currentknown = 0;
+            var prevcantrips = 0;
+            var currentcantrips = 0;
+            var spelladd = 0;
+            thisclass.newspells = 0;
+            _.each(["class", "subclass"], function(section) {
+                if(level[section]) {
+                    _.each(level[section].blobs, function(blob) {
+                        if(blob.Level == thislevel) {
+                            if(blob["Spells Known"]) {
+                                currentknown = parseInt(blob["Spells Known"]);
+                                if(level.class["data-Spell Replace"]) result = true;
+                            }
+                            if(blob.Cantrips) {
+                                thisclass.cantrips = true;
+                                currentcantrips = parseInt(blob.Cantrips);
+                            }
+                            if(blob["Spells Prepared"]) {
+                                result = true;
+                            }
+                        }
+                        if(blob.Level == prevlevel || (prevlevel === 0 && blob.Level == 1)) {
+                            if(blob["Spells Known"]) {
+                                prevknown = prevlevel === 0 ? 0 : parseInt(blob["Spells Known"]);
+                                if(prevlevel === 0) thisclass.newspells = parseInt(blob["Spells Known"]);
+                            }
+                            if(blob.Cantrips) {
+                                thisclass.cantrips = true;
+                                prevcantrips = prevlevel === 0 ? 0 : parseInt(blob.Cantrips);
+                            }
+                        }
+                        if(level[section]["data-Spell Add"]) {
+                            spelladd = parseInt(level[section]["data-Spell Add"]);
+                        }
+                    });
+                }
+            });
+            if(spelladd) {
+                thisclass.newspells += prevlevel === 0 ? spelladd * (thislevel - prevlevel -1) : spelladd * (thislevel - prevlevel);
+            } else {
+                thisclass.newspells = currentknown - prevknown;
+            }
+            thisclass.newcantrips = currentcantrips - prevcantrips;
+            _.each(["", "_subclass"], function(section) {
+                if(blobs.sorted[`class${level.classnumber}${section}`]) {
+                    _.each(blobs.sorted[`class${level.classnumber}${section}`], function(blob) {
+                        if(blob.Spells) {
+                            let spells = JSON.parse(blob.Spells);
+                            _.each(spells, function(spell) {
+                                if(spell.Choose) {
+                                    result = true;
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            if(thisclass.newcantrips || thisclass.newspells) result = true;
+        });
+        return result;
+    };
+
     on("page:lp-spells", function(eventinfo) {
         var mancerdata = getCharmancerData();
         var queries = [];
@@ -15746,6 +15875,43 @@
         console.log(mancerdata["lp-levels"].values);
         console.log(abilities);
         console.log(previous);
+    });
+
+    on("clicked:lp-choices_next", function(eventinfo) {
+        const mancerdata = getCharmancerData();
+        if(mancerdata["lp-levels"].values.asi === "true") {
+            changeCharmancerPage("lp-asi");
+        } else if(mancerdata["lp-levels"].values.spells === "true") {
+            changeCharmancerPage("lp-spells");
+        } else {
+            changeCharmancerPage("lp-summary");
+        }
+    });
+    on("clicked:lp-asi_next", function(eventinfo) {
+        const mancerdata = getCharmancerData();
+        if(mancerdata["lp-levels"].values.spells === "true") {
+            changeCharmancerPage("lp-spells");
+        } else {
+            changeCharmancerPage("lp-summary");
+        }
+    });
+    on("clicked:lp-spells_back", function(eventinfo) {
+        const mancerdata = getCharmancerData();
+        if(mancerdata["lp-levels"].values.asi === "true") {
+            changeCharmancerPage("lp-asi");
+        } else {
+            changeCharmancerPage("lp-choices");
+        }
+    });
+    on("clicked:lp-summary_back", function(eventinfo) {
+        const mancerdata = getCharmancerData();
+        if(mancerdata["lp-levels"].values.spells === "true") {
+            changeCharmancerPage("lp-spells");
+        } else if(mancerdata["lp-levels"].values.asi === "true") {
+            changeCharmancerPage("lp-asi");
+        } else {
+            changeCharmancerPage("lp-choices");
+        }
     });
 
     on("mancerfinish:lp-mancer", function(eventinfo) {
@@ -17562,7 +17728,7 @@
                 <div>
                     <h3 class="class1_features_title choice" style="display: inline;">Class Features: </h3>
                     <button type="action" name="act_class1" class="mancer_info">i</button>
-                    <div>This text is a placeholder.</div>
+                    <div class="class1_features"></div>
                     <div class="subclass1_name"></div>
                     <div class="subclass1_warning"></div>
                     <div class="subclass1_selector">
@@ -17574,7 +17740,7 @@
                 <div>
                     <h3 class="subclass1_features_title choice" style="display: inline;">Subclass Features: </h3>
                     <button type="action" name="act_class1_subclass" class="mancer_info">i</button>
-                    <div>This text is a placeholder.</div>
+                    <div class="subclass1_features"></div>
                 </div>
             </div>
             <div class="row">
@@ -17604,7 +17770,7 @@
                 <div>
                     <h3 class="class2_features_title choice" style="display: inline;">Class Features: </h3>
                     <button type="action" name="act_class2" class="mancer_info">i</button>
-                    <div>This text is a placeholder.</div>
+                    <div class="class2_features"></div>
                     <div class="subclass2_name"></div>
                     <div class="subclass2_warning"></div>
                     <div class="subclass2_selector">
@@ -17616,7 +17782,7 @@
                 <div>
                     <h3 class="subclass2_features_title choice" style="display: inline;">Subclass Features: </h3>
                     <button type="action" name="act_class2_subclass" class="mancer_info">i</button>
-                    <div>This text is a placeholder.</div>
+                    <div class="subclass2_features"></div>
                 </div>
             </div>
             <div class="row">
@@ -17648,7 +17814,7 @@
                 <div>
                     <h3 class="class3_features_title choice" style="display: inline;">Class Features: </h3>
                     <button type="action" name="act_class3" class="mancer_info">i</button>
-                    <div>This text is a placeholder.</div>
+                    <div class="class3_features"></div>
                     <div class="subclass3_name"></div>
                     <div class="subclass3_warning"></div>
                     <div class="subclass3_selector">
@@ -17660,7 +17826,7 @@
                 <div>
                     <h3 class="subclass3_features_title choice" style="display: inline;">Subclass Features: </h3>
                     <button type="action" name="act_class3_subclass" class="mancer_info">i</button>
-                    <div>This text is a placeholder.</div>
+                    <div class="subclass3_features"></div>
                 </div>
             </div>
             <div class="row">
@@ -17690,7 +17856,7 @@
                 <div>
                     <h3 class="class4_features_title choice" style="display: inline;">Class Features: </h3>
                     <button type="action" name="act_class4" class="mancer_info">i</button>
-                    <div>This text is a placeholder.</div>
+                    <div class="class4_features"></div>
                     <div class="subclass4_name"></div>
                     <div class="subclass4_warning"></div>
                     <div class="subclass4_selector">
@@ -17702,7 +17868,7 @@
                 <div>
                     <h3 class="subclass4_features_title choice" style="display: inline;">Subclass Features: </h3>
                     <button type="action" name="act_class4_subclass" class="mancer_info">i</button>
-                    <div>This text is a placeholder.</div>
+                    <div class="subclass4_features"></div>
                 </div>
             </div>
             <div>
@@ -17746,6 +17912,8 @@
         <input type="hidden" name="comp_class4_currentlevel" />
         <input type="hidden" name="comp_class4_classlevel" />
         <input type="hidden" name="comp_class4_hitdie" />
+        <input type="hidden" name="comp_asi" />
+        <input type="hidden" name="comp_spells" />
     </div>
 </charmancer>
 <!-- END DEV  1378-->
@@ -17765,7 +17933,7 @@
         <div class="bottombar">
             <button class="prev" type="back" value="lp-levels">Back</button>
             <button type="button" data-scroll="#top" class="jump">Back to Top</button>
-            <button class="next" type="back" value="lp-asi">Next</button>
+            <button class="next" type="action" name="act_lp-choices_next">Next</button>
         </div>
         <div class="choice cancel-prompt">
             <p class="label">Where would you like to go, Traveler?</p>
@@ -17791,7 +17959,7 @@
         <div class="bottombar">
             <button class="prev" type="back" value="lp-choices">Back</button>
             <button type="button" data-scroll="#top" class="jump">Back to Top</button>
-            <button class="next" type="back" value="lp-spells">Next</button>
+            <button class="next" type="action" name="act_lp-asi_next">Next</button>
         </div>
         <div class="choice cancel-prompt">
             <p class="label">Where would you like to go, Traveler?</p>
@@ -17818,7 +17986,7 @@
             <div class="sheet-compendium-page sheet-spells-info" accept="Rules:Spells"></div>
         </div>
         <div class="bottombar">
-            <button class="prev" type="back" value="lp-asi">Back</button>
+            <button class="prev" type="action" name="act_lp-spells_back">Back</button>
             <button type="button" data-scroll="#top" class="jump">Back to Top</button>
             <button class="next" type="back" value="lp-summary">Next</button>
         </div>
@@ -17855,7 +18023,7 @@
         </div>
 
         <div class="bottombar">
-            <button class="prev" type="back" value="lp-spells">Back</button>
+            <button class="prev" type="action" name="act_lp-summary_back">Back</button>
             <button type="button" data-scroll="#top" class="jump">Back to Top</button>
             <button class="next choice apply_changes" type="finish" value="lp-mancer">Apply Changes</button>
         </div>
