@@ -12907,17 +12907,21 @@
         var sourcepage = eventinfo.currentStep;
         if(eventinfo.currentStep.split("-")[0] == "lp") {
             var sectioninfo = eventinfo.sourceSection.split("_")[2].split("--")[0].split("-");
-            sourcepage = "lp-levels";
-            section = "class" + sectioninfo[1];
-            if(sectioninfo[0] == "subclass") section += "_subclass";
+            if(sectioninfo.length > 1) {
+                sourcepage = "lp-levels";
+                section = "class" + sectioninfo[1];
+                if(sectioninfo[0] == "subclass") section += "_subclass";
+            } else {
+                sourcepage = "lp-welcome";
+                section = "lp-" + sectioninfo[0];
+            }
         }
         var pagedata = mancerdata[sourcepage].data[section];
         if(_.last(eventinfo.sourceAttribute.split("_")) == "choice") {
             if(type == "feature") {
-                clearRepeatingSections(eventinfo.sourceSection);
+                clearRepeatingSections(eventinfo.sourceSection + " span");
                 if(eventinfo.newValue.split(":")[0] == "Blob") {
-                    console.log({name: eventinfo.newValue.split(":")[1]})
-                    handleBlobs(pagedata.blobs, {name: eventinfo.newValue.split(":")[1]}, section, eventinfo.sourceSection);
+                    handleBlobs(pagedata.blobs, {name: eventinfo.newValue.split(":")[1]}, section, eventinfo.sourceSection + " span");
                 }
             }
             if(eventinfo.newValue == "custom") {
@@ -14441,8 +14445,13 @@
         getAttrs(["strength", "strength_mod", "dexterity", "dexterity_mod", "constitution", "constitution_mod", "intelligence", "intelligence_mod", "wisdom", "wisdom_mod", "charisma", "charisma_mod", "strength_maximum", "dexterity_maximum", "constitution_maximum", "intelligence_maximum", "wisdom_maximum", "charisma_maximum"], function(attrs) {
             setAttrs({previous_abilities: JSON.stringify(attrs)});
         });
-        getAttrs(["class", "subclass", "base_level", "multiclass1_flag", "multiclass2_flag", "multiclass3_flag", "multiclass1", "multiclass1_lvl", "multiclass1_subclass", "multiclass2", "multiclass2_lvl", "multiclass2_subclass", "multiclass3", "multiclass3_lvl", "multiclass3_subclass", "hp_max", "class_resource_name", "other_resource_name", "speed"], function(v) {
-            setAttrs({previous_attributes: JSON.stringify(v)});
+        getAttrs(["class", "subclass", "base_level", "multiclass1_flag", "multiclass2_flag", "multiclass3_flag", "multiclass1", "multiclass1_lvl", "multiclass1_subclass", "multiclass2", "multiclass2_lvl", "multiclass2_subclass", "multiclass3", "multiclass3_lvl", "multiclass3_subclass", "hp_max", "class_resource_name", "other_resource_name", "speed", "race", "subrace", "background"], function(v) {
+            let set = {};
+            set["previous_attributes"] = JSON.stringify(v);
+            set["lp-race"] = "Races:" + v.race;
+            set["lp-subrace"] = "Subraces:" + v.subrace;
+            set["lp-background"] = "Backgrounds:" + v.background.split("(")[0].trim();
+            setAttrs(set);
         });
         _.each(allSkills, function(skill) {
             skillget.push(skill + "_prof");
@@ -14494,6 +14503,10 @@
         });
     });
 
+    on("mancerchange:lp-race mancerchange:lp-subrace mancerchange:lp-background", function(eventinfo) {
+        getCompendiumPage(eventinfo.newValue, function(results) {});
+    });
+
     //DEV 1378
     on("page:lp-levels", function(eventinfo) {
         deleteCharmancerData(["lp-choices"]);
@@ -14539,7 +14552,7 @@
         const mancerdata= getCharmancerData();
         const leveldata = mancerdata["lp-levels"];
         const levelclass= eventinfo.sourceAttribute;
-        const previous = data["lp-welcome"].values["previous_attributes"] ? JSON.parse(data["lp-welcome"].values["previous_attributes"]) : {};
+        const previous = mancerdata["lp-welcome"].values["previous_attributes"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_attributes"]) : {};
 
         getCompendiumPage(eventinfo.newValue, function(p) {
             const data          = p.data;
@@ -14872,7 +14885,7 @@
             if(mancerdata["lp-levels"].data["class" + x] && mancerdata["lp-levels"].values["class" + x + "_addlevel"] && mancerdata["lp-levels"].values["class" + x + "_addlevel"] != "0") {
                 var thisclass = {};
                 thisclass.class = mancerdata["lp-levels"].data["class" + x];
-                thisclass.subclass = mancerdata["lp-levels"].data["class" + x + "_subclass"] || "";
+                thisclass.subclass = mancerdata["lp-levels"].data["class" + x + "_subclass"] || {};
                 thisclass.classname = _.last(mancerdata["lp-levels"].values["class" + x].split(":"));
                 thisclass.subclassname = mancerdata["lp-levels"].values["class" + x + "_subclass"] ? _.last(mancerdata["lp-levels"].values["class" + x + "_subclass"].split(":")) : "";
                 thisclass.currentlevel = mancerdata["lp-levels"].values["class" + x + "_currentlevel"] ? parseInt(mancerdata["lp-levels"].values["class" + x + "_currentlevel"]) : 0;
@@ -14885,24 +14898,50 @@
         return leveling;
     };
 
+    var getLpRaceData = function(mancerdata, leveldata) {
+        mancerdata = mancerdata || getCharmancerData();
+        leveldata = leveldata || getLevelingData(mancerdata);
+        let results = {};
+        let currentlevel = 0;
+        let addlevel = 0;
+        _.each(leveldata, function(level) {
+            addlevel += level.addlevel;
+            currentlevel += level.currentlevel;
+        });
+        _.each(["race", "background"], function(section) {
+            results[section] = {addlevel: addlevel, currentlevel: currentlevel};
+            results[section][section] = mancerdata["lp-welcome"].data["lp-" + section] || {};
+            results[section]["sub" + section] = mancerdata["lp-welcome"].data["lp-sub" + section] || {};
+            results[section].type = section;
+            results[section].name = _.last(mancerdata["lp-welcome"].values["lp-" + section].split(":")) || "";
+            results[section].name += mancerdata["lp-welcome"].values["lp-sub" + section] ? " - " + _.last(mancerdata["lp-welcome"].values["lp-sub" + section].split(":")) : "";
+        });
+        return results;
+    };
+
     var getLpBlobs = function(data, include_asi, verbose) {
-        var asi = data.class["data-Ability Score Levels"];
-        var allblobs = {class: {}, subclass: {}};
+        const type = data.type || "class";
+        var asi = type == "class" ? data[type]["data-Ability Score Levels"] : [];
+        var allblobs = {};
+        allblobs[type] = {};
+        allblobs["sub" + type] = {};
         _.times(data.addlevel, function(x) {
             var thislevel = data.currentlevel + x + 1;
-            allblobs.class = _.extend(allblobs.class, filterBlobs(data.class.blobs, {"Level": "" + thislevel, multiclass: true}));
-            allblobs.subclass = _.extend(allblobs.subclass, filterBlobs(data.subclass.blobs, {"Level": "" + thislevel, multiclass: true}));
+            allblobs[type] = _.extend(allblobs[type], filterBlobs(data[type].blobs, {"Level": "" + thislevel, multiclass: true}));
+            allblobs["sub" + type] = _.extend(allblobs["sub" + type], filterBlobs(data["sub" + type].blobs, {"Level": "" + thislevel, multiclass: true}));
             if(asi.includes("" + thislevel) && include_asi) {
-                allblobs.class["Ability Score Increase - Level " + thislevel] = {Level: thislevel, parentSection: "class"};
-                data.class.blobs["Ability Score Increase - Level " + thislevel] = {
+                allblobs[type]["Ability Score Increase - Level " + thislevel] = {Level: thislevel, parentSection: type};
+                data[type].blobs["Ability Score Increase - Level " + thislevel] = {
                     Level: thislevel,
                     Title: ("Ability Score Increase - Level " + thislevel)
                 };
             }
         });
-        allblobs.class = _.extend(allblobs.class, filterBlobs(data.class.blobs, {"Level": "every", multiclass: true}));
-        allblobs.subclass = _.extend(allblobs.subclass, filterBlobs(data.subclass.blobs, {"Level": "every", multiclass: true}));
-        var remove = {class: [], subclass: []};
+        allblobs[type] = _.extend(allblobs[type], filterBlobs(data[type].blobs, {"Level": "every", multiclass: true}));
+        allblobs["sub" + type] = _.extend(allblobs["sub" + type], filterBlobs(data["sub" + type].blobs, {"Level": "every", multiclass: true}));
+        var remove = {};
+        remove[type] = [];
+        remove["sub" + type] = [];
         //Figure out which blobs are just the same feature at a different level, add them to a list to remove (unless we're useing the verbose option)
         if(!verbose) {
             _.each(allblobs, function(blobs, section) {
@@ -14934,7 +14973,9 @@
             });
         });
         //here we build the final list of blobs that will be added
-        var filteredblobs = {class: [], subclass: []};;
+        var filteredblobs = {};
+        filteredblobs[type] = [];
+        filteredblobs["sub" + type] = [];
         _.each(allblobs, function(blobs, section) {
             _.each(blobs, function(blob, name) {
                 var thisblob = {
@@ -14947,56 +14988,89 @@
         _.each(filteredblobs, function(bloblist) {
             bloblist = _.sortBy(bloblist, "Level");
         })
-        filteredblobs.allblobs = _.extend(data.class.blobs, data.subclass.blobs);
+        filteredblobs.allblobs = _.extend(data[type].blobs, data["sub" + type].blobs);
         return filteredblobs;
     };
 
     var getAllLpBlobs = function(mancerdata, include_asi) {
+        const pickBlobs = function(theseblobs, allblobs, key, section) {
+            blobs.names[key] = _.pluck(theseblobs, "name") || [];
+            if(mancerdata["lp-choices"]) {
+                _.each(mancerdata["lp-choices"].values, function(value, id) {
+                    if((value + "").split(":")[0] == "Blob" && id.split("_")[2].split("--")[0] == section) {
+                        blobs.names[key].push(value.split(":")[1]);
+                    };
+                });
+            };
+            _.each(blobs.names[key], function(blobname){
+                _.each(filterBlobs(allblobs, {"name": blobname, multiclass: true}), function(blob, blobname) {
+                    blobs.all.push(blob);
+                    blobs.sorted[key] = blobs.sorted[key] ? blobs.sorted[key] : [];
+                    blobs.sorted[key].push(blob);
+                });
+            });
+        };
         mancerdata = mancerdata || getCharmancerData();
-        var leveldata = getLevelingData(mancerdata);
+        const leveldata = getLevelingData(mancerdata);
+        const racedata = getLpRaceData(mancerdata, leveldata);
         var blobs = {all: [], sorted: {}, names: {}};
         _.each(leveldata, function(level) {
             var name = "class" + level.classnumber;
             var theseblobs = getLpBlobs(level, include_asi, true);
-            blobs.names[name] = _.pluck(theseblobs.class, "name") || [];
-            if(mancerdata["lp-choices"]) {
-                _.each(mancerdata["lp-choices"].values, function(value, id) {
-                    if((value + "").split(":")[0] == "Blob" && id.split("_")[2].split("--")[0] == "class-" + level.classnumber) {
-                        blobs.names[name].push(value.split(":")[1]);
-                    };
-                });
-            };
-            _.each(blobs.names[name], function(blobname){
-                _.each(filterBlobs(level.class.blobs, {"name": blobname, multiclass: true}), function(blob, blobname) {
-                    blobs.all.push(blob);
-                    blobs.sorted[name] = blobs.sorted[name] ? blobs.sorted[name] : [];
-                    blobs.sorted[name].push(blob);
-                });
-            });
+            pickBlobs(theseblobs.class, level.class.blobs, name, "class-" + level.classnumber);
             if(level.subclass) {
-                blobs.names[name + "_subclass"] = _.pluck(theseblobs.subclass, "name") || [];
-                if(mancerdata["lp-choices"]) {
-                    _.each(mancerdata["lp-choices"].values, function(value, id) {
-                        if((value + "").split(":")[0] == "Blob" && id.split("_")[2].split("--")[0] == "subclass-" + level.classnumber) {
-                            blobs.names[name + "_subclass"].push(value.split(":")[1]);
-                        };
-                    });
-                };
-                _.each(blobs.names[name + "_subclass"], function(blobname){
-                    _.each(filterBlobs(level.subclass.blobs, {"name": blobname, multiclass: true}), function(blob, blobname) {
-                        blobs.all.push(blob);
-                        blobs.sorted[name + "_subclass"] = blobs.sorted[name + "_subclass"] ? blobs.sorted[name + "_subclass"] : [];
-                        blobs.sorted[name + "_subclass"].push(blob);
-                    });
-                });
+                pickBlobs(theseblobs.subclass, level.subclass.blobs, name + "_subclass", "subclass-" + level.classnumber);
+            };
+        });
+        _.each(racedata, function(level) {
+            var name = level.type;
+            var theseblobs = getLpBlobs(level, include_asi, true);
+            pickBlobs(theseblobs[name], level[name].blobs, name, name);
+            if(level["sub" + name]) {
+                pickBlobs(theseblobs["sub" + name], level["sub" + name].blobs, name + "_subclass", "sub" + name);
             };
         });
         return blobs;
     };
 
     on("page:lp-choices", function(eventinfo) {
-        var mancerdata = getCharmancerData();
-        var leveling = getLevelingData(mancerdata);
+        const resortBlobs = function(blobs, section) {
+            _.each(blobs[section], function(x) { x.parentSection = section });
+            _.each(blobs["sub" + section], function(x) { x.parentSection = "sub" + section});
+            let filteredblobs = _.sortBy(blobs[section].concat(blobs["sub" + section]), "Level");
+            let resorted = [];
+            _.each(filteredblobs, function(blob) {
+                if(blob.name.split(" ")[0] == "Proficiencies") {
+                    resorted.unshift(blob);
+                } else {
+                    resorted.push(blob);
+                }
+            });
+            return resorted;
+        }
+        const mancerdata = getCharmancerData();
+        const leveling = getLevelingData(mancerdata);
+        const racedata = getLpRaceData(mancerdata, leveling);
+        _.each(racedata, function(data, section) {
+            const blobs = getLpBlobs(data, true);
+            const relevant = resortBlobs(blobs, section);
+
+            if(relevant.length > 0) {
+                addRepeatingSection("choices", "row", function(thisrow) {
+                    let update = {};
+                    update[thisrow] = "<h2>" + data.name + "<span>";
+                    update[thisrow] += data.addlevel > 1 ? " Levels " + (data.currentlevel + 1) + " - " + (data.currentlevel + data.addlevel) : " Level " + (data.currentlevel + 1);
+                    update[thisrow] += "</span></h2>";
+                    setCharmancerText(update);
+                    _.each(relevant, function(blob, y) {
+                        handleBlobs(blobs.allblobs, {multiclass: true, slide: "lp-choices"}, blob.parentSection + "--" + blob.Level, thisrow, blob.name);
+                        if(y === (relevant.length -1)) {
+                            recalcLpData();
+                        }
+                    });
+                });
+            };
+        });
         _.each(leveling, function(data) {
             var x = data.classnumber;
             var blobs = getLpBlobs(data, true);
@@ -15007,17 +15081,7 @@
                 update[classrow] += data.addlevel > 1 ? " Levels " + (data.currentlevel + 1) + " - " + (data.currentlevel + data.addlevel) : " Level " + (data.currentlevel + 1);
                 update[classrow] += "</span></h2>";
                 setCharmancerText(update);
-                _.each(blobs.class, function(x) { x.parentSection = "class" });
-                _.each(blobs.subclass, function(x) { x.parentSection = "subclass" });
-                var filteredblobs = _.sortBy(blobs.class.concat(blobs.subclass), "Level");
-                var resorted = [];
-                _.each(filteredblobs, function(blob) {
-                    if(blob.name.split(" ")[0] == "Proficiencies") {
-                        resorted.unshift(blob);
-                    } else {
-                        resorted.push(blob);
-                    }
-                });
+                resorted = resortBlobs(blobs, "class");
                 _.each(resorted, function(blob, y) {
                     handleBlobs(blobs.allblobs, {multiclass: true, slide: "lp-choices"}, blob.parentSection + "-" + x + "--" + blob.Level, classrow, blob.name);
                     if(y === (resorted.length -1)) {
@@ -15108,7 +15172,13 @@
                                                 spelldata[spell] = spelldata[spell] || {level: blobspell.Level};
                                                 spelldata[spell].known = blobspell.Source || data.Category.substring(0, data.Category.length - 2);
                                                 spelldata[spell].spellclass = thisclass.classname;
-                                                if(thisclass.class && thisclass.class["Spellcasting Ability"]) {
+                                                if(dataname.substring(0,5) != "class") {
+                                                    spelldata[spell].known = data.Category.substring(0, data.Category.length - 1);
+                                                    spelldata[spell].spellclass = data.Category == "Races" ? "Racial" : data.Category.substring(0, data.Category.length - 1);
+                                                }
+                                                if(blobspell.Ability) {
+                                                    spelldata[spell].ability = blobspell.Ability;
+                                                } else if(thisclass.class && thisclass.class["Spellcasting Ability"]) {
                                                     spelldata[spell].ability = thisclass.class["Spellcasting Ability"];
                                                 } else if (thisclass.subclass && thisclass.subclass["Spellcasting Ability"]) {
                                                     spelldata[spell].ability = thisclass.subclass["Spellcasting Ability"];
@@ -15156,7 +15226,7 @@
         _.each(leveldata, function(level) {
             var prevlevel = level.currentlevel;
             var thislevel = level.addlevel + prevlevel;
-            var thisclass = {class: level.classname, number: level.classnumber, newlevel: thislevel};
+            var thisclass = {class: level.classname, number: level.classnumber, newlevel: thislevel, additional: []};
             var toSwap = level.class["data-Spell Replace"] ? parseInt(level.class["data-Spell Replace"]) : 0;
             var prevknown = 0;
             var currentknown = 0;
@@ -15227,10 +15297,11 @@
                         if(blob.Spells) {
                             let spells = JSON.parse(blob.Spells);
                             _.each(spells, function(spell) {
-                                if(spell.Choose === "any" && spell.Level === "0") {
-                                    thisclass.newcantrips += 1;
-                                } else if(spell.Choose === "any") {
-                                    thisclass.newspells += 1;
+                                if(spell.Choose && spell.Level === "0") {
+                                    thisclass.newcantrips += parseInt(spell.Choose);
+                                } else if(spell.Choose) {
+                                    thisclass.newspells += parseInt(spell.Choose);
+                                    if(parseInt(spell.Level) > thisclass.maxlevel) thisclass.additional.push(spell.Level)
                                 }
                             });
                         }
@@ -15285,6 +15356,9 @@
                         thisquery += x;
                         if(x != thisclass.maxlevel) thisquery += "|";
                     }
+                    _.each(thisclass.additional, function(lvl) {
+                        thisquery += "|" + lvl;
+                    });
                     queries.push(thisquery);
                 }
             });
@@ -16048,6 +16122,7 @@
     <select name="comp_choice">
         <option value="" data-i18n="choose"></option>
     </select>
+    <span></span>
     <input type="hidden" name="comp_info">
     <input type="text" class="choice custom" name="comp_custom">
     <button type="roll" class="choice roll" name="roll_roll" value="">Roll</button>
@@ -17424,9 +17499,9 @@
         <input type="hidden" name="comp_previous_attributes">
         <input type="hidden" name="comp_previous_proficiencies">
         <input type="hidden" name="comp_previous_repeating">
-        <input type="hidden" name="comp_race">
-        <input type="hidden" name="comp_subrace">
-        <input type="hidden" name="comp_background">
+        <input type="hidden" name="comp_lp-race">
+        <input type="hidden" name="comp_lp-subrace">
+        <input type="hidden" name="comp_lp-background">
     </div>
 </charmancer>
 
