@@ -1010,9 +1010,11 @@
                     <input type="text" name="attr_alignment">
                     <span class="label" data-i18n="alignment-u">ALIGNMENT</span>
                 </div>
-                <div class="hlabel-container">
+                <div class="hlabel-container" style="position: relative;">
                     <input type="text" name="attr_experience">
                     <span class="label" data-i18n="exp-pts-u">EXPERIENCE POINTS</span>
+                    <input class="sheet-showleveler" type="hidden" name="attr_showleveler" value="0">
+                    <button class="sheet-levelerbutton" type="action" name="act_launch_lvl+mancer" style="padding: 0px; position: absolute; top: -10px; right: 0px;" title="Charactermancer Level Up"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/5th%20Edition%20OGL%20by%20Roll20/images/CharactermancerIcon200px.png" style="height: 18px; width: 18px; max-width: inherit;"></button>
                 </div>
             </div>
         </div>
@@ -4061,9 +4063,11 @@
                     <input type="text" name="attr_alignment">
                     <span class="label" data-i18n="alignment-u">ALIGNMENT</span>
                 </div>
-                <div class="hlabel-container">
+                <div class="hlabel-container" style="position: relative;">
                     <input type="text" name="attr_experience">
                     <span class="label" data-i18n="exp-pts-u">EXPERIENCE POINTS</span>
+                    <input class="sheet-showleveler" type="hidden" name="attr_showleveler" value="0">
+                    <button class="sheet-levelerbutton" type="action" name="act_launch_lvl+mancer" style="padding: 0px; position: absolute; top: -10px; right: 0px;" title="Charactermancer Level Up"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/5th%20Edition%20OGL%20by%20Roll20/images/CharactermancerIcon200px.png" style="height: 18px; width: 18px; max-width: inherit;"></button>
                 </div>
             </div>
         </div>
@@ -4686,7 +4690,16 @@
                     <span data-i18n="general-opts-u">GENERAL OPTIONS</span>
                 </div>
             </div>
-            <div class="general_options">
+            <div class="general_options charactermancer_options">
+                <input type="hidden" class="warningflag" name="attr_leveler_warningflag">
+                <div class="warning">
+                    <span>
+                        <label><input type="checkbox" name="attr_leveler_warningflag" value="hide">*</label>
+                        <span data-i18n="warning-leveler_start-u">
+                            ATTENTION - YOU CANNOT LAUNCH THE CHARACTERMANCER LEVEL UP UNTIL YOU HAVE A CLASS, LEVEL, AND HP SET FOR LEVEL ONE. PLEASE RUN THE CHARACTERMANCER CREATOR FIRST. THE LEVEL UP TOOL DOESN'T WORK WITH CUSTOM CLASSES OR IF THE MULTICLASS OPTIONS ARE SET UP INCORRECTLY.
+                        </span>
+                    </span>
+                </div>
                 <div class="row">
                     <button type="action" name="act_relaunch_lvl1mancer" style="padding: 0px;"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/5th%20Edition%20OGL%20by%20Roll20/images/CharactermancerIcon200px.png" style="height: 32px; width: 32px"></button><span style="width: 180px; margin-left: 10px; display: inline-block;" data-i18n="relaunch-lvl1mancer-u">LAUNCH LEVEL 1 CHARACTERMANCER (CANNOT BE UNDONE)</span>
                 </div>
@@ -6854,9 +6867,35 @@
     });
 
     on("clicked:launch_lvl+mancer", function(eventinfo) {
-        setAttrs({lpmancer_status: "active"}, function() {
-            startCharactermancer("lp-welcome");
+        getAttrs(["class", "level", "hp_max", "custom_class","multiclass1_flag", "multiclass2_flag", "multiclass3_flag", "multiclass1", "multiclass2", "multiclass3"], function(v) {
+            var throw_warning = false;
+            var class_array = [v["class"]];
+            if(!v["class"] || !v["hp_max"] || isNaN(parseInt(v["hp_max"], 10)) || !v["level"] || isNaN(parseInt(v["level"], 10)) || parseInt(v["level"], 10) < 1 || (v["multiclass2_flag"] == 1 && v["multiclass1_flag"] == 0) || (v["multiclass3_flag"] == 1 && v["multiclass2_flag"] == 0) ) {
+                throw_warning = true;
+            };
+
+            if(v["multiclass1_flag"] == 1) {class_array.push(v["multiclass1"])};
+            if(v["multiclass2_flag"] == 1) {class_array.push(v["multiclass2"])};
+            if(v["multiclass3_flag"] == 1) {class_array.push(v["multiclass3"])};
+            // Check to see if there are any duplicate multiclasses
+            if((new Set(class_array)).size !== class_array.length) { 
+                throw_warning = true;
+            };
+
+            if(throw_warning === true) {
+                setAttrs({leveler_warningflag: "show"});
+                return;
+            };
+
+            setAttrs({lpmancer_status: "active"}, function() {
+                startCharactermancer("lp-welcome");
+            });
         });
+
+    });
+
+    on("change:experience", function(eventinfo) {
+        update_leveler_display();
     });
 
     var update_attr = function(attr) {
@@ -9821,6 +9860,7 @@
                 callbacks.push( function() {update_spell_slots();} );
             }
             callbacks.push( function() {update_pb();} );
+            callbacks.push( function() {update_leveler_display();} );
             setAttrs(update, {silent: true}, function() {callbacks.forEach(function(callback) {callback(); })} );
         });
     };
@@ -9875,6 +9915,27 @@
         else if (d8class.indexOf(class_string) != -1) {return "8"}
         else if (d6class.indexOf(class_string) != -1) {return "6"}
         else {return "0"};
+    };
+
+    var update_leveler_display = function () {
+        getAttrs(["experience","level"], function(v) {
+            let lvl = 0;
+            let exp = 0;
+            let update = {};
+            update["showleveler"] = 0;
+            if(v["level"] && !isNaN(parseInt(v["level"], 10)) && parseInt(v["level"], 10) > 0) {
+                lvl = parseInt(v["level"], 10);
+            }
+            if(v["experience"] && !isNaN(parseInt(v["experience"], 10)) && parseInt(v["experience"], 10) > 0) {
+                exp = parseInt(v["experience"], 10);
+            }
+            if(lvl > 0 && exp > 0) {
+                if((lvl === 1 && exp >= 300) || (lvl === 2 && exp >= 900) || (lvl === 3 && exp >= 2700) || (lvl === 4 && exp >= 6500) || (lvl === 5 && exp >= 14000) || (lvl === 6 && exp >= 23000) || (lvl === 7 && exp >= 34000) || (lvl === 8 && exp >= 48000) || (lvl === 9 && exp >= 64000) || (lvl === 10 && exp >= 85000) || (lvl === 11 && exp >= 100000) || (lvl === 12 && exp >= 120000) || (lvl === 13 && exp >= 140000) || (lvl === 14 && exp >= 165000) || (lvl === 15 && exp >= 195000) || (lvl === 16 && exp >= 225000) || (lvl === 17 && exp >= 265000) || (lvl === 18 && exp >= 305000) || (lvl === 19 && exp >= 355000)) {
+                    update["showleveler"] = 1;
+                };
+            };
+            setAttrs(update, {silent: true});
+        });
     };
 
     var update_spell_slots = function() {
@@ -14307,7 +14368,7 @@
         getAttrs(["strength", "strength_mod", "dexterity", "dexterity_mod", "constitution", "constitution_mod", "intelligence", "intelligence_mod", "wisdom", "wisdom_mod", "charisma", "charisma_mod", "strength_maximum", "dexterity_maximum", "constitution_maximum", "intelligence_maximum", "wisdom_maximum", "charisma_maximum"], function(attrs) {
             setAttrs({previous_abilities: JSON.stringify(attrs)});
         });
-        getAttrs(["class", "subclass", "base_level", "multiclass1_flag", "multiclass2_flag", "multiclass3_flag", "multiclass1", "multiclass1_lvl", "multiclass1_subclass", "multiclass2", "multiclass2_lvl", "multiclass2_subclass", "multiclass3", "multiclass3_lvl", "multiclass3_subclass", "hp_max", "class_resource_name", "other_resource_name", "speed"], function(v) {
+        getAttrs(["class", "subclass", "base_level", "multiclass1_flag", "multiclass2_flag", "multiclass3_flag", "multiclass1", "multiclass1_lvl", "multiclass1_subclass", "multiclass2", "multiclass2_lvl", "multiclass2_subclass", "multiclass3", "multiclass3_lvl", "multiclass3_subclass", "hp_max", "class_resource_name", "other_resource_name", "speed", "custom_class", "cust_classname", "cust_hitdietype"], function(v) {
             setAttrs({previous_attributes: JSON.stringify(v)});
         });
         _.each(allSkills, function(skill) {
@@ -14367,11 +14428,22 @@
         const previous   = mancerdata["lp-welcome"].values["previous_attributes"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_attributes"]) : {};
         let set          = {};
         let update       = {};
+        let baseclass    = previous["class"];
+        let classcompend = ["Classes:"] + previous["class"];
+        let custom_lock  = 0;
         
-        set["class1"] = 'Classes:' + previous["class"];
+        if(previous["custom_class"] && previous["custom_class"] == 1) {
+            baseclass = previous["cust_classname"];
+            classcompend = "Rules:Classes";
+            custom_lock = 1;
+            set["class1_addlevel"] = 0;
+        };
+
+        set["lockcustomclass"] = custom_lock;
+        set["class1"] = 'Classes:' + baseclass;
         set["class1_currentlevel"] = previous["base_level"];
-        update["class1_selector"] = `<div style="width:20%; display: inherit;">` + previous["class"] + `</div>`;
-        if (previous["subclass"]) { 
+        update["class1_selector"] = '<span class="sheet-compendium-class-name">' + baseclass + '</span>';
+        if (previous["subclass"] && !previous["custom_class"]) { 
             update[`subclass1_selector`] = `<div>` + previous["subclass"] + `</div>`;
             set["class1_subclass"] = "Subclasses:" + previous["subclass"]; 
         };
@@ -14385,7 +14457,7 @@
             if(previous[`multiclass${x}_flag`] === "1") {
                 set[`class${x1}`] = "Classes:" + previous[`multiclass${x}`];
                 set[`class${x1}_currentlevel`] = previous[`multiclass${x}_lvl`];
-                update[`class${x1}_selector`] = `<div style="width:20%; display: inherit;">${previous[`multiclass${x}`]}</div>`;
+                update[`class${x1}_selector`] = `<span class="sheet-compendium-class-name">${previous[`multiclass${x}`]}</span>`;
                 if (previous[`multiclass${x}_subclass`]) {
                     set[`class${x1}_subclass`] = "Subclasses:" + previous[`multiclass${x}_subclass`];
                     update[`subclass${x1}_selector`] = `<div>` + previous[`multiclass${x}_subclass`] + `</div>`;
@@ -14398,7 +14470,7 @@
         setAttrs(set, () => { update_hp(true) });
         setCharmancerText(update);
 
-        changeCompendiumPage("sheet-levels-info", ["Classes:"] + previous["class"]);
+        changeCompendiumPage("sheet-levels-info", classcompend);
     });
 
     on("mancerchange:class1 mancerchange:class2 mancerchange:class3 mancerchange:class4", function(eventinfo) {
@@ -14413,7 +14485,7 @@
             let set             = {};
             let update          = {};
             
-            if (levelclass === "class1") {
+            if (levelclass === "class1" && (!previous["custom_class"] || previous["custom_class"] == 0)) {
                 set[`${levelclass}_addlevel`] = leveldata.values[`${levelclass}_addlevel`] ? leveldata.values[`${levelclass}_addlevel`] : 1;
             } else {
                 set[`${levelclass}_addlevel`] = leveldata.values[`${levelclass}_addlevel`] ? leveldata.values[`${levelclass}_addlevel`] : 0;
@@ -17265,9 +17337,13 @@
             <div class="levels_message"></div>
         </div>
         <div class="choices levels-multiclass">
+            <input type="hidden" class="lock-custom-class" name="comp_lockcustomclass">
             <input type="hidden" class="hide-multiclass" name="comp_multiclass" min="0" max="3" />
             <input type="hidden" name="comp_multiclass_initial" min="0" max="3" />
-            <div class="row">
+            <div class="row class1_container">
+                <div class="custom_warning">
+                    <span data-i18n="charmancer-leveler-custom-class-warning">The Level Up tool does not support custom classes at this time.</span>
+                </div>
                 <div>
                     <div class="class1_selector">
                         <select name="comp_class1" value="">
@@ -17290,7 +17366,7 @@
                    <!-- <input type="checkbox" name="comp_class1_hpbyLevel" /><span>By level</span> Put on hold -->
                 </div>
                 <div class="class1_by-levels" style="margin-left: 11%;"></div>
-                <div>
+                <div class="class_features_container">
                     <h3 class="class1_features_title choice" style="display: inline;">Class Features: </h3>
                     <button type="action" name="act_class1" class="mancer_info">i</button>
                     <div>This text is a placeholder.</div>
@@ -17302,7 +17378,7 @@
                         </select>
                     </div>
                 </div>
-                <div>
+                <div class="subclass_features_container">
                     <h3 class="subclass1_features_title choice" style="display: inline;">Subclass Features: </h3>
                     <button type="action" name="act_class1_subclass" class="mancer_info">i</button>
                     <div>This text is a placeholder.</div>
