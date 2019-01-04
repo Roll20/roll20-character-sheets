@@ -2411,7 +2411,7 @@
 		updatePR();
 	});
 	// Déplacement
-	on("change:prphy change:stats_force_total", function() {
+	on("change:prphy change:deplacement_mod change:stats_force_total", function() {
 		updateDeplacement();
 	});
 	// Equive
@@ -2630,13 +2630,14 @@
 	}
 
 	function updateDeplacement() {
-		getAttrs( [ "stats_force_total", "deplacementrapide", "deplacementrapide_duree", "deplacementsprint", "deplacementsprint_duree", "prphy" ], function( sValues ) {
+		getAttrs( [ "stats_force_total", "deplacement_mod", "deplacementrapide", "deplacementrapide_duree", "deplacementsprint", "deplacementsprint_duree", "prphy" ], function( sValues ) {
 			var v = structSafeInt( sValues );
 			var prPhy = v[ "prphy" ];
 			var deplacementRapide = v[ "deplacementrapide" ];
 			var deplacementRapideDuree = v[ "deplacementrapide_duree" ];
 			var deplacementSprint = v[ "deplacementsprint" ];
 			var deplacementSprintDuree = v[ "deplacementsprint_duree" ];
+			var deplacement_mod = v[ "deplacement_mod" ] / 100;
 
 			// PR vs Déplacement
 			if( prPhy === 0 || prPhy === 1 ) {
@@ -2675,6 +2676,12 @@
 				deplacementSprint = 2;
 				deplacementSprintDuree = v[ "stats_force_total" ] * 2;
 			}
+			
+			// apply mod
+			deplacementRapide = Math.ceil( deplacementRapide * deplacement_mod * 100 ) / 100;
+			deplacementRapideDuree = Math.ceil( deplacementRapideDuree * deplacement_mod * 100 ) / 100;
+			deplacementSprint = Math.ceil( deplacementSprint * deplacement_mod * 100 ) / 100;
+			deplacementSprintDuree = Math.ceil( deplacementSprintDuree * deplacement_mod * 100 ) / 100;
 
 			setAttrs({
 				"deplacementrapide": deplacementRapide,
