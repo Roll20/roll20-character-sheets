@@ -5883,6 +5883,138 @@
         </div>
     </rolltemplate>
 
+        <rolltemplate class="sheet-rolltemplate-mancerhproll">
+        <div class="container">
+            <div class="row header">
+                <span>
+                    {{title}}
+                    {{#c1}}
+                        <span>{{c1}}</span>
+                    {{/c1}}
+                </span>
+            </div>
+            {{#r1}}
+                <div class="row">
+                    <span class="desc">Roll 1: </span>
+                    <span class="result">{{r1}}</span>
+                </div>
+            {{/r1}}
+            {{#r2}}
+                <div class="row">
+                    <span class="desc">Roll 2: </span>
+                    <span class="result">{{r2}}</span>
+                </div>
+            {{/r2}}
+            {{#r3}}
+                <div class="row">
+                    <span class="desc">Roll 3: </span>
+                    <span class="result">{{r3}}</span>
+                </div>
+            {{/r3}}
+            {{#r4}}
+                <div class="row">
+                    <span class="desc">Roll 4: </span>
+                    <span class="result">{{r4}}</span>
+                </div>
+            {{/r4}}
+            {{#r5}}
+                <div class="row">
+                    <span class="desc">Roll 5: </span>
+                    <span class="result">{{r5}}</span>
+                </div>
+            {{/r5}}
+            {{#r6}}
+                <div class="row">
+                    <span class="desc">Roll 6: </span>
+                    <span class="result">{{r6}}</span>
+                </div>
+            {{/r6}}
+            {{#r7}}
+                <div class="row">
+                    <span class="desc">Roll 7: </span>
+                    <span class="result">{{r7}}</span>
+                </div>
+            {{/r7}}
+            {{#r8}}
+                <div class="row">
+                    <span class="desc">Roll 8: </span>
+                    <span class="result">{{r8}}</span>
+                </div>
+            {{/r8}}
+            {{#r9}}
+                <div class="row">
+                    <span class="desc">Roll 9: </span>
+                    <span class="result">{{r9}}</span>
+                </div>
+            {{/r9}}
+            {{#r10}}
+                <div class="row">
+                    <span class="desc">Roll 10: </span>
+                    <span class="result">{{r10}}</span>
+                </div>
+            {{/r10}}
+            {{#r11}}
+                <div class="row">
+                    <span class="desc">Roll 11: </span>
+                    <span class="result">{{r11}}</span>
+                </div>
+            {{/r11}}
+                        {{#r12}}
+                <div class="row">
+                    <span class="desc">Roll 12: </span>
+                    <span class="result">{{r12}}</span>
+                </div>
+            {{/r12}}
+            {{#r13}}
+                <div class="row">
+                    <span class="desc">Roll 13: </span>
+                    <span class="result">{{r13}}</span>
+                </div>
+            {{/r13}}
+            {{#r14}}
+                <div class="row">
+                    <span class="desc">Roll 14: </span>
+                    <span class="result">{{r14}}</span>
+                </div>
+            {{/r14}}
+            {{#r15}}
+                <div class="row">
+                    <span class="desc">Roll 15: </span>
+                    <span class="result">{{r15}}</span>
+                </div>
+            {{/r15}}
+            {{#r16}}
+                <div class="row">
+                    <span class="desc">Roll 16: </span>
+                    <span class="result">{{r16}}</span>
+                </div>
+            {{/r16}}
+            {{#r17}}
+                <div class="row">
+                    <span class="desc">Roll 17: </span>
+                    <span class="result">{{r17}}</span>
+                </div>
+            {{/r17}}
+            {{#r18}}
+                <div class="row">
+                    <span class="desc">Roll 18: </span>
+                    <span class="result">{{r18}}</span>
+                </div>
+            {{/r18}}
+            {{#r19}}
+                <div class="row">
+                    <span class="desc">Roll 19: </span>
+                    <span class="result">{{r19}}</span>
+                </div>
+            {{/r19}}
+            {{#r20}}
+                <div class="row">
+                    <span class="desc">Roll 20: </span>
+                    <span class="result">{{r20}}</span>
+                </div>
+            {{/r20}}
+        </div>
+    </rolltemplate>
 </div>
 
 <!-- WORKERS -->
@@ -14681,6 +14813,7 @@
             recalcButtons(undefined, "lp-levels");
         });
     };
+
     //Build a function to update the level & class each time they change
     on("mancerchange:class1_classlevel mancerchange:class2_classlevel mancerchange:class3_classlevel mancerchange:class4_classlevel", function(eventinfo) {
         const mancerdata     = getCharmancerData();
@@ -14869,23 +15002,60 @@
     on("clicked:multiclass_add clicked:multiclass_remove", function(eventinfo) {
         const mancerdata = getCharmancerData();
         const leveldata  = mancerdata["lp-levels"];
+        const levelclass = "class" + (parseInt(leveldata.values["multiclass"]) + 1);
+        const repeating = mancerdata["lp-levels"].repeating || [];
         let set          = {};
         let update       = {};
 
         if (eventinfo.sourceAttribute === "multiclass_add") {
             (leveldata.values["multiclass"] < 3) ? set["multiclass"] = parseInt(leveldata.values["multiclass"]) + 1 : false;
             update["add_multiclass"] = `<button type="action" name="act_multiclass_add" disabled>+</button>`;
+            set[`${levelclass}_addlevel`] = 1;
         } else {
             if (leveldata.values["multiclass"] > leveldata.values["multiclass_initial"]) {
-                set["multiclass"] = parseInt(leveldata.values["multiclass"]) - 1;
+                const multiclass = parseInt(leveldata.values["multiclass"]);
+                let rows = "";
+
+                set["multiclass"] = multiclass - 1;
                 update["add_multiclass"] = `<button type="action" name="act_multiclass_add">+</button>`;
+
+                console.log(`Multiclass was ${multiclass}`);
+                console.log(`Data needs cleared from  class${levelclass}`);
+                console.log(leveldata);
+
+                repeating.forEach(row => {
+                    if (row.includes(`${levelclass}-`)) {
+                       set[row + "_result"] = "";
+                    };
+                });
+
+                set[`${levelclass}_addhp`] = 0;
+                set[`${levelclass}_hp_flag`] = "";
             } else {
                 false
             };
         };
 
-        setAttrs(set);
+        setAttrs(set, function() { recalcLpData(); });
         setCharmancerText(update);
+    });
+
+    on("mancerchange:class1_addhp mancerchange:class2_addhp mancerchange:class3_addhp mancerchange:class4_addhp", function(eventinfo) {
+        if (eventinfo.sourceType === "player") {
+            const mancerdata = getCharmancerData(), levelclass = eventinfo.sourceAttribute.slice(0, 6);
+            const repeating = mancerdata["lp-levels"].repeating || [];
+            let set          = {};
+
+            repeating.forEach(row => {
+                if (row.includes(`${levelclass}-`)) {
+                   set[row + "_result"] = "";
+                };
+            });
+
+            set[`${levelclass}_hp_flag`] = "";
+
+            setAttrs(set);
+        };
     });
 
     on("mancerchange:multiclass", function () {
@@ -17690,7 +17860,6 @@
         <ol class="steps lp-steps">
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel-u">CANCEL</button></li>
         </ol>
-    <!-- Remove the inline style later -->
         <div class="topbar-holder"></div>
         <div style="width: 100%;">
             <p data-i18n="charmancer-leveler-level-info1">Your existing class levels have been pre-populated for you. By default your primary class has been set to be increased by one level. You can change how many levels to increase below, as well as adding a new multiclass.</p>
