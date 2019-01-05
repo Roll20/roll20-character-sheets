@@ -8999,6 +8999,8 @@
             update["pcdrop_category"] = "";
             update["pcdrop_data"] = "";
             update["pcdrop_content"] = "";
+            update["l1mancer_status"] = "completed";
+            update["charactermancer_step"] = "l1-welcome";
             deleteCharmancerData(["spell-choose"]);
         } else { // Character mancer
             if(eventinfo["value"] === "l1-welcome" || eventinfo["value"] === "l1-cancel") {
@@ -9748,7 +9750,7 @@
                         update["npcfeat_category"] = "";
                         update["npcfeat_data"] = "";
 
-                        tmpupd = pfom.drop_add_feats(objs,pages);
+                        tmpupd = pfom.drop_add_feats(objs,pages, false);
                         _.extend(update,tmpupd);
 
                         // console.log("*** DEBUG change:npcfeat_data update: " + JSON.stringify(update,null,"  "));
@@ -10583,7 +10585,7 @@
                     setCharmancerText({"mancer_category":"Adding Feats","mancer_progress" :'<div style="width: 72%"></div>'});
                     // console.log("*** MancerFinish feats: " + FeatsToLoad);
                     if(FeatsToLoad.length) {
-                        _.extend(charUpd,drop_add_feats(FeatsToLoad,cdatarr));
+                        _.extend(charUpd,drop_add_feats(FeatsToLoad,cdatarr,true));
                     }
 
                     // === 9.SPELL LIKE ABILITIES ===
@@ -11295,7 +11297,7 @@
                             _.extend(update, tmpobj);
                         }
                         if(objfeats.length) {
-                            tmpobj = drop_add_feats(objfeats,cdatarr);
+                            tmpobj = drop_add_feats(objfeats,cdatarr,false);
                             _.extend(update, tmpobj);
                         }
                         setAttrs(update,{silent:true},() => {
@@ -11736,7 +11738,7 @@
                         page["id"] = (v.pcdrop_uniq || "");
                         page["data"] = cdata;
                         pages.push(page);
-                        _.extend(update,drop_add_feats(objs,pages));
+                        _.extend(update,drop_add_feats(objs,pages, true));
                         setAttrs(update,{silent: true});
                         break;
                     case "items":
@@ -11806,7 +11808,7 @@
                 });
             });
         };
-        const drop_add_feats = function(objs,cdatarr) {
+        const drop_add_feats = function(objs,cdatarr, isPc = false) {
             // console.log("*** DEBUG drop_add_feats objs :" + JSON.stringify(objs,null,"  "));
             let update = {};
             // return update;
@@ -11839,7 +11841,7 @@
                             let featType = cdata.data["Feat Type"].toLowerCase().trim();
                             if(["general","combat","critical","grit","item creation","metamagic","monster","panache","performance","style","teamwork"].includes(featType)) {
                                 featObj[`${repsec}${newrowid}_type`] = featType;
-                                if(featType == "metamagic") {
+                                if((featType == "metamagic") && isPc) {
                                     featRepsec = "repeating_metamagic";
                                 }
                             } else {
