@@ -2278,13 +2278,12 @@
                     <td class="result hit">{{result}} successes</td>
                 </tr>
             {{/rollTotal() result 0}}
-
-            {{#rollWasCrit() result}}
+            {{#rollGreater() result 0}}
                 and hits for<br>
                 <tr>
                     <td class="result miss">{{result}}{{#2nd}} + {{weapon_damage}}{{/2nd}} Damage</td>
                 </tr>
-            {{/rollWasCrit() result}}
+            {{/rollGreater() result 0}}
         </td></tr>
         <tr>
             <td class="specialrollflag">
@@ -3293,7 +3292,8 @@
     }
 
     var updateRollType = function() {
-        getAttrs(["rolltype_select","sheettype"], function(v) {
+        getAttrs(["rolltype_select","sheettype","attack_type0","attack_type1","attack_type2","attack_type3","attack_type4"], function(v) {
+            var update = {};
             var isSecondEdition = v.sheettype === "mortal2" ||
                 v.sheettype === "vampire2" ||
                 v.sheettype === "werewolf2" ||
@@ -3336,7 +3336,58 @@
                     }
                     break;
             }
-            setAttrs({rolltype: value});
+            update["rolltype"] = value;
+            // (PRD-1406) Check that attack type is correlated to edition
+            for(var i = 0; i < 5; i++) {
+                if(isSecondEdition) {
+                    switch(v[`attack_type${i}`]) {
+                        // Melee
+                        case `{{1st=1}} {{str=1}} {{wea=1}} {{result=[[{((@{attack_damage${i}}+@{strength}+@{weaponry}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})`:
+                            update[`attack_type${i}`] = "{{2nd=1}} {{str=1}} {{wea=1}} {{result=[[{((@{strength}+@{weaponry}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})";
+                            break;
+                        // Gun
+                        case `{{1st=1}} {{dex=1}} {{fir=1}} {{result=[[{((@{attack_damage${i}}+@{dexterity}+@{firearms}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})`:
+                            update[`attack_type${i}`] = "{{2nd=1}} {{dex=1}} {{fir=1}} {{result=[[{((@{dexterity}+@{firearms}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})";
+                            break;
+                        // Thrown
+                        case "{{1st=1}} {{dex=1}} {{ath=1}} {{result=[[{((@{attack_damage1}+@{dexterity}+@{athletics}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})":
+                            update[`attack_type${i}`] = "{{2nd=1}} {{dex=1}} {{ath=1}} {{result=[[{((@{dexterity}+@{athletics}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})";
+                            break;
+                        // Brawl* (Fighting Finesse)
+                        case "{{1st=1}} {{dex=1}} {{bra=1}} {{result=[[{((@{attack_damage1}+@{dexterity}+@{brawl}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})":
+                            update[`attack_type${i}`] = "{{2nd=1}} {{dex=1}} {{bra=1}} {{result=[[{((@{dexterity}+@{brawl}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})";
+                            break;
+                        // Melee* (Fighting Finesse)
+                        case "{{1st=1}} {{dex=1}} {{wea=1}} {{result=[[{((@{attack_damage1}+@{dexterity}+@{weaponry}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})":
+                            update[`attack_type${i}`] = "{{2nd=1}} {{dex=1}} {{wea=1}} {{result=[[{((@{dexterity}+@{weaponry}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})";
+                            break;
+                    }
+                } else {
+                    switch(v[`attack_type${i}`]) {
+                        // Melee
+                        case "{{2nd=1}} {{str=1}} {{wea=1}} {{result=[[{((@{strength}+@{weaponry}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})":
+                            update[`attack_type${i}`] = `{{1st=1}} {{str=1}} {{wea=1}} {{result=[[{((@{attack_damage${i}}+@{strength}+@{weaponry}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})`;
+                            break;
+                        // Gun
+                        case "{{2nd=1}} {{dex=1}} {{fir=1}} {{result=[[{((@{dexterity}+@{firearms}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})":
+                            update[`attack_type${i}`] = `{{1st=1}} {{dex=1}} {{fir=1}} {{result=[[{((@{attack_damage${i}}+@{dexterity}+@{firearms}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})`;
+                            break;
+                        // Thrown
+                        case "{{2nd=1}} {{dex=1}} {{ath=1}} {{result=[[{((@{dexterity}+@{athletics}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})":
+                            update[`attack_type${i}`] = "{{1st=1}} {{dex=1}} {{ath=1}} {{result=[[{((@{attack_damage1}+@{dexterity}+@{athletics}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})";
+                            break;
+                        // Brawl* (Fighting Finesse)
+                        case "{{2nd=1}} {{dex=1}} {{bra=1}} {{result=[[{((@{dexterity}+@{brawl}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})":
+                            update[`attack_type${i}`] = "{{1st=1}} {{dex=1}} {{bra=1}} {{result=[[{((@{attack_damage1}+@{dexterity}+@{brawl}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})";
+                            break;
+                        // Melee* (Fighting Finesse)
+                        case "{{2nd=1}} {{dex=1}} {{wea=1}} {{result=[[{((@{dexterity}+@{weaponry}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})":
+                            update[`attack_type${i}`] = "{{1st=1}} {{dex=1}} {{wea=1}} {{result=[[{((@{attack_damage1}+@{dexterity}+@{weaponry}+?{Modifiers|0}+@{wound_penalty}+@{weapon_penalty}+@{armor_penalty})";
+                            break;
+                    }
+                }
+            }
+            setAttrs(update, {silent: true});
         });
     }
 
