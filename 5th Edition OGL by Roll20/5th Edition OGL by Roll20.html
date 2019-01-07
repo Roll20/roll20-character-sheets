@@ -7208,7 +7208,7 @@
             {name: "tool", list: ["toolname"]},
             {name: "traits", list: ["name", "source", "source_type"]},
             {name: "resource", list: ["resource_left_name", "resource_right_name"]},
-            {name: "spell-cantrip", list: ["spellname", "spellattackid", "spellsource"]},
+            {name: "spell-cantrip", list: ["spellname", "spellattackid", "spellsource", "spellattackid"]},
             {name: "savemod", list: ["global_save_rollstring"]},
             {name: "tohitmod", list: ["global_attack_rollstring"]},
             {name: "damagemod", list: ["global_damage_type"]},
@@ -7218,7 +7218,7 @@
             {name: "hpmod", list: ["levels", "source", "mod"]}
         ];
         for(var x=1; x<=9; x++) {
-            getList.push({ name: "spell-" + x, list: ["spellname", "spellattackid", "spellsource"] });
+            getList.push({ name: "spell-" + x, list: ["spellname", "spellattackid", "spellsource", "spellattackid"] });
         }
         var repeating = {prof_names: [], traits: []};
         _.each(getList, function(section) {
@@ -7486,11 +7486,13 @@
             }
         };
         if(category === "Spells") {
+            let existing = {};
             var lvl = page.data["Level"] && page.data["Level"] > 0 ? page.data["Level"] : "cantrip";
             if(repeating["spell-" + lvl]) {
                 _.each(repeating["spell-" + lvl], function(spell, spellid) {
                     if(spell.spellname.toLowerCase() === page.name.toLowerCase()) {
                         id = spellid;
+                        existing = spell;
                     }
                 });
             }
@@ -7501,7 +7503,6 @@
                 update["repeating_spell-" + lvl + "_" + id + "_spell_ability"] = "spell";
             }
             if(page.data["spellclass"]) {
-                console.log("SPELL CLASS!!!!!");
                 update["repeating_spell-" + lvl + "_" + id + "_spellclass"] = page.data["spellclass"];
             }
             if(page.data["spellsource"]) {
@@ -7523,7 +7524,7 @@
             if(page.data["Duration"]) {update["repeating_spell-" + lvl + "_" + id + "_spellduration"] = page.data["Duration"]};
             if(page.data["Damage"] || page.data["Healing"]) {
                 update["repeating_spell-" + lvl + "_" + id + "_spelloutput"] = "ATTACK";
-                callbacks.push( function() {create_attack_from_spell(lvl, id, currentData.character_id);} );
+                if(!existing.spellattackid) callbacks.push( function() {create_attack_from_spell(lvl, id, currentData.character_id);} );
             }
             else if(page.data["Higher Spell Slot Desc"] && page.data["Higher Spell Slot Desc"] != "") {
                 var spelllevel = "?{Cast at what level?";
@@ -8165,7 +8166,7 @@
                 var trait_array = jsonparse(blob["Traits"]);
                 if(trait_array && trait_array.length) {
                     _.each(trait_array, function(trait) {
-                        if(!trait.Input && !trait["Input Spells"]) {
+                        if(!trait.Input) {
                             var match = {name: trait["Name"], type: page.name};
                             if(trait["Replace"]) {
                                 match = {name: trait["Replace"]};
@@ -8185,8 +8186,8 @@
                                 newtrait.type = page.name;
                                 repeating.traits.push(newtrait);
                             }
-                            update["repeating_traits_" + newrowid + "_name"] = trait["Name"];
-                            update["repeating_traits_" + newrowid + "_description"] = trait["Desc"] ? trait["Desc"] : "";
+                            update["repeating_traits_" + newrowid + "_name"] = trait["Name"].replace(/{{Input}}/g, "");
+                            update["repeating_traits_" + newrowid + "_description"] = trait["Desc"] ? trait["Desc"].replace(/{{Input}}/g, "") : "";
                             update["repeating_traits_" + newrowid + "_source"] = traitsource;
                             update["repeating_traits_" + newrowid + "_source_type"] = page.name ? page.name : "";
                             update["repeating_traits_" + newrowid + "_options-flag"] = 0;
@@ -11789,7 +11790,7 @@
                 });
             }
         };
-        const handleTraits = function(blob, subsection) {
+        const handleTraits = function(blob, subsection, name) {
             var traits = JSON.parse(blob.Traits);
             subsection = subsection ? subsection : element;
             _.each(traits, function(trait) {
@@ -11799,8 +11800,10 @@
                         let set = {};
                         repupdate[`${rowid} label span .sheet-title`] = trait.Name.split("{{")[0];
                         if(!trait.Hide) repupdate[`${rowid} label p`] = trait.Desc;
-                        repupdate[`${rowid} button`] = `Pick a Spell`;
+                        repupdate[`${rowid} button`] = trait["Input Spells"].ButtonText;
                         set[`${rowid}_info`] = JSON.stringify(trait["Input Spells"]);
+                        set[`${rowid}_type`] = "trait";
+                        set[`${rowid}_blob`] = name;
                         set[`${rowid}_parent`] = options.parent;
                         set[`${rowid}_title`] = trait.Name;
                         set[`${rowid}_desc`] = trait.Desc;
@@ -11830,7 +11833,7 @@
         let section = options.section || undefined;
         let thisblob = options.thisblob || undefined;
         let element = options.element ? options.element : section + "_holder";
-        let sorted = {choices: {}, traits: {}, other: {}};
+        let sorted = {choices: {}, traits: {}, other: {}, spells: {}};
         let profdata = getProficiencies(mancerdata, options.slide);
         let filtered = {};
         if(thisblob) {
@@ -11841,6 +11844,8 @@
         _.each(filtered, function(blob, name) {
             if(name.split(" ")[0] == "Proficiencies") {
                 sorted.proficiencies = blob;
+            } else if (blob["Pick Spells"]) {
+                sorted.spells[name] = blob;
             } else if(blob.Choice) {
                 sorted.choices[name] = blob;
             } else if(blob.Traits) {
@@ -11872,9 +11877,46 @@
                         var info = {};
                         info[id + "_info"] = title;
                         setAttrs(info);
-                        setCharmancerOptions(id + "_choice", choice, settings);
+                        setCharmancerOptions(id + "_choice", choice, settings, function() {
+                            if(mancerdata[options.slide].values[id + "_choice"] && mancerdata[options.slide].values[id + "_choice"].split(":")[0] == "Blob") {
+                                handleBlobs(blobs, {
+                                    filters: {name: mancerdata[options.slide].values[id + "_choice"].split(":")[1]},
+                                    section: section,
+                                    element: id + " span",
+                                    slide: options.slide,
+                                    parent: options.parent
+                                });
+                            }
+                        });
                     });
                 }
+                handleProficiencies(blob, rowid);
+            });
+        });
+        _.each(sorted.spells, function(blob, name) {
+            addRepeatingSection(element, "row", function(rowid) {
+                let title = blob.Title ? blob.Title : name;
+                let spells = JSON.parse(blob["Pick Spells"]);
+                let settings = {};
+                let repupdate = {};
+                repupdate[rowid + ">label>span"] = title;
+                if(blob.Description) {
+                    repupdate[rowid + ">label>p"] = blob.Description;
+                }
+                _.each(spells, function(spell) {
+                    addRepeatingSection(rowid, "utilityrow", function(rowid) {
+                        let repupdate = {};
+                        let set = {};
+                        repupdate[`${rowid} button`] = spell.ButtonText;
+                        set[`${rowid}_info`] = JSON.stringify(spell);
+                        set[`${rowid}_type`] = "pick";
+                        set[`${rowid}_parent`] = options.parent;
+                        set[`${rowid}_blob`] = name;
+                        setCharmancerText(repupdate);
+                        setAttrs(set);
+                    });
+                })
+                setCharmancerText(repupdate);
                 handleProficiencies(blob, rowid);
             });
         });
@@ -11901,11 +11943,11 @@
                         if(blob.Description) repupdate[rowid + " label p"] = "" + blob.Description;
                         setCharmancerText(repupdate);
                     }
-                    handleTraits(blob, rowid);
+                    handleTraits(blob, rowid, name);
                     handleProficiencies(blob, rowid);
                 });
             } else {
-                handleTraits(blob);
+                handleTraits(blob, undefined, name);
             }
         });
     };
@@ -12186,7 +12228,7 @@
                         });
                         update["race_ability_score"] = abilityText.join(", ");
                     }
-                    handleBlobs(data.blobs, {filters: {"Level": "1"}, section: "race"});
+                    handleBlobs(data.blobs, {filters: {"Level": "1"}, section: "race", slide: "l1-race"});
 
                     setCharmancerText(update);
 
@@ -12283,7 +12325,7 @@
                     });
                     update["subrace_ability_score"] = abilityText.join(", ");
                 }
-                handleBlobs(data.blobs, {filters: {"Level": "1"}, section: "subrace"});
+                handleBlobs(data.blobs, {filters: {"Level": "1"}, section: "subrace", slide: "l1-race"});
 
                 setCharmancerText(update);
                 showChoices(showList);
@@ -12343,7 +12385,7 @@
                 var showList = [];
                 var data = p["data"];
                 var hideList = [];
-                handleBlobs(data.blobs, {filters: {"Level": "1"}, section: "class"});
+                handleBlobs(data.blobs, {filters: {"Level": "1"}, section: "class", slide: "l1-class"});
 
                 var class_name = eventinfo.newValue && eventinfo.newValue.split(":").length > 1 && eventinfo.newValue.split(":")[0] === "Classes" ? eventinfo.newValue.split(":")[1] : false;
 
@@ -12448,7 +12490,7 @@
             hideChoices(["custom_subclass"]);
             getCompendiumPage(eventinfo.newValue, function(p) {
                 var data = p["data"];
-                handleBlobs(data.blobs, {filters: {"Level": "1"}, section: "subclass"});
+                handleBlobs(data.blobs, {filters: {"Level": "1"}, section: "subclass", slide: "l1-class"});
 
                 recalcData();
                 setAttrs(reset);
@@ -12510,7 +12552,7 @@
                 _.each(possibles, function(key) {
                     update[key] = "";
                 });
-                handleBlobs(data.blobs, {filters: {"Level": "1"}, section: "background"});
+                handleBlobs(data.blobs, {filters: {"Level": "1"}, section: "background", slide: "l1-background"});
 
                 if (data["data-Background Choices"] && data["data-Background Choices"] != "") {
                     showList.push("background_detail_choice_row");
@@ -12932,14 +12974,21 @@
         var pagedata = mancerdata[sourcepage].data[section];
         if(_.last(eventinfo.sourceAttribute.split("_")) == "choice") {
             if(type == "feature") {
-                clearRepeatingSections(eventinfo.sourceSection + " span");
-                if(eventinfo.newValue.split(":")[0] == "Blob") {
-                    //blobs, filters, section, element, thisblob
-                    handleBlobs(pagedata.blobs, {
-                        filters: {name: eventinfo.newValue.split(":")[1]},
-                        section: section,
-                        element: eventinfo.sourceSection + " span"
-                    });
+                if(eventinfo.previousValue !== eventinfo.newValue){
+                    clearRepeatingSections(eventinfo.sourceSection + " span");
+                    if(eventinfo.newValue.split(":")[0] == "Blob") {
+                        console.log(pagedata.blobs[eventinfo.newValue.split(":")[1]]);
+                        if(pagedata.blobs[eventinfo.newValue.split(":")[1]]["Pick Spells"] || pagedata.blobs[eventinfo.newValue.split(":")[1]].Spells) {
+                            deleteCharmancerData(["lp-spells"]);
+                        }
+                        handleBlobs(pagedata.blobs, {
+                            filters: {name: eventinfo.newValue.split(":")[1]},
+                            section: section,
+                            element: eventinfo.sourceSection + " span",
+                            slide: eventinfo.currentStep,
+                            parent: section
+                        });
+                    }
                 }
             }
             if(eventinfo.newValue == "custom") {
@@ -14399,10 +14448,11 @@
             asi: "asi-u",
             spells: "spells-u",
             summary: "review-u"
-        }
+        };
         _.each(buttoninfo, function(translation, page) {
             let here = "lp-" + page == thispage;
             let disabled = false;
+            if(thispage === "lp-spellchoice") disabled = true;
             if(!here && page !== "levels" && thispage === "lp-welcome") disabled = true;
             if(mancerdata["lp-levels"]) {
                 if (!here && page === "asi" && mancerdata["lp-levels"].values.asi !== "true") disabled = true;
@@ -14418,7 +14468,7 @@
         setCharmancerText({steps: buttons});
     }
     //Worker for every page to add topbar/buttons
-    on("page:lp-welcome page:lp-levels page:lp-choices page:lp-asi page:lp-spells page:lp-summary", function(eventinfo) {
+    on("page:lp-welcome page:lp-levels page:lp-choices page:lp-asi page:lp-spells page:lp-summary page:lp-spellchoice", function(eventinfo) {
         var mancerdata = getCharmancerData();
         recalcButtons(mancerdata, eventinfo.triggerName);
         if(eventinfo.triggerName != "lp-welcome" && eventinfo.triggerName != "lp-summary") {
@@ -14461,6 +14511,7 @@
                     getList.push("repeating_" + sectionname + "_" + spellid + "_spellname");
                     getList.push("repeating_" + sectionname + "_" + spellid + "_spellclass");
                     getList.push("repeating_" + sectionname + "_" + spellid + "_spelllevel");
+                    getList.push("repeating_" + sectionname + "_" + spellid + "_spellsource");
                 });
             });
             getAttrs(getList, function(attrs) {
@@ -14542,7 +14593,6 @@
 
     //DEV 1378
     on("page:lp-levels", function(eventinfo) {
-        deleteCharmancerData(["lp-choices"]);
         const mancerdata = getCharmancerData();
         const previous   = mancerdata["lp-welcome"].values["previous_attributes"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_attributes"]) : {};
         let set          = {};
@@ -14553,9 +14603,8 @@
         update["class1_selector"] = `<div style="width:20%; display: inherit;">` + previous["class"] + `</div>`;
         if (previous["subclass"]) { 
             update[`subclass1_selector`] = `<div>` + previous["subclass"] + `</div>`;
-            if(mancerdata["lp-levels"].values["class1_subclass"] !== "Subclasses" + previous["subclass"])set["class1_subclass"] = "Subclasses:" + previous["subclass"]; 
+            if(mancerdata["lp-levels"] && mancerdata["lp-levels"].values["class1_subclass"] !== "Subclasses" + previous["subclass"])set["class1_subclass"] = "Subclasses:" + previous["subclass"]; 
         };
-        
         const multiclass = parseInt(previous["multiclass1_flag"]) + parseInt(previous["multiclass2_flag"]) + parseInt(previous["multiclass3_flag"]);
         set["multiclass"] = mancerdata["lp-levels"] && mancerdata["lp-levels"].values["multiclass"] ? mancerdata["lp-levels"].values["multiclass"] : multiclass;
         set["multiclass_initial"] = multiclass;
@@ -14582,6 +14631,7 @@
     });
 
     on("mancerchange:class1 mancerchange:class2 mancerchange:class3 mancerchange:class4", function(eventinfo) {
+        if(eventinfo.sourceType !== "worker") deleteCharmancerData(["lp-choices", "lp-asi", "lp-spells", "lp-summary"]);
         const mancerdata= getCharmancerData();
         const leveldata = mancerdata["lp-levels"];
         const levelclass= eventinfo.sourceAttribute;
@@ -14623,17 +14673,18 @@
 
             setCharmancerText(update);
             setAttrs(set);
-            //update_hp();
         });
     });
 
     on("mancerchange:class1_subclass mancerchange:class2_subclass mancerchange:class3_subclass mancerchange:class4_subclass", function(eventinfo) {
+        if(eventinfo.sourceType !== "worker") deleteCharmancerData(["lp-choices", "lp-asi", "lp-spells", "lp-summary"]);
         getCompendiumPage(eventinfo.newValue, function(data) {
             updateClassLevel(undefined, eventinfo.sourceAttribute.slice(0, 6));
         });
     });
 
     on("mancerchange:class1_addlevel mancerchange:class2_addlevel mancerchange:class3_addlevel mancerchange:class4_addlevel", function(eventinfo) {
+        if(eventinfo.sourceType !== "worker") deleteCharmancerData(["lp-choices", "lp-asi", "lp-spells", "lp-summary"]);
         const mancerdata    = getCharmancerData();
         const leveldata     = mancerdata["lp-levels"];
         const levelclass = eventinfo.sourceAttribute.slice(0, 6);
@@ -14641,8 +14692,7 @@
         const subclasslevel = (leveldata.data[`${levelclass}`] && leveldata.data[`${levelclass}`]["data-Subclass Level"]) ? parseInt(leveldata.data[`${levelclass}`]["data-Subclass Level"]) : 3;
         let set             = {};
         let update          = {};
-
-        updateClassLevel(mancerdata, levelclass);
+        if(eventinfo.currentStep === "lp-levels") updateClassLevel(mancerdata, levelclass);
 
         set[`${levelclass}_classlevel`] = classlevel;
         if (classlevel >= subclasslevel)  {
@@ -14684,7 +14734,7 @@
                     if(blobname.substr(0,30) == "Ability Score Increase - Level") {
                         asi = true;
                         final.push("Ability Score Increase");
-                    } else if (thislevel[prefix + "class"].blobs[blobname].Title || thislevel[prefix + "class"].blobs[blobname].Description || thislevel[prefix + "class"].blobs[blobname].Traits) {
+                    } else if ((thislevel[prefix + "class"].blobs[blobname].Title || thislevel[prefix + "class"].blobs[blobname].Description || thislevel[prefix + "class"].blobs[blobname].Traits) && !thislevel[prefix + "class"].blobs[blobname].Group) {
                         final.push(thislevel[prefix + "class"].blobs[blobname].Title || blobname);
                     }
                 });
@@ -14961,6 +15011,7 @@
         for(var x=1; x<=multiclass + 1; x++) {
             if(mancerdata["lp-levels"].data["class" + x] && mancerdata["lp-levels"].values["class" + x + "_addlevel"] && mancerdata["lp-levels"].values["class" + x + "_addlevel"] != "0") {
                 var thisclass = {};
+                var maxspell = 0;
                 thisclass.class = mancerdata["lp-levels"].data["class" + x];
                 thisclass.subclass = mancerdata["lp-levels"].data["class" + x + "_subclass"] || {};
                 thisclass.classname = _.last(mancerdata["lp-levels"].values["class" + x].split(":"));
@@ -14969,6 +15020,19 @@
                 thisclass.addlevel = parseInt(mancerdata["lp-levels"].values["class" + x + "_addlevel"]);
                 thisclass.addhp = mancerdata["lp-levels"].values["class" + x + "_addhp"] ? parseInt(mancerdata["lp-levels"].values["class" + x + "_addhp"]) : 0;
                 thisclass.classnumber = x;
+                if(thisclass.subclass["Spellcasting Ability"]) {
+                    thisclass.spellcasting = thisclass.subclass["Spellcasting Ability"];
+                } else if(thisclass.class["Spellcasting Ability"]) {
+                    thisclass.spellcasting = thisclass.class["Spellcasting Ability"];
+                }
+                _.each(thisclass.class.blobs, function(blob) {
+                    if(blob["Spell Slots"] && parseInt(blob.Level) <= (thisclass.currentlevel + thisclass.addlevel)) {
+                        _.each(JSON.parse(blob["Spell Slots"]), function(slots, name) {
+                            if(parseInt(_.last(name.split(" "))) > maxspell) maxspell = parseInt(_.last(name.split(" ")));
+                        });
+                    }
+                });
+                thisclass.maxspell = maxspell;
                 leveling.push(thisclass);
             }
         }
@@ -15128,12 +15192,9 @@
         const mancerdata = getCharmancerData();
         const leveling = getLevelingData(mancerdata);
         const racedata = getLpRaceData(mancerdata, leveling);
-        console.log("RACE DATA:");
-        console.log(racedata);
         _.each(racedata, function(data, section) {
             const blobs = getLpBlobs(data, true);
             const relevant = resortBlobs(blobs, section);
-            console.log(data);
             if(relevant.length > 0) {
                 addRepeatingSection("choices", "row", function(thisrow) {
                     let update = {};
@@ -15145,7 +15206,7 @@
                         handleBlobs(blobs.allblobs, {
                             filters: {multiclass: true},
                             slide: "lp-choices",
-                            section: blob.parentSection + "-" + x + "--" + blob.Level,
+                            section: blob.parentSection + "--" + blob.Level,
                             element: thisrow,
                             thisblob: blob.name,
                             maxlevel: data.currentlevel + data.addlevel,
@@ -15161,8 +15222,6 @@
         _.each(leveling, function(data) {
             var x = data.classnumber;
             var blobs = getLpBlobs(data, true);
-            console.log("LEVELING DATA");
-            console.log(data);
             addRepeatingSection("choices", "row", function(classrow) {
                 var classname = data.subclassname ? data.subclassname + " " + data.classname : data.classname;
                 var update = {};
@@ -15246,6 +15305,11 @@
         //Gather known spells
         _.each(mancerdata, function(page, pagename) {
             if(pagename.split("-")[0] == "lp") {
+                let choices = [];
+                let choicepage = ["lp-welcome", "lp-levels"].includes(pagename) ? (mancerdata["lp-choices"] ? mancerdata["lp-choices"].values : []) : page.values;
+                _.each(choicepage, function(val) {
+                    if((val + "").split(":")[0] === "Blob") choices.push(val.split(":")[1]);
+                });
                 _.each(page.data, function(data, dataname) {
                     var thislevel = 0;
                     var prevlevel = 0;
@@ -15259,7 +15323,7 @@
                         prevlevel = prevtotallevel;
                     }
                     _.each(data.blobs, function(blob, blobname) {
-                        if((parseInt(blob.Level) <= thislevel || blob.Level == "all") && blob.Multiclass != "no") {
+                        if((parseInt(blob.Level) <= thislevel || blob.Level == "all") && blob.Multiclass != "no" && (!blob.Group || choices.includes(blobname))) {
                             if(blob.Spells) {
                                 var blobspells = JSON.parse(blob.Spells);
                                 _.each(blobspells, function(blobspell) {
@@ -15287,7 +15351,15 @@
                             }
                         }
                     });
-                })
+                });
+                //Gater spells from class features
+                _.each(page.values, function(value, name) {
+                    if(name.substr(-18) === "_utilityrow_spells") {
+                        console.log("UTILITYROW SPELLS!");
+                        console.log(JSON.parse(value));
+                        spelldata = _.extend(spelldata, JSON.parse(value));
+                    }
+                });
             }
         });
         /**/
@@ -15661,7 +15733,7 @@
                                 if(spellname == spell.name) {
                                     toSet[spellid + "_checked"] = "1";
                                     if(!prepared || x == "0") {
-                                        toSet[spellid + "_existing"] = "true";
+                                        toSet[spellid + "_existing"] = "1";
                                         if(x == "0" || replace == 0) update[spellid + " .sheet-hardlock"] = "locked";
                                     }
                                     if(thisspell.known) {
@@ -15678,6 +15750,11 @@
                             if(settings.selected && settings.selected.includes(spell.name)) {
                                 toSet[spellid + "_checked"] = "1";
                             }
+                            if(settings.locked && settings.locked.includes(spell.name)) {
+                                toSet[spellid + "_checked"] = "1";
+                                toSet[spellid + "_existing"] = "1";
+                                update[spellid + " .sheet-hardlock"] = "locked";
+                            }
                             spellnumber--;
                             setCharmancerText(update);
                             if(spellnumber <= 0) {
@@ -15690,7 +15767,7 @@
                 });
             });
         });
-    }
+    };
 
     const updateSpellSummary = function(sourcelevel, data, thispage) {
         var mancerdata = data || getCharmancerData();
@@ -15761,18 +15838,21 @@
                 }
             });
             if(sourcelevel == "0") {
-                var known = spellpage.values.knowncantrips || 0;
+                var known = (thispage != "lp-spellchoice" && spellpage.values.knowncantrips) ? spellpage.values.knowncantrips : 0;
                 update[cantripsection + " label .sheet-number"] = (known + newspells) + " / " + (known + allowed);
             } else {
-                update[cantripsection + " .sheet-spellstext .sheet-total"] = newspells + " / " + (allowed + replaced) + " spells chosen.";
-                if(replaced > 0) {
-                    update[cantripsection + " .sheet-spellstext .sheet-total"] += "<br>(" + allowed + " new, " + replaced + " replaced)";
-                }
-                if(allowedreplace > 0) {
-                    update[cantripsection + " .sheet-replacetext .sheet-total"] = replaced + " / " + allowedreplace + " spells replaced.";
+                if(thispage != "lp-spellchoice") {
+                    update[cantripsection + " .sheet-spellstext .sheet-total"] = newspells + " / " + (allowed + replaced) + " spells chosen.";
+                    if(replaced > 0) {
+                        update[cantripsection + " .sheet-spellstext .sheet-total"] += "<br>(" + allowed + " new, " + replaced + " replaced)";
+                    }
+                    if(allowedreplace > 0) {
+                        update[cantripsection + " .sheet-replacetext .sheet-total"] = replaced + " / " + allowedreplace + " spells replaced.";
+                    }
                 }
                 _.each(perlevel, function(info, level) {
-                    update[cantripsection + " .sheet-spellstext .sheet-levels"] += "<p>" + info.number + " Level " + level + " spells added.</p>";
+                    if(thispage != "lp-spellchoice") update[cantripsection + " .sheet-spellstext .sheet-levels"] += "<p>" + info.number + " Level " + level + " spells added.</p>";
+                    update[info.section + " label .sheet-number"] = "";
                     if(info.number > 0) update[info.section + " label .sheet-number"] = "+" + info.number;
                     if(info.replaced) {
                         showChoices([info.section + " .sheet-spellheader .sheet-title span"]);
@@ -15788,7 +15868,7 @@
 
     on("clicked:repeating_spell-item_info", function(eventinfo) {
         var mancerdata = getCharmancerData();
-        changeCompendiumPage("sheet-spells-info", "Spells:" + mancerdata["lp-spells"].values[eventinfo.sourceSection + "_name"], "card_only");
+        changeCompendiumPage("sheet-spells-info", "Spells:" + mancerdata[eventinfo.currentStep].values[eventinfo.sourceSection + "_name"], "card_only");
     });
 
     on("mancerchange:repeating_spellsrow", function(eventinfo) {
@@ -15983,9 +16063,13 @@
         const mancerdata = getCharmancerData();
         var querysettings = {};
         var spelldata = getKnownLpSpells(mancerdata);
-        var query = "Category:Spells Name:";
+        var leveldata = _.findWhere(getLevelingData(mancerdata), {classnumber: parseInt(mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_parent`][5])});
+        var query = "";
+        let newspells = 0;
+        let newcantrips = 0;
         var spellnames = [];
         var current = [];
+        var locked = [];
         var update = {};
         update[`${eventinfo.sourceSection} .sheet-warning`] = "";
         try {
@@ -15993,7 +16077,7 @@
         } catch(e) {
             querysettings = mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_info`];
         };
-        if(mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_result`]) current = mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_result`].split(", ")
+        if(mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_result`]) current = mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_result`].split(", ");
         if(mancerdata["lp-spells"] && mancerdata["lp-spells"].repeating) {
             _.each(mancerdata["lp-spells"].repeating, function(repid) {
                 if(mancerdata["lp-spells"].values[`${repid}_checked`]) {
@@ -16004,26 +16088,75 @@
                 }
             });
         }
-        _.each(spelldata, function(spell, spellname) {
-            if(!querysettings.Level || (querysettings.Level && querysettings.Level == spell.level)) spellnames.push(spellname);
-        });
-        if(spellnames.length > 0) {
+        _.each(current, function(currentspell) {
+            delete spelldata[currentspell];
+        })
+        if(querysettings.Known) {
+            if(querysettings.Level + "" === "0") {
+                newcantrips = 1;
+            } else {
+                newspells = 1;
+            }
+            _.each(spelldata, function(spell, spellname) {
+                if(!querysettings.Level || (querysettings.Level && querysettings.Level == spell.level)) spellnames.push(spellname);
+            });
+            if(spellnames.length > 0) {
+                query = "Category:Spells Name:" + spellnames.join("|");
+            } else {
+                update[`${eventinfo.sourceSection} .sheet-warning`] = `You do not currently know any level ${querysettings.Level} spells.`;
+                setCharmancerText(update);
+            }
+        } else {
+            query = "Category:Spells";
+            if(querysettings.Level) {
+                let levels = [querysettings.Level];
+                if(querysettings.Level == "max") {
+                    levels = [];
+                    for(let x=1; x<=leveldata.maxspell; x++) {
+                        levels.push(x);
+                    }
+                }
+                query += " Level:" + levels.join("|");
+            };
+            if(querysettings.List && querysettings.List.toLowerCase() !== "any") {
+                query += " Classes:*" + querysettings.List;
+            };
+            if(querysettings.Level + "" === "0") {
+                newcantrips = querysettings.Number ? parseInt(querysettings.Number) : 1;
+            } else {
+                newspells = querysettings.Number ? parseInt(querysettings.Number) : 1;
+            }
+            locked = _.keys(spelldata);
+        }
+        if(query) {
             setCharmancerText(update);
-            query += spellnames.join("|");
             changeCharmancerPage("lp-spellchoice", function() {
-                getCompendiumQuery(query, function(data) {
+                getCompendiumQuery([query], function(data) {
                     let byLevel = {};
+                    let filters = {};
                     let filtered = [];
                     let toSet = {};
+                    let update = {};
+                    update["instructions"] = querysettings.HelpText;
                     console.log(data);
+                    _.each(querysettings, function(setting, key) {
+                        if(!["Level","List","Number","Type","ButtonText","HelpText", "Known", "Class"].includes(key)) {
+                            filters[key] = setting;
+                        }
+                    });
+                    console.log(filters);
                     if(querysettings.Known) {
                         delete querysettings.Level;
                     }
                     delete querysettings.Known;
-                    console.log(querysettings);
                     _.each(data, function(spell) {
-                        filtered.push(spell);
-                    })
+                        let match = true;
+                        _.each(filters, function(value, name) {
+                            if(spell.data[name] !== value) match = false;
+                        })
+                        if(match) filtered.push(spell);
+                    });
+                    console.log(filtered);
                     _.each(filtered, function(spell) {
                         if(spell.data.Classes) {
                             byLevel[spell.data.Level] = byLevel[spell.data.Level] || [];
@@ -16034,21 +16167,22 @@
                             });
                         }
                     });
-                    toSet.newspells = 1;
+                    toSet.newspells = newspells;
+                    toSet.newcantrips = newcantrips;
                     toSet.valid = "now";
                     toSet.source = eventinfo.sourceSection;
+                    setCharmancerText(update);
                     setAttrs(toSet, function() {
                         addSpellSections(byLevel, {
-                            newspells: 1,
+                            newcantrips: newcantrips,
+                            newspells: newspells,
                             page: "lp-spellchoice",
-                            selected: current
+                            selected: current,
+                            locked: locked
                         });
                     });
                 });
             });/**/
-        } else {
-            update[`${eventinfo.sourceSection} .sheet-warning`] = `You do not currently know any level ${querysettings.Level} spells.`;
-            setCharmancerText(update);
         }
     });
 
@@ -16074,16 +16208,37 @@
 
     on("clicked:lp-spellchoice_back", function(eventinfo) {
         const mancerdata = getCharmancerData();
+        const leveldata = getLevelingData(mancerdata);
         let result = [];
         let source = mancerdata["lp-spellchoice"].values.source;
-        console.log(mancerdata["lp-spellchoice"]);
+        let newspells = false;
+        let spellsettings = {};
+        if(mancerdata["lp-choices"].values[`${source}_info`]) {
+            spellsettings = JSON.parse(mancerdata["lp-choices"].values[`${source}_info`]);
+        }
         _.each(mancerdata["lp-spellchoice"].repeating, function(repid) {
-            if(mancerdata["lp-spellchoice"].values[`${repid}_checked`]) result.push(mancerdata["lp-spellchoice"].values[`${repid}_name`]);
+            if(mancerdata["lp-spellchoice"].values[`${repid}_checked`] && !mancerdata["lp-spellchoice"].values[`${repid}_existing`]) result.push(mancerdata["lp-spellchoice"].values[`${repid}_name`]);
         });
+        if(mancerdata["lp-choices"].values[`${source}_type`] !== "trait") {
+            const thisclass = _.findWhere(leveldata, {classnumber: parseInt(mancerdata["lp-choices"].values[`${source}_parent`][5])});
+            newspells = {}
+            _.each(mancerdata["lp-spellchoice"].repeating, function(repid) {
+                if(mancerdata["lp-spellchoice"].values[`${repid}_checked`] && !mancerdata["lp-spellchoice"].values[`${repid}_existing`]) {
+                    let thisspell = {
+                        ability: thisclass.spellcasting,
+                        spellclass: thisclass.classname,
+                        level: mancerdata["lp-spellchoice"].values[`${repid}_level`] === "0" ? "cantrip" : mancerdata["lp-spellchoice"].values[`${repid}_level`]
+                    }
+                    if(spellsettings.Type) thisspell.known = spellsettings.Type;
+                    newspells[mancerdata["lp-spellchoice"].values[`${repid}_name`]] = thisspell;
+                }
+            });
+        }
         changeCharmancerPage("lp-choices", function() {
             deleteCharmancerData(["lp-spellchoice"]);
             let set = {};
             set[`${source}_result`] = result.join(", ");
+            if(newspells) set[`${source}_spells`] = JSON.stringify(newspells);
             setAttrs(set);
         });
     })
@@ -16252,14 +16407,9 @@
                     }
                     if(name.substr(-17) === "utilityrow_result") {
                         let sectionid = name.substring(0, name.length - 7);
-                        let thisblob = {};
-                        let thistrait = {};
                         let thissection = _.findWhere(leveldata, {classnumber: parseInt(slide.values[sectionid + "_parent"][5])});
-                        thistrait.Name = slide.values[sectionid + "_title"].replace(/{{Input}}/g, value);
-                        thistrait.Desc = slide.values[sectionid + "_desc"] ? slide.values[sectionid + "_desc"].replace(/{{Input}}/g, value) : "";
-                        thisblob.Traits = JSON.stringify([thistrait]);
-                        blobs.names[slide.values[sectionid + "_parent"]].push(sectionid);
-                        thissection[slide.values[sectionid + "_parent"].includes("subclass") ? "subclass" : "class"].blobs[sectionid] = thisblob;
+                        let section = slide.values[sectionid + "_parent"].includes("subclass") ? "subclass" : "class";
+                        thissection[section].blobs[slide.values[sectionid + "_blob"]].Traits = thissection[section].blobs[slide.values[sectionid + "_blob"]].Traits.replace(/{{Input}}/g, value);
                     }
                 });
             }
@@ -16357,12 +16507,12 @@
                         _.each(spells, function(spell) {
                             if(spell.Known) {
                                 _.each(spell.Known, function(spellname) {
-                                    var spelldata = {name: "Spells:" + spellname, data: {}};
+                                    var thisspell = {name: "Spells:" + spellname, data: {}};
                                     var thisclass = name.substring(0,5) === "class" ? _.last(data["lp-levels"].values[name.split("_")[0]].split(":")) : "Racial";
-                                    if(spell.Ability) spelldata.data["spellcasting_ability"] = spell.Ability;
-                                    if(spell.Source) spelldata.data["spellsource"] = spell.Source;
-                                    spelldata.data["spellclass"] = thisclass;
-                                    allDrops.push(spelldata);
+                                    if(spell.Ability) thisspell.data["spellcasting_ability"] = spell.Ability;
+                                    if(spell.Source) thisspell.data["spellsource"] = spell.Source;
+                                    thisspell.data["spellclass"] = thisclass;
+                                    allDrops.push(thisspell);
                                 });
                             };
                         });
@@ -16370,6 +16520,23 @@
                 });
             });
         };
+        //Gater spells from class features
+        _.each(data, function(page, pagename) {
+            if(pagename.split("-")[0] == "lp") {
+                _.each(page.values, function(value, name) {
+                    if(name.substr(-18) === "_utilityrow_spells") {
+                        let featurespells = JSON.parse(value);
+                        _.each(featurespells, function(spell, spellname) {
+                            var thisspell = {name: "Spells:" + spellname, data: {}};
+                            if(spell.ability) thisspell.data["spellcasting_ability"] = spell.ability;
+                            if(spell.known) thisspell.data["spellsource"] = spell.known;
+                            if(spell.spellclass) thisspell.data["spellclass"] = spell.spellclass;
+                            allDrops.push(thisspell);
+                        })
+                    }
+                });
+            }
+        });
         //unset charmancer step
         set["lpmancer_status"] = "";
         set["charactermancer_step"] = "lp-welcome";
@@ -16489,10 +16656,13 @@
     <div class="warning"></div>
     <button type="action" name="act_launch"></button>
     <input type="hidden" name="comp_parent">
+    <input type="hidden" name="comp_blob">
+    <input type="hidden" name="comp_type">
     <input type="hidden" name="comp_result">
     <input type="hidden" name="comp_info">
     <input type="hidden" name="comp_title">
     <input type="hidden" name="comp_desc">
+    <input type="hidden" name="comp_spells">
 </charmancer>
 
 <charmancer class="sheet-repeating-choose">
@@ -18237,8 +18407,12 @@
 
 <charmancer class="sheet-charmancer-lp-spellchoice">
     <div class="charmancer container">
+        <ol class="steps lp-steps">
+            <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel-u">CANCEL</button></li>
+        </ol>
         <div class="topbar-holder"></div>
         <div class="choices spellslide">
+            <p class="instructions"></p>
         </div>
 
         <div class="info spellslide">
