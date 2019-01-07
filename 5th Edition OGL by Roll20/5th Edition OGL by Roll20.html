@@ -14989,13 +14989,22 @@
 
         _.each(sections, (levelclass) => {
             let thishp = 0;
+            let first = true;
+            let rollflag = "";
             _.each(repeating, function(repid) {
                 if(repid.split("_")[2].split("-")[0] == levelclass && leveldata[`${repid}_result`]) {
                     thishp += parseInt(leveldata[`${repid}_result`]);
+                    if(first) {
+                        rollflag = leveldata[`${repid}_rollflag`];
+                        first = false;
+                    }
+                    if(rollflag !== leveldata[`${repid}_rollflag`]) rollflag = "none";
                 }
             });
+            set[`${levelclass}_hp_flag`] = rollflag;
             set[`${levelclass}_addhp`] = thishp;
         });
+        console.log(set);
         setAttrs(set, () => {recalcLpData()});
     };
 
@@ -15111,7 +15120,7 @@
         const mancerdata = getCharmancerData();
         let set = {};
         set[`${eventinfo.sourceSection}_result`] = getDieAvg(mancerdata["lp-levels"].values[`${eventinfo.sourceSection.split("_")[2].split("-")[0]}_hitdie`]);
-        set[`${eventinfo.sourceSection}_rollflag`] = "";
+        set[`${eventinfo.sourceSection}_rollflag`] = "average";
         setAttrs(set, () => {recalcHpByLevel()})
     });
 
@@ -15127,6 +15136,7 @@
                 const num = parseInt(row.split(`${levelclass}-`)[1]) - diff;
 
                set[row + "_result"] = eventinfo.roll[`${num}`].result;
+               set[row + "_rollflag"] = "roll";
             };
         });
 
@@ -15219,6 +15229,7 @@
         repeating.forEach(row => {
             if (row.includes(`${levelclass}-`)) {
                set[row + "_result"] = hp;
+               set[row + "_rollflag"] = "average";
             };
         });
 
@@ -17065,7 +17076,7 @@
 </charmancer>
 
 <charmancer class="sheet-repeating-hpbylevel">
-    <input type="checkbox" name="comp_rollflag" value="roll" style="display:none">
+    <input class="hp-flag" type="hidden" name="comp_rollflag" value="average">
     <label></label>
     <input type="number" class="" name="comp_result" min="0">
     <button type="roll" name="roll_rollhp" value="" title="">Roll</button>
@@ -17084,7 +17095,7 @@
         <p class="label" data-i18n="charmancer-welcome">Welcome to the Charactermancer!</p>
         <p data-i18n="charmancer-what-is">The Charactermancer is step-by-step process that makes building a character simple and streamlined. Changes are saved as you progress, but have no fear. The character sheet is only updated when you have completed your review.</p>
         <p class="label" data-i18n="charmancer-compendium">Your Compendium Awaits.</p>
-        <p data-i18n="charmancer-compendium-detail">The Charactermancer currently supports Dungeons &amp; Dragons 5th Edition SRD and the Player's Handbook. You can add the Player's Handbook to your compendium in the Marketplace, or the game owner can share their compendium with everyone in the game.</p>
+        <p data-i18n="charmancer-compendium-detail">The Charactermancer currently supports Dungeons &amp; Dragons 5th Edition SRD, Player's Handbook, and Guildmasters' Guide to Ravnica. You can add the Player's Handbook and Guildmasters' Guide to Ravnica to your compendium in the Marketplace, or the game owner can share their compendium with everyone in the game.</p>
         <p class="label" data-i18n="get-started">Get started by clicking "Next".</p>
         <!-- <p class="label" data-i18n="">Expand your Compendium!</p>
         <div class="expansions">
@@ -18334,7 +18345,6 @@
                     <input class="hpbylevel-toggle" type="checkbox" name="comp_hpbyLevel" /><span class="collapse">9</span>
                     <div class="class1_by-levels" style="margin-left: 11%;"></div>
                 </div>
-                <div class="class1_by-levels" style="margin-left: 11%;"></div>
                 <div class="class_features_container">
                     <h3 class="class1_features_title choice" style="display: inline;">Class Features: </h3>
                     <button type="action" name="act_class1" class="mancer_info">i</button>
