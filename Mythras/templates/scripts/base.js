@@ -871,7 +871,7 @@
             calc_arcane_casting_derived();
         });
     });
-    on("change:int change:arcane_knowledge_experience change:arcane_knowledge_other change:arcane_knowledge_temp change:arcane_knowledge_penalty change:arcane_knowledge_learnedchange:herculean_mod ", function() {
+    on("change:int change:arcane_knowledge_experience change:arcane_knowledge_other change:arcane_knowledge_temp change:arcane_knowledge_penalty change:arcane_knowledge_learned change:herculean_mod ", function() {
         getAttrs(["arcane_knowledge_learned"], function(v) {
             calc_skill("arcane_knowledge", "@{int}", "@{int}", v.arcane_knowledge_learned);
         });    
@@ -899,7 +899,7 @@
     on("change:int change:customs_experience change:customs_other change:customs_temp change:customs_penalty change:herculean_mod ", function() { calc_skill("customs", "@{int}", "@{int}", 1); });
     on("change:dex change:cha change:dance_experience change:dance_other change:dance_temp change:dance_penalty change:herculean_mod ", function() { calc_skill("dance", "@{cha}", "@{dex}", 1); });
     on("change:int change:cha change:deceit_experience change:deceit_other change:deceit_temp change:deceit_penalty change:herculean_mod ", function() { calc_skill("deceit", "@{int}", "@{cha}", 1); });
-    on("change:pow change:int change:divination_experience change:divination_other change:divination_temp change:divination_penalty change:herculean_mod ", function() {
+    on("change:pow change:int change:divination_experience change:divination_other change:divination_temp change:divination_penalty change:divination_learned change:herculean_mod ", function() {
         getAttrs(["divination_learned"], function(v) {
             calc_skill("divination", "@{pow}", "@{int}", v.divination_learned);
         });    
@@ -907,12 +907,12 @@
     on("change:dex change:pow change:drive_experience change:drive_other change:drive_temp change:drive_penalty change:herculean_mod ", function() { calc_skill("drive", "@{dex}", "@{pow}", 1); });
     on("change:con change:endurance_experience change:endurance_other change:endurance_temp change:endurance_penalty change:herculean_mod ", function() { calc_skill("endurance", "@{con}", "@{con}", 1); });
     on("change:dex change:evade_experience change:evade_other change:evade_temp change:evade_penalty change:herculean_mod ", function() { calc_skill("evade", "@{dex}", "@{dex}", 1); });
-    on("change:cha change:int change:exhort_experience change:exhort_other change:exhort_temp change:exhort_penalty change:herculean_mod ", function() {
+    on("change:cha change:int change:exhort_experience change:exhort_other change:exhort_temp change:exhort_penalty change:exhort_learned change:herculean_mod ", function() {
         getAttrs(["exhort_learned"], function(v) {
             calc_skill("exhort", "@{cha}", "@{int}", v.exhort_learned);
         });    
     });
-    on("change:cha change:pow change:fata_experience change:fata_other change:fata_temp change:fata_penalty change:herculean_mod ", function() {
+    on("change:cha change:pow change:fata_experience change:fata_other change:fata_temp change:fata_penalty change:fata_learned change:herculean_mod ", function() {
         getAttrs(["fata_learned"], function(v) {
             calc_skill("fata", "@{cha}", "@{pow}", v.fata_learned);
             calc_fata_derived();
@@ -927,41 +927,41 @@
     on("change:int change:home_parallel_experience change:home_parallel_other change:home_parallel_temp change:home_parallel_penalty change:herculean_mod ", function() { calc_skill("home_parallel", "@{int}", "@{int}", 1); });
     on("change:cha change:influence_experience change:influence_other change:influence_temp change:influence_penalty change:herculean_mod ", function() { calc_skill("influence", "@{cha}", "@{cha}", 1); });
     on("change:int change:pow change:insight_experience change:insight_other change:insight_temp change:insight_penalty change:herculean_mod ", function() { calc_skill("insight", "@{int}", "@{pow}", 1); });
-    on("change:int change:cha change:linguistics_experience change:linguistics_other change:linguistics_temp change:linguistics_penalty change:herculean_mod ", function() {
+    on("change:int change:cha change:linguistics_experience change:linguistics_other change:linguistics_temp change:linguistics_penalty change:linguistics_learned change:herculean_mod ", function() {
         getAttrs(["linguistics_learned"], function(v) {
             calc_skill("linguistics", "@{cha}", "@{int}", v.linguistics_learned);
         });    
     });
     on("change:int change:locale_experience change:locale_other change:locale_temp change:locale_penalty change:herculean_mod ", function() { calc_skill("locale", "@{int}", "@{int}", 1); });
-    on("change:int change:con change:meditation_experience change:meditation_other change:meditation_temp change:meditation_penalty change:herculean_mod ", function() {
+    on("change:int change:con change:meditation_experience change:meditation_other change:meditation_temp change:meditation_penalty change:meditation_learned change:herculean_mod ", function() {
         getAttrs(["meditation_learned"], function(v) {
             calc_skill("meditation", "@{con}", "@{int}", v.meditation_learned);
         });    
     });
     on("change:int change:cha change:native_tongue_experience change:native_tongue_other change:native_tongue_temp change:native_tongue_penalty change:herculean_mod ", function() { calc_skill("native_tongue", "@{int}", "@{cha}", 1); });
-    on("change:cha change:int change:necromancy_experience change:necromancy_other change:necromancy_temp change:necromancy_penalty change:herculean_mod ", function() {
+    on("change:cha change:int change:necromancy_experience change:necromancy_other change:necromancy_temp change:necromancy_penalty change:necromancy_learned change:herculean_mod ", function() {
         getAttrs(["necromancy_learned"], function(v) {
             calc_skill("necromancy", "@{cha}", "@{int}", v.necromancy_learned);
         });    
     });
-    on("change:int change:pharmacy_experience change:pharmacy_other change:pharmacy_temp change:pharmacy_penalty change:herculean_mod ", function() {
+    on("change:int change:pharmacy_experience change:pharmacy_other change:pharmacy_temp change:pharmacy_penalty change:pharmacy_learned change:herculean_mod ", function() {
         getAttrs(["pharmacy_learned"], function(v) {
             calc_skill("pharmacy", "@{int}", "@{int}", v.pharmacy_learned);
         });    
     });
-    on("change:cha change:pow change:piety_experience change:piety_other change:piety_temp change:piety_penalty change:herculean_mod ", function() {
+    on("change:cha change:pow change:piety_experience change:piety_other change:piety_temp change:piety_penalty change:piety_learned change:herculean_mod ", function() {
         getAttrs(["piety_learned"], function(v) {
             calc_skill("piety", "@{cha}", "@{pow}", v.piety_learned);
         });    
     });
     on("change:int change:pow change:perception_experience change:perception_other change:perception_temp change:perception_penalty change:herculean_mod ", function() { calc_skill("perception", "@{int}", "@{pow}", 1); });
     on("change:dex change:pow change:ride_experience change:ride_other change:ride_temp change:ride_penalty change:herculean_mod ", function() { calc_skill("ride", "@{dex}", "@{pow}", 1); });
-    on("change:con change:pow change:shape_shifting_experience change:shape_shifting_other change:shape_shifting_temp change:shape_shifting_penalty change:herculean_mod ", function() {
+    on("change:con change:pow change:shape_shifting_experience change:shape_shifting_other change:shape_shifting_temp change:shape_shifting_penalty change:shape_shifting_learned change:herculean_mod ", function() {
         getAttrs(["shape_shifting_learned"], function(v) {
             calc_skill("shape_shifting", "@{con}", "@{pow}", v.shape_shifting_learned);
         });    
     });
-    on("change:int change:pow change:shaping_experience change:shaping_other change:shaping_temp change:shaping_penalty change:herculean_mod ", function() {
+    on("change:int change:pow change:shaping_experience change:shaping_other change:shaping_temp change:shaping_penalty change:shaping_learned change:herculean_mod ", function() {
         getAttrs(["shaping_learned"], function(v) {
             calc_skill("shaping", "@{int}", "@{pow}", v.shaping_learned);
         });    
@@ -971,12 +971,12 @@
     on("change:int change:dex change:stealth_experience change:stealth_other change:stealth_temp change:stealth_penalty change:herculean_mod ", function() { calc_skill("stealth", "@{int}", "@{dex}", 1); });
     on("change:int change:pow change:superstition_experience change:superstition_other change:superstition_temp change:superstition_penalty change:herculean_mod ", function() { calc_skill("superstition", "@{int}", "@{pow}", 1); });
     on("change:str change:con change:swim_experience change:swim_other change:swim_temp change:swim_penalty change:herculean_mod ", function() { calc_skill("swim", "@{str}", "@{con}", 1); });
-    on("change:pow change:theology_experience change:theology_other change:theology_temp change:theology_penalty change:herculean_mod ", function() {
+    on("change:pow change:theology_experience change:theology_other change:theology_temp change:theology_penalty change:theology_learned change:herculean_mod ", function() {
         getAttrs(["theology_learned"], function(v) {
             calc_skill("theology", "@{pow}", "@{pow}", v.theology_learned);
         });    
     });
-    on("change:con change:pow change:trance_experience change:trance_other change:trance_temp change:trance_penalty change:herculean_mod ", function() {
+    on("change:con change:pow change:trance_experience change:trance_other change:trance_temp change:trance_penalty change:trance_learned change:herculean_mod ", function() {
         getAttrs(["trance_learned"], function(v) {
             calc_skill("trance", "@{con}", "@{pow}", v.trance_learned);
         });    

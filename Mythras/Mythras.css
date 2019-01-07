@@ -39,7 +39,7 @@ hr {
     background:#DFF0D8;
 }
 .sheet-fading-background {
-    background-image: linear-gradient(to right, rgba(220,220,220,1), rgba(220,221,222,.2));
+    background-image: linear-gradient(to right, rgba(220,220,220,1), rgba(220,221,222,.1));
 }
 
 /* Remove margin from selects in webkit browsers, same for textareas */
@@ -51,6 +51,10 @@ button {
     padding-right: 5px;
     height: 1.5em;
     font-size: 1em;
+}
+button[type=roll].sheet-d100::before {
+    font-family: 'dicefontd10';
+    font-size: 175%;
 }
 button[type=roll].sheet-reduced-size {
     margin-top: 0px;
@@ -65,6 +69,21 @@ button[type=roll].sheet-reduced-size {
 button[type=roll].sheet-no-dice {
     padding-left: 2px;
     padding-right: 2px;
+    height: 16px;
+}
+
+button[type=roll].sheet-memorized {
+    padding-left: 2px;
+    padding-right: 2px;
+    height: 16px;
+}
+
+input[type="checkbox"].sheet-display-memorized:checked + button.sheet-memorized::before {
+    font-family: 'Pictos';
+    content: 'S';
+}
+input[type="checkbox"].sheet-display-memorized:not(:checked) + button.sheet-memorized::before {
+    content: '';
 }
 
 button[type=roll].sheet-no-dice::before { content: ''; }
@@ -111,6 +130,10 @@ div[class^="repcontrol"] {
 div[class="repcontainer editmode"] ~ div[class^="repcontrol"] button[class="btn repcontrol_add"] {
     display: inline-block!important;
     visibility: hidden;
+}
+/* Make repeating section inline-block for display modes */
+fieldset.sheet-inlined~.repcontainer[data-groupname^="repeating_"] > .repitem {
+    display: inline-block;
 }
 
 /* Make the delete buttons appear above the detail toggles */
@@ -325,11 +348,10 @@ h5.sheet-mook-section-toggle {
     display: inline-block;
     position: relative;
     left: 5px;
-    width: calc(100% - 5px);
+    width: calc(100% + 5px);
     margin-left: -100%;
-    padding-left: 16px;
+    padding-left: 6px;
 }
-
 input[type="checkbox"].sheet-mook-section-toggle + h5::after {
     margin-right: 3px;
     margin-left: 3px;
@@ -344,7 +366,9 @@ input[type="checkbox"].sheet-mook-section-toggle + h5::after {
 input[type="checkbox"].sheet-mook-section-toggle:checked + h5::after {
     content: "▼";
 }
-
+div.sheet-mook-section-toggle {
+    margin-left: -10px;
+}
 input[type="checkbox"].sheet-mook-section-toggle:not(:checked) ~ div.sheet-mook-section-toggle {
     display: none;
 }
@@ -863,6 +887,7 @@ div.sheet-page {
     overflow: hidden;
 }
 input.sheet-page-toggle-core:checked ~ div.sheet-page-core,
+input.sheet-page-toggle-magic:checked ~ div.sheet-page-magic,
 input.sheet-page-toggle-equipment:checked ~ div.sheet-page-equipment,
 input.sheet-page-toggle-background:checked ~ div.sheet-page-background,
 input.sheet-page-toggle-notes:checked ~ div.sheet-page-notes,
@@ -871,13 +896,14 @@ input.sheet-page-toggle-help:checked ~ div.sheet-page-help,
 input.sheet-page-toggle-mooks:checked ~ div.sheet-page-mooks,
 input.sheet-page-toggle-compact:checked ~ div.sheet-page-compact,
 input.sheet-page-toggle-all:checked ~ div.sheet-page-core,
+input.sheet-page-toggle-all:checked ~ div.sheet-page-magic,
 input.sheet-page-toggle-all:checked ~ div.sheet-page-equipment,
 input.sheet-page-toggle-all:checked ~ div.sheet-page-background,
 input.sheet-page-toggle-all:checked ~ div.sheet-page-notes {
     visibility: visible;
     opacity: 1;
-    max-height: 999999px;
-    overflow: auto;
+    max-height: 99999999999px;
+    overflow: visible;
 }
 
 /* Traits */
@@ -1217,10 +1243,6 @@ div.sheet-combatskill-button {
 }
 
 /* Combat Styles */
-.repcontainer[data-groupname="repeating_combatstyle"] > .repitem {
-    display: inline-block;
-}
-
 div.sheet-combatstyle {
     margin-bottom: 5px;
 }
@@ -1458,18 +1480,6 @@ div.sheet-weapon-firearm-traits {
 }
 
 /* Skills */
-.repcontainer[data-groupname="repeating_professionalskill"] > .repitem {
-    display: inline-block;
-}
-.repcontainer[data-groupname="repeating_language"] > .repitem {
-    display: inline-block;
-}
-.repcontainer[data-groupname="repeating_dependency"] > .repitem {
-    display: inline-block;
-}
-.repcontainer[data-groupname="repeating_passion"] > .repitem {
-    display: inline-block;
-}
 div.sheet-skill {
     float: left;
     width: 48.5%;
@@ -1585,10 +1595,6 @@ input[type="checkbox"].sheet-display-divine-magic:not(:checked) ~ div.sheet-disp
 
 input[type="checkbox"].sheet-display-roman-magic:not(:checked) ~ div.sheet-display-roman-magic {
     display: none;
-}
-
-.repcontainer[data-groupname="repeating_psionicpower"] > .repitem {
-    display: inline-block;
 }
 
 div.sheet-magic-row {
@@ -1711,7 +1717,7 @@ div.sheet-divine-magic-field {
 div.sheet-animism-number {
     display: inline-block;
     text-align: center;
-    width: 15.75%;
+    width: 15.50%;
 }
 div.sheet-animism-spirit-ap {
     display: inline-block;
@@ -1879,10 +1885,6 @@ div.sheet-income-number {
 }
 
 /* Affiliations */
-.repcontainer[data-groupname="repeating_affiliation"] > .repitem {
-    display: inline-block;
-}
-
 div.sheet-affiliations {
     margin-bottom: 5px;
 }
@@ -2097,6 +2099,7 @@ select.sheet-mook-fatigue-width {
 fieldset.sheet-nocontrols~.repcontrol {
   display: none;
 }
+
 div.sheet-mook-skilllabel-col {
     display: inline-block;
     width: 12%;
@@ -2104,7 +2107,7 @@ div.sheet-mook-skilllabel-col {
 }
 div.sheet-mook-skilllist-col {
     display: inline-block;
-    width: 87.25%;
+    width: 86.25%;
 }
 div.sheet-mook-btn {
     display: inline-block;
