@@ -14805,7 +14805,7 @@
         set["class1"] = 'Classes:' + baseclass;
         set["class1_currentlevel"] = previous["base_level"];
         update["class1_selector"] = '<span class="sheet-compendium-class-name">' + baseclass + '</span>';
-        if (previous["subclass"] && !previous["custom_class"]) { 
+        if (previous["subclass"] && previous["custom_class"] === "0") { 
             update[`subclass1_selector`] = `<div>` + previous["subclass"] + `</div>`;
             if(mancerdata["lp-levels"] && mancerdata["lp-levels"].values["class1_subclass"] !== "Subclasses" + previous["subclass"])set["class1_subclass"] = "Subclasses:" + previous["subclass"]; 
         };
@@ -14993,18 +14993,18 @@
             let rollflag = "";
             _.each(repeating, function(repid) {
                 if(repid.split("_")[2].split("-")[0] == levelclass && leveldata[`${repid}_result`]) {
+                    let thisflag = leveldata[`${repid}_rollflag`] || "average";
                     thishp += parseInt(leveldata[`${repid}_result`]);
                     if(first) {
-                        rollflag = leveldata[`${repid}_rollflag`];
+                        rollflag = thisflag;
                         first = false;
                     }
-                    if(rollflag !== leveldata[`${repid}_rollflag`]) rollflag = "none";
+                    if(rollflag !== thisflag) rollflag = "none";
                 }
             });
             set[`${levelclass}_hp_flag`] = rollflag;
             set[`${levelclass}_addhp`] = thishp;
         });
-        console.log(set);
         setAttrs(set, () => {recalcLpData()});
     };
 
@@ -15208,7 +15208,7 @@
     on("mancerchange:multiclass", function () {
         const mancerdata = getCharmancerData();
         const leveldata = mancerdata["lp-levels"];
-        const tot  = parseInt(leveldata.values["multiclass"]) + 1;
+        const tot  = isNaN(parseInt(leveldata.values["multiclass"])) ? 1 : parseInt(leveldata.values["multiclass"]) + 1;
         let update = {};
         let presets = [];
 
