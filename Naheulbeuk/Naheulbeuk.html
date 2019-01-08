@@ -322,6 +322,39 @@
 					<h2>Déplacement</h2>
 					<table>
 						<tr>
+							<th>Mod.</th>
+							<td title="Modificateur de déplacement">
+								<input type="text" class="sheet-shortInput" name="attr_Deplacement_mod" value="100" /> % <input type="checkbox" name="attr_modal_HowToDeplacement" class="sheet-modal" value="1" style="float: right;"><span class="sheet-cog" style="float: right;">?</span>
+								<div class="sheet-modal-wrapper">
+									<div class="sheet-modal" style="height: 400px">
+										<div class="sheet-modal_header">
+											<h2>Modificateur de déplacement <span class="sheet-close">*</span><input type="checkbox" class="sheet-modal" name="attr_modal_HowToDeplacement" value="1"></h2>
+										</div>
+										<div class="sheet-modal_body">
+											<b>Pour plus de précision et de justesse :</b><br>
+											<ul>
+												<li>Base pour les Humanoïdes, <b>100%</b></li>
+												<li>Pour les Nains et les Gobelins, <b>80%</b></li>
+												<li>Pour les Semi-Hommes et Gnômes, <b>50%</b></li>
+												<li>Pour un Elfe Sylvain ou Elfe Noir, <b>120%</b></li>
+												<li>Pour les Barbares, multipliez par 2 la durée de la vitesse de course, par 5 pour le déplacement rapide</li>
+											</ul>
+											<br>
+											<b>Conséquences blessures graves :</b><br>
+											<ul>
+												<li>Genou luxé, <b>-50%</b></li>
+												<li>Pied écrasé, <b>-50%</b></li>
+												<li>1 Jambe cassée / tranchée, <b>-75%</b></li>
+												<li>2 Jambes cassées / tranchées, <b>-100%</b></li>
+												<li>Organes génitaux endommagés, <b>-50%</b></li>
+												<li>Projectile dans une jambe, <b>-50%</b></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr>
 							<th>Rapide</th>
 							<td title="Calculée en fonction de la PR Phy."><input type="text" class="sheet-shortInput sheet-autoCalc" name="attr_DeplacementRapide" value="8" readonly /> m / assault</td>
 						</tr>
@@ -629,8 +662,8 @@
 								<input type="text" class="sheet-autoCalc" name="attr_Arme_TotalDegats" value="1d6" readonly style="width: 100px;" />
 							</div>
 							<div class="sheet-col" style="width: 170px;">
-								<button type="roll" value="@{displayJet} &{template:atk} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{at=@{Arme_TotalAT} }} {{notes=@{Arme_Note} }} {{effets= @{Arme_Effet} }} {{portee= @{arme_portee} }} {{display_effets= [[@{arme_Effet_display}]] }} {{display_notes= [[@{Arme_Note_display}]] }} {{btn_critique= [Critique](~@{Personnage_Nom}|confirmation_crit_@{Arme_typeDegat}) }} {{btn_fumble= [Fumble](~@{Personnage_Nom}|confirmation_fumble_atk) }} {{results=[[1d20cs<@{Arme_Critique}cf>@{Arme_Fumble}]] }} {{btn_degats=[Dégats](~repeating_armes_rollDegats)}}"> AT </button>
-								<button type="roll" value="@{displayJet} &{template:prd} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{prd=@{Arme_TotalPRD} }} {{results=[[1d20cs<@{Arme_Critique}cf>@{Arme_Fumble}]] }} {{btn_critique= [Critique](~@{Personnage_Nom}|confirmation_crit_prd) }} {{btn_fumble=[Fumble](~@{Personnage_Nom}|confirmation_fumble_atk) }}"> PRD </button>
+								<button type="roll" value="@{displayJet} &{template:atk} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{at=@{Arme_TotalAT} }} {{notes=@{Arme_Note} }} {{effets= @{Arme_Effet} }} {{portee= @{arme_portee} }} {{display_effets= [[@{arme_Effet_display}]] }} {{display_notes= [[@{Arme_Note_display}]] }} {{btn_critique= [Critique](~@{character_name}|confirmation_crit_@{Arme_typeDegat}) }} {{btn_fumble= [Fumble](~@{character_name}|confirmation_fumble_atk) }} {{results=[[1d20cs<@{Arme_Critique}cf>@{Arme_Fumble}]] }} {{btn_degats=[Dégats](~repeating_armes_rollDegats)}}"> AT </button>
+								<button type="roll" value="@{displayJet} &{template:prd} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{prd=@{Arme_TotalPRD} }} {{results=[[1d20cs<@{Arme_Critique}cf>@{Arme_Fumble}]] }} {{btn_critique= [Critique](~@{character_name}|confirmation_crit_prd) }} {{btn_fumble=[Fumble](~@{character_name}|confirmation_fumble_atk) }}"> PRD </button>
 								<button type="roll" class="sheet-rollDegats" name="roll_rollDegats" value="@{displayJet} &{template:dmg} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{dmg= [[ @{Arme_TotalDegats} ]] }} {{munition=@{munition_nom}}} {{typeDegat=@{Arme_typeDegat}}}"> Dégats </button>
 							</div>
 						</div>
@@ -2378,7 +2411,7 @@
 		updatePR();
 	});
 	// Déplacement
-	on("change:prphy change:stats_force_total", function() {
+	on("change:prphy change:deplacement_mod change:stats_force_total", function() {
 		updateDeplacement();
 	});
 	// Equive
@@ -2597,13 +2630,14 @@
 	}
 
 	function updateDeplacement() {
-		getAttrs( [ "stats_force_total", "deplacementrapide", "deplacementrapide_duree", "deplacementsprint", "deplacementsprint_duree", "prphy" ], function( sValues ) {
+		getAttrs( [ "stats_force_total", "deplacement_mod", "deplacementrapide", "deplacementrapide_duree", "deplacementsprint", "deplacementsprint_duree", "prphy" ], function( sValues ) {
 			var v = structSafeInt( sValues );
 			var prPhy = v[ "prphy" ];
 			var deplacementRapide = v[ "deplacementrapide" ];
 			var deplacementRapideDuree = v[ "deplacementrapide_duree" ];
 			var deplacementSprint = v[ "deplacementsprint" ];
 			var deplacementSprintDuree = v[ "deplacementsprint_duree" ];
+			var deplacement_mod = v[ "deplacement_mod" ] / 100;
 
 			// PR vs Déplacement
 			if( prPhy === 0 || prPhy === 1 ) {
@@ -2642,6 +2676,12 @@
 				deplacementSprint = 2;
 				deplacementSprintDuree = v[ "stats_force_total" ] * 2;
 			}
+			
+			// apply mod
+			deplacementRapide = Math.ceil( deplacementRapide * deplacement_mod * 100 ) / 100;
+			deplacementRapideDuree = Math.ceil( deplacementRapideDuree * deplacement_mod * 100 ) / 100;
+			deplacementSprint = Math.ceil( deplacementSprint * deplacement_mod * 100 ) / 100;
+			deplacementSprintDuree = Math.ceil( deplacementSprintDuree * deplacement_mod * 100 ) / 100;
 
 			setAttrs({
 				"deplacementrapide": deplacementRapide,
@@ -3015,7 +3055,7 @@
 		var dataBase = {
 			"simple": [ "personnage_nom", "personnage_origine", "personnage_metiers", "personnage_sex", "personnage_age", "personnage_poids", "personnage_taille",
 						"ev", "ev_max", "ea", "ea_max", "personnage_niveau", "personnage_xp", "personnage_pointdestin", "bonusdegatssorts",
-						"personnage_langue", "personnage_vision", "personnage_nyctalopie", "personnage_ouie", "personnage_odorat", "personnage_charge_max",
+						"personnage_langue", "personnage_vision", "personnage_nyctalopie", "personnage_ouie", "personnage_odorat", "personnage_charge_max", "deplacement_mod",
 						"pr_tete", "pr_bras", "pr_torse", "pr_bouclier", "pr_jambes", "pr_pieds", "pr_mains", "prnat",
 						"bivouac_couverture", "bivouac_couverture_recup", "bivouac_matelas", "bivouac_matelas_recup", "bivouac_tente", "bivouac_tente_recup",
 						"stats_courage", "stats_courage_mod", "stats_courage_temp", "stats_intelligence", "stats_intelligence_mod", "stats_intelligence_temp", "stats_charisme", "stats_charisme_mod", "stats_charisme_temp", "stats_adresse", "stats_adresse_mod", "stats_adresse_temp", "stats_force", "stats_force_mod", "stats_force_temp", "stats_inge", "stats_inge_mod", "stats_inge_temp",
