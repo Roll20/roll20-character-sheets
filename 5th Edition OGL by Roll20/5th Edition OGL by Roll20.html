@@ -15571,27 +15571,25 @@
                         prevlevel = prevtotallevel;
                     }
                     _.each(data.blobs, function(blob, blobname) {
-                        if((parseInt(blob.Level) <= thislevel || blob.Level == "all") && blob.Multiclass != "no" && (!blob.Group || choices.includes(blobname))) {
+                        if(blob.Multiclass != "no" && ((parseInt(blob.Level) <= thislevel || blob.Level == "all") && !blob.Group) || choices.includes(blobname)) {
                             if(blob.Spells) {
                                 var blobspells = JSON.parse(blob.Spells);
                                 _.each(blobspells, function(blobspell) {
                                     if(blobspell.Known) {
                                         _.each(blobspell.Known, function(spell) {
-                                            if(parseInt(blob.Level) >= prevlevel || spelldata[spell]) {
-                                                spelldata[spell] = spelldata[spell] || {level: blobspell.Level};
-                                                spelldata[spell].known = blobspell.Source || data.Category.substring(0, data.Category.length - 2);
-                                                spelldata[spell].spellclass = thisclass.classname;
-                                                if(dataname.substring(0,5) != "class") {
-                                                    spelldata[spell].known = data.Category.substring(0, data.Category.length - 1);
-                                                    spelldata[spell].spellclass = data.Category == "Races" ? "Racial" : data.Category.substring(0, data.Category.length - 1);
-                                                }
-                                                if(blobspell.Ability) {
-                                                    spelldata[spell].ability = blobspell.Ability;
-                                                } else if(thisclass.class && thisclass.class["Spellcasting Ability"]) {
-                                                    spelldata[spell].ability = thisclass.class["Spellcasting Ability"];
-                                                } else if (thisclass.subclass && thisclass.subclass["Spellcasting Ability"]) {
-                                                    spelldata[spell].ability = thisclass.subclass["Spellcasting Ability"];
-                                                }
+                                            spelldata[spell] = spelldata[spell] || {level: blobspell.Level};
+                                            spelldata[spell].known = blobspell.Source || data.Category.substring(0, data.Category.length - 2);
+                                            spelldata[spell].spellclass = thisclass.classname;
+                                            if(dataname.substring(0,5) != "class") {
+                                                spelldata[spell].known = data.Category.substring(0, data.Category.length - 1);
+                                                spelldata[spell].spellclass = data.Category == "Races" ? "Racial" : data.Category.substring(0, data.Category.length - 1);
+                                            }
+                                            if(blobspell.Ability) {
+                                                spelldata[spell].ability = blobspell.Ability;
+                                            } else if(thisclass.class && thisclass.class["Spellcasting Ability"]) {
+                                                spelldata[spell].ability = thisclass.class["Spellcasting Ability"];
+                                            } else if (thisclass.subclass && thisclass.subclass["Spellcasting Ability"]) {
+                                                spelldata[spell].ability = thisclass.subclass["Spellcasting Ability"];
                                             }
                                         });
                                     }
@@ -16084,6 +16082,8 @@
             _.each(spellids, function(id) {
                 if(!spellpage.values[id + "_checked"]) {
                     update[id + " .sheet-lock"] = newspells >= (allowed + replaced) ? "locked" : "";
+                } else if(spellpage.values[id + "_checked"] && spellpage.values[id + "_existing"]) {
+                    update[id + " .sheet-lock"] = allowedreplace <= replaced ? "locked" : "";
                 }
             });
             if(sourcelevel == "0") {
@@ -16112,6 +16112,7 @@
             }
             setCharmancerText(update);
             if(sourcelevel == "all") updateSpellSummary("0", mancerdata, thispage);
+            setCharmancerText({pagelock: "unlock"})
         });
     };
 
@@ -18597,6 +18598,7 @@
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel-u">CANCEL</button></li>
         </ol>
         <div class="topbar-holder"></div>
+        <span class="pagelock" style="display: none"></span>
         <div class="choices spellslide">
             <p class="instructions" data-i18n="charmancer-leveler-spells-info">Listed here are the current spells your character already knows. If you gained access to more spells during your advancement you will be able to select them below. Check next to the spells you wish to learn. The Charactermancer will help you pick the right number of spells and from the correct list. If your class has the option to swap out spells, you can do so by unselecting currently known spells which will allow you to select new ones in their place.</p>
             <p class="spells-summary"></p>
@@ -18663,6 +18665,7 @@
             <li><button class="exit" type="action" name="act_cancel" data-i18n="cancel-u">CANCEL</button></li>
         </ol>
         <div class="topbar-holder"></div>
+        <span class="pagelock" style="display: none"></span>
         <div class="choices spellslide">
             <p class="instructions"></p>
         </div>
