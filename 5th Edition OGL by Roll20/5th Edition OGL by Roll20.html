@@ -7376,7 +7376,7 @@
         };
         var getList = [
             {name: "proficiencies", list: ["name"]},
-            {name: "tool", list: ["toolname"]},
+            {name: "tool", list: ["toolname", "toolattr_base"]},
             {name: "traits", list: ["name", "source", "source_type"]},
             {name: "resource", list: ["resource_left_name", "resource_right_name"]},
             {name: "spell-cantrip", list: ["spellname", "spellattackid", "spellsource", "spellattackid"]},
@@ -7393,15 +7393,20 @@
         }
         var repeating = {prof_names: [], traits: []};
         _.each(getList, function(section) {
-            if(!["tool", "proficiencies", "traits"].includes(section.name)) {
+            if(!["proficiencies", "traits"].includes(section.name)) {
                 repeating[section.name] = {};
             }
         });
         getallrepeating(getList, function(vals) {
             var traitstemp = {};
             _.each(vals, function(value, name) {
-                if(name.split("_")[1] == "proficiencies" || name.split("_")[1] == "tool") {
+                if(name.split("_")[1] == "proficiencies") {
                     repeating.prof_names.push(value.toLowerCase());
+                } else if(name.split("_")[1] == "tool") {
+                    repeating.tool[name.split("_")[2]] = repeating.tool[name.split("_")[2]] || {};
+                    let attr = _.last(name.split("_"));
+                    repeating.tool[name.split("_")[2]][attr] = value.toLowerCase();
+                    if(attr == "toolname") repeating.prof_names.push(value.toLowerCase());
                 } else if (name.split("_")[1] == "traits") {
                     traitstemp[name.split("_")[2]] = traitstemp[name.split("_")[2]] ? traitstemp[name.split("_")[2]] : {};
                     traitstemp[name.split("_")[2]][_.last(name.split("_"))] = value;
@@ -8239,14 +8244,20 @@
                 };
             }
             else if(type.toLowerCase() === "tool" || type.toLowerCase() === "skillcustom") {
-                if( repeating.prof_names.indexOf(page.name.toLowerCase()) == -1 ) {
-                    update["repeating_tool_" + newrowid + "_toolname"] = page.name;
-                    update["repeating_tool_" + newrowid + "_toolattr_base"] = "?{Attribute?|Strength,@{strength_mod}|Dexterity,@{dexterity_mod}|Constitution,@{constitution_mod}|Intelligence,@{intelligence_mod}|Wisdom,@{wisdom_mod}|Charisma,@{charisma_mod}}";
-                    update["repeating_tool_" + newrowid + "_options-flag"] = 0;
-                    if(page.data["toolbonus_base"]) { update["repeating_tool_" + newrowid + "_toolbonus_base"] = page.data["toolbonus_base"] };
-                    repeating.prof_names.push(page.name.toLowerCase());
-                    callbacks.push( function() {update_tool(newrowid);} );
-                };
+                let existing = {};
+                _.each(repeating.tool, function(tool, id) {
+                    if(tool.toolname == page.name.toLowerCase()) {
+                        newrowid = id;
+                        existing = tool;
+                    }
+                });
+                if(!existing.toolname) repeating.tool[newrowid] = {toolname: page.name.toLowerCase()}
+                update["repeating_tool_" + newrowid + "_toolname"] = page.name;
+                if(!existing.base) update["repeating_tool_" + newrowid + "_toolattr_base"] = "?{Attribute?|Strength,@{strength_mod}|Dexterity,@{dexterity_mod}|Constitution,@{constitution_mod}|Intelligence,@{intelligence_mod}|Wisdom,@{wisdom_mod}|Charisma,@{charisma_mod}}";
+                update["repeating_tool_" + newrowid + "_options-flag"] = 0;
+                if(page.data["toolbonus_base"]) update["repeating_tool_" + newrowid + "_toolbonus_base"] = "(@{pb}*2)";
+                repeating.prof_names.push(page.name.toLowerCase());
+                callbacks.push( function() {update_tool(newrowid);} );
             }
             if(type.toLowerCase() === "skill") {
                 var skill_string = page.name.toLowerCase().replace(/ /g, '_');
@@ -8285,6 +8296,13 @@
                 if(page.name && page.name !== "") { update[page.data.multiclass + "_subclass"] = page.name; }
             } else {
                 if(page.name && page.name !== "") { update["subclass"] = page.name; };
+            }
+            if(page.data["Spellcasting Ability"]) {
+                if(page.data.Class == "Fighter") {
+                    update["arcane_fighter"] = "1";
+                } else if(page.data.Class == "Rogue") {
+                    update["arcane_rogue"] = "1";
+                }
             }
             if(!looped) {
                 callbacks.push(update_class);
@@ -8414,14 +8432,19 @@
                     var tool_array = jsonparse(blob["Tool Proficiency"]);
                     if(tool_array["Proficiencies"] && tool_array["Proficiencies"].length) {
                         _.each(tool_array["Proficiencies"], function(prof) {
-                            if( repeating.prof_names.indexOf(prof.toLowerCase()) == -1 ) {
-                                newrowid = generateRowID();
-                                update["repeating_tool_" + newrowid + "_toolname"] = prof;
-                                update["repeating_tool_" + newrowid + "_toolattr_base"] = "?{Attribute?|Strength,@{strength_mod}|Dexterity,@{dexterity_mod}|Constitution,@{constitution_mod}|Intelligence,@{intelligence_mod}|Wisdom,@{wisdom_mod}|Charisma,@{charisma_mod}}";
-                                update["repeating_tool_" + newrowid + "_options-flag"] = 0;
-                                repeating.prof_names.push(prof.toLowerCase());
-                                callbacks.push( function() {update_tool(newrowid);} );
-                            }
+                            let existing = {};
+                            _.each(repeating.tool, function(tool, id) {
+                                if(tool.toolname == prof.toLowerCase()) {
+                                    newrowid = id;
+                                    existing = tool;
+                                }
+                            });
+                            if(!existing.toolname) repeating.tool[newrowid] = {toolname: prof.toLowerCase()}
+                            update["repeating_tool_" + newrowid + "_toolname"] = prof;
+                            if(!existing.base) update["repeating_tool_" + newrowid + "_toolattr_base"] = "?{Attribute?|Strength,@{strength_mod}|Dexterity,@{dexterity_mod}|Constitution,@{constitution_mod}|Intelligence,@{intelligence_mod}|Wisdom,@{wisdom_mod}|Charisma,@{charisma_mod}}";
+                            update["repeating_tool_" + newrowid + "_options-flag"] = 0;
+                            repeating.prof_names.push(page.name.toLowerCase());
+                            callbacks.push( function() {update_tool(newrowid);} );
                         });
                     }
                 };
@@ -10144,6 +10167,7 @@
     var getCasterType = function(class_string, levels, arcane_fighter, arcane_rogue) {
         var full = ["bard","cleric","druid","sorcerer","wizard","full"];
         var half = ["paladin","ranger","half"];
+        class_string = class_string.toLowerCase();
         if(full.indexOf(class_string) != -1) {
             return 1;
         } else if(half.indexOf(class_string) != -1) {
@@ -10172,6 +10196,7 @@
         var d10class = ["fighter","paladin","ranger"];
         var d8class = ["bard","cleric","druid","monk","rogue","warlock"];
         var d6class = ["sorcerer","wizard"];
+        class_string = class_string.toLowerCase();
         if(class_string === "barbarian") {return "12"}
         else if (d10class.indexOf(class_string) != -1) {return "10"}
         else if (d8class.indexOf(class_string) != -1) {return "8"}
@@ -10213,7 +10238,6 @@
             var l7 = v["lvl7_slots_mod"] && !isNaN(parseInt(v["lvl7_slots_mod"], 10)) ? parseInt(v["lvl7_slots_mod"], 10) : 0;
             var l8 = v["lvl8_slots_mod"] && !isNaN(parseInt(v["lvl8_slots_mod"], 10)) ? parseInt(v["lvl8_slots_mod"], 10) : 0;
             var l9 = v["lvl9_slots_mod"] && !isNaN(parseInt(v["lvl9_slots_mod"], 10)) ? parseInt(v["lvl9_slots_mod"], 10) : 0;
-
             if(lvl > 0) {
                 l1 = l1 + Math.min((lvl + 1),4);
                 if(lvl < 3) {l2 = l2 + 0;} else if(lvl === 3) {l2 = l2 + 2;} else {l2 = l2 + 3;};
@@ -14093,31 +14117,31 @@
                 v["other_resource_name"] = "";
                 var update = {};
                 var callbacks = [];
-                var repeating = {prof_names: [], traits: [], resource: {}};
                 var totalDrops = dropArray.length;
                 var x = 0;
                 callbacks.push(update_class);
                 callbacks.push(update_race_display);
-
-                _.each(dropArray, function(page) {
-                    page.data.Category = page.data.Category.replace("@@!!@@", "");
-                    var dropUpdate = processDrop(page, v, repeating, true);
-                    callbacks = callbacks.concat(dropUpdate.callbacks);
-                    repeating.prof_names = _.uniq(repeating.prof_names.concat(dropUpdate.prof_names));
-                    update = _.extend(update, dropUpdate.update);
-                    x++;
-                    setCharmancerText({"mancer_progress" :'<div style="width: ' + (parseInt(x/totalDrops*70) + 20) + '%"></div>'});
-                });
-
-                callbacks.push( function() {update_ac();} );
-                callbacks.push( function() {update_weight();} );
-                callbacks.push(callback);
-                console.log(update);
-                setAttrs(update, {silent: true}, function() {
-                    setCharmancerText({"mancer_progress" :'<div style="width: 95%"></div>'});
-                    _.each(callbacks, function(callback) {
-                        callback();
+                get_repeating_data(function(repeating) {
+                    _.each(dropArray, function(page) {
+                        page.data.Category = page.data.Category.replace("@@!!@@", "");
+                        var dropUpdate = processDrop(page, v, repeating, true);
+                        callbacks = callbacks.concat(dropUpdate.callbacks);
+                        repeating.prof_names = _.uniq(repeating.prof_names.concat(dropUpdate.prof_names));
+                        update = _.extend(update, dropUpdate.update);
+                        x++;
+                        setCharmancerText({"mancer_progress" :'<div style="width: ' + (parseInt(x/totalDrops*70) + 20) + '%"></div>'});
                     });
+
+                    callbacks.push( function() {update_ac();} );
+                    callbacks.push( function() {update_weight();} );
+                    callbacks.push(callback);
+                    console.log(update);
+                    setAttrs(update, {silent: true}, function() {
+                        setCharmancerText({"mancer_progress" :'<div style="width: 95%"></div>'});
+                        _.each(callbacks, function(callback) {
+                            callback();
+                        });
+                    });/**/
                 });
             });
         };
@@ -14720,6 +14744,9 @@
             });
         });
         getAttrs(["strength", "strength_mod", "dexterity", "dexterity_mod", "constitution", "constitution_mod", "intelligence", "intelligence_mod", "wisdom", "wisdom_mod", "charisma", "charisma_mod", "strength_maximum", "dexterity_maximum", "constitution_maximum", "intelligence_maximum", "wisdom_maximum", "charisma_maximum"], function(attrs) {
+            _.each(attrs, function(x, y) {
+                attrs[y] = parseInt(x);
+            });
             setAttrs({previous_abilities: JSON.stringify(attrs)});
         });
         getAttrs(["class", "subclass", "base_level", "multiclass1_flag", "multiclass2_flag", "multiclass3_flag", "multiclass1", "multiclass1_lvl", "multiclass1_subclass", "multiclass2", "multiclass2_lvl", "multiclass2_subclass", "multiclass3", "multiclass3_lvl", "multiclass3_subclass", "hp_max", "class_resource_name", "other_resource_name", "speed", "race", "subrace", "background", "custom_class", "cust_classname", "cust_hitdietype"], function(v) {
@@ -16536,7 +16563,6 @@
                 callbacks.push( function() {update_ac();} );
                 callbacks.push( function() {update_weight();} );
                 callbacks.push(callback);
-                console.log(repeating);
                 console.log(update);
                 setAttrs(update, {silent: true}, function() {
                     setCharmancerText({"mancer_progress" :'<div style="width: 95%"></div>'});
