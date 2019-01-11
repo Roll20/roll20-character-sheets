@@ -7437,7 +7437,7 @@
 
     var handle_drop = function(category, eventinfo) {
 
-        getAttrs(["speed", "drop_name", "drop_data", "drop_content", "character_id", "npc_legendary_actions", "strength_mod", "dexterity_mod", "npc", "base_level", "strength_base", "dexterity_base", "constitution_base", "wisdom_base", "intelligence_base", "charisma_base", "class_resource_name", "other_resource_name"], function(v) {
+        getAttrs(["speed", "drop_name", "drop_data", "drop_content", "character_id", "npc_legendary_actions", "strength_mod", "dexterity_mod", "npc", "base_level", "strength_base", "dexterity_base", "constitution_base", "wisdom_base", "intelligence_base", "charisma_base", "class_resource_name", "other_resource_name", "multiclass1_lvl", "multiclass2_lvl", "multiclass3_lvl"], function(v) {
             var pagedata = {};
             try {
                 pagedata = JSON.parse(v.drop_data);
@@ -7502,13 +7502,8 @@
             return finalAttrib;
         };
         var numUses = function(uses_string) {
-            var attribs = ["strength", "dexterity", "constitution", "wisdom", "intelligence", "charisma"];
-            uses_string = uses_string ? uses_string.toLowerCase() : "";
-            _.each(attribs, function(attrib) {
-                var attribMod = Math.floor((parseInt(currentData[attrib + "_base"]) - 10) / 2);
-                if (attribMod < 0) attribMod = 0;
-                uses_string = uses_string.replace(attrib, attribMod);
-            });
+            uses_string = parseValues(uses_string);
+
             var terms = uses_string.split("+");
             var total = 0;
             _.each(terms, function(term) {
@@ -7516,11 +7511,23 @@
             });
             return uses_string === "" || uses_string === "-" ? uses_string : total;
         };
+        var parseValues = function(uses_string) {
+            var attribs = ["strength", "dexterity", "constitution", "wisdom", "intelligence", "charisma"];
+            uses_string = uses_string ? uses_string.toLowerCase() : "";
+            _.each(attribs, function(attrib) {
+                var attribMod = Math.floor((parseInt(currentData[attrib + "_base"]) - 10) / 2);
+                if (attribMod < 0 || isNaN(attribMod)) attribMod = 0;
+                uses_string = uses_string.replace(attrib, attribMod);
+            });
+            uses_string = uses_string.replace(/half_level/g, Math.floor(classlevel/2));
+            return uses_string.replace(/level/g, classlevel);
+        };
         var category = page.data["Category"];
         var callbacks = [];
         var update = {};
         var id = generateRowID();
         var blobs = {};
+        var classlevel = currentData.base_level ? parseInt(currentData.base_level) : 1;
         repeating.traits = repeating.traits ? repeating.traits : [];
         update["drop_category"] = "";
         update["drop_name"] = "";
@@ -8269,6 +8276,7 @@
             if(page.data.multiclass) {
                 if(page.name && page.name !== "") { update[page.data.multiclass] = page.name; }
                 update[page.data.multiclass + "_flag"] = "1";
+                classlevel = parseInt(currentData[page.data.multiclass + "_lvl"]);
             } else {
                 if(page.name && page.name !== "") { update["class"] = page.name; }
                 if(page.data["Hit Die"] && page.data["Hit Die"] !== "") {
@@ -8294,6 +8302,7 @@
         if(category === "Subclasses") {
             if(page.data.multiclass) {
                 if(page.name && page.name !== "") { update[page.data.multiclass + "_subclass"] = page.name; }
+                classlevel = parseInt(currentData[page.data.multiclass + "_lvl"]);
             } else {
                 if(page.name && page.name !== "") { update["subclass"] = page.name; };
             }
@@ -8515,11 +8524,12 @@
                 _.each(repeating.damagemod, function(name, rowid) {
                     if(name.toLowerCase() === dmgmod["Name"].toLowerCase()) id = rowid;
                 });
-                update["repeating_damagemod_" + id + "_global_damage_rollstring"] = `${dmgmod["Damage"]}[${dmgmod["Name"]}]`;
+                update["repeating_damagemod_" + id + "_global_damage_rollstring"] = `${parseValues(dmgmod["Damage"])}[${dmgmod["Name"]}]`;
                 if(dmgmod["Active"] !== "false") update["repeating_damagemod_" + id + "_global_damage_active_flag"] = "1";
                 update["repeating_damagemod_" + id + "_options-flag"] = "0";
                 update["repeating_damagemod_" + id + "_global_damage_type"] = dmgmod["Name"];
                 update["global_damage_mod_flag"] = "1";
+                repeating.damagemod[id] = dmgmod["Name"];
             };
             if(blob["Resources"]) {
                 var resources = jsonparse(blob["Resources"]);
@@ -8545,9 +8555,8 @@
                         repeating.resource[id] = {left: value["Name"], right: ""};
                     }
                     update[section + "_name"] = value["Name"];
-                    var uses = numUses(value["Uses"]);
-                    update[section] = uses;
-                    update[section + "_max"] = uses;
+                    if(value["Uses"]) update[section] = numUses(value["Uses"]);
+                    update[section + "_max"] = value["Max"] ? numUses(value["Max"]) : numUses(value["Uses"]);
                 });
             };
             if(blob["Custom AC"]) {
@@ -8594,7 +8603,7 @@
                 } else if (blob["Initiative"].toLowerCase() === "disadvantage") {
                     update["initiative_style"] = "{@{d20},@{d20}}kl1";
                 } else {
-                    update.initmod = blob["Initiative"];
+                    update.initmod = numUses(blob["Initiative"]);
                 }
             };
             if(blob["Carry Multiplier"]) {
@@ -8688,6 +8697,12 @@
             };
             if(blob["Global Save Mod"]) {
                 update["globalsavemod"] = numUses(blob["Global Save Mod"]);
+            };
+            if(blob["Proficiency Bonus"]) {
+                var bonus = jsonparse(blob["Proficiency Bonus"]);
+                _.each(bonus, function(value, prof) {
+                    update[prof.replace(/ /g, "_").toLowerCase() + "_flat"] = numUses(value);
+                });
             };
             /**/
         });
@@ -12147,6 +12162,8 @@
                     setCharmancerText(repupdate);
                     handleProficiencies(blob, rowid);
                 });
+            } else {
+                handleProficiencies(blob);
             }
         });
         _.each(sorted.traits, function(blob, name) {
@@ -14834,7 +14851,8 @@
         update["class1_selector"] = '<span class="sheet-compendium-class-name">' + baseclass + '</span>';
         if (previous["subclass"] && previous["custom_class"] === "0") { 
             update[`subclass1_selector`] = `<div>` + previous["subclass"] + `</div>`;
-            if(mancerdata["lp-levels"] && mancerdata["lp-levels"].values["class1_subclass"] !== "Subclasses" + previous["subclass"])set["class1_subclass"] = "Subclasses:" + previous["subclass"]; 
+            if((mancerdata["lp-levels"] && mancerdata["lp-levels"].values["class1_subclass"] !== "Subclasses" + previous["subclass"])
+                || !mancerdata["lp-levels"]) set["class1_subclass"] = "Subclasses:" + previous["subclass"]; 
         };
         const multiclass = parseInt(previous["multiclass1_flag"]) + parseInt(previous["multiclass2_flag"]) + parseInt(previous["multiclass3_flag"]);
         set["multiclass"] = mancerdata["lp-levels"] && mancerdata["lp-levels"].values["multiclass"] ? mancerdata["lp-levels"].values["multiclass"] : multiclass;
@@ -16539,6 +16557,9 @@
                     v[ability + "_mod"] = abilities[ability];
                 });
                 v.base_level = set["base_level"];
+                v["multiclass1_lvl"] = initial["multiclass1_lvl"];
+                v["multiclass2_lvl"] = initial["multiclass2_lvl"];
+                v["multiclass3_lvl"] = initial["multiclass3_lvl"];
                 v.npc = "0";
                 v["class_resource_name"] = previous["class_resource_name"];
                 v["other_resource_name"] = previous["other_resource_name"];
@@ -16829,6 +16850,7 @@
         set["lpmancer_status"] = "";
         set["charactermancer_step"] = "lp-welcome";
         console.log(allDrops);
+        console.log(allPageData);
         _.each(removesections, function(rowid) {
             removeRepeatingRow(rowid);
         });
