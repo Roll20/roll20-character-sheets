@@ -11379,17 +11379,19 @@
             let getArray = [];
             ids.forEach(sectionid => {
                 getArray.push(`repeating_damagemod_${sectionid}_global_damage_rollstring`);
+                getArray.push(`repeating_damagemod_${sectionid}_global_damage_type`);
             });
            getAttrs(getArray, function(v) {
                 let set = {};
-                if (v[`${getArray}`]) {
-                    getArray.forEach(attr => {
-                        const value = v[`${attr}`], brackets = value.split('['), damage = brackets[0], name = brackets[1].slice(0, -1), section = attr.slice(0, -10);
+                _.each(v, (value, attr) => {
+                    if(_.last(attr.split("_")) === "rollstring") {
+                        const brackets = value.split('['), damage = brackets[0], section = attr.slice(0, -10);
+                        const name = brackets[1] ? brackets[1].slice(0, -1) : v[`${section}type`];
 
                         set[`${section}name`] = name;
                         set[`${section}damage`] = damage;
-                    });
-                };
+                    }
+                });
                 setAttrs(set);
 
                 doneupdating();
