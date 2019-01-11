@@ -1597,22 +1597,32 @@
                     </fieldset>
                 </div>
                 <input type="hidden" class="toggleflag" name="attr_global_damage_mod_flag">
-                <div class="hidden textbox globalattack">
+                <div class="hidden globalattack global-dmg">
                     <span class="label" data-i18n="global-damage-u">GLOBAL DAMAGE MODIFIER</span>
                     <fieldset class="repeating_damagemod">
                         <div class="global-mod">
                             <input type="checkbox" name="attr_options-flag" class="options-flag" checked="checked" style="top: -15px;"><span>y</span>
                             <input type="checkbox" name="attr_global_damage_active_flag" value="1" class="active-flag">
                             <div class="options">
-                                <textarea type="textarea" name="attr_global_damage_rollstring" placeholder="1d6[SNEAK ATTACK]"></textarea>
-                                <div class="row" style="margin-bottom: 5px;">
-                                    <span style="display: inline; margin-left: 25px;" data-i18n="type:-u">TYPE:</span>
-                                    <input type="text" name="attr_global_damage_type" value="">
+                                <div class="row">
+                                    <span data-i18n="name:-u">NAME:</span>
+                                    <input type="text" name="attr_global_damage_name" value="" placeholder="Sneak Attack">
+                                </div>
+                                <div class="row">
+                                    <span data-i18n="dmg:-u">DAMAGE:</span>
+                                    <input type="text" name="attr_global_damage_damage" value="" placeholder="1d6">
+                                </div>
+                                <div class="row">
+                                    <span data-i18n="type:-u">TYPE:</span>
+                                    <input type="text" name="attr_global_damage_type" value="" placeholder="Sneak">
                                 </div>
                             </div>
-                            <div class="display" style="margin-bottom: 2px; width: 85%">
-                                <span class="title" name="attr_global_damage_rollstring" style="width: 110px; padding-right: 0px;"></span>
-                                <span class="subheader" name="attr_global_damage_type" style="padding-right: 0px;"></span>
+                            <div class="display">
+                                <span class="title" name="attr_global_damage_name"></span>
+                                <span class="subheader">
+                                    <span name="attr_global_damage_damage"></span>
+                                    <span name="attr_global_damage_type"></span>
+                                </span>
                             </div>
                         </div>
                     </fieldset>
@@ -6438,15 +6448,13 @@
         update_globaldamage();
     });
 
-    on("change:global_damage_mod_flag", function(eventinfo) {
+ on("change:global_damage_mod_flag", function(eventinfo) {
         if(eventinfo.newValue === "1") {
             getSectionIDs("damagemod", function(ids) {
                 if(!ids || ids.length === 0) {
                     var update = {};
                     var rowid = generateRowID();
                     update[`repeating_damagemod_${rowid}_global_damage_active_flag`] = "1";
-                    update[`repeating_damagemod_${rowid}_global_damage_rollstring`] = "1d6[SNEAK ATTACK]";
-                    update[`repeating_damagemod_${rowid}_global_damage_type`] = "Sneak";
                     setAttrs(update);
                 }
             });
@@ -6460,7 +6468,7 @@
                 setAttrs(update);
             });
         }
-    });
+    }); 
 
     on("change:exhaustion_toggle", function(eventinfo) {
         if(eventinfo.newValue !== "0") {
@@ -8515,10 +8523,11 @@
                 _.each(repeating.damagemod, function(name, rowid) {
                     if(name.toLowerCase() === dmgmod["Name"].toLowerCase()) id = rowid;
                 });
-                update["repeating_damagemod_" + id + "_global_damage_rollstring"] = `${dmgmod["Damage"]}[${dmgmod["Name"]}]`;
+                update["repeating_damagemod_" + id + "_global_damage_name"] = `${dmgmod["Name"]}`;
+                update["repeating_damagemod_" + id + "_global_damage_damage"] = `${dmgmod["Damage"]}`;
                 if(dmgmod["Active"] !== "false") update["repeating_damagemod_" + id + "_global_damage_active_flag"] = "1";
                 update["repeating_damagemod_" + id + "_options-flag"] = "0";
-                update["repeating_damagemod_" + id + "_global_damage_type"] = dmgmod["Name"];
+                update["repeating_damagemod_" + id + "_global_damage_type"] = dmgmod["Type"];
                 update["global_damage_mod_flag"] = "1";
             };
             if(blob["Resources"]) {
@@ -10861,27 +10870,31 @@
                 var attr_name_list = [];
                 ids.forEach(function(id) {
                     fields[id] = {};
-                    attr_name_list.push(`repeating_damagemod_${id}_global_damage_active_flag`, `repeating_damagemod_${id}_global_damage_rollstring`, `repeating_damagemod_${id}_global_damage_type`);
+                    attr_name_list.push(`repeating_damagemod_${id}_global_damage_active_flag`, `repeating_damagemod_${id}_global_damage_name`, `repeating_damagemod_${id}_global_damage_damage`, `repeating_damagemod_${id}_global_damage_type`);
                 });
+
                 getAttrs(attr_name_list, function(attrs) {
-                    var regex = /^repeating_damagemod_(.+)_global_damage_(active_flag|rollstring|type)$/;
+                    var regex = /^repeating_damagemod_(.+)_global_damage_(active_flag|name|damage|type)$/;
                     _.each(attrs, function(obj, name) {
                         var r = regex.exec(name);
                         if(r) {
                             fields[r[1]][r[2]] = obj;
-                        }
+                        };
                     });
 
                     var update = {global_damage_mod_roll: "", global_damage_mod_crit: "", global_damage_mod_type: ""};
+
                     console.log("GLOBALDAMAGE");
                     _.each(fields, function(element) {
                         if(element.active_flag != "0") {
-                            if(element.rollstring && element.rollstring !== "") { update["global_damage_mod_roll"] += element.rollstring + "+"; }
+                            if(element.name && element.name !== "") { update["global_damage_mod_roll"] += element.damage + '[' + element.name + ']' + "+"; }
                             if(element.type && element.type !== "") { update["global_damage_mod_type"] += element.type + "/"; }
                         }
                     });
+
                     update["global_damage_mod_roll"] = update["global_damage_mod_roll"].replace(/\+(?=$)/, '');
                     update["global_damage_mod_type"] = update["global_damage_mod_type"].replace(/\/(?=$)/, '');
+
                     // Remove any non-roll damage modifiers from the global damage modifier for the crit rolls
                     // Will also remove any labels attached to these non-roll damage modifiers
                     update["global_damage_mod_crit"] = update["global_damage_mod_roll"].replace(/(?:[+\-*\/%]|\*\*|^)\s*\d+(?:\[.*?])?(?!d\d+)/gi, '')
@@ -11345,6 +11358,30 @@
         });
     };
 
+    var upgrade_to_2_7 = function(doneupdating) {
+        getSectionIDs("damagemod", function(ids) {
+            console.log("Version 2.7 UPGRADE");
+            let getArray = [];
+            ids.forEach(sectionid => {
+                getArray.push(`repeating_damagemod_${sectionid}_global_damage_rollstring`);
+            });
+           getAttrs(getArray, function(v) {
+                let set = {};
+                if (v[`${getArray}`]) {
+                    getArray.forEach(attr => {
+                        const value = v[`${attr}`], brackets = value.split('['), damage = brackets[0], name = brackets[1].slice(0, -1), section = attr.slice(0, -10);
+
+                        set[`${section}name`] = name;
+                        set[`${section}damage`] = damage;
+                    });
+                };
+                setAttrs(set);
+
+                doneupdating();
+            });
+        });
+    };
+
     var no_version_bugfix = function(doneupdating) {
         getAttrs(["npc","class"], function(v) {
             if(v["npc"] && v["npc"] != "0" || v["class"] && v["class"] != "") {
@@ -11359,8 +11396,8 @@
 
     var versioning = function(finished) {
         getAttrs(["version"], function(v) {
-            if(v["version"] === "2.6") {
-                setAttrs({version: "2.6"}, function(){
+            if(v["version"] === "2.7") {
+                setAttrs({version: "2.7"}, function(){
                     finished();
                 });
                 console.log("5th Edition OGL by Roll20 v" + v["version"]);
@@ -11370,6 +11407,14 @@
                 console.log("NO VERSION FOUND");
                 no_version_bugfix(function() {
                     versioning(finished);
+                });
+            }
+            else if(v["version"] === "2.6") {
+                console.log("UPGRADING TO v2.7");
+                upgrade_to_2_7(function() {
+                    setAttrs({version: "2.7"}, function() {
+                        versioning(finished);
+                    });
                 });
             }
             else if(v["version"] === "2.5") {
