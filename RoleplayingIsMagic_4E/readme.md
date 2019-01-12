@@ -1,4 +1,11 @@
-# Roleplaying is Magic: Season 4 edition character sheet
+# Roleplaying is Magic: Season 4 edition character sheet - v1.1
+
+#### v1.1 Updates:
+* Worker script refactoring
+* Includes skillsJSON and edgesJSON attributes for easy access to the skills and edges data.
+
+#### Dependencies:
+* Roleplaying Is Magic 4E Dice script - v1.1 
 
 This character sheet is for [Roleplaying is Magic: Season 4 edition](http://roleplayingismagic.com/),
 a popular fan-created tabletop RPG system based upon the world of
@@ -15,12 +22,11 @@ your campaign.
 For the skill rolling buttons to work, you must also be speaking as the
 character you are rolling the skill for.
 
-The script can also be used as a chat command. This is documented in the
-script's header comment.
+The script can also be used as a chat command. See the script's [README](https://github.com/Roll20/roll20-api-scripts/blob/master/RoleplayingIsMagic_4E_Dice/README.md) for further documentation.
 
 ## Untrained skills
 
-For untrained skills, it is advised that players should add Mind, Body, and
+For untrained skills, players should add Mind, Body, and
 Heart as untrained skills to the Skills section of their character sheets.
-This will make it easy to use untrained skills with the RiM4 dice script and
-the dice rolling buttons by just rolling one of these.
+This will allow players to use untrained skills with the RiM4 dice script and
+the dice rolling buttons.
