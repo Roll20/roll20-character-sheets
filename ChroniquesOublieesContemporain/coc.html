@@ -519,27 +519,35 @@
             var pdef = 0;
             var etatde = values.ETATDE;
             switch (values.PCONDITION) {
-                case 'A':
+                case 'A': // aveuglé
                     pinit = 5;
                     patc = 5;
                     pdef = 5;
                     patd = 10;
                     break;
-                case 'E':
+                case 'E': // étourdi
                     pdef = 5;
                     break;
-                case 'I':
+                case 'F': // effrayé
+                    patc = 5;
+                    patd = 5;
+                    break;
+                case 'I': // immobilisé
                     etatde = '20';
                     break;
-                case 'R':
+                case 'P': // paniqué
+                    pdef = 2;
+                    etatde = '20';
+                    break;
+                case 'R': // renversé
                     patc = 5;
                     patd = 5;
                     pdef = 5;
                     break;
-                case 'S':
+                case 'S': // surpris
                     pdef = 5;
                     break;
-                case '':
+                case '': // -rien-
                     break;
             }
             // check condition for buffs
@@ -548,27 +556,35 @@
             var matd = 0;
             var mdef = 0;
             switch (values.CONDITION) {
-                case 'A':
+                case 'A': // aveuglé
                     minit = 5;
                     matc = 5;
                     mdef = 5;
                     matd = 10;
                     break;
-                case 'E':
+                case 'E': // étourdi
                     mdef = 5;
                     break;
-                case 'I':
+                case 'F': // effrayé
+                    matc = 5;
+                    matd = 5;
+                    break;
+                case 'I': // immobilisé
                     etatde = '12';
                     break;
-                case 'R':
+                case 'P': // paniqué
+                    mdef = 2;
+                    etatde = '12';
+                    break;
+                case 'R': // renversé
                     matc = 5;
                     matd = 5;
                     mdef = 5;
                     break;
-                case 'S':
+                case 'S': // surpris
                     mdef = 5;
                     break;
-                case '':
+                case '': // -rien-
                     etatde = '20';
                     break;
             }
@@ -673,6 +689,28 @@
         });
     });
 
+    function setRank(ei) {
+        let r = !ei.newValue || ei.newValue === '' ? 1 : 0;
+        let v = ei.sourceAttribute.substring(4).split('-');
+        let attr = 'RANG_VOIE' + v[0];
+        let rank = {};
+        rank[attr] = parseInt(v[1]) - r;
+        setAttrs(rank);
+    }
+    
+    on('change:voie1-1 change:voie1-2 change:voie1-3 change:voie1-4 change:voie1-5'
+    + ' change:voie2-1 change:voie2-2 change:voie2-3 change:voie2-4 change:voie2-5'
+    + ' change:voie3-1 change:voie3-2 change:voie3-3 change:voie3-4 change:voie3-5'
+    + ' change:voie4-1 change:voie4-2 change:voie4-3 change:voie4-4 change:voie4-5'
+    + ' change:voie5-1 change:voie5-2 change:voie5-3 change:voie5-4 change:voie5-5'
+    + ' change:voie6-1 change:voie6-2 change:voie6-3 change:voie6-4 change:voie6-5'
+    + ' change:voie7-1 change:voie7-2 change:voie7-3 change:voie7-4 change:voie7-5'
+    + ' change:voie8-1 change:voie8-2 change:voie8-3 change:voie8-4 change:voie8-5'
+    + ' change:voie9-1 change:voie9-2 change:voie9-3 change:voie9-4 change:voie9-5', 
+    function(eventInfo) {
+        setRank(eventInfo);
+    });
+
 </script>
 
 <div class="sheet-mainBg"> <!-- FDP -->
@@ -711,6 +749,16 @@
     <!-- INPUT HIDDEN Choix carac jets capacités -->
     <input type="hidden" name="attr_QRYMOD" value="?{Carac. ?|Force,@{FOR}|Dextérité,@{DEX}|Constitution,@{CON}|Intelligence,@{INT}|Perception,@{PER}|Charisme,@{CHA}}" />
     <input type="hidden" name="attr_QRYMODT" value="?{Carac. ?|Force,@{FOR_TEST}|Dextérité,@{DEX_TEST}|Constitution,@{CON_TEST}|Intelligence,@{INT_TEST}|Perception,@{PER_TEST}|Charisme,@{CHA_TEST}}" />
+    <!-- INPUT HIDDEN Rangs Voies -->
+    <input type="hidden" name="attr_RANG_VOIE1" value="0" />
+    <input type="hidden" name="attr_RANG_VOIE2" value="0" />
+    <input type="hidden" name="attr_RANG_VOIE3" value="0" />
+    <input type="hidden" name="attr_RANG_VOIE4" value="0" />
+    <input type="hidden" name="attr_RANG_VOIE5" value="0" />
+    <input type="hidden" name="attr_RANG_VOIE6" value="0" />
+    <input type="hidden" name="attr_RANG_VOIE7" value="0" />
+    <input type="hidden" name="attr_RANG_VOIE8" value="0" />
+    <input type="hidden" name="attr_RANG_VOIE9" value="0" />
     <!-- Fin INPUT HIDDEN -->
     <div class="sheet-container"><!-- Identité -->
         <div style="vertical-align: middle; text-align: center;">
@@ -879,8 +927,10 @@
                                         <select class="sheet-carac" style="min-width: 100px;" name="attr_CONDITION" title="@{CONDITION}">
                                             <option value="" selected>(aucune)</option>
                                             <option value="A">Aveuglé</option>
+                                            <option value="F">Effrayé</option>
                                             <option value="E">Etourdi</option>
                                             <option value="I">Immobilisé</option>
+                                            <option value="P">Paniqué</option>
                                             <option value="R">Renversé</option>
                                             <option value="S">Surpris</option>
                                         </select>
@@ -1888,7 +1938,7 @@
 		                </div>
     		            <div class="sheet-3colrow">
         		            <div class="sheet-col" style="width: 27%;">
-        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_for" title="Jet de Force" value="@(pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Force}} {{subtags=Test}} {{carac=[[@{pnj_jetfor}cs20cf1[Dé] + [[@{pnj_for}]][FOR] ]] }}"> FOR</div>
+        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_for" title="Jet de Force" value="@{pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Force}} {{subtags=Test}} {{carac=[[@{pnj_jetfor}cs20cf1[Dé] + [[@{pnj_for}]][FOR] ]] }}"> FOR</div>
         						<div class="sheet-boxinput">
         						    <input class="sheet-carac" name="attr_pnj_for" type="number" title="@{pnj_for}" />
 									<select class="sheet-carac" style="width: 30px;" size="1" name="attr_pnj_jetfor" title="@{pnj_jetfor}">
@@ -1898,7 +1948,7 @@
         						</div>
         		            </div>
         		            <div class="sheet-col" style="width: 27%;">
-        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_dex" title="Jet de Dextérité" value="@(pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Dextérité}} {{subtags=Test}} {{carac=[[@{pnj_jetdex}cs20cf1[Dé] + [[@{pnj_dex}]][DEX] ]] }}"> DEX</div>
+        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_dex" title="Jet de Dextérité" value="@{pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Dextérité}} {{subtags=Test}} {{carac=[[@{pnj_jetdex}cs20cf1[Dé] + [[@{pnj_dex}]][DEX] ]] }}"> DEX</div>
         						<div class="sheet-boxinput">
         						    <input class="sheet-carac" name="attr_pnj_dex" type="number" title="@{pnj_dex}" />
 									<select class="sheet-carac" style="width: 30px;" size="1" name="attr_pnj_jetdex" title="@{pnj_jetdex}">
@@ -1908,7 +1958,7 @@
         						</div>
         		            </div>
         		            <div class="sheet-col" style="width: 27%;">
-        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_con" title="Jet de Constitution" value="@(pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Constitution}} {{subtags=Test}} {{carac=[[@{pnj_jetcon}cs20cf1[Dé] + [[@{pnj_con}]][CON] ]] }}"> CON</div>
+        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_con" title="Jet de Constitution" value="@{pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Constitution}} {{subtags=Test}} {{carac=[[@{pnj_jetcon}cs20cf1[Dé] + [[@{pnj_con}]][CON] ]] }}"> CON</div>
         						<div class="sheet-boxinput">
         						    <input class="sheet-carac" name="attr_pnj_con" type="number" title="@{pnj_con}" />
 									<select class="sheet-carac" style="width: 30px;" size="1" name="attr_pnj_jetcon" title="@{pnj_jetcon}">
@@ -1921,7 +1971,7 @@
     		            <div class="sheet-row">&nbsp;</div>
     		            <div class="sheet-3colrow">
         		            <div class="sheet-col" style="width: 27%;">
-        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_int" title="Jet d'Intelligence" value="@(pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Intelligence}} {{subtags=Test}} {{carac=[[@{pnj_jetint}cs20cf1[Dé] + [[@{pnj_int}]][INT] ]] }}"> INT</div>
+        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_int" title="Jet d'Intelligence" value="@{pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Intelligence}} {{subtags=Test}} {{carac=[[@{pnj_jetint}cs20cf1[Dé] + [[@{pnj_int}]][INT] ]] }}"> INT</div>
         						<div class="sheet-boxinput">
         						    <input class="sheet-carac" name="attr_pnj_int" type="number" title="@{pnj_int}" />
 									<select class="sheet-carac" style="width: 30px;" size="1" name="attr_pnj_jetint" title="@{pnj_jetint}">
@@ -1931,7 +1981,7 @@
         						</div>
         		            </div>
         		            <div class="sheet-col" style="width: 27%;">
-        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_per" title="Jet de Perception" value="@(pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Perception}} {{subtags=Test}} {{carac=[[@{pnj_jetper}cs20cf1[Dé] + [[@{pnj_per}]][PER] ]] }}"> PER</div>
+        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_per" title="Jet de Perception" value="@{pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Perception}} {{subtags=Test}} {{carac=[[@{pnj_jetper}cs20cf1[Dé] + [[@{pnj_per}]][PER] ]] }}"> PER</div>
         						<div class="sheet-boxinput">
         						    <input class="sheet-carac" name="attr_pnj_per" type="number" title="@{pnj_per}" />
 									<select class="sheet-carac" style="width: 30px;" size="1" name="attr_pnj_jetper" title="@{pnj_jetper}">
@@ -1941,7 +1991,7 @@
         						</div>
         		            </div>
         		            <div class="sheet-col" style="width: 27%;">
-        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_cha" title="Jet de Charisme" value="@(pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Charisme}} {{subtags=Test}} {{carac=[[@{pnj_jetcha}cs20cf1[Dé] + [[@{pnj_cha}]][CHA] ]] }}"> CHA</div>
+        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_cha" title="Jet de Charisme" value="@{pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Charisme}} {{subtags=Test}} {{carac=[[@{pnj_jetcha}cs20cf1[Dé] + [[@{pnj_cha}]][CHA] ]] }}"> CHA</div>
         						<div class="sheet-boxinput">
         						    <input class="sheet-carac" name="attr_pnj_cha" type="number" title="@{pnj_cha}" />
 									<select class="sheet-carac" style="width: 30px;" size="1" name="attr_pnj_jetcha" title="@{pnj_jetcha}">
@@ -1954,7 +2004,7 @@
     		            <div class="sheet-row">&nbsp;</div>
     		            <div class="sheet-3colrow">
     		                <div class="sheet-col" style="width: 27%;">
-        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_init" title="Jet d'Initiative" value="@(pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Initiative}} {{subtags=Combat}} {{carac=[[@{pnj_init}[Init.] + @{pnj_init_var}[Dé(s)] &{tracker}]]}}"> Init.</div>
+        						<div class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="jet_pnj_init" title="Jet d'Initiative" value="@{pnj_togm}&{template:co1} {{perso=@{character_name}}} {{name=Initiative}} {{subtags=Combat}} {{carac=[[@{pnj_init}[Init.] + @{pnj_init_var}[Dé(s)] &{tracker}]]}}"> Init.</div>
         						<div class="sheet-boxinput">
         						    <input class="sheet-carac" name="attr_pnj_init" type="number" title="@{pnj_init}" />
         						</div>
