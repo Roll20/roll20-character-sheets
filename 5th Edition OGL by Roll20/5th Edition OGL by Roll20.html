@@ -1148,9 +1148,9 @@
                                         <input type="text" name="attr_global_save_roll" value="" placeholder="1d4" style="width:75px">
                                     </div>
                                 </div>
-                                <div class="display-flex">
-                                    <span class="repname" name="attr_global_save_name"></span>
-                                    <span class="reproll" name="attr_global_save_roll"></span>
+                                <div class="globaldisplay" style="width: 75%">
+                                    <span name="attr_global_save_roll"></span>
+                                    [<span name="attr_global_save_name"></span>]
                                 </div>
                             </div>
                         </fieldset>
@@ -1330,9 +1330,9 @@
                                     <input type="text" name="attr_global_skill_roll" value="" placeholder="1d4">
                                 </div>
                             </div>
-                            <div class="display-flex" style="width:87%">
-                                <span class="repname" name="attr_global_skill_name"></span>
-                                <span class="reproll" name="attr_global_skill_roll"></span>
+                            <div class="globaldisplay">
+                                <span name="attr_global_skill_roll"></span>
+                                [<span name="attr_global_skill_name"></span>]
                             </div>
                         </div>
                     </fieldset>
@@ -1613,9 +1613,9 @@
                                     <input type="text" name="attr_global_attack_roll" value="" placeholder="1d4">
                                 </div>
                             </div>
-                            <div class="display-flex" style="width: 87%">
-                                <span class="repname" name="attr_global_attack_name"></span>
-                                <span class="reproll" name="attr_global_attack_roll"></span>
+                            <div class="globaldisplay">
+                                <span name="attr_global_attack_roll"></span>
+                                [<span name="attr_global_attack_name"></span>]
                             </div>
                         </div>
                     </fieldset>
@@ -8619,12 +8619,27 @@
             if(blob["Global AC Mod"]) {
                 var globalac = jsonparse(blob["Global AC Mod"]);
                 var id = generateRowID();
+                _.each(repeating.acmod, function(name, rowid) {
+                    if(name.toLowerCase() === globalac["Name"].toLowerCase()) id = rowid;
+                });
                 update["repeating_acmod_" + id + "_global_ac_val"] = globalac.Bonus;
                 if(globalac["Active"] !== "false") update["repeating_acmod_" + id + "_global_ac_active_flag"] = "1";
                 update["repeating_acmod_" + id + "_options-flag"] = "0";
                 update["repeating_acmod_" + id + "_global_ac_name"] = globalac.Name;
                 update["global_ac_mod_flag"] = "1";
             };
+            if(blob["Global Save Mod"]) {
+                var globalsave = jsonparse(blob["Global Save Mod"]);
+                var id = generateRowID();
+                _.each(repeating.savemod, function(name, rowid) {
+                    if(name.toLowerCase() === globalsave["Name"].toLowerCase()) id = rowid;
+                });
+                update["repeating_savemod_" + id + "_global_save_roll"] = globalsave.Bonus;
+                if(globalsave["Active"] !== "false") update["repeating_savemod_" + id + "_global_save_active_flag"] = "1";
+                update["repeating_savemod_" + id + "_options-flag"] = "0";
+                update["repeating_savemod_" + id + "_global_save_name"] = globalsave.Name;
+                update["global_save_mod_flag"] = "1";
+            }
             if(blob["Global Attack"]) {
                 var globalattack = jsonparse(blob["Global Attack"]);
                 var id = generateRowID();
@@ -11718,6 +11733,12 @@
                         }
                     }
                 });
+                if(blob.Expertise) {
+                    var json = JSON.parse(blob.Expertise);
+                    if(json.Proficiencies) {
+                        allProficiencies.Expertise = allProficiencies.Expertise.concat(json.Proficiencies);
+                    }
+                }
             });
         });
         //Gather all of the chosen proficiencies
@@ -11835,6 +11856,7 @@
         var subclassname = getName("subclass", mancerdata, true);
         var classAbility = mancerdata["l1-class"] && mancerdata["l1-class"].data.class && mancerdata["l1-class"].data.class["Spellcasting Ability"] ? mancerdata["l1-class"].data.class["Spellcasting Ability"] : "";
         var expandedList = {};
+        var additionalList = {};
         var blobs = getRelevantBlobs(mancerdata, "1", "l1");
 
         //Collect expanded spell lists
@@ -11847,6 +11869,15 @@
                     }
                 });
             }
+        });
+        _.each(blobs.sorted, function(sectionblobs, section) {
+            var parentsection = section.replace("sub", "");
+            additionalList[parentsection] = additionalList[parentsection] || []
+            _.each(sectionblobs, function(blob) {
+                if(blob["Additional Spell List"]) {
+                    additionalList[parentsection].push(blob["Additional Spell List"]);
+                }
+            });
         });
         //Process spell data from blobs
         _.each(blobs.sorted, function(sectionblobs, section) {
@@ -11868,6 +11899,7 @@
                             _.times(numSpells, function(n) {
                                 var thisspell = {Level: parseInt(spell.Level)};
                                 thisspell.List = spell.List ? spell.List : classname;
+                                thisspell.AddList = additionalList[parentsection];
                                 thisspell.Ability = spell.Ability ? spell.Ability : classAbility;
                                 if(parentsection == "class") thisspell["Expanded List"] = expandedList[spell.Level];
                                 allSpells[parentsection].choices.push(thisspell);
@@ -12373,9 +12405,9 @@
             if(slidename.split("-")[0] == section) {
                 _.each(slide.data, function(data, section) {
                     if(data.blobs) {
-                        var levelblobs = _.extend(filterBlobs(data.blobs, {"Level": level}), filterBlobs(data.blobs, {"Level": "any"}));
+                        var levelblobs = _.extend(filterBlobs(data.blobs, {"Level": level}), filterBlobs(data.blobs, {"Level": "every"}));
                         sorted[section] = [];
-                        names[section] = []
+                        names[section] = [];
                         _.each(levelblobs, function(blob, blobname) {
                             results.push(blob);
                             sorted[section].push(blob);
@@ -13622,7 +13654,9 @@
                         _.each(spells.choices, function(spell) {
                             addRepeatingSection(rowid, "choose", section + "_spell-l" + spell.Level, function(id) {
                                 var toset = {};
-                                var choices = "Category:Spells Classes:*" + spell.List + " Level:" + spell.Level;
+                                var lists = [spell.List];
+                                if(spell.AddList) lists = lists.concat(spell.AddList);
+                                var choices = "Category:Spells Classes:*" + lists.join("|*") + " Level:" + spell.Level;
                                 var settings = {category: "Spells", disable: spellData.known, add: spell["Expanded List"]};
                                 toset[id + "_info"] = spell.Ability;
                                 if(section != "class") toset[id + "_custom"] = section;
@@ -14380,7 +14414,7 @@
         var silentset = {};
         var silentattrs = ["class_resource_name", "class_resource", "class_resource_max", "other_resource_name", "other_resource", "other_resource_max", "other_resource_itemid", "class", "class_display", "subclass", "hitdietype", "hitdie_final", "race", "subrace", "race_display", "custom_class", "cust_classname"];
         var clearset = {};
-        var clearattrs = ["hp", "hp_max", "size", "speed", "gp", "alignment", "global_damage_mod_flag", "spellcasting_ability", "cust_hitdietype", "cust_spellslots", "cust_spellcasting_ability", "ac", "jack_bonsu", "jack_attr", "death_save_bonus", "weighttotal", "initiative_bonus", "hit_dice", "hit_dice_max", "pb", "jack", "caster_level", "spell_attack_mod", "spell_attack_bonus", "spell_save_dc", "passive_wisdom", "custom_ac_base", "custom_ac_part1", "custom_ac_part2", "custom_ac_shield", "background", "global_ac_mod_flag", "global_attack_mod_flag"];
+        var clearattrs = ["hp", "hp_max", "size", "speed", "gp", "alignment", "global_damage_mod_flag", "spellcasting_ability", "cust_hitdietype", "cust_spellslots", "cust_spellcasting_ability", "ac", "jack_bonsu", "jack_attr", "death_save_bonus", "weighttotal", "initiative_bonus", "hit_dice", "hit_dice_max", "pb", "jack", "caster_level", "spell_attack_mod", "spell_attack_bonus", "spell_save_dc", "passive_wisdom", "custom_ac_base", "custom_ac_part1", "custom_ac_part2", "custom_ac_shield", "background", "global_ac_mod_flag", "global_attack_mod_flag", "global_save_mod_flag", "global_skill_mod_flag"];
         var classname = "";
         var set = {gp: 0};
         var allDrops = [];
@@ -14388,7 +14422,7 @@
         var totalDrops = 1;
         var allSkills = ["athletics", "acrobatics", "sleight_of_hand", "stealth", "arcana", "history", "investigation", "nature", "religion", "animal_handling", "insight", "medicine", "perception", "survival","deception", "intimidation", "performance", "persuasion"];
         var allAbilities = abilityList.map(function(x) {return x.toLowerCase()});
-        var eraseSections = ["attack", "inventory", "traits", "resource", "proficiencies", "tool", "damagemod", "spell-cantrip", "hpmod", "acmod", "tohitmod"];
+        var eraseSections = ["attack", "inventory", "traits", "resource", "proficiencies", "tool", "damagemod", "spell-cantrip", "hpmod", "acmod", "tohitmod", "savemod", "skillmod"];
         console.log(blobs);
         console.log(spells);
         for(var x=1; x<=9; x++) {
@@ -14411,6 +14445,13 @@
         clearset["custom_ac_flag"] = "0";
         clearset["custom_attack_flag"] = "0";
         clearset["custom_ac_flag"] = "0";
+        clearset["multiclass1_flag"] = "0";
+        clearset["multiclass1_lvl"] = "1";
+        clearset["multiclass2_flag"] = "0";
+        clearset["multiclass2_lvl"] = "1";
+        clearset["multiclass3_flag"] = "0";
+        clearset["multiclass3_lvl"] = "1";
+        clearset["custom_class"] = "0";
         _.each(allSkills, function(skill) {
             clearset[skill + "_prof"] = "";//0
             clearset[skill + "_type"] = "";//1
@@ -14879,7 +14920,7 @@
                     proficiencies.Skill.push(capitalize(skill.replace(/_/g, " ")));
                 }
                 if(v[skill + "_type"] !== "1" && v[skill + "_prof"] !== "0") {
-                    proficiencies.Skill.push(capitalize(skill.replace(/_/g, " ")));
+                    proficiencies.Expertise.push(capitalize(skill.replace(/_/g, " ")));
                 }
             });
             getSectionIDs("tool", function(ids) {
@@ -15867,12 +15908,12 @@
             var prevcantrips = 0;
             var currentcantrips = 0;
             var spelladd = 0;
-            thisclass.list = thisclass.class;
+            thisclass.list = [thisclass.class];
             totallevel += thislevel;
             thisclass.newspells = 0;
             _.each(["class", "subclass"], function(section) {
                 if(level[section]) {
-                    if(level[section]["data-Spell List"]) thisclass.list = level[section]["data-Spell List"];
+                    if(level[section]["data-Spell List"]) thisclass.list = [level[section]["data-Spell List"]];
                     if(level[section]["Spellcasting Ability"]) thisclass.ability = level[section]["Spellcasting Ability"];
                     _.each(level[section].blobs, function(blob) {
                         if(blob.Level == thislevel) {
@@ -15911,6 +15952,9 @@
                                 prevcantrips = prevlevel === 0 ? 0 : parseInt(blob.Cantrips);
                                 if(knowncantrips < prevcantrips) prevcantrips = knowncantrips;
                             }
+                        }
+                        if(blob.Level == "every" || blob.Level == thislevel) {
+                            if(blob["Additional Spell List"]) thisclass.list.push(blob["Additional Spell List"]);
                         }
                         if(level[section]["data-Spell Add"]) {
                             spelladd = parseInt(level[section]["data-Spell Add"]);
@@ -15985,7 +16029,7 @@
                     newspells += thisclass.newspells;
                     replace += thisclass.replace;
                     if(!thisclass.prepared) prepared = false;
-                    thisquery = "Category:Spells Classes:*" + thisclass.list + " Level:";
+                    thisquery = "Category:Spells Classes:*" + _.uniq(thisclass.list).join("|*") + " Level:";
                     if(thisclass.cantrips) thisquery += "0|"
                     for(var x = 1; x <= thisclass.maxlevel; x++) {
                         thisquery += x;
@@ -16058,7 +16102,6 @@
             spellnumber += level.length;
         });
         byLevel["0"] = byLevel["0"] || [];
-        console.log(byLevel);
         addRepeatingSection("choices", "row", "spellsrow", function(spellsrow) {
             let toSet = {};
             let update = {};
@@ -16119,9 +16162,9 @@
                                     }
                                 }
                             });
-                            if(spellclasses.length < 2 && spellclasses.length > 0 && !existinglist.includes(spell.name)) {
-                                toSet[spellid + "_class"] = spellclasses[0].class;
-                                toSet[spellid + "_ability"] = spellclasses[0].ability;
+                            if(spellclasses.length == 1 || classes.length == 1) {
+                                toSet[spellid + "_class"] = spellclasses[0] ? spellclasses[0].class : classes[0].class;
+                                toSet[spellid + "_ability"] = spellclasses[0] ? spellclasses[0].ability : classes[0].ability;
                             }
                             _.each(spelldata, function(thisspell, spellname) {
                                 if(spellname == spell.name) {
@@ -16864,6 +16907,7 @@
                 };
             });
         });
+        console.log(profs.all);
         //Set up expertise drops
         _.each(_.uniq(profs.all.Skill.concat(profs.all.Expertise)), function(prof) {
             var profName = prof.toLowerCase().replace(/ /g, "_");
