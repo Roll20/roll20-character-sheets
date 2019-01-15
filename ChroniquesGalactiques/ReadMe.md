@@ -9,9 +9,41 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-editions.fr/catalogue.php?id=207) #17,18 et 19.
 
 # Version courante
-3.2 [Screenshot](cog_v3.png)
+3.4 [Screenshot](cog_v3.png)
 
 # Notes de version
+## V3.4 (2019-01-02)
+### Fiche de PJ
+* Plus de cases Traits/Divers sur l'onglet Caractéristiques. Ces informations peuvent être indiquées dans la liste répétable des traits de l'onglet Capacités (un sheet-worker de MAJ de version importe l'ancienne valeur du champ Traits)
+* Ajout d'un sheet-worker permettant de détecter si le personnage a subi une blessure grave, quand il perd en une seule fois un nombre de PV supérieur au seuil. La case Blessure est automatiquement cochée et l'état préjudiciable Affaibli activé.
+* Les Traits sur l'onglet Capacités sont maintenant affichés en permanence
+* Ajout de cases à cocher sur les lignes d'armes/attaques permettant de faire un jet d'attaque sans jet de dommages ou un jet de dommages sans jet d'attaque
+* Ajout d'une option Choix dans les Mods et Mods de test des jets de capacités permettant de choisir la caractéristique à utiliser au moment du jet
+
+### Fiche de PNJ
+* Ajout de cases à cocher sur les lignes d'armes/attaques permettant de faire un jet d'attaque sans jet de dommages ou un jet de dommages sans jet d'attaque (fiches PJ et PNJ)
+* Import du Statblock sur l'onglet Caractéristiques de la fiche PNJ
+* Amélioration de la fonction d'import de statblock pour permettre la création d'une ligne d'attaque sans attaque ou sans dommages (la présence du mot DM sur la ligne d'attaque reste nécessaire pour qu'elle soit reconnue en tant que telle)
+
+### Fiche de vaisseau
+* Ajout d'un sheet-worker permettant de remplacer les " dans le nom du personnage par des «» (évite des problèmes de parsing dans les macros)
+* Modification des postes d'équipage, avec un champ permettant d'indiquer le nom du personnage et son rang dans sa spécialité (Pilotage, Moteurs, Electronique, etc...)
+* Modification des options des lignes d'armes pour pouvoir indiquer le nom du canonnier et son rang en Armes lourdes
+* Ajout de sheet-workers pour convertir les noms & rangs des PJs aux postes d'équipage en syntaxe utilisable dans les macros de tests et d'attaques
+
+### Roll Template
+* Modification cosmétique avec une bordure aux coins arrondis et un affichage élargi
+* Nouveau tag {{portee= }} permettant d'afficher la portée d'une arme à distance
+* Modification pour permettre l'affichage d'un jet de dommages même sans jet d'attaque préalable
+
+## v3.3 (2018-12-20)
+* Réorganisation de la fiche en 3 onglets principaux : 
+ * Personnage avec 4 sous-onglets : Caractéristiques (+attaques), Capacités (voies, et autres traits), Equipement, Configuration (et buffs)
+ * Vaisseau avec 2 sous-onglets : Caractéristiques (+attaques), Configuration (et buffs)
+ * PNJ avec 2 sous-onglets : Caractéristiques (+attaques), Configuration
+
+* L'onglet Configuration de la fiche de PNJ comporte un champ permettant de copier un statblock depuis un document PDF. Voir le Wiki pour plus d'information.
+
 ## v3.2 (2018-12-11)
 * Ajout de la section répétable des "Autres traits" avec un bouton d'affichage murmuré dans le chat
 * Corrections et ajustements divers (typo, erreurs de noms d'attributs, espaces surnuméraires dans les macros)
