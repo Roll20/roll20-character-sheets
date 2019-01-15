@@ -12178,7 +12178,8 @@
                             repupdate[`${rowid} label span`] += `<input type="hidden" name="comp_${rowid}_trait_section" value="${section}">`;
                         } else {
                             repupdate[`${rowid} label span`] = trait.Name;
-                            repupdate[`${rowid} label p`] = trait.Desc;
+                            repupdate[`${rowid} label p`] = blob.Prerequisite ? "<p class=\"prereq\"><span data-i18n=\"prerequisite:\"></span>" + blob.Prerequisite + "</p>" : "";
+                            repupdate[`${rowid} label p`] += trait.Desc;
                         }
                         setCharmancerText(repupdate);
                         handleProficiencies(blob, rowid);
@@ -12284,7 +12285,8 @@
                     var title = blob.Title ? blob.Title : name;
                     var repupdate = {};
                     repupdate[rowid + " label span"] = "" + title;
-                    if(blob.Description) repupdate[rowid + " label p"] = "" + blob.Description;
+                    repupdate[`${rowid} label p`] = blob.Prerequisite ? "<p class=\"prereq\">" + blob.Prerequisite + "</p>" : "";
+                    if(blob.Description) repupdate[rowid + " label p"] += blob.Description;
                     setCharmancerText(repupdate);
                     handleProficiencies(blob, rowid);
                 });
@@ -16633,7 +16635,7 @@
                 deleteCharmancerData(["lp-spellchoice"]);
             });
         }
-    })
+    });
 
     on("mancerchange:repeating_utilityrow_result", function(eventinfo) {
         if(eventinfo.sourceSection) {
@@ -16644,7 +16646,7 @@
             console.log(update);
             setCharmancerText(update);
         }
-    })
+    });
 
     on("clicked:lp-spellchoice_back", function(eventinfo) {
         const mancerdata = getCharmancerData();
@@ -16681,7 +16683,7 @@
             if(newspells) set[`${source}_spells`] = JSON.stringify(newspells);
             setAttrs(set);
         });
-    })
+    });
 
     on("mancerfinish:lp-mancer", function(eventinfo) {
         console.log("****************************************");
@@ -16829,14 +16831,18 @@
                 console.log(slide);
                 _.each(slide.values, function(value, name) {
                     if(name.substr(-11) == "trait_input") {
-                        var sectionid = name.substring(0, name.length - 6);
-                        var thisblob = {};
-                        var thistrait = {};
+                        let sectionid = name.substring(0, name.length - 6);
+                        let thisblob = {};
+                        let thistrait = {};
+                        let classnumber = _.last(slide.values[sectionid + "_section"].split("--")[0].split("-"));
+                        let sectionname = "class" + classnumber;
+                        if(slide.values[sectionid + "_section"].includes("subclass")) sectionname += "_subclass";
+                        let thissection = _.findWhere(leveldata, {classnumber: parseInt(classnumber)});
                         thistrait.Name = slide.values[sectionid + "_name"].replace(/{{Input}}/g, value);
                         thistrait.Desc = slide.values[sectionid + "_desc"] ? slide.values[sectionid + "_desc"].replace(/{{Input}}/g, value) : "";
                         thisblob.Traits = JSON.stringify([thistrait]);
-                        blobs.names[slide.values[sectionid + "_section"]].push(sectionid);
-                        slide.data[slide.values[sectionid + "_section"]].blobs[sectionid] = thisblob;
+                        blobs.names[sectionname].push(sectionid);
+                        thissection[slide.values[sectionid + "_section"].includes("subclass") ? "subclass" : "class"].blobs[sectionid] = thisblob;
                     }
                     if(name.split("_")[2] == "custom" && name.substr(-10) == "trait_name") {
                         var sectionid = name.substring(0, name.length - 5);
