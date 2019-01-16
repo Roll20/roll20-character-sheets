@@ -614,6 +614,9 @@
 </div>
 
 <script type="text/worker">
+// run any data migrations
+on("sheet:opened", sheetMigration)
+
 const STRENGTH = "str"
 const BODY = "bod"
 const REFLEX = "rfl"
@@ -718,6 +721,46 @@ function getAttributeType(attribute) {
         return EDGE
     alert("Unknown attribute type passed to function getAttributeType()")
     return null
+}
+
+function sheetMigration() {
+    console.log("Running sheet data migration")
+    // Migrate attribute data from version 1 to version 2
+    const oldAttributeNames = ["STRXP", "BODXP", "RFLXP", "DEXXP", "INTXP", "WILXP", "CHAXP", "EDGXP"]
+    const newAttributeNames = ["strength_xp", "body_xp", "reflex_xp", "dexterity_xp", "intelligence_xp", "will_xp", "charisma_xp", "edge_xp"]
+
+    getAttrs(["btatow_sheet_version"], sheetVersion => {
+        console.debug("Checking sheet version")
+        // Check if we should do the migration
+        if (sheetVersion["btatow_sheet_version"] == undefined || sheetVersion["btatow_sheet_version"] > 1) {
+            console.log("No migration needed")
+            return
+        }
+
+        console.log("Migrating data")
+
+        let newAttributes = {}
+
+        getAttrs(oldAttributeNames, attributes => {
+            console.debug("Attributes fetched: " + JSON.stringify(attributes))
+            for (let i = 0; i < oldAttributeNames.length; i++) {
+                if (attributes[oldAttributeNames[i]] != undefined) {
+                    console.debug("Attributes[" + oldAttributeNames[i] + "]: " + attributes[oldAttributeNames[i]])
+                    newAttributes[newAttributeNames[i]] = attributes[oldAttributeNames[i]]
+                }
+            }
+
+            console.debug("New attributes: "+ JSON.stringify(newAttributes))
+
+            setAttrs(newAttributes, null, () => {
+                setAttrs({
+                    btatow_sheet_version: 2.0
+                }, null, () => {
+                    console.log("Sheet data migration completed")
+                })
+            })
+         })
+    })
 }
 
 </script>
