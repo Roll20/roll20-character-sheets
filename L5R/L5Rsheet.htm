@@ -2629,241 +2629,241 @@
         </tr>
     </table>
 </rolltemplate>
-<script type="text/worker">
-// Rank Calculation Worker
 
 <script type="text/worker">
 
-<!-- Rank Calculation Worker -->
+// Insight Calculation Worker
+        
+				on("sheet:opened change:Insight", function() {
+					getAttrs(["foo_insight"], function(values) {
+						setAttrs({ foo_rank: Math.max(1,Math.round((values.foo_insight - 112) / 25)) });
+					});
+				});
 
-on("sheet:opened change:Insight", function() {
-	getAttrs(["foo_insight"], function(values) {
-		setAttrs({ foo_rank: Math.max(1,Math.round((values.foo_insight - 112) / 25)) });
+		var elements = ['foo_air', 'foo_earth', 'foo_fire', 'foo_water', 'foo_void'],
+			ranks = ['rank_acting', 'rank_artisan', 'rank_calligraphy', 'rank_courtier', 'rank_divination', 'rank_etiquette', 'rank_games', 'rank_investigation', 'rank_lore', 'rank_Lore2', 'rank_Lore3', 'rank_Medicine', 'rank_Meditation', 'rank_Perform', 'rank_Sincerity', 'rank_Spellcraft', 'rank_Tea_Ceremony', 'rank_rhigh', 'rank_Athletics', 'rank_Battle', 'rank_Defense', 'rank_Horsemanship', 'rank_Hunting', 'rank_Iaijutsu', 'rank_Jiujutsu', 'rank_Chain_Weapons', 'rank_Heavy_Weapons', 'rank_Kenjutsu', 'rank_Knives', 'rank_Kyujutsu', 'rank_Ninjutsu', 'rank_Polearms', 'rank_Spears', 'rank_Staves', 'rank_WarFan', 'rank_AnimalHandling', 'rank_Commerce', 'rank_Craft', 'rank_Engineering', 'rank_Sailing', 'rank_Forgery', 'rank_Intimidation', 'rank_SleightofHand', 'rank_Stealth', 'rank_Temptation', 'BCourtier', 'BEtiquette', 'add_insight'],
+			eventString = [...elements, ...ranks].map(s => `change:${s}`).join(' ') +
+			' change:repeating_rehigh:rank_rehigh remove:repeating_rehigh' +
+			' change:repeating_rweap:rank_rweap remove:repeating_rweap' +
+			' change:repeating_rcraft:rank_rcraft remove:repeating_rcraft' +
+			' change:repeating_rlow:rank_rlow remove:repeating_rlow';
+		// This function does the actual calculation and attribute-setting after we have all the names
+		var calcFooInsight = function (repeatingNames) {
+			getAttrs([...elements, ...ranks, ...repeatingNames], function (values) {
+				let sum = elements.reduce((s, k) => (s + (parseInt(values[k]) * 10 || 0)), 0) +
+					ranks.reduce((s, k) => (s + (parseInt(values[k]) || 0)), 0) +
+					repeatingNames.reduce((s, k) => (s + (parseFloat(values[k]) || 0)), 0);
+				setAttrs({
+					foo_insight: Math.round(sum)
+				});
+			});
+		};
+		// Collect necessary data for calculation
+		on(eventString, function () {
+			getSectionIDs('repeating_rehigh', function (idArrayRehigh) {
+				getSectionIDs('repeating_rweap', function (idArrayRweap) {
+					getSectionIDs('repeating_rcraft', function (idArrayRcraft) {
+					    getSectionIDs('repeating_rlow', function (idArrayRlow) {
+					        let attrNamesRehigh = idArrayRehigh.map(id => "repeating_rehigh_" + id + "_rank_rehigh"),
+						        attrNamesRweap = idArrayRweap.map(id => "repeating_rweap_" + id + "_rank_rweap"),
+						            attrNamesRcraft = idArrayRcraft.map(id => "repeating_rcraft_" + id + "_rank_rcraft"),
+						                attrNamesRlow = idArrayRlow.map(id => "repeating_rlow_" + id + "_rank_rlow");
+					                calcFooInsight([...attrNamesRehigh, ...attrNamesRweap, ...attrNamesRcraft, ...attrNamesRlow]);
+                                });
+                            });
+				        });
+			        });
+				});
+
+				</script>
+				
+				<script type="text/worker">
+				
+// Ring Calculation Workers
+
+		on("sheet:opened change:reflexes change:awareness", function(eventInfo) {
+			getAttrs(["reflexes", "awareness"], function(values) {
+				setAttrs({ foo_air: Math.min (values.reflexes, values.awareness) });
 			});
 		});
-			
 
-<!-- Insight Calculation Worker -->
-
-var elements = ['foo_air', 'foo_earth', 'foo_fire', 'foo_water', 'foo_void'],
-	ranks = ['rank_acting', 'rank_artisan', 'rank_calligraphy', 'rank_courtier', 'rank_divination', 'rank_etiquette', 'rank_games', 'rank_investigation', 'rank_lore', 'rank_Lore2', 'rank_Lore3', 'rank_Medicine', 'rank_Meditation', 'rank_Perform', 'rank_Sincerity', 'rank_Spellcraft', 'rank_Tea_Ceremony', 'rank_rhigh', 'rank_Athletics', 'rank_Battle', 'rank_Defense', 'rank_Horsemanship', 'rank_Hunting', 'rank_Iaijutsu', 'rank_Jiujutsu', 'rank_Chain_Weapons', 'rank_Heavy_Weapons', 'rank_Kenjutsu', 'rank_Knives', 'rank_Kyujutsu', 'rank_Ninjutsu', 'rank_Polearms', 'rank_Spears', 'rank_Staves', 'rank_WarFan', 'rank_AnimalHandling', 'rank_Commerce', 'rank_Craft', 'rank_Engineering', 'rank_Sailing', 'rank_Forgery', 'rank_Intimidation', 'rank_SleightofHand', 'rank_Stealth', 'rank_Temptation', 'BCourtier', 'BEtiquette', 'add_insight'],
-	eventString = [...elements, ...ranks].map(s => `change:${s}`).join(' ') +
-	' change:repeating_rehigh:rank_rehigh remove:repeating_rehigh' +
-	' change:repeating_rweap:rank_rweap remove:repeating_rweap' +
-	' change:repeating_rcraft:rank_rcraft remove:repeating_rcraft' +
-	' change:repeating_rlow:rank_rlow remove:repeating_rlow';
-// This function does the actual calculation and attribute-setting after we have all the names
-var calcFooInsight = function (repeatingNames) {
-	getAttrs([...elements, ...ranks, ...repeatingNames], function (values) {
-		let sum = elements.reduce((s, k) => (s + (parseInt(values[k]) * 10 || 0)), 0) +
-			ranks.reduce((s, k) => (s + (parseInt(values[k]) || 0)), 0) +
-			repeatingNames.reduce((s, k) => (s + (parseFloat(values[k]) || 0)), 0);
-		setAttrs({
-			foo_insight: Math.round(sum)
-		});
-	});
-};
-// Collect necessary data for calculation
-on(eventString, function () {
-	getSectionIDs('repeating_rehigh', function (idArrayRehigh) {
-		getSectionIDs('repeating_rweap', function (idArrayRweap) {
-			getSectionIDs('repeating_rcraft', function (idArrayRcraft) {
-			    getSectionIDs('repeating_rlow', function (idArrayRlow) {
-			        let attrNamesRehigh = idArrayRehigh.map(id => "repeating_rehigh_" + id + "_rank_rehigh"),
-				        attrNamesRweap = idArrayRweap.map(id => "repeating_rweap_" + id + "_rank_rweap"),
-				            attrNamesRcraft = idArrayRcraft.map(id => "repeating_rcraft_" + id + "_rank_rcraft"),
-				                attrNamesRlow = idArrayRlow.map(id => "repeating_rlow_" + id + "_rank_rlow");
-			                calcFooInsight([...attrNamesRehigh, ...attrNamesRweap, ...attrNamesRcraft, ...attrNamesRlow]);
-                        });
-                    });
-		        });
-	        });
+		on("sheet:opened change:stamina change:willpower", function(eventInfo) {
+			getAttrs(["stamina", "willpower"], function(values) {
+				setAttrs({ foo_earth: Math.min (values.stamina, values.willpower) });
+			});
 		});
 
-<!-- Ring Calculation Workers -->
+		on("sheet:opened change:agility change:intelligence", function(eventInfo) {
+			getAttrs(["agility", "intelligence"], function(values) {
+				setAttrs({ foo_fire: Math.min (values.agility, values.intelligence) });
+			});
+		});
 
-on("sheet:opened change:reflexes change:awareness", function(eventInfo) {
-	getAttrs(["reflexes", "awareness"], function(values) {
-		setAttrs({ foo_air: Math.min (values.reflexes, values.awareness) });
-	});
-});
+		on("sheet:opened change:strength change:perception", function(eventInfo) {
+			getAttrs(["strength", "perception"], function(values) {
+				setAttrs({ foo_water: Math.min (values.strength, values.perception) });
+			});
+		});
 
-on("sheet:opened change:stamina change:willpower", function(eventInfo) {
-	getAttrs(["stamina", "willpower"], function(values) {
-		setAttrs({ foo_earth: Math.min (values.stamina, values.willpower) });
-	});
-});
+// Max Wounds Worker
 
-on("sheet:opened change:agility change:intelligence", function(eventInfo) {
-	getAttrs(["agility", "intelligence"], function(values) {
-		setAttrs({ foo_fire: Math.min (values.agility, values.intelligence) });
-	});
-});
+				on("sheet:opened change:Out", function() {
+					getAttrs(["foo_out"], function(values) {
+						setAttrs({ Wounds_max: (values.foo_out) });
+					});
+				});
 
-on("sheet:opened change:strength change:perception", function(eventInfo) {
-	getAttrs(["strength", "perception"], function(values) {
-		setAttrs({ foo_water: Math.min (values.strength, values.perception) });
-	});
-});
+// Wound Rank Workers
 
-<!-- Max Wounds Worker -->
+						on("sheet:opened change:foo_earth change:Bonus_wounds", function() {
+							getAttrs(["foo_earth", "Bonus_wounds"], function(values) {
+								setAttrs({ foo_healthy: (values.foo_earth*5+parseInt(values.Bonus_wounds)) });
+							});
+						});
 
-on("sheet:opened change:Out", function() {
-	getAttrs(["foo_out"], function(values) {
-		setAttrs({ Wounds_max: (values.foo_out) });
-	});
-});
+						on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
+							getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
+								setAttrs({ foo_nicked: (values.foo_earth*5+values.foo_earth*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*2) });
+							});
+						});
 
-<!-- Wound Rank Workers -->
+						on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
+							getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
+								setAttrs({ foo_grazed: (values.foo_earth*5+values.foo_earth*2*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*3) });
+							});
+						});
 
-on("sheet:opened change:foo_earth change:Bonus_wounds", function() {
-	getAttrs(["foo_earth", "Bonus_wounds"], function(values) {
-		setAttrs({ foo_healthy: (values.foo_earth*5+parseInt(values.Bonus_wounds)) });
-	});
-});
+						on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
+							getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
+								setAttrs({ foo_hurt: (values.foo_earth*5+values.foo_earth*3*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*4) });
+							});
+						});
 
-on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
-	getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
-		setAttrs({ foo_nicked: (values.foo_earth*5+values.foo_earth*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*2) });
-	});
-});
+						on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
+							getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
+								setAttrs({ foo_injured: (values.foo_earth*5+values.foo_earth*4*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*5) });
+							});
+						});
 
-on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
-	getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
-		setAttrs({ foo_grazed: (values.foo_earth*5+values.foo_earth*2*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*3) });
-	});
-});
+						on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
+							getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
+								setAttrs({ foo_crippled: (values.foo_earth*5+values.foo_earth*5*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*6) });
+							});
+						});
 
-on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
-	getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
-		setAttrs({ foo_hurt: (values.foo_earth*5+values.foo_earth*3*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*4) });
-	});
-});
+						on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
+							getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
+								setAttrs({ foo_down: (values.foo_earth*5+values.foo_earth*6*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*7) });
+							});
+						});
 
-on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
-	getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
-		setAttrs({ foo_injured: (values.foo_earth*5+values.foo_earth*4*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*5) });
-	});
-});
+						on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
+							getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
+								setAttrs({ foo_out: (values.foo_earth*5+values.foo_earth*7*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*8) });
+							});
+						});
 
-on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
-	getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
-		setAttrs({ foo_crippled: (values.foo_earth*5+values.foo_earth*5*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*6) });
-	});
-});
+// Spell Ring Selection Worker
 
-on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
-	getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
-		setAttrs({ foo_down: (values.foo_earth*5+values.foo_earth*6*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*7) });
-	});
-});
+		var elements = ['air', 'earth', 'fire', 'water', 'void'],
+			elementAttrs = [...elements.map(s => `foo_${s}`), ...elements.map(s => `${s}_affinity`)];
+			getSpellAffinityByRing = function (prefix, setting, values) {
+				switch (values[`${prefix}_spell_ring`]) {
+				case '@{foo_air}':
+					setting[`${prefix}_spell_affinity`] = values.air_affinity;
+					break;
+				case '@{foo_earth}':
+					setting[`${prefix}_spell_affinity`] = values.earth_affinity;
+					break;
+				case '@{foo_fire}':
+					setting[`${prefix}_spell_affinity`] = values.fire_affinity;
+					break;
+				case '@{foo_water}':
+					setting[`${prefix}_spell_affinity`] = values.water_affinity;
+					break;
+				case '@{foo_void}':
+					setting[`${prefix}_spell_affinity`] = values.void_affinity;
+					break;
+				default:
+					setting[`${prefix}_spell_affinity`] = values.air_affinity;
+				}
+			};
 
-on("sheet:opened change:foo_earth change:Lethality change:Bonus_wounds", function() {
-	getAttrs(["foo_earth", "Bonus_wounds", "Lethality"], function(values) {
-		setAttrs({ foo_out: (values.foo_earth*5+values.foo_earth*7*parseInt(values.Lethality)+parseInt(values.Bonus_wounds)*8) });
-	});
-});
+		// Handle changes for foo_bla and bla_affinity: process all repeating sections
+		on(elementAttrs.map(s => `change:${s}`).join(' '), function () {
+			getSectionIDs('repeating_spells', function (idArray) {
+				let allAttrs = idArray.map(id => `repeating_spells_${id}_spell_ring`).concat(elementAttrs);
+				getAttrs(allAttrs, function (values) {
+					let setting = {};
+					idArray.forEach(id => getSpellAffinityByRing(`repeating_spells_${id}`, setting, values));
+					setAttrs(setting);
+				});
+			});
+		});
 
-<!-- Spell Ring Selection Worker -->
 
-var elements = ['air', 'earth', 'fire', 'water', 'void'],
-	elementAttrs = [...elements.map(s => `foo_${s}`), ...elements.map(s => `${s}_affinity`)];
-	getSpellAffinityByRing = function (prefix, setting, values) {
-		switch (values[`${prefix}_spell_ring`]) {
-		case '@{foo_air}':
-			setting[`${prefix}_spell_affinity`] = values.air_affinity;
-			break;
-		case '@{foo_earth}':
-			setting[`${prefix}_spell_affinity`] = values.earth_affinity;
-			break;
-		case '@{foo_fire}':
-			setting[`${prefix}_spell_affinity`] = values.fire_affinity;
-			break;
-		case '@{foo_water}':
-			setting[`${prefix}_spell_affinity`] = values.water_affinity;
-			break;
-		case '@{foo_void}':
-			setting[`${prefix}_spell_affinity`] = values.void_affinity;
-			break;
-		default:
-			setting[`${prefix}_spell_affinity`] = values.air_affinity;
-		}
-	};
-
-// Handle changes for foo_bla and bla_affinity: process all repeating sections
-on(elementAttrs.map(s => `change:${s}`).join(' '), function () {
-	getSectionIDs('repeating_spells', function (idArray) {
-		let allAttrs = idArray.map(id => `repeating_spells_${id}_spell_ring`).concat(elementAttrs);
-		getAttrs(allAttrs, function (values) {
+		// Only do stuff within one row whenever spell_ring changes
+		on('change:repeating_spells:spell_ring', function (e) {
+			getAttrs([...elementAttrs, 'repeating_spells_spell_ring'], function (values) {
+				let setting = {};
+				getSpellAffinityByRing('repeating_spells', setting, values);
+				setAttrs(setting);
+			});
+		});
+		
+		//Conversion code
+		var convertFromOldSheet = function () {
+			// Non-repeating attributes to rename
+			let conversionData = {
+				'airAffinity': 'air_affinity',
+				'earthAffinity': 'earth_affinity',
+				'fireAffinity': 'fire_affinity',
+				'waterAffinity': 'water_affinity',
+				'voidAffinity': 'void_affinity'
+			};
+		// Non-repeating attribute renaming
+		getAttrs(Object.keys(conversionData), function (values) {
 			let setting = {};
-			idArray.forEach(id => getSpellAffinityByRing(`repeating_spells_${id}`, setting, values));
+			Object.keys(conversionData).forEach(function (oldAttr) {
+				if (values[oldAttr] != null) {
+					// set value of new attribute to value of old one
+					setting[conversionData[oldAttr]] = values[oldAttr];
+					// blank old attribute
+					setting[oldAttr] = '';
+				}
+			});
 			setAttrs(setting);
 		});
-	});
-});
-
-
-// Only do stuff within one row whenever spell_ring changes
-on('change:repeating_spells:spell_ring', function (e) {
-	getAttrs([...elementAttrs, 'repeating_spells_spell_ring'], function (values) {
-		let setting = {};
-		getSpellAffinityByRing('repeating_spells', setting, values);
-		setAttrs(setting);
-	});
-});
-		
-//Conversion code
-var convertFromOldSheet = function () {
-	// Non-repeating attributes to rename
-	let conversionData = {
-		'airAffinity': 'air_affinity',
-		'earthAffinity': 'earth_affinity',
-		'fireAffinity': 'fire_affinity',
-		'waterAffinity': 'water_affinity',
-		'voidAffinity': 'void_affinity'
-	};
-// Non-repeating attribute renaming
-getAttrs(Object.keys(conversionData), function (values) {
-	let setting = {};
-	Object.keys(conversionData).forEach(function (oldAttr) {
-		if (values[oldAttr] != null) {
-			// set value of new attribute to value of old one
-			setting[conversionData[oldAttr]] = values[oldAttr];
-			// blank old attribute
-			setting[oldAttr] = '';
-		}
-	});
-	setAttrs(setting);
-});
-// spellRingConversion
-getSectionIDs('repeating_spells', function (idArray) {
-	getAttrs(idArray.map(id => `repeating_spells_${id}_spellRing`), function (values) {
-		let setting = {};
-		idArray.forEach(function (id) {
-			switch (values[`repeating_spells_${id}_spellRing`]) {
-			case '@{Air}':
-				setting[`repeating_spells_${id}_spell_ring`] = '@{foo_air}';
-				break;
-			case '@{Earth}':
-				setting[`repeating_spells_${id}_spell_ring`] = '@{foo_earth}';
-				break;
-			case '@{Fire}':
-				setting[`repeating_spells_${id}_spell_ring`] = '@{foo_fire}';
-				break;
-			case '@{Water}':
-				setting[`repeating_spells_${id}_spell_ring`] = '@{foo_water}';
-				break;
-			case '@{Void}':
-				setting[`repeating_spells_${id}_spell_ring`] = '@{foo_void}';
-				break;
-			default:
-				setting[`repeating_spells_${id}_spell_ring`] = '@{foo_air}';
-			}
+		// spellRingConversion
+		getSectionIDs('repeating_spells', function (idArray) {
+			getAttrs(idArray.map(id => `repeating_spells_${id}_spellRing`), function (values) {
+				let setting = {};
+				idArray.forEach(function (id) {
+					switch (values[`repeating_spells_${id}_spellRing`]) {
+					case '@{Air}':
+						setting[`repeating_spells_${id}_spell_ring`] = '@{foo_air}';
+						break;
+					case '@{Earth}':
+						setting[`repeating_spells_${id}_spell_ring`] = '@{foo_earth}';
+						break;
+					case '@{Fire}':
+						setting[`repeating_spells_${id}_spell_ring`] = '@{foo_fire}';
+						break;
+					case '@{Water}':
+						setting[`repeating_spells_${id}_spell_ring`] = '@{foo_water}';
+						break;
+					case '@{Void}':
+						setting[`repeating_spells_${id}_spell_ring`] = '@{foo_void}';
+						break;
+					default:
+						setting[`repeating_spells_${id}_spell_ring`] = '@{foo_air}';
+					}
+				});
+				setAttrs(setting);
+			});
 		});
-	setAttrs(setting);
-	});
-});
-};
+	};
+
 
 on('sheet:opened', function () {
   let currentVersion = 1.0;
@@ -2877,7 +2877,7 @@ on('sheet:opened', function () {
   });
 });
 			
-<!-- Sheet Conversion Worker. -->
+// Sheet Conversion Worker.
 
 var convertFromOldSheet = function () {
   // Non-repeating attributes to rename
