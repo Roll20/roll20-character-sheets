@@ -30,14 +30,36 @@ In the weapon section * indicates to use the mounts damage bonus and not the pla
 
 Default in the weapon section indicates that you are using a skill from the same category e.g. using Broadsword skill with a short sword.  It will halve the skill as per the rules.
 
-To remove the experience checkbox from a killadda- at the start of the name e.g. -Animal Lore. To add the experience add a + to the start of a skill name e.g. +Animal Lore
+To remove the experience checkbox from a skill add a - at the start of the name e.g. -Animal Lore. To add the experience checkbox  add a + to the start of a skill name e.g. +Animal Lore
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
-## NPC Sheet
+## Version 19.11.2018
+
+Disguise starting skill changed to 05
+
+The Spirit Lore starting skill changed to 00
+
+Peacefull Cut changed to Peaceful Cut
+
+Customs (local)  tickbox removed 
 
 
-## Version 186.09.2018
+Added the ability to add more weapons to the npc sheet
+
+
+## Version 15.10.2018
+ Fixed issues with NPC sheet
+ 
+ Added Sprul-Pa Hit locations
+
+
+
+## Version 02.10.2018
+
+Fixed experience boxes removed for sheets added before 18.09.2018 update.
+     
+## Version 18.09.2018
 
 Add the ability to add or remove the experience checkbox
 
