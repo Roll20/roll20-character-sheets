@@ -1,69 +1,61 @@
 <script type="text/worker">
-    on("change:talentbonusreset", function(){
-        getAttrs(["talentbonusreset"],function(values){
-            if ( (parseInt(values.talentbonusreset) || 0) == 1 ) {
-                setAttrs({
-                    talentbroadbonus: 0,
-                    talentcommonbonus: 0,
-                    talentdeepbonus: 0
-                });
-                setAttrs({talentbonusreset: 0},{silent: true});
-            }
-        });
+    on("change:talentbonusreset", function(eventinfo){
+        if ( (parseInt(eventinfo.newValue) || 0) == 1 ) {
+            setAttrs({
+                talentbroadbonus: 0,
+                talentcommonbonus: 0,
+                talentdeepbonus: 0
+            });
+            setAttrs({talentbonusreset: 0},{silent: true});
+        }
     });
-    on("change:talentbroadbonus", function(){
-        getAttrs(["talentbroadbonus"],function(values){
-            var tlnt=parseInt(values.talentbroadbonus) || 0;
-            if (tlnt == 0) {
+    on("change:talentbroadbonus", function(eventinfo){
+        var tlnt=parseInt(eventinfo.newValue) || 0;
+        if (tlnt == 0) {
+            setAttrs({
+                talentbroadrollbonus: 0,
+                talentbroadrollbonusname: ''
+            });
+        } else {
+            getAttrs(["talentbroad" + tlnt],function(valz){
                 setAttrs({
-                    talentbroadrollbonus: 0,
-                    talentbroadrollbonusname: ''
+                    talentbroadrollbonus: 1,
+                    talentbroadrollbonusname: valz["talentbroad" + tlnt]
                 });
-            } else {
-                getAttrs(["talentbroad" + tlnt],function(valz){
-                    setAttrs({
-                        talentbroadrollbonus: 1,
-                        talentbroadrollbonusname: valz["talentbroad" + tlnt]
-                    });
-                });
-            }
-        });
+            });
+        }
     });
-    on("change:talentcommonbonus", function(){
-        getAttrs(["talentcommonbonus"],function(values){
-            var tlnt=parseInt(values.talentcommonbonus) || 0;
-            if (tlnt == 0) {
+    on("change:talentcommonbonus", function(eventinfo){
+        var tlnt=parseInt(eventinfo.newValue) || 0;
+        if (tlnt == 0) {
+            setAttrs({
+                talentcommonrollbonus: 0,
+                talentcommonrollbonusname: ''
+            });
+        } else {
+            getAttrs(["talentcommon" + tlnt],function(valz){
                 setAttrs({
-                    talentcommonrollbonus: 0,
-                    talentcommonrollbonusname: ''
+                    talentcommonrollbonus: 2,
+                    talentcommonrollbonusname: valz["talentcommon" + tlnt]
                 });
-            } else {
-                getAttrs(["talentcommon" + tlnt],function(valz){
-                    setAttrs({
-                        talentcommonrollbonus: 2,
-                        talentcommonrollbonusname: valz["talentcommon" + tlnt]
-                    });
-                });
-            }
-        });
+            });
+        }
     });
-    on("change:talentdeepbonus", function(){
-        getAttrs(["talentdeepbonus"],function(values){
-            var tlnt=parseInt(values.talentdeepbonus) || 0;
-            if (tlnt == 0) {
+    on("change:talentdeepbonus", function(eventinfo){
+        var tlnt=parseInt(eventinfo.newValue) || 0;
+        if (tlnt == 0) {
+            setAttrs({
+                talentdeeprollbonus: 0,
+                talentdeeprollbonusname: ''
+            });
+        } else {
+            getAttrs(["talentdeep" + tlnt],function(valz){
                 setAttrs({
-                    talentdeeprollbonus: 0,
-                    talentdeeprollbonusname: ''
+                    talentdeeprollbonus: 3,
+                    talentdeeprollbonusname: valz["talentdeep" + tlnt]
                 });
-            } else {
-                getAttrs(["talentdeep" + tlnt],function(valz){
-                    setAttrs({
-                        talentdeeprollbonus: 3,
-                        talentdeeprollbonusname: valz["talentdeep" + tlnt]
-                    });
-                });
-            }
-        });
+            });
+        }
     });
     on("change:talentbroadrollbonus change:talentcommonrollbonus change:talentdeeprollbonus", function(){
         getAttrs(["talentbroadrollbonus","talentcommonrollbonus","talentdeeprollbonus"],function(values){
@@ -104,184 +96,180 @@
             });
         });
     });
-    on("change:politicalchoice", function(){
-        getAttrs(["politicalchoice"], function(values) {
-            var choice=values.politicalchoice || "";
-            var nme="";
-            var duty="";
-            var lev="";
-            switch(choice) {
-                case "cleaners":
-                    nme="The Cleaners";
-                    duty="Care for the sick, dispose of the trash.";
-                    lev="Nobody pays attention to the rubbish man; Cleaners can move through Sig’s streets and alleys unnoticed.";
-                    break;
-                case "riverwatch":
-                    nme="The Riverwatch";
-                    duty="Clean and patrol the Great River of Sig.";
-                    lev="Control of river trafc and access to water.";
-                    break;
-                case "heralds":
-                    nme="The Heralds";
-                    duty="Deliver messages to the planes or the primes.";
-                    lev="Reading the mail; the Heralds collectively hold vast knowledge of the schemes in Sig.";
-                    break;
-                case "toil":
-                    nme="The Guild of Toil";
-                    duty="Maintain the roads and buildings.";
-                    lev="Demolition of infrastructure, through direct action or subtle neglect.";
-                    break;
-                case "performers":
-                    nme="The Performers Guild";
-                    duty="Provide diplomatic services.";
-                    lev="Compelling propaganda.";
-                    break;
-                case "teachers":
-                    nme="The Teachers' Guild";
-                    duty="Nurture and teach the children.";
-                    lev="Secret reports from students, past and present.";
-                    break;
-                case "advocates":
-                    nme="Guild of Advocates";
-                    duty="Oﬀer legal services to the denizens of Sig.";
-                    lev="Maneuver the bureaucracy of Sig’s many laws and twist them to advantage";
-                    break;
-                case "enforcers":
-                    nme="The Enforcers";
-                    duty="Enforce the rough justice of Sig.";
-                    lev="Police brutality and general thuggery.";
-                    break;
-                case "paper":
-                    nme="The Paper Guard";
-                    duty="Manage the civic government operations.";
-                    lev="Wield the bureaucracy.";
-                    break;
-                case "exterminators":
-                    nme="The League of Exterminators";
-                    duty="Control the vermin and eliminate the pests.";
-                    lev="Transporting vermin and pests to anywhere they choose in the 'verse.";
-                    break;
-                case "gazetteer":
-                    nme="The Sig Gazetteer";
-                    duty="Provide investigative journalism.";
-                    lev="Critical media coverage and tabloid journalism.";
-                    break;
-                case "artificers":
-                    nme="The Artificers' Guild";
-                    duty="Create high-quality craft goods for use and trade.";
-                    lev="Clockwork and phantasmal servants.";
-                    break;
-                case "sage":
-                    nme="The Sage Collegium";
-                    duty="Oﬀer information and research services to Sig.";
-                    lev="Revolutionary-cells full of well-read wizards and alchemists.";
-                    break;
-                case "farmer":
-                    nme="The Farmer's Association";
-                    duty="Produce food for the city.";
-                    lev="Control over the food supply.";
-                    break;
-                case "dustkeepers":
-                    nme="The Dustkeepers Guild";
-                    duty="Manage the dead and their artifacts.";
-                    lev="Undead servants and agents.";
-                    break;
-            }
-            setAttrs({
-                politicalmember: nme,
-                politicalduty: duty,
-                politicalleverage: lev
-            });
+    on("change:politicalchoice", function(eventinfo){
+        var choice=eventinfo.newValue || "";
+        var nme="";
+        var duty="";
+        var lev="";
+        switch(choice) {
+            case "cleaners":
+                nme="The Cleaners";
+                duty="Care for the sick, dispose of the trash.";
+                lev="Nobody pays attention to the rubbish man; Cleaners can move through Sig’s streets and alleys unnoticed.";
+                break;
+            case "riverwatch":
+                nme="The Riverwatch";
+                duty="Clean and patrol the Great River of Sig.";
+                lev="Control of river trafc and access to water.";
+                break;
+            case "heralds":
+                nme="The Heralds";
+                duty="Deliver messages to the planes or the primes.";
+                lev="Reading the mail; the Heralds collectively hold vast knowledge of the schemes in Sig.";
+                break;
+            case "toil":
+                nme="The Guild of Toil";
+                duty="Maintain the roads and buildings.";
+                lev="Demolition of infrastructure, through direct action or subtle neglect.";
+                break;
+            case "performers":
+                nme="The Performers Guild";
+                duty="Provide diplomatic services.";
+                lev="Compelling propaganda.";
+                break;
+            case "teachers":
+                nme="The Teachers' Guild";
+                duty="Nurture and teach the children.";
+                lev="Secret reports from students, past and present.";
+                break;
+            case "advocates":
+                nme="Guild of Advocates";
+                duty="Oﬀer legal services to the denizens of Sig.";
+                lev="Maneuver the bureaucracy of Sig’s many laws and twist them to advantage";
+                break;
+            case "enforcers":
+                nme="The Enforcers";
+                duty="Enforce the rough justice of Sig.";
+                lev="Police brutality and general thuggery.";
+                break;
+            case "paper":
+                nme="The Paper Guard";
+                duty="Manage the civic government operations.";
+                lev="Wield the bureaucracy.";
+                break;
+            case "exterminators":
+                nme="The League of Exterminators";
+                duty="Control the vermin and eliminate the pests.";
+                lev="Transporting vermin and pests to anywhere they choose in the 'verse.";
+                break;
+            case "gazetteer":
+                nme="The Sig Gazetteer";
+                duty="Provide investigative journalism.";
+                lev="Critical media coverage and tabloid journalism.";
+                break;
+            case "artificers":
+                nme="The Artificers' Guild";
+                duty="Create high-quality craft goods for use and trade.";
+                lev="Clockwork and phantasmal servants.";
+                break;
+            case "sage":
+                nme="The Sage Collegium";
+                duty="Oﬀer information and research services to Sig.";
+                lev="Revolutionary-cells full of well-read wizards and alchemists.";
+                break;
+            case "farmer":
+                nme="The Farmer's Association";
+                duty="Produce food for the city.";
+                lev="Control over the food supply.";
+                break;
+            case "dustkeepers":
+                nme="The Dustkeepers Guild";
+                duty="Manage the dead and their artifacts.";
+                lev="Undead servants and agents.";
+                break;
+        }
+        setAttrs({
+            politicalmember: nme,
+            politicalduty: duty,
+            politicalleverage: lev
         });
     });
-    on("change:spiritualchoice", function(){
-        getAttrs(["spiritualchoice"], function(values) {
-            var choice=values.spiritualchoice || "";
-            var nme="";
-            var dev="";
-            var rit="";
-            switch(choice) {
-                case "alius":
-                    nme="Alius the Pure";
-                    dev="Bathing in water is forbidden.";
-                    rit="The Smoke Rite burns away any wound and purges any toxin. If you choose not to spend one Inﬂuence, the Smoke Rite also destroys most of the target’s self-control.";
-                    break;
-                case "tritonous":
-                    nme="Tritonous of the Hungry Seas";
-                    dev="Never suﬀer a blond man to live.";
-                    rit="The Deepcall summons one of Titronous’ warriors from the Abyss. If you choose not to spend one Inﬂuence, that summoned warrior will serve only to kill and destroy.";
-                    break;
-                case "ferrelux":
-                    nme="Ferrelux, the Whisperer";
-                    dev="Direct lies are forbidden, though omissions are encouraged.";
-                    rit="The Rite of Rumour allows you to implant an idea in a target, which they will remember as being told to them by “someone” in the indistinct past. If you choose not to spend one Inﬂuence, the idea will spread uncontrollably any time the target whispers.";
-                    break;
-                case "morkanah":
-                    nme="Morkanah, the Sheltering Stone";
-                    dev="Never harm family.";
-                    rit="Morkanah’s Embrace covers someone in an immobile shell of stone to protect them from harm. If you choose not to spend one Inﬂuence, the shell will not dissipate when its job is done.";
-                    break;
-                case "aludra":
-                    nme="Aludra of the Frozen Tears";
-                    dev="Never forget the names of the dead.";
-                    rit="The Frozen Kiss preserves someone or something by shielding it from the ﬂow of time. If you choose not to spend one Inﬂuence, the person or object targeted will remain frozen in time until hope is found.";
-                    break;
-                case "myn":
-                    nme="Myn the Qestioner";
-                    dev="Never carry more than you need.";
-                    rit="The Third Eye opens to reveal what issues an individual is currently struggling with. If you choose not to spend one Inﬂuence, you will be bound to the individual until that problem is solved.";
-                    break;
-                case "kalzak":
-                    nme="Kalzak the Absolute";
-                    dev="Never treat an outsider as your equal.";
-                    rit="The Chant of the Holy Mission amplifes ethnic and religious hatred in a crowd. If you choose not to spend one Inﬂuence, the mob will cause direct, brutal violence rather than subtle oppression.";
-                    break;
-                case "eater":
-                    nme="Eater of Worlds";
-                    dev="Never reveal your faith.";
-                    rit="The Famine-Touch curses a target to never gain sustenance until they devour the ﬂesh of a specifc person. If you choose not to spend one Inﬂuence, the curse is transmitted to anyone bitten.";
-                    break;
-                case "edana":
-                    nme="Edana of the Pact";
-                    dev="Never break a contract.";
-                    rit="The Blind Contract forges a spiritually-binding agreement between any two parties who willingly agree to it. If you choose not to spend one Inﬂuence, the Blind Contract lasts for a random duration unknown to you or the parties involved.";
-                    break;
-                case "calla":
-                    nme="Calla the Wise";
-                    dev="Never believe what you read.";
-                    rit="The Paradigm Shift allows you to temporarily negate a law, policy, or procedure within the area. If you choose not to spend one Inﬂuence, the GM will temporarily change one of her Beliefs for the duration of the Scene.";
-                    break;
-                case "nyx":
-                    nme="Nyx the Oracle";
-                    dev="Never stop someone from following their dreams.";
-                    rit="Anyone struck by the Foretelling Blow will be given a prophetic dream by the GM when they next rest. If you choose not to spend one Inﬂuence, the dream will be a prophetic nightmare instead.";
-                    break;
-                case "magdak":
-                    nme="Magdak, Clockwork Page";
-                    dev="Never disobey a lawful order.";
-                    rit="The Oath of Tireless Service allows you to forgo food, drink, or rest while following a superior’s commands. If you choose not to spend one Inﬂuence, you are unable to eat, drink, or sleep until the command is fulflled.";
-                    break;
-                case "brossien":
-                    nme="Brossien of Mystic Song";
-                    dev="Never allow an evening to pass without a song.";
-                    rit="The Melodic Charm beguiles a target and temporarily convinces them that you are their steadfast friend. If you choose not to spend one Inﬂuence, the target will remember being charmed when they next wake.";
-                    break;
-                case "kestranna":
-                    nme="Kestranna the Harvester";
-                    dev="Never refuse to oﬀer hospitality to a guest.";
-                    rit="The Hungry Petition bestows you with an abundance of food and drink from Kestr’s table. If you choose not to spend one Inﬂuence, Ranna will slay an innocent mortal nearby to sate her hunger.";
-                    break;
-                case "omulaub":
-                    nme="Omulaub the Tranquil";
-                    dev="Never ignore someone in pain.";
-                    rit="The Numb Blessing removes physical, mental, or emotional pain from a target, removing all Harm from the Spark attribute. If you choose not to spend one Inﬂuence, that target will permanently be numbed to that kind of pain.";
-                    break;
-            }
-            setAttrs({
-                spiritualworshiper: nme,
-                spiritualdevotion: dev,
-                spiritualritual: rit
-            });
+    on("change:spiritualchoice", function(eventinfo){
+        var choice=eventinfo.newValue || "";
+        var nme="";
+        var dev="";
+        var rit="";
+        switch(choice) {
+            case "alius":
+                nme="Alius the Pure";
+                dev="Bathing in water is forbidden.";
+                rit="The Smoke Rite burns away any wound and purges any toxin. If you choose not to spend one Inﬂuence, the Smoke Rite also destroys most of the target’s self-control.";
+                break;
+            case "tritonous":
+                nme="Tritonous of the Hungry Seas";
+                dev="Never suﬀer a blond man to live.";
+                rit="The Deepcall summons one of Titronous’ warriors from the Abyss. If you choose not to spend one Inﬂuence, that summoned warrior will serve only to kill and destroy.";
+                break;
+            case "ferrelux":
+                nme="Ferrelux, the Whisperer";
+                dev="Direct lies are forbidden, though omissions are encouraged.";
+                rit="The Rite of Rumour allows you to implant an idea in a target, which they will remember as being told to them by “someone” in the indistinct past. If you choose not to spend one Inﬂuence, the idea will spread uncontrollably any time the target whispers.";
+                break;
+            case "morkanah":
+                nme="Morkanah, the Sheltering Stone";
+                dev="Never harm family.";
+                rit="Morkanah’s Embrace covers someone in an immobile shell of stone to protect them from harm. If you choose not to spend one Inﬂuence, the shell will not dissipate when its job is done.";
+                break;
+            case "aludra":
+                nme="Aludra of the Frozen Tears";
+                dev="Never forget the names of the dead.";
+                rit="The Frozen Kiss preserves someone or something by shielding it from the ﬂow of time. If you choose not to spend one Inﬂuence, the person or object targeted will remain frozen in time until hope is found.";
+                break;
+            case "myn":
+                nme="Myn the Qestioner";
+                dev="Never carry more than you need.";
+                rit="The Third Eye opens to reveal what issues an individual is currently struggling with. If you choose not to spend one Inﬂuence, you will be bound to the individual until that problem is solved.";
+                break;
+            case "kalzak":
+                nme="Kalzak the Absolute";
+                dev="Never treat an outsider as your equal.";
+                rit="The Chant of the Holy Mission amplifes ethnic and religious hatred in a crowd. If you choose not to spend one Inﬂuence, the mob will cause direct, brutal violence rather than subtle oppression.";
+                break;
+            case "eater":
+                nme="Eater of Worlds";
+                dev="Never reveal your faith.";
+                rit="The Famine-Touch curses a target to never gain sustenance until they devour the ﬂesh of a specifc person. If you choose not to spend one Inﬂuence, the curse is transmitted to anyone bitten.";
+                break;
+            case "edana":
+                nme="Edana of the Pact";
+                dev="Never break a contract.";
+                rit="The Blind Contract forges a spiritually-binding agreement between any two parties who willingly agree to it. If you choose not to spend one Inﬂuence, the Blind Contract lasts for a random duration unknown to you or the parties involved.";
+                break;
+            case "calla":
+                nme="Calla the Wise";
+                dev="Never believe what you read.";
+                rit="The Paradigm Shift allows you to temporarily negate a law, policy, or procedure within the area. If you choose not to spend one Inﬂuence, the GM will temporarily change one of her Beliefs for the duration of the Scene.";
+                break;
+            case "nyx":
+                nme="Nyx the Oracle";
+                dev="Never stop someone from following their dreams.";
+                rit="Anyone struck by the Foretelling Blow will be given a prophetic dream by the GM when they next rest. If you choose not to spend one Inﬂuence, the dream will be a prophetic nightmare instead.";
+                break;
+            case "magdak":
+                nme="Magdak, Clockwork Page";
+                dev="Never disobey a lawful order.";
+                rit="The Oath of Tireless Service allows you to forgo food, drink, or rest while following a superior’s commands. If you choose not to spend one Inﬂuence, you are unable to eat, drink, or sleep until the command is fulflled.";
+                break;
+            case "brossien":
+                nme="Brossien of Mystic Song";
+                dev="Never allow an evening to pass without a song.";
+                rit="The Melodic Charm beguiles a target and temporarily convinces them that you are their steadfast friend. If you choose not to spend one Inﬂuence, the target will remember being charmed when they next wake.";
+                break;
+            case "kestranna":
+                nme="Kestranna the Harvester";
+                dev="Never refuse to oﬀer hospitality to a guest.";
+                rit="The Hungry Petition bestows you with an abundance of food and drink from Kestr’s table. If you choose not to spend one Inﬂuence, Ranna will slay an innocent mortal nearby to sate her hunger.";
+                break;
+            case "omulaub":
+                nme="Omulaub the Tranquil";
+                dev="Never ignore someone in pain.";
+                rit="The Numb Blessing removes physical, mental, or emotional pain from a target, removing all Harm from the Spark attribute. If you choose not to spend one Inﬂuence, that target will permanently be numbed to that kind of pain.";
+                break;
+        }
+        setAttrs({
+            spiritualworshiper: nme,
+            spiritualdevotion: dev,
+            spiritualritual: rit
         });
     });
 </script>

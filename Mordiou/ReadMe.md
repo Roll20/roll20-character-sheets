@@ -11,12 +11,15 @@ Tout commençait généralement par un bon repas, servi à sa table, la meilleur
 Mordiou ! est un jeu de rôle complet, proposant de jouer des héros de cape et d'épée dans une France légèrement fantasmée - vous y trouverez un système de jeu original (tout au d6), une courte description de Paris à l'époque et de quelques figures majeures de l'univers, ainsi que quatre scénarios.
 
 # Version courante
-1.1 [Capture d'écran](mordiou.jpg)
+1.2 [Capture d'écran](mordiou.jpg)
 
 Les jets diffèrent légèrement du livre de règles (pour compenser un manque technique de Roll20 et ne pas utiliser l'API) mais restent statistiquement identiques.
 Au lieu de compter une Qualité sur des résultats pairs au D6, et deux qualités pour un résultat 6, la feuille ne compte aucune qualité pour un résultat de 1,2 ou 3 au D6, une qualité pour un résultat de 4 ou 5, et deux qualités pour un résultat de 6.
 
 # Notes de version
+
+## v1.2 (2017-09-17)
+Optimisation technique.
 
 ## v1.1 (2017-02-26)
 Merci au Grümph, à Xo de Vorcen et Nessir pour les retours, idées et suggestions.

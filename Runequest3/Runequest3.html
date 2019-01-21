@@ -671,9 +671,9 @@
 						<input  class="sheet-blank_skill"  style="display:inline-block;" type="text" name="attr_sskill_name" />
 						
 						<button  type="roll" value="&{template:skillRoll} {{name=@{character_name}}} {{skillvalue=@{sskill_total}}} {{fumble=[[95+ceil((@{sskill_total}/20))]]}} {{crit=[[round(@{sskill_total}/20)+1]]}} {{special=[[round((@{sskill_total})/5)+1]]}}         {{success=[[@{sskill_total}]]}} {{roll=[[1d100]]}} {{skillname=@{sskill_name}}}" ></button>								
-						<button type="roll" value="&{template:skillRoll} {{name=@{character_name}}} {{skillvalue=@{sskill_total}}} {{fumble=[[95+ceil(((@{sskill_total}+?{mods|0})/20))]]}} {{crit=[[round((@{sskill_total}+?{mods|0})/20)+1]]}} {{special=[[round(((@{sskill_total}+?{mods|0}))/5)+1]]}}         {{success=[[@{sskill_total}+?{mods|0}]]}} {{roll=[[1d100]]}} {{skillname=@{sskill_name}}}"  ></button>
+						<button class="sheet-new_roll" type="roll" value="&{template:skillRoll} {{name=@{character_name}}} {{skillvalue=@{sskill_total}}} {{fumble=[[95+ceil(((@{sskill_total}+?{mods|0})/20))]]}} {{crit=[[round((@{sskill_total}+?{mods|0})/20)+1]]}} {{special=[[round(((@{sskill_total}+?{mods|0}))/5)+1]]}}         {{success=[[@{sskill_total}+?{mods|0}]]}} {{roll=[[1d100]]}} {{skillname=@{sskill_name}}}"  ></button>
 						<input type="text"  class="sheet-skill_values" value="0" name="attr_sskill_value" />
-						<input type="text"  class="sheet-skill_values" disabled name="attr_sskill_total" value="@{sskill_value}+@{manipulation_mod}+@{fatigue_mod}" />
+						<input type="text"  class="sheet-skill_values" disabled name="attr_sskill_total" value="@{sskill_value}+@{stealth_mod}+@{fatigue_mod}" />
 						
 					</div>				
 				</fieldset>					
@@ -971,11 +971,12 @@
          <div style="display:inline">
             Roll
             <select name="attr_creature_hit_location" style="margin-top: 7px; height: 24px ; width: 106px">
+			   <option value="CentL-">Centaur</option>			
                <option value="HL-">Human</option>
                <option value="FLL-">Four-Legged</option>
 			   <option value="NewtL-">Newtling</option>
 			   <option value="ScorpL-">Scorpion Man</option>				   
-			   <option value="WalkL-">Walktapus</option>			   
+			   <option value="WalkL-">Walktapus</option>
             </select>
             <select name="attr_selected_wpn_type" style="margin-top: 7px; height: 24px ; width: 106px">
                <option value="Melee">Melee</option>
@@ -1804,7 +1805,7 @@ D20	    Result	       AP/HP
 						</div>
 						<br />
 						Attacks/notes
-						<textarea style="width:80%" name="attr_spirit4_notes" ></textarea>
+						<textarea style="width:80%" name="attr_spirit6_notes" ></textarea>
 						
 						<p>Spells</p>
 						<fieldset class="repeating_spirit6spells">
@@ -3633,23 +3634,37 @@ D20	    Result	       AP/HP
 		{{#^rollBetween() roll fumble 100}}
 		
 			{{#rollGreater() success 99}}
-				{{#rollLess() roll crit}}<td class="template_value">Critical!!!!!!</td>{{/rollLess() roll crit}}
-				{{#^rollLess() roll crit}}
-					{{#rollLess() roll special}}<td class="template_value">Special!!!</td>{{/rollLess() roll special}}
-					{{#^rollLess() roll special}}<td class="template_value">Success</td>{{/^rollLess() roll special}}
-				{{/^rollLess() roll crit}}
+			
+				{{#rollGreater() roll 95}}<td class="template_value">Failure</td>{{/rollGreater() roll 95}}
+				{{#^rollGreater() roll 95}}
+					{{#rollLess() roll crit}}<td class="template_value">Critical!!!!!!</td>{{/rollLess() roll crit}}
+					{{#^rollLess() roll crit}}
+						{{#rollLess() roll special}}<td class="template_value">Special!!!</td>{{/rollLess() roll special}}
+						{{#^rollLess() roll special}}<td class="template_value">Success</td>{{/^rollLess() roll special}}
+					{{/^rollLess() roll crit}}
+				{{/^rollGreater() roll 95}}
 
 			{{/rollGreater() success 99}}
 			
 			{{#^rollGreater() success 99}}
+			
 				{{#rollLess() roll crit}}<td class="template_value">Critical!!!!!!</td>{{/rollLess() roll crit}}
+				
 				{{#^rollLess() roll crit}}
+					
 					{{#rollLess() roll special}}<td class="template_value">Special!!!</td>{{/rollLess() roll special}}
 					{{#^rollLess() roll special}}
-						{{#rollBetween() roll special success}}<td class="template_value">Success</td>{{/rollBetween() roll special success}}
+					
+						{{#rollGreater() roll 95}}<td class="template_value">Failure</td>{{/rollGreater() roll 95}}
+						{{#^rollGreater() roll 95}}
+							{{#rollBetween() roll special success}}<td class="template_value">Success</td>{{/rollBetween() roll special success}}
+						{{/^rollGreater() roll 95}}
+						
 						{{#^rollBetween() roll special success}}
 							{{#rollLess() roll fumble}}
-								<td class="template_value">Failure</td>
+								{{#^rollGreater() roll 95}}							
+									<td class="template_value">Failure</td>
+								{{/^rollGreater() roll 95}}	
 							{{/rollLess() roll fumble}}
 							{{#^rollLess() roll fumble}}
 								<td class="template_value">fumble</td>
@@ -3657,6 +3672,7 @@ D20	    Result	       AP/HP
 						{{/^rollBetween() roll special success}}											
 					{{/^rollLess() roll special}}
 				{{/^rollLess() roll crit}}
+				
 			{{/^rollGreater() success 99}}
 		{{/^rollBetween() roll fumble 100}}
 		
@@ -3880,6 +3896,47 @@ D20	    Result	       AP/HP
 	</table>
 </rolltemplate>
 
+	
+
+
+<rolltemplate class="sheet-rolltemplate-CentL-Melee">
+	<table class="skillRoll" style="border 1px black">
+		<tr><th colspan="2">Centaur Melee Hit location roll</th></tr>
+		<tr>
+	    <td>{{roll}}&nbsp;</td>
+		{{#rollBetween() roll 1 2}}<td class="template_label">Hit on the  RH Leg</td>{{/rollBetween() roll 1 2}}		
+		{{#rollBetween() roll 3 4}}<td class="template_label">Hit on the  LH Leg</td>{{/rollBetween() roll 3 4}}				
+		{{#rollBetween() roll 5 6}}<td class="template_label">Hit on the  Hind Q</td>{{/rollBetween() roll 5 6}}				
+		{{#rollBetween() roll 7 8}}<td class="template_label">Hit on the  Fore Q</td>{{/rollBetween() roll 7 8}}				
+		{{#rollBetween() roll 9 10}}<td class="template_label">Hit on the  RF Leg</td>{{/rollBetween() roll 9 10}}				
+		{{#rollBetween() roll 11 12}}<td class="template_label">Hit on the  LF Leg</td>{{/rollBetween() roll 11 12}}				
+		{{#rollBetween() roll 13 14}}<td class="template_label">Hit on the  Chest</td>{{/rollBetween() roll 13 14}}				
+		{{#rollBetween() roll 15 16}}<td class="template_label">Hit on the  R Arm</td>{{/rollBetween() roll 15 16}}				
+		{{#rollBetween() roll 17 18}}<td class="template_label">Hit on the  L Arm</td>{{/rollBetween() roll 17 18}}				
+		{{#rollBetween() roll 19 20}}<td class="template_label">Hit on the  Head</td>{{/rollBetween() roll 19 20}}				
+		</tr>
+	</table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-CentL-Missle">
+	<table class="skillRoll" style="border 1px black">
+		<tr><th colspan="2">Centaur  Missle Hit location roll</th></tr>
+		<tr>
+	    <td>{{roll}}&nbsp;</td>
+		{{#rollTotal() roll 1}}<td class="template_label">Hit on the  RH Leg</td>{{/rollTotal() roll 1}}		
+		{{#rollTotal() roll 2}}<td class="template_label">Hit on the  LH Leg</td>{{/rollTotal() roll 2}}
+		{{#rollBetween() roll 3 6}}<td class="template_label">Hit on the  Hind Q</td>{{/rollBetween() roll 3 6}}
+		{{#rollBetween() roll 7 10}}<td class="template_label">Hit on the  Fore Q</td>{{/rollBetween() roll 7 10}}
+		{{#rollTotal() roll 11}}<td class="template_label">Hit on the  RF Leg</td>{{/rollTotal() roll 11}}		
+		{{#rollTotal() roll 12}}<td class="template_label">Hit on the  LF Leg</td>{{/rollTotal() roll 12}}				
+		{{#rollBetween() roll 13 17}}<td class="template_label">Hit on the  Chest</td>{{/rollBetween() roll 13 17}}				
+		{{#rollTotal() roll 18}}<td class="template_label">Hit on the  R Amr</td>{{/rollTotal() roll 18}}
+		{{#rollTotal() roll 19}}<td class="template_label">Hit on the  L Arm</td>{{/rollTotal() roll 19}}		
+		{{#rollTotal() roll 20}}<td class="template_label">Hit on the  L Arm</td>{{/rollTotal() roll 20}}		
+		</tr>
+	</table>
+</rolltemplate>
+
 
 
 <rolltemplate class="sheet-rolltemplate-skillRoll">
@@ -3913,8 +3970,15 @@ D20	    Result	       AP/HP
 			{{#rollGreater() success 99}}
 				{{#rollLess() roll crit}}<td class="template_value">Critical!!!!!!</td>{{/rollLess() roll crit}}
 				{{#^rollLess() roll crit}}
-					{{#rollLess() roll special}}<td class="template_value">Special!!!</td>{{/rollLess() roll special}}
-					{{#^rollLess() roll special}}<td class="template_value">Success</td>{{/^rollLess() roll special}}
+				
+					{{#rollGreater() roll 95}}
+						<td class="template_value">Failure</td>					
+					{{/rollGreater() roll 95}}					
+					{{#^rollGreater() roll 95}}					
+						{{#rollLess() roll special}}<td class="template_value">Special!!!</td>{{/rollLess() roll special}}
+						{{#^rollLess() roll special}}<td class="template_value">Success</td>{{/^rollLess() roll special}}
+					{{/^rollGreater() roll 95}}					
+					
 				{{/^rollLess() roll crit}}
 
 			{{/rollGreater() success 99}}

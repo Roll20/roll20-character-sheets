@@ -1,0 +1,436 @@
+<script type="text/worker">
+
+//CODE FOR SETTING/GETTING POWER VALUES from REPEATING SECTIONS
+on("change:repeating_powers:powercheck", function(eventInfo) {
+   getAttrs(["repeating_powers_power","repeating_powers_powerdtype","repeating_powers_powercheck"],function(v) {
+       let check = parseInt(v.repeating_powers_powercheck)||0;
+        if(check === 1) {
+            let power = v.repeating_powers_power;
+            let value = v.repeating_powers_powerdtype;
+            setAttrs({
+                "power_chosen": power,
+                "power_value": value,
+      		    "repeating_powers_powercheck":0
+	        });     
+        }
+   });
+});
+
+//CODE FOR SETTING/GETTING QUALITY VALUES from REPEATING SECTIONS
+on("change:repeating_qualities:qualitycheck", function(eventInfo) {
+   getAttrs(["repeating_qualities_quality","repeating_qualities_qualitydtype","repeating_qualities_qualitycheck"],function(v) {
+       let check = parseInt(v.repeating_qualities_qualitycheck)||0;
+        if(check === 1) {
+            let quality = v.repeating_qualities_quality;
+            let value = v.repeating_qualities_qualitydtype;
+            setAttrs({
+                "quality_chosen": quality,
+                "quality_value": value,
+      		    "repeating_qualities_qualitycheck":0
+	        });     
+        }
+   });
+});
+
+// CODE FOR SETTING/GETTING STATUS from CURRENTHP
+on('change:currenthp sheet:opened', function() {
+  getAttrs(['currenthp', 'greendtype', 'greenmin', 'greenmax', 'yellowdtype',
+        'yellowmin', 'yellowmax', 'reddtype', 'redmin', 'redmax', 'status',
+        'scenecheckr', 'scenechecky', 'scenecheckg'], function(values) {
+    var index = parseInt(values.currenthp);
+    var scener = parseInt(values.scenecheckr);
+    var sceney = parseInt(values.scenechecky);
+    var sceneg = parseInt(values.scenecheckg);
+    if (index <= 0) {
+      setAttrs({ 'status': '0' });
+    } else if (index <= values.redmax && index >= values.redmin) {
+      setAttrs({ 'status': values.reddtype });
+    } else if (index <= values.yellowmax && index >= values.yellowmin) {
+      setAttrs({ 'status': values.yellowdtype });
+    } else if (index <= values.greenmax && index >= values.greenmin) {
+      setAttrs({ 'status': values.greendtype });
+    } else if (scener == 1){
+      setAttrs({ 'status': values.reddtype });
+    } else if (sceney == 1){
+      setAttrs({ 'status': values.yellowdtype });
+    } else if (sceneg == 1){
+      setAttrs({ 'status': values.greendtype });
+    }
+  });
+});
+
+</script>
+
+<!-- CHARACTER SHEET -->
+<!-- HEADER -->
+<div class="sheet">
+    <div class="sheet-header">
+        <div class="logo-img" style="width: 20%; float: left;">
+            <img src="https://i.imgur.com/x8tUivN.png">
+        </div>
+        <div class="sheet-title" style="width: 80%; float: left; height: 67.09px; text-align: center;">
+            <button type='roll' value='/roll {@{power_value}, @{quality_value}, @{status}}kh2dh1+?{Mods|0}' name='roll_mid'>Basic Action</button>
+            <p>Power Dice + Quality Dice + Status Dice + Mods (Mid die = Effect die) </p>
+        </div>
+    </div>
+    
+<!-- DETAILS AND STATUS -->
+    <div class="sheet2rowcol">
+    <!-- Details -->
+        <div class="sheet-col" style="width: 60%;">
+            <div class="sheet-details" style=" float: left; width: 100%; height: 222.73px; border-style: solid; border-width: 1%;">
+                    <b>Name:</b><input class="detail-input" type="text" name="attr_heroname">
+                    <b>Alias:</b><input class="detail-input" type="text" name="attr_alias">
+                    <b>Gender:</b><input class="detail-input" type="text" name="attr_gender"  style="width: 20%;"/>
+                    <b>Age:</b><input  class="detail-input" type="number" name="attr_age"/>
+                    <b>Height:</b><input class="detail-input" type="number" name="attr_ft"/>'<input type="number" name="attr_in">"
+                    <b>Build:</b><input class="detail-input" type="text" name="attr_herobuild" style="width: 15%;">
+                    <b>Eyes:</b><input class="detail-input" type="text" name="attr_eyes" style="width: 12%;">
+                    <b>Hair:</b><input class="detail-input" type="text" name="attr_background" style="width: 18%;">
+                    <b>Origin:</b><input class="detail-input" type="text" name="attr_powersource">
+                    <b>Archetype:</b><input class="detail-input" type="text" name="attr_archetype" style="width: 25%;">
+                    <b>Personality:</b><input class="detail-input" type="text" name="attr_personality">
+                    <b>Costume/Gear:</b>
+                    <textarea name="attr_costume" style="height: 81px; margin: 0px 0px 8.99148px; width: 95%; resize: none;"></textarea>
+            </div>
+        </div>
+    <!-- Status -->
+        <div class="sheet-col" style="width: 35% ; float: right;">
+            <span>
+                <div>
+                <table style="width: 100% ; margin: 0 auto ; text-align: center;">
+                    <tbody>
+                    <!-- Green Status -->
+                        <tr style="background-color: #99ffbb">
+                            <td style="width: 25%">Green</td>
+                            <td style="width: 25%">Min</td>
+                            <td style="width: 25%">Max</td>
+                        </tr>
+                        <tr style="background-color: #99ffbb">
+                            <td>
+                                <select name="attr_greendtype" class="sheet-dtype" style="width: 100%">                
+                                    <option value="1d4">1d4</option>
+                                    <option value="1d6">1d6</option>
+                                    <option value="1d8">1d8</option>
+                                    <option value="1d10">1d10</option>
+                                    <option value="1d12">1d12</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" name="attr_greenmin" class="sheet-green-min">
+                            </td>
+                            <td>
+                                <input type="number" name="attr_greenmax" class="sheet-green-max">
+                            </td>
+                        </tr>
+                    <!-- Yellow Status -->
+                        <tr style="background-color: #ffff99">
+                            <td style="width: 25%">Yellow</td>
+                            <td style="width: 25%">Min</td>
+                            <td style="width: 25%">Max</td>
+                        </tr>
+                        <tr style="background-color: #ffff99">
+                            <td>
+                                <select name="attr_yellowdtype" class="sheet-dtype" style="width: 100%">                
+                                    <option value="1d4">1d4</option>
+                                    <option value="1d6">1d6</option>
+                                    <option value="1d8">1d8</option>
+                                    <option value="1d10">1d10</option>
+                                    <option value="1d12">1d12</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" name="attr_yellowmin" class="sheet-yellow-min">
+                            </td>
+                            <td>
+                                <input type="number" name="attr_yellowmax" class="sheet-yellow-max">
+                            </td>
+                        </tr>
+                    <!-- Red Status -->
+                        <tr style="background-color: #ff5c33">
+                            <td style="width: 25%">Red</td>
+                            <td style="width: 25%">Min</td>
+                            <td style="width: 25%">Max</td>
+                        </tr>
+                        <tr style="background-color: #ff5c33">
+                            <td>
+                                <select name="attr_reddtype" class="sheet-dtype" style="width: 100%">                
+                                    <option value="1d4">1d4</option>
+                                    <option value="1d6">1d6</option>
+                                    <option value="1d8">1d8</option>
+                                    <option value="1d10">1d10</option>
+                                    <option value="1d12">1d12</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" name="attr_redmin" class="sheet-red-min">
+                            </td>
+                            <td>
+                                <input type="number" name="attr_redmax" class="sheet-red-max">
+                            </td>
+                        </tr>
+                    <!-- Status / Defend Tracking -->
+                        <tr style="background-color: #bfbfbf">
+                            <td>
+                                DEFEND:
+                            </td>
+                            <td>
+                                <input type="number" name="attr_currentdefend" class="sheet-current-defend">
+                            </td>
+                            <td>
+                                <input type="hidden" name="attr_status" class="sheet-status">
+                            </td>
+                        </tr>
+                        <tr style="background-color: #bfbfbf">
+                            <td>
+                                <b>HP</b>
+
+                            </td>
+                            <td>
+                                <input type="number" name="attr_currenthp" class="sheet-current-hp"> 
+                            </td>
+                            <td>
+                                <b>0 = OUT</b>
+                            </td>
+                        </tr>
+                        <tr>
+                        	<td>
+                        		Enivronment Status:
+                        	</td>
+                        	<td>
+                        		G:
+                        		<input type="checkbox" name="attr_scenecheckg" value="1" style="width: 25px; height: 25px; margin: 0 auto; float: left; margin-left: 5px;">
+                        	</td>
+                        	<td>
+                        		Y:
+                        		<input type="checkbox" name="attr_scenechecky" value="1" style="width: 25px; height: 25px; margin: 0 auto; float: left; margin-left: 5px;">
+                        	</td>
+                        	<td>
+                        		R:
+                        		<input type="checkbox" name="attr_scenecheckr" value="1" style="width: 25px; height: 25px; margin: 0 auto; float: left; margin-left: 5px;">
+                        	</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+            </span>
+        </div>
+    </div>  
+    
+    
+<!-- BONUSES / PENALTIES (REPEATING) -->
+
+    <div class="sheet-2colrow" style="border-style: solid; border-width: 1%;">
+        <!-- Bonuses -->
+            <div class="sheet-col" style="width: width: 40%;">
+                <h3>Bonuses</h3>
+                <fieldset class="repeating_bonuses">
+                    <input type="text" name="attr_bonusname" style="width: 48%; float: left;">
+                    <input type="number" name="attr_bonus">
+                    Exclusive:
+                    <input type="checkbox" name="attr_bonusex">
+                    Persistent
+                    <input type="checkbox" name="attr_bonusper">
+                </fieldset>
+            </div>
+            
+        <!-- Penalties -->
+        <div class="sheet-col" style="width: width: 40%;">
+            <h3>Penalties</h3>
+            <fieldset class="repeating_penalties">
+                <input type="text" name="attr_penalname" style="width: 48%; float: left;">
+                <input type="number" name="attr_penalty">
+                Exclusive:
+                <input type="checkbox" name="attr_penaltyex">
+                Persistent
+                <input type="checkbox" name="attr_penaltyper">
+            </fieldset>
+        </div>
+    </div>   
+       
+    
+<!-- POWERS / QUALITIES (REPEATING) -->
+        
+    <div class="sheet-2colrow" style="border-style: solid; border-width: 1%;">
+        <!-- Powers -->
+            <div class="sheet-col" style="width: width: 40%;">
+                <h3>Powers</h3>
+                    <fieldset class="repeating_powers">
+                        <input type="text" name="attr_power" style="width: 70%; float: left;">
+                        <select name="attr_powerdtype" style="width: 20%; float: left;">
+                        <option value="1d0" selected>-</option>
+                        <option value="1d4">d4</option>
+                        <option value="1d6">d6</option>
+                        <option value="1d8">d8</option>
+                        <option value="1d10">d10</option>
+                        <option value="1d12">d12</option>
+                        </select>
+                        <input type="checkbox" name="attr_powercheck" value="1" style="width: 25px; height: 25px; margin: 0 auto; float: left; margin-left: 5px;">
+                    </fieldset>
+                    
+                    <input type="text" name="attr_power_chosen" >
+                    <input type="text" name="attr_power_value" >
+            </div>
+        <!-- Qualities -->
+            <div class="sheet-col" style="width: width: 40%;">
+                <h3>Qualities</h3>
+                    <fieldset class="repeating_qualities">
+                        <input type="text" name="attr_quality" style="width: 70%; float: left;">
+                        <select name="attr_qualitydtype" style="width: 20%; float: left;">
+                        <option value="1d0" selected>-</option>
+                        <option value="1d4">d4</option>
+                        <option value="1d6">d6</option>
+                        <option value="1d8">d8</option>
+                        <option value="1d10">d10</option>
+                        <option value="1d12">d12</option>
+                        </select>
+                        <input type="checkbox" name="attr_qualitycheck" value="1" style="width: 25px; height: 25px; margin: 0 auto; float: left; margin-left: 5px;">
+                    </fieldset>
+                    
+                    <input type="text" name="attr_quality_chosen" >
+                    <input type="text" name="attr_quality_value" >
+            </div>
+    </div>
+    
+<!-- ABILITIES (REPEATING) -->
+    <div class="sheet-abilities" style="border-style: solid; border-width: 0.5%;">
+        <h3>Abilities</h3>
+        <!--Green Abilities -->
+            <div class="sheet-green-abilities" style="background-color: #99ffbb;">
+                <span style="background-color: #99ffbb;">
+                    <fieldset class="repeating_greenabilities" style="background-color: #99ffbb;">
+                        <img src="https://i.imgur.com/VdI1nGL.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_atk-action">
+                        <img src="https://i.imgur.com/P74NrWI.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_dfn-action">
+                        <img src="https://i.imgur.com/5Rc36P9.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_ovc-action">
+                        <img src="https://i.imgur.com/S2zULo6.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_bst-action">
+                        <img src="https://i.imgur.com/sgmZ0g5.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_hin-action">
+                        <img src="https://i.imgur.com/714YUtO.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_rec-action">
+                        <b>Name</b>
+                        <input type="text" name="attr_abilityname">
+                        <b>Type</b>
+                        <select name="attr_abilitytype">
+                            <option>Action</option>
+                            <option>Reaction</option>
+                            <option>Inherent</option>
+                        </select>
+                        <textarea name="attr_greenabilitydesc" style="width: 95%; height: 31px;"></textarea>
+                    </fieldset>
+                </span>
+            </div>
+        <!-- Yellow Abilities -->
+            <div class="sheet-yellow-abilities" style="background-color: #ffff99;">
+                <span style="background-color: #ffff99;">
+                    <fieldset class="repeating_yellowabilities" style="background-color: #ffff99;">
+                        <img src="https://i.imgur.com/VdI1nGL.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_atk-action">
+                        <img src="https://i.imgur.com/P74NrWI.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_dfn-action">
+                        <img src="https://i.imgur.com/5Rc36P9.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_ovc-action">
+                        <img src="https://i.imgur.com/S2zULo6.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_bst-action">
+                        <img src="https://i.imgur.com/sgmZ0g5.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_hin-action">
+                        <img src="https://i.imgur.com/714YUtO.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_rec-action">
+                        <b>Name</b>
+                        <input type="text" name="attr_abilityname">
+                        <b>Type</b>
+                        <select name="attr_abilitytype">
+                            <option>Action</option>
+                            <option>Reaction</option>
+                            <option>Inherent</option>
+                        </select>
+                        <textarea name="attr_yellowabilitydesc" style="width: 95%; height: 31px;"></textarea>
+                    </fieldset>
+                </span>
+            </div>
+        <!-- Red Abilities -->
+            <div class="sheet-red-abilities" style="background-color: #ff5c33;">
+                <span style="background-color: #ff5c33;">
+                    <fieldset class="repeating_redabilities" style="background-color: #ff5c33;">
+                        <img src="https://i.imgur.com/VdI1nGL.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_atk-action">
+                        <img src="https://i.imgur.com/P74NrWI.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_dfn-action">
+                        <img src="https://i.imgur.com/5Rc36P9.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_ovc-action">
+                        <img src="https://i.imgur.com/S2zULo6.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_bst-action">
+                        <img src="https://i.imgur.com/sgmZ0g5.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_hin-action">
+                        <img src="https://i.imgur.com/714YUtO.png" style="height: 25px; width: 25px;">
+                        <input type="checkbox" name="attr_rec-action">
+                        <b>Name</b>
+                        <input type="text" name="attr_abilityname">
+                        <b>Type</b>
+                        <select name="attr_abilitytype">
+                            <option>Action</option>
+                            <option>Reaction</option>
+                            <option>Inherent</option>
+                        </select>
+                        <textarea name="attr_redabilitydesc" style="width: 95%; height: 31px;"></textarea>
+                    </fieldset>
+                </span>
+            </div>
+        <!-- Out Ability -->    
+            <div class="sheet-out-abilities" style="background-color: #bfbfbf; padding: 2px;">
+                <b>Out Ability</b>
+                <input type="text" name="attr_outability" style="padding: 2px; width: 80%;">    
+            </div>
+    </div>
+    
+<!-- PRINCIPLES (REPEATING) -->
+    
+    <div class="sheet-principles" style="border-style: solid; border-width: 1%;">
+        <h3>Principles</h3>
+            <fieldset class="repeating_principles">
+                <input type="text" name="attr_principlename1">
+                <textarea name="attr_principledesc1" style="width: 90%; height: 31px;"></textarea>
+            </fieldset>
+    </div>
+    
+<!-- HERO POINTS -->
+    
+    <div class="sheet-heropoints" style="text-align: center; width: 99.40%; float: left; border-style: solid; border-width: 1%;">
+        <b>Unspent Hero Points:</b>
+            <input type="number" name="attr_heropoints">
+        <b>Hero Points this Issue:</b>
+            <input type="checkbox" name="attr_1hp"><b>1</b>
+            <input type="checkbox" name="attr_2hp"><b>2</b>
+            <input type="checkbox" name="attr_3hp"><b>3</b>
+            <input type="checkbox" name="attr_4hp"><b>4</b>
+            <input type="checkbox" name="attr_5hp"><b>5</b>
+    </div>
+    
+<!-- ISSUES / COLLECTIONS (REPEATING) -->
+
+    <div class="sheet-2colrow" style="border-style: solid; border-width: 1%;">
+        <div class="sheet-col" style="width: width: 40%;">
+            <b>Issues:</b>
+            <fieldset class="repeating_issues">
+                <input type="text" name="attr_issue">
+            </fieldset>
+            <em>6 Issues = 1 Collection</em>
+        </div> 
+        <div class="sheet-col" style="width: width: 40%;">
+            <b>Collections</b>
+            <fieldset class="repeating_collections">
+                <input type="checkbox" name="attr_collection-check">
+                <input type="text" name="attr_collection">
+            </fieldset>
+        </div>    
+
+    </div>
+    
+    <span style="color: gray; float: right;">
+        <em>coded by: teekay1127 (teekismcgeekis) - tyler.kinsherf@gmail.com</em>
+    </span>
+</div> 
+    

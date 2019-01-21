@@ -3,9 +3,18 @@
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
 ## Current Version
-2.5
+2.7
 
 ### Changelog
+
+#### 2.7
+* Adding in visible chance numbers to most "chance" rolls
+* Rolls that are supposed to be rolled by the DM for players will be sent to GM (Find secret doors, traps, etc)
+* Adding Monster spells (#2990)
+* Adding field for number of Monster attacks (#2991)
+* Changing fonts to use google fonts Patrick Hand and Shadows Into Light since Roll20 will not fix bug (#265) - this should fix issue (#2989)
+* Adding in Settings tab (currently nonfunctional) which will hopefully be used to change the color of the background per (#2330)
+* Gave Spell Range and Spell Duration their own boxes to handle overflow better
 
 #### 2.6
 * Fix for Halfling Initiative to be set to on by default giving all characters the halfling initiative bonus
