@@ -624,6 +624,7 @@
                             <td>Schadensreduktion</td>
                             <td><input type=number style="width: 4em; font-weight: bold; background-color:#81BEF7; text-align: center" name="attr_schadensreduktion" value=0 readonly="true"></td>
                             <td><input type=number style="width: 4em; font-weight: bold; background-color:#81BEF7; text-align: center" name="attr_schadensreduktionmod" value=0></td>
+                            <td><input type=hidden name="attr_hiddenschadensreduktionfruehstueck" value=0></td>
                         </tr> 
                     </table>
                 </td>
@@ -748,17 +749,18 @@
             <h3 style="text-align: center;">Attribute, Widerstandswerte, Allgemeine Fertigkeiten</h3> <br>
             <table>
             <tr bgcolor="#0489B1" style="color:white">
-                <td color="white" style='width:20em'><b>Bezeichnung</b></td>
-                <td color="white" style='width:5em'><b>Attribut</b></td>
+                <td color="white" style='width:12em'><b>Bezeichnung</b></td>
+                <td color="white" style='width:13em'><b>Attribut</b></td>
                 <td color="white" style='width:5em'><b>Mod.</b></td>
                 <td color="white" style='width:2em'><b>Aktiv?</b></td>
             </tr>
             <tr>
                 <td colspan=4>
                     <fieldset class="repeating_attributmods">
-                         <input type="text" name="attr_attributmodname" style='width: 20em; font-weight: bold; text-align: center;'>
-                         <select name="attr_modattribut" style='width: 5em; font-weight: bold;'> 
+                         <input type="text" name="attr_attributmodname" style='width: 15em; font-weight: bold; text-align: center;'>
+                         <select name="attr_modattribut" style='width: 10em; font-weight: bold;'> 
                             <optgroup style="font-size:10px;">
+                                <option value="attributetrenner">----- Attribute -----</option>
                                 <option value="aus">Ausstrahlung</option>
                                 <option value="bew">Beweglichkeit</option>
                                 <option value="int">Intuition</option>
@@ -767,11 +769,15 @@
                                 <option value="stae">St&auml;rke</option>
                                 <option value="ver">Verstand</option>
                                 <option value="wil">Willenskraft</option>
+                                <option value="widerstaendetrenner">----- Widerst&auml;nde -----</option>
                                 <option value="vtd">Verteidigung</option>
                                 <option value="gw">Geistiger Widerstand</option>
                                 <option value="kw">K&ouml;rperlicher Widerstand</option>
-                                <option value="allgfert">Allgemeine Fertigkeiten</option>
+                                <option value="kampfrelevantetrenner">----- Kampfrelevantes -----</option>
                                 <option value="beh">Behinderungsreduktion</option>
+                                <option value="sr">Schadensreduktion</option>
+                                <option value="fertigkeitentrenner">----- Fertigkeiten -----</option>
+                                <option value="allgfert">Allgemeine Fertigkeiten</option>
                             </optgroup>
                         </select>
                         <input type="number" name="attr_attributmod" style='width: 5em; font-weight: bold; text-align: center;' value=1 placeholder=1>
@@ -3037,8 +3043,8 @@ on("change:epeingesetzt change:epgesamt", function() {
    });
 });
 
-on("change:beweglichkeit change:groessenklasse change:konstitution change:intuition change:mystik change:willenskraft change:verstand change:staerke change:ausstrahlung change:hiddengsw change:hiddenini change:hiddenlp change:hiddenfokus change:hiddengw change:hiddengwhg change:hiddenkw change:hiddenkwhg change:hiddenvtdhg change:schadensreduktionmod change:geschwindigkeitmod change:initiativemod change:lebenspunktemod change:fokusmod change:verteidigungmod change:koerperlicherwiderstandmod change:geistigerwiderstandmod change:bannmagiepunkte change:beherrschungsmagiepunkte change:bewegungsmagiepunkte change:erkenntnismagiepunkte change:felsmagiepunkte change:feuermagiepunkte change:heilungsmagiepunkte change:illusionsmagiepunkte change:kampfmagiepunkte change:lichtmagiepunkte change:naturmagiepunkte change:schattenmagiepunkte change:schicksalsmagiepunkte change:schutzmagiepunkte change:staerkungsmagiepunkte change:todesmagiepunkte change:verwandlungsmagiepunkte change:wassermagiepunkte change:windmagiepunkte change:hiddenvtdruestungschild change:hiddengswbe change:hiddeninibr change:hiddenvtdgr change:hiddengswag change:hiddengswspr change:erschoepft change:lahm change:hiddenvtdbonus change:hiddengwbonus change:hiddenkwbonus", function() {
-   getAttrs(["beweglichkeit", "groessenklasse", "konstitution", "intuition", "mystik", "willenskraft", "verstand", "staerke", "ausstrahlung", "hiddengsw", "hiddenini", "hiddenlp", "hiddenfokus", "hiddengw", "hiddengwhg", "hiddenkw", "hiddenkwhg", "hiddenvtdhg", "schadensreduktionmod", "geschwindigkeitmod", "initiativemod", "lebenspunktemod", "fokusmod", "verteidigungmod", "koerperlicherwiderstandmod", "geistigerwiderstandmod", "arkanekundepunkte", "bannmagiepunkte", "beherrschungsmagiepunkte", "bewegungsmagiepunkte", "erkenntnismagiepunkte", "felsmagiepunkte", "feuermagiepunkte", "heilungsmagiepunkte", "illusionsmagiepunkte", "kampfmagiepunkte", "lichtmagiepunkte", "naturmagiepunkte", "schattenmagiepunkte", "schicksalsmagiepunkte", "schutzmagiepunkte", "staerkungsmagiepunkte", "todesmagiepunkte", "verwandlungsmagiepunkte", "wassermagiepunkte", "windmagiepunkte", "hiddenvtdruestungschild", "gesamtsr", "hiddengswbe", "hiddeninibr", "hiddenvtdgr", "hiddengswag", "hiddengswspr", "erschoepft", "lahm", "hiddenvtdbonus", "hiddenkwbonus", "hiddengwbonus"], function(values) {
+on("change:beweglichkeit change:groessenklasse change:konstitution change:intuition change:mystik change:willenskraft change:verstand change:staerke change:ausstrahlung change:hiddengsw change:hiddenini change:hiddenlp change:hiddenfokus change:hiddengw change:hiddengwhg change:hiddenkw change:hiddenkwhg change:hiddenvtdhg change:schadensreduktionmod change:geschwindigkeitmod change:initiativemod change:lebenspunktemod change:fokusmod change:verteidigungmod change:koerperlicherwiderstandmod change:geistigerwiderstandmod change:bannmagiepunkte change:beherrschungsmagiepunkte change:bewegungsmagiepunkte change:erkenntnismagiepunkte change:felsmagiepunkte change:feuermagiepunkte change:heilungsmagiepunkte change:illusionsmagiepunkte change:kampfmagiepunkte change:lichtmagiepunkte change:naturmagiepunkte change:schattenmagiepunkte change:schicksalsmagiepunkte change:schutzmagiepunkte change:staerkungsmagiepunkte change:todesmagiepunkte change:verwandlungsmagiepunkte change:wassermagiepunkte change:windmagiepunkte change:hiddenvtdruestungschild change:hiddengswbe change:hiddeninibr change:hiddenvtdgr change:hiddengswag change:hiddengswspr change:erschoepft change:lahm change:hiddenvtdbonus change:hiddengwbonus change:hiddenkwbonus change:hiddenschadensreduktionfruehstueck", function() {
+   getAttrs(["beweglichkeit", "groessenklasse", "konstitution", "intuition", "mystik", "willenskraft", "verstand", "staerke", "ausstrahlung", "hiddengsw", "hiddenini", "hiddenlp", "hiddenfokus", "hiddengw", "hiddengwhg", "hiddenkw", "hiddenkwhg", "hiddenvtdhg", "schadensreduktionmod", "geschwindigkeitmod", "initiativemod", "lebenspunktemod", "fokusmod", "verteidigungmod", "koerperlicherwiderstandmod", "geistigerwiderstandmod", "arkanekundepunkte", "bannmagiepunkte", "beherrschungsmagiepunkte", "bewegungsmagiepunkte", "erkenntnismagiepunkte", "felsmagiepunkte", "feuermagiepunkte", "heilungsmagiepunkte", "illusionsmagiepunkte", "kampfmagiepunkte", "lichtmagiepunkte", "naturmagiepunkte", "schattenmagiepunkte", "schicksalsmagiepunkte", "schutzmagiepunkte", "staerkungsmagiepunkte", "todesmagiepunkte", "verwandlungsmagiepunkte", "wassermagiepunkte", "windmagiepunkte", "hiddenvtdruestungschild", "gesamtsr", "hiddengswbe", "hiddeninibr", "hiddenvtdgr", "hiddengswag", "hiddengswspr", "erschoepft", "lahm", "hiddenvtdbonus", "hiddenkwbonus", "hiddengwbonus", "hiddenschadensreduktionfruehstueck"], function(values) {
       setAttrs({
           geschwindigkeit: +values.beweglichkeit + +values.groessenklasse + +values.geschwindigkeitmod + +values.hiddengsw + +values.hiddengswag + +values.hiddengswspr - +values.hiddengswbe - +values.erschoepft - +values.lahm,
           lebenspunkte: +values.groessenklasse + +values.konstitution + +values.lebenspunktemod + +values.hiddenlp,
@@ -3050,7 +3056,7 @@ on("change:beweglichkeit change:groessenklasse change:konstitution change:intuit
           gwoben: 12 + +values.verstand + +values.willenskraft + +values.geistigerwiderstandmod + +values.hiddengw + +values.hiddengwhg,
           verteidigung: 12 + +values.beweglichkeit + +values.staerke + ((5-values.groessenklasse)*2) + +values.verteidigungmod + +values.hiddenvtdgr + +values.hiddenvtdhg + +values.hiddenvtdruestungschild + +values.hiddenvtdbonus,
           vtdoben: 12 + +values.beweglichkeit + +values.staerke + ((5-values.groessenklasse)*2) + +values.verteidigungmod + +values.hiddenvtdgr + +values.hiddenvtdhg + +values.hiddenvtdruestungschild,
-          schadensreduktion: +values.gesamtsr + +values.schadensreduktionmod,
+          schadensreduktion: +values.gesamtsr + +values.schadensreduktionmod + +values.hiddenschadensreduktionfruehstueck,
           sroben: +values.gesamtsr + +values.schadensreduktionmod,
           akrobatik1: values.beweglichkeit,
           akrobatik2: values.staerke,
@@ -3994,10 +4000,10 @@ on("change:repeating_ruestungen remove:repeating_ruestungen change:repeating_rue
 });
 
 on("change:hiddenschildvtd change:hiddenruestungsvtd change:hiddenruestungssr change:hiddenschildbe change:hiddenruestungsbe change:hiddenschildtickplus change:hiddenruestungstickplus change:hiddensr change:hiddenbehinderungfruehstueck", function(g) {
-    getAttrs(["hiddenschildvtd", "hiddenruestungsvtd", "hiddenruestungssr", "hiddenschildbe", "hiddenruestungsbe", "hiddenschildtickplus", "hiddenruestungstickplus", "hiddensr", "hiddenbehinderungfruehstueck"], function(f) {
+    getAttrs(["hiddenschildvtd", "hiddenruestungsvtd", "hiddenruestungssr", "hiddenschildbe", "hiddenruestungsbe", "hiddenschildtickplus", "hiddenruestungstickplus", "hiddensr", "hiddenbehinderungfruehstueck", "hiddenschadensreduktionfruehstueck"], function(f) {
         setAttrs({
             gesamtvtd: +f.hiddenschildvtd + +f.hiddenruestungsvtd,
-            gesamtsr: +f.hiddenruestungssr + +f.hiddensr,
+            gesamtsr: +f.hiddenruestungssr + +f.hiddensr + +f.hiddenschadensreduktionfruehstueck,
             gesamtbe: Math.max((+f.hiddenruestungsbe + +f.hiddenschildbe - +f.hiddenbehinderungfruehstueck), 0),
             gesamttickplus: +f.hiddenruestungstickplus + +f.hiddenschildtickplus
         }) 
@@ -4110,10 +4116,10 @@ on("change:schildonoff change:schildvtd change:schildbe change:schildtickplus ch
 });
 
 on("change:gesamtvtd change:gesamtsr change:gesamtbe", function(eventinfo) {
-    getAttrs(["gesamtvtd", "gesamtsr", "gesamtbe", "schadensreduktionmod"], function(values) {
+    getAttrs(["gesamtvtd", "gesamtsr", "gesamtbe", "schadensreduktionmod", "hiddenschadensreduktionfruehstueck"], function(values) {
       setAttrs({
           hiddenvtdruestungschild: +values.gesamtvtd,
-          schadensreduktion: +values.gesamtsr + +values.schadensreduktionmod,
+          schadensreduktion: +values.gesamtsr + +values.schadensreduktionmod + +values.hiddenschadensreduktionfruehstueck,
           behinderung: +values.gesamtbe
       });
    });
@@ -4202,7 +4208,8 @@ on("change:repeating_attributmods remove:repeating_attributmods", function() {
                 hiddengwbonus: 0,
                 hiddenkwbonus: 0,
                 hiddenallgfert: 0,
-                hiddenbehinderungfruehsteuck: 0
+                hiddenbehinderungfruehsteuck: 0,
+                hiddenschadensreduktionfruehstueck: 0
             });
        } else 
        {
@@ -4219,6 +4226,7 @@ on("change:repeating_attributmods remove:repeating_attributmods", function() {
            var gw = 0;
            var allgfert = 0;
            var beh = 0;
+           var sr = 0;
            var keineaktiv = true;
             _.each(idarray, function(currentID, i) {
                 getAttrs(["repeating_attributmods_" + currentID + "_modattribut", "repeating_attributmods_" + currentID + "_attributmod", "repeating_attributmods_" + currentID + "_attributmodonoff"], function(v) {
@@ -4282,6 +4290,10 @@ on("change:repeating_attributmods remove:repeating_attributmods", function() {
                                 beh += +mod;
                                 update["hiddenbehinderungfruehstueck"] = +beh;
                                 break;
+                            case "sr":
+                                sr += +mod;
+                                update["hiddenschadensreduktionfruehstueck"] = +sr;
+                                break;    
                             default:
                                 break;
                         }
@@ -4304,7 +4316,8 @@ on("change:repeating_attributmods remove:repeating_attributmods", function() {
                     hiddenkwbonus: 0,
                     hiddengwbonus: 0,
                     hiddenallgfert: 0,
-                    hiddenbehinderungfruehstueck: 0
+                    hiddenbehinderungfruehstueck: 0,
+                    hiddenschadensreduktionfruehstueck: 0
                 });
             } 
        }
