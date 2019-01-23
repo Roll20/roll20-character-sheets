@@ -550,6 +550,7 @@
                             <td>Behinderung</td>
                             <td colspan=3><input type=number style="width: 4em; font-weight: bold; background-color:#81BEF7; text-align: center" min=0 name="attr_behinderung" value=0></td>
                             <td><input type=hidden name="attr_hiddenbehinderungschild" value=0></td>
+                            <td><input type=hidden name="attr_hiddenbehinderungfruehstueck" value=0></td>
                         </tr>
                     </table>    
                 </td>
@@ -770,6 +771,7 @@
                                 <option value="gw">Geistiger Widerstand</option>
                                 <option value="kw">K&ouml;rperlicher Widerstand</option>
                                 <option value="allgfert">Allgemeine Fertigkeiten</option>
+                                <option value="beh">Behinderung</option>
                             </optgroup>
                         </select>
                         <input type="number" name="attr_attributmod" style='width: 5em; font-weight: bold; text-align: center;' value=1 placeholder=1>
@@ -3991,12 +3993,12 @@ on("change:repeating_ruestungen remove:repeating_ruestungen change:repeating_rue
     });
 });
 
-on("change:hiddenschildvtd change:hiddenruestungsvtd change:hiddenruestungssr change:hiddenschildbe change:hiddenruestungsbe change:hiddenschildtickplus change:hiddenruestungstickplus change:hiddensr", function(g) {
-    getAttrs(["hiddenschildvtd", "hiddenruestungsvtd", "hiddenruestungssr", "hiddenschildbe", "hiddenruestungsbe", "hiddenschildtickplus", "hiddenruestungstickplus", "hiddensr"], function(f) {
+on("change:hiddenschildvtd change:hiddenruestungsvtd change:hiddenruestungssr change:hiddenschildbe change:hiddenruestungsbe change:hiddenschildtickplus change:hiddenruestungstickplus change:hiddensr change:hiddenbehinderungfruehstueck", function(g) {
+    getAttrs(["hiddenschildvtd", "hiddenruestungsvtd", "hiddenruestungssr", "hiddenschildbe", "hiddenruestungsbe", "hiddenschildtickplus", "hiddenruestungstickplus", "hiddensr", "hiddenbehinderungfruehstueck"], function(f) {
         setAttrs({
             gesamtvtd: +f.hiddenschildvtd + +f.hiddenruestungsvtd,
             gesamtsr: +f.hiddenruestungssr + +f.hiddensr,
-            gesamtbe: +f.hiddenruestungsbe + +f.hiddenschildbe,
+            gesamtbe: Math.max((+f.hiddenruestungsbe + +f.hiddenschildbe - +f.hiddenbehinderungfruehstueck), 0),
             gesamttickplus: +f.hiddenruestungstickplus + +f.hiddenschildtickplus
         }) 
     });
@@ -4199,7 +4201,8 @@ on("change:repeating_attributmods remove:repeating_attributmods", function() {
                 hiddenvtdbonus: 0,
                 hiddengwbonus: 0,
                 hiddenkwbonus: 0,
-                hiddenallgfert: 0
+                hiddenallgfert: 0,
+                hiddenbehinderungfruehsteuck: 0
             });
        } else 
        {
@@ -4215,91 +4218,74 @@ on("change:repeating_attributmods remove:repeating_attributmods", function() {
            var kw = 0;
            var gw = 0;
            var allgfert = 0;
+           var beh = 0;
            var keineaktiv = true;
             _.each(idarray, function(currentID, i) {
                 getAttrs(["repeating_attributmods_" + currentID + "_modattribut", "repeating_attributmods_" + currentID + "_attributmod", "repeating_attributmods_" + currentID + "_attributmodonoff"], function(v) {
                     var attr = v["repeating_attributmods_" + currentID + "_modattribut"];
                     var mod = v["repeating_attributmods_" + currentID + "_attributmod"];
                     var onoff = v["repeating_attributmods_" + currentID + "_attributmodonoff"];
+                    var update =  {};
                     if (onoff == "on")
                     {
                         keineaktiv = false;
                         switch(attr) {
                             case "aus":
                                 ausstrahlung += +mod;
-                                setAttrs({
-                                    hiddenausstrahlungmod: +ausstrahlung   
-                                });
+                                update["hiddenausstrahlungmod"] = +ausstrahlung;
                                 break;
                             case "bew":
                                 beweglichkeit += +mod;
-                                setAttrs({
-                                    hiddenbeweglichkeitmod: +beweglichkeit    
-                                });
+                                update["hiddenbeweglichkeitmod"] = +beweglichkeit;
                                 break;
                             case "int":
                                 intuition += +mod;
-                                setAttrs({
-                                    hiddenintuitionmod: +intuition    
-                                });
+                                update["hiddenintuitionmod"] = +intuition;
                                 break;
                             case "kon":
                                 konstitution += +mod;
-                                setAttrs({
-                                    hiddenkonstitutionmod: +konstitution    
-                                });
+                                update["hiddenkonstitutionmod"] = +konstitution;
                                 break;
                             case "mys":
                                 mystik += +mod;
-                                setAttrs({
-                                    hiddenmystikmod: +mystik    
-                                });
+                                update["hiddenmystikmod"] = +mystik;
                                 break;
                             case "stae":
                                 staerke += +mod;
-                                setAttrs({
-                                    hiddenstaerkemod: +staerke    
-                                });
+                                update["hiddenstaerkemod"] = +staerke;
                                 break;
                             case "ver":
                                 verstand += +mod;
-                                setAttrs({
-                                    hiddenverstandmod: +verstand    
-                                });
+                                update["hiddenverstandmod"] = +verstand;
                                 break;
                             case "wil":
                                 willenskraft += +mod;
-                                setAttrs({
-                                    hiddenwillenskraftmod: +willenskraft    
-                                });
+                                update["hiddenwillenskraftmod"] = +willenskraft;
                                 break;
                             case "vtd":
                                 vtd += +mod;
-                                setAttrs({
-                                    hiddenvtdbonus: +vtd 
-                                });
+                                update["hiddenvtdbonus"] = +vtd;
                                 break;
                             case "kw":
                                 kw += +mod;
-                                setAttrs({
-                                    hiddenkwbonus: +kw  
-                                });
+                                update["hiddenkwbonus"] = +kw;
                                 break;
                             case "gw":
                                 gw += +mod;
-                                setAttrs({
-                                    hiddengwbonus: +gw   
-                                });
+                                update["hiddengwbonus"] = +gw;
                                 break;
                             case "allgfert":
                                 allgfert += +mod;
-                                setAttrs({
-                                    hiddenallgfert: +allgfert
-                                });
+                                update["hiddenallgfert"] = +allgfert;
+                                break;
+                            case "beh":
+                                beh += +mod;
+                                update["hiddenbehinderungfruehstueck"] = +beh;
                                 break;
                             default:
                                 break;
                         }
+                        setAttrs(update);
                     }
                 });
             });
@@ -4317,7 +4303,8 @@ on("change:repeating_attributmods remove:repeating_attributmods", function() {
                     hiddenvtdbonus: 0,
                     hiddenkwbonus: 0,
                     hiddengwbonus: 0,
-                    hiddenallgfert: 0
+                    hiddenallgfert: 0,
+                    hiddenbehinderungfruehstueck: 0
                 });
             } 
        }
