@@ -776,6 +776,7 @@
                                 <option value="beh">Behinderungsreduktion</option>
                                 <option value="sr">Schadensreduktion</option>
                                 <option value="ab">Bonus auf Angriffe</option>
+                                <option value="si">Schadensimmunit&auml;t (1 = aktiv)</option>
                                 <option value="fertigkeitentrenner">-------- Fertigkeiten --------</option>
                                 <!-- <option value="allfert">Alle Fertigkeiten</option> -->
                                 <option value="allgfert">Allgemeine Fertigkeiten</option>
@@ -1346,6 +1347,7 @@
                             <input type="hidden" name="attr_geblendet" value=0 />
                             <input type="hidden" name="attr_erschoepft" value=0 />
                             <input type="hidden" name="attr_lahm" value=0 />
+                            <input type="hidden" name="attr_schadenimmun" value=0 />
                         </tr>
                         <tr bgcolor="#81BEF7">
                             <td>Fokus</td>
@@ -4154,8 +4156,8 @@ on("change:fokus", function(e) {
     });
 });
 
-on("change:lebenspunkte_v change:schmerzresistenz change:sw1 change:sw2 change:verwundet", function(e) {
-   getAttrs(["lebenspunkte", "lebenspunkte_v", "lebenspunkte_k", "lebenspunkte_e", "schmerzresistenz", "sw1", "sw2", "verwundet"], function(v) {
+on("change:lebenspunkte_v change:schmerzresistenz change:sw1 change:sw2 change:verwundet change:schadenimmun", function(e) {
+   getAttrs(["lebenspunkte", "lebenspunkte_v", "lebenspunkte_k", "lebenspunkte_e", "schmerzresistenz", "sw1", "sw2", "verwundet", "schadenimmun"], function(v) {
         var mod;
         var row = Math.ceil( +v.lebenspunkte_v / +v.lebenspunkte );
         row += +v.verwundet;
@@ -4183,7 +4185,7 @@ on("change:lebenspunkte_v change:schmerzresistenz change:sw1 change:sw2 change:v
                 mod = 8 - +sr - +sw1 - +sw2;
                 break;
         }
-        if (mod < 0) { mod = 0; }
+        if (mod < 0 || v.schadenimmun === 1) { mod = 0; }
         setAttrs({
             schadensmod: +mod
         });
@@ -4215,7 +4217,8 @@ on("change:repeating_attributmods remove:repeating_attributmods", function() {
                 hiddenbehinderungfruehsteuck: 0,
                 hiddenschadensreduktionfruehstueck: 0,
                 angriffsbonus: 0,
-                kampffertigkeitenbonus: 0
+                kampffertigkeitenbonus: 0,
+                schadenimmun: 0
             });
        } else 
        {
@@ -4235,6 +4238,7 @@ on("change:repeating_attributmods remove:repeating_attributmods", function() {
            var sr = 0;
            var ab = 0;
            var kf = 0;
+           var si = 0;
            var keineaktiv = true;
             _.each(idarray, function(currentID, i) {
                 getAttrs(["repeating_attributmods_" + currentID + "_modattribut", "repeating_attributmods_" + currentID + "_attributmod", "repeating_attributmods_" + currentID + "_attributmodonoff"], function(v) {
@@ -4310,6 +4314,11 @@ on("change:repeating_attributmods remove:repeating_attributmods", function() {
                                 kf += +mod;
                                 update["kampffertigkeitenbonus"] = +kf;
                                 break;
+                            case "si":
+                                si += +mod;
+                                if (si > 1) { si = 1; }
+                                update["schadenimmun"] = +si;
+                                break;
                             default:
                                 break;
                         }
@@ -4335,7 +4344,8 @@ on("change:repeating_attributmods remove:repeating_attributmods", function() {
                     hiddenbehinderungfruehstueck: 0,
                     hiddenschadensreduktionfruehstueck: 0,
                     angriffsbonus: 0,
-                    kampffertigkeitenbonus: 0
+                    kampffertigkeitenbonus: 0,
+                    schadenimmun: 0
                 });
             } 
        }
