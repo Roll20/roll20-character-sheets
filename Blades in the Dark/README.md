@@ -1,6 +1,6 @@
 # Blades in the Dark Character Sheet
 
-This is the (compressed) source code for the Blades in the Dark character sheet on Roll20. The pug/sass code used to generate it can be found [here](https://github.com/joesinghaus/Blades-in-the-Dark). If you want to hack the sheet for your own Blades hack, a more hackable version and instructions for hacking can be found [here](https://github.com/joesinghaus/Blades-template).
+This is the source code for the Blades in the Dark character sheet on Roll20. If you want to hack the sheet for your own Blades hack, a more hackable version and instructions for hacking can be found [here](https://github.com/joesinghaus/Blades-template). Build command: `./build.js` (requires node, with pug and sass installed via npm).
 
 ## Changelog
 
@@ -8,6 +8,7 @@ This is the (compressed) source code for the Blades in the Dark character sheet 
 
 * Simplified the roll template code
 * Support for French translations added
+* Support for Spanish translations added
 
 ### 3.6
 
