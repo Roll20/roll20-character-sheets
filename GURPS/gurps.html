@@ -2781,6 +2781,11 @@
 
 	<div>
 	<h3>Latest Changes: Updated 01/08/2019</h3>
+	
+	<div>
+	    <input type="checkbox" name="attr_updates_read" class="sheet-manual-unspent-box" value="1">
+	    <span>Mark as read</span>
+	</div>
 		
 	<h3>Known Issues</h3>
 	<ul>
@@ -3197,8 +3202,26 @@
 		console.log('********* Sheet Opened *********');
 		
 		console.log('** Setting default TAB to Updates  **');
+		
 		/* When the sheet is opened, it opens to the Update tab */
-			setAttrs({tab:7});
+		getAttrs(["updates_read"], function(values) {
+		    
+		    console.log(values.updates_read);
+		    
+		    if (values.updates_read == "1") {
+		    
+		        // do nothing
+		        
+		    } else {
+		        
+		        // activate update tab
+		        setAttrs({tab:7}); 
+		        
+		    }
+		    
+		} );
+		
+			
 		/* For Bug Fix v1.3.9 : Need to convert the Value of the Modifier Prompt*/
 		console.log('** Attribute Modifier new values v1.3.9 **');
 
@@ -3218,8 +3241,16 @@
 				modCascadeAll = v.modCascadeAll;
 			}
 			if (!v.sheet_version || v.sheet_version != version) {
+			    
 				// Set sheet version:
-				setAttrs({ sheet_version: version });
+				// uncheck the updates_read checkbox and
+                // be sure to select tab #7, where the updates are located
+                setAttrs({ 
+                    sheet_version: version,
+                    updates_read: 0,
+                    tab: 7
+                });
+
 
 				// initialize any empty fields in repeating sections since the default values were removed.
 				loadRepeating('repeating_languages', 'spoken', 0);
@@ -5263,7 +5294,7 @@
                 // calc. running broad jump
                 if (enhancedGroundMove > basicMove) {
                     
-                    // use enhanced move instead of basic move
+                    // use enhanced move instead of strength
                     statUsedForRunningJump = "Basic Move * (2 ^ Enh MV Mod)";
                     
                     runningMoveToUse = enhancedGroundMove;
