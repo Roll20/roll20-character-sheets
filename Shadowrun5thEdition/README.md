@@ -1,7 +1,7 @@
 Shadowrun 5th Edition Character Sheet
 =======================
 
-Version 1 of Shadowrun 5th Edition Character Sheet. This sheet includes an NPC sheet for Goons, Hosts, Sprites, and Vehicles. Player character pet classes such as spirits, drones, and sprites should use this NPC sheet. 
+Version 1 of Shadowrun 5th Edition Character Sheet. This sheet includes an NPC sheet for Grunts, Hosts, Sprites, and Vehicles. Player character pet classes such as spirits, drones, and sprites should use this NPC sheet. 
 
 ## General Guidelines
 
@@ -116,7 +116,6 @@ This tab is used to record all of your augmentations. It works similar to the Qu
 
 *Note: Essence input here will not auto calculate your essence in the Attributes section.*
 
-
 ### Gear
 
 This tab is used to track all your gear. It works similar to other sections like Qualities & Augmentations. When in display mode clicking the Item's name will expand and collapses the notes section.
@@ -129,7 +128,7 @@ The magic section contains three tabs for Spells, Preparations, and Rituals.
 
 Spells section will work very similar to the Weapons section. See that head for general guidelines.
 
-* **Drain** input will be added to the Force of a spell and the roll template will calculate the drain you need to resist. Currently it does not ensure a minimum of 2, sorry.
+* **Drain** input will be added to the Force of a spell and the roll template will calculate the drain you need to resist.
 * **Spell Category** select when set to Combat will toggle on an additional select & input to track Combat Type and Combat Damage type for these spells.
 
 #### Preparations
@@ -195,31 +194,31 @@ NPCs are intended to be simplified stat blocks. If you are making an NPC that is
 
 ### General NPC Guidelines
 
-### Goon
+### Grunt
 
-New goons sheets should intiatilly open to the settings pages.
+New Grunts sheets should intiatilly open to the settings pages.
 
 * **Attributes** inputs are similar to the PC sheet. The top input is your base and the second input is the modifier. NPCs do not have Temp inputs anywhere so use the modifier inputs.
 * **Bonuses** inputs on the left hand side are all added to the auto calculated attributes. This works the same way as the PC sheet.
 * **Pain Tolerance** input works just like the PC sheet. See the Condition Monitor entry above.
 
-* **Armor Rating** input needs the goon's total armor rating.
+* **Armor Rating** input needs the Grunt's total armor rating.
 * **Soak Bonus** input adds to the Body + Armor Rating. This is where you'll track a bonus like from *Toughness*.
 * **...Protection** inputs adds to the Soak calculation (Body + Armor Rating + Soak Bonus).
 
 * **Mundane/Awakened/Emerged** toggles will hide and reveal appropriate additional inputs, textfields, and repeating sections. Use Awakened for Spirits.
 * **Matrix Device** toggle add a Cyberdeck like device to the bottom of the sheet. This has the same functionality as the Cyberdeck in the PC sheet making enemy deckers easier to manage. 
 
-*Note: If you select Awakened, Emerged, or Matrix Device then change the sheet type some of those revealed sections may linger. This is how you can end up seeing the Spells section on a Host sheet. To fix this just switch back to the Goon sheet and select Mundane and/or toggle off Matrix Device. This isn't a bug, IT'S A FEATURE!*
+*Note: If you select Awakened, Emerged, or Matrix Device then change the sheet type some of those revealed sections may linger. This is how you can end up seeing the Spells section on a Host sheet. To fix this just switch back to the Grunt sheet and select Mundane and/or toggle off Matrix Device. This isn't a bug, IT'S A FEATURE!*
 
 * **Display Mode** has buttons and reset toggles on their appropriate headers. These will all work similar to their counterparts on the PC sheet.
 
-*Note: There is currently not a place on the NPC sheet to track damage and thereby accumulate wounds. The Wounds toggle and this feature can still be used. The easiest way to do this is associate the NPC sheet with a token. Set two of the token bubbles to Physical and Stun. You can then adjust these tracks via the bubbles and it will calculate wounds for you. If you do this you'll want to have a seperate sheet for each individual goon.*
+*Note: There is currently not a place on the NPC sheet to track damage and thereby accumulate wounds. The Wounds toggle and this feature can still be used. The easiest way to do this is associate the NPC sheet with a token. Set two of the token bubbles to Physical and Stun. You can then adjust these tracks via the bubbles and it will calculate wounds for you. If you do this you'll want to have a seperate sheet for each individual Grunt.*
 
 
 ### Hosts
 
-These sheets are pretty basic. It has headers just like the Goon sheet with rolls auto calculated to the matrix attribute + host rating.
+These sheets are pretty basic. It has headers just like the Grunt sheet with rolls auto calculated to the matrix attribute + host rating.
 
 
 * **Intrusion Countermeasures** repeating section works similar to other fields. The IC Limit, Defense Attribute, and Defense Matrix Attributes selects will let you pick appropriate info for you IC will will then be displayed in the roll template to assist with faster opposing rolls. They do not add additional functionality.
@@ -232,7 +231,7 @@ The sprite sheet functions much like the Host sheet. It has an additional Skills
 
 ### Vehicle
 
-This will work similar to the Goon sheet. One difference is under Bonuses that Data Processing, Firewall, and Device Rating will need you to input their appropriate ratings. Currently the Vehicle sheet does not have a functioning button for Pilot, Device Rating, and Firewall rolls. These will be added in a future update.
+This will work similar to the Grunt sheet. One difference is under Bonuses that Data Processing, Firewall, and Device Rating will need you to input their appropriate ratings. Currently the Vehicle sheet does not have a functioning button for Pilot, Device Rating, and Firewall rolls. These will be added in a future update.
 
 
 ## Helpful Macros
