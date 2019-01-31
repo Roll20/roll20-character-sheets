@@ -9764,7 +9764,7 @@
     var pfom = (function () {
         /* === GLOBAL VARIABLES === */
 
-        const pfoglobals_currentversion = 1.24;
+        const pfoglobals_currentversion = 1.25;
         var pfoglobals_i18n_obj = (function () {
             var obj = {};
             obj["strength"] = getTranslationByKey("str-u");
@@ -10327,7 +10327,7 @@
                             if(mancerdata["l1-class"].data["class_subclass" + subcls]) {
                                 // Ability bonus
                                 if(mancerdata["l1-class"].data["class_subclass" + subcls]["data-Ability bonus choice"]) {
-                                    // TODO
+                                    // Nothing to do. Already calculated.
                                 }
                                 //Saving Throw bonus
                                 if(mancerdata["l1-class"].data["class_subclass" + subcls]["data-Saving Throws bonus"]) {
@@ -11586,7 +11586,6 @@
                     update[`${repsec}${newrowid}_descflag`] = "{{descflag=[[1]]}}{{desc=@{description}}}";
                     update[`${repsec}${newrowid}_description`] = obj["Description"];
                 }
-                // TODO : pull from compendium (???) + callbacks
             });
             if(! _.isEmpty(update)) {
                 update["special_abilities_flag"] = 1;
@@ -12264,6 +12263,7 @@
             update[`${repsec}name`] = cdata["Name"];
             update[`${repsec}cost`] = (cdata["Cost"] || "");
             update[`${repsec}special`] = (cdata["Special"] || "");
+            update[`${repsec}slot`] = ((cdata["Slot"] || "none").toLowerCase() == "none") ? "" : (cdata["Slot"] || "");
             update[`${repsec}quantity`] = 1;
             update[`${repsec}weight`] = parseInt((cdata["Weight"] || "0").replace(/\D+/g, ""));
             update[`${repsec}weight_total`] = update[`${repsec}weight`];
@@ -14499,7 +14499,7 @@
 
                 // 2d10 rounds => /(\d+d\d+)( rounds)/gi => 2d10 rounds ([[2d10]])
 
-                // https://regex101.com/r/t2ZZ8t/1 TODO ?
+                // https://regex101.com/r/t2ZZ8t/1
                 /* Divine favor
                     +1 morale bonus on attack rolls and weapon damage rolls against that designated creature for every three caster levels you have (at least +1, maximum +3)
                     (\+\s*)(\d+)(.*?(?=bonus))(.+?(?=for every three caster levels))(for every three caster levels)(.+?(?=maximum))(maximum\s+\+)(\d+)(\s*\))
@@ -17163,10 +17163,8 @@
                     <input type="hidden" name="comp_class_gp" value="0" />
                     <label>
                         <span class="title" data-18n="starting-wealth:">Starting Wealth:</span>
-                        <input type="radio" class="sheet-pseudocheck" name="comp_class_wealth" value="starting" checked="checked" /><span></span><span class="class_wealth_starting class_text"></span>
+                        <input type="radio" class="sheet-pseudocheck" name="comp_class_wealth" value="starting" /><span></span><span class="class_wealth_starting class_text"></span>
                         <input type="radio" class="sheet-pseudocheck" name="comp_class_wealth" value="average" /><span></span><span class="class_wealth_average class_text"></span>
-                        <!-- <input type="radio" name="comp_class_wealth" value="starting" /> Starting
-                        <input type="radio" name="comp_class_wealth" value="average" /> Average -->
                     </label>
                     <div class="choice class_wealthroll_display">
                         <div class="flexrow">
@@ -19108,7 +19106,7 @@
         recalcData("class-or-skills");
     });
     on("mancerchange:class_wealth", (eventinfo) => {
-            // console.log("*** DEBUG mancerchange:class_wealth: " + JSON.stringify(eventinfo,null,"  "));
+            console.log("*** DEBUG mancerchange:class_wealth: " + JSON.stringify(eventinfo,null,"  "));
             let mancerdata = getCharmancerData();
             let values = {};
             let update = {};
@@ -19228,6 +19226,7 @@
                     let tmpint = 0;
 
                     if(mncrDebugMode) {console.log("*** DEBUG class raw data:" + JSON.stringify(data,null,"  "));}
+                    console.log("*** DEBUG class raw data:" + JSON.stringify(data,null,"  "));
 
                     if(!(eventinfo.newValue === "" || eventinfo.newValue === undefined)) {
                         showList.push("class_always");
@@ -19279,8 +19278,15 @@
                         if(mancerdata["l1-class"].values.class_wealth == "average") {
                             update["class_gp_display"] = "";
                         } else {
+                            values["class_wealth"] = "starting";
                             showList.push("class_wealthroll_display");
                             update["class_gp_display"] = (parseInt(mancerdata["l1-class"].values.class_gp) || 0) + " gp";
+                        }
+                    } else {
+                        if(data["data-Starting Wealth"]){
+                            values["class_wealth"] = "starting";
+                        } else {
+                            values["class_wealth"] = "average";
                         }
                     }
                     if(data["data-Base Attack Bonus"]) {
@@ -19422,7 +19428,7 @@
                             }
                         }
                     }
-
+                    console.log("*** DEBUG PRINT class chg:values: " + JSON.stringify(values,null,"  "));
                     setAttrs(values, () => {
                         setCharmancerText(update);
                         showChoices(showList);
