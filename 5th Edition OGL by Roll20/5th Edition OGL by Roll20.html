@@ -6389,23 +6389,25 @@
         }
     });
 
-    on("change:repeating_inventory:hasattack", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {
-            return;
-        }
+    on(`change:repeating_inventory:hasattack`, function(eventinfo) {
+        if(eventinfo.sourceType === "sheetworker") {return;};
 
-        var itemid = eventinfo.sourceAttribute.substring(20, 40);
-        getAttrs(["repeating_inventory_" + itemid + "_hasattack", "repeating_inventory_" + itemid + "_itemattackid"], function(v) {
-            var attackid = v["repeating_inventory_" + itemid + "_itemattackid"];
-            var hasattack = v["repeating_inventory_" + itemid + "_hasattack"];
-            if(attackid && attackid != "" && hasattack == 0) {
-                remove_attack(attackid);
-            }
-            else if(hasattack == 1) {
-                create_attack_from_item(itemid);
-            };
+        const itemid = eventinfo.sourceAttribute.substring(20, 40);
+        getAttrs([`repeating_inventory_${itemid}_itemattackid`], function(v) {
+            const hasattack = eventinfo.newValue, itemattackid = v[`repeating_inventory_${itemid}_itemattackid`];
+            (hasattack == 1) ? create_attack_from_item(itemid) : remove_attack(itemattackid);
         });
-    })
+    });
+
+    on(`change:repeating_inventory:useasresource`, function(eventinfo) {
+        if(eventinfo.sourceType === "sheetworker") {return;};
+
+        const itemid = eventinfo.sourceAttribute.substring(20, 40);
+        getAttrs([`repeating_inventory_${itemid}_itemresourceid`], function(v) {
+            const useasresource = eventinfo.newValue, itemresourceid = v[`repeating_inventory_${itemid}_itemresourceid`];
+            (useasresource == 1) ? create_resource_from_item(itemid) : remove_resource(itemresourceid);
+        });
+    });
 
     on("change:repeating_inventory:itemname change:repeating_inventory:itemproperties change:repeating_inventory:itemmodifiers change:repeating_inventory:itemcount", function(eventinfo) {
         if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
@@ -6422,24 +6424,6 @@
             if(resourceid) {
                 update_resource_from_item(itemid, resourceid);
             }
-        });
-    });
-
-    on("change:repeating_inventory:useasresource", function(eventinfo) {
-        if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
-            return;
-        }
-
-        var itemid = eventinfo.sourceAttribute.substring(20, 40);
-        getAttrs(["repeating_inventory_" + itemid + "_useasresource", "repeating_inventory_" + itemid + "_itemresourceid"], function(v) {
-            var useasresource = v["repeating_inventory_" + itemid + "_useasresource"];
-            var resourceid = v["repeating_inventory_" + itemid + "_itemresourceid"];
-            if(useasresource == 1) {
-                create_resource_from_item(itemid);
-            }
-            else {
-                remove_resource(resourceid);
-            };
         });
     });
 
