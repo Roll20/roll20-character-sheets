@@ -15,25 +15,25 @@
 		</div>
 	</div>
 	<div class="tab-whisper">
-		<input type="radio" name="attr_gm_toggle" value="" checked="checked" title="@{gm_toggle}" /><span data-i18n="public">Public</span>
-		<input type="radio" name="attr_gm_toggle" value="/w gm" title="@{gm_toggle}" /><span data-i18n="gm">To GM</span>
+		<input type="hidden" name="attr_gm_toggle" value=" " /><button type="action" name="act_whisper" title="whisper">/w GM</button>
 	</div>
-	<div class="tab-toggles">			
-		<input type="checkbox" name="attr_wound_toggle" value="@{wounds}" checked="checked" title="@{wound_toggle}" /><span data-i18n="wounds">Wounds</span>
-		<input type="checkbox" name="attr_modifier_toggle" value="?{Modifiers +/-|0}" title="@{modifier_toggle}" /><span data-i18n="modifiers">Modifiers</span>
-		<input type="checkbox" name="attr_edge_toggle" value="@{edge}" title="@{edge_toggle}"/><span data-i18n="edge">Edge</span>
+	<div class="tab-toggles">
+		<input type="hidden" name="attr_wound_toggle" value="@{wounds}" /><button type="action" name="act_wound" title="@{wound_toggle}" data-i18n="wounds">wounds</button>
+		<input type="hidden" name="attr_modifier_toggle" value="?{Modifiers +/-|0}" /><button type="action" name="act_modifier" title="@{modifier_toggle}" data-i18n="modifiers">modifiers</button>
+		<input type="hidden" name="attr_edge_toggle" value="@{edge}" /><button type="action" name="act_edge" title="@{edge_toggle}" data-i18n="edge">edge</button>
 		<button type='roll' value="@{gm_toggle} &{template:rolls}{{header=Dice Roll}}{{base=Rolling dice}}{{dice=[[(?{Base d6s|0}d6>5)]]}}" title="Roll D6s"><span class="d6">L</span></button>
 	</div>
 	<div class="tab-col">
-		<input type="radio" name="attr_tab" value="core" title="Core Sheet" /><span data-i18n="core">Core</span>
-		<input type="radio" name="attr_tab" value="arms" title="Arms"/><span data-i18n="arms">Arms</span>
-		<input type="radio" name="attr_tab" value="augs" title="Augs"/><span data-i18n="augs">Augs</span>
-		<input type="radio" name="attr_tab" value="gear" title="Gear"/><span data-i18n="gear">Gear</span>
-		<input type="radio" name="attr_tab" value="magic" title="Magic"/><span data-i18n="magic">Magic</span>
-		<input type="radio" name="attr_tab" value="matrix" title="Matrix"/><span data-i18n="matrix">Matrix</span>
-		<input type="radio" name="attr_tab" value="social" title="Social"/><span data-i18n="social">Social</span>
-		<input type="radio" name="attr_tab" value="vehicle" title="Vehicle"/><span data-i18n="vehicle">Vehicle</span>
-		<input type="radio" name="attr_tab" value="options" title="Sheet Options" checked="checked"/><span>y</span>
+		<input type="hidden" name="attr_tab" value="core" />
+		<button type="action" name="act_tab_core" title="@{tab}" data-i18n="core">core</button>
+		<button type="action" name="act_tab_arms" title="@{tab}" data-i18n="arms">arms</button>
+		<button type="action" name="act_tab_augs" title="@{tab}" data-i18n="augs">augs</button>
+		<button type="action" name="act_tab_gear" title="@{tab}" data-i18n="gear">gear</button>
+		<button type="action" name="act_tab_magic" title="@{tab}" data-i18n="magic">magic</button>
+		<button type="action" name="act_tab_matrix" title="@{tab}" data-i18n="matrix">matrix</button>
+		<button type="action" name="act_tab_social" title="@{tab}" data-i18n="social">social</button>
+		<button type="action" name="act_tab_vehicle" title="@{tab}" data-i18n="vehicle">vehicle</button>
+		<button type="action" name="act_tab_options" title="@{tab}">y</button>
 	</div>
 	<div class="tab-sheet">
 		<select name="attr_sheet_type" title="Sheet Type">
@@ -3017,964 +3017,1001 @@
 
 <!--Sheet Worker-->
 <script type="text/worker">
-//Sheet open for future versioning
-on('sheet:opened', function(eventinfo) {
-	getAttrs(["version"], function(v) {
-		console.log("SHADOWRUN 5TH EDITION SHEET: VERSION: " + v.version);
-		if (v.version != "1.35") {
-			setAttrs({version : "1.35"});
-		};
-	});
-});
+	//Sheet open versioning
+		on("sheet:opened", function(eventinfo) {
+			getAttrs(["version"], (v) => {
+				const version = v["version"];
+				versioning(version);
+			 });
+		});			
 
-//Watch for Updates and Run the needed functions
-	on("change:body", function() {
-		update_liftCarry();
-		update_overflow();
-		update_soak();
-		const track = "physical"; update_track(track);
-		const type = "physical"; update_limit(type);
-	});
-
-	on("change:agility", function() {
-		update_movement();
-	});
-
-	on("change:strength", function() {
-		update_liftCarry();
-		const type = "physical"; update_limit(type);
-	});
-
-	on("change:reaction", function() {
-		update_defense();
-		update_initiative();
-		const type = "physical"; update_limit(type);
-	});
-
-	on("change:intuition", function() {
-		update_defense();
-		update_initiative();
-		update_judgeIntentions();
-		const type = "mental"; update_limit(type);
-	});
-
-	on("change:willpower", function() {
-		update_composure();
-		update_memory();
-		const track = "stun"; update_track(track);
-		const type = "social"; update_limit(type);
-	});
-
-	on("change:willpower", function() {
-		const type = "mental"; update_limit(type);
-	});
-	
-	on("change:logic", function() {
-		update_memory();
-		const type = "mental"; update_limit(type);
-	});
-
-	on("change:charisma", function() {
-		update_composure();
-		update_judgeIntentions();
-
-		const type = "social"; update_limit(type);
-	});
-
-	on("change:essence", function() {
-		const type = "social"; update_limit(type);
-	});
-
-	on("change:lift_carry_modifier", function() {
-		update_liftCarry();
-	});
-
-	on("change:physical_modifier change:flag_drone", function() {
-		const track = "physical"; update_track(track);
-	});
-
-	on("change:stun_modifier", function() {
-		const track = "stun"; update_track(track);
-	});
-
-	on("change:initiative_modifier change:initiative_temp change:initiative_temp_flag", function() {
-		update_initiative();
-	});
-
-	on("change:defense_modifier change:defense_temp change:defense_temp_flag", function () {
-		update_defense();
-	});
-
-	on("change:armor_rating change:soak_modifier change:soak_temp change:soak_temp_flag", function () {
-		update_soak();
-	});
-
-	on("change:mental_limit_modifier change:mental_limit_temp change:mental_limit_temp_flag change:physical_limit_modifier change:physical_limit_temp change:physical_limit_temp_flag change:social_limit_modifier change:social_limit_temp change:social_limit_temp_flag", function (eventinfo) {
-		const type = eventinfo.sourceAttribute.split("_")[0]; update_limit(type);
-	});
-
-	on("change:composure_modifier", function () {
-		update_composure();
-	});
-
-	on("change:judge_intentions_modifier", function () {
-		update_judgeIntentions();
-	});
-
-	on("change:memory_modifier", function () {
-		update_memory();
-	});
-
-	on("change:walk_modifier change:run_modifier", function () {
-		update_movement();
-	});
-
-	on("change:pain_tolerance", function () {
-		update_wounds();
-	});
-
-//Calculate ATTRIBUTES
-   ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition','charisma','magic', 'resonance',
-    ].forEach(attr => {
-        // Attach listener
-        on(`change:${attr}_base change:${attr}_modifier change:${attr}_temp change:${attr}_temp_flag`, function() {
-            // Load attribute values
-            getAttrs([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`, `${attr}_temp_flag`], function(v) {
-                // Do some math to calculate the total
-	            const bas = parseInt(v[`${attr}_base`]) || 0;
-	            const mod = parseInt(v[`${attr}_modifier`]) || 0;
-              	const tem = (v[`${attr}_temp_flag`] === "on") ? parseInt(v[`${attr}_temp`]) || 0 : 0;
-                const bon = mod + tem;
-                const stat = bas + bon;
-
-                // Update the finalized total
-                setAttrs({
-                    [attr]: stat,
-                    [`display_${attr}`]: bon === 0 ? bas : `${bas} (${stat})`
+	    const versioning = (version) => {
+        	console.log(`Shadowrun 5th Edition version ${version}`);
+            /*if (version === "1.36") {
+                setAttrs({version: "1.37"});
+            } else if (version === "1.35") {
+            	getAttrs(["sheet_type"], (v) => {
+            		let update = {};
+            		(v.sheet_type === "goon") ? update["sheet_type"] = "grunt" : false;
+            		setAttrs(update);
+            	});
+                setAttrs({version: "1.36"}, () => {
+                	versioning("1.36");
                 });
-            });
-        });
-    });
-
-//Calculate OVERFLOW
-	var update_overflow = function () {
-		getAttrs(["body", "overflow_modifier"], function(v) {
-			var bas = parseInt(v.body) || 0;
-			var mod = parseInt(v.overflow_modifier) || 0;
-
-			setAttrs({overflow: bas + mod});
-		});
-	};
-
-//Calculaute limts
-	const update_limit = (type)  => {
-		let attrs = [`${type}_limit_modifier`, `${type}_limit_temp`, `${type}_limit_temp_flag`];
-
-		if (type === "mental") {
-			attrs.push("intuition", "willpower", "logic");
-		} else if (type === "physical") {
-			attrs.push("body", "reaction", "strength");
-		} else {
-			attrs.push("essence", "willpower", "charisma");
-		};
-
-		getAttrs(attrs, function(v) {
-			const attr1 = attrs[3], attr2 = attrs[4], attr3 = attrs[5];
-			const stat1 = (attr1 === "essence") ? Math.ceil(v[`${attr1}`]) || 0 : parseInt(v[`${attr1}`]) || 0; //Essence, Intuition, Body
-			const stat2 = parseInt(v[`${attr2}`]) || 0; //Willpower, Reaction
-			const stat3 = parseInt(v[`${attr3}`]) || 0; //Logic, Strenght, Charisma
-
-			const mod = parseInt(v[`${type}_limit_modifier`]) || 0;
-			const tem = (v[`${type}_limit_temp_flag`] === "on") ? parseInt(v[`${type}_limit_temp_flag`]) || 0 : 0;
-
-			const tot = ((stat1 + stat2 + (stat3 * 2))/3);
-			const update = Math.ceil(tot) + (mod + tem);
-
-			setAttrs({[`${type}_limit`]: update});
-		});
-	};
-
-//Calculate Common Rolls
-	//DEFENSE POOL
-		var update_defense = function () {
-			getAttrs(["reaction", "intuition", "defense_modifier", "defense_temp", `defense_temp_flag`], function(v){
-				const rea = parseInt(v.reaction) || 0, int = parseInt(v.intuition) || 0, mod = parseInt(v.defense_modifier) || 0;
-				const tem = (v.defense_temp_flag === "on") ? parseInt(v.defense_temp) || 0 : 0;
-				const tot = rea + int + mod + tem;
-
-				setAttrs({defense: tot});
-			});
-		};
-
-	//SOAK POOLS
-		var update_soak = function () {
-			getAttrs(["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`], function(v) {
-				const bod = parseInt(v.body) || 0, arm = parseInt(v.armor_rating) || 0, mod = parseInt(v.soak_modifier) || 0;
-				const tem = (v.soak_temp_flag === "on") ? parseInt(v.soak_temp) || 0 : 0;
-				const tot = bod + arm + mod + tem;
-
-				setAttrs({soak: tot});
-			});
-		};
-
-		//This function checks changes to repeating_armor and updates the Primary Armor if needed
-		on("change:repeating_armor", function(eventInfo) {
-			const source = eventInfo.sourceAttribute;
-			const newV = eventInfo.newValue;
-			const arm = ["repeating_armor"];
-
-			//Check if the event was related to the primary flag
-			if (source.includes('primary')) {
-				//Check if the primary flag is set to primary
-				if (newV === 'primary') {
-					//Get attributes from the repeating_armor
-					getAttrs([`${arm}_name`, `${arm}_rating`, `${arm}_acid_modifier`, `${arm}_electrical_modifier`, `${arm}_cold_modifier`,`${arm}_fire_modifier`, `${arm}_radiation_modifier`, `${arm}_dicepool_modifier`], function(v) {
-						let update = {};
-						//Update the hidden static Primary Armor attributes with the repeating_armor attributes
-		                update["armor_name"] = v[`${arm}_name`];
-		                if (v[`${arm}_rating`]) {update["armor_rating"] = v[`${arm}_rating`]};
-						if (v[`${arm}_dicepool_modifier`]) {update["soak_modifier"] = v[`${arm}_dicepool_modifier`]};
-						if (v[`${arm}_acid_modifier`]) {update["acid_modifier"] = v[`${arm}_acid_modifier`]};
-						if (v[`${arm}_cold_modifier`]) {update["cold_modifier"] = v[`${arm}_cold_modifier`]};
-						if (v[`${arm}_electrical_modifier`]) {update["electrical_modifier"] = v[`${arm}_electrical_modifier`]};
-						if (v[`${arm}_fire_modifier`]) {update["fire_modifier"] = v[`${arm}_fire_modifier`]};
-						if (v[`${arm}_radiation_modifier`]) {update["radiation_modifier"] = v[`${arm}_radiation_modifier`]};
-
-		            	setAttrs(update);
-		            });
-
-					//Set the other repeating_armor primary flags to 0 aka unchecked
-		            getSectionIDs(`${arm}`, function(ids) {
-				        let IDs = [];
-				        let update = {};
-
-				        for(var i=0; i < ids.length; i++) {
-				            IDs.push(`${arm}_` + ids[i] + "_primary");
-			        	};
-
-			        	IDs.forEach(id => {
-			        		if (id != source) {
-			        			update[`${id}`] = 0;
-			        		};
-			        	});
-
-			        	setAttrs(update);
-			        });
-				};
-			//Check if the event was for a relevant Primary Armor attribute
-			} else if (source.includes('name') || source.includes('rating') || source.includes('dicepool') || source.includes('acid') || source.includes('cold') || source.includes('electrical') || source.includes('fire') || source.includes('radiation')) {
-				//Get the primary flag attribute for this armor. Also get the repeating_armor attribute we'll need for an update, doing it now is more efficient.
-				getAttrs([`${arm}_primary`, `${source}`], function(v) {
-					//Check if this armor is the designated Primary Armor.
-					if (v[`${arm}_primary`] === 'primary') {
-						let update = {};
-						//Apply the repeating_armor attribute to its static counterpart
-						switch (true) {
-							case /name/.test(source): update["armor_name"] = v[`${source}`]; break;
-							case /rating/.test(source): update["armor_rating"] = v[`${source}`]; break;
-							case /dicepool/.test(source): update["soak_modifier"] = v[`${source}`]; break;
-							case /acid/.test(source): update["acid_modifier"] = v[`${source}`]; break;
-							case /cold/.test(source): update["cold_modifier"] = v[`${source}`]; break;
-							case /electrical/.test(source): update["electrical_modifier"] = v[`${source}`]; break;
-							case /fire/.test(source): update["fire_modifier"] = v[`${source}`]; break;
-							case /radiation/.test(source): update["radiation_modifier"] = v[`${source}`]; break;
-							default: console.log(`Source  ${source} was invalid`);}
-
-						setAttrs(update);
-					};
-				});
-			} else {
-				console.log("CHANGE NOT RELEVENT Primary Armor");
-			};
-		});
-
-	var update_liftCarry = function () {
-		getAttrs(["body", "strength", "lift_carry_modifier"], function(v) {
-			var attrOne = parseInt(v.body) || 0;
-			var attrTwo = parseInt(v.strength) || 0;
-			var mod = parseInt(v.lift_carry_modifier) || 0;
-
-			setAttrs({lift_carry: attrOne + attrTwo + mod});
-		});
-	};
-
-	var update_composure = function () {
-		getAttrs(["charisma", "willpower", "composure_modifier"], function(v) {
-			var attrOne = parseInt(v.charisma) || 0;
-			var attrTwo = parseInt(v.willpower) || 0;
-			var mod = parseInt(v.composure_modifier) || 0;
-
-			setAttrs({composure: attrOne + attrTwo + mod});
-		});
-	};
-	
-	var update_judgeIntentions = function () {
-		getAttrs(["charisma", "intuition", "judge_intentions_modifier"], function(v) {
-			var attrOne = parseInt(v.charisma) || 0;
-			var attrTwo = parseInt(v.intuition) || 0;
-			var mod = parseInt(v.judge_intentions_modifier) || 0;
-
-			setAttrs({judge_intentions: attrOne + attrTwo + mod});
-		});
-	};
-
-
-	var update_memory = function () {
-		getAttrs(["logic", "willpower", "memory_modifier"], function(v) {
-			var attrOne = parseInt(v.logic) || 0;
-			var attrTwo = parseInt(v.willpower) || 0;
-			var mod = parseInt(v.memory_modifier) || 0;
-
-			setAttrs({memory: attrOne + attrTwo + mod});
-		});
-	};
-
-//Calculate Movement Rates
-	var update_movement = function () {
-		getAttrs(["agility", "walk_modifier", "run_modifier"], function(v) {
-			const agi = parseInt(v.agility) || 0, wmod = parseInt(v.walk_modifier) || 0, rmod = parseInt(v.run_modifier) || 0;
-			let update = {};
-			update["walk"] = (agi * 2) + wmod;
-			update["run"] = (agi * 4) + rmod;
-			setAttrs(update);
-		});
-	};
-
-//Update condition tracks
-	const update_track = (track) => {
-		let attrs = [`${track}_modifier`, `${track}_damage`];
-		(track === "stun") ? attrs.push("willpower") : attrs.push("body", "sheet_type", "flag_drone");
-
-		getAttrs(attrs, function(v){
-			const attr1 = attrs[2], stat1 = parseInt(v[`${attr1}`]) || 0; //Willpower or Body
-			const mod = parseInt(v[`${track}_modifier`]) || 0;
-			const dam = parseInt(v[`${track}_damage`]) || 0;
-			let update = {};
-
-			if (track === "stun" || v["sheet_type"] === "pc" || v["sheet_type"] === "grunt") {
-				tot = Math.ceil(stat1/2) + 8 + mod;
-			} else if (v["sheet_type"] === "vehicle" && v["flag_drone"]  === "drone") {
-				tot = (Math.ceil(stat1/2) + 6 + mod);
-			} else if (v["sheet_type"] === "vehicle") {
-				tot = (Math.ceil(stat1/2) + 12 + mod);
-			} else {
-				tot = 0; //Sprites don't have Stun or Physical track
-			};
-
-			const current = (dam != 0) ? tot - dam : tot;
-
-			update[`${track}`] = current;
-			update[`${track}_max`] = tot;
-
-			setAttrs(update, {silent:true}); 
-		});
-	};
-
-//Calculate Device Rating Track
-	on("change:device_rating change:matrix_modifier", function() {
-		getAttrs(["device_rating","matrix_modifier","matrix"], function(v){
-			const dev = parseInt(v.device_rating) || 0, mod = parseInt(v.matrix_modifier) || 0;
-			const dam = parseInt(v.matrix) || 0;
-			const tot = Math.ceil(dev/2) + 8 + mod;
-			const current = (dam > 0) ? dam : tot;
-
-			setAttrs({matrix: current});
-			setAttrs({matrix_max: tot});
-		});
-	});
-
-//Convert physical into the physical damage track boxes and reverse
-	['physical', 'stun'].forEach(attr => {
-		on(`change:${attr} change:${attr}_damage`, function(eventinfo) {
-			getAttrs([`${attr}`, `${attr}_damage`, `${attr}_max`], function(v) {
-				const stat = parseInt(v[`${attr}`]) || 0, dam = parseInt(v[`${attr}_damage`]) || 0, max = parseInt(v[`${attr}_max`]) || 0, source = eventinfo.sourceAttribute;
-				const wou = (source === `${attr}`) ? max - stat : max - dam;
-
-				if (source === `${attr}`) {
-					(dam === wou) ? false : ((stat < max && dam != wou) ? setAttrs({[`${attr}_damage`]: wou}, {silent: true}) : setAttrs({[`${attr}_damage`]: 0}, {silent: true}));
-				} else {
-					(stat === wou) ? false : setAttrs({[`${attr}`]: wou}, {silent: true});
-				};
-
-				update_wounds();
-			});
-		});
-	});
-
-const update_wounds = () => {
-	getAttrs(["stun_damage", "physical_damage", "pain_tolerance"], function(v) {
-		const stu = parseInt(v.stun_damage) || 0, phy = parseInt(v.physical_damage) || 0, pai = parseInt(v.pain_tolerance) || 0;
-		lowP = (pai < 0) ? 2 : 3;
-		highPhy = (pai > 0) ? phy - pai : phy;
-		highStu = (pai > 0) ? stu - pai : stu;
-		pMod = (phy > 0) ? (Math.floor(highPhy/lowP)) : 0;
-		sMod = (stu > 0) ? (Math.floor(highStu/lowP)) : 0;
-		wou = Math.floor(-(pMod) + -(sMod));
-		
-		setAttrs({wounds: wou});
-	});
-};
-
-//Calculate Initiatves
-	var update_initiative = function () {
-		getAttrs(["reaction", "intuition", "initiative_modifier", "initiative_temp", "initiative_temp_flag"], function(v){
-			const rea = parseInt(v.reaction) || 0;
-			const int = parseInt(v.intuition) || 0;
-			const mod = parseInt(v.initiative_modifier) || 0;
-			const tem = (v.initiative_temp_flag === "on") ? parseInt(v.initiative_temp) || 0 : 0;
-			const bas = rea + int;
-			const tot = rea + int + mod + tem;
-			let update = {};
-			update["initiative_mod"] = tot;
-			(mod != 0) ? update["display_initiative_mod"] = bas + " (" + tot + ")" : update["display_initiative_mod"] = bas;
-			setAttrs(update);
-		});
-	};
-
-	on("change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag", function () {
-		getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], function(v){
-			const mod = parseInt(v.initiative_dice_modifier) || 0;
-			const tem = (v.initiative_dice_temp_flag === "on") ? parseInt(v.initiative_dice_temp) || 0 : 0;
-			const bas = mod + tem;
-			const tot = Math.min(bas+1,5);
-			edg = (v.edge_toggle == 0) ? tot : 5;
-
-			setAttrs({initiative_dice: edg});
-		});
-	});
-
-	//Calculate Astral Initiatve
-	on("change:intuition change:astral_mod_modifier", function() {
-		getAttrs(["intuition", "astral_mod_modifier"], function(v) {
-			var int = parseInt(v.intuition) || 0;
-			var mod = parseInt(v.astral_mod_modifier) || 0;
-			var bas = int * 2;
-			var tot = (int * 2) + mod;
-
-			setAttrs({astral_mod: tot});
-			(mod != 0) ? setAttrs({display_astral_mod: bas + " (" + tot + ")"}) : setAttrs({display_astral_mod: bas});
-		});
-	});
-
-	on("change:astral_dice_modifier change:edge_toggle", function () {
-		getAttrs(["astral_dice_modifier", "edge_toggle"], function(v){
-			var mod = parseInt(v.astral_dice_modifier) || 0;
-			var tot = Math.min(mod+3,5);
-			edg = (v.edge_toggle == 0) ? tot : 5;
-
-			setAttrs({astral_dice: edg});
-		});
-	});
-
-//Calculate Matrix Initiatve.
-	on("change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle", function() {
-		getAttrs(["sheet_type", "data_processing", "pilot", "intuition", "matrix_mod_modifier", "host_rating", "level", "matrix_dice_modifier", "edge_toggle"], function(v) {
-			var dat = parseInt(v.data_processing) || 0;
-			var pil = parseInt(v.pilot) || 0;
-			var int = parseInt(v.intuition) || 0;
-			var mat = parseInt(v.matrix_mod_modifier) || 0;
-			var hos = parseInt(v.host_rating) || 0;
-			var lev = parseInt(v.level) || 0;
-			var dic = parseInt(v.matrix_dice_modifier) || 0;
-			let update = {};
-
-			dice = 	(v.sheet_type === "grunt" && v.edge_toggle == 0) ? 4 + dic : 
-					((v.sheet_type === "grunt" && v.edge_toggle != 0) ? 5 :
-					4);
-
-			tot = (v.sheet_type === "vehicle") ? dat + pil :
-				  (v.sheet_type === "host") ? dat + hos :
-				  (v.sheet_type === "sprite") ? dat + lev + mat :
-				  dat + int + mat;
-
-			bas = (v.sheet_type === "sprite") ? dat + lev : dat + int ;
-
-			update["matrix_mod"] = tot;
-			update["matrix_dice"] = dice;
-
-			(mat != 0) ? update["display_matrix_mod"] = bas + " (" + tot + ")" : update["display_matrix_mod"] = tot;
-
-			setAttrs(update);
-		});
-	});
-
-//Edge toggle to include ! for exploding dice
-	on("change:edge_toggle", function() {
-		getAttrs(["edge_toggle"], function(v){
-			edg = (v.edge_toggle != 0) ? "!" : "";
-
-			setAttrs({explode_toggle: edg});
-		});
-	});
-
-//Calculate Reset Condition Track
-	on("change:cond_reset", function() {
-		getAttrs(["sheet_type","physical_max","stun_max", "matrix_max"], function(v){
-			var phy = parseInt(v.physical_max) || 0;
-			var stun = parseInt(v.stun_max) || 0;
-			var mat = parseInt(v.matrix_max) || 0;
-			let update = {};
-
-			if (v.sheet_type === "grunt" || v.sheet_type === "pc") {
-				update["physical"] = phy;
-				update["stun"] = stun;
-			} else if (v.sheet_type === "sprite") {
-				update["matrix"] = mat;
-			} else if (v.sheet_type === "vehicle") {
-				update["physical"] = phy;
-				update["matrix"] = mat;
-			} else {
-				return "Not a grunt or vehicle";
-			};
-
-			setAttrs(update);
-		});
-	});	
-
-//Weapon displays set into an Array
-	// Builder function to display details properly
-	// Note that since undefined are falsey if there's no label or sign we can leave the parameters blank
-	function repeatingStringBuilder(v, keyBase) {
-	    return function(key, label, sign) {
-	        // fetch the attr from v checking if it has a value
-	        const val = v[`${keyBase}${key}`];
-	        if (!val) return '';
-
-	        // Apply the sign if needed
-	        const disp = sign && val > 0 ? `+${val}` : val;
-
-	        // Apply label if needed
-	        return label ? `${label} ${disp}` : disp;
-	    }
-	}
-
-on("change:repeating_weapon", function() {
-    getAttrs(["repeating_weapon_weapon_range", "repeating_weapon_weapon_melee", "repeating_weapon_weapon_type", "repeating_weapon_weapon_reach", "repeating_weapon_weapon_acc", "repeating_weapon_weapon_dv", "repeating_weapon_weapon_ap", "repeating_weapon_weapon_mode", "repeating_weapon_weapon_rc", "repeating_weapon_weapon_ammo", "repeating_weapon_weapon_note"], function(v){
-        // Local builder putting the needed variables into scope for repeatingStringBuilder
-        const b = repeatingStringBuilder(v, 'repeating_weapon_weapon_');
-        // Determine fields to display and in their proper order and formatting
-        // Anonymous function is purely stylistic and adds more overhead than just a simple switch/case.  Personally I find the function looks cleaner and hides any internal scope that might conflict with outside
-        const display = (function() {
-            // 0 for weapon_range is a ranged weapon. A 1 is a melee weapon.
-            switch(v.repeating_weapon_weapon_range) {
-                case '0':
-                // Not a fan of how ammo has to be handled.  Could potentially be placed in the repeatingStringBuilder if used more often for other change:repeating functions as some sort of suffix parameter
-                const ammo = b('amm');
-                return [
-                    b('type'),
-                    b('acc', 'ACC'),
-                    b('dv', 'DV'),
-                    b('ap', 'AP', true),
-                    b('mode'),
-                    b('rc', 'RC'),
-                    ammo ? `${ammo} (c)` : '',
-                    b('note')
-                ];
-                case '1': return [
-                    b('type'),
-                    b('reach', 'Reach', true),
-                    b('acc', 'ACC'),
-                    b('dv', 'DV'),
-                    b('ap', 'AP', true),
-                    b('note')
-                ];
-                default: return [
-                    b('type'),
-                    b('acc', 'ACC'),
-                    b('dv', 'DV'),
-                    b('ap', 'AP', true),
-                    b('note')
-                ];
-            }
-        })()
-            // Remove all empty strings
-            .filter(s => s)
-            // Concat all the strings and add comma between
-            .join(', ');
-
-        // Finally wrap square brackets around the weapon display
-        setAttrs({repeating_weapon_weapon: `[${display}]`});
-    });
-});
-
-//Spell displays set into an Array
-	on("change:repeating_NPCspell", function() {
-	    getAttrs(["repeating_NPCspell_combat_type", "repeating_NPCspell_type", "repeating_NPCspell_range", "repeating_NPCspell_damage", "repeating_NPCspell_duration", "repeating_NPCspell_drain", "repeating_NPCspell_note", ], function(v){
-	        var com = (v.repeating_NPCspell_combat_type);
-	        var typ = "Type " + (v.repeating_NPCspell_type) + ", ";
-			var ran = (v.repeating_NPCspell_range) + ", ";
-			var dam = "Damage " + (v.repeating_NPCspell_damage) + ", ";
-			var dur = "Duration " + (v.repeating_NPCspell_duration) + ", ";
-			var not = (v.repeating_NPCspell_note);
-			dra = (v.repeating_NPCspell_drain > 0) ? ("F" + "+" + (v.repeating_NPCspell_drain) + ", ") : 
-				  ((v.repeating_NPCspell_drain < 0) ? ("F" + (v.repeating_NPCspell_drain) + ", ") :
-				  ("F" + ", "));
-			display = (com === "Direct, Force ") ? (" (Direct) " + "[" + typ + ran + dam + dur + dra + not + "]") :
-					  ((com === "Indirect, Force ?{Force|}, AP -") ? (" (Indirect) " + "[" + typ + ran + dam + dur + dra + not + "]") :
-					  (" [" + typ + ran + dur + dra + not + "]"));
-	        setAttrs({repeating_NPCspell_spell: display});
-	    });
-	});
-
-//Complex Form displays  set into an Array
-	on("change:repeating_form", function() {
-	    getAttrs(["repeating_form_form_duration", "repeating_form_form_target", "repeating_form_form_fade", "repeating_form_form_note", ], function(v){
-	    	var tar = "Target " + (v.repeating_form_form_target) + ", ";
-			var dur = "Duration " + (v.repeating_form_form_duration) + ", ";
-			var not = (v.repeating_form_form_note);
-
-			fad = (v.repeating_form_form_fade > 0) ? ("L" + "+" + (v.repeating_form_form_fade) + ", ") : 
-				  ((v.repeating_form_form_fade < 0) ? ("L" + (v.repeating_form_form_fade) + ", ") :
-				  ("L" + ", "));
-
-			var display = (" [" + tar + dur + fad + not + "]");
-
-	        setAttrs({repeating_form_form: display});
-	    });
-	});
-
-//IC displays are set into an Array
-	on("change:repeating_IC", function() {
-	    getAttrs(["attack", "data_processing", "repeating_IC_IC_limit", "repeating_IC_IC_attribute", "repeating_IC_IC_matrix", "repeating_IC_IC_note"], function(v){
-	    	var att = parseInt(v.attack) || 0;
-	    	var data = parseInt(v.data_processing) || 0;
-			var attr = (v.repeating_IC_IC_attribute);
-			var mat = (v.repeating_IC_IC_matrix);
-			var not = (v.repeating_IC_IC_note);
-
-			display = (v.repeating_IC_IC_limit === "@{data_processing}") ? (" (" + "[" + data + "]" + " vs. " + attr + " + " + mat + ", " + not + ")") : (" (" + "[" + att + "]" + " vs. " + attr + " + " + mat + ", " + not + ")");
-
-	        setAttrs({repeating_IC_IC: display});
-	    });
-	});
-
-//IC  Attack Dice & Condition Track
-	on("change:host_rating", function() {
-		getAttrs(["host_rating"], function(v) {
-			var hos = parseInt(v.host_rating) || 0;
-			var tot = 8 + Math.ceil(hos/2);
-			var atk = Math.min(hos + hos);
-
-			setAttrs({matrix: tot});
-			setAttrs({ic_attack: atk});
-		});
-	});
-
-//Sprite Condition Track
-	on("change:level", function() {
-		getAttrs(["level"], function(v) {
-			var lev = parseInt(v.level) || 0;
-			var tot = 8 + Math.ceil(lev/2);
-
-			setAttrs({matrix: tot});
-		});
-	});
-
-//REFACTORED Skills
-  	[	'repeating_active',
-		'repeating_knowledge',
-		'repeating_language'
-    ].forEach(field => {
-        // Attach listener
-        on(`change:${field}`, function(eventInfo) {
-        
-        	const source = eventInfo.sourceAttribute;
-        	const type = eventInfo.sourceType;
-
-        	if (source.includes("rating")) {
-        		getAttrs([`${field}_rating`, `${field}_rating_modifier`], function(v) {
-        			const bas = parseInt(v[`${field}_rating`]) || 0;
-					const mod = parseInt(v[`${field}_rating_modifier`]) || 0;
-					const tot = bas + mod;
-
-                    setAttrs({
-                        [`${field}_dicepool`]: tot,
-                        [`${field}_display_rating`]: mod === 0 ? bas : `${bas} (${tot})`
-                    });
-        		});
-        	} else if (source.includes("attribute") && type === "player") {
-        		getAttrs([`${source}`], function(v) {;
-        			const attr = v[`${source}`].slice(2, -1);
-        			setAttrs({
-                       [`${field}_display_attribute`]: attr
-                    });
-        		});
-        	} else if (source.includes("specialization") && type === "player")  {	
-        		getAttrs([`${source}`], function(v) {
-        			const bas = v[`${source}`];
-        			const size = bas.length;
-
-        			let display = (size > 0 && size <= 20) ? `(${bas})` : (size > 20 ) ? "(" + bas.slice(0, 20) + "...)" : " ";
-
-        			setAttrs({
-                       [`${field}_display_specialization`]: display
-                    });
-        		});
-        	} else if (source.includes("skill")) {
-                getAttrs([`${source}`], function(v) {
-                    const bas = v[`${source}`];
-                    const size = bas.length;
-
-                    let display = (size > 0 && size <= 20) ? bas : (size > 20 ) ? bas.slice(0, 20) + "..." : " ";
-
-                    setAttrs({
-                       [`${field}_display`]: display
-                    });
-                });
-            } else if (source.includes("dicepool")) {
-                getAttrs([`${source}`, `${field}_skill`], function(v) {
-                    const bas = v[`${source}`];
-                    const skill = v[`${field}_skill`];
-
-                    let lowercase = skill.toLowerCase();
-                    let removeGroup = (lowercase.includes("group")) ? lowercase.slice(0, -6) : lowercase;
-                    let skillSet = (removeGroup.includes(" ")) ? removeGroup.replace(/ /g,"") : removeGroup;
-
-                    setAttrs({
-                       [`${skillSet}`]: bas
-                    });
-                });
-        	}  else  {
-        		console.log(`Change to ${field} did not set attr`);
-        	};
-        });
-    });
-
-   	//Setting the Default attribute name for default skill
-	on("change:default_attribute", function() {
-		getAttrs(["default_attribute", "default_display"], function(v) {
-			const display = (v.default_display);
-			const attribute = (v.default_attribute);
-			let update = {};
-
-			//This sets a hidden input with the Attribute name so the roll template can use it to indicate what attribute was rolled
-			let attributeNew = attribute.slice(2, -1);
-			if (attributeNew != display) {update["default_display"] = attributeNew;};
-
-			setAttrs(update);
-		});
-	});
-
-//REFACTORED Range & MELEE UPDATES
-   ['repeating_range',
-    'repeating_melee',
-    ].forEach(weap => {
-        on(`change:${weap}`, function(eventInfo) {
-            const source = eventInfo.sourceAttribute;
-            const newV = eventInfo.newValue;
-            const type = weap.slice(-5);
-
-            //Setting this here for now to ensure dicepool attribute gets updated. Remove in a future update
-        	getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`], function(v) {
-        		const mod = parseInt(v[`${weap}_dicepool_modifier`]) || 0;
-				const spec = parseInt(v[`${weap}_spec`]) || 0;
-				const tot = mod + spec;
-
-				setAttrs({[`${weap}_dicepool`]: tot});
-        	});
-
-            if (source.includes('primary')) {
-                if (newV === 'primary') {
-                	//Shared attributes names. 
-                	let array = ["dicepool", "weapon", "damage", "acc", "ap", "skill"];
-                	//Add the range or melee specific ones
-                	(type === "range") ? array.push("ammo", "mode", "recoil") : array.push("reach");
-                	//Add the repeating section to the begining of each attribute
-                	let attrs = [];
-			        for(var i=0; i < array.length; i++) {
-			            attrs.push(`${weap}_` + array[i]);
-		        	};
-
-	                getAttrs(attrs, function(v) {
-	                	let update = {};
-	                	//Primary weapon name does not follow the naming scheme.
-	                	update[`primary_${type}_weapon`] = v[`${weap}_weapon`];
-
-	                	_.each(array, function(value) {
-	                		if (value != undefined || value != "weapon") {
-	                			update[`primary_${type}_weapon_${value}`] = v[`${weap}_${value}`];
-	                		};
-	                	});
-
-	                	setAttrs(update);
-	                });
-
-					//Set the other repeating_weapon primary flags to 0 aka unchecked
-		            getSectionIDs(`${weap}`, function(ids) {
-				        let IDs = [];
-				        let update = {};
-
-				        for(var i=0; i < ids.length; i++) {
-				            IDs.push(`${weap}_` + ids[i] + "_primary");
-			        	};
-
-			        	IDs.forEach(id => {
-			        		if (id != source) {
-			        			update[`${id}`] = 0;
-			        		};
-			        	});
-
-			        	setAttrs(update);
-			        });
-	            };
-           	} else if (source.includes('dicepool') || source.includes('weapon') || source.includes('damage') || source.includes('acc') || source.includes('ap') || source.includes('skill') || source.includes('reach') || source.includes('ammo') || source.includes('mode') || source.includes('recoil')) {
-				getAttrs([`${weap}_primary`, `${source}`], function(v) {
-					if (v[`${weap}_primary`] === 'primary') {
-						let update = {};
-						//This whole process needs refactored in the future. Its working for now.
-						switch (true) {
-							case /weapon/.test(source): update[`primary_${type}_weapon`] = v[`${source}`]; break;
-							case /damage/.test(source): update[`primary_${type}_weapon_damage`] = v[`${source}`]; break;
-							case /dicepool/.test(source): update[`primary_${type}_weapon_dicepool`] = v[`${source}`]; break;
-							case /acc/.test(source): update[`primary_${type}_weapon_acc`] = v[`${source}`]; break;
-							case /ap/.test(source): update[`primary_${type}_weapon_ap`] = v[`${source}`]; break;
-							case /skill/.test(source): update[`primary_${type}_weapon_skill`] = v[`${source}`]; break;
-							case /reach/.test(source): update[`primary_${type}_weapon_reach`] = v[`${source}`]; break;
-							case /ammo/.test(source): update[`primary_${type}_weapon_ammo`] = v[`${source}`]; break;
-							case /mode/.test(source): update[`primary_${type}_weapon_mode`] = v[`${source}`]; break;
-							case /recoil/.test(source): update[`primary_${type}_weapon_recoil`] = v[`${source}`]; break;
-							default: console.log(`Source  ${source} was invalid`);}
-
-						setAttrs(update);
-					};
-				});
             } else {
-                 console.log("Change was not relevant.");
-            };
-        });
-    });
+				setAttrs({version: "1.35"}, () => {
+					versioning("1.35");
+				});
+			});*/
+	    };
 
-//PC SPELLS/PREPS/RITUALS
-  	[	'repeating_spell',
-		'repeating_preps',
-		'repeating_ritual"'
-    ].forEach(field => {
-        // Attach listener
-        on(`change:${field}`, function(eventInfo) {
-        	const source = eventInfo.sourceAttribute;
+	 on("clicked:whisper clicked:wound clicked:modifier clicked:edge", (eventinfo) => {
+	 	const attr = (eventinfo.triggerName.includes("whisper")) ? "gm" : eventinfo.triggerName.split("clicked:")[1];
+		getAttrs([`${attr}_toggle`], (v) => {
+			const value = v[`${attr}_toggle`];
+			const change = (attr === "gm" && value != "/w gm") ? "/w gm" : (attr === "wound" && value != "@{wounds}") ? "@{wounds}" : (attr === "edge" && value != "@{edge}") ? "@{edge}" : (attr === "modifier" && value != "?{Modifiers +/-|0}") ? "?{Modifiers +/-|0}" : " ";
 
-        	if (source.includes("dicepool") || source.includes("specialization")) {
-        		getAttrs([`${field}_spec`, `${field}_dicepool_modifier`], function(v) {
-        			const spec = parseInt(v[`${field}_spec`]) || 0;
-					const mod = parseInt(v[`${field}_dicepool_modifier`]) || 0;
-					const tot = spec + mod;
-
-                    setAttrs({
-                        [`${field}_dicepool`]: tot
-                    });
-        		});
-        	}  else  {
-        		console.log(`Change to ${field} did not set attr`);
-        	};
-        });
-    });
-
-//Repeating IDs & Lifestyles Section Display
-	on("change:repeating_lifestyle", function() {
-		getAttrs(["repeating_lifestyle_name", "repeating_lifestyle_lifestyle", "repeating_lifestyle_funds", "repeating_lifestyle_licenses", "repeating_lifestyle_display"], function(v) {
-			var name = ((v.repeating_lifestyle_name).length > 0 && (v.repeating_lifestyle_name).length <= 14) ? (v.repeating_lifestyle_name) : 
-					   ((v.repeating_lifestyle_name).length > 14 ) ? (v.repeating_lifestyle_name).slice(0,14) + "..." :
-					   "";
-
-			var life = ((v.repeating_lifestyle_lifestyle).length > 0 && (v.repeating_lifestyle_lifestyle).length <= 14) ? (v.repeating_lifestyle_lifestyle) : 
-			  			((v.repeating_lifestyle_lifestyle).length > 14 ) ? (v.repeating_lifestyle_lifestyle).slice(0,14) + "..." :
-			   			"";
-
-			var funds = ((v.repeating_lifestyle_funds).length > 0 && (v.repeating_lifestyle_funds).length <= 14) ? (v.repeating_lifestyle_funds) : 
-			   			((v.repeating_lifestyle_funds).length > 14 ) ? (v.repeating_lifestyle_funds).slice(0,14) + "..." :
-			   			"";
-
-			var lice = ((v.repeating_lifestyle_licenses).length > 0 && (v.repeating_lifestyle_licenses).length <= 14) ? (v.repeating_lifestyle_licenses) : 
-			  			((v.repeating_lifestyle_licenses).length > 14 ) ? (v.repeating_lifestyle_licenses).slice(0,14) + "..." :
-			  			"";
-
-			var display = name + " / " + life + " / " + funds + " / " + lice;
-
-			setAttrs({repeating_lifestyle_display: display})
-
+			setAttrs({
+				[`${attr}_toggle`]: change
+			});
 		});
 	});
 
-//Repeating contacts for PC sheet
-	on("change:repeating_contacts", function() {
-		getAttrs(["repeating_contacts_name"], function(v) {
-			const name = (v.repeating_contacts_name);
+   [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`].forEach(attr => {
+   	on(`clicked:tab_${attr}`, () => {
+   		
+   		setAttrs({tab: attr});
+   	});
+   });
 
-			((name).length > 0 && (name).length <= 30) ? setAttrs({repeating_contacts_display: (name)}) : 
-				((name).length > 30) ? setAttrs({repeating_contacts_display: (name).slice(0, 30) + "..."}) :
-				setAttrs({repeating_contacts_display: " "});
+	//Watch for Updates and Run the needed functions
+		on("change:body", () => {
+			update_liftCarry();
+			update_overflow();
+			update_soak();
+			const track = "physical"; update_track(track);
+			const type = "physical"; update_limit(type);
 		});
+
+		on("change:agility", () => {
+			update_movement();
+		});
+
+		on("change:strength", () => {
+			update_liftCarry();
+			const type = "physical"; update_limit(type);
+		});
+
+		on("change:reaction", () => {
+			update_defense();
+			update_initiative();
+			const type = "physical"; update_limit(type);
+		});
+
+		on("change:intuition", () => {
+			update_defense();
+			update_initiative();
+			update_judgeIntentions();
+			const type = "mental"; update_limit(type);
+		});
+
+		on("change:willpower", () => {
+			update_composure();
+			update_memory();
+			const track = "stun"; update_track(track);
+			const type = "social"; update_limit(type);
+		});
+
+		on("change:willpower", () => {
+			const type = "mental"; update_limit(type);
+		});
+		
+		on("change:logic", () => {
+			update_memory();
+			const type = "mental"; update_limit(type);
+		});
+
+		on("change:charisma", () => {
+			update_composure();
+			update_judgeIntentions();
+
+			const type = "social"; update_limit(type);
+		});
+
+		on("change:essence", () => {
+			const type = "social"; update_limit(type);
+		});
+
+		on("change:lift_carry_modifier", () => {
+			update_liftCarry();
+		});
+
+		on("change:physical_modifier change:flag_drone", () => {
+			const track = "physical"; update_track(track);
+		});
+
+		on("change:stun_modifier", () => {
+			const track = "stun"; update_track(track);
+		});
+
+		on("change:initiative_modifier change:initiative_temp change:initiative_temp_flag", () => {
+			update_initiative();
+		});
+
+		on("change:defense_modifier change:defense_temp change:defense_temp_flag", () => {
+			update_defense();
+		});
+
+		on("change:armor_rating change:soak_modifier change:soak_temp change:soak_temp_flag", () => {
+			update_soak();
+		});
+
+		on("change:mental_limit_modifier change:mental_limit_temp change:mental_limit_temp_flag change:physical_limit_modifier change:physical_limit_temp change:physical_limit_temp_flag change:social_limit_modifier change:social_limit_temp change:social_limit_temp_flag", function (eventinfo) {
+			const type = eventinfo.sourceAttribute.split("_")[0]; update_limit(type);
+		});
+
+		on("change:composure_modifier", () => {
+			update_composure();
+		});
+
+		on("change:judge_intentions_modifier", () => {
+			update_judgeIntentions();
+		});
+
+		on("change:memory_modifier", () => {
+			update_memory();
+		});
+
+		on("change:walk_modifier change:run_modifier", () => {
+			update_movement();
+		});
+
+		on("change:pain_tolerance", () => {
+			update_wounds();
+		});
+
+	//Calculate ATTRIBUTES
+	   ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition','charisma','magic', 'resonance',
+	    ].forEach(attr => {
+	        // Attach listener
+	        on(`change:${attr}_base change:${attr}_modifier change:${attr}_temp change:${attr}_temp_flag`, () => {
+	            // Load attribute values
+	            getAttrs([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`, `${attr}_temp_flag`], (v) => {
+	                // Do some math to calculate the total
+		            const bas = parseInt(v[`${attr}_base`]) || 0;
+		            const mod = parseInt(v[`${attr}_modifier`]) || 0;
+	              	const tem = (v[`${attr}_temp_flag`] === "on") ? parseInt(v[`${attr}_temp`]) || 0 : 0;
+	                const bon = mod + tem;
+	                const stat = bas + bon;
+
+	                // Update the finalized total
+	                setAttrs({
+	                    [attr]: stat,
+	                    [`display_${attr}`]: bon === 0 ? bas : `${bas} (${stat})`
+	                });
+	            });
+	        });
+	    });
+
+	//Calculate OVERFLOW
+		var update_overflow = () => {
+			getAttrs(["body", "overflow_modifier"], (v) => {
+				var bas = parseInt(v.body) || 0;
+				var mod = parseInt(v.overflow_modifier) || 0;
+
+				setAttrs({overflow: bas + mod});
+			});
+		};
+
+	//Calculaute limts
+		const update_limit = (type)  => {
+			let attrs = [`${type}_limit_modifier`, `${type}_limit_temp`, `${type}_limit_temp_flag`];
+
+			if (type === "mental") {
+				attrs.push("intuition", "willpower", "logic");
+			} else if (type === "physical") {
+				attrs.push("body", "reaction", "strength");
+			} else {
+				attrs.push("essence", "willpower", "charisma");
+			};
+
+			getAttrs(attrs, (v) => {
+				const attr1 = attrs[3], attr2 = attrs[4], attr3 = attrs[5];
+				const stat1 = (attr1 === "essence") ? Math.ceil(v[`${attr1}`]) || 0 : parseInt(v[`${attr1}`]) || 0; //Essence, Intuition, Body
+				const stat2 = parseInt(v[`${attr2}`]) || 0; //Willpower, Reaction
+				const stat3 = parseInt(v[`${attr3}`]) || 0; //Logic, Strenght, Charisma
+
+				const mod = parseInt(v[`${type}_limit_modifier`]) || 0;
+				const tem = (v[`${type}_limit_temp_flag`] === "on") ? parseInt(v[`${type}_limit_temp_flag`]) || 0 : 0;
+
+				const tot = ((stat1 + stat2 + (stat3 * 2))/3);
+				const update = Math.ceil(tot) + (mod + tem);
+
+				setAttrs({[`${type}_limit`]: update});
+			});
+		};
+
+	//Calculate Common Rolls
+		//DEFENSE POOL
+			var update_defense = () => {
+				getAttrs(["reaction", "intuition", "defense_modifier", "defense_temp", `defense_temp_flag`], (v) =>{
+					const rea = parseInt(v.reaction) || 0, int = parseInt(v.intuition) || 0, mod = parseInt(v.defense_modifier) || 0;
+					const tem = (v.defense_temp_flag === "on") ? parseInt(v.defense_temp) || 0 : 0;
+					const tot = rea + int + mod + tem;
+
+					setAttrs({defense: tot});
+				});
+			};
+
+		//SOAK POOLS
+			var update_soak = () => {
+				getAttrs(["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`], (v) => {
+					const bod = parseInt(v.body) || 0, arm = parseInt(v.armor_rating) || 0, mod = parseInt(v.soak_modifier) || 0;
+					const tem = (v.soak_temp_flag === "on") ? parseInt(v.soak_temp) || 0 : 0;
+					const tot = bod + arm + mod + tem;
+
+					setAttrs({soak: tot});
+				});
+			};
+
+			//This function checks changes to repeating_armor and updates the Primary Armor if needed
+			on("change:repeating_armor", function(eventInfo) {
+				const source = eventInfo.sourceAttribute;
+				const newV = eventInfo.newValue;
+				const arm = ["repeating_armor"];
+
+				//Check if the event was related to the primary flag
+				if (source.includes('primary')) {
+					//Check if the primary flag is set to primary
+					if (newV === 'primary') {
+						//Get attributes from the repeating_armor
+						getAttrs([`${arm}_name`, `${arm}_rating`, `${arm}_acid_modifier`, `${arm}_electrical_modifier`, `${arm}_cold_modifier`,`${arm}_fire_modifier`, `${arm}_radiation_modifier`, `${arm}_dicepool_modifier`], (v) => {
+							let update = {};
+							//Update the hidden static Primary Armor attributes with the repeating_armor attributes
+			                update["armor_name"] = v[`${arm}_name`];
+			                if (v[`${arm}_rating`]) {update["armor_rating"] = v[`${arm}_rating`]};
+							if (v[`${arm}_dicepool_modifier`]) {update["soak_modifier"] = v[`${arm}_dicepool_modifier`]};
+							if (v[`${arm}_acid_modifier`]) {update["acid_modifier"] = v[`${arm}_acid_modifier`]};
+							if (v[`${arm}_cold_modifier`]) {update["cold_modifier"] = v[`${arm}_cold_modifier`]};
+							if (v[`${arm}_electrical_modifier`]) {update["electrical_modifier"] = v[`${arm}_electrical_modifier`]};
+							if (v[`${arm}_fire_modifier`]) {update["fire_modifier"] = v[`${arm}_fire_modifier`]};
+							if (v[`${arm}_radiation_modifier`]) {update["radiation_modifier"] = v[`${arm}_radiation_modifier`]};
+
+			            	setAttrs(update);
+			            });
+
+						//Set the other repeating_armor primary flags to 0 aka unchecked
+			            getSectionIDs(`${arm}`, function(ids) {
+					        let IDs = [];
+					        let update = {};
+
+					        for(var i=0; i < ids.length; i++) {
+					            IDs.push(`${arm}_` + ids[i] + "_primary");
+				        	};
+
+				        	IDs.forEach(id => {
+				        		if (id != source) {
+				        			update[`${id}`] = 0;
+				        		};
+				        	});
+
+				        	setAttrs(update);
+				        });
+					};
+				//Check if the event was for a relevant Primary Armor attribute
+				} else if (source.includes('name') || source.includes('rating') || source.includes('dicepool') || source.includes('acid') || source.includes('cold') || source.includes('electrical') || source.includes('fire') || source.includes('radiation')) {
+					//Get the primary flag attribute for this armor. Also get the repeating_armor attribute we'll need for an update, doing it now is more efficient.
+					getAttrs([`${arm}_primary`, `${source}`], (v) => {
+						//Check if this armor is the designated Primary Armor.
+						if (v[`${arm}_primary`] === 'primary') {
+							let update = {};
+							//Apply the repeating_armor attribute to its static counterpart
+							switch (true) {
+								case /name/.test(source): update["armor_name"] = v[`${source}`]; break;
+								case /rating/.test(source): update["armor_rating"] = v[`${source}`]; break;
+								case /dicepool/.test(source): update["soak_modifier"] = v[`${source}`]; break;
+								case /acid/.test(source): update["acid_modifier"] = v[`${source}`]; break;
+								case /cold/.test(source): update["cold_modifier"] = v[`${source}`]; break;
+								case /electrical/.test(source): update["electrical_modifier"] = v[`${source}`]; break;
+								case /fire/.test(source): update["fire_modifier"] = v[`${source}`]; break;
+								case /radiation/.test(source): update["radiation_modifier"] = v[`${source}`]; break;
+								default: console.log(`Source  ${source} was invalid`);}
+
+							setAttrs(update);
+						};
+					});
+				} else {
+					console.log("CHANGE NOT RELEVENT Primary Armor");
+				};
+			});
+
+		var update_liftCarry = () => {
+			getAttrs(["body", "strength", "lift_carry_modifier"], (v) => {
+				var attrOne = parseInt(v.body) || 0;
+				var attrTwo = parseInt(v.strength) || 0;
+				var mod = parseInt(v.lift_carry_modifier) || 0;
+
+				setAttrs({lift_carry: attrOne + attrTwo + mod});
+			});
+		};
+
+		var update_composure = () => {
+			getAttrs(["charisma", "willpower", "composure_modifier"], (v) => {
+				var attrOne = parseInt(v.charisma) || 0;
+				var attrTwo = parseInt(v.willpower) || 0;
+				var mod = parseInt(v.composure_modifier) || 0;
+
+				setAttrs({composure: attrOne + attrTwo + mod});
+			});
+		};
+		
+		var update_judgeIntentions = () => {
+			getAttrs(["charisma", "intuition", "judge_intentions_modifier"], (v) => {
+				var attrOne = parseInt(v.charisma) || 0;
+				var attrTwo = parseInt(v.intuition) || 0;
+				var mod = parseInt(v.judge_intentions_modifier) || 0;
+
+				setAttrs({judge_intentions: attrOne + attrTwo + mod});
+			});
+		};
+
+
+		var update_memory = () => {
+			getAttrs(["logic", "willpower", "memory_modifier"], (v) => {
+				var attrOne = parseInt(v.logic) || 0;
+				var attrTwo = parseInt(v.willpower) || 0;
+				var mod = parseInt(v.memory_modifier) || 0;
+
+				setAttrs({memory: attrOne + attrTwo + mod});
+			});
+		};
+
+	//Calculate Movement Rates
+		var update_movement = () => {
+			getAttrs(["agility", "walk_modifier", "run_modifier"], (v) => {
+				const agi = parseInt(v.agility) || 0, wmod = parseInt(v.walk_modifier) || 0, rmod = parseInt(v.run_modifier) || 0;
+				let update = {};
+				update["walk"] = (agi * 2) + wmod;
+				update["run"] = (agi * 4) + rmod;
+				setAttrs(update);
+			});
+		};
+
+	//Update condition tracks
+		const update_track = (track) => {
+			let attrs = [`${track}_modifier`, `${track}_damage`];
+			(track === "stun") ? attrs.push("willpower") : attrs.push("body", "sheet_type", "flag_drone");
+
+			getAttrs(attrs, (v) =>{
+				const attr1 = attrs[2], stat1 = parseInt(v[`${attr1}`]) || 0; //Willpower or Body
+				const mod = parseInt(v[`${track}_modifier`]) || 0;
+				const dam = parseInt(v[`${track}_damage`]) || 0;
+				let update = {};
+
+				if (track === "stun" || v["sheet_type"] === "pc" || v["sheet_type"] === "grunt") {
+					tot = Math.ceil(stat1/2) + 8 + mod;
+				} else if (v["sheet_type"] === "vehicle" && v["flag_drone"]  === "drone") {
+					tot = (Math.ceil(stat1/2) + 6 + mod);
+				} else if (v["sheet_type"] === "vehicle") {
+					tot = (Math.ceil(stat1/2) + 12 + mod);
+				} else {
+					tot = 0; //Sprites don't have Stun or Physical track
+				};
+
+				const current = (dam != 0) ? tot - dam : tot;
+
+				update[`${track}`] = current;
+				update[`${track}_max`] = tot;
+
+				setAttrs(update, {silent:true}); 
+			});
+		};
+
+	//Calculate Device Rating Track
+		on("change:device_rating change:matrix_modifier", () => {
+			getAttrs(["device_rating","matrix_modifier","matrix"], (v) =>{
+				const dev = parseInt(v.device_rating) || 0, mod = parseInt(v.matrix_modifier) || 0;
+				const dam = parseInt(v.matrix) || 0;
+				const tot = Math.ceil(dev/2) + 8 + mod;
+				const current = (dam > 0) ? dam : tot;
+
+				setAttrs({matrix: current});
+				setAttrs({matrix_max: tot});
+			});
+		});
+
+	//Convert physical into the physical damage track boxes and reverse
+		['physical', 'stun'].forEach(attr => {
+			on(`change:${attr} change:${attr}_damage`, function(eventinfo) {
+				getAttrs([`${attr}`, `${attr}_damage`, `${attr}_max`], (v) => {
+					const stat = parseInt(v[`${attr}`]) || 0, dam = parseInt(v[`${attr}_damage`]) || 0, max = parseInt(v[`${attr}_max`]) || 0, source = eventinfo.sourceAttribute;
+					const wou = (source === `${attr}`) ? max - stat : max - dam;
+
+					if (source === `${attr}`) {
+						(dam === wou) ? false : ((stat < max && dam != wou) ? setAttrs({[`${attr}_damage`]: wou}, {silent: true}) : setAttrs({[`${attr}_damage`]: 0}, {silent: true}));
+					} else {
+						(stat === wou) ? false : setAttrs({[`${attr}`]: wou}, {silent: true});
+					};
+
+					update_wounds();
+				});
+			});
+		});
+
+	const update_wounds = () => {
+		getAttrs(["stun_damage", "physical_damage", "pain_tolerance"], (v) => {
+			const stu = parseInt(v.stun_damage) || 0, phy = parseInt(v.physical_damage) || 0, pai = parseInt(v.pain_tolerance) || 0;
+			lowP = (pai < 0) ? 2 : 3;
+			highPhy = (pai > 0) ? phy - pai : phy;
+			highStu = (pai > 0) ? stu - pai : stu;
+			pMod = (phy > 0) ? (Math.floor(highPhy/lowP)) : 0;
+			sMod = (stu > 0) ? (Math.floor(highStu/lowP)) : 0;
+			wou = Math.floor(-(pMod) + -(sMod));
+			
+			setAttrs({wounds: wou});
+		});
+	};
+
+	//Calculate Initiatves
+		var update_initiative = () => {
+			getAttrs(["reaction", "intuition", "initiative_modifier", "initiative_temp", "initiative_temp_flag"], (v) =>{
+				const rea = parseInt(v.reaction) || 0;
+				const int = parseInt(v.intuition) || 0;
+				const mod = parseInt(v.initiative_modifier) || 0;
+				const tem = (v.initiative_temp_flag === "on") ? parseInt(v.initiative_temp) || 0 : 0;
+				const bas = rea + int;
+				const tot = rea + int + mod + tem;
+				let update = {};
+				update["initiative_mod"] = tot;
+				(mod != 0) ? update["display_initiative_mod"] = bas + " (" + tot + ")" : update["display_initiative_mod"] = bas;
+				setAttrs(update);
+			});
+		};
+
+		on("change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag", () => {
+			getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], (v) =>{
+				const mod = parseInt(v.initiative_dice_modifier) || 0;
+				const tem = (v.initiative_dice_temp_flag === "on") ? parseInt(v.initiative_dice_temp) || 0 : 0;
+				const bas = mod + tem;
+				const tot = Math.min(bas+1,5);
+				edg = (v.edge_toggle == 0) ? tot : 5;
+
+				setAttrs({initiative_dice: edg});
+			});
+		});
+
+		//Calculate Astral Initiatve
+		on("change:intuition change:astral_mod_modifier", () => {
+			getAttrs(["intuition", "astral_mod_modifier"], (v) => {
+				var int = parseInt(v.intuition) || 0;
+				var mod = parseInt(v.astral_mod_modifier) || 0;
+				var bas = int * 2;
+				var tot = (int * 2) + mod;
+
+				setAttrs({astral_mod: tot});
+				(mod != 0) ? setAttrs({display_astral_mod: bas + " (" + tot + ")"}) : setAttrs({display_astral_mod: bas});
+			});
+		});
+
+		on("change:astral_dice_modifier change:edge_toggle", () => {
+			getAttrs(["astral_dice_modifier", "edge_toggle"], (v) =>{
+				var mod = parseInt(v.astral_dice_modifier) || 0;
+				var tot = Math.min(mod+3,5);
+				edg = (v.edge_toggle == 0) ? tot : 5;
+
+				setAttrs({astral_dice: edg});
+			});
+		});
+
+	//Calculate Matrix Initiatve.
+		on("change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle", () => {
+			getAttrs(["sheet_type", "data_processing", "pilot", "intuition", "matrix_mod_modifier", "host_rating", "level", "matrix_dice_modifier", "edge_toggle"], (v) => {
+				var dat = parseInt(v.data_processing) || 0;
+				var pil = parseInt(v.pilot) || 0;
+				var int = parseInt(v.intuition) || 0;
+				var mat = parseInt(v.matrix_mod_modifier) || 0;
+				var hos = parseInt(v.host_rating) || 0;
+				var lev = parseInt(v.level) || 0;
+				var dic = parseInt(v.matrix_dice_modifier) || 0;
+				let update = {};
+
+				dice = 	(v.sheet_type === "grunt" && v.edge_toggle == 0) ? 4 + dic : 
+						((v.sheet_type === "grunt" && v.edge_toggle != 0) ? 5 :
+						4);
+
+				tot = (v.sheet_type === "vehicle") ? dat + pil :
+					  (v.sheet_type === "host") ? dat + hos :
+					  (v.sheet_type === "sprite") ? dat + lev + mat :
+					  dat + int + mat;
+
+				bas = (v.sheet_type === "sprite") ? dat + lev : dat + int ;
+
+				update["matrix_mod"] = tot;
+				update["matrix_dice"] = dice;
+
+				(mat != 0) ? update["display_matrix_mod"] = bas + " (" + tot + ")" : update["display_matrix_mod"] = tot;
+
+				setAttrs(update);
+			});
+		});
+
+	//Edge toggle to include ! for exploding dice
+		on("change:edge_toggle", () => {
+			getAttrs(["edge_toggle"], (v) =>{
+				edg = (v.edge_toggle != 0) ? "!" : "";
+
+				setAttrs({explode_toggle: edg});
+			});
+		});
+
+	//Calculate Reset Condition Track
+		on("change:cond_reset", () => {
+			getAttrs(["sheet_type","physical_max","stun_max", "matrix_max"], (v) =>{
+				var phy = parseInt(v.physical_max) || 0;
+				var stun = parseInt(v.stun_max) || 0;
+				var mat = parseInt(v.matrix_max) || 0;
+				let update = {};
+
+				if (v.sheet_type === "grunt" || v.sheet_type === "pc") {
+					update["physical"] = phy;
+					update["stun"] = stun;
+				} else if (v.sheet_type === "sprite") {
+					update["matrix"] = mat;
+				} else if (v.sheet_type === "vehicle") {
+					update["physical"] = phy;
+					update["matrix"] = mat;
+				} else {
+					return "Not a grunt or vehicle";
+				};
+
+				setAttrs(update);
+			});
+		});	
+
+	//Weapon displays set into an Array
+		// Builder function to display details properly
+		// Note that since undefined are falsey if there's no label or sign we can leave the parameters blank
+		function repeatingStringBuilder(v, keyBase) {
+		    return function(key, label, sign) {
+		        // fetch the attr from v checking if it has a value
+		        const val = v[`${keyBase}${key}`];
+		        if (!val) return '';
+
+		        // Apply the sign if needed
+		        const disp = sign && val > 0 ? `+${val}` : val;
+
+		        // Apply label if needed
+		        return label ? `${label} ${disp}` : disp;
+		    }
+		}
+
+	on("change:repeating_weapon", () => {
+	    getAttrs(["repeating_weapon_weapon_range", "repeating_weapon_weapon_melee", "repeating_weapon_weapon_type", "repeating_weapon_weapon_reach", "repeating_weapon_weapon_acc", "repeating_weapon_weapon_dv", "repeating_weapon_weapon_ap", "repeating_weapon_weapon_mode", "repeating_weapon_weapon_rc", "repeating_weapon_weapon_ammo", "repeating_weapon_weapon_note"], (v) =>{
+	        // Local builder putting the needed variables into scope for repeatingStringBuilder
+	        const b = repeatingStringBuilder(v, 'repeating_weapon_weapon_');
+	        // Determine fields to display and in their proper order and formatting
+	        // Anonymous function is purely stylistic and adds more overhead than just a simple switch/case.  Personally I find the function looks cleaner and hides any internal scope that might conflict with outside
+	        const display = (() => {
+	            // 0 for weapon_range is a ranged weapon. A 1 is a melee weapon.
+	            switch(v.repeating_weapon_weapon_range) {
+	                case '0':
+	                // Not a fan of how ammo has to be handled.  Could potentially be placed in the repeatingStringBuilder if used more often for other change:repeating functions as some sort of suffix parameter
+	                const ammo = b('amm');
+	                return [
+	                    b('type'),
+	                    b('acc', 'ACC'),
+	                    b('dv', 'DV'),
+	                    b('ap', 'AP', true),
+	                    b('mode'),
+	                    b('rc', 'RC'),
+	                    ammo ? `${ammo} (c)` : '',
+	                    b('note')
+	                ];
+	                case '1': return [
+	                    b('type'),
+	                    b('reach', 'Reach', true),
+	                    b('acc', 'ACC'),
+	                    b('dv', 'DV'),
+	                    b('ap', 'AP', true),
+	                    b('note')
+	                ];
+	                default: return [
+	                    b('type'),
+	                    b('acc', 'ACC'),
+	                    b('dv', 'DV'),
+	                    b('ap', 'AP', true),
+	                    b('note')
+	                ];
+	            }
+	        })()
+	            // Remove all empty strings
+	            .filter(s => s)
+	            // Concat all the strings and add comma between
+	            .join(', ');
+
+	        // Finally wrap square brackets around the weapon display
+	        setAttrs({repeating_weapon_weapon: `[${display}]`});
+	    });
 	});
 
-
-//Cyberdeck Calculations
- 	[
-        'attack',
-        'sleaze',
-        'data_processing',
-        'firewall',
-    ].forEach(attr => {
-        // Attach listener
-        on(`change:${attr}_base change:${attr}_modifier change:${attr}_temp`, function() {
-            // Load attribute values
-            getAttrs([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`], function(v) {
-                // Do some math to calculate the total
-                const bas = parseInt(v[`${attr}_base`]) || 0;
-                const mod = parseInt(v[`${attr}_modifier`]) || 0;
-                const tem = parseInt(v[`${attr}_temp`]) || 0;
-                const tot = tem + bas + mod;
-
-                // Update the finalized total
-                setAttrs({
-                    [attr]: tot
-                });
-            });
-        });
-    });
-
-//Vehicle displays for PCs
-	on("change:repeating_vehicle:name", function(){
-		getAttrs(["repeating_vehicle_name", "repeating_vehicle_display_name"], function(v) {
-			const name = (v.repeating_vehicle_name);
-			const dis = (v.repeating_vehicle_display_name);
-			let update = {};
-
-			let displayName = ((name).length > 0 && (name).length <= 24) ? name : ((name).length > 24 ) ? (name).slice(0, 24) + "..." : " ";
-			if (dis != displayName) {update["repeating_vehicle_display_name"] = displayName};
-
-			setAttrs(update);
+	//Spell displays set into an Array
+		on("change:repeating_NPCspell", () => {
+		    getAttrs(["repeating_NPCspell_combat_type", "repeating_NPCspell_type", "repeating_NPCspell_range", "repeating_NPCspell_damage", "repeating_NPCspell_duration", "repeating_NPCspell_drain", "repeating_NPCspell_note", ], (v) =>{
+		        var com = (v.repeating_NPCspell_combat_type);
+		        var typ = "Type " + (v.repeating_NPCspell_type) + ", ";
+				var ran = (v.repeating_NPCspell_range) + ", ";
+				var dam = "Damage " + (v.repeating_NPCspell_damage) + ", ";
+				var dur = "Duration " + (v.repeating_NPCspell_duration) + ", ";
+				var not = (v.repeating_NPCspell_note);
+				dra = (v.repeating_NPCspell_drain > 0) ? ("F" + "+" + (v.repeating_NPCspell_drain) + ", ") : 
+					  ((v.repeating_NPCspell_drain < 0) ? ("F" + (v.repeating_NPCspell_drain) + ", ") :
+					  ("F" + ", "));
+				display = (com === "Direct, Force ") ? (" (Direct) " + "[" + typ + ran + dam + dur + dra + not + "]") :
+						  ((com === "Indirect, Force ?{Force|}, AP -") ? (" (Indirect) " + "[" + typ + ran + dam + dur + dra + not + "]") :
+						  (" [" + typ + ran + dur + dra + not + "]"));
+		        setAttrs({repeating_NPCspell_spell: display});
+		    });
 		});
-	});
 
-   [
- 		'acceleration',
- 		'armor',
- 		'body',
-        'data_processing',
-        'handling',
-        'pilot',
-        'sensor',
-        'speed',
-    ].forEach(attr => {
-        // Attach listener
-        on(`change:repeating_vehicle:${attr}_base change:repeating_vehicle:${attr}_modifier change:repeating_vehicle:${attr}_temp`, function() {
-            // Load attribute values
-            getAttrs([`repeating_vehicle_${attr}_base`, `repeating_vehicle_${attr}_modifier`, `repeating_vehicle_${attr}_temp`], function(v) {
-                // Do some math to calculate the total
-                const bas = parseInt(v[`repeating_vehicle_${attr}_base`]) || 0;
-                const mod = parseInt(v[`repeating_vehicle_${attr}_modifier`]) || 0;
-                const tem = parseInt(v[`repeating_vehicle_${attr}_temp`]) || 0;
-                const bon = mod + tem;
-                const stat = bas + bon;
+	//Complex Form displays  set into an Array
+		on("change:repeating_form", () => {
+		    getAttrs(["repeating_form_form_duration", "repeating_form_form_target", "repeating_form_form_fade", "repeating_form_form_note", ], (v) =>{
+		    	var tar = "Target " + (v.repeating_form_form_target) + ", ";
+				var dur = "Duration " + (v.repeating_form_form_duration) + ", ";
+				var not = (v.repeating_form_form_note);
 
-                // Update the finalized total
-                setAttrs({
-                    [attr]: stat,
-                    [`repeating_vehicle_display_${attr}`]: bon === 0 ? bas : `${bas} (${stat})`
-                });
-            });
-        });
-    });
+				fad = (v.repeating_form_form_fade > 0) ? ("L" + "+" + (v.repeating_form_form_fade) + ", ") : 
+					  ((v.repeating_form_form_fade < 0) ? ("L" + (v.repeating_form_form_fade) + ", ") :
+					  ("L" + ", "));
+
+				var display = (" [" + tar + dur + fad + not + "]");
+
+		        setAttrs({repeating_form_form: display});
+		    });
+		});
+
+	//IC displays are set into an Array
+		on("change:repeating_IC", () => {
+		    getAttrs(["attack", "data_processing", "repeating_IC_IC_limit", "repeating_IC_IC_attribute", "repeating_IC_IC_matrix", "repeating_IC_IC_note"], (v) =>{
+		    	var att = parseInt(v.attack) || 0;
+		    	var data = parseInt(v.data_processing) || 0;
+				var attr = (v.repeating_IC_IC_attribute);
+				var mat = (v.repeating_IC_IC_matrix);
+				var not = (v.repeating_IC_IC_note);
+
+				display = (v.repeating_IC_IC_limit === "@{data_processing}") ? (" (" + "[" + data + "]" + " vs. " + attr + " + " + mat + ", " + not + ")") : (" (" + "[" + att + "]" + " vs. " + attr + " + " + mat + ", " + not + ")");
+
+		        setAttrs({repeating_IC_IC: display});
+		    });
+		});
+
+	//IC  Attack Dice & Condition Track
+		on("change:host_rating", () => {
+			getAttrs(["host_rating"], (v) => {
+				var hos = parseInt(v.host_rating) || 0;
+				var tot = 8 + Math.ceil(hos/2);
+				var atk = Math.min(hos + hos);
+
+				setAttrs({matrix: tot});
+				setAttrs({ic_attack: atk});
+			});
+		});
+
+	//Sprite Condition Track
+		on("change:level", () => {
+			getAttrs(["level"], (v) => {
+				var lev = parseInt(v.level) || 0;
+				var tot = 8 + Math.ceil(lev/2);
+
+				setAttrs({matrix: tot});
+			});
+		});
+
+	//REFACTORED Skills
+	  	[	'repeating_active',
+			'repeating_knowledge',
+			'repeating_language'
+	    ].forEach(field => {
+	        // Attach listener
+	        on(`change:${field}`, function(eventInfo) {
+	        
+	        	const source = eventInfo.sourceAttribute;
+	        	const type = eventInfo.sourceType;
+
+	        	if (source.includes("rating")) {
+	        		getAttrs([`${field}_rating`, `${field}_rating_modifier`], (v) => {
+	        			const bas = parseInt(v[`${field}_rating`]) || 0;
+						const mod = parseInt(v[`${field}_rating_modifier`]) || 0;
+						const tot = bas + mod;
+
+	                    setAttrs({
+	                        [`${field}_dicepool`]: tot,
+	                        [`${field}_display_rating`]: mod === 0 ? bas : `${bas} (${tot})`
+	                    });
+	        		});
+	        	} else if (source.includes("attribute") && type === "player") {
+	        		getAttrs([`${source}`], (v) => {;
+	        			const attr = v[`${source}`].slice(2, -1);
+	        			setAttrs({
+	                       [`${field}_display_attribute`]: attr
+	                    });
+	        		});
+	        	} else if (source.includes("specialization") && type === "player")  {	
+	        		getAttrs([`${source}`], (v) => {
+	        			const bas = v[`${source}`];
+	        			const size = bas.length;
+
+	        			let display = (size > 0 && size <= 20) ? `(${bas})` : (size > 20 ) ? "(" + bas.slice(0, 20) + "...)" : " ";
+
+	        			setAttrs({
+	                       [`${field}_display_specialization`]: display
+	                    });
+	        		});
+	        	} else if (source.includes("skill")) {
+	                getAttrs([`${source}`], (v) => {
+	                    const bas = v[`${source}`];
+	                    const size = bas.length;
+
+	                    let display = (size > 0 && size <= 20) ? bas : (size > 20 ) ? bas.slice(0, 20) + "..." : " ";
+
+	                    setAttrs({
+	                       [`${field}_display`]: display
+	                    });
+	                });
+	            } else if (source.includes("dicepool")) {
+	                getAttrs([`${source}`, `${field}_skill`], (v) => {
+	                    const bas = v[`${source}`];
+	                    const skill = v[`${field}_skill`];
+
+	                    let lowercase = skill.toLowerCase();
+	                    let removeGroup = (lowercase.includes("group")) ? lowercase.slice(0, -6) : lowercase;
+	                    let skillSet = (removeGroup.includes(" ")) ? removeGroup.replace(/ /g,"") : removeGroup;
+
+	                    setAttrs({
+	                       [`${skillSet}`]: bas
+	                    });
+	                });
+	        	}  else  {
+	        		console.log(`Change to ${field} did not set attr`);
+	        	};
+	        });
+	    });
+
+	   	//Setting the Default attribute name for default skill
+		on("change:default_attribute", () => {
+			getAttrs(["default_attribute", "default_display"], (v) => {
+				const display = (v.default_display);
+				const attribute = (v.default_attribute);
+				let update = {};
+
+				//This sets a hidden input with the Attribute name so the roll template can use it to indicate what attribute was rolled
+				let attributeNew = attribute.slice(2, -1);
+				if (attributeNew != display) {update["default_display"] = attributeNew;};
+
+				setAttrs(update);
+			});
+		});
+
+	//REFACTORED Range & MELEE UPDATES
+	   ['repeating_range',
+	    'repeating_melee',
+	    ].forEach(weap => {
+	        on(`change:${weap}`, function(eventInfo) {
+	            const source = eventInfo.sourceAttribute;
+	            const newV = eventInfo.newValue;
+	            const type = weap.slice(-5);
+
+	            //Setting this here for now to ensure dicepool attribute gets updated. Remove in a future update
+	        	getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`], (v) => {
+	        		const mod = parseInt(v[`${weap}_dicepool_modifier`]) || 0;
+					const spec = parseInt(v[`${weap}_spec`]) || 0;
+					const tot = mod + spec;
+
+					setAttrs({[`${weap}_dicepool`]: tot});
+	        	});
+
+	            if (source.includes('primary')) {
+	                if (newV === 'primary') {
+	                	//Shared attributes names. 
+	                	let array = ["dicepool", "weapon", "damage", "acc", "ap", "skill"];
+	                	//Add the range or melee specific ones
+	                	(type === "range") ? array.push("ammo", "mode", "recoil") : array.push("reach");
+	                	//Add the repeating section to the begining of each attribute
+	                	let attrs = [];
+				        for(var i=0; i < array.length; i++) {
+				            attrs.push(`${weap}_` + array[i]);
+			        	};
+
+		                getAttrs(attrs, (v) => {
+		                	let update = {};
+		                	//Primary weapon name does not follow the naming scheme.
+		                	update[`primary_${type}_weapon`] = v[`${weap}_weapon`];
+
+		                	_.each(array, function(value) {
+		                		if (value != undefined || value != "weapon") {
+		                			update[`primary_${type}_weapon_${value}`] = v[`${weap}_${value}`];
+		                		};
+		                	});
+
+		                	setAttrs(update);
+		                });
+
+						//Set the other repeating_weapon primary flags to 0 aka unchecked
+			            getSectionIDs(`${weap}`, function(ids) {
+					        let IDs = [];
+					        let update = {};
+
+					        for(var i=0; i < ids.length; i++) {
+					            IDs.push(`${weap}_` + ids[i] + "_primary");
+				        	};
+
+				        	IDs.forEach(id => {
+				        		if (id != source) {
+				        			update[`${id}`] = 0;
+				        		};
+				        	});
+
+				        	setAttrs(update);
+				        });
+		            };
+	           	} else if (source.includes('dicepool') || source.includes('weapon') || source.includes('damage') || source.includes('acc') || source.includes('ap') || source.includes('skill') || source.includes('reach') || source.includes('ammo') || source.includes('mode') || source.includes('recoil')) {
+					getAttrs([`${weap}_primary`, `${source}`], (v) => {
+						if (v[`${weap}_primary`] === 'primary') {
+							let update = {};
+							//This whole process needs refactored in the future. Its working for now.
+							switch (true) {
+								case /weapon/.test(source): update[`primary_${type}_weapon`] = v[`${source}`]; break;
+								case /damage/.test(source): update[`primary_${type}_weapon_damage`] = v[`${source}`]; break;
+								case /dicepool/.test(source): update[`primary_${type}_weapon_dicepool`] = v[`${source}`]; break;
+								case /acc/.test(source): update[`primary_${type}_weapon_acc`] = v[`${source}`]; break;
+								case /ap/.test(source): update[`primary_${type}_weapon_ap`] = v[`${source}`]; break;
+								case /skill/.test(source): update[`primary_${type}_weapon_skill`] = v[`${source}`]; break;
+								case /reach/.test(source): update[`primary_${type}_weapon_reach`] = v[`${source}`]; break;
+								case /ammo/.test(source): update[`primary_${type}_weapon_ammo`] = v[`${source}`]; break;
+								case /mode/.test(source): update[`primary_${type}_weapon_mode`] = v[`${source}`]; break;
+								case /recoil/.test(source): update[`primary_${type}_weapon_recoil`] = v[`${source}`]; break;
+								default: console.log(`Source  ${source} was invalid`);}
+
+							setAttrs(update);
+						};
+					});
+	            } else {
+	                 console.log("Change was not relevant.");
+	            };
+	        });
+	    });
+
+	//PC SPELLS/PREPS/RITUALS
+	  	[	'repeating_spell',
+			'repeating_preps',
+			'repeating_ritual"'
+	    ].forEach(field => {
+	        // Attach listener
+	        on(`change:${field}`, function(eventInfo) {
+	        	const source = eventInfo.sourceAttribute;
+
+	        	if (source.includes("dicepool") || source.includes("specialization")) {
+	        		getAttrs([`${field}_spec`, `${field}_dicepool_modifier`], (v) => {
+	        			const spec = parseInt(v[`${field}_spec`]) || 0;
+						const mod = parseInt(v[`${field}_dicepool_modifier`]) || 0;
+						const tot = spec + mod;
+
+	                    setAttrs({
+	                        [`${field}_dicepool`]: tot
+	                    });
+	        		});
+	        	}  else  {
+	        		console.log(`Change to ${field} did not set attr`);
+	        	};
+	        });
+	    });
+
+	//Repeating IDs & Lifestyles Section Display
+		on("change:repeating_lifestyle", () => {
+			getAttrs(["repeating_lifestyle_name", "repeating_lifestyle_lifestyle", "repeating_lifestyle_funds", "repeating_lifestyle_licenses", "repeating_lifestyle_display"], (v) => {
+				var name = ((v.repeating_lifestyle_name).length > 0 && (v.repeating_lifestyle_name).length <= 14) ? (v.repeating_lifestyle_name) : 
+						   ((v.repeating_lifestyle_name).length > 14 ) ? (v.repeating_lifestyle_name).slice(0,14) + "..." :
+						   "";
+
+				var life = ((v.repeating_lifestyle_lifestyle).length > 0 && (v.repeating_lifestyle_lifestyle).length <= 14) ? (v.repeating_lifestyle_lifestyle) : 
+				  			((v.repeating_lifestyle_lifestyle).length > 14 ) ? (v.repeating_lifestyle_lifestyle).slice(0,14) + "..." :
+				   			"";
+
+				var funds = ((v.repeating_lifestyle_funds).length > 0 && (v.repeating_lifestyle_funds).length <= 14) ? (v.repeating_lifestyle_funds) : 
+				   			((v.repeating_lifestyle_funds).length > 14 ) ? (v.repeating_lifestyle_funds).slice(0,14) + "..." :
+				   			"";
+
+				var lice = ((v.repeating_lifestyle_licenses).length > 0 && (v.repeating_lifestyle_licenses).length <= 14) ? (v.repeating_lifestyle_licenses) : 
+				  			((v.repeating_lifestyle_licenses).length > 14 ) ? (v.repeating_lifestyle_licenses).slice(0,14) + "..." :
+				  			"";
+
+				var display = name + " / " + life + " / " + funds + " / " + lice;
+
+				setAttrs({repeating_lifestyle_display: display})
+
+			});
+		});
+
+	//Repeating contacts for PC sheet
+		on("change:repeating_contacts", () => {
+			getAttrs(["repeating_contacts_name"], (v) => {
+				const name = (v.repeating_contacts_name);
+
+				((name).length > 0 && (name).length <= 30) ? setAttrs({repeating_contacts_display: (name)}) : 
+					((name).length > 30) ? setAttrs({repeating_contacts_display: (name).slice(0, 30) + "..."}) :
+					setAttrs({repeating_contacts_display: " "});
+			});
+		});
 
 
-	</script>
+	//Cyberdeck Calculations
+	 	[
+	        'attack',
+	        'sleaze',
+	        'data_processing',
+	        'firewall',
+	    ].forEach(attr => {
+	        // Attach listener
+	        on(`change:${attr}_base change:${attr}_modifier change:${attr}_temp`, () => {
+	            // Load attribute values
+	            getAttrs([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`], (v) => {
+	                // Do some math to calculate the total
+	                const bas = parseInt(v[`${attr}_base`]) || 0;
+	                const mod = parseInt(v[`${attr}_modifier`]) || 0;
+	                const tem = parseInt(v[`${attr}_temp`]) || 0;
+	                const tot = tem + bas + mod;
+
+	                // Update the finalized total
+	                setAttrs({
+	                    [attr]: tot
+	                });
+	            });
+	        });
+	    });
+
+	//Vehicle displays for PCs
+		on("change:repeating_vehicle:name", () =>{
+			getAttrs(["repeating_vehicle_name", "repeating_vehicle_display_name"], (v) => {
+				const name = (v.repeating_vehicle_name);
+				const dis = (v.repeating_vehicle_display_name);
+				let update = {};
+
+				let displayName = ((name).length > 0 && (name).length <= 24) ? name : ((name).length > 24 ) ? (name).slice(0, 24) + "..." : " ";
+				if (dis != displayName) {update["repeating_vehicle_display_name"] = displayName};
+
+				setAttrs(update);
+			});
+		});
+
+	   [
+	 		'acceleration',
+	 		'armor',
+	 		'body',
+	        'data_processing',
+	        'handling',
+	        'pilot',
+	        'sensor',
+	        'speed',
+	    ].forEach(attr => {
+	        // Attach listener
+	        on(`change:repeating_vehicle:${attr}_base change:repeating_vehicle:${attr}_modifier change:repeating_vehicle:${attr}_temp`, () => {
+	            // Load attribute values
+	            getAttrs([`repeating_vehicle_${attr}_base`, `repeating_vehicle_${attr}_modifier`, `repeating_vehicle_${attr}_temp`], (v) => {
+	                // Do some math to calculate the total
+	                const bas = parseInt(v[`repeating_vehicle_${attr}_base`]) || 0;
+	                const mod = parseInt(v[`repeating_vehicle_${attr}_modifier`]) || 0;
+	                const tem = parseInt(v[`repeating_vehicle_${attr}_temp`]) || 0;
+	                const bon = mod + tem;
+	                const stat = bas + bon;
+
+	                // Update the finalized total
+	                setAttrs({
+	                    [attr]: stat,
+	                    [`repeating_vehicle_display_${attr}`]: bon === 0 ? bas : `${bas} (${stat})`
+	                });
+	            });
+	        });
+	    });
+
+
+</script>
