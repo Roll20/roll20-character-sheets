@@ -874,6 +874,7 @@
     on("change:int change:arcane_knowledge_experience change:arcane_knowledge_other change:arcane_knowledge_temp change:arcane_knowledge_penalty change:arcane_knowledge_learned change:herculean_mod ", function() {
         getAttrs(["arcane_knowledge_learned"], function(v) {
             calc_skill("arcane_knowledge", "@{int}", "@{int}", v.arcane_knowledge_learned);
+            calc_arcane_knowledge_derived();
         });    
     });
     on("change:str change:dex change:athletics_experience change:athletics_other change:athletics_temp change:athletics_penalty change:herculean_mod ", function() { calc_skill("athletics", "@{str}", "@{dex}", 1); });
@@ -1621,6 +1622,7 @@
             for(var i=0; i < idarray.length; i++) {
                 var id = idarray[i];
 
+                var old_name = "repeating_ladiscipline_" + id + "_name";
                 var old_fumbled = "repeating_ladiscipline_" + id + "_fumbled";
                 var old_trained = "repeating_ladiscipline_" + id + "_trained";
                 var old_augment = "repeating_ladiscipline_" + id + "_augment";
@@ -1632,6 +1634,7 @@
                 getAttrs([old_fumbled, old_trained, old_augment, old_penalty, old_details, old_experience, old_other, old_discipline_talents], function(v) {
                     var newrowid = generateRowID();
                     var newrowattrs = {};
+                    newrowattrs["repeating_discipline_" + newrowid + "_name"] = v[old_name];
                     newrowattrs["repeating_discipline_" + newrowid + "_fumbled"] = v[old_fumbled];
                     newrowattrs["repeating_discipline_" + newrowid + "_trained"] = v[old_trained];
                     newrowattrs["repeating_discipline_" + newrowid + "_temp"] = v[old_augment];
@@ -1640,6 +1643,38 @@
                     newrowattrs["repeating_discipline_" + newrowid + "_experience"] = v[old_experience];
                     newrowattrs["repeating_discipline_" + newrowid + "_other"] = v[old_other];
                     newrowattrs["repeating_discipline_" + newrowid + "_discipline_talents"] = v[old_discipline_talents];
+                    setAttrs(newrowattrs);
+                });
+            }
+        });
+
+        getSectionIDs("repeating_psionictalent", function(idarray) {
+            for(var i=0; i < idarray.length; i++) {
+                var id = idarray[i];
+
+                var old_name = "repeating_latalent_" + id + "_name";
+                var old_description = "repeating_latalent_" + id + "_description";
+                var old_intensity = "repeating_latalent_" + id + "_intensity";
+                var old_range = "repeating_latalent_" + id + "_range";
+                var old_duration = "repeating_latalent_" + id + "_duration";
+                var old_area = "repeating_latalent_" + id + "_area";
+                var old_cost = "repeating_latalent_" + id + "_cost";
+                var old_resist = "repeating_latalent_" + id + "_resist";
+                var old_damage = "repeating_latalent_" + id + "_damage";
+                var old_macro = "repeating_latalent_" + id + "_macro";
+                getAttrs([old_fumbled, old_trained, old_augment, old_penalty, old_details, old_experience, old_other, old_discipline_talents], function(v) {
+                    var newrowid = generateRowID();
+                    var newrowattrs = {};
+                    newrowattrs["repeating_psionictalent_" + newrowid + "_name"] = v[old_name];
+                    newrowattrs["repeating_psionictalent_" + newrowid + "_description"] = v[old_description];
+                    newrowattrs["repeating_psionictalent_" + newrowid + "_intensity"] = v[old_intensity];
+                    newrowattrs["repeating_psionictalent_" + newrowid + "_range"] = v[old_range];
+                    newrowattrs["repeating_psionictalent_" + newrowid + "_duration"] = v[old_duration];
+                    newrowattrs["repeating_psionictalent_" + newrowid + "_area"] = v[old_area];
+                    newrowattrs["repeating_psionictalent_" + newrowid + "_cost"] = v[old_cost];
+                    newrowattrs["repeating_psionictalent_" + newrowid + "_resist"] = v[old_resist];
+                    newrowattrs["repeating_psionictalent_" + newrowid + "_damage"] = v[old_damage];
+                    newrowattrs["repeating_psionictalent_" + newrowid + "_macro"] = v[old_macro];
                     setAttrs(newrowattrs);
                 });
             }
