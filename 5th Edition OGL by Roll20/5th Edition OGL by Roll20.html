@@ -15154,13 +15154,17 @@
     });
 
     const recalcHpByLevel = (section) => {
+        console.log(section ? `RECALC HP: ${section}` : "RECALC HP: ALL");
         const mancerdata = getCharmancerData();
         const leveldata = mancerdata["lp-levels"].values;
         const repeating = mancerdata["lp-levels"].repeating || [];
-        const sections = section ? [section] : ["class1", "class2", "class3", "class4"];
         let set = {};
+        const sections = section ? [section] : ["class1", "class2", "class3", "class4"];
+
         _.each(sections, (levelclass) => {
-            let thishp = 0, first = true, rollflag = "";
+            let thishp = 0;
+            let first = true;
+            let rollflag = "";
             _.each(repeating, function(repid) {
                 if(repid.split("_")[2].split("-")[0] == levelclass && leveldata[`${repid}_result`]) {
                     let thisflag = leveldata[`${repid}_rollflag`] || "average";
@@ -15173,7 +15177,7 @@
                 }
             });
             set[`${levelclass}_hp_flag`] = rollflag;
-            set[`${levelclass}_addhp`] = rollflag;
+            set[`${levelclass}_addhp`] = thishp;
         });
         setAttrs(set, () => {recalcLpData()});
     };
@@ -15184,19 +15188,26 @@
         const repeating = mancerdata["lp-levels"].repeating || [];
         let set = {};
 
+        //Updates all the Roll button templates
         const updateByLevel = (firstTime) => {
             for(let classnum=1; classnum<=4; classnum++) {
                 const levelclass = `class${classnum}`, hitdie = leveldata[`${levelclass}_hitdie`],
                     current = leveldata[`${levelclass}_currentlevel`] ? parseInt(leveldata[`${levelclass}_currentlevel`]) : 0,
                     addlevel = leveldata[`${levelclass}_addlevel`] ? parseInt(leveldata[`${levelclass}_addlevel`]) : 0;
-                //Bonus for Draconic Ancestor
-                const subclassData = mancerdata["lp-levels"].data[`${levelclass}_subclass`];
-                const hpbonus = (subclassData && subclassData.blobs[`Draconic Resilience`]) ? `1[Draconic Resilience]` : `0`;
                 let levelarray = [], addarray = [], removearray = [], existing = [], average = getDieAvg(hitdie);
 
-                //DEV 1619 REMOVE Later
-                const dragon = (subclassData && subclassData.blobs[`Draconic Resilience`]) ? "Draconic Resilinece Found" : "Draconic Resilinece was not found";
-                console.log(`%c ${dragon}`,'font-size: 14px; background: yellow;');
+                //Bonus for by class mp mods like Draconic Bloodline for Sorcerers
+                const welcome = JSON.parse(mancerdata["lp-welcome"].values["previous_repeating"]), hpmod = welcome["hpmod"];
+                let hpbonus = 0, bonusSource = [];
+
+                _.each(hpmod, (mod) => {
+                    if (mod["levels"] === "base") {
+                        const bonus  = mod["mod"], source = mod["source"];
+
+                        bonusSource.push(`[ ${source} ]`);
+                        hpbonus += parseInt(bonus);
+                    };
+                });
 
                 for(let x = current+1; x<=current+addlevel; x++) {
                     levelarray.push(`${levelclass}-${x}`);
@@ -15220,9 +15231,9 @@
                     });
                     _.each(addarray, function(repname) {
                         addRepeatingSection(rowid, "hpbylevel", repname, function(repid) {
-                            if(!leveldata[`${repid}_result`]) set[`${repid}_result`] = average;
-                            set[`roll_${repid}_rollhp`] = `@{wtype}&{template:mancerhproll} {{title=Roll for HP Level ${_.last(repname.split("-"))}}} {{r1=[[1${hitdie}+${hpbonus}]]}}`;
-                            set[`roll_${repid}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP Level ${_.last(repname.split("-"))}}} {{a1=[[${average}+${hpbonus}]]}}`;
+                            if(!leveldata[`${repid}_result`]) set[`${repid}_result`] = parseInt(average) + parseInt(hpbonus);
+                            set[`roll_${repid}_rollhp`] = `@{wtype}&{template:mancerhproll} {{title=Roll for HP Level ${_.last(repname.split("-"))}}} {{r1=[[1${hitdie}+${hpbonus}${bonusSource}]]}}`;
+                            set[`roll_${repid}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP Level ${_.last(repname.split("-"))}}} {{a1=[[${average}+${hpbonus}${bonusSource}]]}}`;
                             update[`${repid} label`] = `Level ${_.last(repname.split("-"))}`;
                             if(repname == _.last(addarray)) {
                                 setCharmancerText(update);
@@ -15240,19 +15251,15 @@
                     });
                 }
 
-                //console.log('%c Oh my heavens! ', 'background: #222; color: #bada55');
-
-                console.log(mancerdata);
-
                 if (addlevel && hitdie) {
                     let dice = [], set = {};
 
                     //Set the roll buttons
-                    for (x = 1; x <= addlevel; x++) { dice.push(`{{r${x}=[[1${hitdie}+${hpbonus}]]}}`); };
+                    for (x = 1; x <= addlevel; x++) { dice.push(`{{r${x}=[[1${hitdie}+${hpbonus}${bonusSource}]]}}`); };
                     set[`roll_${levelclass}_rollhp`] = `@{wtype}&{template:mancerhproll} {{title=Roll for HP}} ` + dice.join()
 
                     //Set the average hp button
-                    set[`roll_${levelclass}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP}}{{a1=[[${average}+${hpbonus}]]}}`
+                    set[`roll_${levelclass}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP}}{{a1=[[${average}+${hpbonus}${bonusSource}]]}}`
 
                     setAttrs(set);
                 };
@@ -15290,28 +15297,26 @@
         return Math.ceil(sum / num.length)
     };
 
-    on("mancerroll:repeating_class1hprow mancerroll:repeating_class2hprow mancerroll:repeating_class3hprow mancerroll:repeating_class4hprow", function(eventinfo) {
-        let set = {};
-        set[`${eventinfo.sourceSection}_result`] = eventinfo.roll[0].result;
-        set[`${eventinfo.sourceSection}_rollflag`] = "roll";
-        setAttrs(set, () => {recalcHpByLevel()})
+    //Roll & Average buttons inside the repeating hp section for each level
+    ["class1", "class2", "class3", "class4"].forEach(levelclass => {
+        on(`mancerroll:repeating_${levelclass}hprow`, (eventinfo) => {
+            const source = eventinfo.sourceAttribute, flag = source.includes("rollhp") ? "roll" : "average";
+            let set = {};
+
+            set[`${eventinfo.sourceSection}_result`]   = eventinfo.roll[0].result;
+            set[`${eventinfo.sourceSection}_rollflag`] = flag;
+            setAttrs(set, () => {recalcHpByLevel()})
+        });
     });
 
-    on("clicked:repeating_class1hprow clicked:repeating_class2hprow clicked:repeating_class3hprow clicked:repeating_class4hprow", function(eventinfo) {
-        const mancerdata = getCharmancerData();
-        let set = {};
-        set[`${eventinfo.sourceSection}_result`] = getDieAvg(mancerdata["lp-levels"].values[`${eventinfo.sourceSection.split("_")[2].split("-")[0]}_hitdie`]);
-        set[`${eventinfo.sourceSection}_rollflag`] = "average";
-        setAttrs(set, () => {recalcHpByLevel()})
-    });
-
-
+    //Roll & Average top level buttons for each class
     ["class1", "class2", "class3", "class4"].forEach(levelclass => {
         on(`mancerroll:${levelclass}_rollhp mancerroll:${levelclass}_averagehp`, (eventinfo) => {
             const mancerdata = getCharmancerData();
             const leveldata = mancerdata["lp-levels"].values;
             const repeating = mancerdata["lp-levels"].repeating || [];
             const source = eventinfo.sourceAttribute;
+            const flag = source.includes("rollhp") ? "roll" : "average";
             let set = {}, sum = 0, rows = "";
 
             repeating.forEach(row => {
@@ -15320,9 +15325,10 @@
                     const diff = parseInt(leveldata[`${levelclass}_currentlevel`]) + 1;
                     const num = parseInt(row.split(`${levelclass}-`)[1]) - diff;
                     set[row + "_result"] = eventinfo.roll[`${num}`].result;
-                    set[row + "_rollflag"] = "roll";
+                    set[row + "_rollflag"] = flag;
                 } else {
-                    set[row + "_result"] = eventinfo.roll[`0`].result;
+                    set[row + "_result"] = eventinfo.roll[0].result;
+                    set[row + "_rollflag"] = flag;
                 };
             });
 
@@ -15338,7 +15344,6 @@
             set[`${levelclass}_addhp`] = sum;
 
             //Set hp_flag to be roll or average so the CSS will highlight the appropriate button
-            let flag = eventinfo.sourceAttribute.includes("roll") ? "roll" : "average";
             set[`${levelclass}_hp_flag`] = flag;
 
             setAttrs(set, function() { recalcLpData(); });
