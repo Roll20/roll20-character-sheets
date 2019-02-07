@@ -14784,15 +14784,28 @@
         var leveldata = getLevelingData(mancerdata);
         var abilities = abilities || getAbilityTotals(mancerdata, blobs);
         var previous = mancerdata["lp-welcome"].values["previous_attributes"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_attributes"]) : {};
+        var prev_repeat = JSON.parse(mancerdata["lp-welcome"].values["previous_repeating"]), hpmod = prev_repeat["hpmod"];
         var newhp = 0;
         var additionalhp = 0;
         var totalpreviouslevel = parseInt(previous["base_level"]);
         for(var x=1; x<=3; x++) {
             if(previous["multiclass" + x + "_flag"] != "0") totalpreviouslevel += parseInt(previous["multiclass" + x + "_lvl"]);
         };
-        _.each(leveldata, function(level) {
-            newhp += level.addhp > 0 ? level.addhp + (level.addlevel * abilities["constitution_mod"]) : 0;
+
+        //Calculate HP Mods things like Hill Dwarf
+        let levelbonus = 0;
+        _.each(hpmod, (mod) => {
+            const bonus  = mod["mod"];
+            if (mod["levels"] === "total") {
+                levelbonus += parseInt(bonus);
+            };
         });
+
+        //Add up the hp per level
+        _.each(leveldata, function(level) {
+            newhp += level.addhp > 0 ? level.addhp + (level.addlevel * abilities["constitution_mod"]) + (level.addlevel * levelbonus) : 0;
+        });
+
         additionalhp = totalpreviouslevel * (abilities["constitution_mod"] - abilities["constitution_previous_mod"])
         return parseInt(previous["hp_max"]) + newhp + additionalhp;
     };
@@ -14953,7 +14966,6 @@
         getCompendiumPage(eventinfo.newValue, function(results) {});
     });
 
-    //DEV 1378
     on("page:lp-levels", function(eventinfo) {
         const mancerdata = getCharmancerData();
         const previous   = mancerdata["lp-welcome"].values["previous_attributes"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_attributes"]) : {};
@@ -15154,7 +15166,7 @@
     });
 
     const recalcHpByLevel = (section) => {
-        console.log(section ? `RECALC HP: ${section}` : "RECALC HP: ALL");
+        //console.log(section ? `RECALC HP: ${section}` : "RECALC HP: ALL");
         const mancerdata = getCharmancerData();
         const leveldata = mancerdata["lp-levels"].values;
         const repeating = mancerdata["lp-levels"].repeating || [];
@@ -15196,19 +15208,6 @@
                     addlevel = leveldata[`${levelclass}_addlevel`] ? parseInt(leveldata[`${levelclass}_addlevel`]) : 0;
                 let levelarray = [], addarray = [], removearray = [], existing = [], average = getDieAvg(hitdie);
 
-                //Bonus for by class mp mods like Draconic Bloodline for Sorcerers
-                const welcome = JSON.parse(mancerdata["lp-welcome"].values["previous_repeating"]), hpmod = welcome["hpmod"];
-                let hpbonus = 0, bonusSource = [];
-
-                _.each(hpmod, (mod) => {
-                    if (mod["levels"] === "base") {
-                        const bonus  = mod["mod"], source = mod["source"];
-
-                        bonusSource.push(`[ ${source} ]`);
-                        hpbonus += parseInt(bonus);
-                    };
-                });
-
                 for(let x = current+1; x<=current+addlevel; x++) {
                     levelarray.push(`${levelclass}-${x}`);
                 }
@@ -15224,6 +15223,23 @@
                         existing.push(id.split("_")[2]);
                     }
                 });
+
+                //HP Bonus from subclass hp mods like Draconic Bloodline for Sorcerers
+                const prev_repeat = JSON.parse(mancerdata["lp-welcome"].values["previous_repeating"]), hpmod = prev_repeat["hpmod"], subclass = leveldata[`${levelclass}_subclass`];;
+                let hpbonus = 0, bonusSource = [];
+                _.each(hpmod, (mod) => {
+                    if (mod["levels"] === "base" && subclass && subclass.includes(mod["source"])) {
+                        bonusSource.push(mod["source"]);
+                        hpbonus += parseInt(mod["mod"]);
+                    };
+                });
+                //Multiclassing into Sorcer Draconic needs to update buttons
+                if (subclass && subclass.includes("Draconic Bloodline") && !bonusSource.includes("Draconic Bloodline")) {
+                    bonusSource.push("Draconic Bloodline");
+                    hpbonus += parseInt(1);
+                };
+                const templateBonus = (hpbonus > 0) ? `+${hpbonus}[${bonusSource}]` : "";
+
                 if(addarray.length > 0) {
                     let set = {}, update = {}, rowid = "";
                     _.each(repeating, function(repid) {
@@ -15232,8 +15248,8 @@
                     _.each(addarray, function(repname) {
                         addRepeatingSection(rowid, "hpbylevel", repname, function(repid) {
                             if(!leveldata[`${repid}_result`]) set[`${repid}_result`] = parseInt(average) + parseInt(hpbonus);
-                            set[`roll_${repid}_rollhp`] = `@{wtype}&{template:mancerhproll} {{title=Roll for HP Level ${_.last(repname.split("-"))}}} {{r1=[[1${hitdie}+${hpbonus}${bonusSource}]]}}`;
-                            set[`roll_${repid}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP Level ${_.last(repname.split("-"))}}} {{a1=[[${average}+${hpbonus}${bonusSource}]]}}`;
+                            set[`roll_${repid}_rollhp`] = `@{wtype}&{template:mancerhproll} {{title=Roll for HP Level ${_.last(repname.split("-"))}}} {{r1=[[1${hitdie}${templateBonus}]]}}`;
+                            set[`roll_${repid}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP Level ${_.last(repname.split("-"))}}} {{a1=[[${average}${templateBonus}]]}}`;
                             update[`${repid} label`] = `Level ${_.last(repname.split("-"))}`;
                             if(repname == _.last(addarray)) {
                                 setCharmancerText(update);
@@ -15253,13 +15269,12 @@
 
                 if (addlevel && hitdie) {
                     let dice = [], set = {};
-
                     //Set the roll buttons
-                    for (x = 1; x <= addlevel; x++) { dice.push(`{{r${x}=[[1${hitdie}+${hpbonus}${bonusSource}]]}}`); };
+                    for (x = 1; x <= addlevel; x++) { dice.push(`{{r${x}=[[1${hitdie}${templateBonus}]]}}`); };
                     set[`roll_${levelclass}_rollhp`] = `@{wtype}&{template:mancerhproll} {{title=Roll for HP}} ` + dice.join()
 
                     //Set the average hp button
-                    set[`roll_${levelclass}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP}}{{a1=[[${average}+${hpbonus}${bonusSource}]]}}`
+                    set[`roll_${levelclass}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP}}{{a1=[[${average}${templateBonus}]]}}`
 
                     setAttrs(set);
                 };
@@ -15315,20 +15330,19 @@
             const mancerdata = getCharmancerData();
             const leveldata = mancerdata["lp-levels"].values;
             const repeating = mancerdata["lp-levels"].repeating || [];
-            const source = eventinfo.sourceAttribute;
-            const flag = source.includes("rollhp") ? "roll" : "average";
+            const source = eventinfo.sourceAttribute, flag = source.includes("rollhp") ? "roll" : "average";
             let set = {}, sum = 0, rows = "";
 
             repeating.forEach(row => {
                 if (row.includes(`${levelclass}-`) && source.includes("rollhp")) {
-                    const test = row.split(`${levelclass}-`)[1];
-                    const diff = parseInt(leveldata[`${levelclass}_currentlevel`]) + 1;
-                    const num = parseInt(row.split(`${levelclass}-`)[1]) - diff;
+                    const num = parseInt(row.split(`${levelclass}-`)[1]) - 1;
                     set[row + "_result"] = eventinfo.roll[`${num}`].result;
                     set[row + "_rollflag"] = flag;
-                } else {
+                } else if (row.includes(`${levelclass}-`) && source.includes("average")) {
                     set[row + "_result"] = eventinfo.roll[0].result;
                     set[row + "_rollflag"] = flag;
+                } else {
+                    false
                 };
             });
 
