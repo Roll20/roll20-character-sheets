@@ -73,7 +73,7 @@
             <span data-i18n="str-u">STR</span>
             <input class="num" type="text" name="attr_npc_str_save_base" placeholder="0">
             <span data-i18n="agi-u">AGI</span>
-            <input class="num" type="text" name="attr_npc_dex_save_base" placeholder="0">
+            <input class="num" type="text" name="attr_npc_agi_save_base" placeholder="0">
             <span data-i18n="end-u">END</span>
             <input class="num" type="text" name="attr_npc_end_save_base" placeholder="0">
             <span data-i18n="int-u">INT</span>
@@ -5711,6 +5711,19 @@
 <!-- WORKERS -->
 <script type="text/worker">
 
+    on("sheet:opened", function(eventinfo) {
+        versioning(function() {
+            if(eventinfo.sourceType === "sheetworker") {
+                setAttrs({l1mancer_status: "completed"})
+            }
+            else {
+                check_l1_mancer();
+            };
+        });
+        // cleanup_drop_fields();
+        // v2_old_values_check();
+    });
+
     on("sheet:compendium-drop", function() {
         getAttrs(["hp_max","npc_senses","token_size","cd_bar1_v","cd_bar1_m","cd_bar1_l","cd_bar2_v","cd_bar2_m","cd_bar2_l","cd_bar3_v","cd_bar3_m","cd_bar3_l"], function(v) {
 
@@ -6357,7 +6370,7 @@
         });
     });
 
-    on("change:class change:custom_class change:cust_classname change:cust_hitdietype change:cust_spellcasting_ability change:cust_spellslots change:cust_strength_save_prof change:cust_agility_save_prof change:cust_endurance_save_prof change:cust_intelligence_save_prof change:cust_willpower_save_prof change:cust_personality_save_prof change:subclass change:multiclass1 change:multiclass1_subclass change:multiclass2 change:multiclass2_subclass change:multiclass3 change:multiclass3_subclass" , function(eventinfo) {
+    on("change:class change:custom_class change:cust_classname change:cust_hitdietype change:cust_spellcasting_ability change:cust_spellslots change:cust_strength_save_prof change:cust_dexterity_save_prof change:cust_constitution_save_prof change:cust_intelligence_save_prof change:cust_wisdom_save_prof change:cust_charisma_save_prof change:subclass change:multiclass1 change:multiclass1_subclass change:multiclass2 change:multiclass2_subclass change:multiclass3 change:multiclass3_subclass" , function(eventinfo) {
         if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
             return;
         }
@@ -6370,6 +6383,7 @@
         }
         set_level();
     });
+
 
     on("change:level_calculations change:caster_level change:lvl1_slots_mod change:lvl2_slots_mod change:lvl3_slots_mod change:lvl4_slots_mod change:lvl5_slots_mod change:lvl6_slots_mod change:lvl7_slots_mod change:lvl8_slots_mod change:lvl9_slots_mod", function(eventinfo) {
         if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
@@ -6543,6 +6557,35 @@
         }
     });
 
+	
+    on("change:global_ac_mod_flag", function(eventinfo) {
+        if(eventinfo.newValue === "1") {
+            getSectionIDs("acmod", function(ids) {
+                if(!ids || ids.length === 0) {
+                    var update = {};
+                    var rowid = generateRowID();
+                    update[`repeating_acmod_${rowid}_global_ac_val`] = "1";
+                    update[`repeating_acmod_${rowid}_global_ac_name`] = "Defense";
+                    update[`repeating_acmod_${rowid}_global_ac_active_flag`] = "1";
+                    setAttrs(update);
+                }
+            });
+        } else {
+            getSectionIDs("acmod", function(ids) {
+                var update = {};
+                var rowid = generateRowID();
+                _.each(ids, function(rowid) {
+                    update[`repeating_acmod_${rowid}_global_ac_active_flag`] = "0";
+                });
+                setAttrs(update);
+            });
+        }
+    });
+
+    on("change:repeating_acmod remove:repeating_acmod", function(eventinfo) {
+        update_ac();
+    });
+	
     on("change:confirm", function(eventinfo) {
         setAttrs({monster_confirm_flag: ""});
         getAttrs(["drop_category"], function(v) {
@@ -9583,7 +9626,47 @@
         });
     };
 
+    var isMultiCaster = function(classes, arcane_fighter, arcane_rogue) {
+        var singlecaster = false;
+        var multicaster = false;
+        _.each(classes, function(multiclass) {
+            var caster = getCasterType(multiclass[0], multiclass[1], arcane_fighter, arcane_rogue) > 0;
+            if(caster && singlecaster) {
+                multicaster = true;
+            } else if(caster) {
+                singlecaster = true;
+            }
+        });
+        return multicaster;
+    };
 
+    var getCasterType = function(class_string, levels, arcane_fighter, arcane_rogue) {
+        var full = ["bard","cleric","druid","sorcerer","wizard","full"];
+        var half = ["paladin","ranger","half"];
+        if(full.indexOf(class_string) != -1) {
+            return 1;
+        } else if(half.indexOf(class_string) != -1) {
+            return (levels == 1) ? 0 : (1/2);
+        } else if(class_string === "third" || (class_string === "fighter" && arcane_fighter === "1") || (class_string === "rogue" && arcane_rogue === "1")) {
+            return (levels == 1 || levels == 2) ? 0 : (1/3);
+        } else {
+            return 0;
+        }
+    };
+
+    var checkCasterLevel = function(classes, arcane_fighter, arcane_rogue) {
+        console.log("CHECKING CASTER LEVEL");
+        var multicaster = isMultiCaster(classes, arcane_fighter, arcane_rogue);
+        var totalcasterlevel = 0;
+        _.each(classes, function(multiclass) {
+            var casterlevel = parseInt(multiclass[1], 10) * getCasterType(multiclass[0], multiclass[1], arcane_fighter, arcane_rogue);
+            // Characters with multiple spellcasting classes round down the casting level for that class
+            // Character with a single spellcasting class round up the casting level
+            totalcasterlevel = totalcasterlevel + (multicaster ? Math.floor(casterlevel) : Math.ceil(casterlevel));
+        });
+        return totalcasterlevel;
+    };
+	
     var checkHitDie = function(class_string) {
         var d10class = ["crusader","warrior","ranger"];
         var d8class = ["bard","nightblade","spellsword","monk","rogue","thief"];
@@ -9594,7 +9677,45 @@
         else if (d6class.indexOf(class_string) != -1) {return "6"}
         else {return "0"};
     };
+	
+	var update_spell_slots = function() {
+        getAttrs(["lvl1_slots_mod","lvl2_slots_mod","lvl3_slots_mod","lvl4_slots_mod","lvl5_slots_mod","lvl6_slots_mod","lvl7_slots_mod","lvl8_slots_mod","lvl9_slots_mod","caster_level"], function(v) {
+            var update = {};
+            var lvl = v["caster_level"] && !isNaN(parseInt(v["caster_level"], 10)) ? parseInt(v["caster_level"], 10) : 0;
+            var l1 = v["lvl1_slots_mod"] && !isNaN(parseInt(v["lvl1_slots_mod"], 10)) ? parseInt(v["lvl1_slots_mod"], 10) : 0;
+            var l2 = v["lvl2_slots_mod"] && !isNaN(parseInt(v["lvl2_slots_mod"], 10)) ? parseInt(v["lvl2_slots_mod"], 10) : 0;
+            var l3 = v["lvl3_slots_mod"] && !isNaN(parseInt(v["lvl3_slots_mod"], 10)) ? parseInt(v["lvl3_slots_mod"], 10) : 0;
+            var l4 = v["lvl4_slots_mod"] && !isNaN(parseInt(v["lvl4_slots_mod"], 10)) ? parseInt(v["lvl4_slots_mod"], 10) : 0;
+            var l5 = v["lvl5_slots_mod"] && !isNaN(parseInt(v["lvl5_slots_mod"], 10)) ? parseInt(v["lvl5_slots_mod"], 10) : 0;
+            var l6 = v["lvl6_slots_mod"] && !isNaN(parseInt(v["lvl6_slots_mod"], 10)) ? parseInt(v["lvl6_slots_mod"], 10) : 0;
+            var l7 = v["lvl7_slots_mod"] && !isNaN(parseInt(v["lvl7_slots_mod"], 10)) ? parseInt(v["lvl7_slots_mod"], 10) : 0;
+            var l8 = v["lvl8_slots_mod"] && !isNaN(parseInt(v["lvl8_slots_mod"], 10)) ? parseInt(v["lvl8_slots_mod"], 10) : 0;
+            var l9 = v["lvl9_slots_mod"] && !isNaN(parseInt(v["lvl9_slots_mod"], 10)) ? parseInt(v["lvl9_slots_mod"], 10) : 0;
 
+            if(lvl > 0) {
+                l1 = l1 + Math.min((lvl + 1),4);
+                if(lvl < 3) {l2 = l2 + 0;} else if(lvl === 3) {l2 = l2 + 2;} else {l2 = l2 + 3;};
+                if(lvl < 5) {l3 = l3 + 0;} else if(lvl === 5) {l3 = l3 + 2;} else {l3 = l3 + 3;};
+                if(lvl < 7) {l4 = l4 + 0;} else if(lvl === 7) {l4 = l4 + 1;} else if(lvl === 8) {l4 = l4 + 2;} else {l4 = l4 + 3;};
+                if(lvl < 9) {l5 = l5 + 0;} else if(lvl === 9) {l5 = l5 + 1;} else if(lvl < 18) {l5 = l5 + 2;} else {l5 = l5 + 3;};
+                if(lvl < 11) {l6 = l6 + 0;} else if(lvl < 19) {l6 = l6 + 1;} else {l6 = l6 + 2;};
+                if(lvl < 13) {l7 = l7 + 0;} else if(lvl < 20) {l7 = l7 + 1;} else {l7 = l7 + 2;};
+                if(lvl < 15) {l8 = l8 + 0;} else {l8 = l8 + 1;};
+                if(lvl < 17) {l9 = l9 + 0;} else {l9 = l9 + 1;};
+            };
+
+            update["lvl1_slots_total"] = l1;
+            update["lvl2_slots_total"] = l2;
+            update["lvl3_slots_total"] = l3;
+            update["lvl4_slots_total"] = l4;
+            update["lvl5_slots_total"] = l5;
+            update["lvl6_slots_total"] = l6;
+            update["lvl7_slots_total"] = l7;
+            update["lvl8_slots_total"] = l8;
+            update["lvl9_slots_total"] = l9;
+            setAttrs(update, {silent: true});
+        });
+    };
 
     var update_pb = function() {
         callbacks = [];
@@ -10334,6 +10455,7 @@
         });
     };
 
+	
 
     var v2_old_values_check = function() {
         // update_attacks("all");
@@ -10677,95 +10799,6 @@
         });
     };
 
-        var doAllDrops = function(dropArray, callback) {
-            var thisPage = dropArray.shift();
-            var pageName = thisPage;
-            var additionalData = {};
-            if(typeof thisPage == "object") {
-                pageName = thisPage.name;
-                additionalData = thisPage.data || {};
-            }
 
-            getCompendiumPage(pageName, function(pageData) {
-                pageName = pageName.indexOf("@@!!@@") > -1 ? pageName.replace(/@@!!@@/g,"") : pageName; // Hacky bugfix to prevent custom names from matching unavailable content
-                currentDrop++;
-                if(typeof pageData == "string") {
-                    console.log("Creating custom drop for " + pageName);
-                    pageData = {name: pageName.split(":")[1], content: "", data: {Category: pageName.split(":")[0], Source: "Charactermancer"}};
-                };
-                setCharmancerText({"mancer_category": pageData.data.Category, "mancer_progress":"Applying change " + currentDrop + " out of " + totalDrops});
-                pageData.data = _.extend(pageData.data, additionalData);
-                if(pageData.data["data-Equipment"]) {
-                    var json = JSON.parse(pageData.data["data-Equipment"]);
-                    var newItems = makeItemData(json.default);
-                    console.log("ADDING ADDITIONAL ITEMS:");
-                    totalDrops += newItems.length;
-                    dropArray = dropArray.concat(newItems);
-                }
-                if(pageData.data["data-Starting Gold"] && !noEquipmentDrop) {
-                    set["gp"] += parseInt(pageData.data["data-Starting Gold"]);
-                }
-                if(pageData.data["data-Bundle"]) {
-                    var json = JSON.parse(pageData.data["data-Bundle"]);
-                    var newItems = makeItemData(json);
-                    console.log("ADDING ADDITIONAL ITEMS (FROM BUNDLE):");
-                    totalDrops += newItems.length
-                    dropArray = dropArray.concat(newItems);
-                    doAllDrops(dropArray, callback);
-                } else {
-                    dropCompendiumData("licensecontainer", pageData, function(data) {
-                        console.log("Dropped " + pageName);
-                        if(dropArray.length > 0) {
-                            doAllDrops(dropArray, callback);
-                        } else {
-                            callback();
-                        }
-                    });
-                }
-            });
-        };
-        var makeItemData = function(items) {
-            if (noEquipmentDrop) {
-                return [];
-            } else {
-                var itemArray = [];
-                var splitItems = [];
-                _.each(items, function(item) {
-                    item = item.split(",");
-                    _.each(item, function(splitItem) {
-                        splitItems.push(splitItem.trim());
-                    });
-                })
-                _.each(splitItems, function(item) {
-                    var itemname = item.split("(")[0].trim().replace("Items:", "");
-                    itemname = itemname.substring(0,4) == "and " ? itemname.substr(4) : itemname;
-                    var itemdata = {name:"Items:" + itemname, data:{}}
-                    if(item.includes("(")) {
-                        var par = item.split("(")[1].split(")")[0];
-                        if( !isNaN(parseInt(par)) ) {
-                            itemdata.data["itemcount"] = parseInt(par);
-                        }
-                    }
-                    if(itemname != "") {
-                        itemArray.push(itemdata);
-                    }
-                });
-                return itemArray;
-            }
-        };
-        var eraseRepeating = function(sectionArray, callback) {
-            var thisSection = sectionArray.shift();
-            getSectionIDs(thisSection, function(itemids) {
-                _.each(itemids, function(item) {
-                    removeRepeatingRow("repeating_" + thisSection + "_" + item);
-                });
-                if(sectionArray.length > 0) {
-                    eraseRepeating(sectionArray, callback);
-                } else {
-                    callback();
-                }
-
-            });
-        }
 
 </script>
