@@ -3049,48 +3049,26 @@
 		});			
 
 	    const versioning = (version) => {
-        	console.log(`%c Shadowrun 5th Edition versioning, ${version}`, "color: blue; font-weight:bold");
-           if (version === "1.41") {
-				console.log(`%c Shadowrun 5th Edition is update to date`, "color: red; font-weight:bold");
-           	} else if (version === "1.4") {
-           		const toggles = [`wound_toggle`, `edge_toggle`, `modifier_toggle`];
-				getAttrs(toggles, (v) => {
-					let set = {};
-					toggles.forEach(attr => {
-						const name = attr.split("_")[0], value = v[`${attr}`].toString();
-						(value != "0" || !value.includes(name)) ? set[`${attr}`] = 0 : false;
-					});
-					setAttrs(set);
-				});
-           		setAttrs({version: "1.41"}, () => {versioning("1.41")});
+        	console.log(`Shadowrun 5th Edition versioning, ${version}`);
+           if (version === "1.36") {
+                setAttrs({version: "1.4"});
             } else if (version === "1.35") {
             	getAttrs(["sheet_type"], (v) => {
             		let update = {};
             		(v.sheet_type === "goon") ? update["sheet_type"] = "grunt" : false;
             		setAttrs(update);
             	});
-                setAttrs({version: "1.36"}, () => {versioning("1.4")});
+                setAttrs({version: "1.36"}, () => {versioning("1.36")});
             } else {
 				setAttrs({version: "1.35"}, () => {versioning("1.35")});
 			};
 	    };
 
-	 on("clicked:whisper", (eventinfo) => {
-		getAttrs([`gm_toggle`], (v) => {
-			const value = v[`${attr}_toggle`];
-			const change = (attr === "gm" && value != "/w gm") ? "/w gm" : " ";
-
-			setAttrs({
-				[`${attr}_toggle`]: change
-			});
-		});
-	});  
-
-	 on("clicked:wound clicked:modifier clicked:edge", (eventinfo) => {
-	 	const attr = eventinfo.triggerName.split("clicked:")[1];
+	 on("clicked:whisper clicked:wound clicked:modifier clicked:edge", (eventinfo) => {
+	 	const attr = (eventinfo.triggerName.includes("whisper")) ? "gm" : eventinfo.triggerName.split("clicked:")[1];
 		getAttrs([`${attr}_toggle`], (v) => {
 			const value = v[`${attr}_toggle`];
-			const change = (attr === "wound" && value != "@{wounds}") ? "@{wounds}" : (attr === "edge" && value != "@{edge}") ? "@{edge}" : (attr === "modifier" && value != "?{Modifiers +/-|0}") ? "?{Modifiers +/-|0}" : 0;
+			const change = (attr === "gm" && value != "/w gm") ? "/w gm" : (attr === "wound" && value != "@{wounds}") ? "@{wounds}" : (attr === "edge" && value != "@{edge}") ? "@{edge}" : (attr === "modifier" && value != "?{Modifiers +/-|0}") ? "?{Modifiers +/-|0}" : " ";
 
 			setAttrs({
 				[`${attr}_toggle`]: change
