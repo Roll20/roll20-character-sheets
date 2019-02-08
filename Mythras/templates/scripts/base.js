@@ -4007,15 +4007,15 @@
 	            setAttrs({rank: rank});
 	            
 	            if (rank == 2) {
-	                setAttrs({cult_spirit_limit: "ceil(@{cha}*.5)"});
+	                setAttrs({animism_cult_rank: "2"});
 	            } else if (rank == 3) {
-	                setAttrs({cult_spirit_limit: "ceil(@{cha}*.75)"});
+	                setAttrs({animism_cult_rank: "3"});
 	            } else if (rank == 4) {
-	                setAttrs({cult_spirit_limit: "@{cha}"});
+	                setAttrs({animism_cult_rank: "4"});
 	            } else if (rank == 5) {
-	                setAttrs({cult_spirit_limit: "@{cha}+0"});
+	                setAttrs({animism_cult_rank: "5"});
 	            } else {
-	                setAttrs({cult_spirit_limit: "ceil(@{cha}*.25)"});
+	                setAttrs({animism_cult_rank: "1"});
 	            }
 	        }
 	        if (typeof characterData["notes"] !== 'undefined') {
@@ -4079,22 +4079,85 @@
 
 	        // Import Attributes
 	        if (typeof characterData["attributes"]["movement"] !== 'undefined') {
-	            setAttrs({movement_rate_species: characterData["attributes"]["movement"]});
+	            setAttrs({
+                    movement_rate_species: characterData["attributes"]["movement"],
+                    movement_rate_species_swim: characterData["attributes"]["movement"]
+                });
 	        }
 	        if (typeof characterData["attributes"]["action_points"] !== 'undefined') {
-	            setAttrs({action_points: characterData["attributes"]["action_points"]});
+	            setAttrs({
+                    action_points: characterData["attributes"]["action_points"],
+                    action_points_mook1: characterData["attributes"]["action_points"],
+                    action_points_mook2: characterData["attributes"]["action_points"],
+                    action_points_mook3: characterData["attributes"]["action_points"],
+                    action_points_mook4: characterData["attributes"]["action_points"],
+                    action_points_mook5: characterData["attributes"]["action_points"],
+                    action_points_mook6: characterData["attributes"]["action_points"],
+                    action_points_mook7: characterData["attributes"]["action_points"],
+                    action_points_mook8: characterData["attributes"]["action_points"],
+                    action_points_mook9: characterData["attributes"]["action_points"],
+                    action_points_mook10: characterData["attributes"]["action_points"]
+                });
 	        }
 	        if (typeof characterData["attributes"]["magic_points"] !== 'undefined') {
-	            setAttrs({magic_points: characterData["attributes"]["magic_points"]});
+	            setAttrs({
+                    magic_points: characterData["attributes"]["magic_points"],
+                    magic_points_mook1: characterData["attributes"]["magic_points"],
+                    magic_points_mook2: characterData["attributes"]["magic_points"],
+                    magic_points_mook3: characterData["attributes"]["magic_points"],
+                    magic_points_mook4: characterData["attributes"]["magic_points"],
+                    magic_points_mook5: characterData["attributes"]["magic_points"],
+                    magic_points_mook6: characterData["attributes"]["magic_points"],
+                    magic_points_mook7: characterData["attributes"]["magic_points"],
+                    magic_points_mook8: characterData["attributes"]["magic_points"],
+                    magic_points_mook9: characterData["attributes"]["magic_points"],
+                    magic_points_mook10: characterData["attributes"]["magic_points"]
+                });
 	        }
 	        if (typeof characterData["attributes"]["prana_points"] !== 'undefined') {
-	            setAttrs({prana_points: characterData["attributes"]["prana_points"]});
+	            setAttrs({
+                    prana_points: characterData["attributes"]["prana_points"],
+                    prana_points_mook1: characterData["attributes"]["prana_points"],
+                    prana_points_mook2: characterData["attributes"]["prana_points"],
+                    prana_points_mook3: characterData["attributes"]["prana_points"],
+                    prana_points_mook4: characterData["attributes"]["prana_points"],
+                    prana_points_mook5: characterData["attributes"]["prana_points"],
+                    prana_points_mook6: characterData["attributes"]["prana_points"],
+                    prana_points_mook7: characterData["attributes"]["prana_points"],
+                    prana_points_mook8: characterData["attributes"]["prana_points"],
+                    prana_points_mook9: characterData["attributes"]["prana_points"],
+                    prana_points_mook10: characterData["attributes"]["prana_points"]
+                });
 	        }
 	        if (typeof characterData["attributes"]["power_points"] !== 'undefined') {
-	            setAttrs({power_points: characterData["attributes"]["power_points"]});
+	            setAttrs({
+                    power_points: characterData["attributes"]["power_points"],
+                    power_points_mook1: characterData["attributes"]["power_points"],
+                    power_points_mook2: characterData["attributes"]["power_points"],
+                    power_points_mook3: characterData["attributes"]["power_points"],
+                    power_points_mook4: characterData["attributes"]["power_points"],
+                    power_points_mook5: characterData["attributes"]["power_points"],
+                    power_points_mook6: characterData["attributes"]["power_points"],
+                    power_points_mook7: characterData["attributes"]["power_points"],
+                    power_points_mook8: characterData["attributes"]["power_points"],
+                    power_points_mook9: characterData["attributes"]["power_points"],
+                    power_points_mook10: characterData["attributes"]["power_points"]
+                });
 	        }
 	        if (typeof characterData["attributes"]["tenacity"] !== 'undefined') {
-	            setAttrs({tenacity: characterData["attributes"]["tenacity"]});
+	            setAttrs({
+                    tenacity: characterData["attributes"]["tenacity"],
+                    tenacity_mook1: characterData["attributes"]["tenacity"],
+                    tenacity_mook2: characterData["attributes"]["tenacity"],
+                    tenacity_mook3: characterData["attributes"]["tenacity"],
+                    tenacity_mook4: characterData["attributes"]["tenacity"],
+                    tenacity_mook5: characterData["attributes"]["tenacity"],
+                    tenacity_mook6: characterData["attributes"]["tenacity"],
+                    tenacity_mook7: characterData["attributes"]["tenacity"],
+                    tenacity_mook8: characterData["attributes"]["tenacity"],
+                    tenacity_mook9: characterData["attributes"]["tenacity"],
+                    tenacity_mook10: characterData["attributes"]["tenacity"]
+                });
 	        }
 	        if (typeof characterData["attributes"]["strike_rank"] !== 'undefined') {
 	            if (characterData["attributes"]["strike_rank"].includes("-")) {
@@ -4133,7 +4196,20 @@
 	            if (typeof characterData["hit_locations"][0]["ap"] !== 'undefined') {
 	                setAttrs({location1_armor_ap: characterData["hit_locations"][0]["ap"]});
 	            }
-	            setAttrs({simplified_hp: Math.ceil((con+siz)/2)});
+                var simplified_hp_val = Math.ceil((con+siz)/2);
+	            setAttrs({
+                    simplified_hp: simplified_hp_val,
+                    simplified_hp_mook1: simplified_hp_val,
+                    simplified_hp_mook2: simplified_hp_val,
+                    simplified_hp_mook3: simplified_hp_val,
+                    simplified_hp_mook4: simplified_hp_val,
+                    simplified_hp_mook5: simplified_hp_val,
+                    simplified_hp_mook6: simplified_hp_val,
+                    simplified_hp_mook7: simplified_hp_val,
+                    simplified_hp_mook8: simplified_hp_val,
+                    simplified_hp_mook9: simplified_hp_val,
+                    simplified_hp_mook10: simplified_hp_val
+                });
 	        } else {
 	            var base_hp = Math.ceil((con+siz)/5);
 	            
@@ -4150,7 +4226,19 @@
 	                    location1_table_end: table[1],
 	                    location1_name: characterData["hit_locations"][0]["name"],
 	                    location1_armor_ap: characterData["hit_locations"][0]["ap"],
-	                    location1_hp_max_base_mod: characterData["hit_locations"][0]["hp"] - base_hp, location1_hp: characterData["hit_locations"][0]["hp"]
+                        location1_armor_ap_max: characterData["hit_locations"][0]["ap"],
+	                    location1_hp_max_base_mod: characterData["hit_locations"][0]["hp"] - base_hp,
+                        location1_hp: characterData["hit_locations"][0]["hp"],
+                        location1_hp_mook1: characterData["hit_locations"][0]["hp"],
+                        location1_hp_mook2: characterData["hit_locations"][0]["hp"],
+                        location1_hp_mook3: characterData["hit_locations"][0]["hp"],
+                        location1_hp_mook4: characterData["hit_locations"][0]["hp"],
+                        location1_hp_mook5: characterData["hit_locations"][0]["hp"],
+                        location1_hp_mook6: characterData["hit_locations"][0]["hp"],
+                        location1_hp_mook7: characterData["hit_locations"][0]["hp"],
+                        location1_hp_mook8: characterData["hit_locations"][0]["hp"],
+                        location1_hp_mook9: characterData["hit_locations"][0]["hp"],
+                        location1_hp_mook10: characterData["hit_locations"][0]["hp"]
 	                });
 	            } else {
 	                setAttrs({
@@ -4158,7 +4246,19 @@
 	                    location1_table_end: "0",
 	                    location1_name: " ",
 	                    location1_armor_ap: "0",
-	                    location1_hp_max_base_mod: 0 - base_hp, location1_hp: "0",
+                        location1_armor_ap_max: "0",
+	                    location1_hp_max_base_mod: 0 - base_hp,
+                        location1_hp: "0",
+                        location1_hp_mook1: "0",
+                        location1_hp_mook2: "0",
+                        location1_hp_mook3: "0",
+                        location1_hp_mook4: "0",
+                        location1_hp_mook5: "0",
+                        location1_hp_mook6: "0",
+                        location1_hp_mook7: "0",
+                        location1_hp_mook8: "0",
+                        location1_hp_mook9: "0",
+                        location1_hp_mook10: "0"
 	                });
 	            }
 	            
@@ -4175,7 +4275,19 @@
 	                    location2_table_end: table[1],
 	                    location2_name: characterData["hit_locations"][1]["name"],
 	                    location2_armor_ap: characterData["hit_locations"][1]["ap"],
-	                    location2_hp_max_base_mod: characterData["hit_locations"][1]["hp"] - base_hp, location2_hp: characterData["hit_locations"][1]["hp"]
+                        location2_armor_ap_max: characterData["hit_locations"][1]["ap"],
+	                    location2_hp_max_base_mod: characterData["hit_locations"][1]["hp"] - base_hp,
+                        location2_hp: characterData["hit_locations"][1]["hp"],
+                        location2_hp_mook1: characterData["hit_locations"][1]["hp"],
+                        location2_hp_mook2: characterData["hit_locations"][1]["hp"],
+                        location2_hp_mook3: characterData["hit_locations"][1]["hp"],
+                        location2_hp_mook4: characterData["hit_locations"][1]["hp"],
+                        location2_hp_mook5: characterData["hit_locations"][1]["hp"],
+                        location2_hp_mook6: characterData["hit_locations"][1]["hp"],
+                        location2_hp_mook7: characterData["hit_locations"][1]["hp"],
+                        location2_hp_mook8: characterData["hit_locations"][1]["hp"],
+                        location2_hp_mook9: characterData["hit_locations"][1]["hp"],
+                        location2_hp_mook10: characterData["hit_locations"][1]["hp"]
 	                });
 	            } else {
 	                setAttrs({
@@ -4183,7 +4295,19 @@
 	                    location2_table_end: "0",
 	                    location2_name: " ",
 	                    location2_armor_ap: "0",
-	                    location2_hp_max_base_mod: 0 - base_hp, location2_hp: "0",
+                        location2_armor_ap_max: "0",
+	                    location2_hp_max_base_mod: 0 - base_hp,
+                        location2_hp: "0",
+                        location2_hp_mook1: "0",
+                        location2_hp_mook2: "0",
+                        location2_hp_mook3: "0",
+                        location2_hp_mook4: "0",
+                        location2_hp_mook5: "0",
+                        location2_hp_mook6: "0",
+                        location2_hp_mook7: "0",
+                        location2_hp_mook8: "0",
+                        location2_hp_mook9: "0",
+                        location2_hp_mook10: "0"
 	                });
 	            }
 	            
@@ -4200,7 +4324,19 @@
 	                    location3_table_end: table[1],
 	                    location3_name: characterData["hit_locations"][2]["name"],
 	                    location3_armor_ap: characterData["hit_locations"][2]["ap"],
-	                    location3_hp_max_base_mod: characterData["hit_locations"][2]["hp"] - base_hp, location3_hp: characterData["hit_locations"][2]["hp"]
+                        location3_armor_ap_max: characterData["hit_locations"][2]["ap"],
+	                    location3_hp_max_base_mod: characterData["hit_locations"][2]["hp"] - base_hp,
+                        location3_hp: characterData["hit_locations"][2]["hp"],
+                        location3_hp_mook1: characterData["hit_locations"][2]["hp"],
+                        location3_hp_mook2: characterData["hit_locations"][2]["hp"],
+                        location3_hp_mook3: characterData["hit_locations"][2]["hp"],
+                        location3_hp_mook4: characterData["hit_locations"][2]["hp"],
+                        location3_hp_mook5: characterData["hit_locations"][2]["hp"],
+                        location3_hp_mook6: characterData["hit_locations"][2]["hp"],
+                        location3_hp_mook7: characterData["hit_locations"][2]["hp"],
+                        location3_hp_mook8: characterData["hit_locations"][2]["hp"],
+                        location3_hp_mook9: characterData["hit_locations"][2]["hp"],
+                        location3_hp_mook10: characterData["hit_locations"][2]["hp"]
 	                });
 	            } else {
 	                setAttrs({
@@ -4208,7 +4344,18 @@
 	                    location3_table_end: "0",
 	                    location3_name: " ",
 	                    location3_armor_ap: "0",
-	                    location3_hp_max_base_mod: 0 - base_hp, location3_hp: "0",
+                        location3_armor_ap_max: "0",
+	                    location3_hp_max_base_mod: 0 - base_hp,
+                        location3_hp_mook1: "0",
+                        location3_hp_mook2: "0",
+                        location3_hp_mook3: "0",
+                        location3_hp_mook4: "0",
+                        location3_hp_mook5: "0",
+                        location3_hp_mook6: "0",
+                        location3_hp_mook7: "0",
+                        location3_hp_mook8: "0",
+                        location3_hp_mook9: "0",
+                        location3_hp_mook10: "0"
 	                });
 	            }
 	            
@@ -4225,7 +4372,19 @@
 	                    location4_table_end: table[1],
 	                    location4_name: characterData["hit_locations"][3]["name"],
 	                    location4_armor_ap: characterData["hit_locations"][3]["ap"],
-	                    location4_hp_max_base_mod: characterData["hit_locations"][3]["hp"] - base_hp, location4_hp: characterData["hit_locations"][3]["hp"]
+                        location4_armor_ap_max: characterData["hit_locations"][3]["ap"],
+	                    location4_hp_max_base_mod: characterData["hit_locations"][3]["hp"] - base_hp,
+                        location4_hp: characterData["hit_locations"][3]["hp"],
+                        location4_hp_mook1: characterData["hit_locations"][3]["hp"],
+                        location4_hp_mook2: characterData["hit_locations"][3]["hp"],
+                        location4_hp_mook3: characterData["hit_locations"][3]["hp"],
+                        location4_hp_mook4: characterData["hit_locations"][3]["hp"],
+                        location4_hp_mook5: characterData["hit_locations"][3]["hp"],
+                        location4_hp_mook6: characterData["hit_locations"][3]["hp"],
+                        location4_hp_mook7: characterData["hit_locations"][3]["hp"],
+                        location4_hp_mook8: characterData["hit_locations"][3]["hp"],
+                        location4_hp_mook9: characterData["hit_locations"][3]["hp"],
+                        location4_hp_mook10: characterData["hit_locations"][3]["hp"]
 	                });
 	            } else {
 	                setAttrs({
@@ -4233,7 +4392,18 @@
 	                    location4_table_end: "0",
 	                    location4_name: " ",
 	                    location4_armor_ap: "0",
-	                    location4_hp_max_base_mod: 0 - base_hp, location4_hp: "0",
+                        location4_armor_ap_max: "0",
+	                    location4_hp_max_base_mod: 0 - base_hp,
+                        location4_hp_mook1: "0",
+                        location4_hp_mook2: "0",
+                        location4_hp_mook3: "0",
+                        location4_hp_mook4: "0",
+                        location4_hp_mook5: "0",
+                        location4_hp_mook6: "0",
+                        location4_hp_mook7: "0",
+                        location4_hp_mook8: "0",
+                        location4_hp_mook9: "0",
+                        location4_hp_mook10: "0"
 	                });
 	            }
 	            
@@ -4250,7 +4420,19 @@
 	                    location5_table_end: table[1],
 	                    location5_name: characterData["hit_locations"][4]["name"],
 	                    location5_armor_ap: characterData["hit_locations"][4]["ap"],
-	                    location5_hp_max_base_mod: characterData["hit_locations"][4]["hp"] - base_hp, location5_hp: characterData["hit_locations"][4]["hp"]
+                        location5_armor_ap_max: characterData["hit_locations"][4]["ap"],
+	                    location5_hp_max_base_mod: characterData["hit_locations"][4]["hp"] - base_hp,
+                        location5_hp: characterData["hit_locations"][4]["hp"],
+                        location5_hp_mook1: characterData["hit_locations"][4]["hp"],
+                        location5_hp_mook2: characterData["hit_locations"][4]["hp"],
+                        location5_hp_mook3: characterData["hit_locations"][4]["hp"],
+                        location5_hp_mook4: characterData["hit_locations"][4]["hp"],
+                        location5_hp_mook5: characterData["hit_locations"][4]["hp"],
+                        location5_hp_mook6: characterData["hit_locations"][4]["hp"],
+                        location5_hp_mook7: characterData["hit_locations"][4]["hp"],
+                        location5_hp_mook8: characterData["hit_locations"][4]["hp"],
+                        location5_hp_mook9: characterData["hit_locations"][4]["hp"],
+                        location5_hp_mook10: characterData["hit_locations"][4]["hp"]
 	                });
 	            } else {
 	                setAttrs({
@@ -4258,7 +4440,18 @@
 	                    location5_table_end: "0",
 	                    location5_name: " ",
 	                    location5_armor_ap: "0",
-	                    location5_hp_max_base_mod: 0 - base_hp, location5_hp: "0",
+                        location5_armor_ap_max: "0",
+	                    location5_hp_max_base_mod: 0 - base_hp,
+                        location5_hp_mook1: "0",
+                        location5_hp_mook2: "0",
+                        location5_hp_mook3: "0",
+                        location5_hp_mook4: "0",
+                        location5_hp_mook5: "0",
+                        location5_hp_mook6: "0",
+                        location5_hp_mook7: "0",
+                        location5_hp_mook8: "0",
+                        location5_hp_mook9: "0",
+                        location5_hp_mook10: "0"
 	                });
 	            }
 	            
@@ -4275,7 +4468,19 @@
 	                    location6_table_end: table[1],
 	                    location6_name: characterData["hit_locations"][5]["name"],
 	                    location6_armor_ap: characterData["hit_locations"][5]["ap"],
-	                    location6_hp_max_base_mod: characterData["hit_locations"][5]["hp"] - base_hp, location6_hp: characterData["hit_locations"][5]["hp"]
+                        location6_armor_ap_max: characterData["hit_locations"][5]["ap"],
+	                    location6_hp_max_base_mod: characterData["hit_locations"][5]["hp"] - base_hp,
+                        location6_hp: characterData["hit_locations"][5]["hp"],
+                        location6_hp_mook1: characterData["hit_locations"][5]["hp"],
+                        location6_hp_mook2: characterData["hit_locations"][5]["hp"],
+                        location6_hp_mook3: characterData["hit_locations"][5]["hp"],
+                        location6_hp_mook4: characterData["hit_locations"][5]["hp"],
+                        location6_hp_mook5: characterData["hit_locations"][5]["hp"],
+                        location6_hp_mook6: characterData["hit_locations"][5]["hp"],
+                        location6_hp_mook7: characterData["hit_locations"][5]["hp"],
+                        location6_hp_mook8: characterData["hit_locations"][5]["hp"],
+                        location6_hp_mook9: characterData["hit_locations"][5]["hp"],
+                        location6_hp_mook10: characterData["hit_locations"][5]["hp"]
 	                });
 	            } else {
 	                setAttrs({
@@ -4283,7 +4488,18 @@
 	                    location6_table_end: "0",
 	                    location6_name: " ",
 	                    location6_armor_ap: "0",
-	                    location6_hp_max_base_mod: 0 - base_hp, location6_hp: "0",
+                        location6_armor_ap_max: "0",
+	                    location6_hp_max_base_mod: 0 - base_hp,
+                        location6_hp_mook1: "0",
+                        location6_hp_mook2: "0",
+                        location6_hp_mook3: "0",
+                        location6_hp_mook4: "0",
+                        location6_hp_mook5: "0",
+                        location6_hp_mook6: "0",
+                        location6_hp_mook7: "0",
+                        location6_hp_mook8: "0",
+                        location6_hp_mook9: "0",
+                        location6_hp_mook10: "0"
 	                });
 	            }
 	            
@@ -4300,7 +4516,19 @@
 	                    location7_table_end: table[1],
 	                    location7_name: characterData["hit_locations"][6]["name"],
 	                    location7_armor_ap: characterData["hit_locations"][6]["ap"],
-	                    location7_hp_max_base_mod: characterData["hit_locations"][6]["hp"] - base_hp, location7_hp: characterData["hit_locations"][6]["hp"]
+                        location7_armor_ap_max: characterData["hit_locations"][6]["ap"],
+	                    location7_hp_max_base_mod: characterData["hit_locations"][6]["hp"] - base_hp,
+                        location7_hp: characterData["hit_locations"][6]["hp"],
+                        location7_hp_mook1: characterData["hit_locations"][6]["hp"],
+                        location7_hp_mook2: characterData["hit_locations"][6]["hp"],
+                        location7_hp_mook3: characterData["hit_locations"][6]["hp"],
+                        location7_hp_mook4: characterData["hit_locations"][6]["hp"],
+                        location7_hp_mook5: characterData["hit_locations"][6]["hp"],
+                        location7_hp_mook6: characterData["hit_locations"][6]["hp"],
+                        location7_hp_mook7: characterData["hit_locations"][6]["hp"],
+                        location7_hp_mook8: characterData["hit_locations"][6]["hp"],
+                        location7_hp_mook9: characterData["hit_locations"][6]["hp"],
+                        location7_hp_mook10: characterData["hit_locations"][6]["hp"]
 	                });
 	            } else {
 	                setAttrs({
@@ -4308,7 +4536,18 @@
 	                    location7_table_end: "0",
 	                    location7_name: " ",
 	                    location7_armor_ap: "0",
-	                    location7_hp_max_base_mod: 0 - base_hp, location7_hp: "0",
+                        location7_armor_ap_max: "0",
+	                    location7_hp_max_base_mod: 0 - base_hp,
+                        location7_hp_mook1: "0",
+                        location7_hp_mook2: "0",
+                        location7_hp_mook3: "0",
+                        location7_hp_mook4: "0",
+                        location7_hp_mook5: "0",
+                        location7_hp_mook6: "0",
+                        location7_hp_mook7: "0",
+                        location7_hp_mook8: "0",
+                        location7_hp_mook9: "0",
+                        location7_hp_mook10: "0"
 	                });
 	            }
 	            
@@ -4325,7 +4564,19 @@
 	                    location8_table_end: table[1],
 	                    location8_name: characterData["hit_locations"][7]["name"],
 	                    location8_armor_ap: characterData["hit_locations"][7]["ap"],
-	                    location8_hp_max_base_mod: characterData["hit_locations"][7]["hp"] - base_hp, location8_hp: characterData["hit_locations"][7]["hp"]
+                        location8_armor_ap_max: characterData["hit_locations"][7]["ap"],
+	                    location8_hp_max_base_mod: characterData["hit_locations"][7]["hp"] - base_hp,
+                        location8_hp: characterData["hit_locations"][7]["hp"],
+                        location8_hp_mook1: characterData["hit_locations"][7]["hp"],
+                        location8_hp_mook2: characterData["hit_locations"][7]["hp"],
+                        location8_hp_mook3: characterData["hit_locations"][7]["hp"],
+                        location8_hp_mook4: characterData["hit_locations"][7]["hp"],
+                        location8_hp_mook5: characterData["hit_locations"][7]["hp"],
+                        location8_hp_mook6: characterData["hit_locations"][7]["hp"],
+                        location8_hp_mook7: characterData["hit_locations"][7]["hp"],
+                        location8_hp_mook8: characterData["hit_locations"][7]["hp"],
+                        location8_hp_mook9: characterData["hit_locations"][7]["hp"],
+                        location8_hp_mook10: characterData["hit_locations"][7]["hp"]
 	                });
 	            } else {
 	                setAttrs({
@@ -4333,7 +4584,18 @@
 	                    location8_table_end: "0",
 	                    location8_name: " ",
 	                    location8_armor_ap: "0",
-	                    location8_hp_max_base_mod: 0 - base_hp, location8_hp: "0",
+                        location8_armor_ap_max: "0",
+	                    location8_hp_max_base_mod: 0 - base_hp,
+                        location8_hp_mook1: "0",
+                        location8_hp_mook2: "0",
+                        location8_hp_mook3: "0",
+                        location8_hp_mook4: "0",
+                        location8_hp_mook5: "0",
+                        location8_hp_mook6: "0",
+                        location8_hp_mook7: "0",
+                        location8_hp_mook8: "0",
+                        location8_hp_mook9: "0",
+                        location8_hp_mook10: "0"
 	                });
 	            }
 	            
@@ -4350,7 +4612,19 @@
 	                    location9_table_end: table[1],
 	                    location9_name: characterData["hit_locations"][8]["name"],
 	                    location9_armor_ap: characterData["hit_locations"][8]["ap"],
-	                    location9_hp_max_base_mod: characterData["hit_locations"][8]["hp"] - base_hp, location9_hp: characterData["hit_locations"][8]["hp"]
+                        location9_armor_ap_max: characterData["hit_locations"][8]["ap"],
+	                    location9_hp_max_base_mod: characterData["hit_locations"][8]["hp"] - base_hp,
+                        location9_hp: characterData["hit_locations"][8]["hp"],
+                        location9_hp_mook1: characterData["hit_locations"][8]["hp"],
+                        location9_hp_mook2: characterData["hit_locations"][8]["hp"],
+                        location9_hp_mook3: characterData["hit_locations"][8]["hp"],
+                        location9_hp_mook4: characterData["hit_locations"][8]["hp"],
+                        location9_hp_mook5: characterData["hit_locations"][8]["hp"],
+                        location9_hp_mook6: characterData["hit_locations"][8]["hp"],
+                        location9_hp_mook7: characterData["hit_locations"][8]["hp"],
+                        location9_hp_mook8: characterData["hit_locations"][8]["hp"],
+                        location9_hp_mook9: characterData["hit_locations"][8]["hp"],
+                        location9_hp_mook10: characterData["hit_locations"][8]["hp"]
 	                });
 	            } else {
 	                setAttrs({
@@ -4358,7 +4632,18 @@
 	                    location9_table_end: "0",
 	                    location9_name: " ",
 	                    location9_armor_ap: "0",
-	                    location9_hp_max_base_mod: 0 - base_hp, location9_hp: "0",
+                        location9_armor_ap_max: "0",
+	                    location9_hp_max_base_mod: 0 - base_hp,
+                        location9_hp_mook1: "0",
+                        location9_hp_mook2: "0",
+                        location9_hp_mook3: "0",
+                        location9_hp_mook4: "0",
+                        location9_hp_mook5: "0",
+                        location9_hp_mook6: "0",
+                        location9_hp_mook7: "0",
+                        location9_hp_mook8: "0",
+                        location9_hp_mook9: "0",
+                        location9_hp_mook10: "0"
 	                });
 	            }
 	            
@@ -4375,7 +4660,19 @@
 	                    location10_table_end: table[1],
 	                    location10_name: characterData["hit_locations"][9]["name"],
 	                    location10_armor_ap: characterData["hit_locations"][9]["ap"],
-	                    location10_hp_max_base_mod: characterData["hit_locations"][9]["hp"] - base_hp, location10_hp: characterData["hit_locations"][9]["hp"]
+                        location10_armor_ap_max: characterData["hit_locations"][9]["ap"],
+	                    location10_hp_max_base_mod: characterData["hit_locations"][9]["hp"] - base_hp,
+                        location10_hp: characterData["hit_locations"][9]["hp"],
+                        location10_hp_mook1: characterData["hit_locations"][9]["hp"],
+                        location10_hp_mook2: characterData["hit_locations"][9]["hp"],
+                        location10_hp_mook3: characterData["hit_locations"][9]["hp"],
+                        location10_hp_mook4: characterData["hit_locations"][9]["hp"],
+                        location10_hp_mook5: characterData["hit_locations"][9]["hp"],
+                        location10_hp_mook6: characterData["hit_locations"][9]["hp"],
+                        location10_hp_mook7: characterData["hit_locations"][9]["hp"],
+                        location10_hp_mook8: characterData["hit_locations"][9]["hp"],
+                        location10_hp_mook9: characterData["hit_locations"][9]["hp"],
+                        location10_hp_mook10: characterData["hit_locations"][9]["hp"]
 	                });
 	            } else {
 	                setAttrs({
@@ -4383,7 +4680,18 @@
 	                    location10_table_end: "0",
 	                    location10_name: " ",
 	                    location10_armor_ap: "0",
-	                    location10_hp_max_base_mod: 0 - base_hp, location10_hp: "0",
+                        location10_armor_ap_max: "0",
+	                    location10_hp_max_base_mod: 0 - base_hp,
+                        location10_hp_mook1: "0",
+                        location10_hp_mook2: "0",
+                        location10_hp_mook3: "0",
+                        location10_hp_mook4: "0",
+                        location10_hp_mook5: "0",
+                        location10_hp_mook6: "0",
+                        location10_hp_mook7: "0",
+                        location10_hp_mook8: "0",
+                        location10_hp_mook9: "0",
+                        location10_hp_mook10: "0"
 	                });
 	            }
 	            
@@ -4400,7 +4708,19 @@
 	                    location11_table_end: table[1],
 	                    location11_name: characterData["hit_locations"][10]["name"],
 	                    location11_armor_ap: characterData["hit_locations"][10]["ap"],
-	                    location11_hp_max_base_mod: characterData["hit_locations"][10]["hp"] - base_hp, location11_hp: characterData["hit_locations"][10]["hp"]
+                        location11_armor_ap_max: characterData["hit_locations"][10]["ap"],
+	                    location11_hp_max_base_mod: characterData["hit_locations"][10]["hp"] - base_hp,
+                        location11_hp: characterData["hit_locations"][10]["hp"],
+                        location11_hp_mook1: characterData["hit_locations"][10]["hp"],
+                        location11_hp_mook2: characterData["hit_locations"][10]["hp"],
+                        location11_hp_mook3: characterData["hit_locations"][10]["hp"],
+                        location11_hp_mook4: characterData["hit_locations"][10]["hp"],
+                        location11_hp_mook5: characterData["hit_locations"][10]["hp"],
+                        location11_hp_mook6: characterData["hit_locations"][10]["hp"],
+                        location11_hp_mook7: characterData["hit_locations"][10]["hp"],
+                        location11_hp_mook8: characterData["hit_locations"][10]["hp"],
+                        location11_hp_mook9: characterData["hit_locations"][10]["hp"],
+                        location11_hp_mook10: characterData["hit_locations"][10]["hp"]
 	                });
 	            } else {
 	                setAttrs({
@@ -4408,7 +4728,18 @@
 	                    location11_table_end: "0",
 	                    location11_name: " ",
 	                    location11_armor_ap: "0",
-	                    location11_hp_max_base_mod: 0 - base_hp, location11_hp: "0",
+                        location11_armor_ap_max: "0",
+	                    location11_hp_max_base_mod: 0 - base_hp,
+                        location11_hp_mook1: "0",
+                        location11_hp_mook2: "0",
+                        location11_hp_mook3: "0",
+                        location11_hp_mook4: "0",
+                        location11_hp_mook5: "0",
+                        location11_hp_mook6: "0",
+                        location11_hp_mook7: "0",
+                        location11_hp_mook8: "0",
+                        location11_hp_mook9: "0",
+                        location11_hp_mook10: "0"
 	                });
 	            }
 	            
@@ -4425,7 +4756,19 @@
 	                    location12_table_end: table[1],
 	                    location12_name: characterData["hit_locations"][11]["name"],
 	                    location12_armor_ap: characterData["hit_locations"][11]["ap"],
-	                    location12_hp_max_base_mod: characterData["hit_locations"][11]["hp"] - base_hp, location12_hp: characterData["hit_locations"][11]["hp"]
+                        location12_armor_ap_max: characterData["hit_locations"][11]["ap"],
+	                    location12_hp_max_base_mod: characterData["hit_locations"][11]["hp"] - base_hp,
+                        location12_hp: characterData["hit_locations"][11]["hp"],
+                        location12_hp_mook1: characterData["hit_locations"][11]["hp"],
+                        location12_hp_mook2: characterData["hit_locations"][11]["hp"],
+                        location12_hp_mook3: characterData["hit_locations"][11]["hp"],
+                        location12_hp_mook4: characterData["hit_locations"][11]["hp"],
+                        location12_hp_mook5: characterData["hit_locations"][11]["hp"],
+                        location12_hp_mook6: characterData["hit_locations"][11]["hp"],
+                        location12_hp_mook7: characterData["hit_locations"][11]["hp"],
+                        location12_hp_mook8: characterData["hit_locations"][11]["hp"],
+                        location12_hp_mook9: characterData["hit_locations"][11]["hp"],
+                        location12_hp_mook10: characterData["hit_locations"][11]["hp"]
 	                });
 	            } else {
 	                setAttrs({
@@ -4433,17 +4776,26 @@
 	                    location12_table_end: "0",
 	                    location12_name: " ",
 	                    location12_armor_ap: "0",
-	                    location12_hp_max_base_mod: 0 - base_hp, location12_hp: "0",
+                        location12_armor_ap_max: "0",
+	                    location12_hp_max_base_mod: 0 - base_hp,
+                        location12_hp_mook1: "0",
+                        location12_hp_mook2: "0",
+                        location12_hp_mook3: "0",
+                        location12_hp_mook4: "0",
+                        location12_hp_mook5: "0",
+                        location12_hp_mook6: "0",
+                        location12_hp_mook7: "0",
+                        location12_hp_mook8: "0",
+                        location12_hp_mook9: "0",
+                        location12_hp_mook10: "0"
 	                });
 	            }
 	        }
 
-	        //Default weapon displays off
-	        var displayweapons = {};
-	        displayweapons["display_shields"] = 0;
-	        displayweapons["display_melee_weapons"] = 0;
-	        displayweapons["display_missile_weapons"] = 0;
-	        displayweapons["display_firearms"] = 0;
+            //Default weapon displays off
+            var displayweapons = {};
+            displayweapons["display_melee_weapons"] = 0;
+            displayweapons["display_ranged_weapons"] = 0;
 
 	        // Import Combat Styles & Weapons
 	        if (typeof characterData["combat_styles"] !== 'undefined') {
@@ -4462,7 +4814,7 @@
                         var weaponattrs = {};
 
                         if (weapon["type"] == "ranged") {
-                            displayweapons["display_missile_weapons"] = 1;
+                            displayweapons["display_ranged_weapons"] = 0;
                             weaponattrs["repeating_missileweapon_" + weaponid + "_name"] = weapon["name"];
                             weaponattrs["repeating_missileweapon_" + weaponid + "_force"] = weapon["size"];
                             weaponattrs["repeating_missileweapon_" + weaponid + "_impale_size"] = weapon["size"];
@@ -4475,23 +4827,9 @@
                             weaponattrs["repeating_missileweapon_" + weaponid + "_damage"] = weapon["damage"];
                             weaponattrs["repeating_missileweapon_" + weaponid + "_ap"] = weapon["ap"];
                             weaponattrs["repeating_missileweapon_" + weaponid + "_hp"] = weapon["hp"];
+                            weaponattrs["repeating_missileweapon_" + weaponid + "_hp_max"] = weapon["hp"];
                             weaponattrs["repeating_missileweapon_" + weaponid + "_notes"] = weapon["effects"];
                             weaponattrs["repeating_missileweapon_" + weaponid + "_details"] = 0;
-                        } else if (weapon["type"] == "shield") {
-                            displayweapons["display_shields"] = 1;
-                            weaponattrs["repeating_shield_" + weaponid + "_name"] = weapon["name"];
-                            weaponattrs["repeating_shield_" + weaponid + "_size"] = weapon["size"];
-                            weaponattrs["repeating_shield_" + weaponid + "_reach"] = weapon["reach"];
-                            if (weapon["add_damage_modifier"] == true) {
-                                weaponattrs["repeating_shield_" + weaponid + "_damage_mod_toggle"] = "@{damage_mod}";
-                            } else {
-                                weaponattrs["repeating_shield_" + weaponid + "_damage_mod_toggle"] = 0;
-                            }
-                            weaponattrs["repeating_shield_" + weaponid + "_damage"] = weapon["damage"];
-                            weaponattrs["repeating_shield_" + weaponid + "_ap"] = weapon["ap"];
-                            weaponattrs["repeating_shield_" + weaponid + "_hp"] = weapon["hp"];
-                            weaponattrs["repeating_shield_" + weaponid + "_notes"] = weapon["effects"];
-                            weaponattrs["repeating_shield_" + weaponid + "_details"] = 0;
                         } else {
                             displayweapons["display_melee_weapons"] = 1;
                             weaponattrs["repeating_meleeweapon_" + weaponid + "_name"] = weapon["name"];
@@ -4505,6 +4843,7 @@
                             weaponattrs["repeating_meleeweapon_" + weaponid + "_damage"] = weapon["damage"];
                             weaponattrs["repeating_meleeweapon_" + weaponid + "_ap"] = weapon["ap"];
                             weaponattrs["repeating_meleeweapon_" + weaponid + "_hp"] = weapon["hp"];
+                            weaponattrs["repeating_meleeweapon_" + weaponid + "_hp_max"] = weapon["hp"];
                             weaponattrs["repeating_meleeweapon_" + weaponid + "_notes"] = weapon["effects"];
                             weaponattrs["repeating_meleeweapon_" + weaponid + "_details"] = 0;
                         }
@@ -4512,9 +4851,9 @@
                     }
 	            }
 	        }
-	        
-	        //Set Weapon Display
-	        setAttrs(displayweapons);
+
+            //Set Weapon Display
+            setAttrs(displayweapons);
 
 	        // Default to show no magic
 	        var displaymagic = {};
@@ -4543,27 +4882,27 @@
 	                    skillattrs["repeating_combatstyle_" + skillid + "_char2"] = "@{cha}";
 	                    skillattrs["repeating_combatstyle_" + skillid + "_experience"] = skillValue - pow - cha;
 	                    skillattrs["repeating_combatstyle_" + skillid + "_details"] = 0;
-	                    skillattrs["binding_learned"] = "1";
+	                    skillattrs["binding_learned"] = 1;
 	                    skillattrs["binding_experience"] = skillValue - pow - cha;
 	                    displaymagic["display_animism"] = 1;
 	                } else if (skillKey.toLowerCase() == "fata") {
-	                    skillattrs["fata_learned"] = "@{fata_base}";
+	                    skillattrs["fata_learned"] = 1;
 	                    skillattrs["fata_experience"] = skillValue - pow - cha;
 	                    displaymagic["display_fae_powers"] = 1;
 	                } else if (skillKey.toLowerCase() == "folk magic") {
-	                    skillattrs["folk_magic_learned"] = "@{folk_magic_base}";
+	                    skillattrs["folk_magic_learned"] = 1;
 	                    skillattrs["folk_magic_experience"] = skillValue - pow - cha;
 	                    displaymagic["display_folk_magic"] = 1;
 	                } else if (skillKey.toLowerCase() == "trance") {
-	                    skillattrs["trance_learned"] = "@{trance_base}";
+	                    skillattrs["trance_learned"] = 1;
 	                    skillattrs["trance_experience"] = skillValue - pow - con;
 	                    displaymagic["display_animism"] = 1;
 	                } else if (skillKey.toLowerCase() == "binding") {
-	                    skillattrs["binding_learned"] = "1";
+	                    skillattrs["binding_learned"] = 1;
 	                    skillattrs["binding_experience"] = skillValue - pow - cha;
 	                    displaymagic["display_animism"] = 1;
 	                } else if (skillKey.toLowerCase() == "meditation") {
-	                    skillattrs["meditation_learned"] = "1";
+	                    skillattrs["meditation_learned"] = 1;
 	                    skillattrs["meditation_experience"] = skillValue - con - int;
 	                    displaymagic["display_mysticism"] = 1;
 	                } else if (skillKey.toLowerCase() == "mysticism") {
@@ -4577,7 +4916,7 @@
 	                    skillattrs["repeating_invocation_" + skillid + "_details"] = 0;
 	                    displaymagic["display_sorcery"] = 1;
 	                } else if (skillKey.toLowerCase() == "shaping") {
-	                    skillattrs["shaping_learned"] = "1";
+	                    skillattrs["shaping_learned"] = 1;
 	                    skillattrs["shaping_experience"] = skillValue - int - pow;
 	                    displaymagic["display_sorcery"] = 1;
 	                } else if (skillKey.toLowerCase() == "arcane knowledge") {
@@ -4605,7 +4944,7 @@
 	                        skillattrs["repeating_devotion_" + skillid + "_rank_devotion_pool_limit"] = "0";
 	                    }
 	                } else if (skillKey.toLowerCase() == "exhort") {
-	                    skillattrs["exhort_learned"] = "@{exhort_base}";
+	                    skillattrs["exhort_learned"] = 1;
 	                    skillattrs["exhort_experience"] = skillValue - int - cha;
 	                    displaymagic["display_theism"] = 1;
 	                } else if (skillKey.toLowerCase() == "channel") {
@@ -4747,7 +5086,6 @@
 	                    skillattrs["repeating_professionalskill_" + skillid + "_experience"] = skillValue - int - pow;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char1"] = "@{int}";
 	                    skillattrs["repeating_professionalskill_" + skillid + "_char2"] = "@{pow}";
-	                    skillattrs["repeating_professionalskill_" + skillid + "_skill_encumbered"] = 0;
 	                    skillattrs["repeating_professionalskill_" + skillid + "_details"] = 0;
 	                } else if (skillKey.toLowerCase() == "disguise") {
 	                    skillattrs["repeating_professionalskill_" + skillid + "_name"] = skillKey;
