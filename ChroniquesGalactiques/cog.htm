@@ -58,6 +58,8 @@
   <input type="hidden" name="attr_RANG_VOIE7" value="0" />
   <input type="hidden" name="attr_RANG_VOIE8" value="0" />
   <input type="hidden" name="attr_RANG_VOIE9" value="0" />
+  <!-- INPUT HIDDEN Caractéristiques -->
+  <input type="hidden" name="attr_CARACS" value="" />
   <!-- FIN Hidden -->
 	<div style="display: none;">
     <button type="roll" name="attr_incident_tir" value="@{togm}&{template:co1} {{perso=@{character_name}}} {{subtags=Attaque}} {{name=Incident de tir}} {{test=[[1d20cf1cs>2]]}} {{test_crit=Surchauffe ! Tir au prochain tour}} {{test_fumble=Batterie déchargée !}}" />
@@ -2091,6 +2093,43 @@
     }
     return result;
   }
+
+  function buildCaracs() {
+    getAttrs([
+      'FORCE', 'DEXTERITE', 'CONSTITUTION', 'INTELLIGENCE', 'PERCEPTION', 'CHARISME', 'NIVEAU',
+      'RANG_VOIE1', 'RANG_VOIE2', 'RANG_VOIE3', 'RANG_VOIE4', 'RANG_VOIE5', 'RANG_VOIE6', 'RANG_VOIE7', 'RANG_VOIE8', 'RANG_VOIE9',
+      'voie1nom', 'voie2nom', 'voie3nom', 'voie4nom', 'voie5nom', 'voie6nom', 'voie7nom', 'voie8nom', 'voie9nom'
+    ], function (values) {
+      let caracs = {
+        FOR: 0,
+        DEX: 0,
+        CON: 0,
+        INT: 0,
+        PER: 0,
+        CHA: 0
+      };
+      for (let car in values) {
+        let vcar = values[car];
+        if (vcar && !isNaN(vcar)) vcar = parseInt(vcar) || 0;
+        let mod = car.substring(0, 3);
+        if (caracs.hasOwnProperty(mod)) caracs[mod] = Math.floor((vcar - 10) / 2);
+        if (car.startsWith('RANG_')) {
+          if (!caracs.hasOwnProperty('rangs')) caracs.rangs = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+          let voie = parseInt(car.substring(car.length - 1)) || 0;
+          if (voie > 0) caracs.rangs[voie - 1] = vcar;
+        } else if (car.startsWith('voie') && car.endsWith('nom')) {
+          if (!caracs.hasOwnProperty('voies')) caracs.voies = ['', '', '', '', '', '', '', '', ''];
+          let voie = parseInt(car.substring(4, 5)) || 0;
+          if (voie > 0 && vcar) caracs.voies[voie - 1] = vcar.toUpperCase();
+        } else {
+          caracs[car] = vcar;
+        }
+      }
+      setAttrs({
+        CARACS: JSON.stringify(caracs)
+      });
+    });
+  }
   
   on('sheet:opened', function() {
     // **** Gestion transition de version
@@ -2325,6 +2364,12 @@
     getAttrs(['ARMURE_MALUS'], function(value) {
       if (!value.ARMURE_MALUS) setArmorMalus();
     });
+    // RANG_VOIE#
+    for (let voie=1; voie <= 9; voie++) {
+      setRank(voie.toString());
+    }
+    // CARACS
+    buildCaracs();
   });
 
   on('change:character_name', function() {
@@ -2339,11 +2384,49 @@
   /**
    * Buffs de personnage
    */
+
+  function buffValue(v, caracs) {
+    v = v.trim();
+    let bm = 1;
+    if (v.startsWith('-')) bm = -1;
+    if (v.indexOf('2[') !== -1) {
+      v = v.replace('2[','[');
+      bm *= 2;
+    }
+    v = v.replace(/[\+\-\[\]]/g, '');
+    consoleLog(v);
+    if (isNaN(v)) {
+      // c'est une référence d'attribut
+      if (v.toUpperCase().startsWith('VOIE')) {
+        // c'est un rang dans une voie identifiée par son no
+        let rv = parseInt(v.substring(4).trim()) || 0;
+        if (rv > 0) bv = caracs.rangs[rv - 1];
+      } else if (v.toUpperCase().startsWith('RANG')) {
+        // c'est un rang dans une voie identifiée par son nom
+        let vname = v.substring(5).toUpperCase();
+        let vfound = -1;
+        for (let vn = 0; vn < caracs.voies.length; vn++) {
+          if (caracs.voies[vn] === vname) {
+            vfound = vn;
+            break;
+          }
+        }
+        if (vfound > -1) bv = caracs.rangs[vfound];
+      } else {
+        // c'est un mod. de carac
+        bv = caracs[v];
+      }
+    } else { // c'est une valeur fixe
+      bv = v;
+    }
+    return parseInt(bv) * bm || 0;
+  }
    
   function parseBuff(buffAttr) {
-    getAttrs([`${buffAttr}_BUFF_LIST`], function(v) {
+    getAttrs([`${buffAttr}_BUFF_LIST`, 'CARACS'], function(v) {
       let buffAttr = Object.keys(v)[0];
       let buffList = v[buffAttr];
+      let caracs = JSON.parse(v.CARACS);
       let buffSum = 0;
       if (buffList && buffList !== '') {
         let buffs = buffList.split(';');
@@ -2355,14 +2438,13 @@
             let buffName = '';
             let buffVal = 0;
             if (delim === ' ') {
-              buffVal = parseInt(buffv[buffv.length-1]) || 0;
+              buffVal = buffValue(buffv[buffv.length - 1], caracs);
               buffv.pop();
               buffName = buffv.join(' ').trim();
             } else {
               buffName = buffv[0].trim();
-              buffVal = parseInt(buffv[1]) || 0;
+              buffVal = buffValue(buffv[1], caracs);
             }
-            consoleLog(buffName);
             if (!buffName.startsWith('-')) buffSum += buffVal;
           }
         }
@@ -2372,6 +2454,44 @@
       setAttrs(attr);
     });
   }
+  
+  function updateBuffs(e) {
+    const caracs = ['FOR', 'DEX', 'CON', 'INT', 'PER', 'CHA'];
+    let mod = e.sourceAttribute.substring(0, 3).toUpperCase();
+    if (!caracs.includes(mod)) return;
+    const attrs = [...caracs, 'ATKCAC', 'ATKTIR', 'PSYINTUI', 'PSYINFLU', 'INIT', 'DEF', 'DEP'];
+    for (let a = 0; a < attrs.length; a++) {
+      attrs[a] = `${attrs[a]}_BUFF_LIST`;
+    }
+    attrs.unshift(mod);
+    getAttrs(attrs, function (values) {
+      let props = Object.keys(values);
+      for (let p = 1; p < props.length; p++) {
+        if (props[p].startsWith(props[0])) continue;
+        if (values[props[p]].indexOf(`[${props[0]}]`) !== -1) parseBuff(props[p].replace('_BUFF_LIST', ''));
+      }
+    });
+  }
+
+  function changeCaracs() {
+    let changeCaracs = '';
+    const caracs = [
+      'FORCE', 'DEXTERITE', 'CONSTITUTION', 'INTELLIGENCE', 'PERCEPTION', 'CHARISME', 'NIVEAU',
+      'RANG_VOIE1', 'RANG_VOIE2', 'RANG_VOIE3', 'RANG_VOIE4', 'RANG_VOIE5', 'RANG_VOIE6', 'RANG_VOIE7', 'RANG_VOIE8', 'RANG_VOIE9',
+      'voie1nom', 'voie2nom', 'voie3nom', 'voie4nom', 'voie5nom', 'voie6nom', 'voie7nom', 'voie8nom', 'voie9nom'
+      ];
+    for (let c = 0; c < caracs.length; c++) {
+      changeCaracs += `change:${caracs[c]} `;
+    }
+    return changeCaracs;
+  }
+
+  on(changeCaracs(), function (eventInfo) {
+    // on reconstruit d'abord l'attribut caché CARACS...
+    buildCaracs();
+    // ... puis on met à jour les buffs qui contiennent une référence à la caractéristique modifiée
+    updateBuffs(eventInfo);
+  });
 
   on('change:for_buff_list', function() {
     parseBuff('FOR');

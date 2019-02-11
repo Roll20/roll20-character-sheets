@@ -14,13 +14,19 @@ Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-edi
 # Notes de version
 ## V3.5 (2019-02-11)
 ### Remplacement des 5 champs de buffs par un champ unique 
-- Un nombre quasi illimité de buffs est désormais possible pour chaque attribut
-- Le champ unique permet une syntaxe plus "naturelle". 
+* Un nombre quasi illimité de buffs est désormais possible pour chaque attribut
+* Le champ unique permet une syntaxe plus "naturelle". 
 Exemple d'utilisation pour la PER : Oeil d'aigle +2; Drone espion : +2
-- Chaque buff est composé d'un texte et d'une valeur numérique éventuellement séparés par deux points (:).
-- Sans les ':', le script sheet-worker considère que la valeur du buff est située après le dernier espace de la phrase. 
-- Il est possible d'activer ou désactiver temporairement un buff en préfixant son type par le signe -
+* Chaque buff est composé d'un texte et d'une valeur numérique éventuellement séparés par deux points (:).
+* Sans les ':', le script sheet-worker considère que la valeur du buff est située après le dernier espace de la phrase. 
+* Il est possible d'activer ou désactiver temporairement un buff en préfixant son type par le signe -
 Exemple : Oeil d'aigle +2; -Drone espion : +2
+* Possibilité d'utiliser des variables pour les bonus. Exemples :
+ * _Flamboyant +[CHA]_
+ * _Réflexes : +[Voie 2]_ (en supposant que la voie no 2 donne un bonus selon le rang atteint)
+ * _Arts Martiaux : +[rang Corps à corps]_ (pour un buff de DEF, en supposant que le personnage a une voie nommée Corps à corps)
+ * _Réflexes félins : +2[rang Pourfendeur]_ (en supposant que le personnage a une voie nommée Pourfendeur)
+**Attention** : pour pouvoir indiquer _[voie no]_ ou _[rang nom]_, il faut impérativement séparer le nom du buff de sa valeur par **:** (deux points, cf ci-dessus)
 
 ### Conversion des buffs par un sheet-worker à la première ouverture de la fiche
 
