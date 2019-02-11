@@ -9,9 +9,40 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-editions.fr/catalogue.php?id=207) #17,18 et 19.
 
 # Version courante
-3.4 [Screenshot](cog_v3.png)
+3.5 [Screenshot](cog_v3.png)
 
 # Notes de version
+## V3.5 (2019-02-11)
+### Remplacement des 5 champs de buffs par un champ unique 
+- Un nombre quasi illimité de buffs est désormais possible pour chaque attribut
+- Le champ unique permet une syntaxe plus "naturelle". 
+Exemple d'utilisation pour la PER : Oeil d'aigle +2; Drone espion : +2
+- Chaque buff est composé d'un texte et d'une valeur numérique éventuellement séparés par deux points (:).
+- Sans les ':', le script sheet-worker considère que la valeur du buff est située après le dernier espace de la phrase. 
+- Il est possible d'activer ou désactiver temporairement un buff en préfixant son type par le signe -
+Exemple : Oeil d'aigle +2; -Drone espion : +2
+
+### Conversion des buffs par un sheet-worker à la première ouverture de la fiche
+
+### Réorganisation des lignes d'attaque : 
+- Case à cocher pour action limitée (affiche (L) dans le  roll template)
+- Nouveau champ pour indiquer le type de dommage (affiché dans le rolltemplate)
+- Nouveaux champs pour indiquer des DM secondaires (dés et type, affichés sur une deuxième ligne dans le rolltemplate)
+- Suppression case à cocher Tir Haute-Capacité : il suffit d'ajouter une ligne d'attaque avec case Limitée cochée et un dé de DM de plus
+
+### Réorganisation des lignes de jets de capacités
+- Nouveau champ permettant d'indiquer un titre / nom de compétence (remplace 'Jet' dans le rolltemplate)
+- Nouveau champ permettant d'indiquer le nom et le rang dans la voie de la capacité
+- Description détaillée des effets de la capacité dans un champ plus large affiché sur une deuxième ligne
+
+### Modification du rolltemplate
+- Nouvelle propriété {{jet=}} permettant de remplacer le libellé 'Jet' par un autre texte dans le chat pour un test de {{carac=}}
+- Nouvelle propriété {{dmtype=}} permettant d'afficher le type de DM principaux
+- Nouvelle propriété {{degats2=}} permettant d'afficher les DM secondaires
+- Nouvelle propriété {{dm2type=}} permettant d'afficher le type de DM secondaires
+
+### Refactorisation de plusieurs fonctions dans les scripts sheet-workers
+
 ## V3.4 (2019-01-02)
 ### Fiche de PJ
 * Plus de cases Traits/Divers sur l'onglet Caractéristiques. Ces informations peuvent être indiquées dans la liste répétable des traits de l'onglet Capacités (un sheet-worker de MAJ de version importe l'ancienne valeur du champ Traits)
