@@ -14969,6 +14969,7 @@
     on("page:lp-levels", function(eventinfo) {
         const mancerdata = getCharmancerData();
         const previous   = mancerdata["lp-welcome"].values["previous_attributes"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_attributes"]) : {};
+        let levelclass   = ["class1"];
         let set          = {};
         let update       = {};
         let baseclass    = previous["class"];
@@ -15005,12 +15006,17 @@
                     set[`class${x1}_subclass`] = "Subclasses:" + previous[`multiclass${x}_subclass`];
                     update[`subclass${x1}_selector`] = `<div>` + previous[`multiclass${x}_subclass`] + `</div>`;
                 };
-            } else  {
+                levelclass.push(`class${x1}`);
+            } else {
                 set[`class${x1}_currentlevel`] = 0;
+            };
+
+            if (mancerdata["lp-levels"] && mancerdata["lp-levels"].values[`class${x1}`] && parseInt(mancerdata["lp-levels"].values[`class${x1}_addlevel`]) > 0 && !levelclass.includes(`class${x1}`)) {
+                levelclass.push(`class${x1}`);
             };
         };
 
-        setAttrs(set, () => { update_hp(true) });
+        setAttrs(set, () => { update_hp(true, levelclass) });
         setCharmancerText(update);
 
         changeCompendiumPage("sheet-levels-info", classcompend);
@@ -15136,8 +15142,8 @@
         set.spells = spells.toString();
 
         setCharmancerText(update);
-        setAttrs(set, function() {
-            update_hp();
+        setAttrs(set, () => {
+            update_hp(false, [`${levelclass}`]);
             recalcButtons(undefined, "lp-levels");
         });
     };
@@ -15166,7 +15172,6 @@
     });
 
     const recalcHpByLevel = (section) => {
-        //console.log(section ? `RECALC HP: ${section}` : "RECALC HP: ALL");
         const mancerdata = getCharmancerData();
         const leveldata = mancerdata["lp-levels"].values;
         const repeating = mancerdata["lp-levels"].repeating || [];
@@ -15194,19 +15199,19 @@
         setAttrs(set, () => {recalcLpData()});
     };
 
-    const update_hp = (firstTime) => {
+    const update_hp = (firstTime, levelclass) => {
         const mancerdata = getCharmancerData();
         const leveldata = mancerdata["lp-levels"].values;
         const repeating = mancerdata["lp-levels"].repeating || [];
-        let set = {};
 
-        //Updates all the Roll button templates
-        const updateByLevel = (firstTime) => {
-            for(let classnum=1; classnum<=4; classnum++) {
-                const levelclass = `class${classnum}`, hitdie = leveldata[`${levelclass}_hitdie`],
-                    current = leveldata[`${levelclass}_currentlevel`] ? parseInt(leveldata[`${levelclass}_currentlevel`]) : 0,
-                    addlevel = leveldata[`${levelclass}_addlevel`] ? parseInt(leveldata[`${levelclass}_addlevel`]) : 0;
-                let levelarray = [], addarray = [], removearray = [], existing = [], average = getDieAvg(hitdie);
+        console.log(`%c UPDATE HP: ${levelclass}`, "color: green; font-weight:bold;");
+        console.log(`%c First Time: ${firstTime}`, "color: green; font-weight:bold;");
+
+        const updateByLevel = (firstTime, levelclass) => {
+            _.each(levelclass, (levelclass) => {
+                const current = leveldata[`${levelclass}_currentlevel`] ? parseInt(leveldata[`${levelclass}_currentlevel`]) : 0,
+                      addlevel = leveldata[`${levelclass}_addlevel`] ? parseInt(leveldata[`${levelclass}_addlevel`]) : 0;
+                let levelarray = [], addarray = [], removearray = [], existing = [];
 
                 for(let x = current+1; x<=current+addlevel; x++) {
                     levelarray.push(`${levelclass}-${x}`);
@@ -15224,22 +15229,6 @@
                     }
                 });
 
-                //HP Bonus from subclass hp mods like Draconic Bloodline for Sorcerers
-                const prev_repeat = JSON.parse(mancerdata["lp-welcome"].values["previous_repeating"]), hpmod = prev_repeat["hpmod"], subclass = leveldata[`${levelclass}_subclass`];;
-                let hpbonus = 0, bonusSource = [];
-                _.each(hpmod, (mod) => {
-                    if (mod["levels"] === "base" && subclass && subclass.includes(mod["source"])) {
-                        bonusSource.push(mod["source"]);
-                        hpbonus += parseInt(mod["mod"]);
-                    };
-                });
-                //Multiclassing into Sorcer Draconic needs to update buttons
-                if (subclass && subclass.includes("Draconic Bloodline") && !bonusSource.includes("Draconic Bloodline")) {
-                    bonusSource.push("Draconic Bloodline");
-                    hpbonus += parseInt(1);
-                };
-                const templateBonus = (hpbonus > 0) ? `+${hpbonus}[${bonusSource}]` : "";
-
                 if(addarray.length > 0) {
                     let set = {}, update = {}, rowid = "";
                     _.each(repeating, function(repid) {
@@ -15247,9 +15236,8 @@
                     });
                     _.each(addarray, function(repname) {
                         addRepeatingSection(rowid, "hpbylevel", repname, function(repid) {
-                            if(!leveldata[`${repid}_result`]) set[`${repid}_result`] = parseInt(average) + parseInt(hpbonus);
-                            set[`roll_${repid}_rollhp`] = `@{wtype}&{template:mancerhproll} {{title=Roll for HP Level ${_.last(repname.split("-"))}}} {{r1=[[1${hitdie}${templateBonus}]]}}`;
-                            set[`roll_${repid}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP Level ${_.last(repname.split("-"))}}} {{a1=[[${average}${templateBonus}]]}}`;
+                            updateResults(levelclass, repid);
+                            updateButtons(levelclass, repid);
                             update[`${repid} label`] = `Level ${_.last(repname.split("-"))}`;
                             if(repname == _.last(addarray)) {
                                 setCharmancerText(update);
@@ -15266,50 +15254,108 @@
                         recalcHpByLevel(levelclass);
                     });
                 }
-
-                if (addlevel && hitdie) {
-                    let dice = [], set = {};
-                    //Set the roll buttons
-                    for (x = 1; x <= addlevel; x++) { dice.push(`{{r${x}=[[1${hitdie}${templateBonus}]]}}`); };
-                    set[`roll_${levelclass}_rollhp`] = `@{wtype}&{template:mancerhproll} {{title=Roll for HP}} ` + dice.join()
-
-                    //Set the average hp button
-                    set[`roll_${levelclass}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP}}{{a1=[[${average}${templateBonus}]]}}`
-
-                    setAttrs(set);
-                };
-            };
+            });
         };
 
-        setAttrs(set);
         if(firstTime) {
             addRepeatingSection("class1_by-levels", "row", "class1hprow", function() {
                 addRepeatingSection("class2_by-levels", "row", "class2hprow", function() {
                     addRepeatingSection("class3_by-levels", "row", "class3hprow", function() {
                         addRepeatingSection("class4_by-levels", "row", "class4hprow", function() {
-                            updateByLevel(true);
+                            updateByLevel(true, levelclass);
                         });
                     });
                 });
             });
         } else {
-            updateByLevel(false);
-        }
+            updateByLevel(false, levelclass);
+        };
+    };
+
+    const updateButtons = (levelclass, repid) => {
+        const mancerdata    = getCharmancerData();
+        const leveldata     = mancerdata["lp-levels"].values;
+        const addlevel      = leveldata[`${levelclass}_addlevel`] ? parseInt(leveldata[`${levelclass}_addlevel`]) : 0;
+        const hitdie        = leveldata[`${levelclass}_hitdie`];
+        let average         = getDieAvg(hitdie), set = {}, bonus = hpBonus(levelclass), hpbonus = bonus[0], bonusSource = bonus[1];
+        const templateBonus = (hpbonus > 0) ? `+${hpbonus}[${bonusSource}]` : "";
+
+        //console.log(`%c Update Buttons ${levelclass}: template = ${templateBonus}, RepID ${repid}`, "color: blue;");
+        
+        set[`roll_${repid}_rollhp`]    = `@{wtype}&{template:mancerhproll} {{title=Roll for HP Level ${_.last(repid.split(`${levelclass}-`))}}} {{r1=[[1${hitdie}${templateBonus}]]}}`;
+        set[`roll_${repid}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP Level ${_.last(repid.split(`${levelclass}-`))}}} {{a1=[[${average}${templateBonus}]]}}`;
+
+        if (addlevel && hitdie) {
+            let dice = [];
+            //Set the roll buttons
+            for (x = 1; x <= addlevel; x++) { dice.push(`{{r${x}=[[1${hitdie}${templateBonus}]]}}`); };
+            set[`roll_${levelclass}_rollhp`] = `@{wtype}&{template:mancerhproll} {{title=Roll for HP}} ` + dice.join()
+
+            //Set the average hp button
+            set[`roll_${levelclass}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP}}{{a1=[[${average}${templateBonus}]]}}`
+        };
+
+        setAttrs(set);
+    };
+
+    const hpBonus = (levelclass) => {
+        const mancerdata = getCharmancerData();
+        const leveldata  = mancerdata["lp-levels"].values;
+
+        //HP Bonus from subclass hp mods like Draconic Bloodline for Sorcerers
+        const prev_repeat = JSON.parse(mancerdata["lp-welcome"].values["previous_repeating"]), hpmod = prev_repeat["hpmod"], subclass = leveldata[`${levelclass}_subclass`];;
+        let hpbonus = 0, bonusSource = [];
+        _.each(hpmod, (mod) => {
+            if (mod["levels"] === "base" && subclass && subclass.includes(mod["source"])) {
+                bonusSource.push(mod["source"]);
+                hpbonus += parseInt(mod["mod"]);
+            };
+        });
+
+        //Multiclassing into Sorcerer Draconic needs to update buttons
+        if (subclass && subclass.includes("Draconic Bloodline") && !bonusSource.includes("Draconic Bloodline")) {
+            bonusSource.push("Draconic Bloodline");
+            hpbonus += parseInt(1);
+        };
+
+        //console.log(`%c HP Bonus ${levelclass}: hpbonus = ${hpbonus}, bonusSource = ${bonusSource}`, "color: purple;");
+
+        return [hpbonus, bonusSource];
+    };
+
+    const updateResults = (levelclass, repid, eventinfo) => {
+        const mancerdata = getCharmancerData();
+        const leveldata  = mancerdata["lp-levels"].values;
+        const hitdie     = leveldata[`${levelclass}_hitdie`];
+        let average      = getDieAvg(hitdie), bonus = hpBonus(levelclass), hpbonus = bonus[0], set = {};
+
+       //console.log(`%c Update Results ${levelclass}:`, "color: red;");
+
+        if (!leveldata[`${repid}_result`]) {
+            set[`${repid}_result`] = parseInt(average) + parseInt(hpbonus);
+        } else if (eventinfo && (eventinfo.newValue).includes("Draconic Bloodline")) {
+            set[`${repid}_result`] = parseInt(leveldata[`${repid}_result`]) + parseInt(hpbonus);
+        } else if (eventinfo && (eventinfo.previousValue).includes("Draconic Bloodline")) {
+            set[`${repid}_result`] = parseInt(leveldata[`${repid}_result`]) - 1;
+        } else {
+            false
+        };
+
+        setAttrs(set);
     };
 
     const getDieAvg = (hitdie) => {
         if(!hitdie) return 0;
         const size = hitdie.slice(1);
         let num = [], sum = 0;
-        for(x = 1; x <= size; x++) {
-           num.push(x);
-        };
 
-        for(i = 0; i < num.length; i++) {
-            sum += num[i];
-        };
+        //Push an array of numbers
+        for(x = 1; x <= size; x++) { num.push(x); };
 
-        return Math.ceil(sum / num.length)
+        //Add up the nummbers above
+        for(i = 0; i < num.length; i++) { sum += num[i]; };
+
+        return Math.ceil(sum / num.length);
     };
 
     //Roll & Average buttons inside the repeating hp section for each level
@@ -15331,13 +15377,13 @@
             const leveldata = mancerdata["lp-levels"].values;
             const repeating = mancerdata["lp-levels"].repeating || [];
             const source = eventinfo.sourceAttribute, flag = source.includes("rollhp") ? "roll" : "average";
-            let set = {}, sum = 0, rows = "";
+            let set = {}, sum = 0, rows = "", num = 0;
 
             repeating.forEach(row => {
                 if (row.includes(`${levelclass}-`) && source.includes("rollhp")) {
-                    const num = parseInt(row.split(`${levelclass}-`)[1]) - 1;
                     set[row + "_result"] = eventinfo.roll[`${num}`].result;
                     set[row + "_rollflag"] = flag;
+                    num += 1;
                 } else if (row.includes(`${levelclass}-`) && source.includes("average")) {
                     set[row + "_result"] = eventinfo.roll[0].result;
                     set[row + "_rollflag"] = flag;
@@ -15346,15 +15392,16 @@
                 };
             });
 
-            //Add up the results for rollhp and multiply the average option by added levels
+            //Add up the results for rollhp or multiply the average option by added levels
             if (source.includes("rollhp")) {
                 _.each(eventinfo.roll, function(roll) {
                     sum += parseInt(roll.result);
                  });
             } else {
-                sum = parseInt(eventinfo.roll[`0`].result) * leveldata[`${levelclass}_addlevel`];
+                sum = parseInt(eventinfo.roll[0].result) * leveldata[`${levelclass}_addlevel`];
             };
 
+            // Set addhp to the total
             set[`${levelclass}_addhp`] = sum;
 
             //Set hp_flag to be roll or average so the CSS will highlight the appropriate button
@@ -15441,6 +15488,29 @@
 
         changeCompendiumPage("sheet-levels-info", page);
         getCompendiumPage(page, function(p) {
+        });
+    });
+
+    //Trigger a change event when subclass changes
+    ["class1", "class2", "class3", "class4"].forEach(levelclass => {
+        on(`mancerchange:${levelclass}_subclass`, (eventinfo) => {
+            const mancerdata    = getCharmancerData();
+            const leveldata     = mancerdata["lp-levels"].values;
+            const repeating     = mancerdata["lp-levels"].repeating || [];
+            const newValue      = (eventinfo.newValue) ? eventinfo.newValue : " ";
+            const previousValue = (eventinfo.previousValue) ? eventinfo.previousValue : " ";
+            let set             = {};
+
+            _.each(repeating, function(repid) {
+                if (repid.includes(`_${levelclass}-`) && newValue.includes("Draconic Bloodline") || previousValue.includes("Draconic Bloodline")) {
+                    updateButtons(levelclass, repid);
+                    updateResults(levelclass, repid, eventinfo);
+                };
+            });
+
+            setAttrs(set);
+
+            console.log(mancerdata);
         });
     });
 
