@@ -15011,6 +15011,7 @@
                 set[`class${x1}_currentlevel`] = 0;
             };
 
+            //This is handling classes that have been multiclassed into while in the leveler
             if (mancerdata["lp-levels"] && mancerdata["lp-levels"].values[`class${x1}`] && parseInt(mancerdata["lp-levels"].values[`class${x1}_addlevel`]) > 0 && !levelclass.includes(`class${x1}`)) {
                 levelclass.push(`class${x1}`);
             };
@@ -15204,9 +15205,6 @@
         const leveldata = mancerdata["lp-levels"].values;
         const repeating = mancerdata["lp-levels"].repeating || [];
 
-        console.log(`%c UPDATE HP: ${levelclass}`, "color: green; font-weight:bold;");
-        console.log(`%c First Time: ${firstTime}`, "color: green; font-weight:bold;");
-
         const updateByLevel = (firstTime, levelclass) => {
             _.each(levelclass, (levelclass) => {
                 const current = leveldata[`${levelclass}_currentlevel`] ? parseInt(leveldata[`${levelclass}_currentlevel`]) : 0,
@@ -15279,8 +15277,6 @@
         const hitdie        = leveldata[`${levelclass}_hitdie`];
         let average         = getDieAvg(hitdie), set = {}, bonus = hpBonus(levelclass), hpbonus = bonus[0], bonusSource = bonus[1];
         const templateBonus = (hpbonus > 0) ? `+${hpbonus}[${bonusSource}]` : "";
-
-        //console.log(`%c Update Buttons ${levelclass}: template = ${templateBonus}, RepID ${repid}`, "color: blue;");
         
         set[`roll_${repid}_rollhp`]    = `@{wtype}&{template:mancerhproll} {{title=Roll for HP Level ${_.last(repid.split(`${levelclass}-`))}}} {{r1=[[1${hitdie}${templateBonus}]]}}`;
         set[`roll_${repid}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP Level ${_.last(repid.split(`${levelclass}-`))}}} {{a1=[[${average}${templateBonus}]]}}`;
@@ -15318,8 +15314,6 @@
             hpbonus += parseInt(1);
         };
 
-        //console.log(`%c HP Bonus ${levelclass}: hpbonus = ${hpbonus}, bonusSource = ${bonusSource}`, "color: purple;");
-
         return [hpbonus, bonusSource];
     };
 
@@ -15328,8 +15322,6 @@
         const leveldata  = mancerdata["lp-levels"].values;
         const hitdie     = leveldata[`${levelclass}_hitdie`];
         let average      = getDieAvg(hitdie), bonus = hpBonus(levelclass), hpbonus = bonus[0], set = {};
-
-       //console.log(`%c Update Results ${levelclass}:`, "color: red;");
 
         if (!leveldata[`${repid}_result`]) {
             set[`${repid}_result`] = parseInt(average) + parseInt(hpbonus);
@@ -15501,6 +15493,7 @@
             const previousValue = (eventinfo.previousValue) ? eventinfo.previousValue : " ";
             let set             = {};
 
+            //This will update the results inputs with new hp values if the subclass is Draconic
             _.each(repeating, function(repid) {
                 if (repid.includes(`_${levelclass}-`) && newValue.includes("Draconic Bloodline") || previousValue.includes("Draconic Bloodline")) {
                     updateButtons(levelclass, repid);
@@ -15509,8 +15502,6 @@
             });
 
             setAttrs(set);
-
-            console.log(mancerdata);
         });
     });
 
@@ -18580,8 +18571,6 @@
     </div>
 </charmancer>
 
-
-<!-- DEV  1378 -->
 <charmancer class="sheet-charmancer-lp-levels">
     <div class="charmancer container">
         <ol class="steps lp-steps">
@@ -18824,7 +18813,6 @@
         <input type="hidden" name="comp_spells" />
     </div>
 </charmancer>
-<!-- END DEV  1378-->
 
 <charmancer class="sheet-charmancer-lp-choices">
     <div class="charmancer container">
