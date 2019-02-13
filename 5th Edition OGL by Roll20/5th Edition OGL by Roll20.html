@@ -6480,74 +6480,97 @@
             return;
         }
         var regex_result = /^(repeating_spell-(?:cantrip|\d)_[^_]+)_.+$/.exec(eventinfo.sourceAttribute);
+
         if(regex_result) {
             var repeating_source = regex_result[1];
             getAttrs([repeating_source + "_spellattackid", repeating_source + "_spelllevel"], function(v) {
                 var spellid = repeating_source.slice(-20);
                 var attackid = v[repeating_source + "_spellattackid"];
                 var lvl = v[repeating_source + "_spelllevel"];
+                console.log(`%c Spell change: ${spellid}, ${attackid}, ${lvl} `, "color:blue; font-weight:bold;");
+
                 if(attackid && lvl && spellid) {
                     update_attack_from_spell(lvl, spellid, attackid)
                 }
             });
         }
-    });
+    }); 
 
-    on("change:repeating_spell-cantrip:spelloutput change:repeating_spell-1:spelloutput change:repeating_spell-2:spelloutput change:repeating_spell-3:spelloutput change:repeating_spell-4:spelloutput change:repeating_spell-5:spelloutput change:repeating_spell-6:spelloutput change:repeating_spell-7:spelloutput change:repeating_spell-8:spelloutput change:repeating_spell-9:spelloutput", function(eventinfo) {
-        if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
-            return;
-        }
-        var repeating_source = eventinfo.sourceAttribute.substring(0, eventinfo.sourceAttribute.lastIndexOf('_'));
-        getAttrs([repeating_source + "_spellattackid", repeating_source + "_spelllevel", repeating_source + "_spelloutput", repeating_source + "_spellattackid", repeating_source + "_spellathigherlevels","character_id"], function(v) {
-            var update = {};
-            var spelloutput = v[repeating_source + "_spelloutput"];
-            var spellid = repeating_source.slice(-20);
-            var attackid = v[repeating_source + "_spellattackid"];
-            var lvl = v[repeating_source + "_spelllevel"];
-            if(spelloutput && spelloutput === "ATTACK") {
-                create_attack_from_spell(lvl, spellid, v["character_id"]);
-            }
-            else if(spelloutput && spelloutput === "SPELLCARD" && attackid && attackid != "") {
-                remove_attack(attackid);
-                var spelllevel = "@{spelllevel}";
-                if(v[repeating_source + "_spellathigherlevels"]) {
-                    var lvl = parseInt(v[repeating_source + "_spelllevel"],10);
-                    spelllevel = "?{Cast at what level?";
-                    for(i = 0; i < 10-lvl; i++) {
-                        spelllevel = spelllevel + "|Level " + (parseInt(i, 10) + parseInt(lvl, 10)) + "," + (parseInt(i, 10) + parseInt(lvl, 10));
-                    }
-                    spelllevel = spelllevel + "}";
+    ['spell-cantrip','spell-1','spell-2','spell-3','spell-4','spell-5','spell-6','spell-7','spell-8','spell-9'].forEach(attr => {
+        on(`change:repeating_${attr}:includedesc change:repeating_${attr}:innate change:repeating_${attr}:spell_ability change:repeating_${attr}:spell_updateflag change:repeating_${attr}:spellathigherlevels change:repeating_${attr}:spellattack change:repeating_${attr}:spelldamage change:repeating_${attr}:spelldamage2 change:repeating_${attr}:spelldamagetype change:repeating_${attr}:spelldamagetype2 change:repeating_${attr}:spelldescription change:repeating_${attr}:spelldmgmod change:repeating_${attr}:spellhealing change:repeating_${attr}:spellhlbonus change:repeating_${attr}:spellhldie change:repeating_${attr}:spellhldietype change:repeating_${attr}:spellname change:repeating_${attr}:spellprepared change:repeating_${attr}:spellrange change:repeating_${attr}:spellsave change:repeating_${attr}:spellsavesuccess change:repeating_${attr}:spelltarget change:repeating_${attr}:spell_damage_progression`, (eventinfo) => {
+            if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") { return; }
+
+            const spellid = eventinfo.sourceAttribute.split("_")[2], repeating_source = `repeating_${attr}_${spellid}`;
+            getAttrs([repeating_source + "_spellattackid", repeating_source + "_spelllevel"], function(v) {
+                var attackid = v[repeating_source + "_spellattackid"];
+                var lvl      = v[repeating_source + "_spelllevel"];
+
+                console.log(`%c Spell change: ${spellid}, ${attackid}, ${lvl} `, "color:purple; font-weight:bold;");
+
+                if(attackid && lvl && spellid) {
+                    update_attack_from_spell(lvl, spellid, attackid)
                 }
-                update[repeating_source + "_rollcontent"] = "@{wtype}&{template:spell} {{level=@{spellschool} " + spelllevel + "}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}";
-            }
-            setAttrs(update, {silent: true});
+            });
         });
     });
 
-    on("change:repeating_spell-cantrip:spellathigherlevels change:repeating_spell-1:spellathigherlevels change:repeating_spell-2:spellathigherlevels change:repeating_spell-3:spellathigherlevels change:repeating_spell-4:spellathigherlevels change:repeating_spell-5:spellathigherlevels change:repeating_spell-6:spellathigherlevels change:repeating_spell-7:spellathigherlevels change:repeating_spell-8:spellathigherlevels change:repeating_spell-9:spellathigherlevels", function(eventinfo) {
-        if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
-            return;
-        }
-        var repeating_source = eventinfo.sourceAttribute.substring(0, eventinfo.sourceAttribute.lastIndexOf('_'));
-        getAttrs([repeating_source + "_spelllevel", repeating_source + "_spelloutput", repeating_source + "_spellathigherlevels"], function(v) {
-            var update = {};
-            var spelloutput = v[repeating_source + "_spelloutput"];
-            var lvl = v[repeating_source + "_spelllevel"];
-            if(spelloutput && spelloutput === "SPELLCARD") {
-                var spelllevel = "@{spelllevel}";
-                if(v[repeating_source + "_spellathigherlevels"]) {
-                    var lvl = parseInt(v[repeating_source + "_spelllevel"],10);
-                    spelllevel = "?{Cast at what level?";
-                    for(i = 0; i < 10-lvl; i++) {
-                        spelllevel = spelllevel + "|Level " + (parseInt(i, 10) + parseInt(lvl, 10)) + "," + (parseInt(i, 10) + parseInt(lvl, 10));
-                    }
-                    spelllevel = spelllevel + "}";
+    ['spell-cantrip','spell-1','spell-2','spell-3','spell-4','spell-5','spell-6','spell-7','spell-8','spell-9'].forEach(attr => {
+        on(`change:repeating_${attr}:spelloutput`, (eventinfo) => {
+            if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {return;}
+
+            const spellid = eventinfo.sourceAttribute.split("_")[2], repeating_source = `repeating_${attr}_${spellid}`;
+            getAttrs([`${repeating_source}_spellattackid`, `${repeating_source}_spelllevel`, `${repeating_source}_spellathigherlevels`, "character_id"], function(v) {
+                const attackid     = v[repeating_source + "_spellattackid"];
+                const higherlevels = v[repeating_source + "_spellathigherlevels"];
+                const lvl          = parseInt(v[repeating_source + "_spelllevel"], 10);
+                const spelloutput  = eventinfo.newValue;
+
+                if (spelloutput && spelloutput === "ATTACK") {
+                    create_attack_from_spell(lvl, spellid, v["character_id"]);
+                } else if (spelloutput && spelloutput === "SPELLCARD" && attackid && attackid != "") {
+                    remove_attack(attackid);
+                    update_spelloutput(higherlevels, lvl, repeating_source, spelloutput);
                 }
-                update[repeating_source + "_rollcontent"] = "@{wtype}&{template:spell} {{level=@{spellschool} " + spelllevel + "}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}";
-            }
-            setAttrs(update, {silent: true});
+
+                console.log(`%c ${attr} change: ${spellid}, ${attackid}, ${lvl} `, "color:red; font-weight:bold;");
+            });
         });
     });
+
+    ['spell-cantrip','spell-1','spell-2','spell-3','spell-4','spell-5','spell-6','spell-7','spell-8','spell-9'].forEach(attr => {
+        on(`change:repeating_${attr}:spellathigherlevels`, (eventinfo) => {
+            if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {return;}
+
+            const spellid = eventinfo.sourceAttribute.split("_")[2], repeating_source = `repeating_${attr}_${spellid}`;
+            getAttrs([`${repeating_source}_spelllevel`, `${repeating_source}_spelloutput`], function(v) {
+                const higherlevels = eventinfo.newValue;
+                const lvl          = parseInt(v[repeating_source + "_spelllevel"], 10);
+                const spelloutput  = v[repeating_source + "_spelloutput"];
+
+                if (spelloutput && spelloutput === "SPELLCARD") {
+                    update_spelloutput(higherlevels, lvl, repeating_source, spelloutput);
+                }
+            });
+
+            console.log(`%c ${attr} change: ${spellid}, ${attackid}, ${lvl} `, "color:green; font-weight:bold;");
+        });
+    });
+
+    const update_spelloutput = (higherlevels, lvl, repeating_source, spelloutput)  => {
+        let spelllevel = "@{spelllevel}";
+        let update = {};
+
+        if (higherlevels) {
+            for(i = 0; i < 10-lvl; i++) {
+                let tot = parseInt(i, 10) + parseInt(lvl, 10);
+                spelllevel = spelllevel + "|Level " + tot + "," + tot;
+            }
+            spelllevel = `?{Cast at what level? ${spelllevel}}`;
+        }
+        update[repeating_source + "_rollcontent"] = "@{wtype}&{template:spell} {{level=@{spellschool} " + spelllevel + "}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}";
+
+        setAttrs(update, {silent: true});
+    };
 
     on("change:class change:custom_class change:cust_classname change:cust_hitdietype change:cust_spellcasting_ability change:cust_spellslots change:cust_strength_save_prof change:cust_dexterity_save_prof change:cust_constitution_save_prof change:cust_intelligence_save_prof change:cust_wisdom_save_prof change:cust_charisma_save_prof change:subclass change:multiclass1 change:multiclass1_subclass change:multiclass2 change:multiclass2_subclass change:multiclass3 change:multiclass3_subclass" , function(eventinfo) {
         if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
