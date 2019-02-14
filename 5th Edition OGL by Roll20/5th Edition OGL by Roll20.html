@@ -6641,108 +6641,43 @@
         update_globalskills();
     });
 
-    on("change:global_skill_mod_flag", function(eventinfo) {
-        if(eventinfo.newValue === "1") {
-            getSectionIDs("skillmod", function(ids) {
-                if(!ids || ids.length === 0) {
-                    var update = {};
-                    var rowid = generateRowID();
-                    update[`repeating_skillmod_${rowid}_global_skill_name`] = "GUIDANCE";
-                    update[`repeating_skillmod_${rowid}_global_skill_roll`] = "1d4";
-                    update[`repeating_skillmod_${rowid}_global_skill_active_flag`] = "1";
-                    setAttrs(update);
-                }
-            });
-        } else {
-            getSectionIDs("skillmod", function(ids) {
-                var update = {};
-                var rowid = generateRowID();
-                _.each(ids, function(rowid) {
-                    update[`repeating_skillmod_${rowid}_global_skill_active_flag`] = "0";
-                });
-                setAttrs(update);
-            });
-        }
-    });
-
     on("change:repeating_savemod remove:repeating_savemod", function(eventinfo) {
         update_globalsaves();
-    });
-
-    on("change:global_save_mod_flag", function(eventinfo) {
-        if(eventinfo.newValue === "1") {
-            getSectionIDs("savemod", function(ids) {
-                if(!ids || ids.length === 0) {
-                    var update = {};
-                    var rowid = generateRowID();
-                    update[`repeating_savemod_${rowid}_global_save_roll`] = "1d4";
-                    update[`repeating_savemod_${rowid}_global_save_name`] = "BLESS";
-                    update[`repeating_savemod_${rowid}_global_save_active_flag`] = "1";
-                    setAttrs(update);
-                }
-            });
-        } else {
-            getSectionIDs("savemod", function(ids) {
-                var update = {};
-                var rowid = generateRowID();
-                _.each(ids, function(rowid) {
-                    update[`repeating_savemod_${rowid}_global_save_active_flag`] = "0";
-                });
-                setAttrs(update);
-            });
-        }
     });
 
     on("change:repeating_tohitmod remove:repeating_tohitmod", function(eventinfo) {
         update_globalattack();
     });
 
-    on("change:global_attack_mod_flag", function(eventinfo) {
-        if(eventinfo.newValue === "1") {
-            getSectionIDs("tohitmod", function(ids) {
-                if(!ids || ids.length === 0) {
-                    var update = {};
-                    var rowid = generateRowID();
-                    update[`repeating_tohitmod_${rowid}_global_attack_roll`] = "1d4";
-                    update[`repeating_tohitmod_${rowid}_global_attack_name`] = "BLESS";
-                    update[`repeating_tohitmod_${rowid}_global_attack_active_flag`] = "1";
-                    setAttrs(update);
-                }
-            });
-        } else {
-            getSectionIDs("tohitmod", function(ids) {
-                var update = {};
-                var rowid = generateRowID();
-                _.each(ids, function(rowid) {
-                    update[`repeating_tohitmod_${rowid}_global_attack_active_flag`] = "0";
-                });
-                setAttrs(update);
-            });
-        }
-    });
+    [`ac`,`attack`,'save','skill',].forEach(attr => {
+        on(`change:global_${attr}_mod_flag`, (eventinfo) => {
+            const mod = (attr === "attack") ? "tohitmod" : `${attr}mod`;
+            if(eventinfo.newValue === "1") {
+                const firstAttr       = (attr === "ac")  ? "val" : "roll";
+                const firstAttrValue  = (attr === "ac")  ? 1 : "1d4";
+                const secondAttrValue = (attr === "ac")  ? "Defense" : (attr === "skill") ? "GUIDANCE" : "BLESS";
 
-    on("change:global_ac_mod_flag", function(eventinfo) {
-        if(eventinfo.newValue === "1") {
-            getSectionIDs("acmod", function(ids) {
-                if(!ids || ids.length === 0) {
+                getSectionIDs(mod, (ids) => {
+                    if(!ids || ids.length === 0) {
+                        var update = {};
+                        var rowid = generateRowID();
+                        update[`repeating_${mod}_${rowid}_global_${attr}_${firstAttr}`]= `${firstAttrValue}`;
+                        update[`repeating_${mod}_${rowid}_global_${attr}_name`]        = `${secondAttrValue}`;
+                        update[`repeating_${mod}_${rowid}_global_${attr}_active_flag`] = "1";
+                        setAttrs(update);
+                    }
+                });
+            } else {
+                getSectionIDs(mod, function(ids) {
                     var update = {};
                     var rowid = generateRowID();
-                    update[`repeating_acmod_${rowid}_global_ac_val`] = "1";
-                    update[`repeating_acmod_${rowid}_global_ac_name`] = "Defense";
-                    update[`repeating_acmod_${rowid}_global_ac_active_flag`] = "1";
+                    _.each(ids, function(rowid) {
+                        update[`repeating_${mod}_${rowid}_global_${attr}_active_flag`] = "0";
+                    });
                     setAttrs(update);
-                }
-            });
-        } else {
-            getSectionIDs("acmod", function(ids) {
-                var update = {};
-                var rowid = generateRowID();
-                _.each(ids, function(rowid) {
-                    update[`repeating_acmod_${rowid}_global_ac_active_flag`] = "0";
                 });
-                setAttrs(update);
-            });
-        }
+            }
+        });
     });
 
     on("change:repeating_acmod remove:repeating_acmod", function(eventinfo) {
@@ -6838,18 +6773,17 @@
     });
 
     on("remove:repeating_resource", function(eventinfo) {
-        var resourceid = eventinfo.sourceAttribute.substring(19, 39);
-        var left_itemid = eventinfo.removedInfo["repeating_resource_" + resourceid + "_resource_left_itemid"];
-        var right_itemid = eventinfo.removedInfo["repeating_resource_" + resourceid + "_resource_right_itemid"];
-        var update = {};
-        if(left_itemid) {
-            update["repeating_inventory_" + left_itemid + "_useasresource"] = 0;
-            update["repeating_inventory_" + left_itemid + "_itemresourceid"] = "";
-        }
-        if(right_itemid) {
-            update["repeating_inventory_" + right_itemid + "_useasresource"] = 0;
-            update["repeating_inventory_" + right_itemid + "_itemresourceid"] = "";
-        }
+        const resourceid = eventinfo.sourceAttribute.substring(19, 39);
+        let update       = {};
+
+        _.each(['left','right'], (side) => {
+            const itemid = eventinfo.removedInfo[`repeating_resource_${resourceid}_resource_${side}_itemid`];
+            if (itemid) {
+                update[`repeating_inventory_${itemid}_useasresource`] = 0;
+                update[`repeating_inventory_${itemid}_itemresourceid`] = "";
+            };
+        });
+        
         setAttrs(update, {silent: true});
     });
 
