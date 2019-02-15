@@ -6633,11 +6633,9 @@
     });
 
     on("change:repeating_npcaction:attack_flag change:repeating_npcaction:attack_type change:repeating_npcaction:attack_range change:repeating_npcaction:attack_target change:repeating_npcaction:attack_tohit change:repeating_npcaction:attack_damage change:repeating_npcaction:attack_damagetype change:repeating_npcaction:attack_damage2 change:repeating_npcaction:attack_damagetype2 change:repeating_npcaction-l:attack_flag change:repeating_npcaction-l:attack_type change:repeating_npcaction-l:attack_range change:repeating_npcaction-l:attack_target change:repeating_npcaction-l:attack_tohit change:repeating_npcaction-l:attack_damage change:repeating_npcaction-l:attack_damagetype change:repeating_npcaction-l:attack_damage2 change:repeating_npcaction-l:attack_damagetype2 change:repeating_npcaction:show_desc change:repeating_npcaction-l:show_desc change:repeating_npcaction:description change:repeating_npcaction-l:description", function(eventinfo) {
-        var actionid = eventinfo.sourceAttribute.substring(20, 40);
-        var legendary = eventinfo.sourceAttribute.indexOf("npcaction-l") > -1 ? true : false;
-        if(legendary) {
-            actionid = eventinfo.sourceAttribute.substring(22, 42);
-        }
+        const actionid  = eventinfo.sourceAttribute.split("_")[2];
+        const legendary = eventinfo.sourceAttribute.includes("npcaction-l") ? true : false;
+
         update_npc_action(actionid, legendary);
     });
 
@@ -7692,31 +7690,33 @@
                 callbacks.push( function() {update_npc_saves();} );
             };
 
-            update["npc_acrobatics_base"] = "";
+            update["npc_acrobatics_base"]      = "";
             update["npc_animal_handling_base"] = "";
-            update["npc_arcana_base"] = "";
-            update["npc_athletics_base"] = "";
-            update["npc_deception_base"] = "";
-            update["npc_history_base"] = "";
-            update["npc_insight_base"] = "";
-            update["npc_intimidation_base"] = "";
-            update["npc_investigation_base"] = "";
-            update["npc_medicine_base"] = "";
-            update["npc_nature_base"] = "";
-            update["npc_perception_base"] = "";
-            update["npc_performance_base"] = "";
-            update["npc_persuasion_base"] = "";
-            update["npc_religion_base"] = "";
+            update["npc_arcana_base"]          = "";
+            update["npc_athletics_base"]       = "";
+            update["npc_deception_base"]       = "";
+            update["npc_history_base"]         = "";
+            update["npc_insight_base"]         = "";
+            update["npc_intimidation_base"]    = "";
+            update["npc_investigation_base"]   = "";
+            update["npc_medicine_base"]        = "";
+            update["npc_nature_base"]          = "";
+            update["npc_perception_base"]      = "";
+            update["npc_performance_base"]     = "";
+            update["npc_persuasion_base"]      = "";
+            update["npc_religion_base"]        = "";
             update["npc_sleight_of_hand_base"] = "";
-            update["npc_stealth_base"] = "";
-            update["npc_survival_base"] = "";
+            update["npc_stealth_base"]         = "";
+            update["npc_survival_base"]        = "";
             if(page.data["Skills"] && page.data["Skills"] != "") {
                 skillarray = page.data["Skills"].split(", ");
+
                 _.each(skillarray, function(skill) {
                     kv = skill.indexOf("-") > -1 ? skill.split(" ") : skill.split(" +");
                     update["npc_" + kv[0].toLowerCase().replace(/ /g, '_') + "_base"] = parseInt(kv[1], 10);
                 });
-                callbacks.push( function() {update_npc_skills();} );
+
+                callbacks.push( function() { update_npc_skills(); });
             }
 
             getSectionIDs("repeating_npcaction-l", function(idarray) {
@@ -10475,17 +10475,12 @@
             let last_save = 0;
             let npc_flag  = 0;
 
-            console.log(`%c Type: ${type}`, "color: orange; font-weight: bold; font-size: 14px;");
-
             _.each(list.reverse(), (base) => {
-                console.log(`%c BASE: ${base}, VALUE: ${v[`${base}`]}`, "color: black; font-weight: bold; font-size: 14px;");
-
-                const ability = ["charisma", "constitution", "dexterity", "intelligence", "wisdom", "strength"];
                 const attr = base.split("_")[1];
 
                 // CSS will add comma :after 2 & 4 and +/- :before
                 // 1 = Positive Number, 2 = Last Number, 3 = Negative Number, 4 = Last Negative Number
-                if (v[`${base}`] && !v[`${base}`].includes(ability)) {
+                if (v[`${base}`]) {
                     item = parseInt(v[`${base}`], 10);
                     if (last_save === 0) {
                         last_save = 1;
@@ -10498,7 +10493,7 @@
                     item      = "";
                 };
 
-                //Type will be "save" or "skills"
+                //Type = "save" or "skills"
                 const attrName = (type === "save") ? `${attr}_save` : `${attr}`;
                 update[`npc_${attrName}_flag`] = item_flag;
                 update[`npc_${attrName}`]      = item;
@@ -10509,12 +10504,9 @@
             const flagAttr = (type === "save") ? "saving" : type;
             update[`npc_${flagAttr}_flag`] = (npc_flag === 0) ? "" : npc_flag;
 
-            console.log(update);
-
             setAttrs(update, {silent: true});
         });
     };
-
 
     var update_npc_action = function(update_id, legendary) {
         if(update_id.substring(0,1) === "-" && update_id.length === 20) {
