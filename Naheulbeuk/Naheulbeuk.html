@@ -1069,7 +1069,7 @@
 						<fieldset class="repeating_magies">
 							<input type="checkbox" class="sheet-hidden sheet-magie-filtre" name="attr_Magie_Filtre" checked="checked" value="1" />
 	
-							<div class="sheet-magie-filtre">
+							<div class="sheet-magie-filtre sheet-group">
 								<div class="sheet-row">
 									<div class="sheet-col-3">
 										<input type="text" class="sheet-noBorder" name="attr_Magie_Nom" value="" />
@@ -1104,7 +1104,13 @@
 										<button type="roll" class="sheet-rollGrimoire" value="@{displayJet} &{template:magie} {{name=@{magie_nom}}} {{magie_ecole=@{magie_ecole}}} {{magie_niveau=@{magie_niveau}}} {{magie_display_epreuve=@{Magie_EpreuveLanceur_Jet}}} {{magie_display_resistance=@{Magie_EpreuveCible_Jet}}} {{magie_incantation=@{magie_incantation}}} {{magie_duree=@{magie_duree}}} {{magie_cout=@{magie_cout}}} {{magie_portee=@{magie_portee}}} {{magie_effet=@{magie_effet}}} {{magie_ingre=@{magie_ingre}}} {{magie_aireeffet=@{magie_aireeffet}}} {{magie_soin=@{magie_soin}}} {{magie_degats=@{Magie_Degats}}} {{magie_bonusint=[[@{MagieBonusInt}]]}} {{magie_epreuve=@{Magie_EpreuveLanceur_Jet} }} {{magie_resistance=@{Magie_EpreuveCible_Jet} + @{Magie_EpreuveCible_mod}}} {{creature_ev=@{creature_ev}}} {{creature_int=@{creature_int}}} {{creature_at=@{creature_at}}} {{creature_def=@{creature_def}}} {{creature_cou=@{creature_cou}}} {{creature_pr=@{creature_pr}}} {{creature_xp=@{creature_xp}}} {{creature_resimagie=@{creature_resimagie}}} {{creature_degats=@{creature_degats}}} {{magie_epreuveappel_mod=@{magie_epreuveappel_mod}}} {{magie_epreuvecontrol_mod=@{magie_epreuvecontrol_mod}}} {{magie_epreuverevocation_mod=@{magie_epreuverevocation_mod}}} {{magie_notes=@{magie_notes}}}"> Grimoire </button>
 									</div>
 								</div>
-								<br />
+								<input type="checkbox" name="attr_magie_config" class="sheet-config-flag" value="1" /><span class="sheet-cog">y</span>
+								<div class="sheet-config">
+									<div class="row">
+										<div class="sheet-col-1">Macro :</div>
+										<div class="sheet-col-11"><input type="text" class="sheet-noBorder" name="attr_Magie_macros" value="" /></div>
+									</div>
+								</div>
 								<div class="sheet-row">
 									<input type="checkbox" class="sheet-display-magie sheet-display-magie-incantation" name="attr_Magie_Display_Incantation" value="1" /> <span class="sheet-display-magie">Incantation</span>
 									<input type="checkbox" class="sheet-display-magie sheet-display-magie-epreuve" name="attr_Magie_Display_Epreuve" value="1" /> <span class="sheet-display-magie">Épreuves</span>
@@ -2369,6 +2375,12 @@
 	on("change:tab_ecolemagie change:tab_niveaumagie", function() {
 		displayMagicSpells();
 	});
+	// magic import
+	on("change:repeating_magies:magie_macros", function( e ) {
+		if( e[ "sourceType"] === "player" ) {
+			updateSpell();
+		}
+	});
 	// Crating
 	on("change:reparation_qualite change:reparation_specialiste", function( ) {
 		updateRepair();
@@ -2843,6 +2855,27 @@
 				}
 				setAttrs( sDisplay, { silent: true } );
 			});
+		});
+	}
+	
+	function updateSpell() {
+		var err = "";
+		var sAttrs = {};
+		getAttrs( [ "repeating_magies_magie_macros" ], function( v ) {
+			// open json
+			try {
+				var sJson = JSON.parse( v[ "repeating_magies_magie_macros" ] );
+			} catch(e) {
+				err = "Données non valides";
+			}
+			
+			// set values
+			for( var i in sJson ) {
+				sAttrs[ i ] = sJson[ i ];
+			}
+			
+			sAttrs[ "repeating_magies_magie_macros" ] = err;
+			setAttrs( sAttrs );
 		});
 	}
 
