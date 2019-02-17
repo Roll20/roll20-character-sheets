@@ -8,7 +8,7 @@ The text areas are expandable for additional info.
 
 ## [Wiki page for the sheet](https://wiki.roll20.net/Star_Wars_WEG_D6_character_sheet)
 
-## [Changelog](https://raw.githubusercontent.com/Roll20/roll20-character-sheets/tree/master/D6StarWars/CHANGELOG.md)
+## [Changelog](https://github.com/Roll20/roll20-character-sheets/blob/master/D6StarWars/CHANGELOG.md)
 
 Good source for all things D6 Star wars related, including fanmade conversions of campaign settings, forums and more:
 
