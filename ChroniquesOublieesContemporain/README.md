@@ -9,9 +9,16 @@ Cette feuilles de personnage inclut quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](http://www.black-book-editions.fr/produit.php?id=4349).
 
 # Version courante
-2.4 [Screenshot](coc_v2.png)
+2.5 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v2.5 (2019-02-12)
+* Gestion des buffs en langage naturel avec référence aux caracs ou voies/rangs
+* Réorganisation des lignes d'attaque (PJ et PNJ), gestion des DM secondaires sur la fiche PJ, actions limitées
+* Réorganisation des lignes de jets de capacités
+* Réorganisation du roll template
+* Refactorisation de code dans les sheetworkers
 
 ## v2.4 (2019-01-01)
 * Fiche de personnage avec sélection du type par dropdown (PJ, PNJ ou Véhicule)
