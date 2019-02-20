@@ -14768,11 +14768,33 @@
         });
     });
 
-    on("mancerchange:class1_subclass mancerchange:class2_subclass mancerchange:class3_subclass mancerchange:class4_subclass", function(eventinfo) {
-        if(eventinfo.sourceType !== "worker") deleteCharmancerData(["lp-choices", "lp-asi", "lp-spells", "lp-summary"]);
-        getCompendiumPage(eventinfo.newValue, function(data) {
-            updateClassLevel(undefined, eventinfo.sourceAttribute.slice(0, 6));
-        });
+     //Trigger a change event when subclass changes
+    ["class1", "class2", "class3", "class4"].forEach(levelclass => {
+        on(`mancerchange:${levelclass}_subclass`, (eventinfo) => {
+            const mancerdata    = getCharmancerData();
+            const leveldata     = mancerdata["lp-levels"].values;
+            const repeating     = mancerdata["lp-levels"].repeating || [];
+            let set             = {};
+
+            if(eventinfo.sourceType !== "worker") deleteCharmancerData(["lp-choices", "lp-asi", "lp-spells", "lp-summary"]);
+            getCompendiumPage(eventinfo.newValue, function(data) {
+                updateClassLevel(undefined, eventinfo.sourceAttribute.slice(0, 6));
+            });
+
+            //This will update the results inputs with new hp values if the subclass is Draconic
+            if (eventinfo.sourceType !== "worker") {
+                const newValue      = (eventinfo.newValue) ? eventinfo.newValue : " ";
+                const previousValue = (eventinfo.previousValue) ? eventinfo.previousValue : " ";
+                _.each(repeating, function(repid) {
+                    if (repid.includes(`_${levelclass}-`) && newValue.includes("Draconic Bloodline") || previousValue.includes("Draconic Bloodline")) {
+                        updateButtons(levelclass, repid);
+                        updateResults(levelclass, repid, eventinfo);
+                    };
+                });
+            };
+
+            setAttrs(set);
+        });    
     });
 
     on("mancerchange:class1_addlevel mancerchange:class2_addlevel mancerchange:class3_addlevel mancerchange:class4_addlevel", function(eventinfo) {
@@ -14929,8 +14951,8 @@
                     });
                     _.each(addarray, function(repname) {
                         addRepeatingSection(rowid, "hpbylevel", repname, function(repid) {
-                            updateResults(levelclass, repid);
                             updateButtons(levelclass, repid);
+                            updateResults(levelclass, repid);
                             update[`${repid} label`] = `Level ${_.last(repname.split("-"))}`;
                             if(repname == _.last(addarray)) {
                                 setCharmancerText(update);
@@ -15175,28 +15197,6 @@
 
         changeCompendiumPage("sheet-levels-info", page);
         getCompendiumPage(page, function(p) {
-        });
-    });
-
-    //Trigger a change event when subclass changes
-    ["class1", "class2", "class3", "class4"].forEach(levelclass => {
-        on(`mancerchange:${levelclass}_subclass`, (eventinfo) => {
-            const mancerdata    = getCharmancerData();
-            const leveldata     = mancerdata["lp-levels"].values;
-            const repeating     = mancerdata["lp-levels"].repeating || [];
-            const newValue      = (eventinfo.newValue) ? eventinfo.newValue : " ";
-            const previousValue = (eventinfo.previousValue) ? eventinfo.previousValue : " ";
-            let set             = {};
-
-            //This will update the results inputs with new hp values if the subclass is Draconic
-            _.each(repeating, function(repid) {
-                if (repid.includes(`_${levelclass}-`) && newValue.includes("Draconic Bloodline") || previousValue.includes("Draconic Bloodline")) {
-                    updateButtons(levelclass, repid);
-                    updateResults(levelclass, repid, eventinfo);
-                };
-            });
-
-            setAttrs(set);
         });
     });
 
