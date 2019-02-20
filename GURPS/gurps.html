@@ -687,7 +687,7 @@
 					<div class="sheet-cell sheet-col0 sheet-label">
 						<div class="sheet-popup">Air Mv</div>
 						<span class="sheet-tooltip">
-							Bas Air Move = Basic Speed * 2 = <input class="sheet-inline" type="number" name="attr_basic_air_move_unmodified" readonly="readonly">
+							Base Air Move = Basic Speed * 2 = <input class="sheet-inline" type="number" name="attr_basic_air_move_unmodified" readonly="readonly">
 							<br />
 							2pts/level, you can use up and down arrows
 						</span>
@@ -2884,7 +2884,7 @@
 	    <span>Mark updates as read</span>
 	</div>
 	
-	<h3>Latest Changes: Updated 02/11/2019</h3>
+	<h3>Latest Changes: Updated 02/20/2019</h3>
 		
 	<h3>Known Issues</h3>
 	<ul>
@@ -2915,6 +2915,14 @@
 		<p>If there are others that are working on or wish to work on this sheet, lets coordinate using the Roll20 forum for now - perhaps later we can use GitHub.</p>
 	</ul>
 	
+	<h4>Version: 1.5.2</h4>
+
+	<p>Pull Request: TBD</p>
+
+	<ul>
+		<li>Fixed rounding bug with flight move. Updated Air move column to hide enhanced move if there's no enhanced move.</li>
+    </ul>
+		
 	<h4>Version: 1.5.1</h4>
 
 	<p>Pull Request: 02/11/2019</p>
@@ -3655,7 +3663,7 @@
 
 	var noop = function () {}; // do nothing.
 
-	var version = "0.0.0";
+	var version = "1.5.2";
 
 	var modCascade = true;
 	var modCascadeAll = true;
@@ -5098,10 +5106,10 @@
                 
                 //----------------
                 // calculate air move
-                airMoveUnmodified = +values.basic_speed * 2;
+                airMoveUnmodified = Math.floor(+values.basic_speed * 2);
                 
                 // base is basis_speed * 2
-                airMove = +values.basic_speed * 2;
+                airMove = Math.floor(+values.basic_speed * 2);
                 
                 // add air move modifier
                 airMove = airMove + basicAirMoveMod;
@@ -5132,17 +5140,37 @@
                 baseEnhancedAirMove = getEnhancedValue(airMove, totalEnhancedLevel);
                 
                 // get the encumbered levels
-                encumberedDisplayMove0 = airMove + "/" + baseEnhancedAirMove;
+                if (baseEnhancedAirMove > 0) {
                 
-                encumberedDisplayMove1 = getEncumberedMove(airMove, 1) + "/" + getEncumberedMove(baseEnhancedAirMove, 1);
+                    // show the enhanced move
+                    encumberedDisplayMove0 = airMove + "/" + baseEnhancedAirMove;
                 
-                encumberedDisplayMove2 = getEncumberedMove(airMove, 2) + "/" + getEncumberedMove(baseEnhancedAirMove, 2);
+                    encumberedDisplayMove1 = getEncumberedMove(airMove, 1) + "/" + getEncumberedMove(baseEnhancedAirMove, 1);
+                    
+                    encumberedDisplayMove2 = getEncumberedMove(airMove, 2) + "/" + getEncumberedMove(baseEnhancedAirMove, 2);
+                    
+                    encumberedDisplayMove3 = getEncumberedMove(airMove, 3) + "/" + getEncumberedMove(baseEnhancedAirMove, 3);
+                    
+                    encumberedDisplayMove4 = getEncumberedMove(airMove, 4) + "/" + getEncumberedMove(baseEnhancedAirMove, 4);
+                    
+                    encumberedDisplayMove5 = encumberedDisplayMove4;
+                        
+                } else {
+                    
+                    // don't need the enhanced move
+                    encumberedDisplayMove0 = airMove;
                 
-                encumberedDisplayMove3 = getEncumberedMove(airMove, 3) + "/" + getEncumberedMove(baseEnhancedAirMove, 3);
+                    encumberedDisplayMove1 = getEncumberedMove(airMove, 1);
+                    
+                    encumberedDisplayMove2 = getEncumberedMove(airMove, 2);
+                    
+                    encumberedDisplayMove3 = getEncumberedMove(airMove, 3);
+                    
+                    encumberedDisplayMove4 = getEncumberedMove(airMove, 4);
+                    
+                    encumberedDisplayMove5 = encumberedDisplayMove4;
                 
-                encumberedDisplayMove4 = getEncumberedMove(airMove, 4) + "/" + getEncumberedMove(baseEnhancedAirMove, 4);
-                
-                encumberedDisplayMove5 = encumberedDisplayMove4;
+                }
                 
                 // check for half move
                 injuryFatigueMoveModifier = getInjuryFatigueModifier(values.hit_points, values.hit_points_max, values.fatigue_points, values.fatigue_points_max);
@@ -5151,28 +5179,63 @@
                 switch(values.encumbrance_level) {
                     
                     case 0:
-                        currentAirMove = (airMove * injuryFatigueMoveModifier) + "/" + (baseEnhancedAirMove * injuryFatigueMoveModifier);
+                        currentAirMove = (airMove * injuryFatigueMoveModifier);
+                        
+                        if (baseEnhancedAirMove > 0) {
+                            
+                            currentAirMove = currentAirMove + "/" + (baseEnhancedAirMove * injuryFatigueMoveModifier);
+                        }
+                        
                         break;
                         
                     case 1:
-                        currentAirMove = (getEncumberedMove(airMove, 1) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedAirMove, 1) * injuryFatigueMoveModifier);
+                        
+                        currentAirMove = (getEncumberedMove(airMove, 1) * injuryFatigueMoveModifier);
+                        
+                        if (baseEnhancedAirMove > 0) {
+                            
+                            currentAirMove = currentAirMove + "/" + (getEncumberedMove(baseEnhancedAirMove, 1) * injuryFatigueMoveModifier);
+                        }
+                        
                         break;
                         
                     case 2:
-                        currentAirMove = (getEncumberedMove(airMove, 2) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedAirMove, 2) * injuryFatigueMoveModifier);
+                        
+                        currentAirMove = (getEncumberedMove(airMove, 2) * injuryFatigueMoveModifier);
+                        
+                        if (baseEnhancedAirMove > 0) {
+                            
+                            currentAirMove = currentAirMove + "/" + (getEncumberedMove(baseEnhancedAirMove, 2) * injuryFatigueMoveModifier);
+                        }
+                        
                         break;
                         
                     case 3:
-                        currentAirMove = (getEncumberedMove(airMove, 3) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedAirMove, 3) * injuryFatigueMoveModifier);
+                        
+                        currentAirMove = (getEncumberedMove(airMove, 3) * injuryFatigueMoveModifier);
+                        
+                        if (baseEnhancedAirMove > 0) {
+                            
+                            currentAirMove = currentAirMove + "/" + (getEncumberedMove(baseEnhancedAirMove, 3) * injuryFatigueMoveModifier);
+                        }
+                        
                         break;
                         
                     case 4:
                     case 5:
                     default:
-                        currentAirMove = (getEncumberedMove(airMove, 4) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedAirMove, 4) * injuryFatigueMoveModifier);
+                        
+                        currentAirMove = (getEncumberedMove(airMove, 4) * injuryFatigueMoveModifier);
+                        
+                        if (baseEnhancedAirMove > 0) {
+                            
+                            currentAirMove = currentAirMove + "/" + (getEncumberedMove(baseEnhancedAirMove, 4) * injuryFatigueMoveModifier);
+                        }
+                        
                         break;
                     
                 }
+                        
 
             } else {
                 
