@@ -4,6 +4,10 @@ This is the (compressed) source code for the Blades in the Dark character sheet 
 
 ## Changelog
 
+### 3.8
+
+* Minor bugfixes and removal of legacy code
+
 ### 3.7
 
 * Simplified the roll template code
