@@ -15090,12 +15090,18 @@
             if (eventinfo.sourceType !== "worker") {
                 const newValue      = (eventinfo.newValue) ? eventinfo.newValue : " ";
                 const previousValue = (eventinfo.previousValue) ? eventinfo.previousValue : " ";
-                _.each(repeating, function(repid) {
-                    if (repid.includes(`_${levelclass}-`) && newValue.includes("Draconic Bloodline") || previousValue.includes("Draconic Bloodline")) {
-                        updateButtons(levelclass, repid);
-                        updateResults(levelclass, repid, eventinfo);
-                    };
+                let repids          = [], updateArray = [];
+                _.each(repeating, (repid) => {
+                    if (repid.includes(`_${levelclass}-`)) { updateArray.push(repid); };
                 });
+                _.each(updateArray, (repid) => {
+                    if (newValue.includes("Draconic Bloodline") || previousValue.includes("Draconic Bloodline")) { repids.push(repid); };
+                });
+
+                if (repids.length > 0) {
+                    updateButtons(levelclass, repids);
+                    updateResults(levelclass, repids, eventinfo);
+                };
             };
 
             setAttrs(set);
@@ -15224,8 +15230,8 @@
 
     const update_hp = (firstTime, levelclass) => {
         const mancerdata = getCharmancerData();
-        const leveldata = mancerdata["lp-levels"].values;
-        const repeating = mancerdata["lp-levels"].repeating || [];
+        const leveldata  = mancerdata["lp-levels"].values;
+        const repeating  = mancerdata["lp-levels"].repeating || [];
 
         const updateByLevel = (firstTime, levelclass) => {
             _.each(levelclass, (levelclass) => {
@@ -15246,18 +15252,22 @@
                     if(id.split("_")[2].split("-")[0] == levelclass && !levelarray.includes(id.split("_")[2]) && !existing.includes(id.split("_")[2])) {
                         removearray.push(id);
                         existing.push(id.split("_")[2]);
-                    }
+                    };
                 });
 
                 if(addarray.length > 0) {
-                    let set = {}, update = {}, rowid = "";
-                    _.each(repeating, function(repid) {
+                    const last = addarray[addarray.length - 2];
+                    let set = {}, update = {}, rowid = "", repids = [];
+                    _.each(repeating, (repid) => {
                         if(repid.split("_")[2] == `${levelclass}hprow`) rowid = repid;
                     });
-                    _.each(addarray, function(repname) {
+                    _.each(addarray, (repname) => {
                         addRepeatingSection(rowid, "hpbylevel", repname, function(repid) {
-                            updateButtons(levelclass, repid);
-                            updateResults(levelclass, repid);
+                            repids.push(repid);
+                            if (repid.includes(last) || addarray.length == 1) {
+                                updateResults(levelclass, repids);
+                                updateButtons(levelclass, repids);
+                            };
                             update[`${repid} label`] = `Level ${_.last(repname.split("-"))}`;
                             if(repname == _.last(addarray)) {
                                 setCharmancerText(update);
@@ -15273,7 +15283,7 @@
                     clearRepeatingSectionById(removearray, () => {
                         recalcHpByLevel(levelclass);
                     });
-                }
+                };
             });
         };
 
@@ -15292,26 +15302,28 @@
         };
     };
 
-    const updateButtons = (levelclass, repid) => {
+    const updateButtons = (levelclass, repids) => {
         const mancerdata    = getCharmancerData();
         const leveldata     = mancerdata["lp-levels"].values;
         const addlevel      = leveldata[`${levelclass}_addlevel`] ? parseInt(leveldata[`${levelclass}_addlevel`]) : 0;
         const hitdie        = leveldata[`${levelclass}_hitdie`];
         let average         = getDieAvg(hitdie), set = {}, bonus = hpBonus(levelclass), hpbonus = bonus[0], bonusSource = bonus[1];
         const templateBonus = (hpbonus > 0) ? `+${hpbonus}[${bonusSource}]` : "";
-        
-        set[`roll_${repid}_rollhp`]    = `@{wtype}&{template:mancerhproll} {{title=Roll for HP Level ${_.last(repid.split(`${levelclass}-`))}}} {{r1=[[1${hitdie}${templateBonus}]]}}`;
-        set[`roll_${repid}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP Level ${_.last(repid.split(`${levelclass}-`))}}} {{a1=[[${average}${templateBonus}]]}}`;
 
-        if (addlevel && hitdie) {
-            let dice = [];
-            //Set the roll buttons
-            for (x = 1; x <= addlevel; x++) { dice.push(`{{r${x}=[[1${hitdie}${templateBonus}]]}}`); };
-            set[`roll_${levelclass}_rollhp`] = `@{wtype}&{template:mancerhproll} {{title=Roll for HP}} ` + dice.join()
+         _.each(repids, (repid) => {
+            set[`roll_${repid}_rollhp`]    = `@{wtype}&{template:mancerhproll} {{title=Roll for HP Level ${_.last(repid.split(`${levelclass}-`))}}} {{r1=[[1${hitdie}${templateBonus}]]}}`;
+            set[`roll_${repid}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP Level ${_.last(repid.split(`${levelclass}-`))}}} {{a1=[[${average}${templateBonus}]]}}`;
 
-            //Set the average hp button
-            set[`roll_${levelclass}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP}}{{a1=[[${average}${templateBonus}]]}}`
-        };
+            if (addlevel && hitdie) {
+                let dice = [];
+                //Set the roll buttons
+                for (x = 1; x <= addlevel; x++) { dice.push(`{{r${x}=[[1${hitdie}${templateBonus}]]}}`); };
+                set[`roll_${levelclass}_rollhp`] = `@{wtype}&{template:mancerhproll} {{title=Roll for HP}} ` + dice.join()
+
+                //Set the average hp button
+                set[`roll_${levelclass}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP}}{{a1=[[${average}${templateBonus}]]}}`
+            };
+        });
 
         setAttrs(set);
     };
@@ -15339,21 +15351,24 @@
         return [hpbonus, bonusSource];
     };
 
-    const updateResults = (levelclass, repid, eventinfo) => {
+    const updateResults = (levelclass, repids, eventinfo) => {
         const mancerdata = getCharmancerData();
         const leveldata  = mancerdata["lp-levels"].values;
         const hitdie     = leveldata[`${levelclass}_hitdie`];
         let average      = getDieAvg(hitdie), bonus = hpBonus(levelclass), hpbonus = bonus[0], set = {};
 
-        if (!leveldata[`${repid}_result`]) {
-            set[`${repid}_result`] = parseInt(average) + parseInt(hpbonus);
-        } else if (eventinfo && (eventinfo.newValue).includes("Draconic Bloodline")) {
-            set[`${repid}_result`] = parseInt(leveldata[`${repid}_result`]) + parseInt(hpbonus);
-        } else if (eventinfo && (eventinfo.previousValue).includes("Draconic Bloodline")) {
-            set[`${repid}_result`] = parseInt(leveldata[`${repid}_result`]) - 1;
-        } else {
-            false
-        };
+        _.each(repids, (repid) => {
+            console.log(repid);
+           if (!leveldata[`${repid}_result`]) {
+                set[`${repid}_result`] = parseInt(average) + parseInt(hpbonus);
+            } else if (eventinfo && (eventinfo.newValue).includes("Draconic Bloodline")) {
+                set[`${repid}_result`] = parseInt(leveldata[`${repid}_result`]) + parseInt(hpbonus);
+            } else if (eventinfo && (eventinfo.previousValue).includes("Draconic Bloodline")) {
+                set[`${repid}_result`] = parseInt(leveldata[`${repid}_result`]) - 1;
+            } else {
+                false
+            };
+        });
 
         setAttrs(set);
     };
