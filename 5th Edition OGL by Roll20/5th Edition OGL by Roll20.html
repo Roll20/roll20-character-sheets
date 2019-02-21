@@ -14661,7 +14661,7 @@
         getCompendiumPage(eventinfo.newValue, function(results) {});
     });
 
-    on("page:lp-levels", function(eventinfo) {
+ on("page:lp-levels", function(eventinfo) {
         const mancerdata = getCharmancerData();
         const previous   = mancerdata["lp-welcome"].values["previous_attributes"] ? JSON.parse(mancerdata["lp-welcome"].values["previous_attributes"]) : {};
         let levelclass   = ["class1"];
@@ -14781,23 +14781,19 @@
                 updateClassLevel(undefined, eventinfo.sourceAttribute.slice(0, 6));
             });
 
-            console.log(`%c SUBCLASS`, "color:blue;");
-            console.log(eventinfo);
             //This will update the results inputs with new hp values if the subclass is Draconic
             if (eventinfo.sourceType !== "worker") {
                 const newValue      = (eventinfo.newValue) ? eventinfo.newValue : " ";
                 const previousValue = (eventinfo.previousValue) ? eventinfo.previousValue : " ";
-                let repids          = [];
-                _.each(repeating, function(repid) {
-                    if (repid.includes(`_${levelclass}-`) && newValue.includes("Draconic Bloodline") || previousValue.includes("Draconic Bloodline")) {
-                        console.log(`%c SUBCLASS Updated Results`, "color:blue;");
-                        repids.push(repid);
-                    };
+                let repids          = [], updateArray = [];
+                _.each(repeating, (repid) => {
+                    if (repid.includes(`_${levelclass}-`)) { updateArray.push(repid); };
+                });
+                _.each(updateArray, (repid) => {
+                    if (newValue.includes("Draconic Bloodline") || previousValue.includes("Draconic Bloodline")) { repids.push(repid); };
                 });
 
                 if (repids.length > 0) {
-                    console.log(`%c SUBCLASS REP IDS:`, "color:blue;");
-                    console.log(repids);
                     updateButtons(levelclass, repids);
                     updateResults(levelclass, repids, eventinfo);
                 };
@@ -14929,10 +14925,8 @@
 
     const update_hp = (firstTime, levelclass) => {
         const mancerdata = getCharmancerData();
-        const leveldata = mancerdata["lp-levels"].values;
-        const repeating = mancerdata["lp-levels"].repeating || [];
-
-        console.log(`%c UPDATE HP, ${firstTime}`, "color:green;");
+        const leveldata  = mancerdata["lp-levels"].values;
+        const repeating  = mancerdata["lp-levels"].repeating || [];
 
         const updateByLevel = (firstTime, levelclass) => {
             _.each(levelclass, (levelclass) => {
@@ -14953,17 +14947,22 @@
                     if(id.split("_")[2].split("-")[0] == levelclass && !levelarray.includes(id.split("_")[2]) && !existing.includes(id.split("_")[2])) {
                         removearray.push(id);
                         existing.push(id.split("_")[2]);
-                    }
+                    };
                 });
 
                 if(addarray.length > 0) {
+                    const last = addarray[addarray.length - 2];
                     let set = {}, update = {}, rowid = "", repids = [];
-                    _.each(repeating, function(repid) {
+                    _.each(repeating, (repid) => {
                         if(repid.split("_")[2] == `${levelclass}hprow`) rowid = repid;
                     });
-                    _.each(addarray, function(repname) {
+                    _.each(addarray, (repname) => {
                         addRepeatingSection(rowid, "hpbylevel", repname, function(repid) {
                             repids.push(repid);
+                            if (repid.includes(last) || addarray.length == 1) {
+                                updateResults(levelclass, repids);
+                                updateButtons(levelclass, repids);
+                            };
                             update[`${repid} label`] = `Level ${_.last(repname.split("-"))}`;
                             if(repname == _.last(addarray)) {
                                 setCharmancerText(update);
@@ -14975,14 +14974,11 @@
                             }
                         });
                     });
-                    console.log(`%c UPDATE HP REP IDS:`, "color:green;");
-                    updateButtons(levelclass, repids);
-                    updateResults(levelclass, repids);
                 } else {
                     clearRepeatingSectionById(removearray, () => {
                         recalcHpByLevel(levelclass);
                     });
-                }
+                };
             });
         };
 
@@ -15008,7 +15004,7 @@
         const hitdie        = leveldata[`${levelclass}_hitdie`];
         let average         = getDieAvg(hitdie), set = {}, bonus = hpBonus(levelclass), hpbonus = bonus[0], bonusSource = bonus[1];
         const templateBonus = (hpbonus > 0) ? `+${hpbonus}[${bonusSource}]` : "";
-        
+
          _.each(repids, (repid) => {
             set[`roll_${repid}_rollhp`]    = `@{wtype}&{template:mancerhproll} {{title=Roll for HP Level ${_.last(repid.split(`${levelclass}-`))}}} {{r1=[[1${hitdie}${templateBonus}]]}}`;
             set[`roll_${repid}_averagehp`] = `@{wtype}&{template:mancerhproll} {{title=Average for HP Level ${_.last(repid.split(`${levelclass}-`))}}} {{a1=[[${average}${templateBonus}]]}}`;
@@ -15057,7 +15053,8 @@
         let average      = getDieAvg(hitdie), bonus = hpBonus(levelclass), hpbonus = bonus[0], set = {};
 
         _.each(repids, (repid) => {
-            if (!leveldata[`${repid}_result`]) {
+            console.log(repid);
+           if (!leveldata[`${repid}_result`]) {
                 set[`${repid}_result`] = parseInt(average) + parseInt(hpbonus);
             } else if (eventinfo && (eventinfo.newValue).includes("Draconic Bloodline")) {
                 set[`${repid}_result`] = parseInt(leveldata[`${repid}_result`]) + parseInt(hpbonus);
@@ -15068,11 +15065,9 @@
             };
         });
 
-        console.log(`%c Update Results:, REP IDs`, "color:purple;");
-        console.log(set);
-
         setAttrs(set);
     };
+
     const getDieAvg = (hitdie) => {
         if(!hitdie) return 0;
         const size = hitdie.slice(1);
