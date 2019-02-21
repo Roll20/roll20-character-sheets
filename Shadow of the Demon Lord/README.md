@@ -2,6 +2,9 @@
 
 ## Change log
 
+### Version 7
+* Fixed a bug preventing creation of new NPC attacks
+
 ### Version 6 
 * Styling cleanup, using CSS grid instead of Flexbox in some key places
 * Added a rest button
