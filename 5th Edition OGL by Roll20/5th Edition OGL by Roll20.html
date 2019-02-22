@@ -5129,7 +5129,9 @@
         </div>
         {{#desc}}
             <div class="desc info">
-                <span><span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
+                <span>
+                    <span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
+                </span>
             </div>
         {{/desc}}
     </rolltemplate>
@@ -5158,7 +5160,9 @@
         {{^attack}}
             {{#desc}}
                 <div class="desc info">
-                    <span><span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
+                    <span>
+                        <span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
+                    </span>
                 </div>
             {{/desc}}
         {{/attack}}
@@ -5345,7 +5349,9 @@
         {{/save}}
         {{#desc}}
             <div class="desc info">
-                <span><span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
+                <span>
+                    <span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
+                </span>
             </div>
         {{/desc}}
         {{#globaldamage}}
@@ -5542,7 +5548,9 @@
 
     <rolltemplate class="sheet-rolltemplate-desc">
         <div class="desc info">
-            <span><span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
+            <span>
+                <span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
+            </span>
         </div>
     </rolltemplate>
 
@@ -5557,17 +5565,17 @@
             <div class="spacer"></div>
             {{#castingtime}}
             <div class="row">
-                <span class="bold" data-i18n="casting-time:">Casting Time:</span> <span>{{castingtime}}<span>
+                <span class="bold" data-i18n="casting-time:">Casting Time:</span> <span>{{castingtime}}</span>
             </div>
             {{/castingtime}}
             {{#range}}
             <div class="row">
-                <span class="bold" data-i18n="range:">Range:</span> <span>{{range}}<span>
+                <span class="bold" data-i18n="range:">Range:</span> <span>{{range}}</span>
             </div>
             {{/range}}
             {{#target}}
             <div class="row">
-                <span class="bold" data-i18n="target:">Target:</span> <span>{{target}}<span>
+                <span class="bold" data-i18n="target:">Target:</span> <span>{{target}}</span>
             </div>
             {{/target}}
             <div class="row">
@@ -5576,22 +5584,22 @@
                     {{#v}}V{{#s}}, {{/s}}{{^s}}{{#m}}, {{/m}}{{/s}}{{/v}}
                     {{#s}}S{{#m}}, {{/m}}{{/s}}
                     {{#m}}M {{#material}}({{material}}){{/material}}{{/m}}
-                <span>
+                </span>
             </div>
             {{#duration}}
             <div class="row">
-                <span class="bold" data-i18n="duration:">Duration:</span> <span>{{#concentration}}<span data-i18n="concentration">Concentration</span> {{/concentration}}{{duration}}<span>
+                <span class="bold" data-i18n="duration:">Duration:</span> <span>{{#concentration}}<span data-i18n="concentration">Concentration</span> {{/concentration}}{{duration}}</span>
             </div>
             {{/duration}}
             <div class="spacer"></div>
             {{#description}}
             <div class="row">
-                <span class="description">{{description}}<span>
+                <span class="description">{{description}}</span>
             </div>
             {{/description}}
             {{#athigherlevels}}
             <div class="row">
-                <span class="bold italics" data-i18n="at-higher-lvl">At Higher Levels</span>. <span class="description">{{athigherlevels}}<span>
+                <span class="bold italics" data-i18n="at-higher-lvl">At Higher Levels</span>. <span class="description">{{athigherlevels}}</span>
             </div>
             {{/athigherlevels}}
         </div>
@@ -6200,139 +6208,61 @@
         });
     });
 
-    on("change:strength_base change:strength_bonus", function() {
-        update_attr("strength");
+    ['strength','dexterity','constitution','intelligence','wisdom','charisma'].forEach(attr => {
+        on(`change:${attr}_base change:${attr}_bonus`, function() {
+            update_attr(`${attr}`);
+
+        });
     });
 
-    on("change:strength", function() {
-        update_mod("strength");
-        check_customac("Strength");
-        update_weight();
+    ['strength','dexterity','constitution','intelligence','wisdom','charisma'].forEach(attr => {
+        on(`change:${attr}`, function() {
+            update_mod(`${attr}`);
+
+            const cap = attr.charAt(0).toUpperCase() + attr.slice(1);
+            check_customac(cap);
+
+            (attr === "strength") ? update_weight() : false;
+            (attr === "dexterity") ? update_initiative() : false;
+        });
     });
 
-    on("change:dexterity_base change:dexterity_bonus", function() {
-        update_attr("dexterity");
-        update_initiative();
+    ['strength','dexterity','constitution','intelligence','wisdom','charisma'].forEach(attr => {
+        on(`change:${attr}_mod`, function() {
+            update_save(`${attr}`);
+            update_attacks(`${attr}`);
+            update_tool(`${attr}`);
+            update_spell_info(`${attr}`);
+
+            switch(`${attr}`) {
+                case "strength":
+                    update_skills(["athletics"]);
+                    break;
+                case "dexterity":
+                    update_skills(["acrobatics", "sleight_of_hand", "stealth"]);
+                    update_ac();
+                    update_initiative();
+                    break;
+                case "intelligence":
+                    update_skills(["arcana", "history", "investigation", "nature", "religion"]);
+                    break;
+                case "wisdom":
+                    update_skills(["animal_handling", "insight", "medicine", "perception", "survival"]);
+                    break;
+                case "charisma":
+                    update_skills(["deception", "intimidation", "performance", "persuasion"]);
+                    break;
+                default:
+                    false;
+            }
+        });
     });
 
-    on("change:dexterity", function() {
-        update_mod("dexterity");
-        check_customac("Dexterity");
-    });
-
-    on("change:constitution_base change:constitution_bonus", function() {
-        update_attr("constitution");
-    });
-
-    on("change:constitution", function() {
-        update_mod("constitution");
-        check_customac("Constitution");
-    });
-
-    on("change:intelligence_base change:intelligence_bonus", function() {
-        update_attr("intelligence");
-    });
-
-    on("change:intelligence", function() {
-        update_mod("intelligence");
-        check_customac("Intelligence");
-    });
-
-    on("change:wisdom_base change:wisdom_bonus", function() {
-        update_attr("wisdom");
-    });
-
-    on("change:wisdom", function() {
-        update_mod("wisdom");
-        check_customac("Wisdom");
-    });
-
-    on("change:charisma_base change:charisma_bonus", function() {
-        update_attr("charisma");
-    });
-
-    on("change:charisma", function() {
-        update_mod("charisma");
-        check_customac("Charisma");
-    });
-
-    on("change:strength_mod", function() {
-        update_save("strength");
-        update_skills(["athletics"]);
-        update_attacks("strength");
-        update_tool("strength");
-        update_spell_info("strength");
-    });
-
-    on("change:dexterity_mod", function() {
-        update_save("dexterity");
-        update_skills(["acrobatics", "sleight_of_hand", "stealth"]);
-        update_attacks("dexterity");
-        update_tool("dexterity");
-        update_spell_info("dexterity");
-        update_ac();
-        update_initiative();
-    });
-
-    on("change:constitution_mod", function() {
-        update_save("constitution");
-        update_attacks("constitution");
-        update_tool("constitution");
-        update_spell_info("constitution");
-    });
-
-    on("change:intelligence_mod", function() {
-        update_save("intelligence");
-        update_skills(["arcana", "history", "investigation", "nature", "religion"]);
-        update_attacks("intelligence");
-        update_tool("intelligence");
-        update_spell_info("intelligence");
-    });
-
-    on("change:wisdom_mod", function() {
-        update_save("wisdom");
-        update_skills(["animal_handling", "insight", "medicine", "perception", "survival"]);
-        update_attacks("wisdom");
-        update_tool("wisdom");
-        update_spell_info("wisdom");
-    });
-
-    on("change:charisma_mod", function() {
-        update_save("charisma");
-        update_skills(["deception", "intimidation", "performance", "persuasion"]);
-        update_attacks("charisma");
-        update_tool("charisma");
-        update_spell_info("charisma");
-    });
-
-    on("change:strength_save_prof change:strength_save_mod", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_save("strength");
-    });
-
-    on("change:dexterity_save_prof change:dexterity_save_mod", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_save("dexterity");
-    });
-
-    on("change:constitution_save_prof change:constitution_save_mod", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_save("constitution");
-    });
-
-    on("change:intelligence_save_prof change:intelligence_save_mod", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_save("intelligence");
-    });
-
-    on("change:wisdom_save_prof change:wisdom_save_mod", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_save("wisdom");
-    });
-
-    on("change:charisma_save_prof change:charisma_save_mod", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_save("charisma");
+    ['strength','dexterity','constitution','intelligence','wisdom','charisma'].forEach(attr => {
+        on(`change:${attr}_save_prof change:${attr}_save_mod`, function(eventinfo) {
+            if(eventinfo.sourceType === "sheetworker") {return;};
+            update_save(`${attr}`);
+        });
     });
 
     on("change:globalsavemod", function(eventinfo) {
@@ -6345,94 +6275,12 @@
         update_save("death");
     });
 
-    on("change:acrobatics_prof change:acrobatics_type change:acrobatics_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["acrobatics"]);
-    });
-
-    on("change:animal_handling_prof change:animal_handling_type change:animal_handling_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["animal_handling"]);
-    });
-
-    on("change:arcana_prof change:arcana_type change:arcana_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["arcana"]);
-    });
-
-    on("change:athletics_prof change:athletics_type change:athletics_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["athletics"]);
-    });
-
-    on("change:deception_prof change:deception_type change:deception_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["deception"]);
-    });
-
-    on("change:history_prof change:history_type change:history_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["history"]);
-    });
-
-    on("change:insight_prof change:insight_type change:insight_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["insight"]);
-    });
-
-    on("change:intimidation_prof change:intimidation_type change:intimidation_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["intimidation"]);
-    });
-
-    on("change:investigation_prof change:investigation_type change:investigation_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["investigation"]);
-    });
-
-    on("change:medicine_prof change:medicine_type change:medicine_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["medicine"]);
-    });
-
-    on("change:nature_prof change:nature_type change:nature_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["nature"]);
-    });
-
-    on("change:perception_prof change:perception_type change:perception_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["perception"]);
-    });
-
-    on("change:performance_prof change:performance_type change:performance_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["performance"]);
-    });
-
-    on("change:persuasion_prof change:persuasion_type change:persuasion_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["persuasion"]);
-    });
-
-    on("change:religion_prof change:religion_type change:religion_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["religion"]);
-    });
-
-    on("change:sleight_of_hand_prof change:sleight_of_hand_type change:sleight_of_hand_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["sleight_of_hand"]);
-    });
-
-    on("change:stealth_prof change:stealth_type change:stealth_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["stealth"]);
-    });
-
-    on("change:survival_prof change:survival_type change:survival_flat", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {return;};
-        update_skills(["survival"]);
+    ['acrobatics','animal_handling','arcana','athletics','deception','history','insight','intimidation','investigation',
+    'medicine','nature','perception','performance','persuasion','religion','sleight_of_hand','stealth','survival'].forEach(attr => {
+        on(`change:${attr}_prof change:${attr}_type change:${attr}_flat`, function(eventinfo) {
+            if(eventinfo.sourceType === "sheetworker") {return;};
+            update_skills([`${attr}`]);
+        });
     });
 
     on("change:repeating_tool:toolname change:repeating_tool:toolbonus_base change:repeating_tool:toolattr_base change:repeating_tool:tool_mod", function(eventinfo) {
@@ -6473,25 +6321,20 @@
     });
 
     on("change:global_damage_mod_flag", function(eventinfo) {
-        if(eventinfo.newValue === "1") {
-            getSectionIDs("damagemod", function(ids) {
+        getSectionIDs("damagemod", function(ids) {
+            var update = {};
+            if(eventinfo.newValue === "1") {
                 if(!ids || ids.length === 0) {
-                    var update = {};
                     var rowid = generateRowID();
                     update[`repeating_damagemod_${rowid}_global_damage_active_flag`] = "1";
-                    setAttrs(update);
                 }
-            });
-        } else {
-            getSectionIDs("damagemod", function(ids) {
-                console.log(ids);
-                var update = {};
+            } else {
                 _.each(ids, function(rowid) {
                     update[`repeating_damagemod_${rowid}_global_damage_active_flag`] = "0";
                 });
-                setAttrs(update);
-            });
-        }
+            }
+            setAttrs(update);
+        });
     }); 
 
     on("change:exhaustion_toggle", function(eventinfo) {
@@ -6506,38 +6349,24 @@
         }
     });
 
-    on("change:exhaustion_level", function() {
-        var update = {
-            "exhaustion_1": "",
-            "exhaustion_2": "",
-            "exhaustion_3": "",
-            "exhaustion_4": "",
-            "exhaustion_5": "",
-            "exhaustion_6": ""
+    on("change:exhaustion_level", function(eventinfo) {
+        const newValue = parseInt(eventinfo.newValue) || 0, previousValue = parseInt(eventinfo.previousValue) || 0;
+        let update = {};
+
+       if (newValue === 0) {
+            //If exhaustion is 0 the reset exhaustion_1 to "No Effect" and blank the other spans
+            for(let i = 2; i <= 6; i++) { update[`exhaustion_${i}`] = ""}
+            update[`exhaustion_1`] = "• " + getTranslationByKey(`exhaustion-0`)
+        } else if (newValue > previousValue) {
+            //If exhaustion increase then add text to the spans
+            for(let i = previousValue; i <= newValue; i++) 
+            {update[`exhaustion_${i}`] = "• " + getTranslationByKey(`exhaustion-${i}`)}
+        } else {
+            //If exhaustion decrease remove text from spans
+            for(let i = newValue + 1; i <= previousValue; i++) {update[`exhaustion_${i}`] = ""}
         };
 
-        getAttrs(["exhaustion_level"], function(attrs) {
-            switch(attrs["exhaustion_level"]) {
-                case "6":
-                    update["exhaustion_6"] = "• " + getTranslationByKey("exhaustion-6");
-                case "5":
-                    update["exhaustion_5"] = "• " + getTranslationByKey("exhaustion-5");
-                case "4":
-                    update["exhaustion_4"] = "• " + getTranslationByKey("exhaustion-4");
-                case "3":
-                    update["exhaustion_3"] = "• " + getTranslationByKey("exhaustion-3");
-                case "2":
-                    update["exhaustion_2"] = "• " + getTranslationByKey("exhaustion-2");
-                case "1":
-                    update["exhaustion_1"] = "• " + getTranslationByKey("exhaustion-1");
-                    break;
-                default:
-                    update["exhaustion_1"] = "• " + getTranslationByKey("exhaustion-0");
-                    break;
-            }
-
-            setAttrs(update, {silent: true});
-        });
+        setAttrs(update, {silent: true});
     });
 
     on("change:race change:subrace", function(eventinfo) {
@@ -6560,23 +6389,25 @@
         }
     });
 
-    on("change:repeating_inventory:hasattack", function(eventinfo) {
-        if(eventinfo.sourceType === "sheetworker") {
-            return;
-        }
+    on(`change:repeating_inventory:hasattack`, function(eventinfo) {
+        if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {return;};
 
-        var itemid = eventinfo.sourceAttribute.substring(20, 40);
-        getAttrs(["repeating_inventory_" + itemid + "_hasattack", "repeating_inventory_" + itemid + "_itemattackid"], function(v) {
-            var attackid = v["repeating_inventory_" + itemid + "_itemattackid"];
-            var hasattack = v["repeating_inventory_" + itemid + "_hasattack"];
-            if(attackid && attackid != "" && hasattack == 0) {
-                remove_attack(attackid);
-            }
-            else if(hasattack == 1) {
-                create_attack_from_item(itemid);
-            };
+        const itemid = eventinfo.sourceAttribute.substring(20, 40);
+        getAttrs([`repeating_inventory_${itemid}_itemattackid`], function(v) {
+            const hasattack = eventinfo.newValue, itemattackid = v[`repeating_inventory_${itemid}_itemattackid`];
+            (hasattack == 1) ? create_attack_from_item(itemid) : remove_attack(itemattackid);
         });
-    })
+    });
+
+    on(`change:repeating_inventory:useasresource`, function(eventinfo) {
+        if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {return;};
+
+        const itemid = eventinfo.sourceAttribute.substring(20, 40);
+        getAttrs([`repeating_inventory_${itemid}_itemresourceid`], function(v) {
+            const useasresource = eventinfo.newValue, itemresourceid = v[`repeating_inventory_${itemid}_itemresourceid`];
+            (useasresource == 1) ? create_resource_from_item(itemid) : remove_resource(itemresourceid);
+        });
+    });
 
     on("change:repeating_inventory:itemname change:repeating_inventory:itemproperties change:repeating_inventory:itemmodifiers change:repeating_inventory:itemcount", function(eventinfo) {
         if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
@@ -6593,24 +6424,6 @@
             if(resourceid) {
                 update_resource_from_item(itemid, resourceid);
             }
-        });
-    });
-
-    on("change:repeating_inventory:useasresource", function(eventinfo) {
-        if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
-            return;
-        }
-
-        var itemid = eventinfo.sourceAttribute.substring(20, 40);
-        getAttrs(["repeating_inventory_" + itemid + "_useasresource", "repeating_inventory_" + itemid + "_itemresourceid"], function(v) {
-            var useasresource = v["repeating_inventory_" + itemid + "_useasresource"];
-            var resourceid = v["repeating_inventory_" + itemid + "_itemresourceid"];
-            if(useasresource == 1) {
-                create_resource_from_item(itemid);
-            }
-            else {
-                remove_resource(resourceid);
-            };
         });
     });
 
@@ -6662,79 +6475,76 @@
         update_ac();
     });
 
-    on("change:repeating_spell-cantrip:spellname change:repeating_spell-1:spellname change:repeating_spell-1:spellprepared change:repeating_spell-2:spellname change:repeating_spell-2:spellprepared change:repeating_spell-3:spellname change:repeating_spell-3:spellprepared change:repeating_spell-4:spellname change:repeating_spell-4:spellprepared change:repeating_spell-5:spellname change:repeating_spell-5:spellprepared change:repeating_spell-6:spellname change:repeating_spell-6:spellprepared change:repeating_spell-7:spellname change:repeating_spell-7:spellprepared change:repeating_spell-8:spellname change:repeating_spell-8:spellprepared change:repeating_spell-9:spellname change:repeating_spell-9:spellprepared change:repeating_spell-cantrip:spellrange change:repeating_spell-1:spellrange change:repeating_spell-2:spellrange change:repeating_spell-3:spellrange change:repeating_spell-4:spellrange change:repeating_spell-5:spellrange change:repeating_spell-6:spellrange change:repeating_spell-7:spellrange change:repeating_spell-8:spellrange change:repeating_spell-9:spellrange change:repeating_spell-cantrip:spelltarget change:repeating_spell-1:spelltarget change:repeating_spell-2:spelltarget change:repeating_spell-3:spelltarget change:repeating_spell-4:spelltarget change:repeating_spell-5:spelltarget change:repeating_spell-6:spelltarget change:repeating_spell-7:spelltarget change:repeating_spell-8:spelltarget change:repeating_spell-9:spelltarget change:repeating_spell-cantrip:spelldamage change:repeating_spell-1:spelldamage change:repeating_spell-2:spelldamage change:repeating_spell-3:spelldamage change:repeating_spell-4:spelldamage change:repeating_spell-5:spelldamage change:repeating_spell-6:spelldamage change:repeating_spell-7:spelldamage change:repeating_spell-8:spelldamage change:repeating_spell-9:spelldamage change:repeating_spell-cantrip:spelldamagetype change:repeating_spell-1:spelldamagetype change:repeating_spell-2:spelldamagetype change:repeating_spell-3:spelldamagetype change:repeating_spell-4:spelldamagetype change:repeating_spell-5:spelldamagetype change:repeating_spell-6:spelldamagetype change:repeating_spell-7:spelldamagetype change:repeating_spell-8:spelldamagetype change:repeating_spell-9:spelldamagetype change:repeating_spell-cantrip:spelldamage2 change:repeating_spell-1:spelldamage2 change:repeating_spell-2:spelldamage2 change:repeating_spell-3:spelldamage2 change:repeating_spell-4:spelldamage2 change:repeating_spell-5:spelldamage2 change:repeating_spell-6:spelldamage2 change:repeating_spell-7:spelldamage2 change:repeating_spell-8:spelldamage2 change:repeating_spell-9:spelldamage2 change:repeating_spell-cantrip:spelldamagetype2 change:repeating_spell-1:spelldamagetype2 change:repeating_spell-2:spelldamagetype2 change:repeating_spell-3:spelldamagetype2 change:repeating_spell-4:spelldamagetype2 change:repeating_spell-5:spelldamagetype2 change:repeating_spell-6:spelldamagetype2 change:repeating_spell-7:spelldamagetype2 change:repeating_spell-8:spelldamagetype2 change:repeating_spell-9:spelldamagetype2 change:repeating_spell-cantrip:spellhealing change:repeating_spell-1:spellhealing change:repeating_spell-2:spellhealing change:repeating_spell-3:spellhealing change:repeating_spell-4:spellhealing change:repeating_spell-5:spellhealing change:repeating_spell-6:spellhealing change:repeating_spell-7:spellhealing change:repeating_spell-8:spellhealing change:repeating_spell-9:spellhealing change:repeating_spell-cantrip:spelldmgmod change:repeating_spell-1:spelldmgmod change:repeating_spell-2:spelldmgmod change:repeating_spell-3:spelldmgmod change:repeating_spell-4:spelldmgmod change:repeating_spell-5:spelldmgmod change:repeating_spell-6:spelldmgmod change:repeating_spell-7:spelldmgmod change:repeating_spell-8:spelldmgmod change:repeating_spell-9:spelldmgmod change:repeating_spell-cantrip:spellsave change:repeating_spell-1:spellsave change:repeating_spell-2:spellsave change:repeating_spell-3:spellsave change:repeating_spell-4:spellsave change:repeating_spell-5:spellsave change:repeating_spell-6:spellsave change:repeating_spell-7:spellsave change:repeating_spell-8:spellsave change:repeating_spell-9:spellsave change:repeating_spell-cantrip:spellsavesuccess change:repeating_spell-1:spellsavesuccess change:repeating_spell-2:spellsavesuccess change:repeating_spell-3:spellsavesuccess change:repeating_spell-4:spellsavesuccess change:repeating_spell-5:spellsavesuccess change:repeating_spell-6:spellsavesuccess change:repeating_spell-7:spellsavesuccess change:repeating_spell-8:spellsavesuccess change:repeating_spell-9:spellsavesuccess change:repeating_spell-cantrip:spellhldie change:repeating_spell-1:spellhldie change:repeating_spell-2:spellhldie change:repeating_spell-3:spellhldie change:repeating_spell-4:spellhldie change:repeating_spell-5:spellhldie change:repeating_spell-6:spellhldie change:repeating_spell-7:spellhldie change:repeating_spell-8:spellhldie change:repeating_spell-9:spellhldie change:repeating_spell-cantrip:spellhldietype change:repeating_spell-1:spellhldietype change:repeating_spell-2:spellhldietype change:repeating_spell-3:spellhldietype change:repeating_spell-4:spellhldietype change:repeating_spell-5:spellhldietype change:repeating_spell-6:spellhldietype change:repeating_spell-7:spellhldietype change:repeating_spell-8:spellhldietype change:repeating_spell-9:spellhldietype change:repeating_spell-cantrip:spell_updateflag change:repeating_spell-1:spell_updateflag change:repeating_spell-2:spell_updateflag change:repeating_spell-3:spell_updateflag change:repeating_spell-4:spell_updateflag change:repeating_spell-5:spell_updateflag change:repeating_spell-6:spell_updateflag change:repeating_spell-7:spell_updateflag change:repeating_spell-8:spell_updateflag change:repeating_spell-9:spell_updateflag change:repeating_spell-cantrip:spellattack change:repeating_spell-1:spellattack change:repeating_spell-2:spellattack change:repeating_spell-3:spellattack change:repeating_spell-4:spellattack change:repeating_spell-5:spellattack change:repeating_spell-6:spellattack change:repeating_spell-7:spellattack change:repeating_spell-8:spellattack change:repeating_spell-9:spellattack change:repeating_spell-cantrip:spellhlbonus change:repeating_spell-1:spellhlbonus change:repeating_spell-2:spellhlbonus change:repeating_spell-3:spellhlbonus change:repeating_spell-4:spellhlbonus change:repeating_spell-5:spellhlbonus change:repeating_spell-6:spellhlbonus change:repeating_spell-7:spellhlbonus change:repeating_spell-8:spellhlbonus change:repeating_spell-9:spellhlbonus change:repeating_spell-cantrip:includedesc change:repeating_spell-1:includedesc change:repeating_spell-2:includedesc change:repeating_spell-3:includedesc change:repeating_spell-4:includedesc change:repeating_spell-5:includedesc change:repeating_spell-6:includedesc change:repeating_spell-7:includedesc change:repeating_spell-8:includedesc change:repeating_spell-9:includedesc change:repeating_spell-cantrip:spellathigherlevels change:repeating_spell-1:spellathigherlevels change:repeating_spell-2:spellathigherlevels change:repeating_spell-3:spellathigherlevels change:repeating_spell-4:spellathigherlevels change:repeating_spell-5:spellathigherlevels change:repeating_spell-6:spellathigherlevels change:repeating_spell-7:spellathigherlevels change:repeating_spell-8:spellathigherlevels change:repeating_spell-9:spellathigherlevels change:repeating_spell-cantrip:spelldescription change:repeating_spell-1:spelldescription change:repeating_spell-2:spelldescription change:repeating_spell-3:spelldescription change:repeating_spell-4:spelldescription change:repeating_spell-5:spelldescription change:repeating_spell-6:spelldescription change:repeating_spell-7:spelldescription change:repeating_spell-8:spelldescription change:repeating_spell-9:spelldescription change:repeating_spell-cantrip:innate change:repeating_spell-1:innate change:repeating_spell-2:innate change:repeating_spell-3:innate change:repeating_spell-4:innate change:repeating_spell-5:innate change:repeating_spell-6:innate change:repeating_spell-7:innate change:repeating_spell-8:innate change:repeating_spell-9:innate change:repeating_spell-cantrip:spell_ability change:repeating_spell-1:spell_ability change:repeating_spell-2:spell_ability change:repeating_spell-3:spell_ability change:repeating_spell-4:spell_ability change:repeating_spell-5:spell_ability change:repeating_spell-6:spell_ability change:repeating_spell-7:spell_ability change:repeating_spell-8:spell_ability change:repeating_spell-9:spell_ability change:repeating_spell-cantrip:spell_damage_progression", function(eventinfo) {
-        if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
-            return;
-        }
-        var regex_result = /^(repeating_spell-(?:cantrip|\d)_[^_]+)_.+$/.exec(eventinfo.sourceAttribute);
-        if(regex_result) {
-            var repeating_source = regex_result[1];
+   ['spell-cantrip','spell-1','spell-2','spell-3','spell-4','spell-5','spell-6','spell-7','spell-8','spell-9'].forEach(attr => {
+        on(`change:repeating_${attr}:includedesc change:repeating_${attr}:innate change:repeating_${attr}:spell_ability change:repeating_${attr}:spell_updateflag change:repeating_${attr}:spellathigherlevels change:repeating_${attr}:spellattack change:repeating_${attr}:spelldamage change:repeating_${attr}:spelldamage2 change:repeating_${attr}:spelldamagetype change:repeating_${attr}:spelldamagetype2 change:repeating_${attr}:spelldescription change:repeating_${attr}:spelldmgmod change:repeating_${attr}:spellhealing change:repeating_${attr}:spellhlbonus change:repeating_${attr}:spellhldie change:repeating_${attr}:spellhldietype change:repeating_${attr}:spellname change:repeating_${attr}:spellprepared change:repeating_${attr}:spellrange change:repeating_${attr}:spellsave change:repeating_${attr}:spellsavesuccess change:repeating_${attr}:spelltarget change:repeating_${attr}:spell_damage_progression`, (eventinfo) => {
+            if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") { return; }
+
+            const spellid = eventinfo.sourceAttribute.split("_")[2], repeating_source = `repeating_${attr}_${spellid}`;
             getAttrs([repeating_source + "_spellattackid", repeating_source + "_spelllevel"], function(v) {
-                var spellid = repeating_source.slice(-20);
                 var attackid = v[repeating_source + "_spellattackid"];
-                var lvl = v[repeating_source + "_spelllevel"];
+                var lvl      = v[repeating_source + "_spelllevel"];
+
                 if(attackid && lvl && spellid) {
                     update_attack_from_spell(lvl, spellid, attackid)
                 }
             });
-        }
-    });
-
-    on("change:repeating_spell-cantrip:spelloutput change:repeating_spell-1:spelloutput change:repeating_spell-2:spelloutput change:repeating_spell-3:spelloutput change:repeating_spell-4:spelloutput change:repeating_spell-5:spelloutput change:repeating_spell-6:spelloutput change:repeating_spell-7:spelloutput change:repeating_spell-8:spelloutput change:repeating_spell-9:spelloutput", function(eventinfo) {
-        if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
-            return;
-        }
-        var repeating_source = eventinfo.sourceAttribute.substring(0, eventinfo.sourceAttribute.lastIndexOf('_'));
-        getAttrs([repeating_source + "_spellattackid", repeating_source + "_spelllevel", repeating_source + "_spelloutput", repeating_source + "_spellattackid", repeating_source + "_spellathigherlevels","character_id"], function(v) {
-            var update = {};
-            var spelloutput = v[repeating_source + "_spelloutput"];
-            var spellid = repeating_source.slice(-20);
-            var attackid = v[repeating_source + "_spellattackid"];
-            var lvl = v[repeating_source + "_spelllevel"];
-            if(spelloutput && spelloutput === "ATTACK") {
-                create_attack_from_spell(lvl, spellid, v["character_id"]);
-            }
-            else if(spelloutput && spelloutput === "SPELLCARD" && attackid && attackid != "") {
-                remove_attack(attackid);
-                var spelllevel = "@{spelllevel}";
-                if(v[repeating_source + "_spellathigherlevels"]) {
-                    var lvl = parseInt(v[repeating_source + "_spelllevel"],10);
-                    spelllevel = "?{Cast at what level?";
-                    for(i = 0; i < 10-lvl; i++) {
-                        spelllevel = spelllevel + "|Level " + (parseInt(i, 10) + parseInt(lvl, 10)) + "," + (parseInt(i, 10) + parseInt(lvl, 10));
-                    }
-                    spelllevel = spelllevel + "}";
-                }
-                update[repeating_source + "_rollcontent"] = "@{wtype}&{template:spell} {{level=@{spellschool} " + spelllevel + "}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}";
-            }
-            setAttrs(update, {silent: true});
         });
     });
 
-    on("change:repeating_spell-cantrip:spellathigherlevels change:repeating_spell-1:spellathigherlevels change:repeating_spell-2:spellathigherlevels change:repeating_spell-3:spellathigherlevels change:repeating_spell-4:spellathigherlevels change:repeating_spell-5:spellathigherlevels change:repeating_spell-6:spellathigherlevels change:repeating_spell-7:spellathigherlevels change:repeating_spell-8:spellathigherlevels change:repeating_spell-9:spellathigherlevels", function(eventinfo) {
-        if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
-            return;
-        }
-        var repeating_source = eventinfo.sourceAttribute.substring(0, eventinfo.sourceAttribute.lastIndexOf('_'));
-        getAttrs([repeating_source + "_spelllevel", repeating_source + "_spelloutput", repeating_source + "_spellathigherlevels"], function(v) {
-            var update = {};
-            var spelloutput = v[repeating_source + "_spelloutput"];
-            var lvl = v[repeating_source + "_spelllevel"];
-            if(spelloutput && spelloutput === "SPELLCARD") {
-                var spelllevel = "@{spelllevel}";
-                if(v[repeating_source + "_spellathigherlevels"]) {
-                    var lvl = parseInt(v[repeating_source + "_spelllevel"],10);
-                    spelllevel = "?{Cast at what level?";
-                    for(i = 0; i < 10-lvl; i++) {
-                        spelllevel = spelllevel + "|Level " + (parseInt(i, 10) + parseInt(lvl, 10)) + "," + (parseInt(i, 10) + parseInt(lvl, 10));
-                    }
-                    spelllevel = spelllevel + "}";
+    ['spell-cantrip','spell-1','spell-2','spell-3','spell-4','spell-5','spell-6','spell-7','spell-8','spell-9'].forEach(attr => {
+        on(`change:repeating_${attr}:spelloutput`, (eventinfo) => {
+            if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {return;}
+
+            const spellid = eventinfo.sourceAttribute.split("_")[2], repeating_source = `repeating_${attr}_${spellid}`;
+            getAttrs([`${repeating_source}_spellattackid`, `${repeating_source}_spelllevel`, `${repeating_source}_spellathigherlevels`, "character_id"], function(v) {
+                const attackid     = v[repeating_source + "_spellattackid"];
+                const higherlevels = v[repeating_source + "_spellathigherlevels"];
+                const spelloutput  = eventinfo.newValue;
+                let lvl            = v[repeating_source + "_spelllevel"];
+
+                if (spelloutput && spelloutput === "ATTACK") {
+                    create_attack_from_spell(lvl, spellid, v["character_id"]);
+                } else if (spelloutput && spelloutput === "SPELLCARD" && attackid && attackid != "") {
+                    let lvl = parseInt(v[repeating_source + "_spelllevel"], 10);
+                    remove_attack(attackid);
+                    update_spelloutput(higherlevels, lvl, repeating_source, spelloutput);
                 }
-                update[repeating_source + "_rollcontent"] = "@{wtype}&{template:spell} {{level=@{spellschool} " + spelllevel + "}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}";
-            }
-            setAttrs(update, {silent: true});
+            });
         });
     });
+
+    ['spell-cantrip','spell-1','spell-2','spell-3','spell-4','spell-5','spell-6','spell-7','spell-8','spell-9'].forEach(attr => {
+        on(`change:repeating_${attr}:spellathigherlevels`, (eventinfo) => {
+            if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {return;}
+
+            const spellid = eventinfo.sourceAttribute.split("_")[2], repeating_source = `repeating_${attr}_${spellid}`;
+            getAttrs([`${repeating_source}_spelllevel`, `${repeating_source}_spelloutput`], function(v) {
+                const higherlevels = eventinfo.newValue;
+                const lvl          = parseInt(v[repeating_source + "_spelllevel"], 10);
+                const spelloutput  = v[repeating_source + "_spelloutput"];
+
+                if (spelloutput && spelloutput === "SPELLCARD") {
+                    update_spelloutput(higherlevels, lvl, repeating_source, spelloutput);
+                }
+            });
+        });
+    });
+
+    const update_spelloutput = (higherlevels, lvl, repeating_source, spelloutput)  => {
+        let spelllevel = "@{spelllevel}";
+        let update = {};
+
+        if (higherlevels) {
+            for(i = 0; i < 10-lvl; i++) {
+                let tot = parseInt(i, 10) + parseInt(lvl, 10);
+                spelllevel = spelllevel + "|Level " + tot + "," + tot;
+            }
+            spelllevel = `?{Cast at what level? ${spelllevel}}`;
+        }
+        update[repeating_source + "_rollcontent"] = "@{wtype}&{template:spell} {{level=@{spellschool} " + spelllevel + "}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}";
+
+        setAttrs(update, {silent: true});
+    };
 
     on("change:class change:custom_class change:cust_classname change:cust_hitdietype change:cust_spellcasting_ability change:cust_spellslots change:cust_strength_save_prof change:cust_dexterity_save_prof change:cust_constitution_save_prof change:cust_intelligence_save_prof change:cust_wisdom_save_prof change:cust_charisma_save_prof change:subclass change:multiclass1 change:multiclass1_subclass change:multiclass2 change:multiclass2_subclass change:multiclass3 change:multiclass3_subclass" , function(eventinfo) {
         if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
