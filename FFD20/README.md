@@ -44,6 +44,10 @@ Monster Sheet
 *   Special Abilities section now has associated dice roll macros for each entry, along with additional inputs for attack type (none, ranged touch, or touch), an attack modifier number field, and damage formula field. Expander button expands/hides ability description.
 *   Fixed a bug with craft, profession, and perform skills calculating incorrectly.
 
+__Version 1.2.1 (pushed 11/17/2018)__
+
+*	Undead characters now are supported. Use toggle at the top of the page to change Fortitude and hit point calculations from using Con to Cha
+
 __Version 1.2 (pushed 5/22/2018)__
 
 Even smaller update. Had to make some necessary changes -- hopefully I can get around to beefing up this sheet soon!
