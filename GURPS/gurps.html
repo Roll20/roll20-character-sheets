@@ -326,14 +326,13 @@
 						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Attribute Check}} {{characterName=@{character_name}}} {{skillName=Fear Roll}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{fear_check} + @{modifier}]]}} {{useCriticalPlusTen=[[0]]}}" name="roll_vsFearCheck" />
 					</div>
 				</div> <!-- .sheet-row -->
-				<div class="sheet-row sheet-row-condition-stun sheet-hr">
+				<div class="sheet-row sheet-sub-row sheet-hr">
 					<div class="sheet-cell sheet-col0 sheet-label">
-						<div class="sheet-popup">Stun</div>
+						<div class="sheet-popup">Unstun</div>
 						<span class="sheet-tooltip">
-							Physical Stun Check, based on Health.<br />
+							Recover from physical stun, based on Health.<br />
 							High Pain Threshold +3 to check<br />
 							Low Pain Threshold -3 to check<br />
-							
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
@@ -346,7 +345,7 @@
 						&nbsp;
 					</div>
 					<div class="sheet-cell sheet-col4">
-						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Condition Check}} {{characterName=@{character_name}}} {{skillName=Stun Check}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{stun_check} + @{modifier}]]}} {{useCriticalPlusTen=[[0]]}} {{notes=If failed, must Do Nothing. \n<br />-4 to defenses, no retreat.\n<br />Roll per turn to recover.}}"  name="roll_vsKnockdown" />
+						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Condition Check}} {{characterName=@{character_name}}} {{skillName=Unstun Check}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{stun_check} + @{modifier}]]}} {{useCriticalPlusTen=[[0]]}} {{notes=If failed, must Do Nothing. \n<br />-4 to defenses, no retreat.\n<br />Roll per turn to recover.}}"  name="roll_vsKnockdown" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-sub-row sheet-row-condition-knockdown">
@@ -2456,7 +2455,7 @@
 						</div>
 						<div class="sheet-cell sheet-col2">
 						    <input type="hidden" name="attr_damage_dice_icon" class="melee-damage-dice-icon" value="explode" />
-						    <button type="roll" value="@{roll}&{template:skillRoll} {{type=Melee Damage}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{damageRoll=[[@{damage}]]}} {{damageType=@{type}}} {{damageTypeId=[[@{damage_type_id}]]}} {{notes=@{damage_notes}}}" name="roll_damage" class="roll_damage" />
+						    <button type="roll" value="@{roll}&{template:skillRoll} {{type=Melee Damage}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{damageRoll=[[@{damage}]]}} {{damageType=@{type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{damage_type_note}}} {{notes=@{damage_notes}}}" name="roll_damage" class="roll_damage" />
 						</div>
 						<div class="sheet-cell sheet-col3">
 							<select name="attr_type">
@@ -2474,7 +2473,7 @@
 								<option value="Toxic (tox)">tox</option>
 								<option value="Special (spec)">spec</option>
 							</select>
-							<input type="hidden" name="attr_damage_type_id" value="1" />
+							<input type="hidden" name="attr_damage_type_note" value="@{damage_type_note_cut}" />
 						</div>
 						<div class="sheet-cell sheet-col4">
 							<input type="text" name="attr_reach" />
@@ -2618,7 +2617,7 @@
 						</div>
 						<div class="sheet-cell sheet-col2">
 						    <input type="hidden" name="attr_damage_dice_icon" class="range-damage-dice-icon" value="explode" />
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{damageRoll=[[@{damage}]]}} {{damageType=@{type}}} {{damageTypeId=[[@{damage_type_id}]]}} {{notes=@{damage_notes}}}" name="roll_damage" class="roll_damage" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{damageRoll=[[@{damage}]]}} {{damageType=@{type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{damage_type_note}}} {{notes=@{damage_notes}}}" name="roll_damage" class="roll_damage" />
 						</div>
 						<div class="sheet-cell sheet-col3">
 							<select name="attr_type">
@@ -2636,7 +2635,7 @@
 								<option value="Toxic (tox)">tox</option>
 								<option value="Special (spec)">spec</option>
 							</select>
-							<input type="hidden" name="attr_damage_type_id" value="1" />
+							<input type="hidden" name="attr_damage_type_note" value="@{damage_type_note_cut}" />
 						</div>
 						<div class="sheet-cell sheet-col4">
 							<input type="text" name="attr_acc" />
@@ -2921,8 +2920,11 @@
 
 	<ul>
 		<li>Fixed rounding bug with flight move. Updated Air move column to hide enhanced move if there's no enhanced move.</li>
-		<li>Added condition rolls: Stun, Knockdown, Unconscious, and Death Checks.</li>
-		<li>[Experimental] Added default sheet options. Can only be tested after deployeds.</li>
+		<li>Added condition rolls: Unstun, Knockdown, Unconscious, and Death Checks.</li>
+		<li>Added ability to turn off damage type notes.</li>
+		<li>Added ability to edit damage type notes.</li>
+		<li>Added Critical Successes option: Turn off</li>
+		<li>[Experimental] Added default sheet options. Can only be tested after deployment.</li>
     </ul>
 		
 	<h4>Version: 1.5.1</h4>
@@ -3324,8 +3326,128 @@
 				<br />
 				<input type="radio" name="attr_use_critical_plus_10" value="0" />
 				<span class="sheet-popup">Only on a 3 or 4</span>
+				<br />
+				<input type="radio" name="attr_use_critical_plus_10" value="2" />
+				<span class="sheet-popup">Turn Off</span>
 			</div>
-			<br />
+			
+			<hr />
+			
+			<div class="box damage-type-notes">
+			    
+			    <h3>Damage Type Notes</h3>
+			    
+			    <div class="toggle-notes">
+    			    <input type="checkbox" name="attr_use_damage_type_notes" class="sheet-manual-unspent-box" value="1" checked="checked" />
+    			    <span class="sheet-popup">Show Notes on Roll Table</span>
+			    </div>
+			    
+			    <table>
+			        <tr>
+			            <th>Type</th>
+			            <th>Notes</th>
+			        </tr>
+			        <tr>
+			            <td>Cutting</td>
+			            <td>
+			                <textarea name="attr_damage_type_note_cut">Damage x1.5
+Neck Damage x2
+Skull Damage x4</textarea>
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Impaling</td>
+			            <td>
+			                <textarea name="attr_damage_type_note_imp">Damage x2
+Vitals Damage x3
+Skull Damage x4</textarea>
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Crushing</td>
+			            <td>
+			                <textarea name="attr_damage_type_note_cr">Damage x1
+Neck Damage x1.5
+Skull Damage x4</textarea>
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>PI-</td>
+			            <td>
+			                <textarea name="attr_damage_type_note_pi_minus">Damage x .5
+Vitals Damage x3
+Skull Damage x4</textarea>
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>PI</td>
+			            <td>
+			                <textarea name="attr_damage_type_note_pi">Damage x1
+Vitals Damage x3
+Skull Damage x4</textarea>
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>PI+</td>
+			            <td>
+			                <textarea name="attr_damage_type_note_pi_plus">Damage x1.5
+Vitals Damage x3
+Skull Damage x4</textarea>
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>PI++</td>
+			            <td>
+			                <textarea name="attr_damage_type_note_pi_plus_plus">Damage x2
+Vitals Damage x3
+Skull Damage x4</textarea>
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Affliction</td>
+			            <td>
+			                <textarea name="attr_damage_type_note_aff">special damage and affects based on affliction description</textarea>
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Burn</td>
+			            <td>
+			                <textarea name="attr_damage_type_note_burn">Damage x1
+Skull Damage x4</textarea>
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Corrosion</td>
+			            <td>
+			                <textarea name="attr_damage_type_note_cor">Damage x1
+Face Damage x1.5, blind eye if major wound, both eyes if full HP
+Neck Damage x1.5
+Skull Damage x4
+-1 DR per 5 of points damage</textarea>
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Fatigue</td>
+			            <td>
+			                <textarea name="attr_damage_type_note_fat">Damage x1</textarea>
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Toxic</td>
+			            <td>
+			                <textarea name="attr_damage_type_note_tox">Damage x1</textarea>
+			            </td>
+			        </tr>
+			        <tr>
+			            <td>Special</td>
+			            <td>
+			                <textarea name="attr_damage_type_note_spec">See notes for weapon.</textarea>
+			            </td>
+			        </tr>
+			    </table>
+			    
+			</div>
+			
 		</div>
 	</div>
 
@@ -3375,47 +3497,53 @@
                             <span class="failure">{{rollResult}}</span>
                         {{/rollGreater() rollResult effectiveSkill}}
                         
-                        <!-- if effectiveSKill is 16 or higher, check for critical success 6 or less -->
-                        {{#rollTotal() useCriticalPlusTen 1}}
-                            {{#rollGreater() effectiveSkill 15}}
-                                {{#rollLess() rollResult 7}}
-                                    <span class="success">Critical Success</span>
-                                {{/rollLess() rollResult 7}}
-                            {{/rollGreater() effectiveSkill 15}}
-                        {{/rollTotal() useCriticalPlusTen 1}}
-                        <!-- handle case if critical plus ten is off. 3 or 4 is critical success -->
-                        {{#rollTotal() useCriticalPlusTen 0}}
-                            {{#rollGreater() effectiveSkill 15}}
+                        <!-- Check if Critical Success was turned off -->
+                        {{#rollLess() useCriticalPlusTen 2}}
+                        
+                            <!-- if effectiveSKill is 16 or higher, check for critical success 6 or less -->
+                            {{#rollTotal() useCriticalPlusTen 1}}
+                                {{#rollGreater() effectiveSkill 15}}
+                                    {{#rollLess() rollResult 7}}
+                                        <span class="success">Critical Success</span>
+                                    {{/rollLess() rollResult 7}}
+                                {{/rollGreater() effectiveSkill 15}}
+                            {{/rollTotal() useCriticalPlusTen 1}}
+                            <!-- handle case if critical plus ten is off. 3 or 4 is critical success -->
+                            {{#rollTotal() useCriticalPlusTen 0}}
+                                {{#rollGreater() effectiveSkill 15}}
+                                    {{#rollLess() rollResult 5}}
+                                        <span class="success">Critical Success</span>
+                                    {{/rollLess() rollResult 5}}
+                                {{/rollGreater() effectiveSkill 15}}
+                            {{/rollTotal() useCriticalPlusTen 0}}
+                            
+                            <!-- if effectiveSKill is 15, check for critical success 5 or less -->
+                            {{#rollTotal() useCriticalPlusTen 1}}
+                                {{#rollTotal() effectiveSkill 15}}
+                                    {{#rollLess() rollResult 6}}
+                                        <span class="success">Critical Success</span>
+                                    {{/rollLess() rollResult 6}}
+                                {{/rollTotal() effectiveSkill 15}}
+                            {{/rollTotal() useCriticalPlusTen 1}}
+                            <!-- handle case if critical plus ten is off. 3 or 4 is critical success -->
+                            {{#rollTotal() useCriticalPlusTen 0}}
+                                {{#rollTotal() effectiveSkill 15}}
+                                    {{#rollLess() rollResult 5}}
+                                        <span class="success">Critical Success</span>
+                                    {{/rollLess() rollResult 5}}
+                                {{/rollTotal() effectiveSkill 15}}
+                            {{/rollTotal() useCriticalPlusTen 0}}
+                            
+                            
+                            <!-- if effectiveSKill is 14 or less, check for critical success 4 or less -->
+                            {{#rollLess() effectiveSkill 15}}
                                 {{#rollLess() rollResult 5}}
                                     <span class="success">Critical Success</span>
                                 {{/rollLess() rollResult 5}}
-                            {{/rollGreater() effectiveSkill 15}}
-                        {{/rollTotal() useCriticalPlusTen 0}}
+                            {{/rollLess() effectiveSkill 15}}
+                            
+                        {{/rollLess() useCriticalPlusTen 2}}
                         
-                        <!-- if effectiveSKill is 15, check for critical success 5 or less -->
-                        {{#rollTotal() useCriticalPlusTen 1}}
-                            {{#rollTotal() effectiveSkill 15}}
-                                {{#rollLess() rollResult 6}}
-                                    <span class="success">Critical Success</span>
-                                {{/rollLess() rollResult 6}}
-                            {{/rollTotal() effectiveSkill 15}}
-                        {{/rollTotal() useCriticalPlusTen 1}}
-                        <!-- handle case if critical plus ten is off. 3 or 4 is critical success -->
-                        {{#rollTotal() useCriticalPlusTen 0}}
-                            {{#rollTotal() effectiveSkill 15}}
-                                {{#rollLess() rollResult 5}}
-                                    <span class="success">Critical Success</span>
-                                {{/rollLess() rollResult 5}}
-                            {{/rollTotal() effectiveSkill 15}}
-                        {{/rollTotal() useCriticalPlusTen 0}}
-                        
-                        
-                        <!-- if effectiveSKill is 14 or less, check for critical success 4 or less -->
-                        {{#rollLess() effectiveSkill 15}}
-                            {{#rollLess() rollResult 5}}
-                                <span class="success">Critical Success</span>
-                            {{/rollLess() rollResult 5}}
-                        {{/rollLess() effectiveSkill 15}}
                         
                         <!-- if effective skill is 3 or less, critical failure is 13 or higher -->
                         {{#rollLess() effectiveSkill 4}}
@@ -3478,129 +3606,14 @@
                     </td>
                 </tr>
                 {{/damageRoll}}
-                {{#rollTotal() damageTypeId 1}}
-                <tr>
-                    <td class="label cutting">&nbsp;</td>
-                    <td>
-                        Damage x1.5<br />
-                        Neck Damage x2<br />
-                        Skull Damage x4
-                    </td>
-                </tr>
-                {{/rollTotal() damageTypeId 1}}
-                {{#rollTotal() damageTypeId 2}}
-                <tr>
-                    <td class="label impaling">&nbsp;</td>
-                    <td>
-                        Damage x2<br />
-                        Vitals Damage x3<br />
-                        Skull Damage x4
-                    </td>
-                </tr>
-                {{/rollTotal() damageTypeId 2}}
-                {{#rollTotal() damageTypeId 3}}
-                <tr>
-                    <td class="label crushing">&nbsp;</td>
-                    <td>
-                        Damage x1<br />
-                        Neck Damage x1.5<br />
-                        Skull Damage x4
-                    </td>
-                </tr>
-                {{/rollTotal() damageTypeId 3}}
-                {{#rollTotal() damageTypeId 4}}
-                <tr>
-                    <td class="label pierce-minus">&nbsp;</td>
-                    <td>
-                        Damage x.5<br />
-                        Vitals Damage x3<br />
-                        Skull Damage x4
-                    </td>
-                </tr>
-                {{/rollTotal() damageTypeId 4}}
-                {{#rollTotal() damageTypeId 5}}
-                <tr>
-                    <td class="label pierce">&nbsp;</td>
-                    <td>
-                        Damage x1<br />
-                        Vitals Damage x3<br />
-                        Skull Damage x4
-                    </td>
-                </tr>
-                {{/rollTotal() damageTypeId 5}}
-                {{#rollTotal() damageTypeId 6}}
-                <tr>
-                    <td class="label pierce-plus">&nbsp;</td>
-                    <td>
-                        Damage x1.5<br />
-                        Vitals Damage x3<br />
-                        Skull Damage x4
-                    </td>
-                </tr>
-                {{/rollTotal() damageTypeId 6}}
-                {{#rollTotal() damageTypeId 7}}
-                <tr>
-                    <td class="label pierce-plus-plus">&nbsp;</td>
-                    <td>
-                        Damage x2<br />
-                        Vitals Damage x3<br />
-                        Skull Damage x4
-                    </td>
-                </tr>
-                {{/rollTotal() damageTypeId 7}}
-                {{#rollTotal() damageTypeId 8}}
-                <tr>
-                    <td class="label affliction">&nbsp;</td>
-                    <td>
-                        special damage and affects based on
-                        affliction description
-                    </td>
-                </tr>
-                {{/rollTotal() damageTypeId 8}}
-                {{#rollTotal() damageTypeId 9}}
-                <tr>
-                    <td class="label burning">&nbsp;</td>
-                    <td>
-                        Damage x1<br />
-                        Skull Damage x4
-                    </td>
-                </tr>
-                {{/rollTotal() damageTypeId 9}}
-                {{#rollTotal() damageTypeId 10}}
-                <tr>
-                    <td class="label corrosion">&nbsp;</td>
-                    <td>
-                        Damage x1<br />
-                        Face Damage x1.5, blind eye if major wound, both eyes if full HP<br />
-                        Neck Damage x1.5<br />
-                        Skull Damage x4
-                    </td>
-                </tr>
-                {{/rollTotal() damageTypeId 10}}
-                {{#rollTotal() damageTypeId 11}}
-                <tr>
-                    <td class="label fatigue">&nbsp;</td>
-                    <td>
-                        Damage x1<br />
-                    </td>
-                </tr>
-                {{/rollTotal() damageTypeId 11}}
-                {{#rollTotal() damageTypeId 12}}
-                <tr>
-                    <td class="label toxic">&nbsp;</td>
-                    <td>
-                        Damage x1<br />
-                    </td>
-                </tr>
-                {{/rollTotal() damageTypeId 12}}
-                {{#rollTotal() damageTypeId 13}}
-                <tr>
-                    <td class="label special">&nbsp;</td>
-                    <td>
-                        Special damage, see description
-                    </td>
-                </tr>
-                {{/rollTotal() damageTypeId 13}}
+                {{#rollTotal() useDamageTypeNotes 1}}
+                    {{#damageTypeNote}}
+                    <tr>
+                        <td class="label">&nbsp;</td>
+                        <td><span>{{damageTypeNote}}</span></td>
+                    </tr>
+                    {{/damageTypeNote}}
+                {{/rollTotal() useDamageTypeNotes 1}}
                 {{#reach}}
                 <tr>
                     <td class="label">Reach:</td>
@@ -3668,6 +3681,7 @@
 	var version = "1.5.2";
 
 	var modCascade = true;
+	
 	var modCascadeAll = true;
 
 	// add global variable
@@ -3795,11 +3809,15 @@
 
 		// After DX and HT
 		var thenSpeedMoveDodge = _.after(2, function () {
+			
 			updateBasicSpeed(function () {
+			
 				// After Basic Speed...
 				updateBasicMove(thenCurrentMoveDodge);
 				updateDodge(thenCurrentMoveDodge);
+			
 			});
+			
 		});
 		
 		// After Lift and weight...
@@ -3813,27 +3831,41 @@
 
 		// Update attributes, then secondary characteristics, and so on...
 		updateST(function () {
+			
 			// After ST...
 			updateHP(thenCurrentMoveDodge);
+			
 			updateLift(thenEncumbrance);
+			
 			updateStrikingST();
+			
 			// updateStrikingST damage rolls
-			console.log("update Striking Damage");
 			updateStrikingStrengthDamage();
+			
 		});
+		
 		updateDX(thenSpeedMoveDodge);
+		
 		updateIQ(function () {
+			
 			// After IQ...
 			updateWill();
+			
 			updatePer(function () {
 				// After Per...
 				updateSense();
 			});
+			
 		});
+		
 		updateHT(function () {
+		    
 			updateFP(thenCurrentMoveDodge);
+			
 			thenSpeedMoveDodge();
 		});
+		
+		updateDamageNotes();
 
 	}
 
@@ -3864,23 +3896,35 @@
 
 	// load values of a repeating section
 	function loadRepeating(sectionName, fieldName, defaultValue) {
+		
 		console.log('********* loadRepeating ' + sectionName + '.' + fieldName + '*********');
+		
 		getSectionIDs(sectionName, function (ids) {
+		
 			if (ids.length === 0 ) {
 				return;
 			}
+		
 			var fieldArray = [];
+		
 			var update = {};
+		
 			for (var i = 0; i < ids.length; i++) {
+			
 				var propName = sectionName + '_' + ids[i] + '_' + fieldName;
+			
 				fieldArray.push(propName);
+			
 				update[propName] = defaultValue;
 			}
+		
 			getAttrs(fieldArray, function (fieldValues) {
 				Object.assign(update, fieldValues);
 				setAttrs(update);
 			});
+			
 		});
+		
 	}
 
 	// Strength Change
@@ -6063,34 +6107,60 @@
         
     }
     
-    // set number values for damage types
+    // set note values for damage types
     // Update thrust and swing when striking st is updated
 	on('change:repeating_melee:type', function(event){
 
-		getAttrs(['repeating_melee_type'], function(values) {
+		getAttrs(['repeating_melee_type',
+		    'damage_type_note_cut',
+		    'damage_type_note_imp',
+		    'damage_type_note_cr',
+		    'damage_type_note_pi_minus',
+		    'damage_type_note_pi',
+		    'damage_type_note_pi_plus',
+		    'damage_type_note_pi_plus_plus',
+		    'damage_type_note_aff',
+		    'damage_type_note_burn',
+		    'damage_type_note_cor',
+		    'damage_type_note_fat',
+		    'damage_type_note_tox',
+		    'damage_type_note_spec'
+		], function(values) {
 		    
-		    var typeId = getDamageTypeId(values.repeating_melee_type);
+		    var typeNote = getDamageTypeNote(values.repeating_melee_type, values);
 		    
 		    setAttrs({
-		        "repeating_melee_damage_type_id": typeId
+		        "repeating_melee_damage_type_note": typeNote
 		    });
 		    
 		});
 		
 	});
     
-    // set number values for damage types
+    // set note values for damage types
     // Update thrust and swing when striking st is updated
 	on('change:repeating_ranged:type', function(event){
 
-		console.log("----ranged damage type changed: set damage_type_id ----");
-		
-		getAttrs(['repeating_ranged_type'], function(values) {
+		getAttrs(['repeating_ranged_type',
+		    'damage_type_note_cut',
+		    'damage_type_note_imp',
+		    'damage_type_note_cr',
+		    'damage_type_note_pi_minus',
+		    'damage_type_note_pi',
+		    'damage_type_note_pi_plus',
+		    'damage_type_note_pi_plus_plus',
+		    'damage_type_note_aff',
+		    'damage_type_note_burn',
+		    'damage_type_note_cor',
+		    'damage_type_note_fat',
+		    'damage_type_note_tox',
+		    'damage_type_note_spec'
+		], function(values) {
 		    
-		    var typeId = getDamageTypeId(values.repeating_ranged_type);
+		    var typeNote = getDamageTypeNote(values.repeating_ranged_type, values);
 		    
 		    setAttrs({
-		        "repeating_ranged_damage_type_id": typeId
+		        "repeating_ranged_damage_type_note": typeNote
 		    });
 		    
 		});
@@ -6098,74 +6168,170 @@
 	});
 	
 	/**
-	 * Get Damage Type ID for damage type string
+	 * Get Damage Type Note for damage type string
 	 * Used for adding custom notes to rolltemplates
 	 */
-	function getDamageTypeId(damageType) {
+	function getDamageTypeNote(damageType, values) {
 	    
-	    var typeId = 1;
-	    
+		var typeNote = "";
+		    
 	    switch(damageType) {
 	        
 	        case "Cutting (cut)":
-                typeId = 1;
+                typeNote = values.damage_type_note_cut;
                 break;
             
             case "Impaling (imp)":
-                typeId = 2;
+                typeNote = values.damage_type_note_imp;
                 break;
             
             case "Crushing (cr)":
-                typeId = 3;
+                typeNote = values.damage_type_note_cr;
                 break;
             
             case "Small Piercing (pi-)":
-                typeId = 4;
+                typeNote = values.damage_type_note_pi_minus;
                 break;
             
             case "Piercing (pi)":
-                typeId = 5;
+                typeNote = values.damage_type_note_pi;
                 break;
             
             case "Large Piercing (pi+)":
-                typeId = 6;
+                typeNote = values.damage_type_note_pi_plus;
                 break;
             
             case "Huge Piercing (pi++)":
-                typeId = 7;
+                typeNote = values.damage_type_note_pi_plus_plus;
                 break;
             
             case "Affliction (aff)":
-                typeId = 8;
+                typeNote = values.damage_type_note_aff;
                 break;
             
             case "Burning (burn)":
-                typeId = 9;
+                typeNote = values.damage_type_note_burn;
                 break;
             
             case "Corrosion (cor)":
-                typeId = 10;
+                typeNote = values.damage_type_note_cor;
                 break;
             
             case "Fatigue (fat)":
-                typeId = 11;
+                typeNote = values.damage_type_note_fat;
                 break;
             
             case "Toxic (tox)":
-                typeId = 12;
+                typeNote = values.damage_type_note_tox;
                 break;
             
             case "Special (spec)":
-                typeId = 13;
+                typeNote = values.damage_type_note_spec;
                 break;
             
             default:
-                typeId = 1;
+                typeNote = values.damage_type_note_cut;
                 
 	    }
 	    
-	    return typeId;
+	    return typeNote;
 	    
+	}
+	
+	/*
+	 * Loop through each repeating section 
+	 * for melee and ranged and update
+	 * damage notes to match damage type
+	 *
+	 */
+	function updateDamageNotes() {
+	 
+	    // note field values
+	    var noteFields = ['damage_type_note_cut',
+	        'damage_type_note_imp',
+	        'damage_type_note_cr',
+	        'damage_type_note_pi_minus',
+	        'damage_type_note_pi',
+	        'damage_type_note_pi_plus',
+	        'damage_type_note_pi_plus_plus',
+	        'damage_type_note_aff',
+	        'damage_type_note_burn',
+	        'damage_type_note_cor',
+	        'damage_type_note_fat',
+	        'damage_type_note_tox',
+	        'damage_type_note_spec'
+	    ];
+	    
+	    getAttrs(noteFields, function(noteFieldValues) {
+	        
+	        updateDamageNotesBySection("melee", noteFieldValues);
+	    
+	        updateDamageNotesBySection("ranged", noteFieldValues);
+	        
+	    });
+	    
+        
+	}
+    
+    /*
+     * Update damage notes for a section
+     *
+     * @param string sectionName     melee | ranged
+     * @param object noteFieldValues Note Content for each damage type
+     */
+    function updateDamageNotesBySection(sectionName, noteFieldValues) {
+		
+		console.log('********* updateDamageNotesBySection ' + sectionName + '*********');
+		
+		var repeatingName = "";
+		
+		getSectionIDs(sectionName, function (ids) {
+		
+			if (ids.length === 0 ) {
+				return;
+			}
+		
+		    var getFields = [];
+		        
+		    // loop through the rows
+			for (var i = 0; i < ids.length; i++) {
+		
+		        // field that determines note
+                var damageTypeField = "repeating_" + sectionName + '_' + ids[i] + '_type';
+				
+				getFields.push(damageTypeField);
+				
+			}
+			
+			getAttrs(getFields, function (values) {
+		    
+		        var updateFields = {};
+		    
+		        // loop through the row ids again so we can get the values
+		        // and fill array of note values to update
+		        _.each(ids, function(id) {
+		        
+		            var damageTypeField = "repeating_" + sectionName + '_' + id + '_type';
+			
+			        // field we need to update
+			        var damageTypeNoteField = "repeating_" + sectionName + '_' + id + '_damage_type_note';
+				    
+		            var type = values[damageTypeField];
+		            
+		            var note = getDamageTypeNote(type, noteFieldValues);
+		            
+		            updateFields[damageTypeNoteField] = note;
+		            
+                });
+                
+                console.log(JSON.stringify(updateFields));
+                
+				setAttrs(updateFields);
+			    
+			});		
+		
+		});
+		
 	}
     
 </script>
