@@ -7585,16 +7585,16 @@
             if(page.name && page.name != "") {update["npc_name"] = page.name};
 
             const npcAbilites = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
-            _.each(npcAbilites, (ability) => {
+            npcAbilites.forEach((ability) => {
                 const abbreviation = ability.slice(0, 3).toUpperCase();
                 update[`${ability}_base`] = (page.data[`${abbreviation}`]) ? page.data[`${abbreviation}`] : "";
                 callbacks.push(() => {
                     update_attr(`${ability}`);
                 });
             });
-
+          
             const npcExtras = ["Condition Immunities", "Immunities", "Languages", "Resistances", "Speed", "Token Size", "Vulnerabilities"];
-            _.each(npcExtras, (attr) => {
+            npcExtras.forEach((attr) => {
                 const prefixExtra = (attr === "Token Size") ? "" : "npc_";
                 //Replace space with _ if and in both cases make lower case
                 let nameExtra = (attr.includes(" ")) ? attr.replace(" ", "_").toLowerCase() : attr.toLowerCase();
@@ -7613,7 +7613,9 @@
             };
 
             var type = "";
-            if(page.data["Size"]) {type = page.data["Size"]};
+            if(page.data["Size"]) {
+                type = page.data["Size"]
+            };
             if(page.data["Type"]) {
                 type = (type.length > 0) ? type + " " + page.data["Type"].toLowerCase() : page.data["Type"].toLowerCase();
             };
@@ -7622,33 +7624,16 @@
             };
             update["npc_type"] = type;
 
-            if(page.data["HP"]) {
-                if(page.data["HP"].toString().indexOf("(") > -1) {
-                    update["hp_max"] = page.data["HP"].toString().split(" (")[0];
-                    update["npc_hpformula"] = page.data["HP"].toString().split(" (")[1].slice(0, -1);
+            ["AC", "HP"].forEach((achp) => {
+                const array = (achp === "AC") ? ["npc_ac", "npc_actype"] : ["hp_max", "npc_hpformula"];
+               if (page.data[`${achp}`] && page.data[`${achp}`].toString().indexOf("(") > -1)  {
+                    update[`${array[0]}`] = page.data[`${achp}`].toString().split(" (")[0];
+                    update[`${array[1]}`] = page.data[`${achp}`].toString().split(" (")[1].slice(0, -1);
                 } else {
-                    update["hp_max"] = page.data["HP"]
-                    update["npc_hpformula"] = ""
+                    update[`${array[0]}`] = (page.data[`${achp}`]) ? page.data[`${achp}`] : "";
+                    update[`${array[1]}`] = "";
                 };
-            } else {
-                update["hp_max"] = ""
-                update["npc_hpformula"] = ""
-            };
-
-            if(page.data["AC"]) {
-                if(page.data["AC"].toString().indexOf("(") > -1) {
-                    update["npc_ac"] = page.data["AC"].toString().split(" (")[0];
-                    update["npc_actype"] = page.data["AC"].toString().split(" (")[1].slice(0, -1);
-                }
-                else {
-                    update["npc_ac"] = page.data["AC"];
-                    update["npc_actype"] = "";
-                };
-            }
-            else {
-                update["npc_ac"] = "";
-                update["npc_actype"] = "";
-            };
+            });
 
             var senses = page.data["Senses"] ? page.data["Senses"] : "";
             if(page.data["Passive Perception"]) {
@@ -7656,31 +7641,29 @@
             }
             update["npc_senses"] = senses;
 
-            const npcSaves = ["str", "dex", "con", "int", "wis", "cha"];
-            _.each(npcSaves, (attr) => {
-                update[`npc_${attr}_save_base`] = "";
+            //SAVES & SKILLS
+            const npcSavesSkills = ["str_save", "dex_save", "con_save", "int_save", "wis_save", "cha_save",'acrobatics','animal_handling','arcana','athletics','deception','history','insight','intimidation','investigation','medicine','nature','perception','performance','persuasion','religion','sleight_of_hand','stealth','survival'];
+            npcSavesSkills.forEach((attr) => {
+                update[`npc_${attr}_base`] = "";
             });
+
             if(page.data["Saving Throws"] && page.data["Saving Throws"] != "") {
                 var savearray = page.data["Saving Throws"].split(", ");
                 _.each(savearray, function(save) {
                     kv = save.indexOf("-") > -1 ? save.split(" ") : save.split(" +");
                     update["npc_" + kv[0].toLowerCase() + "_save_base"] = parseInt(kv[1], 10);
                 });
-                callbacks.push( function() {update_npc_saves();} );
+                callbacks.push(() => {update_npc_saves();} );
             };
 
-            const npcSkills = ['acrobatics','animal_handling','arcana','athletics','deception','history','insight','intimidation','investigation','medicine','nature','perception','performance','persuasion','religion','sleight_of_hand','stealth','survival'];
-            _.each(npcSkills, (attr) => {
-                update[`npc_${attr}_base`] = "";
-            });
             if(page.data["Skills"] && page.data["Skills"] != "") {
                 skillarray = page.data["Skills"].split(", ");
                 _.each(skillarray, function(skill) {
                     kv = skill.indexOf("-") > -1 ? skill.split(" ") : skill.split(" +");
                     update["npc_" + kv[0].toLowerCase().replace(/ /g, '_') + "_base"] = parseInt(kv[1], 10);
                 });
-                callbacks.push( function() {update_npc_skills();} );
-            }
+                callbacks.push(() => {update_npc_skills();} );
+            };
 
             const npcRepeating = ['npcaction-l', 'npcreaction', 'npcaction', 'npctrait'];
             _.each(npcRepeating, (section) => {
@@ -7691,28 +7674,21 @@
                 });
             });
 
-
-            /* CASSIE - REFACTOR 5  - STOPPED HERE */
-
             var contentarray = page.content;
             if(page.data["data-Legendary Actions"]) {
                 var legendaryactionsarray = jsonparse(page.data["data-Legendary Actions"]);
-                update["npc_legendary_actions"] = 1;
+                update["npc_legendary_actions"] = 3;
                 if(page.data["Legendary Actions Desc"]) {
                     update["npc_legendary_actions_desc"] = page.data["Legendary Actions Desc"];
-                }
-                else if(currentData.npc_legendary_actions > 0){
-                    update["npc_legendary_actions_desc"] = `The ${page.name} can take ${currentData.npc_legendary_actions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
-                }
-                else {
+                } else if(currentData){
+                    update["npc_legendary_actions_desc"] = `${page.name} can take ${currentData.npc_legendary_actions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
+                } else {
                     update["npc_legendary_actions_desc"] = "";
                 }
-            }
-            else if(contentarray && contentarray.indexOf("Legendary Actions") > -1) {
+            } else if(contentarray && contentarray.indexOf("Legendary Actions") > -1) {
                 if(contentarray.indexOf(/\n Legendary Actions\n/) > -1) {
                     temp = contentarray.split(/\n Legendary Actions\n/)
-                }
-                else {
+                } else {
                     temp = contentarray.split(/Legendary Actions\n/)
                 }
                 var legendaryactionsarray = temp[1];
@@ -7721,51 +7697,49 @@
 
             if(page.data["data-Reactions"]) {
                 var reactionsarray = jsonparse(page.data["data-Reactions"]);
-            }
-            else if(contentarray && contentarray.indexOf("Reactions") > -1) {
+            } else if(contentarray && contentarray.indexOf("Reactions") > -1) {
                 if(contentarray.indexOf(/\n Reactions\n/) > -1) {
                     temp = contentarray.split(/\n Reactions\n/)
-                }
-                else {
+                } else {
                     temp = contentarray.split(/Reactions\n/)
                 }
                 var reactionsarray = temp[1];
                 contentarray = temp[0];
-            }
+            } 
 
             if(page.data["data-Actions"]) {
                 var actionsarray = jsonparse(page.data["data-Actions"]);
-            }
-            else if(contentarray && contentarray.indexOf("Actions") > -1) {
+            } else if(contentarray && contentarray.indexOf("Actions") > -1) {
                 if(contentarray.indexOf("Lair Actions") > -1) {
                     contentarray = contentarray.replace("Lair Actions","Lair Action");
-                }
+                } 
+
                 if(contentarray.indexOf(/\n Actions\n/) > -1) {
                     temp = contentarray.split(/\n Actions\n/)
-                }
-                else {
+                } else {
                     temp = contentarray.split(/Actions\n/)
                 }
+
                 var actionsarray = temp[1];
                 contentarray = temp[0];
             }
 
             if(page.data["data-Traits"]) {
                 var traitsarray = jsonparse(page.data["data-Traits"]);
-            }
-            else if(contentarray && contentarray.indexOf("Traits") > -1) {
+            } else if(contentarray && contentarray.indexOf("Traits") > -1) {
                 if(contentarray.indexOf("Lair Traits") > -1) {
                     contentarray = contentarray.replace("Lair Traits","Lair Trait");
-                }
+                } 
+
                 if(contentarray.indexOf(/\n Traits\n/) > -1) {
                     temp = contentarray.split(/\n Traits\n/)
-                }
-                else {
+                } else {
                     temp = contentarray.split(/Traits\n/)
                 }
+                
                 var traitsarray = temp[1];
                 contentarray = temp[0];
-            }
+            } 
 
             if(traitsarray) {
                 if(page.data["data-Traits"]) {
