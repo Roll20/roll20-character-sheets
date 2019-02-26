@@ -6615,11 +6615,9 @@
     });
 
     on("change:repeating_npcaction:attack_flag change:repeating_npcaction:attack_type change:repeating_npcaction:attack_range change:repeating_npcaction:attack_target change:repeating_npcaction:attack_tohit change:repeating_npcaction:attack_damage change:repeating_npcaction:attack_damagetype change:repeating_npcaction:attack_damage2 change:repeating_npcaction:attack_damagetype2 change:repeating_npcaction-l:attack_flag change:repeating_npcaction-l:attack_type change:repeating_npcaction-l:attack_range change:repeating_npcaction-l:attack_target change:repeating_npcaction-l:attack_tohit change:repeating_npcaction-l:attack_damage change:repeating_npcaction-l:attack_damagetype change:repeating_npcaction-l:attack_damage2 change:repeating_npcaction-l:attack_damagetype2 change:repeating_npcaction:show_desc change:repeating_npcaction-l:show_desc change:repeating_npcaction:description change:repeating_npcaction-l:description", function(eventinfo) {
-        var actionid = eventinfo.sourceAttribute.substring(20, 40);
-        var legendary = eventinfo.sourceAttribute.indexOf("npcaction-l") > -1 ? true : false;
-        if(legendary) {
-            actionid = eventinfo.sourceAttribute.substring(22, 42);
-        }
+        const actionid  = eventinfo.sourceAttribute.split("_")[2];
+        const legendary = eventinfo.sourceAttribute.includes("npcaction-l") ? true : false;
+
         update_npc_action(actionid, legendary);
     });
 
@@ -7607,31 +7605,33 @@
                 callbacks.push( function() {update_npc_saves();} );
             };
 
-            update["npc_acrobatics_base"] = "";
+            update["npc_acrobatics_base"]      = "";
             update["npc_animal_handling_base"] = "";
-            update["npc_arcana_base"] = "";
-            update["npc_athletics_base"] = "";
-            update["npc_deception_base"] = "";
-            update["npc_history_base"] = "";
-            update["npc_insight_base"] = "";
-            update["npc_intimidation_base"] = "";
-            update["npc_investigation_base"] = "";
-            update["npc_medicine_base"] = "";
-            update["npc_nature_base"] = "";
-            update["npc_perception_base"] = "";
-            update["npc_performance_base"] = "";
-            update["npc_persuasion_base"] = "";
-            update["npc_religion_base"] = "";
+            update["npc_arcana_base"]          = "";
+            update["npc_athletics_base"]       = "";
+            update["npc_deception_base"]       = "";
+            update["npc_history_base"]         = "";
+            update["npc_insight_base"]         = "";
+            update["npc_intimidation_base"]    = "";
+            update["npc_investigation_base"]   = "";
+            update["npc_medicine_base"]        = "";
+            update["npc_nature_base"]          = "";
+            update["npc_perception_base"]      = "";
+            update["npc_performance_base"]     = "";
+            update["npc_persuasion_base"]      = "";
+            update["npc_religion_base"]        = "";
             update["npc_sleight_of_hand_base"] = "";
-            update["npc_stealth_base"] = "";
-            update["npc_survival_base"] = "";
+            update["npc_stealth_base"]         = "";
+            update["npc_survival_base"]        = "";
             if(page.data["Skills"] && page.data["Skills"] != "") {
                 skillarray = page.data["Skills"].split(", ");
+
                 _.each(skillarray, function(skill) {
                     kv = skill.indexOf("-") > -1 ? skill.split(" ") : skill.split(" +");
                     update["npc_" + kv[0].toLowerCase().replace(/ /g, '_') + "_base"] = parseInt(kv[1], 10);
                 });
-                callbacks.push( function() {update_npc_skills();} );
+
+                callbacks.push( function() { update_npc_skills(); });
             }
 
             getSectionIDs("repeating_npcaction-l", function(idarray) {
@@ -10372,100 +10372,53 @@
         });
     };
 
-    var update_npc_saves = function() {
-        getAttrs(["npc_str_save_base","npc_dex_save_base","npc_con_save_base","npc_int_save_base","npc_wis_save_base","npc_cha_save_base"], function(v) {
-            var update = {};
-            var last_save = 0; var cha_save_flag = 0; var cha_save = ""; var wis_save_flag = 0; var wis_save = ""; var int_save_flag = 0; var int_save = ""; var con_save_flag = 0; var con_save = ""; var dex_save_flag = 0; var dex_save = ""; var str_save_flag = 0; var str_save = "";
-            // 1 = Positive, 2 = Last, 3 = Negative, 4 = Last Negative
-            if(v.npc_cha_save_base && v.npc_cha_save_base != "@{charisma_mod}") {cha_save = parseInt(v.npc_cha_save_base, 10); if(last_save === 0) {last_save = 1; cha_save_flag = cha_save < 0 ? 4 : 2;} else {cha_save_flag = cha_save < 0 ? 3 : 1;} } else {cha_save_flag = 0; cha_save = "";};
-            if(v.npc_wis_save_base && v.npc_wis_save_base != "@{wisdom_mod}") {wis_save = parseInt(v.npc_wis_save_base, 10); if(last_save === 0) {last_save = 1; wis_save_flag = wis_save < 0 ? 4 : 2;} else {wis_save_flag = wis_save < 0 ? 3 : 1;} } else {wis_save_flag = 0; wis_save = "";};
-            if(v.npc_int_save_base && v.npc_int_save_base != "@{intelligence_mod}") {int_save = parseInt(v.npc_int_save_base, 10); if(last_save === 0) {last_save = 1; int_save_flag = int_save < 0 ? 4 : 2;} else {int_save_flag = int_save < 0 ? 3 : 1;} } else {int_save_flag = 0; int_save = "";};
-            if(v.npc_con_save_base && v.npc_con_save_base != "@{constitution_mod}") {con_save = parseInt(v.npc_con_save_base, 10); if(last_save === 0) {last_save = 1; con_save_flag = con_save < 0 ? 4 : 2;} else {con_save_flag = con_save < 0 ? 3 : 1;} } else {con_save_flag = 0; con_save = "";};
-            if(v.npc_dex_save_base && v.npc_dex_save_base != "@{dexterity_mod}") {dex_save = parseInt(v.npc_dex_save_base, 10); if(last_save === 0) {last_save = 1; dex_save_flag = dex_save < 0 ? 4 : 2;} else {dex_save_flag = dex_save < 0 ? 3 : 1;} } else {dex_save_flag = 0; dex_save = "";};
-            if(v.npc_str_save_base && v.npc_str_save_base != "@{strength_mod}") {str_save = parseInt(v.npc_str_save_base, 10); if(last_save === 0) {last_save = 1; str_save_flag = str_save < 0 ? 4 : 2;} else {str_save_flag = str_save < 0 ? 3 : 1;} } else {str_save_flag = 0; str_save = "";};
-
-            update["npc_saving_flag"] = "" + cha_save + wis_save + int_save + con_save + dex_save + str_save;
-            update["npc_str_save"] = str_save;
-            update["npc_str_save_flag"] = str_save_flag;
-            update["npc_dex_save"] = dex_save;
-            update["npc_dex_save_flag"] = dex_save_flag;
-            update["npc_con_save"] = con_save;
-            update["npc_con_save_flag"] = con_save_flag;
-            update["npc_int_save"] = int_save;
-            update["npc_int_save_flag"] = int_save_flag;
-            update["npc_wis_save"] = wis_save;
-            update["npc_wis_save_flag"] = wis_save_flag;
-            update["npc_cha_save"] = cha_save;
-            update["npc_cha_save_flag"] = cha_save_flag;
-            setAttrs(update, {silent: true});
-        });
+    const update_npc_saves = () => {
+        const list = ["npc_str_save_base","npc_dex_save_base","npc_con_save_base","npc_int_save_base","npc_wis_save_base","npc_cha_save_base"];
+        const type = "save";
+        update_npc_lists(list, type);
     };
 
-    var update_npc_skills = function() {
-        getAttrs(["npc_acrobatics_base","npc_animal_handling_base","npc_arcana_base","npc_athletics_base","npc_deception_base","npc_history_base","npc_insight_base","npc_intimidation_base","npc_investigation_base","npc_medicine_base","npc_nature_base","npc_perception_base","npc_performance_base","npc_persuasion_base","npc_religion_base","npc_sleight_of_hand_base","npc_stealth_base","npc_survival_base"], function(v) {
-            var update = {};
-            var last_skill = 0;
-            var survival_flag = 0; var survival = ""; var stealth_flag = 0; var stealth = ""; var sleight_of_hand_flag = 0; var sleight_of_hand = ""; var religion_flag = 0; var religion = ""; var persuasion_flag = 0; var persuasion = ""; var performance_flag = 0; var sperformance = ""; var perception_flag = 0; var perception = ""; var perception_flag = 0; var perception = ""; var nature_flag = 0; var nature = ""; var medicine_flag = 0; var medicine = ""; var investigation_flag = 0; var investigation = ""; var intimidation_flag = 0; var intimidation = ""; var insight_flag = 0; var insight = ""; var history_flag = 0; var history = ""; var deception_flag = 0; var deception = ""; var athletics_flag = 0; var athletics = ""; var arcana_flag = 0; var arcana = ""; var animal_handling_flag = 0; var animal_handling = ""; var acrobatics_flag = 0; var acrobatics = "";
+    const update_npc_skills = () => {
+        const list = ["npc_acrobatics_base","npc_animal_handling_base","npc_arcana_base","npc_athletics_base","npc_deception_base","npc_history_base","npc_insight_base","npc_intimidation_base","npc_investigation_base","npc_medicine_base","npc_nature_base","npc_perception_base","npc_performance_base","npc_persuasion_base","npc_religion_base","npc_sleight_of_hand_base","npc_stealth_base","npc_survival_base"];
+        const type = "skills";
+        update_npc_lists(list, type);
+    };
 
-            // 1 = Positive, 2 = Last, 3 = Negative, 4 = Last Negative
-            if(v.npc_survival_base && v.npc_survival_base != "@{wisdom_mod}") {survival = parseInt(v.npc_survival_base, 10); if(last_skill === 0) {last_skill = 1; survival_flag = survival < 0 ? 4 : 2;} else {survival_flag = survival < 0 ? 3 : 1;} } else {survival_flag = 0; survival = "";};
-            if(v.npc_stealth_base && v.npc_stealth_base != "@{dexterity_mod}") {stealth = parseInt(v.npc_stealth_base, 10); if(last_skill === 0) {last_skill = 1; stealth_flag = stealth < 0 ? 4 : 2;} else {stealth_flag = stealth < 0 ? 3 : 1;} } else {stealth_flag = 0; stealth = "";};
-            if(v.npc_sleight_of_hand_base && v.npc_sleight_of_hand_base != "@{dexterity_mod}") {sleight_of_hand = parseInt(v.npc_sleight_of_hand_base, 10); if(last_skill === 0) {last_skill = 1; sleight_of_hand_flag = sleight_of_hand < 0 ? 4 : 2;} else {sleight_of_hand_flag = sleight_of_hand < 0 ? 3 : 1;} } else {sleight_of_hand_flag = 0; sleight_of_hand = "";};
-            if(v.npc_religion_base && v.npc_religion_base != "@{intelligence_mod}") {religion = parseInt(v.npc_religion_base, 10); if(last_skill === 0) {last_skill = 1; religion_flag = religion < 0 ? 4 : 2;} else {religion_flag = religion < 0 ? 3 : 1;} } else {religion_flag = 0; religion = "";};
-            if(v.npc_persuasion_base && v.npc_persuasion_base != "@{charisma_mod}") {persuasion = parseInt(v.npc_persuasion_base, 10); if(last_skill === 0) {last_skill = 1; persuasion_flag = persuasion < 0 ? 4 : 2;} else {persuasion_flag = persuasion < 0 ? 3 : 1;} } else {persuasion_flag = 0; persuasion = "";};
-            if(v.npc_performance_base && v.npc_performance_base != "@{charisma_mod}") {sperformance = parseInt(v.npc_performance_base, 10); if(last_skill === 0) {last_skill = 1; performance_flag = sperformance < 0 ? 4 : 2;} else {performance_flag = sperformance < 0 ? 3 : 1;} } else {performance_flag = 0; sperformance = "";};
-            if(v.npc_perception_base && v.npc_perception_base != "@{wisdom_mod}") {perception = parseInt(v.npc_perception_base, 10); if(last_skill === 0) {last_skill = 1; perception_flag = perception < 0 ? 4 : 2;} else {perception_flag = perception < 0 ? 3 : 1;} } else {perception_flag = 0; perception = "";};
-            if(v.npc_nature_base && v.npc_nature_base != "@{intelligence_mod}") {nature = parseInt(v.npc_nature_base, 10); if(last_skill === 0) {last_skill = 1; nature_flag = nature < 0 ? 4 : 2;} else {nature_flag = nature < 0 ? 3 : 1;} } else {nature_flag = 0; nature = "";};
-            if(v.npc_medicine_base && v.npc_medicine_base != "@{wisdom_mod}") {medicine = parseInt(v.npc_medicine_base, 10); if(last_skill === 0) {last_skill = 1; medicine_flag = medicine < 0 ? 4 : 2;} else {medicine_flag = medicine < 0 ? 3 : 1;} } else {medicine_flag = 0; medicine = "";};
-            if(v.npc_investigation_base && v.npc_investigation_base != "@{intelligence_mod}") {investigation = parseInt(v.npc_investigation_base, 10); if(last_skill === 0) {last_skill = 1; investigation_flag = investigation < 0 ? 4 : 2;} else {investigation_flag = investigation < 0 ? 3 : 1;} } else {investigation_flag = 0; investigation = "";};
-            if(v.npc_intimidation_base && v.npc_intimidation_base != "@{charisma_mod}") {intimidation = parseInt(v.npc_intimidation_base, 10); if(last_skill === 0) {last_skill = 1; intimidation_flag = intimidation < 0 ? 4 : 2;} else {intimidation_flag = intimidation < 0 ? 3 : 1;} } else {intimidation_flag = 0; intimidation = "";};
-            if(v.npc_insight_base && v.npc_insight_base != "@{wisdom_mod}") {insight = parseInt(v.npc_insight_base, 10); if(last_skill === 0) {last_skill = 1; insight_flag = insight < 0 ? 4 : 2;} else {insight_flag = insight < 0 ? 3 : 1;} } else {insight_flag = 0; insight = "";};
-            if(v.npc_history_base && v.npc_history_base != "@{intelligence_mod}") {history = parseInt(v.npc_history_base, 10); if(last_skill === 0) {last_skill = 1; history_flag = history < 0 ? 4 : 2;} else {history_flag = history < 0 ? 3 : 1;} } else {history_flag = 0; history = "";};
-            if(v.npc_deception_base && v.npc_deception_base != "@{charisma_mod}") {deception = parseInt(v.npc_deception_base, 10); if(last_skill === 0) {last_skill = 1; deception_flag = deception < 0 ? 4 : 2;} else {deception_flag = deception < 0 ? 3 : 1;} } else {deception_flag = 0; deception = "";};
-            if(v.npc_athletics_base && v.npc_athletics_base != "@{strength_mod}") {athletics = parseInt(v.npc_athletics_base, 10); if(last_skill === 0) {last_skill = 1; athletics_flag = athletics < 0 ? 4 : 2;} else {athletics_flag = athletics < 0 ? 3 : 1;} } else {athletics_flag = 0; athletics = "";};
-            if(v.npc_arcana_base && v.npc_arcana_base != "@{intelligence_mod}") {arcana = parseInt(v.npc_arcana_base, 10); if(last_skill === 0) {last_skill = 1; arcana_flag = arcana < 0 ? 4 : 2;} else {arcana_flag = arcana < 0 ? 3 : 1;} } else {arcana_flag = 0; arcana = "";};
-            if(v.npc_animal_handling_base && v.npc_animal_handling_base != "@{wisdom_mod}") {animal_handling = parseInt(v.npc_animal_handling_base, 10); if(last_skill === 0) {last_skill = 1; animal_handling_flag = animal_handling < 0 ? 4 : 2;} else {animal_handling_flag = animal_handling < 0 ? 3 : 1;} } else {animal_handling_flag = 0; animal_handling = "";};
-            if(v.npc_acrobatics_base && v.npc_acrobatics_base != "@{dexterity_mod}") {acrobatics = parseInt(v.npc_acrobatics_base, 10); if(last_skill === 0) {last_skill = 1; acrobatics_flag = acrobatics < 0 ? 4 : 2;} else {acrobatics_flag = acrobatics < 0 ? 3 : 1;} } else {acrobatics_flag = 0; acrobatics = "";};
+    const update_npc_lists = (list, type) => {
+        getAttrs(list, function(v) {
+            let update    = {};
+            let last_save = 0;
+            let npc_flag  = 0;
 
-            update["npc_skills_flag"] = "" + acrobatics + animal_handling + arcana + athletics + deception + history + insight + intimidation + investigation + medicine + nature + perception + sperformance + persuasion + religion + sleight_of_hand + stealth + survival;
-            update["npc_stealth_flag"] = stealth_flag;
-            update["npc_survival"] = survival;;
-            update["npc_acrobatics"] = acrobatics;
-            update["npc_acrobatics_flag"] = acrobatics_flag;
-            update["npc_animal_handling"] = animal_handling;
-            update["npc_animal_handling_flag"] = animal_handling_flag;
-            update["npc_arcana"] = arcana;
-            update["npc_arcana_flag"] = arcana_flag;
-            update["npc_athletics"] = athletics;
-            update["npc_athletics_flag"] = athletics_flag;
-            update["npc_deception"] = deception;
-            update["npc_deception_flag"] = deception_flag;
-            update["npc_history"] = history;
-            update["npc_history_flag"] = history_flag;
-            update["npc_insight"] = insight;
-            update["npc_insight_flag"] = insight_flag;
-            update["npc_intimidation"] = intimidation;
-            update["npc_intimidation_flag"] = intimidation_flag;
-            update["npc_investigation"] = investigation;
-            update["npc_investigation_flag"] = investigation_flag;
-            update["npc_medicine"] = medicine;
-            update["npc_medicine_flag"] = medicine_flag;
-            update["npc_nature"] = nature;
-            update["npc_nature_flag"] = nature_flag;
-            update["npc_perception"] = perception;
-            update["npc_perception_flag"] = perception_flag;
-            update["npc_performance"] = sperformance;
-            update["npc_performance_flag"] = performance_flag;
-            update["npc_persuasion"] = persuasion;
-            update["npc_persuasion_flag"] = persuasion_flag;
-            update["npc_religion"] = religion;
-            update["npc_religion_flag"] = religion_flag;
-            update["npc_sleight_of_hand"] = sleight_of_hand;
-            update["npc_sleight_of_hand_flag"] = sleight_of_hand_flag;
-            update["npc_stealth"] = stealth;
-            update["npc_stealth_flag"] = stealth_flag;
-            update["npc_survival"] = survival;
-            update["npc_survival_flag"] = survival_flag;
+            _.each(list.reverse(), (base) => {
+                const attr   = base.split("_")[1];
+                let item     = parseInt(v[`${base}`], 10);
+
+                // CSS will add comma :after 2 & 4 and +/- :before
+                // 1 = Positive Number, 2 = Last Number, 3 = Negative Number, 4 = Last Negative Number
+                if (v[`${base}`] && !isNaN(item) || v[`${base}`] === 0) {
+                    if (last_save === 0) {
+                        last_save = 1;
+                        item_flag = item < 0 ? 4 : 2;
+                    } else {
+                        item_flag = item < 0 ? 3 : 1; 
+                    }
+                } else {
+                    item_flag = 0; 
+                    item      = "";
+                };
+
+                //Type = "save" or "skills"
+                const attrName = (type === "save") ? `${attr}_save` : `${attr}`;
+                update[`npc_${attrName}_flag`] = item_flag;
+                update[`npc_${attrName}`]      = item;
+
+                npc_flag += item_flag;
+            });
+
+            const flagAttr = (type === "save") ? "saving" : type;
+            update[`npc_${flagAttr}_flag`] = (npc_flag === 0) ? "" : npc_flag;
+
             setAttrs(update, {silent: true});
         });
     };
