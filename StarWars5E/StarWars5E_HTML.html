@@ -4533,7 +4533,7 @@
                         </div>
                         <div class="insp-prof-container">
                             <div class="value">
-                                <input type="number" name="attr_pb">
+                                <input type="number" value="0" name="attr_pb">
                             </div>
                             <div class="label">
                                 <span data-i18n="pilot_prof_bonus-u">PILOT PROF BONUS</span>
@@ -5133,6 +5133,8 @@
 <input type='hidden' name='attr_lvl9_slots_total' value='0'>
 
 <input type='hidden' name='attr_l1mancer_status' value='completed'>
+<input type='hidden' name='attr_pilot_skill' value='0'>
+<input type='hidden' name='attr_ship_size' value='0'>
 <!-- endregion HIDDEN FIELDS -->
 
 <div class="compendium_warning">
@@ -6584,7 +6586,7 @@
                 return;
             }
             else {
-                update_skills(["stealth"]
+                update_skills(["stealth"]);
             }
         });  
     });
@@ -6596,7 +6598,7 @@
                 return;
             }
             else {
-                update_skills(["survival"]
+                update_skills(["survival"]);
             }
         });  
     });
@@ -7280,6 +7282,20 @@
             }
             check_l1_mancer();
         });
+    });
+
+    on("change:ship_size", function(eventinfo) {
+        if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
+            return;
+        }
+        update_ac();
+    });
+
+    on("change:pilot_skill", function(eventinfo) {
+        if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
+            return;
+        }
+        update_ac();
     });
 
     var update_attr = function(attr) {
@@ -9928,15 +9944,17 @@
                     var total = base + part1 + part2;
                     setAttrs({ac: total});
                 });
-            }
+            }         
             else {              
-                var ac_attrs = ["simpleinventory","dexterity_mod","globalacmod"];   
+                var ac_attrs = ["simpleinventory","dexterity_mod","globalacmod","npc","ship_size","pilot_skill"];   
                 getSectionIDs("repeating_inventory", function(idarray) {
                     update_inventory_from_ac_change("repeating_inventory_", idarray, ac_attrs);
                 });
-                getSectionIDs("repeating_hiddeninventory", function(idarray) {
-                    update_inventory_from_ac_change("repeating_hiddeninventory_", idarray, ac_attrs);
-                });
+                if(v.npc === "2") {
+                    getSectionIDs("repeating_hiddeninventory", function(idarray) {
+                        update_inventory_from_ac_change("repeating_hiddeninventory_", idarray, ac_attrs);
+                    });
+                }
             };
         });
     };
@@ -9980,34 +9998,70 @@
                 });
                 armorcount = armoritems.filter(function(item){ return item["type"].indexOf("armor") > -1 }).length;
                 shieldcount = armoritems.filter(function(item){ return item["type"].indexOf("shield") > -1 }).length;
-                var base = dexmod;
-                var armorac = 10;
-                var shieldac = 0;
-                var modac = 0;
 
-                _.each(armoritems, function(item) {
-                    if(item["type"].indexOf("light armor") > -1) {
-                        armorac = item["ac"];
-                        base = dexmod;
-                    }
-                    else if(item["type"].indexOf("medium armor") > -1) {
-                        armorac = item["ac"];
-                        base = Math.min(dexmod, 2);
-                    }
-                    else if(item["type"].indexOf("heavy armor") > -1) {
-                        armorac = item["ac"];
-                        base = 0;
-                    }
-                    else if(item["type"].indexOf("shield") > -1) {
-                        shieldac = item["ac"];
-                    }
-                    else {
-                        modac = modac + item["ac"]
-                    }
-                })
+                if(b.npc === "2") {
+                    var modac = 0;
 
-                total = base + armorac + shieldac + modac;
+                    _.each(armoritems, function(item) {
+                        modac = modac + item["ac"];
+                    })
 
+                    var pilotSkill = isNaN(parseInt(b.pilot_skill, 10)) === false ? parseInt(b.pilot_skill, 10) : 0;
+                    var shipSizeACBase = 0;
+                    switch(b.ship_size) {
+                        case "Tiny":
+                            shipSizeACBase = 10;
+                            break;
+                        case "Small":
+                            shipSizeACBase = 9;
+                            break;
+                        case "Medium":
+                            shipSizeACBase = 8;
+                            break;
+                        case "Large":
+                            shipSizeACBase = 7;
+                            break;
+                        case "Huge":
+                            shipSizeACBase = 6;
+                            break;
+                        case "Gargantuan":
+                            shipSizeACBase = 5;
+                            break;
+                        default:
+                            shipSizeACBase = 0;
+                            break;
+                    }
+                    total = shipSizeACBase + pilotSkill + modac;
+                }
+                else {
+                    var base = dexmod;
+                    var armorac = 10;
+                    var shieldac = 0;
+                    var modac = 0;
+    
+                    _.each(armoritems, function(item) {
+                        if(item["type"].indexOf("light armor") > -1) {
+                            armorac = item["ac"];
+                            base = dexmod;
+                        }
+                        else if(item["type"].indexOf("medium armor") > -1) {
+                            armorac = item["ac"];
+                            base = Math.min(dexmod, 2);
+                        }
+                        else if(item["type"].indexOf("heavy armor") > -1) {
+                            armorac = item["ac"];
+                            base = 0;
+                        }
+                        else if(item["type"].indexOf("shield") > -1) {
+                            shieldac = item["ac"];
+                        }
+                        else {
+                            modac = modac + item["ac"];
+                        }
+                    })
+
+                    total = base + armorac + shieldac + modac;
+                }
             };
             if(armorcount > 1 || shieldcount > 1) {
                 update["armorwarningflag"] = "show";
