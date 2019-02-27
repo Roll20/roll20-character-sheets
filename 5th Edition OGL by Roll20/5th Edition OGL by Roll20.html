@@ -6967,8 +6967,8 @@
             });
 
             getAttrs(attrs_to_get, function(v) {
+                console.log("UPDATING SKILLS");
                 _.each(skills_array, function(s) {
-                    console.log("UPDATING SKILL: " + s);
                     var attr_mod = v[skill_parent[s] + "_mod"] ? parseInt(v[skill_parent[s] + "_mod"], 10) : 0;
                     var prof = v[s + "_prof"] != 0 && !isNaN(v["pb"]) ? parseInt(v["pb"], 10) : 0;
                     var flat = v[s + "_flat"] && !isNaN(parseInt(v[s + "_flat"], 10)) ? parseInt(v[s + "_flat"], 10) : 0;
@@ -7595,62 +7595,25 @@
                     update["npc_legendary_actions_desc"] = "";
                 }
             } else if(contentarray && contentarray.indexOf("Legendary Actions") > -1) {
-                if(contentarray.indexOf(/\n Legendary Actions\n/) > -1) {
-                    temp = contentarray.split(/\n Legendary Actions\n/)
-                } else {
-                    temp = contentarray.split(/Legendary Actions\n/)
-                }
-                var legendaryactionsarray = temp[1];
-                contentarray = temp[0];
+                console.log(`%c Legendary Actions was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
             }
-
-            console.log(`%c PAGE DATA`, "color: purple; font-size: 16px;");
-            console.log(page.data);
 
             if(page.data["data-Reactions"]) {
                 var reactionsarray = jsonparse(page.data["data-Reactions"]);
             } else if(contentarray && contentarray.indexOf("Reactions") > -1) {
-                if(contentarray.indexOf(/\n Reactions\n/) > -1) {
-                    temp = contentarray.split(/\n Reactions\n/)
-                } else {
-                    temp = contentarray.split(/Reactions\n/)
-                }
-                var reactionsarray = temp[1];
-                contentarray = temp[0];
+                console.log(`%c Reactions Actions was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
             } 
 
             if(page.data["data-Actions"]) {
                 var actionsarray = jsonparse(page.data["data-Actions"]);
             } else if(contentarray && contentarray.indexOf("Actions") > -1) {
-                if(contentarray.indexOf("Lair Actions") > -1) {
-                    contentarray = contentarray.replace("Lair Actions","Lair Action");
-                } 
-
-                if(contentarray.indexOf(/\n Actions\n/) > -1) {
-                    temp = contentarray.split(/\n Actions\n/)
-                } else {
-                    temp = contentarray.split(/Actions\n/)
-                }
-
-                var actionsarray = temp[1];
-                contentarray = temp[0];
+                console.log(`%c Actions was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
             }
 
             if(page.data["data-Traits"]) {
                 var traitsarray = jsonparse(page.data["data-Traits"]);
             } else if(contentarray && contentarray.indexOf("Traits") > -1) {
-                if(contentarray.indexOf("Lair Traits") > -1) {
-                    contentarray = contentarray.replace("Lair Traits","Lair Trait");
-                } 
-
-                if(contentarray.indexOf(/\n Traits\n/) > -1) {
-                    temp = contentarray.split(/\n Traits\n/)
-                } else {
-                    temp = contentarray.split(/Traits\n/)
-                }
-                
-                var traitsarray = temp[1];
-                contentarray = temp[0];
+                console.log(`%c Traits was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
             } 
 
             if(traitsarray) {
@@ -7658,39 +7621,8 @@
                     var traitsobj = {};
                     traitsarray.forEach(function(val) { traitsobj[val.Name] = val.Desc; });
                 } else {
-                    console.log("")
-                    traitsarray = traitsarray.split("**");
-                    traitsarray.shift();
-                    var traitsobj = {};
-                    traitsarray.forEach(function(val, i) {
-                        if (i % 2 === 1) return;
-                        traitsobj[val] = traitsarray[i + 1];
-                    });
+                    console.log(`%c Traits was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
                 }
-                _.each(traitsobj, function(desc, name) {
-                    newrowid = generateRowID();
-                    update["repeating_npctrait_" + newrowid + "_name"] = name + ".";
-                    if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
-                        desc = desc.substring(2);
-                    }
-                    update["repeating_npctrait_" + newrowid + "_desc"] = desc.trim();
-                    // SPELLCASTING NPCS
-                    if(name === "Spellcasting") {
-                        var lvl = parseInt(desc.substring(desc.indexOf("-level")-4, desc.indexOf("-level")-2).trim(), 10);
-                        lvl = !isNaN(lvl) ? lvl : 1;
-                        var ability = desc.match(/casting ability is (.*?) /);
-                        ability = ability && ability.length > 1 ? ability[1] : false;
-                        ability = ability ? "@{" + ability.toLowerCase() + "_mod}+" : "0*";
-                        update["base_level"]           = lvl;
-                        update["caster_level"]         = lvl;
-                        update["class"]                = "Wizard";
-                        update["level"]                = lvl;
-                        update["npcspellcastingflag"]  = 1;
-                        update["spellcasting_ability"] = ability;
-                        callbacks.push( function() {update_pb();} );
-                        callbacks.push( function() {update_spell_slots();} );
-                    }
-                });
             }
             if(actionsarray) {
                 if(page.data["data-Actions"]) {
@@ -7724,66 +7656,7 @@
                         }
                     })
                 } else {
-                    actionsarray = actionsarray.split("**");
-                    actionsarray.shift();
-                    var actionsobj = {};
-                    actionsarray.forEach(function(val, i) {
-                        if (i % 2 === 1) return;
-                        actionsobj[val] = actionsarray[i + 1];
-                    });
-                    _.each(actionsobj, function(desc, name) {
-                        newrowid = generateRowID();
-                        update["repeating_npcaction_" + newrowid + "_npc_options-flag"] = "0";
-                        update["repeating_npcaction_" + newrowid + "_name"] = name;
-                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
-                            desc = desc.substring(2);
-                        }
-                        if(desc.indexOf(" Attack:") > -1) {
-                            update["repeating_npcaction_" + newrowid + "_attack_flag"]         = "on";
-                            update["repeating_npcaction_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
-                            update["repeating_npcaction_" + newrowid + "_attack_options"]      = "{{attack=1}}";
-                            if(desc.indexOf(" Weapon Attack:") > -1) {
-                                attacktype = desc.split(" Weapon Attack:")[0];
-                            } else if(desc.indexOf(" Spell Attack:") > -1) {
-                                attacktype = desc.split(" Spell Attack:")[0];
-                            } else {
-                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
-                                return;
-                            }
-
-                            update["repeating_npcaction_" + newrowid + "_attack_type"] = attacktype;
-                            if(attacktype === "Melee") {
-                                update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
-                            } else {
-                                update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/range (.*?),/) || ["",""])[1];
-                            }
-                            update["repeating_npcaction_" + newrowid + "_attack_tohit"] = (desc.match(/\+(.*) to hit/) || ["",""])[1];
-                            update["repeating_npcaction_" + newrowid + "_attack_target"] = (desc.match(/\.,(?!.*\.,)(.*)\. Hit:/) || ["",""])[1];
-                            if(desc.toLowerCase().indexOf("damage") > -1) {
-                                update["repeating_npcaction_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
-                                update["repeating_npcaction_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
-                                if((desc.match(/\(/g) || []).length > 1 && desc.match(/\((?!.*\()([^)]+)\)/)) {
-                                    var second_match = desc.match(/\((?!.*\()([^)]+)\)/);
-                                    if(second_match[1] && second_match[1].indexOf(" DC") === -1) {
-                                        update["repeating_npcaction_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
-                                        update["repeating_npcaction_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
-                                    };
-                                };
-                                ctest1 = desc.split("damage.")[1];
-                                ctest2 = desc.split("damage, ")[1];
-                                if(ctest1 && ctest1.length > 0) {
-                                    update["repeating_npcaction_" + newrowid + "_description"] = ctest1.trim();
-                                } else if(ctest2 && ctest2.length > 0) {
-                                    update["repeating_npcaction_" + newrowid + "_description"] = ctest2.trim();
-                                }
-                            } else {
-                                update["repeating_npcaction_" + newrowid + "_description"] = desc.split("Hit:")[1].trim();
-                            }
-                        } else {
-                            update["repeating_npcaction_" + newrowid + "_description"] = desc;
-                        }
-
-                    });
+                    console.log(`%c Actions was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
                 }
                 callbacks.push( function() {update_npc_action("all");} );
             }
@@ -7793,22 +7666,8 @@
                     var reactionsobj = {};
                     reactionsarray.forEach(function(val) { reactionsobj[val.Name] = val.Desc; });
                 } else {
-                    reactionsarray = reactionsarray.split("**");
-                    reactionsarray.shift();
-                    var reactionsobj = {};
-                    reactionsarray.forEach(function(val, i) {
-                        if (i % 2 === 1) return;
-                        reactionsobj[val] = reactionsarray[i + 1];
-                    });
+                    console.log(`%c Reactions Actions was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
                 }
-                _.each(reactionsobj, function(desc, name) {
-                    newrowid = generateRowID();
-                    update["repeating_npcreaction_" + newrowid + "_name"] = name + ".";
-                    if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
-                        desc = desc.substring(2);
-                    }
-                    update["repeating_npcreaction_" + newrowid + "_desc"] = desc.trim();
-                });
             }
             if(legendaryactionsarray) {
                 if(page.data["data-Legendary Actions"]) {
@@ -7839,55 +7698,8 @@
                         }
                     });
                 } else {
-                    var numlegendaryactions = (legendaryactionsarray.match(/\d+/) || [""])[0];
-                    update["npc_legendary_actions"] = numlegendaryactions;
-                    update["npc_legendary_actions_desc"] = `The ${page.name} can take ${numlegendaryactions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
-                    legendaryactionsarray = legendaryactionsarray.split("**");
-                    legendaryactionsarray.shift();
-                    var actionsobj = {};
-                    legendaryactionsarray.forEach(function(val, i) {
-                        if (i % 2 === 1) return;
-                        actionsobj[val] = legendaryactionsarray[i + 1];
-                    });
-                    _.each(actionsobj, function(desc, name) {
-                        newrowid = generateRowID();
-                        update["repeating_npcaction-l_" + newrowid + "_npc_options-flag"] = "0";
-                        update["repeating_npcaction-l_" + newrowid + "_name"] = name;
-                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
-                            desc = desc.substring(2);
-                        }
-                        if(desc.indexOf(" Attack:") > -1) {
-                            update["repeating_npcaction-l_" + newrowid + "_attack_flag"] = "on";
-                            update["repeating_npcaction-l_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
-                            update["repeating_npcaction-l_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            if(desc.indexOf(" Weapon Attack:") > -1) {
-                                attacktype = desc.split(" Weapon Attack:")[0];
-                            } else if(desc.indexOf(" Spell Attack:") > -1) {
-                                attacktype = desc.split(" Spell Attack:")[0];
-                            } else {
-                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
-                                return;
-                            }
-                            update["repeating_npcaction-l_" + newrowid + "_attack_type"] = attacktype;
-                            if(attacktype === "Melee") {
-                                update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
-                            } else {
-                                update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/range (.*?),/) || ["",""])[1];
-                            }
-                            update["repeating_npcaction-l_" + newrowid + "_attack_tohit"] = (desc.match(/\+(.*) to hit/) || ["",""])[1];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_target"] = (desc.match(/\.,(?!.*\.,)(.*)\. Hit:/) || ["",""])[1];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
-                            if((desc.match(/\(/g) || []).length > 1 && (!desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] || desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1)) {
-                                update["repeating_npcaction-l_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
-                                update["repeating_npcaction-l_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
-                            }
-                        } else {
-                            update["repeating_npcaction-l_" + newrowid + "_description"] = desc;
-                        }
-                    });
+                    console.log(`%c Legendary Actions was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
                 }
-
             }
         };
         if(category === "Feats") {
