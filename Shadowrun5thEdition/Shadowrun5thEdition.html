@@ -15,7 +15,7 @@
 		</div>
 	</div>
 	<div class="tab-whisper">
-		<input type="hidden" name="attr_gm_toggle" value=" " /><button type="action" name="act_whisper" title="whisper">/w GM</button>
+		<input type="hidden" name="attr_gm_toggle" value=" " /><button type="action" name="act_whisper" title="whisper" data-i18n="gm">/w GM</button>
 	</div>
 	<div class="tab-toggles">
 		<input type="hidden" name="attr_wound_toggle" value="@{wounds}" /><button type="action" name="act_wound" title="@{wound_toggle}" data-i18n="wounds">wounds</button>
@@ -2034,7 +2034,7 @@
 			<div class="host attribute">
 				<div class="attr-header">
 					<label>
-						<button type="roll" name="host rating" value="@{gm_toggle} &{template:rolls}{{header=Matrix Resistance}}{{base=Host Rating ♦ Host Rating}}{{dice=[[(@{host_rating}+@{host_rating})+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Host Rating Roll" data-i18n="hostrating">Host Rating</button>
+						<button type="roll" name="host rating" value="@{gm_toggle} &{template:rolls}{{header=Matrix Resistance}}{{base=Host Rating ♦ Host Rating}}{{dice=[[((@{host_rating}+@{host_rating})+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Host Rating Roll" data-i18n="hostrating">Host Rating</button>
 					</label><br />
 					<span name="attr_host_rating"></span>
 				</div>
@@ -2120,7 +2120,7 @@
 				</div>
 				<div>
 					<label>
-						<button type="roll" name="initiative" value="@{gm_toggle} &{template:rolls}{{header=Initiative}}{{base=Base}}{{dice=[[((@{initiative_mod})+@{wound_toggle}+@{modifier_toggle})+(@{initiative_dice})d6cf0 &{tracker}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Initiative Roll" data-i18n="initiate">Initiative</button>
+						<button type="roll" name="initiative" value="@{gm_toggle} &{template:rolls}{{header=Initiative}}{{base=Base}}{{dice=[[((@{initiative_mod})+@{wound_toggle}+@{modifier_toggle})+(@{initiative_dice})d6cf0 &{tracker}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Initiative Roll" data-i18n="initiative">Initiative</button>
 					</label>
 					<span name="attr_display_initiative_mod"></span><span> + </span><span name="attr_initiative_dice"></span><span data-i18n="d6">d6</span>
 				</div>
@@ -3075,13 +3075,10 @@
 			};
 	    };
 
-	 on("clicked:whisper", (eventinfo) => {
+	on("clicked:whisper", (eventinfo) => {
 		getAttrs([`gm_toggle`], (v) => {
-			const value = v[`${attr}_toggle`];
-			const change = (attr === "gm" && value != "/w gm") ? "/w gm" : " ";
-
 			setAttrs({
-				[`${attr}_toggle`]: change
+				gm_toggle: (!v.gm_toggle.includes("gm")) ? "/w gm" : " "
 			});
 		});
 	});  
@@ -3100,79 +3097,74 @@
 
    [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`].forEach(attr => {
    		on(`clicked:tab_${attr}`, () => {
-   		
+   			console.log(`c% The button clicked was tab_${attr} update tab to ${attr}`);
    			setAttrs({tab: attr});
    		});
    });
 
 	//Watch for Updates and Run the needed functions
-		on("change:body", () => {
-			update_liftCarry();
-			update_overflow();
-			update_soak();
-			const track = "physical"; update_track(track);
-			const type = "physical"; update_limit(type);
-		});
-
-		on("change:agility", () => {
+		on("change:agility change:walk_modifier change:run_modifier", () => {
 			update_movement();
 		});
 
-		on("change:strength", () => {
-			update_liftCarry();
-			const type = "physical"; update_limit(type);
+		on("change:body change:strength change:lift_carry_modifier", (eventinfo) => {
+			const source = eventinfo.sourceAttribute;
+			update_common_rolls(["body", "strength", "lift_carry_modifier"]);
+			//STRENGTH & BODY RUN THIS
+			(source.includes("strength") || source.includes("body")) ? update_limit("physical") : false;
+			//ONLY RUN ON BODY CHANGE
+			if (source.includes("body")) {
+				update_common_rolls(["body", "overflow_modifier"]);
+				update_common_rolls(["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`]);
+				update_track("physical");
+			};
 		});
 
-		on("change:reaction", () => {
-			update_defense();
+		on("change:reaction change:intuition", (eventinfo) => {
+			const source = eventinfo.sourceAttribute;
+			update_common_rolls(["reaction", "intuition", "defense_modifier", "defense_temp", `defense_temp_flag`]);
 			update_initiative();
-			const type = "physical"; update_limit(type);
-		});
-
-		on("change:intuition", () => {
-			update_defense();
-			update_initiative();
-			update_judgeIntentions();
-			const type = "mental"; update_limit(type);
+			//REACTION UPDATES PHYSICAL, INTUITION UPDATES MENTAL
+			(source.includes("reaction")) ? update_limit("physical") : update_limit("mental");
+			//ONLY RUN ON INTUITION CHANGE
+			(source.includes("intuition")) ? update_common_rolls(["charisma", "intuition", "judge_intentions_modifier"]) : false;
 		});
 
 		on("change:willpower", () => {
-			update_composure();
-			update_memory();
-			const track = "stun"; update_track(track);
-			const type = "social"; update_limit(type);
+			update_common_rolls(["charisma", "willpower", "composure_modifier"]);
+			update_common_rolls(["logic", "willpower", "memory_modifier"]);
+			update_track("stun");
+			update_limit("social");
+			update_limit("mental");
 		});
 
-		on("change:willpower", () => {
-			const type = "mental"; update_limit(type);
-		});
-		
-		on("change:logic", () => {
-			update_memory();
-			const type = "mental"; update_limit(type);
+		on("change:logic change:memory_modifier", (eventinfo) => {
+			const source = eventinfo.sourceAttribute;
+			update_common_rolls(["logic", "willpower", "memory_modifier"]);
+			//LOGIC UPDATES LIMIT
+			(source.includes("logic")) ? update_limit("mental") : false;
 		});
 
-		on("change:charisma", () => {
-			update_composure();
-			update_judgeIntentions();
-
-			const type = "social"; update_limit(type);
+		on("change:charisma change:composure_modifier change:judge_intentions_modifier", (eventinfo) => {
+			const source = eventinfo.sourceAttribute;
+			//CHARISMA & COMPOSURE UPDATE COMPOSURE
+			(source.includes("charisma") || source.includes("composure")) ? update_common_rolls(["charisma", "willpower", "composure_modifier"]) : false;
+			//CHARISMA & JUDGE INTENTIONS UPDATE JUDGE INTENTIONS
+			(source.includes("charisma") || source.includes("judge")) ? update_common_rolls(["charisma", "intuition", "judge_intentions_modifier"]) : false;
+			//ONLY CHARISMA UPDATES SOCIAL LIMIT
+			(source.includes("charisma")) ? update_limit("social") : false;
 		});
 
 		on("change:essence", () => {
-			const type = "social"; update_limit(type);
-		});
-
-		on("change:lift_carry_modifier", () => {
-			update_liftCarry();
+			update_limit("social");
 		});
 
 		on("change:physical_modifier change:flag_drone", () => {
-			const track = "physical"; update_track(track);
+			update_track("physical");
 		});
 
 		on("change:stun_modifier", () => {
-			const track = "stun"; update_track(track);
+			 update_track("stun");
 		});
 
 		on("change:initiative_modifier change:initiative_temp change:initiative_temp_flag", () => {
@@ -3180,31 +3172,15 @@
 		});
 
 		on("change:defense_modifier change:defense_temp change:defense_temp_flag", () => {
-			update_defense();
+			update_common_rolls(["reaction", "intuition", "defense_modifier", "defense_temp", `defense_temp_flag`]);
 		});
 
 		on("change:armor_rating change:soak_modifier change:soak_temp change:soak_temp_flag", () => {
-			update_soak();
+			update_common_rolls(["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`]);
 		});
 
-		on("change:mental_limit_modifier change:mental_limit_temp change:mental_limit_temp_flag change:physical_limit_modifier change:physical_limit_temp change:physical_limit_temp_flag change:social_limit_modifier change:social_limit_temp change:social_limit_temp_flag", function (eventinfo) {
+		on("change:mental_limit_modifier change:mental_limit_temp change:mental_limit_temp_flag change:physical_limit_modifier change:physical_limit_temp change:physical_limit_temp_flag change:social_limit_modifier change:social_limit_temp change:social_limit_temp_flag",  (eventinfo) => {
 			const type = eventinfo.sourceAttribute.split("_")[0]; update_limit(type);
-		});
-
-		on("change:composure_modifier", () => {
-			update_composure();
-		});
-
-		on("change:judge_intentions_modifier", () => {
-			update_judgeIntentions();
-		});
-
-		on("change:memory_modifier", () => {
-			update_memory();
-		});
-
-		on("change:walk_modifier change:run_modifier", () => {
-			update_movement();
 		});
 
 		on("change:pain_tolerance", () => {
@@ -3234,16 +3210,6 @@
 	        });
 	    });
 
-	//Calculate OVERFLOW
-		var update_overflow = () => {
-			getAttrs(["body", "overflow_modifier"], (v) => {
-				var bas = parseInt(v.body) || 0;
-				var mod = parseInt(v.overflow_modifier) || 0;
-
-				setAttrs({overflow: bas + mod});
-			});
-		};
-
 	//Calculaute limts
 		const update_limit = (type)  => {
 			let attrs = [`${type}_limit_modifier`, `${type}_limit_temp`, `${type}_limit_temp_flag`];
@@ -3272,140 +3238,89 @@
 			});
 		};
 
-	//Calculate Common Rolls
-		//DEFENSE POOL
-			var update_defense = () => {
-				getAttrs(["reaction", "intuition", "defense_modifier", "defense_temp", `defense_temp_flag`], (v) =>{
-					const rea = parseInt(v.reaction) || 0, int = parseInt(v.intuition) || 0, mod = parseInt(v.defense_modifier) || 0;
-					const tem = (v.defense_temp_flag === "on") ? parseInt(v.defense_temp) || 0 : 0;
-					const tot = rea + int + mod + tem;
+	//This function checks changes to repeating_armor and updates the Primary Armor if needed
+	on("change:repeating_armor", function(eventInfo) {
+		const source = eventInfo.sourceAttribute;
+		const newV   = eventInfo.newValue;
+		const arm    = ["repeating_armor"];
+		const armors = [`${arm}_name`, `${arm}_rating`, `${arm}_acid_modifier`, `${arm}_electrical_modifier`, `${arm}_cold_modifier`,`${arm}_fire_modifier`, `${arm}_radiation_modifier`, `${arm}_dicepool_modifier`];
 
-					setAttrs({defense: tot});
-				});
-			};
+		//Check if the event was related to the primary flag & armor is set to primary
+		if (source.includes('primary') && newV === 'primary') {
+			//Get attributes from the repeating_armor
+			getAttrs(armors, (v) => {
+				let update = {};
+				//Update the hidden static Primary Armor attributes with the repeating_armor attributes
+				_.each(armors, (armor) => {
+					const name = (armor.includes("name") || armor.includes("rating")) ? armor.split("repeating_")[1] : armor.split(`${arm}_`)[1];
+					update[`${name}`] = v[`${armor}`];
+            	});
 
-		//SOAK POOLS
-			var update_soak = () => {
-				getAttrs(["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`], (v) => {
-					const bod = parseInt(v.body) || 0, arm = parseInt(v.armor_rating) || 0, mod = parseInt(v.soak_modifier) || 0;
-					const tem = (v.soak_temp_flag === "on") ? parseInt(v.soak_temp) || 0 : 0;
-					const tot = bod + arm + mod + tem;
+            	setAttrs(update);
+            });
 
-					setAttrs({soak: tot});
-				});
-			};
+			//Set the other repeating_armor primary flags to 0 aka unchecked
+            getSectionIDs(`${arm}`, function(ids) {
+				let IDs    = [];
+				let update = {};
 
-			//This function checks changes to repeating_armor and updates the Primary Armor if needed
-			on("change:repeating_armor", function(eventInfo) {
-				const source = eventInfo.sourceAttribute;
-				const newV = eventInfo.newValue;
-				const arm = ["repeating_armor"];
+		        for(var i=0; i < ids.length; i++) {
+		            IDs.push(`${arm}_` + ids[i] + "_primary");
+	        	};
 
-				//Check if the event was related to the primary flag
-				if (source.includes('primary')) {
-					//Check if the primary flag is set to primary
-					if (newV === 'primary') {
-						//Get attributes from the repeating_armor
-						getAttrs([`${arm}_name`, `${arm}_rating`, `${arm}_acid_modifier`, `${arm}_electrical_modifier`, `${arm}_cold_modifier`,`${arm}_fire_modifier`, `${arm}_radiation_modifier`, `${arm}_dicepool_modifier`], (v) => {
-							let update = {};
-							//Update the hidden static Primary Armor attributes with the repeating_armor attributes
-			                update["armor_name"] = v[`${arm}_name`];
-			                if (v[`${arm}_rating`]) {update["armor_rating"] = v[`${arm}_rating`]};
-							if (v[`${arm}_dicepool_modifier`]) {update["soak_modifier"] = v[`${arm}_dicepool_modifier`]};
-							if (v[`${arm}_acid_modifier`]) {update["acid_modifier"] = v[`${arm}_acid_modifier`]};
-							if (v[`${arm}_cold_modifier`]) {update["cold_modifier"] = v[`${arm}_cold_modifier`]};
-							if (v[`${arm}_electrical_modifier`]) {update["electrical_modifier"] = v[`${arm}_electrical_modifier`]};
-							if (v[`${arm}_fire_modifier`]) {update["fire_modifier"] = v[`${arm}_fire_modifier`]};
-							if (v[`${arm}_radiation_modifier`]) {update["radiation_modifier"] = v[`${arm}_radiation_modifier`]};
+	        	IDs.forEach(id => {
+	        		if (id != source) {
+	        			update[`${id}`] = 0;
+	        		};
+	        	});
 
-			            	setAttrs(update);
-			            });
+	        	setAttrs(update);
+	        });
+		//Check if the event was for a relevant Primary Armor attribute
+		} else if (source.includes('name') || source.includes('rating') || source.includes('dicepool') || source.includes('acid') || source.includes('cold') || source.includes('electrical') || source.includes('fire') || source.includes('radiation')) {
+			//Get the primary flag attribute for this armor. Also get the repeating_armor attribute we'll need for an update, doing it now is more efficient.
+			getAttrs([`${arm}_primary`, `${source}`], (v) => {
+				//Check if this armor is the designated Primary Armor.
+				if (v[`${arm}_primary`] === 'primary') {
+					let update = {};
+					//Apply the repeating_armor attribute to its static counterpart
+					switch (true) {
+						case /name/.test(source)      : update["armor_name"] = v[`${source}`]; break;
+						case /rating/.test(source)    : update["armor_rating"] = v[`${source}`]; break;
+						case /dicepool/.test(source)  : update["soak_modifier"] = v[`${source}`]; break;
+						case /acid/.test(source)      : update["acid_modifier"] = v[`${source}`]; break;
+						case /cold/.test(source)      : update["cold_modifier"] = v[`${source}`]; break;
+						case /electrical/.test(source): update["electrical_modifier"] = v[`${source}`]; break;
+						case /fire/.test(source)      : update["fire_modifier"] = v[`${source}`]; break;
+						case /radiation/.test(source) : update["radiation_modifier"] = v[`${source}`]; break;
+						default: console.log(`Source  ${source} was invalid`);}
 
-						//Set the other repeating_armor primary flags to 0 aka unchecked
-			            getSectionIDs(`${arm}`, function(ids) {
-					        let IDs = [];
-					        let update = {};
-
-					        for(var i=0; i < ids.length; i++) {
-					            IDs.push(`${arm}_` + ids[i] + "_primary");
-				        	};
-
-				        	IDs.forEach(id => {
-				        		if (id != source) {
-				        			update[`${id}`] = 0;
-				        		};
-				        	});
-
-				        	setAttrs(update);
-				        });
-					};
-				//Check if the event was for a relevant Primary Armor attribute
-				} else if (source.includes('name') || source.includes('rating') || source.includes('dicepool') || source.includes('acid') || source.includes('cold') || source.includes('electrical') || source.includes('fire') || source.includes('radiation')) {
-					//Get the primary flag attribute for this armor. Also get the repeating_armor attribute we'll need for an update, doing it now is more efficient.
-					getAttrs([`${arm}_primary`, `${source}`], (v) => {
-						//Check if this armor is the designated Primary Armor.
-						if (v[`${arm}_primary`] === 'primary') {
-							let update = {};
-							//Apply the repeating_armor attribute to its static counterpart
-							switch (true) {
-								case /name/.test(source): update["armor_name"] = v[`${source}`]; break;
-								case /rating/.test(source): update["armor_rating"] = v[`${source}`]; break;
-								case /dicepool/.test(source): update["soak_modifier"] = v[`${source}`]; break;
-								case /acid/.test(source): update["acid_modifier"] = v[`${source}`]; break;
-								case /cold/.test(source): update["cold_modifier"] = v[`${source}`]; break;
-								case /electrical/.test(source): update["electrical_modifier"] = v[`${source}`]; break;
-								case /fire/.test(source): update["fire_modifier"] = v[`${source}`]; break;
-								case /radiation/.test(source): update["radiation_modifier"] = v[`${source}`]; break;
-								default: console.log(`Source  ${source} was invalid`);}
-
-							setAttrs(update);
-						};
-					});
-				} else {
-					console.log("CHANGE NOT RELEVENT Primary Armor");
+					setAttrs(update);
 				};
 			});
-
-		var update_liftCarry = () => {
-			getAttrs(["body", "strength", "lift_carry_modifier"], (v) => {
-				var attrOne = parseInt(v.body) || 0;
-				var attrTwo = parseInt(v.strength) || 0;
-				var mod = parseInt(v.lift_carry_modifier) || 0;
-
-				setAttrs({lift_carry: attrOne + attrTwo + mod});
-			});
+		} else {
+			console.log("CHANGE NOT RELEVENT Primary Armor");
 		};
+	});
 
-		var update_composure = () => {
-			getAttrs(["charisma", "willpower", "composure_modifier"], (v) => {
-				var attrOne = parseInt(v.charisma) || 0;
-				var attrTwo = parseInt(v.willpower) || 0;
-				var mod = parseInt(v.composure_modifier) || 0;
+	// COMMON ROLLS: MEOMORY, JUDGE INTETIONS, COMPOSURE, LIFT & CARRY, OVERFLOW, DEFENSE, & SOAK ROLLS
+	const update_common_rolls = (attrs) => {
+		getAttrs(attrs, (v) => {
+			const found = attrs.find((mod) => { return mod.includes("_modifier") });
+			const name  = found.split("_modifier")[0];
+			let numbers = [];
 
-				setAttrs({composure: attrOne + attrTwo + mod});
-			});
-		};
-		
-		var update_judgeIntentions = () => {
-			getAttrs(["charisma", "intuition", "judge_intentions_modifier"], (v) => {
-				var attrOne = parseInt(v.charisma) || 0;
-				var attrTwo = parseInt(v.intuition) || 0;
-				var mod = parseInt(v.judge_intentions_modifier) || 0;
+			//DEFENSE & SOAK HAVE TWO EXTRA ATTRIBUTES. TEMP IS NEEDED BUT ONLY IF THE FLAG IS CHECKED IN SETTINGS
+			const array = (name === "defense" || name === "soak") ? (v[`${name}_temp_flag`] === "on") ? attrs.splice(0, 4) : attrs.splice(0, 3) : attrs;
 
-				setAttrs({judge_intentions: attrOne + attrTwo + mod});
-			});
-		};
+			_.each(array, (attr) => { numbers.push(parseInt(v[`${attr}`]) || 0); });
+        	const add   = (a, b) => a + b, sum = numbers.reduce(add);
 
+			setAttrs({[`${name}`]: sum});
 
-		var update_memory = () => {
-			getAttrs(["logic", "willpower", "memory_modifier"], (v) => {
-				var attrOne = parseInt(v.logic) || 0;
-				var attrTwo = parseInt(v.willpower) || 0;
-				var mod = parseInt(v.memory_modifier) || 0;
-
-				setAttrs({memory: attrOne + attrTwo + mod});
-			});
-		};
+			console.log(`%c ${name} = ${numbers} totaling ${sum}`, "color: green;font-weight: bold;");
+		});
+	};
 
 	//Calculate Movement Rates
 		var update_movement = () => {
@@ -3993,27 +3908,9 @@
 
 
 	//Cyberdeck Calculations
-	 	[
-	        'attack',
-	        'sleaze',
-	        'data_processing',
-	        'firewall',
-	    ].forEach(attr => {
-	        // Attach listener
+	 	['attack', 'sleaze', 'data_processing', 'firewall'].forEach(attr => {
 	        on(`change:${attr}_base change:${attr}_modifier change:${attr}_temp`, () => {
-	            // Load attribute values
-	            getAttrs([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`], (v) => {
-	                // Do some math to calculate the total
-	                const bas = parseInt(v[`${attr}_base`]) || 0;
-	                const mod = parseInt(v[`${attr}_modifier`]) || 0;
-	                const tem = parseInt(v[`${attr}_temp`]) || 0;
-	                const tot = tem + bas + mod;
-
-	                // Update the finalized total
-	                setAttrs({
-	                    [attr]: tot
-	                });
-	            });
+	            update_common_rolls([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`]);
 	        });
 	    });
 
@@ -4031,16 +3928,7 @@
 			});
 		});
 
-	   [
-	 		'acceleration',
-	 		'armor',
-	 		'body',
-	        'data_processing',
-	        'handling',
-	        'pilot',
-	        'sensor',
-	        'speed',
-	    ].forEach(attr => {
+	   ['acceleration', 'armor', 'body', 'data_processing', 'handling', 'pilot', 'sensor','speed'].forEach(attr => {
 	        // Attach listener
 	        on(`change:repeating_vehicle:${attr}_base change:repeating_vehicle:${attr}_modifier change:repeating_vehicle:${attr}_temp`, () => {
 	            // Load attribute values
