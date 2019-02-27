@@ -2454,58 +2454,62 @@
 	
 	// update secondary stats and hints when primary are updated
 	function updateSecondaryStats() {
-		getAttrs( secondaryStats, function( sValues ) {
-			var v = structSafeInt( sValues );
-			var ingeniosite = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_adresse_total" ] ) / 2 );
-			var magiePsy = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_charisme_total" ] ) / 2 );
-			var magiePhy = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_adresse_total" ] ) / 2 );
-			var resiMagie = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_courage_total" ] + v[ "stats_force_total" ] ) / 3 );
-
-			var bonusIntel = " ";
-			var bonusDegatsIntel = 0;
-			var bonusAdresse = " ";
-			var bonusForce = " ";
-			var bonusDegatsForce = 0;
-
-			if( v[ "stats_intelligence_total" ] > 12 ) {
-				bonusIntel = "Pour chaque point d'Intelligence supérieur à 12 : +1 point de dégâts des sorts (selon sortilège).";
-				bonusDegatsIntel = v[ "stats_intelligence_total" ] - 12;
+		getAttrs( [ "tab_pnj" ], function( v ) {
+			if( v[ "tab_pnj" ] != 1 ) {
+				getAttrs( secondaryStats, function( sValues ) {
+					var v = structSafeInt( sValues );
+					var ingeniosite = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_adresse_total" ] ) / 2 );
+					var magiePsy = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_charisme_total" ] ) / 2 );
+					var magiePhy = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_adresse_total" ] ) / 2 );
+					var resiMagie = Math.ceil( ( v[ "stats_intelligence_total"] + v[ "stats_courage_total" ] + v[ "stats_force_total" ] ) / 3 );
+		
+					var bonusIntel = " ";
+					var bonusDegatsIntel = 0;
+					var bonusAdresse = " ";
+					var bonusForce = " ";
+					var bonusDegatsForce = 0;
+		
+					if( v[ "stats_intelligence_total" ] > 12 ) {
+						bonusIntel = "Pour chaque point d'Intelligence supérieur à 12 : +1 point de dégâts des sorts (selon sortilège).";
+						bonusDegatsIntel = v[ "stats_intelligence_total" ] - 12;
+					}
+		
+					if( v[ "stats_adresse_total" ] > 12 ) {
+						bonusAdresse = "Adresse supérieure à 12 : +1 à l'Attaque OU à la Parade (un seul point quel que soit le score).";
+					} else if( v[ "stats_adresse_total" ] <= 8 ) {
+						bonusAdresse = "Adresse à 8 ou inférieur : -1 à l'Attaque OU à la Parade.";
+					}
+		
+					if( v[ "stats_force_total" ] > 12 ) {
+						bonusForce = "Pour chaque point de Force supérieur à 12 : +1 Point d'Impact.";
+						bonusDegatsForce = v[ "stats_force_total" ] - 12;
+					} else if( v[ "stats_force_total" ] <= 8 ) {
+						bonusForce = "Force de 8 ou inférieure : -1 Point d'Impact.";
+						bonusDegatsForce = -1;
+					}
+		
+					setAttrs({
+						"stats_inge": ingeniosite,
+						"stats_inge_total": ingeniosite + v[ "stats_inge_mod" ] + v[ "stats_inge_temp_total" ],
+						"stats_magiepsy": magiePsy,
+						"stats_magiepsy_total": magiePsy + v[ "stats_magiepsy_mod" ] + v[ "stats_magiepsy_temp_total" ],
+						"stats_magiephy": magiePhy,
+						"stats_magiephy_total": magiePhy + v[ "stats_magiephy_mod" ] + v[ "stats_magiephy_temp_total" ],
+						"stats_resimagie": resiMagie,
+						"stats_resimagie_total": resiMagie + v[ "stats_resimagie_mod" ] + v[ "stats_resimagie_temp_total" ],
+						"stats_fouille": v[ "stats_intelligence_total"],
+						"stats_fouille_total": v[ "stats_intelligence_total"] + v[ "stats_fouille_mod" ] + v[ "stats_fouille_temp_total" ],
+						"bonusintel": bonusIntel,
+						"bonusdegatsintel": bonusDegatsIntel,
+						"stats_jet": v[ "stats_adresse_total" ],
+						"stats_jet_total": v[ "stats_adresse_total" ] + v[ "stats_jet_mod" ] + v[ "stats_jet_temp_total" ],
+						"bonusadresse": bonusAdresse,
+						"bonusforce": bonusForce,
+						"bonusdegatsforce": bonusDegatsForce
+					});
+				});
 			}
-
-			if( v[ "stats_adresse_total" ] > 12 ) {
-				bonusAdresse = "Adresse supérieure à 12 : +1 à l'Attaque OU à la Parade (un seul point quel que soit le score).";
-			} else if( v[ "stats_adresse_total" ] <= 8 ) {
-				bonusAdresse = "Adresse à 8 ou inférieur : -1 à l'Attaque OU à la Parade.";
-			}
-
-			if( v[ "stats_force_total" ] > 12 ) {
-				bonusForce = "Pour chaque point de Force supérieur à 12 : +1 Point d'Impact.";
-				bonusDegatsForce = v[ "stats_force_total" ] - 12;
-			} else if( v[ "stats_force_total" ] <= 8 ) {
-				bonusForce = "Force de 8 ou inférieure : -1 Point d'Impact.";
-				bonusDegatsForce = -1;
-			}
-
-			setAttrs({
-				"stats_inge": ingeniosite,
-				"stats_inge_total": ingeniosite + v[ "stats_inge_mod" ] + v[ "stats_inge_temp_total" ],
-				"stats_magiepsy": magiePsy,
-				"stats_magiepsy_total": magiePsy + v[ "stats_magiepsy_mod" ] + v[ "stats_magiepsy_temp_total" ],
-				"stats_magiephy": magiePhy,
-				"stats_magiephy_total": magiePhy + v[ "stats_magiephy_mod" ] + v[ "stats_magiephy_temp_total" ],
-				"stats_resimagie": resiMagie,
-				"stats_resimagie_total": resiMagie + v[ "stats_resimagie_mod" ] + v[ "stats_resimagie_temp_total" ],
-				"stats_fouille": v[ "stats_intelligence_total"],
-				"stats_fouille_total": v[ "stats_intelligence_total"] + v[ "stats_fouille_mod" ] + v[ "stats_fouille_temp_total" ],
-				"bonusintel": bonusIntel,
-				"bonusdegatsintel": bonusDegatsIntel,
-				"stats_jet": v[ "stats_adresse_total" ],
-				"stats_jet_total": v[ "stats_adresse_total" ] + v[ "stats_jet_mod" ] + v[ "stats_jet_temp_total" ],
-				"bonusadresse": bonusAdresse,
-				"bonusforce": bonusForce,
-				"bonusdegatsforce": bonusDegatsForce
-			});
-		});
+		});	
 	}
 
 	// sum _temp + _buff to set _temp_total
