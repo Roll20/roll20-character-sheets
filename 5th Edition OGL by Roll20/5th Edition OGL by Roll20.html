@@ -7563,25 +7563,16 @@
                 update[`npc_${attr}_base`] = "";
             });
 
-            if(page.data["Saving Throws"] && page.data["Saving Throws"] != "") {
-                var savearray = page.data["Saving Throws"].split(", ");
-                _.each(savearray, function(save) {
-                    kv = save.indexOf("-") > -1 ? save.split(" ") : save.split(" +");
-                    update["npc_" + kv[0].toLowerCase() + "_save_base"] = parseInt(kv[1], 10);
-                });
-                callbacks.push(() => {update_npc_saves();} );
-            };
-
-            if(page.data["Skills"] && page.data["Skills"] != "") {
-                skillarray = page.data["Skills"].split(", ");
-
-                _.each(skillarray, function(skill) {
-                    kv = skill.indexOf("-") > -1 ? skill.split(" ") : skill.split(" +");
-                    update["npc_" + kv[0].toLowerCase().replace(/ /g, '_') + "_base"] = parseInt(kv[1], 10);
+            ["Saving Throws", "Skills"].forEach((attr) => {
+                const array = page.data[`${attr}`].split(", ");
+                _.each(array, (entry) => {
+                    const kv        = (entry.indexOf("-") > -1) ? entry.split(" ") : entry.split(" +");
+                    const attribute = (attr === "Saving Throws") ? kv[0].toLowerCase() + "_save" : kv[0].toLowerCase().replace(" ", '_');
+                    update[`npc_${attribute}_base`] = parseInt(kv[1], 10);
                 });
 
-                callbacks.push(() => {update_npc_skills();} );
-            };
+                (attr === "Saving Throws") ? callbacks.push(() => {update_npc_saves();} ) : callbacks.push(() => {update_npc_skills();} );
+            });
 
             const npcRepeating = ['npcaction-l', 'npcreaction', 'npcaction', 'npctrait'];
             _.each(npcRepeating, (section) => {
@@ -7663,8 +7654,7 @@
                 if(page.data["data-Traits"]) {
                     var traitsobj = {};
                     traitsarray.forEach(function(val) { traitsobj[val.Name] = val.Desc; });
-                }
-                else {
+                } else {
                     traitsarray = traitsarray.split("**");
                     traitsarray.shift();
                     var traitsobj = {};
@@ -7687,12 +7677,12 @@
                         var ability = desc.match(/casting ability is (.*?) /);
                         ability = ability && ability.length > 1 ? ability[1] : false;
                         ability = ability ? "@{" + ability.toLowerCase() + "_mod}+" : "0*";
-                        update["npcspellcastingflag"] = 1;
+                        update["base_level"]           = lvl;
+                        update["caster_level"]         = lvl;
+                        update["class"]                = "Wizard";
+                        update["level"]                = lvl;
+                        update["npcspellcastingflag"]  = 1;
                         update["spellcasting_ability"] = ability;
-                        update["caster_level"] = lvl;
-                        update["class"] = "Wizard";
-                        update["base_level"] = lvl;
-                        update["level"] = lvl;
                         callbacks.push( function() {update_pb();} );
                         callbacks.push( function() {update_spell_slots();} );
                     }
@@ -7701,35 +7691,35 @@
             if(actionsarray) {
                 if(page.data["data-Actions"]) {
                     var actionsobj = {};
-                    actionsarray.forEach(function(val) { actionsobj[val.Name] = val; });
+                    actionsarray.forEach((val) => { actionsobj[val.Name] = val; });
 
-                    _.each(actionsobj, function(action, name) {
+                    _.each(actionsobj, (action, name) => {
                         newrowid = generateRowID();
-                        update["repeating_npcaction_" + newrowid + "_npc_options-flag"] = "0";
-                        update["repeating_npcaction_" + newrowid + "_name"] = name;
+                        update[`repeating_npcaction_${newrowid}_npc_options-flag`] = "0";
+                        update[`repeating_npcaction_${newrowid}_name`]             = name;
                         if(action["Desc"]) {
-                            update["repeating_npcaction_" + newrowid + "_description"] = action["Desc"];
+                            update[`repeating_npcaction_${newrowid}_description`] = action["Desc"];
                         }
 
                         if(action["Type Attack"]) {
-                            update["repeating_npcaction_" + newrowid + "_attack_flag"] = "on";
-                            update["repeating_npcaction_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
-                            update["repeating_npcaction_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            if(action["Type"]) { update["repeating_npcaction_" + newrowid + "_attack_type"] = action["Type"]; }
-                            if(action["Reach"]) { update["repeating_npcaction_" + newrowid + "_attack_range"] = action["Reach"]; }
-                            if(action["Hit Bonus"]) { update["repeating_npcaction_" + newrowid + "_attack_tohit"] = action["Hit Bonus"]; }
-                            if(action["Target"]) { update["repeating_npcaction_" + newrowid + "_attack_target"] = action["Target"]; }
-                            if(action["Damage"]) { update["repeating_npcaction_" + newrowid + "_attack_damage"] = action["Damage"]; }
-                            if(action["Damage Type"]) { update["repeating_npcaction_" + newrowid + "_attack_damagetype"] = action["Damage Type"]; }
+                            update[`repeating_npcaction_${newrowid}_attack_display_flag`] = "{{attack=1}}";
+                            update[`repeating_npcaction_${newrowid}_attack_flag`]         = "on";
+                            update[`repeating_npcaction_${newrowid}_attack_options`]      = "{{attack=1}}";
+
+                            ["Damage Type", "Damage", "Hit Bonus", "Reach", "Target", "Type"].forEach((attr) => {
+                                if(action[`${attr}`]) {
+                                    const attributeName = (attr === "Hit Bonus") ? "tohit" : (attr === "Reach") ? "range" : attr.toLowerCase().replace(" ", "");
+                                    update[`repeating_npcaction_${newrowid}_attack_${attributeName}`] = action[`${attr}`];
+                                }
+                            });
 
                             if(action["Damage 2"] && action["Damage 2 Type"]) {
-                                update["repeating_npcaction_" + newrowid + "_attack_damage2"] = action["Damage 2"];
-                                update["repeating_npcaction_" + newrowid + "_attack_damagetype2"] = action["Damage 2 Type"];
+                                update[`repeating_npcaction_${newrowid}_attack_damage2`]     = action["Damage 2"];
+                                update[`repeating_npcaction_${newrowid}_attack_damagetype2`] = action["Damage 2 Type"];
                             }
                         }
                     })
-                }
-                else {
+                } else {
                     actionsarray = actionsarray.split("**");
                     actionsarray.shift();
                     var actionsobj = {};
@@ -7745,16 +7735,14 @@
                             desc = desc.substring(2);
                         }
                         if(desc.indexOf(" Attack:") > -1) {
-                            update["repeating_npcaction_" + newrowid + "_attack_flag"] = "on";
+                            update["repeating_npcaction_" + newrowid + "_attack_flag"]         = "on";
                             update["repeating_npcaction_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
-                            update["repeating_npcaction_" + newrowid + "_attack_options"] = "{{attack=1}}";
+                            update["repeating_npcaction_" + newrowid + "_attack_options"]      = "{{attack=1}}";
                             if(desc.indexOf(" Weapon Attack:") > -1) {
                                 attacktype = desc.split(" Weapon Attack:")[0];
-                            }
-                            else if(desc.indexOf(" Spell Attack:") > -1) {
+                            } else if(desc.indexOf(" Spell Attack:") > -1) {
                                 attacktype = desc.split(" Spell Attack:")[0];
-                            }
-                            else {
+                            } else {
                                 console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
                                 return;
                             }
@@ -7762,8 +7750,7 @@
                             update["repeating_npcaction_" + newrowid + "_attack_type"] = attacktype;
                             if(attacktype === "Melee") {
                                 update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
-                            }
-                            else {
+                            } else {
                                 update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/range (.*?),/) || ["",""])[1];
                             }
                             update["repeating_npcaction_" + newrowid + "_attack_tohit"] = (desc.match(/\+(.*) to hit/) || ["",""])[1];
@@ -7782,16 +7769,13 @@
                                 ctest2 = desc.split("damage, ")[1];
                                 if(ctest1 && ctest1.length > 0) {
                                     update["repeating_npcaction_" + newrowid + "_description"] = ctest1.trim();
-                                }
-                                else if(ctest2 && ctest2.length > 0) {
+                                } else if(ctest2 && ctest2.length > 0) {
                                     update["repeating_npcaction_" + newrowid + "_description"] = ctest2.trim();
                                 }
-                            }
-                            else {
+                            } else {
                                 update["repeating_npcaction_" + newrowid + "_description"] = desc.split("Hit:")[1].trim();
                             }
-                        }
-                        else {
+                        } else {
                             update["repeating_npcaction_" + newrowid + "_description"] = desc;
                         }
 
@@ -7804,8 +7788,7 @@
                 if(page.data["data-Reactions"]) {
                     var reactionsobj = {};
                     reactionsarray.forEach(function(val) { reactionsobj[val.Name] = val.Desc; });
-                }
-                else {
+                } else {
                     reactionsarray = reactionsarray.split("**");
                     reactionsarray.shift();
                     var reactionsobj = {};
@@ -7829,29 +7812,29 @@
                     legendaryactionsarray.forEach(function(val) { actionsobj[val.Name] = val; });
                     _.each(actionsobj, function(action, name) {
                         newrowid = generateRowID();
-                        update["repeating_npcaction-l_" + newrowid + "_npc_options-flag"] = "0";
-                        update["repeating_npcaction-l_" + newrowid + "_name"] = name;
-                        update["repeating_npcaction-l_" + newrowid + "_description"] = action["Desc"];
+                        update[`repeating_npcaction-l_${newrowid}_npc_options-flag`] = "0";
+                        update[`repeating_npcaction-l_${newrowid}_name`]             = name;
+                        update[`repeating_npcaction-l_${newrowid}_description`]      = action["Desc"];
 
                         if(action["Type Attack"]) {
-                            update["repeating_npcaction-l_" + newrowid + "_attack_flag"] = "on";
-                            update["repeating_npcaction-l_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
-                            update["repeating_npcaction-l_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            update["repeating_npcaction-l_" + newrowid + "_attack_type"] = action["Type Attack"];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_range"] = action["Reach"];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_tohit"] = action["Hit Bonus"];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_target"] = action["Target"];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_damage"] = action["Damage"];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_damagetype"] = action["Damage Type"];
+                            update[`repeating_npcaction-l_${newrowid}_attack_display_flag`] = "{{attack=1}}";
+                            update[`repeating_npcaction-l_${newrowid}_attack_flag`]         = "on";
+                            update[`repeating_npcaction-l_${newrowid}_attack_options`]      = "{{attack=1}}";
+
+                            ["Damage Type", "Damage", "Hit Bonus", "Reach", "Target", "Type"].forEach((attr) => {
+                                if(action[`${attr}`]) {
+                                    const attributeName = (attr === "Hit Bonus") ? "tohit" : (attr === "Reach") ? "range" : attr.toLowerCase().replace(" ", "");
+                                    update[`repeating_npcaction-l_${newrowid}_attack_${attributeName}`] = action[`${attr}`];
+                                }
+                            });
 
                             if(action["Damage 2"] && action["Damage 2 Type"]) {
-                                update["repeating_npcaction-l_" + newrowid + "_attack_damage2"] = action["Damage 2"];
-                                update["repeating_npcaction-l_" + newrowid + "_attack_damagetype2"] = action["Damage 2 Type"];
+                                update[`repeating_npcaction-l_${newrowid}_attack_damage2`]     = action["Damage 2"];
+                                update[`repeating_npcaction-l_${newrowid}_attack_damagetype2`] = action["Damage 2 Type"];
                             }
                         }
                     });
-                }
-                else {
+                } else {
                     var numlegendaryactions = (legendaryactionsarray.match(/\d+/) || [""])[0];
                     update["npc_legendary_actions"] = numlegendaryactions;
                     update["npc_legendary_actions_desc"] = `The ${page.name} can take ${numlegendaryactions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
@@ -7875,19 +7858,16 @@
                             update["repeating_npcaction-l_" + newrowid + "_attack_options"] = "{{attack=1}}";
                             if(desc.indexOf(" Weapon Attack:") > -1) {
                                 attacktype = desc.split(" Weapon Attack:")[0];
-                            }
-                            else if(desc.indexOf(" Spell Attack:") > -1) {
+                            } else if(desc.indexOf(" Spell Attack:") > -1) {
                                 attacktype = desc.split(" Spell Attack:")[0];
-                            }
-                            else {
+                            } else {
                                 console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
                                 return;
                             }
                             update["repeating_npcaction-l_" + newrowid + "_attack_type"] = attacktype;
                             if(attacktype === "Melee") {
                                 update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
-                            }
-                            else {
+                            } else {
                                 update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/range (.*?),/) || ["",""])[1];
                             }
                             update["repeating_npcaction-l_" + newrowid + "_attack_tohit"] = (desc.match(/\+(.*) to hit/) || ["",""])[1];
@@ -7898,8 +7878,7 @@
                                 update["repeating_npcaction-l_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
                                 update["repeating_npcaction-l_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
                             }
-                        }
-                        else {
+                        } else {
                             update["repeating_npcaction-l_" + newrowid + "_description"] = desc;
                         }
                     });
