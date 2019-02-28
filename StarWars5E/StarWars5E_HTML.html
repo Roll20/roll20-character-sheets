@@ -4755,8 +4755,8 @@
                                     <input type="checkbox" name="attr_atkflag" value="{{attack=1}}" checked="checked">
                                     <span data-i18n="attack:-u">ATTACK:</span>
                                     <select name="attr_atkattr_base">
-                                        <option value="@{strength_mod}" selected="selected" data-i18n="str-u">STR</option>
-                                        <option value="@{dexterity_mod}" data-i18n="dex-u">DEX</option>
+                                        <option value="@{strength_mod}" data-i18n="str-u">STR</option>
+                                        <option value="@{dexterity_mod}" selected="selected" data-i18n="dex-u">DEX</option>
                                         <option value="@{constitution_mod}" data-i18n="con-u">CON</option>
                                         <option value="@{intelligence_mod}" data-i18n="int-u">INT</option>
                                         <option value="@{wisdom_mod}" data-i18n="wis-u">WIS</option>
@@ -4766,9 +4766,7 @@
                                     </select>
                                     <span>+</span>
                                     <input type="text" class="num" name="attr_atkmod" placeholder="0">
-                                    <span>+</span>
-                                    <input type="checkbox" name="attr_atkprofflag" value="(@{pb})" checked="checked" style="margin-left: 3px;">
-                                    <span data-i18n="proficient-u">PROFICIENT</span>
+                                    <input type="hidden" name="attr_atkprofflag" value="">
                                 </div>
                                 <div class="row">
                                     <span style="margin-left: 17px;" data-i18n="range:-u">RANGE:</span>
@@ -4832,8 +4830,8 @@
                                     <input type="checkbox" name="attr_saveflag" value="{{save=1}} {{saveattr=@{saveattr}}} {{savedesc=@{saveeffect}}} {{savedc=[[[[@{savedc}]][SAVE]]]}}">
                                     <span data-i18n="saving-throw:-u">SAVING THROW:</span>
                                     <select name="attr_saveattr">
-                                        <option value="Strength" selected="selected" data-i18n="str-u">STR</option>
-                                        <option value="Dexterity" data-i18n="dex-u">DEX</option>
+                                        <option value="Strength" data-i18n="str-u">STR</option>
+                                        <option value="Dexterity" selected="selected" data-i18n="dex-u">DEX</option>
                                         <option value="Constitution" data-i18n="con-u">CON</option>
                                         <option value="Intelligence" data-i18n="int-u">INT</option>
                                         <option value="Wisdom" data-i18n="wis-u">WIS</option>
@@ -4841,21 +4839,21 @@
                                     </select>
                                     <span data-i18n="vs-dc:-u">VS DC:</span>
                                     <select name="attr_savedc">
-                                        <option value="(@{power_save_dc})" selected="selected" data-i18n="power-u">POWER</option>
+                                        <option value="(@{power_save_dc})" data-i18n="power-u">POWER</option>
                                         <option value="(@{strength_mod}+8+@{power_dc_mod}+@{pb})" data-i18n="str-u">STR</option>
                                         <option value="(@{dexterity_mod}+8+@{power_dc_mod}+@{pb})" data-i18n="dex-u">DEX</option>
                                         <option value="(@{constitution_mod}+8+@{power_dc_mod}+@{pb})" data-i18n="con-u">CON</option>
                                         <option value="(@{intelligence_mod}+8+@{power_dc_mod}+@{pb})" data-i18n="int-u">INT</option>
                                         <option value="(@{wisdom_mod}+8+@{power_dc_mod}+@{pb})" data-i18n="wis-u">WIS</option>
                                         <option value="(@{charisma_mod}+8+@{power_dc_mod}+@{pb})" data-i18n="cha-u">CHA</option>
-                                        <option value="(@{saveflat})" data-i18n="flat-u">FLAT</option>
+                                        <option value="(@{saveflat})" selected="selected" data-i18n="flat-u">FLAT</option>
                                     </select>
-                                    <input class="flatflag" type="hidden" name="attr_savedc">
-                                    <input class="num flat" type="text" name="attr_saveflat" placeholder="10" value="10">
+                                    <input class="flatflag" type="hidden" name="attr_savedc" value="saveflat">
+                                    <input class="num flat" type="text" name="attr_saveflat" placeholder="8" value="8">
                                 </div>
                                 <div class="row">
                                     <span data-i18n="save-effect:-u">SAVE EFFECT:</span>
-                                    <input type="text" name="attr_saveeffect" placeholder="half damage" style="width: 160px;" data-i18n-placeholder="save-effect-place">
+                                    <input type="text" name="attr_saveeffect" placeholder="half damage" style="width: 160px;" data-i18n-placeholder="save-effect-place" value="half damage">
                                 </div>
                                 <div class="row ammo">
                                     <span data-i18n="ammunition:-u">AMMUNITION:</span>
@@ -4928,7 +4926,7 @@
                             </div>
                         </fieldset>
                     </div>
-                    <span class="label" style="margin-top: 0px; position: absolute; bottom: 0px;" data-i18n="atk-powercasting-u">ATTACKS</span>
+                    <span class="label" style="margin-top: 0px; position: absolute; bottom: 0px;" data-i18n="attacks-u">ATTACKS</span>
                 </div>
                 <div class="resources">
                     <div class="hdice-dsaves-container" style="width: 246px; margin-top: 10px;">
@@ -9382,9 +9380,11 @@
             attack_attribs.push("repeating_attack_" + attackid + "_itemid");
             attack_attribs.push("repeating_attack_" + attackid + "_ammo");
             attack_attribs.push("repeating_attack_" + attackid + "_global_damage_mod_field");
+            attack_attribs.push("npc");
         });
 
         getAttrs(attack_attribs, function(v) {
+            var isShipAttack = v.npc === "2";
             _.each(attack_array, function(attackid) {
                 console.log("UPDATING ATTACK: " + attackid);
                 var callbacks = [];
@@ -9447,6 +9447,9 @@
                 var dmgtype = v["repeating_attack_" + attackid + "_dmgtype"] ? v["repeating_attack_" + attackid + "_dmgtype"] + " " : "";
                 var dmg2type = v["repeating_attack_" + attackid + "_dmg2type"] ? v["repeating_attack_" + attackid + "_dmg2type"] + " " : "";
                 var pb = v["repeating_attack_" + attackid + "_atkprofflag"] && v["repeating_attack_" + attackid + "_atkprofflag"] != 0 && v.pb ? v.pb : 0;
+                if(isShipAttack) {
+                    pb = 0;
+                }
                 var atkmod = v["repeating_attack_" + attackid + "_atkmod"] && v["repeating_attack_" + attackid + "_atkmod"] != "" ? parseInt(v["repeating_attack_" + attackid + "_atkmod"],10) : 0;
                 var atkmag = v["repeating_attack_" + attackid + "_atkpower"] && v["repeating_attack_" + attackid + "_atkpower"] != "" ? parseInt(v["repeating_attack_" + attackid + "_atkpower"],10) : 0;
                 var dmgmag = isNaN(atkmag) === false && atkmag != 0 && ((v["repeating_attack_" + attackid + "_dmgflag"] && v["repeating_attack_" + attackid + "_dmgflag"] != 0) || (v["repeating_attack_" + attackid + "_dmg2flag"] && v["repeating_attack_" + attackid + "_dmg2flag"] != 0)) ? "+ " + atkmag + " Power Bonus" : "";
