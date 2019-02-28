@@ -6304,6 +6304,14 @@
         update_attacks("strength");
         update_tool("strength");
         update_power_info("strength");
+        getAttrs(["npc"], function(v) {
+            if(v.npc === "2") {
+                update_ship_speeds();
+            }
+            else {
+                return;
+            }
+        }); 
     });
 
     on("change:dexterity_mod", function() {
@@ -6314,6 +6322,14 @@
         update_power_info("dexterity");
         update_ac();
         update_initiative();
+        getAttrs(["npc"], function(v) {
+            if(v.npc === "2") {
+                update_ship_speeds();
+            }
+            else {
+                return;
+            }
+        }); 
     });
 
     on("change:constitution_mod", function() {
@@ -6321,6 +6337,14 @@
         update_attacks("constitution");
         update_tool("constitution");
         update_power_info("constitution");
+        getAttrs(["npc"], function(v) {
+            if(v.npc === "2") {
+                update_ship_speeds();
+            }
+            else {
+                return;
+            }
+        }); 
     });
 
     on("change:intelligence_mod", function() {
@@ -7289,6 +7313,7 @@
             return;
         }
         update_ac();
+        update_ship_speeds();
     });
 
     on("change:pilot_skill", function(eventinfo) {
@@ -10289,6 +10314,55 @@
             };
         });
         set_level();
+    };
+
+    var update_ship_speeds = function() {
+        getAttrs(["ship_size", "dexterity_mod", "constitution_mod", "strength_mod"], function(attributes) {
+            var update = {};
+            var baseTurningSpeed = 0;
+            var baseFlyingSpeed = 0;
+            switch(attributes.ship_size) {
+                case "Tiny":
+                    baseTurningSpeed = 300;
+                    baseFlyingSpeed = 400;
+                    break;
+                case "Small":
+                    baseTurningSpeed = 250;
+                    baseFlyingSpeed = 350;
+                    break;
+                case "Medium":
+                    baseTurningSpeed = 200;
+                    baseFlyingSpeed = 300;
+                    break;
+                case "Large":
+                    baseTurningSpeed = 150;
+                    baseFlyingSpeed = 250;
+                    break;
+                case "Huge":
+                    baseTurningSpeed = 100;
+                    baseFlyingSpeed = 200;
+                    break;
+                case "Gargantuan":
+                    baseTurningSpeed = 50;
+                    baseFlyingSpeed = 150;
+                    break;
+                default:
+                    baseTurningSpeed = 0;
+                    break;
+            }
+
+            update["ship_flyspeed"] = baseFlyingSpeed + 50 * (attributes.strength_mod - attributes.constitution_mod);
+            if(update["ship_flyspeed"] < 0) {
+                update["ship_flyspeed"] = 0;
+            }
+
+            update["ship_turnspeed"] = baseTurningSpeed - 50 * (attributes.dexterity_mod - attributes.constitution_mod);
+            if(update["ship_turnspeed"] < 50) {
+                update["ship_flyspeed"] = update["ship_flyspeed"] + (50 - update["ship_turnspeed"]);
+                update["ship_turnspeed"] = 50;
+            }
+            setAttrs(update, {silent: true});
+        });
     };
 
     var set_level = function() {
