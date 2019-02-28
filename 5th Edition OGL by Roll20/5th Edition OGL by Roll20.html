@@ -7585,122 +7585,123 @@
 
             var contentarray = page.content;
             if(page.data["data-Legendary Actions"]) {
-                var legendaryactionsarray = jsonparse(page.data["data-Legendary Actions"]);
                 update["npc_legendary_actions"] = 3;
                 if(page.data["Legendary Actions Desc"]) {
                     update["npc_legendary_actions_desc"] = page.data["Legendary Actions Desc"];
-                } else if(currentData){
-                    update["npc_legendary_actions_desc"] = `${page.name} can take ${currentData.npc_legendary_actions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
+                } else if(currentData.npc_legendary_actions > 0){
+                    update["npc_legendary_actions_desc"] = `The ${page.name} can take ${currentData.npc_legendary_actions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
                 } else {
                     update["npc_legendary_actions_desc"] = "";
                 }
+                let actionsobj = {};
+                jsonparse(page.data["data-Legendary Actions"]).forEach((val) => { actionsobj[val.Name] = val; });
+                _.each(actionsobj, (action, name) => {
+                    newrowid = generateRowID();
+                    update[`repeating_npcaction-l_${newrowid}_npc_options-flag`] = "0";
+                    update[`repeating_npcaction-l_${newrowid}_name`]             = name;
+                    update[`repeating_npcaction-l_${newrowid}_description`]      = action["Desc"];
+
+                    if(action["Type Attack"]) {
+                        update[`repeating_npcaction-l_${newrowid}_attack_display_flag`] = "{{attack=1}}";
+                        update[`repeating_npcaction-l_${newrowid}_attack_flag`]         = "on";
+                        update[`repeating_npcaction-l_${newrowid}_attack_options`]      = "{{attack=1}}";
+
+                        ["Damage Type", "Damage", "Hit Bonus", "Reach", "Target", "Type"].forEach((attr) => {
+                            if(action[`${attr}`]) {
+                                const attributeName = (attr === "Hit Bonus") ? "tohit" : (attr === "Reach") ? "range" : attr.toLowerCase().replace(" ", "");
+                                update[`repeating_npcaction-l_${newrowid}_attack_${attributeName}`] = action[`${attr}`];
+                            }
+                        });
+
+                        if(action["Damage 2"] && action["Damage 2 Type"]) {
+                            update[`repeating_npcaction-l_${newrowid}_attack_damage2`]     = action["Damage 2"];
+                            update[`repeating_npcaction-l_${newrowid}_attack_damagetype2`] = action["Damage 2 Type"];
+                        }
+                    }
+                });
             } else if(contentarray && contentarray.indexOf("Legendary Actions") > -1) {
-                console.log(`%c Legendary Actions was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
+                console.log(`%c Legendary Actions was not found for ${page.name}`, "color: orange;");
             }
 
             if(page.data["data-Reactions"]) {
-                var reactionsarray = jsonparse(page.data["data-Reactions"]);
+                let reactionsobj = {};
+                jsonparse(page.data["data-Reactions"]).forEach((val) => { reactionsobj[val.Name] = val.Desc; });
+                _.each(reactionsobj, (desc, name) => {
+                    newrowid = generateRowID();
+                    update[`repeating_npcreaction_${newrowid}_name`] = name + ".";
+                    if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
+                        desc = desc.substring(2);
+                    }
+                    update[`repeating_npcreaction_${newrowid}_desc`] = desc.trim();
+                });
             } else if(contentarray && contentarray.indexOf("Reactions") > -1) {
-                console.log(`%c Reactions Actions was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
-            } 
+                console.log(`%c Reactions was not found for ${page.name}`, "color: orange;");
+            };
 
             if(page.data["data-Actions"]) {
-                var actionsarray = jsonparse(page.data["data-Actions"]);
+                let actionsobj = {};
+                jsonparse(page.data["data-Actions"]).forEach((val) => { actionsobj[val.Name] = val; });
+                _.each(actionsobj, (action, name) => {
+                    newrowid = generateRowID();
+                    update[`repeating_npcaction_${newrowid}_npc_options-flag`] = "0";
+                    update[`repeating_npcaction_${newrowid}_name`]             = name;
+                    if(action["Desc"]) {
+                        update[`repeating_npcaction_${newrowid}_description`] = action["Desc"];
+                    }
+
+                    if(action["Type Attack"]) {
+                        update[`repeating_npcaction_${newrowid}_attack_display_flag`] = "{{attack=1}}";
+                        update[`repeating_npcaction_${newrowid}_attack_flag`]         = "on";
+                        update[`repeating_npcaction_${newrowid}_attack_options`]      = "{{attack=1}}";
+
+                        ["Damage Type", "Damage", "Hit Bonus", "Reach", "Target", "Type"].forEach((attr) => {
+                            if(action[`${attr}`]) {
+                                const attributeName = (attr === "Hit Bonus") ? "tohit" : (attr === "Reach") ? "range" : attr.toLowerCase().replace(" ", "");
+                                update[`repeating_npcaction_${newrowid}_attack_${attributeName}`] = action[`${attr}`];
+                            }
+                        });
+
+                        if(action["Damage 2"] && action["Damage 2 Type"]) {
+                            update[`repeating_npcaction_${newrowid}_attack_damage2`]     = action["Damage 2"];
+                            update[`repeating_npcaction_${newrowid}_attack_damagetype2`] = action["Damage 2 Type"];
+                        }
+                    }
+                });
+                callbacks.push(() => {update_npc_action("all");} );
             } else if(contentarray && contentarray.indexOf("Actions") > -1) {
-                console.log(`%c Actions was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
-            }
+                console.log(`%c Actions was not found for ${page.name}`, "color: orange;");
+            };
 
             if(page.data["data-Traits"]) {
-                var traitsarray = jsonparse(page.data["data-Traits"]);
+                let traitsobj     = {};
+                jsonparse(page.data["data-Traits"]).forEach((val) => { traitsobj[val.Name] = val.Desc; });
+                _.each(traitsobj, (desc, name) => {
+                    newrowid = generateRowID();
+                    update[`repeating_npctrait_${newrowid}_name`] = name + ".";
+                    if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
+                        desc = desc.substring(2);
+                    }
+                    update[`repeating_npctrait_${newrowid}_desc`] = desc.trim();
+                    // SPELLCASTING NPCS
+                    if(name === "Spellcasting") {
+                        var lvl = parseInt(desc.substring(desc.indexOf("-level")-4, desc.indexOf("-level")-2).trim(), 10);
+                        lvl = !isNaN(lvl) ? lvl : 1;
+                        var ability = desc.match(/casting ability is (.*?) /);
+                            ability = ability && ability.length > 1 ? ability[1] : false;
+                            ability = ability ? "@{" + ability.toLowerCase() + "_mod}+" : "0*";
+                        update["base_level"]           = lvl;
+                        update["caster_level"]         = lvl;
+                        update["class"]                = "Wizard";
+                        update["level"]                = lvl;
+                        update["npcspellcastingflag"]  = 1;
+                        update["spellcasting_ability"] = ability;
+                        callbacks.push(() => {update_pb();} );
+                        callbacks.push(() => {update_spell_slots();} );
+                    }
+                });
             } else if(contentarray && contentarray.indexOf("Traits") > -1) {
-                console.log(`%c Traits was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
-            } 
-
-            if(traitsarray) {
-                if(page.data["data-Traits"]) {
-                    var traitsobj = {};
-                    traitsarray.forEach(function(val) { traitsobj[val.Name] = val.Desc; });
-                } else {
-                    console.log(`%c Traits was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
-                }
-            }
-            if(actionsarray) {
-                if(page.data["data-Actions"]) {
-                    var actionsobj = {};
-                    actionsarray.forEach((val) => { actionsobj[val.Name] = val; });
-
-                    _.each(actionsobj, (action, name) => {
-                        newrowid = generateRowID();
-                        update[`repeating_npcaction_${newrowid}_npc_options-flag`] = "0";
-                        update[`repeating_npcaction_${newrowid}_name`]             = name;
-                        if(action["Desc"]) {
-                            update[`repeating_npcaction_${newrowid}_description`] = action["Desc"];
-                        }
-
-                        if(action["Type Attack"]) {
-                            update[`repeating_npcaction_${newrowid}_attack_display_flag`] = "{{attack=1}}";
-                            update[`repeating_npcaction_${newrowid}_attack_flag`]         = "on";
-                            update[`repeating_npcaction_${newrowid}_attack_options`]      = "{{attack=1}}";
-
-                            ["Damage Type", "Damage", "Hit Bonus", "Reach", "Target", "Type"].forEach((attr) => {
-                                if(action[`${attr}`]) {
-                                    const attributeName = (attr === "Hit Bonus") ? "tohit" : (attr === "Reach") ? "range" : attr.toLowerCase().replace(" ", "");
-                                    update[`repeating_npcaction_${newrowid}_attack_${attributeName}`] = action[`${attr}`];
-                                }
-                            });
-
-                            if(action["Damage 2"] && action["Damage 2 Type"]) {
-                                update[`repeating_npcaction_${newrowid}_attack_damage2`]     = action["Damage 2"];
-                                update[`repeating_npcaction_${newrowid}_attack_damagetype2`] = action["Damage 2 Type"];
-                            }
-                        }
-                    })
-                } else {
-                    console.log(`%c Actions was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
-                }
-                callbacks.push( function() {update_npc_action("all");} );
-            }
-            if(reactionsarray) {
-                update["npcreactionsflag"] = 1;
-                if(page.data["data-Reactions"]) {
-                    var reactionsobj = {};
-                    reactionsarray.forEach(function(val) { reactionsobj[val.Name] = val.Desc; });
-                } else {
-                    console.log(`%c Reactions Actions was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
-                }
-            }
-            if(legendaryactionsarray) {
-                if(page.data["data-Legendary Actions"]) {
-                    var actionsobj = {};
-                    legendaryactionsarray.forEach(function(val) { actionsobj[val.Name] = val; });
-                    _.each(actionsobj, function(action, name) {
-                        newrowid = generateRowID();
-                        update[`repeating_npcaction-l_${newrowid}_npc_options-flag`] = "0";
-                        update[`repeating_npcaction-l_${newrowid}_name`]             = name;
-                        update[`repeating_npcaction-l_${newrowid}_description`]      = action["Desc"];
-
-                        if(action["Type Attack"]) {
-                            update[`repeating_npcaction-l_${newrowid}_attack_display_flag`] = "{{attack=1}}";
-                            update[`repeating_npcaction-l_${newrowid}_attack_flag`]         = "on";
-                            update[`repeating_npcaction-l_${newrowid}_attack_options`]      = "{{attack=1}}";
-
-                            ["Damage Type", "Damage", "Hit Bonus", "Reach", "Target", "Type"].forEach((attr) => {
-                                if(action[`${attr}`]) {
-                                    const attributeName = (attr === "Hit Bonus") ? "tohit" : (attr === "Reach") ? "range" : attr.toLowerCase().replace(" ", "");
-                                    update[`repeating_npcaction-l_${newrowid}_attack_${attributeName}`] = action[`${attr}`];
-                                }
-                            });
-
-                            if(action["Damage 2"] && action["Damage 2 Type"]) {
-                                update[`repeating_npcaction-l_${newrowid}_attack_damage2`]     = action["Damage 2"];
-                                update[`repeating_npcaction-l_${newrowid}_attack_damagetype2`] = action["Damage 2 Type"];
-                            }
-                        }
-                    });
-                } else {
-                    console.log(`%c Legendary Actions was not found. Please report ${page.name} to Roll20. Thanks!`, "color: orange;");
-                }
-            }
+                console.log(`%c Traits was not found for ${page.name}`, "color: orange;");
+            };
         };
         if(category === "Feats") {
             update["tab"] = "core";
