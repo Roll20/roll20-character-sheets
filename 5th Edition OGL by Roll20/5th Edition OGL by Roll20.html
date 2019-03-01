@@ -7496,6 +7496,7 @@
             update["repeating_spell-" + lvl + "_" + id + "_options-flag"] = "0";
         };
         if(category === "Monsters") {
+            console.log(`%c MONSTERS: ${page.name}`, "color: purple; font-weight:16px;");
             update["npc"] = "1";
             update["npc_options-flag"] = "0";
             if(page.name && page.name != "") {update["npc_name"] = page.name};
@@ -7577,19 +7578,19 @@
             });
             // ACTIONS, LEGENDARY ACTIONS, REACTIONS, TRAITS
             var contentarray = page.content;
-            if(page.data["data-Legendary Actions"]) {
-                update["npc_legendary_actions"] = 3;
+            if (page.data["data-Legendary Actions"]) {
+                const actionCount = (page.data["data-LANum"]) ? page.data["data-LANum"] : 3;
+                update["npc_legendary_actions"] = (page.data["data-LANum"]) ? page.data["data-LANum"] : 3;
                 if (page.data["Legendary Actions Desc"]) {
                     update["npc_legendary_actions_desc"] = page.data["Legendary Actions Desc"];
-                } else if (currentData.npc_legendary_actions > 0) {
-                    update["npc_legendary_actions_desc"] = `The ${page.name} can take ${currentData.npc_legendary_actions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
                 } else {
-                    update["npc_legendary_actions_desc"] = "";
+                    update["npc_legendary_actions_desc"] = `The ${page.name} can take ${actionCount}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
                 };
             };
+
             // ACTIONS & LEGENDARY ACTIONS
             ["Actions", "Legendary Actions"].forEach((attr) => {
-                if(page.data[`data-${attr}`]) {
+                if (page.data[`data-${attr}`]) {
                     const npcaction = (attr === "Actions") ? "npcaction" : "npcaction-l";
                     let actionsobj = {};
                     jsonparse(page.data[`data-${attr}`]).forEach((val) => { actionsobj[val.Name] = val; });
@@ -7620,12 +7621,12 @@
                 } else if(contentarray && contentarray.indexOf(`${attr}`) > -1) {
                     console.log(`%c ${attr} was not found for ${page.name}`, "color: orange;");
                 };
-            });
+            }); 
             //REACTIONS
-            if(page.data["data-Reactions"]) {
+            if (page.data["data-Reactions"]) {
                 update["npcreactionsflag"] = 1;
                 let reactionsobj = {};
-                jsonparse(page.data["data-Reactions"]).forEach((val) => { reactionsobj[val.Name] = val.Desc; });
+               jsonparse(page.data["data-Reactions"]).forEach((val) => { reactionsobj[val.Name] = val.Desc; });
                 _.each(reactionsobj, (desc, name) => {
                     newrowid = generateRowID();
                     update[`repeating_npcreaction_${newrowid}_name`] = name + ".";
@@ -7636,9 +7637,9 @@
                 });
             } else if(contentarray && contentarray.indexOf("Reactions") > -1) {
                 console.log(`%c Reactions was not found for ${page.name}`, "color: orange;");
-            };
+            };  
             //TRAITS
-            if(page.data["data-Traits"]) {
+            if (page.data["data-Traits"]) {
                 let traitsobj     = {};
                 jsonparse(page.data["data-Traits"]).forEach((val) => { traitsobj[val.Name] = val.Desc; });
                 _.each(traitsobj, (desc, name) => {
