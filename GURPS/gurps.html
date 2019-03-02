@@ -2685,16 +2685,44 @@
 		<div class="sheet-box sheet-ranged-attacks sheet-thrown-object">
 			<div class="sheet-table">
 				<div class="sheet-header">
-					<div class="sheet-cell sheet-col0-st">Thrown Weight (pounds)</div>
-					<div class="sheet-cell sheet-col1">
+					<div class="sheet-cell sheet-col0-st">Thrown (lbs)</div>
+					<div class="sheet-cell sheet-col8">
 						<div class="sheet-popup">ST</div>
+						<div class="sheet-tooltip">
+						    Based on Striking ST<br />
+						    <i>Note:</i> future versions will add ability to choose ST source or enter ST.
+						</div>
+					</div>
+				    <div class="sheet-cell sheet-col8">
+						<div class="sheet-popup">MOD</div>
+						<div class="sheet-tooltip">
+					        Strength Modifier to distance only<br />
+						    Throwing or Throwing Art at DX Level = +1 ST<br />
+						    Throwing or Throwing Art at DX+1 Level = +2 ST<br />	
+						</div>
+					</div>
+				    <div class="sheet-cell sheet-col8">
+						<div class="sheet-popup">SUPER</div>
+						<div class="sheet-tooltip">
+						    Super Throw Level<br />
+						    Each level of Super Throw, double range.<br />
+						    Each level of Super Throw increases damage by +2 per die.
+						</div>
 					</div>
 					<div class="sheet-cell sheet-col1">
 						<div class="sheet-popup">Damage</div>
+						<div class="sheet-tooltip">
+						    Final damage based on ST, super throw, 
+						    and damage modifier.
+						</div>
 					</div>
 					<div class="sheet-cell sheet-col8">
 						<div class="sheet-popup">Mod</div>
-						<div class="sheet-tooltip">Damage Modifier</div>
+						<div class="sheet-tooltip">
+						    Bonus or penalty per die<br />
+						    Throwing Art at DX Level = +1 per die<br />
+						    Throwing Art at DX+1 Level = +2 per die<br />
+						</div>
 					</div>
 					<div class="sheet-cell sheet-col2"> </div>
 					<div class="sheet-cell sheet-col3">
@@ -2729,7 +2757,7 @@
 					<div class="sheet-cell sheet-col5">
 						<div class="sheet-popup">RNG</div>
 						<span class="sheet-tooltip">
-							See page 269.
+							See GURPS Campaigns Page 355 for formula
 						</span>
 					</div>					
 					<div class="sheet-cell sheet-col6">
@@ -2783,12 +2811,18 @@
     				    <input class="sheet-toggle" type="checkbox" />
     					<span class="sheet-checkbox"></span>
     					
-        				<div class="sheet-row sheet-row-stats">
+        				<div class="sheet-row sheet-row-stats row-thrown-object">
         					<div class="sheet-cell sheet-col0-st">
         						<input type="number" step="1" value="1" min="1" name="attr_thrown_object_weight" />
         					</div>
-        					<div class="sheet-cell sheet-col1">
+        					<div class="sheet-cell sheet-col8">
         						<input type="text" name="attr_thrown_object_strength" readonly="readonly" value="10" />
+        					</div>
+        					<div class="sheet-cell sheet-col8">
+        						<input type="number" name="attr_thrown_object_strength_mod" value="0" step="1" />
+        					</div>
+        					<div class="sheet-cell sheet-col8">
+        						<input type="number" name="attr_super_throw_level" value="0" step="1" />
         					</div>
         					<div class="sheet-cell sheet-col1">
         						<input type="text" name="attr_thrown_object_damage" readonly="readonly" value="@{thrust}" />
@@ -2798,7 +2832,7 @@
         					</div>
 					        <div class="sheet-cell sheet-col2">
         					    <input type="hidden" name="attr_damage_dice_icon" class="range-damage-dice-icon" value="explode" />
-        						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=Thrown Object @{thrown_object_weight} lbs.}} {{damageRoll=[[@{thrown_object_damage} + @{thrown_object_damage_mod}]]}} {{damageType=@{thrown_object_damage_type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{thrown_object_damage_type_note}}} {{notes=@{thrown_object_damage_notes}}}" name="roll_damage" class="roll_damage" />
+        						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=Thrown Object @{thrown_object_weight} lbs.}} {{damageRoll=[[@{thrown_object_damage}]]}} {{damageType=@{thrown_object_damage_type}}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{thrown_object_damage_type_note}}} {{notes=@{thrown_object_damage_notes}}}" name="roll_damage" class="roll_damage" />
         					</div>
         					<div class="sheet-cell sheet-col3">
         						<select name="attr_thrown_object_damage_type">
@@ -2821,8 +2855,8 @@
         					<div class="sheet-cell sheet-col4">
         						<input type="number" step="1" name="attr_thrown_object_acc" value="0" />
         					</div>
-        					<div class="sheet-cell sheet-col5">
-        						<input type="text" name="attr_thrown_object_range" readonly="readonly" value="10/20" />
+        					<div class="sheet-cell sheet-col5 thrown-object-input">
+        						<input type="text" name="attr_thrown_object_range" readonly="readonly" value="10" />
         					</div>
         					<div class="sheet-cell sheet-col6">
         						<input type="text" name="attr_thrown_object_rof" value="1" />
@@ -2837,7 +2871,7 @@
         						<input type="text" name="attr_thrown_object_skill" value="10" />
         					</div>
         					<div class="sheet-cell sheet-col11">
-        						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Attack}} {{characterName=@{character_name}}} {{skillName=Thrown Object @{thrown_object_weight} lbs.}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{thrown_object_skill} + @{modifier}]]}} {{notes=@{thrown_object_notes}}} {{rof=@{thrown_object_rof}}} {{recoil=@{thrown_object_recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
+        						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Attack}} {{characterName=@{character_name}}} {{skillName=Thrown Object @{thrown_object_weight} lbs.}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{thrown_object_skill} + @{modifier}]]}} {{notes=@{thrown_object_notes}}} {{rof=@{thrown_object_rof}}} {{recoil=@{thrown_object_recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
         					</div>
         				</div> <!-- .sheet-row -->
         				<div class="sheet-row sheet-row-details2">
@@ -3102,7 +3136,7 @@
 	<ul>
 		<li>Changed title of Damage Type Notes to Wound Modifier Notes.</li>
 		<li>Changed Speed Add To Tracker to use rolltemplates.</li>
-		<li>Added Thrown Weight below Ranged Attacks.</li>
+		<li>Added Thrown Object based on weight below Ranged Attacks.</li>
 	</ul>
 		
 	<h4>Version: 1.5.2</h4>
@@ -3890,7 +3924,7 @@ Skull Damage x4
 
 	var noop = function () {}; // do nothing.
 
-	var version = "1.5.2";
+	var version = "1.5.3";
 
 	var modCascade = true;
 	
@@ -4036,6 +4070,11 @@ Skull Damage x4
 		var thenEncumbrance = _.after(2, function () {
 			updateEncLevel(thenCurrentMoveDodge);
 		});
+		
+		// After Striking st damage
+		var thenUpdateThrownObjectStats = _.after(1, function() {
+		    updateThrownObjectStats();
+		});
 
 		sumRepeating('repeating_item', 'weighttotal', function (v) {
 			setAttrs({ total_weight: (v * 1000) / 1000 }, {silent: false}, thenEncumbrance);
@@ -4052,7 +4091,8 @@ Skull Damage x4
 			updateStrikingST();
 			
 			// updateStrikingST damage rolls
-			updateStrikingStrengthDamage();
+			// after completed, then update thrown object
+			updateStrikingStrengthDamage(thenUpdateThrownObjectStats);
 			
 		});
 		
@@ -4648,6 +4688,8 @@ Skull Damage x4
 	 * update Thrust and Swing
 	 */
 	function updateStrikingStrengthDamage(callback) {
+	    
+	    console.log("******** updateStrikingStrengthDamage ********");
 
 		// get Strking strength
 		getAttrs(['striking_st'], function(values) {
@@ -4664,7 +4706,7 @@ Skull Damage x4
 			setAttrs({ 
 				thrust: damageType.thrust,
 				swing: damageType.swing
-			});
+			}, {silent: false}, callback);
 
 		});
 
@@ -6574,8 +6616,6 @@ Skull Damage x4
 		            
                 });
                 
-                console.log(JSON.stringify(updateFields));
-                
 				setAttrs(updateFields);
 			    
 			});		
@@ -6584,16 +6624,29 @@ Skull Damage x4
 		
 	}
 	
-	on('change:thrown_object_weight', function(event) {
+	// check for changes that affect thrown object stats
+	on('change:thrown_object_weight change:striking_st change:basic_lift change:super_throw_level change:thrown_object_strength_mod change:thrown_object_damage_mod', function(event) {
 	    
 	    updateThrownObjectStats();
 	    
 	});
 	
-	
+	/**
+	 * Update thrown objects stats
+	 * Damage, range, etc.
+	 */
 	function updateThrownObjectStats() {
 	
-	    var fields = ['basic_lift', 'thrown_object_weight', 'striking_st'];
+	    console.log("*********** Updating Thrown Object Stats ***********");
+	    
+	    var fields = ['thrown_object_weight',
+            'striking_st',
+            'thrown_object_strength_mod',
+            'super_throw_level',
+            'thrust',
+            'basic_lift',
+            'thrown_object_damage_mod'
+        ];
 	    
 	    getAttrs(fields, function (values) {
 	        
@@ -6603,7 +6656,15 @@ Skull Damage x4
 	        
 	        var throwingST = +values.striking_st;
 	        
+	        var throwingStMod = parseInt(values.thrown_object_strength_mod);
+	        
+	        var superThrowLvl = parseInt(values.super_throw_level);
+	        
+	        var enteredDamageMod = parseInt(values.thrown_object_damage_mod);
+	        
 	        var damageMod = 0;
+	        
+	        throwingST = throwingST + throwingStMod;
 	        
 	        if (weight < 1) {
 	            weight = 0;
@@ -6613,6 +6674,9 @@ Skull Damage x4
 	            basicLift = 1;
 	        }
 	        
+	        if (superThrowLvl < 0) {
+	            superThrowLvl = 0;
+	        }
 	        
 	        var weightRatio = weight/basicLift;
 	        
@@ -6620,7 +6684,39 @@ Skull Damage x4
 	        
 	        var distance = throwingST * distanceMod;
 	        
-	        var damageMod = getThrownDamageModifier(basicLift, weight); 
+	        var damageMod = getThrownDamageModifier(basicLift, weight);
+	        
+	        // check for super throw
+	        if (superThrowLvl > 0) {
+	            
+	            distance = distance * Math.pow(2,superThrowLvl);
+	            
+	            damageMod = damageMod + (superThrowLvl * 2);
+	            
+	        }
+	        
+	        // check to see if they entered a modifier
+	        if (enteredDamageMod != 0) {
+	            damageMod = damageMod + enteredDamageMod; 
+	        }
+	        
+	        
+	        console.log("weight:", weight);
+	        console.log("basicLift:", basicLift);
+	        console.log("weightRaio:", weightRatio);
+	        console.log("distanceMod:", distanceMod);
+	        console.log("distance:", distance);
+
+	        distance = Math.floor(distance);
+	        
+	        var finalDamage = getModifiedDamage(values.thrust, damageMod);
+	        
+            //
+	        setAttrs({
+	            'thrown_object_strength': throwingST,
+	            'thrown_object_range': distance,
+	            'thrown_object_damage': finalDamage
+	        });
 	        
 	    });
 	    
@@ -6720,6 +6816,87 @@ Skull Damage x4
 	    }
 	    
 	    return distanceMod;
+	    
+	}
+	
+	/**
+	 * Determines the final damage dice + modifier
+	 * 
+	 * @param string damageDice Original damage dice; 3d6
+	 * @param int    damageMod  Damage modifier per dice; +1 per dice
+	 * 
+	 * @return string Modified damge dice
+	 */
+	function getModifiedDamage(damageDice, damageMod) {
+	    
+	    var newDamageDice = damageDice;
+	    
+	    damageDice = damageDice.toLowerCase();
+	    
+	    // split into array. 
+	    // 3d6 = [3,6]
+	    var arrDice = damageDice.split("d");
+	    
+	    if (arrDice.length == 2) {
+
+            var diceCount = parseInt(arrDice[0]);
+	    
+    	    var diceType = arrDice[1];
+    	    
+    	    var arrDiceTypeModifier = [];
+    	    
+    	    var diceModifier = "";
+	        
+	        if (diceCount < 1) {
+	            diceCount = 1;
+	        }
+	        
+	        // check for dice modifier
+	        // 3d6+1; diceType = 6+1; diceType=6; diceModifier=1;
+	        if (diceType.includes("+")) {
+	            
+	            arrDiceTypeModifier = diceType.split("+");
+	            
+	            diceType = arrDiceTypeModifier[0];
+	            
+	            diceModifier = parseInt(arrDiceTypeModifier[1]);
+	            
+	        } else if (diceType.includes("-")) { 
+	            
+	            arrDiceTypeModifier = diceType.split("-");
+	            
+	            diceType = arrDiceTypeModifier[0];
+	            
+	            diceModifier = -1 * parseInt(arrDiceTypeModifier[1]);
+	            
+	        } else {
+	            
+	            diceModifier = 0;
+	            
+	        }
+	        
+	        newDamageDice = diceCount + "d" + diceType;
+	        
+	        // get the final damage modifier
+	        damageMod = Math.floor(damageMod + diceModifier);
+	        
+	        if (damageMod < 0) {
+	            
+	            damageMod = Math.abs(damageMod) * diceCount;
+	            
+	            newDamageDice = newDamageDice + "-" + damageMod;
+	            
+	        } else if (damageMod > 0) {
+	            
+	            damageMod = Math.abs(damageMod) * diceCount;
+	            
+	            newDamageDice = newDamageDice + "+" + damageMod;
+	            
+	        }
+	        
+	    }
+	    
+	    return newDamageDice;
 	    
 	}
     
