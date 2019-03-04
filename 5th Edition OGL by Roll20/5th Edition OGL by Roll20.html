@@ -7669,6 +7669,79 @@
             } else if(contentarray && contentarray.indexOf("Traits") > -1) {
                 console.log(`%c Traits was not found for ${page.name}`, "color: orange;");
             };
+            //Spells 
+            if (page.data["data-Spells"]) {
+                console.log(`%c MONSTER SPELLS`, "color: orange; font-size: 16px;");
+                let spellsobj = [];
+                let spellList = jsonparse(page.data["data-Spells"])["spells"];
+                console.log(spellList);
+                console.log(page.data["data-Spells"]);
+                //Put ALL the spells into an array to get compendium info
+                ["cantrips", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th"].forEach((lvl) => {
+                    spellList[`${lvl}`].forEach((spell) => {
+                        spellsobj.push(spell);
+                    });
+                });
+                getCompendiumPage(spellsobj, (spellData) => {
+                    let updateSpells = [];
+                    spellData.forEach((page) => {
+                        const spell        = page.data;
+                        const lvl          = spell["Level"] && spell["Level"] > 0 ? spell["Level"] : "cantrip";
+                        const newrowid     = generateRowID();
+                        const repeatingRow = `repeating_spell-${lvl}_${newrowid}`;
+
+                        update[`${repeatingRow}_spelllevel`] = lvl;
+                        update[`${repeatingRow}_spell_ability`] = (spell["spellcasting_ability"]) ? `@{${spell["spellcasting_ability"].toLowerCase()}_mod}+` : "spell";
+                        (spell.Name) ? updateSpells[`${repeatingRow}_spellname`] = spell.Name : false;
+
+                        ["spellclass", "spellsource", "data-description"].forEach((attr) => {
+                            const suffix = (attr.includes("description")) ? "spelldescription" : attr;
+                            (spell[`${attr}`]) ? updateSpells[`${repeatingRow}_${suffix}`] = spell[`${attr}`] : false;
+                        });
+
+                        ["Add Casting Modifier", "Casting Time", "Concentration", "Damage Type", "Damage", "Duration", "Healing", "Material", "Range", "Ritual", "Save", "Save Success", "School", "Secondary Damage", "Secondary Damage Type", "Spell Attack", "Target"].forEach((attr) => {
+                            if(spell[`${attr}`]) {
+                                //Adjust the array entry to match the attribute name in the HTML
+                                const name           = (attr === "Add Casting Modifier") ? "dmgmod" : (attr === "Material") ? `comp_materials` : (attr.includes("Secondary Damage")) ? attr.split("Secondary ")[0] + "2" : attr;
+                                const spellattribute = name.toLowerCase().replace(" ", "");
+                                //Concentration, Ritual, and School are exceptions to norm
+                                const updateSpellsValue = (attr === "Concentration" || attr === "Ritual") ? `{{${spellattribute}=1}}` : (attr === "School") ? spell["School"].toLowerCase() : spell[`${attr}`];
+                                updateSpells[`${repeatingRow}_spell${spellattribute}`] = updateSpellsValue;
+                            };
+                        });
+
+                       ["Higher Spell Slot Bonus", "Higher Spell Slot Desc", "Higher Spell Slot Dice", "Higher Spell Slot Die"].forEach((attr) => {
+                            if (spell[`${attr}`]) {
+                                const spellattribute = (attr.includes("Bonus")) ? "hlbonus" : (attr.includes("Desc")) ? "athigherlevels" : (attr.includes("Dice")) ? "hldie" : "hldietype";
+                                updateSpells[`${repeatingRow}_spell${spellattribute}`] = spell[`${attr}`];
+                            };
+                        }); 
+
+                        if(spell["Components"]) {
+                            ["v", "s", "m"].forEach((comp) => {
+                                if (spell["Components"].toLowerCase().indexOf(comp) === -1) {updateSpells[`${repeatingRow}_spellcomp_${comp}`] = "0"};
+                            });
+                        };
+
+                        if (spell["Damage"] || spell["Healing"]) {
+                            updateSpells[`${repeatingRow}_spelloutput`] = "ATTACK";
+                            callbacks.push(() => {create_attack_from_spell(lvl, newrowid, currentData.character_id);});
+                        } else if(spell["Higher Spell Slot Desc"] && spell["Higher Spell Slot Desc"] != "") {
+                            var spelllevel = "?{Cast at what level?";
+                            for(i = 0; i < 10-lvl; i++) {
+                                spelllevel = spelllevel + "|Level " + (parseInt(i, 10) + parseInt(lvl, 10)) + "," + (parseInt(i, 10) + parseInt(lvl, 10));
+                            };
+                            spelllevel = spelllevel + "}";
+                            updateSpells[`${repeatingRow}_rollcontent`] = "@{wtype}&{template:spell} {{level=@{spellschool} " + spelllevel + "}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}";
+                        };
+
+                        if (spell["data-Cantrip Scaling"] && lvl == "cantrip") {updateSpells[`${repeatingRow}_spell_damage_progression`] = "Cantrip " + spell["data-Cantrip Scaling"].charAt(0).toUpperCase() + spell["data-Cantrip Scaling"].slice(1);};
+                        updateSpells[`${repeatingRow}_options-flag`] = "0";
+                    });
+                    console.log(updateSpells);
+                    setAttrs(updateSpells);
+                }); 
+            };
         };
         if(category === "Feats") {
             update["tab"] = "core";
