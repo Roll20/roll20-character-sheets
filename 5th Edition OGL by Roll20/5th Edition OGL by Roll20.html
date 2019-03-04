@@ -7440,15 +7440,15 @@
                     };
                 });
             }
-            console.log(`%c ${page.name}`, "color: blue; font-size: 18px;");
-            console.log(page.data);
 
-            update[`repeating_spell-${lvl}_${id}_spelllevel`]    = lvl;
+            update[`repeating_spell-${lvl}_${id}_spelllevel`] = lvl;
             update[`repeating_spell-${lvl}_${id}_spell_ability`] = (page.data["spellcasting_ability"]) ? `@{${page.data["spellcasting_ability"].toLowerCase()}_mod}+` : "spell";
-            
-            (page.data["spellclass"]) ? update[`repeating_spell-${lvl}_${id}_spellclass`]   = page.data["spellclass"] : false;
-            (page.data["spellsource"]) ? update[`repeating_spell-${lvl}_${id}_spellsource`] = page.data["spellsource"] : false;
-            (page.name) ? update[`repeating_spell-${lvl}_${id}_spellname`]                  = page.name : false;
+            (page.name) ? update[`repeating_spell-${lvl}_${id}_spellname`] = page.name : false;
+
+            ["spellclass", "spellsource", "data-description"].forEach((attr) => {
+                const suffix = (attr.includes("description")) ? "spelldescription" : attr;
+                (page.data[`${attr}`]) ? update[`repeating_spell-${lvl}_${id}_${suffix}`] = page.data[`${attr}`] : false;
+            });
 
            ["Add Casting Modifier", "Casting Time", "Concentration", "Damage Type", "Damage", "Duration", "Healing", "Material", "Range", "Ritual", "Save", "Save Success", "School", "Secondary Damage", "Secondary Damage Type", "Spell Attack", "Target"].forEach((attr) => {
                 if(page.data[`${attr}`]) {
@@ -7458,11 +7458,6 @@
                     //Concentration, Ritual, and School are exceptions to norm
                     const updateValue = (attr === "Concentration" || attr === "Ritual") ? `{{${spellattribute}=1}}` : (attr === "School") ? page.data["School"].toLowerCase() : page.data[`${attr}`];
                     update[`repeating_spell-${lvl}_${id}_spell${spellattribute}`] = updateValue;
-
-                    console.log(`%c ATTR: ${attr}`, "color: purple;");
-                    console.log(`%c - Name: ${name}`, "color: purple;");
-                    console.log(`%c - Spell Attribute: ${spellattribute}`, "color: purple;");
-                    console.log(`%c - Value: ${updateValue}`, "color: purple;");
                 };
             });
 
@@ -7470,35 +7465,29 @@
                 if (page.data[`${attr}`]) {
                     const spellattribute = (attr.includes("Bonus")) ? "hlbonus" : (attr.includes("Desc")) ? "athigherlevels" : (attr.includes("Dice")) ? "hldie" : "hldietype";
                     update[`repeating_spell-${lvl}_${id}_spell${spellattribute}`] = page.data[`${attr}`];
-
-                    console.log(`%c ATTR: ${attr}`, "color: orange;");
-                    console.log(`%c - Spell Attribute: ${spellattribute}`, "color: orange;");
                 };
             }); 
 
             if(page.data["Components"]) {
                 ["v", "s", "m"].forEach((comp) => {
                     if(page.data["Components"].toLowerCase().indexOf(comp) === -1) {update[`repeating_spell-${lvl}_${id}_spellcomp_${comp}`] = "0"};
-                })
+                });
             };
 
             if(page.data["Damage"] || page.data["Healing"]) {
-                update["repeating_spell-" + lvl + "_" + id + "_spelloutput"] = "ATTACK";
-                if(!existing.spellattackid) callbacks.push( function() {create_attack_from_spell(lvl, id, currentData.character_id);} );
-            }
-            else if(page.data["Higher Spell Slot Desc"] && page.data["Higher Spell Slot Desc"] != "") {
+                update[`repeating_spell-${lvl}_${id}_spelloutput`] = "ATTACK";
+                if(!existing.spellattackid) callbacks.push(() => {create_attack_from_spell(lvl, id, currentData.character_id);} );
+            } else if(page.data["Higher Spell Slot Desc"] && page.data["Higher Spell Slot Desc"] != "") {
                 var spelllevel = "?{Cast at what level?";
                 for(i = 0; i < 10-lvl; i++) {
                     spelllevel = spelllevel + "|Level " + (parseInt(i, 10) + parseInt(lvl, 10)) + "," + (parseInt(i, 10) + parseInt(lvl, 10));
-                }
+                };
                 spelllevel = spelllevel + "}";
-                update["repeating_spell-" + lvl + "_" + id + "_rollcontent"] = "@{wtype}&{template:spell} {{level=@{spellschool} " + spelllevel + "}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}";
+                update[`repeating_spell-${lvl}_${id}_rollcontent`] = "@{wtype}&{template:spell} {{level=@{spellschool} " + spelllevel + "}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}";
             };
 
-
-            if(page.data["data-Cantrip Scaling"] && lvl == "cantrip") {update["repeating_spell-" + lvl + "_" + id + "_spell_damage_progression"] = "Cantrip " + page.data["data-Cantrip Scaling"].charAt(0).toUpperCase() + page.data["data-Cantrip Scaling"].slice(1);};
-            if(page.data["data-description"]) { update["repeating_spell-" + lvl + "_" + id + "_spelldescription"]         = page.data["data-description"]};
-            update["repeating_spell-" + lvl + "_" + id + "_options-flag"] = "0"; 
+            if(page.data["data-Cantrip Scaling"] && lvl == "cantrip") {update[`repeating_spell-${lvl}_${id}_spell_damage_progression`] = "Cantrip " + page.data["data-Cantrip Scaling"].charAt(0).toUpperCase() + page.data["data-Cantrip Scaling"].slice(1);};
+            update[`repeating_spell-${lvl}_${id}_options-flag`] = "0"; 
         };
         if(category === "Monsters") {
             update["npc"] = "1";
