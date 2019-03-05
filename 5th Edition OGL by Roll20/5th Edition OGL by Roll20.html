@@ -7665,6 +7665,12 @@
                         callbacks.push(() => {update_pb();} );
                         callbacks.push(() => {update_spell_slots();} );
                     }
+                    if(name === "Innate Spellcasting") {
+                        const ability = (page.data["Spellcasting Ability"]) ? `@{${page.data["Spellcasting Ability"].toLowerCase()}_mod}+` : "0*";
+                        update["npcspellcastingflag"]  = 1;
+                        update["spellcasting_ability"] = ability;
+                        update["spell_dc_mod"]         = page.data["Spellcasting Save DC"];
+                    };
                 });
             } else if(contentarray && contentarray.indexOf("Traits") > -1) {
                 console.log(`%c Traits was not found for ${page.name}`, "color: orange;");
@@ -7673,14 +7679,16 @@
             if (page.data["data-Spells"]) {
                 console.log(`%c MONSTER SPELLS`, "color: orange; font-size: 16px;");
                 let spellsobj = [];
-                let spellList = jsonparse(page.data["data-Spells"])["spells"];
-                console.log(spellList);
-                console.log(page.data["data-Spells"]);
-                //Put ALL the spells into an array to get compendium info
-                ["cantrips", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th"].forEach((lvl) => {
-                    spellList[`${lvl}`].forEach((spell) => {
-                        spellsobj.push(spell);
-                    });
+                ["spells", "innate"].forEach((type) => {
+                    let spellList = jsonparse(page.data["data-Spells"])[`${type}`];
+                    if (spellList) {
+                        Object.keys(spellList).map((objectKey, index) => {
+                            var list = spellList[objectKey];
+                            list.forEach((spell) => {
+                                spellsobj.push(spell);
+                            });
+                        });
+                    };
                 });
                 getCompendiumPage(spellsobj, (spellData) => {
                     let updateSpells = [];
@@ -7738,7 +7746,6 @@
                         if (spell["data-Cantrip Scaling"] && lvl == "cantrip") {updateSpells[`${repeatingRow}_spell_damage_progression`] = "Cantrip " + spell["data-Cantrip Scaling"].charAt(0).toUpperCase() + spell["data-Cantrip Scaling"].slice(1);};
                         updateSpells[`${repeatingRow}_options-flag`] = "0";
                     });
-                    console.log(updateSpells);
                     setAttrs(updateSpells);
                 }); 
             };
