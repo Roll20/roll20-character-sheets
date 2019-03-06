@@ -1,0 +1,1097 @@
+<!--
+*********LATEST CHANGES/ADDITIONS*********
+10/20' - more i18n updates and updated french translation
+10/17' - small syntax fixes in html(syntax fixes and a small update to sheet button rolls), i18n updates on sheet and roll template, updated french translation. 
+******************************************
+
+******************TODO********************
+Add custom ability names
+New Roll Template styles
+"Permanent bonus" to attack and defense section
+Advantage button - auto calculate +2atk and 1d4dmg
+Concentration check    
+******************************************
+
+-->
+
+<!-- ADDED sheet_version. Used to establish sheet changes -->
+<span style="font-size: 12px;float: right;clear: both;margin-top: -.5em;">v<input name="attr_sheet_version" type="text" value="0" style="font-size: 12px;width: 3em;height: 1.5em; vertical-align: text-bottom;" readonly /></span>
+<!-- ADDED recalc checkbox to force sheet worker events. temp unhide for testing purposes-->
+<input name="attr_recalc1" type="checkbox" title="RECALC" style="display:none;">
+
+<!--*********MENU-->
+<input type="radio" name="attr_page-number" class="sheet-tab sheet-tab1" value="1" title="Character Sheet" data-i18n-title="title-character-sheet" checked="checked"/>
+<span class="sheet-tab sheet-tab1" data-i18n="character">Character</span>
+<input type="radio" name="attr_page-number" class="sheet-tab sheet-tab2" value="2" title="Traits and Abilities" data-i18n-title="title-traits-and-abilities" />
+<span class="sheet-tab sheet-tab2" data-i18n="traits-and-abilities">Traits | Abilities</span>
+<input type="radio" name="attr_page-number" class="sheet-tab sheet-tab3" value="3" title="Rituals and Powers" data-i18n-title="title-rituals-and-powers" />
+<span class="sheet-tab sheet-tab3" data-i18n="rituals-and-powers">Rituals | Powers</span>
+<input type="radio" name="attr_page-number" class="sheet-tab sheet-tab4" value="4" title="Equipment, Group, and Friends" data-i18n-title="title-equipment-group-and-friends" />
+<span class="sheet-tab sheet-tab4" data-i18n="equipment-and-biography">Equipment | Bio</span>
+<div class="sheet-row" style="padding-top:.5em;margin-right:0;">
+    <div><input type="text" name="attr_character-name"/><label data-i18n="name">Name</label></div>
+    <div style="width:8em;"><input type="text" style="width:100%"name="attr_character-race"/><label data-i18n="race">Race</label></div>
+    <div><input type="text"name="attr_character-occupation"/><label data-i18n="occupation">Occupation</label></div>
+    <div style="width:8em;"><input type="text" style="width:100%"name="attr_player-name"/><label data-i18n="player">Player</label></div>
+    <div><input type="number" class="sheet-number-box-small" style="width:4em;" name="attr_character-exp"/><label data-i18n="experience-abbrv">Exp</label></div>
+    <div><input type="number" class="sheet-number-box-small" style="width:4em;" name="attr_character-expu"/><label data-i18n="unspent">Unspent</label></div>
+</div>
+
+<!--********* PAGE 1 -->
+<div class="sheet-section sheet-section-pc1">
+    <div style="height:160px;margin-bottom:1.5em;width:100%">
+        <div style="float:left; text-align:left;padding:20px 20px 20px 0;">
+            <label class="sheet-label-large" data-i18n="toughness">Toughness</label>
+            <div>
+                <input type="number" class="sheet-number-box-small" style="vertical-align:middle" name="attr_toughness" value="@{strong}"/>
+                <span data-i18n="current">Current</span>
+            </div>
+            <div>
+                <input type="number" class="sheet-number-box-small" style="vertical-align:middle"name="attr_toughness_max" min="10" value="10" />
+                <span data-i18n="maximum-abbrv">Max</span>
+            </div>
+            <div>
+                <input  type="number" class="sheet-number-box-small" style="vertical-align:middle"name="attr_pain_threshold" value="ceil(@{strong}/2)" disabled="true" />
+                <span data-i18n="pain-threshold-abbrv">Pain thresh.</span>
+            </div>
+        </div>
+        <div style="text-align:right;float:right;padding:20px 10px 20px 10px;">
+            <label class="sheet-label-large" style="text-align:right;" data-i18n="corruption">Corruption</label>
+            <div>
+                <button type="roll" name="roll_corruption" title="Pick a dice value (to the right) and hit this button to roll" data-i18n-title="title-choose-dice-and-roll" value="/roll @{corruption-d} for Corruption..." style="background-image:url(http://i.imgur.com/MC61Qmt.png?1);background-position: center;width:40px; height:20px"></button>
+                <select name="attr_corruption-d">                
+                    <option value="d4">d4</option>
+                    <option value="d6">d6</option>
+                    <option value="d8">d8</option>
+                    <option value="d10">d10</option>
+                    <option value="d12">d12</option>
+                </select>
+            </div>
+            <div>
+                <span style="text-align:right;vertical-align:middle" data-i18n="temporary-abbrv">Temp.</span>
+                <input type="number" class="sheet-number-box-small" style="vertical-align:middle"name="attr_corruption" min="0" value="0"/>
+            </div>
+            <div>
+                <span style="text-align:right;vertical-align:middle" data-i18n="permanent-abbrv">Perm.</span>
+                <input type="number" class="sheet-number-box-small" style="vertical-align:middle"name="attr_corruption_permanent" min="0" value="0"/>
+            </div>
+            <div>
+                <span style="text-align:right;vertical-align:middle" data-i18n="threshold">Threshold</span>
+                <input type="number" class="sheet-number-box-small" style="vertical-align:middle" name="attr_corruption_threshold" value="ceil(@{resolute}/2)" disabled="true" />
+            </div>
+        </div>    
+    </div>
+    <div class="sheet-row" style="text-align:center;">
+        <div class="sheet-attributes">
+            <div>
+                <div>
+                    <input type="number" class="sheet-number-circle" value="10" min="5" max="15" name="attr_accurate" />
+                </div> 
+                <div>
+                    <label data-i18n="accurate">Accurate</label>
+                    <button type='roll' value='&{template:attrib}{{name=^{accurate}}} {{character=@{character-name}}} {{attribute=[[@{accurate}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_AccurateCheck'></button>
+                </div>
+            </div>    
+            <div>
+                <div><input type="number"  class="sheet-number-circle" value="10" min="5" max="15" name="attr_cunning"/></div>
+                <div>
+                    <label data-i18n="cunning">Cunning</label>
+                    <button type='roll' class="sheet-hidden" value='&{template:attrib}{{name=^{cunning}}} {{character=@{character-name}}} {{attribute=[[@{cunning}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_CunningCheck'></button>
+                </div>
+            </div>    
+            <div>
+                <div><input type="number" class="sheet-number-circle" value="10" min="5" max="15" name="attr_discreet"/></div>
+                <div>
+                    <label data-i18n="discreet">Discreet</label>
+                    <button type='roll' class="sheet-hidden" value='&{template:attrib}{{name=^{discreet}}} {{character=@{character-name}}} {{attribute=[[@{discreet}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_DiscreetCheck'></button> 
+                </div>
+            </div>    
+            <div>
+                <div><input type="number" class="sheet-number-circle" value="10" min="5" max="15" name="attr_persuasive"/></div>
+                <div>
+                    <label data-i18n="persuasive">Persuasive</label>
+                    <button type='roll' class="sheet-hidden" value='&{template:attrib}{{name=^{persuasive}}} {{character=@{character-name}}} {{attribute=[[@{persuasive}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_PersuasiveCheck'></button>
+                </div>
+            </div>
+            <div>
+                <div><input type="number" class="sheet-number-circle" value="10" min="5" max="15" name="attr_quick"/></div>
+                <div>
+                    <label data-i18n="quick">Quick</label>
+                    <button type='roll' class="sheet-hidden" value='&{template:attrib}{{name=^{quick}}} {{character=@{character-name}}} {{attribute=[[@{quick}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_QuickCheck'></button>
+                </div>
+            </div>    
+            <div>
+                <div><input type="number" class="sheet-number-circle" value="10" min="5" max="15" name="attr_resolute"/></div>
+                <div>
+                    <label data-i18n="resolute">Resolute</label>
+                    <button type='roll' class="sheet-hidden" value='&{template:attrib}{{name=^{resolute}}} {{character=@{character-name}}} {{attribute=[[@{resolute}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_ResoluteCheck'></button> 
+                </div> 
+            </div>    
+            <div>
+                <div><input type="number" class="sheet-number-circle" value="10" min="5" max="15" name="attr_strong"/></div>
+                <div>
+                    <label data-i18n="strong">Strong</label>
+                    <button type='roll' class="sheet-hidden" value='&{template:attrib}{{name=^{strong}}} {{character=@{character-name}}} {{attribute=[[@{strong}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_StrongCheck'></button>
+                </div>  
+            </div>    
+            <div>
+                <div><input type="number" class="sheet-number-circle" value="10" min="5" max="15" name="attr_vigilant"/></div>
+                <div>
+                    <label data-i18n="vigilant">Vigilant</label>
+                    <button type='roll' class="sheet-hidden" value='&{template:attrib}{{name=^{vigilant}}} {{character=@{character-name}}} {{attribute=[[@{vigilant}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_VigilantCheck'></button>
+                </div>
+            </div> 
+            <div>
+                <div>
+                    <input type="number" class="sheet-number-circle" style="font-size:1em;width:3em;height:3em;" disabled="true" value="(@{accurate}+@{cunning}+@{discreet}+@{persuasive}+@{quick}+@{resolute}+@{strong}+@{vigilant})" name="attr_attribute-total"/>
+                </div>
+                <div>
+                    <label data-i18n="total">Total</label>
+                    <button type='roll' title="What, you thought this button did something? It doesn't." data-i18n-title="title-button-does-nothing" ></button>
+                </div>
+            </div>
+        </div> <!-- END Attributes -->
+    </div>
+    <div class="sheet-row"> <!-- being Weapons -->
+        <label class="sheet-label-large" style="margin: .5em 0 -.5em 0;" data-i18n="attacks">Attacks</label>    
+        <div class="sheet-row-with-labels">
+            <div>
+                <button type='roll' name="roll_attack" title="Use attack!" data-i18n-title="title-use-attack" value='&{template:attack}{{name=@{weapon1-name}}}{{attribute=[[@{attack-ability1}+?{Enemy Disadvantage|0}+@{weapon1-extra-attack}]]}}{{attribute1=[[@{attack-ability1}+?{Enemy Disadvantage|0}+@{weapon1-extra-attack}+1]]}} {{attack=[[1d20]]}} {{damage=[[@{weapon1-dtype}+@{weapon1-extra-dtype}+@{weapon1-extra-damage}]]}} {{damage-crit=[[1d6]]}} {{character-name=@{character-name}}} {{attack-type=[[@{attack-ability1}]]}}'style="background-image:url(http://i.imgur.com/EPH4536.png);background-position:center;background-repeat:no-repeat;height:100%;width:100%"></button>
+            </div>
+            <div>
+                <label data-i18n="weapon-or-power">Weapon or Power</label>
+                <input type="text" style="font-weight:bold;width:16em;height:2em;margin:0" name="attr_weapon1-name" title="Weapon or power used in attack" data-i18n-title="title-weapon-or-power-used" />
+            </div>
+            <div class="sheet-col-medium">
+                <label data-i18n="attribute">Attribute</label>				
+                <select name="attr_attack-ability1" style="width:auto;" size="1" title="Ability that determines a hit, usually Accurate" data-i18n-title="title-attribute-explanation" >
+                    <option value="[[-1]]" data-i18n="bonus-damage-abbrv">Bonus dmg</option>
+                    <option value="[[@{accurate}]]" data-i18n="accurate" selected>Accurate</option>
+                    <option value="[[@{cunning}]]" data-i18n="cunning">Cunning</option>
+                    <option value="[[@{discreet}]]" data-i18n="discreet">Discreet</option>
+                    <option value="[[@{persuasive}]]" data-i18n="persuasive">Persuasive</option>
+                    <option value="[[@{quick}]]" data-i18n="quick">Quick</option>
+                    <option value="[[@{resolute}]]" data-i18n="resolute">Resolute</option>
+                    <option value="[[@{strong}]]" data-i18n="strong">Strong</option>
+                    <option value="[[@{vigilant}]]" data-i18n="vigilant">Vigilant</option>					
+                </select>
+            </div>
+            <div class="sheet-col-medium">
+                <label data-i18n="damage">Damage</label>
+                <select name="attr_weapon1-dtype" title="Attack roll for the weapon" data-i18n-title="title-attack-roll" style="width:55px;">                
+                    <option value="0"></option>               
+                    <option value="d4">d4</option>
+                    <option value="d6">d6</option>
+                    <option value="d8" selected>d8</option>
+                    <option value="d10">d10</option>
+                    <option value="d12">d12</option>
+                </select>
+            </div>
+            <div class="sheet-col-medium">
+                <label data-i18n="quality">Quality</label>
+				<input type="text" name="attr_weapon1-quality" title="Balanced, Blunt, Deep Impact, Jointed, Long, Precise, Short, etc." data-i18n-title="title-weapon-quality" placeholder="Balanced" data-i18n="balanced" style="width:7em;">
+            </div>
+            <div class="sheet-faded" style="margin-left:1em;">
+                <label style="width:100%;" data-i18n="bonuses-and-advantages">Bonuses/Disadvantages</label>
+                <div>
+                    <div class="sheet-col-small">
+                        <label style="text-align:center;white-space:nowrap;" data-i18n="damage">Damage</label>
+                        <input type="number" name="attr_weapon1-extra-damage" title="Bonus to damage" data-i18n-title="title-bonus-to-damage" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0"/>
+                    </div>
+                    <div class="sheet-col-small">
+                        <label style="text-align:center;white-space:nowrap;" data-i18n="roll">Roll</label>
+                        <select name="attr_weapon1-extra-dtype" style="width:48px;text-align:center;" title="Extra damage roll due to an ability" data-i18n-title="title-extra-damage-roll" >
+                            <option value="0" selected></option>
+                            <option value="d4">d4</option>
+                            <option value="d6">d6</option>
+                            <option value="d8">d8</option>
+                            <option value="d10">d10</option>
+                            <option value="d12">d12</option>
+                        </select>
+                    </div>
+                    <div class="sheet-col-small">
+                        <label style="text-align:center;white-space:nowrap;" data-i18n="attack">Attack</label>
+                        <input type="number" name="attr_weapon1-extra-attack" title="Bonus to attack roll" data-i18n-title="title-bonus-to-attack-roll" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <fieldset class="repeating_weapons">  
+            <div class="sheet-row-with-labels" style="display:block">
+                <div>
+                    <button type='roll' name="roll_attack" title="Use attack!" data-i18n-title="title-use-attack" value='&{template:attack}{{name=@{weapon1-name}}}{{attribute=[[@{attack-ability1}+?{Enemy Disdvantage|0}+@{weapon1-extra-attack}]]}}{{attribute1=[[@{attack-ability1}+?{Enemy Disdvantage|0}+@{weapon1-extra-attack}+1]]}} {{attack=[[1d20]]}} {{damage=[[@{weapon1-dtype}+@{weapon1-extra-dtype}+@{weapon1-extra-damage}]]}} {{damage-crit=[[1d6]]}} {{character-name=@{character-name}}} {{attack-type=[[@{attack-ability1}]]}}' style="background-image:url(http://i.imgur.com/EPH4536.png);background-position:center;background-repeat:no-repeat;height:100%;width:100%"></button>
+                </div>
+                <div>
+                    <input type="text" style="font-weight:bold;width:16em;height:2em;margin:0" name="attr_weapon1-name" title="Weapon or power used in attack" data-i18n-title="title-weapon-or-power-used" />
+                </div>
+                <div class="sheet-col-medium">
+                    <select name="attr_attack-ability1" style="width:auto;" size="1" title="Ability that determines a hit, usually Accurate" data-i18n-title="title-attribute-explanation" >
+                        <option value="[[-1]]" data-i18n="bonus-damage-abbrv">Bonus dmg</option>
+                        <option value="[[@{accurate}]]" data-i18n="accurate" selected>Accurate</option>
+                        <option value="[[@{cunning}]]" data-i18n="cunning">Cunning</option>
+                        <option value="[[@{discreet}]]" data-i18n="discreet">Discreet</option>
+                        <option value="[[@{persuasive}]]" data-i18n="persuasive">Persuasive</option>
+                        <option value="[[@{quick}]]" data-i18n="quick">Quick</option>
+                        <option value="[[@{resolute}]]" data-i18n="resolute">Resolute</option>
+                        <option value="[[@{strong}]]" data-i18n="strong">Strong</option>
+                        <option value="[[@{vigilant}]]" data-i18n="vigilant">Vigilant</option>
+						
+                    </select>
+                </div>
+                <div class="sheet-col-medium">
+                    <select name="attr_weapon1-dtype" title="Attack roll for the weapon" data-i18n-title="title-attack-roll" style="width:55px;">                
+                        <option value="0"></option>               
+                        <option value="d4">d4</option>
+                        <option value="d6">d6</option>
+                        <option value="d8" selected>d8</option>
+                        <option value="d10">d10</option>
+                        <option value="d12">d12</option>
+                    </select>
+                </div>
+                <div class="sheet-col-medium">
+				<input type="text" name="attr_weapon1-quality" title="Balanced, Blunt, Deep Impact, Jointed, Long, Precise, Short, etc." data-i18n-title="title-weapon-quality" placeholder="Balanced" data-i18n="balanced" style="width:7em;">
+                </div>
+                <div class="sheet-faded" style="margin-left:1em;">
+                    <div>
+                        <div class="sheet-col-small">
+                            <input type="number" name="attr_weapon1-extra-damage" title="Bonus to damage" data-i18n-title="title-bonus-to-damage" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0"/>
+                        </div>
+                        <div class="sheet-col-small">
+                            <select name="attr_weapon1-extra-dtype" style="width:48px;text-align:center;" title="Extra damage roll due to an ability" data-i18n-title="title-extra-damage-roll" >
+                                <option value="0" selected></option>
+                                <option value="d4">d4</option>
+                                <option value="d6">d6</option>
+                                <option value="d8">d8</option>
+                                <option value="d10">d10</option>
+                                <option value="d12">d12</option>
+                            </select>
+                        </div>
+                        <div class="sheet-col-small">
+                            <input type="number" name="attr_weapon1-extra-attack" title="Bonus to attack roll" data-i18n-title="title-bonus-to-attack-roll" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0" />
+                        </div>
+                    </div>
+                </div>
+            </div>    
+        </fieldset>
+    </div> <!-- END Weapons-->
+    <div class="sheet-row"><!-- Begin Armor -->
+        <label class="sheet-label-large" style="margin: .5em 0 -.5em 0;" data-i18n="defenses">Defenses</label>
+		<div class="sheet-row-with-labels">
+            <div>
+                <button type='roll' name="roll_defense" value="&{template:defense}{{name=@{armor1-name}}}{{attribute=[[@{defense-ability}+?{Enemy Disdvantage|0}+@{armor-impeding}+@{extra-armor}]]}}{{attribute1=[[1+@{defense-ability}+?{Enemy Disdvantage|0}+@{armor-impeding}+@{extra-armor}]]}}{{defense-roll=[[1d20]]}}{{damage-taken=[[@{armor1-dtype}+@{armor1-extra-dtype}+@{negated-damage}]]}}{{defense-crit=[[1d20]]}}{{damage-crit=[[1d6]]}}{{character-name=@{character-name}}} {{defense-type=[[@{defense-ability}]]}}" style="background-image:url(http://i.imgur.com/QFy0qCe.png?1);background-position:center;background-repeat:no-repeat;background-position:center;background-size:28px 28px;width:100%;height:100%"></button>
+            </div>
+            <div>
+                <label data-i18n="armor-or-power">Armor or Power</label>
+                <input type="text" style="font-weight:bold;width:14em;height:2em;margin:0" name="attr_armor1-name" title="Armor the character is wearing, or Power used to defend" data-i18n-title="title-armor-or-power-explanation" />
+            </div>
+            <div class="sheet-col-medium"> 
+				<label data-i18n="impede">Impede</label>
+                <input class="sheet-number-box-small" title="Armor's impeding penalty" data-i18n-title="title-armors-impending-penalty" type="number" min="-4" max="0" value="0" name="attr_armor-impeding" style="width:55px;"/>
+            </div>
+            <div class="sheet-col-medium">
+                <label data-i18n="attribute">Attribute</label>
+                <select name="attr_defense-ability" style="width:auto;" size="1" title="Ability that determines defense, usually Quick" data-i18n-title="title-ability-that-determines-defense" >
+                    <option value="[[-1]]" data-i18n="bonus-defense-abbrv">Bonus def</option>
+                    <option value="[[@{accurate}]]" data-i18n="accurate" selected>Accurate</option>
+                    <option value="[[@{cunning}]]" data-i18n="cunning">Cunning</option>
+                    <option value="[[@{discreet}]]" data-i18n="discreet">Discreet</option>
+                    <option value="[[@{persuasive}]]" data-i18n="persuasive">Persuasive</option>
+                    <option value="[[@{quick}]]" data-i18n="quick">Quick</option>
+                    <option value="[[@{resolute}]]" data-i18n="resolute">Resolute</option>
+                    <option value="[[@{strong}]]" data-i18n="strong">Strong</option>
+                    <option value="[[@{vigilant}]]" data-i18n="vigilant">Vigilant</option>					
+                </select>
+            </div>
+            <div class="sheet-col-medium">
+                <label data-i18n="negation">Negation</label>
+                <select name="attr_armor1-dtype" title="Defense roll for the armor" data-i18n-title="title-defense-armor" style="width:55px;">                  
+                        <option value="0"></option>                    
+                        <option value="d4" selected>d4</option>
+                        <option value="d6">d6</option>
+                        <option value="d8">d8</option>
+                        <option value="d10">d10</option>
+                        <option value="d12">d12</option>
+                    </select>
+            </div>
+            <div class="sheet-col-medium">
+                <label data-i18n="quality">Quality</label>
+                <input name="attr_armor1-quality" type="text" value="" style="width:7em;" title="Flexible, Cumbersome, etc." data-i18n-title="title-armor-quality" placeholder="Flexible" data-i18n-placeholder="flexible">
+            </div>
+            <div class="sheet-faded" style="margin-left:1em;">
+                <label style="text-align:center;" data-i18n="bonuses-and-disadvantages">Bonuses/Disadvantages</label>
+                <div class="sheet-col-small">
+                    <label style="text-align:center;white-space:nowrap;" data-i18n="damage">Damage</label>
+                    <input type="number" name="attr_negated-damage" title="Any damage reduction from skills or items" data-i18n-title="title-damage-reduction" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0"/>
+                </div>
+                <div class="sheet-col-small">
+                    <label style="text-align:center;white-space:nowrap;" data-i18n="roll">Roll</label>
+                        <select name="attr_armor1-extra-dtype" style="width:48px;text-align:center;" title="Damage negated due to an ability" data-i18n-title="title-damage-negated" >
+                            <option value="0"></option>
+                            <option value="d4">d4</option>
+                            <option value="d6">d6</option>
+                            <option value="d8">d8</option>
+                            <option value="d10">d10</option>
+                            <option value="d12">d12</option>
+                        </select>
+                </div>
+                <div class="sheet-col-small">
+                    <label style="text-align:center;white-space:nowrap;" data-i18n="defenses">Defense</label>
+                    <input type="number" name="attr_extra-armor" title="Any bonus to defense, including shields" data-i18n-title="title-any-bonus-to-defense" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0" />  
+                </div>            
+            </div>
+        </div>
+        <fieldset class="repeating_armor" ><div class="sheet-row-with-labels">
+            <div>
+                <button type='roll' name="roll_defense" value="&{template:defense}{{name=@{armor1-name}}}{{attribute=[[@{defense-ability}+?{Enemy Disdvantage|0}+@{armor-impeding}+@{extra-armor}]]}}{{attribute1=[[1+@{defense-ability}+?{Enemy Disdvantage|0}+@{armor-impeding}+@{extra-armor}]]}}{{defense-roll=[[1d20]]}}{{damage-taken=[[@{armor1-dtype}+@{armor1-extra-dtype}+@{negated-damage}]]}}{{defense-crit=[[1d20]]}}{{damage-crit=[[1d6]]}}{{character-name=@{character-name}}} {{defense-type=[[@{defense-ability}]]}}" style="background-image:url(http://i.imgur.com/QFy0qCe.png?1);background-position:center;background-repeat:no-repeat;background-position:center;background-size:28px 28px;width:100%;height:100%"></button>
+            </div>
+            <div>
+                <input type="text" style="font-weight:bold;width:14em;height:2em;margin:0" name="attr_armor1-name" title="Armor the character is wearing, or Power used to defend" data-i18n-title="title-worn-armor-or-power" />
+            </div>
+            <div class="sheet-col-medium"> 
+                <input class="sheet-number-box-small" title="Armor's impeding penalty" data-i18n-title="title-armors-impending-penalty" type="number" min="-4" max="0" value="0" name="attr_armor-impeding" style="width:55px;"/>
+            </div>
+            <div class="sheet-col-medium">
+                <select name="attr_defense-ability" style="width:auto;" size="1" title="Ability that determines defense, usually Quick" data-i18n-title="title-ability-that-determines-defense" >
+                    <option value="[[-1]]" data-i18n="bonus-defense-abbrv">Bonus def</option>
+                    <option value="[[@{accurate}]]" data-i18n="accurate">Accurate</option>
+                    <option value="[[@{cunning}]]" data-i18n="cunning">Cunning</option>
+                    <option value="[[@{discreet}]]" data-i18n="discreet">Discreet</option>
+                    <option value="[[@{persuasive}]]" data-i18n="persuasive">Persuasive</option>
+                    <option value="[[@{quick}]]" data-i18n="quick" selected>Quick</option>
+                    <option value="[[@{resolute}]]" data-i18n="resolute">Resolute</option>
+                    <option value="[[@{strong}]]" data-i18n="strong">Strong</option>
+                    <option value="[[@{vigilant}]]" data-i18n="vigilant">Vigilant</option>					
+                </select>
+            </div>
+            <div class="sheet-col-medium">
+                <select name="attr_armor1-dtype" title="Defense roll for the armor" data-i18n-title="title-defense-armor" style="width:55px;">                  
+                        <option value="0"></option>                    
+                        <option value="d4" selected>d4</option>
+                        <option value="d6">d6</option>
+                        <option value="d8">d8</option>
+                        <option value="d10">d10</option>
+                        <option value="d12">d12</option>
+                    </select>
+            </div>
+            <div class="sheet-col-medium">
+				<input name="attr_armor1-quality" type="text" value="" style="width:7em;" title="Flexible, Cumbersome, etc." data-i18n-title="title-armor-quality" placeholder="Flexible" data-i18n-placeholder="flexible">
+            </div>
+            <div class="sheet-faded" style="margin-left:1em;">
+                <div class="sheet-col-small">
+                    <input type="number" name="attr_negated-damage" title="Any damage reduction from skills or items" data-i18n-title="title-damage-reduction" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0"/>
+                </div>
+                <div class="sheet-col-small">
+					<select name="attr_armor1-extra-dtype" style="width:48px;text-align:center;" title="Damage negated due to an ability" data-i18n-title="title-damage-negated" >
+						<option value="0"></option>
+						<option value="d4">d4</option>
+						<option value="d6">d6</option>
+						<option value="d8">d8</option>
+						<option value="d10">d10</option>
+						<option value="d12">d12</option>
+					</select>
+                </div>
+                <div class="sheet-col-small">
+                    <input type="number" name="attr_extra-armor" title="Any bonus to defense, including shields" data-i18n-title="title-any-bonus-to-defense" class="sheet-number-box-small" style="vertical-align:top;width:48px;text-align:center;" value="0" />  
+                </div>            
+            </div>
+        </div>
+        </fieldset>
+    </div> <!-- END Armor-->
+</div>
+
+<!-- *******  PAGE 2 -->
+<div class="sheet-section sheet-section-pc2"> 
+    <div class="sheet-row">
+        <div class="sheet-2colrow">
+            <div class="sheet-col">
+                <label class="sheet-label-large" data-i18n="traits">Traits</label>
+                <div class="sheet-ability-section">
+                    <div>
+                        <input type="text" name="attr_traitname" title="Trait name" data-i18n-title="title-trait-name" placeholder="Name" data-i18n-placeholder="name" />
+                    </div>
+                    <div>
+                        <button type="roll" title="Trait Check" data-i18n-title="title-trait-check" class="sheet-hidden sheet-roll" value='&{template:abilitycheck}{{name=^{trait}: @{traitname}}} {{character=@{character-name}}} {{selected=@{traitattribute}}} {{attribute=[[@{traitattribute}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_TraitCheck'></button>
+                        <select name="attr_traitattribute" style="width:auto;" size="1" title="Attribute for Trait Check" data-i18n-title="title-trait-ability" >
+                            <option value="[[-1]]" data-i18n="select" selected>Select</option>
+                            <option value="[[@{accurate}]]" data-i18n="accurate">Accurate</option>
+                            <option value="[[@{cunning}]]" data-i18n="cunning">Cunning</option>
+                            <option value="[[@{discreet}]]" data-i18n="discreet">Discreet</option>
+                            <option value="[[@{persuasive}]]" data-i18n="persuasive">Persuasive</option>
+                            <option value="[[@{quick}]]" data-i18n="quick">Quick</option>
+                            <option value="[[@{resolute}]]" data-i18n="resolute">Resolute</option>
+                            <option value="[[@{strong}]]" data-i18n="strong">Strong</option>
+                            <option value="[[@{vigilant}]]" data-i18n="vigilant">Vigilant</option>					
+                        </select>
+                        <select name="attr_trait-type" title="Trait action type" data-i18n-title="title-trait-action-type" >
+                            <option value="1" data-i18n="active">Active</option>
+                            <option value="2" data-i18n="free">Free</option>
+                            <option value="3" data-i18n="passive">Passive</option>
+                        	<option value="4" data-i18n="reactive">Reactive</option>
+                        	<option value="5" data-i18n="special" selected>Special</option>
+                        </select>
+                        <div class="sheet-faded-nam">
+                            <input type="checkbox" name="attr_trait-level" value="1" title="Novice" data-i18n-title="title-novice" /><span>N</span>
+                            <input type="checkbox" name="attr_trait-level" value="2" title="Adept" data-i18n-title="title-adept" /><span>A</span>
+                            <input type="checkbox" name="attr_trait-level" value="3" title="Master" data-i18n-title="title-master" /><span>M</span>
+                        </div>
+                    </div>
+                    <textarea name="attr_traitdesc" title="Trait description" data-i18n-title="title-trait-description" placeholder="Effect" data-i18n-placeholder="effect"></textarea>
+                </div>
+                <fieldset class="repeating_trait">
+					<div class="sheet-ability-section">
+                        <div>
+                            <input type="text" name="attr_traitname" title="Trait name" data-i18n-title="title-trait-name" placeholder="Name" data-i18n-placeholder="name" />
+                        </div>
+                        <div>
+                            <button type="roll" title="Trait Check" data-i18n-title="title-trait-check" class="sheet-hidden sheet-roll" value='&{template:abilitycheck}{{name=^{trait}: @{traitname}}} {{character=@{character-name}}} {{selected=@{traitattribute}}} {{attribute=[[@{traitattribute}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_TraitCheck'></button>
+                            <select name="attr_traitattribute" style="width:auto;" size="1" title="Attribute for Trait Check" data-i18n-title="title-trait-ability" >
+                                <option value="[[-1]]" data-i18n="select" selected>Select</option>
+                                <option value="[[@{accurate}]]" data-i18n="accurate">Accurate</option>
+                                <option value="[[@{cunning}]]" data-i18n="cunning">Cunning</option>
+                                <option value="[[@{discreet}]]" data-i18n="discreet">Discreet</option>
+                                <option value="[[@{persuasive}]]" data-i18n="persuasive">Persuasive</option>
+                                <option value="[[@{quick}]]" data-i18n="quick">Quick</option>
+                                <option value="[[@{resolute}]]" data-i18n="resolute">Resolute</option>
+                                <option value="[[@{strong}]]" data-i18n="strong">Strong</option>
+                                <option value="[[@{vigilant}]]" data-i18n="vigilant">Vigilant</option>					
+                            </select>
+                            <select name="attr_trait-type" title="Trait action type" data-i18n-title="title-trait-action-type" >
+                                <option value="1" data-i18n="active">Active</option>
+                                <option value="2" data-i18n="free">Free</option>
+                                <option value="3" data-i18n="passive">Passive</option>
+                            	<option value="4" data-i18n="reactive">Reactive</option>
+                            	<option value="5" data-i18n="special" selected>Special</option>
+                            </select>
+                            <div class="sheet-faded-nam">
+                                <input type="checkbox" name="attr_trait-level" value="1" title="Novice" data-i18n-title="title-novice" /><span>N</span>
+                                <input type="checkbox" name="attr_trait-level" value="2" title="Adept" data-i18n-title="title-adept" /><span>A</span>
+                                <input type="checkbox" name="attr_trait-level" value="3" title="Master" data-i18n-title="title-master" /><span>M</span>
+                            </div>
+                        </div>
+                        <textarea name="attr_traitdesc" title="Trait description" data-i18n-title="title-trait-description" placeholder="Effect" data-i18n-placeholder="effect"></textarea>
+                    </div>
+                </fieldset>
+<!-- Boons -->
+                <label class="sheet-label-large" data-i18n="boons">Boons</label>
+                <div class="sheet-ability-section">
+                    <div>
+                        <input type="text" name="attr_boonname" title="boon name" data-i18n-title="title-boon-name" placeholder="Name" data-i18n-placeholder="name" />
+                        <select name="attr_boon-type" title="boon action type" data-i18n-title="title-boon-action-type" >
+                            <option value="1" data-i18n="active">Active</option>
+                            <option value="2" data-i18n="free">Free</option>
+                            <option value="3" data-i18n="passive">Passive</option>
+                        	<option value="4" data-i18n="reactive">Reactive</option>
+                        	<option value="5" data-i18n="special" selected>Special</option>
+                        </select>
+                        <div class="sheet-faded-nam">
+                            <input type="checkbox" name="attr_boon-level" value="1" title="Novice" data-i18n-title="title-novice" /><span>N</span>
+                            <input type="checkbox" name="attr_boon-level" value="2" title="Adept" data-i18n-title="title-adept" /><span>A</span>
+                            <input type="checkbox" name="attr_boon-level" value="3" title="Master" data-i18n-title="title-master" /><span>M</span>
+                        </div>
+                    </div>
+                    <textarea name="attr_boondesc" title="boon description" data-i18n-title="title-boon-description" placeholder="Effect" data-i18n-placeholder="effect"></textarea>
+                </div>
+                <fieldset class="repeating_boon">
+                <div class="sheet-ability-section">
+                    <div>
+                        <input type="text" name="attr_boonname" title="boon name" data-i18n-title="title-boon-name" placeholder="Name" data-i18n-placeholder="name" />
+                        <select name="attr_boon-type" title="boon action type" data-i18n-title="title-boon-action-type" >
+                            <option value="1" data-i18n="active">Active</option>
+                            <option value="2" data-i18n="free">Free</option>
+                            <option value="3" data-i18n="passive">Passive</option>
+                        	<option value="4" data-i18n="reactive">Reactive</option>
+                        	<option value="5" data-i18n="special" selected>Special</option>
+                        </select>
+                        <div class="sheet-faded-nam">
+                            <input type="checkbox" name="attr_boon-level" value="1" title="Novice" data-i18n-title="title-novice" /><span>N</span>
+                            <input type="checkbox" name="attr_boon-level" value="2" title="Adept" data-i18n-title="title-adept" /><span>A</span>
+                            <input type="checkbox" name="attr_boon-level" value="3" title="Master" data-i18n-title="title-master" /><span>M</span>
+                        </div>
+                    </div>
+                    <textarea name="attr_boondesc" title="boon description" data-i18n-title="title-boon-description" placeholder="Effect" data-i18n-placeholder="effect"></textarea>
+                </div>
+                </fieldset>				
+<!-- Burdens -->
+                <label class="sheet-label-large" data-i18n="burdens">Burdens</label> 
+                <div class="sheet-ability-section">
+                    <div>
+                        <input type="text" name="attr_burdenname" title="burden Name" data-i18n-title="title-burden-name" placeholder="Name" data-i18n-placeholder="name" />
+                        <select name="attr_burden-type" title="burden action type" data-i18n-title="title-burden-action-type" >
+                            <option value="1" data-i18n="active" selected>Active</option>
+                            <option value="2" data-i18n="free">Free</option>
+                            <option value="3" data-i18n="passive">Passive</option>
+                        	<option value="4" data-i18n="reactive">Reactive</option>
+                        	<option value="5" data-i18n="special">Special</option>
+                        </select>
+                        <div class="sheet-faded-nam">		
+                            <input type="checkbox" name="attr_burden-level" value="1" title="Novice" data-i18n-title="title-novice" /><span>N</span>
+                            <input type="checkbox" name="attr_burden-level" value="2" title="Adept" data-i18n-title="title-adept" /><span>A</span>
+                            <input type="checkbox" name="attr_burden-level" value="3" title="Master" data-i18n-title="title-master" /><span>M</span>
+                        </div>
+                    </div>
+                    <textarea name="attr_burdendesc" title="burden description" data-i18n-title="title-burden-description" placeholder="Effect" data-i18n-placeholder="effect"></textarea>
+                </div>
+                <fieldset class="repeating_burdens">
+                <div class="sheet-ability-section">
+                    <div>
+                        <input type="text" name="attr_burdenname" title="burden Name" data-i18n-title="title-burden-name" placeholder="Name" data-i18n-placeholder="name" />
+                        <select name="attr_burden-type" title="burden action type" data-i18n-title="title-burden-action-type" >
+                            <option value="1" data-i18n="active" selected>Active</option>
+                            <option value="2" data-i18n="free">Free</option>
+                            <option value="3" data-i18n="passive">Passive</option>
+                        	<option value="4" data-i18n="reactive">Reactive</option>
+                        	<option value="5" data-i18n="special">Special</option>
+                        </select>
+                        <div class="sheet-faded-nam">		
+                            <input type="checkbox" name="attr_burden-level" value="1" title="Novice" data-i18n-title="title-novice" /><span>N</span>
+                            <input type="checkbox" name="attr_burden-level" value="2" title="Adept" data-i18n-title="title-adept" /><span>A</span>
+                            <input type="checkbox" name="attr_burden-level" value="3" title="Master" data-i18n-title="title-master" /><span>M</span>
+                        </div>
+                    </div>
+                    <textarea name="attr_burdendesc" title="burden description" data-i18n-title="title-burden-description" placeholder="Effect" data-i18n-placeholder="effect"></textarea>
+                    </div>
+                </fieldset>	
+            </div>     
+<!-- Abilities -->
+            <div class="sheet-col" > 
+                <label class="sheet-label-large" data-i18n="abilities">Abilities</label> 
+                <div class="sheet-ability-section">
+                    <div>
+                        <input type="text" name="attr_abilityname" title="Ability Name" data-i18n-title="title-ability-name" placeholder="Name" data-i18n-placeholder="name" />
+                    </div>
+                    <div>
+                        <button type="roll" title="Ability Check" data-i18n-title="title-ability-check" class="sheet-hidden sheet-roll" value='&{template:abilitycheck}{{name=^{ability}: @{abilityname}}} {{character=@{character-name}}} {{selected=@{abilityattribute}}} {{attribute=[[@{abilityattribute}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_AbilityCheck'></button>
+                        <select name="attr_abilityattribute" style="width:auto;" size="1" title="Attribute for Ability Check" data-i18n-title="title-attribute-ability" >
+                            <option value="[[-1]]" data-i18n="select" selected>Select</option>
+                            <option value="[[@{accurate}]]" data-i18n="accurate">Accurate</option>
+                            <option value="[[@{cunning}]]" data-i18n="cunning">Cunning</option>
+                            <option value="[[@{discreet}]]" data-i18n="discreet">Discreet</option>
+                            <option value="[[@{persuasive}]]" data-i18n="persuasive">Persuasive</option>
+                            <option value="[[@{quick}]]" data-i18n="quick">Quick</option>
+                            <option value="[[@{resolute}]]" data-i18n="resolute">Resolute</option>
+                            <option value="[[@{strong}]]" data-i18n="strong">Strong</option>
+                            <option value="[[@{vigilant}]]" data-i18n="vigilant">Vigilant</option>					
+                        </select>
+                        <select name="attr_action-type" title="Ability action type" data-i18n-title="title-ability-action-type" >
+                            <option value="1" data-i18n="active" selected>Active</option>
+                            <option value="2" data-i18n="free">Free</option>
+                            <option value="3" data-i18n="passive">Passive</option>
+                        	<option value="4" data-i18n="reactive">Reactive</option>
+                        	<option value="5" data-i18n="special">Special</option>
+                        </select>
+                        <div class="sheet-faded-nam">		
+                            <input type="checkbox" name="attr_skill-level" value="1" title="Novice" data-i18n-title="title-novice" /><span>N</span>
+                            <input type="checkbox" name="attr_skill-level" value="2" title="Adept" data-i18n-title="title-adept" /><span>A</span>
+                            <input type="checkbox" name="attr_skill-level" value="3" title="Master" data-i18n-title="title-master" /><span>M</span>
+                        </div>
+                    </div>
+                    <textarea name="attr_abilitydesc" title="Ability description" data-i18n-title="title-ability-description" placeholder="Effect" data-i18n-placeholder="effect"></textarea>
+                </div>
+                <fieldset class="repeating_abilities">
+                <div class="sheet-ability-section">
+                    <div>
+                        <input type="text" name="attr_abilityname" title="Ability Name" data-i18n-title="title-ability-name" placeholder="Name" data-i18n-placeholder="name" />
+                    </div>
+                    <div>
+                        <button type="roll" title="Ability Check" data-i18n-title="title-ability-check" class="sheet-hidden sheet-roll" value='&{template:abilitycheck}{{name=^{ability}: @{abilityname}}} {{character=@{character-name}}} {{selected=@{abilityattribute}}} {{attribute=[[@{abilityattribute}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_AbilityCheck'></button>
+                        <select name="attr_abilityattribute" style="width:auto;" size="1" title="Attribute for Ability Check" data-i18n-title="title-attribute-ability" >
+                            <option value="[[-1]]" data-i18n="select" selected>Select</option>
+                            <option value="[[@{accurate}]]" data-i18n="accurate">Accurate</option>
+                            <option value="[[@{cunning}]]" data-i18n="cunning">Cunning</option>
+                            <option value="[[@{discreet}]]" data-i18n="discreet">Discreet</option>
+                            <option value="[[@{persuasive}]]" data-i18n="persuasive">Persuasive</option>
+                            <option value="[[@{quick}]]" data-i18n="quick">Quick</option>
+                            <option value="[[@{resolute}]]" data-i18n="resolute">Resolute</option>
+                            <option value="[[@{strong}]]" data-i18n="strong">Strong</option>
+                            <option value="[[@{vigilant}]]" data-i18n="vigilant">Vigilant</option>					
+                        </select>
+                        <select name="attr_action-type" title="Ability action type" data-i18n-title="title-ability-action-type" >
+                            <option value="1" data-i18n="active" selected>Active</option>
+                            <option value="2" data-i18n="free">Free</option>
+                            <option value="3" data-i18n="passive">Passive</option>
+                        	<option value="4" data-i18n="reactive">Reactive</option>
+                        	<option value="5" data-i18n="special">Special</option>
+                        </select>
+                        <div class="sheet-faded-nam">		
+                            <input type="checkbox" name="attr_skill-level" value="1" title="Novice" data-i18n-title="title-novice" /><span>N</span>
+                            <input type="checkbox" name="attr_skill-level" value="2" title="Adept" data-i18n-title="title-adept" /><span>A</span>
+                            <input type="checkbox" name="attr_skill-level" value="3" title="Master" data-i18n-title="title-master" /><span>M</span>
+                        </div>
+                    </div>
+                    <textarea name="attr_abilitydesc" title="Ability description" data-i18n-title="title-ability-description" placeholder="Effect" data-i18n-placeholder="effect"></textarea>
+                </div>
+                </fieldset>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- *******  PAGE 3 -->
+<div class="sheet-section sheet-section-pc3">   
+    <div class="sheet-row">
+        <div class="sheet-2colrow">
+            <div class="sheet-col" >  <!-- BEGIN Column1 -->
+                <label class="sheet-label-large" data-i18n="rituals">Rituals</label>    
+                <div class="sheet-ability-section">
+                    <div> 
+                        <input type="text" name="attr_ritual-name" title="Ritual name" data-i18n-title="title-ritual-name" placeholder="Name" data-i18n-placeholder="name" />
+                    </div>
+                    <div>
+                        <button type="roll" title="Ritual Check" data-18n="title-ritual-check" class="sheet-hidden sheet-roll" value='&{template:powercheck}{{name=^{ritual}: @{ritual-name}}} {{character=@{character-name}}} {{selected=@{ritualattribute}}} {{attribute=[[@{ritualattribute}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_RitualCheck'></button>
+                        <select name="attr_ritualattribute" style="width:auto;" size="1" title="Attribute for Ritual" data-i18n-title="title-power-attribute" >
+                            <option value="[[@{accurate}]]" data-i18n="accurate">Accurate</option>
+                            <option value="[[@{cunning}]]" data-i18n="cunning">Cunning</option>
+                            <option value="[[@{discreet}]]" data-i18n="discreet">Discreet</option>
+                            <option value="[[@{persuasive}]]" data-i18n="persuasive">Persuasive</option>
+                            <option value="[[@{quick}]]" data-i18n="quick">Quick</option>
+                            <option value="[[@{resolute}]]" data-i18n="resolute" selected>Resolute</option>
+                            <option value="[[@{strong}]]" data-i18n="strong">Strong</option>
+                            <option value="[[@{vigilant}]]" data-i18n="vigilant">Vigilant</option>					
+                        </select>
+                        <select name="attr_ritual-corruption" title="Temporary Corruption when power is used" data-i18n-title="title-temporary-corruption-when-ritual-is-used">
+                                <option value="0" selected>-</option>
+                                <option value="[[1]]" >1</option>
+                                <option value="[[1d4]]" >1d4</option>
+                                <option value="[[1d6]]" >1d6</option>
+                                <option value="[[1d8]]" >1d8</option>
+                        </select>
+                        <span data-i18n="temporary-corruption-abbrv">Temp Corruption</span>
+                    </div>
+                    <textarea name="attr_ritualdesc" title="Ritual description" data-i18n-title="title-ritual-description" placeholder="Effect" data-i18n-placeholder="effect"></textarea>
+                </div>
+                <fieldset class="repeating_ritual">
+                <div class="sheet-ability-section">
+                    <div> 
+                        <input type="text" name="attr_ritual-name" title="Ritual name" data-i18n-title="title-ritual-name" placeholder="Name" data-i18n-placeholder="name" />
+                    </div>
+                    <div>
+                        <button type="roll" title="Ritual Check" data-18n="title-ritual-check" class="sheet-hidden sheet-roll" value='&{template:powercheck}{{name=^{ritual}: @{ritual-name}}} {{character=@{character-name}}} {{selected=@{ritualattribute}}} {{attribute=[[@{ritualattribute}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_RitualCheck'></button>
+                        <select name="attr_ritualattribute" style="width:auto;" size="1" title="Attribute for Ritual" data-i18n-title="title-power-attribute" >
+                            <option value="[[@{accurate}]]" data-i18n="accurate">Accurate</option>
+                            <option value="[[@{cunning}]]" data-i18n="cunning">Cunning</option>
+                            <option value="[[@{discreet}]]" data-i18n="discreet">Discreet</option>
+                            <option value="[[@{persuasive}]]" data-i18n="persuasive">Persuasive</option>
+                            <option value="[[@{quick}]]" data-i18n="quick">Quick</option>
+                            <option value="[[@{resolute}]]" data-i18n="resolute" selected>Resolute</option>
+                            <option value="[[@{strong}]]" data-i18n="strong">Strong</option>
+                            <option value="[[@{vigilant}]]" data-i18n="vigilant">Vigilant</option>					
+                        </select>
+                        <select name="attr_ritual-corruption" title="Temporary Corruption when power is used" data-i18n-title="title-temporary-corruption-when-ritual-is-used">
+                                <option value="0" selected>-</option>
+                                <option value="[[1]]" >1</option>
+                                <option value="[[1d4]]" >1d4</option>
+                                <option value="[[1d6]]" >1d6</option>
+                                <option value="[[1d8]]" >1d8</option>
+                        </select>
+                        <span data-i18n="temporary-corruption-abbrv">Temp Corruption</span>
+                    </div>
+                    <textarea name="attr_ritualdesc" title="Ritual description" data-i18n-title="title-ritual-description" placeholder="Effect" data-i18n-placeholder="effect"></textarea>
+                </div>
+                </fieldset>
+            </div> 
+<!-- END column 1 -->  
+<!-- BEGIN Column2 -->
+            <div class="sheet-col" >  
+                <label class="sheet-label-large" data-i18n="mystical-powers">Mystical Powers</label> 
+                <div class="sheet-ability-section">
+                    <div>
+                        <input type="text" name="attr_powername" title="Power's name" data-i18n-title="title-powers-name" placeholder="Name" data-i18n-placeholder="name" /> 
+                    </div>
+                    <div>
+                        <button type="roll" title="Mystical Power Check" data-i18n-title="title-mystical-power-check" class="sheet-hidden sheet-roll" value='&{template:powercheck}{{name=^{power}: @{powername}}} {{character=@{character-name}}} {{selected=@{powerattribute}}} {{attribute=[[@{powerattribute}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_PowerCheck'></button>
+                        <select name="attr_powerattribute" style="width:auto;" size="1" title="Attribute for Mystical Power" data-i18n-title="title-mystical-power-attribute" >
+                            <option value="[[@{accurate}]]" data-i18n="accurate">Accurate</option>
+                            <option value="[[@{cunning}]]" data-i18n="cunning">Cunning</option>
+                            <option value="[[@{discreet}]]" data-i18n="discreet">Discreet</option>
+                            <option value="[[@{persuasive}]]" data-i18n="persuasive">Persuasive</option>
+                            <option value="[[@{quick}]]" data-i18n="quick">Quick</option>
+                            <option value="[[@{resolute}]]" data-i18n="resolute" selected>Resolute</option>
+                            <option value="[[@{strong}]]" data-i18n="strong">Strong</option>
+                            <option value="[[@{vigilant}]]" data-i18n="vigilant">Vigilant</option>					
+                        </select>
+                        <select name="attr_power-corruption" title="Temporary Corruption when power is used" data-i18n-title="title-temporary-corruption-when-power-is-used" >
+                                <option value="0" selected>-</option>
+                                <option value="[[1]]" >1</option>
+                                <option value="[[1d4]]" >1d4</option>
+                                <option value="[[1d6]]" >1d6</option>
+                                <option value="[[1d8]]" >1d8</option>
+                        </select>
+                        <div class="sheet-faded-nam">
+                            <input type="checkbox" name="attr_power-level" value="1" title="Novice" data-i18n-title="title-novice" /><span>N</span>
+                            <input type="checkbox" name="attr_power-level" value="2" title="Adept" data-i18n-title="title-adept" /><span>A</span>
+                            <input type="checkbox" name="attr_power-level" value="3" title="Master" data-i18n-title="title-master" /><span>M</span>
+                        </div>
+                    </div>
+                    <textarea name="attr_powerdesc" title="Power description" data-i18n-title="title-power-description" placeholder="Effect" data-i18n-placeholder="effect"></textarea>
+                </div>
+                <fieldset class="repeating_power">
+                <div class="sheet-ability-section">
+                    <div>
+                        <input type="text" name="attr_powername" title="Power's name" data-i18n-title="title-powers-name" placeholder="Name" data-i18n-placeholder="name" /> 
+                    </div>
+                    <div>
+                        <button type="roll" title="Mystical Power Check" data-i18n-title="title-mystical-power-check" class="sheet-hidden sheet-roll" value='&{template:powercheck}{{name=^{power}: @{powername}}} {{character=@{character-name}}} {{selected=@{powerattribute}}} {{attribute=[[@{powerattribute}+?{Enemy Disadvantage|0}]]}} {{roll=[[1d20]]}} ' name='roll_PowerCheck'></button>
+                        <select name="attr_powerattribute" style="width:auto;" size="1" title="Attribute for Mystical Power" data-i18n-title="title-mystical-power-attribute" >
+                            <option value="[[@{accurate}]]" data-i18n="accurate">Accurate</option>
+                            <option value="[[@{cunning}]]" data-i18n="cunning">Cunning</option>
+                            <option value="[[@{discreet}]]" data-i18n="discreet">Discreet</option>
+                            <option value="[[@{persuasive}]]" data-i18n="persuasive">Persuasive</option>
+                            <option value="[[@{quick}]]" data-i18n="quick">Quick</option>
+                            <option value="[[@{resolute}]]" data-i18n="resolute" selected>Resolute</option>
+                            <option value="[[@{strong}]]" data-i18n="strong">Strong</option>
+                            <option value="[[@{vigilant}]]" data-i18n="vigilant">Vigilant</option>					
+                        </select>
+                        <select name="attr_power-corruption" title="Temporary Corruption when power is used" data-i18n-title="title-temporary-corruption-when-power-is-used" >
+                                <option value="0" selected>-</option>
+                                <option value="[[1]]" >1</option>
+                                <option value="[[1d4]]" >1d4</option>
+                                <option value="[[1d6]]" >1d6</option>
+                                <option value="[[1d8]]" >1d8</option>
+                        </select>
+                        <div class="sheet-faded-nam">
+                            <input type="checkbox" name="attr_power-level" value="1" title="Novice" data-i18n-title="title-novice" /><span>N</span>
+                            <input type="checkbox" name="attr_power-level" value="2" title="Adept" data-i18n-title="title-adept" /><span>A</span>
+                            <input type="checkbox" name="attr_power-level" value="3" title="Master" data-i18n-title="title-master" /><span>M</span>
+                        </div>
+                    </div>
+                    <textarea name="attr_powerdesc" title="Power description" data-i18n-title="title-power-description" placeholder="Effect" data-i18n-placeholder="effect"></textarea>
+                </div>
+                </fieldset>                    
+            </div> <!-- END column 2 -->
+        </div>
+    </div>
+</div>
+<!-- *******  PAGE 4 -->
+<div class="sheet-section sheet-section-pc4">
+    <div class="sheet-row" style="text-align:center">
+        <div>
+            <div style="display:inline-block;">
+                <label style="text-align:center;padding:0;margin:0;" data-i18n="currency-thaler">Thaler</label>
+                <input type="number" class="sheet-number-box-small" value="0" name="attr_player-thaler" style="width:4em;"/>
+            </div>
+            <div style="display:inline-block;">
+                <label style="text-align:center;padding:0;margin:0;" data-i18n="currency-shilling">Shilling</label>
+                <input type="number" class="sheet-number-box-small" value="0" name="attr_player-shilling" style="width:4em;"/>
+            </div>
+            <div style="display:inline-block;">
+                <label style="text-align:center;padding:0;margin:0;" data-i18n="currency-orteg">Orteg</label>
+                <input type="number" class="sheet-number-box-small" value="0" name="attr_player-orteg" style="width:4em;"/>
+            </div>
+        </div>
+    </div>
+    <div class="sheet-row">
+        <div class="sheet-2colrow">
+            <div class="sheet-col">
+                <div style="margin-bottom:1em;">
+                    <label class="sheet-label-large" data-i18n="detailed-equipment-and-artifacts">Detailed Equipment & Artifacts</label>
+                    <div style="margin-bottom:4px">
+                        <div class="sheet-faded" style="height:100%; margin-left:-1em;">
+                            <input type="checkbox" name="attr_artifact-isBound" title="Bound to player" data-i18n-title="title-bond-to-player" />
+                            <input type="text" name="attr_artifact-name" title="Name" data-i18n-title="name" placeholder="Name" data-i18n-placeholder="name" />
+                            <select name="attr_artifact-corruption" title="Temporary Corruption when equipment or artifacts is used" data-i18n-title="title-temporary-corruption-when-equipment-is-used">
+                                    <option value="0" selected>-</option>
+                                    <option value="[[1]]" >1</option>
+                                    <option value="[[1d4]]" >1d4</option>
+                                    <option value="[[1d6]]" >1d6</option>
+                                    <option value="[[1d8]]" >1d8</option>
+                            </select>
+                            <span data-i18n="temporary-corruption">Temp Corruption</span>
+                        </div>
+                        <textarea name="attr_artifact-description" style="height:2em" title="Description" data-i18n-title="description" placeholder="Description" data-i18n-placeholder="description"></textarea>
+                    </div>
+                    <fieldset class="repeating_artifacts" style="margin-bottom:4px">
+                        <div class="sheet-faded" style="height:100%; margin-left:-1em;">
+                            <input type="checkbox" name="attr_artifact-isBound" title="Bound to player" data-i18n-title="title-bond-to-player" />
+                            <input type="text" name="attr_artifact-name" title="Name" data-i18n-title="name" placeholder="Name" data-i18n-placeholder="name" />
+                            <select name="attr_artifact-corruption" title="Temporary Corruption when equipment or artifacts is used" data-i18n-title="title-temporary-corruption-when-equipment-is-used">
+                                    <option value="0" selected>-</option>
+                                    <option value="[[1]]" >1</option>
+                                    <option value="[[1d4]]" >1d4</option>
+                                    <option value="[[1d6]]" >1d6</option>
+                                    <option value="[[1d8]]" >1d8</option>
+                            </select>
+                            <span data-i18n="temporary-corruption">Temp Corruption</span>
+                        </div>
+                        <textarea name="attr_artifact-description" style="height:2em" title="Description" data-i18n-title="description" placeholder="Description" data-i18n-placeholder="description"></textarea>
+                    </fieldset>
+                </div>
+                <div style="margin-bottom:1em;">
+                    <label class="sheet-label-large" data-i18n="items">Items</label>
+                    <div>
+                        <input type="text" style="width:290px" name="attr_item-sleeping-roll" title="Standard Equipment" data-i18n-title="title-standard-equipment" value="Sleeping roll"/>
+                        <input type="number" class="sheet-number-box-small" name="attr_item-sleeping-roll-quantity" value="1" title="Item Quantity" data-i18n-title="title-item-quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                    </div>
+                    <div>
+                        <input type="text" style="width:290px" name="attr_item-cooking-pan" title="Standard Equipment" data-i18n-title="title-standard-equipment" value="Cooking equipment"/>
+                        <input type="number" class="sheet-number-box-small" name="attr_item-cooking-pan-quantity" value="1" title="Item Quantity" data-i18n-title="title-item-quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                    </div>
+                    <div>
+                        <input type="text" style="width:290px" name="attr_item-firewood" title="Standard Equipment" data-i18n-title="title-standard-equipment" value="Firewood"/>
+                        <input type="number" class="sheet-number-box-small" name="attr_item-firewood-quantity" value="1" title="Item Quantity" data-i18n-title="title-item-quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                    </div>
+                    <div>
+                        <input type="text" style="width:290px" name="attr_item-flint-and-steel" title="Standard Equipment" data-i18n-title="title-standard-equipment" value="Flint and Steel"/>
+                        <input type="number" class="sheet-number-box-small" name="attr_item-flint-and-steel-quantity" value="1" title="Item Quantity" data-i18n-title="title-item-quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                    </div>
+                    <div>
+                        <input type="text" style="width:290px" name="attr_item-rope" title="Standard Equipment" data-i18n-title="title-standard-equipment" value="Rope"/>
+                        <input type="number" class="sheet-number-box-small" name="attr_item-rope-quantity" value="1" title="Item Quantity" data-i18n-title="title-item-quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                    </div>
+                    <div>
+                        <input type="text" style="width:290px" name="attr_item-waterskin" title="Standard Equipment" data-i18n-title="title-standard-equipment" value="Waterskin"/>
+                        <input type="number" class="sheet-number-box-small" name="attr_item-waterskin-quantity" value="1" title="Item Quantity" data-i18n-title="title-item-quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                    </div>
+                    <fieldset class="repeating_item">
+                        <input type="text" style="width:290px" name="attr_item-name" title="Item Name" data-i18n-title="title-item-name" placeholder="Item Name" data-i18n-placeholder="item-name" />
+                        <input type="number" class="sheet-number-box-small" name="attr_item-quantity" value="1" title="Item Quantity" data-i18n-title="title-item-quantity" style="width:5em;text-align:left;padding-left:.5em;"/>
+                    </fieldset>
+                </div>
+            </div> <!-- END column 1 -->
+            <div class="sheet-col">
+                <div class="sheet-ability-section">
+                    <label style="font-size:3em;margin-bottom:-.75em;margin-left:-16px;">&ldquo;</label>
+                    <textarea name="attr_character-quote"style="height:2em;width:100%;background:rgba(1,1,1,0.5);border:none;color:#fafafa;font-size:1.5em;padding:.5em;font-style:italic;" placeholder="Quote" data-i18n-placeholder="quote" ></textarea> 
+                    <span style="font-size:3em;float:right;margin-right:-18px;margin-top:-.25em;width:auto;">&rdquo;</span>
+                </div>
+                <div class="sheet-ability-section">
+                    <label class="sheet-label-large" data-i18n="character-background">Character Background</label>
+                    <textarea name="attr_background" data-i18n-title="character-background" title="Explain where your character comes from and where he or she wants to go and accomplish." placeholder="Explain where your character comes from and where he or she wants to go and accomplish." data-i18n-placeholder="character-background"></textarea>
+                </div>
+                <div class="sheet-ability-section">
+                    <label class="sheet-label-large" data-i18n="group">Group</label>
+                    <input type="text" name="attr_groupName" title="Group Name" data-i18n-title="group-name" placeholder="Group Name" data-i18n-placeholder="group-name" />
+                    <textarea name="attr_groupGoal"style="height:3.5em;" title="Group Goal" data-i18n-title="group-goal" placeholder="Group Goal" data-i18n-placeholder="group-goal"></textarea>
+                </div>
+                <div class="sheet-ability-section">
+                    <label class="sheet-label-large" data-i18n="friends">Friends</label>
+                    <div style="margin-bottom:4px;">
+                        <input type="text" name="attr_friendName" title="Friend Name" data-i18n-title="friends-name" placeholder="Friend Name" data-i18n-placeholder="friends-name" />
+                        <input type="text" name="attr_friendRace" title="Friend Race" data-i18n-title="friends-race" placeholder="Friend Race" data-i18n-placeholder="friends-race" />
+                        <input type="text" name="attr_friendOccupation" title="Friend Occupation" data-i18n-title="friends-occupation" placeholder="Friend Occupation" data-i18n-placeholder="friends-occupation" />
+                        <input type="text" name="attr_friendPlayer" title="Player" data-i18n-title="player" placeholder="Player" data-i18n-placeholder="player" />
+                    </div>
+                    <fieldset class="repeating_friends-list">  
+                        <div style="margin-bottom:4px;">
+                            <input type="text" name="attr_friendName" title="Friend Name" data-i18n-title="friends-name" placeholder="Friend Name" data-i18n-placeholder="friends-name" />
+                            <input type="text" name="attr_friendRace" title="Friend Race" data-i18n-title="friends-race" placeholder="Friend Race" data-i18n-placeholder="friends-race" />
+                            <input type="text" name="attr_friendOccupation" title="Friend Occupation" data-i18n-title="friends-occupation" placeholder="Friend Occupation" data-i18n-placeholder="friends-occupation" />
+                            <input type="text" name="attr_friendPlayer" title="Player" data-i18n-title="player" placeholder="Player" data-i18n-placeholder="player" />
+                        </div>                  
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<rolltemplate class="sheet-rolltemplate-abilitycheck">
+    <table>
+    	<tr><th class="attribhead" colspan="2">{{name}}</th></tr>
+		{{#rollLess() selected 0}}
+        	<tr><td class="attribcat" colspan="2">{{character}} has failed to select an Attribute for this Ability</td></tr>
+        {{/rollLess() selected 0}}
+        {{#rollGreater() selected 0}}
+    		<tr><td class="attribcat"><span data-i18n="character">Character</span>:&nbsp;</td><td class="attribresult">{{character}}</td></tr>
+    		<tr><td class="attribcat"><span data-i18n="attribute">Attribute</span>:&nbsp;</td><td class="attribresult">{{attribute}}</td></tr>
+    		<tr><td class="attribcat"><span data-i18n="dice-roll">Roll</span>:&nbsp;</td><td class="attribresult">{{roll}}</td></tr>
+    		{{#rollLess() roll attribute}}
+    			<tr class="effex"><td colspan="2"><span class="attribhit" data-i18n="success">Success</span>!</td></tr>
+    		{{/rollLess() roll attribute}}
+    		{{#rollTotal() roll attribute}}
+    			<tr class="effex"><td colspan="2"><span class="attribhit" data-i18n="success">Success</span>!</td></tr>
+    		{{/rollTotal() roll attribute}}
+    		{{#rollGreater() roll attribute}}
+    		    <tr class="effex"><td colspan="2"><span class="attribmiss" data-i18n="failure">Failure</span>...</td></tr>
+    		{{/rollGreater() roll attribute}}
+    	{{/rollGreater() selected 0}}
+    </table>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-powercheck">
+    <table>
+		<tr><th class="attribhead" colspan="2">{{name}}</th></tr>
+		<tr><td class="attribcat"><span data-i18n="character">Character</span>:&nbsp;</td><td class="attribresult">{{character}}</td></tr>
+		<tr><td class="attribcat"><span data-i18n="attribute">Attribute</span>:&nbsp;</td><td class="attribresult">{{attribute}}</td></tr>
+		<tr><td class="attribcat"><span data-i18n="dice-roll">Roll</span>:&nbsp;</td><td class="attribresult">{{roll}}</td></tr>
+		{{#rollLess() roll attribute}}
+			<tr class="effex"><td colspan="2"><span class="attribhit" data-i18n="success">Success</span>!</td></tr>
+		{{/rollLess() roll attribute}}
+		{{#rollTotal() roll attribute}}
+			<tr class="effex"><td colspan="2"><span class="attribhit" data-i18n="success">Success</span>!</td></tr>
+		{{/rollTotal() roll attribute}}		
+		{{#rollGreater() roll attribute}}
+		    <tr class="effex"><td colspan="2"><span class="attribmiss" data-i18n="failure">Failure</span>...</td></tr>
+		{{/rollGreater() roll attribute}}
+    </table>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-attrib">
+    <table>
+		<tr><th class="attribhead" colspan="2">{{name}}</th></tr>
+		<tr><td class="attribcat"><span data-i18n="character">Character</span>:&nbsp;</td><td class="attribresult">{{character}}</td></tr>
+		<tr><td class="attribcat"><span data-i18n="attribute">Attribute</span>:&nbsp;</td><td class="attribresult">{{attribute}}</td></tr>
+		<tr><td class="attribcat"><span data-i18n="dice-roll">Roll</span>:&nbsp;</td><td class="attribresult">{{roll}}</td></tr>
+		{{#rollLess() roll attribute}}
+			<tr class="effex"><td colspan="2"><span class="attribhit" data-i18n="success">Success</span>!</td></tr>
+		{{/rollLess() roll attribute}}
+		{{#rollTotal() roll attribute}}
+			<tr class="effex"><td colspan="2"><span class="attribhit" data-i18n="success">Success</span>!</td></tr>
+		{{/rollTotal() roll attribute}}		
+		{{#rollGreater() roll attribute}}
+		    <tr class="effex"><td colspan="2"><span class="attribmiss" data-i18n="failure">Failure</span>...</td></tr>
+		{{/rollGreater() roll attribute}}
+    </table>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-defense">
+    <table>
+        {{#rollLess() defense-type 0}}
+    		<tr><th class="defhead" colspan="2">{{character-name}}&nbsp;<span data-i18n="negates-extra-damage">negates extra damage</span>{{#name}}&nbsp;<span data-i18n="using">using</span>&nbsp;{{name}}{{/name}}</th></tr>
+            <tr><td class="defcat"><span data-i18n="damage-negated">Damage negated</span>:</td><td class="defresult">{{damage-taken}}</td></tr>
+        {{/rollLess() defense-type 0}}
+        
+        {{#rollGreater() defense-type 0}}                
+			<tr><th class="defhead" colspan="2">{{character-name}}&nbsp;<span data-i18n="defends">defends</span>{{#name}}&nbsp;<span data-i18n="with">with</span>&nbsp;{{name}}{{/name}}</th></tr>
+			<tr><td class="defcat"><span data-i18n="attribute">Attribute</span>:</td><td class="defresult">{{attribute}}</td></tr>
+			<tr><td class="defcat"><span data-i18n="dice-roll">Roll</span>:</td><td class="defresult">{{defense-roll}}</td></tr>
+			{{#rollLess() defense-roll attribute1}} <!-- miss -->
+			    {{#^rollWasFumble() defense-roll}}<tr><th class="effex" colspan="2"><span class="defmiss"><span data-i18n="enemy-missed">Enemy missed</span>!</span></th></tr>{{/^rollWasFumble() defense-roll}}
+			    {{#rollWasFumble() defense-roll}} <tr><th class="effex" colspan="2" style="text-shadow:1px 1px 1px Black"><span class="defmiss"><span data-i18n="enemy-critically-missed">Enemy critically missed</span>!</span></th></tr>{{/rollWasFumble() defense-roll}}
+			{{/rollLess() defense-roll attribute1}}
+			
+			{{#rollGreater() defense-roll attribute}} <!-- hit -->
+				 {{#^rollWasCrit() defense-roll}}<tr><th colspan="2" style="border-bottom:0px;"><span class="defhit"><span data-i18n="enemy-hit">Enemy hit</span>!</span></th></tr>{{/^rollWasCrit() defense-roll}}
+				 {{#rollWasCrit() defense-roll}}<tr><th colspan="2" style="border-bottom:0px;"><span class="defhit"><span style="text-shadow:1px 1px 1px Black" data-i18n="enemy-critically-hit">Enemy critically hit</span>!</span></th></tr>{{/rollWasCrit() defense-roll}}
+                {{#rollGreater() damage-taken 0 }}<tr style="background-color:#ffffff"><td class="effex" colspan="2"><span data-i18n="damage-negated">Damage negated</span>:&nbsp;{{damage-taken}}</td></tr>{{/rollGreater() damage-taken 0 }}
+                {{#rollLess() damage-taken 1}}<tr style="background-color:#ffffff"><td class="effex" colspan="2"><span data-i18n="damage-negated">Damage negated</span>:&nbsp;0</td></tr>{{/rollLess() damage-taken 1}}
+			{{/rollGreater() defense-roll attribute}}
+        {{/rollGreater() defense-type 0}}
+    </table>
+</rolltemplate>
+<rolltemplate class="sheet-rolltemplate-attack">
+    <table>
+        {{#rollLess() attack-type 0}}
+        	<tr><th class="attkhead" colspan="2">{{character-name}}&nbsp;<span data-i18n="does-extra-damage">does extra damage</span>&nbsp;{{#name}}&nbsp;<span data-i18n="with">with</span>&nbsp;{{name}}{{/name}}</th></tr>
+			<tr style="background-color:#ffffff"><td class="attkcat"><span data-i18n="damage">Damage</span>:</td><td class="attkresult">{{damage}}</td></tr>		
+        {{/rollLess() attack-type 0}}
+        {{#rollGreater() attack-type 0}}
+            
+			<tr><th class="attkhead" colspan="2">{{character-name}}&nbsp;<span data-i18n="attacks-chat">attacks</span>{{#name}}&nbsp;<span data-i18n="with">with</span>&nbsp;{{name}}{{/name}}</th></tr>
+            <tr><td class="attkcat"><span data-i18n="attribute">Attribute</span>:&nbsp;</td><td class="attkresult">{{attribute}}</td></tr>
+            <tr><td class="attkcat"><span data-i18n="dice-roll">Roll</span>:&nbsp;</td><td class="attkresult">{{attack}}</td></tr> 
+			{{#rollLess() attack attribute1}}
+				{{#^rollWasFumble() attack}}<tr><th class="effex" colspan="2"><span class="attkhit"><span data-i18n="attack-hit">Attack hit</span>!</span></th></tr>{{/^rollWasFumble() attack}}
+				{{#rollWasFumble() attack}} <tr><th class="effex" colspan="2" style="text-shadow:1px 1px 1px Black"><span class="attkhit"><span data-i18n="attack-critically-hit">Attack critically hit</span>!</span></th></tr>{{/rollWasFumble() attack}}
+				{{#rollGreater() damage 0}}<tr style="background-color:#ffffff"><td class="effex" colspan="2"><span data-i18n="damage">Damage</span>:&nbsp;{{damage}} {{#rollWasFumble() attack}}<span> + </span> {{damage-crit}} {{/rollWasFumble() attack}}</td></tr>{{/rollGreater() damage 0}}
+			{{/rollLess() attack attribute1}}
+			        
+			{{#rollGreater() attack attribute}}
+				{{#^rollWasCrit() attack}}<tr><th colspan="2"><span data-i18n="attack-missed">Attack missed</span>!</th></tr>{{/^rollWasCrit() attack}}
+				{{#rollWasCrit() attack}}<tr><th colspan="2" style="text-shadow:1px 1px 1px Black"><span data-i18n="attack-critically-missed">Attack critically missed</span>!</span></th></tr>{{/rollWasCrit() attack}}
+			{{/rollGreater() attack attribute}}  
+        {{/rollGreater() attack-type 0}} 
+    </table>
+</rolltemplate>
+
+<script type="text/worker">
+
+var Sheet = Sheet || (function() {
+
+	var version= 1.0,
+	Debug = false,	
+// convert weapon quality selector from numeric value to text
+	qualitySwap = function() {
+// get weapon quality text values
+		getAttrs(["weapon1-quality"], function(values) {
+			var qualityName, 
+				list=["None", "Balanced", "Blunt", "Deep Impact", "Jointed", "Long", "Precise", "Short"],
+				index = ~~values["weapon1-quality"];
+				qualityName = list[index];
+			console.log("....Given: " + values["weapon1-quality"] );
+			console.log("....Index: " + index );
+			console.log("....QualityName: " + qualityName );
+				setAttrs({
+					"weapon1-quality":qualityName
+				});
+		});
+
+// get repeating weapon quality text values
+		getSectionIDs("repeating_weapons", function(ids) {
+			var fields = _.map(ids,function(id) {
+				return "repeating_weapons_" + id + "_weapon1-quality";
+				console.log("....Row id " + id );
+			});
+
+			getAttrs(fields, function(values) {
+				_.each(ids, function(rowid, i) {												
+					console.log("....repeating_weapons_" + rowid + "_weapon1-quality");
+					var qualityName,
+						list=["None", "Balanced", "Blunt", "Deep Impact", "Jointed", "Long", "Precise", "Short"],
+						index = ~~values["repeating_weapons_" + rowid + "_weapon1-quality"];
+						qualityName = list[index];
+					console.log("....Row id " + rowid );
+					console.log("....Given: " + values["repeating_weapons_" + rowid + "_weapon1-quality"] );
+					console.log("....Index: " + index );
+					console.log("....QualityName: " + qualityName );
+						setAttrs({
+						["repeating_weapons_" + rowid + "_weapon1-quality"]:qualityName
+					});
+				});
+			});
+		});		
+
+	},
+
+/* recalculateSheet */
+	recalculateSheet = function(oldversion) {
+		if (oldversion < 0.1) {
+//call your functions here
+		qualitySwap();
+		}
+	},
+	
+/* checkForUpdate looks at current version of page in
+ * sheet_version and compares to code Sheet.version calls
+ * recalulateSheet if versions don't match or if recalculate
+ * button was pressed. */
+	checkForUpdate = function() {
+		getAttrs(["sheet_version","sheet_forcesync","recalc1"],function(v){
+			var setter={},currVer=0,setAny=0,recalc=false;
+			currVer=parseFloat(v["sheet_version"],10)||0;
+			console.log("Current sheet data version:"+currVer+", Sheet code version:" + version );
+			
+			if ( currVer!== version ) {
+				recalc=true;
+				setter["sheet_version"]= version;
+				setAny=1;
+			}
+			if (v["recalc1"] && v["recalc1"]!="0" ) {
+				currVer=-1;
+				recalc=true;
+				setter["recalc1"]=0;
+				setAny=1;
+			}
+			if (v["sheet_forcesync"] && v["sheet_forcesync"]!="0" ) {
+				currVer=-1;
+				recalc=true;
+				setter["sheet_forcesync"]=0;
+				setAny=1;
+			}
+			if (setAny) {
+				 setAttrs( setter);
+			}
+			if (recalc) {
+				recalculateSheet(currVer);
+			}
+		});
+	};
+	return {
+		version:version,
+		checkForUpdate:checkForUpdate,
+		qualitySwap:qualitySwap
+	};
+}());
+
+//sheet
+on("sheet:opened",function() {Sheet.checkForUpdate();});
+on("change:recalc1",function() {Sheet.checkForUpdate();});
+
+</script>

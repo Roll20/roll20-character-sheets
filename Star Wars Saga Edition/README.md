@@ -7,33 +7,7 @@ I've used this sheet (http://www.mad-irishman.net/pub_starwars.html) as a refere
 
 Change log
 ============
-May 15, 2014 - 
-* Made XP, Credits and Carrying Wt text fields for more diverse inputs
-* Included tooltip titles for inputs
-* Created Size modifier drop down for Reflex and Carrying Capacity
-
-May 7, 2014 - 
-* Adjusted field size for Equipment weight, carrying capacity, XP & Max.
-* Added calculations for Grapple with roll
-* Added calculations for Reflex flat-footed
-* Damage field changed to text input
-* Fixed Attack roll button to correctly create new lines using ASCII code. Included descriptive text.
-
-TO DO
-============
-* ~~List out all Skills with modifiers and rolls~~
-* ~~Use repeating function to include weapons and attacks having the user choose which Ability Mod and damage for pre-filled rolls~~
-* ~~Fix Attack Repeating function~~
-* ~~Make it prettier with CSS (incorporate logos, etc)~~
-* ~~Equipment and credits section~~
-* ~~Languages~~
-* ~~Feats, Talents and Force Powers area~~
-* ~~Experience~~
-* Include select options for age and size which would affect calculations
- * Age - Attributes
- * Size - ~~Reflex~~, Stealth, Grapple, ~~Carry Capacity~~, DT 
-  * Need to figure out how to have the drop down to affect the different modifiers
-  * not including Attributes as that's usually taken into effect already
+see Wiki: https://wiki.roll20.net/Star_Wars_Saga_Edition_Character_Sheet
 
 Suggestions
 ============
