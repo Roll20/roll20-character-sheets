@@ -694,7 +694,7 @@
 							<div class="sheet-col-3">
 								<button type="roll" value="@{displayJet} &{template:atk} {{name=Attaque de @{Personnage_Nom} avec @{Arme_Nom} }} {{at=@{Arme_TotalAT} }} {{notes=@{Arme_Note} }} {{effets= @{Arme_Effet} }} {{portee= @{arme_portee} }} {{display_effets= [[@{arme_Effet_display}]] }} {{display_notes= [[@{Arme_Note_display}]] }} {{btn_critique= [Critique](~@{character_name}|confirmation_crit_@{Arme_typeDegat}) }} {{btn_fumble= [Fumble](~@{character_name}|confirmation_fumble_atk) }} {{results=[[1d20cs<@{Arme_Critique}cf>@{Arme_Fumble}]] }} {{btn_degats=[Dégats](~repeating_armes_rollDegats)}}"> AT </button>
 								<button type="roll" value="@{displayJet} &{template:prd} {{name=Parade de @{Personnage_Nom} avec @{Arme_Nom} }} {{prd=@{Arme_TotalPRD} }} {{results=[[1d20cs<@{Arme_Critique}cf>@{Arme_Fumble}]] }} {{btn_critique= [Critique](~@{character_name}|confirmation_crit_prd) }} {{btn_fumble=[Fumble](~@{character_name}|confirmation_fumble_atk) }}"> PRD </button>
-								<button type="roll" class="sheet-rollDegats" name="roll_rollDegats" value="@{displayJet} &{template:dmg} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{dmg= [[ @{Arme_TotalDegats} ]] }} {{munition=@{munition_nom}}} {{typeDegat=@{Arme_typeDegat}}}"> Dégats </button>
+								<button type="roll" class="sheet-rollDegats" name="roll_rollDegats" value="@{displayJet} &{template:dmg} {{name=Dégats de @{Personnage_Nom} avec @{Arme_Nom}}} {{dmg= [[ @{Arme_TotalDegats} ]] }} {{munition=@{munition_nom}}}  {{munition_effet=@{munition_effet}}} {{typeDegat=@{Arme_typeDegat}}}"> Dégats </button>
 							</div>
 						</div>
 						<input type="checkbox" name="attr_Arme_config" class="sheet-config-flag" value="1" /><span class="sheet-cog">y</span>
@@ -750,6 +750,7 @@
 									<div class="sheet-col-2"><b>Munition : </b></div>
 									<div class="sheet-col-2">
 										<input type="text" class="sheet-noBorder" name="attr_munition_nom" value="" />
+										<input type="hidden" name="attr_munition_effet" value="" />
 									</div>
 									<div class="sheet-col-1 sheet-right"><b>Dégats : </b></div>
 									<div class="sheet-col-1">
@@ -2704,17 +2705,19 @@
 		});
 	}
 
-	// attach an existing ammo to a weapong
+	// attach an existing ammo to a weapon
 	function updateAmmo( eventInfo ) {
 		var ammo_selected = eventInfo[ "newValue" ];
 		var idAmmo = 0;
 		var sWeapon = {};
-
+		
 		sWeapon[ 'repeating_armes_munition_degats' ] = "";
 		sWeapon[ 'repeating_armes_munition_modAd' ] = 0;
 		sWeapon[ 'repeating_armes_munition_nom' ] = "";
+		sWeapon[ 'repeating_armes_munition_effet' ] = "";
 
 		getSectionIDs( "repeating_munitions", function(idarray) {
+			// Search ammo_selected from weapon into munitions list
 			getAttrs( [ ...idarray.map(id => `repeating_munitions_${id}_munition_nom`) ], function( sValues ) {
 				for( var i in idarray ) {
 					if( ammo_selected === sValues[`repeating_munitions_${idarray[i]}_munition_nom`] ) {
@@ -2723,10 +2726,12 @@
 				}
 
 				if( idAmmo != 0 ) {
-					getAttrs( [ `repeating_munitions_${idAmmo}_munition_modAd`, `repeating_munitions_${idAmmo}_munition_degats` ], function( v ) {
+					// copy munition values into weapon's attr
+					getAttrs( [ `repeating_munitions_${idAmmo}_munition_modAd`, `repeating_munitions_${idAmmo}_munition_degats`, `repeating_munitions_${idAmmo}_munition_effet` ], function( v ) {
 						sWeapon[ 'repeating_armes_munition_degats' ] = v[ `repeating_munitions_${idAmmo}_munition_degats` ];
 						sWeapon[ 'repeating_armes_munition_modAd' ] = v[ `repeating_munitions_${idAmmo}_munition_modAd` ];
 						sWeapon[ 'repeating_armes_munition_nom' ] = ammo_selected;
+						sWeapon[ 'repeating_armes_munition_effet' ] = v[ `repeating_munitions_${idAmmo}_munition_effet` ];
 
 						setAttrs( sWeapon );
 					});
@@ -3625,13 +3630,21 @@
 		<tbody>
 			<tr>
 				<td>Dégats</td>
-				<td>{{dmg}} ({{typeDegat}})</td>
+				<td>{{dmg}}{{#typeDegat}} ({{typeDegat}}){{/typeDegat}}</td>
 			</tr>
 			{{#munition}}
 			<tr>
 				<td>Munition</td>
 				<td>{{munition}}</td>
 			</tr>
+			{{#munition_effet}}
+			<tr>
+				<td>Effets</td>
+				<td></td>
+			<tr>
+				<td colspan="2" class="sheet-td-noFirst">{{munition_effet}}</td>
+			</tr>
+			{{/munition_effet}}
 			{{/munition}}
 		</tbody>
 	</table>
