@@ -6967,8 +6967,8 @@
             });
 
             getAttrs(attrs_to_get, function(v) {
+                console.log("UPDATING SKILLS");
                 _.each(skills_array, function(s) {
-                    console.log("UPDATING SKILL: " + s);
                     var attr_mod = v[skill_parent[s] + "_mod"] ? parseInt(v[skill_parent[s] + "_mod"], 10) : 0;
                     var prof = v[s + "_prof"] != 0 && !isNaN(v["pb"]) ? parseInt(v["pb"], 10) : 0;
                     var flat = v[s + "_flat"] && !isNaN(parseInt(v[s + "_flat"], 10)) ? parseInt(v[s + "_flat"], 10) : 0;
@@ -7496,485 +7496,179 @@
             update["repeating_spell-" + lvl + "_" + id + "_options-flag"] = "0";
         };
         if(category === "Monsters") {
+            console.log(`%c MONSTERS: ${page.name}`, "color: purple; font-weight:16px;");
             update["npc"] = "1";
             update["npc_options-flag"] = "0";
             if(page.name && page.name != "") {update["npc_name"] = page.name};
-            update["npc_speed"] = page.data["Speed"] ? page.data["Speed"] : "";
-            update["strength_base"] = page.data["STR"] ?  page.data["STR"] : "";
-            update["dexterity_base"] = page.data["DEX"] ? page.data["DEX"] : "";
-            update["constitution_base"] = page.data["CON"] ? page.data["CON"] : "";
-            update["intelligence_base"] = page.data["INT"] ? page.data["INT"] : "";
-            update["wisdom_base"] = page.data["WIS"] ? page.data["WIS"] : "";
-            update["charisma_base"] = page.data["CHA"] ? page.data["CHA"] : "";
-            callbacks.push( function() {update_attr("strength");} );
-            callbacks.push( function() {update_attr("dexterity");} );
-            callbacks.push( function() {update_attr("constitution");} );
-            callbacks.push( function() {update_attr("intelligence");} );
-            callbacks.push( function() {update_attr("wisdom");} );
-            callbacks.push( function() {update_attr("charisma");} );
-            update["npc_vulnerabilities"] = page.data["Vulnerabilities"] ? page.data["Vulnerabilities"] : "";
-            update["npc_resistances"] = page.data["Resistances"] ? page.data["Resistances"] : "";
-            update["npc_immunities"] = page.data["Immunities"] ? page.data["Immunities"] : "";
-            update["npc_condition_immunities"] = page.data["Condition Immunities"] ? page.data["Condition Immunities"] : "";
-            update["npc_languages"] = page.data["Languages"] ? page.data["Languages"] : "";
-            update["token_size"] = page.data["Token Size"] ? page.data["Token Size"] : "";
+
+            //ABILITY SCORES
+            const npcAbilites = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
+            npcAbilites.forEach((ability) => {
+                const abbreviation = ability.slice(0, 3).toUpperCase();
+                update[`${ability}_base`] = (page.data[`${abbreviation}`]) ? page.data[`${abbreviation}`] : "";
+                callbacks.push(() => {
+                    update_attr(`${ability}`);
+                });
+            });
+          
+            const npcExtras = ["Condition Immunities", "Immunities", "Languages", "Resistances", "Speed", "Token Size", "Vulnerabilities"];
+            npcExtras.forEach((attr) => {
+                const prefixExtra = (attr === "Token Size") ? "" : "npc_";
+                let nameExtra     = (attr.includes(" ")) ? attr.replace(" ", "_").toLowerCase() : attr.toLowerCase();
+                update[`${prefixExtra}${nameExtra}`] = (page.data[`${attr}`]) ? page.data[`${attr}`] : "";
+            });
+
+            //CHALLENGE RATING
             if(page.data["Challenge Rating"] && page.data["Challenge Rating"] != "") {
                 callbacks.push( function() {update_challenge();} );
                 update["npc_challenge"] = page.data["Challenge Rating"];
-            }
-            else {
+            } else {
                 update["npc_challenge"] = "";
-            }
-            if(page.data["data-XP"]) {
-                update["npc_xp"] = page.data["data-XP"].toString().replace(",","");
-            }
+            };
 
+            //XP
+            if(page.data["data-XP"]) { update["npc_xp"] = page.data["data-XP"].toString().replace(",","");  };
+
+            //SIZE, TYPE, ALIGNMENT
             var type = "";
-            if(page.data["Size"]) {type = page.data["Size"]};
-            if(page.data["Type"]) {
-                if(type.length > 0) {
-                    type = type + " " + page.data["Type"].toLowerCase();
-                }
-                else {
-                    type = page.data["Type"].toLowerCase();
-                }
-            };
-            if(page.data["Alignment"]) {
-                if(type.length > 0) {
-                    type = type + ", " + page.data["Alignment"];
-                }
-                else {
-                    type = page.data["Alignment"];
-                }
-            };
+            if(page.data["Size"]) {      type = page.data["Size"] };
+            if(page.data["Type"]) {      type = (type.length > 0) ? type + " " + page.data["Type"].toLowerCase() : page.data["Type"].toLowerCase(); };
+            if(page.data["Alignment"]) { type = (type.length > 0) ? type + ", " + page.data["Alignment"] : page.data["Alignment"]; };
             update["npc_type"] = type;
 
-            if(page.data["HP"]) {
-                if(page.data["HP"].toString().indexOf("(") > -1) {
-                    update["hp_max"] = page.data["HP"].toString().split(" (")[0];
-                    update["npc_hpformula"] = page.data["HP"].toString().split(" (")[1].slice(0, -1);
-                }
-                else {
-                    update["hp_max"] = page.data["HP"]
-                    update["npc_hpformula"] = ""
+            ["AC", "HP"].forEach((achp) => {
+                const array = (achp === "AC") ? ["npc_ac", "npc_actype"] : ["hp_max", "npc_hpformula"];
+                if (page.data[`${achp}`] && page.data[`${achp}`].toString().indexOf("(") > -1)  {
+                    update[`${array[0]}`] = page.data[`${achp}`].toString().split(" (")[0];
+                    update[`${array[1]}`] = page.data[`${achp}`].toString().split(" (")[1].slice(0, -1);
+                } else {
+                    update[`${array[0]}`] = (page.data[`${achp}`]) ? page.data[`${achp}`] : "";
+                    update[`${array[1]}`] = "";
                 };
-            }
-            else {
-                update["hp_max"] = ""
-                update["npc_hpformula"] = ""
-            };
-
-            if(page.data["AC"]) {
-                if(page.data["AC"].toString().indexOf("(") > -1) {
-                    update["npc_ac"] = page.data["AC"].toString().split(" (")[0];
-                    update["npc_actype"] = page.data["AC"].toString().split(" (")[1].slice(0, -1);
-                }
-                else {
-                    update["npc_ac"] = page.data["AC"];
-                    update["npc_actype"] = "";
-                };
-            }
-            else {
-                update["npc_ac"] = "";
-                update["npc_actype"] = "";
-            };
+            });
 
             var senses = page.data["Senses"] ? page.data["Senses"] : "";
             if(page.data["Passive Perception"]) {
-                if(senses.length > 0) {
-                    senses = senses + ", passive Perception " + page.data["Passive Perception"];
-                }
-                else {
-                    senses = "passive Perception " + page.data["Passive Perception"];
-                }
+                senses = (senses.length > 0) ? senses + ", passive Perception " + page.data["Passive Perception"] : "passive Perception " + page.data["Passive Perception"];
             }
             update["npc_senses"] = senses;
 
-            update["npc_str_save_base"] = "";
-            update["npc_dex_save_base"] = "";
-            update["npc_con_save_base"] = "";
-            update["npc_int_save_base"] = "";
-            update["npc_wis_save_base"] = "";
-            update["npc_cha_save_base"] = "";
-            if(page.data["Saving Throws"] && page.data["Saving Throws"] != "") {
-                var savearray = page.data["Saving Throws"].split(", ");
-                _.each(savearray, function(save) {
-                    kv = save.indexOf("-") > -1 ? save.split(" ") : save.split(" +");
-                    update["npc_" + kv[0].toLowerCase() + "_save_base"] = parseInt(kv[1], 10);
+            //SAVES & SKILLS
+            const npcSavesSkills = ["str_save", "dex_save", "con_save", "int_save", "wis_save", "cha_save",'acrobatics','animal_handling','arcana','athletics','deception','history','insight','intimidation','investigation','medicine','nature','perception','performance','persuasion','religion','sleight_of_hand','stealth','survival'];
+            npcSavesSkills.forEach((attr) => {
+                update[`npc_${attr}_base`] = "";
+            });
+            ["Saving Throws", "Skills"].forEach((attr) => {
+                const array = (page.data[`${attr}`]) ? page.data[`${attr}`].split(", ") : [];
+                _.each(array, (entry) => {
+                    const kv        = (entry.indexOf("-") > -1) ? entry.split(" ") : entry.split(" +");
+                    const attribute = (attr === "Saving Throws") ? kv[0].toLowerCase() + "_save" : kv[0].toLowerCase().replace(" ", '_');
+                    update[`npc_${attribute}_base`] = parseInt(kv[1], 10);
                 });
-                callbacks.push( function() {update_npc_saves();} );
+                (attr === "Saving Throws") ? callbacks.push(() => {update_npc_saves();} ) : callbacks.push(() => {update_npc_skills();} );
+            });
+
+            const npcRepeating = ['npcaction-l', 'npcreaction', 'npcaction', 'npctrait'];
+            _.each(npcRepeating, (section) => {
+                getSectionIDs(`repeating_${section}`, (idarray) => {
+                    _.each(idarray, (currentID, i) => {
+                        removeRepeatingRow(`repeating_${section}_${currentID}`);
+                    });
+                });
+            });
+            // ACTIONS, LEGENDARY ACTIONS, REACTIONS, TRAITS
+            var contentarray = page.content;
+            if (page.data["data-Legendary Actions"]) {
+                const actionCount = (page.data["data-LANum"]) ? page.data["data-LANum"] : 3;
+                update["npc_legendary_actions"] = (page.data["data-LANum"]) ? page.data["data-LANum"] : 3;
+                if (page.data["Legendary Actions Desc"]) {
+                    update["npc_legendary_actions_desc"] = page.data["Legendary Actions Desc"];
+                } else {
+                    update["npc_legendary_actions_desc"] = `The ${page.name} can take ${actionCount}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
+                };
             };
 
-            update["npc_acrobatics_base"]      = "";
-            update["npc_animal_handling_base"] = "";
-            update["npc_arcana_base"]          = "";
-            update["npc_athletics_base"]       = "";
-            update["npc_deception_base"]       = "";
-            update["npc_history_base"]         = "";
-            update["npc_insight_base"]         = "";
-            update["npc_intimidation_base"]    = "";
-            update["npc_investigation_base"]   = "";
-            update["npc_medicine_base"]        = "";
-            update["npc_nature_base"]          = "";
-            update["npc_perception_base"]      = "";
-            update["npc_performance_base"]     = "";
-            update["npc_persuasion_base"]      = "";
-            update["npc_religion_base"]        = "";
-            update["npc_sleight_of_hand_base"] = "";
-            update["npc_stealth_base"]         = "";
-            update["npc_survival_base"]        = "";
-            if(page.data["Skills"] && page.data["Skills"] != "") {
-                skillarray = page.data["Skills"].split(", ");
+            // ACTIONS & LEGENDARY ACTIONS
+            ["Actions", "Legendary Actions"].forEach((attr) => {
+                if (page.data[`data-${attr}`]) {
+                    const npcaction = (attr === "Actions") ? "npcaction" : "npcaction-l";
+                    let actionsobj = {};
+                    jsonparse(page.data[`data-${attr}`]).forEach((val) => { actionsobj[val.Name] = val; });
+                    _.each(actionsobj, (action, name) => {
+                        newrowid = generateRowID();
+                        update[`repeating_${npcaction}_${newrowid}_npc_options-flag`] = "0";
+                        update[`repeating_${npcaction}_${newrowid}_name`]             = name;
+                        (action["Desc"]) ? update[`repeating_${npcaction}_${newrowid}_description`] = action["Desc"] : false;
+                        if(action["Type Attack"]) {
+                            update[`repeating_${npcaction}_${newrowid}_attack_display_flag`] = "{{attack=1}}";
+                            update[`repeating_${npcaction}_${newrowid}_attack_flag`]         = "on";
+                            update[`repeating_${npcaction}_${newrowid}_attack_options`]      = "{{attack=1}}";
 
-                _.each(skillarray, function(skill) {
-                    kv = skill.indexOf("-") > -1 ? skill.split(" ") : skill.split(" +");
-                    update["npc_" + kv[0].toLowerCase().replace(/ /g, '_') + "_base"] = parseInt(kv[1], 10);
-                });
+                            ["Damage Type", "Damage", "Hit Bonus", "Reach", "Target", "Type"].forEach((attr) => {
+                                if(action[`${attr}`]) {
+                                    const attributeName = (attr === "Hit Bonus") ? "tohit" : (attr === "Reach") ? "range" : attr.toLowerCase().replace(" ", "");
+                                    update[`repeating_${npcaction}_${newrowid}_attack_${attributeName}`] = action[`${attr}`];
+                                };
+                            });
 
-                callbacks.push( function() { update_npc_skills(); });
-            }
-
-            getSectionIDs("repeating_npcaction-l", function(idarray) {
-                _.each(idarray, function(currentID, i) {
-                    removeRepeatingRow("repeating_npcaction-l_" + currentID);
-                });
-            });
-            getSectionIDs("repeating_npcreaction", function(idarray) {
-                _.each(idarray, function(currentID, i) {
-                    removeRepeatingRow("repeating_npcreaction_" + currentID);
-                });
-            });
-            getSectionIDs("repeating_npcaction", function(idarray) {
-                _.each(idarray, function(currentID, i) {
-                    removeRepeatingRow("repeating_npcaction_" + currentID);
-                });
-            });
-            getSectionIDs("repeating_npctrait", function(idarray) {
-                _.each(idarray, function(currentID, i) {
-                    removeRepeatingRow("repeating_npctrait_" + currentID);
-                });
-            });
-
-            var contentarray = page.content;
-            if(page.data["data-Legendary Actions"]) {
-                var legendaryactionsarray = jsonparse(page.data["data-Legendary Actions"]);
-                update["npc_legendary_actions"] = 1;
-                if(page.data["Legendary Actions Desc"]) {
-                    update["npc_legendary_actions_desc"] = page.data["Legendary Actions Desc"];
-                }
-                else if(currentData.npc_legendary_actions > 0){
-                    update["npc_legendary_actions_desc"] = `The ${page.name} can take ${currentData.npc_legendary_actions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
-                }
-                else {
-                    update["npc_legendary_actions_desc"] = "";
-                }
-            }
-            else if(contentarray && contentarray.indexOf("Legendary Actions") > -1) {
-                if(contentarray.indexOf(/\n Legendary Actions\n/) > -1) {
-                    temp = contentarray.split(/\n Legendary Actions\n/)
-                }
-                else {
-                    temp = contentarray.split(/Legendary Actions\n/)
-                }
-                var legendaryactionsarray = temp[1];
-                contentarray = temp[0];
-            }
-
-            if(page.data["data-Reactions"]) {
-                var reactionsarray = jsonparse(page.data["data-Reactions"]);
-            }
-            else if(contentarray && contentarray.indexOf("Reactions") > -1) {
-                if(contentarray.indexOf(/\n Reactions\n/) > -1) {
-                    temp = contentarray.split(/\n Reactions\n/)
-                }
-                else {
-                    temp = contentarray.split(/Reactions\n/)
-                }
-                var reactionsarray = temp[1];
-                contentarray = temp[0];
-            }
-
-            if(page.data["data-Actions"]) {
-                var actionsarray = jsonparse(page.data["data-Actions"]);
-            }
-            else if(contentarray && contentarray.indexOf("Actions") > -1) {
-                if(contentarray.indexOf("Lair Actions") > -1) {
-                    contentarray = contentarray.replace("Lair Actions","Lair Action");
-                }
-                if(contentarray.indexOf(/\n Actions\n/) > -1) {
-                    temp = contentarray.split(/\n Actions\n/)
-                }
-                else {
-                    temp = contentarray.split(/Actions\n/)
-                }
-                var actionsarray = temp[1];
-                contentarray = temp[0];
-            }
-
-            if(page.data["data-Traits"]) {
-                var traitsarray = jsonparse(page.data["data-Traits"]);
-            }
-            else if(contentarray && contentarray.indexOf("Traits") > -1) {
-                if(contentarray.indexOf("Lair Traits") > -1) {
-                    contentarray = contentarray.replace("Lair Traits","Lair Trait");
-                }
-                if(contentarray.indexOf(/\n Traits\n/) > -1) {
-                    temp = contentarray.split(/\n Traits\n/)
-                }
-                else {
-                    temp = contentarray.split(/Traits\n/)
-                }
-                var traitsarray = temp[1];
-                contentarray = temp[0];
-            }
-
-            if(traitsarray) {
-                if(page.data["data-Traits"]) {
-                    var traitsobj = {};
-                    traitsarray.forEach(function(val) { traitsobj[val.Name] = val.Desc; });
-                }
-                else {
-                    traitsarray = traitsarray.split("**");
-                    traitsarray.shift();
-                    var traitsobj = {};
-                    traitsarray.forEach(function(val, i) {
-                        if (i % 2 === 1) return;
-                        traitsobj[val] = traitsarray[i + 1];
+                            if(action["Damage 2"] && action["Damage 2 Type"]) {
+                                update[`repeating_${npcaction}_${newrowid}_attack_damage2`]     = action["Damage 2"];
+                                update[`repeating_${npcaction}_${newrowid}_attack_damagetype2`] = action["Damage 2 Type"];
+                            }
+                        }
                     });
-                }
-                _.each(traitsobj, function(desc, name) {
+                    (attr === "Actions") ? callbacks.push(() => {update_npc_action("all");} ) : false;
+                } else if(contentarray && contentarray.indexOf(`${attr}`) > -1) {
+                    console.log(`%c ${attr} was not found for ${page.name}`, "color: orange;");
+                };
+            }); 
+            //REACTIONS
+            if (page.data["data-Reactions"]) {
+                update["npcreactionsflag"] = 1;
+                let reactionsobj = {};
+               jsonparse(page.data["data-Reactions"]).forEach((val) => { reactionsobj[val.Name] = val.Desc; });
+                _.each(reactionsobj, (desc, name) => {
                     newrowid = generateRowID();
-                    update["repeating_npctrait_" + newrowid + "_name"] = name + ".";
+                    update[`repeating_npcreaction_${newrowid}_name`] = name + ".";
+                    if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
+                        desc = desc.substring(2);
+                    };
+                    update[`repeating_npcreaction_${newrowid}_desc`] = desc.trim();
+                });
+            } else if(contentarray && contentarray.indexOf("Reactions") > -1) {
+                console.log(`%c Reactions was not found for ${page.name}`, "color: orange;");
+            };  
+            //TRAITS
+            if (page.data["data-Traits"]) {
+                let traitsobj     = {};
+                jsonparse(page.data["data-Traits"]).forEach((val) => { traitsobj[val.Name] = val.Desc; });
+                _.each(traitsobj, (desc, name) => {
+                    newrowid = generateRowID();
+                    update[`repeating_npctrait_${newrowid}_name`] = name + ".";
                     if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
                         desc = desc.substring(2);
                     }
-                    update["repeating_npctrait_" + newrowid + "_desc"] = desc.trim();
+                    update[`repeating_npctrait_${newrowid}_desc`] = desc.trim();
                     // SPELLCASTING NPCS
                     if(name === "Spellcasting") {
                         var lvl = parseInt(desc.substring(desc.indexOf("-level")-4, desc.indexOf("-level")-2).trim(), 10);
                         lvl = !isNaN(lvl) ? lvl : 1;
                         var ability = desc.match(/casting ability is (.*?) /);
-                        ability = ability && ability.length > 1 ? ability[1] : false;
-                        ability = ability ? "@{" + ability.toLowerCase() + "_mod}+" : "0*";
-                        update["npcspellcastingflag"] = 1;
+                            ability = ability && ability.length > 1 ? ability[1] : false;
+                            ability = ability ? "@{" + ability.toLowerCase() + "_mod}+" : "0*";
+                        update["base_level"]           = lvl;
+                        update["caster_level"]         = lvl;
+                        update["class"]                = "Wizard";
+                        update["level"]                = lvl;
+                        update["npcspellcastingflag"]  = 1;
                         update["spellcasting_ability"] = ability;
-                        update["caster_level"] = lvl;
-                        update["class"] = "Wizard";
-                        update["base_level"] = lvl;
-                        update["level"] = lvl;
-                        callbacks.push( function() {update_pb();} );
-                        callbacks.push( function() {update_spell_slots();} );
+                        callbacks.push(() => {update_pb();} );
+                        callbacks.push(() => {update_spell_slots();} );
                     }
                 });
-            }
-            if(actionsarray) {
-                if(page.data["data-Actions"]) {
-                    var actionsobj = {};
-                    actionsarray.forEach(function(val) { actionsobj[val.Name] = val; });
-
-                    _.each(actionsobj, function(action, name) {
-                        newrowid = generateRowID();
-                        update["repeating_npcaction_" + newrowid + "_npc_options-flag"] = "0";
-                        update["repeating_npcaction_" + newrowid + "_name"] = name;
-                        if(action["Desc"]) {
-                            update["repeating_npcaction_" + newrowid + "_description"] = action["Desc"];
-                        }
-
-                        if(action["Type Attack"]) {
-                            update["repeating_npcaction_" + newrowid + "_attack_flag"] = "on";
-                            update["repeating_npcaction_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
-                            update["repeating_npcaction_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            if(action["Type"]) { update["repeating_npcaction_" + newrowid + "_attack_type"] = action["Type"]; }
-                            if(action["Reach"]) { update["repeating_npcaction_" + newrowid + "_attack_range"] = action["Reach"]; }
-                            if(action["Hit Bonus"]) { update["repeating_npcaction_" + newrowid + "_attack_tohit"] = action["Hit Bonus"]; }
-                            if(action["Target"]) { update["repeating_npcaction_" + newrowid + "_attack_target"] = action["Target"]; }
-                            if(action["Damage"]) { update["repeating_npcaction_" + newrowid + "_attack_damage"] = action["Damage"]; }
-                            if(action["Damage Type"]) { update["repeating_npcaction_" + newrowid + "_attack_damagetype"] = action["Damage Type"]; }
-
-                            if(action["Damage 2"] && action["Damage 2 Type"]) {
-                                update["repeating_npcaction_" + newrowid + "_attack_damage2"] = action["Damage 2"];
-                                update["repeating_npcaction_" + newrowid + "_attack_damagetype2"] = action["Damage 2 Type"];
-                            }
-                        }
-                    })
-                }
-                else {
-                    actionsarray = actionsarray.split("**");
-                    actionsarray.shift();
-                    var actionsobj = {};
-                    actionsarray.forEach(function(val, i) {
-                        if (i % 2 === 1) return;
-                        actionsobj[val] = actionsarray[i + 1];
-                    });
-                    _.each(actionsobj, function(desc, name) {
-                        newrowid = generateRowID();
-                        update["repeating_npcaction_" + newrowid + "_npc_options-flag"] = "0";
-                        update["repeating_npcaction_" + newrowid + "_name"] = name;
-                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
-                            desc = desc.substring(2);
-                        }
-                        if(desc.indexOf(" Attack:") > -1) {
-                            update["repeating_npcaction_" + newrowid + "_attack_flag"] = "on";
-                            update["repeating_npcaction_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
-                            update["repeating_npcaction_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            if(desc.indexOf(" Weapon Attack:") > -1) {
-                                attacktype = desc.split(" Weapon Attack:")[0];
-                            }
-                            else if(desc.indexOf(" Spell Attack:") > -1) {
-                                attacktype = desc.split(" Spell Attack:")[0];
-                            }
-                            else {
-                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
-                                return;
-                            }
-
-                            update["repeating_npcaction_" + newrowid + "_attack_type"] = attacktype;
-                            if(attacktype === "Melee") {
-                                update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
-                            }
-                            else {
-                                update["repeating_npcaction_" + newrowid + "_attack_range"] = (desc.match(/range (.*?),/) || ["",""])[1];
-                            }
-                            update["repeating_npcaction_" + newrowid + "_attack_tohit"] = (desc.match(/\+(.*) to hit/) || ["",""])[1];
-                            update["repeating_npcaction_" + newrowid + "_attack_target"] = (desc.match(/\.,(?!.*\.,)(.*)\. Hit:/) || ["",""])[1];
-                            if(desc.toLowerCase().indexOf("damage") > -1) {
-                                update["repeating_npcaction_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
-                                update["repeating_npcaction_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
-                                if((desc.match(/\(/g) || []).length > 1 && desc.match(/\((?!.*\()([^)]+)\)/)) {
-                                    var second_match = desc.match(/\((?!.*\()([^)]+)\)/);
-                                    if(second_match[1] && second_match[1].indexOf(" DC") === -1) {
-                                        update["repeating_npcaction_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
-                                        update["repeating_npcaction_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
-                                    };
-                                };
-                                ctest1 = desc.split("damage.")[1];
-                                ctest2 = desc.split("damage, ")[1];
-                                if(ctest1 && ctest1.length > 0) {
-                                    update["repeating_npcaction_" + newrowid + "_description"] = ctest1.trim();
-                                }
-                                else if(ctest2 && ctest2.length > 0) {
-                                    update["repeating_npcaction_" + newrowid + "_description"] = ctest2.trim();
-                                }
-                            }
-                            else {
-                                update["repeating_npcaction_" + newrowid + "_description"] = desc.split("Hit:")[1].trim();
-                            }
-                        }
-                        else {
-                            update["repeating_npcaction_" + newrowid + "_description"] = desc;
-                        }
-
-                    });
-                }
-                callbacks.push( function() {update_npc_action("all");} );
-            }
-            if(reactionsarray) {
-                update["npcreactionsflag"] = 1;
-                if(page.data["data-Reactions"]) {
-                    var reactionsobj = {};
-                    reactionsarray.forEach(function(val) { reactionsobj[val.Name] = val.Desc; });
-                }
-                else {
-                    reactionsarray = reactionsarray.split("**");
-                    reactionsarray.shift();
-                    var reactionsobj = {};
-                    reactionsarray.forEach(function(val, i) {
-                        if (i % 2 === 1) return;
-                        reactionsobj[val] = reactionsarray[i + 1];
-                    });
-                }
-                _.each(reactionsobj, function(desc, name) {
-                    newrowid = generateRowID();
-                    update["repeating_npcreaction_" + newrowid + "_name"] = name + ".";
-                    if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
-                        desc = desc.substring(2);
-                    }
-                    update["repeating_npcreaction_" + newrowid + "_desc"] = desc.trim();
-                });
-            }
-            if(legendaryactionsarray) {
-                if(page.data["data-Legendary Actions"]) {
-                    var actionsobj = {};
-                    legendaryactionsarray.forEach(function(val) { actionsobj[val.Name] = val; });
-                    _.each(actionsobj, function(action, name) {
-                        newrowid = generateRowID();
-                        update["repeating_npcaction-l_" + newrowid + "_npc_options-flag"] = "0";
-                        update["repeating_npcaction-l_" + newrowid + "_name"] = name;
-                        update["repeating_npcaction-l_" + newrowid + "_description"] = action["Desc"];
-
-                        if(action["Type Attack"]) {
-                            update["repeating_npcaction-l_" + newrowid + "_attack_flag"] = "on";
-                            update["repeating_npcaction-l_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
-                            update["repeating_npcaction-l_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            update["repeating_npcaction-l_" + newrowid + "_attack_type"] = action["Type Attack"];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_range"] = action["Reach"];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_tohit"] = action["Hit Bonus"];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_target"] = action["Target"];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_damage"] = action["Damage"];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_damagetype"] = action["Damage Type"];
-
-                            if(action["Damage 2"] && action["Damage 2 Type"]) {
-                                update["repeating_npcaction-l_" + newrowid + "_attack_damage2"] = action["Damage 2"];
-                                update["repeating_npcaction-l_" + newrowid + "_attack_damagetype2"] = action["Damage 2 Type"];
-                            }
-                        }
-                    });
-                }
-                else {
-                    var numlegendaryactions = (legendaryactionsarray.match(/\d+/) || [""])[0];
-                    update["npc_legendary_actions"] = numlegendaryactions;
-                    update["npc_legendary_actions_desc"] = `The ${page.name} can take ${numlegendaryactions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
-                    legendaryactionsarray = legendaryactionsarray.split("**");
-                    legendaryactionsarray.shift();
-                    var actionsobj = {};
-                    legendaryactionsarray.forEach(function(val, i) {
-                        if (i % 2 === 1) return;
-                        actionsobj[val] = legendaryactionsarray[i + 1];
-                    });
-                    _.each(actionsobj, function(desc, name) {
-                        newrowid = generateRowID();
-                        update["repeating_npcaction-l_" + newrowid + "_npc_options-flag"] = "0";
-                        update["repeating_npcaction-l_" + newrowid + "_name"] = name;
-                        if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
-                            desc = desc.substring(2);
-                        }
-                        if(desc.indexOf(" Attack:") > -1) {
-                            update["repeating_npcaction-l_" + newrowid + "_attack_flag"] = "on";
-                            update["repeating_npcaction-l_" + newrowid + "_attack_display_flag"] = "{{attack=1}}";
-                            update["repeating_npcaction-l_" + newrowid + "_attack_options"] = "{{attack=1}}";
-                            if(desc.indexOf(" Weapon Attack:") > -1) {
-                                attacktype = desc.split(" Weapon Attack:")[0];
-                            }
-                            else if(desc.indexOf(" Spell Attack:") > -1) {
-                                attacktype = desc.split(" Spell Attack:")[0];
-                            }
-                            else {
-                                console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
-                                return;
-                            }
-                            update["repeating_npcaction-l_" + newrowid + "_attack_type"] = attacktype;
-                            if(attacktype === "Melee") {
-                                update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/reach (.*?),/) || ["",""])[1];
-                            }
-                            else {
-                                update["repeating_npcaction-l_" + newrowid + "_attack_range"] = (desc.match(/range (.*?),/) || ["",""])[1];
-                            }
-                            update["repeating_npcaction-l_" + newrowid + "_attack_tohit"] = (desc.match(/\+(.*) to hit/) || ["",""])[1];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_target"] = (desc.match(/\.,(?!.*\.,)(.*)\. Hit:/) || ["",""])[1];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_damage"] = (desc.match(/\(([^)]+)\)/) || ["",""])[1];
-                            update["repeating_npcaction-l_" + newrowid + "_attack_damagetype"] = (desc.match(/\) (.*?) damage/) || ["",""])[1];
-                            if((desc.match(/\(/g) || []).length > 1 && (!desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] || desc.match(/\((?!.*\()([^)]+)\)/).indexOf(" DC")[1] === -1)) {
-                                update["repeating_npcaction-l_" + newrowid + "_attack_damage2"] = (desc.match(/\((?!.*\()([^)]+)\)/) || ["",""])[1];
-                                update["repeating_npcaction-l_" + newrowid + "_attack_damagetype2"] = (desc.match(/\)(?!.*\)) (.*?) damage/) || ["",""])[1];
-                            }
-                        }
-                        else {
-                            update["repeating_npcaction-l_" + newrowid + "_description"] = desc;
-                        }
-                    });
-                }
-
-            }
+            } else if(contentarray && contentarray.indexOf("Traits") > -1) {
+                console.log(`%c Traits was not found for ${page.name}`, "color: orange;");
+            };
         };
         if(category === "Feats") {
             update["tab"] = "core";
@@ -10391,7 +10085,7 @@
             let npc_flag  = 0;
 
             _.each(list.reverse(), (base) => {
-                const attr   = base.split("_")[1];
+                const attr   = base.slice(4, -5); //Remove npc_ and _base
                 let item     = parseInt(v[`${base}`], 10);
 
                 // CSS will add comma :after 2 & 4 and +/- :before
@@ -10408,10 +10102,8 @@
                     item      = "";
                 };
 
-                //Type = "save" or "skills"
-                const attrName = (type === "save") ? `${attr}_save` : `${attr}`;
-                update[`npc_${attrName}_flag`] = item_flag;
-                update[`npc_${attrName}`]      = item;
+                update[`npc_${attr}_flag`] = item_flag;
+                update[`npc_${attr}`]      = item;
 
                 npc_flag += item_flag;
             });
@@ -10420,6 +10112,8 @@
             update[`npc_${flagAttr}_flag`] = (npc_flag === 0) ? "" : npc_flag;
 
             setAttrs(update, {silent: true});
+
+            console.log(update);
         });
     };
 
