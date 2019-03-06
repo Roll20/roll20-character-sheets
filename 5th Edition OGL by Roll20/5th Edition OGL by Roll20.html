@@ -7295,88 +7295,99 @@
         update["drop_data"] = "";
         update["drop_content"] = "";
         if(category === "Items") {
+            console.log(`%c ITEMS`, "color: purple; font-weight:16px;");
             if(currentData.npc === "0") {
+                console.log(`%c PC`, "color: purple; font-weight:16px;"); //REMOVE LATER
                 update["tab"] = "core";
-                if(page.name) {update["repeating_inventory_" + id + "_itemname"] = page.name};
-                if(page.data["itemcount"]) {update["repeating_inventory_" + id + "_itemcount"] = page.data["itemcount"]};
-                if(page.data["Weight"]) {update["repeating_inventory_" + id + "_itemweight"] = page.data["Weight"]};
-                if(page.data["Properties"]) {update["repeating_inventory_" + id + "_itemproperties"] = page.data["Properties"]};
-                if(page.content) {update["repeating_inventory_" + id + "_itemcontent"] = page.content};
+                if(page.name) {update[`repeating_inventory_${id}_itemname`]               = page.name};
+                if(page.data["itemcount"]) {update[`repeating_inventory_${id}_itemcount`] = page.data["itemcount"]};
+
+                ["Properties", "Weight"].forEach((attr) => {
+                    if (page.data[`${attr}`]) {
+                        update[`repeating_inventory_${id}_item${attr.toLowerCase()}`] = page.data[`${attr}`]
+                    };
+                });
+
+                if(page.content) {update[`repeating_inventory_${id}_itemcontent`] = page.content};
                 if(!page.data["Item Type"] || page.data["Item Type"] == "") {page.data["Item Type"] = category};
                 var mods = "Item Type: " + page.data["Item Type"];
                 if(page.data["AC"] && page.data["AC"] != "") {
                     mods += ", AC: " + page.data["AC"];
                     if(!looped) {
-                        callbacks.push( function() {update_ac();} )
+                        callbacks.push(() => {update_ac();} )
                     }
                 };
-                if(page.data["Damage"] && page.data["Damage"] != "") {mods += ", Damage: " + page.data["Damage"]};
-                if(page.data["Damage Type"] && page.data["Damage Type"] != "") {mods += ", Damage Type: " + page.data["Damage Type"]};
-                if(page.data["Secondary Damage"] && page.data["Secondary Damage"] != "") {mods += ", Secondary Damage: " + page.data["Secondary Damage"]};
-                if(page.data["Secondary Damage Type"] && page.data["Secondary Damage Type"] != "") {mods += ", Secondary Damage Type: " + page.data["Secondary Damage Type"]};
-                if(page.data["Alternate Damage"] && page.data["Alternate Damage"] != "") {mods += ", Alternate Damage: " + page.data["Alternate Damage"]};
-                if(page.data["Alternate Damage Type"] && page.data["Alternate Damage Type"] != "") {mods += ", Alternate Damage Type: " + page.data["Alternate Damage Type"]};
-                if(page.data["Alternate Secondary Damage"] && page.data["Alternate Secondary Damage"] != "") {mods += ", Alternate Secondary Damage: " + page.data["Alternate Secondary Damage"]};
-                if(page.data["Alternate Secondary Damage Type"] && page.data["Alternate Secondary Damage Type"] != "") {mods += ", Alternate Secondary Damage Type: " + page.data["Alternate Secondary Damage Type"]};
-                if(page.data["Range"] && page.data["Range"] != "") {mods += ", Range: " + page.data["Range"]};
-                if(page.data["Modifiers"] && page.data["Modifiers"] != "") {mods += ", " + page.data["Modifiers"]};
-                update["repeating_inventory_" + id + "_itemmodifiers"] = mods;
+
+                ["Damage", "Damage Type", "Secondary Damage", "Secondary Damage Type", "Alternate Damage", "Alternate Damage Type", "Alternate Secondary Damage", "Alternate Secondary Damage Type", "Range"].forEach((attr) => {
+                    if (page.data[`${attr}`] && page.data[`${attr}`] != "") {
+                        mods += `, ${attr}: ${page.data[`${attr}`]}`
+                    };
+                });
+
+                if(page.data["Modifiers"] && page.data["Modifiers"] != "") { mods += `, ${page.data["Modifiers"]}` }; 
+                update[`repeating_inventory_${id}_itemmodifiers`] = mods;
                 if(page.data["Item Type"].indexOf("Weapon") > -1) {
-                    update["repeating_inventory_" + id + "_hasattack"] = 1;
-                    callbacks.push( function() {
-                        if(page.data["Alternate Damage"] && page.data["Alternate Damage"] !== "") {
-                            create_attack_from_item(id, {versatile: true});
-                        } else {
-                            create_attack_from_item(id);
-                        }
-                    } );
-                }
-                else if(page.data["Item Type"].indexOf("Ammunition") > -1) {
-                    update["repeating_inventory_" + id + "_useasresource"] = 1;
-                    callbacks.push( function() {create_resource_from_item(id);} );
+                    update[`repeating_inventory_${id}_hasattack`] = 1;
+                    callbacks.push(() => {
+                        (page.data["Alternate Damage"] && page.data["Alternate Damage"] !== "") ? create_attack_from_item(id, {versatile: true}) : create_attack_from_item(id);
+                    });
+                } else if(page.data["Item Type"].indexOf("Ammunition") > -1) {
+                    update[`repeating_inventory_${id}_useasresource`] = 1;
+                    callbacks.push(() => { create_resource_from_item(id); });
                 };
+
                 if(page.data["Modifiers"]) {
-                    callbacks.push( function() {check_itemmodifiers(page.data["Modifiers"]);} );
+                    callbacks.push(() => { check_itemmodifiers(page.data["Modifiers"]); });
                 };
+
                 if(!looped) {
-                    callbacks.push( function() {update_weight();} );
+                    callbacks.push(() => { update_weight(); });
                 }
-            }
-            else {
-                if(page.data["Item Type"] && new RegExp('\\bweapon\\b', 'i').test(page.data["Item Type"])) {
-                    var make_npc_attack_from_item = function(rowid, options) {
-                        update["repeating_npcaction_" + rowid + "_npc_options-flag"] = "0";
-                        update["repeating_npcaction_" + rowid + "_attack_flag"] = "on";
+            } else {
+                if(page.data["Item Type"] && page.data["Item Type"].toLowerCase().includes("weapon")) {
+                    const type = (page.data["Item Type"]) ? page.data["Item Type"].toLowerCase() : " ";
+                    console.log(`%c NPCs, ${page.data["Item Type"]}`, "color: orange;"); //REMOVE LATER
+                    console.log(page.data); //REMOVE LATER
+
+                    const make_npc_attack_from_item = (rowid, options) => {
+                        const properties = (page.data["Properties"]) ? page.data["Properties"].toLowerCase() : "";
+
+                        update[`repeating_inventory_${id}_npc_options-flag`] = "0";
+                        update[`repeating_inventory_${id}_attack_flag`]      = "on";
 
                         if(page.name) {
-                            update["repeating_npcaction_" + rowid + "_name"] = page.name;
-                            if(options && options.versatile) {
-                                update["repeating_npcaction_" + rowid + "_name"] += " (" + (options.versatile === 1 ? "One-Handed" : "Two-Handed") + ")";
-                            } else if(options && options.thrown) {
-                                update["repeating_npcaction_" + rowid + "_name"] += " (Thrown)";
+                            update[`repeating_inventory_${id}_name`] = page.name;
+                            if (options && options.versatile) {
+                                update[`repeating_inventory_${id}_name`] += " (" + (options.versatile === 1 ? "One-Handed" : "Two-Handed") + ")";
+                            } else if (options && options.thrown) {
+                                update[`repeating_inventory_${id}_name`] += " (Thrown)";
                             }
                         }
-                        if(page.content) { update["repeating_npcaction_" + rowid + "_description"] = page.content; }
+                        //if(page.content) { update[`repeating_inventory_${id}_description`] = page.content; }
 
-                        update["repeating_npcaction_" + rowid + "_attack_display_flag"] = "{{attack=1}}";
-                        update["repeating_npcaction_" + rowid + "_attack_options"] = "{{attack=1}}";
-                        update["repeating_npcaction_" + rowid + "_attack_type"] = page.data["Item Type"].substring(0, page.data["Item Type"].indexOf(" "));
+                        update[`repeating_inventory_${id}_attack_display_flag`] = "{{attack=1}}";
+                        update[`repeating_inventory_${id}_attack_options`]      = "{{attack=1}}";
+                        update[`repeating_inventory_${id}_attack_type`]         = page.data["Item Type"];
 
-                        var thrown = page.data["Properties"] && new RegExp('\\bthrown\\b', 'i').test(page.data["Properties"]);
+                        console.log(properties);
+                        console.log(update[`repeating_inventory_${id}_attack_type`]);
 
-                        if(page.data["Range"] && page.data["Range"] != "" && (!thrown || (options && options.thrown))) {
-                            update["repeating_npcaction_" + rowid + "_attack_range"] = page.data["Range"];
-                        }
-                        else if(page.data["Properties"] && new RegExp('\\breach\\b', 'i').test(page.data["Properties"])) {
-                            update["repeating_npcaction_" + rowid + "_attack_range"] = "10 ft";
-                        }
-                        else {
-                            update["repeating_npcaction_" + rowid + "_attack_range"] = "5 ft";
-                        }
+                        update[`repeating_inventory_${id}_attack_range`]  = page.data["Range"];
+                        update[`repeating_inventory_${id}_attack_target`] = "one target";
 
-                        update["repeating_npcaction_" + rowid + "_attack_target"] = "one target";
 
-                        var isFinesse = page.data["Properties"] && new RegExp('\\bfinesse\\b', 'i').test(page.data["Properties"]);
+                        update[`repeating_inventory_${id}_attack_tohit`] = (type.includes("ranged") || (properties.includes("finesse") && currentData.dexterity_mod > currentData.strength_mod))) ? currentData.dexterity_mod : currentData.strength_mod;
+                        
+                        const dmgArray = (options && options.versatile === 2) ? 
+                            ["Alternate Damage", "Alternate Damage Type", "Alternate Secondary Damage", "Alternate Secondary Damage Type"] :
+                            ["Damage", "Damage Type", "Secondary Damage", "Secondary Damage Type"];
+
+                        dmgArray.forEach((attr) => {
+                            //(dmgArray.indexOf(`${attr}`) === 0) ? `${page.data[`${attr}`]}+${weapon_attr_mod}` : page.data[`${attr}`];
+                        });
+
+
+             /*           var isFinesse = page.data["Properties"] && new RegExp('\\bfinesse\\b', 'i').test(page.data["Properties"]);
                         var attack_type = update[`repeating_npcaction_${id}_attack_type`].toLowerCase();
                         var use_dex_mod = attack_type === "ranged" || (isFinesse && currentData.dexterity_mod > currentData.strength_mod);
                         var weapon_attr_mod = use_dex_mod ? currentData.dexterity_mod : currentData.strength_mod;
@@ -7384,14 +7395,13 @@
 
                         if(options && options.versatile === 2) {
                             if(page.data["Alternate Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage"] = page.data["Alternate Damage"] + "+" + weapon_attr_mod; }
-                            if(page.data["Alternate Damage Type"]) { update["repeating_npcaction_" + rowid + "_attack_damagetype"] = page.data["Alternate Damage Type"]; }
-                            if(page.data["Alternate Secondary Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage2"] = page.data["Alternate Secondary Damage"]; }
+                            if(page.data["Alternate Damage Type"]) { update["repeating_npcaction_" + rowid + "_attack_damagetype"]            = page.data["Alternate Damage Type"]; }
+                            if(page.data["Alternate Secondary Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage2"]          = page.data["Alternate Secondary Damage"]; }
                             if(page.data["Alternate Secondary Damage Type"]) { update["repeating_npcaction_" + rowid + "_attack_damagetype2"] = page.data["Alternate Secondary Damage Type"]; }
-                        }
-                        else {
-                            if(page.data["Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage"] = page.data["Damage"] + "+" + weapon_attr_mod; }
-                            if(page.data["Damage Type"]) {update["repeating_npcaction_" + rowid + "_attack_damagetype"] = page.data["Damage Type"]; }
-                            if(page.data["Secondary Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage2"] = page.data["Secondary Damage"]; }
+                        } else {
+                            if(page.data["Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage"]                     = page.data["Damage"] + "+" + weapon_attr_mod; }
+                            if(page.data["Damage Type"]) {update["repeating_npcaction_" + rowid + "_attack_damagetype"]             = page.data["Damage Type"]; }
+                            if(page.data["Secondary Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage2"]          = page.data["Secondary Damage"]; }
                             if(page.data["Secondary Damage Type"]) { update["repeating_npcaction_" + rowid + "_attack_damagetype2"] = page.data["Secondary Damage Type"]; }
                         }
 
@@ -7413,19 +7423,19 @@
                                 if(tohit_match && tohit_match[1]) { update[`repeating_npcaction_${rowid}_attack_tohit`] = +update[`repeating_npcaction_${rowid}_attack_tohit`] + +tohit_match[1]; }
                                 if(page.data["Damage"] && damage_match && damage_match[1]) { update[`repeating_npcaction_${rowid}_attack_damage`] += damage_match[1]; }
                             }
-                        }
+                        }*/
                     };
 
-                    var versatile = page.data["Properties"] && new RegExp('\\bversatile\\b', 'i').test(page.data["Properties"]) ? 1 : undefined;
+            /*       var versatile = page.data["Properties"] && new RegExp('\\bversatile\\b', 'i').test(page.data["Properties"]) ? 1 : undefined;
                     make_npc_attack_from_item(id, {versatile: versatile});
                     if(page.data["Properties"] && new RegExp('\\bthrown\\b', 'i').test(page.data["Properties"])) {
                         make_npc_attack_from_item(generateRowID(), {thrown: true});
                     }
                     if(versatile && page.data["Alternate Damage"]) {
                         make_npc_attack_from_item(generateRowID(), {versatile:2})
-                    }
+                    } */
 
-                    callbacks.push(function() { check_itemmodifiers(page.data["Modifiers"]); }, function() { update_npc_action("all"); });
+                    //callbacks.push(function() { check_itemmodifiers(page.data["Modifiers"]); }, function() { update_npc_action("all"); });
                 }
             }
         };
