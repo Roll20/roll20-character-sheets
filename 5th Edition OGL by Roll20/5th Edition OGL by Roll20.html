@@ -7345,97 +7345,81 @@
                 }
             } else {
                 if(page.data["Item Type"] && page.data["Item Type"].toLowerCase().includes("weapon")) {
-                    const type = (page.data["Item Type"]) ? page.data["Item Type"].toLowerCase() : " ";
-                    console.log(`%c NPCs, ${page.data["Item Type"]}`, "color: orange;"); //REMOVE LATER
+                    const type       = (page.data["Item Type"]) ? page.data["Item Type"].toLowerCase().split(" ")[0] : " ";
+                    const properties = (page.data["Properties"]) ? page.data["Properties"].toLowerCase() : undefined;
                     console.log(page.data); //REMOVE LATER
 
                     const make_npc_attack_from_item = (rowid, options) => {
-                        const properties = (page.data["Properties"]) ? page.data["Properties"].toLowerCase() : "";
-
-                        update[`repeating_inventory_${id}_npc_options-flag`] = "0";
-                        update[`repeating_inventory_${id}_attack_flag`]      = "on";
+                        update[`repeating_npcaction_${id}_npc_options-flag`] = "0";
+                        update[`repeating_npcaction_${id}_attack_flag`]      = "on";
 
                         if(page.name) {
-                            update[`repeating_inventory_${id}_name`] = page.name;
+                            update[`repeating_npcaction_${id}_name`] = page.name;
                             if (options && options.versatile) {
-                                update[`repeating_inventory_${id}_name`] += " (" + (options.versatile === 1 ? "One-Handed" : "Two-Handed") + ")";
+                                update[`repeating_npcaction_${id}_name`] += " (" + (options.versatile === 1 ? "One-Handed" : "Two-Handed") + ")";
                             } else if (options && options.thrown) {
-                                update[`repeating_inventory_${id}_name`] += " (Thrown)";
+                                update[`repeating_npcaction_${id}_name`] += " (Thrown)";
                             }
-                        }
-                        //if(page.content) { update[`repeating_inventory_${id}_description`] = page.content; }
+                        };
+                        if(page.content) { update[`repeating_inventory_${id}_description`] = page.content; }
 
-                        update[`repeating_inventory_${id}_attack_display_flag`] = "{{attack=1}}";
-                        update[`repeating_inventory_${id}_attack_options`]      = "{{attack=1}}";
-                        update[`repeating_inventory_${id}_attack_type`]         = page.data["Item Type"];
+                        update[`repeating_npcaction_${id}_attack_display_flag`] = "{{attack=1}}";
+                        update[`repeating_npcaction_${id}_attack_options`]      = "{{attack=1}}";
+                        update[`repeating_npcaction_${id}_attack_type`]         = page.data["Item Type"];
+                        update[`repeating_npcaction_${id}_attack_range`]        = page.data["Range"];
+                        update[`repeating_npcaction_${id}_attack_target`]       = "one target";
 
-                        console.log(properties);
-                        console.log(update[`repeating_inventory_${id}_attack_type`]);
+                        const weapon_attr_mod = (type.includes("ranged") || (properties && properties.includes("finesse") && currentData.dexterity_mod > currentData.strength_mod)) ? currentData.dexterity_mod : currentData.strength_mod;
+                        update[`repeating_npcaction_${id}_attack_tohit`] = weapon_attr_mod;
 
-                        update[`repeating_inventory_${id}_attack_range`]  = page.data["Range"];
-                        update[`repeating_inventory_${id}_attack_target`] = "one target";
-
-
-                        update[`repeating_inventory_${id}_attack_tohit`] = (type.includes("ranged") || (properties.includes("finesse") && currentData.dexterity_mod > currentData.strength_mod))) ? currentData.dexterity_mod : currentData.strength_mod;
-                        
                         const dmgArray = (options && options.versatile === 2) ? 
                             ["Alternate Damage", "Alternate Damage Type", "Alternate Secondary Damage", "Alternate Secondary Damage Type"] :
                             ["Damage", "Damage Type", "Secondary Damage", "Secondary Damage Type"];
 
                         dmgArray.forEach((attr) => {
-                            //(dmgArray.indexOf(`${attr}`) === 0) ? `${page.data[`${attr}`]}+${weapon_attr_mod}` : page.data[`${attr}`];
+                            if (page.data[`${attr}`]) {
+                                // _attack_damage adds the weapon mod
+                                const ending = (dmgArray.indexOf(`${attr}`) === 0) ? `+${weapon_attr_mod}` : "";
+                                //Remove Alternate for the attribute name. Then check for Secondary and remote it while adding 2.
+                                let attrEdit = (attr.includes("Alternate") && attr.includes("Secondary")) ? attr.slice(20) + "2" : (attr.includes("Alternate") || attr.includes("Secondary")) ? attr.slice(10) : attr;
+                                //Lower case everything and remove spaces
+                                let name = attrEdit.toLowerCase().replace(" ", "");
+                                //Set all the necessary attack attributes
+                                update[`repeating_npcaction_${rowid}_attack_${name}`] = page.data[`${attr}`] + [`${ending}`];
+                            };
                         });
 
-
-             /*           var isFinesse = page.data["Properties"] && new RegExp('\\bfinesse\\b', 'i').test(page.data["Properties"]);
-                        var attack_type = update[`repeating_npcaction_${id}_attack_type`].toLowerCase();
-                        var use_dex_mod = attack_type === "ranged" || (isFinesse && currentData.dexterity_mod > currentData.strength_mod);
-                        var weapon_attr_mod = use_dex_mod ? currentData.dexterity_mod : currentData.strength_mod;
-                        update["repeating_npcaction_" + rowid + "_attack_tohit"] = weapon_attr_mod;
-
-                        if(options && options.versatile === 2) {
-                            if(page.data["Alternate Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage"] = page.data["Alternate Damage"] + "+" + weapon_attr_mod; }
-                            if(page.data["Alternate Damage Type"]) { update["repeating_npcaction_" + rowid + "_attack_damagetype"]            = page.data["Alternate Damage Type"]; }
-                            if(page.data["Alternate Secondary Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage2"]          = page.data["Alternate Secondary Damage"]; }
-                            if(page.data["Alternate Secondary Damage Type"]) { update["repeating_npcaction_" + rowid + "_attack_damagetype2"] = page.data["Alternate Secondary Damage Type"]; }
-                        } else {
-                            if(page.data["Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage"]                     = page.data["Damage"] + "+" + weapon_attr_mod; }
-                            if(page.data["Damage Type"]) {update["repeating_npcaction_" + rowid + "_attack_damagetype"]             = page.data["Damage Type"]; }
-                            if(page.data["Secondary Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage2"]          = page.data["Secondary Damage"]; }
-                            if(page.data["Secondary Damage Type"]) { update["repeating_npcaction_" + rowid + "_attack_damagetype2"] = page.data["Secondary Damage Type"]; }
-                        }
-
                         if(page.data["Modifiers"]) {
-                            if(attack_type === "melee") {
-                                var tohit_regex = /(?:melee|weapon) *attacks? *([\\+\\-] *[0-9]+)/i;
-                                var melee_damage_regex = /(?:melee|weapon) *damage *([\\+\\-] *[0-9]+)/i;
-                                var tohit_match = tohit_regex.exec(page.data["Modifiers"]);
-                                var damage_match = melee_damage_regex.exec(page.data["Modifiers"]);
-
-                                if(tohit_match && tohit_match[1]) { update[`repeating_npcaction_${rowid}_attack_tohit`] = +update[`repeating_npcaction_${rowid}_attack_tohit`] + +tohit_match[1]; }
-                                if(page.data["Damage"] && damage_match && damage_match[1]) { update[`repeating_npcaction_${rowid}_attack_damage`] += damage_match[1]; }
-                            } else if(attack_type === "ranged") {
-                                var tohit_regex = /(?:ranged|weapon) *attacks? *([\\+\\-] *[0-9]+)/i;
-                                var ranged_damage_regex = /(?:ranged|weapon) *damage *([\\+\\-] *[0-9]+)/i;
-                                var tohit_match = tohit_regex.exec(page.data["Modifiers"]);
-                                var damage_match = ranged_damage_regex.exec(page.data["Modifiers"]);
-
-                                if(tohit_match && tohit_match[1]) { update[`repeating_npcaction_${rowid}_attack_tohit`] = +update[`repeating_npcaction_${rowid}_attack_tohit`] + +tohit_match[1]; }
-                                if(page.data["Damage"] && damage_match && damage_match[1]) { update[`repeating_npcaction_${rowid}_attack_damage`] += damage_match[1]; }
-                            }
-                        }*/
+                            if(type === "melee" || type === "ranged") {
+                                //+1 Weapons should be in the format of "Melee Attacks +1, Melee Damage +1"
+                                const split = (page.data["Modifiers"].includes(",")) ? page.data["Modifiers"].split(", ") : page.data["Modifiers"];
+                                split.forEach((attr) => {
+                                    const name = attr.toLowerCase();
+                                    if (name.includes("attacks")) { 
+                                        update[`repeating_npcaction_${rowid}_attack_tohit`] = +update[`repeating_npcaction_${rowid}_attack_tohit`] + name.split("attacks ")[1];
+                                    } else if (name.includes("damage")) {
+                                        update[`repeating_npcaction_${rowid}_attack_damage`] += name.split("damage ")[1];
+                                    } else {
+                                        console.log(`%c Item Modifiers format did not include damage or attacks`, "color:orange;");
+                                    };
+                                });
+                            }; 
+                        };
                     };
 
-            /*       var versatile = page.data["Properties"] && new RegExp('\\bversatile\\b', 'i').test(page.data["Properties"]) ? 1 : undefined;
+                    console.log(properties);
+
+                    const versatile = (properties && properties.includes("versatile")) ? 1 : undefined;
                     make_npc_attack_from_item(id, {versatile: versatile});
-                    if(page.data["Properties"] && new RegExp('\\bthrown\\b', 'i').test(page.data["Properties"])) {
-                        make_npc_attack_from_item(generateRowID(), {thrown: true});
+
+                    if(properties && properties.includes("thrown")) {
+                       make_npc_attack_from_item(generateRowID(), {thrown: true});
                     }
                     if(versatile && page.data["Alternate Damage"]) {
-                        make_npc_attack_from_item(generateRowID(), {versatile:2})
-                    } */
+                        make_npc_attack_from_item(generateRowID(), {versatile: 2})
+                    } 
 
-                    //callbacks.push(function() { check_itemmodifiers(page.data["Modifiers"]); }, function() { update_npc_action("all"); });
+                    callbacks.push(() => { check_itemmodifiers(page.data["Modifiers"]); }, () => { update_npc_action("all"); });
                 }
             }
         };
@@ -8624,7 +8608,6 @@
     };
 
     var update_attacks = function(update_id, source) {
-        console.log("DOING UPDATE_ATTACKS: " + update_id);
         if(update_id.substring(0,1) === "-" && update_id.length === 20) {
             do_update_attack([update_id], source);
         }
@@ -8713,7 +8696,6 @@
 
         getAttrs(attack_attribs, function(v) {
             _.each(attack_array, function(attackid) {
-                console.log("UPDATING ATTACK: " + attackid);
                 var callbacks = [];
                 var update = {};
                 var hbonus = "";
@@ -10122,8 +10104,6 @@
             update[`npc_${flagAttr}_flag`] = (npc_flag === 0) ? "" : npc_flag;
 
             setAttrs(update, {silent: true});
-
-            console.log(update);
         });
     };
 
