@@ -11,12 +11,16 @@ Each of the planes is also home to unique peoples, from the Giants of the Elemen
 Visit the Elemental Plane of Flame to test yourself in scorched wastelands of the Crucible. Seek answers to hidden secrets in the Umbral Delta of the Conceptual Plane of Shadow. Defend yourself in The Final Court, where the Seven Magistrates provide final remedy to any injustice.
 
 # Current version
-1.0 [Screenshot](sig.jpg)
+1.1 [Screenshot](sig.jpg)
 
 Click to enlarge:
 [![How to use the sheet](sig_howto.jpg)](sig_howto.jpg)
 
 # Release notes
+
+## v1.1 (2017-09-17)
+
+Technical optimisation.
 
 ## v1.0 (2017-06-04)
 

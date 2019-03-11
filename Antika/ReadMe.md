@@ -27,6 +27,11 @@ Désolé de cet inconvénient mais il n'y a pas d'autres moyens dans Roll20 de r
 
 # Notes de version
 
+## v1.1 (2017-09-27)
+
+Optimisation technique.
+
+
 ## v1.0 (2016-09-27)
 
 Création de la feuille.

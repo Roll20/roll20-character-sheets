@@ -5,7 +5,7 @@ Elle est aussi utilisable (et styl&eacute;e) pour _Numen&eacute;ra_ (modulo la g
 La VF s'appuie sur la traduction de Numen&eacute;ra par Black Book Editions.
 
 # Version courante :
-Version 1.6 (21 Février 2016) :
+Version 1.7 (17 Septembre 2017) :
 
 * Capture d'&eacute;cran [style Cypher System g&eacute;n&eacute;rique](CypherSystem.png)
 * Capture d'&eacute;cran [style Numen&eacute;ra](CypherSystem_style_Numenera.png)
@@ -52,6 +52,9 @@ Alternative (permettant de modifier les sources &agrave; votre convenance si vou
 Le script API permet que l'&eacute;tat du personnage soit automatiquement mis &agrave; jour en fonction de la perte de points de caract&eacute;ristiques, d'appliquer la perte de caract&eacute;ristique &agrave; partir des jets dans le chat, de remettre &agrave; z&eacute;ro les param&egrave;tres de jet, de reposer compl&egrave;tement le personnage en un clic.
 
 # Notes de version
+
+## Version 1.7 (17 Septembre 2017)
+Optimisation technique.
 
 ## Version 1.6 (21 Février 2016)
 Changements esthétiques, pour faciliter l'accès au bouton de suppression de ligne répétable, et diminuer la hauteur des lignes répétables.
