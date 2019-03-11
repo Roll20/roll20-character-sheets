@@ -148,6 +148,23 @@
 			});
 		
 		on("sheet:opened", function() {
+			//If ID is defined, move it to the description.
+			getAttrs(["ID", "character_name", "Description"], function(attributes) {
+				if(attributes.ID) {
+					if(attributes.ID.toLowerCase() != attributes.character_name.toLowerCase()) {
+					    var aka = "aka " + attributes.ID;
+					    if(attributes.Description) {
+    						attributes.Description += " (" + aka + ")";
+					    } else {
+					        attributes.Description = aka;
+					    }
+					}
+					
+					attributes.ID = "";
+					setAttrs(attributes);
+				}
+			});
+			
 			//Watch the entire skill tree for changes.
 			//Skip the first slot because there are no +0 slots.
 			var attrNames = [null, "avg", "fair", "good", "great", "sup", "fan", "epic", "leg"];
