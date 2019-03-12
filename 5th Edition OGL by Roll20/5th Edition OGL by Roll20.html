@@ -6476,6 +6476,7 @@
         });
     });
 
+    //DEV REFACTOR 8
     ['spell-cantrip','spell-1','spell-2','spell-3','spell-4','spell-5','spell-6','spell-7','spell-8','spell-9'].forEach(attr => {
         on(`change:repeating_${attr}:spelloutput`, (eventinfo) => {
             if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {return;}
@@ -6485,12 +6486,11 @@
                 const attackid     = v[repeating_source + "_spellattackid"];
                 const higherlevels = v[repeating_source + "_spellathigherlevels"];
                 const spelloutput  = eventinfo.newValue;
-                let lvl            = v[repeating_source + "_spelllevel"];
+                let lvl            = parseInt(v[repeating_source + "_spelllevel"], 10);
 
                 if (spelloutput && spelloutput === "ATTACK") {
                     create_attack_from_spell(lvl, spellid, v["character_id"]);
                 } else if (spelloutput && spelloutput === "SPELLCARD" && attackid && attackid != "") {
-                    let lvl = parseInt(v[repeating_source + "_spelllevel"], 10);
                     remove_attack(attackid);
                     update_spelloutput(higherlevels, lvl, repeating_source, spelloutput);
                 }
@@ -6503,7 +6503,7 @@
             if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {return;}
 
             const spellid = eventinfo.sourceAttribute.split("_")[2], repeating_source = `repeating_${attr}_${spellid}`;
-            getAttrs([`${repeating_source}_spelllevel`, `${repeating_source}_spelloutput`], function(v) {
+            getAttrs([`${repeating_source}_spelllevel`, `${repeating_source}_spelloutput`], (v) => {
                 const higherlevels = eventinfo.newValue;
                 const lvl          = parseInt(v[repeating_source + "_spelllevel"], 10);
                 const spelloutput  = v[repeating_source + "_spelloutput"];
@@ -6522,12 +6522,11 @@
         if (higherlevels) {
             for(i = 0; i < 10-lvl; i++) {
                 let tot = parseInt(i, 10) + parseInt(lvl, 10);
-                spelllevel = spelllevel + "|Level " + tot + "," + tot;
+                spelllevel = `${spelllevel} |Level ${tot},${tot}`;
             }
             spelllevel = `?{Cast at what level? ${spelllevel}}`;
         }
-        update[repeating_source + "_rollcontent"] = "@{wtype}&{template:spell} {{level=@{spellschool} " + spelllevel + "}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}";
-
+        update[`${repeating_source}_rollcontent`] = `@{wtype}&{template:spell} {{level=@{spellschool} ${spelllevel}}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}`;
         setAttrs(update, {silent: true});
     };
 
@@ -8429,175 +8428,160 @@
         });
     };
 
-    var create_attack_from_spell = function(lvl, spellid, character_id) {
-        var update = {};
-        var newrowid = generateRowID();
-        update["repeating_spell-" + lvl + "_" + spellid + "_spellattackid"] = newrowid;
-        update["repeating_spell-" + lvl + "_" + spellid + "_rollcontent"] = "%{" + character_id + "|repeating_attack_" + newrowid + "_attack}";
+    const create_attack_from_spell = (lvl, spellid, character_id) => {
+        let update = {};
+        const newrowid = generateRowID();
+        update[`repeating_spell-${lvl}_${spellid}_spellattackid`] = newrowid;
+        update[`repeating_spell-${lvl}_${spellid}_rollcontent`] = `%{${character_id}|repeating_attack_${newrowid}_attack}`;
         setAttrs(update, {}, update_attack_from_spell(lvl, spellid, newrowid, true));
     }
 
-    var update_attack_from_spell = function(lvl, spellid, attackid, newattack) {
-        getAttrs(["repeating_spell-" + lvl + "_" + spellid + "_spellname",
-            "repeating_spell-" + lvl + "_" + spellid + "_spellrange",
-            "repeating_spell-" + lvl + "_" + spellid + "_spelltarget",
-            "repeating_spell-" + lvl + "_" + spellid + "_spellattack",
-            "repeating_spell-" + lvl + "_" + spellid + "_spelldamage",
-            "repeating_spell-" + lvl + "_" + spellid + "_spelldamage2",
-            "repeating_spell-" + lvl + "_" + spellid + "_spelldamagetype",
-            "repeating_spell-" + lvl + "_" + spellid + "_spelldamagetype2",
-            "repeating_spell-" + lvl + "_" + spellid + "_spellhealing",
-            "repeating_spell-" + lvl + "_" + spellid + "_spelldmgmod",
-            "repeating_spell-" + lvl + "_" + spellid + "_spellsave",
-            "repeating_spell-" + lvl + "_" + spellid + "_spellsavesuccess",
-            "repeating_spell-" + lvl + "_" + spellid + "_spellhldie",
-            "repeating_spell-" + lvl + "_" + spellid + "_spellhldietype",
-            "repeating_spell-" + lvl + "_" + spellid + "_spellhlbonus",
-            "repeating_spell-" + lvl + "_" + spellid + "_spelllevel",
-            "repeating_spell-" + lvl + "_" + spellid + "_includedesc",
-            "repeating_spell-" + lvl + "_" + spellid + "_spelldescription",
-            "repeating_spell-" + lvl + "_" + spellid + "_spellathigherlevels",
-            "repeating_spell-" + lvl + "_" + spellid + "_spell_damage_progression",
-            "repeating_spell-" + lvl + "_" + spellid + "_innate",
-            "repeating_spell-" + lvl + "_" + spellid + "_spell_ability",
-            "spellcasting_ability"], function(v) {
-            var update = {};
-            var description = "";
-            var spellAbility = v["repeating_spell-" + lvl + "_" + spellid + "_spell_ability"] != "spell" ? v["repeating_spell-" + lvl + "_" + spellid + "_spell_ability"].slice(0, -1) : "spell";
-            update["repeating_attack_" + attackid + "_atkattr_base"] = spellAbility;
+    const update_attack_from_spell = (lvl, spellid, attackid, newattack) => {
+        const repeating_spell  = `repeating_spell-${lvl}_${spellid}`;
+        const repeating_attack = `repeating_attack_${attackid}`;
+        getAttrs([`${repeating_spell}_spellname`,
+            `${repeating_spell}_spellrange`,
+            `${repeating_spell}_spelltarget`,
+            `${repeating_spell}_spellattack`,
+            `${repeating_spell}_spelldamage`,
+            `${repeating_spell}_spelldamage2`,
+            `${repeating_spell}_spelldamagetype`,
+            `${repeating_spell}_spelldamagetype2`,
+            `${repeating_spell}_spellhealing`,
+            `${repeating_spell}_spelldmgmod`,
+            `${repeating_spell}_spellsave`,
+            `${repeating_spell}_spellsavesuccess`,
+            `${repeating_spell}_spellhldie`,
+            `${repeating_spell}_spellhldietype`,
+            `${repeating_spell}_spellhlbonus`,
+            `${repeating_spell}_spelllevel`,
+            `${repeating_spell}_includedesc`,
+            `${repeating_spell}_spelldescription`,
+            `${repeating_spell}_spellathigherlevels`,
+            `${repeating_spell}_spell_damage_progression`,
+            `${repeating_spell}_innate`,
+            `${repeating_spell}_spell_ability`,
+            "spellcasting_ability"], (v) => {
+            let update = {};
+            let description = "";
+            const spellAbility = (v[`${repeating_spell}_spell_ability`] != "spell") ? v[`${repeating_spell}_spell_ability`].slice(0, -1) : "spell";
+            update[`${repeating_attack}_atkattr_base`] = spellAbility;
 
-            if(newattack) {
-                update["repeating_attack_" + attackid + "_options-flag"] = "0";
-                update["repeating_attack_" + attackid + "_spellid"] = spellid;
-                update["repeating_attack_" + attackid + "_spelllevel"] = lvl;
-            }
-
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spell_ability"] == "spell") {
-                update["repeating_attack_" + attackid + "_savedc"] = "(@{spell_save_dc})";
-            } else if (v["repeating_spell-" + lvl + "_" + spellid + "_spell_ability"]) {
-                update["repeating_attack_" + attackid + "_savedc"] = "(" + spellAbility + "+8+@{spell_dc_mod}+@{pb})";
+            if (newattack) {
+                update[`${repeating_attack}_options-flag`] = "0";
+                update[`${repeating_attack}_spellid`]      = spellid;
+                update[`${repeating_attack}_spelllevel`]   = lvl;
             }
 
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spellname"] && v["repeating_spell-" + lvl + "_" + spellid + "_spellname"] != "") {
-                update["repeating_attack_" + attackid + "_atkname"] = v["repeating_spell-" + lvl + "_" + spellid + "_spellname"];
-            }
-            if(!v["repeating_spell-" + lvl + "_" + spellid + "_spellattack"] || v["repeating_spell-" + lvl + "_" + spellid + "_spellattack"] === "None") {
-                update["repeating_attack_" + attackid + "_atkflag"] = "0";
-            }
-            else {
-                update["repeating_attack_" + attackid + "_atkflag"] = "{{attack=1}}";
-                description = description + v["repeating_spell-" + lvl + "_" + spellid + "_spellattack"] + " Spell Attack. ";
+            if (v[`${repeating_spell}_spell_ability`] == "spell") {
+                update[`${repeating_attack}_savedc`] = "(@{spell_save_dc})";
+            } else if (v[`${repeating_spell}_spell_ability`]) {
+                update[`${repeating_attack}_savedc`] = `(${spellAbility}+8+@{spell_dc_mod}+@{pb})`;
             }
 
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spelldamage"] && v["repeating_spell-" + lvl + "_" + spellid + "_spelldamage"] != "") {
-                update["repeating_attack_" + attackid + "_dmgflag"] = "{{damage=1}} {{dmg1flag=1}}";
-                if(v["repeating_spell-" + lvl + "_" + spellid + "_spell_damage_progression"] && v["repeating_spell-" + lvl + "_" + spellid + "_spell_damage_progression"] === "Cantrip Dice") {
-                    update["repeating_attack_" + attackid + "_dmgbase"] = "[[round((@{level} + 1) / 6 + 0.5)]]" + v["repeating_spell-" + lvl + "_" + spellid + "_spelldamage"].substring(1);
-                }
-                else {
-                    update["repeating_attack_" + attackid + "_dmgbase"] = v["repeating_spell-" + lvl + "_" + spellid + "_spelldamage"];
-                }
+            if (v[`${repeating_spell}_spellname`] && v[`${repeating_spell}_spellname`] != "") {
+                update[`${repeating_attack}_atkname`] = v[`${repeating_spell}_spellname`];
             }
-            else {
+
+            if (!v[`${repeating_spell}_spellattack`] || v[`${repeating_spell}_spellattack`] === "None") {
+                update[`${repeating_attack}_atkflag`] = "0";
+            } else {
+                update[`${repeating_attack}_atkflag`] = "{{attack=1}}";
+                description = description + v[`${repeating_spell}_spellattack`] + " Spell Attack. ";
+            }
+
+            if (v[`${repeating_spell}_spelldamage`] && v[`${repeating_spell}_spelldamage`] != "") {
+                update[`${repeating_attack}_dmgflag`] = "{{damage=1}} {{dmg1flag=1}}";
+                update[`${repeating_attack}_dmgbase`] = 
+                    (v[`${repeating_spell}_spell_damage_progression`] && v[`${repeating_spell}_spell_damage_progression`] === "Cantrip Dice") ? "[[round((@{level} + 1) / 6 + 0.5)]]" + v[`${repeating_spell}_spelldamage`].substring(1) :
+                    v[`${repeating_spell}_spelldamage`];
+            } else {
                 update["repeating_attack_" + attackid + "_dmgflag"] = "0"
             }
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spelldmgmod"] && v["repeating_spell-" + lvl + "_" + spellid + "_spelldmgmod"] === "Yes") {
-                update["repeating_attack_" + attackid + "_dmgattr"] = spellAbility;
-            }
-            else {
-                update["repeating_attack_" + attackid + "_dmgattr"] = "0";
-            }
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spelldamagetype"]) {
-                update["repeating_attack_" + attackid + "_dmgtype"] = v["repeating_spell-" + lvl + "_" + spellid + "_spelldamagetype"];
-            }
-            else {
-                update["repeating_attack_" + attackid + "_dmgtype"] = "";
-            }
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spelldamage2"]) {
-                update["repeating_attack_" + attackid + "_dmg2base"] = v["repeating_spell-" + lvl + "_" + spellid + "_spelldamage2"];
-                update["repeating_attack_" + attackid + "_dmg2attr"] = 0;
-                update["repeating_attack_" + attackid + "_dmg2flag"] = "{{damage=1}} {{dmg2flag=1}}";
-            }
-            else {
-                update["repeating_attack_" + attackid + "_dmg2base"] = "";
-                update["repeating_attack_" + attackid + "_dmg2attr"] = 0;
-                update["repeating_attack_" + attackid + "_dmg2flag"] = "0";
-            }
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spelldamagetype2"]) {
-                update["repeating_attack_" + attackid + "_dmg2type"] = v["repeating_spell-" + lvl + "_" + spellid + "_spelldamagetype2"];
+
+            update["repeating_attack_" + attackid + "_dmgattr"] = (v[`${repeating_spell}_spelldmgmod`] && v[`${repeating_spell}_spelldmgmod`] === "Yes") ? spellAbility : "0";
+            update[`${repeating_attack}_dmgtype`] = (v[`${repeating_spell}_spelldamagetype`]) ? v[`${repeating_spell}_spelldamagetype`] : "";
+            update[`${repeating_attack}_dmg2base`] = (v[`${repeating_spell}_spelldamage2`]) ? v[`${repeating_spell}_spelldamage2`] : "";
+            update[`${repeating_attack}_dmg2attr`] = 0;
+            update[`${repeating_attack}_dmg2flag`] = (v[`${repeating_spell}_spelldamage2`]) ? "{{damage=1}} {{dmg2flag=1}}" : 0;
+
+            //Stopped here. Saving work.
+
+            if(v[`${repeating_spell}_spelldamagetype2`]) {
+                update["repeating_attack_" + attackid + "_dmg2type"] = v[`${repeating_spell}_spelldamagetype2`];
             }
             else {
                 update["repeating_attack_" + attackid + "_dmg2type"] = "";
             }
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spellrange"]) {
-                update["repeating_attack_" + attackid + "_atkrange"] = v["repeating_spell-" + lvl + "_" + spellid + "_spellrange"];
+            if(v[`${repeating_spell}_spellrange`]) {
+                update["repeating_attack_" + attackid + "_atkrange"] = v[`${repeating_spell}_spellrange`];
             }
             else {
                 update["repeating_attack_" + attackid + "_atkrange"] = "";
             }
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spellrange"]) {
-                update["repeating_attack_" + attackid + "_atkrange"] = v["repeating_spell-" + lvl + "_" + spellid + "_spellrange"];
+            if(v[`${repeating_spell}_spellrange`]) {
+                update["repeating_attack_" + attackid + "_atkrange"] = v[`${repeating_spell}_spellrange`];
             }
             else {
                 update["repeating_attack_" + attackid + "_atkrange"] = "";
             }
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spellsave"]) {
+            if(v[`${repeating_spell}_spellsave`]) {
                 update["repeating_attack_" + attackid + "_saveflag"] = "{{save=1}} {{saveattr=@{saveattr}}} {{savedesc=@{saveeffect}}} {{savedc=[[[[@{savedc}]][SAVE]]]}}";
-                update["repeating_attack_" + attackid + "_saveattr"] = v["repeating_spell-" + lvl + "_" + spellid + "_spellsave"];
+                update["repeating_attack_" + attackid + "_saveattr"] = v[`${repeating_spell}_spellsave`];
             }
             else {
                 update["repeating_attack_" + attackid + "_saveflag"] = "0";
             }
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spellsavesuccess"]) {
-                update["repeating_attack_" + attackid + "_saveeffect"] = v["repeating_spell-" + lvl + "_" + spellid + "_spellsavesuccess"];
+            if(v[`${repeating_spell}_spellsavesuccess`]) {
+                update["repeating_attack_" + attackid + "_saveeffect"] = v[`${repeating_spell}_spellsavesuccess`];
             }
             else {
                 update["repeating_attack_" + attackid + "_saveeffect"] = "";
             }
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spellhldie"] && v["repeating_spell-" + lvl + "_" + spellid + "_spellhldie"] != "" && v["repeating_spell-" + lvl + "_" + spellid + "_spellhldietype"] && v["repeating_spell-" + lvl + "_" + spellid + "_spellhldietype"] != "") {
+            if(v[`${repeating_spell}_spellhldie`] && v[`${repeating_spell}_spellhldie`] != "" && v[`${repeating_spell}_spellhldietype`] && v[`${repeating_spell}_spellhldietype`] != "") {
                 var bonus = "";
-                var spelllevel = v["repeating_spell-" + lvl + "_" + spellid + "_spelllevel"];
+                var spelllevel = v[`${repeating_spell}_spelllevel`];
                 var query = "?{Cast at what level?";
                 for(i = 0; i < 10-spelllevel; i++) {
                     query = query + "|Level " + (parseInt(i, 10) + parseInt(spelllevel, 10)) + "," + i;
                 }
                 query = query + "}";
-                if(v["repeating_spell-" + lvl + "_" + spellid + "_spellhlbonus"] && v["repeating_spell-" + lvl + "_" + spellid + "_spellhlbonus"] != "") {
-                    bonus = "+(" + v["repeating_spell-" + lvl + "_" + spellid + "_spellhlbonus"] + "*" + query + ")";
+                if(v[`${repeating_spell}_spellhlbonus`] && v[`${repeating_spell}_spellhlbonus`] != "") {
+                    bonus = "+(" + v[`${repeating_spell}_spellhlbonus`] + "*" + query + ")";
                 }
-                update["repeating_attack_" + attackid + "_hldmg"] = "{{hldmg=[[(" + v["repeating_spell-" + lvl + "_" + spellid + "_spellhldie"] + "*" + query + ")" + v["repeating_spell-" + lvl + "_" + spellid + "_spellhldietype"] + bonus + "]]}}";
+                update["repeating_attack_" + attackid + "_hldmg"] = "{{hldmg=[[(" + v[`${repeating_spell}_spellhldie`] + "*" + query + ")" + v[`${repeating_spell}_spellhldietype`] + bonus + "]]}}";
             }
             else {
                 update["repeating_attack_" + attackid + "_hldmg"] = "";
             }
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spellhealing"] && v["repeating_spell-" + lvl + "_" + spellid + "_spellhealing"] != "") {
-                if(!v["repeating_spell-" + lvl + "_" + spellid + "_spelldamage"] || v["repeating_spell-" + lvl + "_" + spellid + "_spelldamage"] === "") {
-                    update["repeating_attack_" + attackid + "_dmgbase"] = v["repeating_spell-" + lvl + "_" + spellid + "_spellhealing"];
+            if(v[`${repeating_spell}_spellhealing`] && v[`${repeating_spell}_spellhealing`] != "") {
+                if(!v[`${repeating_spell}_spelldamage`] || v[`${repeating_spell}_spelldamage`] === "") {
+                    update["repeating_attack_" + attackid + "_dmgbase"] = v[`${repeating_spell}_spellhealing`];
                     update["repeating_attack_" + attackid + "_dmgflag"] = "{{damage=1}} {{dmg1flag=1}}";
                     update["repeating_attack_" + attackid + "_dmgtype"] = "Healing";
                 }
-                else if(!v["repeating_spell-" + lvl + "_" + spellid + "_spelldamage2"] || v["repeating_spell-" + lvl + "_" + spellid + "_spelldamage2"] === "") {
-                    update["repeating_attack_" + attackid + "_dmg2base"] = v["repeating_spell-" + lvl + "_" + spellid + "_spellhealing"];
+                else if(!v[`${repeating_spell}_spelldamage2`] || v[`${repeating_spell}_spelldamage2`] === "") {
+                    update["repeating_attack_" + attackid + "_dmg2base"] = v[`${repeating_spell}_spellhealing`];
                     update["repeating_attack_" + attackid + "_dmg2flag"] = "{{damage=1}} {{dmg2flag=1}}";
                     update["repeating_attack_" + attackid + "_dmg2type"] = "Healing";
                 }
             }
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_innate"]) {
-                update["repeating_attack_" + attackid + "_spell_innate"] = v["repeating_spell-" + lvl + "_" + spellid + "_innate"];
+            if(v[`${repeating_spell}_innate`]) {
+                update["repeating_attack_" + attackid + "_spell_innate"] = v[`${repeating_spell}_innate`];
             }
             else {
                 update["repeating_attack_" + attackid + "_spell_innate"] = "";
             }
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_spelltarget"]) {
-                description = description + v["repeating_spell-" + lvl + "_" + spellid + "_spelltarget"] + ". ";
+            if(v[`${repeating_spell}_spelltarget`]) {
+                description = description + v[`${repeating_spell}_spelltarget`] + ". ";
             }
-            if(v["repeating_spell-" + lvl + "_" + spellid + "_includedesc"] && v["repeating_spell-" + lvl + "_" + spellid + "_includedesc"] === "on") {
-                description = v["repeating_spell-" + lvl + "_" + spellid + "_spelldescription"];
-                if(v["repeating_spell-" + lvl + "_" + spellid + "_spellathigherlevels"] && v["repeating_spell-" + lvl + "_" + spellid + "_spellathigherlevels"] != "") {
-                    description = description + "\n\nAt Higher Levels: " + v["repeating_spell-" + lvl + "_" + spellid + "_spellathigherlevels"];
+            if(v[`${repeating_spell}_includedesc`] && v[`${repeating_spell}_includedesc`] === "on") {
+                description = v[`${repeating_spell}_spelldescription`];
+                if(v[`${repeating_spell}_spellathigherlevels`] && v[`${repeating_spell}_spellathigherlevels`] != "") {
+                    description = description + "\n\nAt Higher Levels: " + v[`${repeating_spell}_spellathigherlevels`];
                 }
             }
-            else if(v["repeating_spell-" + lvl + "_" + spellid + "_includedesc"] && v["repeating_spell-" + lvl + "_" + spellid + "_includedesc"] === "off") {
+            else if(v[`${repeating_spell}_includedesc`] && v[`${repeating_spell}_includedesc`] === "off") {
                 description = "";
             };
             update["repeating_attack_" + attackid + "_atk_desc"] = description;
