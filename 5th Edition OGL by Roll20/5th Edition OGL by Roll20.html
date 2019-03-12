@@ -7432,68 +7432,62 @@
         if(category === "Spells") {
             let existing = {};
             var lvl = page.data["Level"] && page.data["Level"] > 0 ? page.data["Level"] : "cantrip";
-            if(repeating["spell-" + lvl]) {
-                _.each(repeating["spell-" + lvl], function(spell, spellid) {
-                    if(spell.spellname.toLowerCase() === page.name.toLowerCase()) {
-                        id = spellid;
+            if (repeating[`spell-${lvl}`]) {
+                _.each(repeating[`spell-${lvl}`], (spell, spellid) => {
+                    if (spell.spellname.toLowerCase() === page.name.toLowerCase()) {
+                        id       = spellid;
                         existing = spell;
-                    }
+                    };
                 });
             }
-            update["repeating_spell-" + lvl + "_" + id + "_spelllevel"] = lvl;
-            if(page.data["spellcasting_ability"]) {
-                update["repeating_spell-" + lvl + "_" + id + "_spell_ability"] = "@{" + page.data["spellcasting_ability"].toLowerCase() + "_mod}+";
-            } else {
-                update["repeating_spell-" + lvl + "_" + id + "_spell_ability"] = "spell";
-            }
-            if(page.data["spellclass"]) {
-                update["repeating_spell-" + lvl + "_" + id + "_spellclass"] = page.data["spellclass"];
-            }
-            if(page.data["spellsource"]) {
-                update["repeating_spell-" + lvl + "_" + id + "_spellsource"] = page.data["spellsource"];
-            }
-            if(page.name) {update["repeating_spell-" + lvl + "_" + id + "_spellname"] = page.name};
-            if(page.data["Ritual"]) {update["repeating_spell-" + lvl + "_" + id + "_spellritual"] = "{{ritual=1}}"};
-            if(page.data["School"]) {update["repeating_spell-" + lvl + "_" + id + "_spellschool"] = page.data["School"].toLowerCase()};
-            if(page.data["Casting Time"]) {update["repeating_spell-" + lvl + "_" + id + "_spellcastingtime"] = page.data["Casting Time"]};
-            if(page.data["Range"]) {update["repeating_spell-" + lvl + "_" + id + "_spellrange"] = page.data["Range"]};
-            if(page.data["Target"]) {update["repeating_spell-" + lvl + "_" + id + "_spelltarget"] = page.data["Target"]};
+
+            update[`repeating_spell-${lvl}_${id}_spelllevel`] = lvl;
+            update[`repeating_spell-${lvl}_${id}_spell_ability`] = (page.data["spellcasting_ability"]) ? `@{${page.data["spellcasting_ability"].toLowerCase()}_mod}+` : "spell";
+            (page.name) ? update[`repeating_spell-${lvl}_${id}_spellname`] = page.name : false;
+
+            ["spellclass", "spellsource", "data-description"].forEach((attr) => {
+                const suffix = (attr.includes("description")) ? "spelldescription" : attr;
+                (page.data[`${attr}`]) ? update[`repeating_spell-${lvl}_${id}_${suffix}`] = page.data[`${attr}`] : false;
+            });
+
+           ["Add Casting Modifier", "Casting Time", "Concentration", "Damage Type", "Damage", "Duration", "Healing", "Material", "Range", "Ritual", "Save", "Save Success", "School", "Secondary Damage", "Secondary Damage Type", "Spell Attack", "Target"].forEach((attr) => {
+                if(page.data[`${attr}`]) {
+                    //Adjust the array entry to match the attribute name in the HTML
+                    const name           = (attr === "Add Casting Modifier") ? "dmgmod" : (attr === "Material") ? `comp_materials` : (attr.includes("Secondary Damage")) ? attr.split("Secondary ")[0] + "2" : attr;
+                    const spellattribute = name.toLowerCase().replace(" ", "");
+                    //Concentration, Ritual, and School are exceptions to norm
+                    const updateValue = (attr === "Concentration" || attr === "Ritual") ? `{{${spellattribute}=1}}` : (attr === "School") ? page.data["School"].toLowerCase() : page.data[`${attr}`];
+                    update[`repeating_spell-${lvl}_${id}_spell${spellattribute}`] = updateValue;
+                };
+            });
+
+           ["Higher Spell Slot Bonus", "Higher Spell Slot Desc", "Higher Spell Slot Dice", "Higher Spell Slot Die"].forEach((attr) => {
+                if (page.data[`${attr}`]) {
+                    const spellattribute = (attr.includes("Bonus")) ? "hlbonus" : (attr.includes("Desc")) ? "athigherlevels" : (attr.includes("Dice")) ? "hldie" : "hldietype";
+                    update[`repeating_spell-${lvl}_${id}_spell${spellattribute}`] = page.data[`${attr}`];
+                };
+            }); 
+
             if(page.data["Components"]) {
-                if(page.data["Components"].toLowerCase().indexOf("v") === -1) {update["repeating_spell-" + lvl + "_" + id + "_spellcomp_v"] = "0"};
-                if(page.data["Components"].toLowerCase().indexOf("s") === -1) {update["repeating_spell-" + lvl + "_" + id + "_spellcomp_s"] = "0"};
-                if(page.data["Components"].toLowerCase().indexOf("m") === -1) {update["repeating_spell-" + lvl + "_" + id + "_spellcomp_m"] = "0"};
+                ["v", "s", "m"].forEach((comp) => {
+                    if(page.data["Components"].toLowerCase().indexOf(comp) === -1) {update[`repeating_spell-${lvl}_${id}_spellcomp_${comp}`] = "0"};
+                });
             };
-            if(page.data["Material"]) {update["repeating_spell-" + lvl + "_" + id + "_spellcomp_materials"] = page.data["Material"]};
-            if(page.data["Concentration"]) {update["repeating_spell-" + lvl + "_" + id + "_spellconcentration"] = "{{concentration=1}}"};
-            if(page.data["Duration"]) {update["repeating_spell-" + lvl + "_" + id + "_spellduration"] = page.data["Duration"]};
+
             if(page.data["Damage"] || page.data["Healing"]) {
-                update["repeating_spell-" + lvl + "_" + id + "_spelloutput"] = "ATTACK";
-                if(!existing.spellattackid) callbacks.push( function() {create_attack_from_spell(lvl, id, currentData.character_id);} );
-            }
-            else if(page.data["Higher Spell Slot Desc"] && page.data["Higher Spell Slot Desc"] != "") {
+                update[`repeating_spell-${lvl}_${id}_spelloutput`] = "ATTACK";
+                if(!existing.spellattackid) callbacks.push(() => {create_attack_from_spell(lvl, id, currentData.character_id);} );
+            } else if(page.data["Higher Spell Slot Desc"] && page.data["Higher Spell Slot Desc"] != "") {
                 var spelllevel = "?{Cast at what level?";
                 for(i = 0; i < 10-lvl; i++) {
                     spelllevel = spelllevel + "|Level " + (parseInt(i, 10) + parseInt(lvl, 10)) + "," + (parseInt(i, 10) + parseInt(lvl, 10));
-                }
+                };
                 spelllevel = spelllevel + "}";
-                update["repeating_spell-" + lvl + "_" + id + "_rollcontent"] = "@{wtype}&{template:spell} {{level=@{spellschool} " + spelllevel + "}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}";
+                update[`repeating_spell-${lvl}_${id}_rollcontent`] = "@{wtype}&{template:spell} {{level=@{spellschool} " + spelllevel + "}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}";
             };
-            if(page.data["Spell Attack"]) {update["repeating_spell-" + lvl + "_" + id + "_spellattack"] = page.data["Spell Attack"]};
-            if(page.data["Damage"]) {update["repeating_spell-" + lvl + "_" + id + "_spelldamage"] = page.data["Damage"]};
-            if(page.data["Damage Type"]) {update["repeating_spell-" + lvl + "_" + id + "_spelldamagetype"] = page.data["Damage Type"]};
-            if(page.data["Secondary Damage"]) {update["repeating_spell-" + lvl + "_" + id + "_spelldamage2"] = page.data["Secondary Damage"]};
-            if(page.data["Secondary Damage Type"]) {update["repeating_spell-" + lvl + "_" + id + "_spelldamagetype2"] = page.data["Secondary Damage Type"]};
-            if(page.data["Healing"]) {update["repeating_spell-" + lvl + "_" + id + "_spellhealing"] = page.data["Healing"];};
-            if(page.data["Add Casting Modifier"]) {update["repeating_spell-" + lvl + "_" + id + "_spelldmgmod"] = page.data["Add Casting Modifier"]};
-            if(page.data["Save"]) {update["repeating_spell-" + lvl + "_" + id + "_spellsave"] = page.data["Save"]};
-            if(page.data["Save Success"]) {update["repeating_spell-" + lvl + "_" + id + "_spellsavesuccess"] = page.data["Save Success"]};
-            if(page.data["Higher Spell Slot Dice"]) {update["repeating_spell-" + lvl + "_" + id + "_spellhldie"] = page.data["Higher Spell Slot Dice"]};
-            if(page.data["Higher Spell Slot Die"]) {update["repeating_spell-" + lvl + "_" + id + "_spellhldietype"] = page.data["Higher Spell Slot Die"]};
-            if(page.data["Higher Spell Slot Bonus"]) {update["repeating_spell-" + lvl + "_" + id + "_spellhlbonus"] = page.data["Higher Spell Slot Bonus"]};
-            if(page.data["Higher Spell Slot Desc"]) {update["repeating_spell-" + lvl + "_" + id + "_spellathigherlevels"] = page.data["Higher Spell Slot Desc"]};
-            if(page.data["data-Cantrip Scaling"] && lvl == "cantrip") {update["repeating_spell-" + lvl + "_" + id + "_spell_damage_progression"] = "Cantrip " + page.data["data-Cantrip Scaling"].charAt(0).toUpperCase() + page.data["data-Cantrip Scaling"].slice(1);};
-            if(page.data["data-description"]) { update["repeating_spell-" + lvl + "_" + id + "_spelldescription"] = page.data["data-description"]};
-            update["repeating_spell-" + lvl + "_" + id + "_options-flag"] = "0";
+
+            if(page.data["data-Cantrip Scaling"] && lvl == "cantrip") {update[`repeating_spell-${lvl}_${id}_spell_damage_progression`] = "Cantrip " + page.data["data-Cantrip Scaling"].charAt(0).toUpperCase() + page.data["data-Cantrip Scaling"].slice(1);};
+            update[`repeating_spell-${lvl}_${id}_options-flag`] = "0"; 
         };
         if(category === "Monsters") {
             console.log(`%c MONSTERS: ${page.name}`, "color: purple; font-weight:16px;");
