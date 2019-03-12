@@ -1,3 +1,8 @@
+Version 3.0
+- Includes interim changes from Salmedo which added inline chat buttons to roll Possibilities and Ups folling a skill check (and an ingenious hack using the tracker, I might add)
+- Added ability to mod attributes and skills (submitted to me by Torg Eternity community member Leamon - I take no credit for it)
+- WE STILL NEED A next-gen Roll20 sheet formatting update to get this more in line with the newer R20 sheets like 5eOGL, Starfinder, etc. If you are a CSS guru and a fan of Torg E, this should be YOUR project. <G>
+  
 Version 2.0
 - Added multiple roll templates
 - Added roll buttons for all skills
