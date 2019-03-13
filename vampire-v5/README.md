@@ -1,4 +1,4 @@
-# Character sheet for Vampire The Maquerade, 5th Edition (v1.2)
+# Character sheet for Vampire The Maquerade, 5th Edition (v2.2)
 
 ## Known Bugs
 
@@ -42,13 +42,27 @@ In the event you only have access to these files and need to do so manually.
 Notes: 
 The Banners folder contains many of the images made (in part) by Martinez A. with use of the sterling work available at https://game-icons.net  (See Kudos)
 
-Please note this is version 1.2, a set of updates are in progress.
-
 ## Bugs and Updates
 
 If you think anything is missing or you see any bugs, please message me via my [Roll20 Account](https://app.roll20.net/users/117780/)
 
 ## Versions
+
+### Version 2.1
+Bug fix where the Willpower button for non-api sheet would not work as intended
+
+### Version 2.1
+Major bug fix. The last build was broken. Included bug fix.
+Also made it so Powers can now be Attribute, Attribute. Added ----- as divider.
+Added Warning about upgrading to Version 2 from Version 1
+
+### Version 2.0
+Updated so Powers is now displayed by click the arrow next to it, rather than it merely being written in. The Powers now have a "Details" next to each so you can trigger a description.
+Attributes now go up to 7 to enable the pre-gen characters in the book to be made. Note "Exceptional Skills" in the book are complete dicepools.
+Bug fix that adding new Coterie Members added Shared Background
+
+### Version 1.2.1
+Bug fixes
 
 ### Version 1.2
 Fixed inline rolls so they now display hunger and vampire dice correctly if hunger dice pool is greater than the initial dice pool.
