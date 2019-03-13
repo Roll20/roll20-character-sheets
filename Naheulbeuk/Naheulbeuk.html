@@ -48,7 +48,19 @@
 		</div>
 		<div class="sheet-col-1">
 			<input type="checkbox" class="sheet-display-pnj" name="attr_tab_pnj" value="1" title="Personnage Non Joueur" /><span class="sheet-display-pnj"></span>
-			<input type="checkbox" class="sheet-display-reglages" name="attr_tab_reglages" value="1" title="Réglages" /><span class="sheet-cog sheet-display-reglages">y</span>
+			<input type="checkbox" class="sheet-display-reglages" name="attr_tab_reglages" value="1" title="Réglages" /><span class="sheet-cog sheet-display-reglages">y</span><br />
+			<input type="checkbox" class="sheet-modal sheet-compendium" name="attr_modal_compendium" value="1"><span class="sheet-cog sheet-compendium">x</span>
+			<div class="sheet-modal-wrapper">
+				<div class="sheet-modal">
+					<div class="sheet-modal_header">
+						<h2>Compendium <span class="sheet-close">*</span><input type="checkbox" class="sheet-modal" name="attr_modal_compendium" value="1"></h2>
+					</div>
+					<div class="sheet-modal_body">
+						<p>Peut recevoir un objet, un coup spécial, une compétence, un sort (...) du <a href="https://bit.ly/ddn20" target="_blank">compendium</a></p>
+						<textarea name="attr_compendium"></textarea>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 	<!--- Repeat and hide checkbox from header to do css trick --->
@@ -2660,6 +2672,12 @@
 	on("change:repeating_conditions:condition_actif remove:repeating_conditions " + buffStats.map( stat => `change:repeating_conditions:${stat}` ).join(" "), function(e) {
 		updateBuffs();
 	});
+	// compendium import
+	on("change:compendium", function( e ) {
+		if( e[ "sourceType"] === "player" ) {
+			importCompendium();
+		}
+	});
 	// export
 	on("change:export_start", function() {
 		start_export();
@@ -3146,29 +3164,27 @@
 		});
 	}
 	
-	// import spell from compendium
-	function updateSpell() {
+	// import json from compendium
+	function importCompendium() {
 		var err = "";
 		var sAttrs = {};
-		getAttrs( [ "repeating_magies_magie_macros" ], function( v ) {
+		getAttrs( [ "compendium" ], function( v ) {
 			// open json
 			try {
-				var sJson = JSON.parse( v[ "repeating_magies_magie_macros" ] );
+				var sJson = JSON.parse( v[ "compendium" ] );
 			} catch(e) {
 				err = "Données non valides";
 			}
 			
+			var newid = generateRowID();
+			
 			// set values
 			for( var i in sJson ) {
-				sAttrs[ i ] = sJson[ i ];
+				// replace placeholder 'rowid' by a new generatedID to create rows
+				sAttrs[ i.replace( 'rowID', newid ) ] = sJson[ i ];
 			}
 			
-			sAttrs[ "repeating_magies_magie_macros" ] = err;
-			
-			// hide macro input after import
-			if( err === "" ) {
-				sAttrs[ "repeating_magies_magie_config" ] = 0;
-			}
+			sAttrs[ "compendium" ] = err;			
 			
 			setAttrs( sAttrs );
 		});
