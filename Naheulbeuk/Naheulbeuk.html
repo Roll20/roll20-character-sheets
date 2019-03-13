@@ -2792,7 +2792,7 @@
 		var sBuffs = {};
 		var statName ='';
 		var keyName ='';
-
+		
 		getSectionIDs( "repeating_conditions", function(idArray) {
 			getAttrs( [ ...idArray.map(id => `repeating_conditions_${id}_condition_actif`) ], function( sValues ) {
 				for( var i in idArray ) {
@@ -2803,19 +2803,30 @@
 					}
 				}
 
-				getAttrs(aBuffs, function(values) {
-					var v = structSafeInt( values );
-					for( var key in v ) {
-						statName = key.split('_')[4];
-						keyName = "stats_" + statName + "_buff";
-						if( sBuffs[ keyName ] != undefined ) {
-							sBuffs[ keyName ] += v[ key ];
-						} else {
-							sBuffs[ keyName ] = v[ key ];
+				if ( aBuffs.length > 0 ) {
+					// apply buffs
+					getAttrs(aBuffs, function(values) {
+						var v = structSafeInt( values );
+						for( var key in v ) {
+							statName = key.split('_')[4];
+							keyName = "stats_" + statName + "_buff";
+							if( sBuffs[ keyName ] != undefined ) {
+								sBuffs[ keyName ] += v[ key ];
+							} else {
+								sBuffs[ keyName ] = v[ key ];
+							}
 						}
+						setAttrs( sBuffs );
+					});
+				} else {
+					// reset buffs
+					for( var j in buffStats ) {
+						statName = buffStats[j].split('_')[1];
+						keyName = "stats_" + statName + "_buff";
+						sBuffs[ keyName ] = 0;
 					}
 					setAttrs( sBuffs );
-				});
+				}
 			});
 		});
 	}
