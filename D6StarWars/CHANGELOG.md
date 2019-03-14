@@ -1,3 +1,8 @@
+### Version 1.82 (2019-01-08):
+
+- Add names to all roll button, so they can be dragged to user's macro bar
+
+
 ### Version 1.81 (2018-09-25):
 
 - Change roll templates of different kind of rolls to have matching colors: Blue for attributes/skills, red for weapon/armor, black for custom and initiative rolls, and keep force rolls purple
