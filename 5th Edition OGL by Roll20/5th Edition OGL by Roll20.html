@@ -6466,9 +6466,13 @@
             if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") { return; }
 
             const spellid = eventinfo.sourceAttribute.split("_")[2], repeating_source = `repeating_${attr}_${spellid}`;
-            getAttrs([repeating_source + "_spellattackid", repeating_source + "_spelllevel"], function(v) {
-                var attackid = v[repeating_source + "_spellattackid"];
-                var lvl      = v[repeating_source + "_spelllevel"];
+            getAttrs([`${repeating_source}_spellattackid`, `${repeating_source}_spelllevel`], (v) => {
+                const attackid = v[`${repeating_source}_spellattackid`];
+                const lvl      = attr.split("spell-")[0];
+
+                console.log(`%c Attribute change ${attr}`, "color:green; font-weight: 14px");
+                console.log(`%c LVL ${lvl}`, "color:green");
+                console.log(eventinfo);
 
                 if(attackid && lvl && spellid) {
                     update_attack_from_spell(lvl, spellid, attackid)
@@ -8436,32 +8440,16 @@
         setAttrs(update, {}, update_attack_from_spell(lvl, spellid, newrowid, true));
     }
 
+    //Spelloutput change needs to getAttrs
+    //update_attacks will also need all the getAttrs
+    //Blog "Custom Spells" & Spells drag & drop can pass all the info
+    //Spell properties change: only need to update their relative stat
     const update_attack_from_spell = (lvl, spellid, attackid, newattack) => {
+        console.log(`c% Update Attack Frome Spell`, "color:purple");
+
         const repeating_spell  = `repeating_spell-${lvl}_${spellid}`;
         const repeating_attack = `repeating_attack_${attackid}`;
-        getAttrs([`${repeating_spell}_spellname`,
-            `${repeating_spell}_spellrange`,
-            `${repeating_spell}_spelltarget`,
-            `${repeating_spell}_spellattack`,
-            `${repeating_spell}_spelldamage`,
-            `${repeating_spell}_spelldamage2`,
-            `${repeating_spell}_spelldamagetype`,
-            `${repeating_spell}_spelldamagetype2`,
-            `${repeating_spell}_spellhealing`,
-            `${repeating_spell}_spelldmgmod`,
-            `${repeating_spell}_spellsave`,
-            `${repeating_spell}_spellsavesuccess`,
-            `${repeating_spell}_spellhldie`,
-            `${repeating_spell}_spellhldietype`,
-            `${repeating_spell}_spellhlbonus`,
-            `${repeating_spell}_spelllevel`,
-            `${repeating_spell}_includedesc`,
-            `${repeating_spell}_spelldescription`,
-            `${repeating_spell}_spellathigherlevels`,
-            `${repeating_spell}_spell_damage_progression`,
-            `${repeating_spell}_innate`,
-            `${repeating_spell}_spell_ability`,
-            "spellcasting_ability"], (v) => {
+        getAttrs([`${repeating_spell}_spellname`, `${repeating_spell}_spellrange`, `${repeating_spell}_spelltarget`, `${repeating_spell}_spellattack`, `${repeating_spell}_spelldamage`, `${repeating_spell}_spelldamage2`,`${repeating_spell}_spelldamagetype`,`${repeating_spell}_spelldamagetype2`,`${repeating_spell}_spellhealing`,`${repeating_spell}_spelldmgmod`,`${repeating_spell}_spellsave`,`${repeating_spell}_spellsavesuccess`,`${repeating_spell}_spellhldie`,`${repeating_spell}_spellhldietype`,`${repeating_spell}_spellhlbonus`,`${repeating_spell}_spelllevel`,`${repeating_spell}_includedesc`,`${repeating_spell}_spelldescription`,`${repeating_spell}_spellathigherlevels`,`${repeating_spell}_spell_damage_progression`,`${repeating_spell}_innate`,`${repeating_spell}_spell_ability`,"spellcasting_ability"], (v) => {
             let update = {};
             let description = "";
             const spellAbility = (v[`${repeating_spell}_spell_ability`] != "spell") ? v[`${repeating_spell}_spell_ability`].slice(0, -1) : "spell";
