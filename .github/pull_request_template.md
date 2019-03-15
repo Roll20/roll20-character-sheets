@@ -16,6 +16,6 @@ Comments are very helpful for reviewing the code changes. Please answer the rele
 - Does this add or change functional aesthetics (such as layout or color scheme) ? 
 - Are you intentionally changing more that one sheet? If so, which ones ?
 - If changing or removing attributes, what steps have you taken, if any, to preserve player data ?
-- If this is a new sheet, did you follow [Buildig Character Sheets standards](https://wiki.roll20.net/Building_Character_Sheets#Roll20_Character_Sheets_Repository) ?
+- If this is a new sheet, did you follow [Building Character Sheets standards](https://wiki.roll20.net/Building_Character_Sheets#Roll20_Character_Sheets_Repository) ?
 
 If you do not know English. Please leave a comment in your native language.
