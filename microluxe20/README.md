@@ -4,8 +4,11 @@ This is a Microluxe20 character sheet for games played on Roll20.net, modeled af
 
 ### Changelog
 
+* Complex Weapon Update - 9th March 2017
+Added complex weapon bonuses to combat section.
+
 * Initial release - 28th December 2016
-Initial release of the microluxe20 sheet. All basic functions are working. Casting spells, rolling for stat/skill rolls, saves, combat rolls, etc. all work. Spell saves/savedc needs to be reworked in the future. Weapon/armor weight & connection to the inventory tab should also be reworked in the future.
+Initial release of the Microluxe20 sheet. All basic functions are working. Casting spells, rolling for stat/skill rolls, saves, combat rolls, etc. all work. Spell saves/savedc needs to be reworked in the future. Weapon/armor weight & connection to the inventory tab should also be reworked in the future.
 
 ### Resources
 
