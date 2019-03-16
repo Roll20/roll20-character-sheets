@@ -976,12 +976,13 @@ on("change:edge_toggle", () => {
 ["physical", "stun", "npc_physical", "npc_stun"].forEach(attr => {
 	on(`change:${attr}`,  (eventinfo) => {
 		const source = eventinfo.sourceAttribute;
-		const otherattr = (source === "physical") ? "stun" : (source === "stun") ? "physical" : (source == "npc_physical") ? "npc_stun" : "npc_physical";
-		getAttrs([`${attr}`, `${otherattr}`],  (v) => {
-			const phy = parseInt(v.npc_physical) || 0, stu = parseInt(v.npc_stun) || 0, tot = Math.floor(phy/3) + Math.floor(stu/3);
+		const otherattr = (source === "physical") ? "stun" : (source === "stun") ? "physical" : (source === "npc_physical") ? "npc_stun" : "npc_physical";
+		getAttrs([`${otherattr}`],  (v) => {
+			const attr1 = parseInt(eventinfo.newValue) || 0, attr2 = parseInt(v[`${otherattr}`]) || 0, tot = Math.floor(attr1/3) + Math.floor(attr2/3);
 			setAttrs({
 	            wounds: [`-${tot}`]
 	        });
+	        console.log(`%c WOUNDS: ${tot}`, "color:green;font-weight: 16px;");
 		});
 	});
 });
