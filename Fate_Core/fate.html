@@ -4,6 +4,8 @@
     };
     
     try {
+        var numberMatcher = /^\d+$/;
+        
         //Breaks a string into the pieces needed to identify a repeating attribute.
         //Sample usage:
         //var repeatingMatch = repeatingMatcher(string);
@@ -26,6 +28,17 @@
                 }
             }
         }
+        
+        function getSectionIDsOrdered(sectionName, callback) {
+            'use strict';
+            getAttrs([`_reporder_${sectionName}`], function (v) {
+                getSectionIDs(sectionName, function (idArray) {
+                    let reporderArray = v[`_reporder_${sectionName}`] ? v[`_reporder_${sectionName}`].toLowerCase().split(',') : [],
+                    ids = [...new Set(reporderArray.filter(x => idArray.includes(x)).concat(idArray))];
+                    callback(ids);
+                });
+            });
+        };
         
         /**
          * @param repeatingName - The word that comes after "repeating_" in the
@@ -69,38 +82,56 @@
             });
         }
         /**
-         * Like getRepeatingAttributes, but puts the array in order.
+         * Like getRepeatingAttributes(), but puts the array in order. Unlike
+         * getRepeatingAttributes(), you do not need to specify suffixes.
          */
         function getRepeatingAttributesOrdered(repeatingName, suffixes, callback) {
-            getRepeatingAttributes(repeatingName, suffixes, function(attributes) {
+            if(suffixes) {
+                getRepeatingAttributes(repeatingName, suffixes, function(attributes) {
+                    getSectionIDsOrdered(repeatingName, function(idsOrdered) {
+                        var result = [];
+                        
+                        for(var id of idsOrdered) {
+                            for(var attribute of attributes) {
+                                if(attribute.id === id) {
+                                    result.push(attribute);
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        callback(result);
+                    });
+                });
+            } else {
                 getSectionIDsOrdered(repeatingName, function(idsOrdered) {
                     var result = [];
                     
                     for(var id of idsOrdered) {
-                        for(var attribute of attributes) {
-                            if(attribute.id === id) {
-                                result.push(attribute);
-                                break;
-                            }
-                        }
+                        result.push({id:id});
                     }
                     
                     callback(result);
                 });
-            }, true);
+            }
         }
         /**
          * Adds a repeating row of the given type, populating it with the given
          * attributes. Sample usage:
          * addRepeatingRow("Advantages", {Advantages:"High Ground", Adv1:"on"});
          */
-        function addRepeatingRow(repeatingName, localAttrs) {
-            var newRowID = generateRowID();
+        function addRepeatingRow(repeatingName, localAttrs, newRowID) {
+            if(!newRowID) {
+                newRowID = generateRowID();
+            }
+            
             var attrs = {};
             for(var attr in localAttrs) {
                 attrs["repeating_" + repeatingName + "_" + newRowID + "_" + attr] = localAttrs[attr];
             }
             setAttrs(attrs);
+            
+            return newRowID;
         }
         
         function getRung(locationInPyramid) {
@@ -115,51 +146,71 @@
             return 0;
         }
         
-        function updateSkills() {
-            var physique = cache.PhyGoverningSkill;
-            if(physique) {
-                physique = physique.toLowerCase();
-            } else {
-                physique = "physique";
-            }
-            var will = cache.MenGoverningSkill;
-            if(will) {
-                will = will.toLowerCase();
-            } else {
-                will = "will";
-            }
+        function updateStress() {
+            updateBasicStress();
+            updateRepeatingStress();
+        }
+        
+        function updateBasicStress() {
+            updateStressTrack(cache.PhyGoverningSkill, "physique", "Phy");
+            updateStressTrack(cache.MenGoverningSkill, "will", "Men");
+        }
+        
+        function updateRepeatingStress() {
+            getRepeatingAttributes("StressOptions", ["GoverningSkill", "Mirrored"], function(stressOptions) {
+                for(var stressOption of stressOptions) {
+                    updateStressTrack(stressOption.GoverningSkill, null, "repeating_Stress_" + stressOption.Mirrored + "_Stress");
+                }
+            });
+        }
+        
+        function updateStressTrack(governingSkill, defaultGoverningSkill, boxPrefix) {
+            var boxesAvailable = 2;
             
-            //The locations of various important skills in the skill pyramid. For
-            //instance, physiqueLocation could be "Good2", and if you called
-            //getAttrs([physiqueLocation]), you'd get {Good2:"Physique"}.
-            var physiqueLocation;
-            var willLocation;
-            
-            for(var attribute of skillAttributes) {
-                var skill = cache[attribute].toLowerCase();
-                if(skill === physique) {
-                    physiqueLocation = attribute;
-                } else if(skill === will) {
-                    willLocation = attribute;
+            //The "governing skill" may actually be a number of boxes, in which
+            //case there's a lot less to do.
+            if(governingSkill && numberMatcher.test(governingSkill)) {
+                boxesAvailable = parseInt(governingSkill);
+            } else {
+                if(governingSkill) {
+                    governingSkill = governingSkill.toLowerCase();
+                } else if(defaultGoverningSkill) {
+                    governingSkill = defaultGoverningSkill.toLowerCase();
+                } else {
+                    return;
+                }
+                
+                var locationInPyramid;
+                
+                for(var attribute of skillAttributes) {
+                    if(cache[attribute].toLowerCase() === governingSkill) {
+                        locationInPyramid = attribute;
+                        break;
+                    }
+                }
+                
+                var rung = getRung(locationInPyramid);
+                
+                if(rung >= 3) {
+                    boxesAvailable = 4;
+                } else if(rung >= 1) {
+                    boxesAvailable = 3;
+                } else {
+                    boxesAvailable = 2;
                 }
             }
             
-            var physiqueRung = getRung(physiqueLocation);
-            var willRung = getRung(willLocation);
-            
             var attrs = {};
             
-            attrs["Phy3Active"] = physiqueRung >= 1 ? "on" : 0;
-            attrs["Phy4Active"] = physiqueRung >= 3 ? "on" : 0;
-            
-            attrs["Men3Active"] = willRung >= 1 ? "on" : 0;
-            attrs["Men4Active"] = willRung >= 3 ? "on" : 0;
+            attrs[boxPrefix + "3Active"] = boxesAvailable >= 3 ? "on" : 0;
+            attrs[boxPrefix + "4Active"] = boxesAvailable >= 4 ? "on" : 0;
             
             var changeMade = false;
             for(var attr in attrs) {
                 if(attrs[attr] === cache[attr]) {
                     delete attrs[attr];
                 } else {
+                    cache[attr] = attrs[attr];
                     changeMade = true;
                 }
             }
@@ -182,6 +233,12 @@
          * mirrorDestination will be set to that value.
          */
         function createMirror(mirrorSource, mirrorDestination) {
+            getAttrs([mirrorSource], function(sourceAttrs) {
+                var attrs = {};
+                attrs[mirrorDestination] = sourceAttrs[mirrorSource];
+                setAttrs(attrs);
+            });
+            
             on("change:" + mirrorSource, function(eventInfo) {
                 var attrs = {};
                 attrs[mirrorDestination] = eventInfo.newValue;
@@ -245,24 +302,88 @@
         }
         
         /**
-         * Creates and deletes repeating rows to match the number typed in by
-         * the user.
-         * 
-         * @param option - The name of the attribute to watch. Must be a text
-         * input field.
+         * Creates and deletes repeating rows to achieve the given number.
          * 
          * @param repeatingName - The name of the repeating section.
          * 
-         * @param initValues - An object. These name/value pairs will be used to
-         * initialize new rows.
+         * @param targetCount - The number of rows the repeating section should
+         * end up with.
          * 
-         * @param preserveAttributes - An array of attribute names. If an
-         * existing row defines any of these attributes, it will not be deleted.
+         * @param initValues - A function or object. If this is an object, it
+         * will be passed to addRepeatingRow(). If it is a function, it must
+         * take a row ID and return an object that can be passed to addRepeatingRow().
          * 
-         * @param hardCodedRows - The number of rows that appear to be part of
-         * this repeating section but are actually hard-coded.
+         * @param deletionBlockers - An array of attribute names. If a row
+         * defines any of these attributes, it will not be deleted. May be null.
+         * 
+         * @param extraValues - An array of attribute names to search for. These
+         * attributes will be passed to removalCallback but will not block deletion.
+         * 
+         * @param removalCallback - If defined, this will be called just before
+         * a row is removed. It must take one parameter: data about the row to
+         * be removed.
          */
-        function createRepeatingOption(option, repeatingName, initValues, preserveAttributes, hardCodedRows) {
+        function setRepeatingRowCount(repeatingName, targetCount, initValues, deletionBlockers, extraValues, removalCallback) {
+            getRepeatingAttributesOrdered(repeatingName, deletionBlockers.concat(extraValues), function(foundAttributes) {
+                var currentRows = 0;
+                var removableRows = [];
+                for(var row of foundAttributes) {
+                    currentRows++;
+                    
+                    var blocked = false;
+                    for(var blocker of deletionBlockers) {
+                        if(row[blocker]) {
+                            blocked = true;
+                            break;
+                        }
+                    }
+                    
+                    if(!blocked) {
+                        removableRows.push(row);
+                    }
+                }
+                
+                if(currentRows < targetCount) {
+                    for(var i = currentRows; i < targetCount; i++) {
+                        var newRowID = generateRowID();
+                        var initialValues = initValues;
+                        if(typeof initValues === "function") {
+                            initialValues = initValues(newRowID);
+                        }
+                        
+                        addRepeatingRow(repeatingName, initialValues, newRowID);
+                    }
+                } else if(currentRows > targetCount) {
+                    removableRows.reverse();
+                    
+                    for(var i = 0; i < currentRows - targetCount; i++) {
+                        if(i >= removableRows.length) {
+                            var minimum = {};
+                            minimum[option] = (hardCodedRows + currentRows - removableRows.length).toString();
+                            setAttrs(minimum);
+                            
+                            break;
+                        }
+                        
+                        if(removalCallback) {
+                            removalCallback(removableRows[i]);
+                        }
+                        
+                        removeRepeatingRow("repeating_" + repeatingName + "_" + removableRows[i].id);
+                    }
+                }
+            });
+        }
+        
+        /**
+         * Creates and deletes repeating rows to match the number typed in by
+         * the user. See setRepeatingRowCount() for more information on the
+         * parameters.
+         * 
+         * @param option - The name of the attribute to watch. Must be a text
+         * input field.
+         */
+        function createRepeatingOption(option, repeatingName, initValues, deletionBlockers, hardCodedRows, extraValues, removalCallback) {
             on("change:" + option.toLowerCase(), function(eventInfo) {
                 var targetRows;
                 
@@ -285,44 +406,24 @@
                     targetRows -= hardCodedRows;
                 }
                 
-                getRepeatingAttributes(repeatingName, preserveAttributes, function(foundAttributes) {
-                    var currentRows = 0;
-                    var removableRows = [];
-                    for(var row of foundAttributes) {
-                        currentRows++;
-                        
-                        var preserved = false;
-                        for(var preserve of preserveAttributes) {
-                            if(row[preserve]) {
-                                preserved = true;
-                                break;
-                            }
-                        }
-                        
-                        if(!preserved) {
-                            removableRows.push(row.id);
-                        }
-                    }
-                    
-                    if(currentRows < targetRows) {
-                        for(var i = currentRows; i < targetRows; i++) {
-                            addRepeatingRow(repeatingName, initValues);
-                        }
-                    } else if(currentRows > targetRows) {
-                        for(var i = 0; i < currentRows - targetRows; i++) {
-                            if(i >= removableRows.length) {
-                                var minimum = {};
-                                minimum[option] = (hardCodedRows + currentRows - removableRows.length).toString();
-                                setAttrs(minimum);
-                                
-                                break;
-                            }
-                            
-                            removeRepeatingRow("repeating_" + repeatingName + "_" + removableRows[i]);
-                        }
-                    }
-                });
+                setRepeatingRowCount(repeatingName, targetRows, initValues, deletionBlockers, extraValues, removalCallback);
             });
+        }
+        
+        function createMirroredRepeatingOption(option, repeatingName1, repeatingName2, initValues1, initValues2, deletionBlockers, hardCodedRows) {
+            function add(rowID1) {
+                initValues2.Mirrored = rowID1;
+                var rowID2 = addRepeatingRow(repeatingName2, initValues2);
+                
+                initValues1.Mirrored = rowID2;
+                return initValues1;
+            }
+            
+            function remove(removed) {
+                removeRepeatingRow("repeating_" + repeatingName2 + "_" + removed.Mirrored);
+            }
+            
+            createRepeatingOption(option, repeatingName1, add, deletionBlockers, hardCodedRows, ["Mirrored"], remove);
         }
         
         //Set up the options section.
@@ -334,7 +435,7 @@
             ["SuperbActive", "FantasticActive", "EpicActive", "LegendaryActive"],
             "on", "0");
         createRepeatingOption("ConsequenceSlots", "Cons", {conType:"Mild"}, ["Consequence"], 3);
-        createRepeatingOption("StressTracks", "Stress", {Stress1:"0"}, ["Name"], 2);
+        createMirroredRepeatingOption("StressTracks", "Stress", "StressOptions", {Stress1:"0"}, {GoverningSkill:2}, ["Name"], 2);
         createRepeatingOption("CharacterAspectSlots", "Aspects", {Asp1:"0"}, ["Aspect"], 2);
         
         on("change:StuntTextboxSize", function(eventInfo) {
@@ -346,6 +447,8 @@
                 setAttrs({LargeStuntsTextbox:"on", LargeExtrasTextbox:"on"});
             }
         });
+        
+        on("change:repeating_stressoptions:governingskill", updateRepeatingStress);
         
         on("sheet:opened", function() {
             //Figure out what needs to be cached.
@@ -363,7 +466,7 @@
             getAttrs(cachedAttributes, function(attributes) {
                 cache = attributes;
                 
-                updateSkills();
+                updateStress();
             });
             listenForChanges(cachedAttributes, function(eventInfo) {
                 for(var attribute of cachedAttributes) {
@@ -377,7 +480,7 @@
                         
                         //Call a function to process the change.
                         if(skillAttributes.indexOf(attribute) >= 0) {
-                            updateSkills();
+                            updateStress();
                         }
                         break;
                     }
@@ -771,8 +874,11 @@
         		<input class="sheet-dynamic-name sheet-stress-left-column" type="text" name="attr_Name" placeholder="(Name)" />&nbsp;
         		<div><label>1<input type="checkbox" name="attr_Stress1" /></label></div>
         		<div><label>2<input type="checkbox" name="attr_Stress2" /></label></div>
+    		    <input class="sheet-active-toggle" type="checkbox" name="attr_Stress3Active" />
         		<div><label>3<input type="checkbox" name="attr_Stress3" /></label></div>
+    		    <input class="sheet-active-toggle" type="checkbox" name="attr_Stress4Active" />
         		<div><label>4<input type="checkbox" name="attr_Stress4" /></label></div>
+        		<input class="sheet-hidden" type="text" name="attr_Mirrored" />
         	</div>
             <div class="sheet-table">&nbsp;</div>
         </fieldset>
@@ -832,7 +938,7 @@
 <input class="sheet-active-toggle" type="checkbox" name="attr_OptionsActive">
 
 <div class="sheet-section-options sheet-popup">
-    <div>Preferences</div>
+    <div>Layout and preferences</div>
     
     <label title="Deselect this to get rid of the &quot;Modifier&quot; popup that appears when rolling dice.">
         Use roll modifiers?&nbsp;
@@ -842,6 +948,11 @@
     <label title="Deselect this to hide the &quot;Boosts and situation aspects&quot; section, giving you more room to track character aspects.">
         Show boosts and situation aspects?&nbsp;
         <input type="checkbox" name="attr_AdvantagesOption" checked="true">
+    </label>
+    
+    <label title="Deselect this to hide the Extras section, giving you more room to track stunts.">
+        Show extras?&nbsp;
+        <input type="checkbox" name="attr_ExtrasOption" checked="true">
     </label>
     
     <label title="You can resize textboxes by hand, but they'll reset each time you open the sheet. Use this to control the size they reset to.">
@@ -854,14 +965,9 @@
     
     <hr>
     
-    <div>Campaign options</div>
+    <div>Stats</div>
     
-    <label title="Deselect this to hide the Extras section, giving you more room to track stunts. Obviously don't do this if your campaign uses extras.">
-        Show extras?&nbsp;
-        <input type="checkbox" name="attr_ExtrasOption" checked="true">
-    </label>
-    
-	<label title="The maximum skill level in your pyramid. In Fate Core, new skill levels are usually achieved through major milestones.">
+	<label title="The highest skill level that will show up in your pyramid. Skills above this level will be hidden, not deleted.">
 	    Maximum skill level:&nbsp;
         <select name="attr_MaxSkillLevel">
             <option>Great (+4)</option>
@@ -872,28 +978,36 @@
         </select>
     </label>
 	
-	<label title="How many character aspects you have. In Fate Core, you start with five and you almost never gain or lose any. This option will never delete an aspect that contains text.">
+	<label title="How many character aspects you have. To remove an aspect, clear the text before changing this number.">
 	    Character aspects:&nbsp;
         <input type="number" name="attr_CharacterAspectSlots" value="5" min="2" />
     </label>
 	
-	<label title="How many consequences you can take without being taken out (not counting extreme consequences). In Fate Core, you usually earn consequence slots by upgrading governing skills to Superb (+5). This option will never delete a consequence that contains text.">
+	<label title="How many consequences you can take without being taken out (not counting extreme consequences). To remove a consequence, clear the text before changing this number.">
 	    Consequence slots:&nbsp;
         <input type="number" name="attr_ConsequenceSlots" value="3" min="3" />
     </label>
     
-	<label title="How many types of stress you'll be using. This depends entirely on your campaign. This option will never delete a named stress track.">
+	<label title="How many types of stress you'll be using. To remove a track, clear the name before changing this number.">
 	    Stress tracks:&nbsp;
         <input type="number" name="attr_StressTracks" value="2" min="2" />
     </label>
     
-	<label title="The skill that determines how many physical stress boxes you have available. In Fate Core, this is usually Physique.">
-	    Physical stress governing skill:&nbsp;
+	<label title="Either enter the skill that determines how many physical stress boxes you have, or just enter the number of boxes.">
+	    Physical stress boxes/governing skill:&nbsp;
         <input type="text" name="attr_PhyGoverningSkill" value="Physique" />
     </label>
     
-	<label title="The skill that determines how many mental stress boxes you have available. In Fate Core, this is usually Will.">
-	    Mental stress governing skill:&nbsp;
+	<label title="Either enter the skill that determines how many mental stress boxes you have, or just enter the number of boxes">
+	    Mental stress boxes/governing skill:&nbsp;
         <input type="text" name="attr_MenGoverningSkill" value="Will" />
+    </label>
+    
+    <fieldset class="repeating_StressOptions sheet-no-repeating-buttons">
+    	<label title="Either enter the skill that determines how many stress boxes you have in this track, or just enter the number of boxes.">
+    	    Custom stress boxes/governing skill:&nbsp;
+            <input type="text" name="attr_GoverningSkill" value="2" min="2" />
+            <input class="sheet-hidden" type="text" name="attr_Mirrored" />
+        </label>
     </label>
 </div> <!-- .section-options -->
