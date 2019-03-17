@@ -302,12 +302,13 @@
         }
         
         /**
-         * Creates and deletes repeating rows to achieve the given number.
+         * Creates and deletes repeating rows to match the number typed in by
+         * the user.
+         * 
+         * @param option - The name of the attribute to watch. Must be a text
+         * input field.
          * 
          * @param repeatingName - The name of the repeating section.
-         * 
-         * @param targetCount - The number of rows the repeating section should
-         * end up with.
          * 
          * @param initValues - A function or object. If this is an object, it
          * will be passed to addRepeatingRow(). If it is a function, it must
@@ -316,72 +317,15 @@
          * @param deletionBlockers - An array of attribute names. If a row
          * defines any of these attributes, it will not be deleted. May be null.
          * 
+         * @param hardCodedRows - The number of rows that appear to be part of
+         * this repeating section but are actually hard-coded.
+         * 
          * @param extraValues - An array of attribute names to search for. These
          * attributes will be passed to removalCallback but will not block deletion.
          * 
          * @param removalCallback - If defined, this will be called just before
          * a row is removed. It must take one parameter: data about the row to
          * be removed.
-         */
-        function setRepeatingRowCount(repeatingName, targetCount, initValues, deletionBlockers, extraValues, removalCallback) {
-            getRepeatingAttributesOrdered(repeatingName, deletionBlockers.concat(extraValues), function(foundAttributes) {
-                var currentRows = 0;
-                var removableRows = [];
-                for(var row of foundAttributes) {
-                    currentRows++;
-                    
-                    var blocked = false;
-                    for(var blocker of deletionBlockers) {
-                        if(row[blocker]) {
-                            blocked = true;
-                            break;
-                        }
-                    }
-                    
-                    if(!blocked) {
-                        removableRows.push(row);
-                    }
-                }
-                
-                if(currentRows < targetCount) {
-                    for(var i = currentRows; i < targetCount; i++) {
-                        var newRowID = generateRowID();
-                        var initialValues = initValues;
-                        if(typeof initValues === "function") {
-                            initialValues = initValues(newRowID);
-                        }
-                        
-                        addRepeatingRow(repeatingName, initialValues, newRowID);
-                    }
-                } else if(currentRows > targetCount) {
-                    removableRows.reverse();
-                    
-                    for(var i = 0; i < currentRows - targetCount; i++) {
-                        if(i >= removableRows.length) {
-                            var minimum = {};
-                            minimum[option] = (hardCodedRows + currentRows - removableRows.length).toString();
-                            setAttrs(minimum);
-                            
-                            break;
-                        }
-                        
-                        if(removalCallback) {
-                            removalCallback(removableRows[i]);
-                        }
-                        
-                        removeRepeatingRow("repeating_" + repeatingName + "_" + removableRows[i].id);
-                    }
-                }
-            });
-        }
-        
-        /**
-         * Creates and deletes repeating rows to match the number typed in by
-         * the user. See setRepeatingRowCount() for more information on the
-         * parameters.
-         * 
-         * @param option - The name of the attribute to watch. Must be a text
-         * input field.
          */
         function createRepeatingOption(option, repeatingName, initValues, deletionBlockers, hardCodedRows, extraValues, removalCallback) {
             on("change:" + option.toLowerCase(), function(eventInfo) {
@@ -406,10 +350,62 @@
                     targetRows -= hardCodedRows;
                 }
                 
-                setRepeatingRowCount(repeatingName, targetRows, initValues, deletionBlockers, extraValues, removalCallback);
+                getRepeatingAttributesOrdered(repeatingName, deletionBlockers.concat(extraValues), function(foundAttributes) {
+                    var currentRows = 0;
+                    var removableRows = [];
+                    for(var row of foundAttributes) {
+                        currentRows++;
+                        
+                        var blocked = false;
+                        for(var blocker of deletionBlockers) {
+                            if(row[blocker]) {
+                                blocked = true;
+                                break;
+                            }
+                        }
+                        
+                        if(!blocked) {
+                            removableRows.push(row);
+                        }
+                    }
+                    
+                    if(currentRows < targetRows) {
+                        for(var i = currentRows; i < targetRows; i++) {
+                            var newRowID = generateRowID();
+                            var initialValues = initValues;
+                            if(typeof initValues === "function") {
+                                initialValues = initValues(newRowID);
+                            }
+                            
+                            addRepeatingRow(repeatingName, initialValues, newRowID);
+                        }
+                    } else if(currentRows > targetRows) {
+                        removableRows.reverse();
+                        
+                        for(var i = 0; i < currentRows - targetRows; i++) {
+                            if(i >= removableRows.length) {
+                                var minimum = {};
+                                minimum[option] = (hardCodedRows + currentRows - removableRows.length).toString();
+                                setAttrs(minimum);
+                                
+                                break;
+                            }
+                            
+                            if(removalCallback) {
+                                removalCallback(removableRows[i]);
+                            }
+                            
+                            removeRepeatingRow("repeating_" + repeatingName + "_" + removableRows[i].id);
+                        }
+                    }
+                });
             });
         }
         
+        /**
+         * Unlike with createRepeatingOption(), it's fine to pass empty objects
+         * for initValues.
+         */
         function createMirroredRepeatingOption(option, repeatingName1, repeatingName2, initValues1, initValues2, deletionBlockers, hardCodedRows) {
             function add(rowID1) {
                 initValues2.Mirrored = rowID1;
@@ -434,8 +430,12 @@
             ["Great (+4)", "Superb (+5)", "Fantastic (+6)", "Epic (+7)", "Legendary (+8)"],
             ["SuperbActive", "FantasticActive", "EpicActive", "LegendaryActive"],
             "on", "0");
+        createGradedOption("MinSkillLevel",
+            ["Average (+1)", "Mediocre (+0)", "Poor (-1)", "Terrible (-2)"],
+            ["MediocreActive", "PoorActive", "TerribleActive"],
+            "on", "0");
         createRepeatingOption("ConsequenceSlots", "Cons", {conType:"Mild"}, ["Consequence"], 3);
-        createMirroredRepeatingOption("StressTracks", "Stress", "StressOptions", {Stress1:"0"}, {GoverningSkill:2}, ["Name"], 2);
+        createMirroredRepeatingOption("StressTracks", "Stress", "StressOptions", {}, {}, ["Name"], 2);
         createRepeatingOption("CharacterAspectSlots", "Aspects", {Asp1:"0"}, ["Aspect"], 2);
         
         on("change:StuntTextboxSize", function(eventInfo) {
@@ -530,7 +530,11 @@
 				//Move extra stress into repeating rows.
 				for(var oldStressAttribute of oldStressAttributes) {
     				if(attributes[oldStressAttribute]) {
-    				    addRepeatingRow("Stress", {Name:attributes[oldStressAttribute]});
+    				    var rowID2 = generateRowID();
+    				    
+    				    var rowID1 = addRepeatingRow("Stress", {Name:attributes[oldStressAttribute], Mirrored:rowID2});
+    				    
+    				    addRepeatingRow("StressOptions", {Mirrored:rowID1}, rowID2);
     				    
     				    attributes[oldStressAttribute] = "";
     				    changeMade = true;
@@ -673,7 +677,7 @@
 	</div>
 	<div class="sheet-table">
 		<div>Great (+4)</div>
-		<div><input class="sheet-skill-on"  type="text" name="attr_Great1" />
+		<div><input class="sheet-skill-on" type="text" name="attr_Great1" />
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+4+@{RollModifiers}]] @{Great1}" tabindex="-1"></button></div>
 		<div><input class="sheet-skill-off" type="text" name="attr_Great2" placeholder=" "/>
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+4+@{RollModifiers}]] @{Great2}" tabindex="-1"></button></div>
@@ -692,9 +696,9 @@
 	</div>
 	<div class="sheet-table">
 		<div>Good (+3)</div>
-		<div><input class="sheet-skill-on"  type="text" name="attr_Good1" />
+		<div><input class="sheet-skill-on" type="text" name="attr_Good1" />
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+3+@{RollModifiers}]] @{Good1}" tabindex="-1"></button></div>
-		<div><input class="sheet-skill-on"  type="text" name="attr_Good2" />
+		<div><input class="sheet-skill-on" type="text" name="attr_Good2" />
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+3+@{RollModifiers}]] @{Good2}" tabindex="-1"></button></div>
 		<div><input class="sheet-skill-off" type="text" name="attr_Good3" placeholder=" "/>
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+3+@{RollModifiers}]] @{Good3}" tabindex="-1"></button></div>
@@ -711,11 +715,11 @@
 	</div>
 	<div class="sheet-table">
 		<div>Fair (+2)</div>
-		<div><input class="sheet-skill-on"  type="text" name="attr_Fair1" />
+		<div><input class="sheet-skill-on" type="text" name="attr_Fair1" />
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+2+@{RollModifiers}]] @{Fair1}" tabindex="-1"></button></div>
-		<div><input class="sheet-skill-on"  type="text" name="attr_Fair2" />
+		<div><input class="sheet-skill-on" type="text" name="attr_Fair2" />
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+2+@{RollModifiers}]] @{Fair2}" tabindex="-1"></button></div>
-		<div><input class="sheet-skill-on"  type="text" name="attr_Fair3" />
+		<div><input class="sheet-skill-on" type="text" name="attr_Fair3" />
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+2+@{RollModifiers}]] @{Fair3}" tabindex="-1"></button></div>
 		<div><input class="sheet-skill-off" type="text" name="attr_Fair4" placeholder=" "/>
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+2+@{RollModifiers}]] @{Fair4}" tabindex="-1"></button></div>
@@ -730,13 +734,13 @@
 	</div>
 	<div class="sheet-table">
 		<div>Average (+1)</div>
-		<div><input class="sheet-skill-on"  type="text" name="attr_Avg1" />
+		<div><input class="sheet-skill-on" type="text" name="attr_Avg1" />
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1+@{RollModifiers}]] @{Avg1}" tabindex="-1"></button></div>
-		<div><input class="sheet-skill-on"  type="text" name="attr_Avg2" />
+		<div><input class="sheet-skill-on" type="text" name="attr_Avg2" />
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1+@{RollModifiers}]] @{Avg2}" tabindex="-1"></button></div>
-		<div><input class="sheet-skill-on"  type="text" name="attr_Avg3" />
+		<div><input class="sheet-skill-on" type="text" name="attr_Avg3" />
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1+@{RollModifiers}]] @{Avg3}" tabindex="-1"></button></div>
-		<div><input class="sheet-skill-on"  type="text" name="attr_Avg4" />
+		<div><input class="sheet-skill-on" type="text" name="attr_Avg4" />
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1+@{RollModifiers}]] @{Avg4}" tabindex="-1"></button></div>
 		<div><input class="sheet-skill-off" type="text" name="attr_Avg5" placeholder=" "/>
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1+@{RollModifiers}]] @{Avg5}" tabindex="-1"></button></div>
@@ -747,9 +751,50 @@
 		<div><input class="sheet-skill-off" type="text" name="attr_Avg8" placeholder=" "/>
 		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1+@{RollModifiers}]] @{Avg8}" tabindex="-1"></button></div>
 	</div>
+    <input class="sheet-active-toggle" type="checkbox" name="attr_MediocreActive" checked="true" />
 	<div class="sheet-table">
 		<div>Mediocre (+0)</div>
-		<div><button type='roll' name='roll_Mediocre' value='/me rolls [[4dF+@{RollModifiers}]]'></button></div>
+		<div><button type="roll" value="/me rolls [[4dF+@{RollModifiers}]]"></button></div>
+    </div>
+    <input class="sheet-active-toggle" type="checkbox" name="attr_PoorActive" />
+	<div class="sheet-table">
+		<div>Poor (-1)</div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Poor1" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Poor1}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Poor2" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Poor2}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Poor3" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Poor3}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Poor4" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Poor4}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Poor5" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Poor5}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Poor6" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Poor6}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Poor7" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Poor7}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Poor8" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Poor8}" tabindex="-1"></button></div>
+	</div>
+    <input class="sheet-active-toggle" type="checkbox" name="attr_TerribleActive" />
+    <div class="sheet-table">
+		<div>Terrible (-2)</div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Ter1" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Ter1}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Ter2" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Ter2}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Ter3" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Ter3}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Ter4" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Ter4}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Ter5" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Ter5}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Ter6" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Ter6}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Ter7" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Ter7}" tabindex="-1"></button></div>
+		<div><input class="sheet-skill-off" type="text" name="attr_Ter8" placeholder=" "/>
+		    <button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF-1+@{RollModifiers}]] @{Ter8}" tabindex="-1"></button></div>
     </div>
 </div> <!-- .section-skills -->
 
@@ -975,6 +1020,16 @@
             <option>Fantastic (+6)</option>
             <option>Epic (+7)</option>
             <option>Legendary (+8)</option>
+        </select>
+    </label>
+	
+	<label title="The lowest skill level that will show up in your pyramid. Skills below this level will be hidden, not deleted.">
+	    Minimum skill level:&nbsp;
+        <select name="attr_MinSkillLevel">
+            <option>Average (+1)</option>
+            <option selected="selected">Mediocre (+0)</option>
+            <option>Poor (-1)</option>
+            <option>Terrible (-2)</option>
         </select>
     </label>
 	
