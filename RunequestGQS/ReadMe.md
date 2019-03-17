@@ -35,9 +35,11 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
 ## Version 17.03.2018
-Fix for issue of browser cursor not detecting add control fro Equipment.  Reduced the width of the repeating section in case columns where overlapping.
+Fix for issue of browser cursor not detecting add control for equipment.  Reduced the width of the repeating section in case columns where overlapping.
 
 Changed the way version number was displayed .A attributes was removed but it will not effect the end user. 
+
+Changed the path for button images and roll templates images to point to images in Roll20 repository.
 
 
 ## Version 04.03.2019
