@@ -1,25 +1,209 @@
+<script type="text/worker">
+	var log = function(value) {
+		console.log(value);
+	};
+	
+	try {
+		/**
+		 * @param repeatingName - The word that comes after "repeating_" in the
+		 * attribute name. For instance, if you want to find
+		 * "repeating_aspects_$0_aspect", then this should be "aspects".
+		 * 
+		 * @param suffixes - An array of words identifying which parts of the
+		 * repeating attribute you want. For instance, if you want
+		 * "repeating_aspects_$0_aspect" (which is, in fact, the only part),
+		 * then this should be ["aspect"].
+		 * 
+		 * @param callback - A function that takes an array of objects. This
+		 * will be called once the attributes have been found. Each object in
+		 * the array will contain a property for each string in suffixes, mapped
+		 * to the value of that attribute. The objects won't be in order, but
+		 * they will include the repeating section id.
+		 */
+		function getRepeatingAttributes(repeatingName, suffixes, callback, debug) {
+			getSectionIDs("repeating_" + repeatingName, function(idArray) {
+				var attributeNames = [];
+				for(var suffix of suffixes) {
+					for(var id of idArray) {
+						attributeNames.push("repeating_" + repeatingName
+							+ "_" + id + "_" + suffix);
+					}
+				}
+				
+				getAttrs(attributeNames, function(attributes) {
+					var result = [];
+					for(var id of idArray) {
+						var attributeSection = {id:id};
+						result.push(attributeSection);
+						
+						for(var suffix of suffixes) {
+							attributeSection[suffix] = attributes["repeating_"
+								+ repeatingName + "_" + id + "_" + suffix];
+						}
+					}
+					
+					callback(result);
+				});
+			});
+		}
+		/**
+		 * Like getRepeatingAttributes, but puts the array in order.
+		 */
+		function getRepeatingAttributesOrdered(repeatingName, suffixes, callback) {
+			getRepeatingAttributes(repeatingName, suffixes, function(attributes) {
+				getSectionIDsOrdered(repeatingName, function(idsOrdered) {
+					var result = [];
+					
+					for(var id of idsOrdered) {
+						for(var attribute of attributes) {
+							if(attribute.id === id) {
+								result.push(attribute);
+								break;
+							}
+						}
+					}
+					
+					callback(result);
+				});
+			}, true);
+		}
+		
+		function onSkillsChanged(level, eventInfo) {
+			getAttrs(["ThirdStressSkill"], function(attributes) {
+				var thirdStressSkill = attributes["ThirdStressSkill"];
+				if(thirdStressSkill) {
+					thirdStressSkill = thirdStressSkill.toLowerCase();
+				}
+				
+				var attrs;
+				if(eventInfo.previousValue) {
+					var previous = eventInfo.previousValue.toLowerCase();
+					if(previous === "physique") {
+						attrs = {};
+						attrs["Phy3Active"] = 0;
+						attrs["Phy4Active"] = 0;
+						attrs["PhyConActive"] = 0;
+					} else if(previous === "will") {
+						attrs = {};
+						attrs["Men3Active"] = 0;
+						attrs["Men4Active"] = 0;
+						attrs["MenConActive"] = 0;
+					} else if(thirdStressSkill && previous === thirdStressSkill) {
+						attrs = {};
+						attrs["ThirdStress3Active"] = 0;
+						attrs["ThirdStress4Active"] = 0;
+						attrs["ThirdConActive"] = 0;
+					}
+				}
+				
+				if(eventInfo.newValue) {
+					var next = eventInfo.newValue.toLowerCase();
+					if(next === "physique") {
+						if(!attrs) attrs = {};
+						attrs["Phy3Active"] = "on";
+						attrs["Phy4Active"] = level >= 3 ? "on" : 0;
+						attrs["PhyConActive"] = level >= 5 ? "on" : 0;
+					} else if(next === "will") {
+						if(!attrs) attrs = {};
+						attrs["Men3Active"] = "on";
+						attrs["Men4Active"] = level >= 3 ? "on" : 0;
+						attrs["MenConActive"] = level >= 5 ? "on" : 0;
+					} else if(thirdStressSkill && next === thirdStressSkill) {
+						attrs = {};
+						attrs["ThirdStress3Active"] = "on";
+						attrs["ThirdStress4Active"] = level >= 3 ? "on" : 0;
+						attrs["ThirdConActive"] = level >= 5 ? "on" : 0;
+					}
+				}
+				
+				if(attrs) {
+					setAttrs(attrs);
+				}
+			});
+		}
+		
+		var consequences = ["Mild", "MildPhy", "MildMen", "MildThird", "Moderate", "Severe"];
+		
+		on(consequences.map(
+				function(consequence) {
+					return "change:" + consequence.toLowerCase() + "consequence";
+				})
+				.join(" "),
+			function(eventInfo) {
+				if(!eventInfo.previousValue || eventInfo.previousValue === "") {
+					var consequence = null;
+					for(var c of consequences) {
+						if(eventInfo.sourceAttribute === c.toLowerCase() + "consequence") {
+							consequence = c;
+							break;
+						}
+					}
+					
+					if(consequence) {
+						var attrs = {};
+						attrs[consequence + "Invoke"] = "on";
+						setAttrs(attrs);
+					}
+				}
+			});
+		
+		on("sheet:opened", function() {
+			//If ID is defined, move it to the description.
+			getAttrs(["ID", "character_name", "Description"], function(attributes) {
+				if(attributes.ID) {
+					if(attributes.ID.toLowerCase() != attributes.character_name.toLowerCase()) {
+					    var aka = "aka " + attributes.ID;
+					    if(attributes.Description) {
+    						attributes.Description += " (" + aka + ")";
+					    } else {
+					        attributes.Description = aka;
+					    }
+					}
+					
+					attributes.ID = "";
+					setAttrs(attributes);
+				}
+			});
+			
+			//Watch the entire skill tree for changes.
+			//Skip the first slot because there are no +0 slots.
+			var attrNames = [null, "avg", "fair", "good", "great", "sup", "fan", "epic", "leg"];
+			for(var level = 1; level < attrNames.length; level++) {
+				var skills = [];
+				
+				for(var i = 1; i <= 9 - level; i++) {
+					skills.push(attrNames[level] + i);
+				}
+				
+				on("change:" + skills.join(" change:"), onSkillsChanged.bind(null, level));
+			}
+		});
+	} catch(e) {
+		log("Encountered an error: " + e);
+	}
+</script>
 
 <div class="sheet-section-basic sheet-section">
-    <img class="sheet-logo" src="http://www.faterpg.com/wp-content/uploads/2013/06/Powered-by-Fate-Final-Light-BG.png" alt="FATE CORE" />
+	<img class="sheet-logo" src="http://www.faterpg.com/wp-content/uploads/2013/06/Powered-by-Fate-Final-Light-BG.png" alt="FATE CORE" />
 	<table>
 		<tr>
 			<td>
-				<label>ID</label>
-				<input type="text" name="attr_ID" />
+				<label>Name</label>
+				<input class="sheet-descriptions" type="text" name="attr_character_name" />
 			</td>
 			<td>
 				<label>Refresh</label>
-				<input type="number" name="attr_Refresh" />
+				<input type="number" name="attr_Refresh" value="3" />
 			</td>
 		</tr>
 		<tr>
 			<td>
 				<label>Description</label>
-				<input type="text" name="attr_Description" />
+				<input class="sheet-descriptions" type="text" name="attr_Description" />
 			</td>
 			<td>
 				<label>Fate Points</label>
-				<input type="number" name="attr_Fate" />
+				<input type="number" name="attr_Fate" value="3" />
 			</td>
 
 		</tr>
@@ -28,217 +212,314 @@
 
 <div class="sheet-break"></div>
 
-<div class="sheet-section-aspects sheet-section">
-	<div class="sheet-header">Aspects</div>
-	<div class="sheet-repitem">
-    	<input type="text" name="attr_HighConcept" placeholder="High Concept Aspect" />
-    </div>
-	<div class="sheet-repitem">
-    	<input type="text" name="attr_Trouble" placeholder="Trouble Aspect"/>
-    </div>
-	<fieldset class="repeating_Aspects">
-		<input type="text" name="attr_Aspect" />
-	</fieldset>
-</div> <!-- .section-aspects -->
-
-<div class="sheet-break"></div>
-
 <div class="sheet-section-skills sheet-section">
-	<div class="sheet-header">Skills</div>
+	<div class="sheet-header"
+		title="Fate's default skills: Athletics, Burglary, Contacts, Crafts, Deceive, Drive, Empathy, Fight, Investigate, Lore, Notice, Physique, Provoke, Rapport, Resources, Shoot, Stealth, Will">
+		<a href="https://fate-srd.com/fate-core/default-skill-list">Skills</a></div>
+	
+	<input class="sheet-active-toggle" type="checkbox" name="attr_FantasticActive" />
 	<table>
 		<tr>
 			<td>Legendary (+8)</td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Leg1" /><button type='roll' name='roll_Leg1' value='/me rolls @{Leg1} [[{4df+8+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Leg2" /><button type='roll' name='roll_Leg2' value='/me rolls @{Leg2} [[{4df+8+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Leg3" /><button type='roll' name='roll_Leg3' value='/me rolls @{Leg3} [[{4df+8+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Leg4" /><button type='roll' name='roll_Leg4' value='/me rolls @{Leg4} [[{4df+8+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Leg5" /><button type='roll' name='roll_Leg5' value='/me rolls @{Leg5} [[{4df+8+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Leg6" /><button type='roll' name='roll_Leg6' value='/me rolls @{Leg6} [[{4df+8+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Leg7" /><button type='roll' name='roll_Leg7' value='/me rolls @{Leg7} [[{4df+8+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Leg8" /><button type='roll' name='roll_Leg8' value='/me rolls @{Leg8} [[{4df+8+?{Modifier|0}}]] skill.'></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Leg1" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+8]] @{Leg1}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Leg2" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+8]] @{Leg2}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Leg3" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+8]] @{Leg3}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Leg4" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+8]] @{Leg4}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Leg5" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+8]] @{Leg5}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Leg6" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+8]] @{Leg6}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Leg7" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+8]] @{Leg7}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Leg8" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+8]] @{Leg8}" tabindex="-1"></button></td>
 		</tr>
-        <tr>
+		<tr>
 			<td>Epic (+7)</td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Epic1" /><button type='roll' name='roll_Epic1' value='/me rolls @{Epic1} [[{4df+7+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Epic2" /><button type='roll' name='roll_Epic2' value='/me rolls @{Epic2} [[{4df+7+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Epic3" /><button type='roll' name='roll_Epic3' value='/me rolls @{Epic3} [[{4df+7+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Epic4" /><button type='roll' name='roll_Epic4' value='/me rolls @{Epic4} [[{4df+7+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Epic5" /><button type='roll' name='roll_Epic5' value='/me rolls @{Epic5} [[{4df+7+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Epic6" /><button type='roll' name='roll_Epic6' value='/me rolls @{Epic6} [[{4df+7+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Epic7" /><button type='roll' name='roll_Epic7' value='/me rolls @{Epic7} [[{4df+7+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Epic8" /><button type='roll' name='roll_Epic8' value='/me rolls @{Epic8} [[{4df+7+?{Modifier|0}}]] skill.'></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Epic1" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+7]] @{Epic1}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Epic2" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+7]] @{Epic2}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Epic3" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+7]] @{Epic3}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Epic4" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+7]] @{Epic4}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Epic5" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+7]] @{Epic5}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Epic6" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+7]] @{Epic6}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Epic7" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+7]] @{Epic7}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Epic8" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+7]] @{Epic8}" tabindex="-1"></button></td>
 		</tr>
-        <tr>
+		<tr>
 			<td>Fantastic (+6)</td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Fan1" /><button type='roll' name='roll_Fan1' value='/me rolls @{Fan1} [[{4df+6+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Fan2" /><button type='roll' name='roll_Fan2' value='/me rolls @{Fan2} [[{4df+6+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Fan3" /><button type='roll' name='roll_Fan3' value='/me rolls @{Fan3} [[{4df+6+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Fan4" /><button type='roll' name='roll_Fan4' value='/me rolls @{Fan4} [[{4df+6+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Fan5" /><button type='roll' name='roll_Fan5' value='/me rolls @{Fan5} [[{4df+6+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Fan6" /><button type='roll' name='roll_Fan6' value='/me rolls @{Fan6} [[{4df+6+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Fan7" /><button type='roll' name='roll_Fan7' value='/me rolls @{Fan7} [[{4df+6+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Fan8" /><button type='roll' name='roll_Fan8' value='/me rolls @{Fan8} [[{4df+6+?{Modifier|0}}]] skill.'></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Fan1" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+6]] @{Fan1}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Fan2" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+6]] @{Fan2}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Fan3" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+6]] @{Fan3}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Fan4" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+6]] @{Fan4}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Fan5" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+6]] @{Fan5}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Fan6" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+6]] @{Fan6}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Fan7" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+6]] @{Fan7}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Fan8" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+6]] @{Fan8}" tabindex="-1"></button></td>
 		</tr>
-        <tr>
+	</table>
+	<table>
+		<tr>
 			<td>Superb (+5)</td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Sup1" /><button type='roll' name='roll_Sup1' value='/me rolls @{Sup1} [[{4df+5+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Sup2" /><button type='roll' name='roll_Sup2' value='/me rolls @{Sup2} [[{4df+5+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Sup3" /><button type='roll' name='roll_Sup3' value='/me rolls @{Sup3} [[{4df+5+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Sup4" /><button type='roll' name='roll_Sup4' value='/me rolls @{Sup4} [[{4df+5+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Sup5" /><button type='roll' name='roll_Sup5' value='/me rolls @{Sup5} [[{4df+5+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Sup6" /><button type='roll' name='roll_Sup6' value='/me rolls @{Sup6} [[{4df+5+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Sup7" /><button type='roll' name='roll_Sup7' value='/me rolls @{Sup7} [[{4df+5+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Sup8" /><button type='roll' name='roll_Sup8' value='/me rolls @{Sup8} [[{4df+5+?{Modifier|0}}]] skill.'></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Sup1" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+5]] @{Sup1}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Sup2" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+5]] @{Sup2}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Sup3" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+5]] @{Sup3}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Sup4" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+5]] @{Sup4}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Sup5" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+5]] @{Sup5}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Sup6" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+5]] @{Sup6}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Sup7" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+5]] @{Sup7}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Sup8" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+5]] @{Sup8}" tabindex="-1"></button></td>
 		</tr>
 		<tr>
 			<td>Great (+4)</td>
-			<td><input class="sheet-skill-on"  type="text" name="attr_Great1" /><button type='roll' name='roll_Great1' value='/me rolls @{Great1} [[{4df+4+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Great2" /><button type='roll' name='roll_Great2' value='/me rolls @{Great2} [[{4df+4+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Great3" /><button type='roll' name='roll_Great3' value='/me rolls @{Great3} [[{4df+4+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Great4" /><button type='roll' name='roll_Great4' value='/me rolls @{Great4} [[{4df+4+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Great5" /><button type='roll' name='roll_Great5' value='/me rolls @{Great5} [[{4df+4+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Great6" /><button type='roll' name='roll_Great6' value='/me rolls @{Great6} [[{4df+4+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Great7" /><button type='roll' name='roll_Great7' value='/me rolls @{Great7} [[{4df+4+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Great8" /><button type='roll' name='roll_Great8' value='/me rolls @{Great8} [[{4df+4+?{Modifier|0}}]] skill.'></button></td>
+			<td><input class="sheet-skill-on"  type="text" name="attr_Great1" />
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+4]] @{Great1}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Great2" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+4]] @{Great2}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Great3" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+4]] @{Great3}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Great4" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+4]] @{Great4}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Great5" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+4]] @{Great5}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Great6" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+4]] @{Great6}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Great7" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+4]] @{Great7}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Great8" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+4]] @{Great8}" tabindex="-1"></button></td>
 		</tr>
 		<tr>
 			<td>Good (+3)</td>
-			<td><input class="sheet-skill-on"  type="text" name="attr_Good1" /><button type='roll' name='roll_Good1' value='/me rolls @{Good1} [[{4df+3+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-on"  type="text" name="attr_Good2" /><button type='roll' name='roll_Good2' value='/me rolls @{Good2} [[{4df+3+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Good3" /><button type='roll' name='roll_Good3' value='/me rolls @{Good3} [[{4df+3+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Good4" /><button type='roll' name='roll_Good4' value='/me rolls @{Good4} [[{4df+3+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Good5" /><button type='roll' name='roll_Good5' value='/me rolls @{Good5} [[{4df+3+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Good6" /><button type='roll' name='roll_Good6' value='/me rolls @{Good6} [[{4df+3+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Good7" /><button type='roll' name='roll_Good7' value='/me rolls @{Good7} [[{4df+3+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Good8" /><button type='roll' name='roll_Good8' value='/me rolls @{Good8} [[{4df+3+?{Modifier|0}}]] skill.'></button></td>
+			<td><input class="sheet-skill-on"  type="text" name="attr_Good1" />
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+3]] @{Good1}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-on"  type="text" name="attr_Good2" />
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+3]] @{Good2}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Good3" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+3]] @{Good3}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Good4" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+3]] @{Good4}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Good5" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+3]] @{Good5}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Good6" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+3]] @{Good6}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Good7" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+3]] @{Good7}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Good8" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+3]] @{Good8}" tabindex="-1"></button></td>
 		</tr>
 		<tr>
 			<td>Fair (+2)</td>
-			<td><input class="sheet-skill-on"  type="text" name="attr_Fair1" /><button type='roll' name='roll_Fair1' value='/me rolls @{Fair1} [[{4df+2+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-on"  type="text" name="attr_Fair2" /><button type='roll' name='roll_Fair2' value='/me rolls @{Fair2} [[{4df+2+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-on"  type="text" name="attr_Fair3" /><button type='roll' name='roll_Fair3' value='/me rolls @{Fair3} [[{4df+2+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Fair4" /><button type='roll' name='roll_Fair4' value='/me rolls @{Fair4} [[{4df+2+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Fair5" /><button type='roll' name='roll_Fair5' value='/me rolls @{Fair5} [[{4df+2+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Fair6" /><button type='roll' name='roll_Fair6' value='/me rolls @{Fair6} [[{4df+2+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Fair7" /><button type='roll' name='roll_Fair7' value='/me rolls @{Fair7} [[{4df+2+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Fair8" /><button type='roll' name='roll_Fair8' value='/me rolls @{Fair8} [[{4df+2+?{Modifier|0}}]] skill.'></button></td>
+			<td><input class="sheet-skill-on"  type="text" name="attr_Fair1" />
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+2]] @{Fair1}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-on"  type="text" name="attr_Fair2" />
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+2]] @{Fair2}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-on"  type="text" name="attr_Fair3" />
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+2]] @{Fair3}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Fair4" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+2]] @{Fair4}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Fair5" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+2]] @{Fair5}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Fair6" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+2]] @{Fair6}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Fair7" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+2]] @{Fair7}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-invisible" type="text" name="attr_Fair8" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+2]] @{Fair8}" tabindex="-1"></button></td>
 		</tr>
 		<tr>
 			<td>Average (+1)</td>
-			<td><input class="sheet-skill-on"  type="text" name="attr_Avg1" /><button type='roll' name='roll_Avg1' value='/me rolls @{Avg1} [[{4df+1+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-on"  type="text" name="attr_Avg2" /><button type='roll' name='roll_Avg2' value='/me rolls @{Avg2} [[{4df+1+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-on"  type="text" name="attr_Avg3" /><button type='roll' name='roll_Avg3' value='/me rolls @{Avg3} [[{4df+1+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-on"  type="text" name="attr_Avg4" /><button type='roll' name='roll_Avg4' value='/me rolls @{Avg4} [[{4df+1+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Avg5" /><button type='roll' name='roll_Avg5' value='/me rolls @{Avg5} [[{4df+1+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Avg6" /><button type='roll' name='roll_Avg6' value='/me rolls @{Avg6} [[{4df+1+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Avg7" /><button type='roll' name='roll_Avg7' value='/me rolls @{Avg7} [[{4df+1+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Avg8" /><button type='roll' name='roll_Avg8' value='/me rolls @{Avg8} [[{4df+1+?{Modifier|0}}]] skill.'></button></td>
+			<td><input class="sheet-skill-on"  type="text" name="attr_Avg1" />
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1]] @{Avg1}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-on"  type="text" name="attr_Avg2" />
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1]] @{Avg2}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-on"  type="text" name="attr_Avg3" />
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1]] @{Avg3}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-on"  type="text" name="attr_Avg4" />
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1]] @{Avg4}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Avg5" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1]] @{Avg5}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Avg6" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1]] @{Avg6}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Avg7" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1]] @{Avg7}" tabindex="-1"></button></td>
+			<td><input class="sheet-skill-off" type="text" name="attr_Avg8" placeholder=" "/>
+				<button class="sheet-hidden-roll" type="roll" value="/me rolls [[4dF+1]] @{Avg8}" tabindex="-1"></button></td>
 		</tr>
-        
-        <tr>
-			<td>All Mediocre Skills (+0)</td>
-			<td><button type='roll' name='roll_Mediocre' value='/me rolls [[{4df+?{Modifier|0}}]] A Mediocre skill.'></button>
-		</tr>
-        <tr>
-			<td>Poor (-1)</td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Poor1" /><button type='roll' name='roll_Poor1' value='/me rolls @{Poor1} [[{4df-1+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Poor2" /><button type='roll' name='roll_Poor2' value='/me rolls @{Poor2} [[{4df-1+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Poor3" /><button type='roll' name='roll_Poor3' value='/me rolls @{Poor3} [[{4df-1+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Poor4" /><button type='roll' name='roll_Poor4' value='/me rolls @{Poor4} [[{4df-1+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Poor5" /><button type='roll' name='roll_Poor5' value='/me rolls @{Poor5} [[{4df-1+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Poor6" /><button type='roll' name='roll_Poor6' value='/me rolls @{Poor6} [[{4df-1+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Poor7" /><button type='roll' name='roll_Poor7' value='/me rolls @{Poor7} [[{4df-1+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Poor8" /><button type='roll' name='roll_Poor8' value='/me rolls @{Poor8} [[{4df-1+?{Modifier|0}}]] skill.'></button></td>
-		</tr>
-        <tr>
-			<td>Terrible (-2)</td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Ter1" /><button type='roll' name='roll_Ter1' value='/me rolls @{Ter1} [[{4df-2+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Ter2" /><button type='roll' name='roll_Ter2' value='/me rolls @{Ter2} [[{4df-2+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Ter3" /><button type='roll' name='roll_Ter3' value='/me rolls @{Ter3} [[{4df-2+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Ter4" /><button type='roll' name='roll_Ter4' value='/me rolls @{Ter4} [[{4df-2+?{Modifier|0}}]] skill.'></button></td>
-			<td><input class="sheet-skill-off" type="text" name="attr_Ter5" /><button type='roll' name='roll_Ter5' value='/me rolls @{Ter5} [[{4df-2+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Ter6" /><button type='roll' name='roll_Ter6' value='/me rolls @{Ter6} [[{4df-2+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Ter7" /><button type='roll' name='roll_Ter7' value='/me rolls @{Ter7} [[{4df-2+?{Modifier|0}}]] skill.'></button></td>
-            <td><input class="sheet-skill-off" type="text" name="attr_Ter8" /><button type='roll' name='roll_Ter8' value='/me rolls @{Ter8} [[{4df-2+?{Modifier|0}}]] skill.'></button></td>
+		<tr>
+			<td>&nbsp;&nbsp;Mediocre (+0)</td>
+			<td><button type='roll' name='roll_Mediocre' value='/me rolls [[{4dF}}]]'></button>
 		</tr>
 	</table>
 </div> <!-- .section-skills -->
 
 <div class="sheet-break"></div>
 
-<div class="sheet-section-stress sheet-section sheet-half">
-	<div class="sheet-header">Stress</div>
-	<table>
-		<tr>
-			<td>Physical</td>
-			<td>1<input class="sheet-check-on"  type="checkbox" name="attr_Phy1" /></td>
-			<td>2<input class="sheet-check-on"  type="checkbox" name="attr_Phy2" /></td>
-			<td>3<input class="sheet-check-off" type="checkbox" name="attr_Phy3" /></td>
-			<td>4<input class="sheet-check-off" type="checkbox" name="attr_Phy4" /></td>
-			<td>(Physique)</td>
-		</tr>
-		<tr>
-			<td>Mental</td>
-			<td>1<input class="sheet-check-on"  type="checkbox" name="attr_Men1" /></td>
-			<td>2<input class="sheet-check-on"  type="checkbox" name="attr_Men2" /></td>
-			<td>3<input class="sheet-check-off" type="checkbox" name="attr_Men3" /></td>
-			<td>4<input class="sheet-check-off" type="checkbox" name="attr_Men4" /></td>
-			<td>(Will)</td>
-		</tr>
-        <tr>
-			<td><input type="text" name="attr_OpenStress1" placeholder="Type of Stress" /></td>
-			<td>1<input class="sheet-check-on"  type="checkbox" name="attr_OpenStress1-1" /></td>
-			<td>2<input class="sheet-check-on"  type="checkbox" name="attr_OpenStress1-2" /></td>
-			<td>3<input class="sheet-check-off" type="checkbox" name="attr_OpenStress1-3" /></td>
-			<td>4<input class="sheet-check-off" type="checkbox" name="attr_OpenStress1-4" /></td>
-			<td><input type="text" name="attr_OpenStress1-Gov" placeholder="Governing Skill" /></td>
-		</tr>
-        <tr>
-			<td><input type="text" name="attr_OpenStress2" placeholder="Type of Stress" /></td>
-			<td>1<input class="sheet-check-on"  type="checkbox" name="attr_OpenStress2-1" /></td>
-			<td>2<input class="sheet-check-on"  type="checkbox" name="attr_OpenStress2-2" /></td>
-			<td>3<input class="sheet-check-off" type="checkbox" name="attr_OpenStress2-3" /></td>
-			<td>4<input class="sheet-check-off" type="checkbox" name="attr_OpenStress2-4" /></td>
-			<td><input type="text" name="attr_OpenStress2-Gov" placeholder="Governing Skill" /></td>
-		</tr>
-        <tr>
-			<td><input type="text" name="attr_OpenStress3" placeholder="Type of Stress" /></td>
-			<td>1<input class="sheet-check-on"  type="checkbox" name="attr_OpenStress3-1" /></td>
-			<td>2<input class="sheet-check-on"  type="checkbox" name="attr_OpenStress3-2" /></td>
-			<td>3<input class="sheet-check-off" type="checkbox" name="attr_OpenStress3-3" /></td>
-			<td>4<input class="sheet-check-off" type="checkbox" name="attr_OpenStress3-4" /></td>
-			<td><input type="text" name="attr_OpenStress3-Gov" placeholder="Governing Skill" /></td>
-		</tr>
-	</table>
-</div> <!-- .section-stress -->
-
-<div class="sheet-section-consequences sheet-section sheet-half">
-	<div class="sheet-header">Consequences</div>
-	<fieldset class="repeating_Cons">            
-		<select name="attr_conType">                
-			<option>Mild</option>
-			<option>Moderate</option>
-			<option>Severe</option>
-		</select>
-		<input type="text" name="attr_Consequence" />        
+<div class="sheet-section-aspects sheet-section sheet-half">
+	<div class="sheet-header"
+		title="Aspects are phrases that describe something unique or noteworthy about you. You may invoke them by spending fate points.">
+		<a href="https://fate-srd.com/fate-core/types-aspects">Aspects</a></div>
+	<div class="sheet-repitem sheet-left-fill">
+		<div><textarea name="attr_HighConcept" placeholder="High Concept Aspect" rows="1"></textarea></div>
+		<div><label><input type="checkbox" name="attr_HiCon1" title="Free invoke" />&nbsp;</label></div>
+		<div><label><input type="checkbox" name="attr_HiCon2" title="Free invoke" />&nbsp;</label></div>
+	</div>
+	<div class="sheet-repitem sheet-left-fill">
+		<div><textarea name="attr_Trouble" placeholder="Trouble Aspect" rows="1"></textarea></div>
+		<div><label><input type="checkbox" name="attr_Trouble1" title="Free invoke" />&nbsp;</label></div>
+		<div><label><input type="checkbox" name="attr_Trouble2" title="Free invoke" />&nbsp;</label></div>
+	</div>
+	<fieldset class="repeating_Aspects">
+		<div class="sheet-left-fill">
+			<div><textarea name="attr_Aspect" rows="1"></textarea></div>
+			<div><label><input type="checkbox" name="attr_Asp1" title="Free invoke" />&nbsp;</label></div>
+			<div><label><input type="checkbox" name="attr_Asp2" title="Free invoke" />&nbsp;</label></div>
+		</div>
 	</fieldset>
-</div> <!-- .section-consequences -->
+</div> <!-- .section-aspects -->
+
+<div class="sheet-section-aspects sheet-section sheet-half">
+	<div class="sheet-header"
+		title="Situation aspects are phrases that describe the current scene. Boosts are similar, but go away after one invocation. Invoking a boost is always free.">
+		Boosts and situation aspects</div>
+	<fieldset class="repeating_Advantages">
+		<div class="sheet-left-fill">
+			<div><textarea name="attr_Advantages" rows="1"></textarea></div>
+			<div><label><input type="checkbox" name="attr_Adv1" title="Free invoke" />&nbsp;</label></div>
+			<div><label><input type="checkbox" name="attr_Adv2" title="Free invoke" />&nbsp;</label></div>
+		</div>
+	</fieldset>
+</div> <!-- .section-stunts -->
 
 <div class="sheet-break"></div>
 
 <div class="sheet-section-stunts sheet-section sheet-half">
-	<div class="sheet-header">Stunts</div>
-	<textarea name="attr_Stunts"></textarea>
+	<div class="sheet-header"
+		title="A stunt allows you to do something extra in a specific situation. Unless the stunt specifically says otherwise, it doesn't require a fate point.">
+		<a href="https://fate-srd.com/fate-core/skills-stunts">Stunts</a></div>
+	<textarea name="attr_Stunts" rows="2"></textarea>
+	<fieldset class="repeating_Stunts">
+		<textarea name="attr_Stunt" rows="2"></textarea>
+	</fieldset>
 </div> <!-- .section-stunts -->
 
 <div class="sheet-section-extras sheet-section sheet-half">
-	<div class="sheet-header">Extras</div>
-	<textarea name="attr_Extras"></textarea>
-</div> <!-- .section-extra -->
+	<div class="sheet-header"
+		title="An extra can be anything that’s technically part of a character or controlled by a character but gets special treatment in the rules, such as magic abilities or a privately-owned business. Consult your GM.">
+		<a href="https://fate-srd.com/fate-core/creating-extra">Extras</a></div>
+	<textarea name="attr_Extras" rows="2"></textarea>
+	<fieldset class="repeating_Extras">
+		<textarea name="attr_Extra" rows="2"></textarea>
+	</fieldset>
+</div> <!-- .section-extras -->
+
+<div class="sheet-break"></div>
+
+<div class="sheet-section-stress sheet-section sheet-half">
+	<div class="sheet-header"
+		title="When you would take damage, you may check AT MOST ONE stress checkbox to reduce the damage by the number next to that box. Stress goes away at the end of the scene.">
+		<a href="https://fate-srd.com/fate-core/conflicts">Stress</a></div>
+	<div class="sheet-table">
+		<div class="sheet-large-text">Physical</div>
+		<div><label>1<input type="checkbox" name="attr_Phy1" /></label></div>
+		<div><label>2<input type="checkbox" name="attr_Phy2" /></label></div>
+		<input class="sheet-active-toggle" type="checkbox" name="attr_Phy3Active" />
+		<div><label>3<input type="checkbox" name="attr_Phy3" /></label></div>
+		<input class="sheet-active-toggle" type="checkbox" name="attr_Phy4Active" />
+		<div><label>4<input type="checkbox" name="attr_Phy4" /></label></div>
+	</div>
+	<div class="sheet-table">&nbsp;</div>
+	<div class="sheet-table">
+		<div class="sheet-large-text">Mental</div>
+		<div><label>1<input type="checkbox" name="attr_Men1" /></label></div>
+		<div><label>2<input type="checkbox" name="attr_Men2" /></label></div>
+		<input class="sheet-active-toggle" type="checkbox" name="attr_Men3Active" />
+		<div><label>3<input type="checkbox" name="attr_Men3" /></label></div>
+		<input class="sheet-active-toggle" type="checkbox" name="attr_Men4Active" />
+		<div><label>4<input type="checkbox" name="attr_Men4" /></label></div>
+	</div>
+	<div class="sheet-table">&nbsp;</div>
+	<input class="sheet-active-toggle" type="checkbox" name="attr_ThirdStressActive" />
+	<div class="sheet-table">
+		<input class="sheet-dynamic-name" type="text" name="attr_ThirdStressSkill" placeholder="(Enter skill)" />
+		<div><label>1<input type="checkbox" name="attr_ThirdStress1" /></label></div>
+		<div><label>2<input type="checkbox" name="attr_ThirdStress2" /></label></div>
+		<input class="sheet-active-toggle" type="checkbox" name="attr_ThirdStress3Active" />
+		<div><label>3<input type="checkbox" name="attr_ThirdStress3" /></label></div>
+		<input class="sheet-active-toggle" type="checkbox" name="attr_ThirdStress4Active" />
+		<div><label>4<input type="checkbox" name="attr_ThirdStress4" /></label></div>
+	</div>
+</div> <!-- .section-stress -->
+
+<div class="sheet-section-consequences sheet-section sheet-half">
+	<div class="sheet-header"
+		title="Consequences are aspects representing physical or emotional damage. When you take a consequence, your enemies get one free invocation.">
+		<a href="https://fate-srd.com/fate-core/conflicts">Consequences</a></div>
+	<div class="sheet-left-label">
+		<div>Mild</div>
+		<div><input type="text" name="attr_MildConsequence" /></div>
+		<div><label><input type="checkbox" name="attr_MildInvoke" title="Free invoke" />&nbsp;</label></div>
+	</div>
+	<input class="sheet-active-toggle" type="checkbox" name="attr_PhyConActive" />
+	<div class="sheet-left-label">
+		<div>Mild</div>
+		<div><input type="text" name="attr_MildPhyConsequence" placeholder="Physical Consequence" /></div>
+		<div><label><input type="checkbox" name="attr_MildPhyInvoke" title="Free invoke" />&nbsp;</label></div>
+	</div>
+	<input class="sheet-active-toggle" type="checkbox" name="attr_MenConActive" />
+	<div class="sheet-left-label">
+		<div>Mild</div>
+		<div><input type="text" name="attr_MildMenConsequence" placeholder="Mental Consequence" /></div>
+		<div><label><input type="checkbox" name="attr_MildMenInvoke" title="Free invoke" />&nbsp;</label></div>
+	</div>
+	<input class="sheet-active-toggle" type="checkbox" name="attr_ThirdConActive" />
+	<div class="sheet-left-label">
+		<div>Mild</div>
+		<div><input type="text" name="attr_MildThirdConsequence" placeholder="Non-Physical, Non-Mental Consequence" /></div>
+		<div><label><input type="checkbox" name="attr_MildThirdInvoke" title="Free invoke" />&nbsp;</label></div>
+	</div>
+	<div class="sheet-left-label">
+		<div>Moderate</div>
+		<div><input type="text" name="attr_ModerateConsequence" /></div>
+		<div><label><input type="checkbox" name="attr_ModerateInvoke" title="Free invoke" />&nbsp;</label></div>
+	</div>
+	<div class="sheet-left-label">
+		<div>Severe</div>
+		<div><input type="text" name="attr_SevereConsequence" /></div>
+		<div><label><input type="checkbox" name="attr_SevereInvoke" title="Free invoke" />&nbsp;</label></div>
+	</div>
+</div> <!-- .section-consequences -->
 
 <div class="sheet-break"></div>
 
 <div class="sheet-section-notes sheet-section">
 	<div class="sheet-header">Notes</div>
-	<textarea name="attr_Notes"></textarea>
+	<textarea name="attr_Notes" rows="7"></textarea>
 </div> <!-- .section-notes -->
