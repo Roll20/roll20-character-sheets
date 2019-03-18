@@ -9,3 +9,7 @@ Character sheet in Swedish for Drakar och Demoner 6.0 Expert based on the Stars 
 ###v1.0 (2017-03-04)
 
 - First release, supports basic features.
+
+###v1.1 (2019-03-16)
+
+- Minor bug fix, rolling base characteristics now calculates as intended.
