@@ -7778,56 +7778,54 @@
             var existing = _.findWhere(repeating.traits, match);
             var newrowid = generateRowID();
             if(existing) {
-                newrowid = existing.id;
-                existing.name = page.name;
+                newrowid        = existing.id;
+                existing.name   = page.name;
                 existing.source = "Feat";
-                existing.type = page.data["Properties"] ? page.data["Properties"] : "";
+                existing.type   = page.data["Properties"] ? page.data["Properties"] : "";
             } else {
-                var newtrait = {};
-                newtrait.id = newrowid;
-                newtrait.name = page.name;
+                var newtrait    = {};
+                newtrait.id     = newrowid;
+                newtrait.name   = page.name;
                 newtrait.source = "Feat";
-                newtrait.type = page.data["Properties"] ? page.data["Properties"] : "";
+                newtrait.type   = page.data["Properties"] ? page.data["Properties"] : "";
                 repeating.traits.push(newtrait);
             }
-            if(page.name) {update["repeating_traits_" + newrowid + "_name"] = page.name};
-            if(page.content) {update["repeating_traits_" + newrowid + "_description"] = page.content};
-            update["repeating_traits_" + newrowid + "_source"] = "Feat";
-            update["repeating_traits_" + newrowid + "_source_type"] = page.data["Properties"] ? page.data["Properties"] : "";
-            update["repeating_traits_" + newrowid + "_options-flag"] = "0";
-            update["repeating_traits_" + newrowid + "_display_flag"] = "on";
+            if(page.name) {update[`repeating_traits_${newrowid}_name`]           = page.name};
+            if(page.content) {update[`repeating_traits_${newrowid}_description`] = page.content};
+            update[`repeating_traits_${newrowid}_source`]       = "Feat";
+            update[`repeating_traits_${newrowid}_source_type`]  = page.data["Properties"] ? page.data["Properties"] : "";
+            update[`repeating_traits_${newrowid}_options-flag`] = "0";
+            update[`repeating_traits_${newrowid}_display_flag`] = "on";
         };
         if(category === "Proficiencies") {
             var newrowid = generateRowID();
             var type = page.data["Type"] || "";
-            if(type.toLowerCase() === "language" || type.toLowerCase() === "armor"
-                || type.toLowerCase() === "weapon" || type.toLowerCase() === "other") {
+            if (type.toLowerCase() === "language" || type.toLowerCase() === "armor" || type.toLowerCase() === "weapon" || type.toLowerCase() === "other") {
                 if( repeating.prof_names.indexOf(page.name.toLowerCase()) == -1 ) {
-                    update["repeating_proficiencies_" + newrowid + "_prof_type"] = type.replace("custom", "").toUpperCase();
-                    update["repeating_proficiencies_" + newrowid + "_name"] = page.name;
-                    update["repeating_proficiencies_" + newrowid + "_options-flag"] = 0;
+                    update[`repeating_proficiencies_${newrowid}_prof_type`]    = type.replace("custom", "").toUpperCase();
+                    update[`repeating_proficiencies_${newrowid}_name`]         = page.name;
+                    update[`repeating_proficiencies_${newrowid}_options-flag`] = 0;
                     repeating.prof_names.push(page.name.toLowerCase());
                 };
-            }
-            else if(type.toLowerCase() === "tool" || type.toLowerCase() === "skillcustom") {
+            } else if(type.toLowerCase() === "tool" || type.toLowerCase() === "skillcustom") {
                 let existing = {};
-                _.each(repeating.tool, function(tool, id) {
+                _.each(repeating.tool, (tool, id) => {
                     if(tool.toolname == page.name.toLowerCase()) {
                         newrowid = id;
                         existing = tool;
                     }
                 });
                 if(!existing.toolname) repeating.tool[newrowid] = {toolname: page.name.toLowerCase()}
-                update["repeating_tool_" + newrowid + "_toolname"] = page.name;
-                if(!existing.base) update["repeating_tool_" + newrowid + "_toolattr_base"] = "?{Attribute?|Strength,@{strength_mod}|Dexterity,@{dexterity_mod}|Constitution,@{constitution_mod}|Intelligence,@{intelligence_mod}|Wisdom,@{wisdom_mod}|Charisma,@{charisma_mod}}";
-                update["repeating_tool_" + newrowid + "_options-flag"] = 0;
-                if(page.data["toolbonus_base"]) update["repeating_tool_" + newrowid + "_toolbonus_base"] = "(@{pb}*2)";
+                update[`repeating_tool_${newrowid}_toolname`] = page.name;
+                if(!existing.base) update[`repeating_tool_${newrowid}_toolattr_base`] = "?{Attribute?|Strength,@{strength_mod}|Dexterity,@{dexterity_mod}|Constitution,@{constitution_mod}|Intelligence,@{intelligence_mod}|Wisdom,@{wisdom_mod}|Charisma,@{charisma_mod}}";
+                update[`repeating_tool_${newrowid}_options-flag`] = 0;
+                if(page.data["toolbonus_base"]) update[`repeating_tool_${newrowid}_toolbonus_base`] = "(@{pb}*2)";
                 repeating.prof_names.push(page.name.toLowerCase());
                 callbacks.push( function() {update_tool(newrowid);} );
             }
             if(type.toLowerCase() === "skill") {
                 var skill_string = page.name.toLowerCase().replace(/ /g, '_');
-                update[skill_string + "_prof"] = "(@{pb}*@{" + skill_string + "_type})";
+                update[`${skill_string}_prof`] = `(@{pb}*@{${skill_string}_type})`;
             };
         };
         if(category === "Classes") {
