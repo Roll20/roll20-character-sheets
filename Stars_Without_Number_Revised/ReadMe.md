@@ -36,6 +36,12 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ## Changelog
 
+### 2.4.0
+
+* Add tracking of permanent System Strain.
+* Fix HP roll for Heroic characters.
+* Added a macro to calculate travel costs.
+
 ### 2.3.1
 
 * Fixed a bug causing the sheet to sometimes display an incorrect attack bonus for weapons.
