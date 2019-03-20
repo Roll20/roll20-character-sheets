@@ -34,6 +34,28 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
+## Version 17.03.2018
+Fix for issue of browser cursor not detecting add control for equipment.  Reduced the width of the repeating section in case columns where overlapping.
+
+Changed the way version number was displayed .A attributes was removed but it will not effect the end user. 
+
+Changed the path for button images and roll templates images to point to images in Roll20 repository.
+
+
+## Version 04.03.2019
+
+Tweaked CSS so skill names can be read when modifying repeating sections
+
+Added fields for coinage on the 2nd tab.  Currently this does not effect encumbrance.
+
+I added a bunch of new hit locations including all the location tables  at the start of the bestiary. 
+
+Added fields for individual weapons skill modifiers or occasions such as Bladesharp cast.
+
+I also added checkboxes with the heading Spells Cast for Vigor, Strength  and Glamour they handle all the fudges listed under the spells,such as skill category  increases, damage die steps and max enc.So don't add the stat bonuses in the mod fields of the characteristics.The bonuses are automatically added to stat rolls. A message appears under the stats  reminding you to add the bonus when doing resistance table rolls.  There is probably better way of doing this but it would mean changing a lot of sheetworkers and/or adding a whole new column of mod fields
+
+
+
 ## Version 19.11.2018
 
 Disguise starting skill changed to 05
