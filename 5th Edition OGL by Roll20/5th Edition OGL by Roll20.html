@@ -6595,8 +6595,6 @@
     });
 
     on("change:spellcasting_ability change:spell_dc_mod change:globalmagicmod", function(eventinfo) {
-        console.log(`%c Change Spellcasting Ability:`, "color:blue; font-size:16px;");
-        console.log(eventinfo);
         if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
             return;
         }
@@ -7295,7 +7293,7 @@
         update["drop_data"] = "";
         update["drop_content"] = "";
         if(category === "Items") {
-            console.log(`%c ITEM: ${page.name}`, "color: purple;");
+            console.log(`%c ITEM: ${page.name} dropped`, "color: purple; font-size: 14px;");
             if(currentData.npc === "0") {
                 update["tab"] = "core";
                 if(page.name) {update[`repeating_inventory_${id}_itemname`]               = page.name};
@@ -7428,6 +7426,7 @@
             }
         };
         if(category === "Spells") {
+            console.log(`%c SPELL: ${page.name} dropped`, "color: purple; font-weight:14px;");
             let existing = {};
             var lvl = page.data["Level"] && page.data["Level"] > 0 ? page.data["Level"] : "cantrip";
             if (repeating[`spell-${lvl}`]) {
@@ -9461,7 +9460,6 @@
                                     update["ac"] = b.custom_ac_shield == "yes" ? custom_total + shieldac + globalacmod + modac : custom_total + globalacmod + modac;
                                 }
                             }
-                            console.log("total: " + total);
                             setAttrs(update, {silent: true});
                         });
                     });
@@ -9530,16 +9528,18 @@
     };
 
     const update_class = () => {
+        //console.log(`%c Update class:`, "color:purple; font-size:14px;");
         getAttrs(["class", "base_level","custom_class","cust_hitdietype","cust_spellcasting_ability","cust_strength_save_prof","cust_dexterity_save_prof","cust_constitution_save_prof","cust_intelligence_save_prof","cust_wisdom_save_prof","cust_charisma_save_prof", "npc"], (v) => {
             if(v.npc && v.npc == "1") {
                 return;
             }
+            const abilites = ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"];
             //Custom Classes
             if(v.custom_class && v.custom_class != "0") {
                 update = {};
                 update["hitdietype"] = v.cust_hitdietype;
                 update["spellcasting_ability"] = v.cust_spellcasting_ability;
-                ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"].forEach((save) => {
+                abilites.forEach((save) => {
                     const ability = save.toLowerCase();
                     update[`${ability}_save_prof`] = v[`cust_${ability}_save_prof`];
                 });
@@ -9549,12 +9549,12 @@
                 update = {};
                 update["hitdietype"] = 6;
                 update["spellcasting_ability"] = "0*";
-                ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"].forEach((save) => {
+                abilites.forEach((save) => {
                     const ability = save.toLowerCase();
                     update[`${ability}_save_prof`] = 0;
                 });
                 setAttrs(update, {silent: true});
-            //All standard classes can pull their data from the Comependium
+            //Standard classes can pull their data from the Comependium
             } else {
                 getCompendiumPage(v.class, (page) => {
                     update = {};
@@ -9563,16 +9563,14 @@
                             update["hitdietype"] = list.data["Hit Die"].slice(1);
                             update["spellcasting_ability"] = (list.data["Spellcasting Ability"]) ? `@{${list.data["Spellcasting Ability"].toLowerCase()}_mod}+` : "0*";
 
-                            ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"].forEach((save) => {
+                            abilites.forEach((save) => {
                                 const ability = save.toLowerCase();
                                 update[`${ability}_save_prof`] = (list.data["data-Saving Throws"].indexOf(`${save}`) > -1) ? "(@{pb})" : 0;
                             });
                         };
                     });
                     setAttrs(update, {silent: true});
-                    console.log(`%c UPDATE CLASS:`, "color:purple; font-size:16px;");
-                    console.log(update);
-
+                    //Update Spell info to change or remove casting attributes in Spells
                     update_spell_info();
                 });
             };
@@ -9620,9 +9618,6 @@
             callbacks.push(() => {update_pb();} );
             callbacks.push(() => {update_leveler_display();} );
             setAttrs(update, {silent: true},() => {callbacks.forEach((callback) => {callback(); })} );
-
-            console.log(`%c SET LEVEL UPDATE:`, "color:green; font-size:16px;");
-            console.log(update);
         });
     };
 
