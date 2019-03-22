@@ -9275,77 +9275,64 @@
         });
     };
 
-    var update_weight = function() {
-        var update = {};
-        var wtotal = 0;
-        var weight_attrs = ["cp","sp","ep","gp","pp","encumberance_setting","strength","size","carrying_capacity_mod"];
-        getSectionIDs("repeating_inventory", function(idarray) {
-            _.each(idarray, function(currentID, i) {
-                weight_attrs.push("repeating_inventory_" + currentID + "_itemweight");
-                weight_attrs.push("repeating_inventory_" + currentID + "_itemcount");
+    const update_weight = function() {
+        let update = {};
+        let wtotal = 0;
+        let weight_attrs = ["cp","sp","ep","gp","pp","encumberance_setting","strength","size","carrying_capacity_mod"];
+        getSectionIDs("repeating_inventory", (idarray) => {
+            _.each(idarray, (currentID, i) => {
+                weight_attrs.push(`repeating_inventory_${currentID}_itemweight`);
+                weight_attrs.push(`repeating_inventory_${currentID}_itemcount`);
             });
-            getAttrs(weight_attrs, function(v) {
-                cp = isNaN(parseInt(v.cp, 10)) === false ? parseInt(v.cp, 10) : 0;
-                sp = isNaN(parseInt(v.sp, 10)) === false ? parseInt(v.sp, 10) : 0;
-                ep = isNaN(parseInt(v.ep, 10)) === false ? parseInt(v.ep, 10) : 0;
-                gp = isNaN(parseInt(v.gp, 10)) === false ? parseInt(v.gp, 10) : 0;
-                pp = isNaN(parseInt(v.pp, 10)) === false ? parseInt(v.pp, 10) : 0;
-                wtotal = wtotal + ((cp + sp + ep + gp + pp) / 50);
+            getAttrs(weight_attrs, (v) => {
+                let coinWeight = 0;
+                ["cp", "sp", "ep", "gp", "pp"].forEach((type)=> {
+                    coinWeight += (isNaN(parseInt(v[`${type}`], 10)) === false) ? parseInt(v[`${type}`], 10) : 0;
+                });
+                wtotal = wtotal + ((coinWeight) / 50);
 
-                _.each(idarray, function(currentID, i) {
-                    if(v["repeating_inventory_" + currentID + "_itemweight"] && isNaN(parseInt(v["repeating_inventory_" + currentID + "_itemweight"], 10)) === false) {
-                        count = v["repeating_inventory_" + currentID + "_itemcount"] && isNaN(parseFloat(v["repeating_inventory_" + currentID + "_itemcount"])) === false ? parseFloat(v["repeating_inventory_" + currentID + "_itemcount"]) : 1;
-                        wtotal = wtotal + (parseFloat(v["repeating_inventory_" + currentID + "_itemweight"]) * count);
+                _.each(idarray, (currentID, i) => {
+                    if (v[`repeating_inventory_${currentID}_itemweight`] && isNaN(parseInt(v[`repeating_inventory_${currentID}_itemweight`], 10)) === false) {
+                        count = v[`repeating_inventory_${currentID}_itemcount`] && isNaN(parseFloat(v[`repeating_inventory_${currentID}_itemcount`])) === false ? parseFloat(v[`repeating_inventory_${currentID}_itemcount`]) : 1;
+                        wtotal = wtotal + (parseFloat(v[`repeating_inventory_${currentID}_itemweight`]) * count);
                     }
                 });
 
                 update["weighttotal"] = wtotal;
 
-                var str_base = parseInt(v.strength, 10);
-                var size_multiplier = 1;
-                if(v["size"] && v["size"] != "") {
-                    if(v["size"].toLowerCase().trim() == "tiny") {size_multiplier = .5}
-                    else if(v["size"].toLowerCase().trim() == "large") {size_multiplier = 2}
-                    else if(v["size"].toLowerCase().trim() == "huge") {size_multiplier = 4}
-                    else if(v["size"].toLowerCase().trim() == "gargantuan") {size_multiplier = 8}
-                }
-                var str = str_base*size_multiplier;
-                if(v.carrying_capacity_mod) {
-                    var operator = v.carrying_capacity_mod.substring(0,1);
-                    var value = v.carrying_capacity_mod.substring(1);
-                    if(["*","x","+","-"].indexOf(operator) > -1 && isNaN(parseInt(value,10)) === false) {
-                        if(operator == "*" || operator == "x") {str = str*parseInt(value,10);}
-                        else if(operator == "+") {str = str+parseInt(value,10);}
-                        else if(operator == "-") {str = str-parseInt(value,10);}
+                const str_base = parseInt(v.strength, 10);
+                let size_multiplier = 1;
+                if (v["size"] && v["size"] != "") {
+                    const size = v["size"].toLowerCase().trim();
+                    size_multiplier = 
+                        (size === "tiny") ? .5 : (size === "large") ? 2 : (size === "huge") ? 4 : (size === "gargantuan") ? 8 : size_multiplier;
+                };
+                let str = str_base*size_multiplier;
+                // Parse the carrying capacitiy modificator if any
+                if (v.carrying_capacity_mod) {
+                    const operator = v.carrying_capacity_mod.substring(0,1);
+                    const value    = v.carrying_capacity_mod.substring(1);
+                    if(["*","x","+","-"].indexOf(operator) > -1 && isNaN(parseFloat(value,10)) === false) {
+                        str = 
+                            (operator === "*" || operator == "x") ? str*parseFloat(value,10) : 
+                            (operator === "+") ? str+parseFloat(value,10) : 
+                            (operator === "-") ? str-parseFloat(value,10) : 
+                            str;
                     }
                 }
 
-                if(!v.encumberance_setting || v.encumberance_setting === "off") {
-                    if(wtotal > str*15) {
-                        update["encumberance"] = "OVER CARRYING CAPACITY";
-                    }
-                    else {
-                        update["encumberance"] = " ";
-                    }
-                }
-                else if(v.encumberance_setting === "on") {
-                    if(wtotal > str*15) {
-                        update["encumberance"] = "IMMOBILE";
-                    }
-                    else if(wtotal > str*10) {
-                        update["encumberance"] = "HEAVILY ENCUMBERED";
-                    }
-                    else if(wtotal > str*5) {
-                        update["encumberance"] = "ENCUMBERED";
-                    }
-                    else {
-                        update["encumberance"] = " ";
-                    }
-                }
-                else {
+                if (!v.encumberance_setting || v.encumberance_setting === "off") {
+                    update["encumberance"] = (wtotal > str*15) ? "OVER CARRYING CAPACITY" : " ";
+                } else if (v.encumberance_setting === "on") {
+                    update["encumberance"] =
+                        (wtotal > str*15) ? "IMMOBILE" :
+                        (wtotal > str*10) ? "HEAVILY ENCUMBERED" :
+                        (wtotal > str*5)  ? "ENCUMBERED" :
+                        " ";
+                } else {
                     update["encumberance"] = " ";
                 }
-
+                
                 setAttrs(update, {silent: true});
 
             });
