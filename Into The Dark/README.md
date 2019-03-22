@@ -1,17 +1,17 @@
 # Into The Dark
 
-***Into The Dark*** character sheet based on spanish version by *The Hills* press, called ***En La Osuridad***
+***Into The Dark*** character sheet based on spanish version by *The Hills* press, called ***En La Osuridad***.
 
 **Enjoy it!**
 
-Includes a customized roll template differentiating successes and failures.
+The sheet includes a customized roll template differentiating successes and failures.
 
 ![preview](into_the_dark.jpg)
 
 
 ## Author
 
-Bormerberme [MeWe](https://mewe.com/i/bormerberme)
+BormerBerme [MeWe](https://mewe.com/i/bormerberme)
 
 ## Changelog
 
