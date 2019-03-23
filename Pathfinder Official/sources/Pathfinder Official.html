@@ -9775,7 +9775,7 @@
     var pfom = (function () {
         /* === GLOBAL VARIABLES === */
 
-        const pfoglobals_currentversion = 1.27;
+        const pfoglobals_currentversion = 1.28;
         var pfoglobals_i18n_obj = (function () {
             var obj = {};
             obj["strength"] = getTranslationByKey("str-u");
@@ -12977,6 +12977,8 @@
                             rolltype += "damage";
                             let dmgrollbase = "";
                             let dmgrollcrit = "";
+                            let dmg2rollbase = "";
+                            let dmg2rollcrit = "";
                             // First damage roll
                             if(dmgflag != "0") {
                                 // Standard Damage Roll
@@ -13020,41 +13022,41 @@
                                 rolldmg += `{{dmg2name=${dmg2name}}}`;
                                 rolldmgonly += `{{dmg2name=${dmg2name}}}`;
                                 // Standard Damage Roll
-                                dmgrollbase = `${dmg2base} + ${dmg2attr}[${pfoglobals_i18n_obj[`${v[`repeating_attacks_${attackid}_dmg2attr`]}`]}] + ${dmg2mod}[MOD] + ${dmgtmpbonus}[TEMP] + @{rollmod_damage}[QUERY]`;
+                                dmg2rollbase = `${dmg2base} + ${dmg2attr}[${pfoglobals_i18n_obj[`${v[`repeating_attacks_${attackid}_dmg2attr`]}`]}] + ${dmg2mod}[MOD] + ${dmgtmpbonus}[TEMP] + @{rollmod_damage}[QUERY]`;
                                 if(dmg2bonusdice) {
-                                    dmgrollbase += "+" + dmg2bonusdice + "[BONUS DICE]";
+                                    dmg2rollbase += "+" + dmg2bonusdice + "[BONUS DICE]";
                                 }
                                 // Critical damage Roll
                                 if (dmg2critmulti > 1) {
                                     for(i = 1; i <= dmg2critmulti; i++) {
-                                        dmgrollcrit += `${dmgrollcrit.length ? "+" : ""}${dmg2base}`;
+                                        dmg2rollcrit += `${dmg2rollcrit.length ? "+" : ""}${dmg2base}`;
                                     }
-                                    dmgrollcrit = `((${dmgrollcrit}) + (${dmg2attr}[${pfoglobals_i18n_obj[`${v[`repeating_attacks_${attackid}_dmg2attr`]}`]}] + ${dmg2mod}[MOD] + ${dmgtmpbonus}[TEMP] + @{rollmod_damage}[QUERY]) * ${dmg2critmulti})`;
+                                    dmg2rollcrit = `((${dmg2rollcrit}) + (${dmg2attr}[${pfoglobals_i18n_obj[`${v[`repeating_attacks_${attackid}_dmg2attr`]}`]}] + ${dmg2mod}[MOD] + ${dmgtmpbonus}[TEMP] + @{rollmod_damage}[QUERY]) * ${dmg2critmulti})`;
                                     if(dmg2bonusdice) {
-                                        dmgrollcrit += ` + ${dmg2bonusdice}[BONUS DICE]`;
+                                        dmg2rollcrit += ` + ${dmg2bonusdice}[BONUS DICE]`;
                                     }
                                 } else {
-                                    dmgrollcrit = "";
+                                    dmg2rollcrit = "";
                                 }
                                 // Roll calculation
                                 if ( (atkflag != "0") && (atktypearray.length > 1) ) {
                                     // One damage roll per attack
                                     for(i = 0; i < atktypearray.length; i++) {
-                                        rolldmg += `{{roll${i > 0 ? i : ""}dmg2=[[${dmgrollbase}]]}} {{roll${i > 0 ? i : ""}dmg2type=${dmg2type}}}`;
+                                        rolldmg += `{{roll${i > 0 ? i : ""}dmg2=[[${dmg2rollbase}]]}} {{roll${i > 0 ? i : ""}dmg2type=${dmg2type}}}`;
                                         if(dmg2critmulti > 1) {
-                                            rolldmg += `{{roll${i > 0 ? i : ""}dmg2crit=[[${dmgrollcrit}]]}}`;
+                                            rolldmg += `{{roll${i > 0 ? i : ""}dmg2crit=[[${dmg2rollcrit}]]}}`;
                                         }
                                     }
                                 } else {
-                                    rolldmg += `${dmg2flag} {{dmg2=[[${dmgrollbase}]]}} {{dmg2type=${dmg2type}}}`;
+                                    rolldmg += `${dmg2flag} {{dmg2=[[${dmg2rollbase}]]}} {{dmg2type=${dmg2type}}}`;
                                     if(dmg2critmulti > 1) {
-                                        rolldmg += `{{dmg2crit=[[${dmgrollcrit}]]}}`;
+                                        rolldmg += `{{dmg2crit=[[${dmg2rollcrit}]]}}`;
                                     }
                                 }
                                 // No attack (damage only) or just one attack
-                                rolldmgonly += `${dmg2flag} {{dmg2=[[${dmgrollbase}]]}} {{dmg2type=${dmg2type}}}`;
+                                rolldmgonly += `${dmg2flag} {{dmg2=[[${dmg2rollbase}]]}} {{dmg2type=${dmg2type}}}`;
                                 if(dmg2critmulti > 1) {
-                                    rolldmgonly += `{{dmg2crit=[[${dmgrollcrit}]]}}`;
+                                    rolldmgonly += `{{dmg2crit=[[${dmg2rollcrit}]]}}`;
                                 }
                             }
                             // desc
@@ -14994,6 +14996,17 @@
                 });
             });
         };
+        const update_to_1_28 = function(doneupdating) {
+            console.log("UPDATING TO v1.28");
+            getAttrs(["npc"], (v) => {
+                if((v["npc"] || "0") != "1" && (v["l1mancer_status"] || "completed") == "completed") {
+                    update_attacks("all");
+                    doneupdating();
+                } else {
+                    doneupdating();
+                }
+            });
+        };
         const versioning = function() {
             getAttrs(["version"], (v) => {
                 let vrs = parseFloat(v["version"]) || 0.0;
@@ -15087,6 +15100,12 @@
                 } else if (vrs < 1.27) {
                     update_to_1_27(() => {
                         setAttrs({"version": "1.27"}, {silent: true}, () => {
+                            versioning();
+                        });
+                    });
+                } else if (vrs < 1.28) {
+                    update_to_1_28(() => {
+                        setAttrs({"version": "1.28"}, {silent: true}, () => {
                             versioning();
                         });
                     });
