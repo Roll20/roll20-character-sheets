@@ -6106,7 +6106,7 @@
             });
         });
     });
-
+    //Start of Compendium Drops
     on("sheet:compendium-drop", function() {
         getAttrs(["hp_max","npc_senses","token_size","cd_bar1_v","cd_bar1_m","cd_bar1_l","cd_bar2_v","cd_bar2_m","cd_bar2_l","cd_bar3_v","cd_bar3_m","cd_bar3_l"], function(v) {
 
@@ -6527,7 +6527,6 @@
             spelllevel = `?{Cast at what level? ${spelllevel}}`;
         }
         update[repeating_source + "_rollcontent"] = "@{wtype}&{template:spell} {{level=@{spellschool} " + spelllevel + "}} {{name=@{spellname}}} {{castingtime=@{spellcastingtime}}} {{range=@{spellrange}}} {{target=@{spelltarget}}} @{spellcomp_v} @{spellcomp_s} @{spellcomp_m} {{material=@{spellcomp_materials}}} {{duration=@{spellduration}}} {{description=@{spelldescription}}} {{athigherlevels=@{spellathigherlevels}}} @{spellritual} {{innate=@{innate}}} @{spellconcentration} @{charname_output}";
-
         setAttrs(update, {silent: true});
     };
 
@@ -7282,7 +7281,7 @@
             });
             uses_string = uses_string.replace(/half_level/g, Math.floor(classlevel/2));
             return uses_string.replace(/level/g, classlevel);
-        };
+        };//
         var category = page.data["Category"];
         var callbacks = [];
         var update = {};
@@ -7295,137 +7294,135 @@
         update["drop_data"] = "";
         update["drop_content"] = "";
         if(category === "Items") {
+            console.log(`%c ITEM: ${page.name}`, "color: purple;");
             if(currentData.npc === "0") {
                 update["tab"] = "core";
-                if(page.name) {update["repeating_inventory_" + id + "_itemname"] = page.name};
-                if(page.data["itemcount"]) {update["repeating_inventory_" + id + "_itemcount"] = page.data["itemcount"]};
-                if(page.data["Weight"]) {update["repeating_inventory_" + id + "_itemweight"] = page.data["Weight"]};
-                if(page.data["Properties"]) {update["repeating_inventory_" + id + "_itemproperties"] = page.data["Properties"]};
-                if(page.content) {update["repeating_inventory_" + id + "_itemcontent"] = page.content};
+                if(page.name) {update[`repeating_inventory_${id}_itemname`]               = page.name};
+                if(page.data["itemcount"]) {update[`repeating_inventory_${id}_itemcount`] = page.data["itemcount"]};
+
+                ["Properties", "Weight"].forEach((attr) => {
+                    if (page.data[`${attr}`]) {
+                        update[`repeating_inventory_${id}_item${attr.toLowerCase()}`] = page.data[`${attr}`]
+                    };
+                });
+
+                if(page.content) {update[`repeating_inventory_${id}_itemcontent`] = page.content};
                 if(!page.data["Item Type"] || page.data["Item Type"] == "") {page.data["Item Type"] = category};
                 var mods = "Item Type: " + page.data["Item Type"];
                 if(page.data["AC"] && page.data["AC"] != "") {
                     mods += ", AC: " + page.data["AC"];
                     if(!looped) {
-                        callbacks.push( function() {update_ac();} )
+                        callbacks.push(() => {update_ac();} )
                     }
                 };
-                if(page.data["Damage"] && page.data["Damage"] != "") {mods += ", Damage: " + page.data["Damage"]};
-                if(page.data["Damage Type"] && page.data["Damage Type"] != "") {mods += ", Damage Type: " + page.data["Damage Type"]};
-                if(page.data["Secondary Damage"] && page.data["Secondary Damage"] != "") {mods += ", Secondary Damage: " + page.data["Secondary Damage"]};
-                if(page.data["Secondary Damage Type"] && page.data["Secondary Damage Type"] != "") {mods += ", Secondary Damage Type: " + page.data["Secondary Damage Type"]};
-                if(page.data["Alternate Damage"] && page.data["Alternate Damage"] != "") {mods += ", Alternate Damage: " + page.data["Alternate Damage"]};
-                if(page.data["Alternate Damage Type"] && page.data["Alternate Damage Type"] != "") {mods += ", Alternate Damage Type: " + page.data["Alternate Damage Type"]};
-                if(page.data["Alternate Secondary Damage"] && page.data["Alternate Secondary Damage"] != "") {mods += ", Alternate Secondary Damage: " + page.data["Alternate Secondary Damage"]};
-                if(page.data["Alternate Secondary Damage Type"] && page.data["Alternate Secondary Damage Type"] != "") {mods += ", Alternate Secondary Damage Type: " + page.data["Alternate Secondary Damage Type"]};
-                if(page.data["Range"] && page.data["Range"] != "") {mods += ", Range: " + page.data["Range"]};
-                if(page.data["Modifiers"] && page.data["Modifiers"] != "") {mods += ", " + page.data["Modifiers"]};
-                update["repeating_inventory_" + id + "_itemmodifiers"] = mods;
+
+                ["Damage", "Damage Type", "Secondary Damage", "Secondary Damage Type", "Alternate Damage", "Alternate Damage Type", "Alternate Secondary Damage", "Alternate Secondary Damage Type", "Range"].forEach((attr) => {
+                    if (page.data[`${attr}`] && page.data[`${attr}`] != "") {
+                        mods += `, ${attr}: ${page.data[`${attr}`]}`
+                    };
+                });
+
+                if(page.data["Modifiers"] && page.data["Modifiers"] != "") { mods += `, ${page.data["Modifiers"]}` }; 
+                update[`repeating_inventory_${id}_itemmodifiers`] = mods;
                 if(page.data["Item Type"].indexOf("Weapon") > -1) {
-                    update["repeating_inventory_" + id + "_hasattack"] = 1;
-                    callbacks.push( function() {
-                        if(page.data["Alternate Damage"] && page.data["Alternate Damage"] !== "") {
-                            create_attack_from_item(id, {versatile: true});
-                        } else {
-                            create_attack_from_item(id);
-                        }
-                    } );
-                }
-                else if(page.data["Item Type"].indexOf("Ammunition") > -1) {
-                    update["repeating_inventory_" + id + "_useasresource"] = 1;
-                    callbacks.push( function() {create_resource_from_item(id);} );
+                    update[`repeating_inventory_${id}_hasattack`] = 1;
+                    callbacks.push(() => {
+                        (page.data["Alternate Damage"] && page.data["Alternate Damage"] !== "") ? create_attack_from_item(id, {versatile: true}) : create_attack_from_item(id);
+                    });
+                } else if(page.data["Item Type"].indexOf("Ammunition") > -1) {
+                    update[`repeating_inventory_${id}_useasresource`] = 1;
+                    callbacks.push(() => { create_resource_from_item(id); });
                 };
+
                 if(page.data["Modifiers"]) {
-                    callbacks.push( function() {check_itemmodifiers(page.data["Modifiers"]);} );
+                    callbacks.push(() => { check_itemmodifiers(page.data["Modifiers"]); });
                 };
+
                 if(!looped) {
-                    callbacks.push( function() {update_weight();} );
+                    callbacks.push(() => { update_weight(); });
                 }
-            }
-            else {
-                if(page.data["Item Type"] && new RegExp('\\bweapon\\b', 'i').test(page.data["Item Type"])) {
-                    var make_npc_attack_from_item = function(rowid, options) {
-                        update["repeating_npcaction_" + rowid + "_npc_options-flag"] = "0";
-                        update["repeating_npcaction_" + rowid + "_attack_flag"] = "on";
+            } else {
+                if(page.data["Item Type"] && page.data["Item Type"].toLowerCase().includes("weapon")) {
+                    const type       = (page.data["Item Type"]) ? page.data["Item Type"].toLowerCase().split(" ")[0] : " ";
+                    const properties = (page.data["Properties"]) ? page.data["Properties"].toLowerCase() : undefined;
 
+                    const make_npc_attack_from_item = (rowid, options) => {
+                        update[`repeating_npcaction_${rowid}_npc_options-flag`] = "0";
+                        update[`repeating_npcaction_${rowid}_attack_flag`]      = "on";
                         if(page.name) {
-                            update["repeating_npcaction_" + rowid + "_name"] = page.name;
-                            if(options && options.versatile) {
-                                update["repeating_npcaction_" + rowid + "_name"] += " (" + (options.versatile === 1 ? "One-Handed" : "Two-Handed") + ")";
-                            } else if(options && options.thrown) {
-                                update["repeating_npcaction_" + rowid + "_name"] += " (Thrown)";
-                            }
-                        }
-                        if(page.content) { update["repeating_npcaction_" + rowid + "_description"] = page.content; }
+                            update[`repeating_npcaction_${rowid}_name`] = page.name;
+                            if (options && options.versatile) {
+                                update[`repeating_npcaction_${rowid}_name`] += " (" + (options.versatile === 1 ? "One-Handed" : "Two-Handed") + ")";
+                            } else if (options && options.thrown) {
+                                update[`repeating_npcaction_${rowid}_name`] += " (Thrown)";
+                            };
+                        };
+                        if(page.content) { update[`repeating_npcaction_${rowid}_description`] = page.content; }
 
-                        update["repeating_npcaction_" + rowid + "_attack_display_flag"] = "{{attack=1}}";
-                        update["repeating_npcaction_" + rowid + "_attack_options"] = "{{attack=1}}";
-                        update["repeating_npcaction_" + rowid + "_attack_type"] = page.data["Item Type"].substring(0, page.data["Item Type"].indexOf(" "));
+                        update[`repeating_npcaction_${rowid}_attack_display_flag`] = "{{attack=1}}";
+                        update[`repeating_npcaction_${rowid}_attack_options`]      = "{{attack=1}}";
+                        update[`repeating_npcaction_${rowid}_attack_type`]         = page.data["Item Type"];
+                        update[`repeating_npcaction_${rowid}_attack_target`]       = "one target";
 
-                        var thrown = page.data["Properties"] && new RegExp('\\bthrown\\b', 'i').test(page.data["Properties"]);
 
-                        if(page.data["Range"] && page.data["Range"] != "" && (!thrown || (options && options.thrown))) {
-                            update["repeating_npcaction_" + rowid + "_attack_range"] = page.data["Range"];
-                        }
-                        else if(page.data["Properties"] && new RegExp('\\breach\\b', 'i').test(page.data["Properties"])) {
-                            update["repeating_npcaction_" + rowid + "_attack_range"] = "10 ft";
-                        }
-                        else {
-                            update["repeating_npcaction_" + rowid + "_attack_range"] = "5 ft";
-                        }
+                        update[`repeating_npcaction_${rowid}_attack_range`] =
+                            (page.data["Range"] && page.data["Range"] != "" && (!properties.includes("thrown") || (options && options.thrown))) ? page.data["Range"] :
+                            (page.data["Properties"] && properties.includes("range")) ? "10 ft" :
+                            "5 ft";
 
-                        update["repeating_npcaction_" + rowid + "_attack_target"] = "one target";
+                        const weapon_attr_mod = (type.includes("ranged") || (properties && properties.includes("finesse") && currentData.dexterity_mod > currentData.strength_mod)) ? currentData.dexterity_mod : currentData.strength_mod;
+                        update[`repeating_npcaction_${rowid}_attack_tohit`] = weapon_attr_mod;
 
-                        var isFinesse = page.data["Properties"] && new RegExp('\\bfinesse\\b', 'i').test(page.data["Properties"]);
-                        var attack_type = update[`repeating_npcaction_${id}_attack_type`].toLowerCase();
-                        var use_dex_mod = attack_type === "ranged" || (isFinesse && currentData.dexterity_mod > currentData.strength_mod);
-                        var weapon_attr_mod = use_dex_mod ? currentData.dexterity_mod : currentData.strength_mod;
-                        update["repeating_npcaction_" + rowid + "_attack_tohit"] = weapon_attr_mod;
+                        const dmgArray = (options && options.versatile === 2) ? 
+                            ["Alternate Damage", "Alternate Damage Type", "Alternate Secondary Damage", "Alternate Secondary Damage Type"] :
+                            ["Damage", "Damage Type", "Secondary Damage", "Secondary Damage Type"];
 
-                        if(options && options.versatile === 2) {
-                            if(page.data["Alternate Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage"] = page.data["Alternate Damage"] + "+" + weapon_attr_mod; }
-                            if(page.data["Alternate Damage Type"]) { update["repeating_npcaction_" + rowid + "_attack_damagetype"] = page.data["Alternate Damage Type"]; }
-                            if(page.data["Alternate Secondary Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage2"] = page.data["Alternate Secondary Damage"]; }
-                            if(page.data["Alternate Secondary Damage Type"]) { update["repeating_npcaction_" + rowid + "_attack_damagetype2"] = page.data["Alternate Secondary Damage Type"]; }
-                        }
-                        else {
-                            if(page.data["Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage"] = page.data["Damage"] + "+" + weapon_attr_mod; }
-                            if(page.data["Damage Type"]) {update["repeating_npcaction_" + rowid + "_attack_damagetype"] = page.data["Damage Type"]; }
-                            if(page.data["Secondary Damage"]) { update["repeating_npcaction_" + rowid + "_attack_damage2"] = page.data["Secondary Damage"]; }
-                            if(page.data["Secondary Damage Type"]) { update["repeating_npcaction_" + rowid + "_attack_damagetype2"] = page.data["Secondary Damage Type"]; }
-                        }
+                        dmgArray.forEach((attr) => {
+                            if (page.data[`${attr}`]) {
+                                // _attack_damage adds the weapon mod
+                                const ending = (dmgArray.indexOf(`${attr}`) === 0) ? `+${weapon_attr_mod}` : "";
+                                //Remove Alternate for the attribute name. Then check for Secondary and remote it while adding 2.
+                                let attrEdit = (attr.includes("Alternate") && attr.includes("Secondary")) ? attr.slice(20) + "2" : (attr.includes("Alternate") || attr.includes("Secondary")) ? attr.slice(10) : attr;
+                                //Lower case everything and remove spaces
+                                let name = attrEdit.toLowerCase().replace(" ", "");
+                                //Set all the necessary attack attributes
+                                update[`repeating_npcaction_${rowid}_attack_${name}`] = page.data[`${attr}`] + [`${ending}`];
+                            };
+                        });
 
                         if(page.data["Modifiers"]) {
-                            if(attack_type === "melee") {
-                                var tohit_regex = /(?:melee|weapon) *attacks? *([\\+\\-] *[0-9]+)/i;
-                                var melee_damage_regex = /(?:melee|weapon) *damage *([\\+\\-] *[0-9]+)/i;
-                                var tohit_match = tohit_regex.exec(page.data["Modifiers"]);
-                                var damage_match = melee_damage_regex.exec(page.data["Modifiers"]);
-
-                                if(tohit_match && tohit_match[1]) { update[`repeating_npcaction_${rowid}_attack_tohit`] = +update[`repeating_npcaction_${rowid}_attack_tohit`] + +tohit_match[1]; }
-                                if(page.data["Damage"] && damage_match && damage_match[1]) { update[`repeating_npcaction_${rowid}_attack_damage`] += damage_match[1]; }
-                            } else if(attack_type === "ranged") {
-                                var tohit_regex = /(?:ranged|weapon) *attacks? *([\\+\\-] *[0-9]+)/i;
-                                var ranged_damage_regex = /(?:ranged|weapon) *damage *([\\+\\-] *[0-9]+)/i;
-                                var tohit_match = tohit_regex.exec(page.data["Modifiers"]);
-                                var damage_match = ranged_damage_regex.exec(page.data["Modifiers"]);
-
-                                if(tohit_match && tohit_match[1]) { update[`repeating_npcaction_${rowid}_attack_tohit`] = +update[`repeating_npcaction_${rowid}_attack_tohit`] + +tohit_match[1]; }
-                                if(page.data["Damage"] && damage_match && damage_match[1]) { update[`repeating_npcaction_${rowid}_attack_damage`] += damage_match[1]; }
-                            }
-                        }
+                            if(type === "melee" || type === "ranged") {
+                                //+1 Weapons should be in the format of "Melee Attacks +1, Melee Damage +1"
+                                const split = (page.data["Modifiers"].includes(",")) ? page.data["Modifiers"].split(", ") : page.data["Modifiers"];
+                                split.forEach((attr) => {
+                                    const name = attr.toLowerCase();
+                                    if (name.includes("attacks")) { 
+                                        update[`repeating_npcaction_${rowid}_attack_tohit`] = +update[`repeating_npcaction_${rowid}_attack_tohit`] + name.split("attacks ")[1];
+                                    } else if (name.includes("damage")) {
+                                        update[`repeating_npcaction_${rowid}_attack_damage`] += name.split("damage ")[1];
+                                    } else {
+                                        console.log(`%c ${page.name} modifiers format did not include damage or attacks`, "color:orange;");
+                                    };
+                                });
+                            }; 
+                        };
                     };
 
-                    var versatile = page.data["Properties"] && new RegExp('\\bversatile\\b', 'i').test(page.data["Properties"]) ? 1 : undefined;
+                    const versatile = (properties && properties.includes("versatile")) ? 1 : undefined;
                     make_npc_attack_from_item(id, {versatile: versatile});
-                    if(page.data["Properties"] && new RegExp('\\bthrown\\b', 'i').test(page.data["Properties"])) {
-                        make_npc_attack_from_item(generateRowID(), {thrown: true});
-                    }
-                    if(versatile && page.data["Alternate Damage"]) {
-                        make_npc_attack_from_item(generateRowID(), {versatile:2})
-                    }
 
-                    callbacks.push(function() { check_itemmodifiers(page.data["Modifiers"]); }, function() { update_npc_action("all"); });
+                    if (properties && properties.includes("thrown")) {
+                       make_npc_attack_from_item(generateRowID(), {thrown: true});
+                    }
+                    if (versatile && page.data["Alternate Damage"]) {
+                        make_npc_attack_from_item(generateRowID(), {versatile: 2})
+                    } 
+
+                    if (page.data["Modifiers"]) {
+                        callbacks.push(() => { check_itemmodifiers(page.data["Modifiers"]);  }, () => { update_npc_action("all"); });
+                    } else {
+                        callbacks.push(() => { update_npc_action("all"); });
+                    };
                 }
             }
         };
@@ -7450,7 +7447,7 @@
                 (page.data[`${attr}`]) ? update[`repeating_spell-${lvl}_${id}_${suffix}`] = page.data[`${attr}`] : false;
             });
 
-           ["Add Casting Modifier", "Casting Time", "Concentration", "Damage Type", "Damage", "Duration", "Healing", "Material", "Range", "Ritual", "Save", "Save Success", "School", "Secondary Damage", "Secondary Damage Type", "Spell Attack", "Target"].forEach((attr) => {
+           ["Add Casting Modifier", "Casting Time", "Concentration", "Damage Type", "Damage", "Duration", "Healing", "Material", "Range", "Ritual", "Save", "Save Success", "School", "Secondary Damage", "Secondary Damage Type", "Target"].forEach((attr) => {
                 if(page.data[`${attr}`]) {
                     //Adjust the array entry to match the attribute name in the HTML
                     const name           = (attr === "Add Casting Modifier") ? "dmgmod" : (attr === "Material") ? `comp_materials` : (attr.includes("Secondary Damage")) ? attr.split("Secondary ")[0] + "2" : attr;
@@ -7474,10 +7471,15 @@
                 });
             };
 
+            if (page.data["Spell Attack"]) {
+                update[`repeating_spell-${lvl}_${id}_spellattack`] = page.data[`Spell Attack`];
+            };
+
             if(page.data["Damage"] || page.data["Healing"]) {
-                update[`repeating_spell-${lvl}_${id}_spelloutput`] = "ATTACK";
-                if(!existing.spellattackid) callbacks.push(() => {create_attack_from_spell(lvl, id, currentData.character_id);} );
-            } else if(page.data["Higher Spell Slot Desc"] && page.data["Higher Spell Slot Desc"] != "") {
+                update["repeating_spell-" + lvl + "_" + id + "_spelloutput"] = "ATTACK";
+                if(!existing.spellattackid) callbacks.push( function() {create_attack_from_spell(lvl, id, currentData.character_id);});
+            }
+            else if(page.data["Higher Spell Slot Desc"] && page.data["Higher Spell Slot Desc"] != "") {
                 var spelllevel = "?{Cast at what level?";
                 for(i = 0; i < 10-lvl; i++) {
                     spelllevel = spelllevel + "|Level " + (parseInt(i, 10) + parseInt(lvl, 10)) + "," + (parseInt(i, 10) + parseInt(lvl, 10));
@@ -7490,7 +7492,7 @@
             update[`repeating_spell-${lvl}_${id}_options-flag`] = "0"; 
         };
         if(category === "Monsters") {
-            console.log(`%c MONSTERS: ${page.name}`, "color: purple; font-weight:16px;");
+            console.log(`%c MONSTERS: ${page.name} dropped`, "color: purple; font-weight:14px;");
             update["npc"] = "1";
             update["npc_options-flag"] = "0";
             if(page.name && page.name != "") {update["npc_name"] = page.name};
@@ -7581,7 +7583,6 @@
                     update["npc_legendary_actions_desc"] = `The ${page.name} can take ${actionCount}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
                 };
             };
-
             // ACTIONS & LEGENDARY ACTIONS
             ["Actions", "Legendary Actions"].forEach((attr) => {
                 if (page.data[`data-${attr}`]) {
@@ -7659,9 +7660,117 @@
                         callbacks.push(() => {update_pb();} );
                         callbacks.push(() => {update_spell_slots();} );
                     }
+                    //Githzerai in MToF have (Psionics)
+                    if (name.includes("Innate Spellcasting")) {
+                        const ability = (page.data["Spellcasting Ability"]) ? `@{${page.data["Spellcasting Ability"].toLowerCase()}_mod}+` : "0*";
+                        update["npcspellcastingflag"]  = 1;
+                        update["spellcasting_ability"] = ability;
+                    };
                 });
             } else if(contentarray && contentarray.indexOf("Traits") > -1) {
                 console.log(`%c Traits was not found for ${page.name}`, "color: orange;");
+            };
+            //Spells 
+            if (page.data["data-Spells"]) {
+                let spellsobj = [];
+                //Put together a list of spells to get from the Comepndium
+                ["spells", "innate"].forEach((type) => {
+                    let spellList = jsonparse(page.data["data-Spells"])[`${type}`];
+                    if (spellList) {
+                        Object.keys(spellList).map((objectKey, index) => {
+                            spellList[objectKey].forEach((spell) => {
+                                spellsobj.push(spell);
+                            });
+                        });
+                    };
+                });
+                getCompendiumPage(spellsobj, (spellData) => {
+                    const innate = (jsonparse(page.data["data-Spells"])[`innate`]) ? jsonparse(page.data["data-Spells"])[`innate`] : false;
+                    let existing = {};
+                    let update   = [], callbacks = [];
+
+                    spellData.forEach((page) => {
+                        const spell        = page.data;
+                        const lvl          = spell["Level"] && spell["Level"] > 0 ? spell["Level"] : "cantrip";
+                        const newrowid     = generateRowID();
+                        const repeatingRow = `repeating_spell-${lvl}_${newrowid}`;
+
+                        update[`${repeatingRow}_spelllevel`]               = lvl;
+                        update[`${repeatingRow}_spell_ability`]            = (update["spellcasting_ability"]) ? update["spellcasting_ability"] : "spell";
+                        (spell.Name) ? update[`${repeatingRow}_spellname`] = spell.Name : false;
+                        update[`${repeatingRow}_spelloutput`]              = (page.data["Damage"] || page.data["Healing"]) ? "ATTACK" : "SPELLCARD";
+
+                        ["spellclass", "spellsource", "data-description"].forEach((attr) => {
+                            const suffix = (attr.includes("description")) ? "spelldescription" : attr;
+                            (spell[`${attr}`]) ? update[`${repeatingRow}_${suffix}`] = spell[`${attr}`] : false;
+                        });
+
+                        ["Add Casting Modifier", "Casting Time", "Concentration", "Damage Type", "Damage", "Duration", "Healing", "Material", "Range", "Ritual", "Save", "Save Success", "School", "Secondary Damage", "Secondary Damage Type", "Spell Attack", "Target"].forEach((attr) => {
+                            if (spell[`${attr}`]) {
+                                //Adjust the array entry to match the attribute name in the HTML
+                                const name = 
+                                    (attr === "Add Casting Modifier") ? "dmgmod" : 
+                                    (attr === "Material") ? `comp_materials` : 
+                                    (attr === "Spell Attack") ? `attack` : 
+                                    (attr.includes("Secondary Damage")) ? attr.split("Secondary ")[0] + "2" : 
+                                    attr;
+                                const spellattribute = name.toLowerCase().replace(" ", "");
+                                //Concentration, Ritual, and School are exceptions to norm
+                                const updateValue = 
+                                    (attr === "Concentration" || attr === "Ritual") ? `{{${spellattribute}=1}}` : 
+                                    (attr === "School") ? spell["School"].toLowerCase() : 
+                                    spell[`${attr}`];
+                                update[`${repeatingRow}_spell${spellattribute}`] = updateValue;
+                            };
+                        });
+
+                       ["Higher Spell Slot Bonus", "Higher Spell Slot Desc", "Higher Spell Slot Dice", "Higher Spell Slot Die"].forEach((attr) => {
+                            if (spell[`${attr}`]) {
+                                const spellattribute = (attr.includes("Bonus")) ? "hlbonus" : (attr.includes("Desc")) ? "athigherlevels" : (attr.includes("Dice")) ? "hldie" : "hldietype";
+                                update[`${repeatingRow}_spell${spellattribute}`] = spell[`${attr}`];
+                            };
+                        }); 
+
+                        if (spell["Components"]) {
+                            ["v", "s", "m"].forEach((comp) => {
+                                if (spell["Components"].toLowerCase().indexOf(comp) === -1) {update[`${repeatingRow}_spellcomp_${comp}`] = "0"};
+                            });
+                        };
+
+                        if(page.data["Damage"] || page.data["Healing"]) {
+                            //This needs to run the create_attack_from_spell
+                            callbacks.push(() => { create_attack_from_spell(lvl, newrowid, currentData.character_id); });
+                        } else if (page.data["Higher Spell Slot Desc"] && page.data["Higher Spell Slot Desc"] != "") {
+                            //This needs to run the update_spelloutput
+                        }; 
+
+                        if (spell["data-Cantrip Scaling"] && lvl == "cantrip") {
+                            update[`${repeatingRow}_spell_damage_progression`] = "Cantrip " + spell["data-Cantrip Scaling"].charAt(0).toUpperCase() + spell["data-Cantrip Scaling"].slice(1);
+                        };
+
+                        if (innate) {
+                            const spellName = (spell.Name).toLowerCase();
+                            //Search each keys in INNATE to see if spell name === one of the Values
+                            Object.keys(innate).map((objectKey, index) => {
+                                innate[objectKey].forEach((spell) => {
+                                    (spell === spellName) ? update[`${repeatingRow}_innate`] = objectKey : false;
+                                });
+                            });
+                        };
+
+                        update[`${repeatingRow}_options-flag`] = "0";
+                    });
+
+                    setAttrs(update, {silent: true}, () => {
+                        callbacks.forEach((callback) => {
+                            callback(); 
+                        })
+                    });
+
+                    return {
+                        callbacks: callbacks
+                    };
+                }); 
             };
         };
         if(category === "Feats") {
@@ -8608,7 +8717,6 @@
     };
 
     var update_attacks = function(update_id, source) {
-        console.log("DOING UPDATE_ATTACKS: " + update_id);
         if(update_id.substring(0,1) === "-" && update_id.length === 20) {
             do_update_attack([update_id], source);
         }
@@ -8697,7 +8805,6 @@
 
         getAttrs(attack_attribs, function(v) {
             _.each(attack_array, function(attackid) {
-                console.log("UPDATING ATTACK: " + attackid);
                 var callbacks = [];
                 var update = {};
                 var hbonus = "";
@@ -10106,8 +10213,6 @@
             update[`npc_${flagAttr}_flag`] = (npc_flag === 0) ? "" : npc_flag;
 
             setAttrs(update, {silent: true});
-
-            console.log(update);
         });
     };
 
