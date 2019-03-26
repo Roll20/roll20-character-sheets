@@ -7070,8 +7070,7 @@
                         mod = mod + "+" + v["repeating_tool_" + tool_id + "_tool_mod"];
                     }
                     query = true;
-                }
-                else {
+                } else {
                     var attr = v["repeating_tool_" + tool_id + "_toolattr_base"].substring(0, v["repeating_tool_" + tool_id + "_toolattr_base"].length - 5).substr(2);
                     var attr_mod = v[attr + "_mod"] ? parseInt(v[attr + "_mod"], 10) : 0;
                     var tool_mod = v["repeating_tool_" + tool_id + "_tool_mod"] && !isNaN(parseInt(v["repeating_tool_" + tool_id + "_tool_mod"], 10)) ? parseInt(v["repeating_tool_" + tool_id + "_tool_mod"], 10) : 0;
@@ -7293,7 +7292,7 @@
         update["drop_data"] = "";
         update["drop_content"] = "";
         if(category === "Items") {
-            console.log(`%c ITEM: ${page.name}`, "color: purple;");
+            console.log(`%c ITEM: ${page.name} dropped`, "color: purple; font-size: 14px;");
             if(currentData.npc === "0") {
                 update["tab"] = "core";
                 if(page.name) {update[`repeating_inventory_${id}_itemname`]               = page.name};
@@ -7426,6 +7425,7 @@
             }
         };
         if(category === "Spells") {
+            console.log(`%c SPELL: ${page.name} dropped`, "color: purple; font-weight:14px;");
             let existing = {};
             var lvl = page.data["Level"] && page.data["Level"] > 0 ? page.data["Level"] : "cantrip";
             if (repeating[`spell-${lvl}`]) {
@@ -7837,9 +7837,9 @@
             } else {
                 if(page.name && page.name !== "") { update["class"] = page.name; }
                 if(page.data["Hit Die"] && page.data["Hit Die"] !== "") {
-                    update["base_level"] = currentData.base_level ? currentData.base_level : "1";
+                    update["base_level"]   = currentData.base_level ? currentData.base_level : "1";
                     update["hit_dice_max"] = update["base_level"] + page.data["Hit Die"];
-                    update["hit_dice"] = update["base_level"];
+                    update["hit_dice"]     = update["base_level"];
                 }
                 if(page.data["Spellcasting Ability"] && page.data["Spellcasting Ability"] !== "") {
                     update["spellcasting_ability"] = "@{" + page.data["Spellcasting Ability"].toLowerCase() + "_mod}+";
@@ -9384,7 +9384,6 @@
                                     update["ac"] = b.custom_ac_shield == "yes" ? custom_total + shieldac + globalacmod + modac : custom_total + globalacmod + modac;
                                 }
                             }
-                            console.log("total: " + total);
                             setAttrs(update, {silent: true});
                         });
                     });
@@ -9452,217 +9451,97 @@
         });
     };
 
-    var update_class = function() {
-        getAttrs(["class","base_level","custom_class","cust_classname","cust_hitdietype","cust_spellcasting_ability","cust_strength_save_prof","cust_dexterity_save_prof","cust_constitution_save_prof","cust_intelligence_save_prof","cust_wisdom_save_prof","cust_charisma_save_prof","strength_save_prof","dexterity_save_prof","constitution_save_prof","intelligence_save_prof","wisdom_save_prof","charisma_save_prof","subclass","multiclass1","multiclass1_subclass","multiclass2","multiclass2_subclass","multiclass3","multiclass3_subclass","npc"], function(v) {
+    const update_class = () => {
+        //console.log(`%c Update class:`, "color:purple; font-size:14px;");
+        getAttrs(["class", "base_level","custom_class","cust_hitdietype","cust_spellcasting_ability","cust_strength_save_prof","cust_dexterity_save_prof","cust_constitution_save_prof","cust_intelligence_save_prof","cust_wisdom_save_prof","cust_charisma_save_prof", "npc"], (v) => {
             if(v.npc && v.npc == "1") {
                 return;
             }
+            const abilites = ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"];
+            //Custom Classes
             if(v.custom_class && v.custom_class != "0") {
-                setAttrs({
-                    hitdietype: v.cust_hitdietype,
-                    spellcasting_ability: v.cust_spellcasting_ability,
-                    strength_save_prof: v.cust_strength_save_prof,
-                    dexterity_save_prof: v.cust_dexterity_save_prof,
-                    constitution_save_prof: v.cust_constitution_save_prof,
-                    intelligence_save_prof: v.cust_intelligence_save_prof,
-                    wisdom_save_prof: v.cust_wisdom_save_prof,
-                    charisma_save_prof: v.cust_charisma_save_prof
-                });
-            }
-            else {
                 update = {};
-                switch(v.class) {
-                    case "":
-                        update["hitdietype"] = 6;
-                        update["spellcasting_ability"] = "0*";
-                        update["strength_save_prof"] = 0;
-                        update["dexterity_save_prof"] = 0;
-                        update["constitution_save_prof"] = 0;
-                        update["intelligence_save_prof"] = 0;
-                        update["wisdom_save_prof"] = 0;
-                        update["charisma_save_prof"] = 0;
-                        break;
-                    case "Barbarian":
-                        update["hitdietype"] = 12;
-                        update["spellcasting_ability"] = "0*";
-                        update["strength_save_prof"] = "(@{pb})";
-                        update["dexterity_save_prof"] = 0;
-                        update["constitution_save_prof"] = "(@{pb})";
-                        update["intelligence_save_prof"] = 0;
-                        update["wisdom_save_prof"] = 0;
-                        update["charisma_save_prof"] = 0;
-                        break;
-                    case "Bard":
-                        update["hitdietype"] = 8;
-                        update["spellcasting_ability"] = "@{charisma_mod}+";
-                        update["strength_save_prof"] = 0;
-                        update["dexterity_save_prof"] = "(@{pb})";
-                        update["constitution_save_prof"] = 0;
-                        update["intelligence_save_prof"] = 0;
-                        update["wisdom_save_prof"] = 0;
-                        update["charisma_save_prof"] = "(@{pb})";
-                        break;
-                    case "Cleric":
-                        update["hitdietype"] = 8;
-                        update["spellcasting_ability"] = "@{wisdom_mod}+";
-                        update["strength_save_prof"] = 0;
-                        update["dexterity_save_prof"] = 0;
-                        update["constitution_save_prof"] = 0;
-                        update["intelligence_save_prof"] = 0;
-                        update["wisdom_save_prof"] = "(@{pb})";
-                        update["charisma_save_prof"] = "(@{pb})";
-                        break;
-                    case "Druid":
-                        update["hitdietype"] = 8;
-                        update["spellcasting_ability"] = "@{wisdom_mod}+";
-                        update["strength_save_prof"] = 0;
-                        update["dexterity_save_prof"] = 0;
-                        update["constitution_save_prof"] = 0;
-                        update["intelligence_save_prof"] = "(@{pb})";
-                        update["wisdom_save_prof"] = "(@{pb})";
-                        update["charisma_save_prof"] = 0;
-                        break;
-                    case "Fighter":
-                        update["hitdietype"] = 10;
-                        update["spellcasting_ability"] = "0*";
-                        update["strength_save_prof"] = "(@{pb})";
-                        update["dexterity_save_prof"] = 0;
-                        update["constitution_save_prof"] = "(@{pb})";
-                        update["intelligence_save_prof"] = 0;
-                        update["wisdom_save_prof"] = 0;
-                        update["charisma_save_prof"] = 0;
-                        break;
-                    case "Monk":
-                        update["hitdietype"] = 8;
-                        update["spellcasting_ability"] = "0*";
-                        update["strength_save_prof"] = "(@{pb})";
-                        update["dexterity_save_prof"] = "(@{pb})";
-                        update["constitution_save_prof"] = 0;
-                        update["intelligence_save_prof"] = 0;
-                        update["wisdom_save_prof"] = 0;
-                        update["charisma_save_prof"] = 0;
-                        break;
-                    case "Paladin":
-                        update["hitdietype"] = 10;
-                        update["spellcasting_ability"] = "@{charisma_mod}+";
-                        update["strength_save_prof"] = 0;
-                        update["dexterity_save_prof"] = 0;
-                        update["constitution_save_prof"] = 0;
-                        update["intelligence_save_prof"] = 0;
-                        update["wisdom_save_prof"] = "(@{pb})";
-                        update["charisma_save_prof"] = "(@{pb})";
-                        break;
-                    case "Ranger":
-                        update["hitdietype"] = 10;
-                        update["spellcasting_ability"] = "@{wisdom_mod}+";
-                        update["strength_save_prof"] = "(@{pb})";
-                        update["dexterity_save_prof"] = "(@{pb})";
-                        update["constitution_save_prof"] = 0;
-                        update["intelligence_save_prof"] = 0;
-                        update["wisdom_save_prof"] = 0;
-                        update["charisma_save_prof"] = 0;
-                        break;
-                    case "Rogue":
-                        update["hitdietype"] = 8;
-                        update["spellcasting_ability"] = "0*";
-                        update["strength_save_prof"] = 0;
-                        update["dexterity_save_prof"] = "(@{pb})";
-                        update["constitution_save_prof"] = 0;
-                        update["intelligence_save_prof"] = "(@{pb})";
-                        update["wisdom_save_prof"] = 0;
-                        update["charisma_save_prof"] = 0;
-                        break;
-                    case "Sorcerer":
-                        update["hitdietype"] = 6;
-                        update["spellcasting_ability"] = "@{charisma_mod}+";
-                        update["strength_save_prof"] = 0;
-                        update["dexterity_save_prof"] = 0;
-                        update["constitution_save_prof"] = "(@{pb})";
-                        update["intelligence_save_prof"] = 0;
-                        update["wisdom_save_prof"] = 0;
-                        update["charisma_save_prof"] = "(@{pb})";
-                        break;
-                    case "Warlock":
-                        update["hitdietype"] = 8;
-                        update["spellcasting_ability"] = "@{charisma_mod}+";
-                        update["strength_save_prof"] = 0;
-                        update["dexterity_save_prof"] = 0;
-                        update["constitution_save_prof"] = 0;
-                        update["intelligence_save_prof"] = 0;
-                        update["wisdom_save_prof"] = "(@{pb})";
-                        update["charisma_save_prof"] = "(@{pb})";
-                        break;
-                    case "Wizard":
-                        update["hitdietype"] = 6;
-                        update["spellcasting_ability"] = "@{intelligence_mod}+";
-                        update["strength_save_prof"] = 0;
-                        update["dexterity_save_prof"] = 0;
-                        update["constitution_save_prof"] = 0;
-                        update["intelligence_save_prof"] = "(@{pb})";
-                        update["wisdom_save_prof"] = "(@{pb})";
-                        update["charisma_save_prof"] = 0;
-                        break;
-                }
+                update["hitdietype"] = v.cust_hitdietype;
+                update["spellcasting_ability"] = v.cust_spellcasting_ability;
+                abilites.forEach((save) => {
+                    const ability = save.toLowerCase();
+                    update[`${ability}_save_prof`] = v[`cust_${ability}_save_prof`];
+                });
                 setAttrs(update, {silent: true});
+            //If "Choose" has been selected in the select
+            } else if (v.class === "") {
+                update = {};
+                update["hitdietype"] = 6;
+                update["spellcasting_ability"] = "0*";
+                abilites.forEach((save) => {
+                    const ability = save.toLowerCase();
+                    update[`${ability}_save_prof`] = 0;
+                });
+                setAttrs(update, {silent: true});
+            //Standard classes can pull their data from the Comependium
+            } else {
+                getCompendiumPage(v.class, (page) => {
+                    update = {};
+                    page.forEach((list) => {
+                        if (list.data && 'Category' in list.data && list.data[`Category`] === "Classes") {
+                            update["hitdietype"] = list.data["Hit Die"].slice(1);
+                            update["spellcasting_ability"] = (list.data["Spellcasting Ability"]) ? `@{${list.data["Spellcasting Ability"].toLowerCase()}_mod}+` : "0*";
+
+                            abilites.forEach((save) => {
+                                const ability = save.toLowerCase();
+                                update[`${ability}_save_prof`] = (list.data["data-Saving Throws"].indexOf(`${save}`) > -1) ? "(@{pb})" : 0;
+                            });
+                        };
+                    });
+                    setAttrs(update, {silent: true});
+                    //Update Spell info to change or remove casting attributes in Spells
+                    update_spell_info();
+                });
             };
         });
         set_level();
     };
 
-    var set_level = function() {
-        getAttrs(["base_level","multiclass1_flag","multiclass2_flag","multiclass3_flag","multiclass1_lvl","multiclass2_lvl","multiclass3_lvl","class","multiclass1","multiclass2","multiclass3", "arcane_fighter", "arcane_rogue", "custom_class", "cust_spellslots", "cust_classname", "level_calculations", "class", "subclass", "multiclass1_subclass","multiclass2_subclass","multiclass3_subclass"], function(v) {
-            var update = {};
-            var callbacks = [];
-            var multiclass = (v.multiclass1_flag && v.multiclass1_flag === "1") || (v.multiclass2_flag && v.multiclass2_flag === "1") || (v.multiclass3_flag && v.multiclass3_flag === "1") ? true : false;
-            var finalclass = v["custom_class"] && v["custom_class"] != "0" ? v["cust_spellslots"] : v["class"];
-            var finallevel = (v.base_level && v.base_level > 0) ? parseInt(v.base_level,10) : 1;
-            var charclass = v.custom_class && v.custom_class != "0" ? v["cust_classname"] : v["class"];
-            var hitdie_final = multiclass ? "?{Hit Die Class|" + charclass + ",@{hitdietype}" : "@{hitdietype}";
-            var subclass = v.subclass ? v.subclass + " " : "";
-            var class_display = subclass + charclass + " " + finallevel;
+    const set_level = function() {
+        getAttrs(["base_level","multiclass1_flag","multiclass2_flag","multiclass3_flag","multiclass1_lvl","multiclass2_lvl","multiclass3_lvl","class","multiclass1","multiclass2","multiclass3", "arcane_fighter", "arcane_rogue", "custom_class", "cust_spellslots", "cust_classname", "level_calculations", "class", "subclass", "multiclass1_subclass","multiclass2_subclass","multiclass3_subclass"], (v) => {
+            let update        = {};
+            let callbacks     = [];
+            const multiclass  = (v[`multiclass1_flag`] && v[`multiclass1_flag`] === "1") || (v.multiclass2_flag && v.multiclass2_flag === "1") || (v.multiclass3_flag && v.multiclass3_flag === "1") ? true : false;
+            const finalclass  = (v[`custom_class`] && v[`custom_class`] != "0") ? v[`cust_spellslots`] : v[`class`];
+            let finallevel    = (v[`base_level`] && v[`base_level`] > 0) ? parseInt(v.base_level,10) : 1;
+            const charclass   = (v[`custom_class`] && v[`custom_class`] != "0") ? v[`cust_classname`] : v[`class`];
+            let hitdie_final  = (multiclass) ? `?{Hit Die Class|${charclass},@{hitdietype}` : "@{hitdietype}";
+            const subclass    = (v[`subclass`]) ? v[`subclass`] + " " : "";
+            let class_display = `${subclass}${charclass} ${finallevel}`;
 
             // This nested array is used to determine the overall spellcasting level for the character.
-            var classes = [ [finalclass.toLowerCase(), v["base_level"]] ];
+            var classes = [ [finalclass.toLowerCase(), v[`base_level`]] ];
 
-            if(v.multiclass1_flag && v.multiclass1_flag === "1") {
-                var multiclasslevel = (v["multiclass1_lvl"] && v["multiclass1_lvl"] > 0) ? parseInt(v["multiclass1_lvl"], 10) : 1;
-                finallevel = finallevel + multiclasslevel;
-                hitdie_final = hitdie_final + "|" + v["multiclass1"].charAt(0).toUpperCase() + v["multiclass1"].slice(1) + "," + checkHitDie(v["multiclass1"]);
-                classes.push([ v["multiclass1"], multiclasslevel ]);
-                var subclass = v.multiclass1_subclass ? v.multiclass1_subclass + " " : "";
-                class_display = class_display + ", " + subclass + v.multiclass1 + " " + multiclasslevel;
-            };
-            if(v.multiclass2_flag && v.multiclass2_flag === "1") {
-                var multiclasslevel = (v["multiclass2_lvl"] && v["multiclass2_lvl"] > 0) ? parseInt(v["multiclass2_lvl"], 10) : 1;
-                finallevel = finallevel + multiclasslevel;
-                hitdie_final = hitdie_final + "|" + v["multiclass2"].charAt(0).toUpperCase() + v["multiclass2"].slice(1) + "," + checkHitDie(v["multiclass2"]);
-                classes.push([ v["multiclass2"], multiclasslevel ]);
-                var subclass = v.multiclass2_subclass ? v.multiclass2_subclass + " " : "";
-                class_display = class_display + ", " + subclass + v.multiclass2 + " " + multiclasslevel;
-            };
-            if(v.multiclass3_flag && v.multiclass3_flag === "1") {
-                var multiclasslevel = (v["multiclass3_lvl"] && v["multiclass3_lvl"] > 0) ? parseInt(v["multiclass3_lvl"], 10) : 1;
-                finallevel = finallevel + multiclasslevel;
-                hitdie_final = hitdie_final + "|" + v["multiclass3"].charAt(0).toUpperCase() + v["multiclass3"].slice(1) + "," + checkHitDie(v["multiclass3"]);
-                classes.push([ v["multiclass3"], multiclasslevel ]);
-                var subclass = v.multiclass3_subclass ? v.multiclass3_subclass + " " : "";
-                class_display = class_display + ", " + subclass + v.multiclass3 + " " + multiclasslevel;
-            };
+            ["multiclass1", "multiclass2", "multiclass3"].forEach((multiclass) => {
+                 if (v[`${multiclass}_flag`] && v[`${multiclass}_flag`] === "1") {
+                    const multiclasslevel = (v[`${multiclass}_lvl`] && v[`${multiclass}_lvl`] > 0) ? parseInt(v[`${multiclass}_lvl`], 10) : 1;
+                    const subclass = (v[`${multiclass}_subclass`]) ? v[`${multiclass}_subclass`] + " " : "";
+                    finallevel = finallevel + multiclasslevel;
+                    hitdie_final = `${hitdie_final}|` + v[`${multiclass}`].charAt(0).toUpperCase() + v[`${multiclass}`].slice(1) + "," + checkHitDie(v[`${multiclass}`]);
+                    classes.push([ v[`${multiclass}`], multiclasslevel ]);
+                    class_display = `${class_display}, ${subclass}` + v[`${multiclass}`] + ` ${multiclasslevel}`;
+                };
+            });
 
-            var casterlevel = checkCasterLevel(classes, v["arcane_fighter"], v["arcane_rogue"]);
+            const casterlevel = checkCasterLevel(classes, v[`arcane_fighter`], v[`arcane_rogue`]);
 
-            update["hitdie_final"] = multiclass ? hitdie_final + "}" : hitdie_final;
-            update["level"] = finallevel;
-            update["caster_level"] = casterlevel;
+            update["hitdie_final"]  = (multiclass) ? `${hitdie_final}}` : hitdie_final;
+            update["level"]         = finallevel;
+            update["caster_level"]  = casterlevel;
             update["class_display"] = class_display;
 
-            if(!v["level_calculations"] || v["level_calculations"] == "on") {
+            if(!v["level_calculations"] || v["level_calculations"] === "on") {
                 update["hit_dice_max"] = finallevel;
-                callbacks.push( function() {update_spell_slots();} );
+                callbacks.push(() => {update_spell_slots();} );
             }
-            callbacks.push( function() {update_pb();} );
-            callbacks.push( function() {update_leveler_display();} );
-            setAttrs(update, {silent: true}, function() {callbacks.forEach(function(callback) {callback(); })} );
+            callbacks.push(() => {update_pb();} );
+            callbacks.push(() => {update_leveler_display();} );
+            setAttrs(update, {silent: true},() => {callbacks.forEach((callback) => {callback(); })} );
         });
     };
 
