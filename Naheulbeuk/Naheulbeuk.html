@@ -610,6 +610,7 @@
 										<th>MPhy</th>
 										<th>MPsy</th>
 										<th>RM</th>
+										<th>PR</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -626,6 +627,7 @@
 										<td><input type="number" name="attr_condition_magiephy" value="0"></td>
 										<td><input type="number" name="attr_condition_magiepsy" value="0"></td>
 										<td><input type="number" name="attr_condition_resimagie" value="0"></td>
+										<td><input type="number" name="attr_condition_pr" value="0"></td>
 									</tr>
 								</tbody>
 							</table>
@@ -1148,6 +1150,10 @@
 								<div class="sheet-row">
 									<div class="sheet-col-7 sheet-bold" title="Protection par la Magie - Protège toutes les localisations du corps">PR Magique</div>
 									<div class="sheet-col-5"><input type="text" class="sheet-autoCalc" name="attr_PRMag" value="0" readonly /></div>
+								</div>
+								<div class="sheet-row">
+									<div class="sheet-col-7 sheet-bold" title="Protection par bonus temporaire - Protège toutes les localisations du corps">PR Temp.</div>
+									<div class="sheet-col-5"><input type="text" class="sheet-autoCalc" name="attr_stats_pr_buff" value="0" readonly /></div>
 								</div>
 								<span class="sheet-hint">PR : Valeur de protection</span>
 							</div>
@@ -2547,9 +2553,9 @@
 	// Buff Stats
 	var buffStats = [	"condition_courage", "condition_intelligence", "condition_charisme", "condition_adresse", "condition_force",
 						"condition_attaque", "condition_parade", "condition_jet", "condition_esquive",
-						"condition_magiephy", "condition_magiepsy", "condition_resimagie" ];
+						"condition_magiephy", "condition_magiepsy", "condition_resimagie", "condition_pr" ];
 	var prStats = {
-		change: [ "repeating_armures:armure_prphy", "repeating_armures:armure_prmag", "prnat" ],
+		change: [ "repeating_armures:armure_prphy", "repeating_armures:armure_prmag", "prnat", "stats_pr_buff" ],
 		remove: [ "repeating_armures" ]
 	};
 	// items weight
@@ -3023,7 +3029,7 @@
 		var prPhy = 0;
 		var prMag = 0;
 		getSectionIDs( "repeating_armures", function(idarray) {
-			getAttrs( [ "prnat", ...idarray.map(id => `repeating_armures_${id}_armure_prphy`), ...idarray.map(id => `repeating_armures_${id}_armure_prmag`) ], function( sValues ) {
+			getAttrs( [ "prnat", "stats_pr_buff", ...idarray.map(id => `repeating_armures_${id}_armure_prphy`), ...idarray.map(id => `repeating_armures_${id}_armure_prmag`) ], function( sValues ) {
 				var v = structSafeInt( sValues );
 
 				for( var i in idarray) {
@@ -3034,7 +3040,7 @@
 				setAttrs({
 					"prphy": prPhy,
 					"prmag": prMag,
-					"pr": prPhy + prMag + v[ "prnat" ]
+					"pr": prPhy + prMag + v[ "prnat" ] + v[ "stats_pr_buff" ]
 				});
 			});
 		});
@@ -3304,7 +3310,7 @@
 			"simple": [ "personnage_nom", "personnage_origine", "personnage_metiers", "personnage_sex", "personnage_age", "personnage_poids", "personnage_taille", "personnage_notes", "personnage_butins",
 						"ev", "ev_max", "ea", "ea_max", "personnage_niveau", "personnage_xp", "personnage_pointdestin", "bonusdegatssorts",
 						"personnage_langue", "personnage_vision", "personnage_nyctalopie", "personnage_ouie", "personnage_odorat", "personnage_charge_max", "deplacement_mod",
-						"pr_tete", "pr_bras", "pr_torse", "pr_bouclier", "pr_jambes", "pr_pieds", "pr_mains", "prnat", "prphy", "prmag", "pr",
+						"pr_tete", "pr_bras", "pr_torse", "pr_bouclier", "pr_jambes", "pr_pieds", "pr_mains", "prnat", "prphy", "prmag", "pr", "stats_pr_buff",
 						"bivouac_couverture", "bivouac_couverture_recup", "bivouac_matelas", "bivouac_matelas_recup", "bivouac_tente", "bivouac_tente_recup",
 						"stats_courage", "stats_courage_mod", "stats_courage_temp", "stats_intelligence", "stats_intelligence_mod", "stats_intelligence_temp", "stats_charisme", "stats_charisme_mod", "stats_charisme_temp", "stats_adresse", "stats_adresse_mod", "stats_adresse_temp", "stats_force", "stats_force_mod", "stats_force_temp",
 						"stats_attaque", "stats_attaque_mod", "stats_attaque_temp", "stats_parade", "stats_parade_mod", "stats_parade_temp", "stats_jet", "stats_jet_mod", "stats_jet_temp", "stats_esquive", "stats_esquive_mod", "stats_esquive_temp", "stats_fouille_mod", "stats_fouille_temp", "stats_inge", "stats_inge_mod", "stats_inge_temp",
@@ -3320,7 +3326,7 @@
 				{ zone:"materiels", attr: ["materiel_nom", "materiel_poids"] },
 				{ zone:"recettes", attr: ["recette_nom", "recette_effet", "recette_specialiste", "recette_niveau", "recette_xp", "recette_duree", "recette_outils", "recette_materiaux", "recette_materiauxspe", "recette_assistant", "recette_difficulte", "recette_malusspecialiste", "recette_mod", "recette_resultats", "recette_prix", "recette_prixfabrication" ] },
 				{ zone:"ape", attr: ["ape_nom", "ape_note", "ape_effet", "ape_occurence"] },
-				{ zone:"conditions", attr: ["condition_provenance", "condition_nom", "condition_effet", "condition_actif", "condition_courage", "condition_intelligence", "condition_charisme", "condition_adresse", "condition_force", "condition_attaque", "condition_parade", "condition_jet", "condition_esquive", "condition_magiephy", "condition_magiepsy", "condition_resimagie"] },
+				{ zone:"conditions", attr: ["condition_provenance", "condition_nom", "condition_effet", "condition_actif", "condition_courage", "condition_intelligence", "condition_charisme", "condition_adresse", "condition_force", "condition_attaque", "condition_parade", "condition_jet", "condition_esquive", "condition_magiephy", "condition_magiepsy", "condition_resimagie", "condition_pr"] },
 				{ zone:"gemmes", attr: ["gemme_nom", "gemme_ug"] },
 				{ zone:"potions", attr: ["conso_nom", "conso_count", "conso_effet"] },
 				{ zone:"coupsspeciaux", attr: ["coupspecial_nom", "coupspecial_jet", "coupspecial_mod", "coupspecial_degats", "coupspecial_degats_arme", "coupspecial_utilisation", "coupspecial_echec", "coupspecial_effet", "coupspecial_note", "coupspecial_condition", "coupspecial_critique", "coupspecial_fumble" ] },
