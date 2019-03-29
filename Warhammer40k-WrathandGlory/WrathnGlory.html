@@ -160,7 +160,7 @@
 					<div class="other-traits defiance">
 						<span style="display: none" data-i18n="defiance">defiance</span>
 						<h1 data-i18n="defiancetracker">defiance tracker</h1>
-						<button type="roll" name="defiance" value="@{gm_toggle} &{template:rolls}{{header=@{translation_def}}}{{defiance=[[1d6cf<1cs>6]]}}">f</button>
+						<button type="roll" name="defiance" value="@{gm_toggle} &{template:rolls}{{header=^{defence}}{{defiance=[[1d6cf<1cs>6]]}}">f</button>
 						<input type="checkbox" name="attr_defiance_1" title="@{defiance_1}" /><span></span>
 						<input type="checkbox" name="attr_defiance_2" title="@{defiance_2}" /><span></span>
 						<input type="checkbox" name="attr_defiance_3" title="@{defiance_3}" /><span></span>
@@ -836,7 +836,7 @@
 	<input type="hidden" name="attr_display_attribute" value="Base" />
 	<input type="hidden" name="attr_glory" value="" />
 	<input type="hidden" name="attr_ruin" value="" />
-	<input type="hidden" name="attr_version" value="1" />
+	<input type="hidden" name="attr_version" value="1.1" />
 	
 <!--*********************************************************************************************************-->
 <!--***************************           ROLL TEMPLATE                           ***************************-->
@@ -989,13 +989,11 @@
 <!--***************************              SCRIPTS                              ***************************-->
 <!--*********************************************************************************************************-->
 <script type="text/worker">
-on("sheet:opened", function(eventInfo){
-    
-    setAttrs({
-        translation_def: getTranslationByKey("defiance")
-    });     
-    
-});
+
+//Sheet open versioning
+on("sheet:opened", () => {
+	versioning(parseFloat(v.version) || 1);
+});	
 
 ['sheet_toggle_core', 'sheet_toggle_info', 'sheet_toggle_options', 'sheet_toggle_npc'].forEach(attr => {
 	on(`clicked:${attr}`, function(eventinfo) {
@@ -1178,5 +1176,17 @@ on(`change:repeating_weapons:damage_ed change:repeating_attacks:damage_ed`, func
 		[`${source}damage_dicepool`] : (pool.join())
 	});
 });
+
+
+	//VERSION
+const versioning = (version) => {
+	console.log(`%c Wrath & Glory versioning, ${version}`, "color: #111518; font-weight:bold");
+   if (version => 1) {
+		console.log(`%c Wrath & Glory is update to date`, "color: #7b1915; font-weight:bold");
+   } else {
+		setAttrs({version: "1"}, () => {versioning("1")});
+	};
+};
+
 
 </script>
