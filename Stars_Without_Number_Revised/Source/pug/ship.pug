@@ -1,0 +1,133 @@
+.menus.col-4.core-box.flex-between
+	h3(data-i18n="QUICK_MENUS")
+	input(type="hidden", name="attr_macro_ship_weapons", value="")
+	button(type="roll", name="roll_ship_weapon_macro", data-i18n="WEAPONS", value!=`/w &quot;@{character_name}&quot; &{template:swn-default} {{charname=@{ship_name}}} {{title=^{WEAPONS}}} {{buttons=@{macro_ship_weapons}}}`).unstyled-button
+
+//- Ship header
+.info.core-box-text.flex.col-1-3
+	+text-input("ship_name", "NAME").col40.important
+	+text-input("ship_hulltype", "HULL_TYPE").colsixth.grow
+	+text-input("ship_class", "CLASS").colsixth
+	+text-input("ship_cargo_tonnage", "CARGO").colsixth
+	+text-input("ship_home_port", "HOME_PORT").col25
+	+text-input("ship_operating_cost", "OPERATING_COST").col25
+	+text-input("ship_maintenance_cost", "MAINTENANCE COST").col25
+	+text-input("ship_last_maintenance", "LAST_MAINTENANCE").col25
+.data.core-box-text
+	+text-input("ship_speed", "SPEED")(type="number", min="0")
+	+text-input("ship_ac", "AC")(type="number", min="0")
+	+text-input("ship_armor", "ARMOR")(type="number", min="0")
+	+text-input("ship_crew_min", "CREW_MIN")(type="number", min="0")
+	+text-input("ship_crew", "CURRENT")(type="number", min="0")
+	+text-input("ship_crew_max", "MAX")(type="number", min="0")
+.stats.core-box-text
+	+text-input-duo("ship_hp", "ship_hp_max", "HIT_POINTS", {min: "0"})(min="0").important
+	input(type="hidden", name="attr_ship_power" value="0").input-color-negative
+	+text-input-duo("ship_power", "ship_power_max", "POWER", {min: "0", value: "0"})(value="0", readonly)
+	input(type="hidden", name="attr_ship_mass" value="0").input-color-negative
+	+text-input-duo("ship_mass", "ship_mass_max", "MASS", {min: "0", value: "0"})(value="0", readonly)
+	input(type="hidden", name="attr_ship_hardpoints" value="0").input-color-negative
+	+text-input-duo("ship_hardpoints", "ship_hardpoints_max", "HARDPOINTS", {min: "0", value: "0"})(value="0", readonly)
+
+//- Weapons
+.section.col-1-3
+	+sectionheader("show_ship_weapons", "WEAPONS")
+	.ship-weapons
+		fieldset.repeating_ship-weapons
+			input(type="hidden", name="attr_weapon_api", value="")
+			button(type="roll", name="roll_Attack", value!="&{template:swn-attack} {{charname=@{ship_name}}} {{title=@{weapon_name} – @{weapon_qualities}}} {{attack=[[1d20 + @{weapon_attack_bonus}[Attack Bonus] @{modifier_query}]]}} {{damage=[[@{weapon_damage}]]}} @{weapon_use_ammo} @{weapon_api}").display.invisible-button
+			.display.grey-box-bordered
+				input(type="hidden", name="attr_weapon_broken", value="0").hider
+				span.broken.space-after #[span(data-i18n="BROKEN")]:
+				span.name.space-after
+					span(name="attr_weapon_name").space-after
+					input(type="hidden", name="attr_weapon_attack_bonus").add-plus
+					span(name="attr_weapon_attack_bonus")
+				span
+					| (
+					span(name="attr_weapon_damage").space-after
+					span.space-after #[span(data-i18n="DAMAGE").lower];
+					span(name="attr_weapon_qualities")
+					| ; #[span(data-i18n="POWER")]&nbsp;
+					span(name="attr_weapon_power")
+					| , #[span(data-i18n="MASS")]&nbsp;
+					span(name="attr_weapon_mass")
+					| , #[span(data-i18n="HARDPOINTS")]&nbsp;
+					span(name="attr_weapon_hardpoints")
+					| )
+				input(type="hidden", name="attr_weapon_use_ammo", value="0").hider
+				span
+					| . #[span(data-i18n="AMMO")]:&nbsp;
+					input(type="number", name="attr_weapon_ammo").inline-input
+					| &nbsp;/&nbsp;
+					span(name="attr_weapon_ammo_max")
+			.edit.flex-wrap.grey-box-bordered
+				+text-input("weapon_name", "NAME").name
+				+text-input("weapon_power", "POWER")(type="number", value="0", min="0").center.number
+				+text-input("weapon_mass", "MASS")(type="number", value="0", min="0").center.number
+				+text-input("weapon_hardpoints", "HARDPOINTS_SHORT")(type="number", value="0", min="0").center.number
+				+fake-text-input("BROKEN").center.broken
+					input(type="checkbox", name="attr_weapon_broken", value="1")
+				+text-input("weapon_attack_bonus", "ATTACK_BONUS_SHORT")(type="number", value="0").center.number
+				+text-input("weapon_damage", "DAMAGE")(value="0").center.damage
+				+text-input("weapon_qualities", "QUALITIES").qualities
+				+text-input-duo("weapon_ammo", "weapon_ammo_max", "", {min: "0"})(min="0")
+					input(type="checkbox", name="attr_weapon_use_ammo", value="{{ammo=[[@{weapon_ammo} - 1]] / @{weapon_ammo_max}}}")
+					span(data-i18n="AMMO")
+
+//- Fittings
+.section.col-3-5.row-3-5
+	+sectionheader("show_ship_fittings", "FITTING")
+	.ship-fitting
+		fieldset.repeating_ship-fittings
+			.display
+				input(type="hidden", name="attr_fitting_broken", value="0").hider
+				span.broken.space-after #[span(data-i18n="BROKEN")]:
+				span(name="attr_fitting_name").name.space-after
+				span.space-after
+					| (#[span(data-i18n="POWER")]&nbsp;
+					span(name="attr_fitting_power")
+					| , #[span(data-i18n="MASS")]&nbsp;
+					span(name="attr_fitting_mass")
+					| ).
+				span(name="attr_fitting_effect").description
+			.edit.flex.grey-box-bordered
+				+text-input("fitting_name", "NAME").name
+				+text-input("fitting_power", "POWER")(type="number", value="0").center.number
+				+text-input("fitting_mass", "MASS")(type="number", value="0").center.number
+				+fake-text-input("EFFECT").effect
+					textarea(name="attr_fitting_effect")
+				+fake-text-input("BROKEN").center.broken
+					input(type="checkbox", name="attr_fitting_broken", value="1")
+
+//- Defenses
+.section.col-1-3
+	+sectionheader("show_ship_defenses", "DEFENSES")
+	.ship-defenses
+		fieldset.repeating_ship-defenses
+			.display
+				input(type="hidden", name="attr_defense_broken", value="0").hider
+				span.broken.space-after #[span(data-i18n="BROKEN")]:
+				span(name="attr_defense_name").name.space-after
+				span.space-after
+					| (#[span(data-i18n="POWER")]&nbsp;
+					span(name="attr_defense_power")
+					| , #[span(data-i18n="MASS")]&nbsp;
+					span(name="attr_defense_mass")
+					| ).
+				span(name="attr_defense_effect").description
+			.edit.flex.grey-box-bordered
+				+text-input("defense_name", "NAME").name
+				+text-input("defense_power", "POWER")(type="number", value="0").center.number
+				+text-input("defense_mass", "MASS")(type="number", value="0").center.number
+				+fake-text-input("EFFECT").effect
+					textarea(name="attr_defense_effect")
+				+fake-text-input("BROKEN").center.broken
+					input(type="checkbox", name="attr_defense_broken", value="1")
+
+//- Notes
+.section.col-1-5
+	+sectionheader("show_ship_other)", "OTHER_NOTES")
+	.halfgrid
+		textarea(name="attr_ship_notes")
+		textarea(name="attr_ship_other_notes")

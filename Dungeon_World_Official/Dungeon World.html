@@ -12,6 +12,7 @@
 <input type="hidden" name="attr_equipment_armor" value="0">
 <input type="hidden" name="attr_equipment_armormod" value="0">
 <input type="hidden" name="attr_equipment_totalarmor" value="0">
+<input type="hidden" name="attr_bond_query" value="(0)[Other Bond]">
 
 <!-- 
 <input type="hidden" name="attr_level0_name" value="@{rotename}">
@@ -362,6 +363,7 @@
 		<div class="mid-content race">
 			<div class="race-main">
 				<input type="text" name="attr_race" />
+                <textarea name="attr_race_details" style="height:50px;"></textarea>
 			</div>
 		</div>
 		<div class="mid-header">
@@ -380,6 +382,12 @@
 							<span>
 								<span class="label" data-i18n="ongoing-roll-mod:">Ongoing Roll Modifier: </span>
 								<input type="number" name="attr_gmod_ongoing_mod" value="0" />
+							</span>
+						</div>
+                          <div class="flex-row flex-left">
+							<input class="enable-mod" type="checkbox" name="attr_barbdice_on" value="1" />
+							<span>
+								<span class="label" data-i18n="roll1d61d8formoves">Roll 1d6+1d8 for Moves </span>
 							</span>
 						</div>
 						<div class="flex-row flex-left">
@@ -448,6 +456,7 @@
 								<option value="@{wisdom_mod}[wisdom]" data-i18n="wis-u">WIS</option>
 								<option value="@{charisma_mod}[charisma]" data-i18n="cha-u">CHA</option>
 								<option value="@{statmod_query}" data-i18n="ask-u">ASK</option>
+								<option value="@{bond_query}" data-i18n="bond-u">BOND</option>
 							</select>
 							<span class="label moveroll"> + </span>
 							<input class="moveroll" type="number" name="attr_movemod" value="0" />
@@ -644,7 +653,11 @@
 	</div>
 
 </div>
-
+<div class="sheet-notesfield">
+<span class="label" >Notes</span>
+						<br />
+						<textarea class="sheet-notes" name="attr_notes" ></textarea><textarea class="sheet-notes sheet-notes2" name="attr_notes2" ></textarea>
+    </div>
 </div>
 
 <div class="page settings-page">
@@ -962,7 +975,8 @@ var dwMoves = {
 		trigger: "When you consult your accumulated knowledge about something",
 		roll: "INT",
 		success: "The GM will tell you something interesting and useful about the subject relevant to your situation.",
-		partial: "The GM might ask you \"How do you know this?\" Tell them the truth, now."
+		partial: "The GM will only tell you something interesting - it's on you to make it useful.",
+		details: "The GM might ask you \"How do you know this?\" Tell them the truth, now."
 	},
 	aidorinterfere: {
 		class: "Basic",
@@ -2710,6 +2724,24 @@ on("change:repeating_gmods:enable_modifier change:repeating_gmods:ongoing_on cha
 	});
 });
 
+// Set 1d6+1d8 (barbarian dice)     
+on("change:repeating_gmods:enable_modifier change:repeating_gmods:barbdice_on change:repeating_gmods:gmod_rolltype", function() {
+	getAttrs(["repeating_gmods_enable_modifier", "repeating_gmods_barbdice_on", "repeating_gmods_gmod_rolltype", "rolltype"], function(v) {
+		if (v.repeating_gmods_barbdice_on > 0 && v.repeating_gmods_enable_modifier > 0) {
+			var rolltype = "1d6+1d8";
+			if (rolltype === undefined || rolltype == "") mod = "2d6";
+			setAttrs({rolltype: rolltype});
+		} else {
+			setAttrs({rolltype: "2d6"});
+		}
+
+		if (!v.repeating_gmods_enable_modifier > 0) {
+			setAttrs({rolltype: "2d6"});
+		}
+	});
+});
+
+
 // Set Damage Mod
 on("change:repeating_gmods:enable_modifier change:repeating_gmods:dmg_on change:repeating_gmods:gmod_dmg_diecount change:repeating_gmods:gmod_dmg_die change:repeating_gmods:gmod_dmg_mod", function() {
 	getAttrs(["repeating_gmods_enable_modifier", "repeating_gmods_dmg_on", "repeating_gmods_gmod_dmg_diecount", "repeating_gmods_gmod_dmg_die", "repeating_gmods_gmod_dmg_mod"], function(v) {
@@ -2818,6 +2850,45 @@ on("change:repeating_gmods", function(eventInfo) {
 		});
 	});
 
+});
+
+on("change:repeating_bonds", function(eventInfo) {
+	getSectionIDs("repeating_bonds", function(ids) {
+	    if (ids.length == 0){
+	        setAttrs({
+	            bond_query: "(0)[Other Bond]"
+	        });
+	        return;
+	    }
+	    
+	    var attrs = [];
+	    for(var i=0; i < ids.length; i++) {
+	        var attr = "repeating_bonds_" + ids[i] + "_bond_simple";
+			attrs.push(attr);
+	    }
+	    console.log(ids);
+	    
+	    getAttrs(attrs, function(v) {
+	        var bonds = {};
+	        _.each(v, function(val, attrName) {
+	            if (val in bonds){
+	                bonds[val] += 1;
+	            }else{
+	                bonds[val] = 1;
+	            }
+	        });
+	        
+	        var query = "?{Bond";
+	        _.each(bonds, function(count, name) {
+	            query = query.concat(`|${name}, (${count})[Bonds with ${name}]`);
+	        });
+	        query = query.concat("|Other, (0)[Other Bond]}");
+	        
+	        setAttrs({
+	            bond_query: query
+	        });
+	    });
+	});
 });
 
 // Move Drop

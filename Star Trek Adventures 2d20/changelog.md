@@ -2,6 +2,12 @@
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 1.2.5
+### Features
+* Added Vulcan Nerve Pinch to attack options (using security, science, or medicine per p.110)
+### Bug Fixes
+* Fixed melee attack from attr_security to attr_daring
+
 ## 1.2.4
 ### Features
 * Default sheet is missing milestone tracking, added this to the settings screen (attr_norm-mile, attr_spot-mile, attr_arc-mile, attr_rep).

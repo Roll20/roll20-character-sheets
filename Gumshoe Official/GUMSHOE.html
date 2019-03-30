@@ -1097,7 +1097,7 @@
 							</button>
 							<span>
 								<input class="occupation nba-hide npc-hide" name="attr_negotiation_occupation" type="checkbox" value="0.5"
-								><input class="available" name="attr_flattery" type="number"><div>
+								><input class="available" name="attr_negotiation" type="number"><div>
 									<label class="increment"><input name="attr_spinner" type="radio" value="negotiation_inc"></label>
 									<label class="decrement"><input name="attr_spinner" type="radio" value="negotiation_dec"></label>
 								</div><span>/</span><input class="max" name="attr_negotiation_max" type="number" value="0"><div>
@@ -2355,7 +2355,7 @@
 							<input class="free-points" name="attr_weapons_free" type="number" value="0" min="0">
 						</div>
 						<fieldset class="repeating_general">
-							<div class="abilities-item">
+							<div class="abilities-item npc-ability">
 								<input class="constraint" name="attr_r-general_constraint" type="hidden" value="abd">
 								<input name="attr_r-general_dice" type="hidden" value="@{basic_roll}">
 								<div class="rep-title">
@@ -2689,7 +2689,7 @@
 	<div class="notes-full nba-full section toc-col2 npc-full">
 		<div class="content">
 			<div data-i18n="notes-n">Notes</div>
-			<textarea value="attr_notes"></textarea>
+			<textarea name="attr_notes"></textarea>
 		</div>
 	</div>
 </div>
@@ -2883,9 +2883,8 @@ var currentAbilities = {},
 					_.each(abilities, function(ability) {
 						let max = parseInt(values[ability + "_max"]),
 							occupation = values[ability + "_occupation"];
-
 						if(ability == 'fleeing') {
-							let ath = values['athletics_max'] ? values['athletics_max'] : 0;
+							let ath = values['athletics_max'] ? parseInt(values['athletics_max']) : 0;
 							if(ath < max) {
 								result += ath;
 								max -= ath;
@@ -3060,10 +3059,10 @@ on("sheet:opened change:sheetsettings", function(eventInfo) {
 			tocInterpersonal: ['assess-honesty', 'bargain', 'bureaucracy', 'cop-talk', 'credit-rating', 'flattery', 'interrogation', 'intimidation', 'oral-history', 'reassurance', 'streetwise'],
 			tocTechnical: ['art', 'astronomy', 'chemistry', 'craft', 'evidence-collection', 'forensics', 'locksmith', 'outdoorsman', 'pharmacy', 'photography'],
 			tocGeneral: ['athletics', 'conceal', 'disguise', 'driving', 'electrical-repair', 'explosives', 'filch', 'firearms', 'first-aid', 'fleeing', 'health', 'hypnosis', 'mechanical-repair', 'piloting', 'preparedness', 'psychoanalysis', 'riding', 'sanity', 'scuffling', 'sense-trouble', 'shadowing', 'stability', 'stealth', 'weapons'],
-			nbaAcademic: ['accounting', 'archaeology', 'architecture', 'art-hsitory', 'criminology', 'diagnosis', 'history', 'human-terrain', 'languages', 'law', 'military-science', 'occult-studies', 'research', 'vampirology'],
+			nbaAcademic: ['accounting', 'archaeology', 'architecture', 'art-history', 'criminology', 'diagnosis', 'history', 'human-terrain', 'languages', 'law', 'military-science', 'occult-studies', 'research', 'vampirology'],
 			nbaInterpersonal: ['bullshit-detector', 'bureaucracy', 'cop-talk', 'flattery', 'flirting', 'high-society', 'interrogation', 'intimidation', 'negotiation', 'reassurance', 'streetwise', 'tradecraft'],
 			nbaTechnical: ['astronomy', 'chemistry', 'cryptography', 'data-recovery', 'electronic-surveillance', 'forensic-pathology', 'forgery', 'notice', 'outdoor-survival', 'pharmacy', 'photography', 'traffic-analysis', 'urban-survival'],
-			nbaGeneral: ['athletics', 'conceal', 'cover', 'digital-intrusion', 'disguise', 'driving', 'explosive-devices', 'filch', 'gambling', 'hand-to-hand', 'infiltration', 'mechanics', 'medic', 'network', 'piloting', 'preparedness', 'sense-trouble', 'shooting', 'shrink', 'stability', 'surveillance', 'weapons']};
+			nbaGeneral: ['athletics', 'conceal', 'cover', 'digital-intrusion', 'disguise', 'driving', 'explosive-devices', 'filch', 'gambling', 'hand-to-hand', 'health', 'infiltration', 'mechanics', 'medic', 'network', 'piloting', 'preparedness', 'sense-trouble', 'shooting', 'shrink', 'stability', 'surveillance', 'weapons']};
 
 	getAttrs(["health_default", "stability_default", "sanity_default", "cover_default", "network_default", "sheetsettings", "firstopen"], function(values) {
 		let updates = {version: 0.5};
@@ -3247,8 +3246,7 @@ on("change:repeating_weapons", function(eventInfo) {
 						results[prefix + roll +"_roll"] = extra ? fullQuery : "{{roll=[[1d6"
 						results[prefix + roll +"_roll"] += addMod(base) + addMod(weight) + addMod(values[prefix + roll +"_adjust"]) + "]]}}";
 					};
-
-			results[prefix + "weapon-type-flag"] = values[prefix + "weapon-type"][0];
+			results[prefix + "weapon-type-flag"] = values[prefix + "category"] == 'melee' ? 'm' : values[prefix + "weapon-type"][0];
 			if(values[prefix + "category"] == "melee") {
 				results[prefix + "melee_mod"] = parseInt(values[prefix + "melee_weight"]) + parseInt(values[prefix + "melee_adjust"]);
 				changeRoll('melee', values[prefix + "melee_weight"]);
@@ -3294,7 +3292,6 @@ on("change:repeating_weapons", function(eventInfo) {
 					results[key] = results[key] >= 0 ? "+" + results[key] : results[key];
 				}
 			}
-
 			setAttrs(results, {silent: true});
 		});
 	}

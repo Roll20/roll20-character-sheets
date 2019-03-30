@@ -2267,13 +2267,96 @@
 			});
 		}
 	});
-</script>
+	
+	on('sheet:opened', function() 
+	{
+		getAttrs(["WarriorOD_MAJ"], function(values)
+		{
+			var WMAJ = values.WarriorOD_MAJ;
 
+			if(WMAJ == 0)
+			{
+				getSectionIDs("repeating_armeDist", function(idarray) 
+				{ //Get oldSectionID
+					var setOrf={};
+					var setPre={};
+					_.each(idarray, function(currentID, i) 
+					{
+						getAttrs(['repeating_armeDist_' + currentID + '_orfevrerie'], function(v) 
+						{
+							if(v['repeating_armeDist_' + currentID + '_orfevrerie'] == "{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}")
+							{
+								setOrf['repeating_armeDist_' + currentID + '_orfevrerie'] = "{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{orfevrerieWarrior=[[@{dexterite}+@{dextOD}+@{warriorScoutA}]]}}";
+								setAttrs(setOrf); //Update
+							}
+						});
+						
+						getAttrs(['repeating_armeDist_' + currentID + '_precision'], function(v) 
+						{
+							if(v['repeating_armeDist_' + currentID + '_precision'] == "{{precision=[[@{tir}+@{tirOD}]]}}")
+							{
+								setPre['repeating_armeDist_' + currentID + '_precision'] = "{{precision=[[@{tir}+@{tirOD}]]}} {{precisionWarrior=[[@{tir}+@{tirOD}+@{warriorScholarA}]]}}";
+								setAttrs(setPre); //Update
+							}
+						});
+					});
+				});
+				
+				getSectionIDs("repeating_armeCaC", function(idarray) 
+				{ //Get oldSectionID
+					var setOrf={};
+					var setPre={};
+					_.each(idarray, function(currentID, i) 
+					{
+						getAttrs(['repeating_armeCaC_' + currentID + '_orfevrerie'], function(v) 
+						{
+							if(v['repeating_armeCaC_' + currentID + '_orfevrerie'] == "{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}")
+							{
+								setOrf['repeating_armeCaC_' + currentID + '_orfevrerie'] = "{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{orfevrerieWarrior=[[@{dexterite}+@{dextOD}+@{warriorScoutA}]]}}";
+								setAttrs(setOrf); //Update
+							}
+						});
+						
+						getAttrs(['repeating_armeCaC_' + currentID + '_precision'], function(v) 
+						{
+							if(v['repeating_armeCaC_' + currentID + '_precision'] == "{{precision=[[@{tir}+@{tirOD}]]}}")
+							{
+								setPre['repeating_armeCaC_' + currentID + '_precision'] = "{{precision=[[@{tir}+@{tirOD}]]}} {{precisionWarrior=[[@{tir}+@{tirOD}+@{warriorScholarA}]]}}";
+								setAttrs(setPre); //Update
+							}
+						});
+						
+						getAttrs(['repeating_armeCaC_' + currentID + '_sournoise'], function(v) 
+						{
+							if(v['repeating_armeCaC_' + currentID + '_sournoise'] == "{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{ASSournoiseL=Sournoise (Orfevrerie)}}")
+							{
+								setPre['repeating_armeCaC_' + currentID + '_sournoise'] = "{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{orfevrerieWarrior=[[@{dexterite}+@{dextOD}+@{warriorScoutA}]]}} {{ASSournoiseL=Sournoise (Orfevrerie)}}";
+								setAttrs(setPre); //Update
+							}
+						});
+						
+						getAttrs(['repeating_armeCaC_' + currentID + '_surmesure'], function(v) 
+						{
+							if(v['repeating_armeCaC_' + currentID + '_surmesure'] == "{{ASSurMesureD=[[@{combat}+@{combOD}]]}} {{ASSurMesureWOD=[[@{combat}]]}} {{ASSurMesureL=Sur Mesure}}")
+							{
+								setPre['repeating_armeCaC_' + currentID + '_surmesure'] = "{{ASSurMesureD=[[@{combat}+@{combOD}]]}} {{ASSurMesureDWarrior=[[@{combat}+@{combOD}+@{warriorHunterA}]]}} {{ASSurMesureWOD=[[@{combat}]]}} {{ASSurMesureL=Sur Mesure}}";
+								setAttrs(setPre); //Update
+							}
+						});
+					});
+				});
+			
+				setAttrs({WarriorOD_MAJ: 1});
+			}
+		});
+	});
+</script>
 
 <input type="hidden" name="attr_MAJ" value="0" />
 <input type="hidden" name="attr_MonkMAJ" value="0" />
 <input type="hidden" name="attr_PsionMAJ" value="0" />
 <input type="hidden" name="attr_OD_MAJ" value="0" />
+<input type="hidden" name="attr_WarriorOD_MAJ" value="0" />
 
 <input type="radio" name="attr_fichePNJ" class="fichePNJ" value="0" checked /><span title="PJ" class="fichePNJ" ></span><br/>
 <input type="radio" name="attr_fichePNJ" class="fichePNJ2" value="1" /><span title="PNJ" class="fichePNJ2" ></span>
@@ -2448,7 +2531,7 @@
 									<option value="@{dexterite}]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD2=[[@{dextOD}]]}} {{bonusWarrOD2=[[@{warriorScoutA}]]}} {{bonusBarb2=[[0]]}} {{carac2=Dextérité}}">Dextérité</option>
 								</select>
 							</td>
-							<td class="tab-padding-right tab-padding-bottom"><button name="attr_jetBase" type="roll" value="@{jetGM} &{template:simple} {{Nom=@{name}}}  @{caracteristique1} @{jetModifDes}+ @{caracteristique2} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}}" /></td>
+							<td class="tab-padding-right tab-padding-bottom"><button name="attr_jetBase" type="roll" value="@{jetGM} &{template:simple} {{Nom=@{name}}}  @{caracteristique1} @{jetModifDes}+ @{caracteristique2} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} {{taille=[[@{barbarianGoliath}]]}}" /></td>
 						</tr>
 					</table>	
 				</div>
@@ -5963,7 +6046,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 												</tr>
 												<tr style="height:31px;">
 													<td>
-														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
+														<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{orfevrerieWarrior=[[@{dexterite}+@{dextOD}+@{warriorScoutA}]]}}" />
 													</td>
 													<td colspan="2">
 														Orfévrerie
@@ -5987,7 +6070,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 														<input type="number" name="attr_perceArmureValue" size="2" class="center" value="0" />
 													</td>
 													<td>
-														<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}}" />
+														<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}} {{precisionWarrior=[[@{tir}+@{tirOD}+@{warriorScholarA}]]}}" />
 													</td>
 													<td colspan="2">
 														Précision
@@ -6446,7 +6529,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 											</tr>
 											<tr style="height:31px;">
 												<td>
-													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
+													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}  {{orfevrerieWarrior=[[@{dexterite}+@{dextOD}+@{warriorScoutA}]]}}" />
 												</td>
 												<td colspan="2">
 													Orfévrerie
@@ -6470,7 +6553,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 													<input type="number" name="attr_perceArmureValue" size="2" class="center" value="0" />
 												</td>
 												<td>
-													<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}}" />
+													<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}} {{precisionWarrior=[[@{tir}+@{tirOD}+@{warriorScholarA}]]}}" />
 												</td>
 												<td colspan="2">
 													Précision
@@ -7098,7 +7181,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 								<td class="center"><input type="number" name="attr_druidWolfDameT" class="center normalize" style="width:100%" value="@{druidWolfDameTot}" disabled /></td>
 								<td class="center"><input type="number" name="attr_druidWolfMasqueT" class="center normalize" style="width:100%" value="@{druidWolfMasqueTot}" disabled /></td>
 								<td class="center"></td>
-								<td class="center"><input type="number" name="attr_druidWolfCDFT" class="center normalize" style="width:100%" value="@{druidWolfCDFTot}" disabled /></td>
+								<td class="center"><input type="number" name="attr_druidWolfCDFT" class="center normalize" style="width:100%" value="4" disabled /></td>
 							</tr>
 							<tr style="height:20px">
 								<th style="vertical-align:middle;" class="center"><b>Aspects<br/>Exceptionnels</b></th>
@@ -8614,7 +8697,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 											</tr>
 											<tr style="height:31px;">
 												<td>
-													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
+													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{orfevrerieWarrior=[[@{dexterite}+@{dextOD}+@{warriorScoutA}]]}}" />
 												</td>
 												<td colspan="2">
 													Orfévrerie
@@ -8638,7 +8721,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 													<input type="number" name="attr_perceArmureValue" size="2" class="center" value="0" />
 												</td>
 												<td>
-													<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}}" />
+													<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}} {{precisionWarrior=[[@{tir}+@{tirOD}+@{warriorScholarA}]]}}" />
 												</td>
 												<td colspan="2">
 													Précision
@@ -9166,7 +9249,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 											</tr>
 											<tr style="height:31px;">
 												<td>
-													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
+													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{orfevrerieWarrior=[[@{dexterite}+@{dextOD}+@{warriorScoutA}]]}}" />
 												</td>
 												<td colspan="2">
 													Orfévrerie
@@ -9190,7 +9273,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 													<input type="number" name="attr_perceArmureValue" size="2" class="center" value="0" />
 												</td>
 												<td>
-													<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}}" />
+													<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}} {{precisionWarrior=[[@{tir}+@{tirOD}+@{warriorScholarA}]]}}" />
 												</td>
 												<td colspan="2">
 													Précision
@@ -9328,13 +9411,13 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 													Soeur
 												</td>
 												<td>
-													<input type="checkbox" name="attr_sournoise" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{ASSournoiseL=Sournoise (Orfevrerie)}}" />
+													<input type="checkbox" name="attr_sournoise" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{orfevrerieWarrior=[[@{dexterite}+@{dextOD}+@{warriorScoutA}]]}} {{ASSournoiseL=Sournoise (Orfevrerie)}}" />
 												</td>
 												<td>
 													Sournoise
 												</td>
 												<td>
-													<input type="checkbox" name="attr_surmesure" value="{{ASSurMesureD=[[@{combat}+@{combOD}]]}} {{ASSurMesureWOD=[[@{combat}]]}} {{ASSurMesureL=Sur Mesure}}" />
+													<input type="checkbox" name="attr_surmesure" value="{{ASSurMesureD=[[@{combat}+@{combOD}]]}} {{ASSurMesureDWarrior=[[@{combat}+@{combOD}+@{warriorHunterA}]]}} {{ASSurMesureWOD=[[@{combat}]]}} {{ASSurMesureL=Sur Mesure}}" />
 												</td>
 												<td>
 													Sur Mesure
@@ -10183,7 +10266,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 					<input type="hidden" name="attr_dgtBM" readonly />
 					<input type="hidden" name="attr_rctBM" readonly />
 					<input type="hidden" name="attr_defBM" readonly />
-					<table>
+					<table class="Separation">
 						<tr>
 							<th class="tab-padding-top tab-padding-right tab-padding-left"><h4>Style de Combat</h4></th>
 						</tr>
@@ -10203,7 +10286,6 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 							<td class="tab-padding-bottom tab-padding-right tab-padding-left"><textarea name="attr_styleCombatDescr" style="height:40px;" readonly ></textarea></td>
 						</tr>
 					</table>
-					<br/>
 					<input type="checkbox" name="attr_armure" class="checkGuardian hidden" value="guardian" checked />
 					<input type="checkbox" name="attr_armure" class="checkBarb hidden" value="barbarian" />
 					<input type="checkbox" name="attr_armure" class="checkBard hidden" value="bard" />
@@ -10528,7 +10610,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 						<td class="tab-padding-bottom tab-padding-right tab-padding-left"><textarea name="attr_styleCombatDescr" style="height:40px;" readonly ></textarea></td>
 					</tr>
 				</table>
-				<table>
+				<table class="Separation">
 					<tr>
 						<td class="tab-padding-left" style="width:50%"></td>
 						<th style="width:25%"><h4>Actuel</h4></th>
@@ -10558,6 +10640,24 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 						<th class="tab-padding-left tab-padding-bottom left"><h4>Bouclier</h4></th>
 						<td class="tab-padding-bottom"><input type="number" class="center" min="0" style="width:100%" name="attr_bouclierPNJ" value="0" /></td>
 						<td class="tab-padding-bottom tab-padding-right" ><input type="number" class="center" min="0" style="width:100%" name="attr_bouclierPNJ_max" value="0" /></td>
+					</tr>
+				</table>
+				<table class="Separation">
+					<tr>
+						<th class="tab-padding-top tab-padding-right tab-padding-left" colspan="3"><h4>Affichage des armes</h4></th>
+					</tr>
+					<tr>
+						<td style="width:110px" class="center"><input type="checkbox" name="attr_tabDistance" class="button button-110px" value="1" checked><span title="Distances"></span></td>
+						<td style="width:110px" class="center"><input type="checkbox" name="attr_tabMelee" class="button button-110px" value="2" checked><span title="Mêlée"></span></td>
+						<td style="width:110px" class="center"><input type="checkbox" name="attr_tabAutre" class="button button-110px" value="3" checked><span title="Autres"></span></td>
+					</tr>
+				</table>
+				<table>
+					<tr>
+						<th class="center tab-padding-left tab-padding-right"><h4>Bonus/Malus aux Jets</h4></th>
+					</tr>
+					<tr>
+						<td class="tab-padding-left tab-padding-bottom tab-padding-right"><input type="number" name="attr_jetModifDes" class="center" style="width:100%" value="0" /></td>
 					</tr>
 				</table>
 			</div>
@@ -11074,7 +11174,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 											</tr>
 											<tr style="height:31px;">
 												<td>
-													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
+													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{orfevrerieWarrior=[[@{dexterite}+@{dextOD}+@{warriorScoutA}]]}}" />
 												</td>
 												<td colspan="2">
 													Orfévrerie
@@ -11098,7 +11198,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 													<input type="number" name="attr_perceArmureValue" size="2" class="center" value="0" />
 												</td>
 												<td>
-													<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}}" />
+													<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}} {{precisionWarrior=[[@{tir}+@{tirOD}+@{warriorScholarA}]]}}" />
 												</td>
 												<td colspan="2">
 													Précision
@@ -11381,10 +11481,12 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 										<input type="hidden" name="attr_violence" value="{{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}}" />
 										<!-- Bonus de Force -->
 										<input type="hidden" name="attr_bForce" value="{{force=[[@{force}]]}} {{BonusForce=[[@{forOD}*3]]}}" />
+										<!-- Bonus du mode Goliath -->
+										<input type="hidden" name="attr_bGoliath" value="{{taille=[[@{barbarianGoliath}]]}} {{modeGoliathD=[[@{barbarianGoliath}D6]]}} {{modeGoliathV=[[@{barbarianGoliath}D6]]}}" />
 										<!-- Les styles -->
 										<input type="hidden" name="attr_styles" value="{{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}}" />
 										<input type="hidden" name="attr_stylesDB" value="{{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}}" />
-										<input type="hidden" name="attr_stylesVB" value="{{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]}}" />
+										<input type="hidden" name="attr_stylesVB" value="{{styleViolBM=[[ [[(floor([[@{armeCaCViolence}]]/2))]]d6]]}}" />
 										<!-- Les effets -->
 										<input type="hidden" name="attr_listeEffets" value="@{destructeur} @{fureur} @{leste} @{meurtrier} @{orfevrerie} @{precision} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{antiAnatheme} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{discretion}+@{dextOD}]]}} {{silencieuxWOD=[[@{discretion}]]}} @{tenebricite}@{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission}" />
 										<!-- Les améliorations structurelles -->
@@ -11397,9 +11499,9 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 										<input type="hidden" name="attr_minimum" value="{{totalD=[[@{armeCaCDegat}-@{allegee}]]}} {{totalV=[[1]]}} {{minimumD=[[1D6]]}} {{minimumV=[[1D6]]}} {{minimumSD=[[1D6]]}} {{minimumSV=[[1D6]]}}" />
 										<!-- La gestion des OD spéciaux au jet. -->
 										<input type="hidden" name="attr_listeOD" value="@{akimboContactODBonus} @{ambidextrieContactODBonus} @{discretionDegatsBonus}" />
-										
+
 										<!-- Le bouton du jet -->
-										<button name="attr_jetContact" type="roll" value="@{jetGM} &{template:contact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} {{Portee=@{armeCaCPortee}}} @{caracteristique1Equipement} @{jetModifDes}-floor(@{cadence})-floor(@{chromeeLignesLC})@{atkBM}+ @{caracteristique2Equipement} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{degats} @{violence} @{styles} @{stylesDB} @{stylesVB} @{listeEffets} @{listeAS} @{listeAO} @{listeOD} @{bForce} @{speciaux} @{minimum}" />
+										<button name="attr_jetContact" type="roll" value="@{jetGM} &{template:contact} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} {{Portee=@{armeCaCPortee}}} @{caracteristique1Equipement} @{jetModifDes}-floor(@{cadence})-floor(@{chromeeLignesLC})@{atkBM}+ @{caracteristique2Equipement} {{situationnel=[[@{jetModifDes}]]}} @{bGoliath} {{@{armure}=@{armure}}} @{degats} @{violence} @{styles} @{stylesDB} @{stylesVB} @{listeEffets} @{listeAS} @{listeAO} @{listeOD} @{bForce} @{speciaux} @{minimum}" />
 									</td>
 								</tr>
 								<tr>
@@ -11627,7 +11729,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 											</tr>
 											<tr style="height:31px;">
 												<td>
-													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}}" />
+													<input type="checkbox" name="attr_orfevrerie" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{orfevrerieWarrior=[[@{dexterite}+@{dextOD}+@{warriorScoutA}]]}}" />
 												</td>
 												<td colspan="2">
 													Orfévrerie
@@ -11651,7 +11753,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 													<input type="number" name="attr_perceArmureValue" size="2" class="center" value="0" />
 												</td>
 												<td>
-													<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}}" />
+													<input type="checkbox" name="attr_precision" value="{{precision=[[@{tir}+@{tirOD}]]}} {{precisionWarrior=[[@{tir}+@{tirOD}+@{warriorScholarA}]]}}" />
 												</td>
 												<td colspan="2">
 													Précision
@@ -11789,13 +11891,13 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 													Soeur
 												</td>
 												<td>
-													<input type="checkbox" name="attr_sournoise" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{ASSournoiseL=Sournoise (Orfevrerie)}}" />
+													<input type="checkbox" name="attr_sournoise" value="{{orfevrerie=[[@{dexterite}+@{dextOD}]]}} {{orfevrerieWarrior=[[@{dexterite}+@{dextOD}+@{warriorScoutA}]]}} {{ASSournoiseL=Sournoise (Orfevrerie)}}" />
 												</td>
 												<td>
 													Sournoise
 												</td>
 												<td>
-													<input type="checkbox" name="attr_surmesure" value="{{ASSurMesureD=[[@{combat}+@{combOD}]]}} {{ASSurMesureWOD=[[@{combat}]]}} {{ASSurMesureL=Sur Mesure}}" />
+													<input type="checkbox" name="attr_surmesure" value="{{ASSurMesureD=[[@{combat}+@{combOD}]]}} {{ASSurMesureDWarrior=[[@{combat}+@{combOD}+@{warriorHunterA}]]}} {{ASSurMesureWOD=[[@{combat}]]}} {{ASSurMesureL=Sur Mesure}}" />
 												</td>
 												<td>
 													Sur Mesure
@@ -12461,8 +12563,8 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 				<tr>
 					<td style="padding:0px;">
 						<fieldset class="repeating_armeDist">
-							<input type="checkbox" name="attr_armeDistOptions" class="cShow1 hidden" value="1">
-                            <input type="checkbox" name="attr_armeDistOptions" class="cShow2 hidden" value="2">
+							<input type="checkbox" name="attr_armeDistPNJOptions" class="cShow1 hidden" value="1">
+                            <input type="checkbox" name="attr_armeDistPNJOptions" class="cShow2 hidden" value="2">
  							<table>
 								<tr>
 									<td style="width:40%" class="tab-padding-left"><input type="text" name="attr_ArmeDist" /></td>
@@ -12484,11 +12586,11 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 									<td style="width:20%">
 										<select name="attr_aspectPNJCombat">
 											<option value="{{jet=[[ {[[0]]} ]]}}" selected></option>
-											<option value="{{aspect=Chair}} {{jet=[[ {[[@{Chair}+@{jetModifDes}-floor(@{cadence})@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{Chair}}}">Chair</option>
-											<option value="{{aspect=Bête}} {{jet=[[ {[[@{Bete}+@{jetModifDes}-floor(@{cadence})@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0} ]]}} {{ae=@{Bete}}}">Bête</option>
-											<option value="{{aspect=Machine}} {{jet=[[ {[[@{Machine}+@{jetModifDes}-floor(@{cadence})@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{Machine}}}">Machine</option>
-											<option value="{{aspect=Dame}} {{jet=[[ {[[@{Dame}+@{jetModifDes}-floor(@{cadence})@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{Dame}}}">Dame</option>
-											<option value="{{aspect=Masque}} {{jet=[[ {[[@{Masque}+@{jetModifDes}-floor(@{cadence})@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{Masque}}}">Masque</option>
+											<option value="{{aspect=Chair}} {{jet=[[ {[[@{Chair}+@{jetModifDes}-floor(@{cadence})@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{ChairPNJAE}}}">Chair</option>
+											<option value="{{aspect=Bête}} {{jet=[[ {[[@{Bete}+@{jetModifDes}-floor(@{cadence})@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0} ]]}} {{ae=@{BetePNJAE}}}">Bête</option>
+											<option value="{{aspect=Machine}} {{jet=[[ {[[@{Machine}+@{jetModifDes}-floor(@{cadence})@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{MachinePNJAE}}}">Machine</option>
+											<option value="{{aspect=Dame}} {{jet=[[ {[[@{Dame}+@{jetModifDes}-floor(@{cadence})@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{DamePNJAE}}}">Dame</option>
+											<option value="{{aspect=Masque}} {{jet=[[ {[[@{Masque}+@{jetModifDes}-floor(@{cadence})@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{MasquePNJAE}}}">Masque</option>
 										</select>
 									</td>
 									<td style="width:5%" class="tab-padding-right center">
@@ -12496,11 +12598,14 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 									</td>
 								</tr>
 								<tr>
-									<td style="width:230px" colspan="10">
-                                        <input type="checkbox" name="attr_armeDistPNJOptions" class="cButton cButtonFirst" value="1"><span title="Effets"></span>
-                                        <input type="checkbox" name="attr_armeDistPNJOptions" class="cButton cButtonNext" value="2"><span title="Améliorations d'armes"></span>
+									<td class="nopadding" colspan="11">
+										<table>
+											<tr>
+												<td class="nopadding width50"><input type="checkbox" name="attr_armeDistPNJOptions" class="cButton cButtonFirst" value="1"><span title="Effets"></span></td>
+												<td class="nopadding width50"><input type="checkbox" name="attr_armeDistPNJOptions" class="cButton cButtonNext" value="2"><span title="Améliorations d'armes"></span></td>
+											</tr>
+										</table>
                                     </td>
-                                    <td></td>
 								</tr>
 								<tr class="T1 block hidden">
 									<td colspan="11" class="tab-padding-left tab-padding-right">
@@ -12798,7 +12903,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 										</table>
 									</td>
 								</tr>
-								<tr class="T1 block hidden">
+								<tr class="T2 block hidden">
 									<td colspan="11" class="tab-padding-left tab-padding-right">
 										<table class="block">
 											<tr style="height:31px">
@@ -12978,29 +13083,44 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 									<td style="width:20%">
 										<select name="attr_aspectPNJCombat">
 											<option value="{{jet=[[ {[[0]]} ]]}}" selected></option>
-											<option value="{{aspect=Chair}} {{jet=[[ {[[@{Chair}+@{jetModifDes}@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{Chair}}}">Chair</option>
-											<option value="{{aspect=Bête}} {{jet=[[ {[[@{Bete}+@{jetModifDes}@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0} ]]}} {{ae=@{Bete}}}">Bête</option>
-											<option value="{{aspect=Machine}} {{jet=[[ {[[@{Machine}+@{jetModifDes}@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{Machine}}}">Machine</option>
-											<option value="{{aspect=Dame}} {{jet=[[ {[[@{Dame}+@{jetModifDes}@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{Dame}}}">Dame</option>
-											<option value="{{aspect=Masque}} {{jet=[[ {[[@{Masque}+@{jetModifDes}@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{Masque}}}">Masque</option>
+											<option value="{{aspect=Chair}} {{jet=[[ {[[@{Chair}+@{jetModifDes}@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{ChairPNJAE}}}">Chair</option>
+											<option value="{{aspect=Bête}} {{jet=[[ {[[@{Bete}+@{jetModifDes}@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0} ]]}} {{ae=@{BetePNJAE}}}">Bête</option>
+											<option value="{{aspect=Machine}} {{jet=[[ {[[@{Machine}+@{jetModifDes}@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{MachinePNJAE}}}">Machine</option>
+											<option value="{{aspect=Dame}} {{jet=[[ {[[@{Dame}+@{jetModifDes}@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{DamePNJAE}}}">Dame</option>
+											<option value="{{aspect=Masque}} {{jet=[[ {[[@{Masque}+@{jetModifDes}@{atkBM}]]d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}} {{ae=@{MasquePNJAE}}}">Masque</option>
 										</select>
 									</td>
 									<td style="width:5%" class="tab-padding-right center">
-									<!-- Les améliorations structurelles -->
-									<input type="hidden" name="attr_listeAS" value="@{soeur} @{jumelle} @{assassine} {{ASAllegee=[[@{allegee}]]}} @{protectrice} @{barbelee} @{electrifiee} @{sournoise} @{indestructible} @{connectee} @{surmesure} @{lumineuse} @{massive} @{agressive}" />
-									<!-- Les améliorations d'ornement -->
-									<input type="hidden" name="attr_listeAO" value="@{arabesquesIridescentes} @{armeAzurine} @{armeRougeSang} @{armureGravee} @{blasonChevalier} @{bouclierGrave} @{cheneSculpte} @{codeKnightGrave} @{craneRieurGrave} @{faucheuseGravee} @{flammesStylisees} @{griffuresGravees} @{masqueBriseSculpte} @{rouagesCassesGraves} @{fauconsPlumesL} @{sillonsFLF} {{cadence=[[ceil(@{chromeeLignesLC})]]}} {{scoreCadence=2}} {{AOChromeLLC=[[ceil(@{chromeeLignesLC})]]}}" />	
+									<!-- Les dégâts de l'arme -->
+									<input type="hidden" name="attr_degats" value="{{Degats=[[ [[@{armeCaCDegat}-@{allegee}]]d6+@{armeCaCBDegat}]]}}" />
+									<!-- La violence de l'arme -->
+									<input type="hidden" name="attr_violence" value="{{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}}" />
+
+									<!-- Les styles -->
+									<input type="hidden" name="attr_listeStylesPNJ" value="{{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]}}" />
 									
-									<button type="roll" value="@{jetGM} &{template:contactPNJ} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{aspectPNJCombat} {{situationnel=[[@{jetModifDes}]]}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[ [[@{armeCaCDegat}]]d6]]}} {{styleViolBM=[[ (floor([[@{armeCaCViolence}]]/2))d6]]  }} {{AEBete=[[@{BetePNJAE}]]}} {{Bete=[[@{Bete}]]}} {{Violence=[[ [[@{armeCaCViolence}]]d6+@{armeCaCBViolence}]]}} {{Portee=@{armeCaCPortee}}} @{destructeur} @{fureur} @{lestePNJ} @{meurtrier} @{orfevreriePNJ} @{precisionPNJ} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{antiAnatheme} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[floor(@{Masque}/2)]]}} @{tenebricite}@{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission}  {{totalD=[[1]]}} {{totalV=[[1]]}} @{listeAS} @{listeAO}" name="attr_jetCaCPNJ"/>
+									<!-- Les effets -->
+									<input type="hidden" name="attr_listeEffetsPNJ" value="@{destructeur} @{fureur} @{lestePNJ} @{meurtrier} @{orfevreriePNJ} @{precisionPNJ} @{tirSecurite} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{antiAnatheme} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} @{lourd} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[floor(@{Masque}/2)]]}} @{tenebricite} @{akimbo} @{ambidextrie} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission}" />
+									
+									<!-- Les améliorations structurelles -->
+									<input type="hidden" name="attr_listeASPNJ" value="@{soeur} @{jumelle} @{assassine} {{ASAllegee=[[@{allegee}]]}} @{protectrice} @{barbelee} @{electrifiee} @{sournoise} @{indestructible} @{connectee} @{surmesure} @{lumineuse} @{massive} @{agressive}" />
+									
+									<!-- Les améliorations d'ornement -->
+									<input type="hidden" name="attr_listeAOPNJ" value="@{arabesquesIridescentes} @{armeAzurine} @{armeRougeSang} @{armureGravee} @{blasonChevalier} @{bouclierGrave} @{cheneSculpte} @{codeKnightGrave} @{craneRieurGrave} @{faucheuseGravee} @{flammesStylisees} @{griffuresGravees} @{masqueBriseSculpte} @{rouagesCassesGraves} @{fauconsPlumesL} @{sillonsFLF} {{cadence=[[ceil(@{chromeeLignesLC})]]}} {{scoreCadence=2}} {{AOChromeLLC=[[ceil(@{chromeeLignesLC})]]}}" />
+									
+									<button type="roll" value="@{jetGM} &{template:contactPNJ} {{Nom=@{name}}} {{Arme=@{ArmeCaC}}} @{aspectPNJCombat} {{situationnel=[[@{jetModifDes}]]}} @{listeStylesPNJ} {{AEBete=[[@{BetePNJAE}]]}} {{Bete=[[@{Bete}]]}}   @{degats} @{violence} {{Portee=@{armeCaCPortee}}} {{totalD=[[1]]}} {{totalV=[[1]]}} @{listeEffetsPNJ} @{listeASPNJ} @{listeAOPNJ}" name="attr_jetCaCPNJ"/>
 									</td>
 								</tr>
 								<tr>
-									<td colspan="10">
-										<input type="checkbox" name="attr_armeContactPNJOptions" class="cButton cButtonFirst" value="1"><span title="Effets"></span>
-                                        <input type="checkbox" name="attr_armeContactPNJOptions" class="cButton cButtonNext" value="2"><span title="Améliorations Structurelles"></span>
-                                        <input type="checkbox" name="attr_armeContactPNJOptions" class="cButton cButtonNext" value="3"><span title="Améliorations d'Ornement"></span>
+									<td class="nopadding" colspan="11">
+										<table>
+											<tr>
+												<td class="nopadding width33"><input type="checkbox" name="attr_armeContactPNJOptions" class="cButton cButtonFirst" value="1"><span title="Effets"></span></td>
+												<td class="nopadding width33"><input type="checkbox" name="attr_armeContactPNJOptions" class="cButton cButtonNext" value="2"><span title="Améliorations Structurelles"></span></td>
+												<td class="nopadding width33"><input type="checkbox" name="attr_armeContactPNJOptions" class="cButton cButtonNext" value="3"><span title="Améliorations d'Ornement"></span></td>
+											</tr>
+										</table>
 									</td>
-									<td></td>
 								</tr>
 								<tr class="T1 block hidden">
 									<td colspan="11" class="tab-padding-left tab-padding-right">
@@ -13584,11 +13704,14 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 										</td>
 									</tr>
 									<tr>
-										<td style="width:230px" colspan="10">
-                                            <input type="checkbox" name="attr_armeAutrePNJOptions" class="cButton cButtonFirst" value="1"><span title="Effets"></span>
-                                            <input type="checkbox" name="attr_armeAutrePNJOptions" class="cButton cButtonNext" value="2"><span title="Améliorations d'armes"></span>
+										<td class="nopadding" colspan="12">
+											<table>
+												<tr>
+													<td class="nopadding width50"><input type="checkbox" name="attr_armeAutrePNJOptions" class="cButton cButtonFirst" value="1"><span title="Effets"></span></td>
+													<td class="nopadding width50"><input type="checkbox" name="attr_armeAutrePNJOptions" class="cButton cButtonNext" value="2"><span title="Améliorations d'armes"></span></td>
+												</tr>
+											</table>
                                         </td>
-                                        <td></td>
 									</tr>
 									<tr class="T1 block hidden">
 										<td colspan="12" class="tab-padding-left tab-padding-right">
@@ -16078,14 +16201,28 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 			<tr class="body">
 				<td class="padding-left"><h6>+Orfévrerie</h6></td>
 				<td style="width:20%"></td>
-				<td class="center"><h6>{{orfevrerie}}</h6></td>
+				<td class="center"><h6>
+					{{#warrior}}
+						{{orfevrerieWarrior}}
+					{{/warrior}}
+					{{^warrior}}
+						{{orfevrerie}}
+					{{/warrior}}
+				</h6></td>
 			</tr>
 		{{/orfevrerie}}
 		{{#precision}}
 			<tr class="body">
 				<td class="padding-left"><h6>+Précision</h6></td>
 				<td style="width:20%"></td>
-				<td class="center"><h6>{{precision}}</h6></td>
+				<td class="center"><h6>
+					{{#warrior}}
+						{{precisionWarrior}}
+					{{/warrior}}
+					{{^warrior}}
+						{{precision}}
+					{{/warrior}}
+				</h6></td>
 			</tr>
 		{{/precision}}
 		{{#silencieux}}
@@ -16528,6 +16665,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 			{{#rollGreater() bonusBarb1 0}}
 				<tr class="body">
 					<td class="padding-left"><h6>+Bonus Goliath</h6></td>
+					<td style="width:20%"></td>
 					<td class="center"><h6>{{bonusBarb1}} + {{bonusBarb2}}</h6></td>
 				</tr>
 			{{/rollGreater() bonusBarb1 0}}
@@ -16536,6 +16674,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 				{{#rollGreater() bonusBarb2 0}}
 					<tr class="body">
 						<td class="padding-left"><h6>+Bonus Goliath</h6></td>
+						<td style="width:20%"></td>
 						<td class="center"><h6>{{bonusBarb1}} + {{bonusBarb2}}</h6></td>
 					</tr>
 				{{/rollGreater() bonusBarb2 0}}
@@ -16690,14 +16829,28 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 			<tr class="body">
 				<td class="padding-left"><h6>+Orfévrerie</h6></td>
 				<td style="width:20%"></td>
-				<td class="center"><h6>{{orfevrerie}}</h6></td>
+				<td class="center"><h6>
+					{{#warrior}}
+						{{orfevrerieWarrior}}
+					{{/warrior}}
+					{{^warrior}}
+						{{orfevrerie}}
+					{{/warrior}}
+				</h6></td>
 			</tr>
 		{{/orfevrerie}}
 		{{#precision}}
 			<tr class="body">
 				<td class="padding-left"><h6>+Précision</h6></td>
 				<td style="width:20%"></td>
-				<td class="center"><h6>{{precision}}</h6></td>
+				<td class="center"><h6>
+					{{#warrior}}
+						{{precisionWarrior}}
+					{{/warrior}}
+					{{^warrior}}
+						{{precision}}
+					{{/warrior}}
+				</h6></td>
 			</tr>
 		{{/precision}}
 		
@@ -16728,7 +16881,14 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 				<tr class="body">
 					<td class="padding-left"><h6>+Sur Mesure</h6></td>
 					<td style="width:20%"></td>
-					<td class="center"><h6>{{ASSurMesureD}}</h6></td>
+					<td class="center"><h6>
+						{{#warrior}}
+							{{ASSurMesureDWarrior}}
+						{{/warrior}}
+						{{^warrior}}
+							{{ASSurMesureD}}
+						{{/warrior}}
+					</h6></td>
 				</tr>
 			{{/guardian}}
 		{{/ASSurMesureD}}

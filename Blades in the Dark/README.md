@@ -1,8 +1,38 @@
 # Blades in the Dark Character Sheet
 
-This is a character sheet for Blades in the Dark for use on Roll20.
+This is the (compressed) source code for the Blades in the Dark character sheet on Roll20. The pug/sass code used to generate it can be found [here](https://github.com/joesinghaus/Blades-in-the-Dark). If you want to hack the sheet for your own Blades hack, a more hackable version and instructions for hacking can be found [here](https://github.com/joesinghaus/Blades-template).
 
 ## Changelog
+
+### 3.5
+* Added notes for friends and contacts
+
+### 3.4
+* Look up entered ability names and fill description automatically
+
+### 3.3
+* New option to display a small character picture on all chat rolls
+* Number of dice rolled is now pre-calculated by sheet workers; this means that there's no more need for nested inline rolls in the roll buttons
+* Rename attributes corresponding to upgrades
+* Some tweaks around spirit playbook special abilities
+* Minor visual tweaks
+
+### 3.2
+* Added proper vampire traumas (thanks Jeffrey Lamb)
+
+### 3.1
+* Fixed font for the Korean localization
+* Alchemicals now have a renameable title, and bandoliers can be hidden
+* Restyled repeating section controls to use symbols instead of text
+* Use CSS grid for large-scale sheet layout, fixing some weird margins along the way
+
+### 3.0
+* Large internal refactoring and cleanup: the sheet is now generated from pug code. There should be no functionality change from this, but it has probably introduced a few new bugs
+* Unofficial Iruvian playbooks by Johnstone Metzger added
+* Ancient upgrade code (pre-2.0) removed
+
+### 2.6
+* Updates to the sheet to make the Korean translation work
 
 ### 2.5
 * Added option to use Kirsty font if installed
