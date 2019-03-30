@@ -81,7 +81,7 @@
             <span>=</span>
             <input type="number" name='attr_battle_reflex' value="0" />
             <button type='roll' value='&{template:default} {{name=Battle Reflex}} {{roll=[[1d10+@{speed}+@{awareness}]]}}' name='roll_BattleReflex'>k</button>
-            <button type='roll' value='&{template:default} {{name=Battle Reflex (Current)}} {{roll=[[1d10+@{speed_current}+@{awarenes_current}]]}}' name='roll_BattleReflex_current'>k</button>
+            <button type='roll' value='&{template:default} {{name=Battle Reflex (Current)}} {{roll=[[1d10+@{speed_current}+@{awareness_current}]]}}' name='roll_BattleReflex_current'>k</button>
         </div>
     </div>
     <div class="hp">
@@ -108,6 +108,24 @@
             <span>(+1 Attribute)</span>
             <hr />
         </fieldset>
+    </div>
+    <div class="aliases">
+        <label>ALIASES</label>
+        <textarea name="attr_aliases"></textarea>
+    </div>
+    <div class="psychic">
+        <label>PSYCHIC POWERS</label>
+        <label>OVERCHARGE</label>
+        <label>USES</label>
+        <fieldset class="repeating_powers">
+            <input type="text" name="attr_power" />
+            <input type="text" name="attr_overcharge" />
+            <input type="text" name="attr_uses" />
+        </fieldset>
+    </div>
+    <div class="backstory">
+        <label>CHARACTER BACKSTORY</label>
+        <textarea name="attr_character_backstory"></textarea>
     </div>
 </div>
 <!--RIGHT HAND SIDE - CHARACTER INFO & TOUGHNESS-->
@@ -171,8 +189,9 @@
         <div class="small-box"><span name="attr_nerve_defense"></span></div>
     </div>
     <div class="weapons">
+        <label>WEAPON</label>
         <fieldset class="repeating_weapons">
-            <label>WEAPON</label>
+            <label>NAME</label>
             <label>ATT</label>
             <label>DMG</label>
             <label>ATTACK SPD</label>
@@ -201,59 +220,26 @@
         <input type="checkbox" name="attr_rifles" title="@{rifle}" /><span></span>
         <input type="checkbox" name="attr_shotguns" title="@{shotguns}" /><span></span>
     </div>
-    <div class="aspect">
-        <label>ASPECT</label><input type="text" name='attr_aspect' />
+    <div class="contact">
+        <label>CONTACT/FRIENDS</label>
+        <textarea name="attr_contact_friends"></textarea>
+    </div>
+    <div class="possession">
+        <label>POSESSIONS</label>
+        <textarea name="attr_posessions"></textarea>
         <br />
-        <label>TRAITS</label>
-        <textarea name="attr_traits"></textarea>
-        <hr />
+        <label>DAYS OF FOOD</label>
+        <input type="text" name='attr_food' />
+        <label>DAYS WITHOUT EATING</label>
+        <input type="text" name='attr_without_eating' />
+        <br/>
+        <span>EAT AT LEAST 1 MEAL A DAY OR SUFFER -2 TO ALL ROLLS, INCLUDING DMG. GOING MORE THAN 6 + TOUGHNESS DAYS WITHOUT FOOD MEANS YOU DIE. THE DAY COUNT DOES NOT RESET UNTIL YOU EAT FOOD 2 DAYS IN A ROW.</span>
+        <label>LURANS</label>
+        <input type="text" name='attr_lurans' />
     </div>
-</div>
-<div class="2ndHalf">
-    <!--LEFT HAND SIDE - STARTS WITH ALIASES-->
-    <div class="shortColumn">
-        <div class="aliases">
-            <label>ALIASES</label>
-            <textarea name="attr_aliases"></textarea>
-        </div>
-        <div class="psychic">
-            <label>PSYCHIC POWERS</label>
-            <label>OVERCHARGE</label>
-            <label>USES</label>
-            <fieldset class="repeating_powers">
-                <input type="text" name="attr_power" />
-                <input type="text" name="attr_overcharge" />
-                <input type="text" name="attr_uses" />
-            </fieldset>
-        </div>
-        <div class="backstory">
-            <label>CHARACTER BACKSTORY</label>
-            <textarea name="attr_character_backstory"></textarea>
-        </div>
-    </div>
-    <!--RIGHT HAND SIDE - STARTS WITH CONTACTS/FRIENDS-->
-    <div class="longColumn">
-        <div class="contact">
-            <label>CONTACT/FRIENDS</label>
-            <textarea name="attr_contact_friends"></textarea>
-        </div>
-        <div class="possession">
-            <label>POSESSIONS</label>
-            <textarea name="attr_posessions"></textarea>
-            <br />
-            <label>DAYS OF FOOD</label>
-            <input type="text" name='attr_food' />
-            <label>DAYS WITHOUT EATING</label>
-            <input type="text" name='attr_without_eating' />
-            <br/>
-            <span>EAT AT LEAST 1 MEAL A DAY OR SUFFER -2 TO ALL ROLLS, INCLUDING DMG. GOING MORE THAN 6 + TOUGHNESS DAYS WITHOUT FOOD MEANS YOU DIE. THE DAY COUNT DOES NOT RESET UNTIL YOU EAT FOOD 2 DAYS IN A ROW.</span>
-            <label>LURANS</label>
-            <input type="text" name='attr_lurans' />
-        </div>
-        <div class="notes">
-            <label>NOTES</label>
-            <textarea name="attr_notes"></textarea>
-        </div>
+    <div class="notes">
+        <label>NOTES</label>
+        <textarea name="attr_notes"></textarea>
     </div>
 </div>
 
@@ -267,43 +253,14 @@
 <!--Sheet Worker-->
 <script type="text/worker">
 
-//Calculate Toughness and Nerve Totals
-[`toughness`, `nerve`].forEach(attribute => {
-    on(`change:${attribute} change:${attribute}_other`, (eventinfo) => {
-        const attr         = parseInt(eventinfo.newValue) || 0;
-        const 2ndAttribute = (eventinfo.sourceAttribute === `${attribute}`) ? `${attribute}_other` : `${attribute}`;
-
-        //Get the second attribute for the calculation
-        getAttrs(2ndAttribute, (v) => {
-            const attr2 = parseInt(v.2ndAttribute) || 0;
-            setAttrs({
-                [`${attribute}_defense`]: attr + attr2 + 5
-            });
-        });
-    });
-});
-
-    //Armor Defense
-on("change:toughness change:armor_defense_other change:armor", (eventinfo) => {
-    //Get the second attribute for the calculation
-    getAttrs(["toughness", "armor_defense_other", "armor"], (v) => {
-        const toughness = parseInt(v.toughness) || 0;
-        const defense   = parseInt(v.armor_defense_other) || 0;
-        const armor     = parseInt(v.armor) || 0;
-        setAttrs({
-            armor_defense: toughness + defense + armor + 5
-        });
-    });
-});
-
     //Action Points
 on("change:speed change:action_points_other", (eventinfo) => {
     const attr = parseInt(eventinfo.newValue) || 0;
-    const 2ndAttribute = (eventinfo.sourceAttribute === "speed") ? "action_points_other" : "speed";
+    let attr2 = (eventinfo.sourceAttribute === "speed") ? "action_points_other" : "speed";
 
     //Get the second attribute for the calculation
-    getAttrs(2ndAttribute, (v) => {
-        const attr2 = parseInt(v.2ndAttribute) || 0;
+    getAttrs([`${attr2}`], (v) => {
+        let attr2 = parseInt(v.attr2) || 0;
         let update = {};
 
         //Update Action Points
@@ -311,11 +268,41 @@ on("change:speed change:action_points_other", (eventinfo) => {
 
         //Update half speed on speed change
         if (eventinfo.sourceAttribute === "speed") {
-            update["speed_half"] = (eventinfo.sourceAttribute === "speed") ? Math.floor(attr/2) : Math.floor(attr2/2);
+            update["speed_half"] = (eventinfo.sourceAttribute === "speed") ? Math.floor(attr/2) : Math.floor(attr2/2)
         };
 
         setAttrs(update);
     });
+});
+
+
+[`toughness`, `nerve`].forEach(attribute => {
+   on(`change:${attribute} change:${attribute}_other`, (eventinfo) => {
+        const attr         = parseInt(eventinfo.newValue) || 0;
+        let attr2 = (eventinfo.sourceAttribute === `${attribute}`) ? `${attribute}_other` : `${attribute}`;
+
+        //Get the second attribute for the calculation
+        getAttrs([`${attr2}`], (v) => {
+            let attr2 = parseInt(v.attr2) || 0;
+            setAttrs({
+                [`${attribute}_defense`]: attr + attr2 + 5
+            });
+        });
+    });
+});
+
+
+    //Armor Defense
+on("change:toughness change:armor_defense_other change:armor", (eventinfo) => {
+    //Get the second attribute for the calculation
+   getAttrs(["toughness", "armor_defense_other", "armor"], (v) => {
+        const toughness = parseInt(v.toughness) || 0;
+        const defense   = parseInt(v.armor_defense_other) || 0;
+        const armor     = parseInt(v.armor) || 0;
+        setAttrs({
+            armor_defense: toughness + defense + armor + 5
+        });
+    }); 
 });
 
 </script>
