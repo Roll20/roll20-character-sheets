@@ -78,9 +78,9 @@
     <input type="checkbox" name="attr_sheet_rolls" value="1" class="hidden useaction" checked="checked" />
     <input type="checkbox" name="attr_sheetuseapi" value="[[1]]" class="hidden" />
     <input type="checkbox" name="attr_sheet_background" value="1" class="hidden imgbg" checked="checked" />
-    <input type="checkbox" name="attr_sheetuseasset" value="1" class="hidden useasset" />
-    <input type="checkbox" name="attr_sheetusebonus" value="1" class="hidden usebonus" />
-    <input type="checkbox" name="attr_sheetusecost" value="1" class="hidden usecost" />
+    <input type="checkbox" name="attr_showuseasset" value="1" class="hidden useasset" />
+    <input type="checkbox" name="attr_showusebonus" value="1" class="hidden usebonus" />
+    <input type="checkbox" name="attr_showusecost" value="1" class="hidden usecost" />
 
     <div class="pc"> <!-- PC SHEET -->
 
@@ -1319,8 +1319,11 @@
                         if(["Numenéra","The Strange by Roll20","none"].includes((v["converted_from"] || "none"))) {
                             update["sheet_rolls"] = (v["gnlsettings_sheet_rolls"] || "1");
                             update["sheetuseasset"] = (v["gnlsettings_sheetuseasset"] || "0");
+                            update["showuseasset"] = (v["gnlsettings_sheetuseasset"] || "0");
                             update["sheetusebonus"] = (v["gnlsettings_sheetusebonus"] || "0");
+                            update["showusebonus"] = (v["gnlsettings_sheetusebonus"] || "0");
                             update["sheetusecost"] = (v["gnlsettings_sheetusecost"] || "0");
+                            update["showusecost"] = (v["gnlsettings_sheetusecost"] || "0");
                         }
                         setAttrs(update, {silent: true}, () => {
                             versioning();
@@ -1751,30 +1754,37 @@
     const update_rolls = function() {
         // Way of rolling: with action section or questions, with assets, bonus and costs or not
         getAttrs(["sheet_rolls","sheetuseasset","sheetusebonus","sheetusecost"], (v) => {
+            console.log("update_rolls: " + JSON.stringify(v,null,"  "));
             let update = {};
-            update["rollvarasset"] = 0;
-            update["rollvarbonus"] = 0;
-            update["rollvarcost"] = 0;
-            if((parseInt(v["sheet_rolls"]) || 1) == 0) { // Use action section
+            update["rollqstasset"] = 0;
+            update["rollqstbonus"] = 0;
+            update["rollqstcost"] = 0;
+            if((v["sheet_rolls"] || "0") == "1") { // Use roll queries
+                update["rollqstdiff"] = `?{${getTranslationByKey("difficulty")}|0 - ${getTranslationByKey("none-unknown")},0|1 - ${getTranslationByKey("simple")},1|2 - ${getTranslationByKey("standard")},2|3 - ${getTranslationByKey("demanding")},3|4 - ${getTranslationByKey("difficult")},4|5 - ${getTranslationByKey("challenging")},5|6 - ${getTranslationByKey("intimidating")},6|7 - ${getTranslationByKey("formidable")},7|8 - ${getTranslationByKey("heroic")},8|9 - ${getTranslationByKey("immortal")},9|10 - ${getTranslationByKey("impossible")},10}[${getTranslationByKey("difficulty")}]`;
+                update["rollqstrolleff"] = `?{${getTranslationByKey("effort-to-roll")}|0|1|2|3|4|5|6}[${getTranslationByKey("roll-effort")}]`;
+                update["rollqstrolldmg"] = `?{${getTranslationByKey("effort-to-damage")}|0|1|2|3|4|5|6}[${getTranslationByKey("dmg-effort")}]`;
+                if((v["sheetuseasset"] || "0") == "1") { // Use assets
+                    update["rollqstasset"] = `?{${getTranslationByKey('asset')}|0|1|2}[${getTranslationByKey("asset")}]`;
+                }
+                if((v["sheetusebonus"] || "0") == "1") { // Use bonus
+                    update["rollqstbonus"] = `?{${getTranslationByKey('bonus')}|0|1|2|-1|-2}[${getTranslationByKey("bonus")}]`;
+                }
+                if((v["sheetusecost"] || "0") == "1") { // Use cost
+                    update["rollqstcost"] = `?{${getTranslationByKey('cost')}|0}[${getTranslationByKey("cost")}]`;
+                }
+            } else { // Use action section
                 update["rollqstdiff"] = `@{rollvardiff}[${getTranslationByKey("difficulty")}]`;
                 update["rollqstrolleff"] = `@{rollvarrolleff}[${getTranslationByKey("roll-effort")}]`;
                 update["rollqstrolldmg"] = `@{rollvarrolldmg}[${getTranslationByKey("dmg-effort")}]`;
                 update["rollqstasset"] = `@{rollvarasset}[${getTranslationByKey("asset")}]`;
                 update["rollqstbonus"] = `@{rollvarbonus}[${getTranslationByKey("bonus")}]`;
                 update["rollqstcost"] = `@{rollvarcost}[${getTranslationByKey("cost")}]`;
-            } else { // Use roll queries
-                update["rollqstdiff"] = `?{${getTranslationByKey("difficulty")}|0 - ${getTranslationByKey("none-unknown")},0|1 - ${getTranslationByKey("simple")},1|2 - ${getTranslationByKey("standard")},2|3 - ${getTranslationByKey("demanding")},3|4 - ${getTranslationByKey("difficult")},4|5 - ${getTranslationByKey("challenging")},5|6 - ${getTranslationByKey("intimidating")},6|7 - ${getTranslationByKey("formidable")},7|8 - ${getTranslationByKey("heroic")},8|9 - ${getTranslationByKey("immortal")},9|10 - ${getTranslationByKey("impossible")},10}[${getTranslationByKey("difficulty")}]`;
-                update["rollqstrolleff"] = `?{${getTranslationByKey("effort-to-roll")}|0|1|2|3|4|5|6}[${getTranslationByKey("roll-effort")}]`;
-                update["rollqstrolldmg"] = `?{${getTranslationByKey("effort-to-damage")}|0|1|2|3|4|5|6}[${getTranslationByKey("dmg-effort")}]`;
-                if((parseInt(v["sheetuseasset"]) || 0) == 1) { // Use assets
-                    update["rollqstasset"] = `?{${getTranslationByKey('asset')}|0|1|2}[${getTranslationByKey("asset")}]`;
-                }
-                if((parseInt(v["sheetuseasset"]) || 0) == 1) { // Use bonus
-                    update["rollqstbonus"] = `?{${getTranslationByKey('bonus')}|0|1|2|-1|-2}[${getTranslationByKey("bonus")}]`;
-                }
-                if((parseInt(v["sheetuseasset"]) || 0) == 1) { // Use cost
-                    update["rollqstcost"] = `?{${getTranslationByKey('cost')}|0}[${getTranslationByKey("cost")}]`;
-                }
+                // Show assets
+                update["showuseasset"] = (v["sheetuseasset"] || "0");
+                // Show bonus
+                update["showusebonus"] = (v["sheetusebonus"] || "0");
+                // Show cost
+                update["showusecost"] = (v["sheetusecost"] || "0");
             }
             setAttrs(update, {silent: true});
         });
