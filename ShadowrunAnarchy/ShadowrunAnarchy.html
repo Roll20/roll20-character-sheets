@@ -1,19 +1,24 @@
 <!-- ~~~~~~~~ Shadowrun Anarchy Character sheet  ~~~~~~~~~ -->
 <div class="container">
-	<input type="hidden" class="npc-toggle" name="attr_npc_toggle" />
+	<input type="hidden" class="template" name="attr_template" value="English" />
+	<input type="hidden" class="npc-toggle" name="attr_npc_toggle" value="0"/>
 	<img class="header" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ShadowrunAnarchy/ShadowrunHeader.png" style="width:100%" "border:1px solid black;" alt="Shadowrun logo" />
 	<div class="pc">	
 		<!-- The "Shadowrun" logo -->
 		<div class="row row-name">
+			<div class="col" style="margin-top: 1%;">
+				<button class="pictos" type="action" name="act_template">P</button>
+			</div>
 			<div class="col col-name">
 				<input type="text" name="attr_character_name" value="" placeholder="Name" />
 			</div>
-			<div class="col">
-				<div class="special"><input type="checkbox" name="attr_special" value="1" title="@{special}" title="@{special}" /><span data-i18n="awakened">Awakened</span></div>
-				<div class="special"><input type="checkbox" name="attr_special" value= "2" title="@{special}" title="@{special}" /><span data-i18n="emerged">Emerged</span></div>
+			<div class="col special">
+				<input type="hidden" name="attr_special" value="" />
+				<button type="action" name="act_awakened" data-i18n="awakened">Awakened</button>
+				<button type="action" name="act_emerged" data-i18n="emerged">Emerged</button>
 			</div>
-			<div class="col toggle">
-				<input type="checkbox" class="options-flag" name="attr_npc_toggle" value="npc" title="NPC toggle" /><span>NPC</span>
+			<div class="col npc-toggle">
+				<button type="action" name="act_npc" data-i18n="NPC">NPC</button>
 			</div>
 		</div>
 	<!-- ~~~~~~~~ Attribute  ~~~~~~~~ -->
@@ -180,23 +185,25 @@
 		<div class="row cuerow">
 			<div class="trapezoid"></div>
 			<div class="trapezoid-white"></div>
-			<h2 data-i18n="cues">CUES</h2>
-			<div class="textbox toggle">
-				<input type="checkbox" class="options-flag" name="attr_cue_toggle" checked="checked" /><span>y</span>
-				<div class="options">
-					<div class="cues">
-						<textarea name="attr_cues_1"></textarea>
+			<div class="que-hide">
+				<h2 data-i18n="cues">CUES</h2>
+				<div class="textbox toggle">
+					<input type="checkbox" class="options-flag" name="attr_cue_toggle" checked="checked" /><span>y</span>
+					<div class="options">
+						<div class="cues">
+							<textarea name="attr_cues_1"></textarea>
+						</div>
+						<div class="cues">
+							<textarea name="attr_cues_2"></textarea>
+						</div>
 					</div>
-					<div class="cues">
-						<textarea name="attr_cues_2"></textarea>
-					</div>
-				</div>
-				<div class="display">
-					<div class="cues">
-						<span name="attr_cues_1"></span>
-					</div>
-					<div class="cues">
-						<span name="attr_cues_2"></span>
+					<div class="display">
+						<div class="cues">
+							<span name="attr_cues_1"></span>
+						</div>
+						<div class="cues">
+							<span name="attr_cues_2"></span>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -893,7 +900,7 @@
 <!-- Hidden Inputs -->
 <input type="hidden" class="npc-toggle" name="attr_npc_toggle" />
 <input type="hidden" name="attr_attribute_roll" value="?{Attribute|Strength,@{strength}|Agility,@{agility}|Willpower,@{willpower}|Logic,@{logic}|Charisma,@{charisma}|Edge,@{edge}|None,0}" />
-<input type="hidden" name="attr_version" value="1.81" />
+<input type="hidden" name="attr_version" value="1.9" />
 
 <!-- Footer -->
 <div class="footer">
@@ -946,6 +953,32 @@
 	    	attribute_roll +=  `|${translations[i]},@{${attributes[i]}}`;
 	    };
 	    attribute_roll += `|${translations[10]},0}`; //For None
+	});
+
+//Template button
+    on("clicked:template", (eventinfo) => {
+    	getAttrs([`template`], (v) => {
+			setAttrs({
+				template: (v.template === "English") ? "French" : "English"
+			});
+		});
+	});
+
+	on("clicked:awakened clicked:emerged", (eventinfo) => {
+		const trigger = (eventinfo.triggerName).split("clicked:")[1];
+    	getAttrs([`special`], (v) => {
+			setAttrs({
+				special: (v.special === trigger) ? "" : trigger
+			});
+		});
+	});
+
+	on("clicked:npc", (eventinfo) => {
+    	getAttrs([`npc_toggle`], (v) => {
+			setAttrs({
+				npc_toggle: (v.npc_toggle === "0") ? "npc" : "0"
+			});
+		});
 	});
 
 //UPDATE THE TRACKS
@@ -1056,10 +1089,17 @@
 
 //VERSION
 	const versioning = (version) => {
-		console.log(`%c Shadowrun Anarchy versioning. Version ${version}`, "color: blue; font-weight:bold");
-	   if (version => 1.8) {
+		console.log(`%c Shadowrun Anarchy versioning. Version ${version}`, "color: #4f7da7; font-weight:bold");
+	   if (version >= 1.9) {
 			console.log(`%c Shadowrun Anarchy is update to date`, "color: #e9b230; font-weight:bold");
-	   	} else if (version === "1.7") {
+	   	} else if (version >= 1.8) {
+	   		getAttrs(["special"], (v) => {
+	   			let update = {};
+	   			update[`special`] = (v.special === "1") ? "awakened" : (v.special === "2") ? "emerged" : "";
+	   			update[`version`] = "1.9";
+	   			setAttrs(update, () => {versioning("1.9")});
+			});
+	   	} else if (version >= 1.7) {
 			getAttrs(["astral_combat"], (v) => {
 				const skl = parseInt(v.astral_combat) || 0;
 				if (skl > 0) {
@@ -1078,7 +1118,7 @@
 					let update = {};
 					oldSpecs.forEach(spec => {
 						const repeatingID = spec.split("_")[2];
-						update[`repeating_skills_${repeatingID}_skill_specialization`] = (v[`${spec}`]) ? v[`${spec}`] : "";;
+						update[`repeating_skills_${repeatingID}_skill_specialization`] = (v[`${spec}`]) ? v[`${spec}`] : "";
 					});
 					setAttrs(update);
 				});
