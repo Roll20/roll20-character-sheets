@@ -63,7 +63,7 @@
             <br />
             <div class="small-box"><span name="attr_speed_half"></span></div>
             <span>+3+</span>
-            <input type="number" name='v' value="0" />
+            <input type="number" name='attr_action_points_other' value="0" />
             <span>=</span>
             <div class="small-box"><span name="attr_action_points"></span></div>
         </div>
@@ -73,15 +73,15 @@
             <label>OTHER</label>
             <label>BATTLE REFLEX</label>
             <br />
-            <input type="number" name='attr_awareness' value="0" />
+            <div class="small-box"><span name="attr_awareness"></span></div>
             <span>+</span>
-            <input type="number" name='attr_speed' value="0" />
+            <div class="small-box"><span name="attr_speed"></span></div>
             <span>+</span>
             <input type="number" name='attr_battle_reflex_other' value="0" />
             <span>=</span>
             <input type="number" name='attr_battle_reflex' value="0" />
-            <button type='roll' value='&{template:default} {{name=Battle Reflex}} {{roll=[[1d10+@{speed}+@{awareness}]]}}' name='roll_BattleReflex'>k</button>
-            <button type='roll' value='&{template:default} {{name=Battle Reflex (Current)}} {{roll=[[1d10+@{speed_current}+@{awareness_current}]]}}' name='roll_BattleReflex_current'>k</button>
+            <button type='roll' value='&{template:default} {{name=Battle Reflex}} {{roll=[[1d10+@{battle_reflex}]]}}' name='roll_BattleReflex'>k</button>
+            <button type='roll' value='&{template:default} {{name=Battle Reflex (Current)}} {{roll=[[1d10+@{speed_current}+@{awareness_current}+@{battle_reflex_other}]]}}' name='roll_BattleReflex_current'>k</button>
         </div>
     </div>
     <div class="hp">
@@ -168,11 +168,11 @@
             <label>OTHER</label>
             <label>ARMOR</label>
             <label>ARMOR DEFENSE</label>
-            <div class="small-box"><span name="attr_toughness_defense"></span></div>
+            <div class="small-box"><span name="attr_toughness"></span></div>
             <span>+</span>
-            <input type="number" name='attr_armor_defense_other' />
+            <input type="number" name='attr_armor_defense_other' value="0" />
             <span>+ 5 +</span>
-            <input type="number" name='attr_armor' />
+            <input type="number" name='attr_armor' value="0" />
             <span>=</span>
             <div class="small-box"><span name="attr_armor_defense"></span></div>
         </div>
@@ -249,22 +249,23 @@
 <input type="hidden" name="attr_armor_defense" value="5" />
 <input type="hidden" name="attr_action_points" value="3" />
 <input type="hidden" name="attr_speed_half" value="0" />
+<input type="hidden" name="attr_battle_reflex" value="0" />
 
 <!--Sheet Worker-->
 <script type="text/worker">
 
     //Action Points
 on("change:speed change:action_points_other", (eventinfo) => {
-    const attr = parseInt(eventinfo.newValue) || 0;
+    const value1 = parseInt(eventinfo.newValue) || 0;
     let attr2 = (eventinfo.sourceAttribute === "speed") ? "action_points_other" : "speed";
 
     //Get the second attribute for the calculation
     getAttrs([`${attr2}`], (v) => {
-        let attr2 = parseInt(v.attr2) || 0;
+        let value2 = parseInt(v.attr2) || 0;
         let update = {};
 
         //Update Action Points
-        update["action_points"] = attr + attr2 + 3
+        update["action_points"] = value1 + value2 + 3
 
         //Update half speed on speed change
         if (eventinfo.sourceAttribute === "speed") {
@@ -276,16 +277,30 @@ on("change:speed change:action_points_other", (eventinfo) => {
 });
 
 
+    //Calculate Battle Reflex
+on("change:speed change:awareness change:battle_reflex_other", (eventinfo) => {
+     getAttrs(["speed", "awareness", "battle_reflex_other"], (v) => {
+        const speed     = parseInt(v.speed) || 0;
+        const awareness = parseInt(v.awareness) || 0;
+        const other     = parseInt(v.battle_reflex_other) || 0;
+        setAttrs({
+            battle_reflex: speed + awareness + other
+        });
+    });   
+});
+
+
+//This will set the toughness & nerve defense
 [`toughness`, `nerve`].forEach(attribute => {
    on(`change:${attribute} change:${attribute}_other`, (eventinfo) => {
-        const attr         = parseInt(eventinfo.newValue) || 0;
+        const value1         = parseInt(eventinfo.newValue) || 0;
         let attr2 = (eventinfo.sourceAttribute === `${attribute}`) ? `${attribute}_other` : `${attribute}`;
 
         //Get the second attribute for the calculation
         getAttrs([`${attr2}`], (v) => {
-            let attr2 = parseInt(v.attr2) || 0;
+            let value2 = parseInt(v[`${attr2}`]) || 0;
             setAttrs({
-                [`${attribute}_defense`]: attr + attr2 + 5
+                [`${attribute}_defense`]: value1 + value2 + 5
             });
         });
     });
