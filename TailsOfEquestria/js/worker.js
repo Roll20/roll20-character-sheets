@@ -15,26 +15,51 @@ function forceUpdate(attrs, cb) {
   });
 }
 
-var rollSteps = [
-  'D4',
-  'D6',
-  'D8',
-  'D10',
-  'D12',
-  'D20',
-  '{D20,D4}k1',
-  '{D20,D6}k1',
-  '{D20,D8}k1',
-  '{D20,D10}k1',
-  '{D20,D12}k1',
-  '{D20,D20}k1',
-  '{D20,D20,D4}k1',
-  '{D20,D20,D6}k1',
-  '{D20,D20,D8}k1',
-  '{D20,D20,D10}k1',
-  '{D20,D20,D12}k1',
-  '{D20,D20,D20}k1'
-];
+function getRollDiceCount(roll) {
+  // Extract each die type used in the roll.
+  var regex = /{(.+?)}k1/;
+  var match = regex.exec(roll);
+  if(match)
+    roll = match[1];
+  var dice = roll.split(',');
+
+  // Count the number of each die type.
+  var diceCount = {
+    'D20': 0,
+    'D12': 0,
+    'D10': 0,
+    'D8': 0,
+    'D6': 0,
+    'D4': 0
+  };
+  _.each(dice, die => {
+    diceCount[die]++;
+  });
+  return diceCount;
+}
+
+/**
+ * Gets the view for some dice value.
+ * @param {string} roll
+ * @return {string}
+ */
+function getRollView(roll) {
+  var diceCount = getRollDiceCount(roll);
+
+  // Produce the appropriate view based on the dice counts.
+  var view = '';
+  _.each(['D20', 'D12', 'D10', 'D8', 'D6', 'D4'], die => {
+    var count = diceCount[die];
+    if(view && count > 0)
+      view += '+';
+
+    if(count === 1)
+      view += die;
+    else if(count > 1)
+      view += `${count}${die}`;
+  });
+  return view;
+}
 
 /**
  * Gets the upgraded/downgraded dice for a roll.
@@ -44,9 +69,35 @@ var rollSteps = [
  *        Positive for upgrade, negative for downgrade.
  */
 function getUpDowngradedRoll(roll, steps) {
-  let index = rollSteps.indexOf(roll) + steps;
-  index = Math.max(0, Math.min(index, rollSteps.length-1));
-  return rollSteps[index];
+  var diceCount = getRollDiceCount(roll);
+
+  // Derive a numerical value for the dice that can be incremented up and down
+  // by upgrades and downgrades.
+  var diceValue = diceCount['D20']*6;
+  var smallDice = ['', 'D4', 'D6', 'D8', 'D10', 'D12'];
+  _.find(smallDice, (die, index) => {
+    if(diceCount[die] > 0) {
+      diceValue += index;
+      return true;
+    }
+  });
+
+  // Apply the upgrade/downgrade.
+  diceValue = Math.max(1, diceValue + steps);
+
+  // Change the value back into dice.
+  var d20Count = Math.floor(diceValue/6);
+  var smallDieIndex = diceValue%6;
+  var smallDie = smallDice[smallDieIndex];
+
+  // Compose the new roll string.
+  var diceList = [];
+  _.each(_.range(d20Count), i => {
+    diceList.push('D20');
+  });
+  if(smallDie)
+    diceList.push(smallDie);
+  return `{${diceList.join(',')}}k1`;
 }
 
 function onChange(attrs, cb) {
@@ -105,7 +156,8 @@ function _updateTalents(prefix) {
   if(_tickDowngrade(prefix) || _tickUpgrade(prefix))
     return;
 
-  parseAttrs([prefix + '_dice', prefix + '_trait', prefix + '_updowngrade', 'body_equation', 'mind_equation', 'charm_equation'], values => {
+  parseAttrs([prefix + '_name', prefix + '_dice', prefix + '_trait', prefix + '_updowngrade', 'body_equation', 'mind_equation', 'charm_equation'], values => {
+    var talentName = values[prefix + '_name'];
     var talentDice = values[prefix + '_dice'];
 
     var trait = values[prefix + '_trait'];
@@ -114,17 +166,22 @@ function _updateTalents(prefix) {
     var updown = parseInt(values[prefix + '_updowngrade']) || 0;
 
     // Apply upgrades/downgrades to talent dice.
+    var talentDiceModified = talentDice;
     if(talentDice && updown)
-      talentDice = getUpDowngradedRoll(talentDice, updown);
+      talentDiceModified = getUpDowngradedRoll(talentDice, updown);
 
-    if(talentDice === 'null')
+    var talentDiceView = getRollView(talentDice);
+
+    if(talentDiceModified === 'null')
       setAttrs({
-        [prefix + '_equation']: 0
+        [prefix + '_equation']: 0,
+        [prefix + '_readOnlyView']: `${talentName}(n/a)`
       });
     else {
       //var traitDice = values[trait];
       setAttrs({
-        [prefix + '_equation']: `{${talentDice},${traitDice}}k1`
+        [prefix + '_equation']: `{${talentDiceModified},${traitDice}}k1`,
+        [prefix + '_readOnlyView']: `${talentName}(${talentDiceView})`
       });
     }
   });
@@ -208,7 +265,7 @@ onChange(['body_equation', 'mind_equation', 'charm_equation'], () => {
 
 on('sheet:opened', () => {
   setAttrs({
-    character_sheet: 'TailsOfEquestria v1.3'
+    character_sheet: 'TailsOfEquestria v1.5'
   });
   updateTraits(() => {
     updateTalents();
