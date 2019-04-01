@@ -15448,7 +15448,13 @@
                       ["class1", "class2", "class3", "class4"].forEach(levelclass => {
                             //Get the class name out of values & confirm its a spellcaster using data Spellcasting Ability
                             const name = (mancerdata["lp-levels"].values[`${levelclass}`]) ? mancerdata["lp-levels"].values[`${levelclass}`].split("Classes:")[1] : false;
-                            const ability = (mancerdata["lp-levels"].data[`${levelclass}`] && mancerdata["lp-levels"].data[`${levelclass}`]["Spellcasting Ability"]) ? mancerdata["lp-levels"].data[`${levelclass}`]["Spellcasting Ability"] : false;
+                            const ability = 
+                                //Check if the class has a Spellcasting Ability attribute
+                                (mancerdata["lp-levels"].data[`${levelclass}`] && mancerdata["lp-levels"].data[`${levelclass}`]["Spellcasting Ability"]) ? true : 
+                                //Check if the subclass has a Spellcasting Ability attribute
+                                (mancerdata["lp-levels"].data[`${levelclass}_subclass`] && mancerdata["lp-levels"].data[`${levelclass}_subclass`]["Spellcasting Ability"]) ? true :
+                                //Set to false if the class is not a spellcaster
+                                false;
                             if (name && ability) {
                                 //Spell casters have thier class name pushed to the array above
                                 classes.push(name);
@@ -15461,12 +15467,14 @@
                     };
 
                     /* This will set the information for populating the spell list */
-                    byLevel[spell.data.Level] = byLevel[spell.data.Level] || [];
-                    byLevel[spell.data.Level].push({
-                        name: spell.name,
-                        classes: classes.split(",").map(x => x.trim()),
-                        level: parseInt(spell.data.Level)
-                    });
+                    if (classes.length > 0) {
+                        byLevel[spell.data.Level] = byLevel[spell.data.Level] || [];
+                        byLevel[spell.data.Level].push({
+                            name: spell.name,
+                            classes: classes.split(",").map(x => x.trim()),
+                            level: parseInt(spell.data.Level)
+                        });
+                    };
                 });
                 addSpellSections(byLevel, {
                     newspells: newspells,
