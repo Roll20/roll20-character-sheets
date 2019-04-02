@@ -222,17 +222,17 @@
             <div class="topspace myrow bold greybg padindent"> <span data-i18n="statistics">Statistics</span> </div>  <!-- input STATISTICS -->
             <div class="myrow">
                 <span class="lbl" data-i18n="str-u">STR</span>
-                <input type="number" name="attr_strength" class="nospin underlined sml" value="0" title="@{strength}" />
+                <input type="text" name="attr_strength" class="nospin underlined sml" value="-" title="@{strength}" />
                 <span class="lbl margindent" data-i18n="dex-u">DEX</span>
-                <input type="number" name="attr_dexterity" class="nospin underlined sml" value="0" title="@{dexterity}" />
+                <input type="text" name="attr_dexterity" class="nospin underlined sml" value="-" title="@{dexterity}" />
                 <span class="lbl margindent" data-i18n="con-u">CON</span>
-                <input type="number" name="attr_constitution" class="nospin underlined sml" value="0" title="@{constitution}" />
+                <input type="text" name="attr_constitution" class="nospin underlined sml" value="-" title="@{constitution}" />
                 <span class="lbl margindent" data-i18n="int-u">INT</span>
-                <input type="number" name="attr_intelligence" class="nospin underlined sml" value="0" title="@{intelligence}" />
+                <input type="text" name="attr_intelligence" class="nospin underlined sml" value="-" title="@{intelligence}" />
                 <span class="lbl margindent" data-i18n="wis-u">WIS</span>
-                <input type="number" name="attr_wisdom" class="nospin underlined sml" value="0" title="@{wisdom}" />
+                <input type="text" name="attr_wisdom" class="nospin underlined sml" value="-" title="@{wisdom}" />
                 <span class="lbl margindent" data-i18n="cha-u">CHA</span>
-                <input type="number" name="attr_charisma" class="nospin underlined sml" value="0" title="@{charisma}" />
+                <input type="text" name="attr_charisma" class="nospin underlined sml" value="-" title="@{charisma}" />
             </div>
             <div class="myrow">
                 <span class="lbl" data-i18n="base-atk">Base Atk</span>
@@ -8787,11 +8787,11 @@
                         <span data-i18n="skill-rolls">Skill Rolls</span>
                     </label>
                     <label class="labelcheck margindent" title="@{rollmod_attack}">
-                        <input type="checkbox" name="attr_rollmod_attack" value="?{@{ask_modifier}|0}" />
+                        <input type="checkbox" name="attr_rollmod_attack" value="?{@{ask_atk_modifier}|0}" />
                         <span data-i18n="attack-rolls">Attack & CMB Rolls</span>
                     </label>
                     <label class="labelcheck margindent" title="@{rollmod_damage}">
-                        <input type="checkbox" name="attr_rollmod_damage" value="?{@{ask_modifier}|0}" />
+                        <input type="checkbox" name="attr_rollmod_damage" value="?{@{ask_dmg_modifier}|0}" />
                         <span data-i18n="damage-rolls">Damage Rolls</span>
                     </label>
                 <span class="block" data-i18n="show-notes-in">Show Notes in:</span>
@@ -8840,6 +8840,10 @@
                         <span data-i18n="recalc-u">RECALC</span>
                     </button>
                 </div>
+                <label class="labelcheck" title="@{setting_maxrest}">
+                    <input type="checkbox" name="attr_setting_maxrest" value="1" />
+                    <span data-i18n="rest-set-max">REST sets 'per day' uses to max value</span>
+                </label>
             </div>
             <div class="blacklabel pnty">
                 <img class="brdleft" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Pathfinder%20Official/img/brdleft.png" />
@@ -9057,10 +9061,17 @@
     on("clicked:rest", () => {
         getSectionIDs("abilities", (abarray) => {
             getSectionIDs("spell-like", (splarray) => {
-                let update = {};
-                abarray.map((abid) => update[`repeating_abilities_${abid}_perday`] = 0);
-                splarray.map((splid) => update[`repeating_spell-like_${splid}_perday`] = 0);
-                setAttrs(update, {silent: true});
+                if(abarray.length || splarray.length) {
+                    let fields = ["setting_maxrest"];
+                    fields.push(...abarray.map((id) => `repeating_abilities_${id}_perday_max`));
+                    fields.push(...splarray.map((id) => `repeating_spell-like_${id}_perday_max`));
+                    getAttrs(fields, (v) => {
+                        let update = {}, setmax = (parseInt(v["setting_maxrest"]) || 0);
+                        abarray.map((abid) => update[`repeating_abilities_${abid}_perday`] = (setmax == 1) ? (parseInt(v[`repeating_abilities_${abid}_perday_max`]) || 0) : 0);
+                        splarray.map((splid) => update[`repeating_spell-like_${splid}_perday`] = (setmax == 1) ? (parseInt(v[`repeating_spell-like_${splid}_perday_max`]) || 0) : 0);
+                        setAttrs(update, {silent: true});
+                    });
+                }
             });
         });
     });
@@ -9764,7 +9775,7 @@
     var pfom = (function () {
         /* === GLOBAL VARIABLES === */
 
-        const pfoglobals_currentversion = 1.25;
+        const pfoglobals_currentversion = 1.28;
         var pfoglobals_i18n_obj = (function () {
             var obj = {};
             obj["strength"] = getTranslationByKey("str-u");
@@ -9905,7 +9916,8 @@
                 }
                 // console.log("*** DEBUG pfoglobals_repsec_spell:" + JSON.stringify(pfoglobals_repsec_spell,null,"  "));
                 // Query modifiers translation
-                setAttrs({ask_modifier: getTranslationByKey("ask-modifier"),
+                setAttrs({
+                    ask_modifier: getTranslationByKey("ask-modifier"),
                     ask_atk_modifier: getTranslationByKey("ask-atk-modifier"),
                     ask_dmg_modifier: getTranslationByKey("ask-dmg-modifier"),
                     ask_whisper: getTranslationByKey("ask-whisper"),
@@ -10833,44 +10845,44 @@
                 }
                 // Basic Stats
                 if(cdata["data-STR"]) {
-                    update["strength"] = parseInt(cdata["data-STR"]) || 0;
+                    update["strength"] = parseInt(cdata["data-STR"]) || "-";
                 } else {
-                    update["strength"] = 0;
+                    update["strength"] = "-";
                 }
                 tmpobj = calc_ability_mod("strength",update);
                 _.extend(update, tmpobj);
                 if(cdata["data-DEX"]) {
-                    update["dexterity"] = parseInt(cdata["data-DEX"]) || 0;
+                    update["dexterity"] = parseInt(cdata["data-DEX"]) || "-";
                 } else {
-                    update["dexterity"] = 0;
+                    update["dexterity"] = "-";
                 }
                 tmpobj = calc_ability_mod("dexterity",update);
                 _.extend(update, tmpobj);
                 if(cdata["data-CON"]) {
-                    update["constitution"] = parseInt(cdata["data-CON"]) || 0;
+                    update["constitution"] = parseInt(cdata["data-CON"]) || "-";
                 } else {
-                    update["constitution"] = 0;
+                    update["constitution"] = "-";
                 }
                 tmpobj = calc_ability_mod("constitution",update);
                 _.extend(update, tmpobj);
                 if(cdata["data-INT"]) {
-                    update["intelligence"] = parseInt(cdata["data-INT"]) || 0;
+                    update["intelligence"] = parseInt(cdata["data-INT"]) || "-";
                 } else {
-                    update["intelligence"] = 0;
+                    update["intelligence"] = "-";
                 }
                 tmpobj = calc_ability_mod("intelligence",update);
                 _.extend(update, tmpobj);
                 if(cdata["data-WIS"]) {
-                    update["wisdom"] = parseInt(cdata["data-WIS"]) || 0;
+                    update["wisdom"] = parseInt(cdata["data-WIS"]) || "-";
                 } else {
-                    update["wisdom"] = 0;
+                    update["wisdom"] = "-";
                 }
                 tmpobj = calc_ability_mod("wisdom",update);
                 _.extend(update, tmpobj);
                 if(cdata["data-CHA"]) {
-                    update["charisma"] = parseInt(cdata["data-CHA"]) || 0;
+                    update["charisma"] = parseInt(cdata["data-CHA"]) || "-";
                 } else {
-                    update["charisma"] = 0;
+                    update["charisma"] = "-";
                 }
                 tmpobj = calc_ability_mod("charisma",update);
                 _.extend(update, tmpobj);
@@ -12329,8 +12341,8 @@
 
         // === ABILITIES and MODS
         const calc_ability = function(attr,v) {
-            var update = {};
-            var total = (parseInt(v[`${attr}_base`]) || 0) + (parseInt(v[`${attr}_race`]) || 0) + (parseInt(v[`${attr}_bonus`]) || 0);
+            let update = {};
+            let total = (parseInt(v[`${attr}_base`]) || 0) + (parseInt(v[`${attr}_race`]) || 0) + (parseInt(v[`${attr}_bonus`]) || 0);
             if (["strength","dexterity"].includes(attr)) {
                 total += parseInt(v[`${attr}_condition`]) || 0;
             }
@@ -12342,7 +12354,7 @@
             return update;
         };
         const update_mod = function(attr) {
-            var fields = [attr]
+            let fields = [attr]
             if (attr == "dexterity") {
                 fields.push("dexterity_condition_nobonus");
             }
@@ -12351,19 +12363,24 @@
             });
         };
         const calc_ability_mod = function(attr, v) {
-            var update = {};
-            var mod = Math.floor(((parseInt(v[attr]) || 0) - 10) / 2);
-            if (attr == "strength") {
-                update["strength_half_mod"] = Math.floor(mod*0.5);
-                update["strength_oneandahalf_mod"] = Math.floor(mod*1.5);
-            } else if  (attr == "dexterity") {
-                if(v.dexterity_condition_nobonus) {
-                    if ( (v.dexterity_condition_nobonus == "1") && (mod > 0) ) {
-                        mod = 0;
+            let update = {};
+            let mod = 0;
+            if(String(v[attr]).replace(/[^\d]/gi, "") == "" ) {
+                mod = 0;
+            } else {
+                mod = Math.floor(((parseInt(String(v[attr]).replace(/[^\d\-]/gi, "")) || 0) - 10) / 2);
+                if (attr == "strength") {
+                    update["strength_half_mod"] = Math.floor(mod*0.5);
+                    update["strength_oneandahalf_mod"] = Math.floor(mod*1.5);
+                } else if  (attr == "dexterity") {
+                    if(v.dexterity_condition_nobonus) {
+                        if ( (v.dexterity_condition_nobonus == "1") && (mod > 0) ) {
+                            mod = 0;
+                        }
                     }
+                    update["dexterity_half_mod"] = Math.floor(mod*0.5);
+                    update["dexterity_oneandahalf_mod"] = Math.floor(mod*1.5);
                 }
-                update["dexterity_half_mod"] = Math.floor(mod*0.5);
-                update["dexterity_oneandahalf_mod"] = Math.floor(mod*1.5);
             }
             update[attr + "_mod"] = mod;
             return update;
@@ -12960,6 +12977,8 @@
                             rolltype += "damage";
                             let dmgrollbase = "";
                             let dmgrollcrit = "";
+                            let dmg2rollbase = "";
+                            let dmg2rollcrit = "";
                             // First damage roll
                             if(dmgflag != "0") {
                                 // Standard Damage Roll
@@ -13003,41 +13022,41 @@
                                 rolldmg += `{{dmg2name=${dmg2name}}}`;
                                 rolldmgonly += `{{dmg2name=${dmg2name}}}`;
                                 // Standard Damage Roll
-                                dmgrollbase = `${dmg2base} + ${dmg2attr}[${pfoglobals_i18n_obj[`${v[`repeating_attacks_${attackid}_dmg2attr`]}`]}] + ${dmg2mod}[MOD] + ${dmgtmpbonus}[TEMP] + @{rollmod_damage}[QUERY]`;
+                                dmg2rollbase = `${dmg2base} + ${dmg2attr}[${pfoglobals_i18n_obj[`${v[`repeating_attacks_${attackid}_dmg2attr`]}`]}] + ${dmg2mod}[MOD] + ${dmgtmpbonus}[TEMP] + @{rollmod_damage}[QUERY]`;
                                 if(dmg2bonusdice) {
-                                    dmgrollbase += "+" + dmg2bonusdice + "[BONUS DICE]";
+                                    dmg2rollbase += "+" + dmg2bonusdice + "[BONUS DICE]";
                                 }
                                 // Critical damage Roll
                                 if (dmg2critmulti > 1) {
                                     for(i = 1; i <= dmg2critmulti; i++) {
-                                        dmgrollcrit += `${dmgrollcrit.length ? "+" : ""}${dmg2base}`;
+                                        dmg2rollcrit += `${dmg2rollcrit.length ? "+" : ""}${dmg2base}`;
                                     }
-                                    dmgrollcrit = `((${dmgrollcrit}) + (${dmg2attr}[${pfoglobals_i18n_obj[`${v[`repeating_attacks_${attackid}_dmg2attr`]}`]}] + ${dmg2mod}[MOD] + ${dmgtmpbonus}[TEMP] + @{rollmod_damage}[QUERY]) * ${dmg2critmulti})`;
+                                    dmg2rollcrit = `((${dmg2rollcrit}) + (${dmg2attr}[${pfoglobals_i18n_obj[`${v[`repeating_attacks_${attackid}_dmg2attr`]}`]}] + ${dmg2mod}[MOD] + ${dmgtmpbonus}[TEMP] + @{rollmod_damage}[QUERY]) * ${dmg2critmulti})`;
                                     if(dmg2bonusdice) {
-                                        dmgrollcrit += ` + ${dmg2bonusdice}[BONUS DICE]`;
+                                        dmg2rollcrit += ` + ${dmg2bonusdice}[BONUS DICE]`;
                                     }
                                 } else {
-                                    dmgrollcrit = "";
+                                    dmg2rollcrit = "";
                                 }
                                 // Roll calculation
                                 if ( (atkflag != "0") && (atktypearray.length > 1) ) {
                                     // One damage roll per attack
                                     for(i = 0; i < atktypearray.length; i++) {
-                                        rolldmg += `{{roll${i > 0 ? i : ""}dmg2=[[${dmgrollbase}]]}} {{roll${i > 0 ? i : ""}dmg2type=${dmg2type}}}`;
+                                        rolldmg += `{{roll${i > 0 ? i : ""}dmg2=[[${dmg2rollbase}]]}} {{roll${i > 0 ? i : ""}dmg2type=${dmg2type}}}`;
                                         if(dmg2critmulti > 1) {
-                                            rolldmg += `{{roll${i > 0 ? i : ""}dmg2crit=[[${dmgrollcrit}]]}}`;
+                                            rolldmg += `{{roll${i > 0 ? i : ""}dmg2crit=[[${dmg2rollcrit}]]}}`;
                                         }
                                     }
                                 } else {
-                                    rolldmg += `${dmg2flag} {{dmg2=[[${dmgrollbase}]]}} {{dmg2type=${dmg2type}}}`;
+                                    rolldmg += `${dmg2flag} {{dmg2=[[${dmg2rollbase}]]}} {{dmg2type=${dmg2type}}}`;
                                     if(dmg2critmulti > 1) {
-                                        rolldmg += `{{dmg2crit=[[${dmgrollcrit}]]}}`;
+                                        rolldmg += `{{dmg2crit=[[${dmg2rollcrit}]]}}`;
                                     }
                                 }
                                 // No attack (damage only) or just one attack
-                                rolldmgonly += `${dmg2flag} {{dmg2=[[${dmgrollbase}]]}} {{dmg2type=${dmg2type}}}`;
+                                rolldmgonly += `${dmg2flag} {{dmg2=[[${dmg2rollbase}]]}} {{dmg2type=${dmg2type}}}`;
                                 if(dmg2critmulti > 1) {
-                                    rolldmgonly += `{{dmg2crit=[[${dmgrollcrit}]]}}`;
+                                    rolldmgonly += `{{dmg2crit=[[${dmg2rollcrit}]]}}`;
                                 }
                             }
                             // desc
@@ -13789,7 +13808,7 @@
                 rollbase += `{{level=${spell_level}}}`;
             }
             // caster class
-            if ((v.npc || "0") != "1" && csterflag1 == "1" && csterflag2 == "1" && v.caster1_class && v.caster2_class) {
+            if ((v.npc || "0") != "1" && csterflag1 == "1" && csterflag2 == "1" && v.caster1_class && v.caster2_class && spell_level != "like") {
                 rollbase += `{{casterclass=${(cster == "1") ? v.caster1_class : v.caster2_class}}}`;
             }
             // type (spell-like)
@@ -14716,7 +14735,7 @@
         const initializeChar = function(doneupdating) {
             getAttrs(["character_name","npc"], (v) => {
                 console.log("Initializing character " + v.character_name);
-                if(v.npc != "1") {
+                if((v["npc"] || "0") != "1") {
                     let update = calc_reset_character();
                     update["version"] = pfoglobals_currentversion;
                     update["initialize_character_flag"] = 0;
@@ -14737,7 +14756,7 @@
         const update_to_1_08 = function(doneupdating) {
             console.log("UPDATING TO v1.08");
             getAttrs(["ac_ability_mod","npc"], (v) => {
-                if(v.npc != "1") {
+                if((v["npc"] || "0") != "1") {
                     var update = {};
                     var mod = 0;
                     if(v.ac_ability_mod) {
@@ -14764,7 +14783,7 @@
         const update_to_1_10 = function(doneupdating) {
             console.log("UPDATING TO v1.10");
             getAttrs(["dexterity","hp","hp_max","npc"], (v) => {
-                if(v.npc != "1") {
+                if((v["npc"] || "0") != "1") {
                     var update = {};
                     var mod = Math.floor(((parseInt(v.dexterity) || 10) - 10) / 2);
                     update["dexterity_half_mod"] = Math.floor(mod*0.5);
@@ -14785,7 +14804,7 @@
         const update_to_1_12 = function(doneupdating) {
             console.log("UPDATING TO v1.12");
             getAttrs(["npc"], (v) => {
-                if(v.npc != "1") {
+                if((v["npc"] || "0") != "1") {
                     update_all_skills(); // change armor/encumbrance penalty handling
                 }
                 doneupdating();
@@ -14794,7 +14813,7 @@
         const update_to_1_14 = function(doneupdating) {
             console.log("UPDATING TO v1.14");
             getAttrs(["npc","size"], (v) => {
-                if(v.npc != "1") {
+                if((v["npc"] || "0") != "1") {
                     // size mods fix for CMB/CMD
                     setAttrs(calc_pc_size(v["size"]),{silent: true}, () => {
                         update_babs_all(); //=>attacks
@@ -14806,7 +14825,7 @@
         const update_to_1_16 = function(doneupdating) {
             console.log("UPDATING TO v1.16");
             getAttrs(["npc","class","race"], (v) => {
-                if(v.npc != "1") {
+                if((v["npc"] || "0") != "1") {
                     update_speed();
                     // Already existing PC to be considered complete regarding the Charactermancer
                     if((v.class && v.class.trim().length) || (v.race && v.race.trim().length)) {
@@ -14824,7 +14843,7 @@
         const update_to_1_17 = function(doneupdating) {
             console.log("UPDATING TO v1.17");
             getAttrs(["npc","class_favored","l1mancer_status"], (v) => {
-                if(v.npc != "1" && v.l1mancer_status == "completed") {
+                if((v["npc"] || "0") != "1" && (v["l1mancer_status"] || "completed") == "completed") {
                     let update = {};
                     let fav = parseInt(v.class_favored) || 0;
                     for(let i = 1; i < 4; i++) {
@@ -14842,7 +14861,7 @@
         const update_to_1_18 = function(doneupdating) {
             console.log("UPDATING TO v1.18");
             getAttrs(["npc","l1mancer_status"], (v) => {
-                if(v.npc != "1" && v.l1mancer_status == "completed") {
+                if((v["npc"] || "0") != "1" && (v["l1mancer_status"] || "completed") == "completed") {
                     update_skillranks_total();
                 }
                 doneupdating();
@@ -14851,7 +14870,7 @@
         const update_to_1_19 = function(doneupdating) {
             console.log("UPDATING TO v1.19");
             getAttrs(["npc","l1mancer_status"], (v) => {
-                if(v.npc != "1" && v.l1mancer_status == "completed") {
+                if((v["npc"] || "0") != "1" && (v["l1mancer_status"] || "completed") == "completed") {
                     update_babs_all();
                 }
                 doneupdating();
@@ -14860,7 +14879,7 @@
         const update_to_1_20 = function(doneupdating) {
             console.log("UPDATING TO v1.20");
             getAttrs(["npc","l1mancer_status","ac_natural_bonus","ac_deflection_bonus","ac_dodge_bonus","ac_natural","ac_deflection","ac_dodge","hp_condition"], (v) => {
-                if(v.npc != "1" && v.l1mancer_status == "completed") {
+                if((v["npc"] || "0") != "1" && (v["l1mancer_status"] || "completed") == "completed") {
                     // Renaming some AC attributes for Buffs => recalculation
                     var update = {"ac_armor_bonus": 0,"ac_shield_bonus": 0};
                     if(v.ac_natural) {
@@ -14895,7 +14914,7 @@
         const update_to_1_21 = function(doneupdating) {
             console.log("UPDATING TO v1.21");
             getAttrs(["npc","l1mancer_status"], (v) => {
-                if(v.npc != "1" && v.l1mancer_status == "completed") {
+                if((v["npc"] || "0") != "1" && (v["l1mancer_status"] || "completed") == "completed") {
                     getSectionIDs("repeating_buff", (buffarray) => {
                         getSectionIDs("repeating_abilities", (abltarray) => {
                             getSectionIDs("repeating_spell-like", (splarray) => {
@@ -14942,7 +14961,7 @@
         const update_to_1_22 = function(doneupdating) {
             console.log("UPDATING TO v1.22");
             getAttrs(["npc","l1mancer_status"], (v) => {
-                if(v.npc != "1" && v.l1mancer_status == "completed") {
+                if((v["npc"] || "0") != "1" && (v["l1mancer_status"] || "completed") == "completed") {
                     le_big_stuff("all",{},() => {
                         doneupdating();
                     });
@@ -14951,9 +14970,46 @@
                 }
             });
         };
+        const update_to_1_26 = function(doneupdating) {
+            console.log("UPDATING TO v1.26");
+            getAttrs(["npc"], (v) => {
+                if((v["npc"] || "0") != "1" && (v["l1mancer_status"] || "completed") == "completed") {
+                    update_spells("like","all");
+                    doneupdating();
+                } else {
+                    doneupdating();
+                }
+            });
+        };
+        const update_to_1_27 = function(doneupdating) {
+            console.log("UPDATING TO v1.27");
+            getAttrs(["rollmod_attack","rollmod_damage"], (v) => {
+                update = {};
+                if("rollmod_attack" in v && v.rollmod_attack == "?{@{ask_modifier}|0}") {
+                    update["rollmod_attack"] = "?{@{ask_atk_modifier}|0}";
+                }
+                if("rollmod_damage" in v && v.rollmod_damage == "?{@{ask_modifier}|0}") {
+                    update["rollmod_damage"] = "?{@{ask_dmg_modifier}|0}";
+                }
+                setAttrs(update, {silent: true}, () => {
+                    doneupdating();
+                });
+            });
+        };
+        const update_to_1_28 = function(doneupdating) {
+            console.log("UPDATING TO v1.28");
+            getAttrs(["npc"], (v) => {
+                if((v["npc"] || "0") != "1" && (v["l1mancer_status"] || "completed") == "completed") {
+                    update_attacks("all");
+                    doneupdating();
+                } else {
+                    doneupdating();
+                }
+            });
+        };
         const versioning = function() {
             getAttrs(["version"], (v) => {
-                var vrs = parseFloat(v["version"]) || 0.0;
+                let vrs = parseFloat(v["version"]) || 0.0;
                 if (vrs === pfoglobals_currentversion) {
                     console.log("Pathfinder by Roll20 v" + vrs);
                     check_l1_mancer();
@@ -15032,6 +15088,24 @@
                 } else if (vrs < 1.22) {
                     update_to_1_22(() => {
                         setAttrs({"version": "1.22"}, {silent: true}, () => {
+                            versioning();
+                        });
+                    });
+                } else if (vrs < 1.26) {
+                    update_to_1_26(() => {
+                        setAttrs({"version": "1.26"}, {silent: true}, () => {
+                            versioning();
+                        });
+                    });
+                } else if (vrs < 1.27) {
+                    update_to_1_27(() => {
+                        setAttrs({"version": "1.27"}, {silent: true}, () => {
+                            versioning();
+                        });
+                    });
+                } else if (vrs < 1.28) {
+                    update_to_1_28(() => {
+                        setAttrs({"version": "1.28"}, {silent: true}, () => {
                             versioning();
                         });
                     });

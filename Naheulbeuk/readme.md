@@ -11,7 +11,7 @@ La fiche reprend les éléments de la feuille de personnage officielle réorgani
 - Compétences
 	* Permet de gérer les Compétences, les APE, les Traits particuliers (buff / debuff) et les Coups spéciaux avec les lancer d'épreuves / dégâts correspondants
 - Equipement
-	* Permet de gérer ses armes (mêlée, distance), ses armures, ses munitions et bagues
+	* Permet de gérer ses armes (mêlée, distance), ses armes à poudre, ses armures, ses munitions et bagues
 	* Permet de gérer son score de protection (calculé en partie par l'équipement)
 - Magie
 	* Permet d'enregistrer ses écoles de magies (Généraliste, Combat, Feu, Prodiges...)	
