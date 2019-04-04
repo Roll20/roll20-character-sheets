@@ -1,4 +1,4 @@
-<input type='hidden' name='attr_character_sheet' value='Savage Worlds Tabbed v3.0' />
+<input type='hidden' name='attr_character_sheet' value='Savage Worlds Tabbed v3.1' />
 <script type="text/worker">
     /*----- Things I need to Care For -----
     -- o Option to ignore encumbrance    --
@@ -423,7 +423,7 @@
 	}
 
 	/* ---- Begin Sheet Version Validation & Update ---- */
-	const sheetVersion = "3.0";
+	const sheetVersion = "3.1";
 	const sheetVersionPrefix = "Savage Worlds Tabbed v";
 
     const upgradeSheet = function(version) {
@@ -590,10 +590,35 @@
             updateField("repeating_hindrances:showHindraceDesc","0");
             updateField("repeating_edges:showEdgeDesc","0");
             updateField("repeating_skills:showOtherRollMod","0");
-
-
 	    }
-	    else {
+		if (version < 3.2) {
+			console.log(`!@!@! UPGRADING TO VERSION 3.1 !@!@!`)
+			//Set up Multi Attack option
+			stepwiseFaux("weapons","rof");
+			//Migrate Nerves of Steel
+			getAttrs(["NoS"], function(v) {
+				if(v.NoS === "-1") {
+					console.log("!!! Nerves of Steel !!!");
+					let nerves = getTranslationByKey('nerves-of-steel');
+					setAttrs({
+						reducewoundsby: "-1",
+						reducereason: nerves
+					});
+				}
+				else if(v.NoS === "-2") {
+					console.log("!!! Nerves of Steel !!!");
+					let nerves = getTranslationByKey('improved-nerves-of-steel');
+					setAttrs({
+						reducewoundsby: "-2",
+						reducereason: nerves
+					});
+				}
+				else {
+					console.log("No Nerves of Steel to care for");
+				}
+			});
+		}
+		else {
 	        console.log("!!! Sheet Already Upgraded !!!");
 	    }
 
@@ -918,14 +943,17 @@
 	});
 
 	//Set Rank according to the XP value
-	on("change:xp change:rank change:usexp", function() {
-		getAttrs(["xp", "rank", "class","useXP"], function(value) {
+	on("change:xp change:rank change:usexp change:setrank", function() {
+		getAttrs(["xp", "rank", "class","useXP", "setrank"], function(value) {
 			console.log("useXP Value: "+value.useXP);
 			console.log("xp value: " + value.xp);
 			console.log("rank value: " + value.rank);
 			var xpVal = parseInt(value.xp)||0;
 			console.log(xpVal);
-			if(value.useXP === "1") {
+			if (value.setrank === "on") {
+				console.log("Don't set Rank at all, because there's a different structure");
+			}
+			else if(value.useXP === "on") {
 			    //Using XP instead of Advances
 			    if (xpVal >=80) {
           			console.log("Setting rank to Legendary");
@@ -1504,11 +1532,11 @@
 				wbutton = 'repeating_raweapons_raweaponbutton';
 				wskill = 'repeating_raweapons_raweaponskill';
 			}
-			const skillUn = `@{whisperweapon} &{template:roll} @{rolltUnskilled} {{trait=Unskilled}} {{source=@{${pa}weapon}}} {{button=y}} {{DmgRoll=[Roll Damage](~repeating_${pa}weapons_${pa}dmg) }} @{unskilledencumbrancebutton} @{showtraitmods}`;
-			const skillFi = `@{whisperweapon} &{template:roll} {{trait=Fighting}} {{source=@{${pa}weapon}}} @{rolltFighting} {{button=y}} {{DmgRoll=[Roll Damage](~repeating_${pa}weapons_${pa}dmg) }} @{setmodsenc} @{showtraitmods}`;
-			const skillAt = `@{whisperweapon} &{template:roll} {{trait=Athletics}} {{source=@{${pa}weapon}}} @{rolltAthletics} {{button=y}} {{DmgRoll=[Roll Damage](~repeating_${pa}weapons_${pa}dmg) }} @{setmodsenc} @{showtraitmods}`;
-			const skillSh = `@{whisperweapon} &{template:roll} {{trait=Shooting}} {{source=@{${pa}weapon}}} @{rolltShooting} {{button=y}} {{DmgRoll=[Roll Damage](~repeating_${pa}weapons_${pa}dmg) }} @{setmodsenc} @{showtraitmods}`;
-			const skillTh = `@{whisperweapon} &{template:roll} {{trait=Throwing}} {{source=@{${pa}weapon}}} @{rolltThrowing} {{button=y}} {{DmgRoll=[Roll Damage](~repeating_${pa}weapons_${pa}dmg) }} @{setmodsenc} @{showtraitmods}`;
+			const skillUn = `@{whisperweapon} &{template:roll} @{rolltUnskilled} {{trait=^{unskilled}}} {{source=@{${pa}weapon}}} {{button=y}} {{DmgRoll=[Roll Damage](~repeating_${pa}weapons_${pa}dmg) }} @{unskilledencumbrancebutton} @{showtraitmods} @{multiattack}`;
+			const skillFi = `@{whisperweapon} &{template:roll} {{trait=^{fighting}}} {{source=@{${pa}weapon}}} @{rolltFighting} {{button=y}} {{DmgRoll=[Roll Damage](~repeating_${pa}weapons_${pa}dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack}`;
+			const skillAt = `@{whisperweapon} &{template:roll} {{trait=^{athletics}}} {{source=@{${pa}weapon}}} @{rolltAthletics} {{button=y}} {{DmgRoll=[Roll Damage](~repeating_${pa}weapons_${pa}dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack}`;
+			const skillSh = `@{whisperweapon} &{template:roll} {{trait=^{shooting}}} {{source=@{${pa}weapon}}} @{rolltShooting} {{button=y}} {{DmgRoll=[Roll Damage](~repeating_${pa}weapons_${pa}dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack}`;
+			const skillTh = `@{whisperweapon} &{template:roll} {{trait=^{throwing}}} {{source=@{${pa}weapon}}} @{rolltThrowing} {{button=y}} {{DmgRoll=[Roll Damage](~repeating_${pa}weapons_${pa}dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack}`;
 			console.log(eventInfo.sourceAttribute);
 			let sid = eventInfo.sourceAttribute.slice(18,38);
 			let skillToUse = skillFi;
@@ -1516,7 +1544,7 @@
 			console.log("skillFi: "+skillFi);
 			getAttrs([`${weapon}_${pa}weaponbutton`,`${weapon}_${pa}weaponskill`], function(value) {
 				let tWeaponFormula = '';
-				if(value[wbutton] === "0") {
+				if(value[wbutton] === "0" || value[wbutton] === "2") {
 					//Attack + Damage Roll in One
 					console.log("!! Attack + Damage !!");
 					tWeaponFormula = `@{${pa}skillNDamage}`;
@@ -1575,20 +1603,95 @@
 		});
 	});
 
+	//Multi Attack
+	on("change:repeating_weapons:rof change:repeating_weapons:weaponbutton change:repeating_weapons:weaponskill", function(eventInfo) {
+		/* rof > 1; need to set showmulti = 1 (show Atk^+Dmg), otherwise 0 (hide Atk^+Dmg)
+		   if weaponbutton === 2, then we need to build the multi attack formula (goes in multiattack variable)
+		*/
+		console.log("@@@ A Change Happened @@@");
+		console.log(`@@@ ${eventInfo.sourceAttribute} @@@`);
+		getAttrs(["repeating_weapons_rof","repeating_weapons_weaponbutton","repeating_weapons_weaponskill","repeating_weapons_multiattack","atkxconfig"], function(v) {
+			let rof = parseInt(v.repeating_weapons_rof) || 0;
+			let weaponbutton = v.repeating_weapons_weaponbutton;
+			let weaponskill = v.repeating_weapons_weaponskill;
+			let xconfig = v.atkxconfig
+			let multiattackformula ='';
+			console.log(`*** ROF: ${rof} ***`);
+			if (rof > 1) {
+				console.log("Show the Atk^+Dmg button");
+				setAttrs({repeating_weapons_showmulti: "1"}); /*show Atk^+Dmg on drop down menu*/
+			}
+
+			if (rof < 2 && weaponbutton === "2") { /*if ROF < 2 and Weapons Button is set to Atk^+Dmg, need set it to just Atk+Dmg*/
+				console.log("Hide the Atk^+Dmg Button and if it was set to Atk^+Dmg, change it to Atk+Dmg");
+				console.log("Set multiattack to 0, so we don't get the multi attack stuff in the roll template");
+				setAttrs({
+					repeating_weapons_showmulti: "0",
+					repeating_weapons_weaponbutton: "0",
+					repeating_weapons_multiattack: "0"
+				});
+			}
+			console.log(`*** weaponbutton: ${weaponbutton} ***`);
+			if (weaponbutton === "2") {
+				console.log("### Constructing the multiattack formula ###");
+				console.log("constructing roll query");
+				let templatecalls = "";
+				let a,b;
+				let loopParam, loopParam2;
+				//adjusting the roll query
+				if (xconfig === "0") {a = rof; loopParam = `a > 0`; loopParam2 = `a--`;}
+				else {a = 1; loopParam = `a <= ${rof}`; loopParam2 = `a++`;}
+				//Create the Roll Query
+				let rollquery = '?{Number of Skill Dice';
+				for (a; eval(loopParam); eval(loopParam2)) {
+					rollquery += `|${a}`;
+					console.log(`RQ: ${rollquery}`);
+				}
+				rollquery += "}";
+				//Create the Roll Formula
+				let multiattackformula = "";
+				for (b = 2; b <= rof; b++) {
+					if (b === 6 && rof > 6 && xconfig !== "2"){
+						console.log("!!! Using the Roll Query !!!");
+						console.log(`b: ${b} || rof: ${rof} || xconfig: ${xconfig}`);
+						multiattackformula += `{{skill_rollall=^{plus-the-next} [[${rollquery}-5]]}} `;
+					}
+					multiattackformula += `{{skill_roll${b}=[[@{${weaponskill}rollformula}]]}} `;
+				}
+				if (xconfig === "2") {
+					multiattackformula += `{{numrolls=[[1d0+${rof}]]}}`;
+				}
+				else {
+					multiattackformula += `{{numrolls=[[1d0+${rollquery}]]}} `;
+				}
+				multiattackformula = multiattackformula.trim();
+				console.log(`||| ${multiattackformula} |||`);
+				setAttrs({
+					repeating_weapons_multiattack: multiattackformula
+				});
+			}
+			else {
+				console.log("Change was triggered, but Weapon Button isn't Atk^+Dmg");
+				setAttrs({
+					repeating_weapons_multiattack: "0"
+				});
+			}
+		});
+	});
 
 	//Spell Button config
 	on("change:repeating_spells:spellbutton change:repeating_spells:spellskill", function(eventInfo) {
 	    console.log(eventInfo.sourceAttribute);
 	    let sid = eventInfo.sourceAttribute.slice(18,38);
 	    const skillUn = "@{rolltUnskilled} {{trait=Unskilled}} @{unskilledencumbrancebutton} @{showtraitmods}";
-	    const skillFa = "{{trait=Faith}} @{rolltFaith} @{setmods} @{showtraitmods}";
-	    const skillFo = "{{trait=Focus}} @{rolltFocus} @{setmods} @{showtraitmods}";
-	    const skillPe = "{{trait=Performance}} @{rolltPerformance} @{setmods} @{showtraitmods}";
-	    const skillPs = "{{trait=Psionics}} @{rolltPsionics} @{linkedpsionicsattbutton} @{showtraitmods}";
-	    const skillRi = "{{trait=Ritual}} @{rolltRitual} @{linkedritualattscorebutton} @{showtraitmods}";
-	    const skillSp = "{{trait=Spellcasting}} @{rolltSpellcasting} @{linkedspellcastingattscorebutton} @{showtraitmods}";
-	    const skillWs = "{{trait=WeirdScience}} @{rolltWeirdScience} @{linkedweirdscienceattscorebutton} @{showtraitmods}";
-	    const skilltemp = "@{whisperspell} &{template:roll} {{source=@{power}}} {{PowerTemplate=y}} @{shownotes}"
+	    const skillFa = "{{trait=^{faith}}} @{rolltFaith} @{setmods} @{showtraitmods}";
+	    const skillFo = "{{trait=^{focus}}} @{rolltFocus} @{setmods} @{showtraitmods}";
+	    const skillPe = "{{trait=^{performance}}} @{rolltPerformance} @{setmods} @{showtraitmods}";
+	    const skillPs = "{{trait=^{psionics}}} @{rolltPsionics} @{linkedpsionicsattbutton} @{showtraitmods}";
+	    const skillRi = "{{trait=^{ritual}}} @{rolltRitual} @{linkedritualattscorebutton} @{showtraitmods}";
+	    const skillSp = "{{trait=^{spellcasting}}} @{rolltSpellcasting} @{linkedspellcastingattscorebutton} @{showtraitmods}";
+	    const skillWs = "{{trait=^{weird-science}}} @{rolltWeirdScience} @{linkedweirdscienceattscorebutton} @{showtraitmods}";
+	    const skilltemp = "@{whisperspell} &{template:roll} {{source=@{power}}} {{trappings=@{trappings}}} {{PowerTemplate=y}} @{shownotes}"
 
 	    let skillToUse = skillSp;
 	    console.log("sid: "+sid);
@@ -1771,7 +1874,8 @@
 				default:
 					setAttrs({
 						repeating_weapons_weapondamage: dmgdisplay,
-						repeating_weapons_weapondmg: dmgformula
+						repeating_weapons_weapondmg: dmgformula,
+						repeating_weapons_highlightdamage: "0"
 					});
 					break;
 			}
@@ -1874,7 +1978,8 @@
 			console.log("!!! Formula: " + dmgformula + " !!!");
 			setAttrs({
 			    repeating_spells_powerdamage: dmgdisplay,
-			    repeating_spells_spelldmg: dmgformula
+			    repeating_spells_spelldmg: dmgformula,
+				repeating_spells_shighlightdamage: "0"
 			});
 		});
 	});
@@ -2043,12 +2148,32 @@
 
 	const setWoundsMod = function(flag) {
 	    console.log("<==== Updating woundsMod ====>");
-	    getAttrs(["wounds","NoS"], function(lvalue) {
-		    var wound = parseInt(lvalue.wounds)||0;
-		    var nerves = parseInt(lvalue.NoS)||0;
+	    getAttrs(["wounds","reducewoundsby","increasewoundsby","maxwoundmods","reducereason","increasereason","maxreason"], function(lvalue) {
+		    let wound = parseInt(lvalue.wounds)||0;
+		    /*let nerves = parseInt(lvalue.NoS)||0;*/
+			let reduce = parseInt(lvalue.reducewoundsby)||0;
+			let increase = parseInt(lvalue.increasewoundsby)||0;
+			let max = parseInt(lvalue.maxwoundmods)||0;
 
-		    console.log("<==== Wounds:"+wound+"||Nerves of Steel:"+nerves+" ====>");
-		    var wMS = wound+nerves;
+		    console.log(`<==== Wounds: ${wound} || Reduce: ${reduce} || Increase: ${increase} || Max: ${max} ====>`);
+		    /*var wMS = wound+nerves;*/
+			let wMS = Math.abs(wound) - Math.abs(reduce) + Math.abs(increase);
+			console.log(`+++ wMS: ${wMS} +++`);
+			if (wound === 0) {
+				console.log("Made it wounds = 0");
+				wMS = 0;
+			}
+			else {
+				console.log("Made it wounds != 0");
+				if (wMS < 0) {
+					console.log("Wounds are less than 0, make it 0");
+					wMS = 0;
+				}
+				if (wMS > Math.abs(max)) {
+					console.log("wMS is greater than the Max, make it the max");
+					wMS = Math.abs(max);
+				}
+			}
 		    if (flag === "silent") {
 		        console.log("Setting woundsMod silently");
 		        setAttrs({woundsMod: wMS},{silent:true});
@@ -2060,7 +2185,7 @@
    		});
 	}
 
-	on("change:wounds change:NoS",function(){
+	on("change:wounds change:NoS change:reducewoundsby change:increasewoundsby change:maxwoundmods change:reducereason change:increasereason change:maxreason",function(){
 		setWoundsMod();
 	});
 
@@ -2207,16 +2332,42 @@
 	    powerLabel();
 	});
 
+	function getBonusFields(repSection, setField) {
+		//setField should = vbonusdamage || weaponsbdt || spellsbdt
+		let fieldlist = {};
+		getSectionIDs(`repeating_${repSection}`, function(idArray) {
+			for (var i=0; i < idArray.length; i++) {
+				console.log(`x-x|x-x Key: repeating_${repSection}_${idArray[i]}_${repSection}bonusdmg x-x|x-x`);
+				console.log(`x-x|x-x Value: @{${setField}} x-x|x-x`);
+				fieldlist[`repeating_${repSection}_${idArray[i]}_${repSection}bonusdmg`] = "@{"+setField+"}";
+			}
+			setAttrs(fieldlist);
+		});
+
+	}
+
 	on("change:raisehbrule", function(eventInfo) {
-	    if (eventInfo.newValue === "on") {
+	    if (eventInfo.newValue === "1") {
 	        //Using Variable Bonus Damage
 	        console.log("Using variable bonus damage: set up query...");
 	        let qString = getTranslationByKey('bonus-damage-die-type');
 	        setAttrs({vbonusdamage: `?{${qString}|d6,1d6!|d8,1d8!|d10,1d10!|d12,1d12!|d4,1d4!}`});
+			getBonusFields("weapons","vbonusdamage");
+			getBonusFields("spells","vbonusdamage");
 	    }
+		else if (eventInfo.newValue === "2") {
+			console.log("Using static variable bonus damage: determine damage to use");
+			/*let fieldList = ["weapons","spells"];
+			let finalList = {};*/
+			getBonusFields("weapons","weaponsbdt");
+			getBonusFields("spells","spellsbdt");
+
+		}
 	    else {
 	        console.log("Not using using Variable Bonus Damage...");
 	        setAttrs({vbonusdamage: '1d6!'});
+			getBonusFields("weapons","vbonusdamage");
+			getBonusFields("spells","vbonusdamage");
 	    }
 	});
 
@@ -2245,9 +2396,34 @@
 	    });
 	});
 
+	on("change:wealth", function(eventInfo) {
+		let wealth = '&{template:roll} {{name=@{character_name} }} {{trait=Wealth}} {{skill_rank=@{wealth} }} {{skill_roll=[[@{wealth} + @{traitmods}]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{traitmods}]]}} {{wild_die=[[ 1d@{wilddie}! + @{traitmods} ]]}}';
+		if(eventInfo.newValue === "d0") {
+			console.log("The character is broke");
+			wealth = "/em is broke and can't make purchases.";
+		}
+		setAttrs({rollwealth: wealth});
+	});
+
+	on("clicked:repeating_weapons:wdamage", function() {
+		console.log("Damage Field clicked...show the Weapon config");
+		setAttrs({
+			repeating_weapons_showweaponconfig: "on",
+			repeating_weapons_highlightdamage: "1"
+		})
+	});
+
+	on("clicked:repeating_spells:sdamage", function() {
+		console.log("Damage Field clicked...show the Weapon config");
+		setAttrs({
+			repeating_spells_showspellconfig: "on",
+			repeating_spells_shighlightdamage: "1"
+		})
+	});
+
 </script>
 <input type='hidden' name='attr_dopay' value="init" />
-<input type='text' style='display: none;' name='attr_character_sheet' value='Savage Worlds Tabbed v2.0' />
+<input type='text' style='display: none;' name='attr_character_sheet' value='Savage Worlds Tabbed v3.1' />
 <input type='text' style='display: none;' name='attr_wdNum' value='1' />
 <div class='sheet-maindiv'>
     <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="1" checked />
@@ -2264,6 +2440,8 @@
     <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="12" />
     <div class='sheet-background'>
     	<div class='sheet-base'>
+			<input type="checkbox" class="sheet-useBenniesXP" name="attr_bennies" value="1" style="display: none;" />
+			<input type="checkbox" class="sheet-riftsBackground" style="display: none;" name="attr_background" value="11" />
     	    <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="4" />
     	    <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="3" />
         	&nbsp;&nbsp;<input type='radio' class='sheet-tab sheet-characterT' name='attr_sheetTab' data-i18n-title="main-character-view" title="Main Character View" value='1' checked /><span class="sheet-bg">U</span>
@@ -2273,7 +2451,8 @@
             &nbsp;&nbsp;<input type='radio' class='sheet-tab sheet-configT' name='attr_sheetTab' data-i18n-title="sheet-configuration" title="Sheet Configuration" value='2' /><span class="sheet-bg">x</span>
             &nbsp;&nbsp;<input type='radio' class='sheet-tab sheet-releaseN' name='attr_sheetTab' data-i18n-title="release-notes" title="Release Notes" value='5' /><span class="sheet-bg">N</span>
             &nbsp;&nbsp;<input type='radio' class='sheet-tab sheet-documentatioN' name='attr_sheetTab' data-i18n-title="sheet-documentation" title="Sheet Documentation" value='6' /><span class="sheet-bg">i</span>
-            <!--<div class="sheet-toprow">
+			<button class="sheet-benniesxp" type="roll" name="roll_convertBennies" value="&{template:emote} {{name=@{character_name}}} {{does=rolls for XP on ?{Number of Bennies|1} un/spent bennies and gets [[?{Number of Bennies|1}d6>5]] extra experience point(s)!}}">S</button>
+			<!--<div class="sheet-toprow">
                 Trait Test Modifier:
                 Damage Modifier:
                 XP/Rank:
@@ -2321,7 +2500,7 @@
                         <div>
                             <span data-i18n="wild-card">Wild Card</span>&nbsp;&nbsp;<label class='sheet-switch'><input type="checkbox" name="attr_is_npc" value="1" /><span class="sheet-slider sheet-round"></span></label>&nbsp;&nbsp;<span data-i18n="extra">Extra</span>
                             <span class='sheet-xpRank'>
-                                <input type="checkbox" class="sheet-useXP" name="attr_useXP" style="display: none;" value="1" />
+                                <input type="checkbox" class="sheet-useXP" name="attr_usexplabel" style="display: none;" value="1" />
                                 <input type="checkbox" class="sheet-useClass" name="attr_ThreatRatingClass" value="1" style="display: none;" />
 								<input type="checkbox" class="sheet-useThreatRating" name="attr_ThreatRatingClass" value="2" style="display:none;" />
 								<label class='sheet-xplabel sheet-trackXP' data-i18n="experience-points-abbr-u">XP</label><label class='sheet-xplabel sheet-advances' data-i18n="advances">Advances</label> / <label class='sheet-ranklabel sheet-useRank' data-i18n="rank">Rank</label><label class='sheet-ranklabel sheet-trackClass' data-i18n="class">Class</label><label class='sheet-ranklabel sheet-trackThreat' data-i18n="threat">Threat</label>
@@ -2364,10 +2543,10 @@
     					</div>
     					<div class='sheet-base' style='width:30%;'>
     						<div class='sheet-base sheet-basicinfolablecenter' style='width:20%;'>
-    							<input class='sheet-basicinputext' style='text-align: center;' type="text" title="@{character_name}" name="attr_age" /><label class="sheet-basicinfolablecenter" style="font-size: 1em;">Age</label>
+    							<input class='sheet-basicinputext' style='text-align: center;' type="text" title="@{age}" name="attr_age" /><label class="sheet-basicinfolablecenter" style="font-size: 1em;">Age</label>
     						</div>
     						<div class='sheet-base' style='width:77%;'>
-    							<input class='sheet-basicinputext' type="text" title="@{age}" name="attr_gender" /><label class="sheet-basicinfolableleft">Gender</label>
+    							<input class='sheet-basicinputext' type="text" title="@{gender}" name="attr_gender" /><label class="sheet-basicinfolableleft">Gender</label>
     						</div>
     					</div>
     					<div class='sheet-base' style='width:32%;'>
@@ -2393,7 +2572,7 @@
     					<input type="checkbox" class="sheet-useLanguages" name="attr_Lang" style="display: none;" />
     					<div class="sheet-base sheet-Languages">
     						<!--<input class="sheet-basicstandard" type="text" name="attr_languages" style='font-weight: normal;' title="@{languages}" placholer='Languages' />-->
-    						<input class='sheet-basicinputext' style='width: 100%; font-weight: normal; margin: 0px;' name='attr_languages' title="@{languages}" data-i18n-placeholder="languages"  placeholder='Languages' /><label class='sheet-basicinfolableleft' data-i18n="languages">Languages</label>
+    						<input class='sheet-basicinputext' type="text" name='attr_languages' title="@{languages}" data-i18n-placeholder="languages"  placeholder='Languages' /><label class='sheet-basicinfolableleft' data-i18n="languages">Languages</label>
     					</div>
     				</div>
                 </div>
@@ -2401,7 +2580,7 @@
                     <!--Tri-columns for Abilities and the such-->
                     <div class='sheet-atts'>
                         <input type="checkbox" class="sheet-hideCoreAtts" name="attr_hideAtts" /><span class="sheet-showCoreAtts"></span>
-                        <h1 class='sheet-attSectionTitle' data-i18n="attributes">Attributes</h1>
+                        <h1 class='sheet-colHeader' style="margin-top: -35px;" data-i18n="attributes">Attributes</h1>
                         <!--<input type="checkbox" class="sheet-hideAtts" name="attr_hideAtts" /><span class="sheet-showhide"></span>-->
                         <div class='sheet-base sheet-attributes'>
                             <div class='sheet-basetrait'>
@@ -2422,7 +2601,7 @@
         						</div>
         						<input type='hidden' name='attr_agility_rank' value='1d4!' />
         						<input type='hidden' name='attr_agility_display' value='1d4' />
-        						<input type='hidden' name='attr_rolltAgility' value='{{name=@{character_name} }} {{trait=Agility}} {{skill_rank=@{agility_display} }} {{skill_roll=[[@{agility_rank} + @{agrollMod}+ @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{agilitymod} + @{agrollMod} + @{ModSumEnc}[Wounds, Fatigue, Encumbrance] + @{traitmods} ]]}}' />
+        						<input type='hidden' name='attr_rolltAgility' value='{{name=@{character_name} }} {{trait=^{agility}}} {{skill_rank=@{agility_display} }} {{skill_roll=[[@{agility_rank} + @{agrollMod}+ @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{agilitymod} + @{agrollMod} + @{ModSumEnc}[Wounds, Fatigue, Encumbrance] + @{traitmods} ]]}}' />
                             </div>
                             <div class='sheet-basetrait'>
                                 <button class="sheet-traitbutton sheet-traitflexattbutton" type='roll' name='roll_tSmartsRoll' title="@{tSmartsRoll}" value='@{whispersmarts} &{template:roll} @{rolltSmarts} @{setmods} @{showtraitmods}' data-i18n="smarts"> Smarts</button>
@@ -2442,7 +2621,7 @@
         						</div>
         						<input type='hidden' name='attr_smarts_rank' value='1d4!' />
         						<input type='hidden' name='attr_smarts_display' value='1d4' />
-        						<input type='hidden' name='attr_rolltSmarts' value='{{name=@{character_name} }} {{trait=Smarts}} {{skill_rank=@{smarts_display} }} {{skill_roll=[[@{smarts_rank} + @{smrollMod}+ @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{smartsmod} + @{smrollMod} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods}]]}}' />
+        						<input type='hidden' name='attr_rolltSmarts' value='{{name=@{character_name} }} {{trait=^{smarts}}} {{skill_rank=@{smarts_display} }} {{skill_roll=[[@{smarts_rank} + @{smrollMod}+ @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{smartsmod} + @{smrollMod} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods}]]}}' />
                             </div>
                             <div class='sheet-basetrait'>
                                 <button class="sheet-traitbutton sheet-traitflexattbutton" type='roll' name='roll_tSpiritRoll' title="@{tSpiritRoll}" value='@{whisperspirit} &{template:roll} @{rolltSpirit} @{setmods} @{showtraitmods}' data-i18n="spirit"> Spirit</button>
@@ -2462,7 +2641,7 @@
         						</div>
         						<input type='hidden' name='attr_spirit_rank' value='1d4!' />
         						<input type='hidden' name='attr_spirit_display' value='1d4' />
-        						<input type='hidden' name='attr_rolltSpirit' value='{{name=@{character_name} }} {{trait=Spirit}} {{skill_rank=@{spirit_display} }} {{skill_roll=[[@{spirit_rank} + @{sprollMod}+ @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{spiritmod} + @{sprollMod} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]]}}' />
+        						<input type='hidden' name='attr_rolltSpirit' value='{{name=@{character_name} }} {{trait=^{spirit}}} {{skill_rank=@{spirit_display} }} {{skill_roll=[[@{spirit_rank} + @{sprollMod}+ @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{spiritmod} + @{sprollMod} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]]}}' />
                             </div>
                             <div class='sheet-basetrait'>
                                 <button class="sheet-traitbutton sheet-traitflexattbutton" type='roll' name='roll_tStrengthRoll' title="@{tStrengthRoll}" value='@{whisperstrength} &{template:roll} @{rolltStrength} @{setmodsenc} @{showtraitmods}' data-i18n="strength"> Strength</button>
@@ -2482,7 +2661,7 @@
         						</div>
         						<input type='hidden' name='attr_strength_rank' value='1d4!' />
         						<input type='hidden' name='attr_strength_display' value='1d4' />
-        						<input type='hidden' name='attr_rolltStrength' value='{{name=@{character_name} }} {{trait=Strength}} {{skill_rank=@{strength_display} }} {{skill_roll=[[@{strength_rank} + @{strollMod}+ @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{strengthmod} + @{strollMod} + @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods} ]]}}' />
+        						<input type='hidden' name='attr_rolltStrength' value='{{name=@{character_name} }} {{trait=^{strength}}} {{skill_rank=@{strength_display} }} {{skill_roll=[[@{strength_rank} + @{strollMod}+ @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{strengthmod} + @{strollMod} + @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods} ]]}}' />
                             </div>
                             <div class='sheet-basetrait'>
                                 <button class="sheet-traitbutton sheet-traitflexattbutton" type='roll' name='roll_tVigorRoll' title="@{tVigorRoll}" value='@{whispervigor} &{template:roll} @{rolltVigor} @{setmods} @{showtraitmods}' data-i18n="vigor"> Vigor</button>
@@ -2502,7 +2681,7 @@
         						</div>
         						<input type='hidden' name='attr_vigor_rank' value='1d4!' />
         						<input type='hidden' name='attr_vigor_display' value='1d4' />
-        						<input type='hidden' name='attr_rolltVigor' value='{{name=@{character_name} }} {{trait=Vigor}} {{skill_rank=@{vigor_display} }} {{skill_roll=[[@{vigor_rank} + @{virollMod}+ @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{vigormod} + @{virollMod} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]]}}' />
+        						<input type='hidden' name='attr_rolltVigor' value='{{name=@{character_name} }} {{trait=^{vigor}}} {{skill_rank=@{vigor_display} }} {{skill_roll=[[@{vigor_rank} + @{virollMod}+ @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{vigormod} + @{virollMod} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]]}}' />
                             </div>
                         </div>
                         <div class="sheet-base sheet-AttsSum">
@@ -2514,10 +2693,11 @@
 
                             <button class="sheet-traitbutton" type='roll' name='roll_StrengthSumRoll' value='&{template:roll} @{rolltStrength} @{setmodsenc} @{showtraitmods}'><span data-i18n="strength-abbr">Str</span>: <span name='attr_strength_display'></span></button>,
 
-                            <button class="sheet-traitbutton" type='roll' name='roll_VigorSumRoll' value='&{template:roll} @{rolltVigor} @{setmods} @{showtraitmods}'><span data-i18n="vigor-abbr">Vig</span>: <span name='attr_vigor_display'></span></button>
+                            <!--<button class="sheet-traitbutton" type='roll' name='roll_VigorSumRoll' value='&{template:roll} @{rolltVigor} @{setmods} @{showtraitmods}'><span data-i18n="vigor-abbr">Vig</span>: <span name='attr_vigor_display'></span></button>-->
+							<button class="sheet-traitbutton" type='roll' name='roll_VigorSumRoll' value='%{@{character_name}|tVigorRoll}'><span data-i18n="vigor-abbr">Vig</span>: <span name='attr_vigor_display'></span></button>
                         </div>
                         <input type="checkbox" class="sheet-hideskillsconfig" /><span class="sheet-skillList"></span>
-                        <h1 class='sheet-colHeader'>Skills</h1>
+                        <h1 class='sheet-colHeader' data-i18n="skills">Skills</h1>
                         <input type="checkbox" class="sheet-hideSkills" name="attr_hideSkills" /><span class="sheet-showhide"></span>
                         <!--<div class="sheet-base sheet-isSkillList">-->
                         <div class="sheet-base sheet-isSkillConfig">
@@ -2543,7 +2723,7 @@
         						<span class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="StaticSkill" type="checkbox" name="attr_staticHealing" style='width:15px;' /><span></span> <span data-i18n="healing">Healing</span></label></span>
         						<span class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="StaticSkill" type="checkbox" name="attr_staticIntimidation" style='width:15px;' /><span></span> <span data-i18n="intimidation">Intimidation</span></label></span>
         						<span class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="StaticSkill" type="checkbox" name="attr_staticInvestigation" style='width:15px;' /><span></span> <span data-i18n="investigation">Investigation</span></label></span>
-								<span class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="StaticSkill" type="checkbox" name="attr_staticLanguage" style='width:15px;' /><span></span> <span data-i18n="language">Language</span></label></span>
+								<span class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="StaticSkill" type="checkbox" name="attr_staticLanguage" style='width:15px;' /><span></span> <span data-i18n="native-language">Native Language</span></label></span>
         						<span class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="StaticSkill" type="checkbox" name="attr_staticLockpicking" style='width:15px;' /><span></span> <span data-i18n="lockpicking">Lockpicking</span></label></span>
         						<span class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="StaticSkill" type="checkbox" name="attr_staticNotice" style='width:15px;' /><span></span> <span data-i18n="notice">Notice</span></label></span>
 								<span class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="StaticSkill" type="checkbox" name="attr_staticOccult" style='width:15px;' /><span></span> <span data-i18n="occult">Occult</span></label></span>
@@ -2588,6 +2768,7 @@
         						<input type='hidden' name='attr_unskilled_display' value='1d4-2' />
         						<input type='hidden' name='attr_rolltUnskilled' value='{{name=@{character_name} }} {{trait=^{unskilled}}} {{skill_rank=@{unskilled_display} }} {{skill_roll=[[@{unskilled_rank} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} + (@{UnskilledEncumbrance}*@{encumbrance})[Encumbrance Penalty]]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! -2[Unskilled Penalty] + {0,@{JackOfAllTrades}}kh1[Jack of All Trades Modifier] + @{ModSum}[Modifiers] +(@{UnskilledEncumbrance}*@{encumbrance})[Encumbrance Penalty] ]] }}' />
         						<input type="hidden" name="attr_unskilledencumbrancebutton" value="@{setmods}" />
+								<input type="hidden" name="attr_unskilledrollformula" value="@{unskilled_rank} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} + (@{UnskilledEncumbrance}*@{encumbrance})[Encumbrance Penalty]" />
                             </div>
                             <!-- Fighting -->
                             <div class='sheet-basetrait'>
@@ -2609,7 +2790,8 @@
         						<input type='hidden' name='attr_fighting_rank' value='1d4!' />
         						<input type='hidden' name='attr_fighting_display' value='1d4' />
         						<input type='hidden' name='attr_rolltFighting' value='{{name=@{character_name} }} {{skill_rank=@{fighting_display} }} {{skill_roll=[[@{fighting_rank} + @{FightingskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{FightingMod} + @{FightingskillMod} + @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods} ]]}}' />
-        						<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
+								<input type="hidden" name="attr_fightingrollformula" value="@{fighting_rank} + @{FightingskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods}" />
+								<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
         						<div class='sheet-SkillSpec'>
         						    <fieldset class="repeating_fightingspec">
         						        <button class="sheet-traitbutton sheet-smallskillflexattbutton" type='roll' name='roll_tFightingSpecRoll' title="@{tFightingSpecRoll}" value='@{whisperfighting} &{template:roll} {{trait=@{fightingSpecName} }} @{rolltFighting}'></button>
@@ -2684,7 +2866,7 @@
         						    <span class="sheet-ModDesc" data-i18n="linked-attribute">Linked Attribute</span>
         						    <select class="sheet-LinkedAttSelect" name="attr_linkedathleticsatt">
         						        <option value="(AGL)" data-i18n="agility" selected >Agility</option>
-    									<option value="(SMA)" selected data-i18n="smarts">Smarts</option>
+    									<option value="(SMA)" data-i18n="smarts">Smarts</option>
     									<option value="(SPI)" data-i18n="spirit">Spirit</option>
     									<option value="(STR)" data-i18n="strength">Strength</option>
     									<option value="(VIG)" data-i18n="vigor">Vigor</option>
@@ -2698,6 +2880,7 @@
         						<input type='hidden' name='attr_athletics_rank' value='1d4!' />
         						<input type='hidden' name='attr_athletics_display' value='1d4' />
         						<input type='hidden' name='attr_rolltAthletics' value='{{name=@{character_name} }} {{skill_rank=@{athletics_display} }} {{skill_roll=[[@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{AthleticsMod} + @{AthleticsskillMod} + @{linkedathleticsattformula} + @{traitmods} ]]}}' />
+								<input type="hidden" name="attr_athleticsrollformula" value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}" />
         						<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
         						<div class='sheet-SkillSpec'>
         						    <fieldset class="repeating_athleticsspec">
@@ -2901,7 +3084,8 @@
         						<input type='hidden' name='attr_faith_rank' value='1d4!' />
         						<input type='hidden' name='attr_faith_display' value='1d4' />
         						<input type='hidden' name='attr_rolltFaith' value='{{name=@{character_name} }} {{skill_rank=@{faith_display} }} {{skill_roll=[[@{faith_rank} + @{FaithskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{FaithMod} + @{FaithskillMod} + @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods} ]]}}' />
-        						<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
+								<input type="hidden" name="attr_faithrollformula" value="@{faith_rank} + @{FaithskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods}" />
+								<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
         						<div class='sheet-SkillSpec'>
         						    <fieldset class="repeating_faithspec">
         						        <button class="sheet-traitbutton sheet-smallskillflexattbutton" type='roll' name='roll_tFaithSpecRoll' title="@{tFaithSpecRoll}" value='@{whisperfaith} &{template:roll} {{trait=@{faithSpecName} }} @{rolltFaith}'></button>
@@ -2930,6 +3114,7 @@
         						<input type='hidden' name='attr_focus_rank' value='1d4!' />
         						<input type='hidden' name='attr_focus_display' value='1d4' />
         						<input type='hidden' name='attr_rolltFocus' value='{{name=@{character_name} }} {{skill_rank=@{focus_display} }} {{skill_roll=[[@{focus_rank} + @{FocusskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{FocusMod} + @{FocusskillMod} + @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods} ]]}}' />
+								<input type="hidden" name="attr_focusrollformula" value="@{focus_rank} + @{FocusskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods}" />
         						<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
         						<div class='sheet-SkillSpec'>
         						    <fieldset class="repeating_focusspec">
@@ -3115,7 +3300,7 @@
 							<!-- Language -->
                             <input class="sheet-StaticSkill" type="checkbox" name="attr_staticLanguage" style='display:none;'/>
                             <div class='sheet-basetrait sheet-staticLanguage'>
-                                <button class="sheet-traitbutton sheet-skillflexattbutton" type='roll' name='roll_tLanguageRoll' title="@{tLanguageRoll}" value='@{whisperlanguage} &{template:roll} {{trait=^{language}}} @{rolltLanguage} @{setmods} @{showtraitmods}' data-i18n="language"> Language</button><span class='sheet-linkedAtt' data-i18n="sma-u">(SMA)</span>
+                                <button class="sheet-traitbutton sheet-skillflexattbutton" type='roll' name='roll_tLanguageRoll' title="@{tLanguageRoll}" value='@{whisperlanguage} &{template:roll} {{trait=^{language}}} @{rolltLanguage} @{setmods} @{showtraitmods}' data-i18n="native-language">Native Language</button><span class='sheet-linkedAtt' data-i18n="sma-u">(SMA)</span>
                                 <span class="sheet-attrankselect"><select name="attr_language" title="@{Language}" class="sheet-traitdie" value="4">
                                     <option value="4">d4</option>
     								<option value="6">d6</option>
@@ -3249,7 +3434,8 @@
         						<input type='hidden' name='attr_performance_rank' value='1d4!' />
         						<input type='hidden' name='attr_performance_display' value='1d4' />
         						<input type='hidden' name='attr_rolltPerformance' value='{{name=@{character_name} }} {{skill_rank=@{performance_display} }} {{skill_roll=[[@{performance_rank} + @{PerformanceskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{PerformanceMod} + @{PerformanceskillMod} + @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods} ]]}}' />
-        						<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
+								<input type="hidden" name="attr_performancerollformula" value="@{performance_rank} + @{PerformanceskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods}" />
+								<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
         						<div class='sheet-SkillSpec'>
         						    <fieldset class="repeating_performancespec">
         						        <button class="sheet-traitbutton sheet-smallskillflexattbutton" type='roll' name='roll_tPerformanceSpecRoll' title="@{tPerformanceSpecRoll}" value='@{whisperperformance} &{template:roll} {{trait=@{performanceSpecName} }} @{rolltPerformance}'></button>
@@ -3357,6 +3543,7 @@
         						<input type='hidden' name='attr_psionics_rank' value='1d4!' />
         						<input type='hidden' name='attr_psionics_display' value='1d4' />
         						<input type='hidden' name='attr_rolltPsionics' value='{{name=@{character_name} }} {{skill_rank=@{psionics_display} }} {{skill_roll=[[@{psionics_rank} + @{PsionicsskillMod}+ @{linkedpsionicsattformula} + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{PsionicsMod} + @{PsionicsskillMod} + @{linkedpsionicsattformula} + @{traitmods} ]]}}' />
+								<input type="hidden" name="attr_psionicsrollformula" value="@{psionics_rank} + @{PsionicsskillMod}+ @{linkedpsionicsattformula} + @{traitmods}" />
         						<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
         						<div class='sheet-SkillSpec'>
         						    <fieldset class="repeating_psionicsspec">
@@ -3495,6 +3682,7 @@
         						<input type='hidden' name='attr_ritual_rank' value='1d4!' />
         						<input type='hidden' name='attr_ritual_display' value='1d4' />
         						<input type='hidden' name='attr_rolltRitual' value='{{name=@{character_name} }} {{skill_rank=@{ritual_display} }} {{skill_roll=[[@{ritual_rank} + @{RitualskillMod}+ @{linkedritualattscoreformula} + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{RitualMod} + @{RitualskillMod} + @{linkedritualattscoreformula} + @{traitmods} ]]}}' />
+								<input type="hidden" name="attr_ritualrollformula" value="@{ritual_rank} + @{RitualskillMod}+ @{linkedritualattscoreformula} + @{traitmods}" />
         						<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
         						<div class='sheet-SkillSpec'>
         						    <fieldset class="repeating_ritualspec">
@@ -3553,6 +3741,7 @@
         						<input type='hidden' name='attr_shooting_rank' value='1d4!' />
         						<input type='hidden' name='attr_shooting_display' value='1d4' />
         						<input type='hidden' name='attr_rolltShooting' value='{{name=@{character_name} }} {{skill_rank=@{shooting_display} }} {{skill_roll=[[@{shooting_rank} + @{ShootingskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{ShootingMod} + @{ShootingskillMod} + @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods} ]]}}' />
+								<input type="hidden" name="attr_shootingrollformula" value="@{shooting_rank} + @{ShootingskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods}" />
         						<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
         						<div class='sheet-SkillSpec'>
         						    <fieldset class="repeating_shootingspec">
@@ -3604,6 +3793,7 @@
         						<input type='hidden' name='attr_spellcasting_rank' value='1d4!' />
         						<input type='hidden' name='attr_spellcasting_display' value='1d4' />
         						<input type='hidden' name='attr_rolltSpellcasting' value='{{name=@{character_name} }} {{skill_rank=@{spellcasting_display} }} {{skill_roll=[[@{spellcasting_rank} + @{SpellcastingskillMod}+ @{linkedspellcastingattscoreformula} + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{SpellcastingMod} + @{SpellcastingskillMod} + @{linkedspellcastingattscoreformula} + @{traitmods} ]]}}' />
+								<input type="hidden" name="attr_spellcastingrollformula" value="@{spellcasting_rank} + @{SpellcastingskillMod}+ @{linkedspellcastingattscoreformula} + @{traitmods}" />
         						<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
         						<div class='sheet-SkillSpec'>
         						    <fieldset class="repeating_spellcastingspec">
@@ -3807,6 +3997,7 @@
         						<input type='hidden' name='attr_throwing_rank' value='1d4!' />
         						<input type='hidden' name='attr_throwing_display' value='1d4' />
         						<input type='hidden' name='attr_rolltThrowing' value='{{name=@{character_name} }} {{skill_rank=@{throwing_display} }} {{skill_roll=[[@{throwing_rank} + @{ThrowingskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{ThrowingMod} + @{ThrowingskillMod} + @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods} ]]}}' />
+								<input type="hidden" name="attr_throwingrollformula" value="@{throwing_rank} + @{ThrowingskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance] + @{traitmods}" />
         						<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
         						<div class='sheet-SkillSpec'>
         						    <fieldset class="repeating_throwingspec">
@@ -3887,6 +4078,7 @@
         						<input type='hidden' name='attr_weirdscience_rank' value='1d4!' />
         						<input type='hidden' name='attr_weirdscience_display' value='1d4' />
         						<input type='hidden' name='attr_rolltWeirdScience' value='{{name=@{character_name} }} {{skill_rank=@{weirdscience_display} }} {{skill_roll=[[@{weirdscience_rank} + @{WeirdScienceskillMod}+ @{linkedweirdscienceattscoreformula} + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{WeirdScienceMod} + @{WeirdScienceskillMod} + @{linkedweirdscienceattscoreformula} + @{traitmods} ]]}}' />
+								<input type="hidden" name="attr_weirdsciencerollformula" value="@{weirdscience_rank} + @{WeirdScienceskillMod}+ @{linkedweirdscienceattscoreformula} + @{traitmods}" />
         						<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
         						<div class='sheet-SkillSpec'>
         						    <fieldset class="repeating_weirdsciencespec">
@@ -3900,7 +4092,7 @@
                             <div class='sheet-base sheet-staticOther'>
                                 <fieldset class="repeating_skills">
                                     <div class='sheet-basetrait'>
-                                        <button class="sheet-traitbutton sheet-smallskillflexattbutton" type='roll' name='roll_tSkillRoll' value='@{whisperskillname} &{template:roll} {{trait=@{SkillName} }} @{rolltSkill} @{linkedotherattscorebutton} @{showtraitmods}'></button>
+                                        <button class="sheet-traitbutton sheet-smallskillflexattbutton" type='roll' name='roll_tSkillRoll' value='@{whisperskillname} &{template:roll} {{trait=@{SkillName}}} @{rolltSkill} @{linkedotherattscorebutton} @{showtraitmods}'></button>
                                         <input class="sheet-otherskill" type="text" name="attr_SkillName" placeholder="Skill" data-i18n-placeholder="skill" />
                                         <div class='sheet-linkedAtt'>
                                             <input class="sheet-LAA" type='checkbox' name='attr_linkedotherattscore' style="display:none;" value="(AGL)" />
@@ -3992,12 +4184,18 @@
     					<div class='sheet-vertLeft'><span class="sheet-bigger" data-i18n="fatigue">Fatigue</span></div>
     					<input type='checkbox' class="sheet-showWoundmod" name='attr_showWoundmods' style="display: none;" />
     					<div class='sheet-basetrait sheet-woundmod'>
-    					    <span data-i18n="max-wounds">Max Wounds</span>: <input class="sheet-standardHealth" type="number" name="attr_wounds_max" title="@{wounds_max}" value="3" />
-    					    <select name="attr_NoS" title="@{NoS}" class="sheet-NoS" value="0">
+    					    <span data-i18n="max-wounds">Max Wounds</span>: <input class="sheet-standardHealth" type="number" name="attr_wounds_max" title="@{wounds_max}" value="3" /><br />
+    					    <!--<select name="attr_NoS" title="@{NoS}" class="sheet-NoS" value="0">
     							<option value="0" title="@{NoS}" data-i18n="no-nerves-of-steel">No Nerves of Steel</option>
     							<option value="-1" title="@{NoS}" data-i18n="nerves-of-steel">Nerves of Steel</option>
     							<option value="-2" title="@{NoS}" data-i18n="improved-nerves-of-steel">Improved Nerves of Steel</option>
-    						</select>
+    						</select>-->
+							<h5 data-i18n="wound-modifiers">Wound Modifiers</h5>
+							<div class="sheet-nerves">
+								<label class="sheet-healthlabel" data-i18n="reduce">Reduce</label>: <input class="sheet-standardHealthInfo" type="text" name="attr_reducereason" placeholder="Edges/Abilities that reduce Wound Mods" /> <input class="sheet-standardHealth" type="number" name="attr_reducewoundsby" value="0" /><br />
+								<label class="sheet-healthlabel" data-i18n="increase">Increase</label>: <input class="sheet-standardHealthInfo" type="text" name="attr_increasereason" placeholder="Hindrances/Abilities that reduce Wound Mods" /> <input class="sheet-standardHealth" type="number" name="attr_increasewoundsby" value="0" /><br />
+								<label class="sheet-healthlabel" data-i18n="maximum">Maximum</label>: <input class="sheet-standardHealthInfo" type="text" name="attr_maxreason" placeholder="Edges/Abilities that change the # of Wound Mods" /> <input class="sheet-standardHealth" type="number" name="attr_maxwoundmods" value="-3" />
+							</div>
     					</div>
     					<input type='checkbox' class="sheet-showFatiguemod" name='attr_showFatiguemods' style="display: none;" />
     					<div class='sheet-basetrait sheet-fatiguedmod'>
@@ -4021,6 +4219,18 @@
 							<div class="sheet-derivecurrent">&nbsp;</div>
 							<div class="sheet-derivemisc">&nbsp;</div>
 					    </div>
+						<!-- Unshake Button -->
+						<input class="sheet-useunshakebutton" type="checkbox" name="attr_showunshake" style='display:none;' checked />
+						<div class='sheet-basetrait sheet-unshakebutton'>
+							<button class="sheet-traitbutton sheet-skillflexattbutton sheet-unshake" type='roll' name='roll_unshakeroll' title="@{unshakeroll}" value='@{whisperunshake} &{template:unshake} @{rolltunshake}' data-i18n="unshake"> Unshake</button>
+							<input class='sheet-moremods' type='checkbox' name='attr_showunshakerollmod' /><span>y</span>
+							<div class='sheet-basetrait sheet-traitmodplus'>
+								<input type='text' class='sheet-ModDesc' name='attr_unshakemodtype' placeholder='Modifier due to edges, hindrances, etc' data-i18n-placeholder="att-mod-description" />
+								+<input class="sheet-otraitmod" type="number" name="attr_unshakemod" title="@{unshakemod}" value="0" /><br />
+								<input type='checkbox' value='/w gm' name='attr_whisperunshake' /> <span class='sheet-ModDesc' data-i18n="whisper-roll-to-gm">Whisper roll to GM</span>
+							</div>
+							<input type='hidden' name='attr_rolltunshake' value='{{name=@{character_name} }} {{skill_roll=[[@{spirit_rank} [Spirit] + @{sprollMod} + @{unshakemod} [@{unshakemodtype}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! [Wild Die] + @{spiritmod} + @{sprollMod} + @{unshakemod} [@{unshakemodtype}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]]}}' />
+						</div>
     					<!-- Derived Stats -->
     					<input class='sheet-useConviction' type='checkbox' name='attr_useConviction' style="display: none" />
     					<div class="sheet-base sheet-corederived sheet-conviction">
@@ -4053,7 +4263,7 @@
     					    </div>
     					    <!-- Pace -->
     					    <div class="sheet-basederived">
-    					        <div class="sheet-derivelabel"><button class="sheet-traitbutton sheet-traitflexattbutton" type='roll' name='roll_tAgilityRoll' title="@{tAgilityRoll}" value='/em runs [[@{paceCur}+@{runningDie}]]' data-i18n="pace">&nbsp;Pace</button></div>
+    					        <div class="sheet-derivelabel"><button class="sheet-traitbutton sheet-deriveflexbutton" type='roll' name='roll_RunningRoll' title="@{RunningRoll}" value='/em runs [[@{paceCur}+@{runningDie}]]' data-i18n="pace">&nbsp;Pace</button></div>
     					        <div class="sheet-derivebase"><input type="number" name="attr_pace" title="@{pace}" class="sheet-derivedStat" style="text-align: center;" value="6" /></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_paceMod" title="@{paceMod}" class="sheet-derivedStat" value="0" /></div>
     							<div class="sheet-derivecurrent"><input type="number" name="attr_paceCur" title="@{paceCur}" class="sheet-derivedStat" value="" readonly />
@@ -4071,7 +4281,7 @@
     					    </div>
     					    <!-- Parry -->
     					    <div class="sheet-basederived">
-    					        <div class="sheet-derivelabel">Parry</div>
+    					        <div class="sheet-derivelabel" data-i18n="parry">Parry</div>
     					        <div class="sheet-derivebase"><input type="number" name="attr_parry" title="@{parry}" class="sheet-derivedStat" style='color: black;' readonly /></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_parryMod" title="@{parryMod}" class="sheet-derivedStat" value="0" /></div>
     							<div class="sheet-derivecurrent"><input type="number" name="attr_parryCur" title="@{parryCur}" class="sheet-derivedStat" readonly /></div>
@@ -4239,7 +4449,8 @@
     							<div class="sheet-derivecurrent">&nbsp;</div>
     							<div class="sheet-derivemisc">&nbsp;</div>
     					    </div>
-    					    <div class="sheet-basederived" style='font-weight: bold; font-size: .75em; margin-top: 5px; margin-bottom: -3px;'>
+							<input class="sheet-useLoad" type="checkbox" name="attr_useLoad" style="display:none;" checked />
+    					    <div class="sheet-basederived sheet-loadstuff" style='font-weight: bold; font-size: .75em; margin-top: 5px; margin-bottom: -3px;'>
     					        <div class="sheet-derivelabel sheet-loadstuff">&nbsp;</div>
     					        <div class="sheet-derivebase" data-i18n="mod">Mod</div>
     					        <div class="sheet-derivemod" data-i18n="limit">Limit</div>
@@ -4247,6 +4458,7 @@
     					        <div class="sheet-derivemisc" data-i18n="penalty">Penalty</div>
     					    </div>
     					    <!-- Encumbrance -->
+							<input class="sheet-useLoad" type="checkbox" name="attr_useLoad" style="display:none;" checked />
     					    <div class="sheet-basederived sheet-loadstuff">
     					        <div class="sheet-derivelabel">Load</div>
     					        <div class="sheet-derivebase"><input type="number" class="sheet-derivedStat" name="attr_loadlimitmod" style="text-align:center;" title="@{loadlimitmod}" value="0"/></div>
@@ -4270,6 +4482,7 @@
         						</div>
         					</div>
         					<!-- Money -->
+							<input type="checkbox" class="sheet-usewealth" name="attr_usewealth" style="display: none;" />
         					<input type="checkbox" class="sheet-useLankhmar" name="attr_50fPo8Clams" value="3" style="display: none;"/>
         					<div class="sheet-basederived sheet-lankhmar" style='font-weight: bold; font-size: .75em; margin-top: 5px; margin-bottom: -3px;'>
     					        <div class="sheet-derivelabel">&nbsp;</div>
@@ -4278,7 +4491,7 @@
     					        <div class="sheet-derivecurrent" data-i18n="silver-smerduks">Smerduks</div>
     					        <div class="sheet-derivemisc" data-i18n="gold-rilks">Rilks</div>
     					    </div>
-    					    <div class="sheet-basederived">
+    					    <div class="sheet-basederived sheet-nonwealth">
     					        <input type="hidden" class="sheet-usePieces" value="0" name="attr_50fPo8Clams" />
     					        <!-- Labels -->
     					        <div class="sheet-derivelabel sheet-money" data-i18n="money">Money</div>
@@ -4287,11 +4500,25 @@
     					        <div class="sheet-derivelabel sheet-Credits" data-i18n="money-credits">Credits</div>
     					        <div class="sheet-derivelabel sheet-Livre" data-i18n="livre">Livre</div>
     					        <!-- Money Fields -->
-    					        <div class="sheet-derivebase"><input class="sheet-derivedStat" type="number" name="attr_money" title="@{money}" value="0" /></div>
-    							<div class="sheet-derivemod sheet-lankhmar"><input type="number" name="attr_bagols" title="@{bagols}" class="sheet-derivedStat" value="0" /></div>
-    							<div class="sheet-derivecurrent sheet-lankhmar"><input type="number" name="attr_ssmerduks" title="@{ssmerduks}" class="sheet-derivedStat" value="0" /></div>
-    							<div class="sheet-derivemisc sheet-lankhmar"><input type="number" name="attr_grilks" title="@{grilks}" class="sheet-derivedStat" value="0" /></div>
+    					        <div class="sheet-derivebase"><input class="sheet-derivedStat sheet-moneyfield" type="number" step="any" name="attr_money" title="@{money}" value="0" /></div>
+    							<div class="sheet-derivemod sheet-lankhmar"><input type="number" step="any" name="attr_bagols" title="@{bagols}" class="sheet-derivedStat" value="0" /></div>
+    							<div class="sheet-derivecurrent sheet-lankhmar"><input type="number" step="any" name="attr_ssmerduks" title="@{ssmerduks}" class="sheet-derivedStat" value="0" /></div>
+    							<div class="sheet-derivemisc sheet-lankhmar"><input type="number" step="any" name="attr_grilks" title="@{grilks}" class="sheet-derivedStat" value="0" /></div>
     					    </div>
+							<div class="sheet-basederived sheet-usewealth">
+								<!-- Label -->
+								<div class="sheet-derivelabel sheet-wealth"><button class="sheet-traitbutton sheet-deriveflexbutton" type='roll' name='roll_WealthRoll' value="@{rollwealth}" data-i18n="wealth">&nbsp;Wealth</button></div>
+								<!-- Wealth Field -->
+								<select class='sheet-derivebaseplus' name="attr_wealth">
+									<option value="d0">Broke</option>
+									<option value="d4">d4</option>
+									<option value="d6" selected>d6</option>
+									<option value="d8">d8</option>
+									<option value="d10">d10</option>
+									<option value="d12">d12</option>
+								</select>
+								<input type='hidden' name='attr_rollwealth' value="&{template:roll} {{name=@{character_name} }} {{trait=Wealth}} {{skill_rank=@{wealth} }} {{skill_roll=[[1@{wealth}! + @{traitmods}]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{traitmods}]]}} {{wild_die=[[ 1d@{wilddie}! + @{traitmods} ]]}}" />
+							</div>
         					<!-- End Money -->
     					</div>
     					<input type="hidden" name="attr_ModSum" value="0"> <!-- ttmod-woundsMod-fatigue -->
@@ -4384,7 +4611,7 @@
                         <div class='sheet-base sheet-edges'>
                             <fieldset class="repeating_edges">
                                 <div class="sheet-base sheet-hindranceNedge">
-                                    <button type='roll' class="sheet-edgeOutput" name='roll_tHindrance' value="@{whisperDeets} &{template:description} {{name=@{character_name}}} {{type=Edge}} {{item=@{edge}}} {{description=@{edgedescription}}}">w</button>
+                                    <button type='roll' class="sheet-edgeOutput" name='roll_tHindrance' value="@{whisperEdgeDeets} &{template:info} {{name=@{character_name}}} {{type=Edge}} {{item=@{edge}}} {{description=@{edgedescription}}}">w</button>
                                     <input class="sheet-edgefield" type="text" name="attr_edge" title="@{repeating_edges_$#_edge}" style='width:90%;' />
                                     <input class='sheet-moremods' type='checkbox' name='attr_showEdgeDesc' checked /><span>y</span>
             						<div class='sheet-basetrait sheet-traitmodplus'>
@@ -4438,27 +4665,31 @@
 						<span class="sheet-weaponHeader sheet-weaponItem sheet-weaponcarried" data-i18n="carried">Carried</span>
 						<hr class="sheet-weaponItem sheet-hr" />
 						<input type='hidden' name='attr_vbonusdamage' value='1d6!' />
+						<input class="sheet-vdamage" type="checkbox" name="attr_RaiseHBRule" value="2" style="display: none;" />
 						<fieldset class="repeating_weapons" style="width: 100%;">
 						    <!--<div class='sheet-weaponitem'>-->
 						    <div class='sheet-weapons'>
-    						    <button type='roll' class="sheet-weaponItem sheet-button" name='roll_tWeapon' value="@{weaponroll}"><input type="hidden" name="attr_weaponbutton" class="sheet-weaponbutton" value="1" /><span class="sheet-buttonand" data-i18n="attack-and-damage-abbr">Atk+Dmg</span><span class="sheet-buttondo" data-i18n="damage">Damage</span></button>
+    						    <button type='roll' class="sheet-weaponItem sheet-button" name='roll_tWeapon' value="@{weaponroll}"><input type="hidden" name="attr_weaponbutton" class="sheet-weaponbutton" value="1" /><span class="sheet-buttonand" data-i18n="attack-and-damage-abbr">Atk+Dmg</span><span class="sheet-buttondo" data-i18n="damage">Damage</span><span class="sheet-buttonma" data-i18n="multi-attack-and-damage-abbr">Atk<sup>x</sup>+Dmg</span></button>
     						    <button type='roll' style='display: none;' name='roll_dmg' value='@{damageOnly}'></button>
     						    <input type='text' class='sheet-weaponItem sheet-weapon' name='attr_weapon' data-i18n-placeholder="weapon" placeholder="Weapon" />
     						    <input type='text' class='sheet-weaponItem sheet-range' name='attr_range' data-i18n-placeholder="range" placeholder="Range" />
     						    <input type='number' class='sheet-weaponItem sheet-rof' name='attr_rof' data-i18n-placeholder="rate-of-fire-abbr" placeholder="ROF" />
-    						    <input type='text' class='sheet-weaponItem sheet-damage' name='attr_weapondamage' value="Str+d4" readonly />
+    						    <input type='hidden' class='sheet-weaponItem sheet-damage' name='attr_weapondamage' value="Str+d4" readonly />
+								<button type="action" name="act_wdamage" class="sheet-weaponItem sheet-damage sheet-invisbutton"><span name="attr_weapondamage"></span></button>
 								<input type="number" class='sheet-weaponItem sheet-weaponap' name='attr_weaponap' />
     						    <input type='number' class='sheet-weaponItem sheet-shots' name='attr_shots' data-i18n-placeholder="number-of-shots-shortened" placeholder="Shots" />
-    						    <input type='number' class='sheet-weaponItem sheet-weaponweight' name='attr_weaponweight' data-i18n-placeholder="weight-abbr" placeholder="Wt" />
+    						    <input type='number' class='sheet-weaponItem sheet-weaponweight' step="any" name='attr_weaponweight' data-i18n-placeholder="weight-abbr" placeholder="Wt" />
     						    <div class='sheet-weaponItem sheet-weaponcarried'><input type='checkbox' class='sheet-itemCarried sheet-isCarried' name='attr_weaponcarried' /><span class="sheet-isCarriedIcon"></span></div>
     						    <input class='sheet-moreweapon' type='checkbox' name='attr_showweaponconfig' checked /><span>y</span>
     						    <textarea name='attr_weaponnotes' class='sheet-weaponItem sheet-weaponnotes' data-i18n-placeholder="notes" placeholder="Notes"></textarea>
     						    <div class="sheet-weaponconfig">
-                                    <input type='checkbox' value='/w gm' name='attr_whisperweapon' /> <label class="sheet-configlabels" data-i18n="whisper-roll-to-gm">Whisper roll to GM</label><br />
+                                    <label class="sheet-configlabels sheet-configcheckbox"><input type='checkbox' value='/w gm' name='attr_whisperweapon' /> <span data-i18n="whisper-roll-to-gm">Whisper roll to GM</span></label><br />
         						    <label class="sheet-configlabels" data-i18n="button-behavior">Button Behavior</label>
+									<input class='sheet-showmultiattack' type="hidden" name="attr_showmulti" value="0" />
         						    <select name="attr_weaponbutton" class="sheet-weaponbutton">
             							<option value="0" data-i18n="attack-and-damage-abbr">Atk + Dmg</option>
             							<option value="1" data-i18n="damage-only" selected>Damage Only</option>
+										<option class="sheet-multiattack" value="2" data-i18n="multi-attack-and-damage-abbr">Atk^+Dmg</option>
             						</select>
             						<input type="hidden" name="attr_weaponbutton" class="sheet-weaponbutton" />
             						<div class='sheet-weaponskill'>
@@ -4472,6 +4703,7 @@
                 						</select>
             						</div>
             						<div class='sheet-weapondamage'>
+										<input type="checkbox" class="sheet-highlight" name="attr_highlightdamage" value="1" style="display: none;" />
             						    <label class='sheet-configlabels' data-i18n="damage">Damage</label>
             						    <select class='sheet-weaponatt' name="attr_damageatt">
                 							<option value="na" data-i18n="not-applicable-abbr">N/A</option>
@@ -4483,7 +4715,7 @@
                 						</select>
                 						+
                 						<input type="number" class="sheet-weaponnum" name="attr_dmgnumdice" style="text-align: right;" value="1" />
-                						<select name="attr_dmgdietype" class="sheet-dtype">
+										<select name="attr_dmgdietype" class="sheet-dtype">
         									<option value="d4!">d4</option>
         									<option value="d6!">d6</option>
         									<option value="d8!">d8</option>
@@ -4494,18 +4726,31 @@
         								 +
         								 <input type="text" class="sheet-weaponnum" name="attr_dmgbonusnum" />
             						</div>
+									<div class="sheet-vbonusdamage">
+										<label class='sheet-configlabels' data-i18n="bonus-damage-die-type">Bonus Damage Die Type</label>
+										<select name="attr_weaponsbdt" class="sheet-dtype">
+        									<option value="d4!">d4</option>
+        									<option value="d6!" selected>d6</option>
+        									<option value="d8!">d8</option>
+        									<option value="d10!">d10</option>
+        									<option value="d12!">d12</option>
+        									<option value="d20!">d20</option>
+        								 </select>
+									</div>
     						    </div>
 								<!-- Hidden Fields for the roll button(s), etc -->
 								<input type='hidden' name='attr_weaponroll' value='@{damageOnly}' />
-								<input type='hidden' name='attr_skillNDamage' value="@{whisperweapon} &{template:roll} {{trait=Fighting}} {{source=@{weapon}}} @{rolltFighting} {{button=y}} {{DmgRoll=[Roll Damage](~repeating_weapons_dmg) }}" /> <!--Used for Skill and Damage roll -->
+								<input type='hidden' name='attr_skillNDamage' value="@{whisperweapon} &{template:roll} {{trait=Fighting}} {{source=@{weapon}}} @{rolltFighting} {{button=y}} {{DmgRoll=[Roll Damage](~repeating_weapons_dmg) }} @{multiattack}" /> <!--Used for Skill and Damage roll -->
+								<input type="hidden" name='attr_multiattack' value='0' /> <!-- Used for Multiattack -->
 								<input type='hidden' name='attr_damageOnly' value='@{dmgTemplate}' /> <!-- Used for Damage Only -->
 								<!-- Build the Damage Roll Template Info -->
 								<input type='hidden' name='attr_weapondmg' value="@{strength_rank}+1d4!" /> <!-- the damage formula -->
-								<input type='hidden' name='attr_bonusdmg' value='1d6!' />
-								<input type='text' style='display: none;' name='attr_dmgTemplate' value='@{whisperweapon} &{template:damage} {{name=@{character_name}}} {{source=@{weapon} }} {{dmg_rank=@{weapondamage}}} {{dmg_roll=[[@{weapondmg} + @{damagemods}]]}} {{bonus_die=[[@{vbonusdamage}]]}} {{showap=[[1d0+@{weaponap}]]}} {{ap=@{weaponap}}} {{notes=@{weaponnotes}}} {{button=y}} {{DmgRoll=[Re-Roll Damage](~repeating_weapons_dmg) }}' />
+								<input type='hidden' name='attr_weaponsbonusdmg' value='@{vbonusdamage}' />
+								<input type='text' style='display: none;' name='attr_dmgTemplate' value='@{whisperweapon} &{template:damage} {{name=@{character_name}}} {{source=@{weapon} }} {{dmg_rank=@{weapondamage}}} {{dmg_roll=[[@{weapondmg} + @{damagemods}]]}} {{bonus_die=[[@{weaponsbonusdmg}]]}} {{showap=[[1d0+@{weaponap}]]}} {{ap=@{weaponap}}} {{notes=@{weaponnotes}}} {{button=y}} {{DmgRoll=[Re-Roll Damage](~repeating_weapons_dmg) }}' />
     				        </div>
 						</fieldset>
-						<div class='sheet-weaponTotalWeight' style="margin-left: 504px;"><!-- Set up the Total Weight Carried box -->
+						<input class="sheet-useLoad" type="checkbox" name="attr_useLoad" style="display:none;" checked />
+						<div class='sheet-weaponTotalWeight sheet-loadstuff' style="margin-left: 504px;"><!-- Set up the Total Weight Carried box -->
 							<div class='sheet-col' style='width:200px; text-align:right;'> <!-- Protection (240px)-->
 								<h4 class="sheet-weight"><span data-i18n="total-weapon-weight-carried">Total Weapon Weight Carried</span>:</h4>
 							</div>
@@ -4547,6 +4792,7 @@
         					    <h4 class="sheet-repeatingHeader sheet-duration" data-i18n="duration">Duration</h4>
         					    <h4 class="sheet-repeatingHeader sheet-invested" data-18n="power-point-abbr-u-invested">PP Invested</h4>
     					    </div>
+							<input class="sheet-vdamage" type="checkbox" name="attr_RaiseHBRule" value="2" style="display: none;" />
     					    <fieldset class='repeating_spells'>
     					        <div class='sheet-powerrow'>
     					            <div class="sheet-powerbutton">
@@ -4563,7 +4809,8 @@
         					            <input class='sheet-powerrange' type='text' name='attr_powerrange' data-i18n-placeholder='range' placeholder="Range" />
         					        </div>
         					        <div class="sheet-powerdamage">
-        					            <input class='sheet-powerdamage' type='text' name='attr_powerdamage' readonly />
+        					            <input type='hidden' name='attr_powerdamage' />
+										<button type="action" name="act_sdamage" class="sheet-powerdamage sheet-invisbutton"><span name="attr_powerdamage"></span></button>
         					        </div>
         					        <div class="sheet-duration">
         					            <input class='sheet-duration' type='text' name='attr_powerduration' data-i18n-placeholder='duration' placeholder="Duration" />
@@ -4573,9 +4820,10 @@
         					        </div>
     					        </div>
     						    <input class='sheet-morespell' type='checkbox' name='attr_showspellconfig' checked /><span>y</span>
-    					        <textarea name='attr_spellnotes' class='sheet-spellnotes' data-i18n-placeholder="notes" placeholder="Notes"></textarea>
+								<textarea name="attr_trappings" class='sheet-spelltrappings' data-i18n-placeholder="trappings" placeholder="Trappings"></textarea>
+								<textarea name='attr_spellnotes' class='sheet-spellnotes' data-i18n-placeholder="notes" placeholder="Notes"></textarea>
     						    <div class="sheet-spellconfig">
-                                    <label class="sheet-configlabels" data-i18n="whisper-roll-to-gm"><input type='checkbox' value='/w gm' name='attr_whisperspell' /> Whisper roll to GM</label><br />
+                                    <label class="sheet-configlabels sheet-configcheckbox"><input type='checkbox' value='/w gm' name='attr_whisperspell' /> <span data-i18n="whisper-roll-to-gm">Whisper roll to GM</span></label><br />
                                     <label class="sheet-configlabels" data-i18n="button-behavior">Button Behavior</label>
         						    <select name="attr_spellbutton" class="sheet-spellbutton">
         						        <option value="2" data-i18n="skill-only">Skill Only</option>
@@ -4597,6 +4845,7 @@
                 						</select>
             						</div>
             						<div class='sheet-spelldamage'>
+										<input type="checkbox" name="attr_shighlightdamage" class="sheet-highlight" value="1" style="display:none;" />
             						    <label class='sheet-configlabels' data-i18n="damage">Damage</label>
             						    <select class='sheet-spellatt' name="attr_spelldamageatt">
                 							<option value="na" data-i18n="not-applicable-abbr">N/A</option>
@@ -4619,6 +4868,17 @@
         								 +
         								 <input type="text" class="sheet-spellnum" name="attr_spelldmgbonusnum" value="0" />
             						</div>
+									<div class="sheet-vbonusdamage">
+										<label class='sheet-configlabels' data-i18n="bonus-damage-die-type">Bonus Damage Die Type</label>
+										<select name="attr_spellsbdt" class="sheet-dtype">
+        									<option value="d4!">d4</option>
+        									<option value="d6!" selected>d6</option>
+        									<option value="d8!">d8</option>
+        									<option value="d10!">d10</option>
+        									<option value="d12!">d12</option>
+        									<option value="d20!">d20</option>
+        								 </select>
+									</div>
             						<div class="sheet-spellnotesconfig">
             						    <label class='sheet-configlabels' data-i18n="show-notes-with-roll">Show notes with roll</label>
             						    <input type="checkbox" name="attr_shownotes" value="{{notes=@{spellnotes}}}" />
@@ -4630,11 +4890,15 @@
     								<input type='hidden' name='attr_skillOnly' value='@{skTemplate}' /> <!-- Used for Damage Only -->
     								<!-- Build the Damage Roll Template Info -->
     								<input type='hidden' name='attr_spelldmg' /> <!-- the damage formula -->
-    								<input type='hidden' name='attr_spellbonusdmg' value='1d6!' />
-    								<input type='text' style='display: none;' name='attr_spelldmgTemplate' value='@{whisperspell} &{template:damage} {{name=@{character_name}}} {{source=@{power} }} {{dmg_rank=@{powerdamage}}} {{dmg_roll=[[@{spelldmg} + @{damagemods}]]}} {{bonus_die=[[@{vbonusdamage}]]}} @{dmgshownotes} {{button=y}} {{DmgRoll=[Re-Roll Damage](~repeating_spells_spelldmg) }}' />
+    								<input type='hidden' name='attr_spellsbonusdmg' value='@{vbonusdamage}' />
+    								<input type='text' style='display: none;' name='attr_spelldmgTemplate' value='@{whisperspell} &{template:damage} {{name=@{character_name}}} {{source=@{power} }} {{trappings=@{trappings}}} {{dmg_rank=@{powerdamage}}} {{dmg_roll=[[@{spelldmg} + @{damagemods}]]}} {{bonus_die=[[@{spellsbonusdmg}]]}} @{dmgshownotes} {{button=y}} {{DmgRoll=[Re-Roll Damage](~repeating_spells_spelldmg) }}' />
     								<input type='hidden' name='attr_skTemplate' value='1d6!' />
     								<input type='hidden' name='attr_dmgshownotes' value='{{notes=@{spellnotes}}}' />
     						    </div>
+								<input class='sheet-spellconfigb' type='checkbox' name='attr_showspellconfig' style="display:none;" checked />
+								<div class="sheet-spellOutput">
+									<button type="roll" name="roll_spellinfo" class="sheet-hindranceOutput" value="&{template:info} {{name=@{character_name}}} {{item=@{power}}} {{trappings=@{trappings}}} {{Notes=@{spellnotes}}}">w</button>
+								</div>
     					    </fieldset>
     					</div><!-- End Powers -->
     					<hr class="sheet-sectionSeperator" />
@@ -4669,11 +4933,12 @@
 							    <option value=".5">50%</option>
 							    <option value="1">100%</option>
 							</select>
-							<input class="sheet-armorWeight" style="width:50px;" type="number" name="attr_ArmorTypeWeight" title="@{repeating_armor_$#_ArmorTypeWeight}" />
+							<input class="sheet-armorWeight" style="width:50px;" type="number" step="any" name="attr_ArmorTypeWeight" title="@{repeating_armor_$#_ArmorTypeWeight}" />
 							<div class="sheet-armorCarriedContainer"><input class="sheet-armorCarried sheet-isCarried" type="checkbox" name="attr_ArmorCarried" title="@{repeating_armor_$#_ArmorCarried}" checked /><span class="sheet-isCarriedIcon"></span></div>
 							<textarea class="sheet-armorDesc" name="attr_ArmorNotes" title="@{repeating_armor_$#_ArmorNotes}" style="height:50px;" placeholder="Description/Notes" data-i18n-placeholder="description-notes"></textarea>
 						</fieldset>
-						<div class='sheet-armorTotalWeight' style="margin-left: 504px;"><!-- Set up the Total Weight Carried box -->
+						<input class="sheet-useLoad" type="checkbox" name="attr_useLoad" style="display:none;" checked />
+						<div class='sheet-armorTotalWeight sheet-loadstuff' style="margin-left: 504px;"><!-- Set up the Total Weight Carried box -->
 							<div class='sheet-col' style='width:200px; text-align:right;'> <!-- Protection (240px)-->
 								<h4 class="sheet-weight"><span data-i18n="total-armor-weight-carried">Total Armor Weight Carried</span>:</h4>
 							</div>
@@ -4688,11 +4953,14 @@
 					<div class="sheet-gear">
 					    <div class="sheet-worn">
 					        <h1 class="sheet-colHeader" data-i18n="worn">Worn</h1>
+							<h4 class="sheet-repeatingHeader sheet-item" data-i18n="item">Item</h4>
+							<h4 class="sheet-repeatingHeader sheet-itemweight" data-i18n="weight">Weight</h4>
 					        <fieldset class="repeating_gear">
-								<input class="sheet-standard" style='width:360px;' placeholder="Item" type="text" name="attr_item" title="@{repeating_gear_$#_item}" />
-								<input type="number" style="width: 65px;" data-i18n-placeholder="weight" placeholder="weight" name="attr_itemWeight" title="@{repeating_gear_$#_itemWeight}" class="sheet-weaponweight" />
+								<input class="sheet-standard sheet-item" placeholder="Item" type="text" name="attr_item" title="@{repeating_gear_$#_item}" />
+								<input type="number" style="width:65px;" data-i18n-placeholder="weight" placeholder="weight" step="any" name="attr_itemWeight" title="@{repeating_gear_$#_itemWeight}" class="sheet-weaponweight" />
 							</fieldset>
-							<div class='sheet-weaponTotalWeight' style="margin-left: 160px;"><!-- Set up the Total Weight Carried box -->
+							<input class="sheet-useLoad" type="checkbox" name="attr_useLoad" style="display:none;" checked />
+							<div class='sheet-weaponTotalWeight sheet-loadstuff' style="margin-left: 160px;"><!-- Set up the Total Weight Carried box -->
     							<div class='sheet-col' style='width:200px; text-align:right;'> <!-- Protection (240px)-->
     								<h4 class="sheet-weight"><span data-i18n="total-gear-weight-carried">Total Gear Weight Carried</span>:</h4>
     							</div>
@@ -5451,7 +5719,7 @@
 			                    </div>
 			                    <div class="sheet-shipMainItem">
 			                         <label class="sheet-shipMainLabel" data-i18n="weight">Weight:</label>
-			                         <input type="number" class="sheet-shipMainInput" name="attr_PAWeight" />
+			                         <input type="number" class="sheet-shipMainInput" step="any" name="attr_PAWeight" />
 			                    </div>
 			                    <div class="sheet-shipMainItem">
 			                         <label class="sheet-shipMainLabel" data-i18n="cost">Cost:</label>
@@ -5851,9 +6119,15 @@
     			    <input type="checkbox" class="sheet-hideOST" name="attr_hideOST" /><span class="sheet-showOST"></span>
     			    <h3 class='sheet-configSectionTitle' data-i18n="other-sheet-tweaks">Other Sheet Tweaks</h3>
     			    <div class="sheet-miscconfig">
-    			        <label class='sheet-miscItem'><input type="checkbox" class="sheet-hideArcanum" name="attr_ArcanumTab" style="width: 15px;"> <span data-i18n="hide-arcanum-tab">Hide the Arcanum Tab</span></label>
+						<select name="attr_atkxconfig" title="May need to change your ROF for changes to take affect.">
+							<option value="0" selected>Atk^ roll query sorted High to Low</option>
+							<option value="1">Atk^ roll query sorted Low to High</option>
+							<option value="2">Atk^ always roll max (no roll query)</option>
+						</select>
+    			        <label class='sheet-miscItem'><input type="checkbox" class="sheet-hideArcanum" name="attr_ArcanumTab" style="width: 15px;"> <span data-i18n="hide-powers-section">Hide Powers Section</span></label>
     			        <label class='sheet-miscItem'><input type="checkbox" name="attr_promptmods" title="Wounds, Fatigue, Distracted, and Encumbrance are not part of Misc. Modifiers and are accounted for automatically" /> <span data-i18n="prompt-modifiers-text">Prompt for Misc. Modifiers</span></label>
 						<label class='sheet-miscItem'><input type="checkbox" name="attr_useBGPhysicalDesc" checked /> <span data-i18n="show-background-description">Show Background and Description</span></label>
+						<label class='sheet-miscItem'><input type="checkbox" name="attr_useLoad" checked /> <span data-i18n="show-load-and-encumbrance">Show Load and Encumberance</span></label>
         			    <label class='sheet-miscItem'><input type="checkbox" name="attr_showmods" checked /> <span data-i18n="show-modifiers">Show Modifiers For Trait Rolls</span></label>
         			    <!-- Hidden Fields to set whether to show mods in the Roll Template or not -->
     					<input type="hidden" name="attr_setmods" value="{{mods=[[1d0+@{absmod}+abs(@traitmods)]] }}" />
@@ -5871,7 +6145,8 @@
     					<!-- End Hidden Fields -->
 						<label class="sheet-miscItem"><input type="checkbox" class="sheet-usePartyBag" name="attr_usePG" checked /> <span data-i18n="show-party-bag">Show Party Bag</span></label>
 						<label class="sheet-miscItem"><input type='checkbox' class='sheet-useQuestLog' name="attr_questlog" checked /> <span data-i18n="show-quest-log">Show Quest Log</span></label>
-        			    <label class="sheet-miscItem"><input type="checkbox" class="sheet-showVehicles sheet-useVehicles" name="attr_vehicle" style="width: 15px;"> <span data-i18n="show-the-vehicles-tab">Show the Vehicles Tab</span></label>
+						<label class="sheet-miscItem"><input type="checkbox" class="sheet-useunshakebutton" name="attr_showunshake" checked /> <span data-i18n="show-unshake-button">Show Unshake Button</span></label>
+						<label class="sheet-miscItem"><input type="checkbox" class="sheet-showVehicles sheet-useVehicles" name="attr_vehicle" style="width: 15px;"> <span data-i18n="show-the-vehicles-tab">Show the Vehicles Tab</span></label>
         			    <input type="checkbox" class="sheet-showVehicles" name="attr_vehicle" style="display: none;" />
         			    <label class="sheet-miscItem sheet-vehicleTypes"><input class="sheet-useSailingShips" type="checkbox" name="attr_sailingShip" /> <span data-i18n="show-sailing-ship">Show Sailing Ship</span></label>
         			    <label class="sheet-miscItem sheet-vehicleTypes"><input class="sheet-useFlyingShips" type="checkbox" name="attr_flyingShip" /> <span data-i18n="show-flying-ship">Show Flying Ship</span></label>
@@ -5879,7 +6154,7 @@
         			    <label class="sheet-miscItem sheet-vehicleTypes"><input class="sheet-usePowerArmor" type="checkbox" name="attr_PowerArmor" /> <span data-i18n="show-power-armor">Show Power Armor</span></label>
         			    <label class="sheet-miscItem sheet-vehicleTypes"><input class="sheet-useRobotArmor" type="checkbox" name="attr_RobotArmor" /> <span data-i18n="show-robot-armor">Show Robot Armor</span></label>
         			    <label class="sheet-miscItem sheet-vehicleTypes"><input class="sheet-useWalker" type="checkbox" name="attr_Walker" /> <span data-i18n="show-walker">Show Walker</span></label>
-                        <label class='sheet-miscItem'><input type="checkbox" name="attr_whisperrolls" value='1' style="width: 15px;"> <span data-i18n="whisper-all-rolls-to-gm">Whisper all rolls to GM</span></label>
+                        <!--<label class='sheet-miscItem'><input type="checkbox" name="attr_whisperrolls" value='1' style="width: 15px;"> <span data-i18n="whisper-all-rolls-to-gm">Whisper all rolls to GM</span></label>-->
                         <input type='hidden' name='attr_whisperall' />
                         <label class='sheet-miscItem'>
             			    <span data-i18n="wild-card-icon">Wild Card Icon</span>: <select name='attr_WCI' class="sheet-wcIcon">
@@ -5940,7 +6215,7 @@
     			        <!-- End of Hiddent Fields for Power Labels -->
     			        <!--Species--><label class="sheet-fnItem" data-i18n-title="species-race-text" title="Can be used for Sci-Fi settings like The Last Parsec, or any setting where Species is used instead of Race."><input type="checkbox" class="sheet-useSpecies" name="attr_tlpSpecies" style="width: 15px;" /><span data-i18n="species-race">Species (Race)</span></label>
     					<!--Threat Rating--><label class="sheet-fnItem" data-i18n-title="threat-rating-rank-text" title="Change the Rank designation to Threat Rating ala Necessary Evil."><input type="checkbox" class="sheet-useThreatRating" name="attr_ThreatRatingClass" value="2" style="width: 15px;" /><span data-i18n="threat-rating-rank">Threat Rating (Rank)</span></label>
-    					<!--XP--><label class="sheet-fnItem" data-i18n-title="experience-points-text" title="Change the Advances designation used to determine rank to XP."><input type="checkbox" class="sheet-useXP" name="attr_useXP" value="1" checked /><span data-i18n="experience-points-abbr-u-advances">XP (Advances)</span></label>
+    					<!--XP--><label class="sheet-fnItem" data-i18n-title="experience-points-text" title="Change the Advances designation used to determine rank to XP."><input type="checkbox" class="sheet-useXP" name="attr_usexplabel" value="1" checked /><span data-i18n="experience-points-abbr-u-advances">XP (Advances)</span></label>
     			    </div>
     			</div>
     			<div class='sheet-configSection'>
@@ -5979,10 +6254,12 @@
     			        <label class="sheet-srmItem" data-i18n-title="use-charisma"><input type="checkbox" class="sheet-useCharisma" name="attr_usecharisma" checked /><span data-i18n="use-charisma">Use Charisma</span></label>
     				    <label class="sheet-srmItem" data-i18n-title="power-pointless"><input type="checkbox" class="sheet-NoPP" name="attr_NoPPRule" /><span data-i18n="no-power-points">No Power Points</span></label>
     				    <label class="sheet-srmItem" data-i18n-title="use-xp"><input type="checkbox" class="sheet-usexp" name="attr_usexp" checked /><span data-i18n="use-xp">Use Experience Points</span></label>
-    				    <input type="checkbox" class="sheet-usexp" name="attr_usexp" style="display: none;" checked />
-    				    <label class="sheet-srmItem sheet-xpmod" data-i18n-title="roll-for-extra-xp-remaining-text"><input type='checkbox' name='attr_bennies' class='sheet-Bennies' value='2' /><span data-i18n="roll-extra-xp-unspent-text">Roll XP on unspent Bennies</span></label>
-    				    <label class="sheet-srmItem sheet-xpmod" data-i18n-title="roll-for-extra-xp-left-text"><input type='checkbox' name='attr_bennies' class='sheet-Bennies' value='1' /><span data-i18n="roll-extra-xp-left-text">Roll XP on spent Bennies</span></label>
-    				    <label class="sheet-srmItem" data-i18n-title="variable-bonus-damage-die"><input type="checkbox" class="sheet-useRaiseHB" name="attr_RaiseHBRule" /><span data-i18n="variable-bonus-damage">Variable Bonus Damage</span></label>
+    				    <label class="sheet-srmItem" data-i18n-title="use-xp"><input type="checkbox" name="attr_setrank" /><span data-i18n="manually-set-rank">Manually set Rank</span></label>
+						<input type="checkbox" class="sheet-usexp" name="attr_usexp" style="display: none;" checked />
+    				    <label class="sheet-srmItem sheet-xpmod" data-i18n-title="roll-for-extra-xp-left-text"><input type='checkbox' name='attr_bennies' class='sheet-Bennies' value='1' /><span data-i18n="roll-extra-xp-for-bennies">Roll XP for un-/spent Bennies</span></label>
+    				    <label class="sheet-srmItem" data-i18n-title="variable-bonus-damage-die"><input type="checkbox" class="sheet-useRaiseHB" name="attr_RaiseHBRule" value="1" /><span data-i18n="variable-bonus-damage-raise-based">Variable Bonus Damage (Raise based)</span></label>
+						<label class="sheet-srmItem" data-i18n-title="variable-bonus-damage-die"><input type="checkbox" class="sheet-useRaiseHB" name="attr_RaiseHBRule" value="2" /><span data-i18n="variable-bonus-damage-edge-based">Variable Bonus Damage (Edge based)</span></label>
+						<label class="sheet-srmItem"><input type="checkbox" name="attr_usewealth" /> <span data-i18n="use-the-wealth-system">Use the Wealth System</span></label>
     			    </div>
     			</div>
     			<!--<input class='sheet-sbButtonCheck' type='checkbox' style='display: none;' name='attr_initializeStatblock' />
@@ -5993,6 +6270,52 @@
 			<!--                     -->
 			<div class="sheet-release">
 			    <h3 class='subsectionHeader' data-i18n="release-notes">Release Notes</h3>
+				<label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes31' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 3.1</h4></span>
+			    </label>
+			    <input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes31' value='1' />
+        		<div class='sheet-releasenotes'>
+        		   <p data-i18n="changes-this-release">
+        		       Changes this release:
+        		   </p>
+				   <ul>
+						<li><strong data-i18n="bug-fixes">Bug Fixes</strong></li>
+						<ul>
+							<li data-i18n="language-skill-changed-to-native-language">Language Skill changed to Native Language for clarity</li>
+							<li data-i18n="athletics-linked-to-agility">Athletics now linked to Agility by default</li>
+							<li data-i18n="wrong-titles-age-gender-place">Wrong titles displaying for age, gender, and pace</li>
+							<li data-i18n="use-xp-rules-modification-fixed">Fixed the Use Experience Points rules modification</li>
+							<li data-i18n="fixed-whisper-for-hindrances-and-edges">Fixed the Whisper capability for Edges and updated with the correct roll template</li>
+							<li data-i18n="augments-no-hide">Augments weren't hiding when clicking the hide button</li>
+							<li data-i18n="whisper-checkboxes-for-whispering-spells">Missing checkbox for whispering spells rolls to chat has been found</li>
+							<li data-i18n="spells-section-now-hides">Spells section wasn't hiding when configuration section indicated it should be hidden</li>
+							<li data-i18n="removed-extra-space-in-rolltemplate">Removed the extra space in the roll template header when rolling a Custom Skill</li>
+						</ul>
+						<li><strong data-i18n="sheet-enhancements">Functionality Enhancements</strong></li>
+						<ul>
+							<li data-i18n="savage-worlds-adventure-edition-abbr-wealth-system">SWADE Wealth System</li>
+							<li data-i18n="completely-hide-load-and-encumbrance">Ability to completely hide Load/Encumbrance info</li>
+							<li data-i18n="variable-bonus-damage-edge-based">Variable Bonus Damage based on Edges rather than Raises</li>
+							<li data-i18n="unshake-button">Added an Unshake button</li>
+							<ul>
+								<li data-i18n="configure-in-other-sheet-tweaks">Shown by default, but can be hidden via the Configuration tab (Other Sheet Tweaks)</li>
+							</ul>
+							<li data-i18n="chat-out-button-for-spells">Added Chat Output button for Spells</li>
+							<li data-i18n="rate-of-fire-support">Rate of Fire support</li>
+							<li data-i18n="decimal-points-for-money">Decimal points can be used in the Money field</li>
+						</ul>
+						<li><strong data-i18n="sheet-enhancements">Usability Enhancements</strong></li>
+							<ul>
+								<li data-i18n="weapon-spell-config-section-different-color">Weapon and Spell config sections have a different background color to make them stand out a bit more</li>
+								<li data-i18n="made-money-field-longer">Lengthened the Money input field if it's the only field to display</li>
+								<li data-i18n="different-color-add-modify-remove-repeating-section-buttons">Repeating Fields (such as Weapons, Edges/Hindrances, etc) have different colored icons for modification; this is intended to help them stand out and be a little more visible</li>
+								<li data-i18n="trashcan-icon-larger">The trashcan icon to delet a repeating section row has been enlarged and made red so it's easier to see and click</li>
+								<li data-i18n="color-background-header-for-sections">Section headers Weapons, Spells, etc. have been given a background color to make them easier to find</li>
+								<li data-i18n="separate-field-for-power-trappings">Separate field for power Trappings</li>
+								<li data-i18n="action-button-for-weapon-spell-damage">Action button replaced readonly field for Weapon and Spell damage; opens the config section and highlights the damage fields</li>
+							</ul>
+				   </ul>
+				</div>
 			    <label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 3.0</h4></span>
 			    </label>
@@ -6056,21 +6379,38 @@
                     <p class='sheet-docparagraph' data-i18n='maincv-p6v1'>Starting with Version 3.0 of this sheet, support for other conditions (e.g. Distracted, Vulnerable, and Stunned) is included.  Any penalties to rolls as a result of these conditions is automatically accounted for in rolls made from the sheet. For great flexibility, the sheet allows you to set the maximum Wound and Fatigue levels; hoving over each field will show the configuration cog.</p>
                     <p class='sheet-docparagraph' data-i18n='maincv-p7-v1'>The Core Derived stats (Pace, Parry, Toughness) automatically calculate based on the various inputs.  For example, Parry will take the Fighting rank and determine the Base Parry score. Adding any sort of modifiers will then be taken into consideration and the final score will appear in the current column.</p>
                     <p class='sheet-docparagraph' data-i18n='maincv-p8-v1'><strong>A Note on Toughness:</strong> The Toughness score is calculated per the book in terms of the Base. The Current column also includes any armor worn, however, it is only worn armor that covers the Torso; this is because non-called shots automatically target the Torso (per the rules).</p>
-                    <h5 data-i18n='weapons'>Weapons and Powers</h5>
+                    <h5 data-i18n='weapons'>Weapons</h5>
                     <p class='sheet-docparagraph' data-i18n='maincv-p9-v1'>Melee and Ranged weapons have been combined into a single section. This should help with keeping the clutter down, but also keep all the weapons in a single place, allowing for easier management.  It also makes it easier for a weapon that is both Melee and Ranged to be documented in one place.</p>
-                    <p class='sheet-docparagraph' data-i18n='maincv-p10-v1'>Each weapon can be configured to whisper the roll(s) to the GM, as well as modify what the roll button does.  The roll button can be set up to roll damage only, or Attack and Damage (Atk + Dmg). If you set the button to roll Attack and Damage, a drop down menu will be shown where you can select which skill will be rolled for the Attack the Roll. You can also configure the damage to use any of the Core Attributes (thought it defaults to Strength). The modifier field on the damage is a text box instead of a number field for flexibility. For example, if you have a wepon that does Str + d4 + d6, you'd select Strength, place a 1 in the field before the die type, select the appropriate die type, and in the modifier field you'd type 1d6!.</p>
-                    <p class='sheet-docparagraph' data-i18n='maincv-p11-v1'><strong>Note:</strong> While it's not here yet, support will be forth coming to allow a different Bonus Damage die to be rolled instead of the standard d6.</p>
-                    <p class='sheet-docparagraph' data-i18n='maincv-p12-v1'>Powers have the same configuration options as Weapons; the skill selection drop down menu only contains Arcane skills, however.</p>
+					<p class='sheet-docparagraph' data-i18n='maincv-p13-v1'><em>Rolling Attack and Damage</em></p>
+					<p class='sheet-docparagraph' data-i18n='maincv-p14-v1'>Each weapon has a roll button, which can be set up to roll damage only, or Attack and Damage (Atk + Dmg). If the weapon has a rate of fire greater than 1, an additional option becomes available to support full-auto rolls; this option is called Atkx+Dmg. These options are available in the weapon config section (visible by default directly under the weapon—the section has a yellow-ish tint). To configure the roll button, select an option from the <b>Button Behavior</b> drop down menu.</p>
+					<p class='sheet-docparagraph' data-i18n='maincv-p10-v2'>Setting the buttonroll to Atk + Dmg, will present a drop down menu to select which skill will be rolled for the Attack the Roll. The list of skills are only those which can normally be used for attacks, such as Fighting, Athletics/Throwing, Shooting, etc. </p>
+					<p class='sheet-docparagraph' data-i18n='maincv-p15-v1'>Configuring the damage is also done in this section. Weapons can use any of the Core Attributes (though it defaults to Strength), or none of them (N/A). The field directly after the Core Attribute drop down is for the number of dice typically rolled for damage followed immediately by the the die type. After the die type is a field for additional modifiers that are part of the damage. This field is not for situational modifiers, though. Additionally, this field is a text field, allowing you to add additional attack modifiers. Here are some examples:</p>
+					<ul>
+						<li data-i18n='rollexample1-v1'>N/A + 2d6 + __ (rolls 2d6)</li>
+						<li data-i18n='rollexample1-v2'>Strength + 1d4 + __ (rolls Str+d4)</li>
+						<li data-i18n='rollexample1-v3'>N/A + 2d6 + 1 (rolls 2d6+1)</li>
+						<li data-i18n='rollexample1-v4'>Strength + 1d10 + 1d8! (Rolls Str+d10+d8)</li>
+						<li data-i18n='rollexample1-v5'>N/A + 0d4 + __ (No damage to roll)</li>
+					</ul>
+					<p class='sheet-docparagraph' data-i18n='maincv-p16-v1'>Each weapon can be configured to whisper the roll(s) to the GM, as well as modify what the roll button does.</p>
+					<p class='sheet-docparagraph' data-i18n='maincv-p17-v1'><em>Auto-fire</em></p>
+					<p class='sheet-docparagraph' data-i18n='maincv-p18-v1'>If the ROF is 2+ the Atkx+Dmg option becomes visible. By default this button is configured to present a query asking how many skill dice you’d like to roll; this query has a list of options counting down from the ROF to 1 (highest to lowest). This behavior can be changed to offer the query with the options listed from 1 to the ROF (lowest to highest), or to not present a roll query and just always roll the ROF. This configuration is handled under the Other Sheet Tweaks section of the configuration tab.</p>
+					<p class='sheet-docparagraph' data-i18n='maincv-p19-v1'>When using the Atkx+Dmg button, the number of skill dice rolled will be however you have it configured (and whichever option you selected from the drop down), but will only every roll a single Wild Die.</p>
+					<p class='sheet-docparagraph' data-i18n='maincv-p20-v1'>You can still select Atk + Dmg for the roll button, and that will only do a single attack and a single wild die.</p>
+					<p class='sheet-docparagraph' data-i18n='maincv-p21-v1'><b>NOTE</b>: If any weapon is configured for Auto-fire before you change the configuration for how auto-fire is handled, those weapons will not be automatically updated to use the new configuration…you will need to change the ROF and then change it back to get the new configuration</p>
+					<p class='sheet-docparagraph' data-i18n='maincv-p22-v1'><b>Pro Tip</b>: You can set the ROF to 2 for a melee weapon and use this option for things like Frenzy.</p>
+					<h5 data-i18n='powers'>Powers</h5>
+					<p class='sheet-docparagraph' data-i18n='maincv-p12-v1'>Powers have the same configuration options as Weapons; the skill selection drop down menu only contains Arcane skills, however.</p>
 		        </div>
 		        <input type='checkbox' class='sheet-hideVehicleSection' name='attr_is_vehicle' /><span class='sheet-showSection'></span>
 		        <h3 class='sheet-configSectionTitle'><span data-i18n='vehicles'>Vehicles</span> <span class='sheet-pictos'>T</span></h3>
 		        <div class='sheet-vehiclepage'>
-		            <p class='sheet-docparagraph' data-i18n='vehicle-p1v1'>Vehicles page info coming soon</p>
+		            <p class='sheet-docparagraph' data-i18n='vehicle-p1v1'>Vehicles page coming soon</p>
 		        </div>
 		        <input type='checkbox' class='sheet-hideJournalSection' name='attr_is_journal' /><span class='sheet-showSection'></span>
 		        <h3 class='sheet-configSectionTitle'><span data-i18n='journal'>Journal</span> <span class='sheet-pictos'>n</span></h3>
 		        <div class='sheet-journalpage'>
-		            <p class='sheet-docparagraph' data-i18n='journal-p1v1'>Journal page info coming soon</p>
+		            <p class='sheet-docparagraph' data-i18n='journal-p1v1'>Journal page coming soon</p>
 		        </div>
 		        <input type='checkbox' class='sheet-hideConfigSection' name='attr_is_config' /><span class='sheet-showSection'></span>
 		        <h3 class='sheet-configSectionTitle'><span data-i18n='configuration'>Configuration</span> <span class='sheet-pictos'>x</span></h3>
@@ -6094,7 +6434,8 @@
                             <ul>
                                 <li data-i18n='hide-sections-explanation'>Hide different sections and tabs (e.g. Powers and Vehicles)</li>
                                 <li data-i18n='configure-modifiers-explanation'>Configure modifiers; the sheet can prompt for roll modifiers and you can choose to have them display in the roll template when rolls are made</li>
-                                <li data-i18n='configure-api-settings'>Configure API settings</li>
+								<li data-i18n='configure-rate-of-fire-abbr-rolling'>Configure Rate of Fire rolling</li>
+								<li data-i18n='configure-api-settings'>Configure API settings</li>
                             </ul>
                         <li data-i18n='additional-derived-stats'>Additional Derived Stats</li>
                         <li data-i18n='field-name-replacements'>Field Name Replacements</li>
@@ -6117,7 +6458,7 @@
 		        <input type='checkbox' class='sheet-hideReleaseSection' name='attr_is_release' /><span class='sheet-showSection'></span>
 		        <h3 class='sheet-configSectionTitle'><span data-i18n='release-notes'>Release Notes</span> <span class='sheet-pictos'>N</span></h3>
 		        <div class='sheet-releasepage'>
-		            <p class='sheet-docparagraph' data-i18n='release-p1v1'>Release Notes page info coming soon</p>
+		            <p class='sheet-docparagraph' data-i18n='release-p1v1'>Release Notes page coming soon</p>
 		        </div>
 		        <input type='checkbox' class='sheet-hideDocSection' name='attr_is_doc' /><span class='sheet-showSection'></span>
 		        <h3 class='sheet-configSectionTitle'><span data-i18n='documentation'>Documentation</span> <span class='sheet-pictos'>i</span></h3>
@@ -6131,11 +6472,6 @@
 <div class="sheet-disclaimer">
     <input class="sheet-logo" type="hidden" name="attr_logo" />
 	<span data-i18n="the">The</span>&nbsp;<span class="sheet-logotext"></span>&nbsp;<span class="sheet-logostandard" data-i18n="logo-info">logo is a trademark of</span>&nbsp;<span class="sheet-trademarkholder"></span><span class="sheet-logoallforone" data-i18n="all-for-one-logo-info">logo &copy; 2016 Triple Ace Games Ltd. All for One: R&eacute;gime Diabolique and all related marks and logos are trademarks of  Triple Ace Games Ltd. Ubiquity Roleplaying System, Exile Games Studio, and all associated logos and trademarks are copyright, Exile Games Studio, LLC</span><span class="sheet-logorifts" data-i18n="rifts-logo-info">logo and Megaverse are registered trademarks of PALLADIUM BOOKS, INC. All character names and likenesses are copyright and trademarks owned by Palladium Books, Inc. Savage Worlds logo is a trademark of Pinnacle Entertainment Group</span>. <span data-i18n="used-with-permission-visit-website">Used with permission. Visit their website at</span>:&nbsp;<span class="sheet-website"></span>
-
-
-	<!--
-
-	-->
 </div>
 <!--- templates -->
 <rolltemplate class="sheet-rolltemplate-roll">
@@ -6146,15 +6482,27 @@
 		{{/PowerTemplate}}
 		{{#PowerTemplate}}
 		<h2 class="sheet-templateBlue">{{name}}</h2>
-		<h3 class="sheet-templateBlue">({{trait}}{{#source}}: {{source}}{{/source}})</h3>
+		<h3 class="sheet-templateBlue">{{trait}}{{#source}}: {{source}}{{/source}}</h3>
+		{{#trappings}}<h4 class="sheet-templateBlue">Trappings: {{trappings}}</h4>{{/trappings}}
 		{{/PowerTemplate}}
 		<div class="sheet-templateRoll sheet-trollLeft">
 			<span class="sheet-rollLabel">{{skill_rank}}</span>
-			<span class="sheet-rollContainer">{{skill_roll}} </span>
-			{{#skill_roll2}}<span class="sheet-rollContainer">{{skill_roll2}}</span>{{/skill_roll2}}
-			{{#skill_roll3}}<span class="sheet-rollContainer">{{skill_roll3}}</span>{{/skill_roll3}}
-			{{#skill_roll4}}<span class="sheet-rollContainer">{{skill_roll4}}</span>{{/skill_roll4}}
-			{{#skill_roll5}}<span class="sheet-rollContainer">{{skill_roll5}}</span>{{/skill_roll5}}
+			<span class="sheet-rollContainer">{{skill_roll}}</span>
+			{{#rollGreater() numrolls 1}}
+				{{#skill_roll2}}<span class="sheet-rollContainer">{{skill_roll2}}</span>{{/skill_roll2}}
+			{{/rollGreater() numrolls 1}}
+			{{#rollGreater() numrolls 2}}
+				{{#skill_roll3}}<span class="sheet-rollContainer">{{skill_roll3}}</span>{{/skill_roll3}}
+			{{/rollGreater() numrolls 2}}
+			{{#rollGreater() numrolls 3}}
+				{{#skill_roll4}}<span class="sheet-rollContainer">{{skill_roll4}}</span>{{/skill_roll4}}
+			{{/rollGreater() numrolls 3}}
+			{{#rollGreater() numrolls 4}}
+				{{#skill_roll5}}<span class="sheet-rollContainer">{{skill_roll5}}</span>{{/skill_roll5}}
+			{{/rollGreater() numrolls 4}}
+			{{#rollGreater() numrolls 5}}
+				{{#allprops() skill_rank mook showtt showwounds showfatigue showdistracted showenc skill_roll skill_roll2 skill_roll3 skill_roll4 skill_roll5 name trait source PowerTemplate wild_die wild_die2 wild_die3 wild_die4 wild_die5 mods ttmod wounds fatigue distracted encumbrance notes button DmgRoll numrolls}}<span class="sheet-rollContainer">{{value}}</span>{{/allprops() skill_rank mook showtt showwounds showfatigue showdistracted showenc skill_roll skill_roll2 skill_roll3 skill_roll4 skill_roll5 name trait source PowerTemplate wild_die wild_die2 wild_die3 wild_die4 wild_die5 mods ttmod wounds fatigue distracted encumbrance notes button DmgRoll numrolls}}
+			{{/rollGreater() numrolls 5}}
 		</div>
 		<div class="sheet-templateRoll sheet-trollRight">
 			{{#^rollTotal() mook 0}}<span class="sheet-rollLabel">Wild Die</span>{{/^rollTotal() mook 0}}<!--Is a Wild Card-->
@@ -6221,7 +6569,8 @@
         <h2 class="sheet-templateheader">{{name}}</h2>
         <h3 class="sheet-templatesubheader">{{item}}{{#type}} ({{type}}){{/type}}</h3>
         <div class="sheet-templatedescription">
-            {{description}}
+            {{#description}}{{description}}{{/description}}
+			{{#allprops() description item type}}<p><strong>{{key}}:</strong> {{value}}</p>{{/allprops() description item type}}
         </div>
     </div>
 </rolltemplate>
@@ -6238,4 +6587,24 @@
             <td>{{description}}</td>
         </tr>
     </table>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-unshake">
+	<div class="sheet-emoteish">
+		{{name}} <span data-i18n="unshake-desc1">attempts to unshake (Spi</span>: {{skill_roll}} / <span data-i18n="unshake-desc2">Wild</span>: {{wild_die}}) <span data-i18n="unshake-desc3">and</span>
+		{{#rollGreater() skill_roll wild_die}}
+			{{#rollGreater() skill_roll 3}}<span data-i18n="unshake-desc4">succeeds</span>! {{name}} <span data-i18n="unshake-desc5">can now act</span>.{{/rollGreater() skill_roll 3}}
+			{{#^rollGreater() skill_roll 3}}<span data-i18n="unshake-desc6">fails</span>!{{/^rollGreater() skill_roll 3}}
+		{{/rollGreater() skill_roll wild_die}}
+		{{#rollGreater() wild_die skill_roll}}
+			{{#rollGreater() wild_die 3}}<span data-i18n="unshake-desc4">succeeds</span>! {{name}} <span data-i18n="unshake-desc5">can now act</span>.{{/rollGreater() wild_die 3}}
+			{{#^rollGreater() wild_die 3}}<span data-i18n="unshake-desc6">fails</span>!{{/^rollGreater() wild_die 3}}
+		{{/rollGreater() wild_die skill_roll}}
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-emote">
+	<div class="sheet-emoteish">
+		{{name}} {{does}}
+	</div>
 </rolltemplate>
