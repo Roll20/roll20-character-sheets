@@ -326,7 +326,7 @@
 					<div class="sheet-cell sheet-col4">
 					    <!-- For Fright Check, use "kl1" = Keep Lowest One. [[1d8 ( { 16 , 13 }kl1) ]] = 1d6 + 13 -->
 					    <!-- see: https://wiki.roll20.net/Macros_-_Pathfinder_Examples : Calculated Dice Roll -->
-						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Attribute Check}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Fright Check}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[ ( {@{fear_check} + @{modifier}, @{fright_check_threshold} + @{fright_check_threshold_mod}}kl1) ]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{useFrightLabel=[[1]]}}" name="roll_vsFearCheck" />
+						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Attribute Check}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Fright Check}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[ ( {@{fear_check} + @{modifier}, @{fright_check_threshold}}kl1) ]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{useFrightLabel=[[1]]}}" name="roll_vsFearCheck" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-sub-row margin-bottom sheet-row-fear">
@@ -3159,7 +3159,7 @@
 			<div class="table">
 			    <div class="row title">
 			        <div class="cell">
-			            Range Calculator
+			            Range Calculator for Ranged Attacks only
 			        </div>
 			    </div>
 			    <div class="header">
@@ -3436,7 +3436,7 @@
 	    <span>Mark updates as read</span>
 	</div>
 	
-	<h3>Latest Changes: Updated 4/2/2019</h3>
+	<h3>Latest Changes: Updated 4/9/2019</h3>
 		
 	<h3>Known Issues</h3>
 	<ul>
@@ -3484,6 +3484,7 @@
 	    </li>
 	    <li>Combat Tab: Added Combat Tools Heading</li>
 	    <li>Combat Tab: Added Range Calculator</li>
+	    <li>General Tab: Fright check threshold wasn't showing the final modified total. Fixed. Reported by Ray G</li>
 	</ul>
 	
 	<h4>Version: 1.5.5
@@ -4206,8 +4207,6 @@ Skull Damage x4
 	on('sheet:opened', function() {
 		console.log('********* Sheet Opened *********');
 		
-		console.log('** Setting default TAB to Updates  **');
-		
 		/* When the sheet is opened, it opens to the Update tab */
 		getAttrs(["updates_read"], function(values) {
 		    
@@ -4227,9 +4226,6 @@ Skull Damage x4
 		} );
 		
 			
-		/* For Bug Fix v1.3.9 : Need to convert the Value of the Modifier Prompt*/
-		console.log('** Attribute Modifier new values v1.3.9 **');
-
 		getAttrs(['modifier'], function(v){
 			const setObj = {};
 			if(v.modifier==='?{Modifier|0}'){
@@ -4384,6 +4380,8 @@ Skull Damage x4
 		});
 		
 		updateDamageNotes();
+		
+		updateFrightCheckThreshold();
 
 	}
 
@@ -7336,5 +7334,33 @@ Skull Damage x4
 	    
 	}
 	
+	// check to see if modifier for fright check threshold changed
+	on("change:fright_check_threshold_mod", function(event) {
+	    
+	    updateFrightCheckThreshold();
+	    
+	});
+	
+	function updateFrightCheckThreshold() {
+	    
+	    var fields = [
+	        "fright_check_threshold_mod"
+	        ];
+	    
+	    getAttrs(fields, function(values) {
+	        
+	        var base = 13;
+	        
+	        var mod = +values.fright_check_threshold_mod;
+	        
+	        var final = base + mod;
+	        
+	        setAttrs({
+	            "fright_check_threshold": final 
+	        });
+	        
+	    });
+	    
+	} 
     
 </script>
