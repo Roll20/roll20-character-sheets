@@ -6,13 +6,13 @@ Versions have two numbers Major.Minor
 **Minor**: Indicates the addition of new features, bugfixes or other adjustments which do not alter variable names or fundamental workflow.
 
 ## 2.0
-With this version I am switching back to a two number version format.  The description above has been adjusted.  The intent is to release versions in smaller chunks.  As soon as a new feature or adjustment is made it will be released as a version.  This will hopefully quicken the pace of sheet development and make sheet adjustments a bit more managable.  Expect that 2nd number to increase rather fast.
+With this version I am switching back to a two number version format.  The description above has been adjusted.  The intent is to release versions in smaller chunks.  As soon as a new feature or adjustment is made it will be released as a version.  This will hopefully quicken the pace of sheet development and make sheet adjustments a bit more manageable.  Expect that 2nd number to increase rather fast.
 
 ### Known Issues
-* Due to the large number of variables converting to sheet workers and the inter-related effects of values in the Mythras system, the upgrade process will sometimes not go as expected.  It is highly dependant on the order in which other value calculations are triggers when we start converting fields for sheet workers.  If the update of one value triggers a reclac for a field which is also dependant on a value which has not yet converted the process breaks down.  If this happens simply click the recalculate button.  Enough of the conversaions will be complete the 2nd time around to allow the sheet calculations to complete successfully.
+* Due to the large number of variables converting to sheet workers and the inter-related effects of values in the Mythras system, the upgrade process will sometimes not go as expected.  It is highly dependent on the order in which other value calculations are triggers when we start converting fields for sheet workers.  If the update of one value triggers a reclac for a field which is also dependent on a value which has not yet converted the process breaks down.  If this happens simply click the recalculate button.  Enough of the conversions will be complete the 2nd time around to allow the sheet calculations to complete successfully.
 
 ### Compatibility Issues
-* This version removes the NPC sheet in favor of a generic Character type which can be used for NPCs or PCs.  A new Compact and Mook sheet have been added to provide the smaller sheet layout and some other features useful to NPCs.  Data from the NPC sheet will be lost due to an inability to discern which of the npc or pc values one may wish to have in the upgrade sheet.  A warning has been displayed in the NPC sheet for a number of months to copy data over to the PC sheet in preparation for this.
+* This version removes the NPC sheet in favor of a generic Character type which can be used for NPCs or PCs.  A new Compact and Mook sheet have been added to provide the smaller sheet layout and some other features useful to NPCs.  Data from the NPC sheet will be lost due to an inability to discern which of the npc or pc values one may wish to have in the upgraded sheet.  A warning has been displayed in the NPC sheet for a number of months to copy data over to the PC sheet in preparation for this.
 * In addition a large amount of the sheet has converted over to using sheet worker for auto calculations.  As a result many variable value formats have changed.
 * A number of variables have been renamed to reflect a more generic approach to setting support.
 
@@ -23,13 +23,13 @@ With this version I am switching back to a two number version format.  The descr
 * Movement values are now rounded to make them more readable
 * A number of sections can now be collapsed hiding them away when unneeded.
 * Fatigue now uses a number based value under the hood which allows it to be set up as a token bar more easily.
-* Added a toogle which switches the character between spirit and material forms.  Useful for defining spirit type characters and for shamans who often enter the spirit realm.
+* Added a toggle which switches the character between spirit and material forms.  Useful for defining spirit type characters and for shamans who often enter the spirit realm.
 * Removed the tenacity for spirits option.  Now it is simply enabled when Tenacity is.
 * Added a method to define separate swim and fly movement species values.  Useful for defining non-human characters.
 * Added Mythra Imperative as a setting which makes the sheet fall inline with the simplified rulesets better.
 * Added a sheet option to set AP to a particular value instead of being based on Characteristics.
 * Added a sheet option to enable/disable weapon reach
-* The encumbered toogle for skills is automatically checked/unchecked based on the base characteristics selected
+* The encumbered toggle for skills is automatically checked/unchecked based on the base characteristics selected
 * Added buttons at the sheet footer which will show a link in the chat window which serve various purposes: Report a bug in the sheet, contact the sheet author, and visit the Mythras Roll20 Forum on The Design Mechanism's forum board where we discuss beta testing, plan feature enhancements, and other development tasks.
 * Firearms and Missile Weapons were merged together into Ranged Weapons
 * Shields were merged into Melee Weapons
@@ -43,10 +43,10 @@ With this version I am switching back to a two number version format.  The descr
 * Resolved an issue which was preventing sheet upgrade functions from running when sheets were upgraded.
 
 ### Other Changes
-* Quick Stats renamed to Build
+* Quick Stats renamed to Build (Doesn't not take you through the build process, still just provides a quick way to input the fields you need when first defining a character).
 * Traits were broken out of Info and into it's own section
-* The Penalty field has been renamed to 101+ which will hopefully make it's purpose clearer.  
-* The All tab has been removed, partially because I needed to free up the space for new tabs and also because the new Compact tab can be an effect replacement for the purpose the All tab filled.
+* The Penalty field has been renamed to 101+ which will hopefully make it's purpose clearer.
+* The All tab has been removed, partially because I needed to free up the space for new tabs and also because the new Compact tab can be an effective replacement for the purpose the All tab filled.
 * Combat Styles is now just Combat and holds a number of things useful for combat like a handful of standard skills.  Weapons were also merged into this section.
 * Roll buttons which use d100 based rolls have a hundreds d10 icon instead of a d20.
 
