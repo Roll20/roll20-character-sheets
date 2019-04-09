@@ -9,9 +9,9 @@ La fiche reprend les éléments de la feuille de personnage officielle réorgani
 	* Les statistiques secondaires (Esquive, Fouille, Magie...) sont calculées automatiquement
 	* La vitesse de déplacement est calculée en fonction de l'Armure, la Force et l'Encombrement du personnage (pour ceux qui souhaitent pousser le réalisme au maximum)
 - Compétences
-	* Permet de gérer les Compétences, les APE et les Coups spéciaux avec les lancer d'épreuves / dégâts correspondants
+	* Permet de gérer les Compétences, les APE, les Traits particuliers (buff / debuff) et les Coups spéciaux avec les lancer d'épreuves / dégâts correspondants
 - Equipement
-	* Permet de gérer ses armes (mêlée, distance), ses armures, ses munitions et bagues
+	* Permet de gérer ses armes (mêlée, distance), ses armes à poudre, ses armures, ses munitions et bagues
 	* Permet de gérer son score de protection (calculé en partie par l'équipement)
 - Magie
 	* Permet d'enregistrer ses écoles de magies (Généraliste, Combat, Feu, Prodiges...)	

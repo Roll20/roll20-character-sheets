@@ -16,11 +16,11 @@
 .sheet-container{
     display:none;
 }
-.sheet-hide-tab{
+input.sheet-hide-tab{
     opacity:0;
     z-index:10;
     width:100%;
-    height:100%;
+    height:21px;
 }
 .sheet-starfinder :focus{
     outline:0px solid transparent;
@@ -28,9 +28,34 @@
 .sheet-tab-button + span,
 .sheet-initiative-container,
 .sheet-label,
-.sheet-starfinder button[type=roll] {
+.sheet-starfinder button[type=roll],
+.sheet-starfinder button[type=action],
+.sheet-starfinder button[type=compendium],
+.charsheet button[type=cancel],
+.charsheet button[type=submit],
+.charsheet button[type=finish],
+.charsheet button[type=back]{
     font-weight:400 !important;
     font-size:8pt;
+}
+.sheet-hover-react:hover span {
+    color: white;
+}
+.sheet-hover-react:hover{
+    background-color: #215277;
+}
+.sheet-starfinder .sheet-hover-react{
+    padding: 0px 3px;
+    border-radius: 5px;
+}
+.sheet-starfinder button[type=compendium]{
+    display:flex;
+    align-items: center;
+    justify-content:center;
+    padding:0px;
+}
+.sheet-starfinder button[type=compendium]:before {
+    margin-right: 5px;
 }
 [hidden='true'] {
     display:none !important;
@@ -73,6 +98,7 @@ input[type=number]{
 }
 textarea{
     resize:vertical;
+    margin:0px;
 }
 select {
     border: 0px;
@@ -85,8 +111,8 @@ select {
     position:relative;
     width:auto;
     height:14px;
-    margin:0px !important;
-    padding:0px !important;
+    margin:0px;
+    padding:0px;
     text-align-last:center;
     line-height:14px;
 }
@@ -96,6 +122,12 @@ select {
     font-weight:8pt;
 }
 button[type=roll],
+button[type=action],
+button[type=compendium],
+button[type=cancel],
+button[type=submit],
+button[type=finish],
+button[type=back],
 label{
     background-color: transparent;
     border: none;
@@ -136,6 +168,7 @@ label{
     cursor:pointer;
     display:inline;
     position:relative;
+    width:auto;
 }
 button[type=roll]::before{
     content: "" !important;
@@ -165,7 +198,6 @@ label:hover,
     --circlecolor:#707070;
     --borderradius:0px 4px 4px 4px;
     margin-left:5px;
-    min-width:881px;
 }
 .sheet-starfinder .sheet-disclaimer{
     grid-area:disclaimer;
@@ -180,7 +212,8 @@ label:hover,
     height:100%;
     min-height:100%;
 }
-.sheet-starfinder h1 {
+.sheet-starfinder h1,
+.sheet-h1 {
     font-size:10pt;
     line-height:inherit;
     z-index:2;
@@ -191,7 +224,7 @@ label:hover,
 .sheet-class-info,
 .sheet-buffs,
 .sheet-menus,
-.sheet-attribute-container,
+.sheet-starfinder .sheet-attribute-container,
 .sheet-section-container > .sheet-section-container{/*Creates the polygonal appearance of the section containers*/
     position:relative;
     /**/
@@ -215,6 +248,7 @@ label:hover,
 }
 .sheet-starfinder .sheet-section > *{
     padding:0px;
+    color:white;
 }
 .sheet-name-container {
     display:inline-block;
@@ -236,9 +270,6 @@ label:hover,
     position:relative;
     grid-template-columns: [name-container-start tab-container-start header-start]160px [name-container-end ] minmax(257px,1fr) [header-end] 20px [in-play-start] 415px [in-play-end tab-container-end];
     grid-template-rows: [header-start in-play-start] 185px [header-end in-play-end] 20px [tab-container-start]  auto [tab-container-end];
-}
-.sheet-starfinder .sheet-section *{
-    color:white;
 }
 .sheet-pc > .sheet-header-content{
     grid-area:header;
@@ -328,12 +359,16 @@ label:hover,
 .sheet-hide-tab:checked + .sheet-section{
     z-index:11;
 }
-.sheet-hide-tab:not(:checked) + .sheet-section{
+.sheet-hide-tab:not(:checked):not(:hover) + .sheet-section{
   border-image: url('https://cdn.rawgit.com/Roll20/roll20-character-sheets/d0602504/Starfinder%20Official/Assets/SF_header_unselected.png') 17 27 fill repeat;
     z-index:-1;
 }
-.sheet-hide-tab:not(:checked) + .sheet-section .sheet-corner{
-    display:none;
+.sheet-page.sheet-core .sheet-combat .sheet-section-check:not(:checked) + .sheet-head{
+    z-index:-1;
+}
+.sheet-page.sheet-core .sheet-combat .sheet-section-check:not(:checked):not(:hover) + .sheet-head{
+    border-image: url('https://cdn.rawgit.com/Roll20/roll20-character-sheets/d0602504/Starfinder%20Official/Assets/SF_header_unselected.png') 17 27 fill repeat;
+    z-index:-4;
 }
 .sheet-pc > .sheet-header-content > .sheet-char-details:checked ~ .sheet-char-details.sheet-border,
 .sheet-pc > .sheet-header-content > .sheet-class-details:checked ~ .sheet-class-details.sheet-border,
@@ -379,17 +414,20 @@ label:hover,
     overflow:hidden;
 }
 .sheet-in-play > .sheet-condition-tab:checked ~ .sheet-conditions{
-    display:grid!important;
+    display:grid;
     grid-template-columns:repeat(4,1fr);
     grid-gap:5px;
     padding:5px;
     overflow-y:scroll;
     overflow-x:hidden;
 }
-.repcontainer[data-groupname='repeating_condition']{
+.sheet-starfinder .sheet-in-play > .sheet-conditions .repcontainer[data-groupname='repeating_condition']{
     display:grid;
     grid-template-columns:1fr 1fr;
     grid-gap:5px;
+}
+.sheet-span-all{
+    grid-column:1/-1;
 }
 .repcontainer[data-groupname='repeating_condition'] .sheet-display > input{
     width:100%;
@@ -563,52 +601,48 @@ div.sheet-tactical-condition > .sheet-encumbrance:in-range + span{
 input[type=radio].sheet-char-tab.sheet-class-details-tab:checked ~ .sheet-class-info {
     display:grid;
 }
-.repcontainer .sheet-filter-container{
-    position:relative;
-    min-height:20px;
-}
 .repcontainer .repitem:not(:last-child) .sheet-filter-container,
 .repcontainer .repitem:not(:last-child) .sheet-spell{
     margin-bottom:5px;
 }
 .sheet-starfinder input.sheet-show-options,
 .sheet-show-options + span {
-	width: 18px;
-	height: 18px;
+    width: 18px;
+    height: 18px;
 }
 .sheet-show-options{
-	opacity: 0;
-	position: absolute;
-	top: -5px;
-	right: 0px;
-	z-index: 6;
-	top: -5px;
-	right: 0px;
+    opacity: 0;
+    position: absolute;
+    top: -5px;
+    right: 0px;
+    z-index: 6;
+    top: -5px;
+    right: 0px;
 }
 .sheet-show-options + span{
-	position: absolute;
-	top: -5px;
-	right: 0px;
-	white-space: nowrap;
-	width: 18px;
-	height: 18px;
-	font-size: 20px;
-	font-family: pictos;
-	color: #A0A0A0;
-	cursor: pointer;
-	margin-top: 0px;
-	opacity: 0;
-	z-index:5;
+    position: absolute;
+    top: -5px;
+    right: 0px;
+    white-space: nowrap;
+    width: 18px;
+    height: 18px;
+    font-size: 20px;
+    font-family: pictos;
+    color: #A0A0A0;
+    cursor: pointer;
+    margin-top: 0px;
+    opacity: 0;
+    z-index:5;
 }
 .sheet-filter-container:hover .sheet-show-options +span,
 .sheet-skill-container:hover .sheet-show-options +span,
 .sheet-statblock .sheet-spell:hover .sheet-show-options +span{
-	opacity:100;
+    opacity:100;
 }
 .sheet-starfinder .sheet-filter-container .sheet-show-options:not(:checked) ~ .sheet-row-options,
 .sheet-starfinder .sheet-skill-container .sheet-show-options:not(:checked) ~ .sheet-row-options,
 .sheet-starfinder .sheet-spell .sheet-show-options:not(:checked) ~ .sheet-row-options{
-	display: none;
+    display: none;
 }
 .sheet-starfinder .sheet-filter-container .sheet-display .sheet-button-description > *:not(button):not(.sheet-expand-button),
 .sheet-starfinder .sheet-spell .sheet-display .sheet-button-description > *:not(button):not(.sheet-expand-button){
@@ -785,7 +819,7 @@ label.sheet-pseudo-repcontrol input{
     justify-self:end;
     width:auto;
     font-size:var(--squaredim);
-	min-height: 27px;
+    min-height: 27px;
     margin-bottom:10px;
 }
 .repcontrol:not([data-groupname='repeating_profession']){
@@ -802,7 +836,7 @@ label.sheet-pseudo-repcontrol input{
     padding:0px;
 }
 .repcontrol .btn:focus {
-	outline: 0;
+    outline: 0;
 }
 .repcontrol .repcontrol_add::before,
 .sheet-pseudo-repcontrol span,
@@ -819,7 +853,7 @@ label.sheet-pseudo-repcontrol input{
     position: relative;
 }
 .repcontrol .repcontrol_edit:after {
-	content: '(';
+    content: '(';
 }
 .repcontrol .repcontrol_edit:after,
 .repcontrol .repcontrol_add:before{
@@ -827,11 +861,11 @@ label.sheet-pseudo-repcontrol input{
     left:0px;
 }
 .editmode ~ .repcontrol .repcontrol_edit:after {
-	content: ')';
+    content: ')';
 }
 .repcontrol .repcontrol_add:before,
 .sheet-pseudo-repcontrol span{
-	content: '&';
+    content: '&';
 }
 .repcontrol_add,
 .repcontrol_edit{
@@ -840,30 +874,33 @@ label.sheet-pseudo-repcontrol input{
 .repcontrol .repcontrol_edit:hover,
 .repcontrol .repcontrol_add:hover
 {
-	background-color: transparent;
+    background-color: transparent;
 }
 .itemcontrol {
-	z-index: 10;
+    z-index: 10;
 }
 .itemcontrol .repcontrol_del {
-	font-size: 10px;
-	margin-top: 3px;
-	padding: 0px;
-	height: 18px;
-	width: 18px;
+    font-size: 10px;
+    margin-top: 3px;
+    padding: 0px;
+    height: 18px;
+    width: 18px;
     font-family:pictos;
-	content:'#';
+    content:'#';
 }
 .itemcontrol .repcontrol_move {
-	font-size: 10px;
-	margin-top: 3px;
-	padding: 0px;
-	height: 18px;
-	width: 18px;
+    font-size: 10px;
+    margin-top: 3px;
+    padding: 0px;
+    height: 18px;
+    width: 18px;
 }
 .sheet-row-options textarea{
     min-height:60px;
     height:60px;
+}
+.sheet-row-options > textarea{
+    width:100%;
 }
 .sheet-pc > .sheet-tab-container{
     position:relative;
@@ -875,14 +912,14 @@ label.sheet-pseudo-repcontrol input{
 }
 .sheet-page{
     display:grid;
-	grid-area:page;
+    grid-area:page;
 }
 input[type=radio].sheet-tab-button.sheet-core:checked ~ .sheet-page.sheet-core,
 input[type=radio].sheet-tab-button.sheet-bio:checked ~ .sheet-page.sheet-bio,
 input[type=radio].sheet-tab-button.sheet-abilities:checked ~ .sheet-page.sheet-abilities,
 input[type=radio].sheet-tab-button.sheet-spells:checked ~ .sheet-page.sheet-spells,
 input[type=radio].sheet-tab-button.sheet-options:checked ~ .sheet-page.sheet-options{
-	display:grid;
+    display:grid;
 }
 .sheet-proficiency-section .sheet-section-container{
     display:grid;
@@ -931,7 +968,6 @@ input[type=radio].sheet-tab-button.sheet-options:checked ~ .sheet-page.sheet-opt
 }
 .sheet-proficiency-section .sheet-prof-gutter{
     grid-area:gutter;
-    background-color:black;
 }
 .sheet-proficiency-section span.sheet-small-arms{
     grid-area:small-label;
@@ -1011,10 +1047,6 @@ input[type=radio].sheet-tab-button.sheet-options:checked ~ .sheet-page.sheet-opt
     height:100%;
     opacity:0;
 }
-.sheet-page.sheet-core .sheet-combat .sheet-section-check:not(:checked) + .sheet-head{
-    z-index:-4;
-  border-image: url('https://cdn.rawgit.com/Roll20/roll20-character-sheets/d0602504/Starfinder%20Official/Assets/SF_header_unselected.png') 17 27 fill repeat;
-}
 .sheet-page.sheet-core .sheet-combat .sheet-section-check:checked + .sheet-head{
     z-index:10;
 }
@@ -1066,10 +1098,19 @@ input[type=radio].sheet-tab-button.sheet-options:checked ~ .sheet-page.sheet-opt
 .sheet-initiative-container > .sheet-section{
     grid-area:char-tab;
 }
-.sheet-initiative-container > .sheet-section *{
+.sheet-initiative-container > .sheet-section *,
+.sheet-image-button-holder > .sheet-section *{
     line-height:0px;
     font-size:10pt !important;
     padding:0px !important;
+}
+.sheet-starfinder .sheet-page .sheet-initiative-container .sheet-section button {
+    line-height: normal !important;
+    height: auto !important;
+    margin-top: -7px !important;
+    color: white;
+    width: 100%;
+    text-align: center;
 }
 .sheet-initiative-container > .sheet-section-container{
     grid-area:hcontent;
@@ -1091,7 +1132,8 @@ input[type=radio].sheet-tab-button.sheet-options:checked ~ .sheet-page.sheet-opt
     grid-area:select;
     justify-self:stretch;
 }
-.sheet-initiative-container .sheet-section button[type=roll]{
+.sheet-initiative-container .sheet-section button[type=roll],
+.sheet-image-button-holder > .sheet-section button{
     height:0px;
     top:-2px;
     text-shadow:none;
@@ -1130,7 +1172,7 @@ input[type=radio].sheet-tab-button.sheet-options:checked ~ .sheet-page.sheet-opt
 .sheet-section-container > .sheet-section-container:not(.sheet-border) {
     width:100%;
 }
-.sheet-attribute-container {
+.sheet-starfinder .sheet-attribute-container {
     overflow:hidden;
     grid-area:hcontent;
     display:grid;
@@ -1142,10 +1184,10 @@ input[type=radio].sheet-tab-button.sheet-options:checked ~ .sheet-page.sheet-opt
     border:black solid 1px;
     border-radius:var(--borderradius);
 }
-.sheet-attribute-container > *:not(.sheet-always-glow){
+.sheet-starfinder .sheet-attribute-container > *:not(.sheet-always-glow){
     width:100% !important;
 }
-.sheet-attribute-container button{
+.sheet-starfinder .sheet-attribute-container button{
     grid-column:button-start / button-end;
 }
 .sheet-page .sheet-attribute-container > .sheet-mod{
@@ -1153,7 +1195,7 @@ input[type=radio].sheet-tab-button.sheet-options:checked ~ .sheet-page.sheet-opt
     text-align:center;
     border:none;
 }
-.sheet-attribute-container .sheet-label{
+.sheet-starfinder .sheet-attribute-container .sheet-label{
     text-align:center;
 }
 .sheet-starfinder .sheet-attr-base-mod-container{
@@ -1199,31 +1241,37 @@ input[type=radio].sheet-tab-button.sheet-options:checked ~ .sheet-page.sheet-opt
     top:0px;
     left:-5px;
 }
-.sheet-attribute-container .sheet-pen{
+.sheet-starfinder .sheet-attribute-container .sheet-pen{
     grid-column:pen-start / pen-end;
 }
-.sheet-attribute-container .sheet-drain{
+.sheet-starfinder .sheet-attribute-container .sheet-tot{
+    grid-column:total-start / total-end;
+}
+.sheet-starfinder .sheet-attribute-container .sheet-pen{
+    grid-column:pen-start / pen-end;
+}
+.sheet-starfinder .sheet-attribute-container .sheet-drain{
     grid-column:drn-start / drn-end;
 }
-.sheet-attribute-container .sheet-label{
+.sheet-starfinder .sheet-attribute-container .sheet-label{
     grid-row:head-start / head-end;
 }
-.sheet-attribute-container .sheet-strength{
+.sheet-starfinder .sheet-attribute-container .sheet-strength{
     grid-row:strength-start / strength-end;
 }
-.sheet-attribute-container .sheet-dexterity{
+.sheet-starfinder .sheet-attribute-container .sheet-dexterity{
     grid-row:dexterity-start / dexterity-end;
 }
-.sheet-attribute-container .sheet-constitution{
+.sheet-starfinder .sheet-attribute-container .sheet-constitution{
     grid-row:constitution-start / constitution-end;
 }
-.sheet-attribute-container .sheet-intelligence{
+.sheet-starfinder .sheet-attribute-container .sheet-intelligence{
     grid-row:intelligence-start / intelligence-end;
 }
-.sheet-attribute-container .sheet-wisdom{
+.sheet-starfinder .sheet-attribute-container .sheet-wisdom{
     grid-row:wisdom-start / wisdom-end;
 }
-.sheet-attribute-container .sheet-charisma{
+.sheet-starfinder .sheet-attribute-container .sheet-charisma{
     grid-row:charisma-start / charisma-end;
 }
 .sheet-health{
@@ -1236,7 +1284,7 @@ input[type=radio].sheet-tab-button.sheet-options:checked ~ .sheet-page.sheet-opt
 }
 .sheet-health-resolve-container span,
 .sheet-ac-container span {
-	display:block;
+    display:block;
 }
 .sheet-no-sp:checked ~ .sheet-always-glow {
     --box-shadow:0px 0px 20px 2px #fa893a;
@@ -1452,8 +1500,8 @@ span.sheet-ranks,
     overflow:hidden;
 }
 .sheet-cs {
-	opacity:0;
-	position:absolute;
+    opacity:0;
+    position:absolute;
 }
 .sheet-class-skill {
     width:10px;
@@ -1473,13 +1521,13 @@ span.sheet-ranks,
     left:-10px;
 }
 .sheet-class-skill input[type=checkbox] {
-	z-index:2;
+    z-index:2;
 }
 .sheet-class-skill input[type=checkbox]:checked {
-	opacity:0;
+    opacity:0;
 }
 .sheet-class-skill input[type=checkbox]:checked ~ .sheet-cs {
-	opacity:100;
+    opacity:100;
 }
 .sheet-row-options{
     border-radius:5px;
@@ -1489,6 +1537,56 @@ span.sheet-ranks,
 .sheet-row-options .sheet-row {
     display:flex;
     justify-content:flex-start;
+    flex:1 1;
+}
+.sheet-starfinder .sheet-row-options span,
+.sheet-starfinder .sheet-row-options input,
+.sheet-starfinder .sheet-row-options select{
+    margin-right: 5px;
+}
+.sheet-group,
+.sheet-filter-container .sheet-field-tab:checked + .sheet-expandable,
+.sheet-spell .sheet-field-tab:checked + .sheet-expandable{
+    display:flex;
+    width:100%;
+    align-items:center;
+    margin-bottom: 5px;
+}
+.sheet-group > span{
+    display:block;
+}
+.sheet-group label{
+    width:auto;
+}
+.sheet-width-scaled,
+.sheet-width-scaler{
+    width:auto;
+    position:relative;
+}
+.sheet-height-scaled,
+.sheet-height-scaler{
+    height:auto;
+    position:relative;
+}
+.sheet-large-input{
+    flex:4 4 200px;
+    width:200px;
+}
+.sheet-medium-input{
+    flex:2 2 100px;
+    width:100px;
+}
+.sheet-small-input{
+    flex:1 1 50px;
+    width:50px;
+}
+.sheet-tiny-input{
+    flex:0.5 0.5 25px;
+    width:25px;
+}
+.sheet-bab-input{
+    width:20px !important;
+    text-align:center;
 }
 .sheet-skill-container > .sheet-row-options > textarea{
     text-align:left;
@@ -1585,13 +1683,9 @@ button.sheet-summary span{
 .sheet-save-type{
     width:6.5em;
 }
-.sheet-freq-check ~ .sheet-at-will,
-.sheet-freq-check ~ .sheet-daily-limit{
+.sheet-freq-check:not([value=at-will]):not([value=daily-limit]) ~ .sheet-at-will,
+.sheet-freq-check:not([value=daily-limit]) ~ .sheet-daily-limit{
     display:none;
-}
-.sheet-freq-check[value=at-will] ~ .sheet-at-will,
-.sheet-freq-check[value=daily-limit] ~ .sheet-daily-limit{
-    display:flex;
 }
 .sheet-at-will > .sheet-label{
     width:auto;
@@ -1690,15 +1784,15 @@ span.sheet-field{
     width:100%;
 }
 /*PC Attack, Ability, Equipment shared styling*/
-.sheet-filter-container.sheet-attack .sheet-row-options,
-.sheet-filter-container.sheet-item .sheet-row-options,
-.sheet-filter-container.sheet-ability .sheet-row-options,
-.sheet-filter-container.sheet-condition .sheet-row-options{
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr 1fr;
-    grid-gap:5px;
+.sheet-attack .sheet-row-options,
+.sheet-item .sheet-row-options,
+.sheet-ability .sheet-row-options,
+.sheet-condition .sheet-row-options,
+.sheet-spell .sheet-row-options{
+    display:flex;
     padding:2px 5px;
-    grid-auto-flow:dense;
+    flex-wrap:wrap;
+    align-items:center;
 }
 .sheet-row-options > .sheet-inherit-grid{
     display:grid;
@@ -1714,25 +1808,28 @@ span.sheet-field{
     display:none;
 }
 .sheet-starfinder .sheet-span-two{
-    grid-column-end: span 2;
-    margin:0px;
+    width: calc(50% - 10px);
+    grid-column:span 2
 }
 .sheet-starfinder .sheet-span-all{
-    grid-column:1/5;
-    margin:0px;
+    width: calc(100% - 10px);
 }
 .sheet-starfinder .sheet-display-margin{
     margin-right:18px;
 }
+.sheet-expandable{
+    width:auto;
+    margin-right:5px;
+    margin-bottom:5px;
+    display:block;
+}
 .sheet-filter-container .sheet-field-tab:checked + .sheet-expandable,
 .sheet-spell .sheet-field-tab:checked + .sheet-expandable{
-    grid-column:1/5;
-    margin:0px;
+    flex-basis: 100%;
+    margin-right:0px;
 }
-.sheet-filter-container .sheet-field-tab:not(:checked) + div,
-.sheet-filter-container .sheet-field-tab:not(:checked) + textarea,
-.sheet-spell .sheet-field-tab:not(:checked) + div,
-.sheet-spell .sheet-field-tab:not(:checked) + textarea{
+.sheet-field-tab:not(:checked) + div,
+.sheet-field-tab:not(:checked) + textarea{
     display:none;
 }
 .repcontainer[data-groupname='repeating_attack'] .repitem {
@@ -1751,18 +1848,6 @@ span.sheet-field{
     width:100%;
     padding:0px;
     margin:0px;
-}
-.sheet-proficiency{
-    width:50%!important;
-}
-.sheet-weapon-cat,
-.sheet-target{
-    width:40%!important;
-    margin-left:5px;
-}
-.sheet-atk-level{
-    width:20px;
-    margin-right:20px;
 }
 .sheet-starfinder .repcontainer .sheet-bab {
     width:20px;
@@ -1904,13 +1989,6 @@ span.sheet-field{
 .sheet-spell-levels-display ~ div.sheet-class-spells-day{
     display:none;
 }
-.sheet-spell .sheet-row-options{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    grid-gap:5px;
-    padding:2px 5px;
-    grid-auto-flow:dense;
-}
 .sheet-spell .sheet-row-options .sheet-inherit-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -1921,11 +1999,11 @@ span.sheet-field{
     width:100%;
     display:none;
 }
-.sheet-spell .sheet-field-tab:checked + .sheet-expandable{
-    grid-column-end:3;
-    margin:0px;
+.sheet-filter-container .sheet-field-tab:checked + .sheet-expandable.sheet-field-container,
+.sheet-spell .sheet-field-tab:checked + .sheet-expandable.sheet-field-container{
+    display: flex;
+    flex-wrap: wrap;
 }
-
 .sheet-starfinder .sheet-container .repcontainer[data-groupname='repeating_spell'] > .repitem > .sheet-spell .sheet-button-description{
     grid-template-columns:2fr 1fr;
     grid-column-gap:5px;
@@ -2292,15 +2370,17 @@ input[type=checkbox].sheet-class-spells:checked + .sheet-spellclass-container,
 }
 /*settings style*/
 .sheet-settings .sheet-row{
-    display:flex !important;
+    display:flex;
     justify-content:space-between;
+}
+.sheet-settings .sheet-row .sheet-label{
+    display:inline-block;
 }
 .sheet-settings{
     grid-area:settings;
-    grid-template-columns:270px 270px 270px;
-    grid-auto-flow:column;
+    grid-template-columns:1fr 1fr 1fr;
     grid-column-gap:20px;
-    grid-row-gap:40px;
+    grid-row-gap:20px;
     align-items:start;
 }
 .sheet-settings > .sheet-section-container > .sheet-section-container{
@@ -2311,6 +2391,9 @@ input[type=checkbox].sheet-class-spells:checked + .sheet-spellclass-container,
 }
 .sheet-settings > .sheet-section-container > .sheet-section-container > * {
     grid-column: row-start;
+}
+.sheet-pc-display:not([value=pc]) ~ .sheet-pcrow{
+    display:none;
 }
 .sheet-gutter{
     height:0px;
@@ -2419,9 +2502,15 @@ input[type=checkbox].sheet-class-spells:checked + .sheet-spellclass-container,
     grid-area:label;
 }
 .sheet-statblock > .sheet-attack-row > .repcontainer,
-.sheet-statblock > .sheet-spell-like-row > .repcontainer{
+.sheet-statblock > .sheet-spell-like-row > .repcontainer,
+.sheet-statblock > .sheet-attack-row > .sheet-multiattack-button{
     grid-area:repeating;
     max-height:initial;
+}
+.sheet-statblock > .sheet-attack-row > .sheet-multiattack-button{
+    width:100%;
+    height:100%;
+    opacity:0;
 }
 .sheet-statblock > .sheet-spell-like-row > .repcontrol,
 .sheet-statblock > .sheet-spell-like-row > .sheet-pseudo-repcontrol,
@@ -2630,7 +2719,7 @@ input.sheet-cr{
     line-height:18px;
 }
 .sheet-statblock .sheet-row .sheet-skill-fieldset{
-    grid-column-start:initial;
+    grid-column:1/-1;
     grid-row-end:span 2;
 }
 /*Ship Styling*/
@@ -3487,6 +3576,8 @@ grid-template-columns:0px [life-support-start sensors-start weapons-start weapon
     align-items:end;
     align-items:flex-end;
     z-index:100;
+    right:0px;
+    top:0px;
 }
 .sheet-starfinder div.sheet-help-container .sheet-help-icon{
     align-self:end;
@@ -3519,6 +3610,322 @@ grid-template-columns:0px [life-support-start sensors-start weapons-start weapon
     align-self:flex-start;
     max-height:100%;
     overflow-y:scroll;
+}
+/*############################################################ Wizard display ############################################################*/
+.sheet-starfinder .sheet-wizard{
+    z-index:200;
+    position:sticky;
+    top:20%;
+    left: 100px;
+    width: 600px;
+}
+.sheet-wizard.sheet-section-container{
+    display:grid;
+    grid-template-columns: [char-tab-start] 5px [hcontent-start] minmax(150px,auto) [char-tab-end] 1fr [hcontent-end];
+    grid-template-rows: [char-tab-start class-tab-start] 16px [hcontent-start] 1px [char-tab-end class-tab-end] 1fr [hcontent-end];
+    justify-items:stretch;
+    align-items:stretch;
+}
+.sheet-starfinder .sheet-wizard .sheet-section-container > *:not(.repcontainer),
+.sheet-starfinder .sheet-wizard .sheet-section-container > span,
+.sheet-starfinder .sheet-wizard .sheet-section-container .repitem{
+    margin-bottom: 5px;
+}
+.sheet-starfinder .sheet-wizard .repcontainer{
+    margin-top:5px;
+}
+.sheet-starfinder .sheet-wizard .repitem{
+    display: inline-block;
+    margin-right: 10px;
+}
+.sheet-starfinder .sheet-wizard *:not(button),
+.sheet-starfinder .sheet-wizard button[type='action']{
+    font-size: 10pt;
+}
+.sheet-starfinder .sheet-wizard button[type='compendium']{
+    text-transform:none;
+    color:white;
+    text-align:center;
+}
+.sheet-starfinder .sheet-wizard .sheet-button-container{
+    display:flex;
+    justify-content:space-around;
+}
+.sheet-hide-repcontrols .repcontrol{
+    display:none;
+}
+.sheet-starfinder .sheet-wizard .sheet-section-container{
+    background-color:white;
+    position:absolute;
+    box-shadow:0px 0px 150px 60px black;
+    top: 3px;
+    padding:5px;
+}
+.sheet-starfinder .sheet-wizard-display[value=""] + .sheet-wizard{
+    display:none;
+}
+.sheet-type-display[value*=custom] + select,
+.sheet-attribute-display[value*=custom] + select,
+.sheet-type-display:not([value*=custom]) ~ .sheet-custom-type,
+.sheet-attribute-display:not([value*=custom]) ~ .sheet-custom-attribute{
+    display:none;
+}
+.sheet-container-header,
+.sheet-container-header ~ .repcontainer > .repitem{
+    display:flex;
+    align-items: center;
+    text-align: center;
+}
+.sheet-container-header > span{
+    font-family:Contrail One;
+}
+.sheet-container-header > *,
+.sheet-container-header ~ .repcontainer > .repitem > *:not(:last-child){
+    margin-right:5px;
+}
+.sheet-container-header,
+.sheet-container-header ~ .repcontainer,
+.sheet-container-header ~ .repcontainer > .repitem{
+    margin:0px;
+    padding:0px;
+}
+.sheet-container-header{
+    margin-top:10px;
+}
+.sheet-wizard-mod{
+    display:block;
+    position:relative;
+}
+.sheet-filter-container .sheet-field-tab:not(:checked) + .sheet-wizard-mod,
+.sheet-spell .sheet-field-tab:not(:checked) + .sheet-wizard-mod{
+    display: none;
+}
+.sheet-wizard-mod > span{
+    display:block;
+    height:100%;
+    width:100%;
+    border: 0px solid black;
+    box-shadow: none;
+    background-color: #d7dbe0;
+    color: #112d42;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -webkit-border-radius: 0px;
+    border-radius: 5px;
+    padding: 0px;
+    font-size: 8pt;
+    font-family: Lucida Console,Monaco;
+    white-space:pre-wrap;
+}
+.sheet-method-display:not([value=wizard]) + .sheet-starfinder .sheet-wizard-mod{
+    display:none;
+}
+.sheet-method-display[value=wizard] + .sheet-starfinder .sheet-wizard-mod{
+    min-height:60px;
+    height:60px;
+    width:100%;
+}
+.sheet-method-display[value=wizard] + .sheet-starfinder .sheet-manual-mod{
+    display:none !important;
+}
+/*############################################################ Charmancer Styling ############################################################*/
+.sheet-slide-container{
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    flex-basis: 1 1;
+    position: relative;
+    contain: paint;
+}
+.sheet-slide-container > *{
+    width:100%;
+}
+.sheet-maintain-returns{
+    white-space: pre-wrap;
+}
+.sheet-maintain-returns:last-child{
+    text-align:right;
+}
+.sheet-maintain-returns:first-child{
+    text-align:left;
+}
+.sheet-slide-container > div:not(:last-child){
+    margin-bottom:10px;
+}
+.sheet-data-frame{
+    display:grid;
+    grid-template-columns:1fr 1.75fr;
+    grid-gap:10px;
+    min-height:300px;
+}
+.sheet-slide-container > .sheet-top-section{
+    position:sticky;
+    background-color:white;
+    top:0px;
+    border:0px;
+    border-radius:0px;
+    z-index:100;
+}
+.sheet-slide-container > .sheet-mancer-button-container{
+    display:flex;
+    justify-content:space-between;
+    position:sticky;
+    background-color:white;
+    bottom:-1px;
+}
+.sheet-mancernav{
+    display: inline-flex;
+    flex-wrap: wrap;
+    border: 10px solid transparent;
+    border-image: url('https://cdn.rawgit.com/Roll20/roll20-character-sheets/d0602504/Starfinder%20Official/Assets/SF_header_unselected.png') 17 27 fill repeat;
+    text-transform: uppercase;
+    font-weight: normal;
+    font-size: 10pt;
+    height: 0px;
+    padding: 2px 0px 0px 0px;
+    text-align: center;
+    letter-spacing: 0px;
+    margin-bottom: 0px;
+    line-height: 0px;
+}
+.sheet-slide-container .sheet-section{
+    border: 10px solid transparent;
+    text-transform: uppercase;
+    font-weight: normal;
+    font-size: 10pt;
+    height: 0px;
+    padding: 0px;
+    text-align: center;
+    letter-spacing: 0px;
+    display: inline-block;
+    margin-bottom: 0px;
+    line-height: 0px;
+}
+.sheet-slide-container.sheet-pc-start .sheet-image-button-holder > .sheet-section.sheet-pc-start,
+.sheet-slide-container.sheet-pc-race .sheet-image-button-holder > .sheet-section.sheet-pc-race,
+.sheet-slide-container.sheet-pc-theme .sheet-image-button-holder > .sheet-section.sheet-pc-theme,
+.sheet-slide-container.sheet-pc-class .sheet-image-button-holder > .sheet-section.sheet-pc-class,
+.sheet-slide-container.sheet-pc-ability-scores .sheet-image-button-holder > .sheet-section.sheet-pc-ability-scores,
+.sheet-slide-container.sheet-pc-skill .sheet-image-button-holder > .sheet-section.sheet-pc-skill,
+.sheet-slide-container.sheet-pc-feat .sheet-image-button-holder > .sheet-section.sheet-pc-feat,
+.sheet-slide-container.sheet-pc-equipment .sheet-image-button-holder > .sheet-section.sheet-pc-equipment,
+.sheet-image-button-holder > .sheet-section:hover,
+.sheet-class-view[value*='1'] ~ .sheet-image-button-holder > .sheet-class-1,
+.sheet-class-view[value*='2'] ~ .sheet-image-button-holder > .sheet-class-2,
+.sheet-class-view[value*='3'] ~ .sheet-image-button-holder > .sheet-class-3,
+.sheet-class-view[value*='4'] ~ .sheet-image-button-holder > .sheet-class-4,
+.sheet-class-view[value*='5'] ~ .sheet-image-button-holder > .sheet-class-5{
+    border-image: url(http://imgsrv.roll20.net/?src=cdn.rawgit.com/Roll20/roll20-character-sheets/d0602504/Starfinder%2520Official/Assets/SF_header.png) 17 27 fill repeat;
+    z-index:10;
+}
+.sheet-image-button-holder button{
+    color:white;
+}
+.sheet-mancernav > .sheet-section {
+    margin-right: -10px;
+}
+.sheet-image-button-holder > .sheet-section {
+    padding: 2px 5px 0px;
+    top: -12px;
+    position: relative;
+    left: -10px;
+}
+.sheet-image-button-holder > .sheet-section:last-child {
+    margin-right: -20px;
+}
+.sheet-image-button-holder > .sheet-hide-section{
+    opacity:0;
+}
+.sheet-slide-container .sheet-charmancerrow:not(.sheet-choice),
+.sheet-slide-container .sheet-charmancerrow.sheet-choice-showing{
+    display: flex;
+    justify-content:space-around;
+    margin: 0px 0px 10px;
+}
+.sheet-slide-container .sheet-data-frame .sheet-charmancerrow{
+    justify-content:space-between;
+}
+.sheet-slide-container .sheet-stat-container {
+    display: inline;
+}
+.sheet-slide-container .sheet-stat-container > *:first-child {
+    border-right:1px solid black;
+    padding-right:5px;
+}
+.sheet-charmancerrow .sheet-attribute-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    place-items:center center;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 5px;
+}
+.sheet-charmancerrow .sheet-attribute-container > *:last-child {
+    grid-column: 1/3;
+    border-top:1px solid black;
+}
+.sheet-slide-container .sheet-topbar-reciver{
+    border-bottom:1px solid black;
+}
+.sheet-hilite{
+    background-color:#EFEFEF;
+    border-radius:5px;
+}
+.sheet-hilite:after{
+    content:'* required';
+    font-style: italic;
+    font-weight: normal;
+    display: block;
+    font-size: 14px;
+    font-variant: small-caps;
+}
+.sheet-select-div{
+    display:grid;
+    grid-template-columns:1fr auto;
+    grid-template-rows:auto auto;
+    grid-template-areas:
+        'label label'
+        'select button';
+    padding:5px;
+    grid-gap:5px;
+    flex:1 1 auto;
+}
+.sheet-select-div span{
+    grid-area:label;
+}
+.sheet-select-div select{
+    grid-area:select;
+}
+.sheet-slide-container select{
+    background-color:white;
+    -webkit-appearance: menulist;
+    -moz-appearance: menulist;
+    appearance:menulist;
+    box-shadow: 0px 0px 5px 5px #EFEFEF inset;
+    -moz-appearance: menulist;
+    padding: 5px;
+    height: auto;
+    border-radius: 5px;
+}
+div.sheet-select{
+    display:inline;
+}
+.sheet-select-div button{
+    grid-area:button;
+}
+.sheet-ability-container > .sheet-ability-description:not(:last-child){
+    margin-bottom:5px;
+}
+.sheet-ability-container span.sheet-ability-description{
+    font-family:Lucida Console,Monaco;
+}
+.sheet-class-view:not([value*='1']) ~ .sheet-class-1,
+.sheet-class-view:not([value*='2']) ~ .sheet-class-2,
+.sheet-class-view:not([value*='3']) ~ .sheet-class-3,
+.sheet-class-view:not([value*='4']) ~ .sheet-class-4,
+.sheet-class-view:not([value*='5']) ~ .sheet-class-5{
+    display:none;
 }
 /*############################################################ ROLL TEMPLATES ############################################################*/
 .sheet-rolltemplate-sf_generic,
