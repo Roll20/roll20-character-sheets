@@ -187,7 +187,7 @@
                     <span class='label' data-i18n='mod method'>Mod Input Method</span>
                     <label class='hover-react'><input type='radio' title='@{mod_method}' name='attr_mod_method' value='manual'> <span class='label' data-i18n='manual' >Manual</span></label>
                     <label class='hover-react'><input type='radio' title='@{mod_method}' name='attr_mod_method' value='wizard' checked> <span class='label' data-i18n='wizard'>Wizard</span></label>
-                </div>
+                </div>-->
                 <div class='gutter'></div>
             </div>
         </div>
@@ -16968,11 +16968,8 @@ Charmancer overall slide template
                     obj.name = obj.name.replace(/(^|\s+)([a-z])/ig,(match,space,letter)=>{
                         return `${space}${letter.toUpperCase()}`;
                     });
-                    let spellBlob = data.blobs[obj.name]||data.blobs[obj.name.replace(/(.*?)\s*(greater|lesser)\s*(.+)/i,'$1$3 ($2)')];
-                    if(spellBlob && data.blobs[`${obj.name} (Level ${obj.level})`]){
-                        Object.assign(spellBlob,data.blobs[`${obj.name} (Level ${obj.level})`]);
-                    }
-                    TAS.log(`spellBlob for ${obj.name}:`);
+                    let spellBlob = data.blobs[obj.name]||data.blobs[`${obj.name} (Level ${obj.level})`]||data.blobs[obj.name.replace(/(.*?)\s*(greater|lesser)\s*(.+)/i,'$1$3 ($2)')];
+                    TAS.log(`spellBlob:`);
                     TAS.log(spellBlob);
                     if(spellBlob){
                         spellBlob.name = obj.name;
@@ -16994,14 +16991,11 @@ Charmancer overall slide template
                     }
                 });
             }
-            //Spell Like Ability parsing
-            if(data['data-spell-like-abilities']){
-                TAS.log(`processing Spell Like Abilities`);
-                data['data-spell-like-abilities']=JSON.parse(data['data-spell-like-abilities']);
-                TAS.log(data['data-spell-like-abilities']);
-                _.each(data['data-spell-like-abilities'],(obj)=>{
-                    TAS.log(`obj:`);
-                    TAS.log(obj);
+            //Ability parsing
+            if(data['data-abilities']){
+                TAS.log(`processing Abilities`);
+                data['data-abilities']=JSON.parse(data['data-abilities']);
+                _.each(data['data-abilities'],(obj)=>{
                     let rowID = generateRowID();
                     obj.name = obj.name.replace(/(^|\s+)([a-z])/ig,(match,space,letter)=>{
                         return `${space}${letter.toUpperCase()}`;
@@ -17048,14 +17042,36 @@ Charmancer overall slide template
                     }
                 });
             }
-            //Ability parsing
-            if(data['data-abilities']){
-                TAS.log(`processing Abilities`);
-                data['data-abilities']=JSON.parse(data['data-abilities']);
-                _.each(data['data-abilities'],(obj)=>{
+            //Spell Like Ability parsing
+            if(data['data-spell-like-abilities']){
+                TAS.log(`processing Spell Like Abilities`);
+                data['data-spell-like-abilities']=JSON.parse(data['data-spell-like-abilities']);
+                TAS.log(data['data-spell-like-abilities']);
+                _.each(data['data-spell-like-abilities'],(obj)=>{
+                    TAS.log(`obj:`);
+                    TAS.log(obj);
                     let rowID = generateRowID();
+                    obj.name = obj.name.replace(/(^|\s+)([a-z])/ig,(match,space,letter)=>{
+                        return `${space}${letter.toUpperCase()}`;
+                    });
+                    let spellBlob = data.blobs[obj.name]||data.blobs[`${obj.name} (Level ${obj.level})`]||data.blobs[obj.name.replace(/(.*?)\s*(greater|lesser)\s*(.+)/i,'$1$3 ($2)')];
+                    TAS.log(`spellBlob:`);
+                    TAS.log(spellBlob);
+                    if(spellBlob){
+                        spellBlob.name = obj.name;
+                        parseSpellBlob(attributes,spellBlob,'ability',rowID,setObj);
+                    }
+                    TAS.log(`spell like spellBlob created items:`);
+                    TAS.log(
+                        _.reduce(_.keys(setObj),(m,k)=>{
+                            if(new RegExp(rowID).test(k)){
+                                m[k] = setObj[k];
+                            }
+                            return m;
+                        },{})
+                    )
+                    setObj[`repeating_ability_${rowID}_name`] = obj.name;
                     setObj[`repeating_ability_${rowID}_show_options`]=0;
-                    setObj[`repeating_ability_${rowID}_name`]=obj.name||'';
                     setObj[`repeating_ability_${rowID}_dc_base`]=obj.dc||10;
                     setObj[`repeating_ability_${rowID}_dc`]=obj.dc||10;
                     setObj[`repeating_ability_${rowID}_level`]=obj.level||0;
@@ -17233,7 +17249,7 @@ Charmancer overall slide template
                     }
                 }
             }
-            if(levelBlob['Damage Dice']){
+            if(levelBlob.damage_dice){
                 setObj[`repeating_${currentCat}_${rowID}_damage_checkbox`] = 1;
             }
             if(levelBlob.mods){
