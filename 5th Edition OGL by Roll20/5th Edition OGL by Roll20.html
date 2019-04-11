@@ -775,7 +775,7 @@
             <div class="row actiontitle">
                 <span class="title red" style="font-weight: normal; text-align: left;" data-i18n="spells">Spells</span>
             </div>
-            <div class="warning"><span style="color:#d06300;">THIS SECTION IS SCHEDULED TO BE REMOVED ON <u>19 APRIL 2019</u>. PLEASE TRANSFER ANY SPELLS LISTED HERE INTO THE NEW SPELLS BY LEVEL SECTION, AVAILABLE AFTER SELECTING THE 'SPELLCASTING NPC' OPTION FROM THE NPC OPTIONS ABOVE. IF THIS REMOVAL WOULD BE A HARDSHIP FOR YOU PLEASE REPLY ON THE STICKIED POST IN THE CHARACTER SHEET & COMPENDIUM FORUM</span></div>
+            <div class="warning"><span style="color:#d06300;">THIS SECTION IS DEPRECATED. PLEASE TRANSFER ANY SPELLS LISTED HERE INTO THE NEW SPELLS BY LEVEL SECTION, AVAILABLE AFTER SELECTING THE 'SPELLCASTING NPC' OPTION FROM THE NPC OPTIONS ABOVE.</span></div>
             <div class="spell-container">
                 <fieldset class="repeating_spell-npc">
                     <div class="spell">
@@ -7696,7 +7696,7 @@
 
                         update[`${repeatingRow}_spelllevel`]               = lvl;
                         update[`${repeatingRow}_spell_ability`]            = (update["spellcasting_ability"]) ? update["spellcasting_ability"] : "spell";
-                        (spell.Name) ? update[`${repeatingRow}_spellname`] = spell.Name : false;
+                        (spell.Name) ? update[`${repeatingRow}_spellname`] = spell.Name : console.log(`%c ${JSON.stringify(page.name)} is incorrect. Update compendium data.`, "color: orange;");
                         update[`${repeatingRow}_spelloutput`]              = (page.data["Damage"] || page.data["Healing"]) ? "ATTACK" : "SPELLCARD";
 
                         ["spellclass", "spellsource", "data-description"].forEach((attr) => {
@@ -8544,7 +8544,7 @@
     }
 
     const update_attack_from_spell = (lvl, spellid, attackid, newattack) => {
-        console.log(`c% Update Attack From Spell`, "color:purple");
+        console.log(`%c  Update Attack From Spell`, "color:purple");
         const repeating_spell  = `repeating_spell-${lvl}_${spellid}`;
         const repeating_attack = `repeating_attack_${attackid}`;
         getAttrs([`${repeating_spell}_spellname`, `${repeating_spell}_spellrange`, `${repeating_spell}_spelltarget`, `${repeating_spell}_spellattack`, `${repeating_spell}_spelldamage`, `${repeating_spell}_spelldamage2`,`${repeating_spell}_spelldamagetype`,`${repeating_spell}_spelldamagetype2`,`${repeating_spell}_spellhealing`,`${repeating_spell}_spelldmgmod`,`${repeating_spell}_spellsave`,`${repeating_spell}_spellsavesuccess`,`${repeating_spell}_spellhldie`,`${repeating_spell}_spellhldietype`,`${repeating_spell}_spellhlbonus`,`${repeating_spell}_spelllevel`,`${repeating_spell}_includedesc`,`${repeating_spell}_spelldescription`,`${repeating_spell}_spellathigherlevels`,`${repeating_spell}_spell_damage_progression`,`${repeating_spell}_innate`,`${repeating_spell}_spell_ability`,"spellcasting_ability"], (v) => {
@@ -11126,10 +11126,12 @@
         var additionalList = {};
         var blobs = getRelevantBlobs(mancerdata, "1", "l1");
 
-        //Collect expanded spell lists
+        //First look through all Blobs for any blob.Spells
         _.each(blobs.all, function(blob) {
             if(blob.Spells) {
                 var spells = JSON.parse(blob.Spells);
+                //Examine each spell to determine if it is "Extended List". "Extended List" adds to the classes spell list.
+                //Ravnica Guilds backgrounds such as Dimir Operative are examples of this
                 _.each(spells, function(spell) {
                     if(spell["Expanded List"]) {
                         expandedList[spell.Level] = expandedList[spell.Level] ? expandedList[spell.Level].concat(spell["Expanded List"]) : spell["Expanded List"];
@@ -11137,9 +11139,12 @@
                 });
             }
         });
+        //Look through blobs.sorted.
         _.each(blobs.sorted, function(sectionblobs, section) {
+            //Subclass needs to be changed to class.
             var parentsection = section.replace("sub", "");
             additionalList[parentsection] = additionalList[parentsection] || []
+            //Examine eaach blob for "Additional Spell List"
             _.each(sectionblobs, function(blob) {
                 if(blob["Additional Spell List"]) {
                     additionalList[parentsection].push(blob["Additional Spell List"]);
@@ -11150,18 +11155,24 @@
         _.each(blobs.sorted, function(sectionblobs, section) {
             var parentsection = section.replace("sub", "");
             _.each(sectionblobs, function(blob) {
+                //Looks through the blobs for Spells attribute
+                //class.Spells contains the information for how many spells are choosen at each level & Prepared spells to be selected based on ability modifer + 1
+                //[subclass, background, race}.Spells will contain KNOWN, CHOSEN, or EXPANDED LIST for extra spells granted by these sections
                 if(blob.Spells) {
                     var spells = JSON.parse(blob.Spells);
                     allSpells[parentsection] = allSpells[parentsection] || {known: [], choices: []}
                     _.each(spells, function(spell) {
                         var numSpells = 0;
                         expandedList[spell.Level] = expandedList[spell.Level] || [];
+                        //class.Spells will contain Prepared and Choose.
+                        //These are used to populate the number of selects needed for each spell lists on the Spells slide
                         if(spell.Prepared) {
                             numSpells = Math.max(stats.totals[spell.Prepared.split("+")[0].toLowerCase()].mod, 0) + parseInt(spell.Prepared.split("+")[1]);
                         }
                         if(spell.Choose) {
                             numSpells = parseInt(spell.Choose);
                         }
+                        //If Spells are to be Chosen or Prepared add them to a class list, expand the list, and set the Ability modifier & Level
                         if(numSpells > 0) {
                             _.times(numSpells, function(n) {
                                 var thisspell = {Level: parseInt(spell.Level)};
@@ -11172,6 +11183,7 @@
                                 allSpells[parentsection].choices.push(thisspell);
                             });
                         }
+                        //Add any spells that are already known from sections such as Forge Domain Cleric starts with identify & searing smite
                         _.each(spell.Known, function(known) {
                             var thisspell = {Name: known, Level: parseInt(spell.Level)};
                             thisspell.Ability = spell.Ability ? spell.Ability : classAbility;
@@ -15425,17 +15437,44 @@
                 });
             }
             setCharmancerText(update);
-            getCompendiumQuery(queries, function(data) {
-                var byLevel = {};
-                _.each(data, function(spell) {
-                    if(spell.data.Classes) {
+            getCompendiumQuery(queries, (data) => {
+                let byLevel = {};
+                _.each(data, (spell) => {
+                    let classes = [];
+                    if (spell.data.Classes) {
+                        classes = spell.data.Classes;
+                    //Ravinca introduced Spells without Classes
+                    } else {
+                      ["class1", "class2", "class3", "class4"].forEach(levelclass => {
+                            //Get the class name out of values & confirm its a spellcaster using data Spellcasting Ability
+                            const name = (mancerdata["lp-levels"].values[`${levelclass}`]) ? mancerdata["lp-levels"].values[`${levelclass}`].split("Classes:")[1] : false;
+                            const ability = 
+                                //Check if the class has a Spellcasting Ability attribute
+                                (mancerdata["lp-levels"].data[`${levelclass}`] && mancerdata["lp-levels"].data[`${levelclass}`]["Spellcasting Ability"]) ? true : 
+                                //Check if the subclass has a Spellcasting Ability attribute
+                                (mancerdata["lp-levels"].data[`${levelclass}_subclass`] && mancerdata["lp-levels"].data[`${levelclass}_subclass`]["Spellcasting Ability"]) ? true :
+                                //Set to false if the class is not a spellcaster
+                                false;
+                            if (name && ability) {
+                                //Spell casters have thier class name pushed to the array above
+                                classes.push(name);
+                            };
+                        });
+
+                       if (classes.length > 0) {
+                            classes = classes.join(', ');
+                       };
+                    };
+
+                    /* This will set the information for populating the spell list */
+                    if (classes.length > 0) {
                         byLevel[spell.data.Level] = byLevel[spell.data.Level] || [];
                         byLevel[spell.data.Level].push({
                             name: spell.name,
-                            classes: spell.data.Classes.split(",").map(x => x.trim()),
+                            classes: classes.split(",").map(x => x.trim()),
                             level: parseInt(spell.data.Level)
                         });
-                    }
+                    };
                 });
                 addSpellSections(byLevel, {
                     newspells: newspells,
