@@ -1,19 +1,35 @@
 <div class="sheet-darkerdungeons">
-	<div class="compendium-drop-target">
+	<input class="monster_confirm_flag" type="hidden" name="attr_monster_confirm_flag">
+	<div class="licensecontainer compendium-drop-target monsters">
 		<input class="sheet-toggle-npc" name="attr_npc" type="hidden" value="0">
 		<input class="sheet-toggle-npc-spells" name="attr_npcspellcastingflag" type="checkbox" value="1" hidden>
 		<input class="sheet-toggle-npc-edit" name="attr_npc_options-flag" type="checkbox" hidden>
 		<div class="sheet-section-roll">
-			<input type="hidden" name="attr_rtype">
-			<div>
-				<input type="radio" name="attr_advantagetoggle" value="{{query=1}} {{advantage=1}} {{r2=[[@{d20}"><span>ADVANTAGE</span>
-				<input type="radio" name="attr_advantagetoggle" value="{{query=1}} {{normal=1}} {{r2=[[0d20" checked="checked"><span>NORMAL</span>
-				<input type="radio" name="attr_advantagetoggle" value="{{query=1}} {{disadvantage=1}} {{r2=[[@{d20}"><span>DISADVANTAGE</span>
+			<input type="hidden" name="attr_rtype" class="sheet-roll-toggle">
+			<div class="sheet-section-roll-advantage">
+				<label class="sheet-radio">
+					<input type="radio" name="attr_advantagetoggle" value="{{query=1}} {{advantage=1}} {{r2=[[@{d20}">
+					<span title="@{advantagetoggle}">Advantage</span>
+				</label>
+				<label class="sheet-radio">
+					<input type="radio" name="attr_advantagetoggle" value="{{query=1}} {{normal=1}} {{r2=[[0d20" checked="checked">
+					<span title="@{advantagetoggle}">Normal</span>
+				</label>
+				<label class="sheet-radio">
+					<input type="radio" name="attr_advantagetoggle" value="{{query=1}} {{disadvantage=1}} {{r2=[[@{d20}">
+					<span title="@{advantagetoggle}">Disadvantage</span>
+				</label>
 			</div>
-			<input type="hidden" name="attr_wtype">
-			<div>
-				<input type="radio" name="attr_whispertoggle" value="" checked="checked"><span>PUBLIC</span>
-				<input type="radio" name="attr_whispertoggle" value="/w gm "><span>TO <span>GM</span></span>
+			<input type="hidden" name="attr_wtype" class="sheet-roll-toggle">
+			<div class="sheet-section-roll-whisper">
+				<label class="sheet-radio">
+					<input type="radio" name="attr_whispertoggle" value="" checked="checked">
+					<span title="@{whispertoggle}">Public</span>
+				</label>
+				<label class="sheet-radio">
+					<input type="radio" name="attr_whispertoggle" value="/w gm ">
+					<span title="@{whispertoggle}">To GM</span>
+				</label>
 			</div>
 		</div>
 		<div class="sheet-section-npc">
@@ -1158,7 +1174,11 @@
 																		<label class="sheet-form-checkbox">
 																			<input type="checkbox" name="attr_global_save_active_flag" value="1">
 																		</label>
-																		<input type="text" name="attr_global_save_rollstring">
+																		<input type="text" name="attr_global_save_name">
+																	</div>
+																	<div class="sheet-form-group">
+																		<label>Roll:</label>
+																		<input type="text" name="attr_global_save_roll">
 																	</div>
 																</div>
 															</div>
@@ -1169,7 +1189,7 @@
 																	<input type="checkbox" name="attr_global_save_active_flag" value="1">
 																	<span></span>
 																</div>
-																<span name="attr_global_save_rollstring"></span>
+																<span name="attr_global_save_name"></span><span name="attr_global_save_roll"></span>
 															</div>
 														</div>
 													</div>
@@ -1291,7 +1311,7 @@
 												<span></span>
 											</div>
 											<span name='attr_persuasion_bonus' title='@{persuasion_bonus}'>0</span>
-											<button type='roll' name='roll_persuasion' value='@{wtype}&{template:simple} {{rname=Persuasion}} {{mod=@{persuasion_bonus}}} {{r1=[[@{d20}+@{persuasion_bonus}@{pbd_safe}]]}} @{rtype}+@{persuasion_bonus}@{pbd_safe}]]}} {{global=@{global_skill_mod}}} @{charname_output}'>Persuasion <span>(Wis)</span></button>
+											<button type='roll' name='roll_persuasion' value='@{wtype}&{template:simple} {{rname=Persuasion}} {{mod=@{persuasion_bonus}}} {{r1=[[@{d20}+@{persuasion_bonus}@{pbd_safe}]]}} @{rtype}+@{persuasion_bonus}@{pbd_safe}]]}} {{global=@{global_skill_mod}}} @{charname_output}'>Persuasion <span>(Cha)</span></button>
 										</div>
 										<div class="sheet-pc-skill">
 											<div class="sheet-checkbox-image">
@@ -1406,7 +1426,11 @@
 																		<div class="sheet-form-checkbox">
 																			<input type="checkbox" name="attr_global_skill_active_flag" value="1">
 																		</div>
-																		<input type="text" name="attr_global_skill_rollstring">
+																		<input type="text" name="attr_global_skill_name">
+																	</div>
+																	<div class="sheet-form-group">
+																		<label>Roll:</label>
+																		<input type="text" name="attr_global_skill_roll">
 																	</div>
 																</div>
 															</div>
@@ -1417,7 +1441,8 @@
 																	<input type="checkbox" name="attr_global_skill_active_flag" value="1">
 																	<span></span>
 																</div>
-																<span name="attr_global_skill_rollstring"></span>
+																<span name="attr_global_skill_name"></span>
+																<span name="attr_global_skill_roll"></span>
 															</div>
 														</div>
 													</div>
@@ -2032,6 +2057,44 @@
 										</select>
 									</div>
 								</div>
+								<div class="sheet-container-panel sheet-pc-resources">
+									<div class="sheet-container-header">Other Resources</div>
+									<div class="sheet-container-body">
+										<fieldset class="repeating_resource">
+											<div class="sheet-fieldset-item sheet-fieldset-item-resource">
+												<div class="sheet-checkbox-cog">
+													<input type="checkbox" name="attr_options-flag" checked="checked"><span></span>
+													<span class="sheet-toggle-icon"></span>
+												</div>
+												<input type="checkbox" name="attr_options-flag" checked="checked" hidden class="sheet-toggle">
+												<div class="sheet-toggle-checked">
+													<div class="sheet-form">
+														<div class="sheet-form-header">Edit Resource</div>
+														<div class="sheet-form-body">
+															<div class="sheet-form-group">
+																<label>Name:</label>
+																<input type="text" name="attr_resourcename">
+															</div>
+															<div class="sheet-form-group">
+																<label>Amount:</label>
+																<input type="text" name="attr_resourceamount">
+																<label>Max:</label>
+																<input type="text" name="attr_resourcemax">
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="sheet-toggle-unchecked">
+													<div class="sheet-pc-resource">
+														<span name="attr_resourcename"></span>
+														<span name="attr_resourceamount"></span>
+														<span name="attr_resourcemax"></span>
+													</div>
+												</div>
+											</div>
+										</fieldset>
+									</div>
+								</div>
 								<div class="sheet-container-panel sheet-pc-attacks">
 									<div class="sheet-container-header">Attacks & Spellcasting</div>
 									<div class="sheet-container-body">
@@ -2190,8 +2253,8 @@
 												</div>
 												<div class="sheet-toggle-unchecked">
 													<div class="sheet-pc-attack">
-														<input type="text" name="attr_atkbonus" class="sheet-hidden" value="" disabled>
-														<input type="text" name="attr_atkdmgtype" class="sheet-hidden" value="" disabled>
+														<input type="text" name="attr_atkbonus" class="sheet-hidden" value="">
+														<input type="text" name="attr_atkdmgtype" class="sheet-hidden" value="">
 														<button type="roll" name="roll_attack" value="@{rollbase}" class="sheet-attack-button">
 															<span name="attr_atkname"></span>
 															<span name="attr_atkbonus"></span>
@@ -2231,7 +2294,11 @@
 																		<label class="sheet-form-checkbox">
 																			<input type="checkbox" name="attr_global_attack_active_flag" value="1">
 																		</label>
-																		<input type="text" name="attr_global_attack_rollstring">
+																		<input type="text" name="attr_global_attack_name">
+																	</div>
+																	<div class="sheet-form-group">
+																		<label>Roll:</label>
+																		<input type="text" name="attr_global_attack_roll">
 																	</div>
 																</div>
 															</div>
@@ -2242,7 +2309,8 @@
 																	<input type="checkbox" name="attr_global_attack_active_flag" value="1">
 																	<span></span>
 																</div>
-																<span name="attr_global_attack_rollstring"></span>
+																<span name="attr_global_attack_name"></span>
+																<span name="attr_global_attack_roll"></span>
 															</div>
 														</div>
 													</div>
@@ -2268,8 +2336,11 @@
 																		<label class="sheet-form-checkbox">
 																			<input type="checkbox" name="attr_global_damage_active_flag" value="1">
 																		</label>
+																		<input type="text" name="attr_global_damage_name">
+																	</div>
+																	<div class="sheet-form-group">
 																		<label>Damage:</label>
-																		<input type="text" name="attr_global_damage_rollstring">
+																		<input type="text" name="attr_global_damage_damage" value="">
 																	</div>
 																	<div class="sheet-form-group">
 																		<label>Type:</label>
@@ -2284,8 +2355,51 @@
 																	<input type="checkbox" name="attr_global_damage_active_flag" value="1">
 																	<span></span>
 																</div>
-																<span name="attr_global_damage_rollstring"></span>
+																<span name="attr_global_damage_name"></span>
+																<span name="attr_global_damage_damage"></span>
 																<span name="attr_global_damage_type"></span>
+															</div>
+														</div>
+													</div>
+												</fieldset>
+											</div>
+										</div>
+										<input type="hidden" name="attr_global_ac_mod_flag" class="sheet-field-toggle">
+										<div class="sheet-form sheet-form-inline">
+											<div class="sheet-form-header">Global AC Modifiers</div>
+											<div class="sheet-form-body">
+												<fieldset class="repeating_acmod">
+													<div class="sheet-fieldset-item">
+														<div class="sheet-checkbox-cog">
+															<input type="checkbox" name="attr_options-flag" checked="checked"><span></span>
+															<span class="sheet-toggle-icon"></span>
+														</div>
+														<input type="checkbox" name="attr_options-flag" checked="checked" hidden class="sheet-toggle">
+														<div class="sheet-toggle-checked">
+															<div class="sheet-form">
+																<div class="sheet-form-header">Edit Modifier</div>
+																<div class="sheet-form-body">
+																	<div class="sheet-form-group">
+																		<label class="sheet-form-checkbox">
+																			<input type="checkbox" name="attr_global_ac_active_flag" value="1">
+																		</label>
+																		<input type="text" name="attr_global_ac_name">
+																	</div>
+																	<div class="sheet-form-group">
+																		<label>Value:</label>
+																		<input type="text" name="attr_global_ac_val" value="">
+																	</div>
+																</div>
+															</div>
+														</div>
+														<div class="sheet-toggle-unchecked">
+															<div class="sheet-pc-ac-modifier">
+																<div class="sheet-checkbox-image">
+																	<input type="checkbox" name="attr_global_ac_active_flag" value="1">
+																	<span></span>
+																</div>
+																<span name="attr_global_ac_name"></span>
+																<span name="attr_global_ac_val"></span>
 															</div>
 														</div>
 													</div>
@@ -2542,77 +2656,84 @@
 											</select>
 											<input type="text" name="attr_character_weight_detail" title="@{character_weight_detail}">
 										</div>
-										<div class="sheet-pc-detail">
+										<div class="sheet-pc-detail sheet-pc-detail-feature">
 											<label>Feature</label>
-											<select name="attr_character_feature" title="@{character_feature}">
-												<option value=""></option>
-												<option value="scar">Scar</option>
-												<option value="tattoo">Tattoo</option>
-												<option value="Piercing">Piercing</option>
-												<option value="birthmark">Birthmark</option>
-												<option value="accent">Accent</option>
-											</select>
-											<input type="text" name="attr_character_feature_detail" title="@{character_feature_detail}">
+											<div class="sheet-pc-detail-column">
+												<select name="attr_character_feature" title="@{character_feature}">
+													<option value=""></option>
+													<option value="scar">Scar</option>
+													<option value="tattoo">Tattoo</option>
+													<option value="Piercing">Piercing</option>
+													<option value="birthmark">Birthmark</option>
+													<option value="accent">Accent</option>
+												</select>
+												<input type="text" name="attr_character_feature_detail" title="@{character_feature_detail}">
+											</div>
 										</div>
-										<div class="sheet-pc-detail">
+										<div class="sheet-pc-detail sheet-pc-detail-motivation">
 											<label>Motivation</label>
-											<select name="attr_character_motivation" title="@{character_motivation}">
-												<option value=""></option>
-												<option value="achievement">To become the best</option>
-												<option value="acquisition">To obtain possessions or wealth</option>
-												<option value="balance">To bring all things into harmony</option>
-												<option value="beneficence">To protect, heal, and mend</option>
-												<option value="creation">To build or make new</option>
-												<option value="discovery">To explore, uncover, and pioneer</option>
-												<option value="education">To inform, teach, or train</option>
-												<option value="hedonism">To enjoy all things sensuous</option>
-												<option value="liberation">To free the self and/or others</option>
-												<option value="nobility">To be virtuous, honest, and brave</option>
-												<option value="order">To organize and reduce chaos</option>
-												<option value="play">To have fun, to enjoy life</option>
-												<option value="power">To control and lead others</option>
-												<option value="recognition">To gain approval, status, or fame</option>
-												<option value="service">To follow a person or group</option>
-												<option value="understanding">To seek knowledge or wisdom</option>
-											</select>
+											<div class="sheet-pc-detail-column">
+												<select name="attr_character_motivation" title="@{character_motivation}">
+													<option value=""></option>
+													<option value="achievement">To become the best</option>
+													<option value="acquisition">To obtain possessions or wealth</option>
+													<option value="balance">To bring all things into harmony</option>
+													<option value="beneficence">To protect, heal, and mend</option>
+													<option value="creation">To build or make new</option>
+													<option value="discovery">To explore, uncover, and pioneer</option>
+													<option value="education">To inform, teach, or train</option>
+													<option value="hedonism">To enjoy all things sensuous</option>
+													<option value="liberation">To free the self and/or others</option>
+													<option value="nobility">To be virtuous, honest, and brave</option>
+													<option value="order">To organize and reduce chaos</option>
+													<option value="play">To have fun, to enjoy life</option>
+													<option value="power">To control and lead others</option>
+													<option value="recognition">To gain approval, status, or fame</option>
+													<option value="service">To follow a person or group</option>
+													<option value="understanding">To seek knowledge or wisdom</option>
+												</select>
+												<input type="text" name="attr_character_motivation_detail" title="@{character_motivation_detail}">
+											</div>
 										</div>
-										<div class="sheet-pc-detail">
+										<div class="sheet-pc-detail sheet-pc-detail-habit">
 											<label>Habit</label>
-											<select name="attr_character_habit" title="@{character_habit}">
-												<option value=""></option>
-												<option value="humming">Humming</option>
-												<option value="dancing">Dancing</option>
-												<option value="sleepwalking">Sleepwalking</option>
-												<option value="fingernail">Fingernail biting</option>
-												<option value="daydreaming">Daydreaming</option>
-												<option value="talking">Talking in sleep</option>
-												<option value="whistling">Whistling</option>
-												<option value="name">Name dropping</option>
-												<option value="grooming">Constant grooming</option>
-												<option value="tapping">Foot tapping</option>
-												<option value="biting">Lip biting/licking</option>
-												<option value="coin">Coin flipping</option>
-												<option value="chewing">Chewing</option>
-												<option value="cracking">Knuckle cracking</option>
-												<option value="collects">Collects odd things</option>
-												<option value="singing">Singing</option>
-												<option value="snacking">Snacking</option>
-												<option value="pacing">Pacing</option>
-												<option value="counting">Counting</option>
-												<option value="snoring">Snoring</option>
-												<option value="beard">Beard/hair stroking</option>
-												<option value="nose_picking">Nose picking</option>
-												<option value="exaggeration">Exaggeration</option>
-												<option value="superstitious">Superstitious</option>
-												<option value="belching">Belching</option>
-												<option value="repeating">Repeating others</option>
-												<option value="smelling">Smelling things</option>
-												<option value="teeth">Teeth picking</option>
-												<option value="swearing">Swearing</option>
-												<option value="secrets">Telling secrets</option>
-												<option value="repeating_yourself">Repeating yourself</option>
-											</select>
-											<input type="text" name="attr_character_habit_detail" title="@{character_habit_detail}">
+											<div class="sheet-pc-detail-column">
+												<select name="attr_character_habit" title="@{character_habit}">
+													<option value=""></option>
+													<option value="humming">Humming</option>
+													<option value="dancing">Dancing</option>
+													<option value="sleepwalking">Sleepwalking</option>
+													<option value="fingernail">Fingernail biting</option>
+													<option value="daydreaming">Daydreaming</option>
+													<option value="talking">Talking in sleep</option>
+													<option value="whistling">Whistling</option>
+													<option value="name">Name dropping</option>
+													<option value="grooming">Constant grooming</option>
+													<option value="tapping">Foot tapping</option>
+													<option value="biting">Lip biting/licking</option>
+													<option value="coin">Coin flipping</option>
+													<option value="chewing">Chewing</option>
+													<option value="cracking">Knuckle cracking</option>
+													<option value="collects">Collects odd things</option>
+													<option value="singing">Singing</option>
+													<option value="snacking">Snacking</option>
+													<option value="pacing">Pacing</option>
+													<option value="counting">Counting</option>
+													<option value="snoring">Snoring</option>
+													<option value="beard">Beard/hair stroking</option>
+													<option value="nose_picking">Nose picking</option>
+													<option value="exaggeration">Exaggeration</option>
+													<option value="superstitious">Superstitious</option>
+													<option value="belching">Belching</option>
+													<option value="repeating">Repeating others</option>
+													<option value="smelling">Smelling things</option>
+													<option value="teeth">Teeth picking</option>
+													<option value="swearing">Swearing</option>
+													<option value="secrets">Telling secrets</option>
+													<option value="repeating_yourself">Repeating yourself</option>
+												</select>
+												<input type="text" name="attr_character_habit_detail" title="@{character_habit_detail}">
+											</div>
 										</div>
 										<div class="sheet-pc-detail">
 											<label>Family</label>
@@ -2846,6 +2967,38 @@
 												</div>
 											</div>
 										</fieldset>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="sheet-tab sheet-tab-notes">
+						<input type="radio" name="attr_tab" value="notes">
+						<span class="sheet-tab-label">Notes</span>
+						<div class="sheet-tab-content">
+							<div class="sheet-container-well sheet-pc-notes">
+								<div class="sheet-container-box sheet-pc-notes-features">
+									<div class="sheet-container-header">Additional Features & Traits</div>
+									<div class="sheet-container-body">
+										<textarea name="attr_additional_feature_and_traits"></textarea>
+									</div>
+								</div>
+								<div class="sheet-container-box sheet-pc-notes-backstory">
+									<div class="sheet-container-header">Character Backstory</div>
+									<div class="sheet-container-body">
+										<textarea name="attr_character_backstory"></textarea>
+									</div>
+								</div>
+								<div class="sheet-container-box sheet-pc-notes-allies">
+									<div class="sheet-container-header">Allies & Organisations</div>
+									<div class="sheet-container-body">
+										<textarea name="attr_allies_and_organizations"></textarea>
+									</div>
+								</div>
+								<div class="sheet-container-box sheet-pc-notes-treasure">
+									<div class="sheet-container-header">Treasure</div>
+									<div class="sheet-container-body">
+										<textarea name="attr_treasure"></textarea>
 									</div>
 								</div>
 							</div>
@@ -3171,9 +3324,9 @@
 															<div class="sheet-pc-item-header">
 																<span>Item Name</span>
 																<span>Quantity</span>
-																<span>Notches</span>
 																<span>Weight</span>
 																<span>Slots</span>
+																<span>Notches</span>
 															</div>
 															<div class="sheet-pc-item-content">
 																<span class="sheet-pc-item-name">
@@ -3184,14 +3337,14 @@
 																<span class="sheet-pc-item-quantity">
 																	<span name="attr_itemcount"></span>
 																</span>
-																<span class="sheet-pc-item-notches">
-																	<span name="attr_itemnotches"></span>
-																</span>
 																<span class="sheet-pc-item-weight">
 																	<span name="attr_itemweight"></span>
 																</span>
 																<span class="sheet-pc-item-slots">
 																	<span name="attr_itemsize"></span>
+																</span>
+																<span class="sheet-pc-item-notches">
+																	<span name="attr_itemnotches"></span>
 																</span>
 															</div>
 														</div>
@@ -3206,9 +3359,9 @@
 														<div class="sheet-pc-equipment-container-footer">
 															<span>Item Name</span>
 															<span>Quantity</span>
-															<span>Notches</span>
 															<span>Weight</span>
 															<span>Slots</span>
+															<span>Notches</span>
 														</div>
 													</div>
 												</div>
@@ -5842,7 +5995,7 @@
 											<div class="sheet-form-body">
 												<div class="sheet-form-group">
 													<label>Version:</label>
-													<input type="text" name="attr_version" value="2.0" hidden disabled>
+													<input type="text" name="attr_version" value="2.1" hidden disabled>
 													<span name="attr_version"</span>
 												</div>
 												<div class="sheet-form-group">
@@ -5912,6 +6065,12 @@
 													<label class="sheet-form-checkbox" title="@{global_damage_mod_flag}">
 														<input type="checkbox" name="attr_global_damage_mod_flag" value="1">
 														<span>Show Global Damage Modifier Field</span>
+													</label>
+												</div>
+												<div class="sheet-form-group">
+													<label class="sheet-form-checkbox" title="@{attr_global_ac_mod_flag}">
+														<input type="checkbox" name="attr_global_ac_mod_flag" value="1">
+														<span>Show Global AC Modifier Field</span>
 													</label>
 												</div>
 												<div class="sheet-form-group">
@@ -5991,6 +6150,12 @@
 													</label>
 												</div>
 												<div class="sheet-form-group">
+													<label class="sheet-form-checkbox" title="@{use_intelligent_initiative}">
+														<input type="checkbox" name="attr_use_intelligent_initiative" value="1" checked="checked">
+														<span>Use Intelligence for Initiative</span>
+													</label>
+												</div>
+												<div class="sheet-form-group">
 													<label class="sheet-form-checkbox" title="@{use_inventory_slots}">
 														<input type="checkbox" name="attr_use_inventory_slots" value="1" checked="checked">
 														<span>Use Inventory Slots</span>
@@ -6052,10 +6217,6 @@
 													</label>
 												</div>
 												<div class="sheet-form-group">
-													<label>Global Armor Class Modifier:</label>
-													<input type="text" name="attr_globalacmod" placeholder="0" title="@{globalacmod}">
-												</div>
-												<div class="sheet-form-group">
 													<label>Armor Class Tracking:</label>
 													<select name="attr_custom_ac_flag" title="@{custom_ac_flag}">
 														<option value="0" selected="selected">Automatic</option>
@@ -6064,35 +6225,56 @@
 													</select>
 												</div>
 												<input type="hidden" name="attr_custom_ac_flag" class="sheet-field-toggle">
-												<div class="sheet-form-group">
-													<label>Custom AC:</label>
-													<input type="text" name="attr_custom_ac_base" placeholder="10" value="10" title="@{custom_ac_base}">
-													<span>+</span>
-													<select name="attr_custom_ac_part1" title="@{custom_ac_part1}">
-														<option value="none" selected="selected">&mdash;</option>
-														<option value="Strength">STR</option>
-														<option value="Dexterity">DEX</option>
-														<option value="Constitution">CON</option>
-														<option value="Intelligence">INT</option>
-														<option value="Wisdom">WIS</option>
-														<option value="Charisma">CHA</option>
-													</select>
-													<span>+</span>
-													<select name="attr_custom_ac_part2" title="@{custom_ac_part2}">
-														<option value="none" selected="selected">&mdash;</option>
-														<option value="Strength">STR</option>
-														<option value="Dexterity">DEX</option>
-														<option value="Constitution">CON</option>
-														<option value="Intelligence">INT</option>
-														<option value="Wisdom">WIS</option>
-														<option value="Charisma">CHA</option>
-													</select>
+												<div class="sheet-form-fieldset sheet-form-fieldset-custom-ac">
+													<div class="sheet-form-fieldset-header">CUSTOM AC</div>
+													<div class="sheet-form-fieldset-body">
+														<div class="sheet-form-group">
+															<label>AC:</label>
+															<input type="text" name="attr_custom_ac_base" placeholder="10" value="10" title="@{custom_ac_base}">
+															<span>+</span>
+															<select name="attr_custom_ac_part1" title="@{custom_ac_part1}">
+																<option value="none" selected="selected">&mdash;</option>
+																<option value="Strength">STR</option>
+																<option value="Dexterity">DEX</option>
+																<option value="Constitution">CON</option>
+																<option value="Intelligence">INT</option>
+																<option value="Wisdom">WIS</option>
+																<option value="Charisma">CHA</option>
+															</select>
+															<span>+</span>
+															<select name="attr_custom_ac_part2" title="@{custom_ac_part2}">
+																<option value="none" selected="selected">&mdash;</option>
+																<option value="Strength">STR</option>
+																<option value="Dexterity">DEX</option>
+																<option value="Constitution">CON</option>
+																<option value="Intelligence">INT</option>
+																<option value="Wisdom">WIS</option>
+																<option value="Charisma">CHA</option>
+															</select>
+														</div>
+														<div class="sheet-form-group">
+															<label class="sheet-form-checkbox" title="@{custom_ac_shield}">
+																<input type="checkbox" name="attr_custom_ac_shield" value="yes" checked>
+																<span>Allow shields?</span>
+															</label>
+														</div>
+													</div>
 												</div>
-												<div class="sheet-form-fieldset">
-													<div class="sheet-form-fieldset-header">HP MODIFIERS:</div>
+												<div class="sheet-form-fieldset sheet-form-fieldset-hp-modifiers">
+													<div class="sheet-form-fieldset-header">HP MODIFIERS</div>
 													<div class="sheet-form-fieldset-body">
 														<fieldset class="repeating_hpmod">
 															<div class="sheet-fieldset-item">
+																<div class="sheet-form-group">
+																	<label>Level:</label>
+																	<select name="attr_levels">
+																		<option value="total" selected="selected">Total level</option>
+																		<option value="base">Main class level</option>
+																		<option value="multiclass1">Class 2 level</option>
+																		<option value="multiclass2">Class 3 level</option>
+																		<option value="multiclass3">Class 4 level</option>
+																	</select>
+																</div>
 																<div class="sheet-form-group">
 																	<label>Source:</label>
 																	<input type="text" name="attr_source">
@@ -6405,6 +6587,7 @@
 			<input type='hidden' name='attr_show_stress_flag' value='1'>
 			<input type='hidden' name='attr_show_survival_conditions' value='1'>
 			<input type='hidden' name='attr_use_inventory_slots' value='1'>
+			<input type='hidden' name='attr_use_intelligent_initiative' value='1'>
 			<!-- COMPENDIUM DROP CATCHERS -->
 			<input type="hidden" name="attr_drop_category" accept="Category">
 			<input type="hidden" name="attr_drop_name" accept="Name">
@@ -6412,933 +6595,945 @@
 			<input type="hidden" name="attr_drop_content" accept="Content">
 		</div>
 		<div class="sheet-section-templates">
-			<div class="rolltemplates">
+			<div class="sheet-rolltemplates">
 				<rolltemplate class="sheet-rolltemplate-simple">
-						<div class="container">
-								<div class="result">
-										{{#always}}
-												<div class="adv">
-														<span>{{r1}}{{#global}} + {{global}}{{/global}}</span>
-												</div>
-												<div class="advspacer"></div>
-												<div class="adv">
-														<span>{{r2}}{{#global}} + {{global}}{{/global}}</span>
-												</div>
-										{{/always}}
-										{{#normal}}
-												<div class="solo">
-														<span>{{r1}}{{#global}} + {{global}}{{/global}}</span>
-												</div>
-										{{/normal}}
-										{{#advantage}}
-												{{#rollLess() r1 r2}}
-														<div class="adv">
-																<span class="grey">{{r1}}{{#global}} + {{global}}{{/global}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span>{{r2}}{{#global}} + {{global}}{{/global}}</span>
-														</div>
-												{{/rollLess() r1 r2}}
-												{{#rollTotal() r1 r2}}
-														<div class="adv">
-																<span>{{r1}}{{#global}} + {{global}}{{/global}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span>{{r2}}{{#global}} + {{global}}{{/global}}</span>
-														</div>
-												{{/rollTotal() r1 r2}}
-												{{#rollGreater() r1 r2}}
-														<div class="adv">
-																<span>{{r1}}{{#global}} + {{global}}{{/global}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span class="grey">{{r2}}{{#global}} + {{global}}{{/global}}</span>
-														</div>
-												{{/rollGreater() r1 r2}}
-										{{/advantage}}
-										{{#disadvantage}}
-												{{#rollLess() r1 r2}}
-														<div class="adv">
-																<span>{{r1}}{{#global}} + {{global}}{{/global}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span class="grey">{{r2}}{{#global}} + {{global}}{{/global}}</span>
-														</div>
-												{{/rollLess() r1 r2}}
-												{{#rollTotal() r1 r2}}
-														<div class="adv">
-																<span>{{r1}}{{#global}} + {{global}}{{/global}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span>{{r2}}{{#global}} + {{global}}{{/global}}</span>
-														</div>
-												{{/rollTotal() r1 r2}}
-												{{#rollGreater() r1 r2}}
-														<div class="adv">
-																<span class="grey">{{r1}}{{#global}} + {{global}}{{/global}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span>{{r2}}{{#global}} + {{global}}{{/global}}</span>
-														</div>
-												{{/rollGreater() r1 r2}}
-										{{/disadvantage}}
+					<div class="container">
+						<div class="result">
+							{{#always}}
+								<div class="adv">
+									<span>{{r1}}{{#global}} + {{global}}{{/global}}</span>
 								</div>
-								<div class="label">
-										<span>{{rname}}{{#mod}} <span>({{mod}})</span>{{/mod}}</span>
+								<div class="advspacer"></div>
+								<div class="adv">
+									<span>{{r2}}{{#global}} + {{global}}{{/global}}</span>
 								</div>
-								{{#charname}}
-										<div class="charname">
-												<span>{{charname}}</span>
-										</div>
-								{{/charname}}
+							{{/always}}
+							{{#normal}}
+								<div class="solo">
+									<span>{{r1}}{{#global}} + {{global}}{{/global}}</span>
+								</div>
+							{{/normal}}
+							{{#advantage}}
+								{{#rollLess() r1 r2}}
+									<div class="adv">
+										<span class="grey">{{r1}}{{#global}} + {{global}}{{/global}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span>{{r2}}{{#global}} + {{global}}{{/global}}</span>
+									</div>
+								{{/rollLess() r1 r2}}
+								{{#rollTotal() r1 r2}}
+									<div class="adv">
+										<span>{{r1}}{{#global}} + {{global}}{{/global}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span>{{r2}}{{#global}} + {{global}}{{/global}}</span>
+									</div>
+								{{/rollTotal() r1 r2}}
+								{{#rollGreater() r1 r2}}
+									<div class="adv">
+										<span>{{r1}}{{#global}} + {{global}}{{/global}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span class="grey">{{r2}}{{#global}} + {{global}}{{/global}}</span>
+									</div>
+								{{/rollGreater() r1 r2}}
+							{{/advantage}}
+							{{#disadvantage}}
+								{{#rollLess() r1 r2}}
+									<div class="adv">
+										<span>{{r1}}{{#global}} + {{global}}{{/global}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span class="grey">{{r2}}{{#global}} + {{global}}{{/global}}</span>
+									</div>
+								{{/rollLess() r1 r2}}
+								{{#rollTotal() r1 r2}}
+									<div class="adv">
+										<span>{{r1}}{{#global}} + {{global}}{{/global}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span>{{r2}}{{#global}} + {{global}}{{/global}}</span>
+									</div>
+								{{/rollTotal() r1 r2}}
+								{{#rollGreater() r1 r2}}
+									<div class="adv">
+										<span class="grey">{{r1}}{{#global}} + {{global}}{{/global}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span>{{r2}}{{#global}} + {{global}}{{/global}}</span>
+									</div>
+								{{/rollGreater() r1 r2}}
+							{{/disadvantage}}
 						</div>
+						<div class="label">
+							<span>{{rname}}{{#mod}} <span>({{mod}})</span>{{/mod}}</span>
+						</div>
+						{{#charname}}
+							<div class="charname">
+								<span>{{charname}}</span>
+							</div>
+						{{/charname}}
+					</div>
 				</rolltemplate>
+
 				<rolltemplate class="sheet-rolltemplate-atk">
-						<div class="container">
-								<div class="result">
-										{{#always}}
-												<div class="adv">
-														<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-												</div>
-												<div class="advspacer"></div>
-												<div class="adv">
-														<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-												</div>
-										{{/always}}
+					<div class="container">
+						<div class="result">
+							{{#always}}
+								<div class="adv">
+									<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+								</div>
+								<div class="advspacer"></div>
+								<div class="adv">
+									<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+								</div>
+							{{/always}}
+							{{#normal}}
+								<div class="solo">
+									<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+								</div>
+							{{/normal}}
+							{{#advantage}}
+								{{#rollLess() r1 r2}}
+									<div class="adv">
+										<span class="grey">{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+								{{/rollLess() r1 r2}}
+								{{#rollTotal() r1 r2}}
+									<div class="adv">
+										<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+								{{/rollTotal() r1 r2}}
+								{{#rollGreater() r1 r2}}
+									<div class="adv">
+										<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span class="grey">{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+								{{/rollGreater() r1 r2}}
+							{{/advantage}}
+							{{#disadvantage}}
+								{{#rollLess() r1 r2}}
+									<div class="adv">
+										<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span class="grey">{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+								{{/rollLess() r1 r2}}
+								{{#rollTotal() r1 r2}}
+									<div class="adv">
+										<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+								{{/rollTotal() r1 r2}}
+								{{#rollGreater() r1 r2}}
+									<div class="adv">
+										<span class="grey">{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+								{{/rollGreater() r1 r2}}
+							{{/disadvantage}}
+						</div>
+						{{#range}}
+							<div class="sublabel">
+								<span>{{range}}</span>
+							</div>
+						{{/range}}
+						<div class="label">
+							{{#normal}}
+								{{#rollWasCrit() r1}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r1}}
+								{{#^rollWasCrit() r1}}<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/^rollWasCrit() r1}}
+							{{/normal}}
+							{{#always}}
+								{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+								{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+								{{#^rollWasCrit() r1}}{{#^rollWasCrit() r2}}<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/^rollWasCrit() r2}}{{/^rollWasCrit() r1}}
+							{{/always}}
+							{{#advantage}}
+								{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+								{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+								{{#^rollWasCrit() r1}}{{#^rollWasCrit() r2}}<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/^rollWasCrit() r2}}{{/^rollWasCrit() r1}}
+							{{/advantage}}
+							{{#disadvantage}}
+								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+								{{#rollTotal() r1 r2}}{{#^rollWasCrit() r1}}<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/^rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+								{{#rollLess() r1 r2}}<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollLess() r1 r2}}
+								{{#rollGreater() r1 r2}}<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollGreater() r1 r2}}
+							{{/disadvantage}}
+						</div>
+						{{#charname}}
+							<div class="charname">
+								<span>{{charname}}</span>
+							</div>
+						{{/charname}}
+					</div>
+					{{#desc}}
+						<div class="desc info">
+							<span>
+								<span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
+							</span>
+						</div>
+					{{/desc}}
+				</rolltemplate>
+
+				<rolltemplate class="sheet-rolltemplate-dmg">
+					{{#save}}
+						{{#attack}}
+							<div class="desc save">
+						{{/attack}}
+						{{^attack}}
+							<div class="atk save">
+						{{/attack}}
+							<div class="savedc">
+								<span class="rolltemplate-inline">DC</span><span class="rolltemplate-inline">{{savedc}}</span>
+							</div>
+							{{#savedesc}}
+								<div class="sublabel">
+									<span>{{savedesc}}</span>
+								</div>
+							{{/savedesc}}
+							<div class="label">
+								<span class="rolltemplate-inline">{{saveattr}}</span> <span class="rolltemplate-inline">Save</span>
+							</div>
+						</div>
+					{{/save}}
+					{{^attack}}
+						{{#desc}}
+							<div class="desc info">
+								<span>
+									<span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
+								</span>
+							</div>
+						{{/desc}}
+					{{/attack}}
+					{{#globaldamage}}
+						{{#^rollTotal() globaldamage 0}}
+							<div class="desc">
+								<span>{{globaldamage}}{{#globaldamagecrit}}<span class="plus"> + </span>{{globaldamagecrit}}{{/globaldamagecrit}}</span>
+								<span class="sublabel">{{globaldamagetype}}</span>
+							</div>
+						{{/^rollTotal() globaldamage 0}}
+					{{/globaldamage}}
+					{{#hldmg}}
+						{{#^rollTotal() hldmg 0}}
+							<div class="desc">
+								<span>{{hldmg}}{{#hldmgcrit}}<span class="plus"> + </span>{{hldmgcrit}}{{/hldmgcrit}}</span>
+								<span class="sublabel">{{dmg1type}}</span>
+								<div class="label">
+									<span>Higher Level Cast</span>
+								</div>
+							</div>
+						{{/^rollTotal() hldmg 0}}
+					{{/hldmg}}
+					<div class="container damagetemplate">
+						<div class="result">
+							{{#dmg1flag}}
+								{{^dmg2flag}}
+									<div class="solo">
+										<span class="damage">{{dmg1}}{{#crit}} + {{crit1}}{{/crit}}</span>
+										<span class="sublabel">{{dmg1type}}</span>
+									</div>
+								{{/dmg2flag}}
+							{{/dmg1flag}}
+							{{#dmg2flag}}
+								{{^dmg1flag}}
+									<div class="solo">
+										<span class="damage">{{dmg2}}{{#crit}} + {{crit2}}{{/crit}}</span>
+										<span class="sublabel">{{dmg2type}}</span>
+									</div>
+								{{/dmg1flag}}
+							{{/dmg2flag}}
+							{{#dmg1flag}}
+								{{#dmg2flag}}
+									<div class="adv">
+										<span class="damage">{{dmg1}}{{#crit}} + {{crit1}}{{/crit}}</span>
+										<span class="sublabel">{{dmg1type}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span class="damage">{{dmg2}}{{#crit}} + {{crit2}}{{/crit}}</span>
+										<span class="sublabel">{{dmg2type}}</span>
+									</div>
+								{{/dmg2flag}}
+							{{/dmg1flag}}
+						</div>
+						{{^attack}}
+							{{#range}}
+								<div class="sublabel" style="color: black;">
+									<span>{{range}}</span>
+								</div>
+							{{/range}}
+							<div class="label">
+								<span>{{rname}}</span>{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}}
+							</div>
+							{{#charname}}
+								<div class="charname">
+									<span>{{charname}}</span>
+								</div>
+							{{/charname}}
+						{{/attack}}
+					</div>
+				</rolltemplate>
+
+
+
+				<rolltemplate class="sheet-rolltemplate-atkdmg">
+					{{#attack}}
+						<div class="container atk">
+							<div class="result">
+								{{#always}}
+									<div class="adv">
+										<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+									<div class="advspacer"></div>
+									<div class="adv">
+										<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+								{{/always}}
+								{{#normal}}
+									<div class="solo">
+										<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+									</div>
+								{{/normal}}
+								{{#advantage}}
+									{{#rollLess() r1 r2}}
+										<div class="adv">
+											<span class="grey">{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+										</div>
+										<div class="advspacer"></div>
+										<div class="adv">
+											<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+										</div>
+									{{/rollLess() r1 r2}}
+									{{#rollTotal() r1 r2}}
+										<div class="adv">
+											<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+										</div>
+										<div class="advspacer"></div>
+										<div class="adv">
+											<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+										</div>
+									{{/rollTotal() r1 r2}}
+									{{#rollGreater() r1 r2}}
+										<div class="adv">
+											<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+										</div>
+										<div class="advspacer"></div>
+										<div class="adv">
+											<span class="grey">{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+										</div>
+									{{/rollGreater() r1 r2}}
+								{{/advantage}}
+								{{#disadvantage}}
+									{{#rollLess() r1 r2}}
+										<div class="adv">
+											<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+										</div>
+										<div class="advspacer"></div>
+										<div class="adv">
+											<span class="grey">{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+										</div>
+									{{/rollLess() r1 r2}}
+									{{#rollTotal() r1 r2}}
+										<div class="adv">
+											<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+										</div>
+										<div class="advspacer"></div>
+										<div class="adv">
+											<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+										</div>
+									{{/rollTotal() r1 r2}}
+									{{#rollGreater() r1 r2}}
+										<div class="adv">
+											<span class="grey">{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+										</div>
+										<div class="advspacer"></div>
+										<div class="adv">
+											<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
+										</div>
+									{{/rollGreater() r1 r2}}
+								{{/disadvantage}}
+							</div>
+							{{#range}}
+								<div class="sublabel">
+									<span>{{range}}</span>
+								</div>
+							{{/range}}
+							<div class="label">
+								<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}}{{#attack}} <span>({{mod}})</span>{{/attack}}</span>
+							</div>
+							{{#charname}}
+								<div class="charname">
+									<span>{{charname}}</span>
+								</div>
+							{{/charname}}
+						</div>
+					{{/attack}}
+					{{#save}}
+						{{#attack}}
+							<div class="container desc save">
+						{{/attack}}
+						{{^attack}}
+							<div class="container atk save">
+						{{/attack}}
+							<div class="savedc">
+								<span class="rolltemplate-inline">DC</span><span class="rolltemplate-inline">{{savedc}}</span>
+							</div>
+							{{#savedesc}}
+								<div class="sublabel">
+									<span>{{savedesc}}</span>
+								</div>
+							{{/savedesc}}
+							<div class="label">
+								<span class="rolltemplate-inline">{{saveattr}}</span> <span class="rolltemplate-inline">Save</span>
+							</div>
+						</div>
+					{{/save}}
+					{{#desc}}
+						<div class="desc info">
+							<span>
+								<span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
+							</span>
+						</div>
+					{{/desc}}
+					{{#globaldamage}}
+						{{#^rollTotal() globaldamage 0}}
+							<div class="desc">
+								<span>
+									{{globaldamage}}
+									{{#attack}}
 										{{#normal}}
-												<div class="solo">
-														<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-												</div>
+											{{#rollWasCrit() r1}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r1}}
 										{{/normal}}
+										{{#always}}
+											{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+											{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+											{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+										{{/always}}
 										{{#advantage}}
-												{{#rollLess() r1 r2}}
-														<div class="adv">
-																<span class="grey">{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-												{{/rollLess() r1 r2}}
-												{{#rollTotal() r1 r2}}
-														<div class="adv">
-																<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-												{{/rollTotal() r1 r2}}
-												{{#rollGreater() r1 r2}}
-														<div class="adv">
-																<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span class="grey">{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-												{{/rollGreater() r1 r2}}
+											{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+											{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+											{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
 										{{/advantage}}
 										{{#disadvantage}}
-												{{#rollLess() r1 r2}}
-														<div class="adv">
-																<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span class="grey">{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-												{{/rollLess() r1 r2}}
-												{{#rollTotal() r1 r2}}
-														<div class="adv">
-																<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-												{{/rollTotal() r1 r2}}
-												{{#rollGreater() r1 r2}}
-														<div class="adv">
-																<span class="grey">{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-												{{/rollGreater() r1 r2}}
+											{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
 										{{/disadvantage}}
+									{{/attack}}
+								</span>
+								<span class="sublabel">{{globaldamagetype}}</span>
+							</div>
+						{{/^rollTotal() globaldamage 0}}
+					{{/globaldamage}}
+					{{#hldmg}}
+						{{#^rollTotal() hldmg 0}}
+							<div class="desc">
+								<span>
+									{{hldmg}}
+									<!-- {{#hldmgcrit}} + {{hldmgcrit}}{{/hldmgcrit}} -->
+									{{#attack}}
+										{{#normal}}
+											{{#rollWasCrit() r1}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r1}}
+										{{/normal}}
+										{{#always}}
+											{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+											{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+											{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+										{{/always}}
+										{{#advantage}}
+											{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+											{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+											{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+										{{/advantage}}
+										{{#disadvantage}}
+											{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+										{{/disadvantage}}
+									{{/attack}}
+								</span>
+								<span class="sublabel">{{dmg1type}}</span>
+								<div class="label">
+									<span>Higher Level Cast</span>
 								</div>
-								{{#range}}
-										<div class="sublabel">
-												<span>{{range}}</span>
+							</div>
+						{{/^rollTotal() hldmg 0}}
+					{{/hldmg}}
+					{{#damage}}
+						<div class="container damagetemplate">
+							<div class="result">
+								{{#dmg1flag}}
+									{{^dmg2flag}}
+										<div class="solo">
+											<span class="damage">
+												{{dmg1}}
+												{{#attack}}
+													{{#normal}}
+														{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}
+													{{/normal}}
+													{{#always}}
+														{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit1}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+														{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+														{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+													{{/always}}
+													{{#advantage}}
+														{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit1}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+														{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+														{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+													{{/advantage}}
+													{{#disadvantage}}
+														{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+													{{/disadvantage}}
+												{{/attack}}
+											</span>
+											<span class="sublabel">{{dmg1type}}</span>
 										</div>
+									{{/dmg2flag}}
+								{{/dmg1flag}}
+								{{#dmg2flag}}
+									{{^dmg1flag}}
+										<div class="solo">
+											<span class="damage">
+												{{dmg2}}
+												{{#attack}}
+													{{#normal}}
+														{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}
+													{{/normal}}
+													{{#always}}
+														{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit2}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+														{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+														{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+													{{/always}}
+													{{#advantage}}
+														{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit2}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+														{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+														{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+													{{/advantage}}
+													{{#disadvantage}}
+														{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+													{{/disadvantage}}
+												{{/attack}}
+											</span>
+											<span class="sublabel">{{dmg2type}}</span>
+										</div>
+									{{/dmg1flag}}
+								{{/dmg2flag}}
+								{{#dmg1flag}}
+									{{#dmg2flag}}
+										<div class="adv">
+											<span class="damage">
+												{{dmg1}}
+												{{#attack}}
+													{{#normal}}
+														{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}
+													{{/normal}}
+													{{#always}}
+														{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit1}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+														{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+														{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+													{{/always}}
+													{{#advantage}}
+														{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit1}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+														{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+														{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+													{{/advantage}}
+													{{#disadvantage}}
+														{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+													{{/disadvantage}}
+												{{/attack}}
+											</span>
+											<span class="sublabel">{{dmg1type}}</span>
+										</div>
+										<div class="advspacer"></div>
+										<div class="adv">
+											<span>
+												{{dmg2}}
+												{{#attack}}
+													{{#normal}}
+														{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}
+													{{/normal}}
+													{{#always}}
+														{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit2}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+														{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+														{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+													{{/always}}
+													{{#advantage}}
+														{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit2}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+														{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+														{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+													{{/advantage}}
+													{{#disadvantage}}
+														{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+													{{/disadvantage}}
+												{{/attack}}
+											</span>
+											<span class="sublabel">{{dmg2type}}</span>
+										</div>
+									{{/dmg2flag}}
+								{{/dmg1flag}}
+							</div>
+							{{^attack}}
+								{{#range}}
+									<div class="sublabel">
+										<span>{{range}}</span>
+									</div>
 								{{/range}}
 								<div class="label">
-										{{#normal}}
-												{{#rollWasCrit() r1}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r1}}
-												{{#^rollWasCrit() r1}}<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/^rollWasCrit() r1}}
-										{{/normal}}
-										{{#always}}
-												{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-												{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-												{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-												{{#^rollWasCrit() r1}}{{#^rollWasCrit() r2}}<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/^rollWasCrit() r2}}{{/^rollWasCrit() r1}}
-										{{/always}}
-										{{#advantage}}
-												{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-												{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-												{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-												{{#^rollWasCrit() r1}}{{#^rollWasCrit() r2}}<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/^rollWasCrit() r2}}{{/^rollWasCrit() r1}}
-										{{/advantage}}
-										{{#disadvantage}}
-												{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span>{{rnamec}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-												{{#rollTotal() r1 r2}}{{#^rollWasCrit() r1}}<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/^rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-												{{#rollLess() r1 r2}}<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollLess() r1 r2}}
-												{{#rollGreater() r1 r2}}<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}} <span>({{mod}})</span></span>{{/rollGreater() r1 r2}}
-										{{/disadvantage}}
+									<span>{{rname}}</span>{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}}
 								</div>
 								{{#charname}}
-										<div class="charname">
-												<span>{{charname}}</span>
-										</div>
+									<div class="charname">
+										<span>{{charname}}</span>
+									</div>
 								{{/charname}}
+							{{/attack}}
 						</div>
-						{{#desc}}
-								<div class="desc info">
-										<span>
-												<span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
-										</span>
-								</div>
-						{{/desc}}
+					{{/damage}}
 				</rolltemplate>
-				<rolltemplate class="sheet-rolltemplate-dmg">
-						{{#save}}
-								{{#attack}}
-										<div class="desc save">
-								{{/attack}}
-								{{^attack}}
-										<div class="atk save">
-								{{/attack}}
-										<div class="savedc">
-												<span class="rolltemplate-inline">DC</span><span class="rolltemplate-inline">{{savedc}}</span>
-										</div>
-										{{#savedesc}}
-												<div class="sublabel">
-														<span>{{savedesc}}</span>
-												</div>
-										{{/savedesc}}
-										<div class="label">
-												<span class="rolltemplate-inline">{{saveattr}}</span> <span class="rolltemplate-inline">Save</span>
-										</div>
-								</div>
-						{{/save}}
-						{{^attack}}
-								{{#desc}}
-										<div class="desc info">
-												<span>
-														<span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
-												</span>
-										</div>
-								{{/desc}}
-						{{/attack}}
-						{{#globaldamage}}
-								{{#^rollTotal() globaldamage 0}}
-										<div class="desc">
-												<span>{{globaldamage}}{{#globaldamagecrit}}<span class="plus"> + </span>{{globaldamagecrit}}{{/globaldamagecrit}}</span>
-												<span class="sublabel">{{globaldamagetype}}</span>
-										</div>
-								{{/^rollTotal() globaldamage 0}}
-						{{/globaldamage}}
-						{{#hldmg}}
-								{{#^rollTotal() hldmg 0}}
-										<div class="desc">
-												<span>{{hldmg}}{{#hldmgcrit}}<span class="plus"> + </span>{{hldmgcrit}}{{/hldmgcrit}}</span>
-												<span class="sublabel">{{dmg1type}}</span>
-												<div class="label">
-														<span>Higher Level Cast</span>
-												</div>
-										</div>
-								{{/^rollTotal() hldmg 0}}
-						{{/hldmg}}
-						<div class="container damagetemplate">
-								<div class="result">
-										{{#dmg1flag}}
-												{{^dmg2flag}}
-														<div class="solo">
-																<span class="damage">{{dmg1}}{{#crit}} + {{crit1}}{{/crit}}</span>
-																<span class="sublabel">{{dmg1type}}</span>
-														</div>
-												{{/dmg2flag}}
-										{{/dmg1flag}}
-										{{#dmg2flag}}
-												{{^dmg1flag}}
-														<div class="solo">
-																<span class="damage">{{dmg2}}{{#crit}} + {{crit2}}{{/crit}}</span>
-																<span class="sublabel">{{dmg2type}}</span>
-														</div>
-												{{/dmg1flag}}
-										{{/dmg2flag}}
-										{{#dmg1flag}}
-												{{#dmg2flag}}
-														<div class="adv">
-																<span class="damage">{{dmg1}}{{#crit}} + {{crit1}}{{/crit}}</span>
-																<span class="sublabel">{{dmg1type}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span class="damage">{{dmg2}}{{#crit}} + {{crit2}}{{/crit}}</span>
-																<span class="sublabel">{{dmg2type}}</span>
-														</div>
-												{{/dmg2flag}}
-										{{/dmg1flag}}
-								</div>
-								{{^attack}}
-										{{#range}}
-												<div class="sublabel" style="color: black;">
-														<span>{{range}}</span>
-												</div>
-										{{/range}}
-										<div class="label">
-												<span>{{rname}}</span>{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}}
-										</div>
-										{{#charname}}
-												<div class="charname">
-														<span>{{charname}}</span>
-												</div>
-										{{/charname}}
-								{{/attack}}
-						</div>
-				</rolltemplate>
-				<rolltemplate class="sheet-rolltemplate-atkdmg">
-						{{#attack}}
-								<div class="container atk">
-										<div class="result">
-												{{#always}}
-														<div class="adv">
-																<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-														<div class="advspacer"></div>
-														<div class="adv">
-																<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-												{{/always}}
-												{{#normal}}
-														<div class="solo">
-																<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-														</div>
-												{{/normal}}
-												{{#advantage}}
-														{{#rollLess() r1 r2}}
-																<div class="adv">
-																		<span class="grey">{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-																</div>
-																<div class="advspacer"></div>
-																<div class="adv">
-																		<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-																</div>
-														{{/rollLess() r1 r2}}
-														{{#rollTotal() r1 r2}}
-																<div class="adv">
-																		<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-																</div>
-																<div class="advspacer"></div>
-																<div class="adv">
-																		<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-																</div>
-														{{/rollTotal() r1 r2}}
-														{{#rollGreater() r1 r2}}
-																<div class="adv">
-																		<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-																</div>
-																<div class="advspacer"></div>
-																<div class="adv">
-																		<span class="grey">{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-																</div>
-														{{/rollGreater() r1 r2}}
-												{{/advantage}}
-												{{#disadvantage}}
-														{{#rollLess() r1 r2}}
-																<div class="adv">
-																		<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-																</div>
-																<div class="advspacer"></div>
-																<div class="adv">
-																		<span class="grey">{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-																</div>
-														{{/rollLess() r1 r2}}
-														{{#rollTotal() r1 r2}}
-																<div class="adv">
-																		<span>{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-																</div>
-																<div class="advspacer"></div>
-																<div class="adv">
-																		<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-																</div>
-														{{/rollTotal() r1 r2}}
-														{{#rollGreater() r1 r2}}
-																<div class="adv">
-																		<span class="grey">{{r1}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-																</div>
-																<div class="advspacer"></div>
-																<div class="adv">
-																		<span>{{r2}}{{#globalattack}} + {{globalattack}}{{/globalattack}}</span>
-																</div>
-														{{/rollGreater() r1 r2}}
-												{{/disadvantage}}
-										</div>
-										{{#range}}
-												<div class="sublabel">
-														<span>{{range}}</span>
-												</div>
-										{{/range}}
-										<div class="label">
-												<span>{{rname}}{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}}{{#attack}} <span>({{mod}})</span>{{/attack}}</span>
-										</div>
-										{{#charname}}
-												<div class="charname">
-														<span>{{charname}}</span>
-												</div>
-										{{/charname}}
-								</div>
-						{{/attack}}
-						{{#save}}
-								{{#attack}}
-										<div class="container desc save">
-								{{/attack}}
-								{{^attack}}
-										<div class="container atk save">
-								{{/attack}}
-										<div class="savedc">
-												<span class="rolltemplate-inline">DC</span><span class="rolltemplate-inline">{{savedc}}</span>
-										</div>
-										{{#savedesc}}
-												<div class="sublabel">
-														<span>{{savedesc}}</span>
-												</div>
-										{{/savedesc}}
-										<div class="label">
-												<span class="rolltemplate-inline">{{saveattr}}</span> <span class="rolltemplate-inline">Save</span>
-										</div>
-								</div>
-						{{/save}}
-						{{#desc}}
-								<div class="desc info">
-										<span>
-												<span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
-										</span>
-								</div>
-						{{/desc}}
-						{{#globaldamage}}
-								{{#^rollTotal() globaldamage 0}}
-										<div class="desc">
-												<span>
-														{{globaldamage}}
-														{{#attack}}
-																{{#normal}}
-																		{{#rollWasCrit() r1}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r1}}
-																{{/normal}}
-																{{#always}}
-																		{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																		{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																		{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																{{/always}}
-																{{#advantage}}
-																		{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																		{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																		{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																{{/advantage}}
-																{{#disadvantage}}
-																		{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{globaldamagecrit}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																{{/disadvantage}}
-														{{/attack}}
-												</span>
-												<span class="sublabel">{{globaldamagetype}}</span>
-										</div>
-								{{/^rollTotal() globaldamage 0}}
-						{{/globaldamage}}
-						{{#hldmg}}
-								{{#^rollTotal() hldmg 0}}
-										<div class="desc">
-												<span>
-														{{hldmg}}
-														<!-- {{#hldmgcrit}} + {{hldmgcrit}}{{/hldmgcrit}} -->
-														{{#attack}}
-																{{#normal}}
-																		{{#rollWasCrit() r1}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r1}}
-																{{/normal}}
-																{{#always}}
-																		{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																		{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																		{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																{{/always}}
-																{{#advantage}}
-																		{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																		{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																		{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																{{/advantage}}
-																{{#disadvantage}}
-																		{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="plus"> + </span>{{hldmgcrit}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																{{/disadvantage}}
-														{{/attack}}
-												</span>
-												<span class="sublabel">{{dmg1type}}</span>
-												<div class="label">
-														<span>Higher Level Cast</span>
-												</div>
-										</div>
-								{{/^rollTotal() hldmg 0}}
-						{{/hldmg}}
-						{{#damage}}
-								<div class="container damagetemplate">
-										<div class="result">
-												{{#dmg1flag}}
-														{{^dmg2flag}}
-																<div class="solo">
-																		<span class="damage">
-																				{{dmg1}}
-																				{{#attack}}
-																						{{#normal}}
-																								{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}
-																						{{/normal}}
-																						{{#always}}
-																								{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit1}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																								{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																						{{/always}}
-																						{{#advantage}}
-																								{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit1}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																								{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																						{{/advantage}}
-																						{{#disadvantage}}
-																								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																						{{/disadvantage}}
-																				{{/attack}}
-																		</span>
-																		<span class="sublabel">{{dmg1type}}</span>
-																</div>
-														{{/dmg2flag}}
-												{{/dmg1flag}}
-												{{#dmg2flag}}
-														{{^dmg1flag}}
-																<div class="solo">
-																		<span class="damage">
-																				{{dmg2}}
-																				{{#attack}}
-																						{{#normal}}
-																								{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}
-																						{{/normal}}
-																						{{#always}}
-																								{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit2}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																								{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																						{{/always}}
-																						{{#advantage}}
-																								{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit2}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																								{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																						{{/advantage}}
-																						{{#disadvantage}}
-																								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																						{{/disadvantage}}
-																				{{/attack}}
-																		</span>
-																		<span class="sublabel">{{dmg2type}}</span>
-																</div>
-														{{/dmg1flag}}
-												{{/dmg2flag}}
-												{{#dmg1flag}}
-														{{#dmg2flag}}
-																<div class="adv">
-																		<span class="damage">
-																				{{dmg1}}
-																				{{#attack}}
-																						{{#normal}}
-																								{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}
-																						{{/normal}}
-																						{{#always}}
-																								{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit1}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																								{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																						{{/always}}
-																						{{#advantage}}
-																								{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit1}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																								{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																						{{/advantage}}
-																						{{#disadvantage}}
-																								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																						{{/disadvantage}}
-																				{{/attack}}
-																		</span>
-																		<span class="sublabel">{{dmg1type}}</span>
-																</div>
-																<div class="advspacer"></div>
-																<div class="adv">
-																		<span>
-																				{{dmg2}}
-																				{{#attack}}
-																						{{#normal}}
-																								{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}
-																						{{/normal}}
-																						{{#always}}
-																								{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit2}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																								{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																						{{/always}}
-																						{{#advantage}}
-																								{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}+ {{crit2}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																								{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																						{{/advantage}}
-																						{{#disadvantage}}
-																								{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}+ {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																						{{/disadvantage}}
-																				{{/attack}}
-																		</span>
-																		<span class="sublabel">{{dmg2type}}</span>
-																</div>
-														{{/dmg2flag}}
-												{{/dmg1flag}}
-										</div>
-										{{^attack}}
-												{{#range}}
-														<div class="sublabel">
-																<span>{{range}}</span>
-														</div>
-												{{/range}}
-												<div class="label">
-														<span>{{rname}}</span>{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}}
-												</div>
-												{{#charname}}
-														<div class="charname">
-																<span>{{charname}}</span>
-														</div>
-												{{/charname}}
-										{{/attack}}
-								</div>
-						{{/damage}}
-				</rolltemplate>
+
 				<rolltemplate class="sheet-rolltemplate-desc">
-						<div class="desc info">
-								<span>
-										<span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
-								</span>
-						</div>
+					<div class="desc info">
+						<span>
+							<span class="top"></span><span class="middle">{{desc}}</span><span class="bottom"></span>
+						</span>
+					</div>
 				</rolltemplate>
+
 				<rolltemplate class="sheet-rolltemplate-spell">
-						<div class="container">
-								<div class="title row">
-										<span>{{name}}</span>{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}}
-								</div>
-								<div class="italics row">
-										<span>{{level}}{{#ritual}} (<span>ritual</span>){{/ritual}}</span>
-								</div>
-								<div class="spacer"></div>
-								{{#castingtime}}
-								<div class="row">
-										<span class="bold">Casting Time:</span> <span>{{castingtime}}</span>
-								</div>
-								{{/castingtime}}
-								{{#range}}
-								<div class="row">
-										<span class="bold">Range:</span> <span>{{range}}</span>
-								</div>
-								{{/range}}
-								{{#target}}
-								<div class="row">
-										<span class="bold">Target:</span> <span>{{target}}</span>
-								</div>
-								{{/target}}
-								<div class="row">
-										<span class="bold">Components:</span>
-										<span>
-												{{#v}}V{{#s}}, {{/s}}{{^s}}{{#m}}, {{/m}}{{/s}}{{/v}}
-												{{#s}}S{{#m}}, {{/m}}{{/s}}
-												{{#m}}M {{#material}}({{material}}){{/material}}{{/m}}
-										</span>
-								</div>
-								{{#duration}}
-								<div class="row">
-										<span class="bold">Duration:</span> <span>{{#concentration}}<span>Concentration</span> {{/concentration}}{{duration}}</span>
-								</div>
-								{{/duration}}
-								<div class="spacer"></div>
-								{{#description}}
-								<div class="row">
-										<span class="description">{{description}}</span>
-								</div>
-								{{/description}}
-								{{#athigherlevels}}
-								<div class="row">
-										<span class="bold italics">At Higher Levels</span>. <span class="description">{{athigherlevels}}</span>
-								</div>
-								{{/athigherlevels}}
+					<div class="container">
+						<div class="title row">
+							<span>{{name}}</span>{{#innate}}<span class="grey">, {{innate}}</span>{{/innate}}
 						</div>
+						<div class="italics row">
+							<span>{{level}}{{#ritual}} (<span></span>){{/ritual}}</span>
+						</div>
+						<div class="spacer"></div>
+						{{#castingtime}}
+						<div class="row">
+							<span class="bold">Casting Time:</span> <span>{{castingtime}}</span>
+						</div>
+						{{/castingtime}}
+						{{#range}}
+						<div class="row">
+							<span class="bold">Range:</span> <span>{{range}}</span>
+						</div>
+						{{/range}}
+						{{#target}}
+						<div class="row">
+							<span class="bold">Target:</span> <span>{{target}}</span>
+						</div>
+						{{/target}}
+						<div class="row">
+							<span class="bold">Components:</span>
+							<span>
+								{{#v}}V{{#s}}, {{/s}}{{^s}}{{#m}}, {{/m}}{{/s}}{{/v}}
+								{{#s}}S{{#m}}, {{/m}}{{/s}}
+								{{#m}}M {{#material}}({{material}}){{/material}}{{/m}}
+							</span>
+						</div>
+						{{#duration}}
+						<div class="row">
+							<span class="bold">Duration:</span> <span>{{#concentration}}<span>Concentration</span> {{/concentration}}{{duration}}</span>
+						</div>
+						{{/duration}}
+						<div class="spacer"></div>
+						{{#description}}
+						<div class="row">
+							<span class="description">{{description}}</span>
+						</div>
+						{{/description}}
+						{{#athigherlevels}}
+						<div class="row">
+							<span class="bold italics">At Higher Levels</span>. <span class="description">{{athigherlevels}}</span>
+						</div>
+						{{/athigherlevels}}
+					</div>
 				</rolltemplate>
+
 				<rolltemplate class="sheet-rolltemplate-traits">
-						<div class="row header">
-								<span>{{name}}</span>
+					<div class="row header">
+						<span>{{name}}</span>
+					</div>
+					{{#source}}
+						<div class="row subheader">
+							<span class="italics">{{#charname}}{{charname}} {{/charname}}{{source}}</span>
 						</div>
-						{{#source}}
-								<div class="row subheader">
-										<span class="italics">{{#charname}}{{charname}} {{/charname}}{{source}}</span>
-								</div>
-						{{/source}}
-						{{#description}}
-								<div class="row">
-										<span class="desc">{{description}}</span>
-								</div>
-						{{/description}}
+					{{/source}}
+					{{#description}}
+						<div class="row">
+							<span class="desc">{{description}}</span>
+						</div>
+					{{/description}}
 				</rolltemplate>
+
 				<rolltemplate class="sheet-rolltemplate-npc">
-						<div class="row header">
-								<span>{{rname}}</span>
+					<div class="row header">
+						<span>{{rname}}</span>
+					</div>
+					{{#name}}
+						<div class="row subheader">
+							<span class="italics">{{name}}</span>
 						</div>
-						{{#name}}
-								<div class="row subheader">
-										<span class="italics">{{name}}</span>
-								</div>
-						{{/name}}
-						<div class="arrow-right"></div>
-						<div class="row">
-								{{#normal}}
-										<span class="italics">{{type}}: </span><span>{{r1}}</span>
-								{{/normal}}
-								{{#always}}
-										<span class="italics">{{type}}: </span><span>{{r1}}</span><span> | </span><span>{{r2}}</span>
-								{{/always}}
-								{{#advantage}}
-										{{#rollLess() r1 r2}}
-												<span class="italics">{{type}}: </span><span class="grey">{{r1}}</span><span> | </span><span>{{r2}}</span>
-										{{/rollLess() r1 r2}}
-										{{#rollTotal() r1 r2}}
-												<span class="italics">{{type}}: </span><span>{{r1}}</span><span> | </span><span>{{r2}}</span>
-										{{/rollTotal() r1 r2}}
-										{{#rollGreater() r1 r2}}
-												<span class="italics">{{type}}: </span><span>{{r1}}</span><span> | </span><span class="grey">{{r2}}</span>
-										{{/rollGreater() r1 r2}}
-								{{/advantage}}
-								{{#disadvantage}}
-										{{#rollLess() r1 r2}}
-												<span class="italics">{{type}}: </span><span>{{r1}}</span><span> | </span><span class="grey">{{r2}}</span>
-										{{/rollLess() r1 r2}}
-										{{#rollTotal() r1 r2}}
-												<span class="italics">{{type}}: </span><span>{{r1}}</span><span> | </span><span>{{r2}}</span>
-										{{/rollTotal() r1 r2}}
-										{{#rollGreater() r1 r2}}
-												<span class="italics">{{type}}: </span><span class="grey">{{r1}}</span><span> | </span><span>{{r2}}</span>
-										{{/rollGreater() r1 r2}}
-								{{/disadvantage}}
-						</div>
+					{{/name}}
+					<div class="arrow-right"></div>
+					<div class="row">
+						{{#normal}}
+							<span class="italics">{{type}}: </span><span>{{r1}}</span>
+						{{/normal}}
+						{{#always}}
+							<span class="italics">{{type}}: </span><span>{{r1}}</span><span> | </span><span>{{r2}}</span>
+						{{/always}}
+						{{#advantage}}
+							{{#rollLess() r1 r2}}
+								<span class="italics">{{type}}: </span><span class="grey">{{r1}}</span><span> | </span><span>{{r2}}</span>
+							{{/rollLess() r1 r2}}
+							{{#rollTotal() r1 r2}}
+								<span class="italics">{{type}}: </span><span>{{r1}}</span><span> | </span><span>{{r2}}</span>
+							{{/rollTotal() r1 r2}}
+							{{#rollGreater() r1 r2}}
+								<span class="italics">{{type}}: </span><span>{{r1}}</span><span> | </span><span class="grey">{{r2}}</span>
+							{{/rollGreater() r1 r2}}
+						{{/advantage}}
+						{{#disadvantage}}
+							{{#rollLess() r1 r2}}
+								<span class="italics">{{type}}: </span><span>{{r1}}</span><span> | </span><span class="grey">{{r2}}</span>
+							{{/rollLess() r1 r2}}
+							{{#rollTotal() r1 r2}}
+								<span class="italics">{{type}}: </span><span>{{r1}}</span><span> | </span><span>{{r2}}</span>
+							{{/rollTotal() r1 r2}}
+							{{#rollGreater() r1 r2}}
+								<span class="italics">{{type}}: </span><span class="grey">{{r1}}</span><span> | </span><span>{{r2}}</span>
+							{{/rollGreater() r1 r2}}
+						{{/disadvantage}}
+					</div>
 				</rolltemplate>
+
 				<rolltemplate class="sheet-rolltemplate-npcatk">
+					<div class="row header">
+						{{#normal}}
+							{{#rollWasCrit() r1}}{{rnamec}}{{/rollWasCrit() r1}}
+							{{#^rollWasCrit() r1}}{{rname}}{{/^rollWasCrit() r1}}
+						{{/normal}}
+						{{#always}}
+							{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}{{rnamec}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+							{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}{{rnamec}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+							{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}{{rnamec}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+							{{#^rollWasCrit() r1}}{{#^rollWasCrit() r2}}{{rname}}{{/^rollWasCrit() r2}}{{/^rollWasCrit() r1}}
+						{{/always}}
+						{{#advantage}}
+							{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}{{rnamec}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+							{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}{{rnamec}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+							{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}{{rnamec}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+							{{#^rollWasCrit() r1}}{{#^rollWasCrit() r2}}{{rname}}{{/^rollWasCrit() r2}}{{/^rollWasCrit() r1}}
+						{{/advantage}}
+						{{#disadvantage}}
+							{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}{{rnamec}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+							{{#rollTotal() r1 r2}}{{#^rollWasCrit() r1}}{{rname}}{{/^rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+							{{#rollLess() r1 r2}}{{rname}}{{/rollLess() r1 r2}}
+							{{#rollGreater() r1 r2}}{{rnamec}}{{/rollGreater() r1 r2}}
+						{{/disadvantage}}
+					</div>
+					{{#name}}
+						<div class="row subheader">
+							<span class="italics">{{name}}</span>
+						</div>
+					{{/name}}
+					<div class="arrow-right"></div>
+					<div class="row">
+						{{#normal}}
+							{{#rollWasCrit() r1}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r1}}
+							{{#^rollWasCrit() r1}}<span class="italics">{{type}}: </span>{{/^rollWasCrit() r1}}
+						{{/normal}}
+						{{#always}}
+							{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+							{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+							{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+							{{#^rollWasCrit() r1}}{{#^rollWasCrit() r2}}<span class="italics">{{type}}: </span>{{/^rollWasCrit() r2}}{{/^rollWasCrit() r1}}
+						{{/always}}
+						{{#advantage}}
+							{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span class="italics">[{{typec}}: </span>{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+							{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+							{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+							{{#^rollWasCrit() r1}}{{#^rollWasCrit() r2}}<span class="italics">{{type}}: </span>{{/^rollWasCrit() r2}}{{/^rollWasCrit() r1}}
+						{{/advantage}}
+						{{#disadvantage}}
+							{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+							{{#rollTotal() r1 r2}}{{#^rollWasCrit() r1}}<span class="italics">{{type}}: </span>{{/^rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+							{{#rollLess() r1 r2}}<span class="italics">{{type}}: </span>{{/rollLess() r1 r2}}
+							{{#rollGreater() r1 r2}}<span class="italics">{{typec}}: </span>{{/rollGreater() r1 r2}}
+						{{/disadvantage}}
+						{{#normal}}
+							<span>{{r1}}</span>
+						{{/normal}}
+						{{#always}}
+							<span>{{r1}}</span><span> | </span><span>{{r2}}</span>
+						{{/always}}
+						{{#advantage}}
+							{{#rollLess() r1 r2}}
+								<span class="grey">{{r1}}</span><span> | </span><span>{{r2}}</span>
+							{{/rollLess() r1 r2}}
+							{{#rollTotal() r1 r2}}
+								<span>{{r1}}</span><span> | </span><span>{{r2}}</span>
+							{{/rollTotal() r1 r2}}
+							{{#rollGreater() r1 r2}}
+								<span>{{r1}}</span><span> | </span><span class="grey">{{r2}}</span>
+							{{/rollGreater() r1 r2}}
+						{{/advantage}}
+						{{#disadvantage}}
+							{{#rollLess() r1 r2}}
+								<span>{{r1}}</span><span> | </span><span class="grey">{{r2}}</span>
+							{{/rollLess() r1 r2}}
+							{{#rollTotal() r1 r2}}
+								<span>{{r1}}</span><span> | </span><span>{{r2}}</span>
+							{{/rollTotal() r1 r2}}
+							{{#rollGreater() r1 r2}}
+								<span class="grey">{{r1}}</span><span> | </span><span>{{r2}}</span>
+							{{/rollGreater() r1 r2}}
+						{{/disadvantage}}
+					</div>
+					{{#description}}
+						<div class="row">
+							<span class="desc">{{description}}</span>
+						</div>
+					{{/description}}
+				</rolltemplate>
+
+				<rolltemplate class="sheet-rolltemplate-npcdmg">
+					<div class="container dmgcontainer damagetemplate">
+						<span class="italics">Damage: </span>
+						<span>
+							{{#dmg1flag}}
+								{{dmg1}}{{#crit}} + {{crit1}}{{/crit}}{{dmg1type}}
+							{{/dmg1flag}}
+							{{#dmg1flag}}{{#dmg2flag}}+{{/dmg2flag}}{{/dmg1flag}}
+							{{#dmg2flag}}
+								{{dmg2}}{{#crit}} + {{crit2}}{{/crit}}{{dmg2type}}
+							{{/dmg2flag}}
+						</span>
+					</div>
+				</rolltemplate>
+
+				<rolltemplate class="sheet-rolltemplate-npcaction">
+					<div class="container">
 						<div class="row header">
-								{{#normal}}
-										{{#rollWasCrit() r1}}{{rnamec}}{{/rollWasCrit() r1}}
-										{{#^rollWasCrit() r1}}{{rname}}{{/^rollWasCrit() r1}}
-								{{/normal}}
-								{{#always}}
-										{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}{{rnamec}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-										{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}{{rnamec}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-										{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}{{rnamec}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-										{{#^rollWasCrit() r1}}{{#^rollWasCrit() r2}}{{rname}}{{/^rollWasCrit() r2}}{{/^rollWasCrit() r1}}
-								{{/always}}
-								{{#advantage}}
-										{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}{{rnamec}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-										{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}{{rnamec}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-										{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}{{rnamec}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-										{{#^rollWasCrit() r1}}{{#^rollWasCrit() r2}}{{rname}}{{/^rollWasCrit() r2}}{{/^rollWasCrit() r1}}
-								{{/advantage}}
-								{{#disadvantage}}
-										{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}{{rnamec}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-										{{#rollTotal() r1 r2}}{{#^rollWasCrit() r1}}{{rname}}{{/^rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-										{{#rollLess() r1 r2}}{{rname}}{{/rollLess() r1 r2}}
-										{{#rollGreater() r1 r2}}{{rnamec}}{{/rollGreater() r1 r2}}
-								{{/disadvantage}}
+							<span>{{rname}}</span>
 						</div>
 						{{#name}}
-								<div class="row subheader">
-										<span class="italics">{{name}}</span>
-								</div>
+							<div class="row subheader">
+								<span class="italics">{{name}}</span>
+							</div>
 						{{/name}}
 						<div class="arrow-right"></div>
-						<div class="row">
+						{{#attack}}
+							<div class="row">
 								{{#normal}}
-										{{#rollWasCrit() r1}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r1}}
-										{{#^rollWasCrit() r1}}<span class="italics">{{type}}: </span>{{/^rollWasCrit() r1}}
+									<span class="italics">Attack: </span><span>{{r1}}</span>
 								{{/normal}}
 								{{#always}}
-										{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-										{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-										{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-										{{#^rollWasCrit() r1}}{{#^rollWasCrit() r2}}<span class="italics">{{type}}: </span>{{/^rollWasCrit() r2}}{{/^rollWasCrit() r1}}
+									<span class="italics">Attack: </span><span>{{r1}}</span><span> | </span><span>{{r2}}</span>
 								{{/always}}
 								{{#advantage}}
-										{{#rollLess() r1 r2}}{{#rollWasCrit() r2}}<span class="italics">[{{typec}}: </span>{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-										{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-										{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-										{{#^rollWasCrit() r1}}{{#^rollWasCrit() r2}}<span class="italics">{{type}}: </span>{{/^rollWasCrit() r2}}{{/^rollWasCrit() r1}}
+									{{#rollLess() r1 r2}}
+										<span class="italics">Attack: </span><span class="grey">{{r1}}</span><span> | </span><span>{{r2}}</span>
+									{{/rollLess() r1 r2}}
+									{{#rollTotal() r1 r2}}
+										<span class="italics">Attack: </span><span>{{r1}}</span><span> | </span><span>{{r2}}</span>
+									{{/rollTotal() r1 r2}}
+									{{#rollGreater() r1 r2}}
+										<span class="italics">Attack: </span><span>{{r1}}</span><span> | </span><span class="grey">{{r2}}</span>
+									{{/rollGreater() r1 r2}}
 								{{/advantage}}
 								{{#disadvantage}}
-										{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}}<span class="italics">{{typec}}: </span>{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-										{{#rollTotal() r1 r2}}{{#^rollWasCrit() r1}}<span class="italics">{{type}}: </span>{{/^rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-										{{#rollLess() r1 r2}}<span class="italics">{{type}}: </span>{{/rollLess() r1 r2}}
-										{{#rollGreater() r1 r2}}<span class="italics">{{typec}}: </span>{{/rollGreater() r1 r2}}
+									{{#rollLess() r1 r2}}
+										<span class="italics">Attack: </span><span>{{r1}}</span><span> | </span><span class="grey">{{r2}}</span>
+									{{/rollLess() r1 r2}}
+									{{#rollTotal() r1 r2}}
+										<span class="italics">Attack: </span><span>{{r1}}</span><span> | </span><span>{{r2}}</span>
+									{{/rollTotal() r1 r2}}
+									{{#rollGreater() r1 r2}}
+										<span class="italics">Attack: </span><span class="grey">{{r1}}</span><span> | </span><span>{{r2}}</span>
+									{{/rollGreater() r1 r2}}
 								{{/disadvantage}}
-								{{#normal}}
-										<span>{{r1}}</span>
-								{{/normal}}
-								{{#always}}
-										<span>{{r1}}</span><span> | </span><span>{{r2}}</span>
-								{{/always}}
-								{{#advantage}}
-										{{#rollLess() r1 r2}}
-												<span class="grey">{{r1}}</span><span> | </span><span>{{r2}}</span>
-										{{/rollLess() r1 r2}}
-										{{#rollTotal() r1 r2}}
-												<span>{{r1}}</span><span> | </span><span>{{r2}}</span>
-										{{/rollTotal() r1 r2}}
-										{{#rollGreater() r1 r2}}
-												<span>{{r1}}</span><span> | </span><span class="grey">{{r2}}</span>
-										{{/rollGreater() r1 r2}}
-								{{/advantage}}
-								{{#disadvantage}}
-										{{#rollLess() r1 r2}}
-												<span>{{r1}}</span><span> | </span><span class="grey">{{r2}}</span>
-										{{/rollLess() r1 r2}}
-										{{#rollTotal() r1 r2}}
-												<span>{{r1}}</span><span> | </span><span>{{r2}}</span>
-										{{/rollTotal() r1 r2}}
-										{{#rollGreater() r1 r2}}
-												<span class="grey">{{r1}}</span><span> | </span><span>{{r2}}</span>
-										{{/rollGreater() r1 r2}}
-								{{/disadvantage}}
-						</div>
+							</div>
+						{{/attack}}
 						{{#description}}
-								<div class="row">
-										<span class="desc">{{description}}</span>
-								</div>
+							<span class="desc">{{description}}</span>
 						{{/description}}
-				</rolltemplate>
-				<rolltemplate class="sheet-rolltemplate-npcdmg">
-						<div class="container dmgcontainer damagetemplate">
+						</div>
+						{{#damage}}
+							<div class="container dmgcontainer damagetemplate">
 								<span class="italics">Damage: </span>
 								<span>
-										{{#dmg1flag}}
-												{{dmg1}}{{#crit}} + {{crit1}}{{/crit}}{{dmg1type}}
-										{{/dmg1flag}}
-										{{#dmg1flag}}{{#dmg2flag}}+{{/dmg2flag}}{{/dmg1flag}}
-										{{#dmg2flag}}
-												{{dmg2}}{{#crit}} + {{crit2}}{{/crit}}{{dmg2type}}
-										{{/dmg2flag}}
+									{{#dmg1flag}}
+										{{dmg1}}
+										{{#normal}}
+											{{#rollWasCrit() r1}} + {{crit1}}{{/rollWasCrit() r1}}
+										{{/normal}}
+										{{#always}}
+											{{#rollLess() r1 r2}}{{#rollWasCrit() r2}} + {{crit1}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+											{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}} + {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+											{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}} + {{crit1}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+										{{/always}}
+										{{#advantage}}
+											{{#rollLess() r1 r2}}{{#rollWasCrit() r2}} + {{crit1}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+											{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}} + {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+											{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}} + {{crit1}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+										{{/advantage}}
+										{{#disadvantage}}
+											{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}} + {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+										{{/disadvantage}}
+										{{dmg1type}}
+									{{/dmg1flag}}
+									{{#dmg1flag}}{{#dmg2flag}}+{{/dmg2flag}}{{/dmg1flag}}
+									{{#dmg2flag}}
+										{{dmg2}}
+										{{#normal}}
+											{{#rollWasCrit() r1}} + {{crit2}}{{/rollWasCrit() r1}}
+										{{/normal}}
+										{{#always}}
+											{{#rollLess() r1 r2}}{{#rollWasCrit() r2}} + {{crit2}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+											{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}} + {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+											{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}} + {{crit2}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+										{{/always}}
+										{{#advantage}}
+											{{#rollLess() r1 r2}}{{#rollWasCrit() r2}} + {{crit2}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
+											{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}} + {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+											{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}} + {{crit2}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
+										{{/advantage}}
+										{{#disadvantage}}
+											{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}} + {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
+										{{/disadvantage}}
+										{{dmg2type}}
+									{{/dmg2flag}}
 								</span>
-						</div>
+							</div>
+						{{/damage}}
 				</rolltemplate>
-				<rolltemplate class="sheet-rolltemplate-npcaction">
-						<div class="container">
-								<div class="row header">
-										<span>{{rname}}</span>
-								</div>
-								{{#name}}
-										<div class="row subheader">
-												<span class="italics">{{name}}</span>
-										</div>
-								{{/name}}
-								<div class="arrow-right"></div>
-								{{#attack}}
-										<div class="row">
-												{{#normal}}
-														<span class="italics">Attack: </span><span>{{r1}}</span>
-												{{/normal}}
-												{{#always}}
-														<span class="italics">Attack: </span><span>{{r1}}</span><span> | </span><span>{{r2}}</span>
-												{{/always}}
-												{{#advantage}}
-														{{#rollLess() r1 r2}}
-																<span class="italics">Attack: </span><span class="grey">{{r1}}</span><span> | </span><span>{{r2}}</span>
-														{{/rollLess() r1 r2}}
-														{{#rollTotal() r1 r2}}
-																<span class="italics">Attack: </span><span>{{r1}}</span><span> | </span><span>{{r2}}</span>
-														{{/rollTotal() r1 r2}}
-														{{#rollGreater() r1 r2}}
-																<span class="italics">Attack: </span><span>{{r1}}</span><span> | </span><span class="grey">{{r2}}</span>
-														{{/rollGreater() r1 r2}}
-												{{/advantage}}
-												{{#disadvantage}}
-														{{#rollLess() r1 r2}}
-																<span class="italics">Attack: </span><span>{{r1}}</span><span> | </span><span class="grey">{{r2}}</span>
-														{{/rollLess() r1 r2}}
-														{{#rollTotal() r1 r2}}
-																<span class="italics">Attack: </span><span>{{r1}}</span><span> | </span><span>{{r2}}</span>
-														{{/rollTotal() r1 r2}}
-														{{#rollGreater() r1 r2}}
-																<span class="italics">Attack: </span><span class="grey">{{r1}}</span><span> | </span><span>{{r2}}</span>
-														{{/rollGreater() r1 r2}}
-												{{/disadvantage}}
-										</div>
-								{{/attack}}
-								{{#description}}
-										<span class="desc">{{description}}</span>
-								{{/description}}
-								</div>
-								{{#damage}}
-										<div class="container dmgcontainer damagetemplate">
-												<span class="italics">Damage: </span>
-												<span>
-														{{#dmg1flag}}
-																{{dmg1}}
-																{{#normal}}
-																		{{#rollWasCrit() r1}} + {{crit1}}{{/rollWasCrit() r1}}
-																{{/normal}}
-																{{#always}}
-																		{{#rollLess() r1 r2}}{{#rollWasCrit() r2}} + {{crit1}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																		{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}} + {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																		{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}} + {{crit1}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																{{/always}}
-																{{#advantage}}
-																		{{#rollLess() r1 r2}}{{#rollWasCrit() r2}} + {{crit1}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																		{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}} + {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																		{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}} + {{crit1}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																{{/advantage}}
-																{{#disadvantage}}
-																		{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}} + {{crit1}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																{{/disadvantage}}
-																{{dmg1type}}
-														{{/dmg1flag}}
-														{{#dmg1flag}}{{#dmg2flag}}+{{/dmg2flag}}{{/dmg1flag}}
-														{{#dmg2flag}}
-																{{dmg2}}
-																{{#normal}}
-																		{{#rollWasCrit() r1}} + {{crit2}}{{/rollWasCrit() r1}}
-																{{/normal}}
-																{{#always}}
-																		{{#rollLess() r1 r2}}{{#rollWasCrit() r2}} + {{crit2}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																		{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}} + {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																		{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}} + {{crit2}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																{{/always}}
-																{{#advantage}}
-																		{{#rollLess() r1 r2}}{{#rollWasCrit() r2}} + {{crit2}}{{/rollWasCrit() r2}}{{/rollLess() r1 r2}}
-																		{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}} + {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																		{{#rollGreater() r1 r2}}{{#rollWasCrit() r1}} + {{crit2}}{{/rollWasCrit() r1}}{{/rollGreater() r1 r2}}
-																{{/advantage}}
-																{{#disadvantage}}
-																		{{#rollTotal() r1 r2}}{{#rollWasCrit() r1}} + {{crit2}}{{/rollWasCrit() r1}}{{/rollTotal() r1 r2}}
-																{{/disadvantage}}
-																{{dmg2type}}
-														{{/dmg2flag}}
-												</span>
-										</div>
-								{{/damage}}
-				</rolltemplate>
-			</rolltemplate>
+			</div>
 		</div>
 		<script type="text/worker">
 			on("sheet:compendium-drop", function() {
@@ -7443,6 +7638,7 @@
 
 					(attr === "strength") ? update_weight() : false;
 					(attr === "dexterity") ? update_initiative() : false;
+					(attr === "intelligence") ? update_initiative() : false;
 				});
 			});
 
@@ -7464,6 +7660,7 @@
 							break;
 						case "intelligence":
 							update_skills(["arcana", "history", "investigation", "nature", "religion"]);
+							update_initiative();
 							break;
 						case "wisdom":
 							update_skills(["animal_handling", "insight", "medicine", "perception", "survival"]);
@@ -7821,7 +8018,7 @@
 				update_all_ability_checks();
 			});
 
-			on("change:initmod change:init_tiebreaker", function(eventinfo) {
+			on("change:initmod change:init_tiebreaker change:use_intelligent_initiative", function(eventinfo) {
 				if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
 					return;
 				}
@@ -7869,112 +8066,47 @@
 				});
 			});
 
-			on("change:repeating_skillmod remove:repeating_skillmod", function(eventinfo) {
-				update_globalskills();
-			});
+			[`ac`,`attack`,'save','skill',].forEach(attr => {
+				on(`change:global_${attr}_mod_flag`, (eventinfo) => {
+					const mod = (attr === "attack") ? "tohitmod" : `${attr}mod`;
+					if(eventinfo.newValue === "1") {
+						const firstAttr	   = (attr === "ac")  ? "val" : "roll";
+						const firstAttrValue  = (attr === "ac")  ? 1 : "1d4";
+						const secondAttrValue = (attr === "ac")  ? "Defense" : (attr === "skill") ? "GUIDANCE" : "BLESS";
 
-			on("change:global_skill_mod_flag", function(eventinfo) {
-				if(eventinfo.newValue === "1") {
-					getSectionIDs("skillmod", function(ids) {
-						if(!ids || ids.length === 0) {
+						getSectionIDs(mod, (ids) => {
+							if(!ids || ids.length === 0) {
+								var update = {};
+								var rowid = generateRowID();
+								update[`repeating_${mod}_${rowid}_global_${attr}_${firstAttr}`]= `${firstAttrValue}`;
+								update[`repeating_${mod}_${rowid}_global_${attr}_name`]		= `${secondAttrValue}`;
+								update[`repeating_${mod}_${rowid}_global_${attr}_active_flag`] = "1";
+								setAttrs(update);
+							}
+						});
+					} else {
+						getSectionIDs(mod, function(ids) {
 							var update = {};
 							var rowid = generateRowID();
-							update[`repeating_skillmod_${rowid}_global_skill_name`] = "GUIDANCE";
-							update[`repeating_skillmod_${rowid}_global_skill_roll`] = "1d4";
-							update[`repeating_skillmod_${rowid}_global_skill_active_flag`] = "1";
+							_.each(ids, function(rowid) {
+								update[`repeating_${mod}_${rowid}_global_${attr}_active_flag`] = "0";
+							});
 							setAttrs(update);
-						}
-					});
-				} else {
-					getSectionIDs("skillmod", function(ids) {
-						var update = {};
-						var rowid = generateRowID();
-						_.each(ids, function(rowid) {
-							update[`repeating_skillmod_${rowid}_global_skill_active_flag`] = "0";
 						});
-						setAttrs(update);
-					});
-				}
+					}
+				});
+			});
+
+			on("change:repeating_skillmod remove:repeating_skillmod", function(eventinfo) {
+				update_globalskills();
 			});
 
 			on("change:repeating_savemod remove:repeating_savemod", function(eventinfo) {
 				update_globalsaves();
 			});
 
-			on("change:global_save_mod_flag", function(eventinfo) {
-				if(eventinfo.newValue === "1") {
-					getSectionIDs("savemod", function(ids) {
-						if(!ids || ids.length === 0) {
-							var update = {};
-							var rowid = generateRowID();
-							update[`repeating_savemod_${rowid}_global_save_roll`] = "1d4";
-							update[`repeating_savemod_${rowid}_global_save_name`] = "BLESS";
-							update[`repeating_savemod_${rowid}_global_save_active_flag`] = "1";
-							setAttrs(update);
-						}
-					});
-				} else {
-					getSectionIDs("savemod", function(ids) {
-						var update = {};
-						var rowid = generateRowID();
-						_.each(ids, function(rowid) {
-							update[`repeating_savemod_${rowid}_global_save_active_flag`] = "0";
-						});
-						setAttrs(update);
-					});
-				}
-			});
-
 			on("change:repeating_tohitmod remove:repeating_tohitmod", function(eventinfo) {
 				update_globalattack();
-			});
-
-			on("change:global_attack_mod_flag", function(eventinfo) {
-				if(eventinfo.newValue === "1") {
-					getSectionIDs("tohitmod", function(ids) {
-						if(!ids || ids.length === 0) {
-							var update = {};
-							var rowid = generateRowID();
-							update[`repeating_tohitmod_${rowid}_global_attack_roll`] = "1d4";
-							update[`repeating_tohitmod_${rowid}_global_attack_name`] = "BLESS";
-							update[`repeating_tohitmod_${rowid}_global_attack_active_flag`] = "1";
-							setAttrs(update);
-						}
-					});
-				} else {
-					getSectionIDs("tohitmod", function(ids) {
-						var update = {};
-						var rowid = generateRowID();
-						_.each(ids, function(rowid) {
-							update[`repeating_tohitmod_${rowid}_global_attack_active_flag`] = "0";
-						});
-						setAttrs(update);
-					});
-				}
-			});
-
-			on("change:global_ac_mod_flag", function(eventinfo) {
-				if(eventinfo.newValue === "1") {
-					getSectionIDs("acmod", function(ids) {
-						if(!ids || ids.length === 0) {
-							var update = {};
-							var rowid = generateRowID();
-							update[`repeating_acmod_${rowid}_global_ac_val`] = "1";
-							update[`repeating_acmod_${rowid}_global_ac_name`] = "Defense";
-							update[`repeating_acmod_${rowid}_global_ac_active_flag`] = "1";
-							setAttrs(update);
-						}
-					});
-				} else {
-					getSectionIDs("acmod", function(ids) {
-						var update = {};
-						var rowid = generateRowID();
-						_.each(ids, function(rowid) {
-							update[`repeating_acmod_${rowid}_global_ac_active_flag`] = "0";
-						});
-						setAttrs(update);
-					});
-				}
 			});
 
 			on("change:repeating_acmod remove:repeating_acmod", function(eventinfo) {
@@ -8113,7 +8245,7 @@
 							}
 						});
 
-						update[attr + "_flag"] = bonus > 0 || item_bonus > 0 || item_base > base ? 1 : 0;
+						update[attr + "_flag"] = bonus != 0 || item_bonus > 0 || item_base > base ? 1 : 0;
 						base = base > item_base ? base : item_base;
 						update[attr] = base + bonus + item_bonus;
 						setAttrs(update);
@@ -10254,7 +10386,6 @@
 
 				getAttrs(attack_attribs, function(v) {
 					_.each(attack_array, function(attackid) {
-						console.log("UPDATING ATTACK: " + attackid);
 						var callbacks = [];
 						var update = {};
 						var hbonus = "";
@@ -10773,6 +10904,10 @@
 							}
 						});
 
+						// CAP TOTALS AT 2 DECIMAL PLACES
+						wtotal = Math.round(wtotal * 100) / 100;
+						stotal = Math.round(stotal * 100) / 100;
+
 						update["weighttotal"] = wtotal;
 						update["slotstotal"] = stotal;
 
@@ -11001,7 +11136,7 @@
 			};
 
 			var update_initiative = function() {
-				var attrs_to_get = ["dexterity","dexterity_mod","initmod","jack_of_all_trades","jack","init_tiebreaker","pb_type"];
+				var attrs_to_get = ["dexterity","dexterity_mod","intelligence_mod","initmod","jack_of_all_trades","jack","init_tiebreaker","pb_type","use_intelligent_initiative"];
 				getSectionIDs("repeating_inventory", function(idarray){
 					_.each(idarray, function(currentID, i) {
 						attrs_to_get.push("repeating_inventory_" + currentID + "_equipped");
@@ -11010,6 +11145,9 @@
 					getAttrs(attrs_to_get, function(v) {
 						var update = {};
 						var final_init = parseInt(v["dexterity_mod"], 10);
+						if(v["use_intelligent_initiative"] && v["use_intelligent_initiative"] != 0) {
+							final_init = parseInt(v["intelligence_mod"], 10);
+						}
 						if(v["initmod"] && !isNaN(parseInt(v["initmod"], 10))) {
 							final_init = final_init + parseInt(v["initmod"], 10);
 						}
@@ -12318,5 +12456,19 @@
 				return value !== null && typeof(value) !== 'undefined';
 			};
 		</script>
+		<div class="sheet-compendium-warning">
+			<span>Importing compendium data</span>
+		</div>
+		<div class="sheet-monster-confirm">
+			<span>Are you sure you want to turn this character into a </span><span name="attr_drop_name"></span><span>?</span>
+			<div class="sheet-monster-confirm-buttons">
+				<div class="sheet-monster-confirm-button">
+					<input class="sheet-monster-confirm-cancel" type="checkbox" name="attr_cancel"><span class="cancel">Cancel</span>
+				</div>
+				<div class="sheet-monster-confirm-button">
+					<input class="sheet-monster-confirm-yes" type="checkbox" name="attr_confirm"><span class="yes">Yes</span>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
