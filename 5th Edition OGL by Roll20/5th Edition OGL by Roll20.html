@@ -8441,53 +8441,56 @@
         });
     };
 
-    var create_resource_from_item = function(itemid) {
-        var update = {};
-        var newrowid = generateRowID();
+    const create_resource_from_item = (itemid) => {
+        const newrowid = generateRowID();
+        let update     = {};
 
-        getAttrs(["other_resource_name"], function(x) {
-            if(!x.other_resource_name || x.other_resource_name == "") {
-                update["repeating_inventory_" + itemid + "_itemresourceid"] = "other_resource";
+        getAttrs(["other_resource_name"], (v) => {
+            //Use other_resource if it is empty
+            if (!v.other_resource_name || v.other_resource_name == "") {
+                update[`repeating_inventory_${itemid}_itemresourceid`] = "other_resource";
                 setAttrs(update, {}, update_resource_from_item(itemid, "other_resource", true));
-            }
-            else {
-                getSectionIDs("repeating_resource", function(idarray) {
-                    if(idarray.length == 0) {
-                        update["repeating_inventory_" + itemid + "_itemresourceid"] = newrowid + "_resource_left";
-                        setAttrs(update, {}, update_resource_from_item(itemid, newrowid + "_resource_left", true));
-                    }
-                    else {
-                        var resource_names = [];
-                        _.each(idarray, function(currentID, i) {
-                            resource_names.push("repeating_resource_" + currentID + "_resource_left_name");
-                            resource_names.push("repeating_resource_" + currentID + "_resource_right_name");
-                        });
-
-                        getAttrs(resource_names, function(y) {
-                            var existing = false;
-                            _.each(idarray, function(currentID, i) {
-                                if((!y["repeating_resource_" + currentID + "_resource_left_name"] || y["repeating_resource_" + currentID + "_resource_left_name"] === "") && existing == false) {
-                                    update["repeating_inventory_" + itemid + "_itemresourceid"] = currentID + "_resource_left";
-                                    setAttrs(update, {}, update_resource_from_item(itemid, currentID + "_resource_left", true));
-                                    existing = true;
-                                }
-                                else if((!y["repeating_resource_" + currentID + "_resource_right_name"] || y["repeating_resource_" + currentID + "_resource_right_name"] === "") && existing == false) {
-                                    update["repeating_inventory_" + itemid + "_itemresourceid"] = currentID + "_resource_right";
-                                    setAttrs(update, {}, update_resource_from_item(itemid, currentID + "_resource_right", true));
-                                    existing = true;
-                                };
+            //If other_resource is populated look through the repeating sections for an empty spot
+            } else {
+                getSectionIDs(`repeating_resource`, (idarray) => {
+                    if (idarray.length == 0) {
+                        update[`repeating_inventory_${itemid}_itemresourceid`] = `${newrowid}_resource_left`;
+                        setAttrs(update, {}, update_resource_from_item(itemid, `${newrowid}_resource_left`, true));
+                    } else {
+                        let array = [];
+                        _.each(idarray, (currentID, i) => {
+                            ["left", "right"].forEach(side => {
+                                array.push(`repeating_resource_${currentID}_resource_${side}`);
+                                array.push(`repeating_resource_${currentID}_resource_${side}_name`);
+                                array.push(`repeating_resource_${currentID}_resource_${side}_max`);
                             });
-                            if(!existing) {
-                                update["repeating_inventory_" + itemid + "_itemresourceid"] = newrowid + "_resource_left";
-                                setAttrs(update, {}, update_resource_from_item(itemid, newrowid + "_resource_left", true));
-                            }
                         });
+                        getAttrs(array, (y) => {
+                            let existing = false;
+                           _.each(idarray, (currentID, i) => {
+                                ["left", "right"].forEach(side => {
+                                    const Name  = y[`repeating_resource_${currentID}_resource_${side}_name`] || false;
+                                    const Value = y[`repeating_resource_${currentID}_resource_${side}`] || false;
+                                    const Max   = y[`repeating_resource_${currentID}_resource_${side}_max`] || false;
 
+                                    //If Name, Value, & Max are empty and existing === false then populate a resource there
+                                    if ((!Name && !Value && !Max) && existing === false) {
+                                        update[`repeating_inventory_${itemid}_itemresourceid`] = `${currentID}_resource_${side}`;
+                                        setAttrs(update, {}, update_resource_from_item(itemid, `${currentID}_resource_${side}`, true));
+                                        existing = true;
+                                    };
+                                });
+                            });
+                           //If nothing is empty then generatae a new row
+                            if(!existing) {
+                                update[`repeating_inventory_${itemid}_itemresourceid`] = `${newrowid}_resource_left`;
+                                setAttrs(update, {}, update_resource_from_item(itemid, `${newrowid}_resource_left`, true));
+                            };
+                        });
                     };
                 });
             };
         });
-
     };
 
     var update_resource_from_item = function(itemid, resourceid, newresource) {
@@ -9155,36 +9158,42 @@
         removeRepeatingRow("repeating_attack_" + attackid);
     };
 
-    var remove_resource = function(id) {
-        var update = {};
-        getAttrs([id + "_itemid"], function(v) {
-            var itemid = v[id + "_itemid"];
-            if(itemid) {
-                update["repeating_inventory_" + itemid + "_useasresource"] = 0;
-                update["repeating_inventory_" + itemid + "_itemresourceid"] = "";
+    const remove_resource = (id) => {
+        const attr = (id === "other_resource") ? id : `repeating_resource_${id}_itemid`;
+        let update = {};
+        getAttrs([`${attr}`], (v) => {
+            const itemid = v[`${attr}`];
+            //Uncheck Use As A Resource in inventory for an item if its resource row is deleted
+            if (itemid) {
+                update[`repeating_inventory_${itemid}_useasresource`]  = 0;
+                update[`repeating_inventory_${itemid}_itemresourceid`] = "";
             };
-            if(id == "other_resource") {
-                update["other_resource"] = "";
-                update["other_resource_name"] = "";
+            if (id == "other_resource") {
+                update["other_resource"]        = "";
+                update["other_resource_name"]   = "";
                 update["other_resource_itemid"] = "";
                 setAttrs(update, {silent: true});
-            }
-            else {
-                var baseid = id.replace("repeating_resource_", "").substring(0,20);
-                var resource_names = ["repeating_resource_" + baseid + "_resource_left_name", "repeating_resource_" + baseid + "_resource_right_name"];
-                getAttrs(resource_names, function(v) {
-                    if((id.indexOf("left") > -1 && !v["repeating_resource_" + baseid + "_resource_right_name"]) || (id.indexOf("right") > -1 && !v["repeating_resource_" + baseid + "_resource_left_name"])) {
-                        removeRepeatingRow("repeating_resource_" + baseid);
-                    }
-                    else {
-                        update["repeating_resource_" + id.replace("repeating_resource_", "")] = "";
-                        update["repeating_resource_" + id.replace("repeating_resource_", "") + "_name"] = "";
+            } else {
+                const currentID = id.replace("repeating_resource_", "").substring(0,20);
+                const side  = (id.includes("left")) ? `right` : `left`;
+                //Get the inputs for the opposite side to see if they are empty. 
+                //If they are empty delete the entire row. Otherwise set the side that was the source of this event to empty strings
+                getAttrs([`repeating_resource_${currentID}_resource_${side}`, `repeating_resource_${currentID}_resource_${side}_name`, `repeating_resource_${currentID}_resource_${side}_max`], (v) => {
+                    const Name  = v[`repeating_resource_${currentID}_resource_${side}_name`] || false;
+                    const Value = v[`repeating_resource_${currentID}_resource_${side}`] || false;
+                    const Max   = v[`repeating_resource_${currentID}_resource_${side}_max`] || false;
+                    if (!Name && !Value && !Max) {
+                        removeRepeatingRow(`repeating_resource_${currentID}`);
+                    } else {
+                        update[`repeating_resource_${id}`]        = "";
+                        update[`repeating_resource_${id}_name`]   = "";
+                        update[`repeating_resource_${id}_max`]    = "";
+                        update[`repeating_resource_${id}_itemid`] = "";
                     };
                     setAttrs(update, {silent: true});
                 });
-
             };
-        });
+        }); 
     };
 
     const update_weight = function() {
