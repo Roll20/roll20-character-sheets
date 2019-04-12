@@ -6412,29 +6412,25 @@
         });
     });
 
-    on("change:other_resource change:other_resource_name change:repeating_resource:resource_left change:repeating_resource:resource_left_name change:repeating_resource:resource_right change:repeating_resource:resource_right_name", function(eventinfo) {
-
-        if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {
-            return;
-        }
-
-        var resourceid = eventinfo.sourceAttribute;
-        if(eventinfo.sourceAttribute.indexOf("other") > -1) {
-            resourceid = "other_resource";
-        }
-        else if(eventinfo.sourceAttribute.substring(eventinfo.sourceAttribute.length - 5) == "_name") {
-            resourceid = eventinfo.sourceAttribute.substring(0, eventinfo.sourceAttribute.length - 5);
-        };
-
-        getAttrs([resourceid, resourceid + "_name", resourceid + "_itemid"], function(v) {
-            if(!v[resourceid + "_name"]) {
-                remove_resource(resourceid);
-            }
-            else if(v[resourceid + "_itemid"] && v[resourceid + "_itemid"] != ""){
-                update_item_from_resource(resourceid, v[resourceid + "_itemid"]);
-            };
+    ['other_resource','repeating_resource:resource_left','repeating_resource:resource_right'].forEach(attr => {
+        on(`change:${attr} change:${attr}_name`, (eventinfo) => {
+            if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {return;}
+            const resourceid = (eventinfo.sourceAttribute.includes("_name")) ? eventinfo.sourceAttribute.slice(0, -5) : eventinfo.sourceAttribute;
+            getAttrs([`${resourceid}_itemid`], (v) => {
+                const value = eventinfo.newValue;
+                //Update repeating_inventory if an itemid is associated with a resource
+                if (v[`${resourceid}_itemid`] && v[`${resourceid}_itemid`] != "") {
+                    const itemid = v[`${resourceid}_itemid`];
+                    let update = {};
+                    if (eventinfo.sourceAttribute.includes("_name")) {
+                        update[`repeating_inventory_${itemid}_itemname`]  = eventinfo.newValue;
+                    } else {
+                        update[`repeating_inventory_${itemid}_itemcount`] = eventinfo.newValue;
+                    };
+                    setAttrs(update, {silent: true}, () => {update_weight()});
+                };
+            });
         });
-
     });
 
     on("change:repeating_inventory:itemweight change:repeating_inventory:itemcount change:cp change:sp change:ep change:gp change:pp change:encumberance_setting change:size change:carrying_capacity_mod", function() {
@@ -6720,21 +6716,21 @@
         update_passive_perception();
     });
 
-    on("remove:repeating_inventory", function(eventinfo) {
-        var itemid = eventinfo.sourceAttribute.substring(20, 40);
-        var attackids = eventinfo.removedInfo && eventinfo.removedInfo["repeating_inventory_" + itemid + "_itemattackid"] ? eventinfo.removedInfo["repeating_inventory_" + itemid + "_itemattackid"] : undefined;
-        var resourceid = eventinfo.removedInfo && eventinfo.removedInfo["repeating_inventory_" + itemid + "_itemresourceid"] ? eventinfo.removedInfo["repeating_inventory_" + itemid + "_itemresourceid"] : undefined;
+    on("remove:repeating_inventory", (eventinfo) => {
+        const itemid     = eventinfo.sourceAttribute.substring(20, 40);
+        const attackids  = (eventinfo.removedInfo && eventinfo.removedInfo[`repeating_inventory_${itemid}_itemattackid`]) ? eventinfo.removedInfo[`repeating_inventory_${itemid}_itemattackid`] : undefined;
+        const resourceid = (eventinfo.removedInfo && eventinfo.removedInfo[`repeating_inventory_${itemid}_itemresourceid`]) ? eventinfo.removedInfo[`repeating_inventory_${itemid}_itemresourceid`] : undefined;
 
-        if(attackids) {
-            _.each(attackids.split(","), function(value) { remove_attack(value); });
-        }
-        if(resourceid) {
+        if (attackids) {
+            _.each(attackids.split(","), (value) => { remove_attack(value); });
+        };
+        if (resourceid) {
             remove_resource(resourceid);
-        }
+        };
 
-        if(eventinfo.removedInfo && eventinfo.removedInfo["repeating_inventory_" + itemid + "_itemmodifiers"]) {
-            check_itemmodifiers(eventinfo.removedInfo["repeating_inventory_" + itemid + "_itemmodifiers"]);
-        }
+        if (eventinfo.removedInfo && eventinfo.removedInfo[`repeating_inventory_${itemid}_itemmodifiers`]) {
+            check_itemmodifiers(eventinfo.removedInfo[`repeating_inventory_${itemid}_itemmodifiers`]);
+        };
 
         update_weight();
     });
@@ -8526,14 +8522,6 @@
         });
     };
 
-    var update_item_from_resource = function(resourceid, itemid) {
-        var update = {};
-        getAttrs([resourceid, resourceid + "_name"], function(v) {
-            update["repeating_inventory_" + itemid + "_itemcount"] = v[resourceid];
-            update["repeating_inventory_" + itemid + "_itemname"] = v[resourceid + "_name"];
-            setAttrs(update, {silent: true}, function() {update_weight()});
-        });
-    };
 
     const create_attack_from_spell = function(lvl, spellid, character_id) {
         let update   = {};
