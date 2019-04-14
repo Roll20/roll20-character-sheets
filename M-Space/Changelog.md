@@ -7,6 +7,13 @@ Versions have three numbers Major.Minor.Release
 
 **Release**: Indicates bugfixes and minor UI changes only.
 
+## 2.0.0
+### New Features
+* 
+
+### Enhancements
+* Switched calculations to sheet workers in most cases
+
 ## 1.8.0
 ### Bug Fixes
 * Fixed JSON Import when importing hit tables with a range of 1 on one of the locations.  Will now also remove leading 0's from imported hit tables.
