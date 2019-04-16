@@ -667,7 +667,18 @@
 
 <script type="text/worker">
 // run any data migrations
-on("sheet:opened", sheetMigration);
+on("sheet:opened", () => {
+    sheetMigration();
+
+    getSectionIDs("skills", ids => {
+        ids.forEach(id => getAttrs(["repeating_skills_" + id + "_skill_xp"], values => {
+            skillXPChanged({
+                newValue: values["repeating_skills_" + id + "_skill_xp"],
+                id: id
+            })
+        }));
+    });
+});
 
 const STRENGTH_XP = "strength_xp";
 const BODY_XP = "body_xp";
@@ -779,9 +790,13 @@ function skillXPChanged(eventInfo) {
         "prestidigitation"
     ];
 
-    const skill = "repeating_skills_skill";
-    const skillLevel = "repeating_skills_skill_level";
-    const subSkillAttrName = "repeating_skills_sub_skill";
+    // When the sheet is opened, or data migrations are run, the skills are retrieved via ID, and thus must have their
+    // ID included in the attribute name when setting attributes.
+    const id = eventInfo.id !== undefined ? eventInfo.id + "_" : ""
+
+    const skill = "repeating_skills_" + id + "skill";
+    const skillLevel = "repeating_skills_" + id + "skill_level";
+    const subSkillAttrName = "repeating_skills_" + id + "sub_skill";
 
     getAttrs([skill, subSkillAttrName], values => {
         const skillName = values[skill]
@@ -798,18 +813,18 @@ function skillXPChanged(eventInfo) {
             tieredSkills.includes(skillNameLookupKey)
         );
 
-        skillAttributesToSet["repeating_skills_skill_linked_attributes"] = skillData.linkedAttributes
+        skillAttributesToSet["repeating_skills_" + id + "skill_linked_attributes"] = skillData.linkedAttributes
             .map(linkAtr => getLinkedAttributeDisplayName(linkAtr))
             .join(" + ");
 
-        skillAttributesToSet["repeating_skills_skill_tnc"] = skillData.targetNumber + " / " + skillData.complexity;
-        skillAttributesToSet["repeating_skills_target_number"] = skillData.targetNumber;
+        skillAttributesToSet["repeating_skills_" + id + "skill_tnc"] = skillData.targetNumber + " / " + skillData.complexity;
+        skillAttributesToSet["repeating_skills_" + id + "target_number"] = skillData.targetNumber;
 
         getAttrs(skillData.linkedAttributes, values => {
-            skillAttributesToSet["repeating_skills_skill_modifier"] = Object.values(values)
+            skillAttributesToSet["repeating_skills_" + id + "skill_modifier"] = Object.values(values)
                 .reduce((total, num) => Number(total) + Number(num)) + Number(skillAttributesToSet[skillLevel]);
 
-            skillAttributesToSet["repeating_skills_skill_roll_value"] =
+            skillAttributesToSet["repeating_skills_" + id + "skill_roll_value"] =
                 getSkillDisplayName(skillData, skillName, subSkill) + " Skill Check:\n" +
                 "Margin of Success: [[2d6 + @{skill_modifier}[MOD] - @{target_number}[TN]]]";
 
