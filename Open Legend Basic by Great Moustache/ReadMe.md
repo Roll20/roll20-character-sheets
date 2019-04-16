@@ -4,6 +4,12 @@
 ## Tell YOUR story
 
 ### Changelog
+### 1.9.8c on 2019 April 12th
+* Folder Rename
+	- Changing folder name in Roll20 github from "Open Legend Basic by Great Moustache" to "Open Legend"
+	- When I was a young pup in the game, didn't realize should have named folders better
+* Image Updates 2
+	- Updated all remaining links in preperation for Folder rename
 ### 1.9.8b on 2019 April 6th
 * Image Updates
 	- Updated all link references to Roll20 Github

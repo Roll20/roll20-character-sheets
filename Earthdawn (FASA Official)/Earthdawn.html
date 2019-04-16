@@ -21,8 +21,8 @@ Earthdawn (FASA Official) Character sheet and associated API Copyright 2015-2019
 				title="button_WikiHelp:   Click this button, This will send a link to your chat window for this sheets Wiki Documentation that you should open in another tab.">Help Wiki
 		</button>
 		<button class="text-button ui-draggable button-nodice NoAPI" name="button_WikiHelpNoAPI" type="roll" 
-				value="For help look in https://wiki.roll20.net/Earthdawn_(FASA_Official)"
-				title="button_WikiHelp:   This sheets Wiki Documentation is at https://wiki.roll20.net/Earthdawn_(FASA_Official).">Help Wiki
+				value="For help look in https://wiki.roll20.net/Earthdawn_-_FASA_Official"
+				title="button_WikiHelp:   This sheets Wiki Documentation is at https://wiki.roll20.net/Earthdawn_-_FASA_Official.">Help Wiki
 		</button>&nbsp;
 	</div>
 	<div class="w30 flex-container" title="@{character_name}   Full name of character.">
@@ -3095,7 +3095,7 @@ Earthdawn (FASA Official) Character sheet and associated API Copyright 2015-2019
 		This character sheet is compatible with the Earthdawn&reg; game from FASA Games, Inc. and the Roll20 Earthdawn&reg; Compendium (Forthcoming). 
 		Any information copied into this character sheet maintains its original sources copyright, whether it was copied from the Compendium, or copied or typed in by the user, or by any other means.<br>
 		Any use of FASA Games, Inc.’s Intellectual Property other than as specifically authorized by FASA Games, Inc. is strictly prohibited and will terminate the rights granted herein.<br>
-		Earthdawn&reg; is a registered trademark of FASA Corporation. Earthdawn&reg; and all associated trademarks and copyrights are used under license from FASA Corporation.  Copyright &copy; 1993-2019 FASA Corporation<br>
+		Earthdawn&reg; is a registered trademark of FASA Corporation. Earthdawn&reg; and all associated trademarks, copyrights, and logos are used under license from FASA Corporation.  Copyright &copy; 1993-2019 FASA Corporation<br>
 		Roll20 character sheet & API by Christopher D. Dickey. Approved by FASA.
 	</div>
 </div>    <!--  End of Section Notes  -->
@@ -3123,7 +3123,7 @@ Earthdawn (FASA Official) Character sheet and associated API Copyright 2015-2019
 			<select name="attr_record-item" class="selShort">
 				<option value="LP" selected title="Legend Points."> LP</option>
 				<option value="SP"          title="Silver Pieces."> SP</option>
-				<option value="Other"       title="Silver Pieces."> Other</option>
+				<option value="Other"       title="Other."> Other</option>
 			</select>
 		</span>
 		<input class="testCloseChecked hidden" name="attr_record-item" type="checkbox" value="Other"/>
@@ -3196,7 +3196,7 @@ Earthdawn (FASA Official) Character sheet and associated API Copyright 2015-2019
 					Recalc</option>
                 <option value="!Earthdawn~ charID: @{character_id}~ Misc: SetAdjust: " title="Copy the buffs from the Combat Tab to the Adjustments Tab. This makes it easier for the GM to create monsters. He can set the values directly on the combat tab, then copy them to be on the Adjustments tab instead."> 
 					Set Adjustments</option>
-                <option value="!Earthdawn~ ChatMenu: gmState" title="GM can set several State Variables that change how all sheets act."> 
+                <option value="!Earthdawn~ ChatMenu: gmState: ED" title="GM can set several State Variables that change how all sheets act."> 
 					GM: set State variables</option>
                 <option value="!Earthdawn~ Misc: MacroCreate : ?{Macros|Refresh|Create|Delete}" title="Selecting this and pressing Do SF will create all macros used by this sheet. Option to delete them and refresh them (delete followed by create)."> 
 					Macros</option>
@@ -3749,7 +3749,7 @@ Earthdawn (FASA Official) Character sheet and associated API Copyright 2015-2019
 			}
 			return ret.replace( /_xYz_/g, "_");
         } catch(err) {
-            log( "Earthdawn:getParam() error caught: " + err );
+            log( "Earthdawn:buildPre() error caught: " + err );
 		}
 	};	// end buildPre
 
@@ -5076,15 +5076,16 @@ Earthdawn (FASA Official) Character sheet and associated API Copyright 2015-2019
         'use strict';
 
 //log( eventInfo);
-        var rowID = _.isString( eventInfo ) ? eventInfo : eventInfo["sourceAttribute"].slice(16,-8);
+        var rowID = _.isString( eventInfo ) ? eventInfo : eventInfo["sourceAttribute"].slice(16, eventInfo["sourceAttribute"].lastIndexOf("_") -3);
         var strS1 = fullName( "repeating_spell_SP_Circle", eventInfo );
         var strS2 = fullName( "repeating_spell_SP_Discipline", eventInfo );
-        getAttrs([ strS1, "tab-spells", strS2, "SP-Elementalist", "SP-Illusionist", "SP-Nethermancer", "SP-Wizard", "edition" ], function gaRsSpellName(values) {
+        getAttrs([ strS1, "tab-spells", strS2, "SP-Elementalist", "SP-Illusionist", "SP-Nethermancer", "SP-Wizard", "edition", "API" ], function gaRsSpellName(values) {
             'use strict';
             logvalues( values);
             var circle = getInt( values, strS1);
             var vals = {};
-            vals[ fullName( "repeating_spell_SP_RowID", eventInfo) ] = rowID;
+			if( getInt( values, "API" ) == 0 )		// If the API is not already doing this correctly, then do what you can (store the lowercased variable)
+				vals[ fullName( "repeating_spell_SP_RowID", eventInfo) ] = rowID;
 			if( getInt( values, "edition") == 0 ) {			// Due to a bug in Welcome Package, sometimes the api does not run "on add character" and edition ends up being blank. If it is blank, just assign it to 4th edition and hope it is correct. Note that this is also the case if the API is not installed. 
 				values[ "edition" ] = "4";
 				vals[ "edition" ] = "4";
@@ -5738,12 +5739,12 @@ log( "SpecialFunction SheetWorkerTest");
 		else if( recurse > 0) {
             var vals = [];
             vals[ "edition_max" ] = newSheetVersion.toString();
-			vals[ "APIflag" ] = "SheetUpdate," + origSheetVersion.toString() + "," + newSheetVersion.toString();
+			vals[ "APIflag" ] = "SheetUpdate," + origSheetVersion.toString() + "," + newSheetVersion.toString() + ", ED";
 			if( showNotes === -1 )
 				vals[ "Release-notes" ] = "Earthdawn (FASA Official) Character Sheet version: " + newSheetVersion + " by Chris Dickey.\n\n"
 						+ "Welcome to the Earthdawn character sheet.\n"
 						+ "The button that says 'Help Wiki' at the very top right of the sheet will open a help file. " 
-						+ "Alternatively the url is 'https://wiki.roll20.net/Earthdawn_(FASA_Official)'. Read it.\n\n"
+						+ "Alternatively the url is 'https://wiki.roll20.net/Earthdawn_-_FASA_Official'. Read it.\n\n"
 						+ "After you start your character sheet (Name and whether it is a PC or NPC, " 
 						+ "go to the Core tab and spend your Attribute Points by modifying the AP column), be sure to provide an Avatar picture and link it. "
 						+ "See the help file for more details. \n\n";
