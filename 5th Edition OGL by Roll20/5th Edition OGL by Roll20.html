@@ -8638,44 +8638,44 @@
     const update_attacks = (update_id, source) => {
         if (update_id.substring(0,1) === "-" && update_id.length === 20) {
             do_update_attack([update_id], source);
-        } else if(["strength","dexterity","constitution","intelligence","wisdom","charisma","spells","all"].indexOf(update_id) > -1) {
-            getSectionIDs("repeating_attack", function(idarray) {
-                if(update_id === "all") {
+        } else if (["strength","dexterity","constitution","intelligence","wisdom","charisma","spells","all"].indexOf(update_id) > -1) {
+            getSectionIDs("repeating_attack", (idarray) => {
+                if (update_id === "all") {
                     do_update_attack(idarray);
-                } else if(update_id === "spells") {
-                    var attack_attribs = [];
-                    _.each(idarray, function(id) {
-                        attack_attribs.push("repeating_attack_" + id + "_spellid", "repeating_attack_" + id + "_spelllevel");
+                } else if (update_id === "spells") {
+                    let attack_attribs = [];
+                    _.each(idarray, (id) => {
+                        attack_attribs.push(`repeating_attack_${id}_spellid`, `repeating_attack_${id}_spelllevel`);
                     });
-                    getAttrs(attack_attribs, function(v) {
-                        var filteredIds = _.filter(idarray, function(id) {
-                            return v["repeating_attack_" + id + "_spellid"] && v["repeating_attack_" + id + "_spellid"] != "";
+                    getAttrs(attack_attribs, (v) => {
+                        const filteredIds = _.filter(idarray, (id) => {
+                            return v[`repeating_attack_${id}_spellid`] && v[`repeating_attack_${id}_spellid`] != "";
                         });
-                        var spell_attacks = {};
-                        _.each(filteredIds, function(attack_id) {
+                        let spell_attacks = {};
+                        _.each(filteredIds, (attack_id) => {
                             spell_attacks[attack_id] = {
-                                spell_id: v["repeating_attack_" + attack_id + "_spellid"],
-                                spell_lvl: v["repeating_attack_" + attack_id + "_spelllevel"]
+                                spell_id: v[`repeating_attack_${id}_spellid`],
+                                spell_lvl: v[`repeating_attack_${id}_spelllevel`]
                             };
                         });
-                        _.each(spell_attacks, function(data, attack_id) { update_attack_from_spell(data.spell_lvl, data.spell_id, attack_id); });
+                        _.each(spell_attacks, (data, attack_id) => { update_attack_from_spell(data.spell_lvl, data.spell_id, attack_id); });
                     });
                 } else {
-                    var attack_attribs = ["spellcasting_ability"];
-                    _.each(idarray, function(id) {
-                        attack_attribs.push("repeating_attack_" + id + "_atkattr_base");
-                        attack_attribs.push("repeating_attack_" + id + "_dmgattr");
-                        attack_attribs.push("repeating_attack_" + id + "_dmg2attr");
-                        attack_attribs.push("repeating_attack_" + id + "_savedc");
+                    let attack_attribs = ["spellcasting_ability"];
+                    _.each(idarray, (id) => {
+                        attack_attribs.push(`repeating_attack_${id}_atkattr_base`);
+                        attack_attribs.push(`repeating_attack_${id}_dmgattr`);
+                        attack_attribs.push(`repeating_attack_${id}_dmg2attr`);
+                        attack_attribs.push(`repeating_attack_${id}_savedc`);
                     });
-                    getAttrs(attack_attribs, function(v) {
-                        var attr_attack_ids = [];
-                        _.each(idarray, function(id) {
-                            if((v["repeating_attack_" + id + "_atkattr_base"] && v["repeating_attack_" + id + "_atkattr_base"].indexOf(update_id) > -1) || (v["repeating_attack_" + id + "_dmgattr"] && v["repeating_attack_" + id + "_dmgattr"].indexOf(update_id) > -1) || (v["repeating_attack_" + id + "_dmg2attr"] && v["repeating_attack_" + id + "_dmg2attr"].indexOf(update_id) > -1) || (v["repeating_attack_" + id + "_savedc"] && v["repeating_attack_" + id + "_savedc"].indexOf(update_id) > -1) || (v["repeating_attack_" + id + "_savedc"] && v["repeating_attack_" + id + "_savedc"] === "(@{spell_save_dc})" && v["spellcasting_ability"] && v["spellcasting_ability"].indexOf(update_id) > -1)) {
+                    getAttrs(attack_attribs, (v) => {
+                        let attr_attack_ids = [];
+                        _.each(idarray, (id) => {
+                            if ((v[`repeating_attack_${id}_atkattr_base`] && v[`repeating_attack_${id}_atkattr_base`].indexOf(update_id) > -1) || (v[`repeating_attack_${id}_dmgattr`] && v[`repeating_attack_${id}_dmgattr`].indexOf(update_id) > -1) || (v[`repeating_attack_${id}_dmg2attr`] && v[`repeating_attack_${id}_dmg2attr`].indexOf(update_id) > -1) || (v[`repeating_attack_${id}_savedc`] && v[`repeating_attack_${id}_savedc`].indexOf(update_id) > -1) || (v[`repeating_attack_${id}_savedc`] && v[`repeating_attack_${id}_savedc`] === "(@{spell_save_dc})" && v["spellcasting_ability"] && v["spellcasting_ability"].indexOf(update_id) > -1)) {
                                 attr_attack_ids.push(id);
                             }
                         });
-                        if(attr_attack_ids.length > 0) {
+                        if (attr_attack_ids.length > 0) {
                             do_update_attack(attr_attack_ids);
                         }
                     });
@@ -8684,63 +8684,43 @@
         };
     };
 
-    var do_update_attack = function(attack_array, source) {
-        var attack_attribs = ["level","d20","pb","pb_type","pbd_safe","dtype","globalmagicmod","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod","spellcasting_ability","spell_save_dc","spell_attack_mod", "spell_dc_mod", "global_damage_mod_roll", "global_damage_mod_crit"];
-        _.each(attack_array, function(attackid) {
-            attack_attribs.push("repeating_attack_" + attackid + "_atkflag");
-            attack_attribs.push("repeating_attack_" + attackid + "_atkname");
-            attack_attribs.push("repeating_attack_" + attackid + "_atkattr_base");
-            attack_attribs.push("repeating_attack_" + attackid + "_atkmod");
-            attack_attribs.push("repeating_attack_" + attackid + "_atkprofflag");
-            attack_attribs.push("repeating_attack_" + attackid + "_atkmagic");
-            attack_attribs.push("repeating_attack_" + attackid + "_dmgflag");
-            attack_attribs.push("repeating_attack_" + attackid + "_dmgbase");
-            attack_attribs.push("repeating_attack_" + attackid + "_dmgattr");
-            attack_attribs.push("repeating_attack_" + attackid + "_dmgmod");
-            attack_attribs.push("repeating_attack_" + attackid + "_dmgtype");
-            attack_attribs.push("repeating_attack_" + attackid + "_dmg2flag");
-            attack_attribs.push("repeating_attack_" + attackid + "_dmg2base");
-            attack_attribs.push("repeating_attack_" + attackid + "_dmg2attr");
-            attack_attribs.push("repeating_attack_" + attackid + "_dmg2mod");
-            attack_attribs.push("repeating_attack_" + attackid + "_dmg2type");
-            attack_attribs.push("repeating_attack_" + attackid + "_dmgcustcrit");
-            attack_attribs.push("repeating_attack_" + attackid + "_dmg2custcrit");
-            attack_attribs.push("repeating_attack_" + attackid + "_saveflag");
-            attack_attribs.push("repeating_attack_" + attackid + "_savedc");
-            attack_attribs.push("repeating_attack_" + attackid + "_saveeffect");
-            attack_attribs.push("repeating_attack_" + attackid + "_saveflat");
-            attack_attribs.push("repeating_attack_" + attackid + "_hldmg");
-            attack_attribs.push("repeating_attack_" + attackid + "_spellid");
-            attack_attribs.push("repeating_attack_" + attackid + "_spelllevel");
-            attack_attribs.push("repeating_attack_" + attackid + "_atkrange");
-            attack_attribs.push("repeating_attack_" + attackid + "_itemid");
-            attack_attribs.push("repeating_attack_" + attackid + "_ammo");
-            attack_attribs.push("repeating_attack_" + attackid + "_global_damage_mod_field");
+    const do_update_attack = (attack_array, source) => {
+        console.log(`%c DO UPDATE ATTACKS`, "color:orange;font-size: 16px;");
+        let attack_attribs = ["level","d20","pb","pb_type","pbd_safe","dtype","globalmagicmod","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod","spellcasting_ability","spell_save_dc","spell_attack_mod", "spell_dc_mod", "global_damage_mod_roll", "global_damage_mod_crit"];
+        _.each(attack_array, (attackid) => {
+            ["atkflag","atkname","atkattr_base","atkmod","atkprofflag","atkmagic","dmgflag","dmgbase","dmgattr","dmgmod","dmgtype","dmg2flag","dmg2base","dmg2attr","dmg2mod","dmg2type","dmgcustcrit","dmg2custcrit","saveflag","savedc","saveeffect","saveflat","hldmg","spellid","spelllevel","atkrange","itemid","ammo","global_damage_mod_field"].forEach((attr) => {
+                attack_attribs.push(`repeating_attack_${attackid}_${attr}`)
+            });
         });
 
-        getAttrs(attack_attribs, function(v) {
-            _.each(attack_array, function(attackid) {
-                var callbacks = [];
-                var update = {};
-                var hbonus = "";
-                var hdmg1 = "";
-                var hdmg2 = "";
-                var dmg = "";
-                var dmg2 = "";
-                var rollbase = "";
-                var spellattack = false;
-                var magicattackmod = 0;
-                var magicsavemod = 0;
-                var atkattr_abrev = "";
-                var dmgattr_abrev = "";
-                var dmg2attr_abrev = "";
-                var pbd_safe = v["pbd_safe"] ? v["pbd_safe"] : "";
-                var global_crit = v["repeating_attack_" + attackid + "_global_damage_mod_field"] && v["repeating_attack_" + attackid + "_global_damage_mod_field"] != "" ? "@{global_damage_mod_crit}" : "";
-                var hldmgcrit = v["repeating_attack_" + attackid + "_hldmg"] && v["repeating_attack_" + attackid + "_hldmg"] != "" ? v["repeating_attack_" + attackid + "_hldmg"].slice(0, 7) + "crit" + v["repeating_attack_" + attackid + "_hldmg"].slice(7) : "";
-                if(v["repeating_attack_" + attackid + "_spellid"] && v["repeating_attack_" + attackid + "_spellid"] != "") {
+        console.log(attack_array);
+
+        getAttrs(attack_attribs, (v) => {
+            _.each(attack_array, (attackid) => {
+                console.log(`%c ${attackid}`, "color:orange;font-size: 14px;");
+                let callbacks      = [];
+                let update         = {};
+                let hbonus         = "";
+                let hdmg1          = "";
+                let hdmg2          = "";
+                let dmg            = "";
+                let dmg2           = "";
+                let rollbase       = "";
+                let spellattack    = false;
+                let magicattackmod = 0;
+                let magicsavemod   = 0;
+                let atkattr_abrev  = "";
+                let dmgattr_abrev  = "";
+                let dmg2attr_abrev = "";
+                const repeating_attack = `repeating_attack_${attackid}`;
+                const pbd_safe = v["pbd_safe"] || ""; //Proficeny Bonus toggle in settings
+                const global_crit = (v[`${repeating_attack}_global_damage_mod_field`] && v[`${repeating_attack}_global_damage_mod_field`] != "") ? "@{global_damage_mod_crit}" : "";
+                const hldmgcrit = (v[`${repeating_attack}_hldmg`] && v[`${repeating_attack}_hldmg`] != "") ? v[`${repeating_attack}_hldmg`].slice(0, 7) + "crit" + v[`${repeating_attack}_hldmg`].slice(7) : "";
+                console.log(`%c global_crit: ${global_crit}, hldmgcrit: ${hldmgcrit}`, "color:orange;font-size: 12px;");
+                if (v[`${repeating_attack}_spellid`] && v[`${repeating_attack}_spellid`] != "") {
                     spellattack = true;
-                    magicattackmod = v["spell_attack_mod"] && !isNaN(parseInt(v["spell_attack_mod"],10)) ? parseInt(v["spell_attack_mod"],10) : 0;
-                    magicsavemod = v["spell_dc_mod"] && !isNaN(parseInt(v["spell_dc_mod"],10)) ? parseInt(v["spell_dc_mod"],10) : 0;
+                    magicattackmod = (v["spell_attack_mod"] && !isNaN(parseInt(v["spell_attack_mod"],10))) ? parseInt(v["spell_attack_mod"],10) : 0;
+                    magicsavemod = (v["spell_dc_mod"] && !isNaN(parseInt(v["spell_dc_mod"],10))) ? parseInt(v["spell_dc_mod"],10) : 0;
                 };
 
                 if(!v["repeating_attack_" + attackid + "_atkattr_base"] || v["repeating_attack_" + attackid + "_atkattr_base"] === "0") {
