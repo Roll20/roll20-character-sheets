@@ -9436,14 +9436,11 @@
     };
 
     const update_class = () => {
-        //console.log(`%c Update class:`, "color:purple; font-size:14px;");
         getAttrs(["class", "base_level","custom_class","cust_hitdietype","cust_spellcasting_ability","cust_strength_save_prof","cust_dexterity_save_prof","cust_constitution_save_prof","cust_intelligence_save_prof","cust_wisdom_save_prof","cust_charisma_save_prof", "npc"], (v) => {
-            if(v.npc && v.npc == "1") {
-                return;
-            }
+            if (v.npc && v.npc == "1") { return; }
             const abilites = ["Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"];
             //Custom Classes
-            if(v.custom_class && v.custom_class != "0") {
+            if (v.custom_class && v.custom_class != "0") {
                 update = {};
                 update["hitdietype"] = v.cust_hitdietype;
                 update["spellcasting_ability"] = v.cust_spellcasting_ability;
@@ -9468,15 +9465,16 @@
                     update = {};
                     page.forEach((list) => {
                         if (list.data && 'Category' in list.data && list.data[`Category`] === "Classes") {
-                            update["hitdietype"] = list.data["Hit Die"].slice(1);
+                            update["hitdietype"]           = list.data["Hit Die"].slice(1);
                             update["spellcasting_ability"] = (list.data["Spellcasting Ability"]) ? `@{${list.data["Spellcasting Ability"].toLowerCase()}_mod}+` : "0*";
-
                             abilites.forEach((save) => {
                                 const ability = save.toLowerCase();
                                 update[`${ability}_save_prof`] = (list.data["data-Saving Throws"].indexOf(`${save}`) > -1) ? "(@{pb})" : 0;
+                                update_save(ability);
                             });
                         };
                     });
+
                     setAttrs(update, {silent: true});
                     //Update Spell info to change or remove casting attributes in Spells
                     update_spell_info();
