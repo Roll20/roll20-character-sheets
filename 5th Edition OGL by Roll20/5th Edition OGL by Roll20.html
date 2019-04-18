@@ -8778,36 +8778,35 @@
                 const atkmod = parseInt(v[`${repeating_attack}_atkmod`],10) || 0;
                 //MAGIC BONUS input inside settings for the repeating attack
                 const atkmag = parseInt(v[`${repeating_attack}_atkmagic`],10) || 0;
-                console.log(`%c atkmod ${atkmod}, atkmag ${atkmag}`, "color:orange;font-size: 12px;");
 
-                var dmgmag = isNaN(atkmag) === false && atkmag != 0 && ((v[`${repeating_attack}_dmgflag`] && v[`${repeating_attack}_dmgflag`] != 0) || (v[`${repeating_attack}_dmg2flag`] && v[`${repeating_attack}_dmg2flag`] != 0)) ? "+ " + atkmag + " Magic Bonus" : "";
+                //used in _atkdmgtype display
+                const dmgmag = (isNaN(atkmag) === false && atkmag != 0 && ((v[`${repeating_attack}_dmgflag`] && v[`${repeating_attack}_dmgflag`] != 0) || (v[`${repeating_attack}_dmg2flag`] && v[`${repeating_attack}_dmg2flag`] != 0))) ? `+ ${atkmag} Magic Bonus` : "";
+                
+                //WORK IN PROGRESS
                 if (v[`${repeating_attack}_atkflag`] && v[`${repeating_attack}_atkflag`] != 0) {
-                    bonus_mod = atkattr_base + atkmod + atkmag + magicattackmod;
+                    console.log(`%c ATTACK FLAG`, "color:orange;font-size: 12px;");
+                    bonus_mod  = atkattr_base + atkmod + atkmag + magicattackmod;
+                    plus_minus = (bonus_mod > -1) ? "+" : "";
                     if (v["pb_type"] && v["pb_type"] === "die") {
-                        plus_minus = bonus_mod > -1 ? "+" : "";
-                        bonus      = bonus_mod + "+" + pb;
+                        bonus      = `${bonus_mod}+${pb}`;
                     } else {
                         bonus_mod  = bonus_mod + parseInt(pb, 10);
-                        plus_minus = bonus_mod > -1 ? "+" : "";
                         bonus      = plus_minus + bonus_mod;
                     };
-                }
-                else if(v["repeating_attack_" + attackid + "_saveflag"] && v["repeating_attack_" + attackid + "_saveflag"] != 0) {
-                    if(!v["repeating_attack_" + attackid + "_savedc"] || (v["repeating_attack_" + attackid + "_savedc"] && v["repeating_attack_" + attackid + "_savedc"] === "(@{spell_save_dc})")) {
+                } else if (v[`${repeating_attack}_saveflag`] && v[`${repeating_attack}_saveflag`] != 0) {
+                    console.log(`%c SAVE FLAG`, "color:orange;font-size: 12px;");
+                    if (!v[`${repeating_attack}_savedc`] || (v[`${repeating_attack}_savedc`] && v[`${repeating_attack}_savedc`] === "(@{spell_save_dc})")) {
                         var tempdc = v["spell_save_dc"];
-                    }
-                    else if(v["repeating_attack_" + attackid + "_savedc"] && v["repeating_attack_" + attackid + "_savedc"] === "(@{saveflat})") {
-                        var tempdc = isNaN(parseInt(v["repeating_attack_" + attackid + "_saveflat"])) === false ? parseInt(v["repeating_attack_" + attackid + "_saveflat"]) : "0";
-                    }
-                    else {
-                        var savedcattr = v["repeating_attack_" + attackid + "_savedc"].replace(/^[^{]*{/,"").replace(/\_.*$/,"");
-                        var safe_pb = v["pb_type"] && v["pb_type"] === "die" ? parseInt(pb.substring(1), 10) / 2 : parseInt(pb,10);
-                        var safe_attr = v[savedcattr + "_mod"] ? parseInt(v[savedcattr + "_mod"],10) : 0;
-                        var tempdc = 8 + safe_attr + safe_pb + magicsavemod;
+                    } else if(`v[${repeating_attack}_savedc`] && v[`${repeating_attack}_savedc`] === "(@{saveflat})") {
+                        var tempdc = isNaN(parseInt(v[`${repeating_attack}_saveflat`])) === false ? parseInt(v[`${repeating_attack}_saveflat`]) : "0";
+                    } else {
+                        var savedcattr = v[`${repeating_attack}_savedc`].replace(/^[^{]*{/,"").replace(/\_.*$/,"");
+                        var safe_pb    = v["pb_type"] && v["pb_type"] === "die" ? parseInt(pb.substring(1), 10) / 2 : parseInt(pb,10);
+                        var safe_attr  = v[savedcattr + "_mod"] ? parseInt(v[savedcattr + "_mod"],10) : 0;
+                        var tempdc     = 8 + safe_attr + safe_pb + magicsavemod;
                     };
                     bonus = "DC" + tempdc;
-                }
-                else {
+                } else {
                     bonus = "-";
                 }
                 if(v["repeating_attack_" + attackid + "_dmgflag"] && v["repeating_attack_" + attackid + "_dmgflag"] != 0) {
@@ -8921,6 +8920,8 @@
                     var itemid = v["repeating_attack_" + attackid + "_itemid"];
                     callbacks.push( function() {update_item_from_attack(itemid, attackid);} );
                 }
+
+                console.log(update["repeating_attack_" + attackid + "_atkdmgtype"]);
                 setAttrs(update, {silent: true}, function() {callbacks.forEach(function(callback) {callback(); })} );
             });
         });
