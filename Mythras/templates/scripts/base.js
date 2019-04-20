@@ -2070,7 +2070,7 @@
         });
         
         // Convert Learned to Sheet workers
-        getAttrs(["arcane_casting_learned", "channel_learned", "fata_learned", "folk_magic_learned", "trance_learned", "exhort_learned"], function(v) {
+        getAttrs(["arcane_casting_learned", "channel_learned", "fata_learned", "folk_magic_learned", "trance_learned", "exhort_learned", "type"], function(v) {
             var newvattrs = {};
 
             if (v.arcane_casting_learned) {
