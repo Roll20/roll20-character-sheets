@@ -8686,7 +8686,7 @@
     };
 
     const do_update_attack = (attack_array, source) => {
-        console.log(`%c DO UPDATE ATTACKS`, "color:orange;font-size: 16px;");
+        console.log(`%c DO UPDATE ATTACKS`, "color:purple;font-size: 16px;");
         let attack_attribs = ["level","d20","pb","pb_type","pbd_safe","dtype","globalmagicmod","strength_mod","dexterity_mod","constitution_mod","intelligence_mod","wisdom_mod","charisma_mod","spellcasting_ability","spell_save_dc","spell_attack_mod", "spell_dc_mod", "global_damage_mod_roll", "global_damage_mod_crit"];
         _.each(attack_array, (attackid) => {
             ["atkflag","atkname","atkattr_base","atkmod","atkprofflag","atkmagic","dmgflag","dmgbase","dmgattr","dmgmod","dmgtype","dmg2flag","dmg2base","dmg2attr","dmg2mod","dmg2type","dmgcustcrit","dmg2custcrit","saveflag","savedc","saveeffect","saveflat","hldmg","spellid","spelllevel","atkrange","itemid","ammo",].forEach((attr) => {
@@ -8782,135 +8782,121 @@
                 //used in _atkdmgtype display
                 const dmgmag = (isNaN(atkmag) === false && atkmag != 0 && ((v[`${repeating_attack}_dmgflag`] && v[`${repeating_attack}_dmgflag`] != 0) || (v[`${repeating_attack}_dmg2flag`] && v[`${repeating_attack}_dmg2flag`] != 0))) ? `+ ${atkmag} Magic Bonus` : "";
                 
-                //WORK IN PROGRESS
-                if (v[`${repeating_attack}_atkflag`] && v[`${repeating_attack}_atkflag`] != 0) {
-                    console.log(`%c ATTACK FLAG`, "color:orange;font-size: 12px;");
+               //ATTACK checkbox inside settings for the repeating attack
+                const atkflag = v[`${repeating_attack}_atkflag`] || 0;
+                if (atkflag != 0) {
                     bonus_mod  = atkattr_base + atkmod + atkmag + magicattackmod;
                     plus_minus = (bonus_mod > -1) ? "+" : "";
+                    //pb_type is PROFICIENCY BONUS select in Settings
                     if (v["pb_type"] && v["pb_type"] === "die") {
-                        bonus      = `${bonus_mod}+${pb}`;
+                        bonus  = `${bonus_mod}+${pb}`;
                     } else {
                         bonus_mod  = bonus_mod + parseInt(pb, 10);
                         bonus      = plus_minus + bonus_mod;
                     };
+                //SAVING THROW checkbox inside settings for the repeating attack
                 } else if (v[`${repeating_attack}_saveflag`] && v[`${repeating_attack}_saveflag`] != 0) {
-                    console.log(`%c SAVE FLAG`, "color:orange;font-size: 12px;");
-                    if (!v[`${repeating_attack}_savedc`] || (v[`${repeating_attack}_savedc`] && v[`${repeating_attack}_savedc`] === "(@{spell_save_dc})")) {
-                        var tempdc = v["spell_save_dc"];
-                    } else if(`v[${repeating_attack}_savedc`] && v[`${repeating_attack}_savedc`] === "(@{saveflat})") {
-                        var tempdc = isNaN(parseInt(v[`${repeating_attack}_saveflat`])) === false ? parseInt(v[`${repeating_attack}_saveflat`]) : "0";
+                    const saveDC = v[`${repeating_attack}_savedc`] || "";
+                    //SAVING THROW VS DC select "Spell" inside settings for the repeating attack
+                    if (!saveDC || saveDC === "(@{spell_save_dc})") {
+                        const tempdc = v["spell_save_dc"];
+                        bonus = "DC" + tempdc;
+                    //SAVING THROW VS DC select "FLAT" inside settings for the repeating attack
+                    } else if (saveDC === "(@{saveflat})") {
+                        const tempdc = parseInt(v[`${repeating_attack}_saveflat`]) || 0;
+                        bonus = "DC" + tempdc;
+                    //SAVING THROW VS DC select ability score inside settings for the repeating attack
                     } else {
-                        var savedcattr = v[`${repeating_attack}_savedc`].replace(/^[^{]*{/,"").replace(/\_.*$/,"");
-                        var safe_pb    = v["pb_type"] && v["pb_type"] === "die" ? parseInt(pb.substring(1), 10) / 2 : parseInt(pb,10);
-                        var safe_attr  = v[savedcattr + "_mod"] ? parseInt(v[savedcattr + "_mod"],10) : 0;
-                        var tempdc     = 8 + safe_attr + safe_pb + magicsavemod;
+                        const savedcattr = v[`${repeating_attack}_savedc`].split("_mod")[0].slice(3);
+                        const safe_pb    = v["pb_type"] && v["pb_type"] === "die" ? parseInt(pb.substring(1), 10) / 2 : parseInt(pb,10);
+                        const safe_attr  = v[`${savedcattr}_mod`] ? parseInt(v[`${savedcattr}_mod`],10) : 0;
+                        const tempdc     = 8 + safe_attr + safe_pb + magicsavemod;
+                        bonus = "DC" + tempdc;
                     };
-                    bonus = "DC" + tempdc;
                 } else {
                     bonus = "-";
                 }
-                if(v["repeating_attack_" + attackid + "_dmgflag"] && v["repeating_attack_" + attackid + "_dmgflag"] != 0) {
-                    if(spellattack === true && dmgbase.indexOf("[[round((@{level} + 1) / 6 + 0.5)]]") > -1) {
-                        // SPECIAL CANTRIP DAMAGE
-                        dmgdiestring = Math.round(((parseInt(v["level"], 10) + 1) / 6) + 0.5).toString()
-                        dmg = dmgdiestring + dmgbase.substring(dmgbase.lastIndexOf("d"));
-                        if(dmgattr + dmgmod != 0) {
-                            dmg = dmg + "+" + (dmgattr + dmgmod);
-                        }
-                        dmg = dmg + " " + dmgtype;
-                    }
-                    else {
-                        if(dmgbase === 0 && (dmgattr + dmgmod === 0)){
-                            dmg = 0;
-                        }
-                        if(dmgbase != 0) {
-                            dmg = dmgbase;
-                        }
-                        if(dmgbase != 0 && (dmgattr + dmgmod != 0)){
-                            dmg = dmgattr + dmgmod > 0 ? dmg + "+" : dmg;
-                        }
-                        if(dmgattr + dmgmod != 0) {
-                            dmg = dmg + (dmgattr + dmgmod);
-                        }
-                        dmg = dmg + " " + dmgtype;
-                    }
+                //Build ROLL TEMPLATE with below variables
+                //ATTACK checkbox inside settings for the repeating attack
+                if (atkflag != 0) {
+                    if (atkattr_base   != 0) {hbonus += ` + ${atkattr_base}[${atkattr_abrev}]`};
+                    if (atkmod         != 0) {hbonus += ` + ${atkmod}[MOD]`};
+                    if (pb             != 0) {hbonus += ` + ${pb}${pbd_safe}[PROF]`};
+                    if (atkmag         != 0) {hbonus += ` + ${atkmag}[MAGIC]`};
+                    if (magicattackmod != 0) {hbonus += ` + ${magicattackmod}[SPELLATK]`};
                 }
-                else {
-                    dmg = "";
-                };
-                if(v["repeating_attack_" + attackid + "_dmg2flag"] && v["repeating_attack_" + attackid + "_dmg2flag"] != 0) {
-                    if(dmg2base === 0 && (dmg2attr + dmg2mod === 0)){
-                        dmg2 = 0;
-                    }
-                    if(dmg2base != 0) {
-                        dmg2 = dmg2base;
-                    }
-                    if(dmg2base != 0 && (dmg2attr + dmg2mod != 0)){
-                        dmg2 = dmg2attr + dmg2mod > 0 ? dmg2 + "+" : dmg2;
-                    }
-                    if(dmg2attr + dmg2mod != 0) {
-                        dmg2 = dmg2 + (dmg2attr + dmg2mod);
-                    }
-                    dmg2 = dmg2 + " " + dmg2type;
-                }
-                else {
-                    dmg2 = "";
-                };
-                dmgspacer = v["repeating_attack_" + attackid + "_dmgflag"] && v["repeating_attack_" + attackid + "_dmgflag"] != 0 && v["repeating_attack_" + attackid + "_dmg2flag"] && v["repeating_attack_" + attackid + "_dmg2flag"] != 0 ? "+ " : "";
-                crit1 = v["repeating_attack_" + attackid + "_dmgcustcrit"] && v["repeating_attack_" + attackid + "_dmgcustcrit"] != "" ? v["repeating_attack_" + attackid + "_dmgcustcrit"] : dmgbase;
-                crit2 = v["repeating_attack_" + attackid + "_dmg2custcrit"] && v["repeating_attack_" + attackid + "_dmg2custcrit"] != "" ? v["repeating_attack_" + attackid + "_dmg2custcrit"] : dmg2base;
-                r1 = v["repeating_attack_" + attackid + "_atkflag"] && v["repeating_attack_" + attackid + "_atkflag"] != 0 ? "@{d20}" : "0d20";
-                r2 = v["repeating_attack_" + attackid + "_atkflag"] && v["repeating_attack_" + attackid + "_atkflag"] != 0 ? "@{rtype}" : "{{r2=[[0d20";
-                if(v["repeating_attack_" + attackid + "_atkflag"] && v["repeating_attack_" + attackid + "_atkflag"] != 0) {
-                    if(magicattackmod != 0) {hbonus = " + " + magicattackmod + "[SPELLATK]" + hbonus};
-                    if(atkmag != 0) {hbonus = " + " + atkmag + "[MAGIC]" + hbonus};
-                    if(pb != 0) {hbonus = " + " + pb + pbd_safe + "[PROF]" + hbonus};
-                    if(atkmod != 0) {hbonus = " + " + atkmod + "[MOD]" + hbonus};
-                    if(atkattr_base != 0) {hbonus = " + " + atkattr_base + "[" + atkattr_abrev + "]" + hbonus};
-                }
-                else {
-                    hbonus = "";
-                }
-                if(v["repeating_attack_" + attackid + "_dmgflag"] && v["repeating_attack_" + attackid + "_dmgflag"] != 0) {
-                    if(atkmag != 0) {hdmg1 = " + " + atkmag + "[MAGIC]" + hdmg1};
-                    if(dmgmod != 0) {hdmg1 = " + " + dmgmod + "[MOD]" + hdmg1};
-                    if(dmgattr != 0) {hdmg1 = " + " + dmgattr + "[" + dmgattr_abrev + "]" + hdmg1};
+
+                const dmgflag1 = v[`${repeating_attack}_dmgflag`] || 0;
+                const dmgflag2 = v[`${repeating_attack}_dmg2flag`] || 0;
+                //DAMAGE 1 checkbox inside settings for the repeating attack
+                if (dmgflag1 != 0) {
+                    if (atkmag  != 0) {hdmg1 = ` + ${atkmag}[MAGIC]${hdmg1}`};
+                    if (dmgmod  != 0) {hdmg1 = ` + ${dmgmod}[MOD]${hdmg1}`};
+                    if (dmgattr != 0) {hdmg1 = ` + ${dmgattr}[${dmgattr_abrev}]${hdmg1}`};
                     hdmg1 = dmgbase + hdmg1;
-                }
-                else {
+                } else {
                     hdmg1 = "0";
                 }
-                if(v["repeating_attack_" + attackid + "_dmg2flag"] && v["repeating_attack_" + attackid + "_dmg2flag"] != 0) {
-                    if(dmg2mod != 0) {hdmg2 = " + " + dmg2mod + "[MOD]" + hdmg2};
-                    if(dmg2attr != 0) {hdmg2 = " + " + dmg2attr + "[" + dmg2attr_abrev + "]" + hdmg2};
+                //DAMAGE 2 checkbox inside settings for the repeating attack
+                if (dmgflag2 != 0) {
+                    if (dmg2mod  != 0) {hdmg2 = ` + ${dmg2mod}[MOD]${hdmg2}`};
+                    if (dmg2attr != 0) {hdmg2 = ` + ${dmg2attr}[${dmg2attr_abrev}]${hdmg2}`};
                     hdmg2 = dmg2base + hdmg2;
-                }
-                else {
+                } else {
                     hdmg2 = "0";
+                }  
+
+                //WORK IN PROGRESS
+                console.log(`%c hdmg1 ${hdmg1}, hdmg2 ${hdmg2}`, "color:purple;font-size:14px;");
+
+                //DAMAGE 1 checkbox inside settings for the repeating attack
+                if (dmgflag1 != 0) {
+                    hdmg1NEW += dmgbase;
+                    if (dmgattr != 0) {hdmg1NEW += ` + ${dmgattr}[${dmgattr_abrev}]`};
+                    if (dmgmod  != 0) {hdmg1NEW += ` + ${dmgmod}[MOD]`};
+                    if (atkmag  != 0) {hdmg1NEW += ` + ${atkmag}[MAGIC]`};
+                } else {
+                    hdmg1NEW += "0";
                 }
-                var globaldamage = `[[${v.global_damage_mod_roll && v.global_damage_mod_roll !== "" ? v.global_damage_mod_roll : "0"}]]`;
-                var globaldamagecrit = `[[${v.global_damage_mod_crit && v.global_damage_mod_crit !== "" ? v.global_damage_mod_crit : "0"}]]`;
-                if(v.dtype === "full") {
-                    pickbase = "full";
-                    rollbase = "@{wtype}&{template:atkdmg} {{mod=@{atkbonus}}} {{rname=@{atkname}}} {{r1=[[" + r1 + "cs>@{atkcritrange}" + hbonus + "]]}} " + r2 + "cs>@{atkcritrange}" + hbonus + "]]}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} {{crit1=[[" + crit1 + "[CRIT]]]}} {{crit2=[[" + crit2 + "[CRIT]]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} " + hldmgcrit + " {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globalattack=@{global_attack_mod}}} {{globaldamage=" + globaldamage + "}} {{globaldamagecrit=" + globaldamagecrit + "}} {{globaldamagetype=@{global_damage_mod_type}}} ammo=@{ammo} @{charname_output}";
+                console.log(`%c hdmg1 ${hdmg1NEW}, hdmg2 ${hdmg1NEW}`, "color:blue;font-size:14px;");
+                //DAMAGE 2 checkbox inside settings for the repeating attack
+                if (dmgflag2 != 0) {
+                    hdmg2NEW += dmg2base
+                    if (dmg2attr != 0) {hdmg2NEW += ` + ${dmg2attr}[${dmg2attr_abrev}]`};
+                    if (dmg2mod  != 0) {hdmg2NEW += ` + ${dmg2mod}[MOD]`};
+                } else {
+                    hdmg2NEW += "0";
                 }
-                else if(v["repeating_attack_" + attackid + "_atkflag"] && v["repeating_attack_" + attackid + "_atkflag"] != 0) {
-                    pickbase = "pick";
-                    rollbase = "@{wtype}&{template:atk} {{mod=@{atkbonus}}} {{rname=[@{atkname}](~repeating_attack_attack_dmg)}} {{rnamec=[@{atkname}](~repeating_attack_attack_crit)}} {{r1=[[" + r1 + "cs>@{atkcritrange}" + hbonus + "]]}} " + r2 + "cs>@{atkcritrange}" + hbonus + "]]}} {{range=@{atkrange}}} {{desc=@{atk_desc}}} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globalattack=@{global_attack_mod}}} ammo=@{ammo} @{charname_output}";
+                console.log(`%c hdmg1 ${hdmg2NEW}, hdmg2 ${hdmg2NEW}`, "color:blue;font-size:14px;");
+            
+                //CRIT input inside settings for the repeating attack
+                let crit1 = v[`${repeating_attack}_dmgcustcrit`] || 0;
+                let crit2 = v[`${repeating_attack}_dmg2custcrit`] || 0;
+                crit1 = (crit1 != 0) ? v[`${repeating_attack}_dmgcustcrit`] : dmgbase;
+                crit2 = (crit2 != 0) ? v[`${repeating_attack}_dmg2custcrit`] : dmg2base;
+                r1    = (atkflag != 0) ? "@{d20}" : "0d20";
+                r2    = (atkflag != 0) ? "@{rtype}" : "{{r2=[[0d20";
+
+                //set in the GLOBAL DAMAGE MODIFIER section
+                let globaldamage = `[[${v.global_damage_mod_roll || 0}]]`;
+                let globaldamagecrit = `[[${v.global_damage_mod_crit || 0}]]`;
+
+                //Assamble Roll Templates
+           /*     if (v.dtype === "full") {
+                    rollbase = `@{wtype}&{template:atkdmg} {{mod=@{atkbonus}}} {{rname=@{atkname}}} {{r1=[[${r1} cs>@{atkcritrange}${hbonus}]]}} ${r2}cs>@{atkcritrange}${hbonus}]]}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[${hdmg1}]]}} {{dmg1type=${dmgtype}}} @{dmg2flag} {{dmg2=[[${hdmg2}]]}} {{dmg2type=${dmg2type}}} {{crit1=[[${crit1}[CRIT]]]}} {{crit2=[[${crit2}[CRIT]]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} ${hldmgcrit} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globalattack=@{global_attack_mod}}} {{globaldamage=${globaldamage}}} {{globaldamagecrit=${globaldamagecrit}}} {{globaldamagetype=@{global_damage_mod_type}}} ammo=@{ammo} @{charname_output}`;
+                } else if (atkflag != 0) {
+                    rollbase = `@{wtype}&{template:atk} {{mod=@{atkbonus}}} {{rname=[@{atkname}](~repeating_attack_attack_dmg)}} {{rnamec=[@{atkname}](~repeating_attack_attack_crit)}} {{r1=[[${r1}cs>@{atkcritrange}${hbonus}]]}} ${r2}cs>@{atkcritrange}${hbonus}]]}} {{range=@{atkrange}}} {{desc=@{atk_desc}}} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globalattack=@{global_attack_mod}}} ammo=@{ammo} @{charname_output}`;
+                } else if (dmgflag1 != 0) {
+                    rollbase = `@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[${hdmg1}]]}} {{dmg1type=${dmgtype}}} @{dmg2flag} {{dmg2=[[${hdmg2}]]}} {{dmg2type=${dmg2type}}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globaldamage=${globaldamage}}} {{globaldamagetype=@{global_damage_mod_type}}} ammo=@{ammo} @{charname_output}`;
+                } else {
+                    rollbase = "@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{saveflag} {{desc=@{atk_desc}}} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} ammo=@{ammo} @{charname_output}";
                 }
-                else if(v["repeating_attack_" + attackid + "_dmgflag"] && v["repeating_attack_" + attackid + "_dmgflag"] != 0) {
-                    pickbase = "dmg";
-                    rollbase = "@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globaldamage=" + globaldamage + "}} {{globaldamagetype=@{global_damage_mod_type}}} ammo=@{ammo} @{charname_output}"
-                }
-                else {
-                    pickbase = "empty";
-                    rollbase = "@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{saveflag} {{desc=@{atk_desc}}} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} ammo=@{ammo} @{charname_output}"
-                }
-                update["repeating_attack_" + attackid + "_rollbase_dmg"] = "@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globaldamage=" + globaldamage + "}} {{globaldamagetype=@{global_damage_mod_type}}} @{charname_output}";
-                update["repeating_attack_" + attackid + "_rollbase_crit"] = "@{wtype}&{template:dmg} {{crit=1}} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[" + hdmg1 + "]]}} {{dmg1type=" + dmgtype + "}} @{dmg2flag} {{dmg2=[[" + hdmg2 + "]]}} {{dmg2type=" + dmg2type + "}} {{crit1=[[" + crit1 + "]]}} {{crit2=[[" + crit2 + "]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} " + hldmgcrit + " {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globaldamage=" + globaldamage + "}} {{globaldamagecrit=" + globaldamagecrit + "}} {{globaldamagetype=@{global_damage_mod_type}}} @{charname_output}"
-                update["repeating_attack_" + attackid + "_atkbonus"] = bonus;
-                update["repeating_attack_" + attackid + "_atkdmgtype"] = dmg + dmgspacer + dmg2 + dmgmag + " ";
-                update["repeating_attack_" + attackid + "_rollbase"] = rollbase;
+    */
+                //update[`${repeating_attack}_rollbase_dmg`]  = `@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[${hdmg1}]]}} {{dmg1type=${dmgtype}}} @{dmg2flag} {{dmg2=[[${hdmg2}]]}} {{dmg2type=${dmg2type}}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globaldamage=${globaldamage}}} {{globaldamagetype=@{global_damage_mod_type}}} @{charname_output}`;
+                //update[`${repeating_attack}_rollbase_crit`] = `@{wtype}&{template:dmg} {{crit=1}} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[${hdmg1}]]}} {{dmg1type=${dmgtype}}} @{dmg2flag} {{dmg2=[[${hdmg2}]]}} {{dmg2type=${dmg2type}}} {{crit1=[[${crit1}]]}} {{crit2=[[${crit2}]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} ${hldmgcrit} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globaldamage=${globaldamage}}} {{globaldamagecrit=${globaldamagecrit}}} {{globaldamagetype=@{global_damage_mod_type}}} @{charname_output}`;
+                //update[`${repeating_attack}_atkbonus`]      = bonus;
+                //update[`${repeating_attack}_atkdmgtype`     = (dmgflag1 != 0 && dmgflag2 != 0) ? `${dmg} + ${dmg2}${dmgmag} `:`${dmg}${dmg2}${dmgmag} `;
+                //update[`${repeating_attack}_rollbase`]      = rollbase;
                 if(v["repeating_attack_" + attackid + "_spellid"] && v["repeating_attack_" + attackid + "_spellid"] != "" && (!source || source && source != "spell") && v["repeating_attack_" + attackid + "_spellid"].length == 20) {
                     var spellid = v["repeating_attack_" + attackid + "_spellid"];
                     var lvl = v["repeating_attack_" + attackid + "_spelllevel"];
@@ -8920,8 +8906,6 @@
                     var itemid = v["repeating_attack_" + attackid + "_itemid"];
                     callbacks.push( function() {update_item_from_attack(itemid, attackid);} );
                 }
-
-                console.log(update["repeating_attack_" + attackid + "_atkdmgtype"]);
                 setAttrs(update, {silent: true}, function() {callbacks.forEach(function(callback) {callback(); })} );
             });
         });
