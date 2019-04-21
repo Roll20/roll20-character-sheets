@@ -34,6 +34,38 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
+## Version 17.03.2018
+Fix for issue of browser cursor not detecting add control for equipment.  Reduced the width of the repeating section in case columns where overlapping.
+
+Changed the way version number was displayed .A attributes was removed but it will not effect the end user. 
+
+Changed the path for button images and roll templates images to point to images in Roll20 repository.
+
+
+
+## 08.04.2019 Version 
+
+	fix SR for default natural weapons should be 4 not 3
+	
+	fix some users reporting  issues with power rune labels. Replaced graphics for power runes
+	
+	fix enc modifier not applied to stealth
+	
+	Added Move Quietly modifiers to equipment 
+	
+	Added macro code to roll with modifiers on Honor button.
+	
+	Added support for Coordination spell
+	
+	Added support to add turn order entries based on missile weapon strike ranks.
+	
+
+	
+	
+	
+	
+	
+
 ## Version 04.03.2019
 
 Tweaked CSS so skill names can be read when modifying repeating sections
