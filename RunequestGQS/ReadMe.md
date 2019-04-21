@@ -42,6 +42,30 @@ Changed the way version number was displayed .A attributes was removed but it wi
 Changed the path for button images and roll templates images to point to images in Roll20 repository.
 
 
+
+## 08.04.2019 Version 
+
+	fix SR for default natural weapons should be 4 not 3
+	
+	fix some users reporting  issues with power rune labels. Replaced graphics for power runes
+	
+	fix enc modifier not applied to stealth
+	
+	Added Move Quietly modifiers to equipment 
+	
+	Added macro code to roll with modifiers on Honor button.
+	
+	Added support for Coordination spell
+	
+	Added support to add turn order entries based on missile weapon strike ranks.
+	
+
+	
+	
+	
+	
+	
+
 ## Version 04.03.2019
 
 Tweaked CSS so skill names can be read when modifying repeating sections
