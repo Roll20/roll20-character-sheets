@@ -1,8 +1,8 @@
 <div class="sheet-mainBg">
   <!-- FDP -->
   <!-- INPUT HIDDEN Version FdP -->
-  <input type="hidden" name="attr_verfdp" value="3.5" />
-  <input type="hidden" name="attr_VERSION" value="3.5" />
+  <input type="hidden" name="attr_verfdp" value="3.6" />
+  <input type="hidden" name="attr_VERSION" value="3.6" />
   <!-- INPUT HIDDEN Univers (COF, CG, COC) -->
   <input type="hidden" name="attr_UNIVERS" value="CG" />
   <!-- INPUT HIDDEN Type de jets -->
@@ -10,6 +10,10 @@
   <input type="hidden" name="attr_JETSUP" value="2d@{ETATDE}kh1" />
   <input type="hidden" name="attr_JETSUPHERO" value="{2d@{ETATDE}kh1, 0d20+10}kh1" />
   <input type="hidden" name="attr_JETRISQUE" value="1d12" />
+  <input type="hidden" name="attr_JDEX" value="1d@{ETATDE}" />
+  <input type="hidden" name="attr_JDEXSUP" value="2d@{ETATDE}kh1" />
+  <input type="hidden" name="attr_JDEXSUPHERO" value="{2d@{ETATDE}kh1, 0d20+10}kh1" />
+  <input type="hidden" name="attr_JDEXRISQUE" value="1d12" />
   <!-- INPUT HIDDEN Buffs -->
   <input type="hidden" name="attr_FOR_BUFF" value="0" />
   <input type="hidden" name="attr_DEX_BUFF" value="0" />
@@ -35,6 +39,7 @@
   <input type="hidden" name="attr_DEFVSEN_BUFF" value="0" />
   <input type="hidden" name="attr_PEV_BUFF" value="0" />
   <!-- INPUT HIDDEN Etats préjudiciable précédent -->
+  <input type="hidden" name="attr_CONDITION" value="" />
   <input type="hidden" name="attr_PCONDITION" value="" />
   <!-- INPUT HIDDEN PE -->
   <input type="hidden" name="attr_PE_ONCE" value="Points énergie" />
@@ -60,14 +65,19 @@
   <input type="hidden" name="attr_RANG_VOIE9" value="0" />
   <!-- INPUT HIDDEN Caractéristiques -->
   <input type="hidden" name="attr_CARACS" value="" />
+  <!-- INPUT HIDDEN Mods de circonstance attaques -->
+  <input type="hidden" name="attr_MODS_ATC" value="" />
+  <input type="hidden" name="attr_MODS_ATD" value="" />
+  <input type="hidden" name="attr_MODS_MEN" value="" />
+  <input type="hidden" name="attr_MODS_MAG" value="" />
   <!-- FIN Hidden -->
-	<div style="display: none;">
+  <div style="display: none;">
     <button type="roll" name="attr_incident_tir" value="@{togm}&{template:co1} {{perso=@{character_name}}} {{subtags=Attaque}} {{name=Incident de tir}} {{test=[[1d20cf1cs>2]]}} {{test_crit=Surchauffe ! Tir au prochain tour}} {{test_fumble=Batterie déchargée !}}" />
   </div>
   <div class="sheet-container">
     <!-- Identité -->
     <div style="width: 420px; vertical-align: middle; text-align: center;">
-      <img width="340" title="Version 3.5 - 12/02/2019" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_logo.png" />
+      <img width="340" title="Version 3.6 - 17/04/2019" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_logo.png" />
     </div>
     <div style="width: 250px;">
       <table>
@@ -162,9 +172,9 @@
                   <td class="sheet-boxtitre"><button class="sheet-boxtitre" type="roll" name="JET_DEX" title="Jet de Dext&eacute;rit&eacute;" value="@(togm}&{template:co1} {{perso=@{character_name}}} {{name=Dext&eacute;rit&eacute;}} {{subtags=Test}} {{carac=[[@{DEX_SUP}[Dé] + [[@{DEX_TEST}]][Bonus] ]] }}"> DEX</button></td>
                   <td class="sheet-boxinputlight">
                     <select class="sheet-selectmin" name="attr_DEX_SUP" title="@{DEX_SUP} Caractéristique Normale ou Supérieure/Héroïque (règle p.138)">
-                      <option value="@{JETNORMAL}" selected>N Normale</option>
-                      <option value="@{JETSUP}">S Supérieure OU Héroïque</option>
-                      <option value="@{JETSUPHERO}">H Supérieure ET Héroïque</option>
+                      <option value="@{JDEX}" selected>N Normale</option>
+                      <option value="@{JDEXSUP}">S Supérieure OU Héroïque</option>
+                      <option value="@{JDEXSUPHERO}">H Supérieure ET Héroïque</option>
                     </select>
                   </td>
                   <td class="sheet-boxinput"><input type="number" name="attr_DEXTERITE" title="@{DEXTERITE}" value="10" min="0" /></td>
@@ -243,17 +253,31 @@
                 </tr>
                 <tr>
                   <td class="sheet-boxinputlight" colspan="6">
-                    Autres conditions :&nbsp;
-                    <select class="sheet-carac" style="min-width: 100px;" name="attr_CONDITION" title="@{CONDITION}">
-                      <option value="" selected>(aucune)</option>
-                      <option value="A">Aveuglé</option>
-                      <option value="F">Effrayé</option>
-                      <option value="E">Etourdi</option>
-                      <option value="I">Immobilisé</option>
-                      <option value="P">Paniqué</option>
-                      <option value="R">Renversé</option>
-                      <option value="S">Surpris</option>
-                    </select>
+                    <button type="action" class="sheet-iconbtn" name="act_cond_aveugle" title="Aveuglé">
+                      <img class="sheet-iconimg" src="https://raw.githubusercontent.com/stephaned68/ChroniquesGalactiques/master/cond_aveugle.png" />
+                    </button>
+                    <button type="action" class="sheet-iconbtn" name="act_cond_effraye" title="Effrayé">
+                      <img class="sheet-iconimg" src="https://raw.githubusercontent.com/stephaned68/ChroniquesGalactiques/master/cond_effraye.png" />
+                    </button>
+                    <button type="action" class="sheet-iconbtn" name="act_cond_etourdi" title="Etourdi">
+                      <img class="sheet-iconimg" src="https://raw.githubusercontent.com/stephaned68/ChroniquesGalactiques/master/cond_etourdi.png" />
+                    </button>
+                    <button type="action" class="sheet-iconbtn" name="act_cond_immobilise" title="Immobilisé">
+                      <img class="sheet-iconimg" src="https://raw.githubusercontent.com/stephaned68/ChroniquesGalactiques/master/cond_immobilise.png" />
+                    </button>
+                    <button type="action" class="sheet-iconbtn" name="act_cond_panique" title="Paniqué">
+                      <img class="sheet-iconimg" src="https://raw.githubusercontent.com/stephaned68/ChroniquesGalactiques/master/cond_panique.png" />
+                    </button>
+                    <button type="action" class="sheet-iconbtn" name="act_cond_ralenti" title="Ralenti">
+                      <img class="sheet-iconimg" src="https://raw.githubusercontent.com/stephaned68/ChroniquesGalactiques/master/cond_ralenti.png" />
+                    </button>
+                    <button type="action" class="sheet-iconbtn" name="act_cond_renverse" title="Renversé">
+                      <img class="sheet-iconimg" src="https://raw.githubusercontent.com/stephaned68/ChroniquesGalactiques/master/cond_renverse.png" />
+                    </button>
+                    <button type="action" class="sheet-iconbtn" name="act_cond_surpris" title="Surpris">
+                      <img class="sheet-iconimg" src="https://raw.githubusercontent.com/stephaned68/ChroniquesGalactiques/master/cond_surpris.png" />
+                    </button>
+                    <br /><span name="attr_conditions" value=""></span>
                   </td>
                 </tr>
               </table> <!-- FIN Caracs -->
@@ -480,12 +504,12 @@
         <!-- Armes -->
         <table class="sheet-tabsep" title="repeating_armes">
           <tr>
-            <td class="sheet-textfatleft" style="width:155px;">ARMES / ATTAQUES</td>
+            <td class="sheet-textfatleft" style="width: 155px;">ARMES / ATTAQUES</td>
             <td class="sheet-textbase" style="width: 150px;">ATTAQUE</td>
             <td class="sheet-textbase" style="width: 20px;">CRIT.</td>
             <td class="sheet-textbase" style="width: 210px;">DM</td>
             <td class="sheet-textbase" style="width: 40px;">PORTÉE</td>
-            <td class="sheet-textbase" style="width: 100%;">SPÉCIAL</td>
+            <td class="sheet-textbase">SPÉCIAL</td>
           </tr>
         </table>
         <fieldset class="repeating_armes">
@@ -495,7 +519,7 @@
               <table class="sheet-tabsep">
                 <tr>
                   <td>
-                    <button type="roll" class="sheet-neutre" name="attr_jet" value="@{togm}&{template:co1} {{perso=@{character_name}}} {{name=@{armenom} @{armelim}}} {{subtags=Attaque}} {{portee=@{armeportees}}} {{desc=@{armejetn}}} {{@{armeatt}[[@{armejetd}cs>@{armecrit}cf<@{armeinct}[Dé] + [[@{armeatk}]][Attaque] + [[@{visee_att}]][Tir visé] + @{armeatkdiv}[Bonus] ]] }} {{@{armedmg}[[floor((@{armedmnbde}d@{armedmde}@{armedmrel}@{armedmvrel}[Dé DM] + [[@{armedmcar}]][Mod.DM] + [[@{visee_dm}]][Tir visé] + @{armedmdiv}[Bonus DM])/@{distance}) ]]}} {{dmtype=@{armedmtype}}} {{degats2=@{armedmg2}}} {{dm2type=@{armedm2_desc}}} {{special=@{armespec}}}" />
+                    <button type="roll" class="sheet-neutre" name="attr_jet" value="@{togm}&{template:co1} {{perso=@{character_name}}} {{subtags=Attaque}} {{name=@{armenom}}} {{portee=@{armeportees}}} {{desc=@{armejetn} @{armelim}}} {{@{armeatt}[[@{armejetd}cs>@{armecrit}cf<@{armeinct}[Dé] + [[@{armeatk}]][Attaque] + [[@{armeatkdiv}]][Bonus] + (@{armebuff}) ]]}} {{@{armedmg}[[[[@{armedmnbde}d@{armedmde}@{armedmrel}@{armedmvrel}]][Dé DM] + ([[@{armedmcar}]])[Mod.DM] + (@{armedmdiv})[Bonus DM] + (@{armebuffdm}) ]]}} {{dmtype=@{armedmtype}}} {{degats2=@{armedmg2}}} {{dm2type=@{armedm2_desc}}} {{special=@{armespec}}}" />
                   </td>
                   <td class="sheet-boxinputleft" style="min-width: 130px;">
                     <input type="text" name="attr_armenom" title="@{armenom}" style="font-weight: bold;" placeholder="Arme/attaque" />
@@ -508,6 +532,7 @@
                       <option value="@{ATKPSYINFLU}">PSY Inf.</option>
                       <option value="@{ATKPSYINTUI}">PSY Int.</option>
                     </select>+<input type="number" style="width: 32px;" name="attr_armeatkdiv" value="0" title="@{armeatkdiv} Bonus d'attaque divers" />
+                    <input type="hidden" name="attr_armebuff" value="" />
                   </td>
                   <td class="sheet-boxinputleft" style="text-align: right;">
                     <input type="number" name="attr_armecrit" style="width:32px;" min="2" max="20" value="20" title="@{armecrit} Seuil de Critique (par défaut 20)" />
@@ -551,6 +576,7 @@
                         <option value="@{CHA_TEST}">CHA</option>
                       </optgroup>
                     </select>+<input type="number" style="width: 32px;" name="attr_armedmdiv" value="0" title="@{armedmdiv} Bonus de dommage divers" />
+                    <input type="hidden" name="attr_armebuffdm" value="" />
                   </td>
                   <td class="sheet-boxinputleft" style="min-width: 50px;">
                     <input type="text" name="attr_armeportee" placeholder="Portée" title="@{armeportee}" />
@@ -603,19 +629,12 @@
             <td>&nbsp;</td>
           </tr>
           <tr>
-            <td class="sheet-textbase" style="width: 30%;">Bonus visée (L) :&nbsp;
-              <input type="checkbox" name="attr_visee_att" title="@{visee_att} Bonus de visée à l'attaque" value="@{PER}" />&nbsp;Attaque&nbsp;
-              <input type="checkbox" name="attr_visee_dm" title="@{visee_att} Bonus de visée aux DM" value="@{PER}" />&nbsp;DM&nbsp;
+            <td>
+              <textarea class="sheet-boxinputleft" style="height: 5em;" name="attr_mods_atk" title="Modificateurs de circonstances" placeholder="Ex: ATD -5 Portée double; DM ATD +[PER] Visée" value=""></textarea>
             </td>
-            <td>&nbsp;</td>
-            <td class="sheet-textbase" style="width: 25%;">Distance :&nbsp;
-        	    <select class="sheet-carac" style="width: 75px;" name="attr_distance" title="@{distance}" size="1">
-        		    <option value="1" selected>Normale</option>
-        		    <option value="2">Double</option>
-        		    <option value="3">Triple</option>
-        	    </select>
-        	  </td>
-            <td>&nbsp;</td>
+          </tr>
+          <tr>
+            <td style="text-align: left;"><span name="attr_INFOMSG"></span></td>
           </tr>
         </table>
       </div>
@@ -869,13 +888,16 @@
             <div class="sheet-boxtitre">&Eacute;QUIPEMENT : Consommables</div>
             <div class="sheet-boxinputleft">
               <span class="textbase">Crédits&nbsp;:</span>&nbsp;
-              <input type="text" style="width:320px;" name="attr_RICHESSE" title="@{RICHESSE}" placeholder="Rien ? C'est la pauvret&eacute; !" />
+              <input type="text" style="width:230px;" name="attr_BOURSE" title="@{BOURSE}" placeholder="Rien ? C'est la pauvreté !" />
+              <input type="number" name="attr_encombrement" title="@{encombrement} Encombrement total" value="@{total_enc}" disabled></span>
+              / <input type="number" name="attr_seuil_enc" title="@{seuil_enc} Seuil d'encombrement (FOR)" value="0" />
             </div>
             <fieldset class="repeating_equipement">
               <div class="sheet-boxvoie">
-                <input type="text" style="width:310px;" name="attr_equip-nom" title="@{equip-nom}" />
-                &nbsp;<span class="sheet-textbase">Qt&eacute;</span>
-                <input type="number" name="attr_equip-qte" value="1" title="@{equip-qte}" />
+                <input type="text" style="width: 280px;" name="attr_equip-desc" title="@{equip-desc}" /> &nbsp;
+                <input type="number" name="attr_equip-enc" style="width: 30px;" value="0" title="@{equip-enc} Encombrement" />
+                <span class="sheet-textbase">Qté</span>
+                <input type="number" name="attr_equip-qte" style="width: 35px;" value="1" title="@{equip-qte}" />
               </div>
             </fieldset>
           </div>
@@ -936,8 +958,13 @@
                 <option value="U">Utilisés</option>
               </select>
             </td>
-            <td style="width: 20%;"></td>
-            <td style="width: 20%;"></td>
+            <td style="width: 20%;">
+              <span class="textbase">Encombrement</span>&nbsp;
+              <input type="checkbox" name="attr_use_encombrement" title="@{use_encombrement} Gérer l'encombrement" value="1" />
+            </td>
+            <td style="width: 20%;">
+              <button type="action" class="sheet-iconbtn" name="act_reset" title="Re-calculer attributs (rangs, encombrement)">r</button>
+            </td>
           </tr>
         </table>
       </div> <!-- FIN Config -->
@@ -1650,9 +1677,10 @@
                 </div>
               </div>
               <div class="sheet-col" style="width: 25%;">
-                <div class="sheet-boxtitre">DEF</div>
+                <div class="sheet-boxtitre">DEF / DEP</div>
                 <div class="sheet-boxinput">
-                  <input class="sheet-carac" name="attr_pnj_def" type="number" title="@{pnj_def}" />
+                  <input class="sheet-carac" name="attr_pnj_def" type="number" title="@{pnj_def}" />&nbsp;/
+                  <input class="sheet-carac" name="attr_pnj_dep" type="number" title="@{pnj_dep}" />
                 </div>
               </div>
               <div class="sheet-col" style="width: 25%;">
@@ -1665,7 +1693,7 @@
           </div>
           <div class="sheet-col">
             <div class="sheet-row">
-              <span class="textfatleft">Capacités</span>
+              <span class="textfatleft">Divers</span>
             </div>
             <div class="sheet-row">
               <textarea name="attr_pnj_divers" style="border: 1px solid; height: 15em;" title="@{pnj_divers}"></textarea>
@@ -1734,6 +1762,28 @@
                 </td>
                 <td class="sheet-boxinputleft">
                   <textarea class="sheet-carac" name="attr_atkspec" title="@{atkspec} Autres effets"></textarea>
+                </td>
+              </tr>
+            </table>
+          </fieldset>
+        </div>
+        <div class="sheet-row">&nbsp;</div>
+        <img class="sheet-imghr-up" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesGalactiques/cog_hr.png" />
+        <div class="sheet-row">
+          <div class="sheet-row">
+            <span class="textfatleft">Capacités</span>
+          </div>
+          <fieldset class="repeating_pnjcapas">
+            <table class="sheet-tabsep">
+              <tr>
+                <td style="width: 30px;">
+                  <button type="roll" class="sheet-neutre" style="width: 25px;" name="attr_jet" value="@{pnj_togm}&{template:co1} {{perso=@{character_name}}} {{subtags=Capacité}} {{name=@{capanom}}} {{text=@{capadesc}}}" />
+                </td>
+                <td class="sheet-boxinputleft" style="width: 200px;">
+                  <input type="text" class="sheet-carac" style="width: 200px;" name="attr_capanom" title="@{capanom} Nom de la capacité" />
+                </td>
+                <td class="sheet-boxinputleft">
+                  <textarea class="sheet-carac" name="attr_capadesc" title="@{capadesc} Description de la capacité"></textarea>
                 </td>
               </tr>
             </table>
@@ -1931,7 +1981,7 @@
     console.log(l);
     console.log('** CO sheetworker' + m + ' >>>');
   }
-  
+
   // C# String.Format() emulation
   function stringFormat(s) {
     var s = arguments[0];
@@ -1940,21 +1990,54 @@
     }
     return s;
   }
-
+  
+  function addTrait(npcObj, traitObj) {
+    if (traitObj['nom'] !== '' && traitObj['desc'] !== '') {
+      if (!npcObj['Capas']) npcObj['Capas'] = [];
+      npcObj['Capas'].push(`${traitObj['nom']}~${traitObj['desc']}`);
+      traitObj['nom'] = '';
+      traitObj['desc'] = '';
+    }
+  }
+  
   function importStatblock(text) {
     text = text.replace(/\r/g, '');
     text = text.replace(/ \(DM/g, ' DM');
     text = text.replace(/ \(RD/g, ' RD');
     text = text.replace(/\, /g, ' ');
+    text = text.replace(/\n[ ]*\+/g,'+');
     var npc = {};
     var rows = text.split(/\n/);
+    var capacites = false;
+    var capacite = { 'nom': '', 'desc': '' };
     console.log('** CO sheetworker : parsing text <<<');
-    rows.forEach(function(row) {
+    rows.forEach(function(row, rownr) {
       console.log(row);
-      if (row.toUpperCase().indexOf('DM') != -1) { // this is an attack line
+      if (rownr === 0 && row.toUpperCase().indexOf('NC') === -1) {
+        npc['character_name'] = row.trim(); // assume first line is name
+        return;
+      }
+      if (!capacites && row.toUpperCase().indexOf('DM') !== -1) { // this is an attack line
         row = row.replace(/\)$/g, ''); // handle CG statblocks
         if (!npc.Atks) npc.Atks = [];
         npc.Atks.push(row);
+        return;
+      }
+      if (capacites) { // start parsing traits
+        let s = row.indexOf(':');
+        if (s !== -1) {
+          addTrait(npc, capacite); 
+          capacite['nom'] = row.substring(0, s - 1).trim();
+          if (capacite['nom'].indexOf(' RD') !== -1) capacite['nom'] = capacite['nom'].replace(' RD', ' (RD');
+          capacite['desc'] = row.substring(s + 1).trim();
+        } else {
+          capacite['desc'] += ' ' + row.trim();
+        }
+        return;
+      }
+      if (row.trim().startsWith('---')) {
+        if (capacites) addTrait(npc, capacite);
+        capacites = !capacites;
         return;
       }
       row = row.replace(/ \(/g, '('); // strip space before '(
@@ -1964,12 +2047,18 @@
       for (var item = 0; item < items.length-1; item++) {
         if (item % 2 === 0) {
           var k = items[item].toUpperCase().replace(/\./g, '');
-          var v = items[item + 1].replace(/~/g, ' ');
-          if (v.charAt(v.length - 1) == ')' && v.charAt(0) != '(') v = v.substring(0, v.length - 1);
+          var v = items[item + 1];
+          if (v) {
+            v.replace(/~/g, ' ');
+            if (v.charAt(v.length - 1) === ')' && v.charAt(0) !== '(') v = v.substring(0, v.length - 1);
+          } else {
+            v = '';
+          }
           npc[k] = v;
         }
       }
     });
+    if (capacites) addTrait(npc, capacite);
     console.log('** CO sheetworker : parsing text >>>');
     return npc;
   }
@@ -2006,6 +2095,8 @@
     var jnor = '1d20';
     var jsup = '2d20kh1';
     var pnjAttrs = {};
+    if (pnjObj.hasOwnProperty('character_name')) pnjAttrs['character_name'] = pnjObj.character_name;
+    delete pnjObj['character_name'];
     pnjAttrs.NIVEAU = parseInt(pnjObj.NC) || 0;
     delete pnjObj.NC;
     pnjAttrs.TAILLE = pnjObj.TAILLE || '';
@@ -2035,6 +2126,10 @@
     delete pnjObj.INIT;
     pnjAttrs.pnj_def = parseInt(pnjObj.DEF);
     delete pnjObj.DEF;
+    if (pnjObj.hasOwnProperty('DEP')) {
+      pnjAttrs.pnj_dep = parseInt(pnjObj.DEP);
+      delete pnjObj.DEP;
+    }
     pnjAttrs.pnj_pv = parseInt(pnjObj.PV);
     pnjAttrs.pnj_pv_max = parseInt(pnjObj.PV);
     delete pnjObj.PV;
@@ -2078,7 +2173,7 @@
         parsed += atkItems[item];
       }
       consoleLog(atkNom + ' ' + atkBonus + ' ' + atkDM + ' ' + atkSpec);
-      if (atkBonus == -1) atkAtt = ''; // No attack bonus found, damage only
+      if (atkBonus == -1) atkAtt = '0'; // No attack bonus found, damage only
       var atkDmg = 'degats=';
       var atkNbDe = 0;
       var atkDe = '';
@@ -2089,7 +2184,7 @@
         atkDM = atkDM.replace('-', '|-');
         var dm = atkDM.split('|');
         atkNbDe = parseInt(dm[0]) || 0;
-        if (atkNbDe == 0) atkDmg = ''; // No damage dice, attack only
+        if (atkNbDe == 0) atkDmg = '0'; // No damage dice, attack only
         atkDe = dm[1];
         if (universe === 'COC') atkDe += '!';
         atkBonusDM = parseInt(dm[2]) || 0;
@@ -2112,12 +2207,65 @@
         consoleLog(atkRow, 'adding attack');
         setAttrs(atkRow);
       } else {
-        result = 'Err: impossible d\'analyser le contenu de "' + pnjObj.Atks[atk] + '"';
+        result += (result.length > 0 ? '\n' : '') + 'Err: impossible d\'analyser le contenu de "' + pnjObj.Atks[atk] + '"';
+      }
+    }
+    for (let attr of ['ATP(PER)', 'ATP(CHA)']) {
+      if (pnjObj.hasOwnProperty(attr)) {
+        newRowID = generateRowID();
+        let atkRow = {};
+        atkRow[`repeating_pnjatk_${newRowID}_atkatt`] = atkAtt;
+        if (attr === 'ATP(PER)') {
+          atkRow[`repeating_pnjatk_${newRowID}_atknom`] = 'Psy Intuition';
+        } else if (attr === 'ATP(CHA)') {
+          atkRow[`repeating_pnjatk_${newRowID}_atknom`] = 'Psy Influence';
+        } else {
+          continue;
+        }
+        atkRow[`repeating_pnjatk_${newRowID}_atkjet`] = '1d20';
+        atkRow[`repeating_pnjatk_${newRowID}_atkbonus`] = parseInt(pnjObj[attr]);
+        atkRow[`repeating_pnjatk_${newRowID}_atkcrit`] = '20';
+        atkRow[`repeating_pnjatk_${newRowID}_atkdmg`] = '0';
+        atkRow[`repeating_pnjatk_${newRowID}_atkdmnbde`] = 0;
+        atkRow[`repeating_pnjatk_${newRowID}_atkdmde`] = '';
+        atkRow[`repeating_pnjatk_${newRowID}_atkdmbonus`] = 0;
+        consoleLog(atkRow, 'adding attack');
+        setAttrs(atkRow);
+        delete pnjObj[attr];
       }
     }
     return result;
   }
-
+  
+  function processTraits(universe, pnjObj) {
+    let result = '';
+     for (let capa of pnjObj['Capas']) {
+      let capacite = capa.split('~')
+      if (capacite.length == 2) {
+        let name = capacite[0] || '';
+        let desc = capacite[1] || '';
+        if (name !== '' && desc !== '') {
+          newRowID = generateRowID();
+          let capaRow = {};
+          capaRow[`repeating_pnjcapas_${newRowID}_capanom`] = name;
+          desc = desc.replace(/\d+d\d+[+-]*\d*/g, '{{$&}}'); // search for <numbers>d<numbers>+/-<number> 
+          desc = desc.replace(/\[\d+d\d+[+-]*\d*\]/g, '{$&}'); // search for [<numbers>d<numbers>+/-<number>]
+          desc = desc.replace(/\[{{/g, '[[');
+          desc = desc.replace(/}}\]/g, ']]');
+          desc = desc.replace(/{{/g, '[[');
+          desc = desc.replace(/}}/g, ']]');
+          capaRow[`repeating_pnjcapas_${newRowID}_capadesc`] = desc;
+          consoleLog(capaRow, 'adding trait');
+          setAttrs(capaRow);
+        }
+      } else {
+        result += (result.length > 0 ? '\n' : '') + 'Err: impossible d\'analyser le contenu de "' + capacite + '"';
+      }
+    }
+    
+    return result;
+  }
+  
   function buildCaracs() {
     getAttrs([
       'FORCE', 'DEXTERITE', 'CONSTITUTION', 'INTELLIGENCE', 'PERCEPTION', 'CHARISME', 'NIVEAU',
@@ -2154,7 +2302,7 @@
       });
     });
   }
-  
+
   on('sheet:opened', function() {
     // **** Gestion transition de version
     getAttrs(["VERSION"], function(values) {
@@ -2376,13 +2524,13 @@
         }
       }
     });
-    // MAJ Version
-    getAttrs(['verfdp'], function(values) {
-      setAttrs({ VERSION: values.verfdp });
-    });
-    // LAST_PV
-    getAttrs(['PV'], function(values) {
-      setAttrs({ LAST_PV: values.PV })
+    // MAJ Version, LAST_PV, message
+    getAttrs(['verfdp', 'PV'], function(values) {
+      setAttrs({ 
+        VERSION: values.verfdp,
+        LAST_PV: values.PV,
+        INFOMSG: ' '
+      });
     });
     // ARMURE_MALUS
     getAttrs(['ARMURE_MALUS'], function(value) {
@@ -2392,6 +2540,17 @@
     for (let voie=1; voie <= 9; voie++) {
       setRank(voie.toString());
     }
+    // seuil_enc (if needed)
+    getAttrs(['seuil_enc', 'FORCE'], function(values) {
+      let seuil_enc = parseInt(values.seuil_enc) || 0;
+      if (seuil_enc === 0) {
+        setAttrs({
+          seuil_enc: parseInt(values.FORCE) || 0
+        });
+      }
+    });
+    // encombrement (refresh)
+    encumbrance();
     // CARACS
     buildCaracs();
   });
@@ -2418,6 +2577,7 @@
       bm *= 2;
     }
     v = v.replace(/[\+\-\[\]]/g, '');
+    consoleLog(v);
     if (isNaN(v)) {
       // c'est une référence d'attribut
       if (v.toUpperCase().startsWith('VOIE')) {
@@ -2468,6 +2628,7 @@
               buffName = buffv[0].trim();
               buffVal = buffValue(buffv[1], caracs);
             }
+            consoleLog(buffName);
             if (!buffName.startsWith('-')) buffSum += buffVal;
           }
         }
@@ -2654,63 +2815,6 @@
     });
   });
 
-  on('change:condition', function() {
-    getAttrs(['PCONDITION', 'CONDITION', 'ATKCAC_BUFF', 'ATKTIR_BUFF', 'INIT_BUFF', 'DEF_BUFF', 'ETATDE'], function(values) {
-      // setup helper objects
-      const conditions = { // condition names data object
-        'aucune':     '',
-        'aveugle':    'A',
-        'etourdi':    'E',
-        'effraye':    'F',
-        'immobilise': 'I',
-        'panique':    'P',
-        'renverse':   'R',
-        'surpris':    'S'
-      }
-      const buffs = { // buffs values data object
-        '':  { 'atc': 0, 'atd':  0, 'def': 0, 'init': 0 },
-        'A': { 'atc': 5, 'atd': 10, 'def': 5, 'init': 5 },
-        'E': { 'atc': 0, 'atd':  0, 'def': 5, 'init': 0 },
-        'F': { 'atc': 5, 'atd':  5, 'def': 0, 'init': 0 },
-        'I': { 'atc': 0, 'atd':  0, 'def': 0, 'init': 0 },
-        'P': { 'atc': 0, 'atd':  0, 'def': 2, 'init': 0 },
-        'R': { 'atc': 5, 'atd':  5, 'def': 5, 'init': 0 },
-        'S': { 'atc': 0, 'atd':  0, 'def': 5, 'init': 0 }
-      }
-      // check prior condition for die roll
-      let etatde = values.ETATDE;
-      switch (values.PCONDITION) {
-        case conditions.immobilise:
-          etatde = '20';
-          break;
-        case conditions.panique:
-          etatde = '20';
-          break;
-      }
-      // check condition for die roll
-      switch (values.CONDITION) {
-        case conditions.immobilise:
-          etatde = '12';
-          break;
-        case conditions.panique:
-          etatde = '12';
-          break;
-        case conditions.aucune:
-          etatde = '20';
-          break;
-      }
-      // Now update all buffs and prior condition
-      setAttrs({
-        ATKCAC_BUFF: values.ATKCAC_BUFF + buffs[values.PCONDITION].atc - buffs[values.CONDITION].atc,
-        ATKTIR_BUFF: values.ATKTIR_BUFF + buffs[values.PCONDITION].atd - buffs[values.CONDITION].atd,
-        INIT_BUFF: values.INIT_BUFF + buffs[values.PCONDITION].init - buffs[values.CONDITION].init,
-        DEF_BUFF: values.DEF_BUFF + buffs[values.PCONDITION].def - buffs[values.CONDITION].def,
-        ETATDE: etatde,
-        PCONDITION: values.CONDITION
-      });
-    });
-  });
-
   on('change:blessure', function() {
     getAttrs(['BLESSURE'], function(values) {
       var etatde = (values.BLESSURE == '1') ? '12' : '20';
@@ -2730,7 +2834,11 @@
         JETNORMAL: jetn,
         JETSUP: jets,
         JETSUPHERO: jetsh,
-        JETRISQUE: jetr
+        JETRISQUE: jetr,
+        JDEX: jetn,
+        JDEXSUP: jets,
+        JDEXSUPHERO: jetsh,
+        JDEXRISQUE: jetr
       });
     });
   });
@@ -2749,6 +2857,12 @@
           messages += result;
           delete pnjObj.Atks;
         }
+        if (pnjObj.hasOwnProperty('Capas')) {
+          result = processTraits(values.UNIVERS, pnjObj);
+          if (result != '' && messages != '') result = '\n' + result;
+          messages += result;
+          delete pnjObj['Capas'];
+        }
         // Other attributes go to DIVERS field
         var divers = '';
         var otherAttrs = Object.keys(pnjObj);
@@ -2766,13 +2880,126 @@
       }
     });
   });
-
-  on('change:type_personnage', function() {
-    getAttrs(['type_personnage'], function(values) {
+ 
+  const npcAtkAttribs = [
+    'atkatt', 
+    'atknom', 
+    'atkjet', 
+    'atkbonus', 
+    'atkcrit', 
+    'atkdmg', 
+    'atkdmnbde', 
+    'atkdmde', 
+    'atkdmbonus', 
+    'atkportee', 
+    'atkspec'
+  ]
+  
+  function convertToPC() {
+    getAttrs([
+      'pnj_for', 'pnj_dex', 'pnj_con', 'pnj_int', 'pnj_per', 'pnj_cha', 
+      'pnj_jetfor', 'pnj_jetdex', 'pnj_jetcon', 'pnj_jetint', 'pnj_jetper', 'pnj_jetcha', 
+      'pnj_init', 'pnj_def', 'pnj_dep', 'pnj_pv', 'pnj_pv_max'
+      ], function(values) {
       let attrs = {};
-      attrs['type_fiche'] = values.type_personnage;
-      if (values.type_personnage === 'pnj') attrs['pnj_togm'] = '/w gm ';
+      for (let attr of ['FORCE', 'DEXTERITE', 'CONSTITUTION', 'INTELLIGENCE', 'PERCEPTION', 'CHARISME']) {
+        let attrv = parseInt(values[`pnj_${attr.substring(0,3).toLowerCase()}`]) || 0;
+        attrs[attr] = 10 + (2 * attrv);
+        if (attr === 'DEXTERITE') {
+          let init = parseInt(values.pnj_init) || 0;
+          if (init === attrv + 1) {
+            attrs[attr]++;
+          } else {
+            attrs['INIT_BUFF_LIST'] = 'Bonus Init.';
+            attrs['INIT_BUFF'] = init - attrs[attr];
+          }
+          let defb = 10 + attrv;
+          let def = parseInt(values.pnj_def) || 0;
+          if (def !== defb) {
+            attrs['DEF_BUFF_LIST'] = 'Bonus DEF';
+            attrs['DEF_BUFF'] = def - defb;
+          }
+          attrs['DEX_SUP'] = (values['pnj_jetdex'] === '2d20kh1') ? '@{JDEXSUP}' : '@{JDEX}';
+        } else if (attr === 'CHARISME') {
+          let depb = 10 + attrv;
+          let dep = parseInt(values.pnj_dep) || 0;
+          if (dep !== depb) {
+            attrs['DEP_BUFF_LIST'] = 'Bonus DEP';
+            attrs['DEP_BUFF'] = dep - depb;
+          }
+        } else {
+          attrs[`${attr.substring(0,3)}_SUP`] = (values[`pnj_jet${attr.substring(0,3).toLowerCase()}`] === '2d20kh1') ? '@{JETSUP}' : '@{JETNORMAL}';
+        }
+      }
+      attrs['PV'] = parseInt(values.pnj_pv) || 0;
+      attrs['PV_max'] = parseInt(values.pnj_pv_max) || 0;
+      getSectionIDs('repeating_armes', function(ids) {
+        for (let id of ids) {
+          removeRepeatingRow(`repeating_armes_${id}`);
+        }
+      });
+      getSectionIDs('repeating_pnjatk', function(ids) {
+        for (let id of ids) {
+          getAttrs([...npcAtkAttribs.map(attr => `repeating_pnjatk_${id}_${attr}`), 'pnj_for', 'pnj_dex', 'pnj_cha'], function(values) {
+            consoleLog(values);
+            let v = {};
+            for (let attr of npcAtkAttribs) {
+              v[attr] = values[`repeating_pnjatk_${id}_${attr}`] || '';
+            }
+            newRowID = generateRowID();
+            let atkRow = {};
+            atkRow[`repeating_armes_${newRowID}_armeatt`] = v['atkatt'];
+            atkRow[`repeating_armes_${newRowID}_armenom`] = v['atknom'];
+            let psyint = v['atknom'].toLowerCase().includes('psy intuition');
+            let psyinf = v['atknom'].toLowerCase().includes('psy influence');
+            let tohit = parseInt(v['atkbonus']) || 0;
+            let atk = 0;
+            let bdm = 0;
+            if (v['atkportee'] && v['atkportee'] !== '') {
+              atk = values.pnj_dex || 0;
+              if (psyint) atk = values.pnj_int || 0;
+              if (psyinf) atk = values.pnj_cha || 0;
+              atkRow[`repeating_armes_${newRowID}_armeatk`] = '@{ATKTIR}';
+              if (psyint) atkRow[`repeating_armes_${newRowID}_armeatk`] = '@{ATKPSYINTUI}';
+              if (psyinf) atkRow[`repeating_armes_${newRowID}_armeatk`] = '@{ATKPSYINFLU}';
+              atkRow[`repeating_armes_${newRowID}_armedmcar`] = '0';
+            } else {
+              atk = values.pnj_for || 0;
+              if (psyint) atk = values.pnj_int || 0;
+              if (psyinf) atk = values.pnj_cha || 0;
+              bdm = (psyint || psyinf) ? 0 : atk;
+              atkRow[`repeating_armes_${newRowID}_armeatk`] = '@{ATKCAC}';
+              if (psyint) atkRow[`repeating_armes_${newRowID}_armeatk`] = '@{ATKPSYINTUI}';
+              if (psyinf) atkRow[`repeating_armes_${newRowID}_armeatk`] = '@{ATKPSYINFLU}';
+              atkRow[`repeating_armes_${newRowID}_armedmcar`] = (psyint || psyinf) ? '0' : '@{FOR}';
+            }
+            if (tohit !== atk) atkRow[`repeating_armes_${newRowID}_armeatkdiv`] = tohit - atk;
+            atkRow[`repeating_armes_${newRowID}_armejetd`] = v['atkjet'];
+            atkRow[`repeating_armes_${newRowID}_armecrit`] = v['atkcrit'];
+            atkRow[`repeating_armes_${newRowID}_armedmg`] = v['atkdmg'];
+            atkRow[`repeating_armes_${newRowID}_armedmnbde`] = v['atkdmnbde'];
+            atkRow[`repeating_armes_${newRowID}_armedmde`] = v['atkdmde'];
+            let dmdiv = parseInt(v['atkdmbonus']) || 0;
+            if (dmdiv !== bdm) atkRow[`repeating_armes_${newRowID}_armedmdiv`] = dmdiv - bdm;
+            atkRow[`repeating_armes_${newRowID}_armeportee`] = v['atkportee'];
+            atkRow[`repeating_armes_${newRowID}_armespec`] = v['atkspec'];
+            setAttrs(atkRow);
+          });
+        }
+      });
       setAttrs(attrs);
+    });
+  }
+  
+  on('change:type_personnage', function(eventInfo) {
+    if (eventInfo.previousValue === 'pnj' && eventInfo.newValue === 'pj') convertToPC();
+    // if (eventInfo.previousValue === 'pj' && eventInfo.newValue === 'pnj') convertToNPC();
+    getAttrs(['type_personnage'], function(value) {
+      let attrs = {};
+      attrs['type_fiche'] = value.type_personnage;
+      if (value.type_personnage === 'pnj') attrs['pnj_togm'] = '/w gm ';
+      setAttrs(attrs);
+      consoleLog(attrs);
     });
   });
   
@@ -2856,7 +3083,7 @@
   });
 
   function changeRanks(voie) {
-    return `change:voie${voie}-1 change:voie${voie}-2 change:voie${voie}-3 change:voie${voie}-4 change:voie${voie}-5`;
+    return `change:voie${voie}nom change:voie${voie}-1 change:voie${voie}-2 change:voie${voie}-3 change:voie${voie}-4 change:voie${voie}-5`;
   }
   
   function attrRanks(voie) {
@@ -2921,7 +3148,9 @@
     getAttrs(['DEFARMUREON', 'DEFARMUREMALUS'], function(values) {
       let armure_on = values.DEFARMUREON || 0;
       let armure_malus = values.DEFARMUREMALUS || 0;
-      setAttrs({ ARMURE_MALUS: armure_on * armure_malus });
+      setAttrs({ 
+        ARMURE_MALUS: armure_on * armure_malus
+      });
     }); 
   }
   
@@ -2936,7 +3165,9 @@
       let dmg2 = '';
       if (dm2_desc !== '') dm2_desc = `[${dm2_desc}] `;
       if (dm2_de !== '') dmg2 = `[[${dm2_de}${dm2_desc}]]`;
-      setAttrs({ repeating_armes_armedmg2: dmg2 });
+      setAttrs({ 
+        repeating_armes_armedmg2: dmg2 
+      });
     });
   });
   
@@ -2953,7 +3184,7 @@
       let portees = parseInt(portee) || 0;
       if (portees !== 0) {
         setAttrs({ 
-          repeating_armes_armeportees: `${portees}${um} / ${portees*2}${um} / ${portees*3}${um}` 
+          repeating_armes_armeportees: `${portees}m | ${portees*2}m (DM/2) | ${portees*3}m (DM/3)` 
         });
       }
     });
@@ -2965,15 +3196,362 @@
   
   on('change:repeating_armes:arme_al', function() {
     getAttrs(['repeating_armes_arme_al'], function(value) {
-      setAttrs({ repeating_armes_armelim: actionLimitee(value) });
+      setAttrs({ 
+        repeating_armes_armelim: actionLimitee(value) 
+      });
     });
   });
 
   on('change:repeating_jetcapas:jetcapa_al', function() {
     getAttrs(['repeating_jetcapas_jetcapa_al'], function(value) {
-      setAttrs({ repeating_jetcapas_jetcapalim: actionLimitee(value) });
+      setAttrs({ 
+        repeating_jetcapas_jetcapalim: actionLimitee(value) 
+      });
+    });
+  });
+
+  function encumbrance() {
+    getSectionIDs('repeating_equipement', function(ids) {
+      const encombrement = {
+        total: 0,
+        zeros: 0
+      }
+      for (let id = 0; id < ids.length; id++) {
+        getAttrs([`repeating_equipement_${ids[id]}_equip-qte`, `repeating_equipement_${ids[id]}_equip-enc`], function(values) {
+          let qte = parseInt(values[Object.keys(values)[0]]) || 0;
+          let enc = parseInt(values[Object.keys(values)[1]]) || 0;
+          if (enc === 0) {
+            encombrement.zeros += qte;
+            if (encombrement.zeros >= 3) {
+              encombrement.total += Math.floor(encombrement.zeros / 3);
+              encombrement.zeros %= 3;
+            }
+          } else {
+            encombrement.total += qte*enc;
+          }
+          setAttrs({
+            total_enc: encombrement.total
+          });
+        });
+      }
+    });
+  }
+  
+  on('change:repeating_equipement:equip-qte change:repeating_equipement:equip-enc', function() {
+    encumbrance();
+  });
+  
+  on('change:total_enc', function() {
+    getAttrs(['use_encombrement', 'total_enc', 'seuil_enc'], function(values) {
+      let use_encombrement = values.use_encombrement === 1 ? true : false;
+      if (!use_encombrement) return;
+      let seuil_enc = parseInt(values.seuil_enc) || 0;
+      let encombrement = parseInt(values.total_enc) || 0;
+      if (seuil_enc > 0 && encombrement > 0) {
+        let cond = {};
+        if (encombrement > seuil_enc * 3) {
+          cond.CONDITION = 'I'; // Immobilisé 
+        } else if (encombrement > seuil_enc * 2) {
+          cond.CONDITION = 'L'; // Ralenti
+          cond.ETATDE = '12'; // +Affaibli
+        } else if (encombrement > seuil_enc) {
+          cond.CONDITION = '';
+          cond.JDEX = '1d12';
+          cond.JDEXSUP = '2d12kh1';
+          cond.JDEXSUPHERO = '{2d12kh1, 0d12+10}kh1';
+          cond.JDEXRISQUE = '2d12kl1';
+          cond.ETATDE = '20';
+        } else {
+          cond.CONDITION = '';
+          cond.JDEX = '1d@{ETATDE}';
+          cond.JDEXSUP = '2d@{ETATDE}kh1';
+          cond.JDEXSUPHERO = '{2d@{ETATDE}kh1, 0d20+10}kh1';
+          cond.JDEXRISQUE = '1d12';
+          cond.ETATDE = '20';
+        }
+        if (cond !== null) setAttrs(cond);
+      }
     });
   });
   
+  on('clicked:reset', function() {
+    for (let v=1; v <= 9; v++) {
+      setRank(v.toString());
+    }
+    buildCaracs();
+    encumbrance();
+  });
+  	  
+  on('change:mods_atk', function() {
+    let infomsg = 'Syntaxe non reconnue, corrigez SVP...';
+    setAttrs({ INFOMSG: infomsg });
+    getAttrs(['mods_atk', 'CARACS'], function(values) {
+      const aliases = {
+        'attaque': 'att',
+        'attaques': 'att',
+        'cac': 'atc',
+        'contact': 'atc',
+        'cad': 'atd',
+        'distance': 'atd',
+        'psyinf': 'inf',
+        'influ': 'inf',
+        'psyint': 'int',
+        'intui': 'int',
+        'tir': 'atd'
+      };
+      const modifiers = {
+        atc: '',
+        atcdm: '',
+        atd: '',
+        atddm: '',
+        inf: '',
+        infdm: '',
+        int: '',
+        intdm: ''
+      };
+      let result = ' ';
+      if (values.mods_atk !== '') {
+        let caracs = JSON.parse(values.CARACS);
+        let mods = values.mods_atk.replace('\n', ';').split(';');
+        for (let mod of mods) {
+          if (mod.trim() === '') continue;
+          let modv = mod.trim().split(' ');
+          let mod_attr = modv.shift().toLowerCase();
+          let to_dm = false;
+          if (mod_attr === 'dm') {
+            to_dm = true;
+            mod_attr = modv.shift().toLowerCase();
+            if (Object.keys(aliases).includes(mod_attr)) {
+              if (aliases[mod_attr] === 'att') mod_attr = 'dm';
+              if (aliases[mod_attr] === 'atc') mod_attr = 'atcdm';
+              if (aliases[mod_attr] === 'atd') mod_attr = 'atddm';
+              if (aliases[mod_attr] === 'inf') mod_attr = 'infdm';
+              if (aliases[mod_attr] === 'int') mod_attr = 'intdm';
+            } else {
+              if (mod_attr === 'att') mod_attr = 'dm';
+              if (mod_attr === 'atc') mod_attr = 'atcdm';
+              if (mod_attr === 'atd') mod_attr = 'atddm';
+              if (mod_attr === 'inf') mod_attr = 'infdm';
+              if (mod_attr === 'int') mod_attr = 'intdm';
+            }
+          }
+          let mod_sgn = '+';
+          let mod_val = modv.shift();
+          if (mod_val.startsWith('+') || mod_val.startsWith('-')) {
+            mod_sgn = mod_val.substring(0,1);
+            mod_val = mod_val.substring(1);
+          }
+          if (to_dm && mod_val.search(/\d+[dD]\d+/) !== -1) {
+            mod_val = `[[${mod_val}]]`;
+          } else {
+            mod_val = buffValue(mod_val, caracs);
+            if (mod_val === 0) continue;
+          }
+          let mod_desc = ` ${mod_sgn}${mod_val}[${modv.join(' ').trim()}]`;
+          switch (mod_attr) {
+            case 'atc':
+            case 'atcdm':
+            case 'atd':
+            case 'atddm':
+            case 'inf':
+            case 'infdm':
+            case 'int':
+            case 'intdm':
+              modifiers[mod_attr] += mod_desc;
+              break;
+            case 'att':
+              for (let attr of ['atc', 'atd', 'inf', 'int']) {
+                modifiers[attr] += mod_desc;
+              }
+              break;
+            case 'dm':
+              for (let attr of ['atcdm', 'atddm', 'infdm', 'intdm']) {
+                modifiers[attr] += mod_desc;
+              }
+            default:
+              if (Object.keys(aliases).includes(mod_attr)) {
+                modifiers[aliases[mod_attr]] += mod_desc;
+                result = ' ';
+              } else {
+                result = infomsg;
+              }
+              break;
+          }
+        }
+      }
+      getSectionIDs('repeating_armes', function(ids) {
+        for (const id of ids) {
+          getAttrs([`repeating_armes_${id}_armeatk`, `repeating_armes_${id}_armeportee`], function(values) {
+            let type = values[Object.keys(values)[0]] || '';
+            let portee = values[Object.keys(values)[1]] || '';
+            let attr = {};
+            if (type === '@{ATKCAC}' || (type === '@{ATKTIR}' && portee === '')) {
+              attr[`repeating_armes_${id}_armebuff`] = modifiers.atc.trim();
+              attr[`repeating_armes_${id}_armebuffdm`] = modifiers.atcdm.trim();
+            } else if (type === '@{ATKTIR}') {
+              attr[`repeating_armes_${id}_armebuff`] = modifiers.atd.trim();
+              attr[`repeating_armes_${id}_armebuffdm`] = modifiers.atddm.trim();
+            } else if (type === '@{ATKPSYINFLU}') {
+              attr[`repeating_armes_${id}_armebuff`] = modifiers.inf.trim();
+              attr[`repeating_armes_${id}_armebuffdm`] = modifiers.infdm.trim();
+            } else if (type === '@{ATKPSYINTUI}') {
+              attr[`repeating_armes_${id}_armebuff`] = modifiers.int.trim();
+              attr[`repeating_armes_${id}_armebuffdm`] = modifiers.intdm.trim();
+            }
+            if (attr !== null) setAttrs(attr);
+          });
+        }
+      });
+      consoleLog(`[${result}]`);
+      setAttrs({ 
+        INFOMSG: result 
+      });
+    });
+  });
+  
+  const conditions = {
+    'aveugle': 'A',
+    'effraye': 'F',
+    'etourdi': 'E',
+    'immobilise': 'I',
+    'panique': 'P',
+    'ralenti': 'L',
+    'renverse': 'R',
+    'surpris': 'S'
+  }
+  
+  const conditions_data = {
+    '': {
+      'atc': 0,
+      'atd': 0,
+      'def': 0,
+      'init': 0,
+      'title': ''
+    },
+    'A': {
+      'atc': 5,
+      'atd': 10,
+      'def': 5,
+      'init': 5,
+      'title': 'Aveuglé'
+    },
+    'E': {
+      'atc': 0,
+      'atd': 0,
+      'def': 5,
+      'init': 0,
+      'title': 'Etourdi'
+    },
+    'F': {
+      'atc': 5,
+      'atd': 5,
+      'def': 0,
+      'init': 0,
+      'title': 'Effrayé'
+    },
+    'I': {
+      'atc': 0,
+      'atd': 0,
+      'def': 0,
+      'init': 0,
+      'title': 'Immobilisé'
+    },
+    'P': {
+      'atc': 0,
+      'atd': 0,
+      'def': 2,
+      'init': 0,
+      'title': 'Paniqué'
+    },
+    'L': {
+      'atc': 0,
+      'atd': 0,
+      'def': 0,
+      'init': 0,
+      'title': 'Ralenti'
+    },
+    'R': {
+      'atc': 5,
+      'atd': 5,
+      'def': 5,
+      'init': 0,
+      'title': 'Renversé'
+    },
+    'S': {
+      'atc': 0,
+      'atd': 0,
+      'def': 5,
+      'init': 0,
+      'title': 'Surpris'
+    }
+  }
+  
+  function applyConditions(buffs, conditionAttr, s) {
+    if (conditionAttr === '') return;
+    for (let cond of conditionAttr) {
+      buffs.atc += s * conditions_data[cond].atc;
+      buffs.atd += s * conditions_data[cond].atd;
+      buffs.def += s * conditions_data[cond].def;
+      buffs.init += s * conditions_data[cond].init;
+    }
+  }
+  
+  function clickedConditions() {
+    let clickedConditions = '';
+    for (let condition of Object.keys(conditions)) {
+      clickedConditions += `clicked:cond_${condition} `;
+    }
+    return clickedConditions;
+  }
+  
+  on(clickedConditions(), function(eventInfo) {
+    var clickedCondition = conditions[eventInfo.triggerName.replace('clicked:cond_','')];
+    getAttrs(['PCONDITION', 'CONDITION', 'ATKCAC_BUFF', 'ATKTIR_BUFF', 'INIT_BUFF', 'DEF_BUFF', 'ETATDE'], function(values) {
+      let buffs = {
+        'atc': parseInt(values.ATKCAC_BUFF) || 0,
+        'atd': parseInt(values.ATKTIR_BUFF) || 0,
+        'def': parseInt(values.DEF_BUFF) || 0,
+        'init': parseInt(values.INIT_BUFF) || 0
+      };
+      // debuffs prior condition
+      let pcondition = values.PCONDITION || '';
+      applyConditions(buffs, pcondition, +1);
+      // change condition
+      let condition = values.CONDITION || '';
+      if (condition.includes(clickedCondition)) {
+        condition = condition.replace(clickedCondition,'');
+      } else {
+        condition += clickedCondition;
+      }
+      // buff new condition
+      applyConditions(buffs, condition, -1);
+      // check prior condition for die roll
+      let etatde = values.ETATDE;
+      if (pcondition !== '' && (pcondition.includes(conditions.immobilise) || pcondition.includes(conditions.panique))) etatde = '20';
+      // check condition for die roll
+      if (condition !== '' && (condition.includes(conditions.immobilise) || condition.includes(conditions.panique))) etatde = '12';
+      //
+      let displayConditions = '';
+      if (condition !== '') {
+        for (cond of Object.keys(conditions)) {
+          if (condition.includes(conditions[cond])) {
+            displayConditions += (displayConditions === '' ? '' : ', ') + conditions_data[conditions[cond]].title;
+          }
+        }
+      }
+      if (displayConditions === '') displayConditions = ' ';
+      setAttrs({
+        ATKCAC_BUFF: buffs.atc,
+        ATKTIR_BUFF: buffs.atd,
+        DEF_BUFF: buffs.def,
+        INIT_BUFF: buffs.init,
+        ETATDE: etatde,
+        CONDITION: condition,
+        PCONDITION: condition,
+        conditions: displayConditions
+      });
+    });
+  });
+
 </script>
 <!-- FIN SCRIPTS / SHEET WORKERS -->
