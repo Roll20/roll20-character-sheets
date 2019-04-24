@@ -9463,18 +9463,16 @@
             } else {
                 getCompendiumPage(v.class, (page) => {
                     update = {};
-                    page.forEach((list) => {
-                        if (list.data && 'Category' in list.data && list.data[`Category`] === "Classes") {
-                            update["hitdietype"]           = list.data["Hit Die"].slice(1);
-                            update["spellcasting_ability"] = (list.data["Spellcasting Ability"]) ? `@{${list.data["Spellcasting Ability"].toLowerCase()}_mod}+` : "0*";
-                            abilites.forEach((save) => {
-                                const ability = save.toLowerCase();
-                                update[`${ability}_save_prof`] = (list.data["data-Saving Throws"].indexOf(`${save}`) > -1) ? "(@{pb})" : 0;
-                                update_save(ability);
-                            });
-                        };
-                    });
-
+                    const classData = (page.length === undefined || page.length === 1) ? page : page[0];
+                    if (classData.data && 'Category' in classData.data && classData.data[`Category`] === "Classes") {
+                        update["hitdietype"]           = classData.data["Hit Die"].slice(1);
+                        update["spellcasting_ability"] = (classData.data["Spellcasting Ability"]) ? `@{${classData.data["Spellcasting Ability"].toLowerCase()}_mod}+` : "0*";
+                        abilites.forEach((save) => {
+                            const ability = save.toLowerCase();
+                            update[`${ability}_save_prof`] = (classData.data["data-Saving Throws"].indexOf(`${save}`) > -1) ? "(@{pb})" : 0;
+                            update_save(ability);
+                        });
+                    };
                     setAttrs(update, {silent: true});
                     //Update Spell info to change or remove casting attributes in Spells
                     update_spell_info();
