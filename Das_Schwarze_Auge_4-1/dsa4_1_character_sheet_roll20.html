@@ -15475,38 +15475,46 @@ on("sheet:opened change:wound_kopf change:wound_ra change:wound_la change:wound_
         let wundeLB = +v.wound_lb || 0;
         let wundeBrust = +v.wound_brust || 0;
         let wundeBauch = +v.wound_bauch || 0;
-        // Attribute setzen
-        setAttrs({
-            mu: +v.mu_basis + +v.mu_mod - +wundeKopf,
-            kl: +v.kl_basis + +v.kl_mod - +wundeKopf,
-            in: +v.in_basis + +v.in_mod - +wundeKopf,
-            ch: +v.ch_basis + +v.ch_mod,
-            ff: +v.ff_basis + +v.ff_mod - +wundeRA - +wundeLA,
-            ge: +v.ge_basis + +v.ge_mod - +wundeLB - +wundeRB,
-            ko: +v.ko_basis + +v.ko_mod - +wundeBrust - +wundeBauch,
-            kk: +v.kk_basis + +v.kk_mod - +wundeBrust - +wundeBauch - +wundeRA - +wundeLA
-        }); 
-        // Abgeleitete werte setzen
-        setAttrs({
-           gs: +v.gs_basis + +v.gs_mod + Math.floor(((+v.ge_basis + +v.ge_mod + 100) / 111) - 1) + Math.ceil(((+v.ge_basis + +v.ge_mod + 100)/115) - 1) - +wundeBauch - (+wundeRB / 2 - +wundeLB / 2),
-           erschoepfung_basis: +v.ko_basis,
-           erschoepfung_max: +v.ko_basis + +v.erschoepfung_mod,
-           wundschwelle: Math.ceil(((+v.ko_basis) / 2)) + +v.eisern,
-           aspgrundw: Math.round((+v.mu_basis + +v.in_basis + +v.ch_basis) / 2 + 0.05),
-           asp_max: Math.round((+v.mu_basis + +v.in_basis + +v.ch_basis) / 2 + 0.05) + +v.aspzugek,
-           ausgrundw: Math.round((+v.mu_basis + +v.ko_basis + +v.ge_basis) / 2 + 0.05),
-           aus_max: Math.round((+v.mu_basis + +v.ko_basis + +v.ge_basis) / 2 + 0.05) + +v.auszugek,
-           legrundw: Math.round((+v.ko_basis + +v.kk_basis) / 2 + 0.05),
-           le_max: Math.round((+v.ko_basis + +v.kk_basis) / 2 + 0.05) + +v.lezugek,
-           mrgrundw: Math.round((+v.mu_basis + +v.mu_mod + +v.kl_basis + +v.kl_mod + +v.ko_basis + +v.ko_mod) / 5),
-           mr_max: Math.round((+v.mu_basis + +v.mu_mod + +v.kl_basis + +v.kl_mod + +v.ko_basis + +v.ko_mod) / 5) + +v.mrzugek,
-           ueberanstrengung_max: +v.ko_basis,
-           inibasis: Math.round((+v.mu_basis + +v.mu_mod + +v.mu_basis + +v.mu_mod + +v.in_basis + +v.in_mod + +v.ge_basis + +v.ge_mod) / 5),
-           ini_max: Math.round((+v.mu_basis + +v.mu_mod + +v.mu_basis + +v.mu_mod + +v.in_basis + +v.in_mod + +v.ge_basis + +v.ge_mod) / 5) + +v.inizugek - +wundeKopf - +wundeBauch - +wundeLB - +wundeRB,
-           atbasis: Math.round(((+v.mu_basis + +v.mu_mod + +v.ge_basis + +v.ge_mod + +v.kk_basis + +v.kk_mod) / 5) - +wundeBauch - +wundeRA - +wundeLA - +wundeRB - +wundeLB),
-           pabasis: Math.round(((+v.in_basis + +v.in_mod + +v.ge_basis + +v.ge_mod + +v.kk_basis + +v.kk_mod) / 5) - +wundeBrust - +wundeBauch - +wundeRA - +wundeLA - +wundeRB - +wundeLB),
-           fkbasis: Math.round(((+v.in_basis + +v.in_mod + +v.ff_basis + +v.ff_mod + +v.kk_basis + +v.kk_mod) / 5) - +wundeBrust - +wundeBauch - +wundeRA - +wundeLA - +wundeRB - +wundeLB)
-        });
+        let update = {
+            'MU': +v.mu_basis + +v.mu_mod - wundeKopf,
+            'KL': +v.kl_basis + +v.kl_mod - wundeKopf,
+            'IN': +v.in_basis + +v.in_mod - wundeKopf,
+            'CH': +v.ch_basis + +v.ch_mod,
+            'FF': +v.ff_basis + +v.ff_mod - wundeRA - wundeLA,
+            'GE': +v.ge_basis + +v.ge_mod - wundeLB - wundeRB,
+            'KO': +v.ko_basis + +v.ko_mod - wundeBrust - wundeBauch,
+            'KK': +v.kk_basis + +v.kk_mod - wundeBrust - wundeBauch - wundeRA - wundeLA,
+            'erschoepfung_basis': +v.ko_basis,
+            'erschoepfung_max': +v.ko_basis + +v.erschoepfung_mod,
+            'wundschwelle': Math.ceil((+v.ko_basis) / 2) + +v.eisern,
+            'aspgrundw': Math.ceil((+v.mu_basis + +v.in_basis + +v.ch_basis) / 2),
+            'asp_max': Math.ceil((+v.mu_basis + +v.in_basis + +v.ch_basis) / 2) + +v.aspzugek,
+            'ausgrundw': Math.ceil((+v.mu_basis + +v.ko_basis + +v.ge_basis) / 2),
+            'aus_max': Math.ceil((+v.mu_basis + +v.ko_basis + +v.ge_basis) / 2) + +v.auszugek,
+            'legrundw': Math.ceil((+v.ko_basis + +v.kk_basis) / 2),
+            'le_max': Math.ceil((+v.ko_basis + +v.kk_basis) / 2) + +v.lezugek,
+            'mrgrundw': Math.round((+v.mu_basis + +v.kl_basis + +v.ko_basis) / 5),
+            'mr_max': Math.round((+v.mu_basis + +v.kl_basis + +v.ko_basis) / 5) + +v.mrzugek,
+            'ueberanstrengung_max': +v.ko_basis,
+            'inibasis': Math.round((+v.mu_basis + +v.mu_basis + +v.in_basis + +v.ge_basis) / 5),
+            'ini_max': Math.round((+v.mu_basis + +v.mu_basis + +v.in_basis + +v.ge_basis) / 5) + +v.inizugek - wundeKopf - wundeBauch - wundeLB - wundeRB,
+            'atbasis': Math.round(((+v.mu_basis + +v.ge_basis + +v.kk_basis) / 5) - wundeBauch - wundeRA - wundeLA - wundeRB - wundeLB),
+            'pabasis': Math.round(((+v.in_basis + +v.ge_basis + +v.kk_basis) / 5) - wundeBrust - wundeBauch - wundeRA - wundeLA - wundeRB - wundeLB),
+            'fkbasis': Math.round(((+v.in_basis + +v.ff_basis + +v.kk_basis) / 5) - wundeBrust - wundeBauch - wundeRA - wundeLA - wundeRB - wundeLB)
+        };
+        let GS = {
+            'Basis': +v.gs_basis,
+            'Mod': +v.gs_mod,
+            'GE-Einfluss': 0,
+            'Wunden': wundeBauch - (wundeRB / 2) - (wundeLB / 2)
+        };
+        if (update['GE'] < 11) {
+            GS['GE-Einfluss'] = -1;
+        } else if (update['GE'] > 15) {
+            GS['GE-Einfluss'] = 1;
+        }
+        update['GS'] = GS['Basis'] + GS['Mod'] + GS['GE-Einfluss'] + GS['Wunden'];
+        setAttrs(update);
     }); 
 });
 
