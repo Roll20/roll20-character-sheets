@@ -6264,6 +6264,56 @@
                 <button type="roll" value="@{gm_roll_opt} &{template:DSA-Talente} {{name=@{Name_Gabe_Anzeige}}} {{mod=[[?{Erleichterung (-) oder Erschwernis (+)|0}d1cs0cf2]]}} {{taw=[[@{TaW}]]}} {{stat1=[[@{hiddenEigenschaft1}]]}} {{stat2=[[@{hiddenEigenschaft2}]]}} {{stat3=[[@{hiddenEigenschaft3}]]}} {{Talent=[[ { [[{0d1 + @{TaW} - (?{Erleichterung (-) oder Erschwernis (+)|0}), 0d1}kh1]] - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (-) oder Erschwernis (+)|0}) - @{TaW}, 0d1}kh1]] - @{hiddenEigenschaft1}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (-) oder Erschwernis (+)|0}) - @{TaW}, 0d1}kh1]] - @{hiddenEigenschaft2}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (-) oder Erschwernis (+)|0}) - @{TaW}, 0d1}kh1]] - @{hiddenEigenschaft3}, 0d1}kh1, 0d1 + @{TaW}}dh1]]}}"></button>
                 </span>
             </fieldset>
+            <h3>ALTE DATEN</h3>
+            <fieldset class="repeating_AlteGaben">
+                <input type="checkbox" name="attr_SE" style="width: 2em">
+                <select name="attr_TalentName" class="atype" style="width: 14em;">
+                    <option>---</option>
+                    <option>Empathie</option>
+                    <option>Gefahreninstinkt</option>
+                    <option>Geräuschhexerei</option>
+                    <option>Kräfteschub/Talentschub</option>
+                    <option>Magiegespür</option>
+                    <option>Prophezeien</option>
+                    <option>Tierempathie</option>
+                    <option>Zwergennase</option>
+                </select>
+                <select name="attr_Eigenschaft1" class="sheet-talent-eigenschaft">
+                    <option>---</option>
+                    <option value="@{MU}">MU</option>
+                    <option value="@{KL}">KL</option>
+                    <option value="@{IN}">IN</option>
+                    <option value="@{CH}">CH</option>
+                    <option value="@{FF}">FF</option>
+                    <option value="@{GE}">GE</option>
+                    <option value="@{KO}">KO</option>
+                    <option value="@{KK}">KK</option>
+                </select>
+                <select name="attr_Eigenschaft2" class="sheet-talent-eigenschaft">
+                    <option>---</option>
+                    <option value="@{MU}">MU</option>
+                    <option value="@{KL}">KL</option>
+                    <option value="@{IN}">IN</option>
+                    <option value="@{CH}">CH</option>
+                    <option value="@{FF}">FF</option>
+                    <option value="@{GE}">GE</option>
+                    <option value="@{KO}">KO</option>
+                    <option value="@{KK}">KK</option>
+                </select>
+                <select name="attr_Eigenschaft3" class="sheet-talent-eigenschaft">
+                    <option>---</option>
+                    <option value="@{MU}">MU</option>
+                    <option value="@{KL}">KL</option>
+                    <option value="@{IN}">IN</option>
+                    <option value="@{CH}">CH</option>
+                    <option value="@{FF}">FF</option>
+                    <option value="@{GE}">GE</option>
+                    <option value="@{KO}">KO</option>
+                    <option value="@{KK}">KK</option>
+                </select>
+                <input type="number" name="attr_TaW" style="width: 3em;">
+                <button type="roll" value="@{gm_roll_opt} &{template:DSA-Talente} {{name=@{TalentName}}} {{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}d1cs0cf2]]}} {{taw=[[@{TaW}]]}} {{stat1=[[@{Eigenschaft1}]]}} {{stat2=[[@{Eigenschaft2}]]}} {{stat3=[[@{Eigenschaft3}]]}} {{Talent=[[ { [[{0d1 + @{TaW} - (?{Erleichterung (−) oder Erschwernis (+)|0}), 0d1}kh1]] - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}) - @{TaW}, 0d1}kh1]] - @{Eigenschaft1}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}) - @{TaW}, 0d1}kh1]] - @{Eigenschaft2}, 0d1}kh1 - {1d20cs1cf20 + [[{0d1 + (?{Erleichterung (−) oder Erschwernis (+)|0}) - @{TaW}, 0d1}kh1]] - @{Eigenschaft3}, 0d1}kh1, 0d1 + @{TaW}}dh1]]}}"></button>
+            </fieldset>
         </div>
 
         <div class="sheet-section sheet-section-Meta">
@@ -15678,6 +15728,148 @@ on("change:kegrundw change:kezugek", function(eventInfo) {
             ke_max: +v.kegrundw + +v.kezugek
         });
     });
+});
+
+/*
+# Old Data Conversion
+Always try to migrate as much data as possible
+
+Relevant character sheet versions
+* 20171014: last version before sheet worker scripts conversion
+* 20190425: new repeating sections for meta-talents and gifts
+*/
+function migrationCheck() {
+    getAttrs(["character_sheet_version", "data_version"], function(v) {
+        console.log("Checking versions before attempting data migration ...");
+        
+        let dataVersion = parseInt(v["data_version"]);
+        let sheetVersion = parseInt(v["character_sheet_version"]);
+
+        if(sheetVersion == dataVersion) {
+            console.log("Character sheet version (" + sheetVersion + ") matches data version (" + dataVersion + "). Nothing to do.");
+        } else if(sheetVersion > dataVersion) {
+            console.log("Character sheet version (" + sheetVersion + ") is newer than data version (" + dataVersion + "). Having a closer look at the data version ...");
+            // This needs to be adapted/replaced by a better system
+            if(dataVersion === 20171014) {
+                migrate20171014to20190425();
+            } else {
+                console.log("The data version does not indicate the need to migrate old data to new formats. Nothing done.");
+            }
+        } else if (sheetVersion < dataVersion) {
+            console.log("Character sheet version (" + sheetVersion + ") is older than data version (" + dataVersion + "). Version numbers inconsistent, stopping to prevent unwanted effects. Please fix your version number(s).");
+        }
+    });
+}
+
+/*
+## From version 20171014 to 20190425
+* Gifts and meta-talents were changed
+*/
+function migrate20171014to20190425 () {
+    console.log("Migrating sheet data from version 20171014 to 20190425 ...");
+    let migrationFinished = 0;
+
+    getSectionIDs("AlteGaben", function(idarray) {
+        if(idarray.length == 0) {
+            console.log("Migration: No gifts found, nothing to migrate.");
+            migrationFinished = 1;
+        } else {
+            console.log("Migration: Found old gifts, continuing ...");
+            let conversion = {
+                "@{MU}": "mu",
+                "@{KL}": "kl",
+                "@{IN}": "in",
+                "@{CH}": "ch",
+                "@{FF}": "ff",
+                "@{GE}": "ge",
+                "@{KO}": "ko",
+                "@{KK}": "kk",
+                "---": "nothing",
+                "Empathie": "empathie",
+                "Gefahreninstinkt": "gefahreninstinkt",
+                "Geräuschhexerei": "geraeuschhexerei",
+                "Kräfteschub/Talentschub": "kraefteschub/talentschub",
+                "Magiegespür": "magiegespuer",
+                "Prophezeien": "prophezeien",
+                "Tierempathie": "tierempathie",
+                "Zwergennase": "zwergennase",
+            };
+            let gaben = {
+                "empathie": [ ["mu", "in", "in"], "Empathie" ],
+                "gefahreninstinkt": [ ["kl", "in", "in"], "Gefahreninstinkt" ],
+                "geraeuschhexerei": [ ["in", "ch", "ko"], "Geräuschhexerei" ],
+                "kraefteschub/talentschub": [ ["mu", "in", "ko"], "Kräfteschub/Talentschub" ],
+                "magiegespuer": [ ["mu", "in", "in"], "Magiegespür" ],
+                "prophezeien": [ ["in", "in", "ch"], "Prophezeien" ],
+                "tierempathie": [ ["mu", "in", "ch"], "Tierempathie" ],
+                "zwergennase": [ ["in", "in", "ff"], "Zwergennase" ]
+            };
+            for(var i=0; i < idarray.length; i++) {
+                getAttrs(
+                    [
+                        "repeating_AlteGaben_" + idarray[i] + "_TalentName",
+                        "repeating_AlteGaben_" + idarray[i] + "_Eigenschaft1",
+                        "repeating_AlteGaben_" + idarray[i] + "_Eigenschaft2",
+                        "repeating_AlteGaben_" + idarray[i] + "_Eigenschaft3",
+                        "repeating_AlteGaben_" + idarray[i] + "_TaW",
+                        "repeating_AlteGaben_" + idarray[i] + "_SE",
+                        "mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"
+                    ], function(v) {
+                        console.log(v);
+                        let update = {};
+                        let newrow = generateRowID();
+                        let current = Object.keys(v)[0].split("_")[2];
+                        let prefixNew = "repeating_GabenTalente_" + newrow;
+                        let prefixOld = "repeating_AlteGaben_" + current;
+
+                        // Gather data
+                        // Updating the name will set the stats automatically
+                        // To prevent overwriting of custom stats check that the RAW stats are used
+                        // Need to check that the three correct ones are used, order irrelevant
+                        // Comparison made easy by taking all three stats, sorting them alphabetically and then concatenating them into one string -> simple string comparison will reveal whether the same stats are used (order not important)
+                        let gabeStats = gaben[conversion[v[prefixOld + "_TalentName"]]][0].sort().join("");
+                        let gabeStatsOld = [conversion[v[prefixOld + "_Eigenschaft1"]], conversion[v[prefixOld + "_Eigenschaft2"]], conversion[v[prefixOld + "_Eigenschaft3"]]].sort().join("");
+                        if(gabeStats == gabeStatsOld) {
+                            update[prefixNew + "_Name_Gabe"] = conversion[v[prefixOld + "_TalentName"]];
+                            update[prefixNew + "_Name_Gabe_Zusatz"] = "";
+                        } else {
+                            update[prefixNew + "_Name_Gabe_Zusatz"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
+                            console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined gift set. Old data preserved.");
+                        }
+                        if(v[prefixOld + "_SE"] == "on") {
+                            update[prefixNew + "_Name_Gabe_Zusatz"] += "[x] SE";
+                            console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as it is only relevant for character advancement. Old data preserved. Please move to notes.");
+                        } else {
+                            update[prefixNew + "_Name_Gabe_Zusatz"] += "[ ] SE";
+                        }
+                        update[prefixNew + "_Name_Gabe_Anzeige"] = conversion[v[prefixOld + "_TalentName"]];
+                        update[prefixNew + "_Eigenschaft1"] = conversion[v[prefixOld + "_Eigenschaft1"]];
+                        update[prefixNew + "_Eigenschaft2"] = conversion[v[prefixOld + "_Eigenschaft2"]];
+                        update[prefixNew + "_Eigenschaft3"] = conversion[v[prefixOld + "_Eigenschaft3"]];
+                        update[prefixNew + "_hiddenEigenschaft1"] = v[conversion[v[prefixOld + "_Eigenschaft1"]]];
+                        update[prefixNew + "_hiddenEigenschaft2"] = v[conversion[v[prefixOld + "_Eigenschaft2"]]];
+                        update[prefixNew + "_hiddenEigenschaft3"] = v[conversion[v[prefixOld + "_Eigenschaft3"]]];
+                        update[prefixNew + "_TaW"] = parseInt(v[prefixOld + "_TaW"]);
+                        console.log(update);
+
+                        // Create new row
+                        setAttrs(update);
+                    });
+            }
+            migrationFinished = 1;
+        }
+        if (migrationFinished === 1) {
+            let dataVersionNew = "20190425";
+            setAttrs({ "data_version": dataVersionNew });
+            console.log("Migration: Data version updated to character sheet version (" + dataVersionNew + "). Migration complete.");
+        } else {
+            console.log("Migration: Migration appears to be incomplete. See console/log for further hints. Data version not updated to character sheet version.");
+        }
+    });
+}
+
+on("sheet:opened", function() {
+    migrationCheck();
 });
 
 </script>
