@@ -15829,102 +15829,201 @@ function migrate20171014to20190425 () {
     console.log("Migrating sheet data from version 20171014 to 20190425 ...");
     let migrationFinished = 0;
 
-    getSectionIDs("GabenTalente", function(idarray) {
-        if(idarray.length == 0) {
-            console.log("Migration: No gifts found, nothing to migrate.");
-            migrationFinished = 1;
-        } else {
-            console.log("Migration: Found old gifts, continuing ...");
-            let conversion = {
-                "@{MU}": "mu",
-                "@{KL}": "kl",
-                "@{IN}": "in",
-                "@{CH}": "ch",
-                "@{FF}": "ff",
-                "@{GE}": "ge",
-                "@{KO}": "ko",
-                "@{KK}": "kk",
-                "---": "nothing",
-                "Empathie": "empathie",
-                "Gefahreninstinkt": "gefahreninstinkt",
-                "Geräuschhexerei": "geraeuschhexerei",
-                "Kräfteschub/Talentschub": "kraefteschub/talentschub",
-                "Magiegespür": "magiegespuer",
-                "Prophezeien": "prophezeien",
-                "Tierempathie": "tierempathie",
-                "Zwergennase": "zwergennase",
-            };
-            let gaben = {
-                "empathie": [ ["mu", "in", "in"], "Empathie" ],
-                "gefahreninstinkt": [ ["kl", "in", "in"], "Gefahreninstinkt" ],
-                "geraeuschhexerei": [ ["in", "ch", "ko"], "Geräuschhexerei" ],
-                "kraefteschub/talentschub": [ ["mu", "in", "ko"], "Kräfteschub/Talentschub" ],
-                "magiegespuer": [ ["mu", "in", "in"], "Magiegespür" ],
-                "prophezeien": [ ["in", "in", "ch"], "Prophezeien" ],
-                "tierempathie": [ ["mu", "in", "ch"], "Tierempathie" ],
-                "zwergennase": [ ["in", "in", "ff"], "Zwergennase" ]
-            };
-            for(var i=0; i < idarray.length; i++) {
-                getAttrs(
-                    [
-                        "repeating_GabenTalente_" + idarray[i] + "_TalentName",
-                        "repeating_GabenTalente_" + idarray[i] + "_Eigenschaft1",
-                        "repeating_GabenTalente_" + idarray[i] + "_Eigenschaft2",
-                        "repeating_GabenTalente_" + idarray[i] + "_Eigenschaft3",
-                        "repeating_GabenTalente_" + idarray[i] + "_TaW",
-                        "repeating_GabenTalente_" + idarray[i] + "_SE",
-                        "mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"
-                    ], function(v) {
-                        console.log(v);
-                        let update = {};
-                        let newrow = generateRowID();
-                        let current = Object.keys(v)[0].split("_")[2];
-                        let prefixNew = "repeating_Gaben_" + newrow;
-                        let prefixOld = "repeating_GabenTalente_" + current;
+    getSectionIDs("GabenTalente", function(gabenIDs) {
+        getSectionIDs("MetaTalente", function(metatalenteIDs) {
+            // GIFTS MIGRATION
+            if(gabenIDs.length == 0) {
+                console.log("Migration: No gifts found, nothing to migrate.");
+                migrationFinished += 1;
+            } else {
+                console.log("Migration: Found old gifts, continuing ...");
+                let conversion = {
+                    "@{MU}": "mu",
+                    "@{KL}": "kl",
+                    "@{IN}": "in",
+                    "@{CH}": "ch",
+                    "@{FF}": "ff",
+                    "@{GE}": "ge",
+                    "@{KO}": "ko",
+                    "@{KK}": "kk",
+                    "---": "nothing",
+                    "Empathie": "empathie",
+                    "Gefahreninstinkt": "gefahreninstinkt",
+                    "Geräuschhexerei": "geraeuschhexerei",
+                    "Kräfteschub/Talentschub": "kraefteschub/talentschub",
+                    "Magiegespür": "magiegespuer",
+                    "Prophezeien": "prophezeien",
+                    "Tierempathie": "tierempathie",
+                    "Zwergennase": "zwergennase",
+                };
+                let gaben = {
+                    "empathie": [ ["mu", "in", "in"], "Empathie" ],
+                    "gefahreninstinkt": [ ["kl", "in", "in"], "Gefahreninstinkt" ],
+                    "geraeuschhexerei": [ ["in", "ch", "ko"], "Geräuschhexerei" ],
+                    "kraefteschub/talentschub": [ ["mu", "in", "ko"], "Kräfteschub/Talentschub" ],
+                    "magiegespuer": [ ["mu", "in", "in"], "Magiegespür" ],
+                    "prophezeien": [ ["in", "in", "ch"], "Prophezeien" ],
+                    "tierempathie": [ ["mu", "in", "ch"], "Tierempathie" ],
+                    "zwergennase": [ ["in", "in", "ff"], "Zwergennase" ]
+                };
+                for(var i=0; i < gabenIDs.length; i++) {
+                    getAttrs(
+                        [
+                            "repeating_GabenTalente_" + gabenIDs[i] + "_TalentName",
+                            "repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft1",
+                            "repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft2",
+                            "repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft3",
+                            "repeating_GabenTalente_" + gabenIDs[i] + "_TaW",
+                            "repeating_GabenTalente_" + gabenIDs[i] + "_SE",
+                            "mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"
+                        ], function(v) {
+                            console.log(v);
+                            let update = {};
+                            let newrow = generateRowID();
+                            let current = Object.keys(v)[0].split("_")[2];
+                            let prefixNew = "repeating_Gaben_" + newrow;
+                            let prefixOld = "repeating_GabenTalente_" + current;
 
-                        // Gather data
-                        // Updating the name will set the stats automatically
-                        // To prevent overwriting of custom stats check that the RAW stats are used
-                        // Need to check that the three correct ones are used, order irrelevant
-                        // Comparison made easy by taking all three stats, sorting them alphabetically and then concatenating them into one string -> simple string comparison will reveal whether the same stats are used (order not important)
-                        let gabeStats = gaben[conversion[v[prefixOld + "_TalentName"]]][0].sort().join("");
-                        let gabeStatsOld = [conversion[v[prefixOld + "_Eigenschaft1"]], conversion[v[prefixOld + "_Eigenschaft2"]], conversion[v[prefixOld + "_Eigenschaft3"]]].sort().join("");
-                        if(gabeStats == gabeStatsOld) {
-                            update[prefixNew + "_Name_Gabe"] = conversion[v[prefixOld + "_TalentName"]];
-                            update[prefixNew + "_Name_Gabe_Zusatz"] = "";
-                        } else {
-                            update[prefixNew + "_Name_Gabe_Zusatz"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
-                            console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined gift set. Old data preserved.");
-                        }
-                        if(v[prefixOld + "_SE"] == "on") {
-                            update[prefixNew + "_Name_Gabe_Zusatz"] += "[x] SE";
-                            console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as it is only relevant for character advancement. Old data preserved. Please move to notes.");
-                        } else {
-                            update[prefixNew + "_Name_Gabe_Zusatz"] += "[ ] SE";
-                        }
-                        update[prefixNew + "_Name_Gabe_Anzeige"] = conversion[v[prefixOld + "_TalentName"]];
-                        update[prefixNew + "_Eigenschaft1"] = conversion[v[prefixOld + "_Eigenschaft1"]];
-                        update[prefixNew + "_Eigenschaft2"] = conversion[v[prefixOld + "_Eigenschaft2"]];
-                        update[prefixNew + "_Eigenschaft3"] = conversion[v[prefixOld + "_Eigenschaft3"]];
-                        update[prefixNew + "_hiddenEigenschaft1"] = v[conversion[v[prefixOld + "_Eigenschaft1"]]];
-                        update[prefixNew + "_hiddenEigenschaft2"] = v[conversion[v[prefixOld + "_Eigenschaft2"]]];
-                        update[prefixNew + "_hiddenEigenschaft3"] = v[conversion[v[prefixOld + "_Eigenschaft3"]]];
-                        update[prefixNew + "_TaW"] = parseInt(v[prefixOld + "_TaW"]);
-                        console.log(update);
+                            // Gather data
+                            // Updating the name will set the stats automatically
+                            // To prevent overwriting of custom stats check that the RAW stats are used
+                            // Need to check that the three correct ones are used, order irrelevant
+                            // Comparison made easy by taking all three stats, sorting them alphabetically and then concatenating them into one string -> simple string comparison will reveal whether the same stats are used (order not important)
+                            let gabeStats = gaben[conversion[v[prefixOld + "_TalentName"]]][0].sort().join("");
+                            let gabeStatsOld = [conversion[v[prefixOld + "_Eigenschaft1"]], conversion[v[prefixOld + "_Eigenschaft2"]], conversion[v[prefixOld + "_Eigenschaft3"]]].sort().join("");
+                            if(gabeStats == gabeStatsOld) {
+                                update[prefixNew + "_Name_Gabe"] = conversion[v[prefixOld + "_TalentName"]];
+                                update[prefixNew + "_Name_Gabe_Zusatz"] = "";
+                            } else {
+                                update[prefixNew + "_Name_Gabe_Zusatz"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
+                                console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined gift set. Old data preserved.");
+                            }
+                            if(v[prefixOld + "_SE"] == "on") {
+                                update[prefixNew + "_Name_Gabe_Zusatz"] += "[x] SE";
+                                console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as it is only relevant for character advancement. Old data preserved. Please move to notes.");
+                            } else {
+                                update[prefixNew + "_Name_Gabe_Zusatz"] += "[ ] SE";
+                            }
+                            update[prefixNew + "_Name_Gabe_Anzeige"] = conversion[v[prefixOld + "_TalentName"]];
+                            update[prefixNew + "_Eigenschaft1"] = conversion[v[prefixOld + "_Eigenschaft1"]];
+                            update[prefixNew + "_Eigenschaft2"] = conversion[v[prefixOld + "_Eigenschaft2"]];
+                            update[prefixNew + "_Eigenschaft3"] = conversion[v[prefixOld + "_Eigenschaft3"]];
+                            update[prefixNew + "_hiddenEigenschaft1"] = v[conversion[v[prefixOld + "_Eigenschaft1"]]];
+                            update[prefixNew + "_hiddenEigenschaft2"] = v[conversion[v[prefixOld + "_Eigenschaft2"]]];
+                            update[prefixNew + "_hiddenEigenschaft3"] = v[conversion[v[prefixOld + "_Eigenschaft3"]]];
+                            update[prefixNew + "_TaW"] = parseInt(v[prefixOld + "_TaW"]);
+                            console.log(update);
 
-                        // Create new row
-                        setAttrs(update);
-                    });
+                            // Create new row
+                            setAttrs(update);
+                        });
+                }
+                migrationFinished += 1;
             }
-            migrationFinished = 1;
-        }
-        if (migrationFinished === 1) {
-            let dataVersionNew = "20190425";
-            setAttrs({ "data_version": dataVersionNew });
-            console.log("Migration: Data version updated to character sheet version (" + dataVersionNew + "). Migration complete.");
-        } else {
-            console.log("Migration: Migration appears to be incomplete. See console/log for further hints. Data version not updated to character sheet version.");
-        }
+
+            // META-TALENTS MIGRATION
+            if(metatalenteIDs.length == 0) {
+                console.log("Migration: No meta-talents found, nothing to migrate.");
+                migrationFinished += 2;
+            } else {
+                console.log("Migration: Found old meta-talents, continuing ...");
+                let conversion = {
+                    "@{MU}": "mu",
+                    "@{KL}": "kl",
+                    "@{IN}": "in",
+                    "@{CH}": "ch",
+                    "@{FF}": "ff",
+                    "@{GE}": "ge",
+                    "@{KO}": "ko",
+                    "@{KK}": "kk",
+                    "---": "nothing",
+                    "Ansitzjagd": "ansitzjagd",
+                    "Hetzjagd": "hetzjagd",
+                    "Kräutersuchen": "kraeutersuchen",
+                    "Nahrungsammeln": "nahrungsammeln",
+                    "Pirschjagd": "pirschjagd",
+                    "Speerfischen": "speerfischen",
+                    "Tierfallenstellen": "tierfallenstellen",
+                    "Wachehalten": "wachehalten"
+                };
+                let metatalente = {
+                    "nothing": [ ["---", "---", "---"], "nothing" ],
+                    "ansitzjagd": [ ["mu", "in", "ge"], "Ansitzjagd" ],
+                    "hetzjagd": [ ["mu", "in", "ge"], "Hetzjagd" ],
+                    "kraeutersuchen": [ ["mu", "in", "ff"], "Kräutersuchen" ],
+                    "nahrungsammeln": [ ["mu", "in", "ff"], "Nahrungsammeln" ],
+                    "pirschjagd": [ ["mu", "in", "ge"], "Pirschjagd" ],
+                    "speerfischen": [ ["mu", "in", "ge"], "Speerfischen" ],
+                    "tierfallenstellen": [ ["kl", "in", "ff"], "Tierfallenstellen" ],
+                    "wachehalten": [ ["mu", "in", "ko"], "Wachehalten" ]
+                };
+                for(var i=0; i < metatalenteIDs.length; i++) {
+                    getAttrs(
+                        [
+                            "repeating_MetaTalente_" + metatalenteIDs[i] + "_TalentName",
+                            "repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft1",
+                            "repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft2",
+                            "repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft3",
+                            "repeating_MetaTalente_" + metatalenteIDs[i] + "_TaW",
+                            "repeating_MetaTalente_" + metatalenteIDs[i] + "_SE",
+                            "mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"
+                        ], function(v) {
+                            console.log(v);
+                            let update = {};
+                            let newrow = generateRowID();
+                            let current = Object.keys(v)[0].split("_")[2];
+                            let prefixNew = "repeating_Metatalente201904_" + newrow;
+                            let prefixOld = "repeating_MetaTalente_" + current;
+
+                            // Gather data
+                            // Updating the name will set the stats automatically
+                            // To prevent overwriting of custom stats check that the RAW stats are used
+                            // Need to check that the three correct ones are used, order irrelevant
+                            // Comparison made easy by taking all three stats, sorting them alphabetically and then concatenating them into one string -> simple string comparison will reveal whether the same stats are used (order not important)
+                            let metatalentStats = metatalente[conversion[v[prefixOld + "_TalentName"]]][0].sort().join("");
+                            let metatalentStatsOld = [conversion[v[prefixOld + "_Eigenschaft1"]], conversion[v[prefixOld + "_Eigenschaft2"]], conversion[v[prefixOld + "_Eigenschaft3"]]].sort().join("");
+                            if(metatalentStats == metatalentStatsOld) {
+                                update[prefixNew + "_Name_Metatalent"] = conversion[v[prefixOld + "_TalentName"]];
+                                update[prefixNew + "_Name_Metatalent_Eigen"] = "";
+                            } else {
+                                update[prefixNew + "_Name_Metatalent_Eigen"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
+                                console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined meta-talent set. Old data preserved.");
+                            }
+                            if(v[prefixOld + "_SE"] == "on") {
+                                update[prefixNew + "_Name_Metatalent_Eigen"] += "[x] SE";
+                                console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as SEs for metatalents are not RAW and they are only relevant for character advancement. Old data preserved. Please move to notes.");
+                            } else {
+                                update[prefixNew + "_Name_Metatalent_Eigen"] += "[ ] SE";
+                            }
+                            update[prefixNew + "_Name_Metatalent_Anzeige"] = conversion[v[prefixOld + "_TalentName"]];
+                            update[prefixNew + "_Eigenschaft1"] = conversion[v[prefixOld + "_Eigenschaft1"]];
+                            update[prefixNew + "_Eigenschaft2"] = conversion[v[prefixOld + "_Eigenschaft2"]];
+                            update[prefixNew + "_Eigenschaft3"] = conversion[v[prefixOld + "_Eigenschaft3"]];
+                            update[prefixNew + "_hiddenEigenschaft1"] = v[conversion[v[prefixOld + "_Eigenschaft1"]]];
+                            update[prefixNew + "_hiddenEigenschaft2"] = v[conversion[v[prefixOld + "_Eigenschaft2"]]];
+                            update[prefixNew + "_hiddenEigenschaft3"] = v[conversion[v[prefixOld + "_Eigenschaft3"]]];
+                            update[prefixNew + "_TaW"] = parseInt(v[prefixOld + "_TaW"]);
+                            console.log(update);
+
+                            // Create new row
+                            setAttrs(update);
+                        });
+                }
+                migrationFinished += 2;
+            }
+            // FINISHING
+            if (migrationFinished === 1) {
+                console.log("Migration: Gifts migrated to new version, but there seems to be a problem with meta-talents. See console/log for further hints. Data version not updated to character sheet version.");
+            } else if (migrationFinished === 2) {
+                console.log("Migration: Meta-talents migrated to new version, but there seems to be a problem with gifts. See console/log for further hints. Data version not updated to character sheet version.");
+            } else if (migrationFinished === 3) {
+                let dataVersionNew = "20190425";
+                setAttrs({ "data_version": dataVersionNew });
+                console.log("Migration: Data version updated to character sheet version (" + dataVersionNew + "). Migration complete.");
+            } else {
+                console.log("Migration: Migration appears to be incomplete. See console/log for further hints. Data version not updated to character sheet version.");
+            }
+        });
     });
 }
 
