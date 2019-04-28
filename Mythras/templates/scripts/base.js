@@ -1779,8 +1779,9 @@
     }
     
     function upgrade_1_9_1_to_2_0() {
-        var newattrs = {};
-        getAttrs(["fatigue", "action_points_swiftness", "damage_mod_mighty", "healing_rate_healthy", "hit_locations_robust", "cult_spirit_limit", "notes", "str_base", "str_training", "str_ageing", "str_other", "str_temp", ], function(v) {
+        getAttrs(["fatigue", "action_points_swiftness", "damage_mod_mighty", "healing_rate_healthy", "hit_locations_robust", "cult_spirit_limit", "notes"], function(v) {
+            var newattrs = {};
+
             // Copy notes to system notes
             if (v.notes) {
                 newattrs["system_notes"] = v.notes;
@@ -1848,7 +1849,7 @@
             if (v.hit_locations_robust) {
                 newattrs["hp_use_pow"] = v.hit_locations_robust;
             }
-            
+
             setAttrs(newattrs);
         });
 
@@ -1955,7 +1956,7 @@
             }
         });
 
-        getSectionIDs("repeating_shield", function(idarray) {
+        getSectionIDs("repeating_shield", function(idarray) {            
             for(var i=0; i < idarray.length; i++) {
                 var id = idarray[i];
 
@@ -2045,7 +2046,13 @@
                     var newrowattrs = {};
 
                     if (v[old_name]) { newrowattrs["repeating_rangedweapon_" + newrowid + "_name"] = v[old_name]; }
-                    if (v[old_damage_mod_toggle]) { newrowattrs["repeating_rangedweapon_" + newrowid + "_damage_mod_toggle"] = v[old_damage_mod_toggle]; }
+                    if (v[old_damage_mod_toggle]) {
+                        if (v[old_damage_mod_toggle] == "@{damage_mod}") {
+                            newrowattrs["repeating_rangedweapon_" + newrowid + "_damage_mod_toggle"] = 1;
+                        } else {
+                            newrowattrs["repeating_rangedweapon_" + newrowid + "_damage_mod_toggle"] = v[old_damage_mod_toggle];
+                        }
+                    }
                     if (v[old_damage]) { newrowattrs["repeating_rangedweapon_" + newrowid + "_damage"] = v[old_damage]; }
                     if (v[old_force]) { newrowattrs["repeating_rangedweapon_" + newrowid + "_force"] = v[old_force]; }
                     if (v[old_range]) { newrowattrs["repeating_rangedweapon_" + newrowid + "_range"] = v[old_range]; }
@@ -2062,6 +2069,55 @@
             }
         });
         
+        // Convert Learned to Sheet workers
+        getAttrs(["arcane_casting_learned", "channel_learned", "fata_learned", "folk_magic_learned", "trance_learned", "exhort_learned", "type"], function(v) {
+            var newvattrs = {};
+
+            if (v.arcane_casting_learned) {
+                if (v.arcane_casting_learned == "@{arcane_casting_base}") {
+                    newattrs["arcane_casting_learned"] = 1;
+                }
+            }
+
+            if (v.channel_learned) {
+                if (v.channel_learned == "@{channel_base}") {
+                    newattrs["channel_learned"] = 1;
+                }
+            }
+
+            if (v.fata_learned) {
+                if (v.fata_learned == "@{fata_base}") {
+                    newattrs["fata_learned"] = 1;
+                }
+            }
+
+            if (v.folk_magic_learned) {
+                if (v.folk_magic_learned == "@{folk_magic_base}") {
+                    newattrs["folk_magic_learned"] = 1;
+                }
+            }
+
+            if (v.trance_learned) {
+                if (v.trance_learned == "@{trance_base}") {
+                    newattrs["trance_learned"] = 1;
+                }
+            }
+
+            if (v.exhort_learned) {
+                if (v.exhort_learned == "@{exhort_base}") {
+                    newattrs["exhort_learned"] = 1;
+                }
+            }
+
+            if (v.type) {
+                if (v.type == "npc") {
+                    newattrs["type"] = "pc";
+                }
+            }
+
+            setAttrs(newvattrs);
+        });
+
         // Recalc Chars
         console.log("recalc fatigue");
         calc_fatigue();
