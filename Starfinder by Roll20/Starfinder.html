@@ -12769,6 +12769,33 @@ Charmancer overall slide template
             var escapeForRegexp = /(\\|\/|\[|\]|\(|\)|\{|\}|\?|\+|\*|\||\.|\^|\$)/g;
             return s.replace(escapeForRegexp, "\\$1");
         },
+        
+        reverseHE = (function() {
+            var entities = {
+                    ['&' + '#42' + ';']:'*',
+                    ['&' + 'amp' + ';']:'&',
+                    ['&' + 'lt' + ';']:'<',
+                    ['&' + 'gt' + ';']:'>',
+                    ['&' + '#39' + ';']:"'",
+                    ['&' + '#64' + ';']:'@',
+                    ['&' + '#123' + ';']:'{',
+                    ['&' + '#124' + ';']:'|',
+                    ['&' + '#125' + ';']:'}',
+                    ['&' + '#44' + ';']:',',
+                    ['&' + '#91' + ';']:'[',
+                    ['&' + '#93' + ';']:']',
+                    ['&' + 'quot' + ';']:'"',
+                    ['&' + '#58' + ';']:':',
+                    ['&' + '#40' + ';']:'(',
+                    ['&' + '#41' + ';']:')'
+                },
+                re = new RegExp('(' + _.map(_.keys(entities), esRE).join('|') + ')', 'g');
+            return function(s) {
+                return s.replace(re, function(c) {
+                    return entities[c] || c;
+                });
+            };
+        }()),
 
         HE = (function() {
             var entities = {
@@ -13016,7 +13043,7 @@ Charmancer overall slide template
                     setObj[bonus.replace(/bonus/,'total')] = `+${setObj[bonus.replace(/bonus/,'total')]}`;
                 }
             });
-            secondSetObj.stackable_buffs = attributes.stackable_buffs.replace(/,Luck/,'');
+            setObj.stackable_buffs = attributes.stackable_buffs.replace(/,Luck/,'');
         },
         
         updateto1554814800 = function(attributes,setObj){
@@ -16276,9 +16303,7 @@ Charmancer overall slide template
             }
             storeInfo(attributes);
             setObj = buildMenus(attributes, setObj); //build the menus
-            setAttrs(setObj, {
-                silent: true
-            });
+            setAttrs(setObj,silent);
         },
 
         dropObjs = {
@@ -16977,8 +17002,8 @@ Charmancer overall slide template
                 bar1_max: setObj.sp_max,
                 bar3_value: setObj.hp,
                 bar3_max: setObj.hp_max,
-                bar2_value: setObj.rp,
-                bar2_max: setObj.rp_max,
+                bar2_value: setObj.rp*1||'',
+                bar2_max: setObj.rp_max*1||'',
                 showname: true,
                 width: squareSize,
                 height: squareSize
@@ -17356,6 +17381,8 @@ Charmancer overall slide template
             });
             setObj[`repeating_item_${itemRowID}_show_options`]=0;
             if(/small|longarm|weapon|grenade/i.test(data.category)){
+                TAS.log(`data:`);
+                TAS.log(data)
                 setObj[`repeating_attack_${weaponRowID}_show_options`]=0;
                 _.each(_.keys(dropObjs.weapon),(attr)=>{
                     setObj[`repeating_attack_${weaponRowID}_${attr}`] = _.reduce(dropObjs.weapon[attr].data,(memo,dataKey)=>{
@@ -17364,6 +17391,9 @@ Charmancer overall slide template
                             iterativeAdd = iterativeAdd*1||dropObjs.weapon[attr].default_value;
                         }else if(dropObjs.weapon[attr].joiner){
                             iterativeAdd+=dropObjs.weapon[attr].joiner;
+                        }
+                        if(typeof dropObjs.weapon[attr.default_value === 'string']){
+                            iterativeAdd = reverseHE(iterativeAdd);
                         }
                         return memo += iterativeAdd;
                     },(typeof dropObjs.weapon[attr].default_value === 'number' ? 0 : ''));
