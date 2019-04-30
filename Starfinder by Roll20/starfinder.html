@@ -16755,38 +16755,8 @@ Charmancer overall slide template
                 },
             },
             ability: {
-                name: {
-                    data: ['name'],
-                    propagates_to: [],
-                    default_adds: [],
-                    default_value: ''
-                },
-                damage_dice: {
-                    data: ['Damage Dice'],
-                    propagates_to: [],
-                    default_adds: [],
-                    default_value: ''
-                },
-                damage_type: {
-                    data: ['Damage Type'],
-                    propagates_to: [],
-                    default_adds: [],
-                    default_value: ''
-                },
-                range: {
-                    data: ['Range'],
-                    propagates_to: [],
-                    default_adds: [],
-                    default_value: ''
-                },
                 mods: {
                     data: ['data-mods'],
-                    propagates_to: [],
-                    default_adds: [],
-                    default_value: ''
-                },
-                description:{
-                    data: ['Description'],
                     propagates_to: [],
                     default_adds: [],
                     default_value: ''
@@ -17125,25 +17095,10 @@ Charmancer overall slide template
                     }
                     TAS.log(`spellBlob for ${obj.name}:`);
                     TAS.log(spellBlob);
-                    if(spellBlob){
-                        spellBlob.name = obj.name;
-                        parseSpellBlob(attributes,spellBlob,'ability',rowID,setObj);
-                    }
-                    TAS.log(`spell like spellBlob created items:`);
-                    TAS.log(
-                        _.reduce(_.keys(setObj),(m,k)=>{
-                            if(new RegExp(rowID).test(k)){
-                                m[k] = setObj[k];
-                            }
-                            return m;
-                        },{})
-                    )
                     setObj[`repeating_ability_${rowID}_name`] = obj.name;
                     setObj[`repeating_ability_${rowID}_show_options`]=0;
                     setObj[`repeating_ability_${rowID}_dc_base`]=obj.dc||10;
                     setObj[`repeating_ability_${rowID}_dc`]=obj.dc||10;
-                    setObj[`repeating_ability_${rowID}_level`]=obj.level||0;
-                    setObj[`repeating_ability_${rowID}_type`]='SP';
                     setObj[`repeating_ability_${rowID}_save_type`]=(obj['save type']||'save').toLowerCase().replace(/(will|fort|ref)(?:lex|itude)/g,'$1-save');
                     setObj[`repeating_ability_${rowID}_duration`]=obj.duration||'';
                     setObj[`repeating_ability_${rowID}_frequency`]=(obj.frequency||'').toLowerCase();
@@ -17159,6 +17114,27 @@ Charmancer overall slide template
                     if(obj.dc){
                         setObj[`repeating_ability_${rowID}_save_checkbox`]=1;
                     }
+                    if(spellBlob){
+                        spellBlob.name = obj.name;
+                        parseSpellBlob(attributes,spellBlob,'ability',rowID,setObj);
+                    }
+                    TAS.log(`spell like spellBlob created items:`);
+                    TAS.log(
+                        _.reduce(_.keys(setObj),(m,k)=>{
+                            if(new RegExp(rowID).test(k)){
+                                m[k] = setObj[k];
+                            }
+                            return m;
+                        },{})
+                    );
+                    if(spellBlob.Classes){
+                        spellBlob.Classes.replace(/[a-z\s]+\s+(\d+)(?:,[a-z\s]+\s+(\d+))?/,(match,level1,level2)=>{
+                            setObj[`repeating_ability_${rowID}_level`] = _.max([level1,level2]);
+                        })
+                    }else{
+                        setObj[`repeating_ability_${rowID}_level`]=obj.level||0;
+                    }
+                    setObj[`repeating_ability_${rowID}_type`]='SP';
                 });
             }
             //Ability parsing
@@ -17315,7 +17291,7 @@ Charmancer overall slide template
                         setObj[`repeating_${currentCat}_${rowID}_source`] = sourceClass||'';
                     }else if(attr==='save_type' && levelBlob[dataKey]){
                         setObj[`repeating_${currentCat}_${rowID}_save_checkbox`]=1;
-                    }else if(attr==='')
+                    }
                     if(typeof dropObjs[`${currentCat}`][attr].default_value ==='number'){
                         iterativeAdd = iterativeAdd*1||dropObjs[`${currentCat}`][attr].default_value;
                     }else if(dropObjs[`${currentCat}`][attr].joiner){
@@ -17330,7 +17306,7 @@ Charmancer overall slide template
                         });
                     }
                     if(dropObjs[`${currentCat}`][attr].translator){
-                        setObj[`repeating_${currentCat}_${rowID}_${attr}`]=dropObjs[`${currentCat}`][attr].translator[setObj[`repeating_spell_${rowID}_${attr}`]]||iterativeAdd.toUpperCase();
+                        iterativeAdd=dropObjs[`${currentCat}`][attr].translator[iterativeAdd]||iterativeAdd.toUpperCase();
                     }
                     return memo += iterativeAdd;
                 },(typeof dropObjs[`${currentCat}`][attr].default_value === 'number' ? 0 : ''));
@@ -17357,7 +17333,7 @@ Charmancer overall slide template
             if(/^yes$/i.test(levelBlob['Spell Resistance'])){
                 setObj[`repeating_${currentCat}_${rowID}_spell_resistance`]='yes';
             }
-            if(currentCat === 'ability'){
+            if(currentCat === 'ability' && levelBlob.Category === 'Feat'){
                 setObj[`repeating_${currentCat}_${rowID}_source`]='Feat';
             }
             setObj[`repeating_${currentCat}_${rowID}_id`]=rowID;
@@ -17543,8 +17519,6 @@ Charmancer overall slide template
             on(`clicked:class_${[1,2,3,4,5].join(' clicked:class_')}`,viewClass);
             on(`mancerchange:class_${[1,2,3,4,5].join(' mancerchange:class_')} mancerchange:class_level_${[1,2,3,4,5].join(' mancerchange:class_level_')}`,classSelected);
         },
-        
-        
         
         loadSlide = function(event){
             const data = getMancerData(),
@@ -18319,6 +18293,7 @@ Charmancer overall slide template
                 Feats:'Feat'
             },
         };*/
+        Object.assign(dropObjs.ability,dropObjs.spell);
         _.each([1,2,3,4,5],(num)=>{
             mancerObjs[`classDrops${num}`]=[];
             _.each(mancerObjs.classDrops,(drop)=>{
