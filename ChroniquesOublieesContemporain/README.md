@@ -9,9 +9,36 @@ Cette feuilles de personnage inclut quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](http://www.black-book-editions.fr/produit.php?id=4349).
 
 # Version courante
-2.4 [Screenshot](coc_v2.png)
+2.6 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v2.6 (2019-04-17)
+### Fiche de PJ
+
+* Possibilité d'appliquer plusieurs états préjudiciables en même temps
+* Gestion de l'encombrement (idem COF)
+* Ajout d'un champ de texte sous la liste d'attaques pour les buffs "temporaires"
+ * Possibilité d'indiquer des buffs aux jets d'attaque et de dommages en langage quasi-naturel : le premier mot est le type d'attaque concernée, le deuxième est le modificateur (avec possibilité de référencer un autre attribut de la fiche en l'encadrant entre crochets []) et à partir du troisième, la description du buff.
+ * Indiquer ATC (contact), ATD (distance), MAG (att. magique), MEN (att. mentale), pour les types d'attaques, ATT pour toutes les attaques existantes. Indiquer d'abord DM pour un buff aux dommages
+ * Plusieurs buffs peuvent être indiqués et séparés par un point-virgule (;)
+ * Exemple : `DM ATC +2d6 Attaque en traître ; ATD +[PER] Visée`
+ * Il est nécessaire de cliquer en dehors du champ de saisie AVANT de presser un bouton d'attaque afin que le script sheet-worker approprié puisse s'exécuter.
+* Ajout d'un bouton "Recycle" sur l'onglet Configuration pour forcer la fiche à recalculer quelques attributs (rangs atteints dans chaque voie, statbloc interne, encombrement)
+
+### Fiche de PNJ
+
+* Ajout Réduction de DM (RD)
+* Ajout d'une liste de capacités / traits
+* Amélioration du script d'import de statblock
+* Ajout d'un script de conversion d'attributs PNJ => PJ
+
+## v2.5 (2019-02-12)
+* Gestion des buffs en langage naturel avec référence aux caracs ou voies/rangs
+* Réorganisation des lignes d'attaque (PJ et PNJ), gestion des DM secondaires sur la fiche PJ, actions limitées
+* Réorganisation des lignes de jets de capacités
+* Réorganisation du roll template
+* Refactorisation de code dans les sheetworkers
 
 ## v2.4 (2019-01-01)
 * Fiche de personnage avec sélection du type par dropdown (PJ, PNJ ou Véhicule)

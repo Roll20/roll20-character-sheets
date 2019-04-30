@@ -7316,6 +7316,7 @@
                 update["npc_legendary_actions"] = 1;
                 if(page.data["Legendary Actions Desc"]) {
                     update["npc_legendary_actions_desc"] = page.data["Legendary Actions Desc"];
+
                 }
                 else if(currentData.npc_legendary_actions > 0){
                     update["npc_legendary_actions_desc"] = `The ${page.name} can take ${currentData.npc_legendary_actions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
@@ -7324,9 +7325,15 @@
                     update["npc_legendary_actions_desc"] = "";
                 }
             }
-            else if(contentarray && contentarray.indexOf("Legendary Actions") > -1) {
-                if(contentarray.indexOf(/\n Legendary Actions\n/) > -1) {
-                    temp = contentarray.split(/\n Legendary Actions\n/)
+                else if(contentarray && contentarray.indexOf("Legendary Actions") > -1) {
+                    if(contentarray.indexOf(/\n Legendary Actions\n/) > -1) {
+                        temp = contentarray.split(/\n Legendary Actions\n/)
+                    }
+                    else {
+                        temp = contentarray.split(/Legendary Actions\n/)
+                    }
+                    var legendaryactionsarray = temp[1];
+                    contentarray = temp[0];
                 }
                 else {
                     temp = contentarray.split(/Legendary Actions\n/)
@@ -7600,8 +7607,25 @@
                             if(desc.indexOf(" Weapon Attack:") > -1) {
                                 attacktype = desc.split(" Weapon Attack:")[0];
                             }
-                            else if(desc.indexOf(" Spell Attack:") > -1) {
-                                attacktype = desc.split(" Spell Attack:")[0];
+                        });
+                    }
+                    else {
+                        var numlegendaryactions = (legendaryactionsarray.match(/\d+/) || [""])[0];
+                        update["npc_legendary_actions"] = numlegendaryactions;
+						update["npc_legendary_actions_desc"] = `The ${page.name} can take ${numlegendaryactions}, choosing from the options below. Only one legendary option can be used at a time and only at the end of another creature's turn. The ${page.name} regains spent legendary actions at the start of its turn.`;
+                        legendaryactionsarray = legendaryactionsarray.split("**");
+                        legendaryactionsarray.shift();
+                        var actionsobj = {};
+                        legendaryactionsarray.forEach(function(val, i) {
+                            if (i % 2 === 1) return;
+                            actionsobj[val] = legendaryactionsarray[i + 1];
+                        });
+                        _.each(actionsobj, function(desc, name) {
+                            newrowid = generateRowID();
+                            update["repeating_npcaction-l_" + newrowid + "_npc_options-flag"] = "0";
+                            update["repeating_npcaction-l_" + newrowid + "_name"] = name;
+                            if(desc.substring(0,2) === ": " || encodeURI(desc.substring(0,2)) === ":%C2%A0") {
+                                desc = desc.substring(2);
                             }
                             else {
                                 console.log("FAILED TO IMPORT ATTACK - NO ATTACK TYPE FOUND (Weapon Attack/Spell Attack)");
