@@ -1,4 +1,4 @@
-<input type='hidden' name='attr_character_sheet' value='Savage Worlds Tabbed v3.3' />
+<input type='hidden' name='attr_character_sheet' value='Savage Worlds Tabbed v3.4' />
 <script type="text/worker">
     /*----- Things I need to Care For -----
     -- o Option to ignore encumbrance    --
@@ -106,11 +106,18 @@
 							let tRank = '1d'+v[`${fieldArray[i]}`]+'!';
 							let tDisplay = 'd'+v[`${fieldArray[i]}`];
 							let intMod = v[`${fieldModArray[i]}`];
-							if (intMod !== "0") {
-							    console.log(`==== ${repeatingField} intMod (should not be 0): ${intMod} ====`);
+                            intMod = parseInt(intMod)||0;
+							if (intMod > 0) {
+							    console.log(`==== ${repeatingField} intMod (should not be > 0): ${intMod} ====`);
 								tRank += '+'+intMod+'['+getfields[1]+']';
 								tDisplay += '+' + intMod;
 							}
+                            else if(intMod < 0) {
+                                console.log(`==== ${repeatingField} intMod (should not be < 0): ${intMod} ====`);
+								tRank += intMod+'['+getfields[1]+']';
+								tDisplay += intMod;
+                            }
+                            else { console.log("Mod is 0, so don't need to do anything");}
 							console.log("++++ Creating: "+sAttrRank+": "+tRank+" ++++");
 							console.log("++++ Creating: "+sAttrDisplay+": "+tDisplay+" ++++");
 							sattrs[sAttrRank]=tRank;
@@ -130,10 +137,16 @@
 	            let tRank = '1d'+v[field]+'!';
 	            let tDisplay = 'd'+v[field];
 	            let intMod = v[`${field}mod`];
-	            if(intMod !== "0") {
+                intMod = parseInt(intMod)||0;
+	            if(intMod > 0) {
     				tRank += '+'+intMod+'['+field+']';
     				tDisplay += '+' + intMod;
     			}
+                else if(intMod < 0) {
+                    tRank += intMod+'['+field+']';
+    				tDisplay += intMod;
+                }
+                else { console.log("Mod is 0, so don't need to do anything");}
 	            const sAttRank = field + '_rank', sAttDisplay = field + '_display';
     			sattrs[sAttRank]=tRank;
     			sattrs[sAttDisplay]=tDisplay;
@@ -637,6 +650,29 @@
     	           rankNdisplay(otraits);
     	        });
 	        });
+        }
+        if (version < 3.4) {
+            //Need to update all derived stats to now use Sheetworkers
+	        setWildDie(); //set wdNum
+	        console.log("!!!! Setting WoundsMod !!!!");
+	        setWoundsMod("silent"); //set wounds
+	        setModSums(); //various mods variables used in sheet rolls, etc
+	        baseToughness();
+	        setToughness();
+	        setNToughness();
+	        setPace(); //set pace
+	        setCharisma(); //set charisma
+	        setAcademics();
+	        setSanity();
+	        setFame();
+	        setReason();
+	        setStatus();
+	        setGlory();
+	        setFirewall();
+	        setGrit();
+	        setCorruption();
+	        setStreetCred();
+	        setStrain();
         }
 		else {
 	        console.log("!!! Sheet Already Upgraded !!!");
@@ -1143,18 +1179,27 @@
 	});
 
 	const setPace = function() {
-	    getAttrs(["pace", "paceMod"], function(pvalue) {
+	    getAttrs(["pace", "paceMod", "woundsMod", "paceignoreswounds"], function(pvalue) {
 			console.log("pace value: " + pvalue.pace);
 			console.log("mod value: " + pvalue.paceMod);
 			let pace_base = parseInt(pvalue.pace) || 0;
 			let pace_mod = parseInt(pvalue.paceMod) || 0;
-            let totPace = pace_base + pace_mod;
+            let wound_mod = parseInt(pvalue.woundsMod) || 0;
+            let totPace = 0;
+            if (pvalue.paceignoreswounds === "on") {
+                totPace = pace_base + pace_mod;
+            }
+            else {
+                totPace = pace_base + pace_mod - wound_mod;
+            }
+
+            if (totPace < 1) { totPace = 1;}
       		setAttrs({ paceCur: totPace  });
    		});
 	}
 
 	//Set Pace
-	on("change:pace change:pacemod", function() {
+	on("change:pace change:pacemod change:woundsmod change:paceignoreswounds", function() {
 		setPace();
 	});
 
@@ -1170,7 +1215,7 @@
 	}
 
 	//Set charisma
-	on("change:charisma change:charismamod", function() {
+	on("change:charisma change:charismamod change:usecharisma", function() {
 		setCharisma();
 	});
 
@@ -1186,7 +1231,7 @@
 	}
 
 	//Set Fame
-	on("change:fame change:famemod", function() {
+	on("change:fame change:famemod change:potsmFame", function() {
 		setFame();
 	});
 
@@ -1202,7 +1247,7 @@
 	}
 
 	//Set Academics
-	on("change:academics change:academicsmod", function() {
+	on("change:academics change:academicsmod change:change:useacademics", function() {
 		setAcademics();
 	});
 
@@ -1216,12 +1261,15 @@
 			let sanity_mod = parseInt(pvalue.sanityMod) || 0;
 			let totSpirit = spirit + sp_mod;
             let sanity_value = Math.floor(totSpirit/2) + 2;
-      		setAttrs({ sanityCur: sanity_value + sanity_mod  });
+      		setAttrs({
+                sanity: sanity_value,
+                sanityCur: sanity_value + sanity_mod
+            });
    		});
 	}
 
 	//Set Sanity
-	on("change:spirit change:spiritmod change:sanitymod", function() {
+	on("change:spirit change:spiritmod change:sanitymod change:tdsanity", function() {
 		setSanity();
 	});
 
@@ -1237,7 +1285,7 @@
 	}
 
 	//Set Reason
-	on("change:reason change:reasonmod", function() {
+	on("change:reason change:reasonmod change:ripreason", function() {
 		setReason();
 	});
 
@@ -1253,7 +1301,7 @@
 	}
 
 	//Set Status
-	on("change:status change:statusmod", function() {
+	on("change:status change:statusmod change:ripstatus", function() {
 		setStatus();
 	});
 
@@ -1269,7 +1317,7 @@
 	}
 
 	//Set Glory
-	on("change:glory change:glorymod", function() {
+	on("change:glory change:glorymod change:hfglory", function() {
 		setGlory();
 	});
 
@@ -1285,7 +1333,7 @@
 	}
 
 	//Set Firewall
-	on("change:firewall change:firewallmod", function() {
+	on("change:firewall change:firewallmod change:izfirewall", function() {
 		setFirewall();
 	});
 
@@ -1302,7 +1350,7 @@
 	}
 
 	//Set grit
-	on("change:rank change:gritmod", function() {
+	on("change:rank change:gritmod change:dlgrit", function() {
 		setGrit();
 	});
 
@@ -1318,7 +1366,7 @@
 	}
 
 	//Set Corruption
-	on("change:corruptionstat change:corruptionmod", function() {
+	on("change:corruptionstat change:corruptionmod change:corruption", function() {
 		setCorruption();
 	});
 
@@ -1336,7 +1384,7 @@
 	}
 
 	//Set street cred
-	on("change:rank change:streetcredmod", function() {
+	on("change:rank change:streetcredmod change:izstreetcred", function() {
 		setStreetCred();
 	});
 
@@ -1345,7 +1393,7 @@
 	}
 
 	// Calculate Strain
-	on('change:repeating_augmentation remove:repeating_augmentation',function(){
+	on('change:repeating_augmentation remove:repeating_augmentation change:izstrain',function(){
 		calcStrain();
 	});
 
@@ -2093,10 +2141,18 @@
 	            let tRank = '1d'+v[trait]+'!';
 	            let tDisplay = 'd'+v[trait];
 	            let intMod = v[`${trait}mod`];
-	            if(intMod !== "0") {
+                intMod = parseInt(intMod)||0;
+	            if(intMod > 0) {
+                    console.log("Mod is > 0...use +");
     				tRank += '+'+intMod+'[trait]';
     				tDisplay += '+' + intMod;
     			}
+                else if(intMod < 0) {
+                    console.log("Mod is < 0...use +");
+    				tRank += intMod+'[trait]';
+    				tDisplay += intMod;
+                }
+                else {console.log("Mod is 0...don't do anything");}
 	            const sAttRank = trait + '_rank', sAttDisplay = trait + '_display';
     			const sattrs = {};
     			sattrs[sAttRank]=tRank;
@@ -2506,6 +2562,25 @@
 		})
 	});
 
+    on("clicked:hideadvance", function() {
+        let hideval = "0";
+        let icon = "J";
+        getAttrs(["hideAdv"], function(v) {
+            if (v.hideAdv === "on") {
+                console.log("was hidden, but shouldn't be now");
+            }
+            else {
+                console.log("wasn't hidden, but needs to be...");
+                hideval = "on";
+                icon = "E";
+            }
+            setAttrs({
+                hideAdv: hideval,
+                journaladvancehideicon: icon
+            });
+        });
+    });
+
 	console.log("Make sure Skill Names have been set");
 	const skillnamelist = ["fighting","academics","athletics","battle","boating","climbing","common-knowledge","driving","electronics","faith","focus","gambling","guts","hacking","healing","intimidation","investigation","native-language","lockpicking","notice","occult","performance","persuasion","piloting","psionics","repair","research","riding","ritual","science","shooting","spellcasting","stealth","streetwise","survival","swimming","taunt","thievery","throwing","tracking","weirdscience"];
 	skillnamelist.forEach(skillnamelist => {
@@ -2605,9 +2680,401 @@
         }
     });
 
+    const buttonlist = ["characterprofile1","vehicletab3","journaltab4","configurationtab2","releasetab5","documentationtab6"];
+    buttonlist.forEach(buttonlist => {
+        on(`clicked:${buttonlist}`, function() {
+            console.log(`${buttonlist} button was clicked!!`);
+            let radioval = `${buttonlist}`;
+            radioval = radioval.slice(-1);
+            console.log(`Value for Radio Button is: ${radioval}`);
+            setAttrs({ sheetTab: radioval });
+        });
+    });
+
+    /*****************************
+	* Skill Block functions
+	*****************************/
+    on("sheet:opened", function() {
+        getAttrs(["initstatblock","initdesc","initskills","initderived","initgear","initspecabilities","initpowers"], function(v) {
+            if(v.initstatblock === "0") {
+                //stat block isn't fully initialized
+                console.log("⚠⚠ Stat Block Not Initilized...create it ⚠⚠");
+                if(v.initdesc === "0") {
+                    console.log("⚠⚠ Character Description Not Initilized...create it ⚠⚠");
+                    descStatBlock();
+                    setAttrs({initdesc: "1"});
+                }
+                if(v.initskills === "0") {
+                    console.log("⚠⚠ Character Skills Not Initilized...create them ⚠⚠");
+                    skillsStatBlock();
+                    setAttrs({initskills: "1"});
+                }
+                if(v.initderived === "0") {
+                    console.log("⚠⚠ Character Derived Stats Not Initilized...create them ⚠⚠");
+                    derivedStatBlock();
+                    setAttrs({initderived: "1"});
+                }
+                if(v.initgear === "0") {
+                    console.log("⚠⚠ Character Gear Not Initilized...create them ⚠⚠");
+                    gearStatBlock();
+                    setAttrs({initgear: "1"});
+                }
+                if(v.initspecabilities === "0") {
+                    console.log("⚠⚠ Character Hindranes, Edges, and Spec Abilities Not Initilized...create them ⚠⚠");
+                    specabilityStatBlock();
+                    setAttrs({
+                        inithindrances: "1",
+                        initsbedges: "1",
+                        initspecabilities: "1"
+                    });
+                }
+            }
+        });
+    });
+
+    const descStatBlock = function() {
+        let chardesc = "{{name=@{character_name}}}";
+        getAttrs(["is_npc","physdescription"], function(v) {
+            if(v.is_npc === "0") {
+                //is Wild Card
+                chardesc +=" {{wci=@{WCI}}}";
+            }
+            let physdesc = v.physdescription;
+            console.log("Description length: "+physdesc.length);
+            if(physdesc.length > 0) {
+                chardesc += " {{description=@{physdescription}}}"
+            }
+            setAttrs({chardesc: chardesc});
+        });
+    }
+
+    on("change:is_npc change:physdescription", function() {
+        descStatBlock();
+    });
+
+    const skillstatlist = ["academics","athletics","battle","boating","climbing","common-knowledge","driving","electronics","faith","fighting","focus","gambling","guts","hacking","healing","intimidation","investigation","native-language","lockpicking","notice","occult","performance","persuasion","piloting","psionics","repair","research","riding","ritual","science","shooting","spellcasting","stealth","streetwise","survival","swimming","taunt","thievery","throwing","tracking","weirdscience"];
+    const staticlist = ["staticAcademics","staticAthletics","staticBattle","staticBoating","staticClimbing","staticCommonKnowledge","staticDriving","staticElectronics","staticFaith","staticFighting","staticFocus","staticGambling","staticGuts","staticHacking","staticHealing","staticIntimidation","staticInvestigation","staticLanguage","staticLockpicking","staticNotice","staticOccult","staticPerformance","staticPersuasion","staticPiloting","staticPsionics","staticRepair","staticResearch","staticRiding","staticRitual","staticScience","staticShooting","staticSpellcasting","staticStealth","staticStreetwise","staticSurvival","staticSwimming","staticTaunt","staticThievery","staticThrowing","staticTracking","staticWeirdScience"]
+    const skillsStatBlock = function() {
+        console.log("skilllist length: "+skillstatlist.length+" staticlist length: "+staticlist.length);
+        getAttrs(staticlist, function(v) {
+            let charskills = '';
+            for(let i = 0; i < staticlist.length; i++) {
+                //cycle through the array
+                if (staticlist[i] === "staticFighting" || staticlist[i] === "staticAcademics" || staticlist[i] === "staticCommonKnowledge" || staticlist[i] === "staticLanguage") {
+                    switch(staticlist[i]) {
+                        case 'staticFighting':
+                            if(charskills.length < 1) {
+                                //no skills added to the list yet
+                                charskills = "[@{fightingname} @{fighting_display}](~tFightingRoll)";
+                            }
+                            else {
+                                charskills += ", [@{fightingname} @{fighting_display}](~tFightingRoll)";
+                            }
+                            break;
+                        case 'staticAcademics':
+                            if(v[staticlist[i]] != "0") {
+                                if(charskills.length < 1) {
+                                    //no skills added to the list yet
+                                    charskills = "[@{academicsname} @{academicsskill_display}](~tAcademicsRoll)";
+                                }
+                                else {
+                                    charskills += ", [@{academicsname} @{academicsskill_display}](~tAcademicsRoll)";
+                                }
+                            }
+                            break;
+                        case 'staticCommonKnowledge':
+                            if(v[staticlist[i]] != "0") {
+                                if(charskills.length < 1) {
+                                    //no skills added to the list yet
+                                    charskills = "[@{common-knowledgename} @{commonknowledge_display}](~tCommonKnowledgeRoll)";
+                                }
+                                else {
+                                    charskills += ", [@{common-knowledgename} @{commonknowledge_display}](~tCommonKnowledgeRoll)";
+                                }
+                            }
+                            break;
+                        case 'staticLanguage':
+                            if(v[staticlist[i]] != "0") {
+                                if(charskills.length < 1) {
+                                    //no skills added to the list yet
+                                    charskills = "[@{native-languagename} @{language_display}](~tLanguageRoll)";
+                                }
+                                else {
+                                    charskills += ", [@{native-languagename} @{language_display}](~tLanguageRoll)";
+                                }
+                            }
+                            break;
+                        default:
+                            console.log("Nothing to report");
+                    }
+                }
+                else if(v[staticlist[i]] != "0") {
+                    //skill is turned on
+                    let skillname = staticlist[i];
+                    let uskillname = staticlist[i];
+                    skillname = skillname.replace('static','');
+                    uskillname = uskillname.replace('static','');
+                    skillname = skillname.toLowerCase();
+                    if(charskills.length < 1) {
+                        //no skills added to the list yet
+                        charskills = `[@{${skillname}name} @{${skillname}_display}](~t${uskillname}Roll)`;
+                    }
+                    else {
+                        charskills += `, [@{${skillname}name} @{${skillname}_display}](~t${uskillname}Roll)`;
+                    }
+                }
+                else {
+                    console.log(staticlist[i]+" isn't a shown character skill");
+                }
+            }
+            //Need to do custom skill
+            getSectionIDs("repeating_skills", function(idArray) {
+                for (a = 0; a < idArray.length; a++) {
+                    if(charskills.length < 1) {
+                        charskills = `[@{repeating_skills_${idArray[a]}_SkillName} @{repeating_skills_${idArray[a]}_skillnamerank_display}](~repeating_skills_${idArray[a]}_tSkillRoll)`;
+                    }
+                    else {
+                        charskills += `, [@{repeating_skills_${idArray[a]}_SkillName} @{repeating_skills_${idArray[a]}_skillnamerank_display}](~repeating_skills_${idArray[a]}_tSkillRoll)`;
+                    }
+                }
+                setAttrs({ charskills: charskills });
+            });
+        });
+    }
+
+    staticlist.forEach(staticlist => {
+        on(`change:${staticlist} change:repeating_skills remove:repeating_skills`, function() {
+            skillsStatBlock();
+        })
+    });
+
+    const derivedstats = ["usecharisma","useacademics","Corruption","potsmFame","izFirewall","hfGlory","DLGrit","neuraltoughness","ripReason","tdsanity","ripStatus","izStrain","izStreetCred"];
+    const derivedlabels = ["Charisma","Academics","Corruption","Fame","Firewall","Glory","Grit","Neural Toughness","Reason","Sanity","Status","Strain","Street Cred"];
+    const derivedcurfields = ["@{charismaCur}","@{academicsCur}","@{corruptionCur}","@{fameCur}","@{FirewallCur}","@{gloryCur}","@{gritCur}","@{ntoughnesscur}","@{reasonCur}","@{sanityCur}","@{statusCur}","@{StrainCur}","@{StreetCredCur}"];
+    const derivedStatBlock = function() {
+        const toughnessstats = ["toughnessArmor","ntoughnessArmor"];
+        let valuelist = derivedstats.concat(toughnessstats);
+        let charderived = "[**^{pace}:** @{paceCur}](~RunningRoll); **^{parry}:** @{parryCur}; **^{toughness}:** @{toughnesscur}";
+        let dstat = '';
+        getAttrs(valuelist, function(v) {
+            if(v.toughnessArmor != "0") {
+                charderived += "(@{toughnessArmor})";
+            }
+            for(a=0; a < derivedstats.length; a++) {
+                dstat = v[derivedstats[a]];
+                dstatlab = derivedlabels[a];
+                console.log(`^^^ ${dstatlab}: ${dstat} ^^^`);
+                if(dstat != "0") {
+                    charderived += `; **${derivedlabels[a]}:** ${derivedcurfields[a]}`;
+                    if(dstatlab === "Neural Toughness") {
+                        console.log("Derived Stat: " + derivedstats[a]);
+                        //add armor
+                        charderived += `(@{ntoughnessArmor})`;
+                    }
+                }
+                else { console.log("Not needed for stat block");}
+            }
+            setAttrs({charderived: charderived});
+        });
+    }
+
+    on("change:toughnessarmor change:ntoughnessarmor change:usecharisma change:useacademics change:corruption change:potsmfame change:izfirewall change:hfglory change:dlgrit change:neuraltoughness change:ripreason change:tdsanity change:ripstatus change:izstrain change:izstreetcred", function() {
+        derivedStatBlock();
+    });
+
+    const gearStatBlock = function() {
+        //Includes Armor, Weapons, Gear
+        console.log("Started gearStatBlock");
+        let chargear = '';
+        let gearvals = [];
+        let armorrows = [];
+        let weaponrows = [];
+        getSectionIDs(["armor"], function(armoridArray) {
+            console.log("Got Armor Section IDs");
+            for(a=0; a<armoridArray.length; a++) {
+                gearvals[gearvals.length] = `repeating_armor_${armoridArray[a]}_armorWorn`;
+                armorrows[armorrows.length] = `repeating_armor_${armoridArray[a]}_`;
+                weaponrows[weaponrows.length] = 'empty';
+            }
+            console.log("Armor ID Array: "+armoridArray);
+            getSectionIDs(["weapons"], function(weaponidArray) {
+                console.log("Got Weapon Section IDs");
+                console.log("Armor ID Array (again): "+armoridArray);
+                console.log("Weapon ID Array: "+weaponidArray);
+                for(b=0; b<weaponidArray.length; b++) {
+                    gearvals[gearvals.length] = `repeating_weapons_${weaponidArray[b]}_weaponcarried`;
+                    weaponrows[weaponrows.length] = `repeating_weapons_${weaponidArray[b]}_`;
+                }
+                getSectionIDs(["gear"], function(gearidArray) {
+                    console.log("Got Gear Section IDs");
+                    console.log("gearvals: "+gearvals);
+                    console.log("Armor ID Array (again x2): "+armoridArray);
+                    console.log("Weapon ID Array (again): "+weaponidArray);
+                    console.log("Gear ID Array: "+gearidArray);
+                    getAttrs(gearvals, function(v) {
+                        console.log("Got Armor and Weapon Values");
+                        for(c=0; c<gearvals.length; c++) {
+                            console.log("Cycling through Armor and Weapons: "+c);
+                            if(c < armoridArray.length) {
+                                //getting Armor
+                                let worn = gearvals[c];
+                                console.log("⍚⍚⍚ Worn: "+worn+" ⍚⍚⍚");
+                                console.log("worn value: "+v[worn]);
+                                if (v[worn] !== "0") {
+                                    console.log("Armor is Worn");
+                                    if (chargear.length < 1) {
+                                        //First Item in List
+                                        chargear = `@{${armorrows[c]}ArmorType} (+@{${armorrows[c]}ArmorTypeProtection})`;
+                                    }
+                                    else {
+                                        //not first item in list
+                                        chargear += `, @{${armorrows[c]}ArmorType} (+@{${armorrows[c]}ArmorTypeProtection})`;
+                                    }
+                                }
+                                else { console.log("Armor is NOT Worn"); }
+                            }
+                            else {
+                                //getting weapons
+                                let carried = gearvals[c];
+                                console.log("⍚⍚⍚ carried: "+carried+" ⍚⍚⍚");
+                                if (v[carried] !== "0") {
+                                    console.log("Weapons is Carried");
+                                    if (chargear.length < 1) {
+                                        //First Item in List
+                                        chargear = `[@{${weaponrows[c]}weapon} (@{${weaponrows[c]}weapondamage})](~${weaponrows[c]}tWeapon)`;
+                                    }
+                                    else {
+                                        //not first item in list
+                                        chargear += `, [@{${weaponrows[c]}weapon} (@{${weaponrows[c]}weapondamage})](~${weaponrows[c]}tWeapon)`;
+                                    }
+                                }
+                                else { console.log("Weapon is NOT Carried"); }
+                            }
+                        }
+                        for(d=0; d<gearidArray.length; d++) {
+                            if (chargear.length < 1) {
+                                //First Item in List
+                                chargear = `@{repeating_gear_${gearidArray[d]}_item}`;
+                            }
+                            else {
+                                //not first item in list
+                                chargear += `, @{repeating_gear_${gearidArray[d]}_item}`;
+                            }
+                        }
+                        setAttrs({ chargear: chargear });
+                    });
+                });
+            });
+        });
+    }
+
+    on("change:repeating_armor change:repeating_weapons change:repeating_gear remove:repeating_armor remove:repeating_weapons remove:repeating_gear", function() {
+        gearStatBlock();
+    })
+
+    const specabilityStatBlock = function() {
+        let charhindrances = '';
+        let charedges = '';
+        let charspecabilities = '';
+        let abilityvals = [];
+        let hindrancerow = [];
+        let edgerow = [];
+        getSectionIDs("repeating_hindrances", function(hindranceidArray) {
+            for(a=0; a<hindranceidArray.length; a++) {
+                abilityvals[abilityvals.length] = `repeating_hindrances_${hindranceidArray[a]}_hindranceType`;
+                hindrancerow[hindrancerow.length] = `repeating_hindrances_${hindranceidArray[a]}_`;
+                edgerow[edgerow.length] = "empty";
+            }
+            getSectionIDs("repeating_edges", function(edgeidArray) {
+                for(b=0; b<edgeidArray.length; b++) {
+                    abilityvals[abilityvals.length] = `repeating_edges_${edgeidArray[b]}_tookat`;
+                    edgerow[edgerow.length] = `repeating_edges_${edgeidArray[b]}_`;
+                }
+                getAttrs(abilityvals, function(v) {
+                    for(c=0; c<abilityvals.length; c++) {
+                        let evalval = '';
+                        if (c < hindrancerow.length) {
+                            console.log("Found a Hindrance for Evaluation");
+                            evalval = hindrancerow[c]+"hindranceType";
+                            let speccheck = v[evalval];
+                            console.log("Spec Check: "+speccheck);
+                            speccheck = speccheck.toLowerCase();
+                            console.log("Spec Check: "+speccheck);
+                            if (speccheck === "racial") {
+                                //Special ability
+                                charspecabilities += `<li>**@{${hindrancerow[c]}hindrance}:** @{${hindrancerow[c]}hindrancedescription}</li>`
+                            }
+                            else {
+                                //hindrance
+                                if (charhindrances.length < 1) {
+                                    charhindrances = `[@{${hindrancerow[c]}hindrance}](~${hindrancerow[c]}tHindrance)`;
+                                }
+                                else {
+                                    charhindrances += `, [@{${hindrancerow[c]}hindrance}](~${hindrancerow[c]}tHindrance)`;
+                                }
+                            }
+                        }
+                        else {
+                            console.log("Found an Edge for evaluation");
+                            evalval = edgerow[c]+"tookat";
+                            if (v[evalval].toLowerCase() === "racial") {
+                                //Special ability
+                                charspecabilities += `<li>**@{${edgerow[c]}edge}:** @{${edgerow[c]}edgedescription}</li>`
+                            }
+                            else {
+                                //edge
+                                if (charedges.length > 0) {
+                                    charedges += `, `;
+                                }
+                                charedges += `[@{${edgerow[c]}edge}](~${edgerow[c]}tEdge)`;
+                            }
+                        }
+                    }
+                    let salength = charspecabilities.length;
+                    let showspec = 0;
+                    if (salength > 0) {
+                        showspec = `{{showspec=[[1d0+${salength}]]}}`;
+                    }
+                    if (charhindrances.length < 1) { charhindrances = "&mdash;"; }
+                    if (charedges.length < 1) { charedges = "&mdash;"; }
+                    setAttrs({
+                        charhindrances: charhindrances,
+                        charedges: charedges,
+                        showspec: showspec,
+                        charspecabilities: charspecabilities
+                    });
+                });
+            });
+        });
+    }
+
+    on("change:repeating_hindrances change:repeating_edges remove:repeating_hindrances remove:repeating_edges", function() {
+        specabilityStatBlock();
+    });
+    //End Statblock stuff
+
 </script>
 <input type='hidden' name='attr_dopay' value="init" />
 <input type='text' style='display: none;' name='attr_wdNum' value='1' />
+<!-- Stat Block Fields -->
+<input type="hidden" name="attr_initstatblock" value="0" />
+<input type="hidden" name="attr_initdesc" value="0" />
+<input type="hidden" name="attr_chardesc" value="{{name=@{character_name}}}" />
+<input type="hidden" name="attr_charatts" value="[^{agility} @{agility_display}](~tAgilityRoll), [^{smarts} @{smarts_display}](~tSmartRoll), [^{spirit} @{spirit_display}](~tSpirRoll), [^{strength} @{strength_display}](~tStrengthRoll), [^{vigor} @{vigor_display}](~tVigorRoll)" />
+<input type="hidden" name="attr_initskills" value="0" />
+<input type="hidden" name="attr_charskills" />
+<input type="hidden" name="attr_initderived" value="0" />
+<input type="hidden" name="attr_charderived" />
+<input type="hidden" name="attr_initgear" value="0" />
+<input type="hidden" name="attr_chargear" />
+<input type="hidden" name="attr_inithindrances" value="0" />
+<input type="hidden" name="attr_charhindrances" />
+<input type="hidden" name="attr_initsbedges" value="0" />
+<input type="hidden" name="attr_charedges" />
+<input type="hidden" name="attr_initspecabilities" value="0" />
+<input type="hidden" name="attr_showspec" />
+<input type="hidden" name="attr_charspecabilities" />
+<!-- End Stat Block Fields -->
 <div class='sheet-maindiv'>
     <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="1" checked />
     <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="2" />
@@ -2623,7 +3090,26 @@
     <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="12" />
     <div class='sheet-background'>
     	<div class='sheet-base'>
-			<input type="checkbox" class="sheet-useBenniesXP" name="attr_bennies" value="1" style="display: none;" />
+            <div class="sheet-buttonbar">
+                <div class="sheet-navbuttons">
+                    <button type="action" name="act_characterprofile1" class="sheet-topbuttons">U</button>
+                    <input type="checkbox" class="sheet-showVehicles" name="attr_vehicle" style="display: none;" />
+                    <button type="action" name="act_vehicletab3" class="sheet-topbuttons sheet-vehiclesT">T</button>
+                    <button type="action" name="act_journaltab4" class="sheet-topbuttons">n</button>
+                    <button type="action" name="act_configurationtab2" class="sheet-topbuttons">x</button>
+                </div>
+                <div class="sheet-functions">
+                    <input type="checkbox" class="sheet-useBenniesXP" name="attr_bennies" value="1" style="display: none;" />
+                    <button class="sheet-benniesxp" type="roll" name="roll_convertBennies" value="&{template:emote} {{name=@{character_name}}} {{does=rolls for XP on ?{Number of Bennies|1} un/spent bennies and gets [[?{Number of Bennies|1}d6>5]] extra experience point(s)!}}">S</button>
+                    <input class="sheet-isWC" type="hidden" name="attr_is_npc" />
+                    <button class="sheet-statblock" type="roll" name="roll_fullstatblock" value="/w gm &{template:statblock} @{chardesc} {{charatts=@{charatts}}} {{charskills=@{charskills}}} {{charderived=@{charderived}}} {{chargear=@{chargear}}} {{charhindrances=@{charhindrances}}} {{charedges=@{charedges}}} {{showspec=@{showspec}}} {{charspecabilities=@{charspecabilities}}}"><span class="sheet-showWCicon" name="attr_WCI"></span><img style="height: 28px;" src="http://imgsrv.roll20.net/?src=github.com/finderski/SWT/blob/master/BackgroundImages/statblock_profile.png%3Fraw%3Dtrue"</button>
+                </div>
+                <div class="sheet-docbuttons">
+                    <button type="action" name="act_releasetab5" class="sheet-topbuttons">N</button>
+                    <button type="action" name="act_documentationtab6" class="sheet-topbuttons">i</button>
+                </div>
+            </div>
+			<!--<input type="checkbox" class="sheet-useBenniesXP" name="attr_bennies" value="1" style="display: none;" />
 			<input type="checkbox" class="sheet-riftsBackground" style="display: none;" name="attr_background" value="11" />
     	    <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="4" />
     	    <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="3" />
@@ -2633,15 +3119,20 @@
             &nbsp;&nbsp;<input type="radio" class="sheet-tab sheet-journalT" name="attr_sheetTab" data-i18n-title="journal-and-other-info" title="Journal and other Info" value="4" /><span class="sheet-bg">n</span>
             &nbsp;&nbsp;<input type='radio' class='sheet-tab sheet-configT' name='attr_sheetTab' data-i18n-title="sheet-configuration" title="Sheet Configuration" value='2' /><span class="sheet-bg">x</span>
             &nbsp;&nbsp;<input type='radio' class='sheet-tab sheet-releaseN' name='attr_sheetTab' data-i18n-title="release-notes" title="Release Notes" value='5' /><span class="sheet-bg">N</span>
-            &nbsp;&nbsp;<input type='radio' class='sheet-tab sheet-documentatioN' name='attr_sheetTab' data-i18n-title="sheet-documentation" title="Sheet Documentation" value='6' /><span class="sheet-bg">i</span>
-			<button class="sheet-benniesxp" type="roll" name="roll_convertBennies" value="&{template:emote} {{name=@{character_name}}} {{does=rolls for XP on ?{Number of Bennies|1} un/spent bennies and gets [[?{Number of Bennies|1}d6>5]] extra experience point(s)!}}">S</button>
+            &nbsp;&nbsp;<input type='radio' class='sheet-tab sheet-documentatioN' name='attr_sheetTab' data-i18n-title="sheet-documentation" title="Sheet Documentation" value='6' /><span class="sheet-bg">i</span>-->
+			<input type='radio' class='sheet-characterT' name='attr_sheetTab' style="display: none;" value='1' checked />
+            <input type="radio" class="sheet-journalT" name="attr_sheetTab" style="display: none;" value="4" />
+            <input type='radio' class='sheet-vehiclesT' name='attr_sheetTab' style="display: none;" value='3' />
+            <input type='radio' class='sheet-configT' name='attr_sheetTab' style="display: none;" value='2' />
+            <input type='radio' class='sheet-releaseN' name='attr_sheetTab' style="display: none;" value='5' />
+            <input type='radio' class='sheet-documentatioN' name='attr_sheetTab' style="display: none;" value='6' />
 			<!--<div class="sheet-toprow">
                 Trait Test Modifier:
                 Damage Modifier:
                 XP/Rank:
             </div>-->
         	<div class='sheet-character'> <!--Character Sheet Tab-->
-            	<div class='sheet-left' style='width: 250px;'>
+            	<div class='sheet-left'>
                     <!--Logo-->
                     <!--<img src="http://i.imgur.com/iwIoTlT.png" />-->
                     <input type="radio" name="attr_logo" value="1" title="Savage Worlds Deluxe" checked style="display:none;"/>
@@ -4459,7 +4950,7 @@
     					    </div>
     					    <!-- Pace -->
     					    <div class="sheet-basederived">
-    					        <div class="sheet-derivelabel"><button class="sheet-traitbutton sheet-deriveflexbutton" type='roll' name='roll_RunningRoll' title="@{RunningRoll}" value='&{template:runs} @{rolltrun}' data-i18n="pace">&nbsp;Pace</button></div>
+    					        <div class="sheet-derivelabel"><button class="sheet-traitbutton sheet-deriveflexbutton" type='roll' name='roll_RunningRoll' title="@{RunningRoll}" value='&{template:emote} {{name=@{character_name}}} {{does=^{running-text-before-number} [[@{paceCur}+@{runningDie}]] ^{running-text-after-number} }}' data-i18n="pace">&nbsp;Pace</button></div>
     					        <div class="sheet-derivebase"><input type="number" name="attr_pace" title="@{pace}" class="sheet-derivedStat" style="text-align: center;" value="6" /></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_paceMod" title="@{paceMod}" class="sheet-derivedStat" value="0" /></div>
     							<div class="sheet-derivecurrent"><input type="number" name="attr_paceCur" title="@{paceCur}" class="sheet-derivedStat" value="" readonly />
@@ -4509,16 +5000,16 @@
     					        <div class="sheet-derivelabel" data-i18n="academics">Academics</div>
     					        <div class="sheet-derivebase"><input type="number" name="attr_academics" class="sheet-derivedStat" title="@{academics}" value="0"/></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_academicsMod" class="sheet-derivedStat" title="@{academicsMod}" value="0"/></div>
-    							<div class="sheet-derivecurrent"><input type="number" name="attr_academicsCur" title="@{academicsCur}" class="sheet-derivedStat" value="@{academics} + @{academicsMod}" disabled="true" /></div>
+    							<div class="sheet-derivecurrent"><input type="number" name="attr_academicsCur" title="@{academicsCur}" class="sheet-derivedStat" readonly /></div>
     							<div class="sheet-derivemisc">&nbsp;</div>
     					    </div>
     					    <!-- Sanity -->
     					    <input type="checkbox" class="sheet-useSanity" name="attr_tdsanity" style="width: 15px; display: none;" />
     					    <div class="sheet-basederived sheet-Sanity">
     					        <div class="sheet-derivelabel" data-i18n="sanity">Sanity</div>
-    					        <div class="sheet-derivebase"><input type="number" name="attr_sanity" title="@{sanity}" class="sheet-derivedStat" value="floor((@{spirit}+@{spiritmod})/2)+2" disabled="true" /></div>
+    					        <div class="sheet-derivebase"><input type="number" name="attr_sanity" title="@{sanity}" class="sheet-derivedStat" readonly /></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_sanityMod" title="@{sanityMod}" class="sheet-derivedStat" value="0" /></div>
-    							<div class="sheet-derivecurrent"><input type="number" name="attr_sanityCur" title="@{sanityCur}" class="sheet-derivedStat" value="@{sanity} + @{sanityMod}" disabled="true" /></div>
+    							<div class="sheet-derivecurrent"><input type="number" name="attr_sanityCur" title="@{sanityCur}" class="sheet-derivedStat" readonly /></div>
     							<div class="sheet-derivemisc">&nbsp;</div>
     					    </div>
     					    <!-- Fame -->
@@ -4527,7 +5018,7 @@
     					        <div class="sheet-derivelabel" data-i18n="fame">Fame</div>
     					        <div class="sheet-derivebase"><input class="sheet-derivedStat" type="number" name="attr_fame" title="@{fame}" value="0"/></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_fameMod" title="@{fameMod}" class="sheet-derivedStat" value="0" /></div>
-    							<div class="sheet-derivecurrent"><input type="number" name="attr_fameCur" title="@{fameCur}" class="sheet-derivedStat" value="@{fame} + @{fameMod}" disabled="true" /></div>
+    							<div class="sheet-derivecurrent"><input type="number" name="attr_fameCur" title="@{fameCur}" class="sheet-derivedStat" readonly /></div>
     							<div class="sheet-derivemisc">&nbsp;</div>
     					    </div>
     					    <!-- Reason -->
@@ -4536,7 +5027,7 @@
     					        <div class="sheet-derivelabel" data-i18n="reason">Reason</div>
     					        <div class="sheet-derivebase"><input class="sheet-derivedStat" type="number" name="attr_reason" title="@{reason}" value="0"/></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_reasonMod" title="@{reasonMod}" class="sheet-derivedStat" value="0" /></div>
-    							<div class="sheet-derivecurrent"><input type="number" name="attr_reasonCur" title="@{reasonCur}" class="sheet-derivedStat" value="@{reason} + @{reasonMod}" disabled="true" /></div>
+    							<div class="sheet-derivecurrent"><input type="number" name="attr_reasonCur" title="@{reasonCur}" class="sheet-derivedStat" readonly /></div>
     							<div class="sheet-derivemisc">&nbsp;</div>
     					    </div>
     					    <!-- Status -->
@@ -4545,7 +5036,7 @@
     					        <div class="sheet-derivelabel" data-i18n="status">Status</div>
     					        <div class="sheet-derivebase"><input class="sheet-derivedStat" type="number" name="attr_status" title="@{status}" value="0"/></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_statusMod" title="@{statusMod}" class="sheet-derivedStat" value="0" /></div>
-    							<div class="sheet-derivecurrent"><input type="number" name="attr_statusCur" title="@{statusCur}" class="sheet-derivedStat" value="@{status} + @{statusMod}" disabled="true" /></div>
+    							<div class="sheet-derivecurrent"><input type="number" name="attr_statusCur" title="@{statusCur}" class="sheet-derivedStat" readonly /></div>
     							<div class="sheet-derivemisc">&nbsp;</div>
     					    </div>
     					    <!-- Glory -->
@@ -4554,7 +5045,7 @@
     					        <div class="sheet-derivelabel" data-i18n="glory">Glory</div>
     					        <div class="sheet-derivebase"><input class="sheet-derivedStat" type="number" name="attr_glory" title="@{glory}" value="0" /></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_gloryMod" title="@{gloryMod}" class="sheet-derivedStat" value="0" /></div>
-    							<div class="sheet-derivecurrent"><input type="number" name="attr_gloryCur" title="@{gloryCur}" class="sheet-derivedStat" value="@{glory} + @{gloryMod}" disabled="true" /></div>
+    							<div class="sheet-derivecurrent"><input type="number" name="attr_gloryCur" title="@{gloryCur}" class="sheet-derivedStat" readonly /></div>
     							<div class="sheet-derivemisc">&nbsp;</div>
     					    </div>
     					    <!-- Firewall -->
@@ -4563,16 +5054,16 @@
     					        <div class="sheet-derivelabel" data-i18n="firewall">Firewall</div>
     					        <div class="sheet-derivebase"><input class="sheet-derivedStat" type="number" name="attr_Firewall" title="@{Firewall}" value="4"/></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_FirewallMod" title="@{FirewallMod}" class="sheet-derivedStat" value="0" /></div>
-    							<div class="sheet-derivecurrent"><input type="number" name="attr_FirewallCur" title="@{FirewallCur}" class="sheet-derivedStat" value="@{Firewall} + @{FirewallMod}" disabled="true" /></div>
+    							<div class="sheet-derivecurrent"><input type="number" name="attr_FirewallCur" title="@{FirewallCur}" class="sheet-derivedStat" readonly /></div>
     							<div class="sheet-derivemisc">&nbsp;</div>
     					    </div>
     					    <!-- Grit -->
     					    <input type="checkbox" class="sheet-useGrit" name="attr_DLGrit" style="width: 15px; display: none;" />
     					    <div class="sheet-basederived sheet-Grit">
     					        <div class="sheet-derivelabel" data-i18n="grit">Grit</div>
-    					        <div class="sheet-derivebase"><input type="number" name="attr_grit" title="@{grit}" class="sheet-derivedStat" style='color: black;' value="@{rank}" disabled="true" /></div>
+    					        <div class="sheet-derivebase"><input type="number" name="attr_grit" title="@{grit}" class="sheet-derivedStat" style='color: black;' readonly /></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_gritMod" title="@{gritMod}" class="sheet-derivedStat" value="0" /></div>
-    							<div class="sheet-derivecurrent"><input type="number" name="attr_gritCur" title="@{gritCur}" class="sheet-derivedStat" value="@{grit} + @{gritMod}" disabled="true" /></div>
+    							<div class="sheet-derivecurrent"><input type="number" name="attr_gritCur" title="@{gritCur}" class="sheet-derivedStat" readonly /></div>
     							<div class="sheet-derivemisc">&nbsp;</div>
     					    </div>
     					    <!-- Corruption -->
@@ -4581,12 +5072,11 @@
     					        <div class="sheet-derivelabel" data-i18n="corruption">Corruption</div>
     					        <div class="sheet-derivebase"><input type="number" name="attr_corruptionStat" title="@{corruptionStat}" class="sheet-derivedStat" style='color: black;' value="0" /></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_corruptionMod" title="@{corruptionMod}" class="sheet-derivedStat" value="0" /></div>
-    							<div class="sheet-derivecurrent"><input type="number" name="attr_corruptionCur" title="@{corruptionCur}" class="sheet-derivedStat" value="@{corruptionStat} + @{corruptionMod}" disabled="true" /></div>
+    							<div class="sheet-derivecurrent"><input type="number" name="attr_corruptionCur" title="@{corruptionCur}" class="sheet-derivedStat" readonly /></div>
     							<div class="sheet-derivemisc">&nbsp;</div>
     					    </div>
     					    <!-- Street Cred -->
     					    <input type="checkbox" class="sheet-useStreetCred" style="width: 15px; display: none;" name="attr_izStreetCred" />
-
     					    <input type="checkbox" class="sheet-useStrain" style="width: 15px; display: none;" name="attr_izStrain" />
     					    <div class="sheet-basederived sheet-StreetCred sheet-Strain" style='font-weight: bold; font-size: .75em;'>
     					        <div class="sheet-derivelabel">&nbsp;</div>
@@ -4599,7 +5089,7 @@
     					        <div class="sheet-derivelabel" data-i18n="street-cred">Street Cred</div>
     					        <div class="sheet-derivebase"><input class="sheet-derivedStat" type="number" name="attr_StreetCred" title="@{StreetCred}" value="@{Rank}*2" readonly /></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_StreetCredMod" title="@{StreetCredMod}" class="sheet-derivedStat" value="0" /></div>
-    							<div class="sheet-derivecurrent"><input type="number" name="attr_StreetCredCur" title="@{StreetCredCur}" class="sheet-derivedStat" value="@{StreetCred} + @{StreetCredMod}" disabled="true" /></div>
+    							<div class="sheet-derivecurrent"><input type="number" name="attr_StreetCredCur" title="@{StreetCredCur}" class="sheet-derivedStat" readonly /></div>
     							<div class="sheet-derivemisc"><input type="number" name="attr_maxStreetCredCur" title="@{maxStreetCredCur}" class="sheet-derivedStat" value="10" /></div>
     					    </div>
     					    <!-- Strain -->
@@ -4736,14 +5226,14 @@
     							</tr>
     							<tr class='sheet-taprow'>
     								<td>
-    								    <input type="number" name="attr_FirewallCur" title="@{FirewallCur}" value="@{Firewall} + @{FirewallMod}" disabled="true" style='width: 100%; text-align: center; border: none; background-color: none;' />
+    								    <input type="number" name="attr_FirewallCur" title="@{FirewallCur}" readonly style='width: 100%; text-align: center; border: none; background-color: none;' />
         								<input class='sheet-moreTAP' type='checkbox' name='attr_showFirewallConfig' /><span>y</span>
     								</td>
     								<td>
     								    <input type='number' name='attr_ams' value='4' class='sheet-derivedStat' style='width: 100%; text-align: center; border: none; background-color: none;' />
     								</td>
     								<td>
-    								    <input type="number" name="attr_ntoughnesscur" title="@{ntoughnesscur}" class="sheet-derivedStat" value="(@{ntoughness})+(@{ntufnessMod})+(@{ntoughnessArmor})" disabled="true" style='width: 100%; text-align: center; border: none; background-color: none;' />
+    								    <input type="number" name="attr_ntoughnesscur" title="@{ntoughnesscur}" class="sheet-derivedStat" readonly style='width: 100%; text-align: center; border: none; background-color: none;' />
     								    <input class='sheet-moreTAP' type='checkbox' name='attr_showNTConfig' /><span>y</span>
     								</td>
     								<td>
@@ -4812,7 +5302,7 @@
                         <div class='sheet-base sheet-edges'>
                             <fieldset class="repeating_edges">
                                 <div class="sheet-base sheet-hindranceNedge">
-                                    <button type='roll' class="sheet-edgeOutput" name='roll_tHindrance' value="@{whisperEdgeDeets} &{template:info} {{name=@{character_name}}} {{type=Edge}} {{item=@{edge}}} {{description=@{edgedescription}}}">w</button>
+                                    <button type='roll' class="sheet-edgeOutput" name='roll_tEdge' value="@{whisperEdgeDeets} &{template:info} {{name=@{character_name}}} {{type=Edge}} {{item=@{edge}}} {{description=@{edgedescription}}}">w</button>
                                     <input class="sheet-edgefield" type="text" name="attr_edge" title="@{repeating_edges_$#_edge}" style='width:90%;' />
                                     <input class='sheet-moremods' type='checkbox' name='attr_showEdgeDesc' checked /><span>y</span>
             						<div class='sheet-basetrait sheet-traitmodplus'>
@@ -4823,21 +5313,24 @@
                                 </div>
                             </fieldset>
                         </div>
-                        <h1 class='sheet-colHeader' style="margin-top:-35px;" data-i18n="advancements">Advancements</h1>
-                        <input type="checkbox" class="sheet-hideAdv" name="attr_hideAdv" /><span class="sheet-showhide"></span>
-                        <div class='sheet-base sheet-advancements'>
-                            <div class="sheet-xp">
-                                <input type="checkbox" class="sheet-useXP" name="attr_useXP" style="display: none;" value="1" />
-                                <h4 class='sheet-trackXP' data-i18n="experience-points-abbr-u">XP</h4>
-                                <h4 class='sheet-advances' data-i18n="advance">Advance</h4>
+                        <input type='checkbox' name='attr_advanceonjournal' class="sheet-advanceonjournal" style='display: none;' />
+                        <div class="sheet-showadvancements">
+                            <h1 class='sheet-colHeader' style="margin-top:-35px;" data-i18n="advancements">Advancements</h1>
+                            <input type="checkbox" class="sheet-hideAdv" name="attr_hideAdv" /><span class="sheet-showhide"></span>
+                            <div class='sheet-base sheet-advancements'>
+                                <div class="sheet-xp">
+                                    <input type="checkbox" class="sheet-useXP" name="attr_useXP" style="display: none;" value="1" />
+                                    <h4 class='sheet-trackXP' data-i18n="experience-points-abbr-u">XP</h4>
+                                    <h4 class='sheet-advances' data-i18n="advance">Advance</h4>
+                                </div>
+                                <div class="sheet-advancement">
+                                    <h4 data-i18n="advancement">Advancement</h4>
+                                </div>
+                                <fieldset class="repeating_advancement">
+                                        <input class="sheet-xp sheet-advfield" type="text" name="attr_tookat" title="@{repeating_advancement_$#_tookat}" />
+                                        <input class="sheet-advancement sheet-advfield" type="text" name="attr_advancement" title="@{repeating_advancement_$#_advancement}" />
+                                </fieldset>
                             </div>
-                            <div class="sheet-advancement">
-                                <h4 data-i18n="advancement">Advancement</h4>
-                            </div>
-                            <fieldset class="repeating_advancement">
-                                    <input class="sheet-xp sheet-advfield" type="text" name="attr_tookat" title="@{repeating_advancement_$#_tookat}" />
-                                    <input class="sheet-advancement sheet-advfield" type="text" name="attr_advancement" title="@{repeating_advancement_$#_advancement}" />
-                            </fieldset>
                         </div>
                     </div>
                 </div>
@@ -4966,7 +5459,8 @@
 								<!-- Build the Damage Roll Template Info -->
 								<input type='hidden' name='attr_weapondmg' value="@{strength_rank}+1d4!" /> <!-- the damage formula -->
 								<input type='hidden' name='attr_weaponsbonusdmg' value='@{vbonusdamage}' />
-								<input type='text' style='display: none;' name='attr_dmgTemplate' value='@{whisperweapon} &{template:damage} {{name=@{character_name}}} {{source=@{weapon} }} {{dmg_rank=@{weapondamage}}} {{dmg_roll=[[@{weapondmg} + @{damagemods}]]}} {{bonus_die=[[@{weaponsbonusdmg}]]}} {{showap=[[1d0+@{weaponap}]]}} {{ap=@{weaponap}}} {{notes=@{weaponnotes}}} {{button=y}} {{DmgRoll=[Re-Roll Damage](~repeating_weapons_dmg) }}' />
+								<input type='text' style='display: none;' name='attr_dmgTemplate' value='@{whisperweapon} &{template:damage} {{name=@{character_name}}} {{source=@{weapon} }} {{dmg_rank=@{weapondamage}}} {{dmg_roll=[[@{weapondmg} + @{damagemods}]]}} {{bonus_die=[[@{weaponsbonusdmg}]]}} {{showap=[[1d0+@{weaponap}]]}} {{ap=@{weaponap}}} {{notes=@{weaponnotes}}} {{button=y}} {{DmgRoll=[Re-Roll Damage](~repeating_weapons_dmg) }} @{gritty} {{GrittyRoll=[Roll Injury](~repeating_weapons_grittyroll)}}' />
+                                <button type='roll' style='display: none;' name='roll_grittyroll' value='&{template:gritty} {{name=Injury Result}} {{result=[[1t[@{injurytablename}]]]}}'></button>
     				        </div>
 						</fieldset>
 						<input class="sheet-useLoad" type="checkbox" name="attr_useLoad" style="display:none;" checked />
@@ -5147,9 +5641,10 @@
 										<!-- Build the Damage Roll Template Info -->
 										<input type='hidden' name='attr_spelldmg' /> <!-- the damage formula -->
 										<input type='hidden' name='attr_spellsbonusdmg' value='@{vbonusdamage}' />
-										<input type='text' style='display: none;' name='attr_spelldmgTemplate' value='@{whisperspell} &{template:damage} {{name=@{character_name}}} {{source=@{power} }} {{trappings=@{trappings}}} {{dmg_rank=@{powerdamage}}} {{dmg_roll=[[@{spelldmg} + @{damagemods}]]}} {{bonus_die=[[@{spellsbonusdmg}]]}} @{dmgshownotes} {{button=y}} {{DmgRoll=[Re-Roll Damage](~repeating_spells_spelldmg) }}' />
+										<input type='text' style='display: none;' name='attr_spelldmgTemplate' value='@{whisperspell} &{template:damage} {{name=@{character_name}}} {{source=@{power} }} {{trappings=@{trappings}}} {{dmg_rank=@{powerdamage}}} {{dmg_roll=[[@{spelldmg} + @{damagemods}]]}} {{bonus_die=[[@{spellsbonusdmg}]]}} @{dmgshownotes} {{button=y}} {{DmgRoll=[Re-Roll Damage](~repeating_spells_spelldmg) }} @{gritty} {{GrittyRoll=[Roll Injury](~repeating_spells_spellgrittyroll)}}' />
 										<input type='hidden' name='attr_skTemplate' value='1d6!' />
 										<input type='hidden' name='attr_dmgshownotes' value='{{notes=@{spellnotes}}}' />
+                                        <button type='roll' style='display: none;' name='roll_spellgrittyroll' value='&{template:gritty} {{name=Injury Result}} {{result=[[1t[@{injurytablename}]]]}}'></button>
 									</div>
 									<input class='sheet-spellconfigb' type='checkbox' name='attr_showspellconfig' style="display:none;" checked />
 								</div>
@@ -5396,10 +5891,36 @@
 				</div>
     			<!-- End Hero's Journey -->
     			<!-- Notes -->
-				<div class="sheet-standardDiv">
-					<h4 class="sheet-subsectionHeader" data-i18n="notes">Notes</h4>
-					<textarea name="attr_CharNotes" class="sheet-standardTextArea" title="@{CharNotes}"></textarea>
-				</div>
+                <div class="sheet-flexdiv">
+                    <div class="sheet-charnotes">
+    					<h4 class="sheet-subsectionHeader" data-i18n="notes">Notes</h4>
+    					<textarea name="attr_CharNotes" class="sheet-standardTextArea" title="@{CharNotes}"></textarea>
+                    </div>
+                    <input type='checkbox' name='attr_advanceonjournal' class="sheet-advanceonjournal" style='display: none;' />
+                    <div class="sheet-journaladvances">
+                        <div class="sheet-buttonwrapper">
+                            <button type="action" name="act_hideadvance" class="sheet-showhidebutton"><span name="attr_journaladvancehideicon"></span></button>
+                        </div>
+                        <h1 class='sheet-colHeader' data-i18n="advancements">Advancements</h1>
+                        <!--<input type="checkbox" class="sheet-hideAdv" name="attr_hideAdv" /><span class="sheet-showhide"></span>-->
+                        <input type="checkbox" class="sheet-hideAdv" name="attr_hideAdv" style="display: none;" />
+                        <div class='sheet-base sheet-jadvancements'>
+                            <div class="sheet-xp">
+                                <input type="checkbox" class="sheet-useXP" name="attr_useXP" style="display: none;" value="1" />
+                                <h4 class='sheet-trackXP' data-i18n="experience-points-abbr-u">XP</h4>
+                                <h4 class='sheet-advances' data-i18n="advance">Advance</h4>
+                            </div>
+                            <div class="sheet-advancement">
+                                <h4 data-i18n="advancement">Advancement</h4>
+                            </div>
+                            <fieldset class="repeating_advancement">
+                                    <input class="sheet-xp sheet-advfield" type="text" name="attr_tookat" title="@{repeating_advancement_$#_tookat}" />
+                                    <input class="sheet-advancement sheet-advfield" type="text" name="attr_advancement" title="@{repeating_advancement_$#_advancement}" />
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+
     			<!-- Party Bag -->
 				<input type="checkbox" class="sheet-usePartyBag" style="display:none;" name="attr_usePG" checked />
 				<div class="sheet-PartyBag sheet-standardDiv">
@@ -6281,7 +6802,7 @@
 											</div>
 										</div>
 										<!-- Hidden Fields for the roll button(s), etc -->
-										<input type='hidden' name='attr_raweaponroll' />
+										<input type='hidden' name='attr_raweaponroll' value="@{radamageOnly}" />
 										<input type='hidden' name='attr_raskillNDamage' value="&{template:roll} {{trait=Fighting}} {{source=@{raweapon}}} @{rolltFighting} {{button=y}} {{DmgRoll=[Roll Damage](~repeating_raweapons_radmg) }}" /> <!--Used for Skill and Damage roll -->
 										<input type='hidden' name='attr_radamageOnly' value='@{radmgTemplate}' /> <!-- Used for Damage Only -->
 										<!-- Build the Damage Roll Template Info -->
@@ -6378,6 +6899,7 @@
 							<option value="1">Atk^ roll query sorted Low to High</option>
 							<option value="2">Atk^ always roll max (no roll query)</option>
 						</select>
+                        <label class='sheet-miscItem'><input type='checkbox' class="sheet-advanceonjournal" name='attr_advanceonjournal' /> <span data-i18n="move-advances-to-journal-tab">Move Advances to the Journal Tab</span></label>
     			        <label class='sheet-miscItem'><input type="checkbox" class="sheet-hideArcanum" name="attr_ArcanumTab" style="width: 15px;"> <span data-i18n="hide-powers-section">Hide Powers Section</span></label>
     			        <label class='sheet-miscItem'><input type="checkbox" name="attr_promptmods" title="Wounds, Fatigue, Distracted, and Encumbrance are not part of Misc. Modifiers and are accounted for automatically" /> <span data-i18n="prompt-modifiers-text">Prompt for Misc. Modifiers</span></label>
 						<label class='sheet-miscItem'><input type="checkbox" name="attr_useBGPhysicalDesc" checked /> <span data-i18n="show-background-description">Show Background and Description</span></label>
@@ -6411,13 +6933,13 @@
                         <!--<label class='sheet-miscItem'><input type="checkbox" name="attr_whisperrolls" value='1' style="width: 15px;"> <span data-i18n="whisper-all-rolls-to-gm">Whisper all rolls to GM</span></label>-->
                         <input type='hidden' name='attr_whisperall' />
                         <label class='sheet-miscItem'>
-            			    <span data-i18n="wild-card-icon">Wild Card Icon</span>: <select name='attr_WCI' class="sheet-wcIcon">
+            			    <span data-i18n="wild-card-icon">Wild Card Icon</span>: <!--<select name='attr_WCI' class="sheet-wcIcon">
             			        <option value="⊛">⊛</option>
             			        <option value="✪">✪</option>
             			        <option value="♕">♕</option>
             			        <option value="†">†</option>
             			        <option value="༒">༒</option>
-            			    </select>
+            			    </select>--><input type='text' class="sheet-wci" name='attr_WCI' maxlength="2" />
             			</label>
             			<label class="sheet-miscItem"><button type="roll" class="sheet-APIOutput" name="roll_apifield" value="!deal-init --help">i</button><span data-i18n="api-initiative-edge">API Iniative Edges</span> <input class="sheet-standard" type="text" title="@{InitEdges}" name="attr_InitEdges"/></label>
     			    </div>
@@ -6555,7 +7077,11 @@
     			        <label class="sheet-srmItem" data-i18n-title="use-charisma"><input type="checkbox" class="sheet-useCharisma" name="attr_usecharisma" checked /><span data-i18n="use-charisma">Use Charisma</span></label>
     				    <label class="sheet-srmItem" data-i18n-title="power-pointless"><input type="checkbox" class="sheet-NoPP" name="attr_NoPPRule" /><span data-i18n="no-power-points">No Power Points</span></label>
     				    <label class="sheet-srmItem" data-i18n-title="use-xp"><input type="checkbox" class="sheet-usexp" name="attr_usexp" checked /><span data-i18n="use-xp">Use Experience Points</span></label>
-    				    <label class="sheet-srmItem" data-i18n-title="use-xp"><input type="checkbox" name="attr_setrank" /><span data-i18n="manually-set-rank">Manually set Rank</span></label>
+                        <label class="sheet-srmItem" data-i18n-title="gritty-damage"><input type='checkbox' class="sheet-usegritty" name='attr_gritty' value="{{getgritty=gritty}}" /> <span data-i18n="use-gritty-damage">Use Gritty Damage</span></label>
+                        <input type='checkbox' class="sheet-usegritty" name='attr_gritty' value="{{getgritty=gritty}}" style="display: none;" />
+                        <label class="sheet-srmItem sheet-injurytable" data-i18n-title="injury-table-name">Injury Table Name: <input type='text' class="sheet-injury" name="attr_injurytablename" /></label>
+                        <label class="sheet-srmItem" data-i18n-title="use-xp"><input type="checkbox" name="attr_setrank" /><span data-i18n="manually-set-rank">Manually set Rank</span></label>
+                        <label class="sheet-srmItem"><input type="checkbox" class="sheet-useCharisma" name="attr_paceignoreswounds" /><span data-i18n="pace-ignores-wounds">Pace Ignores Wounds</span></label>
 						<input type="checkbox" class="sheet-usexp" name="attr_usexp" style="display: none;" checked />
     				    <label class="sheet-srmItem sheet-xpmod" data-i18n-title="roll-for-extra-xp-left-text"><input type='checkbox' name='attr_bennies' class='sheet-Bennies' value='1' /><span data-i18n="roll-extra-xp-for-bennies">Roll XP for un-/spent Bennies</span></label>
     				    <label class="sheet-srmItem" data-i18n-title="variable-bonus-damage-die"><input type="checkbox" class="sheet-useRaiseHB" name="attr_RaiseHBRule" value="1" /><span data-i18n="variable-bonus-damage-raise-based">Variable Bonus Damage (Raise based)</span></label>
@@ -6572,6 +7098,43 @@
 			<!--                     -->
 			<div class="sheet-release">
 			    <h3 class='subsectionHeader' data-i18n="release-notes">Release Notes</h3>
+                <label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes34' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 3.4</h4></span>
+			    </label>
+			    <input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes33' value='1' />
+        		<div class='sheet-releasenotes'>
+        		   <p data-i18n="changes-this-release">
+        		       Changes this release:
+        		   </p>
+				   <ul>
+						<li><strong data-i18n="bug-fixes">Bug Fixes</strong></li>
+						<ul>
+							<li data-i18n="robot-armor-wasn't-working">Robot Armor Weapon wasn't working</li>
+                            <li data-i18n="running-roll-output-wasnt-display-properly">Running Roll output wasn't displaying properly</li>
+                            <li data-i18n="wounds-werent-reducing-pace">Wounds weren't reducing Pace</li>
+                            <li data-i18n="derived-stats-not-using-sheet-workers">Derived Stats weren't using Sheet Workers and should have been.</li>
+						</ul>
+                        <li><strong data-i18n="sheet-enhancements">Functionality Enhancements</strong></li>
+                        <ul>
+                            <li data-i18n="support-for-gritty-damage">Support for Gritty Damage (see documentation tab for details)</li>
+                            <li data-i18n="option-to-move-advancements-to-journal">Option to move Advancements to the Journal Tab</li>
+                            <li data-i18n="setting-to-allow-pace-to-ignore-wounds">Setting to allow Pace to ignore Wounds</li>
+                            <li data-i18n="option-for-custom-wild-card-icon">Option for custom Wild Card Icon (supports unicode characters)</li>
+                            <li data-i18n="statblock-output-button">Statblock Output button</li>
+                        </ul>
+                        <li><strong data-i18n="known-issues">Known Issues</strong></li>
+                        <ul>
+                            <li data-i18n="statblock-doesnt-support">Statblock Output Button doesn't currently output:</li>
+                            <ul>
+                                <li data-i18n="spell-information">Spell information</li>
+                                <li data-i18n="talismans">Talismans</li>
+                                <li data-i18n="cybernetics-slash-augmentations">Cybernetics/Augmentations</li>
+                                <li data-i18n="rippertech">Rippertech</li>
+                            </ul>
+                            <li data-i18n="talismans-are-missing-from-sheet">Talismans are missing from the sheet completely</li>
+                        </ul>
+				   </ul>
+				</div>
                 <label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes33' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 3.3</h4></span>
 			    </label>
@@ -6782,6 +7345,8 @@
                                 <li data-i18n='hide-sections-explanation'>Hide different sections and tabs (e.g. Powers and Vehicles)</li>
                                 <li data-i18n='configure-modifiers-explanation'>Configure modifiers; the sheet can prompt for roll modifiers and you can choose to have them display in the roll template when rolls are made</li>
 								<li data-i18n='configure-rate-of-fire-abbr-rolling'>Configure Rate of Fire rolling</li>
+                                <li data-i18n="wild-card-icon-info">Wild Card Icon can be up to two (2) characters, including unicode. Some examples include (copy/paste from below):</li>
+                                <textarea class="sheet-configtextarea" readonly name="attr_iconexamples">⊛ ✪ ♕ † ༒</textarea>
 								<li data-i18n='configure-api-settings'>Configure API settings</li>
                             </ul>
                         <li data-i18n='additional-derived-stats'>Additional Derived Stats</li>
@@ -6803,6 +7368,51 @@
                                 <li data-i18n='use-charisma'>Use Charisma</li>
                                 <li data-i18n='dont-use-power-points'>Don't use Power Points</li>
                                 <li data-i18n='use-experience-points-explanation'>Use experinece points instead of the SWADE advancement mechanic</li>
+                                <li data-i18n='use-gritty-damage'>Use Gritty Damage</li>
+                                <ul>
+                                    <li>Selecting this option will add a roll button to the damage output of weapons and spells</li>
+                                    <li>You will need to specify the name of the Injury Table; a field will display for this input</li>
+                                    <li>The Injury Table needs to be a rollable table in order for this functionality to work</li>
+                                    <li>You can set up the Rollable with the following weights</li>
+                                    <table class="sheet-infotable">
+                                        <tr>
+                                            <th>Result (2d6)</th><th>Description</th><th>Sub-effect</th><th>Weight</th>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td><td>Unmentionables</td><td>N/A</td><td>12</td>
+                                        </tr>
+                                        <tr>
+                                            <td>3-4</td><td>Arm</td><td>Left Arm</td><td>30</td>
+                                        </tr>
+                                        <tr>
+                                            <td>3-4</td><td>Arm</td><td>Right Arm</td><td>30</td>
+                                        </tr>
+                                        <tr>
+                                            <td>5-9</td><td>Guts</td><td>Broken</td><td>96</td>
+                                        </tr>
+                                        <tr>
+                                            <td>5-9</td><td>Guts</td><td>Battered</td><td>96</td>
+                                        </tr>
+                                        <tr>
+                                            <td>5-9</td><td>Guts</td><td>Busted</td><td>96</td>
+                                        </tr>
+                                        <tr>
+                                            <td>10-11</td><td>Leg</td><td>Left Leg</td><td>30</td>
+                                        </tr>
+                                        <tr>
+                                            <td>10-11</td><td>Leg</td><td>Right Leg</td><td>30</td>
+                                        </tr>
+                                        <tr>
+                                            <td>12</td><td>Head</td><td>Hideous Scar</td><td>6</td>
+                                        </tr>
+                                        <tr>
+                                            <td>12</td><td>Head</td><td>Blinded</td><td>4</td>
+                                        </tr>
+                                        <tr>
+                                            <td>12</td><td>Head</td><td>Brain Damage</td><td>2</td>
+                                        </tr>
+                                    </table>
+                                </ul>
                                 <li data-i18n='use-variable-die-type-bonus-damage-explanation'>Use variable die types for bonus damage (based on the number of raises)</li>
                             </ul>
                     </ul>
@@ -6913,6 +7523,11 @@
 			{{DmgRoll}}
 		</div>
 		{{/button}}
+        {{#getgritty}}
+        <div class="sheet-templateButton">
+			{{GrittyRoll}}
+		</div>
+        {{/getgritty}}
 	</div>
 </rolltemplate>
 
@@ -6955,7 +7570,7 @@
 	</div>
 </rolltemplate>
 
-<rolltemplate class="sheet-rolltemplate-runs">
+<rolltemplate class="sheet-rolltemplate-running">
 	<div class="sheet-emoteish">
 		{{name}} <span data-i18n="runs">runs for</span> {{roll}} <span data-i18n="inches">inches</span>.
 	</div>
@@ -6966,4 +7581,28 @@
 	<div class="sheet-emoteish">
 		{{name}} {{does}}
 	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-gritty">
+    <div class="sheet-card">
+        <h2 data-i18n="injury-roll">Injury Roll</h2>
+        <div class='sheet-injuryresult'>{{result}}</div>
+    </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-statblock">
+    <div class="sheet-statblockheader">
+        <h2 class="sheet-fullwidth">{{#wci}}{{wci}} {{/wci}}{{name}}</h2>
+    </div>
+    <div class="sheet-statblockbod">
+        {{#description}}<div class="sheet-justify">{{description}}</div>{{/description}}
+        {{#charatts}}<div class="sheet-bodsection">**<span data-i18n="attributes">Attributes</span>**: {{charatts}}</div>{{/charatts}}
+        {{#charskills}}<div class="sheet-bodsection">**<span data-i18n="skills">Skills</span>**: {{charskills}}</div>{{/charskills}}
+        {{#charderived}}<div class="sheet-bodsection">{{charderived}}</div>{{/charderived}}
+        {{#chargear}}<div class="sheet-bodsection">**<span data-i18n="gear">Gear</span>**: {{chargear}}</div>{{/chargear}}
+        {{#charhindrances}}<div class="sheet-bodsection">**<span data-i18n="hindrances">Hindrances</span>**: {{charhindrances}}</div>{{/charhindrances}}
+        {{#charedges}}<div class="sheet-bodsection">**<span data-i18n="edges">Edges</span>**: {{charedges}}</div>{{/charedges}}
+		{{#rollGreater() showspec 0}}{{#charspecabilities}}<div class="sheet-bodsection">**<span data-i18n="special-abilities">Special Abilities</span>**:<br /><ul>{{charspecabilities}}</ul></div>{{/charspecabilities}}{{/rollGreater() showspec 0}}
+		{{#charpowers}}<div class="sheet-bodsection">**{{power label}}**: {{charpowers}}</div>{{/charpowers}}
+    </div>
 </rolltemplate>
