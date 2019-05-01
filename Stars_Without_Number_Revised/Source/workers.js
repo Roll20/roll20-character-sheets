@@ -2251,7 +2251,7 @@
 				const setting = idArray.reduce((m, id) => {
 					if (v.npc_roll_full_attack === "1") {
 						const num = parseInt(v[`repeating_npc-attacks_${id}_attack_number`]) || 1;
-						const macro = [2, 3, 4].map(n => {
+						const macro = [2, 3, 4, 5, 6, 7, 8].map(n => {
 							if (n <= num)
 								return `{{attack${n}=[[1d20 + @{attack_ab} @{attack_burst} @{modifier_query}]]}} ` +
 									`{{damage${n}=[[@{attack_damage} @{attack_burst}]]}} `;
