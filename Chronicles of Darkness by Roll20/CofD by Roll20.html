@@ -3006,16 +3006,16 @@
                         }
                     }
                     if(type === "skill") {
-                        if(rarray.filter(function(x){return attributes.indexOf(x) > -1}).length < 2 && rarray.filter(function(x){return skills.indexOf(x) > -1}).length === 0) {
-                            rarray.unshift(stat);
-                        }
-                        else if(rarray.filter(function(x){return attributes.indexOf(x) > -1}).length < 2 && rarray.filter(function(x){return skills.indexOf(x) > -1}).length > 0) {
-                            rarray = rarray.filter(function(x) {return skills.indexOf(x) < 0;});
-                            rarray.unshift(stat);
-                        }
-                        else if(rarray.filter(function(x){return attributes.indexOf(x) > -1}).length > 1) {
-                            rarray = [stat, prev_rarray.filter(function(x){return attributes.indexOf(x) > -1})[0]];
-                        }
+                       const attrFilter = rarray.filter(function(x){return attributes.indexOf(x) > -1}),
+                           skillFilter = rarray.filter(function(x){return skills.indexOf(x) > -1});
+                       if(attrFilter.length < 2 && skillFilter.length === 0) {
+                           rarray.unshift(stat);
+                       }else if(attrFilter.length < 2 && skillFilter.length > 0) {
+                           rarray = rarray.filter(function(x) {return skills.indexOf(x) < 0;});
+                           rarray.unshift(stat);
+                       }else if(attrFilter.length > 1) {
+                           rarray = [stat, prev_rarray.filter(function(x){return attributes.indexOf(x) > -1})[0]];//This could probably be done with .shift instead of the filter, but I don't know what's going on the grand scheme of things so...
+                       }
                     }
                     if(type === "power") {
                         if(rarray.filter(function(x){return normalStats.indexOf(x) === -1}).length > 0) {
@@ -3046,11 +3046,12 @@
             rarray.filter(function(x){return normalStats.indexOf(x) === -1 && x != "potency"}).forEach(function(x) {order.push(x);});
 
             var names = order.map(function(x) {
-                if (x == "potency"){
-                    return v.potency_name;
-                }
-                return x.charAt(0).toUpperCase() + x.slice(1);
-            })
+               let transX = getTranslationByKey(x);
+               if (x == "potency"){
+                   return v.potency_name;//may need to do getTranslationgByKey here as well, but not sure what the potential values of this are, and if they are user defined or sheet defined
+               }
+               return transX.charAt(0).toUpperCase() + transX.slice(1);//note I actually prefer to do this using .replace if there's going to be a chance for multi word casing
+            });
 
             var base = "&{template:wod-simple} {{name=@{character_name}}} {{option=?{@{dicepoolmacro}|0}}} {{result=[[{(?{@{dicepoolmacro}|1}@{rolltype}";
             if(order.length > 0) {
