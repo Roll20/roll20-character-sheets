@@ -42,6 +42,36 @@ Changed the way version number was displayed .A attributes was removed but it wi
 Changed the path for button images and roll templates images to point to images in Roll20 repository.
 
 
+## 22.04.2019
+	Fix Move Quietly modifiers were being totalled now takes the highest.
+	
+	Tided up the Experience Roll button beside the category modifier, it now uses a Roll template and asks for a skill value to compare it against.
+
+	
+
+## 08.04.2019 Version 
+
+	fix SR for default natural weapons should be 4 not 3
+	
+	fix some users reporting  issues with power rune labels. Replaced graphics for power runes
+	
+	fix enc modifier not applied to stealth
+	
+	Added Move Quietly modifiers to equipment 
+	
+	Added macro code to roll with modifiers on Honor button.
+	
+	Added support for Coordination spell
+	
+	Added support to add turn order entries based on missile weapon strike ranks.
+	
+	Added support for Coordination spell
+	
+	
+	
+	
+	
+
 ## Version 04.03.2019
 
 Tweaked CSS so skill names can be read when modifying repeating sections
@@ -51,6 +81,8 @@ Added fields for coinage on the 2nd tab.  Currently this does not effect encumbr
 I added a bunch of new hit locations including all the location tables  at the start of the bestiary. 
 
 Added fields for individual weapons skill modifiers or occasions such as Bladesharp cast.
+
+
 
 I also added checkboxes with the heading Spells Cast for Vigor, Strength  and Glamour they handle all the fudges listed under the spells,such as skill category  increases, damage die steps and max enc.So don't add the stat bonuses in the mod fields of the characteristics.The bonuses are automatically added to stat rolls. A message appears under the stats  reminding you to add the bonus when doing resistance table rolls.  There is probably better way of doing this but it would mean changing a lot of sheetworkers and/or adding a whole new column of mod fields
 
