@@ -50,6 +50,11 @@ input[type=number].sheet-nospin {
     -moz-appearance:textfield;
     width: 2em !important;
 }
+select {
+    width: auto;
+    max-width: 10em;
+    flex-grow: 0;
+}
 .sheet-pc input
 , .sheet-pc textarea
 , .sheet-pc select {
@@ -84,6 +89,7 @@ label {
     display: unset;
     padding: unset;
     line-height: unset;
+    white-space: nowrap;
 }
 
 .sheet-hidden
@@ -389,11 +395,11 @@ input[type=checkbox].sheet-pseudocheck.sheet-expand:checked ~ .sheet-subblock {
     align-items: flex-start;
 }
 
-.sheet-pc input:not(:read-only):focus
+.sheet-pc input:focus
+, .sheet-pc input:hover
 , .sheet-pc select:focus
-, .sheet-pc textarea:focus
-, .sheet-pc input:not(:read-only):hover
 , .sheet-pc select:hover
+, .sheet-pc textarea:focus
 , .sheet-pc textarea:hover {
     border-color: transparent;
     color: black;
@@ -424,6 +430,7 @@ input[type=checkbox].sheet-pseudocheck.sheet-expand:checked ~ .sheet-subblock {
     font-weight: bold;
     text-transform: uppercase;
     color: var(--brdtitlecolor);
+    white-space: nowrap;
 }
 
 .sheet-subtitle {
@@ -443,7 +450,8 @@ input[type=checkbox].sheet-pseudocheck.sheet-expand:checked ~ .sheet-subblock {
 .sheet-skills .sheet-lbl
 , .sheet-attacks .sheet-lbl
 , .sheet-weapons .sheet-lbl {
-    width: 2.5em;
+    min-width: 2.5em;
+    white-space: nowrap;
 }
 .sheet-abilities .sheet-lbl {
     width: 1.5em;
@@ -519,12 +527,16 @@ input[type="checkbox"].sheet-useaction:checked ~ .sheet-pc div.sheet-useaction {
 
 .sheet-line {
     display: flex;
-    flex-flow: row wrap;
+    flex-flow: row nowrap;
     justify-content: space-evenly;
     align-content: flex-start;
     align-items: center;
     width: 100%;
     clear: both;
+}
+.sheet-line.sheet-wrap
+, .sheet-line.sheet-hide {
+    flex-flow: row wrap;
 }
 .sheet-line.sheet-action select {
     max-width: 5em;
@@ -598,6 +610,22 @@ input[type=number].sheet-notable {
     border: 1px dotted var(--brdsubcolor);
 }
 
+.sheet-help {
+    font-size: 0.9em;
+    font-style: italic;
+}
+.sheet-help::before {
+    content: "?";
+    font-family: "Pictos";
+    font-size: 1em;
+    margin-right: 0.15em;
+}
+
+input[type="checkbox"].sheet-used:checked ~ .sheet-used {
+    text-decoration: line-through;
+    color: var(--notablecolor);
+}
+
 /* === BUTTONS === */
 button[type="compendium"].sheet-myrol,
 button[type="roll"].sheet-myrol,
@@ -651,13 +679,22 @@ button[type="action"].sheet-myrol:focus {
     margin-right: 0.15em;
     font-size: 1.3em;
 }
-.sheet-pc button[type="roll"].sheet-myrol.sheet-roll span::before {
+.sheet-pc button[type="roll"].sheet-myrol.sheet-roll span::before
+, .sheet-pc button[type="roll"].sheet-myrol.sheet-rollsmall span::before {
     font-family: "dicefontd20";
     text-transform: none;
+}
+.sheet-pc button[type="roll"].sheet-myrol.sheet-roll span::before {
     margin-left: 0.15em;
     margin-right: 0.15em;
     font-size: 1.3em;
     content: "A";
+}
+.sheet-pc button[type="roll"].sheet-myrol.sheet-rollsmall span::before {
+    margin-right: 0.3em;
+    font-size: 0.75em;
+    font-weight: normal;
+    content: "a";
 }
 .sheet-pc button[type="action"].sheet-myrol.sheet-reset span::before {
     content: "1";
@@ -931,6 +968,27 @@ input[type="checkbox"].sheet-useasset:checked ~ .sheet-pc .sheet-useasset
     margin-top: 0.3em;
 }
 
+/* ===== LANGUAGES SPECIFICS ===== */
+.charsheet.lang-fr input[type="checkbox"].sheet-stl-strange:checked ~ .sheet-pc .sheet-stats .sheet-subblock .sheet-title
+, .charsheet.lang-es input[type="checkbox"].sheet-stl-strange:checked ~ .sheet-pc .sheet-stats .sheet-subblock .sheet-title {
+    font-size: 105%;
+}
+.charsheet.lang-fr input[type="checkbox"].sheet-stl-cypher:checked ~ .sheet-pc .sheet-stats .sheet-subtitle
+, .charsheet.lang-es input[type="checkbox"].sheet-stl-cypher:checked ~ .sheet-pc .sheet-stats .sheet-subtitle {
+    font-size: calc(var(--subtitlefontsize) * 0.9);
+}
+.charsheet.lang-fr input[type="checkbox"].sheet-stl-strange:checked ~ .sheet-pc .sheet-stats .sheet-subtitle
+, .charsheet.lang-es input[type="checkbox"].sheet-stl-strange:checked ~ .sheet-pc .sheet-stats .sheet-subtitle {
+    font-size: calc(var(--subtitlefontsize) * 0.7);
+}
+.charsheet.lang-fr input[type="checkbox"].sheet-stl-numenera:checked ~ .sheet-pc .sheet-stats .sheet-subtitle
+, .charsheet.lang-es input[type="checkbox"].sheet-stl-numenera:checked ~ .sheet-pc .sheet-stats .sheet-subtitle {
+    font-size: calc(var(--subtitlefontsize) * 0.79);
+}
+.charsheet.lang-fr .sheet-identity .sheet-title span {
+    font-size: calc(var(--titlefontsize) * 0.65);
+}
+
 /* === NPC === */
 .sheet-npc {
     width: 52em;
@@ -960,7 +1018,7 @@ input[type="checkbox"].sheet-useasset:checked ~ .sheet-pc .sheet-useasset
     font-weight: bold;
 }
 .sheet-npc input
-, .sheet-pc select
+, .sheet-npc select
 , .sheet-npc textarea {
     background: rgba(245,241,240,0.9);
     border: 1px dotted var(--subtitlecolor);
@@ -968,13 +1026,14 @@ input[type="checkbox"].sheet-useasset:checked ~ .sheet-pc .sheet-useasset
     margin-bottom: 0.15em;
     font-size: 1em;
 }
+
 .sheet-npc input:hover
-, .sheet-pc select:hover
+, .sheet-npc select:hover
 , .sheet-npc textarea:hover {
     box-shadow: inset 0px 0px 8px var(--glowcolor);
 }
 .sheet-npc input:focus
-, .sheet-pc select:focus
+, .sheet-npc select:focus
 , .sheet-npc textarea:focus {
     border-style: solid;
     box-shadow: inset 0px 0px 2px var(--glowcolor);
@@ -1116,6 +1175,11 @@ input[type="checkbox"].sheet-useasset:checked ~ .sheet-pc .sheet-useasset
     overflow-y: auto;
     max-height: 9em;
 }
+.sheet-rolltemplate-cyphsys .sheet-notable {
+    font-weight: bold;
+    color: var(--notablecolor);
+    text-align: center;
+}
 /* Rolls */
 .sheet-rolltemplate-cyphsys .inlinerollresult
 , .sheet-rolltemplate-cyphsys .sheet-pseudoroll {
@@ -1133,8 +1197,7 @@ input[type="checkbox"].sheet-useasset:checked ~ .sheet-pc .sheet-useasset
     color: #182C4A;
 }
 
-.sheet-rolltemplate-cyphsys .sheet-resright .inlinerollresult,
-.sheet-rolltemplate-npc .sheet-bigres .inlinerollresult {
+.sheet-rolltemplate-cyphsys .sheet-resright .inlinerollresult {
     font-size: 1.6em;
     line-height: 1.45em;
 }
