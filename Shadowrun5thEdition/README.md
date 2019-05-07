@@ -240,21 +240,21 @@ The built in sheet buttons do not cover all of the rolls in Shadowrun 5e by a lo
 
 * **Drain**. This is a sample for a Drain macro. You'll want to replace Logic with your appropriate attribute such as @{intuition}, @{magic}, @{charisma} ...
 
-```@{gm_toggle} &{template:sRun}{{header=Drain}}{{base=Base}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}@{modifier_toggle}{{edge=[[@{edge_toggle}]]}}{{dice=[[(@{willpower}+@{logic}+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}```
+```@{gm_toggle} &{template:rolls}{{header=Drain}}{{base=Base}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}@{modifier_toggle}{{edge=[[@{edge_toggle}]]}}{{dice=[[(@{willpower}+@{logic}+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}```
 
 * **Defense**
 
-```@{gm_toggle} &{template:sRun}{{header=Defense}}{{base=Base}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{dice=[[(@{defense}+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}```
+```@{gm_toggle} &{template:rolls}{{header=Defense}}{{base=Base}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{dice=[[(@{defense}+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}```
 
 
 * **Initiative**
 
-```@{gm_toggle} &{template:sRun}{{header=Initiative}}{{base=Base}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{dice=[[(@{initiative_mod}+@{wound_toggle}+@{modifier_toggle})+(@{initiative_dice})d6cf0 &{tracker}]]}}```
+```@{gm_toggle} &{template:rolls}{{header=Initiative}}{{base=Base}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{dice=[[(@{initiative_mod}+@{wound_toggle}+@{modifier_toggle})+(@{initiative_dice})d6cf0 &{tracker}]]}}```
 
 * **Soak** 
 
-```@{gm_toggle} &{template:sRun}{{header=Soak}}{{base=Base}}{{mod=[[@{modifier_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{dice=[[(@{soak}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}```
+```@{gm_toggle} &{template:rolls}{{header=Soak}}{{base=Base}}{{mod=[[@{modifier_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{dice=[[(@{soak}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}```
 
 * **Primary Range**. This macro requires you to have selected a Primary weapon in your Arms tab.
 
-```@{gm_toggle} &{template:sRun}{{header=@{primary_range_weapon}}}{{base=Base}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{dice=[[((@{primary_range_weapon_skill}+@{primary_range_weapon_dicepool})+@{agility}+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Mode @{primary_range_weapon_mode}, ACC @{primary_range_weapon_acc}, DV @{primary_range_weapon_damage}, AP @{primary_range_weapon_ap}}}```
+```@{gm_toggle} &{template:rolls}{{header=@{primary_range_weapon}}}{{base=Base}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{dice=[[((@{primary_range_weapon_skill}+@{primary_range_weapon_dicepool})+@{agility}+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Mode @{primary_range_weapon_mode}, ACC @{primary_range_weapon_acc}, DV @{primary_range_weapon_damage}, AP @{primary_range_weapon_ap}}}```
