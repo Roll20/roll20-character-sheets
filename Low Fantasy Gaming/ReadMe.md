@@ -1,9 +1,15 @@
 # Low Fantasy Gaming Character Sheet
 
-This is a character sheet for use on Roll20.net with Low Fantasy Gaming. 
+This is a character sheet for use on Roll20.net with Low Fantasy Gaming.
 
 ## Features
 This version of the sheet incorporates roll templates and autocalculates hit and damage values. It does not require access to features of the Dev server or the API.
+
+**Attribute clarifications:**
+
+* GS = Great Success
+* TF = Terrible Failure
+(Low Fantasy Gaming page 42, "Degrees of Success or Failure")
 
 ### Changelog
 * 12 June 2016 original version.
