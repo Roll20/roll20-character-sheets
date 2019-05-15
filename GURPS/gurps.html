@@ -2268,7 +2268,7 @@
 							<input type="text" name="attr_tl" />
 						</div>
 						<div class="sheet-cell sheet-col3">
-							<input type="text" name="attr_level" disabled="disabled" value="@{base} + @{difficulty} + @{bonus} + (floor((@{points} * 0.25) + 2) * ceil( ( ( @{points} - 2 ) + abs( @{points} - 2) ) / 256 ) + @{points} * abs( ceil( ( ( @{points} - 2 ) + abs( @{points} - 2) ) / 256 ) - 1 ))"/>
+							<input type="text" name="attr_level" disabled="disabled" value="@{base} + @{difficulty} + @{bonus} + (floor((@{adjusted_skill_points} * 0.25) + 2) * ceil( ( ( @{adjusted_skill_points} - 2 ) + abs( @{adjusted_skill_points} - 2) ) / 256 ) + @{adjusted_skill_points} * abs( ceil( ( ( @{adjusted_skill_points} - 2 ) + abs( @{adjusted_skill_points} - 2) ) / 256 ) - 1 ))"/>
 						</div>
 						<div class="sheet-cell sheet-col4">
 							<select name="attr_base">
@@ -2287,12 +2287,14 @@
 								<option value="-2">A</option>
 								<option value="-3">H</option>
 								<option value="-4">VH</option>
+								<option value="-5 + 1">W!</option>
 							</select>
 						</div>
 						<div class="sheet-cell sheet-col6">
 							<input type="number" name="attr_bonus" value="0" />
 						</div>
 						<div class="sheet-cell sheet-col7">
+						    <input type="hidden" name="attr_adjusted_skill_points" value="0" />
 							<input type="number" name="attr_points" value="0" />
 						</div>
 						<div class="sheet-cell sheet-col8">
@@ -3604,7 +3606,7 @@
 	<h4>Version: 1.5.8</h4>
 	
 	<ul>
-        <li>Added button links to GURPS Wiki and Forum Thread</li>
+        <li>Added button links to GURPS Wiki and Forum Thread</li>   
     </ul>
 	            
 	<h4>Version: 1.5.7</h4>
@@ -4380,10 +4382,12 @@ Skull Damage x4
 		});
 		
 		getAttrs(['sheet_version', 'mod_cascade', 'modCascade', 'modCascadeAll'], function(v) {
+		    
 			if (v.modCascade && v.modCascadeAll) {
 				modCascade = v.modCascade;
 				modCascadeAll = v.modCascadeAll;
 			}
+			
 			if (!v.sheet_version || v.sheet_version != version) {
 			    
 				// Set sheet version:
@@ -4406,7 +4410,9 @@ Skull Damage x4
 
 				// initalize all calculated stats
 				resetAll(v.mod_cascade);
-			}
+				
+			} 
+			
 		});
 
 		damageTable = generateDamageTable();
@@ -5003,11 +5009,39 @@ Skull Damage x4
 	});
 
 	// Update the total cost of Skills
-	on('change:repeating_skills:points remove:repeating_skills', function (e) {
-		sumRepeating('repeating_skills', 'points', function(v) {
-			setAttrs({ skills_points: v });
+	on('change:repeating_skills:points hange:repeating_skills:difficulty remove:repeating_skills', function (e) {
+	    
+	    // checkForWildCardSkill(e);
+        getAttrs(['repeating_skills_points', 'repeating_skills_difficulty'], function (skill) {
+            
+            var adjusted_points = 0;
+            
+            console.log(skill.repeating_skills_difficulty);
+            
+            if (String(skill.repeating_skills_difficulty) == "-5 + 1") {
+                
+                adjusted_points = Math.floor(skill.repeating_skills_points/3);
+                
+            } else {
+                
+                adjusted_points = skill.repeating_skills_points;
+                
+            }
+            
+            console.log(adjusted_points);
+            
+			setAttrs({
+			    repeating_skills_adjusted_skill_points: adjusted_points
+			});
+			
+		    sumRepeating('repeating_skills', 'points', function(v) {
+			    setAttrs({ skills_points: v });
+		    });
+		
 		});
+		
 	});
+
 
 	// Update the total cost of Techniques
 	on('change:repeating_techniques:points remove:repeating_techniques', function (e) {
