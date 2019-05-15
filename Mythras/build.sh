@@ -33,9 +33,9 @@ read -p "<Enter to copy translations>"
 cat ./translation.json | xclip -selection clipboard
 
 # Copy to M-Space if all has been successful
-./copy-to-mspace.sh
-echo ""
-echo "Copied to M-Space"
+#./copy-to-mspace.sh
+#echo ""
+#echo "Copied to M-Space"
 
 echo ""
 echo "Done"
