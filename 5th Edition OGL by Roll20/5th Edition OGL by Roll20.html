@@ -7553,7 +7553,7 @@
                 const array = (page.data[`${attr}`]) ? page.data[`${attr}`].split(", ") : [];
                 _.each(array, (entry) => {
                     const kv        = (entry.indexOf("-") > -1) ? entry.split(" ") : entry.split(" +");
-                    const attribute = (attr === "Saving Throws") ? kv[0].toLowerCase() + "_save" : kv[0].toLowerCase().replace(" ", '_');
+                    const attribute = (attr === "Saving Throws") ? kv[0].toLowerCase() + "_save" : kv[0].toLowerCase().split(' ').join('_');
                     update[`npc_${attribute}_base`] = parseInt(kv[1], 10);
                 });
                 (attr === "Saving Throws") ? callbacks.push(() => {update_npc_saves();} ) : callbacks.push(() => {update_npc_skills();} );
@@ -7679,12 +7679,13 @@
                         });
                     };
                 });
-                getCompendiumPage(spellsobj, (spellData) => {
+                getCompendiumPage(spellsobj, (compendiumPages) => {
+                    const spellData = (compendiumPages.length === undefined || compendiumPages.length === 1) ? [compendiumPages] : compendiumPages;
                     const innate = (jsonparse(page.data["data-Spells"])[`innate`]) ? jsonparse(page.data["data-Spells"])[`innate`] : false;
                     let existing = {};
                     let update   = [], callbacks = [];
 
-                    spellData.forEach((page) => {
+                   spellData.forEach((page) => {
                         const spell        = page.data;
                         const lvl          = spell["Level"] && spell["Level"] > 0 ? spell["Level"] : "cantrip";
                         const newrowid     = generateRowID();
@@ -8929,68 +8930,40 @@
         });
     };
 
-    var update_spell_from_attack = function(lvl, spellid, attackid) {
-        var update = {};
-        getAttrs(["repeating_attack_" + attackid + "_atkname", "repeating_attack_" + attackid + "_atkrange", "repeating_attack_" + attackid + "_atkflag", "repeating_attack_" + attackid + "_atkattr_base", "repeating_attack_" + attackid + "_dmgbase", "repeating_attack_" + attackid + "_dmgtype", "repeating_attack_" + attackid + "_dmg2base", "repeating_attack_" + attackid + "_dmg2type", "repeating_attack_" + attackid + "_saveflag", "repeating_attack_" + attackid + "_saveattr", "repeating_attack_" + attackid + "_saveeffect"], function(v) {
-            update["repeating_spell-" + lvl + "_" + spellid + "_spellname"] = v["repeating_attack_" + attackid + "_atkname"];
-            if(v["repeating_attack_" + attackid + "_atkrange"] && v["repeating_attack_" + attackid + "_atkrange"] != "") {
-                update["repeating_spell-" + lvl + "_" + spellid + "_spellrange"] = v["repeating_attack_" + attackid + "_atkrange"];
-            }
-            else {
-                update["repeating_spell-" + lvl + "_" + spellid + "_spellrange"] = "";
+    //Update spells in the attack section
+    const update_spell_from_attack = (lvl, spellid, attackid) => {
+        const repeating_attack = `repeating_attack_${attackid}`;
+        const repeating_spell = `repeating_spell-${lvl}_${spellid}`;
+        let update = {};
+        getAttrs([`${repeating_attack}_atkname`, `${repeating_attack}_atkrange`, `${repeating_attack}_atkflag`, `${repeating_attack}_atkattr_base`, `${repeating_attack}_dmgbase`, `${repeating_attack}_dmgtype`, `${repeating_attack}_dmg2base`, `${repeating_attack}_dmg2type`, `${repeating_attack}_saveflag`, `${repeating_attack}_saveattr`, `${repeating_attack}_saveeffect`], (v) => {
+            update[`${repeating_spell}_spellname`]        = v[`${repeating_attack}_atkname`];
+            update[`${repeating_spell}_spellrange`]       = v[`${repeating_attack}_atkrange`] || "";
+            update[`${repeating_spell}_spellsavesuccess`] = v[`${repeating_attack}_saveeffect`] || "";
+
+            if (v[`${repeating_attack}_dmgtype`] && v[`${repeating_attack}_dmgtype`].toLowerCase() == "healing") {
+                if (v[`${repeating_attack}_dmgbase`] && v[`${repeating_attack}_dmgbase`] != "") {
+                    update[`${repeating_spell}_spellhealing`] = v[`${repeating_attack}_dmgbase`];
+                }
+            } else {
+                if (v[`${repeating_attack}_dmgbase`] && v[`${repeating_attack}_dmgbase`] != "" && v[`${repeating_attack}_dmgbase`].indexOf("[[round((@{level} + 1) / 6 + 0.5)]]") === -1) {
+                    update[`${repeating_spell}_spelldamage`] = v[`${repeating_attack}_dmgbase`];
+                } else if (!v[`${repeating_attack}_dmgbase`] || v[`${repeating_attack}_dmgbase`] === "") {
+                    update[`${repeating_spell}_spelldamage`] = "";
+                }
+
+                update[`${repeating_spell}_spelldamagetype`] = v[`${repeating_attack}_dmgtype`] || "";
+            };
+            if (v[`${repeating_attack}_dmg2type`] && v[`${repeating_attack}_dmg2type`].toLowerCase() === "healing") {
+                if (v[`${repeating_attack}_dmgbase`] && v[`${repeating_attack}_dmgbase`] != "") {
+                    update[`${repeating_spell}_spellhealing`] = v[`${repeating_attack}_dmgbase`];
+                }
+            } else {
+                update[`${repeating_spell}_spelldamage2`] = v[`${repeating_attack}_dmg2base`] || "";
+                update[`${repeating_spell}_spelldamagetype2`] = v[`${repeating_attack}_dmg2type`] || "";
             };
 
-            if(v["repeating_attack_" + attackid + "_dmgtype"] && v["repeating_attack_" + attackid + "_dmgtype"].toLowerCase() == "healing") {
-                if(v["repeating_attack_" + attackid + "_dmgbase"] && v["repeating_attack_" + attackid + "_dmgbase"] != "") {
-                    update["repeating_spell-" + lvl + "_" + spellid + "_spellhealing"] = v["repeating_attack_" + attackid + "_dmgbase"];
-                }
-            }
-            else {
-                if(v["repeating_attack_" + attackid + "_dmgbase"] && v["repeating_attack_" + attackid + "_dmgbase"] != "" && v["repeating_attack_" + attackid + "_dmgbase"].indexOf("[[round((@{level} + 1) / 6 + 0.5)]]") === -1) {
-                    update["repeating_spell-" + lvl + "_" + spellid + "_spelldamage"] = v["repeating_attack_" + attackid + "_dmgbase"];
-                }
-                else if(!v["repeating_attack_" + attackid + "_dmgbase"] || v["repeating_attack_" + attackid + "_dmgbase"] === "") {
-                    update["repeating_spell-" + lvl + "_" + spellid + "_spelldamage"] = "";
-                }
-                if(v["repeating_attack_" + attackid + "_dmgtype"] && v["repeating_attack_" + attackid + "_dmgtype"] != "") {
-                    update["repeating_spell-" + lvl + "_" + spellid + "_spelldamagetype"] = v["repeating_attack_" + attackid + "_dmgtype"];
-                }
-                else {
-                    update["repeating_spell-" + lvl + "_" + spellid + "_spelldamagetype"] = "";
-                }
-            };
-            if(v["repeating_attack_" + attackid + "_dmg2type"] && v["repeating_attack_" + attackid + "_dmg2type"].toLowerCase() == "healing") {
-                if(v["repeating_attack_" + attackid + "_dmgbase"] && v["repeating_attack_" + attackid + "_dmgbase"] != "") {
-                    update["repeating_spell-" + lvl + "_" + spellid + "_spellhealing"] = v["repeating_attack_" + attackid + "_dmgbase"];
-                }
-            }
-            else {
-                if(v["repeating_attack_" + attackid + "_dmg2base"] && v["repeating_attack_" + attackid + "_dmg2base"] != "") {
-                    update["repeating_spell-" + lvl + "_" + spellid + "_spelldamage2"] = v["repeating_attack_" + attackid + "_dmg2base"];
-                }
-                else {
-                    update["repeating_spell-" + lvl + "_" + spellid + "_spelldamage2"] = "";
-                }
-                if(v["repeating_attack_" + attackid + "_dmg2type"] && v["repeating_attack_" + attackid + "_dmg2type"] != "") {
-                    update["repeating_spell-" + lvl + "_" + spellid + "_spelldamagetype2"] = v["repeating_attack_" + attackid + "_dmg2type"];
-                }
-                else {
-                    update["repeating_spell-" + lvl + "_" + spellid + "_spelldamagetype2"] = "";
-                }
-            };
-
-            if(v["repeating_attack_" + attackid + "_saveflag"] && v["repeating_attack_" + attackid + "_saveflag"] != "0") {
-                update["repeating_spell-" + lvl + "_" + spellid + "_spellsave"] = v["repeating_attack_" + attackid + "_saveattr"];
-            }
-            else {
-                update["repeating_spell-" + lvl + "_" + spellid + "_spellsave"] = "";
-            };
-            if(v["repeating_attack_" + attackid + "_saveeffect"] && v["repeating_attack_" + attackid + "_saveeffect"] != "") {
-                update["repeating_spell-" + lvl + "_" + spellid + "_spellsavesuccess"] = v["repeating_attack_" + attackid + "_saveeffect"];
-            }
-            else {
-                update["repeating_spell-" + lvl + "_" + spellid + "_spellsavesuccess"] = "";
-            };
+            //SAVING THROW checkbox inside settings for the repeating attack
+            update[`${repeating_spell}_spellsave`] =  (v[`${repeating_attack}_saveflag`] && v[`${repeating_attack}_saveflag`] != "0") ? v[`${repeating_attack}_saveattr`] : "";
             setAttrs(update, {silent: true});
         });
     };
@@ -9463,18 +9436,16 @@
             } else {
                 getCompendiumPage(v.class, (page) => {
                     update = {};
-                    page.forEach((list) => {
-                        if (list.data && 'Category' in list.data && list.data[`Category`] === "Classes") {
-                            update["hitdietype"]           = list.data["Hit Die"].slice(1);
-                            update["spellcasting_ability"] = (list.data["Spellcasting Ability"]) ? `@{${list.data["Spellcasting Ability"].toLowerCase()}_mod}+` : "0*";
-                            abilites.forEach((save) => {
-                                const ability = save.toLowerCase();
-                                update[`${ability}_save_prof`] = (list.data["data-Saving Throws"].indexOf(`${save}`) > -1) ? "(@{pb})" : 0;
-                                update_save(ability);
-                            });
-                        };
-                    });
-
+                    const classData = (page.length === undefined || page.length === 1) ? page : page[0];
+                    if (classData.data && 'Category' in classData.data && classData.data[`Category`] === "Classes") {
+                        update["hitdietype"]           = classData.data["Hit Die"].slice(1);
+                        update["spellcasting_ability"] = (classData.data["Spellcasting Ability"]) ? `@{${classData.data["Spellcasting Ability"].toLowerCase()}_mod}+` : "0*";
+                        abilites.forEach((save) => {
+                            const ability = save.toLowerCase();
+                            update[`${ability}_save_prof`] = (classData.data["data-Saving Throws"].indexOf(`${save}`) > -1) ? "(@{pb})" : 0;
+                            update_save(ability);
+                        });
+                    };
                     setAttrs(update, {silent: true});
                     //Update Spell info to change or remove casting attributes in Spells
                     update_spell_info();
