@@ -226,12 +226,22 @@
                 <div class="sheet-row">
                     <div class="sheet-col-1-12"><input type="number" name="attr_luck" min="1" step="1" value="10"/></div>
                     <div class="sheet-col-1-12"><input type="number" name="attr_luck_max" min="1" step="1" value="10"/></div>
-					<div class="sheet-col-1-10 sheet-core-stat-label">Luck</div>
-					<div class="sheet-col-1-16">
+					<div class="sheet-col-1-10 sheet-luck-stat-label">Luck</div>
+					<!--<div class="sheet-col-1-16">
 						<input type="text" name="attr_luck_mod" value="0" readonly/>
+					</div>-->
+					<div class="sheet-col-11-48">
+                        <select name="attr_luckvs">
+                            <option value="1" selected>Luck Check</option>
+                            <option value="2">(STR) Save</option>
+                            <option value="3">(DEX) Save</option>
+                            <option value="4">(CON) Save</option>
+                            <option value="5">(INT) Save</option>
+                            <option value="6">(PER) Save</option>
+                            <option value="7">(WILL) Save</option>
+                            <option value="8">(CHA) Save</option>
+                        </select>
 					</div>
-					<div class="sheet-col-1-12"><input type="number" name="attr_luck_gs" min="1" step="1" value="1"/></div>
-                    <div class="sheet-col-1-12"><input type="number" name="attr_luck_tf" min="1" step="1" value="20"/></div>
                     <div class="sheet-col-1-8">
                         <select name="attr_luckadvantage">
                             <option value="2d20cs=1cf=20kl1">ADV</option>
@@ -240,9 +250,9 @@
                         </select>
                     </div>
 					<div class="sheet-col-1-14 sheet-center">
-					    <!-- +(?{Luck Save|Luck,0|Luck(STR),@{strength_mod}|Luck(DEX),@{dexterity_mod}|Luck(CON),@{constitution_mod}|Luck(INT),@{intelligence_mod}|Luck(PER),@{perception_mod}|Luck(WILL),@{willpower_mod}|Luck(CHA),@{charisma_mod}})
-						<button type="roll" name="roll_Luck" value="&{template:5eDefault} {{ability=1}} {{title=Luck Check}} {{subheader=@{character_name}}} {{roll=[[@{luck}-(@{luckadvantage}-(?{Modifier|0}))]]}}"></button> -->
-						<button type="roll" name="roll_Luck" value="&{template:5eDefault} {{ability=1}} {{title=Luck Check}} {{subheader=@{character_name}}} {{check=[[@{luckadvantage}]]}} {{target=[[@{luck}]]}} {{gsresult=[[@{luck_gs}]]}} {{tfresult=[[@{luck_tf}]]}}"></button>
+                        <input class="sheet-hide-it" type="text" name="attr_lucksave_title" value="Luck Check">
+                        <input class="sheet-hide-it" type="text" name="attr_lucksave_mod" value="0">
+                        <button type="roll" name="roll_Luck" value="&{template:5eDefault} {{lucksave=1}} {{title=@{lucksave_title}}} {{subheader=@{character_name}}} {{save=[[@{luckadvantage}-(@{lucksave_mod})]]}} {{target=[[@{luck}]]}}"></button>
 					</div>
 					<div class="sheet-col-1-4 sheet-tiny-note">Saves,&nbsp;Exploits</div>
 				</div>
@@ -1234,6 +1244,28 @@
                         {{/^rollLess() check gsresult}}
                     {{/^rollGreater() check target}}
 				{{/check}}
+                {{#save}}
+                    <div class="sheet-row">
+                        <div class="sheet-col-5-12 sheet-padl sheet-padr sheet-rt-key">Save</div>
+                        <div class="sheet-col-7-12 sheet-padr sheet-rt-value">{{save}}</div>
+                    </div>
+                    <div class="sheet-row">
+                        <div class="sheet-col-5-12 sheet-padl sheet-padr sheet-rt-key">Target</div>
+                        <div class="sheet-col-7-12 sheet-padr sheet-rt-value">{{target}}</div>
+                    </div>
+                    {{#rollGreater() save target}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-5-12 sheet-padl sheet-padr sheet-rt-key">Result</div>
+                            <div class="sheet-col-7-12 sheet-padr sheet-rt-value" style="color:red;">Failure!</div>
+                        </div>
+                    {{/rollGreater() save target}}
+                    {{#^rollGreater() save target}}
+                        <div class="sheet-row">
+                            <div class="sheet-col-5-12 sheet-padl sheet-padr sheet-rt-key">Result</div>
+                            <div class="sheet-col-7-12 sheet-padr sheet-rt-value" style="color:green;">Success!</div>
+                        </div>
+                    {{/^rollGreater() save target}}
+				{{/save}}
 				<!--Weapon based attacks-->
 				{{#attack}}
                     {{#rollWasFumble() attack}}
@@ -1403,6 +1435,54 @@
       setAttrs(setting);
     });
   });
+});
+
+//Update associated attribute for luck save
+on("change:luckvs", function() {
+    getAttrs(["luckvs"], function(values) {
+        switch (values.luckvs) {
+            case "1":
+                setAttrs({ lucksave_title: "Luck Check", lucksave_mod: "0" });
+                break;
+            case "2":
+                getAttrs(["strength_mod"], function(values) {
+                    setAttrs({ lucksave_title: "Luck(STR) Save", lucksave_mod: values.strength_mod });
+                });
+                break;
+            case "3":
+                getAttrs(["dexterity_mod"], function(values) {
+                    setAttrs({ lucksave_title: "Luck(DEX) Save", lucksave_mod: values.dexterity_mod });
+                });
+                break;
+            case "4":
+                getAttrs(["constitution_mod"], function(values) {
+                    setAttrs({ lucksave_title: "Luck(CON) Save", lucksave_mod: values.constitution_mod });
+                });
+                break;
+            case "5":
+                getAttrs(["intelligence_mod"], function(values) {
+                    setAttrs({ lucksave_title: "Luck(INT) Save", lucksave_mod: values.intelligence_mod });
+                });
+                break;
+            case "6":
+                getAttrs(["perception_mod"], function(values) {
+                    setAttrs({ lucksave_title: "Luck(PER) Save", lucksave_mod: values.perception_mod });
+                });
+                break;
+            case "7":
+                getAttrs(["willpower_mod"], function(values) {
+                    setAttrs({ lucksave_title: "Luck(WILL) Save", lucksave_mod: values.willpower_mod });
+                });
+                break;
+            case "8":
+                getAttrs(["charisma_mod"], function(values) {
+                    setAttrs({ lucksave_title: "Luck(CHA) Save", lucksave_mod: values.charisma_mod });
+                });
+                break;
+            default:
+                setAttrs({ lucksave_title: "Luck Check", lucksave_mod: "0" });
+        }
+    });
 });
 
 //Update associated attribute for skill
