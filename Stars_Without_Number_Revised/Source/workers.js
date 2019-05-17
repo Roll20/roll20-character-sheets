@@ -1878,6 +1878,15 @@
 		});
 	};
 
+	const calculateMagicEffort = () => {
+		getAttrs(["magic_total_effort", "magic_committed_effort_current", "magic_committed_effort_scene", "magic_committed_effort_day"], function(v) {
+			const magic_total_effort = parseInt(v.magic_committed_effort_current) + parseInt(v.magic_committed_effort_scene) + parseInt(v.magic_committed_effort_day);
+			mySetAttrs({
+				magic_total_effort
+			}, v);
+		});
+	};
+
 	const calculateAC = () => {
 		getSectionIDs("repeating_armor", idArray => {
 			const sourceAttrs = [
@@ -3462,6 +3471,8 @@
 	on("change:level", calculateSaves);
 
 	on([...effortAttributes, "repeating_psychic-skills:skill"].map(x => `change:${x}`).join(" "), calculateEffort);
+
+	on("change:magic_committed_effort_current change:magic_committed_effort_scene change: magic_committed_effort_day", calculateMagicEffort);
 
 	on("change:repeating_armor change:innate_ac remove:repeating_armor", calculateAC);
 
