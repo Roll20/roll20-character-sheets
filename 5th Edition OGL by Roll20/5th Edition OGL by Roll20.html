@@ -9434,21 +9434,24 @@
                 setAttrs(update, {silent: true});
             //Standard classes can pull their data from the Comependium
             } else {
-                getCompendiumPage(v.class, (page) => {
+                getCompendiumPage(v.class, (pages) => {
                     update = {};
-                    const classData = (page.length === undefined || page.length === 1) ? page : page[0];
-                    if (classData.data && 'Category' in classData.data && classData.data[`Category`] === "Classes") {
-                        update["hitdietype"]           = classData.data["Hit Die"].slice(1);
-                        update["spellcasting_ability"] = (classData.data["Spellcasting Ability"]) ? `@{${classData.data["Spellcasting Ability"].toLowerCase()}_mod}+` : "0*";
-                        abilites.forEach((save) => {
-                            const ability = save.toLowerCase();
-                            update[`${ability}_save_prof`] = (classData.data["data-Saving Throws"].indexOf(`${save}`) > -1) ? "(@{pb})" : 0;
-                            update_save(ability);
-                        });
-                    };
-                    setAttrs(update, {silent: true});
-                    //Update Spell info to change or remove casting attributes in Spells
-                    update_spell_info();
+                    const classPages = (Array.isArray(pages)) ? pages : [pages];
+                    classPages.forEach((classData) => {
+                        if (classData.data && 'Category' in classData.data && classData.data[`Category`] === "Classes") {
+                            update["hitdietype"]           = classData.data["Hit Die"].slice(1);
+                            update["spellcasting_ability"] = (classData.data["Spellcasting Ability"]) ? `@{${classData.data["Spellcasting Ability"].toLowerCase()}_mod}+` : "0*";
+                            abilites.forEach((save) => {
+                                const ability = save.toLowerCase();
+                                update[`${ability}_save_prof`] = (classData.data["data-Saving Throws"].indexOf(`${save}`) > -1) ? "(@{pb})" : 0;
+                                update_save(ability);;
+                            });
+                        };
+
+                        setAttrs(update, {silent: true});
+                        //Update Spell info to change or remove casting attributes in Spells
+                        update_spell_info();
+                    });
                 });
             };
         });
