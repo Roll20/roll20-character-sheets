@@ -2272,468 +2272,58 @@
     var allStats = ["intelligence","wits","resolve","strength","dexterity","stamina","presence","manipulation","composure","academics","computer","crafts","investigation","medicine","occult","politics","science","athletics","brawl","drive","firearms","larceny","stealth","survival","weaponry","animalken","empathy","expression","intimidation","persuasion","socialize","streetwise","subterfuge","animalism","auspex","celerity","dominate","majesty","nightmare","obfuscate","protean","resilience","vigor","crúac","thebansorcery","death","fate","forces","life","matter","mind","prime","spirit","space","time","potency"];
     var potencyNames = { mortal1:"", mortal2:"", vampire1:"Blood Potency", vampire2:"Blood Potency", werewolf1:"Primal Urge", werewolf2:"Primal Urge", mage1:"Gnosis", mage2:"Gnosis", promethean1:"Azoth", promethean2:"Azoth", changeling1:"Wyrd", changeling2:"Wyrd", demon:"Primum", beast:"Lair", hunter:"", geist1:"Psyche", mummy1:"Sekhem" };
 
-    on("change:intelligence_flag", function() {
-        updateRolls("intelligence");
-    });
 
-    on("change:wits_flag", function() {
-        updateRolls("wits");
-    });
+    ["intelligence", "wits", "resolve", "strength", "dexterity", "stamina", "presence","manipulation", "composure", "academics", "computer", "crafts", "investigation", "occult", "politics", "science", "athletics", "brawl", "drive", "firearms", "larceny", "stealth", "survival", "weaponry", "animalken", "empathy", "expression", "intimidation", "persuasion", "socialize", "streetwise", "subterfuge", "animalism", "auspex", "celerity", "dominate", "majesty", "nightmare", "obfuscate", "protean", "resilience", "vigor", "crúac", "thebansorcery", "death", "fate", "forces", "life", "matter", "mind", "prime", "spirit", "space", "time", "rolltype"].forEach((attr) => {
+        on(`change:${attr} change:${attr}_flag`, (eventInfo) => {
+            const source = eventInfo.sourceAttribute;
+            const attribute = (attr.includes("flag")) ? attr.split(`_flag`)[0] : attr; //Remove the "_flag" part so we can pass the name
 
-    on("change:resolve_flag", function() {
-        updateRolls("resolve");
-        updateWillpower();
-    });
+            updateRolls(`${attribute}`);
 
-    on("change:strength_flag", function() {
-        updateRolls("strength");
-    });
+            console.log(source);
 
-    on("change:dexterity_flag", function() {
-        updateRolls("dexterity");
-    });
+           if (source === "resolve_flag" || source === "composure_flag") {
+                updateWillpower()
+            };
 
-    on("change:stamina_flag", function() {
-        updateRolls("stamina");
-    });
-
-    on("change:presence_flag", function() {
-        updateRolls("presence");
-    });
-
-    on("change:manipulation_flag", function() {
-        updateRolls("manipulation");
-    });
-
-    on("change:composure_flag", function() {
-        updateRolls("composure");
-        updateWillpower();
-    });
-
-    on("change:academics_flag", function() {
-        updateRolls("academics");
-    });
-
-    on("change:computer_flag", function() {
-        updateRolls("computer");
-    });
-
-    on("change:crafts_flag", function() {
-        updateRolls("crafts");
-    });
-
-    on("change:investigation_flag", function() {
-        updateRolls("investigation");
-    });
-
-    on("change:medicine_flag", function() {
-        updateRolls("medicine");
-    });
-
-    on("change:occult_flag", function() {
-        updateRolls("occult");
-    });
-
-    on("change:politics_flag", function() {
-        updateRolls("politics");
-    });
-
-    on("change:science_flag", function() {
-        updateRolls("science");
-    });
-
-    on("change:athletics_flag", function() {
-        updateRolls("athletics");
-    });
-
-    on("change:brawl_flag", function() {
-        updateRolls("brawl");
-    });
-
-    on("change:drive_flag", function() {
-        updateRolls("drive");
-    });
-
-    on("change:firearms_flag", function() {
-        updateRolls("firearms");
-    });
-
-    on("change:larceny_flag", function() {
-        updateRolls("larceny");
-    });
-
-    on("change:stealth_flag", function() {
-        updateRolls("stealth");
-    });
-
-    on("change:survival_flag", function() {
-        updateRolls("survival");
-    });
-
-    on("change:weaponry_flag", function() {
-        updateRolls("weaponry");
-    });
-
-    on("change:animalken_flag", function() {
-        updateRolls("animalken");
-    });
-
-    on("change:empathy_flag", function() {
-        updateRolls("empathy");
-    });
-
-    on("change:expression_flag", function() {
-        updateRolls("expression");
-    });
-
-    on("change:intimidation_flag", function() {
-        updateRolls("intimidation");
-    });
-
-    on("change:persuasion_flag", function() {
-        updateRolls("persuasion");
-    });
-
-    on("change:socialize_flag", function() {
-        updateRolls("socialize");
-    });
-
-    on("change:streetwise_flag", function() {
-        updateRolls("streetwise");
-    });
-
-    on("change:subterfuge_flag", function() {
-        updateRolls("subterfuge");
-    });
-
-    on("change:intelligence", function() {
-        updateRolls("intelligence");
+            if (source === "wits" || source === "composure") {
+                updateMoralHealth()
+            };
+        });
     });
 
     on("change:wits", function() {
-        updateRolls("wits");
-        updateMoralHealth();
         getAttrs(["defense_select"], (v) => { // PRD-1407
             updateDefense(v.defense_select);
         });
     });
 
-    on("change:resolve", function() {
-        updateRolls("resolve");
-    });
-
-    on("change:strength", function() {
-        updateRolls("strength");
-    });
-
     on("change:dexterity", function() {
-        updateRolls("dexterity");
         getAttrs(["defense_select"], (v) => { // PRD-1407
             updateDefense(v.defense_select);
         });
     });
 
     on("change:stamina", function() {
-        updateRolls("stamina");
         updateHealth();
     });
 
-    on("change:presence", function() {
-        updateRolls("presence");
-    });
-
-    on("change:manipulation", function() {
-        updateRolls("manipulation");
-    });
-
-    on("change:composure", function() {
-        updateRolls("composure");
-        updateMoralHealth();
-    });
-
-    on("change:academics", function() {
-        updateRolls("academics");
-    });
-
-    on("change:computer", function() {
-        updateRolls("computer");
-    });
-
-    on("change:crafts", function() {
-        updateRolls("crafts");
-    });
-
-    on("change:investigation", function() {
-        updateRolls("investigation");
-    });
-
-    on("change:medicine", function() {
-        updateRolls("medicine");
-    });
-
-    on("change:occult", function() {
-        updateRolls("occult");
-    });
-
-    on("change:politics", function() {
-        updateRolls("politics");
-    });
-
-    on("change:science", function() {
-        updateRolls("science");
-    });
-
     on("change:athletics", function() {
-        updateRolls("athletics");
         getAttrs(["defense_select"], (v) => { // PRD-1407
             updateDefense(v.defense_select);
         });
     });
 
     on("change:brawl", function() {
-        updateRolls("brawl");
         getAttrs(["defense_select"], (v) => { // PRD-1407
             updateDefense(v.defense_select);
         });
-    });
-
-    on("change:drive", function() {
-        updateRolls("drive");
-    });
-
-    on("change:firearms", function() {
-        updateRolls("firearms");
-    });
-
-    on("change:larceny", function() {
-        updateRolls("larceny");
-    });
-
-    on("change:stealth", function() {
-        updateRolls("stealth");
-    });
-
-    on("change:survival", function() {
-        updateRolls("survival");
     });
 
     on("change:weaponry", function() {
-        updateRolls("weaponry");
         getAttrs(["defense_select"], (v) => { // PRD-1407
             updateDefense(v.defense_select);
         });
-    });
-
-    on("change:animalken", function() {
-        updateRolls("animalken");
-    });
-
-    on("change:empathy", function() {
-        updateRolls("empathy");
-    });
-
-    on("change:expression", function() {
-        updateRolls("expression");
-    });
-
-    on("change:intimidation", function() {
-        updateRolls("intimidation");
-    });
-
-    on("change:persuasion", function() {
-        updateRolls("persuasion");
-    });
-
-    on("change:socialize", function() {
-        updateRolls("socialize");
-    });
-
-    on("change:streetwise", function() {
-        updateRolls("streetwise");
-    });
-
-    on("change:subterfuge", function() {
-        updateRolls("subterfuge");
-    });
-
-    on("change:animalism", function() {
-        updateRolls("animalism");
-    });
-
-    on("change:animalism_flag", function() {
-        updateRolls("animalism");
-    });
-
-    on("change:auspex", function() {
-        updateRolls("auspex");
-    });
-
-    on("change:auspex_flag", function() {
-        updateRolls("auspex");
-    });
-
-    on("change:celerity", function() {
-        updateRolls("celerity");
-    });
-
-    on("change:celerity_flag", function() {
-        updateRolls("celerity");
-    });
-
-    on("change:dominate", function() {
-        updateRolls("dominate");
-    });
-
-    on("change:dominate_flag", function() {
-        updateRolls("dominate");
-    });
-
-    on("change:majesty", function() {
-        updateRolls("majesty");
-    });
-
-    on("change:majesty_flag", function() {
-        updateRolls("majesty");
-    });
-
-    on("change:nightmare", function() {
-        updateRolls("nightmare");
-    });
-
-    on("change:nightmare_flag", function() {
-        updateRolls("nightmare");
-    });
-
-    on("change:obfuscate", function() {
-        updateRolls("obfuscate");
-    });
-
-    on("change:obfuscate_flag", function() {
-        updateRolls("obfuscate");
-    });
-
-    on("change:protean", function() {
-        updateRolls("protean");
-    });
-
-    on("change:protean_flag", function() {
-        updateRolls("protean");
-    });
-
-    on("change:resilience", function() {
-        updateRolls("resilience");
-    });
-
-    on("change:resilience_flag", function() {
-        updateRolls("resilience");
-    });
-
-    on("change:vigor", function() {
-        updateRolls("vigor");
-    });
-
-    on("change:vigor_flag", function() {
-        updateRolls("vigor");
-    });
-
-    on("change:crúac", function() {
-        updateRolls("crúac");
-    });
-
-    on("change:crúac_flag", function() {
-        updateRolls("crúac");
-    });
-
-    on("change:thebansorcery", function() {
-        updateRolls("thebansorcery");
-    });
-
-    on("change:thebansorcery_flag", function() {
-        updateRolls("thebansorcery");
-    });
-
-    on("change:death", function() {
-        updateRolls("death");
-    });
-
-    on("change:death_flag", function() {
-        updateRolls("death");
-    });
-
-    on("change:fate", function() {
-        updateRolls("fate");
-    });
-
-    on("change:fate_flag", function() {
-        updateRolls("fate");
-    });
-
-    on("change:forces", function() {
-        updateRolls("forces");
-    });
-
-    on("change:forces_flag", function() {
-        updateRolls("forces");
-    });
-
-    on("change:life", function() {
-        updateRolls("life");
-    });
-
-    on("change:life_flag", function() {
-        updateRolls("life");
-    });
-
-    on("change:matter", function() {
-        updateRolls("matter");
-    });
-
-    on("change:matter_flag", function() {
-        updateRolls("matter");
-    });
-
-    on("change:mind", function() {
-        updateRolls("mind");
-    });
-
-    on("change:mind_flag", function() {
-        updateRolls("mind");
-    });
-
-    on("change:prime", function() {
-        updateRolls("prime");
-    });
-
-    on("change:prime_flag", function() {
-        updateRolls("prime");
-    });
-
-    on("change:spirit", function() {
-        updateRolls("spirit");
-    });
-
-    on("change:spirit_flag", function() {
-        updateRolls("spirit");
-    });
-
-    on("change:space", function() {
-        updateRolls("space");
-    });
-
-    on("change:space_flag", function() {
-        updateRolls("space");
-    });
-
-    on("change:time", function() {
-        updateRolls("time");
-    });
-
-    on("change:time_flag", function() {
-        updateRolls("time");
-    });
-
-    on("change:rollstyle", function() {
-        updateRolls("rolltype");
     });
 
     on("change:attack_type0", function() {
