@@ -3524,7 +3524,7 @@
 				const tot = rea + int + mod + tem;
 				let update = {};
 				update["initiative_mod"] = tot;
-				(mod != 0) ? update["display_initiative_mod"] = bas + " (" + tot + ")" : update["display_initiative_mod"] = bas;
+				update["display_initiative_mod"] = (mod != 0) ? `${bas} (${tot})` : bas;
 				setAttrs(update);
 			});
 		};
@@ -3544,13 +3544,16 @@
 		//Calculate Astral Initiatve
 		on("change:intuition change:astral_mod_modifier", () => {
 			getAttrs(["intuition", "astral_mod_modifier"], (v) => {
-				var int = parseInt(v.intuition) || 0;
-				var mod = parseInt(v.astral_mod_modifier) || 0;
-				var bas = int * 2;
-				var tot = (int * 2) + mod;
+				const int = parseInt(v.intuition) || 0;
+				const mod = parseInt(v.astral_mod_modifier) || 0;
+				const bas = int * 2;
+				const tot = (int * 2) + mod;
+				let update = {};
 
-				setAttrs({astral_mod: tot});
-				(mod != 0) ? setAttrs({display_astral_mod: bas + " (" + tot + ")"}) : setAttrs({display_astral_mod: bas});
+				update["astral_mod"] = tot;
+				update["display_astral_mod"] = (mod != 0) ? `${bas} (${tot})` : bas;
+
+				setAttrs(update);
 			});
 		});
 
@@ -3567,13 +3570,13 @@
 	//Calculate Matrix Initiatve.
 		on("change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle", () => {
 			getAttrs(["sheet_type", "data_processing", "pilot", "intuition", "matrix_mod_modifier", "host_rating", "level", "matrix_dice_modifier", "edge_toggle"], (v) => {
-				var dat = parseInt(v.data_processing) || 0;
-				var pil = parseInt(v.pilot) || 0;
-				var int = parseInt(v.intuition) || 0;
-				var mat = parseInt(v.matrix_mod_modifier) || 0;
-				var hos = parseInt(v.host_rating) || 0;
-				var lev = parseInt(v.level) || 0;
-				var dic = parseInt(v.matrix_dice_modifier) || 0;
+				const dat = parseInt(v.data_processing) || 0;
+				const pil = parseInt(v.pilot) || 0;
+				const int = parseInt(v.intuition) || 0;
+				const mat = parseInt(v.matrix_mod_modifier) || 0;
+				const hos = parseInt(v.host_rating) || 0;
+				const lev = parseInt(v.level) || 0;
+				const dic = parseInt(v.matrix_dice_modifier) || 0;
 				let update = {};
 
 				dice = 	(v.sheet_type === "grunt" && v.edge_toggle == 0) ? 4 + dic : 
@@ -3590,7 +3593,7 @@
 				update["matrix_mod"] = tot;
 				update["matrix_dice"] = dice;
 
-				(mat != 0) ? update["display_matrix_mod"] = bas + " (" + tot + ")" : update["display_matrix_mod"] = tot;
+				(mat != 0) ? update["display_matrix_mod"] = `${bas} (${tot})` : update["display_matrix_mod"] = tot;
 
 				setAttrs(update);
 			});
@@ -3654,7 +3657,7 @@
 		}
 
 	on("change:repeating_weapon", () => {
-	    getAttrs(["repeating_weapon_weapon_range", "repeating_weapon_weapon_melee", "repeating_weapon_weapon_type", "repeating_weapon_weapon_reach", "repeating_weapon_weapon_acc", "repeating_weapon_weapon_dv", "repeating_weapon_weapon_ap", "repeating_weapon_weapon_mode", "repeating_weapon_weapon_rc", "repeating_weapon_weapon_ammo", "repeating_weapon_weapon_note"], (v) =>{
+	    getAttrs(["repeating_weapon_weapon_range", "repeating_weapon_weapon_melee", "repeating_weapon_weapon_type", "repeating_weapon_weapon_reach", "repeating_weapon_weapon_acc", "repeating_weapon_weapon_dv", "repeating_weapon_weapon_ap", "repeating_weapon_weapon_mode", "repeating_weapon_weapon_rc", "repeating_weapon_weapon_ammo", "repeating_weapon_weapon_note"], (v) => {
 	        // Local builder putting the needed variables into scope for repeatingStringBuilder
 	        const b = repeatingStringBuilder(v, 'repeating_weapon_weapon_');
 	        // Determine fields to display and in their proper order and formatting
@@ -3704,19 +3707,19 @@
 
 	//Spell displays set into an Array
 		on("change:repeating_NPCspell", () => {
-		    getAttrs(["repeating_NPCspell_combat_type", "repeating_NPCspell_type", "repeating_NPCspell_range", "repeating_NPCspell_damage", "repeating_NPCspell_duration", "repeating_NPCspell_drain", "repeating_NPCspell_note", ], (v) =>{
-		        var com = (v.repeating_NPCspell_combat_type);
-		        var typ = "Type " + (v.repeating_NPCspell_type) + ", ";
-				var ran = (v.repeating_NPCspell_range) + ", ";
-				var dam = "Damage " + (v.repeating_NPCspell_damage) + ", ";
-				var dur = "Duration " + (v.repeating_NPCspell_duration) + ", ";
-				var not = (v.repeating_NPCspell_note);
-				dra = (v.repeating_NPCspell_drain > 0) ? ("F" + "+" + (v.repeating_NPCspell_drain) + ", ") : 
-					  ((v.repeating_NPCspell_drain < 0) ? ("F" + (v.repeating_NPCspell_drain) + ", ") :
-					  ("F" + ", "));
-				display = (com === "Direct, Force ") ? (" (Direct) " + "[" + typ + ran + dam + dur + dra + not + "]") :
-						  ((com === "Indirect, Force ?{Force|}, AP -") ? (" (Indirect) " + "[" + typ + ran + dam + dur + dra + not + "]") :
-						  (" [" + typ + ran + dur + dra + not + "]"));
+		    getAttrs(["repeating_NPCspell_combat_type", "repeating_NPCspell_type", "repeating_NPCspell_range", "repeating_NPCspell_damage", "repeating_NPCspell_duration", "repeating_NPCspell_drain", "repeating_NPCspell_note"], (v) =>{
+		        const com = v.repeating_NPCspell_combat_type;
+		        const typ = `Type ${v.repeating_NPCspell_type}, `;
+				const ran = `${v.repeating_NPCspell_range}, `;
+				const dam = `Damage ${v.repeating_NPCspell_damage}, `;
+				const dur = `Duration ${v.repeating_NPCspell_duration}, `;
+				const not = `, ${v.repeating_NPCspell_note}`;
+				const dra = v.repeating_NPCspell_drain;
+
+				const drain = (dra > 0) ? `F+${dra} ` : (dra < 0) ? `F${dra} ` :"F ";
+				const info = `[${typ}${ran}${dam}${dur}${drain}${not}]`;
+
+				display = (com === "Direct, Force ") ? ` (Direct) ${info}` : (com === "Indirect, Force ?{Force|}, AP -") ? ` (Indirect) ${info}` : `${info}`;
 		        setAttrs({repeating_NPCspell_spell: display});
 		    });
 		});
@@ -3724,17 +3727,15 @@
 	//Complex Form displays  set into an Array
 		on("change:repeating_form", () => {
 		    getAttrs(["repeating_form_form_duration", "repeating_form_form_target", "repeating_form_form_fade", "repeating_form_form_note", ], (v) =>{
-		    	var tar = "Target " + (v.repeating_form_form_target) + ", ";
-				var dur = "Duration " + (v.repeating_form_form_duration) + ", ";
-				var not = (v.repeating_form_form_note);
+		    	const tar = `Target ${v.repeating_form_form_target}, `;
+				const dur = `Duration ${v.repeating_form_form_duration}, `;
+				const not = `, ${v.repeating_form_form_note}`;
+				const fad = (v.repeating_form_form_fade > 0) ? `L+${v.repeating_form_form_fade}` : 
+							(v.repeating_form_form_fade < 0) ? `L${v.repeating_form_form_fade}` : "L";
 
-				fad = (v.repeating_form_form_fade > 0) ? ("L" + "+" + (v.repeating_form_form_fade) + ", ") : 
-					  ((v.repeating_form_form_fade < 0) ? ("L" + (v.repeating_form_form_fade) + ", ") :
-					  ("L" + ", "));
-
-				var display = (" [" + tar + dur + fad + not + "]");
-
-		        setAttrs({repeating_form_form: display});
+		        setAttrs({
+		        	repeating_form_form: ` [${tar}${dur}${fad}${not}]`
+		        });
 		    });
 		});
 
@@ -3743,13 +3744,13 @@
 		    getAttrs(["attack", "data_processing", "repeating_IC_IC_limit", "repeating_IC_IC_attribute", "repeating_IC_IC_matrix", "repeating_IC_IC_note"], (v) =>{
 		    	var att = parseInt(v.attack) || 0;
 		    	var data = parseInt(v.data_processing) || 0;
-				var attr = (v.repeating_IC_IC_attribute);
-				var mat = (v.repeating_IC_IC_matrix);
-				var not = (v.repeating_IC_IC_note);
+				var attr = v.repeating_IC_IC_attribute;
+				var mat = v.repeating_IC_IC_matrix;
+				var not = v.repeating_IC_IC_note;
 
-				display = (v.repeating_IC_IC_limit === "@{data_processing}") ? (" (" + "[" + data + "]" + " vs. " + attr + " + " + mat + ", " + not + ")") : (" (" + "[" + att + "]" + " vs. " + attr + " + " + mat + ", " + not + ")");
-
-		        setAttrs({repeating_IC_IC: display});
+		        setAttrs({
+		        	repeating_IC_IC: (v.repeating_IC_IC_limit === "@{data_processing}") ? ` ([${data}] vs. ${attr} + ${mat}, ${not})` : `([${att}] vs. ${attr} + ${mat}, ${not})`
+		        });
 		    });
 		});
 
@@ -3787,7 +3788,6 @@
 	        			const bas = parseInt(v[`${field}_rating`]) || 0;
 						const mod = parseInt(v[`${field}_rating_modifier`]) || 0;
 						const tot = bas + mod;
-
 	                    setAttrs({
 	                        [`${field}_dicepool`]: tot,
 	                        [`${field}_display_rating`]: (mod === 0) ? bas : `${bas} (${tot})`
@@ -3812,15 +3812,12 @@
 	        			setAttrs({
 	                       [`${field}_display_limit`]: `${translation} ${eventinfo.newValue}`
 	                    });
-
-	                    console.log(`${field}_display_limit : ${translation} ${eventinfo.newValue}`);
 	        		}
 	        	} else if (source.includes("specialization") && type === "player")  {	
 	        		getAttrs([`${source}`], (v) => {
 						const bas   = v[`${source}`];
 						const size  = bas.length;
 						let display = (size > 0 && size <= 20) ? `(${bas})` : (size > 20 ) ? "(" + bas.slice(0, 20) + "...)" : " ";
-
 	        			setAttrs({
 	                       [`${field}_display_specialization`]: display
 	                    });
@@ -3830,7 +3827,6 @@
 						const bas   = v[`${source}`];
 						const size  = bas.length;
 						let display = (size > 0 && size <= 20) ? bas : (size > 20 ) ? bas.slice(0, 20) + "..." : " ";
-
 	                    setAttrs({
 	                       [`${field}_display`]: display
 	                    });
@@ -3841,7 +3837,6 @@
 						let lowercase   = skill.toLowerCase();
 						let removeGroup = (lowercase.includes("group")) ? lowercase.slice(0, -6) : lowercase;
 						let skillSet    = (removeGroup.includes(" ")) ? removeGroup.replace(/ /g,"") : removeGroup;
-
 	                    setAttrs({
 	                       [`${skillSet}`]: v[`${source}`]
 	                    });
@@ -3952,7 +3947,7 @@
 	    });
 
 	//PC SPELLS/PREPS/RITUALS
-	  	['repeating_spell','repeating_preps','repeating_ritual'].forEach(field => {
+	  	['repeating_spells','repeating_preps','repeating_ritual'].forEach(field => {
 	        // Attach listener
 	        on(`change:${field}`, (eventInfo) => {
 	        	const source = eventInfo.sourceAttribute;
@@ -3975,26 +3970,16 @@
 
 	//Repeating IDs & Lifestyles Section Display
 		on("change:repeating_lifestyle", () => {
-			getAttrs(["repeating_lifestyle_name", "repeating_lifestyle_lifestyle", "repeating_lifestyle_funds", "repeating_lifestyle_licenses", "repeating_lifestyle_display"], (v) => {
-				var name = ((v.repeating_lifestyle_name).length > 0 && (v.repeating_lifestyle_name).length <= 14) ? (v.repeating_lifestyle_name) : 
-						   ((v.repeating_lifestyle_name).length > 14 ) ? (v.repeating_lifestyle_name).slice(0,14) + "..." :
-						   "";
-
-				var life = ((v.repeating_lifestyle_lifestyle).length > 0 && (v.repeating_lifestyle_lifestyle).length <= 14) ? (v.repeating_lifestyle_lifestyle) : 
-				  			((v.repeating_lifestyle_lifestyle).length > 14 ) ? (v.repeating_lifestyle_lifestyle).slice(0,14) + "..." :
-				   			"";
-
-				var funds = ((v.repeating_lifestyle_funds).length > 0 && (v.repeating_lifestyle_funds).length <= 14) ? (v.repeating_lifestyle_funds) : 
-				   			((v.repeating_lifestyle_funds).length > 14 ) ? (v.repeating_lifestyle_funds).slice(0,14) + "..." :
-				   			"";
-
-				var lice = ((v.repeating_lifestyle_licenses).length > 0 && (v.repeating_lifestyle_licenses).length <= 14) ? (v.repeating_lifestyle_licenses) : 
-				  			((v.repeating_lifestyle_licenses).length > 14 ) ? (v.repeating_lifestyle_licenses).slice(0,14) + "..." :
-				  			"";
-
-				var display = name + " / " + life + " / " + funds + " / " + lice;
-
-				setAttrs({repeating_lifestyle_display: display})
+			const lifestyle = ["repeating_lifestyle_name", "repeating_lifestyle_lifestyle", "repeating_lifestyle_funds", "repeating_lifestyle_licenses"];
+			getAttrs(lifestyle, (v) => {
+				let string = "";
+				lifestyle.forEach((variable) => {
+					const value = (v[`${variable}`].length > 0 && v[`${variable}`].length <= 14) ? v[`${variable}`] :
+					(v[`${variable}`].length > 14) ? v[`${variable}`].slice(0,14) + "..." : 
+					"";
+					string += (lifestyle.indexOf(variable) === 0) ? `${value}` : ` / ${value}`;
+				});
+				setAttrs({repeating_lifestyle_display: string})
 
 			});
 		});
