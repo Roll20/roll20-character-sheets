@@ -2272,13 +2272,12 @@
     var allStats = ["intelligence","wits","resolve","strength","dexterity","stamina","presence","manipulation","composure","academics","computer","crafts","investigation","medicine","occult","politics","science","athletics","brawl","drive","firearms","larceny","stealth","survival","weaponry","animalken","empathy","expression","intimidation","persuasion","socialize","streetwise","subterfuge","animalism","auspex","celerity","dominate","majesty","nightmare","obfuscate","protean","resilience","vigor","crúac","thebansorcery","death","fate","forces","life","matter","mind","prime","spirit","space","time","potency"];
     var potencyNames = { mortal1:"", mortal2:"", vampire1:"Blood Potency", vampire2:"Blood Potency", werewolf1:"Primal Urge", werewolf2:"Primal Urge", mage1:"Gnosis", mage2:"Gnosis", promethean1:"Azoth", promethean2:"Azoth", changeling1:"Wyrd", changeling2:"Wyrd", demon:"Primum", beast:"Lair", hunter:"", geist1:"Psyche", mummy1:"Sekhem" };
 
-    ["intelligence", "wits", "resolve", "strength", "dexterity", "stamina", "presence","manipulation", "composure", "academics", "computer", "crafts", "investigation", "occult", "politics", "science", "athletics", "brawl", "drive", "firearms", "larceny", "stealth", "survival", "weaponry", "animalken", "empathy", "expression", "intimidation", "persuasion", "socialize", "streetwise", "subterfuge", "animalism", "auspex", "celerity", "dominate", "majesty", "nightmare", "obfuscate", "protean", "resilience", "vigor", "crúac", "thebansorcery", "death", "fate", "forces", "life", "matter", "mind", "prime", "spirit", "space", "time","potency", "rolltype"].forEach((attr) => {
+    ["intelligence","wits","resolve","strength","dexterity","stamina","presence","manipulation","composure","academics","computer","crafts","investigation","occult","politics","science","athletics","brawl","drive","firearms","larceny","stealth","survival","weaponry","animalken","empathy","expression","intimidation","persuasion","socialize","streetwise","subterfuge","animalism","auspex","celerity","dominate","majesty","nightmare","obfuscate","protean","resilience","vigor","crúac","thebansorcery","death","fate","forces","life","matter","mind","prime","spirit","space","time","potency","rolltype"].forEach((attr) => {
         on(`change:${attr} change:${attr}_flag`, (eventInfo) => {
             const source = eventInfo.sourceAttribute;
             const attribute = (attr.includes("flag")) ? attr.split(`_flag`)[0] : attr; //Remove the "_flag" part so we can pass the name
 
             updateRolls(`${attribute}`);
-
             console.log(source);
 
             if (source === "resolve_flag" || source === "composure_flag") {
@@ -2301,10 +2300,11 @@
         });
     });
 
-    [...Array(6).keys()].forEach((attr) => {
-        on(`change:attack_type${attr}`, (eventInfo) => {
+    [...Array(5).keys()].forEach((attr) => {
+        on(`change:attack_type${attr}`, (eventInfo) => {//checks attack_type0 trough attack_type4
+          const source = eventInfo.sourceAttribute;
+          console.log(source);
           updateRolls("rolltype");
-
         });
     });
 
@@ -2329,23 +2329,15 @@
         updateAttacks();
     });
 
-    [...Array(17).keys()].forEach((attr) => {//healthbox nr. 0 through 16
-        on(`change:healthbox_${attr}`, (eventInfo) => {
+    [...Array(16).keys()].forEach((attr) => {//healthbox nr. 1 through 16
+        on(`change:healthbox_${attr+1}`, (eventInfo) => {
           const source = eventInfo.sourceAttribute;
           console.log(source);
           updateAttacks();
         });
     });
 
-    on("change:base_size", function() {
-        updateHealth();
-    });
-
-    on("change:giant", function() {
-        updateHealth();
-    });
-
-    on("change:small_framed", function() {
+    on("change:base_size change:giant change:small_framed change:bonus_health", function() {
         updateHealth();
     });
 
@@ -2354,11 +2346,6 @@
         updateDefaultDefense();
         updatePotencyName();
         updateRollType();
-    });
-
-
-    on("change:bonus_health", function() {
-        updateHealth();
     });
 
     on("change:bonus_willpower", function() {
@@ -2387,7 +2374,7 @@
         updateRollType();
     });
 // ---------------------------------- Translation functions ------------------------------------------
-    on("sheet:opened", function(eventInfo){
+    on("sheet:opened", function(){
         setAttrs({
             dicepoolmacro: getTranslationByKey("dice-pool"),
             modifiermacro: getTranslationByKey("modifiers"),
@@ -2558,7 +2545,7 @@
     };
 
     var updateMoralHealth = function() {
-        getAttrs(["wits", "composure", "bonus_moralhealth", "sheettype"], function(v) {
+        getAttrs(["wits","composure","bonus_moralhealth","sheettype"], function(v) {
             if (v.sheettype == "changeling2"){
                 var moralhealth = parseInt(v.wits, 10) + parseInt(v.composure, 10) + parseInt(v.bonus_moralhealth);
                 setAttrs({
@@ -2600,7 +2587,7 @@
     }
 
     var updateDefense = function(defense_type = "lowest") {
-        getAttrs(["athletics", "brawl", "dexterity", "weaponry", "wits"], function(v) {
+        getAttrs(["athletics","brawl","dexterity","weaponry","wits"], function(v) {
             var athletics = (parseInt(v.athletics, 10) || 0);
             var brawl = (parseInt(v.brawl, 10) || 10); // PRD-1407
             var dexterity = (parseInt(v.dexterity, 10) || 0);
@@ -2658,6 +2645,7 @@
         getAttrs(["iron_stamina"], function(v) {
             var ironStamina = parseInt(v.iron_stamina, 10);
             var woundpenalties = '-1-2-3';
+            const setWound = {};
             if (ironStamina >= 3) {
                 woundpenalties = '';
             }
@@ -2667,24 +2655,10 @@
             else if (ironStamina === 1) {
                 woundpenalties = '-1-2';
             }
-            setAttrs({
-                woundpenalties_1: woundpenalties,
-                woundpenalties_2: woundpenalties,
-                woundpenalties_3: woundpenalties,
-                woundpenalties_4: woundpenalties,
-                woundpenalties_5: woundpenalties,
-                woundpenalties_6: woundpenalties,
-                woundpenalties_7: woundpenalties,
-                woundpenalties_8: woundpenalties,
-                woundpenalties_9: woundpenalties,
-                woundpenalties_10: woundpenalties,
-                woundpenalties_11: woundpenalties,
-                woundpenalties_12: woundpenalties,
-                woundpenalties_13: woundpenalties,
-                woundpenalties_14: woundpenalties,
-                woundpenalties_15: woundpenalties,
-                woundpenalties_16: woundpenalties,
+            [...Array(16).keys()].forEach(num => {
+              setWound[`woundpenalties_${num+1}`]= woundpenalties;
             });
+            setAttrs(setWound);
         });
     }
 
