@@ -1,14 +1,21 @@
 ## Changes / Comments
 
-*Provide a few comments about what you have changed.*
+
 
 
 
 
 ## Roll20 Requests
 
-*Include the name of the sheet you made changes to in the title.*
+*Include the name of the sheet(s) you made changes to in the title.*
 
-- If changes fix a bug or resolves a feature request, be sure to link to that issue. 
-- For pull request that change multiple sheets please confirm these changes are intentional for all sheets. This will help us catch unintended submissions.
-- When updating existing sheets if you are changing attribute names please note what steps you have taken, if any, to assist players in keeping their data.
+Comments are very helpful for reviewing the code changes. Please answer the relevant questions below in your comment.
+
+- Is this a bug fix?
+- Does this add functional enhancements (new features or extending existing features) ?
+- Does this add or change functional aesthetics (such as layout or color scheme) ? 
+- Are you intentionally changing more that one sheet? If so, which ones ?
+- If changing or removing attributes, what steps have you taken, if any, to preserve player data ?
+- If this is a new sheet, did you follow [Building Character Sheets standards](https://wiki.roll20.net/Building_Character_Sheets#Roll20_Character_Sheets_Repository) ?
+
+If you do not know English. Please leave a comment in your native language.

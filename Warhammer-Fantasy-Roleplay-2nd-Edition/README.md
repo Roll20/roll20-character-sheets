@@ -4,6 +4,9 @@ This sheet is created for use in Warhammer 2nd Edition games, based on the chara
 
 ## Features / Changelog
 
+- v2.1.1
+  - Minor
+    * Fixed career advancements to only update for careers marked as "entered".
 - v2.1.0
   - Major
     - Weapons
