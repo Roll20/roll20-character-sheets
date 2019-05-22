@@ -4,10 +4,21 @@ This is the (compressed) source code for the Blades in the Dark character sheet 
 
 ## Changelog
 
+### 3.9
+
+* Option to rename attributes and actions
+* Internal refactoring of sheet worker code
+* CSS fixes for Portuguese translation
+
+### 3.8
+
+* Minor bugfixes and removal of legacy code
+
 ### 3.7
 
 * Simplified the roll template code
 * Support for French translations added
+* Support for Spanish translations added
 
 ### 3.6
 

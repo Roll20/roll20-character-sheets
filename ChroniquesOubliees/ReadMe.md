@@ -9,9 +9,13 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-2.0 [Screenshot](co_v2.png)
+2.1 [Screenshot](co_v2.png)
 
 # Notes de version
+## v2.1 (2019-01-08)
+* Ajout de la type de feuille de personnage PNJ
+* Importation des stats depuis un statblock pour les PNJs
+
 ## v2.0 (2018-11-19)
 
 * Ajout de tabs pour gagner de la place
