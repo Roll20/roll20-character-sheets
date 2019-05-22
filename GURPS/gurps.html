@@ -21,6 +21,7 @@
 	            <h4>GURPS Version <input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Sheet Version" /></h4>
 	            <ul>
 	                <li>Added button links to GURPS Wiki and Forum Thread</li>
+	                <li>Skills Tab. Added Wildcard! Skill level option</li>
 	            </ul>
 	            <label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 	            <button type="action" name="act_view_updates_tab" class="reset" />View All Updates</button>
@@ -2248,7 +2249,13 @@
 					<div class="sheet-cell sheet-col2">TL</div>
 					<div class="sheet-cell sheet-col3">Level</div>
 					<div class="sheet-cell sheet-col4">Attr</div>
-					<div class="sheet-cell sheet-col5">Diff</div>
+					<div class="sheet-cell sheet-col5">
+					    <div class="sheet-popup">Diff</div>
+						<span class="sheet-tooltip">
+							WC = Wildcard Skill.<br />
+							PTS = 3, 6, 12, 24, 36, etc.
+						</span>
+					</div>
 					<div class="sheet-cell sheet-col6">Bonus</div>
 					<div class="sheet-cell sheet-col7">Pts</div>
 					<div class="sheet-cell sheet-col8">Ref</div>
@@ -2268,7 +2275,7 @@
 							<input type="text" name="attr_tl" />
 						</div>
 						<div class="sheet-cell sheet-col3">
-							<input type="text" name="attr_level" disabled="disabled" value="@{base} + @{difficulty} + @{bonus} + (floor((@{adjusted_skill_points} * 0.25) + 2) * ceil( ( ( @{adjusted_skill_points} - 2 ) + abs( @{adjusted_skill_points} - 2) ) / 256 ) + @{adjusted_skill_points} * abs( ceil( ( ( @{adjusted_skill_points} - 2 ) + abs( @{adjusted_skill_points} - 2) ) / 256 ) - 1 ))"/>
+							<input type="text" name="attr_level" disabled="disabled" value="@{base} + @{difficulty} + @{bonus} + (floor(((@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) * 0.25) + 2) * ceil( ( ( (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) - 2 ) + abs( (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) - 2) ) / 256 ) + (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) * abs( ceil( ( ( (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) - 2 ) + abs( (@{wildcard_skill_points}*@{use_wildcard_points} + @{points}*@{use_normal_points}) - 2) ) / 256 ) - 1 ))"/>
 						</div>
 						<div class="sheet-cell sheet-col4">
 							<select name="attr_base">
@@ -2287,14 +2294,16 @@
 								<option value="-2">A</option>
 								<option value="-3">H</option>
 								<option value="-4">VH</option>
-								<option value="-5 + 1">W!</option>
+								<option value="-5 + 1">WC</option>
 							</select>
 						</div>
 						<div class="sheet-cell sheet-col6">
 							<input type="number" name="attr_bonus" value="0" />
 						</div>
 						<div class="sheet-cell sheet-col7">
-						    <input type="hidden" name="attr_adjusted_skill_points" value="0" />
+						    <input type="hidden" name="attr_use_wildcard_points" value="0" />
+							<input type="hidden" name="attr_use_normal_points" value="1" />
+							<input type="hidden" name="attr_wildcard_skill_points" value="0" />
 							<input type="number" name="attr_points" value="0" />
 						</div>
 						<div class="sheet-cell sheet-col8">
@@ -3607,7 +3616,8 @@
 	
 	<ul>
         <li>Added button links to GURPS Wiki and Forum Thread</li>   
-    </ul>
+        <li>Skills Tab. Added Wildcard! Skill level option</li>
+	</ul>
 	            
 	<h4>Version: 1.5.7</h4>
 	
@@ -3618,7 +3628,7 @@
 	    <li>Combat Tab: Added Falling and collision combat tool</li>
     </ul>
 	    
-	<h4>Version: 1.5.6</h4>
+	<h4>Version: 1.5.99</h4>
 	
 	<p>Pull Request: 4/9/2019</p>
 	
@@ -4307,7 +4317,7 @@ Skull Damage x4
 
 	var noop = function () {}; // do nothing.
 
-	var version = "1.5.8";
+	var version = "0.8";
 
 	var modCascade = true;
 	
@@ -4591,7 +4601,7 @@ Skull Damage x4
 		});
 		
 	}
-
+	
 	// Strength Change
 	on('change:strength_points change:strength_mod', function (e) {
 		updateST();
@@ -5009,29 +5019,52 @@ Skull Damage x4
 	});
 
 	// Update the total cost of Skills
-	on('change:repeating_skills:points hange:repeating_skills:difficulty remove:repeating_skills', function (e) {
+	on('change:repeating_skills:points change:repeating_skills:difficulty remove:repeating_skills', function (e) {
 	    
 	    // checkForWildCardSkill(e);
         getAttrs(['repeating_skills_points', 'repeating_skills_difficulty'], function (skill) {
             
+            var skill_points = +skill.repeating_skills_points;
+            
             var adjusted_points = 0;
+            
+            var use_wildcard_points = 0;
+            
+            var use_normal_skill = 0; 
             
             console.log(skill.repeating_skills_difficulty);
             
             if (String(skill.repeating_skills_difficulty) == "-5 + 1") {
                 
-                adjusted_points = Math.floor(skill.repeating_skills_points/3);
+                use_wildcard_points = 1;
+                
+                use_normal_points = 0;
+                
+                // minimum point cost is 3
+                if (skill_points < 3) {
+                    
+                    wildcard_skill_points = 0;
+                
+                } else {
+                
+                    wildcard_skill_points = Math.floor(skill_points/3);
+                    
+                }
                 
             } else {
                 
-                adjusted_points = skill.repeating_skills_points;
+                use_wildcard_points = 0;
+                
+                use_normal_points = 1;
+                
+                wildcard_skill_points = skill.repeating_skills_points;
                 
             }
             
-            console.log(adjusted_points);
-            
 			setAttrs({
-			    repeating_skills_adjusted_skill_points: adjusted_points
+			    repeating_skills_wildcard_skill_points: wildcard_skill_points,
+			    repeating_skills_use_wildcard_points: use_wildcard_points,
+			    repeating_skills_use_normal_points: use_normal_points
 			});
 			
 		    sumRepeating('repeating_skills', 'points', function(v) {
