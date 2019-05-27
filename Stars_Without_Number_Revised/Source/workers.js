@@ -1879,10 +1879,10 @@
 	};
 
 	const calculateMagicEffort = () => {
-		getAttrs(["magic_total_effort", "magic_committed_effort_current", "magic_committed_effort_scene", "magic_committed_effort_day"], function(v) {
-			const magic_total_effort = parseInt(v.magic_committed_effort_current) + parseInt(v.magic_committed_effort_scene) + parseInt(v.magic_committed_effort_day);
+		getAttrs(["magic_total_effort", "magic_committed_effort_current", "magic_committed_effort_scene", "magic_committed_effort_day", "magic_uncommitted_effort"], function(v) {
+			const magic_uncommitted_effort = parseInt(v.magic_total_effort) - (parseInt(v.magic_committed_effort_current) + parseInt(v.magic_committed_effort_scene) + parseInt(v.magic_committed_effort_day));
 			mySetAttrs({
-				magic_total_effort
+				magic_uncommitted_effort
 			}, v);
 		});
 	};
@@ -3472,7 +3472,7 @@
 
 	on([...effortAttributes, "repeating_psychic-skills:skill"].map(x => `change:${x}`).join(" "), calculateEffort);
 
-	on("change:magic_committed_effort_current change:magic_committed_effort_scene change: magic_committed_effort_day", calculateMagicEffort);
+	on("change:magic_committed_effort_current change:magic_committed_effort_scene change: magic_committed_effort_day change:magic_total_effort", calculateMagicEffort);
 
 	on("change:repeating_armor change:innate_ac remove:repeating_armor", calculateAC);
 
