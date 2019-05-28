@@ -709,8 +709,6 @@ const EDGE_LINK = "edge_link";
 on("change:strength_xp change:body_xp change:reflex_xp change:dexterity_xp change:intelligence_xp change:will_xp change:charisma_xp change:edge_xp", eventInfo => {
     attributeName = eventInfo.sourceAttribute;
 
-    console.debug("attribute name = " + attributeName);
-
     attributeValue = Math.floor(eventInfo.newValue/100);
     attributeLinkedValue = calculateLinkedAttributeValue(attributeValue);
 
@@ -840,11 +838,7 @@ function skillXPChanged(eventInfo) {
                 getSkillDisplayName(skillData, skillName, subSkill) + " Skill Check:\n" +
                 "Margin of Success: [[2d6 + @{skill_modifier}[MOD] - @{target_number}[TN]]]";
 
-            console.debug("setting skill attribute(s): " + JSON.stringify(skillAttributesToSet));
-
-            setAttrs(skillAttributesToSet, {}, () => {
-                console.debug("skill attributes set");
-            });
+            setAttrs(skillAttributesToSet);
         });
     });
 }
@@ -1489,11 +1483,9 @@ function sheetMigration() {
     console.log("Running sheet data migration");
 
     let sheetVersionAttributeName = "btatow_sheet_version";
-    let currentVersion = 2;
+    let currentVersion = 3;
 
     getAttrs([sheetVersionAttributeName], sheetVersionAttribute => {
-        console.debug("Checking sheet version");
-
         let sheetVersion = Number(sheetVersionAttribute[sheetVersionAttributeName])
         // Check if we should do the migration
         if (isNaN(sheetVersion)) {
@@ -1584,7 +1576,22 @@ function migrateFrom2To3() {
                 xp: "repeating_skills_" + id + "_skill_xp"
             };
             getAttrs(Object.values(oldSkillDataNames), skillValues => {
+                console.debug("old skill values: " + JSON.stringify(skillValues))
 
+                const skillFirstName = skillValues[oldSkillDataNames.skill].split(" ")[0].toLowerCase();
+
+                console.debug("skill value: " + skillFirstName);
+
+                let skillData = skillsList[skillFirstName];
+                const newSkillData = {};
+
+                if (skillData !== undefined) {
+                    newSkillData[newSkillDataNames.skill] = skillFirstName;
+                    newSkillData[newSkillDataNames.subSkill] = skillValues[oldSkillDataNames.subSkill]
+                    newSkillData[newSkillDataNames.xp] = skillValues[oldSkillDataNames.xp]
+                }
+
+                console.debug("migrated skill data: " + JSON.stringify(newSkillData))
             });
         });
     });
