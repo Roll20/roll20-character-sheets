@@ -36,6 +36,10 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ## Changelog
 
+### 2.4.1
+
+* Fix Innate AC missing translation key.
+
 ### 2.4.0
 
 * Add tracking of permanent System Strain.
