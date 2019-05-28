@@ -4046,6 +4046,10 @@ Skull Damage x4
                     <td>
                         
                         <!-- WARNING THIS IS GOING TO GET GET UGLY AND HARD TO FOLLOW -->
+                        
+                        <!-- NOTE: Regardless of the score you are rolling against, -->
+                        <!-- a roll of 3 or 4 is always a success, while a roll of 17 or 18 is always a failure. -->
+                        
                         <!-- Roll of 18 is always critical failure -->
                         {{#rollTotal() rollResult 18}}
                             <span class="failure">
@@ -4057,8 +4061,39 @@ Skull Damage x4
                             </span>
                         {{/rollTotal() rollResult 18}}
                         
-                        <!-- Roll < 18 means we have a chance at hit or miss -->
-                        {{#rollLess() rollResult 18}}
+                        <!-- Roll of 17 is always a failure -->
+                        {{#rollTotal() rollResult 17}}
+                            <span class="failure">
+                                {{rollResult}}
+                                <span class="failure-text">
+                                    
+                                    <!-- skill of 15 or less is critical -->
+                                    {{#rollLess() effectiveSkill 16}}Critical{{/rollLess() effectiveSkill 16}}
+                                    
+                                    {{#showHitLabel}}Miss{{/showHitLabel}}
+                                    {{#showSuccessLabel}}Failure{{/showSuccessLabel}}
+                                </span>
+                            </span>
+                        {{/rollTotal() rollResult 17}}
+                        
+                        <!-- A roll of 3 or 4 always succeeds -->
+                        {{#rollBetween() rollResult 3 4}}
+                            <span class="success">
+                                {{rollResult}}
+                                <span class="success-text">
+                                    
+                                    <!-- if critical success is turned on, show text -->
+                                    {{#rollLess() useCriticalPlusTen 2}}Critical{{/rollLess() useCriticalPlusTen 2}}
+                                    
+                                    {{#showHitLabel}}Hit{{/showHitLabel}}
+                                    {{#showSuccessLabel}}Success{{/showSuccessLabel}}
+                                </span>
+                            </span>
+                        {{/rollBetween() rollResult 3 4}}
+                        
+                        <!-- Roll from 5 to 16 means we have a chance at hit or miss -->
+                        <!-- NOTE: A roll of 3 or 4 always succeeds, handled above -->
+                        {{#rollBetween() rollResult 5 16}}
 
                             <!-- Check for failure, where roll is greaten than effective skill -->
                             {{#rollGreater() rollResult effectiveSkill}}
@@ -4099,8 +4134,9 @@ Skull Damage x4
                                 </span>
                             {{/rollGreater() rollResult effectiveSkill}}
 
-                            <!-- check for success, roll from 3 to effective skill -->
-                            {{#rollBetween() rollResult 3 effectiveSkill}}
+                            <!-- check for success, roll from 5 to effective skill -->
+                            <!-- NOTE: roll 3 or 4 has already been handled -->
+                            {{#rollBetween() rollResult 5 effectiveSkill}}
 
                                 <span class="success">
                                     {{rollResult}}
@@ -4116,6 +4152,7 @@ Skull Damage x4
                                                 <!-- if effective sKill is 16 or higher, check for critical success on a 6 -->
                                                 {{#rollGreater() effectiveSkill 15}}
                                                     {{#rollTotal() rollResult 6}}Critical{{/rollTotal() rollResult 6}}
+                                                    {{#rollTotal() rollResult 5}}Critical{{/rollTotal() rollResult 5}}
                                                 {{/rollGreater() effectiveSkill 15}}
 
                                                 <!-- If rules as written and if effectiveSKill is 15, check for critical success on a 5 -->
@@ -4125,18 +4162,15 @@ Skull Damage x4
 
                                             {{/rollTotal() useCriticalPlusTen 1}}
 
-                                            <!-- Otherwise a 3 or 4 is a critical -->
-                                            {{#rollBetween() rollResult 3 4}}Critical{{/rollBetween() rollResult 3 4}}
-                                            
                                         {{/rollLess() useCriticalPlusTen 2}}
                                         
                                         {{#showHitLabel}}Hit{{/showHitLabel}}
                                         {{#showSuccessLabel}}Success{{/showSuccessLabel}}
                                     </span>
                                 </span>                            
-                            {{/rollBetween() rollResult 3 effectiveSkill}}
+                            {{/rollBetween() rollResult 5 effectiveSkill}}
 
-                        {{/rollLess() rollResult 18}}
+                        {{/rollBetween() rollResult 5 16}}
                         
                     </td>
                 </tr>
