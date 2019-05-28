@@ -433,7 +433,7 @@
         <span class="skills skill skills-headings left">Skill</span>
         <span class="skills skills-skill-level">Lvl</span>
         <span class="skills skills-linked-attributes">Links</span>
-        <!-- <span class="skills skills-modifier">Mod</span> -->
+        <span class="skills skills-modifier">Mod</span>
         <span class="skills skills-tnc">TN/C</span>
         <span class="skills skills-xp">XP</span>
     </div>
@@ -543,7 +543,7 @@
                 <input type="hidden" name="attr_skill_level">
                 <span name="attr_skill_linked_attributes" class="skills content skills-labels skills-linked-attributes" title="@{repeating_skills_$id_skill_linked_attributes}"></span>
                 <input type="hidden" name="attr_skill_linked_attributes">
-                <!-- <span name="attr_skill_modifier" class="skills content skills-labels skills-modifier" title="@{repeating_skills_$id_skill_modifier}"></span> -->
+                <span name="attr_skill_modifier" class="skills content skills-labels skills-modifier" title="@{repeating_skills_$id_skill_modifier}"></span>
                 <input type="hidden" name="attr_skill_modifier">
                 <span name="attr_skill_tnc" class="skills content skills-labels skills-tnc" title="@{repeating_skills_$id_skill_tnc}"></span>
                 <input type="hidden" name="attr_skill_tnc">
@@ -673,6 +673,10 @@
 on("sheet:opened", () => {
     sheetMigration();
 
+    recalculateSkills();
+});
+
+const recalculateSkills = () => {
     getSectionIDs("skills", ids => {
         ids.forEach(id => getAttrs(["repeating_skills_" + id + "_skill_xp"], values => {
             skillXPChanged({
@@ -681,7 +685,7 @@ on("sheet:opened", () => {
             })
         }));
     });
-});
+}
 
 const STRENGTH_XP = "strength_xp";
 const BODY_XP = "body_xp";
@@ -710,49 +714,54 @@ on("change:strength_xp change:body_xp change:reflex_xp change:dexterity_xp chang
     attributeValue = Math.floor(eventInfo.newValue/100);
     attributeLinkedValue = calculateLinkedAttributeValue(attributeValue);
 
+    let attributesToSet = {};
+
     switch (attributeName) {
-        case STRENGTH_XP: setAttrs({
+        case STRENGTH_XP: attributesToSet = {
                             strength: attributeValue,
                             strength_link: attributeLinkedValue
-                        });
+                        };
                         break;
-        case BODY_XP: setAttrs({
+        case BODY_XP: attributesToSet = {
                             body: attributeValue,
                             body_link: attributeLinkedValue
-                        });
+                        };
                         break;
-        case REFLEX_XP: setAttrs({
+        case REFLEX_XP: attributesToSet = {
                             reflex: attributeValue,
                             reflex_link: attributeLinkedValue
-                        });
+                        };
                         break;
-        case DEXTERITY_XP: setAttrs({
+        case DEXTERITY_XP: attributesToSet = {
                             dexterity: attributeValue,
                             dexterity_link: attributeLinkedValue
-                        });
+                        };
                         break;
-        case INTELLIGENCE_XP: setAttrs({
+        case INTELLIGENCE_XP: attributesToSet = {
                             intelligence: attributeValue,
                             intelligence_link: attributeLinkedValue
-                        });
+                        };
                         break;
-        case WILL_XP: setAttrs({
+        case WILL_XP: attributesToSet = {
                             will: attributeValue,
                             will_link: attributeLinkedValue
-                        });
+                        };
                         break;
-        case CHARISMA_XP: setAttrs({
+        case CHARISMA_XP: attributesToSet = {
                             charisma: attributeValue,
                             charisma_link: attributeLinkedValue
-                        });
+                        };
                         break;
-        case EDGE_XP: setAttrs({
+        case EDGE_XP: attributesToSet = {
                             edge: attributeValue,
                             edge_link: attributeLinkedValue
-                        });
+                        };
                         break;
         default: console.error("unknown attribute type passed in to basic attribute on change function");
+                        return;
     }
+
+    setAttrs(attributesToSet, {}, recalculateSkills)
 });
 
 function calculateLinkedAttributeValue(attribute) {
@@ -816,16 +825,16 @@ function skillXPChanged(eventInfo) {
             tieredSkills.includes(skillNameLookupKey)
         );
 
-        skillAttributesToSet["repeating_skills_" + id + "skill_linked_attributes"] = skillData.linkedAttributes
-            .map(linkAtr => getLinkedAttributeDisplayName(linkAtr))
-            .join(" + ");
-
         skillAttributesToSet["repeating_skills_" + id + "skill_tnc"] = skillData.targetNumber + "/" + skillData.complexity;
         skillAttributesToSet["repeating_skills_" + id + "target_number"] = skillData.targetNumber;
 
         getAttrs(skillData.linkedAttributes, values => {
             skillAttributesToSet["repeating_skills_" + id + "skill_modifier"] = Object.values(values)
                 .reduce((total, num) => Number(total) + Number(num)) + Number(skillAttributesToSet[skillLevel]);
+
+            skillAttributesToSet["repeating_skills_" + id + "skill_linked_attributes"] = skillData.linkedAttributes
+                .map(linkAtr => getLinkedAttributeDisplayName(linkAtr) + " (" + values[linkAtr] + ")")
+                .join(" + ");
 
             skillAttributesToSet["repeating_skills_" + id + "skill_roll_value"] =
                 getSkillDisplayName(skillData, skillName, subSkill) + " Skill Check:\n" +
