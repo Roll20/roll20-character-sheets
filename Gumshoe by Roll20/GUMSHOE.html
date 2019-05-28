@@ -2876,6 +2876,7 @@ var currentAbilities = {},
 
 		getAttrs(aList.concat(pointList), function(values) {
 			let result = {},
+
 				current = repeating ? 'r-' + eventInfo.category + '_points' : eventInfo.category + '_points',
 
 				computePoints = function(abilities) {
@@ -2885,10 +2886,14 @@ var currentAbilities = {},
 							occupation = values[ability + "_occupation"];
 						if(ability == 'fleeing') {
 							let ath = values['athletics_max'] ? parseInt(values['athletics_max']) : 0;
-							if(ath < max) {
-								result += ath;
-								max -= ath;
+							if(ath == 0 || occupation == 0.5) {
+								max = Math.max(max - values[ability + "_free"], 0);
 								occupation = 0.5;
+							}
+							else if(2*ath < max){
+								max = ath + 0.5*max; //Fleeing points cost half when having more than (2*athletics points) amount of fleeing   (ToC p.26) 
+							}else{
+								max = Math.max(max - values[ability + "_free"], 0);
 							}
 						} else {
 							max = Math.max(max - values[ability + "_free"], 0);
