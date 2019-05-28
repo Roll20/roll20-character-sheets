@@ -12,7 +12,6 @@ Versions have two numbers Major.Minor
 * New option to enable/disable battle units.
 * New option to enable/disable spirit type creatures and the form toggle.
 * Removed sheet variants which was a hidden feature utilized to help support the M-Space sheet on the same code base.  Now simply selecting M-Space setting will do all that work.  This includes altering the logo in the upper-right.
-* [ToDo and Delete] Update script to recalculate campaign settings
 
 ## 2.0
 With this version I am switching back to a two number version format.  The description above has been adjusted.  The intent is to release versions in smaller chunks.  As soon as a new feature or adjustment is made it will be released as a version.  This will hopefully quicken the pace of sheet development and make sheet adjustments a bit more manageable.  Expect that 2nd number to increase rather fast.
