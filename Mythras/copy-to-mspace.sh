@@ -7,7 +7,7 @@ cp ./README.md ../M-Space/README.md
 cp ./Mythras.html ../M-Space/M-Space.html
 cp ./Mythras.css ../M-Space/M-Space.css
 cp ./translation.json ../M-Space/translation.json
-cp -r ./translations ../M-Space/
+#cp -r ./translations ../M-Space/
 
 # Flip the sheet variant toggle
 sed -i 's/name="attr_sheet_varient" value="mythras" checked/name="attr_sheet_varient" value="mythras"/' ../M-Space/M-Space.html
