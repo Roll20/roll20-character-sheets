@@ -5,6 +5,14 @@ Versions have two numbers Major.Minor
 
 **Minor**: Indicates the addition of new features, bugfixes or other adjustments which do not alter variable names or fundamental workflow.
 
+## 2.2
+### New Features
+* Added toggle to base HP on CON+SIZ or CON+SIZ+POW or CON+SIZ+STR
+* Added toggle to base damage mod on STR+SIZ or STR+SIZ+POW or STR+SIZ+CON
+* Added toggle to add 1/10 Athletics to Initiative rolls
+* Added notes field to all skills which will display at the bottom of skill rolls
+* Added Worlds United to Settings
+
 ## 2.1
 ### New Features
 * Added options to enable/disable magic point/power points/prana points
@@ -12,6 +20,7 @@ Versions have two numbers Major.Minor
 * New option to enable/disable battle units.
 * New option to enable/disable spirit type creatures and the form toggle.
 * Removed sheet variants which was a hidden feature utilized to help support the M-Space sheet on the same code base.  Now simply selecting M-Space setting will do all that work.  This includes altering the logo in the upper-right.
+* 
 
 ## 2.0
 With this version I am switching back to a two number version format.  The description above has been adjusted.  The intent is to release versions in smaller chunks.  As soon as a new feature or adjustment is made it will be released as a version.  This will hopefully quicken the pace of sheet development and make sheet adjustments a bit more manageable.  Expect that 2nd number to increase rather fast.

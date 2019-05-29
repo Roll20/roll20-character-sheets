@@ -196,17 +196,19 @@
     
     // Damage Mod Auto Calc
     var calc_damage_mod = function() {
-        getAttrs(["str", "siz", "pow", "damage_mod_add_pow", "damage_mod_other", "damage_mod_temp"], function(values) {
-            if (values.damage_mod_add_pow == 1) {
-                var damage_mod_table_value = parseInt(values.str) + parseInt(values.siz) + parseInt(values.pow);
+        getAttrs(["str", "siz", "con", "pow", "damage_mod_calc", "damage_mod_other", "damage_mod_temp"], function(v) {
+            if (v.damage_mod_calc == 1) {
+                var damage_mod_table_value = parseInt(v.str) + parseInt(v.siz) + parseInt(v.pow);
+            } else if (v.damage_mod_calc == 2) {
+                var damage_mod_table_value = parseInt(v.str) + parseInt(v.siz) + parseInt(v.con);
             } else {
-                var damage_mod_table_value = parseInt(values.str) + parseInt(values.siz);
+                var damage_mod_table_value = parseInt(v.str) + parseInt(v.siz);
             }
             
             var base_damage_mod_step = find_damage_mod_step(damage_mod_table_value);
             var base_damage_mod_value = find_damage_mod(base_damage_mod_step);
             
-            var damage_mod_step = parseInt(base_damage_mod_step) + parseInt(values.damage_mod_other) + parseInt(values.damage_mod_temp);
+            var damage_mod_step = parseInt(base_damage_mod_step) + parseInt(v.damage_mod_other) + parseInt(v.damage_mod_temp);
             var damage_mod_value = find_damage_mod(damage_mod_step);
             
             setAttrs({
@@ -215,7 +217,7 @@
             });
         });
     };
-    on("change:str change:siz change:pow change:damage_mod_add_pow change:damage_mod_other change:damage_mod_temp", function() { calc_damage_mod(); });
+    on("change:str change:siz change:con change:pow change:damage_mod_calc change:damage_mod_other change:damage_mod_temp", function() { calc_damage_mod(); });
     
     // Experience Mod Auto Calc
     var calc_experience_mod = function() {
@@ -249,11 +251,19 @@
     
     // Initiative Auto Calc
     var calc_initiative = function() {
-        getAttrs(["dex", "int", "cha", "initiative_bonus_temp", "armor_penalty", "fatigue", "initiative_bonus_other", "spirit"], function(v) {
+        getAttrs(["athletics_experience", "athletics_other", "athletics_temp", "initiative_add_one_tenth_athletics", "str", "dex", "int", "cha", "initiative_bonus_temp", "armor_penalty", "fatigue", "initiative_bonus_other", "spirit"], function(v) {
+            if(v["initiative_add_one_tenth_athletics"] == "1") {
+                var athletics_bonus = Math.ceil((parseInt(v.str)+parseInt(v.dex)+parseInt(v.athletics_experience)+parseInt(v.athletics_other)+parseInt(v.athletics_temp))/10);
+            } else {
+                var athletics_bonus = 0;
+            }
+
             if(v["spirit"] == "1") {
+                var spirit_athletics_bonus = 0;
                 var base_value = Math.ceil((parseInt(v.int) + parseInt(v.cha)) / 2);
                 var spirit_ib = base_value;
             } else {
+                var spirit_athletics_bonus = athletics_bonus;
                 var base_value = Math.ceil((parseInt(v.int) + parseInt(v.dex)) / 2);
                 var spirit_ib = Math.ceil((parseInt(v.int) + parseInt(v.cha)) / 2);
             }
@@ -261,25 +271,26 @@
             var fatigue = parseInt(v.fatigue);
             if (fatigue > 6) {
                 var initiative_bonus_fatigue = getTranslationByKey("no-penalty-u");
-                var initiative_bonus = base_value + parseInt(v.initiative_bonus_other) + parseInt(v.initiative_bonus_temp) + parseInt(v.armor_penalty);
+                var initiative_bonus = base_value + spirit_athletics_bonus + parseInt(v.initiative_bonus_other) + parseInt(v.initiative_bonus_temp) + parseInt(v.armor_penalty);
             } else if (fatigue == 6) {
                 var initiative_bonus_fatigue = "-2";
-                var initiative_bonus = base_value + parseInt(v.initiative_bonus_other) + parseInt(v.initiative_bonus_temp) + parseInt(v.armor_penalty) - 2;
+                var initiative_bonus = base_value + spirit_athletics_bonus + parseInt(v.initiative_bonus_other) + parseInt(v.initiative_bonus_temp) + parseInt(v.armor_penalty) - 2;
             } else if (fatigue == 5) {
                 var initiative_bonus_fatigue = "-4";
-                var initiative_bonus = base_value + parseInt(v.initiative_bonus_other) + parseInt(v.initiative_bonus_temp) + parseInt(v.armor_penalty) - 4;
+                var initiative_bonus = base_value + spirit_athletics_bonus + parseInt(v.initiative_bonus_other) + parseInt(v.initiative_bonus_temp) + parseInt(v.armor_penalty) - 4;
             } else if (fatigue == 4) {
                 var initiative_bonus_fatigue = "-6";
-                var initiative_bonus = base_value + parseInt(v.initiative_bonus_other) + parseInt(v.initiative_bonus_temp) + parseInt(v.armor_penalty) - 6;
+                var initiative_bonus = base_value + spirit_athletics_bonus + parseInt(v.initiative_bonus_other) + parseInt(v.initiative_bonus_temp) + parseInt(v.armor_penalty) - 6;
             } else if (fatigue == 3) {
                 var initiative_bonus_fatigue = "-8";
-                var initiative_bonus = base_value + parseInt(v.initiative_bonus_other) + parseInt(v.initiative_bonus_temp) + parseInt(v.armor_penalty) - 8;
+                var initiative_bonus = base_value + spirit_athletics_bonus + parseInt(v.initiative_bonus_other) + parseInt(v.initiative_bonus_temp) + parseInt(v.armor_penalty) - 8;
             } else {
                 var initiative_bonus_fatigue = getTranslationByKey("no-activities-possible-u");
-                var initiative_bonus = base_value + parseInt(v.initiative_bonus_other) + parseInt(v.initiative_bonus_temp) + parseInt(v.armor_penalty) - 99;
+                var initiative_bonus = base_value + spirit_athletics_bonus + parseInt(v.initiative_bonus_other) + parseInt(v.initiative_bonus_temp) + parseInt(v.armor_penalty) - 99;
             }
             
             setAttrs({
+                initiative_athletics_bonus: athletics_bonus,
                 initiative_bonus_base: base_value,
                 initiative_bonus_fatigue: initiative_bonus_fatigue,
                 initiative_bonus: initiative_bonus,
@@ -287,7 +298,7 @@
             });
         });
     };
-    on("change:dex change:int change:cha change:initiative_bonus_temp change:armor_penalty change:fatigue change:initiative_bonus_other change:spirit", function() { calc_initiative(); });
+    on("change:dex change:str change:int change:cha change:athletics_experience change:athletics_other change:athletics_temp change:initiative_add_one_tenth_athletics change:initiative_bonus_temp change:armor_penalty change:fatigue change:initiative_bonus_other change:spirit", function() { calc_initiative(); });
 
     // Spirit Intensity Auto Calc
     var calc_spirit_intensity = function() {
@@ -566,15 +577,21 @@
 
     // HP & Armor Auto Calc
     var calc_hp_max_base = function() {
-        getAttrs(["con", "siz", "pow", "hp_use_pow"], function(v) {
-            base_value = Math.ceil( (parseInt(v.con) + parseInt(v.siz) + (parseInt(v.pow) * parseInt(v.hp_use_pow)))/5 );
+        getAttrs(["con", "siz", "pow", "str", "hp_calc"], function(v) {
+            if (v.hp_calc == "1") {
+                base_value = Math.ceil((parseInt(v.con) + parseInt(v.siz) + parseInt(v.pow))/5);
+            } else if (v.hp_calc == "2") {
+                base_value = Math.ceil((parseInt(v.con) + parseInt(v.siz) + parseInt(v.str))/5);
+            } else {
+                base_value = Math.ceil((parseInt(v.con) + parseInt(v.siz))/5);
+            }
 
             setAttrs({
                 hp_max_base: base_value,
             });
         });
     };
-    on("change:con change:siz change:pow change:hp_use_pow", function() { calc_hp_max_base(); });
+    on("change:con change:siz change:pow change:str change:hp_calc", function() { calc_hp_max_base(); });
 
     var calc_location_hp = function(location) {
         var hp_max_base_mod = location + "_hp_max_base_mod";
@@ -632,8 +649,15 @@
 
     // Simplified HP Auto Calc
     var calc_simplified_hp = function() {
-        getAttrs(["con", "siz", "pow", "hp_use_pow", "simplified_hp_max_other", "all_hp_temp", "simplified_hp", "simplified_hp_max", "simplified_hp_mook1", "simplified_hp_mook2", "simplified_hp_mook3", "simplified_hp_mook4", "simplified_hp_mook5", "simplified_hp_mook6", "simplified_hp_mook7", "simplified_hp_mook8", "simplified_hp_mook9", "simplified_hp_mook10", "simplified_hp_mook11", "simplified_hp_mook12"], function(v) {
-            base_value = Math.ceil( (parseInt(v.con) + parseInt(v.siz) + (parseInt(v.pow) * parseInt(v.hp_use_pow)))/2 );
+        getAttrs(["con", "siz", "str", "pow", "hp_calc", "simplified_hp_max_other", "all_hp_temp", "simplified_hp", "simplified_hp_max", "simplified_hp_mook1", "simplified_hp_mook2", "simplified_hp_mook3", "simplified_hp_mook4", "simplified_hp_mook5", "simplified_hp_mook6", "simplified_hp_mook7", "simplified_hp_mook8", "simplified_hp_mook9", "simplified_hp_mook10", "simplified_hp_mook11", "simplified_hp_mook12"], function(v) {
+            if (v.hp_calc == "1") {
+                base_value = Math.ceil((parseInt(v.con) + parseInt(v.siz) + parseInt(v.pow))/2);
+            } else if (v.hp_calc == "2") {
+                base_value = Math.ceil((parseInt(v.con) + parseInt(v.siz) + parseInt(v.str))/2);
+            } else {
+                base_value = Math.ceil((parseInt(v.con) + parseInt(v.siz))/2);
+            }
+            
             new_hp_max = base_value + parseInt(v.simplified_hp_max_other) + parseInt(v.all_hp_temp);
             diff_hp_max = new_hp_max - parseInt(v.simplified_hp_max);
 
@@ -654,7 +678,7 @@
             });
         });
     }
-    on("change:con change:siz change:pow change:hp_use_pow change:simplified_hp_max_other change:all_hp_temp", function() { calc_simplified_hp(); });
+    on("change:con change:siz change:pow change:str change:hp_calc change:simplified_hp_max_other change:all_hp_temp", function() { calc_simplified_hp(); });
 
     // Fatigue Auto Calc
     var calc_fatigue = function() {
@@ -2181,6 +2205,32 @@
         calc_cha();
 
     }
+
+    function upgrade_2_1_to_2_2() {
+        var newattrs = {};
+        getAttrs(["hp_use_pow", "damage_mod_add_pow"], function(v) {
+            console.log("Convert hp_use_pow to hp_calc");
+            if(v["hp_use_pow"]) {
+                newattrs["hp_calc"] = v["hp_use_pow"];
+            } else {
+                newattrs["hp_calc"] = "0";
+            }
+
+            console.log("Convert damage_mod_add_pow to damage_mod_calc");
+            if(v["damage_mod_add_pow"]) {
+                newattrs["damage_mod_calc"] = v["damage_mod_add_pow"];
+            } else {
+                newattrs["damage_mod_calc"] = "0";
+            }
+            
+            setAttrs(newattrs);
+        });
+
+        calc_hp_max_base();
+        calc_simplified_hp();
+        calc_damage_mod();
+        calc_initiative();
+    }
     
     var versioning = function() {
         getAttrs(["version"], function(v) {
@@ -2301,6 +2351,12 @@
                 setAttrs({version: "2.1"});
                 versioning();
             }
+            else if(v["version"] === "2.1") {
+                console.log("upgrading to v2.2");
+                upgrade_2_1_to_2_2();
+                setAttrs({version: "2.2"});
+                versioning();
+            }
             else {
                 console.log("Sheet fully updated");
             }
@@ -2357,6 +2413,18 @@
                 setting_configs["boating_standard"] = "0";
                 setting_configs["linguistics_enabled"] = "1";
                 setting_configs["dependencies_enabled"] = "1";
+                setting_configs["firearms_enabled"] = "1";
+                setting_configs["folk_magic_enabled"] = "0";
+                setting_configs["animism_enabled"] = "0";
+                setting_configs["sorcery_enabled"] = "0";
+                setting_configs["theism_enabled"] = "0";
+                setting_configs["mythras_psionics_enabled"] = "1";
+                setting_configs["vehicle_type"] = "mythras";
+            } else if(v["setting_option"] === "worlds_united") {
+                setting_configs["spirits_enabled"] = "0";
+                setting_configs["magic_points_enabled"] = "0";
+                setting_configs["tenacity_enabled"] = "1";
+                setting_configs["linguistics_enabled"] = "1";
                 setting_configs["firearms_enabled"] = "1";
                 setting_configs["folk_magic_enabled"] = "0";
                 setting_configs["animism_enabled"] = "0";
