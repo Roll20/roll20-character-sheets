@@ -9362,49 +9362,41 @@
         });
     };
 
-    var update_initiative = function() {
-        var attrs_to_get = ["dexterity","dexterity_mod","initmod","jack_of_all_trades","jack","init_tiebreaker","pb_type"];
-        getSectionIDs("repeating_inventory", function(idarray){
-            _.each(idarray, function(currentID, i) {
-                attrs_to_get.push("repeating_inventory_" + currentID + "_equipped");
-                attrs_to_get.push("repeating_inventory_" + currentID + "_itemmodifiers");
+    const update_initiative = () => {
+        const attrs_to_get = ["dexterity","dexterity_mod","initmod","jack_of_all_trades","jack","init_tiebreaker","pb_type"];
+        getSectionIDs("repeating_inventory", (idarray) => {
+            _.each(idarray, (currentID) => {
+                attrs_to_get.push(`repeating_inventory_${currentID}_equipped`);
+                attrs_to_get.push(`repeating_inventory_${currentID}_itemmodifiers`);
             });
-            getAttrs(attrs_to_get, function(v) {
-                var update = {};
-                var final_init = parseInt(v["dexterity_mod"], 10);
-                if(v["initmod"] && !isNaN(parseInt(v["initmod"], 10))) {
+            getAttrs(attrs_to_get, (v) => {
+                let update = {};
+                let final_init = parseInt(v["dexterity_mod"], 10);
+                if (v["initmod"] && !isNaN(parseInt(v["initmod"], 10))) {
                     final_init = final_init + parseInt(v["initmod"], 10);
                 }
-                if(v["init_tiebreaker"] && v["init_tiebreaker"] != 0) {
+                if (v["init_tiebreaker"] && v["init_tiebreaker"] != 0) {
                     final_init = final_init + (parseInt(v["dexterity"], 10)/100);
                 }
-                if(v["jack_of_all_trades"] && v["jack_of_all_trades"] != 0) {
-                    if(v["pb_type"] && v["pb_type"] === "die" && v["jack"]) {
-                        // final_init = final_init + Math.floor(parseInt(v["jack"].substring(1),10)/2);
+                if (v["jack_of_all_trades"] && v["jack_of_all_trades"] != 0) {
+                    if (v["pb_type"] && v["pb_type"] === "die" && v["jack"]) {
                         final_init = final_init + "+" + v["jack"];
-                    }
-                    else if(v["jack"] && !isNaN(parseInt(v["jack"], 10))) {
+                    } else if (v["jack"] && !isNaN(parseInt(v["jack"], 10))) {
                         final_init = final_init + parseInt(v["jack"], 10);
                     }
                 }
-                _.each(idarray, function(currentID){
-                    if(v["repeating_inventory_" + currentID + "_equipped"] && v["repeating_inventory_" + currentID + "_equipped"] === "1" && v["repeating_inventory_" + currentID + "_itemmodifiers"] && v["repeating_inventory_" + currentID + "_itemmodifiers"].toLowerCase().indexOf("ability checks") > -1) {
-                        var mods = v["repeating_inventory_" + currentID + "_itemmodifiers"].toLowerCase().split(",");
-                        _.each(mods, function(mod) {
-                            if(mod.indexOf("ability checks") > -1) {
-                                if(mod.indexOf("-") > -1) {
-                                    var new_mod = !isNaN(parseInt(mod.replace(/[^0-9]/g, ""), 10)) ? parseInt(mod.replace(/[^0-9]/g, ""), 10) : false;
-                                    final_init = new_mod ? final_init - new_mod : final_init;
-                                }
-                                else {
-                                    var new_mod = !isNaN(parseInt(mod.replace(/[^0-9]/g, ""), 10)) ? parseInt(mod.replace(/[^0-9]/g, ""), 10) : false;
-                                    final_init = new_mod ? final_init + new_mod : final_init;
-                                }
+                _.each(idarray, (currentID) => {
+                    if (v[`repeating_inventory_${currentID}_equipped`] && v[`repeating_inventory_${currentID}_equipped`] === "1" && v[`repeating_inventory_${currentID}_itemmodifiers`] && v[`repeating_inventory_${currentID}_itemmodifiers`].toLowerCase().indexOf("ability checks") > -1) {
+                        const mods = v[`repeating_inventory_${currentID}_itemmodifiers`].toLowerCase().split(",");
+                        _.each(mods, (mod) => {
+                            if (mod.indexOf("ability checks") > -1) {
+                                const new_mod = !isNaN(parseInt(mod.replace(/[^0-9]/g, ""), 10)) ? parseInt(mod.replace(/[^0-9]/g, ""), 10) : false;
+                                final_init = (mod.indexOf("-") > -1 && new_mod) ? final_init - new_mod : (new_mod) ? final_init + new_mod  : final_init;
                             }
                         });
                     }
                 });
-                if(final_init % 1 != 0) {
+                if (final_init % 1 != 0) {
                     final_init = parseFloat(final_init.toPrecision(12)); // ROUNDING ERROR BUGFIX
                 }
                 update["initiative_bonus"] = final_init;
