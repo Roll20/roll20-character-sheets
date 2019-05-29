@@ -670,7 +670,15 @@
 
 <script type="text/worker">
 // run any data migrations
-on("sheet:opened", sheetMigration);
+on("sheet:opened", () => {
+    sheetMigration();
+
+    getAttrs(["btatow_sheet_version"], values => {
+        if (values["btatow_sheet_version"] >= 3) {
+            recalculateSkills();
+        }
+    });
+});
 
 const recalculateSkills = () => {
     getSectionIDs("skills", ids => {
@@ -1502,7 +1510,6 @@ function sheetMigration() {
                 migrateFrom2To3();
                 break;
             default:
-                recalculateSkills();
                 break;
         }
     });
@@ -1561,6 +1568,8 @@ function migrateFrom2To3() {
     console.log("Starting migration from version 2 to version 3.");
 
     getSectionIDs("skills", ids => {
+        let skillsUpdated = 0;
+
         ids.forEach(id => {
             const oldSkillDataNames = {
                 skill: "repeating_skills_" + id + "_skill",
@@ -1577,6 +1586,8 @@ function migrateFrom2To3() {
 
                 const oldSkillName = oldSkillValues[oldSkillDataNames.skill];
                 const oldSkillSubSkillName = oldSkillValues[oldSkillDataNames.subSkill];
+
+                console.debug("old sub skill type: " + (typeof oldSkillSubSkillName));
 
                 let parsedSkillName = oldSkillName.toLowerCase()
                     .replace(" ", "_")
@@ -1628,13 +1639,23 @@ function migrateFrom2To3() {
                     }
                 }
 
-                console.debug("skill data: " + JSON.stringify(skillData));
-
                 newSkillValues[newSkillDataNames.skill] = skillName;
-                newSkillValues[newSkillDataNames.subSkill] = displaySubSkill ? oldSkillValues[oldSkillDataNames.subSkill] : "";
+                newSkillValues[newSkillDataNames.subSkill] = displaySubSkill ? oldSkillSubSkillName : "";
                 newSkillValues[newSkillDataNames.xp] = oldSkillValues[oldSkillDataNames.xp];
 
                 console.debug("migrated skill data: " + JSON.stringify(newSkillValues));
+
+                setAttrs(newSkillValues, {}, () => {
+                    console.debug("setting new skill values for skill: " + skillName);
+
+                    skillsUpdated++;
+
+                    console.debug("skills updated, ids length: " + skillsUpdated + ", " + ids.length);
+
+                    if (skillsUpdated === ids.length) {
+                        setAttrs({btatow_sheet_version: 3}, {}, recalculateSkills);
+                    }
+                });
             });
         });
     });
