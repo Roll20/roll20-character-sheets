@@ -535,7 +535,7 @@
                 <option value="tracking_urban">Tracking/Urban</option>
                 <option value="tracking_wilds">Tracking/Wilds</option>
                 <option value="training">Training</option>
-                <option value="zerog_operations">Zero-G Operations</option>
+                <option value="zero_g_operations">Zero-G Operations</option>
             </select>
             <input type="text" name="attr_sub_skill" class="skills skill content" title="@{repeating_skills_$id_sub_skill}">
             <button type="roll" name="roll_skill_check" value="@{skill_roll_value}" class="skill-roll" title="@{repeating_skills_$id_skill_check}">
@@ -670,11 +670,7 @@
 
 <script type="text/worker">
 // run any data migrations
-on("sheet:opened", () => {
-    sheetMigration();
-
-    recalculateSkills();
-});
+on("sheet:opened", sheetMigration);
 
 const recalculateSkills = () => {
     getSectionIDs("skills", ids => {
@@ -1321,13 +1317,13 @@ const skillsList = {
             "training": "Training"
         }
     },
-    "zerog": {
+    "zero": {
         "linkedAttributes": [ REFLEX_LINK ],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
         "displayName": {
-            "zerog_operations": "Zero-G Operations"
+            "zero_g_operations": "Zero-G Operations"
         }
     }
 };
@@ -1506,6 +1502,7 @@ function sheetMigration() {
                 migrateFrom2To3();
                 break;
             default:
+                recalculateSkills();
                 break;
         }
     });
@@ -1575,23 +1572,69 @@ function migrateFrom2To3() {
                 subSkill: "repeating_skills_" + id + "_sub_skill",
                 xp: "repeating_skills_" + id + "_skill_xp"
             };
-            getAttrs(Object.values(oldSkillDataNames), skillValues => {
-                console.debug("old skill values: " + JSON.stringify(skillValues))
+            getAttrs(Object.values(oldSkillDataNames), oldSkillValues => {
+                console.debug("old skill values: " + JSON.stringify(oldSkillValues));
 
-                const skillFirstName = skillValues[oldSkillDataNames.skill].split(" ")[0].toLowerCase();
+                const oldSkillName = oldSkillValues[oldSkillDataNames.skill];
+                const oldSkillSubSkillName = oldSkillValues[oldSkillDataNames.subSkill];
+
+                let parsedSkillName = oldSkillName.toLowerCase()
+                    .replace(" ", "_")
+                    .replace("-", "_");
+
+                const skillFirstName = parsedSkillName.split("_")[0];
 
                 console.debug("skill value: " + skillFirstName);
 
-                let skillData = skillsList[skillFirstName];
-                const newSkillData = {};
+                let skillData = {};
+                const newSkillValues = {};
 
-                if (skillData !== undefined) {
-                    newSkillData[newSkillDataNames.skill] = skillFirstName;
-                    newSkillData[newSkillDataNames.subSkill] = skillValues[oldSkillDataNames.subSkill]
-                    newSkillData[newSkillDataNames.xp] = skillValues[oldSkillDataNames.xp]
+                if (skillFirstName in skillsList) {
+                    skillData = skillsList[skillFirstName];
+                } else if (skillFirstName in tieredSkillsBasic) {
+                    skillData = tieredSkillsBasic[skillFirstName];
+                } else if (skillFirstName.substring(0, skillFirstName.length - 1) in tieredSkillsBasic) {
+                    skillData = tieredSkillsBasic[skillFirstName.substring(0, skillFirstName.length - 1)];
+                    parsedSkillName = parsedSkillName.substring(0, parsedSkillName.length - 1);
+                } else {
+                    console.error("Unable to migrate skill data. Old values are: " + JSON.stringify(oldSkillValues));
+                    return;
                 }
 
-                console.debug("migrated skill data: " + JSON.stringify(newSkillData))
+                let skillName = "";
+                let displaySubSkill = true;
+
+                if (parsedSkillName in skillData.displayName) {
+                    skillName = parsedSkillName;
+                } else if (oldSkillSubSkillName === undefined) {
+                    console.error("Unable to identify skill. Old skill name: " + oldSkillName);
+                    return;
+                } else {
+                    const parsedSubSkillName = oldSkillSubSkillName.trim()
+                        .replace("\'", "")
+                        .replace("`", "")
+                        .replace("-", "_")
+                        .replace("/", "_")
+                        .toLowerCase();
+
+                    const skillWithSubSkill = parsedSkillName + "_" + parsedSubSkillName;
+                    
+                    if (skillWithSubSkill in skillData.displayName) {
+                        skillName = skillWithSubSkill;
+                        displaySubSkill = false;
+                    } else {
+                        console.error("Unable to identify skill. Old skill name and notes: " + oldSkillName + " " + oldSkillSubSkillName);
+                        return;
+                    }
+                }
+
+                console.debug("skill data: " + JSON.stringify(skillData));
+
+                newSkillValues[newSkillDataNames.skill] = skillName;
+                newSkillValues[newSkillDataNames.subSkill] = displaySubSkill ? oldSkillValues[oldSkillDataNames.subSkill] : "";
+                newSkillValues[newSkillDataNames.xp] = oldSkillValues[oldSkillDataNames.xp];
+
+                console.debug("migrated skill data: " + JSON.stringify(newSkillValues));
             });
         });
     });
