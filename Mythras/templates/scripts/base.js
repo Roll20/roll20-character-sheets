@@ -2369,6 +2369,11 @@
                 setAttrs({version: "2.2"});
                 versioning();
             }
+            else if(v["version"] === "2.2") {
+                console.log("upgrading to v2.3");
+                setAttrs({version: "2.3"});
+                versioning();
+            }
             else {
                 console.log("Sheet fully updated");
             }
