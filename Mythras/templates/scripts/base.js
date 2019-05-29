@@ -234,11 +234,17 @@
 
     // Healing Rate Auto Calc
     var calc_healing_rate = function() { 
-        getAttrs(["con", "healing_rate_other", "healing_rate_temp", "healing_rate_double"], function(v) {
+        getAttrs(["con", "pow", "healing_rate_calc", "healing_rate_other", "healing_rate_temp", "healing_rate_double"], function(v) {
             if (v.healing_rate_double == "1") {
-                var base_value = Math.ceil(parseInt(v.con)/6)*2;
+                var base_multiplier = 2;
             } else {
-                var base_value = Math.ceil(parseInt(v.con)/6);
+                var base_multiplier = 1;
+            }
+
+            if (v.healing_rate_calc == "1") {
+                var base_value = Math.ceil(Math.ceil(parseInt(v.con)+(parseInt(v.pow)/2))/6) * base_multiplier;
+            } else {
+                var base_value = Math.ceil(parseInt(v.con)/6) * base_multiplier;
             }
             
             setAttrs({
@@ -247,7 +253,7 @@
             });
         });
     };
-    on("change:healing_rate_temp change:healing_rate_other change:con change:healing_rate_double", function() { calc_healing_rate(); });
+    on("change:healing_rate_calc change:healing_rate_temp change:healing_rate_other change:con change:pow change:healing_rate_double", function() { calc_healing_rate(); });
     
     // Initiative Auto Calc
     var calc_initiative = function() {
@@ -310,11 +316,17 @@
     
     // Luck Points Auto Calc
     var calc_luck_points = function() {
-        getAttrs(["pow", "luck_points_temp", "luck_points_other", "luck_points_rank", "rank", "luck_points", "luck_points_max"], function(v) {
+        getAttrs(["pow", "cha", "luck_points_temp", "luck_points_other", "luck_points_rank", "rank", "luck_points", "luck_points_max", "luck_points_calc"], function(v) {
             if (v.luck_points_rank == "1") {
-                var base_value = Math.ceil(parseInt(v.pow)/6) + parseInt(v.rank);
+                var rank_bonus = parseInt(v.rank);
             } else {
-                var base_value = Math.ceil(parseInt(v.pow)/6);
+                var rank_bonus = 0;
+            }
+
+            if (v.luck_points_calc == "1") {
+                var base_value = Math.ceil(Math.ceil(parseInt(v.cha)+(parseInt(v.pow)/2))/6) + rank_bonus;
+            } else {
+                var base_value = Math.ceil(parseInt(v.pow)/6) + rank_bonus;
             }
 
             var new_luck_points_max = base_value + parseInt(v.luck_points_temp) + parseInt(v.luck_points_other);
@@ -326,7 +338,7 @@
             });
         });
     };
-    on("change:pow change:luck_points_temp change:luck_points_other change:luck_points_rank change:rank", function() { calc_luck_points(); });
+    on("change:pow change:cha change:luck_points_calc change:luck_points_temp change:luck_points_other change:luck_points_rank change:rank", function() { calc_luck_points(); });
 
     
     // Magic Points Auto Calc
@@ -2364,7 +2376,7 @@
     }
     
     var campaign_options = function() {
-        getAttrs(["setting_option", "luck_points_rank_option", "herculean_mod_option", "battle_units_enabled_option", "vehicle_type_option", "extended_conflict_enabled_option", "simplified_combat_enabled_option", "action_points_calc_option", "magic_points_enabled_option", "power_points_enabled_option", "prana_points_enabled_option", "tenacity_enabled_option", "spirits_enabled_option", "luther_arkwright_style_option", "m_space_style_option", "boating_standard_option", "status_standard_option", "superstition_standard_option", "linguistics_enabled_option", "dependencies_enabled_option", "firearms_enabled_option", "reach_enabled_option", "affiliations_enabled_option", "ms_psionics_enabled_option", "roman_magic_enabled_option", "arcane_magic_enabled_option", "divine_magic_enabled_option", "folk_magic_enabled_option", "fae_powers_enabled_option", "folk_magic_range_multiplier_option", "animism_enabled_option", "mysticism_enabled_option", "mythras_psionics_enabled_option", "sorcery_enabled_option", "theism_enabled_option", "max_devotional_pool_based_on_option"], function(v) {
+        getAttrs(["setting_option", "luck_points_rank_option", "herculean_mod_option", "battle_units_enabled_option", "vehicle_type_option", "extended_conflict_enabled_option", "simplified_combat_enabled_option", "action_points_calc_option", "magic_points_enabled_option", "power_points_enabled_option", "prana_points_enabled_option", "tenacity_enabled_option", "spirits_enabled_option", "luther_arkwright_style_option", "m_space_style_option", "boating_standard_option", "status_standard_option", "superstition_standard_option", "linguistics_enabled_option", "dependencies_enabled_option", "firearms_enabled_option", "reach_enabled_option", "affiliations_enabled_option", "ms_psionics_enabled_option", "roman_magic_enabled_option", "arcane_magic_enabled_option", "divine_magic_enabled_option", "folk_magic_enabled_option", "superpowers_enabled_option", "fae_powers_enabled_option", "folk_magic_range_multiplier_option", "animism_enabled_option", "mysticism_enabled_option", "mythras_psionics_enabled_option", "sorcery_enabled_option", "theism_enabled_option", "max_devotional_pool_based_on_option"], function(v) {
             var newoptions = {};
             // Default Setting Configs
             var setting_configs = {
@@ -2391,6 +2403,7 @@
                 roman_magic_enabled: "0",
                 arcane_magic_enabled: "0",
                 divine_magic_enabled: "0",
+                superpowers_enabled: "0",
                 fae_powers_enabled: "0",
                 folk_magic_enabled: "1",
                 folk_magic_range_multiplier: "1",
@@ -2419,6 +2432,19 @@
                 setting_configs["sorcery_enabled"] = "0";
                 setting_configs["theism_enabled"] = "0";
                 setting_configs["mythras_psionics_enabled"] = "1";
+                setting_configs["vehicle_type"] = "mythras";
+            } else if(v["setting_option"] === "agony_and_ecstasy") {
+                setting_configs["spirits_enabled"] = "0";
+                setting_configs["magic_points_enabled"] = "0";
+                setting_configs["power_points_enabled"] = "1";
+                setting_configs["linguistics_enabled"] = "1";
+                setting_configs["folk_magic_enabled"] = "0";
+                setting_configs["animism_enabled"] = "0";
+                setting_configs["mysticism_enabled"] = "0";
+                setting_configs["sorcery_enabled"] = "0";
+                setting_configs["theism_enabled"] = "0";
+                setting_configs["superpowers_enabled"] = "1";
+                setting_configs["firearms_enabled"] = "1";
                 setting_configs["vehicle_type"] = "mythras";
             } else if(v["setting_option"] === "worlds_united") {
                 setting_configs["spirits_enabled"] = "0";
@@ -2661,6 +2687,13 @@
                 newoptions["divine_magic_enabled"] = setting_configs["divine_magic_enabled"];
             } else {
                 newoptions["divine_magic_enabled"] = v["divine_magic_enabled_option"];
+            }
+
+             // Superpowers Enabled
+            if(v["superpowers_enabled_option"] === "default") {
+                newoptions["superpowers_enabled"] = setting_configs["superpowers_enabled"];
+            } else {
+                newoptions["superpowers_enabled"] = v["superpowers_enabled_option"];
             }
             
              // Fae Powers Enabled
@@ -5432,6 +5465,7 @@
             displaymagic["display_divine_magic"] = 0;
             displaymagic["display_roman_magic"] = 0;
             displaymagic["display_fae_powers"] = 0;
+            displaymagic["display_superpowers"] = 0;
 
             // Import Skills
             if (typeof characterData["skills"] !== 'undefined') {
@@ -6087,7 +6121,7 @@
     });
     
     //Set campaign options if any change
-    on("change:setting_option change:vehicle_type_option change:battle_units_enabled_option change:extended_conflict_enabled_option change:simplified_combat_enabled_option change:luck_points_rank_option change:herculean_mod_option change:action_points_calc_option change:magic_points_enabled_option change:power_points_enabled_option change:prana_points_enabled_option change:spirits_enabled_option change:tenacity_enabled_option change:status_standard_option change:superstition_standard_option change:boating_standard_option change:linguistics_enabled_option change:dependencies_enabled_option change:firearms_enabled_option change:reach_enabled_option change:affiliations_enabled_option change:roman_magic_enabled_option change:arcane_magic_enabled_option change:divine_magic_enabled_option change:fae_powers_enabled_option change:folk_magic_enabled_option change:folk_magic_range_multiplier_option change:animism_enabled_option change:mysticism_enabled_option change:mythras_psionics_enabled_option change:ms_psionics_enabled_option change:sorcery_enabled_option change:theism_enabled_option change:max_devotional_pool_based_on_option", function() {
+    on("change:setting_option change:vehicle_type_option change:battle_units_enabled_option change:extended_conflict_enabled_option change:simplified_combat_enabled_option change:luck_points_rank_option change:herculean_mod_option change:action_points_calc_option change:magic_points_enabled_option change:power_points_enabled_option change:prana_points_enabled_option change:spirits_enabled_option change:tenacity_enabled_option change:status_standard_option change:superstition_standard_option change:boating_standard_option change:linguistics_enabled_option change:dependencies_enabled_option change:firearms_enabled_option change:reach_enabled_option change:affiliations_enabled_option change:roman_magic_enabled_option change:arcane_magic_enabled_option change:divine_magic_enabled_option change:superpowers_enabled_option change:fae_powers_enabled_option change:folk_magic_enabled_option change:folk_magic_range_multiplier_option change:animism_enabled_option change:mysticism_enabled_option change:mythras_psionics_enabled_option change:ms_psionics_enabled_option change:sorcery_enabled_option change:theism_enabled_option change:max_devotional_pool_based_on_option", function() {
         console.log("Setting campaign options")
         campaign_options();
     });

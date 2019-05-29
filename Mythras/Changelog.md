@@ -5,6 +5,14 @@ Versions have two numbers Major.Minor
 
 **Minor**: Indicates the addition of new features, bugfixes or other adjustments which do not alter variable names or fundamental workflow.
 
+## 2.3
+### New Features
+* Added Support for Superpowers
+* Toggle to calculate Healing Rate with CON + half POW
+* Toggle to calculate Luck Points with CHA + half POW
+* Added Agony & Ecstasy to Settings
+* Cleaned up skill rolltemplate so it doesn't use bold font for everything
+
 ## 2.2
 ### New Features
 * Added toggle to base HP on CON+SIZ or CON+SIZ+POW or CON+SIZ+STR
