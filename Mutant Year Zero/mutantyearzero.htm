@@ -142,8 +142,8 @@
                 </div>		
                 <div class="injuries-box7">
                     <fieldset class="repeating_injuries">
-                        <button class="toggles" name="act_injury-settings" type="action">y</button>
-                        <input class="display" name="attr_injury-settings" type="hidden" value="settings" />
+                        <button class="toggles" name="act_settings" type="action">y</button>
+                        <input class="display" name="attr_reveal" type="hidden" value="display,settings," />
                         <div class="display">
                             <span name="attr_injury_name"></span>
                             <span name="attr_injury_display"></span>
@@ -237,7 +237,7 @@
                     <input class="input-number" type="text" name="attr_comprehend_total" value="0" title="@{comprehend_total}" readonly />
                 </span>
                 <span data-i18n-list-item="know_the_zone">
-                    <button type="action" name="act_dice_pool_know_the_zone"><span data-i18n="know_the_zone">Know the Zone</span><span class="small-caps" data-i18n="wits-abbr"> [wit]</span></button>
+                    <button type="action" name="act_dice_pool_know_the_zone"><span data-i18n="know_the_zone">Know the Zone</span><span class="small-caps" data-i18n="wits-abbr" style="font-size: 0.8em;"> [wit]</span></button>
                     <input class="input-number" type="number" name="attr_know_the_zone" value="0" min="0" title="@{know_the_zone}" />
                     <input class="input-number" type="text" name="attr_wits_total" value="0" title="@{wits_total}" readonly />
                     <span class="equal">=</span>
@@ -379,21 +379,30 @@
                 <div class="talents-box3 column-header"><span data-i18n="rank">Rank</span></div>
                 <div class="talents-box4">
                     <fieldset class="repeating_talents">
+                        <input class="display" name="attr_reveal" type="hidden" value="display,settings,collapse," />
                         <div class="talents-grid">
-                            <input class="expand" type="checkbox" name="attr_expand" data-i18n-title="show-hide" title="show/hide" /><span></span>
+                            <button class="toggles" name="act_settings" type="action">y</button>
+                            <button class="collapse" name="act_collapse" type="action">
+                                <span name="attr_talent_name" title="Talent name"></span>
+                            </button>
+                            <span name="attr_talent_type" title="Talent type"></span>
+                            <span name="attr_talent_rank" title="Talent rank"></span>
+                            <span class="collapsible" name="attr_talent_description"></span>
+                        </div>
+                        <div class="talents-grid settings">
                             <input class="talents-box1 input" type="text" name="attr_talent_name" value="" title="@{repeating_talents_$X_talent_name}" placeholder="Name" />
                             <select class="talents-box2 input" name="attr_talent_type" title="@{repeating_talents_$X_talent_type}">
-                                <option value="Gen" data-i18n="gen" selected>Gen</option>
-                                <option value="Prof" data-i18n="prof">Prof</option>
+                                <option value="Gen" data-i18n="general" selected>General</option>
+                                <option value="Role" data-i18n="role">Role</option>
                             </select>
-                            <input class="talents-box3 input" name="attr_talent_rank" title="@{repeating_talents_$X_talent_rank}" type="text" value="1" />
+                            <input class="input" name="attr_talent_rank" title="@{repeating_talents_$X_talent_rank}" type="text" value="1" />
                             <textarea class="talents-box4 input-textarea" name="attr_talent_description" title="@{repeating_talents_$X_talent_description}" placeholder="description"></textarea>
                         </div>
-                    </fieldset>                    
+                    </fieldset>                
                 </div>
             </div>
             <div class="mutants-grid">
-                <div class="mutant-box header"><h1 data-i18n="mutantions-p">MUTANTIONS POINTS</h1></div>
+                <div class="mutant-box header"><h1 data-i18n="mutantions">MUTANTIONS</h1></div>
                 <div class="dots">
                     <input name="attr_mutation" type="radio" value="0"/>
                     <input name="attr_mutation" type="radio" value="1" checked/><span></span>
@@ -1443,7 +1452,6 @@ on("change:armor1_equiped change:armor1_damage change:armor1_bonus change:armor2
 });
 
 /* Cassie's JAVASCRIPT */
-
     //SKILLS & SKILL NAME NEEDS UPDATE ON CLICK
     ['endure','force','fight','sneak','move','shoot','scout','comprehend','know_the_zone','sense_emotion','manipulate','heal'].forEach(skill => {
         on(`clicked:dice_pool_${skill}`, (eventinfo) => { 
@@ -1474,13 +1482,36 @@ on("change:armor1_equiped change:armor1_damage change:armor1_bonus change:armor2
     });
     
    //toggle off and on show settings for injuries
-    on("clicked:repeating_injuries:injury-settings", (eventinfo) => {
-        let update = {};
-        getAttrs([`${eventinfo.sourceAttribute}`], (v) => {
-            update[`${eventinfo.sourceAttribute}`] = (v[`${eventinfo.sourceAttribute}`] === "settings") ? "display" : "settings";
-            setAttributes(update, true);
+   [`repeating_injuries:settings`, `repeating_talents:settings`, `repeating_talents:collapse`].forEach((attr) => {
+        on(`clicked:${attr}`, (eventinfo) => {
+            const word = eventinfo.sourceAttribute.split("_")[3];
+            const reveal = eventinfo.sourceAttribute.replace(word, "reveal");
+            let update = {};
+            getAttrs([reveal], (v) => {
+                const keyword = attr.split(":")[1];
+                let string = v[`${reveal}`];
+                update[reveal] = (string.includes(`${keyword}`)) ? string.replace(`${keyword},`, "") : string += `${keyword},`;
+                console.log(`%c Was ${v[`${reveal}`]}; Update  ${JSON.stringify(update)}`,"color:blue;font-size:15px;");
+                setAttributes(update, true);
+            });
+        }); 
+   });
+
+
+    //Notes toggles
+    ['class_dc', 'strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma', 'perception', `ancestry`].forEach(attr => {
+        on(`clicked:toggle_${attr}`, (eventinfo) => {
+            const trigger = eventinfo.triggerName.split("clicked:toggle_")[1];
+            getAttrs(["toggles"], (v) => {
+                let string = v[`toggles`];
+                (string.includes(`${attr}`)) ? string = string.replace(`${attr},`, "") : string += `${attr},`;
+                console.log(string);
+                setAttrs({
+                    toggles : string
+                });
+            });
         });
-    }); 
+    });
 
     //Create a string for repeating injuries display
    on("change:repeating_injuries", () => {
