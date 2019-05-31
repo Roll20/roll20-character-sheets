@@ -1119,7 +1119,7 @@ const skillsList = {
         "complexity": "CB",
         "subSkills": false,
         "displayName": {
-            "negotation": "Negotiation"
+            "negotiation": "Negotiation"
         }
     },
     "perception": {
@@ -1612,11 +1612,15 @@ function migrateFrom2To3() {
                     return;
                 }
 
+                console.debug("skill data: " + JSON.stringify(skillData));
+
                 let skillName = "";
                 let displaySubSkill = true;
 
                 if (parsedSkillName in skillData.displayName) {
                     skillName = parsedSkillName;
+                } else if (parsedSkillName.substring(0, parsedSkillName.length - 1) in skillData.displayName) {
+                    skillName = parsedSkillName.substring(0, parsedSkillName.length - 1);
                 } else if (oldSkillSubSkillName === undefined) {
                     console.error("Unable to identify skill. Old skill name: " + oldSkillName);
                     return;
@@ -1628,8 +1632,12 @@ function migrateFrom2To3() {
                         .replace("/", "_")
                         .toLowerCase();
 
+                    console.debug("parsed sub skill name: " + parsedSubSkillName);
+
                     const skillWithSubSkill = parsedSkillName + "_" + parsedSubSkillName;
-                    
+
+                    console.debug("total name: " + skillWithSubSkill);
+
                     if (skillWithSubSkill in skillData.displayName) {
                         skillName = skillWithSubSkill;
                         displaySubSkill = false;
@@ -1638,6 +1646,8 @@ function migrateFrom2To3() {
                         return;
                     }
                 }
+
+                console.debug("skill name: " + skillName);
 
                 newSkillValues[newSkillDataNames.skill] = skillName;
                 newSkillValues[newSkillDataNames.subSkill] = displaySubSkill ? oldSkillSubSkillName : "";
