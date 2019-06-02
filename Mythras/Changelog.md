@@ -4,6 +4,18 @@ Versions have two numbers Major.Minor
 **Major**: Indicates that some form of compatibility has broken.  These versions should have notes indicating what broke and how to handle it.  May include major UI changes to sheet layout and design or fundament changes in how parts of the sheet are managed.
 
 **Minor**: Indicates the addition of new features, bugfixes or other adjustments which do not alter variable names or fundamental workflow.
+## 2.4
+### Bug Fixes
+* Fixed overflow in Firefox with Passions
+* Fixed current/max fields which would be mis-synced after JSON imports
+
+### New Features
+* Added toggle to base Exp Mod on INT
+* Added option to make Strangeness a Standard Skill
+* Added option to make The Soot a Standard Skill
+* Added Peculiarities
+* Added Odd Soot Magic Support
+* Added Odd Soot to Settings
 
 ## 2.3
 ### New Features
