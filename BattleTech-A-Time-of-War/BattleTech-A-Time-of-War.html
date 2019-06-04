@@ -1606,20 +1606,20 @@ function migrateFrom2To3() {
                 xp: "repeating_skills_" + id + "_skill_xp"
             };
             getAttrs(Object.values(oldSkillDataNames), oldSkillValues => {
-                console.debug("old skill values: " + JSON.stringify(oldSkillValues));
-
                 const oldSkillName = oldSkillValues[oldSkillDataNames.skill];
                 const oldSkillSubSkillName = oldSkillValues[oldSkillDataNames.subSkill];
 
-                console.debug("old sub skill type: " + (typeof oldSkillSubSkillName));
+                if (oldSkillName === undefined || oldSkillValues[oldSkillDataNames.xp] === undefined) {
+                    console.error("Old skill data is missing values, unable to migrate.\n" + JSON.stringify(oldSkillValues));
+                    skillsUpdate++;
+                    return;
+                }
 
                 let parsedSkillName = oldSkillName.toLowerCase()
                     .replace(" ", "_")
                     .replace("-", "_");
 
                 const skillFirstName = parsedSkillName.split("_")[0];
-
-                console.debug("skill value: " + skillFirstName);
 
                 let skillData = {};
                 const newSkillValues = {};
@@ -1633,10 +1633,9 @@ function migrateFrom2To3() {
                     parsedSkillName = parsedSkillName.substring(0, parsedSkillName.length - 1);
                 } else {
                     console.error("Unable to migrate skill data. Old values are: " + JSON.stringify(oldSkillValues));
+                    skillsUpdated++;
                     return;
                 }
-
-                console.debug("skill data: " + JSON.stringify(skillData));
 
                 let skillName = "";
                 let displaySubSkill = true;
@@ -1647,6 +1646,7 @@ function migrateFrom2To3() {
                     skillName = parsedSkillName.substring(0, parsedSkillName.length - 1);
                 } else if (oldSkillSubSkillName === undefined) {
                     console.error("Unable to identify skill. Old skill name: " + oldSkillName);
+                    skillsUpdated++;
                     return;
                 } else {
                     const parsedSubSkillName = oldSkillSubSkillName.trim()
@@ -1656,38 +1656,32 @@ function migrateFrom2To3() {
                         .replace("/", "_")
                         .toLowerCase();
 
-                    console.debug("parsed sub skill name: " + parsedSubSkillName);
-
                     const skillWithSubSkill = parsedSkillName + "_" + parsedSubSkillName;
-
-                    console.debug("total name: " + skillWithSubSkill);
 
                     if (skillWithSubSkill in skillData.displayName) {
                         skillName = skillWithSubSkill;
                         displaySubSkill = false;
                     } else {
                         console.error("Unable to identify skill. Old skill name and notes: " + oldSkillName + " " + oldSkillSubSkillName);
+                        skillsUpdated++;
                         return;
                     }
                 }
 
-                console.debug("skill name: " + skillName);
-
                 newSkillValues[newSkillDataNames.skill] = skillName;
-                newSkillValues[newSkillDataNames.subSkill] = displaySubSkill ? oldSkillSubSkillName : "";
+                if (displaySubSkill && oldSkillSubSkillName !== undefined) {
+                newSkillValues[newSkillDataNames.subSkill] = oldSkillSubSkillName;
+            }
                 newSkillValues[newSkillDataNames.xp] = oldSkillValues[oldSkillDataNames.xp];
 
-                console.debug("migrated skill data: " + JSON.stringify(newSkillValues));
-
                 setAttrs(newSkillValues, {}, () => {
-                    console.debug("setting new skill values for skill: " + skillName);
-
                     skillsUpdated++;
 
-                    console.debug("skills updated, ids length: " + skillsUpdated + ", " + ids.length);
-
                     if (skillsUpdated === ids.length) {
-                        setAttrs({btatow_sheet_version: 3}, {}, recalculateSkills);
+                        setAttrs({btatow_sheet_version: 3}, {}, () => {
+                            console.log("Sheet migrated from version 2 to version 3.");
+                            recalculateSkills();
+                        });
                     }
                 });
             });
