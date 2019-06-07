@@ -4,6 +4,10 @@ Versions have two numbers Major.Minor
 **Major**: Indicates that some form of compatibility has broken.  These versions should have notes indicating what broke and how to handle it.  May include major UI changes to sheet layout and design or fundament changes in how parts of the sheet are managed.
 
 **Minor**: Indicates the addition of new features, bugfixes or other adjustments which do not alter variable names or fundamental workflow.
+## 2.5
+### New Features
+* Added sheet option to enable Work Songs
+
 ## 2.4
 ### Bug Fixes
 * Fixed overflow in Firefox with Passions
