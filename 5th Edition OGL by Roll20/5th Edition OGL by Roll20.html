@@ -7504,6 +7504,7 @@
           
             const npcExtras = ["Condition Immunities", "Immunities", "Languages", "Resistances", "Speed", "Token Size", "Vulnerabilities"];
             npcExtras.forEach((attr) => {
+                //console.log(`%c MONSTERS Drop: ${attr}`, "color:cornflowerblue;");
                 const prefixExtra = (attr === "Token Size") ? "" : "npc_";
                 let nameExtra     = (attr.includes(" ")) ? attr.replace(" ", "_").toLowerCase() : attr.toLowerCase();
                 update[`${prefixExtra}${nameExtra}`] = (page.data[`${attr}`]) ? page.data[`${attr}`] : "";
@@ -7528,6 +7529,7 @@
             update["npc_type"] = type;
 
             ["AC", "HP"].forEach((achp) => {
+                //console.log(`%c MONSTERS Drop: AC & HP ${achp}`, "color:cornflowerblue;");
                 const array = (achp === "AC") ? ["npc_ac", "npc_actype"] : ["hp_max", "npc_hpformula"];
                 if (page.data[`${achp}`] && page.data[`${achp}`].toString().indexOf("(") > -1)  {
                     update[`${array[0]}`] = page.data[`${achp}`].toString().split(" (")[0];
@@ -7550,6 +7552,7 @@
                 update[`npc_${attr}_base`] = "";
             });
             ["Saving Throws", "Skills"].forEach((attr) => {
+                //console.log(`%c MONSTERS Drop: Saving Throws & Skills: ${attr}`, "color:cornflowerblue;");
                 const array = (page.data[`${attr}`]) ? page.data[`${attr}`].split(", ") : [];
                 _.each(array, (entry) => {
                     const kv        = (entry.indexOf("-") > -1) ? entry.split(" ") : entry.split(" +");
@@ -7630,8 +7633,15 @@
             };  
             //TRAITS
             if (page.data["data-Traits"]) {
+                //console.log(`%c MONSTERS Drop: NPC Traits`, "color:cornflowerblue;");
                 let traitsobj     = {};
-                jsonparse(page.data["data-Traits"]).forEach((val) => { traitsobj[val.Name] = val.Desc; });
+                jsonparse(page.data["data-Traits"]).forEach((val) => {
+                    if (val.Desc) {
+                        traitsobj[val.Name] = val.Desc; 
+                    } else {
+                        traitsobj[val.Name] = ""; 
+                    };
+                });
                 _.each(traitsobj, (desc, name) => {
                     newrowid = generateRowID();
                     update[`repeating_npctrait_${newrowid}_name`] = name + ".";
