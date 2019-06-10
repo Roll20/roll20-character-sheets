@@ -1,3 +1,7 @@
+### Version 1.83 (2019-05-28):
+
+- Removed wound penalties from affecting soak rolls (reported by **Wolf**)
+
 ### Version 1.82 (2019-01-08):
 
 - Add names to all roll button, so they can be dragged to user's macro bar

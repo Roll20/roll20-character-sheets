@@ -16775,6 +16775,12 @@ Charmancer overall slide template
                     propagates_to: [],
                     default_adds: [],
                     default_value: ''
+                },
+                description: {
+                    data: ['Description'],
+                    propagates_to: [],
+                    default_adds: [],
+                    default_value: ''
                 }
             },
             spell: {
@@ -17061,16 +17067,21 @@ Charmancer overall slide template
             if(data['data-spells']){
                 TAS.log(`processing spells`);
                 data['data-spells']=JSON.parse(data['data-spells']);
+                TAS.log(`spell data:`);
+                TAS.log(data['data-spells']);
+                TAS.log(`blobs:`);
+                TAS.log(data.blobs);
                 _.each(data['data-spells'],(obj)=>{
                     let rowID = generateRowID();
                     obj.name = obj.name.replace(/(^|\s+)([a-z])/ig,(match,space,letter)=>{
                         return `${space}${letter.toUpperCase()}`;
                     });
-                    let spellBlob = data.blobs[obj.name]||data.blobs[obj.name.replace(/(.*?)\s*(greater|lesser)\s*(.+)/i,'$1$3 ($2)')];
+                    let altName = obj.name.replace(/\s*\(\s*(?:\d+\s*\/\s*[a-z]+?|at will|constant)\s*\)\s*/i,'');
+                    let spellBlob = data.blobs[altName.replace(/\s*\([a-z\s]+\)\s*/i,'')]||data.blobs[altName.replace(/(.*?)\s*(greater|lesser)\s*(.+)/i,'$1 $3 ($2)').replace(/\s*\([a-z\s]+\)\s*/i,'')];
                     if(spellBlob && data.blobs[`${obj.name} (Level ${obj.level})`]){
                         Object.assign(spellBlob,data.blobs[`${obj.name} (Level ${obj.level})`]);
                     }
-                    TAS.log(`spellBlob for ${obj.name}:`);
+                    TAS.log(`spellBlob for ${obj.name} or ${altName}:`);
                     TAS.log(spellBlob);
                     if(spellBlob){
                         spellBlob.name = obj.name;
@@ -17104,11 +17115,12 @@ Charmancer overall slide template
                     obj.name = obj.name.replace(/(^|\s+)([a-z])/ig,(match,space,letter)=>{
                         return `${space}${letter.toUpperCase()}`;
                     });
-                    let spellBlob = data.blobs[obj.name]||data.blobs[obj.name.replace(/(.*?)\s*(greater|lesser)\s*(.+)/i,'$1$3 ($2)')];
+                    let altName = obj.name.replace(/\s*\(\s*(?:\d+\s*\/\s*[a-z]+?|at will|constant)\s*\)\s*/i,'');
+                    let spellBlob = data.blobs[altName.replace(/\s*\([a-z\s]+\)\s*/i,'')]||data.blobs[altName.replace(/(.*?)\s*(greater|lesser)\s*(.+)/i,'$1 $3 ($2)').replace(/\s*\([a-z\s]+\)\s*/i,'')];
                     if(spellBlob && data.blobs[`${obj.name} (Level ${obj.level})`]){
                         Object.assign(spellBlob,data.blobs[`${obj.name} (Level ${obj.level})`]);
                     }
-                    TAS.log(`spellBlob for ${obj.name}:`);
+                    TAS.log(`spellBlob for ${obj.name} or ${altName}:`);
                     TAS.log(spellBlob);
                     setObj[`repeating_ability_${rowID}_name`] = obj.name;
                     setObj[`repeating_ability_${rowID}_show_options`]=0;
@@ -17142,7 +17154,7 @@ Charmancer overall slide template
                             return m;
                         },{})
                     );
-                    if(spellBlob.Classes){
+                    if(spellBlob && spellBlob.Classes){
                         spellBlob.Classes.replace(/[a-z\s]+\s+(\d+)(?:,[a-z\s]+\s+(\d+))?/,(match,level1,level2)=>{
                             setObj[`repeating_ability_${rowID}_level`] = _.max([level1,level2]);
                         })
@@ -17205,6 +17217,7 @@ Charmancer overall slide template
                 rowID = generateRowID();
                 TAS.log(`data:`);
                 TAS.log(data);
+                TAS.log(dropObjs[currentCat]);
             if(data.header!==''){
                 let levelName = data.header.replace(/:(.+)/,' ($1)');
                 Object.assign(levelBlob,data.blobs[levelName]);
@@ -18332,6 +18345,7 @@ Charmancer overall slide template
             },
         };*/
         Object.assign(dropObjs.ability,dropObjs.spell);
+        dropObjs.ability.description.data.push('Benefit');
         _.each([1,2,3,4,5],(num)=>{
             mancerObjs[`classDrops${num}`]=[];
             _.each(mancerObjs.classDrops,(drop)=>{
