@@ -5,6 +5,9 @@ Versions have two numbers Major.Minor
 
 **Minor**: Indicates the addition of new features, bugfixes or other adjustments which do not alter variable names or fundamental workflow.
 ## 2.5
+### Big Fixes
+* Fixed unarmed in Combat section
+
 ### New Features
 * Added sheet option to enable Work Songs
 
