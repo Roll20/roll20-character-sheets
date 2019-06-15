@@ -3018,38 +3018,42 @@
 
 	// update Esquive when addresse or PR or overweight is updated
 	function updateEsquive() {
-		getAttrs( [ "stats_adresse_total", "stats_esquive_mod", "stats_esquive_temp_total", "prphy", "personnage_surcharge" ], function( sValues ) {
-			var v = structSafeInt( sValues );
-			var esquive = v[ "stats_adresse_total" ];
-			var prPhy = v[ "prphy" ];
-			var surcharge = v[ "personnage_surcharge" ];
-
-			// PR vs Esquive
-			if( prPhy === 0 || prPhy === 1 ) {
-				esquive += 1;
-			} else if( prPhy === 3 || prPhy === 4 ) {
-				esquive += - 2;
-			} else if( prPhy === 5 ) {
-				esquive += -4;
-			} else if( prPhy === 6 ) {
-				esquive += - 5;
-			} else if( prPhy === 7 ) {
-				esquive += - 6;
-			} else if( prPhy > 7 ) {
-				esquive = 0;
+		getAttrs( [ "tab_pnj" ], function( v ) {
+			if( v[ "tab_pnj" ] != 1 ) {
+				getAttrs( [ "stats_adresse_total", "stats_esquive_mod", "stats_esquive_temp_total", "prphy", "personnage_surcharge" ], function( sValues ) {
+					var v = structSafeInt( sValues );
+					var esquive = v[ "stats_adresse_total" ];
+					var prPhy = v[ "prphy" ];
+					var surcharge = v[ "personnage_surcharge" ];
+		
+					// PR vs Esquive
+					if( prPhy === 0 || prPhy === 1 ) {
+						esquive += 1;
+					} else if( prPhy === 3 || prPhy === 4 ) {
+						esquive += - 2;
+					} else if( prPhy === 5 ) {
+						esquive += -4;
+					} else if( prPhy === 6 ) {
+						esquive += - 5;
+					} else if( prPhy === 7 ) {
+						esquive += - 6;
+					} else if( prPhy > 7 ) {
+						esquive = 0;
+					}
+		
+					// surcharge vs Esquive
+					if( surcharge === 4 ) {
+						esquive += -2;
+					} else if( surcharge === 5 ) {
+						esquive = 0;
+					}
+		
+					setAttrs({
+						"stats_esquive": esquive,
+						"stats_esquive_total": esquive + v[ "stats_esquive_mod" ] + v[ "stats_esquive_temp_total" ]
+					}, { silent: true });
+				});
 			}
-
-			// surcharge vs Esquive
-			if( surcharge === 4 ) {
-				esquive += -2;
-			} else if( surcharge === 5 ) {
-				esquive = 0;
-			}
-
-			setAttrs({
-				"stats_esquive": esquive,
-				"stats_esquive_total": esquive + v[ "stats_esquive_mod" ] + v[ "stats_esquive_temp_total" ]
-			}, { silent: true });
 		});
 	}
 
