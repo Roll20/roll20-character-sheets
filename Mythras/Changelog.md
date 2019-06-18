@@ -10,6 +10,8 @@ Versions have two numbers Major.Minor
 
 ### New Features
 * Added sheet option to enable Work Songs
+* Added sheet option to enable Artifice
+* Added sheet option to enable Alchemy
 
 ## 2.4
 ### Bug Fixes
