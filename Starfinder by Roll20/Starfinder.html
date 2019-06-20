@@ -7259,7 +7259,17 @@
                         {{r5}}
                     </div>
                 </div>
-                {{/r5}}{{#notes}}
+                {{/r5}}{{#r6}}
+                <div class='split-container across'>
+                    <div class='highlighted split r1name'>
+                        {{#r6name}} {{r6name}} {{/r6name}} {{^r6name}}
+                        <span data-i18n='check'>CHECK</span> {{/r6name}}
+                    </div>
+                    <div class='highlighted split roll'>
+                        {{r6}}
+                    </div>
+                </div>
+                {{/r6}}{{#notes}}
                 <div class='highlighted across notes-row'>
                     <span class='notes' data-i18n='notes:'>NOTES:</span><span> {{notes}}</span>
                 </div>
@@ -8288,6 +8298,7 @@ Charmancer overall slide template
         <input type='hidden' name='comp_name' value=''>
         <span class='ability-name'>AbilityName here</span>
         <span class='ability-description'>abilityDescription here</span>
+        <input type='hidden' name='comp_mods' value=''>
     </div>
 </charmancer>
 <charmancer class="sheet-repeating-ability-scores">
@@ -8309,7 +8320,7 @@ Charmancer overall slide template
     <span class='total_value'>0</span>
     <input type='hidden' name='comp_total_value' value='0'>
     <span class='equal'>=</span>
-    <input class='ranks' type='number' name='comp_ranks' value='0'>
+    <input class='ranks' type='number' name='comp_ranks' value='0' min='0'>
     <span class='ranks-plus'>+</span>
     <span class='ability_value choice pregen'></span>
     <select class='ability_value choice profession' name='comp_ability_select'>
@@ -8325,7 +8336,23 @@ Charmancer overall slide template
     <input class='class_skill' type='checkbox' name='comp_class_skill' value='3'>
     <span class='class-plus'>+</span>
     <span class='bonus_value'>0</span>
+    <input type='hidden' name='comp_bonus_value' value=''>
     <button class='choice profession' type='action' name='act_remove' style='font-family:Pictos;' title='Remove Profession Skill'>#</button>
+</charmancer>
+<charmancer class="sheet-repeating-featselector">
+    <input type='hidden' name='comp_name'>
+    <button type='action' name='act_add'><span class='name'></span></button>
+</charmancer>
+<charmancer class="sheet-repeating-feat">
+    <div class='feat-container'>
+        <input type = 'hidden' name='comp_level' value='1'>
+        <span class='level-header'></span>
+        <span class='name'></span>
+        <span class='description'></span>
+        <input type='hidden' name='comp_name'>
+        <input type='hidden' name='comp_description'>
+    </div>
+    <button type='action' name='act_select_feat'>Select a Feat</button>
 </charmancer>
 <charmancer class="sheet-charmancer-loading-slide">
     <span>Loading Character Mancer</span>
@@ -8480,6 +8507,7 @@ Charmancer overall slide template
                 <div class='charmancerrow skill-container'>
                     <span>Theme Skill:</span>
                     <span class='theme_skill'></span>
+                    <input type='hidden' name='comp_theme_skill' value=''>
                 </div>
                 <div class='ability-container'></div>
             </div>
@@ -8781,12 +8809,12 @@ Charmancer overall slide template
 </charmancer>
 <charmancer class="sheet-charmancer-pc-ability-scores">
     <div class="slide-container pc-ability-scores">
-        <input type='hidden' name='comp_strength' value='0'>
-        <input type='hidden' name='comp_dexterity' value='0'>
-        <input type='hidden' name='comp_constitution' value='0'>
-        <input type='hidden' name='comp_intelligence' value='0'>
-        <input type='hidden' name='comp_wisdom' value='0'>
-        <input type='hidden' name='comp_charisma' value='0'>
+        <input type='hidden' name='comp_strength' value='10'>
+        <input type='hidden' name='comp_dexterity' value='10'>
+        <input type='hidden' name='comp_constitution' value='10'>
+        <input type='hidden' name='comp_intelligence' value='10'>
+        <input type='hidden' name='comp_wisdom' value='10'>
+        <input type='hidden' name='comp_charisma' value='10'>
         
         <input type='hidden' name='comp_strength_mod' value='0'>
         <input type='hidden' name='comp_dexterity_mod' value='0'>
@@ -8919,11 +8947,9 @@ Charmancer overall slide template
         </div>
         <div class='data-frame'>
             <div class='mancer-entry'>
-                <div class='charmancerrow'>
-
-                </div>
             </div>
-            <div class='sheet-compendium-page' accept='CategoryIndex:Feats'></div>
+            <div class='choice selector'></div>
+            <div class='choice compendium sheet-compendium-page' accept='CategoryIndex:Feats'></div>
         </div>
         <div class="mancer-button-container image-button-holder">
             <div class='section'>
@@ -9179,7 +9205,7 @@ Charmancer overall slide template
     /*start starfinder.js*/
     var starfinder = starfinder || (function() {
     'use strict';
-    let version = '1.0011556629200', //The sheet's current version. This is put into the character_sheet attribute when a sheet is opened. I've been doing version numbering as 0.0Xyyyyyyyyyy where X represents the state of the sheet (currently in stage 4, or open beta) and y is the UNIX epoch timestamp for when I finished that build
+    let version = '1.002556629200', //The sheet's current version. This is put into the character_sheet attribute when a sheet is opened. I've been doing version numbering as 0.0Xyyyyyyyyyy where X represents the state of the sheet (currently in stage 4, or open beta) and y is the UNIX epoch timestamp for when I finished that build
         pilotingRanks = {},
         sheetAttributes = [
             /*An array of all the non-repeating sheet attributes that could potentially be used in the calculations performed by the script
@@ -13065,15 +13091,10 @@ Charmancer overall slide template
                 attributes = attributes.concat(sheetAttributes).concat(['character_sheet', 'class&level']);
                 getAttrs(attributes, (updateAttrs) => {
                     TAS.log('Sheet Attributes Acquired');
-                    _.each(['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'], (mod) => {
-                        //ensures that the base ability score attributes exist to prevent erroneous setting to 0 (-5) in some instances.
-                        if (!updateAttrs[`${mod}_mod`]) {
-                            setObj[`${mod}_mod`] = 0;
-                            updateAttrs[`${mod}_mod`] = 0;
-                        }
-                        if(!updateAttrs[mod]){
-                            setObj[mod]=10;
-                            updateAttrs[mod]=10;
+                    _.each(['strength_mod', 'dexterity_mod', 'constitution_mod', 'intelligence_mod', 'wisdom_mod', 'charisma_mod'], (mod) => {
+                        if (!updateAttrs[mod]) {
+                            setObj[mod] = 0;
+                            updateAttrs[mod] = 0;
                         }
                     });
                     if (updateAttrs.character_sheet) {
@@ -13082,7 +13103,7 @@ Charmancer overall slide template
                         TAS.log('Base Attack Bonuses Updated');
                         TAS.log(`upgradeFrom: ${upgradeFrom}`);
                         if (upgradeFrom * 1 < version) {
-                            upgradeFrom.replace((upgradeFrom.length <= 14 ? /(\d+\.\d{2})(\d+)/ : /(\d+\.\d{3})(\d+)/), (match, version, build) => {
+                            upgradeFrom.replace(/(\d+\.\d{2})(\d+)/, (match, version, build) => {
                                 upgradeFrom = version * 1;
                                 lastDate = build * 1;
                             });
@@ -15474,7 +15495,7 @@ Charmancer overall slide template
                 buffSplit, buffMatch, buff, buffType, buffed, evalBuff,
                 buffFields = _.chain(_.keys(attributes))
                 .filter((k) => {
-                    return k.match(/repeating_(?:item_-[^_]+_mods|buff_-[^_]+_mods|ability_-[^_]+_mods)/);
+                    return k.match(/_mods$/);
                 })
                 .filter((k) => {
                     let typeSwitch = {
@@ -15483,15 +15504,21 @@ Charmancer overall slide template
                         'ability': (p1) => [p1 + 'toggle', p1 + 'frequency']
                     };
                     let typeMatch = k.match(/(repeating_(item|buff|ability)_-[^_]+_)mods/);
-                    return _.some(typeSwitch[typeMatch[2]](typeMatch[1]), (ts) => {
-                        return (attributes[ts] + '').match(/enabled|equipped|constant|1/);
-                    });
+                    if(typeMatch){
+                        return _.some(typeSwitch[typeMatch[2]](typeMatch[1]), (ts) => {
+                            return (attributes[ts] + '').match(/enabled|equipped|constant|1/);
+                        });
+                    }else{
+                        return true;
+                    }
                 })
                 .map((k) => {
                     let typeMatch = k.match(/(repeating_(item|buff|ability)_-[^_]+_)mods/);
-                    if (typeMatch[2] === 'item' && attributes[typeMatch[1] + 'purpose'] === 'armor') {
-                        armor = /power/.test(attributes[typeMatch[1] + 'type']) ? 'power' : (armor === 'power' ? 'power' : true);
-                        armorProf = attributes[typeMatch[1] + 'proficiency'];
+                    if(typeMatch){
+                        if (typeMatch[2] === 'item' && attributes[typeMatch[1] + 'purpose'] === 'armor') {
+                            armor = /power/.test(attributes[typeMatch[1] + 'type']) ? 'power' : (armor === 'power' ? 'power' : true);
+                            armorProf = attributes[typeMatch[1] + 'proficiency'];
+                        }
                     }
                     return attributes[k];
                 })
@@ -16816,6 +16843,12 @@ Charmancer overall slide template
                     default_adds: [],
                     default_value: ''
                 },
+                level: {
+                    data: ['level'],
+                    propagates_to: [],
+                    default_adds: [],
+                    default_value: ''
+                },
                 cost: {
                     data: ['cost'],
                     propagates_to: [],
@@ -17524,6 +17557,7 @@ Charmancer overall slide template
                     setObj[`repeating_attack_${weaponRowID}_engagement_range`]='ranged';
                     setObj[`repeating_attack_${weaponRowID}_ability`]='@{dexterity_mod}';
                 }
+                setObj[`repeating_attack_${weaponRowID}_range_filter`]=setObj[`repeating_attack_${weaponRowID}_engagement_range`];
                 if(data.capacity){
                     data.capacity.replace(/(\d+)\s*([a-z]*)/i,(match,amount,type)=>{
                         setObj[`repeating_attack_${weaponRowID}_ammo_type`]=type;
@@ -17653,6 +17687,7 @@ Charmancer overall slide template
             on(`mancerchange:race`,raceSelected);
             on(`mancerchange:subrace`,subraceSelected);
             on(`mancerchange:repeating_race_ability mancerchange:repeating_theme_ability`,selectAbility);
+            on('mancerchange:repeating_race_')
             
             //theme page handling
             on(`mancerChange:theme`,themeSelected);
@@ -17673,6 +17708,13 @@ Charmancer overall slide template
             on('clicked:add_profession',addSkill);
             on('clicked:repeating_profession',removeSkill);
             on(`mancerchange:repeating_${['profession',...mancerSkillList].join(' mancerchange:repeating_')}`,updateSkillValues);
+            
+            //Feat page handling
+            on(`page:pc-feat`,loadFeats);
+            on(`clicked:repeating_${['feat','classfeat','racialfeat','customfeat'].join(' clicked:repeating')}`,displayAvailableFeats);
+            
+            //generic selection handling
+            on('mancerchange:repeating_selection',updateMod)
         },
         
         loadSlide = function(event){
@@ -17722,15 +17764,13 @@ Charmancer overall slide template
                     memo.repeatIDs=[...memo.repeatIDs,...slide.repeating]
                 }
                 return memo;
-            },{mancerData:{},repeatIDs:[]});
+            },{mancerData:{stackable_buffs:'circumstance'},repeatIDs:[]});
         },
         
         selectAbility = function(event){
             if(event.sourceType === 'worker'){
                 return;
             }
-            TAS.log(`racial ability selected`);
-            TAS.log(event);
             const updateObj = {
                     setTextObj:{},
                     setObj:{},
@@ -17742,6 +17782,25 @@ Charmancer overall slide template
             TAS.log(updateObj);
             setCharmancerText(updateObj.setTextObj);
             setAttrs(updateObj.setObj,{silent:true});
+        },
+        
+        updateMod = function(event){
+            if(event.sourceType === 'worker'){
+                return;
+            }
+            TAS.log(`event:`);
+            TAS.log(event);
+            const setTextObj={},
+                setObj={},
+                data=getMancerData();
+                
+            getRepeatingSections((structure)=>{
+                let modKey = `${_.find(_.keys(structure.tree),(key)=>{
+                    return _.contains(_.keys(structure.tree[key]),event.sourceSection)
+                })}_mods`;
+                setObj[modKey]=data.mancerData[modKey].replace(new RegExp(`\\(selected.+?\\)|${event.previousValue}`,'i'),event.newValue);
+                setAttrs(setObj,silent);
+            });
         },
         
         subsetScore = function(setObj,setText,data,showOnly){
@@ -17869,13 +17928,17 @@ Charmancer overall slide template
                         let abilityBlob = data.pageData.blobs[ability];
                         addRepeatingSection('ability-container','ability-description','racial_ability_section',(id)=>{
                             let repeatTextAdd = {
-                                [`${id} span.sheet-ability-name`]:`${ability}: `,
-                                [`${id} span.sheet-ability-description`]:abilityBlob.description
-                            };
-                            setAttrs({[`${id}_name`]:ability},{silent:true});
+                                    [`${id} span.sheet-ability-name`]:`${ability}: `,
+                                    [`${id} span.sheet-ability-description`]:abilityBlob.description
+                                },
+                                repeatSetObj = {
+                                    [`${id}_name`]:ability
+                                },
+                                quantity = 0;
+                                
                             if(abilityBlob.selections){
-                                let quantity = abilityBlob['selection quantity']*1||1,
-                                    selection = abilityBlob.selections;
+                                quantity = abilityBlob['selection quantity']*1||1;
+                                let selection = abilityBlob.selections;
                                     
                                 if(/skills/i.test(selection)){
                                     selection = ['Acrobatics', 'Athletics', 'Bluff', 'Computers', 'Culture', 'Diplomacy', 'Disguise', 'Engineering', 'Intimidate', 'Life Science', 'Medicine', 'Mysticism', 'Perception', 'Physical science', 'Piloting', 'Profession','Sense Motive', 'Sleight of Hand', 'Stealth', 'Survival'];
@@ -17883,11 +17946,24 @@ Charmancer overall slide template
                                     //handling for dynamic lists
                                 }
                                 _.each(_.range(quantity),(r)=>{
-                                    addRepeatingSection(`${id}`,`select`,`section_${id}`,(selectID)=>{
+                                    addRepeatingSection(`${id}`,`select`,`selection`,(selectID)=>{
                                         setCharmancerOptions(`${selectID}_selection`,selection);
                                     });
                                 });
                             }
+                            if(abilityBlob['data-mods']){
+                                repeatSetObj[`${id}_mods`] = data.mancerData[`${id}_mods`] || _.reduce(abilityBlob['data-mods'].split(/\n+/),(memo,mod)=>{
+                                    if(!/\(SELECTED/i.test(mod)){
+                                        memo += `${mod}\n`;
+                                    }else{
+                                        memo += `${mod.replace(/(\(selected.+?\))/ig,_.map(_.range(quantity),(num)=>{return'$1'}).join(' and '))}\n`;
+                                    }
+                                    return memo;
+                                },'');
+                            }
+                            TAS.log(`repeatSetObj:`);
+                            TAS.log(repeatSetObj);
+                            setAttrs(repeatSetObj,{silent:true});
                             setCharmancerText(repeatTextAdd);
                         });
                     });
@@ -17970,15 +18046,26 @@ Charmancer overall slide template
                             updateObj.setObj.theme_ability_bonus = '';
                         }
                     }else{
+                        data.mancerData = _.reduce(_.keys(data.mancerData),(memo,key)=>{
+                            if(!/theme_ability_selection/.test(key)){
+                                memo[key] = data.mancerData[key];
+                            }
+                            return memo;
+                        },{});
+                        _.each(_.keys(data.mancerData),(key)=>{
+                            if(/theme_ability_selection/.test(key)){
+                                data.mancerData[key]=undefined;
+                            }
+                        });
                         updateObj.setObj.theme_ability_bonus.replace(/([a-z]+) \+(\d+)/i,(match,ability,score)=>{
                             updateObj.setObj[`theme_${ability.toLowerCase()}`]=score*1;
                         });
                     }
-                    if(/choose/i.test(data.pageData['Theme Knowledge Skill'])){
+                    if(/choose|,/i.test(data.pageData['Theme Knowledge Skill'])){
                         addRepeatingSection('skill-container','select','theme_skill',(id)=>{
-                            setCharmancerOptions(`${id}_selection`,['Acrobatics', 'Athletics', 'Bluff', 'Computers', 'Culture', 'Diplomacy', 'Disguise', 'Engineering', 'Intimidate', 'Life Science', 'Medicine', 'Mysticism', 'Perception', 'Physical science', 'Piloting', 'Profession','Sense Motive', 'Sleight of Hand', 'Stealth', 'Survival']);
+                            setCharmancerOptions(`${id}_selection`,/,/.test(data.pageData['Theme Knowledge Skill']) ? data.pageData['Theme Knowledge Skill'].split(/\s*,\s*/) : ['Acrobatics', 'Athletics', 'Bluff', 'Computers', 'Culture', 'Diplomacy', 'Disguise', 'Engineering', 'Intimidate', 'Life Science', 'Medicine', 'Mysticism', 'Perception', 'Physical science', 'Piloting', 'Profession','Sense Motive', 'Sleight of Hand', 'Stealth', 'Survival']);
                         });
-                        if(/choose/i.test(updateObj.setObj.theme_skill)){
+                        if(/choose|,/i.test(updateObj.setObj.theme_skill)){
                             updateObj.setObj.theme_skill = '';
                         }
                     }
@@ -18246,6 +18333,7 @@ Charmancer overall slide template
             TAS.log(`loading skills slide`);
             TAS.log(event);
             const data = getMancerData(),
+                buffs = parseBuffs(data.mancerData),
                 setObj = {
                     skill_points_available:0
                 },
@@ -18256,16 +18344,19 @@ Charmancer overall slide template
                     }
                     return memo;
                 },[]);
+                if(_.isEmpty(skillRows)){
+                    skillRows.push(...mancerSkillList);
+                }
             TAS.log(data);
+            TAS.log(`buffs:`);
+            TAS.log(buffs);
             _.each([1,2,3,4,5],(num)=>{
-                TAS.log(`((data.mancerData[class_skill_points_${num}]*data.mancerData[class_level_${num}])||0) + ((data.mancerData.intelligence_mod*data.mancerData[class_level_${num}])||0): ((${data.mancerData[`class_skill_points_${num}`]}*${data.mancerData[`class_level_${num}`]})||0) + ((${data.mancerData.intelligence_mod}*${data.mancerData[`class_level_${num}`]})||0)`);
                 setObj.skill_points_available += ((data.mancerData[`class_skill_points_${num}`]*data.mancerData[`class_level_${num}`])||0) + ((data.mancerData.intelligence_mod*data.mancerData[`class_level_${num}`])||0); 
-                TAS.log(`setObj.skill_points_available:${setObj.skill_points_available}`);
             });
             clearRepeatingSections('gridrow');
             _.each(skillRows,(skill)=>{
                 setObj.skill_points_available -= data.mancerData[`${skill}_ranks`]*1||0;
-                addSkill(skill,data);
+                addSkill(skill,data,buffs);
             });
             setText.skill_points_available = setObj.skill_points_available;
             setAttrs(setObj,silent);
@@ -18294,18 +18385,22 @@ Charmancer overall slide template
             'survival':'wisdom'
         },
         
-        addSkill = function(skill,data){
+        addSkill = function(skill,data,buffs){
             if(!data){
                 data = getMancerData();
             }
+            if(!buffs){
+                buffs = parseBuffs(data.mancerData);
+            }
             if(typeof skill !== 'string'){
-                skill = undefined;
+                skill = 'profession';
             }else{
                 skill = skill.replace(/repeating_.+?_/,'');
             }
-            TAS.log(`adding Skill for ${skill}`);
-            addRepeatingSection('gridrow','skill',(skill||'profession'),(id)=>{
-                
+            addRepeatingSection('gridrow','skill',skill,(id)=>{
+                TAS.log(`initial data:`);
+                TAS.log(data);
+                TAS.log(`adding Skill for ${skill}`);
                 let setObj = {},
                     setText = {},
                     ability_mod = 0;
@@ -18314,13 +18409,36 @@ Charmancer overall slide template
                     showChoices([`${id} .sheet-pregen`]);
                     setObj[`${id}_name`]=properCase(skill.replace(/_/g,' '));
                     setText[`${id} span.sheet-name`] = setObj[`${id}_name`];
-                    setText[`${id} span.sheet-ability_value`] = abilitySwitch[skill].replace(/([a-z]{3}).+/i,'$1').toUpperCase();
+                    setText[`${id} span.sheet-ability_value`] = (abilitySwitch[skill]||'').replace(/([a-z]{3}).+/i,'$1').toUpperCase();
                     ability_mod = data.mancerData[`${abilitySwitch[skill]}_mod`]*1||0;
+                    TAS.log(`data.mancerData[${abilitySwitch[skill]}_mod]:${data.mancerData[`${abilitySwitch[skill]}_mod`]}`);
+                    if(_.some([1,2,3,4,5],(num)=>{
+                        return new RegExp(skill,'i').test(data.mancerData[`class_skills_${num}`]);
+                    })){
+                        setObj[`${id}_class_skill`] = 3;
+                    }else{
+                        setObj[`${id}_class_skill`] = 0;
+                    }
+                    setObj[`${id}_bonus_value`] = calcBuffs(data.mancerData,buffs[skill],setObj).total;
+                    let theme_skill = data.mancerData[_.find(_.keys(data.mancerData),(key)=>{return /theme_skill_selection/.test(key)})] || data.mancerData.theme_skill;
+                    if(theme_skill.replace(/\s+/g,'_').toLowerCase() === skill){
+                        if(setObj[`${id}_class_skill`]===3){
+                            setObj[`${id}_bonus_value`] += 1;
+                        }else{
+                            setObj[`${id}_class_skill`]=3;
+                        }
+                    }
+                    setText[`${id} .sheet-bonus_value`] = setObj[`${id}_bonus_value`];
                 }else{
                     showChoices([`${id} .sheet-profession`]);
                     ability_mod = data.mancerData[`${data.mancerData[`${id}_ability_select`]}_mod`]*1||0;
+                    setObj[`${id}_class_skill`] = 3;
+                    setObj[`${id}_bonus_value`] = calcBuffs(data.mancerData,buffs[skill],setObj).total;
+                    setText[`${id} .sheet-bonus_value`] = setObj[`${id}_bonus_value`];
                 }
-                setObj[`${id}_total_value`] = (data.mancerData[`${id}_ranks`]*1||0) + (data.mancerData[`${id}_class_skill`]*1||0) + ability_mod;
+                Object.assign(data.mancerData,setObj);
+                setObj[`${id}_total_value`] = (data.mancerData[`${id}_ranks`]*1||0) + (data.mancerData[`${id}_ranks`]*1 > 0 ? (data.mancerData[`${id}_class_skill`]*1||0) : 0) + ability_mod + (data.mancerData[`${id}_bonus_value`]*1||0);
+                TAS.log(`${setObj[`${id}_total_value`]} = ${(data.mancerData[`${id}_ranks`]*1||0)}[Ranks] + ${(data.mancerData[`${id}_ranks`]*1 > 0 ? (data.mancerData[`${id}_class_skill`]*1||0) : 0)}[CS] + ${ability_mod}[Ability] + ${(data.mancerData[`${id}_bonus_value`]*1||0)}[Bonuses]`);
                 setText[`${id} span.sheet-total_value`] = setObj[`${id}_total_value`];
                 setAttrs(setObj,silent);
                 setCharmancerText(setText);
@@ -18334,16 +18452,23 @@ Charmancer overall slide template
             const data = getMancerData(),
                 setObj = {},
                 setText = {},
-                skill = event.sourceSection.replace(/repeating_.+?_/,''),
-                ability_mod = data.mancerData[`${abilitySwitch[skill]}_mod`]*1||data.mancerData[`${data.mancerData[`${id}_ability_select`]}_mod`]*1||0;
+                skill = event.sourceSection.replace(/repeating_.+?_/,'');
+                
+            if(/ranks/.test(event.sourceAttribute)){
+                if(event.newValue > (data.mancerData.character_level||1)){
+                    setObj[event.sourceAttribute]=data.mancerData.character_level;
+                    data.mancerData[event.sourceAttribute]=data.mancerData.character_level;
+                    event.newValue = data.mancerData.character_level;
+                }
+                TAS.log(`(${data.mancerData.skill_points_available}*1||0) - (${event.newValue}*1||0) - (${event.previousValue}*1||0):(${data.mancerData.skill_points_available*1||0}) - (${event.newValue*1||0}) - (${event.previousValue*1||0})`)
+                setObj.skill_points_available = (data.mancerData.skill_points_available*1||0) - ((event.newValue*1||0) - (event.previousValue*1||0));
+            }
+            const ability_mod = data.mancerData[`${abilitySwitch[skill]}_mod`]*1||data.mancerData[`${data.mancerData[`${event.sourceSection}_ability_select`]}_mod`]*1||0;
             TAS.log(`updating skill values`);
             TAS.log(event);
             TAS.log(data);
-            setObj[`${event.sourceSection}_total_value`] = (data.mancerData[`${event.sourceSection}_ranks`]*1||0) + (data.mancerData[`${event.sourceSection}_class_skill`]*1||0) + ability_mod;
+            setObj[`${event.sourceSection}_total_value`] = (data.mancerData[`${event.sourceSection}_ranks`]*1||0) + (data.mancerData[`${event.sourceSection}_ranks`]*1 > 0 ? (data.mancerData[`${event.sourceSection}_class_skill`]*1||0) : 0) + ability_mod + (data.mancerData[`${event.sourceSection}_bonus_value`]*1||0);
             setText[`${event.sourceSection} span.sheet-total_value`] = setObj[`${event.sourceSection}_total_value`];
-            if(/ranks/.test(event.sourceAttribute)){
-                setObj.skill_points_available = (data.mancerData.skill_points_available*1||0) - (event.previousValue*1||0) - (event.newValue*1||0)
-            }
             Object.assign(setText,setObj);
             setAttrs(setObj,silent);
             setCharmancerText(setText);
@@ -18352,14 +18477,83 @@ Charmancer overall slide template
         removeSkill = function(event){
             TAS.log(`removing profession skill`);
             TAS.log(event);
-            const data = getMancerData();
-            TAS.log(data.repeatIDs);
-            clearRepeatingSectionsById([event.sourceSection]);
+            clearRepeatingSectionById(event.sourceSection);
         },
         
         //End of skill handling
+        //Start of feat handling
+        
+        loadFeats = function(event){
+            TAS.log(`loading feats`);
+            TAS.log(event);
+            const data = getMancerData(),
+                setObj = {},
+                setText = {},
+                featNum = Math.ceil(data.mancerData.character_level/2)||1;
+            let featRows = _.reduce(data.repeatIDs,(memo,key)=>{
+                    if(new RegExp(`repeating_.+?_feat`).test(key) && data.mancerData[`${key}_level`] <= data.mancerData.character_level){
+                        memo.push(key);
+                    }
+                    return memo;
+                },[]);
+                
+            TAS.log(`featNum: ${featNum} | featRows.length: ${featRows.length}`);
+            if(featRows.length < featNum){
+                _.each(_.range(_.max([featNum - featRows.length,0])),(num)=>{
+                    featRows.push(`feat${(featRows.length + num + 1)*2 - 1}`);
+                });
+            }
+            //Need racial, class, and custom feat handling
+            //Racial and class repeating_feats will be named repeating_classfeat or repeating_racialfeat
+            TAS.log(`data:`);
+            TAS.log(data);
+            TAS.log(featRows);
+            featRows = featRows.sort((a,b)=>{return (data.mancerData[`${a}_level`]*1||a.replace(/.*(\d+).*/,'$1')*1||0)-(data.mancerData[`${b}_level`]*1||b.replace(/.*(\d+).*/,'$1')*1||0)})
+            hideChoices();
+            clearRepeatingSections('mancer-entry');
+            clearRepeatingSections('mancer-entry');
+            _.each(featRows,(key)=>{
+                let feat = 'feat1',
+                    id;
+                key.replace(/(repeating_.+?_(.*?)feat)/,(match,i,n)=>{
+                    feat = n;
+                    id = i;
+                });
+                addRepeatingSection('mancer-entry','feat',(newID)=>{
+                    let repeatSetObj = {},
+                        repeatSetText = {};
+                        
+                    repeatSetObj[`${newID}_level`] = data.mancerData[`${id}_level`] || key.replace(/.*(\d+).*/,'$1')*1 || 1;
+                    repeatSetText[`${newID} .sheet-level-header`] = /racial/i.test(key) ? 'Racial Bonus Feat' : `Level ${repeatSetObj[`${newID}_level`]}${/class/i.test(key) ? ' Bonus':''} Feat`;
+                    repeatSetObj[`${newID}_name`] = data.mancerData[`${id}_name`] || '';
+                    repeatSetText[`${newID} .sheet-name`] = repeatSetObj[`${newID}_name`];
+                    repeatSetObj[`${newID}_description`] = data.mancerData[`${id}_description`] || '';
+                    repeatSetText[`${newID} .sheet-description`] = repeatSetObj[`${newID}_description`];
+                    TAS.log(repeatSetObj);
+                    TAS.log(repeatSetText);
+                    setAttrs(repeatSetObj,silent);
+                    setCharmancerText(repeatSetText);
+                });
+            });
+            showChoices(['compendium']);
+        },
+        
+        displayAvailableFeats = function(event){
+            TAS.log(`displaying available feats`);
+            const data = getMancerData(),
+                setObj = {},
+                setText = {},
+                featNum = Math.ceil(data.mancerData.character_level/2)||1;
+            let featRows = _.reduce(data.repeatIDs,(memo,key)=>{
+                    if(new RegExp(`repeating_.+?_feat`).test(key) && data.mancerData[`${key}_level`] <= data.mancerData.character_level){
+                        memo.push(key);
+                    }
+                    return memo;
+                },[]);
+        },
+        
+        //End of feat handling
         properCase = function(string){
-            TAS.log(`string: ${string}`);
             return string.replace(/(^|,|\s)([a-z])/g,(match,space,letter)=>{
                 return `${space}${letter.toUpperCase()}`;
             });
