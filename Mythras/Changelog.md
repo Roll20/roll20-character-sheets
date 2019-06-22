@@ -4,6 +4,43 @@ Versions have two numbers Major.Minor
 **Major**: Indicates that some form of compatibility has broken.  These versions should have notes indicating what broke and how to handle it.  May include major UI changes to sheet layout and design or fundament changes in how parts of the sheet are managed.
 
 **Minor**: Indicates the addition of new features, bugfixes or other adjustments which do not alter variable names or fundamental workflow.
+## 2.4
+### Bug Fixes
+* Fixed overflow in Firefox with Passions
+* Fixed current/max fields which would be mis-synced after JSON imports
+
+### New Features
+* Added toggle to base Exp Mod on INT
+* Added option to make Strangeness a Standard Skill
+* Added option to make The Soot a Standard Skill
+* Added Peculiarities
+* Added Odd Soot Magic Support
+* Added Odd Soot to Settings
+
+## 2.3
+### New Features
+* Added Support for Superpowers
+* Toggle to calculate Healing Rate with CON + half POW
+* Toggle to calculate Luck Points with CHA + half POW
+* Added Agony & Ecstasy to Settings
+* Cleaned up skill rolltemplate so it doesn't use bold font for everything
+
+## 2.2
+### New Features
+* Added toggle to base HP on CON+SIZ or CON+SIZ+POW or CON+SIZ+STR
+* Added toggle to base damage mod on STR+SIZ or STR+SIZ+POW or STR+SIZ+CON
+* Added toggle to add 1/10 Athletics to Initiative rolls
+* Added notes field to all skills which will display at the bottom of skill rolls
+* Added Worlds United to Settings
+
+## 2.1
+### New Features
+* Added options to enable/disable magic point/power points/prana points
+* Can now disable vehicles entirely, this is the default.  Ships and shield walls ships will need enabled unless mechanics are supplied in the setting.
+* New option to enable/disable battle units.
+* New option to enable/disable spirit type creatures and the form toggle.
+* Removed sheet variants which was a hidden feature utilized to help support the M-Space sheet on the same code base.  Now simply selecting M-Space setting will do all that work.  This includes altering the logo in the upper-right.
+* 
 
 ## 2.0
 With this version I am switching back to a two number version format.  The description above has been adjusted.  The intent is to release versions in smaller chunks.  As soon as a new feature or adjustment is made it will be released as a version.  This will hopefully quicken the pace of sheet development and make sheet adjustments a bit more manageable.  Expect that 2nd number to increase rather fast.
