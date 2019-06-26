@@ -14,7 +14,7 @@ This sheet was inspired by the Palladium Megaverse sheet, but has had several ch
 
 ### Menu Roll Template
 - You can also call the template as &{template:menu}.
-- The main difference is that the description section will now center all text.  I use this for all chat menus.
+- The main difference is that the description section will display all text centered, bold, and in italics.  I use this for all chat menus.
 
 ### Roll Template Example
 This example is the macro I use for the healer ability Healing Touch.
