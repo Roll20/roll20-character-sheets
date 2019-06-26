@@ -10,8 +10,8 @@ This sheet was inspired by the Palladium Megaverse sheet, but has had several ch
 - Because I like to apply circumstantial bonuses and penalties to skills, I do not have skill or stat rolls set up to show success or failure.  Instead it will show the roll and the target number.
 
 ### Menu Roll Template
-You can also call the template as &{template:menu}.
-The main difference is that the description section will now center all text.  I use this for all chat menus.
+- You can also call the template as &{template:menu}.
+- The main difference is that the description section will now center all text.  I use this for all chat menus.
 
 ### Auto Calculated Stat Bonuses
 - I.Q. bonuses are auto calculated and displayed at the top of the Skills tab.  Any bonus is subtracted from the percentile roll in the OCC, Elective, and Secondary skill sections.
@@ -46,4 +46,4 @@ The main difference is that the description section will now center all text.  I
 - [Initiative Duplicator on Roll20 Forums](https://app.roll20.net/forum/permalink/6817748/)
 
 ### Disclaimer
-Palladium Fantasy 1E has been around a long while.  It is from an era where house rules were not frowned upon, but encouraged.  As such, I have tried to put enough options in this sheet to allow for creativity.  I am a definite novice at html, css, or anything else that has gone into this sheet, so any major revisions for automation may be beyond me.  As K.S. would say, Game On!
+Palladium Fantasy 1E has been around a long while.  It is from an era where house rules were not frowned upon, but encouraged.  As such, I have tried to put enough options in this sheet to allow for creativity.  I am a definite novice at html, css, or anything else that has gone into this sheet, so any major revisions for automation may be beyond me.  It is in the current state due to the generous help of the Roll20 forum community.  As K.S. would say, Game On!
