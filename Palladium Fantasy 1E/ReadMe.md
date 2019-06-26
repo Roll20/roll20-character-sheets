@@ -4,7 +4,7 @@ This sheet was inspired by the Palladium Megaverse sheet, but has had several ch
 - This sheet has a roll template that is called by &{template:custom}.
 - You specify a color with {{color=black}}.  Available colors are black, brown, blue, red, grey, yellow, green, teal, orange, pine, ice, violet, sun, and wine.
 - You can specify both a title and subtitle as {{title=Desired Title}} and {{subtitle=Desired Subtitle}}
-- Any rolls or can be assigned the same as the default Roll20 template.
+- Any rolls or inline macros can be assigned the same as the default Roll20 template.
 - There is a description section that is called as {{desc=Desired Description}}.  This section will honor line breaks making larger descriptions or even simple table options possible.
 - The roll template is built to change the pink "chat menu" buttons into blue text with no box.
 - Because I like to apply circumstantial bonuses and penalties to skills, I do not have skill or stat rolls set up to show success or failure.  Instead it will show the roll and the target number.
