@@ -2272,492 +2272,40 @@
     var allStats = ["intelligence","wits","resolve","strength","dexterity","stamina","presence","manipulation","composure","academics","computer","crafts","investigation","medicine","occult","politics","science","athletics","brawl","drive","firearms","larceny","stealth","survival","weaponry","animalken","empathy","expression","intimidation","persuasion","socialize","streetwise","subterfuge","animalism","auspex","celerity","dominate","majesty","nightmare","obfuscate","protean","resilience","vigor","crúac","thebansorcery","death","fate","forces","life","matter","mind","prime","spirit","space","time","potency"];
     var potencyNames = { mortal1:"", mortal2:"", vampire1:"Blood Potency", vampire2:"Blood Potency", werewolf1:"Primal Urge", werewolf2:"Primal Urge", mage1:"Gnosis", mage2:"Gnosis", promethean1:"Azoth", promethean2:"Azoth", changeling1:"Wyrd", changeling2:"Wyrd", demon:"Primum", beast:"Lair", hunter:"", geist1:"Psyche", mummy1:"Sekhem" };
 
-    on("change:intelligence_flag", function() {
-        updateRolls("intelligence");
-    });
+    ["intelligence","wits","resolve","strength","dexterity","stamina","presence","manipulation","composure","academics","computer","crafts","investigation","occult","politics","science","athletics","brawl","drive","firearms","larceny","stealth","survival","weaponry","animalken","empathy","expression","intimidation","persuasion","socialize","streetwise","subterfuge","animalism","auspex","celerity","dominate","majesty","nightmare","obfuscate","protean","resilience","vigor","crúac","thebansorcery","death","fate","forces","life","matter","mind","prime","spirit","space","time","potency","rolltype"].forEach((attr) => {
+        on(`change:${attr} change:${attr}_flag`, (eventInfo) => {
+            const source = eventInfo.sourceAttribute;
+            const attribute = (attr.includes("flag")) ? attr.split(`_flag`)[0] : attr; //Remove the "_flag" part so we can pass the name
 
-    on("change:wits_flag", function() {
-        updateRolls("wits");
-    });
+            updateRolls(`${attribute}`);
+            console.log(source);
 
-    on("change:resolve_flag", function() {
-        updateRolls("resolve");
-        updateWillpower();
-    });
+            if (source === "resolve_flag" || source === "composure_flag") {
+                updateWillpower();
+            };
 
-    on("change:strength_flag", function() {
-        updateRolls("strength");
-    });
+            if (source === "wits" || source === "composure") {
+                updateMoralHealth();
+            };
 
-    on("change:dexterity_flag", function() {
-        updateRolls("dexterity");
-    });
+            if (source === "wits" || source === "dexterity" || source === "athletics" || source === "brawl" || source === "weaponry") {
+                getAttrs(["defense_select"], (v) => { // PRD-1407
+                    updateDefense(v.defense_select);
+                });
+            };
 
-    on("change:stamina_flag", function() {
-        updateRolls("stamina");
-    });
-
-    on("change:presence_flag", function() {
-        updateRolls("presence");
-    });
-
-    on("change:manipulation_flag", function() {
-        updateRolls("manipulation");
-    });
-
-    on("change:composure_flag", function() {
-        updateRolls("composure");
-        updateWillpower();
-    });
-
-    on("change:academics_flag", function() {
-        updateRolls("academics");
-    });
-
-    on("change:computer_flag", function() {
-        updateRolls("computer");
-    });
-
-    on("change:crafts_flag", function() {
-        updateRolls("crafts");
-    });
-
-    on("change:investigation_flag", function() {
-        updateRolls("investigation");
-    });
-
-    on("change:medicine_flag", function() {
-        updateRolls("medicine");
-    });
-
-    on("change:occult_flag", function() {
-        updateRolls("occult");
-    });
-
-    on("change:politics_flag", function() {
-        updateRolls("politics");
-    });
-
-    on("change:science_flag", function() {
-        updateRolls("science");
-    });
-
-    on("change:athletics_flag", function() {
-        updateRolls("athletics");
-    });
-
-    on("change:brawl_flag", function() {
-        updateRolls("brawl");
-    });
-
-    on("change:drive_flag", function() {
-        updateRolls("drive");
-    });
-
-    on("change:firearms_flag", function() {
-        updateRolls("firearms");
-    });
-
-    on("change:larceny_flag", function() {
-        updateRolls("larceny");
-    });
-
-    on("change:stealth_flag", function() {
-        updateRolls("stealth");
-    });
-
-    on("change:survival_flag", function() {
-        updateRolls("survival");
-    });
-
-    on("change:weaponry_flag", function() {
-        updateRolls("weaponry");
-    });
-
-    on("change:animalken_flag", function() {
-        updateRolls("animalken");
-    });
-
-    on("change:empathy_flag", function() {
-        updateRolls("empathy");
-    });
-
-    on("change:expression_flag", function() {
-        updateRolls("expression");
-    });
-
-    on("change:intimidation_flag", function() {
-        updateRolls("intimidation");
-    });
-
-    on("change:persuasion_flag", function() {
-        updateRolls("persuasion");
-    });
-
-    on("change:socialize_flag", function() {
-        updateRolls("socialize");
-    });
-
-    on("change:streetwise_flag", function() {
-        updateRolls("streetwise");
-    });
-
-    on("change:subterfuge_flag", function() {
-        updateRolls("subterfuge");
-    });
-
-    on("change:intelligence", function() {
-        updateRolls("intelligence");
-    });
-
-    on("change:wits", function() {
-        updateRolls("wits");
-        updateMoralHealth();
-        getAttrs(["defense_select"], (v) => { // PRD-1407
-            updateDefense(v.defense_select);
+            if (source === "stamina" || source === "resilience") {
+                updateHealth();
+            };
         });
     });
 
-    on("change:resolve", function() {
-        updateRolls("resolve");
-    });
-
-    on("change:strength", function() {
-        updateRolls("strength");
-    });
-
-    on("change:dexterity", function() {
-        updateRolls("dexterity");
-        getAttrs(["defense_select"], (v) => { // PRD-1407
-            updateDefense(v.defense_select);
+    [...Array(5).keys()].forEach((attr) => {
+        on(`change:attack_type${attr}`, (eventInfo) => {//checks attack_type0 trough attack_type4
+          const source = eventInfo.sourceAttribute;
+          console.log(source);
+          updateRolls("rolltype");
         });
-    });
-
-    on("change:stamina", function() {
-        updateRolls("stamina");
-        updateHealth();
-    });
-
-    on("change:presence", function() {
-        updateRolls("presence");
-    });
-
-    on("change:manipulation", function() {
-        updateRolls("manipulation");
-    });
-
-    on("change:composure", function() {
-        updateRolls("composure");
-        updateMoralHealth();
-    });
-
-    on("change:academics", function() {
-        updateRolls("academics");
-    });
-
-    on("change:computer", function() {
-        updateRolls("computer");
-    });
-
-    on("change:crafts", function() {
-        updateRolls("crafts");
-    });
-
-    on("change:investigation", function() {
-        updateRolls("investigation");
-    });
-
-    on("change:medicine", function() {
-        updateRolls("medicine");
-    });
-
-    on("change:occult", function() {
-        updateRolls("occult");
-    });
-
-    on("change:politics", function() {
-        updateRolls("politics");
-    });
-
-    on("change:science", function() {
-        updateRolls("science");
-    });
-
-    on("change:athletics", function() {
-        updateRolls("athletics");
-        getAttrs(["defense_select"], (v) => { // PRD-1407
-            updateDefense(v.defense_select);
-        });
-    });
-
-    on("change:brawl", function() {
-        updateRolls("brawl");
-        getAttrs(["defense_select"], (v) => { // PRD-1407
-            updateDefense(v.defense_select);
-        });
-    });
-
-    on("change:drive", function() {
-        updateRolls("drive");
-    });
-
-    on("change:firearms", function() {
-        updateRolls("firearms");
-    });
-
-    on("change:larceny", function() {
-        updateRolls("larceny");
-    });
-
-    on("change:stealth", function() {
-        updateRolls("stealth");
-    });
-
-    on("change:survival", function() {
-        updateRolls("survival");
-    });
-
-    on("change:weaponry", function() {
-        updateRolls("weaponry");
-        getAttrs(["defense_select"], (v) => { // PRD-1407
-            updateDefense(v.defense_select);
-        });
-    });
-
-    on("change:animalken", function() {
-        updateRolls("animalken");
-    });
-
-    on("change:empathy", function() {
-        updateRolls("empathy");
-    });
-
-    on("change:expression", function() {
-        updateRolls("expression");
-    });
-
-    on("change:intimidation", function() {
-        updateRolls("intimidation");
-    });
-
-    on("change:persuasion", function() {
-        updateRolls("persuasion");
-    });
-
-    on("change:socialize", function() {
-        updateRolls("socialize");
-    });
-
-    on("change:streetwise", function() {
-        updateRolls("streetwise");
-    });
-
-    on("change:subterfuge", function() {
-        updateRolls("subterfuge");
-    });
-
-    on("change:animalism", function() {
-        updateRolls("animalism");
-    });
-
-    on("change:animalism_flag", function() {
-        updateRolls("animalism");
-    });
-
-    on("change:auspex", function() {
-        updateRolls("auspex");
-    });
-
-    on("change:auspex_flag", function() {
-        updateRolls("auspex");
-    });
-
-    on("change:celerity", function() {
-        updateRolls("celerity");
-    });
-
-    on("change:celerity_flag", function() {
-        updateRolls("celerity");
-    });
-
-    on("change:dominate", function() {
-        updateRolls("dominate");
-    });
-
-    on("change:dominate_flag", function() {
-        updateRolls("dominate");
-    });
-
-    on("change:majesty", function() {
-        updateRolls("majesty");
-    });
-
-    on("change:majesty_flag", function() {
-        updateRolls("majesty");
-    });
-
-    on("change:nightmare", function() {
-        updateRolls("nightmare");
-    });
-
-    on("change:nightmare_flag", function() {
-        updateRolls("nightmare");
-    });
-
-    on("change:obfuscate", function() {
-        updateRolls("obfuscate");
-    });
-
-    on("change:obfuscate_flag", function() {
-        updateRolls("obfuscate");
-    });
-
-    on("change:protean", function() {
-        updateRolls("protean");
-    });
-
-    on("change:protean_flag", function() {
-        updateRolls("protean");
-    });
-
-    on("change:resilience", function() {
-        updateRolls("resilience");
-    });
-
-    on("change:resilience_flag", function() {
-        updateRolls("resilience");
-    });
-
-    on("change:vigor", function() {
-        updateRolls("vigor");
-    });
-
-    on("change:vigor_flag", function() {
-        updateRolls("vigor");
-    });
-
-    on("change:crúac", function() {
-        updateRolls("crúac");
-    });
-
-    on("change:crúac_flag", function() {
-        updateRolls("crúac");
-    });
-
-    on("change:thebansorcery", function() {
-        updateRolls("thebansorcery");
-    });
-
-    on("change:thebansorcery_flag", function() {
-        updateRolls("thebansorcery");
-    });
-
-    on("change:death", function() {
-        updateRolls("death");
-    });
-
-    on("change:death_flag", function() {
-        updateRolls("death");
-    });
-
-    on("change:fate", function() {
-        updateRolls("fate");
-    });
-
-    on("change:fate_flag", function() {
-        updateRolls("fate");
-    });
-
-    on("change:forces", function() {
-        updateRolls("forces");
-    });
-
-    on("change:forces_flag", function() {
-        updateRolls("forces");
-    });
-
-    on("change:life", function() {
-        updateRolls("life");
-    });
-
-    on("change:life_flag", function() {
-        updateRolls("life");
-    });
-
-    on("change:matter", function() {
-        updateRolls("matter");
-    });
-
-    on("change:matter_flag", function() {
-        updateRolls("matter");
-    });
-
-    on("change:mind", function() {
-        updateRolls("mind");
-    });
-
-    on("change:mind_flag", function() {
-        updateRolls("mind");
-    });
-
-    on("change:prime", function() {
-        updateRolls("prime");
-    });
-
-    on("change:prime_flag", function() {
-        updateRolls("prime");
-    });
-
-    on("change:spirit", function() {
-        updateRolls("spirit");
-    });
-
-    on("change:spirit_flag", function() {
-        updateRolls("spirit");
-    });
-
-    on("change:space", function() {
-        updateRolls("space");
-    });
-
-    on("change:space_flag", function() {
-        updateRolls("space");
-    });
-
-    on("change:time", function() {
-        updateRolls("time");
-    });
-
-    on("change:time_flag", function() {
-        updateRolls("time");
-    });
-
-    on("change:rollstyle", function() {
-        updateRolls("rolltype");
-    });
-
-    on("change:attack_type0", function() {
-        updateRolls("rolltype");
-    });
-
-    on("change:attack_type1", function() {
-        updateRolls("rolltype");
-    });
-
-    on("change:attack_type2", function() {
-        updateRolls("rolltype");
-    });
-
-    on("change:attack_type3", function() {
-        updateRolls("rolltype");
-    });
-
-    on("change:attack_type4", function() {
-        updateRolls("rolltype");
-    });
-
-    on("change:attack_type5", function() {
-        updateRolls("rolltype");
     });
 
     on("change:attack", function() {
@@ -2765,147 +2313,31 @@
         updateAttacks();
     });
 
-    on("change:attack_initative0", function() {
-        updateAttacks();
+    ["_initiative0","_initiative1","_initiative2","_initiative3","_initiative4","_strength0","_strength1","_strength2","_strength3","_strength4"].forEach((attr) => {
+      on(`change:attack${attr}`, (eventInfo) => {
+          updateAttacks();
+      });
     });
 
-    on("change:attack_initative1", function() {
-        updateAttacks();
-    });
-
-    on("change:attack_initative2", function() {
-        updateAttacks();
-    });
-
-    on("change:attack_initative3", function() {
-        updateAttacks();
-    });
-
-    on("change:attack_initative4", function() {
-        updateAttacks();
-    });
-
-    on("change:attack_strength0", function() {
-        updateAttacks();
-    });
-
-    on("change:attack_strength1", function() {
-        updateAttacks();
-    });
-
-    on("change:attack_strength2", function() {
-        updateAttacks();
-    });
-
-    on("change:attack_strength3", function() {
-        updateAttacks();
-    });
-
-    on("change:attack_strength4", function() {
-        updateAttacks();
-    });
-
-    on("change:armor_flag0", function() {
-        updateAttacks();
-    });
-
-    on("change:armor_flag1", function() {
-        updateAttacks();
-    });
-
-    on("change:armor_flag2", function() {
-        updateAttacks();
-    });
-
-    on("change:armor_strength0", function() {
-        updateAttacks();
-    });
-
-    on("change:armor_strength1", function() {
-        updateAttacks();
-    });
-
-    on("change:armor_strength2", function() {
-        updateAttacks();
+    ["","_flag0","_flag1","_flag2","_strength0","_strength1","_strength2"].forEach((attr) => {
+      on(`change:armor${attr}`, (eventInfo) => {
+          updateAttacks();
+      });
     });
 
     on("change:health", function() {
         updateAttacks();
     });
 
-    on("change:healthbox_1", function() {
-        updateAttacks();
+    [...Array(16).keys()].forEach((attr) => {//healthbox nr. 1 through 16
+        on(`change:healthbox_${attr+1}`, (eventInfo) => {
+          const source = eventInfo.sourceAttribute;
+          console.log(source);
+          updateAttacks();
+        });
     });
 
-    on("change:healthbox_2", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_3", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_4", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_5", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_6", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_7", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_8", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_9", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_10", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_11", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_12", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_13", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_14", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_15", function() {
-        updateAttacks();
-    });
-
-    on("change:healthbox_16", function() {
-        updateAttacks();
-    });
-
-    on("change:base_size", function() {
-        updateHealth();
-    });
-
-    on("change:giant", function() {
-        updateHealth();
-    });
-
-    on("change:small_framed", function() {
+    on("change:base_size change:giant change:small_framed change:bonus_health", function() {
         updateHealth();
     });
 
@@ -2914,14 +2346,6 @@
         updateDefaultDefense();
         updatePotencyName();
         updateRollType();
-    });
-
-    on("change:resilience", function() {
-        updateHealth();
-    });
-
-    on("change:bonus_health", function() {
-        updateHealth();
     });
 
     on("change:bonus_willpower", function() {
@@ -2940,10 +2364,6 @@
         updateWoundPenalties();
     });
 
-    on("change:potency change:potency_flag", function() {
-       updateRolls("potency");
-    });
-
     on("change:rolltype_select", function() {
         updateRollType();
     });
@@ -2954,23 +2374,14 @@
         updateRollType();
     });
 // ---------------------------------- Translation functions ------------------------------------------
-    on("sheet:opened", function(eventInfo){
+    on("sheet:opened", function(){
         setAttrs({
-            dicepoolmacro: getTranslationByKey("dice-pool")
-        });
-    });
-
-    on("sheet:opened", function(eventInfo){
-        setAttrs({
-            modifiermacro: getTranslationByKey("modifiers")
-        });
-    });
-
-    on("sheet:opened", function(eventInfo){
-        setAttrs({
+            dicepoolmacro: getTranslationByKey("dice-pool"),
+            modifiermacro: getTranslationByKey("modifiers"),
             unarmedmacro: getTranslationByKey("unarmed")
         });
     });
+
 // --------------------------------------------------------------------------------------------------
     var updateRolls = function(stat) {
         var type;
@@ -3097,7 +2508,7 @@
                     display = `${display}${getTranslationByKey("firearms")}\n`
                 }
                 if(v[attack_type].indexOf("ath=1") > -1) {
-                    display = `${display}${getTranslationByKey("Athletics")}\n`
+                    display = `${display}${getTranslationByKey("athletics")}\n`
                 }
             }
             else if(v.rollstyle === "@{rollsimple}") {
@@ -3134,7 +2545,7 @@
     };
 
     var updateMoralHealth = function() {
-        getAttrs(["wits", "composure", "bonus_moralhealth", "sheettype"], function(v) {
+        getAttrs(["wits","composure","bonus_moralhealth","sheettype"], function(v) {
             if (v.sheettype == "changeling2"){
                 var moralhealth = parseInt(v.wits, 10) + parseInt(v.composure, 10) + parseInt(v.bonus_moralhealth);
                 setAttrs({
@@ -3176,7 +2587,7 @@
     }
 
     var updateDefense = function(defense_type = "lowest") {
-        getAttrs(["athletics", "brawl", "dexterity", "weaponry", "wits"], function(v) {
+        getAttrs(["athletics","brawl","dexterity","weaponry","wits"], function(v) {
             var athletics = (parseInt(v.athletics, 10) || 0);
             var brawl = (parseInt(v.brawl, 10) || 10); // PRD-1407
             var dexterity = (parseInt(v.dexterity, 10) || 0);
@@ -3234,6 +2645,7 @@
         getAttrs(["iron_stamina"], function(v) {
             var ironStamina = parseInt(v.iron_stamina, 10);
             var woundpenalties = '-1-2-3';
+            const setWound = {};
             if (ironStamina >= 3) {
                 woundpenalties = '';
             }
@@ -3243,24 +2655,10 @@
             else if (ironStamina === 1) {
                 woundpenalties = '-1-2';
             }
-            setAttrs({
-                woundpenalties_1: woundpenalties,
-                woundpenalties_2: woundpenalties,
-                woundpenalties_3: woundpenalties,
-                woundpenalties_4: woundpenalties,
-                woundpenalties_5: woundpenalties,
-                woundpenalties_6: woundpenalties,
-                woundpenalties_7: woundpenalties,
-                woundpenalties_8: woundpenalties,
-                woundpenalties_9: woundpenalties,
-                woundpenalties_10: woundpenalties,
-                woundpenalties_11: woundpenalties,
-                woundpenalties_12: woundpenalties,
-                woundpenalties_13: woundpenalties,
-                woundpenalties_14: woundpenalties,
-                woundpenalties_15: woundpenalties,
-                woundpenalties_16: woundpenalties,
+            [...Array(16).keys()].forEach(num => {
+              setWound[`woundpenalties_${num+1}`]= woundpenalties;
             });
+            setAttrs(setWound);
         });
     }
 
