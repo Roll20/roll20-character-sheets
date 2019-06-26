@@ -1,6 +1,6 @@
 This sheet was inspired by the Palladium Megaverse sheet, but has had several changes for those familiar with that sheet.
 
-##Roll Template##
+###Roll Template
 This sheet has a roll template that is called by &{template:custom}.
 You specify a color with {{color=black}}.  Available colors are black, brown, blue, red, grey, yellow, green, teal, orange, pine, ice, violet, sun, and wine.
 You can specify both a title and subtitle as {{title=Desired Title}} and {{subtitle=Desired Subtitle}}
@@ -9,11 +9,11 @@ There is a description section that is called as {{desc=Desired Description}}.  
 The roll template is built to change the pink "chat menu" buttons into blue text with no box.
 Because I like to apply circumstantial bonuses and penalties to skills, I do not have skill or stat rolls set up to show success or failure.  Instead it will show the roll and the target number.
 
-##Menu Roll Template##
+###Menu Roll Template
 If you call the template as &{template:menu}.
 The main difference is that the description section will now center all text.  I use this for all chat menus.
 
-##Auto Calculated Stat Bonuses##
+###Auto Calculated Stat Bonuses
 I.Q. bonuses are auto calculated and displayed at the top of the Skills tab.  Any bonus is subtracted from the percentile roll in the OCC, Elective, and Secondary skill sections.
 M.A. bonus to trust and intimidate is autocalculated and displayed in the gold section below the stats.
 P.S. bonus to damage is autocalulated and displayed on the Combat Tab under Hand to Hand Combat skill.  This will be included in any damage roll from the melee attack section of the Basic tab.
@@ -22,28 +22,28 @@ P.B. bonuses to charm and impress are autocalculated and displayed in the gold s
 Spd. is autocalculated to rough miles per hour and displayed in the gold section below the stats.
 Saving throw bonuses from M.E. and P.E. are not autocalculated as of this writing (June '19).
 
-##Stat Rolls##
+###Stat Rolls
 The stat rolls are set up to roll 2 numbers.  The first is a d20, and the second is d100.
 The "Perception" roll in the light blue section of the Basic tab is basically a d20 stat check.  It takes the average (rounded down) of the I.Q. and M.E. for a target number.
 
-##Extra Attributes##
+###Extra Attributes
 The right hand column of the Basic tab has quite a list of things there.  This is all to facilitate the creation of macros and being able to link tokens easily to different resources.
 
-##Melee Attacks##
+###Melee Attacks
 This repeating section will pull in any bonuses found under the Hand to Hand Combat skill.  This includes changing the critical strike threshold if it is changed there.  Weapon proficiency bonuses will need to be added manually.
 Any info entered into notes will be displayed using the description part of the roll template, but will not appear at all if left blank.
 
-##Ranged and Spell Attacks##
+###Ranged and Spell Attacks
 This repeating section pulls nothing from anywhere, except for the Ranged Critical Strike which can change in the case of Longbowmen.
 All other info is entered manually and makes for a good place to place some magic and psionic abilities as well as ranged attacks, such as Mental Bolt of Force or Ball Lightning.
 
-##Initiative##
+###Initiative
 The built in Initiative macro adds 80 to the d20 dice roll.  This is to facilitate use of an API script that can add multiple instances of a token on the tracker, reducing the initiative value by 20 for each entry.  Since multiple actions are not clumped all together as with D&D, the extra room for spreading out multiple attacks I have found useful.
 
-##Recommended API##
+###Recommended API
 If you have access to the API, I highly recommend the use of 2 API scripts.
 Universal Chat Menus can be found here:  https://app.roll20.net/forum/permalink/7474530/  
 Initiative Duplicator can be found here:  https://app.roll20.net/forum/permalink/6817748/
 
-##Disclaimer##
-Palladium Fantasy 1E has been around a long while.  It is from an era where house rules were not frowned upon, but encouraged.  As such, I have tried to put enough options in this sheet to allow for creativity.  As K.S. would say, Game On!
+###Disclaimer
+Palladium Fantasy 1E has been around a long while.  It is from an era where house rules were not frowned upon, but encouraged.  As such, I have tried to put enough options in this sheet to allow for creativity.  I am a definite novice at html, css, or anything else that has gone into this sheet, so any major revisions for automation may be beyond me.  As K.S. would say, Game On!
