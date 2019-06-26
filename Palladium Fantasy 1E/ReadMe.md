@@ -1,6 +1,7 @@
 This sheet was inspired by the Palladium Megaverse sheet, but has had several changes for those familiar with that sheet.
 
 ### Roll Template
+- The roll template is based on one written by Jakob and referenced here:  [A Better Default Template](https://app.roll20.net/forum/permalink/6792597/)
 - This sheet has a roll template that is called by &{template:custom}.
 - You specify a color with {{color=black}}.  Available colors are black, brown, blue, red, grey, yellow, green, teal, orange, pine, ice, violet, sun, and wine.
 - You can specify both a title and subtitle as {{title=Desired Title}} and {{subtitle=Desired Subtitle}}
