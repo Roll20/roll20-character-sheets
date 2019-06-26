@@ -16,6 +16,12 @@ This sheet was inspired by the Palladium Megaverse sheet, but has had several ch
 - You can also call the template as &{template:menu}.
 - The main difference is that the description section will now center all text.  I use this for all chat menus.
 
+### Roll Template Example
+This example is the macro I use for the healer ability Healing Touch.
+```
+&{template:custom} {{color=sun}} {{title=**@{character_name}**}} {{subtitle=Healing Touch}} {{ISP=[[8]]}} {{Healing=[[2d6+2]]}} {{desc=By the laying of hands and force of will, the healer can heal the pain and effects of burns, cuts, bruises, broken bones, etc. The healing touch works only on others (not self) and can be done as often as once every other melee until I.S. P. are used up.}}
+```
+
 ### Auto Calculated Stat Bonuses
 - I.Q. bonuses are auto calculated and displayed at the top of the Skills tab.  Any bonus is subtracted from the percentile roll in the OCC, Elective, and Secondary skill sections.
 - M.A. bonus to trust and intimidate is autocalculated and displayed in the gold section below the stats.
