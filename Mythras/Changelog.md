@@ -12,6 +12,8 @@ Versions have two numbers Major.Minor
 * Added sheet option to enable Work Songs
 * Added sheet option to enable Artifice
 * Added sheet option to enable Alchemy
+* Added effect template
+* Added effect rolls to equipment
 
 ## 2.4
 ### Bug Fixes
