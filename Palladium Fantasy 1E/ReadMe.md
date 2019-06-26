@@ -41,6 +41,13 @@ This sheet was inspired by the Palladium Megaverse sheet, but has had several ch
 ### Initiative
 - The built in Initiative macro adds 80 to the d20 dice roll.  This is to facilitate use of an API script that can add multiple instances of a token on the tracker, reducing the initiative value by 20 for each entry.  Since multiple actions are not clumped all together as with D&D, the extra room for spreading out multiple attacks I have found useful.
 
+### Skill Rolls
+- As mentioned earlier, any bonus for an exceptional I.Q. will be subtracted from rolls in the OCC, Elective, and Secondary Skills sections.
+- The rolls will roll the percentage and display the target number of your skill.
+- Any notes about the skills will be displayed in the description part of the template.
+- The mystic skills is intended for druid class rolls, deducing circle invocations, detecting illusions, and other magical type class skills that have a percentile roll.
+- Since I am not sure the I.Q. bonus should apply for some of these types of skills, that bonus is not automatically applied in the Mystic skills section.
+
 ### Recommended API
 - If you have access to the API, I highly recommend the use of 2 API scripts.
 - [Universal Chat Menus on Roll20 Forums](https://app.roll20.net/forum/permalink/7474530/)  
