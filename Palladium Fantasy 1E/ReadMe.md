@@ -3,7 +3,8 @@ This sheet was inspired by the Palladium Megaverse sheet, but has had several ch
 ### Roll Template
 - The roll template is based on one written by Jakob and referenced here:  [A Better Default Template](https://app.roll20.net/forum/permalink/6792597/)
 - This sheet has a roll template that is called by &{template:custom}.
-- You specify a color with {{color=black}}.  Available colors are black, brown, blue, red, grey, yellow, green, teal, orange, pine, ice, violet, sun, and wine.
+- You specify a color with {{color=black}}.  Available colors are black, brown, blue, red, grey, yellow, green, teal, orange, pine, ice, violet, sun, and wine.  The reason for that many color options is to be able to use different colors for different types of magic.
+- The sheet uses black, brown, yellow, red, blue, green, and grey for various rolls.
 - You can specify both a title and subtitle as {{title=Desired Title}} and {{subtitle=Desired Subtitle}}
 - Any rolls or inline macros can be assigned the same as the default Roll20 template.
 - There is a description section that is called as {{desc=Desired Description}}.  This section will honor line breaks making larger descriptions or even simple table options possible.
@@ -21,15 +22,19 @@ This sheet was inspired by the Palladium Megaverse sheet, but has had several ch
 - P.S. bonus to damage is autocalulated and displayed on the Combat Tab under Hand to Hand Combat skill.  This will be included in any damage roll from the melee attack section of the Basic tab.
 - P.P. bonuses to parry and dodge are autocalculated and displayed on the Combat Tab under Hand to Hand Combat skill.  This will be included in rolling Dodge in the light blue section of the Basic tab, or rolling parry in the Melee Attacks section of the basic tab.
 - P.B. bonuses to charm and impress are autocalculated and displayed in the gold section under the stats.
-- Spd. is autocalculated to rough miles per hour and displayed in the gold section below the stats.
+- Spd. is autocalculated to rough miles per hour and displayed in the gold section below the stats.  It also calculates movement per action in case people are using that 2E mechanic.
 - Saving throw bonuses from M.E. and P.E. are not autocalculated as of this writing (June '19).
 
 ### Stat Rolls
 - The stat rolls are set up to roll 2 numbers.  The first is a d20, and the second is d100.
-- The "Perception" roll in the light blue section of the Basic tab is basically a d20 stat check.  It takes the average (rounded down) of the I.Q. and M.E. for a target number.
+- The "Perception" roll in the light blue section of the Basic tab is basically a d20 stat check.  It takes the average (rounded down) of the I.Q. and M.E. for a target number. Since perception doesn't exist in 1E, this was my personal solution.
 
 ### Extra Attributes
 - The right hand column of the Basic tab has quite a list of things there.  This is all to facilitate the creation of macros and being able to link tokens easily to different resources.
+
+### Extra Movement
+- I included this to be used in case of a character having a common secondary mode of travel such as a mount, spell, or magic item.
+- This repeating section does not autocalculate values.  You can temporarily change the Spd attribute to get all the different calculated values to enter manually.
 
 ### Melee Attacks
 - This repeating section will pull in any bonuses found under the Hand to Hand Combat skill.  This includes changing the critical strike threshold if it is changed there.  Weapon proficiency bonuses will need to be added manually.
@@ -37,10 +42,10 @@ This sheet was inspired by the Palladium Megaverse sheet, but has had several ch
 
 ### Ranged and Spell Attacks
 - This repeating section pulls nothing from anywhere, except for the Ranged Critical Strike which can change in the case of Longbowmen.
-- All other info is entered manually and makes for a good place to place some magic and psionic abilities as well as ranged attacks, such as Mental Bolt of Force or Ball Lightning.
+- All other info is entered manually and makes for a good place to place some magic and psionic abilities in addition to ranged weapon attacks, such as Mental Bolt of Force or Ball Lightning.
 
 ### Initiative
-- The built in Initiative macro adds 80 to the d20 dice roll.  This is to facilitate use of an API script that can add multiple instances of a token on the tracker, reducing the initiative value by 20 for each entry.  Since multiple actions are not clumped all together as with D&D, the extra room for spreading out multiple attacks I have found useful.
+- The built in Initiative macro adds 80 to the d20 dice roll.  This is to facilitate use of an API script that can add multiple instances of a token on the tracker, reducing the initiative value by 20 for each additional entry.  Since multiple actions are not clumped all together as with D&D, the extra room for spreading out multiple attacks I have found useful.
 
 ### Skill Rolls
 - As mentioned earlier, any bonus for an exceptional I.Q. will be subtracted from rolls in the OCC, Elective, and Secondary Skills sections.
