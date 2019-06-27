@@ -9191,13 +9191,18 @@
     const update_weight = function() {
         let update = {};
         let wtotal = 0;
-        let weight_attrs = ["cp","sp","ep","gp","pp","encumberance_setting","strength","size","carrying_capacity_mod"];
+        let weight_attrs = ["cp","sp","ep","gp","pp","encumberance_setting","strength","size","carrying_capacity_mod","speed_max","speed","advantagetoggle"];
         getSectionIDs("repeating_inventory", (idarray) => {
             _.each(idarray, (currentID, i) => {
                 weight_attrs.push(`repeating_inventory_${currentID}_itemweight`);
                 weight_attrs.push(`repeating_inventory_${currentID}_itemcount`);
             });
             getAttrs(weight_attrs, (v) => {
+                if (v["speed_max"] === undefined) {
+                    v["speed_max"] = v['speed'];
+                    update["speed_max"] = v['speed'];
+                }
+
                 let coinWeight = 0;
                 ["cp", "sp", "ep", "gp", "pp"].forEach((type)=> {
                     coinWeight += (isNaN(parseInt(v[`${type}`], 10)) === false) ? parseInt(v[`${type}`], 10) : 0;
@@ -9242,6 +9247,16 @@
                         (wtotal > str*10) ? "HEAVILY ENCUMBERED" :
                         (wtotal > str*5)  ? "ENCUMBERED" :
                         " ";
+                    update["speed"] = 
+                        (wtotal > str*15) ? 0 :
+                        (wtotal > str*10) ? parseInt(v["speed_max"]) - 20 :
+                        (wtotal > str*5)  ? parseInt(v["speed_max"]) - 10 :
+                        parseInt(v["speed_max"]);
+                    update["advantagetoggle"] = 
+                        (wtotal > str*15) ? "{{query=1}} {{disadvantage=1}} {{r2=[[@{d20}" :
+                        (wtotal > str*10) ? "{{query=1}} {{disadvantage=1}} {{r2=[[@{d20}" :
+                        (wtotal > str*5)  ? "{{query=1}} {{disadvantage=1}} {{r2=[[@{d20}" :
+                        "{{query=1}} {{normal=1}} {{r2=[[0d20";
                 } else {
                     update["encumberance"] = " ";
                 }
