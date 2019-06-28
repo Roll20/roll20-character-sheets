@@ -14,6 +14,7 @@ Versions have two numbers Major.Minor
 * Added sheet option to enable Alchemy
 * Added effect template
 * Added effect rolls to equipment
+* Added equipement and money to compact/mook sheets
 
 ## 2.4
 ### Bug Fixes
