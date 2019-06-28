@@ -29,7 +29,7 @@ This example is the macro I use for the healer ability Healing Touch.
 - P.P. bonuses to parry and dodge are autocalculated and displayed on the Combat Tab under Hand to Hand Combat skill.  This will be included in rolling Dodge in the light blue section of the Basic tab, or rolling parry in the Melee Attacks section of the basic tab.
 - P.B. bonuses to charm and impress are autocalculated and displayed in the gold section under the stats.
 - Spd. is autocalculated to rough miles per hour and displayed in the gold section below the stats.  It also calculates movement per action in case people are using that 2E mechanic.
-- Saving throw bonuses from M.E. and P.E. are not autocalculated as of this writing (June '19).
+- Saving throw bonuses from M.E. and P.E. are autocalculated and displayed below the rolls in the Saving Throw section of the combat tab.  They are included in the calculation of the rolls.
 
 ### Stat Rolls
 - The stat rolls are set up to roll 2 numbers.  The first is a d20, and the second is d100.
@@ -37,6 +37,20 @@ This example is the macro I use for the healer ability Healing Touch.
 
 ### Extra Attributes
 - The right hand column of the Basic tab has quite a list of things there.  This is all to facilitate the creation of macros and being able to link tokens easily to different resources.
+- Hit Points = @{character_hp}
+- A.R. = @{character_ar}
+- S.D.C. = @{character_sdc}
+- Psion Level = @{psi_level}
+- Psion I.S.P. = @{character_pisp}
+- Heal I.S.P. = @{character_hisp}
+- Caster Level = @{caster_level}
+- Daily Casts = @{character_casts}
+- Spell Str = @{spell_strength}
+- Ward Level = @{ward_level}
+- Daily Wards = @{ward_casts}
+- Ward Str = @{ward_strength}
+- Circle Level = @{circle_level}
+- Circle Str = @{circle_strength}
 
 ### Extra Movement
 - I included this to be used in case of a character having a common secondary mode of travel such as a mount, spell, or magic item.
