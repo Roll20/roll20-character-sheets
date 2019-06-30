@@ -459,18 +459,23 @@ const updateSheet = version => {
       calcWeaponDamage(idArray.map(id => `repeating_weapons_${id}_weapon`));
     });
   }
+  if (version < 7) {
+    getSectionIDs("repeating_attacks", idArray => {
+      idArray.forEach(id => updateNpcAttack(`repeating_attacks_${id}_attack`));
+    });
+  }
 };
 
 // Register events
 on("sheet:opened", () => {
   getAttrs(["version"], v => {
     const version = parseInt(v.version);
-    if (version && version < 6) {
-      updateSheet(5);
+    if (version && version < 7) {
+      updateSheet(version);
     }
     setAttrs({
-      version: "6",
-      character_sheet: "Shadow of the Demon Lord v6",
+      version: "7",
+      character_sheet: "Shadow of the Demon Lord v7",
     });
   });
   setBoonsBanesQuery();
@@ -501,7 +506,7 @@ register(["setting_roll_weapon_damage", "global_damage_bonus", "setting_show_dam
   });
 });
 register(["repeating_weapons"], () => calcWeaponDamage(["repeating_weapons_weapon"]));
-register(["change:repeating_attacks:attack_range"], () => updateNpcAttack("repeating_attacks_attack"));
+register(["repeating_attacks:attack_range"], () => updateNpcAttack("repeating_attacks_attack"));
 ["weapon", "attack"].forEach(sName => {
   register([`repeating_${sName}s:${sName}_boons`], () => {
     calcBoonsDisplay(`repeating_${sName}s_${sName}`);
@@ -540,4 +545,4 @@ register(["npc", "sheet:opened"], sanitizeTab);
 });
 
 // Basic equipment: turn off auto-defense
-register(["change:setting_basic_equipment"], handleBasicEquipment);
+register(["setting_basic_equipment"], handleBasicEquipment);
