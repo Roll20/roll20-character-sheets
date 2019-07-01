@@ -71,7 +71,7 @@ This example is the macro I use for the healer ability Healing Touch.
 - As mentioned earlier, any bonus for an exceptional I.Q. will be subtracted from rolls in the OCC, Elective, and Secondary Skills sections.
 - The rolls will roll the percentage and display the target number of your skill.
 - Any notes about the skills will be displayed in the description part of the template.
-- The mystic skills is intended for druid class rolls, deducing circle invocations, detecting illusions, and other magical type class skills that have a percentile roll.
+- The mystic skills section is intended for druid class rolls, deducing circle invocations, detecting illusions, and other magical type class skills that have a percentile roll.
 - Since I am not sure the I.Q. bonus should apply for some of these types of skills, that bonus is not automatically applied in the Mystic skills section.
 
 ### Recommended API
