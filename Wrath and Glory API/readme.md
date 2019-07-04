@@ -9,10 +9,10 @@ Please note that the inline dice roll macros do not fully enable the type of dic
 If you have any questions, comments, or feedback (all welcome) please contact Barry at btsnyder@gmail.com
 
 ### Current Version
-Version 2.6 (June 30th, 2019) 
+Version 2.4 (November 4th, 2018) 
 
 ### Thanks	
-Many thanks to my players (Dave, Brian, Charles, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes in the middle of play).
+Many thanks to my players (Dave, Brian, Charles, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes in the middle of play) over the past several weeks.
 
 Many thanks to the following individuals who reported defects and provided improvements: 
 1. Morback: extra die on rolls + implement force to add 1/2 willpower to weapon DR + corruption level and roll changes
@@ -37,22 +37,6 @@ v4.0. Refine Inline rolls
     - a 6 = two successes
 
 ### Changelog
-
-** June 30th, 2019: version 2.6 - Fixes** 
-
-Updates:
-1. Fixed NaN error when rolling psyker damage.
-2. Added Psychic Mastery as a hard skill on NPC's so Psychic power rolls are auto-calculated.
-3. Added to all tests a wrath outcome when using the API die roller so that a new ability in the API is included - it lists outcome of the die roll.
-
-** December 17th, 2018: version 2.5 - Fixes** 
-
-Updates:
-1. Fixed update to Conviction for older sheets.
-2. Fixed voidship wounds current; which was pointing to vehicle wounds current.
-3. Updated vehicle and voidship wounds to Roll20 standard of wound/wound_max.
-4. Calculated Heavily wounded for Vehicle and Voidships.
-5. Autoupdate old versions of charactersheets for vehicle wounds, voidship wounds, calculating heavily wounded for vehicles, and heavily wounded for voidships.
 
 ** November 4th, 2018: version 2.4 - API Message Layout Changes** 
 
