@@ -4,6 +4,10 @@ Versions have two numbers Major.Minor
 **Major**: Indicates that some form of compatibility has broken.  These versions should have notes indicating what broke and how to handle it.  May include major UI changes to sheet layout and design or fundament changes in how parts of the sheet are managed.
 
 **Minor**: Indicates the addition of new features, bugfixes or other adjustments which do not alter variable names or fundamental workflow.
+## 2.6
+### New Features
+* Added Social Conflict Support
+
 ## 2.5
 ### Big Fixes
 * Fixed unarmed in Combat section
