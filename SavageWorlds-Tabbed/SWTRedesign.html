@@ -1,4 +1,4 @@
-<input type='hidden' name='attr_character_sheet' value='Savage Worlds Tabbed v3.4' />
+<input type='hidden' name='attr_character_sheet' value='Savage Worlds Tabbed v3.6' />
 <script type="text/worker">
     /*----- Things I need to Care For -----
     -- o Option to ignore encumbrance    --
@@ -437,11 +437,12 @@
 
 	/* ---- Begin Sheet Version Validation & Update ---- */
 
-	const sheetVersion = "3.3";
+	const sheetVersion = "3.6";
 	const sheetVersionPrefix = "Savage Worlds Tabbed v";
 
     const upgradeSheet = function(version) {
 	    if (version < 3.0) {
+            console.log("+++ Upgrading to version 3.0 +++");
 	        //migrate old fields to new
 	        const oldAtts = ["agMod","smMod","spMod","stMod","viMod","UnskilledEncumbrance","FightingMod","Academicsskill","AcademicsskillMod","Athletics","AthleticsMod","Battle","BattleMod","BoatingMod","Climbing","ClimbingMod","Commonknowledge","CommonknowledgeMod","Driving","DrivingMod","Electronics","ElectronicsMod","Faith","FaithMod","Focus","FocusMod","Gambling","GamblingMod","Guts","GutsMod","Hacking","HackingMod","Healing","HealingMod","Intimidation","IntimidationMod","Investigation","InvestigationMod","Language","LanguageMod","Lockpicking","LockpickingMod","Notice","NoticeMod","Occult","OccultMod","Performance","PerformanceMod","Persuasion","PersuasionMod","Piloting","PilotingMod","Psionics","PsionicsMod","Repair","RepairMod","Research","ResearchMod","Riding","RidingMod","Ritual","RitualMod","Science","ScienceMod","Shooting","ShootingMod","Spellcasting","SpellcastingMod","Stealth","StealthMod","Streetwise","StreetwiseMod","Survival","SurvivalMod","Swimming","SwimmingMod","Taunt","TauntMod","Thievery","ThieveryMod","Throwing","ThrowingMod","Tracking","TrackingMod","WeirdScience","WeirdScienceMod","LinkedPsionicsAtt","LinkedRitualAttScore","LinkedSpellcastingAttScore","LinkedWeirdScienceAttScore","PAstrength","PAstMod","PAstrollMod"];
 	        const newAtts = ["agilitymod","smartsmod","spiritmod","strengthmod","vigormod","unskilledencumbrance","fightingmod","academicsskill","academicsskillmod","athletics","athleticsmod","battle","battlemod","boatingmod","climbing","climbingmod","commonknowledge","commonknowledgemod","driving","drivingmod","electronics","electronicsmod","faith","faithmod","focus","focusmod","gambling","gamblingmod","guts","gutsmod","hacking","hackingmod","healing","healingmod","intimidation","intimidationmod","investigation","investigationmod","language","languagemod","lockpicking","lockpickingmod","notice","noticemod","occult","occultmod","performance","performancemod","persuasion","persuasionmod","piloting","pilotingmod","psionics","psionicsmod","repair","repairmod","research","researchmod","riding","ridingmod","ritual","ritualmod","science","sciencemod","shooting","shootingmod","spellcasting","spellcastingmod","stealth","stealthmod","streetwise","streetwisemod","survival","survivalmod","swimming","swimmingmod","taunt","tauntmod","thievery","thieverymod","throwing","throwingmod","tracking","trackingmod","weirdscience","weirdsciencemod","linkedpsionicsatt","linkedritualattscore","linkedspellcastingattscore","linkedweirdscienceattscore","pastrength","pastmod","pastrollmod","rastrength","rastmod","rastrollmod"];
@@ -460,7 +461,7 @@
     	        });
 	        });
 	        //Update the Power Label
-	        powerLabel();
+	        //powerLabel();
 
 	        //Need to update all derived stats to now use Sheetworkers
 	        setWildDie(); //set wdNum
@@ -606,6 +607,7 @@
             updateField("repeating_skills:showOtherRollMod","0");
 	    }
 		if (version < 3.1) {
+            console.log("+++ Upgrading to version 3.1 +++");
 			console.log(`!@!@! UPGRADING TO VERSION 3.1 !@!@!`)
 			//Set up Multi Attack option
 			stepwiseFaux("weapons","rof");
@@ -633,56 +635,101 @@
 			});
 		}
         if (version < 3.3) {
+            console.log("+++ Upgrading to version 3.3 +++");
             //migrate old fields to new
-	        const oldAtts = ["pastmod","rastmod"];
-	        const newAtts = ["pastrengthmod","rastrengthmod"];
-	        let sAttrs = {};
-	        getAttrs(oldAtts, function(v) {
-	            //Convert from Old Trait Mod Format (e.g. agMod) to the new format (e.g. agilitymod)
-	            for (let i=0; i<oldAtts.length; i++) {
-    	            console.log(newAtts[i] + " = " + v[oldAtts[i]]);
-    	            sAttrs[newAtts[i]] = v[oldAtts[i]];
-    	        }
-    	        setAttrs(sAttrs);
-    	        //Need to create rank and display values for existing sheets
-    	        const otraits = ['pastrength','rastrength'];
-    	        otraits.forEach(otraits => {
-    	           rankNdisplay(otraits);
-    	        });
-	        });
+            const oldAtts = ["pastmod","rastmod"];
+            const newAtts = ["pastrengthmod","rastrengthmod"];
+            let sAttrs = {};
+            getAttrs(oldAtts, function(v) {
+                //Convert from Old Trait Mod Format (e.g. agMod) to the new format (e.g. agilitymod)
+                for (let i=0; i<oldAtts.length; i++) {
+      	            console.log(newAtts[i] + " = " + v[oldAtts[i]]);
+      	            sAttrs[newAtts[i]] = v[oldAtts[i]];
+      	        }
+      	        setAttrs(sAttrs);
+      	        //Need to create rank and display values for existing sheets
+      	        const otraits = ['pastrength','rastrength'];
+      	        otraits.forEach(otraits => {
+      	           rankNdisplay(otraits);
+      	        });
+            });
         }
         if (version < 3.4) {
+            console.log("+++ Upgrading to version 3.4 +++");
             //Need to update all derived stats to now use Sheetworkers
-	        setWildDie(); //set wdNum
-	        console.log("!!!! Setting WoundsMod !!!!");
-	        setWoundsMod("silent"); //set wounds
-	        setModSums(); //various mods variables used in sheet rolls, etc
-	        baseToughness();
-	        setToughness();
-	        setNToughness();
-	        setPace(); //set pace
-	        setCharisma(); //set charisma
-	        setAcademics();
-	        setSanity();
-	        setFame();
-	        setReason();
-	        setStatus();
-	        setGlory();
-	        setFirewall();
-	        setGrit();
-	        setCorruption();
-	        setStreetCred();
-	        setStrain();
+            setWildDie(); //set wdNum
+            console.log("!!!! Setting WoundsMod !!!!");
+            setWoundsMod("silent"); //set wounds
+            setModSums(); //various mods variables used in sheet rolls, etc
+            baseToughness();
+            setToughness();
+            setNToughness();
+            setPace(); //set pace
+            setCharisma(); //set charisma
+            setAcademics();
+            setSanity();
+            setFame();
+            setReason();
+            setStatus();
+            setGlory();
+            setFirewall();
+            setGrit();
+            setCorruption();
+            setStreetCred();
+            setStrain();
+        }
+        if (version < 3.6) {
+            console.log("+++ Upgrading to version 3.6 +++");
+            setWoundsMod();
+            setFatigueMod();
+            fauxChange("loadlimitdietypedelta","10");
+            fauxChange("showmods","2");
+            let sectionHeader = getTranslationByKey('powers');
+            let columnHeader = getTranslationByKey('power');
+            let ppAbbreviation = getTranslationByKey('power-point-abbr-u');
+            setAttrs({
+                ppabbr: ppAbbreviation
+            });
+            console.log("*** Checking Rifts Power Settings ***");
+            getAttrs(["ppe","useISP","powerlabelplural","powerlabelsingular"], function(v) {
+                if (v.useISP === "on") {
+                    console.log("ISP is On");
+                    if (v.ppe === "PPE") {
+                        //PPE is also on, so make ISP the second AB label
+                        setAttrs({
+                            numberofabs: "2",
+                            pplabel2: "ISP",
+                            ablabel2: "Psionics"
+                        });
+                    }
+                    else {
+                        //PPE is not on, so make ISP the first AB label
+                        setAttrs({
+                            ppelabel: "ISP",
+                            ablabel: "Psionics"
+                     });
+                    }
+                }
+                console.log("powerlabelplural: " + v.powerlabelplural);
+                console.log("powerlabelsingular: " + v.powerlabelsingular);
+                if (v.powerlabelplural === '') {
+                    setAttrs({ powerlabelsingular: sectionHeader });
+                }
+                if (v.powerlabelsingular === '') {
+                    setAttrs({ powerlabelsingular: columnHeader });
+                }
+            });
+            //Update Sheet Version Number
+            console.log("**** Updating Sheet Version ****");
+            setAttrs({
+                newcontent: "unread",
+                newdocumentation: "unread",
+                character_sheet: sheetVersionPrefix + sheetVersion
+            });
         }
 		else {
 	        console.log("!!! Sheet Already Upgraded !!!");
 	    }
-
-	    //Update Sheet Version Number
-        console.log("**** Updating Sheet Version ****");
-        setAttrs({
-            character_sheet: sheetVersionPrefix + sheetVersion
-        });
         console.log("<===== End Sheet Upgrade Conversion Process =====>");
     };
 
@@ -972,31 +1019,31 @@
    		});
 	});
 
-	on("sheet:opened change:ppe",function(eventInfo) {
-	    console.log("New value: "+eventInfo.newValue);
-	    console.log("Source of change: " +eventInfo.sourceType);
-	    let PowerPointsLabel = getTranslationByKey('power-points');
-	    let PPELabel = getTranslationByKey('potential-psychic-energy-abbr-u');
-        getAttrs(["ppe"], function(v) {
-	        if(v.ppe === "0") {
-	            setAttrs({ppelabel: PowerPointsLabel});
-    	    }
-    	    else {
-    	        setAttrs({ppelabel: PPELabel});
-    	    }
-        });
-	});
+	// on("sheet:opened change:ppe",function(eventInfo) {
+	//     console.log("New value: "+eventInfo.newValue);
+	//     console.log("Source of change: " +eventInfo.sourceType);
+	//     let PowerPointsLabel = getTranslationByKey('power-points');
+	//     let PPELabel = getTranslationByKey('potential-psychic-energy-abbr-u');
+    //     getAttrs(["ppe"], function(v) {
+	//         if(v.ppe === "0") {
+	//             setAttrs({ppelabel: PowerPointsLabel});
+    // 	    }
+    // 	    else {
+    // 	        setAttrs({ppelabel: PPELabel});
+    // 	    }
+    //     });
+	// });
 
-	on("change:useisp",function(eventInfo) {
-	    console.log("New Value: "+eventInfo.newValue);
-	    if(eventInfo.newValue === "on") {
-	        setAttrs({spacer: " || "});
-	    }
-	    else {
-	        console.log("ISP is turned off");
-	        setAttrs({spacer: " "});
-	    }
-	});
+	// on("change:useisp",function(eventInfo) {
+	//     console.log("New Value: "+eventInfo.newValue);
+	//     if(eventInfo.newValue === "on") {
+	//         setAttrs({spacer: " || "});
+	//     }
+	//     else {
+	//         console.log("ISP is turned off");
+	//         setAttrs({spacer: " "});
+	//     }
+	// });
 
 	//Set Rank according to the XP value
 	on("change:xp change:rank change:usexp change:setrank", function() {
@@ -1078,6 +1125,22 @@
    		});
 	});
 	//End Rank
+
+	// Animalistic Intelligence
+	const updateAnimalIntelligenceDisplay = function() {
+		getAttrs(["animalsmarts"], function(attributesValues) {
+			console.log("Updating animal smarts " + attributesValues.animalsmarts);
+			if (attributesValues.animalsmarts === "on") {
+				setAttrs({ animalsmarts_display: "(A)" });
+			} else {
+				setAttrs({ animalsmarts_display: "" });
+			}
+		});
+	}
+	on("change:animalsmarts", function() {
+		updateAnimalIntelligenceDisplay();
+	});
+
 
 	//Display Derived Stats HR
 	on("change:useacademics change:tdsanity change:potsmfame change:ripreason change:ripstatus change:hfglory change:izfirewall change:dlgrit change:neuraltoughness change:corruption change:izstreetcred change:izstrain", function() {
@@ -2163,7 +2226,7 @@
 	});
 
 	const setEncPenalty = function() {
-	    getAttrs(["loadlimit", "totalloadcarried", "strength", "encumbrancerules", "loadlimitdietypedelta", "loadlimitmulitplier", "loadlimitmod"], function(lvalue) {
+	    getAttrs(["loadlimit", "totalloadcarried", "strength", "strengthmod", "encumbrancerules", "loadlimitdietypedelta", "loadlimitmulitplier", "loadlimitmod"], function(lvalue) {
 			let load = parseFloat(lvalue.totalloadcarried)||0;
 			let strength = parseInt(lvalue.strength)||0;
 			let limit = 0;
@@ -2178,6 +2241,9 @@
 			    //use SWADE rules
 			    console.log("### Using SWADE Encumbrance Rules ###");
 			    base = ((strength - 4)*10) + 20;
+                if (lvalue.strength == "12" && lvalue.strengthmod > 0) {
+                    base = base + (lvalue.strengthmod * 20);
+                }
 			    limit = base + (diedelta * 20) + limitmod;
 			    //determine penalty
 			    if (load > limit) {
@@ -2240,7 +2306,7 @@
 	});
 
 	//Calculate Encumbrance Penalty
-	on("change:totalloadcarried change:loadlimit change:strength change:encumbrancerules change:loadlimitdietypedelta change:loadlimitmulitplier change:loadlimitmod",function(){
+	on("change:totalloadcarried change:loadlimit change:strength change:strengthmod change:encumbrancerules change:loadlimitdietypedelta change:loadlimitmulitplier change:loadlimitmod",function(){
 		setEncPenalty();
 	});
 
@@ -2384,10 +2450,10 @@
 	on("change:showmods", function(eventInfo) {
 	    let setDamageMod, setTraitMod, setTraitModEnc;
 	    console.log("newValue: "+eventInfo.newValue);
-	    if (eventInfo.newValue === "on") {
+	    if (eventInfo.newValue == "on") {
 	        setTraitMod = "{{mods=[[1d0+@{absmod}+abs(@{traitmods}) ]] }}";
 	        setTraitModEnc = "{{mods=[[1d0+@{absmodenc}+abs(@{traitmods}) ]] }} {{showenc=[[1d0+@{encumbrance}]]}} {{encumbrance=@{encumbrance}}}";
-	        setDamageMod = "{{mods=[[1d0+[[abs(@{traitmods})]] ]] }}";
+	        setDamageMod = "{{mods=[[1d0+[[abs(@{damagemods})]] ]] }}";
 	    }
 	    else {
 	        setTraitMod = `{{mods=[[1d0+0]]}}`;
@@ -2621,10 +2687,10 @@
                     console.log(`iii setvalue: ${setvalue} iii`);
                     setskill[setfield] = setvalue;
                 }
-                let defaultval = field[0].split('name');
+                /*let defaultval = field[0].split('name');
                 if (section === "weapons") { setfield = repsection + "weaponskill"; }
                 else { setfield = repsection + "spellskill"; }
-                setskill[setfield] = defaultval;
+                setskill[setfield] = defaultval;*/
                 console.log("Setting: " + JSON.stringify(setskill));
                 setAttrs(setskill);
             });
@@ -2688,10 +2754,156 @@
             radioval = radioval.slice(-1);
             console.log(`Value for Radio Button is: ${radioval}`);
             setAttrs({ sheetTab: radioval });
+            if (radioval === "5") {
+                setAttrs({ newcontent: "read" });
+            }
+            if (radioval === "6") {
+                setAttrs({ newdocumentation: "read" });
+            }
         });
     });
 
-    /*****************************
+    on("clicked:powersectionconfig", function() {
+      console.log("Do something");
+      getAttrs(["showpowersectionconfig"], function(v) {
+        if (v.showpowersectionconfig === "0") {
+          //need to show the config
+          setAttrs({
+            showpowersectionconfig: "show",
+            powerconfigindicator: "2"
+          });
+        }
+        else {
+          //need to close config
+          setAttrs({
+            showpowersectionconfig: "0",
+            powerconfigindicator: "x"
+          });
+        }
+      });
+    });
+
+    //Start Multiple AB Support Sheet Workers
+    on("clicked:addab", function() {
+        getAttrs(["numberofabs"], function(v) {
+            let abcount = parseInt(v.numberofabs) || 0;
+            if (abcount < 5) {
+                abcount += 1;
+                console.log("abcount: "+abcount);
+                setAttrs({ numberofabs: abcount});
+            }
+            else {
+                console.log("Max Number of ABs reached");
+            }
+        });
+    });
+
+    on("change:numberofabs", function(eventInfo) {
+        console.log("Number of ABs: " + eventInfo.newValue);
+        if (eventInfo.newValue == "1") {
+            getSectionIDs("spells", function(idArray) {
+                let setattrs = {};
+                for (let i=0; i < idArray.length; i++) {
+                    console.log(`repeating_spells_${idArray[i]}_powercolor = "white"`);
+                    setattrs[`repeating_spells_${idArray[i]}_powergroup`] = "ab1";
+                }
+                setattrs["ab1color"] = "white";
+                setAttrs(setattrs);
+            });
+        }
+        else {
+            console.log("Skipped the getSectionIDs portion of things...");
+        }
+    });
+
+    on("clicked:removeab", function() {
+        getAttrs(["numberofabs"], function(v) {
+            let abcount = parseInt(v.numberofabs) || 0;
+            if (abcount > 1) {
+                abcount -= 1;
+                setAttrs({ numberofabs: abcount});
+            }
+            else {
+                console.log("Min Number of ABs reached");
+            }
+        });
+    });
+
+    const powerlabels = ["ablabel", "ablabel2", "ablabel3", "ablabel4", "ablabel5","ab1color","ab2color","ab3color","ab4color","ab5color"];
+    powerlabels.forEach(powerlabels => {
+        on(`change:${powerlabels}`, function(eventInfo) {
+            console.log("Attribute that changed was: "+eventInfo.sourceAttribute.slice(3));
+            getSectionIDs("repeating_spells", function(idArray) {
+                const plabels = idArray.map(id => `repeating_spells_${id}_rpt${powerlabels}`);
+                let newVal = eventInfo.newValue;
+                const settings = plabels.reduce((obj, item) => (obj[item] = newVal, obj) ,{});
+                console.log("Setting: " + JSON.stringify(settings));
+                setAttrs(settings);
+            });
+        });
+    });
+
+    on("change:repeating_spells:powergroup", function(eventInfo) {
+        let groupColor = eventInfo.newValue;
+        getAttrs([`repeating_spells_rpt${groupColor}color`], function(v) {
+            let rowColor = v[`repeating_spells_rpt${groupColor}color`];
+            console.log("New Row Color: " + rowColor);
+            setAttrs({repeating_spells_powercolor: rowColor});
+        });
+    });
+
+    const powerColors = ["rptab1color", "rptab2color","rptab3color","rptab4color","rptab5color"];
+    powerColors.forEach(powerColors => {
+        on(`change:repeating_spells:${powerColors}`, function(eventInfo) {
+            let colorNum = eventInfo.sourceAttribute;
+            console.log("### Color Attribute: " + colorNum + "####");
+            console.log("### Color that changed: " + colorNum.slice(-6,-5) + " ###");
+            console.log("New Color: " + eventInfo.newValue);
+            getAttrs(["repeating_spells_powergroup"], function(v) {
+                console.log(">>> Power Group: " + v.repeating_spells_powergroup + " <<<");
+                console.log("<<< Power Group Value: " + v.repeating_spells_powergroup.slice(2,3) + " >>>");
+                if(v.repeating_spells_powergroup.slice(2,3) == colorNum.slice(-6,-5)) {
+                    console.log("Need to update the powercolor");
+                    setAttrs({repeating_spells_powercolor: eventInfo.newValue});
+                }
+                else { console.log("No need to update color"); }
+            });
+        });
+    });
+
+    const updateABLabels = function() {
+        const powerlabels = ["ablabel", "ablabel2", "ablabel3", "ablabel4", "ablabel5","ab1color","ab2color","ab3color","ab4color","ab5color"];
+        console.log("!!! Updating AB Labels and Colors !!!");
+        powerlabels.forEach(powerlabels => {
+            getSectionIDs("repeating_spells", function(idArray) {
+                getAttrs([`${powerlabels}`], function(v) {
+                    console.log(`Attribute (${powerlabels}): `+v[`${powerlabels}`]);
+                    const plabels = idArray.map(id => `repeating_spells_${id}_rpt${powerlabels}`);
+                    const settings = plabels.reduce((obj, item) => (obj[item] = v[`${powerlabels}`], obj) ,{});
+                    const abini = idArray.map(id2 => `repeating_spells_${id2}_ablabsinit`);
+                    const settings2 = abini.reduce((obj, item) => (obj[item] = "1", obj) ,{});
+                    console.log("Setting: " + JSON.stringify(settings));
+                    setAttrs(settings);
+                    setAttrs(settings2);
+                });
+            });
+        });
+    }
+
+    on("change:repeating_spells:power", function(eventInfo) {
+        getAttrs(["repeating_spells_ablabsinit"], function(v) {
+            if(v.repeating_spells_ablabsinit == "0") {
+                updateABLabels();
+            }
+            else {
+                console.log("Labels already initialized...");
+            }
+        });
+    });
+
+    //End Multiple AB Support Sheet Workers
+
+  /*****************************
 	* Skill Block functions
 	*****************************/
     on("sheet:opened", function() {
@@ -2727,6 +2939,11 @@
                         initsbedges: "1",
                         initspecabilities: "1"
                     });
+                }
+                if(v.initpowers === "0") {
+                    console.log("⚠⚠ Character Powers Not Initilized...create them ⚠⚠");
+                    spellsStatBlock();
+                    setAttrs({initpowers: "1"});
                 }
             }
         });
@@ -3051,6 +3268,95 @@
     on("change:repeating_hindrances change:repeating_edges remove:repeating_hindrances remove:repeating_edges", function() {
         specabilityStatBlock();
     });
+
+    const spellsStatBlock = function () {
+        console.warn("Creating Spell Stat Block");
+        let charpowers = '';
+        let powercount = 0;
+        getSectionIDs("spells", function(idArray) {
+            if(idArray.length < 1) {
+                console.log("No spells to worry about");
+                setAttrs({powercount: "0"});
+            }
+            else {
+                let getvalues = ["NoPPRule","numberofabs","powerlabelplural","ablabel","ppelabel","ablabel2","pplabel2","ablabel3","pplabel3","ablabel4","pplabel4","ablabel5","pplabel5","PowerPoints_max","powerpoints2_max","powerpoints3_max","powerpoints4_max","powerpoints5_max"];
+                const powerbutton = idArray.map(x => `repeating_spells_${x}_tPower`);
+                const actualpower = idArray.map(x => `repeating_spells_${x}_power`);
+                const powergroup = idArray.map(x => `repeating_spells_${x}_powergroup`);
+                getvalues = getvalues.concat(actualpower, powergroup);
+                console.log("Values I want to get: "+getvalues);
+                getAttrs(getvalues, function(v) {
+                    let ablabels = [v.ablabel, v.ablabel2, v.ablabel3, v.ablabel4, v.ablabel5];
+                    let pplabels = [v.ppelabel, v.pplabel2, v.pplabel3, v.pplabel4, v.pplabel5];
+                    if(v.NoPPRule == "0") {
+                        console.log("!!! Power Points are used !!!");
+                        pplabels = [v.ppelabel, v.pplabel2, v.pplabel3, v.pplabel4, v.pplabel5];
+                        powerpoints = [v.PowerPoints_max, v.powerpoints2_max, v.powerpoints3_max, v.powerpoints4_max, v.powerpoints5_max];
+                    }
+                    let arcanebg = '';
+                    let powers = '';
+                    let powerlists = ["not used","not used","not used","not used","not used"];
+                    let powerpointmax = '';
+                    let abpowercount = 0;
+                    console.log("Actual Powers: "+actualpower);
+                    console.log("Power Buttons: " + powerbutton);
+                    console.log("Values for v are: "+JSON.stringify(v));
+                    console.info("Beginning For Loops");
+                    for(let i=0; i < v.numberofabs; i++) {
+                        //cycle through the number of ABs used on the character
+                        console.log("Entering the First For Loop");
+                        arcanebg = `**${ablabels[i]}**`;
+                        if(v.NoPPRule == "0") {
+                            powerpointmax = `<ul><li>${pplabels[i]}: ${powerpoints[i]}</li>`;
+                        }
+                        else { powerpointmax = ''; }
+                        abpowercount = 0;
+                        for(let p=0; p < idArray.length; p++) {
+                            console.log("Reached the Inner Loop");
+                            //Check to see if any of the powers are associated the AB we are checking
+                            if(v[powergroup[p]] == `ab${i+1}`) {
+                                //powergroup is associated with the AB we are currently looking for
+                                if(abpowercount < 1) {
+                                    console.warn("First Power found");
+                                    powers = `[@{${actualpower[p]}}](~${powerbutton[p]})`;
+                                }
+                                else {
+                                    console.log("Subsequent Power Found");
+                                    powers += `, [@{${actualpower[p]}}](~${powerbutton[p]})`;
+                                }
+                                abpowercount++;
+                            }
+                            else {
+                                console.info("Power not in Power Group");
+                            }
+                        }
+                        powercount += abpowercount;
+                        //done cycling through the list of powers
+                        if(powercount > 0) {
+                            //number of powers associated with the AB is 1+
+                            charpowers += arcanebg + powerpointmax + "<li>" + v.powerlabelplural + ": " +powers + "</li></ul>";
+                            powerlists[i] = powers;
+                        }
+                    }
+                    //done cycling through the number of ABs
+                    setAttrs({
+                        charpowers: charpowers,
+                        powercount: powercount,
+                        ab1powerlist: powerlists[0],
+                        ab2powerlist: powerlists[1],
+                        ab3powerlist: powerlists[2],
+                        ab4powerlist: powerlists[3],
+                        ab5powerlist: powerlists[4]
+                    });
+                });
+            }
+        });
+    }
+
+    on("change:NoPPRule change:numberofabs change:powerlabelplural change:ablabel change:ppelabel change:ablabel2 change:pplabel2 change:ablabel3 change:pplabel3 change:ablabel4 change:pplabel4 change:ablabel5 change:pplabel5 change:PowerPoints_max change:powerpoints2_max change:powerpoints3_max change:powerpoints4_max change:powerpoints5_max change:repeating_spells:power change:repeating_spells:powergroup remove:repeating_spells", function() {
+        spellsStatBlock();
+    });
+
     //End Statblock stuff
 
 </script>
@@ -3060,7 +3366,7 @@
 <input type="hidden" name="attr_initstatblock" value="0" />
 <input type="hidden" name="attr_initdesc" value="0" />
 <input type="hidden" name="attr_chardesc" value="{{name=@{character_name}}}" />
-<input type="hidden" name="attr_charatts" value="[^{agility} @{agility_display}](~tAgilityRoll), [^{smarts} @{smarts_display}](~tSmartRoll), [^{spirit} @{spirit_display}](~tSpirRoll), [^{strength} @{strength_display}](~tStrengthRoll), [^{vigor} @{vigor_display}](~tVigorRoll)" />
+<input type="hidden" name="attr_charatts" value="[^{agility} @{agility_display}](~tAgilityRoll), [^{smarts} @{smarts_display}@{animalsmarts_display}](~tSmartsRoll), [^{spirit} @{spirit_display}](~tSpiritRoll), [^{strength} @{strength_display}](~tStrengthRoll), [^{vigor} @{vigor_display}](~tVigorRoll)" />
 <input type="hidden" name="attr_initskills" value="0" />
 <input type="hidden" name="attr_charskills" />
 <input type="hidden" name="attr_initderived" value="0" />
@@ -3074,6 +3380,14 @@
 <input type="hidden" name="attr_initspecabilities" value="0" />
 <input type="hidden" name="attr_showspec" />
 <input type="hidden" name="attr_charspecabilities" />
+<input type="hidden" name='attr_initpowers' value="0" />
+<input type="hidden" name="attr_powercount" value="0" />
+<input type="hidden" name="attr_charpowers" />
+<input type="hidden" name="attr_ab1powerlist" />
+<input type="hidden" name="attr_ab2powerlist" />
+<input type="hidden" name="attr_ab3powerlist" />
+<input type="hidden" name="attr_ab4powerlist" />
+<input type="hidden" name="attr_ab5powerlist" />
 <!-- End Stat Block Fields -->
 <div class='sheet-maindiv'>
     <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="1" checked />
@@ -3102,36 +3416,23 @@
                     <input type="checkbox" class="sheet-useBenniesXP" name="attr_bennies" value="1" style="display: none;" />
                     <button class="sheet-benniesxp" type="roll" name="roll_convertBennies" value="&{template:emote} {{name=@{character_name}}} {{does=rolls for XP on ?{Number of Bennies|1} un/spent bennies and gets [[?{Number of Bennies|1}d6>5]] extra experience point(s)!}}">S</button>
                     <input class="sheet-isWC" type="hidden" name="attr_is_npc" />
-                    <button class="sheet-statblock" type="roll" name="roll_fullstatblock" value="/w gm &{template:statblock} @{chardesc} {{charatts=@{charatts}}} {{charskills=@{charskills}}} {{charderived=@{charderived}}} {{chargear=@{chargear}}} {{charhindrances=@{charhindrances}}} {{charedges=@{charedges}}} {{showspec=@{showspec}}} {{charspecabilities=@{charspecabilities}}}"><span class="sheet-showWCicon" name="attr_WCI"></span><img style="height: 28px;" src="http://imgsrv.roll20.net/?src=github.com/finderski/SWT/blob/master/BackgroundImages/statblock_profile.png%3Fraw%3Dtrue"</button>
+                    <button class="sheet-statblock" type="roll" name="roll_fullstatblock" value="/w gm &{template:statblock} @{chardesc} {{charatts=@{charatts}}} {{charskills=@{charskills}}} {{charderived=@{charderived}}} {{chargear=@{chargear}}} {{charhindrances=@{charhindrances}}} {{charedges=@{charedges}}} {{showspec=@{showspec}}} {{charspecabilities=@{charspecabilities}}} {{powercount=[[1d0+@{powercount}]]}} {{charpowers=@{charpowers}}}"><span class="sheet-showWCicon" name="attr_WCI"></span><img style="height: 28px;" src="http://imgsrv.roll20.net/?src=github.com/finderski/SWT/blob/master/BackgroundImages/statblock_profile.png%3Fraw%3Dtrue"</button>
                 </div>
                 <div class="sheet-docbuttons">
-                    <button type="action" name="act_releasetab5" class="sheet-topbuttons">N</button>
-                    <button type="action" name="act_documentationtab6" class="sheet-topbuttons">i</button>
+                    <input type="hidden" name="attr_newcontent" value="read" class="sheet-newcontent" />
+                    <button type="action" name="act_releasetab5" class="sheet-topbuttons sheet-releasenotesbutton">N</button>
+                    <input type="hidden" name="attr_newdocumentation" value="read" class="sheet-newdocumentation" />
+                    <button type="action" name="act_documentationtab6" class="sheet-topbuttons sheet-documentationbutton">i</button>
                 </div>
             </div>
-			<!--<input type="checkbox" class="sheet-useBenniesXP" name="attr_bennies" value="1" style="display: none;" />
-			<input type="checkbox" class="sheet-riftsBackground" style="display: none;" name="attr_background" value="11" />
-    	    <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="4" />
-    	    <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="3" />
-        	&nbsp;&nbsp;<input type='radio' class='sheet-tab sheet-characterT' name='attr_sheetTab' data-i18n-title="main-character-view" title="Main Character View" value='1' checked /><span class="sheet-bg">U</span>
-        	<input type="checkbox" class="sheet-showVehicles" name="attr_vehicle" style="display: none;" />
-            <span class="sheet-vehiclesT">&nbsp;&nbsp;</span><input type='radio' class='sheet-tab sheet-vehiclesT' name='attr_sheetTab' data-i18n-title="vehicles" title="Vehicles" value='3' /><span class="sheet-bg sheet-vehiclesT">T</span>
-            &nbsp;&nbsp;<input type="radio" class="sheet-tab sheet-journalT" name="attr_sheetTab" data-i18n-title="journal-and-other-info" title="Journal and other Info" value="4" /><span class="sheet-bg">n</span>
-            &nbsp;&nbsp;<input type='radio' class='sheet-tab sheet-configT' name='attr_sheetTab' data-i18n-title="sheet-configuration" title="Sheet Configuration" value='2' /><span class="sheet-bg">x</span>
-            &nbsp;&nbsp;<input type='radio' class='sheet-tab sheet-releaseN' name='attr_sheetTab' data-i18n-title="release-notes" title="Release Notes" value='5' /><span class="sheet-bg">N</span>
-            &nbsp;&nbsp;<input type='radio' class='sheet-tab sheet-documentatioN' name='attr_sheetTab' data-i18n-title="sheet-documentation" title="Sheet Documentation" value='6' /><span class="sheet-bg">i</span>-->
 			<input type='radio' class='sheet-characterT' name='attr_sheetTab' style="display: none;" value='1' checked />
             <input type="radio" class="sheet-journalT" name="attr_sheetTab" style="display: none;" value="4" />
             <input type='radio' class='sheet-vehiclesT' name='attr_sheetTab' style="display: none;" value='3' />
             <input type='radio' class='sheet-configT' name='attr_sheetTab' style="display: none;" value='2' />
             <input type='radio' class='sheet-releaseN' name='attr_sheetTab' style="display: none;" value='5' />
             <input type='radio' class='sheet-documentatioN' name='attr_sheetTab' style="display: none;" value='6' />
-			<!--<div class="sheet-toprow">
-                Trait Test Modifier:
-                Damage Modifier:
-                XP/Rank:
-            </div>-->
-        	<div class='sheet-character'> <!--Character Sheet Tab-->
+            <!--Character Sheet Tab-->
+        	<div class='sheet-character'>
             	<div class='sheet-left'>
                     <!--Logo-->
                     <!--<img src="http://i.imgur.com/iwIoTlT.png" />-->
@@ -3279,7 +3580,7 @@
         						<input type='hidden' name='attr_rolltAgility' value='{{name=@{character_name} }} {{trait=^{agility}}} {{skill_rank=@{agility_display} }} {{skill_roll=[[@{agility_rank} + @{agrollMod}+ @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{agilitymod} + @{agrollMod} + @{ModSumEnc}[Wounds, Fatigue, Encumbrance] + @{traitmods} ]]}}' />
                             </div>
                             <div class='sheet-basetrait'>
-                                <button class="sheet-traitbutton sheet-traitflexattbutton" type='roll' name='roll_tSmartsRoll' title="@{tSmartsRoll}" value='@{smartsbutton}' data-i18n="smarts"> Smarts</button>
+                                <button class="sheet-traitbutton sheet-traitflexattbutton" type="roll" name="roll_tSmartsRoll" title="@{tSmartsRoll}" value="@{smartsbutton}"><span data-i18n="smarts">Smarts</span> <span name="attr_animalsmarts_display"></span></button>
                                 <input type="hidden" name="attr_smartsbutton" value="@{whispersmarts} &{template:roll} @{rolltSmarts} @{setmods} @{showtraitmods}" />
                                 <span><select name="attr_smarts" title="@{smarts}" class="sheet-traitdie" value="4">
                                     <option value="4">d4</option>
@@ -3294,9 +3595,11 @@
         						    <input type='text' class='sheet-ModDesc' name='attr_smModType' placeholder='Modifier due to edges, hindrances, etc' data-i18n-placeholder="att-mod-description" />
         						    +<input class="sheet-otraitmod" type="number" name="attr_smrollMod" title="@{smrollMod}" value="0" /><br />
                                     <input type='checkbox' value='/w gm' name='attr_whispersmarts' /> <span class='sheet-ModDesc' data-i18n="whisper-roll-to-gm">Whisper roll to GM</span>
+									<input type="checkbox" name="attr_animalsmarts" /> <span class="sheet-ModDesc" data-i18n="animal-intelligence">Animal intelligence</span>
         						</div>
         						<input type='hidden' name='attr_smarts_rank' value='1d4!' />
         						<input type='hidden' name='attr_smarts_display' value='1d4' />
+								<input type="hidden" name="attr_animalsmarts_display" value="" />
         						<input type='hidden' name='attr_rolltSmarts' value='{{name=@{character_name} }} {{trait=^{smarts}}} {{skill_rank=@{smarts_display} }} {{skill_roll=[[@{smarts_rank} + @{smrollMod}+ @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{smartsmod} + @{smrollMod} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods}]]}}' />
                             </div>
                             <div class='sheet-basetrait'>
@@ -3366,7 +3669,7 @@
                         <div class="sheet-base sheet-AttsSum">
                             <button class="sheet-traitbutton" type='roll' name='roll_AgilitySumRoll' value='@{agilitybutton}'><span data-i18n="agility-abbr">Agl</span>: <span name='attr_agility_display'></span></button>,
 
-                            <button class="sheet-traitbutton" type='roll' name='roll_SmartsSumRoll' value='@{smartsbutton}'><span data-i18n="smarts-abbr">Sma</span>: <span name='attr_smarts_display'></span></button>,
+                            <button class="sheet-traitbutton" type='roll' name='roll_SmartsSumRoll' value='@{smartsbutton}'><span data-i18n="smarts-abbr">Sma</span>: <span name='attr_smarts_display'></span><span name="attr_animalsmarts_display"></span></button>,
 
                             <button class="sheet-traitbutton" type='roll' name='roll_SpiritSumRoll' value='@{spiritbutton}'><span data-i18n="spirit-abbr">Spi</span>: <span name='attr_spirit_display'></span></button>,
 
@@ -4906,18 +5209,8 @@
 							<div class="sheet-derivecurrent">&nbsp;</div>
 							<div class="sheet-derivemisc">&nbsp;</div>
 					    </div>
-    					<!-- Conviction -->
-    					<input class='sheet-useConviction' type='checkbox' name='attr_useConviction' style="display: none" />
-    					<div class="sheet-base sheet-corederived sheet-conviction">
-    					    <div class='sheet-basederived'>
-    					        <div class="sheet-derivelabel" style="line-height: 3.5em;" data-i18n="conviction">Conviction</div>
-    					        <div class="sheet-derivebase">&nbsp;</div>
-    					        <div class="sheet-derivemod">&nbsp;</div>
-    					        <div class="sheet-derivecurrent">&nbsp;</div>
-    					        <div class="sheet-derivemisc"><input class="sheet-hasconviction" type="checkbox" value="1" name="attr_conviction" /><span class="sheet-convictiontoken"></span></div>
-    					    </div>
-    					</div>
-						<div class="sheet-recovery">
+						<!--Recovery -->
+                        <div class="sheet-recovery">
 							<!-- Unshake Button -->
 							<input class="sheet-useunshakebutton" type="checkbox" name="attr_showunshake" style="display:none;" checked />
 							<div class="sheet-basetrait sheet-unshakebutton">
@@ -4940,10 +5233,20 @@
 									+<input class="sheet-otraitmod" type="number" name="attr_soakmod" title="@{soakmod}" value="0" /><br />
 									<input type='checkbox' value='/w gm' name='attr_whispersoak' /> <span class='sheet-ModDesc' data-i18n="whisper-roll-to-gm">Whisper roll to GM</span>
 								</div>
-								<input type='hidden' name='attr_rolltSoak' value='{{name=@{character_name} }} {{trait=^{soak}}} {{skill_rank=@{vigor_display}+@{soakmod} }} {{skill_roll=[[@{vigor_rank} [Vigor] + @{virollMod} + @{soakmod} [@{soakmodtype}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! [Wild Die] + @{vigormod} + @{virollMod} + @{soakmod} [@{soakmodtype}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]]}}' />							
+								<input type='hidden' name='attr_rolltSoak' value='{{name=@{character_name} }} {{trait=^{soak}}} {{skill_rank=@{vigor_display}+@{soakmod} }} {{skill_roll=[[@{vigor_rank} [Vigor] + @{virollMod} + @{soakmod} [@{soakmodtype}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! [Wild Die] + @{vigormod} + @{virollMod} + @{soakmod} [@{soakmodtype}] + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} ]]}}' />
 							</div>
 						</div>
-						
+    					<!-- Conviction -->
+    					<input class='sheet-useConviction' type='checkbox' name='attr_useConviction' style="display: none" />
+    					<div class="sheet-base sheet-corederived sheet-conviction">
+    					    <div class='sheet-basederived'>
+    					        <div class="sheet-derivelabel" style="line-height: 3.5em;" data-i18n="conviction">Conviction</div>
+    					        <div class="sheet-derivebase">&nbsp;</div>
+    					        <div class="sheet-derivemod">&nbsp;</div>
+    					        <div class="sheet-derivecurrent">&nbsp;</div>
+    					        <div class="sheet-derivemisc"><input class="sheet-hasconviction" type="checkbox" value="1" name="attr_conviction" /><span class="sheet-convictiontoken"></span></div>
+    					    </div>
+    					</div>
     					<!-- Derived Stats -->
     					<hr class="sheet-block-separator" />
     					<h4 class='sheet-sectionHeading' data-i18n="derived-stats">Derived Stats</h4>
@@ -5177,7 +5480,7 @@
         							<option value="1" title="@{encumberancerules}" data-i18n="use-savage-worlds-adventure-edition-abbr-u-encumbrance" selected>Use SWADE Encumbrance</option>
         							<option value="2" title="@{encumberancerules}" data-i18n="use-savage-worlds-explorers-edition-abbru-u-encumbrance">Use SWEX Encumbrance</option>
         						</select>
-        						<input type='hidden' name='attr_encumbrancerules' class="sheet-encrules" />
+        						<input type='hidden' name='attr_encumbrancerules' class="sheet-encrules" value="1" />
         						<div class="sheet-swadeenc">
         						    <span data-i18n="dice-singular-type-delta">Die Type Delta</span>: <input type="number" class="sheet-modifier" name="attr_loadlimitdietypedelta" title="@{loadlimitmultiplier}" value="0"/>
         						</div>
@@ -5414,16 +5717,17 @@
                 						</select>-->
                                         <div class="sheet-container">
                                             <div class="sheet-child">
-                                                <label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-fighting" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="fighting" checked="checked" />&nbsp;<span name='attr_rfightingname'></span></label>
-                                                <label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-athletics" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="athletics" />&nbsp;<span name='attr_rathleticsname'></span></label>
-                                                <label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-shooting" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="shooting" />&nbsp;<span name='attr_rshootingname'></span></label>
-												<label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-throwing" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="throwing" />&nbsp;<span name='attr_rthrowingname'></span></label>
-												<label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-unskilled" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="unskilled" />&nbsp;<span data-i18n='unskilled'>Unskilled</span></label>
-                                                <input type="checkbox" class="sheet-select-radio sheet-fighting" name="attr_weaponskill" value="fighting" checked="checked" style='display:none;' />
+                                                <label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-fighting" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="fighting" checked="checked" />&nbsp;<span name='attr_rfightingname'></span></label>
+                                                <label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-athletics" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="athletics" />&nbsp;<span name='attr_rathleticsname'></span></label>
+                                                <label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-shooting" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="shooting" />&nbsp;<span name='attr_rshootingname'></span></label>
+												<label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-throwing" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="throwing" />&nbsp;<span name='attr_rthrowingname'></span></label>
+												<label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-unskilled" name="attr_weaponskill" title="@{repeating_weapons_$#_weaponskill}" value="unskilled" />&nbsp;<span data-i18n='unskilled'>Unskilled</span></label>
+                                                <!--<input type="checkbox" class="sheet-select-radio sheet-fighting" name="attr_weaponskill" value="fighting" checked="checked" style='display:none;' />
                                                 <input type="checkbox" class="sheet-select-radio sheet-athletics" name="attr_weaponskill" value="athletics" style='display:none;' />
                                                 <input type="checkbox" class="sheet-select-radio sheet-shooting" name="attr_weaponskill" value="shooting" style='display:none;' />
 												<input type="checkbox" class="sheet-select-radio sheet-throwing" name="attr_weaponskill" value="throwing" style='display:none;' />
-												<input type="checkbox" class="sheet-select-radio sheet-unskilled" name="attr_weaponskill" value="unskilled" style='display:none;' />
+												<input type="checkbox" class="sheet-select-radio sheet-unskilled" name="attr_weaponskill" value="unskilled" style='display:none;' />-->
+                                                <input type="hidden" class="sheet-select-radio" name="attr_weaponskill" value="fighting" />
                                                 <div class="sheet-fighting"><span name='attr_rfightingname'></span></div>
                                                 <div class="sheet-athletics"><span name='attr_rathleticsname'></span></div>
                                                 <div class="sheet-shooting"><span name='attr_rshootingname'></span></div>
@@ -5491,42 +5795,198 @@
 						</div>
 					</div> <!-- End Weapons -->
 					<hr class="sheet-sectionSeperator" />
+                    <!-- ------------- -->
+                    <!-- Power Section -->
+                    <!-- ------------- -->
 					<input type="checkbox" class="sheet-hideArcanum" name="attr_ArcanumTab" style="display: none;">
 					<div class="sheet-arcanum">
 					    <input type="checkbox" class="sheet-hidePowers" name="attr_hidepowers" /><span class="sheet-showNhide"></span>
     					<h1 class="sheet-gearcolHeader"><span name="attr_powerlabelplural"></span></h1>
+                        <div class="sheet-buttonright">
+                            <input type="hidden" name="attr_powerconfigindicator" value="x" />
+                            <button type="action" name='act_powersectionconfig' class="sheet-configbutton"><span name="attr_powerconfigindicator"></span></button>
+                        </div>
+                        <!-- Powers Section Config window -->
+                        <input type="checkbox" class="sheet-showpowerconfig" name="attr_showpowersectionconfig" value="show" style="display:none;" />
+                        <div class="sheet-powerconfig">
+                            <label class="sheet-powerconfiglabel">Section Header: <input type="text" name="attr_powerlabelplural" value="Powers" /></label>
+                            <label class="sheet-powerconfiglabel">Column Header: <input type="text" name="attr_powerlabelsingular" value="Power" /></label>
+                            <label class="sheet-powerconfiglabel">Power Points Abbreviation: <input type="text" name="attr_ppabbr" value="PP" maxlength="8" /></label>
+                            <hr />
+                            <input type="hidden" class="sheet-showmultipleabs" name="attr_numberofabs" value="1" />
+                            <label class="sheet-powerconfiglabel sheet-label1">Arcane Background: <input type="text" name="attr_ablabel" value="AB 1" maxlength="25" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label1">Power Points Label: <input type="text" name="attr_ppelabel" value="Power Points" maxlength="30" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label2">Arcane Background Indicator:
+                                <div class="sheet-container">
+                                    <div class="sheet-child2">
+                                        <label class="sheet-abmenu sheet-white"><input type="radio" class="sheet-select-radio sheet-white" name="attr_ab1color" value="white" checked="checked" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-red"><input type="radio" class="sheet-select-radio sheet-red" name="attr_ab1color" value="red" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-blue"><input type="radio" class="sheet-select-radio sheet-blue" name="attr_ab1color" value="blue" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-green"><input type="radio" class="sheet-select-radio sheet-green" name="attr_ab1color" value="green" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-purple"><input type="radio" class="sheet-select-radio sheet-purple" name="attr_ab1color" value="purple" />&nbsp;</label>
+                                        <input type="hidden" class="sheet-select-radio" name="attr_ab1color" value="white" />
+                                        <div class="sheet-white">&nbsp;</div>
+                                        <div class="sheet-red">&nbsp;</div>
+                                        <div class="sheet-blue">&nbsp;</div>
+                                        <div class="sheet-green">&nbsp;</div>
+                                        <div class="sheet-purple">&nbsp;</div>
+                                    </div>
+                                </div>
+                            </label>
+                            <hr class="sheet-label2" />
+                            <label class="sheet-powerconfiglabel sheet-label2">Arcane Background: <input type="text" name="attr_ablabel2" value="AB 2" maxlength="25" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label2">Power Points Label: <input type="text" name="attr_pplabel2" value="Power Points" maxlength="30" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label2">Arcane Background Indicator:
+                                <div class="sheet-container">
+                                    <div class="sheet-child2">
+                                        <label class="sheet-abmenu sheet-white"><input type="radio" class="sheet-select-radio sheet-white" name="attr_ab2color" value="white" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-red"><input type="radio" class="sheet-select-radio sheet-red" name="attr_ab2color" value="red" checked="checked" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-blue"><input type="radio" class="sheet-select-radio sheet-blue" name="attr_ab2color" value="blue" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-green"><input type="radio" class="sheet-select-radio sheet-green" name="attr_ab2color" value="green" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-purple"><input type="radio" class="sheet-select-radio sheet-purple" name="attr_ab2color" value="purple" />&nbsp;</label>
+                                        <input type="hidden" class="sheet-select-radio" name="attr_ab2color" value="red" />
+                                        <div class="sheet-white">&nbsp;</div>
+                                        <div class="sheet-red">&nbsp;</div>
+                                        <div class="sheet-blue">&nbsp;</div>
+                                        <div class="sheet-green">&nbsp;</div>
+                                        <div class="sheet-purple">&nbsp;</div>
+                                    </div>
+                                </div>
+                            </label>
+                            <hr class="sheet-label3" />
+                            <label class="sheet-powerconfiglabel sheet-label3">Arcane Background: <input type="text" name="attr_ablabel3" value="AB 3" maxlength="25" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label3">Power Points Label: <input type="text" name="attr_pplabel3" value="Power Points" maxlength="30" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label3">Arcane Background Indicator:
+                                <div class="sheet-container">
+                                    <div class="sheet-child2">
+                                        <label class="sheet-abmenu sheet-white"><input type="radio" class="sheet-select-radio sheet-white" name="attr_ab3color" value="white" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-red"><input type="radio" class="sheet-select-radio sheet-red" name="attr_ab3color" value="red" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-blue"><input type="radio" class="sheet-select-radio sheet-blue" name="attr_ab3color" value="blue" checked="checked" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-green"><input type="radio" class="sheet-select-radio sheet-green" name="attr_ab3color" value="green" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-purple"><input type="radio" class="sheet-select-radio sheet-purple" name="attr_ab3color" value="purple" />&nbsp;</label>
+                                        <input type="hidden" class="sheet-select-radio" name="attr_ab3color" value="blue" />
+                                        <div class="sheet-white">&nbsp;</div>
+                                        <div class="sheet-red">&nbsp;</div>
+                                        <div class="sheet-blue">&nbsp;</div>
+                                        <div class="sheet-green">&nbsp;</div>
+                                        <div class="sheet-purple">&nbsp;</div>
+                                    </div>
+                                </div>
+                            </label>
+                            <hr class="sheet-label4" />
+                            <label class="sheet-powerconfiglabel sheet-label4">Arcane Background: <input type="text" name="attr_ablabel4" value="AB 4" maxlength="25" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label4">Power Points Label: <input type="text" name="attr_pplabel4" value="Power Points" maxlength="30" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label4">Arcane Background Indicator:
+                                <div class="sheet-container">
+                                    <div class="sheet-child2">
+                                        <label class="sheet-abmenu sheet-white"><input type="radio" class="sheet-select-radio sheet-white" name="attr_ab4color" value="white" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-red"><input type="radio" class="sheet-select-radio sheet-red" name="attr_ab4color" value="red" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-blue"><input type="radio" class="sheet-select-radio sheet-blue" name="attr_ab4color" value="blue" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-green"><input type="radio" class="sheet-select-radio sheet-green" name="attr_ab4color" value="green" checked="checked" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-purple"><input type="radio" class="sheet-select-radio sheet-purple" name="attr_ab4color" value="purple" />&nbsp;</label>
+                                        <input type="hidden" class="sheet-select-radio" name="attr_ab4color" value="green" />
+                                        <div class="sheet-white">&nbsp;</div>
+                                        <div class="sheet-red">&nbsp;</div>
+                                        <div class="sheet-blue">&nbsp;</div>
+                                        <div class="sheet-green">&nbsp;</div>
+                                        <div class="sheet-purple">&nbsp;</div>
+                                    </div>
+                                </div>
+                            </label>
+                            <hr class="sheet-label5" />
+                            <label class="sheet-powerconfiglabel sheet-label5">Arcane Background: <input type="text" name="attr_ablabel5" value="AB 5" maxlength="25" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label5">Power Points Label: <input type="text" name="attr_pplabel5" value="Power Points" maxlength="30" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label5">Arcane Background Indicator:
+                                <div class="sheet-container">
+                                    <div class="sheet-child2">
+                                        <label class="sheet-abmenu sheet-white"><input type="radio" class="sheet-select-radio sheet-white" name="attr_ab5color" value="white" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-red"><input type="radio" class="sheet-select-radio sheet-red" name="attr_ab5color" value="red" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-blue"><input type="radio" class="sheet-select-radio sheet-blue" name="attr_ab5color" value="blue" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-green"><input type="radio" class="sheet-select-radio sheet-green" name="attr_ab5color" value="green" />&nbsp;</label>
+                                        <label class="sheet-abmenu sheet-purple"><input type="radio" class="sheet-select-radio sheet-purple" name="attr_ab5color" value="purple" checked="checked" />&nbsp;</label>
+                                        <input type="hidden" class="sheet-select-radio" name="attr_ab5color" value="purple" />
+                                        <div class="sheet-white">&nbsp;</div>
+                                        <div class="sheet-red">&nbsp;</div>
+                                        <div class="sheet-blue">&nbsp;</div>
+                                        <div class="sheet-green">&nbsp;</div>
+                                        <div class="sheet-purple">&nbsp;</div>
+                                    </div>
+                                </div>
+                            </label>
+                            <button type="action" class="sheet-addab" name="act_addab">+</button><button type="action" class="sheet-removeab" name="act_removeab">#</button>
+                        </div>
+                        <!-- End Section Config Window -->
     					<div class="sheet-arcane">
     					    <input type="checkbox" class="sheet-NoPP" name="attr_NoPPRule" style="display: none;" />
-    					    <div class="sheet-powerpoints">
-    					        <input type="checkbox" class="sheet-usePPE" name="attr_ppe" style="width: 15px; display: none;" />
-    					        <span class="sheet-mainPP">
-    					            <span class="sheet-pplabel" name="attr_ppelabel"></span>
-        							<input type="number" style="margin-right: 5px;" name="attr_PowerPoints" title="@{PowerPoints}" value="0"  />
-        							<span data-i18n="of">&nbsp;of&nbsp;</span>
-        							<input type="number" style="margin-left: 5px;" name="attr_PowerPoints_max" title="@{PowerPoints_max}" value="0" />
-    					        </span>
-    							<span class="sheet-spacer" name="attr_spacer"></span>
-    							<input type="checkbox" class="sheet-useISP" name="attr_useISP" style="width: 15px; display: none;" />
-    							<span class='sheet-ISP'>
-    								<span class="sheet-pplabel" data-i18n="isp-u">ISP</span>
-    								<input type="number" style="margin-right: 5px;" name="attr_InnerStrPts" title="@{InnerStrPts}" value="0" />
-    								<span data-i18n="of"> of </span>
-    								<input type="number" style="margin-left: 5px;" name="attr_InnerStrPts_max" title="@{InnerStrPts_max}" value="0" />
-    							</span>
+                            <div class="sheet-powerpoints">
+                                <input type="hidden" class="sheet-showmultipleabs" name="attr_numberofabs" value="1" />
+                                <input type="hidden" class="sheet-abcolor" name="attr_ab1color" value="white" />
+                                <div class="sheet-ppcontainer">
+                                    <label class="sheet-ablabel"><span name='attr_ablabel'></span></label>
+                                    <div class="sheet-ppfields">
+                                        <input class="sheet-ppvalue" type="number" name="attr_PowerPoints" title="@{PowerPoints}" value="0"  />
+                                        <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                        <input class="sheet-ppvalue" type="number" name="attr_PowerPoints_max" title="@{PowerPoints_max}" value="0" />
+                                    </div>
+                                    <label class="sheet-abpplabel"><span name='attr_ppelabel'></span></label>
+                                </div>
+                                <input type="hidden" class="sheet-abcolor" name="attr_ab2color" value="red" />
+                                <div class="sheet-ppcontainer sheet-label2">
+                                    <label class="sheet-ablabel"><span name='attr_ablabel2'></span></label>
+                                    <div class="sheet-ppfields">
+                                        <input class="sheet-ppvalue" type="number" name="attr_powerpoints2" title="@{powerpoints2}" value="0"  />
+                                        <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                        <input class="sheet-ppvalue" type="number" name="attr_powerpoints2_max" title="@{powerpoints2_max}" value="0" />
+                                    </div>
+                                    <label class="sheet-abpplabel"><span name='attr_pplabel2'></span></label>
+                                </div>
+                                <input type="hidden" class="sheet-abcolor" name="attr_ab3color" value="blue" />
+                                <div class="sheet-ppcontainer sheet-label3">
+                                    <label class="sheet-ablabel"><span name='attr_ablabel3'></span></label>
+                                    <div class="sheet-ppfields">
+                                        <input class="sheet-ppvalue" type="number" name="attr_powerpoints3" title="@{powerpoints3}" value="0"  />
+                                        <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                        <input class="sheet-ppvalue" type="number" name="attr_powerpoints3_max" title="@{powerpoints3_max}" value="0" />
+                                    </div>
+                                    <label class="sheet-abpplabel"><span name='attr_pplabel3'></span></label>
+                                </div>
+                                <input type="hidden" class="sheet-abcolor" name="attr_ab4color" value="green" />
+                                <div class="sheet-ppcontainer sheet-label4">
+                                    <label class="sheet-ablabel"><span name='attr_ablabel4'></span></label>
+                                    <div class="sheet-ppfields">
+                                        <input class="sheet-ppvalue" type="number" name="attr_powerpoints4" title="@{powerpoints4}" value="0"  />
+                                        <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                        <input class="sheet-ppvalue" type="number" name="attr_powerpoints4_max" title="@{powerpoints4_max}" value="0" />
+                                    </div>
+                                    <label class="sheet-abpplabel"><span name='attr_pplabel4'></span></label>
+                                </div>
+                                <input type="hidden" class="sheet-abcolor" name="attr_ab4color" value="purple" />
+                                <div class="sheet-ppcontainer sheet-label5">
+                                    <label class="sheet-ablabel"><span name='attr_ablabel5'></span></label>
+                                    <div class="sheet-ppfields">
+                                        <input class="sheet-ppvalue" type="number" name="attr_powerpoints5" title="@{powerpoints5}" value="0"  />
+                                        <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                        <input class="sheet-ppvalue" type="number" name="attr_powerpoints5_max" title="@{powerpoints5_max}" value="0" />
+                                    </div>
+                                    <label class="sheet-abpplabel"><span name='attr_pplabel5'></span></label>
+                                </div>
     					    </div>
     					    <div class='sheet-powerrow' style="align-items: flex-end; margin-bottom: 20px; border-bottom: 1px solid silver; overflow: hidden;">
 								<h4 class="sheet-repeatingHeader sheet-spellOutput">&nbsp;</h4>
 								<h4 class="sheet-repeatingHeader sheet-powerbutton">&nbsp;</h4>
         					    <h4 class="sheet-repeatingHeader sheet-power" style='margin-left:'><span name="attr_powerlabelsingular"></span></h4>
-        					    <h4 class="sheet-repeatingHeader sheet-pp" data-i18n="power-point-abbr-u">PP</h4>
+        					    <h4 class="sheet-repeatingHeader sheet-pp"><span name="attr_ppabbr"></span></h4>
         					    <h4 class="sheet-repeatingHeader sheet-powerrange" data-i18n="range">Range</h4>
         					    <h4 class="sheet-repeatingHeader sheet-powerdamage" data-i18n="damage">Damage</h4>
         					    <h4 class="sheet-repeatingHeader sheet-duration" data-i18n="duration">Duration</h4>
-        					    <h4 class="sheet-repeatingHeader sheet-invested" data-18n="power-point-abbr-u-invested">PP Invested</h4>
+        					    <h4 class="sheet-repeatingHeader sheet-invested"><span name="attr_ppabbr"></span> <span data-18n="invested">Invested</span></h4>
     					    </div>
 							<input class="sheet-vdamage" type="checkbox" name="attr_RaiseHBRule" value="2" style="display: none;" />
+                            <input type="hidden" class="sheet-showmultipleabs" name="attr_numberofabs" value="1" />
     					    <fieldset class='repeating_spells'>
-                    <div class='sheet-fullrow'>
+                                <input type="hidden" name="attr_ablabsinit" value="0" />
+                                <input type="hidden" class="sheet-powercolor" name="attr_powercolor" value="white" />
+                                <div class='sheet-fullrow'>
 	    					        <div class='sheet-powerrow'>
 										<div class="sheet-spellOutput">
 											<button type="roll" name="roll_spellinfo" class="sheet-hindranceOutput" value="&{template:info} {{name=@{character_name}}} {{item=@{power}}} {{trappings=@{trappings}}} {{Notes=@{spellnotes}}}">w</button>
@@ -5559,7 +6019,36 @@
 									<textarea name="attr_trappings" class='sheet-spelltrappings' title="@{repeating_spells_$#_spelltrappings}" data-i18n-placeholder="trappings" placeholder="Trappings"></textarea>
 									<textarea name='attr_spellnotes' class='sheet-spellnotes' title="@{repeating_spells_$#_spellnotes}" data-i18n-placeholder="notes" placeholder="Notes"></textarea>
 									<div class="sheet-spellconfig">
-										<label class="sheet-configlabels sheet-configcheckbox"><input type='checkbox' value='/w gm' name='attr_whisperspell' title="@{repeating_spells_$#_whisperspell}" /> <span data-i18n="whisper-roll-to-gm">Whisper roll to GM</span></label><br />
+                                        <div class="sheet-showabindicatorselection">
+                                            <label class="sheet-powerconfiglabel sheet-label1">Arcane Background Indicator:
+                                                <input type="hidden" name="attr_rptablabel" value="AB 1" />
+                                                <input type="hidden" name="attr_rptab1color" value="white" />
+                                                <input type="hidden" name="attr_rptablabel2" value="AB 2" />
+                                                <input type="hidden" name="attr_rptab2color" value="red" />
+                                                <input type="hidden" name="attr_rptablabel3" value="AB 3" />
+                                                <input type="hidden" name="attr_rptab3color" value="blue" />
+                                                <input type="hidden" name="attr_rptablabel4" value="AB 4" />
+                                                <input type="hidden" name="attr_rptab4color" value="green" />
+                                                <input type="hidden" name="attr_rptablabel5" value="AB 5" />
+                                                <input type="hidden" name="attr_rptab5color" value="purple" />
+                                                <div class="sheet-container">
+                                                    <div class="sheet-child3">
+                                                        <label class="sheet-abmenu sheet-ab1"><input type="radio" class="sheet-select-radio sheet-ab1" name="attr_powergroup" value="ab1" checked="checked" /><span class="sheet-powerdisplay" name="attr_rptablabel"></span></label>
+                                                        <label class="sheet-abmenu sheet-ab2"><input type="radio" class="sheet-select-radio sheet-ab2" name="attr_powergroup" value="ab2" /><span class="sheet-powerdisplay" name="attr_rptablabel2"></span></label>
+                                                        <label class="sheet-abmenu sheet-ab3"><input type="radio" class="sheet-select-radio sheet-ab3" name="attr_powergroup" value="ab3" /><span class="sheet-powerdisplay" name="attr_rptablabel3"></span></label>
+                                                        <label class="sheet-abmenu sheet-ab4"><input type="radio" class="sheet-select-radio sheet-ab4" name="attr_powergroup" value="ab4" /><span class="sheet-powerdisplay" name="attr_rptablabel4"></span></label>
+                                                        <label class="sheet-abmenu sheet-ab5"><input type="radio" class="sheet-select-radio sheet-ab5" name="attr_powergroup" value="ab5" /><span class="sheet-powerdisplay" name="attr_rptablabel5"></span></label>
+                                                        <input type="hidden" class="sheet-select-radio" name="attr_powergroup" value="ab1" />
+                                                        <div class="sheet-ab1"><span name="attr_rptablabel"></span></div>
+                                                        <div class="sheet-ab2"><span name="attr_rptablabel2"></span></div>
+                                                        <div class="sheet-ab3"><span name="attr_rptablabel3"></span></div>
+                                                        <div class="sheet-ab4"><span name="attr_rptablabel4"></span></div>
+                                                        <div class="sheet-ab5"><span name="attr_rptablabel5"></span></div>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                        <label class="sheet-configlabels sheet-configcheckbox"><input type='checkbox' value='/w gm' name='attr_whisperspell' title="@{repeating_spells_$#_whisperspell}" /> <span data-i18n="whisper-roll-to-gm">Whisper roll to GM</span></label><br />
 										<label class="sheet-configlabels" data-i18n="button-behavior">Button Behavior</label>
 										<select name="attr_spellbutton" title="@{repeating_spells_$#_spellbutton}" class="sheet-spellbutton">
 											<option value="2" data-i18n="skill-only">Skill Only</option>
@@ -5581,16 +6070,16 @@
 											</select>-->
                                             <div class="sheet-container">
                                                 <div class="sheet-child">
-                                                    <label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-athletics" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="athletics" />&nbsp;<span name='attr_sathleticsname'></span></label>
-                                                    <label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-faith" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="faith" checked="checked" />&nbsp;<span name='attr_sfaithname'></span></label>
-                                                    <label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-focus" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="focus" />&nbsp;<span name='attr_sfocusname'></span></label>
-                                                    <label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-performance" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="performance" />&nbsp;<span name='attr_sperformancename'></span></label>
-    												<label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-psionics" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="psionics" />&nbsp;<span name='attr_spsionicsname'></span></label>
-                                                    <label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-ritual" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="ritual" />&nbsp;<span name='attr_sritualname'></span></label>
-                                                    <label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-spellcasting" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="spellcasting" />&nbsp;<span name='attr_sspellcastingname'></span></label>
-                                                    <label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-weirdscience" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="weirdscience" />&nbsp;<span name='attr_sweirdsciencename'></span></label>
-    												<label class="sheet-ddmenu"><input type="checkbox" class="sheet-select-radio sheet-unskilled" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="unskilled" />&nbsp;<span data-i18n='unskilled'>Unskilled</span></label>
-                                                    <input type="checkbox" class="sheet-select-radio sheet-athletics" name="attr_spellskill" value="athletics" style='display:none;' />
+                                                    <label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-athletics" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="athletics" /><span name='attr_sathleticsname'></span></label>
+                                                    <label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-faith" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="faith" checked /><span name='attr_sfaithname'></span></label>
+                                                    <label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-focus" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="focus" /><span name='attr_sfocusname'></span></label>
+                                                    <label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-performance" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="performance" /><span name='attr_sperformancename'></span></label>
+    												<label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-psionics" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="psionics" /><span name='attr_spsionicsname'></span></label>
+                                                    <label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-ritual" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="ritual" /><span name='attr_sritualname'></span></label>
+                                                    <label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-spellcasting" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="spellcasting" /><span name='attr_sspellcastingname'></span></label>
+                                                    <label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-weirdscience" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="weirdscience" /><span name='attr_sweirdsciencename'></span></label>
+    												<label class="sheet-ddmenu"><input type="radio" class="sheet-select-radio sheet-unskilled" name="attr_spellskill" title="@{repeating_spells_$#_spellskill}" value="unskilled" /><span data-i18n='unskilled'>Unskilled</span></label>
+                                                    <!--<input type="checkbox" class="sheet-select-radio sheet-athletics" name="attr_spellskill" value="athletics" style='display:none;' />
                                                     <input type="checkbox" class="sheet-select-radio sheet-faith" name="attr_spellskill" value="faith" checked="checked" style='display:none;' />
                                                     <input type="checkbox" class="sheet-select-radio sheet-focus" name="attr_spellskill" value="focus" style='display:none;' />
                                                     <input type="checkbox" class="sheet-select-radio sheet-performance" name="attr_spellskill" value="performance" style='display:none;' />
@@ -5598,7 +6087,8 @@
                                                     <input type="checkbox" class="sheet-select-radio sheet-ritual" name="attr_spellskill" value="ritual" style='display:none;' />
                                                     <input type="checkbox" class="sheet-select-radio sheet-spellcasting" name="attr_spellskill" value="spellcasting" style='display:none;' />
     												<input type="checkbox" class="sheet-select-radio sheet-weirdscience" name="attr_spellskill" value="weirdscience" style='display:none;' />
-    												<input type="checkbox" class="sheet-select-radio sheet-unskilled" name="attr_spellskill" value="unskilled" style='display:none;' />
+    												<input type="checkbox" class="sheet-select-radio sheet-unskilled" name="attr_spellskill" value="unskilled" style='display:none;' />-->
+                                                    <input type="hidden" class="sheet-select-radio sheet-" name="attr_spellskill" value="faith" />
                                                     <div class="sheet-athletics"><span name='attr_sathleticsname'></span></div>
                                                     <div class="sheet-faith"><span name='attr_sfaithname'></span></div>
                                                     <div class="sheet-focus"><span name='attr_sfocusname'></span></div>
@@ -5919,7 +6409,6 @@
                             <button type="action" name="act_hideadvance" class="sheet-showhidebutton"><span name="attr_journaladvancehideicon"></span></button>
                         </div>
                         <h1 class='sheet-colHeader' data-i18n="advancements">Advancements</h1>
-                        <!--<input type="checkbox" class="sheet-hideAdv" name="attr_hideAdv" /><span class="sheet-showhide"></span>-->
                         <input type="checkbox" class="sheet-hideAdv" name="attr_hideAdv" style="display: none;" />
                         <div class='sheet-base sheet-jadvancements'>
                             <div class="sheet-xp">
@@ -6588,7 +7077,6 @@
 								<hr class="sheet-weaponItem sheet-hr" />
 								<input type='hidden' name='attr_vbonusdamage' value='1d6!' />
 								<fieldset class="repeating_paweapons" style="width: 100%;">
-									<!--<div class='sheet-weaponitem'>-->
 									<div class='sheet-weapons'>
 										<button type='roll' class="sheet-weaponItem sheet-button" name='roll_tpaWeapon' value="@{paweaponroll}"><input type="hidden" name="attr_paweaponbutton" class="sheet-weaponbutton" value="1" /><span class="sheet-buttonand" data-i18n="attack-and-damage-abbr">Atk+Dmg</span><span class="sheet-buttondo" data-i18n="damage">Damage</span></button>
 										<button type='roll' style='display: none;' name='roll_padmg' value='@{padamageOnly}'></button>
@@ -6622,10 +7110,6 @@
 												<select class='sheet-weaponatt' name="attr_padamageatt">
 													<option value="na" data-i18n="not-applicable-abbr">N/A</option>
 													<option value="strength" data-i18n="strength" selected>Strength</option>
-													<!--<option value="agility" data-i18n="agility">Agility</option>
-													<option value="smarts" data-i18n="smarts">Smarts</option>
-													<option value="spirit" data-i18n="spirit">Spirit</option>
-													<option value="vigor" data-i18n="vigor">Vigor</option>-->
 												</select>
 												+
 												<input type="number" class="sheet-weaponnum" name="attr_padmgnumdice" style="text-align: right;" value="1" />
@@ -6765,7 +7249,6 @@
 								<hr class="sheet-weaponItem sheet-hr" />
 								<input type='hidden' name='attr_vbonusdamage' value='1d6!' />
 								<fieldset class="repeating_raweapons" style="width: 100%;">
-									<!--<div class='sheet-weaponitem'>-->
 									<div class='sheet-weapons'>
 										<button type='roll' class="sheet-weaponItem sheet-button" name='roll_traWeapon' value="@{raweaponroll}"><input type="hidden" name="attr_raweaponbutton" class="sheet-weaponbutton" value="1" /><span class="sheet-buttonand" data-i18n="attack-and-damage-abbr">Atk+Dmg</span><span class="sheet-buttondo" data-i18n="damage">Damage</span></button>
 										<button type='roll' style='display: none;' name='roll_radmg' value='@{radamageOnly}'></button>
@@ -6799,10 +7282,6 @@
 												<select class='sheet-weaponatt' name="attr_radamageatt">
 													<option value="na" data-i18n="not-applicable-abbr">N/A</option>
 													<option value="strength" data-i18n="strength" selected>Strength</option>
-													<!--<option value="agility" data-i18n="agility">Agility</option>
-													<option value="smarts" data-i18n="smarts">Smarts</option>
-													<option value="spirit" data-i18n="spirit">Spirit</option>
-													<option value="vigor" data-i18n="vigor">Vigor</option>-->
 												</select>
 												+
 												<input type="number" class="sheet-weaponnum" name="attr_radmgnumdice" style="text-align: right;" value="1" />
@@ -6951,13 +7430,7 @@
                         <!--<label class='sheet-miscItem'><input type="checkbox" name="attr_whisperrolls" value='1' style="width: 15px;"> <span data-i18n="whisper-all-rolls-to-gm">Whisper all rolls to GM</span></label>-->
                         <input type='hidden' name='attr_whisperall' />
                         <label class='sheet-miscItem'>
-            			    <span data-i18n="wild-card-icon">Wild Card Icon</span>: <!--<select name='attr_WCI' class="sheet-wcIcon">
-            			        <option value="⊛">⊛</option>
-            			        <option value="✪">✪</option>
-            			        <option value="♕">♕</option>
-            			        <option value="†">†</option>
-            			        <option value="༒">༒</option>
-            			    </select>--><input type='text' class="sheet-wci" name='attr_WCI' maxlength="2" />
+            			    <span data-i18n="wild-card-icon">Wild Card Icon</span>: <input type='text' class="sheet-wci" name='attr_WCI' maxlength="2" />
             			</label>
             			<label class="sheet-miscItem"><button type="roll" class="sheet-APIOutput" name="roll_apifield" value="!deal-init --help">i</button><span data-i18n="api-initiative-edge">API Iniative Edges</span> <input class="sheet-standard" type="text" title="@{InitEdges}" name="attr_InitEdges"/></label>
     			    </div>
@@ -6993,19 +7466,19 @@
 						<!--All for One Money--><label class="sheet-fnItem" data-i18n-title="livre-money-text"  title="Replaces 'Money' with 'Livre. Appropriate for the All for One setting."><input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" style="width: 15px;" value="5" /><span data-i18n="livre-money">Livre (Money)</span></label>
 						<!--Pieces of Eight--><label class="sheet-fnItem" data-i18n-title="pieces-of-eight-money-text"  title="Replaces 'Money' with 'Pieces of Eight'. Appropriate for 50 Fathoms or any other Pirate themed setting."><input type="checkbox" class="sheet-usePieces" name="attr_50fPo8Clams" style="width: 15px;" value="1" /><span data-i18n="pieces-of-eight-money">Pieces of Eight (Money)</span></label>
 						<!--Origin of Parahuman Abilities--><label class="sheet-fnItem" data-i18n-title="origin-of-parahuman-abilities-text"  title="Modify the Physical Appearance Text Area to include the Origins of Parahuman Abilties. Useful for Necessary Evil and other Superhero-esque settings."><input type="checkbox" class="sheet-useParaHuman" name="attr_powerOrigins" style="width: 15px;" /><span data-i18n="origin-of-parahuman-abilities">Origin of Parahuman Abilities</span></label>
-    			        <!--PPE for Rifts--><label class="sheet-fnItem" data-i18n-title="ppe-power-points-text" title="Change Power Points to PPE (Potential Psychic Energy) for Rifts"><input type="checkbox" class="sheet-usePPE" value="PPE" name="attr_ppe" style="width: 15px;" /><span data-i18n="ppe-power-points">PPE (Power Points)</span></label>
-                        <input type='hidden' name='attr_ppelabel' value="Power Points" />
-    			        <!--Power Type"--><label class="sheet-fnItem" data-i18n-title="power-type-desc" title="Check this box to show other options for Power Lables, such as Miracles, Spells, etc"><input type="checkbox" class="sheet-showPowerTypes" name="attr_usePowerTypes"> <span data-i18n="power-type">Power Type</span></label>
-    			        <input type="checkbox" class="sheet-showPowerTypes" name="attr_usePowerTypes" style="display:none;" />
-    			        <!--Miracles--><label class="sheet-fnItem sheet-PowerTypes" data-i18n-title="miracles-text" title="Replaces Powers with Miracles. Can be used for characters with Faith-based magic."><input type="checkbox" class="sheet-useMagicType" name="attr_magictype" value='1' /><span data-i18n="miracles">Miracles</span></label>
-						<!--Psionics--><label class="sheet-fnItem sheet-PowerTypes" data-i18n-title="psionics-text" title="Replaces Powers with Psionics. Can be used for characters with Psionics."><input type="checkbox" class="sheet-useMagicType" name="attr_magictype" style="width: 15px;" value='2' /><span data-i18n="psionics">Psionics</span></label>
-						<!--Spells--><label class="sheet-fnItem sheet-PowerTypes" data-i18n-title="spells-text" title="Replaces Powers with Spells. Can be used for characters with traditional-type magic."><input type="checkbox" class="sheet-useMagicType" name="attr_magictype" value='3' /><span data-i18n="spells">Spells</span></label>
-						<!--Rituals--><label class="sheet-fnItem sheet-PowerTypes" data-i18n-title="rituals-text" title="Replaces Powers with Rituals. Can be used for characters or settings (like ETU) where all powers are Ritualistic in nature."><input type="checkbox" class="sheet-useMagicType" name="attr_magictype" style="width: 15px;" value='4' /><span data-i18n="rituals">Rituals</span></label>
-						<!--Weird Science--><label class="sheet-fnItem sheet-PowerTypes" data-i18n-title="weird-science-gadgets-text" title="Replaces Powers with Weird Science. Can be used for characters who create magic through gadgets, such as Mad Scientists in Deadlands."><input type="checkbox" class="sheet-useMagicType" name="attr_magictype" style="width: 15px;" value='5' /><span data-i18n="weird-science-gadgets">Weird Science Gadgets</span></label>
-    			        <!--Custom Power Label--><label class="sheet-fnItem sheet-PowerTypes" data-i18n-title="custom-power-label-text" title="Replaces the generic Powers lable with one you write in"><input type="checkbox" class="sheet-useMagicType" name="attr_magictype" value='6' /><input class="sheet-customLabel" type="text" name="attr_custompowerlabel" data-i18n-placeholder="enter-custom-power-label" placeholder="Enter custom Power Label" /></label>
+    			        <!--PPE for Rifts--><!--<label class="sheet-fnItem" data-i18n-title="ppe-power-points-text" title="Change Power Points to PPE (Potential Psychic Energy) for Rifts"><input type="checkbox" class="sheet-usePPE" value="PPE" name="attr_ppe" style="width: 15px;" /><span data-i18n="ppe-power-points">PPE (Power Points)</span></label>-->
+                        <!-- <input type='hidden' name='attr_ppelabel' value="Power Points" /> -->
+    			        <!--Power Type"--> <!--<label class="sheet-fnItem" data-i18n-title="power-type-desc" title="Check this box to show other options for Power Lables, such as Miracles, Spells, etc"><input type="checkbox" class="sheet-showPowerTypes" name="attr_usePowerTypes"> <span data-i18n="power-type">Power Type</span></label>-->
+    			        <!-- <input type="checkbox" class="sheet-showPowerTypes" name="attr_usePowerTypes" style="display:none;" /> -->
+    			        <!--Miracles--><!--<label class="sheet-fnItem sheet-PowerTypes" data-i18n-title="miracles-text" title="Replaces Powers with Miracles. Can be used for characters with Faith-based magic."><input type="checkbox" class="sheet-useMagicType" name="attr_magictype" value='1' /><span data-i18n="miracles">Miracles</span></label>-->
+						<!--Psionics--><!--<label class="sheet-fnItem sheet-PowerTypes" data-i18n-title="psionics-text" title="Replaces Powers with Psionics. Can be used for characters with Psionics."><input type="checkbox" class="sheet-useMagicType" name="attr_magictype" style="width: 15px;" value='2' /><span data-i18n="psionics">Psionics</span></label>-->
+						<!--Spells--><!--<label class="sheet-fnItem sheet-PowerTypes" data-i18n-title="spells-text" title="Replaces Powers with Spells. Can be used for characters with traditional-type magic."><input type="checkbox" class="sheet-useMagicType" name="attr_magictype" value='3' /><span data-i18n="spells">Spells</span></label>-->
+						<!--Rituals--><!--<label class="sheet-fnItem sheet-PowerTypes" data-i18n-title="rituals-text" title="Replaces Powers with Rituals. Can be used for characters or settings (like ETU) where all powers are Ritualistic in nature."><input type="checkbox" class="sheet-useMagicType" name="attr_magictype" style="width: 15px;" value='4' /><span data-i18n="rituals">Rituals</span></label>-->
+						<!--Weird Science--><!--<label class="sheet-fnItem sheet-PowerTypes" data-i18n-title="weird-science-gadgets-text" title="Replaces Powers with Weird Science. Can be used for characters who create magic through gadgets, such as Mad Scientists in Deadlands."><input type="checkbox" class="sheet-useMagicType" name="attr_magictype" style="width: 15px;" value='5' /><span data-i18n="weird-science-gadgets">Weird Science Gadgets</span></label>-->
+    			        <!--Custom Power Label--><!--<label class="sheet-fnItem sheet-PowerTypes" data-i18n-title="custom-power-label-text" title="Replaces the generic Powers lable with one you write in"><input type="checkbox" class="sheet-useMagicType" name="attr_magictype" value='6' /><input class="sheet-customLabel" type="text" name="attr_custompowerlabel" data-i18n-placeholder="enter-custom-power-label" placeholder="Enter custom Power Label" /></label>-->
     			        <!-- Hidden Fields for Power Labels -->
-    			            <input type='hidden' name='attr_powerlabelsingular' value="Power" />
-    			            <input type='hidden' name='attr_powerlabelplural' value="Powers" />
+    			            <!-- <input type='hidden' name='attr_powerlabelsingular' value="Power" />
+    			            <input type='hidden' name='attr_powerlabelplural' value="Powers" /> -->
     			        <!-- End of Hiddent Fields for Power Labels -->
     			        <!--Species--><label class="sheet-fnItem" data-i18n-title="species-race-text" title="Can be used for Sci-Fi settings like The Last Parsec, or any setting where Species is used instead of Race."><input type="checkbox" class="sheet-useSpecies" name="attr_tlpSpecies" style="width: 15px;" /><span data-i18n="species-race">Species (Race)</span></label>
     					<!--Threat Rating--><label class="sheet-fnItem" data-i18n-title="threat-rating-rank-text" title="Change the Rank designation to Threat Rating ala Necessary Evil."><input type="checkbox" class="sheet-useThreatRating" name="attr_ThreatRatingClass" value="2" style="width: 15px;" /><span data-i18n="threat-rating-rank">Threat Rating (Rank)</span></label>
@@ -7073,7 +7546,7 @@
 						<!--Homeworld--><label class="sheet-asfItem" data-i18n-title="home-world-text" title="Can be used for Sci-Fi settings like The Last Parsec, etc."><input type="checkbox" class="sheet-useHomeworld" name="attr_tlpHW" style="padding-left: 10px; width: 15px;" /><span data-i18n="home-world">Home World</span></label>
 						<!--Hero's Journey--><label class="sheet-asfItem" data-i18n-title="heros-journey-text"  title="Hero's Journey as found in Rifts."><input type="checkbox" class="sheet-useHeroicPath" name="attr_heroicpath" style="width: 15px;" /><span data-i18n="heros-journey">Hero's Journey</span></label>
 						<!--Iconic Frameworks--><label class="sheet-asfItem" data-i18n-title="iconic-framework-text" title="Used for Rifts to capture a character's iconic framework, if one exists."><input type="checkbox" class="sheet-useIF" name="attr_IconicFramwork" style="padding-left: 10px; width: 15px;" /><span data-i18n="iconic-framework">Iconic Framework</span></label>
-  						<!--Inner Strength Points--><label class="sheet-asfItem" data-i18n-title="inner-strength-points-text" title="Adds ISP (Inner Strength Points) as found in Rifts. This is part of the Arcanum section of the sheet."><input type="checkbox" class="sheet-useISP" name="attr_useISP" style="width: 15px;" /><span data-i18n="inner-strength-points">Inner Strength Points (ISP)</span></label>
+  						<!--Inner Strength Points--><!--<label class="sheet-asfItem" data-i18n-title="inner-strength-points-text" title="Adds ISP (Inner Strength Points) as found in Rifts. This is part of the Arcanum section of the sheet."><input type="checkbox" class="sheet-useISP" name="attr_useISP" style="width: 15px;" /><span data-i18n="inner-strength-points">Inner Strength Points (ISP)</span></label>-->
   						<!--Internal Repair System Charges--><label class="sheet-asfItem" data-i18n-title="internal-repair-system-charges-text" title="Used for Rifts to record the character's Internal Repair System Charges (IRSC or IRS Charges) for the Juicer Iconic Framework."><input type='checkbox' class='sheet-useIRSC' name='attr_useIRSC' /><span data-i18n="internal-repair-system-charges">Internal Repair System Charges</span></label>
   						<!--Languages--><label class="sheet-asfItem" data-i18n-title="languages-text" title="Can be used for any setting where Languages are known and no Knowledge skills is required"><input type="checkbox" class="sheet-useLanguages" name="attr_Lang" style="padding-left: 10px; width: 15px;" /><span data-i18n="languages">Languages</span></label>
   						<!--Max Load--><label class="sheet-asfItem" data-i18n-title="max-load-modifier-text" title="Enable the Max Load to be modified by a flat bonus/penalty"><input type="checkbox" class="sheet-useMaxLoad" name="attr_MaxLoad" style="width: 15px;" /><span data-i18n="max-load-modifier">Max Load Modifier</span></label>
@@ -7116,6 +7589,42 @@
 			<!--                     -->
 			<div class="sheet-release">
 			    <h3 class='subsectionHeader' data-i18n="release-notes">Release Notes</h3>
+                <!-- Release 3.6 -->
+                <label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes36' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 3.6</h4></span>
+			    </label>
+			    <input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes36' value='1' />
+        		<div class='sheet-releasenotes'>
+        		   <p data-i18n="changes-this-release">Changes this release:</p>
+				   <ul>
+						<li><strong data-i18n="bug-fixes">Bug Fixes</strong></li>
+						<ul>
+							<li data-i18n="missing-translations-default-sheet-settings-rename-piloting-climbing">Default sheet settings : missing translations entries for "rename piloting" and "rename climbing" settings options.</li>
+							<li data-i18n="renaming-skills-default-sheet-settings-not-working">Default sheet settings : Renaming skills on the Game Setting page would not transfer in game on character sheets.</li>
+							<li data-i18n="statblocks-rolling-smarts-spirit-would-fail">StatBlocks : rolling for Smarts or Spirit from StatBlocks would fail.</li>
+                            <li data-i18n="fixed-encumbrance-for-strength-over-d12">Fixed SWADE Encumbrance rules support when Strength is d12+x. Each x will add an additional 20 to the loadlimit.</li>
+                            <li data-i18n="spells-now-part-of-statblock">Spells are now part of the Statblock output</li>
+                            <li data-i18n="fixed-copyright-issue">Fixed the copyright notification issues.</li>
+						</ul>
+                        <li><strong data-i18n="sheet-enhancements">Functionality Enhancements</strong></li>
+                        <ul>
+							<li data-i18n="added-animal-smarts">Ability to flag Smarts as "Animal Intelligence", which then appears as (A) in character sheet and statblocks.</li>
+                            <li data-i8n="support-for-multiple-arcane-backgrounds">Support for multiple Arcane Backgrounds; a character can have up to five (5) different ABs, each with its own power point pool.</li>
+                            <li data-i18n="powerlist-macro-support">As part of the statblock update to include powers, there are six (6) new fields for macro support. @{charpowers} will output the information how it's used in the statblock. @{ab1powerlist} will output a comma separated values list of powers, for the first Arcane Background, using the ability command button format (e.g. [power name](~powerbutton)). The other five fields are: @{ab2powerlist}, @{ab3powerlist}, @{ab4powerlist}, @{ab5powerlist} (each one corresponding to the relevant Arcane Background).</li>
+						</ul>
+                        <li><strong data-i18n="known-issues">Known Issues</strong></li>
+                        <ul>
+                            <li data-i18n="statblock-doesnt-support">Statblock Output Button doesn't currently output:</li>
+                            <ul>
+                                <li data-i18n="talismans">Talismans</li>
+                                <li data-i18n="cybernetics-slash-augmentations">Cybernetics/Augmentations</li>
+                                <li data-i18n="rippertech">Rippertech</li>
+                            </ul>
+                            <li data-i18n="talismans-are-missing-from-sheet">Talismans are missing from the sheet completely</li>
+                        </ul>
+				   </ul>
+				</div>
+                <!-- Release 3.5 -->
                 <label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes35' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 3.5</h4></span>
 			    </label>
@@ -7131,27 +7640,14 @@
 							<li data-i18n="wounds-fatigue-wonky-display">Wounds and Fatigue modifiers display going wonky when translations where too long (e.g. French). Fixed by reducing the font size for all languages.</li>
 							<li data-i18n="allow-translations-academics">Allowed Academics (derived stat) and Acedemics (SWADE Skill) to have different translations (e.g. French).</li>
 						</ul>
-
                         <li><strong data-i18n="sheet-enhancements">Functionality Enhancements</strong></li>
                         <ul>
                             <li data-i18n="soak-button-added">Added a Soak button (based on vigor, allow to set mods dedicated to Soak rolls)</li>
 							<li data-i18n="rename-skills-from-game-settings">Allow to rename skills directly from game settings page</li>
 						</ul>
-
-                        <li><strong data-i18n="known-issues">Known Issues</strong></li>
-                        <ul>
-                            <li data-i18n="statblock-doesnt-support">Statblock Output Button doesn't currently output:</li>
-                            <ul>
-                                <li data-i18n="spell-information">Spell information</li>
-                                <li data-i18n="talismans">Talismans</li>
-                                <li data-i18n="cybernetics-slash-augmentations">Cybernetics/Augmentations</li>
-                                <li data-i18n="rippertech">Rippertech</li>
-                            </ul>
-                            <li data-i18n="talismans-are-missing-from-sheet">Talismans are missing from the sheet completely</li>
-                        </ul>
 				   </ul>
 				</div>
-				
+                <!-- Release 3.4 -->
                 <label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes34' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 3.4</h4></span>
 			    </label>
@@ -7178,6 +7674,7 @@
                         </ul>
 				   </ul>
 				</div>
+                <!-- Release 3.3 -->
                 <label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes33' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 3.3</h4></span>
 			    </label>
@@ -7199,6 +7696,7 @@
 						</ul>
 				   </ul>
 				</div>
+                <!-- Release 3.2 -->
                 <label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes32' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 3.2</h4></span>
 			    </label>
@@ -7223,6 +7721,7 @@
 						</ul>
 				   </ul>
 				</div>
+                <!-- Release 3.1 -->
                 <label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes31' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 3.1</h4></span>
 			    </label>
@@ -7269,6 +7768,7 @@
 							</ul>
 				   </ul>
 				</div>
+                <!-- Release 3.0 -->
 			    <label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 3.0</h4></span>
 			    </label>
@@ -7354,6 +7854,16 @@
 					<p class='sheet-docparagraph' data-i18n='maincv-p22-v1'><b>Pro Tip</b>: You can set the ROF to 2 for a melee weapon and use this option for things like Frenzy.</p>
 					<h5 data-i18n='powers'>Powers</h5>
 					<p class='sheet-docparagraph' data-i18n='maincv-p12-v1'>Powers have the same configuration options as Weapons; the skill selection drop down menu only contains Arcane skills, however.</p>
+                    <p class='sheet-docparagraph' data-i18n='maincv-p23-v1'>The sheet now supports multiple arcane backgrounds (up to five).  To configure multiple arcane backgrounds, click the hammer and wrench icon (<span class='sheet-pictos'>x</span>). This will reveal the Powers Configuration window. Here you can modify:</p>
+                        <ul>
+                            <li data-i18n="section-header-description">The Section Header: this will allow you to change the overall section header to whatever makes sense for your character. If s/he has a single arcane background, perhaps "Spells" is sufficient; if there are multiple arcane backgrounds, perhaps "Powers" makes more sense. Regardless, changing this, changes the lable in the gray header bar.</li>
+                            <li data-i18n="column-header-description">The Column Header: this changes the header for the column with the power name. Because there is only one column for the header name, this will be used for all arcane background powers, so if there are multiple arcane backgrounds for the charcter, something generic would be more appropriate.</li>
+                            <li data-i18n="power-points-abbreviation-description">The Power Point Header: this changes the abbreviation used for Power Points in the column header section. Like the Column Header setting this is for all powers and is used as a column header. There is a character limit for the abbreviation, just so the column view doesn't get messed up.</li>
+                            <li data-i18n="arcane-background-name-description">Arcane Background: you can now name each of your different Arcane Backgrounds. The default is AB1[-5].</li>
+                            <li data-i18n="power-points-label-description">Power Points Label: this allows you to give the power points a different name for each of a character's arcane backgrounds. This label will be shown beneath the power poins fields for the character's arcane background(s).</li>
+                            <li data-i18n="add-delete-arcane-backgrounds-description">Add (<span class='sheet-pictos'>+</span>) and Delete (<span class='sheet-pictos'>#</span>) buttons have been added to allow you to configure each arcane background differently. The minimum number of arcane backgrounds supported is one (1). If you want no arcane bakgrounds, you should use the Settings tab and hide the Power Sections. The maximum number of arcane backgrounds supported is five (5).</li>
+                            <li data-i18n="arcane-background-indicator-description">Arcane Background Indicator: When there's more than one (1) arcane background, the Arcane Background Indicaor allows you to pick a color to associate with each arcane background. Once an individual power has been tied to an arcane background (defaults to the first arcane background), the power row will use the indicator as a background color, allowing you to quickly identify which arcane background each power goes with.  The power points display will also use the Arcane Background Indicator as the background color as quick reminder of what each color represents.</li>
+                        </ul>
 		        </div>
 		        <input type='checkbox' class='sheet-hideVehicleSection' name='attr_is_vehicle' /><span class='sheet-showSection'></span>
 		        <h3 class='sheet-configSectionTitle'><span data-i18n='vehicles'>Vehicles</span> <span class='sheet-pictos'>T</span></h3>
@@ -7475,7 +7985,7 @@
     </div>
 </div>
 <div class="sheet-disclaimer">
-    <input class="sheet-logo" type="hidden" name="attr_logo" />
+    <input class="sheet-logo" type="hidden" name="attr_logo" value="1" />
 	<span data-i18n="the">The</span>&nbsp;<span class="sheet-logotext"></span>&nbsp;<span class="sheet-logostandard" data-i18n="logo-info">logo is a trademark of</span>&nbsp;<span class="sheet-trademarkholder"></span><span class="sheet-logoallforone" data-i18n="all-for-one-logo-info">logo &copy; 2016 Triple Ace Games Ltd. All for One: R&eacute;gime Diabolique and all related marks and logos are trademarks of  Triple Ace Games Ltd. Ubiquity Roleplaying System, Exile Games Studio, and all associated logos and trademarks are copyright, Exile Games Studio, LLC</span><span class="sheet-logorifts" data-i18n="rifts-logo-info">logo and Megaverse are registered trademarks of PALLADIUM BOOKS, INC. All character names and likenesses are copyright and trademarks owned by Palladium Books, Inc. Savage Worlds logo is a trademark of Pinnacle Entertainment Group</span>. <span data-i18n="used-with-permission-visit-website">Used with permission. Visit their website at</span>:&nbsp;<span class="sheet-website"></span>
 </div>
 <!--- templates -->
@@ -7646,6 +8156,6 @@
         {{#charhindrances}}<div class="sheet-bodsection">**<span data-i18n="hindrances">Hindrances</span>**: {{charhindrances}}</div>{{/charhindrances}}
         {{#charedges}}<div class="sheet-bodsection">**<span data-i18n="edges">Edges</span>**: {{charedges}}</div>{{/charedges}}
 		{{#rollGreater() showspec 0}}{{#charspecabilities}}<div class="sheet-bodsection">**<span data-i18n="special-abilities">Special Abilities</span>**:<br /><ul>{{charspecabilities}}</ul></div>{{/charspecabilities}}{{/rollGreater() showspec 0}}
-		{{#charpowers}}<div class="sheet-bodsection">**{{power label}}**: {{charpowers}}</div>{{/charpowers}}
+		{{#rollGreater() powercount 0}}<div class="sheet-bodsection">{{charpowers}}</div>{{/rollGreater() powercount 0}}
     </div>
 </rolltemplate>
