@@ -71,13 +71,23 @@ This example is the macro I use for the healer ability Healing Touch.
 - As mentioned earlier, any bonus for an exceptional I.Q. will be subtracted from rolls in the OCC, Elective, and Secondary Skills sections.
 - The rolls will roll the percentage and display the target number of your skill.
 - Any notes about the skills will be displayed in the description part of the template.
-- The mystic skills is intended for druid class rolls, deducing circle invocations, detecting illusions, and other magical type class skills that have a percentile roll.
+- The mystic skills section is intended for druid class rolls, deducing circle invocations, detecting illusions, and other magical type class skills that have a percentile roll.
 - Since I am not sure the I.Q. bonus should apply for some of these types of skills, that bonus is not automatically applied in the Mystic skills section.
 
 ### Recommended API
 - If you have access to the API, I highly recommend the use of 2 API scripts.
 - [Universal Chat Menus on Roll20 Forums](https://app.roll20.net/forum/permalink/7474530/)  
 - [Initiative Duplicator on Roll20 Forums](https://app.roll20.net/forum/permalink/6817748/)
+
+### Universal Chat Menu Macro Example for Skills
+```
+!chatmenu @{selected|character_id} {template:menu} {{color=green}} {{title=**@{selected|character_name}**}}{{subtitle=**Complete Skill List**}} {{desc=CHATMENU}} --title:OCC Skills --separator:~ --repeating_skillocc|skill_name|occskill --title:Elective Skills --separator:~ --repeating_skillelective|skill_name|electiveskill --title:Secondary Skills --separator:~ --repeating_skillsecondary|skill_name|secondaryskill --title:Mystic Skills --separator:~ --repeating_skillmystic|skill_name|mysticskill
+```
+
+### Initiative Duplicator Macro Example
+```
+!dup-turn ?{How many attacks?|}
+```
 
 ### Disclaimer
 Palladium Fantasy 1E has been around a long while.  It is from an era where house rules were not frowned upon, but encouraged.  As such, I have tried to put enough options in this sheet to allow for creativity.  I am a definite novice at html, css, or anything else that has gone into this sheet, so any major revisions for automation may be beyond me.  It is in the current state due to the generous help of the Roll20 forum community.  As K.S. would say, Game On!
