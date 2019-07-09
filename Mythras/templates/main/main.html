@@ -41,6 +41,7 @@
     <input type="checkbox" class="battle-units-enabled-toggle hidden" name="attr_battle_units_enabled" value="1">
     <input type="checkbox" class="extended-conflict-toggle hidden" name="attr_extended_conflict_enabled" value="1">
     <input type="checkbox" class="simplified-combat-toggle hidden" name="attr_simplified_combat_enabled" value="1">
+    <input type="checkbox" class="social-conflict-enabled-toggle hidden" name="attr_social_conflict_enabled" value="1">
     <input type="checkbox" class="reach-enabled-toggle hidden" name="attr_reach_enabled" value="1" checked>
     <input type="checkbox" class="boating-standard-toggle hidden" name="attr_boating_standard" value="1">
     <input type="checkbox" class="status-standard-toggle hidden" name="attr_status_standard" value="1">
@@ -184,6 +185,14 @@
             <option value="default" data-i18n="use-setting-default-u" selected>Use Setting Default</option>
                 <option value="0" data-i18n="no-u">No</option>
                 <option value="1" data-i18n="yes-u">Yes</option>
+        </select>
+        <br>
+
+        <span i18n-data="social-conflict-enabled-u">Social Conflict Enabled</span>:
+        <select name="attr_social_conflict_enabled_option">
+            <option value="default" data-i18n="use-setting-default-u" selected>Use Setting Default</option>
+            <option value="0" data-i18n="no-u">No</option>
+            <option value="1" data-i18n="yes-u">Yes</option>
         </select>
         <br>
 
@@ -2847,6 +2856,106 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Social Conflict -->
+                <div class="social-conflict section social-conflict-enabled">
+                    <input type="checkbox" class="section-toggle" name="attr_social_conflict_section_toggle" value="1" checked>
+                    <h3 class="section-toggle" data-i18n="social-conflict-u">Social Conflict</h3>
+                    <div class="section-toggle">
+                        <div class="social-conflict-skill-col">
+                            <div class="header"><span data-i18n="attack-skill-u">Attack Skill</span></div>
+                            <div><input type="text" class="full-width" name="attr_social_attack_skill"></div>
+                            <div class="header"><span data-i18n="defense-skill-u">Defense Skill</span></div>
+                            <div><input type="text" class="full-width" name="attr_social_defense_skill"></div>
+                        </div>
+                        <div class="social-conflict-attribute-col">
+                            <div class="social-attribute-row">
+                                <div class="social-attribute-label header"><span data-i18n="attribute-u">Attribute</span></div>
+                                <div class="social-attribute-number header"><span data-i18n="temp-u">Temp</span></div>
+                                <div class="social-attribute-number header"><span data-i18n="total-u">Total</span></div>
+                            </div>
+                            <div data-i18n-list="social-conflict-attribute-order">
+                                <div data-i18n-list-item="confidence">
+                                    <div class="social-attribute-row">
+                                        <div class="social-attribute-label"><span data-i18n="confidence-u">Confidence</span>:</div>
+                                        <div class="social-attribute-number"><input type="number" class="full-width" name="attr_confidence_temp" value="0"></div>
+                                        <div class="social-attribute-number"><input type="text" class="full-width total" name="attr_confidence" value="1" readonly></div>
+                                    </div> <input type="checkbox" class="details-toggle" name="attr_confidence_details"><span class="details-toggle"></span>
+                                    <div class="details">
+                                        <div><span data-i18n="base-u">Base</span>: <input type="number" name="attr_confidence_base" value="0" readonly></div>
+                                        <div><span data-i18n="other-u">Other</span>: <input type="number" name="attr_confidence_other" value="0"></div>
+                                    </div>
+                                </div>
+                                <div data-i18n-list-item="damage">
+                                    <div class="social-attribute-row">
+                                        <div class="social-attribute-label"><button type="roll" class="reduced-size no-dice" name="roll_social_damage" value="@{roll_display}&{template:weapon} {{name=^{social-damage-u}}} @{name_display} {{damage=[[@{social_damage}]]}}" data-i18n="damage-u">Damage</button>:</div>
+                                        <div class="social-attribute-number"><input type="number" class="full-width" name="attr_social_damage_temp" value="0"></div>
+                                        <div class="social-attribute-number"><input type="text" class="full-width total" name="attr_social_damage" value="0"></div>
+                                    </div> <input type="checkbox" class="details-toggle" name="attr_social_damage_details"><span class="details-toggle"></span>
+                                    <div class="details">
+                                        <div><span data-i18n="other-u">Other</span>: <input type="number" name="attr_social_damage_other" value="0"></div>
+                                    </div>
+                                </div>
+                                <div data-i18n-list-item="initiative">
+                                    <div class="social-attribute-row">
+                                        <div class="social-attribute-label"><button type="roll" class="reduced-size no-dice" name="roll_social_initiative" value="@{roll_display}&{template:default} {{name=^{social-initiative-u}}} @{name_display} {{^{rolled-u}=[[@{init_dice} + @{social_initiative} &{tracker}]]}}" data-i18n="initiative-u">Initiative</button>:</div>
+                                        <div class="social-attribute-number"><input type="number" class="full-width" name="attr_social_initiative_temp" value="0"></div>
+                                        <div class="social-attribute-number"><input type="number" class="full-width total" name="attr_social_initiative" value="12" readonly></div>
+                                    </div> <input type="checkbox" class="details-toggle" name="attr_social_initiative_details"><span class="details-toggle"></span>
+                                    <div class="details">
+                                        <div><span data-i18n="base-u">Base</span>: <input type="number" name="attr_social_initiative_base" value="12" readonly></div>
+                                        <div><span data-i18n="other-u">Other</span>: <input type="number" name="attr_social_initiative_other" value="0"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="social-conflict-resolution-pool-col">
+                            <div class="resolution-pool-row">
+                                <div class="resolution-pool-number header">1d12</div>
+                                <div class="resolution-pool-label header"><span data-i18n="resolution-pool-u">Resolution Pool</span></div>
+                                <div class="resolution-pool-number header"><span data-i18n="temp-u">Temp</span></div>
+                                <div class="resolution-pool-total header"><span data-i18n="total-u">Total</span></div>
+                            </div>
+                            <div class="resolution-pool-row">
+                                <div class="resolution-pool-number"><input type="number" class="resolution-pool-table-number" name="attr_composure_table_start" value="1"/>-<input type="number" class="resolution-pool-table-number" name="attr_composure_table_end" value="4"/></div>
+                                <div class="resolution-pool-label bottom-border"><span data-i18n="composure-u">Composure</span></div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_composure_temp" value="0"></div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_composure" value="4"></div>
+                                <div class="resolution-pool-symbol">/</div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_composure_max" value="4" readonly></div>
+                            </div> <input type="checkbox" class="details-toggle" name="attr_composure_details"><span class="details-toggle"></span>
+                            <div class="details">
+                                <div><span data-i18n="base-u">Base</span>: <input type="number" name="attr_composure_base" value="4" readonly></div>
+                                <div><span data-i18n="other-u">Other</span>: <input type="number" name="attr_composure_other" value="0"></div>
+                            </div>
+                            <div class="resolution-pool-row">
+                                <div class="resolution-pool-number"><input type="number" class="resolution-pool-table-number" name="attr_integrity_table_start" value="5"/>-<input type="number" class="resolution-pool-table-number" name="attr_integrity_table_end" value="8"/></div>
+                                <div class="resolution-pool-label bottom-border"><span data-i18n="integrity-u">Integrity</span></div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_integrity_temp" value="0"></div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_integrity" value="4"></div>
+                                <div class="resolution-pool-symbol">/</div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_integrity_max" value="4" readonly></div>
+                            </div> <input type="checkbox" class="details-toggle" name="attr_integrity_details"><span class="details-toggle"></span>
+                            <div class="details">
+                                <div><span data-i18n="base-u">Base</span>: <input type="number" name="attr_integrity_base" value="4" readonly></div>
+                                <div><span data-i18n="other-u">Other</span>: <input type="number" name="attr_integrity_other" value="0"></div>
+                            </div>
+                            <div class="resolution-pool-row">
+                                <div class="resolution-pool-number"><input type="number" class="resolution-pool-table-number" name="attr_resolve_table_start" value="9"/>-<input type="number" class="resolution-pool-table-number" name="attr_resolve_table_end" value="12"/></div>
+                                <div class="resolution-pool-label bottom-border"><span data-i18n="resolve-u">Resolve</span></div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_resolve_temp" value="0"></div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_resolve" value="5"></div>
+                                <div class="resolution-pool-symbol">/</div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_resolve_max" value="5" readonly></div>
+                            </div> <input type="checkbox" class="details-toggle" name="attr_resolve_details"><span class="details-toggle"></span>
+                            <div class="details">
+                                <div><span data-i18n="base-u">Base</span>: <input type="number" name="attr_resolve_base" value="5" readonly></div>
+                                <div><span data-i18n="other-u">Other</span>: <input type="number" name="attr_resolve_other" value="0"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
         
@@ -7363,6 +7472,32 @@
                                 <div class="weapon-hp"><input type="number" class="text-align-center number-width-sm" name="attr_hp">/<input type="number" class="text-align-center number-width-sm" name="attr_hp_max" value="0"></div>
                                 <div class="weapon-ranged-effects-core"><input type="text" class="text-align-center full-width" name="attr_notes"></div>
                             </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mook/Compact Social Conflict-->
+            <div class="social-conflict-enabled" style="padding-left: 10px">
+                <input type="checkbox" class="mook-section-toggle" name="attr_social_conflict_section_toggle" value="1" checked>
+                <h5 class="mook-section-toggle header-bar bold" data-i18n="social-conflict-u">Social Conflict</h5>
+                <div class="mook-section-toggle">
+                    <div>
+                        <div class="mook-skilllabel-col"><span class="italic underlined" data-i18n="skills-u">Skills</span>:</div>
+                        <div class="mook-skilllist-col"><span class="bold" data-i18n="attack-u">Attack</span>: <input type="text" name="attr_social_attack_skill">, <span class="bold" data-i18n="defense-u">Defense</span>: <input type="text" name="attr_social_defense_skill"></div>
+                    </div>
+                    <div class="mook-skilllabel-col"><span class="italic underlined" data-i18n="attributes-u">Attributes</span>:</div>
+                    <div class="mook-skilllist-col" data-i18n-list="social-conflict-attribute-order">
+                        <div data-i18n-list-item="confidence" class="mook-btn"><span class="bold" data-i18n="confidence-u">Confidence</span>: <input type="number" class="number-width" name="attr_confidence" readonly></div>
+                        <div data-i18n-list-item="damage" class="mook-btn"><button type="roll" class="reduced-size no-dice" name="roll_social_damage" value="@{roll_display}&{template:weapon} {{name=^{social-damage-u}}} @{name_display} {{damage=[[@{social_damage}]]}}"><span class="bold" data-i18n="damage-u">Damage</span></button>: <input type="text" class="number-width text-align-center" name="attr_social_damage"></div>
+                        <div data-i18n-list-item="initiative" class="mook-btn"><button type="roll" class="reduced-size no-dice" name="roll_social_initiative" value="@{roll_display}&{template:default} {{name=^{social-initiative-u}}} @{name_display} {{^{rolled-u}=[[@{init_dice} + @{social_initiative} &{tracker}]]}}"><span class="bold" data-i18n="initiative-u">Initiative</span></button>: <input type="number" class="number-width" name="attr_social_initiative" readonly></div>
+                    </div>
+                    <div>
+                        <div class="mook-skilllabel-col"><span class="italic underlined" data-i18n="resolution-pools-u">Resolution Pools</span>:</div>
+                        <div class="mook-skilllist-col">
+                            <div class="mook-btn"><span class="bold" data-i18n="composure-u">Composure</span>: <input type="number" class="number-width" name="attr_composure">/<input type="number" class="number-width" name="attr_composure_max" readonly></div>,
+                            <div class="mook-btn"><span class="bold" data-i18n="integrity-u">Integrity</span>: <input type="number" class="number-width" name="attr_integrity">/<input type="number" class="number-width" name="attr_integrity_max" readonly></div>,
+                            <div class="mook-btn"><span class="bold" data-i18n="resolve-u">Resolve</span>: <input type="number" class="number-width" name="attr_resolve">/<input type="number" class="number-width" name="attr_resolve_max" readonly></div>
                         </div>
                     </div>
                 </div>
