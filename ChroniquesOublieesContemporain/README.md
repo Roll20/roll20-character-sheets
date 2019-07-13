@@ -9,9 +9,23 @@ Cette feuilles de personnage inclut quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](http://www.black-book-editions.fr/produit.php?id=4349).
 
 # Version courante
-2.6 [Screenshot](coc_v2.png)
+2.7 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v2.7 (2019-29-06)
+### Fiche PJ, onglet Configuration
+* Ajout d'un champ de buff pour les PV
+* Ajout d'un sélecteur pour le mode de calcul des points de vie (lancer le DV ou utiliser la valeur moyenne du DV)
+
+### Fiche PJ, onglet Caractéristiques
+* Modification du roll-button de lancement de dé de vie en action-button permettant d'augmenter le niveau de 1
+* Ajout d'un script sheet-worker pour recalculer / lancer les points de vie lorsque le niveau, le mod de constitution, le buff de PV ou le mode de calcul des PV est modifié
+
+### Modifications globales
+Modification des attributs name de tous les roll-buttons en "roll_nomJet" et ajout des attributs title
+* Permet d'invoquer un jet de dés de la fiche de personnage depuis le chat en indiquant %{selected|nomJet} (si un token est sélectionné) ou %{nomPerso|nomJet}
+* Permet d'afficher le nom du jet qui peut être utilisé dans le chat ou les macros
 
 ## v2.6 (2019-04-17)
 ### Fiche de PJ
