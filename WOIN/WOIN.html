@@ -419,28 +419,32 @@
                 <div class="sheet-header">Defenses</div>
                 <table class="sheet-skill">
                     <tr>
-                        <th>Melee Defense</th>
-                        <th>Ranged Defense</th>
-                        <th>Mental Defense</th>
-                        <th>Vital Defense</th>
+                        <th>Melee</th>
+                        <th>Ranged</th>
+                        <th>Mental</th>
+                        <th>Vital</th>
+						<th>Points</th>
                     </tr>
                     <tr>
                         <td><input type="number" class="sheet-number2" style="width:80px;" name="attr_melee_defense" value="0" /></td>
                         <td><input type="number" class="sheet-number2" style="width:80px;" name="attr_ranged_defense" value="0" /></td>
                         <td><input type="number" class="sheet-number2" style="width:80px;" name="attr_mental_defense" value="0" /></td>
                         <td><input type="number" class="sheet-number2" style="width:80px;" name="attr_vital_defense" value="0" /></td>
+						<td><input type="number" class="sheet-number2" style="width:80px;" name="attr_Points" value="0" /></td>
                     </tr>
                     <tr>
                         <th>Soak</th>
                         <th>Health</th>
                         <th>Max Health</th>
-                        <th>Carry Increment</th>
+                        <th>Carry Incr.</th>
+						<th>Carried</th>
                     </tr>
                     <tr>
                         <td><input type="number" class="sheet-number2" style="width:80px;" name="attr_soak" value="0" /></td>
                         <td><input type="number" class="sheet-number2" style="width:80px;" name="attr_health" value="0" /></td>
                         <td><input type="number" class="sheet-number2" style="width:80px;" name="attr_maxhealth" value="0" /></td>
                         <td><input type="number" class="sheet-number2" style="width:80px;" name="attr_carry_rating" value="0" /></td>
+						<td><input type="number" class="sheet-number2" style="width:80px;" name="attr_carried_total" value="0" /></td>
                     </tr>
                 </table>
             </div>
@@ -467,7 +471,7 @@
                             <th>Soak</th>
                             <th>Type</th>
                             <th>Weight</th>
-                            <th>Inneffective</th>
+                            <th>Ineffective</th>
                             <th></th>
                         </tr>
                         <tr>
@@ -2930,4 +2934,34 @@ on('change:repeating_xpaward', function(){
 on('change:repeating_xp', function(){
     TAS.repeatingSimpleSum('xp','cost','xp_spent_total');
 });
+
+on("change:repeating_gear:equipment_weight change:repeating_gear2:equipment_weight change:repeating_armor:armor_weight remove:repeating_gear remove:repeating_gear2 remove:repeating_armor", function() {
+	var lcarried_total
+	lcarried_total = 0;
+	
+	TAS.repeating('armor')
+		.fields('armor_weight')
+		.each(function(row,attrSet,id,rowSet){
+			lcarried_total += Number(row.armor_weight);
+		})
+		.execute();
+		
+	TAS.repeating('gear')
+		.fields('equipment_weight')
+		.each(function(row,attrSet,id,rowSet){
+			lcarried_total += Number(row.equipment_weight);
+		})
+		.execute();	
+		
+		TAS.repeating('gear2')
+		.attrs('carried_total')
+		.fields('equipment_weight')
+		.each(function(row,attrSet,id,rowSet){
+			lcarried_total += Number(row.equipment_weight);
+		}, function(rowSet, attrSet){
+			attrSet.carried_total = lcarried_total;
+		})
+		.execute();	
+});
+
 </script>
