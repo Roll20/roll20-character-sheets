@@ -36,24 +36,6 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ## Changelog
 
-### 2.4.1
-
-* Fix Innate AC missing translation key.
-
-### 2.4.0
-
-* Add tracking of permanent System Strain.
-* Fix HP roll for Heroic characters.
-* Added a macro to calculate travel costs.
-* Codex of the Black Sun support!
-  * Magic changed to Know Magic and Use Magic.
-  * Sunblade skill and Fight skill added.
-  * Toggle between Adept, Arcanist, and Magister.
-  * Magic Effort for Adepts.
-  * Spell Slots for Magisters and Arcanists.
-  * Arcanists track if spells are prepared.
-  * Adepts have abilities.
-
 ### 2.3.1
 
 * Fixed a bug causing the sheet to sometimes display an incorrect attack bonus for weapons.
