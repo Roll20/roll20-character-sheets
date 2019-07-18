@@ -38,13 +38,13 @@ STR and DEX minimums are not currently supported this maybe added in a future re
 
 
 ## 17.07.2019
-	fixed bug adding more than 1 magic point storag item. Another mp storage section was added. New characters created will only show the new section.  Existing characters will have red notice for the user to copy item and direct them to a configurationsectionto hide the old section.
+	fixed bug adding more than 1 magic point storag item. Another mp storage section was added. New characters created will only show the new section.  Existing characters will have red notice for the user to copy item and direct them to a configuration section to hide the old section.
 	
 	fixed bug in Coordination spell
 	
 	Added support for Mobilty spell
 	
-	fix.  2nd mount/alley displaying 1st mount/ally namein roll templates
+	fix.  2nd mount/alley displaying 1st mount/ally name in roll templates
 	
 
 ## 22.04.2019
