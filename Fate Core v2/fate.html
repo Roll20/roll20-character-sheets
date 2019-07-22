@@ -1085,6 +1085,9 @@
             </div>
         </div>
     </div>
+    <div class="sheet-hidden">
+        <input type="hidden" name="attr_importedOldData_flag" />
+    </div>
 </div>
 
 <rolltemplate class="sheet-rolltemplate-refresh">
@@ -1496,73 +1499,534 @@
 <script type="text/worker">
     on('sheet:opened', function () {
         getAttrs(["run_firstTime_setup", "default_stressSkills",
-                    "default_consequences", "show_conditions_flag"], function (values) {
-            if (Number(values["run_firstTime_setup"]) == 1) {
-                if (values["default_stressSkills"] != null || values["default_stressSkills"].trim() != "") {
-                    getSectionIDs("repeating_stress", function (idArray) {
-                        if (idArray.length == 0) {
-                            var stressSkills = values["default_stressSkills"].split(",");
-                            var newRowAttrs = {};
-                            stressSkills.forEach(element => {
-                                var keyValuePair = element.split(":");
-                                var newRowId = generateRowID();
-                                newRowAttrs["repeating_stress_" + newRowId + "_name"] = keyValuePair[0].trim();
-                                if (keyValuePair.length > 1) {
-                                    var skill = keyValuePair[1].trim();
-                                    var usable = Number(skill);
-                                    if (isNaN(usable)) {
-                                        newRowAttrs["repeating_stress_" + newRowId + "_skill"] = skill;
-                                        newRowAttrs["repeating_stress_" + newRowId + "_usable"] = 2;
-                                        newRowAttrs["repeating_stress_" + newRowId + "_bound"] = 1;
-                                    }
-                                    else {
-                                        newRowAttrs["repeating_stress_" + newRowId + "_usable"] = usable;
-                                        newRowAttrs["repeating_stress_" + newRowId + "_bound"] = 0;
-                                    }
-                                    newRowAttrs["repeating_stress_" + newRowId + "_options_flag"] = 0;
-                                }
-                                else {
-                                    newRowAttrs["repeating_stress_" + newRowId + "_options_flag"] = "on";
-                                }
-                            });
-                            setAttrs(newRowAttrs);
-                        }
-                    });
-                }
+                    "default_consequences", "show_conditions_flag",
+                    "importedOldData_flag"], function (values) {
+            if (isNullOrWhitespace(values["importedOldData_flag"]))
+            {
+                ImportIdData();
+                ImportSkills();
+                ImportAspects();
+                ImportStunts();
+                ImportExtras();
+                ImportStresses(values["run_firstTime_setup"], values["default_stressSkills"]);
+                ImportConsequences(values["run_firstTime_setup"],
+                    values["default_consequences"],
+                    values["show_conditions_flag"]);
+                ImportNotes();
     
-                if (values["default_consequences"] != null || values["default_consequences"].trim() != "") {
-                    getSectionIDs("repeating_consequences", function (idArray) {
-                        if (idArray.length == 0) {
-                            var consequences = values["default_consequences"].split(",")
-                            var newRowAttrs = {};
-                            consequences.forEach(consequence => {
-                                var elements = consequence.split("|");
-                                var worth = Number(elements[0].trim());
-                                if (!isNaN(worth) && worth > 0) {
-                                    var newRowId = generateRowID();
-                                    newRowAttrs["repeating_consequences_" + newRowId + "_worth"] = worth;
-    
-                                    if (elements.length > 1)
-                                        newRowAttrs["repeating_consequences_" + newRowId + "_aspect"] = elements[1];
-                                    if (values["show_conditions_flag"] == "1")
-                                        newRowAttrs["repeating_consequences_" + newRowId + "_worth_text"] = getConditionsText(worth);
-                                    else
-                                        newRowAttrs["repeating_consequences_" + newRowId + "_worth_text"] = getConsequenceText(worth);
-                                }
-                            });
-                            setAttrs(newRowAttrs);
-                        }
-                    });
-                }
+                setAttrs({ importedOldData_flag: 1, run_firstTime_setup: 0 });
+                return;
+            }
+            if (!isNullOrWhitespace(values["run_firstTime_setup"])) {
+                SetDefaultStress(values["default_stressSkills"]);
+                SetDefaultConsequences(values["default_consequences"], values["show_conditions_flag"]);
     
                 setAttrs({ run_firstTime_setup: 0 });
             }
         });
     });
     
+    function ImportIdData () {
+        getAttrs(["Description", "Refresh", "Fate"], function (values) {
+            if(isNullOrWhitespace(values["Description"])
+                && isNullOrWhitespace(values["Refresh"]
+                && isNullOrWhitespace(values["Fate"])))
+                return;
+    
+            setAttrs({ character_description: values["Description"],
+                        fatePoints_refresh: Number(values["Refresh"]),
+                        fatepoints: Number(values["Fate"])
+                     });
+        });
+    };
+    
+    function ImportSkills () {
+        getAttrs(["LegendaryActive", "EpicActive", "FantasticActive",
+                    "SuperbActive", "PoorActive", "TerribleActive"], settings => {
+            var attrs = [];
+            for (var i = 1; i < 9; i++) {
+                if (!isNullOrWhitespace(settings["LegendaryActive"]) || typeof settings["LegendaryActive"] === "undefined")
+                    attrs.push("Leg" + i);
+                if (!isNullOrWhitespace(settings["EpicActive"]) || typeof settings["LegendaryActive"] === "undefined")
+                    attrs.push("Epic" + i);
+                if (!isNullOrWhitespace(settings["FantasticActive"]) || typeof settings["LegendaryActive"] === "undefined")
+                    attrs.push("Fan" + i);
+                if (!isNullOrWhitespace(settings["SuperbActive"]) || typeof settings["LegendaryActive"] === "undefined")
+                    attrs.push("Sup" + i);
+                attrs.push("Great" + i);
+                attrs.push("Good" + i);
+                attrs.push("Fair" + i);
+                attrs.push("Avg" + i);
+                if (!isNullOrWhitespace(settings["PoorActive"]) || typeof settings["LegendaryActive"] === "undefined")
+                    attrs.push("Poor" + i);
+                if (!isNullOrWhitespace(settings["TerribleActive"]) || typeof settings["LegendaryActive"] === "undefined")
+                    attrs.push("Ter" + i);
+            }
+    
+            getAttrs(attrs, function (values) {
+                for (var i = 1; i < 9; i++) {
+                    if (!isNullOrWhitespace(settings["LegendaryActive"]) || typeof settings["LegendaryActive"] === "undefined")
+                        importSkill(values["Leg" + i], 8);
+                    if (!isNullOrWhitespace(settings["EpicActive"]) || typeof settings["LegendaryActive"] === "undefined")
+                        importSkill(values["Epic" + i], 7);
+                    if (!isNullOrWhitespace(settings["FantasticActive"]) || typeof settings["LegendaryActive"] === "undefined")
+                        importSkill(values["Fan" + i], 6);
+                    if (!isNullOrWhitespace(settings["SuperbActive"]) || typeof settings["LegendaryActive"] === "undefined")
+                        importSkill(values["Sup" + i], 5);
+                    importSkill(values["Great" + i], 4);
+                    importSkill(values["Good" + i], 3);
+                    importSkill(values["Fair" + i], 2);
+                    importSkill(values["Avg" + i], 1);
+                    if (!isNullOrWhitespace(settings["PoorActive"]) || typeof settings["LegendaryActive"] === "undefined")
+                        importSkill(values["Poor" + i], -1);
+                    if (!isNullOrWhitespace(settings["TerribleActive"]) || typeof settings["LegendaryActive"] === "undefined")
+                        importSkill(values["Ter" + i], -2);
+                }
+            });
+        });
+    };
+    
+    const importSkill = (skill, skillLevel) => {
+        if (isNullOrWhitespace(skill))
+            return;
+    
+        var newRowId = generateRowID();
+        var newRowAttrs = {};
+        newRowAttrs["repeating_skills_" + newRowId + "_skill"] = skill;
+        newRowAttrs["repeating_skills_" + newRowId + "_shiftLevel"] = skillLevel;
+        newRowAttrs["repeating_skills_" + newRowId + "_shiftLevelText"] = getShiftText(skillLevel);
+        setAttrs(newRowAttrs);
+    };
+    
+    function ImportAspects () {
+        var attrs = [];
+        attrs.push("HighConcept");
+        attrs.push("Trouble");
+        attrs.push("AdvantagesActive");
+        for (var i = 1; i < 6; i++) {
+            attrs.push("HiCon" + i);
+            attrs.push("Trouble" + i);
+        }
+    
+        getAttrs(attrs, function (values) {
+            var hiCon = 0;
+            var trbl = 0;
+            for (var i = 1; i < 6; i++) {
+                if (!isNullOrWhitespace(values["HiCon" + i]))
+                    hiCon++;
+                if (!isNullOrWhitespace(values["Trouble" + i]))
+                    trbl++;
+            }
+    
+            if (hiCon > 0)
+                importSitAspect(values["HighConcept"], hiCon);
+            if (trbl > 0)
+                importSitAspect(values["Trouble"], trbl);
+    
+            if (isNullOrWhitespace(values["AdvantagesActive"]))
+                return;
+    
+            getSectionIDs("repeating_Advantages", function (idArray) {
+                if (idArray.length == 0)
+                    return;
+        
+                idArray.forEach(id => {
+                    var attrs = [];
+                    attrs.push("repeating_Advantages_" + id + "_Advantages");
+                    for (var i = 1; i < 6; i++) {
+                        attrs.push("repeating_Advantages_" + id + "_Adv" + i);
+                    }
+        
+                    getAttrs(attrs, function (values) {
+                        var bonus = 0;
+                        for (var i = 1; i < 6; i++) {
+                            if (!isNullOrWhitespace(values["repeating_Advantages_" + id + "_Adv" + i]))
+                                bonus++;
+                        }
+                
+                        importSitAspect(values["repeating_Advantages_" + id + "_Advantages"], bonus);
+                        removeRepeatingRow("repeating_Advantages_" + id);
+                    });
+                });
+            });
+        });
+    
+        getSectionIDs("repeating_Aspects", function (idArray) {
+            if (idArray.length == 0)
+                return;
+    
+            idArray.forEach(id => {
+                var attrs = [];
+                attrs.push("repeating_Aspects_" + id + "_Aspect");
+                for (var i = 1; i < 6; i++) {
+                    attrs.push("repeating_Aspects_" + id + "_Asp" + i);
+                }
+    
+                getAttrs(attrs, function (values) {
+                    var bonus = 0;
+                    for (var i = 1; i < 6; i++) {
+                        if (!isNullOrWhitespace(values["repeating_Aspects_" + id + "_Asp" + i]))
+                            bonus++;
+                    }
+            
+                    var index = idArray.indexOf(id);
+                    if (index < 3) {
+                        if (index == 0)
+                            setAttrs({ aspect_one: values["repeating_Aspects_" + id + "_Aspect"]});
+                        else if (index == 1)
+                            setAttrs({ aspect_two: values["repeating_Aspects_" + id + "_Aspect"]});
+                        else if (index == 2)
+                            setAttrs({ aspect_three: values["repeating_Aspects_" + id + "_Aspect"]});
+                        if (bonus > 0)
+                            importSitAspect(values["repeating_Aspects_" + id + "_Aspect"], bonus);
+                    }
+                    else
+                        importSitAspect(values["repeating_Aspects_" + id + "_Aspect"], bonus);
+    
+                    removeRepeatingRow("repeating_Aspects_" + id);
+                });
+            });
+        });
+    };
+    
+    const importSitAspect = (aspect, bonus) => {
+        if (isNullOrWhitespace(aspect))
+            return;
+    
+        var newRowId = generateRowID();
+        var newRowAttrs = {};
+        newRowAttrs["repeating_situationaspect_" + newRowId + "_aspect_name"] = aspect;
+        newRowAttrs["repeating_situationaspect_" + newRowId + "_aspect_free_invokes"] = bonus;
+        newRowAttrs["repeating_situationaspect_" + newRowId + "_options_flag"] = "on";
+        setAttrs(newRowAttrs);
+    };
+    
+    function ImportStunts () {
+        getAttrs(["Stunts"], function (values) {
+            getSectionIDs("repeating_Stunts", function (idArray) {
+                importStunt(values["Stunts"]);
+    
+                if (idArray.length == 0)
+                    return;
+        
+                var attrs = [];
+                for (var i = 0; i < idArray.length; i++) {
+                    attrs.push("repeating_Stunts_" + idArray[i] + "_Stunt");
+                }
+        
+                getAttrs(attrs, function (stunts) {
+                    for (var i = 0; i < idArray.length; i++) {
+                        importStunt(stunts["repeating_Stunts_" + idArray[i] + "_Stunt"]);
+                        removeRepeatingRow("repeating_Stunts_" + idArray[i]);
+                    }
+        
+                    setAttrs(newRowAttrs);
+                });
+            });        
+        });
+    };
+    
+    const importStunt = (stunt) => {
+        if (isNullOrWhitespace(stunt))
+            return;
+    
+        var newRowId = generateRowID();
+        var newRowAttrs = {};
+        newRowAttrs["repeating_stunts_" + newRowId + "_description"] = stunt;
+        setAttrs(newRowAttrs);
+    };
+    
+    function ImportExtras () {
+        getAttrs(["Extras"], function (values) {
+            getSectionIDs("repeating_Extras", function (idArray) {
+                importExtra(values["Extras"]);
+    
+                if (idArray.length == 0)
+                    return;
+        
+                var attrs = [];
+                for (var i = 0; i < idArray.length; i++) {
+                    attrs.push("repeating_Extras_" + idArray[i] + "_Extra");
+                }
+        
+                getAttrs(attrs, function (extras) {
+                    for (var i = 0; i < idArray.length; i++) {
+                        importExtra(extras["repeating_Extras_" + idArray[i] + "_Extra"]);
+                        removeRepeatingRow("repeating_Extras_" + idArray[i]);
+                    }
+        
+                    setAttrs(newRowAttrs);
+                });
+            });
+        });
+    };
+    
+    const importExtra = (extra) => {
+        if (isNullOrWhitespace(extra))
+            return;
+    
+        var newRowId = generateRowID();
+        var newRowAttrs = {};
+        newRowAttrs["repeating_extras_" + newRowId + "_description"] = extra;
+        setAttrs(newRowAttrs);
+    };
+    
+    function ImportStresses (runFirstTimeSetup, default_stressSkills) {
+        var attr = [];
+        attr.push("PhyGoverningSkill");
+        attr.push("MenGoverningSkill");
+        for (var i = 1; i < 5; i++) {
+            attr.push("Phy" + i);
+            attr.push("Phy" + i + "Active");
+            attr.push("Men" + i);
+            attr.push("Men" + i + "Active");
+        }
+        
+        getAttrs(attr, function (basicValues) {
+            var phyGoverningSkill = basicValues["PhyGoverningSkill"];
+            if (isNullOrWhitespace(phyGoverningSkill))
+                phyGoverningSkill = "Physique";
+            
+            var menGoverningSkill = basicValues["MenGoverningSkill"];
+            if (isNullOrWhitespace(menGoverningSkill))
+                menGoverningSkill = "Will";
+            
+            getSectionIDs("repeating_Stress", function (idArray) {
+                if (idArray.length == 0) {
+                    importStress("Physical", phyGoverningSkill, "Phy", basicValues);
+                    importStress("Mental", menGoverningSkill, "Men", basicValues);
+                        
+                    if (!isNullOrWhitespace(runFirstTimeSetup))
+                        SetDefaultStress(default_stressSkills);
+    
+                    return;
+                }
+            
+                var attrs = [];
+                idArray.forEach(id =>  {
+                    attrs.push("repeating_Stress_" + id + "_Name");
+                    attrs.push("repeating_Stress_" + id + "_Mirrored");
+                    for (var x = 1; x < 5; x++) {
+                        attr.push("repeating_Stress_" + id + "_Stress" + x);
+                        attr.push("repeating_Stress_" + id + "_Stress" + x + "Active");
+                    }
+                });
+    
+                getAttrs(attrs, function (repValues) {
+                    var mirrors = [];
+                    for (var i = 0; i < idArray.length; i++) {
+                        mirrors.push("repeating_StressOptions_" + repValues["repeating_Stress_" + idArray[i] + "_Mirrored"] + "_GoverningSkill");
+                    }
+        
+                    getAttrs(mirrors, function (mirroredValues) {
+                        importStress("Physical", phyGoverningSkill, "Phy", basicValues);
+                        importStress("Mental", menGoverningSkill, "Men", basicValues);
+    
+                        idArray.forEach(id => {
+                            importStress(repValues["repeating_Stress_" + id + "_Name"],
+                                mirroredValues["repeating_StressOptions_" + repValues["repeating_Stress_" + id + "_Mirrored"] + "_GoverningSkill"],
+                                "repeating_Stress_" + id + "_Stress", repValues);
+                            
+                            removeRepeatingRow("repeating_StressOptions_" + repValues["repeating_Stress_" + id + "_Mirrored"]);
+                            removeRepeatingRow("repeating_Stress_" + id);
+                        });
+                        
+                        if (!isNullOrWhitespace(runFirstTimeSetup))
+                            SetDefaultStress(default_stressSkills);
+                    });
+                });
+            });    
+        });
+    };
+    
+    const importStress = (stress, skill, prefix, attrs) => {
+        var newRowAttrs = {};
+        var stressMax = 0;
+    
+        var newRowId = generateRowID();
+        newRowAttrs["repeating_stress_" + newRowId + "_name"] = stress.trim();
+    
+        for (var i = 1; i < 5; i++) {
+            if(!isNullOrWhitespace(attrs[prefix + i + "Active"])) {
+                stressMax++;
+                if(!isNullOrWhitespace(attrs[prefix + i]))
+                    newRowAttrs["repeating_stress_" + newRowId + "_isUsed" + i] = i;
+            }
+            else
+                return;
+        }
+    
+        if (stressMax == 0)
+            return;
+    
+        newRowAttrs["repeating_stress_" + newRowId + "_usable"] = stressMax;
+    
+        if (!isNullOrWhitespace(skill)) {
+            newRowAttrs["repeating_stress_" + newRowId + "_skill"] = skill.tim();
+            newRowAttrs["repeating_stress_" + newRowId + "_bound"] = 1;
+        }
+    
+        setAttrs(newRowAttrs);
+    };
+    
+    function SetDefaultStress (default_stressSkills) {
+        if (!isNullOrWhitespace(default_stressSkills)) {
+            getSectionIDs("repeating_stress", function (idArray) {
+                if (idArray.length == 0) {
+                    var stressSkills = default_stressSkills.split(",");
+                    var newRowAttrs = {};
+                    stressSkills.forEach(element => {
+                        var keyValuePair = element.split(":");
+                        var newRowId = generateRowID();
+                        newRowAttrs["repeating_stress_" + newRowId + "_name"] = keyValuePair[0].trim();
+                        if (keyValuePair.length > 1) {
+                            var skill = keyValuePair[1].trim();
+                            var usable = Number(skill);
+                            if (isNaN(usable)) {
+                                newRowAttrs["repeating_stress_" + newRowId + "_skill"] = skill;
+                                newRowAttrs["repeating_stress_" + newRowId + "_usable"] = 2;
+                                newRowAttrs["repeating_stress_" + newRowId + "_bound"] = 1;
+                            }
+                            else {
+                                newRowAttrs["repeating_stress_" + newRowId + "_usable"] = usable;
+                                newRowAttrs["repeating_stress_" + newRowId + "_bound"] = 0;
+                            }
+                            newRowAttrs["repeating_stress_" + newRowId + "_options_flag"] = 0;
+                        }
+                        else {
+                            newRowAttrs["repeating_stress_" + newRowId + "_options_flag"] = "on";
+                        }
+                    });
+                    setAttrs(newRowAttrs);
+                }
+            });
+        }
+    };
+    
+    function ImportConsequences (runFirstTimeSetup, default_consequences, show_conditions_flag) {
+        var attr = [];
+        attr.push("MildConsequence");
+        attr.push("MildInvoke");
+        attr.push("ModerateConsequence");
+        attr.push("ModerateInvoke");
+        attr.push("SevereConsequence");
+        attr.push("SevereInvoke");
+        
+        getAttrs(attr, function (basicValues) {
+            getSectionIDs("repeating_Cons", function (idArray) {
+                if (idArray.length == 0) {
+                    if (isNullOrWhitespace(basicValues["MildConsequence"])
+                        && isNullOrWhitespace(basicValues["MildInvoke"])
+                        && isNullOrWhitespace(basicValues["ModerateConsequence"])
+                        && isNullOrWhitespace(basicValues["ModerateInvoke"])
+                        && isNullOrWhitespace(basicValues["SevereConsequence"])
+                        && isNullOrWhitespace(basicValues["SevereInvoke"])) {
+                            if (!isNullOrWhitespace(runFirstTimeSetup))
+                                SetDefaultConsequences(default_consequences, show_conditions_flag);
+                            return;
+                        }
+                    
+                    importConsequence(2, basicValues["MildConsequence"], !isNullOrWhitespace(basicValues["MildInvoke"]));
+                    importConsequence(4, basicValues["ModerateConsequence"], !isNullOrWhitespace(basicValues["ModerateInvoke"]));
+                    importConsequence(6, basicValues["SevereConsequence"], !isNullOrWhitespace(basicValues["SevereInvoke"]));
+                    return;
+                }
+            
+                var attrs = [];
+                for (var i = 0; i < idArray.length; i++) {
+                    attrs.push("repeating_Cons_" + idArray[i] + "_conType");
+                    attrs.push("repeating_Cons_" + idArray[i] + "_Consequence");
+                    attrs.push("repeating_Cons_" + idArray[i] + "_Invoke");
+                }
+    
+                getAttrs(attrs, function (repValues) {
+                    importConsequence(2, basicValues["MildConsequence"], !isNullOrWhitespace(basicValues["MildInvoke"]));
+                    importConsequence(4, basicValues["ModerateConsequence"], !isNullOrWhitespace(basicValues["ModerateInvoke"]));
+                    importConsequence(6, basicValues["SevereConsequence"], !isNullOrWhitespace(basicValues["SevereInvoke"]));
+    
+                    for (var i = 0; i < idArray.length; i++) {
+                        var worth = 0;
+                        switch (repValues["repeating_Cons_" + idArray[i] + "_conType"]) {
+                            case "Mild":
+                                worth = 2;
+                                break;
+                            case "Moderate":
+                                worth = 4;
+                                break;
+                            case "Severe":
+                                worth = 6;
+                                break;
+                        }
+                    
+                        importConsequence(worth,
+                            repValues["repeating_Cons_" + idArray[i] + "_Consequence"],
+                            !isNullOrWhitespace(repValues["repeating_Cons_" + idArray[i] + "_Invoke"]));
+                        
+                        removeRepeatingRow("repeating_Cons_" + idArray[i]);
+                    }
+                });
+            });    
+        });
+    };
+    
+    const importConsequence = (worth, aspect, addBonus) => {
+        if (!isNaN(worth) && worth > 0) {
+            var newRowAttrs = {};
+            var newRowId = generateRowID();
+            newRowAttrs["repeating_consequences_" + newRowId + "_worth"] = worth;
+            newRowAttrs["repeating_consequences_" + newRowId + "_aspect"] = aspect;
+            newRowAttrs["repeating_consequences_" + newRowId + "_worth_text"] = getConsequenceText(worth);
+    
+            setAttrs(newRowAttrs);
+    
+            if (addBonus)
+                importSitAspect(aspect, 1);
+        }
+    };
+    
+    function SetDefaultConsequences (default_consequences, show_conditions_flag) {
+        if (!isNullOrWhitespace(default_consequences)) {
+            getSectionIDs("repeating_consequences", function (idArray) {
+                if (idArray.length == 0) {
+                    var consequences = default_consequences.split(",")
+                    var newRowAttrs = {};
+                    consequences.forEach(consequence => {
+                        var elements = consequence.split("|");
+                        var worth = Number(elements[0].trim());
+                        if (!isNaN(worth) && worth > 0) {
+                            var newRowId = generateRowID();
+                            newRowAttrs["repeating_consequences_" + newRowId + "_worth"] = worth;
+    
+                            if (elements.length > 1)
+                                newRowAttrs["repeating_consequences_" + newRowId + "_aspect"] = elements[1];
+                            if (show_conditions_flag == "1")
+                                newRowAttrs["repeating_consequences_" + newRowId + "_worth_text"] = getConditionsText(worth);
+                            else
+                                newRowAttrs["repeating_consequences_" + newRowId + "_worth_text"] = getConsequenceText(worth);
+                        }
+                    });
+                    setAttrs(newRowAttrs);
+                }
+            });
+        }
+    };
+    
+    function ImportNotes () {
+        getAttrs(["Notes"], function (values) {
+            if(isNullOrWhitespace(values["Notes"]))
+                return;
+    
+            var newRowAttrs = {};
+            var newRowId = generateRowID();
+            newRowAttrs["repeating_notes_" + newRowId + "_body"] = values["Notes"];
+    
+            setAttrs(newRowAttrs);
+        });
+    };
+    
     on("change:repeating_consequences:worth", function (eventInfo) {
         getAttrs(["show_conditions_flag"], function (values) {
-            if (values["show_conditions_flag"] == "1")
+            if (!isNullOrWhitespace(values["show_conditions_flag"]))
                 setAttrs({ repeating_consequences_worth_text: getConditionsText(Number(eventInfo.newValue)) });
             else
                 setAttrs({ repeating_consequences_worth_text: getConsequenceText(Number(eventInfo.newValue)) });
@@ -1583,7 +2047,7 @@
                 var newRowAttrs = {};
                 for (var i = 0; i < idArray.length; i++) {
                     var worth = Number(values["repeating_consequences_" + idArray[i] + "_worth"]);
-                    if (eventInfo.newValue == "1")
+                    if (!isNullOrWhitespace(eventInfo.newValue))
                         newRowAttrs["repeating_consequences_" + idArray[i] + "_worth_text"] = getConditionsText(worth);
                     else
                         newRowAttrs["repeating_consequences_" + idArray[i] + "_worth_text"] = getConsequenceText(worth);
@@ -1751,7 +2215,7 @@
     
         if (Number(eventInfo.newValue) == 2) {
             getAttrs(["repeating_stunts_bonusShifts"], function (values) {
-                if (values["repeating_stunts_bonusShifts"] == "") {
+                if (isNullOrWhitespace(values["repeating_stunts_bonusShifts"])) {
                     var description = getShiftText(2);
                     setAttrs({ repeating_stunts_bonusShiftsText: description, repeating_stunts_bonusShifts: 2 });
                 }
@@ -1927,7 +2391,7 @@
     };
     
     const skillChanged = (skill, skillLevel) => {
-        if (skill == null || skill == "")
+        if (isNullOrWhitespace(skill))
             return;
     
         if (skillLevel == null || isNaN(skillLevel))
@@ -1948,7 +2412,8 @@
             getAttrs(attrs, function (values) {
                 var editAttrs = {};
                 for (var i = 0; i < idArray.length; i++) {
-                    if (values["repeating_stress_" + idArray[i] + "_bound"] == 1 && values["repeating_stress_" + idArray[i] + "_skill"] == skill) {
+                    if (!isNullOrWhitespace(values["repeating_stress_" + idArray[i] + "_bound"])
+                            && values["repeating_stress_" + idArray[i] + "_skill"] == skill) {
                         editAttrs["repeating_stress_" + idArray[i] + "_shiftLevel"] = skillLevel;
                         editAttrs["repeating_stress_" + idArray[i] + "_shiftLevelText"] = skillLevelDesc;
                     }
@@ -1972,7 +2437,8 @@
             getAttrs(attrs, function (values) {
                 var editAttrs = {};
                 for (var i = 0; i < idArray.length; i++) {
-                    if (values["repeating_stress_" + idArray[i] + "_bound"] == 1 && values["repeating_stress_" + idArray[i] + "_skill"] == skill) {
+                    if (!isNullOrWhitespace(values["repeating_stress_" + idArray[i] + "_bound"])
+                            && values["repeating_stress_" + idArray[i] + "_skill"] == skill) {
                         editAttrs["repeating_stress_" + idArray[i] + "_usable"] = getStressMax(skillLevel);
                     }
                 }
@@ -1981,4 +2447,6 @@
             });
         });
     }
+    
+    const isNullOrWhitespace = (attr) => !(attr && attr.trim() && attr.trim() != "0");
 </script>
