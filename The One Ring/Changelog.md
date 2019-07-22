@@ -14,11 +14,6 @@ Versions have three numbers Major.Minor.Release
 * added "Mounts' for Loremaster and Adversary sheets
 * added background for Loremaster and Adversary sheets to better fit with the new PC sheet
  
-### Bug fixes and minor changes
-* reinstate translations overwritten by initial merge to Roll20 master
-* add roll20userid details for sheet authors
-* change asset locations to reference roll20 master repository, not fork
-
 ## 2.0.1
 
 ### Bug fixes and minor changes

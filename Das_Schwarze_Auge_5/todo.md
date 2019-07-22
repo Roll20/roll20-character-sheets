@@ -10,6 +10,7 @@
 
 ### Features
  * Kampf zu Pferd / Streitwagen (eigenen Tab erstellen?)
+ * Belastung automatisch berechnen / Auswählbar / Hausregel 
 
 ### Inhalte
  * Nutzung von Parierwaffen
