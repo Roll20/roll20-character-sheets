@@ -12,6 +12,6 @@ You can contact me via deceptive.duality#6358 on Discord or through Roll20.
 
 ### 1.0
 
-* Initial sheet release containing all playbooks, legion roles, and
+- Initial sheet release containing all playbooks, legion roles, and
   Chosen/Broken
-* Roll templates are still a work in progress and will be replaced
+- All-new roll templates, courtesy of Tim Denee.
