@@ -36,6 +36,12 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ## Changelog
 
+### 2.4.2
+
+* Remove incorrect title text from uncommitted Magic Effort
+* Fix HP rolls for Heroic Characters looking at the wrong attribute
+* Fix the version upgrade code stopping early and thus not change the version number on the sheet.
+
 ### 2.4.1
 
 * Fix Innate AC missing translation key.
