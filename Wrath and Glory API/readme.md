@@ -38,7 +38,7 @@ v4.0. Refine Inline rolls
 
 ### Changelog
 
-** July 30th, 2019: version 2.7 - Dice overhaul + fixes, updates, and enhancements** 
+** July 28th, 2019: version 2.7 - Dice overhaul + fixes, updates, and enhancements** 
 
 Updates:
 1. Cosmetic change: changed all dice to D6; teal buttons roll wrath, black/gold/red buttons have no wrath die.
