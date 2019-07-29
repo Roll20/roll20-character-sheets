@@ -20,6 +20,7 @@
 			"tech_medical", "tech_postech", "tech_pretech", "tech_psitech", "vehicle_air", "vehicle_grav",
 			"vehicle_land", "vehicle_space", "vehicle_water", "dummy"],
 		psionic: ["biopsionics", "metapsionics", "precognition", "telekinesis", "telepathy", "teleportation"],
+		magic: ["know_magic", "use_magic", "sunblade"],
 	};
 
 //- We have foci in two locations, so they are outsourced to this mixin
@@ -94,6 +95,7 @@ input(type="hidden", name="attr_homebrew_skill_list", value="revised").skills-ty
 input(type="hidden", name="attr_setting_super_type", value="psionics").super-type
 input(type="hidden", name="attr_setting_foci_location", value="left").foci-loc
 input(type="hidden", name="attr_setting_skill_query", value="hover").skills-query
+input(type="hidden", name="attr_magic_type", value="arcanist").magic-type
 
 //- Core
 .core.core-info.cols-2
@@ -135,9 +137,9 @@ input(type="hidden", name="attr_setting_skill_query", value="hover").skills-quer
 		.main-content
 			+text-input-duo("HP", "HP_max", false, {value: "0"}).important
 				.label
-					button.unstyled-button(type="roll", name="roll_HP", data-i18n="HIT_POINTS" value!="&{template:swn-default} {{charname=@{name}}} {{title=^{HIT_POINTS}}} {{ =[[{@{level}d6 + @{level}*@{constitution_mod}[CON] + @{level}*@{extra_hp_query}, @{hp|max} + 1d1}kh1 ]]}} {{info=^{MAXIMUM_HP_1} @{level}d6 + @{level}&ast;[[@{constitution_mod}[CON] + @{extra_hp_query}]] ^{MAXIMUM_HP_2} [[@{hp|max} + 1]]}}")
+					button.unstyled-button(type="roll", name="roll_HP", data-i18n="HIT_POINTS" value!="&{template:swn-default} {{charname=@{name}}} {{title=^{HIT_POINTS}}} {{=[[{abs(@{setting_heroic_enable}-1)*@{level}d6 + @{level}*@{constitution_mod}[CON] + @{level}*@{extra_hp_query}, abs(@{setting_heroic_enable}-1)*@{hp|max} + 1d1, 0d0 + @{setting_heroic_enable}*ceil(([[6*@{level}]] [Level] + [[@{level}*@{constitution_mod}]] [Con] + [[@{level}*@{extra_hp_query}]] [Bonus])/2)}kh1]]}} {{info=^{MAXIMUM_HP_1} @{level}d6 + @{level}&ast;[[@{constitution_mod}[CON] + @{extra_hp_query}]] ^{MAXIMUM_HP_2} [[@{hp|max} + 1]]}}")
 			+text-input-duo("strain", "strain_max", "SYSTEM_STRAIN", {value: "10", readonly: true, "data-i18n-title": "CONSTITUTION"})(min="0", value="0")
-			+text-input("strain_permanent", "PERMANENT_STRAIN")(type="number", min="0", value="0").center
+			+text-input-duo("strain_permanent_extra", "strain_permanent", "PERMANENT_STRAIN", {readonly: true, "data-i18n-title": "PERMANENT_STRAIN"})(type="number", min="0", value="0", data-i18n-title="TOTAL_CYBERWARE_STRAIN").center
 			+text-input-duo("xp", "xp_next", "XP_NEXT_LEVEL", {min: "0", value: "3"})(min="0", value="0")
 			+text-input("AC", "ARMOR_CLASS")(type="number", value="10", readonly, data-i18n-title="AC_DESC").center
 			+text-input("attack_bonus", "ATTACK_BONUS")(type="number", min="0", value="0").center
@@ -273,7 +275,9 @@ input(type="hidden", name="attr_setting_skill_query", value="hover").skills-quer
 							option.skills-first(value="@{skill_combat_projectile}", data-i18n="COMBAT_PROJECTILE")
 							option.skills-first(value="@{skill_combat_psitech}", data-i18n="COMBAT_PSITECH")
 							option.skills-first(value="@{skill_combat_unarmed}", data-i18n="COMBAT_UNARMED")
-							option(value="@{skill_telekinesis}", data-i18n="TELEKINESIS")
+							option.skills-psionics(value="@{skill_telekinesis}", data-i18n="TELEKINESIS")
+							option.skills-magic(value="@{skill_sunblade}", data-i18n="SUNBLADE")
+							option.skills-magic(value="@{skill_fight}", data-i18n="FIGHT")
 							option(value="0", data-i18n="NONE")
 					+text-input("weapon_skill_bonus", "SKILL_AB").weapon-skill.skills-neither.center
 					+fake-text-input("ATTRIBUTE").attribute.center
@@ -442,36 +446,81 @@ input(type="hidden", name="attr_setting_skill_query", value="hover").skills-quer
 							textarea.details(name="attr_technique_description", data-i18n-placeholder="DESCRIPTION")
 			.magic
 				.skill-container
-					+makeSkill("magic")
+					+makeSkill("know_magic")
+					+makeSkill("use_magic")
+					+makeSkill("sunblade")
+					+makeSkill("fight")
 					input(type="hidden", name="attr_skill_magic2_name", value="").empty-hider
 					+makeSkill("magic2", true)
 				.skills-repeating
 					fieldset.repeating_magic-skills
 						+makeSkill("", true)
-				.spells.grey-box.simple-repsection
-					.flex-center
-						h3(data-i18n="SPELLS")
-						label.details-button
-							input(type="checkbox", name="attr_show_spell_details", value="1", checked)
-							span(data-i18n="EXPAND")
-					input(type="hidden", name="attr_show_spell_details", value="1").input-details
-					.flex.edit
-						.name(data-i18n="NAME")
-						.prepared(data-i18n="PREPARED")
-						.damage(data-i18n="DAMAGE")
-					fieldset.repeating_spells
-						button.display.invisible-button(type="roll", name="roll_Spell", value!="&{template:swn-default} {{charname=@{name}}} {{title=@{spell_name}}} {{info=^{SPELL}}} {{desc=@{spell_description}}} {{damage=[[@{spell_damage}]]}}")
-						.display
-							.name.flex-center
-								span(name="attr_spell_name")
-								span.prepared #[span(data-i18n="PREPARED")]:
-								input.prepared(type="number", name="attr_spell_prepared", value="0", min="0")
-							.details #[span(name="attr_spell_description")]
-						.edit.flex-wrap
-							input.name(type="text", name="attr_spell_name")
-							input.prepared(type="number", name="attr_spell_prepared", value="0", min="0")
-							input.damage(type="text", name="attr_spell_damage", value="0")
-							textarea.details(name="attr_spell_description")
+				h3(data-i18n="TYPE_OF_MAGIC")
+				select(name="attr_magic_type")
+					option(value="arcanist" data-i18n="ARCANIST")
+					option(value="magister" data-i18n="MAGISTER")
+					option(value="adept" data-i18n="ADEPT")
+				.adept
+					.magic-effort.grey-box
+						h3(data-i18n="MAGIC_EFFORT")
+						+text-input("magic_total_effort", "TOTAL")(type="number", value="0", min="0").center
+						+text-input("magic_committed_effort_current", "CURRENT")(type="number", value="0", min="0").center
+						+text-input("magic_committed_effort_scene", "SCENE")(type="number", value="0", min="0").center
+						+text-input("magic_committed_effort_day", "DAY")(type="number", value="0", min="0").center
+						+text-input("magic_uncommitted_effort", "UNCOMMITTED")(type="number", value="1", readonly).center
+					.spells.grey-box.simple-repsection
+						.flex-center
+							h3(data-i18n="ABILITIES")
+							label.details-button
+								input(type="checkbox", name="attr_show_spell_details", value="1", checked)
+								span(data-i18n="EXPAND")
+						input(type="hidden", name="attr_show_spell_details", value="1").input-details
+						.flex.edit
+							.name(data-i18n="NAME")
+						fieldset.repeating_abilities
+							button.display.invisible-button(type="roll", name="roll_Ability", value!="&{template:swn-default} {{charname=@{name}}} {{title=@{ability_name}}} {{info=^{ABILITY}}} {{desc=@{ability_description}}}")
+							.display
+								.name.flex-center
+									span(name="attr_ability_name")
+								.details #[span(name="attr_ability_description")]
+							.edit.flex-wrap
+								input.name(type="text", name="attr_ability_name")
+								textarea.details(name="attr_ability_description")
+				.spellcaster
+					.spell-slots.grey-box
+						h3(data-i18n="SPELL_SLOTS")
+						+text-input("spell-slots-first-level", "FIRST_LEVEL")(type="number", value="0", min="0").center
+						+text-input("spell-slots-second-level", "SECOND_LEVEL")(type="number", value="0", min="0").center
+						+text-input("spell-slots-third-level", "THIRD_LEVEL")(type="number", value="0", min="0").center
+						+text-input("spell-slots-fourth-level", "FOURTH_LEVEL")(type="number", value="0", min="0").center
+						+text-input("spell-slots-fifth-level", "FIFTH_LEVEL")(type="number", value="0", min="0").center
+					.spells.grey-box.simple-repsection
+						.flex-center
+							h3(data-i18n="SPELLS")
+							label.details-button
+								input(type="checkbox", name="attr_show_spell_details", value="1", checked)
+								span(data-i18n="EXPAND")
+						input(type="hidden", name="attr_show_spell_details", value="1").input-details
+						.flex.edit
+							.name(data-i18n="NAME")
+							.level(data-i18n="LEVEL")
+							.prepared.arcanist(data-i18n="PREPARED")
+							.damage(data-i18n="DAMAGE")
+						fieldset.repeating_spells
+							button.display.invisible-button(type="roll", name="roll_Spell", value!="&{template:swn-default} {{charname=@{name}}} {{title=@{spell_name}}} {{info=^{SPELL}}} {{desc=@{spell_description}}} {{damage=[[@{spell_damage}]]}}")
+							.display
+								.name.flex-center
+									span(name="attr_spell_name")
+									span(name="attr_spell_level")
+									span.prepared.arcanist #[span(data-i18n="PREPARED")]:
+									input.prepared.arcanist(type="number", name="attr_spell_prepared", value="0", min="0")
+								.details #[span(name="attr_spell_description")]
+							.edit.flex-wrap
+								input.name(type="text", name="attr_spell_name")
+								input.level(type="number", name="attr_spell_level", value="0", min="0")
+								input.prepared.arcanist(type="number", name="attr_spell_prepared", value="0", min="0")
+								input.damage(type="text", name="attr_spell_damage", value="0")
+								textarea.details(name="attr_spell_description")
 
 .column
 	//- Skills
@@ -695,7 +744,7 @@ input(type="hidden", name="attr_setting_skill_query", value="hover").skills-quer
 					.enc-bonus(data-i18n="+STR")
 					.status(data-i18n="STATUS")
 				.armor-grid.rep-grid.edit
-					+text-input("innate_ac_name")(value="Innate AC").col-2
+					+text-input("innate_ac_name")(value="Innate AC", data-i18n="INNATE_AC").col-2
 					+text-input("innate_ac")(type="number", value="10").center
 				input(type="hidden", name="attr_show_armor_details", value="1").input-details
 				fieldset.repeating_armor
@@ -728,7 +777,8 @@ input(type="hidden", name="attr_setting_skill_query", value="hover").skills-quer
 							textarea(name="attr_armor_description")
 			.cyberware.simple-repsection.grey-box
 				.flex-center
-					h3(data-i18n="CYBERWARE")
+					h3
+						| #[span(data-i18n="CYBERWARE")] – #[span(data-i18n="TOTAL_CYBERWARE_STRAIN")] #[span(name="attr_cyberware_strain_total")]
 					label.details-button
 						input(type="checkbox", name="attr_show_cyberware_details", value="1", checked)
 						span(data-i18n="EXPAND")
