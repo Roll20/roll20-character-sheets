@@ -3,7 +3,7 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.4.1";
+	const sheetVersion = "2.4.2";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -2861,7 +2861,7 @@
 			}
 		});
 	};
-	const calculateDroneAttack = (prefixes) => {
+	const calculateDroneAttack = (prefixes, callback) => {
 		const sourceAttrs = prefixes.reduce((m, prefix) => {
 			return m.concat([
 				`${prefix}_drone_weapon1_ab`,
@@ -2889,7 +2889,7 @@
 					});
 				return m;
 			}, {});
-			mySetAttrs(setting, v);
+			mySetAttrs(setting, v, callback);
 		});
 	};
 
@@ -3041,9 +3041,12 @@
 			 *  Regenerate drone and weapon ABs
 			 **/
 			else if (major == 2 && (minor < 3 || (minor == 3 && patch == 0))) {
+				const upgradeFunction = _.after(1, () => {
+					upgradeSheet("2.3.1");
+				});
 				generateWeaponDisplay();
 				getSectionIDs("repeating_drones", idArray => {
-					calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`));
+					calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`), upgradeFunction);
 				});
 			}
 			/** Final upgrade clause, always leave this around */
