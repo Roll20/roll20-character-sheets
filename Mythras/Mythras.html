@@ -41,6 +41,7 @@
     <input type="checkbox" class="battle-units-enabled-toggle hidden" name="attr_battle_units_enabled" value="1">
     <input type="checkbox" class="extended-conflict-toggle hidden" name="attr_extended_conflict_enabled" value="1">
     <input type="checkbox" class="simplified-combat-toggle hidden" name="attr_simplified_combat_enabled" value="1">
+    <input type="checkbox" class="social-conflict-enabled-toggle hidden" name="attr_social_conflict_enabled" value="1">
     <input type="checkbox" class="reach-enabled-toggle hidden" name="attr_reach_enabled" value="1" checked>
     <input type="checkbox" class="boating-standard-toggle hidden" name="attr_boating_standard" value="1">
     <input type="checkbox" class="status-standard-toggle hidden" name="attr_status_standard" value="1">
@@ -184,6 +185,14 @@
             <option value="default" data-i18n="use-setting-default-u" selected>Use Setting Default</option>
                 <option value="0" data-i18n="no-u">No</option>
                 <option value="1" data-i18n="yes-u">Yes</option>
+        </select>
+        <br>
+
+        <span i18n-data="social-conflict-enabled-u">Social Conflict Enabled</span>:
+        <select name="attr_social_conflict_enabled_option">
+            <option value="default" data-i18n="use-setting-default-u" selected>Use Setting Default</option>
+            <option value="0" data-i18n="no-u">No</option>
+            <option value="1" data-i18n="yes-u">Yes</option>
         </select>
         <br>
 
@@ -2847,6 +2856,106 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Social Conflict -->
+                <div class="social-conflict section social-conflict-enabled">
+                    <input type="checkbox" class="section-toggle" name="attr_social_conflict_section_toggle" value="1" checked>
+                    <h3 class="section-toggle" data-i18n="social-conflict-u">Social Conflict</h3>
+                    <div class="section-toggle">
+                        <div class="social-conflict-skill-col">
+                            <div class="header"><span data-i18n="attack-skill-u">Attack Skill</span></div>
+                            <div><input type="text" class="full-width" name="attr_social_attack_skill"></div>
+                            <div class="header"><span data-i18n="defense-skill-u">Defense Skill</span></div>
+                            <div><input type="text" class="full-width" name="attr_social_defense_skill"></div>
+                        </div>
+                        <div class="social-conflict-attribute-col">
+                            <div class="social-attribute-row">
+                                <div class="social-attribute-label header"><span data-i18n="attribute-u">Attribute</span></div>
+                                <div class="social-attribute-number header"><span data-i18n="temp-u">Temp</span></div>
+                                <div class="social-attribute-number header"><span data-i18n="total-u">Total</span></div>
+                            </div>
+                            <div data-i18n-list="social-conflict-attribute-order">
+                                <div data-i18n-list-item="confidence">
+                                    <div class="social-attribute-row">
+                                        <div class="social-attribute-label"><span data-i18n="confidence-u">Confidence</span>:</div>
+                                        <div class="social-attribute-number"><input type="number" class="full-width" name="attr_confidence_temp" value="0"></div>
+                                        <div class="social-attribute-number"><input type="text" class="full-width total" name="attr_confidence" value="1" readonly></div>
+                                    </div> <input type="checkbox" class="details-toggle" name="attr_confidence_details"><span class="details-toggle"></span>
+                                    <div class="details">
+                                        <div><span data-i18n="base-u">Base</span>: <input type="number" name="attr_confidence_base" value="0" readonly></div>
+                                        <div><span data-i18n="other-u">Other</span>: <input type="number" name="attr_confidence_other" value="0"></div>
+                                    </div>
+                                </div>
+                                <div data-i18n-list-item="damage">
+                                    <div class="social-attribute-row">
+                                        <div class="social-attribute-label"><button type="roll" class="reduced-size no-dice" name="roll_social_damage" value="@{roll_display}&{template:weapon} {{name=^{social-damage-u}}} @{name_display} {{damage=[[@{social_damage}]]}}" data-i18n="damage-u">Damage</button>:</div>
+                                        <div class="social-attribute-number"><input type="number" class="full-width" name="attr_social_damage_temp" value="0"></div>
+                                        <div class="social-attribute-number"><input type="text" class="full-width total" name="attr_social_damage" value="0"></div>
+                                    </div> <input type="checkbox" class="details-toggle" name="attr_social_damage_details"><span class="details-toggle"></span>
+                                    <div class="details">
+                                        <div><span data-i18n="other-u">Other</span>: <input type="number" name="attr_social_damage_other" value="0"></div>
+                                    </div>
+                                </div>
+                                <div data-i18n-list-item="initiative">
+                                    <div class="social-attribute-row">
+                                        <div class="social-attribute-label"><button type="roll" class="reduced-size no-dice" name="roll_social_initiative" value="@{roll_display}&{template:default} {{name=^{social-initiative-u}}} @{name_display} {{^{rolled-u}=[[@{init_dice} + @{social_initiative} &{tracker}]]}}" data-i18n="initiative-u">Initiative</button>:</div>
+                                        <div class="social-attribute-number"><input type="number" class="full-width" name="attr_social_initiative_temp" value="0"></div>
+                                        <div class="social-attribute-number"><input type="number" class="full-width total" name="attr_social_initiative" value="12" readonly></div>
+                                    </div> <input type="checkbox" class="details-toggle" name="attr_social_initiative_details"><span class="details-toggle"></span>
+                                    <div class="details">
+                                        <div><span data-i18n="base-u">Base</span>: <input type="number" name="attr_social_initiative_base" value="12" readonly></div>
+                                        <div><span data-i18n="other-u">Other</span>: <input type="number" name="attr_social_initiative_other" value="0"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="social-conflict-resolution-pool-col">
+                            <div class="resolution-pool-row">
+                                <div class="resolution-pool-number header">1d12</div>
+                                <div class="resolution-pool-label header"><span data-i18n="resolution-pool-u">Resolution Pool</span></div>
+                                <div class="resolution-pool-number header"><span data-i18n="temp-u">Temp</span></div>
+                                <div class="resolution-pool-total header"><span data-i18n="total-u">Total</span></div>
+                            </div>
+                            <div class="resolution-pool-row">
+                                <div class="resolution-pool-number"><input type="number" class="resolution-pool-table-number" name="attr_composure_table_start" value="1"/>-<input type="number" class="resolution-pool-table-number" name="attr_composure_table_end" value="4"/></div>
+                                <div class="resolution-pool-label bottom-border"><span data-i18n="composure-u">Composure</span></div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_composure_temp" value="0"></div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_composure" value="4"></div>
+                                <div class="resolution-pool-symbol">/</div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_composure_max" value="4" readonly></div>
+                            </div> <input type="checkbox" class="details-toggle" name="attr_composure_details"><span class="details-toggle"></span>
+                            <div class="details">
+                                <div><span data-i18n="base-u">Base</span>: <input type="number" name="attr_composure_base" value="4" readonly></div>
+                                <div><span data-i18n="other-u">Other</span>: <input type="number" name="attr_composure_other" value="0"></div>
+                            </div>
+                            <div class="resolution-pool-row">
+                                <div class="resolution-pool-number"><input type="number" class="resolution-pool-table-number" name="attr_integrity_table_start" value="5"/>-<input type="number" class="resolution-pool-table-number" name="attr_integrity_table_end" value="8"/></div>
+                                <div class="resolution-pool-label bottom-border"><span data-i18n="integrity-u">Integrity</span></div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_integrity_temp" value="0"></div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_integrity" value="4"></div>
+                                <div class="resolution-pool-symbol">/</div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_integrity_max" value="4" readonly></div>
+                            </div> <input type="checkbox" class="details-toggle" name="attr_integrity_details"><span class="details-toggle"></span>
+                            <div class="details">
+                                <div><span data-i18n="base-u">Base</span>: <input type="number" name="attr_integrity_base" value="4" readonly></div>
+                                <div><span data-i18n="other-u">Other</span>: <input type="number" name="attr_integrity_other" value="0"></div>
+                            </div>
+                            <div class="resolution-pool-row">
+                                <div class="resolution-pool-number"><input type="number" class="resolution-pool-table-number" name="attr_resolve_table_start" value="9"/>-<input type="number" class="resolution-pool-table-number" name="attr_resolve_table_end" value="12"/></div>
+                                <div class="resolution-pool-label bottom-border"><span data-i18n="resolve-u">Resolve</span></div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_resolve_temp" value="0"></div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_resolve" value="5"></div>
+                                <div class="resolution-pool-symbol">/</div>
+                                <div class="resolution-pool-number"><input type="number" name="attr_resolve_max" value="5" readonly></div>
+                            </div> <input type="checkbox" class="details-toggle" name="attr_resolve_details"><span class="details-toggle"></span>
+                            <div class="details">
+                                <div><span data-i18n="base-u">Base</span>: <input type="number" name="attr_resolve_base" value="5" readonly></div>
+                                <div><span data-i18n="other-u">Other</span>: <input type="number" name="attr_resolve_other" value="0"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
         
@@ -7368,6 +7477,32 @@
                 </div>
             </div>
 
+            <!-- Mook/Compact Social Conflict-->
+            <div class="social-conflict-enabled" style="padding-left: 10px">
+                <input type="checkbox" class="mook-section-toggle" name="attr_social_conflict_section_toggle" value="1" checked>
+                <h5 class="mook-section-toggle header-bar bold" data-i18n="social-conflict-u">Social Conflict</h5>
+                <div class="mook-section-toggle">
+                    <div>
+                        <div class="mook-skilllabel-col"><span class="italic underlined" data-i18n="skills-u">Skills</span>:</div>
+                        <div class="mook-skilllist-col"><span class="bold" data-i18n="attack-u">Attack</span>: <input type="text" name="attr_social_attack_skill">, <span class="bold" data-i18n="defense-u">Defense</span>: <input type="text" name="attr_social_defense_skill"></div>
+                    </div>
+                    <div class="mook-skilllabel-col"><span class="italic underlined" data-i18n="attributes-u">Attributes</span>:</div>
+                    <div class="mook-skilllist-col" data-i18n-list="social-conflict-attribute-order">
+                        <div data-i18n-list-item="confidence" class="mook-btn"><span class="bold" data-i18n="confidence-u">Confidence</span>: <input type="number" class="number-width" name="attr_confidence" readonly></div>
+                        <div data-i18n-list-item="damage" class="mook-btn"><button type="roll" class="reduced-size no-dice" name="roll_social_damage" value="@{roll_display}&{template:weapon} {{name=^{social-damage-u}}} @{name_display} {{damage=[[@{social_damage}]]}}"><span class="bold" data-i18n="damage-u">Damage</span></button>: <input type="text" class="number-width text-align-center" name="attr_social_damage"></div>
+                        <div data-i18n-list-item="initiative" class="mook-btn"><button type="roll" class="reduced-size no-dice" name="roll_social_initiative" value="@{roll_display}&{template:default} {{name=^{social-initiative-u}}} @{name_display} {{^{rolled-u}=[[@{init_dice} + @{social_initiative} &{tracker}]]}}"><span class="bold" data-i18n="initiative-u">Initiative</span></button>: <input type="number" class="number-width" name="attr_social_initiative" readonly></div>
+                    </div>
+                    <div>
+                        <div class="mook-skilllabel-col"><span class="italic underlined" data-i18n="resolution-pools-u">Resolution Pools</span>:</div>
+                        <div class="mook-skilllist-col">
+                            <div class="mook-btn"><span class="bold" data-i18n="composure-u">Composure</span>: <input type="number" class="number-width" name="attr_composure">/<input type="number" class="number-width" name="attr_composure_max" readonly></div>,
+                            <div class="mook-btn"><span class="bold" data-i18n="integrity-u">Integrity</span>: <input type="number" class="number-width" name="attr_integrity">/<input type="number" class="number-width" name="attr_integrity_max" readonly></div>,
+                            <div class="mook-btn"><span class="bold" data-i18n="resolve-u">Resolve</span>: <input type="number" class="number-width" name="attr_resolve">/<input type="number" class="number-width" name="attr_resolve_max" readonly></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Mook/Compact Skills-->
             <div style="padding-left: 10px">
                 <div class="spacer"></div>
@@ -8980,6 +9115,51 @@
         });
     };
     on("change:cha_base change:cha_training change:cha_ageing change:cha_other change:cha_temp", function() { calc_cha(); });
+
+    // Composure Auto Calc
+    var calc_composure = function() {
+        getAttrs(["pow", "composure", "composure_max", "composure_other", "composure_temp"], function(v) {
+            var base_value = Math.ceil(parseInt(v.pow)/3);
+            var new_composure_max = base_value + parseInt(v.composure_other) + parseInt(v.composure_temp);
+            var diff_composure_max = new_composure_max - parseInt(v.composure_max);
+            setAttrs({
+                composure_base: base_value,
+                composure_max: new_composure_max,
+                composure: parseInt(v.composure) + diff_composure_max
+            });
+        });
+    }
+    on("change:pow change:composure_other change:composure_temp", function() { calc_composure(); });
+
+    // Integrity Auto Calc
+    var calc_integrity = function() {
+        getAttrs(["cha", "integrity", "integrity_max", "integrity_other", "integrity_temp"], function(v) {
+            var base_value = Math.ceil(parseInt(v.cha)/3);
+            var new_integrity_max = base_value + parseInt(v.integrity_other) + parseInt(v.integrity_temp);
+            var diff_integrity_max = new_integrity_max - parseInt(v.integrity_max);
+            setAttrs({
+                integrity_base: base_value,
+                integrity_max: new_integrity_max,
+                integrity: parseInt(v.integrity) + diff_integrity_max
+            });
+        });
+    }
+    on("change:cha change:integrity_other change:integrity_temp", function() { calc_integrity(); });
+
+    // Resolve Auto Calc
+    var calc_resolve = function() {
+        getAttrs(["int", "resolve", "resolve_max", "resolve_other", "resolve_temp"], function(v) {
+            var base_value = Math.ceil(parseInt(v.int)/3);
+            var new_resolve_max = base_value + parseInt(v.resolve_other) + parseInt(v.resolve_temp);
+            var diff_resolve_max = new_resolve_max - parseInt(v.resolve_max);
+            setAttrs({
+                resolve_base: base_value,
+                resolve_max: new_resolve_max,
+                resolve: parseInt(v.resolve) + diff_resolve_max
+            });
+        });
+    }
+    on("change:int change:resolve_other change:resolve_temp", function() { calc_resolve(); });
     
     // Action Points Auto Calc
     var calc_action_points = function() {
@@ -9051,6 +9231,18 @@
     };
     on("change:dex change:int change:pow change:action_points_temp change:action_points_add_one change:action_points_other change:fatigue change:spirit change:action_points_calc", function() { calc_action_points(); });
 
+    // Confidence Auto Calc
+    var calc_confidence = function() {
+        getAttrs(["willpower_experience", "willpower_other", "willpower_temp", "pow"], function(v) {
+            var pow = parseInt(v.pow);
+            var willpower = pow + pow + parseInt(v.willpower_experience) + parseInt(v.willpower_other) + parseInt(v.willpower_temp);
+
+            setAttrs({
+                confidence: Math.floor(willpower/20)
+            });
+        });
+    };
+    on("change:willpower_experience change:willpower_other change:willpower_temp change:pow", function() { calc_confidence(); });
 
     // Spirit Damage Auto Calc + spirit_pow_max
     var calc_spirit_damage = function() {
@@ -9223,6 +9415,19 @@
         });
     };
     on("change:dex change:str change:int change:cha change:athletics_experience change:athletics_other change:athletics_temp change:initiative_add_one_tenth_athletics change:initiative_bonus_temp change:armor_penalty change:fatigue change:initiative_bonus_other change:spirit", function() { calc_initiative(); });
+
+    // Social Initiative Auto Calc
+    var calc_social_initiative = function() {
+        getAttrs(["int", "cha", "social_initiative_temp", "social_initiative_other"], function(v) {
+            var base_value = Math.ceil((parseInt(v.int) + parseInt(v.cha)) / 2);
+            var social_initiative = base_value + parseInt(v.social_initiative_temp) + parseInt(v.social_initiative_other);
+            setAttrs({
+                social_initiative_base: base_value,
+                social_initiative: social_initiative,
+            });
+        });
+    };
+    on("change:int change:cha change:social_initiative_temp change:social_initiative_other", function() { calc_social_initiative(); });
 
     // Spirit Intensity Auto Calc
     var calc_spirit_intensity = function() {
@@ -11399,6 +11604,16 @@
                 setAttrs({version: "2.5"});
                 versioning();
             }
+            else if(v["version"] === "2.5") {
+                console.log("upgrading to v2.6");
+                calc_confidence();
+                calc_social_initiative();
+                calc_composure();
+                calc_integrity();
+                calc_resolve();
+                setAttrs({version: "2.6"});
+                versioning();
+            }
             else {
                 console.log("Sheet fully updated");
             }
@@ -11406,7 +11621,7 @@
     }
     
     var campaign_options = function() {
-        getAttrs(["setting_option", "luck_points_rank_option", "herculean_mod_option", "battle_units_enabled_option", "vehicle_type_option", "extended_conflict_enabled_option", "simplified_combat_enabled_option", "action_points_calc_option", "magic_points_enabled_option", "power_points_enabled_option", "prana_points_enabled_option", "tenacity_enabled_option", "spirits_enabled_option", "luther_arkwright_style_option", "m_space_style_option", "odd_soot_style_option", "boating_standard_option", "status_standard_option", "strangeness_standard_option", "superstition_standard_option", "the_soot_standard_option", "linguistics_enabled_option", "dependencies_enabled_option", "peculiarities_enabled_option", "firearms_enabled_option", "reach_enabled_option", "affiliations_enabled_option", "ms_psionics_enabled_option", "os_magic_enabled_option", "roman_magic_enabled_option", "arcane_magic_enabled_option", "divine_magic_enabled_option", "folk_magic_enabled_option", "work_songs_enabled_option", "superpowers_enabled_option", "fae_powers_enabled_option", "folk_magic_range_multiplier_option", "alchemy_enabled_option", "animism_enabled_option", "artifice_enabled_option", "mysticism_enabled_option", "mythras_psionics_enabled_option", "sorcery_enabled_option", "theism_enabled_option", "max_devotional_pool_based_on_option"], function(v) {
+        getAttrs(["setting_option", "luck_points_rank_option", "herculean_mod_option", "battle_units_enabled_option", "vehicle_type_option", "extended_conflict_enabled_option", "simplified_combat_enabled_option", "action_points_calc_option", "magic_points_enabled_option", "power_points_enabled_option", "prana_points_enabled_option", "tenacity_enabled_option", "spirits_enabled_option", "luther_arkwright_style_option", "m_space_style_option", "odd_soot_style_option", "boating_standard_option", "status_standard_option", "strangeness_standard_option", "superstition_standard_option", "the_soot_standard_option", "linguistics_enabled_option", "dependencies_enabled_option", "peculiarities_enabled_option", "firearms_enabled_option", "reach_enabled_option", "social_conflict_enabled_option", "affiliations_enabled_option", "ms_psionics_enabled_option", "os_magic_enabled_option", "roman_magic_enabled_option", "arcane_magic_enabled_option", "divine_magic_enabled_option", "folk_magic_enabled_option", "work_songs_enabled_option", "superpowers_enabled_option", "fae_powers_enabled_option", "folk_magic_range_multiplier_option", "alchemy_enabled_option", "animism_enabled_option", "artifice_enabled_option", "mysticism_enabled_option", "mythras_psionics_enabled_option", "sorcery_enabled_option", "theism_enabled_option", "max_devotional_pool_based_on_option"], function(v) {
             var newoptions = {};
             // Default Setting Configs
             var setting_configs = {
@@ -11450,6 +11665,7 @@
                 sorcery_enabled: "1",
                 theism_enabled: "1",
                 affiliations_enabled: "0",
+                social_conflict_enabled: "0",
                 vehicle_type: "disabled",
                 max_devotional_pool_based_on: "@{rank_devotion_pool_limit}",
             };
@@ -11873,6 +12089,13 @@
                 newoptions["affiliations_enabled"] = setting_configs["affiliations_enabled"];
             } else {
                 newoptions["affiliations_enabled"] = v["affiliations_enabled_option"];
+            }
+
+            // Social Conflict Enabled
+            if(v["social_conflict_enabled_option"] === "default") {
+                newoptions["social_conflict_enabled"] = setting_configs["social_conflict_enabled"];
+            } else {
+                newoptions["social_conflict_enabled"] = v["social_conflict_enabled_option"];
             }
             
             setAttrs(newoptions);
@@ -15494,7 +15717,7 @@
     });
     
     //Set campaign options if any change
-    on("change:setting_option change:vehicle_type_option change:battle_units_enabled_option change:extended_conflict_enabled_option change:simplified_combat_enabled_option change:luck_points_rank_option change:herculean_mod_option change:action_points_calc_option change:magic_points_enabled_option change:power_points_enabled_option change:prana_points_enabled_option change:spirits_enabled_option change:tenacity_enabled_option change:status_standard_option change:strangeness_standard_option change:superstition_standard_option change:the_soot_standard_option change:boating_standard_option change:linguistics_enabled_option change:dependencies_enabled_option change:peculiarities_enabled_option change:firearms_enabled_option change:reach_enabled_option change:affiliations_enabled_option change:roman_magic_enabled_option change:arcane_magic_enabled_option change:divine_magic_enabled_option change:superpowers_enabled_option change:fae_powers_enabled_option change:folk_magic_enabled_option change:work_songs_enabled_option change:folk_magic_range_multiplier_option change:alchemy_enabled_option change:animism_enabled_option change:artifice_enabled_option change:mysticism_enabled_option change:mythras_psionics_enabled_option change:ms_psionics_enabled_option change:os_magic_enabled_option change:sorcery_enabled_option change:theism_enabled_option change:max_devotional_pool_based_on_option", function() {
+    on("change:setting_option change:vehicle_type_option change:battle_units_enabled_option change:extended_conflict_enabled_option change:simplified_combat_enabled_option change:luck_points_rank_option change:herculean_mod_option change:action_points_calc_option change:magic_points_enabled_option change:power_points_enabled_option change:prana_points_enabled_option change:spirits_enabled_option change:tenacity_enabled_option change:status_standard_option change:strangeness_standard_option change:superstition_standard_option change:the_soot_standard_option change:boating_standard_option change:linguistics_enabled_option change:dependencies_enabled_option change:peculiarities_enabled_option change:firearms_enabled_option change:reach_enabled_option change:social_conflict_enabled_option change:affiliations_enabled_option change:roman_magic_enabled_option change:arcane_magic_enabled_option change:divine_magic_enabled_option change:superpowers_enabled_option change:fae_powers_enabled_option change:folk_magic_enabled_option change:work_songs_enabled_option change:folk_magic_range_multiplier_option change:alchemy_enabled_option change:animism_enabled_option change:artifice_enabled_option change:mysticism_enabled_option change:mythras_psionics_enabled_option change:ms_psionics_enabled_option change:os_magic_enabled_option change:sorcery_enabled_option change:theism_enabled_option change:max_devotional_pool_based_on_option", function() {
         console.log("Setting campaign options")
         campaign_options();
     });
