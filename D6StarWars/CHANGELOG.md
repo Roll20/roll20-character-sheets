@@ -1,3 +1,33 @@
+### Version 2.13 (2019-07-23):
+**Fix:**
+
+- Added back strength pip to Soak rolls in the armor section
+- remove duplicate DM roll button from Tech skills
+
+**Features:**
+
+- New sheet section: Character Point summary; meant for tracking how points are used. Includes option to hide section
+- New sheet section: Credit Spenditure summary; meant for tracking how credits are spent. Includes option to hide section
+
+- New sheet modes: **Ship** and **Shop/Container** as new options alongside existing **PC** and **NPC** sheet modes
+
+- Default Settings: All Settings defaults can now be adjusted by GMs in the [Game Settings Menu](https://wiki.roll20.net/Game_Settings_Page#Character_Sheet_Default_Settings) outside the game. Additional settings that can be changed are `Character Points`, `Credits`, `Force Points` 
+
+### Version 2.00 (2019-07-09):
+**Fixes:**
+
+- fixed on/off toggle for gmroll, isn't any longer entangled with other options
+- Attribute section layout fix, shifted it to display 2 attributes per row from previous 3 per row
+
+**Layout:**
+
+- change Energy/Physical armor soak rolls to display icon instead of text to reduce clutter in button name; Energy Bolt for Energy and Star for Physical 
+
+**Features:**
+
+- New option: Now possible to disable the Wild Die from rolls, making the sheet easier to for playing 1E
+- New option: Now possible to disable roll queries from sheet rolls, so button presses rolls dice instantly without asking for roll modifiers
+
 ### Version 1.83 (2019-05-28):
 
 - Removed wound penalties from affecting soak rolls (reported by **Wolf**)
