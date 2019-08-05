@@ -341,7 +341,7 @@
 							<div class="sheet-col-4 sheet-bold">Mod.</div>
 							<div class="sheet-col-4" title="Modificateur de déplacement">
 								<input type="number" name="attr_Deplacement_mod" value="100" />
-							</div>
+							</div>							
 							<div class="sheet-col-4">
 							 	%
 								<input type="checkbox" name="attr_modal_HowToDeplacement" class="sheet-modal" value="1" style="float: right;"><span class="sheet-cog" style="float: right;">?</span>
@@ -373,6 +373,13 @@
 									</div>
 								</div>
 							</div>
+						</div>
+						<div class="sheet-row">
+							<div class="sheet-col-4 sheet-bold">Mod. Temp.</div>
+							<div class="sheet-col-4" title="Modificateur de déplacement">
+								<input class="sheet-autoCalc" type="text" name="attr_stats_mvt_buff" value="0" readonly="readonly" />
+							</div>
+							<div class="sheet-col-4">%</div>
 						</div>
 						<div class="sheet-row">
 							<div class="sheet-col-4 sheet-bold">Rapide</div>
@@ -2627,11 +2634,11 @@
 	// Temp Stats
 	var tempStats = [	"stats_courage", "stats_intelligence", "stats_charisme", "stats_adresse", "stats_force",
 						"stats_attaque", "stats_parade", "stats_jet", "stats_esquive", "stats_fouille",
-						"stats_inge", "stats_magiephy", "stats_magiepsy", "stats_resimagie", "stats_pr" ];
+						"stats_inge", "stats_magiephy", "stats_magiepsy", "stats_resimagie", "stats_pr", "stats_mvt" ];
 	// Buff Stats
 	var buffStats = [	"cou", "int", "cha", "ad", "fo",
 						"at", "prd", "jet", "esq", "fouille",
-						"inge", "mphy", "mpsy", "rm", "pr" ];
+						"inge", "mphy", "mpsy", "rm", "pr", "mvt" ];
 	var prStats = {
 		change: [ "repeating_armures:armure_prphy", "repeating_armures:armure_prmag", "prnat", "stats_pr_buff" ],
 		remove: [ "repeating_armures" ]
@@ -2672,7 +2679,7 @@
 		updatePR();
 	});
 	// Déplacement
-	on("change:prphy change:deplacement_mod change:stats_force_total", function() {
+	on("change:prphy change:deplacement_mod change:stats_force_total change:stats_mvt_buff", function() {
 		updateDeplacement();
 	});
 	// Equive
@@ -2934,7 +2941,7 @@
 
 	// update walk speed when force, deplacement_mod or PR is updated
 	function updateDeplacement() {
-		getAttrs( [ "stats_force_total", "deplacement_mod", "deplacementrapide", "deplacementrapide_duree", "deplacementsprint", "deplacementsprint_duree", "prphy" ], function( sValues ) {
+		getAttrs( [ "stats_force_total", "deplacement_mod", "deplacementrapide", "deplacementrapide_duree", "deplacementsprint", "deplacementsprint_duree", "prphy", "stats_mvt_buff" ], function( sValues ) {
 			var v = structSafeInt( sValues );
 			var prPhy = v[ "prphy" ];
 			var deplacementRapide = v[ "deplacementrapide" ];
@@ -2942,6 +2949,7 @@
 			var deplacementSprint = v[ "deplacementsprint" ];
 			var deplacementSprintDuree = v[ "deplacementsprint_duree" ];
 			var deplacement_mod = v[ "deplacement_mod" ] / 100;
+			var deplacement_temp = v[ "stats_mvt_buff" ] / 100;
 
 			// PR vs Déplacement
 			if( prPhy === 0 || prPhy === 1 ) {
@@ -2980,6 +2988,8 @@
 				deplacementSprint = 2;
 				deplacementSprintDuree = v[ "stats_force_total" ] * 2;
 			}
+			
+			deplacement_mod += deplacement_temp;
 
 			// apply mod
 			deplacementRapide = Math.ceil( deplacementRapide * deplacement_mod * 100 ) / 100;
@@ -3410,7 +3420,7 @@
 		var dataBase = {
 			"simple": [ "personnage_nom", "personnage_origine", "personnage_metiers", "personnage_sex", "personnage_age", "personnage_poids", "personnage_taille", "personnage_notes", "personnage_butins",
 						"ev", "ev_max", "ea", "ea_max", "personnage_niveau", "personnage_xp", "personnage_pointdestin", "bonusdegatssorts",
-						"personnage_langue", "personnage_vision", "personnage_nyctalopie", "personnage_ouie", "personnage_odorat", "personnage_charge_max", "deplacement_mod",
+						"personnage_langue", "personnage_vision", "personnage_nyctalopie", "personnage_ouie", "personnage_odorat", "personnage_charge_max", "deplacement_mod", "stats_mvt_buff",
 						"pr_tete", "pr_bras", "pr_torse", "pr_bouclier", "pr_jambes", "pr_pieds", "pr_mains", "prnat", "prphy", "prmag", "pr", "pr_max", "stats_pr_buff",
 						"bivouac_couverture", "bivouac_couverture_recup", "bivouac_matelas", "bivouac_matelas_recup", "bivouac_tente", "bivouac_tente_recup",
 						"stats_courage", "stats_courage_mod", "stats_courage_temp", "stats_intelligence", "stats_intelligence_mod", "stats_intelligence_temp", "stats_charisme", "stats_charisme_mod", "stats_charisme_temp", "stats_adresse", "stats_adresse_mod", "stats_adresse_temp", "stats_force", "stats_force_mod", "stats_force_temp",
