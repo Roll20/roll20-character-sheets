@@ -1,4 +1,4 @@
-<input type='hidden' name='attr_character_sheet' value='Savage Worlds Tabbed v3.6' />
+<input type='hidden' name='attr_character_sheet' value='Savage Worlds Tabbed v3.7' />
 <script type="text/worker">
     /*----- Things I need to Care For -----
     -- o Option to ignore encumbrance    --
@@ -780,6 +780,22 @@
        }) ;
     });
 
+    //Set Starting Attributes to d6
+    on("change:attsatdsix", function(eventInfo) {
+        let defaultdtype = "4";
+        if(eventInfo.newValue === "1") {
+            console.log("### Set default starting Die Type to d6");
+            defaultdtype = "6";
+        }
+        setAttrs({
+            agility: defaultdtype,
+            smarts: defaultdtype,
+            spirit: defaultdtype,
+            strength: defaultdtype,
+            vigor: defaultdtype
+        });
+    });
+
     const setWildDie = function() {
         getAttrs(["is_npc"], function(lvalue) {
 		    console.log("<==== Updating whether to Roll the Wild Die ====>")
@@ -1011,39 +1027,9 @@
       		}
       		else {
       			console.log("<==Nothing to see here...move along==>");
-      			/*setAttrs({logo: 1,
-      					  background: 1,
-      					  useacademics: 0,
-      					  majorminor: 0});*/
-      		}
-   		});
+            }
+        });
 	});
-
-	// on("sheet:opened change:ppe",function(eventInfo) {
-	//     console.log("New value: "+eventInfo.newValue);
-	//     console.log("Source of change: " +eventInfo.sourceType);
-	//     let PowerPointsLabel = getTranslationByKey('power-points');
-	//     let PPELabel = getTranslationByKey('potential-psychic-energy-abbr-u');
-    //     getAttrs(["ppe"], function(v) {
-	//         if(v.ppe === "0") {
-	//             setAttrs({ppelabel: PowerPointsLabel});
-    // 	    }
-    // 	    else {
-    // 	        setAttrs({ppelabel: PPELabel});
-    // 	    }
-    //     });
-	// });
-
-	// on("change:useisp",function(eventInfo) {
-	//     console.log("New Value: "+eventInfo.newValue);
-	//     if(eventInfo.newValue === "on") {
-	//         setAttrs({spacer: " || "});
-	//     }
-	//     else {
-	//         console.log("ISP is turned off");
-	//         setAttrs({spacer: " "});
-	//     }
-	// });
 
 	//Set Rank according to the XP value
 	on("change:xp change:rank change:usexp change:setrank", function() {
@@ -1621,34 +1607,6 @@
                                 //Armor Stacks
                                 stackCalc += Math.floor(aProtection*aStack);
                             }
-							/*if(aProtection > highestNonStack) {
-							    console.log("!!! Worn Armor Covers Torso and protection is Higher than current highest Armor value");
-							    console.log("!!! Highest Value: "+highestNonStack);
-							    console.log("!!! Current Value: "+ aProtection);
-							    stackCalc = Math.floor(highestNonStack*highestStack);
-							    console.log("!!! "+highestNonStack+" times "+highestStack);
-							    console.log("!!! Previous Highest Armor Value Now: "+stackCalc);
-							    stackProtection += stackCalc;
-							    previousHighest = highestNonStack;
-							    previousStack = highestStack;
-							    console.log("!!! Move highest stack to Previous: "+previousHighest);
-							    console.log("!!! Move highest Stack to Previous: "+previousStack);
-							    highestNonStack = aProtection;
-							    highestStack = aStack;
-							    console.log("Highest Armor: "+highestNonStack);
-							    console.log("Highest Stack "+ highestStack);
-							    console.log("Stack Protection: "+stackProtection);
-							}
-							else if(aProtection === highestNonStack) {
-							    console.log("!!! Worn Armor has the same protection value of current highest--doesn't count");
-							}
-							else {
-							    console.log("!!! Worn Armor Covers Torso and protection is lower than current highest Armor value");
-							    stackCalc = Math.floor(aProtection*aStack);
-							    stackProtection += stackCalc;
-							    console.log("Highest Armor: "+highestNonStack);
-							    console.log("Stack Protection: "+stackProtection);
-							}*/
 						}
 					}
 				}
@@ -2646,6 +2604,27 @@
         });
     });
 
+    const showhidelist = ["showhidetalismans"];
+    showhidelist.forEach(showhidelist => {
+        on(`clicked:${showhidelist}`, function() {
+            getAttrs([`${showhidelist}att`], function(v) {
+                let sattrs = {};
+                let value = v[`${showhidelist}att`];
+                if(value === "J") {
+                    sattrs[`${showhidelist}att`] = "E";
+                    console.log("Set to E");
+                }
+                else {
+                    sattrs[`${showhidelist}att`] = "J";
+                    console.log("Set to J");
+                }
+                console.log("Setting: " + JSON.stringify(sattrs));
+                setAttrs(sattrs);
+            });
+        });
+    });
+
+
 	console.log("Make sure Skill Names have been set");
 	const skillnamelist = ["fighting","academics","athletics","battle","boating","climbing","common-knowledge","driving","electronics","faith","focus","gambling","guts","hacking","healing","intimidation","investigation","native-language","lockpicking","notice","occult","performance","persuasion","piloting","psionics","repair","research","riding","ritual","science","shooting","spellcasting","stealth","streetwise","survival","swimming","taunt","thievery","throwing","tracking","weirdscience"];
 	skillnamelist.forEach(skillnamelist => {
@@ -3087,6 +3066,11 @@
                         //add armor
                         charderived += `(@{ntoughnessArmor})`;
                     }
+                    if(dstatlab === "Strain") {
+                        console.log("Derived Stat: " + derivedstats[a]);
+                        //display Max
+                        charderived += ` of @{Strain_max}`;
+                    }
                 }
                 else { console.log("Not needed for stat block");}
             }
@@ -3218,7 +3202,7 @@
                             console.log("Spec Check: "+speccheck);
                             if (speccheck === "racial") {
                                 //Special ability
-                                charspecabilities += `<li>**@{${hindrancerow[c]}hindrance}:** @{${hindrancerow[c]}hindrancedescription}</li>`
+                                charspecabilities += `<li>**@{${hindrancerow[c]}hindrance}:** @{${hindrancerow[c]}hindrancedescription}</li>`;
                             }
                             else {
                                 //hindrance
@@ -3235,7 +3219,7 @@
                             evalval = edgerow[c]+"tookat";
                             if (v[evalval].toLowerCase() === "racial") {
                                 //Special ability
-                                charspecabilities += `<li>**@{${edgerow[c]}edge}:** @{${edgerow[c]}edgedescription}</li>`
+                                charspecabilities += `<li>**@{${edgerow[c]}edge}:** @{${edgerow[c]}edgedescription}</li>`;
                             }
                             else {
                                 //edge
@@ -3474,7 +3458,7 @@
                         <div>
                             <span data-i18n="wild-card">Wild Card</span>&nbsp;&nbsp;<label class='sheet-switch'><input type="checkbox" name="attr_is_npc" value="1" /><span class="sheet-slider sheet-round"></span></label>&nbsp;&nbsp;<span data-i18n="extra">Extra</span>
                             <span class='sheet-xpRank'>
-                                <input type="checkbox" class="sheet-useXP" name="attr_usexplabel" style="display: none;" value="1" />
+                                <input type="checkbox" class="sheet-useXPLabel" name="attr_usexp" checked style="display: none;" value="1" />
                                 <input type="checkbox" class="sheet-useClass" name="attr_ThreatRatingClass" value="1" style="display: none;" />
 								<input type="checkbox" class="sheet-useThreatRating" name="attr_ThreatRatingClass" value="2" style="display:none;" />
 								<label class='sheet-xplabel sheet-trackXP' data-i18n="experience-points-abbr-u">XP</label><label class='sheet-xplabel sheet-advances' data-i18n="advances">Advances</label> / <label class='sheet-ranklabel sheet-useRank' data-i18n="rank">Rank</label><label class='sheet-ranklabel sheet-trackClass' data-i18n="class">Class</label><label class='sheet-ranklabel sheet-trackThreat' data-i18n="threat">Threat</label>
@@ -5638,7 +5622,7 @@
                             <input type="checkbox" class="sheet-hideAdv" name="attr_hideAdv" /><span class="sheet-showhide"></span>
                             <div class='sheet-base sheet-advancements'>
                                 <div class="sheet-xp">
-                                    <input type="checkbox" class="sheet-useXP" name="attr_useXP" style="display: none;" value="1" />
+                                    <input type="checkbox" class="sheet-useXPLabel" name="attr_usexp" checked style="display: none;" value="1" />
                                     <h4 class='sheet-trackXP' data-i18n="experience-points-abbr-u">XP</h4>
                                     <h4 class='sheet-advances' data-i18n="advance">Advance</h4>
                                 </div>
@@ -6158,6 +6142,33 @@
     					</div><!-- End Powers -->
     					<hr class="sheet-sectionSeperator" />
 					</div>
+                    <!-- ----------------- -->
+                    <!-- Talismans Section -->
+                    <!-- ----------------- -->
+                    <input class='sheet-useTalismans' type='checkbox' name='attr_talismans' value='1' style='width: 15px; display: none;' />
+                    <div class="sheet-talismans">
+                        <input type="hidden" class="sheet-newshowhide" name="attr_showhidetalismansatt" value="J" />
+                        <div class="sheet-buttonwrapper"><button type="action" name="act_showhidetalismans" class="sheet-showhidebutton"><span name="attr_showhidetalismansatt"></span></button></div>
+                        <h1 class="sheet-gearcolHeader" data-i18n="talismans" style="margin-top: 0px;">Talismans</h1>
+                        <div class="sheet-talismansection">
+                            <div class="sheet-talismanrow">
+                                <h4 class="sheet-repeatingHeader sheet-activate">&nbsp;</h4>
+                                <h4 class="sheet-repeatingHeader sheet-talisman" data-i18n="talisman">Talisman</h4>
+                                <h4 class="sheet-repeatingHeader sheet-actpenalty" data-i18n="activation-penalty">Activation Penalty</h4>
+                                <h4 class="sheet-repeatingHeader sheet-talismaneffect" data-i18n="effect">Effect</h4>
+                            </div>
+                            <fieldset class="repeating_talismans">
+                                <div class="sheet-talismanrow">
+                                    <button class="sheet-activate" type='roll' name='roll_tActivation' title="@{repeating_talismans_$#_tActivation}" value='&{template:roll} @{rolltActivation} @{setmodsenc} @{showtraitmods}'></button>
+                                    <input class="sheet-talisman" type="text" placeholder="Item/Power" name="attr_Talisman" title="@{repeating_talismans_$#_Talisman}" />
+                                    <input class="sheet-actpenalty" type="text" name="attr_actpen" title="@{repeating_talismans_$#_actpen}" />
+                                    <textarea class="sheet-talismaneffect" name="attr_teffect" title="@{repeating_talismans_$#_teffect}" data-i18n-placeholder="effects-notes"  placeholder="Effect/Notes/..."></textarea>
+                                    <input type='hidden' name='attr_rolltActivation' value="{{name=@{character_name}}} {{trait=^{activate-talisman}}} {{source=@{Talisman}}} {{skill_rank=@{agility_display} }} {{actpenalty=[[1d0+@{actpen}]]}} {{skill_roll=[[@{agility_rank} + @{agrollMod} + @{actpen} [Activation Penalty] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance, Distracted] + @{traitmods} ]] }} {{wild_die_rank=@{wilddie}}} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{agilitymod} + @{agrollMod} + @{actpen} [Activation Penalty] + @{ModSumEnc}[Wounds, Fatigue, Encumbrance] + @{traitmods} ]]}}" />
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <!-- End Talismans -->
 					<input type="checkbox" class="sheet-hideArmor" name="attr_hideArmor" /><span class="sheet-showNhide"></span>
 					<h1 class="sheet-gearcolHeader" data-i18n="armor">Armor</h1>
 					<div class="sheet-armor">
@@ -6411,7 +6422,7 @@
                         <input type="checkbox" class="sheet-hideAdv" name="attr_hideAdv" style="display: none;" />
                         <div class='sheet-base sheet-jadvancements'>
                             <div class="sheet-xp">
-                                <input type="checkbox" class="sheet-useXP" name="attr_useXP" style="display: none;" value="1" />
+                                <input type="checkbox" class="sheet-useXP" name="attr_usexp" checked style="display: none;" value="1" />
                                 <h4 class='sheet-trackXP' data-i18n="experience-points-abbr-u">XP</h4>
                                 <h4 class='sheet-advances' data-i18n="advance">Advance</h4>
                             </div>
@@ -7395,6 +7406,7 @@
 							<option value="2">Atk^ always roll max (no roll query)</option>
 						</select>
                         <label class='sheet-miscItem'><input type='checkbox' class="sheet-advanceonjournal" name='attr_advanceonjournal' /> <span data-i18n="move-advances-to-journal-tab">Move Advances to the Journal Tab</span></label>
+                        <label class='sheet-miscItem'><input type="checkbox" class="sheet-attsatdsix" name="attr_attsatdsix" value="1" style="width: 15px;"> <span data-i18n="start-attributes-at-d6-not-d4">Start Attributes at d6 instead of d4</span></label>
     			        <label class='sheet-miscItem'><input type="checkbox" class="sheet-hideArcanum" name="attr_ArcanumTab" style="width: 15px;"> <span data-i18n="hide-powers-section">Hide Powers Section</span></label>
     			        <label class='sheet-miscItem'><input type="checkbox" name="attr_promptmods" title="Wounds, Fatigue, Distracted, and Encumbrance are not part of Misc. Modifiers and are accounted for automatically" /> <span data-i18n="prompt-modifiers-text">Prompt for Misc. Modifiers</span></label>
 						<label class='sheet-miscItem'><input type="checkbox" name="attr_useBGPhysicalDesc" checked /> <span data-i18n="show-background-description">Show Background and Description</span></label>
@@ -7431,7 +7443,7 @@
                         <label class='sheet-miscItem'>
             			    <span data-i18n="wild-card-icon">Wild Card Icon</span>: <input type='text' class="sheet-wci" name='attr_WCI' maxlength="2" />
             			</label>
-            			<label class="sheet-miscItem"><button type="roll" class="sheet-APIOutput" name="roll_apifield" value="!deal-init --help">i</button><span data-i18n="api-initiative-edge">API Iniative Edges</span> <input class="sheet-standard" type="text" title="@{InitEdges}" name="attr_InitEdges"/></label>
+            			<label class="sheet-miscItem"><button type="roll" class="sheet-APIOutput" name="roll_apifield" value="!deal-init --help">i</button><span data-i18n="api-initiative-edge">API Iniative Edges</span> <input class="sheet-standard" style='width: 150px;' type="text" title="@{InitEdges}" name="attr_InitEdges"/></label>
     			    </div>
     			</div>
     			<div class='sheet-configSection'>
@@ -7481,7 +7493,7 @@
     			        <!-- End of Hiddent Fields for Power Labels -->
     			        <!--Species--><label class="sheet-fnItem" data-i18n-title="species-race-text" title="Can be used for Sci-Fi settings like The Last Parsec, or any setting where Species is used instead of Race."><input type="checkbox" class="sheet-useSpecies" name="attr_tlpSpecies" style="width: 15px;" /><span data-i18n="species-race">Species (Race)</span></label>
     					<!--Threat Rating--><label class="sheet-fnItem" data-i18n-title="threat-rating-rank-text" title="Change the Rank designation to Threat Rating ala Necessary Evil."><input type="checkbox" class="sheet-useThreatRating" name="attr_ThreatRatingClass" value="2" style="width: 15px;" /><span data-i18n="threat-rating-rank">Threat Rating (Rank)</span></label>
-    					<!--XP--><label class="sheet-fnItem" data-i18n-title="experience-points-text" title="Change the Advances designation used to determine rank to XP."><input type="checkbox" class="sheet-useXP" name="attr_usexplabel" value="1" checked /><span data-i18n="experience-points-abbr-u-advances">XP (Advances)</span></label>
+    					<!--XP--><!--<label class="sheet-fnItem" data-i18n-title="experience-points-text" title="Change the Advances designation used to determine rank to XP."><input type="checkbox" class="sheet-useXP" name="attr_usexplabel" value="1" checked /><span data-i18n="experience-points-abbr-u-advances">XP (Advances)</span></label>-->
     			    </div>
     			</div>
                 <div class='sheet-configSection'>
@@ -7566,13 +7578,13 @@
     			    <div class="sheet-srmconfig">
     			        <label class="sheet-srmItem" data-i18n-title="use-charisma"><input type="checkbox" class="sheet-useCharisma" name="attr_usecharisma" checked /><span data-i18n="use-charisma">Use Charisma</span></label>
     				    <label class="sheet-srmItem" data-i18n-title="power-pointless"><input type="checkbox" class="sheet-NoPP" name="attr_NoPPRule" /><span data-i18n="no-power-points">No Power Points</span></label>
-    				    <label class="sheet-srmItem" data-i18n-title="use-xp"><input type="checkbox" class="sheet-usexp" name="attr_usexp" checked /><span data-i18n="use-xp">Use Experience Points</span></label>
+    				    <label class="sheet-srmItem" data-i18n-title="use-xp"><input type="checkbox" class="sheet-usexp" name="attr_usexp" value="1" checked /><span data-i18n="use-xp">Use Experience Points</span></label>
                         <label class="sheet-srmItem" data-i18n-title="gritty-damage"><input type='checkbox' class="sheet-usegritty" name='attr_gritty' value="{{getgritty=gritty}}" /> <span data-i18n="use-gritty-damage">Use Gritty Damage</span></label>
                         <input type='checkbox' class="sheet-usegritty" name='attr_gritty' value="{{getgritty=gritty}}" style="display: none;" />
                         <label class="sheet-srmItem sheet-injurytable" data-i18n-title="injury-table-name">Injury Table Name: <input type='text' class="sheet-injury" name="attr_injurytablename" /></label>
                         <label class="sheet-srmItem" data-i18n-title="use-xp"><input type="checkbox" name="attr_setrank" /><span data-i18n="manually-set-rank">Manually set Rank</span></label>
                         <label class="sheet-srmItem"><input type="checkbox" class="sheet-useCharisma" name="attr_paceignoreswounds" /><span data-i18n="pace-ignores-wounds">Pace Ignores Wounds</span></label>
-						<input type="checkbox" class="sheet-usexp" name="attr_usexp" style="display: none;" checked />
+						<input type="checkbox" class="sheet-usexp" name="attr_usexp" value="1" style="display: none;" checked />
     				    <label class="sheet-srmItem sheet-xpmod" data-i18n-title="roll-for-extra-xp-left-text"><input type='checkbox' name='attr_bennies' class='sheet-Bennies' value='1' /><span data-i18n="roll-extra-xp-for-bennies">Roll XP for un-/spent Bennies</span></label>
     				    <label class="sheet-srmItem" data-i18n-title="variable-bonus-damage-die"><input type="checkbox" class="sheet-useRaiseHB" name="attr_RaiseHBRule" value="1" /><span data-i18n="variable-bonus-damage-raise-based">Variable Bonus Damage (Raise based)</span></label>
 						<label class="sheet-srmItem" data-i18n-title="variable-bonus-damage-die"><input type="checkbox" class="sheet-useRaiseHB" name="attr_RaiseHBRule" value="2" /><span data-i18n="variable-bonus-damage-edge-based">Variable Bonus Damage (Edge based)</span></label>
@@ -8054,7 +8066,7 @@
 		</div>
 		{{#^rollTotal() mods 0}}
 		<div class="sheet-templateModifiers">
-			{{#^rollTotal() showtt 0}}Misc. Modifers: {{ttmod}}{{/^rollTotal() showtt 0}}{{#^rollTotal() showwounds 0}} Wounds: {{wounds}}{{/^rollTotal() showwounds 0}}{{#^rollTotal() showfatigue 0}} Fatigue: {{fatigue}}{{/^rollTotal() showfatigue 0}}{{#^rollTotal() showdistracted 0}} Distracted: {{distracted}}{{/^rollTotal() showdistracted 0}}{{#^rollTotal() showenc 0}} Enc: {{encumbrance}}{{/^rollTotal() showenc 0}}
+			{{#^rollTotal() showtt 0}}Misc. Modifers: {{ttmod}}{{/^rollTotal() showtt 0}}{{#^rollTotal() showwounds 0}} Wounds: {{wounds}}{{/^rollTotal() showwounds 0}}{{#^rollTotal() showfatigue 0}} Fatigue: {{fatigue}}{{/^rollTotal() showfatigue 0}}{{#^rollTotal() showdistracted 0}} Distracted: {{distracted}}{{/^rollTotal() showdistracted 0}}{{#^rollTotal() showenc 0}} Enc: {{encumbrance}}{{/^rollTotal() showenc 0}}{{#^rollTotal() actpenalty 0}} Activation Penalty: {{actpenalty}}{{/^rollTotal() actpenalty 0}}
 		</div>
 		{{/^rollTotal() mods 0}}
 		{{#notes}}
@@ -8179,7 +8191,7 @@
         {{#chargear}}<div class="sheet-bodsection">**<span data-i18n="gear">Gear</span>**: {{chargear}}</div>{{/chargear}}
         {{#charhindrances}}<div class="sheet-bodsection">**<span data-i18n="hindrances">Hindrances</span>**: {{charhindrances}}</div>{{/charhindrances}}
         {{#charedges}}<div class="sheet-bodsection">**<span data-i18n="edges">Edges</span>**: {{charedges}}</div>{{/charedges}}
-		{{#rollGreater() showspec 0}}{{#charspecabilities}}<div class="sheet-bodsection">**<span data-i18n="special-abilities">Special Abilities</span>**:<br /><ul>{{charspecabilities}}</ul></div>{{/charspecabilities}}{{/rollGreater() showspec 0}}
+		{{#rollGreater() showspec 0}}{{#charspecabilities}}<div class="sheet-bodsection">**<span data-i18n="special-abilities">Special Abilities</span>**:<!--<br />--><ul>{{charspecabilities}}</ul></div>{{/charspecabilities}}{{/rollGreater() showspec 0}}
 		{{#rollGreater() powercount 0}}<div class="sheet-bodsection">{{charpowers}}</div>{{/rollGreater() powercount 0}}
     </div>
 </rolltemplate>
