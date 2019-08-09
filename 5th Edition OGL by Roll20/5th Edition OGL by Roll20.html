@@ -6433,7 +6433,7 @@
         });
     });
 
-    on("change:repeating_inventory:itemweight change:repeating_inventory:itemcount change:cp change:sp change:ep change:gp change:pp change:encumberance_setting change:size change:carrying_capacity_mod", function() {
+    on("change:repeating_inventory:itemweight change:repeating_inventory:itemcount change:cp change:sp change:ep change:gp change:pp change:encumberance_setting change:size change:carrying_capacity_mod change:repeating_inventory:equipped", function() {
         update_weight();
     });
 
@@ -9191,11 +9191,13 @@
     const update_weight = function() {
         let update = {};
         let wtotal = 0;
+        let count = 0;
         let weight_attrs = ["cp","sp","ep","gp","pp","encumberance_setting","strength","size","carrying_capacity_mod","speed_max","speed","advantagetoggle"];
         getSectionIDs("repeating_inventory", (idarray) => {
             _.each(idarray, (currentID, i) => {
                 weight_attrs.push(`repeating_inventory_${currentID}_itemweight`);
                 weight_attrs.push(`repeating_inventory_${currentID}_itemcount`);
+                weight_attrs.push(`repeating_inventory_${currentID}_equipped`);
             });
             getAttrs(weight_attrs, (v) => {
                 if (v["speed_max"] === undefined) {
@@ -9210,7 +9212,12 @@
                 wtotal = wtotal + ((coinWeight) / 50);
 
                 _.each(idarray, (currentID, i) => {
-                    if (v[`repeating_inventory_${currentID}_itemweight`] && isNaN(parseInt(v[`repeating_inventory_${currentID}_itemweight`], 10)) === false) {
+                    if (
+                                v[`repeating_inventory_${currentID}_itemweight`] 
+                            &&  v[`repeating_inventory_${currentID}_equipped`] === '1'
+                            &&  isNaN(parseInt(v[`repeating_inventory_${currentID}_itemweight`], 10)) === false)
+                    {
+                        console.log('INSIDE IF')
                         count = v[`repeating_inventory_${currentID}_itemcount`] && isNaN(parseFloat(v[`repeating_inventory_${currentID}_itemcount`])) === false ? parseFloat(v[`repeating_inventory_${currentID}_itemcount`]) : 1;
                         wtotal = wtotal + (parseFloat(v[`repeating_inventory_${currentID}_itemweight`]) * count);
                     }
