@@ -294,7 +294,7 @@
         // === SKILLS
         const updateSkill = function(id,attr,callback) {
             console.log(`%c Update skill ${attr}`, "color:purple;font-size:14px;");
-            let fields = ["level"];
+            let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["skills_fields"].map(field => `${id}_${field}`));
             getAttrs(fields, (v) => {
                 let update_ability = true;
@@ -310,20 +310,22 @@
         };
         const calcSkill = function(attr, values, update_ability = false) {
             let update = {};
-            update[`${attr}_ability`] = getSelectAbilityModifier(attr, values, update_ability);
-            update[`${attr}_proficiency`] = calcProficiency(values[`${attr}_rank`], values["level"]);
-            update[attr] = (parseInt(update[`${attr}_ability`]) || 0)
-                + (parseInt(update[`${attr}_proficiency`]) || 0)
-                + (parseInt(values[`${attr}_item`]) || 0)
-                + (parseInt(values[`${attr}_armor`]) || 0)
-                + (parseInt(values[`${attr}_temporary`]) || 0);
+            if((values["sheet_type"] || "").toLowerCase() != "npc") {
+                update[`${attr}_ability`] = getSelectAbilityModifier(attr, values, update_ability);
+                update[`${attr}_proficiency`] = calcProficiency(values[`${attr}_rank`], values["level"]);
+                update[attr] = (parseInt(update[`${attr}_ability`]) || 0)
+                    + (parseInt(update[`${attr}_proficiency`]) || 0)
+                    + (parseInt(values[`${attr}_item`]) || 0)
+                    + (parseInt(values[`${attr}_armor`]) || 0)
+                    + (parseInt(values[`${attr}_temporary`]) || 0);
+            }
             return update;
         };
 
         // === SAVES
         const updateSave = function(id, attr, callback) {
             console.log(`%c Update save ${attr}`, "color:purple;font-size:14px;");
-            let fields = ["level"];
+            let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["saves_fields"].map(field => `${id}_${field}`));
             getAttrs(fields, (v) => {
                 let update_ability = true;
@@ -339,19 +341,21 @@
         };
         const calcSave = function(attr, values, update_ability = false) {
             let update = {};
-            update[`${attr}_ability`] = getSelectAbilityModifier(attr, values, update_ability);
-            update[`${attr}_proficiency`] = calcProficiency(values[`${attr}_rank`], values["level"]);
-            update[attr] = (parseInt(update[`${attr}_ability`]) || 0)
-                + (parseInt(update[`${attr}_proficiency`]) || 0)
-                + (parseInt(values[`${attr}_item`]) || 0)
-                + (parseInt(values[`${attr}_temporary`]) || 0);
+            if((values["sheet_type"] || "").toLowerCase() != "npc") {
+                update[`${attr}_ability`] = getSelectAbilityModifier(attr, values, update_ability);
+                update[`${attr}_proficiency`] = calcProficiency(values[`${attr}_rank`], values["level"]);
+                update[attr] = (parseInt(update[`${attr}_ability`]) || 0)
+                    + (parseInt(update[`${attr}_proficiency`]) || 0)
+                    + (parseInt(values[`${attr}_item`]) || 0)
+                    + (parseInt(values[`${attr}_temporary`]) || 0);
+            }
             return update;
         };
 
         // === ARMOR CLASS (AC)
         const updateArmorClass = function(id, attr, callback) {
             console.log(`%c Update AC ${attr}`, "color:purple;font-size:14px;");
-            let fields = ["level"];
+            let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["ac_fields"].map(field => `${id}_${field}`));
             getAttrs(fields, (v) => {
                 let update_ability = true;
@@ -367,30 +371,32 @@
         };
         const calcArmorClass = function(attr, values, update_ability = false) {
             let update = {}, ability = 0;
-            // Ability modifier
-            ability = getSelectAbilityModifier(attr, values, update_ability);
-            update[`${attr}_ability`] = ability;
-            // Managing armor cap
-            ability = Math.min(ability,parseInt((values[`${attr}_cap`] || "99")));
-            // Proficieny
-            update[`${attr}_proficiency`] = calcProficiency(values[`${attr}_dc_rank`], values["level"]);
-            // AC
-            update[attr] = (parseInt(values[`${attr}_dc_base`]) || 10)
-                + ability
-                + (parseInt(update[`${attr}_proficiency`]) || 0)
-                + (parseInt(values[`${attr}_item`]) || 0)
-                + (parseInt(values[`${attr}_temporary`]) || 0);
-            // Shield
-            update[`${attr}_shield`] = (parseInt(update[attr]) || 10)
-                + (parseInt(values[`${attr}_shield_ac_bonus`]) || 0)
-                + (parseInt(values[`${attr}_shield_temporary`]) || 0);
+            if((values["sheet_type"] || "").toLowerCase() != "npc") {
+                // Ability modifier
+                ability = getSelectAbilityModifier(attr, values, update_ability);
+                update[`${attr}_ability`] = ability;
+                // Managing armor cap
+                ability = Math.min(ability,parseInt((values[`${attr}_cap`] || "99")));
+                // Proficieny
+                update[`${attr}_proficiency`] = calcProficiency(values[`${attr}_dc_rank`], values["level"]);
+                // AC
+                update[attr] = (parseInt(values[`${attr}_dc_base`]) || 10)
+                    + ability
+                    + (parseInt(update[`${attr}_proficiency`]) || 0)
+                    + (parseInt(values[`${attr}_item`]) || 0)
+                    + (parseInt(values[`${attr}_temporary`]) || 0);
+                // Shield
+                update[`${attr}_shield`] = (parseInt(update[attr]) || 10)
+                    + (parseInt(values[`${attr}_shield_ac_bonus`]) || 0)
+                    + (parseInt(values[`${attr}_shield_temporary`]) || 0);
+            }
             return update;
         };
 
         // === HIT POINTS (HP)
         const updateHitPoints = function(attr, callback) {
             console.log(`%c Update HP ${attr}`, "color:purple;font-size:14px;");
-            let fields = ["level"];
+            let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["hit_points"]);
             getAttrs(fields, (v) => {
                 setAttrs(calcHitPoints(v), {silent: true}, () => {
@@ -402,14 +408,16 @@
         };
         const calcHitPoints = function(values) {
             let update = {};
-            update["hit_points_max"] = (parseInt(values[`hit_points_ancestry`]) || 0)
-                + ((
-                    (parseInt(values[`hit_points_class`]) || 0)
-                    +
-                    (parseInt(values[`constitution_modifier`]) || 0)
-                 ) * (parseInt(values[`level`]) || 1))
-                + (parseInt(values[`hit_points_other`]) || 0)
-                + (parseInt(values[`hit_points_item`]) || 0);
+            if((values["sheet_type"] || "").toLowerCase() != "npc") {
+                update["hit_points_max"] = (parseInt(values[`hit_points_ancestry`]) || 0)
+                    + ((
+                        (parseInt(values[`hit_points_class`]) || 0)
+                        +
+                        (parseInt(values[`constitution_modifier`]) || 0)
+                    ) * (parseInt(values[`level`]) || 1))
+                    + (parseInt(values[`hit_points_other`]) || 0)
+                    + (parseInt(values[`hit_points_item`]) || 0);
+            }
             return update;
         };
 
@@ -432,7 +440,7 @@
         };
         const calcAttack = function(id, values, update_ability = false) {
             let update = {};
-            if((values["sheet_type"] || "").toLowerCase() === "character") {
+            if((values["sheet_type"] || "").toLowerCase() != "npc") {
                 // Ability modifiers handling
                 let weapon_ability = getSelectAbilityModifier(`${id}_weapon`, values, update_ability);
                 update[`${id}_weapon_ability`] = weapon_ability;
@@ -495,7 +503,7 @@
         // === PERCEPTION
         const updatePerception = function(attr, callback) {
             console.log(`%c Update perception ${attr}`, "color:purple;font-size:14px;");
-            let fields = ["level"];
+            let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["perception"]);
             getAttrs(fields, (v) => {
                 let update_ability = true;
@@ -511,19 +519,21 @@
         };
         const calcPerception = function(values, update_ability = false) {
             let update = {};
-            update["perception_ability"] = getSelectAbilityModifier("perception", values, update_ability);
-            update["perception_proficiency"] = calcProficiency(values["perception_rank"], values["level"]);
-            update["perception"] = (parseInt(update["perception_ability"]) || 0)
-                + (parseInt(update["perception_proficiency"]) || 0)
-                + (parseInt(values["perception_item"]) || 0)
-                + (parseInt(values["perception_temporary"]) || 0);
+            if((values["sheet_type"] || "").toLowerCase() != "npc") {
+                update["perception_ability"] = getSelectAbilityModifier("perception", values, update_ability);
+                update["perception_proficiency"] = calcProficiency(values["perception_rank"], values["level"]);
+                update["perception"] = (parseInt(update["perception_ability"]) || 0)
+                    + (parseInt(update["perception_proficiency"]) || 0)
+                    + (parseInt(values["perception_item"]) || 0)
+                    + (parseInt(values["perception_temporary"]) || 0);
+            }
             return update;
         };
 
         // === CLASS DC
         const updateClassDc = function(attr, callback) {
             console.log(`%c Update Class DC ${attr}`, "color:purple;font-size:14px;");
-            let fields = ["level"];
+            let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["class_dc"]);
             getAttrs(fields, (v) => {
                 let update_ability = true;
@@ -539,20 +549,22 @@
         };
         const calcClassDc = function(values, update_ability = false) {
             let update = {};
-            update["class_dc_key_ability"] = getSelectAbilityModifier("class_dc_key", values, update_ability);
-            update["class_dc_proficiency"] = calcProficiency(values["class_dc_rank"], values["level"]);
-            update["class_dc"] = 10
-                + (parseInt(update["class_dc_key_ability"]) || 0)
-                + (parseInt(update["class_dc_proficiency"]) || 0)
-                + (parseInt(values["class_dc_item"]) || 0)
-                + (parseInt(values["class_dc_temporary"]) || 0);
+            if((values["sheet_type"] || "").toLowerCase() != "npc") {
+                update["class_dc_key_ability"] = getSelectAbilityModifier("class_dc_key", values, update_ability);
+                update["class_dc_proficiency"] = calcProficiency(values["class_dc_rank"], values["level"]);
+                update["class_dc"] = 10
+                    + (parseInt(update["class_dc_key_ability"]) || 0)
+                    + (parseInt(update["class_dc_proficiency"]) || 0)
+                    + (parseInt(values["class_dc_item"]) || 0)
+                    + (parseInt(values["class_dc_temporary"]) || 0);
+            }
             return update;
         };
 
         // === SPELL ATTACKS
         const updateSpellAttack = function(attr, callback) {
             console.log(`%c Update spell attack ${attr}`, "color:purple;font-size:14px;");
-            let fields = ["level"];
+            let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["spell_attack"]);
             getAttrs(fields, (v) => {
                 let update_ability = true;
@@ -569,18 +581,20 @@
         };
         const calcSpellAttack = function(values, update_ability = false) {
             let update = {};
-            update["spell_attack_key_ability"] = getSelectAbilityModifier("spell_attack_key", values, update_ability);
-            update["spell_attack_proficiency"] = calcProficiency(values["spell_attack_rank"], values["level"]);
-            update["spell_attack"] = (parseInt(update["spell_attack_key_ability"]) || 0)
-                + (parseInt(update["spell_attack_proficiency"]) || 0)
-                + (parseInt(values["class_dc_tspell_attack_temporaryemporary"]) || 0);
+            if((values["sheet_type"] || "").toLowerCase() != "npc") {
+                update["spell_attack_key_ability"] = getSelectAbilityModifier("spell_attack_key", values, update_ability);
+                update["spell_attack_proficiency"] = calcProficiency(values["spell_attack_rank"], values["level"]);
+                update["spell_attack"] = (parseInt(update["spell_attack_key_ability"]) || 0)
+                    + (parseInt(update["spell_attack_proficiency"]) || 0)
+                    + (parseInt(values["spell_attack_temporary"]) || 0);
+            }
             return update;
         };
 
         // === SPELL DC
         const updateSpellDc = function(attr, callback) {
             console.log(`%c Update spell DC ${attr}`, "color:purple;font-size:14px;");
-            let fields = ["level"];
+            let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["spell_dc"]);
             getAttrs(fields, (v) => {
                 let update_ability = true;
@@ -596,21 +610,23 @@
         };
         const calcSpellDc = function(values, update_ability = false) {
             let update = {};
-            update["spell_dc_key_ability"] = getSelectAbilityModifier("spell_dc_key", values, update_ability);
-            update["spell_dc_proficiency"] = calcProficiency(values["spell_dc_rank"], values["level"]);
-            update["spell_dc"] = 10
-                + (parseInt(update["spell_dc_key_ability"]) || 0)
-                + (parseInt(update["spell_dc_proficiency"]) || 0)
-                + (parseInt(values["spell_dc_temporary"]) || 0)
-                // + (parseInt(values["spell_dc_item"]) || 0)
-                ;
+            if((values["sheet_type"] || "").toLowerCase() != "npc") {
+                update["spell_dc_key_ability"] = getSelectAbilityModifier("spell_dc_key", values, update_ability);
+                update["spell_dc_proficiency"] = calcProficiency(values["spell_dc_rank"], values["level"]);
+                update["spell_dc"] = 10
+                    + (parseInt(update["spell_dc_key_ability"]) || 0)
+                    + (parseInt(update["spell_dc_proficiency"]) || 0)
+                    + (parseInt(values["spell_dc_temporary"]) || 0)
+                    // + (parseInt(values["spell_dc_item"]) || 0)
+                    ;
+            }
             return update;
         };
 
         // === SPELLS: MAGIC TRADITIONS
         const updateMagicTradition = function(attr, tradition, callback) {
             console.log(`%c Update Magic Tradition ${tradition} with ${attr}`, "color:purple;font-size:14px;");
-            let fields = ["level"];
+            let fields = ["sheet_type","level"];
             global_attributes_by_category["magic_tradition_fields"].forEach(field => {
                 fields.push(`magic_tradition_${tradition}_${field}`);
             });
@@ -624,7 +640,9 @@
         };
         const calcMagicTradition = function(values, tradition) {
             let update = {};
-            update[`magic_tradition_${tradition}_proficiency`] = calcProficiency(values[`magic_tradition_${tradition}_rank`], values["level"]);
+            if((values["sheet_type"] || "").toLowerCase() != "npc") {
+                update[`magic_tradition_${tradition}_proficiency`] = calcProficiency(values[`magic_tradition_${tradition}_rank`], values["level"]);
+            }
             return update;
         };
 
