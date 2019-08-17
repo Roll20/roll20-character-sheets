@@ -8,7 +8,7 @@
 
 Liebe Abenteurer,
 
-lange habe ich mit mir gerungen, einen eigenen Charakterbogen für DSA 5 zu bauen. Denn der alte Bogen deckt viele Inhalte der aktuellen 5. Edition 1:1 ab. Da aber stetig neue Regelbücher mit neuem Crunch erscheinen, wollte ich einen Charakterbogen erstellen, der eher wie ein Baukastensystem funktioniert. Und anhand dessen man Sonderfertigkeiten, Zabersprüche, Artefakte, Fokusregeln usw. flexibel abbilden kann. Außerdem bietet sich so ein Baukasten auch für Hausregeln an, die per Definition je Gruppe unterschiedlich sind.
+lange habe ich mit mir gerungen, einen eigenen Charakterbogen für DSA 5 zu bauen. Denn der alte Bogen deckt viele Inhalte der aktuellen 5. Edition 1:1 ab. Da aber stetig neue Regelbücher mit neuem Crunch erscheinen, wollte ich einen Charakterbogen erstellen, der eher wie ein Baukastensystem funktioniert. Und anhand dessen man Sonderfertigkeiten, Zaubersprüche, Artefakte, Fokusregeln usw. flexibel abbilden kann. Außerdem bietet sich so ein Baukasten auch für Hausregeln an, die per Definition je Gruppe unterschiedlich sind.
 
 Herausgekommen ist ein neuer Charakterbogen, der anders aussieht und anders funktioniert als wie gewohnt, aber einem mehr Freiheiten lässt und hoffentlich auch mehr Unterstützung und Spaß beim Spielen bringt. Da dieses aber der erste Wurf ist, kann es sein, dass noch Fehler vorhanden oder Dinge noch nicht umgesetzt sind. Bei Fragen oder Feedback wendet euch gerne an mich per Email ( trestolt(at)gmail.com ).
 
@@ -31,30 +31,30 @@ Zuerst wird der Typ der Sonderfertigkeit angegeben. Nach diesem Typ kann später
 In anderen Reitern des Charakterbogens können auch Sonderfertigkeiten mit ihrem Namen sowie der Aktivierungscheckbox angezeigt werden. Das ist nur gedacht, die SF dort zu aktivieren bzw. deaktivieren und ggfs. die geänderten Werte im Bogen besser beobachten zu können.
 
 Beispiel Wochtschlag I :
-...
 
+```
 Kampfsonderfertigkeit Wuchtschlag I
 1. Modifikator  AT -2
 2. Modifikator  TP +2
 
-...
+```
 
 
 Beispiel Vorteil Beidhändig:
 
-...
+```
 
 Vorteil Beidhändig
 1. Modifikator Falsche-Hand-Mod. +4
 
-...
+```
 
 
 
 
 ### Liste der Modifikatoren
 
-...
+```
 
 Eigenschaften
 * Mut
@@ -164,16 +164,16 @@ Magie und Glaube
 * Zauberwirken
 * Göttliches Wirken
 
-...
-
-
+```
 
 ### Status und Talentfertigkeiten
 
-
+Unter Status lassen sich die unterschiedlichen Zunstände eintragen. Entsprechend der Regeln wird maximal eine Obergrenze von -5 auf die Kampfwerte sowie die Talente angerechnet. Bei den Talenten kann anhand der kleinen Checkboxen ausgewählt werden, wann welcher Status bei einer Talentfertigkeit berücksichtigt werden soll. Anhand der Kontexthilfe wird der entsprechende Status beschrieben. Zum Beispiel Belastung wirkt sich nicht auf alle Fertigkeiten aus, entsprechend sind diese per Default nicht angehakt.  Ein bensonderer Status ist Entrückung, der sich je nach Profession sich positiv oder negativ auf eine Talentfertigkeit oder eine Kampftechnik auswirkt. Entsprechend kann an dort bei Entrückung einen Bonus statt eines Malus (Default) auswählen.
 
 
 ### Magie und Götterwirken
+
+
 
 
 ### Ausrüstung
@@ -191,7 +191,11 @@ Magie und Glaube
 
 
 ## Ausblick
-
-
+* Überarbeitung Artefakte
+* Überarbeitung Inventar
+* Einführung von Effekt-Modifkatoren für die Auswirkung von Zaubersprüchen, Liturgien, Artefakten etc. auf den Helden
+* Umschalten des PC-Bogens zu einems NSC-Bogen (eher langfristig)
 
 ## Danksagung
+
+Großer Dank geht an die Entwickler des DSA5 Character Sheet German   Patrick Gebhardt, enhanced by Sönke Holsten, Adam Fedor. Einige Teile des Charakterbogens habe ich von dort übernommen oder mich inspirieren lassen.
