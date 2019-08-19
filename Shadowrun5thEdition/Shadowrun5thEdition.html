@@ -4212,7 +4212,9 @@
 			};
 
 			const textUpdate = (update[`${charSheetAttr}`]) ? "results" : "ignored";
-			setText[`${textUpdate}`] += addFeedback(jsonKeys[key].replace("_"," "), update[`${charSheetAttr}`]);
+			//setText[`${textUpdate}`] += addFeedback(jsonKeys[key].replace("_"," "), update[`${charSheetAttr}`]);
+			const feedbackText = addFeedback(jsonKeys[key].replace("_"," "), update[`${charSheetAttr}`]);
+			(setText[`results`].includes(feedbackText) || setText[`ignored`].includes(feedbackText)) ? false : setText[`${textUpdate}`] += feedbackText;
 
 			console.log(`%c ${charSheetAttr} = ${update[`${charSheetAttr}`]}`, "color: purple; font-weight:bold");
 		});
@@ -4221,8 +4223,18 @@
 		const attributes = character.attributes[1].attribute;
 		attributes.forEach((object) => {
 			const charSheetAttr = attributeKeys[object.name];
-			update[`${charSheetAttr}_base`] = object.base;
-		    update[`${charSheetAttr}_modifier`] = object.total - object.base;
+			if (charSheetAttr === "magic" || charSheetAttr === "resonance") {
+				["magic", "resonance"].forEach((special) => {
+					const flag = (charSheetAttr === `${special}` && update[`flag_special`] === `${special}`) ? true : false;
+					update[`${charSheetAttr}_base`] = (flag) ? object.base : 0;
+					update[`${charSheetAttr}_modifier`] = (flag) ? object.total - object.base : 0;
+				});
+			} else if (charSheetAttr === "edge") {
+				update[`${charSheetAttr}`] = object.base;
+			} else {
+				update[`${charSheetAttr}_base`] = object.base;
+			    update[`${charSheetAttr}_modifier`] = object.total - object.base;
+			};
 		});
 
 		setCharmancerText(setText);
