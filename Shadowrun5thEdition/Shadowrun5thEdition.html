@@ -2923,7 +2923,9 @@
 </div><!-- ~~~~~~~~ End of the NPC sheet ~~~~~~~~ -->
 
 <div class="footer">
-	<span data-i18n="copyrightfooter">The Topps Company, Inc. has sole ownership of the names, logo, artwork, marks, photographs, sounds, audio, video and/or any proprietary material used in connection with the game Shadowrun. The Topps Company, Inc. has granted permission to use such names, logos, artwork, marks and/or any proprietary materials for promotional and informational purposes on its website but does not endorse, and is not affiliated with any official capacity whatsoever.</span><span>Version </span><span name="attr_version"></span>
+	<span data-i18n="copyrightfooter">The Topps Company, Inc. has sole ownership of the names, logo, artwork, marks, photographs, sounds, audio, video and/or any proprietary material used in connection with the game Shadowrun. The Topps Company, Inc. has granted permission to use such names, logos, artwork, marks and/or any proprietary materials for promotional and informational purposes on its website but does not endorse, and is not affiliated with any official capacity whatsoever.
+	</span>
+	<span>Version </span><span name="attr_version"></span>
 </div>
 
 <!-- ~~~~~~~~+:+:::::+:+::+:+:+::+:+:+:+::+:+::::::+:+::+:+:+:+::+:+:::::+:+:+:+:::::+:+::+:+:+::+:+:+:+::::+:+:~~~~~~~~ -->
@@ -4050,22 +4052,201 @@
 
 // CHARACTERMANCER IMPORTER
 	on("clicked:import_launch", (eventinfo) => {
-		startCharactermancer("importer-setup");
+		startCharactermancer("importer");
 	});
 
-	on("clicked:import", (eventinfo) => {
-		console.log(`%c IMPORT Clicked`, "color: purple; font-weight:bold");
-		//const mancerdata = getCharmancerData();
-		let set = {};
-	    let update = {};
+	const mancerArrays = {
+		repeating_rows: ['active', 'knowledge', 'language', 'quality', 'martial', 'range', 'melee',
+	        'weapon', 'armor', 'augementations', 'items', 'NPCspell', 'spell', 'rituals',
+	        'preps', 'powers', 'contacts', 'vehicle']
+	};
 
-	    set[`data`] = "Testing";
+	//Match Chummer JSON keys with their sheet attribute. 
+	//Chummer name is on the left, Roll20 sheet atribute on right.
+	const jsonKeys = {
+		"name": "name"
+		,"alias": "character_name"
+		,"playername": "player_name"
+		,"calculatedstreetcred": "street_cred"
+		,"calculatednotoriety": "notoriety"
+		,"calculatedpublicawareness": "public_awareness"
+		,"metatype": "metatype"
+		,"sex": "sex"
+		,"height": "height"
+		,"weight": "weight"
+		,"karma": "karma" 
+		,"age" : "age"
+		,"totalkarma": "total_karma"
+		,"magician": "flag_special"
+		,"technomancer": "flag_special"
+		,"adept": "flag_special"
+		,"totaless": "essence"
+		,"nuyen":"primary_nuyen"
+	};
 
-	    update[`results`] = `<span style="color:purple">Thre are not errors because we didn't do shit</span>`;
+	const attributeKeys = {
+		"BOD": "body"
+		,"AGI": "agility"
+		,"REA": "reaction"
+		,"STR": "strength"
+		,"CHA": "charisma"
+		,"INT": "intuition"
+		,"LOG": "logic"
+		,"WIL": "willpower"
+		,"EDG": "edge"
+		,"MAG": "magic"
+		,"RES": "resonance"
+	};
 
-	    setAttrs(set);
-	    setCharmancerText(update);
+	on("page:importer", () => {
+		let setText = { "hidden": "" };
+
+		//Add inputs for all of the character values
+		Object.values(jsonKeys).forEach((value) => {
+			const input = `<label><div>${value}</div><input type="text" name="comp_${value}" value="" /></label>`;
+			setText[`hidden`] += (setText[`hidden`].includes(input)) ? "" : input;
+		});
+
+		// ATTRIBUTE inputs
+		Object.values(attributeKeys).forEach((value) => {
+			["base", "modifier"].forEach((input) => {
+				setText[`hidden`] += `<label><div>${value}_${input}</div><input type="text" name="comp_${value}_${input}" value="" /></label>`
+			});
+		});
+
+		setAttrs({builder: "Chummer"});
+		setCharmancerText(setText);
 	});
+
+	on("clicked:import", () => {
+		const mancerData = getCharmancerData();
+		const mancerValues = mancerData["importer"].values;
+		let applyEnabled = true;
+	    let setText = {};
+
+	    // Verify the user entered a JSON in the textarea. If not, provide user feedabck.
+	    if (mancerValues.jsonData) {
+	    	const parsedData = JSON.parse(mancerValues.jsonData) || false;
+	    	setText[`import-feedback`] = "";
+	    	// There is a value in the textarea! Check to see if its a valid JSON. Provide users feeadback 
+	    	if (parsedData) {
+	    		setText[`import-feedback`] += `<p class="feedback">A valid JSON was imported for ${mancerValues.builder}.</p>`
+		      // Send the parsed data to the selected importer or let users know something went wrong 
+		      if (mancerValues.builder && mancerValues.builder === "Chummer") {
+				if (parsedData.characters && parsedData.characters.character) {
+					importChummer(parsedData.characters.character);
+		      	} else {
+					setText[`import-feedback`] += `<p class="warning">Parsed JSON is missing character data.</p>`;
+					applyEnabled = false
+		      	}
+		      } else if (mancerValues.builder && mancerValues.builder === "Hero Lab") {
+		      	importHeroLab();
+		      	setText[`import-feedback`] += `<p class="warning">Coming Soon....</p>`;
+		      } else {
+		      	setText[`import-feedback`] += `<p class="warning">A character builder was not selected. Try changing your selection then change it back if needed.</p>`;
+		      	applyEnabled = false
+		      }
+		    } else {
+		      setText[`import-feedback`] += `<p class="warning"><span>The text imported is not a valid JSON. Verify the JSON is formatted correctly. Check the format at,</span> JSONLint.com.</p>`;
+		      applyEnabled = false
+		    };
+	    } else {
+	    	 setText[`import-feedback`] = `<p class="warning">No information was entered in the JSON text area.</p>`;
+	    	 applyEnabled = false
+	    };
+
+	    let buttonStatus = (applyEnabled) ? "" : "disabled";
+	    setText[`finish-button`] = `<button class="finish" type="finish" value="apply" data-i18n="apply" ${buttonStatus}>Apply</button>`;
+
+	    setCharmancerText(setText);
+	});
+
+	//USEFUL FUNCTIONS
+	const capitialize = (string) => {
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	};
+
+	const addFeedback = (attribute, value) => {
+		return `<p class="feedback"><strong>${capitialize(attribute)}:</strong> ${value} </p>`
+	};
+
+	const alphabatizeKeys = (unsortedJSON) => {
+		let alphabeticalKeys = {};
+		Object.keys(unsortedJSON).sort().forEach((key) => {
+			  alphabeticalKeys[key] = unsortedJSON[key];
+		});
+		return alphabeticalKeys
+	}	
+
+	//IMPORTERS
+	const importHeroLab = (character) => {
+		console.log(`%c HERO LAB IMPORTER:`, "color: purple; font-weight:bold");
+	};
+
+	const importChummer = (character) => {
+		console.log(`%c CHUMMER IMPORTER:`, "color: purple; font-weight:bold");
+		const sortedKeys = alphabatizeKeys(jsonKeys);
+		let setText = {
+			"error": "",
+			"results": "",
+			"ignored": ""
+		};
+		let update = {};
+
+		// PROCESS TOP LEVEL KEYS
+		Object.keys(sortedKeys).forEach((key) => {
+			const charSheetAttr = jsonKeys[key];
+			const chummerValue = character[key];
+			if (key === "adept" || key === "magician" || key === "technomancer") {
+				if (chummerValue.toUpperCase() === "TRUE") {
+					update[`${charSheetAttr}`] = (key === "technomancer") ? "resonance" : "magic";
+				} else {
+					update[`${charSheetAttr}`] = "mundane";
+				};
+			} else if (key === "totaless") {
+				update[`${charSheetAttr}`] = chummerValue || 6;
+			} else if (chummerValue && chummerValue != null) {
+				update[`${charSheetAttr}`] = chummerValue;
+			} else {
+				setText["error"] += addFeedback(charSheetAttr, chummerValue);
+			};
+
+			const textUpdate = (update[`${charSheetAttr}`]) ? "results" : "ignored";
+			setText[`${textUpdate}`] += addFeedback(jsonKeys[key].replace("_"," "), update[`${charSheetAttr}`]);
+
+			console.log(`%c ${charSheetAttr} = ${update[`${charSheetAttr}`]}`, "color: purple; font-weight:bold");
+		});
+
+		// PROCESS ATTRIBUTES
+		const attributes = character.attributes[1].attribute;
+		attributes.forEach((object) => {
+			const charSheetAttr = attributeKeys[object.name];
+			update[`${charSheetAttr}_base`] = object.base;
+		    update[`${charSheetAttr}_modifier`] = object.total - object.base;
+		});
+
+		setCharmancerText(setText);
+		setAttrs(update);
+	};
+
+	// APPLY Changes
+	on("mancerfinish:apply", () => {
+		const mancerData = getCharmancerData();
+		const mancerValues = mancerData["importer"].values;
+
+		Object.keys(mancerValues).forEach((key) => {
+			if (key == "builder" || key == "jsonData" || key == "hidden") {
+				delete mancerValues[key];
+			};
+		});
+
+		setAttrs(mancerValues, () => {
+			console.log(`%c APPLY IMPORTER:`, "color: blue; font-weight:bold");
+			console.log(mancerValues);
+			deleteCharmancerData(["importer"]);
+			finishCharactermancer();
+		});
+	}); 
 </script>
 
 
@@ -4076,37 +4257,48 @@
     </div>
 </charmancer>
 
-<charmancer class="sheet-charmancer-importer-setup">
+<charmancer class="sheet-charmancer-importer">
 	<div class="mancer-box">
 		<h1>Shadowrun Fifth Edition Character Importer</h1>
 		<h2>Setup</h2>
-		<p>This will import character information from a JSON generated from Chummer 5 or Hero Lab data.</p>	
+		<p>This will import character JSON data generated from Chummer 5 or Hero Lab.</p>	
 		<h3>Pick Character Builder</h3>
-		<div>
+		<div class="pick-builder">
 			<label title="choose chummer">
-				<input type="radio" name="comp_builder" value="chummer" />
 				<h4>Chummer</h4>
+				<input type="radio" name="comp_builder" value="Chummer" checked />
 			</label>
 			<label title="choose hero lab">
-				<input type="radio" name="comp_builder" value="hero lab" />
 				<h4>Hero Lab</h4>
+				<input type="radio" name="comp_builder" value="Hero Lab" />
 			</label>
 		</div>
-		<textarea name="comp_jsonData" placeholder="Paste JSON here"></textarea>
+		<h3>Enter JSON Here</h3>
+		<textarea name="comp_jsonData" placeholder="Add JSON here"></textarea>
 		<button type="action" name="act_import" data-i18n="import">Import</button>
 
 		<hr />
 
-		<h2>Review</h2>
-		<p>Review and resolve any errors.</p>
-		 <div class="results">
-		 </div>
+		<h2>Results</h2>
+		<!-- <p>Review for errors and resolve them in your JSON as needed before completing the import by clicking Apply.</p> -->
+		<div class="import-feedback"><p>Enter a JSON string in the text area above.</p></div>
+		<div class="result-grid">
+			<h3>Character data to be updated</h3>
+			<div class="results"><p>Import button has not been pressed yet.</p></div>
+			<h3>Character data not to be updated</h3>
+			<div class="ignored"><p>Import button has not been pressed yet.</p></div>
+		</div>
+		<h4 class="hidden-header">Show Hidden Inputs</h4>
+		<input type="checkbox" name="comp_hidden" value="on">
+		<div class="hidden"></div>
 
-		 <hr />
+		<hr />
 
 		<h2>Complete</h2>
-		<p>After reviewing errors above, click Apply. This will <strong>overwrite</strong> data on the sheet where applicable.</p>
-		<button type="action" name="act_apply" data-i18n="apply">Apply</button>
+		<p>After reviewing the data above, click Apply. This will <strong>overwrite</strong> data on the sheet where applicable.</p>
+		<div class="finish-button">
+			<button class="finish" type="finish" value="apply" data-i18n="apply" disabled>Apply</button>
+		</div>
 
 		 <div class="bottombar">
 		   <button class="prev" type="cancel" value="cancel" data-i18n="cancel">Cancel</button>
