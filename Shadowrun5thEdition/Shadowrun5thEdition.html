@@ -4212,11 +4212,8 @@
 			};
 
 			const textUpdate = (update[`${charSheetAttr}`]) ? "results" : "ignored";
-			//setText[`${textUpdate}`] += addFeedback(jsonKeys[key].replace("_"," "), update[`${charSheetAttr}`]);
 			const feedbackText = addFeedback(jsonKeys[key].replace("_"," "), update[`${charSheetAttr}`]);
 			(setText[`results`].includes(feedbackText) || setText[`ignored`].includes(feedbackText)) ? false : setText[`${textUpdate}`] += feedbackText;
-
-			console.log(`%c ${charSheetAttr} = ${update[`${charSheetAttr}`]}`, "color: purple; font-weight:bold");
 		});
 
 		// PROCESS ATTRIBUTES
@@ -4234,6 +4231,45 @@
 			} else {
 				update[`${charSheetAttr}_base`] = object.base;
 			    update[`${charSheetAttr}_modifier`] = object.total - object.base;
+			};
+		});
+
+		// LOOP THROUGH SKILLS & GENERATE REPEATING FIELDS
+		const skillList = character.skills.skill;
+		skillList.forEach((skill) => {
+			if (skill.rating > 0) {
+				const id = generateRowID();
+				const type = (skill.knowledge.toUpperCase() === "TRUE" && skill.islanguage.toUpperCase() === "TRUE") ? "language" : 
+					(skill.knowledge.toUpperCase() === "TRUE") ? "knowledge" : 
+					"active";
+				const exotic = skill.exotic.toUpperCase();
+				// Exotic Weapons need their name in Specialization
+
+				console.log(`%c ${skill.name} = ${skill.rating}, Type: ${type}, Exotic: ${exotic} `, "color: blue; font-weight:bold");
+
+				update[`repeating_${type}_${id}_skill`] = (exotic) ? "Exotic Melee" : skill.name;
+				update[`repeating_${type}_${id}_rating`] = skill.rating;
+				update[skill.name.toLowerCase().replace(" ", "")] = skill.total;
+				update[`repeating_${type}_${id}_rating_modifier`] = parseInt(skill.total) - parseInt(skill.rating);
+
+				//This needs to be verified with multiple specializations
+				if (skill.skillspecializations && skill.skillspecializations != null) {
+					update[`repeating_${type}_${id}_specialization`] = skill.skillspecializations.skillspecialization.name;
+				} else if (exotic === "TRUE") {
+					update[`repeating_${type}_${id}_specialization`] = skill.spec.slice(1, -1);
+				};
+
+				Object.keys(attributeKeys).forEach((attribute) => {
+					if (attribute === skill.attribute) {
+						update[`repeating_${type}_${id}_attribute`] = attributeKeys[attribute];
+					};
+				});
+
+				if (skill.skillspecializations && skill.skillspecializations != null) {
+					update[`repeating_${type}_${id}_display_specialization`] = `(${skill.skillspecializations.skillspecialization.name})`;
+				};
+			
+				update[`repeating_${type}_${id}_display_rating`] = (skill.rating === skill.total) ? skill.rating : `${skill.rating} (${skill.total})`;
 			};
 		});
 
@@ -4263,10 +4299,7 @@
 
 
 <!-- CHARACTERMANCER IMPORTER -->
-<charmancer class="sheet-repeating-topbar">
-    <div class="topbar-container">
-
-    </div>
+<charmancer class="sheet-repeating-skill">
 </charmancer>
 
 <charmancer class="sheet-charmancer-importer">
