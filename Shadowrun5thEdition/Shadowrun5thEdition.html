@@ -4082,6 +4082,10 @@
 		,"adept": "flag_special"
 		,"totaless": "essence"
 		,"nuyen":"primary_nuyen"
+		,"limitphysical": "physical_limit"
+		,"limitmental": "limit_mental"
+		,"limitsocial": "limit_social"
+		,"limitastral": "limit_astral"
 	};
 
 	const attributeKeys = {
@@ -4195,83 +4199,110 @@
 
 		// PROCESS TOP LEVEL KEYS
 		Object.keys(sortedKeys).forEach((key) => {
-			const charSheetAttr = jsonKeys[key];
-			const chummerValue = character[key];
-			if (key === "adept" || key === "magician" || key === "technomancer") {
-				if (chummerValue.toUpperCase() === "TRUE") {
-					update[`${charSheetAttr}`] = (key === "technomancer") ? "resonance" : "magic";
+			try {
+				const charSheetAttr = jsonKeys[key];
+				const chummerValue = character[key];
+				if (key === "adept" || key === "magician" || key === "technomancer") {
+					if (chummerValue.toUpperCase() === "TRUE") {
+						update[`${charSheetAttr}`] = (key === "technomancer") ? "resonance" : "magic";
+					} else {
+						update[`${charSheetAttr}`] = "mundane";
+					};
+				} else if (key === "totaless") {
+					update[`${charSheetAttr}`] = chummerValue || 6;
+				} else if (chummerValue && chummerValue != null) {
+					update[`${charSheetAttr}`] = chummerValue;
 				} else {
-					update[`${charSheetAttr}`] = "mundane";
+					setText["error"] += addFeedback(charSheetAttr, chummerValue);
 				};
-			} else if (key === "totaless") {
-				update[`${charSheetAttr}`] = chummerValue || 6;
-			} else if (chummerValue && chummerValue != null) {
-				update[`${charSheetAttr}`] = chummerValue;
-			} else {
-				setText["error"] += addFeedback(charSheetAttr, chummerValue);
-			};
 
-			const textUpdate = (update[`${charSheetAttr}`]) ? "results" : "ignored";
-			const feedbackText = addFeedback(jsonKeys[key].replace("_"," "), update[`${charSheetAttr}`]);
-			(setText[`results`].includes(feedbackText) || setText[`ignored`].includes(feedbackText)) ? false : setText[`${textUpdate}`] += feedbackText;
+				const textUpdate = (update[`${charSheetAttr}`]) ? "results" : "ignored";
+				const feedbackText = addFeedback(jsonKeys[key].replace("_"," "), update[`${charSheetAttr}`]);
+				(setText[`results`].includes(feedbackText) || setText[`ignored`].includes(feedbackText)) ? false : setText[`${textUpdate}`] += feedbackText;
+			} catch (error) {
+				setText["error"] += `Error with ${key}: ${error}`;
+			};
 		});
 
 		// PROCESS ATTRIBUTES
 		const attributes = character.attributes[1].attribute;
 		attributes.forEach((object) => {
-			const charSheetAttr = attributeKeys[object.name];
-			if (charSheetAttr === "magic" || charSheetAttr === "resonance") {
-				["magic", "resonance"].forEach((special) => {
-					const flag = (charSheetAttr === `${special}` && update[`flag_special`] === `${special}`) ? true : false;
-					update[`${charSheetAttr}_base`] = (flag) ? object.base : 0;
-					update[`${charSheetAttr}_modifier`] = (flag) ? object.total - object.base : 0;
-				});
-			} else if (charSheetAttr === "edge") {
-				update[`${charSheetAttr}`] = object.base;
-			} else {
-				update[`${charSheetAttr}_base`] = object.base;
-			    update[`${charSheetAttr}_modifier`] = object.total - object.base;
+			try {
+				const charSheetAttr = attributeKeys[object.name];
+				if (charSheetAttr === "magic" || charSheetAttr === "resonance") {
+					["magic", "resonance"].forEach((special) => {
+						const flag = (charSheetAttr === `${special}` && update[`flag_special`] === `${special}`) ? true : false;
+						update[`${charSheetAttr}_base`] = (flag) ? object.base : 0;
+						update[`${charSheetAttr}_modifier`] = (flag) ? object.total - object.base : 0;
+					});
+				} else if (charSheetAttr === "edge") {
+					update[`${charSheetAttr}`] = object.base;
+				} else {
+					update[`${charSheetAttr}_base`] = object.base;
+				    update[`${charSheetAttr}_modifier`] = object.total - object.base;
+				};
+			} catch (error) {
+				setText["error"] += `Error with ${object}: ${error}`;
 			};
 		});
 
 		// LOOP THROUGH SKILLS & GENERATE REPEATING FIELDS
 		const skillList = character.skills.skill;
 		skillList.forEach((skill) => {
-			if (skill.rating > 0) {
-				const id = generateRowID();
-				const type = (skill.knowledge.toUpperCase() === "TRUE" && skill.islanguage.toUpperCase() === "TRUE") ? "language" : 
-					(skill.knowledge.toUpperCase() === "TRUE") ? "knowledge" : 
-					"active";
-				const exotic = skill.exotic.toUpperCase();
-				// Exotic Weapons need their name in Specialization
+			try {
+				if (skill.rating > 0) {
+					const id = generateRowID();
+					const type = 
+						(skill.knowledge.toUpperCase() === "TRUE" && skill.islanguage.toUpperCase() === "TRUE") ? "language" : 
+						(skill.knowledge.toUpperCase() === "TRUE") ? "knowledge" : 
+						"active";
+					const exotic = skill.exotic.toUpperCase();
+					// Exotic Weapons need their name in Specialization
 
-				console.log(`%c ${skill.name} = ${skill.rating}, Type: ${type}, Exotic: ${exotic} `, "color: blue; font-weight:bold");
+					//console.log(`%c ${skill.name} = ${skill.rating}, Type: ${type}, Exotic: ${exotic} `, "color: blue; font-weight:bold");
 
-				update[`repeating_${type}_${id}_skill`] = (exotic) ? "Exotic Melee" : skill.name;
-				update[`repeating_${type}_${id}_rating`] = skill.rating;
-				update[skill.name.toLowerCase().replace(" ", "")] = skill.total;
-				update[`repeating_${type}_${id}_rating_modifier`] = parseInt(skill.total) - parseInt(skill.rating);
+					update[`repeating_${type}_${id}_skill`] = (exotic) ? "Exotic Melee" : skill.name;
+					update[`repeating_${type}_${id}_rating`] = skill.rating;
+					update[skill.name.toLowerCase().replace(" ", "")] = skill.total;
+					update[`repeating_${type}_${id}_rating_modifier`] = parseInt(skill.total) - parseInt(skill.rating);
 
-				//This needs to be verified with multiple specializations
-				if (skill.skillspecializations && skill.skillspecializations != null) {
-					update[`repeating_${type}_${id}_specialization`] = skill.skillspecializations.skillspecialization.name;
-				} else if (exotic === "TRUE") {
-					update[`repeating_${type}_${id}_specialization`] = skill.spec.slice(1, -1);
-				};
-
-				Object.keys(attributeKeys).forEach((attribute) => {
-					if (attribute === skill.attribute) {
-						update[`repeating_${type}_${id}_attribute`] = attributeKeys[attribute];
+					//This needs to be verified with multiple specializations
+					if (skill.skillspecializations && skill.skillspecializations != null) {
+						update[`repeating_${type}_${id}_specialization`] = skill.skillspecializations.skillspecialization.name;
+					} else if (exotic === "TRUE") {
+						update[`repeating_${type}_${id}_specialization`] = skill.spec.slice(1, -1);
 					};
-				});
 
-				if (skill.skillspecializations && skill.skillspecializations != null) {
-					update[`repeating_${type}_${id}_display_specialization`] = `(${skill.skillspecializations.skillspecialization.name})`;
+					Object.keys(attributeKeys).forEach((attribute) => {
+						if (attribute === skill.attribute) {
+							update[`repeating_${type}_${id}_attribute`] = attributeKeys[attribute];
+						};
+					});
+
+					if (skill.skillspecializations && skill.skillspecializations != null) {
+						update[`repeating_${type}_${id}_display_specialization`] = `(${skill.skillspecializations.skillspecialization.name})`;
+					};
+				
+					update[`repeating_${type}_${id}_display_rating`] = (skill.rating === skill.total) ? skill.rating : `${skill.rating} (${skill.total})`;
 				};
-			
-				update[`repeating_${type}_${id}_display_rating`] = (skill.rating === skill.total) ? skill.rating : `${skill.rating} (${skill.total})`;
+			} catch (error) {
+				setText["error"] += `Error with ${skill}: ${error}`;
 			};
 		});
+
+		// LOOP THROUGHT QUALITIES
+		const qualitiesList = Array.isArray(character.qualities.quality) ? character.qualities.quality : [ character.qualities.quality ];
+		qualitiesList.forEach((quality) => {
+			try {
+				const id = generateRowID();
+				update[`repeating_quality_${id}_quality`] = quality.name;
+				update[`repeating_quality_${id}_type`] = (quality.qualitytype === "Positive") ? "P" : "N";
+			} catch (error) {
+				setText["error"] += `Error with ${object}: ${error}`;
+			};
+		});
+
+		//console.log(update);
 
 		setCharmancerText(setText);
 		setAttrs(update);
