@@ -178,7 +178,7 @@
                 getAttrs(all_fields, (values) => {
                     if((values["sheet_type"] || "").toLowerCase() === "npc") {
                         // Stop NPCs autocalculating
-                        console.log(`%c Pathfinder 2 by Roll20: ${(values["character_name"] || "Unnamed character")} is an NPC. TotalUpdate was not fired.`, "color:purple;font-size:14px;");
+                        console.log(`%c Pathfinder Second Edition by Roll20: ${(values["character_name"] || "Unnamed character")} is an NPC. TotalUpdate was not fired.`, "color:purple;font-size:14px;");
                     } else {
                         // == Starting re-calculation
                         // console.table(values);
@@ -258,7 +258,7 @@
                         // == Updating (finally)
                         // console.table(big_update);
                         setAttrs(big_update, {silent: true}, ()=>{
-                            console.log(`%c Pathfinder 2 by Roll20: ${(values["character_name"] || "Unnamed character")} updated (${new Date() - debug_start}ms)`, "color:purple;font-size:14px;");
+                            console.log(`%c Pathfinder Second Edition by Roll20: ${(values["character_name"] || "Unnamed character")} updated (${new Date() - debug_start}ms)`, "color:purple;font-size:14px;");
                             if(callback) {
                                 callback();
                             }
@@ -274,7 +274,7 @@
                 let version_sheet = parseFloat(values["version"]) || 0.0;
                 let version_character = parseFloat(values["version_character"]) || 0.0;
                 if (version_character === version_sheet) {
-                    console.log(`%c Pathfinder 2 by Roll20: ${(values["character_name"] || "Unnamed character")}, version ${version_character}`, "color:purple;font-size:14px;");
+                    console.log(`%c Pathfinder Second Edition by Roll20: ${(values["character_name"] || "Unnamed character")}, version ${version_character}`, "color:purple;font-size:14px;");
                 } else if (version_character < 2.01) {
                     versioningUpdateTo2_01(values, () => {
                         setAttrs({"version_character": 2.01}, {silent: true}, () => {
@@ -289,7 +289,7 @@
             });
         };
         const versioningUpdateTo2_01 = function(versioning_values, versioningDoneUpdating) {
-            console.log(`%c Pathfinder 2 by Roll20: ${(versioning_values["character_name"] || "Unnamed character")} updating to version 2.01`, "color:purple;font-size:13px;font-style:italic;");
+            console.log(`%c Pathfinder Second Edition by Roll20: ${(versioning_values["character_name"] || "Unnamed character")} updating to version 2.01`, "color:purple;font-size:13px;font-style:italic;");
             if((versioning_values["sheet_type"] || "").toLowerCase() !== "npc") {
                 // Global recalculation to update all spells DC
                 totalUpdate(versioningDoneUpdating);
@@ -835,7 +835,7 @@
     on("clicked:whisper", function(eventinfo) {
         getAttrs(["whispertype"], function (values) {
             setAttrs({
-                "whispertype": ("values".whispertype.includes("gm")) ?  " " : "/w gm"
+                "whispertype": ((values["whispertype"] || "").includes("gm")) ?  " " : "/w gm "
             });
         });
     });
