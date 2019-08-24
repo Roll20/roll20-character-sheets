@@ -408,7 +408,7 @@
 					<input class="tab-switch" type="hidden" name="attr_skill_toggle" value="active">
 					<div class="skills-active">
 						<div class="row-long">
-							<div class="name" style="width: 81%;">
+							<div class="name" style="width: 61%;">
 								<button type="roll" name="default" value="@{gm_toggle} &{template:rolls}{{header=^{default}}}{{base=@{default_display}}}{{dice=[[((@{default_attribute}+-1)+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" ><span data-i18n="default">Default a skill</span></button>
 							</div>
 							<input type="hidden" name="attr_default_display" />
@@ -424,9 +424,21 @@
 								<option value="@{magic}" data-i18n="magic">Magic</option>
 								<option value="@{resonance}" data-i18n="resonance">Resonance</option>
 							</select>
+							<select class="limit-select" name="attr_limit" title="Skill limit">
+								<option value="none">-</option>
+								<option value="@{mental_limit}" data-i18n="mental" selected>Mental</option>
+								<option value="@{physical_limit}" data-i18n="physical">Physical</option>
+								<option value="@{social_limit}" data-i18n="social">Social</option>
+								<option value="@{attack}" data-i18n="attack">Attack</option>
+								<option value="@{data_processing}" data-i18n="data_processing">Data Processing</option>
+								<option value="@{firewall}" data-i18n="firewall">Firewall</option>
+								<option value="@{sleaze}" data-i18n="sleaze">Sleaze</option>
+							</select>
 						</div>
 						<fieldset class="repeating_active">
-							<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
+							<input type="hidden" name="attr_display_rating" />
+							<input type="hidden" name="attr_display_specialization" />
 							<div class="settings">
 								<div class="skills-row">
 									<input type="hidden" name="attr_dicepool" />
@@ -568,11 +580,14 @@
 								<option value="@{firewall}" data-i18n="firewall">Firewall</option>
 								<option value="@{sleaze}" data-i18n="sleaze">Sleaze</option>
 							</select>
+							<button class="pictos" name="act_skill" type="action">x</button>
 						</fieldset>
 					</div>
 					<div class="skills-know">
 						<fieldset class="repeating_knowledge">
-							<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
+							<input type="hidden" name="attr_display_rating" />
+							<input type="hidden" name="attr_display_specialization" />
 							<div class="settings">
 								<div class="skills-row">
 									<input type="hidden" name="attr_dicepool"/>
@@ -617,11 +632,14 @@
 								<option value="@{firewall}" data-i18n="firewall">Firewall</option>
 								<option value="@{sleaze}" data-i18n="sleaze">Sleaze</option>
 							</select>
+							<button class="pictos" name="act_skill" type="action">x</button>
 						</fieldset>
 					</div>
 					<div class="skills-lang">
 						<fieldset class="repeating_language">
-							<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
+							<input type="hidden" name="attr_display_rating" />
+							<input type="hidden" name="attr_display_specialization" />
 							<div class="settings">
 								<div class="skills-row">
 									<input type="hidden" name="attr_dicepool" />
@@ -666,6 +684,7 @@
 								<option value="@{firewall}" data-i18n="firewall">Firewall</option>
 								<option value="@{sleaze}" data-i18n="sleaze">Sleaze</option>
 							</select>
+							<button class="pictos" name="act_skill" type="action">x</button>
 						</fieldset>
 					</div>
 				</div>
@@ -3183,9 +3202,19 @@
 		});
 	});
 
+	["active", "knowledge", "language"].forEach((attr) => {
+		on(`clicked:repeating_${attr}:skill`, (eventinfo) => {
+			const source = eventinfo.sourceAttribute.split("_skill")[0];
+			getAttrs([`${source}_flag`], (v) => {
+				setAttrs({
+					[`${source}_flag`]: (v[`${source}_flag`] === "settings") ? "display" : "settings"
+				});
+			});
+		}); 
+	});				
+
 	on("clicked:repeating_quality:quality", (eventinfo) => {
 		const source = (eventinfo.sourceAttribute).slice(0, -8);
-
 		getAttrs([`${source}_flag_quality`], (v) => {
 			setAttrs({
 				[`${source}_flag_quality`]: (v[`${source}_flag_quality`] === "settings") ? "display" : "settings"
@@ -4086,6 +4115,10 @@
 		,"limitmental": "limit_mental"
 		,"limitsocial": "limit_social"
 		,"limitastral": "limit_astral"
+		,"composure" : "composure"
+		,"judgeintentions" : "judge_intentions"
+		,"liftandcarry": "lift_carry"
+		,"memory": "memory"
 	};
 
 	const attributeKeys = {
@@ -4101,26 +4134,6 @@
 		,"MAG": "magic"
 		,"RES": "resonance"
 	};
-
-	on("page:importer", () => {
-		let setText = { "hidden": "" };
-
-		//Add inputs for all of the character values
-		Object.values(jsonKeys).forEach((value) => {
-			const input = `<label><div>${value}</div><input type="text" name="comp_${value}" value="" /></label>`;
-			setText[`hidden`] += (setText[`hidden`].includes(input)) ? "" : input;
-		});
-
-		// ATTRIBUTE inputs
-		Object.values(attributeKeys).forEach((value) => {
-			["base", "modifier"].forEach((input) => {
-				setText[`hidden`] += `<label><div>${value}_${input}</div><input type="text" name="comp_${value}_${input}" value="" /></label>`
-			});
-		});
-
-		setAttrs({builder: "Chummer"});
-		setCharmancerText(setText);
-	});
 
 	on("clicked:import", () => {
 		const mancerData = getCharmancerData();
@@ -4188,124 +4201,188 @@
 	};
 
 	const importChummer = (character) => {
-		console.log(`%c CHUMMER IMPORTER:`, "color: purple; font-weight:bold");
-		const sortedKeys = alphabatizeKeys(jsonKeys);
-		let setText = {
-			"error": "",
-			"results": "",
-			"ignored": ""
-		};
-		let update = {};
-
-		// PROCESS TOP LEVEL KEYS
-		Object.keys(sortedKeys).forEach((key) => {
-			try {
-				const charSheetAttr = jsonKeys[key];
-				const chummerValue = character[key];
-				if (key === "adept" || key === "magician" || key === "technomancer") {
-					if (chummerValue.toUpperCase() === "TRUE") {
-						update[`${charSheetAttr}`] = (key === "technomancer") ? "resonance" : "magic";
-					} else {
-						update[`${charSheetAttr}`] = "mundane";
-					};
-				} else if (key === "totaless") {
-					update[`${charSheetAttr}`] = chummerValue || 6;
-				} else if (chummerValue && chummerValue != null) {
-					update[`${charSheetAttr}`] = chummerValue;
-				} else {
-					setText["error"] += addFeedback(charSheetAttr, chummerValue);
-				};
-
-				const textUpdate = (update[`${charSheetAttr}`]) ? "results" : "ignored";
-				const feedbackText = addFeedback(jsonKeys[key].replace("_"," "), update[`${charSheetAttr}`]);
-				(setText[`results`].includes(feedbackText) || setText[`ignored`].includes(feedbackText)) ? false : setText[`${textUpdate}`] += feedbackText;
-			} catch (error) {
-				setText["error"] += `Error with ${key}: ${error}`;
+		const processChummer = new Promise((resolve, reject) => {
+			console.log(`%c CHUMMER IMPORTER:`, "color: purple; font-weight:bold");
+			const sortedKeys = alphabatizeKeys(jsonKeys);
+			let setText = {
+				"error": "",
+				"results": "",
+				"ignored": ""
 			};
-		});
+			let update = {};
 
-		// PROCESS ATTRIBUTES
-		const attributes = character.attributes[1].attribute;
-		attributes.forEach((object) => {
-			try {
-				const charSheetAttr = attributeKeys[object.name];
-				if (charSheetAttr === "magic" || charSheetAttr === "resonance") {
-					["magic", "resonance"].forEach((special) => {
-						const flag = (charSheetAttr === `${special}` && update[`flag_special`] === `${special}`) ? true : false;
-						update[`${charSheetAttr}_base`] = (flag) ? object.base : 0;
-						update[`${charSheetAttr}_modifier`] = (flag) ? object.total - object.base : 0;
-					});
-				} else if (charSheetAttr === "edge") {
-					update[`${charSheetAttr}`] = object.base;
-				} else {
-					update[`${charSheetAttr}_base`] = object.base;
-				    update[`${charSheetAttr}_modifier`] = object.total - object.base;
-				};
-			} catch (error) {
-				setText["error"] += `Error with ${object}: ${error}`;
-			};
-		});
-
-		// LOOP THROUGH SKILLS & GENERATE REPEATING FIELDS
-		const skillList = character.skills.skill;
-		skillList.forEach((skill) => {
-			try {
-				if (skill.rating > 0) {
-					const id = generateRowID();
-					const type = 
-						(skill.knowledge.toUpperCase() === "TRUE" && skill.islanguage.toUpperCase() === "TRUE") ? "language" : 
-						(skill.knowledge.toUpperCase() === "TRUE") ? "knowledge" : 
-						"active";
-					const exotic = skill.exotic.toUpperCase();
-					// Exotic Weapons need their name in Specialization
-
-					//console.log(`%c ${skill.name} = ${skill.rating}, Type: ${type}, Exotic: ${exotic} `, "color: blue; font-weight:bold");
-
-					update[`repeating_${type}_${id}_skill`] = (exotic) ? "Exotic Melee" : skill.name;
-					update[`repeating_${type}_${id}_rating`] = skill.rating;
-					update[skill.name.toLowerCase().replace(" ", "")] = skill.total;
-					update[`repeating_${type}_${id}_rating_modifier`] = parseInt(skill.total) - parseInt(skill.rating);
-
-					//This needs to be verified with multiple specializations
-					if (skill.skillspecializations && skill.skillspecializations != null) {
-						update[`repeating_${type}_${id}_specialization`] = skill.skillspecializations.skillspecialization.name;
-					} else if (exotic === "TRUE") {
-						update[`repeating_${type}_${id}_specialization`] = skill.spec.slice(1, -1);
-					};
-
-					Object.keys(attributeKeys).forEach((attribute) => {
-						if (attribute === skill.attribute) {
-							update[`repeating_${type}_${id}_attribute`] = attributeKeys[attribute];
+			// PROCESS TOP LEVEL KEYS
+			Object.keys(sortedKeys).forEach((key) => {
+				try {
+					const charSheetAttr = jsonKeys[key];
+					const chummerValue = character[key];
+					if (key === "adept" || key === "magician" || key === "technomancer") {
+						if (chummerValue.toUpperCase() === "TRUE") {
+							update[`${charSheetAttr}`] = (key === "technomancer") ? "resonance" : "magic";
+						} else {
+							update[`${charSheetAttr}`] = "mundane";
 						};
-					});
-
-					if (skill.skillspecializations && skill.skillspecializations != null) {
-						update[`repeating_${type}_${id}_display_specialization`] = `(${skill.skillspecializations.skillspecialization.name})`;
+					} else if (key === "totaless") {
+						update[`${charSheetAttr}`] = chummerValue || 6;
+					} else if (chummerValue && chummerValue != null) {
+						update[`${charSheetAttr}`] = chummerValue;
+					} else {
+						setText["error"] += addFeedback(charSheetAttr, chummerValue);
 					};
-				
-					update[`repeating_${type}_${id}_display_rating`] = (skill.rating === skill.total) ? skill.rating : `${skill.rating} (${skill.total})`;
+
+					const textUpdate = (update[`${charSheetAttr}`]) ? "results" : "ignored";
+					const feedbackText = addFeedback(jsonKeys[key].replace("_"," "), update[`${charSheetAttr}`]);
+					(setText[`results`].includes(feedbackText) || setText[`ignored`].includes(feedbackText)) ? false : setText[`${textUpdate}`] += feedbackText;
+				} catch (error) {
+					setText["error"] += addFeedback(JSON.stringify(key), error);
+				};
+			});
+
+			// PROCESS ATTRIBUTES
+			const attributes = character.attributes[1].attribute;
+			attributes.forEach((object) => {
+				try {
+					const charSheetAttr = attributeKeys[object.name];
+					if (charSheetAttr === "magic" || charSheetAttr === "resonance") {
+						["magic", "resonance"].forEach((special) => {
+							const flag = (charSheetAttr === `${special}` && update[`flag_special`] === `${special}`) ? true : false;
+							update[`${charSheetAttr}_base`] = (flag) ? object.base : 0;
+							update[`${charSheetAttr}_modifier`] = (flag) ? object.total - object.base : 0;
+						});
+					} else if (charSheetAttr === "edge") {
+						update[`${charSheetAttr}`] = object.base;
+					} else {
+						update[`${charSheetAttr}_base`] = object.base;
+					    update[`${charSheetAttr}_modifier`] = object.total - object.base;
+					};
+				} catch (error) {
+					setText["error"] += addFeedback(JSON.stringify(object), error);
+				};
+			});
+
+			// LOOP THROUGHT QUALITIES
+			const qualitiesList = Array.isArray(character.qualities.quality) ? character.qualities.quality : [ character.qualities.quality ];
+			qualitiesList.forEach((quality) => {
+				try {
+					const id = generateRowID();
+					update[`repeating_quality_${id}_flag_quality`] = "display";
+					update[`repeating_quality_${id}_quality`] = quality.name;
+					update[`repeating_quality_${id}_type`] = (quality.qualitytype === "Positive") ? "P" : "N";
+				} catch (error) {
+					setText["error"] += addFeedback(JSON.stringify(quality), error);
+				};
+			});
+
+			// LOOP THROUGH SKILLS & GENERATE REPEATING FIELDS
+			const skillList = character.skills.skill;
+			skillList.forEach((skill) => {
+				try {
+					const rating = parseInt(skill.rating) || 0;
+					if (rating > 0) {
+						const id = generateRowID();
+						const type = 
+							(skill.knowledge.toUpperCase() === "TRUE" && skill.islanguage.toUpperCase() === "TRUE") ? "language" : 
+							(skill.knowledge.toUpperCase() === "TRUE") ? "knowledge" : 
+							"active";
+						const exotic = skill.exotic.toUpperCase();
+						const section = `repeating_${type}_${id}`
+						// Exotic Weapons need their name in Specialization
+
+						update[`${section}_flag`] = "display";
+						update[`${section}_skill`] = (exotic === "TRUE") ? "Exotic Melee" : skill.name;
+						update[`${section}_display`] = (exotic === "TRUE") ? "Exotic Melee" : skill.name;
+						update[`${section}_rating`] = skill.rating;
+						update[`${section}_rating_modifier`] = parseInt(skill.total) - parseInt(skill.rating);
+						update[`${section}_dicepool`] = skill.total;
+
+						//ACTIVE SKILLS HAVE THEIR TOTAL SAVED IN A HIDDEN ATTRIBUTE
+						if (type === "active") {
+							update[skill.name.toLowerCase().replace(" ", "")] = skill.total;
+						};
+
+						//This needs to be verified with multiple specializations
+						if (skill.skillspecializations && skill.skillspecializations != null) {
+							const chummerSpecialization = skill.skillspecializations.skillspecialization.name;
+							const specialization = (chummerSpecialization.includes("[")) ? chummerSpecialization.slice(1, -1) : chummerSpecialization;
+							update[`${section}_specialization`] = specialization;
+						} else if (exotic === "TRUE") {
+							update[`${section}_specialization`] = skill.spec.slice(1, -1);
+						};
+
+						//CREATE THE DISPLAYS FOR SKILLS
+						if (update[`${section}_specialization`]) {
+							update[`${section}_display_specialization`] = `(${update[`${section}_specialization`]})`;
+						};
+
+						//DISPLAY FOR RTG
+						update[`${section}_display_rating`] = (skill.rating != skill.total) ? `${skill.rating} (${skill.total})` : `${skill.rating}`;
+
+						const attribute = skill.attribute;
+						update[`${section}_attribute`] = `@{${attributeKeys[attribute]}}`;
+						update[`${section}_display_attribute`] = attributeKeys[attribute];
+
+						update[`${section}_limit`] = 
+							(attribute === "AGI" || attribute === "BOD" || attribute ===  "STR" || attribute ===  "REA") ? `@{physical_limit}` : 
+							(attribute === "WIL" || attribute ===  "LOG" || attribute ===  "INT") ? `@{mental_limit}` : 
+							(attribute === "CHA") ? `@{social_limit}` : "none";
+					};
+				} catch (error) {
+					setText["error"] += addFeedback(JSON.stringify(skill), error);
+				};
+			});
+
+			//INTIATIVE
+			try {
+				if (character.initvalue != null) {
+					update[`initiative_mod`] = character.initvalue;
+				};
+				if (character.initdice != null) {
+					update[`initiative_dice`] = character.initdice || 1;
 				};
 			} catch (error) {
-				setText["error"] += `Error with ${skill}: ${error}`;
+				setText["error"] += addFeedback("initiative", error);
 			};
-		});
 
-		// LOOP THROUGHT QUALITIES
-		const qualitiesList = Array.isArray(character.qualities.quality) ? character.qualities.quality : [ character.qualities.quality ];
-		qualitiesList.forEach((quality) => {
+			//MOVEMENT
 			try {
-				const id = generateRowID();
-				update[`repeating_quality_${id}_quality`] = quality.name;
-				update[`repeating_quality_${id}_type`] = (quality.qualitytype === "Positive") ? "P" : "N";
+				const movement = character.movementwalk.split(",")[0].split("/");
+				update[`walk`] = movement[0];
+				update[`run`] = movement[1];
 			} catch (error) {
-				setText["error"] += `Error with ${object}: ${error}`;
+				setText["error"] += addFeedback("movement", error);
 			};
+
+			//CONDITION MONITORS
+			try {
+				update[`physical_max`] = character.physicalcm;
+				update[`stun_max`] = character.stuncm;
+				update[`physical_damage`] = character.physicalcmfilled;
+				update[`stun_damage`] = character.stuncmfilled;
+				update[`overflow`] = character.cmoverflow;
+			} catch (error) {
+				setText["error"] += addFeedback("Condition Monitor", error);
+			};
+
+			setCharmancerText(setText);
+			resolve(update);
+
+			console.log(update);
+		}).then((update) => {
+			let setText = {
+				"hidden": ""
+			};
+
+			//GENERATE INPUTS TO SAVE THE DATA
+			Object.keys(update).forEach((key) => {
+				const label = (key.includes("_")) ? key.replace("_", " ") : key;
+				const input = `<label><div>${label}</div><input type="text" name="comp_${key}" value="${update[key]}" /></label>`;
+				setText[`hidden`] += (setText[`hidden`].includes(input)) ? "" : input;
+			});
+
+			setAttrs(update);
+		}).then((result) => {
+			setCharmancerText(result);
 		});
-
-		//console.log(update);
-
-		setCharmancerText(setText);
-		setAttrs(update);
 	};
 
 	// APPLY Changes
@@ -4330,9 +4407,6 @@
 
 
 <!-- CHARACTERMANCER IMPORTER -->
-<charmancer class="sheet-repeating-skill">
-</charmancer>
-
 <charmancer class="sheet-charmancer-importer">
 	<div class="mancer-box">
 		<h1>Shadowrun Fifth Edition Character Importer</h1>
@@ -4362,7 +4436,7 @@
 			<h3>Character data to be updated</h3>
 			<div class="results"><p>Import button has not been pressed yet.</p></div>
 			<h3>Character data not to be updated</h3>
-			<div class="ignored"><p>Import button has not been pressed yet.</p></div>
+			<div class="error"><p>Import button has not been pressed yet.</p></div>
 		</div>
 		<h4 class="hidden-header">Show Hidden Inputs</h4>
 		<input type="checkbox" name="comp_hidden" value="on">
