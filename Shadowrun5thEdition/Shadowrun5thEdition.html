@@ -3526,7 +3526,7 @@
 
 	//Convert physical into the physical damage track boxes and reverse
 		['physical', 'stun'].forEach(attr => {
-			on(`change:${attr} change:${attr}_damage`, function(eventinfo) {
+			on(`change:${attr} change:${attr}_damage`, (eventinfo) => {
 				getAttrs([`${attr}`, `${attr}_damage`, `${attr}_max`], (v) => {
 					const stat = parseInt(v[`${attr}`]) || 0, dam = parseInt(v[`${attr}_damage`]) || 0, max = parseInt(v[`${attr}_max`]) || 0, source = eventinfo.sourceAttribute;
 					const wou = (source === `${attr}`) ? max - stat : max - dam;
@@ -4114,11 +4114,11 @@
 		,"metatype": "metatype"
 		,"nuyen":"primary_nuyen"
 		,"physicalcm": "physical_max"
-		,"physicalcmfilled": "physical_damage"
+		//,"physicalcmfilled": "physical_damage" //RESULTING IN INFINATE LOOP
 		,"playername": "player_name"
 		,"sex": "sex"
 		,"stuncm": "stun_max"
-		,"stuncmfilled": "stun_damage"
+		//,"stuncmfilled": "stun_damage"
 		,"technomancer": "flag_special"
 		,"totaless": "essence"
 		,"totalkarma": "total_karma"
@@ -4139,6 +4139,10 @@
 		,"MAG": "magic"
 		,"RES": "resonance"
 	};
+
+	on("page:importer", () => {
+		setAttrs({builder: "Chummer"});
+	});
 
 	on("clicked:import", () => {
 		const mancerData = getCharmancerData();
@@ -4371,6 +4375,14 @@
 						};
 					});
 				});
+			};
+
+			//WEAPONS
+			const weaponsList = weapons = Array.isArray(character.weapons.weapon) ? character.weapons.weapon : [ character.weapons.weapon ];
+			try {
+
+			} catch (error) {
+				setText["error"] += addFeedback("movement", error);
 			};
 
 			setCharmancerText(setText);
