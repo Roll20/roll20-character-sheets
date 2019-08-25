@@ -4259,21 +4259,17 @@
 			};
 			let update = {};
 
-      let awakened = false;
 			// PROCESS TOP LEVEL KEYS
 			Object.keys(sortedKeys).forEach((key) => {
 				try {
 					const charSheetAttr = jsonKeys[key];
 					const chummerValue = character[key];
 					if ((key === "adept" || key === "magician" || key === "technomancer")) {
-            if (!awakened) {
-              if (chummerValue.toUpperCase() === "TRUE") {
-                update[`${charSheetAttr}`] = (key === "technomancer") ? "resonance" : "magic";
-                awakened = true;
-              } else {
-                update[`${charSheetAttr}`] = "mundane";
-              };
-            }
+            if (chummerValue.toUpperCase() === "TRUE") {
+              update[`${charSheetAttr}`] = (key === "technomancer") ? "resonance" : "magic";
+            } else if (!update.hasOwnProperty(`${charSheetAttr}`)) { // if we don't have the property set already otherwise keys get overriden
+              update[`${charSheetAttr}`] = "mundane";
+            };
 					} else if (key === "totaless") {
 						update[`${charSheetAttr}`] = chummerValue || 6;
 					} else if (chummerValue && chummerValue != null) {
