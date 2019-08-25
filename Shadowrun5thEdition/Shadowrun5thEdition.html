@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="1.62" />
+<input type="hidden" name="attr_version" value="2.0" />
 <!-- ~~~~~~~~ Character Sheet Page, default view ~~~~~~~~ -->    
 	<input class="sheet_type" name="attr_sheet_type" type="hidden" value="pc">
 <!-- ~~~~~~~~ Show & hide optional Magic & Resonance areas ~~~~~~~~ --> 
@@ -969,7 +969,7 @@
 										<label data-i18n="modifierdice">modifier dice</label><input type="number" name="attr_dicepool_modifier" title="Additional dicepool bonus" />
 										<input class="skill-select" type="hidden" name="attr_skill" /><br />
 										<div class="exotic-warning">
-											<span><i data-i18n="exoticnote">Exotics are not linked to skills. Use modifier Dice input to set skill dice.</i></span>
+											<span><i data-i18n="exoticnote">Exotics are not linked to skills. Use Modifier Dice input to set skill dice.</i></span>
 										</div>
 									</div>
 									<div class="settings-row">
@@ -1020,7 +1020,7 @@
 									<label data-i18n="primary">Primary</label><input type="checkbox" class="skill-select" name="attr_primary" value="primary" title="Add to Core tab as primary melee"/>
 									<div class="settings-row">
 										<input type="hidden" name="attr_dicepool" value="0" />
-										<label data-i18n="primary">Primary</label>
+										<label data-i18n="combatskill">Combat Skill</label>
 										<select class="skill-select" name="attr_skill" title="Weapon skill">
 											<option class="option-headers" disabled="true" data-i18n="combatskills">Combat Skills</option>
 											<option class="option-groups" value="@{closecombat}" data-i18n="closecombat">Close Combat Group</option>
@@ -1034,7 +1034,7 @@
 										<label data-i18n="specializations">Specialization</label><input class="skill-select" type="checkbox" name="attr_spec" value="+2" title="Applicable specialization"/>
 										<label data-i18n="modifierdice">modifier dice</label><input type="number" name="attr_dicepool_modifier" title="Additional dicepool bonus"/>
 										<div class="exotic-warning">
-											<span><i data-i18n="exoticnote">Exotic weapons are currently not linked to the skills section. Use modifier Dice input to set dicepool.</i></span>
+											<span><i data-i18n="exoticnote">Exotic weapons are currently not linked to the skills section. Use Modifier Dice input to set dicepool.</i></span>
 										</div>
 									</div>
 									<div class="settings-row">
@@ -4325,6 +4325,7 @@
 			const skillList = character.skills.skill;
 			skillList.forEach((skill) => {
 				try {
+					console.log(`%c ${skill.name}`, "color:blue;font-size:18px;");
 					const rating = parseInt(skill.rating) || 0;
 					if (rating > 0) {
 						const id = generateRowID();
@@ -4337,8 +4338,14 @@
 						// Exotic Weapons need their name in Specialization
 
 						update[`${section}_flag`] = "display";
-						update[`${section}_skill`] = (exotic === "TRUE") ? "Exotic Melee" : skill.name;
-						update[`${section}_display`] = (exotic === "TRUE") ? "Exotic Melee" : skill.name;
+						update[`${section}_skill`] = 
+							(skill.name === "Exotic Melee Weapon") ? "Exotic Melee" : 
+							(skill.name === "Exotic Ranged Weapon") ? "Exotic Range" : 
+							skill.name;
+						update[`${section}_display`] = 
+							(skill.name === "Exotic Melee Weapon") ? "Exotic Melee" : 
+							(skill.name === "Exotic Ranged Weapon") ? "Exotic Range" : 
+							skill.name;
 						update[`${section}_rating`] = skill.rating;
 						update[`${section}_rating_modifier`] = skill.ratingmod;
             let skilltotal = parseInt(skill.rating) + parseInt(skill.ratingmod);
@@ -4355,7 +4362,7 @@
 							const specialization = (chummerSpecialization.includes("[")) ? chummerSpecialization.slice(1, -1) : chummerSpecialization;
 							update[`${section}_specialization`] = specialization;
 						} else if (exotic === "TRUE") {
-							update[`${section}_specialization`] = skill.spec.slice(1, -1);
+							update[`${section}_specialization`] = skill.spec;
 						};
 
 						//CREATE THE DISPLAYS FOR SKILLS
@@ -4417,6 +4424,7 @@
 				});
 			};
 
+			//WEAPON KEYS
 			const weaponKeys = {
 				"name": "weapon"
 				,"damage": "damage"
@@ -4434,27 +4442,34 @@
 			weaponsList.forEach((weapon) => {
 				try {
 					const id = generateRowID();
-			      	const type = (weapon.type.toUpperCase() === "MELEE") ? `repeating_melee_${id}` : `repeating_range_${id}`;
+			      	const section = (weapon.type.toUpperCase() === "MELEE") ? `repeating_melee_${id}` : `repeating_range_${id}`;
 			      	const npcWeapon = `repeating_weapon_${id}`;
 
+			      	const category = weapon.category.toUpperCase();
 			      	Object.keys(weaponKeys).forEach((key) => {
-			      		const category = weapon.category.toUpperCase();
 			      		if (weapon[`${key}`] && weapon[`${key}`] != null) {
-			      			update[`${type}_${weaponKeys[key]}`] = 
-			      				(weapon[`${key}`].includes("(")) ? getValInParen(weapon[`${key}`]) :
+			      			update[`${section}_${weaponKeys[key]}`] = 
+			      				(key != "damage" && weapon[`${key}`].includes("(")) ? getValInParen(weapon[`${key}`]) :
 			      				(key === "skill") ? `@{${weapon[`${key}`].toLowerCase().replace(" ", "")}}` :
 			      				weapon[`${key}`];
 			      		} else if (key === "skill" && category.includes("EXOTIC")) {
-			      			const exoticSkill = (category.includes("MELEE")) ? "exoticmelee" : "exoticrange";
-			      			update[`${type}_${weaponKeys[key]}`] = `@{${exoticSkill}}`;
+			      			update[`${section}_skill`] = 0;
 			      		};
 					});
+
+			      	//EXOTIC WEAPONS NEED SPECIAL HANDLING
+			      	if (category.includes("EXOTIC")) {
+			      		update[`${section}_dicepool_modifier`] = weapon.dicepool;
+			      	};
+
+					//RANGED WEAPONS NEED CLIP & RANGES
 					if (weapon.type.toUpperCase() === "RANGED") {
 				        if (weapon.clips != null && weapon.clips.clip != null) {
 				          const clips = Array.isArray(weapon.clips.clip) ? weapon.clips.clip : [ weapon.clips.clip ];
-				          update[`${type}_ammo`] = clips[0].count;
+				          update[`${section}_ammo`] = clips[0].count;
 				        };
 
+				        //RANGE
 						const rangeList = weapon.ranges;
 						let range = "";
 						Object.keys(rangeList).forEach((key) => {
@@ -4463,7 +4478,7 @@
 								range += (key === "short") ? `${rangeNumber}` : `/${rangeNumber}`;
 							};
 						});
-						update[`${type}_range`] = range;
+						update[`${section}_range`] = range;
 			      	};
 
 			      	//ACCESSORIES
@@ -4471,11 +4486,10 @@
 				      	const accessoriesList = Array.isArray(weapon.accessories.accessory) ? weapon.accessories.accessory : [ weapon.accessories.accessory ];
 				      	let accessories = "";
 				      	accessoriesList.forEach((accessory) => {
-				      		console.log(accessory);
 				      		accessories += `${accessory["name"]}, `
 				      	});
 
-				      	update[`${type}_notes`] = accessories;
+				      	update[`${section}_notes`] = accessories;
 			      	};
 				} catch (error) {
 					setText["error"] += addFeedback(JSON.stringify(weapon), error);
