@@ -3636,7 +3636,7 @@
 				update["matrix_mod"] = tot;
 				update["matrix_dice"] = dice;
 
-				(mat != 0) ? update["display_matrix_mod"] = `${bas} (${tot})` : tot;
+				update["display_matrix_mod"] = (mat != 0) ? `${bas} (${tot})` : tot;
 
 				setAttrs(update);
 			});
@@ -4209,6 +4209,19 @@
 		setCharmancerText(setText);
 	});
 
+  const clean = () => {
+    ['active', 'knowledge', 'language', 'quality', 'martial',
+      'range', 'melee', 'weapon', 'armor', 'augementations',
+      'items', 'NPCspell', 'spell', 'rituals', 'preps', 'powers',
+      'contacts', 'vehicle'].forEach(group => {
+      getSectionIDs(`repeating_${group}`, (ids) => {
+        ids.forEach((id) => {
+          removeRepeatingRow(`repeating_${group}_${id}`);
+        });
+      });
+    });
+  };
+
 	//USEFUL FUNCTIONS
 	const capitialize = (string) => {
 		return string.charAt(0).toUpperCase() + string.slice(1);
@@ -4251,12 +4264,12 @@
 				try {
 					const charSheetAttr = jsonKeys[key];
 					const chummerValue = character[key];
-					if (key === "adept" || key === "magician" || key === "technomancer") {
-						if (chummerValue.toUpperCase() === "TRUE") {
-							update[`${charSheetAttr}`] = (key === "technomancer") ? "resonance" : "magic";
-						} else {
-							update[`${charSheetAttr}`] = "mundane";
-						};
+					if ((key === "adept" || key === "magician" || key === "technomancer")) {
+            if (chummerValue.toUpperCase() === "TRUE") {
+              update[`${charSheetAttr}`] = (key === "technomancer") ? "resonance" : "magic";
+            } else if (!update.hasOwnProperty(`${charSheetAttr}`)) { // if we don't have the property set already otherwise keys get overriden
+              update[`${charSheetAttr}`] = "mundane";
+            };
 					} else if (key === "totaless") {
 						update[`${charSheetAttr}`] = chummerValue || 6;
 					} else if (chummerValue && chummerValue != null) {
@@ -4335,7 +4348,8 @@
 							skill.name;
 						update[`${section}_rating`] = skill.rating;
 						update[`${section}_rating_modifier`] = skill.ratingmod;
-						update[`${section}_dicepool`] = skill.total;
+            let skilltotal = parseInt(skill.rating) + parseInt(skill.ratingmod);
+						update[`${section}_dicepool`] = skilltotal;
 
 						//ACTIVE SKILLS HAVE THEIR TOTAL SAVED IN A HIDDEN ATTRIBUTE
 						if (type === "active") {
@@ -4357,7 +4371,7 @@
 						};
 
 						//DISPLAY FOR RTG
-						update[`${section}_display_rating`] = (skill.rating != skill.total) ? `${skill.rating} (${skill.total})` : `${skill.rating}`;
+						update[`${section}_display_rating`] = (skill.ratingmod != 0) ? `${skill.rating} (${skilltotal})` : `${skill.rating}`;
 
 						const attribute = skill.attribute;
 						update[`${section}_attribute`] = `@{${attributeKeys[attribute]}}`;
@@ -4522,6 +4536,7 @@
 			};
 		});
 
+    clean();
 		setAttrs(mancerValues, () => {
 			console.log(`%c APPLY IMPORTER:`, "color: blue; font-weight:bold");
 			console.log(mancerValues);
