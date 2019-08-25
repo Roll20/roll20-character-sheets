@@ -4142,6 +4142,9 @@
 
 	on("page:importer", () => {
 		setAttrs({builder: "Chummer"});
+		setCharmancerText({
+			"directions" : chummerDirections
+		});
 	});
 
 	on("clicked:import", () => {
@@ -4187,6 +4190,25 @@
 	    setCharmancerText(setText);
 	});
 
+	const chummerDirections = `<ol>
+				<li>In Chummer mark your character as created</li>
+				<li>Go to File -> Export -> Export JSON</li>
+				<li>Copy the JSON in the file</li>
+				<li>Paste it into the textfield below</li>
+				<li>Click the Import button</li>
+				<li>Review the data. Use the checkbox <strong>Show Hidden Inputs</strong> to fix data.</li> 
+				<li>Click Apply to <u>overwrite</u> information on the character sheet</li>
+			</ol>
+			<em>Chummer frequently has the wrong information for Weapons. Review them in the Arms tab after clicking apply. Specializations will not be applied to Weapons or Magic. You will need to manually update the checkbox.</em>`;
+
+	const herolabDirections = `We're working on it.`
+
+	on("change:builder", (eventinfo) => {
+		let setText = {};
+		setText[`directions`] = (eventinfo.newValue === "Chummer") ? chummerDirections : herolabDirections;
+		setCharmancerText(setText);
+	});
+
 	//USEFUL FUNCTIONS
 	const capitialize = (string) => {
 		return string.charAt(0).toUpperCase() + string.slice(1);
@@ -4202,7 +4224,11 @@
 			  alphabeticalKeys[key] = unsortedJSON[key];
 		});
 		return alphabeticalKeys
-	}	
+	};
+
+	const getValInParen = (value) => {
+		return value.split("(")[1].split(")")[0];
+	};
 
 	//IMPORTERS
 	const importHeroLab = (character) => {
@@ -4211,7 +4237,7 @@
 
 	const importChummer = (character) => {
 		const processChummer = new Promise((resolve, reject) => {
-			console.log(`%c CHUMMER IMPORTER:`, "color: purple; font-weight:bold");
+			console.log(`%c CHUMMER IMPORTER`, "color: purple; font-weight:bold");
 			const sortedKeys = alphabatizeKeys(jsonKeys);
 			let setText = {
 				"error": "",
@@ -4377,13 +4403,70 @@
 				});
 			};
 
-			//WEAPONS
-			const weaponsList = weapons = Array.isArray(character.weapons.weapon) ? character.weapons.weapon : [ character.weapons.weapon ];
-			try {
-
-			} catch (error) {
-				setText["error"] += addFeedback("movement", error);
+			const weaponKeys = {
+				"name": "weapon"
+				,"damage": "damage"
+				,"ap": "ap"
+				,"dicepool": "dicepool"
+				,"skill": "skill"
+				,"reach": "reach"
+				,"rc": "recoil"
+				,"mode": "mode_options"
+				,"accuracy": "acc"
 			};
+
+			//WEAPONS
+			const weaponsList = Array.isArray(character.weapons.weapon) ? character.weapons.weapon : [ character.weapons.weapon ];
+			weaponsList.forEach((weapon) => {
+				try {
+					const id = generateRowID();
+			      	const type = (weapon.type.toUpperCase() === "MELEE") ? `repeating_melee_${id}` : `repeating_range_${id}`;
+			      	const npcWeapon = `repeating_weapon_${id}`;
+
+			      	Object.keys(weaponKeys).forEach((key) => {
+			      		const category = weapon.category.toUpperCase();
+			      		if (weapon[`${key}`] && weapon[`${key}`] != null) {
+			      			update[`${type}_${weaponKeys[key]}`] = 
+			      				(weapon[`${key}`].includes("(")) ? getValInParen(weapon[`${key}`]) :
+			      				(key === "skill") ? `@{${weapon[`${key}`].toLowerCase().replace(" ", "")}}` :
+			      				weapon[`${key}`];
+			      		} else if (key === "skill" && category.includes("EXOTIC")) {
+			      			const exoticSkill = (category.includes("MELEE")) ? "exoticmelee" : "exoticrange";
+			      			update[`${type}_${weaponKeys[key]}`] = `@{${exoticSkill}}`;
+			      		};
+					});
+					if (weapon.type.toUpperCase() === "RANGED") {
+				        if (weapon.clips != null && weapon.clips.clip != null) {
+				          const clips = Array.isArray(weapon.clips.clip) ? weapon.clips.clip : [ weapon.clips.clip ];
+				          update[`${type}_ammo`] = clips[0].count;
+				        };
+
+						const rangeList = weapon.ranges;
+						let range = "";
+						Object.keys(rangeList).forEach((key) => {
+							if (key != "name" && rangeList[key] != null) {
+								const rangeNumber = rangeList[key].split("-")[1];
+								range += (key === "short") ? `${rangeNumber}` : `/${rangeNumber}`;
+							};
+						});
+						update[`${type}_range`] = range;
+			      	};
+
+			      	//ACCESSORIES
+			      	if (weapon.accessories) {
+				      	const accessoriesList = Array.isArray(weapon.accessories.accessory) ? weapon.accessories.accessory : [ weapon.accessories.accessory ];
+				      	let accessories = "";
+				      	accessoriesList.forEach((accessory) => {
+				      		console.log(accessory);
+				      		accessories += `${accessory["name"]}, `
+				      	});
+
+				      	update[`${type}_notes`] = accessories;
+			      	};
+				} catch (error) {
+					setText["error"] += addFeedback(JSON.stringify(weapon), error);
+				};
+			});
 
 			setCharmancerText(setText);
 			resolve(update);
@@ -4452,6 +4535,7 @@
 				<input type="radio" name="comp_builder" value="Hero Lab" />
 			</label>
 		</div>
+		<div class="directions"></div>
 		<h3>Enter JSON Here</h3>
 		<textarea name="comp_jsonData" placeholder="Add JSON here"></textarea>
 		<button type="action" name="act_import" data-i18n="import">Import</button>
