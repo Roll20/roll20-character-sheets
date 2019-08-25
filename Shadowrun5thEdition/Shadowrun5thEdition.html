@@ -847,10 +847,10 @@
 							<h3 data-i18n="quality">Quality</h3><h3 data-i18n="type">Type</h3>
 						</div>
 						<fieldset class="repeating_quality">
-							<input type="hidden" class="settings-toggle" name="attr_flag_quality" value="settings" />
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 							<button class="pictos" name="quality_chat" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{quality}}}{{desc=@{notes}}}">w</button>
 							<button class="pictos" name="act_quality" type="action">x</button>
-							<div class="settings"style="margin-left: 0px;"><!-- Remove this when all repeat boxes updated -->
+							<div class="settings"style="margin-left: 0px;">
 								<div>
 									<input type="text" name="attr_quality" placeholder="Quality name" title="Quality name" />
 									<select name="attr_type" title="Positive or Negative quality">
@@ -878,7 +878,7 @@
 							<h3 data-i18n="technique">Technique</h3><h3 data-i18n="style">Style</h3>
 						</div>
 						<fieldset class="repeating_martial">
-							<input type="checkbox" class="settings-toggle" name="attr_flag_martial" checked="checked" title="Marital settings" /><span>x</span>
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 							<div class="settings">
 								<div>
 									<input type="text" name="attr_technique" placeholder="Clinch" title="Technique name" />
@@ -897,6 +897,7 @@
 									<span class="desc" name="attr_notes"></span>
 								</div>
 							</div>
+							<button class="pictos" name="act_martial" type="action">x</button>
 						</fieldset>
 					</div>
 				</div>
@@ -3204,23 +3205,25 @@
 
 	["active", "knowledge", "language"].forEach((attr) => {
 		on(`clicked:repeating_${attr}:skill`, (eventinfo) => {
-			const source = eventinfo.sourceAttribute.split("_skill")[0];
-			getAttrs([`${source}_flag`], (v) => {
-				setAttrs({
-					[`${source}_flag`]: (v[`${source}_flag`] === "settings") ? "display" : "settings"
-				});
-			});
+			settingsToggle(eventinfo);
 		}); 
-	});				
+	});
 
-	on("clicked:repeating_quality:quality", (eventinfo) => {
-		const source = (eventinfo.sourceAttribute).slice(0, -8);
-		getAttrs([`${source}_flag_quality`], (v) => {
+	["quality", "martial"].forEach((attr) => {
+		on(`clicked:repeating_${attr}:${attr}`, (eventinfo) => {
+			settingsToggle(eventinfo);
+		}); 
+	});
+
+	const settingsToggle = (eventinfo) => {
+		const split = eventinfo.sourceAttribute.split("_");
+		const source = `${split[0]}_${split[1]}_${split[2]}`;
+		getAttrs([`${source}_flag`], (v) => {
 			setAttrs({
-				[`${source}_flag_quality`]: (v[`${source}_flag_quality`] === "settings") ? "display" : "settings"
+				[`${source}_flag`]: (v[`${source}_flag`] === "settings") ? "display" : "settings"
 			});
 		});
-	}); 
+	};
 
 	on("clicked:whisper", (eventinfo) => {
 		getAttrs([`gm_toggle`], (v) => {
@@ -3820,7 +3823,6 @@
 	//REFACTORED Skills
 	  	['repeating_active','repeating_knowledge','repeating_language'].forEach(field => {
 	        on(`change:${field}`, (eventinfo) => { 
-	        	console.table(eventinfo);
 				const source = eventinfo.sourceAttribute;
 				const type   = eventinfo.sourceType;
 
@@ -4084,41 +4086,44 @@
 		startCharactermancer("importer");
 	});
 
-	const mancerArrays = {
-		repeating_rows: ['active', 'knowledge', 'language', 'quality', 'martial', 'range', 'melee',
-	        'weapon', 'armor', 'augementations', 'items', 'NPCspell', 'spell', 'rituals',
-	        'preps', 'powers', 'contacts', 'vehicle']
-	};
-
 	//Match Chummer JSON keys with their sheet attribute. 
 	//Chummer name is on the left, Roll20 sheet atribute on right.
 	const jsonKeys = {
 		"name": "name"
+		,"adept": "flag_special"
+		,"age" : "age"
 		,"alias": "character_name"
-		,"playername": "player_name"
-		,"calculatedstreetcred": "street_cred"
+		,"armor": "armor"
 		,"calculatednotoriety": "notoriety"
 		,"calculatedpublicawareness": "public_awareness"
-		,"metatype": "metatype"
-		,"sex": "sex"
-		,"height": "height"
-		,"weight": "weight"
-		,"karma": "karma" 
-		,"age" : "age"
-		,"totalkarma": "total_karma"
-		,"magician": "flag_special"
-		,"technomancer": "flag_special"
-		,"adept": "flag_special"
-		,"totaless": "essence"
-		,"nuyen":"primary_nuyen"
-		,"limitphysical": "physical_limit"
-		,"limitmental": "limit_mental"
-		,"limitsocial": "limit_social"
-		,"limitastral": "limit_astral"
+		,"calculatedstreetcred": "street_cred"
+		,"cmoverflow": "overflow"
 		,"composure" : "composure"
+		,"height": "height"
+		,"initdice": "initiative_dice"
+		,"initvalue": "initiative_mod"
 		,"judgeintentions" : "judge_intentions"
+		,"karma": "karma" 
 		,"liftandcarry": "lift_carry"
+		,"limitastral": "limit_astral"
+		,"limitmental": "limit_mental"
+		,"limitphysical": "physical_limit"
+		,"limitsocial": "limit_social"
+		,"magician": "flag_special"
 		,"memory": "memory"
+		,"metatype": "metatype"
+		,"nuyen":"primary_nuyen"
+		,"physicalcm": "physical_max"
+		,"physicalcmfilled": "physical_damage"
+		,"playername": "player_name"
+		,"sex": "sex"
+		,"stuncm": "stun_max"
+		,"stuncmfilled": "stun_damage"
+		,"technomancer": "flag_special"
+		,"totaless": "essence"
+		,"totalkarma": "total_karma"
+		,"weight": "weight"
+		,"indirectdefenseresist": "defense"
 	};
 
 	const attributeKeys = {
@@ -4265,7 +4270,7 @@
 			qualitiesList.forEach((quality) => {
 				try {
 					const id = generateRowID();
-					update[`repeating_quality_${id}_flag_quality`] = "display";
+					update[`repeating_quality_${id}_flag`] = "display";
 					update[`repeating_quality_${id}_quality`] = quality.name;
 					update[`repeating_quality_${id}_type`] = (quality.qualitytype === "Positive") ? "P" : "N";
 				} catch (error) {
@@ -4331,18 +4336,6 @@
 				};
 			});
 
-			//INTIATIVE
-			try {
-				if (character.initvalue != null) {
-					update[`initiative_mod`] = character.initvalue;
-				};
-				if (character.initdice != null) {
-					update[`initiative_dice`] = character.initdice || 1;
-				};
-			} catch (error) {
-				setText["error"] += addFeedback("initiative", error);
-			};
-
 			//MOVEMENT
 			try {
 				const movement = character.movementwalk.split(",")[0].split("/");
@@ -4352,15 +4345,32 @@
 				setText["error"] += addFeedback("movement", error);
 			};
 
-			//CONDITION MONITORS
-			try {
-				update[`physical_max`] = character.physicalcm;
-				update[`stun_max`] = character.stuncm;
-				update[`physical_damage`] = character.physicalcmfilled;
-				update[`stun_damage`] = character.stuncmfilled;
-				update[`overflow`] = character.cmoverflow;
-			} catch (error) {
-				setText["error"] += addFeedback("Condition Monitor", error);
+			//ELEMENTAL ARMOR
+			["acid", "electricity", "fire", "cold"].forEach((element) => {
+				try {
+					const name = (element === "electricity") ? "electrical" : element;
+					update[`${name}_modifier`] = character[`${element}armor`] - character.armor;
+				} catch (error) {
+					setText["error"] += addFeedback(`${element} armor`, error);
+				};
+			});
+
+			//MARTIAL ARTS
+			if (character.martialarts != null) {
+				const martialartsList = Array.isArray(character.martialarts.martialart) ? character.martialarts.martialart : [ character.martialarts.martialart ];
+				martialartsList.forEach((art) => {
+					const techniqueList = Array.isArray(art.martialarttechniques.martialarttechnique) ? art.martialarttechniques.martialarttechnique : [ art.martialarttechniques.martialarttechnique ];
+					techniqueList.forEach((tech) => {
+						try {
+							const id = generateRowID();
+							update[`repeating_martial_${id}_flag`] = "display";
+							update[`repeating_martial_${id}_technique`] = tech.name;
+							update[`repeating_martial_${id}_style`] = art.name;
+						} catch (error) {
+							setText["error"] += addFeedback(JSON.stringify(art), error);
+						};
+					});
+				});
 			};
 
 			setCharmancerText(setText);
@@ -4377,9 +4387,16 @@
 				const label = (key.includes("_")) ? key.replace("_", " ") : key;
 				const input = `<label><div>${label}</div><input type="text" name="comp_${key}" value="${update[key]}" /></label>`;
 				setText[`hidden`] += (setText[`hidden`].includes(input)) ? "" : input;
+
+				const feedbackLabel = 
+					(key.includes("repeating")) ? key.split("_")[3] : 
+					(key.includes("_")) ? key.replace("_", " ") : key;
+				(feedbackLabel === "flag" || feedbackLabel === "display") ? false : setText["results"] += addFeedback(feedbackLabel, update[key]);
 			});
 
 			setAttrs(update);
+
+			return setText;
 		}).then((result) => {
 			setCharmancerText(result);
 		});
