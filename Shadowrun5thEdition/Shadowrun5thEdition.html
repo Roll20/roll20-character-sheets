@@ -1658,7 +1658,7 @@
 						<h3 data-i18n="fakeidsrelated">Fake IDs / Related Lifestyles / Funds / Licenses</h3>
 					</div>
 					<fieldset class="repeating_lifestyle">
-						<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+						<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 						<div class="settings">
 							<div>
 								<h3 data-i18n="fakeid">Fake ID</h3><textarea name="attr_name" placeholder="John Doe" title="Fake ID"></textarea>
@@ -1675,6 +1675,7 @@
 							<span name="attr_funds" title="Funds"></span>
 							<span name="attr_licenses" title="Licenses"></span>
 						</div>
+						<button class="pictos settings-button" name="act_lifestyle" type="action">x</button>
 					</fieldset>
 				</div>
 			</div>
@@ -3222,7 +3223,7 @@
 		}); 
 	});
 
-	["quality", "martial", "items", "range", "melee", "armor", "spell", "preps", "ritual", "powers", "forms", "vehicle", "augementations"].forEach((attr) => {
+	["quality", "martial", "items", "range", "melee", "armor", "spell", "preps", "ritual", "powers", "forms", "vehicle", "augementations", "lifestyle"].forEach((attr) => {
 		on(`clicked:repeating_${attr}:${attr}`, (eventinfo) => {
 			settingsToggle(eventinfo);
 		}); 
@@ -4099,60 +4100,6 @@
 		startCharactermancer("importer");
 	});
 
-	//Match Chummer JSON keys with their sheet attribute. 
-	//Chummer name is on the left, Roll20 sheet atribute on right.
-	const jsonKeys = {
-		"name": "name"
-		,"adept": "flag_special"
-		,"age" : "age"
-		,"alias": "character_name"
-		,"armor": "armor"
-		,"calculatednotoriety": "notoriety"
-		,"calculatedpublicawareness": "public_awareness"
-		,"calculatedstreetcred": "street_cred"
-		,"cmoverflow": "overflow"
-		,"composure" : "composure"
-		,"height": "height"
-		,"initdice": "initiative_dice"
-		,"initvalue": "initiative_mod"
-		,"judgeintentions" : "judge_intentions"
-		,"karma": "karma" 
-		,"liftandcarry": "lift_carry"
-		,"limitastral": "limit_astral"
-		,"limitmental": "limit_mental"
-		,"limitphysical": "physical_limit"
-		,"limitsocial": "limit_social"
-		,"magician": "flag_special"
-		,"memory": "memory"
-		,"metatype": "metatype"
-		,"nuyen":"primary_nuyen"
-		,"physicalcm": "physical_max"
-		//,"physicalcmfilled": "physical_damage" //RESULTING IN INFINATE LOOP
-		,"playername": "player_name"
-		,"sex": "sex"
-		,"stuncm": "stun_max"
-		//,"stuncmfilled": "stun_damage"
-		,"technomancer": "flag_special"
-		,"totaless": "essence"
-		,"totalkarma": "total_karma"
-		,"weight": "weight"
-		,"indirectdefenseresist": "defense"
-	};
-
-	const attributeKeys = {
-		"BOD": "body"
-		,"AGI": "agility"
-		,"REA": "reaction"
-		,"STR": "strength"
-		,"CHA": "charisma"
-		,"INT": "intuition"
-		,"LOG": "logic"
-		,"WIL": "willpower"
-		,"EDG": "edge"
-		,"MAG": "magic"
-		,"RES": "resonance"
-	};
-
 	on("page:importer", () => {
 		setAttrs({builder: "Chummer"});
 		setCharmancerText({
@@ -4234,7 +4181,7 @@
     ['active', 'knowledge', 'language', 'quality', 'martial',
       'range', 'melee', 'weapon', 'armor', 'augementations',
       'items', 'NPCspell', 'spell', 'rituals', 'preps', 'powers',
-      'contacts', 'vehicle'].forEach(group => {
+      'contacts', 'vehicle', 'lifestyle'].forEach(group => {
       getSectionIDs(`repeating_${group}`, (ids) => {
         ids.forEach((id) => {
           removeRepeatingRow(`repeating_${group}_${id}`);
@@ -4264,12 +4211,80 @@
 		return value.split("(")[1].split(")")[0];
 	};
 
+	const getArray = (array) => {
+		return Array.isArray(array) ? array : [ array ];
+	};
+
 	//IMPORTERS
 	const importHeroLab = (character) => {
 		console.log(`%c HERO LAB IMPORTER:`, "color: purple; font-weight:bold");
 	};
 
 	const importChummer = (character) => {
+		//Match Chummer JSON keys with their sheet attribute. 
+		//Chummer name is on the left, Roll20 sheet atribute on right.
+		const jsonKeys = {
+			"name": "name"
+			,"adept": "flag_special"
+			,"age" : "age"
+			,"alias": "character_name"
+			,"armor": "armor"
+			,"calculatednotoriety": "notoriety"
+			,"calculatedpublicawareness": "public_awareness"
+			,"calculatedstreetcred": "street_cred"
+			,"cmoverflow": "overflow"
+			,"composure" : "composure"
+			,"height": "height"
+			,"initdice": "initiative_dice"
+			,"initvalue": "initiative_mod"
+			,"judgeintentions" : "judge_intentions"
+			,"karma": "karma" 
+			,"liftandcarry": "lift_carry"
+			,"limitastral": "limit_astral"
+			,"limitmental": "limit_mental"
+			,"limitphysical": "physical_limit"
+			,"limitsocial": "limit_social"
+			,"magician": "flag_special"
+			,"memory": "memory"
+			,"metatype": "metatype"
+			,"nuyen":"primary_nuyen"
+			,"physicalcm": "physical_max"
+			//,"physicalcmfilled": "physical_damage" //RESULTING IN INFINATE LOOP
+			,"playername": "player_name"
+			,"sex": "sex"
+			,"stuncm": "stun_max"
+			//,"stuncmfilled": "stun_damage"
+			,"technomancer": "flag_special"
+			,"totaless": "essence"
+			,"totalkarma": "total_karma"
+			,"weight": "weight"
+			,"indirectdefenseresist": "defense"
+		};
+
+		const attributeKeys = {
+			"BOD": "body"
+			,"AGI": "agility"
+			,"REA": "reaction"
+			,"STR": "strength"
+			,"CHA": "charisma"
+			,"INT": "intuition"
+			,"LOG": "logic"
+			,"WIL": "willpower"
+			,"EDG": "edge"
+			,"MAG": "magic"
+			,"RES": "resonance"
+		};
+
+		const jsonLists = {
+			"cyberwareList": character.cyberwares.cyberware
+			,"qualitiesList": character.qualities.quality
+			,"martialartsList": character.martialarts.martialart
+			,"skillList": character.skills.skill
+			,"weaponsList": character.weapons.weapon
+			,"armorList": character.armors.armor
+			,"gearList": character.gears.gear
+		}
+
 		const processChummer = new Promise((resolve, reject) => {
 			console.log(`%c CHUMMER IMPORTER`, "color: purple; font-weight:bold");
 			const sortedKeys = alphabatizeKeys(jsonKeys);
@@ -4279,6 +4294,13 @@
 				"ignored": ""
 			};
 			let update = {};
+
+			// SET ALL LIST TO ARRAYS
+			Object.keys(jsonLists).forEach((key) => {
+				jsonLists[key] = getArray(jsonLists[key]);
+				console.log(`%c ${JSON.stringify(key)}`, "color: purple; font-weight:bold");
+				console.log(jsonLists[key]);
+			});
 
 			// PROCESS TOP LEVEL KEYS
 			Object.keys(sortedKeys).forEach((key) => {
@@ -4330,8 +4352,7 @@
 			});
 
 			// LOOP THROUGHT QUALITIES
-			const qualitiesList = Array.isArray(character.qualities.quality) ? character.qualities.quality : [ character.qualities.quality ];
-			qualitiesList.forEach((quality) => {
+			jsonLists["qualitiesList"].forEach((quality) => {
 				try {
 					const id = generateRowID();
 					update[`repeating_quality_${id}_flag`] = "display";
@@ -4343,8 +4364,7 @@
 			});
 
 			// LOOP THROUGH SKILLS & GENERATE REPEATING FIELDS
-			const skillList = character.skills.skill;
-			skillList.forEach((skill) => {
+			jsonLists["skillList"].forEach((skill) => {
 				try {
 					const rating = parseInt(skill.rating) || 0;
 					if (rating > 0) {
@@ -4418,9 +4438,8 @@
 
 			//MARTIAL ARTS
 			if (character.martialarts != null) {
-				const martialartsList = Array.isArray(character.martialarts.martialart) ? character.martialarts.martialart : [ character.martialarts.martialart ];
-				martialartsList.forEach((art) => {
-					const techniqueList = Array.isArray(art.martialarttechniques.martialarttechnique) ? art.martialarttechniques.martialarttechnique : [ art.martialarttechniques.martialarttechnique ];
+				jsonLists["martialartsList"].forEach((art) => {
+					const techniqueList = getArray(art.martialarttechniques.martialarttechnique);
 					techniqueList.forEach((tech) => {
 						try {
 							const id = generateRowID();
@@ -4448,8 +4467,7 @@
 			};
 
 			//WEAPONS
-			const weaponsList = Array.isArray(character.weapons.weapon) ? character.weapons.weapon : [ character.weapons.weapon ];
-			weaponsList.forEach((weapon) => {
+			jsonLists["weaponsList"].forEach((weapon) => {
 				try {
 					const id = generateRowID();
 			      	const section = (weapon.type.toUpperCase() === "MELEE") ? `repeating_melee_${id}` : `repeating_range_${id}`;
@@ -4477,6 +4495,12 @@
 				        if (weapon.clips != null && weapon.clips.clip != null) {
 				          const clips = Array.isArray(weapon.clips.clip) ? weapon.clips.clip : [ weapon.clips.clip ];
 				          update[`${section}_ammo`] = clips[0].count;
+				        } else if (weapon.name.includes("Grenade")) {
+				        	jsonLists["gearList"].forEach((gear) => {
+				        		if (weapon.name === gear.name) {
+				        			update[`${section}_ammo`] = gear.qty || 1;
+				        		};
+				        	});
 				        } else if (weapon.ammo) {
 				        	 update[`${section}_ammo`] = weapon.ammo;
 				        };
@@ -4495,8 +4519,8 @@
 
 			      	//ACCESSORIES
 			      	if (weapon.accessories) {
-				      	const accessoriesList = Array.isArray(weapon.accessories.accessory) ? weapon.accessories.accessory : [ weapon.accessories.accessory ];
 				      	let accessories = "";
+				      	const accessoriesList = getArray(weapon.accessories.accessory);
 				      	accessoriesList.forEach((accessory) => {
 				      		accessories += `${accessory["name"]}, `
 				      	});
@@ -4512,8 +4536,7 @@
 			});
 
 			//ARMOR
-			const armorList = Array.isArray(character.armors.armor) ? character.armors.armor : [ character.armors.armor ];
-			armorList.forEach((armor) => {
+			jsonLists["armorList"].forEach((armor) => {
 				try {
 					const id = generateRowID();
 					if (armor.category != "Clothing") {
@@ -4529,7 +4552,7 @@
 
 						// ARMOR MODS
 						if (armor.armormods && armor.armormods != null) {
-							const modsList = Array.isArray(armor.armormods.armormod) ? armor.armormods.armormod : [ armor.armormods.armormod ];
+							const modsList = getArray(armor.armormods.armormod);
 							modsList.forEach((modification) => {
 								armorMods += `${modification.name}, `;
 
@@ -4549,10 +4572,10 @@
 
 						// ARMOR GEAR
 						if (armor.gears && armor.gears != null) {
-							const gearList = Array.isArray(armor.gears.gear) ? armor.gears.gear : [ armor.gears.gear ];
+							const gearList = getArray(armor.gears.gear);
 							gearList.forEach((gear) => {
 								if (gear.children) {
-									const childrenList = Array.isArray(gear.children.gear) ? gear.children.gear : [ gear.children.gear ];
+									const childrenList = getArray(gear.children.gear);
 									childrenList.forEach((child) => {
 										armorGear += `${gear.name} (${child.name}), `;
 									});
@@ -4579,6 +4602,64 @@
 					setText["error"] += addFeedback(JSON.stringify(armor), error);
 				}
 			});
+
+			//AUGMENTATIONS
+			if (character.cyberwares != null && character.cyberwares.cyberware != null) {
+				jsonLists["cyberwareList"].forEach((ware) => {
+					const id = generateRowID();
+					try {
+						const section = `repeating_augementations_${id}`;
+						update[`${section}_flag`] = "display";
+						update[`${section}_augmentation`] = ware.name;
+						update[`${section}_rating`]       = ware.rating;
+						update[`${section}_essence`]      = ware.ess;
+						update[`${section}_notes`]        = `Grade: ${ware.grade}`;
+					} catch (error) {
+					  setText["error"] += addFeedback(JSON.stringify(ware.name), error);
+					}
+				});
+			};
+
+			// GEAR
+			if (character.gears != null && character.gears.gear != null) {
+				jsonLists["gearList"].forEach((gear) => {
+					const id = generateRowID();
+					try {
+						if (gear.name ===  "Fake SIN") {
+							const section = `repeating_lifestyle_${id}`;
+							update[`${section}_name`] = `${gear.extra} (rating ${gear.rating})`;
+							update[`${section}_lifestyle`] = gear.location;
+							update[`${section}_flag`] = "display";
+						} else {
+							const section = `repeating_items_${id}`;
+							let gearNotes = "";
+							update[`${section}_item`] = gear.name;
+							update[`${section}_flag`] = "display";
+							update[`${section}_rating`] = (gear.rating >  0) ? gear.rating : "";
+
+							//NAME
+							update[`${section}_item`] += (gear.name.includes("Ammo:")) ? ` (${gear.extra}) ` : "";
+							update[`${section}_item`] += (gear.qty > 1) ?` x${gear.qty}` : "";
+
+							//NOTES
+							gearNotes += (gear.location != null) ? `Location: ${gear.location},` : "";
+							gearNotes += (gear.qty != null) ? ` Qty: ${gear.qty},` : "";
+							gearNotes += (gear.extra != null) ? ` Extra: ${gear.extra},` : "";
+
+							if (gear.children && gear.children != null) {
+								const childrenList = getArray(gear.children.gear);
+									childrenList.forEach((child) => {
+										gearNotes += `${child.name}, `;
+								});
+							};
+
+							update[`${section}_notes`] = gearNotes;
+						}
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(gear.name), error);
+					};
+				});
+			};
 
 			setCharmancerText(setText);
 			resolve(update);
