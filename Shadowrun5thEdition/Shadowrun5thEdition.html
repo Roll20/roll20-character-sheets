@@ -4260,16 +4260,6 @@
 			,"RES": "resonance"
 		};
 
-		const jsonLists = {
-			"cyberwareList": character.cyberwares.cyberware
-			,"qualitiesList": character.qualities.quality
-			,"martialartsList": character.martialarts.martialart
-			,"skillList": character.skills.skill
-			,"weaponsList": character.weapons.weapon
-			,"armorList": character.armors.armor
-			,"gearList": character.gears.gear
-		}
-
 		const processChummer = new Promise((resolve, reject) => {
 			console.log(`%c CHUMMER IMPORTER`, "color: purple; font-weight:bold");
 			const sortedKeys = alphabatizeKeys(jsonKeys);
@@ -4280,24 +4270,17 @@
 			};
 			let update = {};
 
-			// SET ALL LIST TO ARRAYS
-			Object.keys(jsonLists).forEach((key) => {
-				jsonLists[key] = getArray(jsonLists[key]);
-				console.log(`%c ${JSON.stringify(key)}`, "color: purple; font-weight:bold");
-				console.log(jsonLists[key]);
-			});
-
 			// PROCESS TOP LEVEL KEYS
 			Object.keys(sortedKeys).forEach((key) => {
 				try {
 					const charSheetAttr = jsonKeys[key];
 					const chummerValue = character[key];
 					if ((key === "adept" || key === "magician" || key === "technomancer")) {
-            if (chummerValue.toUpperCase() === "TRUE") {
-              update[`${charSheetAttr}`] = (key === "technomancer") ? "resonance" : "magic";
-            } else if (!update.hasOwnProperty(`${charSheetAttr}`)) { // if we don't have the property set already otherwise keys get overriden
-              update[`${charSheetAttr}`] = "mundane";
-            };
+			            if (chummerValue.toUpperCase() === "TRUE") {
+			              update[`${charSheetAttr}`] = (key === "technomancer") ? "resonance" : "magic";
+			            } else if (!update.hasOwnProperty(`${charSheetAttr}`)) { // if we don't have the property set already otherwise keys get overriden
+			              update[`${charSheetAttr}`] = "mundane";
+			            };
 					} else if (key === "totaless") {
 						update[`${charSheetAttr}`] = chummerValue || 6;
 					} else if (chummerValue && chummerValue != null) {
@@ -4337,80 +4320,86 @@
 			});
 
 			// LOOP THROUGHT QUALITIES
-			jsonLists["qualitiesList"].forEach((quality) => {
-				try {
-					const id = generateRowID();
-					update[`repeating_quality_${id}_flag`] = "display";
-					update[`repeating_quality_${id}_quality`] = quality.name;
-					update[`repeating_quality_${id}_type`] = (quality.qualitytype === "Positive") ? "P" : "N";
-				} catch (error) {
-					setText["error"] += addFeedback(JSON.stringify(quality), error);
-				};
-			});
+			if (character.qualities != null && character.qualities.quality != null) {
+				const qualitiesList = getArray(character.qualities.quality);
+				qualitiesList.forEach((quality) => {
+					try {
+						const id = generateRowID();
+						update[`repeating_quality_${id}_flag`] = "display";
+						update[`repeating_quality_${id}_quality`] = quality.name;
+						update[`repeating_quality_${id}_type`] = (quality.qualitytype === "Positive") ? "P" : "N";
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(quality), error);
+					};
+				});
+			}
 
 			// LOOP THROUGH SKILLS & GENERATE REPEATING FIELDS
-			jsonLists["skillList"].forEach((skill) => {
-				try {
-					const rating = parseInt(skill.rating) || 0;
-					if (rating > 0) {
-						const id = generateRowID();
-						const type = 
-							(skill.knowledge.toUpperCase() === "TRUE" && skill.islanguage.toUpperCase() === "TRUE") ? "language" : 
-							(skill.knowledge.toUpperCase() === "TRUE") ? "knowledge" : 
-							"active";
-						const exotic = skill.exotic.toUpperCase();
-						const section = `repeating_${type}_${id}`
-						// Exotic Weapons need their name in Specialization
+			if (character.skills != null && character.skills.skill != null) {
+				const skillsList = getArray(character.skills.skill);
+				skillsList.forEach((skill) => {
+					try {
+						const rating = parseInt(skill.rating) || 0;
+						if (rating > 0) {
+							const id = generateRowID();
+							const type = 
+								(skill.knowledge.toUpperCase() === "TRUE" && skill.islanguage.toUpperCase() === "TRUE") ? "language" : 
+								(skill.knowledge.toUpperCase() === "TRUE") ? "knowledge" : 
+								"active";
+							const exotic = skill.exotic.toUpperCase();
+							const section = `repeating_${type}_${id}`
+							// Exotic Weapons need their name in Specialization
 
-						update[`${section}_flag`] = "display";
-						update[`${section}_skill`] = 
-							(skill.name === "Exotic Melee Weapon") ? "Exotic Melee" : 
-							(skill.name === "Exotic Ranged Weapon") ? "Exotic Range" : 
-							skill.name;
-						update[`${section}_display`] = 
-							(skill.name === "Exotic Melee Weapon") ? "Exotic Melee" : 
-							(skill.name === "Exotic Ranged Weapon") ? "Exotic Range" : 
-							skill.name;
-						update[`${section}_rating`] = skill.rating;
-						update[`${section}_rating_modifier`] = skill.ratingmod;
-            			const skilltotal = parseInt(skill.rating) + parseInt(skill.ratingmod);
-						update[`${section}_dicepool`] = skilltotal;
+							update[`${section}_flag`] = "display";
+							update[`${section}_skill`] = 
+								(skill.name === "Exotic Melee Weapon") ? "Exotic Melee" : 
+								(skill.name === "Exotic Ranged Weapon") ? "Exotic Range" : 
+								skill.name;
+							update[`${section}_display`] = 
+								(skill.name === "Exotic Melee Weapon") ? "Exotic Melee" : 
+								(skill.name === "Exotic Ranged Weapon") ? "Exotic Range" : 
+								skill.name;
+							update[`${section}_rating`] = skill.rating;
+							update[`${section}_rating_modifier`] = skill.ratingmod;
+	            			const skilltotal = parseInt(skill.rating) + parseInt(skill.ratingmod);
+							update[`${section}_dicepool`] = skilltotal;
 
-						//ACTIVE SKILLS HAVE THEIR TOTAL SAVED IN A HIDDEN ATTRIBUTE
-						if (type === "active") {
-							update[skill.name.toLowerCase().replace(/ /g, "")] = skill.total;
+							//ACTIVE SKILLS HAVE THEIR TOTAL SAVED IN A HIDDEN ATTRIBUTE
+							if (type === "active") {
+								update[skill.name.toLowerCase().replace(/ /g, "")] = skill.total;
+							};
+
+							//This needs to be verified with multiple specializations
+							if (skill.skillspecializations && skill.skillspecializations != null) {
+								const chummerSpecialization = skill.skillspecializations.skillspecialization.name;
+								const specialization = (chummerSpecialization.includes("[")) ? chummerSpecialization.slice(1, -1) : chummerSpecialization;
+								update[`${section}_specialization`] = specialization;
+							} else if (exotic === "TRUE") {
+								update[`${section}_specialization`] = skill.spec;
+							};
+
+							//CREATE THE DISPLAYS FOR SKILLS
+							if (update[`${section}_specialization`]) {
+								update[`${section}_display_specialization`] = `(${update[`${section}_specialization`]})`;
+							};
+
+							//DISPLAY FOR RTG
+							update[`${section}_display_rating`] = (skill.ratingmod != 0) ? `${skill.rating} (${skilltotal})` : `${skill.rating}`;
+
+							const attribute = skill.attribute;
+							update[`${section}_attribute`] = `@{${attributeKeys[attribute]}}`;
+							update[`${section}_display_attribute`] = attributeKeys[attribute];
+
+							update[`${section}_limit`] = 
+								(attribute === "AGI" || attribute === "BOD" || attribute ===  "STR" || attribute ===  "REA") ? `@{physical_limit}` : 
+								(attribute === "WIL" || attribute ===  "LOG" || attribute ===  "INT") ? `@{mental_limit}` : 
+								(attribute === "CHA") ? `@{social_limit}` : "none";
 						};
-
-						//This needs to be verified with multiple specializations
-						if (skill.skillspecializations && skill.skillspecializations != null) {
-							const chummerSpecialization = skill.skillspecializations.skillspecialization.name;
-							const specialization = (chummerSpecialization.includes("[")) ? chummerSpecialization.slice(1, -1) : chummerSpecialization;
-							update[`${section}_specialization`] = specialization;
-						} else if (exotic === "TRUE") {
-							update[`${section}_specialization`] = skill.spec;
-						};
-
-						//CREATE THE DISPLAYS FOR SKILLS
-						if (update[`${section}_specialization`]) {
-							update[`${section}_display_specialization`] = `(${update[`${section}_specialization`]})`;
-						};
-
-						//DISPLAY FOR RTG
-						update[`${section}_display_rating`] = (skill.ratingmod != 0) ? `${skill.rating} (${skilltotal})` : `${skill.rating}`;
-
-						const attribute = skill.attribute;
-						update[`${section}_attribute`] = `@{${attributeKeys[attribute]}}`;
-						update[`${section}_display_attribute`] = attributeKeys[attribute];
-
-						update[`${section}_limit`] = 
-							(attribute === "AGI" || attribute === "BOD" || attribute ===  "STR" || attribute ===  "REA") ? `@{physical_limit}` : 
-							(attribute === "WIL" || attribute ===  "LOG" || attribute ===  "INT") ? `@{mental_limit}` : 
-							(attribute === "CHA") ? `@{social_limit}` : "none";
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(skill), error);
 					};
-				} catch (error) {
-					setText["error"] += addFeedback(JSON.stringify(skill), error);
-				};
-			});
+				});
+			}
 
 			//MOVEMENT
 			try {
@@ -4422,8 +4411,9 @@
 			};
 
 			//MARTIAL ARTS
-			if (character.martialarts != null) {
-				jsonLists["martialartsList"].forEach((art) => {
+			if (character.martialarts != null && character.martialarts.martialart != null) {
+				const martialartsList = getArray(character.martialarts.martialart);
+				martialartsList.forEach((art) => {
 					const techniqueList = getArray(art.martialarttechniques.martialarttechnique);
 					techniqueList.forEach((tech) => {
 						try {
@@ -4452,145 +4442,153 @@
 			};
 
 			//WEAPONS
-			jsonLists["weaponsList"].forEach((weapon) => {
-				try {
-					const id = generateRowID();
-			      	const section = (weapon.type.toUpperCase() === "MELEE") ? `repeating_melee_${id}` : `repeating_range_${id}`;
-			      	const npcWeapon = `repeating_weapon_${id}`;
+			if (character.weapons != null && character.weapons.weapon != null) {
+				const weaponsList = getArray(character.weapons.weapon);
+				weaponsList.forEach((weapon) => {
+					try {
+						const id = generateRowID();
+				      	const section = (weapon.type.toUpperCase() === "MELEE") ? `repeating_melee_${id}` : `repeating_range_${id}`;
+				      	const npcWeapon = `repeating_weapon_${id}`;
 
-			      	const category = weapon.category.toUpperCase();
-			      	Object.keys(weaponKeys).forEach((key) => {
-			      		if (weapon[`${key}`] && weapon[`${key}`] != null) {
-			      			update[`${section}_${weaponKeys[key]}`] = 
-			      				(key != "damage" && weapon[`${key}`].includes("(")) ? getValInParen(weapon[`${key}`]) :
-			      				(key === "skill") ? `@{${weapon[`${key}`].toLowerCase().replace(" ", "")}}` :
-			      				weapon[`${key}`];
-			      		} else if (key === "skill" && category.includes("EXOTIC")) {
-			      			update[`${section}_skill`] = 0;
-			      		};
-					});
-
-			      	//EXOTIC WEAPONS NEED SPECIAL HANDLING
-			      	if (category.includes("EXOTIC")) {
-			      		update[`${section}_dicepool_modifier`] = weapon.dicepool;
-			      	};
-
-					//RANGED WEAPONS NEED CLIP & RANGES
-					if (weapon.type.toUpperCase() === "RANGED") {
-				        if (weapon.clips != null && weapon.clips.clip != null) {
-				          const clips = Array.isArray(weapon.clips.clip) ? weapon.clips.clip : [ weapon.clips.clip ];
-				          update[`${section}_ammo`] = clips[0].count;
-				        } else if (weapon.name.includes("Grenade")) {
-				        	jsonLists["gearList"].forEach((gear) => {
-				        		if (weapon.name === gear.name) {
-				        			update[`${section}_ammo`] = gear.qty || 1;
-				        		};
-				        	});
-				        } else if (weapon.ammo) {
-				        	 update[`${section}_ammo`] = weapon.ammo;
-				        };
-
-				        //RANGE
-						const rangeList = weapon.ranges;
-						let range = "";
-						Object.keys(rangeList).forEach((key) => {
-							if (key != "name" && rangeList[key] != null) {
-								const rangeNumber = rangeList[key].split("-")[1];
-								range += (key === "short") ? `${rangeNumber}` : `/${rangeNumber}`;
-							};
+				      	const category = weapon.category.toUpperCase();
+				      	Object.keys(weaponKeys).forEach((key) => {
+				      		if (weapon[`${key}`] && weapon[`${key}`] != null) {
+				      			update[`${section}_${weaponKeys[key]}`] = 
+				      				(key != "damage" && weapon[`${key}`].includes("(")) ? getValInParen(weapon[`${key}`]) :
+				      				(key === "skill") ? `@{${weapon[`${key}`].toLowerCase().replace(" ", "")}}` :
+				      				weapon[`${key}`];
+				      		} else if (key === "skill" && category.includes("EXOTIC")) {
+				      			update[`${section}_skill`] = 0;
+				      		};
 						});
-						update[`${section}_range`] = range;
-			      	};
 
-			      	//ACCESSORIES
-			      	if (weapon.accessories) {
-				      	let accessories = "";
-				      	const accessoriesList = getArray(weapon.accessories.accessory);
-				      	accessoriesList.forEach((accessory) => {
-				      		accessories += `${accessory["name"]}, `
-				      	});
+				      	//EXOTIC WEAPONS NEED SPECIAL HANDLING
+				      	if (category.includes("EXOTIC")) {
+				      		update[`${section}_dicepool_modifier`] = weapon.dicepool;
+				      	};
 
-				      	update[`${section}_notes`] = accessories;
-			      	};
+						//RANGED WEAPONS NEED CLIP & RANGES
+						if (weapon.type.toUpperCase() === "RANGED") {
+					        if (weapon.clips != null && weapon.clips.clip != null) {
+					          const clips = Array.isArray(weapon.clips.clip) ? weapon.clips.clip : [ weapon.clips.clip ];
+					          update[`${section}_ammo`] = clips[0].count;
+					        } else if (weapon.name.includes("Grenade")) {
+					        	const gearsList = getArray(character.gears.gear);
+					        	gearsList.forEach((gear) => {
+					        		if (weapon.name === gear.name) {
+					        			update[`${section}_ammo`] = gear.qty || 1;
+					        		};
+					        	});
+					        } else if (weapon.ammo) {
+					        	 update[`${section}_ammo`] = weapon.ammo;
+					        };
 
-			      	// TOGGLE THE SETTINGS OFF
-			      	update[`${section}_flag`] =  "display";
-				} catch (error) {
-					setText["error"] += addFeedback(JSON.stringify(weapon), error);
-				};
-			});
+					        //RANGE
+							const rangeList = weapon.ranges;
+							let range = "";
+							Object.keys(rangeList).forEach((key) => {
+								if (key != "name" && rangeList[key] != null) {
+									const rangeNumber = rangeList[key].split("-")[1];
+									range += (key === "short") ? `${rangeNumber}` : `/${rangeNumber}`;
+								};
+							});
+							update[`${section}_range`] = range;
+				      	};
+
+				      	//ACCESSORIES
+				      	if (weapon.accessories) {
+					      	let accessories = "";
+					      	const accessoriesList = getArray(weapon.accessories.accessory);
+					      	accessoriesList.forEach((accessory) => {
+					      		accessories += `${accessory["name"]}, `
+					      	});
+
+					      	update[`${section}_notes`] = accessories;
+				      	};
+
+				      	// TOGGLE THE SETTINGS OFF
+				      	update[`${section}_flag`] =  "display";
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(weapon), error);
+					};
+				});
+			}
 
 			//ARMOR
-			jsonLists["armorList"].forEach((armor) => {
-				try {
-					const id = generateRowID();
-					if (armor.category != "Clothing") {
-						const section = `repeating_armor_${id}`;
-						let armorMods = "";
-						let armorGear = "";
+			if (character.armors != null && character.armors.armor != null) {
+				const armorsList = getArray(character.armors.armor);
+				armorsList.forEach((armor) => {
+					try {
+						const id = generateRowID();
+						if (armor.category != "Clothing") {
+							const section = `repeating_armor_${id}`;
+							let armorMods = "";
+							let armorGear = "";
 
-						// ARMOR NAME
-						update[`${section}_name`] =  armor.name;
+							// ARMOR NAME
+							update[`${section}_name`] =  armor.name;
 
-						// ARMOR sometimes has a bonus
-						update[`${section}_rating`] = (armor.armor.includes("/+")) ? armor.armor.split("/+")[0] : armor.armor;
+							// ARMOR sometimes has a bonus
+							update[`${section}_rating`] = (armor.armor.includes("/+")) ? armor.armor.split("/+")[0] : armor.armor;
 
-						// ARMOR MODS
-						if (armor.armormods && armor.armormods != null) {
-							const modsList = getArray(armor.armormods.armormod);
-							modsList.forEach((modification) => {
-								armorMods += `${modification.name}, `;
+							// ARMOR MODS
+							if (armor.armormods && armor.armormods != null) {
+								const modsList = getArray(armor.armormods.armormod);
+								modsList.forEach((modification) => {
+									armorMods += `${modification.name}, `;
 
-								if (modification.name === "Nonconductivity") {
-									update[`${section}_electrical_modifier`] = modification.rating;
-								} else if (modification.name === "Thermal Damping" || modification === "Insulation") {
-									update[`${section}_cold_modifier`] = modification.rating;
-								} else if (modification.name === "Radiation Shielding") {
-									update[`${section}_radiation_modifier`] = modification.rating;
-								} else if (modification.name === "Chemical Protectio") {
-									update[`${section}_acid_modifier`] = modification.rating;
-								} else if (modification.name === "Fire Resistance") {
-									update[`${section}_fire_modifier`] = modification.rating;
-								};
-							});
+									if (modification.name === "Nonconductivity") {
+										update[`${section}_electrical_modifier`] = modification.rating;
+									} else if (modification.name === "Thermal Damping" || modification === "Insulation") {
+										update[`${section}_cold_modifier`] = modification.rating;
+									} else if (modification.name === "Radiation Shielding") {
+										update[`${section}_radiation_modifier`] = modification.rating;
+									} else if (modification.name === "Chemical Protectio") {
+										update[`${section}_acid_modifier`] = modification.rating;
+									} else if (modification.name === "Fire Resistance") {
+										update[`${section}_fire_modifier`] = modification.rating;
+									};
+								});
+							};
+
+							// ARMOR GEAR
+							if (armor.gears && armor.gears != null) {
+								const gearList = getArray(armor.gears.gear);
+								gearList.forEach((gear) => {
+									if (gear.children) {
+										const childrenList = getArray(gear.children.gear);
+										childrenList.forEach((child) => {
+											armorGear += `${gear.name} (${child.name}), `;
+										});
+									} else {
+										armorGear += `${gear.name}, `;
+									};
+								});
+							};
+
+							// HIDE SETTINGS
+							update[`${section}_flag`] =  "display";
+
+							update[`${section}_notes`] =  
+								(armorMods && armorGear) ? `Modification: ${armorMods} Gear: ${armorGear}` :
+								(armorMods) ? `Modification: ${armorMods}` :
+								(armorGear) ? `Gear: ${armorGear}` : "";
+						} else {
+							// Chummer puts Clothing in with armor
+							const section = `repeating_items_${id}`;
+							update[`${section}_item`] =  armor.name;
+							update[`${section}_flag`] =  "display";
 						};
-
-						// ARMOR GEAR
-						if (armor.gears && armor.gears != null) {
-							const gearList = getArray(armor.gears.gear);
-							gearList.forEach((gear) => {
-								if (gear.children) {
-									const childrenList = getArray(gear.children.gear);
-									childrenList.forEach((child) => {
-										armorGear += `${gear.name} (${child.name}), `;
-									});
-								} else {
-									armorGear += `${gear.name}, `;
-								};
-							});
-						};
-
-						// HIDE SETTINGS
-						update[`${section}_flag`] =  "display";
-
-						update[`${section}_notes`] =  
-							(armorMods && armorGear) ? `Modification: ${armorMods} Gear: ${armorGear}` :
-							(armorMods) ? `Modification: ${armorMods}` :
-							(armorGear) ? `Gear: ${armorGear}` : "";
-					} else {
-						// Chummer puts Clothing in with armor
-						const section = `repeating_items_${id}`;
-						update[`${section}_item`] =  armor.name;
-						update[`${section}_flag`] =  "display";
-					};
-				} catch (error) {
-					setText["error"] += addFeedback(JSON.stringify(armor), error);
-				}
-			});
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(armor), error);
+					}
+				});
+			}
 
 			//AUGMENTATIONS
 			if (character.cyberwares != null && character.cyberwares.cyberware != null) {
-				jsonLists["cyberwareList"].forEach((ware) => {
+				const cyberwaresList = getArray(character.cyberwares.cyberware);
+				cyberwaresList.forEach((ware) => {
 					const id = generateRowID();
 					try {
 						const section = `repeating_augementations_${id}`;
@@ -4607,7 +4605,8 @@
 
 			// GEAR
 			if (character.gears != null && character.gears.gear != null) {
-				jsonLists["gearList"].forEach((gear) => {
+				const gearsList = getArray(character.gears.gear);
+				gearsList.forEach((gear) => {
 					const id = generateRowID();
 					try {
 						if (gear.name.toLowerCase() === "fake sin") {
@@ -4653,6 +4652,69 @@
 					};
 				});
 			};
+
+			//SPELL KEYS
+			const spellKeys = {
+				"category": "category"
+				,"name": "name"
+				,"range": "range"
+			};
+
+			// SPELLS
+			if (character.spells != null && character.spells.spell != null) {
+				const spellsList = getArray(character.spells.spell);
+				spellsList.forEach((spell) => {
+					try {
+						const id = generateRowID();
+						const type = (spell.alchemy.toUpperCase() === "TRUE") ? "preps" : "spell";
+						const section = `repeating_${type}_${id}`;
+
+						Object.keys(spellKeys).forEach((key) => {
+				      		if (spell[`${key}`] && spell[`${key}`] != null) {
+				      			update[`${section}_${spellKeys[key]}`] = spell[`${key}`];
+				      		};
+						});
+
+						// FLAG
+						update[`${section}_flag`] = "display";
+
+						// TYPE
+						update[`${section}_type`] = (spell.type === "P") ? "Physical" : "Mana";
+
+						// DRAIN
+						update[`${section}_drain`] = spell.dv.replace("F", "");
+
+						// SET COMBAT TYPE
+						if (spell.category.toUpperCase() === "COMBAT") {
+							const combatType = spell.descriptors.toUpperCase();
+							update[`${section}_combat_type`] = 
+								(combatType.includes("DIRECT")) ? "Direct, Force " :
+								(combatType.includes("INDIRECT")) ? "Indirect, Force ?{Force|}, AP -" :
+								"Force ";
+							update[`${section}_damage`] = spell.damage;
+						}
+
+						// DURATION
+						const duration = spell.duration.toUpperCase();
+						update[`${section}_duration`] = 
+							(duration === "S") ? "Sustained" : 
+							(duration === "I") ? "Instant" : 
+							(duration === "P") ? "Permanent" :
+							"Special";
+
+						// NOTES
+						if (spell.descriptors != null) {
+				            update[`${section}_notes`] = spell.descriptors;
+				         }
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(spell.name), error);
+					}
+				});
+			}
+
+			// POWERS
+
+			// CONTACTS
 
 			setCharmancerText(setText);
 			resolve(update);
