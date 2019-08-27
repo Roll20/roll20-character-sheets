@@ -1669,11 +1669,12 @@
 						</div>
 						<div class="display">
 							<input class="display-flag" type="checkbox" name="attr_display_flag" />
-							<span name="attr_display" style="width: 100%;"></span>
-							<span name="attr_name" title="Fake ID"></span>
-							<span name="attr_lifestyle" title="Related lifestyle"></span>
-							<span name="attr_funds" title="Funds"></span>
-							<span name="attr_licenses" title="Licenses"></span>
+							<div class="display-row" title="Fake ID"><span name="attr_name"></span></div>
+							<div class="collapsable">
+								<div class="desc-lifestyle" title="Related lifestyle"><span name="attr_lifestyle"></span></div>
+								<div class="desc-lifestyle" title="Funds"><span name="attr_funds"></span></div>
+								<div class="desc-lifestyle" title="Licenses"><span name="attr_licenses"></span></div>
+							</div>
 						</div>
 						<button class="pictos settings-button" name="act_lifestyle" type="action">x</button>
 					</fieldset>
@@ -4024,22 +4025,6 @@
 	        });
 	    });
 
-	//Repeating IDs & Lifestyles Section Display
-		on("change:repeating_lifestyle", () => {
-			const lifestyle = ["repeating_lifestyle_name", "repeating_lifestyle_lifestyle", "repeating_lifestyle_funds", "repeating_lifestyle_licenses"];
-			getAttrs(lifestyle, (v) => {
-				let string = "";
-				lifestyle.forEach((variable) => {
-					const value = 
-						(v[`${variable}`].length > 0 && v[`${variable}`].length <= 14) ? v[`${variable}`] :
-						(v[`${variable}`].length > 14) ? v[`${variable}`].slice(0,14) + "..." : 
-						"";
-					string += (lifestyle.indexOf(variable) === 0) ? `${value}` : ` / ${value}`;
-				});
-				setAttrs({repeating_lifestyle_display: string});
-			});
-		});
-
 	//Repeating contacts for PC sheet
 		on("change:repeating_contacts", () => {
 			getAttrs(["repeating_contacts_name"], (v) => {
@@ -4625,11 +4610,19 @@
 				jsonLists["gearList"].forEach((gear) => {
 					const id = generateRowID();
 					try {
-						if (gear.name ===  "Fake SIN") {
+						if (gear.name.toLowerCase() === "fake sin") {
 							const section = `repeating_lifestyle_${id}`;
 							update[`${section}_name`] = `${gear.extra} (rating ${gear.rating})`;
-							update[`${section}_lifestyle`] = gear.location;
+							update[`${section}_lifestyle`] = (gear.location != null) ? `${gear.location},` : "";
 							update[`${section}_flag`] = "display";
+
+							update[`${section}_licenses`] = "";
+							if (gear.children && gear.children.gear != null) {
+								const childrenList = getArray(gear.children.gear);
+								childrenList.forEach((child) => {
+									update[`${section}_licenses`] += `${child.extra} (rating ${child.rating}), `;
+								});
+							}
 						} else {
 							const section = `repeating_items_${id}`;
 							let gearNotes = "";
