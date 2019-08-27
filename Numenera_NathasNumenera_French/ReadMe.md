@@ -5,7 +5,7 @@ Bas&eacute;e sur la feuille de personnage "Numenera" d&eacute;j&agrave; pr&eacut
 Voir en fin de fichier pour les notes de versions.
 
 # Version courante :
-Version 4.7 (19 Septembre 2015) : [Capture d'&eacute;cran](NathasNumenera_tabs_v4-5.jpg).
+Version 4.8 (10 Octobre 2015) : [Capture d'&eacute;cran](NathasNumenera_tabs_v4-5.jpg).
 
 # Utilisation basique :
 
@@ -50,41 +50,47 @@ Alternative (permettant de modifier les sources &agrave; votre convenance si vou
 
 # Notes de version
 
-##Release 4.7 (19 Septembre 2015)
+## Version 4.8 (10 Octobre 2015)
+Le script API doit &ecirc;tre mis &agrave; jour en version 4.8.
+
+* &Agrave; la demande d'utilisateurs de la FdP, le template de jet basique (non API) a &eacute;t&eacute; unifi&eacute;, en ne lan&ccedil;ant qu'un seul d20 dont le r&eacute;sultat brut est affich&eacute;. Si le param&egrave;tre de difficult&eacute; n'est pas pas renseign&eacute; dans le groupe "Action" (=0), la difficult&eacute; battue n'est plus calcul&eacute;e (du fait de limitations technique de Roll20), mais seulement les niveaux la diminuant ou l'augmentant.
+* Ajout d'un bouton de remise &agrave; z&eacute;ro des param&egrave;tres de jet dans la section "Action"
+
+## Version 4.7 (19 Septembre 2015)
 Notez que le [script API](https://github.com/Roll20/roll20-api-scripts/blob/master/Numenera_Natha/Numenera_Natha.js) doit &ecirc;tre mis &agrave; jour pour utiliser les boutons "rouges" !
 
 Les valeurs par d&eacute;faut sont d&eacute;sormais valu&eacute;es automatiquement par la fiche ou l'API, au besoin, et donc les boutons de jets sont imm&eacute;diatement utilisables apr&egrave;s la cr&eacute;tion du personnage.
 
 Les templates de jets ont &eacute;t&eacute; modifi&eacute;s pour une l&eacute;g&egrave;re clarification, et pour harmoniser l'affichage entre les jets par l'API et les jets "basiques".
 
-##Version 4.6 (30 Ao&ucirc;t 2015)
+## Version 4.6 (30 Ao&ucirc;t 2015)
 Am&eacute;lioration de l'affichage des r&eacute;sultats des jets basiques d'attributs (hors API) avec indication de succ&egrave;s ou d'&eacute;chec.
 
-##Version 4.5 (13 Juin 2015)
+## Version 4.5 (13 Juin 2015)
 Ajout des d&eacute;g&acirc;ts sp&eacute;ciaux dans la gestion de l'&Eacute;tat du personnage.
 Le script API &eacute;t&eacute; mis &agrave; jour en cons&eacute;quence.
 
-##Version 4.4 (Juin 2015)
+## Version 4.4 (Juin 2015)
 Ajout du niveau de comp&eacute;tence et des Atouts dans les param&egrave;tres de Jet d'Initiative.
 Le script API &eacute;t&eacute; mis &agrave; jour en cons&eacute;quence.
 
-##Version 4.3 (Mai 2015)
+## Version 4.3 (Mai 2015)
 Ajout du niveau de comp&eacute;tence dans les param&egrave;tres de Jet.
 Le script API &eacute;t&eacute; mis &agrave; jour en cons&eacute;quence.
 
-##Version 4.2 (Avril 2015)
+## Version 4.2 (Avril 2015)
 D&eacute;but d'int&eacute;gration de la traduction officielle VF de [Black Book Editions](http://www.black-book-editions.fr/contenu/file/165_nu_feuille_de_personnage_v0.pdf).
 
 Correction de l'affichage de la difficult&eacute; par d&eacute;faut des PNJs.
 
 Quelques ajustements visuels.
 
-##Version 4.1 (Avril 2015)
+## Version 4.1 (Avril 2015)
 Nouvel attribut "Avantage" en tant que param&egrave;tre de jet de caract&eacute;ristique, utilis&eacute; &agrave; la fois par les jets d'API (v4.2+) et standards/int&eacute;gr&eacute;s.
 
 NB : les fonctions API 4.2 int&egrave;grent aussi une nouvelle commande pour faire des jets de caract&eacute;ristique par macro, avec un pion s&eacute;lectionn&eacute; et en demandant tous les param&egrave;tres n&eacute;cessaires :  !nathanum-macroroll.
 
-##Version 4.0 (Mars 2015)
+## Version 4.0 (Mars 2015)
 *Plus besoin de macros ! Et des templates! Et une version PNJ  de la feuille !*
 
 La feuille int&egrave;gre directement les boutons n&eacute;cessaires &agrave; la plupart des jets, et l'affichages des r&eacute;sultats se fait dans le chat avec la nouvelle fonctions de _templates_ de Roll20.
@@ -97,13 +103,12 @@ Boutons rouges : jets avec appels de l'API (cf. ci-dessus) pour une mise &agrave
 
 Les autres attributs restent identiques &agrave; la version pr&eacute;c&eacute;dente, donc il est possible de mettre &agrave; jour votre campagne avec la nouvelle feuille de personnage (HTML et CSS) et conserver les personnages existants.
 
-##Version 3.0 (05/11/2014)
+## Version 3.0 (05/11/2014)
 *Nouvelle feuille de personnage avec onglets* (lisibilit&eacute; am&eacute;lior&eacute;e).<br/>Trois onglets : Principale (attributs, attaques, comp&eacute;tences, capacit&eacute;s sp&eacute;ciales), Numen&eacute;ra & &Eacute;quipement, Avancements & Background.
 
 Les attributs Roll20 restent identiques &agrave; la version pr&eacute;c&eacute;dente  (ainsi que les macros et fonctions API), donc il est possible de mettre &agrave; jour votre campagne avec la nouvelle feuille de personnage (HTML et CSS) et conserver les personnages existants.
 
-
-##Version 2.7 (22/09/2014)
+## Version 2.7 (22/09/2014)
 Pas de modification de la feuille de personnage.
 D&eacute;placemet des fichiers de scripts API et de Macros vers Gist.
 Am&eacute;liorations du Readme.
@@ -114,7 +119,7 @@ Modifications des fonctions [API](https://gist.github.com/NathaTerrien/14536ac9e
 ## Version 2.2 (23/08/2014)
 Encodage HTML de tous les accents (ReadMe.md, NathasNumenera_Roll20_Macros_French.md, NathasNumenera_Roll20_API_French.js, NathasNumenera_Roll20_CharacterSheet_Layout_French.htm).
 
-##Version 2.1 (29/07/2014)
+## Version 2.1 (29/07/2014)
 1. Mise &agrave; jour de **NathasNumenera_Roll20_CharacterSheet_Layout_French.htm** :
   1. Section "Avancement" plus d&eacute;taill&eacute;es, avec un attribut par avancement et par tiers.
   2. Vous pouvez supprimer des personnages existants les attributs xp-stats, xp-edge etc... qui ne seront plus utilis&eacute;s.
@@ -122,4 +127,3 @@ Encodage HTML de tous les accents (ReadMe.md, NathasNumenera_Roll20_Macros_Frenc
 3. Nouvelle capture d'&eacute;cran / feuille
 4. Mise &agrave; jour de sheet.json pour int&eacute;grer la nouvelle capture d'&eacute;cran
 5. Remplacement du fichier texte (.txt) des macros par un fichier markdown (.md) pour une meilleure lisibilit&eacute; sur Github ("NathasNumenera_Roll20_Macros_French.md")
-

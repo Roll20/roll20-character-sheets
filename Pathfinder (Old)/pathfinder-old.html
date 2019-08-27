@@ -240,7 +240,7 @@
 						<span class="sheet-table-data-center"><input type="number" title="HP" name="attr_HP" value="0"></span>
 						<span class="sheet-table-data-center" style="vertical-align:middle;font-size:150%;"><b>/</b></span>
 						<span class="sheet-table-data-center"><input title="HP|max" type="number" name="attr_HP_max" value="@{HP-formula}" disabled></span>
-						<span class="sheet-table-data-center"><input title="HP-formula" type="text" name="attr_HP-formula" value="(@{CON-mod} * @{level}) + @{total-hp}"></span>
+						<span class="sheet-table-data-center"><input title="HP-formula" type="text" name="attr_HP-formula" value="((@{CON-mod} * @{level}) + @{total-hp})"></span>
 						<span class="sheet-table-data-center"><input type="number" title="HP-temp" name="attr_HP-temp" value="0"></span>
 						<span class="sheet-table-data-center"><input type="number" title="non-lethal-damage" name="attr_non-lethal-damage" value="0"></span>
 					</div>
@@ -300,7 +300,7 @@
 			</div>
 			<div class="sheet-table-row">
 				<span class="sheet-table-row-name">AC</span>
-				<span class="sheet-table-data-center" style="text-align:center;"><input title="AC" type="number" name="attr_AC" value="(10 + @{AC-armor} + @{AC-shield} + @{DEX-mod} + @{size} + @{AC-dodge} + @{AC-natural} + @{AC-deflect} + @{AC-misc} + @{AC-temp})" disabled></span>
+				<span class="sheet-table-data-center" style="text-align:center;"><input title="AC" type="number" name="attr_AC" value="(10 + @{AC-armor} + @{AC-shield} + @{DEX-source} + @{size} + @{AC-dodge} + @{AC-natural} + @{AC-deflect} + @{AC-misc} + @{AC-temp})" disabled></span>
 				<span class="sheet-table-data-center" style="text-align:center;">= 10 +</span>
 				<span class="sheet-table-data-center" style="text-align:center;"><input title="armor-acbonus" type="number" name="attr_AC-armor" value="(@{armor-acbonus} * @{armor-equipped})" disabled></span>
 				<span class="sheet-table-data-center" style="text-align:center;"><input title="shield-acbonus" type="number" name="attr_AC-shield" value="(@{shield-acbonus} * @{shield-equipped})" disabled></span>
@@ -322,7 +322,7 @@
 		<div class="sheet-table">
 			<div class="sheet-table-row">
 				<span class="sheet-table-row-name">Touch</span>
-				<span class="sheet-table-data-center" style="text-align:center;"><input title="Touch" type="number" name="attr_Touch" value="(10 + @{DEX-mod} + @{size} + @{AC-dodge} + @{AC-deflect} + @{AC-misc} + @{AC-temp})" disabled></span>
+				<span class="sheet-table-data-center" style="text-align:center;"><input title="Touch" type="number" name="attr_Touch" value="(10 + @{DEX-source} + @{size} + @{AC-dodge} + @{AC-deflect} + @{AC-misc} + @{AC-temp})" disabled></span>
 				<span class="sheet-table-row-name">Flat-Footed</span>
 				<span class="sheet-table-data-center" style="text-align:center;"><input title="Flat-Footed" type="number" name="attr_Flat-Footed" value="(10 + @{AC-armor} + @{AC-shield} + @{size} + @{AC-natural} + @{AC-deflect} + @{AC-misc} + @{AC-temp})" disabled></span>
 				<span class="sheet-table-row-name">ACP</span>
@@ -546,8 +546,8 @@
 						<span class="sheet-table-header">Misc</span>
 					</div>
 					<div class="sheet-table-row">
-						<span class="sheet-table-row-name" style="width:5%;"><button class="sheet-text-button" title="Roll-for-initiative" type="roll" name="roll_Roll-for-initiative" value="&{template:pf_check} {{name=@{target|character_name}'s}} {{check=Initiative Roll}} {{init=[[1d20 + [[ @{target|init} ]] + [[ 0.01 * @{target|init} ]] &{tracker}]]}}">Initiative</button></span>
-						<span class="sheet-table-data-center"><input title="init" type="number" name="attr_init" value="(@{DEX-mod} + @{init-misc})" disabled></span>
+						<span class="sheet-table-row-name" style="width:5%;"><button class="sheet-text-button" title="Roll-for-initiative" type="roll" name="roll_Roll-for-initiative" value="&{template:pf_check} {{name=@{character_name}'s}} {{check=Initiative Roll}} {{init=[[ ( 1d20 + [[ @{init} ]] [init] + [[ {(0.01 * [[ @{init} ]] ),0}kh1 ]] [tie-breaker] ) &{tracker} ]] }}">Initiative</button></span>
+						<span class="sheet-table-data-center"><input title="init" type="number" name="attr_init" value="(@{init-DEX} + @{init-misc})" disabled></span>
 						<span class="sheet-table-data-center"><input title="DEX-mod" type="number" name="attr_init-DEX" value="@{DEX-mod}" disabled></span>
 						<span class="sheet-table-data-center"><input title="init-misc" type="number" name="attr_init-misc" value="0"></span>
 					</div>
@@ -1178,26 +1178,26 @@
             <fieldset class="repeating_weapon">  
     			<div class="sheet-table">
 					<div class="sheet-table-row1">
-						<span class="sheet-table-data sheet-center" style="width:5%;"><button type="roll" value="@{macro-text}"></button></span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" min="0" name="attr_enhance" title="@{repeating_weapon_X_enhance}"><br>Enhance</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="checkbox" name="attr_masterwork" title="@{repeating_weapon_X_masterwork}" value="1"><br>Mwk</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_name" title="@{repeating_weapon_X_name}" placeholder="Name"><br>Name</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_attack" title="@{repeating_weapon_X_attack}" placeholder="Attack Modifiers"><br>Attack Mods</span>
+						<span class="sheet-table-data sheet-center" style="width:5%;"><button type="roll" name="roll_roll" title="%{repeating_weapon_$X_roll}" value="@{macro-text}"></button></span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" min="0" name="attr_enhance" title="@{repeating_weapon_$X_enhance}" value="0" ><br>Enhance</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="checkbox" name="attr_masterwork" title="@{repeating_weapon_$X_masterwork}" value="1" ><br>Mwk</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_name" title="@{repeating_weapon_$X_name}" placeholder="Name" ><br>Name</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_attack" title="@{repeating_weapon_$X_attack}" placeholder="Attack Modifiers"value="0" ><br>Attack Mods</span>
 						<span class="sheet-table-data sheet-center sheet-small-label" style="width:10%;">
-							<select title="@{repeating_weapon_X_attack-type}" name="attr_attack-type">
-								<option value="0" selected>None</option>
-								<option value="@{attk-melee}">Melee</option>
-								<option value="@{attk-ranged}">Ranged</option>
+							<select title="@{repeating_weapon_$X_attack-type}" name="attr_attack-type">
+								<option value="0" selected >None</option>
+								<option value="@{attk-melee}" >Melee</option>
+								<option value="@{attk-ranged}" >Ranged</option>
 							</select>
 							<br>Attack Type
 						</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_total-attack" title="@{repeating_weapon_X_total-attack}" value="(@{proficiency} + (((@{enhance} + @{masterwork}) + abs(@{enhance} - @{masterwork})) / 2) + @{attack} + @{attack-type})" disabled><br>ATK</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_damage-dice-num" title="@{repeating_weapon_X_damage-dice-num}" min="0"><br>Dice</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_total-attack" title="@{repeating_weapon_$X_total-attack}" value="(@{proficiency} + (((@{enhance} + @{masterwork}) + abs(@{enhance} - @{masterwork})) / 2) + @{attack} + @{attack-type})" disabled><br>ATK</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_damage-dice-num" title="@{repeating_weapon_$X_damage-dice-num}" min="0" value="1" ><br>Dice</span>
 						<span class="sheet-table-data sheet-center" style="vertical-align:middle;font-size:150%;width:2%;">d</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_damage-die" title="@{repeating_weapon_X_damage-die}" min="0"><br>Die</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_damage" title="@{repeating_weapon_X_damage}" placeholder="Damage Modifiers"><br>Damage Mods</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_damage-die" title="@{repeating_weapon_$X_damage-die}" min="0" value="1" ><br>Die</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_damage" title="@{repeating_weapon_$X_damage}" placeholder="Damage Modifiers" value="0" ><br>Damage Mods</span>
 						<span class="sheet-table-data sheet-center" style="width:15%;">
-							<select title="@{repeating_weapon_X_damage-ability}" name="attr_damage-ability">
+							<select title="@{repeating_weapon_$X_damage-ability}" name="attr_damage-ability">
 								<option value="0" selected>None</option>
 								<option value="floor(0.5 * @{STR-mod})">1/2 STR</option>
 								<option value="floor(0.5 * @{DEX-mod})">1/2 DEX</option>
@@ -1226,31 +1226,31 @@
 							</select>
 							<br>Damage Ability
 						</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_total-damage" title="@{repeating_weapon_X_total-damage}" value="(@{enhance} + @{damage} + @{damage-ability})" disabled><br>DMG</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_total-damage" title="@{repeating_weapon_$X_total-damage}" value="(@{enhance} + @{damage} + @{damage-ability})" disabled><br>DMG</span>
 					</div>
 				</div>
 				<div class="sheet-table">
 					<div class="sheet-table-row1">
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_crit-target" title="@{repeating_weapon_X_crit-target}" min="0" max="20"><br>Crit</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_crit-target" title="@{repeating_weapon_$X_crit-target}" min="0" max="20" value="20" ><br>Crit</span>
 						<span class="sheet-table-data sheet-center" style="vertical-align:middle;font-size:150%;width:2%;"><b>/x</b></span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_crit-multiplier" title="@{repeating_weapon_X_crit-multiplier}" min="0"><br>Multiplier</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_range" title="@{repeating_weapon_X_range}" value="0" min="0"><br>Range</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_type" title="@{repeating_weapon_X_type}" placeholder="Damage Type"><br>Damage Type</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_weight" title="@{repeating_weapon_X_weight}" value="0" step="any" min="0"><br>Weight</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_ammo" title="@{repeating_weapon_X_ammo}" value="0"><br>Ammo</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_crit-multiplier" title="@{repeating_weapon_$X_crit-multiplier}" min="0" value="2" ><br>Multiplier</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_range" title="@{repeating_weapon_$X_range}"  min="0" value="0" ><br>Range</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_type" title="@{repeating_weapon_$X_type}" placeholder="Damage Type" ><br>Damage Type</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_weight" title="@{repeating_weapon_$X_weight}"  step="any" min="0" value="0" ><br>Weight</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_ammo" title="@{repeating_weapon_$X_ammo}" value="0" ><br>Ammo</span>
 						<span class="sheet-table-data sheet-center sheet-small-label" style="width:10%;">
-							<select title="@{repeating_weapon_X_proficiency}" name="attr_proficiency">
-								<option value="0">Yes</option>
-								<option value="-4" selected>No</option>
+							<select title="@{repeating_weapon_$X_proficiency}" name="attr_proficiency">
+								<option value="0" selected>Yes</option>
+								<option value="-4">No</option>
 							</select>
 							<br>Proficiency
 						</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:48%;"><input type="text" name="attr_notes" title="@{repeating_weapon_X_notes}" placeholder="Attack Notes"><br>Notes</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:48%;"><input type="text" name="attr_notes" title="@{repeating_weapon_$X_notes}" placeholder="Attack Notes" ><br>Notes</span>
 					</div>
 				</div>
 				<b>Macro Text&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
-				<input type="checkbox" class="sheet-macro-show" title="@{repeating_weapon_X_macro-text-show}" name="attr_macro-text-show" value="1" style="opacity:0;width: 35px;height: 16px;position: relative;top: 5px;left: 6px;margin: -32px;cursor: pointer;z-index: 1;" /><span></span>
-				<textarea class="sheet-macro" title="@{repeating_weapon_X_macro-text}" name="attr_macro-text">/em is attacking with @{name}&#x00A;&{template:PFAttack} {{name=@{character_name}'s @{name}}} {{subtags=@{type}}} {{attack=[[1d20cs>@{crit-target}+@{total-attack}]]}} {{damage=[[@{damage-dice-num}d@{damage-die}+@{total-damage}]]}} {{confirm=[[1d20+@{total-attack}]]}} {{dmgcrit=[[(@{damage-dice-num} * (@{crit-multiplier} - 1))d@{damage-die} + (@{total-damage} * (@{crit-multiplier} - 1))]]}} {{notes=@{notes}}} {{attk-notes=@{attack-notes}}}}</textarea>
+				<input type="checkbox" class="sheet-macro-show" title="@{repeating_weapon_$X_macro-text-show}" name="attr_macro-text-show" value="1" style="opacity:0;width: 35px;height: 16px;position: relative;top: 5px;left: 6px;margin: -32px;cursor: pointer;z-index: 1;" /><span></span>
+				<textarea class="sheet-macro" title="@{repeating_weapon_$X_macro-text}" name="attr_macro-text">/em is attacking with @{name}&#x00A;&{template:PFAttack} {{name=@{character_name}'s @{name}}} {{subtags=@{type}}} {{attack=[[1d20cs>@{crit-target}+@{total-attack}]]}} {{damage=[[@{damage-dice-num}d@{damage-die}+@{total-damage}]]}} {{confirm=[[1d20+@{total-attack}]]}} {{dmgcrit=[[(@{damage-dice-num} * (@{crit-multiplier} - 1))d@{damage-die} + (@{total-damage} * (@{crit-multiplier} - 1))]]}} {{notes=@{notes}}} {{attk-notes=@{attack-notes}}}}</textarea>
 				<hr>		
 			</fieldset>
 		</div>
@@ -1273,7 +1273,7 @@
 		<div class="sheet-table">
 			<fieldset class="repeating_feat">  
 				<span class="sheet-table-data-center" style="width:15%;">
-					<select title="repeating_feat_X_type" name="attr_type">
+					<select title="repeating_feat_$X_type" name="attr_type">
 						<option value="None" selected>None</option>
 						<option value="Racial">Racial</option>
 						<option value="Trait">Trait</option>
@@ -1282,14 +1282,14 @@
 						<option value="Other">Other</option>
 					</select>
 				</span>
-				<span class="sheet-table-data-center"><input title="repeating_feat_X_name" type="text" name="attr_name"></span>
-				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_feat_X_used" type="number" name="attr_used" value="0"></span>
+				<span class="sheet-table-data-center"><input title="repeating_feat_$X_name" type="text" name="attr_name"></span>
+				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_feat_$X_used" type="number" name="attr_used" value="0"></span>
 				<span class="sheet-table-data-center" style="width:2%;vertical-align:middle;font-size:150%;">/</span>
-				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_feat_X_used|max" type="number" name="attr_used_max" value="@{max-calculation}" disabled></span>
-				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_feat_X_max-calculation" type="text" name="attr_max-calculation" value="0"></span>
+				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_feat_$X_used|max" type="number" name="attr_used_max" value="@{max-calculation}" disabled></span>
+				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_feat_$X_max-calculation" type="text" name="attr_max-calculation" value="0"></span>
 				<b>Show Description?</b>
-				<input type="checkbox" class="sheet-section-show" title="repeating_feat_X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
-				<textarea style="height:50px;" class="sheet-section" title="repeating_feat_X_description" name="attr_description"></textarea>
+				<input type="checkbox" class="sheet-section-show" title="repeating_feat_$X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
+				<textarea style="height:50px;" class="sheet-section" title="repeating_feat_$X_description" name="attr_description"></textarea>
 				<hr>
 			</fieldset>
 		</div>
@@ -1309,10 +1309,10 @@
 		</div>
 		<div class="sheet-table">
 			<fieldset class="repeating_item">
-				<span class="sheet-table-data-center" style="width:40%;"><input title="repeating_item_X_name" type="text" name="attr_name"></span>
-				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_item_X_qty" type="number" name="attr_qty" value="0"></span>
-				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_item_X_weight" type="number" name="attr_weight" step="any" value="0"></span>
-				<span class="sheet-table-data-center" style="width:50%;"><input title="repeating_item_X_description" type="text" name="attr_description"></span>
+				<span class="sheet-table-data-center" style="width:40%;"><input title="repeating_item_$X_name" type="text" name="attr_name"></span>
+				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_item_$X_qty" type="number" name="attr_qty" value="0"></span>
+				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_item_$X_weight" type="number" name="attr_weight" step="any" value="0"></span>
+				<span class="sheet-table-data-center" style="width:50%;"><input title="repeating_item_$X_description" type="text" name="attr_description"></span>
 			</fieldset>
 		</div>
 	</div>
@@ -1775,28 +1775,28 @@
 			</div>
 			<div class="sheet-table">
 				<fieldset class="repeating_lvl-0-spells">
-					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="repeating_lvl-0-spells_X_Effect (NOT USABLE IN MACROS)" name="roll_Effect" value="@{macro-text}"></button></span>
-					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-0-spells_X_used" type="number" name="attr_used" value="0"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_X_name" type="text" name="attr_name"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_X_targets" type="text" name="attr_targets"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_X_cast-time" type="text" name="attr_cast-time"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_X_components" type="text" name="attr_components"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_X_school" type="text" name="attr_school"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_X_duration" type="text" name="attr_duration"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_X_range" type="text" name="attr_range"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_X_save" type="text" name="attr_save"></span>
+					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="%{repeating_lvl-0-spells_$X_Effect}" name="roll_Effect" value="@{macro-text}"></button></span>
+					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-0-spells_$X_used" type="number" name="attr_used" value="0"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_$X_name" type="text" name="attr_name"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_$X_targets" type="text" name="attr_targets"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_$X_cast-time" type="text" name="attr_cast-time"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_$X_components" type="text" name="attr_components"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_$X_school" type="text" name="attr_school"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_$X_duration" type="text" name="attr_duration"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_$X_range" type="text" name="attr_range"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-0-spells_$X_save" type="text" name="attr_save"></span>
 					<span class="sheet-table-data-center" style="width:10%;">
-						<select title="repeating_lvl-0-spells_X_sr" name="attr_sr">
+						<select title="repeating_lvl-0-spells_$X_sr" name="attr_sr">
 							<option value="Yes">Yes</option>
 							<option value="No" selected>No</option>
 						</select>
 					</span>
 					<b>Show Description?</b>
-					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-0-spells_X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
-					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-0-spells_X_description" name="attr_description"></textarea>
+					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-0-spells_$X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
+					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-0-spells_$X_description" name="attr_description"></textarea>
 					<br>
 					<b>Show Macro Text?</b>
-					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-0-spells_X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
+					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-0-spells_$X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
 					<textarea class="sheet-macro" title="Remove Melee and Ranged Attack and Damage as appropriate" name="attr_macro-text">/em casts @{name}!&#x00A;&{template:pf_spell} {{name=@{name}}}{{school=@{school}}} {{level=@{spellclass-0-name} 0}} {{casting_time=@{cast-time}}} {{components=@{components}}} {{range=@{range}}} {{target=@{targets}}} {{duration=@{duration}}} {{saving_throw=@{save}}} {{sr=@{sr}}} {{mel_attack=[[1d20+@{attk-melee}]]}} {{rng_attack=[[1d20 + @{attk-ranged}]]}} {{damage=1d3([[1d3]])}} {{spell_description=@{description}}}</textarea>
 					<hr>
 				</fieldset>
@@ -1824,28 +1824,28 @@
 			</div>
 			<div class="sheet-table">
 				<fieldset class="repeating_lvl-1-spells">
-					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="repeating_lvl-1-spells_X_Effect (NOT USABLE IN MACROS)" name="roll_Effect" value="@{macro-text}"></button></span>
-					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-1-spells_X_used" type="number" name="attr_used" value="0"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_X_name" type="text" name="attr_name"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_X_targets" type="text" name="attr_targets"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_X_cast-time" type="text" name="attr_cast-time"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_X_components" type="text" name="attr_components"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_X_school" type="text" name="attr_school"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_X_duration" type="text" name="attr_duration"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_X_range" type="text" name="attr_range"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_X_save" type="text" name="attr_save"></span>
+					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="%{repeating_lvl-1-spells_$X_Effect}" name="roll_Effect" value="@{macro-text}"></button></span>
+					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-1-spells_$X_used" type="number" name="attr_used" value="0"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_$X_name" type="text" name="attr_name"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_$X_targets" type="text" name="attr_targets"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_$X_cast-time" type="text" name="attr_cast-time"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_$X_components" type="text" name="attr_components"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_$X_school" type="text" name="attr_school"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_$X_duration" type="text" name="attr_duration"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_$X_range" type="text" name="attr_range"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-1-spells_$X_save" type="text" name="attr_save"></span>
 					<span class="sheet-table-data-center" style="width:10%;">
-						<select title="repeating_lvl-1-spells_X_sr" name="attr_sr">
+						<select title="repeating_lvl-1-spells_$X_sr" name="attr_sr">
 							<option value="Yes">Yes</option>
 							<option value="No" selected>No</option>
 						</select>
 					</span>
 					<b>Show Description?</b>
-					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-1-spells_X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
-					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-1-spells_X_description" name="attr_description"></textarea>
+					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-1-spells_$X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
+					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-1-spells_$X_description" name="attr_description"></textarea>
 					<br>
 					<b>Show Macro Text?</b>
-					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-1-spells_X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
+					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-1-spells_$X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
 					<textarea class="sheet-macro" title="Remove Melee and Ranged Attack and Damage as appropriate" name="attr_macro-text">/em casts @{name}!&#x00A;&{template:pf_spell} {{name=@{name}}} {{school=@{school}}} {{level=@{spellclass-0-name} 1}} {{casting_time=@{cast-time}}} {{components=@{components}}} {{range=@{range}}} {{target=@{targets}}} {{duration=@{duration}}} {{saving_throw=@{save}}} {{sr=@{sr}}} {{mel_attack=[[1d20+@{attk-melee}]]}} {{rng_attack=[[1d20 + @{attk-ranged}]]}} {{damage=1d3([[1d3]])}} {{spell_description=@{description}}}</textarea>
 					<hr>
 				</fieldset>
@@ -1873,28 +1873,28 @@
 			</div>
 			<div class="sheet-table">
 				<fieldset class="repeating_lvl-2-spells">
-					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="repeating_lvl-2-spells_X_Effect (NOT USABLE IN MACROS)" name="roll_Effect" value="@{macro-text}"></button></span>
-					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-2-spells_X_used" type="number" name="attr_used" value="0"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_X_name" type="text" name="attr_name"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_X_targets" type="text" name="attr_targets"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_X_cast-time" type="text" name="attr_cast-time"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_X_components" type="text" name="attr_components"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_X_school" type="text" name="attr_school"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_X_duration" type="text" name="attr_duration"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_X_range" type="text" name="attr_range"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_X_save" type="text" name="attr_save"></span>
+					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="%{repeating_lvl-2-spells_$X_Effect}" name="roll_Effect" value="@{macro-text}"></button></span>
+					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-2-spells_$X_used" type="number" name="attr_used" value="0"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_$X_name" type="text" name="attr_name"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_$X_targets" type="text" name="attr_targets"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_$X_cast-time" type="text" name="attr_cast-time"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_$X_components" type="text" name="attr_components"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_$X_school" type="text" name="attr_school"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_$X_duration" type="text" name="attr_duration"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_$X_range" type="text" name="attr_range"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-2-spells_$X_save" type="text" name="attr_save"></span>
 					<span class="sheet-table-data-center" style="width:10%;">
-						<select title="repeating_lvl-2-spells_X_sr" name="attr_sr">
+						<select title="repeating_lvl-2-spells_$X_sr" name="attr_sr">
 							<option value="Yes">Yes</option>
 							<option value="No" selected>No</option>
 						</select>
 					</span>
 					<b>Show Description?</b>
-					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-2-spells_X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
-					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-2-spells_X_description" name="attr_description"></textarea>
+					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-2-spells_$X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
+					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-2-spells_$X_description" name="attr_description"></textarea>
 					<br>
 					<b>Show Macro Text?</b>
-					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-2-spells_X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
+					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-2-spells_$X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
 					<textarea class="sheet-macro" title="Remove Melee and Ranged Attack and Damage as appropriate" name="attr_macro-text">/em casts @{name}!&#x00A;&{template:pf_spell} {{name=@{name}}}{{school=@{school}}} {{level=@{spellclass-0-name} 2}} {{casting_time=@{cast-time}}} {{components=@{components}}} {{range=@{range}}} {{target=@{targets}}} {{duration=@{duration}}} {{saving_throw=@{save}}} {{sr=@{sr}}} {{mel_attack=[[1d20+@{attk-melee}]]}} {{rng_attack=[[1d20 + @{attk-ranged}]]}} {{damage=1d3([[1d3]])}} {{spell_description=@{description}}}</textarea>
 					<hr>
 				</fieldset>
@@ -1922,28 +1922,28 @@
 			</div>
 			<div class="sheet-table">
 				<fieldset class="repeating_lvl-3-spells">
-					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="repeating_lvl-3-spells_X_Effect (NOT USABLE IN MACROS)" name="roll_Effect" value="@{macro-text}"></button></span>
-					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-3-spells_X_used" type="number" name="attr_used" value="0"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_X_name" type="text" name="attr_name"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_X_targets" type="text" name="attr_targets"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_X_cast-time" type="text" name="attr_cast-time"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_X_components" type="text" name="attr_components"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_X_school" type="text" name="attr_school"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_X_duration" type="text" name="attr_duration"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_X_range" type="text" name="attr_range"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_X_save" type="text" name="attr_save"></span>
+					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="%{repeating_lvl-3-spells_$X_Effect}" name="roll_Effect" value="@{macro-text}"></button></span>
+					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-3-spells_$X_used" type="number" name="attr_used" value="0"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_$X_name" type="text" name="attr_name"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_$X_targets" type="text" name="attr_targets"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_$X_cast-time" type="text" name="attr_cast-time"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_$X_components" type="text" name="attr_components"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_$X_school" type="text" name="attr_school"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_$X_duration" type="text" name="attr_duration"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_$X_range" type="text" name="attr_range"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-3-spells_$X_save" type="text" name="attr_save"></span>
 					<span class="sheet-table-data-center" style="width:10%;">
-						<select title="repeating_lvl-3-spells_X_sr" name="attr_sr">
+						<select title="repeating_lvl-3-spells_$X_sr" name="attr_sr">
 							<option value="Yes">Yes</option>
 							<option value="No" selected>No</option>
 						</select>
 					</span>
 					<b>Show Description?</b>
-					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-3-spells_X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
-					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-3-spells_X_description" name="attr_description"></textarea>
+					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-3-spells_$X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
+					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-3-spells_$X_description" name="attr_description"></textarea>
 					<br>
 					<b>Show Macro Text?</b>
-					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-3-spells_X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
+					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-3-spells_$X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
 					<textarea class="sheet-macro" title="Remove Melee and Ranged Attack and Damage as appropriate" name="attr_macro-text">/em casts @{name}!&#x00A;&{template:pf_spell} {{name=@{name}}}{{school=@{school}}} {{level=@{spellclass-0-name} 3}} {{casting_time=@{cast-time}}} {{components=@{components}}} {{range=@{range}}} {{target=@{targets}}} {{duration=@{duration}}} {{saving_throw=@{save}}} {{sr=@{sr}}} {{mel_attack=[[1d20+@{attk-melee}]]}} {{rng_attack=[[1d20 + @{attk-ranged}]]}} {{damage=1d3([[1d3]])}} {{spell_description=@{description}}}</textarea>
 					<hr>
 				</fieldset>
@@ -1971,28 +1971,28 @@
 			</div>
 			<div class="sheet-table">
 				<fieldset class="repeating_lvl-4-spells">
-					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="repeating_lvl-4-spells_X_Effect (NOT USABLE IN MACROS)" name="roll_Effect" value="@{macro-text}"></button></span>
-					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-4-spells_X_used" type="number" name="attr_used" value="0"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_X_name" type="text" name="attr_name"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_X_targets" type="text" name="attr_targets"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_X_cast-time" type="text" name="attr_cast-time"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_X_components" type="text" name="attr_components"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_X_school" type="text" name="attr_school"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_X_duration" type="text" name="attr_duration"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_X_range" type="text" name="attr_range"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_X_save" type="text" name="attr_save"></span>
+					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="%{repeating_lvl-4-spells_$X_Effect}" name="roll_Effect" value="@{macro-text}"></button></span>
+					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-4-spells_$X_used" type="number" name="attr_used" value="0"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_$X_name" type="text" name="attr_name"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_$X_targets" type="text" name="attr_targets"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_$X_cast-time" type="text" name="attr_cast-time"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_$X_components" type="text" name="attr_components"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_$X_school" type="text" name="attr_school"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_$X_duration" type="text" name="attr_duration"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_$X_range" type="text" name="attr_range"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-4-spells_$X_save" type="text" name="attr_save"></span>
 					<span class="sheet-table-data-center" style="width:10%;">
-						<select title="repeating_lvl-4-spells_X_sr" name="attr_sr">
+						<select title="repeating_lvl-4-spells_$X_sr" name="attr_sr">
 							<option value="Yes">Yes</option>
 							<option value="No" selected>No</option>
 						</select>
 					</span>
 					<b>Show Description?</b>
-					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-4-spells_X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
-					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-4-spells_X_description" name="attr_description"></textarea>
+					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-4-spells_$X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
+					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-4-spells_$X_description" name="attr_description"></textarea>
 					<br>
 					<b>Show Macro Text?</b>
-					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-4-spells_X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
+					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-4-spells_$X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
 					<textarea class="sheet-macro" title="Remove Melee and Ranged Attack and Damage as appropriate" name="attr_macro-text">/em casts @{name}!&#x00A;&{template:pf_spell} {{name=@{name}}}{{school=@{school}}} {{level=@{spellclass-0-name} 4}} {{casting_time=@{cast-time}}} {{components=@{components}}} {{range=@{range}}} {{target=@{targets}}} {{duration=@{duration}}} {{saving_throw=@{save}}} {{sr=@{sr}}} {{mel_attack=[[1d20+@{attk-melee}]]}} {{rng_attack=[[1d20 + @{attk-ranged}]]}} {{damage=1d3([[1d3]])}} {{spell_description=@{description}}}</textarea>
 					<hr>
 				</fieldset>
@@ -2020,28 +2020,28 @@
 			</div>
 			<div class="sheet-table">
 				<fieldset class="repeating_lvl-5-spells">
-					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="repeating_lvl-5-spells_X_Effect (NOT USABLE IN MACROS)" name="roll_Effect" value="@{macro-text}"></button></span>
-					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-5-spells_X_used" type="number" name="attr_used" value="0"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_X_name" type="text" name="attr_name"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_X_targets" type="text" name="attr_targets"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_X_cast-time" type="text" name="attr_cast-time"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_X_components" type="text" name="attr_components"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_X_school" type="text" name="attr_school"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_X_duration" type="text" name="attr_duration"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_X_range" type="text" name="attr_range"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_X_save" type="text" name="attr_save"></span>
+					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="%{repeating_lvl-5-spells_$X_Effect}" name="roll_Effect" value="@{macro-text}"></button></span>
+					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-5-spells_$X_used" type="number" name="attr_used" value="0"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_$X_name" type="text" name="attr_name"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_$X_targets" type="text" name="attr_targets"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_$X_cast-time" type="text" name="attr_cast-time"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_$X_components" type="text" name="attr_components"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_$X_school" type="text" name="attr_school"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_$X_duration" type="text" name="attr_duration"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_$X_range" type="text" name="attr_range"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-5-spells_$X_save" type="text" name="attr_save"></span>
 					<span class="sheet-table-data-center" style="width:10%;">
-						<select title="repeating_lvl-5-spells_X_sr" name="attr_sr">
+						<select title="repeating_lvl-5-spells_$X_sr" name="attr_sr">
 							<option value="Yes">Yes</option>
 							<option value="No" selected>No</option>
 						</select>
 					</span>
 					<b>Show Description?</b>
-					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-5-spells_X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
-					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-5-spells_X_description" name="attr_description"></textarea>
+					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-5-spells_$X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
+					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-5-spells_$X_description" name="attr_description"></textarea>
 					<br>
 					<b>Show Macro Text?</b>
-					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-5-spells_X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
+					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-5-spells_$X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
 					<textarea class="sheet-macro" title="Remove Melee and Ranged Attack and Damage as appropriate" name="attr_macro-text">/em casts @{name}!&#x00A;&{template:pf_spell} {{name=@{name}}}{{school=@{school}}} {{level=@{spellclass-0-name} 5}} {{casting_time=@{cast-time}}} {{components=@{components}}} {{range=@{range}}} {{target=@{targets}}} {{duration=@{duration}}} {{saving_throw=@{save}}} {{sr=@{sr}}} {{mel_attack=[[1d20+@{attk-melee}]]}} {{rng_attack=[[1d20 + @{attk-ranged}]]}} {{damage=1d3([[1d3]])}} {{spell_description=@{description}}}</textarea>
 					<hr>
 				</fieldset>
@@ -2069,28 +2069,28 @@
 			</div>
 			<div class="sheet-table">
 				<fieldset class="repeating_lvl-6-spells">
-					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="repeating_lvl-6-spells_X_Effect (NOT USABLE IN MACROS)" name="roll_Effect" value="@{macro-text}"></button></span>
-					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-6-spells_X_used" type="number" name="attr_used" value="0"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_X_name" type="text" name="attr_name"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_X_targets" type="text" name="attr_targets"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_X_cast-time" type="text" name="attr_cast-time"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_X_components" type="text" name="attr_components"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_X_school" type="text" name="attr_school"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_X_duration" type="text" name="attr_duration"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_X_range" type="text" name="attr_range"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_X_save" type="text" name="attr_save"></span>
+					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="%{repeating_lvl-6-spells_$X_Effect}" name="roll_Effect" value="@{macro-text}"></button></span>
+					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-6-spells_$X_used" type="number" name="attr_used" value="0"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_$X_name" type="text" name="attr_name"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_$X_targets" type="text" name="attr_targets"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_$X_cast-time" type="text" name="attr_cast-time"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_$X_components" type="text" name="attr_components"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_$X_school" type="text" name="attr_school"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_$X_duration" type="text" name="attr_duration"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_$X_range" type="text" name="attr_range"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-6-spells_$X_save" type="text" name="attr_save"></span>
 					<span class="sheet-table-data-center" style="width:10%;">
-						<select title="repeating_lvl-6-spells_X_sr" name="attr_sr">
+						<select title="repeating_lvl-6-spells_$X_sr" name="attr_sr">
 							<option value="Yes">Yes</option>
 							<option value="No" selected>No</option>
 						</select>
 					</span>
 					<b>Show Description?</b>
-					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-6-spells_X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
-					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-6-spells_X_description" name="attr_description"></textarea>
+					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-6-spells_$X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
+					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-6-spells_$X_description" name="attr_description"></textarea>
 					<br>
 					<b>Show Macro Text?</b>
-					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-6-spells_X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
+					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-6-spells_$X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
 					<textarea class="sheet-macro" title="Remove Melee and Ranged Attack and Damage as appropriate" name="attr_macro-text">/em casts @{name}!&#x00A;&{template:pf_spell} {{name=@{name}}}{{school=@{school}}} {{level=@{spellclass-0-name} 6}} {{casting_time=@{cast-time}}} {{components=@{components}}} {{range=@{range}}} {{target=@{targets}}} {{duration=@{duration}}} {{saving_throw=@{save}}} {{sr=@{sr}}} {{mel_attack=[[1d20+@{attk-melee}]]}} {{rng_attack=[[1d20 + @{attk-ranged}]]}} {{damage=1d3([[1d3]])}} {{spell_description=@{description}}}</textarea>
 					<hr>
 				</fieldset>
@@ -2118,28 +2118,28 @@
 			</div>
 			<div class="sheet-table">
 				<fieldset class="repeating_lvl-7-spells">
-					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="repeating_lvl-7-spells_X_Effect (NOT USABLE IN MACROS)" name="roll_Effect" value="@{macro-text}"></button></span>
-					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-7-spells_X_used" type="number" name="attr_used" value="0"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_X_name" type="text" name="attr_name"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_X_targets" type="text" name="attr_targets"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_X_cast-time" type="text" name="attr_cast-time"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_X_components" type="text" name="attr_components"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_X_school" type="text" name="attr_school"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_X_duration" type="text" name="attr_duration"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_X_range" type="text" name="attr_range"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_X_save" type="text" name="attr_save"></span>
+					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="%{repeating_lvl-7-spells_$X_Effect}" name="roll_Effect" value="@{macro-text}"></button></span>
+					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-7-spells_$X_used" type="number" name="attr_used" value="0"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_$X_name" type="text" name="attr_name"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_$X_targets" type="text" name="attr_targets"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_$X_cast-time" type="text" name="attr_cast-time"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_$X_components" type="text" name="attr_components"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_$X_school" type="text" name="attr_school"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_$X_duration" type="text" name="attr_duration"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_$X_range" type="text" name="attr_range"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-7-spells_$X_save" type="text" name="attr_save"></span>
 					<span class="sheet-table-data-center" style="width:10%;">
-						<select title="repeating_lvl-7-spells_X_sr" name="attr_sr">
+						<select title="repeating_lvl-7-spells_$X_sr" name="attr_sr">
 							<option value="Yes">Yes</option>
 							<option value="No" selected>No</option>
 						</select>
 					</span>
 					<b>Show Description?</b>
-					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-7-spells_X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
-					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-7-spells_X_description" name="attr_description"></textarea>
+					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-7-spells_$X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
+					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-7-spells_$X_description" name="attr_description"></textarea>
 					<br>
 					<b>Show Macro Text?</b>
-					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-7-spells_X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
+					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-7-spells_$X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
 					<textarea class="sheet-macro" title="Remove Melee and Ranged Attack and Damage as appropriate" name="attr_macro-text">/em casts @{name}!&#x00A;&{template:pf_spell} {{name=@{name}}}{{school=@{school}}} {{level=@{spellclass-0-name} 7}} {{casting_time=@{cast-time}}} {{components=@{components}}} {{range=@{range}}} {{target=@{targets}}} {{duration=@{duration}}} {{saving_throw=@{save}}} {{sr=@{sr}}} {{mel_attack=[[1d20+@{attk-melee}]]}} {{rng_attack=[[1d20 + @{attk-ranged}]]}} {{damage=1d3([[1d3]])}} {{spell_description=@{description}}}</textarea>
 					<hr>
 				</fieldset>
@@ -2167,28 +2167,28 @@
 			</div>
 			<div class="sheet-table">
 				<fieldset class="repeating_lvl-8-spells">
-					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="repeating_lvl-8-spells_X_Effect (NOT USABLE IN MACROS)" name="roll_Effect" value="@{macro-text}"></button></span>
-					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-8-spells_X_used" type="number" name="attr_used" value="0"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_X_name" type="text" name="attr_name"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_X_targets" type="text" name="attr_targets"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_X_cast-time" type="text" name="attr_cast-time"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_X_components" type="text" name="attr_components"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_X_school" type="text" name="attr_school"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_X_duration" type="text" name="attr_duration"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_X_range" type="text" name="attr_range"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_X_save" type="text" name="attr_save"></span>
+					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="%{repeating_lvl-8-spells_$X_Effect}" name="roll_Effect" value="@{macro-text}"></button></span>
+					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-8-spells_$X_used" type="number" name="attr_used" value="0"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_$X_name" type="text" name="attr_name"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_$X_targets" type="text" name="attr_targets"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_$X_cast-time" type="text" name="attr_cast-time"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_$X_components" type="text" name="attr_components"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_$X_school" type="text" name="attr_school"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_$X_duration" type="text" name="attr_duration"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_$X_range" type="text" name="attr_range"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-8-spells_$X_save" type="text" name="attr_save"></span>
 					<span class="sheet-table-data-center" style="width:10%;">
-						<select title="repeating_lvl-8-spells_X_sr" name="attr_sr">
+						<select title="repeating_lvl-8-spells_$X_sr" name="attr_sr">
 							<option value="Yes">Yes</option>
 							<option value="No" selected>No</option>
 						</select>
 					</span>
 					<b>Show Description?</b>
-					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-8-spells_X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
-					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-8-spells_X_description" name="attr_description"></textarea>
+					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-8-spells_$X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
+					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-8-spells_$X_description" name="attr_description"></textarea>
 					<br>
 					<b>Show Macro Text?</b>
-					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-8-spells_X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
+					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-8-spells_$X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
 					<textarea class="sheet-macro" title="Remove Melee and Ranged Attack and Damage as appropriate" name="attr_macro-text">/em casts @{name}!&#x00A;&{template:pf_spell} {{name=@{name}}}{{school=@{school}}} {{level=@{spellclass-0-name} 8}} {{casting_time=@{cast-time}}} {{components=@{components}}} {{range=@{range}}} {{target=@{targets}}} {{duration=@{duration}}} {{saving_throw=@{save}}} {{sr=@{sr}}} {{mel_attack=[[1d20+@{attk-melee}]]}} {{rng_attack=[[1d20 + @{attk-ranged}]]}} {{damage=1d3([[1d3]])}} {{spell_description=@{description}}}</textarea>
 					<hr>
 				</fieldset>
@@ -2216,28 +2216,28 @@
 			</div>
 			<div class="sheet-table">
 				<fieldset class="repeating_lvl-9-spells">
-					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="repeating_lvl-9-spells_X_Effect (NOT USABLE IN MACROS)" name="roll_Effect" value="@{macro-text}"></button></span>
-					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-9-spells_X_used" type="number" name="attr_used" value="0"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_X_name" type="text" name="attr_name"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_X_targets" type="text" name="attr_targets"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_X_cast-time" type="text" name="attr_cast-time"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_X_components" type="text" name="attr_components"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_X_school" type="text" name="attr_school"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_X_duration" type="text" name="attr_duration"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_X_range" type="text" name="attr_range"></span>
-					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_X_save" type="text" name="attr_save"></span>
+					<span class="sheet-table-data-center" style="width:5%;"><button type="roll" title="%{repeating_lvl-9-spells_$X_Effect}" name="roll_Effect" value="@{macro-text}"></button></span>
+					<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_lvl-9-spells_$X_used" type="number" name="attr_used" value="0"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_$X_name" type="text" name="attr_name"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_$X_targets" type="text" name="attr_targets"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_$X_cast-time" type="text" name="attr_cast-time"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_$X_components" type="text" name="attr_components"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_$X_school" type="text" name="attr_school"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_$X_duration" type="text" name="attr_duration"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_$X_range" type="text" name="attr_range"></span>
+					<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_lvl-9-spells_$X_save" type="text" name="attr_save"></span>
 					<span class="sheet-table-data-center" style="width:10%;">
-						<select title="repeating_lvl-9-spells_X_sr" name="attr_sr">
+						<select title="repeating_lvl-9-spells_$X_sr" name="attr_sr">
 							<option value="Yes">Yes</option>
 							<option value="No" selected>No</option>
 						</select>
 					</span>
 					<b>Show Description?</b>
-					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-9-spells_X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
-					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-9-spells_X_description" name="attr_description"></textarea>
+					<input type="checkbox" class="sheet-section-show" title="repeating_lvl-9-spells_$X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
+					<textarea style="height:50px;" class="sheet-section" title="repeating_lvl-9-spells_$X_description" name="attr_description"></textarea>
 					<br>
 					<b>Show Macro Text?</b>
-					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-9-spells_X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
+					<input type="checkbox" class="sheet-macro-show" title="repeating_lvl-9-spells_$X_macro-text-show" name="attr_macro-text-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;"/><span></span>
 					<textarea class="sheet-macro" title="Remove Melee and Ranged Attack and Damage as appropriate" name="attr_macro-text">/em casts @{name}!&#x00A;&{template:pf_spell} {{name=@{name}}}{{school=@{school}}} {{level=@{spellclass-0-name} 9}} {{casting_time=@{cast-time}}} {{components=@{components}}} {{range=@{range}}} {{target=@{targets}}} {{duration=@{duration}}} {{saving_throw=@{save}}} {{sr=@{sr}}} {{mel_attack=[[1d20+@{attk-melee}]]}} {{rng_attack=[[1d20 + @{attk-ranged}]]}} {{damage=1d3([[1d3]])}} {{spell_description=@{description}}}</textarea>
 					<hr>
 				</fieldset>
@@ -2310,13 +2310,15 @@
 			<div class="sheet-table-row">
 				<span class="sheet-table-header" style="text-align:left;"></span>
 				<span class="sheet-table-header" style="text-align:left;">Total</span>
+				<span class="sheet-table-header" style="text-align:left;">DEX</span>
 				<span class="sheet-table-header" style="text-align:left;">Misc</span>
 				<span class="sheet-table-header" style="text-align:left;"></span>
 				<span class="sheet-table-header" style="text-align:left;"></span>
 			</div>
 			<div class="sheet-table-row">				
-				<span class="sheet-table-data-left" style="width:5%;"><button style="font-size:100%;" title="NPC-Initiative-Roll" type="roll" name="roll_NPC-Initiative-Roll" value="/w gm &{template:pf_check} {{name=@{character_name}'s}} {{check=Initiative Roll}} {{init=[[1d20 + @{init} + 0.01 * @{init} &{tracker}]]}}">Init</button></span>
-				<span class="sheet-table-data-left" style="width:5%;"><input type="number" title="init" name="attr_init" value="@{DEX-mod} + @{init-misc}" disabled/></span>
+				<span class="sheet-table-data-left" style="width:5%;"><button style="font-size:100%;" title="NPC-Initiative-Roll" type="roll" name="roll_NPC-Initiative-Roll" value="/w gm &{template:pf_check} {{name=@{character_name}'s}} {{init=[[ ( 1d20 + [[ @{init} ]] [init] + [[ {(0.01 * [[ @{init} ]] ),0}kh1 ]] [tie-breaker] ) &{tracker} ]] }}">Init</button></span>
+				<span class="sheet-table-data-left" style="width:5%;"><input type="number" title="init" name="attr_init" value="(@{init-DEX} + @{init-misc})" disabled></span>
+				<span class="sheet-table-data-left" style="width:5%;"><input title="DEX-mod" type="number" name="attr_init-DEX" value="@{DEX-mod}" disabled></span>
 				<span class="sheet-table-data-left" style="width:5%;"><input type="number" title="init-misc" name="attr_init-misc" value="0"/></span>
 				<span class="sheet-table-data-left" style="width:7%;"><b>Senses </b></span>
 				<span class="sheet-table-data-center"><input type="text" title="npc-senses" name="attr_npc-senses"/></span>
@@ -2382,7 +2384,7 @@
 				<span class="sheet-table-data-center" style="width:10%;"><input title="class-0-hp" type="number" name="attr_class-0-hp" value="0"></span>
 				<span class="sheet-table-data-center"><input type="number" title="HP-temp" name="attr_HP-temp" value="0"></span>
 				<span class="sheet-table-data-center"><input type="number" title="non-lethal-damage" name="attr_non-lethal-damage" value="0"></span>
-				<span class="sheet-table-data-center" style="width:35%;"><input title="HP-formula" type="text" name="attr_HP-formula" value="(@{CON-mod} * @{level}) + @{total-hp}"></span>
+				<span class="sheet-table-data-center" style="width:35%;"><input title="HP-formula" type="text" name="attr_HP-formula" value="((@{CON-mod} * @{level}) + @{total-hp})"></span>
 				<span class="sheet-table-data-left" style="text-align:left;width:35%;"><input type="text" title="npc-heal-conditions" name="attr_npc-heal-conditions" value="Heal conditions"></span>
 			</div>
 		</div>
@@ -2415,7 +2417,7 @@
 		<div class="sheet-table">
 			<div class="sheet-table-row">
 				<span class="sheet-table-data-left" style="width:15%;"><b>Defensive Abilities</b></span>
-				<span class="sheet-table-data-left"><input type="text" title="npc-defensive-abilities" name="defensive-abilities"></span>
+				<span class="sheet-table-data-left"><input type="text" title="npc-defensive-abilities" name="attr_defensive-abilities"></span>
 			</div>
 			<div class="sheet-table-row">
 				<span class="sheet-table-data-left" style="width:15%;"><b>Weaknesses</b></span>
@@ -2467,29 +2469,30 @@
 		<br>
 		<b>Weapons/Attacks</b>
 		<input type="checkbox" class="sheet-npc-weapons-show" title="npc-weapons-show" name="attr_npc-weapons-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
-		<div class="sheet-npc-weapons"><fieldset class="repeating_weapon">  
-        		<div class="sheet-table">
+		<div class="sheet-npc-weapons">
+            <fieldset class="repeating_weapon">  
+    			<div class="sheet-table">
 					<div class="sheet-table-row1">
-						<span class="sheet-table-data sheet-center" style="width:5%;"><button type="roll" value="@{macro-text}"></button></span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" min="0" name="attr_enhance" title="@{repeating_weapon_X_enhance}"><br>Enhance</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="checkbox" name="attr_masterwork" title="@{repeating_weapon_X_masterwork}" value="1"><br>Mwk</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_name" title="@{repeating_weapon_X_name}" placeholder="Name"><br>Name</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_attack" title="@{repeating_weapon_X_attack}" placeholder="Attack Modifiers"><br>Attack Mods</span>
+						<span class="sheet-table-data sheet-center" style="width:5%;"><button type="roll" name="roll_NPC_roll" title="%{repeating_weapon_$X_NPC_roll}" value="@{macro-text}"></button></span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" min="0" name="attr_enhance" title="@{repeating_weapon_$X_enhance}" value="0" ><br>Enhance</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="checkbox" name="attr_masterwork" title="@{repeating_weapon_$X_masterwork}" value="1" ><br>Mwk</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_name" title="@{repeating_weapon_$X_name}" placeholder="Name" ><br>Name</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_attack" title="@{repeating_weapon_$X_attack}" placeholder="Attack Modifiers"value="0" ><br>Attack Mods</span>
 						<span class="sheet-table-data sheet-center sheet-small-label" style="width:10%;">
-							<select title="@{repeating_weapon_X_attack-type}" name="attr_attack-type">
-								<option value="0" selected>None</option>
-								<option value="@{attk-melee}">Melee</option>
-								<option value="@{attk-ranged}">Ranged</option>
+							<select title="@{repeating_weapon_$X_attack-type}" name="attr_attack-type">
+								<option value="0" selected >None</option>
+								<option value="@{attk-melee}" >Melee</option>
+								<option value="@{attk-ranged}" >Ranged</option>
 							</select>
 							<br>Attack Type
 						</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_total-attack" title="@{repeating_weapon_X_total-attack}" value="(@{proficiency} + (((@{enhance} + @{masterwork}) + abs(@{enhance} - @{masterwork})) / 2) + @{attack} + @{attack-type})" disabled><br>ATK</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_damage-dice-num" title="@{repeating_weapon_X_damage-dice-num}" min="0"><br>Dice</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_total-attack" title="@{repeating_weapon_$X_total-attack}" value="(@{proficiency} + (((@{enhance} + @{masterwork}) + abs(@{enhance} - @{masterwork})) / 2) + @{attack} + @{attack-type})" disabled><br>ATK</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_damage-dice-num" title="@{repeating_weapon_$X_damage-dice-num}" min="0" value="1" ><br>Dice</span>
 						<span class="sheet-table-data sheet-center" style="vertical-align:middle;font-size:150%;width:2%;">d</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_damage-die" title="@{repeating_weapon_X_damage-die}" min="0"><br>Die</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_damage" title="@{repeating_weapon_X_damage}" placeholder="Damage Modifiers"><br>Damage Mods</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_damage-die" title="@{repeating_weapon_$X_damage-die}" min="0" value="1" ><br>Die</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_damage" title="@{repeating_weapon_$X_damage}" placeholder="Damage Modifiers" value="0" ><br>Damage Mods</span>
 						<span class="sheet-table-data sheet-center" style="width:15%;">
-							<select title="@{repeating_weapon_X_damage-ability}" name="attr_damage-ability">
+							<select title="@{repeating_weapon_$X_damage-ability}" name="attr_damage-ability">
 								<option value="0" selected>None</option>
 								<option value="floor(0.5 * @{STR-mod})">1/2 STR</option>
 								<option value="floor(0.5 * @{DEX-mod})">1/2 DEX</option>
@@ -2518,31 +2521,31 @@
 							</select>
 							<br>Damage Ability
 						</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_total-damage" title="@{repeating_weapon_X_total-damage}" value="(@{enhance} + @{damage} + @{damage-ability})" disabled><br>DMG</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_total-damage" title="@{repeating_weapon_$X_total-damage}" value="(@{enhance} + @{damage} + @{damage-ability})" disabled><br>DMG</span>
 					</div>
 				</div>
 				<div class="sheet-table">
 					<div class="sheet-table-row1">
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_crit-target" title="@{repeating_weapon_X_crit-target}" min="0" max="20"><br>Crit</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_crit-target" title="@{repeating_weapon_$X_crit-target}" min="0" max="20" value="20" ><br>Crit</span>
 						<span class="sheet-table-data sheet-center" style="vertical-align:middle;font-size:150%;width:2%;"><b>/x</b></span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_crit-multiplier" title="@{repeating_weapon_X_crit-multiplier}" min="0"><br>Multiplier</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_range" title="@{repeating_weapon_X_range}" value="0" min="0"><br>Range</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_type" title="@{repeating_weapon_X_type}" placeholder="Damage Type"><br>Damage Type</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_weight" title="@{repeating_weapon_X_weight}" value="0" step="any" min="0"><br>Weight</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_ammo" title="@{repeating_weapon_X_ammo}" value="0"><br>Ammo</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_crit-multiplier" title="@{repeating_weapon_$X_crit-multiplier}" min="0" value="2" ><br>Multiplier</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_range" title="@{repeating_weapon_$X_range}"  min="0" value="0" ><br>Range</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:15%;"><input type="text" name="attr_type" title="@{repeating_weapon_$X_type}" placeholder="Damage Type" ><br>Damage Type</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_weight" title="@{repeating_weapon_$X_weight}"  step="any" min="0" value="0" ><br>Weight</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:5%;"><input type="number" name="attr_ammo" title="@{repeating_weapon_$X_ammo}" value="0" ><br>Ammo</span>
 						<span class="sheet-table-data sheet-center sheet-small-label" style="width:10%;">
-							<select title="@{repeating_weapon_X_proficiency}" name="attr_proficiency">
-								<option value="0">Yes</option>
-								<option value="-4" selected>No</option>
+							<select title="@{repeating_weapon_$X_proficiency}" name="attr_proficiency">
+								<option value="0" selected>Yes</option>
+								<option value="-4">No</option>
 							</select>
 							<br>Proficiency
 						</span>
-						<span class="sheet-table-data sheet-center sheet-small-label" style="width:48%;"><input type="text" name="attr_notes" title="@{repeating_weapon_X_notes}" placeholder="Attack Notes"><br>Notes</span>
+						<span class="sheet-table-data sheet-center sheet-small-label" style="width:48%;"><input type="text" name="attr_notes" title="@{repeating_weapon_$X_notes}" placeholder="Attack Notes" ><br>Notes</span>
 					</div>
 				</div>
 				<b>Macro Text&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
-				<input type="checkbox" class="sheet-macro-show" title="@{repeating_weapon_X_macro-text-show}" name="attr_macro-text-show" value="1" style="opacity:0;width: 35px;height: 16px;position: relative;top: 5px;left: 6px;margin: -32px;cursor: pointer;z-index: 1;" /><span></span>
-				<textarea class="sheet-macro" title="@{repeating_weapon_X_macro-text}" name="attr_macro-text">/w gm &{template:PFAttack} {{name=@{character_name}'s @{name}}} {{subtags=@{type}}} {{attack=[[1d20cs>@{crit-target}+@{total-attack}]]}} {{damage=[[@{damage-dice-num}d@{damage-die}+@{total-damage}]]}} {{confirm=[[1d20+@{total-attack}]]}} {{dmgcrit=[[(@{damage-dice-num} * (@{crit-multiplier} - 1))d@{damage-die} + (@{total-damage} * (@{crit-multiplier} - 1))]]}} {{notes=@{notes}}} {{attk-notes=@{attack-notes}}}}</textarea>
+				<input type="checkbox" class="sheet-macro-show" title="@{repeating_weapon_$X_macro-text-show}" name="attr_macro-text-show" value="1" style="opacity:0;width: 35px;height: 16px;position: relative;top: 5px;left: 6px;margin: -32px;cursor: pointer;z-index: 1;" /><span></span>
+				<textarea class="sheet-macro" title="@{repeating_weapon_$X_macro-text}" name="attr_macro-text">/w gm &{template:PFAttack} {{name=@{character_name}'s @{name}}} {{subtags=@{type}}} {{attack=[[1d20cs>@{crit-target}+@{total-attack}]]}} {{damage=[[@{damage-dice-num}d@{damage-die}+@{total-damage}]]}} {{confirm=[[1d20+@{total-attack}]]}} {{dmgcrit=[[(@{damage-dice-num} * (@{crit-multiplier} - 1))d@{damage-die} + (@{total-damage} * (@{crit-multiplier} - 1))]]}} {{notes=@{notes}}} {{attk-notes=@{attack-notes}}}}</textarea>
 				<hr>		
 			</fieldset>
 		</div>
@@ -2558,7 +2561,7 @@
 		<textarea style="height:50px;" class="sheet-npc-special-attacks" title="npc-special-attacks" name="attr_npc-special-attacks">List all special combat actions here, in alphabetical order. Do not list feats.</textarea>
 		<br>
         <b>Spell-Like Abilities</b> (<button style="font-size:100%;" title="NPC-Spell-Class-0-CL-Check" type="roll" name="roll_NPC-Spell-Class-0-CL-Check" value="/w gm &{template:pf_check} {{name=@{character_name}'s}} {{check=Caster Level Check}} {{caster_class=@{spellclass-1-name} **@{spellclass-1-level}**}} {{caster_lvl_chk=[[1d20 + @{spellclass-1-level}]]}}">CL</button></span>
-        <select style="width:100px;align:left;" title="Caster Class" name="attr_spellclass-0-name">
+        <select style="width:100px;text-align:left;" title="Caster Class" name="attr_spellclass-0-name">
             <option>Bard</option>
 		    <option>Cleric</option>
             <option>Druid</option>
@@ -2582,14 +2585,14 @@
 				</div>
 			</div>
 			<fieldset class="repeating_npc-spell-like-abilities">
-				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_npc-spell-like-abilities_X_used" type="number" name="attr_used" value="0"></span>
-				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_npc-spell-like-abilities_X_used|max" type="number" name="attr_used_max" value="0"></span>
-				<span class="sheet-table-data-center" style="width:52%;"><input title="repeating_npc-spell-like-abilities_X_name" type="text" name="attr_name"></span>
-				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_npc-spell-like-abilities_X_duration" type="text" name="attr_duration"></span>
-				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_npc-spell-like-abilities_X_range" type="text" name="attr_range"></span>
-				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_npc-spell-like-abilities_X_save" type="text" name="attr_save"></span>
+				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_npc-spell-like-abilities_$X_used" type="number" name="attr_used" value="0"></span>
+				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_npc-spell-like-abilities_$X_used|max" type="number" name="attr_used_max" value="0"></span>
+				<span class="sheet-table-data-center" style="width:52%;"><input title="repeating_npc-spell-like-abilities_$X_name" type="text" name="attr_name"></span>
+				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_npc-spell-like-abilities_$X_duration" type="text" name="attr_duration"></span>
+				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_npc-spell-like-abilities_$X_range" type="text" name="attr_range"></span>
+				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_npc-spell-like-abilities_$X_save" type="text" name="attr_save"></span>
 				<span class="sheet-table-data-center" style="width:8%;">
-					<select title="repeating_npc-spell-like-abilities_X_sr" name="attr_sr">
+					<select title="repeating_npc-spell-like-abilities_$X_sr" name="attr_sr">
 						<option value="Yes">Yes</option>
 						<option value="No" selected>No</option>
 					</select>
@@ -2600,7 +2603,7 @@
 		</div>
 		<br>
 		<b>Spells</b> (<button style="font-size:100%;" title="NPC-Spell-Class-1-CL-Check" type="roll" name="roll_NPC-Spell-Class-1-CL-Check" value="/w gm &{template:pf_check} {{name=@{character_name}'s}} {{check=Caster Level Check}} {{caster_class=@{spellclass-1-name} **@{spellclass-1-level}**}} {{caster_lvl_chk=[[1d20 + @{spellclass-1-level}]]}}">CL</button></span>
-		<select style="width:100px;align:left;" title="Caster Class" name="attr_spellclass-1-name">
+		<select style="width:100px;text-align:left;" title="Caster Class" name="attr_spellclass-1-name">
             <option>Bard</option>
 		    <option>Cleric</option>
             <option>Druid</option>
@@ -2625,15 +2628,15 @@
 				</div>
 			</div>
 			<fieldset class="repeating_spells">
-				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_spells_X_used" type="number" name="attr_level" value="0"></span>
-				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_spells_X_used" type="number" name="attr_used" value="0"></span>
-				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_spells_X_used|max" type="number" name="attr_used_max" value="0"></span>
-				<span class="sheet-table-data-center" style="width:47%;"><input title="repeating_spells_X_name" type="text" name="attr_name"></span>
-				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_spells_X_duration" type="text" name="attr_duration"></span>
-				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_spells_X_range" type="text" name="attr_range"></span>
-				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_spells_X_save" type="text" name="attr_save"></span>
+				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_spells_$X_used" type="number" name="attr_level" value="0"></span>
+				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_spells_$X_used" type="number" name="attr_used" value="0"></span>
+				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_spells_$X_used|max" type="number" name="attr_used_max" value="0"></span>
+				<span class="sheet-table-data-center" style="width:47%;"><input title="repeating_spells_$X_name" type="text" name="attr_name"></span>
+				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_spells_$X_duration" type="text" name="attr_duration"></span>
+				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_spells_$X_range" type="text" name="attr_range"></span>
+				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_spells_$X_save" type="text" name="attr_save"></span>
 				<span class="sheet-table-data-center" style="width:8%;">
-					<select title="repeating_spells_X_sr" name="attr_sr">
+					<select title="repeating_spells_$X_sr" name="attr_sr">
 						<option value="Yes">Yes</option>
 						<option value="No" selected>No</option>
 					</select>
@@ -2718,7 +2721,7 @@
 			</div>
 			<fieldset class="repeating_feat">  
 				<span class="sheet-table-data-center" style="width:15%;">
-					<select title="repeating_feat_X_type" name="attr_type">
+					<select title="repeating_feat_$X_type" name="attr_type">
 						<option value="None">None</option>
 						<option value="Racial">Racial</option>
 						<option value="Trait">Trait</option>
@@ -2727,14 +2730,14 @@
 						<option value="Other">Other</option>
 					</select>
 				</span>
-				<span class="sheet-table-data-center"><input title="repeating_feat_X_name" type="text" name="attr_name"></span>
-				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_feat_X_used" type="number" name="attr_used" value="0"></span>
+				<span class="sheet-table-data-center"><input title="repeating_feat_$X_name" type="text" name="attr_name"></span>
+				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_feat_$X_used" type="number" name="attr_used" value="0"></span>
 				<span class="sheet-table-data-center" style="width:2%;vertical-align:middle;font-size:150%;">/</span>
-				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_feat_X_used|max" type="number" name="attr_used_max" value="@{max-calculation}" disabled></span>
-				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_feat_X_max-calculation" type="text" name="attr_max-calculation" value="0"></span>
+				<span class="sheet-table-data-center" style="width:5%;"><input title="repeating_feat_$X_used|max" type="number" name="attr_used_max" value="@{max-calculation}" disabled></span>
+				<span class="sheet-table-data-center" style="width:10%;"><input title="repeating_feat_$X_max-calculation" type="text" name="attr_max-calculation" value="0"></span>
 				<b>Show Description?</b>
-				<input type="checkbox" class="sheet-section-show" title="repeating_feat_X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
-				<textarea style="height:50px;" class="sheet-section" title="repeating_feat_X_description" name="attr_description"></textarea>
+				<input type="checkbox" class="sheet-section-show" title="repeating_feat_$X_description-show" name="attr_description-show" value="1" style="opacity:0;width: 16px;height: 16px;position: relative;top: 5px;left: 6px;margin: -10px;cursor: pointer;z-index: 1;" checked/><span></span>
+				<textarea style="height:50px;" class="sheet-section" title="repeating_feat_$X_description" name="attr_description"></textarea>
 				<br>
 				<span>&nbsp;</span>
 			</fieldset>
@@ -3035,9 +3038,9 @@
 	<hr/>
 	<div style="text-align:left;" class="sheet-npc-special-abilities">
 		<fieldset class="repeating_special-ability">
-			<input type="text" title="repeating_special-ability_X_name" name="attr_name" value="Ability Name"/>
+			<input type="text" title="repeating_special-ability_$X_name" name="attr_name" value="Ability Name"/>
 			<br>
-			<textarea title="repeating_special-ability_X_description" name="attr_description">List special ability info here. Special abilities (including special qualities) are all explained here, in alphabetical order.</textarea>
+			<textarea title="repeating_special-ability_$X_description" name="attr_description">List special ability info here. Special abilities (including special qualities) are all explained here, in alphabetical order.</textarea>
 			<br>
 			<span>&nbsp;</span>
 		</fieldset>

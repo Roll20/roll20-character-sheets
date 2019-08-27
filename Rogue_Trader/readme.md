@@ -1,3 +1,9 @@
+Maintenant il y a la possibilité d'avoir la fiche de vaisseau éditable
+
+Traduit de la feulle de Rogue Trader de Michal S
+
+Pour tout retour ou problème contacter A0
+
 Most things you can roll directly from the sheet, by clicking on the corresponding name or the roll button at the end of the row.
 With weapons: Clicking on 'Name:' rolls an attack, clicking on 'Damage:' rolls the damage you have entered in the field next to it. **Please just enter things like 1d10+2, because it will be transferred to an inline roll - no letters!**
 

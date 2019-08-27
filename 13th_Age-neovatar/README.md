@@ -1,59 +1,14 @@
-# A new 13th Age Character Sheet for roll20.net
-
-*This character sheet has a website with an interactive preview!*
-
-[View Interactive Sheet Preview](http://neovatar.github.io/roll20-character-sheets/13th_Age-neovatar/testbed/)
+# A 13th Age Character Sheet for roll20.net
 
 ### Usage
 
-This character sheet requires a modern web browser.
+Please check the [character sheets documentation](https://wiki.roll20.net/13th_Age_Character_Sheet_neovatar) in the roll20 wiki.
 
-#### Escalation Die Macro
+### Preview
 
-##### Default: Ask for Escalation Die value
+[View Interactive Sheet Preview](http://neovatar.github.io/roll20-character-sheets/13th_Age-neovatar/testbed/)
 
-You can define an escalation die macro in the sheets SETUP tab. The default value is:
-
-```
-?{Escalation die value|0}
-```
-
-This will ask the player to enter the escalation die value, before the roll is made. The basic melee and ranged attacks use this.
-
-You can also use the escalation die macro in you own definitions via the ```@{escdie}``` attribute. The following sheet macro example will roll a d20 and add the escalation die value:
-
-```
-***Roll d20 and add escalation die***
-[[1d20+@{escdie}]]
-```
-
-##### Advanced: Use Escalation Die Token
-
-The basic idea is described in a [Youtube session with Roll20 devs Richard and Riley](https://www.youtube.com/watch?t=434&v=ODh7PN3DVcs).
-
-###### Prepare the Escalation Die Token
-
- * create a character named "Escalation Die"
- * allow all players to view / edit this character (**This is important!!!**)
- * via "Edit" -> "Attributes & Abilities", add an attribute "die"
- * use a nifty die graphic as token image
- * connect the escalation die token with the character "Escalation Die"
- * set one of the bars to track the attribute "die"
- * click on the token and enter the correct escalation die value in the bar
-
-###### Use the Escalation Die Token
-
-Now update all character sheets to use the "Escalation Die" character’s "die" value as escalation die: Go to "SETUP" Tab on your character sheet and enter the following as "Escalation die macro":
-
-```
-@{Escalation Die|die}
-```
-
-Now the basic attacks and the use of ```@{escdie}``` will pull the escalation die value from the escalation die token.
-
-Don't forget to update the escalation die value each round.
-
-#### Bugs and Suggestions
+### Bugs and Suggestions
 
 Report bugs or suggestions to the project’s [issue tracker](https://github.com/neovatar/roll20-character-sheets/issues).
 
@@ -94,7 +49,49 @@ This will create `13th_Age-neovatar.[css|html]` that you can copy and paste into
 
 ### Changelog
 
+**1.8.1:**
+* CSS fixes for upstream Roll20 changes
+
+**1.8.0:**
+* Added @tier_dmg_mult attribute, calculated by helper
+* Use tier ability damage bonus multiplier in basic attacks
+
+**1.7.0:**
+
+* Repeating section items now can be dragged to macro quick bar
+* Removed HP-lvlmod from sheet and autocalc hp_max with worker (fixes issues with HP recalc and tokens)
+* Additional to STR and DEX also INT, WIS and CHA may be used as ability mods for basic attacks
+
+**1.5.0:**
+
+* Sheet workers are used to calculate HP per level and removed HP lvlmod field
+
+**1.4.2:**
+
+* Pop-up asks for situational attack modifier on a basic attack roll
+
+**1.4.1:**
+
+* Inline formulas in roll results are now easier to read
+
+**1.4.0:**
+
+***Breaking changes:***
+
+* Added select boxes for basic attacks. You can select DEX or STR.
+  On existing character sheets if the macro does not work correctly, please re-select the ability you use (switch to the other value and switch back to the one you want to use)
+* Added select boxes to icon rolls
+  You need to re-select the number of points that you have with each icons
+
+***Non-breaking changes:***
+
+* Added popup for background checks and removed ability column. When you do a background check, you get a popup and can select the ability that you want to use for the check roll
+* New style for roll buttons
+* New style for section headers
+* Added at-will check box to power repeating section
+
 **1.3.1:**
+
   * fixed minor spelling typo
 
 **1.3.0:**
