@@ -1671,9 +1671,9 @@
 							<input class="display-flag" type="checkbox" name="attr_display_flag" />
 							<div class="display-row" title="Fake ID"><span name="attr_name"></span></div>
 							<div class="collapsable">
-								<div class="desc-lifestyle" title="Related lifestyle"><span name="attr_lifestyle"></span></div>
-								<div class="desc-lifestyle" title="Funds"><span name="attr_funds"></span></div>
-								<div class="desc-lifestyle" title="Licenses"><span name="attr_licenses"></span></div>
+								<em><span class="desc-lifestyle" name="attr_lifestyle"></span></em>
+								<span class="desc-lifestyle" name="attr_funds"></span>
+								<span class="desc-lifestyle" name="attr_licenses"></span>
 							</div>
 						</div>
 						<button class="pictos settings-button" name="act_lifestyle" type="action">x</button>
@@ -1690,7 +1690,7 @@
 						<h3 data-i18n="name">Name</h3><h3 data-i18n="loyalty">Loyalty</h3><h3 data-i18n="connection">Connection</h3><h3 data-i18n="favor">Favor</h3>
 					</div>
 					<fieldset class="repeating_contacts">
-						<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+						<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 						<div class="settings">
 							<div>
 								<input type="text" name="attr_name" placeholder="Old Crow" title="Contact name" />
@@ -1711,6 +1711,7 @@
 								<div class="desc" title="Notes"><span name="attr_notes"></span></div>
 							</div>
 						</div>
+						<button class="pictos settings-button" name="act_contacts" type="action">x</button>
 					</fieldset>
 				</div>
 			</div>
@@ -1795,7 +1796,7 @@
 								<div class="display-row" title="Handling"><h3 data-i18n="handling">Handling</h3><div><span name="attr_display_handling"></span></div></div>
 							</div>
 							<div class="row-long">
-								<div class="display-row" title="Acceleration"><h3 data-i18n="acceleration">Acceleration</h3><div><span name="attr_display_acceleration"></span></div></div>
+								<div class="display-row" title="Acceleration"><h3 data-i18n="acceleration" style="width: 33%">Acceleration</h3><div><span name="attr_display_acceleration"></span></div></div>
 								<div class="display-row" title="Speed"><h3 data-i18n="speed">Speed</h3><div><span name="attr_display_speed"></span></div></div>
 							</div>
 							<div class="row-long">
@@ -3224,7 +3225,7 @@
 		}); 
 	});
 
-	["quality", "martial", "items", "range", "melee", "armor", "spell", "preps", "ritual", "powers", "forms", "vehicle", "augementations", "lifestyle"].forEach((attr) => {
+	["quality", "martial", "items", "range", "melee", "armor", "spell", "preps", "ritual", "powers", "forms", "vehicle", "augementations", "lifestyle", "contacts"].forEach((attr) => {
 		on(`clicked:repeating_${attr}:${attr}`, (eventinfo) => {
 			settingsToggle(eventinfo);
 		}); 
@@ -4054,7 +4055,7 @@
 				let displayName = ((name).length > 0 && (name).length <= 24) ? name : ((name).length > 24 ) ? (name).slice(0, 24) + "..." : " ";
 				if (dis != displayName) {update["repeating_vehicle_display_name"] = displayName};
 
-				setAttrs(update);
+				setAttrs(update, {silent: true});
 			});
 		});
 
@@ -4074,7 +4075,7 @@
 	                setAttrs({
 	                    [attr]: stat,
 	                    [`repeating_vehicle_display_${attr}`]: bon === 0 ? bas : `${bas} (${stat})`
-	                });
+	                }, {silent: true});
 	            });
 	        });
 	    });
@@ -4199,6 +4200,10 @@
 	const getArray = (array) => {
 		return Array.isArray(array) ? array : [ array ];
 	};
+
+	const getSplitNum = (value) => {
+		return value.split("/")[0];
+	}
 
 	//IMPORTERS
 	const importHeroLab = (character) => {
@@ -4713,8 +4718,150 @@
 			}
 
 			// POWERS
+			if (character.powers != null && character.powers.power != null) {
+				const powersList = getArray(character.powers.power);
+				powersList.forEach((power) => {
+					try {
+						const id = generateRowID();
+						const section = `repeating_powers_${id}`;
+
+						update[`${section}_name`] = (power.fullname != null) ? power.fullname : power.name;
+						update[`${section}_rating`] = power.rating;
+
+						 if (power.totalpoints != null) {
+						 	update[`${section}_notes`] = `Total Points: ${power.totalpoints}.`;
+						 }
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(power.name), error);
+					}
+				});
+			}
+
+			// LIFESTYLES
+			if (character.lifestyles != null && character.lifestyles.lifestyle != null) {
+				const lifestyleList = getArray(character.lifestyles.lifestyle);
+				lifestyleList.forEach((lifestyle) => {
+					try {
+						const id = generateRowID();
+						const section = `repeating_lifestyle_${id}`;
+
+						update[`${section}_name`] = lifestyle.name;
+						update[`${section}_flag`] = "display";
+
+						if (lifestyle.qualities != null && lifestyle.qualities.quality) {
+							const lqualitiesList = getArray(lifestyle.qualities.quality);
+							let lifestyleQualities = "";
+							lqualitiesList.forEach((quality) => {
+								try {
+									lifestyleQualities += (quality.fullname != null) ? quality.fullname : quality.name;
+								} catch (error) {
+									setText["error"] += addFeedback(JSON.stringify(quality.name), error);
+								}
+							});
+
+							update[`${section}_lifestyle`] = lifestyleQualities;
+						}
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(lifestyle.name), error);
+					}
+				});
+			}
 
 			// CONTACTS
+			if (character.contacts != null && character.contacts.contact != null) {
+				const contactList = getArray(character.contacts.contact);
+				contactList.forEach((contact) => {
+					try {
+						const id = generateRowID();
+						const section = `repeating_contacts_${id}`;
+						let contactNotes = "";
+
+					    update[`${section}_name`] = (contact.role != null) ? `${contact.name} (${contact.role})` : contact.name;
+					    update[`${section}_loyalty`] = contact.loyalty;
+					    update[`${section}_connection`] = contact.connection;
+					    update[`${section}_flag`] = "display";
+
+					    ["metatype", "sex", "age", "preferredpayment", "hobbiesvice", "personallife"].forEach((detail) => {
+					    	if (contact[`${detail}`] != null) {
+					    		contactNotes += `${contact[`${detail}`]}. `
+					    	}
+					    });
+
+					    update[`${section}_notes`] = contactNotes;
+
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(contact.name), error);
+					}
+				});
+			}
+
+			// VEHICLE KEYS
+			const vehicleKeys = {
+				"name": "name"
+				,"handling": "handling_base"
+				,"accel": "acceleration_base"
+				,"speed": "speed_base"
+				,"body": "body_base"
+				,"armor": "armor_base"
+				,"sensor": "sensor_base"
+				,"pilot": "pilot_base"
+			};
+
+			// VEHICLES
+			if (character.vehicles != null && character.vehicles.vehicle != null) {
+				const vehicleList = getArray(character.vehicles.vehicle);
+				vehicleList.forEach((vehicle) => {
+					try {
+						const id = generateRowID();
+						const section = `repeating_vehicle_${id}`;
+						let vehicleNotes = "";
+
+						update[`${section}_name`] = vehicle.name;
+						update[`${section}_flag`] = "display";
+						Object.keys(vehicleKeys).forEach((key) => {
+							if (vehicle[`${key}`] && vehicle[`${key}`] != null) {
+								update[`${vehicleKeys[`${key}`]}`] = (vehicle[`${key}`].includes("/")) ? getSplitNum(vehicle[`${key}`]) : vehicle[`${key}`];
+							};
+						}); 
+
+						update[`${section}_display_name`] = vehicle.name;
+
+						["attack", "sleaze", "dataprocessing", "firewall", "devicerating"].forEach((matrixAttr) => {
+							vehicleNotes += (matrixAttr === "devicerating") ? `Device Rating (${vehicle[`${matrixAttr}`]}) ` : 
+								(matrixAttr === "firewall") ? `${vehicle[`${matrixAttr}`]} ` : `${vehicle[`${matrixAttr}`]}/`;
+						}); 
+
+						if (vehicle.mods != null && vehicle.mods.mod != null) {
+							const vehicleModsList = getArray(vehicle.mods.mod);
+							vehicleNotes += "Mods: "
+							vehicleModsList.forEach((mod) => {
+								vehicleNotes += (mod.fullname != null) ? `${mod.fullname}, ` : `${mod.name}, `;
+							});
+						}
+				
+						if (vehicle.gears != null && vehicle.gears.gear != null) {
+							const vehicleGearList = getArray(vehicle.gears.gear);
+							vehicleNotes += "Gear: "
+							vehicleGearList.forEach((gear) => {
+								if (gear.children != null && gear.children.gear != null) {
+									const vehicleChildrenList = getArray(gear.children.gear);
+									let vehicleChildrenNotes = "";
+									vehicleChildrenList.forEach((child) => {
+										vehicleChildrenNotes += `${child.name},`;
+									});
+									vehicleNotes += `${gear.name} (${vehicleChildrenNotes}),`;
+								} else {
+									vehicleNotes += `${gear.name},`;
+								};
+							});
+						} 
+				
+						update[`${section}_notes`] = vehicleNotes;
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(vehicle.name), error);
+					}
+				});
+			}
 
 			setCharmancerText(setText);
 			resolve(update);
