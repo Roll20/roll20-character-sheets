@@ -2976,7 +2976,7 @@
 			<h3 data-i18n="programs">Programs</h3>
 			<fieldset class="repeating_programs">
 			<div class="repeating toggle">
-				<input type="checkbox" class="settings-toggle" name="attr_program_toggle" checked="checked" title="Settings toggle" /><span>x</span>
+				<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 				<div class="settings">
 					<input type="text" name="attr_program" value="" placeholder="Program Name" title="Program name" />
 					<br />
@@ -2991,6 +2991,7 @@
 						<button type="roll" name="program" value="@{gm_toggle} &{template:rolls}{{header=@{program}}}{{desc=@{program_note}}}"><span name="attr_program"></span></button><span name="attr_program_note"></span>
 					</div>
 				</div>
+				<button class="pictos settings-button" name="act_programs" type="action">x</button>
 			</div>
 			</fieldset>
 		</div>
@@ -3264,7 +3265,7 @@
 		}); 
 	});
 
-	["quality", "martial", "items", "range", "melee", "armor", "spell", "preps", "ritual", "powers", "forms", "vehicle", "augementations", "lifestyle", "contacts"].forEach((attr) => {
+	["quality", "martial", "items", "range", "melee", "armor", "spell", "preps", "ritual", "powers", "forms", "vehicle", "augementations", "lifestyle", "contacts", "programs"].forEach((attr) => {
 		on(`clicked:repeating_${attr}:${attr}`, (eventinfo) => {
 			settingsToggle(eventinfo);
 		}); 
@@ -4300,6 +4301,17 @@
 			};
 			let update = {};
 
+			//MATRIX
+			const setCyberdeck = (cyberdeck) => {
+				update["cyberdeck"]     = cyberdeck.name;
+				update["device_rating"] = cyberdeck.devicerating;
+				update["attribute_1"]   = cyberdeck.attack;
+				update["attribute_2"]   = cyberdeck.sleaze;
+				update["attribute_3"]   = cyberdeck.dataprocessing;
+				update["attribute_4"]   = cyberdeck.firewall;
+				update["matrix_con"]   = 0;
+			}
+
 			// PROCESS TOP LEVEL KEYS
 			Object.keys(sortedKeys).forEach((key) => {
 				try {
@@ -4627,11 +4639,22 @@
 						update[`${section}_rating`]       = ware.rating;
 						update[`${section}_essence`]      = ware.ess;
 						update[`${section}_notes`]        = `Grade: ${ware.grade}`;
+
+						if (ware.gears != null && ware.gears.gear != null) {
+							const wareGearList = getArray(ware.gears.gear);
+							wareGearList.forEach((gear) => {
+								if (gear.category.toLowerCase().includes("cyberdeck")) {
+									setCyberdeck(gear);
+								}
+							});
+						}
 					} catch (error) {
 					  setText["error"] += addFeedback(JSON.stringify(ware.name), error);
 					}
 				});
 			};
+
+			console.log(character);
 
 			// GEAR
 			if (character.gears != null && character.gears.gear != null) {
@@ -4652,6 +4675,12 @@
 									update[`${section}_licenses`] += `${child.extra} (rating ${child.rating}), `;
 								});
 							}
+						} else if (gear.category.toLowerCase().includes("cyberdeck")) {
+							setCyberdeck(gear);
+						} else if (gear.category.toLowerCase().includes("programs")) {
+							const section = `repeating_programs_${id}`;
+							update[`${section}_program`] = gear.name;
+							update[`${section}_flag`] = "display";
 						} else {
 							const section = `repeating_items_${id}`;
 							let gearNotes = "";
@@ -4832,7 +4861,7 @@
 			};
 
 			// VEHICLES
-			if (character.vehicles != null && character.vehicles.vehicle != null) {
+		/*	if (character.vehicles != null && character.vehicles.vehicle != null) {
 				const vehicleList = getArray(character.vehicles.vehicle);
 				vehicleList.forEach((vehicle) => {
 					try {
@@ -4886,6 +4915,8 @@
 					}
 				});
 			}
+
+		*/
 
 			setCharmancerText(setText);
 			resolve(update);
