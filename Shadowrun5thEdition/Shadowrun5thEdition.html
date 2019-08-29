@@ -1730,7 +1730,6 @@
 								<div class="row-long">
 									<label data-i18n="name">Name</label>
 									<input type="text" name="attr_name" placeholder="name" title="Vehicle name" />
-									<input type="hidden" name="attr_display_name" />
 									<label data-i18n="handling">Handling</label>
 									<input type="hidden" name="attr_handling" />
 									<input type="number" name="attr_handling_base" placeholder="#" title="Handling base" />
@@ -1792,20 +1791,60 @@
 						<div class="display">
 							<input class="display-flag" type="checkbox" name="attr_display_flag" />
 							<div class="row-long">
-								<div class="display-row" title="Vehicle"><h3 data-i18n="vehicle">Vehicle</h3><div><span name="attr_display_name"></span></div></div>
-								<div class="display-row" title="Handling"><h3 data-i18n="handling">Handling</h3><div><span name="attr_display_handling"></span></div></div>
+								<div class="display-row" title="Vehicle">
+									<h3 data-i18n="vehicle">Vehicle</h3>
+									<div>
+										<span name="attr_name"></span>
+									</div>
+								</div>
+								<div class="display-row" title="Handling">
+									<h3 data-i18n="handling">Handling</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_handling"></span>
+									</div>
+								</div>
 							</div>
 							<div class="row-long">
-								<div class="display-row" title="Acceleration"><h3 data-i18n="acceleration" style="width: 33%">Acceleration</h3><div><span name="attr_display_acceleration"></span></div></div>
-								<div class="display-row" title="Speed"><h3 data-i18n="speed">Speed</h3><div><span name="attr_display_speed"></span></div></div>
+								<div class="display-row" title="Acceleration">
+								<h3 data-i18n="acceleration">Acceleration</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_acceleration"></span>
+									</div>
+								</div>
+								<div class="display-row" title="Speed">
+									<h3 data-i18n="speed">Speed</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_speed"></span>
+									</div>
+								</div>
 							</div>
 							<div class="row-long">
-								<div class="display-row" title="Pilot"><h3 data-i18n="pilot">Pilot</h3><div><span name="attr_display_pilot"></span></div></div>
-								<div class="display-row" title="Body"><h3 data-i18n="body">Body</h3><div><span name="attr_display_body"></span></div></div>
+								<div class="display-row" title="Pilot">
+									<h3 data-i18n="pilot">Pilot</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_pilot"></span>
+									</div>
+								</div>
+								<div class="display-row" title="Body">
+									<h3 data-i18n="body">Body</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_body"></span>
+									</div>
+								</div>
 							</div>
 							<div class="row-long">
-								<div class="display-row" title="Armor"><h3 data-i18n="armor">Armor</h3><div><span name="attr_display_armor"></span></div></div>
-								<div class="display-row" title="Sensor"><h3 data-i18n="sensor">Sensor</h3><div><span name="attr_display_sensor"></span></div></div>
+								<div class="display-row" title="Armor">
+									<h3 data-i18n="armor">Armor</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_armor"></span>
+									</div>
+								</div>
+								<div class="display-row" title="Sensor">
+									<h3 data-i18n="sensor">Sensor</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_sensor"></span>
+									</div>
+								</div>
 							</div>
 							<div class="collapsable">  
 								<div class="desc"><span name="attr_notes"></span></div>
@@ -3263,7 +3302,7 @@
 
    [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`].forEach(attr => {
    		on(`clicked:tab_${attr}`, () => {
-   			console.log(`c% The button clicked was tab_${attr} update tab to ${attr}`);
+   			console.log(`%c The button clicked was tab_${attr} update tab to ${attr}`, "color:purple;");
    			setAttrs({tab: attr});
    		});
    });
@@ -4045,20 +4084,6 @@
 	        });
 	    });
 
-	//Vehicle displays for PCs
-		on("change:repeating_vehicle:name", () =>{
-			getAttrs(["repeating_vehicle_name", "repeating_vehicle_display_name"], (v) => {
-				const name = (v.repeating_vehicle_name);
-				const dis = (v.repeating_vehicle_display_name);
-				let update = {};
-
-				let displayName = ((name).length > 0 && (name).length <= 24) ? name : ((name).length > 24 ) ? (name).slice(0, 24) + "..." : " ";
-				if (dis != displayName) {update["repeating_vehicle_display_name"] = displayName};
-
-				setAttrs(update, {silent: true});
-			});
-		});
-
 	   ['acceleration', 'armor', 'body', 'data_processing', 'handling', 'pilot', 'sensor','speed'].forEach(attr => {
 	        // Attach listener
 	        on(`change:repeating_vehicle:${attr}_base change:repeating_vehicle:${attr}_modifier change:repeating_vehicle:${attr}_temp`, () => {
@@ -4797,8 +4822,7 @@
 
 			// VEHICLE KEYS
 			const vehicleKeys = {
-				"name": "name"
-				,"handling": "handling_base"
+				"handling": "handling_base"
 				,"accel": "acceleration_base"
 				,"speed": "speed_base"
 				,"body": "body_base"
@@ -4820,11 +4844,11 @@
 						update[`${section}_flag`] = "display";
 						Object.keys(vehicleKeys).forEach((key) => {
 							if (vehicle[`${key}`] && vehicle[`${key}`] != null) {
-								update[`${vehicleKeys[`${key}`]}`] = (vehicle[`${key}`].includes("/")) ? getSplitNum(vehicle[`${key}`]) : vehicle[`${key}`];
+								update[`${section}_${vehicleKeys[`${key}`]}`] = 
+									(vehicle[`${key}`].includes("/")) ? getSplitNum(vehicle[`${key}`]) : 
+									vehicle[`${key}`];
 							};
 						}); 
-
-						update[`${section}_display_name`] = vehicle.name;
 
 						["attack", "sleaze", "dataprocessing", "firewall", "devicerating"].forEach((matrixAttr) => {
 							vehicleNotes += (matrixAttr === "devicerating") ? `Device Rating (${vehicle[`${matrixAttr}`]}) ` : 
@@ -4847,11 +4871,11 @@
 									const vehicleChildrenList = getArray(gear.children.gear);
 									let vehicleChildrenNotes = "";
 									vehicleChildrenList.forEach((child) => {
-										vehicleChildrenNotes += `${child.name},`;
+										vehicleChildrenNotes += `${child.name}, `;
 									});
-									vehicleNotes += `${gear.name} (${vehicleChildrenNotes}),`;
+									vehicleNotes += `${gear.name} (${vehicleChildrenNotes}), `;
 								} else {
-									vehicleNotes += `${gear.name},`;
+									vehicleNotes += `${gear.name}, `;
 								};
 							});
 						} 
