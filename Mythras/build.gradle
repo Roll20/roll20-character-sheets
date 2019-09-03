@@ -1,0 +1,37 @@
+plugins {
+    id 'base'
+}
+
+defaultTasks 'upload'
+
+task assemble_html(type: ProcessResources, group: "assemble", description: "Compiles Mythras.html from sources.") {
+    from('src') {
+        include 'Mythras.html'
+    }
+
+    into projectDir
+
+    def props = [:]
+    expand(props)
+}
+
+task assemble_css(type: ProcessResources, group: "assembe", description: "Compiles Mythras.css from sources.") {
+    from('src') {
+        include 'Mythras.css'
+    }
+
+    into projectDir
+
+    def props = [:]
+    expand(props)
+}
+
+task upload(type:Exec) {
+   commandLine 'python3', 'upload2roll20.py'
+}
+
+
+
+assemble.dependsOn(assemble_html)
+assemble.dependsOn(assemble_css)
+upload.dependsOn(build)
