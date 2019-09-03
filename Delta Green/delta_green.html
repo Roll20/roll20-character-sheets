@@ -25,44 +25,57 @@ setAttrs(setting);
 	
 
 on("sheet:opened", function() {
-var updates = {};
-getAttrs(['version','name','sex','v1','v2','v3','h1','h2','h3','special1','special2','special3','special4','special5','special6','special_skill1','special_skill2','special_skill3','special_skill4','special_skill5','special_skill6'], function(v) {
-if(v.version != "1.2") {
-//updates=[{'version': '1.2'} , {'gender': attrs['sex'] ||''}, {'violence_1': attrs['v1'] ||''}, {'violence_2': attrs['v2'] ||''}, {'violence_3': attrs['v3'] ||''}, {'helpness_1': attrs['h1'] ||''}, {'helpness_2': attrs['h2'] ||''}, {'helpness_3': attrs['h3'] ||''}, ]
+	var updates = {};
+	getAttrs(['version','name','sex','v1','v2','v3','h1','h2','h3','special1','special2','special3','special4','special5','special6','special_skill1','special_skill2','special_skill3','special_skill4','special_skill5','special_skill6','antropology'], function(v) {
+		if(v.version != "1.3") {
+			//updates=[{'version': '1.2'} , {'gender': attrs['sex'] ||''}, {'violence_1': attrs['v1'] ||''}, {'violence_2': attrs['v2'] ||''}, {'violence_3': attrs['v3'] ||''}, {'helpness_1': attrs['h1'] ||''}, {'helpness_2': attrs['h2'] ||''}, {'helpness_3': attrs['h3'] ||''}, ]
 
-if(v.name) {
-updates.character_name = v.name;
-}
-if(v.sex) {
-updates.gender = v.sex;
-}
-if(v.v1) {
-updates.violence_1 = v.v1;
-}
-if(v.v2) {
-updates.violence_2 = v.v2;
-}
-if(v.v3) {
-updates.violence_3 = v.v3;
-}
+			if(v.name) {
+				updates.character_name = v.name;
+			}
 
-if(v.h1) {
-updates.helpness_1 = v.h1;
-}
-if(v.h2) {
-updates.helpness_2 = v.h2;
-}
-if(v.h3) {
-updates.helpness_3 = v.h3;
-}
-updates.version = "1.2";
+			if(v.sex) {
+				updates.gender = v.sex;
+			}
 
-setAttrs(updates);
-let data = [{newtraining: v.special1 ||'', skilltraining: v.special_skill1 ||''}, {newtraining: v.special2 ||'', skilltraining: v.special_skill2 ||''}, {newtraining: v.special3 ||'', skilltraining: v.special_skill3 ||''}, {newtraining: v.special4 ||'', skilltraining: v.special_skill4 ||''}, {newtraining: v.special5 ||'', skilltraining: v.special_skill5 ||''}, {newtraining: v.special6 ||'', skilltraining: v.special_skill6 ||''} ].filter(o => (o.newtraining || o.skilltraining));
-fillRepeatingSectionFromData('repeating_training', data);
+			if(v.v1) {
+				updates.violence_1 = v.v1;
+			}
 
-}
-});
+			if(v.v2) {
+				updates.violence_2 = v.v2;
+			}
+
+			if(v.v3) {
+				updates.violence_3 = v.v3;
+			}
+
+			if(v.h1) {
+				updates.helpness_1 = v.h1;
+			}
+
+			if(v.h2) {
+				updates.helpness_2 = v.h2;
+			}
+
+			if(v.h3) {
+				updates.helpness_3 = v.h3;
+			}
+
+			if (v.antropology) {//Duplicating the anthropology attribute into a version with correct spelling
+				updates.anthropology = v.antropology;
+				setAttrs({anthropology: v.antropology});
+			}
+
+			updates.version = "1.3";
+
+			setAttrs(updates);
+
+			let data = [{newtraining: v.special1 ||'', skilltraining: v.special_skill1 ||''}, {newtraining: v.special2 ||'', skilltraining: v.special_skill2 ||''}, {newtraining: v.special3 ||'', skilltraining: v.special_skill3 ||''}, {newtraining: v.special4 ||'', skilltraining: v.special_skill4 ||''}, {newtraining: v.special5 ||'', skilltraining: v.special_skill5 ||''}, {newtraining: v.special6 ||'', skilltraining: v.special_skill6 ||''} ].filter(o => (o.newtraining || o.skilltraining));
+
+			fillRepeatingSectionFromData('repeating_training', data);
+		}
+	});
 });
 
 
@@ -254,6 +267,13 @@ on(" change:headshot_chk", function(){
 		});
 	});
 
+on("change:anthropology", function(){
+	getAttrs(["anthropology"], function(v) {
+		//Maintaining the value in both fields to preserve any macros that used the misspelling
+		setAttrs({antropology: v.anthropology});
+	});
+});
+
 // Breaking points unconcious, stunned, incapacitated and death
 on('sheet:opened change:wp change:hp change:san change:wp_max change:hp_max change:san_max',function(){
 getAttrs(["wp","lowwill_chk","wp_max","hp","unconscious_chk","death_chk","hp_max","san","bp","san_max","pow" ],function(v){
@@ -316,7 +336,7 @@ setAttrs({bp: Math.max(Math.floor(v.bp)+Math.floor(v.bp_diff),0)});
 setAttrs({bp_diff: 0});
 });
 });
-on('sheet:opened change:str change:con change:pow change:dex change:int', function() {
+on('sheet:opened change:str change:con change:pow change:dex change:int change:cha', function() {
 getAttrs(["str","con","pow","dex","int","cha","pow_tmp"], function(values) {
 setAttrs({strx5: Math.floor(values.str * 5)});
 setAttrs({conx5: Math.floor(values.con * 5)});
@@ -952,9 +972,9 @@ sheet version: 1.2 <input type="hidden" name="attr_version"/>
 			
 			<tr>    
 				
-				<td ><input type="checkbox" name="attr_chk_antropology" /> Antropology (0%)</td>
-				<td><input type="number"   name="attr_antropology" value="0"/>  </td>
-				<td class="attr-roll" ><button class='dg-roll'  type='roll' value='&{template:dg}{{name=Antropology roll}} {{normal_d=[[floor(@{antropology}/10)]]}} {{impossible_d=[[floor(@{antropology}/10)-4]]}}{{hard_d=[[floor(@{antropology}/10)-2]]}}{{easy_d=[[floor(@{antropology}/10)+2]]}}{{trivial_d=[[floor(@{antropology}/10)+4]]}} {{normal_u=[[@{antropology}%10]]}}{{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}} ' name='roll_antropology_check' /></td>
+				<td ><input type="checkbox" name="attr_chk_antropology" /> Anthropology (0%)</td>
+				<td><input type="number"   name="attr_anthropology" value="0"/>  </td>
+				<td class="attr-roll" ><button class='dg-roll'  type='roll' value='&{template:dg}{{name=Anthropology roll}} {{normal_d=[[floor(@{anthropology}/10)]]}} {{impossible_d=[[floor(@{anthropology}/10)-4]]}}{{hard_d=[[floor(@{anthropology}/10)-2]]}}{{easy_d=[[floor(@{anthropology}/10)+2]]}}{{trivial_d=[[floor(@{anthropology}/10)+4]]}} {{normal_u=[[@{anthropology}%10]]}}{{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}} ' name='roll_anthropology_check' /></td>
 			</tr>
 			
 			<tr>
@@ -1565,16 +1585,16 @@ sheet version: 1.2 <input type="hidden" name="attr_version"/>
 <h3 class='sheet-sectionHeader'>ATTACKS</h3>
 <table width="810">
 	<tr>
-		<th>WEAPON</th>
-		<th>SKILL</th>
-		<th>BASE RANGE</th>
-		<th>DAMAGE</th>
-		<th>DMG MOD</th>
-		<th>ARMOR PIERCING</th>
-		<th>LETHALITY</th>
-		<th>KILL RADIUS</th>
-		<th>AMMO</th>
-		<th></th>
+		<th width="178px" style="padding-left: 8px">WEAPON</th>
+		<th width="167px">SKILL</th>
+		<th width="63px">BASE RANGE</th>
+		<th width="67px">DAMAGE</th>
+		<th width="51px">DMG MOD</th>
+		<th width="67px">ARMOR PRC</th>
+		<th width="67px">LETH.</th>
+		<th width="68px">KILL<br>RAD.</th>
+		<th width="68px">AMMO</th>
+		<th width="25px"></th>
 	</tr>
 </table>
 <fieldset class="repeating_weapons">
@@ -1957,9 +1977,9 @@ sheet version: 1.2 <input type="hidden" name="attr_version"/>
 				
 				<tr>    
 					
-					<td ><input type="checkbox" name="attr_chk_antropology" /> Antropology (0%)</td>
-					<td><input type="number"   name="attr_antropology" value="0"/>  </td>
-					<td class="attr-roll" ><button class='dg-roll'  type='roll' value='&{template:dg}{{name=Antropology roll}} {{normal_d=[[floor(@{antropology}/10)]]}} {{impossible_d=[[floor(@{antropology}/10)-4]]}}{{hard_d=[[floor(@{antropology}/10)-2]]}}{{easy_d=[[floor(@{antropology}/10)+2]]}}{{trivial_d=[[floor(@{antropology}/10)+4]]}} {{normal_u=[[@{antropology}%10]]}}{{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}} ' name='roll_antropology_check' /></td>
+					<td ><input type="checkbox" name="attr_chk_antropology" /> Anthropology (0%)</td>
+					<td><input type="number"   name="attr_anthropology" value="0"/>  </td>
+					<td class="attr-roll" ><button class='dg-roll'  type='roll' value='&{template:dg}{{name=Anthropology roll}} {{normal_d=[[floor(@{anthropology}/10)]]}} {{impossible_d=[[floor(@{anthropology}/10)-4]]}}{{hard_d=[[floor(@{anthropology}/10)-2]]}}{{easy_d=[[floor(@{anthropology}/10)+2]]}}{{trivial_d=[[floor(@{anthropology}/10)+4]]}} {{normal_u=[[@{anthropology}%10]]}}{{roll1=[[1d10-1]]}} {{roll2=[[1d10-1]]}} ' name='roll_anthropology_check' /></td>
 				</tr>
 				
 				<tr>
@@ -2342,16 +2362,16 @@ sheet version: 1.2 <input type="hidden" name="attr_version"/>
 			<h3 class='sheet-sectionHeader'>ATTACKS</h3>
 			<table width="810">
 			<tr>
-				<th>WEAPON</th>
-				<th>SKILL</th>
-				<th>BASE RANGE</th>
-				<th>DAMAGE</th>
-				<th>DMG MOD</th>
-				<th>ARMOR PIERCING</th>
-				<th>LETHALITY</th>
-				<th>KILL RADIUS</th>
-				<th>AMMO</th>
-				<th></th>
+				<th width="178px" style="padding-left: 8px">WEAPON</th>
+				<th width="167px">SKILL</th>
+				<th width="63px">BASE RANGE</th>
+				<th width="67px">DAMAGE</th>
+				<th width="51px">DMG MOD</th>
+				<th width="67px">ARMOR PRC</th>
+				<th width="67px">LETH.</th>
+				<th width="68px">KILL<br>RAD.</th>
+				<th width="68px">AMMO</th>
+				<th width="25px"></th>
 			</tr>
 			</table>
 			<fieldset class="repeating_weapons">
