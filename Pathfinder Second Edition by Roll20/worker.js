@@ -31,7 +31,7 @@
             , "repeating_spells": ["cantrip","spell1","spell2","spell3","spell4","spell5","spell6","spell7","spell8","spell9","spell10"]
             , "spells_fields": ["name","school","cast","traits","spelllevel","type","range","target","area","duration","frequency","uses","uses_max","attack_ability","attack_misc","damage_dice","damage_ability","damage_misc","damage_type","save_type","dc_misc","effect","description","attack_checkbox","damage_checkbox","save_checkbox","save_critical_success","save_success","save_failure","save_critical_failure"]
             , "repeating_bulks": ["worn","readied","other"]
-            , "bulks_fields": ["bulk"]
+            , "bulks_fields": ["quantity","bulk"]
             , "translatables": ["modifier","ability_modifier","bonus","roll_bonus","roll_damage_bonus","#_damage_dice","use"]
         };
 
@@ -742,10 +742,10 @@
                 repsec_agr.filter(current_section => current_section.section == `items-${category}`)[0].ids.forEach(category_id => {
                     if((values[`repeating_items-${category}_${category_id}_${category}_bulk`] || "").toUpperCase() === "L") {
                         // Light item
-                        light += 1;
+                        light += (parseInt(values[`repeating_items-${category}_${category_id}_${category}_quantity`]) || 0);
                     } else {
                         // Other / normal bulk
-                        other += (parseInt(values[`repeating_items-${category}_${category_id}_${category}_bulk`]) || 0);
+                        other += ((parseInt(values[`repeating_items-${category}_${category_id}_${category}_bulk`]) || 0) * (parseInt(values[`repeating_items-${category}_${category_id}_${category}_quantity`]) || 0));
                     }
                 });
             });
