@@ -431,9 +431,13 @@
     var rows = stats.split(/\n/);
     var newAttrs = {};
     var previousLine = ''; //Au cas d'attaque sur plusieurs lignes
+    var lastPrefix = ''; //Pour les suites d'attaque sur la ligne suivante
+    var firstLine = true;//si la première ligne ne correspond à rien, c'est le nom
     rows.forEach(function(row) {
       if (row === '') {
         previousLine = '';
+        lastPrefix = '';
+        firstLine = false;
         return;
       }
       if (row.search(/\bDM\b/i) >= 0) { //Attaque
@@ -514,7 +518,11 @@
         newAttrs[prefix + 'dm'] = bonusDM;
         newAttrs[prefix + 'spec'] = specAtt;
         if (portee) newAttrs[prefix + 'portee'] = portee;
+        lastPrefix = prefix;
+      } else if (row.startsWith('+') && lastPrefix !== '') {
+        newAttrs[lastPrefix + 'spec'] += row;
       } else { //Pas attaque
+        lastPrefix = '';
         var lexemes = [];
         var lastMatch;
         var match = patternStats.exec(row);
@@ -535,8 +543,12 @@
           });
         }
         if (lexemes.length === 0) {
+          if (firstLine) {
+            newAttrs.character_name = row;
+          } else {
           console.log("La ligne " + row + " ne correspond à rien");
           previousLine = row + ' ';
+          }
         } else previousLine = '';
         lexemes.forEach(function(l) {
           var lstat = l.match[0];
@@ -584,6 +596,7 @@
           newAttrs[lattr] = valAttr;
         });
       }
+      firstLine = false;
     });
     setAttrs(newAttrs);
   });
