@@ -431,16 +431,18 @@
     var rows = stats.split(/\n/);
     var newAttrs = {};
     var previousLine = ''; //Au cas d'attaque sur plusieurs lignes
+    var previousContainsDM = false;
     var lastPrefix = ''; //Pour les suites d'attaque sur la ligne suivante
-    var firstLine = true;//si la première ligne ne correspond à rien, c'est le nom
+    var firstLine = true; //si la première ligne ne correspond à rien, c'est le nom
     rows.forEach(function(row) {
       if (row === '') {
         previousLine = '';
         lastPrefix = '';
         firstLine = false;
+        previousContainsDM = false;
         return;
       }
-      if (row.search(/\bDM\b/i) >= 0) { //Attaque
+      if (previousContainsDM || row.search(/\bDM\b/i) >= 0) { //Attaque
         var currentRow = previousLine + row;
         var nomAttaqueFin = currentRow.search(/\s(\+\d+|0\b|DM)/i);
         var nomAttaque = currentRow.substring(0, nomAttaqueFin);
@@ -480,6 +482,8 @@
           bonusDM = parseInt(dmExpr);
           if (isNaN(bonusDM)) {
             console.log("Impossible de trouver les DM dans " + row);
+            previousLine += row;
+            previousContainsDM = true;
             return;
           }
         } else {
@@ -488,6 +492,8 @@
           de = parseInt(dmExpr);
           if (isNaN(bonusDM) || isNaN(de)) {
             console.log("Impossible de trouver les DM dans " + row);
+            previousLine += row;
+            previousContainsDM = true;
             return;
           }
           var indexBonusDM = dmExpr.search(/(\+|-)/);
@@ -519,6 +525,7 @@
         newAttrs[prefix + 'spec'] = specAtt;
         if (portee) newAttrs[prefix + 'portee'] = portee;
         lastPrefix = prefix;
+        previousContainsDM = false;
       } else if (row.startsWith('+') && lastPrefix !== '') {
         newAttrs[lastPrefix + 'spec'] += row;
       } else { //Pas attaque
@@ -546,8 +553,8 @@
           if (firstLine) {
             newAttrs.character_name = row;
           } else {
-          console.log("La ligne " + row + " ne correspond à rien");
-          previousLine = row + ' ';
+            console.log("La ligne " + row + " ne correspond à rien");
+            previousLine = row + ' ';
           }
         } else previousLine = '';
         lexemes.forEach(function(l) {
