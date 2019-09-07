@@ -21,7 +21,7 @@
 	<div class="tab-toggles">
 		<input type="hidden" name="attr_wound_toggle" value="@{wounds}" /><button type="action" name="act_wound" title="@{wound_toggle}" data-i18n="wounds">wounds</button>
 		<input type="hidden" name="attr_modifier_toggle" value="?{Modifiers +/-|0}" /><button type="action" name="act_modifier" title="@{modifier_toggle}" data-i18n="modifiers">modifiers</button>
-		<input type="hidden" name="attr_edge_toggle" value="@{edge}" /><button type="action" name="act_edge" title="@{edge_toggle}" data-i18n="edge">edge</button>
+		<input type="hidden" name="attr_edge_toggle" value="" /><button type="action" name="act_edge" title="@{edge_toggle}" data-i18n="edge">edge</button>
 		<button type="roll" value="@{gm_toggle} &{template:rolls}{{header=^{d6}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5)]]}}" title="Roll D6s"><span class="d6">L</span></button>
 	</div>
 	<div class="tab-col">
@@ -225,7 +225,7 @@
 							<div class="settings">
 								<input type="number" name="attr_initiative_modifier" value="0" placeholder="0" title="@{initiative_modifier}" /><span class="tiny-span"> + </span>
 								<input type="number" name="attr_initiative_dice_modifier" value="0" min="0" max="4" placeholder="modifier" title="@{initiative_dice_modifier}" />
-								<span class="tiny-span "data-i18n="d6"> d6</span><span class="tiny-span"> = </span>
+								<span class="tiny-span" data-i18n="d6"> d6</span><span class="tiny-span"> = </span>
 								<span name="attr_display_initiative_mod"></span><span class="tiny-span" title="@{initiative_mod}"> + </span>
 								<span name="attr_initiative_dice"></span><span class="tiny-span" title="@{initiative_dice}" data-i18n="d6"> d6</span>
 							</div>
@@ -4258,10 +4258,9 @@
 			,"judgeintentions" : "judge_intentions"
 			,"karma": "karma" 
 			,"liftandcarry": "lift_carry"
-			,"limitastral": "limit_astral"
-			,"limitmental": "limit_mental"
+			,"limitmental": "mental_limit"
 			,"limitphysical": "physical_limit"
-			,"limitsocial": "limit_social"
+			,"limitsocial": "social_limit"
 			,"magician": "flag_special"
 			,"memory": "memory"
 			,"nuyen":"primary_nuyen"
@@ -4325,7 +4324,8 @@
 			              update[`${charSheetAttr}`] = "mundane";
 			            };
 					} else if (key === "totaless") {
-						update[`${charSheetAttr}`] = chummerValue || 6;
+						const essence = chummerValue.includes(",") ? chummerValue.replace(",", ".") : chummerValue;
+						update[`${charSheetAttr}`] = parseFloat(essence) || 6;
 					} else if (chummerValue && chummerValue != null) {
 						update[`${charSheetAttr}`] = chummerValue;
 					} else {
@@ -4352,6 +4352,9 @@
 
 			// PROCESS ATTRIBUTES
 			const attributes = character.attributes[1].attribute;
+			let attributeTotals = { 
+				"essence": update["essence"] 
+			}; // USED FOR LIMITS BELOW
 			attributes.forEach((object) => {
 				try {
 					const charSheetAttr = attributeKeys[object.name];
@@ -4361,10 +4364,43 @@
 						update[`${charSheetAttr}_base`] = object.base;
 					    update[`${charSheetAttr}_modifier`] = object.total - object.base;
 					};
+
+					// USED FOR LIMITS BELOW
+					attributeTotals[`${charSheetAttr}`] = parseInt(object.total) || 0;
 				} catch (error) {
 					setText["error"] += addFeedback(JSON.stringify(object), error);
 				};
 			});
+
+			//PROCESS LIMITS
+			const limitKeys = {
+				"limitmental": "mental_limit"
+				,"limitphysical": "physical_limit"
+				,"limitsocial": "social_limit"
+			};
+
+			Object.keys(limitKeys).forEach((key) => {
+				//CALCULATE THE BASE FOR LIMIT
+				const limitCalculate = (attrsArray) => {
+					return Math.ceil(((attrsArray[0] + attrsArray[1] + (attrsArray[2] * 2))/3))
+				};
+
+				try {
+					let attrs = [];
+					if (key === "limitmental") {
+						attrs.push(attributeTotals["intuition"], attributeTotals["willpower"], attributeTotals["logic"]);
+					} else if (key === "limitphysical") {
+						attrs.push(attributeTotals["body"], attributeTotals["reaction"], attributeTotals["strength"]);
+					} else {
+						attrs.push(attributeTotals["essence"], attributeTotals["willpower"], attributeTotals["charisma"]);
+					}; 
+
+					//SET LIMIT MODIFIER EQUAL TO THE TOTAL IN CHUMMER - THE CALCULATED BASE LIMIT
+					update[`${limitKeys[key]}_modifier`] = parseInt(character[key]) - limitCalculate(attrs);
+				} catch (error) {
+					setText["error"] += addFeedback(JSON.stringify(`${key}`), error);
+				};
+			}); 
 
 			// LOOP THROUGHT QUALITIES
 			if (character.qualities != null && character.qualities.quality != null) {
