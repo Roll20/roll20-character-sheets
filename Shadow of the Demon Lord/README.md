@@ -1,6 +1,31 @@
 # Roll20 Character sheet for 'Shadow of the Demon Lord' by [Robert Schwalb](http://schwalbentertainment.com)
 
 ## Change log
+
+### Version 7
+* Fixed a bug preventing creation of new NPC attacks
+
+### Version 6 
+* Styling cleanup, using CSS grid instead of Flexbox in some key places
+* Added a rest button
+* Added insanity and corruption on the NPC sheet
+* Made rolling weapon damage optional (or available on extra click)
+* Removed legacy conversion code
+* Sheet worker refactored and cleaned up
+* Made some adjustments to adapt to changed Roll20 base CSS
+
+### Version 5
+* Align everything left on main tab
+* Alleviate some display issues with odd number of spells
+* Added spellbook macro
+* Moved description field in roll template to the end
+
+### Version 4
+* Added Finesse and Perception as attack stats
+* Weapons and attacks now correctly display "boon"/"bane"/"banes" instead of always displaying "boons"
+* Added NPC afflictions
+* Fix display of attack roll 20+
+
 ### 2017-11-09: Version 3
 * Improved technique for hiding sections in display mode, leading to attribute savings and less sheet worker code
 * Added defense section, automatically calculating defense; takes into account defenseless and unconscious afflictions
@@ -50,7 +75,5 @@ This sheet uses a preprocessor for its CSS called SASS. When editing, make sure 
 will do the trick. The sheet worker code has been minified as well, although this is not necessary for the functioning of the sheet.
 
 ## Wishlist
-* Afflictions for NPCs
 * Buff/Debuff section
-* Settings page (adjust background, layout, etc.)
 * Responsive version of main tab

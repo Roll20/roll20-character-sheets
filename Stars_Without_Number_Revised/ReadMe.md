@@ -2,28 +2,167 @@
 
 This sheet is created for use in Stars Without Number Revised Edition on Roll20.
 
-### Author/Maintainer
+## Authors/Maintainers
 
-[Karlinator](https://github.com/Karlinator)
+* [Karlinator](https://github.com/Karlinator)
+* [Jakob](https://github.com/joesinghaus)
+* [Panzer](https://app.roll20.net/users/2223776/panzer)
 
-### Contributors
+## Contributors
 
+* [Victor M. Suarez](https://github.com/svmnotn)
 * [MankiGames](https://github.com/MankiGames)
 * [Shadowriku](https://github.com/Shadowriku)
 * [RonaldZ](https://github.com/RonaldZ)
 * [jfredett](https://github.com/jfredett)
 * [CoalPoweredPuppet](https://github.com/CoalPoweredPuppet)
-* [Kevin Searle](https://github.com/kevinsearle)
+* Original First Edition sheet by [Kevin Searle](https://github.com/kevinsearle)
 
-### QA/Testing
+## QA/Testing
 
 * [tipsta](https://github.com/mistatipsta)
 
-### Feedback
+## Feedback
 
 Report any problems, suggestions, or features by [creating an issue](https://github.com/Karlinator/roll20-character-sheets/issues) on Github.
 
-### Changelog
+## Contributing
+
+* Contributions are welcome at [the GitHub](https://github.com/Karlinator/roll20-character-sheets). Just open a pull request.
+* You will need to install [Node.js](https://nodejs.org), then run the following command in bash/cmd:
+  * npm install -g pug pug-cli sass jstransformer-uglify-es
+  * You may need to restart you computer.
+  * Then just make changes to the files in the Source folder, and use the file "build" or "pug_build.bat" and "sass_build.bat" depending on your OS.
+
+## Changelog
+
+### 2.4.2
+
+* Remove incorrect title text from uncommitted Magic Effort
+* Fix HP rolls for Heroic Characters looking at the wrong attribute
+* Fix the version upgrade code stopping early and thus not change the version number on the sheet.
+
+### 2.4.1
+
+* Fix Innate AC missing translation key.
+
+### 2.4.0
+
+* Add tracking of permanent System Strain.
+* Fix HP roll for Heroic characters.
+* Added a macro to calculate travel costs.
+* Codex of the Black Sun support!
+  * Magic changed to Know Magic and Use Magic.
+  * Sunblade skill and Fight skill added.
+  * Toggle between Adept, Arcanist, and Magister.
+  * Magic Effort for Adepts.
+  * Spell Slots for Magisters and Arcanists.
+  * Arcanists track if spells are prepared.
+  * Adepts have abilities.
+
+### 2.3.1
+
+* Fixed a bug causing the sheet to sometimes display an incorrect attack bonus for weapons.
+* Fixed missing base attack bonus for drone attacks.
+
+### 2.3.0
+
+* Added drone tab
+* Added weapon description data as well as armor descriptions
+* Added quantity for inventory, as well as proper support for Enc-1/3 gear
+* Added artifact armor and gear
+* Mech weapons now have range instead of ammo
+
+### 2.2.0
+
+* Added autofill functionality for ship hulls and class ability.
+* Added autofill buttons for armor, cyberware, foci, gear, ship modules, techniques, and weapons.
+* Weapon encumbrance can now be modified in the weapon section. Weapons with 0 encumbrance will no longer be shown in the gear section.
+* Added an extra field to put effort that is only committed as long as a power is active.
+* Changed "Total" effort to "Uncommitted", and added auto-calculating. The formula for effort is now more accurate.
+* Added the option to enable ammo tracking with ChatSetAttr to the sheet default settings.
+* Added a place to track skill points that can only be spent on psionics.
+* Added Discipline field to psychic techniques.
+* Added switch Ship/Mech/Custom for the ship tab.
+* Changed armor to be a repeating section.
+* The gear section now has a header.
+* Exert can now be used as a weapon's attack skill.
+* The chat macro for skills is now sorted into trained/untrained ones, the latter of which can be disabled.
+
+### 2.1.0
+
+* Additions
+  * Added option to disable modifier queries globally.
+  * Added button to roll hit points.
+  * Added weapon encumbrance tracking.
+  * Added ammo maximum for weapons.
+  * Weapon shock damage can now be toggled independent of base being 0 (for Unarmed Combatant).
+  * Added option for automatic ammo reduction (requires ChatSetAttr).
+* Bugfixes
+  * Attribute modifiers are now recalculated upon conversion from v1.6.2.
+  * Roll templates are no longer cut off when chat avatars are disabled.
+  * New NPC attacks should now receive the correct attack bonus.
+  * Line breaks in foci/technique/spell/cyberware descriptions now render correctly.
+
+### 2.0.1
+
+* Fixed a bug preventing successful conversion of NPC sheets.
+* Fixed a bug preventing extra effort from taking effect.
+
+### 2.0.0
+
+* New, overhauled version of the sheet (rewritten in pug and sass)
+  * Complete sheet HTML/CSS has been re-done for a more compact look
+  * Edit/Display mode toggle at the top of the sheet
+  * Roll template overhauled
+  * Many attributes were renamed or otherwise reorganized (seamless conversion)
+  * Chat menus for easy access to all sheet macros
+  * Ship sheet now has tracking for power/mass/hardpoints, as well as weapon attacks
+  * NPC sheet now has repeating sections for attacks and special abilities
+  * Added i18n support
+
+### 1.6.2
+
+* Fixed weapons rolling with Shoot when First Edition skills was selected.
+* Add attribute to Shock damage.
+
+### 1.6.1
+
+* Fix the sheet default settings to actually work.
+* Spelling and text fixes.
+* Added field for number of attacks to NPCs.
+
+### 1.6.0
+
+* Added new tab "Settings", for now primarily for toggling homebrew options.
+* Sheet default settings for everything in the settings page.
+* Luck save can now be added in settings.
+* Option to play with 1st Edition skills if you prefer those.
+* Also option to add your own skills in addition/instead.
+* Autofilling the "Next level xp" (with options).
+* Toggleable custom counters for whatever you heart desires.
+* Option to remove psionics completely.
+* New section for Space Magic, a Deluxe edition set of rules for importing magic into SWN.
+* Fixed formatting of an NPC stat block.
+* Changed the header toggles to work slightly better/faster.
+* You can now enter arbitrary dice rolls for shock damage!
+* Toggling to add skill to damage will now also add it to shock damage.
+* Added field for shock AC
+
+### 1.5.1
+
+* Fixed bug where the AC and AB on NPC sheets was reset to the PC sheet value when the sheet was opened.
+* Updated image.
+* Spelling corrections.
+* Added shock damage to weapons, only shows if a stat is entered.
+* Removed field for magazines in weapons.
+
+### 1.5.0
+
+* Fixed Sneak skill showing as Program.
+* Added Beasts and Bots to NPC autofill.
+* Added Saving Throw to NPC sheet.
+* Added klicking headers to show/hide sections.
 
 ### 1.4.0
 
@@ -57,7 +196,7 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Added Burst as Yes/No option on attack rolls that adds damage too.
 * Changed Psychic Techniques and Cyberware to a repeating section, so people won't run out of fields.
 
-#### 1.1.1
+### 1.1.1
 
 * Completely removed target AC (1.1.0 had 20 for AC) from attack calculation
 * Slight layout tweaks

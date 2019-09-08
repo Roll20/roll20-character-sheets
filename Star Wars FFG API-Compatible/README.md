@@ -22,7 +22,11 @@ Collapsible sections
 Fixed broken images.
 
 6.4.0 Updates
-Implement translation tags for character vehicule and group sheet
+Implement translation tags for character vehicle and group sheet
 
 6.4.2 Updates
-Add rolls for NPC in vehicules and fix roll template typo for riding beasts weapons
+Add rolls for NPC in vehicles and fix roll template typo for riding beasts weapons
+
+6.4.3 Updates
+Fixed Warfare to no longer roll from Xenology dice
+Redirected some sheet icons to imgur

@@ -5,7 +5,7 @@ This character sheet is intended for use with the [Open Legend](http://www.openl
 
 ## Known Issues
 * Physical dice prompts for attributes with a zero score show an extraneous "+" in them
-* Advantage 7+ and Disadvantage 7+ are not supported
+* Advantage 13+ and Disadvantage 13+ are not supported
 * Hitpoints, Legend Points, Speed, and Wealth are not formatted correctly on iPad
 
 ## Key Features
@@ -14,5 +14,9 @@ This character sheet is intended for use with the [Open Legend](http://www.openl
 * Players can switch between using Roll20's built-in dice engine or prompts to enter the total rolled on physical dice. Both options are equally compatible with all features and templates.
 
 ## Revision History
+
+January 29, 2018 - The notes in the Actions section are now added to the roll and text areas are now resizable. (Thanks to Great Moustache for helping with the code for the scrolling notes)
+
+January 22, 2018 - Changed the style of the Advantage menu to allow up to 12 Advantage and Disadvantage. Also fixed a small bug where the Power Level for Boons in the Actions section did not update correctly.
 
 July 1, 2017 - Initial public draft
