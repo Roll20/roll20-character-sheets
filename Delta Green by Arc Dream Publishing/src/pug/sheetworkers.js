@@ -1,7 +1,5 @@
 <!-- SCRIPTS
    ============================= -->
-<script type="text/worker">
-
 	const setAttributes = (update, silent) => { 
 		(silent === true) ? setAttrs(update, {silent:true}) : setAttrs(update); 
 	};
@@ -57,6 +55,3 @@
 				setAttrs({version: 1}, () => {versioning(1)});
 			};
 		};
-
-
-</script>
