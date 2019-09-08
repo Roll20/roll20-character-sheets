@@ -14,38 +14,18 @@
 //    =============================
     @import 'src/scss/_globals';   
 
-/* FLEXBOX
-   ============================= */
-    div.sheet-flex {
-        align-items    : flex-start;
-        display        : inline-flex;
-        flex-direction : row;
-        flex-wrap      : wrap;
-        justify-content: flex-start;
-        max-width      : 100%;
-        min-width      : 410px;
-        vertical-align : top;
-        width          : 45%;
-    }
-
-    div.sheet-flex:first-child {
-        margin-right: 0.5%;
-    }
-
-    div.sheet-npc-flex {
-        display: inline-flex;
-    }   
-
 /* HIDE DIFFERENT SHEET TYPES BY DEFAULT
    ============================= */ 
     div.sheet-npc,
-    div.sheet-pc {
+    div.sheet-pc,
+    div.sheet-settings {
         display: none;
     }   
 
     input.sheet-type[value="npc"] ~  div.sheet-npc,
-    input.sheet-type[value="character"] ~  div.sheet-pc {
-        display: block;
+    input.sheet-type[value="character"] ~  div.sheet-pc,
+    input.sheet-type[value="settings"] ~  div.sheet-settings  {
+        display: grid;
     }   
 
 /* GRID
@@ -72,7 +52,7 @@
     input.sheet-whisper-toggle[value*="gm"] + button[name*="whisper"],
     input.sheet-type[value="character"] ~ div.sheet-tabs button[name*="character"],
     input.sheet-type[value="npc"] ~ div.sheet-tabs button[name*="npc"],
-    input.sheet-type[value="options"] ~ div.sheet-tabs button[name*="options"] {
+    input.sheet-type[value="settings"] ~ div.sheet-tabs button[name*="settings"] {
         @include back-color($accent3);
         box-shadow: inset 0px 0px 3px 1px $palecolor;
         color     : $accent1;
@@ -81,16 +61,12 @@
 /* TABS & LOGO SECTION
    ============================= */
     div.sheet-tabs {
-        margin-bottom: 2%;
+        margin-bottom: 1%;
 
         label > input {
             width: 100%;
         }
-    }
 
-   /* grid-area: #{$rstart} / #{$cstart} / #{$rend} / #{$cend};*/
-
-    div.sheet-grid-tabs {
         grid-template-columns: 8em 1fr 8em;
         @include back-color($maincolor);
 
@@ -113,9 +89,24 @@
 
 /* GENERIC CLASSES
     ============================= */
-    .sheet-pictos {
-        font-family: $pictos;
+    .sheet-center { @include text-align(center); }
+    .sheet-border { border: 0.15em solid $maincolor; }
+    .sheet-border-bottom { border-bottom: 0.15em solid $maincolor; }
+    .sheet-pictos { font-family: $pictos; }
+
+    h2.sheet-aligned-left,
+    h3.sheet-aligned-left { 
+        margin-left: 0.5em;
+        text-align: left;
     }
+
+    /* NOT USED AT MOMENT 
+    button.sheet-pictos {
+        @include grid-area(1, 1, 1, 1);
+        height: 1.5em;
+        width: 1.5em;
+        z-index: 2;
+    } */
 
 /* NPC SHEET
     ============================= */
@@ -123,7 +114,8 @@
 /* PC SHEET
    ============================= */
    div.sheet-pc {
-        grid-template-columns: 3em 1fr;
+        grid-template-columns: 1fr 1fr;
+        grid-row-gap: 0.2em;
 
         h1 {
            font-size: 1em;
@@ -131,17 +123,9 @@
            transform: rotate(180deg);
         }
 
-        h2 {
-            margin-left: 0.5em;
-        }
-
         input[type="text"] {
             text-align: left;
             width: 100%;    
-        }
-
-        div.sheet-border {
-            border: 0.15em solid $maincolor;
         }
 
         div.sheet-section-header {
@@ -151,13 +135,6 @@
            writing-mode: vertical-lr;
         }
 
-        button.sheet-pictos {
-            @include grid-area(1, 1, 1, 1);
-            height: 1.5em;
-            width: 1.5em;
-            z-index: 2;
-        }
-
         div.sheet-vert-line {
             @include back-color($maincolor);
         }
@@ -165,14 +142,58 @@
         /* PERSONAL DATA
         ----------------------------- */
         div.sheet-personal-data {
-            @include grid-area(1, 1, 3, 3);
+            @include grid-area(1, 1, 1, 3);
             grid-template-columns: 3em 1fr;
 
             @import 'src/scss/_section_personal_data';   
         }
+
+        /* STATISTICAL DATA
+        ----------------------------- */
+        div.sheet-statistical-data {
+            @include grid-area(2, 1, 2, 1);
+            grid-template-columns: 3em 1fr;
+
+            div.sheet-section-body-stats {
+                div.sheet-section {
+                    grid-template-columns: 8em 0.155em 2fr 0.155em 1fr 0.155em 14em;
+
+                    //TOP LEVEL HEADERS; }
+                    h2:nth-of-type(1) { grid-area: 1 / 1 / 1 / 1; }
+                    h2:nth-of-type(2) { grid-area: 1 / 3 / 1 / 3; }
+                    h2:nth-of-type(3) { grid-area: 1 / 5 / 1 / 5; }
+                    h2:nth-of-type(4) { grid-area: 1 / 7 / 1 / 7; }
+
+                    //DECORATIVE VERTICAL LINES
+                    div.sheet-vert-line:nth-of-type(1)  { grid-area: 1 / 2 / 1 / 2; }
+                    div.sheet-vert-line:nth-of-type(2)  { grid-area: 1 / 4 / 1 / 4; }
+                    div.sheet-vert-line:nth-of-type(3)  { grid-area: 1 / 6 / 1 / 6; }
+
+                    //ATTRIBUTE HEADERS
+                    h3 {  grid-area: 1 / 1 / 1 / 1 ; }
+                }
+            }
+
+            div.sheet-section-body-derived {
+                div.sheet-section {
+                    grid-template-columns: 12em 0.155em 1fr 0.155em 1fr;
+                    //DECORATIVE VERTICAL LINES
+                    div.sheet-vert-line:nth-of-type(1)  { grid-area: 1 / 2 / 1 / 2; }
+                    div.sheet-vert-line:nth-of-type(2)  { grid-area: 1 / 4 / 1 / 4; }
+                }
+            }
+        }
+
+
+        /* PSYCHOLOGICAL DATA
+        ----------------------------- */
+        div.sheet-pyschological-data {
+            @include grid-area(2, 2, 2, 2);
+            grid-template-columns: 3em 1fr;
+            
+        }
+
    }
-
-
 
 
    /* ATTRIBUTES

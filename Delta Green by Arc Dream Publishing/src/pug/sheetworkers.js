@@ -1,23 +1,26 @@
-<!-- SCRIPTS
-   ============================= -->
+
+	// === SHARED FUNCTIONS
 	const setAttributes = (update, silent) => { 
 		(silent === true) ? setAttrs(update, {silent:true}) : setAttrs(update); 
 	};
 
 	// === ATTRIBUTE ARRAYS
 		const arrays = {
-			attributes: ["agility", "body", "charisma", "edge", "intuition", "logic", "strength", "willpower" ], //EXAMPLE
-			repeating_settings: [],
-			sheets: ["character", "npc"], //EXAMPLE. ADD MOTE SHEET TYPES here
+			attributes: [""], 
+			repeating_settings: [""],
+			sheets: ["sheet_select"],
 			toggles: ["attributes"]
 		};
 
-	// === SWITCH BETWEEN SHEET TYPES
+	// === SWITCH BETWEEN SHEETS
 	    arrays["sheets"].forEach(attr => {
-	        on(`clicked:toggle_${attr}`, (eventinfo) => {
-	        	setAttributes({sheet_type: `${attr}`}, true);
+	        on(`clicked:${attr} change:${attr}`, (eventinfo) => {
+	        	console.log(`%c SHEETS`, "color: blue; font-weight:bold");
+	        	console.log(eventinfo);
+	        	//setAttrs({sheet_type: `${attr}`}, true);
 	        });
 	    });
+
 
 	// === TOGGLE INPUT SETTINGS
 	    arrays["toggles"].forEach(attr => {
@@ -55,3 +58,5 @@
 				setAttrs({version: 1}, () => {versioning(1)});
 			};
 		};
+
+
