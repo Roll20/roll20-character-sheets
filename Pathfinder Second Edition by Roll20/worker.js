@@ -524,7 +524,7 @@
                     update[`${id}_damage_dice_query`] = values[`query_roll_damage_dice`];
                 }
                 // Forced update to attack and damage rolls (in case of logic change)
-                update[`${id}_weapon_roll`] = "{{roll01_name=^{attack}}} {{roll01=[[1d20cs20cf1 + @{weapon_strike}[@{text_modifier}] + @{query_roll_bonus}[@{text_bonus}]]]}} {{roll01_type=attack}} {{roll01_info=@{weapon_traits}}} {{roll01_critical=1}}";
+                update[`${id}_weapon_roll`] = "{{roll01_name=^{attack}}} {{roll01=[[1d20cs20cf1 + ?{Modifier|0} + @{weapon_strike}[@{text_modifier}] + @{query_roll_bonus}[@{text_bonus}]]]}} {{roll01_type=attack}} {{roll01_info=@{weapon_traits}}} {{roll01_critical=1}}";
                 update[`${id}_damage_roll`] = "{{roll02_name=^{damage}}} {{roll02=[[@{damage_dice_query}@{damage_dice_size} + @{damage_ability}[@{text_ability_modifier}] + @{damage_weapon_specialization}[WEAPON SPECIALIZATION] + @{damage_temporary}[TEMP] + @{damage_other}[OTHER] + @{query_roll_damage_bonus}[@{text_roll_damage_bonus}]]]}} {{roll02_type=damage}} {{roll02_info=@{damage_info}}}";
                 update[`${id}_damage_critical_roll`] = "{{roll03_name=^{critical_damage}}} {{roll03=[[(@{damage_dice_query}@{damage_dice_size} + @{damage_ability}[@{text_ability_modifier}] + @{damage_weapon_specialization}[WEAPON SPECIALIZATION] + @{damage_temporary}[TEMP] + @{damage_other}[OTHER] + @{query_roll_damage_bonus}[@{text_roll_damage_bonus}])*2]]}} {{roll03_type=critical-damage}} {{roll03_info=@{damage_info}}}";
                 // End
