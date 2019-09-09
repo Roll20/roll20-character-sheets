@@ -1,14 +1,14 @@
 //VERSION
-  =============================
+// =============================
 input(name='attr_version' type='hidden' value='1')
 
 // TABS
-  =============================
+// =============================
 input.type(name='attr_sheet_type' type='hidden' value='character')
 input.display_string(name='attr_character_settings' type='hidden' value='')
 
 //TABS & LOGO
-  =============================
+// =============================
 .tabs.grid
   // Buttons to toggle on GM whisper
   input.whisper-toggle(name='attr_gm_toggle' type='hidden' value=' ')
@@ -21,7 +21,7 @@ input.display_string(name='attr_character_settings' type='hidden' value='')
     span(class='pictos') y 
 
 // NPC SHEET
-  =============================
+// =============================
 .npc
   .box.npc-flex
     p NPC STUFF
@@ -29,7 +29,7 @@ input.display_string(name='attr_character_settings' type='hidden' value='')
     p MORE NPC STUFF 
 
 //PC SHEET
-  =============================
+// =============================
 .pc
   //PERSONAL DATA
   .grid.personal-data.border
@@ -68,6 +68,7 @@ input.display_string(name='attr_character_settings' type='hidden' value='')
   .grid.statistical-data.border
     .section-header
       h1() statistical data
+    //STATISTICS
     .grid.section-body
       .grid.section-body-stats
         .grid.section.border-bottom
@@ -78,11 +79,19 @@ input.display_string(name='attr_character_settings' type='hidden' value='')
           h2(class='center') x5
           .vert-line
           h2(class='aligned-left') distinguishing features
-        each val, key in {Strength: 'STR', Constitution: 'CON', Dexterity: 'DEX', Intelligence: 'INT', Power: 'POW', Charisma: 'CHA'}
+        each val, key in {strength: 'STR', constitution: 'CON', dexterity: 'DEX', intelligence: 'INT', power: 'POW', charisma: 'CHA'}
           .grid.section.border-bottom
             button(name=key title=key + ' roll' type='roll' value='')
-              h3(class='aligned-left')= key + ' (' + val + ')'
+              h3(class='aligned-left')= key
+              span()= '(' + val + ')'
             .vert-line
+            input(name='attr_' + key + '_score' placeholder='10' title='@{' + key + '_score' + '}' type="number")
+            .vert-line
+            span(class='center' name='attr_' + key title='@{' + key + '}')
+            .vert-line
+            input(name='attr_' + key + '_features' placeholder='distinguishing features' title='@{' + key + '_features' + '}' type="text")
+            input(name='attr_' + key type='hidden' value='50')
+      //DERIVED ATTRIBUTES
       .grid.section-body-derived
         .grid.section.border-bottom
           h2(class='aligned-left') 9. derived attributes
@@ -90,39 +99,54 @@ input.display_string(name='attr_character_settings' type='hidden' value='')
           h2(class='center') maximum
           .vert-line
           h2(class='center') current
-          .vert-line
+        each val, key in {'hit points': 'HP', 'willpower points': 'WP', 'sanity points': 'SAN', 'breaking points': 'BP'}
+          - var attrName = key.replace(' ','_');
+          .grid.section.border-bottom
+            .derived-attr
+              h3(class='aligned-left')= key
+              span()= '(' + val + ')'
+            .vert-line
+            span(class='center' name='attr_' + attrName + '_max' title='@{' + attrName + '_max' + '}')
+            .vert-line
+            input(name='attr_' + attrName placeholder='10' title='@{' + attrName + '}' type="number")
+      //PHYSICAL DESCRIPTION
+      .grid.section-body-physical
+        h2(class='aligned-left') 9. physical description
+        textarea(name='attr_physical_description' placeholder='physical description' title='@{physical_description}')
+
   //PSYCHOLOGICAL DATA
   .grid.pyschological-data.border
     .section-header
       h1() pyschological data 
 
 //NOTES SHEET
-  =============================
+// =============================
 .notes
 
 //SETTINGS SHEET
-  =============================
+// =============================
 .settings
   select(name='attr_sheet_select' title="character sheet select" selected)
     option(data-i18n='' value='character') character
     option(data-i18n='' value='npc') npc
 
 //FOOTER
-  =============================
+// =============================
 footer
   span Version 
   span(name='attr_version')
 
 //HIDDEN ATTRIBUTES
-  =============================
+// =============================
+
 
 
 //ROLL TEMPLATE
-  =============================
+// =============================
 //include src/pug/rolltemplate.pug
 
 
 //SHEETWORKERS
-  =============================
+// =============================
 script(type="text/worker")
   include src/pug/sheetworkers.js
