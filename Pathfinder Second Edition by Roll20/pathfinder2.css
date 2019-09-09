@@ -258,7 +258,8 @@ input.sheet-type[value*="feat"] ~ div.sheet-tabs button[name="act_toggle_feat"],
 input.sheet-type[value*="inventory"] ~ div.sheet-tabs button[name="act_toggle_inventory"],
 input.sheet-type[value*="spells"] ~ div.sheet-tabs button[name="act_toggle_spells"],
 input.sheet-type[value*="npc"] ~ div.sheet-tabs button[name="act_toggle_npc"],
-input.sheet-type[value*="options"] ~ div.sheet-tabs button[name="act_toggle_options"] {
+input.sheet-type[value*="options"] ~ div.sheet-tabs button[name="act_toggle_options"],
+div.sheet-npc-general-options input[name="attr_toggles"][value*="npcspellcaster"] ~ button[name="act_toggle_npcspellcaster"] {
 	color           : hsl(0, 0%, 100%);
 	background-color: #974f3e;
 	box-shadow      : inset 0px 0px 3px 1px #5c1110;
@@ -690,7 +691,8 @@ div.sheet-tabs {
 /* includes the options buttons for changing characters */
 div.sheet-tabs button,
 div.sheet-options button[name="act_toggle_npc"],
-div.sheet-npc-general-options button[name="act_toggle_character"]  {
+div.sheet-npc-general-options button[name="act_toggle_character"],
+div.sheet-npc-general-options button[name="act_toggle_npcspellcaster"] {
 	background-color: hsla(45, 15%, 90%, 1);
 	font-weight: bold;
 	text-transform: uppercase;
@@ -700,7 +702,8 @@ div.sheet-npc-general-options button[name="act_toggle_character"]  {
 }
 
 div.sheet-options button[name="act_toggle_npc"],
-div.sheet-npc-general-options button[name="act_toggle_character"]  {
+div.sheet-npc-general-options button[name="act_toggle_character"],
+div.sheet-npc-general-options button[name="act_toggle_npcspellcaster"] {
 	padding: 1%;
 	width: 10em;
 	text-overflow: ellipsis;
@@ -3039,6 +3042,7 @@ input[name="attr_sheet_type"][value*="feat"] ~ div.sheet-feat,
 input[name="attr_sheet_type"][value*="inventory"] ~ div.sheet-inventory,
 input[name="attr_sheet_type"][value*="spells"] ~ div.sheet-spells,
 input[name="attr_sheet_type"][value*="npc"] ~ div.sheet-npc,
+input[name="attr_sheet_type"][value*="npc"] ~ input[name="attr_toggles"][value*="npcspellcaster"] ~ div.sheet-spells,
 input[name="attr_sheet_type"][value*="options"] ~ div.sheet-options {
 	display: inline-block;
 }
@@ -3616,7 +3620,7 @@ div.sheet-options div.sheet-options-wrapper div.sheet-options-panel > * {
         border: solid 0.1em hsl(41, 29%, 58%);
         color: hsl(0, 0%, 100%);
         font-weight: bold;
-        padding: 0.2em 0.7em 0 0.7em;
+        padding: 0 0.7em;
     }
 
     span.sheet-npc-alignment-trait {
@@ -3670,11 +3674,16 @@ div.sheet-options div.sheet-options-wrapper div.sheet-options-panel > * {
         display: block;
     }
 
+    div.sheet-npc-settings::before {
+        content: none;
+    }
+
     div.sheet-npc .repitem button.sheet-settings-button {
         left: -1.5em;
         top: 1.1em;
     }
-    input.sheet-toggles[value*="npc"] ~ div.sheet-npc div.sheet-npc-settings {
+
+    input.sheet-toggles[value*="npcsettings"] ~ div.sheet-npc-settings {
         border: dotted hsl(1, 70%, 21%) 2px;
         height: auto;
         padding: 0.5em;
@@ -3692,10 +3701,6 @@ div.sheet-options div.sheet-options-wrapper div.sheet-options-panel > * {
 
     div.sheet-npc div.sheet-repeating input.sheet-toggles[value*="settings"] ~ div.sheet-settings {
         height: auto;
-    }
-
-    div.sheet-npc-spell-block {
-        display: none; /* Not going to deal with NPC spells until version 1.1 */
     }
 
     span.sheet-npc-parenthesized-field:not(:empty)::before {
@@ -3775,12 +3780,12 @@ div.sheet-options div.sheet-options-wrapper div.sheet-options-panel > * {
 
     /* buttons, inputs, and labels */
 
-    div.sheet-npc button[name="act_toggle_npc"]  {
+    div.sheet-npc button[name="act_toggle_npcsettings"]  {
         opacity: 0;
         font-size: 1em;
     }
 
-    div.sheet-npc:hover button[name="act_toggle_npc"],
+    div.sheet-npc:hover button[name="act_toggle_npcsettings"],
     div.sheet-npc div.sheet-repeating:hover button.sheet-settings-button  {
         opacity: 0.5;
     }
@@ -3788,7 +3793,7 @@ div.sheet-options div.sheet-options-wrapper div.sheet-options-panel > * {
     div.sheet-npc:hover button[name="act_toggle_npc"]:hover,
     div.sheet-npc div.sheet-repeating:hover button.sheet-settings-button:hover,
     div.sheet-npc input[name="attr_toggles"][value*="settings"] + div > button.sheet-settings-button,
-    input.sheet-toggles[value*="npc"] ~ div.sheet-npc button[name="act_toggle_npc"] {
+    input.sheet-toggles[value*="npcsettings"] ~ div.sheet-npc button[name="act_toggle_npcsettings"] {
         opacity: 1;
     }
 
@@ -3851,7 +3856,7 @@ div.sheet-options div.sheet-options-wrapper div.sheet-options-panel > * {
 	/* TEMPORARY HIT POINT FIX */
 	div.sheet-npc input[name="attr_hit_points"] {
 		display: inline;
-		height: 1.3em;
+		height: 1.4em;
 		text-align: center;
 		width: 10%;
 	}
@@ -3877,3 +3882,33 @@ div.sheet-options div.sheet-options-wrapper div.sheet-options-panel > * {
 	span.sheet-actiontype span:after {
 		content: ".";
 	}
+
+    /* SHOW & HIDE SPELL ATTACK AND DC FOR NPC SPELLCASTERS */
+    .sheet-spells input[name="attr_spell_attack"],
+    .sheet-spells input[name="attr_spell_dc"] {
+        border-radius: 3em;
+        height: 2.5em;
+        width: 2.5em;
+        text-align: center;
+        margin: 0.1em auto;
+        font-size: 2em;
+        font-weight: bold;
+        border-width: 0.15em;
+    }
+
+    .sheet-spells .sheet-npc-spellcaster-field,
+    .sheet-spells input[name="attr_toggles"][value*="npcspellcaster"] ~ div.sheet-spellattack-grid,
+    .sheet-spells input[name="attr_toggles"][value*="npcspellcaster"] ~ div.sheet-spelldc-grid,
+    .sheet-spells input[name="attr_toggles"][value*="npcspellcaster"] ~ .sheet-pc-spellcaster-field,
+    .sheet-spells input[name="attr_toggles"][value*="npcspellcaster"] ~ .repcontainer .sheet-pc-spellcaster-field {
+		display: none;
+	}
+
+    .sheet-spells input[name="attr_toggles"][value*="npcspellcaster"] ~ span.sheet-npc-spellcaster-field,
+    .sheet-spells input[name="attr_toggles"][value*="npcspellcaster"] ~ .repcontainer .sheet-npc-spellcaster-field {
+        display: inline-block;
+    }
+
+    .sheet-spells input[name="attr_toggles"][value*="npcspellcaster"] ~ .sheet-npc-spellcaster-field {
+        display: block;
+    }
