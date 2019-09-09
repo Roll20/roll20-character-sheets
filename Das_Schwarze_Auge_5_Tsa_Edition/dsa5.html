@@ -23,15 +23,15 @@
 <div class="common_header-grid">
 		<div class="common_header common_header1">
 			<span data-i18n="le">LE</span>
-			<input type="number" name="attr_le_aktuell" />
+			<input type="number" name="attr_le" />
 		</div>
 		<div class="common_header common_header2">
 			<span data-i18n="ae">AE</span>
-			<input type="number" name="attr_ae_aktuell"/>
+			<input type="number" name="attr_ae"/>
 		</div>
 		<div class="common_header common_header3">
 			<span data-i18n="ke">KE</span>
-				<input type="number" name="attr_ke_aktuell"/>
+				<input type="number" name="attr_ke"/>
 		</div>
 		<div class="common_header common_header4">
 			<span data-i18n="sk">SK</span>
@@ -239,9 +239,9 @@
 	<div class ="abgeleitete-eigenschaften-grid">
 
 		<span data-i18n="aktuell">Aktuell</span>
-		<input type="number" name='attr_le_aktuell' class='short' value='0'>
+		<input type="number" name='attr_le' class='short' value='0'>
 		<span data-i18n="maximal" >Maximal</span>
-		<input type="number" name='attr_le_maxwert' class='short' value='0' readonly>
+		<input type="number" name='attr_le_max' class='short' value='0' readonly>
 		<span class='dee'></span>
 		<span data-i18n="regeneration">Regeneration</span>
 		<input type="number" name='attr_le_regeneration' class='short' value='0'>
@@ -270,9 +270,9 @@
 		<h3 data-i18n="astralenergie">Astralenergie</h3>
 <div class ="eigenschaft abgeleitete-eigenschaften2-grid">
 	<span  data-i18n="aktuell">Aktuell</span>
-	<input type="number" name='attr_ae_aktuell' class='short' value='0'>
+	<input type="number" name='attr_ae' class='short' value='0'>
 	<span  data-i18n="maximal">Maximal</span>
-	<input type="number" name='attr_ae_maxwert' class='short' value='0' readonly>
+	<input type="number" name='attr_ae_max' class='short' value='0' readonly>
 	<span data-i18n="leiteigenschaft">Leiteigenschaft</span>
 		<select name="attr_leiteigenschaft_ae" style="width: 4em;" >
 			<option selected>---</option>
@@ -305,9 +305,9 @@
 		<h3 data-i18n="karmaenergie">Karmaenergie</h3>
 <div class ="eigenschaft abgeleitete-eigenschaften2-grid">
 		<span  data-i18n="aktuell">Aktuell</span>
-		<input type="number" name='attr_ke_aktuell' class='short' value='0'>
+		<input type="number" name='attr_ke' class='short' value='0'>
 		<span  data-i18n="maximal">Maximal</span>
-		<input type="number" name='attr_ke_maxwert' class='short' value='0' readonly>
+		<input type="number" name='attr_ke_max' class='short' value='0' readonly>
 		<span data-i18n="leiteigenschaft">Leiteigenschaft</span>
 		<select name="attr_leiteigenschaft_ke" class="eigenschaft" style="width: 4em;">
 			<option selected>---</option>
@@ -6624,21 +6624,20 @@ var updateTalentModifier = function(talent, sf_mod, effekt_mod, belastung_akt, b
 
 	// abgeleitete Werte
 
-
 	on("sheet:opened change:le_grundwert change:le_modifikator change:le_verlust_perm change:konstitution_gesamt", function(){
 	//init and change lebensenergie
-	getAttrs(["le_grundwert", "le_ausgangswert", "le_modifikator", "le_verlust_perm", "le_maxwert", "le_aktuell", "wundschwelle","schmerzstufe1","schmerzstufe2","schmerzstufe3","schmerzstufe4", "konstitution_gesamt" ], function(v){
+	getAttrs(["le_grundwert", "le_ausgangswert", "le_modifikator", "le_verlust_perm", "le_max", "le", "wundschwelle","schmerzstufe1","schmerzstufe2","schmerzstufe3","schmerzstufe4", "konstitution_gesamt" ], function(v){
 	  var le_grundwert = parseInt(v.le_grundwert) || 8;
 		var le_modifikator = parseInt(v.le_modifikator) || 0;
 		var le_verlust_perm = parseInt(v.le_verlust_perm) || 0;
-		var le_aktuell = parseInt(v.le_aktuell) || 0;
+		var le = parseInt(v.le) || 0;
 		var schmerzstufe1 = parseInt(v.schmerzstufe1) || 0;
 	  var schmerzstufe2 = parseInt(v.schmerzstufe2) || 0;
 		var schmerzstufe3 = parseInt(v.schmerzstufe3) || 0;
 		var schmerzstufe4 = parseInt(v.schmerzstufe4) || 0;
 		var konstitution_gesamt = parseInt(v.konstitution_gesamt) || 8;
 		var le_ausgangswert = le_grundwert + konstitution_gesamt + konstitution_gesamt;
-		var le_maxwert = le_ausgangswert + le_modifikator - le_verlust_perm;
+		var le_max = le_ausgangswert + le_modifikator - le_verlust_perm;
 		var wundschwelle = Math.round(konstitution_gesamt / 2);
 
 		setAttrs({
@@ -6646,12 +6645,12 @@ var updateTalentModifier = function(talent, sf_mod, effekt_mod, belastung_akt, b
 				le_ausgangswert: le_ausgangswert,
 		  	le_modifikator: le_modifikator,
 		  	le_verlust_perm: le_verlust_perm,
-		  	le_maxwert: le_maxwert,
-		  	le_aktuell: le_aktuell,
+		  	le_max: le_max,
+		  	le: le,
 		  	wundschwelle: wundschwelle,
-				schmerzstufe1: Math.round(le_maxwert / 4 * 3),
-				schmerzstufe2: Math.round(le_maxwert / 4 * 2),
-				schmerzstufe3: Math.round(le_maxwert / 4),
+				schmerzstufe1: Math.round(le_max / 4 * 3),
+				schmerzstufe2: Math.round(le_max / 4 * 2),
+				schmerzstufe3: Math.round(le_max / 4),
 				schmerzstufe4: 5
 			});
 		});
@@ -6660,7 +6659,7 @@ var updateTalentModifier = function(talent, sf_mod, effekt_mod, belastung_akt, b
 
 	on("sheet:opened change:leiteigenschaft_ae change:mut_gesamt change:klugheit_gesamt change:charisma_gesamt change:intuition_gesamt change:fingerfertigkeit_gesamt change:gewandheit_gesamt change:konstitution_gesamt change koerperkraft_gesamt change:ae_ausgangswert change:ae_modifikator change:ae_verlust_perm change:ae_rueckkauf", function(){
 	//init and change astralenergie
-	getAttrs(["leiteigenschaft_ae", "mut_gesamt", "klugheit_gesamt", "charisma_gesamt", "intuition_gesamt", "fingerfertigkeit_gesamt", "gewandheit_gesamt", "konstitution_gesamt", "koerperkraft_gesamt", "ae_modifikator", "ae_verlust_perm", "ae_rueckkauf", "ae_aktuell", "ae_regeneration"], function(v){
+	getAttrs(["leiteigenschaft_ae", "mut_gesamt", "klugheit_gesamt", "charisma_gesamt", "intuition_gesamt", "fingerfertigkeit_gesamt", "gewandheit_gesamt", "konstitution_gesamt", "koerperkraft_gesamt", "ae_modifikator", "ae_verlust_perm", "ae_rueckkauf", "ae", "ae_regeneration"], function(v){
 	  var leiteigenschaft_ae = v.leiteigenschaft_ae;
 	  var mut_gesamt = parseInt(v.mut_gesamt) || 0;
 	  var klugheit_gesamt = parseInt(v.klugheit_gesamt) || 0;
@@ -6673,7 +6672,7 @@ var updateTalentModifier = function(talent, sf_mod, effekt_mod, belastung_akt, b
 	  var ae_modifikator = parseInt(v.ae_modifikator) || 0;
 	  var ae_verlust_perm = parseInt(v.ae_verlust_perm) || 0;
 	  var ae_rueckkauf = parseInt(v.ae_rueckkauf) || 0;
-		var ae_aktuell = parseInt(v.ae_aktuell) ||0;
+		var ae = parseInt(v.ae) ||0;
 	  var ae_regeneration = parseInt(v.ae_regeneration) ||0;
 
 	  switch (leiteigenschaft_ae) {
@@ -6706,14 +6705,14 @@ var updateTalentModifier = function(talent, sf_mod, effekt_mod, belastung_akt, b
 	       var ae_ausgangswert = 0;
 	       break;
 	     }  // Ende switch
-	      var ae_maxwert = ae_ausgangswert + ae_modifikator - ae_verlust_perm + ae_rueckkauf;
+	      var ae_max = ae_ausgangswert + ae_modifikator - ae_verlust_perm + ae_rueckkauf;
 
 		setAttrs({
 					ae_ausgangswert: ae_ausgangswert,
 		  		ae_modifikator: ae_modifikator,
 		  		ae_verlust_perm: ae_verlust_perm,
-		  		ae_maxwert: ae_maxwert,
-		  		ae_aktuell: ae_aktuell,
+		  		ae_max: ae_max,
+		  		ae: ae,
 		  		ae_regeneration: ae_regeneration,
 	        ae_rueckkauf: ae_rueckkauf
 	      });
@@ -6723,7 +6722,7 @@ var updateTalentModifier = function(talent, sf_mod, effekt_mod, belastung_akt, b
 
 	on("sheet:opened change:leiteigenschaft_ke change:mut_gesamt change:klugheit_gesamt change:charisma_gesamt change:intuition_gesamt change:fingerfertigkeit_gesamt change:gewandheit_gesamt change:konstitution_gesamt change koerperkraft_gesamt change:ke_ausgangswert change:ke_modifikator change:ke_verlust_perm change:ke_rueckkauf", function(){
 	//init and change astralenerige
-	getAttrs(["leiteigenschaft_ke", "mut_gesamt", "klugheit_gesamt", "charisma_gesamt", "intuition_gesamt", "fingerfertigkeit_gesamt", "gewandheit_gesamt", "konstitution_gesamt", "koerperkraft_gesamt", "ke_modifikator", "ke_verlust_perm", "ke_rueckkauf",  "ke_aktuell", "ke_regeneration"], function(v){
+	getAttrs(["leiteigenschaft_ke", "mut_gesamt", "klugheit_gesamt", "charisma_gesamt", "intuition_gesamt", "fingerfertigkeit_gesamt", "gewandheit_gesamt", "konstitution_gesamt", "koerperkraft_gesamt", "ke_modifikator", "ke_verlust_perm", "ke_rueckkauf",  "ke", "ke_regeneration"], function(v){
 	  var leiteigenschaft_ke = v.leiteigenschaft_ke;
 	  var mut_gesamt = parseInt(v.mut_gesamt) || 0;
 	  var klugheit_gesamt = parseInt(v.klugheit_gesamt) || 0;
@@ -6736,7 +6735,7 @@ var updateTalentModifier = function(talent, sf_mod, effekt_mod, belastung_akt, b
 	  var ke_modifikator = parseInt(v.ke_modifikator) || 0;
 	  var ke_verlust_perm = parseInt(v.ke_verlust_perm) || 0;
 	  var ke_rueckkauf = parseInt(v.ke_rueckkauf) || 0;
-	  var ke_aktuell = parseInt(v.ke_aktuell) ||0;
+	  var ke = parseInt(v.ke) ||0;
 	  var ke_regeneration = parseInt(v.ke_regeneration) ||0;
 
 	  switch (leiteigenschaft_ke) {
@@ -6769,14 +6768,14 @@ var updateTalentModifier = function(talent, sf_mod, effekt_mod, belastung_akt, b
 	       var ke_ausgangswert = 0;
 	       break;
 	     }  // Ende switch
-	      var ke_maxwert = ke_ausgangswert + ke_modifikator - ke_verlust_perm + ke_rueckkauf;
+	      var ke_max = ke_ausgangswert + ke_modifikator - ke_verlust_perm + ke_rueckkauf;
 
 		setAttrs({
 					ke_ausgangswert: ke_ausgangswert,
 		  		ke_modifikator: ke_modifikator,
 		  		ke_verlust_perm: ke_verlust_perm,
-		  		ke_maxwert: ke_maxwert,
-	        ke_aktuell: ke_aktuell,
+		  		ke_max: ke_max,
+	        ke: ke,
 	        ke_regeneration: ke_regeneration,
 		  		ke_rueckkauf: ke_rueckkauf
 	      });
