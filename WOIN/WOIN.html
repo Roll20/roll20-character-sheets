@@ -239,7 +239,7 @@
                 <fieldset class="repeating_skillsnew">
                     <table class="sheet-skill">
                         <tr>
-                            <td><button type="roll" class="sheet-rollskill" name="roll_skill" value="&{template:default} {{name= @{skill_name} }} {{attribute= @{skill_attrib}:@{skill_attrib_score} }} {{skill= @{skill_level}:@{skill_dice} }} {{Pool Limit= @{skill_max_dice}}} {{roll= [[(@{skill_rolled})d6]]}}"></button></td>
+                            <td><button type="roll" class="sheet-rollskill" name="roll_skill" value="&{template:default} {{name= @{skill_name} }} {{attribute= @{skill_attrib}:@{skill_attrib_score} }} {{skill= @{skill_level}:@{skill_dice} }} {{Pool Limit= @{skill_max_dice}}} {{roll= [[(@{skill_rolled} + ?{Exploit mods|0})d6]]}}"></button></td>
                             <td><input type="text" class="sheet-text3" name="attr_skill_name" value="" placeholder="Skill Name"/></td>
                             <td>
                                 <select class="sheet-select1" name="attr_skill_select">
@@ -282,7 +282,7 @@
                 <fieldset class="repeating_skillsold">
                     <table class="sheet-skillold">
                         <tr>
-                            <td><button type="roll" class="sheet-rollskillold" name="roll_skill" value="&{template:default} {{name= @{skill_name} }} {{attribute= @{skill_attrib}:@{skill_attrib_score} }} {{skill= @{skill_level}:@{skill_dice} }} {{Pool Limit= @{skill_max_dice}}} {{roll= [[(@{skill_rolled})d6]]}}"></button></td>
+                            <td><button type="roll" class="sheet-rollskillold" name="roll_skill" value="&{template:default} {{name= @{skill_name} }} {{attribute= @{skill_attrib}:@{skill_attrib_score} }} {{skill= @{skill_level}:@{skill_dice} }} {{Pool Limit= @{skill_max_dice}}} {{roll= [[(@{skill_rolled} + ?{Exploit mods|0})d6]]}}"></button></td>
                             <td><input type="text" class="sheet-text3" name="attr_skill_name" value="" placeholder="Skill Name"/></td>
                             <td>
                                 <select class="sheet-select1" name="attr_skill_select">
@@ -553,8 +553,8 @@
                         <tr>
                             <th></th>
                             <th>Weapon</th>
-                            <th>Attack Attribute</th>
-                            <th>Skill</th>
+                            <th>Attribute</th>
+                            <th>Skill pool</th>
                             <th>Dmg</th>
 							<th>Dmg Add.</th>
                             <th>Dmg Mod.</th>
@@ -562,7 +562,7 @@
                             <th></th>
                         </tr>
                         <tr>
-                            <td><button type="roll" class="sheet-rollskill" name="roll_weapon1" value="&{template:default} {{name= @{weapon1_name} }} {{range= @{weapon1_range} }} {{attack= [[ (@{weaponattrib1_select} + @{weapon1_skill} - @{weapon1_damagemod}*2)d6]] }} {{damage= [[(@{weapon1_damage} + @{weapon1_damagemod})d6 + @{weapon1_damageadd} ]] }}"></button></td>
+                            <td><button type="roll" class="sheet-rollskill" name="roll_weapon1" value="&{template:default} {{name= @{weapon1_name} }} {{range= @{weapon1_range} }} {{attack= [[ (@{weaponattrib1_select} + @{weapon1_skill} - @{weapon1_damagemod}*2 + ?{Positional effects d|0})d6 ]] }} {{damage= [[(@{weapon1_damage} + @{weapon1_damagemod})d6 + @{weapon1_damageadd} ]] }}"></button></td>
                             <td><input type="text" class="sheet-text3" name="attr_weapon1_name" value="" placeholder="Weapon Name"/></td>
                             <td>
                                 <select class="sheet-select1" name="attr_weaponattrib1_select">
@@ -611,7 +611,7 @@
                             <th></th>
                         </tr>
                         <tr>
-                            <td><button type="roll" class="sheet-rollskillold" name="roll_weapon1" value="&{template:default} {{name= @{weapon1_name} }} {{range= @{weapon1_range} }} {{attack= [[ (@{weaponattrib1_select} + @{weapon1_skill} - @{weapon1_damagemod}*2)d6]] }} {{damage= [[(@{weapon1_damage} + @{weapon1_damagemod})d6 + @{weapon1_damageadd}]] }}"></button></td>
+                            <td><button type="roll" class="sheet-rollskillold" name="roll_weapon1" value="&{template:default} {{name= @{weapon1_name} }} {{range= @{weapon1_range} }} {{attack= [[ (@{weaponattrib1_select} + @{weapon1_skill} - @{weapon1_damagemod}*2  + ?{Positional effects d|0} )d6]] }} {{damage= [[(@{weapon1_damage} + @{weapon1_damagemod})d6 + @{weapon1_damageadd}]] }}"></button></td>
                             <td><input type="text" class="sheet-text3" name="attr_weapon1_name" value="" placeholder="Weapon Name"/></td>
                             <td>
                                 <select class="sheet-select1" name="attr_weaponattrib1_select">
@@ -1536,7 +1536,7 @@
 <script type="text/worker">
 // 
 // dice pool limit INSIDE repeating field 
-on("change:repeating_skillsnew:skill_total change:repeating_skillsnew:skill_max_dice change:maximum_dice_pool sheet:opened", function() {
+on("change:repeating_skillsnew:skill_total change:repeating_skillsnew:skill_max_dice", function() {
     getAttrs(['repeating_skillsnew_skill_total', 'repeating_skillsnew_skill_max_dice'], function(values) {
         setAttrs({ 
             repeating_skillsnew_skill_rolled: Math.min(values.repeating_skillsnew_skill_total, values.repeating_skillsnew_skill_max_dice)
@@ -1544,7 +1544,7 @@ on("change:repeating_skillsnew:skill_total change:repeating_skillsnew:skill_max_
         });
     });
 });
-on("change:repeating_skillsold:skill_total change:repeating_skillsold:skill_max_dice change:maximum_dice_pool sheet:opened", function() {
+on("change:repeating_skillsold:skill_total change:repeating_skillsold:skill_max_dice", function() {
     getAttrs(['repeating_skillsold_skill_total', 'repeating_skillsold_skill_max_dice'], function(values) {
         setAttrs({ 
             repeating_skillsold_skill_rolled: Math.min(values.repeating_skillsold_skill_total, values.repeating_skillsold_skill_max_dice)
@@ -1553,8 +1553,27 @@ on("change:repeating_skillsold:skill_total change:repeating_skillsold:skill_max_
     });
 });
 
+// Change in max dice pool
+on("change:maximum_dice_pool", function(value) {
+	var lmax_dice_pool = value.newValue;
+	
+	console.log("===> New max pool " + lmax_dice_pool );
+	getSectionIDs("repeating_skillsnew", function(id) {
+		for(var i=0; i < id.length; i++) {
+			setAttrs({["repeating_skillsnew_"+id[i]+"_skill_max_dice"]:lmax_dice_pool
+			});
+		}
+	});
+	getSectionIDs("repeating_skillsold", function(id) {
+		for(var i=0; i < id.length; i++) {
+			setAttrs({["repeating_skillsold_"+id[i]+"_skill_max_dice"]:lmax_dice_pool
+			});
+		}
+	});
+});
+
 // Creating Skill Dice Poll skillnew
-on("change:repeating_skillsnew:skill_rating sheet:opened", function() {
+on("change:repeating_skillsnew:skill_rating", function() {
     getAttrs(["repeating_skillsnew_skill_rating"], function(values) {
 
         if (values.repeating_skillsnew_skill_rating == 0) {
@@ -1596,7 +1615,7 @@ on("change:repeating_skillsnew:skill_rating sheet:opened", function() {
     });
 });
 // Creating Skill Dice Poll skillnew
-on("change:repeating_skillsold:skill_rating sheet:opened", function() {
+on("change:repeating_skillsold:skill_rating", function() {
     getAttrs(["repeating_skillsold_skill_rating"], function(values) {
 
         if (values.repeating_skillsold_skill_rating == 0) {
@@ -1638,7 +1657,7 @@ on("change:repeating_skillsold:skill_rating sheet:opened", function() {
     });
 });
     //Skill Dice Limit Dice, skillsnew
-on("change:repeating_skillsnew:skill_select change:repeating_skillsnew:skill_rating change:repeating_skillsnew:skill_dice change:maximum_dice_pool sheet:opened", function() {
+on("change:repeating_skillsnew:skill_select change:repeating_skillsnew:skill_rating change:repeating_skillsnew:skill_dice", function() {
     getAttrs(["repeating_skillsnew_skill_select", "repeating_skillsnew_skill_rating", "repeating_skillsnew_skill_dice", "maximum_dice_pool", "magic", "psionics", "repuation", "luck", "charisma", "willpower", "logic", "intuition", "endurance", "agility", "strength"], function(values) {
 
         if (values.repeating_skillsnew_skill_select == 0) {
@@ -1741,7 +1760,7 @@ on("change:repeating_skillsnew:skill_select change:repeating_skillsnew:skill_rat
 });
 
     //Skill Dice Limit Dice, skillsold
-on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rating change:maximum_dice_pool sheet:opened", function() {
+on("change:repeating_skillsold:skill_select change:repeating_skillsold:skill_rating", function() {
     getAttrs(["repeating_skillsold_skill_select", "repeating_skillsold_skill_rating", "maximum_dice_pool", "magic", "psionics", "repuation", "luck", "charisma", "willpower", "logic", "intuition", "endurance", "agility", "strength"], function(values) {
 
         if (values.repeating_skillsold_skill_select == 0) {
