@@ -31,7 +31,7 @@
             , "repeating_spells": ["cantrip","spell1","spell2","spell3","spell4","spell5","spell6","spell7","spell8","spell9","spell10"]
             , "spells_fields": ["name","school","cast","traits","spelllevel","type","range","target","area","duration","frequency","uses","uses_max","attack_ability","attack_misc","damage_dice","damage_ability","damage_misc","damage_type","save_type","dc_misc","effect","description","attack_checkbox","damage_checkbox","save_checkbox","save_critical_success","save_success","save_failure","save_critical_failure"]
             , "repeating_bulks": ["worn","readied","other"]
-            , "bulks_fields": ["bulk"]
+            , "bulks_fields": ["quantity","bulk"]
             , "translatables": ["modifier","ability_modifier","bonus","roll_bonus","roll_damage_bonus","#_damage_dice","use"]
         };
 
@@ -123,9 +123,11 @@
                 // ending initialization
                 setAttrs(update, {silent: true}, () => {
                     global_sheet_init_done = 1;
+                    versioning();
                 });
+            } else {
+                versioning();
             }
-            // TO DO: versioning
         };
         // -- Calculates proficiency according to rank, level and misc bonus
         const calcProficiency = function(rank, level, misc) {
@@ -173,90 +175,90 @@
                 // -- Add repeating section fields & remove duplicates
                 let all_fields = getRepSecFields(repsec_agr,Array.from(new Set(tmpfields)));
                 // == Gathering values
-                getAttrs(all_fields, (v) => {
-                    if((v["sheet_type"] || "").toLowerCase() === "npc") {
+                getAttrs(all_fields, (values) => {
+                    if((values["sheet_type"] || "").toLowerCase() === "npc") {
                         // Stop NPCs autocalculating
-                        console.log(`%c ${(v["character_name"] || "Unnamed character")} is an NPC. TotalUpdate was not fired.`, "color:purple;font-size:14px;");
+                        console.log(`%c Pathfinder Second Edition by Roll20: ${(values["character_name"] || "Unnamed character")} is an NPC. TotalUpdate was not fired.`, "color:purple;font-size:14px;");
                     } else {
                         // == Starting re-calculation
-                        // console.table(v);
+                        // console.table(values);
                         let big_update = {};
-                        let update = {}; // Will be used to collect intermediate updates and replace values in v, when necessary
+                        let update = {}; // Will be used to collect intermediate updates and replace values in values, when necessary
 
                         // == Skills
                         // Fixed skills
                         global_attributes_by_category["skills"].forEach(skill => {
-                            _.extend(big_update, calcSkill(skill,v,true));
+                            _.extend(big_update, calcSkill(skill,values,true));
                         });
                         // Repeating skills
                         global_attributes_by_category["repeating_skills"].forEach(r_skill => {
                             repsec_agr.filter(current_section => current_section.section == r_skill)[0].ids.forEach(r_skill_id => {
-                                _.extend(big_update, calcSkill(`repeating_${r_skill}_${r_skill_id}_${r_skill}`,v,true));
+                                _.extend(big_update, calcSkill(`repeating_${r_skill}_${r_skill_id}_${r_skill}`,values,true));
                             });
                         });
 
                         // == Saves
                         global_attributes_by_category["saves"].forEach(save => {
-                            _.extend(big_update, calcSave(save,v,true));
+                            _.extend(big_update, calcSave(save,values,true));
                         });
 
                         // == Armor Class (AC)
                         global_attributes_by_category["ac"].forEach(ac => {
-                            _.extend(big_update, calcArmorClass(ac,v,true));
+                            _.extend(big_update, calcArmorClass(ac,values,true));
                         });
 
                         // == Hit Points
-                        _.extend(big_update, calcHitPoints(v,true));
+                        _.extend(big_update, calcHitPoints(values,true));
 
                         // == Perception
-                        _.extend(big_update, calcPerception(v,true));
+                        _.extend(big_update, calcPerception(values,true));
 
                         // == Class DC
-                        _.extend(big_update, calcClassDc(v,true));
+                        _.extend(big_update, calcClassDc(values,true));
 
                         // == Attacks
                         global_attributes_by_category["repeating_attacks"].forEach(r_attack => {
                             repsec_agr.filter(current_section => current_section.section == r_attack)[0].ids.forEach(r_attack_id => {
-                                _.extend(big_update, calcAttack(`repeating_${r_attack}_${r_attack_id}`,v,true));
+                                _.extend(big_update, calcAttack(`repeating_${r_attack}_${r_attack_id}`,values,true));
                             });
                         });
 
                         // == Spell Attack
-                        update = calcSpellAttack(v,true);
+                        update = calcSpellAttack(values,true);
                         _.extend(big_update, update);
-                        _.extend(v, update);
+                        _.extend(values, update);
 
                         // == Spell DC
-                        update = calcSpellDc(v,true);
+                        update = calcSpellDc(values,true);
                         _.extend(big_update, update);
-                        _.extend(v, update);
+                        _.extend(values, update);
 
                         // === Spells: Magic Tradition
                         global_attributes_by_category["magic_tradition"].forEach(tradition => {
-                            update = calcMagicTradition(v,tradition);
+                            update = calcMagicTradition(values,tradition);
                             _.extend(big_update, update);
-                            _.extend(v, update);
+                            _.extend(values, update);
                         });
 
                         // == Spells
                         global_attributes_by_category["repeating_spells"].forEach(r_spell => {
                             repsec_agr.filter(current_section => current_section.section == r_spell)[0].ids.forEach(r_spell_id => {
-                                _.extend(big_update, calcSpell(`repeating_${r_spell}_${r_spell_id}`,v));
+                                _.extend(big_update, calcSpell(`repeating_${r_spell}_${r_spell_id}`,values));
                             });
                         });
 
                         // === Encumbrance / Bulk
                         update = {};
-                        update["encumbered_base"] = 5 + (parseInt(v["strength_modifier"]) || 0);
-                        update["maximum_base"] = 10 + (parseInt(v["strength_modifier"]) || 0);
+                        update["encumbered_base"] = 5 + (parseInt(values["strength_modifier"]) || 0);
+                        update["maximum_base"] = 10 + (parseInt(values["strength_modifier"]) || 0);
                         _.extend(big_update, update);
-                        _.extend(v, update);
-                        _.extend(big_update, calcBulk(v,repsec_agr));
+                        _.extend(values, update);
+                        _.extend(big_update, calcBulk(values,repsec_agr));
 
                         // == Updating (finally)
                         // console.table(big_update);
                         setAttrs(big_update, {silent: true}, ()=>{
-                            console.log(`%c ${(v["character_name"] || "Unnamed character")}'s Pathfinder 2 by Roll20 sheet updated (${new Date() - debug_start}ms)`, "color:purple;font-size:14px;");
+                            console.log(`%c Pathfinder Second Edition by Roll20: ${(values["character_name"] || "Unnamed character")} updated (${new Date() - debug_start}ms)`, "color:purple;font-size:14px;");
                             if(callback) {
                                 callback();
                             }
@@ -266,12 +268,42 @@
             });
         };
 
+        // === VERSIONING ===
+        const versioning = function() {
+            getAttrs(["version","version_character","sheet_type","character_name"], (values) => {
+                let version_sheet = parseFloat(values["version"]) || 0.0;
+                let version_character = parseFloat(values["version_character"]) || 0.0;
+                if (version_character === version_sheet) {
+                    console.log(`%c Pathfinder Second Edition by Roll20: ${(values["character_name"] || "Unnamed character")}, version ${version_character}`, "color:purple;font-size:14px;");
+                } else if (version_character < 2.01) {
+                    versioningUpdateTo2_01(values, () => {
+                        setAttrs({"version_character": 2.01}, {silent: true}, () => {
+                            versioning();
+                        });
+                    });
+                } else {
+                    setAttrs({"version_character": version_sheet}, {silent: true}, () => {
+                        versioning();
+                    });
+                }
+            });
+        };
+        const versioningUpdateTo2_01 = function(versioning_values, versioningDoneUpdating) {
+            console.log(`%c Pathfinder Second Edition by Roll20: ${(versioning_values["character_name"] || "Unnamed character")} updating to version 2.01`, "color:purple;font-size:13px;font-style:italic;");
+            if((versioning_values["sheet_type"] || "").toLowerCase() !== "npc") {
+                // Global recalculation to update all spells DC
+                totalUpdate(versioningDoneUpdating);
+            } else {
+                versioningDoneUpdating();
+            }
+        };
+
         // === ABILITIES
         const updateAbility = function(attr) {
             console.log(`%c Update ability ${attr}`, "color:purple;font-size:14px;");
             let fields = [`${attr}_score`,`${attr}_score_temporary`,`${attr}_modifier_temporary`];
-            getAttrs(fields, (v) => {
-                setAttrs(calcAbility(attr,v), {silent: true}, () => {
+            getAttrs(fields, (values) => {
+                setAttrs(calcAbility(attr,values), {silent: true}, () => {
                     totalUpdate();
                 });
             });
@@ -296,12 +328,12 @@
             console.log(`%c Update skill ${attr}`, "color:purple;font-size:14px;");
             let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["skills_fields"].map(field => `${id}_${field}`));
-            getAttrs(fields, (v) => {
+            getAttrs(fields, (values) => {
                 let update_ability = true;
                 if(attr.includes("ability")) {
                     update_ability = false;
                 }
-                setAttrs(calcSkill(id,v,update_ability), {silent: true}, () => {
+                setAttrs(calcSkill(id,values,update_ability), {silent: true}, () => {
                     if(callback) {
                         callback();
                     }
@@ -327,12 +359,12 @@
             console.log(`%c Update save ${attr}`, "color:purple;font-size:14px;");
             let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["saves_fields"].map(field => `${id}_${field}`));
-            getAttrs(fields, (v) => {
+            getAttrs(fields, (values) => {
                 let update_ability = true;
                 if(attr.includes("ability")) {
                     update_ability = false;
                 }
-                setAttrs(calcSave(id,v,update_ability), {silent: true}, () => {
+                setAttrs(calcSave(id,values,update_ability), {silent: true}, () => {
                     if(callback) {
                         callback();
                     }
@@ -357,12 +389,12 @@
             console.log(`%c Update AC ${attr}`, "color:purple;font-size:14px;");
             let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["ac_fields"].map(field => `${id}_${field}`));
-            getAttrs(fields, (v) => {
+            getAttrs(fields, (values) => {
                 let update_ability = true;
                 if(attr.includes("ability")) {
                     update_ability = false;
                 }
-                setAttrs(calcArmorClass(id,v,update_ability), {silent: true}, () => {
+                setAttrs(calcArmorClass(id,values,update_ability), {silent: true}, () => {
                     if(callback) {
                         callback();
                     }
@@ -398,8 +430,8 @@
             console.log(`%c Update HP ${attr}`, "color:purple;font-size:14px;");
             let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["hit_points"]);
-            getAttrs(fields, (v) => {
-                setAttrs(calcHitPoints(v), {silent: true}, () => {
+            getAttrs(fields, (values) => {
+                setAttrs(calcHitPoints(values), {silent: true}, () => {
                     if(callback) {
                         callback();
                     }
@@ -426,12 +458,12 @@
             console.log(`%c Update attack ${attr}`, "color:purple;font-size:14px;");
             let fields = ["sheet_type","level","query_roll_damage_dice"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["attacks_fields"].map(field => `${id}_${field}`));
-            getAttrs(fields, (v) => {
+            getAttrs(fields, (values) => {
                 let update_ability = true;
                 if(attr.includes("ability")) {
                     update_ability = false;
                 }
-                setAttrs(calcAttack(id,v,update_ability), {silent: true}, () => {
+                setAttrs(calcAttack(id,values,update_ability), {silent: true}, () => {
                     if(callback) {
                         callback();
                     }
@@ -505,12 +537,12 @@
             console.log(`%c Update perception ${attr}`, "color:purple;font-size:14px;");
             let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["perception"]);
-            getAttrs(fields, (v) => {
+            getAttrs(fields, (values) => {
                 let update_ability = true;
                 if(attr.includes("ability")) {
                     update_ability = false;
                 }
-                setAttrs(calcPerception(v, update_ability), {silent: true}, () => {
+                setAttrs(calcPerception(values, update_ability), {silent: true}, () => {
                     if(callback) {
                         callback();
                     }
@@ -535,12 +567,12 @@
             console.log(`%c Update Class DC ${attr}`, "color:purple;font-size:14px;");
             let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["class_dc"]);
-            getAttrs(fields, (v) => {
+            getAttrs(fields, (values) => {
                 let update_ability = true;
                 if(attr.includes("ability")) {
                     update_ability = false;
                 }
-                setAttrs(calcClassDc(v, update_ability), {silent: true}, () => {
+                setAttrs(calcClassDc(values, update_ability), {silent: true}, () => {
                     if(callback) {
                         callback();
                     }
@@ -566,12 +598,12 @@
             console.log(`%c Update spell attack ${attr}`, "color:purple;font-size:14px;");
             let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["spell_attack"]);
-            getAttrs(fields, (v) => {
+            getAttrs(fields, (values) => {
                 let update_ability = true;
                 if(attr.includes("ability")) {
                     update_ability = false;
                 }
-                setAttrs(calcSpellAttack(v, update_ability), {silent: true}, () => {
+                setAttrs(calcSpellAttack(values, update_ability), {silent: true}, () => {
                     if(callback) {
                         callback();
                     }
@@ -596,12 +628,12 @@
             console.log(`%c Update spell DC ${attr}`, "color:purple;font-size:14px;");
             let fields = ["sheet_type","level"];
             fields.push(...global_attributes_by_category["ability_modifiers"],...global_attributes_by_category["spell_dc"]);
-            getAttrs(fields, (v) => {
+            getAttrs(fields, (values) => {
                 let update_ability = true;
                 if(attr.includes("ability")) {
                     update_ability = false;
                 }
-                setAttrs(calcSpellDc(v, update_ability), {silent: true}, () => {
+                setAttrs(calcSpellDc(values, update_ability), {silent: true}, () => {
                     if(callback) {
                         callback();
                     }
@@ -630,8 +662,8 @@
             global_attributes_by_category["magic_tradition_fields"].forEach(field => {
                 fields.push(`magic_tradition_${tradition}_${field}`);
             });
-            getAttrs(fields, (v) => {
-                setAttrs(calcMagicTradition(v, tradition), {silent: true}, () => {
+            getAttrs(fields, (values) => {
+                setAttrs(calcMagicTradition(values, tradition), {silent: true}, () => {
                     if(callback) {
                         callback();
                     }
@@ -651,8 +683,8 @@
             console.log(`%c Update spell ${attr}`, "color:purple;font-size:14px;");
             let fields = ["level","magic_tradition_arcane_proficiency","magic_tradition_primal_proficiency","magic_tradition_occult_proficiency","magic_tradition_divine_proficiency","spell_dc","spell_dc_key_ability","spell_dc_temporary","spell_attack","spell_attack_key_ability","spell_attack_temporary"];
             fields.push(`${id}_type`);
-            getAttrs(fields, (v) => {
-                setAttrs(calcSpell(id,v), {silent: true}, () => {
+            getAttrs(fields, (values) => {
+                setAttrs(calcSpell(id,values), {silent: true}, () => {
                     if(callback) {
                         callback();
                     }
@@ -674,11 +706,12 @@
                 update[`${id}_spelldc`] = values["spell_dc"];
             } else {
                 update[`${id}_spellattack`] = (parseInt(values[`magic_tradition_${tradition}_proficiency`]) || 0)
-                    +  (parseInt(values[`spell_attack_key_ability`]) || 0)
-                    +  (parseInt(values[`spell_attack_temporary`]) || 0);
-                update[`${id}_spelldc`] = (parseInt(values[`magic_tradition_${tradition}_proficiency`]) || 0)
-                    +  (parseInt(values[`spell_dc_key_ability`]) || 0)
-                    +  (parseInt(values[`spell_dc_temporary`]) || 0);
+                    + (parseInt(values[`spell_attack_key_ability`]) || 0)
+                    + (parseInt(values[`spell_attack_temporary`]) || 0);
+                update[`${id}_spelldc`] = 10
+                    + (parseInt(values[`magic_tradition_${tradition}_proficiency`]) || 0)
+                    + (parseInt(values[`spell_dc_key_ability`]) || 0)
+                    + (parseInt(values[`spell_dc_temporary`]) || 0);
             }
             return update;
         };
@@ -709,10 +742,10 @@
                 repsec_agr.filter(current_section => current_section.section == `items-${category}`)[0].ids.forEach(category_id => {
                     if((values[`repeating_items-${category}_${category_id}_${category}_bulk`] || "").toUpperCase() === "L") {
                         // Light item
-                        light += 1;
+                        light += (parseInt(values[`repeating_items-${category}_${category_id}_${category}_quantity`]) || 0);
                     } else {
                         // Other / normal bulk
-                        other += (parseInt(values[`repeating_items-${category}_${category_id}_${category}_bulk`]) || 0);
+                        other += ((parseInt(values[`repeating_items-${category}_${category_id}_${category}_bulk`]) || 0) * (parseInt(values[`repeating_items-${category}_${category_id}_${category}_quantity`]) || 0));
                     }
                 });
             });
@@ -762,7 +795,7 @@
     ['character','details','feat','inventory','spells','options','npc'].forEach(attr => {
         on(`clicked:toggle_${attr}`, (eventinfo) => {
             const trigger = eventinfo.triggerName.split("clicked:toggle_")[1];
-            getAttrs(["sheet_type"], (v) => {
+            getAttrs(["sheet_type"], (values) => {
                 setAttrs({
                     sheet_type : attr
                 });
@@ -773,8 +806,8 @@
     modPf2.getAttrNames(['setting_toggles', "skills"]).forEach(attr => {
         on(`clicked:toggle_${attr}`, (eventinfo) => {
             const trigger = eventinfo.triggerName.split("clicked:toggle_")[1];
-            getAttrs(["toggles"], (v) => {
-                let string = v[`toggles`];
+            getAttrs(["toggles"], (values) => {
+                let string = values[`toggles`];
                 (string.includes(`${attr}`)) ? string = string.replace(`${attr},`, "") : string += `${attr},`;
                 setAttrs({
                 	toggles : string
@@ -788,8 +821,8 @@
 			const trigger = eventinfo.triggerName.split("clicked:")[1];
 			const id      = trigger.split("_")[2];
 			const keyword = trigger.split("_")[3];
-           	getAttrs([`${attr}_${id}_toggles`], (v) => {
-                let string = v[`${attr}_${id}_toggles`];
+           	getAttrs([`${attr}_${id}_toggles`], (values) => {
+                let string = values[`${attr}_${id}_toggles`];
                 (string.includes(`${keyword}`)) ? string = string.replace(`${keyword},`, "") : string += `${keyword},`;
                 setAttrs({
                 	[`${attr}_${id}_toggles`] : string
@@ -800,9 +833,9 @@
 
     // === Options - settings
     on("clicked:whisper", function(eventinfo) {
-        getAttrs(["whispertype"], function (v) {
+        getAttrs(["whispertype"], function (values) {
             setAttrs({
-                "whispertype": (v.whispertype.includes("gm")) ?  " " : "/w gm"
+                "whispertype": ((values["whispertype"] || "").includes("gm")) ?  " " : "/w gm "
             });
         });
     });
@@ -826,9 +859,9 @@
             // console.table(eventinfo);
             if((eventinfo.newValue || "").includes("modifier")) {
                 const ability = eventinfo.newValue.slice(2,-1);
-                getAttrs([ability], (v) => {
+                getAttrs([ability], (values) => {
                     let update = {};
-                    update[`${eventinfo.sourceAttribute.replace(/_select$/,"")}`] = v[ability];
+                    update[`${eventinfo.sourceAttribute.replace(/_select$/,"")}`] = values[ability];
                     setAttrs(update);
                 });
             }
@@ -839,13 +872,13 @@
         on(`change:${attr}_ability`, (eventinfo) => {
             // console.table(eventinfo);
             if (eventinfo.sourceType === "player") {
-                getAttrs([`${eventinfo.sourceAttribute}_select`], (v) => {
-                    if (v[`${eventinfo.sourceAttribute}_select`].includes("modifier")) {
+                getAttrs([`${eventinfo.sourceAttribute}_select`], (values) => {
+                    if (values[`${eventinfo.sourceAttribute}_select`].includes("modifier")) {
                         setAttrs({
                             [`${eventinfo.sourceAttribute}_select`] : "custom"
                         },{silent: true});
                     } else {
-                        console.log(`%c Ability value was ${v[`${eventinfo.sourceAttribute}_select`]}`, "color:orange;");
+                        console.log(`%c Ability value was ${values[`${eventinfo.sourceAttribute}_select`]}`, "color:orange;");
                     };
                 });
             };
