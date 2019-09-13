@@ -7,6 +7,7 @@ This sheet is created for use in Godbound games on Roll20, based on the Characte
 
 - v2.3.0
   - Minor
+    - Description fields for words, gifts, miracles, and artifacts changed to auto-expand
     - Small adjustment to project layout
     - Correction for styling of two  fieldset "add" buttons
 - v2.2.0
