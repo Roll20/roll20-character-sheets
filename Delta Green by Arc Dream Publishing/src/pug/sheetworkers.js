@@ -8,7 +8,7 @@
 		const arrays = {
 			attributes: [""], 
 			repeating_settings: [""],
-			sheets: ["select", "page1", "page2"],
+			sheets: ["select"],
 			toggles: ["attributes"]
 		};
 

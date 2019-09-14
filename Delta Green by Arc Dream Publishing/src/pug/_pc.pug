@@ -1,0 +1,237 @@
+.pc
+  //PERSONAL DATA
+  .grid.header-body.personal-data.border
+    .section-header
+      h1(data-i18n='personal-data') personal data
+    .section-body
+      .grid.section.border-bottom
+        h2(class='aligned-left' data-i18n='1-last-name') 1. last name, first name (and alias or code name if applicable)
+        label(data-i18-title='1-last-name' title='1. last name, first name (and alias or code name if applicable)')
+          input(data-i18-placeholder='name' name='attr_name' placeholder='name' title='${name}' type='text')
+        .vert-line
+        h2(class='aligned-left' data-i18n='2-profession') 2. profession (rank if applicable)
+        label(data-i18-title='2-profession' title='2. profession (rank if applicable)')
+          input(data-i18-placeholder='' name='attr_profession' placeholder='profession' title='${profession}' type='text')
+      .grid.section.border-bottom
+        h2(class='aligned-left' data-i18n='3-employer') 3. employer
+        label(data-i18-title='3-employer' title='3. employer')
+          input(data-i18-placeholder='employer' name='attr_employer' placeholder='employer' title='${employer}' type='text')
+        .vert-line
+        h2(class='aligned-left' data-i18n='4-nationality') 4. nationality
+        label(data-i18-title='4-nationality' title='4. nationality')
+          input(data-i18-placeholder='nationality' name='attr_nationality' placeholder='nationality' title='${nationality}' type='text')
+      .grid.section
+        h2(class='aligned-left' data-i18n='5-sex') 5. sex
+        label(data-i18-title='5-sex' title='5. sex')
+          input(data-i18-placeholder='sex' name='attr_sex' placeholder='sex' title='${sex}' type='text')
+        .vert-line
+        h2(class='aligned-left' data-i18n='6-age') 6. age and d.o.b.
+        label(data-i18-title='6-age' title='age and d.o.b.')
+          input(data-i18-placeholder='age' name='attr_age' placeholder='age and d.o.b.' title='${age}' type='text')
+        .vert-line
+        h2(class='aligned-left' data-i18n='7-education') 7. education and occupational history
+        label(data-i18-title='7-education' title='7. education and occupational history')
+          input(data-i18-placeholder='education' name='attr_education' placeholder='education and occupational history' title='${education}' type='text')
+  
+  //STATISTICAL DATA
+  .grid.header-body.statistical-data.border
+    .section-header
+      h1() statistical data
+    //STATISTICS
+    .grid.section-body
+      .grid.section-stats
+        .grid.section.border-bottom
+          h2(class='aligned-left') 8. statistics
+          .vert-line
+          each string in ['score', 'x5']
+            h2(class='center')= string
+            .vert-line
+          h2(class='aligned-left') distinguishing features
+        each val, key in {strength: 'STR', constitution: 'CON', dexterity: 'DEX', intelligence: 'INT', power: 'POW', charisma: 'CHA'}
+          .grid.section.border-bottom
+            button(name=key title=key + ' roll' type='roll' value='')
+              h3(class='aligned-left')= key
+              span()= '(' + val + ')'
+            .vert-line
+            label(title=key + ' score')
+              input(name='attr_' + key + '_score' placeholder='10' title='@{' + key + '_score' + '}' type='number')
+            .vert-line
+            span(class='center' name='attr_' + key title='@{' + key + '}')
+            .vert-line
+            label(title=key + ' distinguishing features')
+              input(name='attr_' + key + '_features' placeholder='distinguishing features' title='@{' + key + '_features' + '}' type='text')
+            input(name='attr_' + key type='hidden' value='50')
+      //DERIVED ATTRIBUTES
+      .grid.section-derived
+        .grid.section.border-bottom
+          h2(class='aligned-left') 9. derived attributes
+          each string in ['maximum', 'current']
+            .vert-line
+            h2(class='center')= string
+        each val, key in {'hit points': 'HP', 'willpower points': 'WP', 'sanity points': 'SAN', 'breaking points': 'BP'}
+          - const attrName = key.replace(' ','_');
+          .grid.section.border-bottom
+            .derived-attr
+              h3(class='aligned-left')= key
+              span()= '(' + val + ')'
+            .vert-line
+            span(class='center' name='attr_' + attrName + '_max' title='@{' + attrName + '_max' + '}')
+            .vert-line
+            label(title=key)
+              input(name='attr_' + attrName placeholder='10' title='@{' + attrName + '}' type='number')
+      //PHYSICAL DESCRIPTION
+      .grid.section-physical
+        h2(class='aligned-left') 9. physical description
+        textarea(name='attr_physical_description' placeholder='physical description' title='@{physical_description}')
+
+  //PSYCHOLOGICAL DATA
+  .grid.header-body.pyschological-data.border
+    .section-header
+      h1() pyschological data 
+    .grid.section-body
+      .grid.section-bonds
+        .grid.section.border-bottom.max-height
+          h2(class='aligned-left') 11. bonds
+          .vert-line
+          h2(class='center') score
+        .repeating-container.border-bottom
+          fieldset(class='repeating_bonds')
+            .grid.section.border-bottom
+              label(title='bond name')
+                input(name='attr_name' placeholder='bond' title='@{repeating_bonds_${x}_name}' type='text')
+              .vert-line
+              label(title='bond score')
+                input(name='attr_score' placeholder='10' title='@{repeating_bonds_${x}_score}' type='number')
+      .grid.section-motivations
+        .grid.section.border-bottom
+          h2(class='aligned-left') 12. motivations and mental disorders
+          textarea(name='attr_motivations')
+      .grid.section-incidents
+        .grid.section.border-bottom
+          h2(class='aligned-left') 13. incidents of san loss without going insane
+        .grid.section.incidents-body
+          each attr in ['violence', 'helplessness']
+            h3(class='center')= attr
+            +multiCheckbox(attr, 3)
+            span(class='italic') adapted
+
+  //APPLICABLE SKILL SETS
+  .grid.header-body.applicable-skill-sets.border
+    .section-header
+      h1() applicable skill sets
+    .grid.section-body.border
+      - const skills1 = {'accounting': 10, 'alertness': 20, 'anthropology': 0, 'archeology': '0', 'art': '0', 'artillery': 0, 'athletics': 30, 'bureaucracy': 10, 'computer science': 0, 'craft': 0, 'criminology': 10, 'demolitions': 0, 'disguise': 10, 'dodge': 30, 'drive': 20, 'firearms': 20}
+      - const skills2 = {'first aid': 10, 'forensics': 0, 'heavy machinery': 10, 'heavy weapons': 0, 'history': 10, 'humint': 10, 'law': 0, 'medicine': 0, 'melee weapons': 30, 'military science': 0, 'navigate': 10, 'occult': 10, 'persuade': 20, 'pharmacy': 0, 'pilot': 0, 'psychotherapy': 10}
+      - const skills3 = {'ride': 10, 'science': 0, 'search': 20, 'sigint': 0, 'stealth': '10', 'surgery': 0, 'survival': 10, 'swim': 20, 'unarmed combat': 40, 'unnatural': 0};
+      .grid.section-skill-col
+        each val, key in skills1
+          +skill(val, key)
+      .grid.section-skill-col
+        each val, key in skills2
+          +skill(val, key)
+      .grid.section-skill-col
+        each val, key in skills3
+          +skill(val, key)
+        .border-bottom
+          h3(class='margin-left') foriegn languages and other skills:
+        .repeating-container.border-bottom
+          fieldset(class='repeating_skills')
+            .grid.section-repeating.border-bottom
+              label(class='styled-checkbox' title='skill fail checkbox')
+                input(name='attr_fail' title='@{repeating_skills_${x}_fail}' type='checkbox')
+              input(name='attr_name' placeholder='skill name' title='@{repeating_skills_${x}_name}' type='text' value='')
+              button(name='skill roll' title='skill roll' type='roll' value='')
+              .vert-line
+              label(title='skill rank')
+                input(name='attr_rank' title='@{repeating_skills_${x}_rank}' placeholder='0' type='number' value='')
+      .section-directions.center 
+        span() Check a box when you attempt to use a skill and fail. After the session, add 1 to each checked skill and erase all checks.
+
+  //INJURIES
+  .grid.header-body.injuries.border
+    .section-header
+      h1() injuries
+    .grid.section-body.border
+      h2(class='aligned-left') 14. wounds and ailments
+      .border-bottom
+        textarea(name='attr_injuries' placeholder='injuries' title='@{injuries}')
+      .section-directions.center
+        span() Has First Aid been attempted since the last injury?
+        label(class='styled-checkbox' title='checkbox for first aid')
+          input(name='attr_injuries_first_aid' type='checkbox')
+        span() yes: only Medicine, Surgery, or long-term rest can help further.
+
+  //EQUIPMENT
+  .grid.header-body.equipment.border
+    .section-header
+      h1() equipment
+    .grid.section-body.border
+      - const weaponsAttrs = ['weapons', 'skill %', 'base range', 'damage', 'armor piercing', 'lethality %', 'kill radius', 'ammo']
+      h2(class='aligned-left') 15. armor and gear
+      .border-bottom
+        textarea(name='attr_armor_and_gear' placeholder='armor and gear' title='@{armor_and_gear}')
+      .section-directions.center.border-bottom
+        span() Body armor reduces the damage of all attacks except Called Shots and successful Lethality rolls.
+      .grid.section-weapons.border-bottom
+        each weapon in weaponsAttrs
+          - const weaponHeader = (weapon === 'weapons') ? '16. weapons' : weapon;
+          h2(class='center' title=weaponHeader)= weaponHeader
+          .vert-line
+      .repeating-container.border-bottom
+        fieldset(class='repeating_weapons')
+          .grid.section-weapons.border-bottom
+            each weapon in weaponsAttrs
+              - const attrName = weapon.replace(' ', '_').replace('%', 'percent')
+              - const type = weapon.includes('%') || weapon === 'ammo' ? 'number' : 'text';
+                label(title=weapon + ' input')
+                  input(name='attr_' + attrName placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type=type value='')
+                .vert-line
+
+  //REMARKS
+  .grid.header-body.remarks.border
+    .section-header
+      h1() remarks
+    .grid.section-body.border
+      .section.border-bottom
+        h2(class='aligned-left') 17. personal details and notes
+        textarea(name='attr_personal_details_and_notes' placeholder='personal details and notes' title='@{personal_details_and_notes}')
+      .vert-line
+      .section.border-bottom
+        .section.border-bottom
+            h2(class='aligned-left') 18. developments which affect home and family
+            textarea(name='attr_developments_which_affect_home_and_family' placeholder='developments which affect home and family' title='@{developments_which_affect_home_and_family}')
+        .grid.section-19.border-bottom
+          h2(class='aligned-left') 19. special training
+          .vert-line
+          h2(class='aligned-left') skill or stat used
+        .repeating-container.border-bottom
+          fieldset(class='repeating_special')
+            .grid.section-19.border-bottom
+              label(title='special training input')
+                input(name='attr_special_training' placeholder='special training' title='@{repeating_weapons_${x}_special_training}' type='text' value='')
+              .vert-line
+              label(title='special training input')
+                input(name='attr_skill_or_stat_used' placeholder='skill or stat used' title='@{repeating_weapons_${x}_skill_or_stat_used}' type='text' value='')
+      .section-directions.center
+        span() Please indicate why this agent was recruited and why the agent agreed to be recruited.
+
+  //AUTHORIZING OFFICER
+  .grid.authorizing-officer.border
+    .section
+      h2(class='margin-left') 20. authorizing officer
+      label(title='authorizing officer')
+        input(name='attr_authorizing_officer' placeholder='authorizing officer' title='authorizing officer' type='text' value='')
+    .vert-line
+    .section
+      h2(class='margin-left') 21. agent signature
+      label(title='agent signature')
+        input(name='attr_agent_signature' placeholder='agent signature' title='agent signature' type='text' value='')
+
+  //BOTTOM DECORATION
+  .grid.section-bottom-decor
+    span(class="uppercase") DD
+    span(class="uppercase") united states form
+    span() 315
+    span(class="uppercase") top secret//orcon//special access required delta green agent documenation sheet 
+      span(name='attr_version')
+    span() 112382
