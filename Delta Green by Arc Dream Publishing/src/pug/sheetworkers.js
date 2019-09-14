@@ -8,16 +8,16 @@
 		const arrays = {
 			attributes: [""], 
 			repeating_settings: [""],
-			sheets: ["sheet_select"],
+			sheets: ["select", "page1", "page2"],
 			toggles: ["attributes"]
 		};
 
 	// === SWITCH BETWEEN SHEETS
 	    arrays["sheets"].forEach(attr => {
-	        on(`clicked:${attr} change:${attr}`, (eventinfo) => {
+	        on(`clicked:sheet_${attr} changed:sheet_${attr}`, (eventinfo) => {
 	        	console.log(`%c SHEETS`, "color: blue; font-weight:bold");
 	        	console.log(eventinfo);
-	        	//setAttrs({sheet_type: `${attr}`}, true);
+	        	setAttrs({sheet_type: `${attr}`}, true);
 	        });
 	    });
 

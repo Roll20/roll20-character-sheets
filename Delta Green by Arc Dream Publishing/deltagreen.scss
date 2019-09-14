@@ -12,7 +12,11 @@
 
 // GLOBAL SETTINGS
 //    =============================
-    @import 'src/scss/_globals';   
+    @import 'src/scss/_globals';
+
+// REPEATING SECTIONS
+//    =============================
+    @import 'src/scss/_repcontrol';
 
 /* HIDE DIFFERENT SHEET TYPES BY DEFAULT
    ============================= */ 
@@ -23,10 +27,21 @@
     }   
 
     input.sheet-type[value='npc'] ~  div.sheet-npc,
-    input.sheet-type[value='character'] ~  div.sheet-pc,
-    input.sheet-type[value='settings'] ~  div.sheet-settings  {
+    input.sheet-type[value*='character'] ~  div.sheet-pc,
+    input.sheet-type[value*='settings'] ~  div.sheet-settings  {
         display: grid;
-    }   
+    }  
+
+    /* HIGHLIGHT BUTTONS
+   ============================= */
+    input.sheet-whisper-toggle[value*='gm'] + button[name*='whisper'],
+    input.sheet-type[value*='character'] ~ div.sheet-tabs button[name*='character'],
+    input.sheet-type[value='npc'] ~ div.sheet-tabs button[name*='npc'],
+    input.sheet-type[value*='settings'] ~ div.sheet-tabs button[name*='settings'] {
+        @include back-color($accent3);
+        box-shadow: inset 0px 0px 3px 1px $palecolor;
+        color     : $accent1;
+    } 
 
 /* GRID
    ============================= */ 
@@ -47,43 +62,34 @@
         }
     }
 
-/* HIGHLIGHT BUTTONS
-   ============================= */
-    input.sheet-whisper-toggle[value*='gm'] + button[name*='whisper'],
-    input.sheet-type[value='character'] ~ div.sheet-tabs button[name*='character'],
-    input.sheet-type[value='npc'] ~ div.sheet-tabs button[name*='npc'],
-    input.sheet-type[value='settings'] ~ div.sheet-tabs button[name*='settings'] {
-        @include back-color($accent3);
-        box-shadow: inset 0px 0px 3px 1px $palecolor;
-        color     : $accent1;
-    }
-
 /* TABS & LOGO SECTION
    ============================= */
+    img[alt="Delta Green"] {
+        width: 100%;
+    }
+
     div.sheet-tabs {
+        grid-template-columns: 8em 1fr 8em 4em 8em;
         margin-bottom: 0.5%;
 
         label > input {
             width: 100%;
         }
 
-        grid-template-columns: 8em 1fr 8em;
-        @include back-color($maincolor);
-
-        img {
-            @include grid-area(1, 2, 3, 2);
-        }
-
         button[name='attr_gm_toggle'] {
             @include grid-area(1, 1, 1, 1);
         }
 
-        button[name='act_toggle_character'] {
+        button[name='act_sheet_page1'] {
             @include grid-area(1, 3, 1, 3);
         }
 
-        button[name='act_toggle_npc'] {
-            @include grid-area(2, 3, 2, 3);
+        button[name='act_sheet_page2'] {
+            @include grid-area(1, 4, 1, 4);
+        }
+
+        button[name='act_sheet_select'] {
+            @include grid-area(1, 5, 1, 5);
         }
     }
 
@@ -93,14 +99,15 @@
     .sheet-border-bottom { border-bottom: 0.15em solid $maincolor; }
     .sheet-center { @include text-align(center); }
     .sheet-italic {font-style: italic;}
+    .sheet-margin-left {margin-left: 2%; }
     .sheet-pictos { font-family: $pictos; }
+    .sheet-header-body { grid-template-columns: 3em 1fr; }
 
     h2.sheet-aligned-left,
     h3.sheet-aligned-left { 
         margin-left: 0.5em;
         text-align: left;
     }
-
 
 /* STYLED CHECKBOXES
     ============================= */
@@ -164,8 +171,7 @@
         /* PERSONAL DATA
         ----------------------------- */
         div.sheet-personal-data {
-            @include grid-area(1, 1, 1, 3);
-            grid-template-columns: 3em 1fr;
+            grid-column: 1 / 3;
 
             @import 'src/scss/_section_personal_data';   
         }
@@ -174,7 +180,6 @@
         ----------------------------- */
         div.sheet-statistical-data {
             @include grid-area(2, 1, 2, 1);
-            grid-template-columns: 3em 1fr;
 
             button[type='roll'],
             div.sheet-derived-attr {
@@ -216,14 +221,12 @@
                 h2 {grid-row: 1 / 1}
                 textarea {grid-row: 2 / 2}
             }
-
         }
 
         /* PSYCHOLOGICAL DATA
         ----------------------------- */
         div.sheet-pyschological-data {
             @include grid-area(2, 2, 2, 2);
-            grid-template-columns: 3em 1fr;
             grid-template-rows: min-content;
 
             textarea {
@@ -242,6 +245,12 @@
                 div.sheet-repeating-container {
                     margin-bottom: 2%;
                     min-height: 14.5em;
+
+                    .repcontrol {
+                        .repcontrol_add {
+                            right: -84%;
+                        }
+                    }
                 }
             }
 
@@ -256,8 +265,7 @@
         /* APPLICABLE SKILL SET
         ----------------------------- */
         div.sheet-applicable-skill-sets {
-            @include grid-area(3, 1, 3, 3);
-            grid-template-columns: 3em 1fr;
+            grid-column: 1 / 3;
 
             div.sheet-section-body {
                 grid-template-columns: 1fr 1fr 1fr;
@@ -268,7 +276,21 @@
                     }
                 }
 
-                div.sheet-section-skill-col {
+                div.sheet-section-skill-col {                    
+                    input[type='checkbox'] {
+                        margin-left: 10%;
+                        margin-top: 50%;
+                    }
+
+                    input[type='number'] {
+                        height: 100%;
+                    }
+
+                    span {
+                        font-size: 0.8em;
+                        text-align: center;
+                    }
+
                     div.sheet-section {
                         grid-template-columns: 1fr 15em 0.155em 2fr;
                         border-right: 0.15em solid $maincolor;
@@ -281,36 +303,80 @@
                                 margin-right: 5%;
                                 padding-left: 2%;
                             }
+                        }
 
-                            button[name*="humint"] > h3,
-                            button[name*="sigint"] > h3 {
-                                text-transform: uppercase;
+                        label.sheet-custom-label {
+                            grid-column: 1 / 5;
+                        }
+
+                        textarea {
+                            margin-bottom: 0em;
+                            margin-left: 1%;
+                            min-height: 2em;
+                            width: 98%;
+                        }
+                    }
+
+                    div.sheet-repeating-container {
+                        .repcontrol {
+                            .repcontrol_add {
+                                right: -75%;
                             }
                         }
 
-                        input[type="checkbox"] {
-                            margin-left: 10%;
-                            margin-top: 50%;
-                        }
-
-                        input[type="number"] {
-                            height: 100%;
-                        }
-
-                        span {
-                            font-size: 0.8em;
-                            text-align: center;
+                        div.sheet-section-repeating {
+                            grid-template-columns: 1fr 12.5em 2.5em 0.155em 2fr;
                         }
                     }
                 }
+
+                div.sheet-section-directions {
+                    grid-column: 1 / 4;
+                }
             }
+        }
+    
+        /* INJURIES
+        ----------------------------- */
+        div.sheet-injuries {
+            grid-column: 1 / 3;
+
+            h1 { grid-row: 1; }
+            label { display: inline; }
+
+            div.border-bottom { grid-row: 2; }
+        }
+
+
+        /* EQUIPMENT
+        ----------------------------- */
+        div.sheet-equipment {
+            grid-column: 1 / 3;
+
+            div.sheet-section-weapons {
+                grid-template-columns: 8em 0.155em 1fr 0.155em 2fr 0.155em 2fr 0.155em 3fr 0.155em 2fr 0.155em 2fr 0.155em 1fr;
+            }
+        }
+
+
+        /* REMARKS
+        ----------------------------- */
+        div.sheet-remarks {
+            grid-column: 1 / 3;
+        }
+
+
+        /* AUTHORIZING OFFICER
+        ----------------------------- */
+        div.sheet-authorizing-officer {
+            grid-column: 1 / 3;
+            grid-template-columns: 1fr 0.155em 1fr;
+
+            h2 { grid-row: 1; }
+            label { grid-row: 2; }
         }
     }   
 
-
-// REPEATING SECTIONS
-//    =============================
-    @import 'src/scss/_repcontrol';   
 
 /* FOOTER
    ============================= */
