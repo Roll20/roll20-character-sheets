@@ -8,19 +8,21 @@
 		const arrays = {
 			attributes: [""], 
 			repeating_settings: [""],
-			sheets: ["select"],
-			toggles: ["attributes"]
+			sheets: ["settings"]
+			toggles: ["sheet"]
 		};
 
-	// === SWITCH BETWEEN SHEETS
-	    arrays["sheets"].forEach(attr => {
-	        on(`clicked:sheet_${attr} changed:sheet_${attr}`, (eventinfo) => {
-	        	console.log(`%c SHEETS`, "color: blue; font-weight:bold");
-	        	console.log(eventinfo);
-	        	setAttrs({sheet_type: `${attr}`}, true);
+	// === TOGGLE SETTINGS
+		arrays["sheets"].forEach(attr => {
+	        on(`clicked:${attr}`, (eventinfo) => {
+	            setAttributes({sheet_type: `${attr}`}, true);
 	        });
 	    });
 
+	// === SWITCH BETWEEN SHEETS
+	    on(`change:sheet_select`, (eventinfo) => {
+	        setAttributes({sheet_type: eventinfo.newValue}, true);
+	    });
 
 	// === TOGGLE INPUT SETTINGS
 	    arrays["toggles"].forEach(attr => {
@@ -51,9 +53,9 @@
 		});			
 
 		const versioning = (version) => {
-		   console.log(`%c Versioning, ${version}`, "color: blue; font-weight:bold");
+		   console.log(`%c Versioning, ${version}`, "color: green; font-weight:bold");
 		   if (version >= 1) {
-				console.log(`%c Version is update to date`, "color: maroon; font-weight:bold");
+				console.log(`%c Version is update to date`, "color: orange; font-weight:bold");
 		    } else {
 				setAttrs({version: 1}, () => {versioning(1)});
 			};
