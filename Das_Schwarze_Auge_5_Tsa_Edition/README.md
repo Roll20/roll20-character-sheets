@@ -2,7 +2,7 @@
 
 ## Änderungen
 
-
+ 
 2019-09-15: - Die Attribute für Lebensenergie (le, le_max), Astralenergie (ke_, ke_max) und Karmaenergie (ke, ke_max) wurden umbenannt, um das Zuweisen der Werte an Token zu vereinfachen. Achtung: evtl. werden die aktuellen Werte auf 0 gesetzt und müssen angepasst werden.
             - Modifikator für den Fertigkeitswert (FW) der Talente hinzugefügt
             - Rüstungsschutz (RS) wird auch im Kopf des Kampfbogens angezeigt
