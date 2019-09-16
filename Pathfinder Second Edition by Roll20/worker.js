@@ -21,7 +21,7 @@
             , "ac_fields": ["ability","ability_select","dc_rank","proficiency","item","temporary","dc_base","cap","shield_ac_bonus","shield_temporary"]
             , "hit_points": ["hit_points_ancestry","hit_points_class","hit_points_other","hit_points_item"]
             , "repeating_attacks": ["melee-strikes","ranged-strikes"]
-            , "attacks_fields": ["weapon","weapon_ability_select","weapon_ability","weapon_proficiency","weapon_rank","weapon_item","weapon_temporary","weapon_traits","damage_dice","damage_dice_size","damage_ability_select","damage_ability","damage_b","damage_p","damage_s","damage_weapon_specialization","damage_temporary","damage_other","damage_effects"]
+            , "attacks_fields": ["weapon","weapon_ability_select","weapon_ability","weapon_proficiency","weapon_rank","weapon_item","weapon_temporary","weapon_traits","damage_dice","damage_dice_size","damage_ability_select","damage_ability","damage_b","damage_p","damage_s","damage_weapon_specialization","damage_temporary","damage_other","damage_effects","damage_additional"]
             , "perception": ["perception_ability_select","perception_ability","perception_rank","perception_proficiency","perception_item","perception_temporary"]
             , "class_dc": ["class_dc_key_ability_select","class_dc_key_ability","class_dc_proficiency","class_dc_rank","class_dc_item","class_dc_temporary"]
             , "spell_attack": ["spell_attack_key_ability_select","spell_attack_key_ability", "spell_attack_rank","spell_attack_proficiency","spell_attack_temporary"]
@@ -31,7 +31,7 @@
             , "repeating_spells": ["cantrip","spell1","spell2","spell3","spell4","spell5","spell6","spell7","spell8","spell9","spell10"]
             , "spells_fields": ["name","school","cast","traits","spelllevel","type","range","target","area","duration","frequency","uses","uses_max","attack_ability","attack_misc","damage_dice","damage_ability","damage_misc","damage_type","save_type","dc_misc","effect","description","attack_checkbox","damage_checkbox","save_checkbox","save_critical_success","save_success","save_failure","save_critical_failure"]
             , "repeating_bulks": ["worn","readied","other"]
-            , "bulks_fields": ["bulk"]
+            , "bulks_fields": ["quantity","bulk"]
             , "translatables": ["modifier","ability_modifier","bonus","roll_bonus","roll_damage_bonus","#_damage_dice","use"]
         };
 
@@ -178,7 +178,7 @@
                 getAttrs(all_fields, (values) => {
                     if((values["sheet_type"] || "").toLowerCase() === "npc") {
                         // Stop NPCs autocalculating
-                        console.log(`%c Pathfinder 2 by Roll20: ${(values["character_name"] || "Unnamed character")} is an NPC. TotalUpdate was not fired.`, "color:purple;font-size:14px;");
+                        console.log(`%c Pathfinder Second Edition by Roll20: ${(values["character_name"] || "Unnamed character")} is an NPC. TotalUpdate was not fired.`, "color:purple;font-size:14px;");
                     } else {
                         // == Starting re-calculation
                         // console.table(values);
@@ -258,7 +258,7 @@
                         // == Updating (finally)
                         // console.table(big_update);
                         setAttrs(big_update, {silent: true}, ()=>{
-                            console.log(`%c Pathfinder 2 by Roll20: ${(values["character_name"] || "Unnamed character")} updated (${new Date() - debug_start}ms)`, "color:purple;font-size:14px;");
+                            console.log(`%c Pathfinder Second Edition by Roll20: ${(values["character_name"] || "Unnamed character")} updated (${new Date() - debug_start}ms)`, "color:purple;font-size:14px;");
                             if(callback) {
                                 callback();
                             }
@@ -274,7 +274,7 @@
                 let version_sheet = parseFloat(values["version"]) || 0.0;
                 let version_character = parseFloat(values["version_character"]) || 0.0;
                 if (version_character === version_sheet) {
-                    console.log(`%c Pathfinder 2 by Roll20: ${(values["character_name"] || "Unnamed character")}, version ${version_character}`, "color:purple;font-size:14px;");
+                    console.log(`%c Pathfinder Second Edition by Roll20: ${(values["character_name"] || "Unnamed character")}, version ${version_character}`, "color:purple;font-size:14px;");
                 } else if (version_character < 2.01) {
                     versioningUpdateTo2_01(values, () => {
                         setAttrs({"version_character": 2.01}, {silent: true}, () => {
@@ -289,7 +289,7 @@
             });
         };
         const versioningUpdateTo2_01 = function(versioning_values, versioningDoneUpdating) {
-            console.log(`%c Pathfinder 2 by Roll20: ${(versioning_values["character_name"] || "Unnamed character")} updating to version 2.01`, "color:purple;font-size:13px;font-style:italic;");
+            console.log(`%c Pathfinder Second Edition by Roll20: ${(versioning_values["character_name"] || "Unnamed character")} updating to version 2.01`, "color:purple;font-size:13px;font-style:italic;");
             if((versioning_values["sheet_type"] || "").toLowerCase() !== "npc") {
                 // Global recalculation to update all spells DC
                 totalUpdate(versioningDoneUpdating);
@@ -501,7 +501,7 @@
                 // Attack display
                 update[`${id}_weapon_display`] = `${weapon_strike < 0 ? "" : "+"}${weapon_strike}${(values[`${id}_weapon_traits`] || "").length ? " ("+values[`${id}_weapon_traits`]+")" : ""}`;
                 // Damage display
-                update[`${id}_damage_display`] = `${damage_dice == '0D0' ? "" : damage_dice}${damage_bonus < 0 ? "" : "+"}${damage_bonus}${values[`${id}_damage_b`] == "1" ? " "+getTranslationByKey("b").toUpperCase() : ""}${values[`${id}_damage_p`] == "1" ? " "+getTranslationByKey("p").toUpperCase() : ""}${values[`${id}_damage_s`] == "1" ? " "+getTranslationByKey("s").toUpperCase() : ""}${(values[`${id}_damage_effects`] || "").length ?  " "+getTranslationByKey("plus")+" "+values[`${id}_damage_effects`] : ""}`;
+                update[`${id}_damage_display`] = `${damage_dice == '0D0' ? "" : damage_dice}${damage_bonus < 0 ? "" : "+"}${damage_bonus}${values[`${id}_damage_b`] == "1" ? " "+getTranslationByKey("b").toUpperCase() : ""}${values[`${id}_damage_p`] == "1" ? " "+getTranslationByKey("p").toUpperCase() : ""}${values[`${id}_damage_s`] == "1" ? " "+getTranslationByKey("s").toUpperCase() : ""}${(values[`${id}_damage_effects`] || "").length ?  " "+getTranslationByKey("plus")+" "+values[`${id}_damage_effects`] : ""}${(values[`${id}_damage_additional`] || "").length ?  " "+getTranslationByKey("plus")+" "+values[`${id}_damage_additional`] : ""}`;
                 // Damage Roll: calculating info to include translated damage type
                 let damage_info = "";
                 if(values[`${id}_damage_b`] == "1") {
@@ -524,7 +524,7 @@
                     update[`${id}_damage_dice_query`] = values[`query_roll_damage_dice`];
                 }
                 // Forced update to attack and damage rolls (in case of logic change)
-                update[`${id}_weapon_roll`] = "{{roll01_name=^{attack}}} {{roll01=[[1d20cs20cf1 + @{weapon_strike}[@{text_modifier}] + @{query_roll_bonus}[@{text_bonus}]]]}} {{roll01_type=attack}} {{roll01_info=@{weapon_traits}}} {{roll01_critical=1}}";
+                update[`${id}_weapon_roll`] = "{{roll01_name=^{attack}}} {{roll01=[[1d20cs20cf1 + @{weapon_strike}[@{text_modifier}] + (@{query_roll_bonus})[@{text_bonus}]]]}} {{roll01_type=attack}} {{roll01_info=@{weapon_traits}}} {{roll01_critical=1}}";
                 update[`${id}_damage_roll`] = "{{roll02_name=^{damage}}} {{roll02=[[@{damage_dice_query}@{damage_dice_size} + @{damage_ability}[@{text_ability_modifier}] + @{damage_weapon_specialization}[WEAPON SPECIALIZATION] + @{damage_temporary}[TEMP] + @{damage_other}[OTHER] + @{query_roll_damage_bonus}[@{text_roll_damage_bonus}]]]}} {{roll02_type=damage}} {{roll02_info=@{damage_info}}}";
                 update[`${id}_damage_critical_roll`] = "{{roll03_name=^{critical_damage}}} {{roll03=[[(@{damage_dice_query}@{damage_dice_size} + @{damage_ability}[@{text_ability_modifier}] + @{damage_weapon_specialization}[WEAPON SPECIALIZATION] + @{damage_temporary}[TEMP] + @{damage_other}[OTHER] + @{query_roll_damage_bonus}[@{text_roll_damage_bonus}])*2]]}} {{roll03_type=critical-damage}} {{roll03_info=@{damage_info}}}";
                 // End
@@ -742,10 +742,10 @@
                 repsec_agr.filter(current_section => current_section.section == `items-${category}`)[0].ids.forEach(category_id => {
                     if((values[`repeating_items-${category}_${category_id}_${category}_bulk`] || "").toUpperCase() === "L") {
                         // Light item
-                        light += 1;
+                        light += (parseInt(values[`repeating_items-${category}_${category_id}_${category}_quantity`]) || 0);
                     } else {
                         // Other / normal bulk
-                        other += (parseInt(values[`repeating_items-${category}_${category_id}_${category}_bulk`]) || 0);
+                        other += ((parseInt(values[`repeating_items-${category}_${category_id}_${category}_bulk`]) || 0) * (parseInt(values[`repeating_items-${category}_${category_id}_${category}_quantity`]) || 0));
                     }
                 });
             });
@@ -835,7 +835,7 @@
     on("clicked:whisper", function(eventinfo) {
         getAttrs(["whispertype"], function (values) {
             setAttrs({
-                "whispertype": ("values".whispertype.includes("gm")) ?  " " : "/w gm"
+                "whispertype": ((values["whispertype"] || "").includes("gm")) ?  " " : "/w gm "
             });
         });
     });

@@ -2,6 +2,7 @@
 
 ## Änderungen
 
+
  
 2019-09-15: - Die Attribute für Lebensenergie (le, le_max), Astralenergie (ke_, ke_max) und Karmaenergie (ke, ke_max) wurden umbenannt, um das Zuweisen der Werte an Token zu vereinfachen. Achtung: evtl. werden die aktuellen Werte auf 0 gesetzt und müssen angepasst werden.
             - Modifikator für den Fertigkeitswert (FW) der Talente hinzugefügt
@@ -13,10 +14,7 @@
             - AE/KE Leiteigenschaft (Grundwertetab) und Traditionseigenschaft (Magie/Götterwirken-Tab) sind jetzt synchronisiert
             - für AE/KE kann jetzt der Faktor (Default 1) mit dem die Traditionseigenschaft in den Gesamtwert eingeht, eingegeben werden
 
-
-2019-09-01: - Vorteile und Nachteile wurden unter Sonderfertigkeiten zusammenfaßt
-            - Zauberspruchtyp Zaubertricks hinzugefügt
-            - Fix: Berechnung Werte für Hiebwaffen im Kampfwerte
+=======
 
 2019-08-20: Der Charakterbogen wird erstmalig veröffentlicht.
 

@@ -21,10 +21,8 @@
 			<div class="content">
 				<h4>GURPS Version <input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Sheet Version" /></h4>
 				<ul>
-					<li>Change Placeholder Opacity (Cosmetic Only)</ li>
-					<li>Added Placeholders for Grimoire repeating section (Cosmetic Only)< /li>
-					<li>Updated some ToolTips for the Grimoire (Cosmetic Only)< /li>
-
+					<li>Updated some ToolTips and some Roll Templates </li>
+					<li>Correct some Wound Modifiers</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update
 				</span></b></label>
@@ -326,12 +324,14 @@
 					<div class="sheet-cell sheet-col0 sheet-label">
 						<div class="sheet-popup">Fright</div>
 						<span class="sheet-tooltip">
-							Fright Check
+							Fright Check Ref: B360
 							<br />
 							Based on Willpower
 							<br />
 							2pts/level
 							<br />
+							See extensive list of Modifiers B360
+							<br/>
 							Unmodified: <span name="attr_fear_check_base"></span>
 						</span>
 					</div>
@@ -347,7 +347,7 @@
 					<div class="sheet-cell sheet-col4">
 					    <!-- For Fright Check, use "kl1" = Keep Lowest One. [[1d8 ( { 16 , 13 }kl1) ]] = 1d6 + 13 -->
 					    <!-- see: https://wiki.roll20.net/Macros_-_Pathfinder_Examples : Calculated Dice Roll -->
-						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Fright Check}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[ ( {@{fear_check} + @{modifier}, @{fright_check_threshold}}kl1) ]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{useFrightLabel=[[1]]}}" name="roll_vsFearCheck" />
+						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Fright Check}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[ ( {@{fear_check} + @{modifier}, @{fright_check_threshold}}kl1) ]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{useFrightLabel=[[1]]}} {{showNotes=[[1]]}} {{notes= **On a failure**, Roll 3d6, add your margin of failure on the Fright Check, compare result to the Fright Check Table B360.}}" name="roll_vsFearCheck" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-sub-row margin-bottom sheet-row-fear">
@@ -377,6 +377,7 @@
 						<div class="sheet-popup">Unstun</div>
 						<span class="sheet-tooltip">
 							Recover from physical stun, based on Health.<br />
+							Roll at the end of your turn after Do Nothing <br />
 							High Pain Threshold +3 to check<br />
 							Low Pain Threshold -3 to check<br />
 						</span>
@@ -391,20 +392,26 @@
 						&nbsp;
 					</div>
 					<div class="sheet-cell sheet-col4">
-						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Condition Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Unstun Check}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{stun_check} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[1]]}} {{notes=If failed, must Do Nothing. \n<br />-4 to defenses, no retreat.\n<br />Roll per turn to recover.}}"  name="roll_vsUnstun" />
-					</div>
+						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Condition Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Unstun Check (Recovering from Stun)}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{stun_check} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[1]]}} {{notes= **On a failure**, you remain stunned; your next maneuver must also be Do Nothing, but you get another roll at the end of that turn . . . and so on, until you recover from stun. You are also -4 to defenses, no retreat.\n<br /> **On a success**, you recover from stun and can act normally on subsequent turns. B420}}"  name="roll_vsUnstun" />
+					</div>	
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-sub-row sheet-row-condition-knockdown">
 					<div class="sheet-cell sheet-col0 sheet-label">
 						<div class="sheet-popup">K Down</div>
 						<span class="sheet-tooltip">
-							Knockdown Check, based on Health.<br />
-							Roll on Major wound, vitals or head strike.<br />
-							-5 for major wound, -10 if skull or eye.<br />
-							+3 High Pain Threshold<br />
-							-4 Low Pain Threshold<br />
-							Fail means stunned. If fail by 5 or more, unconscious.
+							Knockdown & Stunning Check, based on Health.<br />
+							Roll: <br />
+							Whenever you suffer a major wound. B420<br />
+							Whenever you are struck in the head (skull, face, or eye) or<br />
+							 vitals for enough injury to cause a shock penalty,<br />
+							You must make an immediate HT roll to avoid knockdown and stunning. <br />
+							**Modifiers:** <br />
+								-5 for a major wound to the face or vitals (or to the groin, on a humanoid male).<br />
+								-10 for a major wound to the skull or eye. <br />
+								+3 High Pain Threshold<br />
+								-4 Low Pain Threshold<br />
 						</span>
+
 					</div>
 					<div class="sheet-cell sheet-col1">
 						<input type="number" name="attr_knockdown_check" value="10" readonly="readonly" >
@@ -416,16 +423,19 @@
 						&nbsp;
 					</div>
 					<div class="sheet-cell sheet-col4">
-						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Condition Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Knockdown Check}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{knockdown_check} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[1]]}} {{notes=Fail means stunned. If fail by 5 or more, unconscious.}}"  name="roll_vsKnockdown" />
+						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Condition Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Knockdown & Stunning Check}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{knockdown_check} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[1]]}} {{notes= **On a failure**, you’re Physically stunned. You also fall prone (if you weren’t already), and if you were holding anything, you drop it. \n<br />**On a failure by 5 or more, or any critical failure**, you fall unconscious! B420}}"  name="roll_vsKnockdown" />
 					</div>
+
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-sub-row sheet-row-unconscious">
 					<div class="sheet-cell sheet-col0 sheet-label">
 						<div class="sheet-popup">Unc.</div>
 						<span class="sheet-tooltip">
 							Unconscious Check, based on Health<br />
-							If HP or FP less than zero, roll per turn.<br />
-							Hard/Easy to Subdue plus or minus pts/level. Plus or minus one to Unconscious Check per level.<br />
+							If HP zero or less, roll per turn to take an Active Action.<br />
+							-1 per full multiple of HP below zero.<br />
+							Hard/Easy to Kill: Gives +/- per level to a Unc. Check<br />
+							Fit +1 to Unc. Check . Very Fit +2 to Unc.  Check<br />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
@@ -438,7 +448,7 @@
 						<input type="number" name="attr_unconscious_check_points" value="0" step="2" />
 					</div>
 					<div class="sheet-cell sheet-col4">
-						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Condition Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Unconscious Check}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{unconscious_check} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[1]]}} {{notes=If HP > 0, wake up in 15 minutes. \n<br />0 to -HP, roll HT per hour. \n<br />-HP or worse, Single HT after 12 hours. \n<br />If that fails, need medical attention, then HT roll every 12 hours or die.}}" name="roll_vsUnconsciousCheck" />
+						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Condition Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Unconscious Check}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{unconscious_check} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[1]]}} {{notes=** If you fail:**  you fall unconscious.  See 'Recovering from Unconsciuness' B423 . \n<br />**Success:** means you can act normally, but must roll again at the begining of every turn to continue functioning (If your HP is 0 or less). Exception: If you choose Do Nothing on your turn, then no roll needed. B419}}" name="roll_vsUnconsciousCheck" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-sub-row margin-bottom sheet-row-death">
@@ -446,9 +456,12 @@
 						<div class="sheet-popup">Death</div>
 						<span class="sheet-tooltip">
 							Death Check, based on Health.<br />
-							On damage taken, Roll if -HP. Another roll for each multiple of -HP.<br />
+							On damage taken: Immediately Roll a Death Check if you are<br />
+							at-1xHP or more.<br />
+							Roll again each time you suffer injury equal to a further<br />
+							multiple of your HP. (-2xHP, -3xHP, -4xHP) <br />
 							Immediate Death at -5xHP<br />
-							Hard/Easy to Kill plus or minus 2 pts/level. Plus or minus one to Death Check per level<br />
+							Hard/Easy to Kill: Gives +/- per level to a Death Check<br />
 							Fit +1 to Death Check . Very Fit +2 to Death Check<br />
 						</span>
 					</div>
@@ -462,7 +475,7 @@
 						<input type="number" name="attr_death_check_points" value="0" step="2" />
 					</div>
 					<div class="sheet-cell sheet-col4">
-						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Condition Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Death Check}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{unconscious_check} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsDeathCheck" />
+						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Condition Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Death Check}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{unconscious_check} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[1]]}} {{notes= **On a failure of 1 or 2**, Your receive a Mortal Wound – See Mortal Wounds B423 \n<br /> **On a failure of 3+** ***YOU DIE*** – See Death B423.}}" name="roll_vsDeathCheck" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-basic-speed sheet-hr">
@@ -902,8 +915,8 @@
 						<span class="sheet-tooltip">
 							Energy Reserve
 							<br />
-							Rules can vary depending on what<br />
-							magic system you are using.
+							See  Dungeon Fantasy 3, pg39 - Introduced<br />
+							See Powers, pg119 – More detailed<br />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
@@ -920,7 +933,8 @@
 						<span class="sheet-tooltip">
 							Current Energy Reserve
 							<br />
-							Rules can vary.
+							See  Dungeon Fantasy 3, pg39 - Introduced<br />
+							See Powers, pg119 – More detailed<br />
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
@@ -3226,19 +3240,19 @@
 									</tr>
 								</thead>
 								<tbody>
-									<tr><td>cut</td> <td>Cutting</td></tr>
-									<tr><td>imp</td> <td>Impaling</td></tr>
+									<tr><td>aff</td> <td>Affliction</td></tr>
+									<tr><td>burn</td><td>Burning</td></tr>
+									<tr><td>cor</td> <td>Corrosion</td></tr>
 									<tr><td>cr</td>  <td>Crushing</td></tr>
+									<tr><td>cut</td> <td>Cutting</td></tr>
+									<tr><td>fat</td> <td>Fatigue</td></tr>
+									<tr><td>imp</td> <td>Impaling</td></tr>
 									<tr><td>pi-</td> <td>Small Piercing</td></tr>
 									<tr><td>pi</td>  <td>Piercing</td></tr>
 									<tr><td>pi+</td> <td>Large Piercing</td></tr>
 									<tr><td>pi++</td><td>Huge Piercing</td></tr>
-									<tr><td>aff</td> <td>Affliction</td></tr>
-									<tr><td>burn</td><td>Burning</td></tr>
-									<tr><td>cor</td> <td>Corrosion</td></tr>
-									<tr><td>fat</td> <td>Fatigue</td></tr>
-									<tr><td>tox</td> <td>Toxic</td></tr>
 									<tr><td>spec</td><td>Special</td></tr>
+									<tr><td>tox</td> <td>Toxic</td></tr>
 								</tbody>
 							</table>
 						</span>
@@ -3894,7 +3908,7 @@
 	<div>
 
 	<h3>Latest Changes: Updated 
-		<input type="text" style="font-size: 20px; font-weight: bold; border-style: none;" name="attr_latest_changes" value="08/20/2019" readonly="readonly"/>
+		<input type="text" style="font-size: 20px; font-weight: bold; border-style: none;" name="attr_latest_changes" value="09/10/2019" readonly="readonly"/>
 	</h3>
 		
 	<h3>Known Issues</h3>
@@ -3925,6 +3939,22 @@
 
 		<p>If there are others that are working on or wish to work on this sheet, lets coordinate using the Roll20 forum for now - perhaps later we can use GitHub.</p>
 	</ul>
+	
+		<h4>Version: 1.6.5</h4>
+
+	<p>Pull Request: 09/10/2019</p>
+
+	<ul>
+		<li>Changes, Fixes, and Adds made by Mike W (UserID: 1414610)</li>
+		<li>Updated ToolTips for Fright Check, Knockdown and Stunning, Death, Unc. Check (Unconsciousness), ER, and Unstun - Cosmetic Only</li>
+		<li>Updated Knockdown and Stunning Roll Template - Cosmetic Only </li>
+		<li>Updated Unstun (Recovering from Physical Stun) Roll Template - Cosmetic Only</li>
+		<li>Updated Death Check Roll Template - Cosmetic Only</li>
+		<li>Updated Unc. Check (Unconsciousness) Roll Template - Cosmetic Only</li>
+		<li>Change the basic format of all ToolTips - Cosmetic Only</li>
+		<li>Corrected Wound Modifier Notes for imp, pi+, and pi++. - Cosmetic Only</li>
+	</ul>
+
 	
 	<h4>Version: 1.6.4</h4>
 	
@@ -4295,6 +4325,7 @@ Skull Damage x4</textarea>
 			            <td>Impaling</td>
 			            <td>
 			                <textarea name="attr_damage_type_note_imp">Damage x2
+Arm, Leg, Foot, or Hand x1 (B399)
 Vitals Damage x3
 Skull Damage x4</textarea>
 			            </td>
@@ -4327,6 +4358,7 @@ Skull Damage x4</textarea>
 			            <td>PI+</td>
 			            <td>
 			                <textarea name="attr_damage_type_note_pi_plus">Damage x1.5
+Arm, Leg, Foot, or Hand x1 (B399)
 Vitals Damage x3
 Skull Damage x4</textarea>
 			            </td>
@@ -4335,6 +4367,7 @@ Skull Damage x4</textarea>
 			            <td>PI++</td>
 			            <td>
 			                <textarea name="attr_damage_type_note_pi_plus_plus">Damage x2
+Arm, Leg, Foot, or Hand x1 (B399)
 Vitals Damage x3
 Skull Damage x4</textarea>
 			            </td>
@@ -4879,7 +4912,7 @@ Skull Damage x4
 
 	var noop = function () {}; // do nothing.
 
-	var version = "1.6.4";
+	var version = "1.6.5";
 
 	var modCascade = true;
 	
