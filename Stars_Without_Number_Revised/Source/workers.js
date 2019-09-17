@@ -3,7 +3,7 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.4.2";
+	const sheetVersion = "2.4.3";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -1940,13 +1940,14 @@
 		//Loop through the cyberware and add up the strain.
 		getSectionIDs("repeating_cyberware", idArray => {
 			const sourceAttrs = [
-				...idArray.map(id => `repeating_cyberware${id}_cyberware_strain`),
+				...idArray.map(id => `repeating_cyberware_${id}_cyberware_strain`),
 				"cyberware_strain_total"
 			];
 			getAttrs(sourceAttrs, v => {
-				const cyberwareStrain = Math.max(
-					...idArray.map(id => parseInt(v[`repeating_cyberware${id}_cyberware_strain`]) || 0)
-				);
+                const cyberwareStrain = idArray.reduce((m, id) => {
+				    m += parseInt(v[`repeating_cyberware_${id}_cyberware_strain`]) || 0;
+                    return m
+                }, 0)
 				mySetAttrs({
 					cyberware_strain_total: cyberwareStrain
 				}, v);
@@ -3049,6 +3050,13 @@
 					calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`), upgradeFunction);
 				});
 			}
+            /** v2.4.3
+             * Regenerate Cyberware strain because it was bugged
+             **/
+            else if (major == 2 && (minor < 4 || (minor == 4 && patch < 3))) {
+                calculateCyberwareStrain();
+                upgradeSheet("2.4.3");
+            }
 			/** Final upgrade clause, always leave this around */
 			else upgradeSheet(sheetVersion, false, true);
 		};
