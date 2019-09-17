@@ -36,6 +36,11 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ## Changelog
 
+### 2.4.3
+
+* Fix the summation of cyberware strain not actually doing that even remotely.
+* Fix magic effort update not triggering on changing the committed effor for the day.
+
 ### 2.4.2
 
 * Remove incorrect title text from uncommitted Magic Effort
