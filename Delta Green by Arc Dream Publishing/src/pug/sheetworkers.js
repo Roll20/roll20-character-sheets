@@ -2,8 +2,7 @@
 		const arrays = {
 			stats: ['strength', 'constitution', 'dexterity', 'intelligence', 'power', 'charisma'],
 			hit_points: ['strength_score', 'constitution_score'],
-			sanity_points: ['power_score'],
-			breaking_point: ['sanity_points', 'power_score'],
+			sanity_points: ['power_score'], //ALSO USED FOR BREAKING POINTS
 			willpower_points: ['power_score'],
 			toggles: ['settings']
 		};
