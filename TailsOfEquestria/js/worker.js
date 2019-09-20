@@ -265,8 +265,9 @@ onChange(['body_equation', 'mind_equation', 'charm_equation'], () => {
 
 on('sheet:opened', () => {
   setAttrs({
-    character_sheet: 'TailsOfEquestria v1.5'
+    character_sheet: 'TailsOfEquestria v1.6'
   });
+
   updateTraits(() => {
     updateTalents();
   });
