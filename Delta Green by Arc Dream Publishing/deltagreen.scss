@@ -24,8 +24,7 @@
 
 /* HIDE DIFFERENT SHEET TYPES BY DEFAULT
 ============================= */
-    div.sheet-npc,
-    input.sheet-type[value='npc'] ~ div.sheet-pc {
+    div.sheet-npc {
         display: none;
     }
 
@@ -34,9 +33,21 @@
         display: grid;
     }
 
+     /* HIDE PC SECTIONS NOT NEEDED ON NPC PAGE
+    ----------------------------- */
+    $pcSections: 'personal-data', 'statistical-data', 'pyschological-data', 'applicable-skill-sets', 'injuries', 'remarks', 'authorizing-officer', 'section-bottom-decor', 'equipment';
+    @each $section in $pcSections {
+      input.sheet-type[value='npc'] ~ div.sheet-pc div.sheet-#{$section} {
+        display: none;
+      }
+    }
+
+
+     /* NPC PAGE IS NOT AS WIDE A PC
+    ----------------------------- */
     div.sheet-npc,
     input.sheet-type[value='npc'] ~ div.sheet-tabs {
-        max-width: 500px;
+        max-width: 600px;
     }
 
 /* SWITCHES
@@ -105,11 +116,6 @@
             @include grid-area(2, 3, 2, 3);
         }
 
-        input.sheet-whisper-toggle[value='/w gm'] ~ button > span.sheet-hidden > span.sheet-off,
-        input.sheet-whisper-toggle[value=' '] ~ button > span.sheet-hidden > span.sheet-on {
-            display: none;
-        }
-
         select {
             background-color: $maincolor;
             border: none;
@@ -143,6 +149,7 @@
     .sheet-italic {font-style: italic;}
     .sheet-margin-left {margin-left: 2%; }
     .sheet-pictos { font-family: 'pictos'; }
+    .sheet-none { display: none; }
     .sheet-dicefontd10 {
         color: $maincolor;
         font-family: 'dicefontd10';
@@ -165,12 +172,116 @@
 
 /* NPC SHEET
 ============================= */
+div.sheet-npc {
+    input[type='text'] {
+        width: 100%;
+    }
+
     div.sheet-section-header {
         input[name='attr_name'] {
+            color: $maincolor;
+            font-size: 1.2em;
             text-align: left;
         }
     }
 
+    div.sheet-section-body {
+         grid-template-columns: 4em 1fr 4em 1fr 4em 1fr 4em 1fr 4em 1fr 4em 1fr;
+         margin-left: 2%;
+         max-width: 98%;
+
+        h1 {
+            font-size: 1em;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+         button > h1 {
+            font-size: 0.8em;
+            line-height: 1.8em;
+
+             &:hover,
+             &:focus {
+                color: $accent1;
+            }
+        }
+
+        input {
+            height: 100%;
+
+            &:placeholder-shown {
+                border: 0.1em dashed $accent3;
+            }
+
+            &[type='text'] {
+                text-align: left;
+                margin-left: 1%;
+            }
+        }
+
+        textarea {
+            grid-column: 1 / 13;
+            min-height: 4em;
+        }
+
+        div.sheet-repeating-container,
+        label.sheet-row {
+            grid-column: 1 / 13;
+        }
+
+        /* HIT POINTS & WILLPOWER POINTS
+        ----------------------------- */
+        h1[data-i18n='HP'] { @include grid-area(3, 1, 3, 1);  }
+        label[data-i18n-title='enter hit points']{ @include grid-area(3, 2, 3, 2); }
+        h1[data-i18n='WP'] { @include grid-area(3, 3, 3, 3);  }
+        label[data-i18n-title='enter willpower points']{ @include grid-area(3, 4, 3, 4); }
+
+
+        /* ARMOR
+        ----------------------------- */
+        h1[data-i18n='armor'] { @include grid-area(4, 1, 4, 1);  }
+        label[data-i18n-title='enter armor text']{ 
+            @include grid-area(4, 2, 4, 13); 
+            grid-column: 2 / 13;
+        }
+
+        /* SKILLS
+        ----------------------------- */
+        h1[data-i18n='skills'] { @include grid-area(5, 1, 5, 1);  }
+        label[data-i18n-title='']{ @include grid-area(5, 2, 5, 13); }
+
+        /* ATTACKS
+        ----------------------------- */
+        h1[data-i18n='attacks'] { @include grid-area(6, 1, 6, 3);  }
+        div.sheet-attacks { 
+            grid-row: 7 / 7;
+            margin-left: 2%;
+
+            div.sheet-section-weapons,
+            div.sheet-section-header {
+               grid-column-gap: 1%;
+               grid-template-columns: 12em 4em 5em 1fr 2.5em;
+            }
+        }
+
+        /* OTHER NOTES
+        ----------------------------- */
+        h1[data-i18n='other notes'] { @include grid-area(8, 1, 8, 3);  }
+        div.sheet-notes { 
+            grid-row: 9 / 9;
+            margin-left: 2%;
+
+            div.sheet-section-header,
+            div.sheet-section {
+                grid-column-gap: 1%;
+                grid-template-columns: 10em 1fr;
+            }
+        }
+
+    }
+}
     
 /* PC SHEET
 ============================= */

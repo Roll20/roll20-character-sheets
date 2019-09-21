@@ -14,8 +14,8 @@ input.display_string(name='attr_toggles' type='hidden' value='')
 // =============================
 .tabs.grid
 	// Buttons to toggle on GM whisper
-	span(data-i18n='GM Whisper') GM Whisper
-	label.switch(data-i18n='whisper rolls to gm' title='whisper rolls to gm')
+	span(data-i18n-title='GM Whisper') GM Whisper
+	label.switch(data-i18-titlen='whisper rolls to gm' title='whisper rolls to gm')
 		input.whisper-toggle(name='attr_gm_toggle' type='checkbox' value='/w gm')
 		span.slider
 	// LOGO
@@ -40,33 +40,57 @@ include src/pug/_objects.pug
 		.section-header
 			label(data-i18n-title='enter a name for non-player character' title='enter a name for non-player character')
 				input(data-i18n-placeholder='character name' name='attr_name' placeholder='Character name' title='@{name}' type='text' value='')
-		.section-body
-			.section
-				each val, key in statsObject
-					- const statRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${key}}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}}`;
-					button(name=key data-i18n-title=key + ' roll' title=key + ' roll' type='roll' value!=statRollValue)
-						h1(data-i18n=val)=val
-					label(data-i18n-title=key title=key)
-						input(data-i18n-placeholder='10' min=0 name='attr_' + key placeholder='10' title='@{' + key + '}' type='number' value='10')
-			.section
-				h1(data-i18n='HP') HP
-				label(data-i18n-title='enter hit points' title='enter hit points')
-					input(data-i18n-placeholder='10' name='attr_hit_points' placeholder='10' title='@{hit_points}' type='number' value='')
-				h1(data-i18n='WP') WP
-				label(data-i18n-title='enter willpower points' title='enter willpower points')
-					input(data-i18n-placeholder='10' name='attr_willpower_points' placeholder='10' title='@{willpower_points}' type='number' value='')
-			.section
-				h1(data-i18n='armor') ARMOR
-					label(data-i18n-title='enter armor text' title='enter armor text')
-						input(data-i18n-placeholder='8 points of thick hide' name='attr_armor' placeholder='8 points of thick hide' title='@{armor}' type='text' value='')
-			.section
-				h1(data-i18n='skills') skills
-			.section
-				h1(data-i18n='attacks') attacks
-			.section
-				h1(data-i18n='other notes') other notes
-					textarea(name='attr_other_notes')
+		.grid.section-body
+			label.row(data-i18n-title='enter npc description' title='enter npc description')
+				textarea(name='attr_npc_description' placeholder='description')
+			each val, key in statsObject
+				- const statRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${key}}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}}`;
+				button(name=key data-i18n-title=key + ' roll' title=key + ' roll' type='roll' value!=statRollValue)
+					h1(data-i18n=val)=val
+				label(data-i18n-title=key title=key)
+					input(data-i18n-placeholder='10' min=0 name='attr_' + key placeholder='10' title='@{' + key + '}' type='number' value='10')
 
+			h1(data-i18n='HP') HP
+			label(data-i18n-title='enter hit points' title='enter hit points')
+				input(data-i18n-placeholder='10' name='attr_hit_points' placeholder='10' title='@{hit_points}' type='number' value='')
+			h1(data-i18n='WP') WP
+			label(data-i18n-title='enter willpower points' title='enter willpower points')
+				input(data-i18n-placeholder='10' name='attr_willpower_points' placeholder='10' title='@{willpower_points}' type='number' value='')
+
+			h1(data-i18n='armor') ARMOR
+			label(data-i18n-title='enter armor text' title='enter armor text')
+				input(data-i18n-placeholder='8 points of thick hide' name='attr_armor' placeholder='8 points of thick hide' title='@{armor}' type='text' value='')
+
+			h1(data-i18n='skills') skills
+
+			h1(data-i18n='attacks') attacks
+			.repeating-container.attacks
+				- const attackAttrs = ['attack', 'skill %',  'damage', 'notes']
+				.grid.section-header
+					each attack in attackAttrs
+						h2(data-i18n=attack)=attack
+				fieldset.repeating_weapons
+					.grid.section-weapons.border-bottom
+						- const attackRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}`; 
+						each attack in attackAttrs
+							- const attrName = attack.replace(' ', '_').replace('%', 'percent')
+							- const type = attack.includes('%') ? 'number' : 'text';
+								label(data-i18n-title=attack + ' input' title=attack + ' input')
+									input(data-i18n-placeholder=attack name='attr_' + attrName placeholder=attack title='@{repeating_weapons_${x}_' + attrName + '}' type=type value='')
+						button.dicefontd10(name='attack' type='roll' title='attack roll' value=attackRollValue) k
+						button.none(name='roll_damage' type='roll' value='@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=^{damage}}} {{damage=[[@{damage}]]}}')
+
+			h1(data-i18n='other notes') other notes
+			.repeating-container.notes
+				.grid.section-header
+					h2(data-i18n='name') name
+					h2(data-i18n='notes') notes
+				fieldset.repeating_other
+					.grid.section.border-bottom
+						label(data-i18n-title='other notes name' title='other notes name')
+							input(name='attr_name' placeholder='name' title='@{repeating_other_${x}_name}' type='text')
+						label(data-i18n-title='other notes' title='other notes')
+							input(name='attr_notes' placeholder='notes' title='@{repeating_other_${x}_notes}' type='text')
 
 // PC SHEET
 // =============================
