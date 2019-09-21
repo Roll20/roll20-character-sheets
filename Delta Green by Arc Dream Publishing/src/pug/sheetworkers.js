@@ -84,13 +84,6 @@
         return newString
 	};
 
-	// === GM WHISPER TOGGLES
-	on('clicked:whisper', (eventinfo) => {
-		getAttrs(['gm_toggle'], (values) => {
-			setAttributes({gm_toggle: (values.gm_toggle.includes('gm')) ?  ' ' : '/w gm'}, true);
-		});
-	});
-
 	// === SHEET VERSIONING
 	on('sheet:opened', () => {
 		getAttrs(['version'], (values) => { versioning(parseFloat(values.version) || 1); });
