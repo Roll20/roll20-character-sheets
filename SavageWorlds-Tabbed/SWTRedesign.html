@@ -1,4 +1,4 @@
-<input type='hidden' name='attr_character_sheet' value='Savage Worlds Tabbed v3.7' />
+<input type='hidden' name='attr_character_sheet' value='Savage Worlds Tabbed v3.8' />
 <script type="text/worker">
     /*----- Things I need to Care For -----
     -- o Option to ignore encumbrance    --
@@ -437,7 +437,7 @@
 
 	/* ---- Begin Sheet Version Validation & Update ---- */
 
-	const sheetVersion = "3.6";
+	const sheetVersion = "3.8";
 	const sheetVersionPrefix = "Savage Worlds Tabbed v";
 
     const upgradeSheet = function(version) {
@@ -719,6 +719,8 @@
                     setAttrs({ powerlabelsingular: columnHeader });
                 }
             });
+        }
+        if (version < 3.8) {
             //Update Sheet Version Number
             console.log("**** Updating Sheet Version ****");
             setAttrs({
@@ -1144,19 +1146,44 @@
 	});
 
 	const baseToughness = function() {
-	    getAttrs(["vigor", "vigormod"], function(vvalue) {
+	    getAttrs(["vigor", "vigormod", "sizecur"], function(vvalue) {
 			console.log("vigor value: " + vvalue.vigor);
 			console.log("vimod value: " + vvalue.vigormod);
 			var Vigor = parseInt(vvalue.vigor)||0;
 			var ViMod = parseInt(vvalue.vigormod)||0;
+            var Size = parseInt(vvalue.sizecur)||0;
             var totVigor = Vigor + ViMod;
-      		setAttrs({ toughness: Math.floor(totVigor/2) + 2 });
+      		setAttrs({ toughness: Math.floor(totVigor/2) + 2 + Size });
       		setAttrs({ ntoughness: Math.floor(totVigor/2) + 2 });
    		});
 	}
 
+    //Set values for Size
+    on("change:size change:sizemod", function() {
+        getAttrs(["size","sizemod"], function(value) {
+            let size = parseInt(value.size)||0;
+            let sizemod = parseInt(value.sizemod)||0;
+            let cursize = size + sizemod;
+            let sizecat = "Normal";
+            console.log(`#### Size: ${size}, Size Mod: ${sizemod}, Current Size: ${cursize} ####`);
+            switch (cursize) {
+                case ((cursize<=-4) ? cursize : -4) : console.log('Tiny'); sizecat = "Tiny"; break;
+                case ((cursize<=-3)?cursize:-3): console.log('Very Small'); sizecat = "Very Small"; break;
+                case ((cursize<=-2)?cursize:-2): console.log('Small'); sizecat = "Small"; break;
+                case ((cursize>=-1 && cursize<=3)?cursize:0): console.log('Normal'); sizecat = "Normal"; break;
+                case ((cursize>=4 && cursize<=7)?cursize:7): console.log('Large'); sizecat = "Large"; break;
+                case ((cursize>=8 && cursize<=11)?cursize:8): console.log('Huge'); sizecat = "Huge"; break;
+                default: console.log('Gargantuan'); sizecat = "Gargantuan";
+            }
+            setAttrs({
+                sizecategory: sizecat,
+                sizecur: cursize
+            });
+        });
+    });
+
 	//Set Base Toughness (Regular and Neural)
-	on("sheet:opened change:vigor change:vigormod change:toughness change:ntoughness", function() {
+	on("sheet:opened change:vigor change:vigormod change:toughness change:ntoughness change:sizecur", function() {
 		baseToughness();
 	});
 
@@ -3399,7 +3426,7 @@
                     <input type="checkbox" class="sheet-useBenniesXP" name="attr_bennies" value="1" style="display: none;" />
                     <button class="sheet-benniesxp" type="roll" name="roll_convertBennies" value="&{template:emote} {{name=@{character_name}}} {{does=rolls for XP on ?{Number of Bennies|1} un/spent bennies and gets [[?{Number of Bennies|1}d6>5]] extra experience point(s)!}}">S</button>
                     <input class="sheet-isWC" type="hidden" name="attr_is_npc" />
-                    <button class="sheet-statblock" type="roll" name="roll_fullstatblock" value="/w gm &{template:statblock} @{chardesc} {{charatts=@{charatts}}} {{charskills=@{charskills}}} {{charderived=@{charderived}}} {{chargear=@{chargear}}} {{charhindrances=@{charhindrances}}} {{charedges=@{charedges}}} {{showspec=@{showspec}}} {{charspecabilities=@{charspecabilities}}} {{powercount=[[1d0+@{powercount}]]}} {{charpowers=@{charpowers}}}"><span class="sheet-showWCicon" name="attr_WCI"></span><img style="height: 28px;" src="http://imgsrv.roll20.net/?src=github.com/finderski/SWT/blob/master/BackgroundImages/statblock_profile.png%3Fraw%3Dtrue"</button>
+                    <button class="sheet-statblock" type="roll" name="roll_fullstatblock" value="@{whisperstatblock} &{template:statblock} @{chardesc} {{charatts=@{charatts}}} {{charskills=@{charskills}}} {{charderived=@{charderived}}} {{chargear=@{chargear}}} {{charhindrances=@{charhindrances}}} {{charedges=@{charedges}}} {{showspec=@{showspec}}} {{charspecabilities=@{charspecabilities}}} {{powercount=[[1d0+@{powercount}]]}} {{charpowers=@{charpowers}}}"><span class="sheet-showWCicon" name="attr_WCI"></span><img style="height: 28px;" src="http://imgsrv.roll20.net/?src=github.com/finderski/SWT/blob/master/BackgroundImages/statblock_profile.png%3Fraw%3Dtrue"</button>
                 </div>
                 <div class="sheet-docbuttons">
                     <input type="hidden" name="attr_newcontent" value="read" class="sheet-newcontent" />
@@ -5278,8 +5305,20 @@
     							<div class="sheet-derivecurrent"><input type="number" name="attr_parryCur" title="@{parryCur}" class="sheet-derivedStat" readonly /></div>
     							<div class="sheet-derivemisc" style="position:relative; top: 15px; font-weight: bold; font-size: .75em;" data-i18n="armor">Armor</div>
     					    </div>
+                            <!-- Size -->
+                            <input type="checkbox" class="sheet-usesize sheet-optional" name="attr_useSize" value="1" />
+                            <div class="sheet-showsize">
+                                <div class="sheet-basederived">
+                                    <input type="hidden" name="attr_sizecategory" value="Normal" />
+        					        <div class="sheet-derivelabel" data-i18n="char-size" data-i18n-vars='<p><span class="sheet-sizecat" name="attr_sizecategory"></span></p>'>Size{{0}}</div>
+        					        <div class="sheet-derivebase"><input type="number" name="attr_size" title="@{size}" class="sheet-derivedStat" value="0" /></div>
+        							<div class="sheet-derivemod"><input type="number" name="attr_sizemod" title="@{sizeMod}" class="sheet-derivedStat" value="0" /></div>
+        							<div class="sheet-derivecurrent"><input type="number" name="attr_sizecur" title="@{sizecur}" class="sheet-derivedStat" value="0" readonly /></div>
+        							<div class="sheet-derivemisc">&nbsp;</div>
+        					    </div>
+                            </div>
     					    <!-- Toughness -->
-    					    <div class="sheet-basederived">
+    					    <div class="sheet-basederived sheet-watchtoughness">
     					        <div class="sheet-derivelabel" data-i18n="toughness">Toughness</div>
     					        <div class="sheet-derivebase"><input type="number" name="attr_toughness" title="@{toughness}" class="sheet-derivedStat" readonly /></div>
     							<div class="sheet-derivemod"><input type="number" name="attr_tufnessMod" title="@{tufnessMod}" class="sheet-derivedStat" value="0" /></div>
@@ -5514,6 +5553,35 @@
 								<input type='hidden' name='attr_rollwealth' value="&{template:roll} {{name=@{character_name} }} {{trait=^{wealth}}} {{skill_rank=@{wealth} }} {{skill_roll=[[1@{wealth}! + @{wealthmod} + @{traitmods}]] }} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{wilddie}! + @{wealthmod}[wealth mod] + @{traitmods}]]}}" />
 							</div>
         					<!-- End Money -->
+                            <!-- Consumables -->
+                            <input class="sheet-useconsumables sheet-optional" type="checkbox" name="attr_useconsumables" value="1" />
+                            <div class="sheet-showconsumables">
+                                <input type="checkbox" class="sheet-useConsumablesMod sheet-optional" name="attr_useConsumablesMod" value="1" />
+                                <fieldset class="repeating_consumables">
+                                    <div class="sheet-basederived">
+                                        <!-- Label -->
+        								<div class="sheet-derivelabel sheet-consumables">
+                                            <button class="sheet-traitbutton sheet-smallskillflexattbutton" type='roll' name='roll_ConsumbalesRoll' value="@{rollconsumables}"></button>
+                                            <input class="sheet-derivedlabelinput" type="text" name="attr_consumable" placeholder="Consumable" data-i18n-placeholder="consumable" />
+                                        </div>
+        								<!-- Consumable Field -->
+        								<select class='sheet-derivebaseplus' name="attr_consumablestock">
+        									<option value="d0" data-i18n="empty">Empty</option>
+        									<option value="d4">d4</option>
+        									<option value="d6" selected>d6</option>
+        									<option value="d8">d8</option>
+        									<option value="d10">d10</option>
+        									<option value="d12">d12</option>
+        								</select>
+                                        <input type="checkbox" class="sheet-useConsumablesMod sheet-optional" name="attr_useConsumablesMod" value="1" />
+                                        <div class="sheet-derivebaseplus sheet-consumablesmod">
+                                            + <input type='number' name='attr_consumablesmod' value="0" style="text-align: center;" />
+                                        </div>
+        								<input type='hidden' name='attr_rollconsumables' value='&{template:consumables} {{name=@{character_name} }} {{consumable=@{consumable}}} {{roll=[[1@{consumablestock} + @{consumablesmod} + @{traitmods}]]}}' />
+                                    </div>
+                                </fieldset>
+							</div>
+                            <!-- End Consumables -->
     					</div>
     					<input type="hidden" name="attr_ModSum" value="0"> <!-- ttmod-woundsMod-fatigue -->
     					<input type="hidden" name="attr_ModSumEnc" value="0"> <!-- ttmod-woundsMod-fatigue+encumbrance -->
@@ -5674,7 +5742,9 @@
     						    <input type='hidden' class='sheet-weaponItem sheet-damage' name='attr_weapondamage' value="Str+d4" readonly />
 								<button type="action" name="act_wdamage" class="sheet-weaponItem sheet-damage sheet-invisbutton"><span name="attr_weapondamage"></span></button>
 								<input type="number" class='sheet-weaponItem sheet-weaponap' name='attr_weaponap' title="@{repeating_weapons_$#_weaponap}" />
-    						    <input type='number' class='sheet-weaponItem sheet-shots' name='attr_shots' title="@{repeating_weapons_$#_shots}" data-i18n-placeholder="number-of-shots-shortened" placeholder="Shots" />
+                                <div class="sheet-weaponItem sheet-shots">
+    						        <input type='number' class="sheet-weaponshots" name='attr_shots' title="@{repeating_weapons_$#_shots}" /> of <input type='number' class="sheet-weaponshots" name='attr_shots_max' title="@{repeating_weapons_$#_shots_max}" />
+                                </div>
     						    <input type='number' class='sheet-weaponItem sheet-weaponweight' step="any" name='attr_weaponweight' title="@{repeating_weapons_$#_weaponweight}" data-i18n-placeholder="weight-abbr" placeholder="Wt" />
     						    <div class='sheet-weaponItem sheet-weaponcarried'><input type='checkbox' class='sheet-itemCarried sheet-isCarried' name='attr_weaponcarried' title="@{repeating_weapons_$#_weaponcarried}" /><span class="sheet-isCarriedIcon"></span></div>
     						    <input class='sheet-moreweapon' type='checkbox' name='attr_showweaponconfig' checked /><span>y</span>
@@ -5792,14 +5862,14 @@
                         <!-- Powers Section Config window -->
                         <input type="checkbox" class="sheet-showpowerconfig" name="attr_showpowersectionconfig" value="show" style="display:none;" />
                         <div class="sheet-powerconfig">
-                            <label class="sheet-powerconfiglabel">Section Header: <input type="text" name="attr_powerlabelplural" value="Powers" /></label>
-                            <label class="sheet-powerconfiglabel">Column Header: <input type="text" name="attr_powerlabelsingular" value="Power" /></label>
-                            <label class="sheet-powerconfiglabel">Power Points Abbreviation: <input type="text" name="attr_ppabbr" value="PP" maxlength="8" /></label>
+                            <label class="sheet-powerconfiglabel" data-i18n="ab-section-header">Section Header: <input type="text" name="attr_powerlabelplural" value="Powers" /></label>
+                            <label class="sheet-powerconfiglabel" data-i18n="ab-column-header">Column Header: <input type="text" name="attr_powerlabelsingular" value="Power" /></label>
+                            <label class="sheet-powerconfiglabel" data-i18n="ab-pp">Power Points Abbreviation: <input type="text" name="attr_ppabbr" value="PP" maxlength="8" /></label>
                             <hr />
                             <input type="hidden" class="sheet-showmultipleabs" name="attr_numberofabs" value="1" />
-                            <label class="sheet-powerconfiglabel sheet-label1">Arcane Background: <input type="text" name="attr_ablabel" value="AB 1" maxlength="25" /></label>
-                            <label class="sheet-powerconfiglabel sheet-label1">Power Points Label: <input type="text" name="attr_ppelabel" value="Power Points" maxlength="30" /></label>
-                            <label class="sheet-powerconfiglabel sheet-label2">Arcane Background Indicator:
+                            <label class="sheet-powerconfiglabel sheet-label1" data-i18n="ab-name">Arcane Background: <input type="text" name="attr_ablabel" value="AB 1" maxlength="25" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label1" data-i18n="ab-pp-name">Power Points Label: <input type="text" name="attr_ppelabel" value="Power Points" maxlength="30" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label2" data-i18n="ab-color-indicator">Arcane Background Indicator:
                                 <div class="sheet-container">
                                     <div class="sheet-child2">
                                         <label class="sheet-abmenu sheet-white"><input type="radio" class="sheet-select-radio sheet-white" name="attr_ab1color" value="white" checked="checked" />&nbsp;</label>
@@ -5817,9 +5887,9 @@
                                 </div>
                             </label>
                             <hr class="sheet-label2" />
-                            <label class="sheet-powerconfiglabel sheet-label2">Arcane Background: <input type="text" name="attr_ablabel2" value="AB 2" maxlength="25" /></label>
-                            <label class="sheet-powerconfiglabel sheet-label2">Power Points Label: <input type="text" name="attr_pplabel2" value="Power Points" maxlength="30" /></label>
-                            <label class="sheet-powerconfiglabel sheet-label2">Arcane Background Indicator:
+                            <label class="sheet-powerconfiglabel sheet-label2" data-i18n="ab-name">Arcane Background: <input type="text" name="attr_ablabel2" value="AB 2" maxlength="25" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label2" data-i18n="ab-pp-name">Power Points Label: <input type="text" name="attr_pplabel2" value="Power Points" maxlength="30" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label2" data-i18n="ab-color-indicator">Arcane Background Indicator:
                                 <div class="sheet-container">
                                     <div class="sheet-child2">
                                         <label class="sheet-abmenu sheet-white"><input type="radio" class="sheet-select-radio sheet-white" name="attr_ab2color" value="white" />&nbsp;</label>
@@ -5837,9 +5907,9 @@
                                 </div>
                             </label>
                             <hr class="sheet-label3" />
-                            <label class="sheet-powerconfiglabel sheet-label3">Arcane Background: <input type="text" name="attr_ablabel3" value="AB 3" maxlength="25" /></label>
-                            <label class="sheet-powerconfiglabel sheet-label3">Power Points Label: <input type="text" name="attr_pplabel3" value="Power Points" maxlength="30" /></label>
-                            <label class="sheet-powerconfiglabel sheet-label3">Arcane Background Indicator:
+                            <label class="sheet-powerconfiglabel sheet-label3" data-i18n="ab-name">Arcane Background: <input type="text" name="attr_ablabel3" value="AB 3" maxlength="25" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label3" data-i18n="ab-pp-name">Power Points Label: <input type="text" name="attr_pplabel3" value="Power Points" maxlength="30" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label3" data-i18n="ab-color-indicator">Arcane Background Indicator:
                                 <div class="sheet-container">
                                     <div class="sheet-child2">
                                         <label class="sheet-abmenu sheet-white"><input type="radio" class="sheet-select-radio sheet-white" name="attr_ab3color" value="white" />&nbsp;</label>
@@ -5857,9 +5927,9 @@
                                 </div>
                             </label>
                             <hr class="sheet-label4" />
-                            <label class="sheet-powerconfiglabel sheet-label4">Arcane Background: <input type="text" name="attr_ablabel4" value="AB 4" maxlength="25" /></label>
-                            <label class="sheet-powerconfiglabel sheet-label4">Power Points Label: <input type="text" name="attr_pplabel4" value="Power Points" maxlength="30" /></label>
-                            <label class="sheet-powerconfiglabel sheet-label4">Arcane Background Indicator:
+                            <label class="sheet-powerconfiglabel sheet-label4" data-i18n="ab-name">Arcane Background: <input type="text" name="attr_ablabel4" value="AB 4" maxlength="25" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label4" data-i18n="ab-pp-name">Power Points Label: <input type="text" name="attr_pplabel4" value="Power Points" maxlength="30" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label4" data-i18n="ab-color-indicator">Arcane Background Indicator:
                                 <div class="sheet-container">
                                     <div class="sheet-child2">
                                         <label class="sheet-abmenu sheet-white"><input type="radio" class="sheet-select-radio sheet-white" name="attr_ab4color" value="white" />&nbsp;</label>
@@ -5877,9 +5947,9 @@
                                 </div>
                             </label>
                             <hr class="sheet-label5" />
-                            <label class="sheet-powerconfiglabel sheet-label5">Arcane Background: <input type="text" name="attr_ablabel5" value="AB 5" maxlength="25" /></label>
-                            <label class="sheet-powerconfiglabel sheet-label5">Power Points Label: <input type="text" name="attr_pplabel5" value="Power Points" maxlength="30" /></label>
-                            <label class="sheet-powerconfiglabel sheet-label5">Arcane Background Indicator:
+                            <label class="sheet-powerconfiglabel sheet-label5" data-i18n="ab-name">Arcane Background: <input type="text" name="attr_ablabel5" value="AB 5" maxlength="25" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label5" data-i18n="ab-pp-name">Power Points Label: <input type="text" name="attr_pplabel5" value="Power Points" maxlength="30" /></label>
+                            <label class="sheet-powerconfiglabel sheet-label5" data-i18n="ab-color-indicator">Arcane Background Indicator:
                                 <div class="sheet-container">
                                     <div class="sheet-child2">
                                         <label class="sheet-abmenu sheet-white"><input type="radio" class="sheet-select-radio sheet-white" name="attr_ab5color" value="white" />&nbsp;</label>
@@ -7428,8 +7498,9 @@
     					<!-- End Hidden Fields -->
 						<label class="sheet-miscItem"><input type="checkbox" class="sheet-usePartyBag" name="attr_usePG" checked /> <span data-i18n="show-party-bag">Show Party Bag</span></label>
 						<label class="sheet-miscItem"><input type='checkbox' class='sheet-useQuestLog' name="attr_questlog" checked /> <span data-i18n="show-quest-log">Show Quest Log</span></label>
-						<label class="sheet-miscItem"><input type="checkbox" class="sheet-useunshakebutton" name="attr_showunshake" checked /> <span data-i18n="show-unshake-button">Show Unshake Button</span></label>
+                        <label class="sheet-miscItem"><input type="checkbox" class="sheet-usesize" name="attr_useSize" value="1" />&nbsp;<span data-i18n="show-size-fields">Show Size fields</span></label>
 						<label class="sheet-miscItem"><input type="checkbox" class="sheet-usesoakbutton" name="attr_showsoak" checked /> <span data-i18n="show-soak-button">Show Soak Button</span></label>
+						<label class="sheet-miscItem"><input type="checkbox" class="sheet-useunshakebutton" name="attr_showunshake" checked /> <span data-i18n="show-unshake-button">Show Unshake Button</span></label>
 						<label class="sheet-miscItem"><input type="checkbox" class="sheet-showVehicles sheet-useVehicles" name="attr_vehicle" style="width: 15px;"> <span data-i18n="show-the-vehicles-tab">Show the Vehicles Tab</span></label>
         			    <input type="checkbox" class="sheet-showVehicles" name="attr_vehicle" style="display: none;" />
         			    <label class="sheet-miscItem sheet-vehicleTypes"><input class="sheet-useSailingShips" type="checkbox" name="attr_sailingShip" /> <span data-i18n="show-sailing-ship">Show Sailing Ship</span></label>
@@ -7439,6 +7510,7 @@
         			    <label class="sheet-miscItem sheet-vehicleTypes"><input class="sheet-useRobotArmor" type="checkbox" name="attr_RobotArmor" /> <span data-i18n="show-robot-armor">Show Robot Armor</span></label>
         			    <label class="sheet-miscItem sheet-vehicleTypes"><input class="sheet-useWalker" type="checkbox" name="attr_Walker" /> <span data-i18n="show-walker">Show Walker</span></label>
                         <!--<label class='sheet-miscItem'><input type="checkbox" name="attr_whisperrolls" value='1' style="width: 15px;"> <span data-i18n="whisper-all-rolls-to-gm">Whisper all rolls to GM</span></label>-->
+                        <label class="sheet-miscItem"><input type="checkbox" name="attr_whisperstatblock" value="/w gm" checked /> <span data-i18n="whisper-stat-block">Whisper Stat Block</span></label>
                         <input type='hidden' name='attr_whisperall' />
                         <label class='sheet-miscItem'>
             			    <span data-i18n="wild-card-icon">Wild Card Icon</span>: <input type='text' class="sheet-wci" name='attr_WCI' maxlength="2" />
@@ -7576,7 +7648,9 @@
     			    <input type="checkbox" class="sheet-hideSRM" name="attr_hideSRM" /><span class="sheet-showSRM"></span>
     			    <h3 class='sheet-configSectionTitle' data-i18n="rules-modifications">Rules Modifications</h3>
     			    <div class="sheet-srmconfig">
-    			        <label class="sheet-srmItem" data-i18n-title="use-charisma"><input type="checkbox" class="sheet-useCharisma" name="attr_usecharisma" checked /><span data-i18n="use-charisma">Use Charisma</span></label>
+    			        <label class="sheet-srmItem" data-i18n-title="use-charisma"><input type="checkbox" class="sheet-useCharisma" name="attr_usecharisma" checked />&nbsp;<span data-i18n="use-charisma">Use Charisma</span></label>
+                        <label class="sheet-srmItem" data-i18n-title="use-consumables"><input type="checkbox" name="attr_useconsumables" value="1" />&nbsp;<span data-i18n="use-consumables">Use Consumables</span></label>
+                        <label class="sheet-srmItem" data-i18n-title="use-consumables-mod"><input type="checkbox" name="attr_useConsumablesMod" value="1" />&nbsp;<span data-i18n="use-consumables-mod">Use Consumables Mod</span></label>
     				    <label class="sheet-srmItem" data-i18n-title="power-pointless"><input type="checkbox" class="sheet-NoPP" name="attr_NoPPRule" /><span data-i18n="no-power-points">No Power Points</span></label>
     				    <label class="sheet-srmItem" data-i18n-title="use-xp"><input type="checkbox" class="sheet-usexp" name="attr_usexp" value="1" checked /><span data-i18n="use-xp">Use Experience Points</span></label>
                         <label class="sheet-srmItem" data-i18n-title="gritty-damage"><input type='checkbox' class="sheet-usegritty" name='attr_gritty' value="{{getgritty=gritty}}" /> <span data-i18n="use-gritty-damage">Use Gritty Damage</span></label>
@@ -8162,6 +8236,12 @@
 <rolltemplate class="sheet-rolltemplate-running">
 	<div class="sheet-emoteish">
 		{{name}} <span data-i18n="runs">runs for</span> {{roll}} <span data-i18n="inches">inches</span>.
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-consumables">
+    <div class="sheet-emoteish">
+		{{name}} <span data-i18n="consumable-roll-text" data-i18n-vars="{{consumable}}">rolls for {{0}} consumption and gets a</span> {{roll}}.
 	</div>
 </rolltemplate>
 
