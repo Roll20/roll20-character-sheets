@@ -11327,6 +11327,20 @@
 
     var handleBlobs = function(blobs, options) {
         //Old parameters: (blobs, filters, section, element, thisblob)
+
+        //Function to get blob parameter for Spell Pickers like Magical Secrets
+        //By Miguel
+        const getBlobDescription = function(blob) {
+          if("Description" in blob) {
+            return blob.Description;
+          }
+          else if("Traits" in blob) {
+            traits = JSON.parse(blob.Traits)[0];
+            if("Desc" in traits) return traits.Desc;
+          }
+          return "";
+        }
+
         const handleProficiencies = function(data, subsection) {
             if(!data) {
                 return;
@@ -11525,8 +11539,13 @@
                 let settings = {};
                 let repupdate = {};
                 repupdate[rowid + ">label>span"] = title;
-                if(blob.Description) {
-                    repupdate[rowid + ">label>p"] = blob.Description;
+
+                //This used to check for blob.Description which does not exist for Spell Pickers
+                //In such case the description is located at blob.Traits.Desc
+                //By Miguel
+                let description = getBlobDescription(blob);
+                if(description.length > 0) {
+                    repupdate[rowid + ">label>p"] = description;
                 }
 
                 _.each(spells, function(spell) {
@@ -15903,11 +15922,11 @@
         }
     });
 
-    //Fixing Bard's Magical Secret (UC-10)
+    //Fixing Bard's Magical Secrets (UC-10)
     //By Miguel
     //The ways this was being handled before, binded to clicked:repeating_utilityrow_launch, was not being triggered due to the way the DOM is built.
     on("clicked:repeating_utilityrow", function(eventinfo) {
-        if(eventinfo.sourceAttribute.indexOf('utilityrow_launch') === -1) return;
+        if(eventinfo.triggerName.indexOf('utilityrow_launch') === -1) return;
         const mancerdata = getCharmancerData();
         var querysettings = {};
         var spelldata = getKnownLpSpells(mancerdata);
