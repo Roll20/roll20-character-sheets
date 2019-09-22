@@ -52,16 +52,29 @@ include src/pug/_objects.pug
 
 			h1(data-i18n='HP') HP
 			label(data-i18n-title='enter hit points' title='enter hit points')
-				input(data-i18n-placeholder='10' name='attr_hit_points' placeholder='10' title='@{hit_points}' type='number' value='')
+				input.text-align-left(data-i18n-placeholder='10' name='attr_hit_points' placeholder='10' title='@{hit_points}' type='number' value='')
 			h1(data-i18n='WP') WP
 			label(data-i18n-title='enter willpower points' title='enter willpower points')
-				input(data-i18n-placeholder='10' name='attr_willpower_points' placeholder='10' title='@{willpower_points}' type='number' value='')
+				input.text-align-left(data-i18n-placeholder='10' name='attr_willpower_points' placeholder='10' title='@{willpower_points}' type='number' value='')
 
 			h1(data-i18n='armor') ARMOR
 			label(data-i18n-title='enter armor text' title='enter armor text')
 				input(data-i18n-placeholder='8 points of thick hide' name='attr_armor' placeholder='8 points of thick hide' title='@{armor}' type='text' value='')
 
 			h1(data-i18n='skills') skills
+			.repeating-container.skills
+				.grid.section-header
+					h2(data-i18n='skill') skill
+					h2(data-i18n='rank') rank
+					h2(data-i18n='roll') roll
+				fieldset.repeating_skills
+					.grid.section-skills.border-bottom
+						- const npcSkillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}}`;
+						label(data-i18n-title='skill name' title='skill name')
+							input.center(data-i18n-placeholder='skill name' name='attr_name' placeholder='skill name' title='@{repeating_skills_${x}_name}' type='text' value='')
+						label(data-i18n-title='skill rank' title='skill rank')
+							input(data-i18n-placeholder='0' name='attr_rank' title='@{repeating_skills_${x}_rank}' placeholder='0' type='number' value='')
+						button.dicefontd10(data-i18n-title='skill roll' name='skill roll' title='skill roll' type='roll' value=npcSkillRollValue) k
 
 			h1(data-i18n='attacks') attacks
 			.repeating-container.attacks
@@ -71,14 +84,14 @@ include src/pug/_objects.pug
 						h2(data-i18n=attack)=attack
 				fieldset.repeating_weapons
 					.grid.section-weapons.border-bottom
-						- const attackRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}`; 
+						- const attackRollValue = `@{gm_toggle} &{template:rolls} {{header=@{attack}}} {{subheader=@{skill_percent}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}`; 
 						each attack in attackAttrs
 							- const attrName = attack.replace(' ', '_').replace('%', 'percent')
 							- const type = attack.includes('%') ? 'number' : 'text';
 								label(data-i18n-title=attack + ' input' title=attack + ' input')
 									input(data-i18n-placeholder=attack name='attr_' + attrName placeholder=attack title='@{repeating_weapons_${x}_' + attrName + '}' type=type value='')
 						button.dicefontd10(name='attack' type='roll' title='attack roll' value=attackRollValue) k
-						button.none(name='roll_damage' type='roll' value='@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=^{damage}}} {{damage=[[@{damage}]]}}')
+						button.none(name='roll_damage' type='roll' value='@{gm_toggle} &{template:rolls} {{header=@{attack}}} {{subheader=^{damage}}} {{damage=[[@{damage}]]}}')
 
 			h1(data-i18n='other notes') other notes
 			.repeating-container.notes
@@ -88,9 +101,9 @@ include src/pug/_objects.pug
 				fieldset.repeating_other
 					.grid.section.border-bottom
 						label(data-i18n-title='other notes name' title='other notes name')
-							input(name='attr_name' placeholder='name' title='@{repeating_other_${x}_name}' type='text')
+							input(data-i18n-placeholder='name' name='attr_name' placeholder='name' title='@{repeating_other_${x}_name}' type='text')
 						label(data-i18n-title='other notes' title='other notes')
-							input(name='attr_notes' placeholder='notes' title='@{repeating_other_${x}_notes}' type='text')
+							input(data-i18n-placeholder='notes' name='attr_notes' placeholder='notes' title='@{repeating_other_${x}_notes}' type='text')
 
 // PC SHEET
 // =============================
