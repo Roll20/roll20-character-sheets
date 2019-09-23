@@ -17,12 +17,17 @@
 	<div class="update-alert">
 		<div class="container">
 		<input type="checkbox" class="sheet-showarrow sheet-ack-button" name="attr_announcements_show" value="1" title="Click to view announcements" />
-		<label class="show-content">Announcements</label>
+		<label class="show-content">Announcements <span name="attr_latest_changes"></span></label>
 			<div class="content">
 				<h4>GURPS Version <input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Sheet Version" /></h4>
 				<ul>
-					<li>Updated some ToolTips and some Roll Templates </li>
-					<li>Correct some Wound Modifiers</li>
+					<li>If a Wound Modifier Note is updated, each combat attack with the same modifier will get updated.</li>
+					<li>Jumping - Add check box to factor in encumbrance level. Round Yards to two decimal places.</li>
+					<li>Critical Successes Option: If Turn Off is selected, fixed bug where the critical success text is displayed for active defenses.</li>
+					<li>Combat Tab - Active Defense. If U or F is entered for INFO, the appropriate description will be added. New Feature.</li>
+					<li>Added date to announcements tip.</li>
+					<li>Inventory Tab: If Item is marked as "ON" the weight will be bolded. NOTE: Please toggle the ON field to see the bolded text.</li>
+					<li>Added tooltips to open/close arrows. Changed the style slightly to more of a button feel.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update
 				</span></b></label>
@@ -1693,6 +1698,20 @@
     				</div> <!-- .sheet-row -->
     				<div class="sheet-row sheet-row-basic-move">
     					<div class="sheet-cell sheet-col0 sheet-label">
+    						<div class="sheet-popup">Enc</div>
+    						<span class="sheet-tooltip">
+    						    Apply encumbrance penalty. See B352<br />
+    						    1 for None, 0.8 for Light, 0.6 for Medium, 0.4 for Heavy, and 0.2 for Extra-Heavy.
+    						</span>
+    					</div>
+    					<div class="sheet-cell sheet-col1">
+    						<input type="checkbox" name="attr_jump_encumbrance" value="1" class="sheet-boolean" />
+    					</div>
+    					<div class="sheet-cell sheet-col2 title">&nbsp;</div>
+    					<div class="sheet-cell sheet-col3 title">&nbsp;</div>
+    				</div> <!-- .sheet-row -->
+    				<div class="sheet-row sheet-row-basic-move">
+    					<div class="sheet-cell sheet-col0 sheet-label">
     						<div class="sheet-popup">Prep</div>
     						<span class="sheet-tooltip">
     						    Concentrate for 2 seconds for full jump distances.<br />
@@ -2006,7 +2025,7 @@
 					<div class="sheet-cell sheet-col4">Ref</div>
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_traits">
-					<input class="sheet-toggle" type="checkbox" />
+					<input class="sheet-toggle" type="checkbox" title="Click to show/hide more information." />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
@@ -2067,7 +2086,7 @@
 					<div class="sheet-cell sheet-col4">Ref</div>	
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_disadvantages">
-					<input class="sheet-toggle" type="checkbox" />
+					<input class="sheet-toggle" type="checkbox" title="Click to show/hide more information." />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
@@ -2127,7 +2146,7 @@
 					<div class="sheet-cell sheet-col4">Ref</div>
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_racial">
-					<input class="sheet-toggle" type="checkbox" />
+					<input class="sheet-toggle" type="checkbox" title="Click to show/hide more information." />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
@@ -2452,7 +2471,7 @@
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_skills">
 				    <input class="toggle-highlight" type="checkbox" name="attr_highlight" />
-					<input class="toggle toggle-notes" type="checkbox" />
+					<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
@@ -2548,7 +2567,7 @@
 					<div class="sheet-cell sheet-col8">Ref</div>
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_techniques">
-					<input class="sheet-toggle" type="checkbox" />
+					<input class="sheet-toggle" type="checkbox" title="Click to show/hide more information." />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
@@ -2849,12 +2868,13 @@
 						</div>
 						<div class="sheet-cell sheet-col2">
 							<input type="text" name="attr_info" />
+							<input type="hidden" name="attr_info_description" />
 						</div>
 						<div class="sheet-cell sheet-col3">
 							<input type="text" name="attr_skill" />
 						</div>
 						<div class="sheet-cell sheet-col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll (@{type})}} {{defenseType=[[@{defense_type}]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill} + @{modifier}]]}} {{showNotes=[[1]]}} {{notes=@{info}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll (@{type})}} {{defenseType=[[@{defense_type}]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill} + @{modifier}]]}} {{showNotes=[[1]]}} {{notes=@{info_description}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
 						</div>
 					</div> <!-- .sheet-row -->
 				</fieldset> <!-- .repeating_defense -->
@@ -2934,7 +2954,7 @@
 				
 				<fieldset class="repeating_melee">
 				    <input class="toggle-highlight" type="checkbox" name="attr_highlight" />
-					<input class="sheet-toggle toggle-notes" type="checkbox" />
+					<input class="sheet-toggle toggle-notes" type="checkbox" title="Click to show/hide more information." />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
@@ -2963,7 +2983,7 @@
 								<option value="Special (spec)">spec</option>
 								<option value="Toxic (tox)">tox</option>
 							</select>
-							<input type="hidden" name="attr_damage_type_note" value="@{damage_type_note_cut}" />
+							<input type="hidden" name="attr_damage_type_note" value="@{damage_type_note_aff}" />
 						</div>
 						<div class="sheet-cell sheet-col4">
 							<input type="text" name="attr_reach" />
@@ -3101,7 +3121,7 @@
 				
 				<fieldset class="repeating_ranged">
 					<input class="toggle-highlight" type="checkbox" name="attr_highlight" />
-					<input class="sheet-toggle toggle-notes" type="checkbox" />
+					<input class="sheet-toggle toggle-notes" type="checkbox" title="Click to show/hide more information." />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
@@ -3130,7 +3150,7 @@
 								<option value="Special (spec)">spec</option>
 								<option value="Toxic (tox)">tox</option>
 							</select>
-							<input type="hidden" name="attr_damage_type_note" value="@{damage_type_note_cut}" />
+							<input type="hidden" name="attr_damage_type_note" value="@{damage_type_note_aff}" />
 						</div>
 						<div class="sheet-cell sheet-col4">
 							<input type="text" name="attr_acc" />
@@ -3312,7 +3332,7 @@
 				<div class="repcontainer">
 				    <div class="repitem">
 				       
-    				    <input class="sheet-toggle" type="checkbox" />
+    				    <input class="sheet-toggle" type="checkbox" title="Click to show/hide more information." />
     					<span class="sheet-checkbox"></span>
     					
         				<div class="sheet-row sheet-row-stats row-thrown-object">
@@ -3654,7 +3674,7 @@
 				</div>
 				<fieldset class="repeating_item">
 					<input class="toggle-highlight" type="checkbox" name="attr_highlight" />
-					<input class="sheet-toggle toggle-notes" type="checkbox" />
+					<input class="sheet-toggle toggle-notes" type="checkbox" title="Click to show/hide more information." />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
@@ -3682,7 +3702,8 @@
 							<span name="attr_costtotal" value="0.00" />
 						</div>
 						<div class="sheet-cell sheet-col8" style="text-align: right;background-color: #c9c9c9;border-bottom: 1px solid white;border-right: 1px solid white;">
-							<span name="attr_weighttotal" value="0.000" />
+							<input type="hidden" name="attr_inventory_item_carried" />
+							<span name="attr_weighttotal" value="0.000" class="item-weight-total" />
 						</div>
 					</div> <!-- .sheet-row -->
 					<div class="sheet-row sheet-row-details notebox">
@@ -3827,7 +3848,7 @@
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_spells">
 				    <input class="toggle-highlight" type="checkbox" name="attr_highlight" />
-					<input class="toggle toggle-notes" type="checkbox" />
+					<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
@@ -3908,7 +3929,7 @@
 	<div>
 
 	<h3>Latest Changes: Updated 
-		<input type="text" style="font-size: 20px; font-weight: bold; border-style: none;" name="attr_latest_changes" value="09/10/2019" readonly="readonly"/>
+		<input type="text" style="font-size: 20px; font-weight: bold; border-style: none;" name="attr_latest_changes" value="09/23/2019" readonly="readonly"/>
 	</h3>
 		
 	<h3>Known Issues</h3>
@@ -3939,8 +3960,22 @@
 
 		<p>If there are others that are working on or wish to work on this sheet, lets coordinate using the Roll20 forum for now - perhaps later we can use GitHub.</p>
 	</ul>
+
+    <h4>Version: 1.6.6</h4>
+
+	<p>Pull Request: <span name="attr_latest_changes"></span></p>
+
+	<ul>
+		<li>If a Wound Modifier Note is updated, each combat attack with the same modifier will get updated.</li>
+		<li>Jumping - Add check box to factor in encumbrance level.</li>
+		<li>Critical Successes Option: If Turn Off is selected, fixed bug where the critical success text is displayed for active defenses.</li>
+		<li>Combat Tab - Active Defense. If U or F is entered for INFO, the appropriate description will be added. New Feature.</li>
+		<li>Added date to announcements tip.</li>
+		<li>Inventory Tab: If Item is marked as "ON" the weight will be bolded. NOTE: Please toggle the ON field to see the bolded text.</li>
+		<li>Added tooltips to open/close arrows. Changed the style slightly to more of a button feel.</li>
+	</ul>
 	
-		<h4>Version: 1.6.5</h4>
+	<h4>Version: 1.6.5</h4>
 
 	<p>Pull Request: 09/10/2019</p>
 
@@ -3955,7 +3990,6 @@
 		<li>Corrected Wound Modifier Notes for imp, pi+, and pi++. - Cosmetic Only</li>
 	</ul>
 
-	
 	<h4>Version: 1.6.4</h4>
 	
 	<p>Pull Request: 08/20/2019</p>
@@ -4316,7 +4350,8 @@ Falling Damage: If using hit locations, roll randomly for the hit location damag
 			        <tr>
 			            <td>Cutting</td>
 			            <td>
-			                <textarea name="attr_damage_type_note_cut">Damage x1.5
+			                <textarea name="attr_damage_type_note_cut">CUTTING
+Damage x1.5
 Neck Damage x2
 Skull Damage x4</textarea>
 			            </td>
@@ -4324,7 +4359,8 @@ Skull Damage x4</textarea>
 			        <tr>
 			            <td>Impaling</td>
 			            <td>
-			                <textarea name="attr_damage_type_note_imp">Damage x2
+			                <textarea name="attr_damage_type_note_imp">IMPALING
+Damage x2
 Arm, Leg, Foot, or Hand x1 (B399)
 Vitals Damage x3
 Skull Damage x4</textarea>
@@ -4567,10 +4603,14 @@ Skull Damage x4
                                     {{#showSuccessLabel}}Success{{/showSuccessLabel}}
                                 </span>
                                 
-                                <!-- show notes for critical success on active defense -->
-                                {{#rollTotal() activeDefense 1}}
-                                    <p>If defending against a melee attack, then your foe goes immediately to the Critical Miss Table (B556). (B381)</p>
-                                {{/rollTotal() activeDefense 1}}
+                                <!-- Check if Critical Success was turned on -->
+                                <!-- attr_use_critical_plus_10: 0 = only on 3 or 4, 1 = rules as written, 2 = turn off -->
+                                {{#rollLess() useCriticalPlusTen 2}}
+                                    <!-- show notes for critical success on active defense -->
+                                    {{#rollTotal() activeDefense 1}}
+                                        <p>If defending against a melee attack, then your foe goes immediately to the Critical Miss Table (B556). (B381)</p>
+                                    {{/rollTotal() activeDefense 1}}
+                                {{/rollLess() useCriticalPlusTen 2}}
                                                     
                             </span>
                         {{/rollBetween() rollResult 3 4}}
@@ -4912,7 +4952,7 @@ Skull Damage x4
 
 	var noop = function () {}; // do nothing.
 
-	var version = "1.6.5";
+	var version = "1.6.6";
 
 	var modCascade = true;
 	
@@ -5146,6 +5186,8 @@ Skull Damage x4
 		updateFrightCheckThreshold();
 		
 		updateRepeatingDefenseTypes();
+		
+		updateRepeatingDefenseNotes();
 
 	}
 
@@ -6954,7 +6996,7 @@ Skull Damage x4
     }
     
     // check for changes that affect jump distance
-    on("change:use_st_for_jump change:jump_skill change:basic_move change:enhanced_ground_move change:super_jump_entered_level change:super_jump_points change:jump_concentration change:running_jump_yards_moved change:running_high_jump_yards_moved change:strength change:encumbrance_level change:hit_points change:fatigue_points", function(e) {
+    on("change:use_st_for_jump change:jump_skill change:basic_move change:enhanced_ground_move change:super_jump_entered_level change:super_jump_points change:jump_encumbrance change:encumbrance_level change:jump_concentration change:running_jump_yards_moved change:running_high_jump_yards_moved change:strength change:encumbrance_level change:hit_points change:fatigue_points", function(e) {
         
         updateJumpDistanceValues();
         
@@ -6969,7 +7011,7 @@ Skull Damage x4
 		    
         getAttrs(["use_st_for_jump", "jump_skill", "basic_move", "enhanced_ground_move", "super_jump_entered_level", 
                   "super_jump_points", "strength", "jump_concentration", "running_jump_yards_moved", "running_high_jump_yards_moved", 
-                  "encumbrance_level", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max"], function(values) {
+                  "encumbrance_level", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max", "jump_encumbrance", "encumbrance_level"], function(values) {
             
             var jumpSkill = +values.jump_skill;
             
@@ -7407,17 +7449,79 @@ Skull Damage x4
                 
             }
             
+            // check for encumbrance
+            if (+values.jump_encumbrance === 1) {
+                
+                switch(+values.encumbrance_level) {
+                    
+                    default:
+                    case 0:
+                        // do nothing
+                        break;
+                        
+                    case 1:
+                        // Light
+                        jumpBroadFeet = Math.round( (jumpBroadFeet * .8) * 100) / 100;
+                        
+                        runningBroadJumpFeet = Math.round( (runningBroadJumpFeet * .8) * 100) / 100;
+                        
+                        jumpHighFeet = Math.round( (jumpHighFeet * .8) * 100) / 100;
+                    
+                        runningHighJumpFeet = Math.round( (runningHighJumpFeet * .8) * 100) / 100;
+                        
+                        break;
+                        
+                    case 2:
+                        // Medium
+                        jumpBroadFeet = Math.round( (jumpBroadFeet * .6) * 100) / 100;
+                        
+                        runningBroadJumpFeet = Math.round( (runningBroadJumpFeet * .6) * 100) / 100;
+                        
+                        jumpHighFeet = Math.round( (jumpHighFeet * .6) * 100) / 100;
+                    
+                        runningHighJumpFeet = Math.round( (runningHighJumpFeet * .6) * 100) / 100;
+                        
+                        break;
+                        
+                    case 3:
+                        // Heavy
+                        jumpBroadFeet = Math.round( (jumpBroadFeet * .4) * 100) / 100;
+                        
+                        runningBroadJumpFeet = Math.round( (runningBroadJumpFeet * .4) * 100) / 100;
+                        
+                        jumpHighFeet = Math.round( (jumpHighFeet * .4) * 100) / 100;
+                    
+                        runningHighJumpFeet = Math.round( (runningHighJumpFeet * .4) * 100) / 100;
+                        
+                        break;
+                        
+                    case 4:
+                        // Extra-Heavy
+                        jumpBroadFeet = Math.round( (jumpBroadFeet * .2) * 100) / 100;
+                        
+                        runningBroadJumpFeet = Math.round( (runningBroadJumpFeet * .2) * 100) / 100;
+                        
+                        jumpHighFeet = Math.round( (jumpHighFeet * .2) * 100) / 100;
+                    
+                        runningHighJumpFeet = Math.round( (runningHighJumpFeet * .2) * 100) / 100;
+                        
+                        break;
+                        
+                }
+                
+            }
+            
             // get broad jump in yards. Minimum of 1
-            jumpBroadYards = Math.floor(jumpBroadFeet / 3);
+            jumpBroadYards = Math.round( (jumpBroadFeet / 3) * 100) / 100;
             
             // get running jump in yards. Min of 1
-            runningBroadJumpYards = Math.floor(runningBroadJumpFeet / 3)
+            runningBroadJumpYards = Math.round( (runningBroadJumpFeet / 3) * 100) / 100;
             
             // get high jump in yards
-            jumpHighYards = Math.floor(jumpHighFeet / 3);
+            jumpHighYards = Math.round( (jumpHighFeet / 3) * 100) / 100;
             
             // get running high in yards
-            runningHighJumpYards = Math.floor(runningHighJumpFeet / 3);
+            runningHighJumpYards = Math.round( (runningHighJumpFeet / 3) * 100) / 100;
             
             // calculate jump move speed
             jumpMoveSpeed = Math.floor(jumpBroadYards / 5);
@@ -8404,9 +8508,6 @@ Skull Damage x4
 			        
 			}
 			
-			console.log(`defense type name: ${defenseTypeName}`);
-			console.log(`defense type id: ${defenseTypeId}`);
-			
 			// set the hidden value
 			setAttrs({
 			    repeating_defense_defense_type: defenseTypeId
@@ -8443,9 +8544,6 @@ Skull Damage x4
 				getFields.push(damageTypeField);
 				
 			}
-			
-			console.log("fields for repeating defense");
-			console.log(getFields);
 			
 			getAttrs(getFields, function (values) {
 		    
@@ -8495,15 +8593,477 @@ Skull Damage x4
 		            
                 });
                 
-                console.log("fields to update for repeating defense");
-			    console.log(updateFields);
-                
 				setAttrs(updateFields);
 			    
 			});		
 		
 		});
 		
-	} 
+	}
+	
+	on("change:damage_type_note_cut", function() {
+        
+	    getAttrs(["damage_type_note_cut"], function(values) {
+	        
+	        updateMeleeCombatWoundNotes("Cutting (cut)", values.damage_type_note_cut);
+	        
+	        updateRangedCombatWoundNotes("Cutting (cut)", values.damage_type_note_cut);
+	        
+	        updateCombatToolThrownDamageType("Cutting (cut)", values.damage_type_note_cut);
+	        
+	    });
+	    
+    });
+    
+    on("change:damage_type_note_imp", function() {
+        
+	    getAttrs(["damage_type_note_imp"], function(values) {
+	        
+	        updateMeleeCombatWoundNotes("Impaling (imp)", values.damage_type_note_imp);
+	        
+	        updateRangedCombatWoundNotes("Impaling (imp)", values.damage_type_note_imp);
+	        
+	        updateCombatToolThrownDamageType("Impaling (imp)", values.damage_type_note_imp);
+	        
+	    });
+	    
+    });
+    
+    on("change:damage_type_note_cr", function() {
+        
+	    getAttrs(["damage_type_note_cr"], function(values) {
+	        
+	        updateMeleeCombatWoundNotes("Crushing (cr)", values.damage_type_note_cr);
+	        
+	        updateRangedCombatWoundNotes("Crushing (cr)", values.damage_type_note_cr);
+	        
+	        updateCombatToolThrownDamageType("Crushing (cr)", values.damage_type_note_cr);
+	        
+	    });
+	    
+    });
+    
+    on("change:damage_type_note_pi_minus", function() {
+        
+	    getAttrs(["damage_type_note_pi_minus"], function(values) {
+	        
+	        updateMeleeCombatWoundNotes("Small Piercing (pi-)", values.damage_type_note_pi_minus);
+	        
+	        updateRangedCombatWoundNotes("Small Piercing (pi-)", values.damage_type_note_pi_minus);
+	        
+	        updateCombatToolThrownDamageType("Small Piercing (pi-)", values.damage_type_note_pi_minus);
+	        
+	    });
+	    
+    });
+    
+    on("change:damage_type_note_pi", function() {
+        
+	    getAttrs(["damage_type_note_pi"], function(values) {
+	        
+	        updateMeleeCombatWoundNotes("Piercing (pi)", values.damage_type_note_pi);
+	        
+	        updateRangedCombatWoundNotes("Piercing (pi)", values.damage_type_note_pi);
+	        
+	        updateCombatToolThrownDamageType("Piercing (pi)", values.damage_type_note_pi);
+	        
+	    });
+	    
+    });
+    
+    on("change:damage_type_note_pi_plus", function() {
+        
+	    getAttrs(["damage_type_note_pi_plus"], function(values) {
+	        
+	        updateMeleeCombatWoundNotes("Large Piercing (pi+)", values.damage_type_note_pi_plus);
+	        
+	        updateRangedCombatWoundNotes("Large Piercing (pi+)", values.damage_type_note_pi_plus);
+	        
+	        updateCombatToolThrownDamageType("Large Piercing (pi+)", values.damage_type_note_pi_plus);
+	        
+	    });
+	    
+    });
+    
+    on("change:damage_type_note_pi_plus_plus", function() {
+        
+	    getAttrs(["damage_type_note_pi_plus_plus"], function(values) {
+	        
+	        updateMeleeCombatWoundNotes("Huge Piercing (pi++)", values.damage_type_note_pi_plus_plus);
+	        
+	        updateRangedCombatWoundNotes("Huge Piercing (pi++)", values.damage_type_note_pi_plus_plus);
+	        
+	        updateCombatToolThrownDamageType("Huge Piercing (pi++)", values.damage_type_note_pi_plus_plus);
+	        
+	    });
+	    
+    });
+    
+    on("change:damage_type_note_aff", function() {
+        
+	    getAttrs(["damage_type_note_aff"], function(values) {
+	        
+	        updateMeleeCombatWoundNotes("Affliction (aff)", values.damage_type_note_aff);
+	        
+	        updateRangedCombatWoundNotes("Affliction (aff)", values.damage_type_note_aff);
+	        
+	        updateCombatToolThrownDamageType("Affliction (aff)", values.damage_type_note_aff);
+	        
+	    });
+	    
+    });
+    
+    on("change:damage_type_note_burn", function() {
+        
+	    getAttrs(["damage_type_note_burn"], function(values) {
+	        
+	        updateMeleeCombatWoundNotes("Burning (burn)", values.damage_type_note_burn);
+	        
+	        updateRangedCombatWoundNotes("Burning (burn)", values.damage_type_note_burn);
+	        
+	        updateCombatToolThrownDamageType("Burning (burn)", values.damage_type_note_burn);
+	        
+	    });
+	    
+    });
+    
+    on("change:damage_type_note_cor", function() {
+        
+	    getAttrs(["damage_type_note_cor"], function(values) {
+	        
+	        updateMeleeCombatWoundNotes("Corrosion (cor)", values.damage_type_note_cor);
+	        
+	        updateRangedCombatWoundNotes("Corrosion (cor)", values.damage_type_note_cor);
+	        
+	        updateCombatToolThrownDamageType("Corrosion (cor)", values.damage_type_note_cor);
+	        
+	    });
+	    
+    });
+    
+    on("change:damage_type_note_fat", function() {
+        
+	    getAttrs(["damage_type_note_fat"], function(values) {
+	        
+	        updateMeleeCombatWoundNotes("Fatigue (fat)", values.damage_type_note_fat);
+	        
+	        updateRangedCombatWoundNotes("Fatigue (fat)", values.damage_type_note_fat);
+	        
+	        updateCombatToolThrownDamageType("Fatigue (fat)", values.damage_type_note_fat);
+	        
+	    });
+	    
+    });
+    
+    on("change:damage_type_note_tox", function() {
+        
+	    getAttrs(["damage_type_note_tox"], function(values) {
+	        
+	        updateMeleeCombatWoundNotes("Toxic (tox)", values.damage_type_note_tox);
+	        
+	        updateRangedCombatWoundNotes("Toxic (tox)", values.damage_type_note_tox);
+	        
+	        updateCombatToolThrownDamageType("Toxic (tox)", values.damage_type_note_tox);
+	        
+	    });
+	    
+    });
+    
+    on("change:damage_type_note_spec", function() {
+        
+	    getAttrs(["damage_type_note_spec"], function(values) {
+	        
+	        updateMeleeCombatWoundNotes("Special (spec)", values.damage_type_note_spec);
+	        
+	        updateRangedCombatWoundNotes("Special (spec)", values.damage_type_note_spec);
+	        
+	        updateCombatToolThrownDamageType("Special (spec)", values.damage_type_note_spec);
+	        
+	    });
+	    
+    });
+    
+    /**
+     * Update the damage types for repeating tables
+     * Find damage types that match the one that was updated.
+     * Replace the note with the new note.
+     * 
+     * @param damageType Type of damage to update
+     * @param damageNote Damage not to use
+     */
+    function updateMeleeCombatWoundNotes(damageType, damageNote) {
+        
+        var updateAttrs = {};
+        
+        // repeating_melee | repeating_ranged
+        
+		getSectionIDs("repeating_melee", function (ids) {
+		
+			if (ids.length === 0 ) {
+				return;
+			}
+		
+		    var getFields = [];
+		        
+		    // loop through the rows
+			for (var i = 0; i < ids.length; i++) {
+		
+		        // field that determines defense type
+                var damageTypeField = "repeating_melee_" + ids[i] + '_type';
+				
+				getFields.push(damageTypeField);
+				
+			}
+			
+			getAttrs(getFields, function (values) {
+			    
+			    var updateFields = {};
+			    
+		        // loop through the row ids again so we can get the values
+		        // and fill array of defense_type id numbers
+		        _.each(ids, function(id) {
+		        
+		            var damageTypeField = "repeating_melee_" + id + '_type';
+			
+			        // field we need to update
+			        var fieldToUpdate = "repeating_melee_" + id + '_damage_type_note';
+				    
+		            var damageTypeValue = values[damageTypeField];
+		            
+		            if (damageTypeValue === damageType) {
+		                
+		                // update the defense type id number
+		                updateFields[fieldToUpdate] = damageNote;
+		            
+		            }
+		            
+                });
+                
+				setAttrs(updateFields);
+			    
+			});
+			
+		});
+        
+    }
+    
+    /**
+     * Update the damage types for repeating tables
+     * Find damage types that match the one that was updated.
+     * Replace the note with the new note.
+     * 
+     * @param damageType Type of damage to update
+     * @param damageNote Damage not to use
+     */
+    function updateRangedCombatWoundNotes(damageType, damageNote) {
+        
+        var updateAttrs = {};
+        
+		getSectionIDs("repeating_ranged", function (ids) {
+		
+			if (ids.length === 0 ) {
+				return;
+			}
+		
+		    var getFields = [];
+		        
+		    // loop through the rows
+			for (var i = 0; i < ids.length; i++) {
+		
+		        // field that determines defense type
+                var damageTypeField = "repeating_ranged_" + ids[i] + '_type';
+				
+				getFields.push(damageTypeField);
+				
+			}
+			
+			getAttrs(getFields, function (values) {
+			    
+			    var updateFields = {};
+			    
+		        // loop through the row ids again so we can get the values
+		        // and fill array of defense_type id numbers
+		        _.each(ids, function(id) {
+		        
+		            var damageTypeField = "repeating_ranged_" + id + '_type';
+			
+			        // field we need to update
+			        var fieldToUpdate = "repeating_ranged_" + id + '_damage_type_note';
+				    
+		            var damageTypeValue = values[damageTypeField];
+		            
+		            if (damageTypeValue === damageType) {
+		                
+		                // update the defense type id number
+		                updateFields[fieldToUpdate] = damageNote;
+		            
+		            }
+		            
+                });
+                
+				setAttrs(updateFields);
+			    
+			});
+			
+		});
+        
+    }
+    
+    /**
+     * Update the damage type now for the combat tool thrown damage
+     * 
+     * @param damageType
+     * @param damageNote
+     */
+    function updateCombatToolThrownDamageType(damageType, damageNote) {
+    
+    
+        getAttrs(["thrown_object_damage_type"], function (values) {
+            
+            if (damageType === values.thrown_object_damage_type) {
+                
+                setAttrs({ 
+                    "thrown_object_damage_type_note": damageNote,
+                });
+            
+            }
+            
+        });
+        
+    }
+    
+    on("change:repeating_defense:info", function(event) {
+        
+        updateDefenseNote();
+        
+    });
+    
+    /**
+     * Update the defense note.
+     */
+    function updateDefenseNote() {
+        
+        getAttrs(['repeating_defense_info'], function(values) {
+            
+            var note = getDefenseNote(values.repeating_defense_info);
+            
+            // update the note
+            setAttrs({
+                repeating_defense_info_description: note
+            });
+            
+        });
+        
+    }
+    
+    /**
+     * Get defense note based on initial defense info field
+     * 
+     * @param defenseInfo
+     * 
+     * @return string
+     */
+    function getDefenseNote(defenseInfo) {
+        
+        var note = "";
+        
+        switch(defenseInfo.toLowerCase()) {
+        
+            case "u":
+                note = "Info: U\nThe weapon is unbalanced. You cannot use it to parry if you've already attacked with it this turn.\nSee B208";
+                break;
+                
+            case "f":
+                note = "Info: F\nThis is a fencing weapon. +3 to retreat, instead of +1. -2 for each additional parry for the round.\nSee B208";
+                break;
+                
+            case "":
+                note = "";
+                break;
+                
+            default:
+                note = "Info: " + values.repeating_defense_info;
+                break;
+        }
+        
+        return note;
+        
+    }
+    
+    /**
+     * If new version, make sure to update the 
+     * defensive notes.
+     */
+    function updateRepeatingDefenseNotes() {
+        
+        getSectionIDs("repeating_defense", function (ids) {
+		
+			if (ids.length === 0 ) {
+				return;
+			}
+		
+		    var getFields = [];
+		        
+		    // loop through the rows
+			for (var i = 0; i < ids.length; i++) {
+		
+		        // field that determines defense type
+                var damageTypeField = "repeating_defense_" + ids[i] + '_info';
+				
+				getFields.push(damageTypeField);
+				
+			}
+			
+			getAttrs(getFields, function (values) {
+			    
+			    var updateFields = {};
+			    
+		        // loop through the row ids again so we can get the values
+		        // and fill array of defense_type id numbers
+		        _.each(ids, function(id) {
+		        
+		            var infoField = "repeating_defense_" + id + '_info';
+			
+			        // field we need to update
+			        var fieldToUpdate = "repeating_defense_" + id + '_info_description';
+				    
+		            var infoValue = values[infoField];
+		            
+		            // update the defense type id number
+		            updateFields[fieldToUpdate] = getDefenseNote(infoValue);
+		                
+		            
+                });
+                
+				setAttrs(updateFields);
+			    
+			});
+			
+		});
+        
+    }
+    
+    on("change:repeating_item:carried", function(event) {
+        
+        markItemRowAsCarried();
+        
+    });
+    
+    /**
+     * Update the hidden input field on/off
+     * If ON, the row will bold the weight text.
+     * 
+     */
+    function markItemRowAsCarried() {
+        
+        getAttrs(["repeating_item_carried"], function(values) {
+            
+            setAttrs({
+                "repeating_item_inventory_item_carried": values.repeating_item_carried
+            });
+            
+        });
+        
+    }
     
 </script>
