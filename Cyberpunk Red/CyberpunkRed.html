@@ -4,7 +4,7 @@
     <h1><em>Cyberpunk Red</em></h1>
     <span>Character Sheet</span>
     <div>&nbsp;</div>
-    <label>Roll initiative: <button type="roll" name="roll_initiative" value="&{template:cprskill} {{name=@{character_name}}} {{rollname=initiative}} {{theroll=[[1d10+@{ref}]]}} &{tracker}" class="skillroll"></label>
+    <label>Roll initiative: <button type="roll" name="roll_initiative" value="&{template:initiative} {{name=@{character_name}}} {{rollname=initiative}} {{theroll=[[1d10+@{ref} &{tracker}]]}}" class="skillroll"></label>
   </div>
   <div class="common section">
     <label>Character name:</label><input name="attr_character_name" type="text" />
@@ -35,7 +35,22 @@
     <span><label>Remaining Luck</label><input name="attr_luck" type="number" style="font-weight:bold" /></span>
   </div>
   <div class="skills section">
-    <label>Skills</label>
+    <label>Skills</label><input name="attr_skillinfocheck" class="skillinfocheck" type="checkbox"/><span> Show help</span>
+    <span class="skillinfo">
+          <p/>
+          <p>Due to a limitation of Roll20's dice expressions, this sheet's roll
+          template uses a workaround to support crits and fumbles in skill rolls.
+          The sheet may appear to be rolling 1d8+1, or rolling a constant number,
+          when it's really rolling 1d10. Behind the scenes, this is what
+          the sheet does with skill rolls:</p>
+          <ol>
+              <li>It rolls (all at once) 1d10, 1-1d10, 10+1d10, and 1d8+1.</li>
+              <li>If the first d10 is a 1, the result is the 1-1d10 (a fumble).</li>
+              <li>If the first d10 is a 10, the result is the 10+1d10 (a crit).</li>
+              <li>Otherwise it's the 1d8+1 (a number between 2 and 9, neither a fumble nor a crit).</li>
+          </ol>
+          <p>Statistically this works out correctly for skill rolls in Cyberpunk Red.</p>
+    </span>
     <fieldset class="repeating_skills">
       <input name="attr_skill" class="skill" type="text" />
       <select name="attr_skillstat" class="skillstat">
@@ -145,7 +160,7 @@
   </table>
 </rolltemplate>
 <script type="text/worker">
-  var currentVersion = 5;
+  var currentVersion = 7;
   on('sheet:opened', function() {
     getAttrs(["version"], function(values) {
       v = values.version;
@@ -197,4 +212,3 @@
     });
   });
 </script>
-
