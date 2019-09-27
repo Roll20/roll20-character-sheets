@@ -2,11 +2,23 @@
 
 ## Änderungen
 
+2019-09-15:
+- Die Attribute für Lebensenergie (le, le_max), Astralenergie (ke_, ke_max) und Karmaenergie (ke, ke_max) wurden umbenannt, um das Zuweisen der Werte an Token zu vereinfachen. Achtung: evtl. werden die aktuellen Werte auf 0 gesetzt und müssen angepasst werden.
+- Modifikator für den Fertigkeitswert (FW) der Talente hinzugefügt
+- Rüstungsschutz (RS) wird auch im Kopf des Kampfbogens angezeigt
+- Auf dem Kmapfbogen wurde ein neuer, freier Modifkator hinzugefügt, der nur beim Würfeln herangezogen wird
+- berechnete Werte und Felder, deren Inhalte nicht verändert werden können, werden jetzt grau hinterlegt, um sie besser von Eingabefeldern unterscheiden zu können
+- neue Typen für Sonderfertigkeiten, Magie und Götterwirken
+- Darstellung und Berechnung der SchiPs auf dem Grundwertetab wurden gefixt
+- AE/KE Leiteigenschaft (Grundwertetab) und Traditionseigenschaft (Magie/Götterwirken-Tab) sind jetzt synchronisiert
+- für AE/KE kann jetzt der Faktor (Default 1) mit dem die Traditionseigenschaft in den Gesamtwert eingeht, eingegeben werden
 
-2019-09-01: - Vorteile und Nachteile wurden unter Sonderfertigkeiten zusammenfaßt
-            - Zauberspruchtyp Zaubertricks hinzugefügt
-            - Fix: Berechnung Werte für Hiebwaffen im Kampfwerte
-                        
+
+2019-09-01:
+- Vorteile und Nachteile wurden unter Sonderfertigkeiten zusammenfaßt
+- Zauberspruchtyp Zaubertricks hinzugefügt
+- Fix: Berechnung Werte für Hiebwaffen im Kampfwerte
+
 2019-08-20: Der Charakterbogen wird erstmalig veröffentlicht.
 
 ## Einleitung
@@ -94,6 +106,8 @@ Kampfsonderfertigkeiten
 * Beidhändigkeit-Mod. (Modifikator für das gleichzeitige Führen von zwei Waffen)
 * Falsche-Hand-Mod.  (Modifikator für Waffen in der falschen Hand)
 
+Würfel- / Probenmodifikator
+sowie Modifikator des Fertigkeitwertes (FW)
 Körpertalente
 * Fliegen
 * Gaukeleien

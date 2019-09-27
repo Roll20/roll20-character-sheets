@@ -21,7 +21,7 @@
             , "ac_fields": ["ability","ability_select","dc_rank","proficiency","item","temporary","dc_base","cap","shield_ac_bonus","shield_temporary"]
             , "hit_points": ["hit_points_ancestry","hit_points_class","hit_points_other","hit_points_item"]
             , "repeating_attacks": ["melee-strikes","ranged-strikes"]
-            , "attacks_fields": ["weapon","weapon_ability_select","weapon_ability","weapon_proficiency","weapon_rank","weapon_item","weapon_temporary","weapon_traits","damage_dice","damage_dice_size","damage_ability_select","damage_ability","damage_b","damage_p","damage_s","damage_weapon_specialization","damage_temporary","damage_other","damage_effects"]
+            , "attacks_fields": ["weapon","weapon_ability_select","weapon_ability","weapon_proficiency","weapon_rank","weapon_item","weapon_temporary","weapon_traits","damage_dice","damage_dice_size","damage_ability_select","damage_ability","damage_b","damage_p","damage_s","damage_weapon_specialization","damage_temporary","damage_other","damage_effects","damage_additional"]
             , "perception": ["perception_ability_select","perception_ability","perception_rank","perception_proficiency","perception_item","perception_temporary"]
             , "class_dc": ["class_dc_key_ability_select","class_dc_key_ability","class_dc_proficiency","class_dc_rank","class_dc_item","class_dc_temporary"]
             , "spell_attack": ["spell_attack_key_ability_select","spell_attack_key_ability", "spell_attack_rank","spell_attack_proficiency","spell_attack_temporary"]
@@ -501,7 +501,7 @@
                 // Attack display
                 update[`${id}_weapon_display`] = `${weapon_strike < 0 ? "" : "+"}${weapon_strike}${(values[`${id}_weapon_traits`] || "").length ? " ("+values[`${id}_weapon_traits`]+")" : ""}`;
                 // Damage display
-                update[`${id}_damage_display`] = `${damage_dice == '0D0' ? "" : damage_dice}${damage_bonus < 0 ? "" : "+"}${damage_bonus}${values[`${id}_damage_b`] == "1" ? " "+getTranslationByKey("b").toUpperCase() : ""}${values[`${id}_damage_p`] == "1" ? " "+getTranslationByKey("p").toUpperCase() : ""}${values[`${id}_damage_s`] == "1" ? " "+getTranslationByKey("s").toUpperCase() : ""}${(values[`${id}_damage_effects`] || "").length ?  " "+getTranslationByKey("plus")+" "+values[`${id}_damage_effects`] : ""}`;
+                update[`${id}_damage_display`] = `${damage_dice == '0D0' ? "" : damage_dice}${damage_bonus < 0 ? "" : "+"}${damage_bonus}${values[`${id}_damage_b`] == "1" ? " "+getTranslationByKey("b").toUpperCase() : ""}${values[`${id}_damage_p`] == "1" ? " "+getTranslationByKey("p").toUpperCase() : ""}${values[`${id}_damage_s`] == "1" ? " "+getTranslationByKey("s").toUpperCase() : ""}${(values[`${id}_damage_effects`] || "").length ?  " "+getTranslationByKey("plus")+" "+values[`${id}_damage_effects`] : ""}${(values[`${id}_damage_additional`] || "").length ?  " "+getTranslationByKey("plus")+" "+values[`${id}_damage_additional`] : ""}`;
                 // Damage Roll: calculating info to include translated damage type
                 let damage_info = "";
                 if(values[`${id}_damage_b`] == "1") {
@@ -524,7 +524,7 @@
                     update[`${id}_damage_dice_query`] = values[`query_roll_damage_dice`];
                 }
                 // Forced update to attack and damage rolls (in case of logic change)
-                update[`${id}_weapon_roll`] = "{{roll01_name=^{attack}}} {{roll01=[[1d20cs20cf1 + @{weapon_strike}[@{text_modifier}] + @{query_roll_bonus}[@{text_bonus}]]]}} {{roll01_type=attack}} {{roll01_info=@{weapon_traits}}} {{roll01_critical=1}}";
+                update[`${id}_weapon_roll`] = "{{roll01_name=^{attack}}} {{roll01=[[1d20cs20cf1 + @{weapon_strike}[@{text_modifier}] + (@{query_roll_bonus})[@{text_bonus}]]]}} {{roll01_type=attack}} {{roll01_info=@{weapon_traits}}} {{roll01_critical=1}}";
                 update[`${id}_damage_roll`] = "{{roll02_name=^{damage}}} {{roll02=[[@{damage_dice_query}@{damage_dice_size} + @{damage_ability}[@{text_ability_modifier}] + @{damage_weapon_specialization}[WEAPON SPECIALIZATION] + @{damage_temporary}[TEMP] + @{damage_other}[OTHER] + @{query_roll_damage_bonus}[@{text_roll_damage_bonus}]]]}} {{roll02_type=damage}} {{roll02_info=@{damage_info}}}";
                 update[`${id}_damage_critical_roll`] = "{{roll03_name=^{critical_damage}}} {{roll03=[[(@{damage_dice_query}@{damage_dice_size} + @{damage_ability}[@{text_ability_modifier}] + @{damage_weapon_specialization}[WEAPON SPECIALIZATION] + @{damage_temporary}[TEMP] + @{damage_other}[OTHER] + @{query_roll_damage_bonus}[@{text_roll_damage_bonus}])*2]]}} {{roll03_type=critical-damage}} {{roll03_info=@{damage_info}}}";
                 // End
