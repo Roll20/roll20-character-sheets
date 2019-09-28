@@ -953,6 +953,11 @@ var versioning = function() {
             setAttrs({version: "2.6"});
             versioning();
         }
+        else if(v["version"] === "2.6") {
+            console.log("upgrading to v2.7");
+            setAttrs({version: "2.7"});
+            versioning();
+        }
         else {
             console.log("Sheet fully updated");
         }

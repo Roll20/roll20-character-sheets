@@ -4,6 +4,10 @@ plugins {
 
 defaultTasks 'upload'
 
+task clean_artifacts(type: Delete, description: "Delete the existing Mythras.html and Mythras.css") {
+    delete file("$projectDir/Mythras.html"), file("$projectDir/Mythras.css")
+}
+
 task assemble_html(type: ProcessResources, group: "assemble", description: "Compiles Mythras.html from sources.") {
     from('src') {
         include 'Mythras.html'
@@ -31,7 +35,8 @@ task upload(type:Exec) {
 }
 
 
-
+assemble_html.dependsOn(clean_artifacts)
+assemble_css.dependsOn(clean_artifacts)
 assemble.dependsOn(assemble_html)
 assemble.dependsOn(assemble_css)
 upload.dependsOn(build)

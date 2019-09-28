@@ -1462,7 +1462,8 @@ on("change:mythras_vehicle_type", function() {
                 vehicle_system7_roll: 7, vehicle_system7_name: getTranslationByKey('sensors-u'),
                 vehicle_system8_roll: 8, vehicle_system8_name: getTranslationByKey('shields-u'),
                 vehicle_system9_roll: 9, vehicle_system9_name: getTranslationByKey('sublight-drive-u'),
-                vehicle_system10_roll: 10, vehicle_system10_name: getTranslationByKey('weapons-u')
+                vehicle_system10_roll: 10, vehicle_system10_name: getTranslationByKey('weapons-u'),
+                vehicle_system_die: "1d10"
             });
         } else {
             setAttrs({
@@ -1475,7 +1476,8 @@ on("change:mythras_vehicle_type", function() {
                 vehicle_system7_roll: 7, vehicle_system7_name: getTranslationByKey('sensors-u'),
                 vehicle_system8_roll: 8, vehicle_system8_name: getTranslationByKey('weapons-u'),
                 vehicle_system9_roll: 0, vehicle_system9_name: "",
-                vehicle_system10_roll: 0, vehicle_system10_name: ""
+                vehicle_system10_roll: 0, vehicle_system10_name: "",
+                vehicle_system_die: "1d8"
             });
         }
     });
