@@ -2,7 +2,24 @@
 
 ## Änderungen
 
-2019-08-xx: Der Charakterbogen wird erstmalig veröffentlicht.
+2019-09-15:
+- Die Attribute für Lebensenergie (le, le_max), Astralenergie (ke_, ke_max) und Karmaenergie (ke, ke_max) wurden umbenannt, um das Zuweisen der Werte an Token zu vereinfachen. Achtung: evtl. werden die aktuellen Werte auf 0 gesetzt und müssen angepasst werden.
+- Modifikator für den Fertigkeitswert (FW) der Talente hinzugefügt
+- Rüstungsschutz (RS) wird auch im Kopf des Kampfbogens angezeigt
+- Auf dem Kmapfbogen wurde ein neuer, freier Modifkator hinzugefügt, der nur beim Würfeln herangezogen wird
+- berechnete Werte und Felder, deren Inhalte nicht verändert werden können, werden jetzt grau hinterlegt, um sie besser von Eingabefeldern unterscheiden zu können
+- neue Typen für Sonderfertigkeiten, Magie und Götterwirken
+- Darstellung und Berechnung der SchiPs auf dem Grundwertetab wurden gefixt
+- AE/KE Leiteigenschaft (Grundwertetab) und Traditionseigenschaft (Magie/Götterwirken-Tab) sind jetzt synchronisiert
+- für AE/KE kann jetzt der Faktor (Default 1) mit dem die Traditionseigenschaft in den Gesamtwert eingeht, eingegeben werden
+
+
+2019-09-01:
+- Vorteile und Nachteile wurden unter Sonderfertigkeiten zusammenfaßt
+- Zauberspruchtyp Zaubertricks hinzugefügt
+- Fix: Berechnung Werte für Hiebwaffen im Kampfwerte
+
+2019-08-20: Der Charakterbogen wird erstmalig veröffentlicht.
 
 ## Einleitung
 
@@ -13,17 +30,15 @@ lange habe ich mit mir gerungen, einen eigenen Charakterbogen für DSA 5 zu baue
 Herausgekommen ist ein neuer Charakterbogen, der anders aussieht und anders funktioniert als wie gewohnt, aber einem mehr Freiheiten lässt und hoffentlich auch mehr Unterstützung und Spaß beim Spielen bringt. Da dieses aber der erste Wurf ist, kann es sein, dass noch Fehler vorhanden oder Dinge noch nicht umgesetzt sind. Bei Fragen oder Feedback wendet euch gerne an mich per Email ( trestolt(at)gmail.com ).
 
 
-
-
 ## Charaktererstellung
 
 Dieser Charakterbogen ist nicht für die Erstellung von Charakteren gedacht, ich empfehle die Nutzung des selbstrechnenden PDF-Charakterbogens oder anderer Werkzeuge aus dem Scriptorium Aventuris. Ihr könnt die Werte entsprechend aus dem PDF-Bogen in den Roll20-Charakterbogen übertragen. Die abgeleiteten Werte werden grundsätzlich berechnet.  Die Talente sowie Kampftechniken können 1:1 übernommen werden.
 
-Bei Vor- und Nachteilen, allen Arten von Sonderfertigkeiten sowie Artefakten kommt das Baukastenprinzip ins Spiel.
+Bei Vor- und Nachteilen, allen Arten von Sonderfertigkeiten, Effekten sowie Artefakten kommt das Baukastenprinzip ins Spiel.
 
 ### Vorteile / Nachteile / Sonderfertigkeiten
 
-Vor-/Nachteile sowie Sonderfertigkeiten funktionieren gleich, weswegen nur auf die Erstellung von Sonderfertigkeiten näher eingegangen wird.
+Vor-/Nachteile sowie Sonderfertigkeiten funktionieren gleich, weswegen diese unter Sonderfertigkeiten zusammengefaßt wurden.
 
 SF können und sollen  nur unter dem entsprechendem Reiter Sonderfertigkeiten angelegt werden.
 Zuerst wird der Typ der Sonderfertigkeit angegeben. Nach diesem Typ kann später auch gefiltert werden. Und auch späAchtung, wenn in einer Sonderfertigkeit ein Modifikator doppelt verwendet wird, kann es zu falschen Berechnungen kommen. Daher niemals einen Modifkator innerhalb einer SF mehrfach verwenden. Allerdings kann ein Modifkator in mehreren Sonderfertigkeiten verwendet werden, da diese normal verrechnet werden.
@@ -91,6 +106,8 @@ Kampfsonderfertigkeiten
 * Beidhändigkeit-Mod. (Modifikator für das gleichzeitige Führen von zwei Waffen)
 * Falsche-Hand-Mod.  (Modifikator für Waffen in der falschen Hand)
 
+Würfel- / Probenmodifikator
+sowie Modifikator des Fertigkeitwertes (FW)
 Körpertalente
 * Fliegen
 * Gaukeleien
@@ -172,7 +189,6 @@ Unter Status lassen sich die unterschiedlichen Zunstände eintragen. Entsprechen
 
 
 ### Magie und Götterwirken
-
 
 
 
