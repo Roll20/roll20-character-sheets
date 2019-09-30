@@ -3,7 +3,7 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.3.1";
+	const sheetVersion = "2.4.2";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -1878,6 +1878,15 @@
 		});
 	};
 
+	const calculateMagicEffort = () => {
+		getAttrs(["magic_total_effort", "magic_committed_effort_current", "magic_committed_effort_scene", "magic_committed_effort_day", "magic_uncommitted_effort"], function(v) {
+			const magic_uncommitted_effort = parseInt(v.magic_total_effort) - (parseInt(v.magic_committed_effort_current) + parseInt(v.magic_committed_effort_scene) + parseInt(v.magic_committed_effort_day));
+			mySetAttrs({
+				magic_uncommitted_effort
+			}, v);
+		});
+	};
+
 	const calculateAC = () => {
 		getSectionIDs("repeating_armor", idArray => {
 			const sourceAttrs = [
@@ -1915,6 +1924,33 @@
 			mySetAttrs({
 				strain_max: v.constitution
 			}, v);
+		});
+	};
+
+	const calculatePermanentStrain = () => {
+		getAttrs(["cyberware_strain_total", "strain_permanent_extra", "strain_permanent"], v => {
+			const permStrain = parseInt(v.cyberware_strain_total) + parseInt(v.strain_permanent_extra);
+			mySetAttrs({
+				strain_permanent: permStrain
+			}, v);
+		});
+	};
+
+	const calculateCyberwareStrain = () => {
+		//Loop through the cyberware and add up the strain.
+		getSectionIDs("repeating_cyberware", idArray => {
+			const sourceAttrs = [
+				...idArray.map(id => `repeating_cyberware${id}_cyberware_strain`),
+				"cyberware_strain_total"
+			];
+			getAttrs(sourceAttrs, v => {
+				const cyberwareStrain = Math.max(
+					...idArray.map(id => parseInt(v[`repeating_cyberware${id}_cyberware_strain`]) || 0)
+				);
+				mySetAttrs({
+					cyberware_strain_total: cyberwareStrain
+				}, v);
+			});
 		});
 	};
 
@@ -2224,7 +2260,7 @@
 				const setting = idArray.reduce((m, id) => {
 					if (v.npc_roll_full_attack === "1") {
 						const num = parseInt(v[`repeating_npc-attacks_${id}_attack_number`]) || 1;
-						const macro = [2, 3, 4].map(n => {
+						const macro = [2, 3, 4, 5, 6, 7, 8].map(n => {
 							if (n <= num)
 								return `{{attack${n}=[[1d20 + @{attack_ab} @{attack_burst} @{modifier_query}]]}} ` +
 									`{{damage${n}=[[@{attack_damage} @{attack_burst}]]}} `;
@@ -2825,7 +2861,7 @@
 			}
 		});
 	};
-	const calculateDroneAttack = (prefixes) => {
+	const calculateDroneAttack = (prefixes, callback) => {
 		const sourceAttrs = prefixes.reduce((m, prefix) => {
 			return m.concat([
 				`${prefix}_drone_weapon1_ab`,
@@ -2853,7 +2889,7 @@
 					});
 				return m;
 			}, {});
-			mySetAttrs(setting, v);
+			mySetAttrs(setting, v, callback);
 		});
 	};
 
@@ -3005,9 +3041,12 @@
 			 *  Regenerate drone and weapon ABs
 			 **/
 			else if (major == 2 && (minor < 3 || (minor == 3 && patch == 0))) {
+				const upgradeFunction = _.after(1, () => {
+					upgradeSheet("2.3.1");
+				});
 				generateWeaponDisplay();
 				getSectionIDs("repeating_drones", idArray => {
-					calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`));
+					calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`), upgradeFunction);
 				});
 			}
 			/** Final upgrade clause, always leave this around */
@@ -3429,10 +3468,14 @@
 
 	on("change:strain change:strain_permanent", validateStrain);
 	on("change:constitution", calculateMaxStrain);
+	on("change:repeating_cyberware", calculateCyberwareStrain);
+	on("change:strain_permanent_extra change:cyberware_strain_total", calculatePermanentStrain);
 
 	on("change:level", calculateSaves);
 
 	on([...effortAttributes, "repeating_psychic-skills:skill"].map(x => `change:${x}`).join(" "), calculateEffort);
+
+	on("change:magic_committed_effort_current change:magic_committed_effort_scene change: magic_committed_effort_day change:magic_total_effort", calculateMagicEffort);
 
 	on("change:repeating_armor change:innate_ac remove:repeating_armor", calculateAC);
 
