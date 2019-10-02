@@ -9,9 +9,16 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-editions.fr/catalogue.php?id=207) #17,18 et 19.
 
 # Version courante
-3.6 [Screenshot](cog_v3.png)
+3.7 [Screenshot](cog_v3.png)
 
 # Notes de version
+## V3.7 (2019-09-26)
+Modification de tous les roll-buttons :
+- name="roll\_<nomdujet>"
+- ajout/maj des title=""
+
+Permet de lancer tous les jets de dés de la fiche via %{<nomdujet>} dans le chat
+
 ## V3.6 (2019-04-17)
 ### Fiche de PJ
 
