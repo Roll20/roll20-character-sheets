@@ -1054,48 +1054,24 @@ on("change:condition_positive_moderate change:condition_negative_moderate change
    });
 });
 // NPC!!!
-//Dice updates based on Mental Score
-on("change:mental", function() {
-   getAttrs(["mental"], function (v) {
-       const mental = parseInt(v.mental) || 0;
-       const skills = ["computers", "engineering", "medicine", "knowledge", "perception", "streetwise"];
-       let die = (mental * 2);
-       let newSkills = [];
-       let newDice = (die >= 4 && die <= 12) ? die : (die > 12) ? 12 : 4;
-       _.each(skills, function(skill) {
-           newSkills[skill] = newDice;
-       });
-       setAttrs(newSkills);
-   });
+//Dice updates based on Mental, Physical, and Social score changes
+on("change:mental change:physical change:social", function(eventinfo){
+    const attr = eventinfo.sourceAttribute;
+    const skillsMental = ["computers", "engineering", "medicine", "knowledge", "perception", "streetwise"];
+    const skillsPhysical = ["athletics", "melee", "power", "ranged", "skullduggery", "stealth"];
+    const skillsSocial = ["deceive", "decorum", "empathy", "perform", "presence", "suave"];
+    const skills = (attr === 'mental') ? skillsMental : (attr === 'physical') ? skillsPhysical : skillsSocial;
+    const diceBase = parseInt(eventinfo.newValue) || 0;
+    const die = (diceBase * 2);
+    //Manage edge cases
+    const newDice = (die >= 4 && die <= 12) ? die : (die > 12) ? 12 : 4;
+    let newSkills = [];
+    skills.forEach(skill => {
+        newSkills[skill] = newDice;
+    });
+    setAttrs(newSkills);
 });
-//Dice updates based on Physical Score
-on("change:physical", function() {
-   getAttrs(["physical"], function (v) {
-       const physical = parseInt(v.physical) || 0;
-       const skills = ["athletics", "melee", "power", "ranged", "skullduggery", "stealth"];
-       let die = (physical * 2);
-       let newSkills = [];
-       let newDice = (die >= 4 && die <= 12) ? die : (die > 12) ? 12 : 4;
-       _.each(skills, function(skill) {
-           newSkills[skill] = newDice;
-       });
-       setAttrs(newSkills);
-   });
-});
-//Dice updates based on Social Score
-on("change:social", function() {
-   getAttrs(["social"], function (v) {
-       const social = parseInt(v.social) || 0;
-       const skills = ["deceive", "decorum", "empathy", "perform", "presence", "suave"];
-       let die = (social * 2);
-       let newSkills = [];
-       let newDice = (die >= 4 && die <= 12) ? die : (die > 12) ? 12 : 4;
-       _.each(skills, function(skill) {
-           newSkills[skill] = newDice;
-       });
-       setAttrs(newSkills);
-   });
-});
+
 //Conditions for NPCs
 //on("change:condition_positive_significant", function() {
 //    getAttrs(["condition_positive_significant", "mental", "physical", "social"], function(v) {
@@ -1130,42 +1106,41 @@ on("change:social", function() {
 //    });
 //});
 //Initiative Toggle
-on("change:initiative_toggle", function() {
-   getAttrs(["initiative_toggle"], function(v) {
-       const toggle = (v.initiative_toggle);
-       (toggle != "mt") ? setAttrs({initiative: "mt"}) : setAttrs({initiative: " "});
-   });
+on("change:initiative_toggle", function(eventinfo) {
+   const toggle = (eventinfo.newValue);
+   (toggle != "mt") ? setAttrs({initiative: "mt"}) : setAttrs({initiative: " "});
+
 });
 //Reset the checkmarks for Novapoint dice
 on("change:dice_used", function() {
-   let dice = ["d4", "d6", "d8", "d10", "d12"];
+   const dice = ["d4", "d6", "d8", "d10", "d12"];
    let resetDice = [];
-   _.each(dice, function(die) {
+  dice.forEach(die => {
       resetDice[die] = 0;
    });
    setAttrs(resetDice);
 });
 //Compedium Drop
 on("change:drop_category", function(eventinfo) {
-   var eventinfo = (eventinfo.newValue);
-   handle_drop(eventinfo);
+   const info = (eventinfo.newValue);
+   handle_drop(info);
 });
-var handle_drop = function(eventinfo) {
-   var update = {};
-   var id = generateRowID();
+const handle_drop = function(eventinfo) {
+   let update = {};
+   const id = generateRowID();
    getAttrs(["drop_name", "drop_data", "drop_content"], function(v) {
        try {
            pagedata = JSON.parse(v.drop_data);
        } catch(e) {
            pagedata = v.drop_data;
        };
-       var page = {
+       let page = {
            name: v.drop_name,
            data: pagedata,
            content: v.drop_content
        };
        //Handle updated page data and included events, abilities, scores, etc, based on the type of page dropped in
-       var category = page.data["Category"];
+       const category = page.data["Category"];
        switch(category) {
            case "Culture":
                (page.data["Type"] === "Borders") ? update["culture_border"] = page.name :
@@ -1182,68 +1157,67 @@ var handle_drop = function(eventinfo) {
                update["species"] = page.name;
                break;
            case "Story Paths":
-               update["repeating_story_" + id + "_story"] = page.name;
-               update["repeating_story_" + id + "_story_path"] = page.data["Description"];
-               update["repeating_story_" + id + "_act_flag"] = "false";
-               var eventArray = JSON.parse(page.data["data-Events"]);
-               var i;
+               update[`repeating_story_${id}_story`] = page.name;
+               update[`repeating_story_${id}_story_path`] = page.data["Description"];
+               update[`repeating_story_${id}_act_flag`] = "false";
+               const eventArray = JSON.parse(page.data["data-Events"]);
+               let i = 1;
                //update story events 1-4 with compendium content
-               for (i = 0; i < 4; i++) {
-                   update["repeating_story_" + id + "_event_" + (i + 1)] = eventArray[i].Name;
-                   update["repeating_story_" + id + "_event_" + (i + 1) + "_howto"] = eventArray[i].Completion;
-                   update["repeating_story_" + id + "_event_" + (i + 1) + "_reward"] = eventArray[i].Reward;
-               }
-               //update story event 5 with compendium content and calculated reward
-               update["repeating_story_" + id + "_event_5"] = eventArray[4].Name;
-               update["repeating_story_" + id + "_event_5_howto"] = eventArray[4].Completion;
+               eventArray.forEach(function(event) {
+                   update[`repeating_story_${id}_event_${i}`] = event.Name;
+                   update[`repeating_story_${id}_event_${i}_howto`] = event.Completion;
+                   update[`repeating_story_${id}_event_${i}_reward`] = event.Reward;
+                   i++;
+               });
+               //update story event 5 with calculated reward
                (eventArray[4]["Reward 1"] != "" && eventArray[4]["Reward 2"] != "" && eventArray[4]["Reward 3"] != "") ?
-                   update["repeating_story_" + id + "_event_5_reward"] = eventArray[4]["Reward 1"] + ", " + eventArray[4]["Reward 2"]  + ", " + eventArray[4]["Reward 3"] :
+                   update[`repeating_story_${id}_event_5_reward`] = `${eventArray[4]["Reward 1"]}, ${eventArray[4]["Reward 2"]}, ${eventArray[4]["Reward 3"]}` :
                (eventArray[4]["Reward 1"] != "" && eventArray[4]["Reward 2"] != "") ?
-                   update["repeating_story_" + id + "_event_5_reward"] = eventArray[4]["Reward 1"] + ", " + eventArray[4]["Reward 2"] :
-                   update["repeating_story_" + id + "_event_5_reward"] = eventArray[4]["Reward 1"];
+                   update[`repeating_story_${id}_event_5_reward`] = `${eventArray[4]["Reward 1"]}, ${eventArray[4]["Reward 2"]}` :
+                   update[`repeating_story_${id}_event_5_reward`] = eventArray[4]["Reward 1"];
                break;
            case "Special Abilities":
-               update["repeating_abilities_" + id + "_ability"] = page.name + " (" + page.data["Type"] + ")";
-               update["repeating_abilities_" + id + "_description"] = page.data["Description"];
-               update["repeating_abilities_" + id + "_special_ability_flag"] = "false";
+               update[`repeating_abilities_${id}_ability`] = `${page.name} (${page.data["Type"]})`;
+               update[`repeating_abilities_${id}_description`] = page.data["Description"];
+               update[`repeating_abilities_${id}_special_ability_flag`] = "false";
                var preqArray = (page.data["data-Prerequisites"] === "" || page.data["data-Prerequisites"] === undefined) ? "" : JSON.parse(page.data["data-Prerequisites"]);
-               (preqArray != "" && page.data["Species"] != "") ? update["repeating_abilities_" + id + "_prerequisite"] = preqArray[0].Prerequisite + ", " + page.data["Species"] :
-               (preqArray != "") ? update["repeating_abilities_" + id + "_prerequisite"] = preqArray[0].Prerequisite :
-                   update["repeating_abilities_" + id + "_prerequisite"] = page.data["Species"];
+               (preqArray != "" && page.data["Species"] != "") ? update[`repeating_abilities_${id}_prerequisite`] = `${preqArray[0].Prerequisite}, ${page.data["Species"]}` :
+               (preqArray != "") ? update[`repeating_abilities_${id}_prerequisite`] = preqArray[0].Prerequisite :
+                   update[`repeating_abilities_${id}_prerequisite`] = page.data["Species"];
                break;
            case "Nova Abilities":
-               update["repeating_nova_" + id + "_ability"] = page.name + " (" + page.data["Type"] + ")";
-               update["repeating_nova_" + id + "_description"] = page.data["Description"];
-                update["repeating_nova_" + id + "_special_ability_flag"] = "false";
+               update[`repeating_nova_${id}_ability`] = `${page.name} (${page.data["Type"]})`;
+               update[`repeating_nova_${id}_description`] = page.data["Description"];
+                update[`repeating_nova_${id}_special_ability_flag`] = "false";
                var preqArray = (page.data["data-Prerequisites"] === "" || page.data["data-Prerequisites"] === undefined) ? "" : JSON.parse(page.data["data-Prerequisites"]);
-               (preqArray != "" && page.data["Species"] != "") ? update["repeating_nova_" + id + "_prerequisite"] = preqArray[0].Prerequisite + ", " + page.data["Species"] :
-               (preqArray != "") ? update["repeating_nova_" + id + "_prerequisite"] = preqArray[0].Prerequisite :
-                   update["repeating_nova_" + id + "_prerequisite"] = page.data["Species"];
+               (preqArray != "" && page.data["Species"] != "") ? update[`repeating_nova_${id}_prerequisite`] = `${preqArray[0].Prerequisite}, ${page.data["Species"]}` :
+               (preqArray != "") ? update[`repeating_nova_${id}_prerequisite`] = preqArray[0].Prerequisite :
+                   update[`repeating_nova_${id}_prerequisite`] = page.data["Species"];
                break;
            case "Equipment":
-               update["repeating_items_" + id + "_item"] = page.name;
-               update["repeating_items_" + id + "_items_flag"] = "false";
+               update[`repeating_items_${id}_item`] = page.name;
+               update[`repeating_items_${id}_items_flag`] = "false";
                (page.data["Item Subcategory"] === undefined || page.data["Item Subcategory"] === "") ?
-                   update["repeating_items_" + id + "_type"] = page.data["Item Category"] :
-                   update["repeating_items_" + id + "_type"] = page.data["Item Category"] + ", " + page.data["Item Subcategory"];
+                   update[`repeating_items_${id}_type`] = page.data["Item Category"] :
+                   update[`repeating_items_${id}_type`] = `${page.data["Item Category"]}, ${page.data["Item Subcategory"]}`;
               (page.data["data-Charges"] === undefined || page.data["data-Charges"] === "") ?
-                   update["repeating_items_" + id + "_health"] = 0 :
-                   update["repeating_items_" + id + "_health"] = page.data["data-Charges"];
+                   update[`repeating_items_${id}_health`] = 0 :
+                   update[`repeating_items_${id}_health`] = page.data["data-Charges"];
               (page.data["data-Charges"] === undefined || page.data["data-Charges"] === "") ?
-                   update["repeating_items_" + id + "_health_max"] = 0 :
-                   update["repeating_items_" + id + "_health_max"] = page.data["data-Charges"];
-               update["repeating_items_" + id + "_description"] = page.data["Description"];
-               update["repeating_items_" + id + "_qualities"] = page.data["Qualities"];
+                   update[`repeating_items_${id}_health_max`] = 0 :
+                   update[`repeating_items_${id}_health_max`] = page.data["data-Charges"];
+               update[`repeating_items_${id}_description`] = page.data["Description"];
+               update[`repeating_items_${id}_qualities`] = page.data["Qualities"];
                break;
            case "Ship Modules":
-               update["repeating_modules_" + id + "_name"] = page.name;
-               update["repeating_modules_" + id + "_size"] = page.data["Size"];
-               if (page.data["data-Effect"]) {update["repeating_modules_" + id + "_effect"] = page.data["data-Effect"];};
+               update[`repeating_modules_${id}_name`] = page.name;
+               update[`repeating_modules_${id}_size`] = page.data["Size"];
+               if (page.data["data-Effect"]) {update[`repeating_modules_${id}_effect`] = page.data["data-Effect"];};
 
-               var range = (page.data["data-Range"] === undefined || page.data["data-Range"] === "") ? "" : page.data["data-Range"] + ", ";
-               var angle = (page.data["data-Angles"] === undefined || page.data["data-Angles"] === "") ? "" : page.data["data-Angles"] + ", ";
-               var damage = (page.data["data-Damage"] === undefined || page.data["data-Damage"] === "") ? "" : page.data["data-Damage"] + " damage";
-               if (range != "" || angle != "" || damage != "") {update["repeating_modules_" + id + "_combat_data"] = range + angle + damage;};
+               const range = (page.data["data-Range"] === undefined || page.data["data-Range"] === "") ? "" : `${page.data["data-Range"]}, `;
+               const angle = (page.data["data-Angles"] === undefined || page.data["data-Angles"] === "") ? "" : `${page.data["data-Angles"]}, `;
+               const damage = (page.data["data-Damage"] === undefined || page.data["data-Damage"] === "") ? "" : `${page.data["data-Damage"]} damage`;
+               if (range != "" || angle != "" || damage != "") {update[`repeating_modules_${id}_combat_data`] = range + angle + damage;};
                break;
            case "NPCs":
                 update["sheet_type"] = "npc";
@@ -1259,62 +1233,62 @@ var handle_drop = function(eventinfo) {
                 update["size"] = page.data["Size"];
                 update["shield_health_level"] = page.data["Shield Health Levels"];
                 update["shield_health_level_max"] = page.data["Shield Health Levels"];
-                var abilityArray = JSON.parse(page.data["data-Ability"]);
+                const abilityArray = JSON.parse(page.data["data-Ability"]);
                 abilityArray.forEach(function(ability) {
-                    var id = generateRowID();
-                    update["repeating_abilities_" + id + "_ability"] = ability.Ability;
-                    update["repeating_abilities_" + id + "_description"] = ability.Description;
-                    update["repeating_abilities_" + id + "_special_ability_flag"] = "false";
+                    const id = generateRowID();
+                    update[`repeating_abilities_${id}_ability`] = ability.Ability;
+                    update[`repeating_abilities_${id}_description`] = ability.Description;
+                    update[`repeating_abilities_${id}_special_ability_flag`] = "false";
                 });
-                var attackArray = JSON.parse(page.data["data-Attacks"]);
+                const attackArray = JSON.parse(page.data["data-Attacks"]);
                 attackArray.forEach(function(attack) {
-                    var id = generateRowID();
-                    update["repeating_attacks_" + id + "_attack"] = attack.Attack;
-                    update["repeating_attacks_" + id + "_complexity"] = attack.Complexity;
-                    update["repeating_attacks_" + id + "_details"] = attack.Hit;
-                    update["repeating_attacks_" + id + "_range"] = attack.Range;
-                    update["repeating_attacks_" + id + "_type"] = attack.Type;
-                    update["repeating_attacks_" + id + "_attacks_flag"] = "false";
+                    const id = generateRowID();
+                    update[`repeating_attacks_${id}_attack`] = attack.Attack;
+                    update[`repeating_attacks_${id}_complexity`] = attack.Complexity;
+                    update[`repeating_attacks_${id}_details`] = attack.Hit;
+                    update[`repeating_attacks_${id}_range`] = attack.Range;
+                    update[`repeating_attacks_${id}_type`] = attack.Type;
+                    update[`repeating_attacks_${id}_attacks_flag`] = "false";
                 });
                 if (page.data["data-Equipment"]) {
-                    var equipmentArray = JSON.parse(page.data["data-Equipment"]);
+                    const equipmentArray = JSON.parse(page.data["data-Equipment"]);
                     getCompendiumPage(equipmentArray, function(items) {
                         makeItem(items);
                     });
                 };
-                var makeItem = function(items) {
-                    var newItem = {};
+                const makeItem = function(items) {
+                    let newItem = {};
                     if (items.length > 1) {
                         _.each(items, function(item) {
-                            var id = generateRowID();
-                            newItem["repeating_items_" + id + "_item"] = item["name"];
-                            newItem["repeating_items_" + id + "_items_flag"] = "false";
+                            const id = generateRowID();
+                            newItem[`repeating_items_${id}_item`] = item["name"];
+                            newItem[`repeating_items_${id}_items_flag`] = "false";
                             (item.data["Item Subcategory"] === undefined || item.data["Item Subcategory"] === "") ?
-                                newItem["repeating_items_" + id + "_type"] = item.data["Item Category"] :
-                                newItem["repeating_items_" + id + "_type"] = item.data["Item Category"] + ", " + item.data["Item Subcategory"];
+                                newItem[`repeating_items_${id}_type`] = item.data["Item Category"] :
+                                newItem[`repeating_items_${id}_type`] = `${item.data["Item Category"]}, ${item.data["Item Subcategory"]}`;
                             (item.data["data-Charges"] === undefined || item.data["data-Charges"] === "") ?
-                                newItem["repeating_items_" + id + "_health"] = 0 :
-                                newItem["repeating_items_" + id + "_health"] = item.data["data-Charges"];
+                                newItem[`repeating_items_${id}_health`] = 0 :
+                                newItem[`repeating_items_${id}_health`] = item.data["data-Charges"];
                             (item.data["data-Charges"] === undefined || item.data["data-Charges"] === "") ?
-                                newItem["repeating_items_" + id + "_health_max"] = 0 :
-                                newItem["repeating_items_" + id + "_health_max"] = item.data["data-Charges"];
-                            (item.data["Description"] === undefined || item.data["Description"] === "") ? console.log("no Description") : newItem["repeating_items_" + id + "_description"] = item.data["Description"];
-                            (item.data["Qualities"] === undefined || item.data["Qualities"] === "") ? console.log("no Qualities") : newItem["repeating_items_" + id + "_qualities"] = item.data["Qualities"];
+                                newItem[`repeating_items_${id}_health_max`] = 0 :
+                                newItem[`repeating_items_${id}_health_max`] = item.data["data-Charges"];
+                            (item.data["Description"] === undefined || item.data["Description"] === "") ? console.log("no Description") : newItem[`repeating_items_${id}_description`] = item.data["Description"];
+                            (item.data["Qualities"] === undefined || item.data["Qualities"] === "") ? console.log("no Qualities") : newItem[`repeating_items_${id}_qualities`] = item.data["Qualities"];
                         });
                     } else {
-                        newItem["repeating_items_" + id + "_item"] = items["name"];
-                        newItem["repeating_items_" + id + "_items_flag"] = "false";
+                        newItem[`repeating_items_${id}_item`] = items["name"];
+                        newItem[`repeating_items_${id}_items_flag`] = "false";
                         (items.data["Item Subcategory"] === undefined || items.data["Item Subcategory"] === "") ?
-                            newItem["repeating_items_" + id + "_type"] = items.data["Item Category"] :
-                            newItem["repeating_items_" + id + "_type"] = items.data["Item Category"] + ", " + items.data["Item Subcategory"];
+                            newItem[`repeating_items_${id}_type`] = items.data["Item Category"] :
+                            newItem[`repeating_items_${id}_type`] = `${items.data["Item Category"]}, ${items.data["Item Subcategory"]}`;
                         (items.data["data-Charges"] === undefined || items.data["data-Charges"] === "") ?
-                            newItem["repeating_items_" + id + "_health"] = 0 :
-                            newItem["repeating_items_" + id + "_health"] = items.data["data-Charges"];
+                            newItem[`repeating_items_${id}_health`] = 0 :
+                            newItem[`repeating_items_${id}_health`] = items.data["data-Charges"];
                         (items.data["data-Charges"] === undefined || items.data["data-Charges"] === "") ?
-                            newItem["repeating_items_" + id + "_health_max"] = 0 :
-                            newItem["repeating_items_" + id + "_health_max"] = items.data["data-Charges"];
-                        (items.data["Description"] === undefined || items.data["Description"] === "") ? console.log("no Description") : newItem["repeating_items_" + id + "_description"] = items.data["Description"];
-                        (items.data["Qualities"] === undefined || items.data["Qualities"] === "") ? console.log("no Qualities") : newItem["repeating_items_" + id + "_qualities"] = items.data["Qualities"];
+                            newItem[`repeating_items_${id}_health_max`] = 0 :
+                            newItem[`repeating_items_${id}_health_max`] = items.data["data-Charges"];
+                        (items.data["Description"] === undefined || items.data["Description"] === "") ? console.log("no Description") : newItem[`repeating_items_${id}_description`] = items.data["Description"];
+                        (items.data["Qualities"] === undefined || items.data["Qualities"] === "") ? console.log("no Qualities") : newItem[`repeating_items_${id}_qualities`] = items.data["Qualities"];
                     };
                     setAttrs(newItem);
                 };
@@ -1323,8 +1297,8 @@ var handle_drop = function(eventinfo) {
        {cleanup_drop_fields()};
    });
 };
-var cleanup_drop_fields = function() {
-   var update = [];
+const cleanup_drop_fields = function() {
+   let update = [];
    update["drop_category"] = "";
    update["drop_name"] = "";
    update["drop_data"] = "";
@@ -1333,14 +1307,14 @@ var cleanup_drop_fields = function() {
 };
 on("sheet:compendium-drop", function() {
    getAttrs(["size", "health_level_max", "health_level", "shield_health_level", "shield_health_level_max"], function(v) {
-       var default_attr = {};
+       let default_attr = {};
        default_attr["width"] = 70;
        default_attr["height"] = 70;
        if(v["size"]) {
-           var squarelength = 70;
+           const squarelength = 70;
            if(v["size"].includes("or")) {
-               var setwidth = !isNaN(v["size"][0]) ? v["size"][0] : 1;
-               var setheight = !isNaN(v["size"][0]) ? v["size"][0] : 1;
+               const setwidth = !isNaN(v["size"][0]) ? v["size"][0] : 1;
+               const setheight = !isNaN(v["size"][0]) ? v["size"][0] : 1;
                default_attr["width"] = setwidth * squarelength;
                default_attr["height"] = setheight * squarelength;
            }
