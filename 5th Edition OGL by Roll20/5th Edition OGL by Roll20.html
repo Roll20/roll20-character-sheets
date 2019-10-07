@@ -15745,6 +15745,44 @@
         }
     });
 
+    //UC23: When choosing a class feature, previously selected choices should be disabled.
+    //We should evaluate expading this to other features. Should not be that difficult. I Guess ;)
+    //By Miguel
+    on("mancerchange:repeating_row", function(eventinfo) {
+      if(eventinfo.currentStep !== "lp-choices") return;
+      if(eventinfo.sourceAttribute.indexOf("feature_choice") === -1 && eventinfo.sourceAttribute.indexOf("feature_info") === -1) return;
+      var data = getCharmancerData();
+      var traits = JSON.parse(data["lp-welcome"].values.previous_repeating).traits || [];
+      var manuevers = [];
+      //Previous Levels
+      var traitType = "Manuever: ";
+      for(trait in traits) {
+        if(traits[trait].name.indexOf(traitType) > -1) {
+          var manuever = traits[trait].name.replace(traitType, "");
+          manuevers.push("Blob:"+manuever);
+        }
+      }
+      //Current LP
+      var choices = data["lp-choices"].repeating || [];
+      for(choice in choices) {
+        if(choices[choice].match(/repeating_-.+_subclass-.+--.+_feature/g)) {
+          if(choices[choice]+"_choice" in data["lp-choices"].values) {
+            manuevers.push(data["lp-choices"].values[choices[choice]+"_choice"]);
+          }
+        }
+      }
+      //Disable elements
+      for(choice in choices) {
+        if(choices[choice].match(/repeating_-.+_subclass-.+--.+_feature/g)) {
+          disableCharmancerOptions(choices[choice]+"_choice", ""); //Enable All
+          disableCharmancerOptions(choices[choice]+"_choice", manuevers);
+        }
+      }
+    });
+    //This could probably be hoocked here also.
+    //on("page:lp-choices", function(eventinfo) {
+    //});
+
     on("mancerchange:repeating_asi-row", function(eventinfo) {
         var trigger = eventinfo.sourceAttribute.substr(39);
         if(trigger == "switch") {
