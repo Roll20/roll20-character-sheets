@@ -1,3 +1,4 @@
+<input type="hidden" name="attr_version" value="2.0" />
 <!-- ~~~~~~~~ Character Sheet Page, default view ~~~~~~~~ -->    
 	<input class="sheet_type" name="attr_sheet_type" type="hidden" value="pc">
 <!-- ~~~~~~~~ Show & hide optional Magic & Resonance areas ~~~~~~~~ --> 
@@ -8,7 +9,7 @@
 <!-- ~~~~~~~~+:+:::::+:+::+:+:::::+:+::+:+:+::+:+:+:+::+:+:::::+:+:::::+:+:+:+:::::+:+::+:+:+::+:+:+:+::+::+:+:+~~~~~~~~ -->
 <div class="tabs">
 	<div class="info-box">
-		<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadowrun5thEdition/ShadowrunLogo.png" style="max-height: 200px;" />
+		<img alt="Shadowrun black and metallic logo" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadowrun5thEdition/images/ShadowrunLogo.png" style="max-height: 200px;" />
 		<div>
 			<h1 data-i18n="character">Character</h1><input type="text" name="attr_character_name" placeholder="Character name" title="@{character_name}" />
 			<h1 data-i18n="player">Player</h1><input type="text" name="attr_player_name" placeholder="Player name" title="@{player_name}" />
@@ -20,7 +21,7 @@
 	<div class="tab-toggles">
 		<input type="hidden" name="attr_wound_toggle" value="@{wounds}" /><button type="action" name="act_wound" title="@{wound_toggle}" data-i18n="wounds">wounds</button>
 		<input type="hidden" name="attr_modifier_toggle" value="?{Modifiers +/-|0}" /><button type="action" name="act_modifier" title="@{modifier_toggle}" data-i18n="modifiers">modifiers</button>
-		<input type="hidden" name="attr_edge_toggle" value="@{edge}" /><button type="action" name="act_edge" title="@{edge_toggle}" data-i18n="edge">edge</button>
+		<input type="hidden" name="attr_edge_toggle" value="" /><button type="action" name="act_edge" title="@{edge_toggle}" data-i18n="edge">edge</button>
 		<button type="roll" value="@{gm_toggle} &{template:rolls}{{header=^{d6}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5)]]}}" title="Roll D6s"><span class="d6">L</span></button>
 	</div>
 	<div class="tab-col">
@@ -224,7 +225,7 @@
 							<div class="settings">
 								<input type="number" name="attr_initiative_modifier" value="0" placeholder="0" title="@{initiative_modifier}" /><span class="tiny-span"> + </span>
 								<input type="number" name="attr_initiative_dice_modifier" value="0" min="0" max="4" placeholder="modifier" title="@{initiative_dice_modifier}" />
-								<span class="tiny-span "data-i18n="d6"> d6</span><span class="tiny-span"> = </span>
+								<span class="tiny-span" data-i18n="d6"> d6</span><span class="tiny-span"> = </span>
 								<span name="attr_display_initiative_mod"></span><span class="tiny-span" title="@{initiative_mod}"> + </span>
 								<span name="attr_initiative_dice"></span><span class="tiny-span" title="@{initiative_dice}" data-i18n="d6"> d6</span>
 							</div>
@@ -399,12 +400,15 @@
 			<div class="border-box repeat-box skill-box">
 				<div class="pc-box medium-box">
 					<div class="row-long">
-						<h3 data-i18n="skill">Skill</h3><h3 data-i18n="rtg">RTG</h3><h3 data-i18n="attribute">Attribute</h3>
+						<h3 data-i18n="skill">Skill</h3>
+						<h3 data-i18n="rtg">RTG</h3>
+						<h3 data-i18n="attribute">Attribute</h3>
+						<h3 data-i18n="limit">Limit</h3>
 					</div>
 					<input class="tab-switch" type="hidden" name="attr_skill_toggle" value="active">
 					<div class="skills-active">
 						<div class="row-long">
-							<div class="name" style="width: 81%;">
+							<div class="name" style="width: 61%;">
 								<button type="roll" name="default" value="@{gm_toggle} &{template:rolls}{{header=^{default}}}{{base=@{default_display}}}{{dice=[[((@{default_attribute}+-1)+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" ><span data-i18n="default">Default a skill</span></button>
 							</div>
 							<input type="hidden" name="attr_default_display" />
@@ -420,9 +424,21 @@
 								<option value="@{magic}" data-i18n="magic">Magic</option>
 								<option value="@{resonance}" data-i18n="resonance">Resonance</option>
 							</select>
+							<select class="limit-select" name="attr_limit" title="Skill limit">
+								<option value="none">-</option>
+								<option value="@{mental_limit}" data-i18n="mental" selected>Mental</option>
+								<option value="@{physical_limit}" data-i18n="physical">Physical</option>
+								<option value="@{social_limit}" data-i18n="social">Social</option>
+								<option value="@{attack}" data-i18n="attack">Attack</option>
+								<option value="@{data_processing}" data-i18n="data_processing">Data Processing</option>
+								<option value="@{firewall}" data-i18n="firewall">Firewall</option>
+								<option value="@{sleaze}" data-i18n="sleaze">Sleaze</option>
+							</select>
 						</div>
 						<fieldset class="repeating_active">
-							<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
+							<input type="hidden" name="attr_display_rating" />
+							<input type="hidden" name="attr_display_specialization" />
 							<div class="settings">
 								<div class="skills-row">
 									<input type="hidden" name="attr_dicepool" />
@@ -535,8 +551,8 @@
 							</div>
 							<div class="display">
 								<div class="name">
-									<button type="roll" name="skill" value="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[((@{dicepool}+@{attribute})+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" ><span name="attr_display"></span></button>
-									<button class="spec-button" name="specialization" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[(@{dicepool}+@{attribute}+2+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Spec: @{specialization}}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}"><span name="attr_display_specialization"></span></button>
+									<button type="roll" name="skill" value="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}{{desc=@{display_limit}}}{{dice=[[((@{dicepool}+@{attribute})+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" ><span name="attr_display"></span></button>
+									<button class="spec-button" name="specialization" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}@{display_limit}{{dice=[[(@{dicepool}+@{attribute}+2+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Spec: @{specialization}, @{display_limit}}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}"><span name="attr_display_specialization"></span></button>
 								</div>
 								<div class="rank"><span name="attr_display_rating" title="Skill rating"></span></div>
 							</div>
@@ -553,11 +569,25 @@
 								<option value="@{magic}" data-i18n="magic">Magic</option>
 								<option value="@{resonance}" data-i18n="resonance">Resonance</option>
 							</select>
+							<input type="hidden" name="attr_display_limit" value="" />
+							<select class="attr-select" name="attr_limit" title="Skill limit">
+								<option value="none" selected>-</option>
+								<option value="@{mental_limit}" data-i18n="mental">Mental</option>
+								<option value="@{physical_limit}" data-i18n="physical">Physical</option>
+								<option value="@{social_limit}" data-i18n="social">Social</option>
+								<option value="@{attack}" data-i18n="attack">Attack</option>
+								<option value="@{data_processing}" data-i18n="data_processing">Data Processing</option>
+								<option value="@{firewall}" data-i18n="firewall">Firewall</option>
+								<option value="@{sleaze}" data-i18n="sleaze">Sleaze</option>
+							</select>
+							<button class="pictos" name="act_skill" type="action">x</button>
 						</fieldset>
 					</div>
 					<div class="skills-know">
 						<fieldset class="repeating_knowledge">
-							<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
+							<input type="hidden" name="attr_display_rating" />
+							<input type="hidden" name="attr_display_specialization" />
 							<div class="settings">
 								<div class="skills-row">
 									<input type="hidden" name="attr_dicepool"/>
@@ -573,8 +603,8 @@
 							</div>
 							<div class="display">
 								<div class="name">
-									<button type="roll" name="knowledge" value="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[(@{dicepool}+@{attribute}+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}"><span name="attr_display"></span></button>
-									<button class="spec-button" name="knowledge specialization" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[(@{dicepool}+@{attribute}+2+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Spec: @{specialization}}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}"><span name="attr_display_specialization"></span></button>
+									<button type="roll" name="knowledge" value="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}{{desc=@{display_limit}}}{{dice=[[(@{dicepool}+@{attribute}+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}"><span name="attr_display"></span></button>
+									<button class="spec-button" name="knowledge specialization" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[(@{dicepool}+@{attribute}+2+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Spec: @{specialization}, @{display_limit}}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}"><span name="attr_display_specialization"></span></button>
 								</div>
 								<div class="rank"><span name="attr_display_rating" title="Skill rating"></span></div>
 							</div>
@@ -591,11 +621,25 @@
 								<option value="@{magic}" data-i18n="magic">Magic</option>
 								<option value="@{resonance}" data-i18n="resonance">Resonance</option>
 							</select>
+							<input type="hidden" name="attr_display_limit" value="^{mental} ^{limit} @{mental_limit}" />
+							<select class="attr-select" name="attr_limit" title="Skill limit">
+								<option value="none">-</option>
+								<option value="@{mental_limit}" data-i18n="mental" selected>Mental</option>
+								<option value="@{physical_limit}" data-i18n="physical">Physical</option>
+								<option value="@{social_limit}" data-i18n="social">Social</option>
+								<option value="@{attack}" data-i18n="attack">Attack</option>
+								<option value="@{data_processing}" data-i18n="data_processing">Data Processing</option>
+								<option value="@{firewall}" data-i18n="firewall">Firewall</option>
+								<option value="@{sleaze}" data-i18n="sleaze">Sleaze</option>
+							</select>
+							<button class="pictos" name="act_skill" type="action">x</button>
 						</fieldset>
 					</div>
 					<div class="skills-lang">
 						<fieldset class="repeating_language">
-							<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
+							<input type="hidden" name="attr_display_rating" />
+							<input type="hidden" name="attr_display_specialization" />
 							<div class="settings">
 								<div class="skills-row">
 									<input type="hidden" name="attr_dicepool" />
@@ -611,8 +655,8 @@
 							</div>
 							<div class="display">
 								<div class="name">
-									<button type="roll" name="language" value="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[((@{dicepool}+@{attribute})+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}"><span name="attr_display"></span></button>
-									<button class="spec-button" name="language specialization" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[(@{dicepool}+@{attribute}+2+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Spec: @{specialization}}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}"><span name="attr_display_specialization"></span></button>
+									<button type="roll" name="language" value="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}{{desc=@{display_limit}}}{{dice=[[((@{dicepool}+@{attribute})+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}"><span name="attr_display"></span></button>
+									<button class="spec-button" name="language specialization" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[(@{dicepool}+@{attribute}+2+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Spec: @{specialization}, @{display_limit}}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}"><span name="attr_display_specialization"></span></button>
 								</div>
 								<div class="rank"><span name="attr_display_rating" title="Skill rating"></span></div>
 							</div>
@@ -629,6 +673,18 @@
 								<option value="@{magic}" data-i18n="magic">Magic</option>
 								<option value="@{resonance}" data-i18n="resonance">Resonance</option>
 							</select>
+							<input type="hidden" name="attr_display_limit" value="^{social} ^{limit} @{mental_limit}" />
+							<select class="attr-select" name="attr_limit" title="Skill limit">
+								<option value="none">-</option>
+								<option value="@{mental_limit}" data-i18n="mental">Mental</option>
+								<option value="@{physical_limit}" data-i18n="physical">Physical</option>
+								<option value="@{social_limit}" data-i18n="social" selected>Social</option>
+								<option value="@{attack}" data-i18n="attack">Attack</option>
+								<option value="@{data_processing}" data-i18n="data_processing">Data Processing</option>
+								<option value="@{firewall}" data-i18n="firewall">Firewall</option>
+								<option value="@{sleaze}" data-i18n="sleaze">Sleaze</option>
+							</select>
+							<button class="pictos" name="act_skill" type="action">x</button>
 						</fieldset>
 					</div>
 				</div>
@@ -663,7 +719,7 @@
 						<!-- Ammo removal button -->
 						<button name="act_shots_remove" type="action">4</button>
 						<button type="action" name="act_primary_ammo" title="Shots Fired">
-							<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadowrun5thEdition/gun.png" /><span name="attr_shots_fired"></span>
+							<img alt="small handgun icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadowrun5thEdition/images/gun.png" /><span name="attr_shots_fired"></span>
 						</button>
 						<button name="act_shots_add" type="action">4</button>
 					</div>
@@ -691,7 +747,7 @@
 				</div>
 			</div>
 		</div>
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ START OF THE CONDITION MONITOR ROW  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+		<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ START OF THE CONDITION MONITOR ROW  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 		<div class="pc-row">
 			<div class="header right-header"><h1 data-i18n="conditionmonitor">Condition Monitor</h1><div class="right-tri"></div></div>
 			<div class="border-box">
@@ -770,7 +826,7 @@
 				</div>
 			</div>
 		</div><!-- ~~~~~~~~ End of Condition Monitor ~~~~~~~~ -->
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ START OF THE QUALITY ROW ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+		<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ START OF THE QUALITY ROW ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 		<div class="pc-row quality-box">
 			<div class="header right-header htab">
 				<input class="tab-switch" type="radio" name="attr_quality_toggle" value="quality" checked="checked" title="Qualities" />
@@ -791,10 +847,10 @@
 							<h3 data-i18n="quality">Quality</h3><h3 data-i18n="type">Type</h3>
 						</div>
 						<fieldset class="repeating_quality">
-							<input type="hidden" class="settings-toggle" name="attr_flag_quality" value="settings" />
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 							<button class="pictos" name="quality_chat" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{quality}}}{{desc=@{notes}}}">w</button>
-							<button class="pictos" name="act_quality" type="action">x</button>
-							<div class="settings"style="margin-left: 0px;"><!-- Remove this when all repeat boxes updated -->
+							<button class="pictos settings-button" name="act_quality" type="action">x</button>
+							<div class="settings"style="margin-left: 0px;">
 								<div>
 									<input type="text" name="attr_quality" placeholder="Quality name" title="Quality name" />
 									<select name="attr_type" title="Positive or Negative quality">
@@ -822,7 +878,7 @@
 							<h3 data-i18n="technique">Technique</h3><h3 data-i18n="style">Style</h3>
 						</div>
 						<fieldset class="repeating_martial">
-							<input type="checkbox" class="settings-toggle" name="attr_flag_martial" checked="checked" title="Marital settings" /><span>x</span>
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 							<div class="settings">
 								<div>
 									<input type="text" name="attr_technique" placeholder="Clinch" title="Technique name" />
@@ -841,6 +897,7 @@
 									<span class="desc" name="attr_notes"></span>
 								</div>
 							</div>
+							<button class="pictos settings-button" name="act_martial" type="action">x</button>
 						</fieldset>
 					</div>
 				</div>
@@ -871,7 +928,7 @@
 					</div>
 					<div class="weapon-range">
 						<fieldset class="repeating_range">
-							<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" value="primary" /><span>x</span>
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 							<div class="settings">
 								<div>
 									<input type="text" name="attr_weapon" placeholder="Ares Alpha" title="Weapon name" />
@@ -912,7 +969,7 @@
 										<label data-i18n="modifierdice">modifier dice</label><input type="number" name="attr_dicepool_modifier" title="Additional dicepool bonus" />
 										<input class="skill-select" type="hidden" name="attr_skill" /><br />
 										<div class="exotic-warning">
-											<span><i data-i18n="exoticnote">Exotics are not linked to skills. Use modifier Dice input to set skill dice.</i></span>
+											<span><i data-i18n="exoticnote">Exotics are not linked to skills. Use Modifier Dice input to set skill dice.</i></span>
 										</div>
 									</div>
 									<div class="settings-row">
@@ -945,6 +1002,7 @@
 									<div class="desc"><span name="attr_notes"></span></div>
 								</div>
 							</div>
+							<button class="pictos settings-button" name="act_range" type="action">x</button>
 						</fieldset>
 					</div>
 					<div class="weapon-melee row-long">
@@ -952,7 +1010,7 @@
 					</div>
 					<div class="weapon-melee">
 						<fieldset class="repeating_melee">
-							<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 							<div class="settings">
 								<div>
 									<input type="text" name="attr_weapon" placeholder="Katana" title="Weapon name" />
@@ -963,7 +1021,7 @@
 									<label data-i18n="primary">Primary</label><input type="checkbox" class="skill-select" name="attr_primary" value="primary" title="Add to Core tab as primary melee"/>
 									<div class="settings-row">
 										<input type="hidden" name="attr_dicepool" value="0" />
-										<label data-i18n="primary">Primary</label>
+										<label data-i18n="combatskill">Combat Skill</label>
 										<select class="skill-select" name="attr_skill" title="Weapon skill">
 											<option class="option-headers" disabled="true" data-i18n="combatskills">Combat Skills</option>
 											<option class="option-groups" value="@{closecombat}" data-i18n="closecombat">Close Combat Group</option>
@@ -977,7 +1035,7 @@
 										<label data-i18n="specializations">Specialization</label><input class="skill-select" type="checkbox" name="attr_spec" value="+2" title="Applicable specialization"/>
 										<label data-i18n="modifierdice">modifier dice</label><input type="number" name="attr_dicepool_modifier" title="Additional dicepool bonus"/>
 										<div class="exotic-warning">
-											<span><i data-i18n="exoticnote">Exotic weapons are currently not linked to the skills section. Use modifier Dice input to set dicepool.</i></span>
+											<span><i data-i18n="exoticnote">Exotic weapons are currently not linked to the skills section. Use Modifier Dice input to set dicepool.</i></span>
 										</div>
 									</div>
 									<div class="settings-row">
@@ -1000,6 +1058,7 @@
 									<div class="desc"><span name="attr_notes"></span></div>
 								</div>
 							</div>
+							<button class="pictos settings-button" name="act_melee" type="action">x</button>
 						</fieldset>
 					</div>
 				</div>
@@ -1013,7 +1072,7 @@
 						<h3 data-i18n="armor">Armor</h3><h3 data-i18n="rating">Rating</h3><h3 data-i18n="acid">Acid</h3><h3 data-i18n="cold">Cold</h3><h3 data-i18n="elec">Elec.</h3><h3 data-i18n="fire">Fire</h3><h3 data-i18n="radi">Radi.</h3>
 					</div>
 					<fieldset class="repeating_armor">
-						<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+						<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 						<div class="settings">
 							<div>
 								<input type="text" name="attr_name" placeholder="Armor Jacket" title="Armor name" />
@@ -1062,6 +1121,7 @@
 								<div class="desc"><span name="attr_notes"></span></div>
 							</div>
 						</div>
+						<button class="pictos settings-button" name="act_armor" type="action">x</button>
 					</fieldset>
 				</div>
 			</div>
@@ -1077,7 +1137,7 @@
 						<h3 data-i18n="augmentations">Augementation</h3><h3 data-i18n="rating">Rating</h3><h3 data-i18n="essence">Essence</h3>
 					</div>
 					<fieldset class="repeating_augementations">
-						<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+						<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 						<div class="settings">
 							<div> 
 								<input type="text" name="attr_augmentation" placeholder="Augementation" title="Augementation name" />
@@ -1096,6 +1156,7 @@
 								<div class="desc"><span name="attr_notes"></span></div>
 							</div>
 						</div>
+						<button class="pictos settings-button" name="act_augementations" type="action">x</button>
 					</fieldset>
 				</div>
 			</div>
@@ -1110,7 +1171,7 @@
 					<h3 data-i18n="item">Item</h3><h3 data-i18n="rating">Rating</h3>
 				</div>
 				<fieldset class="repeating_items">
-					<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+					<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 					<div class="settings">
 						<div>
 							<input type="text" name="attr_item" placeholder="Item name" title="Item name" />
@@ -1127,6 +1188,7 @@
 							<div class="desc"><span name="attr_notes"></span></div>
 						</div>
 					</div>
+					<button class="pictos settings-button" name="act_items" type="action">x</button>
 				</fieldset>
 			</div>
 		</div>
@@ -1157,7 +1219,7 @@
 					</div>
 					<div class="magic-spells">
 						<fieldset class="repeating_spell">
-							<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle"  /><span>x</span>
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 							<div class="settings">
 								<div>
 									<input type="text" name="attr_name" placeholder="Fireball" title="Spell name" />
@@ -1232,11 +1294,12 @@
 									<div class="desc"><span name="attr_notes"></span></div>
 								</div>
 							</div>
+							<button class="pictos settings-button" name="act_spell" type="action">x</button>
 						</fieldset>
 					</div>
 					<div class="magic-preps">
 						<fieldset class="repeating_preps">
-							<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 							<div class="settings">
 								<div>
 									<input type="text" name="attr_name" placeholder="Fireball" title="Spell name" />
@@ -1308,11 +1371,12 @@
 									<div class="desc"><span name="attr_notes"></span></div>
 								</div>
 							</div>
+							<button class="pictos settings-button" name="act_preps" type="action">x</button
 						</fieldset>
 					</div>
 					<div class="magic-rituals">
 						<fieldset class="repeating_ritual">
-							<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+							<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 							<div class="settings">
 								<div>
 									<input type="text" name="attr_name" placeholder="Curse (MATERIAL LINK, SPELL)" title="Ritual name" />
@@ -1339,12 +1403,13 @@
 									<div class="desc"><span name="attr_notes"></span></div>
 								</div>
 							</div>
+							<button class="pictos settings-button" name="act_ritual" type="action">x</button>
 						</fieldset>
 					</div>
 				</div>
 			</div>
 		</div>
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ START OF THE POWERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+		<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ START OF THE POWERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 		<div class="pc-row">
 			<div class="header right-header"><h1>Adept Powers or Other Abilities</h1><div class="right-tri"></div></div>
 			<div class="border-box repeat-box powers-box">
@@ -1353,7 +1418,7 @@
 						<h3>Name</h3><h3>Rating</h3>
 					</div>
 					<fieldset class="repeating_powers">
-						<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+						<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 						<div class="settings">
 							<div>
 								<input type="text" name="attr_name" placeholder="Adept powers or other ability" title="Ability or power name" />
@@ -1370,6 +1435,7 @@
 								<div class="desc"><span name="attr_notes"></span></div>
 							</div>
 						</div>
+						<button class="pictos settings-button" name="act_powers" type="action">x</button>
 					</fieldset>
 				</div>
 			</div>
@@ -1437,7 +1503,7 @@
 						</div>
 					</div>
 					<div class="row-long">
-						<label><button type="roll" name="data processing" value="&{template:rolls}{{header=^{dataprocessing}}}{{base=^{base}}}{{dice=[[(@{data_processing}+(?{Attribute|Willpower,@{willpower}|Logic,@{logic}|Intuition,@{intuition}})+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Roll data processing" data-i18n="dataproc">Data Proc.</button></label>
+						<label><button type="roll" name="data processing" value="&{template:rolls}{{header=^{data_processing}}}{{base=^{base}}}{{dice=[[(@{data_processing}+(?{Attribute|Willpower,@{willpower}|Logic,@{logic}|Intuition,@{intuition}})+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Roll data processing" data-i18n="dataproc">Data Proc.</button></label>
 						<div class="matrix-tot" title="@{data_processing}" ><span name="attr_data_processing"></span></div><span> = </span>
 						<input type="number" name="attr_data_processing_temp" min="0" alue="" placeholder="0" title="@{data_processing_temp}" /><spam> + </spam>
 						<input type="number" name="attr_data_processing_modifier" min="0" value="" placeholder="0" title="@{data_processing_modifier}" /><spam> + </spam>
@@ -1525,7 +1591,7 @@
 						<h3 data-i18n="complexform">Complex Form</h3><h3 data-i18n="target">Target</h3><h3 data-i18n="duration">Duration</h3><h3 data-i18n="fade">Fade</h3>
 					</div>
 					<fieldset class="repeating_forms">
-						<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+						<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 						<div class="settings">
 							<div> 
 								<input type="text" name="attr_name" placeholder="Editor" title="Complex Form name" />
@@ -1573,6 +1639,7 @@
 								<div class="desc"><span name="attr_notes"></span></div>
 							</div>
 						</div>
+						<button class="pictos settings-button" name="act_forms" type="action">x</button>
 					</fieldset>
 				</div>
 			</div>
@@ -1591,7 +1658,7 @@
 						<h3 data-i18n="fakeidsrelated">Fake IDs / Related Lifestyles / Funds / Licenses</h3>
 					</div>
 					<fieldset class="repeating_lifestyle">
-						<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+						<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 						<div class="settings">
 							<div>
 								<h3 data-i18n="fakeid">Fake ID</h3><textarea name="attr_name" placeholder="John Doe" title="Fake ID"></textarea>
@@ -1602,12 +1669,14 @@
 						</div>
 						<div class="display">
 							<input class="display-flag" type="checkbox" name="attr_display_flag" />
-							<span name="attr_display" style="width: 100%;"></span>
-							<span name="attr_name" title="Fake ID"></span>
-							<span name="attr_lifestyle" title="Related lifestyle"></span>
-							<span name="attr_funds" title="Funds"></span>
-							<span name="attr_licenses" title="Licenses"></span>
+							<div class="display-row" title="Fake ID"><span name="attr_name"></span></div>
+							<div class="collapsable">
+								<em><span class="desc-lifestyle" name="attr_lifestyle"></span></em>
+								<span class="desc-lifestyle" name="attr_funds"></span>
+								<span class="desc-lifestyle" name="attr_licenses"></span>
+							</div>
 						</div>
+						<button class="pictos settings-button" name="act_lifestyle" type="action">x</button>
 					</fieldset>
 				</div>
 			</div>
@@ -1621,7 +1690,7 @@
 						<h3 data-i18n="name">Name</h3><h3 data-i18n="loyalty">Loyalty</h3><h3 data-i18n="connection">Connection</h3><h3 data-i18n="favor">Favor</h3>
 					</div>
 					<fieldset class="repeating_contacts">
-						<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+						<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 						<div class="settings">
 							<div>
 								<input type="text" name="attr_name" placeholder="Old Crow" title="Contact name" />
@@ -1642,6 +1711,7 @@
 								<div class="desc" title="Notes"><span name="attr_notes"></span></div>
 							</div>
 						</div>
+						<button class="pictos settings-button" name="act_contacts" type="action">x</button>
 					</fieldset>
 				</div>
 			</div>
@@ -1654,13 +1724,12 @@
 			<div class="border-box repeat-box vehicle-box">
 				<div class="pc-box medium-box">
 					<fieldset class="repeating_vehicle">
-						<input type="checkbox" class="settings-toggle" name="attr_flag" checked="checked" title="Settings toggle" /><span>x</span>
+						<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 						<div class="settings">
 							<div>
 								<div class="row-long">
 									<label data-i18n="name">Name</label>
 									<input type="text" name="attr_name" placeholder="name" title="Vehicle name" />
-									<input type="hidden" name="attr_display_name" />
 									<label data-i18n="handling">Handling</label>
 									<input type="hidden" name="attr_handling" />
 									<input type="number" name="attr_handling_base" placeholder="#" title="Handling base" />
@@ -1711,7 +1780,9 @@
 									<input type="hidden" name="attr_display_sensor" placeholder="#" />
 								</div>
 								<div class="row-long">
-									<h3 data-i18n="base">Base</h3><h3 data-i18n="modifier">Modifier</h3><h3 data-i18n="temp">Temp</h3><h3 data-i18n="base">Base</h3><h3 data-i18n="modifier">Modifier</h3><h3 data-i18n="temp">Temp</h3>
+									<h3 data-i18n="base">Base</h3><h3 data-i18n="modifier">Modifier</h3>
+									<h3 data-i18n="temp">Temp</h3><h3 data-i18n="base">Base</h3>
+									<h3 data-i18n="modifier">Modifier</h3><h3 data-i18n="temp">Temp</h3>
 								</div>
 								<h3 data-i18n="notes">Notes</h3>
 								<textarea name="attr_notes" value="" placeholder="Notes"></textarea>
@@ -1720,25 +1791,66 @@
 						<div class="display">
 							<input class="display-flag" type="checkbox" name="attr_display_flag" />
 							<div class="row-long">
-								<div class="display-row" title="Vehicle"><h3 data-i18n="vehicle">Vehicle</h3><div><span name="attr_display_name"></span></div></div>
-								<div class="display-row" title="Handling"><h3 data-i18n="handling">Handling</h3><div><span name="attr_display_handling"></span></div></div>
+								<div class="display-row" title="Vehicle">
+									<h3 data-i18n="vehicle">Vehicle</h3>
+									<div>
+										<span name="attr_name"></span>
+									</div>
+								</div>
+								<div class="display-row" title="Handling">
+									<h3 data-i18n="handling">Handling</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_handling"></span>
+									</div>
+								</div>
 							</div>
 							<div class="row-long">
-								<div class="display-row" title="Acceleration"><h3 data-i18n="acceleration">Acceleration</h3><div><span name="attr_display_acceleration"></span></div></div>
-								<div class="display-row" title="Speed"><h3 data-i18n="speed">Speed</h3><div><span name="attr_display_speed"></span></div></div>
+								<div class="display-row" title="Acceleration">
+								<h3 data-i18n="acceleration">Acceleration</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_acceleration"></span>
+									</div>
+								</div>
+								<div class="display-row" title="Speed">
+									<h3 data-i18n="speed">Speed</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_speed"></span>
+									</div>
+								</div>
 							</div>
 							<div class="row-long">
-								<div class="display-row" title="Pilot"><h3 data-i18n="pilot">Pilot</h3><div><span name="attr_display_pilot"></span></div></div>
-								<div class="display-row" title="Body"><h3 data-i18n="body">Body</h3><div><span name="attr_display_body"></span></div></div>
+								<div class="display-row" title="Pilot">
+									<h3 data-i18n="pilot">Pilot</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_pilot"></span>
+									</div>
+								</div>
+								<div class="display-row" title="Body">
+									<h3 data-i18n="body">Body</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_body"></span>
+									</div>
+								</div>
 							</div>
 							<div class="row-long">
-								<div class="display-row" title="Armor"><h3 data-i18n="armor">Armor</h3><div><span name="attr_display_armor"></span></div></div>
-								<div class="display-row" title="Sensor"><h3 data-i18n="sensor">Sensor</h3><div><span name="attr_display_sensor"></span></div></div>
+								<div class="display-row" title="Armor">
+									<h3 data-i18n="armor">Armor</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_armor"></span>
+									</div>
+								</div>
+								<div class="display-row" title="Sensor">
+									<h3 data-i18n="sensor">Sensor</h3>
+									<div class="vehicle-stat">
+										<span name="attr_display_sensor"></span>
+									</div>
+								</div>
 							</div>
 							<div class="collapsable">  
 								<div class="desc"><span name="attr_notes"></span></div>
 							</div>
 						</div>
+						<button class="pictos settings-button" name="act_vehicle" type="action">x</button>
 					</fieldset>
 				</div>
 			</div>
@@ -1757,6 +1869,7 @@
 							<label data-i18n="awakened">Awakened</label><input class="character-type" type="checkbox" name="attr_flag_special" value="magic" title="@{flag_special}" /><br />
 							<label data-i18n="emerged">Emerged</label><input class="character-type" type="checkbox" name="attr_flag_special" value="resonance" title="@{flag_special}" />
 						</div>
+						<hr />
 						<div>
 							<h2 data-i18n="sheetselect">Sheet Select</h2><br />
 							<select name="attr_sheet_type" title="@{sheet_type}">
@@ -1766,6 +1879,12 @@
 								<option value="sprite" data-i18n="sprite">Sprite</option>
 								<option value="vehicle" data-i18n="vehicle">Vehicle</option>
 							</select>
+						</div>
+						<hr />
+						<div>
+							<h2 data-i18n="importer">Importer</h2>
+							<button type="action" name="act_import_launch" data-i18n="importecharacter">Import Character</button>
+							<p data-i18n="importertext">You can import a character with a JSON from Chummer. <!--or Hero Lab.--> The game owner must set a Compendium in the Game Settings. It does not matter which one you pick. Charactermancer software simply requires one be picked.</p>
 						</div>
 					</div>
 					<div class="op-col">
@@ -1860,7 +1979,7 @@
 				<div class="attr-header"><label data-i18n="hostrating">Host Rating</label><br /><input type="number" name="attr_host_rating" placeholder="5" title="@{host_rating}" value="" /></div>
 				<div class="attr-header"><label data-i18n="attack">Attack</label><br /><input type="number" name="attr_attack" placeholder="5" title="@{attack}" value="" /></div>
 				<div class="attr-header"><label data-i18n="sleaze">Sleaze</label><br /><input type="number" name="attr_sleaze" placeholder="6" title="@{sleaze}" value="" /></div>
-				<div class="attr-header"><label data-i18n="dataprocessing">Data Processing</label><br /><input type="number" name="attr_data_processing" placeholder="7" title="@{data_processing}" value="" /></div>
+				<div class="attr-header"><label data-i18n="data_processing">Data Processing</label><br /><input type="number" name="attr_data_processing" placeholder="7" title="@{data_processing}" value="" /></div>
 				<div class="attr-header"><label data-i18n="firewall">Firewall</label><br /><input type="number" name="attr_firewall" placeholder="8" title="@{firewall}" value="" /></div>
 			</div>
 			<div class="vehicle attribute">
@@ -1878,7 +1997,7 @@
 				<div class="attr-header"><label data-i18n="levelresonance">Level / Resonance</label><br /><input type="number" name="attr_level" placeholder="5" title="@{level}" value="" /></div>
 				<div class="attr-header"><label data-i18n="attack">Attack</label><br /><input type="number" name="attr_attack" placeholder="5" title="@{attack}" value="" /></div>
 				<div class="attr-header"><label data-i18n="sleaze">Sleaze</label><br /><input type="number" name="attr_sleaze" placeholder="6" title="@{sleaze}" value="" /></div>
-				<div class="attr-header"><label data-i18n="dataprocessing">Data Processing</label><br /><input type="number" name="attr_data_processing" placeholder="7" title="@{data_processing}" value="" /></div>
+				<div class="attr-header"><label data-i18n="data_processing">Data Processing</label><br /><input type="number" name="attr_data_processing" placeholder="7" title="@{data_processing}" value="" /></div>
 				<div class="attr-header"><label data-i18n="firewall">Firewall</label><br /><input type="number" name="attr_firewall" placeholder="8" title="@{firewall}" value="" /></div>
 			</div>
 		<!-- ~~~~~~~~ modifieres  ~~~~~~~~ -->
@@ -1943,7 +2062,7 @@
 					<input type="number" name="attr_physical_modifier" placeholder="0" title="@{physical_modifier}" value="0" /><span> / </span>
 					<input type="number" name="attr_matrix_modifier" placeholder="0" title="@{matrix_modifier}" value="0" />
 					<br />
-					<label data-i18n="dataprocessing">Data Processing </label>
+					<label data-i18n="data_processing">Data Processing </label>
 						<input type="number" name="attr_data_processing" min="0" placeholder="0" title="@{data_processing}" value="" /><br />
 					<label data-i18n="firewall">Firewall </label>
 						<input type="number" name="attr_firewall" min="0" placeholder="0" title="@{firewall}" value="" /><br />
@@ -2068,7 +2187,7 @@
 				<br />
 				<div class="attr-header">
 					<label>
-						<button type="roll" name="data processing" value="@{gm_toggle} &{template:rolls}{{header=^{dataprocessing}}}{{base=^{dataprocessing} ♦ ^{hostrating}}}{{dice=[[(@{data_processing}+(@{host_rating})+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Data Processing Roll" data-i18n="dataprocessing">Data Processing</button>
+						<button type="roll" name="data processing" value="@{gm_toggle} &{template:rolls}{{header=^{data_processing}}}{{base=^{data_processing} ♦ ^{hostrating}}}{{dice=[[(@{data_processing}+(@{host_rating})+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Data Processing Roll" data-i18n="data_processing">Data Processing</button>
 					</label><br />
 					<span name="attr_data_processing"></span>
 				</div>
@@ -2114,7 +2233,7 @@
 				<br />
 				<div class="attr-header">
 					<label>
-						<button type="roll" name="data processing" value="@{gm_toggle} &{template:rolls}{{header=^{dataprocessing}}}{{base=^{dataprocessing} ♦ ^{level}}}{{dice=[[((@{data_processing}+@{level})+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Data Processing Roll" data-i18n="dataprocessing">Data Processing</button>
+						<button type="roll" name="data processing" value="@{gm_toggle} &{template:rolls}{{header=^{data_processing}}}{{base=^{data_processing} ♦ ^{level}}}{{dice=[[((@{data_processing}+@{level})+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Data Processing Roll" data-i18n="data_processing">Data Processing</button>
 					</label><br />
 						<span name="attr_data_processing"></span>
 					</div>
@@ -2175,7 +2294,7 @@
 		<!-- ~~~~~~~~ Vehicle Display  ~~~~~~~~ -->
 			<div class="vehicle">
 				<div>
-					<label data-i18n="dataprocessing">Data Processing</label><span name="attr_data_processing" title="@{data_processing}"></span><br />
+					<label data-i18n="data_processing">Data Processing</label><span name="attr_data_processing" title="@{data_processing}"></span><br />
 					<label data-i18n="firewall">Firewall</label><span name="attr_firewall" title="@{firewall}"></span><br />
 					<label data-i18n="devicerating">Device Rating</label><span name="attr_device_rating" title="@{device_rating}"></span><br />
 					<button type="action" name="act_cond_reset" data-i18n="conditionmonitorpm">Condition Monitor (P/M)</button>
@@ -2690,7 +2809,7 @@
 						<div class="repeat-row repeat-row-20"><label data-i18n="iclimit">IC Limit</label><br/>
 							<select name="attr_IC_limit" title="Limit">
 								<option class="option" value="@{attack}" selected="selected" data-i18n="attack">Attack</option>
-								<option class="option" value="@{data_processing}" data-i18n="dataprocessing">Data Processing</option>
+								<option class="option" value="@{data_processing}" data-i18n="data_processing">Data Processing</option>
 							</select>
 						</div>
 						<span>]</span>
@@ -2706,7 +2825,7 @@
 							<select name="attr_IC_matrix" title="Matrix attribute resistance">
 								<option class="option" value="Attack" data-i18n="attack">Attack</option>
 								<option class="option" value="Sleaze" data-i18n="sleaze">Sleaze</option>
-								<option class="option" value="Data Processing" selected="selected" data-i18n="dataprocessing">Data Processing</option>
+								<option class="option" value="Data Processing" selected="selected" data-i18n="data_processing">Data Processing</option>
 								<option class="option" value="Firewall" data-i18n="firewall">Firewall</option>
 							</select>
 						</div>
@@ -2799,7 +2918,7 @@
 		</div>
 		<div class="device-attr">
 			<label>
-				<button type="roll" name="data processing" value="&{template:rolls}{{header=^{dataprocessing}}}{{base=^{base}}}{{dice=[[(@{data_processing}+(?{Attribute|Willpower,@{willpower}|Logic,@{logic}|Intuition,@{intuition}})+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Data Processing Roll" data-i18n="dataprocessing">Data Processing</button>
+				<button type="roll" name="data processing" value="&{template:rolls}{{header=^{data_processing}}}{{base=^{base}}}{{dice=[[(@{data_processing}+(?{Attribute|Willpower,@{willpower}|Logic,@{logic}|Intuition,@{intuition}})+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Data Processing Roll" data-i18n="data_processing">Data Processing</button>
 			</label>
 			<div class="matrix-bubble matrixData">
 				<input type="radio" name="attr_data_processing" value="1" /><span></span>
@@ -2857,7 +2976,7 @@
 			<h3 data-i18n="programs">Programs</h3>
 			<fieldset class="repeating_programs">
 			<div class="repeating toggle">
-				<input type="checkbox" class="settings-toggle" name="attr_program_toggle" checked="checked" title="Settings toggle" /><span>x</span>
+				<input type="hidden" class="settings-toggle" name="attr_flag" value="settings" />
 				<div class="settings">
 					<input type="text" name="attr_program" value="" placeholder="Program Name" title="Program name" />
 					<br />
@@ -2872,13 +2991,21 @@
 						<button type="roll" name="program" value="@{gm_toggle} &{template:rolls}{{header=@{program}}}{{desc=@{program_note}}}"><span name="attr_program"></span></button><span name="attr_program_note"></span>
 					</div>
 				</div>
+				<button class="pictos settings-button" name="act_programs" type="action">x</button>
 			</div>
 			</fieldset>
 		</div>
 	</div><!-- ~~~~~~~~ End of Matrix Area ~~~~~~~~ -->
 </div><!-- ~~~~~~~~ End of the NPC sheet ~~~~~~~~ -->
 
-<div class="footer"><span data-i18n="copyrightfooter">The Topps Company, Inc. has sole ownership of the names, logo, artwork, marks, photographs, sounds, audio, video and/or any proprietary material used in connection with the game Shadowrun. The Topps Company, Inc. has granted permission to use such names, logos, artwork, marks and/or any proprietary materials for promotional and informational purposes on its website but does not endorse, and is not affiliated with any official capacity whatsoever.</span><span>Version </span><span name="attr_version"></span></div>
+<div class="footer">
+	<div>
+		<span data-i18n="copyrightfooter">The Topps Company, Inc. has sole ownership of the names, logo, artwork, marks, photographs, sounds, audio, video and/or any proprietary material used in connection with the game Shadowrun. The Topps Company, Inc. has granted permission to use such names, logos, artwork, marks and/or any proprietary materials for promotional and informational purposes on its website but does not endorse, and is not affiliated with any official capacity whatsoever.
+		</span>
+		<span>Version </span><span name="attr_version"></span>
+	</div>
+	<img src="https://raw.githubusercontent.com/clevett/SheetTemplate/master/images/EProd_Emerald_Gloss.png" />
+</div>
 
 <!-- ~~~~~~~~+:+:::::+:+::+:+:+::+:+:+:+::+:+::::::+:+::+:+:+:+::+:+:::::+:+:+:+:::::+:+::+:+:+::+:+:+:+::::+:+:~~~~~~~~ -->
 <!-- ~~~~~~~~:+:+::+:+:+:+:+::+:+:+:+:+:+: Roll Template :+:+::+:+:+::+:+:+:+::+:+:+::+:+:+:+::+:+::+:+:+:::+:+:~~~~~~~~ -->
@@ -2913,7 +3040,6 @@
 </div>
 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Hidden Attributes ~~~~~~~~~~~~~~~~~~~~~~~~ -->
-	<input type="hidden" name="attr_version" value="1.5" />
 	<input type="hidden" name="attr_wounds" value="0" />
 	<input type="hidden" name="attr_explode_toggle" value="" />
 	<input type="hidden" name="attr_attribute_roll" value="" />
@@ -3082,9 +3208,9 @@
 
     const versioning = (version) => {
     	console.log(`%c Shadowrun 5th Edition versioning, ${version}`, "color: blue; font-weight:bold");
-       if (version => 1.41) {
+       if (version >= 1.41) {
 			console.log(`%c Shadowrun 5th Edition is update to date`, "color: red; font-weight:bold");
-       	} else if (version => 1.4) {
+       	} else if (version >= 1.4) {
        		const toggles = [`wound_toggle`, `edge_toggle`, `modifier_toggle`];
 			getAttrs(toggles, (v) => {
 				let set = {};
@@ -3095,7 +3221,7 @@
 				setAttrs(set);
 			});
        		setAttrs({version: 1.41}, () => {versioning(1.41)});
-        } else if (version => 1.35) {
+        } else if (version >= 1.35) {
         	getAttrs(["sheet_type"], (v) => {
         		let update = {};
         		(v.sheet_type === "goon") ? update["sheet_type"] = "grunt" : false;
@@ -3114,7 +3240,6 @@
 			setAttrs({
 				shots_fired: (shots > 0 && trigger.includes("remove")) ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots
 			});
-			console.log(`%c SHOTS FIRED ${shots}`, "color:green; font-size: 16px");
 		});
 	});
 
@@ -3137,15 +3262,27 @@
 		});
 	});
 
-	on("clicked:repeating_quality:quality", (eventinfo) => {
-		const source = (eventinfo.sourceAttribute).slice(0, -8);
+	["active", "knowledge", "language"].forEach((attr) => {
+		on(`clicked:repeating_${attr}:skill`, (eventinfo) => {
+			settingsToggle(eventinfo);
+		}); 
+	});
 
-		getAttrs([`${source}_flag_quality`], (v) => {
+	["quality", "martial", "items", "range", "melee", "armor", "spell", "preps", "ritual", "powers", "forms", "vehicle", "augementations", "lifestyle", "contacts", "programs"].forEach((attr) => {
+		on(`clicked:repeating_${attr}:${attr}`, (eventinfo) => {
+			settingsToggle(eventinfo);
+		}); 
+	});
+
+	const settingsToggle = (eventinfo) => {
+		const split = eventinfo.sourceAttribute.split("_");
+		const source = `${split[0]}_${split[1]}_${split[2]}`;
+		getAttrs([`${source}_flag`], (v) => {
 			setAttrs({
-				[`${source}_flag_quality`]: (v[`${source}_flag_quality`] === "settings") ? "display" : "settings"
+				[`${source}_flag`]: (v[`${source}_flag`] === "settings") ? "display" : "settings"
 			});
 		});
-	}); 
+	};
 
 	on("clicked:whisper", (eventinfo) => {
 		getAttrs([`gm_toggle`], (v) => {
@@ -3169,7 +3306,7 @@
 
    [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`].forEach(attr => {
    		on(`clicked:tab_${attr}`, () => {
-   			console.log(`c% The button clicked was tab_${attr} update tab to ${attr}`);
+   			console.log(`%c The button clicked was tab_${attr} update tab to ${attr}`, "color:purple;");
    			setAttrs({tab: attr});
    		});
    });
@@ -3301,13 +3438,13 @@
 				const stat3 = parseInt(v[`${attr3}`]) || 0; //Logic, Strenght, Charisma
 
 				const mod = parseInt(v[`${type}_limit_modifier`]) || 0;
-				const tem = (v[`${type}_limit_temp_flag`] === "on") ? parseInt(v[`${type}_limit_temp_flag`]) || 0 : 0;
+				const tem = (v[`${type}_limit_temp_flag`] === "on") ? parseInt(v[`${type}_limit_temp`]) || 0 : 0;
 
 				const tot = ((stat1 + stat2 + (stat3 * 2))/3);
 				const update = Math.ceil(tot) + (mod + tem);
 
 				setAttrs({[`${type}_limit`]: update});
-			});
+			})
 		};
 
 	//This function checks changes to repeating_armor and updates the Primary Armor if needed
@@ -3389,8 +3526,6 @@
         	const add   = (a, b) => a + b, sum = numbers.reduce(add);
 
 			setAttrs({[`${name}`]: sum});
-
-			console.log(`%c ${name} = ${numbers} totaling ${sum}`, "color: green;font-weight: bold;");
 		});
 	};
 
@@ -3450,7 +3585,7 @@
 
 	//Convert physical into the physical damage track boxes and reverse
 		['physical', 'stun'].forEach(attr => {
-			on(`change:${attr} change:${attr}_damage`, function(eventinfo) {
+			on(`change:${attr} change:${attr}_damage`, (eventinfo) => {
 				getAttrs([`${attr}`, `${attr}_damage`, `${attr}_max`], (v) => {
 					const stat = parseInt(v[`${attr}`]) || 0, dam = parseInt(v[`${attr}_damage`]) || 0, max = parseInt(v[`${attr}_max`]) || 0, source = eventinfo.sourceAttribute;
 					const wou = (source === `${attr}`) ? max - stat : max - dam;
@@ -3482,7 +3617,7 @@
 
 	//Calculate Initiatves
 		var update_initiative = () => {
-			getAttrs(["reaction", "intuition", "initiative_modifier", "initiative_temp", "initiative_temp_flag"], (v) =>{
+			getAttrs(["reaction", "intuition", "initiative_modifier", "initiative_temp", "initiative_temp_flag"], (v) => {
 				const rea = parseInt(v.reaction) || 0;
 				const int = parseInt(v.intuition) || 0;
 				const mod = parseInt(v.initiative_modifier) || 0;
@@ -3491,7 +3626,7 @@
 				const tot = rea + int + mod + tem;
 				let update = {};
 				update["initiative_mod"] = tot;
-				(mod != 0) ? update["display_initiative_mod"] = bas + " (" + tot + ")" : update["display_initiative_mod"] = bas;
+				update["display_initiative_mod"] = (mod != 0) ? `${bas} (${tot})` : bas;
 				setAttrs(update);
 			});
 		};
@@ -3511,13 +3646,16 @@
 		//Calculate Astral Initiatve
 		on("change:intuition change:astral_mod_modifier", () => {
 			getAttrs(["intuition", "astral_mod_modifier"], (v) => {
-				var int = parseInt(v.intuition) || 0;
-				var mod = parseInt(v.astral_mod_modifier) || 0;
-				var bas = int * 2;
-				var tot = (int * 2) + mod;
+				const int = parseInt(v.intuition) || 0;
+				const mod = parseInt(v.astral_mod_modifier) || 0;
+				const bas = int * 2;
+				const tot = (int * 2) + mod;
+				let update = {};
 
-				setAttrs({astral_mod: tot});
-				(mod != 0) ? setAttrs({display_astral_mod: bas + " (" + tot + ")"}) : setAttrs({display_astral_mod: bas});
+				update["astral_mod"] = tot;
+				update["display_astral_mod"] = (mod != 0) ? `${bas} (${tot})` : bas;
+
+				setAttrs(update);
 			});
 		});
 
@@ -3534,13 +3672,13 @@
 	//Calculate Matrix Initiatve.
 		on("change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle", () => {
 			getAttrs(["sheet_type", "data_processing", "pilot", "intuition", "matrix_mod_modifier", "host_rating", "level", "matrix_dice_modifier", "edge_toggle"], (v) => {
-				var dat = parseInt(v.data_processing) || 0;
-				var pil = parseInt(v.pilot) || 0;
-				var int = parseInt(v.intuition) || 0;
-				var mat = parseInt(v.matrix_mod_modifier) || 0;
-				var hos = parseInt(v.host_rating) || 0;
-				var lev = parseInt(v.level) || 0;
-				var dic = parseInt(v.matrix_dice_modifier) || 0;
+				const dat = parseInt(v.data_processing) || 0;
+				const pil = parseInt(v.pilot) || 0;
+				const int = parseInt(v.intuition) || 0;
+				const mat = parseInt(v.matrix_mod_modifier) || 0;
+				const hos = parseInt(v.host_rating) || 0;
+				const lev = parseInt(v.level) || 0;
+				const dic = parseInt(v.matrix_dice_modifier) || 0;
 				let update = {};
 
 				dice = 	(v.sheet_type === "grunt" && v.edge_toggle == 0) ? 4 + dic : 
@@ -3557,7 +3695,7 @@
 				update["matrix_mod"] = tot;
 				update["matrix_dice"] = dice;
 
-				(mat != 0) ? update["display_matrix_mod"] = bas + " (" + tot + ")" : update["display_matrix_mod"] = tot;
+				update["display_matrix_mod"] = (mat != 0) ? `${bas} (${tot})` : tot;
 
 				setAttrs(update);
 			});
@@ -3621,7 +3759,7 @@
 		}
 
 	on("change:repeating_weapon", () => {
-	    getAttrs(["repeating_weapon_weapon_range", "repeating_weapon_weapon_melee", "repeating_weapon_weapon_type", "repeating_weapon_weapon_reach", "repeating_weapon_weapon_acc", "repeating_weapon_weapon_dv", "repeating_weapon_weapon_ap", "repeating_weapon_weapon_mode", "repeating_weapon_weapon_rc", "repeating_weapon_weapon_ammo", "repeating_weapon_weapon_note"], (v) =>{
+	    getAttrs(["repeating_weapon_weapon_range", "repeating_weapon_weapon_melee", "repeating_weapon_weapon_type", "repeating_weapon_weapon_reach", "repeating_weapon_weapon_acc", "repeating_weapon_weapon_dv", "repeating_weapon_weapon_ap", "repeating_weapon_weapon_mode", "repeating_weapon_weapon_rc", "repeating_weapon_weapon_ammo", "repeating_weapon_weapon_note"], (v) => {
 	        // Local builder putting the needed variables into scope for repeatingStringBuilder
 	        const b = repeatingStringBuilder(v, 'repeating_weapon_weapon_');
 	        // Determine fields to display and in their proper order and formatting
@@ -3671,19 +3809,20 @@
 
 	//Spell displays set into an Array
 		on("change:repeating_NPCspell", () => {
-		    getAttrs(["repeating_NPCspell_combat_type", "repeating_NPCspell_type", "repeating_NPCspell_range", "repeating_NPCspell_damage", "repeating_NPCspell_duration", "repeating_NPCspell_drain", "repeating_NPCspell_note", ], (v) =>{
-		        var com = (v.repeating_NPCspell_combat_type);
-		        var typ = "Type " + (v.repeating_NPCspell_type) + ", ";
-				var ran = (v.repeating_NPCspell_range) + ", ";
-				var dam = "Damage " + (v.repeating_NPCspell_damage) + ", ";
-				var dur = "Duration " + (v.repeating_NPCspell_duration) + ", ";
-				var not = (v.repeating_NPCspell_note);
-				dra = (v.repeating_NPCspell_drain > 0) ? ("F" + "+" + (v.repeating_NPCspell_drain) + ", ") : 
-					  ((v.repeating_NPCspell_drain < 0) ? ("F" + (v.repeating_NPCspell_drain) + ", ") :
-					  ("F" + ", "));
-				display = (com === "Direct, Force ") ? (" (Direct) " + "[" + typ + ran + dam + dur + dra + not + "]") :
-						  ((com === "Indirect, Force ?{Force|}, AP -") ? (" (Indirect) " + "[" + typ + ran + dam + dur + dra + not + "]") :
-						  (" [" + typ + ran + dur + dra + not + "]"));
+		    getAttrs(["repeating_NPCspell_combat_type", "repeating_NPCspell_type", "repeating_NPCspell_range", "repeating_NPCspell_damage", "repeating_NPCspell_duration", "repeating_NPCspell_drain", "repeating_NPCspell_note"], (v) =>{
+		        const com = v.repeating_NPCspell_combat_type;
+		        const typ = `Type ${v.repeating_NPCspell_type}, `;
+				const ran = `${v.repeating_NPCspell_range}, `;
+				const dam = `Damage ${v.repeating_NPCspell_damage}, `;
+				const dur = `Duration ${v.repeating_NPCspell_duration}, `;
+				const not = `, ${v.repeating_NPCspell_note}`;
+				const dra = v.repeating_NPCspell_drain;
+
+				const drain = (dra > 0) ? `F+${dra} ` : (dra < 0) ? `F${dra} ` :"F ";
+				const info = `[${typ}${ran}${dam}${dur}${drain}${not}]`;
+
+				display = (com === "Direct, Force ") ? ` (Direct) ${info}` : 
+					(com === "Indirect, Force ?{Force|}, AP -") ? ` (Indirect) ${info}` : `${info}`;
 		        setAttrs({repeating_NPCspell_spell: display});
 		    });
 		});
@@ -3691,32 +3830,30 @@
 	//Complex Form displays  set into an Array
 		on("change:repeating_form", () => {
 		    getAttrs(["repeating_form_form_duration", "repeating_form_form_target", "repeating_form_form_fade", "repeating_form_form_note", ], (v) =>{
-		    	var tar = "Target " + (v.repeating_form_form_target) + ", ";
-				var dur = "Duration " + (v.repeating_form_form_duration) + ", ";
-				var not = (v.repeating_form_form_note);
+		    	const tar = `Target ${v.repeating_form_form_target}, `;
+				const dur = `Duration ${v.repeating_form_form_duration}, `;
+				const not = `, ${v.repeating_form_form_note}`;
+				const fad = (v.repeating_form_form_fade > 0) ? `L+${v.repeating_form_form_fade}` : 
+							(v.repeating_form_form_fade < 0) ? `L${v.repeating_form_form_fade}` : "L";
 
-				fad = (v.repeating_form_form_fade > 0) ? ("L" + "+" + (v.repeating_form_form_fade) + ", ") : 
-					  ((v.repeating_form_form_fade < 0) ? ("L" + (v.repeating_form_form_fade) + ", ") :
-					  ("L" + ", "));
-
-				var display = (" [" + tar + dur + fad + not + "]");
-
-		        setAttrs({repeating_form_form: display});
+		        setAttrs({
+		        	repeating_form_form: ` [${tar}${dur}${fad}${not}]`
+		        });
 		    });
 		});
 
 	//IC displays are set into an Array
 		on("change:repeating_IC", () => {
 		    getAttrs(["attack", "data_processing", "repeating_IC_IC_limit", "repeating_IC_IC_attribute", "repeating_IC_IC_matrix", "repeating_IC_IC_note"], (v) =>{
-		    	var att = parseInt(v.attack) || 0;
-		    	var data = parseInt(v.data_processing) || 0;
-				var attr = (v.repeating_IC_IC_attribute);
-				var mat = (v.repeating_IC_IC_matrix);
-				var not = (v.repeating_IC_IC_note);
+		    	const att = parseInt(v.attack) || 0;
+		    	const data = parseInt(v.data_processing) || 0;
+				const attr = v.repeating_IC_IC_attribute;
+				const mat = v.repeating_IC_IC_matrix;
+				const not = v.repeating_IC_IC_note;
 
-				display = (v.repeating_IC_IC_limit === "@{data_processing}") ? (" (" + "[" + data + "]" + " vs. " + attr + " + " + mat + ", " + not + ")") : (" (" + "[" + att + "]" + " vs. " + attr + " + " + mat + ", " + not + ")");
-
-		        setAttrs({repeating_IC_IC: display});
+		        setAttrs({
+		        	repeating_IC_IC: (v.repeating_IC_IC_limit === "@{data_processing}") ? ` ([${data}] vs. ${attr} + ${mat}, ${not})` : `([${att}] vs. ${attr} + ${mat}, ${not})`
+		        });
 		    });
 		});
 
@@ -3753,7 +3890,6 @@
 	        			const bas = parseInt(v[`${field}_rating`]) || 0;
 						const mod = parseInt(v[`${field}_rating_modifier`]) || 0;
 						const tot = bas + mod;
-
 	                    setAttrs({
 	                        [`${field}_dicepool`]: tot,
 	                        [`${field}_display_rating`]: (mod === 0) ? bas : `${bas} (${tot})`
@@ -3767,12 +3903,23 @@
 	                       [`${field}_display_attribute`]: translation
 	                    });
 	        		});
+	        	} else if (source.includes("limit") && type === "player") {
+	        		const limit = eventinfo.newValue.slice(2, -1);
+	        		if (eventinfo.newValue === "none") {
+	        			setAttrs({
+		                   [`${field}_display_limit`]: ""
+		                });
+	        		} else {
+						const translation = getTranslationByKey(`${limit}`);
+	        			setAttrs({
+	                       [`${field}_display_limit`]: `${translation} ${eventinfo.newValue}`
+	                    });
+	        		}
 	        	} else if (source.includes("specialization") && type === "player")  {	
 	        		getAttrs([`${source}`], (v) => {
 						const bas   = v[`${source}`];
 						const size  = bas.length;
 						let display = (size > 0 && size <= 20) ? `(${bas})` : (size > 20 ) ? "(" + bas.slice(0, 20) + "...)" : " ";
-
 	        			setAttrs({
 	                       [`${field}_display_specialization`]: display
 	                    });
@@ -3782,7 +3929,6 @@
 						const bas   = v[`${source}`];
 						const size  = bas.length;
 						let display = (size > 0 && size <= 20) ? bas : (size > 20 ) ? bas.slice(0, 20) + "..." : " ";
-
 	                    setAttrs({
 	                       [`${field}_display`]: display
 	                    });
@@ -3793,7 +3939,6 @@
 						let lowercase   = skill.toLowerCase();
 						let removeGroup = (lowercase.includes("group")) ? lowercase.slice(0, -6) : lowercase;
 						let skillSet    = (removeGroup.includes(" ")) ? removeGroup.replace(/ /g,"") : removeGroup;
-
 	                    setAttrs({
 	                       [`${skillSet}`]: v[`${source}`]
 	                    });
@@ -3802,7 +3947,8 @@
 	        		console.log(`Change to ${field} did not set attr`);
 	        	};
 	        });
-	    });
+	    }); 
+
 
 	   	//Setting the Default attribute name for default skill
 		on("change:default_attribute", (eventinfo) => {
@@ -3893,20 +4039,6 @@
 								console.log(eventinfo);
 							};
 
-
-						/*	switch (true) {
-								case /weapon/.test(source): update[`primary_${type}_weapon`] = v[`${source}`]; break;
-								case /damage/.test(source): update[`primary_${type}_weapon_damage`] = v[`${source}`]; break;
-								case /dicepool/.test(source): update[`primary_${type}_weapon_dicepool`] = v[`${source}`]; break;
-								case /acc/.test(source): update[`primary_${type}_weapon_acc`] = v[`${source}`]; break;
-								case /ap/.test(source): update[`primary_${type}_weapon_ap`] = v[`${source}`]; break;
-								case /skill/.test(source): update[`primary_${type}_weapon_skill`] = v[`${source}`]; break;
-								case /reach/.test(source): update[`primary_${type}_weapon_reach`] = v[`${source}`]; break;
-								case /ammo/.test(source): update[`primary_${type}_weapon_ammo`] = v[`${source}`], update[`primary_${type}_weapon_ammo_max`] = v[`${source}`]; break;
-								case /mode/.test(source): update[`primary_${type}_weapon_mode`] = v[`${source}`]; break;
-								case /recoil/.test(source): update[`primary_${type}_weapon_recoil`] = v[`${source}`]; break;
-								default: console.log(`Source  ${source} was invalid`);} */
-
 							setAttrs(update);
 						};
 					});
@@ -3921,7 +4053,6 @@
 	        // Attach listener
 	        on(`change:${field}`, (eventInfo) => {
 	        	const source = eventInfo.sourceAttribute;
-
 	        	if (source.includes("dicepool") || source.includes("specialization")) {
 	        		getAttrs([`${field}_spec`, `${field}_dicepool_modifier`], (v) => {
 	        			const spec = parseInt(v[`${field}_spec`]) || 0;
@@ -3937,32 +4068,6 @@
 	        	};
 	        });
 	    });
-
-	//Repeating IDs & Lifestyles Section Display
-		on("change:repeating_lifestyle", () => {
-			getAttrs(["repeating_lifestyle_name", "repeating_lifestyle_lifestyle", "repeating_lifestyle_funds", "repeating_lifestyle_licenses", "repeating_lifestyle_display"], (v) => {
-				var name = ((v.repeating_lifestyle_name).length > 0 && (v.repeating_lifestyle_name).length <= 14) ? (v.repeating_lifestyle_name) : 
-						   ((v.repeating_lifestyle_name).length > 14 ) ? (v.repeating_lifestyle_name).slice(0,14) + "..." :
-						   "";
-
-				var life = ((v.repeating_lifestyle_lifestyle).length > 0 && (v.repeating_lifestyle_lifestyle).length <= 14) ? (v.repeating_lifestyle_lifestyle) : 
-				  			((v.repeating_lifestyle_lifestyle).length > 14 ) ? (v.repeating_lifestyle_lifestyle).slice(0,14) + "..." :
-				   			"";
-
-				var funds = ((v.repeating_lifestyle_funds).length > 0 && (v.repeating_lifestyle_funds).length <= 14) ? (v.repeating_lifestyle_funds) : 
-				   			((v.repeating_lifestyle_funds).length > 14 ) ? (v.repeating_lifestyle_funds).slice(0,14) + "..." :
-				   			"";
-
-				var lice = ((v.repeating_lifestyle_licenses).length > 0 && (v.repeating_lifestyle_licenses).length <= 14) ? (v.repeating_lifestyle_licenses) : 
-				  			((v.repeating_lifestyle_licenses).length > 14 ) ? (v.repeating_lifestyle_licenses).slice(0,14) + "..." :
-				  			"";
-
-				var display = name + " / " + life + " / " + funds + " / " + lice;
-
-				setAttrs({repeating_lifestyle_display: display})
-
-			});
-		});
 
 	//Repeating contacts for PC sheet
 		on("change:repeating_contacts", () => {
@@ -3983,20 +4088,6 @@
 	        });
 	    });
 
-	//Vehicle displays for PCs
-		on("change:repeating_vehicle:name", () =>{
-			getAttrs(["repeating_vehicle_name", "repeating_vehicle_display_name"], (v) => {
-				const name = (v.repeating_vehicle_name);
-				const dis = (v.repeating_vehicle_display_name);
-				let update = {};
-
-				let displayName = ((name).length > 0 && (name).length <= 24) ? name : ((name).length > 24 ) ? (name).slice(0, 24) + "..." : " ";
-				if (dis != displayName) {update["repeating_vehicle_display_name"] = displayName};
-
-				setAttrs(update);
-			});
-		});
-
 	   ['acceleration', 'armor', 'body', 'data_processing', 'handling', 'pilot', 'sensor','speed'].forEach(attr => {
 	        // Attach listener
 	        on(`change:repeating_vehicle:${attr}_base change:repeating_vehicle:${attr}_modifier change:repeating_vehicle:${attr}_temp`, () => {
@@ -4013,10 +4104,984 @@
 	                setAttrs({
 	                    [attr]: stat,
 	                    [`repeating_vehicle_display_${attr}`]: bon === 0 ? bas : `${bas} (${stat})`
-	                });
+	                }, {silent: true});
 	            });
 	        });
 	    });
 
 
+// CHARACTERMANCER IMPORTER
+	on("clicked:import_launch", (eventinfo) => {
+		startCharactermancer("importer");
+	});
+
+	on("page:importer", () => {
+		setAttrs({builder: "Chummer"});
+		setCharmancerText({
+			"directions" : chummerDirections
+		});
+	});
+
+	on("clicked:import", () => {
+		const mancerData = getCharmancerData();
+		const mancerValues = mancerData["importer"].values;
+		let applyEnabled = true;
+	    let setText = {};
+
+	    // Verify the user entered a JSON in the textarea. If not, provide user feedabck.
+	    if (mancerValues.jsonData) {
+	    	const parsedData = JSON.parse(mancerValues.jsonData) || false;
+	    	setText[`import-feedback`] = "";
+	    	// There is a value in the textarea! Check to see if its a valid JSON. Provide users feeadback 
+	    	if (parsedData) {
+	    		setText[`import-feedback`] += `<p class="feedback">A valid JSON was imported for ${mancerValues.builder}.</p>`
+		      // Send the parsed data to the selected importer or let users know something went wrong 
+		      if (mancerValues.builder && mancerValues.builder === "Chummer") {
+				if (parsedData.characters && parsedData.characters.character) {
+					importChummer(parsedData.characters.character);
+		      	} else {
+					setText[`import-feedback`] += `<p class="warning">Parsed JSON is missing character data.</p>`;
+					applyEnabled = false
+		      	}
+		      } else if (mancerValues.builder && mancerValues.builder === "Hero Lab") {
+		      	importHeroLab();
+		      	setText[`import-feedback`] += `<p class="warning">Coming Soon....</p>`;
+		      } else {
+		      	setText[`import-feedback`] += `<p class="warning">A character builder was not selected. Try changing your selection then change it back if needed.</p>`;
+		      	applyEnabled = false
+		      }
+		    } else {
+		      setText[`import-feedback`] += `<p class="warning"><span>The text imported is not a valid JSON. Verify the JSON is formatted correctly. Check the format at,</span> JSONLint.com.</p>`;
+		      applyEnabled = false
+		    };
+	    } else {
+	    	 setText[`import-feedback`] = `<p class="warning">No information was entered in the JSON text area.</p>`;
+	    	 applyEnabled = false
+	    };
+
+	    let buttonStatus = (applyEnabled) ? "" : "disabled";
+	    setText[`finish-button`] = `<button class="finish" type="finish" value="apply" data-i18n="apply" ${buttonStatus}>Apply</button>`;
+
+	    setCharmancerText(setText);
+	});
+
+	const chummerDirections = `<ol>
+				<li>In Chummer mark your character as created</li>
+				<li>Go to File -> Export -> Export JSON</li>
+				<li>Copy the JSON in the file</li>
+				<li>Paste it into the textfield below</li>
+				<li>Click the Import button</li>
+				<li>Review the data. Use the checkbox <strong>Show Hidden Inputs</strong> to fix data.</li> 
+				<li>Click Apply to <u>overwrite</u> information on the character sheet</li>
+			</ol>`;
+
+	const herolabDirections = `
+		<ol>
+			<li>Download the file "HLtoRoll20Export.hl" from: https://drive.google.com/file/d/0B3E3jkp51s8aRmpTU1NMRjRIVkk/view</li>
+			<li>Double click the file. Hero Lab will import it automatically now.</li>
+			<li>Load a character</li>
+			<li>Go to File/Save Custom Output and select the "Roll20 Export"</li>
+			<li>Save the file. It should open automatically in your browser</li>
+			<li>Follow the directions.</li>
+		</ol>`;
+
+	on("change:builder", (eventinfo) => {
+		let setText = {};
+		setText[`directions`] = (eventinfo.newValue === "Chummer") ? chummerDirections : herolabDirections;
+		setCharmancerText(setText);
+	});
+
+  const clean = () => {
+    ['active', 'knowledge', 'language', 'quality', 'martial',
+      'range', 'melee', 'weapon', 'armor', 'augementations',
+      'items', 'NPCspell', 'spell', 'rituals', 'preps', 'powers',
+      'contacts', 'vehicle', 'lifestyle', "programs", "forms"].forEach(group => {
+      getSectionIDs(`repeating_${group}`, (ids) => {
+        ids.forEach((id) => {
+          removeRepeatingRow(`repeating_${group}_${id}`);
+        });
+      });
+    });
+  };
+
+	//USEFUL FUNCTIONS
+	const capitialize = (string) => {
+		return string.charAt(0).toUpperCase() + string.slice(1);
+	};
+
+	const addFeedback = (attribute, value) => {
+		return `<p class="feedback"><strong>${capitialize(attribute)}:</strong> ${value} </p>`
+	};
+
+	const alphabatizeKeys = (unsortedJSON) => {
+		let alphabeticalKeys = {};
+		Object.keys(unsortedJSON).sort().forEach((key) => {
+			  alphabeticalKeys[key] = unsortedJSON[key];
+		});
+		return alphabeticalKeys
+	};
+
+	const getValInParen = (value) => {
+		return value.split("(")[1].split(")")[0];
+	};
+
+	const getArray = (array) => {
+		return Array.isArray(array) ? array : [ array ];
+	};
+
+	const getSplitNum = (value) => {
+		return value.split("/")[0];
+	}
+
+	//IMPORTERS
+	const importHeroLab = (character) => {
+		console.log(`%c HERO LAB IMPORTER:`, "color: purple; font-weight:bold");
+	};
+
+	const importChummer = (character) => {
+		//Match Chummer JSON keys with their sheet attribute. 
+		//Chummer name is on the left, Roll20 sheet atribute on right.
+		const jsonKeys = {
+			"name": "name"
+			,"adept": "flag_special"
+			,"age" : "age"
+			,"alias": "character_name"
+			,"armor": "armor"
+			,"calculatednotoriety": "notoriety"
+			,"calculatedpublicawareness": "public_awareness"
+			,"calculatedstreetcred": "street_cred"
+			,"cmoverflow": "overflow"
+			,"composure" : "composure"
+			,"height": "height"
+			,"initdice": "initiative_dice"
+			,"initvalue": "initiative_mod"
+			,"judgeintentions" : "judge_intentions"
+			,"karma": "karma" 
+			,"liftandcarry": "lift_carry"
+			,"limitmental": "mental_limit"
+			,"limitphysical": "physical_limit"
+			,"limitsocial": "social_limit"
+			,"magician": "flag_special"
+			,"memory": "memory"
+			,"nuyen":"primary_nuyen"
+			,"physicalcm": "physical_max"
+			//,"physicalcmfilled": "physical_damage" //RESULTING IN INFINATE LOOP
+			,"playername": "player_name"
+			,"sex": "sex"
+			,"stuncm": "stun_max"
+			//,"stuncmfilled": "stun_damage"
+			,"technomancer": "flag_special"
+			,"totaless": "essence"
+			,"totalkarma": "total_karma"
+			,"weight": "weight"
+			,"indirectdefenseresist": "defense"
+		};
+
+		const attributeKeys = {
+			"BOD": "body"
+			,"AGI": "agility"
+			,"REA": "reaction"
+			,"STR": "strength"
+			,"CHA": "charisma"
+			,"INT": "intuition"
+			,"LOG": "logic"
+			,"WIL": "willpower"
+			,"EDG": "edge"
+			,"MAG": "magic"
+			,"RES": "resonance"
+		};
+
+		const processChummer = new Promise((resolve, reject) => {
+			console.log(`%c CHUMMER IMPORTER`, "color: purple; font-weight:bold");
+			const sortedKeys = alphabatizeKeys(jsonKeys);
+			let setText = {
+				"error": "",
+				"results": "",
+				"ignored": ""
+			};
+			let update = {};
+
+			//MATRIX
+			const setCyberdeck = (cyberdeck) => {
+				update["cyberdeck"]     = cyberdeck.name;
+				update["device_rating"] = cyberdeck.devicerating;
+				update["attribute_1"]   = cyberdeck.attack;
+				update["attribute_2"]   = cyberdeck.sleaze;
+				update["attribute_3"]   = cyberdeck.dataprocessing;
+				update["attribute_4"]   = cyberdeck.firewall;
+				update["matrix_con"]   = 0;
+			}
+
+			// PROCESS TOP LEVEL KEYS
+			Object.keys(sortedKeys).forEach((key) => {
+				try {
+					const charSheetAttr = jsonKeys[key];
+					const chummerValue = character[key];
+					if ((key === "adept" || key === "magician" || key === "technomancer")) {
+			            if (chummerValue.toUpperCase() === "TRUE") {
+			              update[`${charSheetAttr}`] = (key === "technomancer") ? "resonance" : "magic";
+			            } else if (!update.hasOwnProperty(`${charSheetAttr}`)) { // if we don't have the property set already otherwise keys get overriden
+			              update[`${charSheetAttr}`] = "mundane";
+			            };
+					} else if (key === "totaless") {
+						const essence = chummerValue.includes(",") ? chummerValue.replace(",", ".") : chummerValue;
+						update[`${charSheetAttr}`] = parseFloat(essence) || 6;
+					} else if (chummerValue && chummerValue != null) {
+						update[`${charSheetAttr}`] = chummerValue;
+					} else {
+						setText["error"] += addFeedback(charSheetAttr, chummerValue);
+					};
+
+					const textUpdate = (update[`${charSheetAttr}`]) ? "results" : "ignored";
+					const feedbackText = addFeedback(jsonKeys[key].replace("_"," "), update[`${charSheetAttr}`]);
+					(setText[`results`].includes(feedbackText) || setText[`ignored`].includes(feedbackText)) ? false : setText[`${textUpdate}`] += feedbackText;
+				} catch (error) {
+					setText["error"] += addFeedback(JSON.stringify(key), error);
+				};
+			});
+
+			// PROCESS METATYPE
+			try {
+				update[`metatype`] = character.metatype;
+				if (character.metavariant) {
+					update[`metatype`] += ` (${character.metavariant})`
+				}
+			} catch (error) {
+				setText["error"] += addFeedback(JSON.stringify(character.metatype), error);
+			};
+
+			// PROCESS ATTRIBUTES
+			const attributes = character.attributes[1].attribute;
+			let attributeTotals = { 
+				"essence": update["essence"] 
+			}; // USED FOR LIMITS BELOW
+			attributes.forEach((object) => {
+				try {
+					const charSheetAttr = attributeKeys[object.name];
+					if (charSheetAttr === "edge") {
+						update[`${charSheetAttr}`] = object.base;
+					} else {
+						update[`${charSheetAttr}_base`] = object.base;
+					    update[`${charSheetAttr}_modifier`] = object.total - object.base;
+					};
+
+					// USED FOR LIMITS BELOW
+					attributeTotals[`${charSheetAttr}`] = parseInt(object.total) || 0;
+				} catch (error) {
+					setText["error"] += addFeedback(JSON.stringify(object), error);
+				};
+			});
+
+			//PROCESS LIMITS
+			const limitKeys = {
+				"limitmental": "mental_limit"
+				,"limitphysical": "physical_limit"
+				,"limitsocial": "social_limit"
+			};
+
+			Object.keys(limitKeys).forEach((key) => {
+				//CALCULATE THE BASE FOR LIMIT
+				const limitCalculate = (attrsArray) => {
+					return Math.ceil(((attrsArray[0] + attrsArray[1] + (attrsArray[2] * 2))/3))
+				};
+
+				try {
+					let attrs = [];
+					if (key === "limitmental") {
+						attrs.push(attributeTotals["intuition"], attributeTotals["willpower"], attributeTotals["logic"]);
+					} else if (key === "limitphysical") {
+						attrs.push(attributeTotals["body"], attributeTotals["reaction"], attributeTotals["strength"]);
+					} else {
+						attrs.push(attributeTotals["essence"], attributeTotals["willpower"], attributeTotals["charisma"]);
+					}; 
+
+					//SET LIMIT MODIFIER EQUAL TO THE TOTAL IN CHUMMER - THE CALCULATED BASE LIMIT
+					update[`${limitKeys[key]}_modifier`] = parseInt(character[key]) - limitCalculate(attrs);
+				} catch (error) {
+					setText["error"] += addFeedback(JSON.stringify(`${key}`), error);
+				};
+			}); 
+
+			// LOOP THROUGHT QUALITIES
+			if (character.qualities != null && character.qualities.quality != null) {
+				const qualitiesList = getArray(character.qualities.quality);
+				qualitiesList.forEach((quality) => {
+					try {
+						const id = generateRowID();
+						update[`repeating_quality_${id}_flag`] = "display";
+						update[`repeating_quality_${id}_quality`] = quality.name;
+						update[`repeating_quality_${id}_type`] = (quality.qualitytype === "Positive") ? "P" : "N";
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(quality), error);
+					};
+				});
+			}
+
+			// LOOP THROUGH SKILLS & GENERATE REPEATING FIELDS
+			if (character.skills != null && character.skills.skill != null) {
+				const skillsList = getArray(character.skills.skill);
+				skillsList.forEach((skill) => {
+					try {
+						const rating = parseInt(skill.rating) || 0;
+						if (rating > 0) {
+							const id = generateRowID();
+							const type = 
+								(skill.knowledge.toUpperCase() === "TRUE" && skill.islanguage.toUpperCase() === "TRUE") ? "language" : 
+								(skill.knowledge.toUpperCase() === "TRUE") ? "knowledge" : 
+								"active";
+							const exotic = skill.exotic.toUpperCase();
+							const section = `repeating_${type}_${id}`
+							// Exotic Weapons need their name in Specialization
+
+							update[`${section}_flag`] = "display";
+							update[`${section}_skill`] = 
+								(skill.name === "Exotic Melee Weapon") ? "Exotic Melee" : 
+								(skill.name === "Exotic Ranged Weapon") ? "Exotic Range" : 
+								skill.name;
+							update[`${section}_display`] = 
+								(skill.name === "Exotic Melee Weapon") ? "Exotic Melee" : 
+								(skill.name === "Exotic Ranged Weapon") ? "Exotic Range" : 
+								skill.name;
+							update[`${section}_rating`] = skill.rating;
+							update[`${section}_rating_modifier`] = skill.ratingmod;
+
+              				const skilltotal = parseInt(skill.rating) + parseInt(skill.ratingmod);
+							update[`${section}_dicepool`] = skilltotal;
+
+							//ACTIVE SKILLS HAVE THEIR TOTAL SAVED IN A HIDDEN ATTRIBUTE
+							if (type === "active") {
+								update[skill.name.toLowerCase().replace(/ /g, "")] = skilltotal;
+							};
+
+							//This needs to be verified with multiple specializations
+							if (skill.skillspecializations && skill.skillspecializations != null) {
+								const chummerSpecialization = skill.skillspecializations.skillspecialization.name;
+								const specialization = (chummerSpecialization.includes("[")) ? chummerSpecialization.slice(1, -1) : chummerSpecialization;
+								update[`${section}_specialization`] = specialization;
+							} else if (exotic === "TRUE") {
+								update[`${section}_specialization`] = skill.spec;
+							};
+
+							//CREATE THE DISPLAYS FOR SKILLS
+							if (update[`${section}_specialization`]) {
+								update[`${section}_display_specialization`] = `(${update[`${section}_specialization`]})`;
+							};
+
+							//DISPLAY FOR RTG
+							update[`${section}_display_rating`] = (skill.ratingmod != 0) ? `${skill.rating} (${skilltotal})` : `${skill.rating}`;
+
+							const attribute = skill.attribute;
+							update[`${section}_attribute`] = `@{${attributeKeys[attribute]}}`;
+							update[`${section}_display_attribute`] = attributeKeys[attribute];
+
+							update[`${section}_limit`] = 
+								(attribute === "AGI" || attribute === "BOD" || attribute ===  "STR" || attribute ===  "REA") ? `@{physical_limit}` : 
+								(attribute === "WIL" || attribute ===  "LOG" || attribute ===  "INT") ? `@{mental_limit}` : 
+								(attribute === "CHA") ? `@{social_limit}` : "none";
+						};
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(skill), error);
+					};
+				});
+			}
+
+			//MOVEMENT
+			try {
+				const movement = character.movementwalk.split(",")[0].split("/");
+				update[`walk`] = movement[0];
+				update[`run`] = movement[1];
+			} catch (error) {
+				setText["error"] += addFeedback("movement", error);
+			};
+
+			//MARTIAL ARTS
+			if (character.martialarts != null && character.martialarts.martialart != null) {
+				const martialartsList = getArray(character.martialarts.martialart);
+				martialartsList.forEach((art) => {
+					const techniqueList = getArray(art.martialarttechniques.martialarttechnique);
+					techniqueList.forEach((tech) => {
+						try {
+							const id = generateRowID();
+							update[`repeating_martial_${id}_flag`] = "display";
+							update[`repeating_martial_${id}_technique`] = tech.name;
+							update[`repeating_martial_${id}_style`] = art.name;
+						} catch (error) {
+							setText["error"] += addFeedback(JSON.stringify(art), error);
+						};
+					});
+				});
+			};
+
+			//WEAPON KEYS
+			const weaponKeys = {
+				"name": "weapon"
+				,"damage": "damage"
+				,"ap": "ap"
+				,"dicepool": "dicepool"
+				,"skill": "skill"
+				,"reach": "reach"
+				,"rc": "recoil"
+				,"mode": "mode_options"
+				,"accuracy": "acc"
+			};
+
+			//WEAPONS
+			if (character.weapons != null && character.weapons.weapon != null) {
+				const weaponsList = getArray(character.weapons.weapon);
+				weaponsList.forEach((weapon) => {
+					try {
+						const id = generateRowID();
+				      	const section = (weapon.type.toUpperCase() === "MELEE") ? `repeating_melee_${id}` : `repeating_range_${id}`;
+				      	const npcWeapon = `repeating_weapon_${id}`;
+
+				      	const category = weapon.category.toUpperCase();
+				      	Object.keys(weaponKeys).forEach((key) => {
+				      		if (weapon[`${key}`] && weapon[`${key}`] != null) {
+				      			update[`${section}_${weaponKeys[key]}`] = 
+				      				(key != "damage" && weapon[`${key}`].includes("(")) ? getValInParen(weapon[`${key}`]) :
+				      				(key === "skill") ? `@{${weapon[`${key}`].toLowerCase().replace(" ", "")}}` :
+				      				weapon[`${key}`];
+				      		} else if (key === "skill" && category.includes("EXOTIC")) {
+				      			update[`${section}_skill`] = 0;
+				      		};
+						});
+
+				      	//EXOTIC WEAPONS NEED SPECIAL HANDLING
+				      	if (category.includes("EXOTIC")) {
+				      		update[`${section}_dicepool_modifier`] = weapon.dicepool;
+				      	};
+
+						//RANGED WEAPONS NEED CLIP & RANGES
+						if (weapon.type.toUpperCase() === "RANGED") {
+					        if (weapon.clips != null && weapon.clips.clip != null) {
+					          const clips = Array.isArray(weapon.clips.clip) ? weapon.clips.clip : [ weapon.clips.clip ];
+					          update[`${section}_ammo`] = clips[0].count;
+					        } else if (weapon.name.includes("Grenade")) {
+					        	const gearsList = getArray(character.gears.gear);
+					        	gearsList.forEach((gear) => {
+					        		if (weapon.name === gear.name) {
+					        			update[`${section}_ammo`] = gear.qty || 1;
+					        		};
+					        	});
+					        } else if (weapon.ammo) {
+					        	 update[`${section}_ammo`] = weapon.ammo;
+					        };
+
+					        //RANGE
+							const rangeList = weapon.ranges;
+							let range = "";
+							Object.keys(rangeList).forEach((key) => {
+								if (key != "name" && rangeList[key] != null) {
+									const rangeNumber = rangeList[key].split("-")[1];
+									range += (key === "short") ? `${rangeNumber}` : `/${rangeNumber}`;
+								};
+							});
+							update[`${section}_range`] = range;
+				      	};
+
+				      	//ACCESSORIES
+				      	if (weapon.accessories) {
+					      	let accessories = "";
+					      	const accessoriesList = getArray(weapon.accessories.accessory);
+					      	accessoriesList.forEach((accessory) => {
+					      		accessories += `${accessory["name"]}, `
+					      	});
+
+					      	update[`${section}_notes`] = accessories;
+				      	};
+
+				      	// TOGGLE THE SETTINGS OFF
+				      	update[`${section}_flag`] =  "display";
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(weapon), error);
+					};
+				});
+			}
+
+			//ARMOR
+			if (character.armors != null && character.armors.armor != null) {
+				const armorsList = getArray(character.armors.armor);
+				armorsList.forEach((armor) => {
+					try {
+						const id = generateRowID();
+						if (armor.category != "Clothing") {
+							const section = `repeating_armor_${id}`;
+							let armorMods = "";
+							let armorGear = "";
+
+							// ARMOR NAME
+							update[`${section}_name`] =  armor.name;
+
+							// ARMOR sometimes has a bonus
+							update[`${section}_rating`] = (armor.armor.includes("/+")) ? armor.armor.split("/+")[0] : armor.armor;
+
+							// ARMOR MODS
+							if (armor.armormods && armor.armormods != null) {
+								const modsList = getArray(armor.armormods.armormod);
+								modsList.forEach((modification) => {
+									armorMods += `${modification.name}, `;
+
+									if (modification.name === "Nonconductivity") {
+										update[`${section}_electrical_modifier`] = modification.rating;
+									} else if (modification.name === "Thermal Damping" || modification === "Insulation") {
+										update[`${section}_cold_modifier`] = modification.rating;
+									} else if (modification.name === "Radiation Shielding") {
+										update[`${section}_radiation_modifier`] = modification.rating;
+									} else if (modification.name === "Chemical Protectio") {
+										update[`${section}_acid_modifier`] = modification.rating;
+									} else if (modification.name === "Fire Resistance") {
+										update[`${section}_fire_modifier`] = modification.rating;
+									};
+								});
+							};
+
+							// ARMOR GEAR
+							if (armor.gears && armor.gears != null) {
+								const gearList = getArray(armor.gears.gear);
+								gearList.forEach((gear) => {
+									if (gear.children) {
+										const childrenList = getArray(gear.children.gear);
+										childrenList.forEach((child) => {
+											armorGear += `${gear.name} (${child.name}), `;
+										});
+									} else {
+										armorGear += `${gear.name}, `;
+									};
+								});
+							};
+
+							// HIDE SETTINGS
+							update[`${section}_flag`] =  "display";
+
+							update[`${section}_notes`] =  
+								(armorMods && armorGear) ? `Modification: ${armorMods} Gear: ${armorGear}` :
+								(armorMods) ? `Modification: ${armorMods}` :
+								(armorGear) ? `Gear: ${armorGear}` : "";
+						} else {
+							// Chummer puts Clothing in with armor
+							const section = `repeating_items_${id}`;
+							update[`${section}_item`] =  armor.name;
+							update[`${section}_flag`] =  "display";
+						};
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(armor), error);
+					}
+				});
+			}
+
+			//AUGMENTATIONS
+			if (character.cyberwares != null && character.cyberwares.cyberware != null) {
+				const cyberwaresList = getArray(character.cyberwares.cyberware);
+				cyberwaresList.forEach((ware) => {
+					const id = generateRowID();
+					try {
+						const section = `repeating_augementations_${id}`;
+						update[`${section}_flag`] = "display";
+						update[`${section}_augmentation`] = ware.name;
+						update[`${section}_rating`]       = ware.rating;
+						update[`${section}_essence`]      = ware.ess;
+						update[`${section}_notes`]        = `Grade: ${ware.grade}`;
+
+						if (ware.gears != null && ware.gears.gear != null) {
+							const wareGearList = getArray(ware.gears.gear);
+							wareGearList.forEach((gear) => {
+								if (gear.category.toLowerCase().includes("cyberdeck")) {
+									setCyberdeck(gear);
+								}
+							});
+						}
+					} catch (error) {
+					  setText["error"] += addFeedback(JSON.stringify(ware.name), error);
+					}
+				});
+			};
+
+			console.log(character);
+
+			// GEAR
+			if (character.gears != null && character.gears.gear != null) {
+				const gearsList = getArray(character.gears.gear);
+				gearsList.forEach((gear) => {
+					const id = generateRowID();
+					try {
+						if (gear.name.toLowerCase() === "fake sin") {
+							const section = `repeating_lifestyle_${id}`;
+							update[`${section}_name`] = `${gear.extra} (rating ${gear.rating})`;
+							update[`${section}_lifestyle`] = (gear.location != null) ? `${gear.location},` : "";
+							update[`${section}_flag`] = "display";
+
+							update[`${section}_licenses`] = "";
+							if (gear.children && gear.children.gear != null) {
+								const childrenList = getArray(gear.children.gear);
+								childrenList.forEach((child) => {
+									update[`${section}_licenses`] += `${child.extra} (rating ${child.rating}), `;
+								});
+							}
+						} else if (gear.category.toLowerCase().includes("cyberdeck")) {
+							setCyberdeck(gear);
+						} else if (gear.category.toLowerCase().includes("programs")) {
+							const section = `repeating_programs_${id}`;
+							update[`${section}_program`] = gear.name;
+							update[`${section}_flag`] = "display";
+						} else {
+							const section = `repeating_items_${id}`;
+							let gearNotes = "";
+							update[`${section}_item`] = gear.name;
+							update[`${section}_flag`] = "display";
+							update[`${section}_rating`] = (gear.rating >  0) ? gear.rating : "";
+
+							//NAME
+							update[`${section}_item`] += (gear.name.includes("Ammo:")) ? ` (${gear.extra}) ` : "";
+							update[`${section}_item`] += (gear.qty > 1) ?` x${gear.qty}` : "";
+
+							//NOTES
+							gearNotes += (gear.location != null) ? `Location: ${gear.location},` : "";
+							gearNotes += (gear.qty != null) ? ` Qty: ${gear.qty},` : "";
+							gearNotes += (gear.extra != null) ? ` Extra: ${gear.extra},` : "";
+
+							if (gear.children && gear.children != null) {
+								const childrenList = getArray(gear.children.gear);
+									childrenList.forEach((child) => {
+										gearNotes += `${child.name}, `;
+								});
+							};
+
+							update[`${section}_notes`] = gearNotes;
+						}
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(gear.name), error);
+					};
+				});
+			};
+
+			//SPELL KEYS
+			const spellKeys = {
+				"category": "category"
+				,"name": "name"
+				,"range": "range"
+			};
+
+			// SPELLS
+			if (character.spells != null && character.spells.spell != null) {
+				const spellsList = getArray(character.spells.spell);
+				spellsList.forEach((spell) => {
+					try {
+						const id = generateRowID();
+						const type = (spell.alchemy.toUpperCase() === "TRUE") ? "preps" : "spell";
+						const section = `repeating_${type}_${id}`;
+
+						Object.keys(spellKeys).forEach((key) => {
+				      		if (spell[`${key}`] && spell[`${key}`] != null) {
+				      			update[`${section}_${spellKeys[key]}`] = spell[`${key}`];
+				      		};
+						});
+
+						// FLAG
+						update[`${section}_flag`] = "display";
+
+						// TYPE
+						update[`${section}_type`] = (spell.type === "P") ? "Physical" : "Mana";
+
+						// DRAIN
+						update[`${section}_drain`] = spell.dv.replace("F", "");
+
+						// SET COMBAT TYPE
+						if (spell.category.toUpperCase() === "COMBAT") {
+							const combatType = spell.descriptors.toUpperCase();
+							update[`${section}_combat_type`] = 
+								(combatType.includes("DIRECT")) ? "Direct, Force " :
+								(combatType.includes("INDIRECT")) ? "Indirect, Force ?{Force|}, AP -" :
+								"Force ";
+							update[`${section}_damage`] = spell.damage;
+						}
+
+						// DURATION
+						const duration = spell.duration.toUpperCase();
+						update[`${section}_duration`] = 
+							(duration === "S") ? "Sustained" : 
+							(duration === "I") ? "Instant" : 
+							(duration === "P") ? "Permanent" :
+							"Special";
+
+						// NOTES
+						if (spell.descriptors != null) {
+				            update[`${section}_notes`] = spell.descriptors;
+				         }
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(spell.name), error);
+					}
+				});
+			}
+
+			// POWERS
+			if (character.powers != null && character.powers.power != null) {
+				const powersList = getArray(character.powers.power);
+				powersList.forEach((power) => {
+					try {
+						const id = generateRowID();
+						const section = `repeating_powers_${id}`;
+
+						update[`${section}_name`] = (power.fullname != null) ? power.fullname : power.name;
+						update[`${section}_rating`] = power.rating;
+
+						 if (power.totalpoints != null) {
+						 	update[`${section}_notes`] = `Total Points: ${power.totalpoints}.`;
+						 }
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(power.name), error);
+					}
+				});
+			}
+
+			// LIFESTYLES
+			if (character.lifestyles != null && character.lifestyles.lifestyle != null) {
+				const lifestyleList = getArray(character.lifestyles.lifestyle);
+				lifestyleList.forEach((lifestyle) => {
+					try {
+						const id = generateRowID();
+						const section = `repeating_lifestyle_${id}`;
+
+						update[`${section}_name`] = lifestyle.name;
+						update[`${section}_flag`] = "display";
+
+						if (lifestyle.qualities != null && lifestyle.qualities.quality) {
+							const lqualitiesList = getArray(lifestyle.qualities.quality);
+							let lifestyleQualities = "";
+							lqualitiesList.forEach((quality) => {
+								try {
+									lifestyleQualities += (quality.fullname != null) ? quality.fullname : quality.name;
+								} catch (error) {
+									setText["error"] += addFeedback(JSON.stringify(quality.name), error);
+								}
+							});
+
+							update[`${section}_lifestyle`] = lifestyleQualities;
+						}
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(lifestyle.name), error);
+					}
+				});
+			}
+
+			// CONTACTS
+			if (character.contacts != null && character.contacts.contact != null) {
+				const contactList = getArray(character.contacts.contact);
+				contactList.forEach((contact) => {
+					try {
+						const id = generateRowID();
+						const section = `repeating_contacts_${id}`;
+						let contactNotes = "";
+
+					    update[`${section}_name`] = (contact.role != null) ? `${contact.name} (${contact.role})` : `${contact.name}`;
+					    update[`${section}_loyalty`] = contact.loyalty;
+					    update[`${section}_connection`] = contact.connection;
+					    update[`${section}_flag`] = "display";
+
+					    ["metatype", "sex", "age", "preferredpayment", "hobbiesvice", "personallife"].forEach((detail) => {
+					    	if (contact[`${detail}`] != null) {
+					    		contactNotes += `${contact[`${detail}`]}. `
+					    	}
+					    });
+
+					    update[`${section}_notes`] = contactNotes;
+
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(contact.name), error);
+					}
+				});
+			}
+
+			// VEHICLE KEYS
+			const vehicleKeys = {
+				"handling": "handling_base"
+				,"accel": "acceleration_base"
+				,"speed": "speed_base"
+				,"body": "body_base"
+				,"armor": "armor_base"
+				,"sensor": "sensor_base"
+				,"pilot": "pilot_base"
+			};
+
+			// VEHICLES
+		/*	if (character.vehicles != null && character.vehicles.vehicle != null) {
+				const vehicleList = getArray(character.vehicles.vehicle);
+				vehicleList.forEach((vehicle) => {
+					try {
+						const id = generateRowID();
+						const section = `repeating_vehicle_${id}`;
+						let vehicleNotes = "";
+
+						update[`${section}_name`] = vehicle.name;
+						update[`${section}_flag`] = "display";
+						Object.keys(vehicleKeys).forEach((key) => {
+							if (vehicle[`${key}`] && vehicle[`${key}`] != null) {
+								update[`${section}_${vehicleKeys[`${key}`]}`] = 
+									(vehicle[`${key}`].includes("/")) ? getSplitNum(vehicle[`${key}`]) : 
+									vehicle[`${key}`];
+							};
+						}); 
+
+						["attack", "sleaze", "dataprocessing", "firewall", "devicerating"].forEach((matrixAttr) => {
+							vehicleNotes += (matrixAttr === "devicerating") ? `Device Rating (${vehicle[`${matrixAttr}`]}) ` : 
+								(matrixAttr === "firewall") ? `${vehicle[`${matrixAttr}`]} ` : `${vehicle[`${matrixAttr}`]}/`;
+						}); 
+
+						if (vehicle.mods != null && vehicle.mods.mod != null) {
+							const vehicleModsList = getArray(vehicle.mods.mod);
+							vehicleNotes += "Mods: "
+							vehicleModsList.forEach((mod) => {
+								vehicleNotes += (mod.fullname != null) ? `${mod.fullname}, ` : `${mod.name}, `;
+							});
+						}
+				
+						if (vehicle.gears != null && vehicle.gears.gear != null) {
+							const vehicleGearList = getArray(vehicle.gears.gear);
+							vehicleNotes += "Gear: "
+							vehicleGearList.forEach((gear) => {
+								if (gear.children != null && gear.children.gear != null) {
+									const vehicleChildrenList = getArray(gear.children.gear);
+									let vehicleChildrenNotes = "";
+									vehicleChildrenList.forEach((child) => {
+										vehicleChildrenNotes += `${child.name}, `;
+									});
+									vehicleNotes += `${gear.name} (${vehicleChildrenNotes}), `;
+								} else {
+									vehicleNotes += `${gear.name}, `;
+								};
+							});
+						} 
+				
+						update[`${section}_notes`] = vehicleNotes;
+					} catch (error) {
+						setText["error"] += addFeedback(JSON.stringify(vehicle.name), error);
+					}
+				});
+			}
+
+		*/
+
+			setCharmancerText(setText);
+			resolve(update);
+
+			console.log(update);
+		}).then((update) => {
+			let setText = {
+				"hidden": ""
+			};
+
+			//GENERATE INPUTS TO SAVE THE DATA
+			Object.keys(update).forEach((key) => {
+				const label = (key.includes("_")) ? key.replace("_", " ") : key;
+				const input = `<label><div>${label}</div><input type="text" name="comp_${key}" value="${update[key]}" /></label>`;
+				setText[`hidden`] += (setText[`hidden`].includes(input)) ? "" : input;
+
+				const feedbackLabel = 
+					(key.includes("repeating")) ? key.split("_")[3] : 
+					(key.includes("_")) ? key.replace("_", " ") : key;
+				(feedbackLabel === "flag" || feedbackLabel === "display") ? false : setText["results"] += addFeedback(feedbackLabel, update[key]);
+			});
+
+			setAttrs(update);
+
+			return setText;
+		}).then((result) => {
+			setCharmancerText(result);
+		});
+	};
+
+	// APPLY Changes
+	on("mancerfinish:apply", () => {
+		const mancerData = getCharmancerData();
+		const mancerValues = mancerData["importer"].values;
+
+		Object.keys(mancerValues).forEach((key) => {
+			if (key == "builder" || key == "jsonData" || key == "hidden") {
+				delete mancerValues[key];
+			};
+		});
+
+    	clean();
+		setAttrs(mancerValues, () => {
+			console.log(`%c APPLY IMPORTER:`, "color: blue; font-weight:bold");
+			console.log(mancerValues);
+			deleteCharmancerData(["importer"]);
+			finishCharactermancer();
+		});
+	}); 
 </script>
+
+
+<!-- CHARACTERMANCER IMPORTER -->
+<charmancer class="sheet-charmancer-importer">
+	<div class="mancer-box">
+		<h1>Shadowrun Fifth Edition Character Importer</h1>
+		<h2>Setup</h2>
+		<p>This will import character JSON data generated from Chummer 5. This is an <em>experimental</em> feature which is not 100% completed. It will save you a bit of time when bringing a character to Roll20.</p>	
+		<h3>Pick Character Builder</h3>
+		<div class="pick-builder">
+			<label title="choose chummer">
+				<h4>Chummer</h4>
+				<input type="radio" name="comp_builder" value="Chummer" checked />
+			</label>
+			<!--<label title="choose hero lab">
+				<h4>Hero Lab</h4>
+				<input type="radio" name="comp_builder" value="Hero Lab" />
+			</label>-->
+		</div>
+		<div class="directions"></div>
+		<h3>Enter JSON Here</h3>
+		<textarea name="comp_jsonData" placeholder="Add JSON here"></textarea>
+		<button type="action" name="act_import" data-i18n="import">Import</button>
+
+		<hr />
+
+		<h2>Results</h2>
+		<!-- <p>Review for errors and resolve them in your JSON as needed before completing the import by clicking Apply.</p> -->
+		<div class="import-feedback"><p>Enter a JSON string in the text area above.</p></div>
+		<div class="result-grid">
+			<h3>Character data to be updated</h3>
+			<div class="results"><p>Import button has not been pressed yet.</p></div>
+			<h3>Character data not to be updated</h3>
+			<div class="error"><p>Import button has not been pressed yet.</p></div>
+		</div>
+		<h4 class="hidden-header">Show Hidden Inputs</h4>
+		<input type="checkbox" name="comp_hidden" value="on">
+		<div class="hidden"></div>
+
+		<hr />
+
+		<h2>Complete</h2>
+		<p>After reviewing the data above, click Apply. This will <strong>overwrite</strong> data on the sheet where applicable.</p>
+		<h3>Chummer Notes</h3>
+		<ul>
+    		<li>
+    			Chummer frequently has the wrong information for <strong>Weapons</strong>. Review them in the Arms tab after clicking apply.
+    		</li>
+    		<li>
+    			<strong>Specializations</strong> will not be applied to Weapons or Magic. You will need to manually update the checkbox.
+    		</li>
+    		<li>
+    			<strong>Vehicles</strong> will not be imported.
+    		</li>
+    		<li>
+    			<strong>Complex Forms</strong> will not be imported.
+    		</li>
+    	</ul>
+		<div class="finish-button">
+			<button class="finish" type="finish" value="apply" data-i18n="apply" disabled>Apply</button>
+		</div>
+
+		 <div class="bottombar">
+		   <button class="prev" type="cancel" value="cancel" data-i18n="cancel">Cancel</button>
+		 </div>
+	 </div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-final">
+    <div class="charmancer">
+        <div class="">
+           <h1>Importing your Shadowrun character...overwriting previous data</h1>
+           <img alt="emerald productions, llc" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadowrun5thEdition/images/EProd_Title_Green.jpg" />
+        </div>
+    </div>
+</charmancer>
