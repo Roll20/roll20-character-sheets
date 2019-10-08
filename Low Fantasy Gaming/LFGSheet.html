@@ -470,7 +470,7 @@
                             <input type="number" name="attr_skillmod" value="0" step="1">
                         </div>
                         <div class="sheet-col-1-10 sheet-center">
-                            <button type="roll" name="roll_Skill" value="&{template:5eDefault} {{ability=1}} {{title=@{skillname} Check (@{skilltype})}} {{subheader=@{character_name}}} {{check=[[@{skilladvantage}-1-(@{skillmod})]]}} {{target=[[@{skilltarget}]]}} {{gsresult=[[@{skillgs}]]}} {{tfresult=[[@{skilltf}]]}}"></button>
+                            <button type="roll" name="roll_Skill" value="&{template:5eDefault} {{ability=1}} {{title=@{skillname} Check (@{skilltype})}} {{subheader=@{character_name}}} {{check=[[@{skilladvantage}]]}} {{target=[[{[[@{skilltarget}+1+(@{skillmod})]],18}kl1]]}} {{gsresult=[[@{skillgs}]]}} {{tfresult=[[@{skilltf}]]}}"></button>
                         </div>
                     </div>
                 </fieldset>
@@ -1410,6 +1410,14 @@
 						</div>
 					{{/allprops() outputall title subheader subheaderright subheader2 subheaderright2 emote weapon spell ability save feature ddm}}
 				{{/outputall}}
+				{{#chatmenu}}
+					{{#allprops() chatmenu title subheader subheaderright subheader2 subheaderright2 emote weapon spell ability save feature ddm}}
+						<div class="sheet-row">
+                            <div class="sheet-col-1 sheet-padl sheet-padr sheet-rt-key-wide">{{key}}</div>
+    						<div class="sheet-col-1 sheet-padl sheet-padr sheet-rt-value">{{value}}</div>
+						</div>
+					{{/allprops() chatmenu title subheader subheaderright subheader2 subheaderright2 emote weapon spell ability save feature ddm}}
+				{{/chatmenu}}
 				<!--DEBUG-->
 				{{#debug}}
 					{{#allprops()}}
@@ -1549,8 +1557,90 @@ on("change:repeating_skills:skilltype", function() {
         }
     });
 });
-
-
+//Update associated attribute for all skills when attribute is updated
+on("change:strength change:strength_gs change:strength_tf change:dexterity change:dexterity_gs change:dexterity_tf change:constitution change:constitution_gs change:constitution_tf change:intelligence change:intelligence_gs change:intelligence_tf change:perception change:perception_gs change:perception_tf change:willpower change:willpower_gs change:willpower_tf change:charisma change:charisma_gs change:charisma_tf change:luck change:luck_gs change:luck_tf", function() {
+	getSectionIDs('repeating_skills', function (idArray) {
+		getAttrs(idArray.map(id => `repeating_skills_${id}_skilltype`), function (values) {
+			idArray.forEach(function (id) {
+                switch (values[`repeating_skills_${id}_skilltype`]) {
+                    case "STR":
+                        getAttrs(["strength","strength_gs","strength_tf"], function(strval) {
+                            let setting = {};
+                            setting[`repeating_skills_${id}_skilltarget`] = strval.strength;
+                            setting[`repeating_skills_${id}_skillgs`] = strval.strength_gs;
+                            setting[`repeating_skills_${id}_skilltf`] = strval.strength_tf;
+                            setAttrs(setting);
+                        });
+                        break;
+                    case "DEX":
+                        getAttrs(["dexterity","dexterity_gs","dexterity_tf"], function(dexval) {
+                            let setting = {};
+                            setting[`repeating_skills_${id}_skilltarget`] = dexval.dexterity;
+                            setting[`repeating_skills_${id}_skillgs`] = dexval.dexterity_gs;
+                            setting[`repeating_skills_${id}_skilltf`] = dexval.dexterity_tf;
+                            setAttrs(setting);
+                        });
+                        break;
+                    case "CON":
+                        getAttrs(["constitution","constitution_gs","constitution_tf"], function(conval) {
+                            let setting = {};
+                            setting[`repeating_skills_${id}_skilltarget`] = conval.constitution;
+                            setting[`repeating_skills_${id}_skillgs`] = conval.constitution_gs;
+                            setting[`repeating_skills_${id}_skilltf`] = conval.constitution_tf;
+                            setAttrs(setting);
+                        });
+                        break;
+                    case "INT":
+                        getAttrs(["intelligence","intelligence_gs","intelligence_tf"], function(intval) {
+                            let setting = {};
+                            setting[`repeating_skills_${id}_skilltarget`] = intval.intelligence;
+                            setting[`repeating_skills_${id}_skillgs`] = intval.intelligence_gs;
+                            setting[`repeating_skills_${id}_skilltf`] = intval.intelligence_tf;
+                            setAttrs(setting);
+                        });
+                        break;
+                    case "PER":
+                        getAttrs(["perception","perception_gs","perception_tf"], function(perval) {
+                            let setting = {};
+                            setting[`repeating_skills_${id}_skilltarget`] = perval.perception;
+                            setting[`repeating_skills_${id}_skillgs`] = perval.perception_gs;
+                            setting[`repeating_skills_${id}_skilltf`] = perval.perception_tf;
+                            setAttrs(setting);
+                        });
+                        break;
+                    case "WILL":
+                        getAttrs(["willpower","willpower_gs","willpower_tf"], function(willval) {
+                            let setting = {};
+                            setting[`repeating_skills_${id}_skilltarget`] = willval.willpower;
+                            setting[`repeating_skills_${id}_skillgs`] = willval.willpower_gs;
+                            setting[`repeating_skills_${id}_skilltf`] = willval.willpower_tf;
+                            setAttrs(setting);
+                        });
+                        break;
+                    case "CHA":
+                        getAttrs(["charisma","charisma_gs","charisma_tf"], function(chaval) {
+                            let setting = {};
+                            setting[`repeating_skills_${id}_skilltarget`] = chaval.charisma;
+                            setting[`repeating_skills_${id}_skillgs`] = chaval.charisma_gs;
+                            setting[`repeating_skills_${id}_skilltf`] = chaval.charisma_tf;
+                            setAttrs(setting);
+                        });
+                        break;
+                    case "LUCK":
+                        getAttrs(["luck","luck_gs","luck_tf"], function(luckval) {
+                            let setting = {};
+                            setting[`repeating_skills_${id}_skilltarget`] = luckval.luck;
+                            setting[`repeating_skills_${id}_skillgs`] = luckval.luck_gs;
+                            setting[`repeating_skills_${id}_skilltf`] = luckval.luck_tf;
+                            setAttrs(setting);
+                        });
+                        break;
+                    default:
+                }
+			});
+		});
+	});
+});
 var convertFromOldSheet = function () {
     var notes1="";
     var notes2="";
