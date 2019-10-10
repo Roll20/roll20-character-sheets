@@ -17,10 +17,16 @@
   </div>
 
 <!-- MAIN STAT SECTION -->
+
   <div class="stats section">
+
+    <div>
+      <button name="roll_init" type="roll" value="&{template:default} {{name=Initiative}} {{Result=[[d20]]}} &{tracker}"><span>Initiative</span></button>
+    </div>
+
     <div class="stat-block flex-center">
       <label>STRENGTH</label>
-      <input name="attr_strength" type="number" value="2">
+      <input name="attr_strength" type="number" value="">
       <span name="attr_strength_bonus"></span>
       <button name="roll_strength" type="roll" value="&{template:default} {{name=Strength}} {{Result=[[d20+(@{strength_bonus})]]}}"></button>
     </div>
@@ -55,13 +61,13 @@
 
     <div class="stat-block flex-center">
       <label>DEFENSE</label>
-      <input name="attr_defense" type="number" value="11">
-      <input name="attr_defense_bonus" type="number" value="" class="ref" disabled="true">
+      <input name="attr_defense"       type="number" value="10">
+      <input name="attr_defense_bonus" type="number" value="">
     </div>
 
     <div class="stat-block flex-center">
       <label>HIT POINTS</label>
-      <input name="attr_hit_points" type="number" value="">
+      <input name="attr_hit_points"     type="number" value="">
       <input name="attr_hit_points_max" type="number" value="">
     </div>
   </div>
@@ -80,6 +86,7 @@
       <input name="attr_resistance2" type="text">
       <input name="attr_resistance3" type="text">
       <input name="attr_resistance4" type="text">
+      <input name="attr_resistance5" type="text">
     </div>
   </div>
 
@@ -92,12 +99,18 @@
 <!-- GOLD SECTION-->
   <div class="gold section flex-center">
     <label>Gold:</label>
-    <input name="attr_gold" type="number" value="200">
+    <input name="attr_gold" type="number" value="10">
   </div>
 
 <!-- LOAD SECTION -->
   <div class="load section flex-center flex-middle flex-down">
     <label>Load</label>
+    <span>
+      <input name="attr_attack_name" type="text" placeholder="Attack/Weapon Name"> 
+      <input name="attr_attack_bonus" type="number" value=""> 
+      <input name="attr_attack_damage" type="text" value="1d6" class="small">
+      <button name="roll_attack" type="roll" value="&{template:default} {{name=@{attack_name}}} {{Attack=[[d20+(@{attack_bonus})]]}} {{Damage=[[@{attack_damage}]]}}" class ="small"></button>
+    </span>
     <textarea name="attr_load" placeholder="Load"></textarea>
   </div>
 
@@ -126,71 +139,33 @@
 
 <script type="text/worker">
 
-var attr_base = ["strength_base","intelligence_base","charm_base","arcana_base","grace_base"];
+const int = score => parseInt(score, 10) || 0;
 
-var attr_bonus = ["strength_bonus","intelligence_bonus","charm_bonus","arcana_bonus","grace_bonus"];
+// Auto-calculates & updates 'Stat Bonus' based on changes to corresponding 'Base Stat',
+// according to the table on page 5 of the Rulebook.
+// If the Base stat is less than 1, the sheet sets the bonus to "-2"
 
-const stats = ["strength","intelligence","charm","arcana","grace"];
-
-
+const stats = ["strength", "intelligence", "charm", "arcana", "grace"];
 stats.forEach(stat => {
     on(`change:${stat}`, () => {
         getAttrs([stat], values => {
-          const stat_base = parseInt(values[stat], 10)||0;
-          console.log(stat_base);
-
-          if(stat_base == "2" || stat_base == "3" || stat_base == "4"){
-            const stat_bonus = "-2"
+            const stat_base = int(values[stat]);
+            console.log(stat_base);
+            let stat_bonus = 0;
+            if (stat_base >= 17) stat_bonus = "+4";
+            else if (stat_base >= 16) stat_bonus = "+3";
+            else if (stat_base >= 13) stat_bonus = "+2";
+            else if (stat_base >= 9) stat_bonus = "+1";
+            else if (stat_base >= 7) stat_bonus = "0";
+            else if (stat_base >= 5) stat_bonus = "-1";
+            else if (stat_base >= 1) stat_bonus = "-2";
+            else stat_bonus = "-2";
+            
             setAttrs({
-                [`${stat}_bonus`]: stat_bonus 
+                [`${stat}_bonus`]: stat_bonus
             });
-          }
-
-          else if(stat_base == "5" || stat_base == "6"){
-            const stat_bonus = "-1"
-            setAttrs({
-                [`${stat}_bonus`]: stat_bonus 
-            });
-          }
-
-          else if(stat_base == "7" || stat_base == "8"){
-            const stat_bonus = "0"
-            setAttrs({
-                [`${stat}_bonus`]: stat_bonus 
-            });
-          }
-
-          else if(stat_base == "9" || stat_base == "10" || stat_base == "11" || stat_base == "12"){
-            const stat_bonus = "+1"
-            setAttrs({
-                [`${stat}_bonus`]: stat_bonus 
-            });
-          }
-
-          else if(stat_base == "13" || stat_base == "14" || stat_base == "15"){
-            const stat_bonus = "+2"
-            setAttrs({
-                [`${stat}_bonus`]: stat_bonus 
-            });
-          }
-
-          else if(stat_base == "16"){
-            const stat_bonus = "+3"
-            setAttrs({
-                [`${stat}_bonus`]: stat_bonus 
-            });
-          }
-
-          else if(stat_base >= "17"){
-            const stat_bonus = "+4"
-            setAttrs({
-                [`${stat}_bonus`]: stat_bonus 
-            });
-          }
-
         });
     });
 });
-
 
 </script>
