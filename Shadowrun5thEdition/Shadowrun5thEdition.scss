@@ -23,21 +23,21 @@
 		box-shadow      : none;
 		font-family     : Helvetica, Arial, sans-serif;
 		font-size       : 0.8em;
-		text-shadow     : none;}
+		text-shadow     : none;
 
-	button[type="roll"],
-	button[type="action"] {
-		font-size: 1em;
-		margin: 0px 0px 0px 0px;
-		padding: 0px 0px;}
+		&[type="roll"],
+		&[type="action"] {
+			font-size: 1em;
+			margin: 0px;
+			padding: 0px 0px;}
 
-	button:before {display: none;}
-	button:hover {background-color: transparent;}
+		&:before {display: none;}
+		&:hover {background-color: transparent;}
+	}
 
 	div {background-color: transparent;}
 
-	fieldset {
-		background: transparent;}
+	fieldset { background: transparent;}
 
 	hr {
 		border: 0.5px solid #555;
@@ -57,45 +57,45 @@
 		font-weight: normal;
 		margin: 0px;
 		text-align: center;
-		vertical-align: middle;}
+		vertical-align: middle;
 
-	input::placeholder {
-		color: #b8b7b6;
+		&[type="checkbox"],
+		&[type="radio"],
+		&[type="checkbox"] + span,
+		&[type="radio"] + span {
+			position: relative;
+		}
+
+		&[type="checkbox"],
+		&[type="radio"] {
+			opacity: 0;
+			z-index: 2;
+		}
+
+		&[type="checkbox"] + span { font-family: pictos; }
+
+		&[type="text"],
+		&[type="number"] {
+			background: transparent;
+			height    : 20px;
+
+			&:hover, &:focus {
+				background-color: #d2d1cd;
+				color: #333;
+			}
+
+			&:placeholder-shown {
+				background-color: hsla(0, 0%, 11%, 0.14901960784313725);
+				color: white;
+			}
+		}
+
+		&::-webkit-outer-spin-button,
+		&::-webkit-inner-spin-button {
+		  -webkit-appearance: none;
+		  margin: 0;
+		}
 	}
-
-	input[type="checkbox"],
-	input[type="radio"],
-	input[type="checkbox"] + span,
-	input[type="radio"] + span {
-		position: relative;}
-
-	input[type="checkbox"],
-	input[type="radio"] {
-		opacity: 0;
-	    z-index: 2;}
-
-	input[type="checkbox"] + span {
-		font-family: pictos;}
-
-	input[type="text"],
-	input[type="number"] {
-		background: transparent;
-	/*	border-radius: 2px;
-		border: 1px solid #000;
-		box-shadow: inset 0px 0px 3px 1px #7c7c7c; */
-		height    : 20px;}
-
-	input[type="text"]:hover,
-	input[type="number"]:hover,
-	input[type="text"]:focus,
-	input[type="number"]:focus {
-		background-color: #d2d1cd;
-		color: #333;}
-
-	input::-webkit-outer-spin-button,
-	input::-webkit-inner-spin-button {
-	  -webkit-appearance: none;
-	  margin: 0;}
 
 	select {
 		border-radius: 2px;
@@ -104,7 +104,7 @@
 		margin-bottom: 0px;
 		width: auto;}
 
-	span {word-break: break-word;}
+	span { word-break: break-word; }
 
 	textarea {
 		border-radius: 2px;
@@ -117,10 +117,9 @@
 		vertical-align: top;
 		white-space: pre-line;}
 
-	.charsheet {
-		width: 850px;}
+	.charsheet { width: 850px; }
 
-	.sheet-red {color: #610b0d;}
+	.sheet-red {color: #610b0d;  }
 
 	button.sheet-settings-button {
 		height: 5%;
@@ -130,116 +129,125 @@
 /********************************************************************************************************/
 /********************************* PC & NPC SHEET SHOW & HIDE SETTINGS ***********************************/
 /********************************************************************************************************/
-	.sheet-arms,
-	.sheet-augs,
-	.sheet-core,
-	.sheet-gear,
-	.sheet-npc,
-	.sheet-options,
-	.sheet-pc,
-	.sheet-social,
-	.sheet-magic,
-	.sheet-matrix,
-	.sheet-vehicle,
-	.sheet-hide-magic,
-	.sheet-hide-resonance,
-	.sheet-options_toggle[value="options"] ~ .sheet-pc,
-	.sheet-options_toggle[value="options"] ~ .sheet-npc {
-	    display: none;} 
+	
+	%display-none { display: none; }
+	%display-inline { display: inline; }
 
+	%display-inline-block,
 	.sheet-static,
-	.sheet-sheet_type[value="grunt"] ~ .sheet-npc,
-	.sheet-sheet_type[value="host"] ~ .sheet-npc,
-	.sheet-sheet_type[value="sprite"] ~ .sheet-npc,
-	.sheet-sheet_type[value="vehicle"] ~ .sheet-npc,
-	.sheet-sheet_type[value="pc"] ~ .sheet-pc,
-	.sheet-options_toggle[value="arms"] ~ .sheet-arms,
-	.sheet-options_toggle[value="augs"] ~ .sheet-augs,
-	.sheet-options_toggle[value="options"] ~ .sheet-options,
-	.sheet-options_toggle[value="core"] ~ .sheet-core,
-	.sheet-options_toggle[value="gear"] ~ .sheet-gear,
-	.sheet-options_toggle[value="social"] ~ .sheet-social,
-	.sheet-options_toggle[value="magic"] ~ .sheet-magic,
-	.sheet-options_toggle[value="matrix"] ~ .sheet-matrix,
-	.sheet-options_toggle[value="vehicle"] ~ .sheet-vehicle,
-	.sheet-character-type[value="magic"] ~ .sheet-pc .sheet-pc-row .sheet-attr-col .sheet-hide-magic,
-	.sheet-character-type[value="resonance"] ~ .sheet-pc .sheet-pc-row .sheet-attr-col .sheet-hide-resonance {
-	    display: inline-block;}
+	.sheet-sheet_type[value="pc"] ~ .sheet-pc {
+		display: inline-block;
+	}
+
+	@each $characterType in 'npc', 'pc'{
+		.sheet-#{$characterType},
+		.sheet-options_toggle[value="options"] ~ .sheet-#{$characterType}  { 
+			@extend %display-none; 
+		}
+	}
+
+	$tabs:'arms', 'augs', 'core', 'gear', 'options', 'social', 'magic', 'matrix', 'vehicle';
+	@each $tab in $tabs {
+		.sheet-#{$tab} { @extend %display-none; }
+		.sheet-options_toggle[value="#{$tab}"] ~ .sheet-#{$tab} { @extend %display-inline-block; }
+	}
+
+	@each $npcType in 'grunt', 'host', 'sprite', 'vehicle' {
+		.sheet-sheet_type[value="#{$npcType}"] ~ .sheet-npc { @extend %display-none; }
+	}
+
+	@each $specialAttribute in 'magic', 'resonance' {
+		.sheet-hide-#{$specialAttribute} { @extend %display-none;  }
+		.sheet-character-type[value="#{$specialAttribute}"] ~ .sheet-pc .sheet-pc-row .sheet-attr-col .sheet-hide-#{$specialAttribute} { 
+			@extend %display-inline-block; 
+		}
+	}
+
+	%highlight-button {
+		background-color: #610b0d;
+		box-shadow      : inset 0px 0px 3px 1px #e31715;
+		color           : #fff;
+	}
 
 	/***** TABS FOR SHEETS *****/
-
-		.sheet-sheet_type[value="pc"] ~ .sheet-tabs {
+	.sheet-tabs {
+		.sheet-sheet_type[value="pc"] ~ & {
 			position: relative;
-			margin-bottom: -15%;}
+			margin-bottom: -15%;
+		}
 
-		.sheet-tabs div {display: inline-block;}
+		div {display: inline-block;}
 
-		.sheet-tabs button[type="action"] {
-			background-color: #333;
-			border-radius   : 2px;
-			border          : 1px solid #000;
-			box-shadow      : inset 0px 0px 3px 1px #7c7c7c;
-			color           : #fff;
-			font-family     : sans-serif;
-			font-size       : 1em;
-			font-weight     : bolder;
-			text-transform  : capitalize;
-			padding         : 5px;}			
+		button {
+			&[type="action"] {
+				background-color: #333;
+				border-radius   : 2px;
+				border          : 1px solid #000;
+				box-shadow      : inset 0px 0px 3px 1px #7c7c7c;
+				color           : #fff;
+				font-family     : sans-serif;
+				font-size       : 1em;
+				font-weight     : bolder;
+				text-transform  : capitalize;
+				padding         : 5px;
+			}
 
-		.sheet-tabs input[value*="gm"] + button[type="action"],
-		.sheet-tabs input[value*="wounds"] + button[type="action"],
-		.sheet-tabs input[value*="Modifiers"] + button[type="action"],
-		.sheet-tabs input[value*="edge"] + button[type="action"],
-		.sheet-tabs input[value*="core"] ~ button[name*="core"],
-		.sheet-tabs input[value*="arms"] ~ button[name*="arms"],
-		.sheet-tabs input[value*="augs"] ~ button[name*="augs"],
-		.sheet-tabs input[value*="gear"] ~ button[name*="gear"],
-		.sheet-tabs input[value*="magic"] ~ button[name*="magic"],
-		.sheet-tabs input[value*="matrix"] ~ button[name*="matrix"],
-		.sheet-tabs input[value*="social"] ~ button[name*="social"],
-		.sheet-tabs input[value*="vehicle"] ~ button[name*="vehicle"],
-		.sheet-tabs input[value*="options"] ~ button[name*="options"] {
-			background-color: #610b0d;
-			box-shadow      : inset 0px 0px 3px 1px #e31715;
-			color           : #fff;}	
+			&[type="roll"] {
+				color         : #fff;
+				font-family   : "dicefontd6";
+				font-size     : 2.5em;
+				vertical-align: top;
 
-		.sheet-tab-col button[type="action"]:last-child {
-			font-family: pictos;
-			text-transform: lowercase;} 
+				&:hover {
+					text-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px #e31715;
+				}
+			}
+		}
 
-		.sheet-tab-whisper,
-		.sheet-tab-toggles {
-			margin-left : 1%;
-			margin-right: 5%;}
+		input[value*="gm"] + button[type="action"],
+		input[value*="wounds"] + button[type="action"],
+		input[value*="Modifiers"] + button[type="action"],
+		input[value*="edge"] + button[type="action"] {
+			@extend %highlight-button;
+		}
 
-		.sheet-tabs button[type="roll"] {
-			color         : #fff;
-			font-family   : "dicefontd6";
-			font-size     : 2.5em;
-			vertical-align: top;}
+		@each $highlightButton in $tabs {
+			input[value*="#{$highlightButton}"] ~ button[name*="#{$highlightButton}"] { 		
+				@extend %highlight-button; 
+			}
+		}
 
-		.sheet-tabs button[type="roll"]:hover {
-			text-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px #e31715;}
-
-		.sheet-tabs img {
+		img {
 			vertical-align: top;
-			width         : 50%;}
+			width         : 50%;
+		}
+	}		
 
-		.sheet-tab-sheet {
-			width: 35%;}
+	.sheet-tab-col button[type="action"]:last-child {
+		font-family: pictos;
+		text-transform: lowercase;
+	} 
+
+	.sheet-tab-whisper,
+	.sheet-tab-toggles {
+		margin-left : 1%;
+		margin-right: 5%;
+	}
+
+	.sheet-tab-sheet { width: 35%; }
 
 	/***** NPC TABS CUSTOMIZATIONS *****/
-		.sheet-sheet_type[value="pc"] ~ .sheet-tabs div.sheet-tab-sheet,
-		.sheet-sheet_type:not([value="pc"]) ~ .sheet-tabs div.sheet-tab-col,
-		.sheet-sheet_type:not([value="pc"]) ~ .sheet-tabs .sheet-info-box {
-			display: none;}
+	.sheet-sheet_type[value="pc"] ~ .sheet-tabs div.sheet-tab-sheet,
+	.sheet-sheet_type:not([value="pc"]) ~ .sheet-tabs div.sheet-tab-col,
+	.sheet-sheet_type:not([value="pc"]) ~ .sheet-tabs .sheet-info-box {
+		display: none;}
 
-		.sheet-sheet_type:not([value="pc"]) ~ .sheet-tabs {
-			background   : black;
-			margin-bottom: -1.5%;
-			padding      : 2%;
-			position     : relative;
-			width        : 720px;}
+	.sheet-sheet_type:not([value="pc"]) ~ .sheet-tabs {
+		background   : black;
+		margin-bottom: -1.5%;
+		padding      : 2%;
+		position     : relative;
+		width        : 720px;}
 
 /********************************************************************************************************/
 /**************************************** START OF THE PC SHEET *******************************************/
@@ -251,151 +259,170 @@
 		border          : 3px solid;
 		box-shadow      : inset 0px 0px 3px 1px #7c7c7c;
 		margin-left     : -1%;
-		padding-left    : 0.5%;}
+		padding-left    : 0.5%;
+	
+		button > h2:hover,
+		button > span:hover,
+		label > button[type="roll"]:hover,
+		.sheet-con-track button[type="action"]:hover {
+			color      : #fff;
+			text-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px #610b0d;
+		}
+		h1 {
+			background-color: #610b0d;
+			color           : #fff;
+			font-size       : 1em;
+			letter-spacing  : 2px;
+			line-height     : 20px;
+			padding-left    : 5px;
+			padding-right   : 5px;
+			text-transform  : uppercase;
+		}
 
-	.sheet-pc button > h2:hover,
-	.sheet-pc button > span:hover,
-	.sheet-pc label > button[type="roll"]:hover,
-	.sheet-pc .sheet-con-track button[type="action"]:hover {
-		color      : #fff;
-		text-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px #610b0d;}
+		h2, h3 {
+			display       : inline-block;
+			text-transform: capitalize;
+			margin-right  : 5px;
+		}
+	
+		h2 {
+			font-size  : 0.9em;
+			line-height: 25px;
+		}
+	
+		h3 {
+			color    : #b8b7b6;
+			font-size: 0.8em;
+		}
 
-	.sheet-pc h1 {
-		background-color: #610b0d;
-		color           : #fff;
-		font-size       : 1em;
-		letter-spacing  : 2px;
-		line-height     : 20px;
-		padding-left    : 5px;
-		padding-right   : 5px;
-		text-transform  : uppercase;}
+		input[type="number"] {border: 1px solid #b8b7b6;}
+	}
 
-	.sheet-pc h2,
-	.sheet-pc h3 {
-		display       : inline-block;
-		text-transform: capitalize;
-		margin-right  : 5px;}
+/***** PC ROWS & COLUMNS SETTINGS *****/
+	.sheet-pc-row {margin-bottom: 10px;}
 
-	.sheet-pc h2 {
-		font-size  : 0.9em;
-		line-height: 25px;}
+	.sheet-pc-col {
+		vertical-align: top;
+		width         : calc(50% - 5px);
+		margin-top: 16%;}
 
-	.sheet-pc h3 {
-		color    : #b8b7b6;
-		font-size: 0.8em;}
+	.sheet-pc-col:first-child {
+		margin-right: 1.5%;
+		width       : calc(50% - 10px);}
 
-	.sheet-pc input[type="number"] {border: 1px solid #b8b7b6;}
+	.sheet-row-long {border-bottom: 1px solid #000;}
+	.sheet-settings-row {margin-top: 5px;}
+	.sheet-settings-row select.sheet-skill-select {width: 29%;}
 
-	/***** PC ROWS & COLUMNS SETTINGS *****/
-		.sheet-pc-row {margin-bottom: 10px;}
+/***** DECORATIVE BOX THAT ADDS THE RED OUTLINE ON PC SHEET *****/			
+	.sheet-border-box {
+		background-image: -moz-linear-gradient(#610b0d, transparent), -moz-linear-gradient(#610b0d, transparent);
+		background-image: -o-linear-gradient(#610b0d, transparent), -o-linear-gradient(#610b0d, transparent);
+		background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#610b0d), to(transparent));
+		background-image: -webkit-linear-gradient(#610b0d, transparent);
+		background-image: linear-gradient(#610b0d, transparent), linear-gradient(#610b0d, transparent);
+		border-top      : 2px solid #610b0d;
+		clear           : both;
+		border-top-right-radius: 10px;
+		border-top-left-radius : 0px;
 
-		.sheet-pc-col {
-			vertical-align: top;
-			width         : calc(50% - 5px);
-			margin-top: 16%;}
+		.sheet-pc-box {
+			border-top-right-radius: 10px;
+			border-top-left-radius : 0px;
+		} 	
+	} 
 
-		.sheet-pc-col:first-child {
-			margin-right: 1.5%;
-			width       : calc(50% - 10px);}
-
-		.sheet-row-long {border-bottom: 1px solid #000;}
-		.sheet-settings-row {margin-top: 5px;}
-		.sheet-settings-row select.sheet-skill-select {width: 29%;}
-
-	/***** DECORATIVE BOX THAT ADDS THE RED OUTLINE ON PC SHEET *****/			
-		.sheet-border-box {
-			background-image: -moz-linear-gradient(#610b0d, transparent), -moz-linear-gradient(#610b0d, transparent);
-			background-image: -o-linear-gradient(#610b0d, transparent), -o-linear-gradient(#610b0d, transparent);
-			background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#610b0d), to(transparent));
-			background-image: -webkit-linear-gradient(#610b0d, transparent);
-			background-image: linear-gradient(#610b0d, transparent), linear-gradient(#610b0d, transparent);
-			border-top      : 2px solid #610b0d;
-			clear           : both;} 
+	.sheet-static { 
+		margin-right: 0.5%;
 
 		.sheet-border-box,
 		.sheet-border-box .sheet-pc-box {
-			border-top-right-radius: 10px;
-			border-top-left-radius : 0px;} 	
-
-		.sheet-static { margin-right: 0.5%; }
-
-		.sheet-static .sheet-border-box,
-		.sheet-static .sheet-border-box .sheet-pc-box {
 			border-top-right-radius: 0px;
-			border-top-left-radius : 10px;}	
+			border-top-left-radius : 10px;
+		}	
+	}
 
-	/***** HEADERS AND TRIANGLES *****/
-		.sheet-header {
-			display: inline-flex;
-			float: right;
-			height: 20px;}
+/***** HEADERS AND TRIANGLES *****/
+	.sheet-header {
+		display: inline-flex;
+		float: right;
+		height: 20px;}
 
-		.sheet-triangle,
-		.sheet-right-tri {
-		 	border-top: 20px solid transparent;}
+	.sheet-triangle,
+	.sheet-right-tri {
+		border-top: 20px solid transparent;}
 
-		.sheet-triangle {border-right: 30px solid #610b0d;}
-		.sheet-right-tri {border-left: 30px solid #610b0d;}
+	.sheet-triangle {border-right: 30px solid #610b0d;}
+	.sheet-right-tri {border-left: 30px solid #610b0d;}
 
-		.sheet-right-header {float: left;}
+	.sheet-right-header {float: left;}
 
-		/***** SECONDARY HEADERS LIKE ON SKILLS *****/
-			.sheet-htab {margin-right: -47px;}
+/***** SECONDARY HEADERS LIKE ON SKILLS *****/
+	.sheet-htab {
+		margin-right: -47px;
 
-			.sheet-htab input[type="radio"] {
+		input {
+			&[type="radio"] {
 				margin-right: -80px;
 				top         : 4px;
-				width       : 80px;}
+				width       : 80px;
 
-			.sheet-htab input[type="radio"] + h1 {color: #9a9a9a;}
-				.sheet-htab input[type ="radio"]:hover ~ h1,
-				.sheet-htab input[type ="radio"]:checked ~ h1  {color: #fff;}
+				& + h1 {color: #9a9a9a;}
 
-		/***** SWITCH BETWEEN DIFFERENT TABS *****/
-			.sheet-skills-active,
-			.sheet-skills-know,
-			.sheet-skills-lang,
-			.sheet-quality,
-			.sheet-martial,
-			.sheet-magic-spells,
-			.sheet-magic-preps,
-			.sheet-magic-rituals  {
-				display: none;}
+				&:hover ~ h1,
+				&:checked ~ h1  {
+					color: #fff;
+				}
+			}
+		}
+	}
 
-			.sheet-tab-switch[value="active"] ~ .sheet-skills-active,
-			.sheet-tab-switch[value="knowledge"] ~ .sheet-skills-know,
-			.sheet-tab-switch[value="language"] ~ .sheet-skills-lang,
-			.sheet-tab-switch[value="quality"] ~ .sheet-quality,
-			.sheet-tab-switch[value="martial"] ~ .sheet-martial,
-			.sheet-magic-toggle[value="spells"] ~ .sheet-magic-spells,
-			.sheet-magic-toggle[value="preps"] ~ .sheet-magic-preps,
-			.sheet-magic-toggle[value="rituals"] ~ .sheet-magic-rituals {
-				display: inline;}		
+/***** SWITCH BETWEEN DIFFERENT TABS *****/ 
+	.sheet-skills-active,
+	.sheet-skills-know,
+	.sheet-skills-lang {
+		@extend %display-none;
+	}
+
+	.sheet-tab-switch[value="active"] ~ .sheet-skills-active,
+	.sheet-tab-switch[value="knowledge"] ~ .sheet-skills-know,
+	.sheet-tab-switch[value="language"] ~ .sheet-skills-lang {
+		@extend %display-inline;
+	}
 	
-	/***** BOXES FOR DIFFERENT PC SECTIONS *****/
-		.sheet-pc-box {
-			background-color: #e7e6e5;
-			margin-left     : 1.5px;
-			margin-right    : 1.5px;
-			padding-left    : 5px;
-			padding-right   : 5px;}
+	@each $magicTabs in 'spells', 'preps', 'rituals' {
+		.sheet-magic-#{$magicTabs} { @extend %display-none; }
+		.sheet-magic-toggle[value="#{$magicTabs}"] ~ .sheet-magic-#{$magicTabs} { @extend %display-inline; }
+	}
 
-		.sheet-small-box {
-			min-height: 150px;}
+	@each $qualityTabs in 'quality', 'martial' {
+		.sheet-#{$qualityTabs} { @extend %display-none; }
+		.sheet-tab-switch[value="#{$qualityTabs}"] ~ .sheet-#{$qualityTabs} { @extend %display-inline; }
+	}
 
-		.sheet-medium-box {
-			height: 330px;}
+/***** BOXES FOR DIFFERENT PC SECTIONS *****/
+	.sheet-pc-box {
+		background-color: #e7e6e5;
+		margin-left     : 1.5px;
+		margin-right    : 1.5px;
+		padding-left    : 5px;
+		padding-right   : 5px;}
 
-	/***** PLAYER DATA INPUTS *****/
-		.sheet-info-box {
-			margin-bottom: 10px;
-			margin-top   : 10px;
-			width        : 100%;}
+	.sheet-small-box {
+		min-height: 150px;}
 
-		.sheet-info-box div {
-			width: 48%;}
+	.sheet-medium-box {
+		height: 330px;}
 
-		.sheet-info-box h1 {
+/***** PLAYER DATA INPUTS *****/
+	.sheet-info-box {
+		margin-bottom: 10px;
+		margin-top   : 10px;
+		width        : 100%;
+		
+		div { width: 48%; }
+
+		h1 {
 			color           : #fff;
 			background-color: transparent;
 			display         : inline-block;
@@ -405,9 +432,10 @@
 			margin-left     : 5%;
 			text-align      : left;
 			text-transform  : uppercase;
-			width           : 35%;}
+			width           : 35%;
+		}
 
-		.sheet-info-box input[type="text"] {
+		input[type="text"] {
 			color           : #fff;
 			font-weight     : bolder;
 			background-color: transparent;
@@ -416,7 +444,9 @@
 			border-bottom   : 2px solid #fff;
 			border-radius   : 0px;
 			height          : 30px;
-			width           : 60%;}
+			width           : 60%;
+		}
+	}
 
 	/***** CHARACTER PERSONAL DATA SECTION INPUTS *****/
 		.sheet-pd-nam input[type="text"]  {width: 66%;}
@@ -435,83 +465,79 @@
 			width : 20%;}
 
 	/***** CORE COMBAT INFO *****/
-		.sheet-core-combat button[type="roll"] {
+	.sheet-core-combat {
+		button[type="roll"] {
 			font-size : 0.9em;
 			text-align: left;}
 
-		.sheet-core-combat h2,
-		.sheet-core-combat h3 {
-			margin-right: 0px;}
+		h2, h3 { margin-right: 0px; }	
+	}
 
-		.sheet-flag-primary + div {display: none;}
+	.sheet-flag-primary {
+		& + div {
+			display: none;
 
-		.sheet-flag-primary[value="primary"] + div {
+			& > span {font-family: "pictos";}
+		}
+
+		&[value="primary"] + div {
 			display     : inline;
-			margin-right: -5%;}
-						
-		.sheet-flag-primary + div > span {font-family: "pictos";}
+			margin-right: -5%;
+		}
+	}
 
-		/***** PRIMARY ARMOR *****/
-			.sheet-cc-arm button[type="roll"] {
-				padding    : 2px 3px;
-				margin-left: 0px;}
+	/***** PRIMARY ARMOR *****/
+	.sheet-cc-arm {
+		button[type="roll"] {
+			padding    : 2px 3px;
+			margin-left: 0px;
 
-			.sheet-cc-arm button[type="roll"]:nth-of-type(2) {
+			&:nth-of-type(2) {
 				margin-right: 0px;
-				margin-left : 5px;}
+			}
+		}
+	}
 
-			.sheet-cc-arm .sheet-armor-buttons button[type="roll"] {
-				font-size   : 1.3em;
-				margin-right: -5px;
-				width       : 15%;}
+	.sheet-armor-buttons {
+		display    : inline-block;
+		font-size  : 1.2em;
+		line-height: 20px;
+		margin-left: 1%;
+		width      : 28%;
 
-			.sheet-armor-buttons {
-				display    : inline-block;
-				font-size  : 1.2em;
-				line-height: 20px;
-				margin-left: 1%;
-				width      : 28%;}
+		button[type="roll"] {
+			font-size   : 1.3em;
+			margin-right: -5px;
+			width       : 15%;
+		}
 
-			.sheet-armor-buttons span {
-				font-size  : 1.2em;
-				margin-left: -5px;}
+		span {
+			font-size  : 1.2em;
+			margin-left: -5px;
+		}
+	}
 
-		/***** PRIMARY WEAPON *****/
-			.sheet-cc-row button[type="roll"] {
-				width: 40%;}
-
-			.sheet-cc-row button[type="action"] {
+	/***** PRIMARY WEAPON *****/
+	.sheet-cc-row {
+		button {
+			&[type="roll"] { width: 40%; }
+			&[type="action"] {
 				font-family: fontello;
-				width      : 5%;}
+				width      : 5%;
+			}
 
-			.sheet-cc-row button[name*="primary_ammo"] {
-				width      : 10%;}
+			&[name*="primary_ammo"] { width: 10%; }
 
-			.sheet-cc-row button[type="roll"] > span,
-			.sheet-cc-row h3 + span {
-				display    : inline-block;
-				margin-left: 1%;
-				text-align : center;
-				width      : 8%;}
-
-				/** Ammo displa */
-			.sheet-cc-row span[name*="ammo"] {
-				width  : 4%;}
-
-			.sheet-cc-row span[name*="ammo_max"]:before {
-				content: "/";}
-
-				/** The x# after ammo button **/
-			.sheet-cc-row button[type="action"] > span {
+			&[type="action"] > span {
 				display: inline;
-				margin-left: 0px;}
+				margin-left: 0px;
 
-			.sheet-cc-row button[type="action"] > span:before {
-				content: "x";}
+				&:before { content: "x"; } /** The x# after ammo button **/
+			}
 
-			.sheet-cc-row button[name*="shots"],
-			.sheet-cc-row button[name="act_reload"],
-			.sheet-cc-row button[name="act_primary_ammo"]  {
+			&[name*="shots"],
+			&[name="act_reload"],
+			&[name="act_primary_ammo"]  {
 				border-bottom             : 2px solid #666;
 				border-bottom-right-radius: 2px;
 				border-color              : #aaa;
@@ -520,626 +546,736 @@
 				border-style              : outset;
 				font-family               : "Pictos";}
 
-			.sheet-cc-row button[name*="shots_remove"] {
+			&[name*="shots_remove"] {
 				transform: rotate(180deg);
 				-ms-transform: rotate(180deg); /* IE 9 */
-  				-webkit-transform: rotate(180deg); /* Safari 3-8 */}
+				  -webkit-transform: rotate(180deg); /* Safari 3-8 */
+			}
+		}
 
-  			.sheet-cc-row span[name*="fired"] {
-  				font-size: 0.9em;}
+		button[type="roll"] > span,
+		h3 + span {
+			display    : inline-block;
+			margin-left: 1%;
+			text-align : center;
+			width      : 8%;
+		}
 
-	/***** ATTRIBUTE AND CONDITION MONITOR *****/				
-		/***** ATTRIBUTES BOX *****/
-			.sheet-attr-box h3 {color: #000;}
+		/** Ammo display */
+		span[name*="ammo"] { width  : 4%; }
+		span[name*="ammo_max"]:before { content: "/"; }
 
-			.sheet-attr-col {
-				display       : inline-block;
-				margin-top    : 10px;
-				vertical-align: top;
-				width         : 48%;}
+		span[name*="fired"] { font-size: 0.9em; }
+	}
 
-			.sheet-attr-col button[type="roll"] {
-				border-bottom: 1px solid #000;
-				border-radius: 0px;
-				cursor       : pointer;
-				font-size    : 0.9em;
-				font-weight  : bold;
-				margin-left  : 0px;
-				padding-right: 2px;
-				text-align   : right;
-				width        : 30%;}
+/***** ATTRIBUTE AND CONDITION MONITOR *****/				
+	/***** ATTRIBUTES BOX *****/
+		.sheet-attr-box h3 {color: #000;}
 
-			.sheet-attr-col input[type="number"] {
-				border-radius: 0px;
-				width        : 23%;}
+		.sheet-attr-col {
+			display       : inline-block;
+			margin-top    : 10px;
+			vertical-align: top;
+			width         : 48%;
 
-			.sheet-attr-col input[type="text"] {
-				width: 50%;
+			button {
+				&[type="roll"] {
+					border-bottom: 1px solid #000;
+					border-radius: 0px;
+					cursor       : pointer;
+					font-size    : 0.9em;
+					font-weight  : bold;
+					margin-left  : 0px;
+					padding-right: 2px;
+					text-align   : right;
+					width        : 30%;
+				}
+
+				& > span {font-weight: bold;}
 			}
 
-			.sheet-attr-col .sheet-totals {
-				padding      : 0px 2px;}
+			input[type="number"] {
+				border-radius: 0px;
+				width        : 23%;
+			}
 
-			sheet-attr-col button > span {font-weight: bold;}
+			input[type="text"] { width: 50%; }
 
-			.sheet-attr-col-left {margin-left: -13%;}
+			.sheet-totals { padding: 0px 2px;}
 
-			.sheet-attr-col-right {width: 50%;}
+			&-left { margin-left: -13%; }
 
-			.sheet-attr-col-right .sheet-attr-ini input[type="number"] {width: 15%;}
+			&-right { 
+				width: 50%; 
 
-			.sheet-attr-col-right button[type="roll"] {
-				margin-right: 0px;
-				width       : 55%;}
+				button[type="roll"] {
+					margin-right: 0px;
+					width       : 55%;
+				}
 
-			.sheet-settings-toggle:checked ~ .sheet-attr-col-right .sheet-attr-ini {width: 70%;}
+				.sheet-attr-ini input[type="number"] {width: 15%;}
 
-			.sheet-settings-toggle:checked ~ .sheet-attr-col-right button.sheet-attr-ini {width: 28%;}
+				label {
+					border-bottom: 1px solid #000;
+					font-size    : 0.9em;
+					height       : 22px;
+					text-align   : right;
+					width        : 55%;
+				}
 
-			.sheet-settings-toggle:checked ~ .sheet-attr-col-right button.sheet-attr-ini .sheet-init-settings {display: inline;}
+				.sheet-attr-und {
+					width: 43%;
+				}
+			}
+		}
 
-			.sheet-attr-col-right button.sheet-attr-ini .sheet-init-settings,
-			.sheet-settings-toggle:checked ~ .sheet-attr-col-right button.sheet-attr-ini .sheet-init-display {
-				display: none;}
+	.sheet-settings-toggle:checked ~ .sheet-attr-col-right .sheet-attr-ini {width: 70%;}
+	.sheet-settings-toggle:checked ~ .sheet-attr-col-right button.sheet-attr-ini {width: 28%;}
+	.sheet-settings-toggle:checked ~ .sheet-attr-col-right button.sheet-attr-ini .sheet-init-settings {display: inline;}
 
-			.sheet-attr-col-right label {
-				border-bottom: 1px solid #000;
-				font-size    : 0.9em;
-				height       : 22px;
-				text-align   : right;
-				width        : 55%;}
+	.sheet-attr-col-right button.sheet-attr-ini .sheet-init-settings,
+	.sheet-settings-toggle:checked ~ .sheet-attr-col-right button.sheet-attr-ini .sheet-init-display {
+		display: none;}
 
-			.sheet-attr-col-right .sheet-attr-und {width: 43%;}
 
-			.sheet-attr-und {
-				border-bottom : 1px solid #000;
-				display       : inline-block;
-				height        : 22px;
-				margin-bottom : 4px;
-				vertical-align: top;
-				width         : 65%;}
+	.sheet-attr-und {
+		border-bottom : 1px solid #000;
+		display       : inline-block;
+		height        : 22px;
+		margin-bottom : 4px;
+		vertical-align: top;
+		width         : 65%;
 
-			.sheet-attr-und .sheet-display {text-align: center;}
+		.sheet-display {text-align: center;}
+	}
 
-			.sheet-tiny-span {font-size: 0.75em;}
+	.sheet-tiny-span {font-size: 0.75em;}
 
-		/***** ATTRIBUTE LIMITS *****/	
-			.sheet-attr-lim {margin-top: 20px;}
+/***** ATTRIBUTE LIMITS *****/	
+	.sheet-attr-lim {
+		margin-top: 20px;
 
-			.sheet-attr-lim div {
-				display   : inline-block;
-				height    : 22px;
-				text-align: center;
-				width     : 10%;}
+		div {
+			display   : inline-block;
+			height    : 22px;
+			text-align: center;
+			width     : 10%;
+		}
 
-			.sheet-attr-lim input[type="number"] {width: 6%;}
+		input[type="number"] { width: 6%; }
+		label { width: auto; }
 
-			.sheet-attr-lim label {width: auto;}
+		span + span { margin-right: 1%; }
 
-			.sheet-attr-lim span + span {margin-right: 1%;}
+		.sheet-display {width: 100%;}
+	}
 
-			.sheet-attr-lim .sheet-display {width: 100%;}
+/***** ATTRIBUTE AND CONDITION MONITOR SETTINGS TOGGLES *****/
+	/***** ATTRIBUTE SETTINGS TOGGLE *****/
+		.sheet-attr-box input.sheet-settings-toggle {
+			left: 94%;
+			top : 0px;
 
-		/***** ATTRIBUTE AND CONDITION MONITOR SETTINGS TOGGLES *****/
-			/***** ATTRIBUTE SETTINGS TOGGLE *****/
-				.sheet-attr-box input.sheet-settings-toggle {
-					left: 94%;
-					top : 0px;}
+			& + span  {
+				font-size: 1em;
+				left     : 88%;
+			}
+		}
 
- 				.sheet-attr-box input.sheet-settings-toggle + span  {
-					font-size: 1em;
-					left     : 88%;}
+	/***** CONDITION SETTINGS TOGGLE  *****/
+		.sheet-condition-box input[type="checkbox"] {
+			left: -1%;
+			
+			& + span { left: -10%; }
+		}
 
-			/***** CONDITION SETTINGS TOGGLE  *****/
-				.sheet-condition-box input[type="checkbox"] {
-					left: -1%;}
+	/***** CONDITION MONITOR SECTION *****/
+		.sheet-con-track {
+			display       : inline-block;
+			vertical-align: top;
+			width         : 47%;
 
- 				.sheet-condition-box input[type="checkbox"] + span {
-					left: -10%;}
-
-		/***** CONDITION MONITOR SECTION *****/
-			.sheet-con-track {
-				display       : inline-block;
-				vertical-align: top;
-				width         : 47%;}
-
-			.sheet-con-track button[type="action"] {
+			button[type="action"] {
 				font-size    : 1em;
 				font-weight  : bold;
 				margin-bottom: -5px;
 				padding-left : 20px;
-				width        : 100%;}
+				width        : 100%;
+			}
+		}
 
-			.sheet-condition-box .sheet-display,
-			.sheet-condition-box .sheet-settings {
-					margin-top: -10px;}
 
-			/***** CONDITION MONITOR SETTINGS  *****/
-				.sheet-condition-box .sheet-settings input {
+		/***** CONDITION MONITOR SETTINGS  *****/
+		.sheet-condition-box {
+			.sheet-display,
+			.sheet-settings {
+				margin-top: -10px;
+			}
+
+
+			.sheet-settings {
+				input {
 					border-bottom: 1px solid #000;
 					border-radius: 0px;
 					height       : 22px;
-					margin-bottom: 5px;}
+					margin-bottom: 5px;
+				}
 
-				.sheet-condition-box .sheet-settings .sheet-con-footer {
+				/***** CONDITION MONITOR DISPLAY*****/
+				.sheet-con-footer {
 					margin-top : 0px;
-					text-indent: 10px;}
+					text-indent: 10px;
 
-			/***** CONDITION MONITOR DISPLAY*****/
-				.sheet-con-footer .sheet-attr-und {
-					display      : inline-block;
-					margin-bottom: -5px;
-					text-align   : center;
-					width        : 60%;}
+					.sheet-attr-und {
+						display      : inline-block;
+						margin-bottom: -5px;
+						text-align   : center;
+						width        : 60%;
+					}
+				}
+			}
+		}
 
-				/***** CONDITION MONITOR SQUARES *****/
-				.sheet-squares {
-					margin-left: 20%;
-					width      : 70%;}
+		/***** CONDITION MONITOR SQUARES *****/
+		.sheet-squares {
+			margin-left: 20%;
+			width      : 70%;
 
-				.sheet-squares div {
-					background-color: transparent;
-					border-right    : none;
-					left            : 85%;
-					margin-bottom   : -20px;
-					position        : relative;
-					top             : -15px;}
-
-				.sheet-squares input[type="radio"],
-				.sheet-squares span {
-					height: 45px;
-					width : 33%;} 
-
-				.sheet-squares input[type="radio"] {
-					clear       : both;
-					left        : 2px;
-					margin-right: -43px;
-					position    : relative;
-					top         : 6px;}
-
-				.sheet-squares span {
-					background-color: #9a9a9a;
-					border-radius   : 0px;
-					border          : 2px solid #610b0d;
-					box-shadow      : inset 0px 0px 3px 1px #7c7c7c;
-					display         : inline-block;
-					margin-bottom   : -25px;
-					margin-right    : -7px;}
-
-				.sheet-squares input[type="radio"]:checked ~ input[type="radio"] + span,
-				.sheet-con-track input[type="radio"]:checked ~ .sheet-squares span,
-				.sheet-con-track input[type="hidden"][value="0"] ~ .sheet-squares span {
-					background-color: transparent;}
-
-				/***** MAKE CONDTION SQUARES APPEAR & DISPPEAR *****/
-					.sheet-hex-hider[value="8"] ~ input[type="radio"]:nth-child(1n+19),
-					.sheet-hex-hider[value="9"] ~ input[type="radio"]:nth-child(1n+21),
-					.sheet-hex-hider[value="10"] ~ input[type="radio"]:nth-child(1n+24),
-					.sheet-hex-hider[value="11"] ~ input[type="radio"]:nth-child(1n+26),
-					.sheet-hex-hider[value="12"] ~ input[type="radio"]:nth-child(1n+28),
-					.sheet-hex-hider[value="13"] ~ input[type="radio"]:nth-child(1n+32),
-					.sheet-hex-hider[value="14"] ~ input[type="radio"]:nth-child(1n+34),
-					.sheet-hex-hider[value="15"] ~ input[type="radio"]:nth-child(1n+36),
-					.sheet-hex-hider[value="16"] ~ input[type="radio"]:nth-child(1n+38),
-					.sheet-hex-hider[value="17"] ~ input[type="radio"]:nth-child(1n+40),
-					.sheet-hex-hider[value="18"] ~ input[type="radio"]:nth-child(1n+42),
-					.sheet-hex-hider[value="8"] ~ div:nth-child(1n+19),
-					.sheet-hex-hider[value="9"] ~ div:nth-child(1n+24),
-					.sheet-hex-hider[value="10"] ~ div:nth-child(1n+24),
-					.sheet-hex-hider[value="11"] ~ div:nth-child(1n+24),
-					.sheet-hex-hider[value="12"] ~ div:nth-child(1n+30),
-					.sheet-hex-hider[value="13"] ~ div:nth-child(1n+30),
-					.sheet-hex-hider[value="14"] ~ div:nth-child(1n+30),
-					.sheet-hex-hider[value="15"] ~ div:nth-child(1n+38),
-					.sheet-hex-hider[value="16"] ~ div:nth-child(1n+38),
-					.sheet-hex-hider[value="17"] ~ div:nth-child(1n+38),
-					.sheet-hex-hider[value="18"] ~ div:nth-child(1n+48) {
-						display: none;}
-
-					.sheet-hex-hider[value="8"] ~ input[type="radio"]:nth-child(1n+19) + span,
-					.sheet-hex-hider[value="9"] ~ input[type="radio"]:nth-child(1n+21) + span,
-					.sheet-hex-hider[value="10"] ~ input[type="radio"]:nth-child(1n+24) + span,
-					.sheet-hex-hider[value="11"] ~ input[type="radio"]:nth-child(1n+26) + span,
-					.sheet-hex-hider[value="12"] ~ input[type="radio"]:nth-child(1n+28) + span,
-					.sheet-hex-hider[value="13"] ~ input[type="radio"]:nth-child(1n+32) + span,
-					.sheet-hex-hider[value="14"] ~ input[type="radio"]:nth-child(1n+34) + span,
-					.sheet-hex-hider[value="15"] ~ input[type="radio"]:nth-child(1n+36) + span,
-					.sheet-hex-hider[value="16"] ~ input[type="radio"]:nth-child(1n+38) + span,
-					.sheet-hex-hider[value="17"] ~ input[type="radio"]:nth-child(1n+40) + span,
-					.sheet-hex-hider[value="18"] ~ input[type="radio"]:nth-child(1n+42) + span {
-						opacity: 0;}
-
-		/***** CONDITION MONITOR FOOTERS *****/
-			.sheet-con-footer {
-				font-size : 0.8em;
-				margin-top: 10px;}
-
-			.sheet-con-footer label {
-				margin-right: 5px;
-				width       : auto;}
-
-			.sheet-con-footer input[type="number"] {
-				border-bottom: 1px solid #000;
-				border-radius: 0px;
-				height       : 22px;
-				margin-top   : -5px;}
-
-	/***** REPEATING FIELDS FOR PC SECTIONS SUCH AS SKILLS *****/
-		.sheet-repeat-box .sheet-medium-box {
-			height    : auto;
-			min-height: 200px;}
-
-		.sheet-repeat-box h3 {
-			color        : #000;
-			margin-bottom: -3px;}
-
-		/***** REPEATING SECTION *****/
-			.sheet-repeat-box .repitem {
-				display      : inline-flex;
-				border-bottom: 1px solid #000;
-				width        : 100%;}
-
-		/***** REPEATING SECTION TOGGLES *****/
-			.sheet-repeat-box input.sheet-settings-toggle,
-			.sheet-repeat-box input.sheet-primary-flag + span {
-				position: absolute;
-				width   : 13px;}
-
-			.sheet-repeat-box input.sheet-settings-toggle,
-			.sheet-repeat-box input.sheet-settings-toggle + span {
-				left: 98.5%;}
-
-			.sheet-repeat-box input.sheet-settings-toggle + span {
-				top  : -2px;
-				width: 2%;}
-
-		/***** REPEATING BOX SECTION INPUTS *****/
-			.sheet-repeat-box .sheet-settings input[type="text"] {
-				border-bottom: 1px solid #333;
-				border-radius: 0px;}
-
-			.sheet-repeat-box .sheet-settings input[type="number"] {
-				border       : none;
-				border-bottom: 1px solid #333;
-				border-radius: 0px;
-				width        : 8%;}
-
-			.sheet-repeat-box .sheet-settings input[type="text"]:first-child {
-				text-align: left;}
-
-			.sheet-repeat-box .sheet-settings label {
-				font-size    : 0.8em;
-				margin-bottom: 0px;}
-
-		/***** REPEATING BOX DISPLAY *****/
-			.sheet-repeat-box button[type="roll"],
-			.sheet-repeat-box button[type="action"] {
-				font-size: 0.9em;
-				color    : #000;}
-
-			.sheet-rank {
-				display   : inline-block;
-				text-align: center;
-				width     : 10%;}
-
-		/***** REPEATING SECTION SELECTS *****/
-			.sheet-repeat-box select {
-				color      :  #000;
-				font-size  : 0.8em;
-				font-weight: bolder;
-				height     : 20px;
-				padding    : 0px;
-				width      : 14%;}
-
-			.sheet-repeat-box option {
-				padding    : 2px;
-				font-weight: bold;}
-
-	/***** COLLAPSABLE DIVS *****/
-		.sheet-collapsable {
-			padding-left: 1.5em;
-			width       : 100%;
-			word-break  : break-word;}
-
-		.sheet-collapsable span {
-			white-space: pre-line;}
-
-		/***** DISPLAY FLAG FOR THE COLLAPSABLE DIVS *****/
-			.sheet-quality-box .sheet-display-flag,
-			.sheet-contacts .sheet-display-flag,
-			.sheet-item-box .sheet-display-flag,
-			.sheet-spell-box .sheet-display-flag,
-			.sheet-powers-box .sheet-display-flag,
-			.sheet-program-box .sheet-display-flag,
-			.sheet-aug-box .sheet-display-flag,
-			.sheet-form-box .sheet-display-flag,
-			.sheet-social-box .sheet-display-flag,
-			.sheet-vehicle-box .sheet-display-flag  {
-				opacity : 0;    
-				position: absolute;
-				top     : 0px;
-				width   : 95%;
-				height  : 100%;}
-
-			.sheet-collapsable .sheet-desc,
-			.sheet-collapsable .sheet-desc-lifestyle {
-				display: none;
+			div {
+				background-color: transparent;
+				border-right    : none;
+				left            : 85%;
+				margin-bottom   : -20px;
+				position        : relative;
+				top             : -15px;
 			}
 
-			.sheet-display-flag:checked ~ .sheet-collapsable .sheet-desc {
-				display: inline;
+			input[type="radio"],
+			span {
+				height: 45px;
+				width : 33%;
+			} 
+
+			input[type="radio"] {
+				clear       : both;
+				left        : 2px;
+				margin-right: -43px;
+				position    : relative;
+				top         : 6px;
 			}
 
-			.sheet-display-flag:checked ~ .sheet-collapsable .sheet-desc-lifestyle {
-				display: inline-block;
+			span {
+				background-color: #9a9a9a;
+				border-radius   : 0px;
+				border          : 2px solid #610b0d;
+				box-shadow      : inset 0px 0px 3px 1px #7c7c7c;
+				display         : inline-block;
+				margin-bottom   : -25px;
+				margin-right    : -7px;
+			}
+		}
+
+	.sheet-squares input[type="radio"]:checked ~ input[type="radio"] + span,
+	.sheet-con-track input[type="radio"]:checked ~ .sheet-squares span,
+	.sheet-con-track input[type="hidden"][value="0"] ~ .sheet-squares span {
+		background-color: transparent;}
+
+	/***** MAKE CONDTION SQUARES APPEAR & DISPPEAR *****/
+		.sheet-hex-hider[value="8"] ~ input[type="radio"]:nth-child(1n+19),
+		.sheet-hex-hider[value="9"] ~ input[type="radio"]:nth-child(1n+21),
+		.sheet-hex-hider[value="10"] ~ input[type="radio"]:nth-child(1n+24),
+		.sheet-hex-hider[value="11"] ~ input[type="radio"]:nth-child(1n+26),
+		.sheet-hex-hider[value="12"] ~ input[type="radio"]:nth-child(1n+28),
+		.sheet-hex-hider[value="13"] ~ input[type="radio"]:nth-child(1n+32),
+		.sheet-hex-hider[value="14"] ~ input[type="radio"]:nth-child(1n+34),
+		.sheet-hex-hider[value="15"] ~ input[type="radio"]:nth-child(1n+36),
+		.sheet-hex-hider[value="16"] ~ input[type="radio"]:nth-child(1n+38),
+		.sheet-hex-hider[value="17"] ~ input[type="radio"]:nth-child(1n+40),
+		.sheet-hex-hider[value="18"] ~ input[type="radio"]:nth-child(1n+42),
+		.sheet-hex-hider[value="8"] ~ div:nth-child(1n+19),
+		.sheet-hex-hider[value="9"] ~ div:nth-child(1n+24),
+		.sheet-hex-hider[value="10"] ~ div:nth-child(1n+24),
+		.sheet-hex-hider[value="11"] ~ div:nth-child(1n+24),
+		.sheet-hex-hider[value="12"] ~ div:nth-child(1n+30),
+		.sheet-hex-hider[value="13"] ~ div:nth-child(1n+30),
+		.sheet-hex-hider[value="14"] ~ div:nth-child(1n+30),
+		.sheet-hex-hider[value="15"] ~ div:nth-child(1n+38),
+		.sheet-hex-hider[value="16"] ~ div:nth-child(1n+38),
+		.sheet-hex-hider[value="17"] ~ div:nth-child(1n+38),
+		.sheet-hex-hider[value="18"] ~ div:nth-child(1n+48) {
+			display: none;}
+
+		.sheet-hex-hider[value="8"] ~ input[type="radio"]:nth-child(1n+19) + span,
+		.sheet-hex-hider[value="9"] ~ input[type="radio"]:nth-child(1n+21) + span,
+		.sheet-hex-hider[value="10"] ~ input[type="radio"]:nth-child(1n+24) + span,
+		.sheet-hex-hider[value="11"] ~ input[type="radio"]:nth-child(1n+26) + span,
+		.sheet-hex-hider[value="12"] ~ input[type="radio"]:nth-child(1n+28) + span,
+		.sheet-hex-hider[value="13"] ~ input[type="radio"]:nth-child(1n+32) + span,
+		.sheet-hex-hider[value="14"] ~ input[type="radio"]:nth-child(1n+34) + span,
+		.sheet-hex-hider[value="15"] ~ input[type="radio"]:nth-child(1n+36) + span,
+		.sheet-hex-hider[value="16"] ~ input[type="radio"]:nth-child(1n+38) + span,
+		.sheet-hex-hider[value="17"] ~ input[type="radio"]:nth-child(1n+40) + span,
+		.sheet-hex-hider[value="18"] ~ input[type="radio"]:nth-child(1n+42) + span {
+			opacity: 0;}
+
+/***** CONDITION MONITOR FOOTERS *****/
+.sheet-con-footer {
+	font-size : 0.8em;
+	margin-top: 10px;
+
+	label {
+		margin-right: 5px;
+		width       : auto;
+	}
+
+	input[type="number"] {
+		border-bottom: 1px solid #000;
+		border-radius: 0px;
+		height       : 22px;
+		margin-top   : -5px;
+	}
+}
+
+/***** REPEATING FIELDS FOR PC SECTIONS SUCH AS SKILLS *****/
+.sheet-repeat-box {
+	.sheet-medium-box {
+		height    : auto;
+		min-height: 200px;
+	}
+
+	h3 {
+		color        : #000;
+		margin-bottom: -3px;
+	}
+
+	/***** REPEATING SECTION *****/
+	.repitem {
+		display      : inline-flex;
+		border-bottom: 1px solid #000;
+		width        : 100%;
+	}
+
+	/***** REPEATING SECTION TOGGLES *****/
+	input.sheet-settings-toggle,
+	input.sheet-primary-flag + span {
+		position: absolute;
+		width   : 13px;
+	}
+
+	input.sheet-settings-toggle {
+		left: 98.5%;
+
+		& + span {
+			left: 98.5%;
+			top  : -2px;
+			width: 2%;
+		}
+	}
+
+	/***** REPEATING BOX SECTION INPUTS *****/
+	.sheet-settings {
+		input[type="text"] {
+			border-bottom: 1px solid #333;
+			border-radius: 0px;
+
+			&:first-child { text-align: left; }
+	
+		}
+
+		input[type="number"] {
+			border       : none;
+			border-bottom: 1px solid #333;
+			border-radius: 0px;
+			width        : 8%;
+		}
+
+		label {
+			font-size    : 0.8em;
+			margin-bottom: 0px;
+		}
+	}
+
+	/***** REPEATING BOX DISPLAY *****/
+	button[type="roll"],
+	button[type="action"] {
+		font-size: 0.9em;
+		color    : #000;
+	}
+
+	/***** REPEATING SECTION SELECTS *****/
+	select {
+		color      :  #000;
+		font-size  : 0.8em;
+		font-weight: bolder;
+		height     : 20px;
+		padding    : 0px;
+		width      : 14%;
+	}
+
+	option {
+		padding    : 2px;
+		font-weight: bold;
+	}
+}
+
+.sheet-rank {
+	display   : inline-block;
+	text-align: center;
+	width     : 10%;
+}
+
+/***** COLLAPSABLE DIVS *****/
+	.sheet-collapsable {
+		padding-left: 1.5em;
+		width       : 100%;
+		word-break  : break-word;
+
+		span { white-space: pre-line; }
+
+		.sheet-desc { 
+			@extend %display-none;
+
+			.sheet-display-flag:checked ~ & { @extend %display-inline; }
+		}
+
+		.sheet-desc-lifestyle { 
+			@extend %display-none;
+
+			.sheet-display-flag:checked ~ & {
+				@extend %display-inline-block;
 				width: 100%;
 			}
+		}
+	}
 
-			.sheet-arms input.sheet-display-flag,
-			.sheet-arms input.sheet-display-flag + span,
-			.sheet-spell-box input.sheet-display-flag,
-			.sheet-spell-box input.sheet-display-flag + span,
-			.sheet-matrix input.sheet-display-flag,
-			.sheet-matrix input.sheet-display-flag + span  {
-				height  : 12px;
-				position: absolute;
-				top     : 2px;
-				width   : 12px;
-			}
+	/***** DISPLAY FLAG FOR THE COLLAPSABLE DIVS *****/
+	%display-flag {
+		opacity : 0;    
+		position: absolute;
+		top     : 0px;
+		width   : 95%;
+		height  : 100%;
+	}
 
-			.sheet-arms input.sheet-display-flag,
-			.sheet-arms input.sheet-display-flag + span,
-			.sheet-spell-box input.sheet-display-flag,
-			.sheet-spell-box input.sheet-display-flag + span,
-			.sheet-matrix input.sheet-display-flag,
-			.sheet-matrix input.sheet-display-flag + span  {
-				left: 93%;
-			}
+	$displayFlags: 'quality-box', 'contacts', 'item-box', 'spell-box', 'powers-box', 'program-box', 'aug-box', 'form-box', 'social-box', 'vehicle-box';
+	@each $flag in $displayFlags {
+		.sheet-#{$flag} .sheet-display-flag { @extend %display-flag;}
+	}
 
-			.sheet-arms input.sheet-display-flag + span,
-			.sheet-spell-box input.sheet-display-flag + span,
-			.sheet-matrix input.sheet-display-flag + span,
-			.sheet-matrix input.sheet-display-flag + span   {
-				top: -2px;}
+	%arms-display-flag {
+		height  : 12px;
+		position: absolute;
+		top     : 2px;
+		width   : 12px;
+		left: 93%;
+	}
 
-	/***** DISPLAY ROWS *****/
-		.sheet-display-row {
-			display       : inline-block;
-			overflow      : hidden;
-			text-align    : center;
-			vertical-align: top;
-			word-break    : break-word;}
+	@each $flag in 'arms', 'spell-box', 'matrix' {
+		.sheet-#{$flag} input.sheet-display-flag,
+		.sheet-#{$flag} input.sheet-display-flag + span {
+			@extend %arms-display-flag;
+		}
 
-		.sheet-display-row:nth-of-type(1),
-		.sheet-display-row:nth-of-type(1) button {
+		.sheet-#{$flag} input.sheet-display-flag { top: 2px; }
+		.sheet-#{$flag} input.sheet-display-flag + span { top: -2px; }
+	}
+
+/***** DISPLAY ROWS *****/
+	.sheet-display-row {
+		display       : inline-block;
+		overflow      : hidden;
+		text-align    : center;
+		vertical-align: top;
+		word-break    : break-word;
+
+		&:nth-of-type(1),
+		&:nth-of-type(1) button {
 			font-weight: bold;
-			text-align : left;}
+			text-align : left;
+		}
+	}
 
-	/***** DISPLAY & SETTINGS *****/		
-		.sheet-skills-row,
-		.sheet-quality-box .sheet-settings div,
-		.sheet-quality-box .sheet-display,
-		.sheet-lifestyle .sheet-settings div,
-		.sheet-contacts .sheet-settings div,
-		.sheet-contacts .sheet-display,
-		.sheet-magic-rituals .sheet-settings div,
-		.sheet-spell-box .sheet-display, 
-		.sheet-item-box .sheet-display,
-		.sheet-item-box .sheet-settings div,
-		.sheet-aug-box .sheet-display,
-		.sheet-powers-box .sheet-display {
-			display: inline-block;
-			width  : 100%;}
+/***** DISPLAY & SETTINGS *****/	
+	.sheet-skills-row,
+	.sheet-lifestyle .sheet-settings div,
+	.sheet-magic-rituals .sheet-settings div,
+	.sheet-spell-box .sheet-display, 
+	.sheet-aug-box .sheet-display,
+	.sheet-powers-box .sheet-display {
+		display: inline-block;
+		width  : 100%;
+	}
+
+	@each $box in 'quality-box', 'contacts', 'item-box' {
+		.sheet-#{$box} .sheet-display,
+		.sheet-#{$box} .sheet-settings div {
+			@extend .sheet-skills-row;
+		}
+	}
 
 	/***** SKILLS *****/
-		.sheet-skill-box h3[data-i18n="skill"] {margin-right: 47%;}
-		.sheet-skill-box h3[data-i18n="attribute"] {margin-left: 4%;}
-		.sheet-skill-box h3[data-i18n="limit"] {margin-left: 8%;}
+	.sheet-skill-box {
+		h3 {
+			&[data-i18n="skill"] {margin-right: 47%;}
+			&[data-i18n="attribute"] {margin-left: 4%;}
+			&[data-i18n="limit"] {margin-left: 8%;}
+		}
 
-		.sheet-skill-box label {
+		label {
 			display       : inline-block;
 			font-size     : 0.8em;
-			text-transform: capitalize;}
+			text-transform: capitalize;
+		}
+	}
 
-		select.sheet-attr-select {
-			position: absolute;}
+	.sheet-attr-select {
+		select {
+			position: absolute;
+	
+			&[name="attr_attribute"] {left: 62%; }
+			&[name="attr_limit"] {left: 82%;}
+		}
 
-		select.sheet-attr-select[name="attr_attribute"] {
-			left    : 62%;}
+		option:nth-of-type(1n+9) { color: #7a2593;	}
+		option:nth-of-type(1n+5) { color: #610b0d; }
+	}
 
-		select.sheet-attr-select[name="attr_limit"] {
-			left    : 82%;}
+	.sheet-limit-select  {
+		margin-left: 4%;
 
-			.sheet-attr-select option:nth-of-type(1n+5),
-			.sheet-limit-select option:nth-of-type(1n+5) {color: #610b0d;}
-			.sheet-attr-select option:nth-of-type(1n+9) {color: #7a2593;}
+		option:nth-of-type(1n+5) { color: #610b0d; }
+	}
 
-			.sheet-limit-select  {
-				margin-left: 4%;
-			}
+	/***** SKILLS REPEATING SECTION *****/
+	.sheet-skills-row {
+		.sheet-name,
+		select.sheet-skill-select,
+		.sheet-settings input[type="text"] {
+			width: 50%;
+		}
 
-		/***** SKILLS REPEATING SECTION *****/ 
-			.sheet-skills-row .sheet-settings-row div {
-				width: 70%;}
+		.sheet-settings {
+			input[type="text"] {text-align: left;}
 
-			.sheet-skill-box .sheet-name,
-			.sheet-skill-box select.sheet-skill-select,
-			.sheet-skill-box .sheet-settings input[type="text"] {
-				width: 50%;}
-
-			.sheet-skill-box .sheet-settings input[type="text"] {text-align: left;}
-
-			.sheet-skill-box .sheet-settings input[type="number"] {
+			input[type="number"] {
 				margin-left  : 3px;
 				margin-right : 5px;
-				margin-bottom: 2px;}
-
-			option.sheet-option-headers {opacity: 0.2;}
-
-			option.sheet-option-groups {
-				font-size: 1em;
-				font-style: italic;}
-
-			input.sheet-skill-select {
-				opacity: 1;
-				width: 3%;}
-
-			/***** SKILLS SETTINGS ROWS *****/
-				.sheet-skills-row label {
-					font-size    : 0.8em;
-					font-weight  : 700;
-					margin-bottom: -3px;}
-
-				.sheet-skills-row .sheet-settings-row input[type="text"] {
-					width: 45%;}
-
-			/***** SKILLS DISPLAY *****/
-				.sheet-skill-box .sheet-name {
-					display: inline-block;
-					min-height: 20px;}
-
-	/***** ARMS *****/
-		.sheet-arms .sheet-htab {margin-right: -40px;}
-		.sheet-arms .sheet-htab:first-child {margin-left: -35px;}
-
-		/***** WEAPONS *****/
-			.sheet-pc .sheet-weapon-range,
-			.sheet-pc .sheet-weapon-melee {
-				display: none;
-				width  : 100%;}
-
-			.sheet-tab-switch[value="range"] ~ .sheet-weapon-range,
-			.sheet-tab-switch[value="melee"] ~ .sheet-weapon-melee,
-			.sheet-arms .sheet-display  {
-				display: inline-block;;
+				margin-bottom: 2px;
 			}
+		}
 
-			.sheet-arms .sheet-display  {
-				margin-left: -1%;
-			}
+		/***** SKILLS SETTINGS ROWS *****/
+		label {
+			font-size    : 0.8em;
+			font-weight  : 700;
+			margin-bottom: -3px;
+		}
 
-			/***** WEAPON SETTINGS *****/
-				.sheet-weapon-box select {width: 10%;}
-				.sheet-weapon-box .sheet-settings-row {margin-top: 5px;}
+		.sheet-settings-row {
+			div {width: 70%;}
 
-				.sheet-arms input[type="text"],
-				.sheet-arms h3,
-				.sheet-arms .sheet-display .sheet-display-row {
-					text-align: center;
-					width     : 8%;}
+			input[type="text"] {width: 45%;}
+		}
 
-				.sheet-arms input[type="text"]:first-child,
-				.sheet-arms .sheet-display .sheet-display-row:first-child {
+	}
+
+	option.sheet-option-headers {opacity: 0.2;}
+
+	option.sheet-option-groups {
+		font-size: 1em;
+		font-style: italic;
+	}
+
+	input.sheet-skill-select {
+		opacity: 1;
+		width: 3%;
+	}
+
+	/***** SKILLS DISPLAY *****/
+		.sheet-skill-box .sheet-name {
+			display: inline-block;
+			min-height: 20px;
+		}
+
+/***** ARMS *****/
+	.sheet-arms {
+		.sheet-htab {
+			margin-right: -40px;
+			&:first-child {margin-left: -35px;}
+		}
+
+		.sheet-display  {
+			@extend %display-inline-block;
+			margin-left: -1%;
+
+			.sheet-display-row {
+				text-align: center;
+				width     : 8%;
+
+				&:first-child {
 					text-align  : left;
 					width       : 36%;
 					margin-right: 1%;
 				}
 
-				.sheet-arms h3:first-child {
-					text-align: left;
-					margin-right: 2%;
-				}
+				&:nth-of-type(2) {width: 12%;}
+			}
+		}
 
-				.sheet-arms h3[data-i18n="weapon"] {
-					width: 34%;
-				}
+		input[type="text"] {
+			text-align: center;
+			width     : 8%;
 
-				.sheet-arms h3[data-i18n="armor"] {
-					width: 38%;
-				}
+			&:first-child {
+				text-align  : left;
+				width       : 36%;
+				margin-right: 1%;
+			}
+		} 
 
-				.sheet-weapon-range h3 {
-					margin-right: 3px;}
+		h3 {
+			text-align: center;
+			width     : 8%;
 
-				.sheet-weapon-melee h3 {
-					margin-right: 10px;}
-
-					.sheet-weapon-melee h3:first-child,
-					.sheet-weapon-melee input[type="text"]:first-child {
-						width: 40%;}
-
-				.sheet-arms .sheet-display-row:nth-of-type(2) {
-					width: 12%;}
-
-				.sheet-weapon-range h3:nth-child(2),
-				.sheet-weapon-range h3:nth-child(5) {
-					width: 11%;}
-
-				.sheet-weapon-melee input,			
-				.sheet-weapon-melee .sheet-display-row {
-					margin-right: 5px;}
-
-				.sheet-weapon-box label + input[type="text"] {width: 27%;}
-
-				.sheet-exotic-warning {
-					display  : none;
-					font-size: 0.8em;}
-
-					.sheet-skill-select[value="0"] ~ .sheet-exotic-warning {
-						display: inline;}
-
-		/***** ARMOR *****/
-			.sheet-armor-box h3 {margin-right: 5.5px;}
-
-			/***** ARMOR SETTINGS *****/
-				.sheet-armor-box .sheet-settings input[name="attr_name"] {
-					width: 40%;
-				}
-
-				.sheet-armor-box .sheet-settings input[type="number"] {
-					margin-right: 0.75%;
-				}
-
-			/***** ARMOR DISPLAY *****/
-				.sheet-armor-box .sheet-display .sheet-display-row {margin-right: 3px;}
-				.sheet-armor-box .sheet-display .sheet-display-row:nth-of-type(7) {margin-right: 0px;}
-
-	/***** QUALITIES *****/
-		.sheet-quality-box h3:first-child {
-			margin-right: 67%;
-			width       : 15%;}
-
-		/***** QUALITIES SETTINGS *****/
-			.sheet-quality button[type="roll"],
-			.sheet-quality button[type="action"]  {
-				font-size: 1em;
-				left: 92%;
-				position: absolute;}
-
-			.sheet-quality button[type="action"] {
-				left: 98%;}
-
-			.sheet-quality .sheet-settings input[type="text"] {
+			&:first-child {
+				text-align: left;
 				margin-right: 2%;
-				width       : 82%;}
+			}
 
-			.sheet-quality .sheet-display-row:nth-of-type(1) {
-				width: 80%;}
+			&[data-i18n="weapon"] {width: 34%;}
+			&[data-i18n="armor"] { width: 38%;}
+		}
+	}
 
-			.sheet-quality .sheet-display-row:nth-of-type(2),
-			.sheet-quality .sheet-settings select  {
-				width: 8%;}
+	/***** WEAPONS *****/
+		.sheet-pc .sheet-weapon-range,
+		.sheet-pc .sheet-weapon-melee {
+			display: none;
+			width  : 100%;}
+
+		.sheet-tab-switch[value="range"] ~ .sheet-weapon-range,
+		.sheet-tab-switch[value="melee"] ~ .sheet-weapon-melee  {
+			display: inline-block;
+		}
+
+	/***** WEAPON SETTINGS *****/
+		.sheet-weapon-box select {width: 10%;}
+		.sheet-weapon-box .sheet-settings-row {margin-top: 5px;}
+
+		.sheet-weapon-range h3 {
+			margin-right: 3px;}
+
+		.sheet-weapon-melee {
+			h3 {
+				margin-right: 10px;
+
+				&:first-child { width: 40%; }
+			}
+
+			input[type="text"]:first-child { width: 40%; }
+
+			input,			
+			.sheet-display-row {
+				margin-right: 5px;
+			}
+		}
+
+		.sheet-weapon-range h3:nth-child(2),
+		.sheet-weapon-range h3:nth-child(5) {
+			width: 11%;}
+
+		.sheet-weapon-box label + input[type="text"] {width: 27%;}
+
+		.sheet-exotic-warning {
+			display  : none;
+			font-size: 0.8em;
+
+			.sheet-skill-select[value="0"] ~ & {
+				display: inline;
+			}
+		}
+
+
+	/***** ARMOR *****/
+	.sheet-armor-box {
+		h3 {margin-right: 5.5px;}
+
+		/***** ARMOR SETTINGS *****/
+		.sheet-settings {
+			input[name="attr_name"] {width: 40%;}
+			input[type="number"] { margin-right: 0.75%; }
+		}
+
+		/***** ARMOR DISPLAY *****/
+		.sheet-display {
+			.sheet-display-row {
+				margin-right: 3px;
+
+				&:nth-of-type(7) {margin-right: 0px;}
+			}
+		}
+	}
+
+/***** QUALITIES *****/
+	.sheet-quality-box {
+		h3:first-child {
+			margin-right: 67%;
+			width       : 15%;
+		}
 
 		/***** QUALITIES & MARTIAL ARTS TABS *****/
-			.sheet-quality-box .sheet-htab input[type="radio"] {
-				margin-right: -100px;
-				width       : 100px;}
+		.sheet-htab input[type="radio"] {
+			margin-right: -100px;
+			width       : 100px;
+		}
 
-			.sheet-quality-box .sheet-header:nth-of-type(2) .sheet-htab input[type="radio"] {
-				margin-right: -150px;
-				width       : 150px;}
+		.sheet-header:nth-of-type(2) .sheet-htab input[type="radio"] {
+			margin-right: -150px;
+			width       : 150px;
+		}
+	}
+
+	/***** QUALITIES SETTINGS *****/
+	.sheet-quality {
+		button[type="roll"],
+		button[type="action"]  {
+			font-size: 1em;
+			left: 92%;
+			position: absolute;
+		}
+
+		button[type="action"] { left: 98%; }
+
+		.sheet-settings {
+			input[type="text"] {
+				margin-right: 2%;
+				width       : 82%;
+			}
+
+			select  { width: 8%; }
+		}
+
+		.sheet-display-row {
+			&:nth-of-type(1) { width: 80%; }
+			&:nth-of-type(2) { width: 8%; }
+		}
+	}
 
 		/***** MARTIAL ARTS *****/
-			.sheet-martial h3:first-child {margin-right: 39%;}
+		.sheet-martial {
+			h3:first-child {margin-right: 39%;}
 
-			.sheet-martial input[type="text"],
-			.sheet-martial .sheet-display-row {
-				width: 54%;}
+			input[type="text"],
+			.sheet-display-row {
+				width: 54%;
+			}
 
-			.sheet-martial input[type="text"]:nth-of-type(2),
-			.sheet-martial .sheet-display-row:nth-of-type(2) {
+			input[type="text"]:nth-of-type(2),
+			.sheet-display-row:nth-of-type(2) {
 				text-align: left;
-				width     : 43%;}
+				width     : 43%;
+			}
+		}
 
 	/***** LIFESTYLES *****/
 		.sheet-lifestyle h3:nth-of-type(2) {
