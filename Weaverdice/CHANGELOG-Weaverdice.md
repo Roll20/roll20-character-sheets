@@ -1,3 +1,7 @@
+### Version 2.00(2019-10):
+
+- sheet refactoring
+
 ### Version 1.41(2018-9-25):
 
 - crit fails/successes add back to skill rolls(roll of highest/lowest shows red/green)
