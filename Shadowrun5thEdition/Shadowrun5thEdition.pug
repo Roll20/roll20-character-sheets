@@ -1,9 +1,3 @@
-//- OBJECTS
-//- include src/pug/_objects.pug
-
-//- MIXINS
-//- include src/pug/_mixins.pug
-
 input(name='attr_version' type='hidden' value='2.010')
 
 //- CHARACTER SHETE PAGE
@@ -12,13 +6,87 @@ input.sheet_type(name='attr_sheet_type' type='hidden' value='pc')
 //- CHARACTER TYPE (MUNDANE < MAGI C< RESONANCE)
 input.character-type(name='attr_flag_special' type='hidden' value='mundane')
 
+//- MIXINS
+include src/pug/_mixins.pug
+
 //- Old HTML TABS
 include src/tabs.html
 
 .pc
 	input.options_toggle(name='attr_tab' type='hidden' value='options')
 	//- STATIC TAB
-	include src/static.html
+	.static.pc-col
+		include src/static.html
+		//- SKILLS
+		.pc-row
+			.header
+				- const skillTypes = {'Active': 'active', 'Knowledge': 'know', 'Language': 'lang'}
+				each val, key in skillTypes
+					- const attrName = key.toLowerCase();
+					.header.htab
+						.triangle
+						input.tab-switch(name='attr_skill_toggle' title=key + ' skills' type='radio' value=attrName)
+						h1(data-i18n=val) #{val}..
+						.right-tri
+				.triangle
+				h1(data-i18n='skills') Skills
+			.border-box.skill-box
+				.pc-box.medium-box
+					.row-long
+						each val in ['Skill', 'RTG', 'Attribute', 'Limit']
+							- const translationKey = val.toLowerCase();
+							h3(data-i18n=translationKey) #{val}
+					input.tab-switch(name="attr_skill_toggle" type="hidden" value="active")
+					each val, key in {"active":"active","know":"knowledge", "lang": "language"}
+						- const attributeDefault = val === 'active' ? 'Agility' : val === "knowledge" ? 'Logic' : "Charisma";
+						- const limitDefault = val === 'active' ? 'Physical' : val === "knowledge" ? 'Mental' : "Social";
+						div(class="skills-"+key)
+							if val === "active"
+								.row-long
+									button(name="default" type="roll" value!="@{gm_toggle} &{template:rolls}{{header=^{default}}}{{base=@{default_display}}}{{dice=[[((@{default_attribute}+-1)+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}")
+										span(data-i18n="default") Default a skill
+									input(name="attr_default_display" type="hidden")
+									span.text-align-center -
+									select.attribute-select(name="attr_default_attribute" title="Skill attribute")
+										+attributeSelect('Agility')
+									select.limit-select(name="attr_limit" title="Skill limit")
+										+limitSelect('Physical')
+							fieldset(class="repeating_" + val)
+								input.settings-toggle(name="attr_flag" type="hidden" value="settings")
+								input(name="attr_display_rating" type="hidden")
+								input(name="attr_display_specialization" type="hidden")
+								input(name="attr_display_limit" type="hidden" value="")
+								input(name="attr_display_attribute" type="hidden")
+								input(name="attr_dicepool" type="hidden")
+								.row-long.border-bottom
+									.buttons
+										button(name="skill" type="roll" value!="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}{{desc=@{display_limit}}}{{dice=[[((@{dicepool}+@{attribute})+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}")
+											span(name="attr_display")
+										button.spec-button(name="specialization" type="roll" value!="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}@{display_limit}{{dice=[[(@{dicepool}+@{attribute}+2+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Spec: @{specialization}, @{display_limit}}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}")
+											span(name="attr_display_specialization")
+									span.text-align-center(name="attr_display_rating" title="Skill rating")
+									select.attribute-select(name="attr_attribute" title="Skill attribute")
+										+attributeSelect(attributeDefault)
+									select.limit-select(name="attr_limit" title="Skill limit")
+										+limitSelect(limitDefault)
+									button.pictos(name="act_skill" type="action") x
+								.settings-grid.row-long
+									if val === "active"
+										select.skill-select(name="attr_skill" title="Active skill" value="Close Combat Group")
+											include src/skillselect.html
+									else
+										input(name="attr_skill" placeholder=val title=val+" skill name" type="text" )
+									input(name="attr_rating" min="0" placeholder="0" title="Skill rating" type="number")
+									label(title="Rating Modifier")
+										span(data-i18n="ratingmodifier") Rating Modifier
+										input(name="attr_rating_modifier" min="0" placeholder="0" title="Skill rating bonus" type="number" )
+									label(title="specializations") 
+										span(data-i18n="specializations") Specializations
+										input(name="attr_specialization" placeholder="Specalizations" title="Skill specializations" type="text")
+									label(title="notes")
+										span(data-i18n="notes") Notes
+									textarea(name="attr_notes" value="" placeholder="Notes")
+
 
 	//- CORE TAB
 	include src/core.html
