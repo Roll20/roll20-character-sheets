@@ -1,6 +1,9 @@
-### Version 2.00(2019-10):
+### Version 2.00(2019-10-15):
 
-- sheet refactoring
+- sheet code refactored to use CSS Flexbox and CSS Grid(previously the sheet used >
+`<table>` for layout)
+
+- adjusted layout to more closely resemble latest Gdocs version of the character sheet
 
 ### Version 1.41(2018-9-25):
 
