@@ -1,4 +1,4 @@
-Charaacter Sheet Code Deprecation
+Character Sheet Code Migration
 ==================================
 
 This character sheet code has been migrated to a private repository to allow for the User Collaboration team to utilize GitHub's integration and automation features. 
