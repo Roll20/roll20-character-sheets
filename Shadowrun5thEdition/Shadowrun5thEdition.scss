@@ -161,11 +161,12 @@
 	}
 
 	@each $characterType in 'npc', 'pc'{
-		.sheet-#{$characterType},
-		.sheet-options_toggle[value="options"] ~ .sheet-#{$characterType}  { 
-			@extend %display-none; 
-		}		
-		.sheet-sheet_type[value="#{$characterType}"] ~ .sheet-#{$characterType}  {  @extend %display-inline-block;  }
+		.sheet-#{$characterType} { @extend %display-none; }
+	}
+
+	input[name='attr_sheet_type']:not([value="pc"]) ~ .sheet-npc,
+	input[name='attr_sheet_type'][value="pc"] ~ .sheet-pc  {  
+		@extend %display-inline-block;  
 	}
 
 	$tabs:'arms', 'augs', 'core', 'gear', 'options', 'social', 'magic', 'matrix', 'vehicle';
@@ -179,6 +180,17 @@
 		.sheet-character-type[value="#{$specialAttribute}"] ~ .sheet-pc .sheet-pc-row .sheet-attr-col .sheet-hide-#{$specialAttribute} { 
 			@extend %display-inline-block; 
 		}
+	}
+
+	@each $npcType in 'grunt', 'host', 'sprite', 'vehicle' {
+		.sheet-#{$npcType}  { @extend %display-none; }
+
+		input[name='attr_sheet_type'][value="#{$npcType}"] ~ .sheet-npc .sheet-#{$npcType} { @extend %display-inline-grid; }
+	}
+
+	input[name='attr_stats_toggle'][value="settings"] ~ .sheet-attribute .sheet-settings,
+	input[name='attr_stats_toggle'][value="settings"] ~ .sheet-body .sheet-settings {
+		display: block;
 	}
 
 	%highlight-button {
@@ -225,19 +237,6 @@
 			margin-right: 5%;
 		}
 	}		
-
-	/***** NPC TABS CUSTOMIZATIONS *****/
-	.sheet-sheet_type[value="pc"] ~ .sheet-tabs div.sheet-tab-sheet,
-	.sheet-sheet_type:not([value="pc"]) ~ .sheet-tabs div.sheet-tab-col,
-	.sheet-sheet_type:not([value="pc"]) ~ .sheet-tabs .sheet-info-box {
-		display: none;}
-
-	.sheet-sheet_type:not([value="pc"]) ~ .sheet-tabs {
-		background   : black;
-		margin-bottom: -1.5%;
-		padding      : 2%;
-		position     : relative;
-		width        : 720px;}
 
 /********************************************************************************************************/
 /**************************************** START OF THE PC SHEET *******************************************/
@@ -361,15 +360,19 @@
 			color    : hsla(0, 0%, 20%, 0.59);
 			font-size: 0.8em;
 		}
+
+		&:first-child {
+			margin-right: 1.5%;
+			width       : calc(50% - 10px);
+		}
 	}
 
-	.sheet-pc-col:first-child {
-		margin-right: 1.5%;
-		width       : calc(50% - 10px);}
-
 	.sheet-row-long {border-bottom: 1px solid #000;}
-	.sheet-settings-row {margin-top: 5px;}
-	.sheet-settings-row select.sheet-skill-select {width: 29%;}
+	.sheet-settings-row {
+		margin-top: 5px;
+
+		select.sheet-skill-select {width: 29%;}
+	}
 
 /***** DECORATIVE BOX THAT ADDS THE RED OUTLINE ON PC SHEET *****/			
 	.sheet-border-box {
@@ -1187,56 +1190,56 @@
 		}
 	}
 
-	/***** WEAPONS *****/
-		.sheet-pc .sheet-weapon-range,
-		.sheet-pc .sheet-weapon-melee {
-			display: none;
-			width  : 100%;}
+/***** WEAPONS *****/
+	.sheet-pc .sheet-weapon-range,
+	.sheet-pc .sheet-weapon-melee {
+		display: none;
+		width  : 100%;}
 
-		.sheet-tab-switch[value="range"] ~ .sheet-weapon-range,
-		.sheet-tab-switch[value="melee"] ~ .sheet-weapon-melee  {
-			display: inline-block;
+	.sheet-tab-switch[value="range"] ~ .sheet-weapon-range,
+	.sheet-tab-switch[value="melee"] ~ .sheet-weapon-melee  {
+		display: inline-block;
+	}
+
+/***** WEAPON SETTINGS *****/
+	.sheet-weapon-box select {width: 10%;}
+	.sheet-weapon-box .sheet-settings-row {margin-top: 5px;}
+
+	.sheet-weapon-range h3 {
+		margin-right: 3px;}
+
+	.sheet-weapon-melee {
+		h3 {
+			margin-right: 10px;
+
+			&:first-child { width: 40%; }
 		}
 
-	/***** WEAPON SETTINGS *****/
-		.sheet-weapon-box select {width: 10%;}
-		.sheet-weapon-box .sheet-settings-row {margin-top: 5px;}
+		input[type="text"]:first-child { width: 40%; }
 
-		.sheet-weapon-range h3 {
-			margin-right: 3px;}
-
-		.sheet-weapon-melee {
-			h3 {
-				margin-right: 10px;
-
-				&:first-child { width: 40%; }
-			}
-
-			input[type="text"]:first-child { width: 40%; }
-
-			input,			
-			.sheet-display-row {
-				margin-right: 5px;
-			}
+		input,			
+		.sheet-display-row {
+			margin-right: 5px;
 		}
+	}
 
-		.sheet-weapon-range h3:nth-child(2),
-		.sheet-weapon-range h3:nth-child(5) {
-			width: 11%;}
+	.sheet-weapon-range h3:nth-child(2),
+	.sheet-weapon-range h3:nth-child(5) {
+		width: 11%;}
 
-		.sheet-weapon-box label + input[type="text"] {width: 27%;}
+	.sheet-weapon-box label + input[type="text"] {width: 27%;}
 
-		.sheet-exotic-warning {
-			display  : none;
-			font-size: 0.8em;
+	.sheet-exotic-warning {
+		display  : none;
+		font-size: 0.8em;
 
-			.sheet-skill-select[value="0"] ~ & {
-				display: inline;
-			}
+		.sheet-skill-select[value="0"] ~ & {
+			display: inline;
 		}
+	}
 
 
-	/***** ARMOR *****/
+/***** ARMOR *****/
 	.sheet-armor-box {
 		h3 {margin-right: 5.5px;}
 
@@ -1275,7 +1278,7 @@
 		}
 	}
 
-	/***** QUALITIES SETTINGS *****/
+/***** QUALITIES SETTINGS *****/
 	.sheet-quality {
 		button[type="roll"],
 		button[type="action"]  {
@@ -1301,21 +1304,21 @@
 		}
 	}
 
-		/***** MARTIAL ARTS *****/
-		.sheet-martial {
-			h3:first-child {margin-right: 39%;}
+/***** MARTIAL ARTS *****/
+	.sheet-martial {
+		h3:first-child {margin-right: 39%;}
 
-			input[type="text"],
-			.sheet-display-row {
-				width: 54%;
-			}
-
-			input[type="text"]:nth-of-type(2),
-			.sheet-display-row:nth-of-type(2) {
-				text-align: left;
-				width     : 43%;
-			}
+		input[type="text"],
+		.sheet-display-row {
+			width: 54%;
 		}
+
+		input[type="text"]:nth-of-type(2),
+		.sheet-display-row:nth-of-type(2) {
+			text-align: left;
+			width     : 43%;
+		}
+	}
 
 	/***** LIFESTYLES *****/
 		.sheet-lifestyle {
@@ -1875,7 +1878,7 @@
 
 	button {
 		font-weight: bold;
-		
+
 		&[type="roll"] {
 			color    : #fff;
 			margin   : 0px;
@@ -1891,6 +1894,23 @@
 			font-size   : 1em;
 			padding-left: 0px;
 		}
+	}
+
+	h1, h2, h3, h4, input, label { color: #fff; }
+
+	h1 {font-size: 1.25em;}
+
+	h2 { 
+		font-size: 1em;
+		font-variant: small-caps;
+		text-align  : center;
+		text-decoration: underline; 
+	}
+
+
+	textarea, select, .sheet-matrix input {
+		color           : #fff;
+		background-color: #555;
 	}
 
 	.sheet-tabs {
@@ -1936,11 +1956,12 @@
 		margin       : 2% 0px;
 		padding: 1%;
 		width        : 100%;
-		@extend %display-inline-grid;
 
 		input[type="number"] {text-align   : center;}
 
 		label {
+			text-align: center;
+
 			&[data-i18n-title='modifier']{ input[type='number'] {width: 65%;} }
 			&[data-i18n-title='modifier']:before {content: "(";}
 			&[data-i18n-title='modifier']:after {content: ")";}
@@ -1948,10 +1969,15 @@
 
 		h1 {
 			font-weight: normal;
+			grid-row: 1;
 			text-align: center;
 		}
 
-		button, h1 {grid-row: 1;}
+		button { 
+			grid-row: 1;
+			text-transform: capitalize; 
+		}
+
 		span {
 			grid-row: 2;
 			text-align: center;
@@ -1960,101 +1986,9 @@
 		span +  label {grid-row: 3;}
 		label[data-i18n-title='modifier']{grid-row: 4;}
 	}
-
-	input[name='attr_stats_toggle'][value="settings"] ~ .sheet-attribute .sheet-settings {
-		display: block;
-	}
 }
-
-
-	.sheet-npc h1, 
-	.sheet-npc h2,
-	.sheet-npc h3,
-	.sheet-npc h4,
-	.sheet-npc hr,
-	.sheet-npc input,
-	.sheet-npc label,
-	.sheet-sheet_type[value="npc"] ~ .sheet-tab-toggles button {
-		color: #fff;}
-
-	.sheet-npc h3,
-	.sheet-npc h4,
-	.sheet-npc .sheet-repeating label {
-		text-decoration: underline;}
-
-	.sheet-npc h2 {
-		line-height  : 15px;
-		margin-bottom: 10px;
-		margin-top   : 5px;}
-
-	.sheet-npc h1 {font-size: 1.25em;}
-	.sheet-npc h2 {font-size: 1em;}
-
-	.sheet-npc h3,
-	.sheet-npc h4,
-	.sheet-npc .sheet-repeating label {
-		font-size   : 1em;
-		font-variant: small-caps;
-		text-align  : center;}
-
-	.sheet-npc .sheet-repeating label {
-		font-size: 0.9em;
-		width    : 100%;}
-
-	.sheet-npc textarea,
-	.sheet-npc select,
-	.sheet-npc .sheet-stat-inputs input,
-	.sheet-sheet_type:not([value="pc"]) ~ .sheet-tabs select,
-	.sheet-npc .sheet-matrix input {
-		color           : #fff;
-		background-color: #555;}
-
-	.sheet-npc .sheet-repeat-section option {background-color: #000;}
-
-	.sheet-npc input[type="text"] ,
-	.sheet-npc input[type="number"] {
-		margin-bottom: 5px;}
-
-	.sheet-npc input[type="checkbox"].sheet-character-type {
-		margin-right: 5%;
-		opacity     : 1;}
-
-	.sheet-npc label {
-		font-size: 1em;
-		font-weight: normal;}
-
-	.sheet-npc textarea {
-		margin-top: -35px;}
-
 	/*:+:+:+: NPC STATS :+:+:+:*/
-	/*:+:+:+: NPC CUSTOMIZED ROWS & COLUMNS :+:+:+:*/
-		.sheet-row {margin: 0px 0px 0px 0px;}
 
-		.sheet-leftcol,
-		.sheet-2col {
-			display       : inline-block;
-			vertical-align: top;}
-
-		div.sheet-grunt.sheet-2col,
-		div.sheet-vehicle.sheet-2col {
-			width:calc(16% - 0px);}
-
-		div.sheet-grunt.sheet-vehicle.sheet-2col  {
-			margin-left : 1%;
-			margin-right: 3%;
-			width       :calc(27% - 0px);}
-
-		div.sheet-leftcol {
-			width:calc(50% - 0px);}
-
-		div.sheet-leftcol input[type="number"]{
-			width: 10%;}
-
-		div.sheet-2col input[type="number"] {
-			width: 20%;}
-		
-		div.sheet-grunt.sheet-vehicle.sheet-2col label {
-			width: 75%;}
 
 	/*:+:+:+: NPC TOGGLES & GEAR ICONS :+:+:+:*/
 		input.sheet-settings-toggle {
@@ -2079,17 +2013,6 @@
 			 color: #FCD116;}
 
 	/*:+:+:+: NPC SETTINGS & DISPLAYS :+:+:+:*/
-		.sheet-npc .sheet-display,
-		.sheet-npc .sheet-display .sheet-grunt,
-		.sheet-npc .sheet-display .sheet-host,
-		.sheet-npc .sheet-display .sheet-vehicle,
-		.sheet-npc .sheet-display .sheet-sprite {
-			vertical-align: top;
-			width         : calc(100% - 0px) !important;}
-
-		.sheet-npc .sheet-display div:nth-of-type(1n+5) {
-			margin: 1px;}
-
 		.sheet-npc .sheet-display span {
 			border        : 0px;
 			font-size     : 1em;
@@ -2130,12 +2053,14 @@
 		.sheet-npc .sheet-skill-box select {
 			font-size: 1em;
 			height   : 25px;
-			width    : 60%;}
+			width    : 60%;
 
-			.sheet-npc .sheet-skill-box select:last-child {
+			&:last-child {
 				margin-left   : 6%;
 				text-transform: capitalize;
-				width         : 14%;}
+				width         : 14%;
+			}
+		}
 
 			.sheet-npc .sheet-sprite.sheet-skills .sheet-skill-box select {width: 25%;}
 
@@ -2443,21 +2368,11 @@
 		.sheet-textboxes,
 		.sheet-optional-flag[value="0"] + .sheet-attr-header,
 		.sheet-category + div,
-		.sheet-category + div + div,
-		.sheet-grunt,
-		.sheet-host,
-		.sheet-sprite,
-		.sheet-vehicle  {
+		.sheet-category + div + div {
 			@extend %display-none;
 		}
 
 		.sheet-optional-flag:not([value="0"]) + .sheet-optional { @extend %display-inline-block; }
-
-		@each $npcType in 'grunt', 'host', 'sprite', 'vehicle' {
-			.sheet-npc-type[value="#{$npcType}"] ~ .sheet-#{$npcType} { @extend %display-inline-block; }
-			.sheet-sheet_type[value="#{$npcType}"] ~ .sheet-npc { @extend %display-inline-block; }
-		}
-
 
 		.sheet-optional-flag:not([value="0"]) + .sheet-textboxes {
 			display: inherit;
@@ -2469,12 +2384,6 @@
 			display: inherit;}
 
 		.sheet-category[value="Combat"] ~ .sheet-combat-type-hide {display: inline;}
-
-		.sheet-npc-type[value="grunt"] ~ div.sheet-grunt.sheet-attribute,
-		.sheet-npc-type[value="host"] ~ div.sheet-host.sheet-attribute,
-		.sheet-npc-type[value="sprite"] ~ div.sheet-sprite.sheet-attribute,
-		.sheet-npc-type[value="vehicle"] ~ div.sheet-vehicle.sheet-attribute {
-			display: inline-grid;}
 
 		.sheet-magic-skill,
 		.sheet-resonance-skill {

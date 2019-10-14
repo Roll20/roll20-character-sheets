@@ -3,7 +3,7 @@ input(name='attr_version' type='hidden' value='2.010')
 //- CHARACTER SHETE PAGE
 input.sheet_type(name='attr_sheet_type' type='hidden' value='pc')
 
-//- CHARACTER TYPE (MUNDANE < MAGI C< RESONANCE)
+//- CHARACTER TYPE (MUNDANE < MAGIC < RESONANCE)
 input.character-type(name='attr_flag_special' type='hidden' value='mundane')
 
 //- MIXINS
@@ -155,7 +155,6 @@ include src/pug/_mixins.pug
 		input(name='attr_stats_toggle' type='checkbox' value='settings' checked)
 		span.pictos y
 	input(name='attr_stats_toggle' type='hidden' value='settings')
-	input.npc-type(name='attr_sheet_type' type='hidden' value='grunt')
 	.grunt.attribute
 		input.character-type(name='attr_flag_special' type='hidden')
 		each val in coreAttributeArray
@@ -167,7 +166,7 @@ include src/pug/_mixins.pug
 			if (val != 'Edge')
 				label.settings(data-i18n-title='modifier' title='modifier')
 					input(name='attr_'+attrName+'_modifier' placeholder='+' title='@{'+attrName+'_modifier}' type='number' value='')
-		h1(data-i18n="ess") ess
+		h1(data-i18n='ess') ess
 		span(name='attr_essence')
 		label.settings(data-i18n-title='essence' title='essence')
 			input(name='attr_essence' placeholder='6' title='@{essence}' type='number' value='6')
@@ -178,18 +177,22 @@ include src/pug/_mixins.pug
 			label.settings(class=val data-i18n-title=key title=key)
 				input(name='attr_'+key placeholder='6' title='@{'+key+'}' type='number' value='6')
 	.host.attribute
-		each val, key in {'Host Rating': ['host_rating', '5'], 'Attack': ['attack', '5'], 'Sleaze': ['sleaze', '6'], 'Data Processing': ['data_processing', '7'], 'Firewall': ['firewall', '8']}
-			- const base = '^{host_rating} ♦ ^{'+val[0]+'}', rollForumla = '@{host_rating}+@{'+val[0]+'}';
-			+rollButton(val[0], base, rollForumla)
-			span(name='attr_'+val[0])
-			label.settings(data-i18n-title=val[0] title=key) #{key}
-				input(name='attr_'+val[0] placeholder=val[1] title='@{'+val[0]+'}' type='number' value='')
+		+hostSprite(hostObject, 'host_rating')
 	.vehicle.attribute
-		//-each val, key in {'Hand': 'handling', 'Hand (Off)': 'handling_offroad', 'Speed': 'speed', 'Speed (Off)': 'speed_offroad', 
-		//-'Accel': 'acceleration', 'Body': 'body', 'Pilot': 'pilot', 'Sensor': 'sensor', 'Seat': 'seating'}
-
-
-	//-include src/npc.html
+		each val, key in {'Hand': ['handling', 'hand'], 'Hand (Off)': ['handling_offroad', 'handoff'], 'Speed': ['speed', 'speed'], 'Speed (Off)': ['speed_offroad', 'speedoff'], 'Accel': ['acceleration', 'accel'], 'Body': ['body', 'body'], 'Pilot': ['pilot', 'pilot'], 'Sensor': ['sensor', 'sensor'], 'Seat': ['seating', 'seat']}
+			if key === 'Pilot'
+				+rollButton(val[1], '^{pilot}', '@{pilot}+@{pilot}')
+			else
+				h1(data-i18n=val[1]) #{key}
+			span(name='attr_'+val[0])
+			label.settings(data-i18n-title=val[1] title=key)
+				input(name='attr_'+val[0] placeholder='3' title='@{'+val[0]+'}' type='number' value='')
+	.sprite.attribute
+		+hostSprite(spriteObject, 'level')
+	.grunt.body
+		.row
+			label(data-i18n-title='pr' title='Professional Rating')
+				input(name='attr_pr' title='@{pr}' type='number')
 
 //- FOOTER
 include src/footer.html
