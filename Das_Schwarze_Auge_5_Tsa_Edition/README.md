@@ -2,6 +2,8 @@
 
 ## Änderungen
 
+2019-10-14: Englische Übersetzung durch Tajo. Vielen Dank!
+
 2019-10-07:
 - Änderungen des Status lösen nun eine Neuberechnung der Kampfwerte aus --> bestehende Events ergänzt
 - Änderungen der Kampftechnikwerte führen zur Neuberechnung der Kampfwerte --> neuer Event Trigger und Change Flag (ktw_change_flag) hinzugefügt.
@@ -222,4 +224,4 @@ Unter Status lassen sich die unterschiedlichen Zunstände eintragen. Entsprechen
 ## Danksagung
 
 Großer Dank geht an die Entwickler des DSA5 Character Sheet German   Patrick Gebhardt, enhanced by Sönke Holsten, Adam Fedor. Einige Teile des Charakterbogens habe ich von dort übernommen oder mich inspirieren lassen.
-Noch größerer Dank geht an alle, deren Anregungen und Feedback in den Bogen eingeflossen sind, insbesonders an: Perceval, Igraine, Lodge, Paladose, Danii, Tiro.
+Noch größerer Dank geht an alle, deren Anregungen und Feedback in den Bogen eingeflossen sind, insbesonders an: Perceval, Igraine, Lodge, Paladose, Danii, Tiro sowie Tajo für die englische Übersetzung.
