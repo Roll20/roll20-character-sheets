@@ -1,12 +1,15 @@
-/* Colors:
-	Gold: #FCD116;
-	Red: #610b0d;
-	Purple: #7a2593;
-	Gray: #555; (primaryly on the NPC sheet)
-	Light gray: #9a9a9a;
-	Blacker: #040404; (primaryly on the NPC sheet)
-	Blackish: #1c1c1c; (Gray on the role template)
-*/
+//- Colors:
+	$gold: #FCD116;
+	$red: #610b0d;
+	$purple: #7a2593;
+	$lightgray: #9a9a9a;
+	$blacker: #040404;
+	//- GRAY IN ROLL TEMPLATE
+	$blackish: #1c1c1c;
+	//-(primaryly on the NPC sheet)
+	$gray: #555;
+	$blacker: #040404;
+
 
 /********************************************************************************************************/
 /********************************* GLOBAL SETTINGS *******************************************************/
@@ -59,21 +62,6 @@
 		margin: 0px;
 		text-align: center;
 		vertical-align: middle;
-
-		&[type="checkbox"],
-		&[type="radio"],
-		&[type="checkbox"] + span,
-		&[type="radio"] + span {
-			position: relative;
-		}
-
-		&[type="checkbox"],
-		&[type="radio"] {
-			opacity: 0;
-			z-index: 2;
-		}
-
-		&[type="checkbox"] + span { font-family: pictos; }
 
 		&[type="text"],
 		&[type="number"] {
@@ -128,6 +116,30 @@
 		margin-left: 1%;
 	}
 
+/* SWITCHES
+	============================= */
+	@import 'src/scss/_switch'; 
+
+.sheet-pc-col, .sheet-npc {
+	input {
+		&[type="checkbox"],
+		&[type="radio"],
+		&[type="checkbox"] + span,
+		&[type="radio"] + span {
+			position: relative;
+		}
+
+		&[type="checkbox"],
+		&[type="radio"] {
+			opacity: 0;
+			z-index: 2;
+		}
+
+		&[type="checkbox"] + span { @extend .sheet-pictos; }
+		&[type="number"] {border: 1px solid #b8b7b6;}
+	}
+}
+
 /********************************************************************************************************/
 /********************************* PC & NPC SHEET SHOW & HIDE SETTINGS ***********************************/
 /********************************************************************************************************/
@@ -141,9 +153,10 @@
 	}
 	%display-grid { display: grid; }
 
+	.sheet-pictos { font-family: "Pictos"; }
+
 	%display-inline-block,
-	.sheet-static,
-	.sheet-sheet_type[value="pc"] ~ .sheet-pc {
+	.sheet-static {
 		display: inline-block;
 	}
 
@@ -151,17 +164,14 @@
 		.sheet-#{$characterType},
 		.sheet-options_toggle[value="options"] ~ .sheet-#{$characterType}  { 
 			@extend %display-none; 
-		}
+		}		
+		.sheet-sheet_type[value="#{$characterType}"] ~ .sheet-#{$characterType}  {  @extend %display-inline-block;  }
 	}
 
 	$tabs:'arms', 'augs', 'core', 'gear', 'options', 'social', 'magic', 'matrix', 'vehicle';
 	@each $tab in $tabs {
 		.sheet-#{$tab} { @extend %display-none; }
 		.sheet-options_toggle[value="#{$tab}"] ~ .sheet-#{$tab} { @extend %display-inline-block; }
-	}
-
-	@each $npcType in 'grunt', 'host', 'sprite', 'vehicle' {
-		.sheet-sheet_type[value="#{$npcType}"] ~ .sheet-npc { @extend %display-none; }
 	}
 
 	@each $specialAttribute in 'magic', 'resonance' {
@@ -179,13 +189,6 @@
 
 	/***** TABS FOR SHEETS *****/
 	.sheet-tabs {
-		.sheet-sheet_type[value="pc"] ~ & {
-			position: relative;
-			margin-bottom: -15%;
-		}
-
-		div {display: inline-block;}
-
 		button {
 			&[type="action"] {
 				background-color: #333;
@@ -193,11 +196,12 @@
 				border          : 1px solid #000;
 				box-shadow      : inset 0px 0px 3px 1px #7c7c7c;
 				color           : #fff;
-				font-family     : sans-serif;
 				font-size       : 1em;
 				font-weight     : bolder;
 				text-transform  : capitalize;
 				padding         : 5px;
+
+				&.sheet-pictos {text-transform: lowercase;}
 			}
 
 			&[type="roll"] {
@@ -205,44 +209,22 @@
 				font-family   : "dicefontd6";
 				font-size     : 2.5em;
 				vertical-align: top;
-
+	
 				&:hover {
 					text-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px #e31715;
 				}
 			}
 		}
 
-		input[value*="gm"] + button[type="action"],
-		input[value*="wounds"] + button[type="action"],
-		input[value*="Modifiers"] + button[type="action"],
-		input[value*="edge"] + button[type="action"] {
-			@extend %highlight-button;
-		}
-
-		@each $highlightButton in $tabs {
-			input[value*="#{$highlightButton}"] ~ button[name*="#{$highlightButton}"] { 		
-				@extend %highlight-button; 
-			}
-		}
-
-		img {
-			vertical-align: top;
-			width         : 50%;
+		h2 {
+			color: #fff;
+			font-size: 1em;
+			text-transform: capitalize;
+			text-align: right;
+			line-height: 2em;
+			margin-right: 5%;
 		}
 	}		
-
-	.sheet-tab-col button[type="action"]:last-child {
-		font-family: pictos;
-		text-transform: lowercase;
-	} 
-
-	.sheet-tab-whisper,
-	.sheet-tab-toggles {
-		margin-left : 1%;
-		margin-right: 5%;
-	}
-
-	.sheet-tab-sheet { width: 35%; }
 
 	/***** NPC TABS CUSTOMIZATIONS *****/
 	.sheet-sheet_type[value="pc"] ~ .sheet-tabs div.sheet-tab-sheet,
@@ -268,7 +250,7 @@
 		box-shadow      : inset 0px 0px 3px 1px #7c7c7c;
 		margin-left     : -1%;
 		padding-left    : 0.5%;
-	
+		
 		button > h2:hover,
 		button > span:hover,
 		label > button[type="roll"]:hover,
@@ -276,6 +258,83 @@
 			color      : #fff;
 			text-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px #610b0d;
 		}
+
+		.sheet-tabs {
+			@extend %display-inline-grid;
+			grid-template-columns: 1fr 5em 1fr 5em 2.5em 5em 5em 5em 5em 5em 5em 5em;
+			grid-column-gap: 0.25%;
+			padding: 0px 1% 3% 1%;
+			margin-top: 1%;
+			grid-row-gap: 10%;
+
+			button[type="roll"] {grid-area: 2 / 5 / 2 / 5;}
+
+				/***** PLAYER DATA INPUTS *****/
+			h1 {
+				background-color: transparent;
+				color: #fff;
+				display: inline-block;
+				font-size : 1em;
+				grid-column: 6 / 8;
+				letter-spacing: 2px;
+				line-height : 20px;
+				margin-left: 5%;
+				text-align: right;
+				text-transform  : uppercase;
+			}
+
+			h2 {
+				&[data-i18n-title='/w GM'] { grid-area: 2 / 1 / 2 / 1; }
+				&[data-i18n-title='wounds'] { grid-area: 2 / 3 / 2 / 4; }
+				&[data-i18n-title='modifiers'] { grid-area: 3 / 1 / 3 / 1; }
+				&[data-i18n-title='edge'] { grid-area: 3 / 3 / 3 / 4; }
+			}
+
+			@each $highlightButton in $tabs {
+				input[value*="#{$highlightButton}"] ~ button[name*="#{$highlightButton}"] { 		
+					@extend %highlight-button; 
+				}
+			}
+
+			img { 
+				grid-area: 1 / 1 / 2 / 6;
+				height: 100%;
+				width: 100%;
+			}
+
+			label {
+				&[data-i18n-title='character name'] > input[type="text"],
+				&[data-i18n-title='player name'] > input[type="text"] {
+					color           : #fff;
+					font-weight     : bolder;
+					background-color: transparent;
+					border          : none;
+					box-shadow      : none;
+					border-bottom   : 2px solid #fff;
+					border-radius   : 0px;
+					height          : 30px;
+					width           : 100%;
+					grid-column: 4;
+				}
+
+				&[data-i18n-title='character name'] { grid-area: 1 / 8 / 1 / 14; }
+				&[data-i18n-title='player name'] { grid-area: 2 / 8 / 2 / 14; }
+
+				&[data-i18n-title='whisper rolls to gm']{ grid-area: 2 / 2 / 2 / 3; }
+				&[data-i18n-title='wounds'] { grid-area: 2 / 4 / 2 / 5;}
+				&[data-i18n-title='modifiers'] { grid-area: 3 / 2 / 3 / 3;}
+				&[data-i18n-title='edge'] { grid-area: 3 / 4 / 3 / 5;}
+			}
+		}
+	}
+
+/***** PC ROWS & COLUMNS SETTINGS *****/
+	.sheet-pc-row {margin-bottom: 10px;}
+
+	.sheet-pc-col {
+		vertical-align: top;
+		width         : calc(50% - 5px);
+
 		h1 {
 			background-color: #610b0d;
 			color           : #fff;
@@ -302,17 +361,7 @@
 			color    : hsla(0, 0%, 20%, 0.59);
 			font-size: 0.8em;
 		}
-
-		input[type="number"] {border: 1px solid #b8b7b6;}
 	}
-
-/***** PC ROWS & COLUMNS SETTINGS *****/
-	.sheet-pc-row {margin-bottom: 10px;}
-
-	.sheet-pc-col {
-		vertical-align: top;
-		width         : calc(50% - 5px);
-		margin-top: 16%;}
 
 	.sheet-pc-col:first-child {
 		margin-right: 1.5%;
@@ -424,40 +473,6 @@
 	.sheet-medium-box {
 		min-height: 330px;}
 
-/***** PLAYER DATA INPUTS *****/
-	.sheet-info-box {
-		margin-bottom: 10px;
-		margin-top   : 10px;
-		width        : 100%;
-		
-		div { width: 48%; }
-
-		h1 {
-			color           : #fff;
-			background-color: transparent;
-			display         : inline-block;
-			font-size       : 1em;
-			letter-spacing  : 2px;
-			line-height     : 20px;
-			margin-left     : 5%;
-			text-align      : left;
-			text-transform  : uppercase;
-			width           : 35%;
-		}
-
-		input[type="text"] {
-			color           : #fff;
-			font-weight     : bolder;
-			background-color: transparent;
-			border          : none;
-			box-shadow      : none;
-			border-bottom   : 2px solid #fff;
-			border-radius   : 0px;
-			height          : 30px;
-			width           : 60%;
-		}
-	}
-
 	/***** CHARACTER PERSONAL DATA SECTION INPUTS *****/
 		.sheet-pd-nam input[type="text"]  {width: 66%;}
 
@@ -487,7 +502,7 @@
 		& + div {
 			display: none;
 
-			& > span {font-family: "pictos";}
+			& > span {@extend .sheet-pictos;}
 		}
 
 		&[value="primary"] + div {
@@ -554,7 +569,7 @@
 				border-radius             : 5px;
 				border-right              : 3px solid #999;
 				border-style              : outset;
-				font-family               : "Pictos";}
+				@extend .sheet-pictos;}
 
 			&[name*="shots_remove"] {
 				transform: rotate(180deg);
@@ -1575,28 +1590,34 @@
 				box-shadow        : inset 0px 1px 5px 2px #470101;}
 
 		/***** MATRIX PROGRAMS *****/
-			.sheet-program-box .sheet-repeating-indent {
-				padding-left: 0em;
-				text-indent : -1em;}
+			.sheet-program-box {
+				.sheet-repeating-indent {
+					padding-left: 0em;
+					text-indent : -1em;
+				}
 
-			.sheet-program-box input.sheet-program-toggle {
-				left : 5px;
-				top  : 2px;
-				width: 15px;}
+				input.sheet-program-toggle {
+					left : 5px;
+					top  : 2px;
+					width: 15px;
+				}	
+				span.sheet-program-toggle {
+					left: 5px;
+					top : -3px;
+				}
 
-			.sheet-program-box span.sheet-program-toggle {
-				left: 5px;
-				top : -3px;}
-
-			/***** MATRIX PROGRAM SETTINGS *****/
-				.sheet-program-box .sheet-settings div {
+				/***** MATRIX PROGRAM SETTINGS *****/
+				.sheet-settings div {
 					display: inline-block;
-					width  : 100%;}
+					width  : 100%;
+				}
 
-				.sheet-program-box  input[type="text"] {
+				input[type="text"] {
 					border-radius: 0px;
 					border-bottom: 1px solid #000;
-					width        : 98%;}
+					width        : 98%;
+				}
+			}
 
 			/***** MATRIX PROGRAM DISPLAY *****/
 				.sheet-matrix-box .sheet-display {
@@ -1625,42 +1646,38 @@
 					padding-left: 0em;}
 
 		/***** COMPLEX FORMS *****/
-			.sheet-form-box h3 {
+		.sheet-form-box {
+			h3 {
 				margin-right: 1%;
-				width       : 16%;}
+				width       : 16%;
 
-				.sheet-form-box h3:nth-of-type(1) {
-					width: 48%;}
-
-				.sheet-form-box h3:nth-of-type(4) {
-					width: 10%;}
-
-				.sheet-form-box h3:nth-of-type(5) {
+				&:nth-of-type(1) {width: 48%;}
+				&:nth-of-type(5) {
 					margin-right: 0px;
 					width       : 7%;}
+				&:nth-of-type(4) {width: 10%;}
+			}
 
-			.sheet-form-box input[type="text"] {width: 50%;}
+			input[type="text"] {width: 50%;}
+			input[type="number"] {width: 8%;}
+			.sheet-settings div {width: 100%;}
+			select {
+				margin-right: 1%;
+				width       : 17%;}
 
-			.sheet-form-box input[type="number"] {width: 8%;}
-
-			/***** COMPLEX FORM SETTINGS *****/
-				.sheet-form-box .sheet-settings div {width: 100%;}
-
-				.sheet-form-box select {
-					margin-right: 1%;
-					width       : 17%;}
-
-			/***** COMPLEX FORM DISPLAY *****/
-				.sheet-form-box .sheet-display {display: inline-block;}
-
-				.sheet-form-box .sheet-display .sheet-display-row {
+			.sheet-display {
+				display: inline-block;
+				.sheet-display-row {
 					margin-right: 1%;
 					text-align  : left;
-					width       : 16%;}
+					width       : 16%;
 
-				.sheet-form-box .sheet-display-row:nth-of-type(1) {width: 48%;}
-					.sheet-form-box .sheet-display .sheet-display-row:nth-of-type(4) {width: 10%;}
-					.sheet-form-box .sheet-display .sheet-display-row:nth-of-type(5) {width: 7%;}
+					&:nth-of-type(1) {width: 48%;}
+					&:nth-of-type(4) {width: 10%;}
+					&:nth-of-type(5) {width: 7%;}
+				}
+			}
+		}
 
 	/***** VEHICLE *****/
 		.sheet-vehicle-box .sheet-settings div,
@@ -1847,28 +1864,108 @@
 /********************************************************************************************************/
 /**************************************** START OF THE NPC SHEET *******************************************/
 /********************************************************************************************************/
-	.sheet-npc {
-		background-color: #040404;
-		border-radius   : 3px;
-		color           : #fff;
-		margin-top      : -20px;
-		min-height      : 800px;
-		padding         : 10px 10px;
-		width           : 720px;}
+.sheet-npc {
+	background-color: #040404;
+	border-radius   : 3px;
+	color           : #fff;
+	margin-top      : -20px;
+	min-height      : 800px;
+	padding         : 10px 10px;
+	width           : 720px;
 
-	.sheet-npc button[type="roll"] {
-		color    : #fff;
-		font-size: 14px;
-		margin   : 0px;
-		padding  : 0px;}
+	button {
+		font-weight: bold;
+		
+		&[type="roll"] {
+			color    : #fff;
+			margin   : 0px;
+			padding  : 0px;
+		}
 
-	.sheet-npc button:hover {
-		background-color: transparent;
-		text-shadow     : none;}
+		&:hover {
+			background-color: transparent;
+			text-shadow     : none;
+		}
 
-	.sheet-npc button[type="action"] {
-		font-size   : 1em;
-		padding-left: 0px;}
+		&[type="action"] {
+			font-size   : 1em;
+			padding-left: 0px;
+		}
+	}
+
+	.sheet-tabs {
+		@extend %display-inline-grid;
+		grid-template-columns: 2.5em 1fr 4em 1fr 4em 1fr 4em 1fr 4em;
+		grid-row-gap: 10%;
+		button[type="roll"] {grid-area: 2 / 1 / 2 / 2;}
+
+		img {
+			grid-area: 1 / 1 / 2 / 4;
+			height: 100%;
+			width: 100%
+		}
+
+		.sheet-switch {
+			input[type="checkbox"] + span {
+				position: absolute;
+			}
+		}
+
+		h2, label { grid-row: 2;}
+		select { grid-column: 8 / 8;}
+
+		input[name='attr_stats_toggle'],
+		input[name='attr_stats_toggle'] + span.sheet-pictos {
+			grid-area: 1 / 9 / 1 / 9;
+			position: relative;
+			width: 100%;
+			height: 100%;
+		}
+
+		input[name='attr_stats_toggle']:checked + span { color: $gold; }
+		span.sheet-pictos {
+			text-align: center;
+			font-size: 1.2em;
+		}
+	}
+
+	/*:+:+:+: NPC ATTRIBUTES :+:+:+:*/
+	.sheet-attribute {
+		border-bottom: 1px solid #fff;
+		border-top   : 1px solid #fff;
+		margin       : 2% 0px;
+		padding: 1%;
+		width        : 100%;
+		@extend %display-inline-grid;
+
+		input[type="number"] {text-align   : center;}
+
+		label {
+			&[data-i18n-title='modifier']{ input[type='number'] {width: 65%;} }
+			&[data-i18n-title='modifier']:before {content: "(";}
+			&[data-i18n-title='modifier']:after {content: ")";}
+		}
+
+		h1 {
+			font-weight: normal;
+			text-align: center;
+		}
+
+		button, h1 {grid-row: 1;}
+		span {
+			grid-row: 2;
+			text-align: center;
+		}
+
+		span +  label {grid-row: 3;}
+		label[data-i18n-title='modifier']{grid-row: 4;}
+	}
+
+	input[name='attr_stats_toggle'][value="settings"] ~ .sheet-attribute .sheet-settings {
+		display: block;
+	}
+}
+
 
 	.sheet-npc h1, 
 	.sheet-npc h2,
@@ -1880,13 +1977,11 @@
 	.sheet-sheet_type[value="npc"] ~ .sheet-tab-toggles button {
 		color: #fff;}
 
-	.sheet-npc h1,
 	.sheet-npc h3,
 	.sheet-npc h4,
 	.sheet-npc .sheet-repeating label {
 		text-decoration: underline;}
 
-	.sheet-npc h1,
 	.sheet-npc h2 {
 		line-height  : 15px;
 		margin-bottom: 10px;
@@ -1932,8 +2027,6 @@
 		margin-top: -35px;}
 
 	/*:+:+:+: NPC STATS :+:+:+:*/
-		.sheet-stats {display: inline;}
-
 	/*:+:+:+: NPC CUSTOMIZED ROWS & COLUMNS :+:+:+:*/
 		.sheet-row {margin: 0px 0px 0px 0px;}
 
@@ -1969,7 +2062,7 @@
 
 		.sheet-settings-toggle input[type="checkbox"] + span {
 			background : transparent;
-			font-family: pictos;
+			@extend .sheet-pictos;
 			font-size  : 20px;
 			height     : 20px;
 			text-align : center;
@@ -2086,23 +2179,6 @@
 
 		.sheet-npc-repeating .sheet-settings input[type="text"] {width: 51%;}
 
-
-	/*:+:+:+: NPC ATTRIBUTES :+:+:+:*/
-		.sheet-attribute {
-			border-bottom: 1px solid #fff;
-			border-top   : 1px solid #fff;
-			margin       : 10px 0px;
-			text-indent  : center;
-			width        : 100%;}
-
-			.sheet-attribute input[type="number"] {
-				width: 50%;}
-
-		.sheet-attr-header {
-			margin-bottom: 5px;
-			text-align   : center;
-			width        : 80%;}
-
 	/*:+:+:+: NPC BONUS ROW CUSTOMIZATIONS :+:+:+:*/
 		.sheet-bonusrow {
 			display: inline-block;
@@ -2132,9 +2208,6 @@
 		.sheet-textrow input.sheet-settings-toggle + span,
 		.sheet-repeating input.sheet-settings-toggle + span {
 			position: relative;}
-
-		.sheet-npc-stats-toggle {left: 95%;}
-		.sheet-npc-stats-toggle + span {left: 90%;}
 
 		.sheet-textrow input.sheet-settings-toggle {
 			left: 775px;
@@ -2375,14 +2448,16 @@
 		.sheet-host,
 		.sheet-sprite,
 		.sheet-vehicle  {
-			display: none;}
+			@extend %display-none;
+		}
 
-		.sheet-optional-flag:not([value="0"]) + .sheet-optional,
-		.sheet-npc-type[value="grunt"] ~ .sheet-grunt,
-		.sheet-npc-type[value="host"] ~ .sheet-host,
-		.sheet-npc-type[value="sprite"] ~ .sheet-sprite,
-		.sheet-npc-type[value="vehicle"] ~ .sheet-vehicle {
-			display: inline-block;}
+		.sheet-optional-flag:not([value="0"]) + .sheet-optional { @extend %display-inline-block; }
+
+		@each $npcType in 'grunt', 'host', 'sprite', 'vehicle' {
+			.sheet-npc-type[value="#{$npcType}"] ~ .sheet-#{$npcType} { @extend %display-inline-block; }
+			.sheet-sheet_type[value="#{$npcType}"] ~ .sheet-npc { @extend %display-inline-block; }
+		}
+
 
 		.sheet-optional-flag:not([value="0"]) + .sheet-textboxes {
 			display: inherit;
@@ -2399,7 +2474,7 @@
 		.sheet-npc-type[value="host"] ~ div.sheet-host.sheet-attribute,
 		.sheet-npc-type[value="sprite"] ~ div.sheet-sprite.sheet-attribute,
 		.sheet-npc-type[value="vehicle"] ~ div.sheet-vehicle.sheet-attribute {
-			display: inline-flex;}
+			display: inline-grid;}
 
 		.sheet-magic-skill,
 		.sheet-resonance-skill {
@@ -2430,7 +2505,7 @@
 		.sheet-armor-buttons span,
 		.sheet-roll-toggles,
 		.sheet-roll-toggles span {
-			font-family: "pictos";
+			@extend .sheet-pictos;
 			position: relative;}
 
 		.sheet-armor-buttons,
@@ -2448,7 +2523,6 @@
 				height: 20px;
 				width: 20px;}
 
-	button.sheet-pictos {font-family: "Pictos";}
 	span.sheet-pictosC {font-family: "Pictos Custom";}
 	span.sheet-pictos3 {font-family: "Pictos Three";}
 	span.sheet-d6 {font-family: "dicefontd6";}	
@@ -2503,7 +2577,7 @@
 	 .repcontrol .repcontrol_add:after  {
 		background-color: none;
 		color: #fff;
-		font-family: pictos;
+		@extend .sheet-pictos;
 		font-size: 16px;
 		height: 12px;
 		padding: 2px 4px 2px 4px;
@@ -2541,7 +2615,7 @@
 
 	.itemcontrol .repcontrol_del {
 		background-color: darkred;
-		font-family     : pictos;}
+		@extend .sheet-pictos;}
 
 /********************************************************************************************************/
 /**************************************** Roll template *******************************************/

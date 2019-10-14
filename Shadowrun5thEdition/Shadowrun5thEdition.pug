@@ -9,10 +9,30 @@ input.character-type(name='attr_flag_special' type='hidden' value='mundane')
 //- MIXINS
 include src/pug/_mixins.pug
 
-//- Old HTML TABS
-include src/tabs.html
-
 .pc
+	.tabs
+		img(alt='Shadowrun black and metallic logo' src='https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadowrun5thEdition/images/ShadowrunLogo.png')
+		h1(data-i18n='character') Character
+		label(data-i18n-title='character name' title='character name')
+			input(type='text' name='attr_character_name' placeholder='Character name' title='@{character_name}')
+		h1(data-i18n='player') Player
+		label(data-i18n-title='player name' title='player name')
+			input(type='text' name='attr_player_name' placeholder='Player name' title='@{player_name}')
+		h2(data-i18n-title='/w GM') /w GM
+		label.switch(data-i18n-title='whisper rolls to gm' title='whisper rolls to gm')
+			input.whisper-toggle(name='attr_gm_toggle' type='checkbox' value='/w gm')
+			span.slider
+		each val, key in {'wounds': '@{wounds}', 'modifiers':'?{Modifiers +/-|0}', 'edge':'@{edge}'}
+			h2(data-i18n-title=key) #{key}
+			label.switch(data-i18n-title=key title=key)
+				input.whisper-toggle(name='attr_'+key+'_toggle' type='checkbox' value=val)
+				span.slider
+		button(name='d6' title='Roll D6s' type='roll' value='@{gm_toggle} &{template:rolls}{{header=^{d6}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5)]]}}') L
+		button.pictos(name='act_tab_options' title='@{tab}' type='action' ) y
+		input(name='attr_tab' type='hidden' value='core')
+		each val in ['core', 'arms', 'augs', 'gear', 'magic', 'matrix', 'social', 'vehicle']
+			button(data-i18n=val name='act_tab_'+val type='action' title='@{tab}') #{val}
+
 	input.options_toggle(name='attr_tab' type='hidden' value='options')
 	//- STATIC TAB
 	.static.pc-col
@@ -36,56 +56,55 @@ include src/tabs.html
 						each val in ['Skill', 'RTG', 'Attribute', 'Limit']
 							- const translationKey = val.toLowerCase();
 							h3(data-i18n=translationKey) #{val}
-					input.tab-switch(name="attr_skill_toggle" type="hidden" value="active")
-					each val, key in {"active":"active","know":"knowledge", "lang": "language"}
-						- const attributeDefault = val === 'active' ? 'Agility' : val === "knowledge" ? 'Logic' : "Charisma";
-						- const limitDefault = val === 'active' ? 'Physical' : val === "knowledge" ? 'Mental' : "Social";
-						div(class="skills-"+key)
-							if val === "active"
+					input.tab-switch(name='attr_skill_toggle' type='hidden' value='active')
+					each val, key in {'active':'active','know':'knowledge', 'lang': 'language'}
+						- const attributeDefault = val === 'active' ? 'Agility' : val === 'knowledge' ? 'Logic' : 'Charisma';
+						- const limitDefault = val === 'active' ? 'Physical' : val === 'knowledge' ? 'Mental' : 'Social';
+						div(class='skills-'+key)
+							if val === 'active'
 								.row-long
-									button(name="default" type="roll" value!="@{gm_toggle} &{template:rolls}{{header=^{default}}}{{base=@{default_display}}}{{dice=[[((@{default_attribute}+-1)+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}")
-										span(data-i18n="default") Default a skill
-									input(name="attr_default_display" type="hidden")
+									input(name='attr_default_display' type='hidden' value='Agility')
+									+rollButton('default', '@{default_display}', '@{default_attribute}+-1')
 									span.text-align-center -
-									select.attribute-select(name="attr_default_attribute" title="Skill attribute")
+									select.attribute-select(name='attr_default_attribute' title='Skill attribute')
 										+attributeSelect('Agility')
-									select.limit-select(name="attr_limit" title="Skill limit")
+									select.limit-select(name='attr_limit' title='Skill limit')
 										+limitSelect('Physical')
-							fieldset(class="repeating_" + val)
-								input.settings-toggle(name="attr_flag" type="hidden" value="settings")
-								input(name="attr_display_rating" type="hidden")
-								input(name="attr_display_specialization" type="hidden")
-								input(name="attr_display_limit" type="hidden" value="")
-								input(name="attr_display_attribute" type="hidden")
-								input(name="attr_dicepool" type="hidden")
+							fieldset(class='repeating_' + val)
+								input.settings-toggle(name='attr_flag' type='hidden' value='settings')
+								input(name='attr_display_rating' type='hidden')
+								input(name='attr_display_specialization' type='hidden' value='')
+								input(name='attr_display_limit' type='hidden' value='Physical')
+								input(name='attr_display_attribute' type='hidden')
+								input(name='attr_dicepool' type='hidden' value='0')
 								.row-long.border-bottom
 									.buttons
-										button(name="skill" type="roll" value!="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}{{desc=@{display_limit}}}{{dice=[[((@{dicepool}+@{attribute})+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}")
-											span(name="attr_display")
-										button.spec-button(name="specialization" type="roll" value!="@{gm_toggle} &{template:rolls}{{header=@{skill}}}{{base=@{display_attribute}}}@{display_limit}{{dice=[[(@{dicepool}+@{attribute}+2+@{wound_toggle}+@{modifier_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Spec: @{specialization}, @{display_limit}}}{{mod=[[@{modifier_toggle}]]}}{{wound=[[@{wound_toggle}]]}}{{edge=[[@{edge_toggle}]]}}")
-											span(name="attr_display_specialization")
-									span.text-align-center(name="attr_display_rating" title="Skill rating")
-									select.attribute-select(name="attr_attribute" title="Skill attribute")
+										//- SKILL BUTTOn
+										+skillButton(false)
+										//- SPECILIZATION BUTTON
+										+skillButton(true)
+									span.text-align-center(name='attr_display_rating' title='Skill rating')
+									select.attribute-select(name='attr_attribute' title='Skill attribute')
 										+attributeSelect(attributeDefault)
-									select.limit-select(name="attr_limit" title="Skill limit")
+									select.limit-select(name='attr_limit' title='Skill limit' value='physical_limit')
 										+limitSelect(limitDefault)
-									button.pictos(name="act_skill" type="action") x
+									button.pictos(name='act_skill' type='action') x
 								.settings-grid.row-long
-									if val === "active"
-										select.skill-select(name="attr_skill" title="Active skill" value="Close Combat Group")
+									if val === 'active'
+										select.skill-select(name='attr_skill' title='Active skill' value='Close Combat Group')
 											include src/skillselect.html
 									else
-										input(name="attr_skill" placeholder=val title=val+" skill name" type="text" )
-									input(name="attr_rating" min="0" placeholder="0" title="Skill rating" type="number")
-									label(title="Rating Modifier")
-										span(data-i18n="ratingmodifier") Rating Modifier
-										input(name="attr_rating_modifier" min="0" placeholder="0" title="Skill rating bonus" type="number" )
-									label(title="specializations") 
-										span(data-i18n="specializations") Specializations
-										input(name="attr_specialization" placeholder="Specalizations" title="Skill specializations" type="text")
-									label(title="notes")
-										span(data-i18n="notes") Notes
-									textarea(name="attr_notes" value="" placeholder="Notes")
+										input(name='attr_skill' placeholder=val title=val+' skill name' type='text' )
+									input(name='attr_rating' min='0' placeholder='0' title='Skill rating' type='number')
+									label(title='Rating Modifier')
+										span(data-i18n='ratingmodifier') Rating Modifier
+										input(name='attr_rating_modifier' min='0' placeholder='0' title='Skill rating bonus' type='number' )
+									label(title='specializations') 
+										span(data-i18n='specializations') Specializations
+										input(name='attr_specialization' placeholder='Specalizations' title='Skill specializations' type='text')
+									label(title='notes')
+										span(data-i18n='notes') Notes
+									textarea(name='attr_notes' value='' placeholder='Notes')
 
 
 	//- CORE TAB
@@ -116,7 +135,61 @@ include src/tabs.html
 	include src/options.html
 
 //- NPCs
-include src/npc.html
+.npc
+	.tabs
+		img(alt='Shadowrun black and metallic logo' src='https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadowrun5thEdition/images/ShadowrunLogo.png')
+		h2(data-i18n-title='/w GM') /w GM
+		label.switch(data-i18n-title='whisper rolls to gm' title='whisper rolls to gm')
+			input.whisper-toggle(name='attr_gm_toggle' type='checkbox' value='/w gm')
+			span.slider
+		each val, key in {'wounds': '@{wounds}', 'modifiers':'?{Modifiers +/-|0}', 'edge':'@{edge}'}
+			h2(data-i18n-title=key) #{key}
+			label.switch(data-i18n-title=key title=key)
+				input.whisper-toggle(name='attr_'+key+'_toggle' type='checkbox' value=val)
+				span.slider
+		button(name='d6' title='Roll D6s' type='roll' value='@{gm_toggle} &{template:rolls}{{header=^{d6}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5)]]}}') L
+		select(name='attr_sheet_type' title='Sheet Type')
+			each val in ['Grunt', 'Host', 'Sprite', 'Vehicle', 'PC']
+				- const attrName = val.toLowerCase();
+				option(value=attrName data-i18n=attrName) #{val}
+		input(name='attr_stats_toggle' type='checkbox' value='settings' checked)
+		span.pictos y
+	input(name='attr_stats_toggle' type='hidden' value='settings')
+	input.npc-type(name='attr_sheet_type' type='hidden' value='grunt')
+	.grunt.attribute
+		input.character-type(name='attr_flag_special' type='hidden')
+		each val in coreAttributeArray
+			- const attrName = val.toLowerCase();
+			+npcAttributeButton(attrName, '@{'+attrName+'}+@{attribute_roll}')
+			span(name='attr_display_'+attrName)
+			label.settings(data-i18n-title=val title=val)
+				input(name='attr_'+attrName+'_base' placeholder='3' title='@{'+attrName+'_base}' type='number' value='3')
+			if (val != 'Edge')
+				label.settings(data-i18n-title='modifier' title='modifier')
+					input(name='attr_'+attrName+'_modifier' placeholder='+' title='@{'+attrName+'_modifier}' type='number' value='')
+		h1(data-i18n="ess") ess
+		span(name='attr_essence')
+		label.settings(data-i18n-title='essence' title='essence')
+			input(name='attr_essence' placeholder='6' title='@{essence}' type='number' value='6')
+		each val, key in {'magic': 'magic', 'force': 'magic', 'resonance': 'resonance'}
+			- const abbreviation = key.slice(0,1);
+			h1.settings(class=val data-i18n=abbreviation) #{abbreviation}
+			span.settings(class=val name='attr_'+key)
+			label.settings(class=val data-i18n-title=key title=key)
+				input(name='attr_'+key placeholder='6' title='@{'+key+'}' type='number' value='6')
+	.host.attribute
+		each val, key in {'Host Rating': ['host_rating', '5'], 'Attack': ['attack', '5'], 'Sleaze': ['sleaze', '6'], 'Data Processing': ['data_processing', '7'], 'Firewall': ['firewall', '8']}
+			- const base = '^{host_rating} ♦ ^{'+val[0]+'}', rollForumla = '@{host_rating}+@{'+val[0]+'}';
+			+rollButton(val[0], base, rollForumla)
+			span(name='attr_'+val[0])
+			label.settings(data-i18n-title=val[0] title=key) #{key}
+				input(name='attr_'+val[0] placeholder=val[1] title='@{'+val[0]+'}' type='number' value='')
+	.vehicle.attribute
+		//-each val, key in {'Hand': 'handling', 'Hand (Off)': 'handling_offroad', 'Speed': 'speed', 'Speed (Off)': 'speed_offroad', 
+		//-'Accel': 'acceleration', 'Body': 'body', 'Pilot': 'pilot', 'Sensor': 'sensor', 'Seat': 'seating'}
+
+
+	//-include src/npc.html
 
 //- FOOTER
 include src/footer.html

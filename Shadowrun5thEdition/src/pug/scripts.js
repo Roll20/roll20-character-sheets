@@ -107,18 +107,6 @@
 		});
 	});  
 
-	 on("clicked:wound clicked:modifier clicked:edge", (eventinfo) => {
-	 	const attr = eventinfo.triggerName.split("clicked:")[1];
-		getAttrs([`${attr}_toggle`], (v) => {
-			const value = v[`${attr}_toggle`];
-			const change = (attr === "wound" && value != "@{wounds}") ? "@{wounds}" : (attr === "edge" && value != "@{edge}") ? "@{edge}" : (attr === "modifier" && value != "?{Modifiers +/-|0}") ? "?{Modifiers +/-|0}" : 0;
-
-			setAttrs({
-				[`${attr}_toggle`]: change
-			});
-		});
-	});
-
    [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`].forEach(attr => {
    		on(`clicked:tab_${attr}`, () => {
    			console.log(`%c The button clicked was tab_${attr} update tab to ${attr}`, "color:purple;");
