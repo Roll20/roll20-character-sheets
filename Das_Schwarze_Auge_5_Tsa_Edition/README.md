@@ -2,6 +2,8 @@
 
 ## Änderungen
 
+2019-10-18: strukturelle Anpassungen durch Tajo, um Sortierreihenfolge bei Übersetzungen z. B. bei Talenten beizubehalten
+
 2019-10-14: Englische Übersetzung durch Tajo. Vielen Dank!
 
 2019-10-07:
