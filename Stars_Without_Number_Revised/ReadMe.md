@@ -36,6 +36,14 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ## Changelog
 
+### 2.4.4
+
+* Fix inconsistent field name HP_MAX on the NPC sheet - the correct way to write
+  this is HP_max.
+* Link the name input on the PC sheet to the character_name attribute.
+* Fix misspelling of "Initiative" in translations, which was not propagated from
+  translation.json
+
 ### 2.4.3
 
 * Fix the summation of cyberware strain not actually doing that even remotely.
