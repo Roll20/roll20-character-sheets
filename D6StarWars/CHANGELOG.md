@@ -1,3 +1,7 @@
+### Version 2.14 (2019-10-08):
+
+- Adjust rolltemplates so title-text is centered, and bold 
+
 ### Version 2.13 (2019-07-23):
 **Fix:**
 

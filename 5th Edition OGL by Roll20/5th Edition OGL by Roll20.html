@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="2.713">
+<input type="hidden" name="attr_version" value="2.714">
 <input class="monster_confirm_flag" type="hidden" name="attr_monster_confirm_flag">
 <input class="mancer_confirm_flag" type="hidden" name="attr_mancer_confirm_flag">
 <div class="licensecontainer compendium-drop-target monsters">
@@ -7018,6 +7018,11 @@
     };
 
     var update_tool = function(tool_id) {
+        //D&D 5e Mancer: Land Vehicles proficiency does not drop with Marine background (UC748)
+        //Added a test to check for an undefined tool_id so to prevent similar errors.
+        //By Miguel Peres
+        if(typeof tool_id == "undefined") return;
+
         if(tool_id.substring(0,1) === "-" && tool_id.length === 20) {
             do_update_tool([tool_id]);
         }
@@ -8009,6 +8014,11 @@
                     var tool_array = jsonparse(blob["Tool Proficiency"]);
                     if(tool_array["Proficiencies"] && tool_array["Proficiencies"].length) {
                         _.each(tool_array["Proficiencies"], function(prof) {
+                            //D&D 5e Mancer: Land Vehicles proficiency does not drop with Marine background (UC748)
+                            //Generating ID that was coming empty for not existing rows.
+                            //By Miguel Peres
+                            let newrowid = generateRowID();
+
                             let existing = {};
                             _.each(repeating.tool, function(tool, id) {
                                 if(tool.toolname == prof.toLowerCase()) {
@@ -9723,7 +9733,10 @@
 
                     if(v["pb_type"] && v["pb_type"] === "die") {
                         atk = atk + "+" + v["pb"];
-                        dc = dc + parseInt(v["pb"].substring(1), 10) / 2;
+                        //Fixing Spell DC when using type Die
+                        //By Miguel
+                        //Used to be equals to: dc + parseInt(v["pb"].substring(1), 10) / 2
+                        dc = dc + "+" + v["pb"];
                     }
                     else {
                         atk = parseInt(atk, 10) + parseInt(v["pb"], 10);
@@ -15521,6 +15534,13 @@
         let spelldata = settings.spelldata || [];
         let existinglist = settings.existinglist || [];
         let spellnumber = 0;
+        //D&D 5e Lvl+ Mancer: Spells tab "Level undefined" (UC605)
+        //When invoking Lvl+ from an incomplete manually levelled character, an undefined lv is generated due to missing information.
+        //This code prevents an incomplete list from being displayed.
+        //By Miguel
+        //('undefined' in byLevel) {
+         // delete byLevel.undefined;
+        //}
         _.each(byLevel, function(level) {
             spellnumber += level.length;
         });
