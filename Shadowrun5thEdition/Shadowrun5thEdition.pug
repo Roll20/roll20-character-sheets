@@ -212,9 +212,46 @@ include src/pug/_mixins.pug
 					span.tiny-span() +
 					span(name='attr_'+val[0]+'_dice')
 					span.tiny-span(data-i18n='d6') d6
-			.row
-			
+			.row.grunt
+				h2(data-i18n='movement') Movement
+				- const movementObject = {'walk': ' / ', 'run': ' / + ', 'movement_mod': ''}
+				each val, key in movementObject
+					- const translationKey = key.includes('mod') ? 'movement' : key;
+					- const placeholderValue = key.includes('movement') ? '2' : '0';
+					label.settings(data-i18n-title=translationKey + ' modifier' title=translationKey + ' modifier')
+						input(name='attr_'+key+'_modifier' placeholder=placeholderValue title='@{'+key+'_modifier}' type='number' value=placeholderValue)
+					span.settings #{val}
+				span.tiny-span() =
+				each val, key in movementObject
+					span(name='attr_'+key title='@{'+key+'}')
+					span #{val}
+			.row.grunt
+				button(data-i18n='conditionmonitorps' name='act_cond_reset' type='action') Condition Monitor (P/S)
+				+conditionMonitor(['physical', 'stun'])
+			.row.grunt
+				h2(data-i18n='limits') Limits
+				br
+				each val in ['Physical', 'Mental', 'Social']
+					- const attrName = val.toLowerCase();
+					h3(data-i18n=attrName) val
+					label(data-i18n-title='modifier' title='modifier')
+						input(name='attr_'+attrName+'_limit_modifier' placeholder='0' title='@{'+attrName+'_limit_modifier}' type='number' value='0')
+					span.settings.tiny-span() =
+					span(name='attr_'+attrName+'_limit' title='@{'+attrName+'_limit}')
+			.row.grunt
+				h2(data-i18n='paintolerance') Pain Tolerance
+				label(data-i18n-title='paintolerance' title='paintolerance')
+					input(name='attr_pain_tolerance' min='-1' max='3' placeholder='0' title='@{pain_tolerance}' type='number' value='0')
+			.row.vehicle
+				h2(data-i18n='conditionmonitorpm') Condition Monitor (P/M)
+				+conditionMonitor(['physical', 'matrix'])
+			.row.vehicle
+				each val, key in {'Data Processing': ['data_processing', 'data_processing'], 'Firewall': ['firewall', 'firewall'], 'Device Rating': ['device_rating', 'devicerating']}
+					h2(data-i18n=val[1]) key
+					label(data-i18n-title=val[1] title=val[1]) 
+						input(name='attr_'+val[0] min='0' placeholder='0' title='@{'+val[0]+'}' type='number' value='')
 		.column
+
 		.column
 
 //- FOOTER
