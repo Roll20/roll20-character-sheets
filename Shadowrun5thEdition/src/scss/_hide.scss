@@ -1,0 +1,112 @@
+	%display-none { display: none; }
+	%display-inline { display: inline; }
+
+	%display-inline-grid { 
+		display: inline-grid;
+		grid-column-gap: 1%;
+		grid-row-gap: 1%;
+	}
+
+	%display-grid { display: grid; }
+
+	.sheet-pictos { font-family: 'Pictos'; }
+
+	%display-inline-block,
+	.sheet-static {
+		display: inline-block;
+	}
+
+	/***** PC AND NPC *****/
+	@each $characterType in 'npc', 'pc'{
+		.sheet-#{$characterType} { @extend %display-none; }
+	}
+
+	input[name='attr_sheet_type']:not([value='pc']) ~ .sheet-npc,
+	input[name='attr_sheet_type'][value='pc'] ~ .sheet-pc  {  
+		@extend %display-inline-block;  
+	}
+
+	/***** TABS *****/
+	$tabs:'arms', 'augs', 'core', 'gear', 'options', 'social', 'magic', 'matrix', 'vehicle';
+	@each $tab in $tabs {
+		.sheet-#{$tab} { @extend %display-none; }
+		.sheet-options_toggle[value='#{$tab}'] ~ .sheet-#{$tab} { @extend %display-inline-block; }
+	}
+
+	/***** SETTINGS *****/
+	.sheet-settings { @extend %display-none; }
+
+	input[name='attr_stats_toggle'][value='settings'] ~ .sheet-attribute .sheet-settings,
+	input[name='attr_stats_toggle'][value='settings'] ~ .sheet-body .sheet-settings {
+		@extend %display-inline-block; 
+	}
+
+		/*** TOGGLE ***/
+		input.sheet-settings-toggle:checked ~ div.sheet-display,
+	    input.sheet-settings-toggle:checked ~ .sheet-attr-col .sheet-attr-und div.sheet-display,
+	    input.sheet-settings-toggle ~ .sheet-attr-lim div.sheet-settings,
+	    input.sheet-settings-toggle:checked ~ .sheet-attr-lim div.sheet-display,
+	    input.sheet-settings-toggle[value='settings'] ~ div.sheet-display,
+	    input.sheet-settings-toggle[value='display'] ~ div.sheet-settings,
+	    input.sheet-settings-toggle[value='display'] ~ div.sheet-settings-grid  {
+	    	@extend %display-none; 
+	    }
+
+	.sheet-display,
+	input.sheet-settings-toggle:checked ~ div.sheet-settings,
+	input.sheet-settings-toggle:checked ~ .sheet-attr-col .sheet-attr-und div.sheet-settings,
+	input.sheet-settings-toggle:checked ~ .sheet-attr-lim div.sheet-settings {
+		background: none;
+		display   : inherit;
+		font-size : 1em;
+		text-align: left;
+		width     : 100%;
+	}
+
+	input.sheet-settings-toggle[value='display'] ~ div.sheet-pc div.sheet-display,
+    input.sheet-settings-toggle[value='settings'] ~ div.sheet-pc div.sheet-settings {
+      display: inline-block;
+    }
+
+	@each $specialAttribute in 'magic', 'resonance' {
+		//-PCs
+		.sheet-hide-#{$specialAttribute} { @extend %display-none;  }
+		.sheet-character-type[value='#{$specialAttribute}'] ~ .sheet-pc .sheet-pc-row .sheet-attr-col .sheet-hide-#{$specialAttribute} { 
+			@extend %display-inline-block; 
+		}
+
+		//NPC
+		input[name='attr_flag_special'][value='#{$specialAttribute}'] ~ .sheet-npc .sheet-hide-#{$specialAttribute} { 
+			@extend %display-inline-block; 
+		}
+	}
+
+	input[name='attr_flag_special'][value='mundane'] ~ div.sheet-npc .sheet-hide-magic,
+	input[name='attr_flag_special'][value='mundane'] ~ div.sheet-npc .sheet-hide-resonance,
+	input[name='attr_flag_special'][value='resonance'] ~ div.sheet-npc .sheet-hide-magic,
+	input[name='attr_flag_special'][value='magic'] ~ div.sheet-npc .sheet-hide-resonance,
+	input[name='attr_stats_toggle']:not([value='settings']) ~ .sheet-attribute .sheet-settings.sheet-hide-magic,
+	input[name='attr_stats_toggle']:not([value='settings']) ~ .sheet-attribute .sheet-settings.sheet-hide-resonance,
+	input[name='attr_stats_toggle']:not([value='settings']) ~ .sheet-body .sheet-settings.sheet-hide-magic,
+	input[name='attr_stats_toggle']:not([value='settings']) ~ .sheet-body .sheet-settings.sheet-hide-resonance {
+		display: none;
+	}
+
+	/***** NPC TYPES *****/
+	@each $npcType in 'grunt', 'host', 'sprite', 'vehicle' {
+		.sheet-#{$npcType}  { @extend %display-none; }
+
+		input[name='attr_sheet_type'][value='#{$npcType}'] ~ .sheet-npc .sheet-attribute.sheet-#{$npcType} { 
+			@extend %display-inline-grid; 
+		}
+
+		input[name='attr_sheet_type'][value='#{$npcType}'] ~ .sheet-npc .sheet-rows.sheet-#{$npcType} { 
+			@extend %display-inline-block; 
+		}
+	}
+
+	%highlight-button {
+		background-color: #610b0d;
+		box-shadow      : inset 0px 0px 3px 1px #e31715;
+		color           : #fff;
+	}
