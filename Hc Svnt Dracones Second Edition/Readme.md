@@ -5,7 +5,8 @@ Official Character Sheet
 
 ## V.1.20 (2019-10)
 
-* add "Quantity" field to Inventory scetion, and instuctions that appears when hovering over "Cost" or "Gear Score"
+* add "Quantity" field to Inventory section, and instructions that appears when hovering over "Cost" or "Gear Score"
+* add "source" field to techniques
 * change "Cargo Points" total to directly use `attr_mass_base` and `attr_body_exert`
 * removed default `cargo point`, `gear score` and `cost` values from equipment at request
 * Change all "Progression Purchase Tracking" attributes to start as "0"(was "1")
