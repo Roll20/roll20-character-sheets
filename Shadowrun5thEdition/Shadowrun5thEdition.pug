@@ -79,7 +79,7 @@ include src/pug/_mixins.pug
 								input(name='attr_dicepool' type='hidden' value='0')
 								.rows-long.border-bottom
 									.buttons
-										//- SKILL BUTTOn
+										//- SKILL BUTTON
 										+skillButton(false)
 										//- SPECILIZATION BUTTON
 										+skillButton(true)
@@ -95,14 +95,15 @@ include src/pug/_mixins.pug
 											include src/skillselect.html
 									else
 										input(name='attr_skill' placeholder=val title=val+' skill name' type='text' )
-									input(name='attr_rating' min='0' placeholder='0' title='Skill rating' type='number')
-									label(title='Rating Modifier')
+									label(data-i18n='rating')
+										input(name='attr_rating' min='0' placeholder='0' title='Skill rating' type='number')
+									label(data-i18n-title='ratingmodifier' title='Rating Modifier')
 										span(data-i18n='ratingmodifier') Rating Modifier
 										input(name='attr_rating_modifier' min='0' placeholder='0' title='Skill rating bonus' type='number' )
-									label(title='specializations') 
+									label(data-i18n-title='specializations' title='Specializations') 
 										span(data-i18n='specializations') Specializations
 										input(name='attr_specialization' placeholder='Specalizations' title='Skill specializations' type='text')
-									label(title='notes')
+									label(data-i18n-title='notes' title='notes')
 										span(data-i18n='notes') Notes
 									textarea(name='attr_notes' value='' placeholder='Notes')
 
@@ -155,6 +156,8 @@ include src/pug/_mixins.pug
 		input(name='attr_stats_toggle' type='checkbox' value='settings' checked)
 		span.pictos y
 	input(name='attr_stats_toggle' type='hidden' value='settings')
+	
+	//- ATTRIBUTES
 	.grunt.attribute
 		each val in coreAttributeArray
 			- const attrName = val.toLowerCase();
@@ -193,20 +196,22 @@ include src/pug/_mixins.pug
 				input(name='attr_'+val[0] placeholder='3' title='@{'+val[0]+'}' type='number' value='')
 	.sprite.attribute
 		+hostSprite(spriteObject, 'level')
+	
+	//-BODY
 	.body
 		.column
 			h1.settings(data-i18n='bonuses') Bonuses
 			//- PROFESSIONAL RATINGS
+			input(name='attr_pr' type='hidden' value='')
 			.rows.grunt
 				h2(data-i18n='pr') Professional Rating
-				span(name='attr_pr')
+				span(name='attr_pr' style='margin-left: 2%;')
 				label.settings(data-i18n-title='pr' title='Professional Rating')
 					input(name='attr_pr' title='@{pr}' type='number')
 			
 			//- INITAITIVE
-			each val, key in {'Initiative': ['initiative', 'initiative'], 'Astral Initiative': ['astral', 'astralinitiative'], 'Matrix Initiative': ['matrix', 'matrixinitiative']}
-				- const npcCharacterType = key === 'Initiative' ? 'grunt' : key === 'Astral Initiative' ? 'grunt hide-magic' : 'grunt vehicle sprite host';
-				.rows(class=npcCharacterType)
+			each val, key in {'Initiative': ['initiative', 'initiative', 'grunt'], 'Astral Initiative': ['astral', 'astralinitiative', 'grunt hide-magic'], 'Matrix Initiative': ['matrix', 'matrixinitiative', 'grunt vehicle sprite host']}
+				.rows(class=val[2])
 					+initiativeRoll(key, val[0], val[1])
 					label.settings(data-i18n-title='modifier' title='modifier')
 						input(name='attr_'+val[0]+'_modifier' placeholder='0' title='@{'+val[0]+'_modifier}' type='number' value='0')
@@ -230,7 +235,7 @@ include src/pug/_mixins.pug
 					label.settings(data-i18n-title=translationKey + ' modifier' title=translationKey + ' modifier')
 						input(name='attr_'+key+'_modifier' placeholder=placeholderValue title='@{'+key+'_modifier}' type='number' value=placeholderValue)
 					span.settings #{val}
-				span.tiny-span() =
+				span.settings.tiny-span() =
 				each val, key in movementObject
 					span(name='attr_'+key title='@{'+key+'}')
 					span #{val}
@@ -257,10 +262,12 @@ include src/pug/_mixins.pug
 					span(name='attr_'+attrName+'_limit' title='@{'+attrName+'_limit}')
 			
 			//- PAIN TOLERANCE
-			.rows.grunt
-				h2.settings(data-i18n='paintolerance') Pain Tolerance
+			.rows.grunt.pain-tolerance
+				h2(data-i18n='paintolerance') Pain Tolerance
 				label.settings(data-i18n-title='paintolerance' title='paintolerance')
 					input(name='attr_pain_tolerance' min='-1' max='3' placeholder='0' title='@{pain_tolerance}' type='number' value='0')
+				em
+					span(data-i18n='painfooter') Low Pain Tolernace adds a -1 and High Pain Tolerance adds a +1 per rank.
 			
 			//- MATRIX ATTRIBUTES
 			.rows.vehicle
@@ -271,6 +278,8 @@ include src/pug/_mixins.pug
 							input(name='attr_'+val[0] min='0' placeholder='0' title='@{'+val[0]+'}' type='number' value='')
 						span.settings.tiny-span() =
 						span(name='attr_'+val[0])
+
+		//- MODIFIERS				
 		.column
 			h1.settings(data-i18n='modifier') Modifier
 			.rows
@@ -287,6 +296,8 @@ include src/pug/_mixins.pug
 						span(name='attr_'+val[0])
 					else
 						span(name='attr_'+val[0]+'_protection')
+
+		///- OPTIONS
 		.column
 			.rows
 				h1.settings(data-i18n='options') Options
@@ -307,26 +318,62 @@ include src/pug/_mixins.pug
 		//TEXTBOXES
 		each val, key in {'Qualities': 'grunt', 'Augmentations': 'grunt', 'Gear': 'grunt vehicle', 'Programs': 'vehicle', 'Modifications': 'vehicle', 'Powers': 'grunt hide-magic', 'Weakness': 'grunt hide-magic'}
 			- const attrName = key.toLowerCase();
+			input(name='attr_'+attrName type='hidden' value='')
 			.textrow(class=val)
-				input(name='attr_'+attrName type='hidden' value='')
-				h2(data-i18n=attrName) key
+				h1(data-i18n=attrName) key
+				span(name='attr_'+attrName)
 				label.settings(data-i18n-title=attrName title=key)
 					textarea(name='attr_'+attrName placeholder=key title='@{'+attrName+'}')
-				span(name='attr_'+attrName)
 
-		each val, key in {'Initiate': ['grunt hide-magic', 'metamagic'],'Submersion': ['grunt resonance-magic', 'echos']}
+		each val, key in {'Initiate': ['grunt hide-magic', 'metamagic'],'Submersion': ['grunt hide-resonance', 'echos']}
 			- const attrName = key.toLowerCase();
 			.textrow(class=val[0])
 				input(name='attr_'+attrName type='hidden' value='')
-				h2(data-i18n=attrName) key
+				h1(data-i18n=attrName) key
 				span(name='attr_'+attrName)
 				label.settings(data-i18n-title=attrName title=key)
-					input(name='attr_'+attrName placeholder=attrName title='@{'+attrName+'}')
+					input(name='attr_'+attrName placeholder=attrName type='number' title='@{'+attrName+'}')
+				br
+				span(name='attr_'+val[1])
 				label.settings(data-i18n-title=val[1] title=val[1])
 					textarea(name='attr_'+val[1] placeholder=val[1] title='@{'+val[1]+'}')
-				span(name='attr_'+val[1])
 
 
+		//- SKILLS
+		.rows.grunt.skills
+			h1(data-i18n='skills') skills
+			fieldset(class='repeating_active')
+				input(name='attr_display_rating' type='hidden')
+				input(name='attr_display_specialization' type='hidden' value='')
+				input(name='attr_display_limit' type='hidden' value='Physical')
+				input(name='attr_display_attribute' type='hidden')
+				input(name='attr_dicepool' type='hidden' value='0')
+				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+				span.pictos x
+				//- SKILL BUTTON
+				+skillButton(false)
+				//- SPECILIZATION BUTTON
+				+skillButton(true)
+				span(name='attr_display_rating')
+				.settings
+					h2(data-i18n='skill') Skill
+					h2(data-i18n='rating') Rating
+					h2(data-i18n='ratingmodifier') Rating Modifier
+					h2(data-i18n='attribute') Attribute
+					h2(data-i18n='limit') Limit
+					select.skill-select(name='attr_skill' title='Active skill' value='Close Combat Group')
+						include src/skillselect.html
+					label(data-i18n-title='rating' title='rating')
+						input(name='attr_rating' min='0' placeholder='0' title='Skill rating' type='number')
+					label(data-i18n-title='ratingmodifier' title='Rating Modifier')
+						input(name='attr_rating_modifier' min='0' placeholder='0' title='Skill rating bonus' type='number' )
+					select.attribute-select(name='attr_attribute' title='Skill attribute')
+						+attributeSelect(attributeDefault)
+					select.limit-select(name='attr_limit' title='Skill limit' value='physical_limit')
+						+limitSelect(limitDefault)
+					h2(data-i18n='specializations') Specializations
+					label(data-i18n-title='specializations' title='Specializations') 
+						input(name='attr_specialization' placeholder='Specalizations' title='Skill specializations' type='text')
 
 //- FOOTER
 include src/footer.html

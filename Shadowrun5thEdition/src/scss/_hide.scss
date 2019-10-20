@@ -36,7 +36,8 @@
 	.sheet-settings { @extend %display-none; }
 
 	input[name='attr_stats_toggle'][value='settings'] ~ .sheet-attribute .sheet-settings,
-	input[name='attr_stats_toggle'][value='settings'] ~ .sheet-body .sheet-settings {
+	input[name='attr_stats_toggle'][value='settings'] ~ .sheet-body .sheet-column .sheet-settings,
+	input[name='attr_stats_toggle'][value='settings'] ~ .sheet-body .sheet-textrow .sheet-settings {
 		@extend %display-inline-block; 
 	}
 
@@ -80,18 +81,6 @@
 		}
 	}
 
-	/* SHOW AND HIDE MAGIC AND RESONANCE SPECIFIC ATTRIBUTES BASED ON RADIO TOGGLE */
-	input[name='attr_flag_special'][value='mundane'] ~ div.sheet-npc .sheet-hide-magic,
-	input[name='attr_flag_special'][value='mundane'] ~ div.sheet-npc .sheet-hide-resonance,
-	input[name='attr_flag_special'][value='resonance'] ~ div.sheet-npc .sheet-hide-magic,
-	input[name='attr_flag_special'][value='magic'] ~ div.sheet-npc .sheet-hide-resonance,
-	input[name='attr_stats_toggle']:not([value='settings']) ~ .sheet-attribute .sheet-settings.sheet-hide-magic,
-	input[name='attr_stats_toggle']:not([value='settings']) ~ .sheet-attribute .sheet-settings.sheet-hide-resonance,
-	input[name='attr_stats_toggle']:not([value='settings']) ~ .sheet-body .sheet-settings.sheet-hide-magic,
-	input[name='attr_stats_toggle']:not([value='settings']) ~ .sheet-body .sheet-settings.sheet-hide-resonance {
-		display: none;
-	}
-
 	/***** NPC TYPES *****/
 	@each $npcType in $npcTypes {
 		.sheet-#{$npcType}  { @extend %display-none; }
@@ -108,20 +97,49 @@
 
 	input[name='attr_sheet_type'][value='host'] ~ .sheet-npc .sheet-column:nth-of-type(1n+2),
 	input[name='attr_sheet_type'][value='sprite'] ~ .sheet-npc .sheet-column:nth-of-type(1n+2)  { 
-		display: none;
+		@extend %display-none;
+	}
+
+
+	/* SHOW AND HIDE MAGIC AND RESONANCE SPECIFIC ATTRIBUTES BASED ON RADIO TOGGLE */
+	input[name='attr_flag_special'][value='mundane'] ~ div.sheet-npc .sheet-hide-magic,
+	input[name='attr_flag_special'][value='mundane'] ~ div.sheet-npc .sheet-hide-resonance,
+	input[name='attr_flag_special'][value='mundane'] ~ div.sheet-npc .sheet-grunt.sheet-hide-magic,
+	input[name='attr_flag_special'][value='mundane'] ~ div.sheet-npc .sheet-grunt.sheet-hide-resonance,
+	input[name='attr_flag_special'][value='resonance'] ~ div.sheet-npc .sheet-hide-magic,
+	input[name='attr_flag_special'][value='resonance'] ~ div.sheet-npc .sheet-grunt.sheet-hide-magic,
+	input[name='attr_flag_special'][value='magic'] ~ div.sheet-npc .sheet-hide-resonance,
+	input[name='attr_flag_special'][value='magic'] ~ div.sheet-npc .sheet-grunt.sheet-hide-resonance,
+	input[name='attr_stats_toggle']:not([value='settings']) ~ div.sheet-attribute .sheet-settings.sheet-hide-magic,
+	input[name='attr_stats_toggle']:not([value='settings']) ~ div.sheet-attribute .sheet-settings.sheet-hide-resonance,
+	input[name='attr_stats_toggle']:not([value='settings']) ~ div.sheet-body .sheet-settings.sheet-hide-magic,
+	input[name='attr_stats_toggle']:not([value='settings']) ~ div.sheet-body .sheet-settings.sheet-hide-resonance {
+		@extend %display-none;
 	}
 
 	//- HIDE TEXT ROWS WHEN THE TEXTAREA IS EMPTY
-	input[name='attr_stats_toggle']:not([value='settings']) ~ .sheet-body .sheet-textrow input[type='hidden'][value=''] + h2,
-	input[name='attr_stats_toggle']:not([value='settings']) ~ .sheet-body .sheet-textrow input[type='hidden'][value=''] + h2 + label + span,
-	input[name='attr_stats_toggle']:not([value='settings']) ~ .sheet-body .sheet-textrow input[type='hidden'][value=''] + h2 + span[name='attr_initiate'],
-	input[name='attr_stats_toggle']:not([value='settings']) ~ .sheet-body .sheet-textrow input[type='hidden'][value=''] + h2 + span[name='attr_submersion'],
-	input[name='attr_stats_toggle']:not([value='settings']) ~ .sheet-body .sheet-textrow input[type='hidden'][value=''] + h2 + span + label + label + span {
+	input[name='attr_stats_toggle']:not([value='settings']) ~ div.sheet-body input[type='hidden'][value=''] + div.sheet-textrow {
+		@extend %display-none;
+	}
+
+
+	input[name='attr_stats_toggle']:not([value='settings']) ~ div.sheet-body input[type='hidden'][value=''] + div.sheet-rows.sheet-grunt {
+		@extend %display-none;
+	}
+
+	//- HIDE PAIN TOLLERANCE FOR NPCS
+	input[name='attr_stats_toggle']:not([value='settings']) ~ div.sheet-body div.sheet-grunt.sheet-pain-tolerance {
 		display: none;
+	}
+
+	//- HIDE SPECIALIZATION BUTTONS IF THERE IS NO SPECIALIZATION
+	input[name='attr_display_specialization'][value=''] ~ button[name*='specialization'],
+	input[name='attr_display_specialization'][value=' '] ~ button[name*='specialization'] {
+		@extend %display-none;
 	}
 
 	%highlight-button {
 		background-color: #610b0d;
-		box-shadow      : inset 0px 0px 3px 1px #e31715;
+		box-shadow      : inset 0px 0px 3px 1px #e31715; 
 		color           : #fff;
 	}
