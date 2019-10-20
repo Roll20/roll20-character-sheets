@@ -57,10 +57,8 @@ include src/pug/_mixins.pug
 							- const translationKey = val.toLowerCase();
 							h3(data-i18n=translationKey) #{val}
 					input.tab-switch(name='attr_skill_toggle' type='hidden' value='active')
-					each val, key in {'active':'active','know':'knowledge', 'lang': 'language'}
-						- const attributeDefault = val === 'active' ? 'Agility' : val === 'knowledge' ? 'Logic' : 'Charisma';
-						- const limitDefault = val === 'active' ? 'Physical' : val === 'knowledge' ? 'Mental' : 'Social';
-						div(class='skills-'+key)
+					each val, key in {'active': ['active', 'Agility', 'Physical'],'knowledge':['know', 'Logic', 'Mental'], 'language': ['lang', 'Charisma', 'Social']}
+						div(class='skills-'+val[0])
 							if val === 'active'
 								.rows-long
 									input(name='attr_default_display' type='hidden' value='Agility')
@@ -70,12 +68,12 @@ include src/pug/_mixins.pug
 										+attributeSelect('Agility')
 									select.limit-select(name='attr_limit' title='Skill limit')
 										+limitSelect('Physical')
-							fieldset(class='repeating_' + val)
+							fieldset(class='repeating_' + val[0])
 								input.settings-toggle(name='attr_flag' type='hidden' value='settings')
 								input(name='attr_display_rating' type='hidden')
 								input(name='attr_display_specialization' type='hidden' value='')
-								input(name='attr_display_limit' type='hidden' value='Physical')
-								input(name='attr_display_attribute' type='hidden')
+								input(name='attr_display_limit' type='hidden' value=val[2])
+								input(name='attr_display_attribute' type='hidden' value=val[1])
 								input(name='attr_dicepool' type='hidden' value='0')
 								.rows-long.border-bottom
 									.buttons
@@ -85,16 +83,17 @@ include src/pug/_mixins.pug
 										+skillButton(true)
 									span.text-align-center(name='attr_display_rating' title='Skill rating')
 									select.attribute-select(name='attr_attribute' title='Skill attribute')
-										+attributeSelect(attributeDefault)
+										+attributeSelect(val[1])
 									select.limit-select(name='attr_limit' title='Skill limit' value='physical_limit')
-										+limitSelect(limitDefault)
+										+limitSelect(val[2])
 									button.pictos(name='act_skill' type='action') x
 								.settings-grid.rows-long
 									if val === 'active'
 										select.skill-select(name='attr_skill' title='Active skill' value='Close Combat Group')
-											include src/skillselect.html
+											include src/pug/skillselect.html
 									else
-										input(name='attr_skill' placeholder=val title=val+' skill name' type='text' )
+										label(data-i18n-title='skill' title='skill')
+											input(name='attr_skill' placeholder=val title=val+' skill name' type='text' )
 									label(data-i18n='rating')
 										input(name='attr_rating' min='0' placeholder='0' title='Skill rating' type='number')
 									label(data-i18n-title='ratingmodifier' title='Rating Modifier')
@@ -340,40 +339,74 @@ include src/pug/_mixins.pug
 
 
 		//- SKILLS
-		.rows.grunt.skills
+		each val, key in {'active': ['skills', 'Agility', 'Physical'],'knowledge':['knowledgeskills', 'Logic', 'Mental'], 'language': ['languageskills', 'Charisma', 'Social']}
+			.rows.grunt.repeating
+				h1(data-i18n=val[0]) #{val[0]}
+				fieldset(class='repeating_'+key)
+					input(name='attr_display_rating' type='hidden')
+					input(name='attr_display_specialization' type='hidden' value='')
+					input(name='attr_display_limit' type='hidden' value=val[2])
+					input(name='attr_display_attribute' type='hidden' value=val[1])
+					input(name='attr_dicepool' type='hidden' value='0')
+					input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+					span.pictos x
+					//- SKILL BUTTON
+					+skillButton(false)
+					//- SPECILIZATION BUTTON
+					+skillButton(true)
+					span(name='attr_display_rating')
+					.settings
+						h2(data-i18n='skill') Skill
+						h2(data-i18n='rating') Rating
+						h2(data-i18n='ratingmodifier') Rating Modifier
+						h2(data-i18n='attribute') Attribute
+						h2(data-i18n='limit') Limit
+						if key === 'active'
+							select.skill-select(name='attr_skill' title='@{repeating_'+key+'_${x}_skill}' value='Close Combat Group')
+								include src/pug/skillselect.html
+						else
+							label(data-i18n-title='skill' title='skill')
+								input(name='attr_skill' placeholder=key title='@{repeating_'+key+'_${x}_skill}' type='text' )
+						label(data-i18n-title='rating' title='rating')
+							input(name='attr_rating' min='0' placeholder='0' title='@{repeating_'+key+'_${x}_rating}' type='number')
+						label(data-i18n-title='ratingmodifier' title='Rating Modifier')
+							input(name='attr_rating_modifier' min='0' placeholder='0' title='@{repeating_'+key+'_${x}_rating_modifier}' type='number' )
+						select.attribute-select(name='attr_attribute' title='@{repeating_'+key+'_${x}_attribute')
+							+attributeSelect(val[1])
+						select.limit-select(name='attr_limit' title='@{repeating_'+key+'_${x}_limit}' value='physical_limit')
+							+limitSelect(val[2])
+						h2.full-row(data-i18n='specializations') Specializations
+						label.full-row(data-i18n-title='specializations' title='Specializations') 
+							input(name='attr_specialization' placeholder='Specalizations' title='@{repeating_'+key+'_${x}_specialization}' type='text')
+
+		.rows.sprite.repeating
 			h1(data-i18n='skills') skills
 			fieldset(class='repeating_active')
-				input(name='attr_display_rating' type='hidden')
-				input(name='attr_display_specialization' type='hidden' value='')
-				input(name='attr_display_limit' type='hidden' value='Physical')
-				input(name='attr_display_attribute' type='hidden')
-				input(name='attr_dicepool' type='hidden' value='0')
 				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
 				span.pictos x
 				//- SKILL BUTTON
-				+skillButton(false)
-				//- SPECILIZATION BUTTON
-				+skillButton(true)
-				span(name='attr_display_rating')
+				+spriteButton('skill', 'display')
 				.settings
-					h2(data-i18n='skill') Skill
-					h2(data-i18n='rating') Rating
-					h2(data-i18n='ratingmodifier') Rating Modifier
-					h2(data-i18n='attribute') Attribute
-					h2(data-i18n='limit') Limit
-					select.skill-select(name='attr_skill' title='Active skill' value='Close Combat Group')
-						include src/skillselect.html
-					label(data-i18n-title='rating' title='rating')
-						input(name='attr_rating' min='0' placeholder='0' title='Skill rating' type='number')
-					label(data-i18n-title='ratingmodifier' title='Rating Modifier')
-						input(name='attr_rating_modifier' min='0' placeholder='0' title='Skill rating bonus' type='number' )
-					select.attribute-select(name='attr_attribute' title='Skill attribute')
-						+attributeSelect(attributeDefault)
-					select.limit-select(name='attr_limit' title='Skill limit' value='physical_limit')
-						+limitSelect(limitDefault)
-					h2(data-i18n='specializations') Specializations
-					label(data-i18n-title='specializations' title='Specializations') 
-						input(name='attr_specialization' placeholder='Specalizations' title='Skill specializations' type='text')
+					h2.full-row(data-i18n='skill') Skill
+					select.skill-select(name="attr_skill" title='@{repeating_'+key+'_${x}_skill}')
+						include src/pug/skillsselectsprite.html
+
+		.rows.sprite.repeating
+			h1(data-i18n='powers') Powers
+			fieldset(class='repeating_powers')
+				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+				span.pictos x
+				+spriteButton('power', 'power')
+				.settings
+					h2.full-row(data-i18n='power') power
+					label.full-row(data-i18n-title='power' title='power')
+						input(name='attr_power' placeholder='power' title='@{repeating_powers_${x}_power}' +' power name' type='text' )
+					h2.full-row(data-i18n='notes') Notes
+					label.full-row(data-i18n-title="notes" title="notes")
+						textarea(name="attr_notes" placeholder="Powers notes" title='@{repeating_powers_${x}_notes}' value="")
+
+
+								
 
 //- FOOTER
 include src/footer.html
