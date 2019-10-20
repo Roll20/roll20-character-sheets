@@ -1,9 +1,15 @@
 - const coreAttributeArray = ['Body', 'Agility', 'Reaction', 'Strength', 'Willpower', 'Logic', 'Intuition', 'Charisma'];
 - const attributesArray = ['Body', 'Agility', 'Reaction', 'Strength', 'Willpower', 'Logic', 'Intuition', 'Charisma', 'Magic', 'Resonance'];
+- const spellCatagories = ['Combat', 'Detection', 'Health', 'Illusion', 'Manipulation'];
+- const spellTypes = ['Mana', 'Physical'];
+- const spellRanges = ['LOS', 'LOS (A)', 'Special', 'T', 'T (A)'];
+- const spellDurations = ['Instant', 'Permanent', 'Special', 'Sustained'];
+- const spellCombatTypes = ['Force ', 'Direct, Force ', 'Indirect, Force ?{Force|}, AP -'];
 - const limitObject = {'Mental':'mental_limit', 'Physical':'physical_limit', 'Social':'social_limit', 'Attack':'attack', 'Data Processing':'data_processing', 'Firewall':'firewall', 'Sleaze':'sleaze'};
 - const hostObject = {'Host Rating': ['host_rating', '5'], 'Attack': ['attack', '5'], 'Sleaze': ['sleaze', '6'], 'Data Processing': ['data_processing', '7'], 'Firewall': ['firewall', '8']};
 - const spriteObject = {'Level': ['level', '5'], 'Attack': ['attack', '5'], 'Sleaze': ['sleaze', '6'], 'Data Processing': ['data_processing', '7'], 'Firewall': ['firewall', '8']};
-- const npcWeaponsObject = {'Range': {'type': 'select', 'placeholder': 'range'}, 'Dice': {'type': 'number', 'placeholder': '18'},'Name': {'type': 'text', 'placeholder': 'Ares Predator'}, 'Type': {'type': 'text', 'placeholder': 'Heavy Pistol'}, 'Reach': {'type': 'number', 'placeholder': '0'}, 'ACC': {'type': 'text', 'placeholder': '5'},'Dam': {'type': 'text', 'placeholder': '9P'},  'AP': {'type': 'number', 'placeholder': '-2'},'Modes': {'type': 'text', 'placeholder': 'SA/BF/FA'},'Recoil': {'type': 'text', 'placeholder': '+2'},'Ammo': {'type': 'number', 'placeholder': '15'}, 'Notes': {'type': 'text', 'placeholder': 'w/ 3 clips of explosive rounds'}};
+- const npcWeaponsObject = {'Range': {'type': 'select', 'default': 'range'}, 'Dice': {'type': 'number', 'placeholder': '18'},'Name': {'type': 'text', 'placeholder': 'Ares Predator'}, 'Type': {'type': 'text', 'placeholder': 'Heavy Pistol'}, 'Reach': {'type': 'number', 'placeholder': '0'}, 'ACC': {'type': 'text', 'placeholder': '5'},'Dam': {'type': 'text', 'placeholder': '9P'},  'AP': {'type': 'number', 'placeholder': '-2'},'Modes': {'type': 'text', 'placeholder': 'SA/BF/FA'},'Recoil': {'type': 'text', 'placeholder': '+2'},'Ammo': {'type': 'number', 'placeholder': '15'}, 'Notes': {'type': 'text', 'placeholder': 'w/ 3 clips of explosive rounds'}};
+- const npcSpellObject = {'Category': {'type': 'select', 'default': 'combat', 'array': spellCatagories}, 'Dice': {'type': 'number', 'placeholder': '18'}, 'Name': {'type': 'text', 'placeholder': 'Fireball'}, 'Type': {'type': 'select', 'default': 'P', 'array': spellTypes}, 'Range': {'type': 'select', 'default': 'LOS', 'array':spellRanges}, 'Duration': {'type': 'select', 'default': 'Instant', 'array':spellDurations}, 'Drain': {'type': 'number', 'placeholder': '-1'}, 'Combat': {'type': 'select', 'default': 'Force', 'array':spellCombatTypes}, 'Dam': {'type': 'text', 'placeholder': 'P'}, 'Notes': {'type': 'text', 'placeholder': 'may start fires'}};
 
 //- DIE ROLL VARIABLES
 - const rollBeginging = '@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}';
@@ -31,6 +37,12 @@ mixin spriteButton(header, display)
 mixin weaponButton()
     button(name='weapon' type='roll' value=rollBeginging+'{{header=@{weapon_type}}}{{base=^{base}}}{{dice=[[((@{weapon_dice})'+rollEnding+'{{desc=ACC @{weapon_acc}, DV @{weapon_dv}, AP @{weapon_ap}}}{{rea=[[@{weapon_reach}]]}}')
          span(name='attr_weapon_name')
+
+//- SPELL BUTTON FOR NPCS
+mixin spellButton()
+    button(name='spell' type='roll' value=rollBeginging+'{{header=@{name}}}{{base=^{base}}}{{dice=[[((@{dice})'+rollEnding+'{{desc=@{combat_type}?{Force|}, Drain [[?{Force|}+(@{drain})]]}}')
+        span(name='attr_name')
+
 
 //- NPC ATTRIBUTE ROLLS
 mixin npcAttributeButton(attribute, rollFormula)

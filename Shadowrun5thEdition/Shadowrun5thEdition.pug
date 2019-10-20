@@ -427,7 +427,7 @@ include src/pug/_mixins.pug
 						- const translationKey = key.toLowerCase();
 						- const attrName = key === 'Dam' ? 'dv' : key === 'Modes' ? 'mode' : key === 'Notes' ? 'note' : key.toLowerCase();
 						if (key === 'Range')
-							select(name='attr_weapon_'+attrName title='@{repeating_weapon_${x}_weapon_'+attrName+'}' value=val['placeholder'])
+							select(name='attr_weapon_'+attrName title='@{repeating_weapon_${x}_weapon_'+attrName+'}' value=val['default'])
 								option(data-i18n='range' value='range' selected) range
 								option(data-i18n='melee' value='melee') melee
 						else
@@ -437,11 +437,38 @@ include src/pug/_mixins.pug
 
 
 		//- SPELLS
-		.rows.grunt.hide-magic
+		.rows.grunt.repeating.spells
 			h1(data-i18n='spells') Spells
 			fieldset(class='repeating_NPCspell')
 				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
-				span.pictos 
+				span.pictos x
+				input(name='attr_spell' type='hidden' value='')
+				span(name='attr_dice')
+				+spellButton()
+				span(name='attr_spell')
+				.settings
+					input(name='attr_category' type='hidden' value='')
+					each val, key in npcSpellObject
+						- const translationKey = key.toLowerCase();
+						if (key !== 'Notes')
+							h2(data-i18n=translationKey) #{key}
+					each val, key in npcSpellObject
+						- const translationKey = key.toLowerCase();
+						- const attrName = key === 'Dam' ? 'damage' : key === 'Combat' ? 'combat_type' : key === 'Notes' ? 'note' : key.toLowerCase();
+						if val['type'] === 'select'
+							select(name='attr_'+attrName title='@{repeating_NPCspell_${x}_'+attrName+'}' value=val['default'])
+								each type in val['array']
+									- const i18n = key === 'Combat' ? type.split(' ')[0].replace(',','').toLowerCase() : type.toLowerCase();
+									- const value = key === 'Type' ? type.slice(0,1) : type;
+									if val['default'] === i18n
+										option(data-i18n=i18n value=value 'selected') #{i18n}
+									else if i18n === 'force'
+										option(value=value 'selected')
+									else
+										option(data-i18n=i18n value=value) #{i18n}
+						else
+							label(data-i18n-title=translationKey title=key)
+								input(name='attr_'+attrName placeholder=val['placeholder'] title='@{repeating_NPCspell_${x}_'+attrName+'}' type=val['type'])
 
 
 //- FOOTER
