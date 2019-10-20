@@ -3,6 +3,7 @@
 - const limitObject = {'Mental':'mental_limit', 'Physical':'physical_limit', 'Social':'social_limit', 'Attack':'attack', 'Data Processing':'data_processing', 'Firewall':'firewall', 'Sleaze':'sleaze'};
 - const hostObject = {'Host Rating': ['host_rating', '5'], 'Attack': ['attack', '5'], 'Sleaze': ['sleaze', '6'], 'Data Processing': ['data_processing', '7'], 'Firewall': ['firewall', '8']};
 - const spriteObject = {'Level': ['level', '5'], 'Attack': ['attack', '5'], 'Sleaze': ['sleaze', '6'], 'Data Processing': ['data_processing', '7'], 'Firewall': ['firewall', '8']};
+- const npcWeaponsObject = {'Range': {'type': 'select', 'placeholder': 'range'}, 'Dice': {'type': 'number', 'placeholder': '18'},'Name': {'type': 'text', 'placeholder': 'Ares Predator'}, 'Type': {'type': 'text', 'placeholder': 'Heavy Pistol'}, 'Reach': {'type': 'number', 'placeholder': '0'}, 'ACC': {'type': 'text', 'placeholder': '5'},'Dam': {'type': 'text', 'placeholder': '9P'},  'AP': {'type': 'number', 'placeholder': '-2'},'Modes': {'type': 'text', 'placeholder': 'SA/BF/FA'},'Recoil': {'type': 'text', 'placeholder': '+2'},'Ammo': {'type': 'number', 'placeholder': '15'}, 'Notes': {'type': 'text', 'placeholder': 'w/ 3 clips of explosive rounds'}};
 
 //- DIE ROLL VARIABLES
 - const rollBeginging = '@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}';
@@ -17,14 +18,19 @@ mixin skillButton(specialization)
     - const rollName = specialization === true ? 'specialization' : 'skill';
     - const rollFormula = specialization === true ? '@{dicepool}+@{attribute}+2' : '@{dicepool}+@{attribute}';
     - const desc = specialization === true ? 'Spec: @{specialization}, @{display_limit}' : '@{display_limit}';
-    - const display = specialization === true ? "attr_display_specialization" : "attr_display";
+    - const display = specialization === true ? 'attr_display_specialization' : 'attr_display';
     button(name=rollName type='roll' value!=rollBeginging+'{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[(('+rollFormula+')'+rollEnding+'{{desc='+desc+'}}')
         span(name=display)
 
 //- SPRITE BUTTONS
 mixin spriteButton(header, display)
     button(name=header type='roll' value!=rollBeginging+'{{header=@{'+header+'}}}{{base=^{level}}}{{dice=[[((@{level}+@{level})'+rollEnding)
-        span(name="attr_"+display)
+        span(name='attr_'+display)
+
+//- WEAPON BUTTON FOR NPCS
+mixin weaponButton()
+    button(name='weapon' type='roll' value=rollBeginging+'{{header=@{weapon_type}}}{{base=^{base}}}{{dice=[[((@{weapon_dice})'+rollEnding+'{{desc=ACC @{weapon_acc}, DV @{weapon_dv}, AP @{weapon_ap}}}{{rea=[[@{weapon_reach}]]}}')
+         span(name='attr_weapon_name')
 
 //- NPC ATTRIBUTE ROLLS
 mixin npcAttributeButton(attribute, rollFormula)

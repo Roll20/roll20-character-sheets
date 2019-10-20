@@ -337,10 +337,9 @@ include src/pug/_mixins.pug
 				label.settings(data-i18n-title=val[1] title=val[1])
 					textarea(name='attr_'+val[1] placeholder=val[1] title='@{'+val[1]+'}')
 
-
 		//- SKILLS
 		each val, key in {'active': ['skills', 'Agility', 'Physical'],'knowledge':['knowledgeskills', 'Logic', 'Mental'], 'language': ['languageskills', 'Charisma', 'Social']}
-			.rows.grunt.repeating
+			.rows.grunt.repeating.inline-repeating
 				h1(data-i18n=val[0]) #{val[0]}
 				fieldset(class='repeating_'+key)
 					input(name='attr_display_rating' type='hidden')
@@ -379,7 +378,8 @@ include src/pug/_mixins.pug
 						label.full-row(data-i18n-title='specializations' title='Specializations') 
 							input(name='attr_specialization' placeholder='Specalizations' title='@{repeating_'+key+'_${x}_specialization}' type='text')
 
-		.rows.sprite.repeating
+		//- SPRITE ACTIVE SKILLS
+		.rows.sprite.repeating.inline-repeating
 			h1(data-i18n='skills') skills
 			fieldset(class='repeating_active')
 				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
@@ -388,10 +388,11 @@ include src/pug/_mixins.pug
 				+spriteButton('skill', 'display')
 				.settings
 					h2.full-row(data-i18n='skill') Skill
-					select.skill-select(name="attr_skill" title='@{repeating_'+key+'_${x}_skill}')
+					select.skill-select(name='attr_skill' title='@{repeating_'+key+'_${x}_skill}')
 						include src/pug/skillsselectsprite.html
 
-		.rows.sprite.repeating
+		//- SPRITE POWERS
+		.rows.sprite.repeating.inline-repeating
 			h1(data-i18n='powers') Powers
 			fieldset(class='repeating_powers')
 				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
@@ -402,11 +403,46 @@ include src/pug/_mixins.pug
 					label.full-row(data-i18n-title='power' title='power')
 						input(name='attr_power' placeholder='power' title='@{repeating_powers_${x}_power}' +' power name' type='text' )
 					h2.full-row(data-i18n='notes') Notes
-					label.full-row(data-i18n-title="notes" title="notes")
-						textarea(name="attr_notes" placeholder="Powers notes" title='@{repeating_powers_${x}_notes}' value="")
+					label.full-row(data-i18n-title='notes' title='notes')
+						textarea(name='attr_notes' placeholder='Powers notes' title='@{repeating_powers_${x}_notes}' value='')
 
 
-								
+		//- WEAPONS
+		.rows.grunt.vehicle.repeating.weapons
+			h1(data-i18n='weapons') Weapons
+			fieldset(class='repeating_weapon')
+				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+				span.pictos x
+				input(name='attr_weapon' type='hidden' value='')
+				span(name='attr_weapon_dice')
+				+weaponButton()
+				span(name='attr_weapon')
+				.settings
+					input(name='attr_weapon_range' type='hidden' value='range')
+					each val, key in npcWeaponsObject
+						- const translationKey = key.toLowerCase();
+						if (key !== 'Notes')
+							h2(data-i18n=translationKey) #{key}
+					each val, key in npcWeaponsObject
+						- const translationKey = key.toLowerCase();
+						- const attrName = key === 'Dam' ? 'dv' : key === 'Modes' ? 'mode' : key === 'Notes' ? 'note' : key.toLowerCase();
+						if (key === 'Range')
+							select(name='attr_weapon_'+attrName title='@{repeating_weapon_${x}_weapon_'+attrName+'}' value=val['placeholder'])
+								option(data-i18n='range' value='range' selected) range
+								option(data-i18n='melee' value='melee') melee
+						else
+							label(data-i18n-title=translationKey title=key)
+								input(name='attr_weapon_'+attrName placeholder=val['placeholder'] title='@{repeating_weapon_${x}_weapon_'+attrName+'}' type=val['type'])
+					span (c)
+
+
+		//- SPELLS
+		.rows.grunt.hide-magic
+			h1(data-i18n='spells') Spells
+			fieldset(class='repeating_NPCspell')
+				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+				span.pictos 
+
 
 //- FOOTER
 include src/footer.html
@@ -420,5 +456,5 @@ include src/hidden.html
 //- SCRIPTS
 include src/pug/scripts.js
 
-//- SCRIPTS
+//- CHUMMER IMPORTER
 include src/importer.html
