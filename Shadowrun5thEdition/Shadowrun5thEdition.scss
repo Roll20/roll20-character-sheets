@@ -95,6 +95,27 @@
 	&:before { content: '('; }
 	&:after { content: ')'; }
 }
+
+%toggleCheckbox,
+input.sheet-toggle {
+	position: absolute;
+	opacity: 0;
+	z-index: 2;
+	&:checked + span { color: $gold; }
+}
+
+%settingsCheckboxes { 
+	& + span { opacity: 0; }
+	&:checked + span { opacity: 1; }
+
+	&:checked ~ .sheet-settings {
+		display: inline-grid;
+		margin-bottom: 2%;
+	}
+}
+
+@import 'src/scss/_matrixdevice'; 
+
 /******************************************************************************/
 /********************************* VARIABLES *********************************/
 /****************************************************************************/
@@ -301,6 +322,44 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 		span.sheet-tiny-span { margin: 0px 1%; }
 	}
 
+	/*:+:+:+: REPEATING SECTIONS :+:+:+:*/
+	div.sheet-repeating {
+		h1 {display: inline;}
+		h2 {
+			font-variant: small-caps;
+			text-align  : center;
+			text-decoration: underline; 
+		}
+
+		input[type='number'], input[type='text'] { width: 100%; }
+
+		input[name='attr_flag'] {
+			top: 15%;
+			@extend %settingsCheckboxes;
+			@extend %toggleCheckbox;
+		}
+
+		div.repitem {
+			&:hover > input[name='attr_flag'] + span,
+			&:hover > input[name='attr_program_on'] + span { 
+				opacity: 1; 
+			}
+
+			div.sheet-settings { min-width: 700px; }
+		}
+
+
+		div.sheet-settings {
+			select, label, span { grid-row: 2; }
+			label[data-i18n-title='notes'] { 
+				grid-row: 3;
+
+				input[type='text'] { text-align: left; }
+			}
+		}
+	}
+
+
 	/*:+:+:+: NPC ATTRIBUTES :+:+:+:*/
 	div.sheet-attribute {
 		border-bottom: 1px solid #fff;
@@ -387,52 +446,7 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 		}
 
 		/*:+:+:+: REPEATING SECTIONS :+:+:+:*/
-		div.sheet-repeating {
-			grid-column: 1 / 4;
-
-			h1 {display: inline;}
-			h2 {
-				font-variant: small-caps;
-				text-align  : center;
-				text-decoration: underline; 
-			}
-
-			input[type='number'], input[type='text'] { width: 100%; }
-
-			input[name='attr_flag'] { 
-				position: absolute;
-				opacity: 0;
-				z-index: 2;
-				top: 5%;
-
-				& + span { opacity: 0; }
-				&:checked + span {
-					color: $gold;
-					opacity: 1; 
-				}
-
-				&:checked ~ .sheet-settings {
-					display: inline-grid;
-					margin-bottom: 2%;
-				}
-			}
-
-			div.repitem {
-				&:hover > input[name='attr_flag'] + span { opacity: 1; }
-
-				div.sheet-settings { min-width: 700px; }
-			}
-
-
-			div.sheet-settings {
-				select, label, span { grid-row: 2; }
-				label[data-i18n-title='notes'] { 
-					grid-row: 3;
-
-					input[type='text'] { text-align: left; }
-				}
-			}
-		}
+		div.sheet-repeating { grid-column: 1 / 4; }
 
 		/*:+:+:+: NPC INLINE REPEAITNG SECTIONS SUCH AS SKILLS :+:+:+:*/
 		div.sheet-inline-repeating {
@@ -489,7 +503,7 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 				grid-template-columns: 7em 3em 1fr 5em 5em 5em 3em 5em 3em;
 			}
 
-			span[name="attr_dice"] { @extend %parantheseNumbers; }
+			span[name='attr_dice'] { @extend %parantheseNumbers; }
 
 			label[data-i18n-title='notes'] { grid-column: 1 / 10; }
 		}
@@ -501,7 +515,7 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 				grid-template-columns: 3em 1fr 7em 8em 3em;
 			}
 
-			span[name="attr_software_dice"] { @extend %parantheseNumbers; }
+			span[name='attr_software_dice'] { @extend %parantheseNumbers; }
 			label[data-i18n-title='notes'] { grid-column: 1 / 6; }
 		}
 
@@ -512,12 +526,14 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 				grid-template-columns: 1fr 8em 8em 8em;
 			}
 
-			span[name="attr_software_dice"] { @extend %parantheseNumbers; }
+			span[name='attr_software_dice'] { @extend %parantheseNumbers; }
 			label[data-i18n-title='notes'] { grid-column: 1 / 6; }
 		}
 	}
 
 	/*:+:+:+: NPC MATRIX :+:+:+:*/
+	div.sheet-matrix {width: 100%;}
+
 	div.sheet-matrix-device {
 		margin-bottom: 5%;
 
@@ -526,23 +542,8 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 			grid-template-columns: 12em 45% 10em 1fr;
 			grid-row-gap: 5%;
 
-			&:first-child { margin-bottom: 5%; }
+			&:first-child { margin-bottom: 4%; }
 		}
-
-		button {
-	     	&[name*='Attack']:hover { color: #cc0701; }
-	     	&[name*='Sleaze']:hover { color: #007bfc; }
-	     	&[name*='Data']:hover { color: #88dd04; }
-	     	&[name*='Firewall']:hover { color: #f88703; }
-	     }
-
-	    input[type='radio'] { 
-	     	position: relative;
-	     	opacity: 0;
-	     	z-index: 2;
-
-	     	& + span { position: relative; }
-	     }
 
 		label {
 			width: 100%;
@@ -560,35 +561,38 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 			}
 		}
 
-		div.sheet-matrix-bubble { grid-column: 2 / 4; }
-	}
+		div.sheet-matrix-bubble {
+			background-color: transparent;
+			height: 15px;
+			grid-column: 2 / 4;
 
-	div.sheet-matrix {
-      width: 100%;
+		/*:+:+:+: NPC MATRIX BUBBLES :+:+:+:*/
+			input[type='radio'] {
+				height: 25px;
+				width : 20px;
+				left  : 0px;
+				top: -115%;
 
-     /*:+:+:+: NPC MATRIX BUBBLES :+:+:+:*/
-	div.sheet-matrix-bubble {
-		background-color: transparent;
-
-		input[type='radio'] {
-		height: 25px;
-		width : 20px;
-		left  : 0px;
-
-			& + span {
-			border-radius: 5px;
-			height       : 25px;
-			left         : 5px;
-			width        : 20px;
+				& + span {
+					border-radius: 5px;
+					height       : 25px;
+					left         : 5px;
+					width        : 20px;
+					top: -60%;
+				}
 			}
 		}
-	}
 
-      .sheet-matrixAttack { box-shadow: 0px 0px 29px 8px  #cc0701; }
-      .sheet-matrixSleaze { box-shadow: 0px 0px 29px 8px  #007bfc; }
-      .sheet-matrixData { box-shadow: 0px 0px 29px 8px  #88dd04; }
-      .sheet-matrixFirewall { box-shadow: 0px 0px 29px 8px  #f88703; }
-    }
+		/*:+:+:+: NPC PROGRAMS :+:+:+:*/
+		div.repcontainer {
+			grid-column: 1 / 6;
+
+			h2[data-i18n='notes'] { grid-row: 3; }
+			label[data-i18n-title='notes'] { grid-row: 4; }
+
+			input.sheet-toggle { top: 3%; }
+		}
+	}
 } 
 
 /********************************************************************************************************/

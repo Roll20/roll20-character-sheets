@@ -300,12 +300,12 @@ include src/pug/_mixins.pug
 		.column
 			.rows
 				h1.settings(data-i18n='options') Options
-			.rows
+			.rows.grunt
 				each val, key in {'Mundane': ['mundane', 'mundane'], 'Awakened': ['awakened', 'magic'], 'Emerged': ['emerged', 'resonance']}
 					label.settings(data-i18n-title=val[0] title=val[0])
 						input.character-type(name='attr_flag_special' title='@{flag_special}' type='radio' value=val[1])
 						h2(data-i18n=val[0]) key
-			.rows
+			.rows.host.grunt.vehicle
 				label.settings(data-i18n-title=matrixdevice title='Matrix Device')
 					input.character-type(name='attr_flag_matrix' title='@{flag_matrix}' type='checkbox' value='matrix')
 					h2(data-i18n=matrixdevice) Matrix Device
@@ -542,11 +542,12 @@ include src/pug/_mixins.pug
 			button(data-i18n='devicerating' name='device rating' value!=rollBeginging+'{{header=Matrix Resistance}}{{base=^{base}}}{{dice=[[((@{device_rating}+@{firewall})'+rollEnding type='roll') Device Rating
 			label.round(data-i18n-title='devicerating' title='devicerating')
 				input(name='attr_device_rating' placeholder='4' type='number' value='')
-		.rows
-			each val in ['Attack', 'Sleaze', 'Data Processing', 'Firewall']
-				- const attrName = val === 'Data Processing' ? 'data_processing' : val.toLowerCase();
-				- const matrixClass = val === 'Data Processing' ? 'Data' : val; 
-				button(data-i18n=attrName name=val value!=rollBeginging+'{{header='+val+'}}{{base=^{base}}}{{dice=[[((@{'+attrName+'}+(?{Attribute|Willpower,@{willpower}|Logic,@{logic}|Intuition,@{intuition}})'+rollEnding type='roll') #{val}
+		
+		each val in ['Attack', 'Sleaze', 'Data Processing', 'Firewall']
+			- const attrName = val === 'Data Processing' ? 'data_processing' : val.toLowerCase();
+			- const matrixClass = val === 'Data Processing' ? 'Data' : val;
+			.rows
+				button(data-i18n=attrName name=val value!='&{template:rolls}{{header=^{'+attrName+'}}}{{base=^{base}}}{{dice=[[(@{'+attrName+'}+(?{Attribute|Willpower,@{willpower}|Logic,@{logic}|Intuition,@{intuition}})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}' type='roll') #{val}
 				.matrix-bubble(class='matrix'+matrixClass)
 					- let i = 0;
 					while i < 21
@@ -554,26 +555,23 @@ include src/pug/_mixins.pug
 						span
 				label.round(data-i18n-title=attrName title=attrName)
 					input(name='attr_'+attrName placeholder='4' type='number' value='')
-
-
-
-
-	//- MATRIX PROGRAMS
-	.matrix.body
-		.rows.grunt.repeating
+		.rows.repeating
 			h1(data-i18n='programs') Programs
 			fieldset(class='repeating_programs')
-				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+				input.toggle(name='attr_flag' title='Settings toggle' type='checkbox' checked)
 				span.pictos x
-				input(name="attr_program_on" type="checkbox" checked)
+				input.toggle(name="attr_program_on" type="checkbox" checked)
 				span.pictos Q
 				button(name="program" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{program}}}{{desc=@{program_note}}}")
 					span(name="attr_program")
+				span(name="attr_program_note")
 				.settings
-					label(data-i18n-title='programs' title='programs')
+					h2(data-i18n='name') name
+					label(data-i18n-title='name' title='name')
 						input(name="attr_program" placeholder="Program Name" title="@{repeating_programs_${x}_program}" type="text" value="")
+					h2(data-i18n='notes') notes
 					label(data-i18n-title='notes' title='notes')
-						input(name="attr_program_note" placeholder="Program Description" title="@{repeating_programs_${x}_program_note}" type="text" value="")
+						textarea(name="attr_program_note" placeholder="Program Description" title="@{repeating_programs_${x}_program_note}" type="text" value="")
 
 
 //- FOOTER
