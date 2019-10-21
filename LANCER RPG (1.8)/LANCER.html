@@ -1,0 +1,1410 @@
+<script type="text/worker">
+    on("sheet:opened change:acc_diff change:frame_class change:frame_tech_attack change:frame_sp change:acc_diff_mod change:frame_sp change:core_hull change:core_agility change:core_systems change:core_engineering change:licenselevel change:frame_evasion change:frame_sensors change:frame_edef change:frame_evasion change:frame_armor change:frame_speed change:frame_hp_bonus change:frame_heat_bonus change:frame_repairs_bonus change:acc_tab", function() {
+    getAttrs(["acc_dif","core_hull", "core_agility","core_systems","core_engineering","licenselevel", "frame_tech_attack","frame_evasion","frame_edef","frame_speed", "frame_armor","frame_sensors","frame_hp_bonus","frame_heat_bonus","frame_repairs_bonus", "frame_sp", "frame_class","acc_diff","acc_tab","grit"], function(values) {
+        let net_acc=parseInt(values.acc_diff,10);
+        let frame_hp = 0;
+        let frame_heat = 0;
+        let frame_repairs = 0;
+        let save_target = 0;
+        let accdiff_input = net_acc;
+
+        switch (values.frame_class)
+        {
+            case "EVEREST":
+                frame_hp = 10;
+                frame_heat = 6;
+                frame_repairs = 5;
+                save_target = 10;
+                break;
+            case "BLACKBEARD":
+                frame_hp = 12;
+                frame_heat = 4;
+                frame_repairs = 5;
+                save_target = 10;
+                break;
+            case "DRAKE":
+                frame_hp = 8;
+                frame_heat = 5;
+                frame_repairs = 5;
+                save_target = 10;
+                break;
+            case "LANCASTER":
+                frame_hp = 6;
+                frame_heat = 6;
+                frame_repairs = 10;
+                save_target = 10;
+                break;
+            case "NELSON":
+                frame_hp = 8;
+                frame_heat = 6;
+                frame_repairs = 5;
+                save_target = 10;
+                break;
+            case "RALEIGH":
+                frame_hp = 10;
+                frame_heat = 5;
+                frame_repairs = 5;
+                save_target = 10;
+                break;
+            case "TORTUGA":
+                frame_hp = 8;
+                frame_heat = 6;
+                frame_repairs = 6;
+                save_target = 10;
+                break;
+            case "VLAD":
+                frame_hp = 8;
+                frame_heat = 6;
+                frame_repairs = 4;
+                save_target = 10;
+                break;
+            case "BLACK WITCH":
+                frame_hp = 6;
+                frame_heat = 6;
+                frame_repairs = 3;
+                save_target = 10;
+                break;
+            case "DEATH'S HEAD":
+                frame_hp = 8;
+                frame_heat = 6;
+                frame_repairs = 2;
+                save_target = 10;
+                break;
+            case "DUSK WING":
+                frame_hp = 6;
+                frame_heat = 4;
+                frame_repairs = 3;
+                save_target = 10;
+                break;
+            case "METALMARK":
+                frame_hp = 8;
+                frame_heat = 5;
+                frame_repairs =4;
+                save_target = 10;
+                break;
+            case "MONARCH":
+                frame_hp = 8;
+                frame_heat = 6;
+                frame_repairs = 3;
+                save_target = 10;
+                break;
+            case "MOURNING CLOAK":
+                frame_hp = 8;
+                frame_heat = 4;
+                frame_repairs = 3;
+                save_target = 10;
+                break;
+            case "SWALLOWTAIL":
+                frame_hp = 6;
+                frame_heat = 4;
+                frame_repairs = 5;
+                save_target = 10;
+                break;
+            case "BALOR":
+                frame_hp = 12;
+                frame_heat = 4;
+                frame_repairs = 4;
+                save_target = 10;
+                break;
+            case "GOBLIN":
+                frame_hp = 6;
+                frame_heat = 4;
+                frame_repairs = 2;
+                save_target = 12;
+                break;
+            case "GORGON":
+                frame_hp = 12;
+                frame_heat = 5;
+                frame_repairs = 3;
+                save_target = 10;
+                break;
+            case "HYDRA":
+                frame_hp = 8;
+                frame_heat = 5;
+                frame_repairs = 4;
+                save_target = 10;
+                break;
+            case "MANTICORE":
+                frame_hp = 12;
+                frame_heat = 7;
+                frame_repairs = 3;
+                save_target = 10;
+                break;
+            case "MINOTAUR":
+                frame_hp = 10;
+                frame_heat = 5;
+                frame_repairs = 4;
+                save_target = 10;
+                break;
+            case "PEGASUS":
+                frame_hp = 8;
+                frame_heat = 6;
+                frame_repairs = 3;
+                save_target = 10;
+                break;
+            case "BARBAROSSA":
+                frame_hp = 10;
+                frame_heat = 8;
+                frame_repairs = 4;
+                save_target = 10;
+                break;
+            case "GENGHIS":
+                frame_hp = 6;
+                frame_heat = 10;
+                frame_repairs = 4;
+                save_target = 10;
+                break;
+            case "ISKANDER":
+                frame_hp = 8;
+                frame_heat = 7;
+                frame_repairs = 4;
+                save_target = 10;
+                break;
+            case "NAPOLEON":
+                frame_hp = 6;
+                frame_heat = 8;
+                frame_repairs = 3;
+                save_target = 11;
+                break;
+            case "SALADIN":
+                frame_hp = 12;
+                frame_heat = 8;
+                frame_repairs = 4;
+                save_target = 10;
+                break;
+            case "SHERMAN":
+                frame_hp = 10;
+                frame_heat = 8;
+                frame_repairs = 4;
+                save_target = 10;
+                break;
+            case "TOKUGAWA":
+                frame_hp = 8;
+                frame_heat = 8;
+                frame_repairs = 4;
+                save_target = 10;
+                break;    
+            default:
+                frame_hp=0;
+                frame_heat=0;
+                frame_repairs=0;
+                save_target = 10;
+                break;
+        }
+        
+        if (values.acc_tab==="acc")
+        {
+            net_acc = "+"+net_acc.toString()+"d6kh1";
+        }
+        
+        if (values.acc_tab==="diff")
+        {
+            net_acc = "-"+net_acc.toString()+"d6kh1";
+        }
+        
+        if(values.acc_tab==="none")
+        {
+            
+            net_acc="+0d6kh1";
+            accdiff_input = 0;
+            
+        }
+        
+        setAttrs({
+            grit: Math.ceil(parseInt(values.licenselevel)/2),
+            autocalc_evasion:parseInt(values.core_agility)+parseInt(values.frame_evasion),
+            autocalc_edef:parseInt(values.core_systems,10) + parseInt(values.frame_edef,10),
+            autocalc_speed:Math.floor(parseInt(values.core_agility,10) / 2 ) + parseInt(values.frame_speed,10),
+            autocalc_sensors: parseInt(values.core_systems,10) + parseInt(values.frame_sensors,10),
+            autocalc_tech_attack: parseInt(values.core_systems,10) + parseInt(values.frame_tech_attack),
+            frame_hp_max: parseInt(values.core_hull)*2 + frame_hp + parseInt(values.frame_hp_bonus),
+            frame_heat_max:parseInt(values.core_engineering,10) + frame_heat +parseInt(values.frame_heat_bonus,10),
+            frame_repairs_max:frame_repairs + parseInt(values.frame_repairs_bonus,10)+Math.floor(parseInt(values.core_hull,10)/2),
+            frame_max_sp: parseInt(values.frame_sp) + Math.ceil(parseInt(values.licenselevel)/2) + Math.floor(parseInt(values.core_systems)/2),
+            autocalc_save_target:Math.ceil(parseInt(values.licenselevel)/2) + save_target,
+            net_acc:net_acc,
+            acc_diff:accdiff_input
+        });
+    });
+});
+</script>
+
+<div style="background:#ddd;min-height:950px;min-width:820px;width:840px"> <!--> main container div<-->
+	<!-- tab/topbar setup -->
+    <input type="hidden" name="attr_net_acc" value="0"/>
+	<input type="radio" class="sheet-tab sheet-tab1" name="attr_core-tab" value="1" title="Pilot" checked="checked" /> 
+	<span class="tab tab1" style='line-height: 40px;'>PILOT</span>
+	<input type="radio" class="sheet-tab sheet-tab2" name="attr_core-tab" value="2" title="Talents" /> 
+	<span class="tab tab2" style='line-height: 40px;'>TALENTS</span>
+	<input type="radio" class="sheet-tab sheet-tab3" name="attr_core-tab" value="3" title="FRAME"   /> 
+	<span class="tab tab3" style='line-height: 40px;margin-right:115px'>FRAME</span>
+	
+
+	<input type="radio" class="acc-tab acc-tab1" name="attr_acc_tab" value="acc" title="Accuracy" /> 
+	<span class="acc-tab acc-tab1" style='line-height: 40px;'>ACCURACY</span>
+	<input type="radio" class="acc-tab acc-tab2" name="attr_acc_tab" value="diff" title="Difficulty" /> 
+	<span class="acc-tab acc-tab2" style='line-height: 40px;'>DIFFICULTY</span>
+	<input type="radio" class="acc-tab acc-tab2" name="attr_acc_tab" value="none" title="None" /> 
+	<span class="acc-tab acc-tab2" style='line-height: 40px;'>NONE</span>
+	<input type="number" name="attr_acc_diff" min="0" value="0" style="width:45px;height:40px;display:inline;margin-left:18px;text-align:center;font-size:18px;margin-top:2px"/>	
+	<!-- end tab setup-->
+	
+    <div class="section-pilot"><!-- pilot tab -->   
+        <div class="flex-row-wrapper" style="background:#ddd"> <!--row display; wraps entire tab -->
+            <div class="nomarg 1x tab-flex-item" style="height:75px;width:800px"> <!-- header bar-->
+                <div class="nested tab-flex-item">
+                    <div class="flex-element"> 
+                        <label class="LANCER">LANCER</label>
+                    </div> 
+                </div> 
+                <div class="1x tab-flex-item" style="height:100%; width:68%;"> <!--header inputs-->
+                    <div class="notop tab-flex-item" style="width:100%">
+                        <div class="flex-element"> 
+                            <label>NAME</label>
+                        </div>
+                        <div class="2x flex-element"> 
+                            <input class="flex mid" style="width:82px" type="text" name="attr_pilot_name">
+                        </div>
+                        <div class="flex-element"> 
+                            <label>LEVEL</label>
+                        </div>
+                        <div class="3m-sides flex-element"> 
+                            <input class="flex short" type="text" value="0" name="attr_licenselevel">
+                        </div>
+    
+                        <div class="flex-element"> 
+                            <label>PLAYER</label>
+                        </div>
+                        <div class="3m-sides 1x flex-element"> 
+                            <input class="flex mid" type="text" name="attr_player">
+                        </div>
+                    </div>
+                    <div class="notop 1x tab-flex-item" style="width:100%">
+                        <div class=" flex-element"> 
+                            <label>CALLSIGN</label>
+                        </div>
+                        <div class="3m-sides flex-element"> 
+                            <input class="flex mid" type="text" name="attr_callsign">
+                        </div> 
+                        <div class="flex-element"> 
+                            <label>BACKGROUND</label>
+                        </div>
+                        <div class="flex-element"> 
+                            <input style="width:255px" type="text" name="attr_background">
+                        </div>
+                    </div>
+                </div>  <!--header inputs-->
+            </div> <!--header bar-->
+            <div class="flex-column-wrapper" style="width:240px"> <!--wraps pilot column 1-->
+                <div class="just-between border tab-flex-item" style="height:30px"> <!--pilot hp block-->
+                    <div class="flex-element"> <!--block title-->
+                        <label style="margin-top:1px">PILOT HP</label>
+                    </div>
+                    <div class="flex-element">
+                        <input class="compressed 2digit" value="0" type="number" name="attr_pilot_hp"/>
+                        <label>/</label>
+                        <input class="compressed 2digit" value="0" type="number" name="attr_pilot_hp_max" style="margin-right:25px"/>
+                    </div>
+                    <div class="flex-element">
+                    </div>
+                </div><!--pilot hp block-->
+                
+                <div class="border tab-flex-item" style="height:70px"> <!-- pilot mech skills block -->
+                    <div class="flex-element"> <!--block title-->
+                        <label>MECH SKILLS</label>
+                    </div>
+                    <div class="nested tab-flex-item" style="width:inherit;position:relative;bottom:9px;"> <!-- core inputs container-->
+                        <div class=" just-between flex-column-wrapper" > <!--hull/sys column-->
+                            <div class=" flex-element">
+                                <label class="mid">HUL<span class="haseinfo"> hp/repairs</span></label>
+                                <input class="short compressed" value="0" type="text" name="attr_core_hull"/>
+                            </div>
+                            <div class="flex-element" style="position:relative;bottom:4px">
+                                <label class="mid">SYS<span class="haseinfo"> tech atk/SP</span></label>
+                                <input class="short compressed" value="0" type="text" name="attr_core_systems"/>
+                            </div>
+                        </div><!--hull/sys column-->
+                        <div class="nested just-between flex-column-wrapper" style="width:105px;"> <!--agi/engi column-->
+                            <div class=" flex-element">
+                                <label class="mid">AGI<span class="haseinfo"> evade/spd</span></label>
+                                <input class="short compressed" value="0" type="text" name="attr_core_agility"/>
+                            </div>
+                            <div class="flex-element" style="position:relative;bottom:4px">
+                                <label class="mid">ENG<span class="haseinfo"> heat/lim</span></label>
+                                <input class="short compressed" value="0" type="text" name="attr_core_engineering"/>
+                            </div>
+                        </div><!--agi/engi column-->
+                    </div> <!--core inputs container-->
+                </div><!--pilot core stats block-->
+                
+                <div class="just-between border tab-flex-item" style="height:30px"> <!--pilot grit block-->
+                    <button type="roll" class="grit-roll" name="Grit_Check" value="&{template:default}{{name=GRIT CHECK}}{{grit=[[d20cs0cf0@{net_acc}+@{grit}]]}}">GRIT
+                    <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                    <div class="flex-element" style="position:relative;margin:auto;right:20px">
+                        <span class="frame-autocalcs" style="height:22px;padding-bottom:1px;line-height:20px;" name="attr_grit"></span>
+                    </div>
+                </div>
+                
+                <div class="border tab-flex-item" style="min-height:470px"> <!--pilot skills block-->
+                    <div class="flex-column-wrapper"> <!--skills column wrapper-->
+                        <div class="flex-element"> <!--block title-->
+                            <label>TRIGGERS</label>
+                        </div>
+                        <div class="just-between nested tab-flex-item" style="margin-left:2px;margin-bottom:0px">
+                            <input class="long" type="text" name="attr_base-pilotskill" style="margin-right:2px;" value="Skill Name"/>
+                            <select style="margin:0;width:40px;padding:0px" name="attr_base-pilotskill-mod">
+                                <option value="2">+2</option>
+                                <option value="4">+4</option>
+                                <option value="6">+6</option>
+                            </select>
+                            <button type="roll" name="Base_Pilot_Trigger" value="&{template:default}} {{name=@{base-pilotskill} Check}} {{@{base-pilotskill}=[[d20cs0cf0@{net_acc}+@{base-pilotskill-mod}]] }}"></button>
+                        </div>  
+                        <fieldset class="repeating_pilotskills"> <!--pilot skills repeating set--> 
+                            <div class="just-between nested tab-flex-item" style="margin-left:2px;margin-bottom:0px">
+                                <input class="long" type="text" name="attr_pilotskill" style="margin-right:2px" />
+                                <select style="margin:0;width:40px;padding:0px" name="attr_pilotskill-mod">
+                                    <option value="2">+2</option>
+                                    <option value="4">+4</option>
+                                    <option value="6">+6</option>
+                                </select>
+                                <button type="roll" name="Pilot_Trigger" value="&{template:default}} {{name=@{pilotskill} Check}} {{@{pilotskill}=[[d20cs0cf0@{net_acc}+@{pilotskill-mod}]] }}"></button>
+                            </div>  
+                        </fieldset> <!--pilot skills repeating set--> 
+                    </div> <!--skills column wrapper-->
+                </div><!--pilot skills block-->
+                
+                <div class="border tab-flex-item" style="min-height:150px"> <!--pilot notes block-->
+                    <div class="flex-element"> <!--block title-->
+                        <label>NOTES</label>
+                    </div>
+                    <div class="flex-element" style="width:100%;height:90%"> <!--notes textarea -->
+                        <textarea name="attr_notes"></textarea>
+                    </div>
+
+                </div>
+            </div> <!--pilot col 1-->
+            
+            <div class="flex-column-wrapper"> <!--wraps pilot column 2-->
+                <div class="border tab-flex-item" style="width:400px;height:150px;min-height:150px"> <!--pilot backstory block -->
+                    <div class="flex-element"> <!--block title-->
+                        <label>BACKSTORY</label>
+                    </div>
+                    <div class="flex-element" style="width:100%;height:90%"> <!--backstory textarea -->
+                        <textarea name="attr_pilot_backstory"></textarea>
+                    </div>
+                </div> <!--pilot backstory block-->
+                
+                <div class="just-between nopad tab-flex-item" style="width:400px;min-height:150px"> <!--pilot appearance/f&f joint block -->
+                    <div class="nomarg border tab-flex-item" style="width:49%"> <!--pilot appearance block -->
+                        <div class="flex-element"> <!--block title-->
+                            <label>APPEARANCE</label>
+                        </div>
+                        <div class="flex-element" style="width:100%;height:90%"> <!--appearance textarea -->
+                            <textarea name="attr_pilot_appearance"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="nomarg border tab-flex-item" style="width:49%"> <!--pilot f&f block-->
+                        <div class="flex-element"> <!--block title-->
+                            <label>FRIENDS & FOES</label>
+                        </div>
+                        <div class="flex-element" style="width:100%;height:90%"> <!--f&f textarea -->
+                            <textarea name="attr_pilot_friendsfoes"></textarea>
+                        </div>
+                    </div>
+                </div> <!--pilot appearance/f&f joint block-->
+
+                <div class="border tab-flex-item" style="width:400px;height:150px;min-height:150px"> <!--pilot gear block -->
+                    <div class="flex-element"> <!--block title-->
+                        <label>PILOT GEAR</label>
+                    </div>
+                    <div class="flex-element" style="width:100%;height:90%"> <!--pilot gear textarea -->
+                        <textarea name="attr_pilot_gear"></textarea>
+                    </div>
+                </div>  <!--pilot gear block -->
+                
+                <div class="multi-input just-between border tab-flex-item" style="width:400px;min-height:150px"> <!--pilot base armor block-->
+                    <div class="flex-element" style="width:100%;margin-bottom:0px"> <!--block title-->
+                        <label>PILOT ARMOR 1</label>
+                    </div>
+                    <div class="flex-element">
+                        <label class="mid">NAME</label>
+                    </div>
+                    <div class="1x flex-element" style="width:58%;margin-right:3px">
+                        <input type="text" class="flex" name="attr_base_pilotarmor_name"/>
+                    </div>
+                    <div class="flex-element">
+                        <label class="mid">RARITY</label>
+                    </div>
+                    <div class="1x flex-element">
+                        <input type="number" class="flex" name="attr_base_pilotarmor_rarity"/>
+                    </div>
+                    <div class="flex-element">
+                        <label class="mid">ARMOR</label>
+                    </div>
+                    <div class="flex-element" style="margin-right:3px">
+                        <input type="number" class="1digit" name="attr_base_pilotarmor_armor"/>
+                    </div>
+                    <div class="flex-element">
+                        <label class="mid">EVADE</label>
+                    </div>
+                    <div class="flex-element">
+                        <input type="number" class="2digit" name="attr_base_pilotarmor_evasion"/>
+                    </div>
+                    <div class="flex-element">
+                        <label class="mid">E-DEF</label>
+                    </div>
+                    <div class="flex-element">
+                        <input type="number" class="2digit" name="attr_base_pilotarmor_edef"/>
+                    </div>
+                    <div class="flex-element">
+                        <label class="mid">SPD</label>
+                    </div>
+                    <div class="flex-element">
+                        <input type="number" class="2digit" name="attr_base_pilotarmor_spd"/>
+                    </div>
+                    <div class="flex-element">
+                        <label class="mid">BONUSES </label>
+                    </div>
+                    <div class="1x flex-element" style="width:10%">
+                        <input type="text" class="flex" name="attr_base_pilotarmor_bonuses"/>
+                    </div>
+                    <div class="flex-element">
+                        <label class="mid">BONUS HP</label>
+                        <input type="number" class="1digit" name="attr_base_pilotarmor_bonushp"/>
+                    </div>
+                </div> <!--pilot base armor block-->
+                <div class="pilotarmor-counter-div">  <!--counter div-->
+                    <fieldset class="repeating_pilotarmor" style="width:400px;"> <!--pilot armor repeating set-->
+                        <div class="border just-between multi-input tab-flex-item" style="width:400px;height:150px"> <!--pilot armor repeating block-->
+                            <div class="flex-element" style="width:100%;margin-bottom:0px"> <!--block title-->
+                               <label class="pilotarmor-counter"></label> 
+                            </div>
+                            <div class="flex-element">
+                                <label class="mid">NAME</label>
+                            </div>
+                            <div class="1x flex-element" style="width:58%;margin-right:3px">
+                                <input type="text" class="flex" name="attr_pilotarmor-name"/>
+                            </div>
+                            <div class="flex-element">
+                                <label class="mid">RARITY</label>
+                            </div>
+                            <div class="1x flex-element">
+                                <input type="number" class="flex" name="attr_pilotarmor-rarity"/>
+                            </div>
+                            <div class="flex-element">
+                                <label class="mid">ARMOR</label>
+                            </div>
+                            <div class="flex-element" style="margin-right:3px">
+                                <input type="number" class="1digit" name="attr_pilotarmor-armor"/>
+                            </div>
+                            <div class="flex-element">
+                                <label class="mid">EVADE</label>
+                            </div>
+                            <div class="flex-element">
+                                <input type="number" class="2digit" name="attr_pilotarmor-evasion"/>
+                            </div>
+                            <div class="flex-element">
+                                <label class="mid">E-DEF</label>
+                            </div>
+                            <div class="flex-element">
+                                <input type="number" class="2digit" name="attr_pilotarmor-edef"/>
+                            </div>
+                            <div class="flex-element">
+                                <label class="mid">SPD</label>
+                            </div>
+                            <div class="flex-element">
+                                <input type="number" class="2digit" name="attr_pilotarmor-spd"/>
+                            </div>
+                            <div class="flex-element">
+                                <label class="mid">BONUSES </label>
+                            </div>
+                            <div class="1x flex-element" style="width:10%">
+                                <input type="text" class="flex" name="attr_pilotarmor-bonuses"/>
+                            </div>
+                            <div class="flex-element">
+                                <label class="mid">BONUS HP</label>
+                                <input type="number" class="1digit" name="attr_pilotarmor-bonushp"/>
+                            </div>
+                        </div> <!--pilot armor repeating block-->
+                    </fieldset><!--pilot armor repeating set-->
+                </div> <!--counter div-->
+
+                <div class="just-between nopad tab-flex-item" style="width:400px;min-height:150px;height:150px;margin-top:-23px"> <!--pilot base weapons joint block -->
+                    <div class="mini-input just-between nomarg border tab-flex-item" style="width:49%;height:150px"> <!--pilot base weapon block 1-->
+                        <div class="flex-element"> <!--block title-->
+                            <button type="roll" name="Pilot_Wep_1" class="pilotweapon-roll" value="&{template:default}{{name=PILOT ATTACK: @{base_pilotwep1_name}}} {{ATK=[[d20cs0cf0@{net_acc}+@{grit}]]}}{{DMG=[[@{base_pilotwep1_damage}]] @{base_pilotwep1_dmgtype}}} {{RANGE=[[@{base_pilotwep1_range}]]}}{{TAGS=@{base_pilotwep1_tags}}}">
+                                PILOT WEAPON 1 <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                        </div>
+                        <div class="flex-element"> 
+                            <label class="mid">NAME</label>
+                        </div>
+                        <div class="1x flex-element"> 
+                            <input style="width:135px" type="text" name="attr_base_pilotwep1_name"/>
+                        </div>
+                        <div class="flex-element"> 
+                            <label class="mid">RARITY</label>
+                        </div>
+                        <div class="flex-element"> 
+                            <input class="1digit" type="number" name="attr_base_pilotwep1_rarity"/>
+                        </div>
+                        <div class="flex-element" > 
+                            <label class="mid">RANGE</label>
+                        </div>
+                        <div class="flex-element"> 
+                            <input class="1digit" type="number" name="attr_base_pilotwep1_range"/>
+                        </div>
+                        <div class="flex-element"> 
+                            <label class="mid">DMG</label>
+                        </div>
+                        <div class="flex-element"> 
+                            <input style="width:45px;text-align:center" type="text" name="attr_base_pilotwep1_damage"/>
+                        </div>
+                        <div class="flex-element"> 
+                            <label class="mid">TYPE</label>
+                        </div>
+                        <div class="flex-element"> 
+                            <select style="width:45px;height:25px;padding:0" name="attr_base_pilotwep1_dmgtype">
+                                <option value="KIN">KIN</option>
+                                <option value="EXP">EXP</option>
+                                <option value="ERG">ERG</option>
+                            </select>
+                        </div>
+
+                        <div class="flex-element"> 
+                            <label class="mid">TAGS</label>
+                        </div>
+                        <div class="1x flex-element"> 
+                            <input style="width:140px" type="text" name="attr_base_pilotwep1_tags"/>
+                        </div>
+                    </div><!--pilot base weapon block 1-->
+                    
+                    <div class="mini-input just-between nomarg border tab-flex-item" style="width:49%;height:150px;"> <!--pilot base weapon block 2-->
+                        <div class="flex-element"> <!--block title-->
+                            <button type="roll"  name="Pilot_Wep_2" class="pilotweapon-roll" value="&{template:default}{{name=PILOT ATTACK: @{base_pilotwep2_name}}} {{ATK=[[d20cs0cf0@{net_acc}+@{grit}]]}}{{DMG=[[@{base_pilotwep2_damage}]] @{base_pilotwep2_dmgtype}}} {{RANGE=[[@{base_pilotwep2_range}]]}}{{TAGS=@{base_pilotwep2_tags}}}">
+                                PILOT WEAPON 2 <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                        </div>
+                        <div class="flex-element"> 
+                            <label class="mid">NAME</label>
+                        </div>
+                        <div class="1x flex-element"> 
+                            <input style="width:135px" type="text" name="attr_base_pilotwep2_name"/>
+                        </div>
+                        <div class="flex-element"> 
+                            <label class="mid">RARITY</label>
+                        </div>
+                        <div class="flex-element"> 
+                            <input class="1digit" type="number" name="attr_base_pilotwep2_rarity"/>
+                        </div>
+                        <div class="flex-element" > 
+                            <label class="mid">RANGE</label>
+                        </div>
+                        <div class="flex-element"> 
+                            <input class="1digit" type="number" name="attr_base_pilotwep2_range"/>
+                        </div>
+                        <div class="flex-element"> 
+                            <label class="mid">DMG</label>
+                        </div>
+                        <div class="flex-element"> 
+                            <input style="width:45px;text-align:center" type="text" name="attr_base_pilotwep2_damage"/>
+                        </div>
+                        <div class="flex-element"> 
+                            <label class="mid">TYPE</label>
+                        </div>
+                        <div class="flex-element"> 
+                            <select style="width:45px;height:25px;padding:0" name="attr_base_pilotwep2_dmgtype">
+                                <option value="KIN">KIN</option>
+                                <option value="EXP">EXP</option>
+                                <option value="ERG">ERG</option>
+                            </select>
+                        </div>
+                        <div class="flex-element"> 
+                            <label class="mid">TAGS</label>
+                        </div>
+                        <div class="1x flex-element"> 
+                            <input style="width:140px" type="text" name="attr_base_pilotwep2_tags"/>
+                        </div>
+                    </div><!--pilot base weapon block 2-->
+                </div> <!--pilot base weapons joint block -->
+                <div class="pilotwep-counter-div" style="width:410px"> <!--counter div-->
+                    <fieldset class="repeating_pilotweapons" > <!--pilot weapon repeating set-->
+                        <div class="mini-input just-between border tab-flex-item" style="width:195px;height:150;margin-top:5px"> <!--pilot weapon repeating item-->
+                            <div class="flex-element"> <!--block title-->
+                                <label class="pilotwep-counter"></label>
+                            </div>
+                            <div class="just-end-self flex-element">
+                                <button type="roll" name="Pilot_Wep" value="&{template:default}{{name=PILOT ATTACK: @{pilotwep-name}}} {{ATK=[[d20cs0cf0@{net_acc}+@{grit}]]}}{{DMG=[[@{pilotwep-damage}]] @{pilotwep-dmgtype}}} {{RANGE=[[@{pilotwep-range}]]}}{{TAGS=@{pilotwep-tags}}}{{TAGS=@{pilotwep-tags}}}"></button>
+                            </div>
+                            <div class="flex-element"> 
+                                <label class="mid">NAME</label>
+                            </div>
+                            <div class="1x flex-element"> 
+                                <input style="width:135px" type="text" name="attr_pilotwep-name"/>
+                            </div>
+                            <div class="flex-element"> 
+                                <label class="mid">RARITY</label>
+                            </div>
+                            <div class="flex-element"> 
+                                <input class="1digit" type="number" name="attr_pilotwep-rarity"/>
+                            </div>
+                            <div class="flex-element" > 
+                                <label class="mid">RANGE</label>
+                            </div>
+                            <div class="flex-element"> 
+                                <input class="1digit" type="number" name="attr_pilotwep-range"/>
+                            </div>
+                            <div class="flex-element"> 
+                                <label class="mid">DMG</label>
+                            </div>
+                            <div class="flex-element"> 
+                                <input style="width:45px;text-align:center" type="text" name="attr_pilotwep-damage"/>
+                            </div>
+                            <div class="flex-element"> 
+                                <label class="mid">TYPE</label>
+                            </div>
+                            <div class="flex-element"> 
+                                <select style="width:45px;height:25px;padding:0" name="attr_pilotwep-dmgtype">
+                                    <option value="KIN">KIN</option>
+                                    <option value="EXP">EXP</option>
+                                    <option value="ERG">ERG</option>
+                                </select>
+                            </div>
+                            <div class="flex-element"> 
+                                <label class="mid">TAGS</label>
+                            </div>
+                            <div class="1x flex-element"> 
+                                <input style="width:140px" type="text" name="attr_pilotwep-tags"/>
+                            </div>
+                        </div><!--pilot base weapon block 2-->
+                    </fieldset> <!--pilot weapon repeating set-->
+                </div> <!--counter div-->
+            </div> <!--pilot col 2-->
+            
+            <div class-"flex-column-wrapper"> <!--wraps pilot column 3-->
+                <div class="align-start border tab-flex-item" style="width:180px;min-height:310px"> <!--pilot licenses block -->
+                    <div class="flex-element"> <!--block title-->
+                        <label>LICENSES</label>
+                    </div>
+                    <fieldset class="repeating_licenses"> <!--licenses repeating set-->
+                        <div class="nopad flex-element-reverse";style="width:inherit;height:30px;margin-top:3px"> <!--license item repeating block-->
+                            <input type="text" name="attr_licensename" style="width:62%;margin-left:0px;"/>
+                        	<input type="radio" class="license license3" name="attr_license-tab" value="3" title="License III" /> 
+                        	<span class="license license3" style='border-radius: 0px 5px 5px 0px'>III</span>
+                        	<input type="radio" class="license license2" name="attr_license-tab" value="2" title="License II" /> 
+                        	<span class="license license2" >II</span>
+                        	<input type="radio" class="license license1" name="attr_license-tab" value="1" checked='true' title="License I"/> 
+                        	<span class="license license1" style='border-left:2px solid black; border-radius: 5px 0px 0px 5px'>I</span>
+                        	
+                        </div> <!--license item repeating block-->
+                    </fieldset> <!--licenses repeating set-->
+                </div> <!--pilot licenses block -->
+                
+                <div class="border align-start tab-flex-item" style="width:180px;min-height:310px;margin-top:10px"> <!-- pilot core bonus block-->
+                    <div class="flex-element">
+                        <label>CORE BONUSES</label><!--block title-->
+                    </div>
+                    <div class="flex-element" style="height:273px;width:101%">
+                        <textarea name="attr_corebonuses"></textarea>
+                    </div>
+                </div> <!-- pilot core bonus block-->
+                <div class="border tab-flex-item" style="width:180px;height:150px;margin-top:10px"> <!--pilot reserves block -->
+                    <div class="flex-element"> <!--block title-->
+                        <label>RESERVES</label>
+                    </div>
+                    <div class="flex-element" style="width:100%;height:90%"> <!--reserves textarea -->
+                        <textarea name="attr_pilot_reserves"></textarea>
+                    </div>
+                </div> 
+            </div><!--pilot col 3-->
+	    </div><!--pilot row wrapper-->
+    </div> <!--pilot tab-->
+	
+	<div class="section-talents"><!-- Talents Tab -->
+    	<div class="flex-row-wrapper just-between">
+            <div class="nomarg 1x tab-flex-item" style="height:75px;width:800px;"> <!-- header bar-->
+                <div class="nested tab-flex-item">
+                    <div class="flex-element"> 
+                        <label class="LANCER">LANCER</label>
+                    </div> 
+                </div> 
+                <div class="1x tab-flex-item" style="height:100%; width:544px;"> <!--header inputs-->
+                    <div class="notop tab-flex-item" style="width:100%">
+                        <div class="flex-element"> 
+                            <label>NAME</label>
+                        </div>
+                        <div class="2x flex-element"> 
+                            <input class="flex mid" style="width:82px" type="text" name="attr_pilot_name">
+                        </div>
+                        <div class="flex-element"> 
+                            <label>LEVEL</label>
+                        </div>
+                        <div class="3m-sides flex-element"> 
+                            <input class="flex short" type="text" value="0" name="attr_licenselevel">
+                        </div>
+    
+                        <div class="flex-element"> 
+                            <label>PLAYER</label>
+                        </div>
+                        <div class="3m-sides 1x flex-element"> 
+                            <input class="flex mid" type="text" name="attr_player">
+                        </div>
+                    </div>
+                    <div class="notop 1x tab-flex-item" style="width:100%">
+                        <div class=" flex-element"> 
+                            <label>CALLSIGN</label>
+                        </div>
+                        <div class="3m-sides flex-element"> 
+                            <input class="flex mid" type="text" name="attr_callsign">
+                        </div> 
+                        <div class="flex-element"> 
+                            <label>BACKGROUND</label>
+                        </div>
+                        <div class="flex-element"> 
+                            <input style="width:255px" type="text" name="attr_background">
+                        </div>
+                    </div>
+                </div>  <!--header inputs-->
+            </div> <!--header bar-->
+            <div class="border tab-flex-item" style="width:405px;height:350px;margin-bottom:10px"> <!--base talent block 1-->
+                <div class="flex-element">
+                    <label style="width:65px">TALENT</label>
+                    <input type="text" name="attr_base_talent1_name">
+                </div>
+                <div class="just-end-self flex-element">
+                    <label>RANK</label>
+                    <input type="number" name= "attr_base_talent1_rank" style="margin-top:0px" class="1digit" />
+                </div>
+                <div class="flex-element" style="width:100%;margin-top:5px">
+                    <button type="roll" name="Talent_1_Rank_I"  class="grit-roll" value="&{template:default}{{name=@{base_talent1_name} RANK I}}{{text=@{base_talent1_rank1_desc}}}">RANK I
+                    <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                </div>
+                <div class="flex-element" style="width:100%;height:75px">
+                    <textarea name="attr_base_talent1_rank1_desc"></textarea>
+                </div>
+                <div class="flex-element" style="width:100%;margin-top:5px">
+                    <button type="roll" name="Talent_1_Rank_II" class="grit-roll" value="&{template:default}{{name=@{base_talent1_name} RANK II}}{{text=@{base_talent1_rank2_desc}}}">RANK II
+                    <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                </div>
+                <div class="flex-element" style="width:100%;height:75px">
+                    <textarea name="attr_base_talent1_rank2_desc"></textarea>
+                </div>
+                <div class="flex-element" style="width:100%;margin-top:5px">
+                    <button type="roll" name="Talent_1_Rank_III" class="grit-roll" value="&{template:default}{{name=@{base_talent1_name} RANK III}}{{text=@{base_talent1_rank3_desc}}}">RANK III
+                    <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                </div>
+                <div class="flex-element" style="width:100%;height:75px">
+                    <textarea name="attr_base_talent1_rank3_desc"></textarea>
+                </div>
+            </div> <!--base talent block 1-->
+            
+            <div class="border tab-flex-item" style="width:405px;margin-bottom:10px"> <!--base talent block 2-->
+                <div class="flex-element">
+                    <label style="width:65px">TALENT</label>
+                    <input type="text" name="attr_base_talent2_name"/>
+                </div>
+                <div class="just-end-self flex-element">
+                    <label>RANK</label>
+                    <input type="number" name= "attr_base_talent2_rank" style="margin-top:0px" class="1digit" />
+                </div>
+                <div class="flex-element" style="width:100%;margin-top:5px">
+                    <button type="roll" name="Talent_2_Rank_I"  class="grit-roll" value="&{template:default}{{name=@{base_talent2_name} RANK I}}{{text=@{base_talent2_rank1_desc}}}">RANK I
+                    <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                </div>
+                <div class="flex-element" style="width:100%;height:75px">
+                    <textarea name="attr_base_talent2_rank1_desc"></textarea>
+                </div>
+                <div class="flex-element" style="width:100%;margin-top:5px">
+                    <button type="roll"  name="Talent_2_Rank_II" class="grit-roll" value="&{template:default}{{name=@{base_talent2_name} RANK II}}{{text=@{base_talent2_rank2_desc}}}">RANK II
+                    <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                </div>
+                <div class="flex-element" style="width:100%;height:75px">
+                    <textarea name="attr_base_talent2_rank2_desc"></textarea>
+                </div>
+                <div class="flex-element" style="width:100%;margin-top:5px">
+                    <button type="roll"  name="Talent_2_Rank_III" class="grit-roll" value="&{template:default}{{name=@{base_talent2_name} RANK III}}{{text=@{base_talent2_rank3_desc}}}">RANK III
+                    <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                </div>
+                <div class="flex-element" style="width:100%;height:75px">
+                    <textarea name="attr_base_talent2_rank3_desc"></textarea>
+                </div>
+            </div> <!--base talent block 2-->
+            
+            <fieldset class="repeating_talents"> <!--talents repeating set-->
+                <div class="border tab-flex-item" style="width:405px;margin-bottom:10px"> <!--talents repeating item-->
+                    <div class="flex-element">
+                        <label style="width:65px">TALENT</label>
+                        <input type="text" name="attr_talent_name"/>
+                    </div>
+                    <div class="just-end-self flex-element">
+                        <label>RANK</label>
+                        <input type="number" name= "attr_talent_rank" style="margin-top:0px" class="1digit" />
+                    </div>
+                <div class="flex-element" style="width:100%;margin-top:5px">
+                    <button type="roll"  name="Talent_Rank_I" class="grit-roll" value="&{template:default}{{name=@{talent_name} RANK I}}{{text=@{talent_rank1_desc}}}">RANK I
+                    <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                </div>
+                <div class="flex-element" style="width:100%;height:75px">
+                    <textarea name="attr_talent_rank1_desc"></textarea>
+                </div>
+                <div class="flex-element" style="width:100%;margin-top:5px">
+                    <button type="roll" name="Talent_Rank_II" class="grit-roll" value="&{template:default}{{name=@{talent_name} RANK II}}{{text=@{talent_rank2_desc}}}">RANK II
+                    <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                </div>
+                <div class="flex-element" style="width:100%;height:75px">
+                    <textarea name="attr_talent_rank2_desc"></textarea>
+                </div>
+                <div class="flex-element" style="width:100%;margin-top:5px">
+                    <button type="roll" name="Talent_Rank_III" class="grit-roll" value="&{template:default}{{name=@{talent_name} RANK III}}{{text=@{talent_rank3_desc}}}">RANK III
+                    <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                </div>
+                <div class="flex-element" style="width:100%;height:75px">
+                    <textarea name="attr_talent_rank3_desc"></textarea>
+                </div>
+                </div> <!--talents repeating item-->
+            </fieldset> <!--talents repeating set-->
+        </div> <!--row wrapper-->
+    </div> <!--talents tab-->
+
+	<div class="sheet-section-frame"> <!-->FRAME Tab<-->
+    	<div class="flex-row-wrapper">
+            <div class="nomarg 1x tab-flex-item" style="height:75px;width:800px"> <!-- header bar-->
+                <div class="nested tab-flex-item">
+                    <div class="flex-element"> 
+                        <label class="LANCER">LANCER</label>
+                    </div> 
+                </div> 
+                <div class="1x tab-flex-item" style="height:100%; width:68%;"> <!--header inputs-->
+                    <div class="notop tab-flex-item" style="width:100%">
+                        <div class="flex-element"> 
+                            <label>NAME</label>
+                        </div>
+                        <div class="2x flex-element"> 
+                            <input class="flex mid" style="width:82px" type="text" name="attr_pilot_name">
+                        </div>
+                        <div class="flex-element"> 
+                            <label>LEVEL</label>
+                        </div>
+                        <div class="3m-sides flex-element"> 
+                            <input class="flex short" type="text" value="0" name="attr_licenselevel">
+                        </div>
+    
+                        <div class="flex-element"> 
+                            <label>PLAYER</label>
+                        </div>
+                        <div class="3m-sides 1x flex-element"> 
+                            <input class="flex mid" type="text" name="attr_player">
+                        </div>
+                    </div>
+                    <div class="notop 1x tab-flex-item" style="width:100%">
+                        <div class=" flex-element"> 
+                            <label>FRAME</label>
+                        </div>
+                        <div class="3m-sides flex-element"> 
+                            <select style="width:150px;height:25px;padding:0px" name="attr_frame_class"> <!--FRAME dropdown select-->
+                                <optgroup label="GMS">
+                                    <option value="EVEREST">GMS EVEREST</option>
+                                </optgroup>
+                                <optgroup label="IPS-NORTHSTAR">
+                                    <option value="BLACKBEARD">BLACKBEARD</option>
+                                    <option value="DRAKE">DRAKE</option>
+                                    <option value="LANCASTER">LANCASTER</option>
+                                    <option value="NELSON">NELSON</option>
+                                    <option value="RALEIGH">RALEIGH</option>
+                                    <option value="TORTUGA">TORTUGA</option>
+                                    <option value="VLAD">VLAD</option>
+                                </optgroup>
+                                <optgroup label="SMITH-SHIMANO">
+                                    <option value="BLACK WITCH">BLACK WITCH</option>
+                                    <option value="DEATH'S HEAD">DEATH'S HEAD</option>
+                                    <option value="DUSK WING">DUSK WING</option>
+                                    <option value="METALMARK">METALMARK</option>
+                                    <option value="MONARCH">MONARCH</option>
+                                    <option value="MOURNING CLOAK">MOURNING CLOAK</option>
+                                    <option value="SWALLOWTAIL">SWALLOWTAIL</option>
+                                </optgroup>
+                                <optgroup label="HORUS">
+                                    <option value="BALOR">BALOR</option>
+                                    <option value="GOBLIN">GOBLIN</option>
+                                    <option value="GORGON">GORGON</option>
+                                    <option value="HYDRA">HYDRA</option>
+                                    <option value="MANTICORE">MANTICORE</option>
+                                    <option value="MINOTAUR">MINOTAUR</option>
+                                    <option value="PEGASUS">PEGASUS</option>
+                                </optgroup>
+                                <optgroup label="HARRISON ARMORY">
+                                    <option value="BARBAROSSA">BARBAROSSA</option>
+                                    <option value="GENGHIS">GENGHIS</option>
+                                    <option value="ISKANDER">ISKANDER</option>
+                                    <option value="NAPOLEON">NAPOLEON</option>
+                                    <option value="SALADIN">SALADIN</option>
+                                    <option value="SHERMAN">SHERMAN</option>
+                                    <option value="TOKUGAWA">TOKUGAWA</option>
+                                </optgroup>
+                                <optgroup label="HOMEBREW">
+                                    <option value="HOMEBREW">HOMEBREW</option>
+                                </optgroup>
+                            </select> <!--FRAME dropdown select-->
+                        </div> 
+                        <div class="flex-element"> 
+                            <label>SIZE</label>
+                        </div>
+                        <div class="3m-sides flex-element"> 
+                            <input class="2digit" type="number" name="attr_frame_size">
+                        </div>
+                        <div class="flex-element"> 
+                            <label>SP</label>
+                        </div>
+                        <div class="3m-sides flex-element"> 
+                            <input class="2digit" value="0" type="number"name="attr_frame_sp">
+                        </div>
+                        <div class="flex-element"> 
+                            <label>PAINT</label>
+                        </div>
+                        <div class="3m-sides flex-element"> 
+                            <input class="flex mid" type="text" style="width:135px" name="attr_frame_paint">
+                        </div>
+                    </div>
+                </div>  <!--header inputs-->
+            </div> <!--header bar-->
+    	    <div class="flex-column-wrapper"> <!--frame column 1-->
+    	        <div class="border tab-flex-item" style="height:250px;padding:1px"> <!--frame stat tracking block-->
+                    <div class="flex-column-wrapper" style="margin-right:15px;margin-left:5px"> <!--frame stat column 1-->
+                        <div class="nested tab-flex-item-column">
+                            <label class="nomarg">STRUCTURE DAMAGE</label>
+                            <div class="flex-element-reverse" style="margin-bottom:25px"> <!--structure damage gauge-->
+                            	<input type="radio" class="structure structurecrit" name="attr_structure-tab" value="4" title="Destroyed!" /> 
+                            	<span class="structure structurecrit" style='line-height:37px; font-size:30px;border-radius: 0px 5px 5px 0px'>⚠</span>
+                            	<input type="radio" class="structure structure4" name="attr_structure-tab" value="3" title="3 Damage" /> 
+                            	<span class="structure structure4" style='line-height: 40px;'>3</span>
+                            	<input type="radio" class="structure structure3" name="attr_structure-tab" value="2" title="2 Damage" /> 
+                            	<span class="structure structure3" style='line-height: 40px;'>2</span>
+                            	<input type="radio" class="structure structure2" name="attr_structure-tab" value="1" title="1 Damage " /> 
+                            	<span class="structure structure2" style='line-height: 40px;'>1</span>
+                            	<input type="radio" class="structure structure1" name="attr_structure-tab" value="0" title="0 Damage" checked="checked"/> 
+                            	<span class="structure structure1"  style='line-height:40px;border-left:2px solid black;border-radius:5px 0px 0px 5px'>0</span>
+                            </div> <!--structure damage gauge-->
+                            <label class="nomarg">REACTOR STRESS</label>
+                            <div class="flex-element-reverse" style="margin-bottom:10px"> <!--core stress gauge-->
+                            	<input type="radio" class="corestress corestressbreach" name="attr_corestress-tab" value="5" title="Meltdown!️"/> 
+                            	<span class="corestress corestressbreach" style='line-height:37px; font-size:30px; border-radius:0px 5px 5px 0px'>⚠️</span>
+                            	<input type="radio" class="corestress corestress4" name="attr_corestress-tab" value="4" title="3 Reactor Stress" /> 
+                            	<span class="corestress corestress4" style='line-height: 40px;'>3</span>
+                            	<input type="radio" class="corestress corestress3" name="attr_corestress-tab" value="3" title="2 Reactor Stress" /> 
+                            	<span class="corestress corestress3" style='line-height: 40px;'>2</span>
+                            	<input type="radio" class="corestress corestress2" name="attr_corestress-tab" value="2" title="1 Reactor Stress" /> 
+                            	<span class="corestress corestress2" style='line-height: 40px;'>1</span>
+                            	<input type="radio" class="corestress corestress1" name="attr_corestress-tab" value="1" title="0 Reactor Stress" checked="checked"/> 
+                            	<span class="corestress corestress1"  style='line-height: 40px; border-left:2px solid black; border-radius:5px 0px 0px 5px'>0</span>
+                            </div> <!--core stress gauge-->
+                        </div>
+                        
+                        <div class="multi-input nomarg tab-flex-item" style="margin-top:5px"> <!--hp/heat/repair tracker block-->
+                            <div class="flex-column-wrapper">
+                                <div class="nested tab-flex-item">
+                                    <div class="flex-element">
+                                        <label style="margin-left:0px">HP</label>
+                                    </div>
+                                    <div class="flex-element just-end-self">
+                                        <input class="2digit" type="number" value="0" min="0" style="height:25px" name="attr_frame_hp"/>
+                                    </div>
+                                </div>
+                                <div class="nested tab-flex-item">
+                                    <div class="flex-element">
+                                        <label style="margin-left:0px">HEAT</label>
+                                    </div>
+                                    <div class="just-end-self flex-element">
+                                        <input class="2digit" type="number" value="0" min="0" style="height:25px" name="attr_frame_heat"/>
+                                    </div>
+                                </div>
+                                <div class="nested tab-flex-item">
+                                    <div class="flex-element">
+                                        <label style="margin-left:0px">REPAIRS</label>
+                                    </div>
+                                    <div class="just-end-self flex-element">
+                                        <input class="2digit" type="number" value="0" min="0" style="height:25px" name="attr_frame_repairs"/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex-column-wrapper" style="margin-right:5px">
+                                <div class="nested tab-flex-item">
+                                    <div class="flex-element">
+                                        <label>/</label>
+                                    </div>
+                                    <div class="flex-element">
+                                        <span class='frame-autocalcs' name="attr_frame_hp_max"></span>
+                                    </div>
+                                </div>
+                                <div class="nested tab-flex-item">
+                                    <div class="flex-element">
+                                        <label>/</label>
+                                    </div>
+                                    <div class="flex-element">
+                                        <span class='frame-autocalcs' name="attr_frame_heat_max" ></span>
+                                    </div>
+                                </div>
+                                <div class="nested tab-flex-item">
+                                    <div class="flex-element">
+                                        <label>/</label>
+                                    </div>
+                                    <div class="flex-element">
+                                        <span class='frame-autocalcs' name="attr_frame_repairs_max"></span>
+                                    </div>
+                                </div>
+                            </div>
+                           
+                            <div class="flex-column-wrapper">
+                                <div class="nested tab-flex-item">
+                                    <div class="flex-element">
+                                        <input class="2digit" type="number" value="0" min="0" style="height:25px" name="attr_frame_hp_bonus"/>
+                                    </div>
+                                    <div class="flex-element">
+                                        <label>BONUS</label>
+                                    </div>
+                                </div>
+                                <div class="nested tab-flex-item">
+                                    <div class="flex-element">
+                                        <input class="2digit" type="number" value="0" min="0" style="height:25px" name="attr_frame_heat_bonus"/>
+                                    </div>
+                                    <div class="flex-element">
+                                        <label>BONUS</label>
+                                    </div>
+                                </div>
+                                <div class="nested tab-flex-item">
+                                    <div class="flex-element">
+                                        <input class="2digit" type="number" value="0" min="0" style="height:25px" name="attr_frame_repairs_bonus"/>
+                                    </div>
+                                    <div class="flex-element">
+                                        <label>BONUS</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <!--hp/heat/rep block-->
+                    </div> <!--frame stat column 1-->
+                    
+                    <div class="flex-column-wrapper"> <!--frame stat column 2-->
+                        <div class="nested tab-flex-item-column" style="margin-bottom:18px"> <!--overcharge gauge-->
+                            <label class="nomarg">OVERCHARGE</label>
+                            <div class="flex-element-reverse">
+                            	<input type="radio" class="overcharge overcharge4" name="attr_overcharge-tab" value="4" title="Overcharge d6+3" /> 
+                            	<span class="overcharge overcharge4" style='line-height: 40px; border-radius: 0px 5px 5px 0px;'>d6+3</span>
+                            	<input type="radio" class="overcharge overcharge3" name="attr_overcharge-tab" value="3" title="Overcharge d6" /> 
+                            	<span class="overcharge overcharge3" style='line-height: 40px;'>d6</span>
+                            	<input type="radio" class="overcharge overcharge2" name="attr_overcharge-tab" value="2" title="Overcharge d3" /> 
+                            	<span class="overcharge overcharge2" style='line-height: 40px;'>d3</span>
+                            	<input type="radio" class="overcharge overcharge1" name="attr_overcharge-tab" value="1" title="Overcharge 1"/> 
+                            	<span class="overcharge overcharge1" style='line-height:40px;'>1</span>
+                            	<input type="radio" class="overcharge overcharge0" name="attr_overcharge-tab" value="0" title="Overcharge 0" checked="true"/> 
+                            	<span class="overcharge overcharge0" style='line-height:40px; border-left:2px solid black; border-radius: 5px 0px 0px 5px'>0</span>
+
+                            </div> 
+                        </div> <!--overcharge gauge-->
+                        <div class="nested multi-input tab-flex-item" style="width:180px"> <!--frame base stats column-->
+                            <div class="flex-column-wrapper" style="width:inherit;height:175px">
+                                <div class="flex-element">
+                                    <label style="margin-left:0px">ARMOR</label>
+                                    <input class="2digit" type="number" value="0" min="0" style="height:25px" name="attr_frame_armor"/>
+                                </div>
+                                <div class="4m-top flex-element">
+                                    <label style="margin-left:0px">EVASION</label>
+                                    <input class="2digit" type="number" value="0" min="0" style="height:25px" name="attr_frame_evasion"/>
+                                </div>
+                                <div class="4m-top flex-element">
+                                    <label style="margin-left:0px">E-DEFENSE</label>
+                                    <input class="2digit" type="number" value="0" min="0" style="height:25px" name="attr_frame_edef"/>
+                                </div>
+                                <div class="4m-top flex-element">
+                                    <label style="margin-left:0px">SPEED</label>
+                                    <input class="2digit" type="number" value="0"  style="height:25px" name="attr_frame_speed"/>
+                                </div>
+
+                                <div class="4m-top flex-element">
+                                    <label style="margin-left:0px">SENSORS</label>
+                                    <input class="2digit" type="number" value="0" style="height:25px" name="attr_frame_sensors"/>
+                                </div>
+
+                                <div class="4m-top flex-element">
+                                    <label style="margin-left:0px">TECH ATK</label>
+                                    <input class="2digit" type="number" value="0" min="0" style="height:25px" name="attr_frame_tech_attack"/>
+                                </div>
+                            </div>
+                        </div> <!--frame base stats column-->
+                    </div> <!--frame stat column 2-->
+    	        </div> <!--frame stat tracking block-->
+    	        
+                <div class="just-around border tab-flex-item" style="width:505px;height:250px"> <!--frame stat autocalcs block-->
+                    <div class="just-around multi-input flex-column-wrapper" style="width:36.55%">
+                        <div class="flex-element">
+                            <label class="autocalc-rolls"> <button type="roll" name="Hull_Save" class="grit-roll" value="&{template:default}{{name=HULL SAVE}}{{hull=[[d20cs0cf0@{net_acc}+@{core_hull}]]}}">HULL
+                            <span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
+                            <span class="frame-autocalcs" name="attr_core_hull"></span>
+                        </div>
+                        <div class="flex-element">
+                            <label class="autocalc-rolls"> <button type="roll"  name="Agility_Save" class="grit-roll" value="&{template:default}{{name=AGILITY SAVE}}{{agility=[[d20cs0cf0@{net_acc}+@{core_agility}]]}}">AGILITY
+                            <span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
+                            <span class="frame-autocalcs" name="attr_core_agility"></span>
+                        </div>
+                        <div class="flex-element">
+                            <label class="autocalc-rolls"> <button type="roll"  name="Systems_Save" class="grit-roll" value="&{template:default}{{name=SYSTEMS SAVE}}{{systems=[[d20cs0cf0@{net_acc}+@{core_systems}]]}}">SYSTEMS
+                            <span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
+                            <span class="frame-autocalcs" name="attr_core_systems"></span>
+                        </div>
+                        <div class="flex-element">
+                            <label class="autocalc-rolls" > <button type="roll"  name="Engineering_Save" class="grit-roll" value="&{template:default}{{name=ENGINEERING SAVE}}{{engineering=[[d20cs0cf0@{net_acc}+@{core_engineering}]]}}">ENGINEERING
+                            <span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
+                            <span class="frame-autocalcs" name="attr_core_engineering"></span>
+                        </div>
+                        <div class="flex-element">
+                            <label class="autocalc-rolls"> <button type="roll"  name="Tech_Attack" class="grit-roll" value="&{template:default}{{name=TECH ATTACK}}{{attack=[[d20cs0cf0@{net_acc}+@{autocalc_tech_attack}]]}}">TECH ATTACK
+                            <span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
+                            <span class="frame-autocalcs" name="attr_autocalc_tech_attack"></span>
+                        </div>
+                    </div>
+                    <div class="just-around multi-input flex-column-wrapper"style="width:30.8%">
+                        <div class="flex-element">
+                            <label>ARMOR</label>
+                            <span class="frame-autocalcs" name="attr_frame_armor"></span>
+                        </div>
+                        <div class="flex-element">
+                            <label>EVASION</label>
+                            <span class="frame-autocalcs" name="attr_autocalc_evasion"></span>
+                        </div>
+                        <div class="flex-element">
+                            <label>E-DEFENSE</label>
+                            <span class="frame-autocalcs" name="attr_autocalc_edef"></span>
+                        </div>
+                        <div class="flex-element">
+                            <label>SPEED</label>
+                            <span class="frame-autocalcs" name="attr_autocalc_speed"></span>
+                        </div>
+                        <div class="flex-element">
+                            <label>SENSORS</label>
+                            <span class="frame-autocalcs" name="attr_autocalc_sensors"></span>
+                        </div>
+                    </div>
+
+                    <div class="just-around multi-input flex-column-wrapper"style="width:31.8%">
+                        <div class="flex-element">
+                            <label>MAX SP</label>
+                            <span class="frame-autocalcs" name="attr_frame_max_sp"></span>
+                        </div>
+                        <div class="flex-element">
+                            <label>SAVE TARGET</label>
+                            <span class="frame-autocalcs" name="attr_autocalc_save_target"></span>
+                        </div>
+                        <div class="flex-element">
+                            <label>MOUNT 1</label>
+                            <input type="text" style="width:75px" name="attr_mount1"/>
+                        </div>
+                        <div class="flex-element">
+                            <label>MOUNT 2</label>
+                            <input type="text" style="width:75px" name="attr_mount2"/>
+                        </div>
+                        <div class="flex-element">
+                            <label>MOUNT 3</label>
+                            <input type="text" style="width:75px" name="attr_mount3"/>
+                        </div>
+                    </div>
+                </div> <!--frame stat autocals block-->
+                
+                <div class="flex-row-wrapper" style="width:515px"> <!--frame weapons block-->
+                    <div class="align-start multi-input border tab-flex-item" style="width:247px;height:165px"> <!--frame base weapon 1-->
+                        <div class="flex-element">
+                            <button type="roll"  name="Mech_Wep_1" class="weapon-roll" value="&{template:default}{{name=WEAPON ATTACK: @{base_framewep1_name}}} {{ATK=[[d20cs0cf0@{net_acc}+@{grit}]]}}{{DMG=[[@{base_framewep1_damage}]] @{base_framewep1_dmgtype} }} {{RANGE=[[@{base_framewep1_range}]]}}{{TAGS=@{base_framewep1_tags}}}{{NOTES=@{base_framewep1_notes}}}">WEAPON 1
+                             <span style="font-family:'dicefontd20';position:relative;">0</span></button>
+                            <input type="text"  style="width:112px;" name="attr_base_framewep1_name"/>
+                        </div>
+                        <div class="flex-element">
+                            <label>TYPE</label>
+                            <input type="text" style="width:84px;" name="attr_base_framewep1_type"/>
+                        </div>
+                        <div class="flex-element">
+                            <label>RANGE</label>
+                            <input type="number" class="2digit" min="0" name="attr_base_framewep1_range"/>
+                        </div>
+                        <div class="flex-element">
+                            <label style="width:65px">DAMAGE</label>
+                            <input type="text" style="width:60px;text-align:center;margin-left:4px" name="attr_base_framewep1_damage"/>
+                            <select name="attr_base_framewep1_dmgtype" style="width:95px;height:25px;margin-left:3px;padding:0">
+                                <option>KINETIC</option>
+                                <option>EXPLOSIVE</option>
+                                <option>ENERGY</option>
+                                <option>HEAT</option>
+                                <option>BURN</option>
+                            </select>
+                        </div>
+                        <div class="flex-element">
+                            <label style="margin-right:0px;width:50px">TAGS</label>
+                            <input type="text" style="width:180px" name="attr_base_framewep1_tags">
+                        </div>
+                        <div class="flex-element">
+                            <label style="margin-right:0px;width:60px">NOTES</label>
+                            <input type="text" style="width:170px" name="attr_base_framewep1_notes">
+                        </div>
+                    </div> <!--frame base weapon 1-->
+                    
+                    <div class="align-start multi-input border tab-flex-item" style="width:247px;height:165px"> <!--frame base weapon 2-->
+                        <div class="flex-element">
+                            <button type="roll" class="weapon-roll" name="Mech_Wep_2"  value="&{template:default}{{name=WEAPON ATTACK: @{base_framewep2_name}}} {{ATK=[[d20cs0cf0@{net_acc}+@{grit}]]}}{{DMG=[[@{base_framewep2_damage}]] @{base_framewep2_dmgtype} }} {{RANGE=[[@{base_framewep2_range}]]}}{{TAGS=@{base_framewep2_tags}}}{{NOTES=@{base_framewep2_notes}}}">WEAPON 2
+                             <span style="font-family:'dicefontd20';position:relative;">0</span></button>
+                            <input type="text"  style="width:112px;" name="attr_base_framewep2_name"/>
+                        </div>
+                        <div class="flex-element">
+                            <label>TYPE</label>
+                            <input type="text" style="width:84px;" name="attr_base_framewep2_type"/>
+                        </div>
+                        <div class="flex-element">
+                            <label>RANGE</label>
+                            <input type="number" class="2digit" min="0" name="attr_base_framewep2_range"/>
+                        </div>
+                        <div class="flex-element">
+                            <label style="width:65px">DAMAGE</label>
+                            <input type="text" style="width:60px;text-align:center;margin-left:4px" name="attr_base_framewep2_damage"/>
+                            <select name="attr_base_framewep2_dmgtype" style="width:95px;height:25px;margin-left:3px;padding:0">
+                                <option>KINETIC</option>
+                                <option>EXPLOSIVE</option>
+                                <option>ENERGY</option>
+                                <option>HEAT</option>
+                                <option>BURN</option>
+                            </select>
+                        </div>
+                        <div class="flex-element">
+                            <label style="margin-right:0px;width:50px">TAGS</label>
+                            <input type="text" style="width:180px" name="attr_base_framewep2_tags">
+                        </div>
+                        <div class="flex-element">
+                            <label style="margin-right:0px;width:60px">NOTES</label>
+                            <input type="text" style="width:170px" name="attr_base_framewep2_notes">
+                        </div>
+                    </div> <!--frame base weapon 2-->
+                    <div class="weapon-counter-div"> <!--weapon counter div-->
+                        <fieldset class="repeating_weapons"> <!--frame weapon repeating set-->
+                            <div class="align-start multi-input border tab-flex-item" style="width:247px;height:165px"> <!--frame weapon repeating item-->
+                                <div class="flex-element">
+                                <button type="roll" class="weapon-roll" name="Mech_Wep"  value="&{template:default}{{name=WEAPON ATTACK: @{framewep-name}}} {{ATK=[[d20cs0cf0@{net_acc}+@{grit}]]}}{{DMG=[[@{framewep-damage}]] @{framewep-dmgtype} }} {{RANGE=[[@{framewep-range}]]}}{{TAGS=@{framewep-tags}}}{{NOTES=@{framewep-notes}}}">
+                                <span style="margin-left:-5px" class="weapon-counter"></span><span style="font-family:'dicefontd20';font-size:17px;"> 0</span></button>
+                                <input type="text"  style="width:112px;" name="attr_framewep-name"/>
+                                </div>
+                                <div class="flex-element">
+                                    <label>TYPE</label>
+                                    <input type="text" style="width:84px;" name="attr_framewep-type"/>
+                                </div>
+                                <div class="flex-element">
+                                    <label>RANGE</label>
+                                    <input type="number" class="2digit" min="0" name="attr_framewep-range"/>
+                                </div>
+                                <div class="flex-element">
+                                    <label style="width:65px">DAMAGE</label>
+                                    <input type="text" style="width:60px;text-align:center;margin-left:4px" name="attr_framewep-damage"/>
+                                    <select name="attr_framewep-dmgtype" style="width:95px;height:25px;margin-left:3px;padding:0">
+                                        <option>KINETIC</option>
+                                        <option>EXPLOSIVE</option>
+                                        <option>ENERGY</option>
+                                        <option>HEAT</option>
+                                        <option>BURN</option>
+                                    </select>
+                                </div>
+                                <div class="flex-element">
+                                    <label style="margin-right:0px;width:50px">TAGS</label>
+                                    <input type="text" style="width:180px" name="attr_framewep-tags">
+                                </div>
+                                <div class="flex-element">
+                                    <label style="margin-right:0px;width:60px">NOTES</label>
+                                    <input type="text" style="width:170px" name="attr_framewep-notes">
+                                </div>
+                            </div> <!--frame weapon repeating item-->
+                        </fieldset> <!--frame weapon repeating set-->
+                    </div> <!--weapon counter div-->
+                </div> <!--frame weapons block-->
+    	    </div> <!--frame column 1-->
+    	    <div class="flex-column-wrapper"> <!--frame column 2-->
+                <div class="align-start border tab-flex-item" style="height:250px;width:315px"> <!--frame coresys block-->
+                    <div>
+                    <button type="roll" class="grit-roll"  name="CORE_Sys_Passive" style="top:1px" value="&{template:default}{{name=CORE System Passive}}{{text=@{core_system_passive}}}">CORE SYSTEM PASSIVE
+                    <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                    </div>
+                    <div class="just-end-self">
+                        <input type="checkbox" name="attr_corepower" class="corepower" />
+                        <span class="corepower"></span>
+                    </div>
+                    <div style="width:100%"> 
+                        <textarea class="nomarg" name="attr_core_system_passive" style="height:90px"></textarea>
+                    </div>
+                    <div class="nomarg">
+                        <button type="roll" class="nomarg grit-roll" name="CORE_Sys_Active" style="top:-3px" value="&{template:default}{{name=CORE System Active}}{{text=@{core_system_active}}}">CORE SYSTEM ACTIVE
+                        <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                    </div>
+                    <div style="width:100%"> 
+                        <textarea name="attr_core_system_active" style="height:102px;margin-top:-6px"></textarea>
+                    </div>
+                </div> <!--frame coresys block-->
+                
+                <div class="multi-input border tab-flex-element" style="min-height:250px;width:315px;margin:5px;padding:3px"> <!--frame traits block-->
+                    <div class="flex-element">
+                        <label style="width:100px">TRAIT NAME</label>
+                        <input type="text" class="flex" name="attr_base_frame_trait_name"/>
+                    </div>
+                    <div class="flex-element">
+                        <input type="text" class="flex" name="attr_base_frame_trait_desc"/>
+                    </div>
+                    <fieldset class="repeating_traits"> <!--frame traits repeating set-->
+                        <div class="flex-element" style="margin-bottom:3px;margin-top:2px">
+                            <label style="width:100px">TRAIT NAME</label>
+                            <input type="text" class="flex" name="attr_frame-trait-name"/>
+                        </div>
+                        <div class="flex-element">
+                            <input type="text" class="flex" name="attr_frame-trait-desc"/>
+                        </div>
+                    </fieldset> <!--frame traits repeating set-->
+                </div> <!--frame traits block-->
+                
+                <div class="align-start multi-input border tab-flex-item" style="height:340px;width:315px;margin-bottom:0px"> <!--frame base systems block-->
+                    <div class="flex-element" style="width:100%">
+                    <button type="roll" class="sys-roll" name="Base_Mech_Sys" value="&{template:default}{{name=SYSTEM: @{base_system_name}}}{{tags=@{base_system_tags}}}{{effect=@{base_system_effect}}}">SYSTEM 1
+                    <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
+                        <input type="text" style="width:205px" name="attr_base_system_name"/>
+                    </div>
+                    <div class="flex-element">
+                        <label style="width:45px">TAGS</label>
+                        <input type="text" style="width:187px" name="attr_base_system_tags"/>
+                    </div>
+                    <div class="flex-element">
+                        <label style="width:25px">SP</label>
+                        <input type="number" class="1digit" name="attr_base_system_sp"/>
+                    </div>
+                    <div class="flex-element" style="margin-bottom:0px">
+                        <label style="margin-bottom:0px">EFFECT</label>
+                    </div>
+                    <textarea style="height:237px;margin-top:0px" name="attr_base_system_effect"></textarea>
+                </div><!--frame base systems block-->
+                
+                <div class="system-counter-div"> <!--systems counter div-->
+                    <fieldset class="repeating_systems"> <!--frame systems repeating set-->
+                        <div class="align-start multi-input border tab-flex-item" style="height:340px;width:315px;margin-top:10px;margin-bottom:10px"> <!--frame systems repeating item-->
+                            <div class="flex-element" style="width:100%">
+                                <button type="roll" class="sys-roll" name="Mech_Sys" value="&{template:default}{{name=SYSTEM: @{system-name}}}{{tags=@{system-tags}}}{{effect=@{system-effect}}}">
+                                <span style="margin-left:-5px" class="system-counter"></span><span style="font-family:'dicefontd20';font-size:17px;"> 0</span></button>
+                                <input type="text" style="width:205px" name="attr_system-name"/>
+                            </div>
+                            <div class="flex-element">
+                                <label style="width:45px">TAGS</label>
+                                <input type="text" style="width:187px" name="attr_system-tags"/>
+                            </div>
+                            <div class="flex-element">
+                                <label style="width:25px">SP</label>
+                                <input type="number" class="1digit" name="attr_system-sp"/>
+                            </div>
+                            <div class="flex-element" style="margin-bottom:0px">
+                                <label style="margin-bottom:0px">EFFECT</label>
+                            </div>
+                            <textarea style="height:237px;margin-top:0px" name="attr_system-effect" ></textarea>
+                        </div><!--frame systems repeating item-->
+                    </fieldset> <!--frame systems repeating set-->
+                    
+                </div> <!--systems counter div-->
+    	    </div> <!--frame column 2-->
+    	</div> <!--row wrapper-->
+    </div><!--FRAME tab-->
+</div> <!-- main container div<-->
+
+
