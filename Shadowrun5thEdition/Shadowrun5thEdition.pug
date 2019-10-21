@@ -197,7 +197,7 @@ include src/pug/_mixins.pug
 		+hostSprite(spriteObject, 'level')
 	
 	//-BODY
-	.body
+	.mid.body
 		.column
 			h1.settings(data-i18n='bonuses') Bonuses
 			//- PROFESSIONAL RATINGS
@@ -314,7 +314,8 @@ include src/pug/_mixins.pug
 					input.character-type(name='attr_flag_drone' title='@{flag_drone}' type='checkbox' value='drone')
 					h2(data-i18n=drone) Drone
 
-		//TEXTBOXES
+	.end.body
+		//- TEXTBOXES
 		each val, key in {'Qualities': 'grunt', 'Augmentations': 'grunt', 'Gear': 'grunt vehicle', 'Programs': 'vehicle', 'Modifications': 'vehicle', 'Powers': 'grunt hide-magic', 'Weakness': 'grunt hide-magic'}
 			- const attrName = key.toLowerCase();
 			input(name='attr_'+attrName type='hidden' value='')
@@ -415,8 +416,7 @@ include src/pug/_mixins.pug
 				span.pictos x
 				input(name='attr_weapon' type='hidden' value='')
 				span(name='attr_weapon_dice')
-				+weaponButton()
-				span(name='attr_weapon')
+				+npcButton(weaponButton)
 				.settings
 					input(name='attr_weapon_range' type='hidden' value='range')
 					each val, key in npcWeaponsObject
@@ -437,14 +437,14 @@ include src/pug/_mixins.pug
 
 
 		//- SPELLS
-		.rows.grunt.repeating.spells
+		.rows.grunt.repeating.spells.hide-magic
 			h1(data-i18n='spells') Spells
 			fieldset(class='repeating_NPCspell')
 				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
 				span.pictos x
 				input(name='attr_spell' type='hidden' value='')
 				span(name='attr_dice')
-				+spellButton()
+				+npcButton(spellButton)
 				span(name='attr_spell')
 				.settings
 					input(name='attr_category' type='hidden' value='')
@@ -469,6 +469,111 @@ include src/pug/_mixins.pug
 						else
 							label(data-i18n-title=translationKey title=key)
 								input(name='attr_'+attrName placeholder=val['placeholder'] title='@{repeating_NPCspell_${x}_'+attrName+'}' type=val['type'])
+
+		//- COMPLEX FORMS
+		.rows.grunt.repeating.forms.hide-resonance
+			h1(data-i18n='complexform') Complex Forms
+			fieldset(class='repeating_form')
+				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+				span.pictos x
+				input(name='attr_form' type='hidden' value='')
+				span(name='attr_software_dice')
+				+npcButton(formButton)
+				span(name='attr_form')
+				.settings
+					each val, key in npcComplexFormsObject
+						- const translationKey = key.toLowerCase();
+						if (key !== 'Notes')
+							h2(data-i18n=translationKey) #{key}
+					each val, key in npcComplexFormsObject
+						- const translationKey = key.toLowerCase();
+						- const attrName = key === 'Notes' ? 'note' : 'form_' + key.toLowerCase();
+						if val['type'] === 'select'
+							select(name='attr_'+attrName title='@{repeating_form_${x}_'+attrName+'}' value=val['default'])
+								each type in val['array']
+									- const i18n = type.toLowerCase();
+									- const value = type;
+									if val['default'] === i18n
+										option(data-i18n=i18n value=value 'selected') #{i18n}
+									else
+										option(data-i18n=i18n value=value) #{i18n}
+						else
+							label(data-i18n-title=translationKey title=key)
+								input(name='attr_'+attrName placeholder=val['placeholder'] title='@{repeating_form_${x}_'+attrName+'}' type=val['type'])
+
+		//- IC
+		.rows.host.repeating.ic
+			h1(data-i18n='intrusioncountermeasures') Intrusion Countermeasures
+			fieldset(class='repeating_IC')
+				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+				span.pictos x
+				input(name='attr_IC' type='hidden' value='')
+				span(name='attr_IC')
+				+npcButton(icButton)
+				span(name='attr_IC')
+				.settings
+					each val, key in icObject
+						- const translationKey = key.toLowerCase();
+						if (key !== 'Notes')
+							h2(data-i18n=translationKey) #{key}
+					each val, key in icObject
+						- const translationKey = key.toLowerCase();
+						- const attrName = key === 'IC Limit' ? 'limit' : key === 'Defense Attribute' ? 'attribute' : key === 'Defense Matrix Attribute' ? 'matrix' : key === 'Notes' ? 'note' : key.toLowerCase();
+						if val['type'] === 'select'
+							select(name='attr_IC_'+attrName title='@{repeating_IC_${x}_'+attrName+'}' value=val['default'])
+								each type in val['array']
+									- const i18n = type === 'Data Processing' ? 'data_processing' : type.toLowerCase();
+									- const value = type;
+									if val['default'] === i18n
+										option(data-i18n=i18n value=value 'selected') #{i18n}
+									else
+										option(data-i18n=i18n value=value) #{i18n}
+						else
+							label(data-i18n-title=translationKey title=key)
+								input(name='attr_IC_'+attrName placeholder=val['placeholder'] title='@{repeating_IC_${x}_'+attrName+'}' type=val['type'])
+
+	//- MATRIX DEVICE
+	input(name='attr_flag_matrix' type='hidden' value='')
+	.matrix.body.matrix-device
+		.rows
+			h1(data-i18n='matrixdevice') Matrix Device
+			label(data-i18n-title='device' title='device')
+				input(name='attr_device_name' placeholder='Sony CIY-720' type='text')
+			button(data-i18n='devicerating' name='device rating' value!=rollBeginging+'{{header=Matrix Resistance}}{{base=^{base}}}{{dice=[[((@{device_rating}+@{firewall})'+rollEnding type='roll') Device Rating
+			label.round(data-i18n-title='devicerating' title='devicerating')
+				input(name='attr_device_rating' placeholder='4' type='number' value='')
+		.rows
+			each val in ['Attack', 'Sleaze', 'Data Processing', 'Firewall']
+				- const attrName = val === 'Data Processing' ? 'data_processing' : val.toLowerCase();
+				- const matrixClass = val === 'Data Processing' ? 'Data' : val; 
+				button(data-i18n=attrName name=val value!=rollBeginging+'{{header='+val+'}}{{base=^{base}}}{{dice=[[((@{'+attrName+'}+(?{Attribute|Willpower,@{willpower}|Logic,@{logic}|Intuition,@{intuition}})'+rollEnding type='roll') #{val}
+				.matrix-bubble(class='matrix'+matrixClass)
+					- let i = 0;
+					while i < 21
+						input(name="attr_"+attrName value=i++ type="radio")
+						span
+				label.round(data-i18n-title=attrName title=attrName)
+					input(name='attr_'+attrName placeholder='4' type='number' value='')
+
+
+
+
+	//- MATRIX PROGRAMS
+	.matrix.body
+		.rows.grunt.repeating
+			h1(data-i18n='programs') Programs
+			fieldset(class='repeating_programs')
+				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+				span.pictos x
+				input(name="attr_program_on" type="checkbox" checked)
+				span.pictos Q
+				button(name="program" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{program}}}{{desc=@{program_note}}}")
+					span(name="attr_program")
+				.settings
+					label(data-i18n-title='programs' title='programs')
+						input(name="attr_program" placeholder="Program Name" title="@{repeating_programs_${x}_program}" type="text" value="")
+					label(data-i18n-title='notes' title='notes')
+						input(name="attr_program_note" placeholder="Program Description" title="@{repeating_programs_${x}_program_note}" type="text" value="")
 
 
 //- FOOTER
