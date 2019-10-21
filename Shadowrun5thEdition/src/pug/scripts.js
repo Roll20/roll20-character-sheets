@@ -635,7 +635,7 @@
 		    getAttrs(["repeating_form_form_duration", "repeating_form_form_target", "repeating_form_form_fade", "repeating_form_form_note", ], (v) =>{
 		    	const tar = `Target ${v.repeating_form_form_target}, `;
 				const dur = `Duration ${v.repeating_form_form_duration}, `;
-				const not = `, ${v.repeating_form_form_note}`;
+				const not = `, ${v.repeating_form_form_note}` || '';
 				const fad = (v.repeating_form_form_fade > 0) ? `L+${v.repeating_form_form_fade}` : 
 							(v.repeating_form_form_fade < 0) ? `L${v.repeating_form_form_fade}` : "L";
 
