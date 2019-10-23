@@ -24,9 +24,9 @@
 					<li>Combat Tab - Ranged Attacks. Added Malfunction field.</li>
 					<li>New Option - Use Malfunction. If checked, roll result will check for malfunction.</li>
 					<li>Character Sheet Default Options. Added Use Malfunction default option.</li>
+					<li>Add turning radius movement table.</li>
 				</ul>
-				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update
-				</span></b></label>
+				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset" />View All Updates</button>
 			</div>
 		</div>
@@ -1496,6 +1496,76 @@
 						<input type="text" name="attr_current_dodge" value="" readonly="readonly" title="Macro name: current_dodge" />
 					</div>
 				</div> <!-- .sheet-row -->
+				<div class="sheet-row">
+					<div class="sheet-cell sheet-col0 sheet-label">
+						<div class="sheet-popup" style="text-align:center;">Current Velocity</div>
+						<span class="sheet-tooltip">
+							Enter velocity (yards/second) for current turn. 
+						</span>
+					</div>
+					<div class="sheet-cell sheet-colAll">&nbsp;</div>
+					<div class="sheet-cell sheet-colAll">
+					    <div class="sheet-popup">Turn Radius</div>
+						<span class="sheet-tooltip">
+							Turn Radius. Minimum number of hexes to move<br />
+							before making a 60° facing change.<br />
+							Turn Radius = (Max. Allowed Velocity / Move Score) rounded down.<br />
+							See B394.<br />
+							<span style="color:red;font-weight:bold;">NOTE:</span> Turn radius for a move type is limited by maximum velocity.<br />
+							If Air has 8/16, the maximum velocity is 16.
+						</span>
+					</div>
+				</div> <!-- .sheet-row -->
+				<div class="sheet-row">
+					<div class="sheet-cell sheet-col0 sheet-label">
+						<input type="number" step="1" name="attr_entered_move" value="0" title="Macro name: entered_move" />
+					</div>
+					<div class="sheet-cell sheet-colAll">&nbsp;</div>
+					<div class="sheet-cell sheet-colAll">
+						<input type="text" name="attr_current_move_turn_radius" value="0" readonly="readonly" title="Macro name: current_move_turn_radius" />
+					</div>
+					<div class="sheet-cell sheet-colAll">
+						<input type="text" name="attr_enhanced_move_current_turn_radius" value="0" readonly="readonly" title="Macro name: enhanced_move_current_turn_radius" />
+					</div>
+					<div class="sheet-cell sheet-colAll">
+						<input type="text" name="attr_current_air_turn_radius" value="0" readonly="readonly" title="Macro name: current_air_turn_radius" />
+					</div>
+					<div class="sheet-cell sheet-colAll">
+						<input type="text" name="attr_current_water_turn_radius" value="0" readonly="readonly" title="Macro name: current_water_turn_radius" />
+					</div>
+					<div class="sheet-cell sheet-colAll">&nbsp;</div>
+				</div> <!-- .sheet-row -->
+				<div class="sheet-row">
+					<div class="sheet-cell sheet-col0 sheet-label">&nbsp;</div>
+					<div class="sheet-cell sheet-colAll">&nbsp;</div>
+					<div class="sheet-cell sheet-colAll">
+					    <div class="sheet-popup">Tight Turn Penalty</div>
+						<span class="sheet-tooltip">
+							Skill penalty for a tight turn. Allows you to make an additional facing change.<br />
+							120° facing change instead of 60°.<br />
+							Penalty = -1 per full increment of base move which your velocity exceeds your Basic Move.<br />
+							See B395.<br />
+						</span>
+					</div>
+				</div> <!-- .sheet-row -->
+				<div class="sheet-row">
+					<div class="sheet-cell sheet-col0 sheet-label">&nbsp;</div>
+					<div class="sheet-cell sheet-colAll">&nbsp;</div>
+					<div class="sheet-cell sheet-colAll">
+						<input type="text" name="attr_current_move_turn_radius_penalty" value="0" readonly="readonly" title="Macro name: current_move_turn_radius_penalty" />
+					</div>
+					<div class="sheet-cell sheet-colAll">
+						<input type="text" name="attr_enhanced_move_current_turn_radius_penalty" value="0" readonly="readonly" title="Macro name: enhanced_move_current_turn_radius_penalty" />
+					</div>
+					<div class="sheet-cell sheet-colAll">
+						<input type="text" name="attr_current_air_turn_radius_penalty" value="0" readonly="readonly" title="Macro name: current_air_turn_radius_penalty" />
+					</div>
+					<div class="sheet-cell sheet-colAll">
+						<input type="text" name="attr_current_water_turn_radius_penalty" value="0" readonly="readonly" title="Macro name: current_water_turn_radius_penalty" />
+					</div>
+					<div class="sheet-cell sheet-colAll">&nbsp;</div>
+				</div> <!-- .sheet-row -->
+				
 			</div> <!-- .sheet-table -->
 		</div> <!-- .sheet-box .sheet-encumberance -->
 		
@@ -4105,6 +4175,7 @@
         <li>Combat Tab - Ranged Attacks. Added Malfunction field.</li>
 		<li>New Option - Use Malfunction. If checked, roll result will check for malfunction.</li>
 		<li>Character Sheet Default Options. Added Use Malfunction default option.</li>
+		<li>Add turning radius movement table.</li>
     </ul>
     
     <h4>Version: 1.6.6</h4>
@@ -9442,6 +9513,289 @@ If fail, attacker can opt to hit limb<br /></textarea>
         
         return minDamageNote; 
         
-    } 
+    }
+    
+    on("change:entered_move change:current_move change:enhanced_move_current change:current_air change:current_water", function(event) {
+        
+        updateTurnRadiusMovements();
+        
+    });
+    
+    /**
+     * Updates the turn radius for different move types
+     * based on velocity.
+     * 
+     * TODO: Check for max velocity for move, enhanced move, air, and water. Limit to max velocity.
+     */
+    function updateTurnRadiusMovements() {
+        
+        getAttrs(["entered_move", "current_move", "enhanced_move_current", "current_air", "current_water"], function(values) {
+            
+            var enteredMove = +values.entered_move;
+            
+            var enhancedGroundMove = values.enhanced_move_current;
+            
+            var arrEnhancedGroundMove;
+            
+            var maxGroundVelocity = 0;
+            
+            var baseMove = +values.current_move;
+            
+            var baseMoveTurnRadius = 0;
+            
+            var groundTightTurnPenalty = 0;
+            
+            var maxAirVelocity = 0;
+            
+            var baseAirMove = values.current_air;
+            
+            var arrAirMove;
+            
+            var baseAirMoveTurnRadius = 0;
+            
+            var airTightTurnPenalty = 0;
+            
+            var maxWaterVelocity = 0;
+            
+            var baseWaterMove = values.current_water;
+            
+            var baseWaterMoveTurnRadius = 0;
+            
+            var arrWaterMove;
+            
+            var waterTightTurnPenalty = 0;
+            
+            if (enteredMove < 0) {
+                enteredMove = 0;
+            }
+            
+            // --
+            // get ground move and turn radius
+            if ( enhancedGroundMove === "0" ) {
+                
+                // if no super move, then use normal base move
+                maxGroundVelocity = getMaxVelocity(values.current_move, enteredMove);
+                
+                groundTightTurnPenalty = 0;
+                
+            } else {
+                
+                // use super move
+                maxGroundVelocity = getMaxVelocity(enhancedGroundMove, enteredMove);
+                
+                groundTightTurnPenalty = getTightTurnPenalty(maxGroundVelocity, values.enhanced_move_current);
+                
+            }
+            
+            if (maxGroundVelocity && baseMove) {
+                
+                baseMoveTurnRadius = maxGroundVelocity/baseMove;
+                
+                // round down, but min. is 1.
+                if (baseMoveTurnRadius <= 1) {
+                    baseMoveTurnRadius = 1;
+                } else {
+                    baseMoveTurnRadius = Math.floor(baseMoveTurnRadius);
+                }
+                
+            }
+            
+            // --
+            // get base air move and turn radius
+            // check for slash
+            maxAirVelocity = getMaxVelocity(baseAirMove, enteredMove);
+            
+            baseAirMove = getBaseMove(baseAirMove); 
+            
+            if ( baseAirMove === 0 ) {
+                
+                baseAirMoveTurnRadius = 0;
+                
+            } else if ( maxAirVelocity && baseAirMove ) {
+                
+                baseAirMoveTurnRadius = maxAirVelocity/baseAirMove;
+                
+                // round down, but min. is 1.
+                if (baseAirMoveTurnRadius <= 1) {
+                    baseAirMoveTurnRadius = 1;
+                } else {
+                    baseAirMoveTurnRadius = Math.floor(baseAirMoveTurnRadius);
+                }
+                
+                airTightTurnPenalty = getTightTurnPenalty(maxAirVelocity, values.current_air);
+                
+            }
+            
+            // --
+            // get base water move and turn radius
+            maxWaterVelocity = getMaxVelocity(baseWaterMove, enteredMove);
+            
+            baseWaterMove = getBaseMove(baseWaterMove); 
+            
+            if (maxWaterVelocity && baseWaterMove ) {
+                
+                baseWaterMoveTurnRadius = maxWaterVelocity/baseWaterMove;
+                
+                // round down, but min. is 1.
+                if (baseWaterMoveTurnRadius <= 1) {
+                    baseWaterMoveTurnRadius = 1;
+                } else {
+                    baseWaterMoveTurnRadius = Math.floor(baseWaterMoveTurnRadius);
+                }
+                
+                waterTightTurnPenalty = getTightTurnPenalty(maxWaterVelocity, values.current_water);
+                
+            }
+            
+            setAttrs({
+                "current_move_turn_radius": baseMoveTurnRadius,
+                "current_move_turn_radius_penalty": groundTightTurnPenalty,
+                "enhanced_move_current_turn_radius": baseMoveTurnRadius,
+                "enhanced_move_current_turn_radius_penalty": groundTightTurnPenalty,
+                "current_air_turn_radius": baseAirMoveTurnRadius,
+                "current_air_turn_radius_penalty": airTightTurnPenalty,
+                "current_water_turn_radius": baseWaterMoveTurnRadius,
+                "current_water_turn_radius_penalty": waterTightTurnPenalty,
+            });
+            
+        });
+        
+    }
+    
+    /**
+     * Gets base move from a number or two values.
+     * If move = 8/16, basemove = 8.
+     * If move = 8, basemove = 8
+     */
+    function getBaseMove(moveValue) {
+        
+        var move = 0;
+        
+        if ( moveValue.toString().includes("/") ) {
+            
+            // split the value
+            // move = 8/16
+            // 8 = base move
+            // 16 = max move
+            arrMoveValue = moveValue.split("/");
+            
+            // get second part, convert to number
+            move = +arrMoveValue[0];
+            
+        } else {
+            
+            move = +moveValue;
+            
+        }
+        
+        return move;
+    }
+    
+    /**
+     * Determines max velocity for a movement type.
+     * Entered move can't exceed move value.
+     * Example moveValue = 8/16
+     *   if enteredMove = 8, then use it
+     *   if enteredMove = 20, then use 16
+     * @param string moveValue   Example: 8/16 or 8
+     * @param string enteredMove Velocity entered by user
+     * 
+     * @return int
+     */
+    function getMaxVelocity(moveValue, enteredMove) {
+        
+        var maxVelocity = 0;
+        
+        var move = 0;
+        
+        var arrMoveValue;
+        
+        if ( moveValue.toString().includes("/") ) {
+                
+            // split the value
+            // move = 8/16
+            // 8 = base move
+            // 16 = max move
+            arrMoveValue = moveValue.split("/");
+            
+            // get second part, convert to number
+            move = +arrMoveValue[1];
+            
+        } else {
+            
+            move = +moveValue;
+            
+        }
+        
+        // i.e. entered move = 20, top speed = 16
+        // if 20 > 16, then use 16
+        if (enteredMove > move ) {
+            
+            maxVelocity = move;
+            
+        } else {
+            
+            maxVelocity = enteredMove;
+            
+        }
+        
+        return maxVelocity;
+        
+    }
+    
+    /**
+     * Determines the tight turn penalty
+     * 
+     * @param int    velocity  Current velocity
+     * @param string moveValue Base move used to determine turn penalty
+     * 
+     * @return int
+     */
+    function getTightTurnPenalty(velocity, moveValue) {
+        
+        var penalty = 0;
+        
+        var arrMoveValue;
+        
+        var baseMove = 0;
+        
+        var maxMove = 0;
+        
+        var temp = 0;
+        
+        if ( moveValue.toString().includes("/") ) {
+                
+            // split the value
+            // move = 8/16
+            // 8 = base move
+            // 16 = max move
+            arrMoveValue = moveValue.split("/");
+            
+            baseMove = +arrMoveValue[0];
+            
+            maxMove = +arrMoveValue[1];
+            
+        } else {
+            
+            baseMove = +moveValue;
+            
+            maxMove = +moveValue;
+            
+        }
+        
+        if ( baseMove === maxMove ) {
+            
+            penalty = 0;
+            
+        } else {
+            
+            temp = velocity - baseMove;
+            
+            penalty = Math.floor(temp/baseMove) * -1;
+            
+        }
+        
+        return penalty;
+    }
     
 </script>
