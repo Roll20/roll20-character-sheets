@@ -99,17 +99,8 @@
 		});
 	};
 
-	on("clicked:whisper", (eventinfo) => {
-		getAttrs([`gm_toggle`], (v) => {
-			setAttrs({
-				gm_toggle: (!v.gm_toggle.includes("gm")) ? "/w gm" : " "
-			});
-		});
-	});  
-
    [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`].forEach(attr => {
    		on(`clicked:tab_${attr}`, () => {
-   			console.log(`%c The button clicked was tab_${attr} update tab to ${attr}`, "color:purple;");
    			setAttrs({tab: attr});
    		});
    });
@@ -1430,7 +1421,7 @@
 										update[`${section}_cold_modifier`] = modification.rating;
 									} else if (modification.name === "Radiation Shielding") {
 										update[`${section}_radiation_modifier`] = modification.rating;
-									} else if (modification.name === "Chemical Protectio") {
+									} else if (modification.name === "Chemical Protection") {
 										update[`${section}_acid_modifier`] = modification.rating;
 									} else if (modification.name === "Fire Resistance") {
 										update[`${section}_fire_modifier`] = modification.rating;
