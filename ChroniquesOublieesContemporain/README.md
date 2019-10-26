@@ -9,9 +9,55 @@ Cette feuilles de personnage inclut quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](http://www.black-book-editions.fr/produit.php?id=4349).
 
 # Version courante
-2.4 [Screenshot](coc_v2.png)
+2.8 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v2.8 (2019-10-10)
+* Modifications du sheetworker pour éviter erreurs dans la console API
+* Homogénéisation des noms des roll buttons
+* Séparation des buffs circonstanciels de combat en deux champs : un pour le jet d'attaque et un pour le jet de dommages
+
+## v2.7 (2019-29-06)
+### Fiche PJ, onglet Configuration
+* Ajout d'un champ de buff pour les PV
+* Ajout d'un sélecteur pour le mode de calcul des points de vie (lancer le DV ou utiliser la valeur moyenne du DV)
+
+### Fiche PJ, onglet Caractéristiques
+* Modification du roll-button de lancement de dé de vie en action-button permettant d'augmenter le niveau de 1
+* Ajout d'un script sheet-worker pour recalculer / lancer les points de vie lorsque le niveau, le mod de constitution, le buff de PV ou le mode de calcul des PV est modifié
+
+### Modifications globales
+Modification des attributs name de tous les roll-buttons en "roll_nomJet" et ajout des attributs title
+* Permet d'invoquer un jet de dés de la fiche de personnage depuis le chat en indiquant %{selected|nomJet} (si un token est sélectionné) ou %{nomPerso|nomJet}
+* Permet d'afficher le nom du jet qui peut être utilisé dans le chat ou les macros
+
+## v2.6 (2019-04-17)
+### Fiche de PJ
+
+* Possibilité d'appliquer plusieurs états préjudiciables en même temps
+* Gestion de l'encombrement (idem COF)
+* Ajout d'un champ de texte sous la liste d'attaques pour les buffs "temporaires"
+ * Possibilité d'indiquer des buffs aux jets d'attaque et de dommages en langage quasi-naturel : le premier mot est le type d'attaque concernée, le deuxième est le modificateur (avec possibilité de référencer un autre attribut de la fiche en l'encadrant entre crochets []) et à partir du troisième, la description du buff.
+ * Indiquer ATC (contact), ATD (distance), MAG (att. magique), MEN (att. mentale), pour les types d'attaques, ATT pour toutes les attaques existantes. Indiquer d'abord DM pour un buff aux dommages
+ * Plusieurs buffs peuvent être indiqués et séparés par un point-virgule (;)
+ * Exemple : `DM ATC +2d6 Attaque en traître ; ATD +[PER] Visée`
+ * Il est nécessaire de cliquer en dehors du champ de saisie AVANT de presser un bouton d'attaque afin que le script sheet-worker approprié puisse s'exécuter.
+* Ajout d'un bouton "Recycle" sur l'onglet Configuration pour forcer la fiche à recalculer quelques attributs (rangs atteints dans chaque voie, statbloc interne, encombrement)
+
+### Fiche de PNJ
+
+* Ajout Réduction de DM (RD)
+* Ajout d'une liste de capacités / traits
+* Amélioration du script d'import de statblock
+* Ajout d'un script de conversion d'attributs PNJ => PJ
+
+## v2.5 (2019-02-12)
+* Gestion des buffs en langage naturel avec référence aux caracs ou voies/rangs
+* Réorganisation des lignes d'attaque (PJ et PNJ), gestion des DM secondaires sur la fiche PJ, actions limitées
+* Réorganisation des lignes de jets de capacités
+* Réorganisation du roll template
+* Refactorisation de code dans les sheetworkers
 
 ## v2.4 (2019-01-01)
 * Fiche de personnage avec sélection du type par dropdown (PJ, PNJ ou Véhicule)

@@ -4,6 +4,17 @@ This sheet is created for use in Godbound games on Roll20, based on the Characte
 
 ## Features / Changelog
 
+
+- v2.3.0
+  - Minor
+    - Description fields for words, gifts, miracles, and artifacts changed to auto-expand
+    - Small adjustment to project layout
+    - Correction for styling of two  fieldset "add" buttons
+- v2.2.0
+  - Minor
+    - Renamed Project Opposition to Resistance
+    - Corrected calculation for Project Cost
+    - Small teaks and spelling corrections
 - v2.1.0
   - Minor
     - Renamed Headings for Clarity

@@ -36,6 +36,43 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ## Changelog
 
+### 2.4.4
+
+* Fix inconsistent field name HP_MAX on the NPC sheet - the correct way to write
+  this is HP_max.
+* Link the name input on the PC sheet to the character_name attribute.
+* Fix misspelling of "Initiative" in translations, which was not propagated from
+  translation.json
+
+### 2.4.3
+
+* Fix the summation of cyberware strain not actually doing that even remotely.
+* Fix magic effort update not triggering on changing the committed effor for the day.
+
+### 2.4.2
+
+* Remove incorrect title text from uncommitted Magic Effort
+* Fix HP rolls for Heroic Characters looking at the wrong attribute
+* Fix the version upgrade code stopping early and thus not change the version number on the sheet.
+
+### 2.4.1
+
+* Fix Innate AC missing translation key.
+
+### 2.4.0
+
+* Add tracking of permanent System Strain.
+* Fix HP roll for Heroic characters.
+* Added a macro to calculate travel costs.
+* Codex of the Black Sun support!
+  * Magic changed to Know Magic and Use Magic.
+  * Sunblade skill and Fight skill added.
+  * Toggle between Adept, Arcanist, and Magister.
+  * Magic Effort for Adepts.
+  * Spell Slots for Magisters and Arcanists.
+  * Arcanists track if spells are prepared.
+  * Adepts have abilities.
+
 ### 2.3.1
 
 * Fixed a bug causing the sheet to sometimes display an incorrect attack bonus for weapons.
