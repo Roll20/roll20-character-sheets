@@ -2,6 +2,24 @@
 
 ## Änderungen
 
+2019-10-29:
+- Fix eines Problems mit der Auswahl und Berechnung von Fernkampfwaffen
+- Neu: Unter Optionen stehen diverse Farbschema zur Auswahl: Yrn White (Default), Nebachot Sand, Rekki Blue, Perceval Grey, Gerasim Green)
+- Aufruf: Wer Ideen hat und das eigene Farbschema im Bogen sehen möchte, kann mir eine Nachricht an untenstehende Emailadresse senden.
+  Das Farbschema sollte folgende Punkte abdecken und der Namen einen Bezug zu Aventurien aufweisen:
+{
+  --color-font-tab-checked : white;
+  --bg-tab-unchecked       : white;
+  --bg-tab-checked         : green;
+  --bg-sheet               : #ffffff;
+  --bg-input               : #ffffff;
+  --bg-input-readonly      : #f5f5f5;
+  --color-font             : black;
+  --color-border           : black;
+}
+
+
+
 2019-10-18: strukturelle Anpassungen durch Tajo, um Sortierreihenfolge bei Übersetzungen z. B. bei Talenten beizubehalten
 
 2019-10-14: Englische Übersetzung durch Tajo. Vielen Dank!
