@@ -1,0 +1,377 @@
+//- Colors:
+	$gold: #FCD116;
+	$red: #610b0d;
+	$purple: #7a2593;
+	$lightgray: #9a9a9a;
+	$graytrans: rgba(28, 28, 28, 0.14902);
+	$grayshadow: #7c7c7c;
+	$blacker: #040404;
+	//- GRAY IN ROLL TEMPLATE
+	$blackish: #1c1c1c;
+	//-(primaryly on the NPC sheet)
+	$gray: #555;
+	$blacker: #040404;
+	$white: #fff;
+
+
+/********************************************************************************************************/
+/********************************* GLOBAL SETTINGS *******************************************************/
+/********************************************************************************************************/
+/* GLOBALS
+	============================= */
+	@import 'src/scss/_global'; 
+
+/* SWITCHES
+	============================= */
+	@import 'src/scss/_switch'; 
+
+/***** TABS FOR SHEETS *****/
+	.sheet-tabs {
+		button {
+			&[type='action'] {
+				background-color: #333;
+				border-radius   : 2px;
+				border          : 1px solid #000;
+				box-shadow      : inset 0px 0px 3px 1px #7c7c7c;
+				color           : #fff;
+				font-size       : 1em;
+				font-weight     : bolder;
+				text-transform  : capitalize;
+				padding         : 5px;
+
+				&.sheet-pictos {text-transform: lowercase;}
+			}
+
+			&[type='roll'] {
+				background: none;
+				border: none;
+				color         : #fff;
+				font-family   : 'dicefontd6';
+				font-size     : 2.5em;
+				vertical-align: top;
+
+				&:hover {
+					text-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px #e31715;
+				}
+			}
+		}
+
+		h2 {
+			color: #fff;
+			font-size: 1em;
+			text-transform: capitalize;
+			text-align: right;
+			line-height: 2em;
+			margin-right: 5%;
+		}
+	}
+
+
+/***** TABS FOR SHEETS *****/
+.sheet-settings-toggle {
+	 input { width: 3em;}
+
+	input[type='checkbox'] + span {
+      background : transparent;
+      @extend .sheet-pictos;
+      font-size  : 20px;
+      height     : 20px;
+      text-align : center;
+      width      : 20px;
+  }
+}
+
+%parantheseNumbers {
+	vertical-align: middle;
+
+	&:before { content: '('; }
+	&:after { content: ')'; }
+}
+
+%toggleCheckbox,
+input.sheet-toggle {
+	position: absolute;
+	opacity: 0;
+	z-index: 2;
+}
+
+%toggleRelative {
+	position: relative;
+	opacity: 0;
+	z-index: 2;
+}
+
+%settingsCheckboxes { 
+	& + span { opacity: 0; }
+	&:checked + span { opacity: 1; }
+
+	&:checked ~ .sheet-settings {
+		display: inline-grid;
+		margin-bottom: 2%;
+	}
+}
+
+%borderBottom { border-bottom: 1px solid #333; }
+
+@import 'src/scss/_matrixdevice'; 
+
+/******************************************************************************/
+/********************************* VARIABLES *********************************/
+/****************************************************************************/
+$tabs:'arms', 'augs', 'core', 'gear', 'options', 'social', 'magic', 'matrix', 'vehicle';
+$characterTypes: 'npc', 'pc';
+$specialCharacters: 'magic', 'resonance';
+$npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
+
+/***************************************************************************************/
+/************************** START OF THE PC SHEET *************************************/
+/*************************************************************************************/
+	.sheet-pc {
+		background-color: #333;
+		background-image: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadowrun5thEdition/images/Blackbackground.jpg');
+		background-size : cover;
+		border          : 3px solid;
+		box-shadow      : inset 0px 0px 3px 1px #7c7c7c;
+		margin-left     : -1%;
+		padding-left    : 0.5%;
+		
+		button > h2:hover,
+		button > span:hover,
+		label > button[type='roll']:hover,
+		.sheet-repeat-box button[type='roll']:hover,
+		.sheet-con-track button[type='action']:hover,
+		button[data-i18n="default"]:hover {
+			color      : #fff;
+			text-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px $red;
+		}
+
+		hr { margin: 7px 0px -2px 0px; }
+
+		.sheet-tabs {
+			@extend %display-inline-grid;
+			grid-template-columns: 1fr 5em 1fr 5em 2.5em 5em 5em 5em 5em 5em 5em 5em;
+			grid-column-gap: 0.25%;
+			padding: 0px 1% 3% 1%;
+			margin-top: 1%;
+			grid-row-gap: 10%;
+
+			button[type='roll'] {grid-area: 2 / 5 / 2 / 5;}
+
+				/***** PLAYER DATA INPUTS *****/
+			h1 {
+				background-color: transparent;
+				color: #fff;
+				display: inline-block;
+				font-size : 1em;
+				grid-column: 6 / 8;
+				letter-spacing: 2px;
+				line-height : 20px;
+				margin-left: 5%;
+				text-align: right;
+				text-transform  : uppercase;
+			}
+
+			h2 {
+				&[data-i18n-title='/w GM'] { grid-area: 2 / 1 / 2 / 1; }
+				&[data-i18n-title='wounds'] { grid-area: 2 / 3 / 2 / 4; }
+				&[data-i18n-title='modifiers'] { grid-area: 3 / 1 / 3 / 1; }
+				&[data-i18n-title='edge'] { grid-area: 3 / 3 / 3 / 4; }
+			}
+
+			@each $highlightButton in $tabs {
+				input[value*='#{$highlightButton}'] ~ button[name*='#{$highlightButton}'] { 		
+					@extend %highlight-button; 
+				}
+			}
+
+			img { 
+				grid-area: 1 / 1 / 2 / 6;
+				height: 100%;
+				width: 100%;
+			}
+
+			label {
+				&[data-i18n-title='character name'] > input[type='text'],
+				&[data-i18n-title='player name'] > input[type='text'] {
+					color           : #fff;
+					font-weight     : bolder;
+					background-color: transparent;
+					border          : none;
+					box-shadow      : none;
+					border-bottom   : 2px solid #fff;
+					border-radius   : 0px;
+					height          : 30px;
+					width           : 100%;
+					grid-column: 4;
+				}
+
+				&[data-i18n-title='character name'] { grid-area: 1 / 8 / 1 / 14; }
+				&[data-i18n-title='player name'] { grid-area: 2 / 8 / 2 / 14; }
+
+				&[data-i18n-title='whisper rolls to gm']{ grid-area: 2 / 2 / 2 / 3; }
+				&[data-i18n-title='wounds'] { grid-area: 2 / 4 / 2 / 5;}
+				&[data-i18n-title='modifiers'] { grid-area: 3 / 2 / 3 / 3;}
+				&[data-i18n-title='edge'] { grid-area: 3 / 4 / 3 / 5;}
+			}
+		}
+
+		input[type='checkbox'],
+		input[type='radio'] {
+			@extend %toggleRelative;
+			
+			& + span { font-family: 'pictos'; }
+			
+			&:checked + span {  color: $red; }
+		}
+
+		select {
+			height: 1.8em;
+			padding: 0px;
+		}
+
+		div.sheet-core-info {
+			h2{ margin-right: 1%; }
+
+			input[type='text'], input[type='number'] { 
+				background-color: transparent; 
+				border: none;
+
+				&:placeholder-shown {
+					background-color: $graytrans;
+				}
+			}
+		}
+
+		input.sheet-display-flag { position: absolute; }
+
+		/***** REPEATING CONTAINERS *****/
+
+		div.repitem {
+			input[type='number'] {
+				text-align: center;
+				width: 2.5em;
+			}
+		}
+
+		/***** SKILLS *****/
+		div.sheet-skill-box {
+			button[type='roll'] {
+				font-size: 1em;
+				text-align: left;
+			}
+
+			h2:nth-of-type(1n+2) { text-align: center; }
+
+			label {
+				display       : inline-block;
+				font-size     : 0.8em;
+				text-transform: capitalize;
+
+				&[data-i18n-title='ratingmodifier'] { grid-area: 2 / 3 / 2 / 6; }
+				&[data-i18n-title='specializations'] { grid-area: 3 / 1 / 3 / 6; }
+				&[data-i18n-title='notes'], textarea { grid-area: 4 / 1 / 4 / 6; }
+
+				& > input {
+					@extend %borderBottom;
+					text-align: left;
+					border-radius: 0px;
+					width: 100%;
+				}
+			}
+
+			input[name='attr_skill'] { @extend %borderBottom; }
+
+			div.sheet-row-long {
+				display: inline-grid;
+				grid-column-gap: 1%;
+				grid-row-gap: 2%;
+				grid-template-columns: 1fr 3.5em 5em 5em 1.5em;
+				padding: 1%;
+				width: 100%;
+
+				h3:nth-of-type(1n+2) { text-align: center; }
+			}
+
+			select.sheet-attribute-select {
+				option:nth-of-type(1n+9) { color: #7a2593;	}
+				option:nth-of-type(1n+5) { color: $red; }
+			}
+
+			select.sheet-limit-select  {
+				option:nth-of-type(1n+5) { color: $red; }
+			}
+		}
+	}
+	@import 'src/scss/_pc'; 
+
+/******************************************************************************************/
+/**************************** START OF THE NPC SHEET *************************************/
+/****************************************************************************************/
+	@import 'src/scss/_npc'; 
+
+/**************************************************************************/
+/***************** PC & NPC SHEET SHOW & HIDE SETTINGS *******************/
+/************************************************************************/
+
+/* DISPLAY SETTINGS
+	============================= */
+	@import 'src/scss/_hide'; 
+		
+
+/*****************************************************************************************/
+/**************************************** FOOTER ****************************************/
+/***************************************************************************************/
+	/**** Footer ****/
+	.sheet-footer {
+		border     : none;
+		font-size  : 0.55em;
+		line-height: 15px;
+		margin-top : 15px;
+		text-align : left;
+		width      : 700px;}
+
+	div.sheet-footer div {
+		display: inline-block;
+		width: 90%;
+	}
+
+	div.sheet-footer img {
+		float: right;
+		vertical-align: top;
+		width: 5%;
+	}
+
+/********************************************************************************************************/
+/**************************************** REPEATING SECTIONS *******************************************/
+/********************************************************************************************************/
+	@import 'src/scss/_repeatingsection'; 
+
+/********************************************************************************************************/
+/**************************************** Roll template *******************************************/
+/********************************************************************************************************/
+
+	@import 'src/scss/_rolltemplate';
+
+/********************************************************************************************************/
+/*******************************         Charactermancer        ****************************************/
+/******************************************************************************************************/
+	@import 'src/scss/_importer';
+
+
+/********************************************************************************************************/
+/*******************************         FireFox             *******************************************/
+/******************************************************************************************************/
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;}
+
+input[type=number] {
+    -moz-appearance:textfield;}
+
+
+ /********************************************************************************************/
+/*****************         French Adjustments                ********************************/
+/*******************************************************************************************/
+	@import 'src/scss/_lang-fr';
