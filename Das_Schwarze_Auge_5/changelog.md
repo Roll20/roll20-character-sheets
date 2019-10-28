@@ -1,3 +1,28 @@
+## 1.2.3
+ - 09.10.2018
+
+ ### Fixes
+ - Versionsnummer korrigiert
+ - editierbarer Eigenschaftsbasiswert ist nun auch im NPC Sheet ersichtlich
+
+
+## 1.2.2
+ - 26.09.2018
+
+ ### Features
+ - Zauber & Liturgie Bogen wurde überarbeitet, Infos zum Zauber/Liturgien/magische SF finden sich nun in einem eigenen Tooltip, Angaben wurden aus der Regelwiki kopiert
+ - Anmerkungsfeld für Zauber/Liturgien/magische SF wurden hinzugefügt
+ - Data-i18n Tags für die Übersetung des Charakterbogens in andere Sprachen wurden hinzugefügt, Tags für Subtags im Rolltemplate fehlen noch
+
+ ### Visuelles
+ - Hinweis für Erleichterungswürfe wurde hinzugefügt
+
+## 1.2.1
+ - 14.07.2018
+
+ ### Bugfixes
+ - Durch die Auswahl von Aura verbergen und Flugsalbe wurden bisher beide Sonderfertigkeiten aktiviert, Fehler wurde behoben 
+
 ## 1.2.0
  - 31.07.2018
 

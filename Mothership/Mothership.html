@@ -1,0 +1,1539 @@
+<script type="text/worker">
+    on("change:loadout", () => {
+	getAttrs(['loadoutequipment','loadout'], (v) => {
+		const loadoutSwitch = {
+		                none:'Get an extra 5d10*10 starting credits when you do not choose a loadout.',
+                        excavation:'Crowbar, Hand Welder, Laser Cutter, Body Cam, Bioscanner, Infrared Goggles, Lockpick Set, Vaccsuit (Oxygen Tank, Mag-Boots, Short-range Comms)',
+                        exploration:'Vibechete, Rigging Gun, Flare Gun, First Aid Kit, Vaccsuit (Long-range Comms, Oxygen Tank), Survey Kit, Water Filter, Locator, Rebreather, Binoculars, Flashlight, Camping Gear, MREs x7',
+                        extermination:'SMG, Frag Grenade x6, Standard Battle Dress (Heads-up Display, Body Cam, Short-range Comms), Stimpak x6, Electronic Tool Kit',
+                        examination:'Scalpel, Tranq Pistol, Stun Baton, Hazard Suit, Medscanner, Automed x6, Pain Pills x6, Stimpak x6, Cybernetic Diagnostic Scanner'
+                    },
+                    newValues = {};
+
+                newValues.loadoutequipment = loadoutSwitch[v.loadout];
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+	
+	on("change:class", () => {
+	getAttrs(['class'], (v) => {
+		const sanity = {
+		                teamster:30,
+                        android:20,
+                        scientist:40,
+                        marine:25
+                    },
+				fear = {
+		                teamster:35,
+                        android:85,
+                        scientist:25,
+                        marine:30
+                    },
+				body = {
+		                teamster:30,
+                        android:40,
+                        scientist:25,
+                        marine:35
+                    },
+				armor = {
+		                teamster:35,
+                        android:25,
+                        scientist:30,
+                        marine:40
+                    },
+				strength = {
+		                teamster:5,
+                        android:0,
+                        scientist:0,
+                        marine:0
+                    },
+				speed = {
+		                teamster:5,
+                        android:5,
+                        scientist:0,
+                        marine:0
+                    },
+				intellect = {
+		                teamster:0,
+                        android:5,
+                        scientist:10,
+                        marine:0
+                    },
+				combat = {
+		                teamster:0,
+                        android:0,
+                        scientist:0,
+                        marine:0
+                    },
+				classpanic = {
+		                teamster:"Once per session, a teamster may re-roll a roll on the Panic Effect table",
+                        android:"Fear saves made in the presence of Androids have disadvantage",
+                        scientist:"Whenever a Scientist fails a Sanity save, every friendly player nearby gains 1 stress",
+                        marine:"Whenever a Marine Panics, every friendly player nearby must make a Fear save"
+                    },
+				startingskills = {
+		                teamster:"Zero-G. Mechanical Repair. Pick One: Heavy Machinery or Piloting. +4 pts.",
+                        scientist:"Pick Two: Biology, Agriculture, Geology, Computers, Mathematics, Chemistry. +3 pts.",
+                        android:"Computers, Mathematics, Linguistics. +2 pts.",
+                        marine:"Military Training. +3 pts."
+                    },
+                    newValues = {};
+		
+                newValues.classsanity = sanity[v.class];
+                newValues.classfear = fear[v.class];
+                newValues.classbody = body[v.class];
+                newValues.classarmor= armor[v.class];
+                newValues.classstrength= strength[v.class];
+                newValues.classspeed = speed[v.class];
+                newValues.classintellect = intellect[v.class];
+                newValues.classcombat = combat[v.class];
+				newValues.classpanic=classpanic[v.class];
+				newValues.startingskills=startingskills[v.class];
+	
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+
+    on("change:psychology", () => {
+	const newValues={};
+	getAttrs(['biology','psychology','linguistics'], (v) => {
+		if (v.psychology == 1)
+		{
+			if (v.biology == 0)
+			{
+				newValues.psychology=0;
+			}
+		}
+		if (v.psychology == 0 && v.linguistics == 0)
+		{
+			newValues.sophontology = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+	
+    on("change:genetics", () => {
+	const newValues={};
+	getAttrs(['biology','genetics','pathology','botany'], (v) => {
+		if (v.genetics == 1)
+		{
+			if (v.biology == 0)
+			{
+				newValues.genetics=0;
+			}
+		}
+		if (v.genetics == 0 && v.pathology == 0 && v.botany == 0)
+		{
+			newValues.xenobiology = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+		
+    on("change:pathology", () => {
+	const newValues={};
+	getAttrs(['firstaid','genetics','pathology','botany'], (v) => {
+		if (v.pathology == 1)
+		{
+			if (v.firstaid == 0)
+			{
+				newValues.pathology=0;
+			}
+		}
+		if (v.genetics == 0 && v.pathology == 0 && v.botany == 0)
+		{
+			newValues.xenobiology = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+			
+    on("change:botany", () => {
+	const newValues={};
+	getAttrs(['hydroponics','genetics','pathology','botany'], (v) => {
+		if (v.botany == 1)
+		{
+			if (v.hydroponics == 0)
+			{
+				newValues.botany=0;
+			}
+		}
+		if (v.genetics == 0 && v.pathology == 0 && v.botany == 0)
+		{
+			newValues.xenobiology = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+			
+    on("change:planetology", () => {
+	const newValues={};
+	getAttrs(['geology','planetology'], (v) => {
+		if (v.planetology == 1)
+		{
+			if (v.geology == 0)
+			{
+				newValues.planetology=0;
+			}
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+			
+    on("change:asteroidmining", () => {
+	const newValues={};
+	getAttrs(['geology','zerog','piloting','scavenging','asteroidmining'], (v) => {
+		if (v.asteroidmining == 1)
+		{
+			if (v.geology == 0 && v.zerog == 0 && v.heavymachinery == 0 && v.scavenging == 0)
+			{
+				newValues.asteroidmining=0;
+			}
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });			
+	
+    on("change:juryrigging", () => {
+	const newValues={};
+	getAttrs(['juryrigging','scavenging','mechanicalrepair','cybernetics'], (v) => {
+		if (v.juryrigging == 1)
+		{
+			if (v.scavenging == 0 && v.mechanicalrepair == 0)
+			{
+				newValues.juryrigging=0;
+			}
+		}
+		if (v.juryrigging == 0 && v.engineering == 0)
+		{
+			newValues.cybernetics = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+		
+    on("change:engineering", () => {
+	const newValues={};
+	getAttrs(['engineering','heavymachinery','mechanicalrepair','computers','cybernetics','robotics','artificialintelligence','hacking','juryrigging'], (v) => {
+		if (v.engineering == 1)
+		{
+			if (v.heavymachinery == 0 && v.mechanicalrepair == 0 && v.computers == 0)
+			{
+				newValues.engineering=0;
+			}
+		}
+		if (v.engineering == 0)
+		{
+			newValues.robotics = 0;
+		}
+		if (v.engineering == 0 && v.juryrigging == 0)
+		{
+			newValues.cybernetics = 0;
+		}
+		if (v.engineering == 0 && v.hacking == 0)
+		{
+			newValues.artificialintelligence = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });		
+		
+    on("change:hacking", () => {
+	const newValues={};
+	getAttrs(['hacking','computers','artificialintelligence'], (v) => {
+		if (v.hacking == 1)
+		{
+			if (v.computers == 0)
+			{
+				newValues.hacking=0;
+			}
+		}
+		if (v.hacking== 0 && v.engineering == 0)
+		{
+			newValues.artificialintelligence= 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+	
+    on("change:vehiclespecialization", () => {
+	const newValues={};
+	getAttrs(['vehiclespecialization','driving','mechanicalrepair','piloting','command','tactics'], (v) => {
+		if (v.vehiclespecialization == 1)
+		{
+			if (v.driving == 0 && v.mechanicalrepair == 0 && v.piloting== 0)
+			{
+				newValues.vehiclespecialization=0;
+			}
+		}
+		if (v.vehiclespecialization == 0 && v.tactics == 0)
+		{
+			newValues.command = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+	
+    on("change:astrogation", () => {
+	const newValues={};
+	getAttrs(['astrogation','piloting','hyperspace','phsyics','mysticism'], (v) => {
+		if (v.astrogation == 1)
+		{
+			if (v.piloting == 0)
+			{
+				newValues.astrogation=0;
+			}
+		}
+		if (v.astrogation == 0 && v.physics == 0 && v.mysticism == 0)
+		{
+			newValues.hyperspace = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });		
+	
+    on("change:physics", () => {
+	const newValues={};
+	getAttrs(['astrogation','mathematics','hyperspace','phsyics','mysticism'], (v) => {
+		if (v.physics == 1)
+		{
+			if (v.mathematics == 0)
+			{
+				newValues.physics=0;
+			}
+		}
+		if (v.physics == 0 && v.astrogation == 0 && v.mysticism == 0)
+		{
+			newValues.hyperspace = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+		
+    on("change:mysticism", () => {
+	const newValues={};
+	getAttrs(['astrogation','art','archaeology','theology','xenoesotericism','hyperspace','phsyics','mysticism'], (v) => {
+		if (v.mysticism == 1)
+		{
+			if (v.art == 0  && v.archaeology == 0 && v.theology== 0)
+			{
+				newValues.mysticism=0;
+			}
+		}
+		if (v.mysticism == 0 && v.physics == 0 && v.astrogation == 0)
+		{
+			newValues.hyperspace = 0;
+		}
+		if (v.mysticism == 0)
+		{
+			newValues.xenoesotericism = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+		
+    on("change:tactics", () => {
+	const newValues={};
+	getAttrs(['tactics','militarytraining','command','vehiclespecialization'], (v) => {
+		if (v.tactics == 1)
+		{
+			if (v.militarytraining == 0)
+			{
+				newValues.tactics=0;
+			}
+		}
+		if (v.tactics == 0 && v.vehiclespecialization == 0)
+		{
+			newValues.command = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+			
+    on("change:gunnery", () => {
+	const newValues={};
+	getAttrs(['gunnery','militarytraining','firearms','closequarterscombat','explosives','weaponspecialization'], (v) => {
+		if (v.gunnery == 1)
+		{
+			if (v.militarytraining == 0)
+			{
+				newValues.gunnery=0;
+			}
+		}
+		if (v.gunnery == 0 && v.firearms == 0 && v.closequarterscombat == 0 && v.explosives == 0)
+		{
+			newValues.weaponspecialization = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+	
+				
+    on("change:firearms", () => {
+	const newValues={};
+	getAttrs(['gunnery','militarytraining','rimwise','firearms','closequarterscombat','explosives','weaponspecialization'], (v) => {
+		if (v.firearms == 1)
+		{
+			if (v.militarytraining == 0 && v.rimwise == 0)
+			{
+				newValues.firearms=0;
+			}
+		}
+		if (v.gunnery == 0 && v.firearms == 0 && v.closequarterscombat == 0 && v.explosives == 0)
+		{
+			newValues.weaponspecialization = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+    
+	on("change:closequarterscombat", () => {
+	const newValues={};
+	getAttrs(['gunnery','militarytraining','rimwise','athletics','firearms','closequarterscombat','explosives','weaponspecialization'], (v) => {
+		if (v.closequarterscombat == 1)
+		{
+			if (v.militarytraining == 0 && v.rimwise == 0 && v.athletics == 0)
+			{
+				newValues.closequarterscombat=0;
+			}
+		}
+		if (v.gunnery == 0 && v.firearms == 0 && v.closequarterscombat == 0 && v.explosives == 0)
+		{
+			newValues.weaponspecialization = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+	
+	on("change:explosives", () => {
+	const newValues={};
+	getAttrs(['gunnery','militarytraining','chemistry','closequarterscombat','explosives','weaponspecialization'], (v) => {
+		if (v.explosives == 1)
+		{
+			if (v.militarytraining == 0 && v.chemistry == 0)
+			{
+				newValues.explosives=0;
+			}
+		}
+		if (v.gunnery == 0 && v.firearms == 0 && v.closequarterscombat == 0 && v.explosives == 0)
+		{
+			newValues.weaponspecialization = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+	
+	on("change:weaponspecialization", () => {
+	const newValues={};
+	getAttrs(['gunnery','firearms','closequarterscombat','explosives','weaponspecialization'], (v) => {
+		if (v.gunnery == 0 && v.firearms == 0 && v.closequarterscombat == 0 && v.explosives == 0)
+		{
+			newValues.weaponspecialization = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+	
+	on("change:sophontology", () => {
+	const newValues={};
+	getAttrs(['linguistics','psychology'], (v) => {
+		if (v.linguistics == 0 && v.psychology == 0)
+		{
+			newValues.sophontology = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });		
+	
+	on("change:xenobiology", () => {
+	const newValues={};
+	getAttrs(['genetics','pathology','botany'], (v) => {
+		if (v.genetics == 0 && v.pahtology == 0 && v.botany==0)
+		{
+			newValues.xenobiology = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });		
+	
+	on("change:cybernetics", () => {
+	const newValues={};
+	getAttrs(['juryrigging','engineering'], (v) => {
+		if (v.juryrigging == 0 && v.engineering == 0)
+		{
+			newValues.cybernetics = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });		
+	
+	on("change:robotics", () => {
+	const newValues={};
+	getAttrs(['engineering'], (v) => {
+		if (v.engineering == 0)
+		{
+			newValues.robotics = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+		
+	on("change:artificialintelligence", () => {
+	const newValues={};
+	getAttrs(['hacking','engineering'], (v) => {
+		if (v.hacking== 0 && v.engineering == 0)
+		{
+			newValues.artificialintelligence= 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+		
+	on("change:command", () => {
+	const newValues={};
+	getAttrs(['vehiclespecialization','tactics'], (v) => {
+		if (v.vehiclespecialization == 0 && v.tactics == 0)
+		{
+			newValues.command= 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });			
+	
+	on("change:hyperspace", () => {
+	const newValues={};
+	getAttrs(['astrogation','physics','mysticism'], (v) => {
+		if (v.astrogation== 0 && v.physics == 0 && v.mysticism==0)
+		{
+			newValues.hyperspace= 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });				
+	
+	on("change:xenoesotericism", () => {
+	const newValues={};
+	getAttrs(['mysticism'], (v) => {
+		if (v.mysticism==0)
+		{
+			newValues.xenoesotericism= 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+	
+	on("change:linguistics", () => {
+	const newValues={};
+	getAttrs(['linguistics'], (v) => {
+		if (v.linguistics==0)
+		{
+			newValues.sophontology= 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });		
+	
+	on("change:biology", () => {
+	const newValues={};
+	getAttrs(['biology'], (v) => {
+		if (v.biology==0)
+		{
+			newValues.psychology = 0;
+			newValues.genetics = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+		
+	on("change:firstaid", () => {
+	const newValues={};
+	getAttrs(['firstaid'], (v) => {
+		if (v.firstaid==0)
+		{
+			newValues.pathology = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+		
+	on("change:hydroponics", () => {
+	const newValues={};
+	getAttrs(['hydroponics'], (v) => {
+		if (v.hydroponics==0)
+		{
+			newValues.botany = 0;
+		}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+		
+	on("change:geology", () => {
+	const newValues={};
+	getAttrs(['zerog','geology','scavenging','heavymachinery'], (v) => {
+		if (v.geology==0)
+		{
+			newValues.planetology= 0;
+		}
+			if (v.geology == 0 && v.zerog == 0 && v.heavymachinery == 0 && v.scavenging == 0)
+			{
+				newValues.asteroidmining=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+		
+	on("change:zerog", () => {
+	const newValues={};
+	getAttrs(['zerog','geology','scavenging','heavymachinery'], (v) => {
+		if (v.geology == 0 && v.zerog == 0 && v.heavymachinery == 0 && v.scavenging == 0)
+			{
+				newValues.asteroidmining=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+		
+	on("change:scavenging", () => {
+	const newValues={};
+	getAttrs(['zerog','geology','scavenging','heavymachinery','mechanicalrepair'], (v) => {
+		if (v.geology == 0 && v.zerog == 0 && v.heavymachinery == 0 && v.scavenging == 0)
+			{
+				newValues.asteroidmining=0;
+			}
+		if (v.scavenging == 0 && v.mechanicalrepair == 0)
+			{
+				newValues.juryrigging=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+	
+	on("change:heavymachinery", () => {
+	const newValues={};
+	getAttrs(['zerog','geology','scavenging','heavymachinery','mechanicalrepair','computers'], (v) => {
+		if (v.heavymachinery == 0 && v.mechanicalrepair == 0 && v.computers == 0)
+			{
+				newValues.engineering=0;
+			}
+		if (v.geology == 0 && v.zerog == 0 && v.heavymachinery == 0 && v.scavenging == 0)
+			{
+				newValues.asteroidmining=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+	
+	on("change:computers", () => {
+	const newValues={};
+	getAttrs(['heavymachinery','mechanicalrepair','computers'], (v) => {
+		if (v.heavymachinery == 0 && v.mechanicalrepair == 0 && v.computers == 0)
+			{
+				newValues.engineering=0;
+			}
+			if (v.computers == 0)
+			{
+				newValues.hacking=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });	
+		
+	on("change:mechanicalrepair", () => {
+	const newValues={};
+	getAttrs(['zerog','geology','scavenging','heavymachinery','mechanicalrepair','driving','piloting'], (v) => {
+		if (v.geology == 0 && v.zerog == 0 && v.heavymachinery == 0 && v.scavenging == 0)
+			{
+				newValues.asteroidmining=0;
+			}
+		if (v.driving == 0 && v.mechanicalrepair == 0 && v.piloting== 0)
+			{
+				newValues.vehiclespecialization=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+		
+	on("change:driving", () => {
+	const newValues={};
+	getAttrs(['mechanicalrepair','driving','piloting'], (v) => {
+		if (v.driving == 0 && v.mechanicalrepair == 0 && v.piloting== 0)
+			{
+				newValues.vehiclespecialization=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+		
+	on("change:piloting", () => {
+	const newValues={};
+	getAttrs(['mechanicalrepair','driving','piloting'], (v) => {
+		if (v.driving == 0 && v.mechanicalrepair == 0 && v.piloting== 0)
+			{
+				newValues.vehiclespecialization=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+		
+	on("change:mathematics", () => {
+	const newValues={};
+	getAttrs(['mathematics'], (v) => {
+		if (v.mathematics == 0)
+			{
+				newValues.physics=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+		
+	on("change:art", () => {
+	const newValues={};
+	getAttrs(['art','archaeology','theology'], (v) => {
+		if (v.art == 0  && v.archaeology == 0 && v.theology== 0)
+			{
+				newValues.mysticism=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+		
+	on("change:archaeology", () => {
+	const newValues={};
+	getAttrs(['art','archaeology','theology'], (v) => {
+		if (v.art == 0  && v.archaeology == 0 && v.theology== 0)
+			{
+				newValues.mysticism=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+		
+	on("change:theology", () => {
+	const newValues={};
+	getAttrs(['art','archaeology','theology'], (v) => {
+		if (v.art == 0  && v.archaeology == 0 && v.theology== 0)
+			{
+				newValues.mysticism=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+		
+	on("change:militarytraining", () => {
+	const newValues={};
+	getAttrs(['militarytraining','chemistry','rimwise','athletics'], (v) => {
+		if (v.militarytraining == 0 && v.rimwise == 0)
+			{
+				newValues.firearms=0;
+			}
+		if (v.militarytraining == 0)
+			{
+				newValues.tactics=0;
+			}
+		if (v.militarytraining == 0)
+			{
+				newValues.gunnery=0;
+			}
+		if (v.militarytraining == 0 && v.rimwise == 0 && v.athletics == 0)
+			{
+				newValues.closequarterscombat=0;
+			}
+		if (v.militarytraining == 0 && v.chemistry == 0)
+			{
+				newValues.explosives=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+		
+	on("change:rimwise", () => {
+	const newValues={};
+	getAttrs(['militarytraining','chemistry','rimwise','athletics'], (v) => {
+		if (v.militarytraining == 0 && v.rimwise == 0)
+			{
+				newValues.firearms=0;
+			}
+		if (v.militarytraining == 0 && v.rimwise == 0 && v.athletics == 0)
+			{
+				newValues.closequarterscombat=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+		
+	on("change:athletics", () => {
+	const newValues={};
+	getAttrs(['militarytraining','chemistry','rimwise','athletics'], (v) => {
+		if (v.militarytraining == 0 && v.rimwise == 0 && v.athletics == 0)
+			{
+				newValues.closequarterscombat=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+		
+	on("change:chemistry", () => {
+	const newValues={};
+	getAttrs(['militarytraining','chemistry','rimwise','athletics'], (v) => {
+		if (v.militarytraining == 0 && v.chemistry == 0)
+			{
+				newValues.explosives=0;
+			}
+		log(`newValues: ${JSON.stringify(newValues)}`);//I'd also recommend stringifying your object to log it so that it's easier to read in the console log.
+		setAttrs(newValues);
+        });
+    });
+	
+	
+		
+</script>
+
+
+<div class="sheet-main">
+	<div>
+    <div class="sheet-header">
+    <table>
+		<tr>
+		<td><img src="https://i.imgur.com/Kz1vZHL.png"></img></td>
+			<td>
+				<table style="width: 100%;">
+					<tr>
+						<td><span data-i18n="name">Name</span></td>
+						<td colspan="3"><input type="text" name="attr_character_name"></input></td>
+						<td><span data-i18n="class">Class</span></td>
+						<td>
+							<select name="attr_class">
+								<option value="" data-18n="selectclass" disabled selected>Select a Class</option>
+								<option value="teamster" data-i18n="teamster">TEAMSTER</option>
+								<option value="android" data-i18n="android">ANDROID</option>
+								<option value="scientist" data-i18n="scientist">SCIENTIST</option>
+								<option value="marine" data-i18n="marine">MARINE</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td><span data-i18n="level">Level</span></td>
+						<td><input type="number" name="attr_level"  value=1></input> </td>
+						<td><span data-i18n="xp" >XP</span></td>
+						<td><input type="number" value=0 name="attr_xp"></input></td>
+						<td><span data-i18n="ranktitle">Rank/Title</span></td>
+						<td><input type="text" name="attr_ranktitle"></input></td>
+					</tr>
+					</table>
+				</td>
+		</tr>
+	</table>
+	</div>
+    <hr/>
+    <table class="sheet-otherdata">
+        <tbody>
+            <tr>
+                <td>
+					<span class="sheet-statname" data-i18n="stress">STRESS</span>
+					<input type="number" name="attr_stress" value=2></input>
+                </td>
+				<td>
+					<span class="sheet-statname" data-i18n="resolve">RESOLVE</span>
+					<input type="number"  value=0 name="attr_resolve"></input></td>
+				<td>
+					<button class="sheet-rollbutton sheet-panicbutton" type="roll" name="roll_paniccheck" value="&{template:panic} {{charname=@{character_name}}} {{stressdice=[[2d10]]}} {{currentstress=[[@{stress}]]}}" data-i18n="paniccheck">PANIC CHECK</button>
+					<button class="sheet-rollbutton sheet-panicbutton" type="roll" name="roll_panictable" value="&{template:panictable} {{charname=@{character_name}}} {{currentstress=[[@{stress}]]}} {{panicdice=[[2d10+@{stress}-@{resolve}]]}}" data-i18n="paniceffect">PANIC EFFECT</button>
+                </td>
+                <td><span class="sheet-statname" data-i18n="credits">CREDITS</span>
+                    <input type="number" name="attr_credits"></input>
+                </td>
+                <td>
+					<span class="sheet-statname" data-i18n="currenthealth">HEALTH</span>
+					<input type="number"  value="@(currenthealth_max)" name="attr_currenthealth"></input>/
+                    <input type="number" name="attr_currenthealth_max" value="(@{strength})*2" disabled></input>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+	<input type="hidden" name="attr_classpanic"></input>
+	<div class="sheet-classpanic"><span name="attr_classpanic"></span></div>
+				</td>
+            </tr>
+		<hr/>
+			<table class="sheet-stats">
+				<tbody>
+					<tr>
+						<td colspan="8" class="sheet-sectionheader" data-i18n="stats">STATS</td>
+						<td colspan="1"> </td>
+						<td colspan="4" class="sheet-sectionheader" data-i18n="saves">SAVES</td>
+					</tr>
+					<tr>
+						<td class="sheet-statname"><span data-i18n="strength">STRENGTH</span></td>					
+						<td class="sheet-statsbuttonrow">
+							<input type="number" disabled name="attr_strength" value="@{basestrength}+@{classstrength}+@{levelstrength}"></input>
+						</td>
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_strength" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{strength}+0)/10)]]}} {{statvalueones=[[((@{strength}+0)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-strength=1}} {{skill=Unskilled}}">+0%</button>
+						</td>                                                                                                                                                                                                                                                                                                                                                                 
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_strength" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{strength}+10)/10)]]}} {{statvalueones=[[((@{strength}+10)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-strength=1}} {{skill=Trained}}">+10%</button>
+						</td>                                                                                                                                                                                                                                                                                                                                                                 
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_strength" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{strength}+15)/10)]]}} {{statvalueones=[[((@{strength}+15)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-strength=1}} {{skill=Expert}}">+15%</button>
+						</td>                                                                                                                                                                                                                                                                                                                                                                 
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_strength" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{strength}+20)/10)]]}} {{statvalueones=[[((@{strength}+20)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-strength=1}} {{skill=Master}}">+20%</button>
+						</td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" value="0" name="attr_basestrength"></input>
+							<input type="hidden" value="0" name="attr_classstrength"></input>
+						</td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" value="0" name="attr_levelstrength"></input>
+						</td>
+						<td class="sheet-statsdivider"></td>
+						<td class="sheet-statname"><span data-i18n="sanity">SANITY</span></td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" disabled name="attr_sanity" value="@{classsanity}+@{levelsanity}"></input>
+						</td>
+						<td class="sheet-statsbuttonrow"> <button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_sanity" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{sanity}+0)/10)]]}} {{statvalueones=[[((@{sanity}+0)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{stressdie=[[1d10]]}} {{title-sanity=1}} {{save=1}}">
+						</td>
+						<td class="sheet-statsbuttonrow">
+							<input type="hidden" value="0" name="attr_classsanity"></input>
+							<input type="number" value="0" name="attr_levelsanity"></input>
+						</td>
+					</tr>
+					<tr>
+						<td class="sheet-statname"><span data-i18n="speed">SPEED</span></td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" disabled name="attr_speed" value="@{basespeed}+@{classspeed}+@{levelspeed}"></input>
+						</td>
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_speed" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{speed}+0)/10)]]}} {{statvalueones=[[((@{speed}+0)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-speed=1}} {{skill=Unskilled}}">+0%</button>
+						</td>                                                                                                                                                                                                                                                                                                                                                     
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_speed" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{speed}+10)/10)]]}} {{statvalueones=[[((@{speed}+10)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-speed=1}} {{skill=Trained}}">+10%</button>
+						</td>                                                                                                                                                                                                                                                                                                                                                     
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_speed" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{speed}+15)/10)]]}} {{statvalueones=[[((@{speed}+15)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-speed=1}} {{skill=Expert}}">+15%</button>
+						</td>                                                                                                                                                                                                                                                                                                                                                     
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_speed" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{speed}+20)/10)]]}} {{statvalueones=[[((@{speed}+20)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-speed=1}} {{skill=Master}}">+20%</button>
+						</td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" value="0" name="attr_basespeed"></input>
+							<input type="hidden" value="0"   name="attr_classspeed"></input>
+						</td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" value="0" name="attr_levelspeed"></input>
+						</td>
+						<td class="sheet-statsdivider"></td>
+						<td class="sheet-statname"><span data-i18n="fear">FEAR</span></td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" disabled name="attr_fear" value="@{classfear}+@{levelfear}"></input>
+						</td>
+						<td class="sheet-statsbuttonrow"> <button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_fear" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{fear}+0)/10)]]}} {{statvalueones=[[((@{fear}+0)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{stressdie=[[1d10]]}} {{title-fear=1}} {{save=1}}">
+						</td>
+						<td class="sheet-statsbuttonrow">
+							<input type="hidden" value="0"  name="attr_classfear"></input>
+							<input type="number" value="0" name="attr_levelfear"></input>
+						</td>
+					</tr>
+					<tr>
+						<td class="sheet-statname"><span data-i18n="intellect">INTELLECT</span></td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" disabled name="attr_intellect" value="@{baseintellect}+@{classintellect}+@{levelintellect}"></input>
+						</td>
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_intellect" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{intellect}+0)/10)]]}} {{statvalueones=[[((@{intellect}+0)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-intellect=1}} {{skill=Unskilled}}">+0%</button>
+						</td>                                                                                                                                                                                                                                                                                                                                                                     
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_intellect" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{intellect}+10)/10)]]}} {{statvalueones=[[((@{intellect}+10)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-intellect=1}} {{skill=Trained}}">+10%</button>
+						</td>                                                                                                                                                                                                                                                                                                                                                                     
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_intellect" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{intellect}+15)/10)]]}} {{statvalueones=[[((@{intellect}+15)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-intellect=1}} {{skill=Expert}}">+15%</button>
+						</td>                                                                                                                                                                                                                                                                                                                                                                     
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_intellect" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{intellect}+20)/10)]]}} {{statvalueones=[[((@{intellect}+20)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-intellect=1}} {{skill=Master}}">+20%</button>
+						</td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" value="0" name="attr_baseintellect"></input>
+							<input type="hidden" value="0"   name="attr_classintellect"></input>
+						</td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" value="0" name="attr_levelintellect"></input>
+						</td>
+						<td class="sheet-statsdivider"></td>
+						<td class="sheet-statname"><span data-i18n="body">BODY</span></td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" disabled name="attr_body" value="@{classbody}+@{levelbody}"></input>
+						</td>
+						<td class="sheet-statsbuttonrow"> <button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_body" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{body}+0)/10)]]}} {{statvalueones=[[((@{body}+0)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{stressdie=[[1d10]]}} {{title-body=1}} {{save=1}}">
+						</td>
+						<td class="sheet-statsbuttonrow">
+							<input type="hidden" value="0"   name="attr_classbody"></input>
+							<input type="number" value="0" name="attr_levelbody"></input>
+						</td>
+					</tr>
+					<tr>
+						<td class="sheet-statname"><span data-i18n="combat">COMBAT</span></td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" disabled name="attr_combat" value="@{basecombat}+@{classcombat}+@{levelcombat}"></input>
+						</td>
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_combat" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{combat}+0)/10)]]}} {{statvalueones=[[((@{combat}+0)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-combat=1}} {{skill=Unskilled}}">+0%</button>
+						</td>                                                                                                                                                                                                                                                                                                                                                         
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_combat" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{combat}+10)/10)]]}} {{statvalueones=[[((@{combat}+10)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-combat=1}} {{skill=Trained}}">+10%</button>
+						</td>                                                                                                                                                                                                                                                                                                                                                         
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_combat" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{combat}+15)/10)]]}} {{statvalueones=[[((@{combat}+15)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-combat=1}} {{skill=Expert}}">+15%</button>
+						</td>                                                                                                                                                                                                                                                                                                                                                         
+						<td class="sheet-statsbuttonrow"><button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_combat" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{combat}+20)/10)]]}} {{statvalueones=[[((@{combat}+20)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-combat=1}} {{skill=Master}}">+20%</button>
+						</td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" value="0" name="attr_basecombat"></input>
+							<input type="hidden" value="0"   name="attr_classcombat"></input>
+						</td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" value="0" name="attr_levelcombat"></input>
+						</td>
+						<td class="sheet-statsdivider"></td>
+						<td class="sheet-statname"><span data-i18n="armor">ARMOR</span></td>
+						<td class="sheet-statsbuttonrow">
+							<input type="number" disabled name="attr_armor" value="@{classarmor}+@{levelarmor}"></input>
+						</td>
+						<td class="sheet-statsbuttonrow"> <button class="sheet-rollbutton sheet-actionbutton" type="roll" name="roll_body" value="&{template:mothership} {{charname=@{character_name}}} {{statvaluetens=[[floor((@{armor}+0)/10)]]}} {{statvalueones=[[((@{armor}+0)%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{stressdie=[[1d10]]}} {{title-armor=1}} {{save=1}}">
+						</td>
+						<td class="sheet-statsbuttonrow">
+							<input type="hidden" value="0" name="attr_classarmor"></input>
+							<input type="number" value="0" name="attr_levelarmor"></input>
+						</td>
+					</tr>
+					<tr>
+					<td></td>
+					<td class="sheet-statlabels"><span data-18n="total">TOTAL</span></td>	
+					<td></td>	
+					<td></td>	
+					<td></td>	
+					<td></td>
+					<td class="sheet-statlabels"><span>BASE</span></td>
+					<td class="sheet-statlabels"><span>MOD</span></td>
+					<td class="sheet-statsdivider"></td>
+					<td></td>
+					<td class="sheet-statlabels"><span>TOTAL</span></td>
+					<td></td>	
+					<td class="sheet-statlabels"><span>MOD</span></td>
+					
+					</tr>
+			</tbody>
+			</table>
+    <hr>
+        <div class="sheet-sectionheader" data-i18n="skills">SKILLS</div>
+		<div class="sheet-classpanic">Trained Skills cost 1 point. Expert skills cost 2 points. Master skills cost 3 points. To take an Expert or Master skill you must first take one of its prerequisite skills.</div>
+    <div>
+        <div class="sheet-skilltree">
+                <table class="sheet-skilltreetable">
+                    <thead>
+                        <td colspan=2 class="sheet-skillheader" data-i18n="trained">TRAINED +10%<td>
+						<td colspan=2 class="sheet-skillheader" data-i18n="expert">EXPERT +15%</td>
+                        <td colspan=2 class="sheet-skillheader" data-i18n="master">MASTER +20%</td>		
+                    </thead>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_linguistics"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="linguistics">LINGUISTICS</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_psychology"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="psychology" title="Prerequisite(s): Biology">PSYCHOLOGY</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_sophontology"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="sophontology"  title="Prerequisite(s): Linguistics, Psychology">SOPHONTOLOGY</span></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_biology"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="biology">BIOLOGY</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_genetics"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="genetics"  title="Prerequisite(s): Biology">GENETICS</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_xenobiology"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="xenobiology" title="Prerequisite(s): Genetics, Pathology, Botany">XENOBIOLOGY</span></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_firstaid"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="firstaid">FIRST AID</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_pathology"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="pathology"  title="Prerequisite(s): First Aid">PATHOLOGY</span></td>
+						<td class="sheet-emptyskillrow"></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_hydroponics"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="hydroponics">HYDROPONICS</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_botany"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="botany"  title="Prerequisite(s): Hydroponics">BOTANY</span></td>
+						<td class="sheet-emptyskillrow"></td>
+					</tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_geology"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="geology">GEOLOGY</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_planetology"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="planetology"  title="Prerequisite(s): Geology">PLANETOLOGY</span></td>
+						<td class="sheet-emptyskillrow"></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_zerog"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="zerog">ZERO-G</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_asteroidmining"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="asteroidmining"  title="Prerequisite(s): Geology, Zero-G, Scavenging, Heavy Machinery">ASTEROID MINING</span></td>
+						<td class="sheet-emptyskillrow"></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_scavenging"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="scavenging">SCAVENGING</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_juryrigging"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="juryrigging" title="Prerequisite(s): Scavenging, Mechanical Repair">JURY RIGGING</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_cybernetics"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="cybernetics" title="Prerequisite(s): Jury Rigging, Engineering">CYBERNETICS</span></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_heavymachinery"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="heavymachinery">HEAVY MACHINERY</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_engineering"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="engineering"  title="Prerequisite(s): Heavy Machinery, Computers, Mechanical Repair">ENGINEERING</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_robotics"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="robotics"  title="Prerequisite(s): Engineering">ROBOTICS</span></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_computers"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="computers">COMPUTERS</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_hacking"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="hacking"  title="Prerequisite(s): Computers">HACKING</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_artificialintelligence"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="artificialintelligence" title="Prerequisite(s): Engineering, Hacking">ARTIFICIAL INTELLIGANCE</span></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_mechanicalrepair"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="mechanicalrepair">MECHANICAL REPAIR</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_vehiclespecialization"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="vehiclespecialization"  title="Prerequisite(s): Mechanical Repair, Driving, Piloting">VEHICLE SPECIALIZATION</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_command"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="command" title="Prerequisite(s): Vehicle Specialization, Tactics">COMMAND</span></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_driving"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="driving">DRIVING</span></td>
+						<td class="sheet-emptyskillrow"></td>
+						<td class="sheet-emptyskillrow"></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_piloting"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="piloting">PILOTING</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_astrogation"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="astrogation"  title="Prerequisite(s): Piloting">ASTROGATION</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_hyperspace"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="hyperspace" title="Prerequisite(s): Astrogation">HYPERSPACE</span></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_mathematics"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="mathematics">MATHEMATICS</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_physics"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="physics"  title="Prerequisite(s): Mathematics">PHYSICS</span></td>
+						<td class="sheet-emptyskillrow"></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_art"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="art">ART</span></td>
+						<td class="sheet-emptyskillrow"></td>
+						<td class="sheet-emptyskillrow"></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_archaeology"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="archaeology">ARCHAEOLOGY</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_mysticism"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="mysticism"  title="Prerequisite(s): Art, Archaeology, Theology">MYSTICISM</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_xenoesotericism"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="xenoesotericism"  title="Prerequisite(s): Mysticism">XENOESOTERICISM</span></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_theology"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="theology">THEOLOGY</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_tactics"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="tactics"  title="Prerequisite(s): Military Training">TACTICS</span></td>
+   						<td class="sheet-emptyskillrow"></td>
+                </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_militarytraining"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="militarytraining">MILITARY TRAINING</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_gunnery"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="gunnery" title="Prerequisite(s): Military Training">GUNNERY</span></td>
+						<td class="sheet-emptyskillrow"></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_rimwise"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="rimwise">RIMWISE</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_firearms"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="firearms"  title="Prerequisite(s): Military Training, Rimwise">FIREARMS</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_weaponspecialization"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="weaponspecialization" title="Prerequisite(s): Gunnery, Firearms, Close-Quarters Combat, Explosives">WEAPON SPECIALIZATION</span></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_athletics"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="athletics">ATHLETICS</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_closequarterscombat"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="closequarterscombat" title="Prerequisite(s): Military Training, Rimwise, Athletics">CLOSE-QUARTERS COMBAT</span></td>
+						<td class="sheet-emptyskillrow"></td>
+                    </tr>
+                    <tr class="sheet-skilltreerow">
+                        <td>
+                            <input type="checkbox" value="1" name="attr_chemistry"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="chemistry">CHEMISTRY</span></td>
+                        <td>
+                            <input type="checkbox" value="1" name="attr_explosives"></input>
+                        </td>
+                        <td><span class="sheet-skill" data-i18n="explosives"  title="Prerequisite(s): Military Training, Chemistry">EXPLOSIVES</span></td>
+						<td class="sheet-emptyskillrow"></td>
+                    </tr>
+                </table>
+			</div>
+        </div>
+    </div>
+	<br>
+	<br>
+	<div><b>Class Starting Skills: </b>
+		<input type="hidden" name="attr_startingskills"></input>
+		<span name="attr_startingskills"></span>
+	</div>
+    <hr/>
+    <div>
+        <div class="sheet-sectionheader" data-i18n="equipment">EQUIPMENT</div>
+        <div class="sheet-loadoutselector">
+                        <select name="attr_loadout">
+                            <option value="none" data-i18n="noloadout">NO LOADOUT SELECTED</option>
+							<option value="excavation" data-i18n="excavation">EXCAVATION</option>
+                            <option value="exploration" data-i18n="exploration">exploration</option>
+                            <option value="extermination" data-i18n="extermination">EXTERMINATION</option>
+                            <option value="examination" data-i18n="examination">EXAMINATION</option>
+                        </select>   
+			<br>						
+            <span class="sheet-classpanic" name="attr_loadoutequipment"></span>
+		</div>
+			<br>
+            <h4 data-i18n="other-equipment">Other Equipment</h4>
+            <textarea name="attr_equipment"></textarea>
+            <br>
+        </div>
+    </div>
+</div>
+</div>
+
+<rolltemplate class="sheet-rolltemplate-mothership">
+	<div>
+	<div class="sheet-roll-type">
+	{{skill}} 
+			{{#title-strength}}Strength Check{{/title-strength}}
+			{{#title-speed}}Speed Check{{/title-speed}}
+			{{#title-intellect}}Intellect Check{{/title-intellect}}
+			{{#title-combat}}Combat Check{{/title-combat}}
+			{{#title-sanity}}Sanity Save{{/title-sanity}}
+			{{#title-fear}}Fear Save{{/title-fear}}
+			{{#title-body}}Body Save{{/title-body}}
+			{{#title-armor}}Armor Save{{/title-armor}}
+	</div>
+	<div class="sheet-roll-container">
+		<div class="sheet-roll-leftcol">
+			<div class="sheet-roll-result">
+				{{tensdie}}{{onesdie}}
+			</div>	
+			<div class="sheet-roll-subheader" data-i18n="rollvalue">
+				Roll Value 
+			</div>
+		</div>
+		<div class="sheet-roll-rightcol">
+			<div class="sheet-roll-result">
+				{{statvaluetens}}{{statvalueones}}
+			</div>
+			<div class="sheet-roll-subheader" data-i18n="targetvalue">	
+				Target Value
+			</div>
+		</div>
+		<div class="sheet-roll-clear"></div>
+	</div>
+	<div class="sheet-roll-result">
+		{{#rollTotal() tensdie onesdie}}CRITICAL{{/rollTotal() tensdie onesdie}}
+		{{#rollLess() tensdie statvaluetens}}SUCCESS{{/rollLess() tensdie statvaluetens}}
+		{{#rollTotal() tensdie statvaluetens}}{{#rollTotal() onesdie statvalueones}}SUCCESS{{/rollTotal() onesdie statvalueones}}{{/rollTotal() tensdie statvaluetens}}
+		{{#rollTotal() tensdie statvaluetens}}{{#rollLess() onesdie statvalueones}}SUCCESS{{/rollLess() onesdie statvalueones}}{{/rollTotal() tensdie statvaluetens}}
+		{{#rollTotal() tensdie statvaluetens}}{{#rollGreater() onesdie statvalueones}}FAILURE{{/rollGreater() onesdie statvalueones}}{{/rollTotal() tensdie statvaluetens}}
+		{{#rollGreater() tensdie statvaluetens}}FAILURE{{/rollGreater() tensdie statvaluetens}}
+	</div>
+	{{#save}}{{#rollTotal() tensdie statvaluetens}}
+	{{#rollGreater() onesdie statvalueones}}
+	<div class="sheet-roll-row">
+	Gain 1 stress.
+	</div>
+	{{/rollGreater() onesdie statvalueones}}
+	{{/rollTotal() tensdie statvaluetens}}{{/save}}
+	
+	{{#save}}{{#rollGreater() tensdie statvaluetens}}
+	<div class="sheet-roll-row">
+	Gain 1 stress.
+	</div>
+	{{/rollGreater() tensdie statvaluetens}}{{/save}}
+	</div>
+	<div class="sheet-roll-charname">
+		{{charname}}
+	</div>
+	</div>
+</div>
+</rolltemplate>	
+
+
+
+<rolltemplate class="sheet-rolltemplate-panic">
+<div class="sheet-roll-panic">
+	<div class="sheet-roll-type">
+	Panic Check
+	</div>
+		<div class="sheet-roll-container">
+		<div class="sheet-roll-leftcol">
+			<div class="sheet-roll-result">
+				{{stressdice}}
+			</div>	
+			<div class="sheet-roll-subheader" data-i18n="rollvalue">
+				Roll Value 
+			</div>
+		</div>
+		<div class="sheet-roll-rightcol">
+			<div class="sheet-roll-result">
+				{{currentstress}}
+			</div>
+			<div class="sheet-roll-subheader" data-i18n="currentstress">	
+				Current Stress
+			</div>
+		</div>
+		<div class="sheet-roll-clear"></div>
+	</div>
+	<div class="sheet-roll-result">
+	{{#rollLess() stressdice currentstress}}FAILURE</div><div class="sheet-roll-row" data-i18n="rollpanic">Roll on Panic Table.{{/rollLess() stressdice currentstress}}
+	{{#rollTotal() stressdice currentstress}}FAILURE</div><div class="sheet-roll-row" data-i18n="rollpanic">Roll on Panic Table.{{/rollTotal() stressdice currentstress}}
+	{{#rollGreater() stressdice currentstress}}SUCCESS</div><div class="sheet-roll-row" data-i18n="stressrelief">Relieve one stress.{{/rollGreater() stressdice currentstress}}
+	</div>
+	<div class="sheet-roll-charname">
+		{{charname}}
+	</div>
+</div>
+</rolltemplate>		
+
+
+<rolltemplate class="sheet-rolltemplate-panictable">
+<div class="sheet-roll-panic">
+	<div class="sheet-roll-type">
+	Panic Table
+	</div>
+		<div class="sheet-roll-result">
+			{{panicdice}}
+		</div>
+		<div class="sheet-roll-subheader" data-i18n="rollvalue">
+			Roll Value 
+		</div>
+	{{#rollLess() panicdice 2}}
+		<div class="sheet-roll-result" data-i18n="noeffect">No effect</div>
+		<div class="sheet-roll-row" data-i18n="noeffecttext">{{charname}} did not panic.</div>
+	{{/rollLess() panicdice 2}}
+	{{#rollGreater() panicdice 1}}{{#rollLess() panicdice 4}}
+		<div class="sheet-roll-result" data-i18n="laserfocus">Laser Focus</div>
+		<div class="sheet-roll-row" data-i18n="laserfocustext">Advantage on all rolls for the next 1d10 hours.</div>
+	{{/rollLess() panicdice 4}}{{/rollGreater() panicdice 1}}
+	{{#rollGreater() panicdice 3}}{{#rollLess() panicdice 6}}
+		<div class="sheet-roll-result" data-i18n="majadr">Major Adrenaline Rush</div>
+		<div class="sheet-roll-row" data-i18n="majadrtext">Advantage on all rolls for the next 3d10 minutes.</div>
+	{{/rollLess() panicdice 6}}{{/rollGreater() panicdice 3}}
+	{{#rollGreater() panicdice 5}}{{#rollLess() panicdice 8}}
+		<div class="sheet-roll-result" data-i18n="minadr">Minor Adrenaline Rush</div>
+		<div class="sheet-roll-row" data-i18n="minadrtext">Advantage on all rolls for the next 1d10 minutes.</div>
+	{{/rollLess() panicdice 8}}{{/rollGreater() panicdice 5}}
+	{{#rollGreater() panicdice 7}}{{#rollLess() panicdice 10}}
+		<div class="sheet-roll-result" data-i18n="anxious">Anxious</div>
+		<div class="sheet-roll-row" data-i18n="anxioustext">Gain 1 stress.</div>
+	{{/rollLess() panicdice 10}}{{/rollGreater() panicdice 7}}
+	{{#rollGreater() panicdice 9}}{{#rollLess() panicdice 12}}
+		<div class="sheet-roll-result" data-i18n="nervoustwitch">Nervous Twitch</div>
+		<div class="sheet-roll-row" data-i18n="nervoustwitchtext">Gain 2 stress. The nearest crew member also gains 1 Stress</div>
+	{{/rollLess() panicdice 12}}{{/rollGreater() panicdice 9}}
+	{{#rollGreater() panicdice 11}}{{#rollLess() panicdice 14}}
+		<div class="sheet-roll-result" data-i18n="cowardice">Cowardice</div>
+		<div class="sheet-roll-row" data-i18n="cowardicetext">Gain 1 stress. For the next 1d10 hours, you must make a Fear save to engage in combat or else flee.</div>
+	{{/rollLess() panicdice 14}}{{/rollGreater() panicdice 11}}
+	{{#rollGreater() panicdice 13}}{{#rollLess() panicdice 16}}
+		<div class="sheet-roll-result" data-i18n="hallucinations">Hallucinations</div>
+		<div class="sheet-roll-row" data-i18n="hallucinationstext">For the next 2d10 hours (determined secretly), you have trouble distinguishing between reality and fantasy.</div>
+	{{/rollLess() panicdice 16}}{{/rollGreater() panicdice 13}}
+	{{#rollGreater() panicdice 15}}{{#rollLess() panicdice 18}}
+		<div class="sheet-roll-result" data-i18n="cripplingfear">Crippling Fear</div>
+		<div class="sheet-roll-row" data-i18n="cripplingfeartext">Gain a new permanent phobia. Whenever you encounter this phobia make a Fear save at Disadvantage or gain 1d10 stress.</div>
+	{{/rollLess() panicdice 18}}{{/rollGreater() panicdice 15}}
+	{{#rollGreater() panicdice 17}}{{#rollLess() panicdice 20}}
+		<div class="sheet-roll-result" data-i18n="overwhelmed">Overwhelmed</div>
+		<div class="sheet-roll-row" data-i18n="overwhelmedtext">Gain 1d10 stress.</div>
+	{{/rollLess() panicdice 20}}{{/rollGreater() panicdice 17}}
+	{{#rollGreater() panicdice 19}}{{#rollLess() panicdice 22}}
+		<div class="sheet-roll-result" data-i18n="rattled">Rattled</div>
+		<div class="sheet-roll-row" data-i18n="rattledtext">Let out a blood-curdling scream. Disadvantage on all rolls for 2d10 minutes.</div>
+	{{/rollLess() panicdice 22}}{{/rollGreater() panicdice 19}}
+	{{#rollTotal() panicdice 22}}
+		<div class="sheet-roll-result" data-i18n="paranoid">Paranoid</div>
+		<div class="sheet-roll-row" data-i18n="paranoidtext">For the next 1d10 days, whenever a character joins your group (even if they only left for a short period of time), make a Fear save or gain 1 stress.</div>	
+	{{/rollTotal() panicdice 22}}
+	{{#rollTotal() panicdice 23}}
+		<div class="sheet-roll-result" data-i18n="deathdrive">Death Drive</div>
+		<div class="sheet-roll-row" data-i18n="deathdrivetext">For the next Xd10 (where X=Stress) days whenever you encounter a stranger or known enemy, you must make a Sanity save or else immediately attack them.</div>	
+	{{/rollTotal() panicdice 23}}
+	{{#rollTotal() panicdice 24}}
+		<div class="sheet-roll-result" data-i18n="catatonic">Catatonic</div>
+		<div class="sheet-roll-row" data-i18n="catatonictext">Become unresponsive and unmoving for Xd10 (where X=Stress) minutes.</div>	
+	{{/rollTotal() panicdice 24}}
+	{{#rollTotal() panicdice 25}}
+		<div class="sheet-roll-result" data-i18n="broken">Broken</div>
+		<div class="sheet-roll-row" data-i18n="brokentext">For the next Xd10 (where X=Stress) days make a Panic roll whenever a nearby crew member fails a save.</div>	
+	{{/rollTotal() panicdice 25}}
+	{{#rollTotal() panicdice 26}}
+		<div class="sheet-roll-result" data-i18n="psychotic">Psychotic</div>
+		<div class="sheet-roll-row" data-i18n="psychotictext">Immediately attack the closest crew member until you do at least 2d10 damage. If there is no crew member nearby, you attack the environment.</div>	
+	{{/rollTotal() panicdice 26}}
+	{{#rollTotal() panicdice 27}}
+		<div class="sheet-roll-result" data-i18n="compounding">Compounding Problems</div>
+		<div class="sheet-roll-row" data-i18n="compoundingtext">Roll for two more panic effects.</div>	
+	{{/rollTotal() panicdice 27}}
+	{{#rollTotal() panicdice 28}}
+		<div class="sheet-roll-result" data-i18n="descent">Descent into Madness</div>
+		<div class="sheet-roll-row" data-i18n="descenttext">Gain 2 new phobias. Your Stress cannot be relieved below 5.</div>	
+	{{/rollTotal() panicdice 28}}
+	{{#rollTotal() panicdice 29}}
+		<div class="sheet-roll-result" data-i18n="pyschologicalcollapse">Psychological Collapse</div>
+		<div class="sheet-roll-row" data-i18n="pyschologicalcollapsetext">You become permanently, irreparably insane. Your character is now played by the Warden.</div>	
+	{{/rollTotal() panicdice 29}}
+	{{#rollGreater() panicdice 29}}
+		<div class="sheet-roll-result" data-i18n="heartattack">Heart Attack</div>
+		<div class="sheet-roll-row" data-i18n="heartattacktext">Instant death.</div>	
+	{{/rollGreater() panicdice 29}}
+	<div class="sheet-roll-charname">
+		{{charname}}
+	</div>
+</div>
+</rolltemplate>		
+

@@ -179,6 +179,21 @@
 				</tr>
 			</table>
 		</div>
+		<h4 class="section-head">魔法值</h4>
+		<div class="section">
+			<table style="width:100%">
+				<tr>
+					<td>
+						<input class="secondary-attr-input" placeholder="當前" type="text" min="0" name="attr_mp">
+					</td>
+					<td style="text-align: center">/</td>
+					<td>
+						<input class="secondary-attr-input" placeholder="最大" type="number" min="0" name="attr_mp_max"
+							value="floor(@{pow}/5)" disabled="true">
+					</td>
+				</tr>
+			</table>
+		</div>
 		<h4 class="section-head">幸運</h4>
 		<div class="section">
 			<table style="width:100%">
@@ -233,20 +248,20 @@
 						<input class="secondary-attr-input"  placeholder="當前" type="text" min="0" name="attr_san">
 					</td>
 					<td>
-						<button class='old-roll' type='roll' value='@{roll_display}&{template:coc} {{ima_coc=@{ima_coc_san}}} {{name=San值檢定}} {{success=[[@{san}]]}} {{hard=[[floor(@{san}/2)]]}} {{extreme=[[floor(@{san}/5)]]}} {{roll1=[[1d100]]}} {{roll2=[[1d100]]}} {{roll3=[[1d100]]}}' name='roll_san_check' />
-						<button class='new-roll' type='roll' value='@{roll_display}&{template:coc-1}{{ima_coc1=@{ima_coc1_san}}}{{ima_coc1_fum=@{ima_coc1_san_fum}}}{{ima_coc1_fail=@{ima_coc1_san_fail}}}{{ima_coc1_succ=@{ima_coc1_san_succ}}}{{ima_coc1_hard=@{ima_coc1_san_hard}}}{{ima_coc1_ext=@{ima_coc1_san_ext}}}{{ima_coc1_crit=@{ima_coc1_san_crit}}}  {{name=San值檢定}} {{success=[[@{san}]]}} {{hard=[[floor(@{san}/2)]]}} {{extreme=[[floor(@{san}/5)]]}} {{roll1=[[1d100]]}}' name='roll_san_check' />
+						<button class='old-roll' type='roll' value='@{roll_display}&{template:coc} {{ima_coc=@{ima_coc_san}}} {{name=San值檢定}} {{success=[[@{san}]]}} {{hard=[[floor(@{san}/2)]]}} {{extreme=[[floor(@{san}/5)]]}} {{roll1=[[1d100]]}} {{roll2=[[1d100]]}} {{roll3=[[1d100]]}}{{san_when_insane=[[@{san_when_insane}]]}}' name='roll_san_check' />
+						<button class='new-roll' type='roll' value='@{roll_display}&{template:coc-1}{{ima_coc1=@{ima_coc1_san}}}{{ima_coc1_fum=@{ima_coc1_san_fum}}}{{ima_coc1_fail=@{ima_coc1_san_fail}}}{{ima_coc1_succ=@{ima_coc1_san_succ}}}{{ima_coc1_hard=@{ima_coc1_san_hard}}}{{ima_coc1_ext=@{ima_coc1_san_ext}}}{{ima_coc1_crit=@{ima_coc1_san_crit}}}  {{name=San值檢定}} {{success=[[@{san}]]}} {{hard=[[floor(@{san}/2)]]}} {{extreme=[[floor(@{san}/5)]]}} {{roll1=[[1d100]]}}{{san_when_insane=[[@{san_when_insane}]]}}' name='roll_san_check' />
 					</td>
 					<td style="text-align: center">/</td>
 					<td colspan="4">
-						<input class="secondary-attr-input"  placeholder="初始" type="text" min="0" name="attr_san_start">
-						<input class="secondary-attr-input" type="number" min="0"  name="attr_san_when_insane" placeholder="不定性瘋狂值" value="@{san_start}-floor(@{san_start}/5)" disabled="true">
+						<input class="secondary-attr-input"  title="每天SAN初始值" placeholder="初始" type="text" min="0" name="attr_san_start" value="0">
+						<input class="secondary-attr-input" type="number" min="0"  name="attr_san_when_insane" placeholder="不定性瘋狂值" title="不定性瘋狂值 - 一天內喪失SAN值到達此數則瘋狂" value="@{san_start}-floor(@{san_start}/5)" disabled="true">
 					</td>
 					<td style="text-align: center">/</td>
 					<td colspan="2">
-					<input class="secondary-attr-input" type="number" min="0" name="attr_san_max"  placeholder="最大" value="99-@{cthulhu_mythos}" disabled="true">
+					<input class="secondary-attr-input" type="number" min="0" name="attr_san_max"  placeholder="最大" value="99-@{cthulhu_mythos}" title="SAN值上限" disabled="true">
 					</td>
 				</tr>
-				<tr>
+				<tr style="height: 40PX">
 					<td colspan="5">
 					<input type="checkbox" value="1" name="attr_temp_insane"><span>臨時性瘋狂</span>
 					</td>
@@ -254,23 +269,41 @@
 					<input type="checkbox" value="1" name="attr_indef_insane"><span>不定性瘋狂</span>
 					</td>
 				</tr>
+				
 			</table>
+			
 		</div>
-		<h4 class="section-head">魔法值</h4>
+		<!-- 狂氣發作 -->
+		<h4 class="section-head">狂氣發作</h4>
 		<div class="section">
 			<table style="width:100%">
-				<tr>
-					<td>
-						<input class="secondary-attr-input"  placeholder="當前" type="text" min="0" name="attr_mp">
-					</td>
-					<td style="text-align: center">/</td>
-					<td>
-						<input class="secondary-attr-input"  placeholder="最大" type="number" min="0" name="attr_mp_max" value="floor(@{pow}/5)" disabled="true">
-					</td>
-				</tr>
+		
+				<div class="sheet-row" style="width:100%;text-align:left">
+					<div class="sheet-col" style="width:20%">
+						<button class='old-roll' type='roll'
+							value='&{template:coc-bomadness-rt} {{roll1=[[1D10]]}} {{rounds=[[1d10]]}}{{d100s=[[1d100]]}}'
+							name='roll_bomadness-20-rt' />
+					</div>
+					<div class="sheet-col" style="width:45%;margin-bottom:8px">
+						<span >即時型</span>
+					</div>
+				</div>
+				<div class="sheet-row" style="width:100%;text-align:left">
+					<div class="sheet-col" style="width:20%">
+						<button class='new-roll' type='roll' value='&{template:coc-bomadness-summ} {{roll1=[[1D10]]}}{{rounds=[[1d10]]}}{{d100s=[[1d100]]}}'
+							name='roll_bomadness-20-summ' />
+					</div>
+					<div class="sheet-col" style="width:45%">
+						<span>總結型</span>
+					</div>
+				</div>
+		
 			</table>
+		
 		</div>
+
 	</div>
+	
 </div>
 	<!-- Stuff on the tab -->
 	</div>
@@ -501,18 +534,18 @@
 					<td colspan="3" align="center">[職業興趣技能]</td>
 				</tr>
 				<tr>
-					<td><input type="checkbox" name="attr_compute_use_checkbox"></td>
-					<td class="skill-label">電腦使用(5%)</td>
-					<td><input class="skill-input" type="text" name="attr_compute_use" value="5"/></td>
-					<td><button class='old-roll' type='roll' value='@{roll_display}&{template:coc} {{ima_coc=@{ima_coc}}} {{name=電腦使用檢定}} {{success=[[@{compute_use}]]}} {{hard=[[floor(@{compute_use}/2)]]}} {{extreme=[[floor(@{compute_use}/5)]]}} {{roll1=[[1d100]]}} {{roll2=[[1d100]]}} {{roll3=[[1d100]]}}' name='roll_mech_repair_check' /></td>
-					<td><button class='new-roll' type='roll' value='@{roll_display}&{template:coc-1}{{ima_coc1=@{ima_coc1}}}{{ima_coc1_fum=@{ima_coc1_fum}}}{{ima_coc1_fail=@{ima_coc1_fail}}}{{ima_coc1_succ=@{ima_coc1_succ}}}{{ima_coc1_hard=@{ima_coc1_hard}}}{{ima_coc1_ext=@{ima_coc1_ext}}}{{ima_coc1_crit=@{ima_coc1_crit}}}  {{name=電腦使用檢定}} {{success=[[@{compute_use}]]}} {{hard=[[floor(@{compute_use}/2)]]}} {{extreme=[[floor(@{compute_use}/5)]]}} {{roll1=[[1d100]]}}' name='roll_acting_check' /></td>
-				</tr>
-				<tr>
 					<td><input type="checkbox" name="attr_acting_checkbox"></td>
 					<td class="skill-label">表演(5%)</td>
 					<td><input class="skill-input" type="text" name="attr_acting" value="5"/></td>
 					<td><button class='old-roll' type='roll' value='@{roll_display}&{template:coc} {{ima_coc=@{ima_coc}}} {{name=表演檢定}} {{success=[[@{acting}]]}} {{hard=[[floor(@{acting}/2)]]}} {{extreme=[[floor(@{acting}/5)]]}} {{roll1=[[1d100]]}} {{roll2=[[1d100]]}} {{roll3=[[1d100]]}}' name='roll_mech_repair_check' /></td>
 					<td><button class='new-roll' type='roll' value='@{roll_display}&{template:coc-1}{{ima_coc1=@{ima_coc1}}}{{ima_coc1_fum=@{ima_coc1_fum}}}{{ima_coc1_fail=@{ima_coc1_fail}}}{{ima_coc1_succ=@{ima_coc1_succ}}}{{ima_coc1_hard=@{ima_coc1_hard}}}{{ima_coc1_ext=@{ima_coc1_ext}}}{{ima_coc1_crit=@{ima_coc1_crit}}}  {{name=表演檢定}} {{success=[[@{acting}]]}} {{hard=[[floor(@{acting}/2)]]}} {{extreme=[[floor(@{acting}/5)]]}} {{roll1=[[1d100]]}}' name='roll_acting_check' /></td>
+				</tr>
+				<tr>
+					<td><input type="checkbox" name="attr_op_hv_machine_checkbox"></td>
+					<td class="skill-label">重機械操作(01%)</td>
+					<td><input class="skill-input" type="text" name="attr_op_hv_machine" value="1"/></td>
+					<td><button class='old-roll' type='roll' value='@{roll_display}&{template:coc} {{ima_coc=@{ima_coc}}} {{name=重機械操作檢定}} {{success=[[@{op_hv_machine}]]}} {{hard=[[floor(@{op_hv_machine}/2)]]}} {{extreme=[[floor(@{op_hv_machine}/5)]]}} {{roll1=[[1d100]]}} {{roll2=[[1d100]]}} {{roll3=[[1d100]]}}' name='roll_op_hv_machine_check' /></td>
+					<td><button class='new-roll' type='roll' value='@{roll_display}&{template:coc-1}{{ima_coc1=@{ima_coc1}}}{{ima_coc1_fum=@{ima_coc1_fum}}}{{ima_coc1_fail=@{ima_coc1_fail}}}{{ima_coc1_succ=@{ima_coc1_succ}}}{{ima_coc1_hard=@{ima_coc1_hard}}}{{ima_coc1_ext=@{ima_coc1_ext}}}{{ima_coc1_crit=@{ima_coc1_crit}}}  {{name=重機械操作檢定}} {{success=[[@{op_hv_machine}]]}} {{hard=[[floor(@{op_hv_machine}/2)]]}} {{extreme=[[floor(@{op_hv_machine}/5)]]}} {{roll1=[[1d100]]}}' name='roll_op_hv_machine_check' /></td>
 				</tr>
 				<tr>
 					<td><input type="checkbox" name="attr_mech_repair_checkbox"></td>
@@ -529,12 +562,13 @@
 					<td><button class='new-roll' type='roll' value='@{roll_display}&{template:coc-1}{{ima_coc1=@{ima_coc1}}}{{ima_coc1_fum=@{ima_coc1_fum}}}{{ima_coc1_fail=@{ima_coc1_fail}}}{{ima_coc1_succ=@{ima_coc1_succ}}}{{ima_coc1_hard=@{ima_coc1_hard}}}{{ima_coc1_ext=@{ima_coc1_ext}}}{{ima_coc1_crit=@{ima_coc1_crit}}}  {{name=電器維修檢定}} {{success=[[@{elec_repair}]]}} {{hard=[[floor(@{elec_repair}/2)]]}} {{extreme=[[floor(@{elec_repair}/5)]]}} {{roll1=[[1d100]]}}' name='roll_elec_repair_check' /></td>
 				</tr>
 				<tr>
-					<td><input type="checkbox" name="attr_op_hv_machine_checkbox"></td>
-					<td class="skill-label">重機械操作(01%)</td>
-					<td><input class="skill-input" type="text" name="attr_op_hv_machine" value="1"/></td>
-					<td><button class='old-roll' type='roll' value='@{roll_display}&{template:coc} {{ima_coc=@{ima_coc}}} {{name=重機械操作檢定}} {{success=[[@{op_hv_machine}]]}} {{hard=[[floor(@{op_hv_machine}/2)]]}} {{extreme=[[floor(@{op_hv_machine}/5)]]}} {{roll1=[[1d100]]}} {{roll2=[[1d100]]}} {{roll3=[[1d100]]}}' name='roll_op_hv_machine_check' /></td>
-					<td><button class='new-roll' type='roll' value='@{roll_display}&{template:coc-1}{{ima_coc1=@{ima_coc1}}}{{ima_coc1_fum=@{ima_coc1_fum}}}{{ima_coc1_fail=@{ima_coc1_fail}}}{{ima_coc1_succ=@{ima_coc1_succ}}}{{ima_coc1_hard=@{ima_coc1_hard}}}{{ima_coc1_ext=@{ima_coc1_ext}}}{{ima_coc1_crit=@{ima_coc1_crit}}}  {{name=重機械操作檢定}} {{success=[[@{op_hv_machine}]]}} {{hard=[[floor(@{op_hv_machine}/2)]]}} {{extreme=[[floor(@{op_hv_machine}/5)]]}} {{roll1=[[1d100]]}}' name='roll_op_hv_machine_check' /></td>
+					<td><input type="checkbox" name="attr_compute_use_checkbox"></td>
+					<td class="skill-label">電腦使用(5%)</td>
+					<td><input class="skill-input" type="text" name="attr_compute_use" value="5"/></td>
+					<td><button class='old-roll' type='roll' value='@{roll_display}&{template:coc} {{ima_coc=@{ima_coc}}} {{name=電腦使用檢定}} {{success=[[@{compute_use}]]}} {{hard=[[floor(@{compute_use}/2)]]}} {{extreme=[[floor(@{compute_use}/5)]]}} {{roll1=[[1d100]]}} {{roll2=[[1d100]]}} {{roll3=[[1d100]]}}' name='roll_mech_repair_check' /></td>
+					<td><button class='new-roll' type='roll' value='@{roll_display}&{template:coc-1}{{ima_coc1=@{ima_coc1}}}{{ima_coc1_fum=@{ima_coc1_fum}}}{{ima_coc1_fail=@{ima_coc1_fail}}}{{ima_coc1_succ=@{ima_coc1_succ}}}{{ima_coc1_hard=@{ima_coc1_hard}}}{{ima_coc1_ext=@{ima_coc1_ext}}}{{ima_coc1_crit=@{ima_coc1_crit}}}  {{name=電腦使用檢定}} {{success=[[@{compute_use}]]}} {{hard=[[floor(@{compute_use}/2)]]}} {{extreme=[[floor(@{compute_use}/5)]]}} {{roll1=[[1d100]]}}' name='roll_acting_check' /></td>
 				</tr>
+				
 				<tr>
 					<td colspan="3" align="center">[調查類技能]</td>
 				</tr>	
@@ -575,7 +609,14 @@
 				</tr>
 				<tr>
 					<td colspan="3" align="center">[醫療類技能]</td>
-				</tr>   
+				</tr>  
+				<tr>
+					<td><input type="checkbox" name="attr_psychoanalysis_checkbox"></td>
+					<td class="skill-label">精神分析(01%)</td>
+					<td><input class="skill-input" type="text" name="attr_psychoanalysis" value="1"/></td>
+					<td><button class='old-roll' type='roll' value='@{roll_display}&{template:coc} {{ima_coc=@{ima_coc}}} {{name=精神分析檢定}} {{success=[[@{psychoanalysis}]]}} {{hard=[[floor(@{psychoanalysis}/2)]]}} {{extreme=[[floor(@{psychoanalysis}/5)]]}} {{roll1=[[1d100]]}} {{roll2=[[1d100]]}} {{roll3=[[1d100]]}}' name='roll_psychoanalysis_check' /></td>
+					<td><button class='new-roll' type='roll' value='@{roll_display}&{template:coc-1}{{ima_coc1=@{ima_coc1}}}{{ima_coc1_fum=@{ima_coc1_fum}}}{{ima_coc1_fail=@{ima_coc1_fail}}}{{ima_coc1_succ=@{ima_coc1_succ}}}{{ima_coc1_hard=@{ima_coc1_hard}}}{{ima_coc1_ext=@{ima_coc1_ext}}}{{ima_coc1_crit=@{ima_coc1_crit}}}  {{name=精神分析檢定}} {{success=[[@{psychoanalysis}]]}} {{hard=[[floor(@{psychoanalysis}/2)]]}} {{extreme=[[floor(@{psychoanalysis}/5)]]}} {{roll1=[[1d100]]}}' name='roll_psychoanalysis_check' /></td>
+				</tr> 
 				<tr>
 					<td><input type="checkbox" name="attr_first_aid_checkbox"></td>
 					<td class="skill-label">急救(30%)</td>
@@ -597,13 +638,7 @@
 					<td><button class='old-roll' type='roll' value='@{roll_display}&{template:coc} {{ima_coc=@{ima_coc}}} {{name=藥學檢定}} {{success=[[@{pharmacy}]]}} {{hard=[[floor(@{pharmacy}/2)]]}} {{extreme=[[floor(@{pharmacy}/5)]]}} {{roll1=[[1d100]]}} {{roll2=[[1d100]]}} {{roll3=[[1d100]]}}' name='roll_anthropology_check' /></td>
 					<td><button class='new-roll' type='roll' value='@{roll_display}&{template:coc-1}{{ima_coc1=@{ima_coc1}}}{{ima_coc1_fum=@{ima_coc1_fum}}}{{ima_coc1_fail=@{ima_coc1_fail}}}{{ima_coc1_succ=@{ima_coc1_succ}}}{{ima_coc1_hard=@{ima_coc1_hard}}}{{ima_coc1_ext=@{ima_coc1_ext}}}{{ima_coc1_crit=@{ima_coc1_crit}}}  {{name=藥學檢定}} {{success=[[@{pharmacy}]]}} {{hard=[[floor(@{pharmacy}/2)]]}} {{extreme=[[floor(@{pharmacy}/5)]]}} {{roll1=[[1d100]]}}' name='roll_anthropology_check' /></td>
 				</tr>
-				<tr>
-					<td><input type="checkbox" name="attr_psychoanalysis_checkbox"></td>
-					<td class="skill-label">精神分析(01%)</td>
-					<td><input class="skill-input" type="text" name="attr_psychoanalysis" value="1"/></td>
-					<td><button class='old-roll' type='roll' value='@{roll_display}&{template:coc} {{ima_coc=@{ima_coc}}} {{name=精神分析檢定}} {{success=[[@{psychoanalysis}]]}} {{hard=[[floor(@{psychoanalysis}/2)]]}} {{extreme=[[floor(@{psychoanalysis}/5)]]}} {{roll1=[[1d100]]}} {{roll2=[[1d100]]}} {{roll3=[[1d100]]}}' name='roll_psychoanalysis_check' /></td>
-					<td><button class='new-roll' type='roll' value='@{roll_display}&{template:coc-1}{{ima_coc1=@{ima_coc1}}}{{ima_coc1_fum=@{ima_coc1_fum}}}{{ima_coc1_fail=@{ima_coc1_fail}}}{{ima_coc1_succ=@{ima_coc1_succ}}}{{ima_coc1_hard=@{ima_coc1_hard}}}{{ima_coc1_ext=@{ima_coc1_ext}}}{{ima_coc1_crit=@{ima_coc1_crit}}}  {{name=精神分析檢定}} {{success=[[@{psychoanalysis}]]}} {{hard=[[floor(@{psychoanalysis}/2)]]}} {{extreme=[[floor(@{psychoanalysis}/5)]]}} {{roll1=[[1d100]]}}' name='roll_psychoanalysis_check' /></td>
-				</tr>
+				
 			</table>
 		</div>
 		<div class="sheet-col">
@@ -1434,10 +1469,10 @@
 		<h4 class="section-head">JSON快速匯入功能</h4>
 		<div class="sheet-section">
 		<table style="width:100%">
-		<tr><td>JSON格式參考[{"name":"Z", "san":"o"}],基本上支援角色卡所有欄位,可使用上方匯出功能轉移角色卡.</td></tr>
+		<tr><td>JSON格式參考[{"name":"Sad", "san":"o"}],基本上支援角色卡所有欄位,可使用上方匯出功能轉移角色卡.</td></tr>
 		<tr><td>注意:沒有輸入資料的欄位將被清除.輸入資料後重開角卡,變成Done即代表匯入成功.</td></tr>
 		<tr><td>支援JSON的EXCEL角色卡</td></tr>
-		<tr><td>請致純美香港面團專區或HKTRPG下載</td></tr>
+		<tr><td>請致純美香港面團專區或www.HKTRPG.com下載</td></tr>
 		</table>
 		<textarea name="attr_import_json" style="width:100%;height:260px"></textarea>
 		</div>	
@@ -1464,6 +1499,12 @@
 			<td class="template_label">擲出:</td>
 			<td class="template_value">{{roll1}}, {{roll2}}, {{roll3}}</td>
 		</tr>
+		{{#san_when_insane}}
+		<tr>
+			<td class="template_label">不定性瘋狂:</td>
+			<td class="template_value">{{san_when_insane}}</td>
+		</tr>
+		{{/san_when_insane}}
 		<tr style="background:#DFF0D8;">
 			<td class="template_label">+2:</td>
 			<!-- Is roll2 less than roll1 -->
@@ -4045,6 +4086,228 @@
 	</table>
 </rolltemplate>
 
+<!--
+即時型瘋狂---------------------------------------------------------------------------------------------------------
+-->
+<rolltemplate class="sheet-rolltemplate-coc-bomadness-rt">
+	<table>
+		<caption >即時型瘋狂</caption>
+		<tr>
+			<!--   -->
+			{{#rollTotal() roll1 1}}
+			<td class="template_value"><b >失憶:</b></td>
+			{{/rollTotal() roll1 1}}
+			<!--   -->
+			{{#rollTotal() roll1 2}}
+			<td class="template_value"><b >假性殘疾:</b></td>
+			{{/rollTotal() roll1 2}}
+			<!--   -->
+			{{#rollTotal() roll1 3}}
+			<td class="template_value"><b >暴力傾向:</b></td>
+			{{/rollTotal() roll1 3}}
+			<!--   -->
+			{{#rollTotal() roll1 4}}
+			<td class="template_value"><b >偏執:</b></td>
+			{{/rollTotal() roll1 4}}
+			<!--   -->
+			{{#rollTotal() roll1 5}}
+			<td class="template_value"><b >人際依賴:</b></td>
+			{{/rollTotal() roll1 5}}
+			<!--   -->
+			{{#rollTotal() roll1 6}}
+			<td class="template_value"><b >昏厥:</b></td>
+			{{/rollTotal() roll1 6}}
+			<!--   -->
+			{{#rollTotal() roll1 7}}
+			<td class="template_value"><b >逃避行為:</b></td>
+			{{/rollTotal() roll1 7}}
+			<!--   -->
+			{{#rollTotal() roll1 8}}
+			<td class="template_value"><b >竭嘶底裡:</b></td>
+			{{/rollTotal() roll1 8}}
+			<!--   -->
+			{{#rollTotal() roll1 9}}
+			<td class="template_value"><b >恐懼:</b></td>
+			{{/rollTotal() roll1 9}}
+			<!--   -->
+			{{#rollTotal() roll1 10}}
+			<td class="template_value"><b >狂躁:</b></td>
+			{{/rollTotal() roll1 10}}
+			<!--   -->
+		</tr>
+		<tr>
+			<!--   -->
+			{{#rollTotal() roll1 1}}
+			<td class="template_value" >調查員會發現自己只記得最後身處的安全地點，卻沒有任何來到這裡的記憶。例如，調查員前一刻還在家中吃著早飯，下一刻就已經直面著不知名的怪物。</td>
+			{{/rollTotal() roll1 1}}
+			<!--   -->
+			{{#rollTotal() roll1 2}}
+			<td class="template_value" >調查員陷入了心理性的失明，失聰以及軀體缺失感中。</td>
+			{{/rollTotal() roll1 2}}
+			<!--   -->
+			{{#rollTotal() roll1 3}}
+			<td class="template_value" >調查員陷入了六親不認的暴力行為中，對周圍的敵人與友方進行著無差別的攻擊。</td>
+			{{/rollTotal() roll1 3}}
+			<!--   -->
+			{{#rollTotal() roll1 4}}
+			<td class="template_value" >調查員陷入了嚴重的偏執妄想之中。有人在暗中窺視著他們，同伴中有人背叛了他們，沒有人可以信任，萬事皆虛。</td>
+			{{/rollTotal() roll1 4}}
+			<!--   -->
+			{{#rollTotal() roll1 5}}
+			<td class="template_value" >守秘人適當參考調查員的背景中重要之人的條目，調查員因為一些原因而將他人誤認為了他重要的人並且努力的會與那個人保持那種關係。</td>
+			{{/rollTotal() roll1 5}}
+			<!--   -->
+			{{#rollTotal() roll1 6}}
+			<td class="template_value" >調查員當場昏倒。</td>
+			{{/rollTotal() roll1 6}}
+			<!--   -->
+			{{#rollTotal() roll1 7}}
+			<td class="template_value" >調查員會用任何的手段試圖逃離現在所處的位置，即使這意味著開走唯一一輛交通工具並將其它人拋諸腦後。</td>
+			{{/rollTotal() roll1 7}}
+			<!--   -->
+			{{#rollTotal() roll1 8}}
+			<td class="template_value" >調查員表現出大笑，哭泣，嘶吼，害怕等的極端情緒表現。</td>
+			{{/rollTotal() roll1 8}}
+			<!--   -->
+			{{#rollTotal() roll1 9}}
+			<td class="template_value" >調查員投1D100 或者由守秘人選擇，來從恐懼症狀表中選擇一個恐懼源，就算這一恐懼的事物是並不存在的，調查員的症狀會持續 [[1D10]] 輪。</td>
+			{{/rollTotal() roll1 9}}
+			<!--   -->
+			{{#rollTotal() roll1 10}}
+			<td class="template_value" >調查員投1D100 或者由守秘人選擇，來從狂躁症狀表中選擇一個狂躁的誘因。</td>
+			{{/rollTotal() roll1 10}}
+			<!--   -->
+		</tr>
+		<tr>
+			<td class="template_value"> 持續 {{rounds}} 輪.</td>
+		</tr>
+		{{#rollTotal() roll1 9}}
+		<tr>
+			<td class="template_value"> 恐懼症狀表: {{d100s}} .</td>
+		</tr>
+		{{/rollTotal() roll1 9}}
+		{{#rollTotal() roll1 10}}
+		<tr>
+			<td class="template_value"> 狂躁症狀表: {{d100s}} .</td>
+		</tr>
+		{{/rollTotal() roll1 10}}
+
+	</table>
+</rolltemplate>
+
+<!--
+總結型瘋狂---------------------------------------------------------------------------------------------------------
+-->
+<rolltemplate class="sheet-rolltemplate-coc-bomadness-summ">
+	<table>
+		<caption >總結型瘋狂</caption>
+		<tr>
+			<!--   -->
+			{{#rollTotal() roll1 1}}
+			<td class="template_value"><b >失憶:</b></td>
+			{{/rollTotal() roll1 1}}
+			<!--   -->
+			{{#rollTotal() roll1 2}}
+			<td class="template_value"><b >被竊:</b></td>
+			{{/rollTotal() roll1 2}}
+			<!--   -->
+			{{#rollTotal() roll1 3}}
+			<td class="template_value"><b >遍體鱗傷:</b></td>
+			{{/rollTotal() roll1 3}}
+			<!--   -->
+			{{#rollTotal() roll1 4}}
+			<td class="template_value"><b >暴力傾向:</b></td>
+			{{/rollTotal() roll1 4}}
+			<!--   -->
+			{{#rollTotal() roll1 5}}
+			<td class="template_value"><b >極端信念:</b></td>
+			{{/rollTotal() roll1 5}}
+			<!--   -->
+			{{#rollTotal() roll1 6}}
+			<td class="template_value"><b >重要之人:</b></td>
+			{{/rollTotal() roll1 6}}
+			<!--   -->
+			{{#rollTotal() roll1 7}}
+			<td class="template_value"><b >被收容:</b></td>
+			{{/rollTotal() roll1 7}}
+			<!--   -->
+			{{#rollTotal() roll1 8}}
+			<td class="template_value"><b >逃避行為:</b></td>
+			{{/rollTotal() roll1 8}}
+			<!--   -->
+			{{#rollTotal() roll1 9}}
+			<td class="template_value"><b >恐懼:</b></td>
+			{{/rollTotal() roll1 9}}
+			<!--   -->
+			{{#rollTotal() roll1 10}}
+			<td class="template_value"><b >狂躁:</b></td>
+			{{/rollTotal() roll1 10}}
+			<!--   -->
+		</tr>
+		<tr>
+			<!--   -->
+			{{#rollTotal() roll1 1}}
+			<td class="template_value" >回過神來，調查員們發現自己身處一個陌生的地方，並忘記了自己是誰。記憶會隨時間恢復。
+			</td>
+			{{/rollTotal() roll1 1}}
+			<!--   -->
+			{{#rollTotal() roll1 2}}
+			<td class="template_value" >調查員恢復清醒，發覺自己被盜，身體毫髮無損。如果調查員攜帶著寶貴之物（見調查員背景），做幸運檢定來決定其是否被盜。所有有價值的東西無需檢定自動消失。</td>
+			{{/rollTotal() roll1 2}}
+			<!--   -->
+			{{#rollTotal() roll1 3}}
+			<td class="template_value" >調查員恢復清醒，發現自己身上滿是拳痕和瘀傷。生命值減少到瘋狂前的一半，但這不會造成重傷。調查員沒有被竊。這種傷害如何持續到現在由守秘人決定。</td>
+			{{/rollTotal() roll1 3}}
+			<!--   -->
+			{{#rollTotal() roll1 4}}
+			<td class="template_value" >調查員陷入強烈的暴力與破壞欲之中。調查員回過神來可能會理解自己做了什麼也可能毫無印象。調查員對誰或何物施以暴力，他們是殺人還是僅僅造成了傷害，由守秘人決定。</td>
+			{{/rollTotal() roll1 4}}
+			<!--   -->
+			{{#rollTotal() roll1 5}}
+			<td class="template_value" >查看調查員背景中的思想信念，調查員會採取極端和瘋狂的表現手段展示他們的思想信念之一。比如一個信教者會在地鐵上高聲佈道。</td>
+			{{/rollTotal() roll1 5}}
+			<!--   -->
+			{{#rollTotal() roll1 6}}
+			<td class="template_value" >考慮調查員背景中的重要之人，及其重要的原因。在1D10 小時或更久的時間中，調查員將不顧一切地接近那個人，並為他們之間的關係做出行動。</td>
+			{{/rollTotal() roll1 6}}
+			<!--   -->
+			{{#rollTotal() roll1 7}}
+			<td class="template_value" >調查員在精神病院病房或警察局牢房中回過神來，他們可能會慢慢回想起導致自己被關在這裡的事情。</td>
+			{{/rollTotal() roll1 7}}
+			<!--   -->
+			{{#rollTotal() roll1 8}}
+			<td class="template_value" >調查員恢復清醒時發現自己在很遠的地方，也許迷失在荒郊野嶺，或是在駛向遠方的列車或長途汽車上。</td>
+			{{/rollTotal() roll1 8}}
+			<!--   -->
+			{{#rollTotal() roll1 9}}
+			<td class="template_value">調查員患上一個新的恐懼症。投1D100 從表Ⅸ：恐懼症狀表上 的症狀，或由守秘人選擇一個。調查員在回過神來，並開始為避開恐懼源而採取任何措施。</td>
+			{{/rollTotal() roll1 9}}
+			<!--   -->
+			{{#rollTotal() roll1 10}}
+			<td class="template_value" >調查員患上一個新的狂躁症。投1D100 從表Ⅹ：狂躁症狀表上的症狀，或由守秘人選擇一個。在這次瘋狂發作中，調查員將完全沉浸於其新的狂躁症狀。這症狀是否會表現給旁人則取決於守秘人和此調查員。</td>
+			{{/rollTotal() roll1 10}}
+			<!--   -->
+			
+		</tr>
+		
+		{{#rollTotal() roll1 6}}
+		<tr>
+			<td class="template_value"> 持續 {{rounds}} 小時.</td>
+		</tr>
+		{{/rollTotal() roll1 6}}
+		{{#rollTotal() roll1 9}}
+		<tr>
+			<td class="template_value"> 恐懼症狀表: {{d100s}} .</td>
+		</tr>
+		{{/rollTotal() roll1 9}}
+		{{#rollTotal() roll1 10}}
+		<tr>
+			<td class="template_value"> 狂躁症狀表: {{d100s}} .</td>
+		</tr>
+		{{/rollTotal() roll1 10}}
+
+	</table>
+</rolltemplate>
 
  <!--	   
  <tr><td class="template_label">擲出:</td><td class="template_value">{{roll1}}, {{roll2}}, {{roll3}}</td></tr>
@@ -4109,6 +4372,12 @@
 			<td class="template_label">擲出:</td>
 			<td class="template_value">{{roll1}}</td>
 		</tr>
+		{{#san_when_insane}}
+		<tr>
+			<td class="template_label">不定性瘋狂:</td>
+			<td class="template_value">{{san_when_insane}}</td>
+		</tr>
+		{{/san_when_insane}}
 		<tr style="background:#BEBEBE;">
 			<td class="template_label">結果:</td>
 				<!-- 01 is always Critical -->
@@ -4683,12 +4952,6 @@
 			setAttrs({fellow_investigators: characterData["fellow_investigators"]});
 			//調查員筆記 investigators_notes
 			setAttrs({investigators_notes: characterData["investigators_notes"]});
-			//attr_roll_display_to  attr_roll_display_tell attr_text_kp "text_kp_enter"
-			setAttrs({roll_display_to: characterData["roll_display_to"]});
-			setAttrs({roll_display_tell: characterData["roll_display_tell"]});
-			setAttrs({text_kp: characterData["text_kp"]});
-			setAttrs({roll_display_tell_enter: characterData["roll_display_tell_enter"]});
-			setAttrs({text_kp_enter: characterData["text_kp_enter"]});
 			//圖片
 			setAttrs({ima_coc: characterData["ima_coc"]});
 			setAttrs({ima_coc_san: characterData["ima_coc_san"]});
@@ -4757,7 +5020,7 @@
 	});
 	//attr_roll_display_to  attr_roll_display_tell attr_text_kp
 		on('sheet:opened change:core-tab',function(){
-		  getAttrs(["character_name","name","player","occupation","sex","age","birthplace","residence","str","dex","pow","con","app","edu","siz","int","luck","hp","armor","san","san_start","mp","psychology","credit_rating","persuade","fast_talk","intimidate","charm","navigate","survival_name","survival01","jump","climb","swim","drive_auto","drive_other01_name","drive_other01","ride","stealth","track","disguise","locksmith","sleight_of_hand","language_own","language_other_name","language_other01","accounting","law","occult","history","natural_world","anthropology","archaeology","compute_use","acting","mech_repair","elec_repair","op_hv_machine","spot_hidden","listen","library_use","appraise","cthulhu_mythos","first_aid","medicine","pharmacy","psychoanalysis","dodge","fighting_brawl","throw","firearms_handgun","firearms_rifle","submachine_gun","machine_gun","otherskill1","otherskill1_name","otherskill2","otherskill2_name","otherskill3","otherskill3_name","otherskill4","otherskill4_name","otherskill5","otherskill5_name","otherskill6","otherskill6_name","weapon0_extdamage","auto_weapon1_name","auto_weapon1_skill","auto_weapon1_damage","auto_weapon1_damage2","auto_weapon1_extdamage","auto_weapon1_extdamage2","auto_weapon1_range","auto_weapon1_attacks","auto_weapon1_ammo","auto_weapon1_malf","weapon1_name","weapon1_skill","weapon1_damage","weapon1_db","weapon1_extdamage","weapon1_range","weapon1_attacks","weapon1_ammo","weapon1_malf","weapon2_name","weapon2_skill","weapon2_damage","weapon2_db","weapon2_extdamage","weapon2_range","weapon2_attacks","weapon2_ammo","weapon2_malf","weapon3_name","weapon3_skill","weapon3_damage","weapon3_db","weapon3_extdamage","weapon3_range","weapon3_attacks","weapon3_ammo","weapon3_malf","weapon4_name","weapon4_skill","weapon4_damage","weapon4_db","weapon4_extdamage","weapon4_range","weapon4_attacks","weapon4_ammo","weapon4_malf","weapon5_name","weapon5_skill","weapon5_damage","weapon5_db","weapon5_extdamage","weapon5_range","weapon5_attacks","weapon5_ammo","weapon5_malf","gear_and_posessions","spending_level","cash","assets","personal_description","ideaology_beliefs","significant_people","meaningful_locations","treasured_posessions","traits","injuries_scars","phobias_manias","tomes_spells_artifacts","encounters_with_strange_entities","key_connection","charchest_traits","charchest_exp","other_back_story","fellow_investigators","investigators_notes","ima_coc","ima_coc_san","ima_coc1","ima_coc1_fum","ima_coc1_fail","ima_coc1_succ","ima_coc1_hard","ima_coc1_ext","ima_coc1_crit","ima_coc1_san","ima_coc1_san_fum","ima_coc1_san_fail","ima_coc1_san_succ","ima_coc1_san_hard","ima_coc1_san_ext","ima_coc1_san_crit","ima_att_coc","ima_coc_att1","ima_coc_att1_fum","ima_coc_att1_fail","ima_coc_att1_succ","ima_coc_att1_hard","ima_coc_att1_ext","ima_coc_att1_crit","ima_auto_att1_gray","ima_auto_att1_green","ima_coc2","ima_coc2_fail","ima_coc2_succ","ima_coc2_hard","ima_coc2_ext","ima_coc_url","ima_coc_san_url","ima_coc1_url","ima_coc1_fum_url","ima_coc1_fail_url","ima_coc1_succ_url","ima_coc1_hard_url","ima_coc1_ext_url","ima_coc1_crit_url","ima_coc1_san_url","ima_coc1_san_fum_url","ima_coc1_san_fail_url","ima_coc1_san_succ_url","ima_coc1_san_hard_url","ima_coc1_san_ext_url","ima_coc1_san_crit_url","ima_att_coc_url","ima_coc_att1_url","ima_coc_att1_fum_url","ima_coc_att1_fail_url","ima_coc_att1_succ_url","ima_coc_att1_hard_url","ima_coc_att1_ext_url","ima_coc_att1_crit_url","ima_auto_att1_gray_url","ima_auto_att1_green_url","ima_coc2_url","ima_coc2_fail_url","ima_coc2_succ_url","ima_coc2_hard_url","ima_coc2_ext","roll_display_to","roll_display_tell","text_kp","roll_display_tell_enter","text_kp_enter"], function(values) {
+		  getAttrs(["character_name","name","player","occupation","sex","age","birthplace","residence","str","dex","pow","con","app","edu","siz","int","luck","hp","armor","san","san_start","mp","psychology","credit_rating","persuade","fast_talk","intimidate","charm","navigate","survival_name","survival01","jump","climb","swim","drive_auto","drive_other01_name","drive_other01","ride","stealth","track","disguise","locksmith","sleight_of_hand","language_own","language_other_name","language_other01","accounting","law","occult","history","natural_world","anthropology","archaeology","compute_use","acting","mech_repair","elec_repair","op_hv_machine","spot_hidden","listen","library_use","appraise","cthulhu_mythos","first_aid","medicine","pharmacy","psychoanalysis","dodge","fighting_brawl","throw","firearms_handgun","firearms_rifle","submachine_gun","machine_gun","otherskill1","otherskill1_name","otherskill2","otherskill2_name","otherskill3","otherskill3_name","otherskill4","otherskill4_name","otherskill5","otherskill5_name","otherskill6","otherskill6_name","weapon0_extdamage","auto_weapon1_name","auto_weapon1_skill","auto_weapon1_damage","auto_weapon1_damage2","auto_weapon1_extdamage","auto_weapon1_extdamage2","auto_weapon1_range","auto_weapon1_attacks","auto_weapon1_ammo","auto_weapon1_malf","weapon1_name","weapon1_skill","weapon1_damage","weapon1_db","weapon1_extdamage","weapon1_range","weapon1_attacks","weapon1_ammo","weapon1_malf","weapon2_name","weapon2_skill","weapon2_damage","weapon2_db","weapon2_extdamage","weapon2_range","weapon2_attacks","weapon2_ammo","weapon2_malf","weapon3_name","weapon3_skill","weapon3_damage","weapon3_db","weapon3_extdamage","weapon3_range","weapon3_attacks","weapon3_ammo","weapon3_malf","weapon4_name","weapon4_skill","weapon4_damage","weapon4_db","weapon4_extdamage","weapon4_range","weapon4_attacks","weapon4_ammo","weapon4_malf","weapon5_name","weapon5_skill","weapon5_damage","weapon5_db","weapon5_extdamage","weapon5_range","weapon5_attacks","weapon5_ammo","weapon5_malf","gear_and_posessions","spending_level","cash","assets","personal_description","ideaology_beliefs","significant_people","meaningful_locations","treasured_posessions","traits","injuries_scars","phobias_manias","tomes_spells_artifacts","encounters_with_strange_entities","key_connection","charchest_traits","charchest_exp","other_back_story","fellow_investigators","investigators_notes","ima_coc","ima_coc_san","ima_coc1","ima_coc1_fum","ima_coc1_fail","ima_coc1_succ","ima_coc1_hard","ima_coc1_ext","ima_coc1_crit","ima_coc1_san","ima_coc1_san_fum","ima_coc1_san_fail","ima_coc1_san_succ","ima_coc1_san_hard","ima_coc1_san_ext","ima_coc1_san_crit","ima_att_coc","ima_coc_att1","ima_coc_att1_fum","ima_coc_att1_fail","ima_coc_att1_succ","ima_coc_att1_hard","ima_coc_att1_ext","ima_coc_att1_crit","ima_auto_att1_gray","ima_auto_att1_green","ima_coc2","ima_coc2_fail","ima_coc2_succ","ima_coc2_hard","ima_coc2_ext","ima_coc_url","ima_coc_san_url","ima_coc1_url","ima_coc1_fum_url","ima_coc1_fail_url","ima_coc1_succ_url","ima_coc1_hard_url","ima_coc1_ext_url","ima_coc1_crit_url","ima_coc1_san_url","ima_coc1_san_fum_url","ima_coc1_san_fail_url","ima_coc1_san_succ_url","ima_coc1_san_hard_url","ima_coc1_san_ext_url","ima_coc1_san_crit_url","ima_att_coc_url","ima_coc_att1_url","ima_coc_att1_fum_url","ima_coc_att1_fail_url","ima_coc_att1_succ_url","ima_coc_att1_hard_url","ima_coc_att1_ext_url","ima_coc_att1_crit_url","ima_auto_att1_gray_url","ima_auto_att1_green_url","ima_coc2_url","ima_coc2_fail_url","ima_coc2_succ_url","ima_coc2_hard_url","ima_coc2_ext"], function(values) {
 			var characterData = "["+JSON.stringify(values)+"]";
 			//if(values.character_name != "undefined") jsonDataExport += "\"character_name\":\""+values.character_name+"\",";
 	  		setAttrs({export_json:characterData}); 
