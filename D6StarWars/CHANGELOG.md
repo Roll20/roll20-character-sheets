@@ -1,3 +1,22 @@
+### Version 2.14 (2019-10-08):
+
+- Adjust rolltemplates so title-text is centered, and bold 
+
+### Version 2.13 (2019-07-23):
+**Fix:**
+
+- Added back strength pip to Soak rolls in the armor section
+- remove duplicate DM roll button from Tech skills
+
+**Features:**
+
+- New sheet section: Character Point summary; meant for tracking how points are used. Includes option to hide section
+- New sheet section: Credit Spenditure summary; meant for tracking how credits are spent. Includes option to hide section
+
+- New sheet modes: **Ship** and **Shop/Container** as new options alongside existing **PC** and **NPC** sheet modes
+
+- Default Settings: All Settings defaults can now be adjusted by GMs in the [Game Settings Menu](https://wiki.roll20.net/Game_Settings_Page#Character_Sheet_Default_Settings) outside the game. Additional settings that can be changed are `Character Points`, `Credits`, `Force Points` 
+
 ### Version 2.00 (2019-07-09):
 **Fixes:**
 
