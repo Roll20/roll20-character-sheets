@@ -6,6 +6,7 @@
 	$graytrans: rgba(28, 28, 28, 0.14902);
 	$grayshadow: #7c7c7c;
 	$blacker: #040404;
+	$ccc: #cccccc;
 	//- GRAY IN ROLL TEMPLATE
 	$blackish: #1c1c1c;
 	//-(primaryly on the NPC sheet)
@@ -24,6 +25,26 @@
 /* SWITCHES
 	============================= */
 	@import 'src/scss/_switch'; 
+
+/* MIXIN
+	============================= */
+@mixin repeatingInformation($endColumn) {
+	label[data-i18n-title="notes"], 
+	h3[data-i18n='notes'], 
+	div.sheet-collapse { 
+		grid-column: 1 / #{$endColumn};
+	}
+
+	input.sheet-collapse-flag, 
+	input.sheet-collapse-flag + span.sheet-pictos { 
+		grid-area: 1 / #{$endColumn - 2} / 1 / #{$endColumn - 1}; 
+	}
+
+	input.sheet-settings-toggle, 
+	input.sheet-settings-toggle + span.sheet-pictos { 
+		grid-area: 1 / #{$endColumn - 1} / 1 / #{$endColumn}; 
+	}
+}
 
 /***** TABS FOR SHEETS *****/
 	.sheet-tabs {
@@ -66,7 +87,6 @@
 		}
 	}
 
-
 /***** TABS FOR SHEETS *****/
 .sheet-settings-toggle {
 	 input { width: 3em;}
@@ -81,6 +101,8 @@
   }
 }
 
+
+/***** GENERIC STYLES *****/
 %parantheseNumbers {
 	vertical-align: middle;
 
@@ -113,7 +135,16 @@ input.sheet-toggle {
 
 %borderBottom { border-bottom: 1px solid #333; }
 
+.sheet-center { text-align: center; }
+
 @import 'src/scss/_matrixdevice'; 
+
+/***** GRID *****/
+%gridGap {
+	grid-column-gap: 1%;
+	grid-row-gap: 1%;
+}
+
 
 /******************************************************************************/
 /********************************* VARIABLES *********************************/
@@ -143,6 +174,12 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 		button[data-i18n="default"]:hover {
 			color      : #fff;
 			text-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px $red;
+		}
+
+		button[type='roll'] {
+			font-size: 1em;
+			font-weight: bold;
+			text-align: left;
 		}
 
 		hr { margin: 7px 0px -2px 0px; }
@@ -215,7 +252,8 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 			}
 		}
 
-		input[type='checkbox'],
+		input.sheet-settings-toggle,
+		input.sheet-collapse-flag,
 		input[type='radio'] {
 			@extend %toggleRelative;
 			
@@ -227,6 +265,7 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 		select {
 			height: 1.8em;
 			padding: 0px;
+			color: $blacker;
 		}
 
 		div.sheet-core-info {
@@ -245,11 +284,39 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 		input.sheet-display-flag { position: absolute; }
 
 		/***** REPEATING CONTAINERS *****/
-		div.repitem {
-			input[type='number'] {
-				text-align: center;
-				width: 2.5em;
+		div.sheet-repeating-container {
+			div.repitem {
+				display: inline-grid;
+				@extend %gridGap;
+
+				input[type="text"] { width: 100%; }
+
+				@extend %borderBottom;
+
+				div.sheet-settings { 
+					background-color: $ccc;
+					border-left: 2px solid $gray;
+					@extend %gridGap;
+					padding: 2% 1%;
+					width: 100%;
+
+					select { text-transform: capitalize; }
+				}
+
+				div.sheet-collapse {
+					@extend %display-none;
+					padding-left: 5%;
+				}
+
+				/* SHOW COLLAPSABLE DESCRIPTIONS AFTER CLICKING HIDDEN CHECKBOX */
+			    input.sheet-collapse-flag:checked ~ div.sheet-collapse { display: block; }
 			}
+		}
+
+		div.repitem {
+			width: 100%;
+
+			input[type='number'] { text-align: center; }
 		}
 
 		/***** SKILLS *****/
@@ -280,6 +347,8 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 
 			input[name='attr_skill'] { @extend %borderBottom; }
 
+			input[name="attr_rating_modifier"] { width: 3.5em; }
+
 			div.sheet-row-long {
 				display: inline-grid;
 				grid-column-gap: 1%;
@@ -292,8 +361,8 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 			}
 
 			select.sheet-attribute-select {
-				option:nth-of-type(1n+9) { color: #7a2593;	}
 				option:nth-of-type(1n+5) { color: $red; }
+				option:nth-of-type(1n+9) { color: #7a2593;	}
 			}
 
 			select.sheet-limit-select  {
@@ -301,7 +370,74 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 			}
 		}
 
-		/***** SKILLS *****/
+		/***** MAGIC *****/
+		div.sheet-magic {
+			h3 { color: $blacker; }
+
+			div.sheet-headers {
+				display: grid;
+				@extend %gridGap;
+
+				h3:nth-of-type(1n+2) { text-align: center; }
+			} 
+
+
+			div.sheet-spellsForumlas {
+				$alchemicForumlasGrid: 1fr 4em 4em 6em 3em 1em 1em;
+
+				div.sheet-headers {
+					grid-template-columns:$alchemicForumlasGrid;
+				} 
+
+
+				div.repitem {
+					grid-template-columns: $alchemicForumlasGrid;
+
+					@include repeatingInformation(8);
+
+					input[name="attr_damage"],
+					input[name="attr_dicepool_modifier"] {
+						width: 3.5em;
+					}
+
+					select[name="attr_category"] { grid-row: 2; }
+
+					div.sheet-row { grid-column: 1 / 8; }
+
+					div.sheet-settings { 
+						grid-column: 1 / 8;
+						grid-template-columns: $alchemicForumlasGrid;
+
+						h3 {margin-right: 2%;}
+					}
+				}
+			}
+		}
+
+		/***** MAGICAL PREPERATIONS *****/
+		div.sheet-magic-preps {
+			/* READIED PREPARATIONS */
+			div.sheet-prepared-preparations {
+				$preparationsGrid: 1fr 5em 5em 6em 1em 1em;
+
+				div.sheet-headers {
+					grid-template-columns:$preparationsGrid ;
+				} 
+
+				div.repitem {
+					grid-template-columns: $preparationsGrid ;
+
+					@include repeatingInformation(7);
+
+					div.sheet-settings { 
+						grid-column: 1 / 7;
+						grid-template-columns: $preparationsGrid;
+
+						select { grid-column: 4 / 7; }
+					}
+				}
+			}
+		}
 	}
 	@import 'src/scss/_pc'; 
 
