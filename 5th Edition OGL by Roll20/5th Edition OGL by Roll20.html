@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="2.711">
+<input type="hidden" name="attr_version" value="2.714">
 <input class="monster_confirm_flag" type="hidden" name="attr_monster_confirm_flag">
 <input class="mancer_confirm_flag" type="hidden" name="attr_mancer_confirm_flag">
 <div class="licensecontainer compendium-drop-target monsters">
@@ -7018,6 +7018,11 @@
     };
 
     var update_tool = function(tool_id) {
+        //D&D 5e Mancer: Land Vehicles proficiency does not drop with Marine background (UC748)
+        //Added a test to check for an undefined tool_id so to prevent similar errors.
+        //By Miguel Peres
+        if(typeof tool_id == "undefined") return;
+
         if(tool_id.substring(0,1) === "-" && tool_id.length === 20) {
             do_update_tool([tool_id]);
         }
@@ -8009,6 +8014,11 @@
                     var tool_array = jsonparse(blob["Tool Proficiency"]);
                     if(tool_array["Proficiencies"] && tool_array["Proficiencies"].length) {
                         _.each(tool_array["Proficiencies"], function(prof) {
+                            //D&D 5e Mancer: Land Vehicles proficiency does not drop with Marine background (UC748)
+                            //Generating ID that was coming empty for not existing rows.
+                            //By Miguel Peres
+                            let newrowid = generateRowID();
+
                             let existing = {};
                             _.each(repeating.tool, function(tool, id) {
                                 if(tool.toolname == prof.toLowerCase()) {
@@ -9723,7 +9733,10 @@
 
                     if(v["pb_type"] && v["pb_type"] === "die") {
                         atk = atk + "+" + v["pb"];
-                        dc = dc + parseInt(v["pb"].substring(1), 10) / 2;
+                        //Fixing Spell DC when using type Die
+                        //By Miguel
+                        //Used to be equals to: dc + parseInt(v["pb"].substring(1), 10) / 2
+                        dc = dc + "+" + v["pb"];
                     }
                     else {
                         atk = parseInt(atk, 10) + parseInt(v["pb"], 10);
@@ -11327,6 +11340,20 @@
 
     var handleBlobs = function(blobs, options) {
         //Old parameters: (blobs, filters, section, element, thisblob)
+
+        //Function to get blob parameter for Spell Pickers like Magical Secrets
+        //By Miguel
+        const getBlobDescription = function(blob) {
+          if("Description" in blob) {
+            return blob.Description;
+          }
+          else if("Traits" in blob) {
+            traits = JSON.parse(blob.Traits)[0];
+            if("Desc" in traits) return traits.Desc;
+          }
+          return "";
+        }
+
         const handleProficiencies = function(data, subsection) {
             if(!data) {
                 return;
@@ -11525,9 +11552,15 @@
                 let settings = {};
                 let repupdate = {};
                 repupdate[rowid + ">label>span"] = title;
-                if(blob.Description) {
-                    repupdate[rowid + ">label>p"] = blob.Description;
+
+                //This used to check for blob.Description which does not exist for Spell Pickers
+                //In such case the description is located at blob.Traits.Desc
+                //By Miguel
+                let description = getBlobDescription(blob);
+                if(description.length > 0) {
+                    repupdate[rowid + ">label>p"] = description;
                 }
+
                 _.each(spells, function(spell) {
                     addRepeatingSection(rowid, "utilityrow", function(rowid) {
                         let repupdate = {};
@@ -15501,6 +15534,13 @@
         let spelldata = settings.spelldata || [];
         let existinglist = settings.existinglist || [];
         let spellnumber = 0;
+        //D&D 5e Lvl+ Mancer: Spells tab "Level undefined" (UC605)
+        //When invoking Lvl+ from an incomplete manually levelled character, an undefined lv is generated due to missing information.
+        //This code prevents an incomplete list from being displayed.
+        //By Miguel
+        //('undefined' in byLevel) {
+         // delete byLevel.undefined;
+        //}
         _.each(byLevel, function(level) {
             spellnumber += level.length;
         });
@@ -15735,6 +15775,14 @@
 
         } else {
             updateAbilityLock(eventinfo.sourceSection);
+            //This will lock other ASI when leveling up multiple levels at once
+            //By Miguel
+            var repeatingData = getCharmancerData()['lp-asi'].repeating || [];
+            for(data in repeatingData) {
+              if(repeatingData[data].indexOf('_asi-row') > -1) {
+                updateAbilityLock(repeatingData[data]);
+              }
+            }
         }
         recalcLpData();
     });
@@ -15902,6 +15950,139 @@
         }
     });
 
+    //Fixing Bard's Magical Secrets (UC-10)
+    //By Miguel
+    //The ways this was being handled before, binded to clicked:repeating_utilityrow_launch, was not being triggered due to the way the DOM is built.
+    on("clicked:repeating_utilityrow", function(eventinfo) {
+        if(eventinfo.triggerName.indexOf('utilityrow_launch') === -1) return;
+        const mancerdata = getCharmancerData();
+        var querysettings = {};
+        var spelldata = getKnownLpSpells(mancerdata);
+        var leveldata = _.findWhere(getLevelingData(mancerdata), {classnumber: parseInt(mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_parent`][5])});
+        var query = "";
+        let newspells = 0;
+        let newcantrips = 0;
+        var spellnames = [];
+        var current = [];
+        var locked = [];
+        var update = {};
+        update[`${eventinfo.sourceSection} .sheet-warning`] = "";
+        try {
+            querysettings = JSON.parse(mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_info`]);
+        } catch(e) {
+            querysettings = mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_info`];
+        };
+        if(mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_result`]) current = mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_result`].split(", ");
+        if(mancerdata["lp-spells"] && mancerdata["lp-spells"].repeating) {
+            _.each(mancerdata["lp-spells"].repeating, function(repid) {
+                if(mancerdata["lp-spells"].values[`${repid}_checked`]) {
+                    spelldata[mancerdata["lp-spells"].values[`${repid}_name`]] = {
+                        level: mancerdata["lp-spells"].values[`${repid}_level`],
+                        spellclass: mancerdata["lp-spells"].values[`${repid}_class`]
+                    }
+                }
+            });
+        }
+        _.each(current, function(currentspell) {
+            delete spelldata[currentspell];
+        })
+        if(querysettings.Known) {
+            if(querysettings.Level + "" === "0") {
+                newcantrips = 1;
+            } else {
+                newspells = 1;
+            }
+            _.each(spelldata, function(spell, spellname) {
+                if(!querysettings.Level || (querysettings.Level && querysettings.Level == spell.level)) spellnames.push(spellname);
+            });
+            if(spellnames.length > 0) {
+                query = "Category:Spells Name:" + spellnames.join("|");
+            } else {
+                update[`${eventinfo.sourceSection} .sheet-warning`] = `You do not currently know any level ${querysettings.Level} spells.`;
+                setCharmancerText(update);
+            }
+        } else {
+            query = "Category:Spells";
+            if(querysettings.Level) {
+                let levels = [querysettings.Level];
+                if(querysettings.Level == "max") {
+                    levels = [];
+                    for(let x=1; x<=leveldata.maxspell; x++) {
+                        levels.push(x);
+                    }
+                }
+                query += " Level:" + levels.join("|");
+            };
+            if(querysettings.List && querysettings.List.toLowerCase() !== "any") {
+                query += " Classes:*" + querysettings.List;
+            };
+            if(querysettings.Level + "" === "0") {
+                newcantrips = querysettings.Number ? parseInt(querysettings.Number) : 1;
+            } else {
+                newspells = querysettings.Number ? parseInt(querysettings.Number) : 1;
+            }
+            locked = _.keys(spelldata);
+        }
+        if(query) {
+            setCharmancerText(update);
+            changeCharmancerPage("lp-spellchoice", function() {
+                getCompendiumQuery([query], function(data) {
+                    let byLevel = {};
+                    let filters = {};
+                    let filtered = [];
+                    let toSet = {};
+                    let update = {};
+                    update["instructions"] = querysettings.HelpText;
+                    console.log(data);
+                    _.each(querysettings, function(setting, key) {
+                        if(!["Level","List","Number","Type","ButtonText","HelpText", "Known", "Class"].includes(key)) {
+                            filters[key] = setting;
+                        }
+                    });
+                    console.log(filters);
+                    if(querysettings.Known) {
+                        delete querysettings.Level;
+                    }
+                    delete querysettings.Known;
+                    _.each(data, function(spell) {
+                        let match = true;
+                        _.each(filters, function(value, name) {
+                            if(spell.data[name] !== value) match = false;
+                        })
+                        if(match) filtered.push(spell);
+                    });
+                    console.log(filtered);
+                    _.each(filtered, function(spell) {
+                        if(spell.data.Classes) {
+                            byLevel[spell.data.Level] = byLevel[spell.data.Level] || [];
+                            byLevel[spell.data.Level].push({
+                                name: spell.name,
+                                classes: spell.data.Classes.split(",").map(x => x.trim()),
+                                level: parseInt(spell.data.Level)
+                            });
+                        }
+                    });
+                    toSet.newspells = newspells;
+                    toSet.newcantrips = newcantrips;
+                    toSet.valid = "now";
+                    toSet.source = eventinfo.sourceSection;
+                    setCharmancerText(update);
+                    setAttrs(toSet, function() {
+                        addSpellSections(byLevel, {
+                            newcantrips: newcantrips,
+                            newspells: newspells,
+                            page: "lp-spellchoice",
+                            selected: current,
+                            locked: locked
+                        });
+                    });
+                });
+            });/**/
+        }
+    });
+
+    //TODO: Investigate if the duplicated event below listener can be removed
+    //By Miguel
     on("clicked:repeating_utilityrow_launch", function(eventinfo) {
         const mancerdata = getCharmancerData();
         var querysettings = {};

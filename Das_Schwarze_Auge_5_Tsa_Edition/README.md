@@ -2,6 +2,35 @@
 
 ## Änderungen
 
+2019-10-29:
+- Fix eines Problems mit der Auswahl und Berechnung von Fernkampfwaffen
+- Neu: Unter Optionen stehen diverse Farbschema zur Auswahl: Yrn White (Default), Nebachot Sand, Rekki Blue, Perceval Grey, Gerasim Green)
+- Aufruf: Wer Ideen hat und das eigene Farbschema im Bogen sehen möchte, kann mir eine Nachricht an untenstehende Emailadresse senden.
+  Das Farbschema sollte folgende Punkte abdecken und der Namen einen Bezug zu Aventurien aufweisen:
+{
+  --color-font-tab-checked : white;
+  --bg-tab-unchecked       : white;
+  --bg-tab-checked         : green;
+  --bg-sheet               : #ffffff;
+  --bg-input               : #ffffff;
+  --bg-input-readonly      : #f5f5f5;
+  --color-font             : black;
+  --color-border           : black;
+}
+
+
+
+2019-10-18: strukturelle Anpassungen durch Tajo, um Sortierreihenfolge bei Übersetzungen z. B. bei Talenten beizubehalten
+
+2019-10-14: Englische Übersetzung durch Tajo. Vielen Dank!
+
+2019-10-07:
+- Änderungen des Status lösen nun eine Neuberechnung der Kampfwerte aus --> bestehende Events ergänzt
+- Änderungen der Kampftechnikwerte führen zur Neuberechnung der Kampfwerte --> neuer Event Trigger und Change Flag (ktw_change_flag) hinzugefügt.
+- Der Status (status_maxi) wird bei Eigenschaftsproben jetzt berücksichtigt.
+- Modifikatoren für Regeneration LE/AE/KE hinzugefügt
+- Felder für Münzen im Geldbeutel hinzugefügt
+
 2019-09-15:
 - Die Attribute für Lebensenergie (le, le_max), Astralenergie (ke_, ke_max) und Karmaenergie (ke, ke_max) wurden umbenannt, um das Zuweisen der Werte an Token zu vereinfachen. Achtung: evtl. werden die aktuellen Werte auf 0 gesetzt und müssen angepasst werden.
 - Modifikator für den Fertigkeitswert (FW) der Talente hinzugefügt
@@ -27,7 +56,7 @@ Liebe Abenteurer,
 
 lange habe ich mit mir gerungen, einen eigenen Charakterbogen für DSA 5 zu bauen. Denn der alte Bogen deckt viele Inhalte der aktuellen 5. Edition 1:1 ab. Da aber stetig neue Regelbücher mit neuem Crunch erscheinen, wollte ich einen Charakterbogen erstellen, der eher wie ein Baukastensystem funktioniert. Und anhand dessen man Sonderfertigkeiten, Zaubersprüche, Artefakte, Fokusregeln usw. flexibel abbilden kann. Außerdem bietet sich so ein Baukasten auch für Hausregeln an, die per Definition je Gruppe unterschiedlich sind.
 
-Herausgekommen ist ein neuer Charakterbogen, der anders aussieht und anders funktioniert als wie gewohnt, aber einem mehr Freiheiten lässt und hoffentlich auch mehr Unterstützung und Spaß beim Spielen bringt. Da dieses aber der erste Wurf ist, kann es sein, dass noch Fehler vorhanden oder Dinge noch nicht umgesetzt sind. Bei Fragen oder Feedback wendet euch gerne an mich per Email ( trestolt(at)gmail.com ).
+Herausgekommen ist ein neuer Charakterbogen, der anders aussieht und anders funktioniert als wie gewohnt, aber einem mehr Freiheiten lässt und hoffentlich auch mehr Unterstützung und Spaß beim Spielen bringt. Da dieses aber der erste Wurf ist, kann es sein, dass noch Fehler vorhanden oder Dinge noch nicht umgesetzt sind. Bei Fragen oder Feedback wendet euch gerne an mich per Email ( trestolt(at)gmail.com ). Ich findet mich auch auf der Drachenzwinge (https://www.drachenzwinge.de/) sowie im Orkenspalter-Forum (https://www.orkenspalter.de/).
 
 
 ## Charaktererstellung
@@ -215,3 +244,4 @@ Unter Status lassen sich die unterschiedlichen Zunstände eintragen. Entsprechen
 ## Danksagung
 
 Großer Dank geht an die Entwickler des DSA5 Character Sheet German   Patrick Gebhardt, enhanced by Sönke Holsten, Adam Fedor. Einige Teile des Charakterbogens habe ich von dort übernommen oder mich inspirieren lassen.
+Noch größerer Dank geht an alle, deren Anregungen und Feedback in den Bogen eingeflossen sind, insbesonders an: Perceval, Igraine, Lodge, Paladose, Danii, Tiro sowie Tajo für die englische Übersetzung.
