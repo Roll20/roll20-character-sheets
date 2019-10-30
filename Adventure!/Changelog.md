@@ -11,7 +11,8 @@ Versions have three numbers Major.Minor.Release
 
 ### Bug fixes and minor changes
 * removed typos that was causing problems
-* imported fonts and images so as not to get a security issue on browsers 
+* added assets folder and subfolders fonts and images
+* imported fonts and images into the apropriate subfolders so as not to get a security issue on browsers 
 
 ## 1.0
 
