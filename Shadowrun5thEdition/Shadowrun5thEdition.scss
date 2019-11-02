@@ -40,8 +40,8 @@
 		grid-area: 1 / #{$endColumn - 2} / 1 / #{$endColumn - 1}; 
 	}
 
-	input.sheet-settings-toggle, 
-	input.sheet-settings-toggle + span.sheet-pictos { 
+	input.sheet-settings-flag, 
+	input.sheet-settings-flag + span.sheet-pictos { 
 		grid-area: 1 / #{$endColumn - 1} / 1 / #{$endColumn}; 
 	}
 }
@@ -88,7 +88,8 @@
 	}
 
 /***** TABS FOR SHEETS *****/
-.sheet-settings-toggle {
+.sheet-settings-toggle,
+.sheet-settings-flag {
 	 input { width: 3em;}
 
 	input[type='checkbox'] + span {
@@ -137,6 +138,17 @@ input.sheet-toggle {
 
 .sheet-center { text-align: center; }
 
+select {
+	&.sheet-attribute-select {
+		option:nth-of-type(1n+5) { color: $red; }
+		option:nth-of-type(1n+9) { color: #7a2593;	}
+	}
+
+	&.sheet-limit-select  {
+		option:nth-of-type(1n+5) { color: $red; }
+	}
+}
+
 @import 'src/scss/_matrixdevice'; 
 
 /***** GRID *****/
@@ -176,10 +188,30 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 			text-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px $red;
 		}
 
-		button[type='roll'] {
-			font-size: 1em;
-			font-weight: bold;
-			text-align: left;
+		h1 {
+			background-color: $red;
+			color           : #fff;
+			font-size       : 1em;
+			letter-spacing  : 2px;
+			line-height     : 20px;
+			padding-left    : 5px;
+			padding-right   : 5px;
+			text-transform  : uppercase;
+		}
+	
+		h2 {
+			font-size  : 0.9em;
+			line-height: 25px;
+			text-transform: capitalize;
+			@extend %display-inline-grid;
+		}
+	
+		h3 {
+			color    : hsla(0, 0%, 20%, 0.59);
+			font-size: 0.8em;
+			text-transform: capitalize;
+
+			@extend %display-inline-grid;
 		}
 
 		hr { margin: 7px 0px -2px 0px; }
@@ -253,6 +285,7 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 		}
 
 		input.sheet-settings-toggle,
+		input.sheet-settings-flag,
 		input.sheet-collapse-flag,
 		input[type='radio'] {
 			@extend %toggleRelative;
@@ -283,10 +316,18 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 
 		input.sheet-display-flag { position: absolute; }
 
+		div.sheet-border-box {
+			button[type='roll'] {
+				font-size: 0.8em;
+				font-weight: bold;
+			}
+		}
+
 		/***** REPEATING CONTAINERS *****/
 		div.sheet-repeating-container {
 			div.repitem {
 				display: inline-grid;
+				padding: 1% 0.5%;
 				@extend %gridGap;
 
 				input[type="text"] { width: 100%; }
@@ -303,13 +344,7 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 					select { text-transform: capitalize; }
 				}
 
-				div.sheet-collapse {
-					@extend %display-none;
-					padding-left: 5%;
-				}
-
-				/* SHOW COLLAPSABLE DESCRIPTIONS AFTER CLICKING HIDDEN CHECKBOX */
-			    input.sheet-collapse-flag:checked ~ div.sheet-collapse { display: block; }
+				div.sheet-collapse { padding-left: 5%; }
 			}
 		}
 
@@ -321,6 +356,8 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 
 		/***** SKILLS *****/
 		div.sheet-skill-box {
+			$skillGrid: 1fr 3.5em 5em 5em 1em 1em;
+
 			button[type='roll'] {
 				font-size: 1em;
 				text-align: left;
@@ -333,9 +370,9 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 				font-size     : 0.8em;
 				text-transform: capitalize;
 
-				&[data-i18n-title='ratingmodifier'] { grid-area: 2 / 3 / 2 / 6; }
-				&[data-i18n-title='specializations'] { grid-area: 3 / 1 / 3 / 6; }
-				&[data-i18n-title='notes'], textarea { grid-area: 4 / 1 / 4 / 6; }
+				&[data-i18n-title='ratingmodifier'] { grid-area: 1 / 3 / 1 / 7; }
+				&[data-i18n-title='specialization'] { grid-area: 3 / 1 / 3 / 7; }
+				&[data-i18n-title='notes'], textarea { grid-area: 4 / 1 / 4 / 7; }
 
 				& > input {
 					@extend %borderBottom;
@@ -349,49 +386,63 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 
 			input[name="attr_rating_modifier"] { width: 3.5em; }
 
+			input[name='attr_display_specialization'][value=''] ~ div.sheet-buttons button[name*='specialization'] { @extend %display-none; }
+
 			div.sheet-row-long {
-				display: inline-grid;
-				grid-column-gap: 1%;
-				grid-row-gap: 2%;
-				grid-template-columns: 1fr 3.5em 5em 5em 1.5em;
-				padding: 1%;
+				grid-template-columns: $skillGrid;
+				padding: 1% 0.5%;
 				width: 100%;
+
+				@extend %display-inline-grid;
+				@extend %gridGap;
 
 				h3:nth-of-type(1n+2) { text-align: center; }
 			}
 
-			select.sheet-attribute-select {
-				option:nth-of-type(1n+5) { color: $red; }
-				option:nth-of-type(1n+9) { color: #7a2593;	}
-			}
 
-			select.sheet-limit-select  {
-				option:nth-of-type(1n+5) { color: $red; }
+			div.repitem {
+				grid-template-columns: $skillGrid;
+
+				@include repeatingInformation(7);
+
+				input[name="attr_damage"],
+				input[name="attr_dicepool_modifier"] {
+					width: 3.5em;
+				}
+
+				div.sheet-settings { 
+					grid-column: 1 / 7;
+					grid-template-columns: $skillGrid;
+				}
 			}
 		}
 
 		/***** MAGIC *****/
 		div.sheet-magic {
+			$magicGrid: 1fr 4em 4em 6em 3em 1em 1em;
+
+			input.sheet-magic-toggle[value='rituals'] ~ .sheet-headers h2:nth-of-type(1n+2) {
+				@extend %display-none;
+			}
+
 			h3 { color: $blacker; }
+
+			button[type='roll'],
+			input[name='attr_name'] { text-align: left; }
 
 			div.sheet-headers {
 				display: grid;
 				@extend %gridGap;
+				grid-template-columns:$magicGrid;
 
 				h3:nth-of-type(1n+2) { text-align: center; }
 			} 
 
 
 			div.sheet-spellsForumlas {
-				$alchemicForumlasGrid: 1fr 4em 4em 6em 3em 1em 1em;
-
-				div.sheet-headers {
-					grid-template-columns:$alchemicForumlasGrid;
-				} 
-
 
 				div.repitem {
-					grid-template-columns: $alchemicForumlasGrid;
+					grid-template-columns: $magicGrid;
 
 					@include repeatingInformation(8);
 
@@ -406,34 +457,51 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 
 					div.sheet-settings { 
 						grid-column: 1 / 8;
-						grid-template-columns: $alchemicForumlasGrid;
-
-						h3 {margin-right: 2%;}
+						grid-template-columns: $magicGrid;
 					}
 				}
 			}
-		}
 
-		/***** MAGICAL PREPERATIONS *****/
-		div.sheet-magic-preps {
-			/* READIED PREPARATIONS */
-			div.sheet-prepared-preparations {
-				$preparationsGrid: 1fr 5em 5em 6em 1em 1em;
+			div.sheet-magic-rituals {
+				$ritualsGrid: 1fr 1em 1em;
 
-				div.sheet-headers {
-					grid-template-columns:$preparationsGrid ;
-				} 
+				@include repeatingInformation(4);
 
 				div.repitem {
-					grid-template-columns: $preparationsGrid ;
+					grid-template-columns: $ritualsGrid;
 
-					@include repeatingInformation(7);
+					label[data-i18n-title="name"] { grid-column: 1 / 4; }
 
-					div.sheet-settings { 
-						grid-column: 1 / 7;
-						grid-template-columns: $preparationsGrid;
+					div.sheet-row { grid-column: 1 / 4; }
+				}
 
-						select { grid-column: 4 / 7; }
+				div.sheet-settings {
+					grid-template-columns: $ritualsGrid;
+					grid-column: 1 / 4;
+				}
+			}
+
+			/***** MAGICAL PREPERATIONS *****/
+			div.sheet-magic-preps {
+				/* READIED PREPARATIONS */
+				div.sheet-prepared-preparations {
+					$preparationsGrid: 1fr 5em 5em 6em 1em 1em;
+
+					div.sheet-headers {
+						grid-template-columns:$preparationsGrid ;
+					} 
+
+					div.repitem {
+						grid-template-columns: $preparationsGrid ;
+
+						@include repeatingInformation(7);
+
+						div.sheet-settings { 
+							grid-column: 1 / 7;
+							grid-template-columns: $preparationsGrid;
+
+							select { grid-column: 4 / 7; }
+						}
 					}
 				}
 			}

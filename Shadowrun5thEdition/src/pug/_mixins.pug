@@ -1,6 +1,6 @@
 //- ROLL BUTTON
 mixin rollButton(header, base, rollFormula)
-    button(data-i18n=header name=header type='roll' value!=rollBeginging+'{{header=^{'+header+'}}}{{base='+base+'}}{{dice=[[(('+rollFormula+')'+rollEnding) #{header}
+    button(data-i18n=header name=`roll_${header}` type='roll' value!=rollBeginging+'{{header=^{'+header+'}}}{{base='+base+'}}{{dice=[[(('+rollFormula+')'+rollEnding) #{header}
 
 //- SKILL BUTTON
 mixin skillButton(specialization)
@@ -8,29 +8,29 @@ mixin skillButton(specialization)
     - const rollFormula = specialization === true ? '@{dicepool}+@{attribute}+2' : '@{dicepool}+@{attribute}';
     - const desc = specialization === true ? 'Spec: @{specialization}, @{display_limit}' : '@{display_limit}';
     - const display = specialization === true ? 'attr_display_specialization' : 'attr_display';
-    button(name=rollName type='roll' value!=rollBeginging+'{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[(('+rollFormula+')'+rollEnding+'{{desc='+desc+'}}')
+    button(name=`roll_${rollName}` type='roll' value!=rollBeginging+'{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[(('+rollFormula+')'+rollEnding+'{{desc='+desc+'}}')
         span(name=display)
 
 //- ROLLS
 mixin displayRollButton(button, wounds)
     - const rollTemplateBeginning = wounds ? rollBeginging : noWoundsRollBegining;
     - const rollTemplateEnding = wounds ? rollEnding : noWoundsRollEnding;
-    button(name=button['name'] type='roll' value!=rollTemplateBeginning+'{{header='+button['header']+'}}{{base=^{base}}}{{dice=[[(('+button['rollFormula']+')'+rollTemplateEnding+button['desc'])
+    button(name=`roll_${button['name']}` type='roll' value!=rollTemplateBeginning+'{{header='+button['header']+'}}{{base=^{base}}}{{dice=[[(('+button['rollFormula']+')'+rollTemplateEnding+button['desc'])
          span(name='attr_'+button['display'])
 
 //- SOAK ROLL
 mixin soakRoll(header, base, rollForumla)
-    button(data-i18n=header name=header type='roll' value!=noWoundsRollBegining+'{{header=^{'+header+'}}}{{base='+base+'}}{{dice=[[(('+rollForumla+')'+noWoundsRollEnding) #{name}
+    button(data-i18n=header name=`roll_${header}` type='roll' value!=noWoundsRollBegining+'{{header=^{'+header+'}}}{{base='+base+'}}{{dice=[[(('+rollForumla+')'+noWoundsRollEnding) #{name}
 
 //- SPRITE BUTTONS
 mixin spriteButton(header, display)
-    button(name=header type='roll' value!=rollBeginging+'{{header=@{'+header+'}}}{{base=^{level}}}{{dice=[[((@{level}+@{level})'+rollEnding)
+    button(name=`roll_${header}` type='roll' value!=rollBeginging+'{{header=@{'+header+'}}}{{base=^{level}}}{{dice=[[((@{level}+@{level})'+rollEnding)
         span(name='attr_'+display)
 
 //- NPC ATTRIBUTE ROLLS
 mixin npcAttributeButton(attribute, rollFormula)
     - const abbreviation = attribute.slice(0,1).toLowerCase();
-    button(data-i18n=abbreviation name=attribute type='roll' value!=rollBeginging+'{{header=^{'+attribute+'}}}{{base=^{base}}}{{dice=[[(('+rollFormula+')'+rollEnding) #{abbreviation}
+    button(data-i18n=abbreviation name=`roll_${attribute}` type='roll' value!=rollBeginging+'{{header=^{'+attribute+'}}}{{base=^{base}}}{{dice=[[(('+rollFormula+')'+rollEnding) #{abbreviation}
 
 //- ATTRIBUTE SELECTS
 mixin attributeSelect(selectedDefault)
@@ -96,20 +96,17 @@ mixin pcSpells(type)
     - const repeatingSection = `@{repeating_${type}`+'_${x}';
     
     .rows.repeating-container
-        .row-long.headers
-            each val in ['spells', 'type', 'range', 'duration', 'drain']
-                h3(data-i18n=val) #{val}
         fieldset(class=`repeating_`+type)
             input(name='attr_dicepool' type='hidden' value='0')
             +displayRollButton(pcSpellButton, true)
             each val in ['type', 'range', 'duration', 'drain']
                 span.center(name='attr_'+val)
-            input.collapse-flag(name='attr_display_flag' type='checkbox')
+            input.collapse-flag(name='attr_display_flag' type='checkbox' checked)
             span.pictos i
-            input.settings-toggle(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+            input.settings-flag(name='attr_flag' title='Settings toggle' type='checkbox' checked)
             span.pictos x
             .collapse
-                span(name='attr_note')
+                span(name='attr_notes')
             .settings
                 each val, key in pcCoreSpellObject
                     - const translationKey = key.toLowerCase();
@@ -162,4 +159,4 @@ mixin pcSpells(type)
                                 input(name=`attr_${attrName}` placeholder=val['placeholder'] title=`${repeatingSection}_${attrName}}` type=val['type'])
                 h3(data-i18n='notes') notes
                 label(data-i18n-title='notes' title='notes')
-                    textarea(name='attr_note' placeholder='Notes' title=repeatingSection+'note}' type='text' value='')
+                    textarea(name='attr_notes' placeholder='Notes' title=repeatingSection+'note}' type='text' value='')
