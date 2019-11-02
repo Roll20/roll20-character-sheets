@@ -219,9 +219,9 @@
 								update[skill.name.toLowerCase().replace(/ /g, "")] = skilltotal;
 							};
 
-							//This needs to be verified with multiple specializations
-							if (skill.skillspecializations && skill.skillspecializations != null) {
-								const chummerSpecialization = skill.skillspecializations.skillspecialization.name;
+							//This needs to be verified with multiple specialization
+							if (skill.skillspecialization && skill.skillspecialization != null) {
+								const chummerSpecialization = skill.skillspecialization.skillspecialization.name;
 								const specialization = (chummerSpecialization.includes("[")) ? chummerSpecialization.slice(1, -1) : chummerSpecialization;
 								update[`${section}_specialization`] = specialization;
 							} else if (exotic === "TRUE") {

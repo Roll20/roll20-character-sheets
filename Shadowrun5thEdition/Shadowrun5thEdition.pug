@@ -176,7 +176,7 @@ include src/pug/_variables.pug
 							fieldset(class='repeating_preperations')
 								+displayRollButton(prepButton, false)
 								each val in ['force', 'potency', 'trigger']
-									span.center(name='attr_'+val)
+									span.center(name=`attr_${val}`)
 								input.collapse-flag(name='attr_display_flag' type='checkbox')
 								span.pictos i
 								input.settings-flag(name='attr_flag' title='Settings toggle' type='checkbox' checked)
@@ -240,19 +240,79 @@ include src/pug/_variables.pug
 
 	//- MATRIX TAB
 	.matrix.pc-col
-		.pc-row
-			include src/matrix.html
+		.pc-row.matrix-box
+			.header.right-header
+				h1(data-i18n='cyberdeck') Cyberdeck
+				.right-tri
+			.border-box
+				.pc-box.medium-box
+					.cyberdeck
+						include src/matrix.html
+					.rows.repeating-container.programs
+						h2(data-i18n='programs') Programs
+						fieldset(class=`repeating_programs`)
+							span(name='attr_program')
+							input.collapse-flag(name='attr_display_flag' type='checkbox')
+							span.pictos i
+							input.settings-flag(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+							span.pictos x
+							.collapse
+								span(name='attr_notes')
+							.settings
+								label(data-i18n-title='programs' title='programs')
+									input(name="attr_program" placeholder="Program name" title="@{repeating_programs_${x}_program}" type="text" value="")
+								h3(data-i18n='notes') notes
+								label(data-i18n-title='notes' title='notes')
+									textarea(name='attr_notes' placeholder='Notes' title='@{repeating_preperations_${x}_notes}' type='text' value='')
 		.pc-row
 			.header.right-header
 				h1(data-i18n='complexform') Complex Forms
 				.right-tri
-			.border-box.repeat-box.form-box
+			.border-box
 				.pc-box.medium-box
 					+fadeDrainSection('fade')
-					.row-long
-						each val, key in {'Complex Form': 'complexform','Target':'target', 'Duration': 'duration', 'Fade': 'fade'}
-							h3(data-i18n=val) #{key}
-					include src/complexforms.html
+					.rows.repeating-container.complex-forms
+						- const formsrepeatingSection = `@{repeating_forms`+'_${x}';
+						.row-long.headers
+							each val, key in {'Complex Form': 'complexform','Target':'target', 'Duration': 'duration', 'Fade': 'fade'}
+								h2(data-i18n=val) #{key}
+						fieldset(class=`repeating_forms`)
+							+displayRollButton(pcComplexFormButton, true)
+							each val in ['target', 'duration', 'fade']
+								span.center(name=`attr_${val}`)
+							input.collapse-flag(name='attr_display_flag' type='checkbox')
+							span.pictos i
+							input.settings-flag(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+							span.pictos x
+							.collapse
+								span(name='attr_notes')
+							.settings
+								label(data-i18n-title='name' title='name')
+									input(name="attr_name" placeholder="name" title=`${formsrepeatingSection}_name}` type="text" value="")
+								select(name=`attr_target` title=`${formsrepeatingSection}_target}` value='Device')
+									each val in formTargets
+										- const i18n = val.toLowerCase();
+										option(data-i18n=i18n value=val) #{val}
+								select(name=`attr_duration` title=`${formsrepeatingSection}_duration}` value='Instant')
+									each val in formDurations
+										- const i18n = val.toLowerCase();
+										option(data-i18n=i18n value=val) #{val}
+								label(data-i18n-title='fade' title='fade')
+									input(name="attr_fade"  placeholder="-1" title=`${formsrepeatingSection}_fade}` type="number" value="")
+								.row
+									h3(data-i18n="skill") skill
+									select(name=`attr_skill` title=`${formsrepeatingSection}_skill}` value='@{software}')
+										option(data-i18n="electronicsgroup" value="@{electronics}") Electronics Group
+										option(data-i18n="software" value="@{software}" selected) Software
+									h3(data-i18n="specialization") specialization
+									label(data-i18n-title='specialization' title='specialization')
+										input(name="attr_spec" value="2" title=`${formsrepeatingSection}_spec}` type="checkbox")
+									h3(data-i18n="modifier") modifier
+									label(data-i18n-title="modifier" title="modifier")
+										input(name="attr_dicepool_modifier" title=`${formsrepeatingSection}_dicepool_modifier}` type="number")
+								h3(data-i18n='notes') notes
+								label(data-i18n-title='notes' title='notes')
+									textarea(name='attr_notes' placeholder='Notes' title=`${formsrepeatingSection}_notes}` type='text' value='')
 
 	//- SOCIAL TAB
 	include src/social.html
