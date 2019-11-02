@@ -553,9 +553,10 @@
 		}
 
 	on("change:repeating_weapon", () => {
-	    getAttrs(["repeating_weapon_weapon_range", "repeating_weapon_weapon_melee", "repeating_weapon_weapon_type", "repeating_weapon_weapon_reach", "repeating_weapon_weapon_acc", "repeating_weapon_weapon_dv", "repeating_weapon_weapon_ap", "repeating_weapon_weapon_mode", "repeating_weapon_weapon_rc", "repeating_weapon_weapon_ammo", "repeating_weapon_weapon_note"], (v) => {
+		const source = "repeating_weapon_weapon";
+	    getAttrs([`${source}_range`, `${source}_type`, `${source}_reach`, `${source}_acc`, `${source}_dv`, `${source}_ap`, `${source}_mode`, `${source}_rc`, `${source}_ammo`, `${source}_note`, `${source}_primary`], (v) => {
 	        // Local builder putting the needed variables into scope for repeatingStringBuilder
-	        const b = repeatingStringBuilder(v, 'repeating_weapon_weapon_');
+	        const b = repeatingStringBuilder(v, `${source}_`);
 	        // Determine fields to display and in their proper order and formatting
 	        // Anonymous function is purely stylistic and adds more overhead than just a simple switch/case.  Personally I find the function looks cleaner and hides any internal scope that might conflict with outside
 	        const display = (() => {
@@ -596,10 +597,14 @@
 	            // Concat all the strings and add comma between
 	            .join(', ');
 
+	        let update = {};
+	        update[`${source}`] = `[${display}]`;
+
 	        // Finally wrap square brackets around the weapon display
-	        setAttrs({repeating_weapon_weapon: `[${display}]`});
+	        setAttrs(update);
 	    });
 	});
+
 
 	//Spell displays set into an Array
 		on("change:repeating_NPCspell", () => {
