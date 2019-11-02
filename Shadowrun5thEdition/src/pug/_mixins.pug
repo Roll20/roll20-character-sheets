@@ -1,0 +1,89 @@
+//- ROLL BUTTON
+mixin rollButton(header, base, rollFormula)
+    button(data-i18n=header name=header type='roll' value!=rollBeginging+'{{header=^{'+header+'}}}{{base='+base+'}}{{dice=[[(('+rollFormula+')'+rollEnding) #{header}
+
+//- SKILL BUTTON
+mixin skillButton(specialization)
+    - const rollName = specialization === true ? 'specialization' : 'skill';
+    - const rollFormula = specialization === true ? '@{dicepool}+@{attribute}+2' : '@{dicepool}+@{attribute}';
+    - const desc = specialization === true ? 'Spec: @{specialization}, @{display_limit}' : '@{display_limit}';
+    - const display = specialization === true ? 'attr_display_specialization' : 'attr_display';
+    button(name=rollName type='roll' value!=rollBeginging+'{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[(('+rollFormula+')'+rollEnding+'{{desc='+desc+'}}')
+        span(name=display)
+
+//- SOAK ROLL
+mixin soakRoll(header, base, rollForumla)
+    button(data-i18n=header name=header type='roll' value!=soakRollBeginging+'{{header=^{'+header+'}}}{{base='+base+'}}{{dice=[[(('+rollForumla+')'+soakRollEnding) #{name}
+
+//- SPRITE BUTTONS
+mixin spriteButton(header, display)
+    button(name=header type='roll' value!=rollBeginging+'{{header=@{'+header+'}}}{{base=^{level}}}{{dice=[[((@{level}+@{level})'+rollEnding)
+        span(name='attr_'+display)
+
+//- BUTTONS FOR NPCS
+mixin npcButton(button)
+    button(name=button['name'] type='roll' value!=rollBeginging+'{{header=@{'+button['header']+'}}}{{base=^{base}}}{{dice=[[(('+button['rollFormula']+')'+rollEnding+button['desc'])
+         span(name='attr_'+button['display'])
+
+//- NPC ATTRIBUTE ROLLS
+mixin npcAttributeButton(attribute, rollFormula)
+    - const abbreviation = attribute.slice(0,1).toLowerCase();
+    button(data-i18n=abbreviation name=attribute type='roll' value!=rollBeginging+'{{header=^{'+attribute+'}}}{{base=^{base}}}{{dice=[[(('+rollFormula+')'+rollEnding) #{abbreviation}
+
+//- ATTRIBUTE SELECTS
+mixin attributeSelect(selectedDefault)
+    each attribute in attributesArray
+        - const attributeName = attribute.toLowerCase();
+        if attribute === selectedDefault
+            option(data-i18n=attributeName value='@{' + attributeName + '}' selected) #{attribute}
+        else
+             option(data-i18n=attributeName value='@{' + attributeName + '}') #{attribute}
+
+//- LIMIT SElECTS
+mixin limitSelect(selectedDefault)
+    option(value='none') -
+    each val, key in limitObject
+        - const attributeName = key.toLowerCase().replace(' ', '_');
+        if key === selectedDefault
+            option(data-i18n=attributeName value='@{' + val + '}' selected) #{key}
+        else
+            option(data-i18n=attributeName value='@{' + val + '}') #{key}
+
+//- HOST & SPRITE NPCS
+mixin hostSprite(object, attrName)
+    each val, key in object
+        - const base = '^{'+attrName+'}', rollForumla = '@{'+attrName+'}+@{'+val[0]+'}';
+        +rollButton(val[0], base, rollForumla)
+        span(name='attr_'+val[0])
+        label.settings(data-i18n-title=val[0] title=key)
+            input(name='attr_'+val[0] placeholder=val[1] title='@{'+val[0]+'}' type='number' value='')
+            
+//- INITITAITVE ROLL
+mixin initiativeRoll(name, attribute, translation)
+    button(data-i18n=translation name=name type='roll' value!=rollBeginging+'{{header=^{'+translation+'}}}{{base=^{base}}}{{dice=[[((@{'+attribute+'_mod})+@{wounds_toggle}+@{modifiers_toggle})+(@{'+attribute+'_dice})d6cf0 &{tracker}]]}}') #{name}
+
+//- NPC CONDITION MONITOR
+mixin conditionMonitor(conditionTypes)
+    each val in conditionTypes
+        label.settings(data-i18n-title=val+'bonus' title=val+'bonus')
+            input(name='attr_'+val+'_modifier' placeholder='0' title='@{'+val+'_modifier}' type='number' value='0')
+        if val === 'physical'
+            span.settings /
+    span.settings.tiny-span() =
+    each val in conditionTypes
+        span(name='attr_'+val title='@{'+val+'_modifier}')
+        if val === 'physical'
+            span /
+
+//- PC FADE & DRAIN ROLLS
+mixin fadeDrainSection(fadeOrDrain)
+    - const defaultFirstAttribute = fadeOrDrain === 'fade' ? 'Resonance' : 'Logic';
+    +soakRoll(fadeOrDrain, '^{base}', '@{'+fadeOrDrain+'_attribute_1}+@{'+fadeOrDrain+'_attribute_2}+@{'+fadeOrDrain+'_modifier}')
+    select.attribute-select(name='attr_'+fadeOrDrain+'_attribute_1' title='@{'+fadeOrDrain+'_attribute_1}')
+        +attributeSelect(defaultFirstAttribute)
+    span +
+    select.attribute-select(name='attr_'+fadeOrDrain+'_attribute_2' title='@{'+fadeOrDrain+'_attribute_2}')
+        +attributeSelect('Willpower')
+    h3(data-i18n='modifier') modifier
+    label(data-i18n-title='modifier' title='modifier')
+        input(name='attr_'+fadeOrDrain+'_modifier' title='@{'+fadeOrDrain+'_modifier}' type="number" value=0)
