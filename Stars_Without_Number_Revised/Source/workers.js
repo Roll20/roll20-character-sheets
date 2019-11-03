@@ -2472,7 +2472,7 @@
 			const macroList = [
 				"[**^{SAVES}** v@{npc_saves},](~npc_save) [**^{SKILLS}** +@{npc_skills},](~npc_skill) ",
 				"[**^{MORALE}** v@{npc_morale}](~npc_morale)\n",
-				"[**^{INITIATIVE}** d8,](~npc_initiative) [**^{REACTION}** 2d6,](~npc_reaction) ",
+				"[**^{INITIATIVE_FIXED}** d8,](~npc_initiative) [**^{REACTION}** 2d6,](~npc_reaction) ",
 				"**Move** @{npc_move}\n"
 			];
 			if (v.macro_npc_attacks) macroList.push("\n**Attacks:** @{macro_npc_attacks}");

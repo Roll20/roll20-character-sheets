@@ -47,6 +47,7 @@ on Github.
 * Fixed an issue with the travel cost formula when the crew field was empty
 * Fixed an issue with roll buttons referencing the old "name" attribute instead
   of character_name
+* Fixed the tranlation for Initiative
 
 ### 2.4.4
 
