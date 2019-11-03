@@ -78,17 +78,18 @@ mixin conditionMonitor(conditionTypes)
             span /
 
 //- PC FADE & DRAIN ROLLS
-mixin fadeDrainSection(fadeOrDrain)
-    - const defaultFirstAttribute = fadeOrDrain === 'fade' ? 'Resonance' : 'Logic';
-    +soakRoll(fadeOrDrain, '^{base}', '@{'+fadeOrDrain+'_attribute_1}+@{'+fadeOrDrain+'_attribute_2}+@{'+fadeOrDrain+'_modifier}')
-    select.attribute-select(name='attr_'+fadeOrDrain+'_attribute_1' title='@{'+fadeOrDrain+'_attribute_1}')
+mixin fadeDrainSection(fadeOrDrain, adept)
+    - const defaultFirstAttribute = fadeOrDrain === 'fade' ? 'Resonance' : adept ? 'Body' : 'Logic';
+    - const nameFadeorDrain = adept ? 'drain' : fadeOrDrain;
+    +soakRoll(nameFadeorDrain, '^{base}', `@{${nameFadeorDrain}_attribute_1}+@{${nameFadeorDrain}_attribute_2}+@{${nameFadeorDrain}_modifier}`)
+    select.attribute-select(name=`attr_${nameFadeorDrain}_attribute_1` title=`@{${nameFadeorDrain}_attribute_1}`)
         +attributeSelect(defaultFirstAttribute)
     span +
-    select.attribute-select(name='attr_'+fadeOrDrain+'_attribute_2' title='@{'+fadeOrDrain+'_attribute_2}')
+    select.attribute-select(name=`attr_${nameFadeorDrain}_attribute_2` title=`@{${nameFadeorDrain}_attribute_2}`)
         +attributeSelect('Willpower')
     h3(data-i18n='modifier') modifier
     label(data-i18n-title='modifier' title='modifier')
-        input(name='attr_'+fadeOrDrain+'_modifier' title='@{'+fadeOrDrain+'_modifier}' type='number' value=0)
+        input(name=`attr_${nameFadeorDrain}_modifier` title=`@{${nameFadeorDrain}_modifier}` type='number' value=0)
 
 //- PC SPELLS AND PREPARATIONS
 mixin pcSpells(type)
@@ -160,3 +161,19 @@ mixin pcSpells(type)
                 h3(data-i18n='notes') notes
                 label(data-i18n-title='notes' title='notes')
                     textarea(name='attr_notes' placeholder='Notes' title=repeatingSection+'note}' type='text' value='')
+
+
+//- REPEATING SECTIONS FLAGS
+mixin repeatingSectionFlags()
+    input.collapse-flag(name='attr_display_flag' type='checkbox')
+    span.pictos i
+    input.settings-flag(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+    span.pictos x
+    .collapse
+        span(name='attr_notes')
+
+//- REPEATING SECTIONS NOTES
+mixin repeatingSectionNotes(section)   
+    h3(data-i18n='notes') notes
+    label(data-i18n-title='notes' title='notes')
+        textarea(name='attr_notes' placeholder='Notes' title=`@{repeating_preperations_${section}`+'${x}_notes}' type='text' value='')

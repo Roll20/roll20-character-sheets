@@ -94,12 +94,7 @@ include src/pug/_variables.pug
 										+attributeSelect(val[1])
 									select.limit-select(name='attr_limit' value='physical_limit' title=`${repeatingSection}_limit}`)
 										+limitSelect(val[2])
-									input.collapse-flag(name='attr_display_flag' type='checkbox' checked)
-									span.pictos i
-									input.settings-flag(name='attr_flag' title='Settings toggle' type='checkbox' checked)
-									span.pictos x
-									.collapse
-										span(name='attr_notes')
+									+repeatingSectionFlags()
 									.settings
 										if key === 'active'
 											select.skill-select(name='attr_skill' value='Close Combat Group' title=`${repeatingSection}_skill}`)
@@ -127,10 +122,57 @@ include src/pug/_variables.pug
 	include src/arms.html
 
 	//- AUGS TAB
-	include src/augs.html
+	.augs.pc-col
+		.pc-row
+			.header.right-header
+				h1(data-i18n='augmentations') Augmentations
+				.right-tri
+			.border-box
+				.pc-box.medium-box
+					.row-long.headers
+						each val in augementations
+							h2(data-i18n=`${val.toLowerCase()}`) #{val}
+					.rows.repeating-container
+						fieldset(class=`repeating_augementations`)
+							span(name=`attr_augementation`)
+							span.center(name=`attr_rating`)
+							span.center(name=`attr_essence`)
+							+repeatingSectionFlags()
+							.settings
+								each val in augementations
+									- const attrName = val === 'Augmentations' ? "augementation" : val.toLowerCase();
+									- const type = val === 'Augmentations' ? 'text' : 'number';
+									- const placeholder = val === 'Augmentations' ? 'name' : '0';
+									label(data-i18n-title=val title=val)
+										input(name=`attr_${attrName}` placeholder=placeholder title=`@{repeating_augementations_`+'${x}'+`_${attrName}}` type=type value="")
+								+repeatingSectionNotes('augementations')
 
 	//- GEAR TAB
-	include src/gear.html
+	.gear.pc-col
+		.pc-row
+			.header.right-header
+				h1(data-i18n='gear') gear
+				.right-tri
+			.border-box
+				.pc-box.medium-box
+					.row-long.headers
+						each val in ['Item', 'Rating', 'Quantity']
+							h2(data-i18n=`${val.toLowerCase()}`) #{val}
+					.rows.repeating-container
+						fieldset(class=`repeating_items`)
+							span(name=`attr_item`)
+							span.center(name=`attr_rating`)
+							span.center(name=`attr_quantity`)
+							+repeatingSectionFlags()
+							.settings
+								label(data-i18n-title='item' title='item')
+									input(name=`attr_item` placeholder=name title=`@{repeating_items_`+'${x}'+`_item}` type='text' value="")
+								label(data-i18n-title='rating' title='rating')
+									input(name=`attr_rating` placeholder=name title=`@{repeating_items_`+'${x}'+`_rating}` type='text' value="")
+								label(data-i18n-title='quantity' title='quantity')
+									input(name=`attr_quantity` placeholder=name title=`@{repeating_items_`+'${x}'+`_quantity}` type='text' value="")
+								+repeatingSectionNotes('items')
+
 
 	//- MAGIC TAB
 	.magic.pc-col
@@ -177,12 +219,7 @@ include src/pug/_variables.pug
 								+displayRollButton(prepButton, false)
 								each val in ['force', 'potency', 'trigger']
 									span.center(name=`attr_${val}`)
-								input.collapse-flag(name='attr_display_flag' type='checkbox')
-								span.pictos i
-								input.settings-flag(name='attr_flag' title='Settings toggle' type='checkbox' checked)
-								span.pictos x
-								.collapse
-									span(name='attr_note')
+								+repeatingSectionFlags()
 								.settings
 									label(data-i18n-title='name' title='name')
 										input(name='attr_name' placeholder='Name' title='@{repeating_preperations_${x}_name}' type='text' value='')
@@ -196,24 +233,17 @@ include src/pug/_variables.pug
 											option(data-i18n='contact' value='Contact' selected) contact
 											option(data-i18n='time' value='Time') time
 											option(data-i18n='special' value='Special') special
-									h3(data-i18n='notes') notes
-									label(data-i18n-title='notes' title='notes')
-										textarea(name='attr_notes' placeholder='Notes' title='@{repeating_preperations_${x}_notes}' type='text' value='')
+									+repeatingSectionNotes('preperations')
 
 					.magic-rituals
 						.rows.repeating-container
-							fieldset(class=`repeating_ritua`+type)
+							fieldset(class=`repeating_ritual`)
 								- const repeatingRitualSection = `@{repeating_${type}`+'_${x}';
 								input(name='attr_dicepool' type='hidden' value='0')
 								+displayRollButton(pcSpellButton, true)
 								each val in ['type', 'range', 'duration', 'drain']
 									span.center(name='attr_'+val)
-								input.collapse-flag(name='attr_display_flag' type='checkbox' checked)
-								span.pictos i
-								input.settings-flag(name='attr_flag' title='Settings toggle' type='checkbox' checked)
-								span.pictos x
-								.collapse
-									span(name='attr_notes')
+								+repeatingSectionFlags()
 								.settings
 									label(data-i18n-title='name' title='name')
 										input(name="attr_name" placeholder="Curse (MATERIAL LINK, SPELL)" title=`@{${repeatingRitualSection}_name}` type="text")
@@ -228,15 +258,30 @@ include src/pug/_variables.pug
 										h3(data-i18n="modifier") modifier
 										label(data-i18n-title="modifier" title="modifier")
 											input(name="attr_dicepool_modifier" title=`@{${repeatingRitualSection}_dicepool_modifier}` type="number")
-									h3(data-i18n='notes') notes
-									label(data-i18n-title='notes' title='notes')
-										textarea(name='attr_notes' placeholder='Notes' title=repeatingSection+'note}' type='text' value='')
+									+repeatingSectionNotes('ritual')
 
-
-
-
-		.pc-row
-			include src/powers.html
+		.pc-row.powers
+			.header.right-header
+				h1(data-i18n='adeptpowers') Adept Powers or Other Abilities
+				.right-tri
+			.border-box
+				.pc-box.medium-box
+					+fadeDrainSection('drain', true)
+					.row-long.headers
+						h2(data-i18n='name') Name
+						h2.center(data-i18n='rating') Rating
+					.rows.repeating-container.powers
+						fieldset(class=`repeating_powers`)
+							span(name='attr_name')
+							span.center(name='attr_rating')
+							+repeatingSectionFlags()
+							.settings
+								label(data-i18n-title='name' title='name')
+									input(name="attr_name" placeholder="name" title="@{repeating_powers_${x}_name}" type="text" value="")
+								label(data-i18n-title='rating' title='rating')
+									input(name="attr_rating" placeholder="rating" title="@{repeating_powers_${x}_rating}" type="number" value="")
+								h3(data-i18n='notes') notes
+								+repeatingSectionNotes('powers')
 
 	//- MATRIX TAB
 	.matrix.pc-col
@@ -247,23 +292,16 @@ include src/pug/_variables.pug
 			.border-box
 				.pc-box.medium-box
 					.cyberdeck
-						include src/matrix.html
+						include src/html/matrix.html
 					.rows.repeating-container.programs
 						h2(data-i18n='programs') Programs
 						fieldset(class=`repeating_programs`)
 							span(name='attr_program')
-							input.collapse-flag(name='attr_display_flag' type='checkbox')
-							span.pictos i
-							input.settings-flag(name='attr_flag' title='Settings toggle' type='checkbox' checked)
-							span.pictos x
-							.collapse
-								span(name='attr_notes')
+							+repeatingSectionFlags()
 							.settings
 								label(data-i18n-title='programs' title='programs')
 									input(name="attr_program" placeholder="Program name" title="@{repeating_programs_${x}_program}" type="text" value="")
-								h3(data-i18n='notes') notes
-								label(data-i18n-title='notes' title='notes')
-									textarea(name='attr_notes' placeholder='Notes' title='@{repeating_preperations_${x}_notes}' type='text' value='')
+								+repeatingSectionNotes('programs')
 		.pc-row
 			.header.right-header
 				h1(data-i18n='complexform') Complex Forms
@@ -277,15 +315,11 @@ include src/pug/_variables.pug
 							each val, key in {'Complex Form': 'complexform','Target':'target', 'Duration': 'duration', 'Fade': 'fade'}
 								h2(data-i18n=val) #{key}
 						fieldset(class=`repeating_forms`)
+							input(name='attr_dicepool' type='hidden' value='0')
 							+displayRollButton(pcComplexFormButton, true)
 							each val in ['target', 'duration', 'fade']
 								span.center(name=`attr_${val}`)
-							input.collapse-flag(name='attr_display_flag' type='checkbox')
-							span.pictos i
-							input.settings-flag(name='attr_flag' title='Settings toggle' type='checkbox' checked)
-							span.pictos x
-							.collapse
-								span(name='attr_notes')
+							+repeatingSectionFlags()
 							.settings
 								label(data-i18n-title='name' title='name')
 									input(name="attr_name" placeholder="name" title=`${formsrepeatingSection}_name}` type="text" value="")
@@ -310,9 +344,7 @@ include src/pug/_variables.pug
 									h3(data-i18n="modifier") modifier
 									label(data-i18n-title="modifier" title="modifier")
 										input(name="attr_dicepool_modifier" title=`${formsrepeatingSection}_dicepool_modifier}` type="number")
-								h3(data-i18n='notes') notes
-								label(data-i18n-title='notes' title='notes')
-									textarea(name='attr_notes' placeholder='Notes' title=`${formsrepeatingSection}_notes}` type='text' value='')
+								+repeatingSectionNotes('forms')
 
 	//- SOCIAL TAB
 	include src/social.html
@@ -339,5 +371,5 @@ include src/html/hidden.html
 include src/pug/scripts.js
 
 //- CHUMMER IMPORTER
-include src/importer.html
+include src/html/importer.html
 include src/js/importer.js
