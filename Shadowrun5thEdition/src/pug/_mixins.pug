@@ -18,6 +18,16 @@ mixin displayRollButton(button, wounds)
     button(name=`roll_${button['name']}` type='roll' value!=rollTemplateBeginning+'{{header='+button['header']+'}}{{base=^{base}}}{{dice=[[(('+button['rollFormula']+')'+rollTemplateEnding+button['desc'])
          span(name='attr_'+button['display'])
 
+//- ROLLS
+mixin spellRollButton(button)
+    button(name=`roll_${button['name']}` type='roll' value!=rollBeginging+'{{header='+button['header']+'}}{{base=^{magic}}}{{dice=[[(('+button['rollFormula']+')'+rollEnding+button['desc'])
+         span(name='attr_'+button['display'])
+
+//- PC WEAPON ROLL BUTTON
+mixin weaponRollButton(button)
+    button(name=`roll_${button['name']}` type='roll' value!=`${rollBeginging}{{header=${button['header']}}}{{base=^{agility}}}`+'{{dice=[[(('+button['rollFormula']+')'+rollEnding+button['desc'])
+         span(name=`attr_${button['display']}`)
+
 //- SOAK ROLL
 mixin soakRoll(header, base, rollForumla)
     button(data-i18n=header name=`roll_${header}` type='roll' value!=noWoundsRollBegining+'{{header=^{'+header+'}}}{{base='+base+'}}{{dice=[[(('+rollForumla+')'+noWoundsRollEnding) #{name}
@@ -99,7 +109,8 @@ mixin pcSpells(type)
     .rows.repeating-container
         fieldset(class=`repeating_`+type)
             input(name='attr_dicepool' type='hidden' value='0')
-            +displayRollButton(pcSpellButton, true)
+            button(name=`roll_${type}}` type='roll' value!=rollBeginging+'{{header=@{name}}}{{base=^{magic}}}{{dice=[[((@{skill}+@{dicepool}+@{magic})'+rollEnding+'{{desc=@{combat_type}?{Force|}}}{{drain=[[?{Force|}+(@{drain})]]}}')
+                span(name='attr_name')
             each val in ['type', 'range', 'duration', 'drain']
                 span.center(name='attr_'+val)
             input.collapse-flag(name='attr_display_flag' type='checkbox' checked)
@@ -148,20 +159,26 @@ mixin pcSpells(type)
                         h3(data-i18n=translationKey) #{key}
                         if val['type'] === 'select'
                             select(name=`attr_${attrName}` title=`${repeatingSection}_${attrName}}` value=val['default'])
-                                each type in val['array']
-                                    - const i18n = type.includes('Group') ? type.toLowerCase().replace(' ', '') : type.toLowerCase();
-                                    - const attrName = type.includes('Group') ? type.toLowerCase().split(' ')[0] : type.toLowerCase();
+                                each skill in val['array']
+                                    - const i18n = skill.includes('Group') ? skill.toLowerCase().replace(' ', '') : skill.toLowerCase();
+                                    - const attrName = skill.includes('Group') ? skill.toLowerCase().split(' ')[0] : skill.toLowerCase();
                                     if val['default'] === `@{${attrName}}`
-                                        option(data-i18n=i18n value=type 'selected') #{i18n}
+                                        option(data-i18n=i18n value=`@{${attrName}}` 'selected') #{i18n}
                                     else
-                                        option(data-i18n=i18n value=type) #{i18n}
+                                        option(data-i18n=i18n value=`@{${attrName}}`) #{i18n}
                         else
                             label(data-i18n-title=translationKey title=key)
                                 input(name=`attr_${attrName}` placeholder=val['placeholder'] title=`${repeatingSection}_${attrName}}` type=val['type'])
                 h3(data-i18n='notes') notes
                 label(data-i18n-title='notes' title='notes')
-                    textarea(name='attr_notes' placeholder='Notes' title=repeatingSection+'note}' type='text' value='')
+                    textarea(name='attr_notes' placeholder='Notes' title=`${repeatingSection}_notes}` type='text' value='')
 
+
+//- PC ARMS
+mixin h2Headers(headerObject)
+    .row-long.headers
+        each val, key in headerObject
+            h2(data-i18n=`${key.toLowerCase()}`) #{key}
 
 //- REPEATING SECTIONS FLAGS
 mixin repeatingSectionFlags()
