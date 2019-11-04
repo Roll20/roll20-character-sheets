@@ -605,7 +605,6 @@
 	    });
 	});
 
-
 	//Spell displays set into an Array
 		on("change:repeating_NPCspell", () => {
 		    getAttrs(["repeating_NPCspell_combat_type", "repeating_NPCspell_type", "repeating_NPCspell_range", "repeating_NPCspell_damage", "repeating_NPCspell_duration", "repeating_NPCspell_drain", "repeating_NPCspell_note"], (v) =>{

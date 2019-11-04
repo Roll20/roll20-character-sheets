@@ -2,6 +2,28 @@
 
 ## Änderungen
 
+2019-10-29:
+- Fix eines Problems mit der Auswahl und Berechnung von Fernkampfwaffen
+- Neu: Unter Optionen stehen diverse Farbschema zur Auswahl: Yrn White (Default), Nebachot Sand, Rekki Blue, Perceval Grey, Gerasim Green)
+- Aufruf: Wer Ideen hat und das eigene Farbschema im Bogen sehen möchte, kann mir eine Nachricht an untenstehende Emailadresse senden.
+  Das Farbschema sollte folgende Punkte abdecken und der Namen einen Bezug zu Aventurien aufweisen:
+{
+  --color-font-tab-checked : white;
+  --bg-tab-unchecked       : white;
+  --bg-tab-checked         : green;
+  --bg-sheet               : #ffffff;
+  --bg-input               : #ffffff;
+  --bg-input-readonly      : #f5f5f5;
+  --color-font             : black;
+  --color-border           : black;
+}
+
+
+
+2019-10-18: strukturelle Anpassungen durch Tajo, um Sortierreihenfolge bei Übersetzungen z. B. bei Talenten beizubehalten
+
+2019-10-14: Englische Übersetzung durch Tajo. Vielen Dank!
+
 2019-10-07:
 - Änderungen des Status lösen nun eine Neuberechnung der Kampfwerte aus --> bestehende Events ergänzt
 - Änderungen der Kampftechnikwerte führen zur Neuberechnung der Kampfwerte --> neuer Event Trigger und Change Flag (ktw_change_flag) hinzugefügt.
@@ -222,4 +244,4 @@ Unter Status lassen sich die unterschiedlichen Zunstände eintragen. Entsprechen
 ## Danksagung
 
 Großer Dank geht an die Entwickler des DSA5 Character Sheet German   Patrick Gebhardt, enhanced by Sönke Holsten, Adam Fedor. Einige Teile des Charakterbogens habe ich von dort übernommen oder mich inspirieren lassen.
-Noch größerer Dank geht an alle, deren Anregungen und Feedback in den Bogen eingeflossen sind, insbesonders an: Perceval, Igraine, Lodge, Paladose, Danii, Tiro.
+Noch größerer Dank geht an alle, deren Anregungen und Feedback in den Bogen eingeflossen sind, insbesonders an: Perceval, Igraine, Lodge, Paladose, Danii, Tiro sowie Tajo für die englische Übersetzung.
