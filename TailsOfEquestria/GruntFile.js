@@ -1,5 +1,24 @@
 module.exports = function(grunt) {
   grunt.initConfig({
+    jshint: {
+      dist: {
+        src: ['js/worker.js']
+      },
+      options: {
+        esversion: 6,
+        globals: {
+          '_': true,
+          'generateRowID': true,
+          'getAttrs': true,
+          'getSectionIDs': true,
+          'on': true,
+          'setAttrs': true
+        },
+        strict: true,
+        sub: true,
+        undef: true
+      }
+    },
     less: {
       default: {
         files: {
@@ -49,9 +68,10 @@ module.exports = function(grunt) {
     }
   });
 
+  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-pug');
   grunt.loadNpmTasks('grunt-string-replace');
 
-  grunt.registerTask('default', ['less', 'pug', 'string-replace']);
+  grunt.registerTask('default', ['jshint', 'less', 'pug', 'string-replace']);
 };
