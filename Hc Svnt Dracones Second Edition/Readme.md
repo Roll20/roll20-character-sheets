@@ -6,6 +6,7 @@ Official Character Sheet
 ## V.1.50 (2019-11)
 * "XP purchase"-section(Page 3) now automatically adjusts "XP Spent" and "Remaining Exp" when checking/unchecking new entires in the section(it does not prevent from selecting both options in places where ther are choices, nor does it prevent selecting things out of order).
 * Editing "Total Exp" also updates "Remaining Exp" accordingly
+* "Xp purchase"-section updates the numbers in the "Progression Purchase Tracking"-section, as well as increase credits amounts accordingly if credits have been gained through it. Adds a hidden "attr_progression_credits_track" attribute for tracking how many times credits have been gained through XP purchase
 
 ## V.1.20 (2019-10)
 
