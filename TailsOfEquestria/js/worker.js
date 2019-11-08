@@ -1,6 +1,27 @@
 (() => {
   'use strict';
 
+  // A list of the dice, in descending order.
+  let DICE_DESCENDING = ['D20', 'D12', 'D10', 'D8', 'D6', 'D4'];
+
+  // Constant for a normal upgrade/downgrade. No special rules apply.
+  let NORMAL_UPDOWNGRADE = 0;
+
+  // Constant for when a D20 is upgraded. The player can choose to reroll the
+  // D20 and use the new result.
+  let SUPER_UPGRADE = 1;
+
+  // Constant for when a D4 is downgraded. The player must reroll the D4 and
+  // use the worst result.
+  let SUPER_DOWNGRADE = 2;
+
+  // Map upgrade/downgrade type constants to an upgrade/downgrade note.
+  let UPDOWNGRADE_NOTES = {
+    [NORMAL_UPDOWNGRADE]: '',
+    [SUPER_UPGRADE]: 'Can choose to reroll D20. Must use new result.',
+    [SUPER_DOWNGRADE]: 'Must reroll D4 and use lowest result.'
+  };
+
   /**
    * Forces an update on a list of numerical fields, also making sure that
    * any undefined fields are set to 0.
@@ -51,7 +72,7 @@
 
     // Produce the appropriate view based on the dice counts.
     var view = '';
-    _.each(['D20', 'D12', 'D10', 'D8', 'D6', 'D4'], die => {
+    _.each(DICE_DESCENDING, die => {
       var count = diceCount[die];
       if(view && count > 0)
         view += '+';
@@ -65,42 +86,113 @@
   }
 
   /**
+   * @typedef {object} UpdownResult
+   * @property {string} roll
+   *           The modified roll expression.
+   * @property {int} resultType
+   *           One of SUPER_UPGRADE, SUPER_DOWNGRADE, or NORMAL_UPDOWNGRADE.
+   */
+
+  /**
    * Gets the upgraded/downgraded dice for a roll.
    * @param {string} roll
    *        The roll expression.
    * @param {int} steps
    *        Positive for upgrade, negative for downgrade.
+   * @return {string}
+   *        The dice expression for the upgraded/downgraded roll.
    */
   function getUpDowngradedRoll(roll, steps) {
-    var diceCount = getRollDiceCount(roll);
+    if (steps === 0)
+      return roll;
 
-    // Derive a numerical value for the dice that can be incremented up and down
-    // by upgrades and downgrades.
-    var diceValue = diceCount['D20']*6;
-    var smallDice = ['', 'D4', 'D6', 'D8', 'D10', 'D12'];
-    _.find(smallDice, (die, index) => {
-      if(diceCount[die] > 0) {
-        diceValue += index;
-        return true;
+    // Map each die to the number of times it is normally rolled.
+    let diceCount = getRollDiceCount(roll);
+
+    // Apply the upgrade or downgrade a number of times equal to the
+    // unsigned steps. Stop early if we reach a rerollGood or rerollBad case.
+    let rerollGood = false;
+    let rerollBad = false;
+    _.find(_.range(Math.abs(steps)), () => {
+      // Determine the highest die in the roll.
+      let highestDie = _.find(DICE_DESCENDING, die => {
+        let count = diceCount[die];
+        if (count > 0)
+          return true;
+      }) || 'D4';
+
+      // Upgrade the highest die.
+      if (steps > 0) {
+        // If we're upgrading a D20, the player can choose to reroll.
+        if (highestDie === 'D20') {
+          rerollGood = true;
+          return true;
+        }
+
+        // Otherwise, decrement the highest die's count and increment the count
+        // for the die ranking above it.
+        else {
+          let nextIndex = DICE_DESCENDING.indexOf(highestDie) - 1;
+          let nextDie = DICE_DESCENDING[nextIndex];
+
+          diceCount[highestDie]--;
+          diceCount[nextDie]++;
+        }
+      }
+
+      // Downgrade the highest die.
+      else {
+        if (highestDie === 'D4') {
+          // Drop a D4 if we have more than 1.
+          if (diceCount['D4'] > 1)
+            diceCount['D4']--;
+
+          // If we're downgrading a lone D4, the player must reroll and use
+          // the lowest result.
+          else {
+            rerollBad = true;
+            return true;
+          }
+        }
+
+        // If the highest die is not a D4, decrement its count and increment
+        // the count of the die ranking below it.
+        else {
+          let nextIndex = DICE_DESCENDING.indexOf(highestDie) + 1;
+          let nextDie = DICE_DESCENDING[nextIndex];
+
+          diceCount[highestDie]--;
+          diceCount[nextDie]++;
+        }
       }
     });
 
-    // Apply the upgrade/downgrade.
-    diceValue = Math.max(1, diceValue + steps);
-
-    // Change the value back into dice.
-    var d20Count = Math.floor(diceValue/6);
-    var smallDieIndex = diceValue%6;
-    var smallDie = smallDice[smallDieIndex];
-
-    // Compose the new roll string.
-    var diceList = [];
-    _.each(_.range(d20Count), i => {
-      diceList.push('D20');
+    // Compose a new roll based on the modified dice count.
+    let newDice = [];
+    _.each(DICE_DESCENDING, die => {
+      let count = diceCount[die];
+      if (count) {
+        _.each(_.range(count), () => {
+          newDice.push(die);
+        });
+      }
     });
-    if(smallDie)
-      diceList.push(smallDie);
-    return `{${diceList.join(',')}}k1`;
+
+    if (rerollGood)
+      return {
+        roll: `{${newDice.join(',')}}k1`,
+        type: SUPER_UPGRADE
+      };
+    else if (rerollBad)
+      return {
+        roll: `D4`,
+        type: SUPER_DOWNGRADE
+      };
+    else
+      return {
+        roll: `{${newDice.join(',')}}k1`,
+        type: NORMAL_UPDOWNGRADE
+      };
   }
 
   // Migrate sheet data from prior versions to the most recent version.
@@ -253,29 +345,34 @@
     parseAttrs([prefix + '_name', prefix + '_dice', prefix + '_trait', prefix + '_updowngrade', 'body_equation', 'mind_equation', 'charm_equation'], values => {
       var talentName = values[prefix + '_name'];
       var talentDice = values[prefix + '_dice'];
+      var talentDiceView = getRollView(talentDice);
 
       var trait = values[prefix + '_trait'];
       var traitDice = values[trait + '_equation'] || 'D0';
 
-      var updown = parseInt(values[prefix + '_updowngrade']) || 0;
-
       // Apply upgrades/downgrades to talent dice.
+      var updown = parseInt(values[prefix + '_updowngrade']) || 0;
       var talentDiceModified = talentDice;
-      if(talentDice && updown)
-        talentDiceModified = getUpDowngradedRoll(talentDice, updown);
+      var updowngrade_note = '';
+      if(talentDice && updown) {
+        let {roll, type} = getUpDowngradedRoll(talentDice, updown, 'talent');
+        talentDiceModified = roll;
+        updowngrade_note = UPDOWNGRADE_NOTES[type];
+      }
 
-      var talentDiceView = getRollView(talentDice);
-
+      // Update the attributes.
       if(talentDiceModified === 'null')
         setAttrs({
           [prefix + '_equation']: 0,
-          [prefix + '_readOnlyView']: `${talentName}(n/a)`
+          [prefix + '_readOnlyView']: `${talentName}(n/a)`,
+          [prefix + '_updowngrade_note']: ''
         }, {}, cb);
       else {
         //var traitDice = values[trait];
         setAttrs({
           [prefix + '_equation']: `{${talentDiceModified} [talent],${traitDice} [trait]}k1`,
-          [prefix + '_readOnlyView']: `${talentName}(${talentDiceView})`
+          [prefix + '_readOnlyView']: `${talentName}(${talentDiceView})`,
+          [prefix + '_updowngrade_note']: updowngrade_note
         }, {}, cb);
       }
     });
@@ -294,16 +391,25 @@
   function _updateTrait(trait, cb) {
     parseAttrs([trait, trait + '_updowngrade'], values => {
       var traitDice = values[trait];
+      var updowngrade_note = '';
+
       if(traitDice === 'null')
         setAttrs({
-          [trait + '_equation']: 0
+          [trait + '_equation']: 0,
+          [trait + '_updowngrade_note']: ''
         }, {}, cb);
       else {
+        // Apply upgrades/downgrades to the trait dice.
         var updown = values[trait + '_updowngrade'] || 0;
-        if(updown)
-          traitDice = getUpDowngradedRoll(traitDice, updown);
+        if(updown) {
+          let {roll, type} = getUpDowngradedRoll(traitDice, updown, 'trait');
+          traitDice = roll;
+          updowngrade_note = UPDOWNGRADE_NOTES[type];
+        }
+
         setAttrs({
-          [trait + '_equation']: traitDice
+          [trait + '_equation']: traitDice,
+          [trait + '_updowngrade_note']: updowngrade_note
         }, {}, cb);
       }
     });
