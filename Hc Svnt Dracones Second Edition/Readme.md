@@ -4,7 +4,8 @@ Official Character Sheet
 # Changelog
 
 ## V.1.50 (2019-11)
-* "XP purchase"-tracker now automatically adjusts XP left/XP spent when checking/unchecking new columns
+* "XP purchase"-section(Page 3) now automatically adjusts "XP Spent" and "Remaining Exp" when checking/unchecking new entires in the section(it does not prevent from selecting both options in places where ther are choices, nor does it prevent selecting things out of order).
+* Editing "Total Exp" also updates "Remaining Exp" accordingly
 
 ## V.1.20 (2019-10)
 

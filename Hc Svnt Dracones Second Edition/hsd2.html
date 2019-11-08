@@ -4,7 +4,7 @@
 <input type="radio" name="attr_tab" class="tab tab2" value="2"                  ><span title="Page 2"></span>
 <input type="radio" name="attr_tab" class="tab tab3" value="3"                  ><span title="Page 3"></span>
 
-<span class="version bold">Sheet Version: 1.50beta</span>
+<span class="version bold">Sheet Version: 1.50</span>
 <!--  ----------------------------------------------------------------------------------------------------------------------- -->
 <!--  ------------------------------------------------- PAGE 1 -------------------------------------------------------------- -->
 <!--  ----------------------------------------------------------------------------------------------------------------------- -->
@@ -1043,16 +1043,18 @@ const xp30a = ["mind_stat13","mind_perceive13","body_stat13", "body_perceive13",
 checkboxes.forEach(checkbox => {
     on(`change:${checkbox}`, (eventInfo) => {
         console.log("checkbox changed:" + checkbox);
-        let xplist = [ checkbox, "exp_total", "exp_spent"];
+        let xplist = [ checkbox, "exp_total", "exp_spent", "exp"];
         console.log(xplist);
         console.log("xp arr printed");
         getAttrs(xplist, values => {
             let xp_total = int(values["exp_total"]);
             let xp_spent = int(values["exp_spent"]);
-            let xp = 10;
+            let xp_current = int(values["exp"]);
+
             console.log("getAttr: exp total is:" + xp_total);
             console.log("getAttr: exp spent is:" + xp_spent);
-
+            console.log("getAttr: exp current is:" + xp_current);
+            let xp = 10;
             let stat = int(values[checkbox]);
             console.log("Checkbox '" + checkbox + "' value is:" + stat);
             
@@ -1080,44 +1082,46 @@ checkboxes.forEach(checkbox => {
 
             if (stat === 1){
               console.log("checkbox was checked");
-              xp_total = xp_total - xp;
+              xp_current = xp_current - xp;
               xp_spent = xp_spent + xp;
               console.log("getAttr: exp total should be:" + xp_total);
               console.log("getAttr: exp spent should be:" + xp_spent);
+              console.log("getAttr: exp current should be:" + xp_current);
             } 
             else{
               console.log("checkbox was UNchecked");
-              xp_total = xp_total + xp;
+              xp_current = xp_current + xp;
               xp_spent = xp_spent - xp;
               console.log("getAttr: exp total should be:" + xp_total);
               console.log("getAttr: exp spent should be:" + xp_spent);
+              console.log("getAttr: exp current should be:" + xp_current);
             }
+
+            //xp_current = xp_total - xp_spent;
+
             setAttrs({
-                exp_total: xp_total,
-                exp_spent: xp_spent
+                exp_spent: xp_spent,
+                exp: xp_current
             });
         });
     });
 });
 
-/*
-const stats = ["exp_spent"];
-stats.forEach(stat => {
-    on(`change:${stat}`, () => {
-        getAttrs([stat], values => {
-            let xp_total = int(values["exp_total"]);
-            let xp_spent = int(values["exp_spent"]);
-            console.log("getAttr: exp total is:" + xp_total);
-            console.log("getAttr: exp spent is:" + xp_spent);
-            let xp = 0;
 
-            xp = xp_total - xp_spent;
-            console.log("getAttr: exp left is:" + xp);
-            setAttrs({
-                exp: xp
-            });
+on("change:exp_total", () => {
+    getAttrs(["exp","exp_total","exp_spent"], values => {
+        let xp_total = int(values["exp_total"]);
+        let xp_spent = int(values["exp_spent"]);
+        console.log("getAttr: exp total is:" + xp_total);
+        console.log("getAttr: exp spent is:" + xp_spent);
+        let xp_current = 0;
+
+        xp_current = xp_total - xp_spent;
+        console.log("getAttr: exp current is:" + xp_current);
+        setAttrs({
+            exp: xp_current
         });
     });
-});*/
+});
 
 </script>
