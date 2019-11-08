@@ -3,6 +3,9 @@ Official Character Sheet
 
 # Changelog
 
+## V.1.50 (2019-11)
+* "XP purchase"-tracker now automatically adjusts XP left/XP spent when checking/unchecking new columns
+
 ## V.1.20 (2019-10)
 
 * add "Quantity" field to Inventory section, and instructions that appears when hovering over "Cost" or "Gear Score"
