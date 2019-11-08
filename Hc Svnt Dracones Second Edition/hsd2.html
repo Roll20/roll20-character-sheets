@@ -4,7 +4,7 @@
 <input type="radio" name="attr_tab" class="tab tab2" value="2"                  ><span title="Page 2"></span>
 <input type="radio" name="attr_tab" class="tab tab3" value="3"                  ><span title="Page 3"></span>
 
-<span class="version bold">Sheet Version: 1.50B</span>
+<span class="version bold">Sheet Version: 1.50C</span>
 <!--  ----------------------------------------------------------------------------------------------------------------------- -->
 <!--  ------------------------------------------------- PAGE 1 -------------------------------------------------------------- -->
 <!--  ----------------------------------------------------------------------------------------------------------------------- -->
@@ -81,10 +81,10 @@
     </div>
 
     <div class="spread-info">
-      <label><span class="padding1">Evade</span> <input     type="number" name="attr_evade"            value="1"></label>
-      <label><span class="padding1">Endure</span> <input    type="number" name="attr_mass_endure"      value="1"></label>
-      <label><span class="padding1">Focus</span> <input     type="number" name="attr_mass_focus_spent" value="0"><span class="slash">/</span><input type="number" name="attr_mass_focus_max"  value="1"></label>
-      <label>Readiness <input type="number" name="attr_readiness_spent"  value="0" value="1"><span class="slash">/</span><input type="number" name="attr_readiness_max" value="1"></label>
+      <label><span class="padding1">Evade</span> <input     type="number" name="attr_evade"            value=""></label>
+      <label><span class="padding1">Endure</span> <input    type="number" name="attr_mass_endure"      value=""></label>
+      <label><span class="padding1">Focus</span> <input     type="number" name="attr_mass_focus_spent" value="0"><span class="slash">/</span><input type="number" name="attr_mass_focus_max"  value=""></label>
+      <label>Readiness <input type="number" name="attr_readiness_spent"  value="0"><span class="slash">/</span><input type="number" name="attr_readiness_max" value=""></label>
 
       <label title="Ranged Damage Bonus"><span class="padding2">RDB</span><input type="number" name="attr_mass_rdb" value="1"></label>
       <label title="Melee Damage Bonus" ><span class="padding2">MDB</span><input type="number" name="attr_mass_mdb" value="1"></label>
@@ -212,7 +212,7 @@
 <!--  TECHNIQUES -->
 
   <div class="techq section border">
-    <span class="bold">Techniques -- Total:<input type="number" name="attr_techniques"> Spent: <input type="number" name="attr_techniques_spent"></span>
+    <span class="bold">Techniques -- Total:<input type="number" name="attr_techniques"> Spent: <input type="number" name="attr_techniques_spent" value="0"></span>
     <fieldset class="repeating_technique">
         <input name="attr_technique" type="text" placeholder="Technique 1">
         <span class="bold">p.(<input name="attr_technique_source" type="number" class="ref">)</span>
@@ -1026,12 +1026,12 @@
 const int = score => parseInt(score, 10) || 0;
 
 
-const xp_mind_stat = ["mind_stat1","mind_stat2","mind_stat3","mind_stat4","mind_stat5"];
-const xp_mind_perceive = ["mind_perceive1","mind_perceive2","mind_perceive3","mind_perceive4","mind_perceive5",];
-const xp_body_stat = ["body_stat1","body_stat2","body_stat3","body_stat4","body_stat",];
-const xp_body_perceive = ["body_perceive1","body_perceive2","body_perceive3","body_perceive4","body_perceive5"];
-const xp_community_stat = ["community_stat1","community_stat2","community_stat3","community_stat4","community_stat5"];
-const xp_community_perceive = ["community_perceive1","community_perceive2","community_perceive3","community_perceive4","community_perceive5"];
+const xp_mind_stat = ["mind_stat1","mind_stat4","mind_stat7","mind_stat10","mind_stat13"];
+const xp_mind_perceive = ["mind_perceive1","mind_perceive4","mind_perceive7","mind_perceive10","mind_perceive13",];
+const xp_body_stat = ["body_stat1","body_stat4","body_stat7","body_stat10","body_stat13",];
+const xp_body_perceive = ["body_perceive1","body_perceive4","body_perceive7","body_perceive10","body_perceive13"];
+const xp_community_stat = ["community_stat1","community_stat4","community_stat7","community_stat10","community_stat13"];
+const xp_community_perceive = ["community_perceive1","community_perceive4","community_perceive7","community_perceive10","community_perceive13"];
 
 
 
@@ -1072,7 +1072,7 @@ const creditstracker = ["community_stat3a","community_stat9b","community_stat3a"
 checkboxes.forEach(checkbox => {
     on(`change:${checkbox}`, (eventInfo) => {
         console.log("checkbox changed:" + checkbox);
-        let xplist = [ checkbox, "exp_total", "exp_spent", "exp", "boons_track", "focus_track", "readiness_track", "profs_track", "move_track", "init_track", "techniques_track", "notoriety_track", "credits", "progression_credits_track", "mind_exert","mind_perceive", "body_exert","body_perceive", "community_exert","community_perceive"];
+        let xplist = [ checkbox, "exp_total", "exp_spent", "exp", "boons_track", "focus_track", "readiness_track", "profs_track", "move_track", "init_track", "techniques_track", "notoriety_track", "credits", "progression_credits_track", "mind_exert","mind_perceive", "body_exert","body_perceive", "community_exert","community_perceive","move_base","readiness_max","focus_max","techniques"];
         console.log(xplist);
         getAttrs(xplist, values => {
             let xp_total = int(values["exp_total"]);
@@ -1133,11 +1133,26 @@ checkboxes.forEach(checkbox => {
             let notoriety = int(values["notoriety_track"]);
             let profs = int(values["profs_track"]);
             let readiness = int(values["readiness_track"]);
-            let techniques = int(values["techniques_track"]);
+            let techniques_track = int(values["techniques_track"]);
             
 
             let credits = int(values["credits"]);
             let credits_tracker = int(values["progression_credits_track"]);
+
+            //Main stats
+            let mind_exert = int(values["mind_exert"]);
+            let mind_perceive = int(values["mind_perceive"]);
+            let body_exert = int(values["body_exert"]);
+            let body_perceive = int(values["body_perceive"]);
+            let community_exert = int(values["community_exert"]);
+            let community_perceive = int(values["community_perceive"]);
+
+            //Secondary stats chaged by XP table
+            let move_base = int(values["move_base"]);
+            let readiness_max = int(values["readiness_max"]);
+            let mass_focus_max = int(values["mass_focus_max"]);
+            let techniques = int(values["techniques"]);
+            let initiative_max = int(values["initiative_max"]);
 
             //Boons
             if (boonstracker.includes(checkbox)){
@@ -1153,31 +1168,40 @@ checkboxes.forEach(checkbox => {
             else if (focustracker.includes(checkbox)){
               if(stat === 1){
                 focus = focus + 2;
+                mass_focus_max = mass_focus_max + 2;
               }
               else{
                 focus = focus - 2;
+                mass_focus_max = mass_focus_max - 2;
               }
               console.log("Total focus Purchased: " + focus);
+              console.log("mass_focus_max: " + mass_focus_max);
             }
             //init
             else if (inittracker.includes(checkbox)){
               if(stat === 1){
                 init = init + 2;
+                initiative_max = initiative_max + 2;
               }
               else{
                 init = init - 2;
+                initiative_max = initiative_max - 2;
               }
               console.log("Total init Purchased: " + init);
+              console.log("initiative_max: " + initiative_max);
             }
             //move
             else if (movetracker.includes(checkbox)){
               if(stat === 1){
                 move = move + 1;
+                move_base = move_base + 1;
               }
               else{
                 move = move - 1;
+                move_base = move_base - 1;
               }
               console.log("Total move Purchased: " + move);
+              console.log("move_base: " + move_base);
             }
             //notoriety
             else if (notorietytracker.includes(checkbox)){
@@ -1203,21 +1227,27 @@ checkboxes.forEach(checkbox => {
             else if (readinesstracker.includes(checkbox)){
               if(stat === 1){
                 readiness = readiness + 2;
+                readiness_max = readiness_max + 2;
               }
               else{
                 readiness = readiness - 2;
+                readiness_max = readiness_max - 2;
               }
               console.log("Total readiness Purchased: " + readiness);
+              console.log("readiness_max: " + readiness_max);
             }
             //techniques
             else if (techniquestracker.includes(checkbox)){
               if(stat === 1){
+                techniques_track = techniques_track + 2;
                 techniques = techniques + 2;
               }
               else{
+                techniques_track = techniques_track - 2;
                 techniques = techniques - 2;
               }
-              console.log("Total techniques Purchased: " + techniques);
+              console.log("Total techniques_track Purchased: " + techniques_track);
+              console.log("techniques: " + techniques);
             }
             //Credits
             //automatically adds/subtracts 600 credits from characters "attr_credits", and updates the hidden "attr_progression_credits_track" which serves as an extra tracker to see how many times the character have gained credit through Character Progression Purchases if you get unsure.
@@ -1233,13 +1263,8 @@ checkboxes.forEach(checkbox => {
               console.log("Progression Credit Instances Purchased: " + credits_tracker + " for a total of " + credits + " credits.");
             }
 
-            //Stat increases
-            let mind_exert = int(values["mind_exert"]);
-            let mind_perceive = int(values["mind_perceive"]);
-            let body_exert = int(values["body_exert"]);
-            let body_perceive = int(values["body_perceive"]);
-            let community_exert = int(values["community_exert"]);
-            let community_perceive = int(values["community_perceive"]);
+
+            //stat increases
             //mind exert
             else if (xp_mind_stat.includes(checkbox)){
               if(stat === 1){
@@ -1262,6 +1287,7 @@ checkboxes.forEach(checkbox => {
             }
             //body exert
             else if (xp_body_stat.includes(checkbox)){
+              console.log("'body_exert' before: " + body_exert);
               if(stat === 1){
                 body_exert = body_exert + 1;
               }
@@ -1306,12 +1332,17 @@ checkboxes.forEach(checkbox => {
                 exp: xp_current,
                 boons_track: boons,
                 focus_track: focus,
+                mass_focus_max: mass_focus_max,
                 init_track: init,
+                initiative_max: initiative_max,
                 move_track: move,
+                move_base: move_base,
                 notoriety_track: notoriety,
                 profs_track: profs,
                 readiness_track: readiness,
-                techniques_track: techniques,
+                readiness_max: readiness_max,
+                techniques_track: techniques_track,
+                techniques: techniques,
                 credits: credits,
                 progression_credits_track: credits_tracker,
                 mind_exert : mind_exert,
