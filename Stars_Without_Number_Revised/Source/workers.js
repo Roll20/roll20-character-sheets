@@ -1956,14 +1956,14 @@
 	};
 
 	const calculateMod = (attr) => {
-		getAttrs([attr, `${attr}_bonus`, `${attr}_mod`], v => {
+		getAttrs([attr, `${attr}_bonus`, `${attr}_boosts`, `${attr}_mod`], v => {
 			const mod = (value => {
 				if (value >= 18) return 2;
 				else if (value >= 14) return 1;
 				else if (value >= 8) return 0;
 				else if (value >= 4) return -1;
 				else return -2;
-			})(parseInt(v[attr]) || 10);
+			})((parseInt(v[attr]) || 10) + parseInt(v[`${attr}_boosts`]) || 0);
 
 			const setting = {
 				[`${attr}_mod`]: `${mod + (parseInt(v[`${attr}_bonus`]) || 0)}`
@@ -3467,7 +3467,7 @@
 
 	/* Character sheet */
 	on("change:class", fillClassStats);
-	attributes.forEach(attr => on(`change:${attr} change:${attr}_bonus`, () => calculateMod(attr)));
+	attributes.forEach(attr => on(`change:${attr} change:${attr}_boosts change:${attr}_bonus`, () => calculateMod(attr)));
 
 	on(weaponDisplayEvent, generateWeaponDisplay);
 
