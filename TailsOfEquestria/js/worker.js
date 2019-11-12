@@ -197,66 +197,102 @@
 
   // Migrate sheet data from prior versions to the most recent version.
   function migrateVersion(cb) {
-    // Migrate from v1.5 to v1.6
-    let _migrate1_5 = (cb1_5) => {
-      // Migrates a hard-coded talent.
-      let __migrateHardcodedTalent = (prefix, source, cb1_5talent) => {
-        let attrList = [prefix + 'name', prefix + 'dice', prefix + 'trait', prefix + 'updowngrade', prefix + 'equation', prefix + 'readOnlyView', prefix + 'notes'];
-        parseAttrs(attrList, values => {
-          if (values[prefix + 'name']) {
-            let nextRowID = generateRowID();
-            let repPrefix = `repeating_talents_${nextRowID}_`;
-            setAttrs({
-              // Void the hard-coded talent's name.
-              [prefix + 'name']: '',
+    _migrate1_5(cb);
+  }
 
-              // Copy the hard-coded talent's values to a new repeating talent.
-              [repPrefix + 'name']: values[prefix + 'name'],
-              [repPrefix + 'source']: source,
-              [repPrefix + 'dice']: values[prefix + 'dice'],
-              [repPrefix + 'trait']: values[prefix + 'trait'],
-              [repPrefix + 'updowngrade']: values[prefix + 'updowngrade'],
-              [repPrefix + 'equation']: values[prefix + 'equation'],
-              [repPrefix + 'readOnlyView']: values[prefix + 'readOnlyView'],
-              [repPrefix + 'notes']: values[prefix + 'notes']
-            }, { silent: true }, cb1_5talent);
-          }
-          else
-            cb1_5talent();
-        });
-      };
-
-      // Migrates a hard-coded quirk.
-      let __migrateHardcodedQuirk = (prefix, cb1_5quirk) => {
-        let attrList = [prefix + 'name', prefix + 'notes'];
-        parseAttrs(attrList, values => {
-          if (values[prefix + 'name']) {
-            let nextRowID = generateRowID();
-            let repPrefix = `repeating_quirks_${nextRowID}_`;
-            setAttrs({
-              // Void the hard-coded quirk.
-              [prefix + 'name']: '',
-
-              // Copy the hard-coded quirk's values to a new repeating quirk.
-              [repPrefix + 'name']: values[prefix + 'name'],
-              [repPrefix + 'notes']: values[prefix + 'notes']
-            }, { silent: true }, cb1_5quirk);
-          }
-          else
-            cb1_5quirk();
-        });
-      };
-
-      // Transfer cutie mark and race talents to repeating section.
-      __migrateHardcodedTalent('talent_cutieMark_', 'Cutie Mark', () => {
-        __migrateHardcodedTalent('talent_racial_', 'Race', () => {
-          // Transfer main quirk to repeating section.
-          __migrateHardcodedQuirk('quirk_main_', cb1_5);
+  /**
+   * Migrate from v1.5 to 1.6.
+   * @param {func} cb   Callback
+   */
+  function _migrate1_5(cb) {
+    _migrate1_5_hardcodedTalent('talent_cutieMark_', 'Cutie Mark', () => {
+      _migrate1_5_hardcodedTalent('talent_racial_', 'Race', () => {
+        _migrate1_5_mainQuirk(() => {
+          _migrate1_5_equipment(cb);
         });
       });
-    };
+    });
+  }
 
-    _migrate1_5(cb);
+  /**
+   * Migrate a hardcoded talent from v1.5 to repeating talents section.
+   * @param {string} prefix   The attribute prefix for the talent.
+   * @param {string} source   The new value for the talent's source property.
+   * @param {func} cb         Callback.
+   */
+  function _migrate1_5_hardcodedTalent(prefix, source, cb) {
+    let attrList = [prefix + 'name', prefix + 'dice', prefix + 'trait', prefix + 'updowngrade', prefix + 'equation', prefix + 'readOnlyView', prefix + 'notes'];
+    parseAttrs(attrList, values => {
+      if (values[prefix + 'name']) {
+        let nextRowID = generateRowID();
+        let repPrefix = `repeating_talents_${nextRowID}_`;
+        setAttrs({
+          // Void the hard-coded talent's name.
+          [prefix + 'name']: '',
+
+          // Copy the hard-coded talent's values to a new repeating talent.
+          [repPrefix + 'name']: values[prefix + 'name'],
+          [repPrefix + 'source']: source,
+          [repPrefix + 'dice']: values[prefix + 'dice'],
+          [repPrefix + 'trait']: values[prefix + 'trait'],
+          [repPrefix + 'updowngrade']: values[prefix + 'updowngrade'],
+          [repPrefix + 'equation']: values[prefix + 'equation'],
+          [repPrefix + 'readOnlyView']: values[prefix + 'readOnlyView'],
+          [repPrefix + 'notes']: values[prefix + 'notes']
+        }, { silent: true }, cb);
+      }
+      else
+        cb();
+    });
+  }
+
+  /**
+   * Migrate main quirk from v1.5 to repeating quirks section.
+   * @param {func} cb   Callback.
+   */
+  function _migrate1_5_mainQuirk(cb) {
+    let prefix = 'quirk_main_';
+    let attrList = [prefix + 'name', prefix + 'notes'];
+    parseAttrs(attrList, values => {
+      if (values[prefix + 'name']) {
+        let nextRowID = generateRowID();
+        let repPrefix = `repeating_quirks_${nextRowID}_`;
+        setAttrs({
+          // Void the hard-coded quirk.
+          [prefix + 'name']: '',
+
+          // Copy the hard-coded quirk's values to a new repeating quirk.
+          [repPrefix + 'name']: values[prefix + 'name'],
+          [repPrefix + 'notes']: values[prefix + 'notes']
+        }, { silent: true }, cb);
+      }
+      else
+        cb();
+    });
+  }
+
+  /**
+   * Migrate equipment from v1.5 to v1.6.
+   * @param {func} cb   Callback.
+   */
+  function _migrate1_5_equipment(cb) {
+    getAttrs(['equipment'], values => {
+      let equipmentRaw = values['equipment'] || '';
+
+      // Transfer equipment from the 1.5 textarea to the 1.6 repeating section.
+      if (equipmentRaw) {
+        let equipmentList = equipmentRaw.split('\n');
+
+        _.each(equipmentList, item => {
+          let nextRowID = generateRowID();
+          let repPrefix = `repeating_equipment_${nextRowID}_`;
+          setAttrs({
+            [repPrefix + 'name']: item,
+            'equipment': ''
+          }, { silent: true }, cb);
+        });
+      }
+    });
   }
 
   // Registers an event listener for attribute changes.
@@ -285,9 +321,9 @@
    */
   function parseAttrs(attrs, cb) {
     try {
-      getAttrs(attrs, function(values) {
+      getAttrs(attrs, values => {
         try {
-          _.each(attrs, function(attr) {
+          _.each(attrs, attr => {
             if(_.isUndefined(values[attr]))
               values[attr] = 0;
             else if(!isNaN(values[attr]))
