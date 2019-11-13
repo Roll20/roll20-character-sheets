@@ -501,7 +501,7 @@
     });
 
     setAttrs({
-      character_sheet: 'TailsOfEquestria v1.6'
+      character_sheet: 'TailsOfEquestria vSCRIPT_VERSION'
     });
 
     // Migrate from v1.5 to 1.6

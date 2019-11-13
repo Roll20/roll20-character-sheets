@@ -37,7 +37,7 @@ module.exports = function(grunt) {
       }
     },
     'string-replace': {
-      default: {
+      css: {
         files: {
           'sheet.css': 'sheet.css'
         },
@@ -64,6 +64,19 @@ module.exports = function(grunt) {
             }
           ]
         }
+      },
+      html: {
+        files: {
+          'sheet.html': 'sheet.html'
+        },
+        options: {
+          replacements: [
+            {
+              pattern: /SCRIPT_VERSION/g,
+              replacement: '1.6'
+            }
+          ]
+        }
       }
     }
   });
@@ -73,5 +86,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-pug');
   grunt.loadNpmTasks('grunt-string-replace');
 
-  grunt.registerTask('default', ['jshint', 'less', 'pug', 'string-replace']);
+  grunt.registerTask('default', ['jshint', 'less', 'pug', 'string-replace:css', 'string-replace:html']);
 };
