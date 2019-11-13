@@ -1,6 +1,6 @@
 Arask is a free-to-play TTRPG system for wizards!
 
-Learn more: 
+Learn More: 
 https://www.toxicsasquatch.com/arask
 
 Current Handbook (v1.3): 
