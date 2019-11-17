@@ -6,6 +6,7 @@
 	$graytrans: rgba(28, 28, 28, 0.14902);
 	$grayshadow: #7c7c7c;
 	$blacker: #040404;
+	$ccc: #cccccc;
 	//- GRAY IN ROLL TEMPLATE
 	$blackish: #1c1c1c;
 	//-(primaryly on the NPC sheet)
@@ -24,6 +25,35 @@
 /* SWITCHES
 	============================= */
 	@import 'src/scss/_switch'; 
+
+/* MIXIN
+	============================= */
+@mixin repeatingInformation($endColumn, $longCollapseFlag) {
+	label[data-i18n-title='notes'], 
+	h3[data-i18n='notes'], 
+	div.sheet-collapse { 
+		grid-column: 1 / #{$endColumn};
+	}
+
+	input.sheet-collapse-flag {
+		@if $longCollapseFlag {
+			grid-area: 1 / 1 / 1 / #{$endColumn - 1};
+			position: absolute;
+			width: 100%;
+		} @else {
+			grid-area: 1 / #{$endColumn - 2} / 1 / #{$endColumn - 1};
+		}
+	}
+
+	input.sheet-collapse-flag + span.sheet-pictos { 
+		grid-area: 1 / #{$endColumn - 2} / 1 / #{$endColumn - 1}; 
+	}
+
+	input.sheet-settings-flag, 
+	input.sheet-settings-flag + span.sheet-pictos { 
+		grid-area: 1 / #{$endColumn - 1} / 1 / #{$endColumn}; 
+	}
+}
 
 /***** TABS FOR SHEETS *****/
 	.sheet-tabs {
@@ -66,9 +96,9 @@
 		}
 	}
 
-
 /***** TABS FOR SHEETS *****/
-.sheet-settings-toggle {
+.sheet-settings-toggle,
+.sheet-settings-flag {
 	 input { width: 3em;}
 
 	input[type='checkbox'] + span {
@@ -81,6 +111,8 @@
   }
 }
 
+
+/***** GENERIC STYLES *****/
 %parantheseNumbers {
 	vertical-align: middle;
 
@@ -113,7 +145,27 @@ input.sheet-toggle {
 
 %borderBottom { border-bottom: 1px solid #333; }
 
+.sheet-center { text-align: center; }
+
+select {
+	&.sheet-attribute-select {
+		option:nth-of-type(1n+5) { color: $red; }
+		option:nth-of-type(1n+9) { color: #7a2593;	}
+	}
+
+	&.sheet-limit-select  {
+		option:nth-of-type(1n+5) { color: $red; }
+	}
+}
+
 @import 'src/scss/_matrixdevice'; 
+
+/***** GRID *****/
+%gridGap {
+	grid-column-gap: 1%;
+	grid-row-gap: 1%;
+}
+
 
 /******************************************************************************/
 /********************************* VARIABLES *********************************/
@@ -134,18 +186,48 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 		box-shadow      : inset 0px 0px 3px 1px #7c7c7c;
 		margin-left     : -1%;
 		padding-left    : 0.5%;
-		
+
 		button > h2:hover,
 		button > span:hover,
 		label > button[type='roll']:hover,
 		.sheet-repeat-box button[type='roll']:hover,
 		.sheet-con-track button[type='action']:hover,
-		button[data-i18n="default"]:hover {
+		button[data-i18n='default']:hover {
 			color      : #fff;
 			text-shadow: 1px 1px 2px black, 0 0 25px red, 0 0 5px $red;
 		}
 
+		h1 {
+			background-color: $red;
+			color           : #fff;
+			font-size       : 1em;
+			letter-spacing  : 2px;
+			line-height     : 20px;
+			padding-left    : 5px;
+			padding-right   : 5px;
+			text-transform  : uppercase;
+		}
+	
+		h2 {
+			font-size  : 0.9em;
+			line-height: 25px;
+			text-transform: capitalize;
+			@extend %display-inline-grid;
+		}
+	
+		h3 {
+			color    : hsla(0, 0%, 20%, 0.59);
+			font-size: 0.8em;
+			text-transform: capitalize;
+
+			@extend %display-inline-grid;
+		}
+
 		hr { margin: 7px 0px -2px 0px; }
+
+		input {
+			border-radius: 0px;
+		}
 
 		.sheet-tabs {
 			@extend %display-inline-grid;
@@ -215,7 +297,9 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 			}
 		}
 
-		input[type='checkbox'],
+		input.sheet-settings-toggle,
+		input.sheet-settings-flag,
+		input.sheet-collapse-flag,
 		input[type='radio'] {
 			@extend %toggleRelative;
 			
@@ -227,6 +311,7 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 		select {
 			height: 1.8em;
 			padding: 0px;
+			color: $blacker;
 		}
 
 		div.sheet-core-info {
@@ -244,21 +329,181 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 
 		input.sheet-display-flag { position: absolute; }
 
+		/***** DECORATIVE BOX THAT ADDS THE RED OUTLINE ON PC SHEET *****/			
+		div.sheet-border-box {
+			background-image: -moz-linear-gradient($red, transparent), -moz-linear-gradient($red, transparent);
+			background-image: -o-linear-gradient($red, transparent), -o-linear-gradient($red, transparent);
+			background-image: -webkit-gradient(linear, 0 0, 0 100%, from($red), to(transparent));
+			background-image: -webkit-linear-gradient($red, transparent);
+			background-image: linear-gradient($red, transparent), linear-gradient($red, transparent);
+			border-top      : 2px solid $red;
+			clear           : both;
+			border-top-right-radius: 10px;
+			border-top-left-radius : 0px;
+
+			button[type='roll'] {
+				font-size: 0.8em;
+				font-weight: bold;
+			}
+
+			div.sheet-pc-box {
+				border-top-right-radius: 10px;
+				border-top-left-radius : 0px;
+			} 	
+		} 
+
 		/***** REPEATING CONTAINERS *****/
+		div.sheet-repeating-container {
+			div.repitem {
+				display: inline-grid;
+				padding: 1% 0.5%;
+				margin-bottom: 0px;
+				@extend %gridGap;
+				@extend %borderBottom;
+
+				button[type='roll'] { 
+					text-align: left; 
+				}
+
+				input { 
+					&:nth-of-type(1n+2) { text-align: center; } 
+
+					&[type='text'],
+					&[type='number'] { 
+						@extend %borderBottom;
+						width: 100%; 
+					}
+				}
+
+				label { 
+					padding-right: 0px;
+
+					input[name='attr_name'],
+					input[name='attr_weapon'],
+					input[name='attr_quality'] { 
+						text-align: left; 
+					}
+
+					&[data-i18n-title='modifier'] {
+						width: 3em;
+					}
+				}
+
+				div.sheet-settings { 
+					background-color: $ccc;
+					border-left: 2px solid $gray;
+					@extend %gridGap;
+					padding: 2% 1%;
+					width: 100%;
+
+					select { text-transform: capitalize; }
+				}
+
+				div.sheet-collapse { padding-left: 5%; }
+			}
+		}
 
 		div.repitem {
-			input[type='number'] {
-				text-align: center;
-				width: 2.5em;
+			width: 100%;
+
+			input[type='number'] { text-align: center; }
+		}
+
+		/***** STATIC  *****/
+		div.sheet-static { 
+			margin-right: 0.5%;
+
+			div.sheet-border-box,
+			div.sheet-border-box .sheet-pc-box {
+				border-top-right-radius: 0px;
+				border-top-left-radius : 10px;
+			}	
+		}
+
+
+		/***** CORE  *****/
+		div.sheet-core {
+			div.sheet-armor-buttons {
+				display    : inline-block;
+				font-size  : 1.5em;
+				line-height: 20px;
+				margin-left: 1%;
+				width      : 35%;
+
+				button {
+					&[type='roll'] { margin-right: -5px; }
+					&[name='roll_defense'] { 
+						background-color: $gray;
+						color: $white;
+					}
+				}
+
+				span { font-size  : 1em; }
+			}
+
+			/***** QUALITIES *****/
+			div.sheet-quality-box {
+				div.sheet-htab input[type='radio'] {
+					margin-right: -100px;
+					width       : 100px;
+				}
+
+				div.sheet-header:nth-of-type(2) .sheet-htab input[type='radio'] {
+					margin-right: -150px;
+					width       : 150px;
+				}
+
+				div.sheet-quality {
+					$qualityGrid: 1fr 3em 1.5em 1em 1em;
+
+
+					h2:nth-of-type(2) { text-align: center; } 
+
+					div.sheet-headers {
+						display: grid;
+						grid-template-columns: $qualityGrid;
+						@extend %gridGap;
+					}
+
+					div.repitem {
+						grid-template-columns: $qualityGrid;
+						@include repeatingInformation(6, false);
+
+						div.sheet-settings { 
+							grid-column: 1 / 6;
+							grid-template-columns: $qualityGrid;
+						}
+					}
+				}
+
+				div.sheet-martial {
+					$martialGrid: 2fr 1fr 1.5em 1em 1em;
+
+
+					h2:nth-of-type(2) { text-align: center; } 
+
+					div.sheet-headers {
+						display: grid;
+						grid-template-columns: $martialGrid;
+						@extend %gridGap;
+					}
+
+					div.repitem {
+						grid-template-columns: $martialGrid;
+						@include repeatingInformation(6, false);
+
+						div.sheet-settings { 
+							grid-column: 1 / 6;
+							grid-template-columns: $martialGrid;
+						}
+					}
+				}
 			}
 		}
 
 		/***** SKILLS *****/
 		div.sheet-skill-box {
-			button[type='roll'] {
-				font-size: 1em;
-				text-align: left;
-			}
+			$skillGrid: 1fr 3.5em 5em 5em 1em 1em;
 
 			h2:nth-of-type(1n+2) { text-align: center; }
 
@@ -267,9 +512,15 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 				font-size     : 0.8em;
 				text-transform: capitalize;
 
-				&[data-i18n-title='ratingmodifier'] { grid-area: 2 / 3 / 2 / 6; }
-				&[data-i18n-title='specializations'] { grid-area: 3 / 1 / 3 / 6; }
-				&[data-i18n-title='notes'], textarea { grid-area: 4 / 1 / 4 / 6; }
+				&[data-i18n-title='ratingmodifier'] { 
+					grid-area: 1 / 3 / 1 / 7; 
+					width: 100%;
+
+					input[type='number'] { width: 3em; }
+				}
+
+				&[data-i18n-title='specialization'] { grid-area: 3 / 1 / 3 / 7; }
+				&[data-i18n-title='notes'], textarea { grid-area: 4 / 1 / 4 / 7; }
 
 				& > input {
 					@extend %borderBottom;
@@ -281,28 +532,338 @@ $npcTypes: 'grunt', 'host', 'sprite', 'vehicle';
 
 			input[name='attr_skill'] { @extend %borderBottom; }
 
+			input[name='attr_rating_modifier'] { width: 3.5em; }
+
+			input[name='attr_display_specialization'][value=' '] ~ div.sheet-buttons button[name*='specialization'],
+			input[name='attr_display_specialization'][value=''] ~ div.sheet-buttons button[name*='specialization'] { @extend %display-none; }
+
 			div.sheet-row-long {
-				display: inline-grid;
-				grid-column-gap: 1%;
-				grid-row-gap: 2%;
-				grid-template-columns: 1fr 3.5em 5em 5em 1.5em;
-				padding: 1%;
+				grid-template-columns: $skillGrid;
+				padding: 1% 0.5%;
 				width: 100%;
+
+				@extend %display-inline-grid;
+				@extend %gridGap;
 
 				h3:nth-of-type(1n+2) { text-align: center; }
 			}
 
-			select.sheet-attribute-select {
-				option:nth-of-type(1n+9) { color: #7a2593;	}
-				option:nth-of-type(1n+5) { color: $red; }
+
+			div.repitem {
+				grid-template-columns: $skillGrid;
+
+				@include repeatingInformation(7, false);
+
+				input[name='attr_damage'],
+				input[name='attr_dicepool_modifier'] {
+					width: 3.5em;
+				}
+
+				div.sheet-settings { 
+					grid-column: 1 / 7;
+					grid-template-columns: $skillGrid;
+				}
+			}
+		}
+
+		/*** ARMS ****/
+		div.sheet-arms {
+			div.sheet-headers {
+				display: grid;
+				@extend %gridGap;
+
+				h2:nth-of-type(1n+2) { text-align: center; }
 			}
 
-			select.sheet-limit-select  {
-				option:nth-of-type(1n+5) { color: $red; }
+			div.repitem {
+				h3 { color: $blacker; }
+
+				input { 
+					&:nth-of-type(1n+2) { text-align: center; }
+
+					&.sheet-flag-primary[value='primary'] + button {
+						background-color: $gold;
+						border-bottom: 2px solid $blacker;
+					}
+				}
+			}
+
+			div.sheet-weapons {
+				$weaponsGrid: 25% 1.25fr 3em 2.5em 3em 1fr 1fr 1em 1em;
+				div.sheet-headers { grid-template-columns:$weaponsGrid; }
+
+				div.repitem {
+					grid-template-columns: $weaponsGrid;
+					@include repeatingInformation(10, false);
+
+					div.sheet-settings { 
+						grid-column: 1 / 10;
+						grid-template-columns: $weaponsGrid;
+					}
+				}
+
+				div.sheet-weapon-range,
+				div.sheet-weapon-melee {
+					width: 100%;
+					div.sheet-row { 
+						grid-column: 1 / 9;
+
+						label[data-i18n-title="modeoptions"],
+						label[data-i18n-title="range"]{ 
+							width: 25%; 
+						}
+
+						input[type='number'] {width: 3em;}
+
+						select {width: 30%;}
+					};
+
+					div.sheet-exotic-warning { display: none; }
+
+					input[value='0'] + div.sheet-exotic-warning  { display: block; }
+				}
+			}
+
+			div.sheet-armor {
+				$armorGrid: 30% 3.5em 2.5em 2.5em 2.5em 2.5em 2.5em 1em 1em;
+				div.sheet-headers { grid-template-columns:$armorGrid; }
+
+				div.repitem {
+					grid-template-columns: $armorGrid;
+					@include repeatingInformation(11, false);
+
+					div.sheet-settings { 
+						grid-column: 1 / 11;
+						grid-template-columns: $armorGrid;
+
+						div.sheet-row {
+							grid-column: 1 / 11;
+						}
+					}
+				}
+
+			}
+		}
+
+		/*** AUGS ****/
+		div.sheet-augs {
+			$augsGrid: 1fr 5em 5em 1em 1em;;
+
+			div.sheet-headers {
+				display: grid;
+				grid-template-columns:$augsGrid;
+			} 
+
+			div.repitem {
+				grid-template-columns: $augsGrid;
+				@include repeatingInformation(6, true);
+
+				input[name='attr_augementation'] { text-align: left; }
+
+				div.sheet-settings { 
+					grid-column: 1 / 6;
+					grid-template-columns: $augsGrid;
+				}
+			}	
+		}
+
+		/*** GEAR ****/
+		div.sheet-gear {
+			$gearGrid: 1fr 5em 5em 1em 1em;;
+
+			div.sheet-headers {
+				display: grid;
+				grid-template-columns:$gearGrid;
+			} 
+
+			div.repitem {
+				grid-template-columns: $gearGrid;
+				@include repeatingInformation(6, true);
+
+				input[name='attr_item'] { text-align: left; }
+
+				div.sheet-settings { 
+					grid-column: 1 / 6;
+					grid-template-columns: $gearGrid;
+				}
+			}	
+		}
+
+		/***** MAGIC *****/
+		div.sheet-magic {
+			$magicGrid: 30% 1.5fr 1.5fr 2fr 2em 1em 1em;
+
+			input.sheet-magic-toggle[value='rituals'] ~ .sheet-headers h2:nth-of-type(1n+2) {
+				@extend %display-none;
+			}
+
+			h2:nth-of-type(1n+2) { text-align: center; }
+			h3 { color: $blacker; }
+
+			div.sheet-headers {
+				display: grid;
+				@extend %gridGap;
+				grid-template-columns:$magicGrid;
+
+				h3:nth-of-type(1n+2) { text-align: center; }
+			} 
+
+
+			/***** SPELLS & PREPARTATIONS *****/
+			div.sheet-spellsForumlas {
+				div.repitem {
+					grid-template-columns: $magicGrid;
+
+					@include repeatingInformation(8, false);
+
+					input[name='attr_damage'],
+					input[name='attr_dicepool_modifier'] {
+						width: 3.5em;
+					}
+
+					select[name='attr_category'] { grid-row: 2; }
+
+					div.sheet-row { grid-column: 1 / 6; }
+
+					div.sheet-settings { 
+						grid-column: 1 / 8;
+						grid-template-columns: $magicGrid;
+					}
+				}
+			}
+
+			/***** RITUALS *****/
+			div.sheet-magic-rituals {
+				$ritualsGrid: 1fr 1em 1em;
+
+				@include repeatingInformation(4, false);
+
+				div.repitem {
+					grid-template-columns: $ritualsGrid;
+
+					label {
+						&[data-i18n-title='name'] { grid-column: 1 / 4; }
+					}
+
+					div.sheet-row { grid-column: 1 / 4; }
+				}
+
+				div.sheet-settings {
+					grid-template-columns: $ritualsGrid;
+					grid-column: 1 / 4;
+				}
+			}
+
+			div.sheet-magic-preps, div.sheet-magic-spells {
+				textarea { width: 93%; }
+			}
+
+			/***** PREPARATIONS *****/
+			div.sheet-magic-preps {
+				/* READIED PREPARATIONS */
+				div.sheet-prepared-preparations {
+					$preparationsGrid: 40% 1fr 1fr 2fr 1em 1em;
+
+					div.sheet-headers {
+						grid-template-columns:$preparationsGrid ;
+					} 
+
+					div.repitem {
+						grid-template-columns: $preparationsGrid ;
+
+						@include repeatingInformation(7, false);
+
+						div.sheet-settings { 
+							grid-column: 1 / 7;
+							grid-template-columns: $preparationsGrid;
+
+							select { grid-column: 4 / 7; }
+
+							textarea { width: 100%; }
+						}
+					}
+				}
+			}
+
+
+			/***** ADEPT POWERS *****/
+			div.sheet-powers {
+				$powersGrid: 1fr 3em 1em 1em;;
+
+				div.sheet-headers {
+					grid-template-columns:$powersGrid;
+				} 
+
+				div.repitem {
+					grid-template-columns: $powersGrid;
+					@include repeatingInformation(5, true);
+
+					div.sheet-settings { 
+						grid-column: 1 / 5;
+						grid-template-columns: $powersGrid;
+					}
+				}
+			}
+		}
+
+		/*** MATRIX ****/
+		div.sheet-matrix {
+			h3 { color: $blacker; }
+
+			div.sheet-programs {
+				$programGrid: 1fr 1em 1em;
+
+				div.repitem {
+					grid-template-columns: $programGrid;
+					@extend %borderBottom;
+					@include repeatingInformation(4, true);
+				}
+
+				div.sheet-settings { 
+					grid-column: 1 / 4;
+
+					input[type='text'] {
+						grid-column: 1 / 4;
+						text-align: left; 
+					}
+
+					label {
+						grid-column: 1 / 4;
+					}
+				}
+			}
+
+			div.sheet-complex-forms {
+				$complexFormsGrid: 30% 1fr 1fr 4em 1em 1em;
+
+				div.sheet-headers {
+					display: grid;
+					@extend %gridGap;
+					grid-template-columns: $complexFormsGrid;
+
+					h2:nth-of-type(1n+2) { text-align: center; }
+				} 
+
+				div.repitem {
+					grid-template-columns: $complexFormsGrid;
+
+					@include repeatingInformation(7, false);
+
+					div.sheet-row {
+						grid-column: 1 / 7;
+					}
+
+					div.sheet-settings { 
+						grid-column: 1 / 7;
+						grid-template-columns: $complexFormsGrid;
+
+					}
+				}
 			}
 		}
 	}
 	@import 'src/scss/_pc'; 
+
 
 /******************************************************************************************/
 /**************************** START OF THE NPC SHEET *************************************/

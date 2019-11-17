@@ -26,9 +26,9 @@
 			+npcAttributeButton(attrName, '@{'+attrName+'}+@{attribute_roll}')
 			span(name='attr_display_'+attrName)
 			label.settings(data-i18n-title=val title=val)
-				input(name='attr_'+attrName+'_base' placeholder='3' title='@{'+attrName+'_base}' type='number' value='3')
+				input(name=`attr_${attrName}`+'_base' placeholder='3' title='@{'+attrName+'_base}' type='number' value='3')
 			label.settings(data-i18n-title='modifier' title='modifier')
-				input(name='attr_'+attrName+'_modifier' placeholder='+' title='@{'+attrName+'_modifier}' type='number' value='')
+				input(name=`attr_${attrName}`+'_modifier' placeholder='+' title='@{'+attrName+'_modifier}' type='number' value='')
 		//- EDGE
 		+npcAttributeButton('edge', '@{edge}+@{attribute_roll}')
 		span(name='attr_edge')
@@ -122,9 +122,9 @@
 					- const attrName = val.toLowerCase();
 					h2(data-i18n=attrName) val
 					label.settings(data-i18n-title='modifier' title='modifier')
-						input(name='attr_'+attrName+'_limit_modifier' placeholder='0' title='@{'+attrName+'_limit_modifier}' type='number' value='0')
+						input(name=`attr_${attrName}`+'_limit_modifier' placeholder='0' title='@{'+attrName+'_limit_modifier}' type='number' value='0')
 					span.settings.tiny-span() =
-					span(name='attr_'+attrName+'_limit' title='@{'+attrName+'_limit}')
+					span(name=`attr_${attrName}`+'_limit' title='@{'+attrName+'_limit}')
 			
 			//- PAIN TOLERANCE
 			.rows.grunt.pain-tolerance
@@ -148,10 +148,14 @@
 		.column
 			h1.settings(data-i18n='modifier') Modifier
 			.rows
-				+rollButton('armorrating', 'base', '@{soak}')
+				+rollButton('armorrating', 'base', '@{armor_rating}')
 				label.settings(data-i18n-title='armorrating' title='armorrating')
-					input(,ame='attr_armor_rating' placeholder='9' title='@{armor_rating}' type='number' value='0')
-			each val, key in {'Defense': ['defense', 'defense'], 'Soak': ['soak', 'soak'], 'Acid Protection': ['acid', 'acidprotection'], 'Cold Protection': ['cold', 'coldprotection'], 'Electrical Protection': ['electrical', 'electricalprotection'], 'Fire Protection': ['fire', 'fireprotection'], 'Radiation Protection': ['radiation', 'radiationprotection']}
+					input(name='attr_armor_rating' placeholder='9' title='@{armor_rating}' type='number' value='0')
+			.rows
+				+rollButton('defense', 'base', '@{defense}')
+				label.settings(data-i18n-title='defense' title='defense')
+					input(name='attr_defense_modifier' placeholder='9' title='@{defense_modifier}' type='number' value='0')
+			each val, key in {'Soak': ['soak', 'soak'], 'Acid Protection': ['acid', 'acidprotection'], 'Cold Protection': ['cold', 'coldprotection'], 'Electrical Protection': ['electrical', 'electricalprotection'], 'Fire Protection': ['fire', 'fireprotection'], 'Radiation Protection': ['radiation', 'radiationprotection']}
 				.rows
 					+rollButton(val[1], 'base', '@{soak}+@{'+val[0]+'_modifier}')
 					label.settings(data-i18n-title=val[1] title=val[1])
@@ -182,21 +186,21 @@
 		//- TEXTBOXES
 		each val, key in {'Qualities': 'grunt', 'Augmentations': 'grunt', 'Gear': 'grunt vehicle', 'Programs': 'vehicle', 'Modifications': 'vehicle', 'Powers': 'grunt hide-magic', 'Weakness': 'grunt hide-magic'}
 			- const attrName = key === 'Qualities' ? 'quality' : key.toLowerCase();
-			input(name='attr_'+attrName type='hidden' value='')
+			input(name=`attr_${attrName}` type='hidden' value='')
 			.textrow(class=val)
 				h1(data-i18n=attrName) key
-				span(name='attr_'+attrName)
+				span(name=`attr_${attrName}`)
 				label.settings(data-i18n-title=attrName title=key)
-					textarea(name='attr_'+attrName placeholder=key title='@{'+attrName+'}')
+					textarea(name=`attr_${attrName}` placeholder=key title='@{'+`${attrName}}`)
 
 		each val, key in {'Initiate': ['grunt hide-magic', 'metamagic'],'Submersion': ['grunt hide-resonance', 'echos']}
 			- const attrName = key.toLowerCase();
 			.textrow(class=val[0])
-				input(name='attr_'+attrName type='hidden' value='')
+				input(name=`attr_${attrName}` type='hidden' value='')
 				h1(data-i18n=attrName) key
-				span(name='attr_'+attrName)
+				span(name=`attr_${attrName}`)
 				label.settings(data-i18n-title=attrName title=key)
-					input(name='attr_'+attrName placeholder=attrName type='number' title='@{'+attrName+'}')
+					input(name=`attr_${attrName}` placeholder=attrName type='number' title='@{'+`${attrName}}`)
 				br
 				span(name='attr_'+val[1])
 				label.settings(data-i18n-title=val[1] title=val[1])
@@ -226,22 +230,22 @@
 						h2(data-i18n='attribute') Attribute
 						h2(data-i18n='limit') Limit
 						if key === 'active'
-							select.skill-select(name='attr_skill' title='@{repeating_'+key+'_${x}_skill}' value='Close Combat Group')
-								include skillselect.html
+							select.skill-select(name='attr_skill' title=`@{repeating_${key}`+'_${x}_skill}' value='Close Combat Group')
+								include ../html/skillselect.html
 						else
 							label(data-i18n-title='skill' title='skill')
-								input(name='attr_skill' placeholder=key title='@{repeating_'+key+'_${x}_skill}' type='text' )
+								input(name='attr_skill' placeholder=key title=`@{repeating_${key}`+'_${x}_skill}' type='text' )
 						label(data-i18n-title='rating' title='rating')
-							input(name='attr_rating' min='0' placeholder='0' title='@{repeating_'+key+'_${x}_rating}' type='number')
+							input(name='attr_rating' min='0' placeholder='0' title=`@{repeating_${key}`+'_${x}_rating}' type='number')
 						label(data-i18n-title='ratingmodifier' title='Rating Modifier')
-							input(name='attr_rating_modifier' min='0' placeholder='0' title='@{repeating_'+key+'_${x}_rating_modifier}' type='number' )
-						select.attribute-select(name='attr_attribute' title='@{repeating_'+key+'_${x}_attribute}')
+							input(name='attr_rating_modifier' min='0' placeholder='0' title=`@{repeating_${key}`+'_${x}_rating_modifier}' type='number' )
+						select.attribute-select(name='attr_attribute' title=`@{repeating_${key}`+'_${x}_attribute}')
 							+attributeSelect(val[1])
-						select.limit-select(name='attr_limit' title='@{repeating_'+key+'_${x}_limit}' value='physical_limit')
+						select.limit-select(name='attr_limit' title=`@{repeating_${key}`+'_${x}_limit}' value='physical_limit')
 							+limitSelect(val[2])
-						h2.full-row(data-i18n='specializations') Specializations
-						label.full-row(data-i18n-title='specializations' title='Specializations') 
-							input(name='attr_specialization' placeholder='Specalizations' title='@{repeating_'+key+'_${x}_specialization}' type='text')
+						h2.full-row(data-i18n='specialization') specialization
+						label.full-row(data-i18n-title='specialization' title='specialization') 
+							input(name='attr_specialization' placeholder='Specalizations' title=`@{repeating_${key}`+'_${x}_specialization}' type='text')
 
 		//- SPRITE ACTIVE SKILLS
 		.rows.sprite.repeating.inline-repeating
@@ -253,8 +257,8 @@
 				+spriteButton('skill', 'display')
 				.settings
 					h2.full-row(data-i18n='skill') Skill
-					select.skill-select(name='attr_skill' title='@{repeating_'+key+'_${x}_skill}')
-						include skillsselectsprite.html
+					select.skill-select(name='attr_skill' title=`@{repeating_active`+'_${x}_skill}')
+						include ../html/skillsselectsprite.html
 
 		//- SPRITE POWERS
 		.rows.sprite.repeating.inline-repeating
@@ -279,7 +283,8 @@
 				span.pictos x
 				input(name='attr_weapon' type='hidden' value='')
 				span(name='attr_weapon_dice')
-				+npcButton(weaponButton)
+				+displayRollButton(weaponButton, true)
+				span(name='attr_weapon')
 				.settings
 					input(name='attr_weapon_range' type='hidden' value='range')
 					each val, key in npcWeaponsObject
@@ -289,13 +294,14 @@
 					each val, key in npcWeaponsObject
 						- const translationKey = key.toLowerCase();
 						- const attrName = key === 'Dam' ? 'dv' : key === 'Modes' ? 'mode' : key === 'Notes' ? 'note' : key.toLowerCase();
+						- const defaultValue = key === 'Reach' ? 0 : '';
 						if (key === 'Range')
-							select(name='attr_weapon_'+attrName title='@{repeating_weapon_${x}_weapon_'+attrName+'}' value=val['default'])
+							select(name='attr_weapon_'+attrName title='@{repeating_weapon_${x}_weapon_'+`${attrName}}` value=val['default'])
 								option(data-i18n='range' value='range' selected) range
 								option(data-i18n='melee' value='melee') melee
 						else
 							label(data-i18n-title=translationKey title=key)
-								input(name='attr_weapon_'+attrName placeholder=val['placeholder'] title='@{repeating_weapon_${x}_weapon_'+attrName+'}' type=val['type'])
+								input(name='attr_weapon_'+attrName placeholder=val['placeholder'] title='@{repeating_weapon_${x}_weapon_'+`${attrName}}` type=val['type'] value=defaultValue)
 					span (c)
 
 		//- SPELLS
@@ -306,7 +312,7 @@
 				span.pictos x
 				input(name='attr_spell' type='hidden' value='')
 				span(name='attr_dice')
-				+npcButton(spellButton)
+				+displayRollButton(npcSpellButton, true)
 				span(name='attr_spell')
 				.settings
 					input(name='attr_category' type='hidden' value='')
@@ -318,7 +324,7 @@
 						- const translationKey = key.toLowerCase();
 						- const attrName = key === 'Dam' ? 'damage' : key === 'Combat' ? 'combat_type' : key === 'Notes' ? 'note' : key.toLowerCase();
 						if val['type'] === 'select'
-							select(name='attr_'+attrName title='@{repeating_NPCspell_${x}_'+attrName+'}' value=val['default'])
+							select(name=`attr_${attrName}` title='@{repeating_NPCspell_${x}_'+`${attrName}}` value=val['default'])
 								each type in val['array']
 									- const i18n = key === 'Combat' ? type.split(' ')[0].replace(',','').toLowerCase() : type.toLowerCase();
 									- const value = key === 'Type' ? type.slice(0,1) : type;
@@ -330,7 +336,7 @@
 										option(data-i18n=i18n value=value) #{i18n}
 						else
 							label(data-i18n-title=translationKey title=key)
-								input(name='attr_'+attrName placeholder=val['placeholder'] title='@{repeating_NPCspell_${x}_'+attrName+'}' type=val['type'])
+								input(name=`attr_${attrName}` placeholder=val['placeholder'] title='@{repeating_NPCspell_${x}_'+`${attrName}}` type=val['type'])
 
 		//- COMPLEX FORMS
 		.rows.grunt.repeating.forms.hide-resonance
@@ -340,7 +346,7 @@
 				span.pictos x
 				input(name='attr_form' type='hidden' value='')
 				span(name='attr_form_dice')
-				+npcButton(formButton)
+				+displayRollButton(formButton, true)
 				span(name='attr_form')
 				.settings
 					each val, key in npcComplexFormsObject
@@ -351,7 +357,7 @@
 						- const translationKey = key.toLowerCase();
 						- const attrName = key === 'Notes' ? 'form_note' : 'form_' + key.toLowerCase();
 						if val['type'] === 'select'
-							select(name='attr_'+attrName title='@{repeating_form_${x}_'+attrName+'}' value=val['default'])
+							select(name=`attr_${attrName}` title='@{repeating_form_${x}_'+`${attrName}}` value=val['default'])
 								each type in val['array']
 									- const i18n = type.toLowerCase();
 									- const value = type;
@@ -361,7 +367,7 @@
 										option(data-i18n=i18n value=value) #{i18n}
 						else
 							label(data-i18n-title=translationKey title=key)
-								input(name='attr_'+attrName placeholder=val['placeholder'] title='@{repeating_form_${x}_'+attrName+'}' type=val['type'])
+								input(name=`attr_${attrName}` placeholder=val['placeholder'] title='@{repeating_form_${x}_'+`${attrName}}` type=val['type'])
 
 		//- IC
 		.rows.host.repeating.ic
@@ -370,7 +376,7 @@
 				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
 				span.pictos x
 				input(name='attr_IC' type='hidden' value='')
-				+npcButton(icButton)
+				+displayRollButton(icButton, false)
 				span(name='attr_IC')
 				.settings
 					each val, key in icObject
@@ -381,7 +387,7 @@
 						- const translationKey = key.toLowerCase();
 						- const attrName = key === 'IC Limit' ? 'limit' : key === 'Defense Attribute' ? 'attribute' : key === 'Defense Matrix Attribute' ? 'matrix' : key === 'Notes' ? 'note' : key.toLowerCase();
 						if val['type'] === 'select'
-							select(name='attr_IC_'+attrName title='@{repeating_IC_${x}_'+attrName+'}' value=val['default'])
+							select(name='attr_IC_'+attrName title='@{repeating_IC_${x}_'+`${attrName}}` value=val['default'])
 								each type in val['array']
 									- const i18n = type === 'Data Processing' ? 'data_processing' : type.toLowerCase();
 									- const value = type;
@@ -391,7 +397,7 @@
 										option(data-i18n=i18n value=value) #{i18n}
 						else
 							label(data-i18n-title=translationKey title=key)
-								input(name='attr_IC_'+attrName placeholder=val['placeholder'] title='@{repeating_IC_${x}_'+attrName+'}' type=val['type'])
+								input(name='attr_IC_'+attrName placeholder=val['placeholder'] title='@{repeating_IC_${x}_'+`${attrName}}` type=val['type'])
 
 	//- MATRIX DEVICE
 	input(name='attr_flag_matrix' type='hidden' value='')
@@ -409,27 +415,27 @@
 			- const matrixClass = val === 'Data Processing' ? 'Data' : val;
 			.rows
 				button(data-i18n=attrName name=val value!='&{template:rolls}{{header=^{'+attrName+'}}}{{base=^{base}}}{{dice=[[(@{'+attrName+'}+(?{Attribute|Willpower,@{willpower}|Logic,@{logic}|Intuition,@{intuition}})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}' type='roll') #{val}
-				.matrix-bubble(class='matrix'+matrixClass)
+				.matrix-bubble(class=`matrix${matrixClass}`)
 					- let i = 1;
 					while i < 21
-						input(name="attr_"+attrName value=i++ type="radio")
+						input(name=`attr_${attrName}` value=i++ type='radio')
 						span
 				label.round(data-i18n-title=attrName title=attrName)
-					input(name='attr_'+attrName placeholder='4' type='number' value='')
+					input(name=`attr_${attrName}` placeholder='4' type='number' value='')
 		.rows.repeating
 			h1(data-i18n='programs') Programs
 			fieldset(class='repeating_programs')
 				input.toggle(name='attr_flag' title='Settings toggle' type='checkbox' checked)
 				span.pictos x
-				input.toggle(name="attr_program_on" type="checkbox" checked)
+				input.toggle(name='attr_program_on' type='checkbox' checked)
 				span.pictos Q
-				button(name="program" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{program}}}{{desc=@{program_note}}}")
-					span(name="attr_program")
-				span(name="attr_program_note")
+				button(name='roll_program' type='roll' value='@{gm_toggle} &{template:rolls}{{header=@{program}}}{{desc=@{program_note}}}')
+					span(name='attr_program')
+				span(name='attr_program_note')
 				.settings
 					h2(data-i18n='name') name
 					label(data-i18n-title='name' title='name')
-						input(name="attr_program" placeholder="Program Name" title="@{repeating_programs_${x}_program}" type="text" value="")
+						input(name='attr_program' placeholder='Program Name' title='@{repeating_programs_${x}_program}' type='text' value='')
 					h2(data-i18n='notes') notes
 					label(data-i18n-title='notes' title='notes')
-						textarea(name="attr_program_note" placeholder="Program Description" title="@{repeating_programs_${x}_program_note}" type="text" value="")
+						textarea(name='attr_program_note' placeholder='Program Description' title='@{repeating_programs_${x}_program_note}' type='text' value='')
