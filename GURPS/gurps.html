@@ -26,6 +26,11 @@
 					    Repeating melee/ranged attacks. Ability to link weapon to skill or spell. The weapon will show the skill or spell level 
 					    and should update when the skill or spell level is updated.
 					</li>
+					<li>Reformat minimum damage notes and include page reference.</li>
+					<li>
+					    Repeating Spells. Moved checkboxes for <b>ON</b> and <b>MT</b> to avoid collision with delete button. Resized some text 
+					    boxes to allow more space for delete button. Change Maintained Penalty titles to Concentration Penalty. Thanks to Valter.
+					</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset" />View All Updates</button>
@@ -4072,12 +4077,12 @@
 						<input type="number" name="attr_spell_on_penalty_total" value="0" title="Macro name: spell_on_penalty_total" readonly="readonly" />
 					</div>
 					<div class="cell">
-					    <div class="popup">Maintained Penalty</div>
+					    <div class="popup">Concentration Penalty</div>
 						<div class="tooltip">
-						   Skill penalty based on # of <b>maintained</b> spells.<br />
+						   <b>Concentration</b> spell penalty<br />
 						   <input type="hidden" name="attr_spell_maintained_count" value="0" />
-						   Number of spells <b>Maintained:</b> <span name="attr_spell_maintained_count"></span>.<br />
-						   <i>NOTE:</i> Use the options tab to adjust the penalty.
+						   Number of spells: <span name="attr_spell_maintained_count"></span>.<br />
+						   <i>NOTE:</i> Use options tab to adjust the penalty.
 						</div>
 					</div>
 					<div class="cell margin-right">
@@ -4124,6 +4129,22 @@
 						   Points
 						</div>
 					</div>
+					<div class="sheet-cell sheet-col12">
+					    <div class="popup">ON</div>
+						<div class="tooltip">
+						   Mark the spell as <b>ON</b><br />
+						   -1 skill penalty for each spell that is <b>ON</b>.<br />
+						   See B238 or M10.
+						</div>
+					</div>
+					<div class="sheet-cell sheet-col12">
+					    <div class="popup">CT</div>
+						<div class="tooltip">
+						   Mark the spell as <b>Under Concentration</b>.<br />
+						   -3 skill penalty for each spell.<br />
+						   See B238 or M10.
+						</div>
+					</div>
 					<div class="sheet-cell sheet-col6">
 					    <div class="popup">Class</div>
 						<div class="tooltip">
@@ -4151,7 +4172,7 @@
 					</div>
 					<div class="sheet-cell sheet-col10">
 					    <div class="popup">Time</div>
-						<div class="tooltip">
+						<div class="tooltip tooltip-spell-time">
 						   Amount of time to cast the spell.
 						</div>
 					</div>
@@ -4159,22 +4180,6 @@
 					    <div class="popup">Maintain</div>
 						<div class="tooltip">
 						   Energy cost to maintain the spell.
-						</div>
-					</div>
-					<div class="sheet-cell sheet-col12">
-					    <div class="popup">ON</div>
-						<div class="tooltip">
-						   Mark the spell as <b>ON</b><br />
-						   -1 skill penalty for each spell that is <b>ON</b>.<br />
-						   See B238 or M10.
-						</div>
-					</div>
-					<div class="sheet-cell sheet-col12">
-					    <div class="popup">MT</div>
-						<div class="tooltip">
-						   Mark the spell as <b>Being Maintained</b>.<br />
-						   -3 skill penalty for each spell that is <b>Maintained</b>.<br />
-						   See B238 or M10.
 						</div>
 					</div>
 				</div> <!-- .sheet-header -->
@@ -4205,6 +4210,12 @@
 						<div class="sheet-cell sheet-col5">
 							<input type="number" name="attr_points" value="0" title="Macro table name: repeating_spells. Field name: points" />
 						</div>
+						<div class="sheet-cell sheet-col12">
+							<input type="checkbox" class="checkbox" title="Check to mark spell as on." name="attr_spell_on_checked" value="1" />
+						</div>
+						<div class="sheet-cell sheet-col12">
+							<input type="checkbox" class="checkbox" title="Check to mark spell as on." name="attr_spell_maintained_checked" value="1" />
+						</div>
 						<div class="sheet-cell sheet-col6">
 							<input type="text" name="attr_spell_class" placeholder="Class" title="Macro table name: repeating_spells. Field name: spell_class" />
 						</div>
@@ -4222,12 +4233,6 @@
 						</div>
 						<div class="sheet-cell sheet-col11">
 							<input type="text" name="attr_maintain" placeholder="Cost to Maintain" title="Macro table name: repeating_spells. Field name: maintain" />
-						</div>
-						<div class="sheet-cell sheet-col12">
-							<input type="checkbox" class="checkbox" title="Check to mark spell as on." name="attr_spell_on_checked" value="1" />
-						</div>
-						<div class="sheet-cell sheet-col12">
-							<input type="checkbox" class="checkbox" title="Check to mark spell as on." name="attr_spell_maintained_checked" value="1" />
 						</div>
 					</div> <!-- .sheet-row -->
 					
@@ -4369,6 +4374,11 @@
 	    <li>
 		    Repeating melee/ranged attacks. Ability to link weapon to skill or spell. The weapon will show the skill or spell level 
 		    and should update when the skill or spell level is updated.
+		</li>
+		<li>Reformat minimum damage notes and include page reference.</li>
+		<li>
+		    Repeating Spells. Moved checkboxes for <b>ON</b> and <b>MT</b> to avoid collision with delete button. Resized some text 
+		    boxes to allow more space for delete button. Change Maintained Penalty titles to Concentration Penalty. Thanks to Valter.
 		</li>
 	</ul>
 	
@@ -5606,11 +5616,17 @@ If fail, attacker can opt to hit limb<br /></textarea>
                     <td class="label">Damage:</td>
                     <td class="damage-roll">
                         {{damageRoll}} <span class="damageType">{{damageType}}</span>
-                        {{#minDamageNote}}
-                            <span>{{minDamageNote}}</span>
-                        {{/minDamageNote}}
                     </td>
                 </tr>
+                {{#minDamageNote}}
+                <tr>
+                    <td class="label">Minimum:</td>
+                    <td class="damage-roll">
+                        {{minDamageNote}}<br />
+                        See B378 <b>Damage Roll</b>
+                    </td>
+                </tr>
+                {{/minDamageNote}}
                 {{/damageRoll}}
                 {{#rollTotal() useDamageTypeNotes 1}}
                     {{#damageTypeNote}}
