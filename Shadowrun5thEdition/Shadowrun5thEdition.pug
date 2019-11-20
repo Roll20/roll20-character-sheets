@@ -1,4 +1,4 @@
-input(name='attr_version' type='hidden' value='3.01')
+input(name='attr_version' type='hidden' value='3.02')
 
 //- CHARACTER SHETE PAGE
 input.sheet_type(name='attr_sheet_type' type='hidden' value='pc')
@@ -116,7 +116,53 @@ include src/pug/_variables.pug
 
 
 	//- CORE TAB
-	include src/core.html
+	.core.pc-col
+		include src/core.html
+		.quality-box
+			.header.right-header
+				.header.htab
+					input.tab-switch(input name='attr_quality_toggle' type='radio'  value='quality' checked)
+					h1(data-i18n='qualities') Qualities
+					.right-tri
+				.header.htab
+					.triangle
+					input.tab-switch(input name='attr_quality_toggle' type='radio'  value='martial')
+					h1(data-i18n='martialarts') Martial Arts
+					.right-tri
+			.border-box
+				.pc-box.medium-box
+					input.tab-switch(input name='attr_quality_toggle' type='hidden'  value='quality')
+					.quality
+						.row-long.headers
+							each val in ['Quality', 'Type']
+								h2(data-i18n=`${val.toLowerCase()}`) #{val}
+						.rows.repeating-container
+							fieldset(class='repeating_quality')
+								span(name="attr_quality")
+								span.center(name="attr_type")
+								button.pictos(name="quality_chat" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{quality}}}{{desc=@{notes}}}") w
+								+repeatingSectionFlags()
+								.settings
+									input(name="attr_quality" placeholder="quality name" title="@{repeating_quality_${x}_quality}" type="text")
+									select(name="attr_type" title="@{repeating_quality_${x}_type}" value='p')
+										option(data-i18n="p" value="P" selected) P
+										option(data-i18n="n" value="N") N
+									+repeatingSectionNotes('quality')
+					.martial
+						.row-long.headers
+							each val in ['Technique', 'Style']
+								h2(data-i18n=`${val.toLowerCase()}`) #{val}
+						.rows.repeating-container
+							fieldset(class='repeating_martial')
+								span(name="attr_technique")
+								span.center(name="attr_style")
+								button.pictos(name="technique_chat" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{technique}}}{{desc=@{notes}}}") w
+								+repeatingSectionFlags()
+								.settings
+									input(name="attr_technique" placeholder="technique name" title="@{repeating_martial_${x}_technique}" type="text")
+									input(name="attr_style" placeholder="style name" title="@{repeating_martial_${x}_style}" type="text")
+									+repeatingSectionNotes('martial')
+
 
 	//- ARMS TAB
 	.arms.pc-col
@@ -165,15 +211,15 @@ include src/pug/_variables.pug
 										label(data-i18n-title=key.toLowerCase() title=key.toLowerCase())
 											input(name=`attr_${attrName}` placeholder=val['placeholder'] title=`${rangeRepeatingSection}_${attrName}}` type=val['type'] value='')
 								.row
-									h3(data-i18n="modeoptions") Mode Options
-									label(data-i18n-title="modeoptions" title="Mode Options")
-										input(name="attr_mode_options" placeholder="SA/BF/FA" type="text" title=`${rangeRepeatingSection}_mode_options}}`)
-									h3(data-i18n="range") range
-									label(data-i18n-title="range" title="Range")
-										input(name="attr_range" placeholder="25/150/350/550" type="text" title='')
-									h3(data-i18n="primary") primary
-									label(data-i18n-title="primary" title="Primary")
-										input(name="attr_primary" type="checkbox" title=`${rangeRepeatingSection}_primary}`  value='primary')
+									h3(data-i18n='modeoptions') Mode Options
+									label(data-i18n-title='modeoptions' title='Mode Options')
+										input(name='attr_mode_options' placeholder='SA/BF/FA' type='text' title=`${rangeRepeatingSection}_mode_options}}`)
+									h3(data-i18n='range') range
+									label(data-i18n-title='range' title='Range')
+										input(name='attr_range' placeholder='25/150/350/550' type='text' title='')
+									h3(data-i18n='primary') primary
+									label(data-i18n-title='primary' title='Primary')
+										input(name='attr_primary' type='checkbox' title=`${rangeRepeatingSection}_primary}`  value='primary')
 
 								.row
 									h3(data-i18n='skill') skill
@@ -197,7 +243,7 @@ include src/pug/_variables.pug
 										input(name='attr_dicepool_modifier' title=`${rangeRepeatingSection}_dicepool_modifier}` type='number')
 									input(name=`attr_skill` type='hidden' value='')
 									.exotic-warning
-										i(data-i18n="exoticnote") Exotic weapons are not linked to a skill. Use Modifier input to set dicepool.
+										i(data-i18n='exoticnote') Exotic weapons are not linked to a skill. Use Modifier input to set dicepool.
 								+repeatingSectionNotes('range')
 					.rows.repeating-container.weapon-melee
 						- const meleeRepeatingSection = '@{repeating_melee_${x}';
@@ -215,9 +261,9 @@ include src/pug/_variables.pug
 									- const attrName = key === 'Dam' ? 'damage' : key.toLowerCase();
 									label(data-i18n-title=key.toLowerCase() title=key.toLowerCase())
 											input(name=`attr_${attrName}` placeholder=val['placeholder'] title=`${meleeRepeatingSection}_${attrName}}` type=val['type'] value='')
-								h3(data-i18n="primary") primary
-								label(data-i18n-title="primary" title="Primary")
-									input(name="attr_primary" type="checkbox" title=`${meleeRepeatingSection}_primary}`  value='primary')
+								h3(data-i18n='primary') primary
+								label(data-i18n-title='primary' title='Primary')
+									input(name='attr_primary' type='checkbox' title=`${meleeRepeatingSection}_primary}`  value='primary')
 								.row
 									h3(data-i18n='skill') skill
 									select(name=`attr_skill` title=`${meleeRepeatingSection}_skill}` value='@{closecombat}')
@@ -237,7 +283,7 @@ include src/pug/_variables.pug
 										input(name='attr_dicepool_modifier' title=`${meleeRepeatingSection}_dicepool_modifier}` type='number')
 									input(name=`attr_skill` type='hidden' value='')
 									.exotic-warning
-										i(data-i18n="exoticnote") Exotic weapons are not linked to a skill. Use Modifier input to set dicepool.
+										i(data-i18n='exoticnote') Exotic weapons are not linked to a skill. Use Modifier input to set dicepool.
 								+repeatingSectionNotes('melee')
 		.pc-row.armor
 			.header.right-header
@@ -267,14 +313,13 @@ include src/pug/_variables.pug
 									label(data-i18n-title=key.toLowerCase() title=key.toLowerCase())
 										input(name=`attr_${attrName}` placeholder=val['placeholder'] title=`@{repeating_armor_`+'${x}'+`_${attrName}}` type=val['type'] value='')
 								.row
-									h3(data-i18n="primary") primary
-									label(data-i18n-title="primary" title="Primary")
-										input(name="attr_primary" type="checkbox" title=`${armorRepeatingSection}_primary}`  value='primary')
-									h3(data-i18n="modifier") modifier
+									h3(data-i18n='primary') primary
+									label(data-i18n-title='primary' title='Primary')
+										input(name='attr_primary' type='checkbox' title=`${armorRepeatingSection}_primary}`  value='primary')
+									h3(data-i18n='modifier') modifier
 									label(data-i18n-title='modifier' title='modifier')
 										input(name='attr_dicepool_modifier' placeholder='0' title=`${armorRepeatingSection}_dicepool_modifier}` type='number' value='0')
 								+repeatingSectionNotes('armor')
-
 
 
 	//- AUGS TAB
@@ -290,13 +335,13 @@ include src/pug/_variables.pug
 							h2(data-i18n=`${val.toLowerCase()}`) #{val}
 					.rows.repeating-container
 						fieldset(class=`repeating_augementations`)
-							span(name=`attr_augementation`)
+							span(name=`attr_augmentation`)
 							span.center(name=`attr_rating`)
 							span.center(name=`attr_essence`)
 							+repeatingSectionFlags()
 							.settings
 								each val in augementations
-									- const attrName = val === 'Augmentations' ? 'augementation' : val.toLowerCase();
+									- const attrName = val === 'Augmentations' ? 'augmentation' : val.toLowerCase();
 									- const type = val === 'Augmentations' ? 'text' : 'number';
 									- const placeholder = val === 'Augmentations' ? 'name' : '0';
 									label(data-i18n-title=val title=val)
@@ -328,7 +373,6 @@ include src/pug/_variables.pug
 								label(data-i18n-title='quantity' title='quantity')
 									input(name=`attr_quantity` placeholder='x3' title=`@{repeating_items_`+'${x}'+`_quantity}` type='text' value='')
 								+repeatingSectionNotes('items')
-
 
 	//- MAGIC TAB
 	.magic.pc-col
@@ -523,7 +567,7 @@ include src/rolltemplates.html
 include src/html/hidden.html
 
 //- SCRIPTS
-include src/pug/scripts.js
+include src/js/scripts.js
 
 //- CHUMMER IMPORTER
 include src/html/importer.html
