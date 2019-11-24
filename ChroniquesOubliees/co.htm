@@ -237,24 +237,29 @@
       });
     });
   });
-  on('change:pnj_pv', function(eventinfo) {
-    getAttrs(['pnj_pv', 'pnj_pv_max', 'PV_max'], function(values) {
+  on('change:pnj_pv', function(eventinfo) { //fires also when pnj_pv_max changes
+    getAttrs(['pnj_pv', 'pnj_pv_max', 'PV', 'PV_max'], function(values) {
       var sta = {};
-      if (eventinfo.newValue) sta.PV = eventinfo.newValue;
+      var new_pv = parseInt(values.pnj_pv);
+      var old_pv = parseInt(values.PV);
       var new_pv_max = parseInt(values.pnj_pv_max);
       var old_pv_max = parseInt(values.PV_max);
       if (!isNaN(new_pv_max) && (isNaN(old_pv_max) || new_pv_max != old_pv_max)) { //PV max du pnj a changé
         sta.PV_max = new_pv_max;
-        var pv = parseInt(values.pnj_pv);
-        if (isNaN(old_pv_max) || isNaN(pv) || pv === 0) {
-          sta.pnj_pv = new_pv_max;
-          sta.PV = new_pv_max;
-        } else {
-          pv += new_pv_max - old_pv_max;
-          if (pv < 0) pv = 0;
-          sta.pnj_pv = pv;
-          sta.PV = pv;
+        if (isNaN(old_pv_max) || old_pv_max === 0) { //first time set pv max
+          if (isNaN(new_pv) || new_pv === 0) { //and pv is 0 or not set
+            sta.pnj_pv = new_pv_max;
+            sta.PV = new_pv_max;
+          } else sta.PV = new_pv;
+        } else if (!isNaN(new_pv) && old_pv_max > new_pv) {
+          new_pv += new_pv_max - old_pv_max;
+          if (new_pv < 0) new_pv = 0;
+          sta.pnj_pv = new_pv;
+          sta.PV = new_pv;
         }
+      } else { //PV du pnj a changé
+        sta.PV = new_pv;
+        if (isNaN(new_pv_max) || new_pv_max === 0) sta.pnj_pv_max = new_pv;
       }
       setAttrs(sta);
     });
@@ -387,6 +392,19 @@
     }
   });
 
+  //Mise à jour des stats dérivées
+  on('change:CHARISME', function(eventinfo) {
+    getAttrs(["CHARISME"], function(values) {
+      var charisme = parseInt(values.CHARISME);
+      if (!isNaN(charisme) && charisme > 0) {
+       var pc_max = 3 + Math.floor((parseInt(values.CHARISME) - 10) / 2);
+        setAttrs({
+          PC_max: pc_max
+        });
+      }
+    });
+  });
+
   //Importation de statblocks
   var statsReconnues = {
     for: 'pnj_for',
@@ -431,12 +449,18 @@
     var rows = stats.split(/\n/);
     var newAttrs = {};
     var previousLine = ''; //Au cas d'attaque sur plusieurs lignes
+    var previousContainsDM = false;
+    var lastPrefix = ''; //Pour les suites d'attaque sur la ligne suivante
+    var firstLine = true; //si la première ligne ne correspond à rien, c'est le nom
     rows.forEach(function(row) {
       if (row === '') {
         previousLine = '';
+        lastPrefix = '';
+        firstLine = false;
+        previousContainsDM = false;
         return;
       }
-      if (row.search(/\bDM\b/i) >= 0) { //Attaque
+      if (previousContainsDM || row.search(/\bDM\b/i) >= 0) { //Attaque
         var currentRow = previousLine + row;
         var nomAttaqueFin = currentRow.search(/\s(\+\d+|0\b|DM)/i);
         var nomAttaque = currentRow.substring(0, nomAttaqueFin);
@@ -476,6 +500,8 @@
           bonusDM = parseInt(dmExpr);
           if (isNaN(bonusDM)) {
             console.log("Impossible de trouver les DM dans " + row);
+            previousLine += row;
+            previousContainsDM = true;
             return;
           }
         } else {
@@ -484,6 +510,8 @@
           de = parseInt(dmExpr);
           if (isNaN(bonusDM) || isNaN(de)) {
             console.log("Impossible de trouver les DM dans " + row);
+            previousLine += row;
+            previousContainsDM = true;
             return;
           }
           var indexBonusDM = dmExpr.search(/(\+|-)/);
@@ -514,7 +542,12 @@
         newAttrs[prefix + 'dm'] = bonusDM;
         newAttrs[prefix + 'spec'] = specAtt;
         if (portee) newAttrs[prefix + 'portee'] = portee;
+        lastPrefix = prefix;
+        previousContainsDM = false;
+      } else if (row.startsWith('+') && lastPrefix !== '') {
+        newAttrs[lastPrefix + 'spec'] += row;
       } else { //Pas attaque
+        lastPrefix = '';
         var lexemes = [];
         var lastMatch;
         var match = patternStats.exec(row);
@@ -535,8 +568,12 @@
           });
         }
         if (lexemes.length === 0) {
-          console.log("La ligne " + row + " ne correspond à rien");
-          previousLine = row + ' ';
+          if (firstLine) {
+            newAttrs.character_name = row;
+          } else {
+            console.log("La ligne " + row + " ne correspond à rien");
+            previousLine = row + ' ';
+          }
         } else previousLine = '';
         lexemes.forEach(function(l) {
           var lstat = l.match[0];
@@ -580,10 +617,21 @@
             } else {
               valAttr = parseInt(valAttr);
             }
+          } else if (lattr == 'pnj_pv_max') {
+            //On met aussi les pv courants à jour
+            var pvMax = parseInt(valAttr);
+            //Cas où on note entre parenhèse les PV courants
+            var caracParen = valAttr.indexOf('(');
+            if (caracParen > 0) {
+              var pvCourant = parseInt(valAttr.substring(caracParen + 1));
+              newAttrs.pnj_pv = pvCourant;
+              valAttr = valAttr.substring(0, caracParen).trim();
+            } else newAttrs.pnj_pv = pvMax;
           }
           newAttrs[lattr] = valAttr;
         });
       }
+      firstLine = false;
     });
     setAttrs(newAttrs);
   });
@@ -1208,7 +1256,7 @@
                 <td class="sheet-boxtitre">Épuisement</td>
               </tr>
               <tr>
-                <td class="sheet-boxinputlight"><input type="number" name="attr_PC_max" value="3+@{CHA}" title="Points de Chance MAX (page 79)" disabled /></td>
+                <td class="sheet-boxinputlight"><input type="number" name="attr_PC_max" value="3" title="Points de Chance MAX (page 79)" /></td>
                 <td class="sheet-boxinput">
                   <input type="checkbox" name="attr_PR1" value="1" title="Point de Récupération 1 (page 80)" />
                   <input type="checkbox" name="attr_PR2" value="1" title="Point de Récupération 2 (page 80)" />

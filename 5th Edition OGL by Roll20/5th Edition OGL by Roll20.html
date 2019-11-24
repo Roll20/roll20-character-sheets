@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="2.710">
+<input type="hidden" name="attr_version" value="2.714">
 <input class="monster_confirm_flag" type="hidden" name="attr_monster_confirm_flag">
 <input class="mancer_confirm_flag" type="hidden" name="attr_mancer_confirm_flag">
 <div class="licensecontainer compendium-drop-target monsters">
@@ -6321,7 +6321,7 @@
             }
             setAttrs(update);
         });
-    }); 
+    });
 
     on("change:exhaustion_toggle", function(eventinfo) {
         if(eventinfo.newValue !== "0") {
@@ -6345,7 +6345,7 @@
             update[`exhaustion_1`] = "• " + getTranslationByKey(`exhaustion-0`)
         } else if (newValue > previousValue) {
             //If exhaustion increase then add text to the spans
-            for(let i = previousValue; i <= newValue; i++) 
+            for(let i = previousValue; i <= newValue; i++)
             {update[`exhaustion_${i}`] = "• " + getTranslationByKey(`exhaustion-${i}`)}
         } else {
             //If exhaustion decrease remove text from spans
@@ -6774,7 +6774,7 @@
                 update[`repeating_inventory_${itemid}_itemresourceid`] = "";
             };
         });
-        
+
         setAttrs(update, {silent: true});
     });
 
@@ -6806,7 +6806,7 @@
             if(v["multiclass2_flag"] == 1) {class_array.push(v["multiclass2"])};
             if(v["multiclass3_flag"] == 1) {class_array.push(v["multiclass3"])};
             // Check to see if there are any duplicate multiclasses
-            if((new Set(class_array)).size !== class_array.length) { 
+            if((new Set(class_array)).size !== class_array.length) {
                 throw_warning = true;
             };
 
@@ -7018,6 +7018,11 @@
     };
 
     var update_tool = function(tool_id) {
+        //D&D 5e Mancer: Land Vehicles proficiency does not drop with Marine background (UC748)
+        //Added a test to check for an undefined tool_id so to prevent similar errors.
+        //By Miguel Peres
+        if(typeof tool_id == "undefined") return;
+
         if(tool_id.substring(0,1) === "-" && tool_id.length === 20) {
             do_update_tool([tool_id]);
         }
@@ -7317,7 +7322,7 @@
                     };
                 });
 
-                if(page.data["Modifiers"] && page.data["Modifiers"] != "") { mods += `, ${page.data["Modifiers"]}` }; 
+                if(page.data["Modifiers"] && page.data["Modifiers"] != "") { mods += `, ${page.data["Modifiers"]}` };
                 update[`repeating_inventory_${id}_itemmodifiers`] = mods;
                 if(page.data["Item Type"].indexOf("Weapon") > -1) {
                     update[`repeating_inventory_${id}_hasattack`] = 1;
@@ -7368,7 +7373,7 @@
                         const weapon_attr_mod = (type.includes("ranged") || (properties && properties.includes("finesse") && currentData.dexterity_mod > currentData.strength_mod)) ? currentData.dexterity_mod : currentData.strength_mod;
                         update[`repeating_npcaction_${rowid}_attack_tohit`] = weapon_attr_mod;
 
-                        const dmgArray = (options && options.versatile === 2) ? 
+                        const dmgArray = (options && options.versatile === 2) ?
                             ["Alternate Damage", "Alternate Damage Type", "Alternate Secondary Damage", "Alternate Secondary Damage Type"] :
                             ["Damage", "Damage Type", "Secondary Damage", "Secondary Damage Type"];
 
@@ -7391,7 +7396,7 @@
                                 const split = (page.data["Modifiers"].includes(",")) ? page.data["Modifiers"].split(", ") : page.data["Modifiers"];
                                 split.forEach((attr) => {
                                     const name = attr.toLowerCase();
-                                    if (name.includes("attacks")) { 
+                                    if (name.includes("attacks")) {
                                         update[`repeating_npcaction_${rowid}_attack_tohit`] = +update[`repeating_npcaction_${rowid}_attack_tohit`] + name.split("attacks ")[1];
                                     } else if (name.includes("damage")) {
                                         update[`repeating_npcaction_${rowid}_attack_damage`] += name.split("damage ")[1];
@@ -7399,7 +7404,7 @@
                                         console.log(`%c ${page.name} modifiers format did not include damage or attacks`, "color:orange;");
                                     };
                                 });
-                            }; 
+                            };
                         };
                     };
 
@@ -7411,7 +7416,7 @@
                     }
                     if (versatile && page.data["Alternate Damage"]) {
                         make_npc_attack_from_item(generateRowID(), {versatile: 2})
-                    } 
+                    }
 
                     if (page.data["Modifiers"]) {
                         callbacks.push(() => { check_itemmodifiers(page.data["Modifiers"]);  }, () => { update_npc_action("all"); });
@@ -7459,7 +7464,7 @@
                     const spellattribute = (attr.includes("Bonus")) ? "hlbonus" : (attr.includes("Desc")) ? "athigherlevels" : (attr.includes("Dice")) ? "hldie" : "hldietype";
                     update[`repeating_spell-${lvl}_${id}_spell${spellattribute}`] = page.data[`${attr}`];
                 };
-            }); 
+            });
 
             if(page.data["Components"]) {
                 ["v", "s", "m"].forEach((comp) => {
@@ -7485,7 +7490,7 @@
             };
 
             if(page.data["data-Cantrip Scaling"] && lvl == "cantrip") {update[`repeating_spell-${lvl}_${id}_spell_damage_progression`] = "Cantrip " + page.data["data-Cantrip Scaling"].charAt(0).toUpperCase() + page.data["data-Cantrip Scaling"].slice(1);};
-            update[`repeating_spell-${lvl}_${id}_options-flag`] = "0"; 
+            update[`repeating_spell-${lvl}_${id}_options-flag`] = "0";
         };
         if(category === "Monsters") {
             console.log(`%c MONSTERS: ${page.name} dropped`, "color: purple; font-weight:14px;");
@@ -7502,7 +7507,7 @@
                     update_attr(`${ability}`);
                 });
             });
-          
+
             const npcExtras = ["Condition Immunities", "Immunities", "Languages", "Resistances", "Speed", "Token Size", "Vulnerabilities"];
             npcExtras.forEach((attr) => {
                 //console.log(`%c MONSTERS Drop: ${attr}`, "color:cornflowerblue;");
@@ -7615,7 +7620,7 @@
                 } else if(contentarray && contentarray.indexOf(`${attr}`) > -1) {
                     console.log(`%c ${attr} was not found for ${page.name}`, "color: orange;");
                 };
-            }); 
+            });
             //REACTIONS
             if (page.data["data-Reactions"]) {
                 update["npcreactionsflag"] = 1;
@@ -7631,7 +7636,7 @@
                 });
             } else if(contentarray && contentarray.indexOf("Reactions") > -1) {
                 console.log(`%c Reactions was not found for ${page.name}`, "color: orange;");
-            };  
+            };
             //TRAITS
             if (page.data["data-Traits"]) {
                 //console.log(`%c MONSTERS Drop: NPC Traits`, "color:cornflowerblue;");
@@ -7639,9 +7644,9 @@
                 jsonparse(page.data["data-Traits"]).forEach((val) => {
                     traitsobj[val.Name] = (val.Name && val.Desc) ? val.Desc : "";
                     if (val.Name && val.Desc) {
-                        traitsobj[val.Name] = val.Desc; 
+                        traitsobj[val.Name] = val.Desc;
                     } else if (val.Name) {
-                        traitsobj[val.Name] = ""; 
+                        traitsobj[val.Name] = "";
                     } else {
                         console.log(`%c Traits JSON is lacking a Name key`, "color: orange;")
                     };
@@ -7679,7 +7684,7 @@
             } else if(contentarray && contentarray.indexOf("Traits") > -1) {
                 console.log(`%c Traits was not found for ${page.name}`, "color: orange;");
             };
-            //Spells 
+            //Spells
             if (page.data["data-Spells"]) {
                 let spellsobj = [];
                 //Put together a list of spells to get from the Comepndium
@@ -7718,17 +7723,17 @@
                         ["Add Casting Modifier", "Casting Time", "Concentration", "Damage Type", "Damage", "Duration", "Healing", "Material", "Range", "Ritual", "Save", "Save Success", "School", "Secondary Damage", "Secondary Damage Type", "Spell Attack", "Target"].forEach((attr) => {
                             if (spell[`${attr}`]) {
                                 //Adjust the array entry to match the attribute name in the HTML
-                                const name = 
-                                    (attr === "Add Casting Modifier") ? "dmgmod" : 
-                                    (attr === "Material") ? `comp_materials` : 
-                                    (attr === "Spell Attack") ? `attack` : 
-                                    (attr.includes("Secondary Damage")) ? attr.split("Secondary ")[0] + "2" : 
+                                const name =
+                                    (attr === "Add Casting Modifier") ? "dmgmod" :
+                                    (attr === "Material") ? `comp_materials` :
+                                    (attr === "Spell Attack") ? `attack` :
+                                    (attr.includes("Secondary Damage")) ? attr.split("Secondary ")[0] + "2" :
                                     attr;
                                 const spellattribute = name.toLowerCase().replace(" ", "");
                                 //Concentration, Ritual, and School are exceptions to norm
-                                const updateValue = 
-                                    (attr === "Concentration" || attr === "Ritual") ? `{{${spellattribute}=1}}` : 
-                                    (attr === "School") ? spell["School"].toLowerCase() : 
+                                const updateValue =
+                                    (attr === "Concentration" || attr === "Ritual") ? `{{${spellattribute}=1}}` :
+                                    (attr === "School") ? spell["School"].toLowerCase() :
                                     spell[`${attr}`];
                                 update[`${repeatingRow}_spell${spellattribute}`] = updateValue;
                             };
@@ -7739,7 +7744,7 @@
                                 const spellattribute = (attr.includes("Bonus")) ? "hlbonus" : (attr.includes("Desc")) ? "athigherlevels" : (attr.includes("Dice")) ? "hldie" : "hldietype";
                                 update[`${repeatingRow}_spell${spellattribute}`] = spell[`${attr}`];
                             };
-                        }); 
+                        });
 
                         if (spell["Components"]) {
                             ["v", "s", "m"].forEach((comp) => {
@@ -7752,7 +7757,7 @@
                             callbacks.push(() => { create_attack_from_spell(lvl, newrowid, currentData.character_id); });
                         } else if (page.data["Higher Spell Slot Desc"] && page.data["Higher Spell Slot Desc"] != "") {
                             //This needs to run the update_spelloutput
-                        }; 
+                        };
 
                         if (spell["data-Cantrip Scaling"] && lvl == "cantrip") {
                             update[`${repeatingRow}_spell_damage_progression`] = "Cantrip " + spell["data-Cantrip Scaling"].charAt(0).toUpperCase() + spell["data-Cantrip Scaling"].slice(1);
@@ -7773,14 +7778,14 @@
 
                     setAttrs(update, {silent: true}, () => {
                         callbacks.forEach((callback) => {
-                            callback(); 
+                            callback();
                         })
                     });
 
                     return {
                         callbacks: callbacks
                     };
-                }); 
+                });
             };
         };
         if(category === "Feats") {
@@ -8009,6 +8014,11 @@
                     var tool_array = jsonparse(blob["Tool Proficiency"]);
                     if(tool_array["Proficiencies"] && tool_array["Proficiencies"].length) {
                         _.each(tool_array["Proficiencies"], function(prof) {
+                            //D&D 5e Mancer: Land Vehicles proficiency does not drop with Marine background (UC748)
+                            //Generating ID that was coming empty for not existing rows.
+                            //By Miguel Peres
+                            let newrowid = generateRowID();
+
                             let existing = {};
                             _.each(repeating.tool, function(tool, id) {
                                 if(tool.toolname == prof.toLowerCase()) {
@@ -8581,7 +8591,7 @@
             };
 
             if (v[`${repeating_spell}_spelldamage`] && v[`${repeating_spell}_spelldamage`] != "") {
-                update[`${repeating_attack}_dmgbase`] = 
+                update[`${repeating_attack}_dmgbase`] =
                     (v[`${repeating_spell}_spell_damage_progression`] && v[`${repeating_spell}_spell_damage_progression`] === "Cantrip Dice") ? "[[round((@{level} + 1) / 6 + 0.5)]]" + v[`${repeating_spell}_spelldamage`].substring(1) :
                     v[`${repeating_spell}_spelldamage`];
             };
@@ -8728,7 +8738,7 @@
 
                 //HIGHER LVL CAST DMG found in Spells for spells like Fireball
                 const hldmgcrit = (v[`${repeating_attack}_hldmg`] && v[`${repeating_attack}_hldmg`] != "") ? v[`${repeating_attack}_hldmg`].slice(0, 7) + "crit" + v[`${repeating_attack}_hldmg`].slice(7) : "";
-                
+
                 if (v[`${repeating_attack}_spellid`] && v[`${repeating_attack}_spellid`] != "") {
                     spellattack    = true;
                     //GLOBAL MAGIC ATTACK MODIFIER in Settings
@@ -8922,7 +8932,7 @@
                 } else {
                     rollbase = "@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{saveflag} {{desc=@{atk_desc}}} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} ammo=@{ammo} @{charname_output}";
                 }
-    
+
                 update[`${repeating_attack}_rollbase_dmg`]  = `@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[${hdmg1}]]}} {{dmg1type=${dmgtype}}} @{dmg2flag} {{dmg2=[[${hdmg2}]]}} {{dmg2type=${dmg2type}}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globaldamage=${globaldamage}}} {{globaldamagetype=@{global_damage_mod_type}}} @{charname_output}`;
                 update[`${repeating_attack}_rollbase_crit`] = `@{wtype}&{template:dmg} {{crit=1}} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[${hdmg1}]]}} {{dmg1type=${dmgtype}}} @{dmg2flag} {{dmg2=[[${hdmg2}]]}} {{dmg2type=${dmg2type}}} {{crit1=[[${crit1}]]}} {{crit2=[[${crit2}]]}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} ${hldmgcrit} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globaldamage=${globaldamage}}} {{globaldamagecrit=${globaldamagecrit}}} {{globaldamagetype=@{global_damage_mod_type}}} @{charname_output}`;
                 update[`${repeating_attack}_atkbonus`]      = bonus;
@@ -9169,7 +9179,7 @@
             } else {
                 const currentID = id.replace("repeating_resource_", "").substring(0,20);
                 const side  = (id.includes("left")) ? `right` : `left`;
-                //Get the inputs for the opposite side to see if they are empty. 
+                //Get the inputs for the opposite side to see if they are empty.
                 //If they are empty delete the entire row. Otherwise set the side that was the source of this event to empty strings
                 getAttrs([`repeating_resource_${currentID}_resource_${side}`, `repeating_resource_${currentID}_resource_${side}_name`, `repeating_resource_${currentID}_resource_${side}_max`], (v) => {
                     const Name  = v[`repeating_resource_${currentID}_resource_${side}_name`] || false;
@@ -9186,7 +9196,7 @@
                     setAttrs(update, {silent: true});
                 });
             };
-        }); 
+        });
     };
 
     const update_weight = function() {
@@ -9218,7 +9228,7 @@
                 let size_multiplier = 1;
                 if (v["size"] && v["size"] != "") {
                     const size = v["size"].toLowerCase().trim();
-                    size_multiplier = 
+                    size_multiplier =
                         (size === "tiny") ? .5 : (size === "large") ? 2 : (size === "huge") ? 4 : (size === "gargantuan") ? 8 : size_multiplier;
                 };
                 let str = str_base*size_multiplier;
@@ -9227,10 +9237,10 @@
                     const operator = v.carrying_capacity_mod.substring(0,1);
                     const value    = v.carrying_capacity_mod.substring(1);
                     if(["*","x","+","-"].indexOf(operator) > -1 && isNaN(parseFloat(value,10)) === false) {
-                        str = 
-                            (operator === "*" || operator == "x") ? str*parseFloat(value,10) : 
-                            (operator === "+") ? str+parseFloat(value,10) : 
-                            (operator === "-") ? str-parseFloat(value,10) : 
+                        str =
+                            (operator === "*" || operator == "x") ? str*parseFloat(value,10) :
+                            (operator === "+") ? str+parseFloat(value,10) :
+                            (operator === "-") ? str-parseFloat(value,10) :
                             str;
                     }
                 }
@@ -9246,7 +9256,7 @@
                 } else {
                     update["encumberance"] = " ";
                 }
-                
+
                 setAttrs(update, {silent: true});
 
             });
@@ -9723,7 +9733,10 @@
 
                     if(v["pb_type"] && v["pb_type"] === "die") {
                         atk = atk + "+" + v["pb"];
-                        dc = dc + parseInt(v["pb"].substring(1), 10) / 2;
+                        //Fixing Spell DC when using type Die
+                        //By Miguel
+                        //Used to be equals to: dc + parseInt(v["pb"].substring(1), 10) / 2
+                        dc = dc + "+" + v["pb"];
                     }
                     else {
                         atk = parseInt(atk, 10) + parseInt(v["pb"], 10);
@@ -9967,10 +9980,10 @@
                         last_save = 1;
                         item_flag = item < 0 ? 4 : 2;
                     } else {
-                        item_flag = item < 0 ? 3 : 1; 
+                        item_flag = item < 0 ? 3 : 1;
                     }
                 } else {
-                    item_flag = 0; 
+                    item_flag = 0;
                     item      = "";
                 };
 
@@ -10897,6 +10910,8 @@
                         disableAbilities[increaseSection].push(ability.toLowerCase());
                     });
                 }
+                //TODO: Investigate if additional hitpoits at first level could be calculated and interted at this point
+                //By Miguel
                 if(pagedata["data-HP per level"]) {
                     additionalHP += pagedata["data-HP per level"];
                 }
@@ -10942,7 +10957,10 @@
         if(mancerdata["l1-class"] && (mancerdata["l1-class"].data.class || mancerdata["l1-class"].values["custom_hit_die"])) {
             var basehp = mancerdata["l1-class"].data.class ? mancerdata["l1-class"].data.class["Hit Die"] : mancerdata["l1-class"].values["custom_hit_die"];
             var conmod = abilityTotals.constitution.base > 0 ? abilityTotals.constitution.mod : 0;
-            allAbilities.hp = parseInt(basehp.replace("d", "")) + additionalHP + conmod;
+            //Calculating additional hitpoints at first level from things like Draconic Bloodline ad Hill Dwarf
+            //By Miguel
+            let additionalHitPointsFromClassAndRaceAtFirstLevel = getAdditionalHitPointsFromClassAndRaceAtFirstLevel(getRelevantBlobs(mancerdata, '1', 'l1'));
+            allAbilities.hp = parseInt(basehp.replace("d", "")) + additionalHitPointsFromClassAndRaceAtFirstLevel + additionalHP + conmod;
             update["hit_points"] = allAbilities.hp;
         }
 
@@ -11322,6 +11340,20 @@
 
     var handleBlobs = function(blobs, options) {
         //Old parameters: (blobs, filters, section, element, thisblob)
+
+        //Function to get blob parameter for Spell Pickers like Magical Secrets
+        //By Miguel
+        const getBlobDescription = function(blob) {
+          if("Description" in blob) {
+            return blob.Description;
+          }
+          else if("Traits" in blob) {
+            traits = JSON.parse(blob.Traits)[0];
+            if("Desc" in traits) return traits.Desc;
+          }
+          return "";
+        }
+
         const handleProficiencies = function(data, subsection) {
             if(!data) {
                 return;
@@ -11520,9 +11552,15 @@
                 let settings = {};
                 let repupdate = {};
                 repupdate[rowid + ">label>span"] = title;
-                if(blob.Description) {
-                    repupdate[rowid + ">label>p"] = blob.Description;
+
+                //This used to check for blob.Description which does not exist for Spell Pickers
+                //In such case the description is located at blob.Traits.Desc
+                //By Miguel
+                let description = getBlobDescription(blob);
+                if(description.length > 0) {
+                    repupdate[rowid + ">label>p"] = description;
                 }
+
                 _.each(spells, function(spell) {
                     addRepeatingSection(rowid, "utilityrow", function(rowid) {
                         let repupdate = {};
@@ -11658,6 +11696,18 @@
             if(_.last(repid.split("_")) != "topbar" && !repids.includes(repid) && (!match || match && repid.includes(match))) clearRepeatingSectionById(repid);
         });
     }
+
+    //This function should be used to read additional hit points gained at first level by things like Draconic Bloodline or Hill Dwarf. Can be possbily be used in the future for Tough feat(?)
+    //By Miguel
+    var getAdditionalHitPointsFromClassAndRaceAtFirstLevel = function(blobs) {
+      let additionalHP = 0;
+      blobs.all.map(blob => {
+         if("Hit Points Per Level" in blob) {
+           additionalHP += parseInt(blob["Hit Points Per Level"]);
+         }
+      });
+      return additionalHP;
+    };
 
     var getRelevantBlobs = function(mancerdata, level, section) {
         var results = [];
@@ -13171,19 +13221,19 @@
 
                 if(mancerdata["l1-bio"].values.age) {
                     set["bio_info"] += '<p>Your age is ' + mancerdata["l1-bio"].values.age + '.</p>';};
-                
+
                 if(mancerdata["l1-bio"].values["height"]) {
                     set["bio_info"] += '<p>Your height is ' + mancerdata["l1-bio"].values["height"] + '.</p>';};
-                
+
                 if(mancerdata["l1-bio"].values.weight) {
                     set["bio_info"] += '<p>Your weight is ' + mancerdata["l1-bio"].values.weight + '.</p>';};
-                
+
                 if(mancerdata["l1-bio"].values.eyes) {
                     set["bio_info"] += '<p>Your eye color is ' + mancerdata["l1-bio"].values.eyes + '.</p>';};
-                
+
                 if(mancerdata["l1-bio"].values.hair) {
                     set["bio_info"] += '<p>Your hair is ' + mancerdata["l1-bio"].values.hair + '.</p>';};
-                
+
                 if(mancerdata["l1-bio"].values.skin) {
                     set["bio_info"] += '<p>Your skin is ' + mancerdata["l1-bio"].values.skin + '.</p>';};
 
@@ -13907,6 +13957,9 @@
             })
         }
 
+        //Here there is a window to modify the hitpoints, however additional hitpoints inserted here would not appear on charatermancer header
+        //By Miguel
+
         //Set up the final setAttrs()
         set["alignment"] = data["l1-race"].values.alignment || "";
         set["hp"] = stats.hp;
@@ -14249,7 +14302,7 @@
         let baseclass    = previous["class"];
         let classcompend = ["Classes:"] + previous["class"];
         let custom_lock  = 0;
-        
+
         if(previous["custom_class"] && previous["custom_class"] == 1) {
             baseclass = previous["cust_classname"];
             classcompend = "Rules:Classes";
@@ -14261,10 +14314,10 @@
         set["class1"] = 'Classes:' + baseclass;
         set["class1_currentlevel"] = previous["base_level"];
         update["class1_selector"] = '<span class="sheet-compendium-class-name">' + baseclass + '</span>';
-        if (previous["subclass"] && previous["custom_class"] === "0") { 
+        if (previous["subclass"] && previous["custom_class"] === "0") {
             update[`subclass1_selector`] = `<div>` + previous["subclass"] + `</div>`;
             if((mancerdata["lp-levels"] && mancerdata["lp-levels"].values["class1_subclass"] !== "Subclasses" + previous["subclass"])
-                || !mancerdata["lp-levels"]) set["class1_subclass"] = "Subclasses:" + previous["subclass"]; 
+                || !mancerdata["lp-levels"]) set["class1_subclass"] = "Subclasses:" + previous["subclass"];
         };
         const multiclass = parseInt(previous["multiclass1_flag"]) + parseInt(previous["multiclass2_flag"]) + parseInt(previous["multiclass3_flag"]);
         set["multiclass"] = mancerdata["lp-levels"] && mancerdata["lp-levels"].values["multiclass"] ? mancerdata["lp-levels"].values["multiclass"] : multiclass;
@@ -14379,7 +14432,7 @@
             };
 
             setAttrs(set);
-        });    
+        });
     });
 
     on("mancerchange:class1_addlevel mancerchange:class2_addlevel mancerchange:class3_addlevel mancerchange:class4_addlevel", function(eventinfo) {
@@ -15430,9 +15483,9 @@
                       ["class1", "class2", "class3", "class4"].forEach(levelclass => {
                             //Get the class name out of values & confirm its a spellcaster using data Spellcasting Ability
                             const name = (mancerdata["lp-levels"].values[`${levelclass}`]) ? mancerdata["lp-levels"].values[`${levelclass}`].split("Classes:")[1] : false;
-                            const ability = 
+                            const ability =
                                 //Check if the class has a Spellcasting Ability attribute
-                                (mancerdata["lp-levels"].data[`${levelclass}`] && mancerdata["lp-levels"].data[`${levelclass}`]["Spellcasting Ability"]) ? true : 
+                                (mancerdata["lp-levels"].data[`${levelclass}`] && mancerdata["lp-levels"].data[`${levelclass}`]["Spellcasting Ability"]) ? true :
                                 //Check if the subclass has a Spellcasting Ability attribute
                                 (mancerdata["lp-levels"].data[`${levelclass}_subclass`] && mancerdata["lp-levels"].data[`${levelclass}_subclass`]["Spellcasting Ability"]) ? true :
                                 //Set to false if the class is not a spellcaster
@@ -15481,6 +15534,13 @@
         let spelldata = settings.spelldata || [];
         let existinglist = settings.existinglist || [];
         let spellnumber = 0;
+        //D&D 5e Lvl+ Mancer: Spells tab "Level undefined" (UC605)
+        //When invoking Lvl+ from an incomplete manually levelled character, an undefined lv is generated due to missing information.
+        //This code prevents an incomplete list from being displayed.
+        //By Miguel
+        //('undefined' in byLevel) {
+         // delete byLevel.undefined;
+        //}
         _.each(byLevel, function(level) {
             spellnumber += level.length;
         });
@@ -15715,6 +15775,14 @@
 
         } else {
             updateAbilityLock(eventinfo.sourceSection);
+            //This will lock other ASI when leveling up multiple levels at once
+            //By Miguel
+            var repeatingData = getCharmancerData()['lp-asi'].repeating || [];
+            for(data in repeatingData) {
+              if(repeatingData[data].indexOf('_asi-row') > -1) {
+                updateAbilityLock(repeatingData[data]);
+              }
+            }
         }
         recalcLpData();
     });
@@ -15882,6 +15950,139 @@
         }
     });
 
+    //Fixing Bard's Magical Secrets (UC-10)
+    //By Miguel
+    //The ways this was being handled before, binded to clicked:repeating_utilityrow_launch, was not being triggered due to the way the DOM is built.
+    on("clicked:repeating_utilityrow", function(eventinfo) {
+        if(eventinfo.triggerName.indexOf('utilityrow_launch') === -1) return;
+        const mancerdata = getCharmancerData();
+        var querysettings = {};
+        var spelldata = getKnownLpSpells(mancerdata);
+        var leveldata = _.findWhere(getLevelingData(mancerdata), {classnumber: parseInt(mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_parent`][5])});
+        var query = "";
+        let newspells = 0;
+        let newcantrips = 0;
+        var spellnames = [];
+        var current = [];
+        var locked = [];
+        var update = {};
+        update[`${eventinfo.sourceSection} .sheet-warning`] = "";
+        try {
+            querysettings = JSON.parse(mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_info`]);
+        } catch(e) {
+            querysettings = mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_info`];
+        };
+        if(mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_result`]) current = mancerdata["lp-choices"].values[`${eventinfo.sourceSection}_result`].split(", ");
+        if(mancerdata["lp-spells"] && mancerdata["lp-spells"].repeating) {
+            _.each(mancerdata["lp-spells"].repeating, function(repid) {
+                if(mancerdata["lp-spells"].values[`${repid}_checked`]) {
+                    spelldata[mancerdata["lp-spells"].values[`${repid}_name`]] = {
+                        level: mancerdata["lp-spells"].values[`${repid}_level`],
+                        spellclass: mancerdata["lp-spells"].values[`${repid}_class`]
+                    }
+                }
+            });
+        }
+        _.each(current, function(currentspell) {
+            delete spelldata[currentspell];
+        })
+        if(querysettings.Known) {
+            if(querysettings.Level + "" === "0") {
+                newcantrips = 1;
+            } else {
+                newspells = 1;
+            }
+            _.each(spelldata, function(spell, spellname) {
+                if(!querysettings.Level || (querysettings.Level && querysettings.Level == spell.level)) spellnames.push(spellname);
+            });
+            if(spellnames.length > 0) {
+                query = "Category:Spells Name:" + spellnames.join("|");
+            } else {
+                update[`${eventinfo.sourceSection} .sheet-warning`] = `You do not currently know any level ${querysettings.Level} spells.`;
+                setCharmancerText(update);
+            }
+        } else {
+            query = "Category:Spells";
+            if(querysettings.Level) {
+                let levels = [querysettings.Level];
+                if(querysettings.Level == "max") {
+                    levels = [];
+                    for(let x=1; x<=leveldata.maxspell; x++) {
+                        levels.push(x);
+                    }
+                }
+                query += " Level:" + levels.join("|");
+            };
+            if(querysettings.List && querysettings.List.toLowerCase() !== "any") {
+                query += " Classes:*" + querysettings.List;
+            };
+            if(querysettings.Level + "" === "0") {
+                newcantrips = querysettings.Number ? parseInt(querysettings.Number) : 1;
+            } else {
+                newspells = querysettings.Number ? parseInt(querysettings.Number) : 1;
+            }
+            locked = _.keys(spelldata);
+        }
+        if(query) {
+            setCharmancerText(update);
+            changeCharmancerPage("lp-spellchoice", function() {
+                getCompendiumQuery([query], function(data) {
+                    let byLevel = {};
+                    let filters = {};
+                    let filtered = [];
+                    let toSet = {};
+                    let update = {};
+                    update["instructions"] = querysettings.HelpText;
+                    console.log(data);
+                    _.each(querysettings, function(setting, key) {
+                        if(!["Level","List","Number","Type","ButtonText","HelpText", "Known", "Class"].includes(key)) {
+                            filters[key] = setting;
+                        }
+                    });
+                    console.log(filters);
+                    if(querysettings.Known) {
+                        delete querysettings.Level;
+                    }
+                    delete querysettings.Known;
+                    _.each(data, function(spell) {
+                        let match = true;
+                        _.each(filters, function(value, name) {
+                            if(spell.data[name] !== value) match = false;
+                        })
+                        if(match) filtered.push(spell);
+                    });
+                    console.log(filtered);
+                    _.each(filtered, function(spell) {
+                        if(spell.data.Classes) {
+                            byLevel[spell.data.Level] = byLevel[spell.data.Level] || [];
+                            byLevel[spell.data.Level].push({
+                                name: spell.name,
+                                classes: spell.data.Classes.split(",").map(x => x.trim()),
+                                level: parseInt(spell.data.Level)
+                            });
+                        }
+                    });
+                    toSet.newspells = newspells;
+                    toSet.newcantrips = newcantrips;
+                    toSet.valid = "now";
+                    toSet.source = eventinfo.sourceSection;
+                    setCharmancerText(update);
+                    setAttrs(toSet, function() {
+                        addSpellSections(byLevel, {
+                            newcantrips: newcantrips,
+                            newspells: newspells,
+                            page: "lp-spellchoice",
+                            selected: current,
+                            locked: locked
+                        });
+                    });
+                });
+            });/**/
+        }
+    });
+
+    //TODO: Investigate if the duplicated event below listener can be removed
+    //By Miguel
     on("clicked:repeating_utilityrow_launch", function(eventinfo) {
         const mancerdata = getCharmancerData();
         var querysettings = {};
@@ -16585,7 +16786,7 @@
     <div class="switch-container">
         <label class="switch-tab asi-tab">
             <input type="radio" name="comp_switch" value="asi">
-            <span data-i18n="ability-score">Ability Score</span> 
+            <span data-i18n="ability-score">Ability Score</span>
         </label>
         <label class="switch-tab feat-tab">
             <input type="radio" name="comp_switch" value="feat">
@@ -16871,8 +17072,8 @@
                     </div>
                 </div>
                 <div class="choice row race_possible custom_race custom_subrace">
-                    <label><span data-i18n="innate-spellcasting:">Innate Spellcasting:</span> 
-                        <label><span data-i18n="spellcasting-ability">Spellcasting Ability:</span> 
+                    <label><span data-i18n="innate-spellcasting:">Innate Spellcasting:</span>
+                        <label><span data-i18n="spellcasting-ability">Spellcasting Ability:</span>
                             <select name="comp_custom_race_spell_ability">
                                 <option value="" data-i18n="choose">Choose</option>
                                 <option value="Strength" data-i18n="strength">Strength</option>
@@ -16931,7 +17132,7 @@
         <div class="choices">
             <div>
                 <div class="row">
-                    <label class="hilite"><span data-i18n="choose-a-class:">Choose a class:</span> 
+                    <label class="hilite"><span data-i18n="choose-a-class:">Choose a class:</span>
                         <select name="comp_class" accept="Category:Classes" required>
                             <option value="" data-i18n="choose">Choose</option>
                             <option class="custom" value="Rules:Classes" data-i18n="custom">Custom</option>
