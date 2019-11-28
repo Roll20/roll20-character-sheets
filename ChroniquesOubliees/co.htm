@@ -397,7 +397,7 @@
     getAttrs(["CHARISME"], function(values) {
       var charisme = parseInt(values.CHARISME);
       if (!isNaN(charisme) && charisme > 0) {
-       var pc_max = 3 + Math.floor((parseInt(values.CHARISME) - 10) / 2);
+        var pc_max = 3 + Math.floor((parseInt(values.CHARISME) - 10) / 2);
         setAttrs({
           PC_max: pc_max
         });
@@ -460,7 +460,11 @@
         previousContainsDM = false;
         return;
       }
-      if (previousContainsDM || row.search(/\bDM\b/i) >= 0) { //Attaque
+      row = row.trim();
+      if (row.endsWith('DM')) {
+        previousLine += row + ' ';
+        previousContainsDM = true;
+      } else if (previousContainsDM || row.search(/\bDM\b/i) >= 0) { //Attaque
         var currentRow = previousLine + row;
         var nomAttaqueFin = currentRow.search(/\s(\+\d+|0\b|DM)/i);
         var nomAttaque = currentRow.substring(0, nomAttaqueFin);
@@ -500,7 +504,7 @@
           bonusDM = parseInt(dmExpr);
           if (isNaN(bonusDM)) {
             console.log("Impossible de trouver les DM dans " + row);
-            previousLine += row;
+            previousLine += row + ' ';
             previousContainsDM = true;
             return;
           }
@@ -510,7 +514,7 @@
           de = parseInt(dmExpr);
           if (isNaN(bonusDM) || isNaN(de)) {
             console.log("Impossible de trouver les DM dans " + row);
-            previousLine += row;
+            previousLine += row + ' ';
             previousContainsDM = true;
             return;
           }
@@ -544,6 +548,7 @@
         if (portee) newAttrs[prefix + 'portee'] = portee;
         lastPrefix = prefix;
         previousContainsDM = false;
+        previousLine = '';
       } else if (row.startsWith('+') && lastPrefix !== '') {
         newAttrs[lastPrefix + 'spec'] += row;
       } else { //Pas attaque
