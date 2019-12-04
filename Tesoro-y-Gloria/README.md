@@ -2,4 +2,4 @@
 
 Ficha y herramientas para usar el juego de rol TyG en roll20
 
-Offical Character Sheet for Tesoro y Gloria(TyG) by the publsiher.
+Offical Character Sheet for "Tesoro y Gloria"(TyG), by the publisher.
