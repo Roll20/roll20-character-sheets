@@ -1,4 +1,4 @@
-# Character sheet for Vampire The Maquerade, 5th Edition (v2.2)
+# Character sheet for Vampire The Maquerade, 5th Edition (v2.3)
 
 ## Known Bugs
 
