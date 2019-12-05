@@ -48,6 +48,9 @@ If you think anything is missing or you see any bugs, please message me via my [
 
 ## Versions
 
+### Version 2.3
+Bug fix where macros wouldn't work so well. Added rituals.
+
 ### Version 2.1
 Bug fix where the Willpower button for non-api sheet would not work as intended
 
