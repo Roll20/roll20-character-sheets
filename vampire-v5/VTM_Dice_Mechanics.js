@@ -852,9 +852,7 @@ on("chat:message", function (msg) {
 			return processScriptTabs(run, msg.who, dc);
 		} else if (argv[1] === "log" || argv[1] === "graphics" || argv[1] === "test" || argv[1] === "hero" || argv[1] === "lupine") {
 			return processScriptTabs(argv, msg.who, baseDc());
-		} else {
-			sendChat("Error", "Invalid API call" + msg);
-		}
+		} 
 	} catch (err) {
 		sendChat("Error", "Invalid input" + err);
 		return;
