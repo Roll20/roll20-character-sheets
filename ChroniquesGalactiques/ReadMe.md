@@ -9,9 +9,16 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-editions.fr/catalogue.php?id=207) #17,18 et 19.
 
 # Version courante
-3.7 [Screenshot](cog_v3.png)
+3.8 [Screenshot](cog_v3.png)
 
 # Notes de version
+## V3.8 (2019-10-10)
+* Ajout buff et calcul auto des PV
+* Modification du sheetworker pour éviter erreurs dans la console API
+* Homogénéisation des noms des roll buttons
+* Séparation des buffs circonstanciels de combat en deux champs : un pour le jet d'attaque et un pour le jet de dommages
+* Ajout de cases à cocher pour lancer ou nom le jet d'attaque et le jet de dommages sur les lignes d'armes de la fiche de vaisseau -- idem fiche PJ et PNJ (demande forum BBe)
+
 ## V3.7 (2019-09-26)
 Modification de tous les roll-buttons :
 - name="roll\_<nomdujet>"
