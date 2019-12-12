@@ -7,7 +7,7 @@ input(name='attr_version' type='hidden' value='1')
 include src/pug/_mixins.pug
 
 h1.logo
-.grid.kob-row
+.grid.outbreak-row
   .grid.box.navigation
     input(name='attr_tab' type='radio' value='1' class="sheet-tab sheet-tab1") 
     span MAIN
@@ -16,7 +16,7 @@ h1.logo
     input(name='attr_tab' type='radio' value='3' class="sheet-tab sheet-tab3") 
     span LOG 
 
-.grid.kob-row
+.grid.outbreak-row
   .grid.box.biobox
     each val in ['Name', 'Player', 'Campaign']
       - const attrName = val.toLowerCase();
@@ -26,7 +26,7 @@ h1.logo
   .grid.box.logo
     img(alt='Outbreak Character Sheet', src='https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/outbreak/images/OU_Logo_340pxWx90pxH.png')
 
-.grid.kob-row
+.grid.outbreak-row
   .grid.box.spewbox
     .grid.box.spewlabel S.P.E.W. Attributes
     each val in ['Strength', 'Perception', 'Empathy', 'Willpower']
@@ -35,60 +35,58 @@ h1.logo
         br
         span #{val}
         p
-          input.spewbonus(type='text' name='attr_' + val +'_bonus' title= val + 'Bonus' value='0')
-          input.spewones(type='text' name='attr_' + val value='[[(@{Sb}*10)+@{str}]]')  
-
+          input.spewbonus(type='text' name='attr_' + val +'bonus' title= val + 'Bonus' value='0')
+          input.spewones(type='text' name='attr_' + val value='[[(@{#valBonus}*10)+@{val}]]')
+    each val in ['Survival', 'Competance', 'Gestalt']
+      .grid.box.pointsbox
+        span #{val} Points:
+        input.points(type='text' name='attr_' + val +'points' title= val + 'points' value='0')
+      
+.grid.outbreak-row
   .grid.box.dicebox
-    each val in ['Fight', 'Flight', 'Brains', 'Brawn', 'Charm', 'Grit']
-      - const attrName = val.toLowerCase();
-      button(name=val type='roll' value!='&{template:rolls}{{header=^{'+val+'}}} {{dice=[[@{'+attrName+'}!+?{modifier|0}]]}}')  
-        img(alt=val src='https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Kids-on-Bikes/images/Label-'+val+'.png')
-      select(name='attr_'+attrName title='@{'+attrName+'}' value='d4')
-        +diceSelect()
+    .grid.box.dicelabel Skills
+      span Basic Skills
+      each val in ['Balance', 'Brawl', 'Climb', 'Composure', 'Dodge', 'Endurance', 'Expression', 'Grapple', 'Hold', 'Jump/Leap', 'Lift/Pull', 'Resist Pain', 'Search', 'Spot/Listen', 'Stealth']
+        - const attrName = val.toLowerCase();
+        .grid.box.skillbox
+          span #{val}
+          input.skillstat(type='hidden' name='attr_' + val value='(@{perception}+@{Wb})' title='Perception + Wb' disabled='true')
+          input.skillstat(type='text' name='attr_Gestalt' + val value='0' title='Input total skill gain from spent gestalt levels')
+          input.skillstat(type='text' name='attr_'+ val +'Total' value='[[@#{val}+@{Gest#{val}}]]' title='Will add Base Training Value equal to Pb + Training Value multiplied by the multiplier or any gear you are using.' disabled='true')
+          input.skillname(type='hidden' name='attr_'+val+'Tot' value='(@{#{val}Total} [Skill]+@{#{val}BaseTv} [Kit])' disabled='true')
+          button.skillstat(type='roll' name='roll_'+val title='If using no gear select none and select a multiplier of 0' value='&{template:ou} {{name=@{character_name}}} {{roll_name={#{val}%}}} {{attr=#{val}}}} {{Target1=[[@{#{val}Tot}]]}} {{Target2=[[@{#{val}Tot}+1]]}} {{skill=VS.}} {{Diff=@{dpDiff}}} {{Spd1=@{dpSpeed}}} {{Dmg=@{dpDmg}}} {{Deplet=@{dpDeplet}}} {{DieDif=@{DiffDie}}} {{DieSpd=@{SpeedDie}}} {{DieDmg=@{DmgDie}}} {{DieDep=@{DepletDie}}} {{result=[[1d100+@{dpDiff} [Diff]]]}} {{dos1=[[@{#{val}Tot}-19]]}} {{dos2a=[[@{#{val}Tot}-20]]}} {{dos2b=[[@{#{val}Tot}-29]]}} {{dos3a=[[@{#{val}Tot}-30]]}} {{dos3b=[[@{#{val}Tot}-39]]}} {{dos4a=[[@{#{val}Tot}-40]]}} {{dos4b=[[@{#{val}Tot}-49]]}} {{dof1=[[@{#{val}Tot}+19]]}} {{dof2a=[[@{#{val}Tot}+20]]}} {{dof2b=[[@{#{val}Tot}+29]]}} {{dof3a=[[@{#{val}Tot}+30]]}} {{dof3b=[[@{#{val}Tot}+39]]}} {{dof4a=[[@{#{val}Tot}+40]]}} {{dof4b=[[@{#{val}Tot}+49]]}}')
 
-.grid.kob-row
-  .grid.box.strenghtsbox
-    h2
-      img.header(alt='Strengths' src='https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Kids-on-Bikes/images/Label-Strengths-1.png')
-      - const strengths =[{'attr' : 'cool', 'name' : 'COOL UNDER PRESSURE'}, {'attr' : 'easy_going', 'name' : 'EASY GOING'}, {'attr' : 'gross', 'name' : 'GROSS'}, {'attr' : 'heroic', 'name' : 'HEROIC'}, {'attr' : 'intuitive', 'name' : 'INTUITIVE'}, {'attr' : 'loyal', 'name' : 'LOYAL'}, {'attr' : 'lucky', 'name' : 'LUCKY'}, {'attr' : 'prepared', 'name' : 'PREPARED'}, {'attr' : 'protective', 'name' : 'PROTECTIVE'}, {'attr' : 'quick_healing', 'name' : 'QUICK HEALING'}, {'attr' : 'rebellious', 'name' : 'REBELLIOUS'}, {'attr' : 'tough', 'name' : 'TOUGH'}, {'attr' : 'treasure_hunter', 'name' : 'TREASURE HUNTER'}, {'attr' : 'unassuming', 'name' : 'UNASSUMING'}, {'attr' : 'wealthy', 'name' : 'WEALTHY'}]
-    each s,i in strengths
-      - const attrName = s.attr.split('attr_')[0];
-      label(data-i18n-title=s.name title=s.name)
-        input(name='attr_'+s.attr title='@{'+attrName+'}' type='checkbox' value='1')
-      span(data-i18n=s.name)=s.name
-    label.skilledat(data-i18n-title='SKILLED AT' title='SKILLED AT')
-      input(name='attr_skilled_at' title='@{skilled_at}' type='checkbox' value='1')
-    span(data-i18n='SKILLED AT:') SKILLED AT:
-    label.skillatcheckbox(data-i18n-title='SKILLED AT DESCRIPTION' title='SKILLED AT DESCRIPTION')
-      input(name='attr_skill_description' title='@{skill_description}' type='text' )
+      span Trained Skills
+      each val in ['Bow/Crossbow', 'Calm Other', 'Deplomacy Persuade', 'Diplomacy Barter/Bribe', 'Diplomacy Command/Coax', 'Diplomacy Detect Motives', 'Diplomacy Intimidate', 'Digital Systems', 'Firearms Pistol', 'Firearms Long Gun', 'First Aid', 'Melee Attack Blunt', 'Melee Attack Pierce', 'Melee Attack Slash', 'Navigation', 'Swim', 'Throw']
+        - const attrName = val.toLowerCase();
+        .grid.box.skillbox
+          span #{val}
+          input.skillstat(type='hidden' name='attr_' + val value='(@{perception}+@{Wb})' title='Perception + Wb' disabled='true')
+          input.skillstat(type='text' name='attr_Gestalt' + val value='0' title='Input total skill gain from spent gestalt levels')
+          input.skillstat(type='text' name='attr_'+ val +'Total' value='[[@#{val}+@{Gest#{val}}]]' title='Will add Base Training Value equal to Pb + Training Value multiplied by the multiplier or any gear you are using.' disabled='true')
+          input.skillname(type='hidden' name='attr_'+val+'Tot' value='(@{#{val}Total} [Skill]+@{#{val}BaseTv} [Kit])' disabled='true')
+          button.skillstat(type='roll' name='roll_'+val title='If using no gear select none and select a multiplier of 0' value='&{template:ou} {{name=@{character_name}}} {{roll_name={#{val}%}}} {{attr=#{val}}}} {{Target1=[[@{#{val}Tot}]]}} {{Target2=[[@{#{val}Tot}+1]]}} {{skill=VS.}} {{Diff=@{dpDiff}}} {{Spd1=@{dpSpeed}}} {{Dmg=@{dpDmg}}} {{Deplet=@{dpDeplet}}} {{DieDif=@{DiffDie}}} {{DieSpd=@{SpeedDie}}} {{DieDmg=@{DmgDie}}} {{DieDep=@{DepletDie}}} {{result=[[1d100+@{dpDiff} [Diff]]]}} {{dos1=[[@{#{val}Tot}-19]]}} {{dos2a=[[@{#{val}Tot}-20]]}} {{dos2b=[[@{#{val}Tot}-29]]}} {{dos3a=[[@{#{val}Tot}-30]]}} {{dos3b=[[@{#{val}Tot}-39]]}} {{dos4a=[[@{#{val}Tot}-40]]}} {{dos4b=[[@{#{val}Tot}-49]]}} {{dof1=[[@{#{val}Tot}+19]]}} {{dof2a=[[@{#{val}Tot}+20]]}} {{dof2b=[[@{#{val}Tot}+29]]}} {{dof3a=[[@{#{val}Tot}+30]]}} {{dof3b=[[@{#{val}Tot}+39]]}} {{dof4a=[[@{#{val}Tot}+40]]}} {{dof4b=[[@{#{val}Tot}+49]]}}')
 
-  .grid.box.flawsbox
-    h2
-      img.header(alt='Flaws' src='https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Kids-on-Bikes/images/Label-Flaws-1.png')
-    - const flaws = [{'name': "ABSENT MINDED", "attr":"attr_absent_minded"},{"name": "BLUNT","attr":"attr_blunt" } ,{"name":"BOASTFUL", "attr":"attr_boastful"},{"name":"CLUMSY", "attr" : "attr_clumsy"},{"name":"CONCEITED", "attr":"attr_conceited"} , {"name":"COWARDLY", "attr": "attr_cowardly"},{"name": "DECEITFUL", "attr":"attr_deceitful"} ,  {"name":"DEMANDING", "attr": "attr_demanding"}, {'attr' :'attr_disloyal', 'name': 'DISLOYAL'}, {'attr' :'attr_disobedient', 'name' : 'DISOBEDIENT'}, {'attr' :'attr_dogmatic', 'name' :'DOGMATIC'}, {'attr' :'attr_envious', 'name' : 'ENVIOUS'}, {'attr' :'attr_flippant', 'name' :'FLIPPANT'}, {'attr' :'attr_gloomy', 'name' : 'GLOOMY'}, {'attr' :'attr_greedy', 'name' :'GREEDY'}, {'attr' :'attr_hot_tempered', 'name' :'HOT-TEMPERED'}, {'attr' :'attr_ignorant', 'name' :'IGNORANT'}, {'attr' :'attr_inconsiderate', 'name' :'INCONSIDERATE'}, {'attr' :'attr_insecure', 'name' :'INSECURE'}, {'attr' :'attr_irrational', 'name' :'IRRATIONAL'}, {'attr' :'attr_neurotic', 'name' :'NEUROTIC'}, {'attr' :'attr_obnoxious', 'name' :'OBNOXIOUS'}, {'attr' :'attr_paranoid', 'name' :'PARANOID'}, {'attr' :'attr_patronizing', 'name' :'PATRONIZING'}, {'attr' :'attr_perverse', 'name' :'PERVERSE'}, {'attr' :'attr_petty', 'name' :'PETTY'}, {'attr' :'attr_picky', 'name' :'PICKY'}, {'attr' :'attr_prejudice', 'name' :'PREJUDICE'}, {'attr' :'attr_prim', 'name' :'PRIM'}, {'attr' :'attr_reckless', 'name' :'RECKLESS'},{'attr' :'attr_resentful', 'name' :'RESENTFUL'}, {'attr' :'attr_restless', 'name' :'RESTLESS'}, {'attr' :'attr_rude', 'name' :'RUDE'}, {'attr' :'attr_secretive', 'name' :'SECRETIVE'}, {'attr' :'attr_selfcentered', 'name' :'SELF-CENTERED'}, {'attr' :'attr_selfpitying', 'name' :'SELF-PITYING'}, {'attr' :'attr_slovenly', 'name' :'SLOVENLY'}, {'attr' :'attr_superstitous', 'name' :'SUPERSTITIOUS'}, {'attr' :'attr_vain', 'name' :'VAIN'}, {'attr' :'attr_vindictive', 'name' :'VINDICTIVE'} ]
-    each n in flaws
-      - const attrName = n.attr.split('attr_')[0];
-      label(data-i18n-title=n.name title=n.name)
-        input(name=n.attr title='@{'+attrName+'}' type='checkbox' value='1')
-      span(data-i18n=n.name)=n.name
+      span Expert Skills
+      each val in ['Adv Medicine', 'Construct Engineer', 'Specialization','Specialization', 'Martial Arts', 'Pilot', 'Vehicle', 'Vehicle', 'Ride Animal', 'Animal', 'Science', 'Field Of Study', 'Field Of Study', 'Field Of Study', 'Survival', 'Toughness']
+        - const attrName = val.toLowerCase();
+        .grid.box.skillbox
+          if val == 'Specialization' || val == 'Vehicle' || val == 'Animal' || val == 'Field Of Study'
+            input(type='text' name='attr_'+val placeholder=val title=val style='width:80px;')
+            input.skillstat(type='hidden' name='attr_' + val value='(@{perception}+@{Wb})' title='Perception + Wb' disabled='true')
+            input.skillstat(type='text' name='attr_Gestalt' + val value='0' title='Input total skill gain from spent gestalt levels')
+            input.skillstat(type='text' name='attr_'+ val +'Total' value='[[@#{val}+@{Gest#{val}}]]' title='Will add Base Training Value equal to Pb + Training Value multiplied by the multiplier or any gear you are using.' disabled='true')
+            input.skillname(type='hidden' name='attr_'+val+'Tot' value='(@{#{val}Total} [Skill]+@{#{val}BaseTv} [Kit])' disabled='true')
+            button.skillstat(type='roll' name='roll_'+val title='If using no gear select none and select a multiplier of 0' value='&{template:ou} {{name=@{character_name}}} {{roll_name={#{val}%}}} {{attr=#{val}}}} {{Target1=[[@{#{val}Tot}]]}} {{Target2=[[@{#{val}Tot}+1]]}} {{skill=VS.}} {{Diff=@{dpDiff}}} {{Spd1=@{dpSpeed}}} {{Dmg=@{dpDmg}}} {{Deplet=@{dpDeplet}}} {{DieDif=@{DiffDie}}} {{DieSpd=@{SpeedDie}}} {{DieDmg=@{DmgDie}}} {{DieDep=@{DepletDie}}} {{result=[[1d100+@{dpDiff} [Diff]]]}} {{dos1=[[@{#{val}Tot}-19]]}} {{dos2a=[[@{#{val}Tot}-20]]}} {{dos2b=[[@{#{val}Tot}-29]]}} {{dos3a=[[@{#{val}Tot}-30]]}} {{dos3b=[[@{#{val}Tot}-39]]}} {{dos4a=[[@{#{val}Tot}-40]]}} {{dos4b=[[@{#{val}Tot}-49]]}} {{dof1=[[@{#{val}Tot}+19]]}} {{dof2a=[[@{#{val}Tot}+20]]}} {{dof2b=[[@{#{val}Tot}+29]]}} {{dof3a=[[@{#{val}Tot}+30]]}} {{dof3b=[[@{#{val}Tot}+39]]}} {{dof4a=[[@{#{val}Tot}+40]]}} {{dof4b=[[@{#{val}Tot}+49]]}}')
+          else
+            span #{val}
+            input.skillstat(type='hidden' name='attr_' + val value='(@{perception}+@{Wb})' title='Perception + Wb' disabled='true')
+            input.skillstat(type='text' name='attr_Gestalt' + val value='0' title='Input total skill gain from spent gestalt levels')
+            input.skillstat(type='text' name='attr_'+ val +'Total' value='[[@#{val}+@{Gest#{val}}]]' title='Will add Base Training Value equal to Pb + Training Value multiplied by the multiplier or any gear you are using.' disabled='true')
+            input.skillname(type='hidden' name='attr_'+val+'Tot' value='(@{#{val}Total} [Skill]+@{#{val}BaseTv} [Kit])' disabled='true')
+            button.skillstat(type='roll' name='roll_'+val title='If using no gear select none and select a multiplier of 0' value='&{template:ou} {{name=@{character_name}}} {{roll_name={#{val}%}}} {{attr=#{val}}}} {{Target1=[[@{#{val}Tot}]]}} {{Target2=[[@{#{val}Tot}+1]]}} {{skill=VS.}} {{Diff=@{dpDiff}}} {{Spd1=@{dpSpeed}}} {{Dmg=@{dpDmg}}} {{Deplet=@{dpDeplet}}} {{DieDif=@{DiffDie}}} {{DieSpd=@{SpeedDie}}} {{DieDmg=@{DmgDie}}} {{DieDep=@{DepletDie}}} {{result=[[1d100+@{dpDiff} [Diff]]]}} {{dos1=[[@{#{val}Tot}-19]]}} {{dos2a=[[@{#{val}Tot}-20]]}} {{dos2b=[[@{#{val}Tot}-29]]}} {{dos3a=[[@{#{val}Tot}-30]]}} {{dos3b=[[@{#{val}Tot}-39]]}} {{dos4a=[[@{#{val}Tot}-40]]}} {{dos4b=[[@{#{val}Tot}-49]]}} {{dof1=[[@{#{val}Tot}+19]]}} {{dof2a=[[@{#{val}Tot}+20]]}} {{dof2b=[[@{#{val}Tot}+29]]}} {{dof3a=[[@{#{val}Tot}+30]]}} {{dof3b=[[@{#{val}Tot}+39]]}} {{dof4a=[[@{#{val}Tot}+40]]}} {{dof4b=[[@{#{val}Tot}+49]]}}')
 
 
-.grid.kob-row
-  .grid.box.powers
-    h2
-      img.header(alt='Powers' src='https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Kids-on-Bikes/images/Label-Powers-1.png')
-    textarea(data-i18n-placeholder='Powers' name='attr_powers' placeholder='Powers' title='@{powers}')
-
-  .grid.box.backpack
-    h2
-      img.header(alt='Backpack' src='https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Kids-on-Bikes/images/Label-Backpack-1.png')
-    textarea(data-i18n-placeholder='Backpack' name='attr_backpack' placeholder='Backpack' title='@{backpack}')
-
-.grid.kob-row
-  .grid.box.boxnotes  
-    h2
-      img.header(alt='Notes' src='https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Kids-on-Bikes/images/Label-Notes-1.png')
-    textarea(data-i18n-placeholder='Notes' name='attr_notes' placeholder='Notes' title='@{notes}')
 
 
 
