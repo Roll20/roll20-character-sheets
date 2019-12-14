@@ -22,6 +22,7 @@
 				<h4>GURPS Version <input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Sheet Version" /></h4>
 				<ul>
 					<li>General tab. Change layout for Turning and Deceleration table and fixed some bugs in the process.</li>
+					<li>Combat tab. Added Demolition combat tool. Code provided by Savage. Thank you Savage!</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset" />View All Updates</button>
@@ -1502,7 +1503,8 @@
     					<div class="cell colAll label">
     						<div class="popup" style="text-align:center;">Start Vel.</div>
     						<span class="tooltip">
-    							Enter velocity (yards/second) for current turn. 
+    							Enter velocity (yards/second) for current turn.<br />
+    							<b>Important:</b> Be sure to check your max allowed velocity based on movement type.
     						</span>
     					</div>
     					<div class="cell colAll label">
@@ -3792,7 +3794,6 @@
 		</div> <!-- .sheet-box .sheet-ranged-attacks firing-up-or-down -->
 		
 		<!-- _____ _____ Falling and Collision _____ _____ -->
-
 		<div class="box falling-collision">
 			<div class="table">
 			    
@@ -3917,7 +3918,177 @@
 				</div> <!-- .container -->
 				
 			</div> <!-- .sheet-table -->
-		</div> <!-- .sheet-box .sheet-ranged-attacks -->
+		</div> <!-- .sheet-box .falling and collision -->
+
+
+        <!-- Demolition -->
+        <div class="box demolition">
+			<div class="table">
+			    
+			    <div class="row title">
+			        <div class="cell">
+			            Demolition
+			        </div>
+			    </div>
+			    
+			    <div class="header">
+			        <div class="cell row-title">&nbsp;</div>
+					<div class="cell select-box">
+						<div class="popup">Select</div>
+						<span class="tooltip">
+						    Select an explosion type to use. This will populate Type and REF fields.
+						</span>
+					</div>
+				    <div class="cell text-box">
+						<div class="popup">Type</div>
+						<span class="tooltip">
+						    <strong>Type</strong><br />Refer to the REF table B415.
+						</span>
+					</div>
+				    <div class="cell input">
+						<div class="popup">REF</div>
+						<span class="tooltip">
+						    Relative Explosive Force, equivilence in pounds of TNT.<br />
+						    TNT = 1.0. See B415.
+						</span>
+					</div>
+				    <div class="cell input">
+						<div class="popup">lbs</div>
+						<span class="tooltip">
+						    Weight in pounds required by its REF.
+						</span>
+					</div>
+					<div class="cell input">
+						<div class="popup">Base</div>
+						<span class="tooltip">
+						    Base damage role. Rules as written is 6d6.
+						</span>
+					</div>
+					<div class="cell six-d-spacer">&nbsp;</div>
+				    <div class="cell damage">
+				        <div class="popup">Damage</div>
+				        <span class="tooltip">
+				            <strong>Damage:</strong><br />Enter the number to multiply 6d6 by.<br />
+				            An explosion doing 6dx<i>n</i> damage takes (<i>n</i>x<i>n</i>)/4 pounds of TNT.
+				        </span>
+					</div>
+				    <div class="cell roll-damage">
+						&nbsp;
+					</div>
+					<div class="cell reset">
+					    &nbsp;
+					</div>
+				</div> <!-- .sheet-header -->
+				
+				<div class="container">
+				    
+				    <div class="row">
+    					<div class="cell row-title">
+    					    <div class="popup">How Much?</div>
+    						<span class="tooltip">
+    						    Determine how much explosive to use based on damage. TNT = 1.0<br />
+    						    See B415.
+    						</span>
+    					</div>
+    					<div class="cell select-box">
+    					    <select name="attr_demo_how_much_selected_type">
+    					        <option>TNT</option>
+    					        <option>Serpentine Powder</option>
+    					        <option>Ammonium Nitrate</option>
+    					        <option>TL4 Black Powder</option>
+    					        <option>TL5 Black Powder</option>
+    					        <option>Diesel/Fertilizer</option>
+    					        <option>Dynamite</option>
+    					        <option>Amatol</option>
+    					        <option>Nitroglycerine</option>
+    					        <option>Tetryl</option>
+    					        <option>Composition B</option>
+    					        <option>C4</option>
+    					        <option>Octanitrocubane</option>
+    					        <option>Metallic Hydrogen</option>
+    					    </select>
+    					</div>
+    				    <div class="cell text-box">
+    					    <input type="text" value="TNT" name="attr_demo_how_much_type" title="Macro name: demo_how_much_type" />
+    					</div>
+    				    <div class="cell input">
+    					    <input type="number" value="1.0" min="0" name="attr_demo_how_much_ref" title="Macro name: demo_how_much_ref" />
+    					</div>
+    				    <div class="cell input">
+    					    <input type="number" value="1" readonly="readonly" name="attr_demo_how_much_weight" title="Macro name: demo_how_much_weight" />
+    					</div>
+    					<div class="cell input">
+    					    <input type="text" value="6d6" name="attr_demo_how_much_base_damage" title="Macro name: demo_how_much_base_damage" />
+    					</div>
+    					<div class="cell six-d-spacer">X</div>
+    				    <div class="cell damage">
+    					    <input type="number" value="1" min="1" step="1" name="attr_demo_how_much_damage_multiplier" title="Macro name: demo_how_much_damage_multiplier" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="hidden" name="attr_demo_how_much_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
+						    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_much_type}}} {{damageRoll=[[@{demo_how_much_base_damage} * @{demo_how_much_damage_multiplier}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+    					</div>
+						<div class="cell reset">
+					        <button type="action" name="act_demo_how_much_reset" class="reset" />Reset</button>
+					    </div>
+				    </div>
+				    
+				    <div class="row">
+    					<div class="cell row-title">
+    					    <div class="popup">How Big?</div>
+    						<span class="tooltip">
+    						    Determine how big the explosion is based on weight.<br />
+    						    See B415.
+    						</span>
+    					</div>
+    				    <div class="cell select-box">
+    					    <select name="attr_demo_how_big_selected_type">
+    					        <option>TNT</option>
+    					        <option>Serpentine Powder</option>
+    					        <option>Ammonium Nitrate</option>
+    					        <option>TL4 Black Powder</option>
+    					        <option>TL5 Black Powder</option>
+    					        <option>Diesel/Fertilizer</option>
+    					        <option>Dynamite</option>
+    					        <option>Amatol</option>
+    					        <option>Nitroglycerine</option>
+    					        <option>Tetryl</option>
+    					        <option>Composition B</option>
+    					        <option>C4</option>
+    					        <option>Octanitrocubane</option>
+    					        <option>Metallic Hydrogen</option>
+    					    </select>
+    					</div>
+    				    <div class="cell text-box">
+    					    <input type="text" value="TNT" name="attr_demo_how_big_type" title="Macro name: demo_how_big_type" />
+    					</div>
+    				    <div class="cell input">
+    					    <input type="number" value="1.0" min="0" name="attr_demo_how_big_ref" title="Macro name: demo_how_big_ref" />
+    					</div>
+    				    <div class="cell input">
+    					    <input type="number" value="1" name="attr_demo_how_big_weight" title="Macro name: demo_how_big_weight" />
+    					</div>
+    					<div class="cell input">
+    					    <input type="text" value="6d6" name="attr_demo_how_big_base_damage" title="Macro name: demo_how_big_base_damage" />
+    					</div>
+    					<div class="cell six-d-spacer">X</div>
+    				    <div class="cell damage">
+    					    <input type="number" value="1" readonly="readonly" name="attr_demo_how_big_damage_multiplier" title="Macro name: demo_how_big_damage_multiplier" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="hidden" name="attr_demo_how_big_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
+						    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_big_type}}} {{damageRoll=[[@{demo_how_big_base_damage} * @{demo_how_big_damage_multiplier}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+    					</div>
+						<div class="cell reset">
+					        <button type="action" name="act_demo_how_big_reset" class="reset" />Reset</button>
+					    </div>
+				    </div>
+				    
+				</div> <!-- .container -->
+				
+			</div> <!-- .sheet-table -->
+		</div> 
+        <!-- end demolition -->
 
 	</div> <!-- .sheet-tab4 -->
 
@@ -4351,6 +4522,7 @@
 	
 	<ul>
 		<li>General tab. Change layout for Turning and Deceleration table and fixed some bugs in the process.</li>
+		<li>Combat tab. Added Demolition combat tool. Code provided by Savage. Thank you Savage!</li>
 	</ul>
 	
 	<h4>Version: 1.7.1</h4>
@@ -4799,6 +4971,17 @@
 			    
 Falling Damage: If using hit locations, roll randomly for the hit location damaged in a fall. If the injury is to an extremity or a limb, do not ignore injury in excess of that required to cripple it. Instead, subtract the full amount from HP! If the fall would cripple a limb, roll 1d. On 5-6, all limbs of that type are crippled, although there is no extra injury. B431</textarea>
 			</div>
+			
+			<div class="box collision-falling-options">
+			    <span class="label">Demolition Damage Notes</span><br />
+			    <textarea name="attr_demolition_damage_notes">Explosion damage. Targets struck directly takes listed damage. Apply "collateral damage" of Damage / (3 x distance from center of blast) rounded down.
+			    
+* Use torso armor to determine DR against explosion.
+* If the explosion has an armor divisor, do NOT apply to "collateral damage."
+* Explosions are considered incendiary. see Catching Fire B434
+* Can use Dodge and Drop (B377) to avoid collateral damage.
+* See B414</textarea>
+			    </div>
 			
 			<hr />
 			
@@ -5697,7 +5880,7 @@ If fail, attacker can opt to hit limb<br /></textarea>
 
 	var noop = function () {}; // do nothing.
 
-	var version = "1.7.2";
+	var version = "1.7.beta";
 	
 	var latestChangesDate = "01/07/2020";
 
@@ -10836,5 +11019,144 @@ If fail, attacker can opt to hit limb<br /></textarea>
         return newTotalPenalty;
 	}
 	
+	/* ---- DEMOLITION SECTION ---- */
+	
+	const DEMO_TYPES = [
+	    {type: "TNT", ref: "1.0"},
+	    {type: "Serpentine Powder", ref: "0.3"},
+	    {type: "Ammonium Nitrate", ref: "0.4"},
+	    {type: "TL4 Black Powder", ref: "0.4"},
+	    {type: "TL5 Black Powder", ref: "0.5"},
+	    {type: "Diesel/Fertilizer", ref: "0.5"},
+	    {type: "Dynamite", ref: "0.8"},
+	    {type: "Amatol", ref: "1.2"},
+	    {type: "Nitroglycerine", ref: "1.5"},
+	    {type: "Tetryl", ref: "1.3"},
+	    {type: "Composition B", ref: "1.4"},
+	    {type: "C4", ref: "1.4"},
+	    {type: "Octanitrocubane", ref: "4"},
+	    {type: "Metallic Hydrogen", ref: "6"},
+	];
+	
+	// check for how much? damage
+	on("change:demo_how_much_ref change:demo_how_much_damage_multiplier", function (event) {
+	    
+	    getAttrs(["demo_how_much_ref", "demo_how_much_damage_multiplier"], function(values) {
+	        
+	        var multiplier = +values.demo_how_much_damage_multiplier;
+	        
+	        var REF = +values.demo_how_much_ref;
+	        
+	        var weight = (multiplier * multiplier) / (4 * REF);
+	        
+	        var result = weight.toFixed(2);
+	        
+	        setAttrs({
+	            demo_how_much_weight: result
+	        });
+	        
+	    });
+	    
+	});
+	
+	// check for how big? damage
+	on("change:demo_how_big_ref change:demo_how_big_weight", function (event) {
+	    
+	    getAttrs(["demo_how_big_ref", "demo_how_big_weight"], function(values) {
+	        
+	        var multiplier = 0;
+	        
+	        var REF = +values.demo_how_big_ref;
+	        
+	        var weight = +values.demo_how_big_weight;
+	        
+	        if (weight > 0) {
+	            
+    	        multiplier = Math.sqrt(weight * 4 * REF);
+    	        
+    	        multiplier = Math.floor(1 * multiplier);
+    	        
+	        }
+	        
+	        setAttrs({
+	            demo_how_big_damage_multiplier: multiplier
+	        });
+	        
+	    });
+	    
+	});
+	
+	// check for selecting an demolition type for how much.
+	on("change:demo_how_much_selected_type", function(event) {
+	    
+	    getAttrs(["demo_how_much_selected_type"], function(values) {
+	        
+	        var demoType = getDemoTypeObject(values.demo_how_much_selected_type);
+	        
+	        setAttrs({
+	            demo_how_much_type: demoType.type,
+	            demo_how_much_ref: demoType.ref
+	        });
+	        
+	    });
+	    
+	});
+	
+	// check for selectin an demolition type for how big
+	on("change:demo_how_big_selected_type", function(event) {
+	    
+	    getAttrs(["demo_how_big_selected_type"], function(values) {
+	        
+	        console.log(values);
+	        
+	        var demoType = getDemoTypeObject(values.demo_how_big_selected_type);
+	        
+	        console.log(demoType);
+	        
+	        setAttrs({
+	            demo_how_big_type: demoType.type,
+	            demo_how_big_ref: demoType.ref
+	        });
+	        
+	    });
+	    
+	});
+	
+	/**
+	 * Find the demo type objects in the DEMO_TYPES constant array
+	 * 
+	 * @param string type Demolition Type name
+	 * 
+	 * @return object {type, ref}
+	 */
+	function getDemoTypeObject(type) {
+	    
+	    var object = DEMO_TYPES.find( element => element.type === type); 
+	    
+	    return object;
+	    
+	}
+	
+    on("clicked:demo_how_much_reset", function() {
+        
+        setAttrs({
+            demo_how_much_selected_type: "TNT",
+            demo_how_much_type: "TNT",
+            demo_how_much_ref: 1.0,
+            demo_how_much_damage_multiplier: 1
+        });
+        
+    });
+    
+    on("clicked:demo_how_big_reset", function() {
+        
+        setAttrs({
+            demo_how_big_selected_type: "TNT",
+            demo_how_big_type: "TNT",
+            demo_how_big_ref: 1.0,
+            demo_how_big_weight: 1
+        });
+        
+    });
 	
 </script>
