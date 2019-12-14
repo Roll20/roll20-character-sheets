@@ -1,8 +1,17 @@
 # Das Schwarze Auge 5 - Tsa Edition
 
 ## Änderungen
+2019-12-03:
+
+- Überarbeitung Design Status Tab
+- Talente: es lässt sich jetzt die Ansicht zwischen Anmerkung und Status-Modifikatoren umschalten
+
+2019-11-02:
+
+- Bugfix: Output Option für Talente funktioniert jetzt wie erwartet
 
 2019-10-29:
+
 - Fix eines Problems mit der Auswahl und Berechnung von Fernkampfwaffen
 - Neu: Unter Optionen stehen diverse Farbschema zur Auswahl: Yrn White (Default), Nebachot Sand, Rekki Blue, Perceval Grey, Gerasim Green)
 - Aufruf: Wer Ideen hat und das eigene Farbschema im Bogen sehen möchte, kann mir eine Nachricht an untenstehende Emailadresse senden.
@@ -18,13 +27,12 @@
   --color-border           : black;
 }
 
-
-
 2019-10-18: strukturelle Anpassungen durch Tajo, um Sortierreihenfolge bei Übersetzungen z. B. bei Talenten beizubehalten
 
 2019-10-14: Englische Übersetzung durch Tajo. Vielen Dank!
 
 2019-10-07:
+
 - Änderungen des Status lösen nun eine Neuberechnung der Kampfwerte aus --> bestehende Events ergänzt
 - Änderungen der Kampftechnikwerte führen zur Neuberechnung der Kampfwerte --> neuer Event Trigger und Change Flag (ktw_change_flag) hinzugefügt.
 - Der Status (status_maxi) wird bei Eigenschaftsproben jetzt berücksichtigt.
@@ -32,6 +40,7 @@
 - Felder für Münzen im Geldbeutel hinzugefügt
 
 2019-09-15:
+
 - Die Attribute für Lebensenergie (le, le_max), Astralenergie (ke_, ke_max) und Karmaenergie (ke, ke_max) wurden umbenannt, um das Zuweisen der Werte an Token zu vereinfachen. Achtung: evtl. werden die aktuellen Werte auf 0 gesetzt und müssen angepasst werden.
 - Modifikator für den Fertigkeitswert (FW) der Talente hinzugefügt
 - Rüstungsschutz (RS) wird auch im Kopf des Kampfbogens angezeigt
@@ -42,8 +51,8 @@
 - AE/KE Leiteigenschaft (Grundwertetab) und Traditionseigenschaft (Magie/Götterwirken-Tab) sind jetzt synchronisiert
 - für AE/KE kann jetzt der Faktor (Default 1) mit dem die Traditionseigenschaft in den Gesamtwert eingeht, eingegeben werden
 
-
 2019-09-01:
+
 - Vorteile und Nachteile wurden unter Sonderfertigkeiten zusammenfaßt
 - Zauberspruchtyp Zaubertricks hinzugefügt
 - Fix: Berechnung Werte für Hiebwaffen im Kampfwerte
@@ -83,7 +92,6 @@ Kampfsonderfertigkeit Wuchtschlag I
 
 ```
 
-
 Beispiel Vorteil Beidhändig:
 
 ```
@@ -92,9 +100,6 @@ Vorteil Beidhändig
 1. Modifikator Falsche-Hand-Mod. +4
 
 ```
-
-
-
 
 ### Liste der Modifikatoren
 
@@ -216,26 +221,20 @@ Magie und Glaube
 
 Unter Status lassen sich die unterschiedlichen Zunstände eintragen. Entsprechend der Regeln wird maximal eine Obergrenze von -5 auf die Kampfwerte sowie die Talente angerechnet. Bei den Talenten kann anhand der kleinen Checkboxen ausgewählt werden, wann welcher Status bei einer Talentfertigkeit berücksichtigt werden soll. Anhand der Kontexthilfe wird der entsprechende Status beschrieben. Zum Beispiel Belastung wirkt sich nicht auf alle Fertigkeiten aus, entsprechend sind diese per Default nicht angehakt.  Ein bensonderer Status ist Entrückung, der sich je nach Profession sich positiv oder negativ auf eine Talentfertigkeit oder eine Kampftechnik auswirkt. Entsprechend kann an dort bei Entrückung einen Bonus statt eines Malus (Default) auswählen.
 
-
 ### Magie und Götterwirken
-
-
 
 ### Ausrüstung
 
-
 ### Kampfbogen
-
 
 ## Nützliche Makros für Pro-Benutzer
 
-
 ## Interessante Links
 
-* [Ulisses DSA 5 Regelwiki ](https://ulisses-regelwiki.de/) - Offizielle Wiki zu den DSA 5 - Regeln
-
+* [Ulisses DSA 5 Regelwiki](https://ulisses-regelwiki.de/) - Offizielle Wiki zu den DSA 5 - Regeln
 
 ## Ausblick
+
 * Überarbeitung Artefakte
 * Überarbeitung Inventar
 * Einführung von Effekt-Modifkatoren für die Auswirkung von Zaubersprüchen, Liturgien, Artefakten etc. auf den Helden

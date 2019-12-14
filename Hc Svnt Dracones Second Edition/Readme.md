@@ -3,6 +3,18 @@ Official Character Sheet
 
 # Changelog
 
+## V.1.61 (2019-11-26)
+* Small bugfix for a unresponsive checkbox(Mind Stat "2 Profs") in Exp Table
+* change Battlescore default to zero from previous arbitrary "20"
+
+## V.1.60 (2019-11)
+* "XP purchase"-section(Page 3) now automatically adjusts "XP Spent" and "Remaining Exp" when checking/unchecking new entires in the section(it does not prevent from selecting both options in places where ther are choices, nor does it prevent selecting things out of order).
+* Editing "Total Exp" also updates "Remaining Exp" accordingly
+* "Xp purchase"-section updates the numbers in the "Progression Purchase Tracking"-section, as well as increase credits amounts accordingly if credits have been gained through it. Adds a hidden "attr_progression_credits_track" attribute for tracking how many times credits have been gained through XP purchase
+* "XP Purchase"-section choices now updates the Six Main Stats, Focus_max, Readiness_max, Base_move, Initiative_max and max number of known Techniques  on the first page.
+* If any checkboxes are unchecked, it also reverts the corresponding stat increase. The sheet only increments the stats based on checkbox actions, so the stats can be edited before/after using the "XP Purcase"-section.  
+
+
 ## V.1.20 (2019-10)
 
 * add "Quantity" field to Inventory section, and instructions that appears when hovering over "Cost" or "Gear Score"
