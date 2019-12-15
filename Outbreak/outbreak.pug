@@ -19,21 +19,40 @@ include src/pug/_mixins.pug
 	.main.tab
 		.column
 			.grid.spewbox
-				h1 S.P.E.W Attributes
-				.dicetypes
+				h1.green-header(data-i18n='S.P.E.W Attributes') S.P.E.W Attributes
+				.grid.dicetypes
 					each val in ['Strength', 'Perception', 'Empathy', 'Willpower']
-						.grid.box.attributebox
-							img(val=val, src='https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/outbreak/images/OU_Attributes_' + val + '_40x40.png')
-							br
-							span #{val}
-							p
-								input.spewbonus(type='text' name='attr_' + val +'bonus' title= val + 'Bonus' value='0')
-								input.spewones(type='text' name='attr_' + val value='[[(@{#valBonus}*10)+@{val}]]')
-				.grid.box.points
+						- const name = val.toLowerCase()
+						.grid.attributes
+							img(alt=`${val}` src=`https://raw.githubusercontent.com/clevett/roll20-character-sheets/outbreakv1/Outbreak/src/img/OU_Attributes_${val}_40x40.png`)
+							h2(data-i18n=val) #{val}
+							.grid
+								input(name=`attr_${name}` type='hidden' value=`[[(@{${name}_bonus}*10)+@{${name}_base}]]`)
+								label
+									input(name=`attr_${name}_bonus` title=`@{${name}_bonus}` type='text' value='0')
+								label
+									input(name=`attr_${name}_base`  title=`@{${name}_base}` type='text' value=`0`)
+				.grid.points
 					each val in ['Survival', 'Competance', 'Gestalt']
-						.grid.box.pointsbox
-							span #{val} Points:
-							input.points(type='text' name='attr_' + val +'points' title= val + 'points' value='0')
+						if val === 'Gestalt'
+							h2(data-i18n=val) #{val} Level:
+						else
+							h2(data-i18n=val) #{val} Points:
+						label
+							input.points(name=`attr_${val}_points` title=`@{${val}_points}` value='0' type='text')
+
+				.grid.skills
+					h1(data-i18n='Skills') Skills
+					.grid
+						h2(data-i18n='Basic Skills') Basic Skills
+						each val in ['Balance', 'Brawl', 'Climb', 'Composure', 'Dodge', 'Endurance', 'Expression', 'Grapple', 'Hold', 'Jump/Leap', 'Lift/Pull', 'Resist Pain', 'Search', 'Spot/Listen', 'Stealth']
+							- const name = val.toLowerCase();
+					.grid
+						h2(data-i18n='Trained Skills') Trained Skills
+						each val in ['Bow/Crossbow', 'Calm Other', 'Deplomacy Persuade', 'Diplomacy Barter/Bribe', 'Diplomacy Command/Coax', 'Diplomacy Detect Motives', 'Diplomacy Intimidate', 'Digital Systems', 'Firearms Pistol', 'Firearms Long Gun', 'First Aid', 'Melee Attack Blunt', 'Melee Attack Pierce', 'Melee Attack Slash', 'Navigation', 'Swim', 'Throw']
+							- const name = val.toLowerCase();
+
+
 
 		.column
 				.grid.box.logo
