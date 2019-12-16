@@ -7,61 +7,56 @@ input(name='attr_version' type='hidden' value='1')
 include src/pug/_mixins.pug
 
 .grid.navigation
-		each val in ['Main', 'Equipment', 'Log']
-			if val === 'main'
-				input(name='attr_tab' type='radio' value=val.toLowerCase() checked)
-			else
-				input(name='attr_tab' type='radio' value=val.toLowerCase())
-			span(data-i18n=val) val
+	each val in ['Main', 'Equipment', 'Log']
+		if val === 'main'
+			input(name='attr_tab' type='radio' value=val.toLowerCase() checked)
+		else
+			input(name='attr_tab' type='radio' value=val.toLowerCase())
+		span(data-i18n=val) val
 
 .container
 	input(name='attr_tab' type='hidden' value='main')
 	.main.tab
 		.column
-			.grid.spewillpower_bonusox
+			.grid.playerinfo.box
+				each val in ['Name', 'Player', 'Campaign']
+					-const name = val.toLowerCase();
+					h2(data-i18n=`${val}`) #{val}
+					input(name=`attr_character_${name}` placeholder=val title=`@{character_${name}}` type='text' value='')
+
+			.spewbox.box
 				h1.green-header(data-i18n='S.P.E.W Attributes') S.P.E.W Attributes
 				.grid.dicetypes
 					each val in ['Strength', 'Perception', 'Empathy', 'Willpower']
-						- const name = val.toLowerCase()
+						-const name = val.toLowerCase();
 						.grid.attributes
 							img(alt=`${val}` src=`https://raw.githubusercontent.com/clevett/roll20-character-sheets/outbreakv1/Outbreak/src/img/OU_Attributes_${val}_40x40.png`)
-							h2(data-i18n=val) #{val}
+							h3(data-i18n=val) #{val}${name}
 							.grid
 								input(name=`attr_${name}` type='hidden' value=`[[(@{${name}_bonus}*10)+@{${name}_base}]]`)
 								label
 									input(name=`attr_${name}_bonus` title=`@{${name}_bonus}` type='text' value='0')
 								label
 									input(name=`attr_${name}_base`  title=`@{${name}_base}` type='text' value=`0`)
+				
+				h2(data-i18n='Character Resources') Character Resources
 				.grid.points
-					each val in ['Survival', 'Competance', 'Gestalt']
+					each val in ['Survival', 'Gestalt', 'Competance']
+						-const name = val.toLowerCase();
 						if val === 'Gestalt'
-							h2(data-i18n=`${val} Level:`) #{val} Level:
+							h2.yellow-header(data-i18n=`${val} Level:`) #{val} Level:
 						else
-							h2(data-i18n=`${val} Points:`) #{val} Points:
+							h2.green-header(data-i18n=`${val} Points:`) #{val} Points:
 						label
-							input.points(name=`attr_${val}_points` title=`@{${val}_points}` value='0' type='text')
+							input.points(name=`attr_${name}` title=`@{${name}}` value='0' type='text')
 
 				.grid.skills
 					h1.yellow-header(data-i18n='Skills') Skills
-					- const rollPrompt = '[[(?{Gear Or Kit| None, 0 | Archery, @{archery_total}+@{perception_bonus}|Athletic Gear, @{athletic_total}+@{perception_bonus}|Bludgeon, @{bludgeon_total}+@{perception_bonus}|Climbing Gear, @{climbing_total}+@{perception_bonus}|Command Apparatus, @{command_apparatus}+@{perception_bonus}|Firefighting, @{firefighting_total}+@{perception_bonus}|First Aid Kit, @{first_aid_total}+@{perception_bonus}|Long Gun, @{long_gun_total}+@{perception_bonus}|Martial Arts, @{martial_arts_total}+@{perception_bonus}|Medical Gear, @{medical_gear_total}+@{perception_bonus}|Piercing, @{piearcing_total}+@{perception_bonus}|Pistol, @{pistol_total}+@{perception_bonus}|Recon Gear, @{recon_gear_total}+@{perception_bonus}|Slashing, @{slashing_total}+@{perception_bonus}|Survival Kit, @{survival_total}+@{perception_bonus}|Swimming/Diving, @{SwimTv}+@{perception_bonus}|Throwing, @{throwing_total}+@{perception_bonus}|Tools, @{tools_total}+@{perception_bonus}|Value, @{value_total}+@{perception_bonus}|Vehicles, @{vhehicles_total}+@{perception_bonus}})*?{Multiplier|1|2|3|4|5}]]'
-
 					h2(data-i18n='Basic Skills') Basic Skills
 					.grid
-						each val in ['Balance', 'Brawl', 'Climb', 'Composure', 'Dodge', 'Endurance', 'Expression', 'Grapple', 'Hold', 'Jump/Leap', 'Lift/Pull', 'Resist Pain', 'Search', 'Spot/Listen', 'Stealth']
-							- const name = val.toLowerCase();
-							h3(data-i18n=`${val}`) #{val}
-							input(name=`attr_${name}_base_total` type='hidden' value=rollPrompt)
+						each val in {'Balance':'perception', 'Brawl': 'strength', 'Climb':'strength', 'Composure':'willpower', 'Dodge':'perception', 'Endurance':'strength', 'Expression':'empathy', 'Grapple':'strength', 'Hold':'willpower', 'Jump/Leap':'strength', 'Lift/Pull':'strenght', 'Resist Pain':'willpower', 'Search':'perception', 'Spot/Listen':'perception', 'Stealth':'strength'}
+							+skillList(val)
 
-							input.skillstat(name=`attr_${name}` title='Perception + willpower_bonus' type='hidden' value='(@{perception}+@{willpower_bonus})')
-
-							input.skillstat(name=`attr_gestalt_${name}` value='0' title='Input total skill gain from spent gestalt levels' type='text')
-
-							input.skillstat(disabled='true' name=`attr_${name}_total` title='Will add Base Training Value equal to perception_bonus + Training Value multiplied by the multiplier or any gear you are using.' type='text' value=`[[@${name}+@{gestalt_${name}}]]`)
-
-							input.skillname(name=`attr_${name}_tot` value=`(@{${name}_total} [Skill]+@{${name}_base_total} [Kit])` disabled='true' type='hidden')
-
-							- const buttonValue = `&{template:ou} {{name=@{character_name}}} {{roll_name={Bal%}}} {{attr=Balance}} {{Target1=[[@{${name}_tot}]]}} {{Target2=[[@{${name}_tot}+1]]}} {{skill=VS.}} {{Diff=@{dpDiff}}} {{Spd1=@{dpSpeed}}} {{Dmg=@{dpDmg}}} {{Deplet=@{dpDeplet}}} {{DieDif=@{DiffDie}}} {{DieSpd=@{SpeedDie}}} {{DieDmg=@{DmgDie}}} {{DieDep=@{DepletDie}}} {{result=[[1d100+@{dpDiff} [Diff]]]}} {{dos1=[[@{${name}_tot}-19]]}} {{dos2a=[[@{${name}_tot}-20]]}} {{dos2b=[[@{${name}_tot}-29]]}} {{dos3a=[[@{${name}_tot}-30]]}} {{dos3b=[[@{${name}_tot}-39]]}} {{dos4a=[[@{${name}_tot}-40]]}} {{dos4b=[[@{${name}_tot}-49]]}} {{dof1=[[@{${name}_tot}+19]]}} {{dof2a=[[@{${name}_tot}+20]]}} {{dof2b=[[@{${name}_tot}+29]]}} {{dof3a=[[@{${name}_tot}+30]]}} {{dof3b=[[@{${name}_tot}+39]]}} {{dof4a=[[@{${name}_tot}+40]]}} {{dof4b=[[@{${name}_tot}+49]]}}`
-							button.skillstat(name=`roll_${val}` title='If using no gear select none and select a multiplier of 0' type='roll' value=buttonValue)
 
 
 					h2(data-i18n='Trained Skills') Trained Skills
@@ -73,8 +68,6 @@ include src/pug/_mixins.pug
 					.grid
 						each val in ['Adv Medicine', 'Construct Engineer', 'Specialization','Specialization', 'Martial Arts', 'Pilot', 'Vehicle', 'Vehicle', 'Ride Animal', 'Animal', 'Science', 'Field Of Study', 'Field Of Study', 'Field Of Study', 'Survival', 'Toughness']
 							- const name = val.toLowerCase();
-
-
 
 		.column
 				.grid.box.logo
