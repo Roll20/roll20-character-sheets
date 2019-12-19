@@ -19,6 +19,10 @@ A very special thank to https://game-icons.net The below icons were used and are
 
 If your name doesn't appear here I apologies, the Thank you section on the sheet should be kept up to date.
 
+## Special Thank You
+
+To the Anonymous donors and to Kaye Elling for donating money to our sponsored charity (https://www.justgiving.com/fundraising/vtm-5thed-character-sheet-red-cross)
+
 ## Installation instructions.
 If you have access to Roll20
 1. Select the Vampire the Masquerade 5th Edition character sheet.
