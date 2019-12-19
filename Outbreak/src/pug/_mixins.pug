@@ -9,23 +9,20 @@ mixin diceSelect(selectedDefault)
 
 
 //- SKILL BUILDERS
-mixin skillList(skill, selected)
+mixin skillList(skill, attributes)
 	.skill
-		-const name = skill.toLowerCase();
-		select(name=`attr_${name}_attribute` value=``)
-			each val in ['Strength', 'Perception', 'Empathy', 'Willpower']
-				- const attribute = val.toLowerCase();
-				if selected === val
-					option(data-i18n=val value=`@{${attribute}}` selected) #{val}
-				else
-					option(data-i18n=val value=`@{${attribute}}`) #{val}
-		select(name=`attr_${name}_advancement` value='')
-			option(value=``) -
-			each val in ['1st', '2nd', '3rd', '4th', '5th']
-				option(data-i18n=val value=`${val.slice(0, -2)}`) #{val}
-		button(name=`roll_${skill}` type='roll' value=``) 
+		-const name = skill.toLowerCase().replace('/', '_').replace(' ', '_');
+		-const primaryAttribute = attributes[0];
+		-const secondaryAttribute = attributes[1];
+
+		input(name=`attr_${name}_button_base` type='hidden' value=`[[(?{Gear Or Kit| None, 0 | Archery, @{ArchTv}+@{${primaryAttribute}_bonus}|Athletic Gear, @{AthlTv}+@{${primaryAttribute}_bonus}|Bludgeon, @{BludTv}+@{${primaryAttribute}_bonus}|Climbing Gear, @{ClimTv}+@{${primaryAttribute}_bonus}|Command Apparatus, @{CommTv}+@{${primaryAttribute}_bonus}|Firefighting, @{FireTv}+@{${primaryAttribute}_bonus}|First Aid Kit, @{FirsTv}+@{${primaryAttribute}_bonus}|Long Gun, @{LngGnTv}+@{${primaryAttribute}_bonus}|Martial Arts, @{MtlArtTv}+@{${primaryAttribute}_bonus}|Medical Gear, @{MediTv}+@{${primaryAttribute}_bonus}|Piercing, @{PierTv}+@{${primaryAttribute}_bonus}|Pistol, @{PistTv}+@{${primaryAttribute}_bonus}|Recon Gear, @{RecoTv}+@{${primaryAttribute}_bonus}|Slashing, @{SlashTv}+@{${primaryAttribute}_bonus}|Survival Kit, @{SurvTv}+@{${primaryAttribute}_bonus}|Swimming/Diving, @{SwimTv}+@{${primaryAttribute}_bonus}|Throwing, @{ThrowTv}+@{${primaryAttribute}_bonus}|Tools, @{ToolTv}+@{${primaryAttribute}_bonus}|Value, @{ValuTv}+@{${primaryAttribute}_bonus}|Vehicles, @{VehiTv}+@{${primaryAttribute}_bonus}})*?{Multiplier|1|2|3|4|5}]]`)
+
+		input(name=`attr_${name}_attributes` type='hidden' value=`(@{${primaryAttribute}}+@{${secondaryAttribute}_bonus})`)
+		input(name=`attr_${name}_total` type='hidden' value=`(@{${name}} [Skill]+@{${name}_button_base} [Kit])`)
+
+		button(name=`roll_${skill}` type='roll' value=`&{template:ou} {{name=@{character_name}}} {{roll_name=^{${skill}}}} {{attr=${skill}}} {{Target1=[[@{${name}_total}]]}} {{Target2=[[@{${name}_total}+1]]}} {{skill=VS.}} {{Diff=@{dpDiff}}} {{Spd1=@{dpSpeed}}} {{Dmg=@{dpDmg}}} {{Deplet=@{dpDeplet}}} {{DieDif=@{DiffDie}}} {{DieSpd=@{SpeedDie}}} {{DieDmg=@{DmgDie}}} {{DieDep=@{DepletDie}}} {{result=[[1d100+@{dpDiff} [Diff]]]}} {{dos1=[[@{${name}_total}-19]]}} {{dos2a=[[@{${name}_total}-20]]}} {{dos2b=[[@{${name}_total}-29]]}} {{dos3a=[[@{${name}_total}-30]]}} {{dos3b=[[@{${name}_total}-39]]}} {{dos4a=[[@{${name}_total}-40]]}} {{dos4b=[[@{${name}_total}-49]]}} {{dof1=[[@{${name}_total}+19]]}} {{dof2a=[[@{${name}_total}+20]]}} {{dof2b=[[@{${name}_total}+29]]}} {{dof3a=[[@{${name}_total}+30]]}} {{dof3b=[[@{${name}_total}+39]]}} {{dof4a=[[@{${name}_total}+40]]}} {{dof4b=[[@{${name}_total}+49]]}}`) 
 			span(data-i18n=`${skill}`) #{skill}
 		label
-			input(name=`attr_${name}_increase` title=`attr_${name}_increase` value='')
+			input(name=`attr_${name}_advancement` title=`attr_${name}_advancement` type='text' value='0')
 		label
-			input(name=`attr_${name}` value='' title=`attr_${name}`)
+			input(name=`attr_${name}` title=`attr_${name}` type='text' value=`[[@{${name}_attributes}+@{${name}_advancement}]]` disabled='true')
