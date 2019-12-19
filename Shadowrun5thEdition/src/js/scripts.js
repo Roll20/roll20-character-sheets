@@ -1,4 +1,3 @@
-<script type="text/worker">
 
 //Sheet open versioning
 	on("sheet:opened", function() {
@@ -1031,4 +1030,3 @@
 	const getSplitNum = (value) => {
 		return value.split("/")[0];
 	}
-</script>
