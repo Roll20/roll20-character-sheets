@@ -23,6 +23,7 @@
 				<ul>
 					<li>General tab. Change layout for Turning and Deceleration table and fixed some bugs in the process.</li>
 					<li>Combat tab. Added Demolition combat tool. Code provided by Savage. Thank you Savage!</li>
+					<li>Combat tab - Thrown Object tool. Thrust damage was not updating correctly when thrust damage changed.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset" />View All Updates</button>
@@ -4576,6 +4577,8 @@
 	<ul>
 		<li>General tab. Change layout for Turning and Deceleration table and fixed some bugs in the process.</li>
 		<li>Combat tab. Added Demolition combat tool. Code provided by Savage. Thank you Savage!</li>
+		<li>General tab. Change Thrust and Swing damage to use formula instead of a lookup table that stops at ST 100.</li>
+		<li>Combat tab - Thrown Object tool. Thrust damage was not updating correctly when thrust damage changed.</li>
 	</ul>
 	
 	<h4>Vesion: 1.7.2</h4>
@@ -6763,6 +6766,8 @@ Skull Damage x4
 	 */
 	function getDamageType(strikingST) {
 
+        console.log("strikingST", strikingST);
+
 		// return value
 		var damgeType = null;
 
@@ -6777,7 +6782,7 @@ Skull Damage x4
 			strikingST = 1;
 		}
 
-		if (strikingST < 110) {
+		if (strikingST <= 100) {
 
 			// get damageType from table
 			damageType = damageTable[strikingST];
@@ -8738,7 +8743,7 @@ Skull Damage x4
 	}
 	
 	// check for changes that affect thrown object stats
-	on('change:thrown_object_weight change:striking_st change:basic_lift change:super_throw_level change:thrown_object_strength_mod change:thrown_object_damage_mod', function(event) {
+	on('change:thrown_object_weight change:basic_lift change:thrust change:super_throw_level change:thrown_object_strength_mod change:thrown_object_damage_mod', function(event) {
 	    
 	    updateThrownObjectStats();
 	    
@@ -8817,7 +8822,6 @@ Skull Damage x4
 	        
 	        var finalDamage = getModifiedDamage(values.thrust, damageMod);
 	        
-            //
 	        setAttrs({
 	            'thrown_object_strength': throwingST,
 	            'thrown_object_range': distance,
@@ -9910,8 +9914,6 @@ Skull Damage x4
     
     on("change:start_velocity change:current_move change:enhanced_move_current change:current_air change:current_water change:change_velocity", function(event) {
         
-        console.log("change!");
-        
         updateTurnRadiusMovements();
         
     });
@@ -9923,11 +9925,7 @@ Skull Damage x4
      */
     function updateTurnRadiusMovements() {
         
-        console.log("updateTurnRadiusMovements");
-        
         getAttrs(["turning_move_type", "start_velocity", "current_move", "enhanced_move_current", "current_air", "current_water", "change_velocity"], function(values) {
-            
-            console.log(values);
             
             var moveType = values.turning_move_type;
             
@@ -10312,12 +10310,6 @@ Skull Damage x4
         
         // if the weapon rowId is being used by a skill, update the toggles
         weapons = getMatchinWeaponsFromSkillId(rowId);
-        
-        console.log("update spell level mirror");
-        
-        console.log("rowId", rowId);
-        
-        console.log(weapons);
         
         // could be more than one weapon tied to a skill/spell
         if (weapons.length) {
@@ -10954,11 +10946,7 @@ Skull Damage x4
 	    
 	    getAttrs(["demo_how_big_selected_type"], function(values) {
 	        
-	        console.log(values);
-	        
 	        var demoType = getDemoTypeObject(values.demo_how_big_selected_type);
-	        
-	        console.log(demoType);
 	        
 	        setAttrs({
 	            demo_how_big_type: demoType.type,
