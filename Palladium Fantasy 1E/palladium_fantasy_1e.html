@@ -2,7 +2,6 @@
     <div class="sheet-buttonbar">
         <div class="sheet-navbuttons">
             <button type="action" name="act_characterprofile1" class="sheet-topbuttons">Statistics</button>
-            
             <button type="action" name="act_socialtab2" class="sheet-topbuttons sheet-socialT">Social</button>
             <button type="action" name="act_skilltab3" class="sheet-topbuttons">Skills</button>
             <button type="action" name="act_combattab4" class="sheet-topbuttons">Combat</button>
@@ -31,7 +30,7 @@
             <h4>Macro Rolls:</h4>
             <div class="whispertoggle-container">
                 <input type="radio" class="toggle-left" name="attr_whispertoggle" title="Public" value="" checked="checked"><span title="Public"></span>
-                <input type="radio" class="toggle-right" name="attr_whispertoggle" title="Whisper" value="/w gm "><span title="Whisper"></span>
+                <input type="radio" class="toggle-right" name="attr_whispertoggle" title="GM Whisper" value="/w gm "><span title="Whisper"></span>
             </div>
         </div>
         <div class='name-grid-container'>
@@ -152,7 +151,7 @@
                 <input class='roll-field' type='text' title='Perception Bonus' value="0" name="attr_perception" />
                 <button class='rolldice' type="roll" title='Initiative (d20+80)' name='roll_initiative' value="@{whispertoggle}&{template:custom} {{color=black}} {{title=**@{character_name}**}} {{subtitle=Initiative}} {{Initiative=[[d20+80+@{initiative_mod}&{tracker}]]}}" >Init.</button>                
                 <input class='roll-field' type='text' title='Initiative Bonus' value="0" name="attr_initiative_mod" />
-                <button class='rolldice' type="roll" title='Dodge' name='roll_dodge' value="@{whispertoggle}&{template:custom} {{color=grey}} {{title=**@{character_name}**}} {{subtitle=Attempts to Dodge}} {{Dodge=[[1d20+@{hth_dodge}+@{pp_bonus}+?{Mounted?:|No, 0|Yes, @{hth_mountedparrydodge}}+@{temp_dodge}]]}} {{desc=Dodge takes the place of a remaining attack this round.}}" >Dodge</button>                
+                <button class='rolldice' type="roll" title='Dodge' name='roll_dodge' value="@{whispertoggle}&{template:custom} {{color=grey}} {{title=**@{character_name}**}} {{subtitle=Attempts to Dodge}} {{Dodge=[[1d20+@{hth_dodge}+@{pp_bonus}+@{temp_dodge}@{mountedpd}]]}} {{desc=Dodge takes the place of a remaining attack this round.}}" >Dodge</button>                
                 <input class='roll-field' type='text' title='Dodge Bonus Other Than HtH or PP' value="0" name="attr_temp_dodge"/>
             </div>
             <div class='mid-column-gap'></div>
@@ -247,10 +246,24 @@
                 </div>    
             </div>
         </div>
-    	<div class="melee-attack-panel">
+        <div class="melee-attack-panel">
             <input type="checkbox" name="attr_melee_attacks-toggle" class="sheet-arrow" />
             <h4>Melee Attacks</h4>
             <div class="body">
+                <div class="attackoptions-container">
+                    <h4>Melee Options:</h4>
+                    <h5>Parry/Dodge:</h5>
+                    <div class="mountparry-container">
+                        <input type="radio" class="ctoggle-left" name="attr_mountedpd" title="No extra bonuses" value="" checked="checked"><span title="On Foot"></span>
+                        <input type="radio" class="ctoggle-right" name="attr_mountedpd" title="Adds mounted parry/dodge to parry and dodge rolls" value="+@{hth_mountedparrydodge}"><span title="Mounted"></span>
+                    </div>
+                    <h5>Damage:</h5>
+                    <div class="mountdamage-container">
+                        <input type="radio" class="ctoggle-left" name="attr_mounteddam" title="No extra bonuses" value="" checked="checked"><span title="On Foot"></span>
+                        <input type="radio" class="ctoggle-middle" name="attr_mounteddam" title="Adds mounted damage to melee damage rolls" value="+@{hth_mounteddamage}"><span title="Mounted"></span>
+                        <input type="radio" class="ctoggle-right" name="attr_mounteddam" title="Adds mounted charge damage to melee damage rolls" value="+@{hth_chargedamage}"><span title="Charge"></span>
+                    </div>                    
+                </div> 
                 <div class='mattack-grid-container' >
                     <h5>Weapon</h5>
                     <div class='space-holder'></div>
@@ -267,13 +280,13 @@
                 <fieldset class="repeating_meleeattacks">
                     <div class='mattack-grid-container' > 
                         <input class='mattack-label' type="text" value="" name="attr_weapon_attack" placeholder="Weapon Name" />
-                        <button class='meleedice' type='roll' title='Strike (Attack) Roll with Damage' name='roll_meleeattack' value="@{whispertoggle}&{template:custom} {{color=blue}} {{title=**@{character_name}**}} {{subtitle=attacks with @{weapon_attack}}} {{Attack= [[d20cs>@{hth_critical}+@{weapon_strike}+@{hth_strike}+@{pp_bonus}+@{temp_strike}]]}} {{Damage= [[@{weapon_damage}+@{hth_damage}+@{ps_bonus}+@{temp_damage}]]}} {{desc=@{mattack_reference}}}">S</button>
+                        <button class='meleedice' type='roll' title='Strike (Attack) Roll with Damage' name='roll_meleeattack' value="@{whispertoggle}&{template:custom} {{color=blue}} {{title=**@{character_name}**}} {{subtitle=attacks with @{weapon_attack}}} {{Attack= [[d20cs>@{hth_critical}+@{weapon_strike}+@{hth_strike}+@{pp_bonus}+@{temp_strike}]]}} {{Damage= [[@{weapon_damage}+@{hth_damage}+@{ps_bonus}+@{temp_damage}@{mounteddam}]]}} {{desc=@{mattack_reference}}}">S</button>
                         <input class='mattack-text' type="text" title='Strike Bonuses other than HtH or PP' value="0" name="attr_weapon_strike" />
                         <input class='mattack-text' type="text" title='Temporary Strike Bonuses' value="0" name="attr_temp_strike" />
-                        <button class='meleedice' type='roll' title='Parry Roll' name='roll_meleeparry' value="@{whispertoggle}&{template:custom} {{color=grey}} {{title=**@{character_name}**}} {{subtitle=parries with @{weapon_attack}}} {{Parry= [[d20+@{weapon_parry}+@{hth_parry}+@{pp_bonus}+@{temp_parry}]]}}">P</button>
+                        <button class='meleedice' type='roll' title='Parry Roll' name='roll_meleeparry' value="@{whispertoggle}&{template:custom} {{color=grey}} {{title=**@{character_name}**}} {{subtitle=parries with @{weapon_attack}}} {{Parry= [[d20+@{weapon_parry}+@{hth_parry}+@{pp_bonus}+@{temp_parry}@{mountedpd}]]}}">P</button>
                         <input class='mattack-text' type="text" title='Parry Bonuses other than HtH or PP' value="0" name="attr_weapon_parry" />
                         <input class='mattack-text' type="text" title='Temporary Parry Bonuses' value="0" name="attr_temp_parry" />
-                        <button class='meleedice' type='roll' title='Damage Roll' name='roll_meleedamage' value="@{whispertoggle}&{template:custom} {{color=red}} {{title=**@{character_name}**}} {{subtitle=lashes out}} {{@{character_name}'s @{weapon_attack} deals= [[@{weapon_damage}+@{hth_damage}+@{ps_bonus}+@{temp_damage}]]}} {{desc=@{mattack_reference}}}">D</button>
+                        <button class='meleedice' type='roll' title='Damage Roll' name='roll_meleedamage' value="@{whispertoggle}&{template:custom} {{color=red}} {{title=**@{character_name}**}} {{subtitle=lashes out}} {{@{character_name}'s @{weapon_attack} deals= [[@{weapon_damage}+@{hth_damage}+@{ps_bonus}+@{temp_damage}@{mounteddam}]]}} {{desc=@{mattack_reference}}}">D</button>
                         <input class='damage-dice' type="text" title='Damage Dice Calculation other than HtH and PS' value="" name="attr_weapon_damage" placeholder="xdy+z" />
                         <input class='mattack-text' type="text" title='Temporary Damage Bonuses' value="0" name="attr_temp_damage" />
                         <input class='mattack-notes' type="text" title='Special Note About This Attack' value="" name="attr_mattack_reference" />
@@ -372,14 +385,14 @@
                     <h5>Notes</h5>
                 </div>
                 <fieldset class="repeating_skillocc">
-    	            <div class='skill-grid-container' >
-    	                <button type="roll" name='roll_occskill' value="@{whispertoggle}&{template:custom} {{color=green}} {{title=**@{character_name}'s**}} {{subtitle=@{skill_name}}} {{Check=[[d100cs<1cf>100-@{iq_bonus}]]}} {{Skill=@{skill_rating}}} {{desc=@{skill_reference}}}"></button>
-    	                <input class='occ-field' type="text" value="" name="attr_skill_name" placeholder="Skill name"/>
-    		            <input class='occ-field' type="number" title='Total Skill Percentage Rating' value="" name="attr_skill_rating" />
-    		            <h6>%</h6>
-    		            <input class='occ-field' type="number" title='Skill Level' value="1" name="attr_skill_level" />
-    		            <input class="skill-notes" type="text" value="" name="attr_skill_reference" />
-    	            </div>
+                    <div class='skill-grid-container' >
+                        <button type="roll" name='roll_occskill' value="@{whispertoggle}&{template:custom} {{color=green}} {{title=**@{character_name}'s**}} {{subtitle=@{skill_name}}} {{Check=[[d100cs<1cf>100-@{iq_bonus}]]}} {{Skill=@{skill_rating}}} {{desc=@{skill_reference}}}"></button>
+                        <input class='occ-field' type="text" value="" name="attr_skill_name" placeholder="Skill name"/>
+                        <input class='occ-field' type="number" title='Total Skill Percentage Rating' value="" name="attr_skill_rating" />
+                        <h6>%</h6>
+                        <input class='occ-field' type="number" title='Skill Level' value="1" name="attr_skill_level" />
+                        <input class="skill-notes" type="text" value="" name="attr_skill_reference" />
+                    </div>
                 </fieldset>
             </div>
         </div>
@@ -396,14 +409,14 @@
                     <h5>Notes</h5>
                 </div>
                 <fieldset class="repeating_skillelective">
-    	            <div class='skill-grid-container' >
-    		            <button type="roll" name='roll_electiveskill' value="@{whispertoggle}&{template:custom} {{color=green}} {{title=**@{character_name}'s**}} {{subtitle=@{skill_name}}} {{Check=[[d100cs<1cf>100-@{iq_bonus}]]}} {{Skill=@{skill_rating}}} {{desc=@{skill_reference}}}"></button>
-    		            <input class='elective-field' type="text" value="" name="attr_skill_name" placeholder="Skill name"/>
-    		            <input class='elective-field' type="number" title='Total Skill Percentage Rating' value="" name="attr_skill_rating" />
-    		            <h6>%</h6>
-    		            <input class='elective-field' type="number" title='Skill Level' value="1" name="attr_skill_level" />
-    		            <input class="skill-notes" type="text" value="" name="attr_skill_reference" />
-    	            </div>
+                    <div class='skill-grid-container' >
+                        <button type="roll" name='roll_electiveskill' value="@{whispertoggle}&{template:custom} {{color=green}} {{title=**@{character_name}'s**}} {{subtitle=@{skill_name}}} {{Check=[[d100cs<1cf>100-@{iq_bonus}]]}} {{Skill=@{skill_rating}}} {{desc=@{skill_reference}}}"></button>
+                        <input class='elective-field' type="text" value="" name="attr_skill_name" placeholder="Skill name"/>
+                        <input class='elective-field' type="number" title='Total Skill Percentage Rating' value="" name="attr_skill_rating" />
+                        <h6>%</h6>
+                        <input class='elective-field' type="number" title='Skill Level' value="1" name="attr_skill_level" />
+                        <input class="skill-notes" type="text" value="" name="attr_skill_reference" />
+                    </div>
                 </fieldset>
             </div>
         </div>
@@ -420,14 +433,14 @@
                     <h5>Notes</h5>
                 </div>
                 <fieldset class="repeating_skillsecondary">
-    	            <div class='skill-grid-container' >
-    		            <button type="roll" name='roll_secondaryskill' value="@{whispertoggle}&{template:custom} {{color=green}} {{title=**@{character_name}'s**}} {{subtitle=@{skill_name}}} {{Check=[[d100cs<1cf>100-@{iq_bonus}]]}} {{Skill=@{skill_rating}}} {{desc=@{skill_reference}}}"></button>
-    		            <input class='secondary-field' type="text" value="" name="attr_skill_name" placeholder="Skill name"/>
-    		            <input class='secondary-field' type="number" title='Total Skill Percentage Rating' value="" name="attr_skill_rating" />
-    		            <h6>%</h6>
-    		            <input class='secondary-field' type="number" title='Skill Level' value="1" name="attr_skill_level" />
-    		            <input class="skill-notes" type="text" value="" name="attr_skill_reference" />
-    	            </div>
+                    <div class='skill-grid-container' >
+                        <button type="roll" name='roll_secondaryskill' value="@{whispertoggle}&{template:custom} {{color=green}} {{title=**@{character_name}'s**}} {{subtitle=@{skill_name}}} {{Check=[[d100cs<1cf>100-@{iq_bonus}]]}} {{Skill=@{skill_rating}}} {{desc=@{skill_reference}}}"></button>
+                        <input class='secondary-field' type="text" value="" name="attr_skill_name" placeholder="Skill name"/>
+                        <input class='secondary-field' type="number" title='Total Skill Percentage Rating' value="" name="attr_skill_rating" />
+                        <h6>%</h6>
+                        <input class='secondary-field' type="number" title='Skill Level' value="1" name="attr_skill_level" />
+                        <input class="skill-notes" type="text" value="" name="attr_skill_reference" />
+                    </div>
                 </fieldset>
             </div>
         </div>
@@ -444,14 +457,14 @@
                     <h5>Notes</h5>
                 </div>
                 <fieldset class="repeating_skillmystic">
-    	            <div class='skill-grid-container' >
-    		            <button type="roll" name='roll_mysticskill' value="@{whispertoggle}&{template:custom} {{color=green}} {{title=**@{character_name}'s**}} {{subtitle=@{skill_name}}} {{Check=[[d100cs<1cf>100]]}} {{Skill=@{skill_rating}}} {{desc=@{skill_reference}}}"></button>
-    		            <input class='mystic-field' type="text" value="" name="attr_skill_name" placeholder="Skill name"/>
-    		            <input class='mystic-field' type="number" title='Total Skill Percentage Rating' value="" name="attr_skill_rating" />
-    		            <h6>%</h6>
-    		            <input class='mystic-field' type="number" title='Skill Level' value="1" name="attr_skill_level" />
-    		            <input class="skill-notes" type="text" value="" name="attr_skill_reference" />
-    	            </div>
+                    <div class='skill-grid-container' >
+                        <button type="roll" name='roll_mysticskill' value="@{whispertoggle}&{template:custom} {{color=green}} {{title=**@{character_name}'s**}} {{subtitle=@{skill_name}}} {{Check=[[d100cs<1cf>100]]}} {{Skill=@{skill_rating}}} {{desc=@{skill_reference}}}"></button>
+                        <input class='mystic-field' type="text" value="" name="attr_skill_name" placeholder="Skill name"/>
+                        <input class='mystic-field' type="number" title='Total Skill Percentage Rating' value="" name="attr_skill_rating" />
+                        <h6>%</h6>
+                        <input class='mystic-field' type="number" title='Skill Level' value="1" name="attr_skill_level" />
+                        <input class="skill-notes" type="text" value="" name="attr_skill_reference" />
+                    </div>
                 </fieldset>
             </div>
         </div> 
@@ -516,45 +529,45 @@
                 </div>
                 <div class='bonus-grid-container' >
                     <h5>Combat Skill Level</h5>
-                    <input class='combat-field' type="number" name="attr_hth_level" value="0" />
+                    <input class='combat-field' type="number" title="@{hth_level}" name="attr_hth_level" value="0" />
                     <div class='space-holder'></div>
                     <h5>Number of Attacks</h5>
-                    <input class='combat-field' type="number" name="attr_hth_numberattacks" value="1" />
+                    <input class='combat-field' type="number" title="@{hth_numberattacks}" name="attr_hth_numberattacks" value="1" />
                     <h5>Strike</h5>
-                    <input class='combat-field' type="number" name="attr_hth_strike" value="0" />
+                    <input class='combat-field' type="number" title="@{hth_strike}" name="attr_hth_strike" value="0" />
                     <div class='space-holder'></div>
                     <h5>Damage</h5>
-                    <input class='combat-field' type="number" name="attr_hth_damage" value="0" />
+                    <input class='combat-field' type="number" title="@{hth_damage}" name="attr_hth_damage" value="0" />
                     <h5>Parry</h5>
-                    <input class='combat-field' type="number" name="attr_hth_parry" value="0" />
+                    <input class='combat-field' type="number" title="@{hth_parry}" name="attr_hth_parry" value="0" />
                     <div class='space-holder'></div>
                     <h5>Dodge</h5>
-                    <input class='combat-field' type="number" name="attr_hth_dodge" value="0" />
+                    <input class='combat-field' type="number" title="@{hth_dodge}" name="attr_hth_dodge" value="0" />
                     <h5>Mounted Damage</h5>
-                    <input class='combat-field' type="number" name="attr_hth_mounteddamage" value="0" />
+                    <input class='combat-field' type="number" title="@{hth_mounteddamage}" name="attr_hth_mounteddamage" value="0" />
                     <div class='space-holder'></div>
                     <h5>Charge Damage</h5>
-                    <input class='combat-field' type="number" name="attr_hth_chargedamage" value="0" />                    
+                    <input class='combat-field' type="number" title="@{hth_chargedamage}" name="attr_hth_chargedamage" value="0" />                    
                     <h5>Mounted Parry/Dodge</h5>
-                    <input class='combat-field' type="number" name="attr_hth_mountedparrydodge" value="0" />
+                    <input class='combat-field' type="number" title="@{hth_mountedparrydodge}" name="attr_hth_mountedparrydodge" value="0" />
                     <div class='space-holder'></div>
                     <h5>Disarm</h5>
-                    <input class='combat-field' type="number" name="attr_hth_disarm" value="0" />
+                    <input class='combat-field' type="number" title="@{hth_disarm}" name="attr_hth_disarm" value="0" />
                     <h5>Knockout/Stun</h5>
-                    <input class='combat-field' type="number" name="attr_hth_knockout" value="none" />
+                    <input class='combat-field' type="number" title="@{hth_knockout}" name="attr_hth_knockout" value="none" />
                     <div class='space-holder'></div>
                     <h5>Critical Strike</h5>
-                    <input class='combat-field' type="number" name="attr_hth_critical" value="20" />
+                    <input class='combat-field' type="number" title="@{hth_critical}" name="attr_hth_critical" value="20" />
                     <h5>Ranged Critical Strike</h5>
-                    <input class='combat-field' type="number" name="attr_hth_ranged_critical" value="20" />
+                    <input class='combat-field' type="number" title="@{hth_ranged_critical}" name="attr_hth_ranged_critical" value="20" />
                     <div class='space-holder'></div>
                     <div class='space-holder'></div>
                     <div class='space-holder'></div>
                     <h5>Physical Prowess Bonus</h5>
-                    <input class='bonus-field' type="text" value="" name="attr_pp_bonus" readonly>
+                    <input class='bonus-field' type="text" value="" title="@{pp_bonus}" name="attr_pp_bonus" readonly>
                     <div class='space-holder'></div>
                     <h5>Physical Strength Bonus</h5>
-                    <input class='bonus-field' type="text" value="" name="attr_ps_bonus" readonly>
+                    <input class='bonus-field' type="text" value="" title="@{ps_bonus}" name="attr_ps_bonus" readonly>
                 </div>
             </div>
         </div>
@@ -614,19 +627,19 @@
                     <input class='save-field' type="number" value="0" name="attr_save_comadeath" />
                     
                     <h5>PE Save Bonus</h5>
-                    <input class='bonus-field' type="text" value="" name="attr_pe_magpois" readonly>
+                    <input class='bonus-field' type="text" value="" title="@{pe_magpois}" name="attr_pe_magpois" readonly>
                     <div class='space-holder'></div>
                     <div class='space-holder'></div>
                     <h5>ME Psionic Bonus</h5>
-                    <input class='bonus-field' type="text" value="" name="attr_me_psionic" readonly>
+                    <input class='bonus-field' type="text" value="" title="@{me_psionic}" name="attr_me_psionic" readonly>
                     <div class='space-holder'></div>
                     
                     <h5>PE Coma/Death Bonus</h5>
-                    <input class='bonus-field' type="text" value="" name="attr_pe_coma" readonly>
+                    <input class='bonus-field' type="text" value="" title="@{pe_coma}" name="attr_pe_coma" readonly>
                     <div class='space-holder'></div>
                     <div class='space-holder'></div>
                     <h5>ME Insanity Bonus</h5>
-                    <input class='bonus-field' type="text" value="" name="attr_me_insanity" readonly>
+                    <input class='bonus-field' type="text" value="" title="@{me_insanity}" name="attr_me_insanity" readonly>
                     <div class='space-holder'></div>
                 </div>
             </div>
@@ -821,6 +834,8 @@
         <h1>Sheet Version: 1.0</h1>
         <h5>Recent Changes:</h5>
         <ul>
+	    <li>Toggles have been added for the mounted parry/dodge, damage, and charge damage to be included in the melee attack macros.</li>
+	    <li>The parry/dodge toggle will add the mounted dodge bonus to the dodge roll button macro, so no more query when dodging.</li>
             <li>The sheet tabs have been altered to run on sheetworkers.</li>
             <li>The repeating attack entries on the statistics tab are now all text instead of number to allow entry of attributes instead of only numbers.  
             This allows the use of repeating section attributes to pull numbers from the weapon proficiencies on the combat tab.</li>
@@ -841,9 +856,6 @@
             setAttrs({ sheetTab: radioval });
             if (radioval === "7") {
                 setAttrs({ newcontent: "read" });
-            }
-            if (radioval === "8") {
-                setAttrs({ newdocumentation: "read" });
             }
         });
     });
@@ -873,22 +885,22 @@
         });
     });
     function maMod(score) {
-    	let bonus = 0;
-    	if (score >= 30) bonus = 97;
-    	else if (score >= 29) bonus = 96;
-    	else if (score >= 28) bonus = 94;
-    	else if (score >= 27) bonus = 92;
-    	else if (score >= 26) bonus = 88;
-    	else if (score >= 25) bonus = 84;
-    	else if (score >= 16) bonus = Math.floor(score-8)*5;
-    	return bonus;
+        let bonus = 0;
+        if (score >= 30) bonus = 97;
+        else if (score >= 29) bonus = 96;
+        else if (score >= 28) bonus = 94;
+        else if (score >= 27) bonus = 92;
+        else if (score >= 26) bonus = 88;
+        else if (score >= 25) bonus = 84;
+        else if (score >= 16) bonus = Math.floor(score-8)*5;
+        return bonus;
    }; 
-	on("change:ma sheet:opened", function () {
+    on("change:ma sheet:opened", function () {
         getAttrs(['ma'], function (values) {
             let ma = parseInt(values['ma'])||0;
             let invoke_trust = maMod(ma);
             setAttrs({                            
-            	invoke_trust: invoke_trust
+                invoke_trust: invoke_trust
             });
         });
     });
@@ -907,16 +919,16 @@
             });
     });
     function ppMod(score) {
-    	let bonus = 0;
-    	if (score >= 16) bonus = Math.round((score-15)*.5);
-    	return bonus;
+        let bonus = 0;
+        if (score >= 16) bonus = Math.round((score-15)*.5);
+        return bonus;
    }; 
-	on("change:pp sheet:opened", function () {
+    on("change:pp sheet:opened", function () {
         getAttrs(['pp'], function (values) {
             let pp = parseInt(values['pp'])||0;
             let pp_bonus = ppMod(pp);
             setAttrs({                            
-            	pp_bonus: pp_bonus
+                pp_bonus: pp_bonus
             });
         });
     });    
@@ -939,18 +951,18 @@
         });
     }); 
     function pbMod(score) {
-    	let bonus = 0;
-    	if (score >= 30) bonus = 92;
-    	else if (score >= 27) bonus = (score *3) +3;
-    	else if (score >= 16) bonus = Math.floor(score-10)*5;
-    	return bonus;
+        let bonus = 0;
+        if (score >= 30) bonus = 92;
+        else if (score >= 27) bonus = (score *3) +3;
+        else if (score >= 16) bonus = Math.floor(score-10)*5;
+        return bonus;
    }; 
-	on("change:pb sheet:opened", function () {
+    on("change:pb sheet:opened", function () {
         getAttrs(['pb'], function (values) {
             let pb = parseInt(values['pb'])||0;
             let charm_impress = pbMod(pb);
             setAttrs({                            
-            	charm_impress: charm_impress
+                charm_impress: charm_impress
             });
         });
     }); 
@@ -965,7 +977,7 @@
             });
         });
     }); 
-	on("change:spd change:hth_numberattacks sheet:opened", function () {
+    on("change:spd change:hth_numberattacks sheet:opened", function () {
         getAttrs(['spd','hth_numberattacks'], function (values) {
             const spd = parseInt(values['spd'])||0;
             const hth_numberattacks = parseInt(values['hth_numberattacks'])||0;
@@ -989,19 +1001,19 @@
         });
     };
     on('change:repeating_weapon remove:repeating_weapon', function() {
-	    repeatingSum("total_weapon","weapon",["weapon_weight","weapon_count"]);
+        repeatingSum("total_weapon","weapon",["weapon_weight","weapon_count"]);
     });
     on('change:repeating_armor remove:repeating_armor', function() {
-	    repeatingSum("total_armor","armor",["armor_weight","armor_count"]);
+        repeatingSum("total_armor","armor",["armor_weight","armor_count"]);
     });
     on('change:repeating_gear remove:repeating_gear', function() {
-	    repeatingSum("total_gear","gear",["gear_weight","gear_count"]);
+        repeatingSum("total_gear","gear",["gear_weight","gear_count"]);
     });
     on('change:repeating_consumables remove:repeating_consumables', function() {
-	    repeatingSum("total_consumables","consumables",["consumables_weight","consumables_count"]);
+        repeatingSum("total_consumables","consumables",["consumables_weight","consumables_count"]);
     });
     on('change:repeating_wealth remove:repeating_wealth', function() {
-	    repeatingSum("total_wealth","wealth",["wealth_weight","wealth_count"]);
+        repeatingSum("total_wealth","wealth",["wealth_weight","wealth_count"]);
     });
     on("change:total_weapon change:total_armor change:total_gear change:total_consumables change:total_wealth", function () {
         getAttrs(['total_weapon','total_armor','total_gear','total_consumables','total_wealth'], function (values) {
