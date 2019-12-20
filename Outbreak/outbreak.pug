@@ -68,20 +68,61 @@ include src/pug/_mixins.pug
 
 					h2(data-i18n='Trained Skills') Trained Skills
 					.skill-column
-						each val,key in {'Bow':['perception', 'strenght'], 'Calm Other':['empathy', 'willpower'], 'Persuade':['empathy', 'willpower'], 'Barter':['empathy', 'willpower'], 'Command':['empathy', 'willpower'], 'Detect Motives':['empathy', 'willpower'], 'Intimidate':['empathy', 'willpower'], 'Digital Systems':['perception', 'willpower'], 'Pistol':['perception', 'willpower'], 'Long Gun':['perception', 'willpower'], 'First Aid':['perception', 'willpower'], 'Blunt':['strength', 'willpower'], 'Pierce':['strength', 'willpower'], 'Slash':['strength', 'willpower'], 'Navigation':['perception', 'willpower'], 'Swim':['strength', 'willpower'], 'Throw':['perception', 'strength']}
+						each val,key in {'Bow':['perception', 'strenght'], 'Calm Other':['empathy', 'willpower'], 'Persuade':['empathy', 'willpower'], 'Barter':['empathy', 'willpower'], 'Command':['empathy', 'willpower'], 'Detect Motives':['empathy', 'willpower'], 'Intimidate':['empathy', 'willpower'], 'Digital Systems':['perception', 'willpower']}
+							+skillList(key, val[0], val[1])
+					.skill-column
+						each val,key in {'Pistol':['perception', 'willpower'], 'Long Gun':['perception', 'willpower'], 'First Aid':['perception', 'willpower'], 'Blunt':['strength', 'willpower'], 'Pierce':['strength', 'willpower'], 'Slash':['strength', 'willpower'], 'Navigation':['perception', 'willpower'], 'Swim':['strength', 'willpower'], 'Throw':['perception', 'strength']}
 							+skillList(key, val[0], val[1])
 
 					h2(data-i18n='Expert Skills') Expert Skills
 					.skill-column
-						each val, key in {'Adv Medicine':['perception', 'willpower'], 'Construct Engineer':['perception', 'willpower'], 'Martial Arts':['strength', 'perception'], 'Pilot':['perception', 'willpower'], 'Ride': ['empathy', 'willpower'], 'Science':['perception', 'willpower'], 'Survival':['perception', 'willpower'], 'Toughness':['strength', 'willpower']}
+						each val, key in {'Adv Medicine':['perception', 'willpower'], 'Construct Engineer':['perception', 'willpower'], 'Martial Arts':['strength', 'perception'], 'Pilot':['perception', 'willpower']}
 							+skillList(key, val[0], val[1])
+					.skill-column
+						each val, key in {'Ride': ['empathy', 'willpower'], 'Science':['perception', 'willpower'], 'Survival':['perception', 'willpower'], 'Toughness':['strength', 'willpower']}
+							+skillList(key, val[0], val[1])
+					.skill-column.repeating-container
+						.fieldset(class='repeating_skills')
+							input(name=`attr_button_base` type='hidden' value=`[[(?{Gear Or Kit| None, 0 | Archery, @{ArchTv}+@{${primaryAttribute}_bonus}|Athletic Gear, @{AthlTv}+@{${primaryAttribute}_bonus}|Bludgeon, @{BludTv}+@{${primaryAttribute}_bonus}|Climbing Gear, @{ClimTv}+@{${primaryAttribute}_bonus}|Command Apparatus, @{CommTv}+@{${primaryAttribute}_bonus}|Firefighting, @{FireTv}+@{${primaryAttribute}_bonus}|First Aid Kit, @{FirsTv}+@{${primaryAttribute}_bonus}|Long Gun, @{LngGnTv}+@{${primaryAttribute}_bonus}|Martial Arts, @{MtlArtTv}+@{${primaryAttribute}_bonus}|Medical Gear, @{MediTv}+@{${primaryAttribute}_bonus}|Piercing, @{PierTv}+@{${primaryAttribute}_bonus}|Pistol, @{PistTv}+@{${primaryAttribute}_bonus}|Recon Gear, @{RecoTv}+@{${primaryAttribute}_bonus}|Slashing, @{SlashTv}+@{${primaryAttribute}_bonus}|Survival Kit, @{SurvTv}+@{${primaryAttribute}_bonus}|Swimming/Diving, @{SwimTv}+@{${primaryAttribute}_bonus}|Throwing, @{ThrowTv}+@{${primaryAttribute}_bonus}|Tools, @{ToolTv}+@{${primaryAttribute}_bonus}|Value, @{ValuTv}+@{${primaryAttribute}_bonus}|Vehicles, @{VehiTv}+@{${primaryAttribute}_bonus}})*?{Multiplier|1|2|3|4|5}]]`)
+
+							input(name=`attr_attributes` type='hidden' value=`(@{${primaryAttribute}}+@{${secondaryAttribute}_bonus})`)
+							input(name=`attr_total` type='hidden' value=`(@{skill} [Skill]+@{button_base} [Kit])`)
+
+							button(name=`roll_${skill}` type='roll' value=`&{template:ou} {{name=@{character_name}}} {{roll_name=@{skill}}} {{attr=@{skill}}} {{Target1=[[@{total}]]}} {{Target2=[[@{total}+1]]}} {{skill=VS.}} {{Diff=@{dpDiff}}} {{Spd1=@{dpSpeed}}} {{Dmg=@{dpDmg}}} {{Deplet=@{dpDeplet}}} {{DieDif=@{DiffDie}}} {{DieSpd=@{SpeedDie}}} {{DieDmg=@{DmgDie}}} {{DieDep=@{DepletDie}}} {{result=[[1d100+@{dpDiff} [Diff]]]}} {{dos1=[[@{total}-19]]}} {{dos2a=[[@{total}-20]]}} {{dos2b=[[@{total}-29]]}} {{dos3a=[[@{total}-30]]}} {{dos3b=[[@{total}-39]]}} {{dos4a=[[@{total}-40]]}} {{dos4b=[[@{total}-49]]}} {{dof1=[[@{total}+19]]}} {{dof2a=[[@{total}+20]]}} {{dof2b=[[@{total}+29]]}} {{dof3a=[[@{total}+30]]}} {{dof3b=[[@{total}+39]]}} {{dof4a=[[@{total}+40]]}} {{dof4b=[[@{total}+49]]}}`) 
+								span(name=`attr_skill`)
+							label
+								input.center(name=`attr_advancement` title=`attr_advancement` type='number' value='0')
+							label
+								input.center(name=`attr_skill` title=`attr_skill` type='number' value=`[[@{attributes}+@{advancement}]]` disabled='true')
+
 
 
 		.column
 			.grid.box.logo
 				img(alt='Outbreak Character Sheet', src='https://i.imgur.com/css0cBR.png')
 					
-			.grid.box
+			.grid.box.dice-box
+				button(data-i18n='Dice Pool' name='roll_Pool' type='roll' value='&{template:ou-small} {{Diff=@{dpDiff}}} {{Spd1=@{dpSpeed}}} {{Dmg=@{dpDmg}}} {{Deplet=@{dpDeplet}}} {{DieDif=@{DiffDie}}} {{DieSpd=@{SpeedDie}}} {{DieDmg=@{DmgDie}}} {{DieDep=@{DepletDie}}}')
+
+				.die
+					<img class="dieimg" src="https://i.imgur.com/lum5jcz.jpg">
+					select(name='attr_difficulty_dice')
+						- let n = 0;
+						while n < 6
+							option(data-i18n=n value=`[[${n}d6!p]]`) #{n}
+							- n++
+
+				.die
+					img.dieimg(src='https://i.imgur.com/QIhFKV7.jpg' title="Speed Dice")
+					+diceSelect('speed')
+
+				.die
+					img.dieimg(src='https://i.imgur.com/EkBzVOm.jpg' title="Damage Dice")
+					+diceSelect('damage')
+
+				.die
+					img.dieimg(src='https://i.imgur.com/JyxTN3O.jpg' title="Depletion Dice" border="1")
+					+diceSelect('depletion')
 
 	.equipment.tab
 
