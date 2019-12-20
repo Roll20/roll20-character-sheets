@@ -44,9 +44,9 @@ include src/pug/_mixins.pug
 					each val in ['Survival', 'Gestalt', 'Competance']
 						-const name = val.toLowerCase();
 						if val === 'Gestalt'
-							h2.yellow-header(data-i18n=`${val} Level:`) #{val} Level:
+							h3.yellow-header(data-i18n=`${val} Level:`) #{val} Level:
 						else
-							h2.green-header(data-i18n=`${val} Points:`) #{val} Points:
+							h3.green-header(data-i18n=`${val} Points:`) #{val} Points:
 						label
 							input.points(name=`attr_${name}` title=`@{${name}}` value='0' type='text')
 
@@ -88,7 +88,7 @@ include src/pug/_mixins.pug
 							input(name=`attr_attributes` type='hidden' value=`(@{${primaryAttribute}}+@{${secondaryAttribute}_bonus})`)
 							input(name=`attr_total` type='hidden' value=`(@{skill} [Skill]+@{button_base} [Kit])`)
 
-							button(name=`roll_${skill}` type='roll' value=`&{template:ou} {{name=@{character_name}}} {{roll_name=@{skill}}} {{attr=@{skill}}} {{Target1=[[@{total}]]}} {{Target2=[[@{total}+1]]}} {{skill=VS.}} {{Diff=@{dpDiff}}} {{Spd1=@{dpSpeed}}} {{Dmg=@{dpDmg}}} {{Deplet=@{dpDeplet}}} {{DieDif=@{DiffDie}}} {{DieSpd=@{SpeedDie}}} {{DieDmg=@{DmgDie}}} {{DieDep=@{DepletDie}}} {{result=[[1d100+@{dpDiff} [Diff]]]}} {{dos1=[[@{total}-19]]}} {{dos2a=[[@{total}-20]]}} {{dos2b=[[@{total}-29]]}} {{dos3a=[[@{total}-30]]}} {{dos3b=[[@{total}-39]]}} {{dos4a=[[@{total}-40]]}} {{dos4b=[[@{total}-49]]}} {{dof1=[[@{total}+19]]}} {{dof2a=[[@{total}+20]]}} {{dof2b=[[@{total}+29]]}} {{dof3a=[[@{total}+30]]}} {{dof3b=[[@{total}+39]]}} {{dof4a=[[@{total}+40]]}} {{dof4b=[[@{total}+49]]}}`) 
+							button(name=`roll_${skill}` type='roll' value=`&{template:ou} {{name=@{character_name}}} {{roll_name=@{skill}}} {{attr=@{skill}}} {{Target1=[[@{total}]]}} {{Target2=[[@{total}+1]]}} {{skill=VS.}} {{Diff=@{difficulty_dice}}} {{Spd1=@{speed_dice}}} {{Dmg=@{damage_dice}}} {{Deplet=@{depletion_dice}}} {{DieDif=@{difficulty_die}}} {{DieSpd=@{speed_die}}} {{DieDmg=@{damage_die}}} {{DieDep=@{depletion_die}}} {{result=[[1d100+@{difficulty_dice} [Diff]]]}} {{dos1=[[@{total}-19]]}} {{dos2a=[[@{total}-20]]}} {{dos2b=[[@{total}-29]]}} {{dos3a=[[@{total}-30]]}} {{dos3b=[[@{total}-39]]}} {{dos4a=[[@{total}-40]]}} {{dos4b=[[@{total}-49]]}} {{dof1=[[@{total}+19]]}} {{dof2a=[[@{total}+20]]}} {{dof2b=[[@{total}+29]]}} {{dof3a=[[@{total}+30]]}} {{dof3b=[[@{total}+39]]}} {{dof4a=[[@{total}+40]]}} {{dof4b=[[@{total}+49]]}}`) 
 								span(name=`attr_skill`)
 							label
 								input.center(name=`attr_advancement` title=`attr_advancement` type='number' value='0')
@@ -102,10 +102,10 @@ include src/pug/_mixins.pug
 				img(alt='Outbreak Character Sheet', src='https://i.imgur.com/css0cBR.png')
 					
 			.grid.box.dice-box
-				button(data-i18n='Dice Pool' name='roll_Pool' type='roll' value='&{template:ou-small} {{Diff=@{dpDiff}}} {{Spd1=@{dpSpeed}}} {{Dmg=@{dpDmg}}} {{Deplet=@{dpDeplet}}} {{DieDif=@{DiffDie}}} {{DieSpd=@{SpeedDie}}} {{DieDmg=@{DmgDie}}} {{DieDep=@{DepletDie}}}')
+				button(data-i18n='Dice Pool' name='roll_Pool' type='roll' value='&{template:ou-small} {{Diff=@{difficulty_dice}}} {{Spd1=@{speed_dice}}} {{Dmg=@{damage_dice}}} {{Deplet=@{depletion_dice}}} {{DieDif=@{difficulty_die}}} {{DieSpd=@{speed_die}}} {{DieDmg=@{damage_die}}} {{DieDep=@{depletion_die}}}')
 
 				.die
-					<img class="dieimg" src="https://i.imgur.com/lum5jcz.jpg">
+					img(src="https://i.imgur.com/lum5jcz.jpg" title='Difficult Dice')
 					select(name='attr_difficulty_dice')
 						- let n = 0;
 						while n < 6
@@ -113,16 +113,50 @@ include src/pug/_mixins.pug
 							- n++
 
 				.die
-					img.dieimg(src='https://i.imgur.com/QIhFKV7.jpg' title="Speed Dice")
+					img(src='https://i.imgur.com/QIhFKV7.jpg' title="Speed Dice")
 					+diceSelect('speed')
 
 				.die
-					img.dieimg(src='https://i.imgur.com/EkBzVOm.jpg' title="Damage Dice")
+					img(src='https://i.imgur.com/EkBzVOm.jpg' title="Damage Dice")
 					+diceSelect('damage')
 
 				.die
-					img.dieimg(src='https://i.imgur.com/JyxTN3O.jpg' title="Depletion Dice" border="1")
+					img(src='https://i.imgur.com/JyxTN3O.jpg' title="Depletion Dice" border="1")
 					+diceSelect('depletion')
+
+				each val in ['difficulty', 'speed', 'damage', 'depletion']
+					.die
+						+dieRadios(val)
+
+			.grid.box.health
+				.grid.vitality
+					h1.green-header(data-i18n='Vitality') Vitality
+					.grid.header
+						h2(data-i18n='Injuries') Injuries
+						h2(data-i18n='Damage Threshold') Damage Threshold
+					.grid.body
+						h3(data-i18n='Health Points')
+						.grid.injuries
+							- let i = 0;
+							while i < 5
+								- i++
+								input(name=`attr_injury_${i}` type='checkbox')
+								input(name=`attr_injury_${i}_details` type='text' value='')
+						.grid.damage-threshold
+							.row
+								h3(data-i18n='Sb + Wb') Sb + Wb
+								input(name='attr_damage_treshold_base' type="number" value="(@{strength_bonus}+@{willpower_bonus})" disabled="true")
+							.row
+								h3(data-i18n='Bonus') Bonus
+								input(name='attr_damage_threshold_bonus' type='number' value='')
+							.row
+								h3(data-i18n='Total') Total
+								input(name='attr_damage_threshold' type='number' value='(@{strength_bonus}+@{willpower_bonus}+@{damage_threshold_bonus})' disabled="true")
+
+				h1.yellow-header(data-i18n='Viral') Viral
+
+				h1.yellow-header(data-i18n='Psyche') Psyche
+
 
 	.equipment.tab
 
