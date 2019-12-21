@@ -24,6 +24,7 @@
 					<li>General tab. Change layout for Turning and Deceleration table and fixed some bugs in the process.</li>
 					<li>Combat tab. Added Demolition combat tool. Code provided by Savage. Thank you Savage!</li>
 					<li>Combat tab - Thrown Object tool. Thrust damage was not updating correctly when thrust damage changed.</li>
+					<li>General tab. Added whisper to GM option for Perception roll.</li>
 					<li>See Updates tab for more detailed information.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
@@ -153,16 +154,20 @@
 				</div>
 				<div class="sheet-row sheet-row-perception sheet-hr">
 					<div class="sheet-cell sheet-col0 sheet-label">
-						<div class="sheet-popup">Per</div>
-						<span class="sheet-tooltip">
-							Perception
-							<br />
-							Based on Intelligence
-							<br />
-							5pts/level
-							<br />
-							Unmodified: <span name="attr_perception_base"></span>
-						</span>
+					    <div class="whisper-box">
+					        <div class="whisper-checkbox">
+					            <input type="checkbox" name="attr_whisper_perception" value="/w gm " class="sheet-boolean" title="Check to whisper perception roll to GM. Macro name: whisper_perception">
+						    </div>
+						    <div class="whisper-title">
+						        <div class="sheet-popup">Per</div>
+        						<span class="sheet-tooltip">
+        							Perception: Based on Intelligence<br />
+        							5pts/level<br />
+        							Check the box to whisper perception roll to GM.<br />
+        							Unmodified: <span name="attr_perception_base"></span>
+        						</span>    
+						    </div>
+						</div>
 					</div>
 					<div class="sheet-cell sheet-col1">
 						<input type="number" name="attr_perception" value="10" readonly="readonly" title="Macro name: perception" />
@@ -174,7 +179,7 @@
 						<input type="number" name="attr_perception_points" value="0" step="5" title="Macro name: perception_points" />
 					</div>
 					<div class="sheet-cell sheet-col4">
-						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Perception Roll}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{perception} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsPer" />
+						<button type="roll" value="@{whisper_perception}&@{roll}&{template:skillRoll} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Perception Roll}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{perception} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsPer" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-sub-row sheet-row-vision">
@@ -4582,6 +4587,7 @@
 		<li>Combat tab - Thrown Object tool. Thrust damage was not updating correctly when thrust damage changed.</li>
 		<li>Inventory tab - Grand Total Weight. Changed to use <b>on</b> change event.</li>
 		<li>General tab - Custom Pools section. Added some height to Current text box so underline is visible.</li>
+		<li>General tab. Added whisper to GM option for Perception roll.</li>
 	</ul>
 	
 	<h4>Vesion: 1.7.2</h4>
@@ -10999,11 +11005,7 @@ Skull Damage x4
     
     on("change:total_value change:total_weight", function(event) {
         
-        console.log("change:total_value change:total_weight");
-        
         getAttrs(["weight", "total_weight"], function (values) {
-            
-            console.log(values);
             
             var characterWeight = 0;
             
@@ -11034,8 +11036,6 @@ Skull Damage x4
             
             // make sure it's a number again
             grandTotalWeight = +grandTotalWeight;    
-            
-            console.log("grandTotalWeight", grandTotalWeight);
             
             // conver to string to remove trailing zeros
             setAttrs({
