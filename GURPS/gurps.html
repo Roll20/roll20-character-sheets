@@ -4236,7 +4236,7 @@
 						</div>
 					</div>
 					<div class="sheet-cell sheet-col6">
-						<input type="number" style="font-weight: bold; text-align: center;" step=".001" name="attr_grand_total_weight" value="@{weight} + @{total_weight}" disabled="disabled" title="Macro name: grand_total_weight" />
+						<input type="number" style="font-weight: bold; text-align: center;" step=".001" name="attr_grand_total_weight" value="0" readonly="readonly" title="Macro name: grand_total_weight" />
 
 					</div>					
 				</div> <!-- .sheet-row -->
@@ -4579,6 +4579,7 @@
 		<li>Combat tab. Added Demolition combat tool. Code provided by Savage. Thank you Savage!</li>
 		<li>General tab. Change Thrust and Swing damage to use formula instead of a lookup table that stops at ST 100.</li>
 		<li>Combat tab - Thrown Object tool. Thrust damage was not updating correctly when thrust damage changed.</li>
+		<li>Inventory tab - Grand Total Weight. Changed to use <b>on</b> change event.</li>
 	</ul>
 	
 	<h4>Vesion: 1.7.2</h4>
@@ -10990,6 +10991,55 @@ Skull Damage x4
             demo_how_big_type: "TNT",
             demo_how_big_ref: 1.0,
             demo_how_big_weight: 1
+        });
+        
+    });
+    
+    on("change:total_value change:total_weight", function(event) {
+        
+        console.log("change:total_value change:total_weight");
+        
+        getAttrs(["weight", "total_weight"], function (values) {
+            
+            console.log(values);
+            
+            var characterWeight = 0;
+            
+            var carriedWeight = +values.total_weight;
+            
+            var grandTotalWeight = 0;
+            
+            // if someone entered a text for character weight.
+            // then set value to zero
+            if ( isNaN(+values.weight) ) {
+                
+                characterWeight = 0;
+                
+            } else {
+                
+                // else it's a number, we can convert
+                characterWeight = +values.weight;
+                
+            }
+            
+            grandTotalWeight = characterWeight + carriedWeight;
+            
+            // round to three decimal places
+            grandTotalWeight =  Math.round( grandTotalWeight * 1000) / 1000;
+            
+            // remove trailing zeros
+            grandTotalWeight = grandTotalWeight.toString(); 
+            
+            // make sure it's a number again
+            grandTotalWeight = +grandTotalWeight;    
+            
+            console.log("grandTotalWeight", grandTotalWeight);
+            
+            // conver to string to remove trailing zeros
+            setAttrs({
+                grand_total_weight: grandTotalWeight
+            });
+            
         });
         
     });
