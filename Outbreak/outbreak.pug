@@ -31,7 +31,7 @@ include src/pug/_mixins.pug
 						-const name = val.toLowerCase();
 						.grid.attributes
 							img(alt=`${val}` src=`https://raw.githubusercontent.com/clevett/roll20-character-sheets/outbreakv1/Outbreak/src/img/OU_Attributes_${val}_40x40.png`)
-							h3(data-i18n=val) #{val}${name}
+							h3(data-i18n=val) #{val}
 							.grid
 								input(name=`attr_${name}` type='hidden' value=`[[(@{${name}_bonus}*10)+@{${name}_base}]]`)
 								label
@@ -81,21 +81,34 @@ include src/pug/_mixins.pug
 					.skill-column
 						each val, key in {'Ride': ['empathy', 'willpower'], 'Science':['perception', 'willpower'], 'Survival':['perception', 'willpower'], 'Toughness':['strength', 'willpower']}
 							+skillList(key, val[0], val[1])
-					.skill-column.repeating-container
-						.fieldset(class='repeating_skills')
-							input(name=`attr_button_base` type='hidden' value=`[[[(?{Gear Or Kit| None, 0 | Archery, @{archery_gear}+@{${primaryAttribute}_bonus}|Athletic Gear, @{athletic_gear}+@{${primaryAttribute}_bonus}|Bludgeon, @{bludgeoning}+@{${primaryAttribute}_bonus}|Climbing Gear, @{climbing_gear}+@{${primaryAttribute}_bonus}|Command Apparatus, @{command_app}+@{${primaryAttribute}_bonus}|Firefighting, @{firefighting}+@{${primaryAttribute}_bonus}|First Aid Kit, @{first_aid_kits}+@{${primaryAttribute}_bonus}|Long Gun, @{long_gun}+@{${primaryAttribute}_bonus}|Martial Arts, @{martial_arts}+@{${primaryAttribute}_bonus}|Medical Gear, @{medical_gear}+@{${primaryAttribute}_bonus}|Piercing, @{piercing}+@{${primaryAttribute}_bonus}|Pistol, @{pistol}+@{${primaryAttribute}_bonus}|Recon Gear, @{recon_gear}+@{${primaryAttribute}_bonus}|Slashing, @{slashing}+@{${primaryAttribute}_bonus}|Survival Kit, @{survival_kit}+@{${primaryAttribute}_bonus}|Swimming/Diving, @{swimming_diving}+@{${primaryAttribute}_bonus}|Throwing, @{throwing}+@{${primaryAttribute}_bonus}|Tools, @{tools}+@{${primaryAttribute}_bonus}|Value, @{value}+@{${primaryAttribute}_bonus}|Vehicles, @{vehicles}+@{${primaryAttribute}_bonus}})*?{Multiplier|1|2|3|4|5}]]`)
+					.grid.repeating-container
+						each val in ['Specalizations', 'Attr', 'Bonus', 'Adv', 'Skill', 'Roll',]
+							h3(data-i18n=val) #{val}
+						fieldset(class='repeating_skills')
+							input(name=`attr_button_base` type='hidden' value=`[[(?{Gear Or Kit| None, 0 | Archery, @{archery_gear}+@{attribute_bonus}|Athletic Gear, @{athletic_gear}+@{attribute_bonus}|Bludgeon, @{bludgeoning}+@{attribute_bonus}|Climbing Gear, @{climbing_gear}+@{attribute_bonus}|Command Apparatus, @{command_app}+@{attribute_bonus}|Firefighting, @{firefighting}+@{attribute_bonus}|First Aid Kit, @{first_aid_kits}+@{attribute_bonus}|Long Gun, @{long_gun}+@{attribute_bonus}|Martial Arts, @{martial_arts}+@{attribute_bonus}|Medical Gear, @{medical_gear}+@{attribute_bonus}|Piercing, @{piercing}+@{attribute_bonus}|Pistol, @{pistol}+@{attribute_bonus}|Recon Gear, @{recon_gear}+@{attribute_bonus}|Slashing, @{slashing}+@{attribute_bonus}|Survival Kit, @{survival_kit}+@{attribute_bonus}|Swimming/Diving, @{swimming_diving}+@{attribute_bonus}|Throwing, @{throwing}+@{attribute_bonus}|Tools, @{tools}+@{attribute_bonus}|Value, @{value}+@{attribute_bonus}|Vehicles, @{vehicles}+@{attribute_bonus}})*?{Multiplier|1|2|3|4|5}]]`)
 
-							input(name=`attr_attributes` type='hidden' value=`(@{${primaryAttribute}}+@{${secondaryAttribute}_bonus})`)
 							input(name=`attr_total` type='hidden' value=`(@{skill} [Skill]+@{button_base} [Kit])`)
+							input(name=`attr_skill_name` type='text' value=``)
 
-							button(name=`roll_${skill}` type='roll' value=`&{template:ou} {{name=@{character_name}}} {{roll_name=@{skill}}} {{attr=@{skill}}} {{Target1=[[@{total}]]}} {{Target2=[[@{total}+1]]}} {{skill=VS.}} {{Diff=@{difficulty_dice}}} {{Spd1=@{speed_dice}}} {{Dmg=@{damage_dice}}} {{Deplet=@{depletion_dice}}} {{DieDif=@{difficulty_die}}} {{DieSpd=@{speed_die}}} {{DieDmg=@{damage_die}}} {{DieDep=@{depletion_die}}} {{result=[[1d100+@{difficulty_dice} [Diff]]]}} {{dos1=[[@{total}-19]]}} {{dos2a=[[@{total}-20]]}} {{dos2b=[[@{total}-29]]}} {{dos3a=[[@{total}-30]]}} {{dos3b=[[@{total}-39]]}} {{dos4a=[[@{total}-40]]}} {{dos4b=[[@{total}-49]]}} {{dof1=[[@{total}+19]]}} {{dof2a=[[@{total}+20]]}} {{dof2b=[[@{total}+29]]}} {{dof3a=[[@{total}+30]]}} {{dof3b=[[@{total}+39]]}} {{dof4a=[[@{total}+40]]}} {{dof4b=[[@{total}+49]]}}`) 
+							select(name='attr_attribute_base' value='@{perception}')
+								option(value='@{strength}') strength
+								option(value='@{perception}' selected) perception
+								option(value='@{empathy}') empathy
+								option(value='@{willpower}') willpower
+
+							select(name='attr_attribute_bonus' value='@{willpower_bonus}')
+								option(value='@{strength_bonus}') strength
+								option(value='@{perception_bonus}') perception
+								option(value='@{empathy_bonus}') empathy
+								option(value='@{willpower_bonus}' selected) willpower
+
+							label
+								input.center(name=`attr_advancement` type='number' value='0')
+							label
+								input.center(name=`attr_skill` type='hidden' value=`0`)
 								span(name=`attr_skill`)
-							label
-								input.center(name=`attr_advancement` title=`attr_advancement` type='number' value='0')
-							label
-								input.center(name=`attr_skill` title=`attr_skill` type='number' value=`[[@{attributes}+@{advancement}]]` disabled='true')
 
-
+							button.dicefontd10(name=`roll_name` type='roll' value!=`&{template:ou} {{name=@{character_name}}} {{roll_name=@{skill_name}}} {{attr=@{skill}}} {{Target1=[[@{total}]]}} {{Target2=[[@{total}+1]]}} {{skill=VS.}} {{Diff=@{difficulty_dice}}} {{Spd1=@{speed_dice}}} {{Dmg=@{damage_dice}}} {{Deplet=@{depletion_dice}}} {{DieDif=@{difficulty_die}}} {{DieSpd=@{speed_die}}} {{DieDmg=@{damage_die}}} {{DieDep=@{depletion_die}}} {{result=[[1d100+@{difficulty_dice} [Diff]]]}} {{dos1=[[@{total}-19]]}} {{dos2a=[[@{total}-20]]}} {{dos2b=[[@{total}-29]]}} {{dos3a=[[@{total}-30]]}} {{dos3b=[[@{total}-39]]}} {{dos4a=[[@{total}-40]]}} {{dos4b=[[@{total}-49]]}} {{dof1=[[@{total}+19]]}} {{dof2a=[[@{total}+20]]}} {{dof2b=[[@{total}+29]]}} {{dof3a=[[@{total}+30]]}} {{dof3b=[[@{total}+39]]}} {{dof4a=[[@{total}+40]]}} {{dof4b=[[@{total}+49]]}}`) t
 
 		.column
 			.grid.box.logo
@@ -203,3 +216,8 @@ include src/pug/_mixins.pug
 
 //- ROLL TEMPLATE
 include src/pug/rolltemplate.html
+
+
+//- SCRIPTS
+script(type="text/worker")
+	include src/js/scripts.js
