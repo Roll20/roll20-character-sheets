@@ -1,5 +1,6 @@
 <input type='hidden' name='attr_character_sheet' value='Savage Worlds Tabbed v3.89' />
 <script type="text/worker">
+ 
     /*----- Things I need to Care For -----
     -- o Option to ignore encumbrance    --
     -- o Add a Strain config so the      --
@@ -746,6 +747,14 @@
                 character_sheet: sheetVersionPrefix + sheetVersion
             });
         }
+        if (version < 3.10) {
+            console.log("**** Updating Sheet Version ****");
+            setAttrs({
+                newcontent: "unread",
+                newdocumentation: "unread",
+                character_sheet: sheetVersionPrefix + sheetVersion
+            });
+        }
 		else {
 	        console.log("!!! Sheet Already Upgraded !!!");
 	    }
@@ -1043,7 +1052,24 @@
       			          ripStatus: 0,
       			          useRippertech: 0});
       			console.log("<==Configuration complete==>");
-      		}
+            }
+            else if (setting.settingconfig === "15") {
+                console.log("<==Setting configuration for Interface Zero 3.0==>");
+                setAttrs({logo: 9,
+                          background: 7,
+                          izStrainThree: 'on',
+                          izStreetCredThree: 'on',
+                          '50fPo8Clams': 4,
+                          increasedfatigue: 1,
+                          augment: 'on',
+                          Lang: 'on',
+						  vehicle: 'on',
+						  flyingShip: 'on',
+						  groundVehicle: 'on',
+						  Walker: 'on'
+            });
+                console.log("<==Configuration complete==>");
+            }
       		else {
       			console.log("<==Nothing to see here...move along==>");
             }
@@ -1147,10 +1173,10 @@
 	});
 
 	//Display Derived Stats HR
-	on("change:useacademics change:tdsanity change:potsmfame change:ripreason change:ripstatus change:hfglory change:izfirewall change:dlgrit change:neuraltoughness change:corruption change:izstreetcred change:izstrain", function() {
-	    getAttrs(["useacademics","tdsanity","potsmFame","ripReason","ripStatus","hfGlory","izFirewall","DLGrit","neuraltoughness","Corruption","izStreetCred","izStrain"], function(v) {
+	on("change:useacademics change:tdsanity change:potsmfame change:ripreason change:ripstatus change:hfglory change:izfirewall change:dlgrit change:neuraltoughness change:corruption change:izstreetcred change:izstrain change:izstreetcredthree change:izstrainthree", function() {
+	    getAttrs(["useacademics","tdsanity","potsmFame","ripReason","ripStatus","hfGlory","izFirewall","DLGrit","neuraltoughness","Corruption","izStreetCred","izStrain","izStreetCredThree","izStrainTHree"], function(v) {
 	        console.log ("**********\nacademics:"+v.useacademics+"\nneuraltoughness:"+v.neuraltoughness+"\nCorruption:"+v.Corruption+"\npotsmFame:"+v.potsmFame+"\nizFirewall:"+v.izFirewall+"\nripReason:"+v.ripReason+"\nDLGrit:"+v.DLGrit+"\nhfGlory:"+v.hfGlory+"\ntdsanity:"+v.tdsanity+"\nripReason:"+v.ripReason+"\nizStrain:"+v.izStrain+"\nizStreetCred:"+v.izStreetCred+"\n**********");
-	        if(v.useacademics == "1" || v.useacademics == 'on' || v.tdsanity == 'on' || v.potsmFame == 'on' || v.ripReason == 'on' || v.ripStatus == 'on' || v.hfGlory == 'on' || v.izFirewall == 'on' || v.DLGrit == 'on' || v.neuraltoughness == 'on' || v.Corruption == 'on' || v.izStreetCred == 'on' || v.izStrain == 'on') {
+	        if(v.useacademics == "1" || v.useacademics == 'on' || v.tdsanity == 'on' || v.potsmFame == 'on' || v.ripReason == 'on' || v.ripStatus == 'on' || v.hfGlory == 'on' || v.izFirewall == 'on' || v.DLGrit == 'on' || v.neuraltoughness == 'on' || v.Corruption == 'on' || v.izStreetCred == 'on' || v.izStrain == 'on' || v.izStreetCredThree == 'on' || v.izStrainThree == 'on') {
 	            //then one of the custom derived stats is checked so display the <hr> tag
 	            setAttrs({showDerived: 1});
 	        }
@@ -1485,7 +1511,7 @@
 	}
 
 	// Calculate Strain
-	on('change:repeating_augmentation remove:repeating_augmentation change:izstrain',function(){
+	on('change:repeating_augmentation remove:repeating_augmentation change:izstrain change:izstrainthree',function(){
 		calcStrain();
 	});
 
@@ -3162,8 +3188,8 @@
         })
     });
 
-    const derivedstats = ["usecharisma","useacademics","Corruption","potsmFame","izFirewall","hfGlory","DLGrit","neuraltoughness","ripReason","tdsanity","ripStatus","izStrain","izStreetCred", "izStrainThree"];
-    const derivedlabels = ["Charisma","Academics","Corruption","Fame","Firewall","Glory","Grit","Neural Toughness","Reason","Sanity","Status","Strain","Street Cred", "Strain"];
+    const derivedstats = ["usecharisma","useacademics","Corruption","potsmFame","izFirewall","hfGlory","DLGrit","neuraltoughness","ripReason","tdsanity","ripStatus","izStrain","izStreetCred", "izStrainThree","izStreetCredThree"];
+    const derivedlabels = ["Charisma","Academics","Corruption","Fame","Firewall","Glory","Grit","Neural Toughness","Reason","Sanity","Status","Strain","Street Cred"];
     const derivedcurfields = ["@{charismaCur}","@{academicsCur}","@{corruptionCur}","@{fameCur}","@{FirewallCur}","@{gloryCur}","@{gritCur}","@{ntoughnesscur}","@{reasonCur}","@{sanityCur}","@{statusCur}","@{StrainCur}","@{StreetCredCur}"];
     const derivedStatBlock = function() {
         const toughnessstats = ["toughnessArmor","ntoughnessArmor"];
@@ -6148,7 +6174,7 @@
 							<!-- IZ 3.0 Strain -->
 							<input type="checkbox" class="sheet-useStrainThree" style="width: 15px; display: none;" name="attr_izStrainThree" />
     					    <div class="sheet-basederived sheet-StrainThree">
-								<div class="sheet-derivelabel" data-i18n="strain-three">Strain</div>
+								<div class="sheet-derivelabel" data-i18n="strain">Strain</div>
 								<div class="sheet-derivebase">
     					            <input type="number" name="attr_StrainThree" title="@{strainthree}">
     					        </div>
@@ -6163,7 +6189,7 @@
 							<!-- IZ 3.0 Street Cred-->
 							<input type="checkbox" class="sheet-useStreetCred" style="width: 15px; display: none;" name="attr_izStreetCredThree" />
 							<div class="sheet-basederived sheet-StreetCredThree">
-    					        <div class="sheet-derivelabel" data-i18n="street-cred-three">Street Cred</div>
+    					        <div class="sheet-derivelabel" data-i18n="street-cred">Street Cred</div>
     					        <div class="sheet-derivebase">
     					            <select name="attr_streetcredthree" title="@{StreetCredThree}" class="sheet-dtype" value="6">
     									<option value="4">d4</option>
@@ -8164,8 +8190,8 @@
     					<label class='sheet-quickItem'><input type='checkbox' name='attr_settingconfig' value='3' /> <span data-i18n="deadlands-reloaded">Deadlands Reloaded</span></label>
     					<label class='sheet-quickItem'><input type='checkbox' name='attr_settingconfig' value='4' /> <span data-i18n="east-texas-university">East Texas University</span></label>
     					<label class='sheet-quickItem'><input type='checkbox' name='attr_settingconfig' value='5' /> <span data-i18n="hellfrost">Hellfrost</span></label>
-    					<label class="sheet-quickItem"><input type='checkbox' name='attr_settingconfig' value='6' /> <span data-i18n="interface-zero">Interface Zero 2.0</span></label>
-						<label class="sheet-quickItem"><input type='checkbox' name='attr_settingconfig' value='15' /> <span data-i18n="interface-zero">Interface Zero 3.0</span></label>
+    					<label class="sheet-quickItem"><input type='checkbox' name='attr_settingconfig' value='6' /> <span data-i18n="interface-zero-20">Interface Zero 2.0</span></label>
+						<label class="sheet-quickItem"><input type='checkbox' name='attr_settingconfig' value='15' /> <span data-i18n="interface-zero-30">Interface Zero 3.0</span></label>
     					<label class="sheet-quickItem"><input type='checkbox' name='attr_settingconfig' value='7' /> <span data-i18n="lankhmar">Lankhmar</span></label>
     					<label class="sheet-quickItem"><input type='checkbox' name='attr_settingconfig' value='8' /> <span data-i18n="last-parsec">Last Parsec</span></label>
     					<label class="sheet-quickItem"><input type='checkbox' name='attr_settingconfig' value='9' /> <span data-i18n="low-life">Low Life</span></label>
@@ -8285,7 +8311,9 @@
     			        <!--Sanity--><label class="sheet-dsItem" data-i18n-title="sanity-text" title="Used to track a character's sanity. Useful for most Horroresque settings. This is a derived stat based on (Spirit/2)+2."><input type="checkbox" class="sheet-useSanity" name="attr_tdsanity" style="width: 15px;" /><span data-i18n="sanity">Sanity</span></label>
     			        <!--Status--><label class="sheet-dsItem" data-i18n-title="status-text" title="A reflection of ones position in society, and the esteem with which others regard the hero. This is used in Rippers."><input type="checkbox" class="sheet-useStatus" name="attr_ripStatus" style="width: 15px;" /><span data-i18n="status">Status</span></label>
     			        <!--Strain IZ 2.0--><label class="sheet-dsItem" data-i18n-title="strain-text" title="Used to measure how much strain a character is under due to augmentation from bioware. This field is useful for settings like Interface Zero 2.0 or other Cyberpunk settings."><input type="checkbox" class="sheet-useStrain" style="width: 15px;" name="attr_izStrain" /><span data-i18n="strain">Strain</span></label>
-    			        <!--Street Cred IZ 2.0--><label class="sheet-dsItem" data-i18n-title="street-cred-text" title="Used to measure a character's reputation on the streets. Base = 2 per Character Rank. This field is useful for settings like Interface Zero 2.0 or other Cyberpunk settings."><input type="checkbox" class="sheet-useStreetCred" style="width: 15px;" name="attr_izStreetCred" /><span data-i18n="street-cred">Street Cred</span></label>
+						<!--Street Cred IZ 2.0--><label class="sheet-dsItem" data-i18n-title="street-cred-text" title="Used to measure a character's reputation on the streets. Base = 2 per Character Rank. This field is useful for settings like Interface Zero 2.0 or other Cyberpunk settings."><input type="checkbox" class="sheet-useStreetCred" style="width: 15px;" name="attr_izStreetCred" /><span data-i18n="street-cred">Street Cred</span></label>
+						<!--Strain IZ 3.0--><label class="sheet-dsItem" data-i18n-title="strain-three-text" title="Used to measure how much strain a character is under due to augmentation from bioware, with the base equal to your vigor die. This field is for Interface Zero 3.0, where Strain is a flat value"><input type="checkbox" class="sheet-useStrain" style="width: 15px;" name="attr_izStrainThree" /><span data-i18n="strain">Strain</span></label>
+    			        <!--Street Cred IZ 3.0--><label class="sheet-dsItem" data-i18n-title="street-cred-three-text" title="Used to measure a character's general reputation and credibility. This field is a die to work with Interface Zero 3.0"><input type="checkbox" class="sheet-useStreetCred" style="width: 15px;" name="attr_izStreetCredThree" /><span data-i18n="street-cred">Street Cred</span></label>
     			    </div>
     			</div>
     			<div class='sheet-configSection'>
