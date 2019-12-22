@@ -27,7 +27,7 @@ on("change:repeating_skills", (eventInfo) => {
 
 			setAttrs({
 				"repeating_skills_skill":  Math.floor((base+bonus)+adv)
-			});
+			}, {silent:true});
 		});
 	});
 });
