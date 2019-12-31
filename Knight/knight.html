@@ -2980,6 +2980,33 @@
 			}
 		});
 	});
+	
+	on("sheet:opened",function()
+	{		
+		getAttrs(["DruidLionBF"], function(value)
+		{
+			if(value.DruidLionBF != 1)
+			{
+				getSectionIDs("repeating_armeDruidLion", function (ids) 
+				{
+					_.each(ids,function(id) 
+					{
+						getAttrs(["repeating_armeDruidLion_"+id+"_leste"], function (v) 
+						{
+							var LL = v["repeating_armeDruidLion_"+id+"_leste"];
+							
+							if(LL == "{{leste=[[@{force}]]}}")
+							{
+								setAttrs({["repeating_armeDruidLion_"+id+"_leste"]: "{{leste=[[@{druidLionChairTot}]]}}"});
+							}
+						});
+						
+					});
+				});
+				setAttrs({DruidLionBF: 1});
+			}
+		});
+	});
 </script>
 <div class="container">
 	<input type="hidden" name="attr_MAJ" value="0" />
@@ -2994,6 +3021,7 @@
 	<input type="hidden" name="attr_MAJV15LDB_1" value="0" />
 	<input type="hidden" name="attr_MAJV15LDB_2" value="0" />
 	<input type="hidden" name="attr_MAJV15LDB_3" value="0" />
+	<input type="hidden" name="attr_DruidLionBF" value="0" />
 	<div class="logo">
 	</div>
 	<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Knight/knightLogo.png" class="logo" width="350" height="49">
@@ -5836,7 +5864,7 @@
 								<h4 class="titre">Mode Goliath</h4>
 							</div>
 							<div>
-								<h4>Taille</h4>
+								<h4>Taille Bonus</h4>
 								<input type="number" name="attr_barbarianGoliath" class="textCenter" min="0" value="0" />
 							</div>
 							<div>
@@ -5942,45 +5970,105 @@
 							<div>
 								<select name="attr_effetArmes" class="full">
 									<option value="" selected></option>
-									<option value="Ignore la valeur de bouclier et de chair exceptionnel de la créature prise pour cible. Les PA de la cible puis ses PS sont directement touché.">Anti-Anathème</option>
-									<option value="Si l'arme tire sur un véhicule ou un colosse elle inflige ses dégâts normaux et n'a pas besoin d'infliger des tranches de 10 points de dégâts pour en infliger 1 à ces énormes ennemi.">Anti-Véhicule</option>
-									<option value="L'arme peut tirée sans ligne de vue ni malus de portée sur une cible préalablement désignée. La cible ne bénéficie d'aucun bonus de couvert, tant que la balle peut l'atteindre.">Artillerie</option>
+									
+									<option value="L’arme ignore purement et simplement la valeur de bouclier et de Chair exceptionnelle (qu’elle soit majeure ou mineure) de la créature de l’Anathème prise pour cible. Les PA, puis la santé de la cible sont directement touchés. Lorsqu’une arme de ce type touche une bande de créatures de l’Anathème, ses scores de bouclier et de Chair exceptionnelle sont ignorés.">Anti-Anathème</option>
+									
+									<option value="Les armes possédant cet effet sont conçues pour détruire les véhicules, les blindés et abattre les ennemis de type colosse. Lorsque l’arme tire sur un véhicule ou un colosse, elle inflige ses dégâts normaux et n’a pas besoin d’infliger des tranches de 10 points de dégâts pour en infliger 1 à ces énormes ennemis.">Anti-Véhicule</option>
+									
+									<option value="Si la cible a préalablement été désignée, l’arme peut tirer sans les malus de portée et sans ligne de vue (il faut quand même une ligne de tir direct). La cible ne bénéficie d’aucun bonus de couvert. Attention, il faut que la munition puisse atteindre la cible d’une manière ou d’une autre et qu’un test de tir soit effectué. Une cible préalablement désignée est toujours atteignable, quelle que soit la distance et le « couvert », sans avoir besoin de ligne de tir dégagée.">Artillerie</option>
+									
 									<option value="Ajoute XD6 aux dégâts lors des attaques surprises.">Assassin X</option>
-									<option value="Chaque réussite au dessus du score de réaction ou de défense de la cible permet de lui infliger 1 point de dégât ou de violence supplémentaire.">Assistance à l'attaque</option>
-									<option value="Il est possible de sacrifier ses dégâts ou sa violence pour diminuer la défense et la réaction de la bande ou du PNJ ciblé d'un nombre de points égal à X jusqu'au début du prochain tour. Aucun test d'attaque n'est nécessaire.">Barrage X</option>
-									<option value="L’arme est très rapide et peut cibler X adversaires par action de combat au lieu d’un seul. Une attaque doit être réalisée pour chacune des cibles, avec 3 dés de malus. Chacune des cibles ne peut être distante de plus de 2 mètres.">Cadence X</option>
-									<option value="Définie le nombre de munition et d'utilisation par mission de l'objet.">Chargeur X</option>
-									<option value="Si le jet de toucher avec l'arme est supérieur au score de chair de la cible celle ci perd ses X prochaine actions. Cette effet ne fonctionne pas contre les bandes. Effet non cumulable.">Choc X</option>
-									<option value="L'utilisateur bénéficie d'un bonus en défense ou en réaction de X lorsqu'il utilise cette arme ou module.">Défense X / Réaction X</option>
-									<option value="L'arme inflige X dégâts tous les tours durant 1D6 tour.">Dégâts Continus X</option>
-									<option value="Avec une attaque réussie, l'arme enlève 2 points au score de débordement du tour actuel. L'effet ne dure qu'un tour et nécessite d'être renouvelé chaque tour.">Démoralisant</option>
-									<option value="L'arme permet de désigner une cible une fois part tour. Son utilisateur et ses alliés possède un bonus d'une réussite automatique pour touché la cible et ignore les échecs critiques. La cible demeure désigner durant toute la scène ou toute la phase de conflit. Effet non cumulable.">Désignation</option>
-									<option value="Si l'arme inflige des dégâts a une armure on ajoute 2D6 au total des dégâts.">Destructeur</option>
-									<option value="Utiliser à une main une arme possédant cet effet est impossible, l'arme étant trop lourde ou possédant trop de recul pour toucher efficacement.">Deux Mains</option>
-									<option value="L'arme peut toucher un nombre X d'ennemis distant de moins de deux mètres les uns des autres. N'affecte pas les bandes.">Dispersion X</option>
-									<option value="Si le PJ tue un hostile ou un salopard avec cette arme, il peut effectuer, au prix de 3PE, au même tour et a la même initiative une autre attaque contre un autre hostile ou un autre salopard à portée. Applicable plusieurs fois si l'ennemi suivant est tué.">En Chaîne</option>
-									<option value="Permet d'échanger les dégâts de l'arme contre l'effet Espérance. Toute personne désespérée touchée par l'attaque peut effectuer un test de Bête (ou Hargne/Sang-Froid) difficulté 5 pour combattre le désespoir. Chaque attaque supplémentaire sur une même personne fait baisser la difficulté de 1. Si le test est réussi, le déséspéré a vaincu le désespoir et n'est plus un ennemi. Sur une Bande, cela a le même effet, mais en baissant simplement la cohésion. Si elle tombe à 0, la bande reprend espoir.">Espérance</option>
-									<option value="Si l'arme est utilisée contre une cible ayant un score de chair de 10 ou plus la violence de l'arme est augmenté de 4D6.">Fureur</option>
+									
+									<option value="Lorsqu’un jet pour toucher est effectué avec cette arme, chaque réussite excédentaire au-dessus du score de réaction (dans le cas d’un tir) ou de défense (dans le cas d’une attaque au contact) de la cible permet de lui infliger 1 point de dégât (ou de violence dans le cas d’une bande) supplémentaire.">Assistance à l'attaque</option>
+									
+									<option value="Au lieu de faire une attaque, le chevalier peut décider, au prix de son action de combat, de diminuer la défense et la réaction de la bande ou du PNJ ciblé d’un nombre de points égal à X jusqu’au début de son prochain tour, permettant ainsi à ses alliés de toucher plus facilement. L’effet s’applique automatiquement. Aucun autre effet, et aucun dégât de l’arme ne s’applique. Plusieurs effets barrage peuvent s’appliquer sur une même cible et se cumulent. Mais attention, l’effet barrage infligé par l’arme d’un PJ prend fin au début de son tour de jeu suivant (dès ce que c’est à lui de jouer de nouveau).">Barrage X</option>
+									
+									<option value="L’arme est très rapide et peut cibler X adversaires par action de combat au lieu d’un seul. Une attaqu doit être réalisée pour chacune des cibles, avec 3 dés d malus. Chacune des cibles ne peut être distante de plus d 2 mètres.">Cadence X</option>
+									
+									<option value="L’arme ou le module dispose d’un nombre d’utilisations indiqué par X. Une fois utilisé autant de fois que X, on estime qu’il n’a plus de munitions et ne peut donc plus faire feu. L’arme ou le module doit être rechargé (gratuitement) à Camelot entre deux missions.">Chargeur X</option>
+									
+									<option value="Si le jet pour toucher avec l’arme est supérieur au score de l’aspect Chair (divisé par 2 pour un PNJ) de la cible, celle-ci perd ses X prochaines actions. Cet effet ne fonctionne pas contre les bandes. Attention, l’effet ne peut pas se cumuler alors que la cible est déjà sous l’effet choc.
+
+Dans certaines circonstances, l’effet choc peut être considéré comme automatique et ne prend donc pas en compte le score de l’aspect Chair. Lorsque l’effet choc est censé s’appliquer automatiquement, il faut tout de même que le personnage touche sa cible. En revanche, son résultat n’a pas besoin d’égaler l’aspect Chair divisé par deux de la cible pour que l’effet fonctionne. En fonction des circonstances, le MJ peut décider qu’un personnage sous l’effet choc subit un malus de 2 à sa réaction et à sa défense. L’effet ne se cumule pas avec parasitage X.">Choc X</option>
+
+									<option value="L’utilisateur bénéficie d’un bonus en défense ou en réaction, X représentant cette valeur, tant qu’il utilise cette arme ou module. Les bonus reçus peuvent se cumuler tant que le personnage peut bénéficier de l’effet.">Défense X / Réaction X</option>
+									
+									<option value="L’arme inflige X points de dégâts à chaque tour durant 1D6 tours. Les dégâts sont subis par la cible à chacun de ses tours de jeu et ignorent les éventuels scores de CdF ou de bouclier. Au regard de la technologie utilisée, l’effet ne peut se stopper que si la cible reçoit les soins appropriés ou s’il se termine de lui-même. Typiquement, cet effet se retrouve sur les armes causant des brûlures. Cet effet ne peut être cumulé sur une même créature tant que l’effet est déjà présent au moins une fois.">Dégâts Continus X</option>
+									
+									<option value="Avec une attaque réussie, l’arme enlève 2 points au score de débordement que les bandes composées d’humains infligent, avant calcul des dégâts effectifs.
+
+Les dégâts effectifs du tour sont donc égaux débordement moins 2 multiplié par le nombre de tours écoulés à ce tour.
+
+Autrement dit, démoralisant réduit le débordement pour le tour en cours, et uniquement le tour en cours. Précision : Si l’effet démoralisant est appliqué plusieurs fois, cela se cumule en ajoutant un tour de durée (et non pas en sous-trayant des points supplémentaires au débordement de la bande ciblée).">Démoralisant</option>
+
+									<option value="L’arme peut désigner une cible (une seule cible, pas une bande) une fois par tour. Son utilisateur et ses alliés reçoivent un bonus de 1 réussite automatique pour toucher la cible et ignorent toujours les éventuels échecs critiques qu’ils pourraient subir lorsqu’ils tentent de la toucher. Désigner une cible ne coûte pas d’action. Il n’y a aucun test à effectuer pour désigner une cible et la portée de la désignation est celle de l’arme utilisée. La cible demeure désignée durant toute la scène ou toute la phase de conflit. 
+
+Une fois désignée, l’armure va suivre les mouvements et les bruits de la cible et représenter sa position, ce qui permet au chevalier de lui tirer dessus avec une arme disposant de l’effet artillerie notamment, ou d’utiliser automatiquement tout effet venant de ses éventuelles visions alternatives.
+
+L’effet permet par exemple, couplé avec un module de type vision prédatrice, de voir la cible à travers les murs, silhouettée sur la visière à Réalité Augmentée de la méta-armure. Tant que la signature de la cible reste visible par la méta-armure, la cible reste désignée. Attention : L’effet ne peut être cumulé sur une même cible.">Désignation</option>
+
+									<option value="Lorsque les dégâts impactent les points d’armure de la cible, si elle a des PA, on ajoute 2D6 au total de dégâts. Si un seul point de dégâts passe le bouclier et le CdF de la cible, l’effet est appliqué.">Destructeur</option>
+									
+									<option value="Cet effet signifie simplement que le chevalier doit utiliser ses deux mains pour frapper ou tirer avec l’arme. Utiliser à une main une arme possédant cet effet est impossible, l’arme étant trop lourde ou possédant trop de recul pour toucher efficacement.">Deux Mains</option>
+									
+									<option value="L’arme peut toucher plusieurs ennemis et ses dégâts peuvent donc s’appliquer à plusieurs du moment que ces ennemis sont à moins de deux mètres les uns des autres. X représente le nombre d’ennemis que l’arme peut toucher dans une même action. Un seul jet d’attaque est à effectuer contre un seul ennemi. Les autres ennemis proches subissent automatiquement les dégâts et les autres effets que dispersion, à condition que le résultat du test d’attaque dépasse leur score d’opposition. Typiquement, les lance-flammes ou les armes explosives infligent cet effet. Cet effet n’affecte pas les bandes contre lesquelles seule la violence peut s’appliquer.
+
+Attention : Si l’effet est utilisé contre des ennemis au contact avec un autre PJ, ce dernier subit aussi les dégâts de la dispersion. ">Dispersion X</option>
+
+									<option value="Lorsque le PJ utilisant cette arme réussit à éliminer (pas forcément à tuer, neutraliser suffit) un hostile ou un salopard, il peut effectuer au prix de 3 PE, au même tour et à la même initiative, une autre attaque sur un autre hostile ou un autre salopard qui se trouve à portée de son arme (un test pour toucher est de nouveau nécessaire). Si cette deuxième attaque élimine la cible, l’effet peut s’appliquer une nouvelle fois et ainsi de suite. Le coût en énergie intervient en plus de l’éventuel coût en énergie de l’arme. Chaque nouvelle attaque doit donner lieu à une dépense d’énergie en conséquence. 
+
+Dans le cas où plusieurs ennemis sont éliminés en même temps, l’effet en chaîne ne s’applique qu’une seule fois.">En Chaîne</option>
+
+									<option value="Contre des désespérés, l’équipement est extrêmement puissant. S’il le veut, un PJ peut décider d’échanger les dégâts qu’il devrait infliger contre l’application de l’effet espérance. L’arme, plutôt que d’infliger des dégâts, traverse alors le corps du désespéré, arrachant une partie de son désespoir.
+
+S’il le fait, chaque PNJ désespéré touché par l’attaque peut effectuer un test de Bête difficulté ardu (5) (ou Hargne combo Sang-Froid dans le cas d’un PJ) pour combattre le désespoir. Chaque attaque supplémentaire infligée par l’équipement à un même désespéré et appliquant l’effet espérance fait baisser le niveau de difficulté du test de 1. Si le désespéré réussit son test, alors il a réussi à vaincre le désespoir et n’est plus un ennemi. Il peut se joindre aux chevaliers ou rester terrorisé par ce qu’il a commis ou par ce qui lui est arrivé (au choix du MJ).
+
+Contre une bande de désespérés, on considère que l’équipement fait simplement baisser sa cohésion. Cependant, si le personnage utilisant un équipement avec l’effet espérance a infligé assez de violence à une bande pour qu’elle tombe à 0 point de cohésion, les désespérés qui la composent reprennent espoir et retrouvent simplement leurs esprits. Ils se souviendront tout de même des actes qu’ils ont commis. 
+
+Contre les autres types d’ennemis, les équipements possédant l’effet espérance infligent des dégâts et de la violence de manière normale.">Espérance</option>
+
+									<option value="Lorsque l’arme est utilisée contre une bande avec un score d’aspect Chair de 10 ou plus, la violence de l’arme est augmentée de 4D6.">Fureur</option>
+									
 									<option value="L’arme ignore purement et simplement la valeur de points d’armure d’un adversaire. La santé de la cible est directement touchée si les dégâts passent le CdF ou le bouclier.">Ignore Armure</option>
-									<option value="L'arme ignore purement et simplement le champ de force de l'adversaire.">Ignore Champs de Force</option>
+									
+									<option value="L’arme ignore purement et simplement le champ de force d’un adversaire. Les PS de la cible sont directement touchés si les dégâts passent les PA ou le bouclier.">Ignore Champ de Force</option>
+									
 									<option value="Lorsqu’on utilise deux exemplaires de cette arme en style akimbo, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3).">Jumelé (Akimbo)</option>
-									<option value="Lorsqu’on utilise deux armes disposant de cet effet en style ambidextre, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3)">Jumelé (Ambidextrie)</option>
-									<option value="Lorsque l'arme est utilisé son utilisateur ajoute sa force multipliée par deux lorsqu'il calcul ses dégâts. Seuls les personnages ayant un score de Force de 4 ou supérieur, ou un overdrive de Force peuvent utiliser une arme avec cet effet.">Lesté</option>
-									<option value="Lorsqu'il utilise une arme avec cet effet, le personnage perd son action de déplacement. De même, s'il a déjà bougé, il ne peut pas frapper avec une arme possédant cet effet. Les armes Lourdes sont également à Deux Mains.">Lourd</option>
-									<option value="Quand l'arme frappe une créature ou une bande de l'anathème ses scores de défense et de réaction sont réduits d'une valeur X durant le tour suivant. Non cumulatif.">Lumière X</option>
-									<option value="Si l'arme impact la santé de la cible on ajoute 2d6 au dégâts. Il suffit qu'un seul point de dégâts touche la santé pour que cela s'applique.">Meurtrier</option>
-									<option value="Inflige toujours le maximum de dégâts. Si combiné avec Dispersion, chaque cible touchée subit le maximum de dégâts également.">Oblitération</option>
-									<option value="Lors du calcul de dégâts de cette arme l'utilisateur ajoute sa dextérité au total + 1 point de dégâts par overdrive.">Orfèvrerie</option>
-									<option value="Cet effet s’applique uniquement aux méta-armures, exosquelettes, robots, véhicules, créatures de la Machine et tous les ennemis possé- dant la capacité sensibilité IEM. L’ennemi du type désigné perd automatiquement ses X prochaines actions.">Parasitage X</option>
-									<option value="L'arme ignore une valeur X du champ de force de la cible. Ne fonctionne pas contre un score de bouclier.">Pénétrant X</option>
+									
+									<option value="Lorsqu’on utilise deux armes disposant de cet effet en style ambidextre, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3).">Jumelé (Ambidextrie)</option>
+									
+									<option value="Lorsque l’arme est utilisée, son utilisateur ajoute le score de la caractéristique Force multipliée par deux (ou Chair complet pour un PNJ) lorsqu’il détermine les dégâts plutôt que sa Force seule (ou Chair divisé par 2). Seuls les PJ ayant un score de Force égal ou supérieur à 4 ou possédant un overdrive de Force peuvent utiliser une arme avec un tel effet.">Lesté</option>
+									
+									<option value="Pour utiliser cette arme, vous devez dépenser une (et une seule) action de déplacement et une (et une seule) action de combat. Les actions supplémentaires acquises ne sont pas touchées par cet effet.">Lourd</option>
+									
+									<option value="Lorsque l’arme frappe une créature de l’Anathème ou une bande de l’Anathème, ses scores de défense et de réaction sont réduits d’une certaine valeur jusqu’à la fin du prochain tour du PJ qui a infligé l’effet lumière. X représente cette valeur. Cet effet ne peut pas se cumuler sur une même cible.">Lumière X</option>
+									
+									<option value="Lorsque les dégâts impactent la santé de la cible, on ajoute 2D6 au total des dégâts. Si un seul point de dégâts passe l’armure, le bouclier et le CdF de la cible, l’effet meurtrier est appliqué.">Meurtrier</option>
+									
+									<option value="Ces équipements particulièrement puissants infligent des dégâts considérables aux cibles les moins résistantes. Contre un ennemi de type hostile, ils infligent toujours le résultat maximal des dés de dégâts, comme si chacun des dés avait fait 6. Les dés ne sont simplement pas lancés. Si l’arme possède l’effet dispersion, chaque cible hostile touchée subit le maximum de dégâts.">Oblitération</option>
+									
+									<option value="Lorsque l’arme est utilisée, son utilisateur ajoute sa caractéristique Dextérité (+ 1 point de dégâts par overdrive) (ou Masque divisé par 2, arrondi à l’entier supérieur, pour un PNJ) lorsqu’il détermine les dégâts en plus d’autres caractéristiques déjà incluses.">Orfèvrerie</option>
+									
+									<option value="Cet effet s’applique uniquement aux méta-armures, exosquelettes, robots, véhicules, créatures de la Machine et tous les ennemis possédant la capacité sensibilité IEM. La cible touchée par une attaque avec parasitage X perd automatiquement ses X prochaines actions. 
+Attention : l’effet ne peut pas se cumuler alors que la cible est déjà sous l’effet parasitage X et ne se cumule pas avec l’effet choc X.">Parasitage X</option>
+									
+									<option value="L’arme ignore une certaine valeur de champ de force, X représentant cette valeur. Si la valeur est égale ou supérieure au champ de force de l’ennemi, celui-ci est tout simplement ignoré et les points d’armure (ou les points de santé si la cible n’a pas de PA) sont directement touchés. Cet effet ne fonctionne pas contre le score de bouclier d’une cible.">Pénétrant X</option>
+									
 									<option value="L’arme ignore une certaine valeur d’armure, X représentant cette valeur. Si la valeur est égale ou supérieure aux points d’armure de l’ennemi, le total de PA est simplement ignoré et la santé est directement touchée.">Perce Armure X</option>
-									<option value="Lors du calcul de dégâts de cette arme l'utilisateur ajoute son tir au total + 1 point de dégâts par overdrive.">Précision</option>
-									<option value="Le personnage ne peut être repéré par un PNJ lorsqu'il utilise l’arme. Lors d'une attaque surprise, d'une invisibilité, d'un mode Ghost ou d'un mode Changeling, la Discrétion + OD est ajoutée aux dégâts.">Silencieux</option>
-									<option value="Après avoir touché sa cible avec un effet soumission, l’attaquant peut soumettre sa cible physiquement et l’empêcher de se déplacer ou d’attaquer qui que ce soit d’autre que l’attaquant, et ce au contact. Pour se libérer de l’effet soumission, la cible touchée doit, à son tour, réussir un test base Déplacement ou Combat (aspect Chair ou Bête) dont la difficulté est définie par le nombre de réussites de l’attaquant. Si la cible n’a pas pu se libérer à son tour, l’attaquant peut maintenir la soumission sans relancer les dés et infliger des dégâts normalement, ou relancer un test d’attaque afin de renforcer sa prise. Si le jet est à nouveau réussi, les dégâts sont infligés sans prendre en considération tout éventuel champ de force ou bouclier (pour les créatures de l’Anathème). L’effet soumission ne peut impacter les colosses tel quel mais peut tout de même être pris en compte par le MJ.">Soumission</option>
-									<option value="L’équipement a été pensé pour anéantir les créatures de l’Anathème et uniquement celles ci. Contre des ennemis humains (de n’importe quel type), il n’inflige que la moitié de ses dés de dégâts et de ses dés de violence.">Ténébricide</option>
-									<option value="Lors du calcul des dégâts, il est possible, une fois par attaque, d’annuler tous les résultats et de relancer les dés. Le nouveau résultat remplace le premier et doit être conservé. Il n’est pas possible de prendre la moyenne des dégâts en utilisant cet effet.">Tir en rafale</option>
-									<option value="Le personnage peut tirer a couvert sans subir de malus au tir.">Tir en sécurité</option>
-									<option value="Lorsque l'arme est utilisé contre une bande avec une valeur de chair de moins de 10, la violence est augmentée de 2D6.">Ultraviolence</option>
+									
+									<option value="Lorsque l’arme est utilisée, son utilisateur ajoute sa caractéristique Tir (+ 1 point de dégâts par overdrive) (ou Machine divisé par 2, arrondi à l’entier supérieur, pour u PNJ) lorsqu’il détermine les dégâts.">Précision</option>
+									
+									<option value="Le personnage ne peut être repéré par un autre personnage parce qu’il utilise son arme. Lorsque cet effet est utilisé pendant une attaque surprise, une invisibilité, un mode Ghost ou un mode Changeling, le score de la caractéristique Discrétion (plus les éventuels OD) du PJ est ajouté aux dégâts. Dans le cas des PNJ, c’est la moitié du score de Masque (plus le score de Masque exceptionnel éventuel) qui est ajouté aux dégâts. Cet effet peut s’ajouter à ceux du mode Ghost et du niveau 2 de l’overdrive de Discrétion.">Silencieux</option>
+									
+									<option value="Après avoir touché sa cible avec un effet soumission, l’attaquant peut soumettre sa cible physiquement et l’empêcher de se déplacer ou d’attaquer qui que ce soit d’autre que l’attaquant, et ce au contact. Pour se libérer de l’effet soumission, la cible touchée doit, à son tour, réussir un test de base Déplacement ou Combat (aspect Chair ou Bête) dont la difficulté est définie par le nombre de réussites de l’attaquant. Si la cible n’a pas pu se libérer à son tour, l’attaquant peut maintenir la soumission sans relancer les dés et infliger des dégâts normalement, ou relancer un test d’attaque afin de renforcer sa prise. Si le jet est à nouveau réussi, les dégâts sont infligés sans prendre en considération tout éventuel champ de force ou bouclier (pour les créatures de l’Anathème). L’effet soumission ne peut impacter les colosses.">Soumission</option>
+									
+									<option value="L’équipement a été pensé pour anéantir les créatures de l’Anathème et uniquement celles-ci. Contre des ennemis humains (de n’importe quel type), il n’inflige que la moitié de ses dés de dégâts et de ses dés de violence.">Ténébricide</option>
+									
+									<option value="Lors du calcul des dégâts, il est possible, une fois par attaque, d’annuler tous les résultats et de relancer les dés. Le nouveau résultat remplace le premier et doit être conservé. Il n’est pas possible de prendre la moyenne de dégâts en utilisant cet effet.">Tir en rafale</option>
+									
+									<option value="Grâce à une caméra sur le bout du canon ou à un canon déformable, le porteur de l’arme peut tirer tout en bénéficiant des bonus du style à couvert sans subir de malus au tir.">Tir en sécurité</option>
+									
+									<option value="Lorsque l’arme est utilisée contre une bande avec un score d’aspect Chair de moins de 10, la violence de l’arme est augmentée de 2D6.">Ultraviolence</option>
 								</select>
 							</div>
 							<div class="autoex autoex100">
@@ -6314,7 +6402,7 @@
 							<div class="limiteArmure psion150">
 								<h4 class="titre bouton">
 									Mode Puppet Master
-									<button name="attr_jetBasePsion" type="roll" class="boutonBase" value="@{jetGM} &{template:simple} {{Nom=@{name}}}  @{caracteristique1Psion} @{jetModifDes}+ @{caracteristique2} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} {{taille=[[@{barbarianGoliath}]]}}" />
+									<button name="attr_jetBasePsion" type="roll" class="boutonBase" value="@{jetGM} &{template:simple} {{Nom=@{name}}}  {{carac1=Aura}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+ @{jetModifDes}+ @{caracteristique2} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} {{taille=[[@{barbarianGoliath}]]}}" />
 								</h4>
 							</div>
 							<div class="limiteArmure psion150">
@@ -6465,25 +6553,58 @@
 							<div>
 								<select name="attr_effetArmes" class="full">
 									<option value="" selected></option>
-									<option value="Ignore la valeur de bouclier et de chair exceptionnel de la créature prise pour cible. Les PA de la cible puis ses PS sont directement touché.">Anti-Anathème</option>
-									<option value="Si l'arme tire sur un véhicule ou un colosse elle inflige ses dégâts normaux et n'a pas besoin d'infliger des tranches de 10 points de dégâts pour en infliger 1 à ces énormes ennemi.">Anti-Véhicule</option>
-									<option value="L'arme peut tirée sans ligne de vue ni malus de portée sur une cible préalablement désignée. La cible ne bénéficie d'aucun bonus de couvert, tant que la balle peut l'atteindre.">Artillerie</option>
-									<option value="Chaque réussite au dessus du score de réaction ou de défense de la cible permet de lui infliger 1 point de dégât ou de violence supplémentaire.">Assistance à l'attaque</option>
-									<option value="Si le jet de toucher avec l'arme est supérieur au score de chair de la cible celle ci perd ses X prochaine actions. Cette effet ne fonctionne pas contre les bandes. Effet non cumulable.">Choc X</option>
-									<option value="L'arme inflige X dégâts tous les tours durant 1D6 tour.">Dégâts Continus X</option>
-									<option value="Avec une attaque réussie, l'arme enlève 2 points au score de débordement du tour actuel. L'effet ne dure qu'un tour et nécessite d'être renouvelé chaque tour.">Démoralisant</option>
-									<option value="L'arme permet de désigner une cible une fois part tour. Son utilisateur et ses alliés possède un bonus d'une réussite automatique pour touché la cible et ignore les échecs critiques. La cible demeure désigner durant toute la scène ou toute la phase de conflit. Effet non cumulable.">Désignation</option>
-									<option value="Utiliser à une main une arme possédant cet effet est impossible, l'arme étant trop lourde ou possédant trop de recul pour toucher efficacement.">Deux Mains</option>
-									<option value="L'arme peut toucher un nombre X d'ennemis distant de moins de deux mètres les uns des autres. N'affecte pas les bandes.">Dispersion X</option>
-									<option value="Si le PJ tue un hostile ou un salopard avec cette arme, il peut effectuer, au prix de 3PE, au même tour et a la même initiative une autre attaque contre un autre hostile ou un autre salopard à portée. Applicable plusieurs fois si l'ennemi suivant est tué.">En Chaîne</option>
-									<option value="Si l'arme est utilisée contre une cible ayant un score de chair de 10 ou plus la violence de l'arme est augmenté de 4D6.">Fureur</option>
+									
+									<option value="L’arme ignore purement et simplement la valeur de bouclier et de Chair exceptionnelle (qu’elle soit majeure ou mineure) de la créature de l’Anathème prise pour cible. Les PA, puis la santé de la cible sont directement touchés. Lorsqu’une arme de ce type touche une bande de créatures de l’Anathème, ses scores de bouclier et de Chair exceptionnelle sont ignorés.">Anti-Anathème</option>
+									
+									<option value="Les armes possédant cet effet sont conçues pour détruire les véhicules, les blindés et abattre les ennemis de type colosse. Lorsque l’arme tire sur un véhicule ou un colosse, elle inflige ses dégâts normaux et n’a pas besoin d’infliger des tranches de 10 points de dégâts pour en infliger 1 à ces énormes ennemis.">Anti-Véhicule</option>
+									
+									<option value="Si la cible a préalablement été désignée, l’arme peut tirer sans les malus de portée et sans ligne de vue (il faut quand même une ligne de tir direct). La cible ne bénéficie d’aucun bonus de couvert. Attention, il faut que la munition puisse atteindre la cible d’une manière ou d’une autre et qu’un test de tir soit effectué. Une cible préalablement désignée est toujours atteignable, quelle que soit la distance et le « couvert », sans avoir besoin de ligne de tir dégagée.">Artillerie</option>
+									
+									<option value="Lorsqu’un jet pour toucher est effectué avec cette arme, chaque réussite excédentaire au-dessus du score de réaction (dans le cas d’un tir) ou de défense (dans le cas d’une attaque au contact) de la cible permet de lui infliger 1 point de dégât (ou de violence dans le cas d’une bande) supplémentaire.">Assistance à l'attaque</option>
+									
+									<option value="Si le jet pour toucher avec l’arme est supérieur au score de l’aspect Chair (divisé par 2 pour un PNJ) de la cible, celle-ci perd ses X prochaines actions. Cet effet ne fonctionne pas contre les bandes. Attention, l’effet ne peut pas se cumuler alors que la cible est déjà sous l’effet choc.
+
+Dans certaines circonstances, l’effet choc peut être considéré comme automatique et ne prend donc pas en compte le score de l’aspect Chair. Lorsque l’effet choc est censé s’appliquer automatiquement, il faut tout de même que le personnage touche sa cible. En revanche, son résultat n’a pas besoin d’égaler l’aspect Chair divisé par deux de la cible pour que l’effet fonctionne. En fonction des circonstances, le MJ peut décider qu’un personnage sous l’effet choc subit un malus de 2 à sa réaction et à sa défense. L’effet ne se cumule pas avec parasitage X.">Choc X</option>
+
+									<option value="L’arme inflige X points de dégâts à chaque tour durant 1D6 tours. Les dégâts sont subis par la cible à chacun de ses tours de jeu et ignorent les éventuels scores de CdF ou de bouclier. Au regard de la technologie utilisée, l’effet ne peut se stopper que si la cible reçoit les soins appropriés ou s’il se termine de lui-même. Typiquement, cet effet se retrouve sur les armes causant des brûlures. Cet effet ne peut être cumulé sur une même créature tant que l’effet est déjà présent au moins une fois.">Dégâts Continus X</option>
+									
+									<option value="Avec une attaque réussie, l’arme enlève 2 points au score de débordement que les bandes composées d’humains infligent, avant calcul des dégâts effectifs.
+
+Les dégâts effectifs du tour sont donc égaux débordement moins 2 multiplié par le nombre de tours écoulés à ce tour.
+
+Autrement dit, démoralisant réduit le débordement pour le tour en cours, et uniquement le tour en cours. Précision : Si l’effet démoralisant est appliqué plusieurs fois, cela se cumule en ajoutant un tour de durée (et non pas en sous-trayant des points supplémentaires au débordement de la bande ciblée).">Démoralisant</option>
+
+									<option value="L’arme peut désigner une cible (une seule cible, pas une bande) une fois par tour. Son utilisateur et ses alliés reçoivent un bonus de 1 réussite automatique pour toucher la cible et ignorent toujours les éventuels échecs critiques qu’ils pourraient subir lorsqu’ils tentent de la toucher. Désigner une cible ne coûte pas d’action. Il n’y a aucun test à effectuer pour désigner une cible et la portée de la désignation est celle de l’arme utilisée. La cible demeure désignée durant toute la scène ou toute la phase de conflit. 
+
+Une fois désignée, l’armure va suivre les mouvements et les bruits de la cible et représenter sa position, ce qui permet au chevalier de lui tirer dessus avec une arme disposant de l’effet artillerie notamment, ou d’utiliser automatiquement tout effet venant de ses éventuelles visions alternatives.
+
+L’effet permet par exemple, couplé avec un module de type vision prédatrice, de voir la cible à travers les murs, silhouettée sur la visière à Réalité Augmentée de la méta-armure. Tant que la signature de la cible reste visible par la méta-armure, la cible reste désignée. Attention : L’effet ne peut être cumulé sur une même cible.">Désignation</option>
+
+									<option value="Cet effet signifie simplement que le chevalier doit utiliser ses deux mains pour frapper ou tirer avec l’arme. Utiliser à une main une arme possédant cet effet est impossible, l’arme étant trop lourde ou possédant trop de recul pour toucher efficacement.">Deux Mains</option>
+									
+									<option value="L’arme peut toucher plusieurs ennemis et ses dégâts peuvent donc s’appliquer à plusieurs du moment que ces ennemis sont à moins de deux mètres les uns des autres. X représente le nombre d’ennemis que l’arme peut toucher dans une même action. Un seul jet d’attaque est à effectuer contre un seul ennemi. Les autres ennemis proches subissent automatiquement les dégâts et les autres effets que dispersion, à condition que le résultat du test d’attaque dépasse leur score d’opposition. Typiquement, les lance-flammes ou les armes explosives infligent cet effet. Cet effet n’affecte pas les bandes contre lesquelles seule la violence peut s’appliquer.
+
+Attention : Si l’effet est utilisé contre des ennemis au contact avec un autre PJ, ce dernier subit aussi les dégâts de la dispersion. ">Dispersion X</option>
+
+									<option value="Lorsque le PJ utilisant cette arme réussit à éliminer (pas forcément à tuer, neutraliser suffit) un hostile ou un salopard, il peut effectuer au prix de 3 PE, au même tour et à la même initiative, une autre attaque sur un autre hostile ou un autre salopard qui se trouve à portée de son arme (un test pour toucher est de nouveau nécessaire). Si cette deuxième attaque élimine la cible, l’effet peut s’appliquer une nouvelle fois et ainsi de suite. Le coût en énergie intervient en plus de l’éventuel coût en énergie de l’arme. Chaque nouvelle attaque doit donner lieu à une dépense d’énergie en conséquence. 
+
+Dans le cas où plusieurs ennemis sont éliminés en même temps, l’effet en chaîne ne s’applique qu’une seule fois.">En Chaîne</option>
+
+									<option value="Lorsque l’arme est utilisée contre une bande avec un score d’aspect Chair de 10 ou plus, la violence de l’arme est augmentée de 4D6.">Fureur</option>
+									
 									<option value="L’arme ignore purement et simplement la valeur de points d’armure d’un adversaire. La santé de la cible est directement touchée si les dégâts passent le CdF ou le bouclier.">Ignore Armure</option>
-									<option value="Lorsqu'il utilise une arme avec cet effet, le personnage perd son action de déplacement. De même, s'il a déjà bougé, il ne peut pas frapper avec une arme possédant cet effet. Les armes Lourdes sont également à Deux Mains.">Lourd</option>
-									<option value="Quand l'arme frappe une créature ou une bande de l'anathème ses scores de défense et de réaction sont réduits d'une valeur X durant le tour suivant. Non cumulatif.">Lumière X</option>
-									<option value="L'arme ignore une valeur X du champ de force de la cible. Ne fonctionne pas contre un score de bouclier.">Pénétrant X</option>
+									
+									<option value="Pour utiliser cette arme, vous devez dépenser une (et une seule) action de déplacement et une (et une seule) action de combat. Les actions supplémentaires acquises ne sont pas touchées par cet effet.">Lourd</option>
+									
+									<option value="Lorsque l’arme frappe une créature de l’Anathème ou une bande de l’Anathème, ses scores de défense et de réaction sont réduits d’une certaine valeur jusqu’à la fin du prochain tour du PJ qui a infligé l’effet lumière. X représente cette valeur. Cet effet ne peut pas se cumuler sur une même cible.">Lumière X</option>
+									
+									<option value="L’arme ignore une certaine valeur de champ de force, X représentant cette valeur. Si la valeur est égale ou supérieure au champ de force de l’ennemi, celui-ci est tout simplement ignoré et les points d’armure (ou les points de santé si la cible n’a pas de PA) sont directement touchés. Cet effet ne fonctionne pas contre le score de bouclier d’une cible.">Pénétrant X</option>
+									
 									<option value="L’arme ignore une certaine valeur d’armure, X représentant cette valeur. Si la valeur est égale ou supérieure aux points d’armure de l’ennemi, le total de PA est simplement ignoré et la santé est directement touchée.">Perce Armure X</option>
-									<option value="Le personnage ne peut être repéré par un PNJ lorsqu'il utilise l’arme. Lors d'une attaque surprise, d'une invisibilité, d'un mode Ghost ou d'un mode Changeling, la Discrétion + OD est ajoutée aux dégâts.">Silencieux</option>
-									<option value="Lorsque l'arme est utilisé contre une bande avec une valeur de chair de moins de 10, la violence est augmentée de 2D6.">Ultraviolence</option>
+									
+									<option value="Le personnage ne peut être repéré par un autre personnage parce qu’il utilise son arme. Lorsque cet effet est utilisé pendant une attaque surprise, une invisibilité, un mode Ghost ou un mode Changeling, le score de la caractéristique Discrétion (plus les éventuels OD) du PJ est ajouté aux dégâts. Dans le cas des PNJ, c’est la moitié du score de Masque (plus le score de Masque exceptionnel éventuel qui est ajouté aux dégâts. Cet effet peut s’ajouter à ceux du mode Ghost et du niveau 2 de l’overdrive de Discrétion.">Silencieux</option>
+									
+									<option value="Lorsque l’arme est utilisée contre une bande avec un score d’aspect Chair de moins de 10, la violence de l’arme est augmentée de 2D6.">Ultraviolence</option>
 								</select>
 							</div>
 							<div class="autoex autoex100">
@@ -6543,45 +6664,105 @@
 							<div>
 								<select name="attr_effetArmes" class="full">
 									<option value="" selected></option>
-									<option value="Ignore la valeur de bouclier et de chair exceptionnel de la créature prise pour cible. Les PA de la cible puis ses PS sont directement touché.">Anti-Anathème</option>
-									<option value="Si l'arme tire sur un véhicule ou un colosse elle inflige ses dégâts normaux et n'a pas besoin d'infliger des tranches de 10 points de dégâts pour en infliger 1 à ces énormes ennemi.">Anti-Véhicule</option>
-									<option value="L'arme peut tirée sans ligne de vue ni malus de portée sur une cible préalablement désignée. La cible ne bénéficie d'aucun bonus de couvert, tant que la balle peut l'atteindre.">Artillerie</option>
+									
+									<option value="L’arme ignore purement et simplement la valeur de bouclier et de Chair exceptionnelle (qu’elle soit majeure ou mineure) de la créature de l’Anathème prise pour cible. Les PA, puis la santé de la cible sont directement touchés. Lorsqu’une arme de ce type touche une bande de créatures de l’Anathème, ses scores de bouclier et de Chair exceptionnelle sont ignorés.">Anti-Anathème</option>
+									
+									<option value="Les armes possédant cet effet sont conçues pour détruire les véhicules, les blindés et abattre les ennemis de type colosse. Lorsque l’arme tire sur un véhicule ou un colosse, elle inflige ses dégâts normaux et n’a pas besoin d’infliger des tranches de 10 points de dégâts pour en infliger 1 à ces énormes ennemis.">Anti-Véhicule</option>
+									
+									<option value="Si la cible a préalablement été désignée, l’arme peut tirer sans les malus de portée et sans ligne de vue (il faut quand même une ligne de tir direct). La cible ne bénéficie d’aucun bonus de couvert. Attention, il faut que la munition puisse atteindre la cible d’une manière ou d’une autre et qu’un test de tir soit effectué. Une cible préalablement désignée est toujours atteignable, quelle que soit la distance et le « couvert », sans avoir besoin de ligne de tir dégagée.">Artillerie</option>
+									
 									<option value="Ajoute XD6 aux dégâts lors des attaques surprises.">Assassin X</option>
-									<option value="Chaque réussite au dessus du score de réaction ou de défense de la cible permet de lui infliger 1 point de dégât ou de violence supplémentaire.">Assistance à l'attaque</option>
-									<option value="Il est possible de sacrifier ses dégâts ou sa violence pour diminuer la défense et la réaction de la bande ou du PNJ ciblé d'un nombre de points égal à X jusqu'au début du prochain tour. Aucun test d'attaque n'est nécessaire.">Barrage X</option>
-									<option value="L’arme est très rapide et peut cibler X adversaires par action de combat au lieu d’un seul. Une attaque doit être réalisée pour chacune des cibles, avec 3 dés de malus. Chacune des cibles ne peut être distante de plus de 2 mètres.">Cadence X</option>
-									<option value="Définie le nombre de munition et d'utilisation par mission de l'objet.">Chargeur X</option>
-									<option value="Si le jet de toucher avec l'arme est supérieur au score de chair de la cible celle ci perd ses X prochaine actions. Cette effet ne fonctionne pas contre les bandes. Effet non cumulable.">Choc X</option>
-									<option value="L'utilisateur bénéficie d'un bonus en défense ou en réaction de X lorsqu'il utilise cette arme ou module.">Défense X / Réaction X</option>
-									<option value="L'arme inflige X dégâts tous les tours durant 1D6 tour.">Dégâts Continus X</option>
-									<option value="Avec une attaque réussie, l'arme enlève 2 points au score de débordement du tour actuel. L'effet ne dure qu'un tour et nécessite d'être renouvelé chaque tour.">Démoralisant</option>
-									<option value="L'arme permet de désigner une cible une fois part tour. Son utilisateur et ses alliés possède un bonus d'une réussite automatique pour touché la cible et ignore les échecs critiques. La cible demeure désigner durant toute la scène ou toute la phase de conflit. Effet non cumulable.">Désignation</option>
-									<option value="Si l'arme inflige des dégâts a une armure on ajoute 2D6 au total des dégâts.">Destructeur</option>
-									<option value="Utiliser à une main une arme possédant cet effet est impossible, l'arme étant trop lourde ou possédant trop de recul pour toucher efficacement.">Deux Mains</option>
-									<option value="L'arme peut toucher un nombre X d'ennemis distant de moins de deux mètres les uns des autres. N'affecte pas les bandes.">Dispersion X</option>
-									<option value="Si le PJ tue un hostile ou un salopard avec cette arme, il peut effectuer, au prix de 3PE, au même tour et a la même initiative une autre attaque contre un autre hostile ou un autre salopard à portée. Applicable plusieurs fois si l'ennemi suivant est tué.">En Chaîne</option>
-									<option value="Permet d'échanger les dégâts de l'arme contre l'effet Espérance. Toute personne désespérée touchée par l'attaque peut effectuer un test de Bête (ou Hargne/Sang-Froid) difficulté 5 pour combattre le désespoir. Chaque attaque supplémentaire sur une même personne fait baisser la difficulté de 1. Si le test est réussi, le déséspéré a vaincu le désespoir et n'est plus un ennemi. Sur une Bande, cela a le même effet, mais en baissant simplement la cohésion. Si elle tombe à 0, la bande reprend espoir.">Espérance</option>
-									<option value="Si l'arme est utilisée contre une cible ayant un score de chair de 10 ou plus la violence de l'arme est augmenté de 4D6.">Fureur</option>
+									
+									<option value="Lorsqu’un jet pour toucher est effectué avec cette arme, chaque réussite excédentaire au-dessus du score de réaction (dans le cas d’un tir) ou de défense (dans le cas d’une attaque au contact) de la cible permet de lui infliger 1 point de dégât (ou de violence dans le cas d’une bande) supplémentaire.">Assistance à l'attaque</option>
+									
+									<option value="Au lieu de faire une attaque, le chevalier peut décider, au prix de son action de combat, de diminuer la défense et la réaction de la bande ou du PNJ ciblé d’un nombre de points égal à X jusqu’au début de son prochain tour, permettant ainsi à ses alliés de toucher plus facilement. L’effet s’applique automatiquement. Aucun autre effet, et aucun dégât de l’arme ne s’applique. Plusieurs effets barrage peuvent s’appliquer sur une même cible et se cumulent. Mais attention, l’effet barrage infligé par l’arme d’un PJ prend fin au début de son tour de jeu suivant (dès ce que c’est à lui de jouer de nouveau).">Barrage X</option>
+									
+									<option value="L’arme est très rapide et peut cibler X adversaires par action de combat au lieu d’un seul. Une attaqu doit être réalisée pour chacune des cibles, avec 3 dés d malus. Chacune des cibles ne peut être distante de plus d 2 mètres.">Cadence X</option>
+									
+									<option value="L’arme ou le module dispose d’un nombre d’utilisations indiqué par X. Une fois utilisé autant de fois que X, on estime qu’il n’a plus de munitions et ne peut donc plus faire feu. L’arme ou le module doit être rechargé (gratuitement) à Camelot entre deux missions.">Chargeur X</option>
+									
+									<option value="Si le jet pour toucher avec l’arme est supérieur au score de l’aspect Chair (divisé par 2 pour un PNJ) de la cible, celle-ci perd ses X prochaines actions. Cet effet ne fonctionne pas contre les bandes. Attention, l’effet ne peut pas se cumuler alors que la cible est déjà sous l’effet choc.
+
+Dans certaines circonstances, l’effet choc peut être considéré comme automatique et ne prend donc pas en compte le score de l’aspect Chair. Lorsque l’effet choc est censé s’appliquer automatiquement, il faut tout de même que le personnage touche sa cible. En revanche, son résultat n’a pas besoin d’égaler l’aspect Chair divisé par deux de la cible pour que l’effet fonctionne. En fonction des circonstances, le MJ peut décider qu’un personnage sous l’effet choc subit un malus de 2 à sa réaction et à sa défense. L’effet ne se cumule pas avec parasitage X.">Choc X</option>
+
+									<option value="L’utilisateur bénéficie d’un bonus en défense ou en réaction, X représentant cette valeur, tant qu’il utilise cette arme ou module. Les bonus reçus peuvent se cumuler tant que le personnage peut bénéficier de l’effet.">Défense X / Réaction X</option>
+									
+									<option value="L’arme inflige X points de dégâts à chaque tour durant 1D6 tours. Les dégâts sont subis par la cible à chacun de ses tours de jeu et ignorent les éventuels scores de CdF ou de bouclier. Au regard de la technologie utilisée, l’effet ne peut se stopper que si la cible reçoit les soins appropriés ou s’il se termine de lui-même. Typiquement, cet effet se retrouve sur les armes causant des brûlures. Cet effet ne peut être cumulé sur une même créature tant que l’effet est déjà présent au moins une fois.">Dégâts Continus X</option>
+									
+									<option value="Avec une attaque réussie, l’arme enlève 2 points au score de débordement que les bandes composées d’humains infligent, avant calcul des dégâts effectifs.
+
+Les dégâts effectifs du tour sont donc égaux débordement moins 2 multiplié par le nombre de tours écoulés à ce tour.
+
+Autrement dit, démoralisant réduit le débordement pour le tour en cours, et uniquement le tour en cours. Précision : Si l’effet démoralisant est appliqué plusieurs fois, cela se cumule en ajoutant un tour de durée (et non pas en sous-trayant des points supplémentaires au débordement de la bande ciblée).">Démoralisant</option>
+
+									<option value="L’arme peut désigner une cible (une seule cible, pas une bande) une fois par tour. Son utilisateur et ses alliés reçoivent un bonus de 1 réussite automatique pour toucher la cible et ignorent toujours les éventuels échecs critiques qu’ils pourraient subir lorsqu’ils tentent de la toucher. Désigner une cible ne coûte pas d’action. Il n’y a aucun test à effectuer pour désigner une cible et la portée de la désignation est celle de l’arme utilisée. La cible demeure désignée durant toute la scène ou toute la phase de conflit. 
+
+Une fois désignée, l’armure va suivre les mouvements et les bruits de la cible et représenter sa position, ce qui permet au chevalier de lui tirer dessus avec une arme disposant de l’effet artillerie notamment, ou d’utiliser automatiquement tout effet venant de ses éventuelles visions alternatives.
+
+L’effet permet par exemple, couplé avec un module de type vision prédatrice, de voir la cible à travers les murs, silhouettée sur la visière à Réalité Augmentée de la méta-armure. Tant que la signature de la cible reste visible par la méta-armure, la cible reste désignée. Attention : L’effet ne peut être cumulé sur une même cible.">Désignation</option>
+
+									<option value="Lorsque les dégâts impactent les points d’armure de la cible, si elle a des PA, on ajoute 2D6 au total de dégâts. Si un seul point de dégâts passe le bouclier et le CdF de la cible, l’effet est appliqué.">Destructeur</option>
+									
+									<option value="Cet effet signifie simplement que le chevalier doit utiliser ses deux mains pour frapper ou tirer avec l’arme. Utiliser à une main une arme possédant cet effet est impossible, l’arme étant trop lourde ou possédant trop de recul pour toucher efficacement.">Deux Mains</option>
+									
+									<option value="L’arme peut toucher plusieurs ennemis et ses dégâts peuvent donc s’appliquer à plusieurs du moment que ces ennemis sont à moins de deux mètres les uns des autres. X représente le nombre d’ennemis que l’arme peut toucher dans une même action. Un seul jet d’attaque est à effectuer contre un seul ennemi. Les autres ennemis proches subissent automatiquement les dégâts et les autres effets que dispersion, à condition que le résultat du test d’attaque dépasse leur score d’opposition. Typiquement, les lance-flammes ou les armes explosives infligent cet effet. Cet effet n’affecte pas les bandes contre lesquelles seule la violence peut s’appliquer.
+
+Attention : Si l’effet est utilisé contre des ennemis au contact avec un autre PJ, ce dernier subit aussi les dégâts de la dispersion. ">Dispersion X</option>
+
+									<option value="Lorsque le PJ utilisant cette arme réussit à éliminer (pas forcément à tuer, neutraliser suffit) un hostile ou un salopard, il peut effectuer au prix de 3 PE, au même tour et à la même initiative, une autre attaque sur un autre hostile ou un autre salopard qui se trouve à portée de son arme (un test pour toucher est de nouveau nécessaire). Si cette deuxième attaque élimine la cible, l’effet peut s’appliquer une nouvelle fois et ainsi de suite. Le coût en énergie intervient en plus de l’éventuel coût en énergie de l’arme. Chaque nouvelle attaque doit donner lieu à une dépense d’énergie en conséquence. 
+
+Dans le cas où plusieurs ennemis sont éliminés en même temps, l’effet en chaîne ne s’applique qu’une seule fois.">En Chaîne</option>
+
+									<option value="Contre des désespérés, l’équipement est extrêmement puissant. S’il le veut, un PJ peut décider d’échanger les dégâts qu’il devrait infliger contre l’application de l’effet espérance. L’arme, plutôt que d’infliger des dégâts, traverse alors le corps du désespéré, arrachant une partie de son désespoir.
+
+S’il le fait, chaque PNJ désespéré touché par l’attaque peut effectuer un test de Bête difficulté ardu (5) (ou Hargne combo Sang-Froid dans le cas d’un PJ) pour combattre le désespoir. Chaque attaque supplémentaire infligée par l’équipement à un même désespéré et appliquant l’effet espérance fait baisser le niveau de difficulté du test de 1. Si le désespéré réussit son test, alors il a réussi à vaincre le désespoir et n’est plus un ennemi. Il peut se joindre aux chevaliers ou rester terrorisé par ce qu’il a commis ou par ce qui lui est arrivé (au choix du MJ).
+
+Contre une bande de désespérés, on considère que l’équipement fait simplement baisser sa cohésion. Cependant, si le personnage utilisant un équipement avec l’effet espérance a infligé assez de violence à une bande pour qu’elle tombe à 0 point de cohésion, les désespérés qui la composent reprennent espoir et retrouvent simplement leurs esprits. Ils se souviendront tout de même des actes qu’ils ont commis. 
+
+Contre les autres types d’ennemis, les équipements possédant l’effet espérance infligent des dégâts et de la violence de manière normale.">Espérance</option>
+
+									<option value="Lorsque l’arme est utilisée contre une bande avec un score d’aspect Chair de 10 ou plus, la violence de l’arme est augmentée de 4D6.">Fureur</option>
+									
 									<option value="L’arme ignore purement et simplement la valeur de points d’armure d’un adversaire. La santé de la cible est directement touchée si les dégâts passent le CdF ou le bouclier.">Ignore Armure</option>
-									<option value="L'arme ignore purement et simplement le champ de force de l'adversaire.">Ignore Champs de Force</option>
+									
+									<option value="L’arme ignore purement et simplement le champ de force d’un adversaire. Les PS de la cible sont directement touchés si les dégâts passent les PA ou le bouclier.">Ignore Champ de Force</option>
+									
 									<option value="Lorsqu’on utilise deux exemplaires de cette arme en style akimbo, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3).">Jumelé (Akimbo)</option>
-									<option value="Lorsqu’on utilise deux armes disposant de cet effet en style ambidextre, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3)">Jumelé (Ambidextrie)</option>
-									<option value="Lorsque l'arme est utilisé son utilisateur ajoute sa force multipliée par deux lorsqu'il calcul ses dégâts. Seuls les personnages ayant un score de Force de 4 ou supérieur, ou un overdrive de Force peuvent utiliser une arme avec cet effet.">Lesté</option>
-									<option value="Lorsqu'il utilise une arme avec cet effet, le personnage perd son action de déplacement. De même, s'il a déjà bougé, il ne peut pas frapper avec une arme possédant cet effet. Les armes Lourdes sont également à Deux Mains.">Lourd</option>
-									<option value="Quand l'arme frappe une créature ou une bande de l'anathème ses scores de défense et de réaction sont réduits d'une valeur X durant le tour suivant. Non cumulatif.">Lumière X</option>
-									<option value="Si l'arme impact la santé de la cible on ajoute 2d6 au dégâts. Il suffit qu'un seul point de dégâts touche la santé pour que cela s'applique.">Meurtrier</option>
-									<option value="Inflige toujours le maximum de dégâts. Si combiné avec Dispersion, chaque cible touchée subit le maximum de dégâts également.">Oblitération</option>
-									<option value="Lors du calcul de dégâts de cette arme l'utilisateur ajoute sa dextérité au total + 1 point de dégâts par overdrive.">Orfèvrerie</option>
-									<option value="Cet effet s’applique uniquement aux méta-armures, exosquelettes, robots, véhicules, créatures de la Machine et tous les ennemis possé- dant la capacité sensibilité IEM. L’ennemi du type désigné perd automatiquement ses X prochaines actions.">Parasitage X</option>
-									<option value="L'arme ignore une valeur X du champ de force de la cible. Ne fonctionne pas contre un score de bouclier.">Pénétrant X</option>
+									
+									<option value="Lorsqu’on utilise deux armes disposant de cet effet en style ambidextre, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3).">Jumelé (Ambidextrie)</option>
+									
+									<option value="Lorsque l’arme est utilisée, son utilisateur ajoute le score de la caractéristique Force multipliée par deux (ou Chair complet pour un PNJ) lorsqu’il détermine les dégâts plutôt que sa Force seule (ou Chair divisé par 2). Seuls les PJ ayant un score de Force égal ou supérieur à 4 ou possédant un overdrive de Force peuvent utiliser une arme avec un tel effet.">Lesté</option>
+									
+									<option value="Pour utiliser cette arme, vous devez dépenser une (et une seule) action de déplacement et une (et une seule) action de combat. Les actions supplémentaires acquises ne sont pas touchées par cet effet.">Lourd</option>
+									
+									<option value="Lorsque l’arme frappe une créature de l’Anathème ou une bande de l’Anathème, ses scores de défense et de réaction sont réduits d’une certaine valeur jusqu’à la fin du prochain tour du PJ qui a infligé l’effet lumière. X représente cette valeur. Cet effet ne peut pas se cumuler sur une même cible.">Lumière X</option>
+									
+									<option value="Lorsque les dégâts impactent la santé de la cible, on ajoute 2D6 au total des dégâts. Si un seul point de dégâts passe l’armure, le bouclier et le CdF de la cible, l’effet meurtrier est appliqué.">Meurtrier</option>
+									
+									<option value="Ces équipements particulièrement puissants infligent des dégâts considérables aux cibles les moins résistantes. Contre un ennemi de type hostile, ils infligent toujours le résultat maximal des dés de dégâts, comme si chacun des dés avait fait 6. Les dés ne sont simplement pas lancés. Si l’arme possède l’effet dispersion, chaque cible hostile touchée subit le maximum de dégâts.">Oblitération</option>
+									
+									<option value="Lorsque l’arme est utilisée, son utilisateur ajoute sa caractéristique Dextérité (+ 1 point de dégâts par overdrive) (ou Masque divisé par 2, arrondi à l’entier supérieur, pour un PNJ) lorsqu’il détermine les dégâts en plus d’autres caractéristiques déjà incluses.">Orfèvrerie</option>
+									
+									<option value="Cet effet s’applique uniquement aux méta-armures, exosquelettes, robots, véhicules, créatures de la Machine et tous les ennemis possédant la capacité sensibilité IEM. La cible touchée par une attaque avec parasitage X perd automatiquement ses X prochaines actions. 
+Attention : l’effet ne peut pas se cumuler alors que la cible est déjà sous l’effet parasitage X et ne se cumule pas avec l’effet choc X.">Parasitage X</option>
+									
+									<option value="L’arme ignore une certaine valeur de champ de force, X représentant cette valeur. Si la valeur est égale ou supérieure au champ de force de l’ennemi, celui-ci est tout simplement ignoré et les points d’armure (ou les points de santé si la cible n’a pas de PA) sont directement touchés. Cet effet ne fonctionne pas contre le score de bouclier d’une cible.">Pénétrant X</option>
+									
 									<option value="L’arme ignore une certaine valeur d’armure, X représentant cette valeur. Si la valeur est égale ou supérieure aux points d’armure de l’ennemi, le total de PA est simplement ignoré et la santé est directement touchée.">Perce Armure X</option>
-									<option value="Lors du calcul de dégâts de cette arme l'utilisateur ajoute son tir au total + 1 point de dégâts par overdrive.">Précision</option>
-									<option value="Le personnage ne peut être repéré par un PNJ lorsqu'il utilise l’arme. Lors d'une attaque surprise, d'une invisibilité, d'un mode Ghost ou d'un mode Changeling, la Discrétion + OD est ajoutée aux dégâts.">Silencieux</option>
-									<option value="Après avoir touché sa cible avec un effet soumission, l’attaquant peut soumettre sa cible physiquement et l’empêcher de se déplacer ou d’attaquer qui que ce soit d’autre que l’attaquant, et ce au contact. Pour se libérer de l’effet soumission, la cible touchée doit, à son tour, réussir un test base Déplacement ou Combat (aspect Chair ou Bête) dont la difficulté est définie par le nombre de réussites de l’attaquant. Si la cible n’a pas pu se libérer à son tour, l’attaquant peut maintenir la soumission sans relancer les dés et infliger des dégâts normalement, ou relancer un test d’attaque afin de renforcer sa prise. Si le jet est à nouveau réussi, les dégâts sont infligés sans prendre en considération tout éventuel champ de force ou bouclier (pour les créatures de l’Anathème). L’effet soumission ne peut impacter les colosses tel quel mais peut tout de même être pris en compte par le MJ.">Soumission</option>
-									<option value="L’équipement a été pensé pour anéantir les créatures de l’Anathème et uniquement celles ci. Contre des ennemis humains (de n’importe quel type), il n’inflige que la moitié de ses dés de dégâts et de ses dés de violence.">Ténébricide</option>
-									<option value="Lors du calcul des dégâts, il est possible, une fois par attaque, d’annuler tous les résultats et de relancer les dés. Le nouveau résultat remplace le premier et doit être conservé. Il n’est pas possible de prendre la moyenne des dégâts en utilisant cet effet.">Tir en rafale</option>
-									<option value="Le personnage peut tirer a couvert sans subir de malus au tir.">Tir en sécurité</option>
-									<option value="Lorsque l'arme est utilisé contre une bande avec une valeur de chair de moins de 10, la violence est augmentée de 2D6.">Ultraviolence</option>
+									
+									<option value="Lorsque l’arme est utilisée, son utilisateur ajoute sa caractéristique Tir (+ 1 point de dégâts par overdrive) (ou Machine divisé par 2, arrondi à l’entier supérieur, pour u PNJ) lorsqu’il détermine les dégâts.">Précision</option>
+									
+									<option value="Le personnage ne peut être repéré par un autre personnage parce qu’il utilise son arme. Lorsque cet effet est utilisé pendant une attaque surprise, une invisibilité, un mode Ghost ou un mode Changeling, le score de la caractéristique Discrétion (plus les éventuels OD) du PJ est ajouté aux dégâts. Dans le cas des PNJ, c’est la moitié du score de Masque (plus le score de Masque exceptionnel éventuel) qui est ajouté aux dégâts. Cet effet peut s’ajouter à ceux du mode Ghost et du niveau 2 de l’overdrive de Discrétion.">Silencieux</option>
+									
+									<option value="Après avoir touché sa cible avec un effet soumission, l’attaquant peut soumettre sa cible physiquement et l’empêcher de se déplacer ou d’attaquer qui que ce soit d’autre que l’attaquant, et ce au contact. Pour se libérer de l’effet soumission, la cible touchée doit, à son tour, réussir un test de base Déplacement ou Combat (aspect Chair ou Bête) dont la difficulté est définie par le nombre de réussites de l’attaquant. Si la cible n’a pas pu se libérer à son tour, l’attaquant peut maintenir la soumission sans relancer les dés et infliger des dégâts normalement, ou relancer un test d’attaque afin de renforcer sa prise. Si le jet est à nouveau réussi, les dégâts sont infligés sans prendre en considération tout éventuel champ de force ou bouclier (pour les créatures de l’Anathème). L’effet soumission ne peut impacter les colosses.">Soumission</option>
+									
+									<option value="L’équipement a été pensé pour anéantir les créatures de l’Anathème et uniquement celles-ci. Contre des ennemis humains (de n’importe quel type), il n’inflige que la moitié de ses dés de dégâts et de ses dés de violence.">Ténébricide</option>
+									
+									<option value="Lors du calcul des dégâts, il est possible, une fois par attaque, d’annuler tous les résultats et de relancer les dés. Le nouveau résultat remplace le premier et doit être conservé. Il n’est pas possible de prendre la moyenne de dégâts en utilisant cet effet.">Tir en rafale</option>
+									
+									<option value="Grâce à une caméra sur le bout du canon ou à un canon déformable, le porteur de l’arme peut tirer tout en bénéficiant des bonus du style à couvert sans subir de malus au tir.">Tir en sécurité</option>
+									
+									<option value="Lorsque l’arme est utilisée contre une bande avec un score d’aspect Chair de moins de 10, la violence de l’arme est augmentée de 2D6.">Ultraviolence</option>
 								</select>
 							</div>
 							<div class="autoex autoex100">
@@ -7740,7 +7921,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 										<span title="Jumelé (Ambidextrie)"></span>
 									</label>
 									<label class="simple">
-										<input type="checkbox" name="attr_leste" value="{{leste=[[@{force}]]}}" />
+										<input type="checkbox" name="attr_leste" value="{{leste=[[@{druidLionChairTot}]]}}" />
 										<span title="Lesté"></span>
 									</label>
 									<label class="simple">
@@ -13536,7 +13717,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 							<!-- La violence-->
 							<input type="hidden" name="attr_poingMACviolence" value="{{Violence=[[ [[ {[[@{poingMACaCViolence}]], 0}kh1]]d6+@{poingMACaCBViolence}]]}}" />
 							<!-- Bonus de Force -->
-							<input type="hidden" name="attr_poingMACbForce" value="{{force=[[@{force}]]}} {{BonusForce=[[@{forOD}*3]]}}" />
+							<input type="hidden" name="attr_poingMACbForce" value="{{force=[[@{force}]]}} {{BonusForce=[[ [[@{forOD}+@{warriorSoldierA}]]*3]]}}" />
 							<!-- Les styles -->
 							<input type="hidden" name="attr_poingMACstyles" value="{{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}}" />
 							<input type="hidden" name="attr_poingMACstyleBM" value="[[{ [[{@{atkAkimbo}, 0}kl1]], 0}kl1]]+[[{ [[{@{atkAmbidextre}, 0}kl1]],[[{@{atkAmbidextre}, 0}kl1]]}kh1 ]]+[[{@{atkCouvert}, 0}kl1]]+[[{@{atkDefensif}, 0}kl1]]+[[@{atkAgressif}]]" />
@@ -14437,7 +14618,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 							<!-- La violence de l'arme -->
 							<input type="hidden" name="attr_violence" value="{{Violence=[[ [[ {[[@{armeCaCViolence}]], 0}kh1]]d6+@{armeCaCBViolence}]]}}" />
 							<!-- Bonus de Force -->
-							<input type="hidden" name="attr_bForce" value="{{force=[[@{force}]]}} {{BonusForce=[[@{forOD}*3]]}}" />
+							<input type="hidden" name="attr_bForce" value="{{force=[[@{force}]]}} {{BonusForce=[[ [[@{forOD}+@{warriorSoldierA}]]*3]]}}" />
 							<!-- Les styles -->
 							<input type="hidden" name="attr_styles" value="{{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}}" />
 							<input type="hidden" name="attr_styleBM" value="[[{ [[{@{atkAkimbo}+@{akimbo}, 0}kl1]],[[{@{atkAkimbo}+@{jumelle}, 0}kl1]]}kh1 ]]+[[{ [[{@{atkAmbidextre}+@{ambidextrie}, 0}kl1]],[[{@{atkAmbidextre}+@{soeur}, 0}kl1]]}kh1 ]]+[[{@{atkCouvert}+@{tirSecurite}, 0}kl1]]+[[{@{atkDefensif}+@{protectrice}, 0}kl1]]+[[@{atkAgressif}]]" />
@@ -17897,45 +18078,105 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 					<div>
 						<select name="attr_effetArmes" class="full">
 							<option value="" selected></option>
-							<option value="Ignore la valeur de bouclier et de chair exceptionnel de la créature prise pour cible. Les PA de la cible puis ses PS sont directement touché.">Anti-Anathème</option>
-							<option value="Si l'arme tire sur un véhicule ou un colosse elle inflige ses dégâts normaux et n'a pas besoin d'infliger des tranches de 10 points de dégâts pour en infliger 1 à ces énormes ennemi.">Anti-Véhicule</option>
-							<option value="L'arme peut tirée sans ligne de vue ni malus de portée sur une cible préalablement désignée. La cible ne bénéficie d'aucun bonus de couvert, tant que la balle peut l'atteindre.">Artillerie</option>
+							
+							<option value="L’arme ignore purement et simplement la valeur de bouclier et de Chair exceptionnelle (qu’elle soit majeure ou mineure) de la créature de l’Anathème prise pour cible. Les PA, puis la santé de la cible sont directement touchés. Lorsqu’une arme de ce type touche une bande de créatures de l’Anathème, ses scores de bouclier et de Chair exceptionnelle sont ignorés.">Anti-Anathème</option>
+							
+							<option value="Les armes possédant cet effet sont conçues pour détruire les véhicules, les blindés et abattre les ennemis de type colosse. Lorsque l’arme tire sur un véhicule ou un colosse, elle inflige ses dégâts normaux et n’a pas besoin d’infliger des tranches de 10 points de dégâts pour en infliger 1 à ces énormes ennemis.">Anti-Véhicule</option>
+							
+							<option value="Si la cible a préalablement été désignée, l’arme peut tirer sans les malus de portée et sans ligne de vue (il faut quand même une ligne de tir direct). La cible ne bénéficie d’aucun bonus de couvert. Attention, il faut que la munition puisse atteindre la cible d’une manière ou d’une autre et qu’un test de tir soit effectué. Une cible préalablement désignée est toujours atteignable, quelle que soit la distance et le « couvert », sans avoir besoin de ligne de tir dégagée.">Artillerie</option>
+							
 							<option value="Ajoute XD6 aux dégâts lors des attaques surprises.">Assassin X</option>
-							<option value="Chaque réussite au dessus du score de réaction ou de défense de la cible permet de lui infliger 1 point de dégât ou de violence supplémentaire.">Assistance à l'attaque</option>
-							<option value="Il est possible de sacrifier ses dégâts ou sa violence pour diminuer la défense et la réaction de la bande ou du PNJ ciblé d'un nombre de points égal à X jusqu'au début du prochain tour. Aucun test d'attaque n'est nécessaire.">Barrage X</option>
-							<option value="L’arme est très rapide et peut cibler X adversaires par action de combat au lieu d’un seul. Une attaque doit être réalisée pour chacune des cibles, avec 3 dés de malus. Chacune des cibles ne peut être distante de plus de 2 mètres.">Cadence X</option>
-							<option value="Définie le nombre de munition et d'utilisation par mission de l'objet.">Chargeur X</option>
-							<option value="Si le jet de toucher avec l'arme est supérieur au score de chair de la cible celle ci perd ses X prochaine actions. Cette effet ne fonctionne pas contre les bandes. Effet non cumulable.">Choc X</option>
-							<option value="L'utilisateur bénéficie d'un bonus en défense ou en réaction de X lorsqu'il utilise cette arme ou module.">Défense X / Réaction X</option>
-							<option value="L'arme inflige X dégâts tous les tours durant 1D6 tour.">Dégâts Continus X</option>
-							<option value="Avec une attaque réussie, l'arme enlève 2 points au score de débordement du tour actuel. L'effet ne dure qu'un tour et nécessite d'être renouvelé chaque tour.">Démoralisant</option>
-							<option value="L'arme permet de désigner une cible une fois part tour. Son utilisateur et ses alliés possède un bonus d'une réussite automatique pour touché la cible et ignore les échecs critiques. La cible demeure désigner durant toute la scène ou toute la phase de conflit. Effet non cumulable.">Désignation</option>
-							<option value="Si l'arme inflige des dégâts a une armure on ajoute 2D6 au total des dégâts.">Destructeur</option>
-							<option value="Utiliser à une main une arme possédant cet effet est impossible, l'arme étant trop lourde ou possédant trop de recul pour toucher efficacement.">Deux Mains</option>
-							<option value="L'arme peut toucher un nombre X d'ennemis distant de moins de deux mètres les uns des autres. N'affecte pas les bandes.">Dispersion X</option>
-							<option value="Si le PJ tue un hostile ou un salopard avec cette arme, il peut effectuer, au prix de 3PE, au même tour et a la même initiative une autre attaque contre un autre hostile ou un autre salopard à portée. Applicable plusieurs fois si l'ennemi suivant est tué.">En Chaîne</option>
-							<option value="Permet d'échanger les dégâts de l'arme contre l'effet Espérance. Toute personne désespérée touchée par l'attaque peut effectuer un test de Bête (ou Hargne/Sang-Froid) difficulté 5 pour combattre le désespoir. Chaque attaque supplémentaire sur une même personne fait baisser la difficulté de 1. Si le test est réussi, le déséspéré a vaincu le désespoir et n'est plus un ennemi. Sur une Bande, cela a le même effet, mais en baissant simplement la cohésion. Si elle tombe à 0, la bande reprend espoir.">Espérance</option>
-							<option value="Si l'arme est utilisée contre une cible ayant un score de chair de 10 ou plus la violence de l'arme est augmenté de 4D6.">Fureur</option>
+							
+							<option value="Lorsqu’un jet pour toucher est effectué avec cette arme, chaque réussite excédentaire au-dessus du score de réaction (dans le cas d’un tir) ou de défense (dans le cas d’une attaque au contact) de la cible permet de lui infliger 1 point de dégât (ou de violence dans le cas d’une bande) supplémentaire.">Assistance à l'attaque</option>
+							
+							<option value="Au lieu de faire une attaque, le chevalier peut décider, au prix de son action de combat, de diminuer la défense et la réaction de la bande ou du PNJ ciblé d’un nombre de points égal à X jusqu’au début de son prochain tour, permettant ainsi à ses alliés de toucher plus facilement. L’effet s’applique automatiquement. Aucun autre effet, et aucun dégât de l’arme ne s’applique. Plusieurs effets barrage peuvent s’appliquer sur une même cible et se cumulent. Mais attention, l’effet barrage infligé par l’arme d’un PJ prend fin au début de son tour de jeu suivant (dès ce que c’est à lui de jouer de nouveau).">Barrage X</option>
+							
+							<option value="L’arme est très rapide et peut cibler X adversaires par action de combat au lieu d’un seul. Une attaqu doit être réalisée pour chacune des cibles, avec 3 dés d malus. Chacune des cibles ne peut être distante de plus d 2 mètres.">Cadence X</option>
+							
+							<option value="L’arme ou le module dispose d’un nombre d’utilisations indiqué par X. Une fois utilisé autant de fois que X, on estime qu’il n’a plus de munitions et ne peut donc plus faire feu. L’arme ou le module doit être rechargé (gratuitement) à Camelot entre deux missions.">Chargeur X</option>
+							
+							<option value="Si le jet pour toucher avec l’arme est supérieur au score de l’aspect Chair (divisé par 2 pour un PNJ) de la cible, celle-ci perd ses X prochaines actions. Cet effet ne fonctionne pas contre les bandes. Attention, l’effet ne peut pas se cumuler alors que la cible est déjà sous l’effet choc.
+
+Dans certaines circonstances, l’effet choc peut être considéré comme automatique et ne prend donc pas en compte le score de l’aspect Chair. Lorsque l’effet choc est censé s’appliquer automatiquement, il faut tout de même que le personnage touche sa cible. En revanche, son résultat n’a pas besoin d’égaler l’aspect Chair divisé par deux de la cible pour que l’effet fonctionne. En fonction des circonstances, le MJ peut décider qu’un personnage sous l’effet choc subit un malus de 2 à sa réaction et à sa défense. L’effet ne se cumule pas avec parasitage X.">Choc X</option>
+
+							<option value="L’utilisateur bénéficie d’un bonus en défense ou en réaction, X représentant cette valeur, tant qu’il utilise cette arme ou module. Les bonus reçus peuvent se cumuler tant que le personnage peut bénéficier de l’effet.">Défense X / Réaction X</option>
+							
+							<option value="L’arme inflige X points de dégâts à chaque tour durant 1D6 tours. Les dégâts sont subis par la cible à chacun de ses tours de jeu et ignorent les éventuels scores de CdF ou de bouclier. Au regard de la technologie utilisée, l’effet ne peut se stopper que si la cible reçoit les soins appropriés ou s’il se termine de lui-même. Typiquement, cet effet se retrouve sur les armes causant des brûlures. Cet effet ne peut être cumulé sur une même créature tant que l’effet est déjà présent au moins une fois.">Dégâts Continus X</option>
+							
+							<option value="Avec une attaque réussie, l’arme enlève 2 points au score de débordement que les bandes composées d’humains infligent, avant calcul des dégâts effectifs.
+
+Les dégâts effectifs du tour sont donc égaux débordement moins 2 multiplié par le nombre de tours écoulés à ce tour.
+
+Autrement dit, démoralisant réduit le débordement pour le tour en cours, et uniquement le tour en cours. Précision : Si l’effet démoralisant est appliqué plusieurs fois, cela se cumule en ajoutant un tour de durée (et non pas en sous-trayant des points supplémentaires au débordement de la bande ciblée).">Démoralisant</option>
+
+							<option value="L’arme peut désigner une cible (une seule cible, pas une bande) une fois par tour. Son utilisateur et ses alliés reçoivent un bonus de 1 réussite automatique pour toucher la cible et ignorent toujours les éventuels échecs critiques qu’ils pourraient subir lorsqu’ils tentent de la toucher. Désigner une cible ne coûte pas d’action. Il n’y a aucun test à effectuer pour désigner une cible et la portée de la désignation est celle de l’arme utilisée. La cible demeure désignée durant toute la scène ou toute la phase de conflit. 
+
+Une fois désignée, l’armure va suivre les mouvements et les bruits de la cible et représenter sa position, ce qui permet au chevalier de lui tirer dessus avec une arme disposant de l’effet artillerie notamment, ou d’utiliser automatiquement tout effet venant de ses éventuelles visions alternatives.
+
+L’effet permet par exemple, couplé avec un module de type vision prédatrice, de voir la cible à travers les murs, silhouettée sur la visière à Réalité Augmentée de la méta-armure. Tant que la signature de la cible reste visible par la méta-armure, la cible reste désignée. Attention : L’effet ne peut être cumulé sur une même cible.">Désignation</option>
+
+							<option value="Lorsque les dégâts impactent les points d’armure de la cible, si elle a des PA, on ajoute 2D6 au total de dégâts. Si un seul point de dégâts passe le bouclier et le CdF de la cible, l’effet est appliqué.">Destructeur</option>
+							
+							<option value="Cet effet signifie simplement que le chevalier doit utiliser ses deux mains pour frapper ou tirer avec l’arme. Utiliser à une main une arme possédant cet effet est impossible, l’arme étant trop lourde ou possédant trop de recul pour toucher efficacement.">Deux Mains</option>
+							
+							<option value="L’arme peut toucher plusieurs ennemis et ses dégâts peuvent donc s’appliquer à plusieurs du moment que ces ennemis sont à moins de deux mètres les uns des autres. X représente le nombre d’ennemis que l’arme peut toucher dans une même action. Un seul jet d’attaque est à effectuer contre un seul ennemi. Les autres ennemis proches subissent automatiquement les dégâts et les autres effets que dispersion, à condition que le résultat du test d’attaque dépasse leur score d’opposition. Typiquement, les lance-flammes ou les armes explosives infligent cet effet. Cet effet n’affecte pas les bandes contre lesquelles seule la violence peut s’appliquer.
+
+Attention : Si l’effet est utilisé contre des ennemis au contact avec un autre PJ, ce dernier subit aussi les dégâts de la dispersion. ">Dispersion X</option>
+
+							<option value="Lorsque le PJ utilisant cette arme réussit à éliminer (pas forcément à tuer, neutraliser suffit) un hostile ou un salopard, il peut effectuer au prix de 3 PE, au même tour et à la même initiative, une autre attaque sur un autre hostile ou un autre salopard qui se trouve à portée de son arme (un test pour toucher est de nouveau nécessaire). Si cette deuxième attaque élimine la cible, l’effet peut s’appliquer une nouvelle fois et ainsi de suite. Le coût en énergie intervient en plus de l’éventuel coût en énergie de l’arme. Chaque nouvelle attaque doit donner lieu à une dépense d’énergie en conséquence. 
+
+Dans le cas où plusieurs ennemis sont éliminés en même temps, l’effet en chaîne ne s’applique qu’une seule fois.">En Chaîne</option>
+
+							<option value="Contre des désespérés, l’équipement est extrêmement puissant. S’il le veut, un PJ peut décider d’échanger les dégâts qu’il devrait infliger contre l’application de l’effet espérance. L’arme, plutôt que d’infliger des dégâts, traverse alors le corps du désespéré, arrachant une partie de son désespoir.
+
+S’il le fait, chaque PNJ désespéré touché par l’attaque peut effectuer un test de Bête difficulté ardu (5) (ou Hargne combo Sang-Froid dans le cas d’un PJ) pour combattre le désespoir. Chaque attaque supplémentaire infligée par l’équipement à un même désespéré et appliquant l’effet espérance fait baisser le niveau de difficulté du test de 1. Si le désespéré réussit son test, alors il a réussi à vaincre le désespoir et n’est plus un ennemi. Il peut se joindre aux chevaliers ou rester terrorisé par ce qu’il a commis ou par ce qui lui est arrivé (au choix du MJ).
+
+Contre une bande de désespérés, on considère que l’équipement fait simplement baisser sa cohésion. Cependant, si le personnage utilisant un équipement avec l’effet espérance a infligé assez de violence à une bande pour qu’elle tombe à 0 point de cohésion, les désespérés qui la composent reprennent espoir et retrouvent simplement leurs esprits. Ils se souviendront tout de même des actes qu’ils ont commis. 
+
+Contre les autres types d’ennemis, les équipements possédant l’effet espérance infligent des dégâts et de la violence de manière normale.">Espérance</option>
+
+							<option value="Lorsque l’arme est utilisée contre une bande avec un score d’aspect Chair de 10 ou plus, la violence de l’arme est augmentée de 4D6.">Fureur</option>
+							
 							<option value="L’arme ignore purement et simplement la valeur de points d’armure d’un adversaire. La santé de la cible est directement touchée si les dégâts passent le CdF ou le bouclier.">Ignore Armure</option>
-							<option value="L'arme ignore purement et simplement le champ de force de l'adversaire.">Ignore Champs de Force</option>
+							
+							<option value="L’arme ignore purement et simplement le champ de force d’un adversaire. Les PS de la cible sont directement touchés si les dégâts passent les PA ou le bouclier.">Ignore Champ de Force</option>
+							
 							<option value="Lorsqu’on utilise deux exemplaires de cette arme en style akimbo, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3).">Jumelé (Akimbo)</option>
-							<option value="Lorsqu’on utilise deux armes disposant de cet effet en style ambidextre, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3)">Jumelé (Ambidextrie)</option>
-							<option value="Lorsque l'arme est utilisé son utilisateur ajoute sa force multipliée par deux lorsqu'il calcul ses dégâts. Seuls les personnages ayant un score de Force de 4 ou supérieur, ou un overdrive de Force peuvent utiliser une arme avec cet effet.">Lesté</option>
-							<option value="Lorsqu'il utilise une arme avec cet effet, le personnage perd son action de déplacement. De même, s'il a déjà bougé, il ne peut pas frapper avec une arme possédant cet effet. Les armes Lourdes sont également à Deux Mains.">Lourd</option>
-							<option value="Quand l'arme frappe une créature ou une bande de l'anathème ses scores de défense et de réaction sont réduits d'une valeur X durant le tour suivant. Non cumulatif.">Lumière X</option>
-							<option value="Si l'arme impact la santé de la cible on ajoute 2d6 au dégâts. Il suffit qu'un seul point de dégâts touche la santé pour que cela s'applique.">Meurtrier</option>
-							<option value="Inflige toujours le maximum de dégâts. Si combiné avec Dispersion, chaque cible touchée subit le maximum de dégâts également.">Oblitération</option>
-							<option value="Lors du calcul de dégâts de cette arme l'utilisateur ajoute sa dextérité au total + 1 point de dégâts par overdrive.">Orfèvrerie</option>
-							<option value="Cet effet s’applique uniquement aux méta-armures, exosquelettes, robots, véhicules, créatures de la Machine et tous les ennemis possé- dant la capacité sensibilité IEM. L’ennemi du type désigné perd automatiquement ses X prochaines actions.">Parasitage X</option>
-							<option value="L'arme ignore une valeur X du champ de force de la cible. Ne fonctionne pas contre un score de bouclier.">Pénétrant X</option>
+							
+							<option value="Lorsqu’on utilise deux armes disposant de cet effet en style ambidextre, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3).">Jumelé (Ambidextrie)</option>
+							
+							<option value="Lorsque l’arme est utilisée, son utilisateur ajoute le score de la caractéristique Force multipliée par deux (ou Chair complet pour un PNJ) lorsqu’il détermine les dégâts plutôt que sa Force seule (ou Chair divisé par 2). Seuls les PJ ayant un score de Force égal ou supérieur à 4 ou possédant un overdrive de Force peuvent utiliser une arme avec un tel effet.">Lesté</option>
+							
+							<option value="Pour utiliser cette arme, vous devez dépenser une (et une seule) action de déplacement et une (et une seule) action de combat. Les actions supplémentaires acquises ne sont pas touchées par cet effet.">Lourd</option>
+							
+							<option value="Lorsque l’arme frappe une créature de l’Anathème ou une bande de l’Anathème, ses scores de défense et de réaction sont réduits d’une certaine valeur jusqu’à la fin du prochain tour du PJ qui a infligé l’effet lumière. X représente cette valeur. Cet effet ne peut pas se cumuler sur une même cible.">Lumière X</option>
+							
+							<option value="Lorsque les dégâts impactent la santé de la cible, on ajoute 2D6 au total des dégâts. Si un seul point de dégâts passe l’armure, le bouclier et le CdF de la cible, l’effet meurtrier est appliqué.">Meurtrier</option>
+							
+							<option value="Ces équipements particulièrement puissants infligent des dégâts considérables aux cibles les moins résistantes. Contre un ennemi de type hostile, ils infligent toujours le résultat maximal des dés de dégâts, comme si chacun des dés avait fait 6. Les dés ne sont simplement pas lancés. Si l’arme possède l’effet dispersion, chaque cible hostile touchée subit le maximum de dégâts.">Oblitération</option>
+							
+							<option value="Lorsque l’arme est utilisée, son utilisateur ajoute sa caractéristique Dextérité (+ 1 point de dégâts par overdrive) (ou Masque divisé par 2, arrondi à l’entier supérieur, pour un PNJ) lorsqu’il détermine les dégâts en plus d’autres caractéristiques déjà incluses.">Orfèvrerie</option>
+							
+							<option value="Cet effet s’applique uniquement aux méta-armures, exosquelettes, robots, véhicules, créatures de la Machine et tous les ennemis possédant la capacité sensibilité IEM. La cible touchée par une attaque avec parasitage X perd automatiquement ses X prochaines actions. 
+Attention : l’effet ne peut pas se cumuler alors que la cible est déjà sous l’effet parasitage X et ne se cumule pas avec l’effet choc X.">Parasitage X</option>
+							
+							<option value="L’arme ignore une certaine valeur de champ de force, X représentant cette valeur. Si la valeur est égale ou supérieure au champ de force de l’ennemi, celui-ci est tout simplement ignoré et les points d’armure (ou les points de santé si la cible n’a pas de PA) sont directement touchés. Cet effet ne fonctionne pas contre le score de bouclier d’une cible.">Pénétrant X</option>
+							
 							<option value="L’arme ignore une certaine valeur d’armure, X représentant cette valeur. Si la valeur est égale ou supérieure aux points d’armure de l’ennemi, le total de PA est simplement ignoré et la santé est directement touchée.">Perce Armure X</option>
-							<option value="Lors du calcul de dégâts de cette arme l'utilisateur ajoute son tir au total + 1 point de dégâts par overdrive.">Précision</option>
-							<option value="Le personnage ne peut être repéré par un PNJ lorsqu'il utilise l’arme. Lors d'une attaque surprise, d'une invisibilité, d'un mode Ghost ou d'un mode Changeling, la Discrétion + OD est ajoutée aux dégâts.">Silencieux</option>
-							<option value="Après avoir touché sa cible avec un effet soumission, l’attaquant peut soumettre sa cible physiquement et l’empêcher de se déplacer ou d’attaquer qui que ce soit d’autre que l’attaquant, et ce au contact. Pour se libérer de l’effet soumission, la cible touchée doit, à son tour, réussir un test base Déplacement ou Combat (aspect Chair ou Bête) dont la difficulté est définie par le nombre de réussites de l’attaquant. Si la cible n’a pas pu se libérer à son tour, l’attaquant peut maintenir la soumission sans relancer les dés et infliger des dégâts normalement, ou relancer un test d’attaque afin de renforcer sa prise. Si le jet est à nouveau réussi, les dégâts sont infligés sans prendre en considération tout éventuel champ de force ou bouclier (pour les créatures de l’Anathème). L’effet soumission ne peut impacter les colosses tel quel mais peut tout de même être pris en compte par le MJ.">Soumission</option>
-							<option value="L’équipement a été pensé pour anéantir les créatures de l’Anathème et uniquement celles ci. Contre des ennemis humains (de n’importe quel type), il n’inflige que la moitié de ses dés de dégâts et de ses dés de violence.">Ténébricide</option>
-							<option value="Lors du calcul des dégâts, il est possible, une fois par attaque, d’annuler tous les résultats et de relancer les dés. Le nouveau résultat remplace le premier et doit être conservé. Il n’est pas possible de prendre la moyenne des dégâts en utilisant cet effet.">Tir en rafale</option>
-							<option value="Le personnage peut tirer a couvert sans subir de malus au tir.">Tir en sécurité</option>
-							<option value="Lorsque l'arme est utilisé contre une bande avec une valeur de chair de moins de 10, la violence est augmentée de 2D6.">Ultraviolence</option>
+							
+							<option value="Lorsque l’arme est utilisée, son utilisateur ajoute sa caractéristique Tir (+ 1 point de dégâts par overdrive) (ou Machine divisé par 2, arrondi à l’entier supérieur, pour u PNJ) lorsqu’il détermine les dégâts.">Précision</option>
+							
+							<option value="Le personnage ne peut être repéré par un autre personnage parce qu’il utilise son arme. Lorsque cet effet est utilisé pendant une attaque surprise, une invisibilité, un mode Ghost ou un mode Changeling, le score de la caractéristique Discrétion (plus les éventuels OD) du PJ est ajouté aux dégâts. Dans le cas des PNJ, c’est la moitié du score de Masque (plus le score de Masque exceptionnel éventuel) qui est ajouté aux dégâts. Cet effet peut s’ajouter à ceux du mode Ghost et du niveau 2 de l’overdrive de Discrétion.">Silencieux</option>
+							
+							<option value="Après avoir touché sa cible avec un effet soumission, l’attaquant peut soumettre sa cible physiquement et l’empêcher de se déplacer ou d’attaquer qui que ce soit d’autre que l’attaquant, et ce au contact. Pour se libérer de l’effet soumission, la cible touchée doit, à son tour, réussir un test de base Déplacement ou Combat (aspect Chair ou Bête) dont la difficulté est définie par le nombre de réussites de l’attaquant. Si la cible n’a pas pu se libérer à son tour, l’attaquant peut maintenir la soumission sans relancer les dés et infliger des dégâts normalement, ou relancer un test d’attaque afin de renforcer sa prise. Si le jet est à nouveau réussi, les dégâts sont infligés sans prendre en considération tout éventuel champ de force ou bouclier (pour les créatures de l’Anathème). L’effet soumission ne peut impacter les colosses.">Soumission</option>
+							
+							<option value="L’équipement a été pensé pour anéantir les créatures de l’Anathème et uniquement celles-ci. Contre des ennemis humains (de n’importe quel type), il n’inflige que la moitié de ses dés de dégâts et de ses dés de violence.">Ténébricide</option>
+							
+							<option value="Lors du calcul des dégâts, il est possible, une fois par attaque, d’annuler tous les résultats et de relancer les dés. Le nouveau résultat remplace le premier et doit être conservé. Il n’est pas possible de prendre la moyenne de dégâts en utilisant cet effet.">Tir en rafale</option>
+							
+							<option value="Grâce à une caméra sur le bout du canon ou à un canon déformable, le porteur de l’arme peut tirer tout en bénéficiant des bonus du style à couvert sans subir de malus au tir.">Tir en sécurité</option>
+							
+							<option value="Lorsque l’arme est utilisée contre une bande avec un score d’aspect Chair de moins de 10, la violence de l’arme est augmentée de 2D6.">Ultraviolence</option>
 						</select>
 					</div>
 					<div class="autoex autoex100">
@@ -18073,46 +18314,107 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 					<div>
 						<select name="attr_effetArmes" class="full">
 							<option value="" selected></option>
-							<option value="Le PNJ peut décider d’infliger ses dégâts sur les points d’espoir plutôt que sur les points de santé. Le CdF fonctionne, mais pas les points d’armure. Si le PNJ est tué, les PNJ ayant subi cet effet récupèrent 1D6 points d’espoir par tranche complète de 6 points d’espoir perdus.">Anathème</option>
-							<option value="Ignore la valeur de bouclier et de chair exceptionnel de la créature prise pour cible. Les PA de la cible puis ses PS sont directement touché.">Anti-Anathème</option>
-							<option value="Si l'arme tire sur un véhicule ou un colosse elle inflige ses dégâts normaux et n'a pas besoin d'infliger des tranches de 10 points de dégâts pour en infliger 1 à ces énormes ennemi.">Anti-Véhicule</option>
-							<option value="L'arme peut tirée sans ligne de vue ni malus de portée sur une cible préalablement désignée. La cible ne bénéficie d'aucun bonus de couvert, tant que la balle peut l'atteindre.">Artillerie</option>
+							
+							<option value="Le PNJ peut décider d’infliger ses dégâts sur les points d’espoir plutôt que sur les points de santé. Le CdF fonctionne, mais pas les points d’armure. Si le PNJ est tué, les PJ ayant subi cet effet récupèrent 1D6 points d’espoir par tranche complète de 6 points d’espoir perdus.">Anathème</option>
+							
+							<option value="L’arme ignore purement et simplement la valeur de bouclier et de Chair exceptionnelle (qu’elle soit majeure ou mineure) de la créature de l’Anathème prise pour cible. Les PA, puis la santé de la cible sont directement touchés. Lorsqu’une arme de ce type touche une bande de créatures de l’Anathème, ses scores de bouclier et de Chair exceptionnelle sont ignorés.">Anti-Anathème</option>
+									
+							<option value="Les armes possédant cet effet sont conçues pour détruire les véhicules, les blindés et abattre les ennemis de type colosse. Lorsque l’arme tire sur un véhicule ou un colosse, elle inflige ses dégâts normaux et n’a pas besoin d’infliger des tranches de 10 points de dégâts pour en infliger 1 à ces énormes ennemis.">Anti-Véhicule</option>
+							
+							<option value="Si la cible a préalablement été désignée, l’arme peut tirer sans les malus de portée et sans ligne de vue (il faut quand même une ligne de tir direct). La cible ne bénéficie d’aucun bonus de couvert. Attention, il faut que la munition puisse atteindre la cible d’une manière ou d’une autre et qu’un test de tir soit effectué. Une cible préalablement désignée est toujours atteignable, quelle que soit la distance et le « couvert », sans avoir besoin de ligne de tir dégagée.">Artillerie</option>
+							
 							<option value="Ajoute XD6 aux dégâts lors des attaques surprises.">Assassin X</option>
-							<option value="Chaque réussite au dessus du score de réaction ou de défense de la cible permet de lui infliger 1 point de dégât ou de violence supplémentaire.">Assistance à l'attaque</option>
-							<option value="Il est possible de sacrifier ses dégâts ou sa violence pour diminuer la défense et la réaction de la bande ou du PNJ ciblé d'un nombre de points égal à X jusqu'au début du prochain tour. Aucun test d'attaque n'est nécessaire.">Barrage X</option>
-							<option value="L’arme est très rapide et peut cibler X adversaires par action de combat au lieu d’un seul. Une attaque doit être réalisée pour chacune des cibles, avec 3 dés de malus. Chacune des cibles ne peut être distante de plus de 2 mètres.">Cadence X</option>
-							<option value="Définie le nombre de munition et d'utilisation par mission de l'objet.">Chargeur X</option>
-							<option value="Si le jet de toucher avec l'arme est supérieur au score de chair de la cible celle ci perd ses X prochaine actions. Cette effet ne fonctionne pas contre les bandes. Effet non cumulable.">Choc X</option>
-							<option value="L'utilisateur bénéficie d'un bonus en défense ou en réaction de X lorsqu'il utilise cette arme ou module.">Défense X / Réaction X</option>
-							<option value="L'arme inflige X dégâts tous les tours durant 1D6 tour.">Dégâts Continus X</option>
-							<option value="Avec une attaque réussie, l'arme enlève 2 points au score de débordement du tour actuel. L'effet ne dure qu'un tour et nécessite d'être renouvelé chaque tour.">Démoralisant</option>
-							<option value="L'arme permet de désigner une cible une fois part tour. Son utilisateur et ses alliés possède un bonus d'une réussite automatique pour touché la cible et ignore les échecs critiques. La cible demeure désigner durant toute la scène ou toute la phase de conflit. Effet non cumulable.">Désignation</option>
-							<option value="Si l'arme inflige des dégâts a une armure on ajoute 2D6 au total des dégâts.">Destructeur</option>
-							<option value="Utiliser à une main une arme possédant cet effet est impossible, l'arme étant trop lourde ou possédant trop de recul pour toucher efficacement.">Deux Mains</option>
-							<option value="L'arme peut toucher un nombre X d'ennemis distant de moins de deux mètres les uns des autres. N'affecte pas les bandes.">Dispersion X</option>
-							<option value="Si le PJ tue un hostile ou un salopard avec cette arme, il peut effectuer, au prix de 3PE, au même tour et a la même initiative une autre attaque contre un autre hostile ou un autre salopard à portée. Applicable plusieurs fois si l'ennemi suivant est tué.">En Chaîne</option>
-							<option value="Permet d'échanger les dégâts de l'arme contre l'effet Espérance. Toute personne désespérée touchée par l'attaque peut effectuer un test de Bête (ou Hargne/Sang-Froid) difficulté 5 pour combattre le désespoir. Chaque attaque supplémentaire sur une même personne fait baisser la difficulté de 1. Si le test est réussi, le déséspéré a vaincu le désespoir et n'est plus un ennemi. Sur une Bande, cela a le même effet, mais en baissant simplement la cohésion. Si elle tombe à 0, la bande reprend espoir.">Espérance</option>
-							<option value="Si l'arme est utilisée contre une cible ayant un score de chair de 10 ou plus la violence de l'arme est augmenté de 4D6.">Fureur</option>
+							
+							<option value="Lorsqu’un jet pour toucher est effectué avec cette arme, chaque réussite excédentaire au-dessus du score de réaction (dans le cas d’un tir) ou de défense (dans le cas d’une attaque au contact) de la cible permet de lui infliger 1 point de dégât (ou de violence dans le cas d’une bande) supplémentaire.">Assistance à l'attaque</option>
+							
+							<option value="Au lieu de faire une attaque, le chevalier peut décider, au prix de son action de combat, de diminuer la défense et la réaction de la bande ou du PNJ ciblé d’un nombre de points égal à X jusqu’au début de son prochain tour, permettant ainsi à ses alliés de toucher plus facilement. L’effet s’applique automatiquement. Aucun autre effet, et aucun dégât de l’arme ne s’applique. Plusieurs effets barrage peuvent s’appliquer sur une même cible et se cumulent. Mais attention, l’effet barrage infligé par l’arme d’un PJ prend fin au début de son tour de jeu suivant (dès ce que c’est à lui de jouer de nouveau).">Barrage X</option>
+							
+							<option value="L’arme est très rapide et peut cibler X adversaires par action de combat au lieu d’un seul. Une attaqu doit être réalisée pour chacune des cibles, avec 3 dés d malus. Chacune des cibles ne peut être distante de plus d 2 mètres.">Cadence X</option>
+							
+							<option value="L’arme ou le module dispose d’un nombre d’utilisations indiqué par X. Une fois utilisé autant de fois que X, on estime qu’il n’a plus de munitions et ne peut donc plus faire feu. L’arme ou le module doit être rechargé (gratuitement) à Camelot entre deux missions.">Chargeur X</option>
+							
+							<option value="Si le jet pour toucher avec l’arme est supérieur au score de l’aspect Chair (divisé par 2 pour un PNJ) de la cible, celle-ci perd ses X prochaines actions. Cet effet ne fonctionne pas contre les bandes. Attention, l’effet ne peut pas se cumuler alors que la cible est déjà sous l’effet choc.
+
+Dans certaines circonstances, l’effet choc peut être considéré comme automatique et ne prend donc pas en compte le score de l’aspect Chair. Lorsque l’effet choc est censé s’appliquer automatiquement, il faut tout de même que le personnage touche sa cible. En revanche, son résultat n’a pas besoin d’égaler l’aspect Chair divisé par deux de la cible pour que l’effet fonctionne. En fonction des circonstances, le MJ peut décider qu’un personnage sous l’effet choc subit un malus de 2 à sa réaction et à sa défense. L’effet ne se cumule pas avec parasitage X.">Choc X</option>
+
+							<option value="L’utilisateur bénéficie d’un bonus en défense ou en réaction, X représentant cette valeur, tant qu’il utilise cette arme ou module. Les bonus reçus peuvent se cumuler tant que le personnage peut bénéficier de l’effet.">Défense X / Réaction X</option>
+							
+							<option value="L’arme inflige X points de dégâts à chaque tour durant 1D6 tours. Les dégâts sont subis par la cible à chacun de ses tours de jeu et ignorent les éventuels scores de CdF ou de bouclier. Au regard de la technologie utilisée, l’effet ne peut se stopper que si la cible reçoit les soins appropriés ou s’il se termine de lui-même. Typiquement, cet effet se retrouve sur les armes causant des brûlures. Cet effet ne peut être cumulé sur une même créature tant que l’effet est déjà présent au moins une fois.">Dégâts Continus X</option>
+							
+							<option value="Avec une attaque réussie, l’arme enlève 2 points au score de débordement que les bandes composées d’humains infligent, avant calcul des dégâts effectifs.
+
+Les dégâts effectifs du tour sont donc égaux débordement moins 2 multiplié par le nombre de tours écoulés à ce tour.
+
+Autrement dit, démoralisant réduit le débordement pour le tour en cours, et uniquement le tour en cours. Précision : Si l’effet démoralisant est appliqué plusieurs fois, cela se cumule en ajoutant un tour de durée (et non pas en sous-trayant des points supplémentaires au débordement de la bande ciblée).">Démoralisant</option>
+
+							<option value="L’arme peut désigner une cible (une seule cible, pas une bande) une fois par tour. Son utilisateur et ses alliés reçoivent un bonus de 1 réussite automatique pour toucher la cible et ignorent toujours les éventuels échecs critiques qu’ils pourraient subir lorsqu’ils tentent de la toucher. Désigner une cible ne coûte pas d’action. Il n’y a aucun test à effectuer pour désigner une cible et la portée de la désignation est celle de l’arme utilisée. La cible demeure désignée durant toute la scène ou toute la phase de conflit. 
+
+Une fois désignée, l’armure va suivre les mouvements et les bruits de la cible et représenter sa position, ce qui permet au chevalier de lui tirer dessus avec une arme disposant de l’effet artillerie notamment, ou d’utiliser automatiquement tout effet venant de ses éventuelles visions alternatives.
+
+L’effet permet par exemple, couplé avec un module de type vision prédatrice, de voir la cible à travers les murs, silhouettée sur la visière à Réalité Augmentée de la méta-armure. Tant que la signature de la cible reste visible par la méta-armure, la cible reste désignée. Attention : L’effet ne peut être cumulé sur une même cible.">Désignation</option>
+
+							<option value="Lorsque les dégâts impactent les points d’armure de la cible, si elle a des PA, on ajoute 2D6 au total de dégâts. Si un seul point de dégâts passe le bouclier et le CdF de la cible, l’effet est appliqué.">Destructeur</option>
+							
+							<option value="Cet effet signifie simplement que le chevalier doit utiliser ses deux mains pour frapper ou tirer avec l’arme. Utiliser à une main une arme possédant cet effet est impossible, l’arme étant trop lourde ou possédant trop de recul pour toucher efficacement.">Deux Mains</option>
+							
+							<option value="L’arme peut toucher plusieurs ennemis et ses dégâts peuvent donc s’appliquer à plusieurs du moment que ces ennemis sont à moins de deux mètres les uns des autres. X représente le nombre d’ennemis que l’arme peut toucher dans une même action. Un seul jet d’attaque est à effectuer contre un seul ennemi. Les autres ennemis proches subissent automatiquement les dégâts et les autres effets que dispersion, à condition que le résultat du test d’attaque dépasse leur score d’opposition. Typiquement, les lance-flammes ou les armes explosives infligent cet effet. Cet effet n’affecte pas les bandes contre lesquelles seule la violence peut s’appliquer.
+
+Attention : Si l’effet est utilisé contre des ennemis au contact avec un autre PJ, ce dernier subit aussi les dégâts de la dispersion. ">Dispersion X</option>
+
+							<option value="Lorsque le PJ utilisant cette arme réussit à éliminer (pas forcément à tuer, neutraliser suffit) un hostile ou un salopard, il peut effectuer au prix de 3 PE, au même tour et à la même initiative, une autre attaque sur un autre hostile ou un autre salopard qui se trouve à portée de son arme (un test pour toucher est de nouveau nécessaire). Si cette deuxième attaque élimine la cible, l’effet peut s’appliquer une nouvelle fois et ainsi de suite. Le coût en énergie intervient en plus de l’éventuel coût en énergie de l’arme. Chaque nouvelle attaque doit donner lieu à une dépense d’énergie en conséquence. 
+
+Dans le cas où plusieurs ennemis sont éliminés en même temps, l’effet en chaîne ne s’applique qu’une seule fois.">En Chaîne</option>
+
+							<option value="Contre des désespérés, l’équipement est extrêmement puissant. S’il le veut, un PJ peut décider d’échanger les dégâts qu’il devrait infliger contre l’application de l’effet espérance. L’arme, plutôt que d’infliger des dégâts, traverse alors le corps du désespéré, arrachant une partie de son désespoir.
+
+S’il le fait, chaque PNJ désespéré touché par l’attaque peut effectuer un test de Bête difficulté ardu (5) (ou Hargne combo Sang-Froid dans le cas d’un PJ) pour combattre le désespoir. Chaque attaque supplémentaire infligée par l’équipement à un même désespéré et appliquant l’effet espérance fait baisser le niveau de difficulté du test de 1. Si le désespéré réussit son test, alors il a réussi à vaincre le désespoir et n’est plus un ennemi. Il peut se joindre aux chevaliers ou rester terrorisé par ce qu’il a commis ou par ce qui lui est arrivé (au choix du MJ).
+
+Contre une bande de désespérés, on considère que l’équipement fait simplement baisser sa cohésion. Cependant, si le personnage utilisant un équipement avec l’effet espérance a infligé assez de violence à une bande pour qu’elle tombe à 0 point de cohésion, les désespérés qui la composent reprennent espoir et retrouvent simplement leurs esprits. Ils se souviendront tout de même des actes qu’ils ont commis. 
+
+Contre les autres types d’ennemis, les équipements possédant l’effet espérance infligent des dégâts et de la violence de manière normale.">Espérance</option>
+
+							<option value="Lorsque l’arme est utilisée contre une bande avec un score d’aspect Chair de 10 ou plus, la violence de l’arme est augmentée de 4D6.">Fureur</option>
+							
 							<option value="L’arme ignore purement et simplement la valeur de points d’armure d’un adversaire. La santé de la cible est directement touchée si les dégâts passent le CdF ou le bouclier.">Ignore Armure</option>
-							<option value="L'arme ignore purement et simplement le champ de force de l'adversaire.">Ignore Champs de Force</option>
+							
+							<option value="L’arme ignore purement et simplement le champ de force d’un adversaire. Les PS de la cible sont directement touchés si les dégâts passent les PA ou le bouclier.">Ignore Champ de Force</option>
+							
 							<option value="Lorsqu’on utilise deux exemplaires de cette arme en style akimbo, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3).">Jumelé (Akimbo)</option>
-							<option value="Lorsqu’on utilise deux armes disposant de cet effet en style ambidextre, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3)">Jumelé (Ambidextrie)</option>
-							<option value="Lorsque l'arme est utilisé son utilisateur ajoute sa force multipliée par deux lorsqu'il calcul ses dégâts. Seuls les personnages ayant un score de Force de 4 ou supérieur, ou un overdrive de Force peuvent utiliser une arme avec cet effet.">Lesté</option>
-							<option value="Lorsqu'il utilise une arme avec cet effet, le personnage perd son action de déplacement. De même, s'il a déjà bougé, il ne peut pas frapper avec une arme possédant cet effet. Les armes Lourdes sont également à Deux Mains.">Lourd</option>
-							<option value="Quand l'arme frappe une créature ou une bande de l'anathème ses scores de défense et de réaction sont réduits d'une valeur X durant le tour suivant. Non cumulatif.">Lumière X</option>
-							<option value="Si l'arme impact la santé de la cible on ajoute 2d6 au dégâts. Il suffit qu'un seul point de dégâts touche la santé pour que cela s'applique.">Meurtrier</option>
-							<option value="Inflige toujours le maximum de dégâts. Si combiné avec Dispersion, chaque cible touchée subit le maximum de dégâts également.">Oblitération</option>
-							<option value="Lors du calcul de dégâts de cette arme l'utilisateur ajoute sa dextérité au total + 1 point de dégâts par overdrive.">Orfèvrerie</option>
-							<option value="Cet effet s’applique uniquement aux méta-armures, exosquelettes, robots, véhicules, créatures de la Machine et tous les ennemis possé- dant la capacité sensibilité IEM. L’ennemi du type désigné perd automatiquement ses X prochaines actions.">Parasitage X</option>
-							<option value="L'arme ignore une valeur X du champ de force de la cible. Ne fonctionne pas contre un score de bouclier.">Pénétrant X</option>
+							
+							<option value="Lorsqu’on utilise deux armes disposant de cet effet en style ambidextre, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3).">Jumelé (Ambidextrie)</option>
+							
+							<option value="Lorsque l’arme est utilisée, son utilisateur ajoute le score de la caractéristique Force multipliée par deux (ou Chair complet pour un PNJ) lorsqu’il détermine les dégâts plutôt que sa Force seule (ou Chair divisé par 2). Seuls les PJ ayant un score de Force égal ou supérieur à 4 ou possédant un overdrive de Force peuvent utiliser une arme avec un tel effet.">Lesté</option>
+							
+							<option value="Pour utiliser cette arme, vous devez dépenser une (et une seule) action de déplacement et une (et une seule) action de combat. Les actions supplémentaires acquises ne sont pas touchées par cet effet.">Lourd</option>
+							
+							<option value="Lorsque l’arme frappe une créature de l’Anathème ou une bande de l’Anathème, ses scores de défense et de réaction sont réduits d’une certaine valeur jusqu’à la fin du prochain tour du PJ qui a infligé l’effet lumière. X représente cette valeur. Cet effet ne peut pas se cumuler sur une même cible.">Lumière X</option>
+							
+							<option value="Lorsque les dégâts impactent la santé de la cible, on ajoute 2D6 au total des dégâts. Si un seul point de dégâts passe l’armure, le bouclier et le CdF de la cible, l’effet meurtrier est appliqué.">Meurtrier</option>
+							
+							<option value="Ces équipements particulièrement puissants infligent des dégâts considérables aux cibles les moins résistantes. Contre un ennemi de type hostile, ils infligent toujours le résultat maximal des dés de dégâts, comme si chacun des dés avait fait 6. Les dés ne sont simplement pas lancés. Si l’arme possède l’effet dispersion, chaque cible hostile touchée subit le maximum de dégâts.">Oblitération</option>
+							
+							<option value="Lorsque l’arme est utilisée, son utilisateur ajoute sa caractéristique Dextérité (+ 1 point de dégâts par overdrive) (ou Masque divisé par 2, arrondi à l’entier supérieur, pour un PNJ) lorsqu’il détermine les dégâts en plus d’autres caractéristiques déjà incluses.">Orfèvrerie</option>
+							
+							<option value="Cet effet s’applique uniquement aux méta-armures, exosquelettes, robots, véhicules, créatures de la Machine et tous les ennemis possédant la capacité sensibilité IEM. La cible touchée par une attaque avec parasitage X perd automatiquement ses X prochaines actions. 
+Attention : l’effet ne peut pas se cumuler alors que la cible est déjà sous l’effet parasitage X et ne se cumule pas avec l’effet choc X.">Parasitage X</option>
+							
+							<option value="L’arme ignore une certaine valeur de champ de force, X représentant cette valeur. Si la valeur est égale ou supérieure au champ de force de l’ennemi, celui-ci est tout simplement ignoré et les points d’armure (ou les points de santé si la cible n’a pas de PA) sont directement touchés. Cet effet ne fonctionne pas contre le score de bouclier d’une cible.">Pénétrant X</option>
+							
 							<option value="L’arme ignore une certaine valeur d’armure, X représentant cette valeur. Si la valeur est égale ou supérieure aux points d’armure de l’ennemi, le total de PA est simplement ignoré et la santé est directement touchée.">Perce Armure X</option>
-							<option value="Lors du calcul de dégâts de cette arme l'utilisateur ajoute son tir au total + 1 point de dégâts par overdrive.">Précision</option>
-							<option value="Le personnage ne peut être repéré par un PNJ lorsqu'il utilise l’arme. Lors d'une attaque surprise, d'une invisibilité, d'un mode Ghost ou d'un mode Changeling, la Discrétion + OD est ajoutée aux dégâts.">Silencieux</option>
-							<option value="Après avoir touché sa cible avec un effet soumission, l’attaquant peut soumettre sa cible physiquement et l’empêcher de se déplacer ou d’attaquer qui que ce soit d’autre que l’attaquant, et ce au contact. Pour se libérer de l’effet soumission, la cible touchée doit, à son tour, réussir un test base Déplacement ou Combat (aspect Chair ou Bête) dont la difficulté est définie par le nombre de réussites de l’attaquant. Si la cible n’a pas pu se libérer à son tour, l’attaquant peut maintenir la soumission sans relancer les dés et infliger des dégâts normalement, ou relancer un test d’attaque afin de renforcer sa prise. Si le jet est à nouveau réussi, les dégâts sont infligés sans prendre en considération tout éventuel champ de force ou bouclier (pour les créatures de l’Anathème). L’effet soumission ne peut impacter les colosses tel quel mais peut tout de même être pris en compte par le MJ.">Soumission</option>
-							<option value="L’équipement a été pensé pour anéantir les créatures de l’Anathème et uniquement celles ci. Contre des ennemis humains (de n’importe quel type), il n’inflige que la moitié de ses dés de dégâts et de ses dés de violence.">Ténébricide</option>
-							<option value="Lors du calcul des dégâts, il est possible, une fois par attaque, d’annuler tous les résultats et de relancer les dés. Le nouveau résultat remplace le premier et doit être conservé. Il n’est pas possible de prendre la moyenne des dégâts en utilisant cet effet.">Tir en rafale</option>
-							<option value="Le personnage peut tirer a couvert sans subir de malus au tir.">Tir en sécurité</option>
-							<option value="Lorsque l'arme est utilisé contre une bande avec une valeur de chair de moins de 10, la violence est augmentée de 2D6.">Ultraviolence</option>
+							
+							<option value="Lorsque l’arme est utilisée, son utilisateur ajoute sa caractéristique Tir (+ 1 point de dégâts par overdrive) (ou Machine divisé par 2, arrondi à l’entier supérieur, pour u PNJ) lorsqu’il détermine les dégâts.">Précision</option>
+							
+							<option value="Le personnage ne peut être repéré par un autre personnage parce qu’il utilise son arme. Lorsque cet effet est utilisé pendant une attaque surprise, une invisibilité, un mode Ghost ou un mode Changeling, le score de la caractéristique Discrétion (plus les éventuels OD) du PJ est ajouté aux dégâts. Dans le cas des PNJ, c’est la moitié du score de Masque (plus le score de Masque exceptionnel éventuel) qui est ajouté aux dégâts. Cet effet peut s’ajouter à ceux du mode Ghost et du niveau 2 de l’overdrive de Discrétion.">Silencieux</option>
+							
+							<option value="Après avoir touché sa cible avec un effet soumission, l’attaquant peut soumettre sa cible physiquement et l’empêcher de se déplacer ou d’attaquer qui que ce soit d’autre que l’attaquant, et ce au contact. Pour se libérer de l’effet soumission, la cible touchée doit, à son tour, réussir un test de base Déplacement ou Combat (aspect Chair ou Bête) dont la difficulté est définie par le nombre de réussites de l’attaquant. Si la cible n’a pas pu se libérer à son tour, l’attaquant peut maintenir la soumission sans relancer les dés et infliger des dégâts normalement, ou relancer un test d’attaque afin de renforcer sa prise. Si le jet est à nouveau réussi, les dégâts sont infligés sans prendre en considération tout éventuel champ de force ou bouclier (pour les créatures de l’Anathème). L’effet soumission ne peut impacter les colosses.">Soumission</option>
+							
+							<option value="L’équipement a été pensé pour anéantir les créatures de l’Anathème et uniquement celles-ci. Contre des ennemis humains (de n’importe quel type), il n’inflige que la moitié de ses dés de dégâts et de ses dés de violence.">Ténébricide</option>
+							
+							<option value="Lors du calcul des dégâts, il est possible, une fois par attaque, d’annuler tous les résultats et de relancer les dés. Le nouveau résultat remplace le premier et doit être conservé. Il n’est pas possible de prendre la moyenne de dégâts en utilisant cet effet.">Tir en rafale</option>
+							
+							<option value="Grâce à une caméra sur le bout du canon ou à un canon déformable, le porteur de l’arme peut tirer tout en bénéficiant des bonus du style à couvert sans subir de malus au tir.">Tir en sécurité</option>
+							
+							<option value="Lorsque l’arme est utilisée contre une bande avec un score d’aspect Chair de moins de 10, la violence de l’arme est augmentée de 2D6.">Ultraviolence</option>
 						</select>
 					</div>
 					<div class="autoex autoex100">
@@ -20200,7 +20502,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 					<div class="limiteArmure ODAur2">
 						<h4 class="h4W30">2</h4>
 						<p class="pWAdjusted">
-							Le personnage, lorsqu’il Aurbat des humains, est toujours attaqué en dernier par les hostiles ou les salopards.
+							Le personnage, lorsqu’il Combat des humains, est toujours attaqué en dernier par les hostiles ou les salopards.
 						</p>
 					</div>
 					<div class="limiteArmure ODAur3">
@@ -21600,45 +21902,105 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 				<div>
 					<select name="attr_effetArmes" class="full">
 						<option value="" selected></option>
-						<option value="Ignore la valeur de bouclier et de chair exceptionnel de la créature prise pour cible. Les PA de la cible puis ses PS sont directement touché.">Anti-Anathème</option>
-						<option value="Si l'arme tire sur un véhicule ou un colosse elle inflige ses dégâts normaux et n'a pas besoin d'infliger des tranches de 10 points de dégâts pour en infliger 1 à ces énormes ennemi.">Anti-Véhicule</option>
-						<option value="L'arme peut tirée sans ligne de vue ni malus de portée sur une cible préalablement désignée. La cible ne bénéficie d'aucun bonus de couvert, tant que la balle peut l'atteindre.">Artillerie</option>
+						
+						<option value="L’arme ignore purement et simplement la valeur de bouclier et de Chair exceptionnelle (qu’elle soit majeure ou mineure) de la créature de l’Anathème prise pour cible. Les PA, puis la santé de la cible sont directement touchés. Lorsqu’une arme de ce type touche une bande de créatures de l’Anathème, ses scores de bouclier et de Chair exceptionnelle sont ignorés.">Anti-Anathème</option>
+						
+						<option value="Les armes possédant cet effet sont conçues pour détruire les véhicules, les blindés et abattre les ennemis de type colosse. Lorsque l’arme tire sur un véhicule ou un colosse, elle inflige ses dégâts normaux et n’a pas besoin d’infliger des tranches de 10 points de dégâts pour en infliger 1 à ces énormes ennemis.">Anti-Véhicule</option>
+						
+						<option value="Si la cible a préalablement été désignée, l’arme peut tirer sans les malus de portée et sans ligne de vue (il faut quand même une ligne de tir direct). La cible ne bénéficie d’aucun bonus de couvert. Attention, il faut que la munition puisse atteindre la cible d’une manière ou d’une autre et qu’un test de tir soit effectué. Une cible préalablement désignée est toujours atteignable, quelle que soit la distance et le « couvert », sans avoir besoin de ligne de tir dégagée.">Artillerie</option>
+						
 						<option value="Ajoute XD6 aux dégâts lors des attaques surprises.">Assassin X</option>
-						<option value="Chaque réussite au dessus du score de réaction ou de défense de la cible permet de lui infliger 1 point de dégât ou de violence supplémentaire.">Assistance à l'attaque</option>
-						<option value="Il est possible de sacrifier ses dégâts ou sa violence pour diminuer la défense et la réaction de la bande ou du PNJ ciblé d'un nombre de points égal à X jusqu'au début du prochain tour. Aucun test d'attaque n'est nécessaire.">Barrage X</option>
-						<option value="L’arme est très rapide et peut cibler X adversaires par action de combat au lieu d’un seul. Une attaque doit être réalisée pour chacune des cibles, avec 3 dés de malus. Chacune des cibles ne peut être distante de plus de 2 mètres.">Cadence X</option>
-						<option value="Définie le nombre de munition et d'utilisation par mission de l'objet.">Chargeur X</option>
-						<option value="Si le jet de toucher avec l'arme est supérieur au score de chair de la cible celle ci perd ses X prochaine actions. Cette effet ne fonctionne pas contre les bandes. Effet non cumulable.">Choc X</option>
-						<option value="L'utilisateur bénéficie d'un bonus en défense ou en réaction de X lorsqu'il utilise cette arme ou module.">Défense X / Réaction X</option>
-						<option value="L'arme inflige X dégâts tous les tours durant 1D6 tour.">Dégâts Continus X</option>
-						<option value="Avec une attaque réussie, l'arme enlève 2 points au score de débordement du tour actuel. L'effet ne dure qu'un tour et nécessite d'être renouvelé chaque tour.">Démoralisant</option>
-						<option value="L'arme permet de désigner une cible une fois part tour. Son utilisateur et ses alliés possède un bonus d'une réussite automatique pour touché la cible et ignore les échecs critiques. La cible demeure désigner durant toute la scène ou toute la phase de conflit. Effet non cumulable.">Désignation</option>
-						<option value="Si l'arme inflige des dégâts a une armure on ajoute 2D6 au total des dégâts.">Destructeur</option>
-						<option value="Utiliser à une main une arme possédant cet effet est impossible, l'arme étant trop lourde ou possédant trop de recul pour toucher efficacement.">Deux Mains</option>
-						<option value="L'arme peut toucher un nombre X d'ennemis distant de moins de deux mètres les uns des autres. N'affecte pas les bandes.">Dispersion X</option>
-						<option value="Si le PJ tue un hostile ou un salopard avec cette arme, il peut effectuer, au prix de 3PE, au même tour et a la même initiative une autre attaque contre un autre hostile ou un autre salopard à portée. Applicable plusieurs fois si l'ennemi suivant est tué.">En Chaîne</option>
-						<option value="Permet d'échanger les dégâts de l'arme contre l'effet Espérance. Toute personne désespérée touchée par l'attaque peut effectuer un test de Bête (ou Hargne/Sang-Froid) difficulté 5 pour combattre le désespoir. Chaque attaque supplémentaire sur une même personne fait baisser la difficulté de 1. Si le test est réussi, le déséspéré a vaincu le désespoir et n'est plus un ennemi. Sur une Bande, cela a le même effet, mais en baissant simplement la cohésion. Si elle tombe à 0, la bande reprend espoir.">Espérance</option>
-						<option value="Si l'arme est utilisée contre une cible ayant un score de chair de 10 ou plus la violence de l'arme est augmenté de 4D6.">Fureur</option>
+						
+						<option value="Lorsqu’un jet pour toucher est effectué avec cette arme, chaque réussite excédentaire au-dessus du score de réaction (dans le cas d’un tir) ou de défense (dans le cas d’une attaque au contact) de la cible permet de lui infliger 1 point de dégât (ou de violence dans le cas d’une bande) supplémentaire.">Assistance à l'attaque</option>
+						
+						<option value="Au lieu de faire une attaque, le chevalier peut décider, au prix de son action de combat, de diminuer la défense et la réaction de la bande ou du PNJ ciblé d’un nombre de points égal à X jusqu’au début de son prochain tour, permettant ainsi à ses alliés de toucher plus facilement. L’effet s’applique automatiquement. Aucun autre effet, et aucun dégât de l’arme ne s’applique. Plusieurs effets barrage peuvent s’appliquer sur une même cible et se cumulent. Mais attention, l’effet barrage infligé par l’arme d’un PJ prend fin au début de son tour de jeu suivant (dès ce que c’est à lui de jouer de nouveau).">Barrage X</option>
+						
+						<option value="L’arme est très rapide et peut cibler X adversaires par action de combat au lieu d’un seul. Une attaqu doit être réalisée pour chacune des cibles, avec 3 dés d malus. Chacune des cibles ne peut être distante de plus d 2 mètres.">Cadence X</option>
+						
+						<option value="L’arme ou le module dispose d’un nombre d’utilisations indiqué par X. Une fois utilisé autant de fois que X, on estime qu’il n’a plus de munitions et ne peut donc plus faire feu. L’arme ou le module doit être rechargé (gratuitement) à Camelot entre deux missions.">Chargeur X</option>
+						
+						<option value="Si le jet pour toucher avec l’arme est supérieur au score de l’aspect Chair (divisé par 2 pour un PNJ) de la cible, celle-ci perd ses X prochaines actions. Cet effet ne fonctionne pas contre les bandes. Attention, l’effet ne peut pas se cumuler alors que la cible est déjà sous l’effet choc.
+
+Dans certaines circonstances, l’effet choc peut être considéré comme automatique et ne prend donc pas en compte le score de l’aspect Chair. Lorsque l’effet choc est censé s’appliquer automatiquement, il faut tout de même que le personnage touche sa cible. En revanche, son résultat n’a pas besoin d’égaler l’aspect Chair divisé par deux de la cible pour que l’effet fonctionne. En fonction des circonstances, le MJ peut décider qu’un personnage sous l’effet choc subit un malus de 2 à sa réaction et à sa défense. L’effet ne se cumule pas avec parasitage X.">Choc X</option>
+
+						<option value="L’utilisateur bénéficie d’un bonus en défense ou en réaction, X représentant cette valeur, tant qu’il utilise cette arme ou module. Les bonus reçus peuvent se cumuler tant que le personnage peut bénéficier de l’effet.">Défense X / Réaction X</option>
+						
+						<option value="L’arme inflige X points de dégâts à chaque tour durant 1D6 tours. Les dégâts sont subis par la cible à chacun de ses tours de jeu et ignorent les éventuels scores de CdF ou de bouclier. Au regard de la technologie utilisée, l’effet ne peut se stopper que si la cible reçoit les soins appropriés ou s’il se termine de lui-même. Typiquement, cet effet se retrouve sur les armes causant des brûlures. Cet effet ne peut être cumulé sur une même créature tant que l’effet est déjà présent au moins une fois.">Dégâts Continus X</option>
+						
+						<option value="Avec une attaque réussie, l’arme enlève 2 points au score de débordement que les bandes composées d’humains infligent, avant calcul des dégâts effectifs.
+
+Les dégâts effectifs du tour sont donc égaux débordement moins 2 multiplié par le nombre de tours écoulés à ce tour.
+
+Autrement dit, démoralisant réduit le débordement pour le tour en cours, et uniquement le tour en cours. Précision : Si l’effet démoralisant est appliqué plusieurs fois, cela se cumule en ajoutant un tour de durée (et non pas en sous-trayant des points supplémentaires au débordement de la bande ciblée).">Démoralisant</option>
+
+						<option value="L’arme peut désigner une cible (une seule cible, pas une bande) une fois par tour. Son utilisateur et ses alliés reçoivent un bonus de 1 réussite automatique pour toucher la cible et ignorent toujours les éventuels échecs critiques qu’ils pourraient subir lorsqu’ils tentent de la toucher. Désigner une cible ne coûte pas d’action. Il n’y a aucun test à effectuer pour désigner une cible et la portée de la désignation est celle de l’arme utilisée. La cible demeure désignée durant toute la scène ou toute la phase de conflit. 
+
+Une fois désignée, l’armure va suivre les mouvements et les bruits de la cible et représenter sa position, ce qui permet au chevalier de lui tirer dessus avec une arme disposant de l’effet artillerie notamment, ou d’utiliser automatiquement tout effet venant de ses éventuelles visions alternatives.
+
+L’effet permet par exemple, couplé avec un module de type vision prédatrice, de voir la cible à travers les murs, silhouettée sur la visière à Réalité Augmentée de la méta-armure. Tant que la signature de la cible reste visible par la méta-armure, la cible reste désignée. Attention : L’effet ne peut être cumulé sur une même cible.">Désignation</option>
+
+						<option value="Lorsque les dégâts impactent les points d’armure de la cible, si elle a des PA, on ajoute 2D6 au total de dégâts. Si un seul point de dégâts passe le bouclier et le CdF de la cible, l’effet est appliqué.">Destructeur</option>
+						
+						<option value="Cet effet signifie simplement que le chevalier doit utiliser ses deux mains pour frapper ou tirer avec l’arme. Utiliser à une main une arme possédant cet effet est impossible, l’arme étant trop lourde ou possédant trop de recul pour toucher efficacement.">Deux Mains</option>
+						
+						<option value="L’arme peut toucher plusieurs ennemis et ses dégâts peuvent donc s’appliquer à plusieurs du moment que ces ennemis sont à moins de deux mètres les uns des autres. X représente le nombre d’ennemis que l’arme peut toucher dans une même action. Un seul jet d’attaque est à effectuer contre un seul ennemi. Les autres ennemis proches subissent automatiquement les dégâts et les autres effets que dispersion, à condition que le résultat du test d’attaque dépasse leur score d’opposition. Typiquement, les lance-flammes ou les armes explosives infligent cet effet. Cet effet n’affecte pas les bandes contre lesquelles seule la violence peut s’appliquer.
+
+Attention : Si l’effet est utilisé contre des ennemis au contact avec un autre PJ, ce dernier subit aussi les dégâts de la dispersion. ">Dispersion X</option>
+
+						<option value="Lorsque le PJ utilisant cette arme réussit à éliminer (pas forcément à tuer, neutraliser suffit) un hostile ou un salopard, il peut effectuer au prix de 3 PE, au même tour et à la même initiative, une autre attaque sur un autre hostile ou un autre salopard qui se trouve à portée de son arme (un test pour toucher est de nouveau nécessaire). Si cette deuxième attaque élimine la cible, l’effet peut s’appliquer une nouvelle fois et ainsi de suite. Le coût en énergie intervient en plus de l’éventuel coût en énergie de l’arme. Chaque nouvelle attaque doit donner lieu à une dépense d’énergie en conséquence. 
+
+Dans le cas où plusieurs ennemis sont éliminés en même temps, l’effet en chaîne ne s’applique qu’une seule fois.">En Chaîne</option>
+
+						<option value="Contre des désespérés, l’équipement est extrêmement puissant. S’il le veut, un PJ peut décider d’échanger les dégâts qu’il devrait infliger contre l’application de l’effet espérance. L’arme, plutôt que d’infliger des dégâts, traverse alors le corps du désespéré, arrachant une partie de son désespoir.
+
+S’il le fait, chaque PNJ désespéré touché par l’attaque peut effectuer un test de Bête difficulté ardu (5) (ou Hargne combo Sang-Froid dans le cas d’un PJ) pour combattre le désespoir. Chaque attaque supplémentaire infligée par l’équipement à un même désespéré et appliquant l’effet espérance fait baisser le niveau de difficulté du test de 1. Si le désespéré réussit son test, alors il a réussi à vaincre le désespoir et n’est plus un ennemi. Il peut se joindre aux chevaliers ou rester terrorisé par ce qu’il a commis ou par ce qui lui est arrivé (au choix du MJ).
+
+Contre une bande de désespérés, on considère que l’équipement fait simplement baisser sa cohésion. Cependant, si le personnage utilisant un équipement avec l’effet espérance a infligé assez de violence à une bande pour qu’elle tombe à 0 point de cohésion, les désespérés qui la composent reprennent espoir et retrouvent simplement leurs esprits. Ils se souviendront tout de même des actes qu’ils ont commis. 
+
+Contre les autres types d’ennemis, les équipements possédant l’effet espérance infligent des dégâts et de la violence de manière normale.">Espérance</option>
+
+						<option value="Lorsque l’arme est utilisée contre une bande avec un score d’aspect Chair de 10 ou plus, la violence de l’arme est augmentée de 4D6.">Fureur</option>
+						
 						<option value="L’arme ignore purement et simplement la valeur de points d’armure d’un adversaire. La santé de la cible est directement touchée si les dégâts passent le CdF ou le bouclier.">Ignore Armure</option>
-						<option value="L'arme ignore purement et simplement le champ de force de l'adversaire.">Ignore Champs de Force</option>
+						
+						<option value="L’arme ignore purement et simplement le champ de force d’un adversaire. Les PS de la cible sont directement touchés si les dégâts passent les PA ou le bouclier.">Ignore Champ de Force</option>
+						
 						<option value="Lorsqu’on utilise deux exemplaires de cette arme en style akimbo, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3).">Jumelé (Akimbo)</option>
-						<option value="Lorsqu’on utilise deux armes disposant de cet effet en style ambidextre, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3)">Jumelé (Ambidextrie)</option>
-						<option value="Lorsque l'arme est utilisé son utilisateur ajoute sa force multipliée par deux lorsqu'il calcul ses dégâts. Seuls les personnages ayant un score de Force de 4 ou supérieur, ou un overdrive de Force peuvent utiliser une arme avec cet effet.">Lesté</option>
-						<option value="Lorsqu'il utilise une arme avec cet effet, le personnage perd son action de déplacement. De même, s'il a déjà bougé, il ne peut pas frapper avec une arme possédant cet effet. Les armes Lourdes sont également à Deux Mains.">Lourd</option>
-						<option value="Quand l'arme frappe une créature ou une bande de l'anathème ses scores de défense et de réaction sont réduits d'une valeur X durant le tour suivant. Non cumulatif.">Lumière X</option>
-						<option value="Si l'arme impact la santé de la cible on ajoute 2d6 au dégâts. Il suffit qu'un seul point de dégâts touche la santé pour que cela s'applique.">Meurtrier</option>
-						<option value="Inflige toujours le maximum de dégâts. Si combiné avec Dispersion, chaque cible touchée subit le maximum de dégâts également.">Oblitération</option>
-						<option value="Lors du calcul de dégâts de cette arme l'utilisateur ajoute sa dextérité au total + 1 point de dégâts par overdrive.">Orfèvrerie</option>
-						<option value="Cet effet s’applique uniquement aux méta-armures, exosquelettes, robots, véhicules, créatures de la Machine et tous les ennemis possé- dant la capacité sensibilité IEM. L’ennemi du type désigné perd automatiquement ses X prochaines actions.">Parasitage X</option>
-						<option value="L'arme ignore une valeur X du champ de force de la cible. Ne fonctionne pas contre un score de bouclier.">Pénétrant X</option>
+						
+						<option value="Lorsqu’on utilise deux armes disposant de cet effet en style ambidextre, le malus est diminué de 2 (soit 1 dé de malus au lieu de 3).">Jumelé (Ambidextrie)</option>
+						
+						<option value="Lorsque l’arme est utilisée, son utilisateur ajoute le score de la caractéristique Force multipliée par deux (ou Chair complet pour un PNJ) lorsqu’il détermine les dégâts plutôt que sa Force seule (ou Chair divisé par 2). Seuls les PJ ayant un score de Force égal ou supérieur à 4 ou possédant un overdrive de Force peuvent utiliser une arme avec un tel effet.">Lesté</option>
+						
+						<option value="Pour utiliser cette arme, vous devez dépenser une (et une seule) action de déplacement et une (et une seule) action de combat. Les actions supplémentaires acquises ne sont pas touchées par cet effet.">Lourd</option>
+						
+						<option value="Lorsque l’arme frappe une créature de l’Anathème ou une bande de l’Anathème, ses scores de défense et de réaction sont réduits d’une certaine valeur jusqu’à la fin du prochain tour du PJ qui a infligé l’effet lumière. X représente cette valeur. Cet effet ne peut pas se cumuler sur une même cible.">Lumière X</option>
+						
+						<option value="Lorsque les dégâts impactent la santé de la cible, on ajoute 2D6 au total des dégâts. Si un seul point de dégâts passe l’armure, le bouclier et le CdF de la cible, l’effet meurtrier est appliqué.">Meurtrier</option>
+						
+						<option value="Ces équipements particulièrement puissants infligent des dégâts considérables aux cibles les moins résistantes. Contre un ennemi de type hostile, ils infligent toujours le résultat maximal des dés de dégâts, comme si chacun des dés avait fait 6. Les dés ne sont simplement pas lancés. Si l’arme possède l’effet dispersion, chaque cible hostile touchée subit le maximum de dégâts.">Oblitération</option>
+						
+						<option value="Lorsque l’arme est utilisée, son utilisateur ajoute sa caractéristique Dextérité (+ 1 point de dégâts par overdrive) (ou Masque divisé par 2, arrondi à l’entier supérieur, pour un PNJ) lorsqu’il détermine les dégâts en plus d’autres caractéristiques déjà incluses.">Orfèvrerie</option>
+						
+						<option value="Cet effet s’applique uniquement aux méta-armures, exosquelettes, robots, véhicules, créatures de la Machine et tous les ennemis possédant la capacité sensibilité IEM. La cible touchée par une attaque avec parasitage X perd automatiquement ses X prochaines actions. 
+Attention : l’effet ne peut pas se cumuler alors que la cible est déjà sous l’effet parasitage X et ne se cumule pas avec l’effet choc X.">Parasitage X</option>
+						
+						<option value="L’arme ignore une certaine valeur de champ de force, X représentant cette valeur. Si la valeur est égale ou supérieure au champ de force de l’ennemi, celui-ci est tout simplement ignoré et les points d’armure (ou les points de santé si la cible n’a pas de PA) sont directement touchés. Cet effet ne fonctionne pas contre le score de bouclier d’une cible.">Pénétrant X</option>
+						
 						<option value="L’arme ignore une certaine valeur d’armure, X représentant cette valeur. Si la valeur est égale ou supérieure aux points d’armure de l’ennemi, le total de PA est simplement ignoré et la santé est directement touchée.">Perce Armure X</option>
-						<option value="Lors du calcul de dégâts de cette arme l'utilisateur ajoute son tir au total + 1 point de dégâts par overdrive.">Précision</option>
-						<option value="Le personnage ne peut être repéré par un PNJ lorsqu'il utilise l’arme. Lors d'une attaque surprise, d'une invisibilité, d'un mode Ghost ou d'un mode Changeling, la Discrétion + OD est ajoutée aux dégâts.">Silencieux</option>
-						<option value="Après avoir touché sa cible avec un effet soumission, l’attaquant peut soumettre sa cible physiquement et l’empêcher de se déplacer ou d’attaquer qui que ce soit d’autre que l’attaquant, et ce au contact. Pour se libérer de l’effet soumission, la cible touchée doit, à son tour, réussir un test base Déplacement ou Combat (aspect Chair ou Bête) dont la difficulté est définie par le nombre de réussites de l’attaquant. Si la cible n’a pas pu se libérer à son tour, l’attaquant peut maintenir la soumission sans relancer les dés et infliger des dégâts normalement, ou relancer un test d’attaque afin de renforcer sa prise. Si le jet est à nouveau réussi, les dégâts sont infligés sans prendre en considération tout éventuel champ de force ou bouclier (pour les créatures de l’Anathème). L’effet soumission ne peut impacter les colosses tel quel mais peut tout de même être pris en compte par le MJ.">Soumission</option>
-						<option value="L’équipement a été pensé pour anéantir les créatures de l’Anathème et uniquement celles ci. Contre des ennemis humains (de n’importe quel type), il n’inflige que la moitié de ses dés de dégâts et de ses dés de violence.">Ténébricide</option>
-						<option value="Lors du calcul des dégâts, il est possible, une fois par attaque, d’annuler tous les résultats et de relancer les dés. Le nouveau résultat remplace le premier et doit être conservé. Il n’est pas possible de prendre la moyenne des dégâts en utilisant cet effet.">Tir en rafale</option>
-						<option value="Le personnage peut tirer a couvert sans subir de malus au tir.">Tir en sécurité</option>
-						<option value="Lorsque l'arme est utilisé contre une bande avec une valeur de chair de moins de 10, la violence est augmentée de 2D6.">Ultraviolence</option>
+						
+						<option value="Lorsque l’arme est utilisée, son utilisateur ajoute sa caractéristique Tir (+ 1 point de dégâts par overdrive) (ou Machine divisé par 2, arrondi à l’entier supérieur, pour u PNJ) lorsqu’il détermine les dégâts.">Précision</option>
+						
+						<option value="Le personnage ne peut être repéré par un autre personnage parce qu’il utilise son arme. Lorsque cet effet est utilisé pendant une attaque surprise, une invisibilité, un mode Ghost ou un mode Changeling, le score de la caractéristique Discrétion (plus les éventuels OD) du PJ est ajouté aux dégâts. Dans le cas des PNJ, c’est la moitié du score de Masque (plus le score de Masque exceptionnel éventuel) qui est ajouté aux dégâts. Cet effet peut s’ajouter à ceux du mode Ghost et du niveau 2 de l’overdrive de Discrétion.">Silencieux</option>
+						
+						<option value="Après avoir touché sa cible avec un effet soumission, l’attaquant peut soumettre sa cible physiquement et l’empêcher de se déplacer ou d’attaquer qui que ce soit d’autre que l’attaquant, et ce au contact. Pour se libérer de l’effet soumission, la cible touchée doit, à son tour, réussir un test de base Déplacement ou Combat (aspect Chair ou Bête) dont la difficulté est définie par le nombre de réussites de l’attaquant. Si la cible n’a pas pu se libérer à son tour, l’attaquant peut maintenir la soumission sans relancer les dés et infliger des dégâts normalement, ou relancer un test d’attaque afin de renforcer sa prise. Si le jet est à nouveau réussi, les dégâts sont infligés sans prendre en considération tout éventuel champ de force ou bouclier (pour les créatures de l’Anathème). L’effet soumission ne peut impacter les colosses.">Soumission</option>
+						
+						<option value="L’équipement a été pensé pour anéantir les créatures de l’Anathème et uniquement celles-ci. Contre des ennemis humains (de n’importe quel type), il n’inflige que la moitié de ses dés de dégâts et de ses dés de violence.">Ténébricide</option>
+						
+						<option value="Lors du calcul des dégâts, il est possible, une fois par attaque, d’annuler tous les résultats et de relancer les dés. Le nouveau résultat remplace le premier et doit être conservé. Il n’est pas possible de prendre la moyenne de dégâts en utilisant cet effet.">Tir en rafale</option>
+						
+						<option value="Grâce à une caméra sur le bout du canon ou à un canon déformable, le porteur de l’arme peut tirer tout en bénéficiant des bonus du style à couvert sans subir de malus au tir.">Tir en sécurité</option>
+						
+						<option value="Lorsque l’arme est utilisée contre une bande avec un score d’aspect Chair de moins de 10, la violence de l’arme est augmentée de 2D6.">Ultraviolence</option>
 					</select>
 				</div>
 				<div class="autoex autoex100">
@@ -22346,9 +22708,9 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 			
 			{{^antiVehicule}}
 				{{#barbarian}}
-					{{#rollGreater() taille 5}}
+					{{#rollGreater() taille 3}}
 						Anti Véhicule / 
-					{{/rollGreater() taille 5}}
+					{{/rollGreater() taille 3}}
 				{{/barbarian}}
 			{{/antiVehicule}}
 			
@@ -23028,9 +23390,9 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 				
 				{{^antiVehicule}}
 					{{#barbarian}}
-						{{#rollGreater() taille 5}}
+						{{#rollGreater() taille 3}}
 							Anti Véhicule /
-						{{/rollGreater() taille 5}}
+						{{/rollGreater() taille 3}}
 					{{/barbarian}}
 				{{/antiVehicule}}
 				
@@ -23407,9 +23769,9 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 				{{/antiVehicule}}
 				
 				{{^antiVehicule}}
-					{{#rollGreater() taille 5}}
+					{{#rollGreater() taille 3}}
 						Anti Véhicule /
-					{{/rollGreater() taille 5}}
+					{{/rollGreater() taille 3}}
 				{{/antiVehicule}}
 				
 				{{#artillerie}}
