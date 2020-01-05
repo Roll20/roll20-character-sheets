@@ -1,4 +1,4 @@
-# Character sheet for Vampire The Maquerade, 5th Edition (v2.2)
+# Character sheet for Vampire The Maquerade, 5th Edition (v2.3)
 
 ## Known Bugs
 
@@ -47,6 +47,9 @@ The Banners folder contains many of the images made (in part) by Martinez A. wit
 If you think anything is missing or you see any bugs, please message me via my [Roll20 Account](https://app.roll20.net/users/117780/)
 
 ## Versions
+
+### Version 2.3
+Bug fix where macros wouldn't work so well. Added rituals.
 
 ### Version 2.1
 Bug fix where the Willpower button for non-api sheet would not work as intended
