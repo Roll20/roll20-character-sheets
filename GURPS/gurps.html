@@ -26,11 +26,12 @@
 				    <li>This is a major update to version 2.0.0. – User interaction is required, please read the details of the changes and what you need to do under the Updates TAB.</li>
 					<li>General tab. Change layout for Turning and Deceleration table and fixed some bugs in the process.</li>
 					<li>Combat tab. Added Demolition combat tool. Code provided by Savage. Thank you Savage!</li>
-					<li>Combat tab - Thrown Object tool. Thrust damage was not updating correctly when thrust damage changed.</li>
+					<li>Combat tab. Thrown Object tool. Thrust damage was not updating correctly when thrust damage changed.</li>
 					<li>General tab. Added whisper to GM option for Perception roll.</li>
 					<li>Traits tab. Added repeating tables for Perks and Quirks.</li>
 					<li>General tab. Display points summary based on selected option.</li>
 					<li>Corrected a few spelling errors.</li>
+					<li>General tab. Current HP and Current FP notes. Show halved or quartered movement. Removed modify that divided ST by 2 when HP is 1/3 or less.</li>
 					<li>See Updates tab for more detailed information.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
@@ -828,6 +829,21 @@
 					<div class="sheet-cell sheet-col1">
 						<input type="number" name="attr_hit_points" value="10" />
 					</div>
+					<div class="cell col2">
+					    <input type="hidden" class="hit-points-notes" name="attr_hit_points_notes" value="0" />
+						<div class="hit-points-halved-dodge">
+						    <div class="popup">Halved</div>
+    						<span class="tooltip">
+    						    Movement and dodge is halved due to hit point loss.
+    						</span>
+						</div>
+						<div class="hit-points-quartered-dodge">
+						    <div class="popup">Quartered</div>
+    						<span class="tooltip">
+    						    Movement and dodge is quartered due to hit and fatigue loss.
+    						</span>
+						</div>
+					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-fatigue-points">
 					<div class="sheet-cell sheet-col0 sheet-label">
@@ -911,6 +927,21 @@
 					</div>
 					<div class="sheet-cell sheet-col1">
 						<input type="number" name="attr_fatigue_points" value="10" title="Macro name: fatigue_points" />
+					</div>
+					<div class="cell col2">
+					    <input type="hidden" class="fatigue-points-notes" name="attr_fatigue_points_notes" value="0" />
+						<div class="fatigue-points-halved-dodge">
+						    <div class="popup">Halved</div>
+    						<span class="tooltip">
+    						    Movement and dodge is halved due to fatigue loss.
+    						</span>
+						</div>
+						<div class="fatigue-points-quartered-dodge">
+						    <div class="popup">Quartered</div>
+    						<span class="tooltip">
+    						    Movement and dodge is quartered due to hit and fatigue loss.
+    						</span>
+						</div>
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-energy-points">
@@ -4902,6 +4933,7 @@
 		<li>Traits tab. Added repeating tables for Perks and Quirks.</li>
 		<li>General tab. Display points summary based on selected option.</li>
 		<li>Corrected a few spelling errors.</li>
+		<li>General tab. Current HP and Current FP notes. Show halved or quartered movement. Removed modify that divided ST by 2 when HP is 1/3 or less.</li>
 		<li>Options tab. Added Point summary option. Reformatted option tab layout.</li>
 	</ul>
 	
@@ -6516,17 +6548,25 @@ Skull Damage x4
 	on('change:strength change:hit_points_points change:hit_points_mod', function (e) {
 		updateHP();
 	});
+	
 	// Update HP
 	function updateHP(callback) {
+		
 		console.log('********* updateHP *********');
+		
 		callback = callback || noop;
+		
 		getAttrs(['strength', 'strength_base', 'hit_points_points', 'hit_points_mod'], function(v) {
+		
 			var base = (modCascadeAll ? +v.strength : +v.strength_base) +
 				((+v.hit_points_points || 0) / 2 | 0);
+		
 			var mod = +v.hit_points_mod;
+		
 			setAttrs({
 				hit_points_max: base + mod
 			}, {silent: false}, callback);
+		
 		});
 	}
 
@@ -6723,40 +6763,97 @@ Skull Damage x4
 
 	// Encumbered/injured move and dodge
 	on('change:encumbrance_level change:dodge change:basic_move change:hit_points change:fatigue_points', function (e) {
+	    
 		updateMoveDodge();
+	
 	});
+	
 	// Update encumbered/injured move and dodge
 	function updateMoveDodge(callback) {
+	    
 		console.log('***** UPDATE MOVE/DODGE *****');
+		
 		callback = callback || noop;
-		getAttrs(['encumbrance_level', 'dodge', 'basic_move', 'hit_points', 'hit_points_max', 'fatigue_points', 'fatigue_points_max', 'strength_base', 'strength_mod'], function(v) {
+		
+		getAttrs(['encumbrance_level', 'dodge', 'basic_move', 'hit_points', 'hit_points_max', 'fatigue_points', 'fatigue_points_max'], function(v) {
+		
+		    console.log(v);
+		    
 			var dodge = +v.dodge;
+		
 			var move = +v.basic_move;
-			var strength = +v.strength_base + +v.strength_mod;
+		
+			var hitPointsNotes = 0;
+			
+			var fatiguePointNotes = 0;
+		
 			if (v.encumbrance_level === 5) {
+			    
 				dodge = 1;
+				
 				move = 1;
+				
 			} else {
+				
 				dodge = dodge - +v.encumbrance_level;
-			// There is some math error when calculating Encumbrance which requires the modifier of 1.01 instead of 1 below
+			
+			    // There is some math error when calculating Encumbrance which requires the modifier of 1.01 instead of 1 below
 				move = Math.floor(+v.basic_move * (1.01 - (0.2 * +v.encumbrance_level)));
+				
 				dodge = dodge < 1 ? 1 : dodge;
+				
 				move = move < 1 ? 1 : move;
 			}
+			
+			console.log("hitPointsNotes", hitPointsNotes);
+				
+			console.log("fatiguePointNotes", hitPointsNotes);
+				
+			// check for reduced move for low hit points
 			if (+v.hit_points < +v.hit_points_max / 3) {
+				
+				hitPointsNotes = 1;
+				
+				console.log("hitPointsNotes", hitPointsNotes);
+				
 				dodge = Math.ceil(dodge / 2);
+				
 				move = Math.ceil(move / 2);
+				
 			}
+			
+			// check for reduced move for low fatigue points
 			if (+v.fatigue_points < +v.fatigue_points_max / 3 ) {
+			    
+			    fatiguePointNotes = 1;
+			    
+				console.log("fatiguePointNotes", fatiguePointNotes);
+				
 				dodge = Math.ceil(dodge / 2);
+				
 				move = Math.ceil(move / 2);
-				strength = Math.ceil(strength / 2);
 			}
+			
+			// if both hit and fatigue were reduced, then change trigger to value
+			if ( hitPointsNotes === 1 && fatiguePointNotes == 1 ) {
+			    
+			    hitPointsNotes = 2;
+			    
+			    fatiguePointNotes = 2;
+			    
+			}
+		
+		    console.log("hitPointsNotes", hitPointsNotes);
+				
+			console.log("fatiguePointNotes", fatiguePointNotes);
+				
 			setAttrs({
 				current_move: move,
 				current_dodge: dodge,
-				strength: strength
+				hit_points_notes: hitPointsNotes,
+				fatigue_points_notes: fatiguePointNotes
 			}, {silent: false}, callback);
+			
 		});
 	}
 
