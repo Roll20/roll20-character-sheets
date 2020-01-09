@@ -3,7 +3,7 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.4.2";
+	const sheetVersion = "2.4.5";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -1940,13 +1940,14 @@
 		//Loop through the cyberware and add up the strain.
 		getSectionIDs("repeating_cyberware", idArray => {
 			const sourceAttrs = [
-				...idArray.map(id => `repeating_cyberware${id}_cyberware_strain`),
+				...idArray.map(id => `repeating_cyberware_${id}_cyberware_strain`),
 				"cyberware_strain_total"
 			];
 			getAttrs(sourceAttrs, v => {
-				const cyberwareStrain = Math.max(
-					...idArray.map(id => parseInt(v[`repeating_cyberware${id}_cyberware_strain`]) || 0)
-				);
+                const cyberwareStrain = idArray.reduce((m, id) => {
+				    m += parseInt(v[`repeating_cyberware_${id}_cyberware_strain`]) || 0;
+                    return m
+                }, 0)
 				mySetAttrs({
 					cyberware_strain_total: cyberwareStrain
 				}, v);
@@ -2471,7 +2472,7 @@
 			const macroList = [
 				"[**^{SAVES}** v@{npc_saves},](~npc_save) [**^{SKILLS}** +@{npc_skills},](~npc_skill) ",
 				"[**^{MORALE}** v@{npc_morale}](~npc_morale)\n",
-				"[**^{INITIATIVE}** d8,](~npc_initiative) [**^{REACTION}** 2d6,](~npc_reaction) ",
+				"[**^{INITIATIVE_FIXED}** d8,](~npc_initiative) [**^{REACTION}** 2d6,](~npc_reaction) ",
 				"**Move** @{npc_move}\n"
 			];
 			if (v.macro_npc_attacks) macroList.push("\n**Attacks:** @{macro_npc_attacks}");
@@ -3049,6 +3050,13 @@
 					calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`), upgradeFunction);
 				});
 			}
+            /** v2.4.3
+             * Regenerate Cyberware strain because it was bugged
+             **/
+            else if (major == 2 && (minor < 4 || (minor == 4 && patch < 3))) {
+                calculateCyberwareStrain();
+                upgradeSheet("2.4.3");
+            }
 			/** Final upgrade clause, always leave this around */
 			else upgradeSheet(sheetVersion, false, true);
 		};
@@ -3475,7 +3483,7 @@
 
 	on([...effortAttributes, "repeating_psychic-skills:skill"].map(x => `change:${x}`).join(" "), calculateEffort);
 
-	on("change:magic_committed_effort_current change:magic_committed_effort_scene change: magic_committed_effort_day change:magic_total_effort", calculateMagicEffort);
+	on("change:magic_committed_effort_current change:magic_committed_effort_scene change:magic_committed_effort_day change:magic_total_effort", calculateMagicEffort);
 
 	on("change:repeating_armor change:innate_ac remove:repeating_armor", calculateAC);
 
