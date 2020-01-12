@@ -2,12 +2,18 @@
 
 ## Änderungen
 
-in Arbeit:
-- Das Design der Tabs Ausrüstung und Artefakte wird aktuell überarbeitet.
+2020-01-12:
 
-in Plannung:
-- Erweiterung um einen NPC-Bogen mit vereinfachter Eingabe der Spielwerte
+Mit der Überarbeitung des Ausrüstung- und des Artefakte-Tabs ist erste Überarbeitung des Designs abgeschlossen. Die Elemente des Bogens sollten jetzt einheitlicher gestaltet und übersichtlicher angeordnet sein. Dabei habe ich noch einige Ideen für das Inventar sowie den Artefakte-Tab gesammelt, die neben dem NPC-Bogen als nächstes bearbeiten werden.
 
+Features:
+- Je Waffe / Rüstung lassen sich jetzt Textfelder für Anmerkungen/Vorteile/Nachteile ein- und ausblenden.
+- Waffen und Rüstungen haben jetzt Attribute für Bruchfaktor und Strukturpunkte erhalten
+
+Bugfixes:
+- Die Kampftechnik Zweihandhiebwaffen wird wieder angezeigt.
+- Bei Fernkampfwaffen wurde der Schadenbonus durch eine Leiteigenschaft entfernt.
+- Berechnung des Fernkampfmodifikators korrigiert.
 
 2020-01-05:
 
