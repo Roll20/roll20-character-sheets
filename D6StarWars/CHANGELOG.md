@@ -1,3 +1,7 @@
+### Version 2.15 (2020-01-07):
+
+- Fix the Ship's weapons
+
 ### Version 2.14 (2019-10-08):
 
 - Adjust rolltemplates so title-text is centered, and bold 
