@@ -17,13 +17,15 @@
 	<!-- /HIDDEN FIELDS -->
 	
 	<div class="update-alert">
-		<div class="container">
+		<div class="container">,
 		<input type="checkbox" class="sheet-showarrow sheet-ack-button" name="attr_announcements_show" value="1" title="Click to view announcements" />
 		<label class="show-content">Announcements <span name="attr_latest_changes"></span></label>
 			<div class="content">
 				<h4>GURPS Version <input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Sheet Version" /></h4>
 				<ul>
 				    <li>Grimoire Tab. Repeating Spells. Fix bug where Reason MOD text and input spanned two lines.</li>
+				    <li>General Tab. Update text for HP and FP alerts. If fatigued, ST is halved, added new field for ST display and use it with ST rolls.</li>
+				    <li>Combat Tab. Show alert message when dodge is halved or quartered.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset" />View All Updates</button>
@@ -77,7 +79,9 @@
 							</span>
 						</div>
 						<div class="sheet-cell sheet-col1">
-							<input type="number" name="attr_strength" value="10" readonly="readonly" title="Macro name: strength" >
+							<input type="number" name="attr_strength_display" value="10" readonly="readonly" title="Macro name: strength_display" />
+							<input type="hidden" name="attr_strength_halved" value="0" title="Macro name: strength_halved" />
+							<input type="hidden" name="attr_strength" value="10" title="Macro name: strength" />
 						</div>
 						<div class="sheet-cell sheet-col2">
 							<input type="number" name="attr_strength_mod" value="0" step="1" title="Macro name: strength_mod" />
@@ -86,7 +90,7 @@
 							<input type="number" name="attr_strength_points" value="0" step="10" title="Macro name: strength_points" />
 						</div>
 						<div class="sheet-cell sheet-col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Strength Roll}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{strength} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsST" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Strength Roll}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{strength_display} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsST" />
 						</div>
 					</div> <!-- .sheet-row -->
 					<div class="sheet-row sheet-row-dexterity">
@@ -823,15 +827,15 @@
 					<div class="cell col2">
 					    <input type="hidden" class="hit-points-notes" name="attr_hit_points_notes" value="0" />
 						<div class="hit-points-halved-dodge">
-						    <div class="popup">Halved</div>
+						    <div class="popup">½ Move</div>
     						<span class="tooltip">
-    						    Movement and dodge is halved due to hit point loss.
+    						    Move and Dodge is halved due to hit point loss. See B419.
     						</span>
 						</div>
 						<div class="hit-points-quartered-dodge">
-						    <div class="popup">Quartered</div>
+						    <div class="popup">¼ Move</div>
     						<span class="tooltip">
-    						    Movement and dodge is quartered due to hit and fatigue loss.
+    						    Move and Dodge is quartered due to hit point and fatigue loss. See B419.
     						</span>
 						</div>
 					</div>
@@ -922,15 +926,17 @@
 					<div class="cell col2">
 					    <input type="hidden" class="fatigue-points-notes" name="attr_fatigue_points_notes" value="0" />
 						<div class="fatigue-points-halved-dodge">
-						    <div class="popup">Halved</div>
+						    <div class="popup">½ MV/ST</div>
     						<span class="tooltip">
-    						    Movement and dodge is halved due to fatigue loss.
+    						    Move, Dodge, and ST are halved due to fatigue loss. See B426.<br />
+    						    Affects ST roll and using weapons with minimum ST.
     						</span>
 						</div>
 						<div class="fatigue-points-quartered-dodge">
-						    <div class="popup">Quartered</div>
+						    <div class="popup">½ ST</div>
     						<span class="tooltip">
-    						    Movement and dodge is quartered due to hit and fatigue loss.
+    						    ST is halved due to fatigue loss. See B426.<br />
+    						    Affects ST roll and using weapons with minimum ST.
     						</span>
 						</div>
 					</div>
@@ -3321,7 +3327,22 @@
 					<div class="sheet-cell sheet-col4">&nbsp;</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-stats sheet-row-standard">
-					<div class="sheet-cell sheet-col0">Dodge</div>
+					<div class="sheet-cell sheet-col-dodge-label">Dodge</div>
+					<div class="cell col-dodge">
+					    <input type="hidden" class="dodge-reduced-notes" name="attr_dodge_reduced_notes" value="0" />
+						<div class="halved-dodge">
+						    <div class="popup">½ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is halved due to hit points or fatigue loss. See B418 or B426.
+    						</span>
+						</div>
+						<div class="quartered-dodge">
+						    <div class="popup">¼ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is quartered due to hit points and fatigue loss. See B418 or B426.
+    						</span>
+						</div>
+					</div>
 					<div class="sheet-cell sheet-col1">Dodge</div>
 					<div class="sheet-cell sheet-col2"></div>
 					<div class="sheet-cell sheet-col3"><input type="text" name="attr_ad_dodge_skill" value="@{current_dodge}" disabled="disabled" title="Macro name: ad_dodge_skill" /></div>
@@ -3330,7 +3351,22 @@
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-stats sheet-row-standard">
-					<div class="sheet-cell sheet-col0">Dodge and Retreat</div>
+					<div class="sheet-cell sheet-col-dodge-label">Dodge and Retreat</div>
+					<div class="cell col-dodge">
+					    <input type="hidden" class="dodge-reduced-notes" name="attr_dodge_reduced_notes" value="0" />
+						<div class="halved-dodge">
+						    <div class="popup">½ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is halved due to hit points or fatigue loss. See B418 or B426.
+    						</span>
+						</div>
+						<div class="quartered-dodge">
+						    <div class="popup">¼ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is quartered due to hit points and fatigue loss. See B418 or B426.
+    						</span>
+						</div>
+					</div>
 					<div class="sheet-cell sheet-col1">Dodge</div>
 					<div class="sheet-cell sheet-col2"></div>
 					<div class="sheet-cell sheet-col3"><input type="text" name="attr_ad_dodge_retreat_skill" value="@{current_dodge} + 3" disabled="disabled" title="Macro name: ad_dodge_retreat_skill" /></div>
@@ -4940,6 +4976,8 @@
 	
 	<ul>
 		<li>Grimoire Tab. Repeating Spells. Fix bug where Reason MOD text and input spanned two lines.</li>
+		<li>General Tab. Update text for HP and FP alerts. If fatigued, ST is halved, added new field for ST display and use it with ST rolls.</li>
+		<li>Combat Tab. Show alert message when dodge is halved or quartered.</li>		
 	</ul>
 	
 	<h4>Version: 2.0.0</h4>
@@ -6771,12 +6809,27 @@ Skull Damage x4
 	function updateST(callback) {
 		callback = callback || noop;
 		console.log('********* updateST *********');
-		getAttrs(['strength_points', 'strength_mod'], function(v) {
+		getAttrs(['strength_points', 'strength_mod', 'strength_halved'], function(v) {
+		    
 			var base = 10 + ((+v.strength_points || 0) / 10 | 0);
+			
 			var mod = +v.strength_mod || 0;
+			
+			var st_halved = +v.strength_halved;
+			
+			var st_display = base + mod;
+			
+			// check if ST was halved due to fatigue.
+			if (st_halved === 1) {
+			    
+			    st_display = st_display/2;
+			
+			}
+			
 			setAttrs({
 				strength_base: base,
-				strength: base + mod
+				strength: base + mod,
+				strength_display: st_display,
 			}, {silent: false}, callback);
 		});
 	}
@@ -7066,7 +7119,7 @@ Skull Damage x4
 		
 		callback = callback || noop;
 		
-		getAttrs(['encumbrance_level', 'dodge', 'basic_move', 'hit_points', 'hit_points_max', 'fatigue_points', 'fatigue_points_max'], function(v) {
+		getAttrs(['encumbrance_level', 'dodge', 'basic_move', 'hit_points', 'hit_points_max', 'fatigue_points', 'fatigue_points_max', 'strength'], function(v) {
 		
 		    var dodge = +v.dodge;
 		
@@ -7075,6 +7128,12 @@ Skull Damage x4
 			var hitPointsNotes = 0;
 			
 			var fatiguePointNotes = 0;
+			
+			var dodgeNotes = 0;
+			
+			var strengthDisplay = +v.strength;
+			
+			var strengthHalved = 0;
 		
 			if (v.encumbrance_level === 5) {
 			    
@@ -7098,6 +7157,8 @@ Skull Damage x4
 				
 				hitPointsNotes = 1;
 				
+				dodgeNotes = 1;
+				
 				dodge = Math.ceil(dodge / 2);
 				
 				move = Math.ceil(move / 2);
@@ -7109,9 +7170,17 @@ Skull Damage x4
 			    
 			    fatiguePointNotes = 1;
 			    
+			    dodgeNotes = 1; 
+			    
 				dodge = Math.ceil(dodge / 2);
 				
 				move = Math.ceil(move / 2);
+				
+				// reduce strength_display in half
+				strengthDisplay = Math.ceil(strengthDisplay / 2);
+				
+				strengthHalved = 1;
+				
 			}
 			
 			// if both hit and fatigue were reduced, then change trigger to value
@@ -7121,13 +7190,18 @@ Skull Damage x4
 			    
 			    fatiguePointNotes = 2;
 			    
+			    dodgeNotes = 2;
+			    
 			}
 
 			setAttrs({
 				current_move: move,
 				current_dodge: dodge,
 				hit_points_notes: hitPointsNotes,
-				fatigue_points_notes: fatiguePointNotes
+				fatigue_points_notes: fatiguePointNotes,
+				dodge_reduced_notes: dodgeNotes,
+				strength_display: strengthDisplay,
+				strength_halved: strengthHalved
 			}, {silent: false}, callback);
 			
 		});
