@@ -26,6 +26,7 @@
 				    <li>Grimoire Tab. Repeating Spells. Fix bug where Reason MOD text and input spanned two lines.</li>
 				    <li>General Tab. Update text for HP and FP alerts. If fatigued, ST is halved, added new field for ST display and use it with ST rolls.</li>
 				    <li>Combat Tab. Show alert message when dodge is halved or quartered.</li>
+				    <li>Combat Tab. Demolition tool. Add radius and distance from ccenter. Add fragmentation row.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset" />View All Updates</button>
@@ -4351,7 +4352,37 @@
 				        <div class="popup">Damage</div>
 				        <span class="tooltip">
 				            <strong>Damage:</strong><br />Enter the number to multiply 6d6 by.<br />
-				            An explosion doing 6dx<i>n</i> damage takes (<i>n</i>x<i>n</i>)/4 pounds of TNT.
+				            An explosion doing 6dx<i>n</i> damage takes (<i>n</i>x<i>n</i>)/4 pounds of TNT.<br />
+				            <b>NOTE:</b> Anyone caught in a blast may attempt an active defense roll to dive<br />
+				            for cover from the explosion’s collateral damage and fragmentation; see Dodge and Drop B377.
+				        </span>
+					</div>
+				    <div class="cell roll-damage">
+				        <div class="popup">Rad</div>
+				        <span class="tooltip">
+				            Radius of collateral damage. See B414<br />
+				            For instance, if an explosion does 6dx2 damage,<br />
+				            everyone within 24 yards is vulnerable.
+				        </span>
+					</div>
+				    <div class="cell roll-damage">
+				        <div class="popup">Div</div>
+				        <span class="tooltip">
+				            Divisor. Amount to divide damage by based on<br />
+				            distance from blast. See B414<br />
+				            You can enter: <b>3</b> (default), 2, or 1.<br />
+				            Default: Damage rolled / (3 x distance blast).<br />
+				            Damage Modifiers Explosion, see B104.<br />
+				            Exp. +100% = Damage rolled / (2 x distance from blast).<br />
+				            Exp. +150% = Damage rolled / (1 x distance from blast).<br />
+				        </span>
+					</div>
+				    <div class="cell roll-damage">
+				        <div class="popup">TGT</div>
+				        <span class="tooltip">
+				            Target's distance from center of blast.<br />
+				            Damage / (3 x distance from blast). Rounded down.<br />
+				            See B414
 				        </span>
 					</div>
 				    <div class="cell roll-damage">
@@ -4407,8 +4438,18 @@
     					    <input type="number" value="1" min="1" step="1" name="attr_demo_how_much_damage_multiplier" title="Macro name: demo_how_much_damage_multiplier" />
     					</div>
     					<div class="cell roll-damage">
+    					    <input type="text" readonly="readonly" value="12" name="attr_demo_how_much_radius" title="Macro name: demo_how_much_radius" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="number" value="3" min="1" step="1" max="3" name="attr_demo_how_much_divisor" title="Macro name: demo_how_much_divisor" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="number" value="0" min="0" step="1" name="attr_demo_how_much_target_distance" title="Macro name: demo_how_much_target_distance" />
+    					</div>
+    					<div class="cell roll-damage">
     					    <input type="hidden" name="attr_demo_how_much_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-						    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_much_type}}} {{damageRoll=[[@{demo_how_much_base_damage} * @{demo_how_much_damage_multiplier}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+    					    <input type="hidden" name="attr_demo_how_much_damage_divisor" value="1" />
+    					    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_much_type}}} {{damageRoll=[[ floor( (@{demo_how_much_base_damage} * @{demo_how_much_damage_multiplier}) / @{demo_how_much_damage_divisor} )]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
     					</div>
 						<div class="cell reset">
 					        <button type="action" name="act_demo_how_much_reset" class="reset" />Reset</button>
@@ -4458,8 +4499,18 @@
     					    <input type="number" value="1" readonly="readonly" name="attr_demo_how_big_damage_multiplier" title="Macro name: demo_how_big_damage_multiplier" />
     					</div>
     					<div class="cell roll-damage">
+    					    <input type="text" readonly="readonly" value="12" name="attr_demo_how_big_radius" title="Macro name: demo_how_big_radius" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="number" value="3" min="1" step="1" max="3" name="attr_demo_how_big_divisor" title="Macro name: demo_how_big_divisor" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="number" value="0" min="0" step="1" name="attr_demo_how_big_target_distance" title="Macro name: demo_how_big_target_distance" />
+    					</div>
+    					<div class="cell roll-damage">
     					    <input type="hidden" name="attr_demo_how_big_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-						    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_big_type}}} {{damageRoll=[[@{demo_how_big_base_damage} * @{demo_how_big_damage_multiplier}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+						    <input type="hidden" name="attr_demo_how_big_damage_divisor" value="1" />
+    					    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_big_type}}} {{damageRoll=[[ floor( (@{demo_how_big_base_damage} * @{demo_how_big_damage_multiplier}) / @{demo_how_big_damage_divisor} )]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
     					</div>
 						<div class="cell reset">
 					        <button type="action" name="act_demo_how_big_reset" class="reset" />Reset</button>
@@ -4977,7 +5028,8 @@
 	<ul>
 		<li>Grimoire Tab. Repeating Spells. Fix bug where Reason MOD text and input spanned two lines.</li>
 		<li>General Tab. Update text for HP and FP alerts. If fatigued, ST is halved, added new field for ST display and use it with ST rolls.</li>
-		<li>Combat Tab. Show alert message when dodge is halved or quartered.</li>		
+		<li>Combat Tab. Show alert message when dodge is halved or quartered.</li>
+		<li>Combat Tab. Demolition tool. Add radius and distance from ccenter. Add fragmentation row.</li>
 	</ul>
 	
 	<h4>Version: 2.0.0</h4>
@@ -11737,9 +11789,9 @@ Skull Damage x4
 	];
 	
 	// check for how much? damage
-	on("change:demo_how_much_ref change:demo_how_much_damage_multiplier", function (event) {
+	on("change:demo_how_much_ref change:demo_how_much_damage_multiplier change:demo_how_much_base_damage change:demo_how_much_divisor change:demo_how_much_target_distance", function (event) {
 	    
-	    getAttrs(["demo_how_much_ref", "demo_how_much_damage_multiplier"], function(values) {
+	    getAttrs(["demo_how_much_ref", "demo_how_much_base_damage", "demo_how_much_damage_multiplier", "demo_how_much_divisor", "demo_how_much_target_distance"], function(values) {
 	        
 	        var multiplier = +values.demo_how_much_damage_multiplier;
 	        
@@ -11749,18 +11801,62 @@ Skull Damage x4
 	        
 	        var result = weight.toFixed(2);
 	        
+	        // determine damage divisor
+	        var divisor = 1;
+	        
+	        var targetDistance = parseInt(values.demo_how_much_target_distance);
+	        
+	        var baseDivisor = parseInt(values.demo_how_much_divisor);
+	        
+	        // if target is 1 or more yards away, determine divisor
+	        if (targetDistance > 0) {
+	            
+	            divisor = baseDivisor * targetDistance;
+	            
+	        }
+	        
+	        // determine blast radius
+	        var diceCount = getNumberOfDiceToRoll(values.demo_how_much_base_damage);
+	        
+	        // see B414
+	        var blastRadius = diceCount * multiplier * 2;
+	        
 	        setAttrs({
-	            demo_how_much_weight: result
+	            demo_how_much_weight: result,
+	            demo_how_much_damage_divisor: divisor,
+	            demo_how_much_radius: blastRadius
 	        });
 	        
 	    });
 	    
 	});
 	
-	// check for how big? damage
-	on("change:demo_how_big_ref change:demo_how_big_weight", function (event) {
+	/**
+	 * Determines the number of dice in a simple roll value
+	 * If 3d6+2, it will return 3. The number of dice to roll.
+	 * 
+	 * @param string rollString Roll value to parse
+	 * 
+	 * @return int
+	 */
+	function getNumberOfDiceToRoll(rollString) {
 	    
-	    getAttrs(["demo_how_big_ref", "demo_how_big_weight"], function(values) {
+	    rollString = rollString.toLowerCase();
+	    
+	    console.log(rollString);
+	    
+	    var arrRoll = rollString.split("d");
+	    
+	    var diceCount = +arrRoll[0];
+	    
+	    return diceCount;
+	    
+	}
+	
+	// check for how big? damage
+	on("change:demo_how_big_ref chage:demo_how_big_base_damage change:demo_how_big_weight change:demo_how_big_divisor change:demo_how_big_target_distance", function (event) {
+	    
+	    getAttrs(["demo_how_big_ref", "demo_how_big_base_damage", "demo_how_big_weight", "demo_how_big_divisor", "demo_how_big_target_distance"], function(values) {
 	        
 	        var multiplier = 0;
 	        
@@ -11776,8 +11872,30 @@ Skull Damage x4
     	        
 	        }
 	        
+	        // determine damage divisor
+	        var divisor = 1;
+	        
+	        var targetDistance = parseInt(values.demo_how_big_target_distance);
+	        
+	        var baseDivisor = parseInt(values.demo_how_big_divisor);
+	        
+	        // if target is 1 or more yards away, determine divisor
+	        if (targetDistance > 0) {
+	            
+	            divisor = baseDivisor * targetDistance;
+	            
+	        }
+	        
+	        // determine blast radius
+	        var diceCount = getNumberOfDiceToRoll(values.demo_how_big_base_damage);
+	        
+	        // see B414
+	        var blastRadius = diceCount * multiplier * 2;
+	        
 	        setAttrs({
-	            demo_how_big_damage_multiplier: multiplier
+	            demo_how_big_damage_multiplier: multiplier,
+	            demo_how_big_damage_divisor: divisor,
+	            demo_how_big_radius: blastRadius
 	        });
 	        
 	    });
