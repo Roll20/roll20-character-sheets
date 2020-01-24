@@ -26,7 +26,7 @@
 				    <li>Grimoire Tab. Repeating Spells. Fix bug where Reason MOD text and input spanned two lines.</li>
 				    <li>General Tab. Update text for HP and FP alerts. If fatigued, ST is halved, added new field for ST display and use it with ST rolls.</li>
 				    <li>Combat Tab. Show alert message when dodge is halved or quartered.</li>
-				    <li>Combat Tab. Demolition tool. Add radius and distance from ccenter. Add fragmentation row.</li>
+				    <li>Combat Tab. Demolition tool. Add radius and distance from center. Add fragmentation row.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset" />View All Updates</button>
@@ -4349,12 +4349,13 @@
 					</div>
 					<div class="cell six-d-spacer">&nbsp;</div>
 				    <div class="cell damage">
-				        <div class="popup">Damage</div>
+				        <div class="popup">Multi</div>
 				        <span class="tooltip">
-				            <strong>Damage:</strong><br />Enter the number to multiply 6d6 by.<br />
+				            <strong>Damage Multiplier:</strong><br />Enter the number to multiply 6d6 by.<br />
 				            An explosion doing 6dx<i>n</i> damage takes (<i>n</i>x<i>n</i>)/4 pounds of TNT.<br />
-				            <b>NOTE:</b> Anyone caught in a blast may attempt an active defense roll to dive<br />
-				            for cover from the explosion’s collateral damage and fragmentation; see Dodge and Drop B377.
+				            <b>NOTE:</b> Anyone caught in a blast may attempt an active defense<br />
+				            roll to dive for cover from the explosion’s collateral damage and<br />
+				            fragmentation; see Dodge and Drop B377.
 				        </span>
 					</div>
 				    <div class="cell roll-damage">
@@ -4362,7 +4363,10 @@
 				        <span class="tooltip">
 				            Radius of collateral damage. See B414<br />
 				            For instance, if an explosion does 6dx2 damage,<br />
-				            everyone within 24 yards is vulnerable.
+				            everyone within 24 yards is vulnerable.<br />
+				            <br />
+				            For fragmentation damage, the radius is<br />
+				            5 x dice of fragmentation damage.
 				        </span>
 					</div>
 				    <div class="cell roll-damage">
@@ -4381,7 +4385,7 @@
 				        <div class="popup">TGT</div>
 				        <span class="tooltip">
 				            Target's distance from center of blast.<br />
-				            Damage / (3 x distance from blast). Rounded down.<br />
+				            Damage / (3 x distance from blast). Round down.<br />
 				            See B414
 				        </span>
 					</div>
@@ -4514,6 +4518,55 @@
     					</div>
 						<div class="cell reset">
 					        <button type="action" name="act_demo_how_big_reset" class="reset" />Reset</button>
+					    </div>
+				    </div>
+				    
+				    <div class="row">
+    					<div class="cell row-title">
+    					    <div class="popup">Fragmentation</div>
+    						<span class="tooltip">
+    						    Fragmentation damage.<br />
+    						    See B415.
+    						</span>
+    					</div>
+    				    <div class="cell select-box">
+    				    </div>
+    				    <div class="cell text-box">
+    					<div class="popup frag-label">Skill</div>
+    						<span class="tooltip">
+    						    Base skill level for a fragmentation damage to hit a target.<br />
+    						    A hit is <b>automatic</b> if the explosive attack actually strikes the target.<br />
+    						    Only three modifiers apply: the <b>range modifier</b> for the distance from the center<br />
+    						    of the blast to the target, the modifier for the <b>target’s posture</b> (prone, etc.),<br />
+    						    and the target’s <b>Size Modifier</b>. It is possible for several fragments to hit! For<br />
+    						    every <b>three points</b> by which the attack roll succeeds, one additional fragment
+    						    <br />strikes the target.
+    						</span>
+    					</div>
+    				    <div class="cell input">
+    				        <input type="number" value="15" step="1" name="attr_fragmentation_skill" />
+    				    </div>
+    				    <div class="cell input">
+    				        <button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{fragmentation_skill} + @{modifier}]]}} {{notes=@{fragmentation_skill_notes}}} {{showNotes=[[1]]}} {{recoil=@{fragmentation_recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" />
+    					</div>
+    					<div class="cell input">
+    					    <input type="text" value="1d6" name="attr_fragmentation_damage" title="Macro name: fragmentation_damage" />
+    					</div>
+    					<div class="cell six-d-spacer"></div>
+    				    <div class="cell damage">
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="text" readonly="readonly" value="12" name="attr_fragmentation_radius" title="Macro name: fragmentation_radius" />
+    					</div>
+    					<div class="cell roll-damage">
+    					</div>
+    					<div class="cell roll-damage">
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="hidden" name="attr_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
+						    <button type="roll" name="roll_vsSL" value="@{roll}&{template:skillRoll} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{damageRoll=[[ @{fragmentation_damage} ]]}} {{damageType=Cutting (cut)}} {{minDamageNote=Cutting min 1}} {{showNotes=[[1]]}} {{notes=@{fragmentation_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+    					</div>
+						<div class="cell reset">
 					    </div>
 				    </div>
 				    
@@ -5029,7 +5082,7 @@
 		<li>Grimoire Tab. Repeating Spells. Fix bug where Reason MOD text and input spanned two lines.</li>
 		<li>General Tab. Update text for HP and FP alerts. If fatigued, ST is halved, added new field for ST display and use it with ST rolls.</li>
 		<li>Combat Tab. Show alert message when dodge is halved or quartered.</li>
-		<li>Combat Tab. Demolition tool. Add radius and distance from ccenter. Add fragmentation row.</li>
+		<li>Combat Tab. Demolition tool. Add radius and distance from center. Add fragmentation row.</li>
 	</ul>
 	
 	<h4>Version: 2.0.0</h4>
@@ -5395,13 +5448,51 @@ Falling Damage: If using hit locations, roll randomly for the hit location damag
 		            <h4>Demolition Damage Notes</h4>
 		            <textarea name="attr_demolition_damage_notes">Explosion damage. Targets struck directly takes listed damage. Apply "collateral damage" of Damage / (3 x distance from center of blast) rounded down.
 			    
-* Use torso armor to determine DR against explosion.
-* If the explosion has an armor divisor, do NOT apply to "collateral damage."
-* Explosions are considered incendiary. see Catching Fire B434
-* Can use Dodge and Drop (B377) to avoid collateral damage.
+* Use torso armor to determine DR against explosion.<br />
+* If the explosion has an armor divisor, do NOT apply to "collateral damage.<br />
+* Explosions are considered incendiary. see Catching Fire B434<br />
+* Can use Dodge and Drop (B377) to avoid collateral damage.<br />
 * See B414</textarea>    
 		        </div><!-- end option-container -->
 		       
+		        <div class="option-container collision-falling-options">
+		            <h4>Fragmentation Skill Notes</h4>
+		            <textarea name="attr_fragmentation_skill_notes">For every three points by which the attack roll succeeds, one additional fragment strikes the target.<br />
+<br />
+The only active defense against fragments is to dive away from the explosion that produced them; see Dodge and Drop (p. 377).<br />
+<br />
+For each hit, roll hit location randomly. If that location is behind cover, the fragment hits cover.
+</textarea>    
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container collision-falling-options">
+		            <h4>Fragmentation Damage Notes</h4>
+		            <textarea name="attr_fragmentation_damage_notes">Fragmentation damage is cutting. Note that if an explosive attack has an armor divisor, this does not apply to the fragments it produces.</textarea>    
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container">
+		            
+		            <table>
+    			        <tr>
+    			            <td>
+    			                Fragmentation Recoil</b>      
+    			            </td>
+    			            <td>
+    			                <input type="number" step="1" value="3" name="attr_fragmentation_recoil"></input>
+    			            </td>
+    			        </tr>
+    			        <tr>
+    			            <td>
+    			                Penalty for each spell <b>Maintained:</b>             
+    			            </td>
+    			            <td>
+    			                <input type="number" step="1" value="-3" name="attr_penalty_per_spell_maintained"></input>
+    			            </td>
+    			        </tr>
+    			    </table>
+    			    
+		        </div><!-- end option-container -->
+		        
 		    </div><!-- end option-column -->
 		    
 		    <div class="option-column">
@@ -12009,6 +12100,22 @@ Skull Damage x4
             setAttrs({
                 grand_total_weight: grandTotalWeight
             });
+            
+        });
+        
+    });
+    
+    on("change:fragmentation_damage", function(event) {
+        
+        getAttrs(["fragmentation_damage"], function(values) {
+            
+             var diceCount = getNumberOfDiceToRoll(values.fragmentation_damage);
+             
+             var radius = 5 * diceCount;
+             
+             setAttrs({
+                 fragmentation_radius: radius
+             });
             
         });
         
