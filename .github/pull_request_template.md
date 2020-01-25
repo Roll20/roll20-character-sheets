@@ -1,7 +1,7 @@
 ## Changes / Comments
 This is a new character sheet for the Daemon system, a Brazilian open license system. there are no character sheet for this system in roll20.
 
-The title for this sheet is "Daemon Homebrew 0.1 System"
+The title for this sheet is "Daemon Homebrew 0.1"
 
 
 
