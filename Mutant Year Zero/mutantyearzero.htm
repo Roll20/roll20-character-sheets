@@ -1,4 +1,4 @@
-<input type="hidden" name="attr_version" value="1">
+<input type="hidden" name="attr_version" value="1.1">
 <input class="tab" type="hidden" name="attr_tab" value="character">
 
 <!--tabs-->
@@ -438,7 +438,7 @@
                         <input name="attr_rot_roll" type="hidden" value="" />
                         <div class="rot-box header"><h1 data-i18n="rot-p">ROT POINTS</h1></div>
                         <div class="dots">
-                            <input type="hidden" name="attr_rot_permenant" value="" />
+                            <input type="hidden" name="attr_rot_permenant" value="0" />
                             <input name="attr_rot" type="radio" value="0" checked /><span>0</span>
                             <input name="attr_rot" type="radio" value="1"/><span>1</span>
                             <input name="attr_rot" type="radio" value="2"/><span>2</span>
@@ -635,6 +635,20 @@
                                     <textarea class="talents-box4 input-textarea" name="attr_mutantion_description" title="@{repeating_mutantions_$X_mutantion_description}" placeholder="description"></textarea>
                                 </div>
                             </fieldset>                    
+                        </div>
+                    </div>
+                </div>
+                <div class="box character-necessities">
+                    <div class="nec-grid">
+                        <div class="header"><h1 data-i18n="nec-u">NECESSITIES</h1></div>        
+                        <div>        
+                            <img alt="chocolate bar representing grub" src="https://raw.githubusercontent.com/clevett/roll20-character-sheets/myz-v1.2/Mutant%20Year%20Zero/images/grub.png" /><input name="attr_grub" placeholder="0" title="@{grub}" type="number" value="" />
+                        </div>
+                        <div>
+                            <img alt="water bottle" src="https://raw.githubusercontent.com/clevett/roll20-character-sheets/myz-v1.2/Mutant%20Year%20Zero/images/water.png" /><input name="attr_water" placeholder="0" title="@{water}" type="number" value="" />
+                        </div>
+                        <div>
+                            <img alt="bullets" src="https://raw.githubusercontent.com/clevett/roll20-character-sheets/myz-v1.2/Mutant%20Year%20Zero/images/bullet.png" /><input name="attr_bullets" placeholder="0" title="@{bullets}" type="number" value="" />
                         </div>
                     </div>
                 </div>
@@ -840,7 +854,8 @@
             <h2 data-i18n="terrain">Terrain</h2>
             <h2 data-i18n="rot-level">Rot Level</h2>
             <h2 data-i18n="threat">Threat</h2>
-            <h2 data-i18n="comment">Comment</h2>
+            <h2 data-i18n="threat-notes">Threat Notes</h2>
+            <h2 data-i18n="resources-found">Resources Found</h2>
         </div>
         <div class="repeating-log-grid">
             <fieldset class="repeating_log">
@@ -850,7 +865,11 @@
                     <input class="input-number" name="attr_rot_level" title="@{repeating_log_$X_rot_level}" type="text" value="" />
                     <input name="attr_threat" title="@{repeating_log_$X_threat}" type="checkbox" /><span></span>
                     <input class="input-number" name="attr_threat_notes" title="@{repeating_log_$X_threat_notes}" type="text" value="" />
-                    <input class="input-number" name="attr_comment" title="@{repeating_log_$X_comment}" type="text" value="" />
+                    <label class="log-resouces" data-i18n="a">A</label><input name="attr_artifacts" title="@{repeating_log_$X_artifacts}" type="checkbox" /><span></span>
+                    <label class="log-resouces" data-i18n="b">B</label><input name="attr_bullets" title="@{repeating_log_$X_bullets}" type="checkbox" /><span></span>
+                    <label class="log-resouces" data-i18n="g">G</label><input name="attr_grub" title="@{repeating_log_$X_grub}" type="checkbox" /><span></span>
+                    <label class="log-resouces" data-i18n="w">W</label><input name="attr_water" title="@{repeating_log_$X_water}" type="checkbox" /><span></span>
+                    <input class="input-number" data-i18n-placeholder="comment" name="attr_comment" placholder="Comment" title="@{repeating_log_$X_comment}" type="text" value="" />
                 </div>
                 <hr />
             </fieldset>
@@ -984,14 +1003,21 @@ on('change:repeating_vehicle remove:repeating_vehicle sheet_opened', () => {
     repeatingSum("vehicle_gear_encumbrance","vehicle",["vehicle_gear_weight","vehicle_gear_qty","vehicle_gear_carried"]);
 });
 /* total encumbrance */
-on('change:character_gear_encumbrance change:vehicle_gear_encumbrance', function() {
-    getAttrs(["character_gear_encumbrance", "vehicle_gear_encumbrance"], function(values) {
+on('change:character_gear_encumbrance change:vehicle_gear_encumbrance change:water change:grub change:bullets', function() {
+    getAttrs(["character_gear_encumbrance", "vehicle_gear_encumbrance", "water", "grub", "bullets"], function(values) {
         console.log(">>> Change Detected: Character Encumbrance <<<");
         const character_gear_encumbrance = parseFloat(values["character_gear_encumbrance"],10)||0;
         const vehicle_gear_encumbrance   = parseFloat(values["vehicle_gear_encumbrance"],10)||0;
-        const sum_character_weight       = (character_gear_encumbrance);
+        let sum_character_weight       = (character_gear_encumbrance);
         const sum_vehicle_weight         = (vehicle_gear_encumbrance);
-            setAttrs({
+
+        ["water", "grub", "bullets"].forEach(item => {
+            const number = parseFloat(values[item],10) || 0;
+            const modifier = (item === "bullets") ? 0.05 : 0.25;
+            sum_character_weight += Math.floor(number * modifier)
+        });
+
+        setAttrs({
             "character_encumbrance": sum_character_weight,
             "vehicle_encumbrance": sum_vehicle_weight
         });
@@ -1006,12 +1032,14 @@ const damages = {
 };
 Object.keys(damages).forEach(stat => { 
     on(`change:${stat}_max change:${damages[stat]}`, () => {
-        getAttrs([`${stat}_max`, damages[stat]], (v) => {
+        getAttrs([`${stat}_max`, `tab`, damages[stat]], (v) => {
             const 	stat_score = parseInt(v[`${stat}_max`], 10) || 0,
                     damage_score = parseInt(v[damages[stat]], 10) || 0;
-            setAttrs({
-                [`${stat}`] : Math.max(0, stat_score - damage_score )
-            });
+            if (v.tab === "character") {
+                setAttrs({
+                    [`${stat}`] : Math.max(0, stat_score - damage_score )
+                });
+            };
         });
     });
 });
