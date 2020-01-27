@@ -17,25 +17,17 @@
 	<!-- /HIDDEN FIELDS -->
 	
 	<div class="update-alert">
-		<div class="container">
+		<div class="container">,
 		<input type="checkbox" class="sheet-showarrow sheet-ack-button" name="attr_announcements_show" value="1" title="Click to view announcements" />
 		<label class="show-content">Announcements <span name="attr_latest_changes"></span></label>
 			<div class="content">
 				<h4>GURPS Version <input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Sheet Version" /></h4>
 				<ul>
-				    <li>This is a major update to version 2.0.0. – User interaction is required, please read the details of the changes and what you need to do under the Updates TAB.</li>
-					<li>General tab. Change layout for Turning and Deceleration table and fixed some bugs in the process.</li>
-					<li>Combat tab. Added Demolition combat tool. Code provided by Savage. Thank you Savage!</li>
-					<li>Combat tab. Thrown Object tool. Thrust damage was not updating correctly when thrust damage changed.</li>
-					<li>Combat tab. Row ID - Add related skill name and level to description. Add Reason for MOD field. Converted Weapon and Damage notes to text areas.</li>
-					<li>General tab. Added whisper to GM option for Perception roll.</li>
-					<li>Traits tab. Added repeating tables for Perks and Quirks.</li>
-					<li>General tab. Display points summary based on selected option.</li>
-					<li>Corrected a few spelling errors.</li>
-					<li>General tab. Current HP and Current FP notes. Show halved or quartered movement. Removed modifier that divided ST by 2 when HP is 1/3 or less.</li>
-					<li>Spell Rolls. Added options to enter notes for Spell Critical Success, Fail, and Critical Failure. Display spell notes on roll template.</li>
-					<li>Grimoire Tab. Update formatting repeating spells.</li>
-					<li>See Updates tab for more detailed information.</li>
+				    <li>Grimoire Tab. Repeating Spells. Fix bug where Reason MOD text and input spanned two lines.</li>
+				    <li>General Tab. Update text for HP and FP alerts. If fatigued, ST is halved, added new field for ST display and use it with ST rolls.</li>
+				    <li>Combat Tab. Show alert message when dodge is halved or quartered.</li>
+				    <li>Combat Tab. Demolition tool. Add radius and distance from center. Add fragmentation row.</li>
+				    <li>Linked Attacks to skills or spells. On version update, ensure links are updated correctly. Fixed a couple of bugs with linking spells.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset" />View All Updates</button>
@@ -89,7 +81,9 @@
 							</span>
 						</div>
 						<div class="sheet-cell sheet-col1">
-							<input type="number" name="attr_strength" value="10" readonly="readonly" title="Macro name: strength" >
+							<input type="number" name="attr_strength_display" value="10" readonly="readonly" title="Macro name: strength_display" />
+							<input type="hidden" name="attr_strength_halved" value="0" title="Macro name: strength_halved" />
+							<input type="hidden" name="attr_strength" value="10" title="Macro name: strength" />
 						</div>
 						<div class="sheet-cell sheet-col2">
 							<input type="number" name="attr_strength_mod" value="0" step="1" title="Macro name: strength_mod" />
@@ -98,7 +92,7 @@
 							<input type="number" name="attr_strength_points" value="0" step="10" title="Macro name: strength_points" />
 						</div>
 						<div class="sheet-cell sheet-col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Strength Roll}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{strength} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsST" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Strength Roll}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{strength_display} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsST" />
 						</div>
 					</div> <!-- .sheet-row -->
 					<div class="sheet-row sheet-row-dexterity">
@@ -835,15 +829,15 @@
 					<div class="cell col2">
 					    <input type="hidden" class="hit-points-notes" name="attr_hit_points_notes" value="0" />
 						<div class="hit-points-halved-dodge">
-						    <div class="popup">Halved</div>
+						    <div class="popup">½ Move</div>
     						<span class="tooltip">
-    						    Movement and dodge is halved due to hit point loss.
+    						    Move and Dodge is halved due to hit point loss. See B419.
     						</span>
 						</div>
 						<div class="hit-points-quartered-dodge">
-						    <div class="popup">Quartered</div>
+						    <div class="popup">¼ Move</div>
     						<span class="tooltip">
-    						    Movement and dodge is quartered due to hit and fatigue loss.
+    						    Move and Dodge is quartered due to hit point and fatigue loss. See B419.
     						</span>
 						</div>
 					</div>
@@ -934,15 +928,17 @@
 					<div class="cell col2">
 					    <input type="hidden" class="fatigue-points-notes" name="attr_fatigue_points_notes" value="0" />
 						<div class="fatigue-points-halved-dodge">
-						    <div class="popup">Halved</div>
+						    <div class="popup">½ MV/ST</div>
     						<span class="tooltip">
-    						    Movement and dodge is halved due to fatigue loss.
+    						    Move, Dodge, and ST are halved due to fatigue loss. See B426.<br />
+    						    Affects ST roll and using weapons with minimum ST.
     						</span>
 						</div>
 						<div class="fatigue-points-quartered-dodge">
-						    <div class="popup">Quartered</div>
+						    <div class="popup">½ ST</div>
     						<span class="tooltip">
-    						    Movement and dodge is quartered due to hit and fatigue loss.
+    						    ST is halved due to fatigue loss. See B426.<br />
+    						    Affects ST roll and using weapons with minimum ST.
     						</span>
 						</div>
 					</div>
@@ -3333,7 +3329,22 @@
 					<div class="sheet-cell sheet-col4">&nbsp;</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-stats sheet-row-standard">
-					<div class="sheet-cell sheet-col0">Dodge</div>
+					<div class="sheet-cell sheet-col-dodge-label">Dodge</div>
+					<div class="cell col-dodge">
+					    <input type="hidden" class="dodge-reduced-notes" name="attr_dodge_reduced_notes" value="0" />
+						<div class="halved-dodge">
+						    <div class="popup">½ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is halved due to hit points or fatigue loss. See B418 or B426.
+    						</span>
+						</div>
+						<div class="quartered-dodge">
+						    <div class="popup">¼ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is quartered due to hit points and fatigue loss. See B418 or B426.
+    						</span>
+						</div>
+					</div>
 					<div class="sheet-cell sheet-col1">Dodge</div>
 					<div class="sheet-cell sheet-col2"></div>
 					<div class="sheet-cell sheet-col3"><input type="text" name="attr_ad_dodge_skill" value="@{current_dodge}" disabled="disabled" title="Macro name: ad_dodge_skill" /></div>
@@ -3342,7 +3353,22 @@
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-stats sheet-row-standard">
-					<div class="sheet-cell sheet-col0">Dodge and Retreat</div>
+					<div class="sheet-cell sheet-col-dodge-label">Dodge and Retreat</div>
+					<div class="cell col-dodge">
+					    <input type="hidden" class="dodge-reduced-notes" name="attr_dodge_reduced_notes" value="0" />
+						<div class="halved-dodge">
+						    <div class="popup">½ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is halved due to hit points or fatigue loss. See B418 or B426.
+    						</span>
+						</div>
+						<div class="quartered-dodge">
+						    <div class="popup">¼ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is quartered due to hit points and fatigue loss. See B418 or B426.
+    						</span>
+						</div>
+					</div>
 					<div class="sheet-cell sheet-col1">Dodge</div>
 					<div class="sheet-cell sheet-col2"></div>
 					<div class="sheet-cell sheet-col3"><input type="text" name="attr_ad_dodge_retreat_skill" value="@{current_dodge} + 3" disabled="disabled" title="Macro name: ad_dodge_retreat_skill" /></div>
@@ -4324,10 +4350,44 @@
 					</div>
 					<div class="cell six-d-spacer">&nbsp;</div>
 				    <div class="cell damage">
-				        <div class="popup">Damage</div>
+				        <div class="popup">Multi</div>
 				        <span class="tooltip">
-				            <strong>Damage:</strong><br />Enter the number to multiply 6d6 by.<br />
-				            An explosion doing 6dx<i>n</i> damage takes (<i>n</i>x<i>n</i>)/4 pounds of TNT.
+				            <strong>Damage Multiplier:</strong><br />Enter the number to multiply 6d6 by.<br />
+				            An explosion doing 6dx<i>n</i> damage takes (<i>n</i>x<i>n</i>)/4 pounds of TNT.<br />
+				            <b>NOTE:</b> Anyone caught in a blast may attempt an active defense<br />
+				            roll to dive for cover from the explosion’s collateral damage and<br />
+				            fragmentation; see Dodge and Drop B377.
+				        </span>
+					</div>
+				    <div class="cell roll-damage">
+				        <div class="popup">Rad</div>
+				        <span class="tooltip">
+				            Radius of collateral damage. See B414<br />
+				            For instance, if an explosion does 6dx2 damage,<br />
+				            everyone within 24 yards is vulnerable.<br />
+				            <br />
+				            For fragmentation damage, the radius is<br />
+				            5 x dice of fragmentation damage.
+				        </span>
+					</div>
+				    <div class="cell roll-damage">
+				        <div class="popup">Div</div>
+				        <span class="tooltip">
+				            Divisor. Amount to divide damage by based on<br />
+				            distance from blast. See B414<br />
+				            You can enter: <b>3</b> (default), 2, or 1.<br />
+				            Default: Damage rolled / (3 x distance blast).<br />
+				            Damage Modifiers Explosion, see B104.<br />
+				            Exp. +100% = Damage rolled / (2 x distance from blast).<br />
+				            Exp. +150% = Damage rolled / (1 x distance from blast).<br />
+				        </span>
+					</div>
+				    <div class="cell roll-damage">
+				        <div class="popup">TGT</div>
+				        <span class="tooltip">
+				            Target's distance from center of blast.<br />
+				            Damage / (3 x distance from blast). Round down.<br />
+				            See B414
 				        </span>
 					</div>
 				    <div class="cell roll-damage">
@@ -4383,8 +4443,18 @@
     					    <input type="number" value="1" min="1" step="1" name="attr_demo_how_much_damage_multiplier" title="Macro name: demo_how_much_damage_multiplier" />
     					</div>
     					<div class="cell roll-damage">
+    					    <input type="text" readonly="readonly" value="12" name="attr_demo_how_much_radius" title="Macro name: demo_how_much_radius" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="number" value="3" min="1" step="1" max="3" name="attr_demo_how_much_divisor" title="Macro name: demo_how_much_divisor" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="number" value="0" min="0" step="1" name="attr_demo_how_much_target_distance" title="Macro name: demo_how_much_target_distance" />
+    					</div>
+    					<div class="cell roll-damage">
     					    <input type="hidden" name="attr_demo_how_much_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-						    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_much_type}}} {{damageRoll=[[@{demo_how_much_base_damage} * @{demo_how_much_damage_multiplier}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+    					    <input type="hidden" name="attr_demo_how_much_damage_divisor" value="1" />
+    					    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_much_type}}} {{damageRoll=[[ floor( (@{demo_how_much_base_damage} * @{demo_how_much_damage_multiplier}) / @{demo_how_much_damage_divisor} )]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
     					</div>
 						<div class="cell reset">
 					        <button type="action" name="act_demo_how_much_reset" class="reset" />Reset</button>
@@ -4434,11 +4504,70 @@
     					    <input type="number" value="1" readonly="readonly" name="attr_demo_how_big_damage_multiplier" title="Macro name: demo_how_big_damage_multiplier" />
     					</div>
     					<div class="cell roll-damage">
+    					    <input type="text" readonly="readonly" value="12" name="attr_demo_how_big_radius" title="Macro name: demo_how_big_radius" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="number" value="3" min="1" step="1" max="3" name="attr_demo_how_big_divisor" title="Macro name: demo_how_big_divisor" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="number" value="0" min="0" step="1" name="attr_demo_how_big_target_distance" title="Macro name: demo_how_big_target_distance" />
+    					</div>
+    					<div class="cell roll-damage">
     					    <input type="hidden" name="attr_demo_how_big_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-						    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_big_type}}} {{damageRoll=[[@{demo_how_big_base_damage} * @{demo_how_big_damage_multiplier}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+						    <input type="hidden" name="attr_demo_how_big_damage_divisor" value="1" />
+    					    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_big_type}}} {{damageRoll=[[ floor( (@{demo_how_big_base_damage} * @{demo_how_big_damage_multiplier}) / @{demo_how_big_damage_divisor} )]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
     					</div>
 						<div class="cell reset">
 					        <button type="action" name="act_demo_how_big_reset" class="reset" />Reset</button>
+					    </div>
+				    </div>
+				    
+				    <div class="row">
+    					<div class="cell row-title">
+    					    <div class="popup">Fragmentation</div>
+    						<span class="tooltip">
+    						    Fragmentation damage.<br />
+    						    See B415.
+    						</span>
+    					</div>
+    				    <div class="cell select-box">
+    				    </div>
+    				    <div class="cell text-box">
+    					<div class="popup frag-label">Skill</div>
+    						<span class="tooltip">
+    						    Base skill level for a fragmentation damage to hit a target.<br />
+    						    A hit is <b>automatic</b> if the explosive attack actually strikes the target.<br />
+    						    Only three modifiers apply: the <b>range modifier</b> for the distance from the center<br />
+    						    of the blast to the target, the modifier for the <b>target’s posture</b> (prone, etc.),<br />
+    						    and the target’s <b>Size Modifier</b>. It is possible for several fragments to hit! For<br />
+    						    every <b>three points</b> by which the attack roll succeeds, one additional fragment
+    						    <br />strikes the target.
+    						</span>
+    					</div>
+    				    <div class="cell input">
+    				        <input type="number" value="15" step="1" name="attr_fragmentation_skill" />
+    				    </div>
+    				    <div class="cell input">
+    				        <button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{fragmentation_skill} + @{modifier}]]}} {{notes=@{fragmentation_skill_notes}}} {{showNotes=[[1]]}} {{recoil=@{fragmentation_recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" />
+    					</div>
+    					<div class="cell input">
+    					    <input type="text" value="1d6" name="attr_fragmentation_damage" title="Macro name: fragmentation_damage" />
+    					</div>
+    					<div class="cell six-d-spacer"></div>
+    				    <div class="cell damage">
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="text" readonly="readonly" value="12" name="attr_fragmentation_radius" title="Macro name: fragmentation_radius" />
+    					</div>
+    					<div class="cell roll-damage">
+    					</div>
+    					<div class="cell roll-damage">
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="hidden" name="attr_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
+						    <button type="roll" name="roll_vsSL" value="@{roll}&{template:skillRoll} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{damageRoll=[[ @{fragmentation_damage} ]]}} {{damageType=Cutting (cut)}} {{minDamageNote=Cutting min 1}} {{showNotes=[[1]]}} {{notes=@{fragmentation_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+    					</div>
+						<div class="cell reset">
 					    </div>
 				    </div>
 				    
@@ -4951,6 +5080,18 @@
 	<p>Pull Request: <span name="attr_latest_changes"></span></p>
 	
 	<ul>
+		<li>Grimoire Tab. Repeating Spells. Fix bug where Reason MOD text and input spanned two lines.</li>
+		<li>General Tab. Update text for HP and FP alerts. If fatigued, ST is halved, added new field for ST display and use it with ST rolls.</li>
+		<li>Combat Tab. Show alert message when dodge is halved or quartered.</li>
+		<li>Combat Tab. Demolition tool. Add radius and distance from center. Add fragmentation row.</li>
+		<li>Linked Attacks to skills or spells. On version update, ensure links are updated correctly. Fixed a couple of bugs with linking spells.</li>
+	</ul>
+	
+	<h4>Version: 2.0.0</h4>
+	
+	<p>Pull Request: 01/07/2020</p>
+
+	<ul>
 		<li>This is a major update to version 2.0.0. – User interaction is required, please read the details of the changes and what you need to do under the Updates TAB.</li>
 		<li>General tab. Change layout for Turning and Deceleration table and fixed some bugs in the process.</li>
 		<li>Combat tab. Added Demolition combat tool. Code provided by Savage. Thank you Savage!</li>
@@ -5309,13 +5450,51 @@ Falling Damage: If using hit locations, roll randomly for the hit location damag
 		            <h4>Demolition Damage Notes</h4>
 		            <textarea name="attr_demolition_damage_notes">Explosion damage. Targets struck directly takes listed damage. Apply "collateral damage" of Damage / (3 x distance from center of blast) rounded down.
 			    
-* Use torso armor to determine DR against explosion.
-* If the explosion has an armor divisor, do NOT apply to "collateral damage."
-* Explosions are considered incendiary. see Catching Fire B434
-* Can use Dodge and Drop (B377) to avoid collateral damage.
+* Use torso armor to determine DR against explosion.<br />
+* If the explosion has an armor divisor, do NOT apply to "collateral damage.<br />
+* Explosions are considered incendiary. see Catching Fire B434<br />
+* Can use Dodge and Drop (B377) to avoid collateral damage.<br />
 * See B414</textarea>    
 		        </div><!-- end option-container -->
 		       
+		        <div class="option-container collision-falling-options">
+		            <h4>Fragmentation Skill Notes</h4>
+		            <textarea name="attr_fragmentation_skill_notes">For every three points by which the attack roll succeeds, one additional fragment strikes the target.<br />
+<br />
+The only active defense against fragments is to dive away from the explosion that produced them; see Dodge and Drop (p. 377).<br />
+<br />
+For each hit, roll hit location randomly. If that location is behind cover, the fragment hits cover.
+</textarea>    
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container collision-falling-options">
+		            <h4>Fragmentation Damage Notes</h4>
+		            <textarea name="attr_fragmentation_damage_notes">Fragmentation damage is cutting. Note that if an explosive attack has an armor divisor, this does not apply to the fragments it produces.</textarea>    
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container">
+		            
+		            <table>
+    			        <tr>
+    			            <td>
+    			                Fragmentation Recoil</b>      
+    			            </td>
+    			            <td>
+    			                <input type="number" step="1" value="3" name="attr_fragmentation_recoil"></input>
+    			            </td>
+    			        </tr>
+    			        <tr>
+    			            <td>
+    			                Penalty for each spell <b>Maintained:</b>             
+    			            </td>
+    			            <td>
+    			                <input type="number" step="1" value="-3" name="attr_penalty_per_spell_maintained"></input>
+    			            </td>
+    			        </tr>
+    			    </table>
+    			    
+		        </div><!-- end option-container -->
+		        
 		    </div><!-- end option-column -->
 		    
 		    <div class="option-column">
@@ -6449,9 +6628,9 @@ Skull Damage x4
 
 	var noop = function () {}; // do nothing.
 
-	var version = "2.0.0";
+	var version = "2.1.0";
 	
-	var latestChangesDate = "01/07/2020";
+	var latestChangesDate = "01/28/2020";
 
 	var modCascade = true;
 	
@@ -6463,6 +6642,8 @@ Skull Damage x4
 	// caching technique. Store skill row ids and attack rows ids,
     // avoids looping through repeating tables to get matching row.
 	var skillRowIds = [];
+	
+	var spellRowIds = [];
 	
 	var weaponRowIds = [];
 	
@@ -6525,6 +6706,8 @@ Skull Damage x4
 		console.log('********* Sheet Opened *********');
 		
 		setSkillRowIds();
+		
+		setSpellRowIds();
 		
 		setWeaponRowIds();
 		
@@ -6703,9 +6886,46 @@ Skull Damage x4
 		
 		updateRepeatingDefenseNotes();
 		
-		updateRepeatingSkillLevels();
+		// use underscore wrap to update skills, then update melee/ranged linked skills
+		runUpdateRepeatingSkillLevels = _.wrap(updateRepeatingSkillLevels, function(firstFunction) {
+		    
+		    firstFunction();
+		    
+		    thenUpdateLinkedAttacksSkills(); 
+		    
+		});
+		
+		runUpdateRepeatingSkillLevels();
+		
+		runUpdateRepeatingSpellLevels = _.wrap(updateRepeatingSpellLevels, function(thisFunction) {
+		    
+		    thisFunction();
+		    
+		    thenUpdateLinkedAttacksSpells(); 
+		    
+		});
+		
+		runUpdateRepeatingSpellLevels();
+		
+	}
+	
+	function thenUpdateLinkedAttacksSkills() {
+		
+	    console.log("Updating linked skills");
+		
+	    updateLinkedSkills("repeating_melee", "melee");
+    
+        updateLinkedSkills("repeating_ranged", "ranged");
+        
+	}
 
-        updateRepeatingSpellLevels();
+	function thenUpdateLinkedAttacksSpells() {
+		
+	    console.log("Updating linked spells");
+		
+	    updateLinkedSkills("repeating_melee", "melee");
+    
+        updateLinkedSkills("repeating_ranged", "ranged");
         
 	}
 
@@ -6775,12 +6995,27 @@ Skull Damage x4
 	function updateST(callback) {
 		callback = callback || noop;
 		console.log('********* updateST *********');
-		getAttrs(['strength_points', 'strength_mod'], function(v) {
+		getAttrs(['strength_points', 'strength_mod', 'strength_halved'], function(v) {
+		    
 			var base = 10 + ((+v.strength_points || 0) / 10 | 0);
+			
 			var mod = +v.strength_mod || 0;
+			
+			var st_halved = +v.strength_halved;
+			
+			var st_display = base + mod;
+			
+			// check if ST was halved due to fatigue.
+			if (st_halved === 1) {
+			    
+			    st_display = st_display/2;
+			
+			}
+			
 			setAttrs({
 				strength_base: base,
-				strength: base + mod
+				strength: base + mod,
+				strength_display: st_display,
 			}, {silent: false}, callback);
 		});
 	}
@@ -7070,7 +7305,7 @@ Skull Damage x4
 		
 		callback = callback || noop;
 		
-		getAttrs(['encumbrance_level', 'dodge', 'basic_move', 'hit_points', 'hit_points_max', 'fatigue_points', 'fatigue_points_max'], function(v) {
+		getAttrs(['encumbrance_level', 'dodge', 'basic_move', 'hit_points', 'hit_points_max', 'fatigue_points', 'fatigue_points_max', 'strength'], function(v) {
 		
 		    var dodge = +v.dodge;
 		
@@ -7079,6 +7314,12 @@ Skull Damage x4
 			var hitPointsNotes = 0;
 			
 			var fatiguePointNotes = 0;
+			
+			var dodgeNotes = 0;
+			
+			var strengthDisplay = +v.strength;
+			
+			var strengthHalved = 0;
 		
 			if (v.encumbrance_level === 5) {
 			    
@@ -7102,6 +7343,8 @@ Skull Damage x4
 				
 				hitPointsNotes = 1;
 				
+				dodgeNotes = 1;
+				
 				dodge = Math.ceil(dodge / 2);
 				
 				move = Math.ceil(move / 2);
@@ -7113,9 +7356,17 @@ Skull Damage x4
 			    
 			    fatiguePointNotes = 1;
 			    
+			    dodgeNotes = 1; 
+			    
 				dodge = Math.ceil(dodge / 2);
 				
 				move = Math.ceil(move / 2);
+				
+				// reduce strength_display in half
+				strengthDisplay = Math.ceil(strengthDisplay / 2);
+				
+				strengthHalved = 1;
+				
 			}
 			
 			// if both hit and fatigue were reduced, then change trigger to value
@@ -7125,13 +7376,18 @@ Skull Damage x4
 			    
 			    fatiguePointNotes = 2;
 			    
+			    dodgeNotes = 2;
+			    
 			}
 
 			setAttrs({
 				current_move: move,
 				current_dodge: dodge,
 				hit_points_notes: hitPointsNotes,
-				fatigue_points_notes: fatiguePointNotes
+				fatigue_points_notes: fatiguePointNotes,
+				dodge_reduced_notes: dodgeNotes,
+				strength_display: strengthDisplay,
+				strength_halved: strengthHalved
 			}, {silent: false}, callback);
 			
 		});
@@ -7319,6 +7575,16 @@ Skull Damage x4
 	    
 	});
 	
+	// if spell was removed, make sure to remove it from cache
+	on("remove:repeating_spells", function(event) {
+	    
+	    var rowId = getRowIdFromEventInfo(event, "repeating_spells");
+	    
+	    // remove from array
+	    spellRowIds = spellRowIds.remove(rowId);
+	    
+	});
+	
 	// update row ids when repeating row is updated
 	on("change:repeating_spells", function(event) {
 	    
@@ -7351,7 +7617,7 @@ Skull Damage x4
 	    var rowId = getRowIdFromEventInfo(event, "repeating_spells");
 	    
 	    // remove from array
-	    skillRowIds = skillRowIds.remove(rowId);
+	    spellRowIds = spellRowIds.remove(rowId);
 	    
 	});
 	
@@ -7376,7 +7642,15 @@ Skull Damage x4
                 // set the field value
                 items[`${sectionId}_${rowId}_row_id`] = rowId;
                 
-                updateSkillIdsArrayCache(rowId);
+                if (sectionId == "repeating_skills") {
+                
+                    updateSkillIdsArrayCache(rowId);
+                    
+                } else {
+                    
+                    updateSpellIdsArrayCache(rowId);
+                    
+                }
                 
             }
            
@@ -7398,6 +7672,21 @@ Skull Damage x4
 	    if (skillRowIds.includes(rowId) === false ) {
 	        
 	        skillRowIds.push(rowId);
+	        
+	    }
+	    
+	}
+	
+	/**
+	 * If missing in cache, add this row id
+	 * 
+	 * @param string rowId Row ID to add to cache
+	 */
+	function updateSpellIdsArrayCache(rowId) {
+	    
+	    if (spellRowIds.includes(rowId) === false ) {
+	        
+	        spellRowIds.push(rowId);
 	        
 	    }
 	    
@@ -11012,6 +11301,16 @@ Skull Damage x4
         
     }
     
+    function setSpellRowIds() {
+        
+        getSectionIDs("repeating_spells", function(ids) {
+            
+            spellRowIds = ids;
+            
+        });
+        
+    }
+    
     function setWeaponRowIds() {
         
         setWeaponRowIdsBySection("repeating_melee", "melee");
@@ -11304,7 +11603,7 @@ Skull Damage x4
 	
 	function validSkillRowId( rowIdToFind ) {
 	    
-	    var blnValid = skillRowIds.includes(rowIdToFind);
+	    var blnValid = skillRowIds.includes(rowIdToFind) || spellRowIds.includes(rowIdToFind);
 	    
 	    return blnValid;
 	    
@@ -11322,7 +11621,8 @@ Skull Damage x4
 	        
 	        updateSkillLevel(sectionName, ids);
 	        
-	    }); 
+	    });
+	    
 	}
 	
 	function updateSkillLevel(sectionName, ids) {
@@ -11392,7 +11692,7 @@ Skull Damage x4
 	            
 	            updateFields[fieldToUpdate] = skillLevel;
 	            
-	            setAttrs(updateFields);
+	            setAttrs(updateFields, {silent: false});
 	            
 	        });
 	        
@@ -11446,6 +11746,8 @@ Skull Damage x4
 	function updateRepeatingSpellLevels() {
 	    
 	    var sectionName = "repeating_spells";
+	    
+	    console.log(sectionName);
 	    
 	    // get the base spell level and bonus
 	    getAttrs(["spell_base", "spell_bonus"], function(values) {
@@ -11509,8 +11811,8 @@ Skull Damage x4
 	            var updateFields = {};
 	            
 	            updateFields[fieldToUpdate] = skillLevel;
-	            
-	            setAttrs(updateFields);
+	             
+	            setAttrs(updateFields, {silent: false});
 	            
 	        });
 	        
@@ -11553,6 +11855,125 @@ Skull Damage x4
 	    
         return skill;
         
+	}
+	
+	/**
+	 * Loops through each melee attack and make sure the
+	 * linked skills have the correct information.
+	 * TODO: linked-skills
+	 */
+	function updateLinkedSkills(sectionName, subName) {
+	    
+	    getSectionIDs(sectionName, function(ids) {
+    	
+    	    // loop through each row
+    	    _.each(ids,function(id) {
+            
+				var rowType = `${sectionName}_${id}_${subName}_row_type`;
+	   
+	            var linkedRowId = `${sectionName}_${id}_${subName}_skill_row_id`;
+	            
+	            var linkedSkillMod = `${sectionName}_${id}_${subName}_skill_row_id_modifier`;
+			
+			    var skillMessageFieldName = `${sectionName}_${id}_${subName}_skill_row_id_message`;
+	    
+	            var skillMessageFieldLevel = `${sectionName}_${id}_${subName}_skill_row_id_level`;
+	            
+	            var weaponSkillFieldName = `${sectionName}_${id}_${subName}_skill`;
+	    
+	            // if this gets changed, then the update linked weapon skill gets triggered
+	            var skillRowIdToggleFieldName = `${sectionName}_${id}_${subName}_skill_row_id_toggle`;
+	    
+	            var attributes = [
+			            rowType,
+			            linkedRowId,
+			            linkedSkillMod,
+			            skillMessageFieldName,
+			            skillMessageFieldLevel,
+			            weaponSkillFieldName
+			        ];
+			        
+			    getAttrs(attributes, function(values) {
+			        
+			        var repeatingTableToUse = "";
+			        
+			        var rowTypeValue = values[rowType];
+	    
+            	    switch (rowTypeValue) {
+            	        
+            	        case "Spell":
+            	            repeatingTableToUse = "repeating_spells";
+            	            break;
+            	            
+            	        case "Skill":
+            	        default:
+                            repeatingTableToUse = "repeating_skills";
+            	            break;
+            	            
+            	    }
+            	    
+            	    var skillRowId = values[linkedRowId];
+		    
+        		    var skillMod = +values[linkedSkillMod];
+        		    
+        		    // exit if there's no value
+        		    if (skillRowId.length === 0) {
+        		        
+        		        // clear the field
+        		        var updateFields = {};
+        		        
+        		        updateFields[skillMessageFieldName] = ``;
+            	            
+            	        updateFields[skillMessageFieldLevel] = "";
+            	        
+            	        setAttrs(updateFields);
+            	        
+        		    } else if ( validSkillRowId(skillRowId) ) {
+        		        
+        		        // if it's a good row id, let's update stuff
+        		        var skillFieldName = `${repeatingTableToUse}_${skillRowId}_level_mirror`;
+        		        
+        		        var skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
+        		        
+        		        // update the skill level for weapon.
+        		        getAttrs([skillFieldName, skillFieldNameOfSkill], function(values) {
+        
+        		            var skillLevel = +values[skillFieldName];
+        		            
+        		            var skillLevelFinal = skillLevel + linkedSkillMod;
+        		            
+        		            var updateFields = {};
+        	            
+            	            updateFields[weaponSkillFieldName] = skillLevelFinal;
+            	            
+            	            updateFields[skillMessageFieldName] = values[skillFieldNameOfSkill];
+            	            
+            	            updateFields[skillMessageFieldLevel] = skillLevel;
+            	            
+            	            // reset toggle to zero
+            	            updateFields[skillRowIdToggleFieldName] = 0;
+            	            
+            	            setAttrs(updateFields);
+        		            
+        		        });
+        		        
+        		    } else {
+        		        
+        		        // show an error message
+        		        var updateFields = {};
+        		        
+        		        updateFields[skillMessageFieldName] = `Could not find ${rowTypeValue}.`;
+            	            
+            	        setAttrs(updateFields);
+            	            
+        		    }
+			        
+			    });
+			
+			});
+    	
+    	});
+    	
 	}
 	
 	// see: https://stackoverflow.com/questions/3954438/how-to-remove-item-from-array-by-value
@@ -11667,9 +12088,9 @@ Skull Damage x4
 	];
 	
 	// check for how much? damage
-	on("change:demo_how_much_ref change:demo_how_much_damage_multiplier", function (event) {
+	on("change:demo_how_much_ref change:demo_how_much_damage_multiplier change:demo_how_much_base_damage change:demo_how_much_divisor change:demo_how_much_target_distance", function (event) {
 	    
-	    getAttrs(["demo_how_much_ref", "demo_how_much_damage_multiplier"], function(values) {
+	    getAttrs(["demo_how_much_ref", "demo_how_much_base_damage", "demo_how_much_damage_multiplier", "demo_how_much_divisor", "demo_how_much_target_distance"], function(values) {
 	        
 	        var multiplier = +values.demo_how_much_damage_multiplier;
 	        
@@ -11679,18 +12100,62 @@ Skull Damage x4
 	        
 	        var result = weight.toFixed(2);
 	        
+	        // determine damage divisor
+	        var divisor = 1;
+	        
+	        var targetDistance = parseInt(values.demo_how_much_target_distance);
+	        
+	        var baseDivisor = parseInt(values.demo_how_much_divisor);
+	        
+	        // if target is 1 or more yards away, determine divisor
+	        if (targetDistance > 0) {
+	            
+	            divisor = baseDivisor * targetDistance;
+	            
+	        }
+	        
+	        // determine blast radius
+	        var diceCount = getNumberOfDiceToRoll(values.demo_how_much_base_damage);
+	        
+	        // see B414
+	        var blastRadius = diceCount * multiplier * 2;
+	        
 	        setAttrs({
-	            demo_how_much_weight: result
+	            demo_how_much_weight: result,
+	            demo_how_much_damage_divisor: divisor,
+	            demo_how_much_radius: blastRadius
 	        });
 	        
 	    });
 	    
 	});
 	
-	// check for how big? damage
-	on("change:demo_how_big_ref change:demo_how_big_weight", function (event) {
+	/**
+	 * Determines the number of dice in a simple roll value
+	 * If 3d6+2, it will return 3. The number of dice to roll.
+	 * 
+	 * @param string rollString Roll value to parse
+	 * 
+	 * @return int
+	 */
+	function getNumberOfDiceToRoll(rollString) {
 	    
-	    getAttrs(["demo_how_big_ref", "demo_how_big_weight"], function(values) {
+	    rollString = rollString.toLowerCase();
+	    
+	    console.log(rollString);
+	    
+	    var arrRoll = rollString.split("d");
+	    
+	    var diceCount = +arrRoll[0];
+	    
+	    return diceCount;
+	    
+	}
+	
+	// check for how big? damage
+	on("change:demo_how_big_ref chage:demo_how_big_base_damage change:demo_how_big_weight change:demo_how_big_divisor change:demo_how_big_target_distance", function (event) {
+	    
+	    getAttrs(["demo_how_big_ref", "demo_how_big_base_damage", "demo_how_big_weight", "demo_how_big_divisor", "demo_how_big_target_distance"], function(values) {
 	        
 	        var multiplier = 0;
 	        
@@ -11706,8 +12171,30 @@ Skull Damage x4
     	        
 	        }
 	        
+	        // determine damage divisor
+	        var divisor = 1;
+	        
+	        var targetDistance = parseInt(values.demo_how_big_target_distance);
+	        
+	        var baseDivisor = parseInt(values.demo_how_big_divisor);
+	        
+	        // if target is 1 or more yards away, determine divisor
+	        if (targetDistance > 0) {
+	            
+	            divisor = baseDivisor * targetDistance;
+	            
+	        }
+	        
+	        // determine blast radius
+	        var diceCount = getNumberOfDiceToRoll(values.demo_how_big_base_damage);
+	        
+	        // see B414
+	        var blastRadius = diceCount * multiplier * 2;
+	        
 	        setAttrs({
-	            demo_how_big_damage_multiplier: multiplier
+	            demo_how_big_damage_multiplier: multiplier,
+	            demo_how_big_damage_divisor: divisor,
+	            demo_how_big_radius: blastRadius
 	        });
 	        
 	    });
@@ -11821,6 +12308,22 @@ Skull Damage x4
             setAttrs({
                 grand_total_weight: grandTotalWeight
             });
+            
+        });
+        
+    });
+    
+    on("change:fragmentation_damage", function(event) {
+        
+        getAttrs(["fragmentation_damage"], function(values) {
+            
+             var diceCount = getNumberOfDiceToRoll(values.fragmentation_damage);
+             
+             var radius = 5 * diceCount;
+             
+             setAttrs({
+                 fragmentation_radius: radius
+             });
             
         });
         
