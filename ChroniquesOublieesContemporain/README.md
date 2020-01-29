@@ -9,9 +9,14 @@ Cette feuilles de personnage inclut quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](http://www.black-book-editions.fr/produit.php?id=4349).
 
 # Version courante
-2.7 [Screenshot](coc_v2.png)
+2.8 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v2.8 (2019-10-10)
+* Modifications du sheetworker pour éviter erreurs dans la console API
+* Homogénéisation des noms des roll buttons
+* Séparation des buffs circonstanciels de combat en deux champs : un pour le jet d'attaque et un pour le jet de dommages
 
 ## v2.7 (2019-29-06)
 ### Fiche PJ, onglet Configuration
