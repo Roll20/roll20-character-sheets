@@ -9,13 +9,25 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 ///// ============ Change Log ============ ///// 
 
 
+
+- Feb 2 2020
+
+- Banner rework, added light/dark mode to settings
+- Roll public/whisper chooser moved to settings
+- Fields for Career level and Career Path added.
+- Perception/Stealth rolls influence from armour fixed
+- Critical Hit roll fixed
+- Bug fixes
+
+
+
 - Jan 20 2020
 
-- Asset and Color palate rework (darker)
-- Spellbook rework, added all known spell names. And Extended Channeling tweak.
+- Asset and Color palate rework, light/dark mode
 - Clean up of global rolls mechanic
 - Xp spend log tab added, these field interact with Xp current/earned/spent fields.
 - Bug fixes
+
 
 
 - Jan 13 2020
@@ -27,9 +39,14 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 - Rework of Weapons (formerly Combat) Tab. With Skill selector for Melee/Ranged specilizations.
 - Rework of Spellbook Tab. Removed unused 2e spell sub tabs. Spells now work correctly and added Channelling Test button for Arcane spells.
 
-Dec 2019
+
+
+Dec 24 2019
 
 - Project Forked
+
+
+
 
 Usage Notes:
 
@@ -44,10 +61,9 @@ Usage Notes:
 
 Possible additons to come :
 
+- Roll Template rework
 - Condition Tracker
-- Spellbook enhancemnts
-- Map Tab
-
+- Map/Info Tab
 
 
 Enjoy.
