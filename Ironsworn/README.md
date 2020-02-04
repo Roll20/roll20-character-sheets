@@ -1,6 +1,6 @@
 # Ironsworn - Character Sheet
 ## Roll Logic
-### Weild a Rarity
+### Wield a Rarity
 Structured it so it is easier to read.
 ```javascript
 if (actionWithRarity == (negativeMomentum + modifiers)) {
