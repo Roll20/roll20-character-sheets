@@ -10,7 +10,7 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 
 
-- Feb 2 2020
+Feb 2 2020
 
 - Banner rework, added light/dark mode to settings
 - Roll public/whisper chooser moved to settings
@@ -21,7 +21,7 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 
 
-- Jan 20 2020
+Jan 20 2020
 
 - Asset and Color palate rework, light/dark mode
 - Clean up of global rolls mechanic
@@ -30,7 +30,7 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 
 
-- Jan 13 2020
+Jan 13 2020
 
 - Reworked Initiative Roll button, with 3 Core book rule options. See Settings cog.
 - Moved Wounds/Advantage/Fate points out of the tabs to the top of the sheet for better access.
