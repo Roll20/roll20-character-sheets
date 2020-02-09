@@ -3153,10 +3153,9 @@
 					    <div class="sheet-popup">Max</div>
 						<span class="sheet-tooltip">
 							Maximum modifier allowed for the technique.<br />
-							This is usually relative to the parent skill.<br />
+							This is relative to the parent skill.<br />
 							For example, Kicking cannot exceed Brawling + 0<br />
 							or Karate + 0.<br />
-							<b style="color:red;">Important!</b> Leave empty if there's no max.<br />
 							see Techniques B229
 						</span>
 					</div>
@@ -3213,6 +3212,7 @@
 							<input type="number" name="attr_points" value="0" title="Macro table name: repeating_techniquesrevised. Field name: points" />
 						</div>
 						<div class="cell col8">
+							<input type="hidden" name="attr_level_mirror" value="@{level}" /> 
 							<input type="text" name="attr_level" readonly="readonly" title="Macro table name: repeating_techniquesrevised. Field name: level" value="10"/>
 						</div>
 						<div class="cell col9">
@@ -3227,12 +3227,10 @@
 					
 					    <div class="row-misc">
 							<div class="cell label">
-							    <div class="sheet-popup">Row ID:</div>
-        						<span class="sheet-tooltip">
+							    <div class="popup">Row ID:</div>
+        						<span class="tooltip">
         							The row id can be used with macros.<br />
-        							NOTE: Future use for linking to techniques<br />
-        							and combat skills.<br />
-        							Example field name: repeating_skills_[the row id]_level<br />
+        							Example field name: repeating_techniquesrevised_[the row id]_level<br />
         							This example would represent the skill level on that row.
         						</span> 
 							</div>
@@ -3253,6 +3251,42 @@
 							</div>
 						</div> <!-- .sheet-row -->
 					    
+						<div class="row">
+					        <div class="cell label">
+							    <div class="popup">Link: </div>
+        						<span class="tooltip">
+									Link this technique to a skill or spell.<br />
+									Will populate Parent and Base Skill Level fields.
+        						</span> 
+					        </div>
+							<div class="cell">
+								<select name="attr_technique_row_type">
+					                <option>Skill</option>
+					                <option>Spell</option>
+					            </select>
+					        </div>
+    					    <div class="cell col-row-id label">
+    						    <div class="popup">Row ID: </div>
+        						<span class="tooltip">
+        							Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
+        							When the skill/spell is updated, the technique's parent name and base skill level<br />
+        							will be updated.
+        						</span>	
+    						</div>
+    						<div class="cell col-input-medium">
+    						    <input type="hidden" name="attr_technique_skill_row_id_toggle" value="0" />
+								<input type="text" name="attr_technique_skill_row_id" title="Macro table name: repeating_techniquesrevised. Field name: technique_skill_row_id" />
+							</div>
+							<div class="cell col-wide">
+								<input type="hidden" name="attr_skill" value="" />
+    							<input type="hidden" name="attr_technique_skill_row_id_modifier" value="0" />
+    							<input type="hidden" name="attr_technique_skill_row_id_message" value="" />
+    							<b>Name:</b><span name="attr_technique_skill_row_id_message"></span>
+    							<input type="hidden" name="attr_technique_skill_row_id_level" value="" />
+    							<b>Level:</b><span name="attr_technique_skill_row_id_level"></span>
+    						</div>
+						</div> <!-- .sheet-row -->
+						
 						<div class="rolltable-result-notes notes-below">
 						    <div class="show-notes">
 						        <input type="checkbox" name="attr_show_notes_revised" value="1" />
@@ -3744,13 +3778,14 @@
 					        <div class="cell">
 					            <select name="attr_melee_row_type">
 					                <option>Skill</option>
-					                <option>Spell</option>
+									<option>Spell</option>
+									<option>Technique</option>
 					            </select>
 					        </div>
     					    <div class="cell col-row-id label">
-    						    <div class="popup">Row ID</div>
+    						    <div class="popup">Row ID: </div>
         						<span class="tooltip">
-        							Copy/paste the Skill or Spell Row ID to link that skill to this attack.<br />
+        							Copy/paste the Skill, Spell, or Technique Row ID to link that skill to this attack.<br />
         							When the skill/spell is updated, the weapon attack will also be updated.<br />
         							Use the Modifier column to account for unfamiliar weapon, weapon bond, quality, etc.
         						</span>	
@@ -4010,13 +4045,14 @@
     					    <div class="cell">
 					            <select name="attr_ranged_row_type">
 					                <option>Skill</option>
-					                <option>Spell</option>
+									<option>Spell</option>
+									<option>Technique</option>
 					            </select>
 					        </div>
 					        <div class="cell col-row-id label">
-    						    <div class="popup">Row ID</div>
+    						    <div class="popup">Row ID: </div>
         						<span class="tooltip">
-        							Copy/paste the Skill or Spell Row ID to link that skill to this attack.<br />
+        							Copy/paste the Skill, Spell, or Technique Row ID to link that skill to this attack.<br />
         							When the skill/spell is updated, the weapon attack will also be updated.<br />
         							Use the Modifier column to account for unfamiliar weapon, weapon bond, quality, etc.
         						</span>	
@@ -6901,6 +6937,8 @@ Skull Damage x4
 	var spellRowIds = [];
 	
 	var weaponRowIds = [];
+
+	var techniqueRowIds = [];
 	
 	const decelerationDivisor = 2;
 	
@@ -6964,8 +7002,10 @@ Skull Damage x4
 		
 		setSpellRowIds();
 		
-		setWeaponRowIds();
+		setTechniqueRowIds();
 		
+		setWeaponRowIds();
+
 		setAttrs({inventory_fixed_digits: 1}); 
 
 		sumRepeating('repeating_item', 'weighttotal', function(v) {
@@ -7171,7 +7211,9 @@ Skull Damage x4
 	    updateLinkedSkills("repeating_melee", "melee");
     
         updateLinkedSkills("repeating_ranged", "ranged");
-        
+		
+		updateLinkedSkills("repeating_techniquesrevised", "technique");
+
 	}
 
 	function thenUpdateLinkedAttacksSpells() {
@@ -7181,7 +7223,9 @@ Skull Damage x4
 	    updateLinkedSkills("repeating_melee", "melee");
     
         updateLinkedSkills("repeating_ranged", "ranged");
-        
+		
+		updateLinkedSkills("repeating_techniquesrevised", "technique");
+
 	}
 
 	// Sum values, used in reduce
@@ -7809,7 +7853,7 @@ Skull Damage x4
 		
 	});
 	
-	// update row ids when repeating row is updated
+	// update row ids and then update mirrored skill level when repeating row is updated
 	on("change:repeating_skills", function(event) {
 	    
 	    get_update_row_ids("repeating_skills", function(ids) {
@@ -7830,17 +7874,7 @@ Skull Damage x4
 	    
 	});
 	
-	// if spell was removed, make sure to remove it from cache
-	on("remove:repeating_spells", function(event) {
-	    
-	    var rowId = getRowIdFromEventInfo(event, "repeating_spells");
-	    
-	    // remove from array
-	    spellRowIds = spellRowIds.remove(rowId);
-	    
-	});
-	
-	// update row ids when repeating row is updated
+	// update row id field and update mirrored skill level when repeating row is updated
 	on("change:repeating_spells", function(event) {
 	    
 	    var sectionName = "repeating_spells";
@@ -7876,6 +7910,27 @@ Skull Damage x4
 	    
 	});
 	
+	// update row id field
+	on("change:repeating_techniquesrevised", function(event) {
+	    
+	    get_update_row_ids("repeating_techniquesrevised", function(ids) {
+
+			// do nothing
+
+		});
+	    
+	});
+	
+	// if technique was removed, make sure to remove it from cache
+	on("remove:repeating_techniquesrevised", function(event) {
+	    
+	    var rowId = getRowIdFromEventInfo(event, "repeating_techniquesrevised");
+	    
+	    // remove from array
+	    techniqueRowIds = techniqueRowIds.remove(rowId);
+	    
+	});
+
 	/**
 	 * get rows ids and update display field
 	 * 
@@ -7901,11 +7956,15 @@ Skull Damage x4
                 
                     updateSkillIdsArrayCache(rowId);
                     
-                } else {
+                } else if (sectionId == "repeating_spells") {
                     
                     updateSpellIdsArrayCache(rowId);
                     
-                }
+                } else if (sectionId == "repeating_techniquesrevised") {
+
+					updateTechniqueSkillIdsArrayCache(rowId);
+
+				}
                 
             }
            
@@ -7945,6 +8004,21 @@ Skull Damage x4
 	        
 	    }
 	    
+	}
+
+	/**
+	 * If missing in cache, add this row id
+	 * 
+	 * @param string rowId Row ID to add to cache
+	 */
+	 function updateTechniqueSkillIdsArrayCache(rowId) {
+
+		if (techniqueRowIds.includes(rowId) === false ) {
+	        
+	        techniqueRowIds.push(rowId);
+	        
+	    }
+		
 	}
 	
 	// Update the total cost of Techniques
@@ -11565,25 +11639,42 @@ Skull Damage x4
         });
         
     }
-    
+	
+	/**
+	 * Save melee and ranged weapon row ids to cache 
+	 */
     function setWeaponRowIds() {
         
         setWeaponRowIdsBySection("repeating_melee", "melee");
         
-        setWeaponRowIdsBySection("repeating_ranged", "ranged");
-        
-    }
+		setWeaponRowIdsBySection("repeating_ranged", "ranged");
+		
+		setWeaponRowIdsBySection("repeating_techniquesrevised", "technique");
+		
+	}
+	
+	/**
+	 * Save techniques revised row ids to cache
+	 */
+	function setTechniqueRowIds() {
+
+		getSectionIDs("repeating_techniquesrevised", function(ids) {
+            
+			techniqueRowIds = ids;
+			
+        });
+	} 
     
     function setWeaponRowIdsBySection(sectionName, prefixValue) {
-        
-        getSectionIDs(sectionName, function(ids) {
-            
+		
+		getSectionIDs(sectionName, function(ids) {
+		
             // loop through each row, find ones that have skill row id
             // see: https://underscorejs.org/#each 
             _.each(ids,function(id) {
                 
-                var fieldName = `${sectionName}_${id}_${prefixValue}_skill_row_id`;
-                
+				var fieldName = `${sectionName}_${id}_${prefixValue}_skill_row_id`;
+				
                 getAttrs([fieldName], function(values) {
                 
                     var rowId = values[fieldName];
@@ -11599,8 +11690,8 @@ Skull Damage x4
                         };
                         
                         // add to global variable
-                        weaponRowIds.push(skillData);
-                        
+						weaponRowIds.push(skillData);
+						
                     }
                        
                 });
@@ -11647,6 +11738,33 @@ Skull Damage x4
         weapons = getMatchinWeaponsFromSkillId(rowId);
         
         // could be more than one weapon tied to a skill/spell
+        if (weapons.length) {
+        
+            var updateFields = {};
+    
+            weapons.forEach( function(weaponRow) {
+            
+                var toggleFieldName = `${weaponRow.sectionName}_${weaponRow.rowId}_${weaponRow.prefix}_skill_row_id_toggle`;
+                
+                updateFields[toggleFieldName] = 1;
+    
+            });
+    
+            setAttrs(updateFields);
+                
+        }
+        
+	});
+	
+	// check if technique level changed
+	on("change:repeating_techniquesrevised:level", function(event) {
+        
+        var rowId = getRowIdFromEventInfo(event, "repeating_techniquesrevised");
+        
+        // if the weapon rowId is being used by a skill, update the toggles
+        weapons = getMatchinWeaponsFromSkillId(rowId);
+        
+        // could be more than one weapon tied to a skill
         if (weapons.length) {
         
             var updateFields = {};
@@ -11719,8 +11837,7 @@ Skull Damage x4
         
     }
     
-    // set note values for damage types
-    // Update thrust and swing when striking st is updated
+    // if linked melee data changes update the linked weapon skill
 	on('change:repeating_ranged:ranged_row_type change:repeating_ranged:ranged_skill_row_id change:repeating_ranged:ranged_skill_row_id_modifier change:repeating_ranged:ranged_skill_row_id_toggle', function(event){
 
 		getAttrs(["repeating_ranged_ranged_row_type"], function(values) {
@@ -11737,8 +11854,7 @@ Skull Damage x4
 		
 	});
 	
-	// set note values for damage types
-    // Update thrust and swing when striking st is updated
+	// if linked melee data changes update the linked weapon skill
 	on('change:repeating_melee:melee_row_type change:repeating_melee:melee_skill_row_id change:repeating_melee:melee_skill_row_id_modifier change:repeating_melee:melee_skill_row_id_toggle', function(event){
 
         getAttrs(["repeating_melee_melee_row_type"], function(values) {
@@ -11754,8 +11870,24 @@ Skull Damage x4
         
 	});
 	
+	// if linked technique data changes update linked skills
+	on('change:repeating_techniquesrevised:technique_row_type change:repeating_techniquesrevised:technique_skill_row_id change:repeating_techniquesrevised:technique_skill_row_id_toggle', function(event){
+
+		getAttrs(["repeating_techniquesrevised_technique_row_type"], function(values) {
+
+			updateLinkedWeaponSkill("repeating_techniquesrevised", "technique", values.repeating_techniquesrevised_technique_row_type, function() {
+			
+				//make sure we update the cache 
+				setWeaponRowIdsBySection("repeating_techniquesrevised", "technique");
+				
+			});
+			
+		});
+
+	});
+
 	/**
-	 * Update the weapon skill associated with the skill row id
+	 * Update the melee, ranged, or technique associated with the skill row id
 	 * 
 	 * @param string sectionName Should be either repeating_melee or repeating_ranged
 	 * @param string prefix      Placed before skill attribute names to follow rules for unique names, even inside repeating sections.
@@ -11765,9 +11897,13 @@ Skull Damage x4
 	function updateLinkedWeaponSkill(sectionName, prefix, rowType, callback) {
 	    
 	    var repeatingTableToUse = "";
-	    
+		
 	    switch (rowType) {
 	        
+	        case "Technique":
+	            repeatingTableToUse = "repeating_techniquesrevised";
+	            break;
+	            
 	        case "Spell":
 	            repeatingTableToUse = "repeating_spells";
 	            break;
@@ -11785,8 +11921,14 @@ Skull Damage x4
 	    
 	    var skillMessageFieldName = `${sectionName}_${prefix}_skill_row_id_message`;
 	    
-	    var skillMessageFieldLevel = `${sectionName}_${prefix}_skill_row_id_level`;
-	    
+		var skillMessageFieldLevel = `${sectionName}_${prefix}_skill_row_id_level`;
+		
+		// for updating technique values
+		var parentFieldName = `${sectionName}_parent`;
+		        
+		// for updating technique values
+		var baseSkillFieldName = `${sectionName}_base_level`;
+		
 	    var weaponSkillFieldName = `${sectionName}_skill`;
 	    
 	    // if this gets changed, then the update linked weapon skill gets triggered
@@ -11795,7 +11937,7 @@ Skull Damage x4
 	    getAttrs([skillRowIdFieldName,
 		          skillRowModFieldName
 		         ], function(values) {
-		    
+			
 		    var skillRowId = values[skillRowIdFieldName];
 		    
 		    var skillMod = +values[skillRowModFieldName];
@@ -11817,12 +11959,19 @@ Skull Damage x4
 		        // if it's a good row id, let's update stuff
 		        var skillFieldName = `${repeatingTableToUse}_${skillRowId}_level_mirror`;
 		        
-		        var skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
-		        
-		        // update the skill level for weapon.
-		        getAttrs([skillFieldName, skillFieldNameOfSkill], function(values) {
+				var skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
+				
+				// if we're getting values from the techniques table, don't use level_mirror
+				if (repeatingTableToUse == "repeating_techniquesrevised") {
 
-		            var skillLevel = +values[skillFieldName];
+					skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
+		        
+				}
+				
+				// update the skill level for weapon.
+		        getAttrs([skillFieldName, skillFieldNameOfSkill], function(skillValues) {
+
+		            var skillLevel = +skillValues[skillFieldName];
 		            
 		            var skillLevelFinal = skillLevel + skillMod;
 		            
@@ -11830,13 +11979,22 @@ Skull Damage x4
 	            
     	            updateFields[weaponSkillFieldName] = skillLevelFinal;
     	            
-    	            updateFields[skillMessageFieldName] = values[skillFieldNameOfSkill];
+    	            updateFields[skillMessageFieldName] = skillValues[skillFieldNameOfSkill];
     	            
     	            updateFields[skillMessageFieldLevel] = skillLevel;
     	            
     	            // reset toggle to zero
-    	            updateFields[skillRowIdToggleFieldName] = 0;
+					updateFields[skillRowIdToggleFieldName] = 0;
+					
+					// if repeating_techniquesrevised, also update the Parent skill name and base skill level
+					if (sectionName == "repeating_techniquesrevised") {
+
+						updateFields[parentFieldName] = skillValues[skillFieldNameOfSkill];
     	            
+    	            	updateFields[baseSkillFieldName] = skillLevel;
+
+					}
+					
     	            setAttrs(updateFields, '', callback());
 		            
 		        });
@@ -11858,7 +12016,7 @@ Skull Damage x4
 	
 	function validSkillRowId( rowIdToFind ) {
 	    
-	    var blnValid = skillRowIds.includes(rowIdToFind) || spellRowIds.includes(rowIdToFind);
+	    var blnValid = skillRowIds.includes(rowIdToFind) || spellRowIds.includes(rowIdToFind) || techniqueRowIds.includes(rowIdToFind);
 	    
 	    return blnValid;
 	    
@@ -11880,6 +12038,10 @@ Skull Damage x4
 	    
 	}
 	
+	/**
+	 * Update the mirrored skill level when any field
+	 * is updated for skill or spell
+	 */
 	function updateSkillLevel(sectionName, ids) {
 	    
         _.each(ids,function(id) {
@@ -12002,8 +12164,6 @@ Skull Damage x4
 	    
 	    var sectionName = "repeating_spells";
 	    
-	    console.log(sectionName);
-	    
 	    // get the base spell level and bonus
 	    getAttrs(["spell_base", "spell_bonus"], function(values) {
 	        
@@ -12113,9 +12273,8 @@ Skull Damage x4
 	}
 	
 	/**
-	 * Loops through each melee attack and make sure the
+	 * Loops through each designated section and make sure the
 	 * linked skills have the correct information.
-	 * TODO: linked-skills
 	 */
 	function updateLinkedSkills(sectionName, subName) {
 	    
@@ -12156,6 +12315,10 @@ Skull Damage x4
 	    
             	    switch (rowTypeValue) {
             	        
+            	        case "Technique":
+            	            repeatingTableToUse = "repeating_techniquesrevised";
+            	            break;
+            	            
             	        case "Spell":
             	            repeatingTableToUse = "repeating_spells";
             	            break;
@@ -12190,7 +12353,7 @@ Skull Damage x4
         		        
         		        var skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
         		        
-        		        // update the skill level for weapon.
+        		        // update the skill level for weapon or linked technique.
         		        getAttrs([skillFieldName, skillFieldNameOfSkill], function(values) {
         
         		            var skillLevel = +values[skillFieldName];
@@ -12396,8 +12559,6 @@ Skull Damage x4
 	function getNumberOfDiceToRoll(rollString) {
 	    
 	    rollString = rollString.toLowerCase();
-	    
-	    console.log(rollString);
 	    
 	    var arrRoll = rollString.split("d");
 	    
