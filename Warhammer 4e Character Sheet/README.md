@@ -10,14 +10,17 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 
 
-Feb 2 2020
+Feb 10 2020
 
 - Banner rework, added light/dark mode to settings
+- Roll test clean up and rules, Crit Success/Failure added
+- Crit roll fixed
+- Wounds updated, locked between 0 and max wounds
+- Roll template rework
 - Roll public/whisper chooser moved to settings
 - Fields for Career level and Career Path added.
 - Perception/Stealth rolls influence from armour fixed
 - Critical Hit roll fixed
-- Bug fixes
 
 
 
@@ -61,9 +64,9 @@ Usage Notes:
 
 Possible additons to come :
 
-- Roll Template rework
 - Condition Tracker
 - Map/Info Tab
+
 
 
 Enjoy.
