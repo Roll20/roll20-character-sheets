@@ -11,6 +11,7 @@
 	<input type="hidden" name="attr_racial_points" value="0" />
 	<input type="hidden" name="attr_skills_points" value="0" />
 	<input type="hidden" name="attr_techniques_points" value="0" />
+	<input type="hidden" name="attr_techniques_revised_points" value="0" />
 	<input type="hidden" name="attr_spells_points" value="0" />
 	<input type="hidden" name="attr_announcements_hide" value="0" />
 	<input type="hidden" name="attr_inventory_fixed_digits" value="0" />
@@ -23,10 +24,8 @@
 			<div class="content">
 				<h4>GURPS Version <input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Sheet Version" /></h4>
 				<ul>
-					<li><b style="color:red;">New Optional Feature Available.</b> A revised techniques table is available by setting the options on the character sheet or the campaign default options. This revised techniques is not final, we'll make adjustments based upon feedback.</li>
-					<li>Options tab. New option to show/hide the Original Techniques table and new Revised Techniques table. Show both tables if you want to transfer your current techniques to the new table.</li>
-					<li>Skills Tab. New Revised Technique Table. Options to show/hide old technigue or new technique tables. If old technique table has no rows, then hide old table, show new table.</li>
-					<li>Quirks and Perks tables. Set default point value of Quirks to -1 and Perks to 1, suggested by Kevin A (ID: 688156).</li>
+					<li>Techniques Table Revised. Points spent on techniques are now totaled correctly. <b>NOTE:</b> When transferring techniques to the revised table, be sure to delete the old technqies, otherwise the total will be wrong.</li>
+					<li>Tecnniques Table Revised. Fix bug where Modifier was not added to the final Technique Skill Level.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset" />View All Updates</button>
@@ -1095,7 +1094,7 @@
 						Spent
 					</div>
 					<div class="cell col1">
-						<input type="text" name="attr_point_summary" disabled="disabled" value="@{att_points} + @{languages_points} + @{tl_pts} + @{cf_points} + @{racial_points} +  @{advantages_points} + @{advantages_perks} + @{disadvantages_points} + @{disadvantages_quirks} + @{skill_points} + @{techniques_points} + @{spells_points} + @{misc_points}" title="Macro name: point_summary" />
+						<input type="text" name="attr_point_summary" disabled="disabled" value="@{att_points} + @{languages_points} + @{tl_pts} + @{cf_points} + @{racial_points} +  @{advantages_points} + @{advantages_perks} + @{disadvantages_points} + @{disadvantages_quirks} + @{skill_points} + @{techniques_points} + @{techniques_revised_points} + @{spells_points} + @{misc_points}" title="Macro name: point_summary" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="row margin-bottom row-total hr">
@@ -1103,7 +1102,7 @@
 						Unspent
 					</div>
 					<div class="cell col1">
-					    <input type="text" name="attr_point_diff" value="@{total_points} - (@{att_points} + @{languages_points} + @{tl_pts} + @{cf_points} + @{racial_points} +  @{advantages_points} + @{advantages_perks} + @{disadvantages_points} + @{disadvantages_quirks} + @{skill_points} + @{techniques_points} + @{spells_points} + @{misc_points})" disabled="disabled" title="Macro name: point_diff" />
+					    <input type="text" name="attr_point_diff" value="@{total_points} - (@{att_points} + @{languages_points} + @{tl_pts} + @{cf_points} + @{racial_points} +  @{advantages_points} + @{advantages_perks} + @{disadvantages_points} + @{disadvantages_quirks} + @{skill_points} + @{techniques_points} + @{techniques_revised_points} + @{spells_points} + @{misc_points})" disabled="disabled" title="Macro name: point_diff" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="row margin-bottom row-unspent hr">
@@ -1331,7 +1330,7 @@
 						Skills
 					</div>
 					<div class="cell col1">
-						<input type="text" name="attr_skill_technique_points" disabled="disabled" value="@{skills_points} + @{techniques_points}" title="Macro name: skill_technique_points" />
+						<input type="text" name="attr_skill_technique_points" disabled="disabled" value="@{skills_points} + @{techniques_points} + @{techniques_revised_points}" title="Macro name: skill_technique_points" />
 					</div>
 				</div> <!-- .sheet-row -->
 				
@@ -1340,7 +1339,7 @@
 						Skills
 					</div>
 					<div class="cell col1">
-						<input type="text" name="attr_skill_technique_points" disabled="disabled" value="@{skills_points} + @{techniques_points}" title="Macro name: skill_technique_points" />
+						<input type="text" name="attr_skill_technique_points" disabled="disabled" value="@{skills_points} + @{techniques_points} + @{techniques_revised_points}" title="Macro name: skill_technique_points" />
 					</div>
 				</div> <!-- .sheet-row -->
 				
@@ -1362,6 +1361,18 @@
 					</div>
 					<div class="sheet-cell sheet-col1">
 						<input type="text" name="attr_techniques_total_points" disabled="disabled" value="@{techniques_points}" title="Macro name: techniques_total_points" />
+					</div>
+				</div> <!-- .sheet-row -->
+				
+				<div class="sheet-row sheet-row-skills all">
+					<div class="sheet-cell sheet-col0 sheet-label">
+						<div class="sheet-popup">Tech. (r)</div>
+    					<span class="sheet-tooltip">
+    						Techniques Revised
+    					</span>
+					</div>
+					<div class="sheet-cell sheet-col1">
+						<input type="text" name="attr_techniques_total_points" disabled="disabled" value="@{techniques_revised_points}" title="Macro name: techniques_revised_points" />
 					</div>
 				</div> <!-- .sheet-row -->
 				
@@ -5367,6 +5378,15 @@
 	<p>Pull Request: <span name="attr_latest_changes"></span></p>
 	
 	<ul>
+		<li>Techniques Table Revised. Points spent on techniques are now totaled correctly. <b>NOTE:</b> When transferring techniques to the revised table, be sure to delete the old technqies, otherwise the total will be wrong.</li>
+		<li>Tecnniques Table Revised. Fix bug where Modifier was not added to the final Technique Skill Level.</li>
+	</ul>
+
+	<h4>Version 2.2.0</h4>
+
+	<p>Pull Reqeust: 02/11/2018</p>
+
+	<ul>
 		<li><b style="color:red;">New Optional Feature Available.</b> A revised techniques table is available by setting the options on the character sheet or the campaign default options. This revised techniques is not final, we'll make adjustments based upon feedback.</li>
 		<li>Options tab. New option to show/hide the Original Techniques table and new Revised Techniques table. Show both tables if you want to transfer your current techniques to the new table.</li>
 		<li>Skills Tab. New Revised Technique Table. Options to show/hide old technigue or new technique tables. If old technique table has no rows, then hide old table, show new table.</li>
@@ -6953,12 +6973,13 @@ Skull Damage x4
 </div>
 
 <script type="text/worker">
+	// type="text/worker"
 
 	var noop = function () {}; // do nothing.
 
-	var version = "2.2.0";
+	var version = "2.2.1";
 	
-	var latestChangesDate = "02/11/2020";
+	var latestChangesDate = "02/18/2020";
 
 	var modCascade = true;
 	
@@ -8062,6 +8083,13 @@ Skull Damage x4
 	on('change:repeating_techniques:points remove:repeating_techniques', function (e) {
 		sumRepeating('repeating_techniques', 'points', function(v) {
 			setAttrs({ techniques_points: v });
+		});
+	});
+
+	// Update the total cost of Techniques revised
+	on('change:repeating_techniquesrevised:points remove:repeating_techniquesrevised', function (e) {
+		sumRepeating('repeating_techniquesrevised', 'points', function(v) {
+			setAttrs({ techniques_revised_points: v });
 		});
 	});
 
@@ -11908,7 +11936,7 @@ Skull Damage x4
 	});
 	
 	// if linked technique data changes update linked skills
-	on('change:repeating_techniquesrevised:technique_row_type change:repeating_techniquesrevised:technique_skill_row_id change:repeating_techniquesrevised:technique_skill_row_id_toggle', function(event){
+	on('change:repeating_techniquesrevised:technique_row_type change:repeating_techniquesrevised:technique_skill_row_id  change:repeating_techniquesrevised:technique_skill_row_id_toggle', function(event){
 
 		getAttrs(["repeating_techniquesrevised_technique_row_type"], function(values) {
 
@@ -12193,7 +12221,7 @@ Skull Damage x4
 	    return baseLevel;
 	}
 	
-		/**
+	/**
 	 * This function is used to make sure the repeating 
 	 * skill levels are updated when the version has changed
 	 */
@@ -12454,74 +12482,104 @@ Skull Damage x4
         return arr;
     }
     
-	on("change:repeating_spells:spell_on_checked", function(event) {
-	   
-        var fields = [
-	            "repeating_spells_spell_on_checked",
-	            "penalty_per_spell_on",
-	            "spell_on_penalty_total"
-	        ];
-	        
-	    getAttrs( fields, function(values) {
-	        
-	        var currentPenalty = +values.spell_on_penalty_total;
-	        
-	        var perSpellPenalty = +values.penalty_per_spell_on;
-	        
-	        var checked = +values.repeating_spells_spell_on_checked;
-	        
-	        var newTotalPenalty = getSpellPenaltyForOnOrMaintained(checked, currentPenalty, perSpellPenalty);
-	        
-	        setAttrs({
-	            spell_on_penalty_total: newTotalPenalty
-	        })
-	        
-	    });
-	    
+	// method to reduce async calls.
+	['on','maintained'].forEach(onormaintained => {
+		
+		on(`change:repeating_spells:spell_${onormaintained}_checked change:penalty_per_spell_${onormaintained} remove:repeating_spells`, function (event) {
+		
+			getSectionIDs('repeating_spells', ids => {
+		
+				const fieldnames = [];
+		
+				ids.forEach(id => fieldnames.push(`repeating_spells_${id}_spell_${onormaintained}_checked`));
+
+				getAttrs([`penalty_per_spell_${onormaintained}`, ...fieldnames], values => {
+		
+					const penalty = +values[`penalty_per_spell_${onormaintained}`] ||0;
+		
+					let checkedcount = 0;
+		
+					ids.forEach(id => checkedcount += ((+values[`repeating_spells_${id}_spell_${onormaintained}_checked`] || 0) > 0) ? 1: 0);
+
+					const totalpenalty = checkedcount * penalty;
+		
+					setAttrs({
+						[`spell_${onormaintained}_penalty_total`]: totalpenalty
+					})
+		
+				});
+			});
+		});
 	});
-	
-	on("change:repeating_spells:spell_maintained_checked", function(event) {
+
+	// on("change:repeating_spells:spell_on_checked", function(event) {
 	   
-        var fields = [
-	            "repeating_spells_spell_maintained_checked",
-	            "penalty_per_spell_maintained",
-	            "spell_maintained_penalty_total"
-	        ];
+    //     var fields = [
+	//             "repeating_spells_spell_on_checked",
+	//             "penalty_per_spell_on",
+	//             "spell_on_penalty_total"
+	//         ];
 	        
-	    getAttrs( fields, function(values) {
+	//     getAttrs( fields, function(values) {
 	        
-	        var currentPenalty = +values.spell_maintained_penalty_total;
+	//         var currentPenalty = +values.spell_on_penalty_total;
 	        
-	        var perSpellPenalty = +values.penalty_per_spell_maintained;
+	//         var perSpellPenalty = +values.penalty_per_spell_on;
 	        
-	        var checked = +values.repeating_spells_spell_maintained_checked;
+	//         var checked = +values.repeating_spells_spell_on_checked;
 	        
-	        var newTotalPenalty = getSpellPenaltyForOnOrMaintained(checked, currentPenalty, perSpellPenalty);
+	//         var newTotalPenalty = getSpellPenaltyForOnOrMaintained(checked, currentPenalty, perSpellPenalty);
 	        
-	        setAttrs({
-	            spell_maintained_penalty_total: newTotalPenalty
-	        })
+	//         setAttrs({
+	//             spell_on_penalty_total: newTotalPenalty
+	//         })
 	        
-	    });
+	//     });
 	    
-	});
+	// });
 	
-	function getSpellPenaltyForOnOrMaintained(checked, currentPenalty, perSpellPenalty) {
-	    
-	    var newTotalPenalty = 0;
+	// on("change:repeating_spells:spell_maintained_checked", function(event) {
+	   
+    //     var fields = [
+	//             "repeating_spells_spell_maintained_checked",
+	//             "penalty_per_spell_maintained",
+	//             "spell_maintained_penalty_total"
+	//         ];
 	        
-        if (checked) {
+	//     getAttrs( fields, function(values) {
+	        
+	//         var currentPenalty = +values.spell_maintained_penalty_total;
+	        
+	//         var perSpellPenalty = +values.penalty_per_spell_maintained;
+	        
+	//         var checked = +values.repeating_spells_spell_maintained_checked;
+	        
+	//         var newTotalPenalty = getSpellPenaltyForOnOrMaintained(checked, currentPenalty, perSpellPenalty);
+	        
+	//         setAttrs({
+	//             spell_maintained_penalty_total: newTotalPenalty
+	//         })
+	        
+	//     });
+	    
+	// });
+	
+	// function getSpellPenaltyForOnOrMaintained(checked, currentPenalty, perSpellPenalty) {
+	    
+	//     var newTotalPenalty = 0;
+	        
+    //     if (checked) {
             
-            newTotalPenalty = currentPenalty + perSpellPenalty;
+    //         newTotalPenalty = currentPenalty + perSpellPenalty;
             
-        } else {
+    //     } else {
             
-            newTotalPenalty = currentPenalty - perSpellPenalty;
+    //         newTotalPenalty = currentPenalty - perSpellPenalty;
             
-        }
+    //     }
         
-        return newTotalPenalty;
-	}
+    //     return newTotalPenalty;
+	// }
 	
 	/* ---- DEMOLITION SECTION ---- */
 	
@@ -12806,6 +12864,8 @@ Skull Damage x4
 
 			var defaultMod = +values.repeating_techniquesrevised_default;
 
+			var customSkillModifier = +values.repeating_techniquesrevised_skill_modifier;
+
 			var maxModifier = 0;
 
 			var maxLevel = 0;
@@ -12822,7 +12882,7 @@ Skull Damage x4
 
 			}
 			
-			finalLevel = baseLevel + defaultMod + technigueSkillMod;
+			finalLevel = baseLevel + defaultMod + technigueSkillMod + customSkillModifier;
 
 			// check for max level
 			if (maxLevel > 0 && finalLevel > maxLevel) {
