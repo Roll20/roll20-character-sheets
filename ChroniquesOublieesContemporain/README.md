@@ -9,9 +9,13 @@ Cette feuilles de personnage inclut quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](http://www.black-book-editions.fr/produit.php?id=4349).
 
 # Version courante
-2.8 [Screenshot](coc_v2.png)
+2.9 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v2.9 (2020-02-12)
+* Déplacement des parties règles optionnelles vers le tab caractéristiques
+* Utilisation de coc_settings pour précharger les options de règles par défaut
 
 ## v2.8 (2019-10-10)
 * Modifications du sheetworker pour éviter erreurs dans la console API
