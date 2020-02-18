@@ -11,31 +11,28 @@
 	<input type="hidden" name="attr_racial_points" value="0" />
 	<input type="hidden" name="attr_skills_points" value="0" />
 	<input type="hidden" name="attr_techniques_points" value="0" />
+	<input type="hidden" name="attr_techniques_revised_points" value="0" />
 	<input type="hidden" name="attr_spells_points" value="0" />
 	<input type="hidden" name="attr_announcements_hide" value="0" />
 	<input type="hidden" name="attr_inventory_fixed_digits" value="0" />
 	<!-- /HIDDEN FIELDS -->
-	
+
 	<div class="update-alert">
 		<div class="container">
 		<input type="checkbox" class="sheet-showarrow sheet-ack-button" name="attr_announcements_show" value="1" title="Click to view announcements" />
-		<label class="show-content">Announcements <span name="attr_latest_changes"></span></label>
+		<label class="show-content">Announcements <span name="attr_latest_changes"></span> </label>
 			<div class="content">
 				<h4>GURPS Version <input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Sheet Version" /></h4>
 				<ul>
-				    <li>This is a major update to version 2.0.0. – User interaction is required, please read the details of the changes and what you need to do under the Updates TAB.</li>
-					<li>General tab. Change layout for Turning and Deceleration table and fixed some bugs in the process.</li>
-					<li>Combat tab. Added Demolition combat tool. Code provided by Savage. Thank you Savage!</li>
-					<li>Combat tab. Thrown Object tool. Thrust damage was not updating correctly when thrust damage changed.</li>
-					<li>Combat tab. Row ID - Add related skill name and level to description. Add Reason for MOD field. Converted Weapon and Damage notes to text areas.</li>
-					<li>General tab. Added whisper to GM option for Perception roll.</li>
-					<li>Traits tab. Added repeating tables for Perks and Quirks.</li>
-					<li>General tab. Display points summary based on selected option.</li>
-					<li>Corrected a few spelling errors.</li>
-					<li>General tab. Current HP and Current FP notes. Show halved or quartered movement. Removed modifier that divided ST by 2 when HP is 1/3 or less.</li>
-					<li>Spell Rolls. Added options to enter notes for Spell Critical Success, Fail, and Critical Failure. Display spell notes on roll template.</li>
-					<li>Grimoire Tab. Update formatting repeating spells.</li>
-					<li>See Updates tab for more detailed information.</li>
+					<li>Adjusted the field widths for Techniques (Revised) and Parent Attributes – Cosmetic only.</li>
+					<li>Added new function of ‘Dodge and Drop’ to default Active Defenses.</li>
+					<li>Techniques Table Revised. Points spent on techniques are now totaled correctly. <b>NOTE:</b> When transferring techniques to the revised table, be sure to delete the old technqies, otherwise the total will be wrong.</li>
+					<li>Tecnniques Table Revised. Fix bug where Modifier was not added to the final Technique Skill Level.</li>
+					<li>Quirks/Perks Bugfix. Adding a row did not total the quirks/perks correctly.</li>
+					<li>Repeating Spells, quickly clicking checkboxes prevented correct totals. Using new code provided by GiGs to improve speed.</li>
+					<li>Many ToolTips updated or added.</li>
+					<li>Some slight format changes – Cosmetic Only.</li>
+					<li>Added a Defense Bonus (DB) Notes box to the Active Defense section.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset" />View All Updates</button>
@@ -89,7 +86,9 @@
 							</span>
 						</div>
 						<div class="sheet-cell sheet-col1">
-							<input type="number" name="attr_strength" value="10" readonly="readonly" title="Macro name: strength" >
+							<input type="number" name="attr_strength_display" value="10" readonly="readonly" title="Macro name: strength_display" />
+							<input type="hidden" name="attr_strength_halved" value="0" title="Macro name: strength_halved" />
+							<input type="hidden" name="attr_strength" value="10" title="Macro name: strength" />
 						</div>
 						<div class="sheet-cell sheet-col2">
 							<input type="number" name="attr_strength_mod" value="0" step="1" title="Macro name: strength_mod" />
@@ -98,7 +97,7 @@
 							<input type="number" name="attr_strength_points" value="0" step="10" title="Macro name: strength_points" />
 						</div>
 						<div class="sheet-cell sheet-col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Strength Roll}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{strength} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsST" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Strength Roll}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{strength_display} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsST" />
 						</div>
 					</div> <!-- .sheet-row -->
 					<div class="sheet-row sheet-row-dexterity">
@@ -166,7 +165,7 @@
 					<div class="sheet-cell sheet-col0 sheet-label">
 					    <div class="whisper-box">
 					        <div class="whisper-checkbox">
-					            <input type="checkbox" name="attr_whisper_perception" value="/w gm " class="sheet-boolean" title="Check to whisper perception roll to GM. Macro name: whisper_perception">
+					            <input type="checkbox" name="attr_whisper_perception" value="/w gm " class="sheet-boolean" title="Check to whisper perception roll to GM. Macro name: whisper_perception" checked>
 						    </div>
 						    <div class="whisper-title">
 						        <div class="sheet-popup">Per</div>
@@ -356,13 +355,21 @@
 					<div class="sheet-cell sheet-col0 sheet-label">
 						<div class="sheet-popup">Thresh</div>
 						<span class="sheet-tooltip">
-							Fright Check Threshold - Uses <strong>Rule of 14</strong> (B360)
+							Fright Check Threshold - Uses <strong>Rule of 14</strong> (B360). By default this value is 13.
 							<br />
-							If final modified fright check exceeds threshold, then reduce modified fright check to threshold level.
+							This means that a roll of 14 or more is automatically a failure.
 							<br />
-							Can be modified by Brave, or Rule of 15.
+							This Threshold can be modifier by the Perks of Brave (Dungeon Fantasy 11, p11) or Rule of 15 
 							<br />
-							Note: A Fright Check can be used for Awe and Confusion. (Powers p84 under Terror) and the Awe and Confusion Check Table for failures, Powers p85.
+							(Power Ups 2, p13). 
+							<br />
+							Will and/or Fright plus bonuses (like Fearlessness or Combat Reflexes) must total 14+ for this
+							<br />
+							to be useful, of course!
+							<br />
+							Note: A Fright Check can be used for Awe and Confusion. (Powers p84 under Terror) and the Awe and 
+							<br />
+							Confusion Check Table for failures. (Powers p85).
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
@@ -504,7 +511,7 @@
 						<input type="number" name="attr_basic_speed_points" value="0" step="5" title="Macro name: basic_speed_points" />
 					</div>
 					<div class="sheet-cell sheet-col4">
-						<button class="sheet-roll-tracker" type="roll" value="@{speed_tracker} [[@{basic_speed} &{tracker}]] &{template:addToTracker} {{characterName=@{character_name}}} {{basicSpeed=@{basic_speed}}}" name="roll_init" />
+						<button title="Reminder: You must select your Token first.&#013;This will add the Token's Speed plus DX&#013;as a single number in the Turn Order." class="sheet-roll-tracker" type="roll" value="@{speed_tracker} [[[[@{selected|Basic_Speed}]]+[[(@{selected|dexterity}/100)]] &{tracker:=}]] &{template:addToTracker} {{characterName=@{character_name}}} {{skillName=Added to the Turn Order as [[ [[@{selected|Basic_Speed}]]+[[(@{selected|dexterity}/100)]] ]]}} {{basicSpeed=Speed: @{selected|Basic_Speed} &nbsp;&nbsp; DX: @{selected|dexterity}}}" name="roll_init" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-basic-move">
@@ -830,20 +837,20 @@
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
-						<input type="number" name="attr_hit_points" value="10" />
+						<input type="number" name="attr_hit_points" value="10" title="Macro name: hit_points" />
 					</div>
 					<div class="cell col2">
 					    <input type="hidden" class="hit-points-notes" name="attr_hit_points_notes" value="0" />
 						<div class="hit-points-halved-dodge">
-						    <div class="popup">Halved</div>
+						    <div class="popup"><b style="color:red;">½ Move</div>
     						<span class="tooltip">
-    						    Movement and dodge is halved due to hit point loss.
+    						    Move and Dodge is halved due to hit point loss. See B419.
     						</span>
 						</div>
 						<div class="hit-points-quartered-dodge">
-						    <div class="popup">Quartered</div>
+						    <div class="popup"><b style="color:red;">¼ Move</div>
     						<span class="tooltip">
-    						    Movement and dodge is quartered due to hit and fatigue loss.
+    						    Move and Dodge is quartered due to hit point and fatigue loss. See B419.
     						</span>
 						</div>
 					</div>
@@ -934,15 +941,17 @@
 					<div class="cell col2">
 					    <input type="hidden" class="fatigue-points-notes" name="attr_fatigue_points_notes" value="0" />
 						<div class="fatigue-points-halved-dodge">
-						    <div class="popup">Halved</div>
+						    <div class="popup"><b style="color:red;">½ MV/ST</div>
     						<span class="tooltip">
-    						    Movement and dodge is halved due to fatigue loss.
+    						    Move, Dodge, and ST are halved due to fatigue loss. See B426.<br />
+    						    Affects ST roll and using weapons with minimum ST.
     						</span>
 						</div>
 						<div class="fatigue-points-quartered-dodge">
-						    <div class="popup">Quartered</div>
+						    <div class="popup"><b style="color:red;">½ ST</div>
     						<span class="tooltip">
-    						    Movement and dodge is quartered due to hit and fatigue loss.
+    						    ST is halved due to fatigue loss. See B426.<br />
+    						    Affects ST roll and using weapons with minimum ST.
     						</span>
 						</div>
 					</div>
@@ -1100,7 +1109,7 @@
 						Spent
 					</div>
 					<div class="cell col1">
-						<input type="text" name="attr_point_summary" disabled="disabled" value="@{att_points} + @{languages_points} + @{tl_pts} + @{cf_points} + @{racial_points} +  @{advantages_points} + @{advantages_perks} + @{disadvantages_points} + @{disadvantages_quirks} + @{skill_points} + @{techniques_points} + @{spells_points} + @{misc_points}" title="Macro name: point_summary" />
+						<input type="text" name="attr_point_summary" disabled="disabled" value="@{att_points} + @{languages_points} + @{tl_pts} + @{cf_points} + @{racial_points} +  @{advantages_points} + @{advantages_perks} + @{disadvantages_points} + @{disadvantages_quirks} + @{skill_points} + @{techniques_points} + @{techniques_revised_points} + @{spells_points} + @{misc_points}" title="Macro name: point_summary" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="row margin-bottom row-total hr">
@@ -1108,7 +1117,7 @@
 						Unspent
 					</div>
 					<div class="cell col1">
-					    <input type="text" name="attr_point_diff" value="@{total_points} - (@{att_points} + @{languages_points} + @{tl_pts} + @{cf_points} + @{racial_points} +  @{advantages_points} + @{advantages_perks} + @{disadvantages_points} + @{disadvantages_quirks} + @{skill_points} + @{techniques_points} + @{spells_points} + @{misc_points})" disabled="disabled" title="Macro name: point_diff" />
+					    <input type="text" name="attr_point_diff" value="@{total_points} - (@{att_points} + @{languages_points} + @{tl_pts} + @{cf_points} + @{racial_points} +  @{advantages_points} + @{advantages_perks} + @{disadvantages_points} + @{disadvantages_quirks} + @{skill_points} + @{techniques_points} + @{techniques_revised_points} + @{spells_points} + @{misc_points})" disabled="disabled" title="Macro name: point_diff" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="row margin-bottom row-unspent hr">
@@ -1184,9 +1193,8 @@
     						ST, DX, IQ, HT,<br />
     						HP, FP, Energy Reserve One, Two, and Three,<br />
     						Per, Vision, Hearing, Smell, Touch,<br />
-    						Will, Fright, Hard to Subdue, Hard to Kill,<br />
-    						Speed, Move, Enhanced Move, Enhanced Dodge,<br />
-    						Lift ST, Striking ST,<br />
+    						Will, Fright, Unconsciousness, Death,<br />
+    						Speed, Move, Lift ST, Striking ST,<br />
     						Flying, Air Move, Enhanced Air Move, Super Jump
     					</span>
 					</div>
@@ -1304,8 +1312,7 @@
 					<div class="sheet-cell sheet-col0 sheet-label">
 						<div class="sheet-popup">Disadv.</div>
     					<span class="sheet-tooltip">
-    						Point Summary for: <br />
-    						Disadvantages
+    						Point Summary for Disadvantages <br />
     					</span>
 					</div>
 					<div class="sheet-cell sheet-col1">
@@ -1336,7 +1343,7 @@
 						Skills
 					</div>
 					<div class="cell col1">
-						<input type="text" name="attr_skill_technique_points" disabled="disabled" value="@{skills_points} + @{techniques_points}" title="Macro name: skill_technique_points" />
+						<input type="text" name="attr_skill_technique_points" disabled="disabled" value="@{skills_points} + @{techniques_points} + @{techniques_revised_points}" title="Macro name: skill_technique_points" />
 					</div>
 				</div> <!-- .sheet-row -->
 				
@@ -1345,7 +1352,7 @@
 						Skills
 					</div>
 					<div class="cell col1">
-						<input type="text" name="attr_skill_technique_points" disabled="disabled" value="@{skills_points} + @{techniques_points}" title="Macro name: skill_technique_points" />
+						<input type="text" name="attr_skill_technique_points" disabled="disabled" value="@{skills_points} + @{techniques_points} + @{techniques_revised_points}" title="Macro name: skill_technique_points" />
 					</div>
 				</div> <!-- .sheet-row -->
 				
@@ -1370,6 +1377,18 @@
 					</div>
 				</div> <!-- .sheet-row -->
 				
+				<div class="sheet-row sheet-row-skills all">
+					<div class="sheet-cell sheet-col0 sheet-label">
+						<div class="sheet-popup">Tech. (r)</div>
+    					<span class="sheet-tooltip">
+    						Techniques Revised
+    					</span>
+					</div>
+					<div class="sheet-cell sheet-col1">
+						<input type="text" name="attr_techniques_total_points" disabled="disabled" value="@{techniques_revised_points}" title="Macro name: techniques_revised_points" />
+					</div>
+				</div> <!-- .sheet-row -->
+
 				<div class="sheet-row sheet-row-skills">
 					<div class="sheet-cell sheet-col0 sheet-label">
 						Spells
@@ -1397,7 +1416,12 @@
 		<div class="sheet-box sheet-lift">
 			<div class="sheet-table">
 				<div class="sheet-header">
-					<div class="sheet-cell sheet-col0">Lifting and Moving</div>
+					<div class="sheet-cell sheet-col0 sheet-label">
+						<div class="sheet-popup">Lifting and Moving</div>
+						<span class="sheet-tooltip">
+							See B14.
+						</span>
+					</div>
 					<div class="sheet-cell sheet-col1">Weight</div>
 				</div> <!-- .sheet-header -->
 				<div class="sheet-row sheet-row-simple-lift">
@@ -1753,8 +1777,7 @@
     					<div class="cell colAll label">
     					    <div class="popup" style="text-align:center;">Turn Radius</div>
     						<span class="tooltip">
-    							Turn Radius. Minimum number of hexes to move<br />
-    							before making a 60° facing change.<br />
+    							Turn Radius. Minimum number of hexes to move before making a 60° facing change.<br />
     							Turn Radius = (Final Velocity / Base Move Score) rounded down.<br />
     							Example: Super Run = 6/24. Final Velocity = 18. Turn Radius = 18/6 = 3.
     							See B394.<br />
@@ -2392,7 +2415,7 @@
 							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Frequency of Appearance Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{foa} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsAFOA" />
 						</div>
 						<div class="sheet-cell sheet-col3">
-							<input type="number" name="attr_points" title="Macro table name: repeating_perks. Field name: points" />
+							<input type="number" name="attr_points" value="1" title="Macro table name: repeating_perks. Field name: points" />
 						</div>
 						<div class="sheet-cell sheet-col4">
 							<input type="text" name="attr_ref" title="Macro table name: repeating_perks. Field name: ref" />
@@ -2513,7 +2536,7 @@
 							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Self-control Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{control_rating} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsDSCR" />
 						</div>
 						<div class="sheet-cell sheet-col3">
-							<input type="number" name="attr_points" title="Macro table name: repeating_quirks. Field name: points" />
+							<input type="number" name="attr_points" value="-1" title="Macro table name: repeating_quirks. Field name: points" />
 						</div>
 						<div class="sheet-cell sheet-col4">
 							<input type="text" name="attr_ref" title="Macro table name: repeating_quirks. Field name: ref" />
@@ -2654,10 +2677,9 @@
 						<span class="sheet-tooltip">
 							This sheet does <strong>NOT</strong> auto adjust the cost values for ST	and Extra HP for a SM
 							<br />
-							that is greater than 0. To do that you can use a combination 
+							that is greater than 0. To do that you can use a combination of Points and
 							<br />
-							of Points and Mod entries to get the desired value.
-						</span>
+							MOD entries to get the desired value. (B15, B16, <strong>B19</strong>)
 					</div>
 					<div class="sheet-cell sheet-col1">
 						<input type="number" name="attr_size" value="0" title="Macro name: size" />
@@ -2704,10 +2726,16 @@
 						<input type="text" name="attr_height" title="Macro name: height" />
 					</div>
 					<div class="sheet-cell sheet-col0 sheet-label">
-						Weight
+						<div class="sheet-popup">Weight</div>
+						<span class="sheet-tooltip">
+							Enter a <strong>Numerical Value</strong> only.<br/>
+							Do not enter any type of indicator like lbs, ponds, kilos, etc.<br/>
+							This is because the weight is added to your Inventory’s Grand Total<br/>
+							Weight and thus needs to be numerical.
+						</span>
 					</div>
 					<div class="sheet-cell sheet-col-half">
-						<input type="text" name="attr_weight" title="Macro name: weight" />
+						<input type="number" name="attr_weight" title="Macro name: weight" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row">
@@ -2884,7 +2912,18 @@
 		<div class="sheet-box sheet-training-notes">
 			<div class="sheet-table">
 				<div class="sheet-header">
-					<div class="sheet-cell sheet-col0">Training</div>
+					<div class="sheet-cell sheet-col0 sheet-label">
+						<div class="sheet-popup">TRAINING</div>
+						<span class="sheet-tooltip">
+							Training rules can be found at ‘Improvement 
+							<br />
+							Through Study’ B292.
+							<br />
+							Advanced rules can be found in Social 
+							<br />
+							Engineering: Back to School.
+						</span>
+					</div>
 				</div> <!-- .sheet-header -->
 				<div class="sheet-row sheet-row-textarea">
 					<div class="sheet-cell sheet-col0">
@@ -2929,7 +2968,7 @@
 							<input type="text" name="attr_name" title="Macro table name: repeating_skills. Field name: name" />
 						</div>
 						<div class="sheet-cell sheet-col1">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Skill Roll}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{level} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{skill_success_note}}} {{customCriticalSuccessNote=@{skill_critical_success_note}}} {{customFailNote=@{skill_fail_note}}} {{customCriticalFailNote=@{skill_critical_fail_note}}}" name="roll_vsSL" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{level} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{skill_success_note}}} {{customCriticalSuccessNote=@{skill_critical_success_note}}} {{customFailNote=@{skill_fail_note}}} {{customCriticalFailNote=@{skill_critical_fail_note}}}" name="roll_vsSL" />
 						</div>
 						<div class="sheet-cell sheet-col2">
 							<input type="text" name="attr_tl" title="Macro table name: repeating_skills. Field name: tl" />
@@ -2995,7 +3034,16 @@
 								<input type="text" name="attr_skill_misc" title="Macro table name: repeating_skills. Field name: skill_misc" />
 							</div>
 							<div class="cell label">
-								Reason for MOD (Modifier):
+								<div class="sheet-popup">Reason for MOD (Modifier):</div>
+									<span class="sheet-tooltip">
+									Examples:
+									<br />
+									+1 from Talent...
+									<br />
+									+1 from Default Skill...
+									<br />
+									+1 from Enchanted Item with...
+									</span>
 							</div>
 							<div class="cell">
 								<input type="text" name="attr_skill_mod_notes" title="Macro table name: repeating_skills. Field name: skill_mod_notes" />
@@ -3053,10 +3101,22 @@
 
 		<!-- _____ _____ TECHNIQUES BOX _____ _____ -->
 
+		<input type="hidden" class="box-techniques-old" name="attr_show_old_techniques" value="1" />
 		<div class="sheet-box sheet-techniques">
 			<div class="sheet-table">
 				<div class="sheet-header">
-					<div class="sheet-cell sheet-col0">Techniques</div>
+					<div class="sheet-cell sheet-col0 sheet-label">
+						<div class="sheet-popup">TECHNIQUES (LEGACY).</div>
+    					<span class="sheet-tooltip">
+							<b>New Optional Feature Available.</b><br /> 
+							A revised techniques table is available by setting the options on the character sheet.<br />
+							This revised techniques is not final, we'll make adjustments based upon feedback.<br />
+							<b>New Legacy and Revised Technique Tables.</b> Options to show/hide the Legacy<br />
+							Techniques table and the new Revised Techniques table.<br />
+							Show both tables if you want to transfer your current techniques to the new table.<br />
+							If old technique table has no rows, then hide old table, show new table.<br />
+    					</span>
+					</div>					
 					<div class="sheet-cell sheet-col1">Parent</div>
 					<div class="sheet-cell sheet-col2">Min</div>
 					<div class="sheet-cell sheet-col3">Max</div>
@@ -3111,6 +3171,218 @@
 			</div> <!-- .sheet-table -->
 		</div> <!-- .sheet-box .sheet-techniques -->
 
+        <!-- _____ _____ TECHNIQUES REVISED BOX _____ _____ -->
+
+        
+		<input type="hidden" class="box-techniques-new" name="attr_show_new_techniques" value="0" />
+		<div class="box techniques-revised">
+			<div class="table">
+				<div class="header">
+					<div class="cell col0">Techniques (Revised)</div>
+					<div class="cell col1">Parent</div>
+					<div class="cell col2">
+					    <div class="sheet-popup">Base</div>
+						<span class="sheet-tooltip">
+							Base skill level of technique, usually<br />
+							based on Parent Skill.<br />
+							see Techniques B229
+						</span>
+					</div>
+					<div class="cell col3">
+					    <div class="sheet-popup">DFLT</div>
+						<span class="sheet-tooltip">
+							Default modifier to apply to the base skill.<br />
+							For example, Kicking is -2 from Brawling or Karate Skill.<br />
+							Enter 0 if there is no modifier.<br />
+							see Techniques B229
+						</span>
+					</div>
+					<div class="cell col4">
+					    <div class="sheet-popup">Max</div>
+						<span class="sheet-tooltip">
+							Maximum modifier allowed for the technique.<br />
+							This is relative to the parent skill.<br />
+							For example, Kicking cannot exceed Brawling + 0<br />
+							or Karate + 0.<br />
+							see Techniques B229
+						</span>
+					</div>
+					<div class="cell col5">
+					    <div class="sheet-popup">Diff</div>
+						<span class="sheet-tooltip">
+							Difficulty of technique.<br />
+							Feats with severe consquences on a failure<br />
+							or allow only one attempt are Hard.<br />
+							see Techniques B229
+						</span>
+					</div>
+					<div class="cell col6">
+					    <div class="sheet-popup">Mod</div>
+						<span class="sheet-tooltip">
+							Modifiers. i.e. a bonus from a Talent,<br />
+							Equipment, Perk, etc.
+						</span>    
+					</div>
+					<div class="cell col7">Pts</div>
+					<div class="cell col8">Level</div>
+					<div class="cell col9"></div>
+					<div class="cell col10">Ref</div>
+				</div> <!-- .header -->
+				<fieldset class="repeating_techniquesrevised">
+					<input class="toggle" type="checkbox" title="Click to show/hide more information." name="attr_technique_revised_toggle_notes" />
+					<span class="checkbox"></span>
+					<div class="row row-stats">
+						<div class="cell col0">
+							<input type="text" name="attr_name" title="Macro table name: repeating_techniquesrevised. Field name: name" />
+						</div>
+						<div class="cell col1">
+							<input type="text" name="attr_parent" title="Macro table name: repeating_techniquesrevised. Field name: parent" />
+						</div>
+						<div class="cell col2">
+							<input type="number" name="attr_base_level" value="0" title="Macro table name: repeating_techniquesrevised. Field name: base_level" />
+						</div>
+						<div class="cell col3">
+							<input type="number" name="attr_default" value="0" title="Macro table name: repeating_techniquesrevised. Field name: default" />
+						</div>
+						<div class="cell col4">
+							<input type="number" name="attr_max_modifier" value="0" title="Macro table name: repeating_techniquesrevised. Field name: max_modifier" />
+						</div>
+						<div class="cell col5">
+							<select name="attr_difficulty" title="Macro table name: repeating_techniquesrevised. Field name: difficulty">
+								<option>Average</option>
+								<option>Hard</option>
+							</select>
+						</div>
+						<div class="cell col6">
+							<input type="number" name="attr_skill_modifier" value="0" title="Macro table name: repeating_techniquesrevised. Field name: skill_modifier" />
+						</div>
+						<div class="cell col7">
+							<input type="number" name="attr_points" value="0" title="Macro table name: repeating_techniquesrevised. Field name: points" />
+						</div>
+						<div class="cell col8">
+							<input type="hidden" name="attr_level_mirror" value="@{level}" /> 
+							<input type="text" name="attr_level" readonly="readonly" title="Macro table name: repeating_techniquesrevised. Field name: level" value="10"/>
+						</div>
+						<div class="cell col9">
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Technique Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{level} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes_revised}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{skill_success_note}}} {{customCriticalSuccessNote=@{skill_critical_success_note}}} {{customFailNote=@{skill_fail_note}}} {{customCriticalFailNote=@{skill_critical_fail_note}}}" name="roll_vsSL"></button>
+						</div>
+						<div class="cell col10">
+							<input type="text" name="attr_ref" title="Macro table name: repeating_techniquesrevised. Field name: ref" />
+						</div>
+					</div> <!-- .row -->
+					
+					<div class="row row-details notebox">
+					
+					    <div class="row-misc">
+							<div class="cell label">
+							    <div class="popup">Row ID:</div>
+        						<span class="tooltip">
+        							The row id can be used with macros.<br />
+        							Example field name: repeating_techniquesrevised_[the row id]_level<br />
+        							This example would represent the skill level on that row.
+        						</span> 
+							</div>
+							<div class="cell">
+							    <input type="text" readonly="readonly" name="attr_row_id" value="" />
+							</div>
+							<div class="cell label">
+								Misc:
+							</div>
+							<div class="cell">
+								<input type="text" name="attr_skill_misc" title="Macro table name: repeating_techniquesrevised. Field name: skill_misc" />
+							</div>
+							<div class="cell label">
+								Reason for MOD (Modifier):
+							</div>
+							<div class="cell">
+								<input type="text" name="attr_skill_mod_notes" title="Macro table name: repeating_techniquesrevised. Field name: skill_mod_notes" />
+							</div>
+						</div> <!-- .sheet-row -->
+					    
+						<div class="row">
+					        <div class="cell label">
+							    <div class="popup">Link: </div>
+        						<span class="tooltip">
+									Link this technique to a skill or spell.<br />
+									Will populate Parent and Base Skill Level fields.
+        						</span> 
+					        </div>
+							<div class="cell">
+								<select name="attr_technique_row_type">
+					                <option>Skill</option>
+					                <option>Spell</option>
+					            </select>
+					        </div>
+    					    <div class="cell col-row-id label">
+    						    <div class="popup">Row ID: </div>
+        						<span class="tooltip">
+        							Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
+        							When the skill/spell is updated, the technique's parent name and base skill level<br />
+        							will be updated.
+        						</span>	
+    						</div>
+    						<div class="cell col-input-medium">
+    						    <input type="hidden" name="attr_technique_skill_row_id_toggle" value="0" />
+								<input type="text" name="attr_technique_skill_row_id" title="Macro table name: repeating_techniquesrevised. Field name: technique_skill_row_id" />
+							</div>
+							<div class="cell col-wide">
+								<input type="hidden" name="attr_skill" value="" />
+    							<input type="hidden" name="attr_technique_skill_row_id_modifier" value="0" />
+    							<input type="hidden" name="attr_technique_skill_row_id_message" value="" />
+    							<b>Name:</b><span name="attr_technique_skill_row_id_message"></span>
+    							<input type="hidden" name="attr_technique_skill_row_id_level" value="" />
+    							<b>Level:</b><span name="attr_technique_skill_row_id_level"></span>
+    						</div>
+						</div> <!-- .sheet-row -->
+						
+						<div class="rolltable-result-notes notes-below">
+						    <div class="show-notes">
+						        <input type="checkbox" name="attr_show_notes_revised" value="1" />
+						        <span class="label">Show notes below, in roll template</span>
+						    </div>
+						    <textarea name="attr_notes" title="Macro table name: repeating_techniquesrevised. Field name: notes" style="height: 50px"></textarea>
+						</div>
+					
+					    <div class="rolltable-result-notes">
+						    
+						    <div class="note-input">
+						        <div class="note-title">
+    						        <div class="sheet-popup">Success Note:</div>
+            						<span class="sheet-tooltip">
+            						    Success, critical success, fail, and critical fail<br />
+            						    notes will be added to roll results.<br />
+            						    You can add macros to these notes.
+            						</span>
+    						    </div>
+						        <textarea name="attr_skill_success_note" title="Macro table name: repeating_skills. Field name: skill_success_note"></textarea>
+						    </div>
+						    
+						    <div class="note-input">
+						        <div class="note-title">Critical Success Note:</div>
+						        <textarea name="attr_skill_critical_success_note" title="Macro table name: repeating_skills. Field name: skill_critical_success_note"></textarea>
+						    </div>
+						</div>
+						
+						<div class="rolltable-result-notes">
+						    
+						    <div class="note-input">
+						        <div class="note-title">Fail Note:</div>
+						        <textarea name="attr_skill_fail_note" title="Macro table name: repeating_skills. Field name: skill_fail_note"></textarea>
+						    </div>
+						    
+						    <div class="note-input">
+						        <div class="note-title">Critical Fail Note:</div>
+						        <textarea name="attr_skill_critical_fail_note" title="Macro table name: repeating_skills. Field name: skill_critical_fail_note"></textarea>
+						    </div>
+						    
+						</div>
+						
+					</div> <!-- .row -->
+					
+				</fieldset> <!-- .repeating_techniques -->
+			</div> <!-- .table -->
+		</div> <!-- .box .techniques -->
+
 	</div> <!-- .sheet-tab3 -->
 
 
@@ -3122,9 +3394,19 @@
 		<div class="sheet-box sheet-damage-reduction">
 			<div class="sheet-table">
 				<div class="sheet-header sheet-row-title">
-					<div class="sheet-cell sheet-col0">
+	
+				<div class="title hit-location">
+					<div class="popup">
 						Hit Location
 					</div>
+					<span class="tooltip">
+						Basic Table B552.<br/>
+						<strong>Optinal:</strong><br/>
+						New Hit Locations<br/>
+						MA137
+					</span>
+				</div>	
+					
 				</div> <!-- .sheet-header -->
 				<div class="sheet-header">
 					<div class="sheet-cell sheet-col0">Where</div>
@@ -3136,7 +3418,32 @@
                             specific location.
 						</span>
 					</div>
-					<div class="sheet-cell sheet-col2">DR</div>
+					
+					<div class="sheet-cell sheet-col2">
+						<div class="sheet-popup">DR</div>
+						<span class="sheet-tooltip">
+							<strong>Low-Tech</strong> #/# usually means All Attack Types / Except 
+							<br />
+							this specific Type of attack.
+							<br />
+							Example: Enter as 3/2cr* means DR3 vs all attacks 
+							<br />
+							except cr which uses DR2. * means it is Flexible 
+							<br />
+							armor (B379).
+							<br />
+							<strong>High-Tech and Ultra-Tech</strong> #/# usually mean against 
+							<br />
+							these Type Attacks / All other Attack Types. 
+							<br />
+							Example: Enter as 5imp, cr /2 means DR5 vs imp and 
+							<br />
+							cr type of attacks and DR2 against all other types 
+							<br />
+							of attacks.
+						</span>
+					</div>
+					
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-skull">
 					<div class="sheet-cell sheet-col0 sheet-label">
@@ -3223,7 +3530,7 @@
 						<input type="text" name="attr_hit_penalty_vitals" value="-3" title="Macro name: hit_penalty_vitals" />
 					</div>
 					<div class="sheet-cell sheet-col2">
-						<input type="text" name="attr_vitals_dr_max" value="0" title="Macro name: vitals_dr_max" />
+						<input type="text" name="attr_vitals_dr_max" value="See Torso" title="Macro name: vitals_dr_max" />
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-groin">
@@ -3291,10 +3598,10 @@
 			</div> <!-- .sheet-table -->
 
                <div class="rapid-fire-table">
-                    <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/GURPS/Images/Rapid_Fire_Table.png" title="Rapid Fire Table" alt="Rapid Fire Table" />
+                    <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/GURPS/Images/Rapid_Fire_Table.png" title="Rapid Fire Table: B373. Additional Rules B408." alt="Rapid Fire Table" />
                </div>
                <div class="speed-range-table"> <!-- .speed-range-table image-->
-                    <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/GURPS/Images/Speed_Range_Table.PNG"  title="Speed/Range Table" alt="GURPS Speed/Range Table" /> 
+                    <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/GURPS/Images/Speed_Range_Table.PNG"  title="Speed/Range Table: B550" alt="GURPS Speed/Range Table" /> 
                 </div> <!-- .speed-range-table image-->
 
 		</div> <!-- .sheet-box .sheet-damage-reduction -->
@@ -3304,6 +3611,15 @@
 
 		<div class="sheet-box sheet-active-defense">
 			<div class="sheet-table">
+				<div class="sheet-row sheet-row-stats sheet-row-standard">
+					<div class="cell col0">
+						<input type="checkbox" class="boolean combat-reflex-check" name="attr_combat_reflexes" value="1" />
+						<div class="popup">[Optional] Apply Combat Reflexes to Dodge and Fright Modifiers</div>
+							<span class="tooltip sheet-ad-col0-tooltip">
+								Quickly add +1 Dodge modifier and +2 Fright modifier on the General page. (B43)
+							</span>
+					</div>
+				</div> <!-- .sheet-row -->
 				<div class="sheet-header">
 					<div class="sheet-cell sheet-col0">Active Defenses</div>
 					<div class="sheet-cell sheet-col1">Type</div>
@@ -3316,24 +3632,27 @@
 							parry if you've already attacked with it this turn<br /> (and vice versa).
 						</span>
 					</div>
-					<div class="sheet-cell sheet-col3">Skill</div>
+					<div class="sheet-cell sheet-col3">
+						<span style="background-color: #87CEFA">| skill |</span>
+					</div>
 				</div> <!-- .sheet-header -->
 				<div class="sheet-row sheet-row-stats sheet-row-standard">
-					<div class="sheet-cell sheet-col0">
-					    <div class="sheet-popup">[Optional] Apply Combat Reflexes to Dodge and Fright Modifiers</div>
-						<span class="sheet-tooltip sheet-ad-col0-tooltip">
-							Quickly add +1 Dodge modifier and +2 Fright modifier on the General page. (B43)
-						</span>
+					<div class="sheet-cell sheet-col-dodge-label">Dodge</div>
+					<div class="cell col-dodge">
+					    <input type="hidden" class="dodge-reduced-notes" name="attr_dodge_reduced_notes" value="0" />
+						<div class="halved-dodge">
+						    <div class="popup"><b style="color:red;">½ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is halved due to hit points or fatigue loss. See B418 or B426.
+    						</span>
+						</div>
+						<div class="quartered-dodge">
+						    <div class="popup"><b style="color:red;">¼ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is quartered due to hit points and fatigue loss. See B418 or B426.
+    						</span>
+						</div>
 					</div>
-					<div class="sheet-cell sheet-col1">&nbsp;</div>
-					<div class="sheet-cell sheet-col2">&nbsp;</div>
-					<div class="sheet-cell sheet-col3">
-						<input type="checkbox" class="sheet-boolean" name="attr_combat_reflexes" value="1" />
-					</div>
-					<div class="sheet-cell sheet-col4">&nbsp;</div>
-				</div> <!-- .sheet-row -->
-				<div class="sheet-row sheet-row-stats sheet-row-standard">
-					<div class="sheet-cell sheet-col0">Dodge</div>
 					<div class="sheet-cell sheet-col1">Dodge</div>
 					<div class="sheet-cell sheet-col2"></div>
 					<div class="sheet-cell sheet-col3"><input type="text" name="attr_ad_dodge_skill" value="@{current_dodge}" disabled="disabled" title="Macro name: ad_dodge_skill" /></div>
@@ -3342,7 +3661,30 @@
 					</div>
 				</div> <!-- .sheet-row -->
 				<div class="sheet-row sheet-row-stats sheet-row-standard">
-					<div class="sheet-cell sheet-col0">Dodge and Retreat</div>
+
+					<div class="sheet-cell sheet-col-dodge-label">
+						<div class="sheet-popup">Dodge and Retreat (vs. Melee Attacks Only)</div>
+							<span class="sheet-tooltip">
+								Against a <strong>Melee Attack</strong> ONLY. (B377). It cannot be used against Ranged Attacks.<br/>
+								Optional Rules for Retreat can be found in MA123.
+							</span>
+					</div>
+
+					<div class="cell col-dodge">
+					    <input type="hidden" class="dodge-reduced-notes" name="attr_dodge_reduced_notes" value="0" />
+						<div class="halved-dodge">
+						    <div class="popup"><b style="color:red;">½ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is halved due to hit points or fatigue loss. See B418 or B426.
+    						</span>
+						</div>
+						<div class="quartered-dodge">
+						    <div class="popup"><b style="color:red;">¼ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is quartered due to hit points and fatigue loss. See B418 or B426.
+    						</span>
+						</div>
+					</div>
 					<div class="sheet-cell sheet-col1">Dodge</div>
 					<div class="sheet-cell sheet-col2"></div>
 					<div class="sheet-cell sheet-col3"><input type="text" name="attr_ad_dodge_retreat_skill" value="@{current_dodge} + 3" disabled="disabled" title="Macro name: ad_dodge_retreat_skill" /></div>
@@ -3350,6 +3692,38 @@
 						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Retreat}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{current_dodge} + @{modifier} + 3]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsDodgeRetreat" />
 					</div>
 				</div> <!-- .sheet-row -->
+				
+				<div class="sheet-row sheet-row-stats sheet-row-standard">
+					<div class="sheet-cell sheet-col-dodge-label">
+						<div class="sheet-popup">Dodge and Drop (vs. Ranged Attacks only)</div>
+							<span class="sheet-tooltip">
+								Dodge and Drop (Also 'Sacrificial Dodge and Drop', and 'Diving for Cover').<br/>
+								It is similar to a Dodge and Retreat, but only effective against <strong>Ranged Attacks</strong>. (B377)
+							</span>
+					</div>
+					<div class="cell col-dodge">
+					    <input type="hidden" class="dodge-reduced-notes" name="attr_dodge_reduced_notes" value="0" />
+						<div class="halved-dodge">
+						    <div class="popup"><b style="color:red;">½ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is halved due to hit points or fatigue loss. See B418 or B426.
+    						</span>
+						</div>
+						<div class="quartered-dodge">
+						    <div class="popup"><b style="color:red;">¼ Dodge</div>
+    						<span class="tooltip">
+    						    Dodge is quartered due to hit points and fatigue loss. See B418 or B426.
+    						</span>
+						</div>
+					</div>
+					<div class="sheet-cell sheet-col1">Dodge</div>
+					<div class="sheet-cell sheet-col2"></div>
+					<div class="sheet-cell sheet-col3"><input type="text" name="attr_ad_dodge_retreat_skill" value="@{current_dodge} + 3" disabled="disabled" title="Macro name: ad_dodge_retreat_skill" /></div>
+					<div class="sheet-cell sheet-col4">
+						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Drop}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{current_dodge} + @{modifier} + 3]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsDodgeDrop" />
+					</div>
+				</div> <!-- .sheet-row -->
+				
 				<fieldset class="repeating_defense">
 					<div class="sheet-row sheet-row-stats">
 						<div class="sheet-cell sheet-col0">
@@ -3377,6 +3751,23 @@
 						</div>
 					</div> <!-- .sheet-row -->
 				</fieldset> <!-- .repeating_defense -->
+
+				<!-- _____ _____ DEFENSE BONUS BOX _____ _____ -->
+				<div class="sheet-box sheet-defense-bonus-notes sheet-textarea">
+					<div class="sheet-header">
+						<div class="sheet-popup">Defense Bonus (DB) Notes</div>
+						<span class="sheet-tooltip">
+							<strong>Examples:</strong><br/>
+							+2 DB for Torso (Front Only), Skull, Neck, Hands, Head (1/6 Face), and Feet. Armor Enchantment: Deflect.<br/>
+							+1 DB SHIELD SIDE (Left): from Small Shield.<br/>
+							+1 DB for Rear only - (All but head unless hood is up). From Heavy Cloak.
+						</span>
+					</div>
+					<div class="defense-bonus-notes-textarea">
+						<textarea name="attr_defense_bonus_notes" title="Macro name: defense_bonus_notes"></textarea>
+					</div>
+				</div>
+				
 			</div> <!-- .sheet-table -->
 		</div> <!-- .sheet-box .sheet-active-defense -->
 
@@ -3491,22 +3882,22 @@
 							<input type="text" name="attr_skill" title="Macro table name: repeating_melee. Field name: skill" />
 						</div>
 						<div class="sheet-cell sheet-col6">
-						    <button type="roll" class="template-attack-roll" value="@{roll}&{template:skillRoll} {{type=Melee Attack}} {{activeDefense=[[0]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill} + @{modifier}]]}} {{reach=@{reach}}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
+						    <button type="roll" class="template-attack-roll" value="@{roll}&{template:skillRoll} {{type=Melee Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill} + @{modifier}]]}} {{reach=@{reach}}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
 						</div>
 					</div> <!-- .sheet-row -->
 					<div class="melee-notebox">
-					    
-					    <div class="row">
+ 					    <div class="row">
 					        <div class="cell">
 					            <select name="attr_melee_row_type">
 					                <option>Skill</option>
-					                <option>Spell</option>
+									<option>Spell</option>
+									<option>Technique</option>
 					            </select>
 					        </div>
     					    <div class="cell col-row-id label">
-    						    <div class="popup">Row ID</div>
+    						    <div class="popup">Row ID: </div>
         						<span class="tooltip">
-        							Copy/paste the Skill or Spell Row ID to link that skill to this attack.<br />
+        							Copy/paste the Skill, Spell, or Technique Row ID to link that skill to this attack.<br />
         							When the skill/spell is updated, the weapon attack will also be updated.<br />
         							Use the Modifier column to account for unfamiliar weapon, weapon bond, quality, etc.
         						</span>	
@@ -3530,9 +3921,18 @@
     					</div> <!-- .sheet-row -->
     					
     					<div class="row">
-    					    <div class="cell label">
-								Reason for MOD (Modifier):
-							</div>
+							<div class="cell label">
+								<div class="sheet-popup">Reason for MOD (Modifier):</div>
+									<span class="sheet-tooltip">
+									Examples:
+									<br />
+									+1 for Weapon Bond
+									<br />
+									+1 for Balanced
+									<br />
+									+1 for Enchantment: Accuracy
+									</span>
+								</div>
 							<div class="cell reason-for-mod">
 								<input type="text" name="attr_reason_for_mod" title="Macro table name: repeating_melee. Field name: reason_for_mod" />
 							</div>
@@ -3747,7 +4147,7 @@
 							<input type="text" name="attr_skill" title="Macro table name: repeating_ranged. Field name: skill" />
 						</div>
 						<div class="sheet-cell sheet-col11">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{rof=@{rof}}} {{recoil=@{recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{useMalfunction=[[@{use_malfunction}]]}} {{malfunction=[[@{malfunction}]]}} {{verifyMalfunction=[[ @{malfunction_verify} ]]}}" name="roll_vsSL" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{rof=@{rof}}} {{recoil=@{recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{useMalfunction=[[@{use_malfunction}]]}} {{malfunction=[[@{malfunction}]]}} {{verifyMalfunction=[[ @{malfunction_verify} ]]}}" name="roll_vsSL" />
 						</div>
 					</div> <!-- .sheet-row -->
 					
@@ -3757,13 +4157,14 @@
     					    <div class="cell">
 					            <select name="attr_ranged_row_type">
 					                <option>Skill</option>
-					                <option>Spell</option>
+									<option>Spell</option>
+									<option>Technique</option>
 					            </select>
 					        </div>
 					        <div class="cell col-row-id label">
-    						    <div class="popup">Row ID</div>
+    						    <div class="popup">Row ID: </div>
         						<span class="tooltip">
-        							Copy/paste the Skill or Spell Row ID to link that skill to this attack.<br />
+        							Copy/paste the Skill, Spell, or Technique Row ID to link that skill to this attack.<br />
         							When the skill/spell is updated, the weapon attack will also be updated.<br />
         							Use the Modifier column to account for unfamiliar weapon, weapon bond, quality, etc.
         						</span>	
@@ -3787,9 +4188,16 @@
     					</div> <!-- .sheet-row -->
     					
     					<div class="row">
-    					    <div class="cell label">
-								Reason for MOD (Modifier):
-							</div>
+							<div class="cell label">
+								<div class="sheet-popup">Reason for MOD (Modifier):</div>
+									<span class="sheet-tooltip">
+										Examples:
+										<br />
+										+1 for Weapon Bond
+										<br />
+										+1 for Enchantment: Accuracy
+									</span>
+								</div>
 							<div class="cell reason-for-mod">
 								<input type="text" name="attr_reason_for_mod" title="Macro table name: repeating_ranged. Field name: reason_for_mod" />
 							</div>
@@ -4041,7 +4449,7 @@
         						<input type="text" name="attr_thrown_object_skill" value="10" title="Macro name: thrown_object_skill" />
         					</div>
         					<div class="sheet-cell sheet-col11">
-        						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Thrown Object @{thrown_object_weight} lbs.}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{thrown_object_skill} + @{modifier}]]}} {{showNotes=[[1]]}} {{notes=@{thrown_object_notes}}} {{rof=@{thrown_object_rof}}} {{recoil=@{thrown_object_recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
+        						<button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Thrown Object @{thrown_object_weight} lbs.}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{thrown_object_skill} + @{modifier}]]}} {{showNotes=[[1]]}} {{notes=@{thrown_object_notes}}} {{rof=@{thrown_object_rof}}} {{recoil=@{thrown_object_recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
         					</div>
         				</div> <!-- .sheet-row -->
         				<div class="sheet-row sheet-row-details2">
@@ -4081,27 +4489,40 @@
 					<div class="cell linear-range">
 						<div class="popup">Range</div>
 						<div class="tooltip">
-						    Distance between shooter and target.<br />
+							Distance between shooter and target.<br />
+							See B372-373
 						</div>
 					</div>
 				    <div class="cell speed">
 						<div class="popup">Speed</div>
 						<div class="tooltip">
 						   (2 mph = 1 yard/second).<br />
-						   Ignore if human like target moving 10 yards or less.
+						   Ignore if human like target moving 10 yards or less.<br />
+						   See B372-373
 						</div>
 					</div>
 				    <div class="cell size">
 						Size Mod
 					</div>
 				    <div class="cell fire-direction">
-						<div class="popup">Direction</div>
+						<div class="popup">Position</div>
 						<div class="tooltip">
-						   Ignore up/down for beam type weapons like lasers.
+							Your vertical position relative to the target.<br />
+							Ignore up/down for beam type weapons like lasers.<br />
+							See <b>FIRING UPWARD AND DOWNWARD</b> B407.<br />
+							Firing downward decreases distance.<br />
+							<i>For every 2 yards <b>above</b> your target, subtract 1 from distance.</i><br />
+							Firing upward increases distance.<br />
+							<i>Example:</i> Distance 40 yards, you are 10 yards <b>above</b> the target, so <b>subtract</b> 5 yards. Final distance is 35 yards.<br />
+							<i>For every 1 yard <b>below</b>> your target, add 1 to distance.</i><br />
+							<i>Example:</i> Distance 40 yards, you are 10 yards <b>below</b> the target, so <b>add</b> 10 yards. Final distance is 50 yards.<br />
 						</div>
 					</div>
 				    <div class="cell fire-up-dwn-distance">
-						Elevation
+						<div class="popup">Elevation</div>
+						<div class="tooltip">
+						   The number of yards you are above or below the target.
+						</div>
 					</div>
 					<div class="cell new-range">
 						Speed/Range
@@ -4128,9 +4549,9 @@
     					</div>
     				    <div class="cell fire-direction">
     					    <select name="attr_firing_direction" title="Macro name: firing_direction">
-    					        <option value="linear">Normal</option>
-    					        <option value="up">Elev. Up</option>
-    					        <option value="dn">Elev. Down</option>
+    					        <option value="linear">Same Height</option>
+    					        <option value="dn">Above Target</option>
+    					        <option value="up">Below Target</option>
     					    </select>
     					</div>
     				    <div class="cell fire-up-dwn-distance">
@@ -4324,10 +4745,44 @@
 					</div>
 					<div class="cell six-d-spacer">&nbsp;</div>
 				    <div class="cell damage">
-				        <div class="popup">Damage</div>
+				        <div class="popup">Multi</div>
 				        <span class="tooltip">
-				            <strong>Damage:</strong><br />Enter the number to multiply 6d6 by.<br />
-				            An explosion doing 6dx<i>n</i> damage takes (<i>n</i>x<i>n</i>)/4 pounds of TNT.
+				            <strong>Damage Multiplier:</strong><br />Enter the number to multiply 6d6 by.<br />
+				            An explosion doing 6dx<i>n</i> damage takes (<i>n</i>x<i>n</i>)/4 pounds of TNT.<br />
+				            <b>NOTE:</b> Anyone caught in a blast may attempt an active defense<br />
+				            roll to dive for cover from the explosion’s collateral damage and<br />
+				            fragmentation; see Dodge and Drop B377.
+				        </span>
+					</div>
+				    <div class="cell roll-damage">
+				        <div class="popup">Rad</div>
+				        <span class="tooltip">
+				            Radius of collateral damage. See B414<br />
+				            For instance, if an explosion does 6dx2 damage,<br />
+				            everyone within 24 yards is vulnerable.<br />
+				            <br />
+				            For fragmentation damage, the radius is<br />
+				            5 x dice of fragmentation damage.
+				        </span>
+					</div>
+				    <div class="cell roll-damage">
+				        <div class="popup">Div</div>
+				        <span class="tooltip">
+				            Divisor. Amount to divide damage by based on<br />
+				            distance from blast. See B414<br />
+				            You can enter: <b>3</b> (default), 2, or 1.<br />
+				            Default: Damage rolled / (3 x distance blast).<br />
+				            Damage Modifiers Explosion, see B104.<br />
+				            Exp. +100% = Damage rolled / (2 x distance from blast).<br />
+				            Exp. +150% = Damage rolled / (1 x distance from blast).<br />
+				        </span>
+					</div>
+				    <div class="cell roll-damage">
+				        <div class="popup">TGT</div>
+				        <span class="tooltip">
+				            Target's distance from center of blast.<br />
+				            Damage / (3 x distance from blast). Round down.<br />
+				            See B414
 				        </span>
 					</div>
 				    <div class="cell roll-damage">
@@ -4383,8 +4838,18 @@
     					    <input type="number" value="1" min="1" step="1" name="attr_demo_how_much_damage_multiplier" title="Macro name: demo_how_much_damage_multiplier" />
     					</div>
     					<div class="cell roll-damage">
+    					    <input type="text" readonly="readonly" value="12" name="attr_demo_how_much_radius" title="Macro name: demo_how_much_radius" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="number" value="3" min="1" step="1" max="3" name="attr_demo_how_much_divisor" title="Macro name: demo_how_much_divisor" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="number" value="0" min="0" step="1" name="attr_demo_how_much_target_distance" title="Macro name: demo_how_much_target_distance" />
+    					</div>
+    					<div class="cell roll-damage">
     					    <input type="hidden" name="attr_demo_how_much_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-						    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_much_type}}} {{damageRoll=[[@{demo_how_much_base_damage} * @{demo_how_much_damage_multiplier}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+    					    <input type="hidden" name="attr_demo_how_much_damage_divisor" value="1" />
+    					    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_much_type}}} {{damageRoll=[[ floor( (@{demo_how_much_base_damage} * @{demo_how_much_damage_multiplier}) / @{demo_how_much_damage_divisor} )]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
     					</div>
 						<div class="cell reset">
 					        <button type="action" name="act_demo_how_much_reset" class="reset" />Reset</button>
@@ -4434,11 +4899,70 @@
     					    <input type="number" value="1" readonly="readonly" name="attr_demo_how_big_damage_multiplier" title="Macro name: demo_how_big_damage_multiplier" />
     					</div>
     					<div class="cell roll-damage">
+    					    <input type="text" readonly="readonly" value="12" name="attr_demo_how_big_radius" title="Macro name: demo_how_big_radius" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="number" value="3" min="1" step="1" max="3" name="attr_demo_how_big_divisor" title="Macro name: demo_how_big_divisor" />
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="number" value="0" min="0" step="1" name="attr_demo_how_big_target_distance" title="Macro name: demo_how_big_target_distance" />
+    					</div>
+    					<div class="cell roll-damage">
     					    <input type="hidden" name="attr_demo_how_big_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-						    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_big_type}}} {{damageRoll=[[@{demo_how_big_base_damage} * @{demo_how_big_damage_multiplier}]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+						    <input type="hidden" name="attr_demo_how_big_damage_divisor" value="1" />
+    					    <button type="roll" value="@{roll}&{template:skillRoll} {{type='crush ex' or 'burn ex'}} {{characterName=@{character_name}}} {{skillName=Demolition Damage @{demo_how_big_type}}} {{damageRoll=[[ floor( (@{demo_how_big_base_damage} * @{demo_how_big_damage_multiplier}) / @{demo_how_big_damage_divisor} )]]}} {{minDamageNote=Crush min 0, else min 1}} {{showNotes=[[1]]}} {{notes=@{demolition_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
     					</div>
 						<div class="cell reset">
 					        <button type="action" name="act_demo_how_big_reset" class="reset" />Reset</button>
+					    </div>
+				    </div>
+				    
+				    <div class="row">
+    					<div class="cell row-title">
+    					    <div class="popup">Fragmentation</div>
+    						<span class="tooltip">
+    						    Fragmentation damage.<br />
+    						    See B415.
+    						</span>
+    					</div>
+    				    <div class="cell select-box">
+    				    </div>
+    				    <div class="cell text-box">
+    					<div class="popup frag-label">Skill</div>
+    						<span class="tooltip">
+    						    Base skill level for a fragmentation damage to hit a target.<br />
+    						    A hit is <b>automatic</b> if the explosive attack actually strikes the target.<br />
+    						    Only three modifiers apply: the <b>range modifier</b> for the distance from the center<br />
+    						    of the blast to the target, the modifier for the <b>target’s posture</b> (prone, etc.),<br />
+    						    and the target’s <b>Size Modifier</b>. It is possible for several fragments to hit! For<br />
+    						    every <b>three points</b> by which the attack roll succeeds, one additional fragment
+    						    <br />strikes the target.
+    						</span>
+    					</div>
+    				    <div class="cell input">
+    				        <input type="number" value="15" step="1" name="attr_fragmentation_skill" />
+    				    </div>
+    				    <div class="cell input">
+    				        <button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{fragmentation_skill} + @{modifier}]]}} {{notes=@{fragmentation_skill_notes}}} {{showNotes=[[1]]}} {{recoil=@{fragmentation_recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" />
+    					</div>
+    					<div class="cell input">
+    					    <input type="text" value="1d6" name="attr_fragmentation_damage" title="Macro name: fragmentation_damage" />
+    					</div>
+    					<div class="cell six-d-spacer"></div>
+    				    <div class="cell damage">
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="text" readonly="readonly" value="12" name="attr_fragmentation_radius" title="Macro name: fragmentation_radius" />
+    					</div>
+    					<div class="cell roll-damage">
+    					</div>
+    					<div class="cell roll-damage">
+    					</div>
+    					<div class="cell roll-damage">
+    					    <input type="hidden" name="attr_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
+						    <button type="roll" name="roll_vsSL" value="@{roll}&{template:skillRoll} {{type=Ranged Damage}} {{characterName=@{character_name}}} {{skillName=Fragmentation Damage}} {{damageRoll=[[ @{fragmentation_damage} ]]}} {{damageType=Cutting (cut)}} {{minDamageNote=Cutting min 1}} {{showNotes=[[1]]}} {{notes=@{fragmentation_damage_notes}}}" name="roll_dmgDemo" class="roll_damage" />
+    					</div>
+						<div class="cell reset">
 					    </div>
 				    </div>
 				    
@@ -4458,7 +4982,7 @@
 
 		<div class="sheet-box sheet-quick-inventory sheet-textarea">
 			<div class="sheet-header"> 
-				<div class="sheet-cell sheet-col0">Quick Inventory & Wealth</div>
+				<div class="sheet-cell sheet-col0">Quick Inventory</div>
 			</div>
 			<div class="quick-inventory-textarea">
 			    <textarea name="attr_quick_inventory" title="Macro name: quick_inventory"></textarea>
@@ -4664,16 +5188,18 @@
 					    <div class="popup">ON</div>
 						<div class="tooltip">
 						   Mark the spell as <b>ON</b><br />
-						   -1 skill penalty for each spell that is <b>ON</b>.<br />
-						   See B238 or M10.
+						   <b><span name="attr_penalty_per_spell_on"></span></b> skill penalty for each spell that is <b>ON</b>.<br />
+						   See B238 or M10.<br/>
+						   Click one at a time, wait until each penalty is applied before clicking the next one.
 						</div>
 					</div>
 					<div class="sheet-cell sheet-col12">
 					    <div class="popup">CT</div>
 						<div class="tooltip">
 						   Mark the spell as <b>Under Concentration</b>.<br />
-						   -3 skill penalty for each spell.<br />
-						   See B238 or M10.
+						   <b><span name="attr_penalty_per_spell_maintained"></span></b> skill penalty for each spell.<br />
+						   See B238 or M10.<br/>
+						   Click one at a time, wait until each penalty is applied before clicking the next one.
 						</div>
 					</div>
 					<div class="sheet-cell sheet-col7">
@@ -4708,7 +5234,7 @@
 					</div>
 					<div class="cell col3">
 					    <div class="popup">Ref</div>
-						<div class="tooltip alt-indent">
+						<div class="tooltip tooltip-spell-ref">
 						   Reference to book and page numbers.<br />
 						   Examples:<br />
 						   B238 = GURPS Basic, Page 238<br />
@@ -4725,7 +5251,7 @@
 							<input type="text" name="attr_name" title="Macro table name: repeating_spells. Field name: name" />
 						</div>
 						<div class="sheet-cell sheet-col1">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Spell Skill Roll}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{level} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{castingTime=@{casttime}}} {{castingDuration=@{duration}}} {{castingCost=@{cost}}} {{castingMaintain=@{maintain}}} {{castingResist=@{spell_resisted_by}}} {{castingClass=@{spell_class}}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{spell_success_note}}} {{customCriticalSuccessNote=@{spell_critical_success_note}}} {{customFailNote=@{spell_fail_note}}} {{customCriticalFailNote=@{spell_critical_fail_note}}} {{spellRoll=true}} {{spellCriticalSuccessNote=@{spell_critical_success_notes}}} {{spellFailNote=@{spell_fail_notes}}} {{spellCriticalFailureNote=@{spell_critical_failure_notes}}} {{showSpellNotes=[[@{show_spell_notes}]]}} {{spellNotes=@{spell_notes}}}" name="roll_vsSL" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Spell Skill Roll}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{level} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{castingTime=@{casttime}}} {{castingDuration=@{duration}}} {{castingCost=@{cost}}} {{castingMaintain=@{maintain}}} {{castingResist=@{spell_resisted_by}}} {{castingClass=@{spell_class}}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{spell_success_note}}} {{customCriticalSuccessNote=@{spell_critical_success_note}}} {{customFailNote=@{spell_fail_note}}} {{customCriticalFailNote=@{spell_critical_fail_note}}} {{spellRoll=true}} {{spellCriticalSuccessNote=@{spell_critical_success_notes}}} {{spellFailNote=@{spell_fail_notes}}} {{spellCriticalFailureNote=@{spell_critical_failure_notes}}} {{showSpellNotes=[[@{show_spell_notes}]]}} {{spellNotes=@{spell_notes}}}" name="roll_vsSL" />
 						</div>
 						<div class="sheet-cell sheet-col2">
 						    <input type="hidden" name="attr_level_mirror" value="0" />
@@ -4741,7 +5267,7 @@
 							<input type="number" name="attr_spell_modifier" value="0" title="Macro table name: repeating_spells. Field name: spell_modifier" />
 						</div>
 						<div class="sheet-cell sheet-col5">
-							<input type="number" name="attr_points" value="0" title="Macro table name: repeating_spells. Field name: points" />
+							<input type="number" name="attr_points" value="1" title="Macro table name: repeating_spells. Field name: points" />
 						</div>
 						<div class="sheet-cell sheet-col12">
 							<input type="checkbox" class="checkbox" title="Check to mark spell as on." name="attr_spell_on_checked" value="1" />
@@ -4919,13 +5445,8 @@
 		
 	<h3>Known Issues</h3>
 	<ul>
-		<li>Unable to delete a Technique - UPDATE</li>
-		<li>
-		    The issue is the 'Max' value for the Technique. If any value was placed in there, the row will not delete. 
-		    So I have blocked values from being placed there so that new Techniques can be deleted if need be. 
-		    Existing Techniques that you are unable to delete - the Devs are looking into that issue and will advise me.
-		 </li>
-		<li>NOTE: Techniques, as it is now on the character sheet, does not really work well - that section will most likely be completely rewritten (I plan on doing it when I get some time and my skills at HTML improve).</li>
+		<li>The original issue was that you were unable to delete a Technique – UPDATED 02/18/2020</li>
+		<li>We now have a Revised Techniques table. See update Version 2.2.0 notes. We will continue to revise this Table until we are 100% satisfied it works as intended. The main issue is the complexity of some Techniques and how to enter them into this Table.</li>
 	</ul>
 
 		<h3>Note to authors</h3>
@@ -4950,6 +5471,66 @@
 
 	<p>Pull Request: <span name="attr_latest_changes"></span></p>
 	
+	<ul>
+		<li>Changes, Fixes, and Adds made by a combind effort from MadCode (UserID: 945642) and Mike W (UserID: 1414610)</li>
+		<li>Adjusted the field widths for Techniques (Revised) and Parent Attributes – Cosmetic only.</li>
+		<li>Added new function of ‘Dodge and Drop’ to default Active Defenses.</li>
+		<li>Techniques Table Revised. Points spent on techniques are now totaled correctly. <b>NOTE:</b> When transferring techniques to the revised table, be sure to delete the old technqies, otherwise the total will be wrong.</li>
+		<li>Tecnniques Table Revised. Fix bug where Modifier was not added to the final Technique Skill Level.</li>
+		<li>Quirks/Perks Bugfix. Adding a row did not total the quirks/perks correctly.</li>
+		<li>Repeating Spells, quickly clicking checkboxes prevented correct totals. Using new code provided by GiGs to improve speed.</li>
+		<li>Many ToolTips updated or added.</li>
+		<li>Some slight format changes – Cosmetic Only.</li>
+		<li>Added a Defense Bonus (DB) Notes box to the Active Defense section.</li>
+	</ul>
+
+	<h4>Version 2.2.0</h4>
+
+	<p>Pull Request: 02/11/2020</p>
+	
+	<ul>
+		<li><b style="color:red;">New Optional Feature Available.</b> A revised techniques table is available by setting the options on the character sheet or the campaign default options. This revised techniques is not final, we'll make adjustments based upon feedback.</li>
+		<li>Options tab. New option to show/hide the Original Techniques table and new Revised Techniques table. Show both tables if you want to transfer your current techniques to the new table.</li>
+		<li>Skills Tab. New Revised Technique Table. Options to show/hide old technigue or new technique tables. If old technique table has no rows, then hide old table, show new table.</li>
+		<li>Bugfix: Check when Character Weight is updated on the Bio\Misc tab to also update the Grand Total on the Inventory tab.</li>
+		<li>Various spelling and text updates. Updated wording and titles for Combat Tolls Range Calculator.</li>
+		<li>Fix display bug with Add to Tracker Roll Template.</li>
+		<li>Grimoire tab. Spells Table. Reduce the size of the Reason for MOD input line to try to prevent wrapping to next line.</li>
+		<li>Quirks and Perks tables. Set default point value of Quirks to -1 and Perks to 1, suggested by Kevin A (ID: 688156).</li>
+		<li>Rolltemplate - Skill Rolls. Added <i>(Effective Skill)</i> text after the displayed number.</li>
+	</ul>
+	
+	<h4>Version 2.1.1</h4>
+
+	<p>Pull Request: 02/04/2020</p>
+
+	<ul>
+		<li>Changes, Fixes, and Adds made by Mike W (UserID: 1414610)</li>
+		<li>Added and/or modified several ToolTips – Cosmetic Only</li>
+		<li>Updated alerts due to HP and/or FP loss in Red – Cosmetic Only</li>
+		<li>Added ToolTips to ‘Reason for MOD’ with some examples – Cosmetic Only</li>
+		<li>Added a title to the Speed button to remind you that you must select a Token first – Cosmetic Only</li>
+		<li>Added missingmacro name title for Current HP – Cosmetic Only</li>
+		<li>Add to Turn Order macro for Initiative has been revised to help eliminate ties – Suggested by Jared (UserID: 1026445)</li>
+		<li>When adding a new spell, it will now input 1 point automatically to avoid 0 point spells.</li>
+	</ul>
+
+	<h4>Version 2.1.0</h4>
+	
+	<p>Pull Request: 01/28/2020</p>
+	
+	<ul>
+		<li>Grimoire Tab. Repeating Spells. Fix bug where Reason MOD text and input spanned two lines.</li>
+		<li>General Tab. Update text for HP and FP alerts. If fatigued, ST is halved, added new field for ST display and use it with ST rolls.</li>
+		<li>Combat Tab. Show alert message when dodge is halved or quartered.</li>
+		<li>Combat Tab. Demolition tool. Add radius and distance from center. Add fragmentation row.</li>
+		<li>Linked Attacks to skills or spells. On version update, ensure links are updated correctly. Fixed a couple of bugs with linking spells.</li>
+	</ul>
+	
+	<h4>Version: 2.0.0</h4>
+	
+	<p>Pull Request: 01/07/2020</p>
+
 	<ul>
 		<li>This is a major update to version 2.0.0. – User interaction is required, please read the details of the changes and what you need to do under the Updates TAB.</li>
 		<li>General tab. Change layout for Turning and Deceleration table and fixed some bugs in the process.</li>
@@ -5168,7 +5749,21 @@
     					level and the result.
     				</span>
     			</div><!-- end public/private rolls -->
-    			
+				
+				<div class="option-container">
+    			    <h4>Repeating Technique Tables</h4>
+    				<div>
+        			    <input type="checkbox" name="attr_show_old_techniques" value="1" checked="checked" />
+        			    <span class="popup">Show Original</span>
+        			    <span class="sheet-tooltip">Show the original techniques table.</span>
+					</div>
+					<div>
+        			    <input type="checkbox" name="attr_show_new_techniques" value="1" />
+        			    <span class="popup">Show Revised</span>
+        			    <span class="sheet-tooltip">Show the revised techniques table.</span>
+    			    </div>
+				</div><!-- end public/private rolls -->
+				
 		    </div><!-- end option-column -->
 		    
 			<div class="option-column">
@@ -5217,8 +5812,8 @@
     			
     			<div class="option-container">
 		            
-		            <h4>Spell Options</h4>
-		            
+		            <h4>Spell Options (See B238, M10)</h4>
+					
 		            <table>
     			        <tr>
     			            <td>
@@ -5230,7 +5825,7 @@
     			        </tr>
     			        <tr>
     			            <td>
-    			                Penalty for each spell <b>Maintained:</b>             
+    			                Penalty for each spell <b>Concentrated On:</b>             
     			            </td>
     			            <td>
     			                <input type="number" step="1" value="-3" name="attr_penalty_per_spell_maintained"></input>
@@ -5310,12 +5905,42 @@ Falling Damage: If using hit locations, roll randomly for the hit location damag
 		            <textarea name="attr_demolition_damage_notes">Explosion damage. Targets struck directly takes listed damage. Apply "collateral damage" of Damage / (3 x distance from center of blast) rounded down.
 			    
 * Use torso armor to determine DR against explosion.
-* If the explosion has an armor divisor, do NOT apply to "collateral damage."
-* Explosions are considered incendiary. see Catching Fire B434
+* If the explosion has an armor divisor, do NOT apply to "collateral damage.
+* Explosions are considered incendiary. see Catching Fire B434.
 * Can use Dodge and Drop (B377) to avoid collateral damage.
 * See B414</textarea>    
 		        </div><!-- end option-container -->
 		       
+		        <div class="option-container collision-falling-options">
+		            <h4>Fragmentation Skill Notes</h4>
+		            <textarea name="attr_fragmentation_skill_notes">For every three points by which the attack roll succeeds, one additional fragment strikes the target.
+
+The only active defense against fragments is to dive away from the explosion that produced them; see Dodge and Drop and Diving for Cober (B377).
+
+For each hit, roll hit location randomly. If that location is behind cover, the fragment hits cover.
+</textarea>    
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container collision-falling-options">
+		            <h4>Fragmentation Damage Notes</h4>
+		            <textarea name="attr_fragmentation_damage_notes">Fragmentation damage is cutting. Note that if an explosive attack has an armor divisor, this does not apply to the fragments it produces.</textarea>    
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container">
+		            
+		            <table>
+    			        <tr>
+    			            <td>
+    			                <b>Fragmentation Recoil: </b>      
+    			            </td>
+    			            <td>
+    			                <input type="number" step="1" value="3" name="attr_fragmentation_recoil"></input>
+    			            </td>
+    			        </tr>
+    			    </table>
+    			    
+		        </div><!-- end option-container -->
+		        
 		    </div><!-- end option-column -->
 		    
 		    <div class="option-column">
@@ -5327,7 +5952,7 @@ Falling Damage: If using hit locations, roll randomly for the hit location damag
 		        
 		        <div class="option-container collision-falling-options">
 		            <h4>Spell Fail Notes</h4>
-		            <textarea name="attr_spell_fail_notes">The spell does not work. If success would have cost energy, you lose one energy point; otherwise, you lose nothing. (Exception: You must pay the full energy cost even on a failure for an Information spell; see Information Spells. B241, M13). B235, M7.
+		            <textarea name="attr_spell_fail_notes">The spell does not work. If success would have cost energy, you lose one energy point; otherwise, you lose nothing. (Exception: You must pay the full energy cost even on a failure for an Information spell; see Information Spells. B235, M7.
 		            
 **In Very High Mana Areas**, all Failures are treated as Critical Failures. M6.</textarea>    
 		        </div><!-- end option-container -->
@@ -5383,7 +6008,8 @@ Skull Damage x4</textarea>
     			        <tr>
     			            <td>Crushing</td>
     			            <td>
-    			                <textarea name="attr_damage_type_note_cr">Damage x1
+    			                <textarea name="attr_damage_type_note_cr">CRUSHING
+Damage x1
 Neck Damage x1.5
 Skull Damage x4</textarea>
     			            </td>
@@ -5391,7 +6017,8 @@ Skull Damage x4</textarea>
     			        <tr>
     			            <td>PI-</td>
     			            <td>
-    			                <textarea name="attr_damage_type_note_pi_minus">Damage x .5
+    			                <textarea name="attr_damage_type_note_pi_minus">PIERCING-
+Damage x .5
 Vitals Damage x3
 Skull Damage x4</textarea>
     			            </td>
@@ -5399,7 +6026,8 @@ Skull Damage x4</textarea>
     			        <tr>
     			            <td>PI</td>
     			            <td>
-    			                <textarea name="attr_damage_type_note_pi">Damage x1
+    			                <textarea name="attr_damage_type_note_pi">PIERCING
+Damage x1
 Vitals Damage x3
 Skull Damage x4</textarea>
     			            </td>
@@ -5407,7 +6035,8 @@ Skull Damage x4</textarea>
     			        <tr>
     			            <td>PI+</td>
     			            <td>
-    			                <textarea name="attr_damage_type_note_pi_plus">Damage x1.5
+    			                <textarea name="attr_damage_type_note_pi_plus">PIERCING+
+Damage x1.5
 Arm, Leg, Foot, or Hand x1 (B399)
 Vitals Damage x3
 Skull Damage x4</textarea>
@@ -5416,7 +6045,8 @@ Skull Damage x4</textarea>
     			        <tr>
     			            <td>PI++</td>
     			            <td>
-    			                <textarea name="attr_damage_type_note_pi_plus_plus">Damage x2
+    			                <textarea name="attr_damage_type_note_pi_plus_plus">PIERCING++
+Damage x2
 Arm, Leg, Foot, or Hand x1 (B399)
 Vitals Damage x3
 Skull Damage x4</textarea>
@@ -5425,20 +6055,23 @@ Skull Damage x4</textarea>
     			        <tr>
     			            <td>Affliction</td>
     			            <td>
-    			                <textarea name="attr_damage_type_note_aff">special damage and affects based on affliction description</textarea>
+    			                <textarea name="attr_damage_type_note_aff">AFFLICTION
+Special damage and affects based on affliction description</textarea>
     			            </td>
     			        </tr>
     			        <tr>
     			            <td>Burn</td>
     			            <td>
-    			                <textarea name="attr_damage_type_note_burn">Damage x1
+    			                <textarea name="attr_damage_type_note_burn">BURN 
+Damage x1
 Skull Damage x4</textarea>
     			            </td>
     			        </tr>
     			        <tr>
     			            <td>Corrosion</td>
     			            <td>
-    			                <textarea name="attr_damage_type_note_cor">Damage x1
+    			                <textarea name="attr_damage_type_note_cor">CORRROSION 
+Damage x1
 Face Damage x1.5, blind eye if major wound, both eyes if full HP
 Neck Damage x1.5
 Skull Damage x4
@@ -5448,19 +6081,22 @@ Skull Damage x4
         			        <tr>
         			            <td>Fatigue</td>
         			            <td>
-        			                <textarea name="attr_damage_type_note_fat">Damage x1</textarea>
+        			                <textarea name="attr_damage_type_note_fat">FATIGUE 
+Damage x1</textarea>
         			            </td>
         			        </tr>
         			        <tr>
         			            <td>Toxic</td>
         			            <td>
-        			                <textarea name="attr_damage_type_note_tox">Damage x1</textarea>
+        			                <textarea name="attr_damage_type_note_tox">TOXIC 
+Damage x1</textarea>
         			            </td>
         			        </tr>
         			        <tr>
         			            <td>Special</td>
         			            <td>
-        			                <textarea name="attr_damage_type_note_spec">See notes for weapon.</textarea>
+        			                <textarea name="attr_damage_type_note_spec">SPECIAL 
+See notes for weapon.</textarea>
         			            </td>
         			        </tr>
         			    </table>
@@ -5508,7 +6144,7 @@ Skull Damage x4
 				</tr>
 
                 <tr>
-                    <td class="label">Speed:</td>
+                    <td class="label">BASE:</td>
                     <td>{{basicSpeed}}</td>
                 </tr>
             </table>
@@ -6077,18 +6713,22 @@ Skull Damage x4
                         {{#useFrightLabel}}
                             <i>Fright Threshold</i>
                         {{/useFrightLabel}}
-                        
+						
+						{{#isSkillRoll}}
+							<i>(Effective Skill)</i>
+						{{/isSkillRoll}}
+						
                         <!-- If defense roll, check for effective skill below 1 -->
                         {{#rollTotal() activeDefense 1}}
                             {{#rollLess() effectiveSkill 1}}
-                            <div style="color: red; margin-top: 6px;">WARNING: Final Target is less than 1. Defense roll is not possible. Ref B345</div> 
+                            <div style="color: red; margin-top: 6px;"><b>WARNING:</b> You may not attempt a success roll if your effective skill (Target) is less than 3. (See B345)</div> 
                             {{/rollLess() effectiveSkill 1}}
                         {{/rollTotal() activeDefense 1}}
                         
                         <!-- For other rolls, check for effective skill below 3 -->
-                        {{#rollTotal() activeDefense 0}}
-                            {{#rollLess() effectiveSkill 3}}
-                            <div style="color: red; margin-top: 6px;">WARNING: Final Target is less than 3. Roll is not possible. Ref B374</div> 
+						{{#rollTotal() activeDefense 0}}
+							{{#rollLess() effectiveSkill 3}}
+                            <div style="color: red; margin-top: 6px;"><b>WARNING:</b> You may not attempt a success roll if your effective skill (Target) is less than 3. (See B345)</div> 
                             {{/rollLess() effectiveSkill 3}}
                         {{/rollTotal() activeDefense 0}}
                         
@@ -6342,7 +6982,7 @@ Skull Damage x4
                 <tr>
                     <td class="label">Minimum:</td>
                     <td class="damage-roll">
-                        {{minDamageNote}}<br />
+                        {{minDamageNote}}: Applied to Target's DR<br />
                         See B378 <b>Damage Roll</b>
                     </td>
                 </tr>
@@ -6446,12 +7086,13 @@ Skull Damage x4
 </div>
 
 <script type="text/worker">
+	// type="text/worker"					  
 
 	var noop = function () {}; // do nothing.
 
-	var version = "2.0.0";
+	var version = "2.2.1";
 	
-	var latestChangesDate = "01/07/2020";
+	var latestChangesDate = "02/18/2020";
 
 	var modCascade = true;
 	
@@ -6464,7 +7105,11 @@ Skull Damage x4
     // avoids looping through repeating tables to get matching row.
 	var skillRowIds = [];
 	
+	var spellRowIds = [];
+	
 	var weaponRowIds = [];
+
+	var techniqueRowIds = [];
 	
 	const decelerationDivisor = 2;
 	
@@ -6526,8 +7171,12 @@ Skull Damage x4
 		
 		setSkillRowIds();
 		
-		setWeaponRowIds();
+		setSpellRowIds();
 		
+		setTechniqueRowIds();
+		
+		setWeaponRowIds();
+
 		setAttrs({inventory_fixed_digits: 1}); 
 
 		sumRepeating('repeating_item', 'weighttotal', function(v) {
@@ -6703,10 +7352,51 @@ Skull Damage x4
 		
 		updateRepeatingDefenseNotes();
 		
-		updateRepeatingSkillLevels();
+		// use underscore wrap to update skills, then update melee/ranged linked skills
+		runUpdateRepeatingSkillLevels = _.wrap(updateRepeatingSkillLevels, function(firstFunction) {
+		    
+		    firstFunction();
+		    
+		    thenUpdateLinkedAttacksSkills(); 
+		    
+		});
+		
+		runUpdateRepeatingSkillLevels();
+		
+		runUpdateRepeatingSpellLevels = _.wrap(updateRepeatingSpellLevels, function(thisFunction) {
+		    
+		    thisFunction();
+		    
+		    thenUpdateLinkedAttacksSpells(); 
+		    
+		});
+		
+		runUpdateRepeatingSpellLevels();
+		
+	}
+	
+	function thenUpdateLinkedAttacksSkills() {
+		
+	    console.log("Updating linked skills");
+		
+	    updateLinkedSkills("repeating_melee", "melee");
+    
+        updateLinkedSkills("repeating_ranged", "ranged");
+		
+		updateLinkedSkills("repeating_techniquesrevised", "technique");
 
-        updateRepeatingSpellLevels();
-        
+	}
+
+	function thenUpdateLinkedAttacksSpells() {
+		
+	    console.log("Updating linked spells");
+		
+	    updateLinkedSkills("repeating_melee", "melee");
+    
+        updateLinkedSkills("repeating_ranged", "ranged");
+		
+		updateLinkedSkills("repeating_techniquesrevised", "technique");
+
 	}
 
 	// Sum values, used in reduce
@@ -6775,12 +7465,27 @@ Skull Damage x4
 	function updateST(callback) {
 		callback = callback || noop;
 		console.log('********* updateST *********');
-		getAttrs(['strength_points', 'strength_mod'], function(v) {
+		getAttrs(['strength_points', 'strength_mod', 'strength_halved'], function(v) {
+		    
 			var base = 10 + ((+v.strength_points || 0) / 10 | 0);
+			
 			var mod = +v.strength_mod || 0;
+			
+			var st_halved = +v.strength_halved;
+			
+			var st_display = base + mod;
+			
+			// check if ST was halved due to fatigue.
+			if (st_halved === 1) {
+			    
+			    st_display = st_display/2;
+			
+			}
+			
 			setAttrs({
 				strength_base: base,
-				strength: base + mod
+				strength: base + mod,
+				strength_display: st_display,
 			}, {silent: false}, callback);
 		});
 	}
@@ -7070,7 +7775,7 @@ Skull Damage x4
 		
 		callback = callback || noop;
 		
-		getAttrs(['encumbrance_level', 'dodge', 'basic_move', 'hit_points', 'hit_points_max', 'fatigue_points', 'fatigue_points_max'], function(v) {
+		getAttrs(['encumbrance_level', 'dodge', 'basic_move', 'hit_points', 'hit_points_max', 'fatigue_points', 'fatigue_points_max', 'strength'], function(v) {
 		
 		    var dodge = +v.dodge;
 		
@@ -7079,6 +7784,12 @@ Skull Damage x4
 			var hitPointsNotes = 0;
 			
 			var fatiguePointNotes = 0;
+			
+			var dodgeNotes = 0;
+			
+			var strengthDisplay = +v.strength;
+			
+			var strengthHalved = 0;
 		
 			if (v.encumbrance_level === 5) {
 			    
@@ -7102,6 +7813,8 @@ Skull Damage x4
 				
 				hitPointsNotes = 1;
 				
+				dodgeNotes = 1;
+				
 				dodge = Math.ceil(dodge / 2);
 				
 				move = Math.ceil(move / 2);
@@ -7113,9 +7826,17 @@ Skull Damage x4
 			    
 			    fatiguePointNotes = 1;
 			    
+			    dodgeNotes = 1; 
+			    
 				dodge = Math.ceil(dodge / 2);
 				
 				move = Math.ceil(move / 2);
+				
+				// reduce strength_display in half
+				strengthDisplay = Math.ceil(strengthDisplay / 2);
+				
+				strengthHalved = 1;
+				
 			}
 			
 			// if both hit and fatigue were reduced, then change trigger to value
@@ -7125,13 +7846,18 @@ Skull Damage x4
 			    
 			    fatiguePointNotes = 2;
 			    
+			    dodgeNotes = 2;
+			    
 			}
 
 			setAttrs({
 				current_move: move,
 				current_dodge: dodge,
 				hit_points_notes: hitPointsNotes,
-				fatigue_points_notes: fatiguePointNotes
+				fatigue_points_notes: fatiguePointNotes,
+				dodge_reduced_notes: dodgeNotes,
+				strength_display: strengthDisplay,
+				strength_halved: strengthHalved
 			}, {silent: false}, callback);
 			
 		});
@@ -7216,7 +7942,7 @@ Skull Damage x4
 	});
 
 	// Update the total cost of Perks
-	on('change:repeating_perks:points remove:repeating_perks', function (e) {
+	on('change:repeating_perks remove:repeating_perks', function (e) {
 		sumRepeating('repeating_perks', 'points', function(v) {
 			setAttrs({ advantages_perks: v });
 		});
@@ -7230,7 +7956,7 @@ Skull Damage x4
 	});
 
 	// Update the total cost of Quirks
-	on('change:repeating_quirks:points remove:repeating_quirks', function (e) {
+	on('change:repeating_quirks remove:repeating_quirks', function (e) {
 		sumRepeating('repeating_quirks', 'points', function(v) {
 			setAttrs({ disadvantages_quirks: v });
 		});
@@ -7298,7 +8024,7 @@ Skull Damage x4
 		
 	});
 	
-	// update row ids when repeating row is updated
+	// update row ids and then update mirrored skill level when repeating row is updated
 	on("change:repeating_skills", function(event) {
 	    
 	    get_update_row_ids("repeating_skills", function(ids) {
@@ -7319,7 +8045,7 @@ Skull Damage x4
 	    
 	});
 	
-	// update row ids when repeating row is updated
+	// update row id field and update mirrored skill level when repeating row is updated
 	on("change:repeating_spells", function(event) {
 	    
 	    var sectionName = "repeating_spells";
@@ -7351,10 +8077,31 @@ Skull Damage x4
 	    var rowId = getRowIdFromEventInfo(event, "repeating_spells");
 	    
 	    // remove from array
-	    skillRowIds = skillRowIds.remove(rowId);
+	    spellRowIds = spellRowIds.remove(rowId);
 	    
 	});
 	
+	// update row id field
+	on("change:repeating_techniquesrevised", function(event) {
+	    
+	    get_update_row_ids("repeating_techniquesrevised", function(ids) {
+
+			// do nothing
+
+		});
+	    
+	});
+	
+	// if technique was removed, make sure to remove it from cache
+	on("remove:repeating_techniquesrevised", function(event) {
+	    
+	    var rowId = getRowIdFromEventInfo(event, "repeating_techniquesrevised");
+	    
+	    // remove from array
+	    techniqueRowIds = techniqueRowIds.remove(rowId);
+	    
+	});
+
 	/**
 	 * get rows ids and update display field
 	 * 
@@ -7376,7 +8123,19 @@ Skull Damage x4
                 // set the field value
                 items[`${sectionId}_${rowId}_row_id`] = rowId;
                 
-                updateSkillIdsArrayCache(rowId);
+                if (sectionId == "repeating_skills") {
+                
+                    updateSkillIdsArrayCache(rowId);
+                    
+                } else if (sectionId == "repeating_spells") {
+                    
+                    updateSpellIdsArrayCache(rowId);
+                    
+                } else if (sectionId == "repeating_techniquesrevised") {
+
+					updateTechniqueSkillIdsArrayCache(rowId);
+
+				}
                 
             }
            
@@ -7403,6 +8162,36 @@ Skull Damage x4
 	    
 	}
 	
+	/**
+	 * If missing in cache, add this row id
+	 * 
+	 * @param string rowId Row ID to add to cache
+	 */
+	function updateSpellIdsArrayCache(rowId) {
+	    
+	    if (spellRowIds.includes(rowId) === false ) {
+	        
+	        spellRowIds.push(rowId);
+	        
+	    }
+	    
+	}
+
+	/**
+	 * If missing in cache, add this row id
+	 * 
+	 * @param string rowId Row ID to add to cache
+	 */
+	 function updateTechniqueSkillIdsArrayCache(rowId) {
+
+		if (techniqueRowIds.includes(rowId) === false ) {
+	        
+	        techniqueRowIds.push(rowId);
+	        
+	    }
+		
+	}
+	
 	// Update the total cost of Techniques
 	on('change:repeating_techniques:points remove:repeating_techniques', function (e) {
 		sumRepeating('repeating_techniques', 'points', function(v) {
@@ -7410,6 +8199,12 @@ Skull Damage x4
 		});
 	});
 
+	// Update the total cost of Techniques revised
+	on('change:repeating_techniquesrevised:points remove:repeating_techniquesrevised', function (e) {
+		sumRepeating('repeating_techniquesrevised', 'points', function(v) {
+			setAttrs({ techniques_revised_points: v });
+		});
+	});
 	// Update the total cost of Spells
 	on('change:repeating_spells:points remove:repeating_spells', function (e) {
 		sumRepeating('repeating_spells', 'points', function(v) {
@@ -11012,24 +11807,51 @@ Skull Damage x4
         
     }
     
+    function setSpellRowIds() {
+        
+        getSectionIDs("repeating_spells", function(ids) {
+            
+            spellRowIds = ids;
+            
+        });
+        
+    }
+	
+	/**
+	 * Save melee and ranged weapon row ids to cache 
+	 */
     function setWeaponRowIds() {
         
         setWeaponRowIdsBySection("repeating_melee", "melee");
         
-        setWeaponRowIdsBySection("repeating_ranged", "ranged");
-        
-    }
+		setWeaponRowIdsBySection("repeating_ranged", "ranged");
+		
+		setWeaponRowIdsBySection("repeating_techniquesrevised", "technique");
+		
+	}
+	
+	/**
+	 * Save techniques revised row ids to cache
+	 */
+	function setTechniqueRowIds() {
+
+		getSectionIDs("repeating_techniquesrevised", function(ids) {
+            
+			techniqueRowIds = ids;
+			
+        });
+	} 
     
     function setWeaponRowIdsBySection(sectionName, prefixValue) {
-        
-        getSectionIDs(sectionName, function(ids) {
-            
+		
+		getSectionIDs(sectionName, function(ids) {
+		
             // loop through each row, find ones that have skill row id
             // see: https://underscorejs.org/#each 
             _.each(ids,function(id) {
                 
-                var fieldName = `${sectionName}_${id}_${prefixValue}_skill_row_id`;
-                
+				var fieldName = `${sectionName}_${id}_${prefixValue}_skill_row_id`;
+				
                 getAttrs([fieldName], function(values) {
                 
                     var rowId = values[fieldName];
@@ -11045,8 +11867,8 @@ Skull Damage x4
                         };
                         
                         // add to global variable
-                        weaponRowIds.push(skillData);
-                        
+						weaponRowIds.push(skillData);
+						
                     }
                        
                 });
@@ -11093,6 +11915,33 @@ Skull Damage x4
         weapons = getMatchinWeaponsFromSkillId(rowId);
         
         // could be more than one weapon tied to a skill/spell
+        if (weapons.length) {
+        
+            var updateFields = {};
+    
+            weapons.forEach( function(weaponRow) {
+            
+                var toggleFieldName = `${weaponRow.sectionName}_${weaponRow.rowId}_${weaponRow.prefix}_skill_row_id_toggle`;
+                
+                updateFields[toggleFieldName] = 1;
+    
+            });
+    
+            setAttrs(updateFields);
+                
+        }
+        
+	});
+	
+	// check if technique level changed
+	on("change:repeating_techniquesrevised:level", function(event) {
+        
+        var rowId = getRowIdFromEventInfo(event, "repeating_techniquesrevised");
+        
+        // if the weapon rowId is being used by a skill, update the toggles
+        weapons = getMatchinWeaponsFromSkillId(rowId);
+        
+        // could be more than one weapon tied to a skill
         if (weapons.length) {
         
             var updateFields = {};
@@ -11165,8 +12014,7 @@ Skull Damage x4
         
     }
     
-    // set note values for damage types
-    // Update thrust and swing when striking st is updated
+    // if linked melee data changes update the linked weapon skill
 	on('change:repeating_ranged:ranged_row_type change:repeating_ranged:ranged_skill_row_id change:repeating_ranged:ranged_skill_row_id_modifier change:repeating_ranged:ranged_skill_row_id_toggle', function(event){
 
 		getAttrs(["repeating_ranged_ranged_row_type"], function(values) {
@@ -11183,8 +12031,7 @@ Skull Damage x4
 		
 	});
 	
-	// set note values for damage types
-    // Update thrust and swing when striking st is updated
+	// if linked melee data changes update the linked weapon skill
 	on('change:repeating_melee:melee_row_type change:repeating_melee:melee_skill_row_id change:repeating_melee:melee_skill_row_id_modifier change:repeating_melee:melee_skill_row_id_toggle', function(event){
 
         getAttrs(["repeating_melee_melee_row_type"], function(values) {
@@ -11200,8 +12047,24 @@ Skull Damage x4
         
 	});
 	
+	// if linked technique data changes update linked skills
+	on('change:repeating_techniquesrevised:technique_row_type change:repeating_techniquesrevised:technique_skill_row_id change:repeating_techniquesrevised:technique_skill_row_id_toggle', function(event){
+
+		getAttrs(["repeating_techniquesrevised_technique_row_type"], function(values) {
+
+			updateLinkedWeaponSkill("repeating_techniquesrevised", "technique", values.repeating_techniquesrevised_technique_row_type, function() {
+			
+				//make sure we update the cache 
+				setWeaponRowIdsBySection("repeating_techniquesrevised", "technique");
+				
+			});
+			
+		});
+
+	});
+
 	/**
-	 * Update the weapon skill associated with the skill row id
+	 * Update the melee, ranged, or technique associated with the skill row id
 	 * 
 	 * @param string sectionName Should be either repeating_melee or repeating_ranged
 	 * @param string prefix      Placed before skill attribute names to follow rules for unique names, even inside repeating sections.
@@ -11211,9 +12074,13 @@ Skull Damage x4
 	function updateLinkedWeaponSkill(sectionName, prefix, rowType, callback) {
 	    
 	    var repeatingTableToUse = "";
-	    
+		
 	    switch (rowType) {
 	        
+	        case "Technique":
+	            repeatingTableToUse = "repeating_techniquesrevised";
+	            break;
+	            
 	        case "Spell":
 	            repeatingTableToUse = "repeating_spells";
 	            break;
@@ -11231,8 +12098,14 @@ Skull Damage x4
 	    
 	    var skillMessageFieldName = `${sectionName}_${prefix}_skill_row_id_message`;
 	    
-	    var skillMessageFieldLevel = `${sectionName}_${prefix}_skill_row_id_level`;
-	    
+		var skillMessageFieldLevel = `${sectionName}_${prefix}_skill_row_id_level`;
+		
+		// for updating technique values
+		var parentFieldName = `${sectionName}_parent`;
+		        
+		// for updating technique values
+		var baseSkillFieldName = `${sectionName}_base_level`;
+		
 	    var weaponSkillFieldName = `${sectionName}_skill`;
 	    
 	    // if this gets changed, then the update linked weapon skill gets triggered
@@ -11241,7 +12114,7 @@ Skull Damage x4
 	    getAttrs([skillRowIdFieldName,
 		          skillRowModFieldName
 		         ], function(values) {
-		    
+			
 		    var skillRowId = values[skillRowIdFieldName];
 		    
 		    var skillMod = +values[skillRowModFieldName];
@@ -11263,12 +12136,19 @@ Skull Damage x4
 		        // if it's a good row id, let's update stuff
 		        var skillFieldName = `${repeatingTableToUse}_${skillRowId}_level_mirror`;
 		        
-		        var skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
-		        
-		        // update the skill level for weapon.
-		        getAttrs([skillFieldName, skillFieldNameOfSkill], function(values) {
+				var skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
+				
+				// if we're getting values from the techniques table, don't use level_mirror
+				if (repeatingTableToUse == "repeating_techniquesrevised") {
 
-		            var skillLevel = +values[skillFieldName];
+					skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
+		        
+				}
+				
+				// update the skill level for weapon.
+		        getAttrs([skillFieldName, skillFieldNameOfSkill], function(skillValues) {
+
+		            var skillLevel = +skillValues[skillFieldName];
 		            
 		            var skillLevelFinal = skillLevel + skillMod;
 		            
@@ -11276,13 +12156,22 @@ Skull Damage x4
 	            
     	            updateFields[weaponSkillFieldName] = skillLevelFinal;
     	            
-    	            updateFields[skillMessageFieldName] = values[skillFieldNameOfSkill];
+    	            updateFields[skillMessageFieldName] = skillValues[skillFieldNameOfSkill];
     	            
     	            updateFields[skillMessageFieldLevel] = skillLevel;
     	            
     	            // reset toggle to zero
-    	            updateFields[skillRowIdToggleFieldName] = 0;
+					updateFields[skillRowIdToggleFieldName] = 0;
+					
+					// if repeating_techniquesrevised, also update the Parent skill name and base skill level
+					if (sectionName == "repeating_techniquesrevised") {
+
+						updateFields[parentFieldName] = skillValues[skillFieldNameOfSkill];
     	            
+    	            	updateFields[baseSkillFieldName] = skillLevel;
+
+					}
+					
     	            setAttrs(updateFields, '', callback());
 		            
 		        });
@@ -11304,7 +12193,7 @@ Skull Damage x4
 	
 	function validSkillRowId( rowIdToFind ) {
 	    
-	    var blnValid = skillRowIds.includes(rowIdToFind);
+	    var blnValid = skillRowIds.includes(rowIdToFind) || spellRowIds.includes(rowIdToFind) || techniqueRowIds.includes(rowIdToFind);
 	    
 	    return blnValid;
 	    
@@ -11322,9 +12211,14 @@ Skull Damage x4
 	        
 	        updateSkillLevel(sectionName, ids);
 	        
-	    }); 
+	    });
+	    
 	}
 	
+	/**
+	 * Update the mirrored skill level when any field
+	 * is updated for skill or spell
+	 */
 	function updateSkillLevel(sectionName, ids) {
 	    
         _.each(ids,function(id) {
@@ -11392,7 +12286,7 @@ Skull Damage x4
 	            
 	            updateFields[fieldToUpdate] = skillLevel;
 	            
-	            setAttrs(updateFields);
+	            setAttrs(updateFields, {silent: false});
 	            
 	        });
 	        
@@ -11439,7 +12333,7 @@ Skull Damage x4
 	    return baseLevel;
 	}
 	
-		/**
+	/**
 	 * This function is used to make sure the repeating 
 	 * skill levels are updated when the version has changed
 	 */
@@ -11509,8 +12403,8 @@ Skull Damage x4
 	            var updateFields = {};
 	            
 	            updateFields[fieldToUpdate] = skillLevel;
-	            
-	            setAttrs(updateFields);
+	             
+	            setAttrs(updateFields, {silent: false});
 	            
 	        });
 	        
@@ -11555,6 +12449,128 @@ Skull Damage x4
         
 	}
 	
+	/**
+	 * Loops through each designated section and make sure the
+	 * linked skills have the correct information.
+	 */
+	function updateLinkedSkills(sectionName, subName) {
+	    
+	    getSectionIDs(sectionName, function(ids) {
+    	
+    	    // loop through each row
+    	    _.each(ids,function(id) {
+            
+				var rowType = `${sectionName}_${id}_${subName}_row_type`;
+	   
+	            var linkedRowId = `${sectionName}_${id}_${subName}_skill_row_id`;
+	            
+	            var linkedSkillMod = `${sectionName}_${id}_${subName}_skill_row_id_modifier`;
+			
+			    var skillMessageFieldName = `${sectionName}_${id}_${subName}_skill_row_id_message`;
+	    
+	            var skillMessageFieldLevel = `${sectionName}_${id}_${subName}_skill_row_id_level`;
+	            
+	            var weaponSkillFieldName = `${sectionName}_${id}_${subName}_skill`;
+	    
+	            // if this gets changed, then the update linked weapon skill gets triggered
+	            var skillRowIdToggleFieldName = `${sectionName}_${id}_${subName}_skill_row_id_toggle`;
+	    
+	            var attributes = [
+			            rowType,
+			            linkedRowId,
+			            linkedSkillMod,
+			            skillMessageFieldName,
+			            skillMessageFieldLevel,
+			            weaponSkillFieldName
+			        ];
+			        
+			    getAttrs(attributes, function(values) {
+			        
+			        var repeatingTableToUse = "";
+			        
+			        var rowTypeValue = values[rowType];
+	    
+            	    switch (rowTypeValue) {
+            	        
+            	        case "Technique":
+            	            repeatingTableToUse = "repeating_techniquesrevised";
+            	            break;
+            	            
+            	        case "Spell":
+            	            repeatingTableToUse = "repeating_spells";
+            	            break;
+            	            
+            	        case "Skill":
+            	        default:
+                            repeatingTableToUse = "repeating_skills";
+            	            break;
+            	            
+            	    }
+            	    
+            	    var skillRowId = values[linkedRowId];
+		    
+        		    var skillMod = +values[linkedSkillMod];
+        		    
+        		    // exit if there's no value
+        		    if (skillRowId.length === 0) {
+        		        
+        		        // clear the field
+        		        var updateFields = {};
+        		        
+        		        updateFields[skillMessageFieldName] = ``;
+            	            
+            	        updateFields[skillMessageFieldLevel] = "";
+            	        
+            	        setAttrs(updateFields);
+            	        
+        		    } else if ( validSkillRowId(skillRowId) ) {
+        		        
+        		        // if it's a good row id, let's update stuff
+        		        var skillFieldName = `${repeatingTableToUse}_${skillRowId}_level_mirror`;
+        		        
+        		        var skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
+        		        
+        		        // update the skill level for weapon or linked technique.
+        		        getAttrs([skillFieldName, skillFieldNameOfSkill], function(values) {
+        
+        		            var skillLevel = +values[skillFieldName];
+        		            
+        		            var skillLevelFinal = skillLevel + linkedSkillMod;
+        		            
+        		            var updateFields = {};
+        	            
+            	            updateFields[weaponSkillFieldName] = skillLevelFinal;
+            	            
+            	            updateFields[skillMessageFieldName] = values[skillFieldNameOfSkill];
+            	            
+            	            updateFields[skillMessageFieldLevel] = skillLevel;
+            	            
+            	            // reset toggle to zero
+            	            updateFields[skillRowIdToggleFieldName] = 0;
+            	            
+            	            setAttrs(updateFields);
+        		            
+        		        });
+        		        
+        		    } else {
+        		        
+        		        // show an error message
+        		        var updateFields = {};
+        		        
+        		        updateFields[skillMessageFieldName] = `Could not find ${rowTypeValue}.`;
+            	            
+            	        setAttrs(updateFields);
+            	            
+        		    }
+			        
+			    });
+			
+			});
+    	
+    	});
+    	
+	}
+	
 	// see: https://stackoverflow.com/questions/3954438/how-to-remove-item-from-array-by-value
 	Array.prototype.remove = function() {
         var what, a = arguments, L = a.length, ax;
@@ -11578,75 +12594,37 @@ Skull Damage x4
         return arr;
     }
     
-	on("change:repeating_spells:spell_on_checked", function(event) {
-	   
-        var fields = [
-	            "repeating_spells_spell_on_checked",
-	            "penalty_per_spell_on",
-	            "spell_on_penalty_total"
-	        ];
-	        
-	    getAttrs( fields, function(values) {
-	        
-	        var currentPenalty = +values.spell_on_penalty_total;
-	        
-	        var perSpellPenalty = +values.penalty_per_spell_on;
-	        
-	        var checked = +values.repeating_spells_spell_on_checked;
-	        
-	        var newTotalPenalty = getSpellPenaltyForOnOrMaintained(checked, currentPenalty, perSpellPenalty);
-	        
-	        setAttrs({
-	            spell_on_penalty_total: newTotalPenalty
-	        })
-	        
-	    });
-	    
+	// method to reduce async calls.
+	['on','maintained'].forEach(onormaintained => {
+		
+		on(`change:repeating_spells:spell_${onormaintained}_checked change:penalty_per_spell_${onormaintained} remove:repeating_spells`, function (event) {
+		
+			getSectionIDs('repeating_spells', ids => {
+		
+				const fieldnames = [];
+		
+				ids.forEach(id => fieldnames.push(`repeating_spells_${id}_spell_${onormaintained}_checked`));
+
+				getAttrs([`penalty_per_spell_${onormaintained}`, ...fieldnames], values => {
+
+					const penalty = +values[`penalty_per_spell_${onormaintained}`] ||0;
+		
+					let checkedcount = 0;
+		
+					ids.forEach(id => checkedcount += ((+values[`repeating_spells_${id}_spell_${onormaintained}_checked`] || 0) > 0) ? 1: 0);
+
+					const totalpenalty = checkedcount * penalty;
+		
+					setAttrs({
+						[`spell_${onormaintained}_penalty_total`]: totalpenalty
+					})
+		
+				});
+			});
+		});
 	});
-	
-	on("change:repeating_spells:spell_maintained_checked", function(event) {
-	   
-        var fields = [
-	            "repeating_spells_spell_maintained_checked",
-	            "penalty_per_spell_maintained",
-	            "spell_maintained_penalty_total"
-	        ];
-	        
-	    getAttrs( fields, function(values) {
-	        
-	        var currentPenalty = +values.spell_maintained_penalty_total;
-	        
-	        var perSpellPenalty = +values.penalty_per_spell_maintained;
-	        
-	        var checked = +values.repeating_spells_spell_maintained_checked;
-	        
-	        var newTotalPenalty = getSpellPenaltyForOnOrMaintained(checked, currentPenalty, perSpellPenalty);
-	        
-	        setAttrs({
-	            spell_maintained_penalty_total: newTotalPenalty
-	        })
-	        
-	    });
-	    
-	});
-	
-	function getSpellPenaltyForOnOrMaintained(checked, currentPenalty, perSpellPenalty) {
-	    
-	    var newTotalPenalty = 0;
-	        
-        if (checked) {
-            
-            newTotalPenalty = currentPenalty + perSpellPenalty;
-            
-        } else {
-            
-            newTotalPenalty = currentPenalty - perSpellPenalty;
-            
-        }
-        
-        return newTotalPenalty;
-	}
-	
+							 
+
 	/* ---- DEMOLITION SECTION ---- */
 	
 	const DEMO_TYPES = [
@@ -11667,9 +12645,9 @@ Skull Damage x4
 	];
 	
 	// check for how much? damage
-	on("change:demo_how_much_ref change:demo_how_much_damage_multiplier", function (event) {
+	on("change:demo_how_much_ref change:demo_how_much_damage_multiplier change:demo_how_much_base_damage change:demo_how_much_divisor change:demo_how_much_target_distance", function (event) {
 	    
-	    getAttrs(["demo_how_much_ref", "demo_how_much_damage_multiplier"], function(values) {
+	    getAttrs(["demo_how_much_ref", "demo_how_much_base_damage", "demo_how_much_damage_multiplier", "demo_how_much_divisor", "demo_how_much_target_distance"], function(values) {
 	        
 	        var multiplier = +values.demo_how_much_damage_multiplier;
 	        
@@ -11679,18 +12657,60 @@ Skull Damage x4
 	        
 	        var result = weight.toFixed(2);
 	        
+	        // determine damage divisor
+	        var divisor = 1;
+	        
+	        var targetDistance = parseInt(values.demo_how_much_target_distance);
+	        
+	        var baseDivisor = parseInt(values.demo_how_much_divisor);
+	        
+	        // if target is 1 or more yards away, determine divisor
+	        if (targetDistance > 0) {
+	            
+	            divisor = baseDivisor * targetDistance;
+	            
+	        }
+	        
+	        // determine blast radius
+	        var diceCount = getNumberOfDiceToRoll(values.demo_how_much_base_damage);
+	        
+	        // see B414
+	        var blastRadius = diceCount * multiplier * 2;
+	        
 	        setAttrs({
-	            demo_how_much_weight: result
+	            demo_how_much_weight: result,
+	            demo_how_much_damage_divisor: divisor,
+	            demo_how_much_radius: blastRadius
 	        });
 	        
 	    });
 	    
 	});
 	
-	// check for how big? damage
-	on("change:demo_how_big_ref change:demo_how_big_weight", function (event) {
+	/**
+	 * Determines the number of dice in a simple roll value
+	 * If 3d6+2, it will return 3. The number of dice to roll.
+	 * 
+	 * @param string rollString Roll value to parse
+	 * 
+	 * @return int
+	 */
+	function getNumberOfDiceToRoll(rollString) {
 	    
-	    getAttrs(["demo_how_big_ref", "demo_how_big_weight"], function(values) {
+	    rollString = rollString.toLowerCase();
+	    
+	    var arrRoll = rollString.split("d");
+	    
+	    var diceCount = +arrRoll[0];
+	    
+	    return diceCount;
+	    
+	}
+	
+	// check for how big? damage
+	on("change:demo_how_big_ref chage:demo_how_big_base_damage change:demo_how_big_weight change:demo_how_big_divisor change:demo_how_big_target_distance", function (event) {
+	    
+	    getAttrs(["demo_how_big_ref", "demo_how_big_base_damage", "demo_how_big_weight", "demo_how_big_divisor", "demo_how_big_target_distance"], function(values) {
 	        
 	        var multiplier = 0;
 	        
@@ -11706,8 +12726,30 @@ Skull Damage x4
     	        
 	        }
 	        
+	        // determine damage divisor
+	        var divisor = 1;
+	        
+	        var targetDistance = parseInt(values.demo_how_big_target_distance);
+	        
+	        var baseDivisor = parseInt(values.demo_how_big_divisor);
+	        
+	        // if target is 1 or more yards away, determine divisor
+	        if (targetDistance > 0) {
+	            
+	            divisor = baseDivisor * targetDistance;
+	            
+	        }
+	        
+	        // determine blast radius
+	        var diceCount = getNumberOfDiceToRoll(values.demo_how_big_base_damage);
+	        
+	        // see B414
+	        var blastRadius = diceCount * multiplier * 2;
+	        
 	        setAttrs({
-	            demo_how_big_damage_multiplier: multiplier
+	            demo_how_big_damage_multiplier: multiplier,
+	            demo_how_big_damage_divisor: divisor,
+	            demo_how_big_radius: blastRadius
 	        });
 	        
 	    });
@@ -11783,7 +12825,7 @@ Skull Damage x4
         
     });
     
-    on("change:total_value change:total_weight", function(event) {
+    on("change:total_value change:total_weight change:weight", function(event) {
         
         getAttrs(["weight", "total_weight"], function (values) {
             
@@ -11825,5 +12867,106 @@ Skull Damage x4
         });
         
     });
+    
+    on("change:fragmentation_damage", function(event) {
+        
+        getAttrs(["fragmentation_damage"], function(values) {
+            
+             var diceCount = getNumberOfDiceToRoll(values.fragmentation_damage);
+             
+             var radius = 5 * diceCount;
+             
+             setAttrs({
+                 fragmentation_radius: radius
+             });
+            
+        });
+        
+	});
 	
+	/* ====================== */
+	/*   TECHNIQUES REVISED   */
+	/* ====================== */
+		
+	// check for changes that effect final technique level
+	on("change:repeating_techniquesrevised:base_level change:repeating_techniquesrevised:default change:repeating_techniquesrevised:max_modifier change:repeating_techniquesrevised:difficulty change:repeating_techniquesrevised:skill_modifier change:repeating_techniquesrevised:points", function(event) {
+
+		var technigueFields = [
+			"repeating_techniquesrevised_base_level",
+			"repeating_techniquesrevised_default",
+			"repeating_techniquesrevised_max_modifier",
+			"repeating_techniquesrevised_difficulty",
+			"repeating_techniquesrevised_skill_modifier",
+			"repeating_techniquesrevised_points"
+		];
+
+		getAttrs(technigueFields, function(values) {
+
+			var finalLevel = 10;
+
+			var baseLevel = +values.repeating_techniquesrevised_base_level;
+
+			var defaultMod = +values.repeating_techniquesrevised_default;
+
+			var customSkillModifier = +values.repeating_techniquesrevised_skill_modifier;
+			var maxModifier = 0;
+
+			var maxLevel = 0;
+
+			var techPoints = +values.repeating_techniquesrevised_points;
+
+			var technigueSkillMod = getModifierForTechniqueDifficulty(values.repeating_techniquesrevised_difficulty, techPoints);
+
+			if (values.repeating_techniquesrevised_max_modifier) {
+
+				maxModifier = +values.repeating_techniquesrevised_max_modifier;
+
+				maxLevel = baseLevel + maxModifier;	
+
+			}
+			
+			finalLevel = baseLevel + defaultMod + technigueSkillMod + customSkillModifier;
+
+			// check for max level
+			if (maxLevel > 0 && finalLevel > maxLevel) {
+
+				// the finalLevel can't exceed maxLevel
+				finalLevel = maxLevel;
+
+			} 
+			
+			setAttrs({
+				repeating_techniquesrevised_level: finalLevel
+			});
+
+		});
+
+	});
+
+	/**
+	 * Calculate the technique skill modifier based
+	 * difficulty level. see B230
+	 */
+	function getModifierForTechniqueDifficulty(difficultyLevel, points) {
+
+		var mod = 0;
+
+		if (points > 0) {
+
+			if (difficultyLevel.toLowerCase() == "average") {
+
+				mod = points;
+
+			} else if (points > 1) {
+
+				// Hard requires a minimum of 2 spoint be spent.
+				mod = points - 1;
+			}
+
+		}
+
+		return mod;
+
+	}
+
 </script>
