@@ -1,6 +1,6 @@
-input(name='attr_version' type='hidden' value='3.03')
+input(name='attr_version' type='hidden' value='4.0')
 
-//- CHARACTER SHETE PAGE
+//- CHARACTER SHEET PAGE
 input.sheet_type(name='attr_sheet_type' type='hidden' value='pc')
 
 //- CHARACTER TYPE (MUNDANE < MAGIC < RESONANCE)
@@ -32,7 +32,7 @@ include src/pug/_variables.pug
 				input.whisper-toggle(name='attr_'+key+'_toggle' type='checkbox' value=val)
 				span.slider
 		button(name='d6' title='Roll D6s' type='roll' value!='@{gm_toggle} &{template:rolls}{{header=^{d6}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5)]]}}') L
-		input(name='attr_tab' type='hidden' value='core')
+		input(name='attr_tab' type='hidden' value='options')
 		button.pictos(name='act_tab_options' title='@{tab}' type='action' ) y
 		each val in ['core', 'arms', 'augs', 'gear', 'magic', 'matrix', 'social', 'vehicle']
 			button(data-i18n=val name='act_tab_'+val type='action' title='@{tab}') #{val}
@@ -454,7 +454,7 @@ include src/pug/_variables.pug
 											option(data-i18n='ritualspellcasting' value='@{ritualspellcasting}' selected) Ritual Spellcasting
 										h3(data-i18n='specialization') specialization
 										label(data-i18n-title='specialization' title='specialization')
-											input(name='attr_spec' title=`@{${repeatingRitualSection}_spec}` type='checkbox' value='2')
+											input(name='attr_specialization' title=`@{${repeatingRitualSection}_specialization}` type='checkbox' value='2')
 										h3(data-i18n='modifier') modifier
 										label(data-i18n-title='modifier' title='modifier')
 											input(name='attr_dicepool_modifier' title=`@{${repeatingRitualSection}_dicepool_modifier}` type='number')
@@ -503,20 +503,21 @@ include src/pug/_variables.pug
 								+repeatingSectionNotes('programs')
 		.pc-row
 			.header.right-header
-				h1(data-i18n='complexform') Complex Forms
+				h1(data-i18n='complex form') Complex Forms
 				.right-tri
 			.border-box
 				.pc-box.medium-box
 					+fadeDrainSection('fade')
 					.rows.repeating-container.complex-forms
-						- const formsrepeatingSection = `@{repeating_forms`+'_${x}';
+						- const formsrepeatingSection = `@{repeating_forms_` + "${x}";
 						.row-long.headers
-							each val, key in {'Complex Form': 'complexform','Target':'target', 'Duration': 'duration', 'Fade': 'fade'}
-								h2(data-i18n=val) #{key}
+							each val in complexFormAttributes
+								h2.text-capitalize(data-i18n=val)
 						fieldset(class=`repeating_forms`)
 							input(name='attr_dicepool' type='hidden' value='0')
 							+displayRollButton(pcComplexFormButton, true)
-							each val in ['target', 'duration', 'fade']
+							- const complexFormSpans = complexFormAttributes.shift();
+							each val in complexFormSpans
 								span.center(name=`attr_${val}`)
 							+repeatingSectionFlags()
 							.settings
@@ -524,12 +525,10 @@ include src/pug/_variables.pug
 									input(name='attr_name' placeholder='name' title=`${formsrepeatingSection}_name}` type='text' value='')
 								select(name=`attr_target` title=`${formsrepeatingSection}_target}` value='Device')
 									each val in formTargets
-										- const i18n = val.toLowerCase();
-										option(data-i18n=i18n value=val) #{val}
+										option.text-capitalize(data-i18n=val value=val) #{val}
 								select(name=`attr_duration` title=`${formsrepeatingSection}_duration}` value='Instant')
 									each val in formDurations
-										- const i18n = val.toLowerCase();
-										option(data-i18n=i18n value=val) #{val}
+										option.text-capitalize(data-i18n=val value=val)
 								label(data-i18n-title='fade' title='fade')
 									input(name='attr_fade'  placeholder='-1' title=`${formsrepeatingSection}_fade}` type='number' value='')
 								.row
@@ -537,7 +536,7 @@ include src/pug/_variables.pug
 									select(name=`attr_skill` title=`${formsrepeatingSection}_skill}` value='@{software}')
 										option(data-i18n='electronicsgroup' value='@{electronics}') Electronics Group
 										option(data-i18n='software' value='@{software}' selected) Software
-									h3(data-i18n='specialization') specialization
+									h3(data-i18n='specialization')
 									label(data-i18n-title='specialization' title='specialization')
 										input(name='attr_spec' value='2' title=`${formsrepeatingSection}_spec}` type='checkbox')
 									h3(data-i18n='modifier') modifier
@@ -569,9 +568,19 @@ include src/html/hidden.html
 //- SCRIPTS
 script(type="text/worker")
 
+	include src/js/attributes.js
+
+	include src/js/versioning.js
+
+	include src/js/helpers.js
+
+	include src/js/eventhandlers.js
+
 	include src/js/scripts.js
 
 	include src/js/importer.js
+
+	include src/js/importerUI.js
 
 //- CHUMMER IMPORTER
 include src/html/importer.html

@@ -11,10 +11,13 @@
 				input.whisper-toggle(name='attr_'+key+'_toggle' type='checkbox' value=val)
 				span.slider
 		button(name='d6' title='Roll D6s' type='roll' value='@{gm_toggle} &{template:rolls}{{header=^{d6}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5)]]}}') L
-		select(name='attr_sheet_type' title='Sheet Type')
+		select(name='attr_sheet_type' title='Sheet Type' value='pc')
 			each val in ['Grunt', 'Host', 'Sprite', 'Vehicle', 'PC']
 				- const attrName = val.toLowerCase();
-				option(value=attrName data-i18n=attrName) #{val}
+				if val === 'PC'
+					option(value=attrName data-i18n=attrName selected) #{val}
+				else
+					option(value=attrName data-i18n=attrName) #{val}
 		input(name='attr_stats_toggle' type='checkbox' value='settings' checked)
 		span.pictos y
 	input(name='attr_stats_toggle' type='hidden' value='settings')
@@ -114,7 +117,7 @@
 				+conditionMonitor(['physical', 'matrix'])
 			.rows.host.sprite
 				button(data-i18n='conditionmonitorm' name='act_cond_reset' type='action') Condition Monitor (M)
-				span(name='attr_matrix')
+				span(name='attr_matrix_max')
 
 			//- PHYSICAL, MENTAL, SOCIAL
 			.rows.grunt
@@ -127,13 +130,24 @@
 					span(name=`attr_${attrName}`+'_limit' title='@{'+attrName+'_limit}')
 			
 			//- PAIN TOLERANCE
-			.rows.grunt.pain-tolerance
-				h2(data-i18n='paintolerance') Pain Tolerance
-				label.settings(data-i18n-title='paintolerance' title='paintolerance')
-					input(name='attr_pain_tolerance' min='-1' max='3' placeholder='0' title='@{pain_tolerance}' type='number' value='0')
-				em
-					span(data-i18n='painfooter') Low Pain Tolernace adds a -1 and High Pain Tolerance adds a +1 per rank.
-			
+			.grunt.pain-tolerance
+				.rows.settings
+					h2(data-i18n='high pain tolerance')
+					label(data-i18n-title="high pain tolerance")
+						input(type="number" name="attr_high_pain_tolerance" min="0" value="" placeholder="#" title="@{high_pain_tolerance}")
+				.rows.settings
+					h2(data-i18n='low pain tolerance')
+					label(data-i18n-title="low pain tolerance")
+						input(type="checkbox" name="attr_low_pain_tolerance" value="2" title="@{low_pain_tolerance}")
+				.rows.settings
+					h2(data-i18n='damage compensators')
+					label(data-i18n-title="damage compensators physical")
+						input(type="number" min="0" name="attr_damage_compensators_physical" value="" placeholder="1" title="@{damage_compensators_physical}")
+					span /
+					label(data-i18n-title="damage compensators stun")
+						input(type="number" min="0" name="attr_damage_compensators_stun" value="" placeholder="2" title="@{damage_compensators_stun}")
+
+
 			//- MATRIX ATTRIBUTES
 			.rows.vehicle
 				each val, key in {'Data Processing': ['data_processing', 'data_processing'], 'Firewall': ['firewall', 'firewall'], 'Device Rating': ['device_rating', 'devicerating']}
@@ -340,7 +354,7 @@
 
 		//- COMPLEX FORMS
 		.rows.grunt.repeating.forms.hide-resonance
-			h1(data-i18n='complexform') Complex Forms
+			h1(data-i18n='complex form') Complex Forms
 			fieldset(class='repeating_form')
 				input(name='attr_flag' title='Settings toggle' type='checkbox' checked)
 				span.pictos x
