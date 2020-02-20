@@ -42,7 +42,12 @@ on Github.
 
 ## Changelog
 
-### 2.5.5
+### 2.4.6
+
+* Add a box to keep track of attribute boosts.
+* Fix travel cost macro not calculating travel cost correctly.
+
+### 2.4.5
 
 * Fixed an issue with the travel cost formula when the crew field was empty
 * Fixed an issue with roll buttons referencing the old "name" attribute instead
