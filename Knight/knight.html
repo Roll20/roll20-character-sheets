@@ -989,8 +989,8 @@
 		{
 			setAttrs
 			({
-				monkSalveEffets: "Parasitage 1 / Dispersion 6 / Ultraviolence / Destructeur",
-				monkVagueEffets: "Parasitage 4 / Dispersion 3 / Choc 2",
+				monkSalveEffets: "Parasitage 1 / Dispersion 6 / Ultraviolence / Meurtrier",
+				monkVagueEffets: "Parasitage 4 / Dispersion 3 / Destructeur / Choc 2",
 				monkRayonEffets: "Parasitage 1 / Ignore Armure"
 			});
 		}
@@ -998,8 +998,8 @@
 		{
 			setAttrs
 			({
-				monkSalveEffets: "Parasitage 1 / Dispersion 3 / Ultraviolence / Destructeur",
-				monkVagueEffets: "Parasitage 2 / Dispersion 3 / Choc 2",
+				monkSalveEffets: "Parasitage 1 / Dispersion 3 / Ultraviolence / Meurtrier",
+				monkVagueEffets: "Parasitage 2 / Dispersion 3 / Destructeur / Choc 2",
 				monkRayonEffets: "Parasitage 1 / Perce Armure 40"
 			});
 		}
@@ -2980,6 +2980,60 @@
 			}
 		});
 	});
+	
+	on("sheet:opened",function()
+	{		
+		getAttrs(["DruidLionBF"], function(value)
+		{
+			if(value.DruidLionBF != 1)
+			{
+				getSectionIDs("repeating_armeDruidLion", function (ids) 
+				{
+					_.each(ids,function(id) 
+					{
+						getAttrs(["repeating_armeDruidLion_"+id+"_leste"], function (v) 
+						{
+							var LL = v["repeating_armeDruidLion_"+id+"_leste"];
+							
+							if(LL == "{{leste=[[@{force}]]}}")
+							{
+								setAttrs({["repeating_armeDruidLion_"+id+"_leste"]: "{{leste=[[@{druidLionChairTot}]]}}"});
+							}
+						});
+						
+					});
+				});
+				setAttrs({DruidLionBF: 1});
+			}
+		});
+	});
+	
+	on("sheet:opened",function()
+	{		
+		getAttrs(["monk250PG"], function(v)
+		{
+			var NV = v["monk250PG"];
+	
+			if(NV == 1)
+			{
+				setAttrs
+				({
+					monkSalveEffets: "Parasitage 1 / Dispersion 6 / Ultraviolence / Meurtrier",
+					monkVagueEffets: "Parasitage 4 / Dispersion 3 / Destructeur / Choc 2",
+					monkRayonEffets: "Parasitage 1 / Ignore Armure"
+				});
+			}
+			else
+			{
+				setAttrs
+				({
+					monkSalveEffets: "Parasitage 1 / Dispersion 3 / Ultraviolence / Meurtrier",
+					monkVagueEffets: "Parasitage 2 / Dispersion 3 / Destructeur / Choc 2",
+					monkRayonEffets: "Parasitage 1 / Perce Armure 40"
+				});
+			}
+		});
+	});
 </script>
 <div class="container">
 	<input type="hidden" name="attr_MAJ" value="0" />
@@ -2994,6 +3048,7 @@
 	<input type="hidden" name="attr_MAJV15LDB_1" value="0" />
 	<input type="hidden" name="attr_MAJV15LDB_2" value="0" />
 	<input type="hidden" name="attr_MAJV15LDB_3" value="0" />
+	<input type="hidden" name="attr_DruidLionBF" value="0" />
 	<div class="logo">
 	</div>
 	<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Knight/knightLogo.png" class="logo" width="350" height="49">
@@ -6177,7 +6232,7 @@ Attention : l’effet ne peut pas se cumuler alors que la cible est déjà sous 
 								<div>
 									<h4 class="titre bouton">
 										Vague d'énergie
-										<button type="roll" name="attr_monkJetVague" class="boutonBase" value="@{jetGM} &{template:monk} {{Nom=@{name}}} @{caracteristique1Monk} @{jetModifDes}+@{styleSimple}+ @{caracteristique2Monk} {{situationnel=[[@{jetModifDes}]]}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[(@{monkVagueDegatDes})d6]]}} {{styleViolBM=[[ [[(floor([[@{monkVagueDegatDes}]]/2))]]d6]]}} {{Arme=Vague d'énergie}} {{Portee=@{monkVaguePortee}}} {{Degats=[[(@{monkVagueDegatDes})D6]]}} {{Violence=[[(@{monkVagueDegatDes})D6]]}} {{Effets=@{monkVagueEffets}}}" />
+										<button type="roll" name="attr_monkJetVague" class="boutonBase" value="@{jetGM} &{template:monk} {{Nom=@{name}}} @{caracteristique1Monk} @{jetModifDes}+@{styleSimple}+ @{caracteristique2Monk} {{situationnel=[[@{jetModifDes}]]}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[(@{monkVagueDegatDes})d6]]}} {{styleViolBM=[[ [[(floor([[@{monkVagueDegatDes}]]/2))]]d6]]}} {{Arme=Vague d'énergie}} {{Portee=@{monkVaguePortee}}} {{Degats=[[(@{monkVagueDegatDes})D6]]}} {{Violence=[[(@{monkVagueDegatDes})D6]]}} {{Effets=Parasitage [[@{monkParasitageVagueValue}]] / Dispersion 3 / Choc 2}} {{destructeur=[[2D6]]}}" />
 									</h4>
 									<h4>Dégâts</h4>
 									<h4>Violence</h4>
@@ -6192,7 +6247,7 @@ Attention : l’effet ne peut pas se cumuler alors que la cible est déjà sous 
 								</div>
 								<div class="autoex autoex22">
 									<span name="attr_monkVagueEffets"></span>
-									<textarea name="attr_monkVagueEffets" readonly>Parasitage 2 / Dispersion 3 / Choc 2</textarea>
+									<textarea name="attr_monkVagueEffets" readonly>Parasitage 2 / Dispersion 3 / Destructeur / Choc 2</textarea>
 								</div>
 							</div>
 							
@@ -6203,7 +6258,7 @@ Attention : l’effet ne peut pas se cumuler alors que la cible est déjà sous 
 								<div>
 									<h4 class="titre bouton">
 										Salve d'énergie
-										<button type="roll" name="attr_monkJetSalve" class="boutonBase" value="@{jetGM} &{template:monk} {{Nom=@{name}}} @{caracteristique1Monk} @{jetModifDes}+@{styleSimple}+ @{caracteristique2Monk} {{situationnel=[[@{jetModifDes}]]}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[(@{monkSalveDegatDes})d6]]}} {{styleViolBM=[[ [[(floor([[@{monkSalveDegatDes}]]/2))]]d6]]}} {{Arme=Salve d'énergie}} {{Portee=@{monkSalvePortee}}} {{Degats=[[(@{monkSalveDegatDes})D6]]}} {{Violence=[[(@{monkSalveDegatDes})D6]]}} {{Effets=Parasitage 1 / Dispersion [[@{monkDispersionSalveValue}]]}} {{ultraviolence=[[2D6]]}} {{destructeur=[[2D6]]}}" />
+										<button type="roll" name="attr_monkJetSalve" class="boutonBase" value="@{jetGM} &{template:monk} {{Nom=@{name}}} @{caracteristique1Monk} @{jetModifDes}+@{styleSimple}+ @{caracteristique2Monk} {{situationnel=[[@{jetModifDes}]]}} {{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}} {{styleDgtBM=[[(@{monkSalveDegatDes})d6]]}} {{styleViolBM=[[ [[(floor([[@{monkSalveDegatDes}]]/2))]]d6]]}} {{Arme=Salve d'énergie}} {{Portee=@{monkSalvePortee}}} {{Degats=[[(@{monkSalveDegatDes})D6]]}} {{Violence=[[(@{monkSalveDegatDes})D6]]}} {{Effets=Parasitage 1 / Dispersion [[@{monkDispersionSalveValue}]]}} {{ultraviolence=[[2D6]]}} {{meurtrier=[[2D6]]}}" />
 									</h4>
 									<h4>Dégâts</h4>
 									<h4>Violence</h4>
@@ -6218,7 +6273,7 @@ Attention : l’effet ne peut pas se cumuler alors que la cible est déjà sous 
 								</div>
 								<div class="autoex autoex22">
 									<span name="attr_monkSalveEffets"></span>
-									<textarea name="attr_monkSalveEffets" readonly>Parasitage 1 / Dispersion 3 / Ultraviolence / Destructeur</textarea>
+									<textarea name="attr_monkSalveEffets" readonly>Parasitage 1 / Dispersion 3 / Ultraviolence / Meurtrier</textarea>
 								</div>
 							</div>
 							
@@ -6374,7 +6429,7 @@ Attention : l’effet ne peut pas se cumuler alors que la cible est déjà sous 
 							<div class="limiteArmure psion150">
 								<h4 class="titre bouton">
 									Mode Puppet Master
-									<button name="attr_jetBasePsion" type="roll" class="boutonBase" value="@{jetGM} &{template:simple} {{Nom=@{name}}}  @{caracteristique1Psion} @{jetModifDes}+ @{caracteristique2} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} {{taille=[[@{barbarianGoliath}]]}}" />
+									<button name="attr_jetBasePsion" type="roll" class="boutonBase" value="@{jetGM} &{template:simple} {{Nom=@{name}}}  {{carac1=Aura}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+ @{jetModifDes}+ @{caracteristique2} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} {{taille=[[@{barbarianGoliath}]]}}" />
 								</h4>
 							</div>
 							<div class="limiteArmure psion150">
@@ -7893,7 +7948,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 										<span title="Jumelé (Ambidextrie)"></span>
 									</label>
 									<label class="simple">
-										<input type="checkbox" name="attr_leste" value="{{leste=[[@{force}]]}}" />
+										<input type="checkbox" name="attr_leste" value="{{leste=[[@{druidLionChairTot}]]}}" />
 										<span title="Lesté"></span>
 									</label>
 									<label class="simple">
@@ -13689,7 +13744,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 							<!-- La violence-->
 							<input type="hidden" name="attr_poingMACviolence" value="{{Violence=[[ [[ {[[@{poingMACaCViolence}]], 0}kh1]]d6+@{poingMACaCBViolence}]]}}" />
 							<!-- Bonus de Force -->
-							<input type="hidden" name="attr_poingMACbForce" value="{{force=[[@{force}]]}} {{BonusForce=[[@{forOD}*3]]}}" />
+							<input type="hidden" name="attr_poingMACbForce" value="{{force=[[@{force}]]}} {{BonusForce=[[ [[@{forOD}+@{warriorSoldierA}]]*3]]}}" />
 							<!-- Les styles -->
 							<input type="hidden" name="attr_poingMACstyles" value="{{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}}" />
 							<input type="hidden" name="attr_poingMACstyleBM" value="[[{ [[{@{atkAkimbo}, 0}kl1]], 0}kl1]]+[[{ [[{@{atkAmbidextre}, 0}kl1]],[[{@{atkAmbidextre}, 0}kl1]]}kh1 ]]+[[{@{atkCouvert}, 0}kl1]]+[[{@{atkDefensif}, 0}kl1]]+[[@{atkAgressif}]]" />
@@ -14590,7 +14645,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 							<!-- La violence de l'arme -->
 							<input type="hidden" name="attr_violence" value="{{Violence=[[ [[ {[[@{armeCaCViolence}]], 0}kh1]]d6+@{armeCaCBViolence}]]}}" />
 							<!-- Bonus de Force -->
-							<input type="hidden" name="attr_bForce" value="{{force=[[@{force}]]}} {{BonusForce=[[@{forOD}*3]]}}" />
+							<input type="hidden" name="attr_bForce" value="{{force=[[@{force}]]}} {{BonusForce=[[ [[@{forOD}+@{warriorSoldierA}]]*3]]}}" />
 							<!-- Les styles -->
 							<input type="hidden" name="attr_styles" value="{{@{styleCombat}=@{styleCombat}}} {{style=@{styleCombat}}}" />
 							<input type="hidden" name="attr_styleBM" value="[[{ [[{@{atkAkimbo}+@{akimbo}, 0}kl1]],[[{@{atkAkimbo}+@{jumelle}, 0}kl1]]}kh1 ]]+[[{ [[{@{atkAmbidextre}+@{ambidextrie}, 0}kl1]],[[{@{atkAmbidextre}+@{soeur}, 0}kl1]]}kh1 ]]+[[{@{atkCouvert}+@{tirSecurite}, 0}kl1]]+[[{@{atkDefensif}+@{protectrice}, 0}kl1]]+[[@{atkAgressif}]]" />
@@ -20474,7 +20529,7 @@ Effet : L’arme reçoit un bonus de 3 permanent aux dégâts qu’elle inflige.
 					<div class="limiteArmure ODAur2">
 						<h4 class="h4W30">2</h4>
 						<p class="pWAdjusted">
-							Le personnage, lorsqu’il Aurbat des humains, est toujours attaqué en dernier par les hostiles ou les salopards.
+							Le personnage, lorsqu’il Combat des humains, est toujours attaqué en dernier par les hostiles ou les salopards.
 						</p>
 					</div>
 					<div class="limiteArmure ODAur3">
@@ -24082,7 +24137,15 @@ Attention : l’effet ne peut pas se cumuler alors que la cible est déjà sous 
 				<h5 class="W80">+Destructeur</h5>
 				<h5 class="W20 textCenter">{{destructeur}}</h5>
 			</div>
-		{{/destructeur}}	
+		{{/destructeur}}
+		
+		{{#meurtrier}}
+			<div>
+				<h5 class="W80">+Meurtrier</h5>
+				<h5 class="W20 textCenter">{{meurtrier}}</h5>
+			</div>
+		{{/meurtrier}}
+		
 		{{^modeZen}}
 		<div>
 			<h4 class="W80">Violence</h4>
