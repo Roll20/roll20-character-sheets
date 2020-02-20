@@ -2592,6 +2592,12 @@
 		else if ((shipClass || "").toLowerCase() === "capital") return 4;
 		else return 1;
 	};
+	const getShipPriceMultiplier = (shipClass) => {
+		if ((shipClass || "").toLowerCase() === "frigate") return 10;
+		else if ((shipClass || "").toLowerCase() === "cruiser") return 25;
+		else if ((shipClass || "").toLowerCase() === "capital") return 100;
+		else return 1;
+	}
 	const getAutofillData = (sName, v, data, label) => {
 		// Transforms the stored data to be suitable for
 		// inclusion into the sheet.
