@@ -19,7 +19,9 @@ While this sheet is designed to be as intuitive as possible and to aid in stream
 Author: Momtahan K. | UserID: 117780  
 Design: Martinez A. | UserID: 143652  
 Design Contributor: Obi | UserID: 95940 
+
 Dark Ages Redesign: Jones C| UserID: 3717626
+
 Kudos to: Andreas J. (UserID: 1223200), Matt Zaldivar, Brian Shields, Benjamin Bandelow, for their stirling work which provided a basis for this sheet, and espcially to Konrad J. (UserID: 77736), who's Hero Quest Dice Roller has been invaluable. Special thanks to Beta testers Chros G.(326614) and Jordan L.(46186). Many thanks to BigWhoop (UserID: 2124413) for his work on the first version of Obi's sheet. Massive thanks to Barry Snyder (UserID: 399162) for helping us with API-to-Non-API Toggling through explication and use of his code examples.
 
 A very special thank to https://game-icons.net The below icons were used and are licensed under a Creative Commons Attribution 3.0 Unported License. Water fountain icon - by Delapouite under CC BY 3.0 Oppression icon - by Lorc under CC BY 3.0 Prayer icon - by Lorc under CC BY 3.0 Ent Mouth icon - by Lorc under CC BY 3.0 Spattericon - by Lorc under CC BY 3.0 Wolverine claws icon - by Lorc under CC BY 3.0 Half heart icon - by Lorc under CC BY 3.0 Embraced energy iconby Lorc under CC BY 3.0
