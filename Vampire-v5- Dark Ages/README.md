@@ -1,4 +1,6 @@
 # Character sheet for Vampire The Dark Ages, 5th Edition (v1.0)
+# Based on Character sheet for Vampire The Maquerade, 5th Edition (v2.4)
+
 
 ## Known Bugs
 
