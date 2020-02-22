@@ -10,6 +10,13 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 
 
+Feb 17 2020
+
+- init test not visable fixed
+- Ranged Weapon SB? check box now useable
+
+
+
 Feb 10 2020
 
 - Banner rework, added light/dark mode to settings
@@ -64,6 +71,7 @@ Usage Notes:
 
 Possible additons to come :
 
+- GM/NPC Tab (coming)
 - Condition Tracker
 - Map/Info Tab
 
