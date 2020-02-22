@@ -12,7 +12,7 @@ The names of four skills have changed, however the intent is that the area cover
 
 ## User Guide and Installation Instructions (Please read)
 
-While this sheet is designed to be as intuitive as possible and to aid in stream lining your game there are several key features which are worth being aware of. As such we highly recommend you read the [VtM 5th Edition Sheet Guide](https://wiki.roll20.net/Vampire_The_Masquerade_5th_edition#Welcome_to_The_World_of_Darkness). The [VtM 5th Edition Sheet Guide](https://wiki.roll20.net/Vampire_The_Masquerade_5th_edition#Welcome_to_The_World_of_Darkness) also contains installation instructions and details about the API script.
+This Sheet is based on the Character sheet for Vampire The Maquerade, 5th Edition, as such all notes for that are applicable here. While this sheet is designed to be as intuitive as possible and to aid in stream lining your game there are several key features which are worth being aware of. As such we highly recommend you read the [VtM 5th Edition Sheet Guide](https://wiki.roll20.net/Vampire_The_Masquerade_5th_edition#Welcome_to_The_World_of_Darkness). The [VtM 5th Edition Sheet Guide](https://wiki.roll20.net/Vampire_The_Masquerade_5th_edition#Welcome_to_The_World_of_Darkness) also contains installation instructions and details about the API script.
 
 ## About Us and Thanks
 
@@ -21,6 +21,7 @@ Design: Martinez A. | UserID: 143652
 Design Contributor: Obi | UserID: 95940 
 
 Dark Ages Redesign: Jones C | UserID: 3717626
+Many thanks to the authors of the original Character sheet for Vampire The Maquerade, 5th Edition - without thier hard work, this Dark ages version would not be possible
 
 Kudos to: Andreas J. (UserID: 1223200), Matt Zaldivar, Brian Shields, Benjamin Bandelow, for their stirling work which provided a basis for this sheet, and espcially to Konrad J. (UserID: 77736), who's Hero Quest Dice Roller has been invaluable. Special thanks to Beta testers Chros G.(326614) and Jordan L.(46186). Many thanks to BigWhoop (UserID: 2124413) for his work on the first version of Obi's sheet. Massive thanks to Barry Snyder (UserID: 399162) for helping us with API-to-Non-API Toggling through explication and use of his code examples.
 
@@ -57,7 +58,7 @@ The Banners folder contains many of the images made (in part) by Martinez A. wit
 
 ## Bugs and Updates
 
-If you think anything is missing or you see any bugs, please message me via my [Roll20 Account](https://app.roll20.net/users/117780/)
+If you think anything is missing or you see any bugs, please message me via my [Roll20 Account](https://app.roll20.net/users/3717626/) 
 
 ## Versions
 
