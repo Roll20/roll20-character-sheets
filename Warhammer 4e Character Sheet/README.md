@@ -10,6 +10,18 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 
 
+Feb 24 2020
+
+- NPC tab added, this new tab allows on the fly simple contained NPC rolling without a new character sheets with template integration, fully featured with up to 5 weapons & spells for each NPC. Good for GMs and players.
+- All skill rolls now have Success/Fail msg
+- Heal Adv-Skill: Added new Heal template witch displays IntBonus
+- Advantage Rule selection (from the corebook). See settings tab
+- SL modifier for all simple and dramatic rolls, displays after the SL result {e.g. Success Level -3 | +Mod 0}. SL results also in Bold.
+- Removed Hit location from opposed rolls
+- Defensive Melee weapon tick now adds +1 SL when opposing as per rulebook, uses new SL modifier field (rather then +10 to the target roll)
+
+
+
 Feb 17 2020
 
 - init test not visable fixed
@@ -60,21 +72,21 @@ Dec 24 2019
 
 Usage Notes:
 
-- Wounds: ensure correct Race and HArdy level are chose. Wounds are subtracted by adding damage, and given back by subtracting it.
-- Advantage Field applied to Attacks and Combat Action Skills automatically.
-- For an advanced talent you must select the taken checkbox in order to roll.
-- On Weapons ensure you select the coresponding skill (Melee Basic, Melee Parrying or Ranged Bow or Ranged Blackpowder or other Melee or Ranged Skills)
-- Spells need to have a number in CN and Damage Field or they will not roll correctly, both fields will default to Zero.
-- Extended Channeling, set Accu Ext SL to 0 before beginning a new Channelling action. Increment with Success level of roll until finished. Allows easy tracking of CN v Accu Ext SL for all players.
-
+- SETTING: Check setting (cog) tab ever time when setting up a new Char sheet, and select correct options for your game
+- Wounds: ensure correct Race and Hardy level are chosen. Wounds are subtracted by adding damage, and given back by subtracting it. Will not go our of 0-Max Wounds range.
+- Advantage Field applied to Attacks and appropriate Combat Skills (Cool & Dodge for now) automatically.
+- For an advanced talent you must select the taken checkbox in order for target to be above 0.
+- On Weapons ensure you select the coresponding skill (e.g. Melee Basic, Melee Parrying, Ranged Bow, Ranged Blackpowder etc), and that the correct skill is learned and advance points in it.
+- Arcane Spells need to have a number in CN and Damage Field or they will not roll correctly, both fields will default to Zero.
+- Extended Channelling Test (spellbook tab, Arcane Spells only), set Accu Ext SL to 0 before beginning a new Channelling action. Increment with Success level of roll until finished. Allows easy tracking of CN v Accu Ext SL for all players. (NPC tab has channelling on all spells for simplicity)
+- NPC tab is intended of quick persistent and contained NPC creation without the need for full character sheets for each of them. With template integration, semi featured with conmtained Name / Characteristic / Condition / Advantage ingration and up to 5 weapons & spells for each NPC, and a colapisble notes section. Good for GMs and players. (I would still recommed seperate character sheet for actual bosses). 
 
 
 Possible additons to come :
 
-- GM/NPC Tab (coming)
 - Condition Tracker
-- Map/Info Tab
-
+- 
+- Map/Info Tab (maybe)
 
 
 Enjoy.
