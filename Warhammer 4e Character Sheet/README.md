@@ -14,7 +14,7 @@ Feb 24 2020
 
 - NPC tab added, this new tab allows simple contained NPC mini-cs creation with template integration, featured with up to 5 weapons & spells for each NPC. Good for GMs and players.
 - All skill rolls now have Success/Fail msg
-- Heal Adv-Skill: Added new Heal template witch displays IntBonus
+- Heal Adv-Skill: Added new Heal template which displays IntBonus
 - Optional Advantage Rule selection (core book). See settings tab
 - SL modifier for all simple and dramatic rolls, displays after the SL result {e.g. Success Level -3 | +Mod 0}. SL results now also in Bold.
 - Removed Hit location from opposed rolls.
