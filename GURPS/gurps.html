@@ -24,15 +24,9 @@
 			<div class="content">
 				<h4>GURPS Version <input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Sheet Version" /></h4>
 				<ul>
-					<li>Adjusted the field widths for Techniques (Revised) and Parent Attributes – Cosmetic only.</li>
-					<li>Added new function of ‘Dodge and Drop’ to default Active Defenses.</li>
-					<li>Techniques Table Revised. Points spent on techniques are now totaled correctly. <b>NOTE:</b> When transferring techniques to the revised table, be sure to delete the old technqies, otherwise the total will be wrong.</li>
-					<li>Tecnniques Table Revised. Fix bug where Modifier was not added to the final Technique Skill Level.</li>
-					<li>Quirks/Perks Bugfix. Adding a row did not total the quirks/perks correctly.</li>
-					<li>Repeating Spells, quickly clicking checkboxes prevented correct totals. Using new code provided by GiGs to improve speed.</li>
-					<li>Many ToolTips updated or added.</li>
-					<li>Some slight format changes – Cosmetic Only.</li>
-					<li>Added a Defense Bonus (DB) Notes box to the Active Defense section.</li>
+					<li>Fix spelling errors.</li>
+					<li>To avoid confusion, critical failure will only display the critical failure not.</li>
+					<li>Combine Perks & Quirks into one row. Less scrolling and hopefully improved interface.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset" />View All Updates</button>
@@ -1751,7 +1745,7 @@
     						<span class="tooltip">
     						    Final velocity. Current Velocity - Deceleration.<br />
     						    The final velocity is how you start the turn and is used to<br />
-    						    calculate the deceleration penalty, turn radius, and tigh turn penalty.
+    						    calculate the deceleration penalty, turn radius, and tight turn penalty.
     						</span>
     					</div>
     					<div class="cell colAll label">
@@ -2378,7 +2372,10 @@
 		<!-- this box uses the identifier "traits" for backwards compatibility -->
 
 		<div class="sheet-box sheet-traits">
-			<div class="sheet-table">
+
+			<!-- PERKS AREA -->
+			<div class="sheet-table half-size border">
+
 				<div class="sheet-header">
 					<div class="sheet-cell sheet-col0">Perks</div>
 					<div class="sheet-cell sheet-col1">
@@ -2431,6 +2428,66 @@
 					</div> <!-- .sheet-row -->
 				</fieldset> <!-- .repeating_perks -->
 			</div> <!-- .sheet-table -->
+			<!-- END PERKS AREA -->
+			
+			<!-- QUIRKS AREA -->
+			<div class="sheet-table half-size">
+				<div class="sheet-header">
+					<div class="sheet-cell sheet-col0">Quirks</div>
+					<div class="sheet-cell sheet-col1">
+						<div class="sheet-popup">SCN</div>
+						<span class="sheet-tooltip">
+							Self-control Number OR
+							<br />
+							Frequency of Appearance
+							<br />							
+							<table>
+								<tbody>
+									<tr><td>15 or less</td></tr>
+									<tr><td>12 or less</td></tr>
+									<tr><td>9 or less</td></tr>
+									<tr><td>6 or less</td></tr>
+								</tbody>
+							</table>
+						</span>
+					</div>
+					<div class="sheet-cell sheet-col2"></div>
+					<div class="sheet-cell sheet-col3">Pts</div>
+					<div class="sheet-cell sheet-col4">Ref</div>	
+				</div> <!-- .sheet-header -->
+				<fieldset class="repeating_quirks">
+					<input class="sheet-toggle" type="checkbox" title="Click to show/hide more information." name="attr_quirks_toggle_notes" />
+					<span class="sheet-checkbox"></span>
+					<div class="sheet-row sheet-row-stats">
+						<div class="sheet-cell sheet-col0">
+							<input type="text" name="attr_name" title="Macro table name: repeating_quirks. Field name: name" />
+						</div>
+						<div class="sheet-cell sheet-col1">
+							<input type="number" name="attr_control_rating" title="Macro table name: repeating_quirks. Field name: control_rating" />
+						</div>
+						<div class="sheet-cell sheet-col2">
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Self-control Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{control_rating} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsDSCR" />
+						</div>
+						<div class="sheet-cell sheet-col3">
+							<input type="number" name="attr_points" value="-1" title="Macro table name: repeating_quirks. Field name: points" />
+						</div>
+						<div class="sheet-cell sheet-col4">
+							<input type="text" name="attr_ref" title="Macro table name: repeating_quirks. Field name: ref" />
+						</div>
+					</div> <!-- .sheet-row -->
+					<div class="sheet-row sheet-row-details notebox">
+						<div class="cell col-notebox">
+						    <div class="show-notes">
+						        <input type="checkbox" name="attr_show_notes" value="1" />
+						        <span class="label">Show notes below, in roll template</span>
+						    </div>
+						    <textarea name="attr_notes" title="Macro table name: repeating_quirks. Field name: notes"></textarea>
+						</div>
+					</div> <!-- .sheet-row -->
+				</fieldset> <!-- .repeating_disadvantages -->
+			</div> <!-- .sheet-table -->
+			<!-- END QUIRKS AREA -->
+
 		</div> <!-- .sheet-box .sheet-traits -->
 
 
@@ -2493,67 +2550,6 @@
 				</fieldset> <!-- .repeating_disadvantages -->
 			</div> <!-- .sheet-table -->
 		</div> <!-- .sheet-box .sheet-disadvantages -->
-
-        <!-- _____ _____ QUIRKS BOX _____ _____ -->
-
-		<div class="sheet-box sheet-disadvantages">
-			<div class="sheet-table">
-				<div class="sheet-header">
-					<div class="sheet-cell sheet-col0">Quirks</div>
-					<div class="sheet-cell sheet-col1">
-						<div class="sheet-popup">SCN</div>
-						<span class="sheet-tooltip">
-							Self-control Number OR
-							<br />
-							Frequency of Appearance
-							<br />							
-							<table>
-								<tbody>
-									<tr><td>15 or less</td></tr>
-									<tr><td>12 or less</td></tr>
-									<tr><td>9 or less</td></tr>
-									<tr><td>6 or less</td></tr>
-								</tbody>
-							</table>
-						</span>
-					</div>
-					<div class="sheet-cell sheet-col2"></div>
-					<div class="sheet-cell sheet-col3">Pts</div>
-					<div class="sheet-cell sheet-col4">Ref</div>	
-				</div> <!-- .sheet-header -->
-				<fieldset class="repeating_quirks">
-					<input class="sheet-toggle" type="checkbox" title="Click to show/hide more information." name="attr_quirks_toggle_notes" />
-					<span class="sheet-checkbox"></span>
-					<div class="sheet-row sheet-row-stats">
-						<div class="sheet-cell sheet-col0">
-							<input type="text" name="attr_name" title="Macro table name: repeating_quirks. Field name: name" />
-						</div>
-						<div class="sheet-cell sheet-col1">
-							<input type="number" name="attr_control_rating" title="Macro table name: repeating_quirks. Field name: control_rating" />
-						</div>
-						<div class="sheet-cell sheet-col2">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Self-control Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{control_rating} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsDSCR" />
-						</div>
-						<div class="sheet-cell sheet-col3">
-							<input type="number" name="attr_points" value="-1" title="Macro table name: repeating_quirks. Field name: points" />
-						</div>
-						<div class="sheet-cell sheet-col4">
-							<input type="text" name="attr_ref" title="Macro table name: repeating_quirks. Field name: ref" />
-						</div>
-					</div> <!-- .sheet-row -->
-					<div class="sheet-row sheet-row-details notebox">
-						<div class="cell col-notebox">
-						    <div class="show-notes">
-						        <input type="checkbox" name="attr_show_notes" value="1" />
-						        <span class="label">Show notes below, in roll template</span>
-						    </div>
-						    <textarea name="attr_notes" title="Macro table name: repeating_quirks. Field name: notes"></textarea>
-						</div>
-					</div> <!-- .sheet-row -->
-				</fieldset> <!-- .repeating_disadvantages -->
-			</div> <!-- .sheet-table -->
-		</div> <!-- .sheet-box .sheet-disadvantages -->
-
 
 		<!-- _____ _____ RACIAL Traits BOX _____ _____ -->
 
@@ -3210,7 +3206,7 @@
 					    <div class="sheet-popup">Diff</div>
 						<span class="sheet-tooltip">
 							Difficulty of technique.<br />
-							Feats with severe consquences on a failure<br />
+							Feats with severe consequences on a failure<br />
 							or allow only one attempt are Hard.<br />
 							see Techniques B229
 						</span>
@@ -4039,7 +4035,7 @@
 							<strong>mxn</strong>: fires the first number of shots, which each then<br />
 							split into the second number (eg. shotguns)
 							<br />
-							<strong>Jet</strong>: shoots a continuous stream of fliud. See page 106.
+							<strong>Jet</strong>: shoots a continuous stream of fluid. See page 106.
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col7">
@@ -4351,7 +4347,7 @@
 							<strong>mxn</strong>: fires the first number of shots, which each then<br />
 							split into the second number (eg. shotguns)
 							<br />
-							<strong>Jet</strong>: shoots a continuous stream of fliud. See page 106.
+							<strong>Jet</strong>: shoots a continuous stream of fluid. See page 106.
 						</span>
 					</div>
 					<div class="sheet-cell sheet-col7">
@@ -4726,7 +4722,7 @@
 				    <div class="cell input">
 						<div class="popup">REF</div>
 						<span class="tooltip">
-						    Relative Explosive Force, equivilence in pounds of TNT.<br />
+						    Relative Explosive Force, equivalence in pounds of TNT.<br />
 						    TNT = 1.0. See B415.
 						</span>
 					</div>
@@ -5469,9 +5465,19 @@
 	<h4>Version: <span name="attr_announcement_version"></span></h4>
 
 	<p>Pull Request: <span name="attr_latest_changes"></span></p>
-	
+
 	<ul>
-		<li>Changes, Fixes, and Adds made by a combind effort from MadCode (UserID: 945642) and Mike W (UserID: 1414610)</li>
+		<li>Fix spelling errors.</li>
+		<li>To avoid confusion, critical failure will only display the critical failure not.</li>
+		<li>Combine Perks & Quirks into one row. Less scrolling and hopefully improved interface.</li>
+	</ul>
+
+	<h4>Version 2.2.1</h4>
+	
+	<p>Pull Request: 02/18/2020</p>
+
+	<ul>
+		<li>Changes, Fixes, and Adds made by a combined effort from MadCode (UserID: 945642) and Mike W (UserID: 1414610)</li>
 		<li>Adjusted the field widths for Techniques (Revised) and Parent Attributes – Cosmetic only.</li>
 		<li>Added new function of ‘Dodge and Drop’ to default Active Defenses.</li>
 		<li>Techniques Table Revised. Points spent on techniques are now totaled correctly. <b>NOTE:</b> When transferring techniques to the revised table, be sure to delete the old technqies, otherwise the total will be wrong.</li>
@@ -5509,7 +5515,7 @@
 		<li>Updated alerts due to HP and/or FP loss in Red – Cosmetic Only</li>
 		<li>Added ToolTips to ‘Reason for MOD’ with some examples – Cosmetic Only</li>
 		<li>Added a title to the Speed button to remind you that you must select a Token first – Cosmetic Only</li>
-		<li>Added missingmacro name title for Current HP – Cosmetic Only</li>
+		<li>Added missing macro name title for Current HP – Cosmetic Only</li>
 		<li>Add to Turn Order macro for Initiative has been revised to help eliminate ties – Suggested by Jared (UserID: 1026445)</li>
 		<li>When adding a new spell, it will now input 1 point automatically to avoid 0 point spells.</li>
 	</ul>
@@ -6204,11 +6210,8 @@ See notes for weapon.</textarea>
                                 {{/rollTotal() defenseType 3}}
                                 
                                 <!-- block custom critical failure note -->
-                                {{#customFailNote}}
-                                    <p><span class="failure-note-label">Fail:</span> {{customFailNote}}</p>
-                                {{/customFailNote}}
                                 {{#customCriticalFailNote}}
-                                    <p><span class="failure-note-label">Crit:</span> {{customCriticalFailNote}}</p>
+                                    <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                 {{/customCriticalFailNote}}
                                     
                             </span>
@@ -6257,11 +6260,8 @@ See notes for weapon.</textarea>
                                     {{/rollTotal() defenseType 3}}
                                     
                                     <!-- block custom critical failure note -->
-                                    {{#customFailNote}}
-                                        <p><span class="failure-note-label">Fail:</span> {{customFailNote}}</p>
-                                    {{/customFailNote}}
                                     {{#customCriticalFailNote}}
-                                        <p><span class="failure-note-label">Crit:</span> {{customCriticalFailNote}}</p>
+                                        <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                     {{/customCriticalFailNote}}
                                     
                                 {{/rollLess() effectiveSkill 16}}
@@ -6386,11 +6386,8 @@ See notes for weapon.</textarea>
                                             {{/rollTotal() defenseType 3}}
                                             
                                             <!-- block custom critical fail note -->
-                                            {{#customFailNote}}
-                                                <p><span class="failure-note-label">Fail:</span> {{customFailNote}}</p>
-                                            {{/customFailNote}}
                                             {{#customCriticalFailNote}}
-                                                <p><span class="failure-note-label">Crit:</span> {{customCriticalFailNote}}</p>
+                                                <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
                                             
                                         {{/rollGreater() rollResult 12}}
@@ -6429,11 +6426,8 @@ See notes for weapon.</textarea>
                                             {{/rollTotal() defenseType 3}}
                                             
                                             <!-- block custom critical fail note -->
-                                            {{#customFailNote}}
-                                                <p><span class="failure-note-label">Fail:</span> {{customFailNote}}</p>
-                                            {{/customFailNote}}
                                             {{#customCriticalFailNote}}
-                                                <p><span class="failure-note-label">Crit:</span> {{customCriticalFailNote}}</p>
+                                                <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
                                             
                                         {{/rollGreater() rollResult 13}}
@@ -6472,11 +6466,8 @@ See notes for weapon.</textarea>
                                             {{/rollTotal() defenseType 3}}
                                             
                                             <!-- block custom critical fail note -->
-                                            {{#customFailNote}}
-                                                <p><span class="failure-note-label">Fail:</span> {{customFailNote}}</p>
-                                            {{/customFailNote}}
                                             {{#customCriticalFailNote}}
-                                                <p><span class="failure-note-label">Crit:</span> {{customCriticalFailNote}}</p>
+                                                <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
                                             
                                         {{/rollGreater() rollResult 14}}
@@ -6515,11 +6506,8 @@ See notes for weapon.</textarea>
                                             {{/rollTotal() defenseType 3}}
                                             
                                             <!-- block custom critical fail note -->
-                                            {{#customFailNote}}
-                                                <p><span class="failure-note-label">Fail:</span> {{customFailNote}}</p>
-                                            {{/customFailNote}}
                                             {{#customCriticalFailNote}}
-                                                <p><span class="failure-note-label">Crit:</span> {{customCriticalFailNote}}</p>
+                                                <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
                                             
                                         {{/rollGreater() rollResult 15}}
@@ -6558,11 +6546,8 @@ See notes for weapon.</textarea>
                                             {{/rollTotal() defenseType 3}}
                                             
                                             <!-- block custom critical fail note -->
-                                            {{#customFailNote}}
-                                                <p><span class="failure-note-label">Fail:</span> {{customFailNote}}</p>
-                                            {{/customFailNote}}
                                             {{#customCriticalFailNote}}
-                                                <p><span class="failure-note-label">Crit:</span> {{customCriticalFailNote}}</p>
+                                                <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
                                             
                                         {{/rollGreater() rollResult 16}}
@@ -7089,9 +7074,9 @@ See notes for weapon.</textarea>
 
 	var noop = function () {}; // do nothing.
 
-	var version = "2.2.1";
+	var version = "2.2.2";
 	
-	var latestChangesDate = "02/18/2020";
+	var latestChangesDate = "02/25/2020";
 
 	var modCascade = true;
 	
@@ -8112,7 +8097,7 @@ See notes for weapon.</textarea>
             
             if (ids.length === 0) return;
             
-            const items = {}; // initialise an object to hold fields to update.
+            const items = {}; // initialize an object to hold fields to update.
             
             for(var i=0; i < ids.length; i++) {
                 
@@ -8248,7 +8233,7 @@ See notes for weapon.</textarea>
             `repeating_item_${id}_count`, `repeating_item_${id}_cost`, `repeating_item_${id}_weight`, `repeating_item_${id}_carried`
         ));
         getAttrs(fieldArray, function (item) {
-            const items = {}; // initialise an object to hold the total weights and costs.
+            const items = {}; // initialize an object to hold the total weights and costs.
             ids.forEach(id => {
                 // for each row of the table, calculate the total weight and cost
                 const weight = (+item[`repeating_item_${id}_count`]||0) * (+item[`repeating_item_${id}_weight`]||0) * (+item[`repeating_item_${id}_carried`]||0);
