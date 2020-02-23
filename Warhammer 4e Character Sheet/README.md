@@ -12,14 +12,13 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 Feb 24 2020
 
-- NPC tab added, this new tab allows on the fly simple contained NPC rolling without a new character sheets with template integration, fully featured with up to 5 weapons & spells for each NPC. Good for GMs and players.
+- NPC tab added, this new tab allows simple contained NPC mini-cs creation with template integration, featured with up to 5 weapons & spells for each NPC. Good for GMs and players.
 - All skill rolls now have Success/Fail msg
 - Heal Adv-Skill: Added new Heal template witch displays IntBonus
-- Advantage Rule selection (from the corebook). See settings tab
-- SL modifier for all simple and dramatic rolls, displays after the SL result {e.g. Success Level -3 | +Mod 0}. SL results also in Bold.
-- Removed Hit location from opposed rolls
-- Defensive Melee weapon tick now adds +1 SL when opposing as per rulebook, uses new SL modifier field (rather then +10 to the target roll)
-
+- Optional Advantage Rule selection (core book). See settings tab
+- SL modifier for all simple and dramatic rolls, displays after the SL result {e.g. Success Level -3 | +Mod 0}. SL results now also in Bold.
+- Removed Hit location from opposed rolls.
+- Defensive Melee weapon tick now adds +1 SL when opposing as per rulebook, uses new SL modifier field (rather then +10 to the target roll as before)
 
 
 Feb 17 2020
