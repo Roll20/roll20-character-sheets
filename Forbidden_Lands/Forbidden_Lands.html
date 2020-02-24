@@ -1305,7 +1305,7 @@
                             <option value="-5">-5</option>
                             <option value="-6">-6</option>
                         </select>
-                        <input class="shield-box9 input-number" type="text" name="attr_shield1_bonus_total" value="0" data-i18n-title="shield-bonus-total" title="Total GEAR and SKILL dice included for Parry|Shove. @{shield1_bonus_total}" readonly />	
+                        <input class="shield-box9 input-number" type="text" name="attr_shield1_bonus_total" value="0" data-i18n-title="shield-bonus-total" title="Total BASE, GEAR, and SKILL dice included for Parry|Shove. @{shield1_bonus_total}" readonly />	
                         <input class="shield-box10 sheet-input" type="checkbox" name="attr_shield1_artifact_die_ocho" value="1" data-i18n-title="mighty" title="Mighty">
                         <input class="shield-box11 sheet-input" type="checkbox" name="attr_shield1_artifact_die_eight" value="1" data-i18n-title="mighty" title="Mighty">
                         <input class="shield-box12 sheet-input" type="checkbox" name="attr_shield1_artifact_die_ten" value="1" data-i18n-title="epic" title="Epic">
@@ -3256,7 +3256,7 @@
     /* set armor and shield calcs */
     on("sheet:opened change:melee change:strength_total change:armor1_equiped change:armor1_damage change:armor1_bonus change:armor1_bonus_max change:armor2_equiped change:armor2_damage change:armor2_bonus change:armor2_bonus_max change:shield1_equiped change:shield1_bonus change:shield1_bonus_max change:shield1_bonus_misc", function () {
         clog('Change Detected: Armor/Helmet/Shield');
-        getAttrs(['melee', 'armor1_equiped', 'armor1_bonus', 'armor1_bonus_max', 'armor1_damage', 'armor2_equiped', 'armor2_bonus', 'armor2_bonus_max', 'armor2_damage', 'shield1_equiped', 'shield1_bonus', 'shield1_bonus_misc', 'shield1_bonus_max'], function (values) {
+        getAttrs(['melee', 'strength_total', 'armor1_equiped', 'armor1_bonus', 'armor1_bonus_max', 'armor1_damage', 'armor2_equiped', 'armor2_bonus', 'armor2_bonus_max', 'armor2_damage', 'shield1_equiped', 'shield1_bonus', 'shield1_bonus_misc', 'shield1_bonus_max'], function (values) {
             const armor1_equiped = int(values.armor1_equiped),
                 armor1_bonus = int(values.armor1_bonus),
                 armor1_bonus_max = int(values.armor1_bonus_max),
@@ -3267,13 +3267,14 @@
                 armor2_bonus_max = int(values.armor2_bonus_max),
                 armor2_bonusCap = Math.min(armor2_bonus, armor2_bonus_max), //prevents inputing a higher bonus than the bonus_max value
                 armor2_damage = int(values.armor2_damage),
+                strength_total = int(values.strength_total),
                 melee = int(values.melee),
                 shield1_equiped = int(values.shield1_equiped),
                 shield1_bonus = int(values.shield1_bonus),
                 shield1_bonus_misc = int(values.shield1_bonus_misc),
                 shield1_bonus_max = int(values.shield1_bonus_max),
                 shield1_bonusCap = Math.min(shield1_bonus, shield1_bonus_max), //prevents inputing a higher bonus than the bonus_max value
-                shield1_bonus_total = Math.max((shield1_equiped * (shield1_bonusCap + melee + shield1_bonus_misc))),
+                shield1_bonus_total = Math.max((shield1_equiped * (strength_total + shield1_bonusCap + melee + shield1_bonus_misc))),
                 tempAR1 = (armor1_equiped * (armor1_bonusCap + armor1_damage)),
                 tempAR2 = (armor2_equiped * (armor2_bonusCap + armor2_damage)),
                 tempAR = Math.max((tempAR1 + tempAR2),0); //prevents negative value
