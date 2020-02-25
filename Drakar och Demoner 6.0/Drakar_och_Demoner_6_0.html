@@ -318,6 +318,12 @@
                             <input type="number" name="attr_maxspip" min="0" class="sheet-fardighetstabell">
                         </td>
                     </tr>
+                    <tr>
+                        <td class="sheet-box_alternate_row"><span>Memorerade poäng</span></td>
+                        <td>
+                            <input type="number" name="attr_spimem" min="0" class="sheet-fardighetstabell">
+                        </td>
+                    </tr>
                 </table>
             </div>
             <div>
@@ -998,7 +1004,7 @@
         </div>
     </div>
     <div class="sheet-row">
-        <div class="sheet-col sheet-dod-min">Version 2.1</div>
+        <div class="sheet-col sheet-dod-min">Version 2.2</div>
     </div>
 </div>
 
@@ -1055,8 +1061,42 @@
         });
     };
     
+    /* ===== PARAMETERS ==========
+    destination = the name of the attribute that stores the total quantity
+    section = name of repeating fieldset, without the repeating_
+    fields = the name of the attribute field to be summed
+          can be a single attribute: 'weight'
+          or an array of attributes: ['weight','number','equipped']
+    multiplier (optional) = a multiplier to the entire fieldset total. For instance, if summing coins of weight 0.02, might want to multiply the final total by 0.02.
+    */
+    const repeatingSum = (destination, section, fields, additional, additionalCheckbox, multiplier = 1) => {
+        if (!Array.isArray(fields)) fields = [fields];
+        getSectionIDs(`repeating_${section}`, idArray => {
+            const attrArray = idArray.reduce( (m,id) => [...m, ...(fields.map(field => `repeating_${section}_${id}_${field}`))],[]);
+            getAttrs(attrArray, v => {
+                console.log("===== values of v: "+ JSON.stringify(v) +" =====");
+                     // getValue: if not a number, returns 1 if it is 'on' (checkbox), otherwise returns 0..
+                const getValue = (section, id,field) => parseFloat(v[`repeating_${section}_${id}_${field}`]) || (v[`repeating_${section}_${id}_${field}`] === 'on' ? 1 : 0);
+
+                console.log("===== values of additional: "+ JSON.stringify(additional) +" =====");
+                console.log("===== values of additionalCheckbox: "+ JSON.stringify(additionalCheckbox) +" =====");
+
+                getAttrs([additional, additionalCheckbox], function(values) {
+                    console.log("===== values of values: "+ JSON.stringify(values) +" =====");
+                    let add = parseFloat(values[additional]) * parseFloat(values[additionalCheckbox]);
+
+                    const sumTotal = idArray.reduce((total, id) => total + fields.reduce((subtotal,field) => subtotal * getValue(section, id,field),1),0) + add;
+                    setAttrs({[destination]: sumTotal * multiplier});
+                });
+            });
+        });
+    };
+    
     on('change:repeating_utrustning remove:repeating_utrustning change:totviktrustning change:utrustningantal_display change:utrustningvikt_display change:mynttot', function() {
         beraknaVikt("utrustningtotalla","utrustning",["utrustningvikt","utrustningantal"]);
+    });
+    on('change:repeating_magi remove:repeating_magi change:magikost_display change:magimemorerad_display', function() {
+        repeatingSum("spimem", "magi",["magikost","magimemorerad"], "magikost_display", "magimemorerad_display");
     });
 </script>
 
