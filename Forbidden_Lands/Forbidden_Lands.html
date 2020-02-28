@@ -3606,10 +3606,11 @@ Object.keys(monster_attributes).forEach(skill_name => {
     
     const dicePoolButtons = (which) => {
         clog(`Change Detected: Dice Pool ${which} - button clicked`);
-        getAttrs([attributes[which], getSkill(which), getSkillKey(which)], function (values) {
+        getAttrs([attributes[which], misc[which], getSkill(which), getSkillKey(which)], function (values) {
             // attributes[which] returns the attribute; e.g attributes['Stealth'] gives 'agility_total'
             // getSkill(which) converts the skill name to a valid attribute string: getSkill('Animal Handling') gives 'animal_handling'
-            const stat = int(values[attributes[which]]);
+            const stat = int(values[attributes[which]]),
+                  miscStat = Math.max((int(values[misc[which]])),-3);
             // stat here first gets attributes['Stealth'] which will be, say, 'agility_total' and 
             //  then values['ability_total'] gives you the score from the character sheet.
     
@@ -3620,7 +3621,7 @@ Object.keys(monster_attributes).forEach(skill_name => {
                 attribute: stat > 0 ? stat : 0, // this is a Ternary Operator, it starts with a question (e.g. is stat > 0) 
                 // and if true, returns the bit after the ? and if false returns the bit after the :
                 // you can often replace simple if/then expressions with a single line ternary operator.    
-                skill: int(values[getSkill(which)]),
+                skill: int(values[getSkill(which)]) + miscStat,
                 // uses the translation key
                 gear: 0,
                 current_preset: whichKey,
