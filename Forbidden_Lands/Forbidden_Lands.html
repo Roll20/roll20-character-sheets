@@ -3364,48 +3364,68 @@
     });
     
     /* skill total calcs */
-    const attributes = {
-            // a javascript Object Literal, containing each skill, and its corresponding attribute
-            'Animal Handling': 'empathy_total',
-            Crafting: 'strength_total',
-            Endurance: 'strength_total',
-            Healing: 'empathy_total',
-            Insight: 'wits_total',
-            Lore: 'wits_total',
-            Manipulation: 'empathy_total',
-            Marksmanship: 'agility_total',
-            Melee: 'strength_total',
-            Might: 'strength_total',
-            Move: 'agility_total',
-            Performance: 'empathy_total',
-            Scouting: 'wits_total',
-            'Sleight of Hand': 'agility_total',
-            Stealth: 'agility_total',
-            Survival: 'wits_total'
-        },
-        getSkill = (label) => label.split(' ').join('_').toLowerCase(),
-        // a function to change (for example) "Animal Handling" to "animal_handling"
-        // needed for a couple of functions below
-    
-        getSkillKey = (label) => label.split(' ').join('-').toLowerCase();
-    // a function to change (for example) "Animal Handling" to "animal-handling"
+const attributes = {
+        // a javascript Object Literal, containing each skill, and its corresponding attribute
+        'Animal Handling': 'empathy_total',
+        Crafting: 'strength_total',
+        Endurance: 'strength_total',
+        Healing: 'empathy_total',
+        Insight: 'wits_total',
+        Lore: 'wits_total',
+        Manipulation: 'empathy_total',
+        Marksmanship: 'agility_total',
+        Melee: 'strength_total',
+        Might: 'strength_total',
+        Move: 'agility_total',
+        Performance: 'empathy_total',
+        Scouting: 'wits_total',
+        'Sleight of Hand': 'agility_total',
+        Stealth: 'agility_total',
+        Survival: 'wits_total'
+    },
+    misc = {
+        // a javascript Object Literal, containing each skill, and its corresponding attribute
+        'Animal Handling': 'animal_handling_skill_misc',
+        Crafting: 'crafting_skill_misc',
+        Endurance: 'endurance_skill_misc',
+        Healing: 'healing_skill_misc',
+        Insight: 'insight_skill_misc',
+        Lore: 'lore_skill_misc',
+        Manipulation: 'manipulation_skill_misc',
+        Marksmanship: 'marksmanship_skill_misc',
+        Melee: 'melee_skill_misc',
+        Might: 'might_skill_misc',
+        Move: 'move_skill_misc',
+        Performance: 'performance_skill_misc',
+        Scouting: 'scouting_skill_misc',
+        'Sleight of Hand': 'sleight_of_hand_skill_misc',
+        Stealth: 'stealth_skill_misc',
+        Survival: 'survival_skill_misc'
+    },
+    getSkill = (label) => label.split(' ').join('_').toLowerCase(),
+    // a function to change (for example) "Animal Handling" to "animal_handling"
     // needed for a couple of functions below
-    
-    Object.keys(attributes).forEach(skill_name => {
-        // creates a sheet worker for each skill in attributes - first skill = 'strength', then stat = 'agility', etc
-        // in each worker, stat = the stat (strength, agility, etc) and damages[stat] = the associated damage ('damage'. 'fatigue', etc)
-        const skill = getSkill(skill_name);
-        on(`change:${skill} change:${attributes[skill_name]}`, function () {
-            clog(`${skill} or ${attributes[skill_name]} has changed.`);
-            getAttrs([skill, attributes[skill_name]], function (values) {
-                const stat_score = int(values[attributes[skill_name]]),
-                    skill_score = int(values[skill]);
-                setAttrs({
-                    [skill + '_total']: stat_score + skill_score
-                });
+
+    getSkillKey = (label) => label.split(' ').join('-').toLowerCase();
+// a function to change (for example) "Animal Handling" to "animal-handling"
+// needed for a couple of functions below
+
+Object.keys(attributes).forEach(skill_name => {
+    // creates a sheet worker for each skill in attributes - first skill = 'strength', then stat = 'agility', etc
+    // in each worker, stat = the stat (strength, agility, etc) and damages[stat] = the associated damage ('damage'. 'fatigue', etc)
+    const skill = getSkill(skill_name);
+    on(`change:${skill} change:${attributes[skill_name]} change:${misc[skill_name]}`, function () {
+        clog(`${skill} or ${attributes[skill_name]} or ${misc[skill_name]} has changed.`);
+        getAttrs([skill, attributes[skill_name], misc[skill_name]], function (values) {
+            const stat_score = int(values[attributes[skill_name]]),
+                misc_score = int(values[misc[skill_name]]),
+                skill_score = int(values[skill]);
+            setAttrs({
+                [skill + '_total']: stat_score + misc_score + skill_score
             });
         });
     });
+});
     
     /* set weapon base_total and skill_total */
     on("change:repeating_weapons:weapon_name change:repeating_weapons:weapon_skill change:repeating_weapons:weapon_skill_misc", function () {
@@ -3512,22 +3532,29 @@
         });
     });
     
-    /* Monster strength-based skill total calcs */
-    const monster_attributes = {
-        'crafting monster': 'crafting_monster',
-        'endurance monster': 'endurance_monster',
-        'melee monster': 'melee_monster',
-        'might monster': 'might_monster'
-    };
-    
-    Object.keys(monster_attributes).forEach(skill_name => {
+/* Monster strength-based skill total calcs */
+const monster_attributes = {
+    'crafting monster': 'crafting_monster',
+    'endurance monster': 'endurance_monster',
+    'melee monster': 'melee_monster',
+    'might monster': 'might_monster'
+};
+const monster_misc = {
+    'crafting monster': 'crafting_skill_misc_monster',
+    'endurance monster': 'endurance_skill_misc_monster',
+    'melee monster': 'melee_skill_misc_monster',
+    'might monster': 'might_skill_misc_monster'
+};
+
+Object.keys(monster_attributes).forEach(skill_name => {
     const monster_skill = getSkill(skill_name);
-        on(`change:${monster_skill} change:${monster_attributes[skill_name]}`, function () {
-            clog(`${monster_skill} or ${monster_attributes[skill_name]} has changed.`);
-            getAttrs([monster_skill, monster_attributes[skill_name]], function (values) {
-                const stat_score = int(values[monster_attributes[skill_name]]);
+        on(`change:${monster_skill} change:${monster_attributes[skill_name]} change:${monster_misc[skill_name]}`, function () {
+            clog(`${monster_skill} or ${monster_attributes[skill_name]} or ${monster_misc[skill_name]} has changed.`);
+            getAttrs([monster_skill, monster_attributes[skill_name], monster_misc[skill_name]], function (values) {
+                const stat_score = int(values[monster_attributes[skill_name]]),
+                      misc_score = int(values[monster_misc[skill_name]]);
                 setAttrs({
-                    monster_skill: stat_score
+                    [monster_skill + '_total']: misc_score + stat_score
                 });
             });
         });
