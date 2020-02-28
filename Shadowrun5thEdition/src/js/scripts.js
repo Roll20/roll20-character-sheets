@@ -489,16 +489,20 @@
 					const size  = bas.length;
 					let display = (size > 0 && size <= 20) ? `(${bas})` : (size > 20 ) ? "(" + bas.slice(0, 20) + "...)" : " ";
         			setAttrs({
-                       [`${field}_display_specialization`]: display
+                       [`${eventinfo.triggerName}_display_specialization`]: display
                     });
         		});
         	} else if (source.includes("skill") && type === "player") {
                 getAttrs([`${source}`], (v) => {
+                	console.log(eventinfo)
 					const bas   = v[`${source}`];
 					const size  = bas.length;
 					let display = (size > 0 && size <= 20) ? bas : (size > 20 ) ? bas.slice(0, 20) + "..." : " ";
+
+					console.log(display)
+					console.log(field)
                     setAttrs({
-                       [`${field}_display`]: display
+                       [`${eventinfo.triggerName}_display`]: display
                     });
                 });
             } else if (source.includes("dicepool") && type === "player") {
