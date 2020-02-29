@@ -3606,14 +3606,17 @@ Object.keys(monster_attributes).forEach(skill_name => {
     
     const dicePoolButtons = (which) => {
         clog(`Change Detected: Dice Pool ${which} - button clicked`);
-        getAttrs([attributes[which], misc[which], getSkill(which), getSkillKey(which)], function (values) {
+        getAttrs([attributes[which], misc[which], getSkill(which), getSkillKey(which), getSkill(which) + '_artifact_die_eight', getSkill(which) + '_artifact_die_ocho', getSkill(which) + '_artifact_die_ten', getSkill(which) + '_artifact_die_twelve'], function (values) {
             // attributes[which] returns the attribute; e.g attributes['Stealth'] gives 'agility_total'
             // getSkill(which) converts the skill name to a valid attribute string: getSkill('Animal Handling') gives 'animal_handling'
             const stat = int(values[attributes[which]]),
-                  miscStat = Math.max((int(values[misc[which]])),-3);
+                  miscStat = Math.max((int(values[misc[which]])),-3),
             // stat here first gets attributes['Stealth'] which will be, say, 'agility_total' and 
             //  then values['ability_total'] gives you the score from the character sheet.
-    
+            artifact_die_eight = int(values[getSkill(which) + '_artifact_die_eight']),
+            artifact_die_ocho = int(values[getSkill(which) + '_artifact_die_ocho']),
+            artifact_die_ten = int(values[getSkill(which) + '_artifact_die_ten']),
+            artifact_die_twelve = int(values[getSkill(which) + '_artifact_die_twelve']);
             // used to set the proper translation key
             let whichKey = getTranslationByKey(getSkillKey(which));
     
@@ -3624,6 +3627,10 @@ Object.keys(monster_attributes).forEach(skill_name => {
                 skill: int(values[getSkill(which)]) + miscStat,
                 // uses the translation key
                 gear: 0,
+                artifact_die_eight: artifact_die_eight,
+                artifact_die_ocho: artifact_die_ocho,
+                artifact_die_ten: artifact_die_ten,
+                artifact_die_twelve: artifact_die_twelve,
                 current_preset: whichKey,
                 include_with_roll: ""
             });
