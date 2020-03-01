@@ -1,6 +1,47 @@
 # Das Schwarze Auge 5 - Tsa Edition
 
 ## Änderungen
+
+2020-01-12:
+
+Mit der Überarbeitung des Ausrüstung- und des Artefakte-Tabs ist erste Überarbeitung des Designs abgeschlossen. Die Elemente des Bogens sollten jetzt einheitlicher gestaltet und übersichtlicher angeordnet sein. Dabei habe ich noch einige Ideen für das Inventar sowie den Artefakte-Tab gesammelt, die neben dem NPC-Bogen als nächstes bearbeiten werden.
+
+Features:
+- Je Waffe / Rüstung lassen sich jetzt Textfelder für Anmerkungen/Vorteile/Nachteile ein- und ausblenden.
+- Waffen und Rüstungen haben jetzt Attribute für Bruchfaktor und Strukturpunkte erhalten
+
+Bugfixes:
+- Die Kampftechnik Zweihandhiebwaffen wird wieder angezeigt.
+- Bei Fernkampfwaffen wurde der Schadenbonus durch eine Leiteigenschaft entfernt.
+- Berechnung des Fernkampfmodifikators korrigiert.
+
+2020-01-05:
+
+Neue Features:
+- Es wurden jetzt Effekte hinzugefügt, die genauso funktionieren wie Sonderfertigkeiten. Hierüber kann man Auswirkungen von Zaubern, Liturgien oder Artefakten abbilden. Modifikatoren für Effekte werden an vielen Stellen getrennt von SFs angezeigt.
+- Sonderfertigkeiten sowie Effekte haben jetzt 4 statt 3 Modifikatoren
+- Magie und Götterwirken haben jetzt 5 statt 3 Beschreibungsfelder für Erweiterungen.
+- Die Textfelder für Beschreibungen, Anmerkungen oder Referenzen sind jetzt Textareas, die man aufziehen kann und deutlich mehr Text enthalten können.
+
+- Bei Sonderfertigkeiten und Effekten sind die Modifikatoren und Beschreibung jeweils ein- und ausblendbar. Dazu einfach auf das (+) oder (-) klicken.
+
+- Bei Magie und Götterwirken sind die Merkmale, Erweiterungen sowie Anmerkungen jeweils ein- und ausblendbar. Dazu einfach auf das (+) oder (-) klicken.
+
+
+Das Design wurde überarbeitet:
+- Rahmen und Abstände sollten jetzt einheitlicher gestaltet sein.
+- Der Tab Kampf sollte nun etwas übersichtlicher sein.
+- Es stehen weitere Farboptionen wie Harvena Blue und Farmelor Fire zur Verfügung.
+
+Bugfixes:
+- Der Parade Malus wird jetzt nur einmal berücksichtigt und nicht zweifach.
+- Die Fernkampfwaffen sind jetzt wieder per Radio Button auswählbar.
+
+
+2019-12-20:
+- Tab Sonderfertigkeiten: Änderung Beschreibung von Text zu einer Textarea, damit dort mehr Platz für Notizen ist. Außerdem können Beschreibung und Modifikatoren gezielt ein- und ausgeblendet werden. Außerdem wurde ein vierter Modifikator hinzugefügt
+- Tab Effekte: Es könne jetzt Effekte hinzugefügt werden. Im wesentlichen ist die Funktionalität ähnlich zu den Sonderfertigkeiten. Bei Talenten, Magie, Götterwirken und Kampfwerten werden statt des Sonderfertigkeitsmodifikators ein Effektmodifikator angegeben.
+
 2019-12-03:
 
 - Überarbeitung Design Status Tab
