@@ -25,3 +25,6 @@ Character sheet in Swedish for Drakar och Demoner 6.0 Expert based on the Stars 
 - Separated divine and arcane magic skills.
 - Magic skill values now calculated from characteristics.
 - Hit points are now calculated from base characteristics.
+
+### v2.2 (2020-02-23)
+- Added automatic calculation of memorized spell points.
