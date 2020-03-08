@@ -12,6 +12,11 @@
 		return values
 	}
 
+	const getRepeatingSection = triggerName => {
+		const split = triggerName.split('_');
+		return `${split[0]}_${split[1]}_${split[2]}`
+	}
+
 	const calculateLimitTotal = (values, type) => {
 		const attributes = sheetAttribues[`${type}Limits`];
 		values.essence ? Math.ceil(values.essence) || 0 : false;
