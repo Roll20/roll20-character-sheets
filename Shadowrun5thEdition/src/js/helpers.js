@@ -1,3 +1,5 @@
+	
+
 	const parseIntegers = numbers => {
 		for (let [key, value] of Object.entries(numbers)) {
 	        numbers[key] = parseInt(value) || 0;
@@ -10,11 +12,6 @@
 		values[`${flag}`] === "on" ? false : delete values[`${temp}`];
 		delete values[`${flag}`];
 		return values
-	}
-
-	const getRepeatingSection = triggerName => {
-		const split = triggerName.split('_');
-		return `${split[0]}_${split[1]}_${split[2]}`
 	}
 
 	const calculateLimitTotal = (values, type) => {
