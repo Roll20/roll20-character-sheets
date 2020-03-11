@@ -449,78 +449,102 @@
 		});
 
 	//REFACTORED Skills
-  	sheetAttribues.repeatingSkills.forEach(field => {
-        on(`change:repeating_${field}`, eventinfo => { 
-			const source = eventinfo.sourceAttribute;
-			const type   = eventinfo.sourceType;
-        	if (source.includes("rating")) {
-        		getAttrs([`${field}_rating`, `${field}_rating_modifier`], (v) => {
-        			const bas = parseInt(v[`${field}_rating`]) || 0;
-					const mod = parseInt(v[`${field}_rating_modifier`]) || 0;
-					const tot = bas + mod;
-                    setAttrs({
-                        [`${field}_dicepool`]: tot,
-                        [`${field}_display_rating`]: (mod === 0) ? bas : `${bas} (${tot})`
-                    });
-        		});
-        	} else if (source.includes("attribute") && type === "player") {
-        		getAttrs([`${source}`], (v) => {
-					const attribute   = v[`${source}`].slice(2, -1);
-					const translation = getTranslationByKey(`${attribute}`);
-        			setAttrs({
-                       [`${field}_display_attribute`]: translation
-                    });
-        		});
-        	} else if (source.includes("limit") && type === "player") {
-        		const limit = eventinfo.newValue.slice(2, -1);
-        		if (eventinfo.newValue === "none") {
-        			setAttrs({
-	                   [`${field}_display_limit`]: ""
-	                });
-        		} else {
-					const translation = getTranslationByKey(`${limit}`);
-        			setAttrs({
-                       [`${field}_display_limit`]: `${translation} ${eventinfo.newValue}`
-                    });
-        		}
-        	} else if (source.includes("specialization") && type === "player")  {	
-        		getAttrs([`${source}`], (v) => {
-					const bas   = v[`${source}`];
-					const size  = bas.length;
-					let display = (size > 0 && size <= 20) ? `(${bas})` : (size > 20 ) ? "(" + bas.slice(0, 20) + "...)" : " ";
-        			setAttrs({
-                       [`${eventinfo.triggerName}_display_specialization`]: display
-                    });
-        		});
-        	} else if (source.includes("skill") && type === "player") {
-                getAttrs([`${source}`], (v) => {
-                	console.log(eventinfo)
-					const bas   = v[`${source}`];
-					const size  = bas.length;
-					let display = (size > 0 && size <= 20) ? bas : (size > 20 ) ? bas.slice(0, 20) + "..." : " ";
+	sheetAttribues.repeatingSkills.forEach(field => {
+		on(`change:repeating_${field}:rating change:repeating_${field}:rating_modifier`, eventinfo => {
+			const section = getRepeatingSection(eventinfo.triggerName);
 
-					console.log(display)
-					console.log(field)
-                    setAttrs({
-                       [`${eventinfo.triggerName}_display`]: display
-                    });
-                });
-            } else if (source.includes("dicepool") && type === "player") {
-                getAttrs([`${source}`, `${field}_skill`], (v) => {
-					const skill     = v[`${field}_skill`];
-					let lowercase   = skill.toLowerCase();
-					let removeGroup = (lowercase.includes("group")) ? lowercase.slice(0, -6) : lowercase;
-					let skillSet    = (removeGroup.includes(" ")) ? removeGroup.replace(/ /g,"") : removeGroup;
-                    setAttrs({
-                       [`${skillSet}`]: v[`${source}`]
-                    });
-                });
-        	}  else  {
-        		console.log(`Change to ${field} did not set attr`);
-        	};
-        });
-    }); 
+			getAttrs([`${section}_rating`, `${section}_rating_modifier`], value => {
+				const numbers = parseIntegers(value);
+				const base = numbers[`${section}_rating`];
+				const total = calculateSum(Object.values(numbers));
 
+				setAttrs({
+					[`${section}_dicepool`]: total,
+					[`${section}_display_rating`]: numbers[`${section}_rating_modifier`] === 0 ? base : `${base} (${total})`
+				})
+			})
+		});
+	});
+
+	sheetAttribues.repeatingSkills.forEach(field => {
+		on(`change:repeating_${field}:attribute`, eventinfo => {
+			const section = getRepeatingSection(eventinfo.triggerName);
+
+			if (eventinfo.sourceType === "player") {
+				const attribute = eventinfo.newValue.slice(2, -1)
+				const translation = getTranslationByKey(`${attribute}`)
+
+				setAttrs({
+                	[`${section}_display_attribute`]: translation
+                });
+			}
+		})
+	})
+
+	sheetAttribues.repeatingSkills.forEach(field => {
+		on(`change:repeating_${field}:limit`, eventinfo => {
+			const section = getRepeatingSection(eventinfo.triggerName);
+
+			if (eventinfo.sourceType === "player") {
+				const limit = eventinfo.newValue.slice(2, -1);
+
+				setAttrs({
+	           		[`${section}_display_limit`]: eventinfo.newValue === "none" ? "" : `${getTranslationByKey(`${limit}`)} ${eventinfo.newValue}`
+	           	});
+			}
+		})
+	})
+
+	sheetAttribues.repeatingSkills.forEach(field => {
+		on(`change:repeating_${field}:specialization`, eventinfo => {
+			const section = getRepeatingSection(eventinfo.triggerName);
+
+			if (eventinfo.sourceType === "player") {
+				const base = eventinfo.newValue;
+				const size = base.length;
+				const display = size > 0 && size <= 20 ? `(${base})` : size > 20 ? "(" + base.slice(0, 20) + "...)" : " "; 
+
+				setAttrs({
+					[`${section}_display_specialization`]: display
+				 });	
+			}
+		})
+	})
+
+	sheetAttribues.repeatingSkills.forEach(field => {
+		on(`change:repeating_${field}:skill`, eventinfo => {
+			const section = getRepeatingSection(eventinfo.triggerName);
+
+			if (eventinfo.sourceType === "player") {
+				const base = eventinfo.newValue;
+				const size = base.length;
+				const display = size > 0 && size <= 20 ? base : size > 20  ? base.slice(0, 20) + "...)" : " "; 
+
+				setAttrs({
+					[`${section}_display`]: display
+				 });	
+			}
+		})
+	})
+
+	sheetAttribues.repeatingSkills.forEach(field => {
+		on(`change:repeating_${field}:dicepool`, eventinfo => {
+			const section = getRepeatingSection(eventinfo.triggerName);
+
+			if (eventinfo.sourceType === "player") {
+				getAttrs([`${section}_skill`], value => {
+					let skill = value[`${section}_skill`];
+					skill = skill.toLowerCase();
+					skill = skill.includes("group") ? skill.split(' group')[0] : skill
+					skill = skill.includes(" ") ? skill.replace(/ /g,"") : skill
+
+					setAttrs({
+						[`${skill}`]: eventinfo.newValue
+					 });
+				})
+			}
+		})
+	})
 
    	//Setting the Default attribute name for default skill
 	on("change:default_attribute", (eventinfo) => {
