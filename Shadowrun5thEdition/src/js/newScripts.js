@@ -15,9 +15,10 @@ const errorMessage = (name, error) => console.error(`%c ${name}: ${error}`, "col
 const warningMessage = (name, error) => console.warn(`%c ${name}: ${error}`, "color: orange; font-weight:14px;");
 
 const functions = {
-	convertIntegerNegative: numbers => {
+  convertIntegerNegative: number => number > 0 ? -Math.abs(number) : number,
+	convertIntegersNegatives: numbers => {
 		for (let [key, value] of Object.entries(numbers)) {
-			numbers[key] = value > 0 ? -Math.abs(value) : value;
+			numbers[key] = functions.convertIntegerNegative(value);
 		}
 		return numbers
 	},
@@ -38,10 +39,49 @@ const functions = {
 	sumIntegers: numbers => numbers.reduce((a,b) => a + b, 0),
 
   shadowrun: {
-    shotsFired: (shots, trigger) => shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots
+    shotsFired: (shots, trigger) => shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots,
+
   }
 }
 
 //for Mocha Unit Texting
-module.exports = functions;
+//module.exports = functions;
+
+const translations = () => {
+  const attributes = sheetAttribues.translationsAttributes;
+  const translations = getTranslations(attributes);
+  let attribute_roll = `?{${translations[0]}`;
+  for (i = 1; i <= (attributes.length - 2); i += 1) {
+    attribute_roll +=  `|${translations[i]},@{${attributes[i]}}`;
+  };
+  attribute_roll += `|${translations[10]},0}`; //For None
+  functions.setAttributes({attribute_roll: attribute_roll})
+} 
+
+const updateShotsFired = trigger => {
+  getAttrs([`shots_fired`], attrs => {   
+    attrs = functions.parseIntegers(attrs)
+    const shots = functions.shadowrun.shotsFired(attrs.shots_fired, trigger)
+    functions.setAttributes({shots_fired: shots})
+  });
+}
+
+const updateAmmoWithShotsFired = () => {
+  getAttrs([`primary_range_weapon_ammo`, `shots_fired`], attrs => {
+    attrs = functions.parseIntegers(attrs)
+    attrs.shots_fired = functions.convertIntegerNegative(attrs.shots_fired)
+    functions.setAttributes({primary_range_weapon_ammo: functions.sumIntegers(Object.values(attrs))})
+  });
+}
+
+const updateAmmoWithMax = () => {
+  getAttrs([`primary_range_weapon_ammo_max`], attrs => {
+    attrs = functions.parseIntegers(attrs)
+    functions.setAttributes({primary_range_weapon_ammo: attrs.primary_range_weapon_ammo_max})
+  });
+}
+
+const updateTab = attr => on(`clicked:tab_${attr}`, () => functions.setAttributes({tab: attr}))
+
+ 
 

@@ -3410,18 +3410,20 @@ const errorMessage = (name, error) => console.error(`%c ${name}: ${error}`, "col
 const warningMessage = (name, error) => console.warn(`%c ${name}: ${error}`, "color: orange; font-weight:14px;");
 
 const functions = {
-  convertInteger: string => parseInt(string) || 0,
-	convertIntegerNegative: numbers => {
+  convertIntegerNegative: number => number > 0 ? -Math.abs(number) : number,
+	convertIntegersNegatives: numbers => {
 		for (let [key, value] of Object.entries(numbers)) {
-			numbers[key] = value > 0 ? -Math.abs(value) : value;
+			numbers[key] = functions.convertIntegerNegative(value);
 		}
 		return numbers
 	},
+  //Roll20 does not all for Promises
   //getAttributes: array => new Promise((resolve, reject) => array ? getAttrs(array, v => resolve(v)) : reject(errorMessage('getAttributes', 'Function failed'))),
 	getReprowid: trigger => {
 		const split = trigger.split('_');
 		return `${split[0]}_${split[1]}_${split[2]}`
 	},
+  parseInteger: string => parseInt(string) || 0,
 	parseIntegers: numbers => {
 		for (let [key, value] of Object.entries(numbers)) {
 		    numbers[key] = parseInt(value) || 0;
@@ -3432,12 +3434,51 @@ const functions = {
 	sumIntegers: numbers => numbers.reduce((a,b) => a + b, 0),
 
   shadowrun: {
-    shotsFired: (shots, trigger) => shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots
+    shotsFired: (shots, trigger) => shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots,
+
   }
 }
 
 //for Mocha Unit Texting
 //module.exports = functions;
+
+const translations = () => {
+  const attributes = sheetAttribues.translationsAttributes;
+  const translations = getTranslations(attributes);
+  let attribute_roll = `?{${translations[0]}`;
+  for (i = 1; i <= (attributes.length - 2); i += 1) {
+    attribute_roll +=  `|${translations[i]},@{${attributes[i]}}`;
+  };
+  attribute_roll += `|${translations[10]},0}`; //For None
+  functions.setAttributes({attribute_roll: attribute_roll})
+} 
+
+const updateShotsFired = trigger => {
+  getAttrs([`shots_fired`], attrs => {   
+    attrs = functions.parseIntegers(attrs)
+    const shots = functions.shadowrun.shotsFired(attrs.shots_fired, trigger)
+    functions.setAttributes({shots_fired: shots})
+  });
+}
+
+const updateAmmoWithShotsFired = () => {
+  getAttrs([`primary_range_weapon_ammo`, `shots_fired`], attrs => {
+    attrs = functions.parseIntegers(attrs)
+    attrs.shots_fired = functions.convertIntegerNegative(attrs.shots_fired)
+    functions.setAttributes({primary_range_weapon_ammo: functions.sumIntegers(Object.values(attrs))})
+  });
+}
+
+const updateAmmoWithMax = () => {
+  getAttrs([`primary_range_weapon_ammo_max`], attrs => {
+    attrs = functions.parseIntegers(attrs)
+    functions.setAttributes({primary_range_weapon_ammo: attrs.primary_range_weapon_ammo_max})
+  });
+}
+
+const updateTab = attr => on(`clicked:tab_${attr}`, () => functions.setAttributes({tab: attr}))
+
+ 
 
   const versioning = version => {
   	console.log(`%c Shadowrun 5th Edition versioning, ${version}`, "color: darkblue; font-weight:bold");
@@ -3510,7 +3551,8 @@ const onepointthreefive = () => {
         }
     });  
 };
-  	
+
+  <!--Old functions working to become obsolete-->	
 
 	const processTempFlags = (flag, temp, values) => {
 		values[`${flag}`] === "on" ? false : delete values[`${temp}`];
@@ -3546,187 +3588,98 @@ const onepointthreefive = () => {
 	}
   on("sheet:opened", () => {
 		getAttrs(["version"], v => { versioning(parseFloat(v.version) || 1); });
-
 		translations();
 	});
 
 
-  on("clicked:shots_remove clicked:shots_add", async eventinfo => {
-    getAttrs([`shots_fired`], value => {   
-      let shots = functions.parseIntegers(value)
-      shots = functions.shadowrun.shotsFired(shots, eventinfo.triggerName)
-      functions.setAttributes({shots_fired: shots})
-    });
-	});
+  on("clicked:shots_remove clicked:shots_add", eventinfo => updateShotsFired(eventinfo.triggerName))
 
-	on("clicked:primary_ammo", eventinfo => {
-    	getAttrs([`primary_range_weapon_ammo`, `shots_fired`], v => {
-    		v = parseIntegers(v);
-			setAttrs({
-				primary_range_weapon_ammo: v[`primary_range_weapon_ammo`] - v[`shots_fired`]
-			});
-		});
-	});
+	on("clicked:primary_ammo", () => updateAmmoWithShotsFired())
 
-   on("clicked:reload", eventinfo=> {
-    	getAttrs([`primary_range_weapon_ammo_max`], (v) => {
-    		v = parseIntegers(v);
-			setAttrs({
-				primary_range_weapon_ammo: v[`primary_range_weapon_ammo_max`]
-			});
-		});
-	});
+  on("clicked:reload", () => updateAmmoWithMax())
 
-	sheetAttribues.tabs.forEach(attr => {
-   		on(`clicked:tab_${attr}`, () => {
-   			setAttrs({ tab: attr });
-   		});
-   });
+	sheetAttribues.tabs.forEach(attr => updateTab(attr))
 
+	on("change:agility change:walk_modifier change:run_modifier", () => updateMovement())
 
-	on("change:agility change:walk_modifier change:run_modifier", () => {
-		update_movement();
-	});
+  on("change:body change:strength change:lift_carry_modifier", () => update_common_rolls(["body", "strength", "lift_carry_modifier"]))
 
-	on("change:body change:strength change:lift_carry_modifier", eventinfo=> {
-		const source = eventinfo.sourceAttribute;
-		update_common_rolls(["body", "strength", "lift_carry_modifier"]);
-		//STRENGTH & BODY RUN THIS
-		source.includes("strength") || source.includes("body") ? update_limit("physical") : false;
-		//ONLY RUN ON BODY CHANGE
-		if (source.includes("body")) {
-			update_common_rolls(["body", "overflow_modifier"]);
-			update_common_rolls(["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`]);
-			update_track("physical");
-		};
-	});
+  on("change:body change:strength", () => update_limit("physical"))
 
-	on("change:reaction change:intuition", eventinfo=> {
-		const source = eventinfo.sourceAttribute;
-		update_common_rolls(["reaction", "intuition", "defense_modifier", "defense_temp", `defense_temp_flag`]);
-		update_initiative();
-		//REACTION UPDATES PHYSICAL, INTUITION UPDATES MENTAL
-		(source.includes("reaction")) ? update_limit("physical") : update_limit("mental");
-		//ONLY RUN ON INTUITION CHANGE
-		(source.includes("intuition")) ? update_common_rolls(["charisma", "intuition", "judge_intentions_modifier"]) : false;
-	});
+	on("change:body", () => {
+			update_common_rolls(["body", "overflow_modifier"])
+			update_common_rolls(["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`])
+			update_track("physical")
+	})
+
+  on("change:reaction change:intuition", () => {
+    update_common_rolls(["reaction", "intuition", "defense_modifier", "defense_temp", `defense_temp_flag`])
+    update_initiative()
+  })
+
+  on("change:reaction", () => update_limit("physical"))
+
+  on("change:intuition", () => {
+    update_limit("mental")
+    update_common_rolls(["charisma", "intuition", "judge_intentions_modifier"])
+  })
 
 	on("change:willpower", () => {
-		update_common_rolls(["charisma", "willpower", "composure_modifier"]);
-		update_common_rolls(["logic", "willpower", "memory_modifier"]);
-		update_track("stun");
-		update_limit("social");
-		update_limit("mental");
-	});
+		update_common_rolls(["charisma", "willpower", "composure_modifier"])
+		update_common_rolls(["logic", "willpower", "memory_modifier"])
+		update_track("stun")
+		update_limit("social")
+		update_limit("mental")
+	})
 
-	on("change:logic change:memory_modifier", eventinfo=> {
-		const source = eventinfo.sourceAttribute;
-		update_common_rolls(["logic", "willpower", "memory_modifier"]);
-		//LOGIC UPDATES LIMIT
-		(source.includes("logic")) ? update_limit("mental") : false;
-	});
+  on("change:logic change:memory_modifier", () => update_common_rolls(["logic", "willpower", "memory_modifier"]))
 
-	on("change:charisma change:composure_modifier change:judge_intentions_modifier", eventinfo=> {
-		const source = eventinfo.sourceAttribute;
-		//CHARISMA & COMPOSURE UPDATE COMPOSURE
-		(source.includes("charisma") || source.includes("composure")) ? update_common_rolls(["charisma", "willpower", "composure_modifier"]) : false;
-		//CHARISMA & JUDGE INTENTIONS UPDATE JUDGE INTENTIONS
-		(source.includes("charisma") || source.includes("judge")) ? update_common_rolls(["charisma", "intuition", "judge_intentions_modifier"]) : false;
-		//ONLY CHARISMA UPDATES SOCIAL LIMIT
-		(source.includes("charisma")) ? update_limit("social") : false;
-	});
+	on("change:logic", () => update_limit("mental")) 
 
-	on("change:essence", () => {
-		update_limit("social");
-	});
+  on("change:charisma change:composure_modifier", eventinfo => update_common_rolls(["charisma", "willpower", "composure_modifier"]))
 
-	on("change:physical_modifier change:flag_drone", () => {
-		update_track("physical");
-	});
+  on("change:charisma change:judge_intentions_modifier", eventinfo => update_common_rolls(["charisma", "intuition", "judge_intentions_modifier"]))
 
-	on("change:stun_modifier", () => {
-		 update_track("stun");
-	});
+  on("change:charisma change:essence", eventinfo => update_limit("social"))
 
-	on("change:initiative_modifier change:initiative_temp change:initiative_temp_flag", () => {
-		update_initiative();
-	});
+	on("change:physical_modifier change:flag_drone", () => update_track("physical"))
 
-	on("change:defense_modifier change:defense_temp change:defense_temp_flag", () => {
-		update_common_rolls(["reaction", "intuition", "defense_modifier", "defense_temp", `defense_temp_flag`]);
-	});
+	on("change:stun_modifier", () => update_track("stun"))
 
-	on("change:armor_rating change:soak_modifier change:soak_temp change:soak_temp_flag", () => {
-		update_common_rolls(["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`]);
-	});
+	on("change:initiative_modifier change:initiative_temp change:initiative_temp_flag", () => update_initiative())
 
-	on("change:mental_limit_modifier change:mental_limit_temp change:mental_limit_temp_flag change:physical_limit_modifier change:physical_limit_temp change:physical_limit_temp_flag change:social_limit_modifier change:social_limit_temp change:social_limit_temp_flag",  eventinfo=> {
-		const type = eventinfo.sourceAttribute.split("_")[0]; 
-		update_limit(type);
-	});
+	on("change:defense_modifier change:defense_temp change:defense_temp_flag", () => update_common_rolls(["reaction", "intuition", "defense_modifier", "defense_temp", `defense_temp_flag`]))
 
-	sheetAttribues.woundCalculation.forEach(attr => {
-		on(`change:${attr}`, () => {
-			update_wounds();
-		});
-	});
+	on("change:armor_rating change:soak_modifier change:soak_temp change:soak_temp_flag", () => update_common_rolls(["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`]))
 
-	on("clicked:cond_reset_physical clicked:cond_reset_stun", (eventinfo) => {
-		resetConditionTrack(eventinfo)
-	});
+	on("change:mental_limit_modifier change:mental_limit_temp change:mental_limit_temp_flag change:physical_limit_modifier change:physical_limit_temp change:physical_limit_temp_flag change:social_limit_modifier change:social_limit_temp change:social_limit_temp_flag", eventinfo => update_limit(eventinfo.sourceAttribute.split("_")[0]));
 
-	on("change:edge_toggle", eventinfo => {
-		edgeToggle(eventinfo)
-	});
+	sheetAttribues.woundCalculation.forEach(attr => on(`change:${attr}`, () => update_wounds()))
 
-	on("change:device_rating change:matrix_modifier", () => {
-		updateMatrixMaximum()
-	});
+	on("clicked:cond_reset_physical clicked:cond_reset_stun", eventinfo => resetConditionTrack(eventinfo))
 
-	on("change:intuition change:astral_mod_modifier", () => {
-		updateAstralInitiative()
-	});
+	on("change:edge_toggle", eventinfo => edgeToggle(eventinfo))
 
-	on("change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag", () => {
-		updateInitiative()
-	});
+	on("change:device_rating change:matrix_modifier", () => updateMatrixMaximum())
 
-	on("change:astral_dice_modifier change:edge_toggle", () => {
-		updateAstralInitiativeDice()
-	});
+	on("change:intuition change:astral_mod_modifier", () => updateAstralInitiative())
 
-	on("change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle", () => {
-		updateMatrixInitiative()
-	});
+	on("change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag", () => updateInitiative())
 
-//	sheetAttribues.repeatingSkills.forEach(field => {
-//		on(`change:repeating_${field}`, eventinfo => { 
-//			const id = eventinfo.sourceAttribute.split(`_`)[2];
-//		});
-//    }); 
-  
-	const translations = () => {
-		const attributes = sheetAttribues.translationsAttributes;
-		const translations = getTranslations(attributes);
-		let attribute_roll = `?{${translations[0]}`;
+	on("change:astral_dice_modifier change:edge_toggle", () => updateAstralInitiativeDice())
 
-	    for (i = 1; i <= (attributes.length - 2); i += 1) {
-	    	attribute_roll +=  `|${translations[i]},@{${attributes[i]}}`;
-	    };
+	on("change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle", () => updateMatrixInitiative())
 
-	    attribute_roll += `|${translations[10]},0}`; //For None
 
-	    setAttrs({
-	    	attribute_roll: attribute_roll
-	    });
-	}	
+
+  <!--Old functions working to become obsolete-->
 
 	//Calculate ATTRIBUTES
 	sheetAttribues.calculatedAttributes.forEach(attr => {
         on(`change:${attr}_base change:${attr}_modifier change:${attr}_temp change:${attr}_temp_flag`, () => {
             getAttrs([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`, `${attr}_temp_flag`], v => {
                 v = processTempFlags(`${attr}_temp_flag`, `${attr}_temp`, v);
-                v = parseIntegers(v);
+                v = functions.parseIntegers(v);
 
                 const base = v[`${attr}_base`], bonus = calculateBonuses(v), total = base + bonus;
 
@@ -3743,7 +3696,7 @@ const onepointthreefive = () => {
 			let attrs = [`${type}_limit_modifier`, `${type}_limit_temp`, `${type}_limit_temp_flag`].concat(sheetAttribues[`${type}Limits`]);
 			getAttrs(attrs, v => {
 				v = processTempFlags(`${type}_limit_temp_flag`, `${type}_limit_temp`, v);
-				v = parseIntegers(v);
+				v = functions.parseIntegers(v);
 
 				const bonus = calculateBonuses(v), total = calculateLimitTotal(v, type);
 
@@ -3838,7 +3791,7 @@ const onepointthreefive = () => {
 	};
 
 	//Calculate Movement Rates
-		var update_movement = () => {
+		var updateMovement = () => {
 			getAttrs(["agility", "walk_modifier", "run_modifier"], (v) => {
 				const agi = parseInt(v.agility) || 0, wmod = parseInt(v.walk_modifier) || 0, rmod = parseInt(v.run_modifier) || 0;
 				let update = {};
@@ -3877,7 +3830,7 @@ const onepointthreefive = () => {
 	//Calculate Device Rating Track
 	const updateMatrixMaximum = () => {
 		getAttrs(["device_rating","matrix_modifier"], (v) => {
-			v = parseIntegers(v);
+			v = functions.parseIntegers(v);
 
 			setAttrs({
 				matrix_max: Math.ceil(v.device_rating/2) + 8 + v.matrix_modifier
@@ -3887,7 +3840,7 @@ const onepointthreefive = () => {
 
 	const update_wounds = () => {
 		getAttrs(sheetAttribues.woundCalculation, v => {
-			v = parseIntegers(v);
+			v = functions.parseIntegers(v);
 
 	       	const divisor  = v.low_pain_tolerance === 2 ? v.low_pain_tolerance : 3;
 	       	const highPain = v.high_pain_tolerance >= 1 ? v.high_pain_tolerance : 0;
@@ -3909,7 +3862,7 @@ const onepointthreefive = () => {
 	const update_initiative = () => {
 		getAttrs(["reaction", "intuition", "initiative_modifier", "initiative_temp", "initiative_temp_flag"], v => {
 			v = processTempFlags(`initiative_temp_flag`, `initiative_temp`, v);
-            v = parseIntegers(v);
+            v = functions.parseIntegers(v);
             const base = v.reaction + v.intuition, bonus = calculateBonuses(v), total = base + bonus;
 
 			setAttrs({
@@ -3924,7 +3877,7 @@ const onepointthreefive = () => {
 			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
 
 			v = processTempFlags(`initiative_dice_temp_flag`, `initiative_dice_temp`, v);
-			v = parseIntegers(v);
+			v = functions.parseIntegers(v);
 
 			const bonus = calculateBonuses(v), total = Math.min(bonus+1,5);
 			setAttrs({
@@ -3936,7 +3889,7 @@ const onepointthreefive = () => {
 	//Calculate Astral Initiatve
 	const updateAstralInitiative = () => {
 		getAttrs(["intuition", "astral_mod_modifier"], v => {
-			v = parseIntegers(v);
+			v = functions.parseIntegers(v);
 			const base = v.intuition * 2, bonus = v.astral_mod_modifier, total = base + bonus;
 
 			setAttrs({
@@ -3963,7 +3916,7 @@ const onepointthreefive = () => {
 			const sheetType = v.sheet_type;
 			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
 
-			v = parseIntegers(v);
+			v = functions.parseIntegers(v);
 
 			let base = v.data_processing;
 			base += sheetType === "sprite" ? v.level : sheetType === "vehicle" ? v.pilot : sheetType === "host" ? v.host_rating : v.intuition;
@@ -4319,7 +4272,7 @@ const onepointthreefive = () => {
 	        	const source = eventInfo.sourceAttribute;
 	        	if (source.includes("dicepool") || source.includes("specialization")) {
 	        		getAttrs([`${field}_specialization`, `${field}_dicepool_modifier`], v => {
-	        			v = parseIntegers(v);
+	        			v = functions.parseIntegers(v);
 	                    setAttrs({
 	                        [`${field}_dicepool`]: v[`${field}_specialization`] + v[`${field}_dicepool_modifier`]
 	                    });

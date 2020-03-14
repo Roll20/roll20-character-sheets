@@ -1,26 +1,11 @@
 
-	const translations = () => {
-		const attributes = sheetAttribues.translationsAttributes;
-		const translations = getTranslations(attributes);
-		let attribute_roll = `?{${translations[0]}`;
-
-	    for (i = 1; i <= (attributes.length - 2); i += 1) {
-	    	attribute_roll +=  `|${translations[i]},@{${attributes[i]}}`;
-	    };
-
-	    attribute_roll += `|${translations[10]},0}`; //For None
-
-	    setAttrs({
-	    	attribute_roll: attribute_roll
-	    });
-	}	
 
 	//Calculate ATTRIBUTES
 	sheetAttribues.calculatedAttributes.forEach(attr => {
         on(`change:${attr}_base change:${attr}_modifier change:${attr}_temp change:${attr}_temp_flag`, () => {
             getAttrs([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`, `${attr}_temp_flag`], v => {
                 v = processTempFlags(`${attr}_temp_flag`, `${attr}_temp`, v);
-                v = parseIntegers(v);
+                v = functions.parseIntegers(v);
 
                 const base = v[`${attr}_base`], bonus = calculateBonuses(v), total = base + bonus;
 
@@ -37,7 +22,7 @@
 			let attrs = [`${type}_limit_modifier`, `${type}_limit_temp`, `${type}_limit_temp_flag`].concat(sheetAttribues[`${type}Limits`]);
 			getAttrs(attrs, v => {
 				v = processTempFlags(`${type}_limit_temp_flag`, `${type}_limit_temp`, v);
-				v = parseIntegers(v);
+				v = functions.parseIntegers(v);
 
 				const bonus = calculateBonuses(v), total = calculateLimitTotal(v, type);
 
@@ -132,7 +117,7 @@
 	};
 
 	//Calculate Movement Rates
-		var update_movement = () => {
+		var updateMovement = () => {
 			getAttrs(["agility", "walk_modifier", "run_modifier"], (v) => {
 				const agi = parseInt(v.agility) || 0, wmod = parseInt(v.walk_modifier) || 0, rmod = parseInt(v.run_modifier) || 0;
 				let update = {};
@@ -171,7 +156,7 @@
 	//Calculate Device Rating Track
 	const updateMatrixMaximum = () => {
 		getAttrs(["device_rating","matrix_modifier"], (v) => {
-			v = parseIntegers(v);
+			v = functions.parseIntegers(v);
 
 			setAttrs({
 				matrix_max: Math.ceil(v.device_rating/2) + 8 + v.matrix_modifier
@@ -181,7 +166,7 @@
 
 	const update_wounds = () => {
 		getAttrs(sheetAttribues.woundCalculation, v => {
-			v = parseIntegers(v);
+			v = functions.parseIntegers(v);
 
 	       	const divisor  = v.low_pain_tolerance === 2 ? v.low_pain_tolerance : 3;
 	       	const highPain = v.high_pain_tolerance >= 1 ? v.high_pain_tolerance : 0;
@@ -203,7 +188,7 @@
 	const update_initiative = () => {
 		getAttrs(["reaction", "intuition", "initiative_modifier", "initiative_temp", "initiative_temp_flag"], v => {
 			v = processTempFlags(`initiative_temp_flag`, `initiative_temp`, v);
-            v = parseIntegers(v);
+            v = functions.parseIntegers(v);
             const base = v.reaction + v.intuition, bonus = calculateBonuses(v), total = base + bonus;
 
 			setAttrs({
@@ -218,7 +203,7 @@
 			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
 
 			v = processTempFlags(`initiative_dice_temp_flag`, `initiative_dice_temp`, v);
-			v = parseIntegers(v);
+			v = functions.parseIntegers(v);
 
 			const bonus = calculateBonuses(v), total = Math.min(bonus+1,5);
 			setAttrs({
@@ -230,7 +215,7 @@
 	//Calculate Astral Initiatve
 	const updateAstralInitiative = () => {
 		getAttrs(["intuition", "astral_mod_modifier"], v => {
-			v = parseIntegers(v);
+			v = functions.parseIntegers(v);
 			const base = v.intuition * 2, bonus = v.astral_mod_modifier, total = base + bonus;
 
 			setAttrs({
@@ -257,7 +242,7 @@
 			const sheetType = v.sheet_type;
 			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
 
-			v = parseIntegers(v);
+			v = functions.parseIntegers(v);
 
 			let base = v.data_processing;
 			base += sheetType === "sprite" ? v.level : sheetType === "vehicle" ? v.pilot : sheetType === "host" ? v.host_rating : v.intuition;
@@ -613,7 +598,7 @@
 	        	const source = eventInfo.sourceAttribute;
 	        	if (source.includes("dicepool") || source.includes("specialization")) {
 	        		getAttrs([`${field}_specialization`, `${field}_dicepool_modifier`], v => {
-	        			v = parseIntegers(v);
+	        			v = functions.parseIntegers(v);
 	                    setAttrs({
 	                        [`${field}_dicepool`]: v[`${field}_specialization`] + v[`${field}_dicepool_modifier`]
 	                    });

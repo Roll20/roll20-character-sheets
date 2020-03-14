@@ -21,6 +21,8 @@ describe('Helper functions', () => {
 		const actual = Functions.getReprowid('repeating_advancement_-m1czg68yzicwhfdpyys_earned_xp')
 		assert.strictEqual(actual, expected)
 	})
+
+  it('convertIntegerNegative turns positive integar into negative', () => assert.strictEqual(Functions.convertIntegerNegative(6), -6))
 })
 
 describe('Shadowrun specific functions', () => {
