@@ -15,16 +15,6 @@
 	    });
 	}	
 
-	const settingsToggle = (eventinfo) => {
-		const split = eventinfo.sourceAttribute.split("_");
-		const source = `${split[0]}_${split[1]}_${split[2]}`;
-		getAttrs([`${source}_flag`], (v) => {
-			setAttrs({
-				[`${source}_flag`]: (v[`${source}_flag`] === "settings") ? "display" : "settings"
-			});
-		});
-	};
-
 	//Calculate ATTRIBUTES
 	sheetAttribues.calculatedAttributes.forEach(attr => {
         on(`change:${attr}_base change:${attr}_modifier change:${attr}_temp change:${attr}_temp_flag`, () => {

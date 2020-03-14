@@ -3393,18 +3393,52 @@
 <input type="hidden" name="attr_tracking" min="0" value="0" />
 <input type="hidden" name="attr_unarmedcombat" min="0" value="0" />
 <script type="text/worker">
-  	const sheetAttribues = {
-		"attributes": ["body", "agility", "reaction", "strength", "willpower", "logic", "intuition", "charisma", "edge"],
-		"translationsAttributes": ["attribute", "body", "agility", "reaction", "strength", "willpower", "logic", "intuition", "charisma", "edge", "none"],
-		"calculatedAttributes": ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition','charisma','magic', 'resonance'],
-		"repeating": ["quality", "martial", "items", "range", "melee", "armor", "spell", "preps", "ritual", "powers", "forms", "vehicle", "augementations", "lifestyle", "contacts", "programs"],
-		"repeatingSkills": ["active", "knowledge", "language"],
-		"tabs": [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`],
-		"woundCalculation": ["high_pain_tolerance", "low_pain_tolerance", "damage_compensators_physical", "damage_compensators_stun", "stun", "physical"],
-		"mentalLimits": ["intuition", "willpower", "logic"],
-		"physicalLimits": ["body", "reaction", "strength"],
-		"socialLimits": ["essence", "willpower", "charisma"]
-	}
+  const sheetAttribues = {
+	"attributes": ["body", "agility", "reaction", "strength", "willpower", "logic", "intuition", "charisma", "edge"],
+	"translationsAttributes": ["attribute", "body", "agility", "reaction", "strength", "willpower", "logic", "intuition", "charisma", "edge", "none"],
+	"calculatedAttributes": ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition','charisma','magic', 'resonance'],
+	"repeating": ["quality", "martial", "items", "range", "melee", "armor", "spell", "preps", "ritual", "powers", "forms", "vehicle", "augementations", "lifestyle", "contacts", "programs"],
+	"repeatingSkills": ["active", "knowledge", "language"],
+	"tabs": [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`],
+	"woundCalculation": ["high_pain_tolerance", "low_pain_tolerance", "damage_compensators_physical", "damage_compensators_stun", "stun", "physical"],
+	"mentalLimits": ["intuition", "willpower", "logic"],
+	"physicalLimits": ["body", "reaction", "strength"],
+	"socialLimits": ["essence", "willpower", "charisma"],
+}
+
+const errorMessage = (name, error) => console.error(`%c ${name}: ${error}`, "color: orange; font-weight:14px;");
+const warningMessage = (name, error) => console.warn(`%c ${name}: ${error}`, "color: orange; font-weight:14px;");
+
+const functions = {
+  convertInteger: string => parseInt(string) || 0,
+	convertIntegerNegative: numbers => {
+		for (let [key, value] of Object.entries(numbers)) {
+			numbers[key] = value > 0 ? -Math.abs(value) : value;
+		}
+		return numbers
+	},
+  //getAttributes: array => new Promise((resolve, reject) => array ? getAttrs(array, v => resolve(v)) : reject(errorMessage('getAttributes', 'Function failed'))),
+	getReprowid: trigger => {
+		const split = trigger.split('_');
+		return `${split[0]}_${split[1]}_${split[2]}`
+	},
+	parseIntegers: numbers => {
+		for (let [key, value] of Object.entries(numbers)) {
+		    numbers[key] = parseInt(value) || 0;
+		}
+		return numbers	
+	},
+  setAttributes: (update, silent) => silent && typeof update === 'object' ? setAttrs(update, {silent:true}) : typeof update === 'object' ? setAttrs(update) : errorMessage('setAttributes', `${update} is not an object`),
+	sumIntegers: numbers => numbers.reduce((a,b) => a + b, 0),
+
+  shadowrun: {
+    shotsFired: (shots, trigger) => shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots
+  }
+}
+
+//for Mocha Unit Texting
+//module.exports = functions;
+
   const versioning = version => {
   	console.log(`%c Shadowrun 5th Edition versioning, ${version}`, "color: darkblue; font-weight:bold");
 
@@ -3476,13 +3510,7 @@ const onepointthreefive = () => {
         }
     });  
 };
-  	const parseIntegers = numbers => {
-		for (let [key, value] of Object.entries(numbers)) {
-	        numbers[key] = parseInt(value) || 0;
-	    }
-
-	    return numbers
-	}
+  	
 
 	const processTempFlags = (flag, temp, values) => {
 		values[`${flag}`] === "on" ? false : delete values[`${temp}`];
@@ -3501,9 +3529,6 @@ const onepointthreefive = () => {
 		return ((stat1 + stat2 + (stat3 * 2))/3)
 	}
 
-
-	const calculateSum = arr => arr.reduce((a,b) => a + b, 0)
-
 	const calculateBonuses = values => {
 		let bonus = 0;
 		for (let [key, value] of Object.entries(values)) {
@@ -3518,22 +3543,20 @@ const onepointthreefive = () => {
 			translations.push(getTranslationByKey(key));
 		});
 		return translations
-	}	
-   	on("sheet:opened", () => {
+	}
+  on("sheet:opened", () => {
 		getAttrs(["version"], v => { versioning(parseFloat(v.version) || 1); });
 
 		translations();
 	});
 
-    on("clicked:shots_remove clicked:shots_add", eventinfo => {
-    	getAttrs([`shots_fired`], v => {
-    		v = parseIntegers(v);
-    		const trigger = eventinfo.triggerName;
-    		let shots = v[`shots_fired`];
-			setAttrs({
-				shots_fired: shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots
-			});
-		});
+
+  on("clicked:shots_remove clicked:shots_add", async eventinfo => {
+    getAttrs([`shots_fired`], value => {   
+      let shots = functions.parseIntegers(value)
+      shots = functions.shadowrun.shotsFired(shots, eventinfo.triggerName)
+      functions.setAttributes({shots_fired: shots})
+    });
 	});
 
 	on("clicked:primary_ammo", eventinfo => {
@@ -3552,18 +3575,6 @@ const onepointthreefive = () => {
 				primary_range_weapon_ammo: v[`primary_range_weapon_ammo_max`]
 			});
 		});
-	});
-
-	sheetAttribues.repeatingSkills.forEach(attr => {
-		on(`clicked:repeating_${attr}:skill`, eventinfo=> {
-			settingsToggle(eventinfo);
-		}); 
-	});
-
-	sheetAttribues.repeating.forEach(attr => {
-		on(`clicked:repeating_${attr}:${attr}`, eventinfo=> {
-			settingsToggle(eventinfo);
-		}); 
 	});
 
 	sheetAttribues.tabs.forEach(attr => {
@@ -3687,6 +3698,13 @@ const onepointthreefive = () => {
 	on("change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle", () => {
 		updateMatrixInitiative()
 	});
+
+//	sheetAttribues.repeatingSkills.forEach(field => {
+//		on(`change:repeating_${field}`, eventinfo => { 
+//			const id = eventinfo.sourceAttribute.split(`_`)[2];
+//		});
+//    }); 
+  
 	const translations = () => {
 		const attributes = sheetAttribues.translationsAttributes;
 		const translations = getTranslations(attributes);
@@ -3702,16 +3720,6 @@ const onepointthreefive = () => {
 	    	attribute_roll: attribute_roll
 	    });
 	}	
-
-	const settingsToggle = (eventinfo) => {
-		const split = eventinfo.sourceAttribute.split("_");
-		const source = `${split[0]}_${split[1]}_${split[2]}`;
-		getAttrs([`${source}_flag`], (v) => {
-			setAttrs({
-				[`${source}_flag`]: (v[`${source}_flag`] === "settings") ? "display" : "settings"
-			});
-		});
-	};
 
 	//Calculate ATTRIBUTES
 	sheetAttribues.calculatedAttributes.forEach(attr => {
@@ -4137,13 +4145,10 @@ const onepointthreefive = () => {
 		});
 
 	//REFACTORED Skills
-  	['repeating_active','repeating_knowledge','repeating_language'].forEach(field => {
-        on(`change:${field}`, eventinfo => { 
+  	sheetAttribues.repeatingSkills.forEach(field => {
+        on(`change:repeating_${field}`, eventinfo => { 
 			const source = eventinfo.sourceAttribute;
 			const type   = eventinfo.sourceType;
-
-			console.log(eventinfo);
-
         	if (source.includes("rating")) {
         		getAttrs([`${field}_rating`, `${field}_rating_modifier`], (v) => {
         			const bas = parseInt(v[`${field}_rating`]) || 0;

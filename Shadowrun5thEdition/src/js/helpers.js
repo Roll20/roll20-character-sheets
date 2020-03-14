@@ -1,13 +1,5 @@
 	
 
-	const parseIntegers = numbers => {
-		for (let [key, value] of Object.entries(numbers)) {
-	        numbers[key] = parseInt(value) || 0;
-	    }
-
-	    return numbers
-	}
-
 	const processTempFlags = (flag, temp, values) => {
 		values[`${flag}`] === "on" ? false : delete values[`${temp}`];
 		delete values[`${flag}`];
@@ -24,9 +16,6 @@
 
 		return ((stat1 + stat2 + (stat3 * 2))/3)
 	}
-
-
-	const calculateSum = arr => arr.reduce((a,b) => a + b, 0)
 
 	const calculateBonuses = values => {
 		let bonus = 0;

@@ -8,9 +8,11 @@ const sheetAttribues = {
 	"woundCalculation": ["high_pain_tolerance", "low_pain_tolerance", "damage_compensators_physical", "damage_compensators_stun", "stun", "physical"],
 	"mentalLimits": ["intuition", "willpower", "logic"],
 	"physicalLimits": ["body", "reaction", "strength"],
-	"socialLimits": ["essence", "willpower", "charisma"]
+	"socialLimits": ["essence", "willpower", "charisma"],
 }
 
+const errorMessage = (name, error) => console.error(`%c ${name}: ${error}`, "color: orange; font-weight:14px;");
+const warningMessage = (name, error) => console.warn(`%c ${name}: ${error}`, "color: orange; font-weight:14px;");
 
 const functions = {
 	convertIntegerNegative: numbers => {
@@ -19,19 +21,21 @@ const functions = {
 		}
 		return numbers
 	},
+  //Roll20 does not all for Promises
+  //getAttributes: array => new Promise((resolve, reject) => array ? getAttrs(array, v => resolve(v)) : reject(errorMessage('getAttributes', 'Function failed'))),
 	getReprowid: trigger => {
 		const split = trigger.split('_');
 		return `${split[0]}_${split[1]}_${split[2]}`
 	},
+  parseInteger: string => parseInt(string) || 0,
 	parseIntegers: numbers => {
 		for (let [key, value] of Object.entries(numbers)) {
 		    numbers[key] = parseInt(value) || 0;
 		}
 		return numbers	
 	},
-  setAttributes: (update, silent) => silent === true ? setAttrs(update, {silent:true}) : setAttrs(update),
+  setAttributes: (update, silent) => silent && typeof update === 'object' ? setAttrs(update, {silent:true}) : typeof update === 'object' ? setAttrs(update) : errorMessage('setAttributes', `${update} is not an object`),
 	sumIntegers: numbers => numbers.reduce((a,b) => a + b, 0),
-	convertInteger: string => parseInt(string) || 0,
 
   shadowrun: {
     shotsFired: (shots, trigger) => shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots
@@ -39,5 +43,5 @@ const functions = {
 }
 
 //for Mocha Unit Texting
-//module.exports = functions;
+module.exports = functions;
 

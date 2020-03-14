@@ -1,19 +1,17 @@
-	
-   	on("sheet:opened", () => {
+
+  on("sheet:opened", () => {
 		getAttrs(["version"], v => { versioning(parseFloat(v.version) || 1); });
 
 		translations();
 	});
 
-    on("clicked:shots_remove clicked:shots_add", eventinfo => {
-    	getAttrs([`shots_fired`], v => {
-    		v = parseIntegers(v);
-    		const trigger = eventinfo.triggerName;
-    		let shots = v[`shots_fired`];
-			setAttrs({
-				shots_fired: shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots
-			});
-		});
+
+  on("clicked:shots_remove clicked:shots_add", eventinfo => {
+    getAttrs([`shots_fired`], value => {   
+      const startingShots = functions.parseIntegers(value)
+      const shots = functions.shadowrun.shotsFired(startingShots.shots_fired, eventinfo.triggerName)
+      functions.setAttributes({shots_fired: shots})
+    });
 	});
 
 	on("clicked:primary_ammo", eventinfo => {
@@ -32,18 +30,6 @@
 				primary_range_weapon_ammo: v[`primary_range_weapon_ammo_max`]
 			});
 		});
-	});
-
-	sheetAttribues.repeatingSkills.forEach(attr => {
-		on(`clicked:repeating_${attr}:skill`, eventinfo=> {
-			settingsToggle(eventinfo);
-		}); 
-	});
-
-	sheetAttribues.repeating.forEach(attr => {
-		on(`clicked:repeating_${attr}:${attr}`, eventinfo=> {
-			settingsToggle(eventinfo);
-		}); 
 	});
 
 	sheetAttribues.tabs.forEach(attr => {
