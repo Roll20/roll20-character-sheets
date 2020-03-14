@@ -64,36 +64,6 @@
 		};
 	});
 
-	// COMMON ROLLS: MEOMORY, JUDGE INTETIONS, COMPOSURE, LIFT & CARRY, OVERFLOW, DEFENSE, & SOAK ROLLS
-	const update_common_rolls = (attrs) => {
-		getAttrs(attrs, (v) => {
-			const found = attrs.find(mod => { return mod.includes("_modifier") });
-			const name  = found.split("_modifier")[0];
-			let numbers = [];
-
-			//DEFENSE & SOAK HAVE TWO EXTRA ATTRIBUTES. TEMP IS NEEDED BUT ONLY IF THE FLAG IS CHECKED IN SETTINGS
-			const array = name === "defense" || name === "soak" ? (v[`${name}_temp_flag`] === "on") ? attrs.splice(0, 4) : attrs.splice(0, 3) : attrs;
-
-			_.each(array, (attr) => { 
-				numbers.push(parseInt(v[`${attr}`]) || 0); 
-			});
-        	const add = (a, b) => a + b, sum = numbers.reduce(add);
-
-			setAttrs({[`${name}`]: sum});
-		});
-	};
-
-	//Calculate Movement Rates
-		var update_movement = () => {
-			getAttrs(["agility", "walk_modifier", "run_modifier"], (v) => {
-				const agi = parseInt(v.agility) || 0, wmod = parseInt(v.walk_modifier) || 0, rmod = parseInt(v.run_modifier) || 0;
-				let update = {};
-				update["walk"] = (agi * 2) + wmod;
-				update["run"] = (agi * 4) + rmod;
-				setAttrs(update);
-			});
-		};
-
 	//Update condition tracks
 	const update_track = track => {
 		let attrs = [`${track}_modifier`];
@@ -154,7 +124,7 @@
 	//Calculate Initiatves
 	const update_initiative = () => {
 		getAttrs(["reaction", "intuition", "initiative_modifier", "initiative_temp", "initiative_temp_flag"], v => {
-			v = processTempFlags(`initiative_temp_flag`, `initiative_temp`, v);
+			v = functions.processTempFlags(`initiative_temp_flag`, `initiative_temp`, v);
             v = functions.parseIntegers(v);
             const base = v.reaction + v.intuition, bonus = functions.calculateBonuses(v), total = base + bonus;
 
@@ -169,7 +139,7 @@
 		getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], v => {
 			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
 
-			v = processTempFlags(`initiative_dice_temp_flag`, `initiative_dice_temp`, v);
+			v = functions.processTempFlags(`initiative_dice_temp_flag`, `initiative_dice_temp`, v);
 			v = functions.parseIntegers(v);
 
 			const bonus = functions.calculateBonuses(v), total = Math.min(bonus+1,5);
