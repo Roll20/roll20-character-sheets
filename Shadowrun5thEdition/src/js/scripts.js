@@ -1,37 +1,4 @@
 
-
-	//Calculate ATTRIBUTES
-	sheetAttribues.calculatedAttributes.forEach(attr => {
-        on(`change:${attr}_base change:${attr}_modifier change:${attr}_temp change:${attr}_temp_flag`, () => {
-            getAttrs([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`, `${attr}_temp_flag`], v => {
-                v = processTempFlags(`${attr}_temp_flag`, `${attr}_temp`, v);
-                v = functions.parseIntegers(v);
-
-                const base = v[`${attr}_base`], bonus = calculateBonuses(v), total = base + bonus;
-
-                setAttrs({
-                    [attr]: total,
-                    [`display_${attr}`]: bonus === 0 ? base : `${base} (${total})`
-                });
-            });
-        });
-    });
-
-	//Calculaute limts
-		const update_limit = type => {
-			let attrs = [`${type}_limit_modifier`, `${type}_limit_temp`, `${type}_limit_temp_flag`].concat(sheetAttribues[`${type}Limits`]);
-			getAttrs(attrs, v => {
-				v = processTempFlags(`${type}_limit_temp_flag`, `${type}_limit_temp`, v);
-				v = functions.parseIntegers(v);
-
-				const bonus = calculateBonuses(v), total = calculateLimitTotal(v, type);
-
-				setAttrs({
-					[`${type}_limit`]: Math.ceil(total) + bonus
-			});
-			})
-		};
-
 	//This function checks changes to repeating_armor and updates the Primary Armor if needed
 	on("change:repeating_armor", (eventInfo) => {
 		const source = eventInfo.sourceAttribute;
@@ -117,7 +84,7 @@
 	};
 
 	//Calculate Movement Rates
-		var updateMovement = () => {
+		var update_movement = () => {
 			getAttrs(["agility", "walk_modifier", "run_modifier"], (v) => {
 				const agi = parseInt(v.agility) || 0, wmod = parseInt(v.walk_modifier) || 0, rmod = parseInt(v.run_modifier) || 0;
 				let update = {};
@@ -189,7 +156,7 @@
 		getAttrs(["reaction", "intuition", "initiative_modifier", "initiative_temp", "initiative_temp_flag"], v => {
 			v = processTempFlags(`initiative_temp_flag`, `initiative_temp`, v);
             v = functions.parseIntegers(v);
-            const base = v.reaction + v.intuition, bonus = calculateBonuses(v), total = base + bonus;
+            const base = v.reaction + v.intuition, bonus = functions.calculateBonuses(v), total = base + bonus;
 
 			setAttrs({
 				["initiative_mod"]: total,
@@ -205,7 +172,7 @@
 			v = processTempFlags(`initiative_dice_temp_flag`, `initiative_dice_temp`, v);
 			v = functions.parseIntegers(v);
 
-			const bonus = calculateBonuses(v), total = Math.min(bonus+1,5);
+			const bonus = functions.calculateBonuses(v), total = Math.min(bonus+1,5);
 			setAttrs({
 				initiative_dice: edgeFlag ? 5 : total
 			});

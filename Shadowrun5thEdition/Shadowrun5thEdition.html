@@ -3406,8 +3406,8 @@
 	"socialLimits": ["essence", "willpower", "charisma"],
 }
 
-const errorMessage = (name, error) => console.error(`%c ${name}: ${error}`, "color: orange; font-weight:14px;");
-const warningMessage = (name, error) => console.warn(`%c ${name}: ${error}`, "color: orange; font-weight:14px;");
+const errorMessage = error => console.error(`%c ${error}`, "color: orange; font-weight:14px; font-weight:bold;");
+const warningMessage = error => console.warn(`%c ${error}`, "color: yellow; font-weight:14px; font-weight:bold;");
 
 const functions = {
   convertIntegerNegative: number => number > 0 ? -Math.abs(number) : number,
@@ -3417,12 +3417,17 @@ const functions = {
 		}
 		return numbers
 	},
-  //Roll20 does not all for Promises
-  //getAttributes: array => new Promise((resolve, reject) => array ? getAttrs(array, v => resolve(v)) : reject(errorMessage('getAttributes', 'Function failed'))),
+  //Roll20 does not allow for Promises
+  //getAttributes: array => new Promise((resolve, reject) => array ? getAttrs(array, v => resolve(v)) : reject(errorMessage('Function failed'))),
 	getReprowid: trigger => {
 		const split = trigger.split('_');
 		return `${split[0]}_${split[1]}_${split[2]}`
 	},
+  getTranslations: translationKeys => {
+    let translations = {}
+    translationKeys.forEach(key => translations[`${key}`] = getTranslationByKey(key))
+    return translations
+  },
   parseInteger: string => parseInt(string) || 0,
 	parseIntegers: numbers => {
 		for (let [key, value] of Object.entries(numbers)) {
@@ -3430,12 +3435,32 @@ const functions = {
 		}
 		return numbers	
 	},
-  setAttributes: (update, silent) => silent && typeof update === 'object' ? setAttrs(update, {silent:true}) : typeof update === 'object' ? setAttrs(update) : errorMessage('setAttributes', `${update} is not an object`),
+  setAttributes: (update, silent) => silent && typeof update === 'object' ? setAttrs(update, {silent:true}) : typeof update === 'object' ? setAttrs(update) : errorMessage(`${update} is not an object`),
 	sumIntegers: numbers => numbers.reduce((a,b) => a + b, 0),
 
   shadowrun: {
-    shotsFired: (shots, trigger) => shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots,
+    buildDisplay: (base, bonus) => bonus === 0 ? base : `${base} (${base + bonus})`,
+    calculateBonuses: attrs => {
+      let bonus = 0
+      for (let [key, value] of Object.entries(attrs)) { key.includes('modifier') || key.includes('temp') ? bonus += value : 0 }
+      return bonus
+    },
 
+    calculateLimitTotal: attrs => Math.ceil((attrs[0] + attrs[1] + (attrs[2] * 2))/3),
+    processTempFlags: (attribute, attrs) => {
+      try {
+        attrs[`${attribute}_temp_flag`] === "on" ? false : delete attrs[`${attribute}_temp`];
+        delete attrs[`${attribute}_temp_flag`];
+        return attrs
+      } catch (error) {
+        errorMessage(error)
+      }
+    },
+    shotsFired: (shots, trigger) => shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots,
+    updateLimitTotal: attrs => {
+      attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
+      return functions.shadowrun.calculateLimitTotal(Object.values(attrs))
+    }
   }
 }
 
@@ -3443,44 +3468,110 @@ const functions = {
 //module.exports = functions;
 
 const translations = () => {
-  const attributes = sheetAttribues.translationsAttributes;
-  const translations = getTranslations(attributes);
-  let attribute_roll = `?{${translations[0]}`;
-  for (i = 1; i <= (attributes.length - 2); i += 1) {
-    attribute_roll +=  `|${translations[i]},@{${attributes[i]}}`;
-  };
-  attribute_roll += `|${translations[10]},0}`; //For None
-  functions.setAttributes({attribute_roll: attribute_roll})
+  try {
+    const attributes = sheetAttribues.translationsAttributes
+    const translations = functions.getTranslations(attributes)
+    let attribute_roll = `?{${translations.attribute}`
+    delete translations.attribute
+    for (let [key, value] of Object.entries(translations)) {
+        attribute_roll += key !== 'none' ? `|${value},@{${key}}` : `|${value},0}`
+    }
+    functions.setAttributes({attribute_roll: attribute_roll})
+  } catch (error) {
+    errorMessage(error)
+  }
 } 
 
 const updateShotsFired = trigger => {
-  getAttrs([`shots_fired`], attrs => {   
-    attrs = functions.parseIntegers(attrs)
-    const shots = functions.shadowrun.shotsFired(attrs.shots_fired, trigger)
-    functions.setAttributes({shots_fired: shots})
-  });
+  try {
+    getAttrs([`shots_fired`], attrs => {   
+      attrs = functions.parseIntegers(attrs)
+      const shots = functions.shadowrun.shotsFired(attrs.shots_fired, trigger)
+      functions.setAttributes({shots_fired: shots})
+    });
+  } catch (error) {
+    errorMessage(error)
+  }
 }
 
 const updateAmmoWithShotsFired = () => {
-  getAttrs([`primary_range_weapon_ammo`, `shots_fired`], attrs => {
-    attrs = functions.parseIntegers(attrs)
-    attrs.shots_fired = functions.convertIntegerNegative(attrs.shots_fired)
-    functions.setAttributes({primary_range_weapon_ammo: functions.sumIntegers(Object.values(attrs))})
-  });
+  try {
+    getAttrs([`primary_range_weapon_ammo`, `shots_fired`], attrs => {
+      attrs = functions.parseIntegers(attrs)
+      attrs.shots_fired = functions.convertIntegerNegative(attrs.shots_fired)
+      functions.setAttributes({primary_range_weapon_ammo: functions.sumIntegers(Object.values(attrs))})
+    });
+  } catch (error) {
+    errorMessage(error)
+  }
 }
 
 const updateAmmoWithMax = () => {
-  getAttrs([`primary_range_weapon_ammo_max`], attrs => {
-    attrs = functions.parseIntegers(attrs)
-    functions.setAttributes({primary_range_weapon_ammo: attrs.primary_range_weapon_ammo_max})
-  });
+  try {
+    getAttrs([`primary_range_weapon_ammo_max`], attrs => {
+      attrs = functions.parseIntegers(attrs)
+      functions.setAttributes({primary_range_weapon_ammo: attrs.primary_range_weapon_ammo_max})
+    });
+  } catch (error) {
+    errorMessage(error)
+  }
 }
 
-const updateTab = attr => on(`clicked:tab_${attr}`, () => functions.setAttributes({tab: attr}))
+const updateTab = attr => functions.setAttributes({tab: attr})
 
- 
+const updateAttributes = (array, attribute) => {
+  try {
+    getAttrs(array, attrs => {
+      attrs = functions.shadowrun.processTempFlags(attribute, attrs)
+      attrs = functions.parseIntegers(attrs)
+      const base = attrs[`${attribute}_base`], bonus = functions.shadowrun.calculateBonuses(attrs)
+      functions.setAttributes({
+        [attribute]: base + bonus,
+        [`display_${attribute}`]: functions.shadowrun.buildDisplay(base, bonus)
+      })
+    })
+  } catch (error) {
+    errorMessage(error)
+  }
+}
 
-  const versioning = version => {
+const updateLimitTotal = attrs => {
+  attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
+  return functions.shadowrun.calculateLimitTotal(Object.values(attrs))
+}
+
+//physical, social, mental
+const updateLimits = type => {
+  try {
+    const limitsAttributes = sheetAttribues[`${type}Limits`];
+    let array = [`${type}_limit_modifier`, `${type}_limit_temp`, `${type}_limit_temp_flag`].concat(limitsAttributes);
+    getAttrs(array, attrs => {
+        attrs = functions.shadowrun.processTempFlags(`${type}_limit`, attrs)
+        attrs = functions.parseIntegers(attrs)
+
+        const bonus = functions.shadowrun.calculateBonuses(attrs)
+        delete attrs[`${type}_limit_modifier`]
+        delete attrs[`${type}_limit_temp`]
+
+        const total = functions.shadowrun.updateLimitTotal(attrs)
+
+        functions.setAttributes({[`${type}_limit`]: total + bonus})
+    })
+  } catch (error) {
+    errorMessage(error)
+  }
+}
+
+
+    var update_movement = () => {
+      getAttrs(["agility", "walk_modifier", "run_modifier"], (v) => {
+        const agi = parseInt(v.agility) || 0, wmod = parseInt(v.walk_modifier) || 0, rmod = parseInt(v.run_modifier) || 0;
+        let update = {};
+        update["walk"] = (agi * 2) + wmod;
+        update["run"] = (agi * 4) + rmod;
+        setAttrs(update);
+      });
+    };const versioning = version => {
   	console.log(`%c Shadowrun 5th Edition versioning, ${version}`, "color: darkblue; font-weight:bold");
 
     switch(true) {
@@ -3551,41 +3642,7 @@ const onepointthreefive = () => {
         }
     });  
 };
-
-  <!--Old functions working to become obsolete-->	
-
-	const processTempFlags = (flag, temp, values) => {
-		values[`${flag}`] === "on" ? false : delete values[`${temp}`];
-		delete values[`${flag}`];
-		return values
-	}
-
-	const calculateLimitTotal = (values, type) => {
-		const attributes = sheetAttribues[`${type}Limits`];
-		values.essence ? Math.ceil(values.essence) || 0 : false;
-
-		const stat1 = values[`${attributes[0]}`]; //Essence, Intuition, Body
-		const stat2 = values[`${attributes[1]}`]; //Willpower, Reaction, Willpower
-		const stat3 = values[`${attributes[2]}`]; //Logic, Strenght, Charisma
-
-		return ((stat1 + stat2 + (stat3 * 2))/3)
-	}
-
-	const calculateBonuses = values => {
-		let bonus = 0;
-		for (let [key, value] of Object.entries(values)) {
-	        key.includes('modifier') || key.includes('temp') ? bonus += value : 0;
-	    }
-		return bonus
-	}
-
-	const getTranslations = translationKeys => {
-		let translations = [];
-		translationKeys.forEach(key => {
-			translations.push(getTranslationByKey(key));
-		});
-		return translations
-	}
+  
   on("sheet:opened", () => {
 		getAttrs(["version"], v => { versioning(parseFloat(v.version) || 1); });
 		translations();
@@ -3598,13 +3655,13 @@ const onepointthreefive = () => {
 
   on("clicked:reload", () => updateAmmoWithMax())
 
-	sheetAttribues.tabs.forEach(attr => updateTab(attr))
+	sheetAttribues.tabs.forEach(attr => on(`clicked:tab_${attr}`, () => updateTab(attr)))
 
 	on("change:agility change:walk_modifier change:run_modifier", () => updateMovement())
 
   on("change:body change:strength change:lift_carry_modifier", () => update_common_rolls(["body", "strength", "lift_carry_modifier"]))
 
-  on("change:body change:strength", () => update_limit("physical"))
+  on("change:body change:strength", () => updateLimits("physical"))
 
 	on("change:body", () => {
 			update_common_rolls(["body", "overflow_modifier"])
@@ -3617,10 +3674,10 @@ const onepointthreefive = () => {
     update_initiative()
   })
 
-  on("change:reaction", () => update_limit("physical"))
+  on("change:reaction", () => updateLimits("physical"))
 
   on("change:intuition", () => {
-    update_limit("mental")
+    updateLimits("mental")
     update_common_rolls(["charisma", "intuition", "judge_intentions_modifier"])
   })
 
@@ -3628,19 +3685,19 @@ const onepointthreefive = () => {
 		update_common_rolls(["charisma", "willpower", "composure_modifier"])
 		update_common_rolls(["logic", "willpower", "memory_modifier"])
 		update_track("stun")
-		update_limit("social")
-		update_limit("mental")
+		updateLimits("social")
+		updateLimits("mental")
 	})
 
   on("change:logic change:memory_modifier", () => update_common_rolls(["logic", "willpower", "memory_modifier"]))
 
-	on("change:logic", () => update_limit("mental")) 
+	on("change:logic", () => updateLimits("mental")) 
 
   on("change:charisma change:composure_modifier", eventinfo => update_common_rolls(["charisma", "willpower", "composure_modifier"]))
 
   on("change:charisma change:judge_intentions_modifier", eventinfo => update_common_rolls(["charisma", "intuition", "judge_intentions_modifier"]))
 
-  on("change:charisma change:essence", eventinfo => update_limit("social"))
+  on("change:charisma change:essence", eventinfo => updateLimits("social"))
 
 	on("change:physical_modifier change:flag_drone", () => update_track("physical"))
 
@@ -3652,7 +3709,7 @@ const onepointthreefive = () => {
 
 	on("change:armor_rating change:soak_modifier change:soak_temp change:soak_temp_flag", () => update_common_rolls(["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`]))
 
-	on("change:mental_limit_modifier change:mental_limit_temp change:mental_limit_temp_flag change:physical_limit_modifier change:physical_limit_temp change:physical_limit_temp_flag change:social_limit_modifier change:social_limit_temp change:social_limit_temp_flag", eventinfo => update_limit(eventinfo.sourceAttribute.split("_")[0]));
+	on("change:mental_limit_modifier change:mental_limit_temp change:mental_limit_temp_flag change:physical_limit_modifier change:physical_limit_temp change:physical_limit_temp_flag change:social_limit_modifier change:social_limit_temp change:social_limit_temp_flag", eventinfo => updateLimits(eventinfo.sourceAttribute.split("_")[0]));
 
 	sheetAttribues.woundCalculation.forEach(attr => on(`change:${attr}`, () => update_wounds()))
 
@@ -3670,42 +3727,12 @@ const onepointthreefive = () => {
 
 	on("change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle", () => updateMatrixInitiative())
 
-
+  sheetAttribues.calculatedAttributes.forEach(attribute => {
+      const attributeArray = [`${attribute}_base`, `${attribute}_modifier`, `${attribute}_temp`, `${attribute}_temp_flag`]
+      attributeArray.forEach(attr => on(`change:${attr}`, () => updateAttributes(attributeArray, attribute)))
+  });
 
   <!--Old functions working to become obsolete-->
-
-	//Calculate ATTRIBUTES
-	sheetAttribues.calculatedAttributes.forEach(attr => {
-        on(`change:${attr}_base change:${attr}_modifier change:${attr}_temp change:${attr}_temp_flag`, () => {
-            getAttrs([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`, `${attr}_temp_flag`], v => {
-                v = processTempFlags(`${attr}_temp_flag`, `${attr}_temp`, v);
-                v = functions.parseIntegers(v);
-
-                const base = v[`${attr}_base`], bonus = calculateBonuses(v), total = base + bonus;
-
-                setAttrs({
-                    [attr]: total,
-                    [`display_${attr}`]: bonus === 0 ? base : `${base} (${total})`
-                });
-            });
-        });
-    });
-
-	//Calculaute limts
-		const update_limit = type => {
-			let attrs = [`${type}_limit_modifier`, `${type}_limit_temp`, `${type}_limit_temp_flag`].concat(sheetAttribues[`${type}Limits`]);
-			getAttrs(attrs, v => {
-				v = processTempFlags(`${type}_limit_temp_flag`, `${type}_limit_temp`, v);
-				v = functions.parseIntegers(v);
-
-				const bonus = calculateBonuses(v), total = calculateLimitTotal(v, type);
-
-				setAttrs({
-					[`${type}_limit`]: Math.ceil(total) + bonus
-			});
-			})
-		};
-
 	//This function checks changes to repeating_armor and updates the Primary Armor if needed
 	on("change:repeating_armor", (eventInfo) => {
 		const source = eventInfo.sourceAttribute;
@@ -3791,7 +3818,7 @@ const onepointthreefive = () => {
 	};
 
 	//Calculate Movement Rates
-		var updateMovement = () => {
+		var update_movement = () => {
 			getAttrs(["agility", "walk_modifier", "run_modifier"], (v) => {
 				const agi = parseInt(v.agility) || 0, wmod = parseInt(v.walk_modifier) || 0, rmod = parseInt(v.run_modifier) || 0;
 				let update = {};
@@ -3863,7 +3890,7 @@ const onepointthreefive = () => {
 		getAttrs(["reaction", "intuition", "initiative_modifier", "initiative_temp", "initiative_temp_flag"], v => {
 			v = processTempFlags(`initiative_temp_flag`, `initiative_temp`, v);
             v = functions.parseIntegers(v);
-            const base = v.reaction + v.intuition, bonus = calculateBonuses(v), total = base + bonus;
+            const base = v.reaction + v.intuition, bonus = functions.calculateBonuses(v), total = base + bonus;
 
 			setAttrs({
 				["initiative_mod"]: total,
@@ -3879,7 +3906,7 @@ const onepointthreefive = () => {
 			v = processTempFlags(`initiative_dice_temp_flag`, `initiative_dice_temp`, v);
 			v = functions.parseIntegers(v);
 
-			const bonus = calculateBonuses(v), total = Math.min(bonus+1,5);
+			const bonus = functions.calculateBonuses(v), total = Math.min(bonus+1,5);
 			setAttrs({
 				initiative_dice: edgeFlag ? 5 : total
 			});

@@ -11,8 +11,8 @@ const sheetAttribues = {
 	"socialLimits": ["essence", "willpower", "charisma"],
 }
 
-const errorMessage = (name, error) => console.error(`%c ${name}: ${error}`, "color: orange; font-weight:14px;");
-const warningMessage = (name, error) => console.warn(`%c ${name}: ${error}`, "color: orange; font-weight:14px;");
+const errorMessage = error => console.error(`%c ${error}`, "color: orange; font-weight:14px; font-weight:bold;");
+const warningMessage = error => console.warn(`%c ${error}`, "color: yellow; font-weight:14px; font-weight:bold;");
 
 const functions = {
   convertIntegerNegative: number => number > 0 ? -Math.abs(number) : number,
@@ -22,12 +22,17 @@ const functions = {
 		}
 		return numbers
 	},
-  //Roll20 does not all for Promises
-  //getAttributes: array => new Promise((resolve, reject) => array ? getAttrs(array, v => resolve(v)) : reject(errorMessage('getAttributes', 'Function failed'))),
+  //Roll20 does not allow for Promises
+  //getAttributes: array => new Promise((resolve, reject) => array ? getAttrs(array, v => resolve(v)) : reject(errorMessage('Function failed'))),
 	getReprowid: trigger => {
 		const split = trigger.split('_');
 		return `${split[0]}_${split[1]}_${split[2]}`
 	},
+  getTranslations: translationKeys => {
+    let translations = {}
+    translationKeys.forEach(key => translations[`${key}`] = getTranslationByKey(key))
+    return translations
+  },
   parseInteger: string => parseInt(string) || 0,
 	parseIntegers: numbers => {
 		for (let [key, value] of Object.entries(numbers)) {
@@ -35,53 +40,140 @@ const functions = {
 		}
 		return numbers	
 	},
-  setAttributes: (update, silent) => silent && typeof update === 'object' ? setAttrs(update, {silent:true}) : typeof update === 'object' ? setAttrs(update) : errorMessage('setAttributes', `${update} is not an object`),
+  setAttributes: (update, silent) => silent && typeof update === 'object' ? setAttrs(update, {silent:true}) : typeof update === 'object' ? setAttrs(update) : errorMessage(`${update} is not an object`),
 	sumIntegers: numbers => numbers.reduce((a,b) => a + b, 0),
 
   shadowrun: {
-    shotsFired: (shots, trigger) => shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots,
+    buildDisplay: (base, bonus) => bonus === 0 ? base : `${base} (${base + bonus})`,
+    calculateBonuses: attrs => {
+      let bonus = 0
+      for (let [key, value] of Object.entries(attrs)) { key.includes('modifier') || key.includes('temp') ? bonus += value : 0 }
+      return bonus
+    },
 
+    calculateLimitTotal: attrs => Math.ceil((attrs[0] + attrs[1] + (attrs[2] * 2))/3),
+    processTempFlags: (attribute, attrs) => {
+      try {
+        attrs[`${attribute}_temp_flag`] === "on" ? false : delete attrs[`${attribute}_temp`];
+        delete attrs[`${attribute}_temp_flag`];
+        return attrs
+      } catch (error) {
+        errorMessage(error)
+      }
+    },
+    shotsFired: (shots, trigger) => shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots,
+    updateLimitTotal: attrs => {
+      attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
+      return functions.shadowrun.calculateLimitTotal(Object.values(attrs))
+    }
   }
 }
 
 //for Mocha Unit Texting
-//module.exports = functions;
+module.exports = functions;
 
 const translations = () => {
-  const attributes = sheetAttribues.translationsAttributes;
-  const translations = getTranslations(attributes);
-  let attribute_roll = `?{${translations[0]}`;
-  for (i = 1; i <= (attributes.length - 2); i += 1) {
-    attribute_roll +=  `|${translations[i]},@{${attributes[i]}}`;
-  };
-  attribute_roll += `|${translations[10]},0}`; //For None
-  functions.setAttributes({attribute_roll: attribute_roll})
+  try {
+    const attributes = sheetAttribues.translationsAttributes
+    const translations = functions.getTranslations(attributes)
+    let attribute_roll = `?{${translations.attribute}`
+    delete translations.attribute
+    for (let [key, value] of Object.entries(translations)) {
+        attribute_roll += key !== 'none' ? `|${value},@{${key}}` : `|${value},0}`
+    }
+    functions.setAttributes({attribute_roll: attribute_roll})
+  } catch (error) {
+    errorMessage(error)
+  }
 } 
 
 const updateShotsFired = trigger => {
-  getAttrs([`shots_fired`], attrs => {   
-    attrs = functions.parseIntegers(attrs)
-    const shots = functions.shadowrun.shotsFired(attrs.shots_fired, trigger)
-    functions.setAttributes({shots_fired: shots})
-  });
+  try {
+    getAttrs([`shots_fired`], attrs => {   
+      attrs = functions.parseIntegers(attrs)
+      const shots = functions.shadowrun.shotsFired(attrs.shots_fired, trigger)
+      functions.setAttributes({shots_fired: shots})
+    });
+  } catch (error) {
+    errorMessage(error)
+  }
 }
 
 const updateAmmoWithShotsFired = () => {
-  getAttrs([`primary_range_weapon_ammo`, `shots_fired`], attrs => {
-    attrs = functions.parseIntegers(attrs)
-    attrs.shots_fired = functions.convertIntegerNegative(attrs.shots_fired)
-    functions.setAttributes({primary_range_weapon_ammo: functions.sumIntegers(Object.values(attrs))})
-  });
+  try {
+    getAttrs([`primary_range_weapon_ammo`, `shots_fired`], attrs => {
+      attrs = functions.parseIntegers(attrs)
+      attrs.shots_fired = functions.convertIntegerNegative(attrs.shots_fired)
+      functions.setAttributes({primary_range_weapon_ammo: functions.sumIntegers(Object.values(attrs))})
+    });
+  } catch (error) {
+    errorMessage(error)
+  }
 }
 
 const updateAmmoWithMax = () => {
-  getAttrs([`primary_range_weapon_ammo_max`], attrs => {
-    attrs = functions.parseIntegers(attrs)
-    functions.setAttributes({primary_range_weapon_ammo: attrs.primary_range_weapon_ammo_max})
-  });
+  try {
+    getAttrs([`primary_range_weapon_ammo_max`], attrs => {
+      attrs = functions.parseIntegers(attrs)
+      functions.setAttributes({primary_range_weapon_ammo: attrs.primary_range_weapon_ammo_max})
+    });
+  } catch (error) {
+    errorMessage(error)
+  }
 }
 
-const updateTab = attr => on(`clicked:tab_${attr}`, () => functions.setAttributes({tab: attr}))
+const updateTab = attr => functions.setAttributes({tab: attr})
 
- 
+const updateAttributes = (array, attribute) => {
+  try {
+    getAttrs(array, attrs => {
+      attrs = functions.shadowrun.processTempFlags(attribute, attrs)
+      attrs = functions.parseIntegers(attrs)
+      const base = attrs[`${attribute}_base`], bonus = functions.shadowrun.calculateBonuses(attrs)
+      functions.setAttributes({
+        [attribute]: base + bonus,
+        [`display_${attribute}`]: functions.shadowrun.buildDisplay(base, bonus)
+      })
+    })
+  } catch (error) {
+    errorMessage(error)
+  }
+}
 
+const updateLimitTotal = attrs => {
+  attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
+  return functions.shadowrun.calculateLimitTotal(Object.values(attrs))
+}
+
+//physical, social, mental
+const updateLimits = type => {
+  try {
+    const limitsAttributes = sheetAttribues[`${type}Limits`];
+    let array = [`${type}_limit_modifier`, `${type}_limit_temp`, `${type}_limit_temp_flag`].concat(limitsAttributes);
+    getAttrs(array, attrs => {
+        attrs = functions.shadowrun.processTempFlags(`${type}_limit`, attrs)
+        attrs = functions.parseIntegers(attrs)
+
+        const bonus = functions.shadowrun.calculateBonuses(attrs)
+        delete attrs[`${type}_limit_modifier`]
+        delete attrs[`${type}_limit_temp`]
+
+        const total = functions.shadowrun.updateLimitTotal(attrs)
+
+        functions.setAttributes({[`${type}_limit`]: total + bonus})
+    })
+  } catch (error) {
+    errorMessage(error)
+  }
+}
+
+
+    var update_movement = () => {
+      getAttrs(["agility", "walk_modifier", "run_modifier"], (v) => {
+        const agi = parseInt(v.agility) || 0, wmod = parseInt(v.walk_modifier) || 0, rmod = parseInt(v.run_modifier) || 0;
+        let update = {};
+        update["walk"] = (agi * 2) + wmod;
+        update["run"] = (agi * 4) + rmod;
+        setAttrs(update);
+      });
+    };
