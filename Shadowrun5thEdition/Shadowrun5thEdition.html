@@ -2101,8 +2101,8 @@
 						<label data-i18n="initiative">Initiative</label><input type="number" name="attr_initiative_temp" title="@{initiative_temp}" /><input type="checkbox" name="attr_initiative_temp_flag" value="on" checked />
 						<label data-i18n="initiativedice">Initiative Dice</label><input type="number" name="attr_initiative_dice_temp" title="@{initiative_dice_temp}" /><input type="checkbox" name="attr_initiative_dice_temp_flag" value="on" checked />
 						<hr />
-						<label data-i18n="mentallimit">Mental Limit</label><input type="number" name="attr_mental_limit_temp" title="@{mental_limit_temp}" /><input type="checkbox" name="attr_mental_limit_temp_flag" value="on" checked />
 						<label data-i18n="physicallimit">Physical Limit</label><input type="number" name="attr_physical_limit_temp" title="@{physical_limit_temp}" /><input type="checkbox" name="attr_physical_limit_temp_flag" value="on" checked />
+            <label data-i18n="mentallimit">Mental Limit</label><input type="number" name="attr_mental_limit_temp" title="@{mental_limit_temp}" /><input type="checkbox" name="attr_mental_limit_temp_flag" value="on" checked />
 						<label data-i18n="sociallimit">Social Limit</label><input type="number" name="attr_social_limit_temp" title="@{social_limit_temp}" /><input type="checkbox" name="attr_social_limit_temp_flag" value="on" checked />
 					</div>
 				</div>
@@ -3495,6 +3495,16 @@ const functions = {
 //for Mocha Unit Texting
 //module.exports = functions;
 
+const updateConditionTracks = conditionTrack => {
+  try {
+    getAttrs(sheetAttribues[conditionTrack], attrs => {
+      console.log(attrs)
+    })
+  } catch (error) {
+    errorMessage(error)
+  }
+}
+
 const translations = () => {
   try {
     const attributes = sheetAttribues.translationsAttributes
@@ -3610,16 +3620,6 @@ const updateDerivedAttribute = derivedAttribute => {
   }
 }
 
-const updateConditionTracks = derivedAttribute => {
-  try {
-    getAttrs(sheetAttribues[derivedAttribute], attrs => {
-      attrs = functions.shadowrun.attributeFactory(attrs)
-    })
-  } catch (error) {
-    errorMessage(error)
-  }
-}
-
   const versioning = version => {
   	console.log(`%c Shadowrun 5th Edition versioning, ${version}`, "color: darkblue; font-weight:bold");
 
@@ -3707,13 +3707,7 @@ const onepointthreefive = () => {
 
 	on('change:agility change:walk_modifier change:run_modifier', () => updateMovement())
 
-	on('change:body', () => update_track('physical'))
-
   on('change:reaction change:intuition', () => update_initiative())
-
-	on('change:willpower', () => {
-		updateConditionTracks('stun')
-	})
 
   sheetAttribues.derivedAttributes.forEach(derivedAttribute => {
     sheetAttribues[derivedAttribute].forEach(attr => on(`change:${attr}`, () => updateDerivedAttribute(derivedAttribute)))
@@ -3724,9 +3718,9 @@ const onepointthreefive = () => {
     on(`change:${attributeLimit}_modifier change:${attributeLimit}_temp change:${attributeLimit}_temp_flag`, () => updateLimits([`${attributeLimit}`]))
   })
 
-	on('change:physical_modifier change:flag_drone', () => update_track('physical'))
-
-	on('change:stun_modifier', () => update_track('stun'))
+  sheetAttribues.conditionTracks.forEach(conditionTrack => {
+    sheetAttribues[conditionTrack].forEach(attr => on(`change:${attr}`, () => updateConditionTracks(conditionTrack)))
+  })
 
 	on('change:initiative_modifier change:initiative_temp change:initiative_temp_flag', () => update_initiative())
 

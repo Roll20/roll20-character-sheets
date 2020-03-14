@@ -14,13 +14,7 @@
 
 	on('change:agility change:walk_modifier change:run_modifier', () => updateMovement())
 
-	on('change:body', () => update_track('physical'))
-
   on('change:reaction change:intuition', () => update_initiative())
-
-	on('change:willpower', () => {
-		updateConditionTracks('stun')
-	})
 
   sheetAttribues.derivedAttributes.forEach(derivedAttribute => {
     sheetAttribues[derivedAttribute].forEach(attr => on(`change:${attr}`, () => updateDerivedAttribute(derivedAttribute)))
@@ -31,9 +25,9 @@
     on(`change:${attributeLimit}_modifier change:${attributeLimit}_temp change:${attributeLimit}_temp_flag`, () => updateLimits([`${attributeLimit}`]))
   })
 
-	on('change:physical_modifier change:flag_drone', () => update_track('physical'))
-
-	on('change:stun_modifier', () => update_track('stun'))
+  sheetAttribues.conditionTracks.forEach(conditionTrack => {
+    sheetAttribues[conditionTrack].forEach(attr => on(`change:${attr}`, () => updateConditionTracks(conditionTrack)))
+  })
 
 	on('change:initiative_modifier change:initiative_temp change:initiative_temp_flag', () => update_initiative())
 

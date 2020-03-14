@@ -1,12 +1,30 @@
-	const sheetAttribues = {
-		"attributes": ["body", "agility", "reaction", "strength", "willpower", "logic", "intuition", "charisma", "edge"],
-		"translationsAttributes": ["attribute", "body", "agility", "reaction", "strength", "willpower", "logic", "intuition", "charisma", "edge", "none"],
-		"calculatedAttributes": ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition','charisma','magic', 'resonance'],
-		"repeating": ["quality", "martial", "items", "range", "melee", "armor", "spell", "preps", "ritual", "powers", "forms", "vehicle", "augementations", "lifestyle", "contacts", "programs"],
-		"repeatingSkills": ["active", "knowledge", "language"],
-		"tabs": [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`],
-		"woundCalculation": ["high_pain_tolerance", "low_pain_tolerance", "damage_compensators_physical", "damage_compensators_stun", "stun", "physical"],
-		"mentalLimits": ["intuition", "willpower", "logic"],
-		"physicalLimits": ["body", "reaction", "strength"],
-		"socialLimits": ["essence", "willpower", "charisma"]
-	}
+const sheetAttribues = {
+  attributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge'],
+  translationsAttributes: ['attribute', 'body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge', 'none'],
+  calculatedAttributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition','charisma','magic', 'resonance'],
+  repeating: ['quality', 'martial', 'items', 'range', 'melee', 'armor', 'spell', 'preps', 'ritual', 'powers', 'forms', 'vehicle', 'augementations', 'lifestyle', 'contacts', 'programs'],
+  repeatingSkills: ['active', 'knowledge', 'language'],
+  tabs: [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`],
+  woundCalculation: ['high_pain_tolerance', 'low_pain_tolerance', 'damage_compensators_physical', 'damage_compensators_stun', 'stun', 'physical'],
+  attributeLimits: ['mental_limit', 'physical_limit', 'social_limit'],
+  mental_limit: ['intuition', 'willpower', 'logic'],
+  physical_limit: ['body', 'reaction', 'strength'],
+  social_limit: ['essence', 'willpower', 'charisma'],
+  lift_carry: ['body', 'strength', 'lift_carry_modifier'],
+  overflow: ['body', 'overflow_modifier'],
+  soak: ['body', 'armor_rating', 'soak_modifier', 'soak_temp', `soak_temp_flag`],
+  defense: ['reaction', 'intuition', 'defense_modifier', 'defense_temp', `defense_temp_flag`],
+  judge_intentions: ['charisma', 'intuition', 'judge_intentions_modifier'],
+  composure: ['charisma', 'willpower', 'composure_modifier'],
+  memory: ['logic', 'willpower', 'memory_modifier'],
+  conditionTracks: ['stun', 'physical', 'matrix'],
+  physical: ['physical_modifier', 'body', 'sheet_type', 'flag_drone'],
+  stun: ['stun_modifier', 'willpower'],
+  matrix: ['matrix_modifier', 'device_rating'],
+  derivedAttributes: ['memory', 'composure', 'defense', 'soak', 'overflow', 'judge_intentions', 'lift_carry'],
+  stunCharacters: ['grunt', 'pc'],
+  physicalCharacters: sheetAttribues.stunCharacters.concat(['vehicle']),
+  matrixCharacters: ['vehicle', 'host', 'sprite']
+
+}
+
