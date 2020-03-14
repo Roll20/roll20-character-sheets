@@ -69,7 +69,7 @@
 		let attrs = [`${track}_modifier`];
 		track === "stun" ? attrs.push("willpower") : attrs.push("body", "sheet_type", "flag_drone");
 
-		getAttrs(attrs, v =>{
+		getAttrs(attrs, v => {
 			const stat = parseInt(v[`${attrs[1]}`]) || 0; //Willpower or Body
 			const mod = parseInt(v[`${track}_modifier`]) || 0;
 			let update = {};

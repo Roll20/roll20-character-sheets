@@ -1,26 +1,30 @@
 const sheetAttribues = {
-	attributes: ["body", "agility", "reaction", "strength", "willpower", "logic", "intuition", "charisma", "edge"],
-	translationsAttributes: ["attribute", "body", "agility", "reaction", "strength", "willpower", "logic", "intuition", "charisma", "edge", "none"],
+	attributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge'],
+	translationsAttributes: ['attribute', 'body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge', 'none'],
 	calculatedAttributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition','charisma','magic', 'resonance'],
-	repeating: ["quality", "martial", "items", "range", "melee", "armor", "spell", "preps", "ritual", "powers", "forms", "vehicle", "augementations", "lifestyle", "contacts", "programs"],
-	repeatingSkills: ["active", "knowledge", "language"],
+	repeating: ['quality', 'martial', 'items', 'range', 'melee', 'armor', 'spell', 'preps', 'ritual', 'powers', 'forms', 'vehicle', 'augementations', 'lifestyle', 'contacts', 'programs'],
+	repeatingSkills: ['active', 'knowledge', 'language'],
   tabs: [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`],
-	woundCalculation: ["high_pain_tolerance", "low_pain_tolerance", "damage_compensators_physical", "damage_compensators_stun", "stun", "physical"],
+	woundCalculation: ['high_pain_tolerance', 'low_pain_tolerance', 'damage_compensators_physical', 'damage_compensators_stun', 'stun', 'physical'],
   attributeLimits: ['mental_limit', 'physical_limit', 'social_limit'],
-	mental_limit: ["intuition", "willpower", "logic"],
-	physical_limit: ["body", "reaction", "strength"],
-	social_limit: ["essence", "willpower", "charisma"],
-  lift_carry: ["body", "strength", "lift_carry_modifier"],
-  overflow: ["body", "overflow_modifier"],
-  soak: ["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`],
-  defense: ["reaction", "intuition", "defense_modifier", "defense_temp", `defense_temp_flag`],
-  judge_intentions: ["charisma", "intuition", "judge_intentions_modifier"],
-  composure: ["charisma", "willpower", "composure_modifier"],
-  memory: ["logic", "willpower", "memory_modifier"]
+	mental_limit: ['intuition', 'willpower', 'logic'],
+	physical_limit: ['body', 'reaction', 'strength'],
+	social_limit: ['essence', 'willpower', 'charisma'],
+  lift_carry: ['body', 'strength', 'lift_carry_modifier'],
+  overflow: ['body', 'overflow_modifier'],
+  soak: ['body', 'armor_rating', 'soak_modifier', 'soak_temp', `soak_temp_flag`],
+  defense: ['reaction', 'intuition', 'defense_modifier', 'defense_temp', `defense_temp_flag`],
+  judge_intentions: ['charisma', 'intuition', 'judge_intentions_modifier'],
+  composure: ['charisma', 'willpower', 'composure_modifier'],
+  memory: ['logic', 'willpower', 'memory_modifier'],
+  conditionTracks: ['stun', 'physical'],
+  physical: ['physical_modifier', 'body', 'sheet_type', 'flag_drone'],
+  stun: ['stun_modifier', 'willpower'],
+  derivedAttributes: ['memory', 'composure', 'defense', 'soak', 'overflow', 'judge_intentions', 'lift_carry']
 }
 
-const errorMessage = error => console.error(`%c ${error}`, "color: maroon; font-weight:14px; font-weight:bold;");
-const warningMessage = error => console.warn(`%c ${error}`, "color: darkorange; font-weight:14px; font-weight:bold;");
+const errorMessage = error => console.error(`%c ${error}`, 'color: maroon; font-weight:14px; font-weight:bold;');
+const warningMessage = error => console.warn(`%c ${error}`, 'color: darkorange; font-weight:14px; font-weight:bold;');
 
 const functions = {
   convertIntegerNegative: number => number > 0 ? -Math.abs(number) : number,
@@ -53,7 +57,7 @@ const functions = {
 
   shadowrun: {
     attributeFactory: attrs => {
-      attrs = functions.shadowrun.processTempFlags(attrs)
+      attrs = functions.shadowrun.findFlagInKeys(attrs) ? functions.shadowrun.processTempFlags(attrs) : attrs
       attrs = functions.parseIntegers(attrs)
       attrs = functions.shadowrun.calculateBonuses(attrs)
       return attrs
@@ -69,6 +73,7 @@ const functions = {
       }
       return attrs
     },
+    calculateConditionTracks: attrs => Math.ceil(attrs.attribute/2) + attrs.base + attrs.modifier,
     calculateLimitTotal: attrs => Math.ceil((attrs[0] + attrs[1] + (attrs[2] * 2))/3),
     calculateRunSpeed: (agility, modifier) => (agility * 4) + modifier,
     calculateWalkSpeed:(agility, modifier) => (agility * 2) + modifier,
@@ -77,14 +82,14 @@ const functions = {
       try {
         const tempFlag = functions.shadowrun.findFlagInKeys(attrs)
         const attrName = tempFlag.split('_temp_flag')[0]
-        attrs[`${tempFlag}`] === "on" ? false : delete attrs[`${attrName}_temp`];
+        attrs[`${tempFlag}`] === 'on' ? false : delete attrs[`${attrName}_temp`];
         delete attrs[`${tempFlag}`];
         return attrs
       } catch (error) {
         errorMessage(error)
       }
     },
-    shotsFired: (shots, trigger) => shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots,
+    shotsFired: (shots, trigger) => shots > 0 && trigger.includes('remove') ? shots -= 1 : trigger.includes('add') ? shots += 1 : shots,
     updateLimitTotal: attrs => {
       attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
       return functions.shadowrun.calculateLimitTotal(Object.values(attrs))
@@ -153,7 +158,7 @@ const updateAttributes = (array, attribute) => {
       attrs = functions.shadowrun.attributeFactory(attrs)
       const base = attrs[`${attribute}_base`]
       functions.setAttributes({
-        [attribute]: unctions.sumIntegers([base, attrs.bonus]),
+        [attribute]: functions.sumIntegers([base, attrs.bonus]),
         [`display_${attribute}`]: functions.shadowrun.buildDisplay(base, attrs.bonus)
       })
     })
@@ -167,7 +172,6 @@ const updateLimitTotal = attrs => {
   return functions.shadowrun.calculateLimitTotal(Object.values(attrs))
 }
 
-//physical, social, mental
 const updateLimits = attributeLimit => {
   try {
     const array = sheetAttribues[attributeLimit].concat([`${attributeLimit}_modifier`, `${attributeLimit}_temp`, `${attributeLimit}_temp_flag`])
@@ -187,7 +191,7 @@ const updateLimits = attributeLimit => {
 
 const updateMovement = () => {
   try {
-    getAttrs(["agility", "walk_modifier", "run_modifier"], attrs => {
+    getAttrs(['agility', 'walk_modifier', 'run_modifier'], attrs => {
       attrs = functions.parseIntegers(attrs)
       functions.setAttributes({
         walk: functions.shadowrun.calculateWalkSpeed(attrs.agility, attrs.walk_modifier),
@@ -205,6 +209,16 @@ const updateDerivedAttribute = derivedAttribute => {
       attrs = functions.shadowrun.attributeFactory(attrs)
       const sum = functions.sumIntegers(Object.values(attrs))
       functions.setAttributes({[derivedAttribute]: sum})
+    })
+  } catch (error) {
+    errorMessage(error)
+  }
+}
+
+const updateConditionTracks = derivedAttribute => {
+  try {
+    getAttrs(sheetAttribues[derivedAttribute], attrs => {
+      attrs = functions.shadowrun.attributeFactory(attrs)
     })
   } catch (error) {
     errorMessage(error)
