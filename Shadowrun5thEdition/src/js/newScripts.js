@@ -1,5 +1,4 @@
 
-
 const updateWounds = () => {
   try {
     getAttrs(sheetAttribues.woundCalculation, attrs => {
@@ -8,7 +7,7 @@ const updateWounds = () => {
       processingFunctions.setAttributes({wounds: sum})
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -20,7 +19,7 @@ const updateConditionTracks= conditionTrack => {
       processingFunctions.setAttributes({[`${conditionTrack}_max`]: conditionTotal}, true)
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -35,7 +34,7 @@ const translations = () => {
     }
     processingFunctions.setAttributes({attribute_roll: attribute_roll})
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 } 
 
@@ -47,7 +46,7 @@ const updateShotsFired = trigger => {
       processingFunctions.setAttributes({shots_fired: shots})
     });
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -59,7 +58,7 @@ const updateAmmoWithShotsFired = () => {
       processingFunctions.setAttributes({primary_range_weapon_ammo: processingFunctions.sumIntegers(Object.values(attrs))})
     });
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -70,7 +69,7 @@ const updateAmmoWithMax = () => {
       processingFunctions.setAttributes({primary_range_weapon_ammo: attrs.primary_range_weapon_ammo_max})
     });
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -80,14 +79,13 @@ const updateAttributes = (array, attribute) => {
   try {
     getAttrs(array, attrs => {
       attrs = processingFunctions.shadowrun.attributeFactory(attrs)
-      const base = attrs[`${attribute}_base`]
       processingFunctions.setAttributes({
-        [attribute]: processingFunctions.sumIntegers([base, attrs.bonus]),
-        [`display_${attribute}`]: processingFunctions.shadowrun.buildDisplay(base, attrs.bonus)
+        [attribute]: attrs.total,
+        [`display_${attribute}`]: attrs.base === attrs.total ? attrs.base : `${attrs.base} (${attrs.total}}`
       })
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -109,7 +107,7 @@ const updateLimits = attributeLimit => {
         })
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -123,7 +121,7 @@ const updateMovement = () => {
       })
     })
   } catch (error) {
-     console.log(error)
+     console.error(error)
   }
 }
 
@@ -135,7 +133,7 @@ const updateDerivedAttribute = derivedAttribute => {
       processingFunctions.setAttributes({[derivedAttribute]: sum})
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 

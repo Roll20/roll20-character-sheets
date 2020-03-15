@@ -125,38 +125,6 @@ describe('Shadowrun condition factory', () => {
   })
 })
 
-describe('Shadowrun attribute factory', () => {
-  it('should return an object', () => {
-    const actual = Functions.shadowrun.attributeFactory({})
-    assert.ok(actual, 'object')
-  })
-
-  it('should return a bonus key', () => {
-    const actual = Functions.shadowrun.attributeFactory({})
-    assert.deepStrictEqual(actual, {bonus: 0})
-  })
-
-  it('should remove temp keys if flag is "on" and return bonus with temp value', () => {
-    const actual = Functions.shadowrun.attributeFactory({reaction_temp: 123, reaction_temp_flag: "on"})
-    assert.deepStrictEqual(actual, {bonus: 123})
-  })
-
-  it('should return modifier + temp as bonus if flag is "on"', () => {
-    const actual = Functions.shadowrun.attributeFactory({reaction_modifier: 20, reaction_temp: 1, reaction_temp_flag: "on"})
-    assert.deepStrictEqual(actual, {bonus: 21})
-  })
-
-  it('should return just modifier as bonus if flag is not "on"', () => {
-    const actual = Functions.shadowrun.attributeFactory({reaction_base: 1, reaction_modifier: 2, reaction_temp: 1, reaction_temp_flag: 0})
-    assert.deepStrictEqual(actual, {reaction_base: 1, bonus: 2})
-  })
-
-  it('should not throw an error if there are no flag key', () => {
-    const actual = Functions.shadowrun.attributeFactory({reaction_base: 1, reaction_modifier: 2})
-    assert.deepStrictEqual(actual, {reaction_base: 1, bonus: 2})
-  })
-})
-
 describe('Shadowrun calculate condition tracks', () => {
   it('divide attribute by 2 then add base and modiifer', () => {
     const actual = Functions.shadowrun.calculateConditionTracks({attribute: 3, base: 8, modifier: 2})
@@ -245,3 +213,29 @@ describe('Shadowrun calculate wounds', () => {
   })
 })
 
+describe('Shadowrun attribute factory', () => {
+  it('should return an object', () => {
+    const actual = Functions.shadowrun.attributeFactory({})
+    assert.ok(actual, 'object')
+  })
+
+  it('should remove temp keys if flag is "on" and return bonus with temp value', () => {
+    const actual = Functions.shadowrun.attributeFactory({reaction_temp: 123, reaction_temp_flag: "on"})
+    assert.deepStrictEqual(actual, {total: 123, base: 0, bonus: 123})
+  })
+
+  it('should return base values', () => {
+    const actual = Functions.shadowrun.attributeFactory({intuition: 1, reaction: 3})
+    assert.deepStrictEqual(actual.base, 4)
+  })
+
+  it('should return modifier + temp as bonus if flag is "on"', () => {
+    const actual = Functions.shadowrun.attributeFactory({reaction_modifier: 20, reaction_temp: 1, reaction_temp_flag: "on"})
+    assert.equal(actual.total, 21)
+  })
+
+  it('should return total values', () => {
+    const actual = Functions.shadowrun.attributeFactory({intuition: 1, reaction: 3, initiative_modifier: 6, initiative_temp: 10, initiative_temp_flag: 'on'})
+    assert.deepStrictEqual(actual.base, 4)
+  })
+})

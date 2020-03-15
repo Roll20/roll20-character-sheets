@@ -33,6 +33,9 @@ const processingFunctions = {
       attrs = processingFunctions.shadowrun.findFlagInKeys(attrs) ? processingFunctions.shadowrun.processTempFlags(attrs) : attrs
       attrs = processingFunctions.parseIntegers(attrs)
       attrs = processingFunctions.shadowrun.calculateBonuses(attrs)
+      attrs.total = processingFunctions.sumIntegers(Object.values(attrs))
+      attrs.base = attrs.total - attrs.bonus
+      console.log(attrs)
       return attrs
     },
     conditionFactor: attrs => {
@@ -93,9 +96,7 @@ const processingFunctions = {
   }
 }
 
-//'high_pain_tolerance', 'low_pain_tolerance', 'damage_compensators_physical', 'damage_compensators_stun', 'stun', 'physical'
-
 
 //for Mocha Unit Texting
-module.exports = processingFunctions;
+//module.exports = processingFunctions;
 

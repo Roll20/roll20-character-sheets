@@ -14,12 +14,14 @@
 
 	on('change:agility change:walk_modifier change:run_modifier', () => updateMovement())
 
-  on('change:reaction change:intuition', () => update_initiative())
-
   sheetAttribues.calculatedAttributes.forEach(attribute => {
       const attributeArray = [`${attribute}_base`, `${attribute}_modifier`, `${attribute}_temp`, `${attribute}_temp_flag`]
       attributeArray.forEach(attr => on(`change:${attr}`, () => updateAttributes(attributeArray, attribute)))
   });
+
+  sheetAttribues.initiative_mod.forEach(attr => on(`change:${attr}`, () => updateAttributes(sheetAttribues.initiative_mod, 'initiative_mod')))
+
+  sheetAttribues.astral_mod.forEach(attr => on(`change:${attr}`, () => updateAstralInitiative()))
 
   sheetAttribues.derivedAttributes.forEach(derivedAttribute => {
     sheetAttribues[derivedAttribute].forEach(attr => on(`change:${attr}`, () => updateDerivedAttribute(derivedAttribute)))
@@ -34,21 +36,19 @@
     sheetAttribues[conditionTrack].forEach(attr => on(`change:${attr}`, () => updateConditionTracks(conditionTrack)))
   })
 
-	on('change:initiative_modifier change:initiative_temp change:initiative_temp_flag', () => update_initiative())
-
 	sheetAttribues.woundCalculation.forEach(attr => on(`change:${attr}`, () => updateWounds()))
 
-	on('clicked:cond_reset_physical clicked:cond_reset_stun', eventinfo => resetConditionTrack(eventinfo))
+	//on('clicked:cond_reset_physical clicked:cond_reset_stun', eventinfo => resetConditionTrack(eventinfo))
 
-	on('change:edge_toggle', eventinfo => edgeToggle(eventinfo))
+	//on('change:edge_toggle', eventinfo => edgeToggle(eventinfo))
 
-	on('change:device_rating change:matrix_modifier', () => updateMatrixMaximum())
+	//on('change:device_rating change:matrix_modifier', () => updateMatrixMaximum())
 
-	on('change:intuition change:astral_mod_modifier', () => updateAstralInitiative())
+	//on('change:intuition change:astral_mod_modifier', () => updateAstralInitiative())
 
-	on('change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag', () => updateInitiative())
+	//on('change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag', () => updateInitiative())
 
-	on('change:astral_dice_modifier change:edge_toggle', () => updateAstralInitiativeDice())
+	//on('change:astral_dice_modifier change:edge_toggle', () => updateAstralInitiativeDice())
 
-	on('change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle', () => updateMatrixInitiative())
+	//on('change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle', () => updateMatrixInitiative())
 

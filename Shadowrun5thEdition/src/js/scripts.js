@@ -64,20 +64,6 @@
 		};
 	});
 
-	//Calculate Initiatves
-	const update_initiative = () => {
-		getAttrs(["reaction", "intuition", "initiative_modifier", "initiative_temp", "initiative_temp_flag"], v => {
-			v = processingFunctions.shadowrun.processTempFlags(`initiative_temp_flag`, `initiative_temp`, v);
-            v = processingFunctions.parseIntegers(v);
-            const base = v.reaction + v.intuition, bonus = processingFunctions.calculateBonuses(v), total = base + bonus;
-
-			setAttrs({
-				["initiative_mod"]: total,
-				["display_initiative_mod"]: bonus === 0 ? base : `${base} (${total})`
-			});
-		});
-	};
-
 	const updateInitiative = () => {
 		getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], v => {
 			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;

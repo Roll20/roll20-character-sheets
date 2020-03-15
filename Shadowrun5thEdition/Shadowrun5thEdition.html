@@ -1,5 +1,5 @@
 
-<input name="attr_version" type="hidden" value="4.0"/>
+<input name="attr_version" type="hidden" value="4.1"/>
 <input class="sheet_type" name="attr_sheet_type" type="hidden" value="pc"/>
 <input class="character-type" name="attr_flag_special" type="hidden" value="mundane"/>
 <div class="pc">
@@ -211,7 +211,7 @@
 				<button class="attr-ini" name="initiative" type="roll" value="@{gm_toggle} &{template:rolls}{{header=^{initiative}}}{{base=^{base}}}{{dice=[[(@{initiative_mod}+@{wounds_toggle}+@{modifiers_toggle})+(@{initiative_dice})d6cf0 &{tracker}]]}}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}"><span class="attr-ini red" data-i18n="initiative">Initiative</span></button>
 				<div class="attr-und attr-ini">
 					<div class="settings">
-						<input type="number" name="attr_initiative_modifier" value="0" placeholder="0" title="@{initiative_modifier}" /><span class="tiny-span"> + </span>
+						<input type="number" name="attr_initiative_mod_modifier" value="0" placeholder="0" title="@{initiative_modifier}" /><span class="tiny-span"> + </span>
 						<input type="number" name="attr_initiative_dice_modifier" value="0" min="0" max="4" placeholder="modifier" title="@{initiative_dice_modifier}" />
 						<span class="tiny-span"> = </span>
 						<span name="attr_display_initiative_mod"></span><span class="tiny-span" title="@{initiative_mod}"> + </span>
@@ -2098,7 +2098,7 @@
 						<label data-i18n="magic">Magic</label><input type="number" name="attr_magic_temp" title="@{magic_temp}" /><input type="checkbox" name="attr_magic_temp_flag" value="on" checked />
 						<label data-i18n="resonance">Resonance</label><input type="number" name="attr_resonance_temp" title="@{resonance_temp}" /><input type="checkbox" name="attr_resonance_temp_flag" value="on" checked />
 						<hr />
-						<label data-i18n="initiative">Initiative</label><input type="number" name="attr_initiative_temp" title="@{initiative_temp}" /><input type="checkbox" name="attr_initiative_temp_flag" value="on" checked />
+						<label data-i18n="initiative">Initiative</label><input type="number" name="attr_initiative_mod_temp" title="@{initiative_mod_temp}" /><input type="checkbox" name="attr_initiative_mod_temp_flag" value="on" checked />
 						<label data-i18n="initiativedice">Initiative Dice</label><input type="number" name="attr_initiative_dice_temp" title="@{initiative_dice_temp}" /><input type="checkbox" name="attr_initiative_dice_temp_flag" value="on" checked />
 						<hr />
 						<label data-i18n="physicallimit">Physical Limit</label><input type="number" name="attr_physical_limit_temp" title="@{physical_limit_temp}" /><input type="checkbox" name="attr_physical_limit_temp_flag" value="on" checked />
@@ -3397,15 +3397,23 @@
 const sheetAttribues = {
   attributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge'],
   translationsAttributes: ['attribute', 'body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge', 'none'],
-  calculatedAttributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition','charisma','magic', 'resonance', 'attack', 'sleaze', 'data_processing', 'firewall'],
   repeating: ['quality', 'martial', 'items', 'range', 'melee', 'armor', 'spell', 'preps', 'ritual', 'powers', 'forms', 'vehicle', 'augementations', 'lifestyle', 'contacts', 'programs'],
   repeatingSkills: ['active', 'knowledge', 'language'],
   tabs: [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`],
   woundCalculation: ['high_pain_tolerance', 'low_pain_tolerance', 'damage_compensators_physical', 'damage_compensators_stun', 'stun', 'physical'],
+  
   attributeLimits: ['mental_limit', 'physical_limit', 'social_limit'],
   mental_limit: ['intuition', 'willpower', 'logic'],
   physical_limit: ['body', 'reaction', 'strength'],
   social_limit: ['essence', 'willpower', 'charisma'],
+
+  calculatedAttributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition','charisma','magic', 'resonance', 'attack', 'sleaze', 'data_processing', 'firewall'],
+
+  initiative_mod: ['reaction', 'intuition', 'initiative_mod_modifier', 'initiative_mod_temp', 'initiative_mod_temp_flag'],
+  astral_mod: ['intuition', 'astral_mod_modifier'],
+  matrix_mod: [],
+
+  derivedAttributes: ['memory', 'composure', 'defense', 'soak', 'overflow', 'judge_intentions', 'lift_carry'],
   lift_carry: ['body', 'strength', 'lift_carry_modifier'],
   overflow: ['body', 'overflow_modifier'],
   soak: ['body', 'armor_rating', 'soak_modifier', 'soak_temp', `soak_temp_flag`],
@@ -3413,11 +3421,12 @@ const sheetAttribues = {
   judge_intentions: ['charisma', 'intuition', 'judge_intentions_modifier'],
   composure: ['charisma', 'willpower', 'composure_modifier'],
   memory: ['logic', 'willpower', 'memory_modifier'],
+
   conditionTracks: ['stun', 'physical', 'matrix'],
   physical: ['physical_modifier', 'body', 'sheet_type', 'flag_drone'],
   stun: ['stun_modifier', 'willpower'],
   matrix: ['matrix_modifier', 'device_rating'],
-  derivedAttributes: ['memory', 'composure', 'defense', 'soak', 'overflow', 'judge_intentions', 'lift_carry'],
+
   stunCharacters: ['grunt', 'pc'],
   physicalCharacters: ['grunt', 'pc', 'vehicle'],
   matrixCharacters: ['vehicle', 'host', 'sprite'],
@@ -3459,6 +3468,9 @@ const processingFunctions = {
       attrs = processingFunctions.shadowrun.findFlagInKeys(attrs) ? processingFunctions.shadowrun.processTempFlags(attrs) : attrs
       attrs = processingFunctions.parseIntegers(attrs)
       attrs = processingFunctions.shadowrun.calculateBonuses(attrs)
+      attrs.total = processingFunctions.sumIntegers(Object.values(attrs))
+      attrs.base = attrs.total - attrs.bonus
+      console.log(attrs)
       return attrs
     },
     conditionFactor: attrs => {
@@ -3484,6 +3496,18 @@ const processingFunctions = {
     calculateLimitTotal: attrs => Math.ceil((attrs[0] + attrs[1] + (attrs[2] * 2))/3),
     calculateRunSpeed: (agility, modifier) => (agility * 4) + modifier,
     calculateWalkSpeed:(agility, modifier) => (agility * 2) + modifier,
+    calculateWounds: attrs => {
+      const divisor  = attrs.low_pain_tolerance === 2 ? attrs.low_pain_tolerance : 3;
+      const highPain = attrs.high_pain_tolerance >= 1 ? attrs.high_pain_tolerance : 0;
+      let sum = 0;
+
+      ["stun", "physical"].forEach(attr => {
+        const damageCompensator = attrs[`damage_compensators_${attr}`] || 0
+        let dividend = Math.max(attrs[`${attr}`] - (highPain + damageCompensator), 0)
+        sum -= Math.floor(dividend / divisor) || 0
+      })
+      return sum
+    },
     determineConditionBase: (type, drone) => drone ? 6 : type === 'vehicle' ? 12 : 8,
     determineConditionAttribute: attrs => attrs.willpower ? attrs.willpower : attrs.body ? attrs.body : attrs.device_rating ? attrs.device_rating : 0,
     findFlagInKeys: attrs => Object.keys(attrs).find(key => key.includes('_flag')),
@@ -3512,25 +3536,15 @@ const processingFunctions = {
 //module.exports = processingFunctions;
 
   
-
 const updateWounds = () => {
   try {
     getAttrs(sheetAttribues.woundCalculation, attrs => {
       attrs = processingFunctions.parseIntegers(attrs)
-      const divisor  = attrs.low_pain_tolerance === 2 ? attrs.low_pain_tolerance : 3;
-      const highPain = attrs.high_pain_tolerance >= 1 ? attrs.high_pain_tolerance : 0;
-      let sum = 0;
-
-      ["stun", "physical"].forEach(attr => {
-          let dividend = attrs[`${attr}`];
-          dividend -= highPain + attrs[`damage_compensators_${attr}`]
-          sum -= dividend > 0 ? Math.floor(dividend / divisor) : Math.floor(0 / divisor)
-       });
-
+      const sum = processingFunctions.shadowrun.calculateWounds(attrs)
       processingFunctions.setAttributes({wounds: sum})
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -3542,7 +3556,7 @@ const updateConditionTracks= conditionTrack => {
       processingFunctions.setAttributes({[`${conditionTrack}_max`]: conditionTotal}, true)
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -3557,7 +3571,7 @@ const translations = () => {
     }
     processingFunctions.setAttributes({attribute_roll: attribute_roll})
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 } 
 
@@ -3569,7 +3583,7 @@ const updateShotsFired = trigger => {
       processingFunctions.setAttributes({shots_fired: shots})
     });
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -3581,7 +3595,7 @@ const updateAmmoWithShotsFired = () => {
       processingFunctions.setAttributes({primary_range_weapon_ammo: processingFunctions.sumIntegers(Object.values(attrs))})
     });
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -3592,7 +3606,7 @@ const updateAmmoWithMax = () => {
       processingFunctions.setAttributes({primary_range_weapon_ammo: attrs.primary_range_weapon_ammo_max})
     });
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -3602,14 +3616,13 @@ const updateAttributes = (array, attribute) => {
   try {
     getAttrs(array, attrs => {
       attrs = processingFunctions.shadowrun.attributeFactory(attrs)
-      const base = attrs[`${attribute}_base`]
       processingFunctions.setAttributes({
-        [attribute]: processingFunctions.sumIntegers([base, attrs.bonus]),
-        [`display_${attribute}`]: processingFunctions.shadowrun.buildDisplay(base, attrs.bonus)
+        [attribute]: attrs.total,
+        [`display_${attribute}`]: attrs.base === attrs.total ? attrs.base : `${attrs.base} (${attrs.total}}`
       })
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -3631,7 +3644,7 @@ const updateLimits = attributeLimit => {
         })
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -3645,7 +3658,7 @@ const updateMovement = () => {
       })
     })
   } catch (error) {
-     console.log(error)
+     console.error(error)
   }
 }
 
@@ -3657,7 +3670,7 @@ const updateDerivedAttribute = derivedAttribute => {
       processingFunctions.setAttributes({[derivedAttribute]: sum})
     })
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -3730,20 +3743,6 @@ const updateDerivedAttribute = derivedAttribute => {
 			console.log("CHANGE NOT RELEVENT Primary Armor");
 		};
 	});
-
-	//Calculate Initiatves
-	const update_initiative = () => {
-		getAttrs(["reaction", "intuition", "initiative_modifier", "initiative_temp", "initiative_temp_flag"], v => {
-			v = processingFunctions.shadowrun.processTempFlags(`initiative_temp_flag`, `initiative_temp`, v);
-            v = processingFunctions.parseIntegers(v);
-            const base = v.reaction + v.intuition, bonus = processingFunctions.calculateBonuses(v), total = base + bonus;
-
-			setAttrs({
-				["initiative_mod"]: total,
-				["display_initiative_mod"]: bonus === 0 ? base : `${base} (${total})`
-			});
-		});
-	};
 
 	const updateInitiative = () => {
 		getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], v => {
@@ -4193,21 +4192,35 @@ const updateDerivedAttribute = derivedAttribute => {
 
     switch(true) {
         case version < 1.35:
-            onepointthreefive();
-            setAttrs({version: 1.35}, () => versioning(1.35));
+            onepointthreefive()
+            setAttrs({version: 1.35}, () => versioning(1.35))
             break;
         case version < 1.41:
-            onepointfour();
-            setAttrs({version: 1.41}, () => versioning(1.41));
+            onepointfour()
+            setAttrs({version: 1.41}, () => versioning(1.41))
             break;
         case version < 4.0:
-            fourpointzero();
-            setAttrs({version: 4.0}, () => versioning(4.0));;
+            fourpointzero()
+            setAttrs({version: 4.0}, () => versioning(4.0))
+            break;
+        case version < 4.1:
+            fourpointzero()
+            setAttrs({version: 4.1}, () => versioning(4.1))
             break;
         default:
             console.log(`%c Shadowrun 5th Edition is update to date. Version ${version}`, "color: green; font-weight:bold");
     }
 };
+
+const fourpointone = () => {
+  getAttrs(["initiative_modifier", "initiative_temp", "initiative_temp_flag"], value => {
+    setAttrs({
+      initiative_mod_modifier: value.initiative_modifier,
+      initiative_mod_temp: value.initiative_temp,
+      initiative_mod_temp_flag: value.initiative_mod_temp_flag
+    })
+  })
+}
 
 const fourpointzero = () => {
     const attributes = ['physical', 'physical_damage', 'stun', 'stun_damage', 'sheet_type', 'matrix_con'];
@@ -4275,12 +4288,14 @@ const onepointthreefive = () => {
 
 	on('change:agility change:walk_modifier change:run_modifier', () => updateMovement())
 
-  on('change:reaction change:intuition', () => update_initiative())
-
   sheetAttribues.calculatedAttributes.forEach(attribute => {
       const attributeArray = [`${attribute}_base`, `${attribute}_modifier`, `${attribute}_temp`, `${attribute}_temp_flag`]
       attributeArray.forEach(attr => on(`change:${attr}`, () => updateAttributes(attributeArray, attribute)))
   });
+
+  sheetAttribues.initiative_mod.forEach(attr => on(`change:${attr}`, () => updateAttributes(sheetAttribues.initiative_mod, 'initiative_mod')))
+
+  sheetAttribues.astral_mod.forEach(attr => on(`change:${attr}`, () => updateAstralInitiative()))
 
   sheetAttribues.derivedAttributes.forEach(derivedAttribute => {
     sheetAttribues[derivedAttribute].forEach(attr => on(`change:${attr}`, () => updateDerivedAttribute(derivedAttribute)))
@@ -4295,23 +4310,21 @@ const onepointthreefive = () => {
     sheetAttribues[conditionTrack].forEach(attr => on(`change:${attr}`, () => updateConditionTracks(conditionTrack)))
   })
 
-	on('change:initiative_modifier change:initiative_temp change:initiative_temp_flag', () => update_initiative())
-
 	sheetAttribues.woundCalculation.forEach(attr => on(`change:${attr}`, () => updateWounds()))
 
-	on('clicked:cond_reset_physical clicked:cond_reset_stun', eventinfo => resetConditionTrack(eventinfo))
+	//on('clicked:cond_reset_physical clicked:cond_reset_stun', eventinfo => resetConditionTrack(eventinfo))
 
-	on('change:edge_toggle', eventinfo => edgeToggle(eventinfo))
+	//on('change:edge_toggle', eventinfo => edgeToggle(eventinfo))
 
-	on('change:device_rating change:matrix_modifier', () => updateMatrixMaximum())
+	//on('change:device_rating change:matrix_modifier', () => updateMatrixMaximum())
 
-	on('change:intuition change:astral_mod_modifier', () => updateAstralInitiative())
+	//on('change:intuition change:astral_mod_modifier', () => updateAstralInitiative())
 
-	on('change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag', () => updateInitiative())
+	//on('change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag', () => updateInitiative())
 
-	on('change:astral_dice_modifier change:edge_toggle', () => updateAstralInitiativeDice())
+	//on('change:astral_dice_modifier change:edge_toggle', () => updateAstralInitiativeDice())
 
-	on('change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle', () => updateMatrixInitiative())
+	//on('change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle', () => updateMatrixInitiative())
 
   
 	//IMPORTERS
