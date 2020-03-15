@@ -203,6 +203,45 @@ describe('Shadowrun determine condition attribute', () => {
   })
 })
 
-//  stunCharacters: ['grunt', 'pc'],
-//  physicalCharacters: sheetAttribues.stunCharacters.concat(['vehicle']),
-//  matrixCharacters: ['vehicle', 'host', 'sprite']
+describe('Shadowrun calculate wounds', () => {
+  it('default is 0', () => {
+    const actual = Functions.shadowrun.calculateWounds({})
+    assert.strictEqual(actual, 0)
+  })
+
+  it('low pain tolerance is false then divide by 3', () => {
+    const actual = Functions.shadowrun.calculateWounds({physical: 6})
+    assert.strictEqual(actual, -2)
+  })
+
+  it('low pain tolerance is equal 2 then divide by 2', () => {
+    const actual = Functions.shadowrun.calculateWounds({low_pain_tolerance: 2, physical: 6})
+    assert.strictEqual(actual, -3)
+  })
+
+  it('add physical & stun wounds together', () => {
+    const actual = Functions.shadowrun.calculateWounds({physical: 6, stun: 9})
+    assert.strictEqual(actual, -5)
+  })
+
+  it('high pain tolerance should subtract from the divisor', () => {
+    const actual = Functions.shadowrun.calculateWounds({high_pain_tolerance: 2, physical: 6, stun: 9})
+    assert.strictEqual(actual, -3)
+  })
+
+  it('damage compensator should subtract from its type', () => {
+    const actual = Functions.shadowrun.calculateWounds({physical: 6, stun: 9, damage_compensators_physical: 3})
+    assert.strictEqual(actual, -4)
+  })
+
+  it('damage compensator and high paintolerance stack', () => {
+    const actual = Functions.shadowrun.calculateWounds({high_pain_tolerance: 2, physical: 6, damage_compensators_physical: 3})
+    assert.strictEqual(actual, 0)
+  })
+
+  it('minimum of 0', () => {
+    const actual = Functions.shadowrun.calculateWounds({physical: 6, damage_compensators_physical: 13})
+    assert.strictEqual(actual, 0)
+  })
+})
+

@@ -58,6 +58,18 @@ const processingFunctions = {
     calculateLimitTotal: attrs => Math.ceil((attrs[0] + attrs[1] + (attrs[2] * 2))/3),
     calculateRunSpeed: (agility, modifier) => (agility * 4) + modifier,
     calculateWalkSpeed:(agility, modifier) => (agility * 2) + modifier,
+    calculateWounds: attrs => {
+      const divisor  = attrs.low_pain_tolerance === 2 ? attrs.low_pain_tolerance : 3;
+      const highPain = attrs.high_pain_tolerance >= 1 ? attrs.high_pain_tolerance : 0;
+      let sum = 0;
+
+      ["stun", "physical"].forEach(attr => {
+        const damageCompensator = attrs[`damage_compensators_${attr}`] || 0
+        let dividend = Math.max(attrs[`${attr}`] - (highPain + damageCompensator), 0)
+        sum -= Math.floor(dividend / divisor) || 0
+      })
+      return sum
+    },
     determineConditionBase: (type, drone) => drone ? 6 : type === 'vehicle' ? 12 : 8,
     determineConditionAttribute: attrs => attrs.willpower ? attrs.willpower : attrs.body ? attrs.body : attrs.device_rating ? attrs.device_rating : 0,
     findFlagInKeys: attrs => Object.keys(attrs).find(key => key.includes('_flag')),
@@ -81,7 +93,9 @@ const processingFunctions = {
   }
 }
 
+//'high_pain_tolerance', 'low_pain_tolerance', 'damage_compensators_physical', 'damage_compensators_stun', 'stun', 'physical'
+
 
 //for Mocha Unit Texting
-//module.exports = processingFunctions;
+module.exports = processingFunctions;
 

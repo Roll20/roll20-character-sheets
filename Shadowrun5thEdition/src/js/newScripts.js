@@ -4,16 +4,7 @@ const updateWounds = () => {
   try {
     getAttrs(sheetAttribues.woundCalculation, attrs => {
       attrs = processingFunctions.parseIntegers(attrs)
-      const divisor  = attrs.low_pain_tolerance === 2 ? attrs.low_pain_tolerance : 3;
-      const highPain = attrs.high_pain_tolerance >= 1 ? attrs.high_pain_tolerance : 0;
-      let sum = 0;
-
-      ["stun", "physical"].forEach(attr => {
-          let dividend = attrs[`${attr}`];
-          dividend -= highPain + attrs[`damage_compensators_${attr}`]
-          sum -= dividend > 0 ? Math.floor(dividend / divisor) : Math.floor(0 / divisor)
-       });
-
+      const sum = processingFunctions.shadowrun.calculateWounds(attrs)
       processingFunctions.setAttributes({wounds: sum})
     })
   } catch (error) {
