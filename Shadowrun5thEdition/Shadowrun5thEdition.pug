@@ -1,6 +1,6 @@
-input(name='attr_version' type='hidden' value='3.03')
+input(name='attr_version' type='hidden' value='4.01')
 
-//- CHARACTER SHETE PAGE
+//- CHARACTER SHEET PAGE
 input.sheet_type(name='attr_sheet_type' type='hidden' value='pc')
 
 //- CHARACTER TYPE (MUNDANE < MAGIC < RESONANCE)
@@ -12,10 +12,11 @@ include src/pug/_mixins.pug
 //- VARIABLES
 include src/pug/_variables.pug
 
+- const imageSource = 'https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadowrun5thEdition/src/imgs/'
 
 .pc
 	.tabs
-		img(alt='Shadowrun black and metallic logo' src='https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadowrun5thEdition/images/ShadowrunLogo.png')
+		img(alt='Shadowrun black and metallic logo' src=`${imageSource}/ShadowrunLogo.png`)
 		h1(data-i18n='character') Character
 		label(data-i18n-title='character name' title='character name')
 			input(type='text' name='attr_character_name' placeholder='Character name' title='@{character_name}')
@@ -32,7 +33,7 @@ include src/pug/_variables.pug
 				input.whisper-toggle(name='attr_'+key+'_toggle' type='checkbox' value=val)
 				span.slider
 		button(name='d6' title='Roll D6s' type='roll' value!='@{gm_toggle} &{template:rolls}{{header=^{d6}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5)]]}}') L
-		input(name='attr_tab' type='hidden' value='core')
+		input(name='attr_tab' type='hidden' value='options')
 		button.pictos(name='act_tab_options' title='@{tab}' type='action' ) y
 		each val in ['core', 'arms', 'augs', 'gear', 'magic', 'matrix', 'social', 'vehicle']
 			button(data-i18n=val name='act_tab_'+val type='action' title='@{tab}') #{val}
@@ -74,45 +75,46 @@ include src/pug/_variables.pug
 											+attributeSelect('Agility')
 										select.limit-select(name='attr_limit' title='Skill limit')
 											+limitSelect('Physical')
-								fieldset(class='repeating_' + key)
-									- const skillsRepeatingSection = `@{repeating_${val[0]}`+'_${x}';
+								fieldset(class=`repeating_${key}`)
+									- const skillsRepeatingSection = `@{repeating_${key}_`+'${x}';
 
+									input(name='attr_display' type='hidden')
 									input(name='attr_display_rating' type='hidden')
 									input(name='attr_display_specialization' type='hidden' value='')
 									input(name='attr_display_limit' type='hidden' value=val[2])
 									input(name='attr_display_attribute' type='hidden' value=val[1])
 									input(name='attr_dicepool' type='hidden' value='0')
 
-									input.settings-flag(name='attr_flag' type='hidden' value='settings' title=`${repeatingSection}_flag}`)
+									input.settings-flag(name='attr_flag' type='hidden' value='settings' title=`${skillsRepeatingSection}_flag}`)
 									.buttons
 										//- SKILL BUTTON
 										+skillButton(false)
 										//- SPECILIZATION BUTTON
 										+skillButton(true)
 									span.text-align-center(name='attr_display_rating' title=`${skillsRepeatingSection}_display_rating}`)
-									select.attribute-select(name='attr_attribute' title=`${repeatingSection}_attribute}`)
+									select.attribute-select(name='attr_attribute' title=`${skillsRepeatingSection}_attribute}`)
 										+attributeSelect(val[1])
-									select.limit-select(name='attr_limit' value='physical_limit' title=`${repeatingSection}_limit}`)
+									select.limit-select(name='attr_limit' value='physical_limit' title=`${skillsRepeatingSection}_limit}`)
 										+limitSelect(val[2])
 									+repeatingSectionFlags()
 									.settings
 										if key === 'active'
-											select.skill-select(name='attr_skill' value='Close Combat Group' title=`${repeatingSection}_skill}`)
+											select.skill-select(name='attr_skill' value='Close Combat Group' title=`${skillsRepeatingSection}_skill}`)
 												include src/html/skillselect.html
 										else
 											label(data-i18n-title='skill' title='skill')
-												input(name='attr_skill' placeholder=key type='text' title=`${repeatingSection}_skill}`)
+												input(name='attr_skill' placeholder=key type='text' title=`${skillsRepeatingSection}_skill}`)
 										label(data-i18n-title='rating' title='rating')
-											input(name='attr_rating' min='0' placeholder='0' type='number' title=`${repeatingSection}_rating}`)
+											input(name='attr_rating' min='0' placeholder='0' type='number' title=`${skillsRepeatingSection}_rating}`)
 										label(data-i18n-title='ratingmodifier' title='Rating Modifier')
 											span(data-i18n='ratingmodifier') Rating Modifier
-											input(name='attr_rating_modifier' placeholder='0' type='number' title=`${repeatingSection}_rating_modifier}`)
+											input(name='attr_rating_modifier' placeholder='0' type='number' title=`${skillsRepeatingSection}_rating_modifier}`)
 										label(data-i18n-title='specialization' title='specialization') 
 											span(data-i18n='specialization') specialization
-											input(name='attr_specialization}' placeholder='Specalizations' type='text' title=`${repeatingSection}_specialization}`)
+											input(name='attr_specialization' placeholder='Specalizations' type='text' title=`${skillsRepeatingSection}_specialization}`)
 										label(data-i18n-title='notes' title='notes')
 											span(data-i18n='notes') Notes
-											textarea(name='attr_notes' value='' placeholder='Notes' title=`${repeatingSection}_notes}`)
+											textarea(name='attr_notes' value='' placeholder='Notes' title=`${skillsRepeatingSection}_notes}`)
 
 
 	//- CORE TAB
@@ -454,7 +456,7 @@ include src/pug/_variables.pug
 											option(data-i18n='ritualspellcasting' value='@{ritualspellcasting}' selected) Ritual Spellcasting
 										h3(data-i18n='specialization') specialization
 										label(data-i18n-title='specialization' title='specialization')
-											input(name='attr_spec' title=`@{${repeatingRitualSection}_spec}` type='checkbox' value='2')
+											input(name='attr_specialization' title=`@{${repeatingRitualSection}_specialization}` type='checkbox' value='2')
 										h3(data-i18n='modifier') modifier
 										label(data-i18n-title='modifier' title='modifier')
 											input(name='attr_dicepool_modifier' title=`@{${repeatingRitualSection}_dicepool_modifier}` type='number')
@@ -503,20 +505,21 @@ include src/pug/_variables.pug
 								+repeatingSectionNotes('programs')
 		.pc-row
 			.header.right-header
-				h1(data-i18n='complexform') Complex Forms
+				h1(data-i18n='complex form') Complex Forms
 				.right-tri
 			.border-box
 				.pc-box.medium-box
 					+fadeDrainSection('fade')
 					.rows.repeating-container.complex-forms
-						- const formsrepeatingSection = `@{repeating_forms`+'_${x}';
+						- const formsrepeatingSection = `@{repeating_forms_` + "${x}";
 						.row-long.headers
-							each val, key in {'Complex Form': 'complexform','Target':'target', 'Duration': 'duration', 'Fade': 'fade'}
-								h2(data-i18n=val) #{key}
+							each val in complexFormAttributes
+								h2.text-capitalize(data-i18n=val)
 						fieldset(class=`repeating_forms`)
 							input(name='attr_dicepool' type='hidden' value='0')
 							+displayRollButton(pcComplexFormButton, true)
-							each val in ['target', 'duration', 'fade']
+							- const complexFormSpans = complexFormAttributes.shift();
+							each val in complexFormSpans
 								span.center(name=`attr_${val}`)
 							+repeatingSectionFlags()
 							.settings
@@ -524,12 +527,10 @@ include src/pug/_variables.pug
 									input(name='attr_name' placeholder='name' title=`${formsrepeatingSection}_name}` type='text' value='')
 								select(name=`attr_target` title=`${formsrepeatingSection}_target}` value='Device')
 									each val in formTargets
-										- const i18n = val.toLowerCase();
-										option(data-i18n=i18n value=val) #{val}
+										option.text-capitalize(data-i18n=val value=val) #{val}
 								select(name=`attr_duration` title=`${formsrepeatingSection}_duration}` value='Instant')
 									each val in formDurations
-										- const i18n = val.toLowerCase();
-										option(data-i18n=i18n value=val) #{val}
+										option.text-capitalize(data-i18n=val value=val)
 								label(data-i18n-title='fade' title='fade')
 									input(name='attr_fade'  placeholder='-1' title=`${formsrepeatingSection}_fade}` type='number' value='')
 								.row
@@ -537,7 +538,7 @@ include src/pug/_variables.pug
 									select(name=`attr_skill` title=`${formsrepeatingSection}_skill}` value='@{software}')
 										option(data-i18n='electronicsgroup' value='@{electronics}') Electronics Group
 										option(data-i18n='software' value='@{software}' selected) Software
-									h3(data-i18n='specialization') specialization
+									h3(data-i18n='specialization')
 									label(data-i18n-title='specialization' title='specialization')
 										input(name='attr_spec' value='2' title=`${formsrepeatingSection}_spec}` type='checkbox')
 									h3(data-i18n='modifier') modifier
@@ -558,7 +559,12 @@ include src/pug/_variables.pug
 include src/pug/_npc.pug
 
 //- FOOTER
-include src/footer.html
+.footer
+	div
+		span(data-i18n="copyrightfooter")
+		span Version
+		span(name="attr_version")
+	img(alt='Emerald Productins, LLC' src=`${imageSource}/EProd_Emerald_Gloss.png`)
 
 //- ROLL TEMPLATES
 include src/rolltemplates.html
@@ -569,9 +575,19 @@ include src/html/hidden.html
 //- SCRIPTS
 script(type="text/worker")
 
+	include src/js/attributes.js
+
+	include src/js/versioning.js
+
+	include src/js/helpers.js
+
+	include src/js/eventhandlers.js
+
 	include src/js/scripts.js
 
 	include src/js/importer.js
+
+	include src/js/importerUI.js
 
 //- CHUMMER IMPORTER
 include src/html/importer.html
