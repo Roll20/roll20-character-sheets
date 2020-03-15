@@ -1,7 +1,8 @@
+
 const sheetAttribues = {
   attributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge'],
   translationsAttributes: ['attribute', 'body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge', 'none'],
-  calculatedAttributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition','charisma','magic', 'resonance'],
+  calculatedAttributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition','charisma','magic', 'resonance', 'attack', 'sleaze', 'data_processing', 'firewall'],
   repeating: ['quality', 'martial', 'items', 'range', 'melee', 'armor', 'spell', 'preps', 'ritual', 'powers', 'forms', 'vehicle', 'augementations', 'lifestyle', 'contacts', 'programs'],
   repeatingSkills: ['active', 'knowledge', 'language'],
   tabs: [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`],
@@ -23,8 +24,8 @@ const sheetAttribues = {
   matrix: ['matrix_modifier', 'device_rating'],
   derivedAttributes: ['memory', 'composure', 'defense', 'soak', 'overflow', 'judge_intentions', 'lift_carry'],
   stunCharacters: ['grunt', 'pc'],
-  physicalCharacters: sheetAttribues.stunCharacters.concat(['vehicle']),
-  matrixCharacters: ['vehicle', 'host', 'sprite']
-
+  physicalCharacters: ['grunt', 'pc', 'vehicle'],
+  matrixCharacters: ['vehicle', 'host', 'sprite'],
+  matrixAttributes: ['attack', 'sleaze', 'data_processing', 'firewall']
 }
 

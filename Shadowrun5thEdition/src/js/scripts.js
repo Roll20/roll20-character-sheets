@@ -64,69 +64,12 @@
 		};
 	});
 
-	//Update condition tracks
-	const update_track = track => {
-		let attrs = [`${track}_modifier`];
-		track === "stun" ? attrs.push("willpower") : attrs.push("body", "sheet_type", "flag_drone");
-
-		getAttrs(attrs, v => {
-			const stat = parseInt(v[`${attrs[1]}`]) || 0; //Willpower or Body
-			const mod = parseInt(v[`${track}_modifier`]) || 0;
-			let update = {};
-
-			if (track === "stun" || v["sheet_type"] === "pc" || v["sheet_type"] === "grunt") {
-				tot = Math.ceil(stat/2) + 8 + mod;
-			} else if (v["sheet_type"] === "vehicle" && v["flag_drone"]  === "drone") {
-				tot = (Math.ceil(stat/2) + 6 + mod);
-			} else if (v["sheet_type"] === "vehicle") {
-				tot = (Math.ceil(stat/2) + 12 + mod);
-			} else {
-				tot = 0; //Sprites don't have Stun or Physical track
-			};
-
-			update[`${track}_max`] = tot;
-
-			setAttrs(update, {silent:true});
-		});
-	};
-
-	//Calculate Device Rating Track
-	const updateMatrixMaximum = () => {
-		getAttrs(["device_rating","matrix_modifier"], (v) => {
-			v = functions.parseIntegers(v);
-
-			setAttrs({
-				matrix_max: Math.ceil(v.device_rating/2) + 8 + v.matrix_modifier
-			});
-		});
-	};
-
-	const update_wounds = () => {
-		getAttrs(sheetAttribues.woundCalculation, v => {
-			v = functions.parseIntegers(v);
-
-	       	const divisor  = v.low_pain_tolerance === 2 ? v.low_pain_tolerance : 3;
-	       	const highPain = v.high_pain_tolerance >= 1 ? v.high_pain_tolerance : 0;
-	       	let sum = 0;
-
-	       	["stun", "physical"].forEach(attr => {
-	       		let dividend = v[`${attr}`];
-	       		dividend -= highPain + v[`damage_compensators_${attr}`]
-	       		sum -= dividend > 0 ? Math.floor(dividend / divisor) : Math.floor(0 / divisor)
-			});
-
-			setAttrs({
-				wounds: sum
-			});
-		});
-	};
-
 	//Calculate Initiatves
 	const update_initiative = () => {
 		getAttrs(["reaction", "intuition", "initiative_modifier", "initiative_temp", "initiative_temp_flag"], v => {
-			v = functions.processTempFlags(`initiative_temp_flag`, `initiative_temp`, v);
-            v = functions.parseIntegers(v);
-            const base = v.reaction + v.intuition, bonus = functions.calculateBonuses(v), total = base + bonus;
+			v = processingFunctions.shadowrun.processTempFlags(`initiative_temp_flag`, `initiative_temp`, v);
+            v = processingFunctions.parseIntegers(v);
+            const base = v.reaction + v.intuition, bonus = processingFunctions.calculateBonuses(v), total = base + bonus;
 
 			setAttrs({
 				["initiative_mod"]: total,
@@ -139,10 +82,10 @@
 		getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], v => {
 			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
 
-			v = functions.processTempFlags(`initiative_dice_temp_flag`, `initiative_dice_temp`, v);
-			v = functions.parseIntegers(v);
+			v = processingFunctions.shadowrun.processTempFlags(`initiative_dice_temp_flag`, `initiative_dice_temp`, v);
+			v = processingFunctions.parseIntegers(v);
 
-			const bonus = functions.calculateBonuses(v), total = Math.min(bonus+1,5);
+			const bonus = processingFunctions.calculateBonuses(v), total = Math.min(bonus+1,5);
 			setAttrs({
 				initiative_dice: edgeFlag ? 5 : total
 			});
@@ -152,7 +95,7 @@
 	//Calculate Astral Initiatve
 	const updateAstralInitiative = () => {
 		getAttrs(["intuition", "astral_mod_modifier"], v => {
-			v = functions.parseIntegers(v);
+			v = processingFunctions.parseIntegers(v);
 			const base = v.intuition * 2, bonus = v.astral_mod_modifier, total = base + bonus;
 
 			setAttrs({
@@ -179,7 +122,7 @@
 			const sheetType = v.sheet_type;
 			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
 
-			v = functions.parseIntegers(v);
+			v = processingFunctions.parseIntegers(v);
 
 			let base = v.data_processing;
 			base += sheetType === "sprite" ? v.level : sheetType === "vehicle" ? v.pilot : sheetType === "host" ? v.host_rating : v.intuition;
@@ -535,7 +478,7 @@
 	        	const source = eventInfo.sourceAttribute;
 	        	if (source.includes("dicepool") || source.includes("specialization")) {
 	        		getAttrs([`${field}_specialization`, `${field}_dicepool_modifier`], v => {
-	        			v = functions.parseIntegers(v);
+	        			v = processingFunctions.parseIntegers(v);
 	                    setAttrs({
 	                        [`${field}_dicepool`]: v[`${field}_specialization`] + v[`${field}_dicepool_modifier`]
 	                    });
@@ -557,13 +500,6 @@
 			});
 		});
 
-
-	//Cyberdeck Calculations
-	 	['attack', 'sleaze', 'data_processing', 'firewall'].forEach(attr => {
-	        on(`change:${attr}_base change:${attr}_modifier change:${attr}_temp`, () => {
-	            update_common_rolls([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`]);
-	        });
-	    });
 
 	   ['acceleration', 'armor', 'body', 'data_processing', 'handling', 'pilot', 'sensor','speed'].forEach(attr => {
 	        // Attach listener

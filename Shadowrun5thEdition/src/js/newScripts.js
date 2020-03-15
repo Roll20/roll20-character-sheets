@@ -1,14 +1,32 @@
 
+
+const updateWounds = () => {
+  try {
+    getAttrs(sheetAttribues.woundCalculation, attrs => {
+      attrs = processingFunctions.parseIntegers(attrs)
+      const divisor  = attrs.low_pain_tolerance === 2 ? attrs.low_pain_tolerance : 3;
+      const highPain = attrs.high_pain_tolerance >= 1 ? attrs.high_pain_tolerance : 0;
+      let sum = 0;
+
+      ["stun", "physical"].forEach(attr => {
+          let dividend = attrs[`${attr}`];
+          dividend -= highPain + attrs[`damage_compensators_${attr}`]
+          sum -= dividend > 0 ? Math.floor(dividend / divisor) : Math.floor(0 / divisor)
+       });
+
+      processingFunctions.setAttributes({wounds: sum})
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 const updateConditionTracks= conditionTrack => {
   try {
     getAttrs(sheetAttribues[conditionTrack], attrs => {
-      //attrs.attribute = conditionTrack === 'stun' ? attrs.body : attrs.willpower;
-      //console.log(conditionTrack)
-      //console.log(attrs)
-      // physical: ['physical_modifier', 'body', 'sheet_type', 'flag_drone'],
-      // stun: ['stun_modifier', 'willpower']
-
-      //processingFunctions.setAttributes({[conditionTrack]: shots})
+      attrs = processingFunctions.shadowrun.conditionFactor(attrs)
+      const conditionTotal = processingFunctions.shadowrun.calculateConditionTracks(attrs)
+      processingFunctions.setAttributes({[`${conditionTrack}_max`]: conditionTotal}, true)
     })
   } catch (error) {
     console.log(error)
