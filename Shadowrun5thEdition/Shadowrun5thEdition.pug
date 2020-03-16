@@ -1,4 +1,4 @@
-input(name='attr_version' type='hidden' value='4.01')
+input(name='attr_version' type='hidden' value='4.1')
 
 //- CHARACTER SHEET PAGE
 input.sheet_type(name='attr_sheet_type' type='hidden' value='pc')
@@ -64,7 +64,7 @@ include src/pug/_variables.pug
 								h2(data-i18n=translationKey) #{val}
 					input.tab-switch(name='attr_skill_toggle' type='hidden' value='active')
 					each val, key in {'active': ['active', 'Agility', 'Physical'],'knowledge':['know', 'Logic', 'Mental'], 'language': ['lang', 'Charisma', 'Social']}
-						div(class='skills-'+val[0])
+						div(class=`skills-${val[0]}`)
 							.rows.repeating-container
 								if key === 'active'
 									.row-long
@@ -76,19 +76,21 @@ include src/pug/_variables.pug
 										select.limit-select(name='attr_limit' title='Skill limit')
 											+limitSelect('Physical')
 								fieldset(class=`repeating_${key}`)
-									- const skillsRepeatingSection = `@{repeating_${key}_`+'${x}';
+									- const skillsRepeatingSection = `@{repeating_${key}`+'_${x}';
 
-									input(name='attr_display' type='hidden')
 									input(name='attr_display_rating' type='hidden')
-									input(name='attr_display_specialization' type='hidden' value='')
+									input(name='attr_specialization' type='hidden' value='')
 									input(name='attr_display_limit' type='hidden' value=val[2])
 									input(name='attr_display_attribute' type='hidden' value=val[1])
 									input(name='attr_dicepool' type='hidden' value='0')
 
+									if key === 'active'
+										input(name='attr_display_skill' type='hidden' value='')
+
 									input.settings-flag(name='attr_flag' type='hidden' value='settings' title=`${skillsRepeatingSection}_flag}`)
 									.buttons
 										//- SKILL BUTTON
-										+skillButton(false)
+										+skillButton(false, key)
 										//- SPECILIZATION BUTTON
 										+skillButton(true)
 									span.text-align-center(name='attr_display_rating' title=`${skillsRepeatingSection}_display_rating}`)
@@ -577,13 +579,16 @@ script(type="text/worker")
 
 	include src/js/attributes.js
 
+	include src/js/processingFunctions.js
+
+	include src/js/newScripts.js
+	
+	//Old functions working to become obsolete
+	include src/js/scripts.js
+
 	include src/js/versioning.js
 
-	include src/js/helpers.js
-
 	include src/js/eventhandlers.js
-
-	include src/js/scripts.js
 
 	include src/js/importer.js
 
