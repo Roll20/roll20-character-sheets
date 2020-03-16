@@ -45,6 +45,10 @@
     on(`change:repeating_${field}:dicepool`, eventinfo => updateRepeatingSkillDicepool(eventinfo))
   })
 
+  sheetAttribues.weaponTypes.forEach(type => {
+    on(`change:repeating_${type}:dicepool_modifier`, eventinfo => updateRepeatingWeaponDicepool(eventinfo))
+  })
+
   on(`change:repeating_active:skill`, eventinfo => updateRepeatingSkillName(eventinfo))
 
 	on('clicked:cond_reset_physical clicked:cond_reset_stun', eventinfo => resetConditionTrack(eventinfo))

@@ -1,3 +1,9 @@
+const updateRepeatingWeaponDicepool = eventinfo => {
+  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+  
+}
+
+
 const updateRepeatingSkillDicepool = eventinfo => {
    const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
     getAttrs([`${repRowID}_skill`], attrs => {
