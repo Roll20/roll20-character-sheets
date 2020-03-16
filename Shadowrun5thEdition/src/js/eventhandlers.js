@@ -41,10 +41,11 @@
   sheetAttribues.repeatingSkills.forEach(field => {
     on(`change:repeating_${field}:rating change:repeating_${field}:rating_modifier`, eventinfo => updateRepeatingSkillRating(eventinfo.triggerName))
     on(`change:repeating_${field}:attribute`, eventinfo => updateRepeatingSkillAttribute(eventinfo))
-    on(`change:repeating_${field}:skill`, eventinfo => updateRepeatingSkillName(eventinfo))
     on(`change:repeating_${field}:limit`, eventinfo => updateRepeatingSkillLimit(eventinfo))
     on(`change:repeating_${field}:dicepool`, eventinfo => updateRepeatingSkillDicepool(eventinfo))
   })
+
+  on(`change:repeating_active:skill`, eventinfo => updateRepeatingSkillName(eventinfo))
 
 	on('clicked:cond_reset_physical clicked:cond_reset_stun', eventinfo => resetConditionTrack(eventinfo))
 
