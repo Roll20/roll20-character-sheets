@@ -31,6 +31,18 @@ const fourpointone = () => {
       initiative_mod_temp_flag: value.initiative_mod_temp_flag
     })
   })
+
+  getSectionIDs("active", idarray => {
+    let attributes = [];
+    let update = {};
+
+    idarray.forEach(id => attributes.push(`repeating_active_${id}_skill`))
+
+    getAttrs(attributes, value => {
+        idarray.forEach(id => update[`repeating_active_${id}_display_skill`] = value[`repeating_active_${id}_skill`])
+       setAttrs(update);
+    });
+  });
 }
 
 const fourpointzero = () => {
@@ -54,7 +66,7 @@ const fourpointzero = () => {
 
         getAttrs(ritualAttributes, value => {
             idarray.forEach(id => {
-                update[`repeating_ritual_${id}_specialization`] = v[`repeating_ritual_${id}_spec`]
+                update[`repeating_ritual_${id}_specialization`] = value[`repeating_ritual_${id}_spec`]
             }); 
 
            setAttrs(update);

@@ -1,3 +1,56 @@
+const updateRepeatingSkillDicepool = eventinfo => {
+   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+    getAttrs([`${repRowID}_skill`], attrs => {
+      let skill = processingFunctions.shadowrun.convertSkillSelectToHiddenSkill(attrs[`${repRowID}_skill`])
+      processingFunctions.setAttributes({
+        [`${skill}`]: eventinfo.newValue
+      })
+    })
+}
+
+const updateRepeatingSkillLimit = eventinfo => {
+  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+  if (eventinfo.newValue === "none") {
+    processingFunctions.setAttributes({[`${repRowID}_display_limit`]: ' '})
+  } else {
+    const translationKey = processingFunctions.sliceAttr(eventinfo.newValue)
+    const translation = getTranslationByKey(translationKey);
+    getAttrs([translationKey], attrs => {
+      const limitDisplay = `${translation} ${attrs[translationKey]}`
+      processingFunctions.setAttributes({[`${repRowID}_display_limit`]: limitDisplay})
+    })
+  }
+}
+
+
+const updateRepeatingSkillName = eventinfo => {
+  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+  const translationKey = eventinfo.newValue.replace(/ /g, '').toLowerCase()
+  const translation = getTranslationByKey(translationKey);
+  processingFunctions.setAttributes({
+    [`${repRowID}_display_skill`]: translation
+  })
+}
+
+const updateRepeatingSkillAttribute = eventinfo => {
+  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+  const translationKey = processingFunctions.sliceAttr(eventinfo.newValue)
+  const translation = getTranslationByKey(translationKey);
+  processingFunctions.setAttributes({
+    [`${repRowID}_display_attribute`]: translation
+  })
+}
+
+const updateRepeatingSkillRating = trigger => {
+  const repRowID = processingFunctions.getReprowid(trigger)
+  getAttrs([`${repRowID}_rating`, `${repRowID}_rating_modifier`], attrs => {   
+    attrs = processingFunctions.shadowrun.attributeFactory(attrs)
+    processingFunctions.setAttributes({
+      [`${repRowID}_dicepool`]: attrs.total,
+      [`${repRowID}_display_rating`]: processingFunctions.shadowrun.buildDisplay(attrs.base, attrs.bonus)
+    })
+  });
+}
 
 const updateWounds = () => {
   getAttrs(sheetAttribues.woundCalculation, attrs => {

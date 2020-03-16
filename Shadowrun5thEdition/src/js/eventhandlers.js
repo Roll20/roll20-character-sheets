@@ -38,17 +38,25 @@
 
 	sheetAttribues.woundCalculation.forEach(attr => on(`change:${attr}`, () => updateWounds()))
 
-	//on('clicked:cond_reset_physical clicked:cond_reset_stun', eventinfo => resetConditionTrack(eventinfo))
+  sheetAttribues.repeatingSkills.forEach(field => {
+    on(`change:repeating_${field}:rating change:repeating_${field}:rating_modifier`, eventinfo => updateRepeatingSkillRating(eventinfo.triggerName))
+    on(`change:repeating_${field}:attribute`, eventinfo => updateRepeatingSkillAttribute(eventinfo))
+    on(`change:repeating_${field}:skill`, eventinfo => updateRepeatingSkillName(eventinfo))
+    on(`change:repeating_${field}:limit`, eventinfo => updateRepeatingSkillLimit(eventinfo))
+    on(`change:repeating_${field}:dicepool`, eventinfo => updateRepeatingSkillDicepool(eventinfo))
+  })
 
-	//on('change:edge_toggle', eventinfo => edgeToggle(eventinfo))
+	on('clicked:cond_reset_physical clicked:cond_reset_stun', eventinfo => resetConditionTrack(eventinfo))
 
-	//on('change:device_rating change:matrix_modifier', () => updateMatrixMaximum())
+	on('change:edge_toggle', eventinfo => edgeToggle(eventinfo))
 
-	//on('change:intuition change:astral_mod_modifier', () => updateAstralInitiative())
+	on('change:device_rating change:matrix_modifier', () => updateMatrixMaximum())
 
-	//on('change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag', () => updateInitiative())
+	on('change:intuition change:astral_mod_modifier', () => updateAstralInitiative())
 
-	//on('change:astral_dice_modifier change:edge_toggle', () => updateAstralInitiativeDice())
+	on('change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag', () => updateInitiative())
 
-	//on('change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle', () => updateMatrixInitiative())
+	on('change:astral_dice_modifier change:edge_toggle', () => updateAstralInitiativeDice())
+
+	on('change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle', () => updateMatrixInitiative())
 

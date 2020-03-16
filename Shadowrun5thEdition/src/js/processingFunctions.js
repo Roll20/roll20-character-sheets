@@ -26,6 +26,7 @@ const processingFunctions = {
     return numbers  
   },
   setAttributes: (update, silent) => silent && typeof update === 'object' ? setAttrs(update, {silent:true}) : typeof update === 'object' ? setAttrs(update) : console.error(`${update} is not an object`),
+  sliceAttr: attribute => attribute.slice(2, -1), 
   sumIntegers: numbers => numbers.reduce((a,b) => a + b, 0),
 
   shadowrun: {
@@ -35,7 +36,6 @@ const processingFunctions = {
       attrs = processingFunctions.shadowrun.calculateBonuses(attrs)
       attrs.total = processingFunctions.sumIntegers(Object.values(attrs))
       attrs.base = attrs.total - attrs.bonus
-      console.log(attrs)
       return attrs
     },
     conditionFactor: attrs => {
@@ -72,6 +72,12 @@ const processingFunctions = {
         sum -= Math.floor(dividend / divisor) || 0
       })
       return sum
+    },
+    convertSkillSelectToHiddenSkill: skillName => {
+      let skill = skillName.toLowerCase()
+      skill = skill.includes('group') ? skill.slice(0, -6) : skill
+      skill = skill.includes(" ") ? skill.replace(/ /g,"") : skill
+      return skill
     },
     determineConditionBase: (type, drone) => drone ? 6 : type === 'vehicle' ? 12 : 8,
     determineConditionAttribute: attrs => attrs.willpower ? attrs.willpower : attrs.body ? attrs.body : attrs.device_rating ? attrs.device_rating : 0,

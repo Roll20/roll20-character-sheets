@@ -22,6 +22,18 @@ describe('Helper functions', () => {
 	})
 
   it('convertIntegerNegative turns positive integar into negative', () => assert.strictEqual(Functions.convertIntegerNegative(6), -6))
+
+  it('sliceAttr removes the @{} from a value', () => assert.ok(Functions.sliceAttr('@{strength}'), 'strength'))
+
+  it('convertSkillSelectToHiddenSkill removes " Group" in skill groups ', () => {
+    const actual = Functions.shadowrun.convertSkillSelectToHiddenSkill('Firearms Group')
+    assert.ok(actual, 'firearms')
+  })
+
+  it('convertSkillSelectToHiddenSkill removes all " " in skill groups ', () => {
+    const actual = Functions.shadowrun.convertSkillSelectToHiddenSkill('Close Combat Group')
+    assert.ok(actual, 'closecombat')
+  })
 })
 
 describe('Shadowrun shotsFired', () => {
