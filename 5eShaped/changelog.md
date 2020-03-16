@@ -11,6 +11,268 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 19.3.0
+
+### Features
+- Update French translations
+
+## 19.2.0
+
+### Features
+- [#778: Suggestion: Luck Statistic](https://bitbucket.org/mlenser/5eshaped/issues/778/suggestion-luck-statistic)
+
+## 19.1.5
+
+### Bug fixes
+- [#775: Spell data not converting for NPCs and Monster spellcasters on premade campaign](https://bitbucket.org/mlenser/5eshaped/issues/775/spell-data-not-converting-for-npcs-and)
+
+## 19.1.4
+
+### Bug fixes
+- [#772: Drag and Drop of spells ceases to function after attempting the "Heal" spell](https://bitbucket.org/mlenser/5eshaped/issues/772/drag-and-drop-of-spells-ceases-to-function) and add a test
+
+## 19.1.3
+
+### Bug fixes
+- [#766: Warlock spell slots not updating when level changed](https://bitbucket.org/mlenser/5eshaped/issues/766/warlock-spell-slots-not-updating-when)
+- [#767: Higher level spell queries are not updated as spells are expended](https://bitbucket.org/mlenser/5eshaped/issues/767/higher-level-spell-queries-are-not-updated)
+
+## 19.1.2
+
+### Bug fixes
+- [#758: New SRD Content cleanup code breaks lair actions and regional effects import from script](https://bitbucket.org/mlenser/5eshaped/issues/758/new-srd-content-cleanup-code-breaks-lair)
+- [#759: Race condition with updating actions on import](https://bitbucket.org/mlenser/5eshaped/issues/759/race-condition-with-updating-actions-on)
+- Fixed Goblin Spider parsing
+- [#761: Spellcasting trait parse has invalid destructuring usage](https://bitbucket.org/mlenser/5eshaped/issues/761/spellcasting-trait-parse-has-invalid)
+- [#765: Fix for #759 broke more stuff](https://bitbucket.org/mlenser/5eshaped/issues/765/fix-for-759-broke-more-stuff)
+
+## 19.1.1
+
+### Bug fixes
+- [#754: Incorrect assumption that all innate spellcasting groups will end with "each"](https://bitbucket.org/mlenser/5eshaped/issues/757/incorrect-assumption-that-all-innate)
+
+## 19.1.0
+
+### Features
+- The sheet now supports some newer script edge-case features such as Anubian’s stealth being higher in sand.
+
+### Bug fixes
+- [#752: NPC Average HP's not calculating properly](https://bitbucket.org/mlenser/5eshaped/issues/752/npc-average-hps-not-calculating-properly)
+
+## 19.0.0
+
+### Breaking Changes
+- Removed my custom classes (only one, called `Summoner`) and my psionic classes (`Psion` and `Soulknife`) from the sheet. If you have custom classes then use the custom name field for the class.
+
+### Features
+- Settings page cleaned up after latest Roll20 changes. It has also been reorganized to match the PC sheet sections (skills, saving throws, etc).
+- [#750: Always show NPC saving throws](https://bitbucket.org/mlenser/5eshaped/issues/750/always-show-npc-saving-throws)
+
+### Bug fixes
+- [#729: NPC skill proficiencies are lost during conversion from OGL sheet](https://bitbucket.org/mlenser/5eshaped/issues/729/npc-skill-proficiencies-are-lost-during)
+- NPC skills should never expand in to the right column now
+
+## 18.1.13
+
+### Bug fixes
+- [#738: Overlapping UI in NPC sheet](https://bitbucket.org/mlenser/5eshaped/issues/738/overlapping-ui-in-npc-sheet)
+
+## 18.1.12
+
+### Bug fixes
+- [#733: Class traits with damage do not check damage option by default](https://bitbucket.org/mlenser/5eshaped/issues/733/class-traits-with-damage-do-not-check)
+- [#743: Incorrect assumption about OGL HP format breaks some imports](https://bitbucket.org/mlenser/5eshaped/issues/743/incorrect-assumption-about-ogl-hp-format)
+- [#744: TypeError on OGL conversion](https://bitbucket.org/mlenser/5eshaped/issues/744/typeerror-on-ogl-conversion)
+- [#745: Consider not using npc_name from OGL to set character name](https://bitbucket.org/mlenser/5eshaped/issues/745/consider-not-using-npc_name-from-ogl-to)
+
+## 18.1.11
+
+### Bug fixes
+- [#728: Error message when using NPC actions](https://bitbucket.org/mlenser/5eshaped/issues/728/error-message-when-using-npc-actions)
+
+## 18.1.10
+
+### Bug fixes
+- Fix attachers for NPC actions and reactions. Closes [#726: NPC attachers do not trigger for Actions](https://bitbucket.org/mlenser/5eshaped/issues/726/npc-attachers-do-not-trigger-for-actions)
+
+## 18.1.9
+
+### Bug fixes
+- [#723: NPC skill parsing broken for skills with spaces in them](https://bitbucket.org/mlenser/5eshaped/issues/723/npc-skill-parsing-broken-for-skills-with)
+- [#724: Drag-and-drop for crossbow bolts freezes sheet, breaks future imports](https://bitbucket.org/mlenser/5eshaped/issues/724/drag-and-drop-for-crossbow-bolts-freezes)
+
+## 18.1.8
+
+### Bug fixes
+- [#717: Custom Coin Text Alignment](https://bitbucket.org/mlenser/5eshaped/issues/717/custom-coin-text-alignment)
+
+## 18.1.7
+
+### Bug fixes
+- Fixed all the new cases raised in [#714: Mordenkainen's Tome of Foes, seems like monster imports fail to get actions](https://bitbucket.org/mlenser/5eshaped/issues/714/mordenkainens-tome-of-foes-seems-like). With Vanakoji's testing this should handle every case it seems (besides some formatting issues that roll20 needs to fix).
+
+## 18.1.6
+
+### Bug fixes
+- Fixed error when modifying anything with a melee weapon caused by refactoring from yesterday.
+
+## 18.1.5
+
+### Bug fixes
+- Fixed all the new cases raised in [#714: Mordenkainen's Tome of Foes, seems like monster imports fail to get actions](https://bitbucket.org/mlenser/5eshaped/issues/714/mordenkainens-tome-of-foes-seems-like). This should fix the vast majority of Mordenkainen.
+
+## 18.1.4
+
+### Bug fixes
+- [#711: Modifiers section not changing attack bonus on display](https://bitbucket.org/mlenser/5eshaped/issues/711/modifiers-section-not-changing-attack)
+- Improved the method to only show NPC skills and saving throws. They show on the sheet and chat macros if they are proficient or if there are modifiers for that specific skill/saving throw.
+
+## 18.1.3
+
+### Bug fixes
+- [#714: Mordenkainen's Tome of Foes, seems like monster imports fail to get actions](https://bitbucket.org/mlenser/5eshaped/issues/714/mordenkainens-tome-of-foes-seems-like)
+
+## 18.1.2
+
+### Bug fixes
+- The spell macro now shows spells from spell level 1 and above.
+
+## 18.1.1
+
+### Bug fixes
+- `Currency` is now generated on upgrade for existing characters and current quantities, weight per coin, and gold equivalent values are upgraded.
+
+## 18.1.0
+
+### Features
+- `Currency` (previously `coins` or `coinage`) is now a repeating section. It defaults to having the 5 currencies of 5e, but their name, acronym, weight, value, and border style can be changed as desired. Additionally more currencies (gems, rocks, or any other currency) can be added as desired. The currency macro now outputs how much of each currency and a total value. Gold is the standard currency as it is in 5e, but that can be changed by changing the values of each currency. So for example the Silver Standard can be used by making Silver's value 1 and the other values as desired. Closes [#689: Silver Standard support](https://bitbucket.org/mlenser/5eshaped/issues/689/silver-standard-support)
+
+## 18.0.0
+
+### Breaking Changes
+This breaking change should be fully handled with the upgrade, but custom scripts may break as the roll template has changed. This will only impact existing roll template outputs and should only matter for those who want a well preserved chat record and for those who make custom macros (not recommended as the sheet should provide all that are needed).
+
+### Features
+- Added support for `spell points` to be called `sorcery`, `psi`, and `ki`. `mana` is already supported. Closes [#295](https://bitbucket.org/mlenser/5eshaped/issues/295/psi-points)
+- Spell points can be customized for each spell level. This will allow each player to set the cost of each level. This supports the UA mystic, allowing them to set level 1 spells to 1 psi, level 2 spells to 2 psi, and so forth.
+
+## 17.1.1
+
+### Bug Fixes
+* Added parsing to fix poor formatting of some Tome of Beasts creatures. Closes [#709: Tome of Beasts Monster imports not importing correctly](https://bitbucket.org/mlenser/5eshaped/issues/709/tome-of-beasts-monster-imports-not)
+
+## 17.1.0
+
+### Features
+* Added a myriad of attachers. Closes [#708: Add attacher functionality to NPC Actions](https://bitbucket.org/mlenser/5eshaped/issues/708/add-attacher-functionality-to-npc-actions)
+
+### Bug Fixes
+* [#707: D&D 5e (5eShaped) Brutal Critical error](https://bitbucket.org/mlenser/5eshaped/issues/707/d-d-5e-5eshaped-brutal-critical-error)
+
+## 17.0.6
+
+### Bug Fixes
+* [#697: NPC right column overlaps left column in edit mode](https://bitbucket.org/mlenser/5eshaped/issues/697/npc-right-column-overlaps-left-column-in)
+* [#704: Princes of the Apocalypse Module fails to convert creature attacks actions](https://bitbucket.org/mlenser/5eshaped/issues/704/princes-of-the-apocalypse-module-fails-to)
+
+## 17.0.5
+
+### Bug Fixes
+* [#693: Tooltips for carry capacity and push/drag cut off at default sheet size](https://bitbucket.org/mlenser/5eshaped/issues/693/tooltips-for-carry-capacity-and-push-drag)
+* [#691: Feature uses tied to modifiers aren't being read](https://bitbucket.org/mlenser/5eshaped/issues/691/feature-uses-tied-to-modifiers-arent-being)
+* [#692: Repeat attack / damage needs some point of reference](https://bitbucket.org/mlenser/5eshaped/issues/692/repeat-attack-damage-needs-some-point-of)
+
+## 17.0.4
+
+### Bug Fixes
+* [#686: Spell tooltips do not respect newlines in the spell's description](https://bitbucket.org/mlenser/5eshaped/issues/686/spell-tooltips-do-not-respect-newlines-in)
+* [#687: Attacks and Traits are blank when](https://bitbucket.org/mlenser/5eshaped/issues/687/attacks-and-traits-are-blank-when)
+
+## 17.0.3
+
+### Bug Fixes
+* Monsters imported from the script now correctly output their content. Closes [#682: Imported Actions/Traits don't send content to chat](https://bitbucket.org/mlenser/5eshaped/issues/682/imported-actions-traits-dont-send-content)
+* Skill rows that run out of room now cause the name to shrink better, primarily on firefox. Closes [#684: Formatting Skills error](https://bitbucket.org/mlenser/5eshaped/issues/684/formatting-skills-error)
+
+## 17.0.2
+
+### Bug Fixes
+* [#675: Warlock slots not generating](https://bitbucket.org/mlenser/5eshaped/issues/675/warlock-slots-not-generating-v-1701)
+* Spells known and spells chat macro now update when dragging a spell from the SRD. Closes [#677: Spells Macro Not Updating](https://bitbucket.org/mlenser/5eshaped/issues/677/spells-macro-not-updating)
+
+## 17.0.1
+
+### Bug Fixes
+* `Roll 2` now indicates to the user that it is a legacy feature that does not work with all sheet features.
+* [#672: coin weight calculation resulting in high decimal values](https://bitbucket.org/mlenser/5eshaped/issues/672/coin-weight-calculation-resulting-in-high)
+* Spells manually changed in any way resulted in an error which prevented the scripts from running properly. This has been fixed. Closes [#674: Adding custom spells does not output description to chat or use spell slot](https://bitbucket.org/mlenser/5eshaped/issues/674/adding-custom-spells-does-not-output)
+
+## 17.0.0
+
+### Breaking Changes
+* Spells now track the number of slots expended instead of the remaining slots. This aligns with the paper and OGL sheets. Upgrades should handle this change for you.
+* NPC saving throws and skills will only show proficient/expertise items while in presentation mode. Closes [#669: Don't generate skills by default that have no proficiency or expertise on NPC sheets](https://bitbucket.org/mlenser/5eshaped/issues/669/dont-generate-skills-by-default-that-have)
+
+### Features
+* Spell UI has been updated with bubbles for spell slots and new UI wrappers.
+* Spells now have tooltips to display the full contents of the spell. Closes [#374: Enable 'condense' toggling for spells on a more granular basis](https://bitbucket.org/mlenser/5eshaped/issues/374/enable-condense-toggling-for-spells-on-a)
+* NPC skills will now show in a grid layout in edit mode.
+* Falling to 0 hp now sets the unconscious condition. Gaining HP removes it. Closes [#3: Conditions](https://bitbucket.org/mlenser/5eshaped/issues/3/conditions)
+* Cleaned up the Stablock macro to translate the size of PCs/NPCs. Race will now show instead of type for PCs. Offense and utility added for PCs as well.
+* Settings page reorganized.
+
+### Bug Fixes
+* [#670: Not assigning a weight value to equipment completely breaks weight calculations](https://bitbucket.org/mlenser/5eshaped/issues/670/not-assigning-a-weight-value-to-equipment)
+
+## 16.1.2
+
+### Bug Fixes
+* [#572: Modifiers adding a second time on critical damage](https://bitbucket.org/mlenser/5eshaped/issues/572/modifiers-adding-a-second-time-on-critical)
+
+## 16.1.1
+
+### Bug Fixes
+* [#664: Spelling errors in translation.json](https://bitbucket.org/mlenser/5eshaped/issues/664/spelling-errors-in-translationjson)
+* [#663: Saving Throw Bonus Formatting Error](https://bitbucket.org/mlenser/5eshaped/issues/663/saving-throw-bonus-formatting-error)
+* Crit range is shown by default as turning it on wasn’t intuitive enough.
+
+## 16.1.0
+
+### Features
+* Shaped sheet can now process OGL spells from PC sheets or NPC sheets (only NPC sheets from the Curse of Strahd module and newer use this format for spells). Closes [#659: NPC Spells not converting from OGL to Shaped](https://bitbucket.org/mlenser/5eshaped/issues/659/npc-spells-not-converting-from-ogl-to)
+
+### UI Adjustments
+* The sheet is a bit wider now and no longer assumes my stylish CSS so it should fit on the default width (~888px depending on browser) without a horizontal scrollbar.
+* Firefox UI cleaned up. Closes [#661: Tie bar behind exhastion states not centered](https://bitbucket.org/mlenser/5eshaped/issues/661/tie-bar-behind-exhastion-states-not)
+
+## 16.0.0
+
+### Breaking Changes
+* Importing data from the compendium, script, or OGL content has been completely revamped to use the same system for as much as possible.
+
+### Features
+* [#656: Missing comma in Modifiers -> Saving throw](https://bitbucket.org/mlenser/5eshaped/issues/656/missing-comma-in-modifiers-saving-throw)
+* Conditions have been added.
+
+### Bug Fixes
+* [#654: Magic Missile](https://bitbucket.org/mlenser/5eshaped/issues/654/magic-missile)
+* New characters sheets will be created with edit mode enabled
+* [#655: OGL skills do not convert](https://bitbucket.org/mlenser/5eshaped/issues/655/ogl-skills-do-not-convert)
+* OGL conversion, Compendium drop, and Script import of monsters, spells, and items should be fully working (update the script to 12.0.0)
+  * A processing notification now shows while these items are processing, regardless of origin
+* [#38: Spell Save DC Not calculating properly in !shaped-spells](https://bitbucket.org/mlenser/5eshapedscript/issues/38/spell-save-dc-not-calculating-properly-in)
+* Weapons dropped on a NPC sheet are added as actions
+
+### UI Adjustments
+* Styled boxes have been added
+* Tabs renamed to "Character"/"NPC", "Spells", and the cog.
+* "Character" tab for PCs will now show the appearance and backstory details below the normal sheet
+* "All" option removed as it is now only useful for showing settings below other sheets which doesn't have much value
+* Repeating buttons restyled a bit
+* PC Core page column widths adjusted a bit
+* Font sizes adjusted to match the new UI
+* Passive skills moved to the core page and restyled
+
 ## 15.7.4
 
 ### Bug Fixes
@@ -214,7 +476,7 @@ The sheet will always upgrade itself unless I specify otherwise, though some thi
 
 * Fixed a bug where prepared_matters_var was not set on new character. Old characters can re-toggle that value on the spells section to have the chat output correct. Closes. [#513: Spell preparation still bugged?](https://bitbucket.org/mlenser/5eshaped/issues/513/spell-preparation-still-bugged)
 * Rests will now output a message even if they have not recharged anything: "Nothing recharged". Closes [#514: Short rest doesn't output anything if there's nothing to recharge](https://bitbucket.org/mlenser/5eshaped/issues/514/short-rest-doesnt-output-anything-if)
-* [#512: Companion script-imported spell issues](https://bitbucket.org/mlenser/5eshaped/issues/512/companion-script-imported-spell-issues)
+* [#512: Script-imported spell issues](https://bitbucket.org/mlenser/5eshaped/issues/512/companion-script-imported-spell-issues)
 
 ## 14.2.3
 
