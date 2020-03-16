@@ -311,10 +311,10 @@
 	        on(`change:${weap}`, (eventInfo) => {
 				const source = eventInfo.sourceAttribute;
 				const newV   = eventInfo.newValue;
-				const type   = weap.slice(-5);
+				const type   = weap.split('repeating_');
 
 	            //Setting this here for now to ensure dicepool attribute gets updated. Remove in a future update
-	        	getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`], (v) => {
+	       getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`], (v) => {
 	        		const mod = parseInt(v[`${weap}_dicepool_modifier`]) || 0;
 					const spec = parseInt(v[`${weap}_spec`]) || 0;
 					const tot = mod + spec;
@@ -367,20 +367,20 @@
 				        });
 		            };
 	           	} else if (source.includes('dicepool') || source.includes('weapon') || source.includes('damage') || source.includes('acc') || source.includes('ap') || source.includes('skill') || source.includes('reach') || source.includes('ammo') || source.includes('mode') || source.includes('recoil')) {
-					getAttrs([`${weap}_primary`, `${source}`], (v) => {
-						if (v[`${weap}_primary`] === 'primary') {
-							let update = {};
-							//This whole process needs refactored in the future. Its working for now.
-							if (source.includes('ammo')) {
-								update[`primary_${type}_weapon_ammo`]     = v[`${source}`];
-								update[`primary_${type}_weapon_ammo_max`] = v[`${source}`];
-							} else {
-								console.log(eventinfo);
-							};
+          					getAttrs([`${weap}_primary`, `${source}`], (v) => {
+          						if (v[`${weap}_primary`] === 'primary') {
+          							let update = {};
+          							//This whole process needs refactored in the future. Its working for now.
+          							if (source.includes('ammo')) {
+          								update[`primary_${type}_weapon_ammo`]     = v[`${source}`];
+          								update[`primary_${type}_weapon_ammo_max`] = v[`${source}`];
+          							} else {
+          								console.log(eventinfo);
+          							};
 
-							setAttrs(update);
-						};
-					});
+          							setAttrs(update);
+          						};
+          					});
 	            } else {
 	                 console.log("Change was not relevant.");
 	            };
