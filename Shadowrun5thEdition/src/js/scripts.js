@@ -1,62 +1,4 @@
 
-	const translations = () => {
-		const attributes = sheetAttribues.translationsAttributes;
-		const translations = getTranslations(attributes);
-		let attribute_roll = `?{${translations[0]}`;
-
-	    for (i = 1; i <= (attributes.length - 2); i += 1) {
-	    	attribute_roll +=  `|${translations[i]},@{${attributes[i]}}`;
-	    };
-
-	    attribute_roll += `|${translations[10]},0}`; //For None
-
-	    setAttrs({
-	    	attribute_roll: attribute_roll
-	    });
-	}	
-
-	const settingsToggle = (eventinfo) => {
-		const split = eventinfo.sourceAttribute.split("_");
-		const source = `${split[0]}_${split[1]}_${split[2]}`;
-		getAttrs([`${source}_flag`], (v) => {
-			setAttrs({
-				[`${source}_flag`]: (v[`${source}_flag`] === "settings") ? "display" : "settings"
-			});
-		});
-	};
-
-	//Calculate ATTRIBUTES
-	sheetAttribues.calculatedAttributes.forEach(attr => {
-        on(`change:${attr}_base change:${attr}_modifier change:${attr}_temp change:${attr}_temp_flag`, () => {
-            getAttrs([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`, `${attr}_temp_flag`], v => {
-                v = processTempFlags(`${attr}_temp_flag`, `${attr}_temp`, v);
-                v = parseIntegers(v);
-
-                const base = v[`${attr}_base`], bonus = calculateBonuses(v), total = base + bonus;
-
-                setAttrs({
-                    [attr]: total,
-                    [`display_${attr}`]: bonus === 0 ? base : `${base} (${total})`
-                });
-            });
-        });
-    });
-
-	//Calculaute limts
-		const update_limit = type => {
-			let attrs = [`${type}_limit_modifier`, `${type}_limit_temp`, `${type}_limit_temp_flag`].concat(sheetAttribues[`${type}Limits`]);
-			getAttrs(attrs, v => {
-				v = processTempFlags(`${type}_limit_temp_flag`, `${type}_limit_temp`, v);
-				v = parseIntegers(v);
-
-				const bonus = calculateBonuses(v), total = calculateLimitTotal(v, type);
-
-				setAttrs({
-					[`${type}_limit`]: Math.ceil(total) + bonus
-			});
-			})
-		};
-
 	//This function checks changes to repeating_armor and updates the Primary Armor if needed
 	on("change:repeating_armor", (eventInfo) => {
 		const source = eventInfo.sourceAttribute;
@@ -122,115 +64,14 @@
 		};
 	});
 
-	// COMMON ROLLS: MEOMORY, JUDGE INTETIONS, COMPOSURE, LIFT & CARRY, OVERFLOW, DEFENSE, & SOAK ROLLS
-	const update_common_rolls = (attrs) => {
-		getAttrs(attrs, (v) => {
-			const found = attrs.find(mod => { return mod.includes("_modifier") });
-			const name  = found.split("_modifier")[0];
-			let numbers = [];
-
-			//DEFENSE & SOAK HAVE TWO EXTRA ATTRIBUTES. TEMP IS NEEDED BUT ONLY IF THE FLAG IS CHECKED IN SETTINGS
-			const array = name === "defense" || name === "soak" ? (v[`${name}_temp_flag`] === "on") ? attrs.splice(0, 4) : attrs.splice(0, 3) : attrs;
-
-			_.each(array, (attr) => { 
-				numbers.push(parseInt(v[`${attr}`]) || 0); 
-			});
-        	const add = (a, b) => a + b, sum = numbers.reduce(add);
-
-			setAttrs({[`${name}`]: sum});
-		});
-	};
-
-	//Calculate Movement Rates
-		var update_movement = () => {
-			getAttrs(["agility", "walk_modifier", "run_modifier"], (v) => {
-				const agi = parseInt(v.agility) || 0, wmod = parseInt(v.walk_modifier) || 0, rmod = parseInt(v.run_modifier) || 0;
-				let update = {};
-				update["walk"] = (agi * 2) + wmod;
-				update["run"] = (agi * 4) + rmod;
-				setAttrs(update);
-			});
-		};
-
-	//Update condition tracks
-	const update_track = track => {
-		let attrs = [`${track}_modifier`];
-		track === "stun" ? attrs.push("willpower") : attrs.push("body", "sheet_type", "flag_drone");
-
-		getAttrs(attrs, v =>{
-			const stat = parseInt(v[`${attrs[1]}`]) || 0; //Willpower or Body
-			const mod = parseInt(v[`${track}_modifier`]) || 0;
-			let update = {};
-
-			if (track === "stun" || v["sheet_type"] === "pc" || v["sheet_type"] === "grunt") {
-				tot = Math.ceil(stat/2) + 8 + mod;
-			} else if (v["sheet_type"] === "vehicle" && v["flag_drone"]  === "drone") {
-				tot = (Math.ceil(stat/2) + 6 + mod);
-			} else if (v["sheet_type"] === "vehicle") {
-				tot = (Math.ceil(stat/2) + 12 + mod);
-			} else {
-				tot = 0; //Sprites don't have Stun or Physical track
-			};
-
-			update[`${track}_max`] = tot;
-
-			setAttrs(update, {silent:true});
-		});
-	};
-
-	//Calculate Device Rating Track
-	const updateMatrixMaximum = () => {
-		getAttrs(["device_rating","matrix_modifier"], (v) => {
-			v = parseIntegers(v);
-
-			setAttrs({
-				matrix_max: Math.ceil(v.device_rating/2) + 8 + v.matrix_modifier
-			});
-		});
-	};
-
-	const update_wounds = () => {
-		getAttrs(sheetAttribues.woundCalculation, v => {
-			v = parseIntegers(v);
-
-	       	const divisor  = v.low_pain_tolerance === 2 ? v.low_pain_tolerance : 3;
-	       	const highPain = v.high_pain_tolerance >= 1 ? v.high_pain_tolerance : 0;
-	       	let sum = 0;
-
-	       	["stun", "physical"].forEach(attr => {
-	       		let dividend = v[`${attr}`];
-	       		dividend -= highPain + v[`damage_compensators_${attr}`]
-	       		sum -= dividend > 0 ? Math.floor(dividend / divisor) : Math.floor(0 / divisor)
-			});
-
-			setAttrs({
-				wounds: sum
-			});
-		});
-	};
-
-	//Calculate Initiatves
-	const update_initiative = () => {
-		getAttrs(["reaction", "intuition", "initiative_modifier", "initiative_temp", "initiative_temp_flag"], v => {
-			v = processTempFlags(`initiative_temp_flag`, `initiative_temp`, v);
-            v = parseIntegers(v);
-            const base = v.reaction + v.intuition, bonus = calculateBonuses(v), total = base + bonus;
-
-			setAttrs({
-				["initiative_mod"]: total,
-				["display_initiative_mod"]: bonus === 0 ? base : `${base} (${total})`
-			});
-		});
-	};
-
 	const updateInitiative = () => {
 		getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], v => {
 			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
 
-			v = processTempFlags(`initiative_dice_temp_flag`, `initiative_dice_temp`, v);
-			v = parseIntegers(v);
+			v = processingFunctions.shadowrun.processTempFlags(`initiative_dice_temp_flag`, `initiative_dice_temp`, v);
+			v = processingFunctions.parseIntegers(v);
 
-			const bonus = calculateBonuses(v), total = Math.min(bonus+1,5);
+			const bonus = processingFunctions.calculateBonuses(v), total = Math.min(bonus+1,5);
 			setAttrs({
 				initiative_dice: edgeFlag ? 5 : total
 			});
@@ -240,7 +81,7 @@
 	//Calculate Astral Initiatve
 	const updateAstralInitiative = () => {
 		getAttrs(["intuition", "astral_mod_modifier"], v => {
-			v = parseIntegers(v);
+			v = processingFunctions.parseIntegers(v);
 			const base = v.intuition * 2, bonus = v.astral_mod_modifier, total = base + bonus;
 
 			setAttrs({
@@ -267,7 +108,7 @@
 			const sheetType = v.sheet_type;
 			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
 
-			v = parseIntegers(v);
+			v = processingFunctions.parseIntegers(v);
 
 			let base = v.data_processing;
 			base += sheetType === "sprite" ? v.level : sheetType === "vehicle" ? v.pilot : sheetType === "host" ? v.host_rating : v.intuition;
@@ -448,104 +289,6 @@
 			});
 		});
 
-	//REFACTORED Skills
-	sheetAttribues.repeatingSkills.forEach(field => {
-		on(`change:repeating_${field}:rating change:repeating_${field}:rating_modifier`, eventinfo => {
-			const section = getRepeatingSection(eventinfo.triggerName);
-
-			getAttrs([`${section}_rating`, `${section}_rating_modifier`], value => {
-				const numbers = parseIntegers(value);
-				const base = numbers[`${section}_rating`];
-				const total = calculateSum(Object.values(numbers));
-
-				setAttrs({
-					[`${section}_dicepool`]: total,
-					[`${section}_display_rating`]: numbers[`${section}_rating_modifier`] === 0 ? base : `${base} (${total})`
-				})
-			})
-		});
-	});
-
-	sheetAttribues.repeatingSkills.forEach(field => {
-		on(`change:repeating_${field}:attribute`, eventinfo => {
-			const section = getRepeatingSection(eventinfo.triggerName);
-
-			if (eventinfo.sourceType === "player") {
-				const attribute = eventinfo.newValue.slice(2, -1)
-				const translation = getTranslationByKey(`${attribute}`)
-
-				setAttrs({
-                	[`${section}_display_attribute`]: translation
-                });
-			}
-		})
-	})
-
-	sheetAttribues.repeatingSkills.forEach(field => {
-		on(`change:repeating_${field}:limit`, eventinfo => {
-			const section = getRepeatingSection(eventinfo.triggerName);
-
-			if (eventinfo.sourceType === "player") {
-				const limit = eventinfo.newValue.slice(2, -1);
-
-				setAttrs({
-	           		[`${section}_display_limit`]: eventinfo.newValue === "none" ? "" : `${getTranslationByKey(`${limit}`)} ${eventinfo.newValue}`
-	           	});
-			}
-		})
-	})
-
-	sheetAttribues.repeatingSkills.forEach(field => {
-		on(`change:repeating_${field}:specialization`, eventinfo => {
-			const section = getRepeatingSection(eventinfo.triggerName);
-
-			if (eventinfo.sourceType === "player") {
-				const base = eventinfo.newValue;
-				const size = base.length;
-				const display = size > 0 && size <= 20 ? `(${base})` : size > 20 ? "(" + base.slice(0, 20) + "...)" : " "; 
-
-				setAttrs({
-					[`${section}_display_specialization`]: display
-				 });	
-			}
-		})
-	})
-
-	sheetAttribues.repeatingSkills.forEach(field => {
-		on(`change:repeating_${field}:skill`, eventinfo => {
-			const section = getRepeatingSection(eventinfo.triggerName);
-
-			if (eventinfo.sourceType === "player") {
-				const base = eventinfo.newValue;
-				const size = base.length;
-				const display = size > 0 && size <= 20 ? base : size > 20  ? base.slice(0, 20) + "...)" : " "; 
-
-				setAttrs({
-					[`${section}_display`]: display
-				 });	
-			}
-		})
-	})
-
-	sheetAttribues.repeatingSkills.forEach(field => {
-		on(`change:repeating_${field}:dicepool`, eventinfo => {
-			const section = getRepeatingSection(eventinfo.triggerName);
-
-			if (eventinfo.sourceType === "player") {
-				getAttrs([`${section}_skill`], value => {
-					let skill = value[`${section}_skill`];
-					skill = skill.toLowerCase();
-					skill = skill.includes("group") ? skill.split(' group')[0] : skill
-					skill = skill.includes(" ") ? skill.replace(/ /g,"") : skill
-
-					setAttrs({
-						[`${skill}`]: eventinfo.newValue
-					 });
-				})
-			}
-		})
-	})
-
    	//Setting the Default attribute name for default skill
 	on("change:default_attribute", (eventinfo) => {
 		getAttrs(["default_display"], v => {
@@ -568,10 +311,10 @@
 	        on(`change:${weap}`, (eventInfo) => {
 				const source = eventInfo.sourceAttribute;
 				const newV   = eventInfo.newValue;
-				const type   = weap.slice(-5);
+				const type   = weap.split('repeating_');
 
 	            //Setting this here for now to ensure dicepool attribute gets updated. Remove in a future update
-	        	getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`], (v) => {
+	       getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`], (v) => {
 	        		const mod = parseInt(v[`${weap}_dicepool_modifier`]) || 0;
 					const spec = parseInt(v[`${weap}_spec`]) || 0;
 					const tot = mod + spec;
@@ -624,20 +367,20 @@
 				        });
 		            };
 	           	} else if (source.includes('dicepool') || source.includes('weapon') || source.includes('damage') || source.includes('acc') || source.includes('ap') || source.includes('skill') || source.includes('reach') || source.includes('ammo') || source.includes('mode') || source.includes('recoil')) {
-					getAttrs([`${weap}_primary`, `${source}`], (v) => {
-						if (v[`${weap}_primary`] === 'primary') {
-							let update = {};
-							//This whole process needs refactored in the future. Its working for now.
-							if (source.includes('ammo')) {
-								update[`primary_${type}_weapon_ammo`]     = v[`${source}`];
-								update[`primary_${type}_weapon_ammo_max`] = v[`${source}`];
-							} else {
-								console.log(eventinfo);
-							};
+          					getAttrs([`${weap}_primary`, `${source}`], (v) => {
+          						if (v[`${weap}_primary`] === 'primary') {
+          							let update = {};
+          							//This whole process needs refactored in the future. Its working for now.
+          							if (source.includes('ammo')) {
+          								update[`primary_${type}_weapon_ammo`]     = v[`${source}`];
+          								update[`primary_${type}_weapon_ammo_max`] = v[`${source}`];
+          							} else {
+          								console.log(eventinfo);
+          							};
 
-							setAttrs(update);
-						};
-					});
+          							setAttrs(update);
+          						};
+          					});
 	            } else {
 	                 console.log("Change was not relevant.");
 	            };
@@ -651,7 +394,7 @@
 	        	const source = eventInfo.sourceAttribute;
 	        	if (source.includes("dicepool") || source.includes("specialization")) {
 	        		getAttrs([`${field}_specialization`, `${field}_dicepool_modifier`], v => {
-	        			v = parseIntegers(v);
+	        			v = processingFunctions.parseIntegers(v);
 	                    setAttrs({
 	                        [`${field}_dicepool`]: v[`${field}_specialization`] + v[`${field}_dicepool_modifier`]
 	                    });
@@ -673,13 +416,6 @@
 			});
 		});
 
-
-	//Cyberdeck Calculations
-	 	['attack', 'sleaze', 'data_processing', 'firewall'].forEach(attr => {
-	        on(`change:${attr}_base change:${attr}_modifier change:${attr}_temp`, () => {
-	            update_common_rolls([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`]);
-	        });
-	    });
 
 	   ['acceleration', 'armor', 'body', 'data_processing', 'handling', 'pilot', 'sensor','speed'].forEach(attr => {
 	        // Attach listener
