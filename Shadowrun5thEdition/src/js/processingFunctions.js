@@ -1,4 +1,5 @@
 
+
 const processingFunctions = {
   convertIntegerNegative: number => number > 0 ? -Math.abs(number) : number,
   convertIntegersNegatives: numbers => {
@@ -7,6 +8,7 @@ const processingFunctions = {
     }
     return numbers
   },
+  findRepeatingField: trigger => trigger.split('_')[1],
   //Roll20 does not allow for Promises
   //getAttributes: array => new Promise((resolve, reject) => array ? getAttrs(array, v => resolve(v)) : reject(errorMessage('Function failed'))),
   getReprowid: trigger => {
@@ -30,6 +32,11 @@ const processingFunctions = {
   sumIntegers: numbers => numbers.reduce((a,b) => a + b, 0),
 
   shadowrun: {
+    addRepRow: (repRowID, attributeList) => {
+      let weaponAttributeWithRepeatingRow = []
+      attributeList.forEach(weaponAttribute => weaponAttributeWithRepeatingRow.push(`${repRowID}_${weaponAttribute}`))
+      return weaponAttributeWithRepeatingRow
+    },
     attributeFactory: attrs => {
       attrs = processingFunctions.shadowrun.findFlagInKeys(attrs) ? processingFunctions.shadowrun.processTempFlags(attrs) : attrs
       attrs = processingFunctions.parseIntegers(attrs)
@@ -38,13 +45,18 @@ const processingFunctions = {
       attrs.base = attrs.total - attrs.bonus
       return attrs
     },
-    conditionFactor: attrs => {
+    conditionFactory: attrs => {
       attrs.attribute = processingFunctions.shadowrun.determineConditionAttribute(attrs)
       attrs.base = processingFunctions.shadowrun.determineConditionBase(attrs.sheet_type, attrs.drone_flag)
       attrs.modifier = attrs[processingFunctions.shadowrun.findModifierInKeys(attrs)]
       Object.keys(attrs).forEach(key => !['attribute', 'base', 'modifier'].includes(key) ? delete attrs[key] : false)
       attrs = processingFunctions.parseIntegers(attrs)
       return attrs
+    },
+    contructRepeatingWeaponAttributes: (repRowID, type) => {
+      const attributeList = processingFunctions.shadowrun.determineWeaponAttributesByType(type)
+      const constructedWeaponAttributes = processingFunctions.shadowrun.addRepRow(repRowID, attributeList)
+      return constructedWeaponAttributes
     },
     buildDisplay: (base, bonus) => bonus === 0 ? base : `${base} (${base + bonus})`,
     calculateBonuses: attrs => {
@@ -81,6 +93,7 @@ const processingFunctions = {
     },
     determineConditionBase: (type, drone) => drone ? 6 : type === 'vehicle' ? 12 : 8,
     determineConditionAttribute: attrs => attrs.willpower ? attrs.willpower : attrs.body ? attrs.body : attrs.device_rating ? attrs.device_rating : 0,
+    determineWeaponAttributesByType: weaponType =>  weaponType === 'range' ? sheetAttributes.rangeAttributes : sheetAttributes.meleeAttribute,
     findFlagInKeys: attrs => Object.keys(attrs).find(key => key.includes('_flag')),
     findModifierInKeys: attrs => Object.keys(attrs).find(key => key.includes('_modifier')),
     processTempFlags: attrs => {
@@ -94,10 +107,42 @@ const processingFunctions = {
         console.error(error)
       }
     },
+    resetRepeatingFieldsPrimaries: (repeatingSection, repRowID) => {
+      getSectionIDs(repeatingSection, ids => {
+        let attributesWithIDs = [];
+        let update = {};
+        ids.forEach(id => attributesWithIDs.push(`${repeatingSection}_${id}_primary`))
+        attributesWithIDs.forEach(attribute => !attribute.includes(repRowID) ? update[attribute] = 0 : false)
+        setAttrs(update);
+      })
+    },
     shotsFired: (shots, trigger) => shots > 0 && trigger.includes('remove') ? shots -= 1 : trigger.includes('add') ? shots += 1 : shots,
     updateLimitTotal: attrs => {
       attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
       return processingFunctions.shadowrun.calculateLimitTotal(Object.values(attrs))
+    },
+    resetPrimaryWeapon: type => {
+      const resetPrimary = type === 'range' ? new PrimaryRangeWeapon(type) : new PrimaryMeleeWeapon(type)
+      let update = {}
+      for (let [key, value] of Object.entries(resetPrimary)) {
+        update[key] = value
+      }
+      return update
+    },
+    updatePrimaryWeapons: attrs => {
+      let update = {}
+      for (let [key, value] of Object.entries(attrs)) {
+        const type = processingFunctions.findRepeatingField(key)
+        const getReprowid = processingFunctions.getReprowid(key)
+        const weaponAttribute = key.split(`${getReprowid}_`)[1]
+        const primaryAttributeName = key.includes('weapon') ? `primary_${type}_weapon` : `primary_${type}_weapon_${weaponAttribute}`
+        update[primaryAttributeName] = value
+
+        if (key.includes('ammo')) {
+          update[`${primaryAttributeName}_max`] = value
+        }
+      }
+      return update
     }
   }
 }

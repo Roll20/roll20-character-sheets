@@ -1,5 +1,5 @@
 
-const sheetAttribues = {
+const sheetAttributes = {
   attributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge'],
   translationsAttributes: ['attribute', 'body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge', 'none'],
   repeating: ['quality', 'martial', 'items', 'range', 'melee', 'armor', 'spell', 'preps', 'ritual', 'powers', 'forms', 'vehicle', 'augementations', 'lifestyle', 'contacts', 'programs'],
@@ -37,6 +37,8 @@ const sheetAttribues = {
   matrixCharacters: ['vehicle', 'host', 'sprite'],
   matrixAttributes: ['attack', 'sleaze', 'data_processing', 'firewall'],
 
-  weaponTypes: ['range', 'melee']
+  weaponTypes: ['range', 'melee'],
+  rangeAttributes: ['dicepool', 'weapon', 'damage', 'acc', 'ap', 'skill', 'ammo', 'mode', 'recoil'],
+  meleeAttributes: ['dicepool', 'weapon', 'damage', 'acc', 'ap', 'skill', 'reach'],
 }
 

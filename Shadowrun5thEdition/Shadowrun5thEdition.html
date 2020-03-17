@@ -467,8 +467,8 @@
                 <div class="collapse"><span name="attr_notes"></span></div>
                 <div class="settings">
                   <select class="skill-select" name="attr_skill" value="Close Combat Group" title="@{repeating_active_${x}_skill}"><option class="option-headers" disabled="true" data-i18n="combatskills">Combat Skills</option>
-<option class="option-groups" value="Close Combat Group" data-i18n="closecombat">Close Combat Group</option>
-<option class="option-groups" value="Firearms Group" data-i18n="firearms">Firearms Group</option>
+<option class="option-groups" value="Close Combat Group" data-i18n="closecombatgroup">Close Combat Group</option>
+<option class="option-groups" value="Firearms Group" data-i18n="firearmsgroup">Firearms Group</option>
 <option value="Archery" data-i18n="archery">Archery</option>
 <option value="Automatics" data-i18n="automatics">Automatics</option>
 <option value="Blades" data-i18n="blades">Blades</option>
@@ -1015,7 +1015,7 @@
                   </select>
                   <h3 data-i18n="specialization">specialization</h3>
                   <label data-i18n-title="specialization" title="specialization">
-                    <input name="attr_spec" value="2" title="@{repeating_range_${x}_spec}" type="checkbox"/>
+                    <input name="attr_specialization" value="2" title="@{repeating_range_${x}_specialization}" type="checkbox"/>
                   </label>
                   <h3 data-i18n="modifier">modifier</h3>
                   <label data-i18n-title="modifier" title="modifier">
@@ -1082,7 +1082,7 @@
                   </select>
                   <h3 data-i18n="specialization">specialization</h3>
                   <label data-i18n-title="specialization" title="specialization">
-                    <input name="attr_spec" value="2" title="@{repeating_melee_${x}_spec}" type="checkbox"/>
+                    <input name="attr_specialization" value="2" title="@{repeating_melee_${x}_specialization}" type="checkbox"/>
                   </label>
                   <h3 data-i18n="modifier">modifier</h3>
                   <label data-i18n-title="modifier" title="modifier">
@@ -2602,8 +2602,8 @@
           <h2 data-i18n="attribute">Attribute</h2>
           <h2 data-i18n="limit">Limit</h2>
           <select class="skill-select" name="attr_skill" title="@{repeating_active_${x}_skill}" value="Close Combat Group"><option class="option-headers" disabled="true" data-i18n="combatskills">Combat Skills</option>
-<option class="option-groups" value="Close Combat Group" data-i18n="closecombat">Close Combat Group</option>
-<option class="option-groups" value="Firearms Group" data-i18n="firearms">Firearms Group</option>
+<option class="option-groups" value="Close Combat Group" data-i18n="closecombatgroup">Close Combat Group</option>
+<option class="option-groups" value="Firearms Group" data-i18n="firearmsgroup">Firearms Group</option>
 <option value="Archery" data-i18n="archery">Archery</option>
 <option value="Automatics" data-i18n="automatics">Automatics</option>
 <option value="Blades" data-i18n="blades">Blades</option>
@@ -3392,7 +3392,7 @@
 <input type="hidden" name="attr_unarmedcombat" min="0" value="0" />
 <script type="text/worker">
   
-const sheetAttribues = {
+const sheetAttributes = {
   attributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge'],
   translationsAttributes: ['attribute', 'body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'edge', 'none'],
   repeating: ['quality', 'martial', 'items', 'range', 'melee', 'armor', 'spell', 'preps', 'ritual', 'powers', 'forms', 'vehicle', 'augementations', 'lifestyle', 'contacts', 'programs'],
@@ -3428,10 +3428,43 @@ const sheetAttribues = {
   stunCharacters: ['grunt', 'pc'],
   physicalCharacters: ['grunt', 'pc', 'vehicle'],
   matrixCharacters: ['vehicle', 'host', 'sprite'],
-  matrixAttributes: ['attack', 'sleaze', 'data_processing', 'firewall']
+  matrixAttributes: ['attack', 'sleaze', 'data_processing', 'firewall'],
+
+  weaponTypes: ['range', 'melee'],
+  rangeAttributes: ['dicepool', 'weapon', 'damage', 'acc', 'ap', 'skill', 'ammo', 'mode', 'recoil'],
+  meleeAttributes: ['dicepool', 'weapon', 'damage', 'acc', 'ap', 'skill', 'reach'],
+}
+
+  class PrimaryWeapon {
+  constructor(type) {
+    this[`primary_${type}_weapon`] = 'select a Primary in Arms',
+    this[`primary_${type}_weapon_skill`] = type === 'range' ?  '@{firearms}' : '@{closecombat}',
+    this[`primary_${type}_weapon_damage`] = '',
+    this[`primary_${type}_weapon_dicepool`] = '',
+    this[`primary_${type}_weapon_acc`] = '',
+    this[`primary_${type}_weapon_ap`] = ''
+  }
+}
+
+class PrimaryRangeWeapon extends PrimaryWeapon {
+  constructor(type) {
+    super(type)
+    this[`primary_${type}_weapon_mode`] = '',
+    this[`primary_${type}_weapon_recoil`] = '',
+    this[`primary_${type}_weapon_ammo`] = '',
+    this[`primary_${type}_weapon_ammo_max`] = ''
+  }
+}
+
+class PrimaryMeleeWeapon extends PrimaryWeapon {
+  constructor(type) {
+    super(type)
+    this[`primary_${type}_weapon_reach`] = ''
+  }
 }
 
   
+
 const processingFunctions = {
   convertIntegerNegative: number => number > 0 ? -Math.abs(number) : number,
   convertIntegersNegatives: numbers => {
@@ -3440,6 +3473,7 @@ const processingFunctions = {
     }
     return numbers
   },
+  findRepeatingField: trigger => trigger.split('_')[1],
   //Roll20 does not allow for Promises
   //getAttributes: array => new Promise((resolve, reject) => array ? getAttrs(array, v => resolve(v)) : reject(errorMessage('Function failed'))),
   getReprowid: trigger => {
@@ -3463,6 +3497,11 @@ const processingFunctions = {
   sumIntegers: numbers => numbers.reduce((a,b) => a + b, 0),
 
   shadowrun: {
+    addRepRow: (repRowID, attributeList) => {
+      let weaponAttributeWithRepeatingRow = []
+      attributeList.forEach(weaponAttribute => weaponAttributeWithRepeatingRow.push(`${repRowID}_${weaponAttribute}`))
+      return weaponAttributeWithRepeatingRow
+    },
     attributeFactory: attrs => {
       attrs = processingFunctions.shadowrun.findFlagInKeys(attrs) ? processingFunctions.shadowrun.processTempFlags(attrs) : attrs
       attrs = processingFunctions.parseIntegers(attrs)
@@ -3471,13 +3510,18 @@ const processingFunctions = {
       attrs.base = attrs.total - attrs.bonus
       return attrs
     },
-    conditionFactor: attrs => {
+    conditionFactory: attrs => {
       attrs.attribute = processingFunctions.shadowrun.determineConditionAttribute(attrs)
       attrs.base = processingFunctions.shadowrun.determineConditionBase(attrs.sheet_type, attrs.drone_flag)
       attrs.modifier = attrs[processingFunctions.shadowrun.findModifierInKeys(attrs)]
       Object.keys(attrs).forEach(key => !['attribute', 'base', 'modifier'].includes(key) ? delete attrs[key] : false)
       attrs = processingFunctions.parseIntegers(attrs)
       return attrs
+    },
+    contructRepeatingWeaponAttributes: (repRowID, type) => {
+      const attributeList = processingFunctions.shadowrun.determineWeaponAttributesByType(type)
+      const constructedWeaponAttributes = processingFunctions.shadowrun.addRepRow(repRowID, attributeList)
+      return constructedWeaponAttributes
     },
     buildDisplay: (base, bonus) => bonus === 0 ? base : `${base} (${base + bonus})`,
     calculateBonuses: attrs => {
@@ -3514,6 +3558,7 @@ const processingFunctions = {
     },
     determineConditionBase: (type, drone) => drone ? 6 : type === 'vehicle' ? 12 : 8,
     determineConditionAttribute: attrs => attrs.willpower ? attrs.willpower : attrs.body ? attrs.body : attrs.device_rating ? attrs.device_rating : 0,
+    determineWeaponAttributesByType: weaponType =>  weaponType === 'range' ? sheetAttributes.rangeAttributes : sheetAttributes.meleeAttribute,
     findFlagInKeys: attrs => Object.keys(attrs).find(key => key.includes('_flag')),
     findModifierInKeys: attrs => Object.keys(attrs).find(key => key.includes('_modifier')),
     processTempFlags: attrs => {
@@ -3527,10 +3572,42 @@ const processingFunctions = {
         console.error(error)
       }
     },
+    resetRepeatingFieldsPrimaries: (repeatingSection, repRowID) => {
+      getSectionIDs(repeatingSection, ids => {
+        let attributesWithIDs = [];
+        let update = {};
+        ids.forEach(id => attributesWithIDs.push(`${repeatingSection}_${id}_primary`))
+        attributesWithIDs.forEach(attribute => !attribute.includes(repRowID) ? update[attribute] = 0 : false)
+        setAttrs(update);
+      })
+    },
     shotsFired: (shots, trigger) => shots > 0 && trigger.includes('remove') ? shots -= 1 : trigger.includes('add') ? shots += 1 : shots,
     updateLimitTotal: attrs => {
       attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
       return processingFunctions.shadowrun.calculateLimitTotal(Object.values(attrs))
+    },
+    resetPrimaryWeapon: type => {
+      const resetPrimary = type === 'range' ? new PrimaryRangeWeapon(type) : new PrimaryMeleeWeapon(type)
+      let update = {}
+      for (let [key, value] of Object.entries(resetPrimary)) {
+        update[key] = value
+      }
+      return update
+    },
+    updatePrimaryWeapons: attrs => {
+      let update = {}
+      for (let [key, value] of Object.entries(attrs)) {
+        const type = processingFunctions.findRepeatingField(key)
+        const getReprowid = processingFunctions.getReprowid(key)
+        const weaponAttribute = key.split(`${getReprowid}_`)[1]
+        const primaryAttributeName = key.includes('weapon') ? `primary_${type}_weapon` : `primary_${type}_weapon_${weaponAttribute}`
+        update[primaryAttributeName] = value
+
+        if (key.includes('ammo')) {
+          update[`${primaryAttributeName}_max`] = value
+        }
+      }
+      return update
     }
   }
 }
@@ -3539,7 +3616,43 @@ const processingFunctions = {
 //for Mocha Unit Texting
 //module.exports = processingFunctions;
 
-  const updateRepeatingSkillDicepool = eventinfo => {
+  const updatePrimaryWeapon = eventinfo => {
+  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+  getAttrs([`${repRowID}_primary`], attrs => {
+    if (attrs[`${repRowID}_primary`] === 'primary') {
+      let update = processingFunctions.shadowrun.updatePrimaryWeapons({[eventinfo.triggerName]: eventinfo.newValue})
+      console.log(update)
+      processingFunctions.setAttributes(update)
+    }
+  })
+}
+
+const updateRepeatingWeaponPrimary = (eventinfo, type) => {
+  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+  if (eventinfo.newValue === 'primary') {
+    const constructedWeaponAttributes = processingFunctions.shadowrun.contructRepeatingWeaponAttributes(repRowID, type)
+    getAttrs(constructedWeaponAttributes, attrs => { 
+      const update = processingFunctions.shadowrun.updatePrimaryWeapons(attrs)
+      processingFunctions.setAttributes(update)
+    })
+    processingFunctions.shadowrun.resetRepeatingFieldsPrimaries(`repeating_${type}`, repRowID)
+  } else {
+    const update = processingFunctions.shadowrun.resetPrimaryWeapon(type)
+    processingFunctions.setAttributes(update)
+  }
+}
+
+const updateRepeatingWeaponDicepool = trigger => {
+  const repRowID = processingFunctions.getReprowid(trigger)
+  getAttrs([`${repRowID}_dicepool_modifier`, `${repRowID}_specialization`], attrs => {   
+    attrs = processingFunctions.parseIntegers(attrs)
+    processingFunctions.setAttributes({
+      [`${repRowID}_dicepool`]: processingFunctions.sumIntegers(Object.values(attrs))
+    })
+  })
+}
+
+const updateRepeatingSkillDicepool = eventinfo => {
    const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
     getAttrs([`${repRowID}_skill`], attrs => {
       let skill = processingFunctions.shadowrun.convertSkillSelectToHiddenSkill(attrs[`${repRowID}_skill`])
@@ -3562,7 +3675,6 @@ const updateRepeatingSkillLimit = eventinfo => {
     })
   }
 }
-
 
 const updateRepeatingSkillName = eventinfo => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
@@ -3590,11 +3702,11 @@ const updateRepeatingSkillRating = trigger => {
       [`${repRowID}_dicepool`]: attrs.total,
       [`${repRowID}_display_rating`]: processingFunctions.shadowrun.buildDisplay(attrs.base, attrs.bonus)
     })
-  });
+  })
 }
 
 const updateWounds = () => {
-  getAttrs(sheetAttribues.woundCalculation, attrs => {
+  getAttrs(sheetAttributes.woundCalculation, attrs => {
     attrs = processingFunctions.parseIntegers(attrs)
     const sum = processingFunctions.shadowrun.calculateWounds(attrs)
     processingFunctions.setAttributes({wounds: sum})
@@ -3602,15 +3714,15 @@ const updateWounds = () => {
 }
 
 const updateConditionTracks= conditionTrack => {
-  getAttrs(sheetAttribues[conditionTrack], attrs => {
-    attrs = processingFunctions.shadowrun.conditionFactor(attrs)
+  getAttrs(sheetAttributes[conditionTrack], attrs => {
+    attrs = processingFunctions.shadowrun.conditionFactory(attrs)
     const conditionTotal = processingFunctions.shadowrun.calculateConditionTracks(attrs)
     processingFunctions.setAttributes({[`${conditionTrack}_max`]: conditionTotal}, true)
   })
 }
 
 const translations = () => {
-  const attributes = sheetAttribues.translationsAttributes
+  const attributes = sheetAttributes.translationsAttributes
   const translations = processingFunctions.getTranslations(attributes)
   let attribute_roll = `?{${translations.attribute}`
   delete translations.attribute
@@ -3650,7 +3762,7 @@ const updateAttributes = (array, attribute) => {
     attrs = processingFunctions.shadowrun.attributeFactory(attrs)
     processingFunctions.setAttributes({
       [attribute]: attrs.total,
-      [`display_${attribute}`]: attrs.base === attrs.total ? attrs.base : `${attrs.base} (${attrs.total}}`
+      [`display_${attribute}`]: attrs.base === attrs.total ? attrs.base : `${attrs.base} (${attrs.total})`
     })
   })
 }
@@ -3661,7 +3773,7 @@ const updateLimitTotal = attrs => {
 }
 
 const updateLimits = attributeLimit => {
-  const array = sheetAttribues[attributeLimit].concat([`${attributeLimit}_modifier`, `${attributeLimit}_temp`, `${attributeLimit}_temp_flag`])
+  const array = sheetAttributes[attributeLimit].concat([`${attributeLimit}_modifier`, `${attributeLimit}_temp`, `${attributeLimit}_temp_flag`])
   getAttrs(array, attrs => {
       attrs = processingFunctions.shadowrun.attributeFactory(attrs)
       const bonus = attrs.bonus
@@ -3684,7 +3796,7 @@ const updateMovement = () => {
 }
 
 const updateDerivedAttribute = derivedAttribute => {
-  getAttrs(sheetAttribues[derivedAttribute], attrs => {
+  getAttrs(sheetAttributes[derivedAttribute], attrs => {
     attrs = processingFunctions.shadowrun.attributeFactory(attrs)
     const sum = processingFunctions.sumIntegers(Object.values(attrs))
     processingFunctions.setAttributes({[derivedAttribute]: sum})
@@ -3761,14 +3873,16 @@ const updateDerivedAttribute = derivedAttribute => {
 		};
 	});
 
-	const updateInitiative = () => {
-		getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], v => {
-			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
+	const updateInitiativeDice = () => {
+		getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], values => {
+      console.log(values)
+			const edgeFlag = values.edge_toggle === "@{edge}" ? true : false;
 
-			v = processingFunctions.shadowrun.processTempFlags(`initiative_dice_temp_flag`, `initiative_dice_temp`, v);
-			v = processingFunctions.parseIntegers(v);
+			values = processingFunctions.shadowrun.processTempFlags(values)
+			values = processingFunctions.parseIntegers(values)
 
-			const bonus = processingFunctions.calculateBonuses(v), total = Math.min(bonus+1,5);
+			const bonus = processingFunctions.shadowrun.calculateBonuses(values)
+      const total = Math.min(values.bonus+1,5);
 			setAttrs({
 				initiative_dice: edgeFlag ? 5 : total
 			});
@@ -4003,87 +4117,6 @@ const updateDerivedAttribute = derivedAttribute => {
 		});
 	});
 
-	//REFACTORED Range & MELEE UPDATES
-	   ['repeating_range','repeating_melee'].forEach(weap => {
-	        on(`change:${weap}`, (eventInfo) => {
-				const source = eventInfo.sourceAttribute;
-				const newV   = eventInfo.newValue;
-				const type   = weap.split('repeating_');
-
-	            //Setting this here for now to ensure dicepool attribute gets updated. Remove in a future update
-	       getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`], (v) => {
-	        		const mod = parseInt(v[`${weap}_dicepool_modifier`]) || 0;
-					const spec = parseInt(v[`${weap}_spec`]) || 0;
-					const tot = mod + spec;
-
-					setAttrs({[`${weap}_dicepool`]: tot});
-	        	});
-
-	            if (source.includes('primary')) {
-	                if (newV === 'primary') {
-	                	//Shared attributes names. 
-	                	let array = ["dicepool", "weapon", "damage", "acc", "ap", "skill"];
-	                	//Add the range or melee specific ones
-	                	(type === "range") ? array.push("ammo", "ammo_max", "mode", "recoil") : array.push("reach");
-	                	//Add the repeating section to the begining of each attribute
-	                	let attrs = [];
-				        for(var i=0; i < array.length; i++) {
-				            attrs.push(`${weap}_` + array[i]);
-			        	};
-
-		                getAttrs(attrs, (v) => {
-		                	let update = {};
-		                	//Primary weapon name does not follow the naming scheme.
-		                	update[`primary_${type}_weapon`] = v[`${weap}_weapon`];
-
-		                	_.each(array, (value) => {
-		                		if (value != undefined || value != "weapon") {
-		                			update[`primary_${type}_weapon_${value}`] = (value === "ammo_max") ? v[`${weap}_ammo`] : v[`${weap}_${value}`];
-		                		};
-		                	});
-
-		                	setAttrs(update);
-		                });
-
-						//Set the other repeating_weapon primary flags to 0 aka unchecked
-			            getSectionIDs(`${weap}`, function(ids) {
-					        let IDs = [];
-					        let update = {};
-
-					        for(var i=0; i < ids.length; i++) {
-					            IDs.push(`${weap}_` + ids[i] + "_primary");
-				        	};
-
-				        	IDs.forEach(id => {
-				        		if (id != source) {
-				        			update[`${id}`] = 0;
-				        		};
-				        	});
-
-				        	setAttrs(update);
-				        });
-		            };
-	           	} else if (source.includes('dicepool') || source.includes('weapon') || source.includes('damage') || source.includes('acc') || source.includes('ap') || source.includes('skill') || source.includes('reach') || source.includes('ammo') || source.includes('mode') || source.includes('recoil')) {
-          					getAttrs([`${weap}_primary`, `${source}`], (v) => {
-          						if (v[`${weap}_primary`] === 'primary') {
-          							let update = {};
-          							//This whole process needs refactored in the future. Its working for now.
-          							if (source.includes('ammo')) {
-          								update[`primary_${type}_weapon_ammo`]     = v[`${source}`];
-          								update[`primary_${type}_weapon_ammo_max`] = v[`${source}`];
-          							} else {
-          								console.log(eventinfo);
-          							};
-
-          							setAttrs(update);
-          						};
-          					});
-	            } else {
-	                 console.log("Change was not relevant.");
-	            };
-	        });
-	    });
-
 	//PC SPELLS/PREPS/RITUALS
 	  	['repeating_spell','repeating_preps','repeating_ritual'].forEach(field => {
 	        // Attach listener
@@ -4168,6 +4201,20 @@ const fourpointone = () => {
     })
   })
 
+  ['range', 'melee'].forEach(weaponType => {
+    getSectionIDs(weaponType, idarray => {
+      let attributes = [];
+      let update = {};
+
+      idarray.forEach(id => attributes.push(`repeating_${weaponType}_${id}_spec`))
+
+      getAttrs(attributes, value => {
+        idarray.forEach(id => update[`repeating_${weaponType}_${id}_specialization`] = value[`repeating_${weaponType}_${id}_spec`])
+        setAttrs(update);
+      });
+    });
+  })
+
   getSectionIDs("active", idarray => {
     let attributes = [];
     let update = {};
@@ -4243,40 +4290,49 @@ const onepointthreefive = () => {
 
   on('clicked:reload', () => updateAmmoWithMax())
 
-	sheetAttribues.tabs.forEach(attr => on(`clicked:tab_${attr}`, () => updateTab(attr)))
+	sheetAttributes.tabs.forEach(attr => on(`clicked:tab_${attr}`, () => updateTab(attr)))
 
 	on('change:agility change:walk_modifier change:run_modifier', () => updateMovement())
 
-  sheetAttribues.calculatedAttributes.forEach(attribute => {
+  sheetAttributes.calculatedAttributes.forEach(attribute => {
       const attributeArray = [`${attribute}_base`, `${attribute}_modifier`, `${attribute}_temp`, `${attribute}_temp_flag`]
       attributeArray.forEach(attr => on(`change:${attr}`, () => updateAttributes(attributeArray, attribute)))
   });
 
-  sheetAttribues.initiative_mod.forEach(attr => on(`change:${attr}`, () => updateAttributes(sheetAttribues.initiative_mod, 'initiative_mod')))
+  sheetAttributes.initiative_mod.forEach(attr => on(`change:${attr}`, () => updateAttributes(sheetAttributes.initiative_mod, 'initiative_mod')))
 
-  sheetAttribues.astral_mod.forEach(attr => on(`change:${attr}`, () => updateAstralInitiative()))
+  sheetAttributes.astral_mod.forEach(attr => on(`change:${attr}`, () => updateAstralInitiative()))
 
-  sheetAttribues.derivedAttributes.forEach(derivedAttribute => {
-    sheetAttribues[derivedAttribute].forEach(attr => on(`change:${attr}`, () => updateDerivedAttribute(derivedAttribute)))
+  sheetAttributes.derivedAttributes.forEach(derivedAttribute => {
+    sheetAttributes[derivedAttribute].forEach(attr => on(`change:${attr}`, () => updateDerivedAttribute(derivedAttribute)))
   })
 
-  sheetAttribues.attributeLimits.forEach(attributeLimit => {
-    sheetAttribues[attributeLimit].forEach(attr => on(`change:${attr}`, () => updateLimits(attributeLimit)))
+  sheetAttributes.attributeLimits.forEach(attributeLimit => {
+    sheetAttributes[attributeLimit].forEach(attr => on(`change:${attr}`, () => updateLimits(attributeLimit)))
     on(`change:${attributeLimit}_modifier change:${attributeLimit}_temp change:${attributeLimit}_temp_flag`, () => updateLimits([`${attributeLimit}`]))
   })
 
-  sheetAttribues.conditionTracks.forEach(conditionTrack => {
-    sheetAttribues[conditionTrack].forEach(attr => on(`change:${attr}`, () => updateConditionTracks(conditionTrack)))
+  sheetAttributes.conditionTracks.forEach(conditionTrack => {
+    sheetAttributes[conditionTrack].forEach(attr => on(`change:${attr}`, () => updateConditionTracks(conditionTrack)))
   })
 
-	sheetAttribues.woundCalculation.forEach(attr => on(`change:${attr}`, () => updateWounds()))
+	sheetAttributes.woundCalculation.forEach(attr => on(`change:${attr}`, () => updateWounds()))
 
-  sheetAttribues.repeatingSkills.forEach(field => {
+  sheetAttributes.repeatingSkills.forEach(field => {
     on(`change:repeating_${field}:rating change:repeating_${field}:rating_modifier`, eventinfo => updateRepeatingSkillRating(eventinfo.triggerName))
     on(`change:repeating_${field}:attribute`, eventinfo => updateRepeatingSkillAttribute(eventinfo))
     on(`change:repeating_${field}:limit`, eventinfo => updateRepeatingSkillLimit(eventinfo))
     on(`change:repeating_${field}:dicepool`, eventinfo => updateRepeatingSkillDicepool(eventinfo))
   })
+
+  sheetAttributes.weaponTypes.forEach(type => {
+    on(`change:repeating_${type}:dicepool_modifier change:repeating_${type}:specialization`, eventinfo => updateRepeatingWeaponDicepool(eventinfo.triggerName))
+    on(`change:repeating_${type}:primary`, eventinfo => updateRepeatingWeaponPrimary(eventinfo, type))
+  })
+
+  sheetAttributes.rangeAttributes.forEach(attr => on(`change:repeating_range:${attr}`, eventinfo => updatePrimaryWeapon(eventinfo)))
+
+  sheetAttributes.meleeAttributes.forEach(attr => on(`change:repeating_melee:${attr}`, eventinfo => updatePrimaryWeapon(eventinfo)))
 
   on(`change:repeating_active:skill`, eventinfo => updateRepeatingSkillName(eventinfo))
 
@@ -4288,7 +4344,7 @@ const onepointthreefive = () => {
 
 	on('change:intuition change:astral_mod_modifier', () => updateAstralInitiative())
 
-	on('change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag', () => updateInitiative())
+	on('change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag', () => updateInitiativeDice())
 
 	on('change:astral_dice_modifier change:edge_toggle', () => updateAstralInitiativeDice())
 

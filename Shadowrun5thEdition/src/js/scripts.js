@@ -64,14 +64,16 @@
 		};
 	});
 
-	const updateInitiative = () => {
-		getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], v => {
-			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
+	const updateInitiativeDice = () => {
+		getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], values => {
+      console.log(values)
+			const edgeFlag = values.edge_toggle === "@{edge}" ? true : false;
 
-			v = processingFunctions.shadowrun.processTempFlags(`initiative_dice_temp_flag`, `initiative_dice_temp`, v);
-			v = processingFunctions.parseIntegers(v);
+			values = processingFunctions.shadowrun.processTempFlags(values)
+			values = processingFunctions.parseIntegers(values)
 
-			const bonus = processingFunctions.calculateBonuses(v), total = Math.min(bonus+1,5);
+			const bonus = processingFunctions.shadowrun.calculateBonuses(values)
+      const total = Math.min(values.bonus+1,5);
 			setAttrs({
 				initiative_dice: edgeFlag ? 5 : total
 			});
@@ -305,87 +307,6 @@
 			};
 		});
 	});
-
-	//REFACTORED Range & MELEE UPDATES
-	   ['repeating_range','repeating_melee'].forEach(weap => {
-	        on(`change:${weap}`, (eventInfo) => {
-				const source = eventInfo.sourceAttribute;
-				const newV   = eventInfo.newValue;
-				const type   = weap.split('repeating_');
-
-	            //Setting this here for now to ensure dicepool attribute gets updated. Remove in a future update
-	       getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`], (v) => {
-	        		const mod = parseInt(v[`${weap}_dicepool_modifier`]) || 0;
-					const spec = parseInt(v[`${weap}_spec`]) || 0;
-					const tot = mod + spec;
-
-					setAttrs({[`${weap}_dicepool`]: tot});
-	        	});
-
-	            if (source.includes('primary')) {
-	                if (newV === 'primary') {
-	                	//Shared attributes names. 
-	                	let array = ["dicepool", "weapon", "damage", "acc", "ap", "skill"];
-	                	//Add the range or melee specific ones
-	                	(type === "range") ? array.push("ammo", "ammo_max", "mode", "recoil") : array.push("reach");
-	                	//Add the repeating section to the begining of each attribute
-	                	let attrs = [];
-				        for(var i=0; i < array.length; i++) {
-				            attrs.push(`${weap}_` + array[i]);
-			        	};
-
-		                getAttrs(attrs, (v) => {
-		                	let update = {};
-		                	//Primary weapon name does not follow the naming scheme.
-		                	update[`primary_${type}_weapon`] = v[`${weap}_weapon`];
-
-		                	_.each(array, (value) => {
-		                		if (value != undefined || value != "weapon") {
-		                			update[`primary_${type}_weapon_${value}`] = (value === "ammo_max") ? v[`${weap}_ammo`] : v[`${weap}_${value}`];
-		                		};
-		                	});
-
-		                	setAttrs(update);
-		                });
-
-						//Set the other repeating_weapon primary flags to 0 aka unchecked
-			            getSectionIDs(`${weap}`, function(ids) {
-					        let IDs = [];
-					        let update = {};
-
-					        for(var i=0; i < ids.length; i++) {
-					            IDs.push(`${weap}_` + ids[i] + "_primary");
-				        	};
-
-				        	IDs.forEach(id => {
-				        		if (id != source) {
-				        			update[`${id}`] = 0;
-				        		};
-				        	});
-
-				        	setAttrs(update);
-				        });
-		            };
-	           	} else if (source.includes('dicepool') || source.includes('weapon') || source.includes('damage') || source.includes('acc') || source.includes('ap') || source.includes('skill') || source.includes('reach') || source.includes('ammo') || source.includes('mode') || source.includes('recoil')) {
-          					getAttrs([`${weap}_primary`, `${source}`], (v) => {
-          						if (v[`${weap}_primary`] === 'primary') {
-          							let update = {};
-          							//This whole process needs refactored in the future. Its working for now.
-          							if (source.includes('ammo')) {
-          								update[`primary_${type}_weapon_ammo`]     = v[`${source}`];
-          								update[`primary_${type}_weapon_ammo_max`] = v[`${source}`];
-          							} else {
-          								console.log(eventinfo);
-          							};
-
-          							setAttrs(update);
-          						};
-          					});
-	            } else {
-	                 console.log("Change was not relevant.");
-	            };
-	        });
-	    });
 
 	//PC SPELLS/PREPS/RITUALS
 	  	['repeating_spell','repeating_preps','repeating_ritual'].forEach(field => {
