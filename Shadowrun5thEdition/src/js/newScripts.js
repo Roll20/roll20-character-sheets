@@ -1,3 +1,39 @@
+const updatePrimaryWeapon = eventinfo => {
+  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+  getAttrs([`${repRowID}_primary`], attrs => {
+    if (attrs[`${repRowID}_primary`] === 'primary') {
+      let update = processingFunctions.shadowrun.updatePrimaryWeapons({[eventinfo.triggerName]: eventinfo.newValue})
+      console.log(update)
+      processingFunctions.setAttributes(update)
+    }
+  })
+}
+
+const updateRepeatingWeaponPrimary = (eventinfo, type) => {
+  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+  if (eventinfo.newValue === 'primary') {
+    const constructedWeaponAttributes = processingFunctions.shadowrun.contructRepeatingWeaponAttributes(repRowID, type)
+    getAttrs(constructedWeaponAttributes, attrs => { 
+      const update = processingFunctions.shadowrun.updatePrimaryWeapons(attrs)
+      processingFunctions.setAttributes(update)
+    })
+    processingFunctions.shadowrun.resetRepeatingFieldsPrimaries(`repeating_${type}`, repRowID)
+  } else {
+    const update = processingFunctions.shadowrun.resetPrimaryWeapon(type)
+    processingFunctions.setAttributes(update)
+  }
+}
+
+const updateRepeatingWeaponDicepool = trigger => {
+  const repRowID = processingFunctions.getReprowid(trigger)
+  getAttrs([`${repRowID}_dicepool_modifier`, `${repRowID}_specialization`], attrs => {   
+    attrs = processingFunctions.parseIntegers(attrs)
+    processingFunctions.setAttributes({
+      [`${repRowID}_dicepool`]: processingFunctions.sumIntegers(Object.values(attrs))
+    })
+  })
+}
+
 const updateRepeatingSkillDicepool = eventinfo => {
    const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
     getAttrs([`${repRowID}_skill`], attrs => {
@@ -21,7 +57,6 @@ const updateRepeatingSkillLimit = eventinfo => {
     })
   }
 }
-
 
 const updateRepeatingSkillName = eventinfo => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
@@ -49,11 +84,11 @@ const updateRepeatingSkillRating = trigger => {
       [`${repRowID}_dicepool`]: attrs.total,
       [`${repRowID}_display_rating`]: processingFunctions.shadowrun.buildDisplay(attrs.base, attrs.bonus)
     })
-  });
+  })
 }
 
 const updateWounds = () => {
-  getAttrs(sheetAttribues.woundCalculation, attrs => {
+  getAttrs(sheetAttributes.woundCalculation, attrs => {
     attrs = processingFunctions.parseIntegers(attrs)
     const sum = processingFunctions.shadowrun.calculateWounds(attrs)
     processingFunctions.setAttributes({wounds: sum})
@@ -61,15 +96,15 @@ const updateWounds = () => {
 }
 
 const updateConditionTracks= conditionTrack => {
-  getAttrs(sheetAttribues[conditionTrack], attrs => {
-    attrs = processingFunctions.shadowrun.conditionFactor(attrs)
+  getAttrs(sheetAttributes[conditionTrack], attrs => {
+    attrs = processingFunctions.shadowrun.conditionFactory(attrs)
     const conditionTotal = processingFunctions.shadowrun.calculateConditionTracks(attrs)
     processingFunctions.setAttributes({[`${conditionTrack}_max`]: conditionTotal}, true)
   })
 }
 
 const translations = () => {
-  const attributes = sheetAttribues.translationsAttributes
+  const attributes = sheetAttributes.translationsAttributes
   const translations = processingFunctions.getTranslations(attributes)
   let attribute_roll = `?{${translations.attribute}`
   delete translations.attribute
@@ -109,7 +144,7 @@ const updateAttributes = (array, attribute) => {
     attrs = processingFunctions.shadowrun.attributeFactory(attrs)
     processingFunctions.setAttributes({
       [attribute]: attrs.total,
-      [`display_${attribute}`]: attrs.base === attrs.total ? attrs.base : `${attrs.base} (${attrs.total}}`
+      [`display_${attribute}`]: attrs.base === attrs.total ? attrs.base : `${attrs.base} (${attrs.total})`
     })
   })
 }
@@ -120,7 +155,7 @@ const updateLimitTotal = attrs => {
 }
 
 const updateLimits = attributeLimit => {
-  const array = sheetAttribues[attributeLimit].concat([`${attributeLimit}_modifier`, `${attributeLimit}_temp`, `${attributeLimit}_temp_flag`])
+  const array = sheetAttributes[attributeLimit].concat([`${attributeLimit}_modifier`, `${attributeLimit}_temp`, `${attributeLimit}_temp_flag`])
   getAttrs(array, attrs => {
       attrs = processingFunctions.shadowrun.attributeFactory(attrs)
       const bonus = attrs.bonus
@@ -143,7 +178,7 @@ const updateMovement = () => {
 }
 
 const updateDerivedAttribute = derivedAttribute => {
-  getAttrs(sheetAttribues[derivedAttribute], attrs => {
+  getAttrs(sheetAttributes[derivedAttribute], attrs => {
     attrs = processingFunctions.shadowrun.attributeFactory(attrs)
     const sum = processingFunctions.sumIntegers(Object.values(attrs))
     processingFunctions.setAttributes({[derivedAttribute]: sum})

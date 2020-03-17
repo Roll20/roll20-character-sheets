@@ -32,6 +32,20 @@ const fourpointone = () => {
     })
   })
 
+  ['range', 'melee'].forEach(weaponType => {
+    getSectionIDs(weaponType, idarray => {
+      let attributes = [];
+      let update = {};
+
+      idarray.forEach(id => attributes.push(`repeating_${weaponType}_${id}_spec`))
+
+      getAttrs(attributes, value => {
+        idarray.forEach(id => update[`repeating_${weaponType}_${id}_specialization`] = value[`repeating_${weaponType}_${id}_spec`])
+        setAttrs(update);
+      });
+    });
+  })
+
   getSectionIDs("active", idarray => {
     let attributes = [];
     let update = {};

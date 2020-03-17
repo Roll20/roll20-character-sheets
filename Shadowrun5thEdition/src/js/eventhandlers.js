@@ -10,40 +10,49 @@
 
   on('clicked:reload', () => updateAmmoWithMax())
 
-	sheetAttribues.tabs.forEach(attr => on(`clicked:tab_${attr}`, () => updateTab(attr)))
+	sheetAttributes.tabs.forEach(attr => on(`clicked:tab_${attr}`, () => updateTab(attr)))
 
 	on('change:agility change:walk_modifier change:run_modifier', () => updateMovement())
 
-  sheetAttribues.calculatedAttributes.forEach(attribute => {
+  sheetAttributes.calculatedAttributes.forEach(attribute => {
       const attributeArray = [`${attribute}_base`, `${attribute}_modifier`, `${attribute}_temp`, `${attribute}_temp_flag`]
       attributeArray.forEach(attr => on(`change:${attr}`, () => updateAttributes(attributeArray, attribute)))
   });
 
-  sheetAttribues.initiative_mod.forEach(attr => on(`change:${attr}`, () => updateAttributes(sheetAttribues.initiative_mod, 'initiative_mod')))
+  sheetAttributes.initiative_mod.forEach(attr => on(`change:${attr}`, () => updateAttributes(sheetAttributes.initiative_mod, 'initiative_mod')))
 
-  sheetAttribues.astral_mod.forEach(attr => on(`change:${attr}`, () => updateAstralInitiative()))
+  sheetAttributes.astral_mod.forEach(attr => on(`change:${attr}`, () => updateAstralInitiative()))
 
-  sheetAttribues.derivedAttributes.forEach(derivedAttribute => {
-    sheetAttribues[derivedAttribute].forEach(attr => on(`change:${attr}`, () => updateDerivedAttribute(derivedAttribute)))
+  sheetAttributes.derivedAttributes.forEach(derivedAttribute => {
+    sheetAttributes[derivedAttribute].forEach(attr => on(`change:${attr}`, () => updateDerivedAttribute(derivedAttribute)))
   })
 
-  sheetAttribues.attributeLimits.forEach(attributeLimit => {
-    sheetAttribues[attributeLimit].forEach(attr => on(`change:${attr}`, () => updateLimits(attributeLimit)))
+  sheetAttributes.attributeLimits.forEach(attributeLimit => {
+    sheetAttributes[attributeLimit].forEach(attr => on(`change:${attr}`, () => updateLimits(attributeLimit)))
     on(`change:${attributeLimit}_modifier change:${attributeLimit}_temp change:${attributeLimit}_temp_flag`, () => updateLimits([`${attributeLimit}`]))
   })
 
-  sheetAttribues.conditionTracks.forEach(conditionTrack => {
-    sheetAttribues[conditionTrack].forEach(attr => on(`change:${attr}`, () => updateConditionTracks(conditionTrack)))
+  sheetAttributes.conditionTracks.forEach(conditionTrack => {
+    sheetAttributes[conditionTrack].forEach(attr => on(`change:${attr}`, () => updateConditionTracks(conditionTrack)))
   })
 
-	sheetAttribues.woundCalculation.forEach(attr => on(`change:${attr}`, () => updateWounds()))
+	sheetAttributes.woundCalculation.forEach(attr => on(`change:${attr}`, () => updateWounds()))
 
-  sheetAttribues.repeatingSkills.forEach(field => {
+  sheetAttributes.repeatingSkills.forEach(field => {
     on(`change:repeating_${field}:rating change:repeating_${field}:rating_modifier`, eventinfo => updateRepeatingSkillRating(eventinfo.triggerName))
     on(`change:repeating_${field}:attribute`, eventinfo => updateRepeatingSkillAttribute(eventinfo))
     on(`change:repeating_${field}:limit`, eventinfo => updateRepeatingSkillLimit(eventinfo))
     on(`change:repeating_${field}:dicepool`, eventinfo => updateRepeatingSkillDicepool(eventinfo))
   })
+
+  sheetAttributes.weaponTypes.forEach(type => {
+    on(`change:repeating_${type}:dicepool_modifier change:repeating_${type}:specialization`, eventinfo => updateRepeatingWeaponDicepool(eventinfo.triggerName))
+    on(`change:repeating_${type}:primary`, eventinfo => updateRepeatingWeaponPrimary(eventinfo, type))
+  })
+
+  sheetAttributes.rangeAttributes.forEach(attr => on(`change:repeating_range:${attr}`, eventinfo => updatePrimaryWeapon(eventinfo)))
+
+  sheetAttributes.meleeAttributes.forEach(attr => on(`change:repeating_melee:${attr}`, eventinfo => updatePrimaryWeapon(eventinfo)))
 
   on(`change:repeating_active:skill`, eventinfo => updateRepeatingSkillName(eventinfo))
 
@@ -55,7 +64,7 @@
 
 	on('change:intuition change:astral_mod_modifier', () => updateAstralInitiative())
 
-	on('change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag', () => updateInitiative())
+	on('change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag', () => updateInitiativeDice())
 
 	on('change:astral_dice_modifier change:edge_toggle', () => updateAstralInitiativeDice())
 
