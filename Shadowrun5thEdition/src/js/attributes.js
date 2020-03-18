@@ -40,5 +40,7 @@ const sheetAttributes = {
   weaponTypes: ['range', 'melee'],
   rangeAttributes: ['dicepool', 'weapon', 'damage', 'acc', 'ap', 'skill', 'ammo', 'mode', 'recoil'],
   meleeAttributes: ['dicepool', 'weapon', 'damage', 'acc', 'ap', 'skill', 'reach'],
+
+  spellTypes: ['spell', 'preps', 'ritual', 'forms']
 }
 
