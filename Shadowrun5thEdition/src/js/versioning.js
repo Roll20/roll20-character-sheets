@@ -3,21 +3,61 @@ const versioning = version => {
 
     switch(true) {
         case version < 1.35:
-            onepointthreefive();
-            setAttrs({version: 1.35}, () => versioning(1.35));
+            onepointthreefive()
+            setAttrs({version: 1.35}, () => versioning(1.35))
             break;
         case version < 1.41:
-            onepointfour();
-            setAttrs({version: 1.41}, () => versioning(1.41));
+            onepointfour()
+            setAttrs({version: 1.41}, () => versioning(1.41))
             break;
         case version < 4.0:
-            fourpointzero();
-            setAttrs({version: 4.0}, () => versioning(4.0));;
+            fourpointzero()
+            setAttrs({version: 4.0}, () => versioning(4.0))
+            break;
+        case version < 4.1:
+            fourpointzero()
+            setAttrs({version: 4.1}, () => versioning(4.1))
             break;
         default:
             console.log(`%c Shadowrun 5th Edition is update to date. Version ${version}`, "color: green; font-weight:bold");
     }
 };
+
+const fourpointone = () => {
+  getAttrs(["initiative_modifier", "initiative_temp", "initiative_temp_flag"], value => {
+    setAttrs({
+      initiative_mod_modifier: value.initiative_modifier,
+      initiative_mod_temp: value.initiative_temp,
+      initiative_mod_temp_flag: value.initiative_mod_temp_flag
+    })
+  })
+
+  ['range', 'melee'].forEach(weaponType => {
+    getSectionIDs(weaponType, idarray => {
+      let attributes = [];
+      let update = {};
+
+      idarray.forEach(id => attributes.push(`repeating_${weaponType}_${id}_spec`))
+
+      getAttrs(attributes, value => {
+        idarray.forEach(id => update[`repeating_${weaponType}_${id}_specialization`] = value[`repeating_${weaponType}_${id}_spec`])
+        setAttrs(update);
+      });
+    });
+  })
+
+  getSectionIDs("active", idarray => {
+    let attributes = [];
+    let update = {};
+
+    idarray.forEach(id => attributes.push(`repeating_active_${id}_skill`))
+
+    getAttrs(attributes, value => {
+        idarray.forEach(id => update[`repeating_active_${id}_display_skill`] = value[`repeating_active_${id}_skill`])
+       setAttrs(update);
+    });
+  });
+}
 
 const fourpointzero = () => {
     const attributes = ['physical', 'physical_damage', 'stun', 'stun_damage', 'sheet_type', 'matrix_con'];
@@ -40,7 +80,7 @@ const fourpointzero = () => {
 
         getAttrs(ritualAttributes, value => {
             idarray.forEach(id => {
-                update[`repeating_ritual_${id}_specialization`] = v[`repeating_ritual_${id}_spec`]
+                update[`repeating_ritual_${id}_specialization`] = value[`repeating_ritual_${id}_spec`]
             }); 
 
            setAttrs(update);
