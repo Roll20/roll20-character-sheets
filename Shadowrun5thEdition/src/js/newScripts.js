@@ -1,9 +1,43 @@
+  //Edge toggle to include ! for exploding dice
+  const edgeToggle = eventinfo => {
+    processingFunctions.setAttributes({
+      explode_toggle: eventinfo.newValue != 0 ? "!" : ""
+    })
+  }
+
+const updateHostAttributes = newValue => {
+  newValue = processingFunctions.parseInteger(newValue)
+  processingFunctions.setAttributes({
+    matrix_max: 8 + Math.ceil(newValue/2),
+    ic_attack: Math.min(newValue + newValue)
+  })
+}
+
+const updateSpriteConditionTrack = newValue => {
+  newValue = processingFunctions.parseInteger(newValue)
+  processingFunctions.setAttributes({
+    matrix_max: 8 + Math.ceil(newValue/2)
+  })
+}
+
+//ALSO COVER COMPLEX FORMS
+const updateSpellsDicepool = eventinfo => {
+  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+  getAttrs([`${repRowID}_specialization`, `${repRowID}_dicepool_modifier`], attrs => {
+    attrs = processingFunctions.parseIntegers(attrs)
+    processingFunctions.setAttributes({
+      [`${repRowID}_dicepool`]: processingFunctions.sumIntegers(Object.values(attrs))
+    })
+  })
+}
+
+const resetNpcCondition = () => setAttributes({physical: 0, stun: 0, matrix: 0})
+
 const updatePrimaryWeapon = eventinfo => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
   getAttrs([`${repRowID}_primary`], attrs => {
     if (attrs[`${repRowID}_primary`] === 'primary') {
       let update = processingFunctions.shadowrun.updatePrimaryWeapons({[eventinfo.triggerName]: eventinfo.newValue})
-      console.log(update)
       processingFunctions.setAttributes(update)
     }
   })
@@ -61,6 +95,7 @@ const updateRepeatingSkillLimit = eventinfo => {
 const updateRepeatingSkillName = eventinfo => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
   const translationKey = eventinfo.newValue.replace(/ /g, '').toLowerCase()
+  console.log(translationKey)
   const translation = getTranslationByKey(translationKey);
   processingFunctions.setAttributes({
     [`${repRowID}_display_skill`]: translation

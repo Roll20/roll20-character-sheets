@@ -3,25 +3,44 @@ const versioning = version => {
 
     switch(true) {
         case version < 1.35:
-            onepointthreefive()
-            setAttrs({version: 1.35}, () => versioning(1.35))
-            break;
+          onepointthreefive()
+          setAttrs({version: 1.35}, () => versioning(1.35))
+          break;
         case version < 1.41:
-            onepointfour()
-            setAttrs({version: 1.41}, () => versioning(1.41))
-            break;
+          onepointfour()
+          setAttrs({version: 1.41}, () => versioning(1.41))
+          break;
         case version < 4.0:
-            fourpointzero()
-            setAttrs({version: 4.0}, () => versioning(4.0))
-            break;
+          fourpointzero()
+          setAttrs({version: 4.0}, () => versioning(4.0))
+          break;
         case version < 4.1:
-            fourpointzero()
-            setAttrs({version: 4.1}, () => versioning(4.1))
-            break;
+          fourpointone()
+          setAttrs({version: 4.1}, () => versioning(4.1))
+          break;
+        case version < 4.11:
+          fourpointone()
+          fourpointoneone()
+          setAttrs({version: 4.11}, () => versioning(4.11))
+          break;
         default:
             console.log(`%c Shadowrun 5th Edition is update to date. Version ${version}`, "color: green; font-weight:bold");
     }
 };
+
+const fourpointoneone = () => {
+  getSectionIDs('forms', idarray => {
+    let attributes = [];
+    let update = {};
+
+    idarray.forEach(id => attributes.push(`repeating_forms_${id}_spec`))
+
+    getAttrs(attributes, value => {
+      idarray.forEach(id => update[`repeating_forms_${id}_specialization`] = value[`repeating_forms_${id}_spec`])
+      setAttrs(update);
+    });
+  });
+}
 
 const fourpointone = () => {
   getAttrs(["initiative_modifier", "initiative_temp", "initiative_temp_flag"], value => {

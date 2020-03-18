@@ -70,3 +70,11 @@
 
 	on('change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle', () => updateMatrixInitiative())
 
+  on("clicked:cond_reset", () => resetNpcCondition()); 
+
+  sheetAttributes.spellTypes.forEach(type => on(`change:repeating_${type}:dicepool_modifier change:repeating_${type}:specialization`, eventinfo => updateSpellsDicepool(eventinfo)))
+
+  on("change:level", eventinfo => updateSpriteConditionTrack(eventinfo.newValue))
+
+  on("change:host_rating", eventinfo => updateHostAttributes(eventinfo.newValue))
+
