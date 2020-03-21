@@ -35,7 +35,8 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
 
-
+## 14.12.2019
+	Mobility and Coordination now reducing SR for Melee Weapons
 
 ## 17.07.2019
 	fixed bug adding more than 1 magic point storag item. Another mp storage section was added. New characters created will only show the new section.  Existing characters will have red notice for the user to copy item and direct them to a configuration section to hide the old section.

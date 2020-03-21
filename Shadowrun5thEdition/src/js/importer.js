@@ -1,4 +1,4 @@
-<script>
+
 	//IMPORTERS
 	const importHeroLab = (character) => {
 		console.log(`%c HERO LAB IMPORTER:`, "color: purple; font-weight:bold");
@@ -75,7 +75,7 @@
 				update["attribute_2"]   = cyberdeck.sleaze;
 				update["attribute_3"]   = cyberdeck.dataprocessing;
 				update["attribute_4"]   = cyberdeck.firewall;
-				update["matrix_con"]   = 0;
+				update["matrix"]   = 0;
 			}
 
 			// PROCESS TOP LEVEL KEYS
@@ -774,4 +774,3 @@
 			finishCharactermancer();
 		});
 	}); 
-</script>

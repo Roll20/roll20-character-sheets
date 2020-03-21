@@ -6,11 +6,11 @@ I need to mention that the original author(s) misspelled the words Miscellaneous
 -------------------------------------------------------------------------------------------------------
 ## Recent changes
 
-### v1.7.1 (12-03-2019) Mike W
+### v2.1.1 (02-04-2020) Mike W
 
 **Cosmetic Only:**
+**Few bug fixes:**
 
-* Updated screenshot of sheet image file
 * Updated, reformatted, and added many ToolTips – Cosmetic Only
 
 *** A FULL change log can be found in the Updates page within the character sheet.***
