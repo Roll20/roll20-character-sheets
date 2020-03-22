@@ -1034,7 +1034,7 @@
                 
                 <button class="hidden" type="roll" name="roll_MultiActionPossibility" value="&{template:torg} {{what=Roll For Bonus}} {{why=Possibility}} @{rollmultipossibility} {{defense=[[0]]}} {{buttons=[Possibility](~MultiActionPossibility) [Up](~MultiActionUP)}}"></button>
                 <button class="hidden" type="roll" name="roll_MultiActionUP" value="&{template:torg} {{what=Roll For Bonus}} {{why=UP}} @{rollmultiup} {{defense=[[0]]}} {{buttons=[Possibility](~MultiActionPossibility) [Up](~MultiActionUP)}}"></button>
-                <button class="ability-roll invisibutton" type="roll" name="roll_MultiAction" value="&{template:torg} {{what=Roll For Bonus}} {{wounded=[[ @{wounded} [wounds] ]]}} {{stymied=[[ @{stymied} [stymied] ]]}} {{modifier=[[ ?{Modifier|0} [modifier] ]]}} {{value=[[10 + ?{Modifier}[Modifier] +@{wounded}[wounds] +@{stymied}[stymied] ]]}} {{torgroll=[[@{skilledquery}cs10cs>20cf1 @{rolltracker}]]}} {{defense=[[0]]}} {{buttons=[Possibility](~MultiActionPossibility) [Up](~MultiActionUP)}}">
+                <button class="ability-roll invisibutton" type="roll" name="roll_MultiAction" value="&{template:torg} {{who=@{character_name}}} {{what=Roll For Bonus}} {{wounded=[[ @{wounded} [wounds] ]]}} {{stymied=[[ @{stymied} [stymied] ]]}} {{modifier=[[ ?{Modifier|0} [modifier] ]]}} {{value=[[10 + ?{Modifier}[Modifier] +@{wounded}[wounds] +@{stymied}[stymied] ]]}} {{torgroll=[[@{skilledquery}cs10cs>20cf1 @{rolltracker}]]}} {{defense=[[0]]}} {{buttons=[Possibility](~MultiActionPossibility) [Up](~MultiActionUP)}}">
                     <h3 title="click to roll for Multi-Action Bonus">Attributes</h3>
                 </button>
                 <div class="grid-contents stats">
@@ -1068,7 +1068,7 @@
                     <input type="hidden" name="attr_rollMIN" value="{{what=Mind}}  {{score=[[@{MIN}]]}}  {{value=[[@{MIN}+?{Modifier|0}+@{stymied}+@{wounded}]]}} {{buttons=[Possibility](~MINPossibility) [Up](~MINUp)}}" />	
                     <button type="roll" class="hidden" name="roll_MINPossibility" value="@{rollMINPossibility}"></button>	
                     <button type="roll" class="hidden" name="roll_MINUP" value="@{rollMINUP}"></button>	
-                    <button class="ability-roll" type="roll" name="roll_MIN" value="@{rollMIN">
+                    <button class="ability-roll" type="roll" name="roll_MIN" value="@{rollMIN}">
                         <span class="name">MIND</span>
                     </button>
                     <input type="number" name="attr_MINBase" value="0" title="Mind" />
@@ -1553,11 +1553,12 @@
             {{#duration}}
                 <div class="template-row"><span class="template-label">Duration: </span><span class="template-value">{{duration}}</span></div>
             {{/duration}}
-            <div class="template-row arrow-container"><div class="arrow-right"></div></div>
             {{#target}}
-                <div class="template-row"><span class="template-label">Attack vs: </span><span class="template-value">{{target}}</span></div>
+            <div class="template-row arrow-container"><div class="arrow-right"></div></div>
+            <div class="template-row"><span class="template-label">Attack vs: </span><span class="template-value">{{target}}</span></div>
             {{/target}}
             {{#score}}
+                <div class="template-row arrow-container"><div class="arrow-right"></div></div>
                 <div class="template-row highlight"><span class="template-label">Value: </span><span class="template-value">{{score}}</span></div>
             {{/score}}
                 {{#^rollTotal() modifier 0}}
@@ -1569,14 +1570,16 @@
                 {{#rollLess() wounded 0}}
                     <div class="template-row"><span class="template-label">Wounded: </span><span class="template-value">{{wounded}}</span></div>
                 {{/rollLess() wounded 0}}
-            {{#score}}
+            <!-- {{#score}} -->
                 <div class="template-row arrow-container"><div class="arrow-right"></div></div>
-            {{/score}}
+            <!-- {{/score}} -->
 
             {{#lastroll}}
                 <div class="template-row"><span class="template-label">Last Roll: </span><span class="template-value">{{lastroll}}</span></div>
             {{/lastroll}}
+            {{#torgroll}}
             <div class="template-row"><span class="template-label">{{#lastroll}}Total {{/lastroll}}Roll: </span><span class="template-value">{{torgroll}}</span></div>
+            {{/torgroll}}
             {{#defense}}
             <div class="template-row highlight bonus"><span class="template-label">Bonus: </span>
                 <span class="template-value">
@@ -3301,22 +3304,23 @@
                     </div>
                     
             {{/value}}
-            {{#rollLess() torgroll 5}}
-                {{#^rollGreater() torgroll 59}}
-                    <div class="template-row arrow-container"><div class="arrow-right"></div></div>
-                {{/^rollGreater() torgroll 59}}
-            {{/rollLess() torgroll 5}}
-            {{#^rollLess() torgroll 5}}
-                {{#rollGreater() torgroll 59}}
-                    <div class="template-row arrow-container"><div class="arrow-right"></div></div>
-                {{/rollGreater() torgroll 59}}
-            {{/^rollLess() torgroll 5}}
-            {{#rollLess() torgroll 5}}
-                {{#rollGreater() torgroll 59}}
-                    <div class="template-row arrow-container"><div class="arrow-right"></div></div>
-                {{/rollGreater() torgroll 59}}
-            {{/rollLess() torgroll 5}}
-            
+            {{#torgroll}}
+                {{#rollLess() torgroll 5}}
+                    {{#^rollGreater() torgroll 59}}
+                        <div class="template-row arrow-container"><div class="arrow-right"></div></div>
+                    {{/^rollGreater() torgroll 59}}
+                {{/rollLess() torgroll 5}}
+                {{#^rollLess() torgroll 5}}
+                    {{#rollGreater() torgroll 59}}
+                        <div class="template-row arrow-container"><div class="arrow-right"></div></div>
+                    {{/rollGreater() torgroll 59}}
+                {{/^rollLess() torgroll 5}}
+                {{#rollLess() torgroll 5}}
+                    {{#rollGreater() torgroll 59}}
+                        <div class="template-row arrow-container"><div class="arrow-right"></div></div>
+                    {{/rollGreater() torgroll 59}}
+                {{/rollLess() torgroll 5}}
+            {{/torgroll}}
             {{#rollLess() torgroll 5}}
                 <div class="template-row">
                     <span class="template-label">
@@ -3343,12 +3347,23 @@
                 </div>
             {{/rollGreater() torgroll 59}}
             {{/defense}}
-            <div class="template-row arrow-container"><div class="arrow-right"></div></div>
             {{#buttons}}
+                <div class="template-row arrow-container"><div class="arrow-right"></div></div>
                 <div class="template-row buttons">
                 {{buttons}}
                 </div>
             {{/buttons}}
+            {{#allprops() who what why defense stymied wounded modifier score value torgroll lastroll buttons note}}
+
+            <div class="template-row template-extras">
+                <span class="template-label">
+                    {{key}}
+                </span>
+                <span class="template-value">
+                    {{value}}
+                </span>
+            </div>
+            {{/allprops() who what why defense stymied wounded modifier score value torgroll lastroll buttons note}}
             {{#note}}
             <div class="template-row arrow-container"><div class="arrow-right"></div></div>
                 <div class="template-row">
