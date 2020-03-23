@@ -10,25 +10,31 @@
 	</div>
 	<div class="sheet-header harmony">
 		<div class="sheet-section-name">Harmony</div>
-		<input type="checkbox" class="sheet-progression"><input type="checkbox" class="sheet-progression"><input type="checkbox" class="sheet-progression"><input type="checkbox" class="sheet-progression"><input type="checkbox" class="sheet-progression">
-		<!-- <input type="number" name="attr_harmony_max" value="5" disabled="true">
-		<span>/</span>	
-		<input type="number" name="attr_harmony" value=0> -->
+		<input type="checkbox" class="sheet-progression" value=1 name="attr_harmony1">
+		<input type="checkbox" class="sheet-progression" value=1 name="attr_harmony2">
+		<input type="checkbox" class="sheet-progression" value=1 name="attr_harmony3">
+		<input type="checkbox" class="sheet-progression" value=1 name="attr_harmony4">
+		<input type="checkbox" class="sheet-progression" value=1 name="attr_harmony5">
 	</div>
 	<div class="sheet-header corruption">
 		<div class="sheet-section-name">Corruption</div>
-		<input type="checkbox" class="sheet-progression"><input type="checkbox" class="sheet-progression"><input type="checkbox" class="sheet-progression"><input type="checkbox" class="sheet-progression"><input type="checkbox" class="sheet-progression">
-		<!-- <input type="number" name="attr_corruption_max" value="5" disabled="true">
-		<span>/</span>	
-		<input type="number" name="attr_corruption" value=0> -->
+		<input type="checkbox" class="sheet-progression" value=1 name="attr_corruption1">
+		<input type="checkbox" class="sheet-progression" value=1 name="attr_corruption2">
+		<input type="checkbox" class="sheet-progression" value=1 name="attr_corruption3">
+		<input type="checkbox" class="sheet-progression" value=1 name="attr_corruption4">
+		<input type="checkbox" class="sheet-progression" value=1 name="attr_corruption5">
+	</div>
+	<div class="sheet-header ongoing">
+		<div class="sheet-section-name">Ongoing</div>
+		<input type="number" name="attr_ongoing" value=0>
 	</div>
 	<div class="sheet-clearfix"></div>
 </div>
-
 <div class="sheet-attributes">
 	<div class="sheet-header">
-		<button type="roll" name="roll_TestHope" value="/me rolls [[2d6 + @{hope} - @{despairing}]] for Hope.">Hope</button>
-
+		<button type="roll" name="roll_TestHope" value="/me rolls @{Hoperoll}">Hope</button>
+		<input type="hidden" value="[[2d6 + @{hope} - @{despairing} + @{ongoing}]]" name="attr_Hoperoll">
+		
 		<div class="sheet-row-1">
 			<input type="number" name="attr_hope" value=0>
 		</div>
@@ -41,7 +47,8 @@
 		</div>
 	</div>
 	<div class="sheet-header">
-		<button type="roll" name="roll_TestAltruism" value="/me rolls [[2d6 + @{altruism} - @{selfish}]] for Altruism.">Altruism</button>
+		<button type="roll" name="roll_TestAltruism" value="/me rolls @{Altruismroll}">Altruism</button>
+		<input type="hidden" value="[[2d6 + @{altruism} - @{selfish} + @{ongoing}]]" name="attr_Altruismroll">
 
 		<div class="sheet-row-1">
 			<input type="number" name="attr_altruism" value=0>
@@ -55,7 +62,8 @@
 		</div>
 	</div>
 	<div class="sheet-header">
-		<button type="roll" name="roll_TestCommunity" value="/me rolls [[2d6 + @{community} - @{isolated}]] for Community.">Community</button>
+		<button type="roll" name="roll_TestCommunity" value="/me rolls @{Communityroll}">Community</button>
+		<input type="hidden" value="[[2d6 + @{community} - @{isolated} + @{ongoing}]]" name="attr_Communityroll">
 
 		<div class="sheet-row-1">
 			<input type="number" name="attr_community" value=0>
@@ -69,7 +77,8 @@
 		</div>
 	</div>
 	<div class="sheet-header">
-		<button type="roll" name="roll_TestCalm" value="/me rolls [[2d6 + @{calm} - @{angry}]] for Calm.">Calm</button>
+		<button type="roll" name="roll_TestCalm" value="/me rolls @{Calmroll}">Calm</button>
+		<input type="hidden" value="[[2d6 + @{calm} - @{angry} + @{ongoing}]]" name="attr_Calmroll">
 
 		<div class="sheet-row-1">
 			<input type="number" name="attr_calm" value=0>
@@ -83,7 +92,8 @@
 		</div>
 	</div>
 	<div class="sheet-header">
-		<button type="roll" name="roll_TestDrive" value="/me rolls [[2d6 + @{drive} - @{conflicted}]] for Drive.">Drive</button>
+		<button type="roll" name="roll_TestDrive" value="/me rolls @{Driveroll}">Drive</button>
+		<input type="hidden" value="[[2d6 + @{drive} - @{conflicted} + @{ongoing}]]" name="attr_Driveroll">
 
 		<div class="sheet-row-1">
 			<input type="number" name="attr_drive" value=0>
@@ -370,4 +380,36 @@
 <br>
 
 
+<!-- ROLL TEMPLATES -->
 
+<!-- &{template:basic} {{name=Test}} {{roll=[[2d6]]}} 
+	{{Hit= Hit Content}} {{Partial = Partial Content}} {{Miss = Miss Content}}-->
+
+<rolltemplate class="sheet-rolltemplate-basic">
+	<div class="sheet-template-header">{{name}}</div>
+	<div class="sheet-template-row"><strong>Roll:</strong> {{rollvalue}}</div>
+	{{#rollGreater() rollvalue 9}} <div class="sheet-template-row">
+		<strong>Result:</strong> {{Hit}}
+	</div>{{/rollGreater() rollvalue 9}}
+	{{#rollLess() rollvalue 7}} <div class="sheet-template-row">
+		<strong>Result:</strong> {{Partial}}
+	</div>{{/rollLess() rollvalue 7}}
+	{{#rollBetween rollvalue 7 9}} <div class="sheet-template-row">
+		<strong>Result:</strong> {{Miss}}
+	</div>{{/rollLess() rollvalue 7}}
+</rolltemplate>
+
+<!-- <rolltemplate class="sheet-rolltemplate-hit">
+	<div class="sheet-template-header">{{rollname}}</div>
+
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-partial">
+	<div class="sheet-template-header">{{rollname}}</div>
+	
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-miss">
+	<div class="sheet-template-header">{{rollname}}</div>
+
+</rolltemplate> -->
