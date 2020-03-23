@@ -125,22 +125,6 @@
 		});
 	};
 
-	//Edge toggle to include ! for exploding dice
-	const edgeToggle = eventinfo => {
-		setAttrs({
-			explode_toggle: eventinfo.newValue != 0 ? "!" : ""
-		});
-	};
-
-	//Calculate Reset Condition Track
-	on("clicked:cond_reset", () => {
-		setAttrs({
-			physical: 0,
-			stun: 0,
-			matrix: 0
-		});
-	});	
-
 	const resetConditionTrack = eventinfo => {
 		const attr = eventinfo.triggerName.split("_").pop();
 		setAttrs({
@@ -259,9 +243,9 @@
 		    getAttrs(["attack", "data_processing", "repeating_IC_IC_limit", "repeating_IC_IC_attribute", "repeating_IC_IC_matrix", "repeating_IC_IC_note"], (v) =>{
 		    	const att = parseInt(v.attack) || 0;
 		    	const data = parseInt(v.data_processing) || 0;
-				const attr = v.repeating_IC_IC_attribute;
-				const mat = v.repeating_IC_IC_matrix;
-				const not = v.repeating_IC_IC_note;
+  				const attr = v.repeating_IC_IC_attribute;
+  				const mat = v.repeating_IC_IC_matrix;
+  				const not = v.repeating_IC_IC_note;
 
 		        setAttrs({
 		        	repeating_IC_IC: (v.repeating_IC_IC_limit === "@{data_processing}") ? ` ([${data}] vs. ${attr} + ${mat}, ${not})` : `([${att}] vs. ${attr} + ${mat}, ${not})`
@@ -269,74 +253,22 @@
 		    });
 		});
 
-	//IC  Attack Dice & Condition Track
-		on("change:host_rating", () => {
-			getAttrs(["host_rating"], (v) => {
-				var hos = parseInt(v.host_rating) || 0;
-				var tot = 8 + Math.ceil(hos/2);
-				var atk = Math.min(hos + hos);
-
-				setAttrs({matrix: tot});
-				setAttrs({ic_attack: atk});
-			});
-		});
-
-	//Sprite Condition Track
-		on("change:level", () => {
-			getAttrs(["level"], (v) => {
-				var lev = parseInt(v.level) || 0;
-				var tot = 8 + Math.ceil(lev/2);
-
-				setAttrs({matrix: tot});
-			});
-		});
-
    	//Setting the Default attribute name for default skill
-	on("change:default_attribute", (eventinfo) => {
-		getAttrs(["default_display"], v => {
-			const display   = (v.default_display);
-			let update      = {};
+  	on("change:default_attribute", (eventinfo) => {
+  		getAttrs(["default_display"], v => {
+  			const display   = (v.default_display);
+  			let update      = {};
 
-			//This sets a hidden input with the Attribute name so the roll template can use it to indicate what attribute was rolled
-			const attribute   = eventinfo.newValue.slice(2, -1);
-			const translation = getTranslationByKey(`${attribute}`);
-			if (translation != display) {
-				setAttrs({
-					default_display: translation
-				});
-			};
-		});
-	});
-
-	//PC SPELLS/PREPS/RITUALS
-	  	['repeating_spell','repeating_preps','repeating_ritual'].forEach(field => {
-	        // Attach listener
-	        on(`change:${field}`, (eventInfo) => {
-	        	const source = eventInfo.sourceAttribute;
-	        	if (source.includes("dicepool") || source.includes("specialization")) {
-	        		getAttrs([`${field}_specialization`, `${field}_dicepool_modifier`], v => {
-	        			v = processingFunctions.parseIntegers(v);
-	                    setAttrs({
-	                        [`${field}_dicepool`]: v[`${field}_specialization`] + v[`${field}_dicepool_modifier`]
-	                    });
-	        		});
-	        	}  else  {
-	        		console.log(`Change to ${field} did not set attr`);
-	        	};
-	        });
-	    });
-
-	//Repeating contacts for PC sheet
-		on("change:repeating_contacts", () => {
-			getAttrs(["repeating_contacts_name"], (v) => {
-				const name = (v.repeating_contacts_name);
-
-				((name).length > 0 && (name).length <= 30) ? setAttrs({repeating_contacts_display: (name)}) : 
-					((name).length > 30) ? setAttrs({repeating_contacts_display: (name).slice(0, 30) + "..."}) :
-					setAttrs({repeating_contacts_display: " "});
-			});
-		});
-
+  			//This sets a hidden input with the Attribute name so the roll template can use it to indicate what attribute was rolled
+  			const attribute   = eventinfo.newValue.slice(2, -1);
+  			const translation = getTranslationByKey(`${attribute}`);
+  			if (translation != display) {
+  				setAttrs({
+  					default_display: translation
+  				});
+  			};
+  		});
+  	});
 
 	   ['acceleration', 'armor', 'body', 'data_processing', 'handling', 'pilot', 'sensor','speed'].forEach(attr => {
 	        // Attach listener
