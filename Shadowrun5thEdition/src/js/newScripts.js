@@ -215,11 +215,8 @@ const updateMovement = () => {
 const updateDerivedAttribute = derivedAttribute => {
   getAttrs(sheetAttributes[derivedAttribute], attrs => {
     attrs = processingFunctions.shadowrun.attributeFactory(attrs)
-    const sum = processingFunctions.sumIntegers(Object.values(attrs))
-    processingFunctions.setAttributes({[derivedAttribute]: sum})
+    processingFunctions.setAttributes({[derivedAttribute]: attrs.total})
   })
 }
 
-//for Mocha Unit Texting
-//module.exports = updateFunctions;
 
