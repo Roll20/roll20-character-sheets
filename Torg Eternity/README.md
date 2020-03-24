@@ -1,6 +1,9 @@
 
 
 # Changelog
+## Version 4 (March 2020) - GiGs
+
+- completely new sheet, see Torg Eternity community Sheet on the Wiki for more information.
 
 ## Version 3.1 (October 2019) - Archange/Anduh
 

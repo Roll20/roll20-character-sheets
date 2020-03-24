@@ -106,33 +106,33 @@ describe('Shadowrun findModifierInKeys', () => {
 
 describe('Shadowrun condition factory', () => {
   it('should return an object', () => {
-    const actual = Functions.shadowrun.conditionFactor({})
+    const actual = Functions.shadowrun.conditionFactory({})
     assert.ok(actual, 'object')
   })
 
   it('should contain an attribute key', () => {
-    const actual = Functions.shadowrun.conditionFactor({body: 3})
+    const actual = Functions.shadowrun.conditionFactory({body: 3})
     assert.ok(actual.attribute, true) 
   })
 
   it('should return attribute key with the value of willpower', () => {
-    const actual = Functions.shadowrun.conditionFactor({body: 3, willpower: 5})
+    const actual = Functions.shadowrun.conditionFactory({body: 3, willpower: 5})
     assert.strictEqual(actual.attribute, 5) 
   })
 
   it('should return base key', () => {
-    const actual = Functions.shadowrun.conditionFactor({})
+    const actual = Functions.shadowrun.conditionFactory({})
     assert.ok(actual.base, true) 
   })
 
   it('should return modifier key', () => {
-    const actual = Functions.shadowrun.conditionFactor({stun_modifier: 6})
+    const actual = Functions.shadowrun.conditionFactory({stun_modifier: 6})
     assert.ok(actual.modifier, true) 
   })
 
   it('should convert the attrs object into condition object', () => {
     const expected = {modifier: 7, attribute: 10, base: 8}
-    const actual = Functions.shadowrun.conditionFactor({stun_modifier: 7, willpower: 10})
+    const actual = Functions.shadowrun.conditionFactory({stun_modifier: 7, willpower: 10})
     assert.deepStrictEqual(actual, expected)
   })
 })
@@ -251,3 +251,46 @@ describe('Shadowrun attribute factory', () => {
     assert.deepStrictEqual(actual.base, 4)
   })
 })
+
+describe('Shadowrun findRepeatingField', () => {
+  it('Shadowrun get type out of the trigger', () => {
+    const actual = Functions.findRepeatingField('repeating_range_-m1czg68yzicwhfdpyys')
+    assert.ok(actual, 'range')
+  })
+})
+
+describe('Shadowrun addRepRow', () => {
+  it('Shadowrun should return an array', () => {
+    const actual = Functions.shadowrun.addRepRow('repeating_range_-m1czg68yzicwhfdpyys', ['ammo'])
+    assert.ok(typeof actual, 'array')
+  })
+
+  it('Shadowrun should entries with the reprowid added to the attribute name', () => {
+    const actual = Functions.shadowrun.addRepRow('repeating_range_-m1czg68yzicwhfdpyys', ['ammo'])
+    assert.ok(actual, ['repeating_range_-m1czg68yzicwhfdpyys_ammo'])
+  })
+})
+
+describe('Shadowrun updatePrimaryWeapons', () => {
+  it('should return an object', () => {
+    const actual = Functions.shadowrun.updatePrimaryWeapons({})
+    assert.ok(typeof actual, 'object')
+  })
+
+  it('should return weapon with the string in weapon from the attrs', () => {
+    const actual = Functions.shadowrun.updatePrimaryWeapons({"repeating_range_-m2wiegzcjb0w5vewbnj_weapon": "Test Name"})
+    assert.ok(actual.primary_range_weapon, 'Test Name')
+  })
+
+  it('all other attributes should add weapon before the descritive attribute name', () => {
+    const actual = Functions.shadowrun.updatePrimaryWeapons({"repeating_melee_-m2wiegzcjb0w5vewbnj_dicepool": 12})
+    assert.deepStrictEqual(actual, {"primary_melee_weapon_dicepool":12})
+  })
+
+  it('if ammo is the key then ammo_maxs should also be in update', () => {
+    const actual = Functions.shadowrun.updatePrimaryWeapons({"repeating_range_-m2wiegzcjb0w5vewbnj_ammo": 12})
+    assert.deepStrictEqual(actual, {"primary_range_weapon_ammo": 12, "primary_range_weapon_ammo_max": 12})
+  })
+})
+
+
