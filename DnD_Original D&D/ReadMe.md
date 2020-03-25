@@ -16,4 +16,4 @@ This is a character sheet designed for use with Original Dungeons & Dragons. The
 If you have any problems, suggestions or features you'd like to see added to the sheet, please let me know either by  sending me a private message via roll20.  Please be patient when waiting for a reply.
 
 ### Credits
-Sheet design and adaptation for Roll20 by ([@Malchor](https://app.roll20.net/users/2078012/malchor).
+Sheet design and adaptation for Roll20 by [@Malchor](https://app.roll20.net/users/2078012/malchor).
