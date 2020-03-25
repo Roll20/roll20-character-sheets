@@ -9,9 +9,15 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-2.2 [Screenshot](co_v2.png)
+3.0 [Screenshot](co_v2.png)
 
 # Notes de version
+## v3.0 (2020-01-21)
+* Utilisation d'options pour l'affichage ou non des règles optionnelles, qui sont maintenant dans la partie caractéristique, et non équipement
+* Capacités raciales et langues passent dans l'onglet capacités
+* Ajout d'un onglet Options pour régler ce qu'une fiche particulière doit afficher
+* Possibilité d'ajuster les points de chance
+
 ## v2.2 (2019-07-15)
 * Ajout d'un bouton pour faire le jet d'épuisement magique
 * Changement des noms de jets : ils commencent tous par "roll", pour être accessibles tels quels depuis les macros.

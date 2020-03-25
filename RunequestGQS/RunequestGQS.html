@@ -22,7 +22,7 @@
 
 
 					</div>
-					<b>Version 17.07.2019</b>
+					<b>Version 14.12.2019</b>
 					<input style="color:red;border:none;background:none;padding 0px;font-weight: bold;;width:400px;" type="text" readonly name="attr_versiony" value ="(https://tinyurl.com/yb9tgmlv)" />
 					
 					
@@ -669,7 +669,7 @@
 							<input  style="width:24px;margin-left:246px" type="text" value="0" class="sheet-text_input sheet-percentiles" readonly name="attr_curpow"/>
 							<input  style="width:24px" type="text" value="0" class="sheet-text_input sheet-percentiles"  name="attr_curmp"/>
 						</div>
-						<input type="checkbox" class="sheet-showbroken1" name="attr_showbroken1" checked="checked" >
+						<input type="checkbox" style="display:none "class="sheet-showbroken1" name="attr_showbroken1" checked="checked" >
 						<div class="broken1">
 							<fieldset class="repeating_mp_storage">
 								<input  style="width:302px" type="text"  class="sheet-text_input" name="attr_mp_location"/>
@@ -707,7 +707,9 @@
 								<input type="text"  style="display:inline-block"  class="sheet-text_input sheet-percentiles" value="0" name="attr_skillMods" />
 							</div>
 						</div>				  
-						   
+						
+						<input type="text" style="display:none" name="attr_srMod"  value="0">						
+						
 						<div class="sheet-melee_wpns_labels">
 							   <div style="margin-left:3px;">Melee Weapon</div>
 							   <div style="margin-left:30px;">Skill Used</div>
@@ -722,7 +724,8 @@
 							   <div style="margin-left:7px;">Type</div>
 							   <div style="margin-left:8px;">Special</div>						   
 							   <div style="margin-left:25px;" >HP</div>		
-						</div>						
+						</div>
+						
 						<fieldset class="repeating_melee2">
 						   <div class="sheet-melee_wpns">
 
@@ -733,7 +736,8 @@
 							 <input type="text"  style="display:none"  value="1" name="attr_skillReduct" />						  								  
 	
 							<input type="text"  style="margin-left:1px" class="sheet-text_input sheet-percentiles" value="0"  name="attr_wpn_sr" />
-							  <input type="text" class="sheet-text_input sheet-percentiles"  disabled name="attr_total_wpn_sr" value="[[@{wpn_sr}+@{melee_srm}]]" />
+							  <!--<input type="text" class="sheet-text_input sheet-percentiles"  disabled name="attr_total_wpn_sr" value="[[{@{wpn_sr}+@{melee_srm}]]" />-->
+							  <input type="text" class="sheet-text_input sheet-percentiles"  disabled name="attr_total_wpn_sr" value="[[((((@{wpn_sr}+@{melee_srm}-@{srMod}) + 1) + abs((@{wpn_sr}+@{melee_srm}-@{srMod}) - 1)) / 2)]]">
 							  <button type="roll" style="padding-top: 0px;" class="sheet-turn_order" title="Add to turn order" value="@{add_sr}" ></button>
 							  <textarea name="attr_add_sr" style="display:none">
 								/em --
@@ -4140,7 +4144,7 @@ D20	    Result	       AP/HP
 				<input checked="checked" class="sheet-HideConfig" name="attr_is_config" type="checkbox"><span class="sheet-is-config"><span style="font-family: &quot;pictos&quot;">y</span></span>
 				<div class="sheet-config" style="border-style: dotted ; border-color: gray ; padding: 5px ; background-color: white ; background-image: none">
 					<div>
-						<b>Version 17.07.2019</b> <input name="attr_versiony" readonly style="color:red;border:none;background:none;padding 0px;font-weight: bold;;width:400px;" type="text" value="(https://tinyurl.com/yb9tgmlv)">
+						<b>Version 14.12.2019</b> <input name="attr_versiony" readonly style="color:red;border:none;background:none;padding 0px;font-weight: bold;;width:400px;" type="text" value="(https://tinyurl.com/yb9tgmlv)">
 					</div><br>
 					<input checked="checked" class="sheet-toggleQSSheet" name="attr_toggleQSSheet" type="checkbox">Display Quick Start Sheet <input class="sheet-toggleFullSheet" name="attr_toggleFullSheet" type="checkbox">Display Full Sheet <input class="sheet-toggleNPC1Sheet" name="attr_toggleNPC1Sheet" type="checkbox">Display NPC Sheet
 				</div>
@@ -4842,7 +4846,7 @@ wpn 3 HP 12</textarea>
 						BonusMod = BonusMod + -5;
 					}else if (curChr >16 && curChr < 21){
 						BonusMod = BonusMod + 5;
-					}else if (curPow >20){
+					}else if (curChr >20){
 						BonusMod = BonusMod + (5+(Math.ceil((curChr-20)/4)*5));
 					}
 					console.log("BonusMod value1: " + BonusMod);
@@ -5282,16 +5286,16 @@ wpn 3 HP 12</textarea>
 						dsrm = 0;				
 					}	
 					console.log("^^^^^^^^^^^^^ dsrm: "+dsrm);					
-console.log("^^^^^^^^^^^^^ coordCast: "+pvalue.coordCast)					
+console.log("^^^^^^^^^^^^^ srbuff: "+srBuff)					
 					if (pvalue.coordCast=="on"){
 						srBuff++;
 					}
-console.log("^^^^^^^^^^^^^ dsrm: "+dsrm);					
-console.log("^^^^^^^^^^^^^ mobilCast: "+pvalue.mobilCast)					
+console.log("^^^^^^^^^^^^^ srbuff: "+srBuff)					
+
 					if (pvalue.mobilCast=="on"){
 						srBuff++;
 					}
-console.log("^^^^^^^^^^^^^ dsrm: "+dsrm);										
+console.log("^^^^^^^^^^^^^ srbuff: "+srBuff)					
 					msrm = msrm+dsrm;
 					
 					if (msrm < 1){
@@ -5327,9 +5331,9 @@ console.log("^^^^^^^^^^^^^ dsrm: "+dsrm);
 					if (dsrm < 1){
 						dsrm =1;
 					}
+					console.log("^^^^^^^^^^^^^ srbuff: "+srBuff)
 					
-					
-					setAttrs({ dex_srm: dsrm , melee_srm: msrm,ready_wpn: srStr,unready_wpn: srStr2});
+					setAttrs({ dex_srm: dsrm , melee_srm: msrm,ready_wpn: srStr,unready_wpn: srStr2,srMod:srBuff});
 				   
 					console.log("************ End DEx SRM Calculation ************");
 				});
