@@ -6,7 +6,7 @@ This is a character sheet designed for use with Original Dungeons & Dragons. The
 ## Current Version
 1.0
 
-### Changelog
+### Change log
 
 #### 1.0
 * Sheet creation for Roll20
