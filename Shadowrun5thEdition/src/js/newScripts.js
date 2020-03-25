@@ -95,7 +95,6 @@ const updateRepeatingSkillLimit = eventinfo => {
 const updateRepeatingSkillName = eventinfo => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
   const translationKey = eventinfo.newValue.replace(/ /g, '').toLowerCase()
-  console.log(translationKey)
   const translation = getTranslationByKey(translationKey);
   processingFunctions.setAttributes({
     [`${repRowID}_display_skill`]: translation
