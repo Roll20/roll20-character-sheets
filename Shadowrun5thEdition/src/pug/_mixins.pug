@@ -3,12 +3,12 @@ mixin rollButton(header, base, rollFormula)
     button(data-i18n=header name=`roll_${header}` type='roll' value!=rollBeginging+'{{header=^{'+header+'}}}{{base='+base+'}}{{dice=[[(('+rollFormula+')'+rollEnding) #{header}
 
 //- SKILL BUTTON
-mixin skillButton(specialization)
+mixin skillButton(specialization, skillType)
     - const rollName = specialization === true ? 'specialization' : 'skill';
     - const rollFormula = specialization === true ? '@{dicepool}+@{attribute}+2' : '@{dicepool}+@{attribute}';
     - const desc = specialization === true ? 'Spec: @{specialization}, @{display_limit}' : '@{display_limit}';
-    - const display = specialization === true ? 'attr_display_specialization' : 'attr_display';
-    button(name=`roll_${rollName}` type='roll' value!=rollBeginging+'{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[(('+rollFormula+')'+rollEnding+'{{desc='+desc+'}}')
+    - const display = specialization === true ? 'attr_specialization' : skillType != 'active' ? 'attr_skill' : 'attr_display_skill';
+    button.eclipse(name=`roll_${rollName}` type='roll' value!=rollBeginging+'{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[(('+rollFormula+')'+rollEnding+'{{desc='+desc+'}}')
         span(name=display)
 
 //- ROLLS
@@ -35,7 +35,7 @@ mixin soakRoll(header, base, rollForumla)
 //- SPRITE BUTTONS
 mixin spriteButton(header, display)
     button(name=`roll_${header}` type='roll' value!=rollBeginging+'{{header=@{'+header+'}}}{{base=^{level}}}{{dice=[[((@{level}+@{level})'+rollEnding)
-        span(name='attr_'+display)
+        span(name=display)
 
 //- NPC ATTRIBUTE ROLLS
 mixin npcAttributeButton(attribute, rollFormula)
@@ -77,13 +77,13 @@ mixin initiativeRoll(name, attribute, translation)
 //- NPC CONDITION MONITOR
 mixin conditionMonitor(conditionTypes)
     each val in conditionTypes
-        label.settings(data-i18n-title=val+'bonus' title=val+'bonus')
-            input(name='attr_'+val+'_modifier' placeholder='0' title='@{'+val+'_modifier}' type='number' value='0')
+        label.settings(data-i18n-title=`${val}bonus` title=`${val} bonus`)
+            input(name=`attr_${val}_modifier` placeholder='0' title=`@{${val}_modifier}` type='number' value='0')
         if val === 'physical'
             span.settings /
     span.settings.tiny-span() =
     each val in conditionTypes
-        span(name='attr_'+val title='@{'+val+'_modifier}')
+        span(name=`attr_${val}_max` title=`@{${val}_max}`)
         if val === 'physical'
             span /
 
@@ -107,7 +107,7 @@ mixin pcSpells(type)
     - const repeatingSection = `@{repeating_${type}`+'_${x}';
     
     .rows.repeating-container
-        fieldset(class=`repeating_`+type)
+        fieldset(class=`repeating_${type}`)
             input(name='attr_dicepool' type='hidden' value='0')
             button(name=`roll_${type}}` type='roll' value!=rollBeginging+'{{header=@{name}}}{{base=^{magic}}}{{dice=[[((@{skill}+@{dicepool}+@{magic})'+rollEnding+'{{desc=@{combat_type}?{Force|}}}{{drain=[[?{Force|}+(@{drain})]]}}')
                 span(name='attr_name')
@@ -168,7 +168,7 @@ mixin pcSpells(type)
                                         option(data-i18n=i18n value=`@{${attrName}}`) #{i18n}
                         else
                             label(data-i18n-title=translationKey title=key)
-                                input(name=`attr_${attrName}` placeholder=val['placeholder'] title=`${repeatingSection}_${attrName}}` type=val['type'])
+                                input(name=`attr_${attrName}` placeholder=val['placeholder'] title=`${repeatingSection}_${attrName}}` type=val['type'] value=val['default'])
                 h3(data-i18n='notes') notes
                 label(data-i18n-title='notes' title='notes')
                     textarea(name='attr_notes' placeholder='Notes' title=`${repeatingSection}_notes}` type='text' value='')
