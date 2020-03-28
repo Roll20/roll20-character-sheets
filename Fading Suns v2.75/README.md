@@ -1,4 +1,6 @@
 # TODO
+- /!\ Remove dependency on API
+
 - Allow choice b/w public vs GM roll
 - Initiative roll query - English translation
 - Initiative roll query - parse list of Combat Styles known by the character
