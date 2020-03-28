@@ -5,13 +5,13 @@ const processingFunctions = {
   convertIntegersNegatives: numbers => {
     for (let [key, value] of Object.entries(numbers)) {
       numbers[key] = processingFunctions.convertIntegerNegative(value);
-    }
+    }calculateConditionTracks
     return numbers
   },
   findRepeatingField: trigger => trigger.split('_')[1],
   //Roll20 does not allow for Promises
   //getAttributes: array => new Promise((resolve, reject) => array ? getAttrs(array, v => resolve(v)) : reject(errorMessage('Function failed'))),
-  getReprowid: trigger => {
+  getReprowid: trigger => {calculateConditionTracks
     const split = trigger.split('_');
     return `${split[0]}_${split[1]}_${split[2]}`
   },
@@ -47,7 +47,7 @@ const processingFunctions = {
     },
     conditionFactory: attrs => {
       attrs.attribute = processingFunctions.shadowrun.determineConditionAttribute(attrs)
-      attrs.base = processingFunctions.shadowrun.determineConditionBase(attrs.sheet_type, attrs.drone_flag)
+      attrs.base = processingFunctions.shadowrun.determineConditionBase(attrs.sheet_type, attrs.flag_drone)
       attrs.modifier = attrs[processingFunctions.shadowrun.findModifierInKeys(attrs)]
       Object.keys(attrs).forEach(key => !['attribute', 'base', 'modifier'].includes(key) ? delete attrs[key] : false)
       attrs = processingFunctions.parseIntegers(attrs)
@@ -91,7 +91,7 @@ const processingFunctions = {
       skill = skill.includes(" ") ? skill.replace(/ /g,"") : skill
       return skill
     },
-    determineConditionBase: (type, drone) => drone ? 6 : type === 'vehicle' ? 12 : 8,
+    determineConditionBase: (type, drone) => drone && drone === 'drone' ? 6 : type === 'vehicle' ? 12 : 8,
     determineConditionAttribute: attrs => attrs.willpower ? attrs.willpower : attrs.body ? attrs.body : attrs.device_rating ? attrs.device_rating : 0,
     determineWeaponAttributesByType: weaponType =>  weaponType === 'range' ? sheetAttributes.rangeAttributes : sheetAttributes.meleeAttributes,
     findFlagInKeys: attrs => Object.keys(attrs).find(key => key.includes('_flag')),
