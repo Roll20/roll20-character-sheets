@@ -24,7 +24,7 @@
 			<div class="content">
 				<h4>GURPS Version <input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Sheet Version" /></h4>
 				<ul>
-					<li>Added some new ToolTips – Cosmetic Only.</li>
+					<li>Combat Tab. Add additional information window for Active Defenses.</li>
 					<li>Changed width of Weapon and Damage Notes fields, under Melee and Raged Attacks, to be more readable – Cosmetic Only.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
@@ -2362,7 +2362,7 @@
 						<div class="cell col-notebox">
 						    <div class="show-notes">
 						        <input type="checkbox" name="attr_show_notes" value="1" />
-						        <span class="label">Show notes below, in roll template</span>
+						        <span class="label">Show notes below in roll template</span>
 						    </div>
 						    <textarea name="attr_notes" title="Macro table name: repeating_traits. Field name: notes"></textarea>
 						</div>
@@ -3756,11 +3756,13 @@
 				</div> <!-- .sheet-row -->
 				
 				<fieldset class="repeating_defense">
-					<div class="sheet-row sheet-row-stats">
-						<div class="sheet-cell sheet-col0">
+					<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." name="attr_defense_toggle_notes" />
+					<span class="checkbox"></span>
+					<div class="row row-stats">
+						<div class="cell col0">
 							<input type="text" name="attr_name" title="Macro table name: repeating_defense. Field name: name" />
 						</div>
-						<div class="sheet-cell sheet-col1">
+						<div class="cell col1">
 						    <input type="hidden" name="attr_defense_type" value="0" />
 							<select name="attr_type" title="Macro table name: repeating_defense. Field name: type">
 								<option>Dodge</option>
@@ -3770,17 +3772,120 @@
 								<option>Other</option>
 							</select>
 						</div>
-						<div class="sheet-cell sheet-col2">
+						<div class="cell col2">
 							<input type="text" name="attr_info" title="Macro table name: repeating_defense. Field name: info" />
-							<input type="hidden" name="attr_info_description" />
 						</div>
-						<div class="sheet-cell sheet-col3">
+						<div class="cell col3">
 							<input type="text" name="attr_skill" title="Macro table name: repeating_defense. Field name: skill" />
 						</div>
-						<div class="sheet-cell sheet-col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll (@{type})}} {{defenseType=[[@{defense_type}]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill} + @{modifier}]]}} {{showNotes=[[1]]}} {{notes=@{info_description}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
+						<div class="cell col4">
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll (@{type})}} {{defenseType=[[@{defense_type}]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill} + @{modifier}]]}} {{showNotes=[[@{show_notes}]]}} {{notes=@{info_description} @{notes} }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{defense_success_note}}} {{customCriticalSuccessNote=@{defense_critical_success_note}}} {{customFailNote=@{defense_fail_note}}} {{customCriticalFailNote=@{defense_critical_fail_note}}}" name="roll_vsSL" />
 						</div>
-					</div> <!-- .sheet-row -->
+					</div> <!-- .row -->
+					
+					<div class="row row-details notebox">
+					
+					    <div class="row">
+					        <div class="cell label">
+							    <div class="popup">Link: </div>
+        						<span class="tooltip">
+									Link this technique to a skill, technique, or spell.
+        						</span> 
+					        </div>
+							<div class="cell">
+								<select name="attr_defense_row_type">
+					                <option>Skill</option>
+					                <option>Technique</option>
+					                <option>Spell</option>
+					            </select>
+					        </div>
+    					    <div class="cell col-row-id label">
+    						    <div class="popup">Row ID: </div>
+        						<span class="tooltip">
+        							Copy/paste the Skill, Technique, or Spell Row ID to link to active defense.<br />
+        							When the skill/technique/spell is updated, the active defense<br />
+        							will be updated.
+        						</span>	
+    						</div>
+    						<div class="cell col-input-medium">
+    						    <input type="hidden" name="attr_defense_skill_row_id_toggle" value="0" />
+								<input type="text" name="attr_defense_skill_row_id" title="Macro table name: repeating_defense. Field name: defense_skill_row_id" />
+							</div>
+							<div class="cell col-wide">
+								<input type="hidden" name="attr_skill" value="" />
+    							<input type="hidden" name="attr_defense_skill_row_id_modifier" value="0" />
+    							<input type="hidden" name="attr_defense_skill_row_id_message" value="" />
+    							<b>Name:</b><span name="attr_defense_skill_row_id_message"></span>
+    							<input type="hidden" name="attr_defense_skill_row_id_level" value="" />
+    							<b>Level:</b><span name="attr_defense_skill_row_id_level"></span>
+    						</div>
+						</div> <!-- .sheet-row -->
+						
+						<div class="rolltable-result-notes notes-below">
+							
+							<div class="show-notes">
+						        <input type="checkbox" name="attr_show_notes" value="1" style="float:left; margin-right: 5px;" />
+								<div class="popup" style="float:left;">Show notes below in roll template</div>
+        						<span class="tooltip">
+									The INFO Notes and Custom notes will be combined into a single note that is displayed on the rolltemplate.
+        						</span>
+							</div>
+
+							<div style="clear:both;"></div>
+
+							<div class="popup">INFO Notes</div>
+							<span class="tooltip">
+								If you enter F or U under the <b>INFO</b> column, the notes <br />
+								below will be <b>replaced</b> with appropriate notes. <br />
+								Any other value, and the text box will get <b>cleared</b> out.<br />
+							</span>
+							<input type="text" name="attr_info_description" title="Macro table name: repeating_defense. Field name: info_description" />
+
+							<div class="popup">Custom Notes</div>
+							<span class="tooltip">
+
+							</span>
+						    <textarea name="attr_notes" title="Macro table name: repeating_defense. Field name: notes" style="height: 50px"></textarea>
+						</div>
+					
+					    <div class="rolltable-result-notes">
+						    
+						    <div class="note-input">
+						        <div class="note-title">
+    						        <div class="sheet-popup">Success Note:</div>
+            						<span class="sheet-tooltip">
+            						    Success, critical success, fail, and critical fail<br />
+            						    notes will be added to roll results.<br />
+            						    You can add macros to these notes. <br />
+										The width of these note boxes are set to help you<br />
+										visualize what it will look like in chat.
+            						</span>
+    						    </div>
+						        <textarea name="attr_defense_success_note" title="Macro table name: repeating_defense. Field name: defense_success_note"></textarea>
+						    </div>
+						    
+						    <div class="note-input">
+						        <div class="note-title">Critical Success Note:</div>
+						        <textarea name="attr_defense_critical_success_note" title="Macro table name: repeating_defense. Field name: defense_critical_success_note"></textarea>
+						    </div>
+						</div>
+						
+						<div class="rolltable-result-notes">
+						    
+						    <div class="note-input">
+						        <div class="note-title">Fail Note:</div>
+						        <textarea name="attr_defense_fail_note" title="Macro table name: repeating_defense. Field name: defense_fail_note"></textarea>
+						    </div>
+						    
+						    <div class="note-input">
+						        <div class="note-title">Critical Fail Note:</div>
+						        <textarea name="attr_defense_critical_fail_note" title="Macro table name: repeating_defense. Field name: defense_critical_fail_note"></textarea>
+						    </div>
+						    
+						</div>
+						
+					</div> <!-- .row -->
+					
 				</fieldset> <!-- .repeating_defense -->
 
 				<!-- _____ _____ DEFENSE BONUS BOX _____ _____ -->
@@ -5533,6 +5638,14 @@
 	<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
 	<ul>
+		<li>Combat Tab. Add additional information window for Active Defenses.</li>
+	</ul>
+
+	<h4>Version 2.2.3</h4>
+
+	<p>Pull Request: 03/03/2020</p>
+
+	<ul>
 		<li>Changes, Fixes, and Adds made by Mike W (UserID: 1414610)</li>
 		<li>Added some new ToolTips – Cosmetic Only.</li>
 		<li>Changed width of Weapon and Damage Notes fields, under Melee and Raged Attacks, to be more readable – Cosmetic Only.</li>
@@ -6047,7 +6160,76 @@ For each hit, roll hit location randomly. If that location is behind cover, the 
 
 **In Low Mana Areas**, Critical Failures have mild effects or no effect at all. (M6)</textarea>    
 		        </div><!-- end option-container -->
+				
+				<!-- options: dodge roll notes -->
+				<div class="option-container collision-falling-options">
+		            <h4>Dodge Success Notes</h4>
+		            <textarea name="attr_dodge_success_notes">If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.</textarea>    
+		        </div><!-- end option-container -->
 		        
+		        <div class="option-container collision-falling-options">
+		            <h4>Dodge Critical Success Notes</h4>
+		            <textarea name="attr_dodge_critical_success_notes">If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>    
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container collision-falling-options">
+		            <h4>Dodge Fail Notes</h4>
+		            <textarea name="attr_dodge_fail_notes"></textarea>    
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container collision-falling-options">
+		            <h4>Dodge Critical Failure Notes</h4>
+		            <textarea name="attr_dodge_critical_failure_notes"></textarea>    
+				</div><!-- end option-container -->
+
+				<!-- options: parry roll notes -->
+				<div class="option-container collision-falling-options">
+		            <h4>Parry Success Notes</h4>
+		            <textarea name="attr_parry_success_notes">If parrying an unarmed attack with a weapon, you may injure your attacker. Immediately roll against your skill with the weapons you used to parry. This roll is at -4 if your attacker used Judo or Karate. If you succeed, your parry struck the attacker's limb squarely, no defense roll allowed! Roll damage normally. See B376.
+
+If parrying a weapon 3 times your weapons weight, roll for breakage, <b>1d6</b> on <i>1</i> or <i>2</i> weapon breaks. Add +1 to these odds per whole-numbered multiple past 3 (a 3 in 6 chance at 4 times weapon weight, a 4 in 6 chance at 5 times, and so on). Weapon quality modifies these odds: +2 if the parrying weapon is cheap, -1 if fine, or -2 if very fine.
+<b>NOTE:</b> If your weapon breaks, the parry still counts <i>unless</i> the odds of breakage exceeded 6 in 6. See B376.</textarea>
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container collision-falling-options">
+		            <h4>Parry Critical Success Notes</h4>
+		            <textarea name="attr_parry_critical_success_notes">If parrying an unarmed attack with a weapon, you may injure your attacker. Immediately roll against your skill with the weapons you used to parry. This roll is at -4 if your attacker used Judo or Karate. If you succeed, your parry struck the attacker's limb squarely, no defense roll allowed! Roll damage normally. See B376.
+
+If parrying a weapon 3 times your weapons weight, roll for breakage, <b>1d6</b> on <i>1</i> or <i>2</i> weapon breaks. Add +1 to these odds per whole-numbered multiple past 3 (a 3 in 6 chance at 4 times weapon weight, a 4 in 6 chance at 5 times, and so on). Weapon quality modifies these odds: +2 if the parrying weapon is cheap, -1 if fine, or -2 if very fine.
+<b>NOTE:</b> If your weapon breaks, the parry still counts <i>unless</i> the odds of breakage exceeded 6 in 6. See B376.</textarea>
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container collision-falling-options">
+		            <h4>Parry Fail Notes</h4>
+		            <textarea name="attr_parry_fail_notes">If you're using an unarmed parry, attacker may choose to the original target or the limb you used to parry with. See B376.</textarea>    
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container collision-falling-options">
+		            <h4>Parry Critical Failure Notes</h4>
+		            <textarea name="attr_parry_critical_failure_notes">If you're using an unarmed parry, attacker may choose to the original target or the limb you used to parry with. See B376.</textarea>
+				</div><!-- end option-container -->
+
+				<!-- options: block roll notes -->
+				<div class="option-container collision-falling-options">
+		            <h4>Block Success Notes</h4>
+		            <textarea name="attr_block_success_notes"></textarea>    
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container collision-falling-options">
+		            <h4>Block Critical Success Notes</h4>
+		            <textarea name="attr_block_critical_success_notes"></textarea>    
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container collision-falling-options">
+		            <h4>Block Fail Notes</h4>
+		            <textarea name="attr_block_fail_notes"></textarea>    
+		        </div><!-- end option-container -->
+		        
+		        <div class="option-container collision-falling-options">
+		            <h4>Block Critical Failure Notes</h4>
+		            <textarea name="attr_block_critical_failure_notes"></textarea>    
+				</div><!-- end option-container -->
+					
 		    </div><!-- end option-column -->
 		    
 		    <div class="option-column">
@@ -7151,9 +7333,9 @@ See notes for weapon.</textarea>
 
 	var noop = function () {}; // do nothing.
 
-	var version = "2.2.3";
+	var version = "2.3.0";
 	
-	var latestChangesDate = "03/03/2020";
+	var latestChangesDate = "03/10/2020";
 
 	var modCascade = true;
 	
