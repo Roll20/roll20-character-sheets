@@ -1,6 +1,6 @@
 
   on('sheet:opened', () => {
-		getAttrs(['version'], v => { versioning(parseFloat(v.version) || 1); });
+		//-getAttrs(['version'], v => { versioning(parseFloat(v.version) || 1); });
 		translations();
 	});
 
@@ -27,11 +27,6 @@
     sheetAttributes[derivedAttribute].forEach(attr => on(`change:${attr}`, () => updateDerivedAttribute(derivedAttribute)))
   })
 
-  sheetAttributes.attributeLimits.forEach(attributeLimit => {
-    sheetAttributes[attributeLimit].forEach(attr => on(`change:${attr}`, () => updateLimits(attributeLimit)))
-    on(`change:${attributeLimit}_modifier change:${attributeLimit}_temp change:${attributeLimit}_temp_flag`, () => updateLimits([`${attributeLimit}`]))
-  })
-
   sheetAttributes.conditionTracks.forEach(conditionTrack => {
     sheetAttributes[conditionTrack].forEach(attr => on(`change:${attr}`, () => updateConditionTracks(conditionTrack)))
   })
@@ -41,7 +36,6 @@
   sheetAttributes.repeatingSkills.forEach(field => {
     on(`change:repeating_${field}:rating change:repeating_${field}:rating_modifier`, eventinfo => updateRepeatingSkillRating(eventinfo.triggerName))
     on(`change:repeating_${field}:attribute`, eventinfo => updateRepeatingSkillAttribute(eventinfo))
-    on(`change:repeating_${field}:limit`, eventinfo => updateRepeatingSkillLimit(eventinfo))
     on(`change:repeating_${field}:dicepool`, eventinfo => updateRepeatingSkillDicepool(eventinfo))
   })
 

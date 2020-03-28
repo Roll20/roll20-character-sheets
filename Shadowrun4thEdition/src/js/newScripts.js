@@ -78,24 +78,9 @@ const updateRepeatingSkillDicepool = eventinfo => {
     })
 }
 
-const updateRepeatingSkillLimit = eventinfo => {
-  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
-  if (eventinfo.newValue === "none") {
-    processingFunctions.setAttributes({[`${repRowID}_display_limit`]: ' '})
-  } else {
-    const translationKey = processingFunctions.sliceAttr(eventinfo.newValue)
-    const translation = getTranslationByKey(translationKey);
-    getAttrs([translationKey], attrs => {
-      const limitDisplay = `${translation} ${attrs[translationKey]}`
-      processingFunctions.setAttributes({[`${repRowID}_display_limit`]: limitDisplay})
-    })
-  }
-}
-
 const updateRepeatingSkillName = eventinfo => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
   const translationKey = eventinfo.newValue.replace(/ /g, '').toLowerCase()
-  console.log(translationKey)
   const translation = getTranslationByKey(translationKey);
   processingFunctions.setAttributes({
     [`${repRowID}_display_skill`]: translation
@@ -181,24 +166,6 @@ const updateAttributes = (array, attribute) => {
       [attribute]: attrs.total,
       [`display_${attribute}`]: attrs.base === attrs.total ? attrs.base : `${attrs.base} (${attrs.total})`
     })
-  })
-}
-
-const updateLimitTotal = attrs => {
-  attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
-  return processingFunctions.shadowrun.calculateLimitTotal(Object.values(attrs))
-}
-
-const updateLimits = attributeLimit => {
-  const array = sheetAttributes[attributeLimit].concat([`${attributeLimit}_modifier`, `${attributeLimit}_temp`, `${attributeLimit}_temp_flag`])
-  getAttrs(array, attrs => {
-      attrs = processingFunctions.shadowrun.attributeFactory(attrs)
-      const bonus = attrs.bonus
-      delete attrs.bonus
-      const base = processingFunctions.shadowrun.updateLimitTotal(attrs)
-      processingFunctions.setAttributes({
-        [attributeLimit]: processingFunctions.sumIntegers([base, bonus])
-      })
   })
 }
 

@@ -70,7 +70,6 @@ const processingFunctions = {
       return attrs
     },
     calculateConditionTracks: conditionInts => Math.ceil(conditionInts.attribute/2) + conditionInts.base + conditionInts.modifier,
-    calculateLimitTotal: attrs => Math.ceil((attrs[0] + attrs[1] + (attrs[2] * 2))/3),
     calculateRunSpeed: (agility, modifier) => (agility * 4) + modifier,
     calculateWalkSpeed:(agility, modifier) => (agility * 2) + modifier,
     calculateWounds: attrs => {
@@ -117,10 +116,6 @@ const processingFunctions = {
       })
     },
     shotsFired: (shots, trigger) => shots > 0 && trigger.includes('remove') ? shots -= 1 : trigger.includes('add') ? shots += 1 : shots,
-    updateLimitTotal: attrs => {
-      attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
-      return processingFunctions.shadowrun.calculateLimitTotal(Object.values(attrs))
-    },
     resetPrimaryWeapon: type => {
       const resetPrimary = type === 'range' ? new PrimaryRangeWeapon(type) : new PrimaryMeleeWeapon(type)
       let update = {}
