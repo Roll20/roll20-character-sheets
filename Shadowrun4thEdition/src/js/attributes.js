@@ -7,11 +7,6 @@ const sheetAttributes = {
   tabs: [`core`, `arms`, `augs`, `gear`, `magic`, `matrix`, `social`, `vehicle`, `options`],
   woundCalculation: ['high_pain_tolerance', 'low_pain_tolerance', 'damage_compensators_physical', 'damage_compensators_stun', 'stun', 'physical'],
   
-  attributeLimits: ['mental_limit', 'physical_limit', 'social_limit'],
-  mental_limit: ['intuition', 'willpower', 'logic'],
-  physical_limit: ['body', 'reaction', 'strength'],
-  social_limit: ['essence', 'willpower', 'charisma'],
-
   calculatedAttributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition','charisma','magic', 'resonance', 'attack', 'sleaze', 'data_processing', 'firewall'],
 
   initiative_mod: ['reaction', 'intuition', 'initiative_mod_modifier', 'initiative_mod_temp', 'initiative_mod_temp_flag'],
