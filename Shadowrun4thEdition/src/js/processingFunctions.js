@@ -150,13 +150,12 @@ const processingFunctions = {
         const repRowID = processingFunctions.getReprowid(key)
         if (key.includes('name')) {
           update['armor_name'] = attrs[`${repRowID}_name`]
-        } else if (key.includes('rating')) {
-          update['armor_rating'] = value
-        } else if (key.includes('dicepool_modifier')) {
+        } else if (key.includes('impact')) {
+          update['impact'] = value
+        } else if (key.includes('modifier')) {
           update['soak_modifier'] = value
         } else {
-          const type = key.split('_')[3]
-          update[`${type}_modifier`] = value
+          update[`ballistic`] = value
         }
       }
 

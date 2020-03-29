@@ -291,7 +291,7 @@ include src/pug/_variables.pug
           .rows.repeating-container
             - const armorRepeatingSection = '@{repeating_armor_${x}';
             .row-long.headers
-              each val in ['Armor', 'Ballastic', 'Impact']
+              each val in ['Armor', 'ballistic', 'Impact']
                 h2(data-i18n=`${val.toLowerCase()}`) #{val}
             fieldset(class='repeating_armor')
               input.flag-primary(name='attr_primary' type='hidden' value='')
@@ -306,11 +306,12 @@ include src/pug/_variables.pug
               input.settings-flag(name='attr_flag' title='Settings toggle' type='checkbox' checked)
               span.pictos x
               .collapse
-                each val in armorProtections
-                  - const attrName = val.toLowerCase().replace(' ', '_');
-                  - const datai18n = val === 'Gause Round' ? 'Gause Round' : `${val} Protection`;
+                each val in armorProtectionsButtons
+                  - const attrName = val.toLowerCase();
                   input(type='hidden' name=`attr_${attrName}`)
-                  button(data-i18n=datai18n name=`roll_${attrName}` type='roll' value!=noWoundsRollBegining+`{{header=^{${attrName}}}}{{base=^{armor}}}{{dice=[[((@{${attrName}}+@{body}+@{modifier}+@{${attrName}})`+noWoundsRollEnding)
+                  button(data-i18n=`${val} Protection` name=`roll_${attrName}` type='roll' value!=noWoundsRollBegining+`{{header=^{${val} Protection}}}{{base=^{armor}}}{{dice=[[((@{impact}/2)+@{${attrName}_modifier}+@{body}+@{modifier})`+noWoundsRollEnding)
+                button(data-i18n=`Laser Protection` name=`roll_laser` type='roll' value!=noWoundsRollBegining+`{{header=^{Laser Protection}}}{{base=^{armor}}}{{dice=[[((@{impact}/2)+@{radiation_modifier}+@{laser_modifier}+@{body}+@{modifier})`+noWoundsRollEnding)
+                button(data-i18n=`Gause Round Armor` name=`roll_gause` type='roll' value!=noWoundsRollBegining+`{{header=^{Gause Round Armor}}}{{base=^{armor}}}{{dice=[[((@{ballistic}/2)+@{gause_modifier}+@{body}+@{modifier})`+noWoundsRollEnding)
                 .row
                   span(name='attr_notes')
               .settings
@@ -324,10 +325,14 @@ include src/pug/_variables.pug
                   each val in armorProcAbbrev
                     h2.center(data-i18n=val) #{val}
                 .row
-                  each val in armorProtections
-                    - const attrName = val.toLowerCase().replace(' ', '_');
+                  each val in armorProtectionsInputs
+                    - const attrName = val.toLowerCase();
                     label.protections(data-i18n-title=val)
-                      input(name=`attr_${attrName}_modifier` placeholder=0 title=`@{${armorRepeatingSection}_${attrName}_modifier}` type=number value='0')
+                      input(name=`attr_${attrName}_modifier` placeholder='0' title=`@{${armorRepeatingSection}_${attrName}_modifier}` type='number' value='0')
+                  label.protections(data-i18n-title='Laser Protection')
+                    input(name=`attr_laser_modifier` placeholder='0' title=`@{${armorRepeatingSection}_laser_modifier}` type='number' value='0')
+                  label.protections(data-i18n-title='Gause Round')
+                    input(name=`attr_gause_modifier` placeholder='0' title=`@{${armorRepeatingSection}_gause_modifier}` type='number' value='0')
                 .row
                   h3(data-i18n='primary') primary
                   label(data-i18n-title='primary' title='Primary')
@@ -501,12 +506,24 @@ include src/pug/_variables.pug
   .matrix.pc-col
     .pc-row.matrix-box
       .header.right-header
-        h1(data-i18n='cyberdeck') Cyberdeck
+        h1(data-i18n='Commlinks') Commlinks
         .right-tri
       .border-box
         .pc-box.medium-box
-          .cyberdeck
-            include src/html/matrix.html
+          .commlinks.rows.repeating-container
+            fieldset(class=`repeating_commlinks`)
+              - const commlinksrepeatingSection = `@{repeating_commlink_` + "${x}";
+              each val in ['name', 'os', 'response', 'system', 'signal', 'firewall']
+                h2.text-capitalize(data-i18n=val)
+                label(data-i18n-title=val)
+                  input(name=`attr_${val}` placeholder=`Commlink ${val}` title=`@{${commlinksrepeatingSection}_${val}}` type='text' value='')
+              .con-hex
+                input(type="radio" name="attr_matrix" value="0")
+                h2(data-i18n="conditionmonitor")
+                -let matrixHexes = 0;
+                while matrixHexes < 13
+                  input(type="radio" name="attr_matrix" value=matrixHexes++)
+                  span.hexagon
           .rows.repeating-container.programs
             h2(data-i18n='programs') Programs
             fieldset(class=`repeating_programs`)
