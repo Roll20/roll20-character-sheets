@@ -33,11 +33,18 @@ const updateSpellsDicepool = eventinfo => {
 
 const resetNpcCondition = () => setAttributes({physical: 0, stun: 0, matrix: 0})
 
-const updatePrimaryWeapon = eventinfo => {
+const updatePrimary = eventinfo => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
   getAttrs([`${repRowID}_primary`], attrs => {
     if (attrs[`${repRowID}_primary`] === 'primary') {
-      let update = processingFunctions.shadowrun.updatePrimaryWeapons({[eventinfo.triggerName]: eventinfo.newValue})
+      let update = {}
+
+      if (repRowID.includes('armor')) {
+        update = processingFunctions.shadowrun.updatePrimaryArmor({[eventinfo.triggerName]: eventinfo.newValue})
+      } else {
+        update = processingFunctions.shadowrun.updatePrimaryWeapons({[eventinfo.triggerName]: eventinfo.newValue})
+      }
+
       processingFunctions.setAttributes(update)
     }
   })
@@ -54,6 +61,21 @@ const updateRepeatingWeaponPrimary = (eventinfo, type) => {
     processingFunctions.shadowrun.resetRepeatingFieldsPrimaries(`repeating_${type}`, repRowID)
   } else {
     const update = processingFunctions.shadowrun.resetPrimaryWeapon(type)
+    processingFunctions.setAttributes(update)
+  }
+}
+
+const updateRepeatingArmorPrimary = eventinfo => {
+  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+  if (eventinfo.newValue === 'primary') {
+    const constructedArmorAttributes = processingFunctions.shadowrun.addRepRow(repRowID, sheetAttributes.armorAttributes)
+    getAttrs(constructedArmorAttributes, attrs => { 
+      const update = processingFunctions.shadowrun.updatePrimaryArmor(attrs)
+      processingFunctions.setAttributes(update)
+    })
+    processingFunctions.shadowrun.resetRepeatingFieldsPrimaries(`repeating_armor`, repRowID)
+  } else {
+    const update = processingFunctions.shadowrun.resetPrimaryArmor()
     processingFunctions.setAttributes(update)
   }
 }
@@ -218,4 +240,20 @@ const updateDerivedAttribute = derivedAttribute => {
   })
 }
 
+const updateInitiativeDice = () => {
+  getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], values => {
+    const edgeFlag = values.edge_toggle === "@{edge}" ? true : false;
+    values = processingFunctions.shadowrun.processTempFlags(values)
+    values = processingFunctions.parseIntegers(values)
+    const bonus = processingFunctions.shadowrun.calculateBonuses(values)
+    const total = Math.min(values.bonus+1,5)
+    processingFunctions.setAttributes({
+      initiative_dice: edgeFlag ? 5 : total
+    })
+  })
+}
 
+const resetConditionTrack = eventinfo => {
+  const attr = eventinfo.triggerName.split("_").pop();
+  processingFunctions.setAttributes({[`${attr}`] : 0})
+}

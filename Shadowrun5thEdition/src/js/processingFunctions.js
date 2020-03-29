@@ -5,15 +5,19 @@ const processingFunctions = {
   convertIntegersNegatives: numbers => {
     for (let [key, value] of Object.entries(numbers)) {
       numbers[key] = processingFunctions.convertIntegerNegative(value);
-    }calculateConditionTracks
+    }
     return numbers
   },
   findRepeatingField: trigger => trigger.split('_')[1],
   //Roll20 does not allow for Promises
   //getAttributes: array => new Promise((resolve, reject) => array ? getAttrs(array, v => resolve(v)) : reject(errorMessage('Function failed'))),
-  getReprowid: trigger => {calculateConditionTracks
+  getReprowid: trigger => {
     const split = trigger.split('_');
     return `${split[0]}_${split[1]}_${split[2]}`
+  },
+  getReprowAttribute: key => {
+    const getReprowid = processingFunctions.getReprowid(key)
+    return key.split(`${getReprowid}_`)[1]
   },
   getTranslations: translationKeys => {
     let translations = {}
@@ -121,6 +125,14 @@ const processingFunctions = {
       attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
       return processingFunctions.shadowrun.calculateLimitTotal(Object.values(attrs))
     },
+    resetPrimaryArmor: () => {
+      const resetPrimary = new PrimaryArmor()
+      let update = {}
+      for (let [key, value] of Object.entries(resetPrimary)) {
+        update[key] = value
+      }
+      return update
+    },
     resetPrimaryWeapon: type => {
       const resetPrimary = type === 'range' ? new PrimaryRangeWeapon(type) : new PrimaryMeleeWeapon(type)
       let update = {}
@@ -129,12 +141,30 @@ const processingFunctions = {
       }
       return update
     },
+    updatePrimaryArmor: attrs => {
+      let update = {}
+
+      for (let [key, value] of Object.entries(attrs)) {
+        const repRowID = processingFunctions.getReprowid(key)
+        if (key.includes('name')) {
+          update['armor_name'] = attrs[`${repRowID}_name`]
+        } else if (key.includes('rating')) {
+          update['armor_rating'] = value
+        } else if (key.includes('dicepool_modifier')) {
+          update['soak_modifier'] = value
+        } else {
+          const type = key.split('_')[3]
+          update[`${type}_modifier`] = value
+        }
+      }
+
+      return update
+    },
     updatePrimaryWeapons: attrs => {
       let update = {}
       for (let [key, value] of Object.entries(attrs)) {
         const type = processingFunctions.findRepeatingField(key)
-        const getReprowid = processingFunctions.getReprowid(key)
-        const weaponAttribute = key.split(`${getReprowid}_`)[1]
+        const weaponAttribute = processingFunctions.getReprowAttribute(key)
         const primaryAttributeName = key.includes('weapon') ? `primary_${type}_weapon` : `primary_${type}_weapon_${weaponAttribute}`
         update[primaryAttributeName] = value
 
