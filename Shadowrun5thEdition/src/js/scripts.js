@@ -1,27 +1,5 @@
 
 
-	//Calculate Matrix Initiatve.
-	const updateMatrixInitiative = () => {
-		getAttrs(["sheet_type", "data_processing", "pilot", "intuition", "matrix_mod_modifier", "host_rating", "level", "matrix_dice_modifier", "edge_toggle"], v => {
-			const sheetType = v.sheet_type;
-			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
-
-			v = processingFunctions.parseIntegers(v);
-
-			let base = v.data_processing;
-			base += sheetType === "sprite" ? v.level : sheetType === "vehicle" ? v.pilot : sheetType === "host" ? v.host_rating : v.intuition;
-
-			const total = base + v.matrix_mod_modifier;
-
-			setAttrs({
-				["matrix_mod"]: total,
-				["matrix_dice"]: sheetType === "grunt" && edgeFlag ? 5 : sheetType === "grunt" && !edgeFlag ? 4 + v.matrix_dice_modifier : 4,
-				["display_matrix_mod"]: v.matrix_mod_modifier === 0 ? base : `${base} (${total})`
-			});
-		});
-	};
-
-
 //Weapon displays set into an Array
 	// Builder function to display details properly
 	// Note that since undefined are falsey if there's no label or sign we can leave the parameters blank
@@ -142,23 +120,6 @@
 		        });
 		    });
 		});
-
-   	//Setting the Default attribute name for default skill
-  	on("change:default_attribute", (eventinfo) => {
-  		getAttrs(["default_display"], v => {
-  			const display   = (v.default_display);
-  			let update      = {};
-
-  			//This sets a hidden input with the Attribute name so the roll template can use it to indicate what attribute was rolled
-  			const attribute   = eventinfo.newValue.slice(2, -1);
-  			const translation = getTranslationByKey(`${attribute}`);
-  			if (translation != display) {
-  				setAttrs({
-  					default_display: translation
-  				});
-  			};
-  		});
-  	});
 
 	   ['acceleration', 'armor', 'body', 'data_processing', 'handling', 'pilot', 'sensor','speed'].forEach(attr => {
 	        // Attach listener

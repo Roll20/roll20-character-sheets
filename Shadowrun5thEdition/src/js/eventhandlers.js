@@ -82,5 +82,5 @@
 
   on("change:host_rating", eventinfo => updateHostAttributes(eventinfo.newValue))
 
-
+  on("change:default_attribute", eventinfo => updateDefaultAttribute(eventinfo.newValue))
 
