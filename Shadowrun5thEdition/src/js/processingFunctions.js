@@ -93,7 +93,7 @@ const processingFunctions = {
     },
     determineConditionBase: (type, drone) => drone ? 6 : type === 'vehicle' ? 12 : 8,
     determineConditionAttribute: attrs => attrs.willpower ? attrs.willpower : attrs.body ? attrs.body : attrs.device_rating ? attrs.device_rating : 0,
-    determineWeaponAttributesByType: weaponType =>  weaponType === 'range' ? sheetAttributes.rangeAttributes : sheetAttributes.meleeAttribute,
+    determineWeaponAttributesByType: weaponType =>  weaponType === 'range' ? sheetAttributes.rangeAttributes : sheetAttributes.meleeAttributes,
     findFlagInKeys: attrs => Object.keys(attrs).find(key => key.includes('_flag')),
     findModifierInKeys: attrs => Object.keys(attrs).find(key => key.includes('_modifier')),
     processTempFlags: attrs => {
