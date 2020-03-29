@@ -19,9 +19,11 @@
       attributeArray.forEach(attr => on(`change:${attr}`, () => updateAttributes(attributeArray, attribute)))
   });
 
-  sheetAttributes.initiative_mod.forEach(attr => on(`change:${attr}`, () => updateAttributes(sheetAttributes.initiative_mod, 'initiative_mod')))
+  sheetAttributes.initiative.forEach(attr => on(`change:${attr}`, () => updateAttributes(sheetAttributes.initiative, 'initiative')))
 
-  sheetAttributes.astral_mod.forEach(attr => on(`change:${attr}`, () => updateAstralInitiative()))
+  sheetAttributes.initiative_passes.forEach(attr => on(`change:${attr}`, () => updateAttributes(sheetAttributes.initiative_passes, 'initiative_passes')))
+
+  sheetAttributes.astral_initiative.forEach(attr => on(`change:${attr}`, () => updateAstralInitiative()))
 
   sheetAttributes.derivedAttributes.forEach(derivedAttribute => {
     sheetAttributes[derivedAttribute].forEach(attr => on(`change:${attr}`, () => updateDerivedAttribute(derivedAttribute)))
@@ -58,11 +60,11 @@
 
 	on('change:intuition change:astral_mod_modifier', () => updateAstralInitiative())
 
-	on('change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag', () => updateInitiativeDice())
+	on('change:initiative_passes_modifier change:edge_toggle change:initiative_passes_temp change:initiative_passes_temp_flag', () => updateInitiativeDice())
 
 	on('change:astral_dice_modifier change:edge_toggle', () => updateAstralInitiativeDice())
 
-	on('change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle', () => updateMatrixInitiative())
+	on('change:host_rating change:data_processing change:pilot change:intuition change:matrix_initiative_modifier change:level change:matrix_dice_modifier change:edge_toggle', () => updateMatrixInitiative())
 
   on("clicked:cond_reset", () => resetNpcCondition()); 
 

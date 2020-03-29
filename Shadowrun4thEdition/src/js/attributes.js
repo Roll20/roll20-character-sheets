@@ -9,9 +9,10 @@ const sheetAttributes = {
   
   calculatedAttributes: ['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition','charisma','magic', 'resonance', 'attack', 'sleaze', 'data_processing', 'firewall'],
 
-  initiative_mod: ['reaction', 'intuition', 'initiative_mod_modifier', 'initiative_mod_temp', 'initiative_mod_temp_flag'],
-  astral_mod: ['intuition', 'astral_mod_modifier'],
-  matrix_mod: [],
+  initiative: ['reaction', 'intuition', 'initiative_modifier', 'initiative_temp', 'initiative_temp_flag'],
+  initiative_passes: ['initiative_passes_base', 'initiative_passes_modifier', 'initiative_passes_temp', 'initiative_passes_temp_flag'],
+  astral_initiative: ['intuition', 'astral_initiative_modifier'],
+  matrix_initiative: [],
 
   derivedAttributes: ['memory', 'composure', 'defense', 'soak', 'overflow', 'judge_intentions', 'lift_carry'],
   lift_carry: ['body', 'strength', 'lift_carry_modifier'],
@@ -33,8 +34,8 @@ const sheetAttributes = {
   matrixAttributes: ['attack', 'sleaze', 'data_processing', 'firewall'],
 
   weaponTypes: ['range', 'melee'],
-  rangeAttributes: ['dicepool', 'weapon', 'damage', 'acc', 'ap', 'skill', 'ammo', 'mode', 'recoil'],
-  meleeAttributes: ['dicepool', 'weapon', 'damage', 'acc', 'ap', 'skill', 'reach'],
+  rangeAttributes: ['dicepool', 'weapon', 'damage', 'ap', 'skill', 'ammo', 'mode', 'recoil'],
+  meleeAttributes: ['dicepool', 'weapon', 'damage', 'ap', 'skill', 'reach'],
 
   spellTypes: ['spell', 'preps', 'ritual', 'forms']
 }

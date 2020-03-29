@@ -4,7 +4,7 @@
 		const source = eventInfo.sourceAttribute;
 		const newV   = eventInfo.newValue;
 		const arm    = ["repeating_armor"];
-		const armors = [`${arm}_name`, `${arm}_rating`, `${arm}_acid_modifier`, `${arm}_electrical_modifier`, `${arm}_cold_modifier`,`${arm}_fire_modifier`, `${arm}_radiation_modifier`, `${arm}_dicepool_modifier`];
+		const armors = [`${arm}_name`, `${arm}_rating`, `${arm}_acid_modifier`, `${arm}_electrical_modifier`, `${arm}_laser_modifier`, `${arm}_gause_round_modifier`, `${arm}_cold_modifier`,`${arm}_fire_modifier`, `${arm}_radiation_modifier`, `${arm}_dicepool_modifier`];
 
 		//Check if the event was related to the primary flag & armor is set to primary
 		if (source.includes('primary') && newV === 'primary') {
@@ -48,12 +48,12 @@
 					switch (true) {
 						case /name/.test(source)      : update["armor_name"] = v[`${source}`]; break;
 						case /rating/.test(source)    : update["armor_rating"] = v[`${source}`]; break;
-						case /dicepool/.test(source)  : update["soak_modifier"] = v[`${source}`]; break;
-						case /acid/.test(source)      : update["acid_modifier"] = v[`${source}`]; break;
-						case /cold/.test(source)      : update["cold_modifier"] = v[`${source}`]; break;
-						case /electrical/.test(source): update["electrical_modifier"] = v[`${source}`]; break;
-						case /fire/.test(source)      : update["fire_modifier"] = v[`${source}`]; break;
-						case /radiation/.test(source) : update["radiation_modifier"] = v[`${source}`]; break;
+						case /dicepool/.test(source)  : update["soak"] = v[`${source}`]; break;
+						case /acid/.test(source)      : update["acid"] = v[`${source}`]; break;
+						case /cold/.test(source)      : update["cold"] = v[`${source}`]; break;
+						case /electrical/.test(source): update["electrical"] = v[`${source}`]; break;
+						case /fire/.test(source)      : update["fire"] = v[`${source}`]; break;
+						case /radiation/.test(source) : update["radiation"] = v[`${source}`]; break;
 						default: console.log(`Source  ${source} was invalid`);}
 
 					setAttrs(update);
@@ -64,49 +64,9 @@
 		};
 	});
 
-	const updateInitiativeDice = () => {
-		getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], values => {
-      console.log(values)
-			const edgeFlag = values.edge_toggle === "@{edge}" ? true : false;
-
-			values = processingFunctions.shadowrun.processTempFlags(values)
-			values = processingFunctions.parseIntegers(values)
-
-			const bonus = processingFunctions.shadowrun.calculateBonuses(values)
-      const total = Math.min(values.bonus+1,5);
-			setAttrs({
-				initiative_dice: edgeFlag ? 5 : total
-			});
-		});
-	};
-
-	//Calculate Astral Initiatve
-	const updateAstralInitiative = () => {
-		getAttrs(["intuition", "astral_mod_modifier"], v => {
-			v = processingFunctions.parseIntegers(v);
-			const base = v.intuition * 2, bonus = v.astral_mod_modifier, total = base + bonus;
-
-			setAttrs({
-				["astral_mod"]: total,
-				["display_astral_mod"]: bonus === 0 ? base : `${base} (${total})`
-			});
-		});
-	};
-
-	const updateAstralInitiativeDice = () => {
-		getAttrs(["astral_dice_modifier", "edge_toggle"], v => {
-			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
-			const bonus = parseInt(v.astral_dice_modifier) || 0;
-
-			setAttrs({
-				astral_dice: edgeFlag ? 5 : Math.min(bonus+3,5)
-			});
-		});
-	};
-
 	//Calculate Matrix Initiatve.
 	const updateMatrixInitiative = () => {
-		getAttrs(["sheet_type", "data_processing", "pilot", "intuition", "matrix_mod_modifier", "host_rating", "level", "matrix_dice_modifier", "edge_toggle"], v => {
+		getAttrs(["sheet_type", "data_processing", "pilot", "intuition", "matrix_initiative_modifier", "host_rating", "level", "matrix_dice_modifier", "edge_toggle"], v => {
 			const sheetType = v.sheet_type;
 			const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
 
@@ -115,12 +75,11 @@
 			let base = v.data_processing;
 			base += sheetType === "sprite" ? v.level : sheetType === "vehicle" ? v.pilot : sheetType === "host" ? v.host_rating : v.intuition;
 
-			const total = base + v.matrix_mod_modifier;
+			const total = base + v.matrix_initiative_modifier;
 
 			setAttrs({
-				["matrix_mod"]: total,
-				["matrix_dice"]: sheetType === "grunt" && edgeFlag ? 5 : sheetType === "grunt" && !edgeFlag ? 4 + v.matrix_dice_modifier : 4,
-				["display_matrix_mod"]: v.matrix_mod_modifier === 0 ? base : `${base} (${total})`
+				["matrix_initiative"]: total,
+				["display_matrix_initiative"]: v.matrix_initiative_modifier === 0 ? base : `${base} (${total})`
 			});
 		});
 	};
@@ -151,7 +110,7 @@
 
 	on("change:repeating_weapon", () => {
 		const source = "repeating_weapon_weapon";
-	    getAttrs([`${source}_range`, `${source}_type`, `${source}_reach`, `${source}_acc`, `${source}_dv`, `${source}_ap`, `${source}_mode`, `${source}_rc`, `${source}_ammo`, `${source}_note`, `${source}_primary`], (v) => {
+	    getAttrs([`${source}_range`, `${source}_type`, `${source}_reach`, `${source}_dv`, `${source}_ap`, `${source}_mode`, `${source}_rc`, `${source}_ammo`, `${source}_note`, `${source}_primary`], (v) => {
 	        // Local builder putting the needed variables into scope for repeatingStringBuilder
 	        const b = repeatingStringBuilder(v, `${source}_`);
 	        // Determine fields to display and in their proper order and formatting
@@ -164,7 +123,6 @@
 	                const ammo = b('amm');
 	                return [
 	                    b('type'),
-	                    b('acc', 'ACC'),
 	                    b('dv', 'DV'),
 	                    b('ap', 'AP', true),
 	                    b('mode'),
@@ -175,14 +133,12 @@
 	                case '1': return [
 	                    b('type'),
 	                    b('reach', 'Reach', true),
-	                    b('acc', 'ACC'),
 	                    b('dv', 'DV'),
 	                    b('ap', 'AP', true),
 	                    b('note')
 	                ];
 	                default: return [
 	                    b('type'),
-	                    b('acc', 'ACC'),
 	                    b('dv', 'DV'),
 	                    b('ap', 'AP', true),
 	                    b('note')

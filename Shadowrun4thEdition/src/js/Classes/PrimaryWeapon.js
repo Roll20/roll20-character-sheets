@@ -4,7 +4,6 @@ class PrimaryWeapon {
     this[`primary_${type}_weapon_skill`] = type === 'range' ?  '@{firearms}' : '@{closecombat}',
     this[`primary_${type}_weapon_damage`] = '',
     this[`primary_${type}_weapon_dicepool`] = '',
-    this[`primary_${type}_weapon_acc`] = '',
     this[`primary_${type}_weapon_ap`] = ''
   }
 }

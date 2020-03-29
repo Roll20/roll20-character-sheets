@@ -113,7 +113,6 @@ include src/pug/_variables.pug
                       span(data-i18n='notes') Notes
                       textarea(name='attr_notes' value='' placeholder='Notes' title=`${skillsRepeatingSection}_notes}`)
 
-
   //- CORE TAB
   .core.pc-col
     include src/html/core.html
@@ -162,7 +161,6 @@ include src/pug/_variables.pug
                   input(name="attr_style" placeholder="style name" title="@{repeating_martial_${x}_style}" type="text")
                   +repeatingSectionNotes('martial')
 
-
   //- ARMS TAB
   .arms.pc-col
     .pc-row.weapons
@@ -190,7 +188,7 @@ include src/pug/_variables.pug
               input(name='attr_dicepool' type='hidden' value='0')
               input.flag-primary(name='attr_primary' type='hidden' value='')
               +weaponRollButton(pcRangeWeaponButton)
-              each val in ['Dam', 'Acc', 'AP', 'Mode', 'RC', 'Ammo']
+              each val in ['Dam', 'AP', 'Mode', 'RC', 'Ammo']
                 - const attrName = val === 'Dam' ? 'damage' : val === 'RC' ? 'recoil' : val.toLowerCase();
                 if val === 'Mode'
                   select(name='attr_mode' title='@{mode}' value='BF')
@@ -224,7 +222,7 @@ include src/pug/_variables.pug
                   h3(data-i18n='skill') skill
                   select(name=`attr_skill` title=`${rangeRepeatingSection}_skill}` value='@{firearms}')
                     optgroup(label='Combat Skills' ) Combat Skills
-                      option(data-i18n='firearms' value='@{firearms}' selected) Firearms Group
+                      option(data-i18n='firearmsgroup' value='@{firearms}' selected) Firearms Group
                       option(data-i18n='automatics' value='@{automatics}') Automatics
                       option(data-i18n='archery' value='@{archery}') Archery
                       option(data-i18n='exoticrange' value='0') Exotic Range
@@ -251,7 +249,7 @@ include src/pug/_variables.pug
               input(name='attr_dicepool' type='hidden' value='0')
               input.flag-primary(name='attr_primary' type='hidden' value='')
               +weaponRollButton(pcMeleeWeaponButton)
-              each val in ['Dam', 'Acc', 'AP', 'Reach']
+              each val in ['Dam', 'AP', 'Reach']
                 - const attrName = val === 'Dam' ? 'damage' : val.toLowerCase();
                 span.center(name=`attr_${attrName}`)
               +repeatingSectionFlags()
@@ -293,31 +291,50 @@ include src/pug/_variables.pug
           .rows.repeating-container
             - const armorRepeatingSection = '@{repeating_armor_${x}';
             .row-long.headers
-              each val in ['Armor', 'Rating', 'Acid', 'Cold', 'Elec', 'Fire', 'Radi']
+              each val in ['Armor', 'Ballastic', 'Impact']
                 h2(data-i18n=`${val.toLowerCase()}`) #{val}
             fieldset(class='repeating_armor')
               input.flag-primary(name='attr_primary' type='hidden' value='')
-              button(name=`roll_soak` type='roll' value!=noWoundsRollBegining+'{{header=^{soak}}}{{base=^{body} ♦ ^{armor}}}{{dice=[[((@{body}+@{rating}+@{dicepool_modifier})'+noWoundsRollEnding)
-                span(name='attr_name')
-              button(name=`roll_armor` type='roll' value!=noWoundsRollBegining+'{{header=@{name}}}{{base= ^{armor}}}{{dice=[[((@{rating})'+noWoundsRollEnding)
-                span.center(name='attr_rating')
-              each val in ['Acid', 'Cold', 'Electrical', 'Fire', 'Radiation']
+              .primary.eclipse
+                span.bold(name='attr_name')
+              each val in armorTypes
                 - const attrName = val.toLowerCase();
-                button(name=`roll_${attrName}` type='roll' value!=noWoundsRollBegining+`{{header=^{${attrName}protection}}}{{base= ^{armor}}}{{dice=[[((@{body}+@{rating}+@{dicepool_modifier}+@{${attrName}_modifier})`+noWoundsRollEnding)
-                  span.center(name=`attr_${attrName}_modifier`)
-              +repeatingSectionFlags()
+                button(name=`roll_${attrName}` type='roll' value!=noWoundsRollBegining+`{{header=@{name}}}{{base= ^{armor}}}{{dice=[[((@{${attrName}}+@{body}+@{modifier})`+noWoundsRollEnding)
+                  span.center(name=`attr_${attrName}`)
+              input.collapse-flag(name='attr_display_flag' type='checkbox')
+              span.pictos i
+              input.settings-flag(name='attr_flag' title='Settings toggle' type='checkbox' checked)
+              span.pictos x
+              .collapse
+                each val in armorProtections
+                  - const attrName = val.toLowerCase().replace(' ', '_');
+                  - const datai18n = val === 'Gause Round' ? 'Gause Round' : `${attrName}protection`;
+                  input(type='hidden' name=`attr_${attrName}`)
+                  button(data-i18n=datai18n name=`roll_${attrName}` type='roll' value!=noWoundsRollBegining+`{{header=^{${attrName}}}}{{base=^{armor}}}{{dice=[[((@{${attrName}}+@{body}+@{modifier}+@{${attrName}})`+noWoundsRollEnding)
+                .row
+                  span(name='attr_notes')
               .settings
-                each val, key in pcArmorObject
-                  - const attrName = key === 'Name' || key === 'Rating' ? key.toLowerCase() : `${key.toLowerCase()}_modifier`;
-                  label(data-i18n-title=key.toLowerCase() title=key.toLowerCase())
-                    input(name=`attr_${attrName}` placeholder=val['placeholder'] title=`@{repeating_armor_`+'${x}'+`_${attrName}}` type=val['type'] value='')
+                label(data-i18n-title='name' title='name')
+                    input(name='attr_name' placeholder='Armor Jacket' title=`@{${armorRepeatingSection}_name}` type='text' value='')
+                each val in armorTypes
+                  - const attrName = val.toLowerCase();
+                  label(data-i18n-title=val)
+                      input(name=`attr_${attrName}` placeholder='9' title=`@{${armorRepeatingSection}_${attrName}}` type='text' value='')
+                .row
+                  each val in armorProcAbbrev
+                    h2.center(data-i18n=val) #{val}
+                .row
+                  each val in armorProtections
+                    - const attrName = val.toLowerCase().replace(' ', '_');
+                    label.protections(data-i18n-title=val)
+                      input(name=`attr_${attrName}_modifier` placeholder=0 title=`@{${armorRepeatingSection}_${attrName}_modifier}` type=number value='0')
                 .row
                   h3(data-i18n='primary') primary
                   label(data-i18n-title='primary' title='Primary')
                     input(name='attr_primary' type='checkbox' title=`${armorRepeatingSection}_primary}`  value='primary')
                   h3(data-i18n='modifier') modifier
                   label(data-i18n-title='modifier' title='modifier')
-                    input(name='attr_dicepool_modifier' placeholder='0' title=`${armorRepeatingSection}_dicepool_modifier}` type='number' value='0')
+                    input(name='attr_modifier' placeholder='0' title=`${armorRepeatingSection}_modifier}` type='number' value='0')
                 +repeatingSectionNotes('armor')
 
   //- AUGS TAB
@@ -535,7 +552,7 @@ include src/pug/_variables.pug
                 .row
                   h3(data-i18n='skill') skill
                   select(name=`attr_skill` title=`${formsrepeatingSection}_skill}` value='@{software}')
-                    option(data-i18n='electronicsgroup' value='@{electronics}') Electronics Group
+                    option(data-i18n='Electronics Group' value='@{electronics}') Electronics Group
                     option(data-i18n='software' value='@{software}' selected) Software
                   h3(data-i18n='specialization')
                   label(data-i18n-title='specialization' title='specialization')

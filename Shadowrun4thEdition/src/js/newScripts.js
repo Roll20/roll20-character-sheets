@@ -187,3 +187,15 @@ const updateDerivedAttribute = derivedAttribute => {
 }
 
 
+//Calculate Astral Initiatve
+const updateAstralInitiative = () => {
+  getAttrs(["intuition", "astral_initiative_modifier"], v => {
+    v = processingFunctions.parseIntegers(v);
+    const base = v.intuition * 2, bonus = v.astral_initiative_modifier, total = base + bonus;
+
+    setAttrs({
+      ["astral_initiative"]: total,
+      ["display_astral_initiative"]: bonus === 0 ? base : `${base} (${total})`
+    });
+  });
+};
