@@ -12,7 +12,7 @@
 				span.slider
 		button(name='d6' title='Roll D6s' type='roll' value='@{gm_toggle} &{template:rolls}{{header=^{d6}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5)]]}}') L
 		select(name='attr_sheet_type' title='Sheet Type' value='pc')
-			each val in ['Grunt', 'Host', 'Sprite', 'Vehicle', 'PC']
+			each val in sheetTypes
 				- const attrName = val.toLowerCase();
 				if val === 'PC'
 					option(value=attrName data-i18n=attrName selected) #{val}
@@ -134,36 +134,33 @@
 					label(data-i18n-title="damage compensators stun")
 						input(type="number" min="0" name="attr_damage_compensators_stun" value="" placeholder="2" title="@{damage_compensators_stun}")
 
-
-			//- MATRIX ATTRIBUTES
-			.rows.vehicle
-				each val, key in {'Data Processing': ['data_processing', 'data_processing'], 'Firewall': ['firewall', 'firewall'], 'Device Rating': ['device_rating', 'devicerating']}
-					.rows
-						h2(data-i18n=val[1]) key
-						label.settings(data-i18n-title=val[1] title=val[1]) 
-							input(name='attr_'+val[0] min='0' placeholder='0' title='@{'+val[0]+'}' type='number' value='')
-						span.settings.tiny-span() =
-						span(name='attr_'+val[0])
-
-		//- MODIFIERS				
-		.column
-			h1.settings(data-i18n='modifier') Modifier
 			.rows
-				+rollButton('armorrating', 'base', '@{armor_rating}')
-				label.settings(data-i18n-title='armorrating' title='armorrating')
-					input(name='attr_armor_rating' placeholder='9' title='@{armor_rating}' type='number' value='0')
+				h2(data-i18n='soak') soak
+				label.settings(data-i18n-title='soak')
+					input(name=`attr_soak_modifier` placeholder='0' title=`@{soak_modifier}` type='number' value='0')
+				span.settings.tiny-span() =
+				span(name=`attr_soak_modifier`)
 			.rows
 				+rollButton('defense', 'base', '@{defense}')
 				label.settings(data-i18n-title='defense' title='defense')
 					input(name='attr_defense_modifier' placeholder='9' title='@{defense_modifier}' type='number' value='0')
-			each val, key in {'Soak': ['soak', 'soak'], 'Acid Protection': ['acid', 'Acid Protection'], 'Cold Protection': ['cold', 'Cold Protection'], 'Electrical Protection': ['electrical', 'Electrical Protection'], 'Fire Protection': ['fire', 'Fire Protection'], 'Radiation Protection': ['radiation', 'Radiation Protection']}
+
+		//- MODIFIERS				
+		.column
+			h1.settings(data-i18n='modifier') Modifier
+			each val in ['Ballistic', 'Impact']
+				- const attrName = val.toLowerCase();
 				.rows
-					+rollButton(key, 'base', '@{soak}+@{'+val[0]+'_modifier}')
-					label.settings(data-i18n-title=key title=key)
-						input(name='attr_'+val[0]+'_modifier' placeholder='0' title='@{'+val[0]+'_modifier}' type='number' value='0')
-					if (key === 'Soak')
-						span.settings.tiny-span() =
-						span(name=`attr_${val[0]}`)
+					+rollButton(val, 'base', `@{${attrName}}+@{soak}`)
+					label.settings(data-i18n-title=val)
+						input(name=`attr_${val}` placeholder='9' title=`@{${attrName}}` type='number' value='0')
+			each val in armorProtectionsInputs
+				.rows
+					- const attrName = val.toLowerCase();
+					+rollButton(`${val} Protection`, 'base', `(@{impact}/2)+@{${val}_modifier}+@{soak}`)
+					label.protections(data-i18n-title=val)
+						input(name=`attr_${attrName}_modifier` placeholder='0' title=`@{${armorRepeatingSection}_${attrName}_modifier}` type='number' value='0')
+
 
 		///- OPTIONS
 		.column
@@ -174,10 +171,6 @@
 					label.settings(data-i18n-title=val[0] title=val[0])
 						input.character-type(name='attr_flag_special' title='@{flag_special}' type='radio' value=val[1])
 						h2(data-i18n=val[0]) key
-			.rows.host.grunt.vehicle
-				label.settings(data-i18n-title=matrixdevice title='Matrix Device')
-					input.character-type(name='attr_flag_matrix' title='@{flag_matrix}' type='checkbox' value='matrix')
-					h2(data-i18n=matrixdevice) Matrix Device
 			.rows.vehicle
 				label.settings(data-i18n-title=drone title='Drone')
 					input.character-type(name='attr_flag_drone' title='@{flag_drone}' type='checkbox' value='drone')
@@ -401,43 +394,3 @@
 							label(data-i18n-title=translationKey title=key)
 								input(name='attr_IC_'+attrName placeholder=val['placeholder'] title='@{repeating_IC_${x}_'+`${attrName}}` type=val['type'])
 
-	//- MATRIX DEVICE
-	input(name='attr_flag_matrix' type='hidden' value='')
-	.matrix.body.matrix-device
-		.rows
-			h1(data-i18n='matrixdevice') Matrix Device
-			label(data-i18n-title='device' title='device')
-				input(name='attr_device_name' placeholder='Sony CIY-720' type='text')
-			button(data-i18n='devicerating' name='device rating' value!=rollBeginging+'{{header=Matrix Resistance}}{{base=^{base}}}{{dice=[[((@{device_rating}+@{firewall})'+rollEnding type='roll') Device Rating
-			label.round(data-i18n-title='devicerating' title='devicerating')
-				input(name='attr_device_rating' placeholder='4' type='number' value='')
-		
-		each val in ['Attack', 'Sleaze', 'Data Processing', 'Firewall']
-			- const attrName = val === 'Data Processing' ? 'data_processing' : val.toLowerCase();
-			- const matrixClass = val === 'Data Processing' ? 'Data' : val;
-			.rows
-				button(data-i18n=attrName name=val value!='&{template:rolls}{{header=^{'+attrName+'}}}{{base=^{base}}}{{dice=[[(@{'+attrName+'}+(?{Attribute|Willpower,@{willpower}|Logic,@{logic}|Intuition,@{intuition}})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}' type='roll') #{val}
-				.matrix-bubble(class=`matrix${matrixClass}`)
-					- let i = 1;
-					while i < 21
-						input(name=`attr_${attrName}` value=i++ type='radio')
-						span
-				label.round(data-i18n-title=attrName title=attrName)
-					input(name=`attr_${attrName}` placeholder='4' type='number' value='')
-		.rows.repeating
-			h1(data-i18n='programs') Programs
-			fieldset(class='repeating_programs')
-				input.toggle(name='attr_flag' title='Settings toggle' type='checkbox' checked)
-				span.pictos x
-				input.toggle(name='attr_program_on' type='checkbox' checked)
-				span.pictos Q
-				button(name='roll_program' type='roll' value='@{gm_toggle} &{template:rolls}{{header=@{program}}}{{desc=@{program_note}}}')
-					span(name='attr_program')
-				span(name='attr_program_note')
-				.settings
-					h2(data-i18n='name') name
-					label(data-i18n-title='name' title='name')
-						input(name='attr_program' placeholder='Program Name' title='@{repeating_programs_${x}_program}' type='text' value='')
-					h2(data-i18n='notes') notes
-					label(data-i18n-title='notes' title='notes')
-						textarea(name='attr_program_note' placeholder='Program Description' title='@{repeating_programs_${x}_program_note}' type='text' value='')
