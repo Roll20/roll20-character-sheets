@@ -292,5 +292,3 @@ describe('Shadowrun updatePrimaryWeapons', () => {
     assert.deepStrictEqual(actual, {"primary_range_weapon_ammo": 12, "primary_range_weapon_ammo_max": 12})
   })
 })
-
-
