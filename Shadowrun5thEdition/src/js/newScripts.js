@@ -33,11 +33,18 @@ const updateSpellsDicepool = eventinfo => {
 
 const resetNpcCondition = () => setAttributes({physical: 0, stun: 0, matrix: 0})
 
-const updatePrimaryWeapon = eventinfo => {
+const updatePrimary = eventinfo => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
   getAttrs([`${repRowID}_primary`], attrs => {
     if (attrs[`${repRowID}_primary`] === 'primary') {
-      let update = processingFunctions.shadowrun.updatePrimaryWeapons({[eventinfo.triggerName]: eventinfo.newValue})
+      let update = {}
+
+      if (repRowID.includes('armor')) {
+        update = processingFunctions.shadowrun.updatePrimaryArmor({[eventinfo.triggerName]: eventinfo.newValue})
+      } else {
+        update = processingFunctions.shadowrun.updatePrimaryWeapons({[eventinfo.triggerName]: eventinfo.newValue})
+      }
+
       processingFunctions.setAttributes(update)
     }
   })
@@ -54,6 +61,21 @@ const updateRepeatingWeaponPrimary = (eventinfo, type) => {
     processingFunctions.shadowrun.resetRepeatingFieldsPrimaries(`repeating_${type}`, repRowID)
   } else {
     const update = processingFunctions.shadowrun.resetPrimaryWeapon(type)
+    processingFunctions.setAttributes(update)
+  }
+}
+
+const updateRepeatingArmorPrimary = eventinfo => {
+  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+  if (eventinfo.newValue === 'primary') {
+    const constructedArmorAttributes = processingFunctions.shadowrun.addRepRow(repRowID, sheetAttributes.armorAttributes)
+    getAttrs(constructedArmorAttributes, attrs => { 
+      const update = processingFunctions.shadowrun.updatePrimaryArmor(attrs)
+      processingFunctions.setAttributes(update)
+    })
+    processingFunctions.shadowrun.resetRepeatingFieldsPrimaries(`repeating_armor`, repRowID)
+  } else {
+    const update = processingFunctions.shadowrun.resetPrimaryArmor()
     processingFunctions.setAttributes(update)
   }
 }
@@ -95,7 +117,6 @@ const updateRepeatingSkillLimit = eventinfo => {
 const updateRepeatingSkillName = eventinfo => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
   const translationKey = eventinfo.newValue.replace(/ /g, '').toLowerCase()
-  console.log(translationKey)
   const translation = getTranslationByKey(translationKey);
   processingFunctions.setAttributes({
     [`${repRowID}_display_skill`]: translation
@@ -219,4 +240,57 @@ const updateDerivedAttribute = derivedAttribute => {
   })
 }
 
+const updateInitiativeDice = () => {
+  getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], values => {
+    const edgeFlag = values.edge_toggle === "@{edge}" ? true : false;
+    values = processingFunctions.shadowrun.processTempFlags(values)
+    values = processingFunctions.parseIntegers(values)
+    const bonus = processingFunctions.shadowrun.calculateBonuses(values)
+    const total = Math.min(values.bonus+1,5)
+    processingFunctions.setAttributes({
+      initiative_dice: edgeFlag ? 5 : total
+    })
+  })
+}
+
+const resetConditionTrack = eventinfo => {
+  const attr = eventinfo.triggerName.split("_").pop();
+  processingFunctions.setAttributes({[`${attr}`] : 0})
+}
+
+//Calculate Matrix Initiatve.
+const updateMatrixInitiative = () => {
+  getAttrs(["sheet_type", "data_processing", "pilot", "intuition", "matrix_mod_modifier", "host_rating", "level", "matrix_dice_modifier", "edge_toggle"], v => {
+    const sheetType = v.sheet_type;
+    const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
+
+    v = processingFunctions.parseIntegers(v);
+
+    let base = v.data_processing;
+    base += sheetType === "sprite" ? v.level : sheetType === "vehicle" ? v.pilot : sheetType === "host" ? v.host_rating : v.intuition;
+
+    const total = base + v.matrix_mod_modifier;
+
+    setAttrs({
+      ["matrix_mod"]: total,
+      ["matrix_dice"]: sheetType === "grunt" && edgeFlag ? 5 : sheetType === "grunt" && !edgeFlag ? 4 + v.matrix_dice_modifier : 4,
+      ["display_matrix_mod"]: v.matrix_mod_modifier === 0 ? base : `${base} (${total})`
+    })
+  })
+}
+
+//Setting the Default attribute name for default skill
+const updateDefaultAttribute = newValue => {
+  getAttrs(["default_display"], value => {
+    const display   = value.default_display
+    let update      = {};
+
+    //This sets a hidden input with the Attribute name so the roll template can use it to indicate what attribute was rolled
+    const attribute   = processingFunctions.sliceAttr(newValue)
+    const translation = getTranslationByKey(`${attribute}`)
+    if (translation != display) {
+      processingFunctions.setAttributes({default_display: translation})
+    }
+  })
+}
 

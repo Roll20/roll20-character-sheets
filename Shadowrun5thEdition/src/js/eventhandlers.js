@@ -50,9 +50,13 @@
     on(`change:repeating_${type}:primary`, eventinfo => updateRepeatingWeaponPrimary(eventinfo, type))
   })
 
-  sheetAttributes.rangeAttributes.forEach(attr => on(`change:repeating_range:${attr}`, eventinfo => updatePrimaryWeapon(eventinfo)))
+  sheetAttributes.rangeAttributes.forEach(attr => on(`change:repeating_range:${attr}`, eventinfo => updatePrimary(eventinfo)))
 
-  sheetAttributes.meleeAttributes.forEach(attr => on(`change:repeating_melee:${attr}`, eventinfo => updatePrimaryWeapon(eventinfo)))
+  sheetAttributes.meleeAttributes.forEach(attr => on(`change:repeating_melee:${attr}`, eventinfo => updatePrimary(eventinfo)))
+
+  sheetAttributes.armorAttributes.forEach(attr => on(`change:repeating_armor:${attr}`, eventinfo => updatePrimary(eventinfo)))
+
+  on("change:repeating_armor:primary", eventinfo => updateRepeatingArmorPrimary(eventinfo))
 
   on(`change:repeating_active:skill`, eventinfo => updateRepeatingSkillName(eventinfo))
 
@@ -77,4 +81,6 @@
   on("change:level", eventinfo => updateSpriteConditionTrack(eventinfo.newValue))
 
   on("change:host_rating", eventinfo => updateHostAttributes(eventinfo.newValue))
+
+  on("change:default_attribute", eventinfo => updateDefaultAttribute(eventinfo.newValue))
 
