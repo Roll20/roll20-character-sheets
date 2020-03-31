@@ -103,6 +103,15 @@
 			<input type="checkbox" title="@{setting_npc_afflictions}" name="attr_setting_npc_afflictions" value="1">
 			<span data-i18n="NPC_AFFLICTIONS">NPC afflictions</span>
 		</label>
+		<label class="sheet-40">
+			<input type="checkbox" title="@{setting_roll_weapon_damage}" name="attr_setting_roll_weapon_damage" value="1" checked>
+			<span data-i18n="ROLL_WEAPON_DAMAGE">Roll weapon damage</span>
+		</label>
+		<input type="hidden" name="attr_setting_roll_weapon_damage" class="sheet-weapon-damage-setting" value="1">
+		<label class="sheet-60">
+			<input type="checkbox" title="@{setting_show_damage_button}" name="attr_setting_show_damage_button" value="1">
+			<span data-i18n="SHOW_DAMAGE_BUTTON_INSTEAD">Show damage button instead</span>
+		</label>
 		<label>
 			<input type="checkbox" title="@{setting_versus_freeform}" name="attr_setting_versus_freeform" value="1">
 			<span data-i18n="SHOW_VERSUS_TEXT">Show a text field instead of dropdown for "Against" fields</span>
@@ -283,7 +292,7 @@
 			</label>
 		</div>
 		<div class="sheet-middle-col">
-			<div>
+			<div class="sheet-afflictions-header">
 				<span data-i18n="AFFLICTIONS">Afflictions</span>
 				<input type="hidden" name="attr_banes_from_afflictions" class="sheet-hider-numeric" value="0">
 				<span title="banes_from_afflictions" class="sheet-bracketed-space">
@@ -388,6 +397,11 @@
 					<div data-i18n="UNCONSCIOUS_DESC">Cannot use actions or move. Challenge rolls fail. Defense becomes 5.</div>
 				</label>
 			</div>
+			<label class="sheet-pseudo-button sheet-rest">
+				<input type="checkbox" title="@{rest}" name="attr_rest" value="1">
+				<span data-i18n="REST">Rest</span>
+				<span data-i18n="RESTED!">Rested!</span>
+			</label>
 		</div>
 		<div class="sheet-right-col">
 			<label>
@@ -423,7 +437,8 @@
 					</label>
 					<div class="sheet-flex-row">
 						<input type="hidden" name="attr_weapon_against_display" value="">
-						<button type="roll" name="roll_Attack" title="%{@{character_id}|repeating_weapons_$X_Attack}" value="@{output_option} &{template:sotdl} @{setting_show_name} {{title=@{weapon_name}}} {{showroll=1}} {{roll-label=^{ATTACK}}} {{roll=[[@{die_attack} + @{weapon_mod} + [[@{boons_banes_query} + @{weapon_boons} + @{global_attack_boons} + @{global_weapon_attack_boons} - @{banes_from_afflictions}]]@{die_boon}k1[boons/banes]]]}} {{boons=[[@{boons_banes_query} + @{weapon_boons} + @{global_attack_boons} + @{global_weapon_attack_boons} - @{banes_from_afflictions}]]}} {{damage=@{weapon_damage}}} {{damageroll=[[0@{weapon_damage} + @{global_damage_bonus}[global bonus]]]}} {{versus=@{weapon_against}}} {{roll20plus=@{weapon_roll20plus}}} {{description=@{weapon_description}}}"></button>
+						<input type="hidden" name="attr_weapon_damage_formula" value="">
+						<button type="roll" name="roll_Attack" title="%{@{character_id}|repeating_weapons_$X_Attack}" value="@{output_option} &{template:sotdl} @{setting_show_name} {{title=@{weapon_name}}} {{showroll=1}} {{roll-label=^{ATTACK}}} {{roll=[[@{die_attack} + @{weapon_mod} + [[@{boons_banes_query} + @{weapon_boons} + @{global_attack_boons} + @{global_weapon_attack_boons} - @{banes_from_afflictions}]]@{die_boon}k1[boons/banes]]]}} {{boons=[[@{boons_banes_query} + @{weapon_boons} + @{global_attack_boons} + @{global_weapon_attack_boons} - @{banes_from_afflictions}]]}} @{weapon_damage_formula} {{versus=@{weapon_against}}} {{roll20plus=@{weapon_roll20plus}}} {{description=@{weapon_description}}}"></button>
 						<input type="text" spellcheck="false" class="sheet-name" title="@{repeating_weapons_$X_weapon_name}" name="attr_weapon_name">
 						<select title="@{repeating_weapons_$X_weapon_attribute}" name="attr_weapon_attribute" class="sheet-mod">
 							<option value="strength" data-i18n="STRENGTH" selected>Strength</option>
@@ -457,7 +472,7 @@
 					</div>
 				</div>
 				<div class="sheet-display">
-					<button type="roll" name="roll_Attack" title="%{@{character_id}|repeating_weapons_$X_Attack}" class="sheet-invisible-button" value="@{output_option} &{template:sotdl} @{setting_show_name} {{title=@{weapon_name}}} {{showroll=1}} {{roll-label=^{ATTACK}}} {{roll=[[@{die_attack} + @{weapon_mod} + [[@{boons_banes_query} + @{weapon_boons} + @{global_attack_boons} + @{global_weapon_attack_boons} - @{banes_from_afflictions}]]@{die_boon}k1[boons/banes]]]}} {{boons=[[@{boons_banes_query} + @{weapon_boons} + @{global_attack_boons} + @{global_weapon_attack_boons} - @{banes_from_afflictions}]]}} {{damage=@{weapon_damage}}} {{damageroll=[[0@{weapon_damage} + @{global_damage_bonus}[global bonus]]]}} {{versus=@{weapon_against}}} {{roll20plus=@{weapon_roll20plus}}} {{description=@{weapon_description}}}"></button>
+					<button type="roll" name="roll_Attack" title="%{@{character_id}|repeating_weapons_$X_Attack}" class="sheet-invisible-button" value="@{output_option} &{template:sotdl} @{setting_show_name} {{title=@{weapon_name}}} {{showroll=1}} {{roll-label=^{ATTACK}}} {{roll=[[@{die_attack} + @{weapon_mod} + [[@{boons_banes_query} + @{weapon_boons} + @{global_attack_boons} + @{global_weapon_attack_boons} - @{banes_from_afflictions}]]@{die_boon}k1[boons/banes]]]}} {{boons=[[@{boons_banes_query} + @{weapon_boons} + @{global_attack_boons} + @{global_weapon_attack_boons} - @{banes_from_afflictions}]]}} @{weapon_damage_formula} {{versus=@{weapon_against}}} {{roll20plus=@{weapon_roll20plus}}} {{description=@{weapon_description}}}"></button>
 					<input type="hidden" name="attr_weapon_boons_display" value="">
 					<span class="sheet-name sheet-space-after" name="attr_weapon_name"></span>
 					<input type="hidden" name="attr_weapon_properties" class="sheet-hider" value="">
@@ -472,6 +487,7 @@
 					<span class="sheet-bracketed" name="attr_weapon_damage"></span>
 					<span class="sheet-space-before-nonempty" name="attr_weapon_against_display"></span>
 				</div>
+				<button type="roll" style="display:none" name="roll_damage" value="@{output_option} &{template:sotdl} {{damage=1}} {{damageroll=[[@{weapon_damage} + @{global_damage_bonus}[global bonus] + ?{Bonus damage|0}]]}}"></button>
 			</fieldset>
 		</div>
 		<div class="sheet-right-col">
@@ -672,10 +688,11 @@
 				<input type="hidden" name="attr_talent_attack_formula" value="0">
 				<input type="hidden" name="attr_talent_boons_formula" value="">
 				<div class="sheet-display-header">
-					<span name="attr_talent_name"></span>
-					<input type="number" name="attr_talent_uses" class="sheet-uses sheet-uses-display" min="0" value="0">
-					<span class="sheet-uses-display">/</span>
-					<span name="attr_talent_uses_max" class="sheet-uses-display">1</span>
+					<span class="sheet-name" name="attr_talent_name"></span>
+					<div class="sheet-header-rest">
+						<input type="number" name="attr_talent_uses" class="sheet-uses sheet-uses-display" min="0" value="0">
+						<span class="sheet-uses-display">/</span>
+						<span name="attr_talent_uses_max" class="sheet-uses-display">1</span></div>
 				</div>
 				<div class="sheet-display-text">
 					<div class="sheet-description sheet-linebreak"><span name="attr_talent_description"></span></div>
@@ -876,13 +893,14 @@
 				<input type="hidden" name="attr_spell_boons_formula" value="">
 				<input type="hidden" name="attr_spell_sacrifice_query" value="">
 				<div class="sheet-display-header">
-					<span name="attr_spell_name"></span>
-					<span name="attr_spell_tradition"></span>
-					<span name="attr_spell_type" data-i18n-dynamic></span>
-					<span name="attr_spell_rank"></span>
-					<input type="number" name="attr_spell_castings" class="sheet-uses" min="0" value="0">
-					<span>/</span>
-					<span name="attr_spell_castings_max">1</span>
+					<span class="sheet-name" name="attr_spell_name"></span>
+					<div class="sheet-header-rest">
+						<span name="attr_spell_tradition"></span>
+						<span name="attr_spell_type" data-i18n-dynamic></span>
+						<span name="attr_spell_rank"></span>
+						<input type="number" name="attr_spell_castings" class="sheet-uses" min="0" value="0">
+						<span>/</span>
+						<span name="attr_spell_castings_max">1</span></div>
 				</div>
 				<div class="sheet-display-info">
 					<div class="sheet-requirement">
@@ -945,66 +963,68 @@
 <div class="sheet-background sheet-pane sheet-secondary-tab">
 	<input type="checkbox" name="attr_edit_mode" class="sheet-hidden sheet-editmode" checked>
 	<h3 data-i18n="BACKGROUND">Background</h3>
-	<div class="sheet-left-col">
-		<fieldset class="repeating_background">
+	<div class="sheet-background-content">
+		<div class="sheet-left-col">
+			<fieldset class="repeating_background">
+				<div class="sheet-edit">
+					<input type="text" spellcheck="false" title="@{repeating_background_$X_background_name}" name="attr_background_name" placeholder="Name" data-i18-placeholder="NAME">
+					<textarea spellcheck="false" title="@{repeating_background_$X_background_description}" name="attr_background_description" placeholder="Details" data-i18-placeholder="DETAILS"></textarea>
+				</div>
+				<div class="sheet-indent-container sheet-display">
+					<span class="sheet-name sheet-space-after" name="attr_background_name"></span>
+					<span class="sheet-linebreak" name="attr_background_description"></span>
+				</div>
+			</fieldset>
+		</div>
+		<div class="sheet-right-col">
 			<div class="sheet-edit">
-				<input type="text" spellcheck="false" title="@{repeating_background_$X_background_name}" name="attr_background_name" placeholder="Name" data-i18-placeholder="NAME">
-				<textarea spellcheck="false" title="@{repeating_background_$X_background_description}" name="attr_background_description" placeholder="Details" data-i18-placeholder="DETAILS"></textarea>
+				<span class="sheet-name" data-i18n="NOVICE_TRAINING">Novice training</span>
+				<textarea spellcheck="false" title="@{novice_training}" name="attr_novice_training"></textarea>
 			</div>
 			<div class="sheet-indent-container sheet-display">
-				<span class="sheet-name sheet-space-after" name="attr_background_name"></span>
-				<span class="sheet-linebreak" name="attr_background_description"></span>
+				<span class="sheet-name sheet-space-after" data-i18n="NOVICE_TRAINING">Novice training</span>
+				<span class="sheet-linebreak" name="attr_novice_training"></span>
 			</div>
-		</fieldset>
-	</div>
-	<div class="sheet-right-col">
-		<div class="sheet-edit">
-			<span class="sheet-name" data-i18n="NOVICE_TRAINING">Novice training</span>
-			<textarea spellcheck="false" title="@{novice_training}" name="attr_novice_training"></textarea>
-		</div>
-		<div class="sheet-indent-container sheet-display">
-			<span class="sheet-name sheet-space-after" data-i18n="NOVICE_TRAINING">Novice training</span>
-			<span class="sheet-linebreak" name="attr_novice_training"></span>
-		</div>
-		<div class="sheet-edit">
-			<span class="sheet-name" data-i18n="EXPERT_DEVELOPMENT">Expert development</span>
-			<textarea spellcheck="false" title="@{expert_development}" name="attr_expert_development"></textarea>
-		</div>
-		<div class="sheet-indent-container sheet-display">
-			<span class="sheet-name sheet-space-after" data-i18n="EXPERT_DEVELOPMENT">Expert development</span>
-			<span class="sheet-linebreak" name="attr_expert_development"></span>
-		</div>
-		<div class="sheet-edit">
-			<span class="sheet-name" data-i18n="EXPERT_OBJECTIVE">Expert objective</span>
-			<textarea spellcheck="false" title="@{expert_objective}" name="attr_expert_objective"></textarea>
-		</div>
-		<div class="sheet-indent-container sheet-display">
-			<span class="sheet-name sheet-space-after" data-i18n="EXPERT_OBJECTIVE">Expert objective</span>
-			<span class="sheet-linebreak" name="attr_expert_objective"></span>
-		</div>
-		<div class="sheet-edit">
-			<span class="sheet-name" data-i18n="MASTER_DEVELOPMENT">Master development</span>
-			<textarea spellcheck="false" title="@{master_development}" name="attr_master_development"></textarea>
-		</div>
-		<div class="sheet-indent-container sheet-display">
-			<span class="sheet-name sheet-space-after" data-i18n="MASTER_DEVELOPMENT">Master development</span>
-			<span class="sheet-linebreak" name="attr_master_development"></span>
-		</div>
-		<div class="sheet-edit">
-			<span class="sheet-name" data-i18n="MASTER_QUEST">Master quest</span>
-			<textarea spellcheck="false" title="@{master_quest}" name="attr_master_quest"></textarea>
-		</div>
-		<div class="sheet-indent-container sheet-display">
-			<span class="sheet-name sheet-space-after" data-i18n="MASTER_QUEST">Master quest</span>
-			<span class="sheet-linebreak" name="attr_master_quest"></span>
-		</div>
-		<label class="sheet-notes">
-			<div class="sheet-indent-container">
-				<span class="sheet-name sheet-space-after" data-i18n="NOTES">Notes</span>
-				<span class="sheet-display sheet-linebreak" name="attr_background_notes"></span>
+			<div class="sheet-edit">
+				<span class="sheet-name" data-i18n="EXPERT_DEVELOPMENT">Expert development</span>
+				<textarea spellcheck="false" title="@{expert_development}" name="attr_expert_development"></textarea>
 			</div>
-			<textarea spellcheck="false" class="sheet-edit" title="@{background_notes}" name="attr_background_notes" placeholder="Notes" data-i18n-placeholder="NOTES"></textarea>
-		</label>
+			<div class="sheet-indent-container sheet-display">
+				<span class="sheet-name sheet-space-after" data-i18n="EXPERT_DEVELOPMENT">Expert development</span>
+				<span class="sheet-linebreak" name="attr_expert_development"></span>
+			</div>
+			<div class="sheet-edit">
+				<span class="sheet-name" data-i18n="EXPERT_OBJECTIVE">Expert objective</span>
+				<textarea spellcheck="false" title="@{expert_objective}" name="attr_expert_objective"></textarea>
+			</div>
+			<div class="sheet-indent-container sheet-display">
+				<span class="sheet-name sheet-space-after" data-i18n="EXPERT_OBJECTIVE">Expert objective</span>
+				<span class="sheet-linebreak" name="attr_expert_objective"></span>
+			</div>
+			<div class="sheet-edit">
+				<span class="sheet-name" data-i18n="MASTER_DEVELOPMENT">Master development</span>
+				<textarea spellcheck="false" title="@{master_development}" name="attr_master_development"></textarea>
+			</div>
+			<div class="sheet-indent-container sheet-display">
+				<span class="sheet-name sheet-space-after" data-i18n="MASTER_DEVELOPMENT">Master development</span>
+				<span class="sheet-linebreak" name="attr_master_development"></span>
+			</div>
+			<div class="sheet-edit">
+				<span class="sheet-name" data-i18n="MASTER_QUEST">Master quest</span>
+				<textarea spellcheck="false" title="@{master_quest}" name="attr_master_quest"></textarea>
+			</div>
+			<div class="sheet-indent-container sheet-display">
+				<span class="sheet-name sheet-space-after" data-i18n="MASTER_QUEST">Master quest</span>
+				<span class="sheet-linebreak" name="attr_master_quest"></span>
+			</div>
+			<label class="sheet-notes">
+				<div class="sheet-indent-container">
+					<span class="sheet-name sheet-space-after" data-i18n="NOTES">Notes</span>
+					<span class="sheet-display sheet-linebreak" name="attr_background_notes"></span>
+				</div>
+				<textarea spellcheck="false" class="sheet-edit" title="@{background_notes}" name="attr_background_notes" placeholder="Notes" data-i18n-placeholder="NOTES"></textarea>
+			</label>
+		</div>
 	</div>
 </div>
 
@@ -1085,6 +1105,16 @@
 			<label class="sheet-field-movement">
 				<div data-i18n="SPECIAL MOVEMENT">Special movement traits</div>
 				<input type="text" title="@{special_movement}" name="attr_special_movement" placeholder="flier" data-i18n-placeholder="MOVEMENT_PLACEHOLDER">
+			</label>
+		</div>
+		<div class="sheet-flex-row sheet-checks sheet-edit">
+			<label class="sheet-field-check">
+				<input type="checkbox" name="attr_has_insanity" value="1">
+				<span data-i18n="INSANITY">Insanity</span>
+			</label>
+			<label class="sheet-field-check">
+				<input type="checkbox" name="attr_has_corruption" value="1">
+				<span data-i18n="CORRUPTION">Corruption</span>
 			</label>
 		</div>
 		<div class="sheet-tags sheet-display">
@@ -1174,6 +1204,20 @@
 				<span name="attr_speed_display">10</span>
 				<span class="sheet-semicolon-before-nonempty" name="attr_special_movement"></span>
 			</div>
+		</div>
+		<div class="sheet-indent-container sheet-display">
+			<input type="checkbox" name="attr_has_insanity" class="sheet-hider sheet-hidden" value="1">
+			<span>
+				<span class="sheet-label sheet-space-after" data-i18n="INSANITY">Insanity</span>
+				<input type="number" name="attr_insanity" class="sheet-inline-input" value="0">
+			</span>
+		</div>
+		<div class="sheet-indent-container sheet-display">
+			<input type="checkbox" name="attr_has_corruption" class="sheet-hider sheet-hidden" value="1">
+			<span>
+				<span class="sheet-label sheet-space-after" data-i18n="CORRUPTION">Corruption</span>
+				<input type="number" name="attr_corruption" class="sheet-inline-input" value="0">
+			</span>
 		</div>
 		<input type="checkbox" name="attr_setting_npc_afflictions" class="sheet-hider sheet-hidden" value="1">
 		<div class="sheet-afflictions sheet-indent-container sheet-display">
@@ -1434,109 +1478,3 @@
 		</div>
 	</div>
 </div>
-
-<rolltemplate class="sheet-rolltemplate-sotdl">
-	{{#title}}
-		<div class="sheet-title">
-			<div>{{title}}</div>
-			{{#subtitle}}
-				<div class="sheet-subtitle">{{subtitle}}</div>
-			{{/subtitle}}
-		</div>
-	{{/title}}
-	{{#name}}
-		<div class="sheet-name">{{name}}</div>
-	{{/name}}
-	{{^sacrifice}}
-		<div class="sheet-rolls">
-			{{#showroll}}
-				<div class="sheet-roll">
-					<span class="sheet-label">{{roll-label}}</span>
-					{{#boons}}
-						{{#rollGreater() boons 0}}
-							<span class="sheet-boons sheet-super">
-								+{{boons}}
-								<div class="sheet-info">
-									<span data-i18n="WITH">with</span> {{boons}}<span> </span>
-									{{#rollLess() boons 2}}
-										<span class="sheet-lower" data-i18n="BOON">boon</span>
-									{{/rollLess() boons 2}}
-									{{#rollGreater() boons 1}}
-										<span class="sheet-lower" data-i18n="BOONS">boons</span>
-									{{/rollGreater() boons 1}}
-								</div>
-							</span>
-						{{/rollGreater() boons 0}}
-						{{#rollLess() boons 0}}
-							<span class="sheet-banes sheet-super">
-								{{boons}}
-								<div class="sheet-info">
-									<span data-i18n="WITH">with</span>{{boons}}<span> </span>
-									{{#rollGreater() boons -2}}
-										<span class="sheet-lower" data-i18n="BANE">bane</span>
-									{{/rollGreater() boons -2}}
-									{{#rollLess() boons -1}}
-										<span class="sheet-lower" data-i18n="BANES">banes</span>
-									{{/rollLess() boons -1}}
-								</div>
-							</span>
-						{{/rollLess() boons 0}}
-					{{/boons}}
-					: {{roll}}
-					{{#versus}}
-						<span> </span><span data-i18n="VS">vs</span> <span class="sheet-vs">{{versus}}</span>
-					{{/versus}}
-				</div>
-			{{/showroll}}
-			{{#damage}}
-				<div class="sheet-damage">
-					<span class="sheet-label" data-i18n="DAMAGE">Damage</span>: {{damageroll}}
-				</div>
-			{{/damage}}
-			{{#damageplus}}
-				<div class="sheet-damageplus">{{damageplus}}</div>
-			{{/damageplus}}
-		</div>
-	{{/sacrifice}}
-	{{#spell}}{{^sacrifice}}
-		<div class="sheet-spell-info">
-			{{#requirement}}
-				<div><strong data-i18n="REQUIREMENT">Requirement</strong> {{requirement}}</div>
-			{{/requirement}}
-			{{#target}}
-				<div><strong data-i18n="TARGET">Target</strong> {{target}}</div>
-			{{/target}}
-			{{#area}}
-				<div><strong data-i18n="AREA">Area</strong> {{area}}</div>
-			{{/area}}
-			{{#duration}}
-				<div><strong data-i18n="DURATION">Duration</strong> {{duration}}</div>
-			{{/duration}}
-		</div>
-	{{/sacrifice}}{{/spell}}
-	<div class="sheet-content">
-		{{#sacrifice}}
-			<div><strong data-i18n="SACRIFICE">Sacrifice</strong> {{sacrifice}}</div>
-		{{/sacrifice}}
-		{{^sacrifice}}
-			{{#rollGreater() roll 19}}{{#roll20plus}}
-				<div><strong data-i18n="ATTACK_ROLL_20+">Attack Roll 20+</strong> {{roll20plus}}</div>
-			{{/roll20plus}}{{/rollGreater() roll 19}}
-			{{#triggered}}
-				<div><strong data-i18n="TRIGGERED">Triggered</strong> {{triggered}}</div>
-			{{/triggered}}
-			{{#permanence}}
-				<div><strong data-i18n="PERMANENCE">Permanence</strong> {{permanence}}</div>
-			{{/permanence}}
-			{{#aftereffect}}
-				<div><strong data-i18n="AFTEREFFECT">Aftereffect</strong> {{aftereffect}}</div>
-			{{/aftereffect}}
-			{{#special}}
-				<div><strong data-i18n="SPECIAL">Special</strong> {{special}}</div>
-			{{/special}}
-			{{#description}}
-				<div class="sheet-description"> {{description}}</div>
-			{{/description}}
-		{{/sacrifice}}
-	</div>
-</rolltemplate>

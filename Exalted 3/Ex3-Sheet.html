@@ -49,6 +49,12 @@
         })).execute();
     }));
 
+    on('sheet:opened change:battlegroup change:battlegroup-size change:battlegroup-health-levels', TAS._fn(function updateBattleGroupMagnitude(e) {
+        getAttrs(["battlegroup-size", "battlegroup-health-levels"], TAS._fn(function determineBattleGroupMagnitude(values) {
+            setAttrs({"battlegroup-magnitude_max": parseInt(values["battlegroup-size"]) + parseInt(values["battlegroup-health-levels"])});
+        }));
+    }));
+
     on('change:caste', TAS._fn(function updateMotePool(eventInfo){
         getAttrs(["caste"], TAS._fn(function determineMotePool(values){
             var periEquation = "0";
@@ -544,6 +550,8 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
             <input class="sheet-tab sheet-tab-spells sheet-tab-spell-sheet" name="attr_sheet" title="Sorceries" type="radio" value="3">
             <input class="sheet-tab sheet-tab-settings sheet-tab-settings-sheet" name="attr_sheet" title="y" type="radio" value="4">
         </form>
+        <input class="sheet-quick-character" name="attr_qc" type="hidden" value="0">
+        <input class="sheet-battle-group" name="attr_battlegroup" type="hidden" value="0">
         <div class="sheet-body sheet-tab-content sheet-tab-character-sheet">
             <div class="sheet-3colrow">
                 <div class="sheet-col">
@@ -682,8 +690,8 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                 </div><!-- /sheet-col concept, animal, supernal -->
             </div><!-- /sheet-3colrow bio -->
 
-            <h1><span data-i18n="attributes">Attributes</span></h1>
-            <div class="sheet-3colrow">
+            <h1 class="sheet-attributes"><span data-i18n="attributes">Attributes</span></h1>
+            <div class="sheet-attributes sheet-3colrow">
                 <div class="sheet-col">
                     <div class="sheet-trait">
                         <label>
@@ -864,7 +872,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
             </div><!-- /sheet-3colrow attributes -->
 
             <div class="sheet-3colrow">
-                <div class="sheet-col">
+                <div class="sheet-abilities sheet-col">
                     <h1><span data-i18n="abilities">Abilities</span></h1>
                     <div class="sheet-trait">
                         <label>
@@ -1770,7 +1778,92 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         </div>
                     </fieldset>
                 </div><!-- /sheet-col abilities -->
+                <div class="sheet-qc-pools sheet-col">
+                    <h1><span data-i18n="actions">Actions</span></h1>
+                    <div class="sheet-trait">
+                        <span data-i18n="join-battle">Join Battle</span>
+                        <input type="number" name="attr_qc-join">
+                    </div><!-- /sheet-trait qc-join -->
+                    <div class="sheet-trait">
+                        <span data-i18n="combat-movement">Combat Movement</span>
+                        <input type="number" name="attr_qc-move">
+                    </div><!-- /sheet-trait qc-move -->
+                    <fieldset class="repeating_qcactions">
+                        <div class="sheet-trait">
+                            <input type="text" name="attr_repqcactionname" data-i18n-placeholder="action-place" placeholder="Senses">
+                            <input type="number" name="attr_repqcactiondice">
+                        </div>
+                    </fieldset>
+                    <h1><span data-i18n="attacks">Attacks</span></h1>
+                    <div class="sheet-trait">
+                        <span data-i18n="grapple">Grapple</span>
+                        <span>
+                            <input type="number" name="attr_qc-grapple">
+                            <input type="number" name="attr_qc-grapple-control">
+                        </span>
+                    </div><!-- /sheet-trait qc-move -->
+                    <fieldset class="repeating_qcattacks">
+                        <div class="sheet-trait">
+                            <input type="text" name="attr_repqcattackname" data-i18n-placeholder="attack-place" placeholder="Self bow">
+                            <span>
+                                <input type="number" name="attr_repqcattackdice">
+                                <input type="number" name="attr_repqcattackdamage">
+                            </span>
+                        </div>
+                    </fieldset>
+                </div><!-- /sheet-col quick-pools -->
                 <div class="sheet-2col">
+                    <h1 class="sheet-battle-group-header"><span data-i18n="battle-group">Battle Group</span></h1>
+                    <div class="sheet-battle-group-body sheet-2colrow">
+                        <div class="sheet-col">
+                            <div class="sheet-battle-group-row">
+                                <span data-i18n="drill">Drill</span>:
+                                <select name="attr_battlegroup-drill">
+                                    <option data-i18n="poor" value="Poor">Poor</option>
+                                    <option data-i18n="average" value="Average" selected="selected">Average</option>
+                                    <option data-i18n="elite" value="Elite">Elite</option>
+                                </select>
+                            </div>
+                            <div class="sheet-battle-group-row">
+                                <span data-i18n="might">Might</span>:
+                                <select name="attr_battlegroup-might">
+                                    <option value="0" selected="selected">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
+                            </div>
+                            <div class="sheet-battle-group-row">
+                                <label>
+                                    <input type="checkbox" name="attr_battlegroup-perfect-morale" value="1"><span></span>
+                                    <span data-i18n="perfect-morale">Perfect Morale</span>
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="sheet-col">
+                            <div class="sheet-battle-group-row">
+                                <span data-i18n="magnitude">Magnitude</span>:
+                                <span>
+                                    <input type="number" name="attr_battlegroup-magnitude" value="8"> |
+                                    <input type="number" name="attr_battlegroup-magnitude_max" readonly="readonly">
+                                </span>
+                            </div>
+                            <div class="sheet-battle-group-row">
+                                <span data-i18n="size">Size</span>:
+                                <span>
+                                    <input type="number" name="attr_battlegroup-size" value="1"> |
+                                    <input type="number" name="attr_battlegroup-size_max" value="1">
+                                </span>
+                            </div>
+                            <div class="sheet-battle-group-row">
+                                <span data-i18n="health-levels">Health Levels</span>:
+                                <span>
+                                    <input type="number" name="attr_battlegroup-health-levels" value="7">
+                                </span>
+                            </div>
+                        </div>
+                    </div><!-- /sheet-battle-group-body-->
                     <h1><span data-i18n="merits">Merits</span></h1>
                     <fieldset class="repeating_merits">
                         <input type="text" name="attr_repmerits-name" data-i18n-placeholder="merits-place" placeholder="Artifact">
@@ -1854,8 +1947,8 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                             </div>
                         </div><!-- /sheet-col willpower/essence -->
                         <div class="sheet-col">
-                            <h1><span data-i18n="limit-break">Limit Break</span></h1>
-                            <div style="padding-left:6px;margin:9px 0 9px 0">
+                            <h1 class="sheet-limit"><span data-i18n="limit-break">Limit Break</span></h1>
+                            <div class="sheet-limit" style="padding-left:6px;margin:9px 0 9px 0">
                                 <div class="sheet-dots-full">
                                     <input type="radio" class="sheet-dots0" name="attr_limit" value="0" checked="checked"><span></span>
                                     <input type="radio" class="sheet-dots1" name="attr_limit" value="1"><span></span>
@@ -1870,13 +1963,44 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                                     <input type="radio" class="sheet-dots10" name="attr_limit" value="10"><span></span>
                                 </div>
                             </div>
-                            <h1><span data-i18n="limit-trigger">Limit Trigger</span></h1>
-                            <textarea name="attr_limittrigger" class="sheet-6rows" data-i18n-placeholder="limit-trigger-place"
+                            <h1 class="sheet-limit"><span data-i18n="limit-trigger">Limit Trigger</span></h1>
+                            <textarea name="attr_limittrigger" class="sheet-6rows sheet-limit" data-i18n-placeholder="limit-trigger-place"
                                 placeholder="Karal is insulted, belittled, or deliberately frustrated by another character."></textarea>
-                        </div><!-- /sheet-col limit -->
+                            <h1 class="sheet-qc-defenses"><span data-i18n="defenses">Defenses</span></h1>
+                            <div class="sheet-qc-defenses">
+                                <div class="sheet-trait">
+                                    <span data-i18n="appearance">Appearance</span>
+                                    <input type="number" name="attr_qc-appearance">
+                                </div><!-- /sheet-trait qc-appearance -->
+                                <div class="sheet-trait">
+                                    <span data-i18n="guile">Guile</span>
+                                    <input type="number" name="attr_qc-guile">
+                                </div><!-- /sheet-trait qc-guile -->
+                                <div class="sheet-trait">
+                                    <span data-i18n="resolve">Resolve</span>
+                                    <input type="number" name="attr_qc-resolve">
+                                </div><!-- /sheet-trait qc-resolve -->
+                                <div class="sheet-trait">
+                                    <span data-i18n="parry">Parry</span>
+                                    <input type="number" name="attr_qc-parry">
+                                </div><!-- /sheet-trait qc-parry -->
+                                <div class="sheet-trait">
+                                    <span data-i18n="evasion">Evasion</span>
+                                    <input type="number" name="attr_qc-evasion">
+                                </div><!-- /sheet-trait qc-evasion -->
+                                <div class="sheet-trait">
+                                    <span data-i18n="soak">Soak</span>
+                                    <input type="number" name="attr_qc-soak">
+                                </div><!-- /sheet-trait qc-soak -->
+                                <div class="sheet-trait">
+                                    <span data-i18n="hardness">Hardness</span>
+                                    <input type="number" name="attr_qc-hardness">
+                                </div><!-- /sheet-trait qc-hardness -->
+                            </div><!-- /sheet-col limit -->
+                        </div>
                     </div><!-- /sheet-2colrow -->
-                    <h1><span data-i18n="experience-and-crafting">Experience & Crafting</span></h1>
-                    <div class="sheet-flexbox-h sheet-flexbox-inline">
+                    <h1><span class="sheet-experience" data-i18n="experience-and-crafting">Experience & Crafting</span></h1>
+                    <div class="sheet-experience sheet-flexbox-h sheet-flexbox-inline">
                         <label>
                             <span data-i18n="current-experience-points">Current XP:</span>
                             <input type="number" name="attr_xp">
@@ -1894,7 +2018,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                             <input type="number" name="attr_sxp_max">
                         </label>
                     </div><!-- /sheet-flexbox-h experience -->
-                    <div class="sheet-2colrow">
+                    <div class="sheet-experience sheet-2colrow">
                         <div class="sheet-col sheet-flexbox-h">
                             <label>
                                 <span data-i18n="silver-experience-points">Silver XP</span>:
@@ -1935,8 +2059,8 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                             </fieldset>
                         </div><!-- /sheet-col crafting projects -->
                     </div><!-- /sheet-2colrow -->
-                    <h1><span data-i18n="weapons-and-gear">Weapons & Gear</span></h1>
-                    <div class="sheet-table">
+                    <h1><span class="sheet-gear" data-i18n="weapons-and-gear">Weapons & Gear</span></h1>
+                    <div class="sheet-gear sheet-table">
                         <div class="sheet-table-header">
                             <div class="sheet-table-row">
                                 <div data-i18n="weapon" class="sheet-table-cell">Weapon</div>
@@ -1959,13 +2083,15 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                         </fieldset>
                     </div><!-- /sheet-table weapons-->
 
-                    <div class="sheet-text-center sheet-txt-lg" style="margin-top:8px"><strong data-i18n="miscellaneous-items">Miscellaneous Items</strong></div>
-                    <fieldset class="repeating_gear">
-                        <input type="text" name="attr_repgear" style="width:100%" data-i18n-placeholder="miscellaneous-items-place" placeholder="Fancy scarf">
-                    </fieldset>
+                    <div class="sheet-gear">
+                        <div class="sheet-text-center sheet-txt-lg" style="margin-top:8px"><strong data-i18n="miscellaneous-items">Miscellaneous Items</strong></div>
+                        <fieldset class="repeating_gear">
+                            <input type="text" name="attr_repgear" style="width:100%" data-i18n-placeholder="miscellaneous-items-place" placeholder="Fancy scarf">
+                        </fieldset>
+                    </div>
 
-                    <h1><span data-i18n="armor">Armor</span></h1>
-                    <div class="sheet-table">
+                    <h1><span class="sheet-gear" data-i18n="armor">Armor</span></h1>
+                    <div class="sheet-gear sheet-table">
                         <div class="sheet-table-header">
                             <div class="sheet-table-row">
                                 <div data-i18n="armor" class="sheet-table-cell">Armor</div>
@@ -1990,8 +2116,9 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                 </div><!-- /sheet-2col -->
             </div><!-- /sheet-3colrow -->
 
-            <h1><span data-i18n="health-and-defense">Health & Defense</span></h1>
-            <div class="sheet-table sheet-txt-lg sheet-center-table sheet-80pct">
+            <h1 class="sheet-qc-health"><span data-i18n="health-levels">Health Levels</span></h1>
+            <h1 class="sheet-health-defenses"><span data-i18n="health-and-defense">Health & Defense</span></h1>
+            <div class="sheet-defenses sheet-table sheet-txt-lg sheet-center-table sheet-80pct">
                 <div class="sheet-table-body">
                     <div class="sheet-table-row">
                         <div class="sheet-table-cell sheet-text-right"><span data-i18n="natural-soak">Natural Soak</span>:</div>
@@ -2021,7 +2148,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                             <input type="hidden" value="(@{dexterity} + @{dodge})" disabled="disabled" name="attr_evasion-root">
                             <input type="hidden" value="(@{evasion-root} + 1)" disabled="disabled" name="attr_evasion-root-s">
                             <input type="hidden" value="(ceil(@{evasion-root} / 2) - abs(@{armor-mobility}) - abs(@{wound-penalty}))" disabled="disabled" name="attr_evasion-base">
-                            <input type="hidden" value="(ceil(@{evasion-root-s} / 2) - abs(@{armor-mobility}) - abc(@{wound-penalty}))" disabled="disabled" name="attr_evasion-base-s">
+                            <input type="hidden" value="(ceil(@{evasion-root-s} / 2) - abs(@{armor-mobility}) - abs(@{wound-penalty}))" disabled="disabled" name="attr_evasion-base-s">
                             <input type="number" value="(@{evasion-base} + abs(@{evasion-base})) / 2" disabled="disabled" style="width:27px;margin-right:2px" data-i18n-title="evasion-without-specialty" title="Evasion without specialty" name="attr_evasion"><input type="number" value="(@{evasion-base-s} + abs(@{evasion-base-s})) / 2" disabled="disabled" style="width:27px" data-i18n-title="evasion-with-specialty" title="Evasion with specialty" name="attr_evasion-specialty">
                         </div>
                         <div class="sheet-table-cell sheet-text-right"><span data-i18n="resolve">Resolve</span>:</div>
@@ -2043,7 +2170,7 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                     </div>
                 </div>
             </div><!-- /sheet-table defenses -->
-            <div class="sheet-text-center sheet-txt-lg" style="margin-top:8px"><strong data-i18n="health-levels">Health Levels</strong></div>
+            <div class="sheet-health-header sheet-text-center sheet-txt-lg" style="margin-top:8px"><strong data-i18n="health-levels">Health Levels</strong></div>
             <div class="sheet-health-track">
                 <input type="hidden" name="attr_wound-penalty" value="0">
                 <div class="sheet-health-level">
@@ -2592,7 +2719,6 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
                 </div>
             </div><!-- /sheet-health-track -->
 
-
             <h1><span data-i18n="intimacies">Intimacies</span></h1>
             <input type="hidden" value="0" name="attr_init-intimacies">
             <div class="sheet-table">
@@ -2702,6 +2828,17 @@ TAS=TAS||function(){"use strict";var e="0.2.4",n=1457098091,t={debug:{key:"debug
             </fieldset><!-- /sheet-table sorceries -->
         </div><!-- /sheet-body -->
         <div class="sheet-body sheet-tab-content sheet-tab-settings-sheet">
+            <h1><span data-i18n="character-type">Character Type</span></h1>
+            <div class="sheet-checklist">
+                <label>
+                    <input type="checkbox" name="attr_qc" value="1"><span></span>
+                    <span data-i18n="quick-character">quick character</span>
+                </label>
+                <label>
+                    <input type="checkbox" name="attr_battlegroup" value="1"><span></span>
+                    <span data-i18n="battle-group">battle group</span>
+                </label>
+            </div>
             <h1><span data-i18n="mote-pool-equations">Mote Pool Equations</span></h1>
             <label data-i18n="max-personal-motes">Max Personal Motes</label>
             <input type="text" name="attr_personal-equation" value="@{essence} * 3 + 10"><span> </span>

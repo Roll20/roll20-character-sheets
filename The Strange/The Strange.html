@@ -91,7 +91,7 @@
                     <td class="header" colspan="2" width="33%">&bull;INTELLECT&bull;</td>
                 </tr>
                 <tr>
-                    <td class="attrbox" colspan="2"><span class="circle" type="text" name="attr_mightpool"></span></td>
+                    <td class="attrbox" colspan="2"><input class="circle" type="text" name="attr_mightpool"></td>
                     <td class="attrbox" colspan="2"><input class="circle" type="text" name="attr_speedpool"></td>
                     <td class="attrbox" colspan="2"><input class="circle" type="text" name="attr_intellectpool"></td>
                 </tr>
@@ -334,3 +334,53 @@
         &copy;2015 Monte Cook Games, LLC. The Strange are trademarks of Monte Cook Games, LLC, in the U.S.A. and other countries. All Monte Cook Games characters and character names, and the distinctive likeness thereof, are trademarks of Monte Cook Games, LLC.
     </span>
 </div>
+<script type="text/worker">
+  on("sheet:opened", function() {
+    var getRequest = ["version"];
+
+    getAttrs(getRequest, function(values){
+      if(!values.version){
+        for(var x=1; x<22; x++){
+          getRequest.push("checkboxt" + x);
+          getRequest.push("checkboxs" + x);
+          getRequest.push("skill" + x);
+        };
+
+        for(var y=1; y<10; y++){
+          getRequest.push("attack" + y);
+          getRequest.push("mod" + y);
+          getRequest.push("dmg" + y);
+        };
+
+        getAttrs(getRequest, function(values) {
+          var newrowattrs = {version: 1.0};
+          for(var x=1; x<22; x++){
+            if(values["skill" + x]){
+              var rowId = generateRowID();
+              newrowattrs["repeating_skills_" + rowId + "_skill-name"] = values["skill" + x];
+              if(values["checkboxt" + x]) {
+                newrowattrs["repeating_skills_" + rowId + "_trained-skill"] = values["checkboxt" + x];
+              };
+              if(values["checkboxt" + x]) {
+                newrowattrs["repeating_skills_" + rowId + "_specialized-skill"] = values["checkboxs" + x];
+              };
+            };
+          };
+          for(var y=1; y<10; y++){
+            if(values["attack" + y]){
+              var rowId = generateRowID();
+              newrowattrs["repeating_attacks_" + rowId + "_attack-name"] = values["attack" + y];
+              if(values["mod" + y]) {
+                newrowattrs["repeating_attacks_" + rowId + "_attack-mod"] = values["mod" + y];
+              };
+              if(values["dmg" + y]){
+                newrowattrs["repeating_attacks_" + rowId + "_attack-dmg"] = values["dmg" + y];
+              };
+            };
+          };
+          setAttrs(newrowattrs);
+        });
+      } else(values.version);
+      };
+    });
+</script>
