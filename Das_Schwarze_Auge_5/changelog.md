@@ -1,3 +1,14 @@
+## 1.2.4
+- 30.02.2020 (by mckee14)
+  - Nahkampfwaffen 1-4 berücksichtigen nun die Leiteigenschaft und Schadensschwelle. Berechnung findet automatisch statt, sobald ein Waffenwert, die Leiteigenschaft, der GE Wert oder der KK Wert geändert wird.
+  - Änderungen am Schadensbonus durch die Leiteigenschaft bei Nahkampfwaffen werden (für die aktuell ausgewählte Waffe) direkt an das entsprechende Feld im Nahkampf-Tab geschickt. Die Waffe muss nicht mehr erneut ausgewählt werden.
+  - Placeholder Hinweis am unteren Rand des Charakterbogens entfernt
+  - Versionsnummer angepasst
+  - Versionsbutton verlinkt nun auf das offizielle R20 Repository damit der Changelog zentral gepflegt werden kann.
+  - (Alter) Hinweis auf regelmässige Updates im Kopfbereich des Charbogens entfernt.
+  - Footer Information leicht angepasst
+
+
 ## 1.2.3
  - 09.10.2018
 

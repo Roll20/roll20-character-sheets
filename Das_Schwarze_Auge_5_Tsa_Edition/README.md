@@ -2,6 +2,9 @@
 
 ## Änderungen
 
+2020-03-28:
+- Bugfix: halbe Parade funktioniert wieder
+
 2020-01-12:
 
 Mit der Überarbeitung des Ausrüstung- und des Artefakte-Tabs ist erste Überarbeitung des Designs abgeschlossen. Die Elemente des Bogens sollten jetzt einheitlicher gestaltet und übersichtlicher angeordnet sein. Dabei habe ich noch einige Ideen für das Inventar sowie den Artefakte-Tab gesammelt, die neben dem NPC-Bogen als nächstes bearbeiten werden.
