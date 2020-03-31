@@ -1,4 +1,4 @@
-<!--3/29/20 set sheet version manually with currentVersion in sheetworkers-->
+<!--3/31/20 set sheet version manually with currentVersion in sheetworkers-->
 <input type="hidden" name="attr_version" value="0" />
 <!-- ADDED recalc checkbox to force sheet worker events. temp unhide for testing purposes-->
 <input class="hidden" name="attr_recalc1" type="checkbox" />
@@ -19,7 +19,7 @@
     <span class="announcements-show toggle-dice-only toggle-monster-only" name="attr_version">&nbsp;</span>
     <div class="announcements toggle-dice-only toggle-monster-only">
         <h3 data-i18n="latest-announcements">Latest Announcements</h3>
-        <span class="footer">3/29/20</span>
+        <span class="footer">3/31/20</span>
         <ol style="margin: 0 2em 0 2em; padding: 0 1em 0 3em;">
             <span>v1.65</span>
             <li>Added Misc Gear modifier to Skills.</li>
@@ -1733,7 +1733,7 @@
                             <input type="hidden" name="attr_translation_push_query" value="push-query" />
                         </div>
                         <div class="dice-rolls-d66">
-                            <button class="dice-pool" type="roll" name="roll_d66" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{d66-roll}}} {{subtitle}} {{free-text}}  {{d66-die-one=[[ 1 ]] }} {{d66-roll-one=[[ 1d6 ]] }} {{d66-die-two=[[ 1 ]] }} {{d66-roll-two=[[ 1d6 ]] }} {{footer}}" data-i18n-title="roll-dice-66" title="Roll d66!">&nbsp;<span class="small-caps" data-i18n="die-66-u">D66</span>&nbsp;</button>
+                            <button class="dice-pool" type="roll" name="roll_d66" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{d66-roll}}} {{subtitle}} {{free-text}}  {{d66-die-one=[[ 1 ]] }} {{d66-roll-one=[[ 1d6 ]] }} {{d66-die-two=[[ 1 ]] }} {{d66-roll-two=[[ 1d6 ]] }} {{footer}}" data-i18n-title="roll-dice-66" title="Roll d66!">&nbsp;<span class="small-caps" data-i18n="die-66-u">D66</span>&nbsp;</button>                            
                         </div>
                     </div>
                     <div class="dice-preset">
@@ -2463,22 +2463,30 @@
 
 <div class="wrapper tab-content settings">
     <div class="settings-options">
+        <input type="hidden" name="attr_translation_whisper_query" value="whisper-query" />
+        <input type="hidden" name="attr_translation_whisper_api_query" value="whisper_api-query" />
         <div>
             <span data-i18n="whisper-options">Whisper Options:</span>
             <select name="attr_whisper_option" title="@{whisper_option}">
                 <option value="" data-i18n="whisper-nothing" selected>Do not whisper rolls(default).</option>
                 <option value="/w gm" data-i18n="whisper-rolls">Whisper all rolls to the GM.</option>
-                <option value="?{Whisper roll?|no,|yes,/w gm |}" data-i18n="whisper-query">Use a query.</option>
+                <option value="@{translation_whisper_macro_query}" data-i18n="whisper-query">Use a query.</option>
             </select>
         </div>
         <div>
-            <span data-i18n="whisper-options-api">API Whisper Options:</span>
+            <span data-i18n="whisper-options-api">API Whisper Options:</span>            
             <select name="attr_whisper_option_api" title="@{whisper_option_api}">
                 <option value="!forl" data-i18n="whisper-nothing" selected>Do not whisper rolls(default).</option>
                 <option value="!wforl" data-i18n="whisper-rolls">Whisper all rolls to the GM.</option>
-                <option value="?{Whisper roll?|no,!forl|yes,!wforl |}" data-i18n="whisper-query">Use a query.</option>
+                <option value="@{translation_whisper_api_macro_query}" data-i18n="whisper-query">Use a query.</option>
             </select>
         </div>
+<!-- used to translate query-->
+        <span style="display: none" name="attr_translation_whisper_macro_query" value=""></span>
+        <span style="display: none" name="attr_translation_whisper_api_macro_query" value=""></span>
+        <span style="display: none" data-i18n="whisper-query">Whisper roll?</span>
+        <span style="display: none" data-i18n="yes">yes</span>
+        <span style="display: none" data-i18n="no">no</span>
     </div>
 </div>
 
@@ -4289,14 +4297,13 @@
         });
     });
     
-    /* translate push query */
-    on('sheet:opened', function () {
-        getAttrs(['translation_push_query'], v => {
-            if (v.translation_push_query !== getTranslationByKey('push-query')) {
-                setAttrs({
-                    translation_push_query: getTranslationByKey('push-query')
-                });
-            }
+    /* translate query text */
+    on('sheet:opened', function (){
+        clog('Translation of query text complete.');
+        setAttrs({
+            translation_push_query: getTranslationByKey('push-query'),
+            translation_whisper_macro_query: "?{" + getTranslationByKey("whisper-macro") + "|" + getTranslationByKey("no") + ",|" + getTranslationByKey("yes") + ",/w gm |"+"}",
+            translation_whisper_api_macro_query: "?{" + getTranslationByKey("whisper-macro") + "|" + getTranslationByKey("no") + ",!forl |" + getTranslationByKey("yes") + ",!wforl |"+"}"
         });
     });
     
