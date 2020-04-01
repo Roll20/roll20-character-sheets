@@ -1,5 +1,13 @@
+## 1.2.5
+ - 01.04.2020 (by Marc Ehrenmann / mckee14)
+  - Schilde berücksichtigen nun die Leiteigenschaft (KK) korrekt, der Bonusschaden wird im Schadenswurf berücksichtigt.
+  - Traditionen von Geweihten 
+    - Erweitert auf alle 12 Götter aus dem GRW.
+    - Eigenschaften für die Traditionen erweitert auf 4 (KK, KL, IN, CH)
+    - Berechnung von KarmaEnergie geschieht nun automatisch nach der Änderung von KK, KL, IN oder CH.
+
 ## 1.2.4
-- 30.02.2020 (by mckee14)
+- 30.03.2020 (by Marc Ehrenmann / mckee14)
   - Nahkampfwaffen 1-4 berücksichtigen nun die Leiteigenschaft und Schadensschwelle. Berechnung findet automatisch statt, sobald ein Waffenwert, die Leiteigenschaft, der GE Wert oder der KK Wert geändert wird.
   - Änderungen am Schadensbonus durch die Leiteigenschaft bei Nahkampfwaffen werden (für die aktuell ausgewählte Waffe) direkt an das entsprechende Feld im Nahkampf-Tab geschickt. Die Waffe muss nicht mehr erneut ausgewählt werden.
   - Placeholder Hinweis am unteren Rand des Charakterbogens entfernt
