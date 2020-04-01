@@ -1,10 +1,18 @@
 ## 1.2.5
  - 01.04.2020 (by Marc Ehrenmann / mckee14)
+  - Schmerzstufen werden automatisch berechnet und eingetragen!
+	- Vor/Nachteil Zäher Hund und Zerbrechlich werden berücksichtigt
+	- Spieler können im neuen Modifikator-Feld die automatisch berechnete Stufe verschieben, um z.B. Gift oder "Schmerzen unterdrücken" abzubilden.
+	- Ein Balken kann an "Schmerz" gebunden werden, so sind die Schmerzstufen 0 bis 4 immer direkt zu sehen für den Spieler.
+  - Lebenspunkteberechnung automatisiert
+	- Änderungen an Werten, Vor/Nachteilen, Rasse, KOnstitution und zugekauften Lebenspunkten aktualisiert automatisch die berechneten Lebenspunkte
+	- Die berechneten LE Punkte werden zusätzlich in das Feld LE_Wert_max geladen - ein damit verbundener Lebensbalken skaliert also automatisch korrekt mit
   - Schilde berücksichtigen nun die Leiteigenschaft (KK) korrekt, der Bonusschaden wird im Schadenswurf berücksichtigt.
   - Traditionen von Geweihten 
     - Erweitert auf alle 12 Götter aus dem GRW.
     - Eigenschaften für die Traditionen erweitert auf 4 (KK, KL, IN, CH)
     - Berechnung von KarmaEnergie geschieht nun automatisch nach der Änderung von KK, KL, IN oder CH.
+
 
 ## 1.2.4
 - 30.03.2020 (by Marc Ehrenmann / mckee14)
