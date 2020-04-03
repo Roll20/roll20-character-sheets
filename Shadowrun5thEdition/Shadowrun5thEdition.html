@@ -3501,7 +3501,6 @@ class PrimaryArmor {
 
 
   
-
 const processingFunctions = {
   convertIntegerNegative: number => number > 0 ? -Math.abs(number) : number,
   convertIntegersNegatives: numbers => {
@@ -3536,157 +3535,179 @@ const processingFunctions = {
   setAttributes: (update, silent) => silent && typeof update === 'object' ? setAttrs(update, {silent:true}) : typeof update === 'object' ? setAttrs(update) : console.error(`${update} is not an object`),
   sliceAttr: attribute => attribute.slice(2, -1), 
   sumIntegers: numbers => numbers.reduce((a,b) => a + b, 0),
-
-  shadowrun: {
-    addRepRow: (repRowID, attributeList) => {
-      let weaponAttributeWithRepeatingRow = []
-      attributeList.forEach(weaponAttribute => weaponAttributeWithRepeatingRow.push(`${repRowID}_${weaponAttribute}`))
-      return weaponAttributeWithRepeatingRow
-    },
-    attributeFactory: attrs => {
-      attrs = processingFunctions.shadowrun.findFlagInKeys(attrs) ? processingFunctions.shadowrun.processTempFlags(attrs) : attrs
-      attrs = processingFunctions.parseIntegers(attrs)
-      attrs = processingFunctions.shadowrun.calculateBonuses(attrs)
-      attrs.total = processingFunctions.sumIntegers(Object.values(attrs))
-      attrs.base = attrs.total - attrs.bonus
-      return attrs
-    },
-    conditionFactory: attrs => {
-      attrs.attribute = processingFunctions.shadowrun.determineConditionAttribute(attrs)
-      attrs.base = processingFunctions.shadowrun.determineConditionBase(attrs.sheet_type, attrs.flag_drone)
-      attrs.modifier = attrs[processingFunctions.shadowrun.findModifierInKeys(attrs)]
-      Object.keys(attrs).forEach(key => !['attribute', 'base', 'modifier'].includes(key) ? delete attrs[key] : false)
-      attrs = processingFunctions.parseIntegers(attrs)
-      return attrs
-    },
-    contructRepeatingWeaponAttributes: (repRowID, type) => {
-      const attributeList = processingFunctions.shadowrun.determineWeaponAttributesByType(type)
-      const constructedWeaponAttributes = processingFunctions.shadowrun.addRepRow(repRowID, attributeList)
-      return constructedWeaponAttributes
-    },
-    buildDisplay: (base, bonus) => bonus === 0 ? base : `${base} (${base + bonus})`,
-    calculateBonuses: attrs => {
-      attrs.bonus = 0
-      for (let [key, value] of Object.entries(attrs)) { 
-        if (key.includes('modifier') || key.includes('temp')) {
-          attrs.bonus += value
-          delete attrs[key]
-        }
-      }
-      return attrs
-    },
-    calculateConditionTracks: conditionInts => Math.ceil(conditionInts.attribute/2) + conditionInts.base + conditionInts.modifier,
-    calculateLimitTotal: attrs => Math.ceil((attrs[0] + attrs[1] + (attrs[2] * 2))/3),
-    calculateRunSpeed: (agility, modifier) => (agility * 4) + modifier,
-    calculateWalkSpeed:(agility, modifier) => (agility * 2) + modifier,
-    calculateWounds: attrs => {
-      const divisor  = attrs.low_pain_tolerance === 2 ? attrs.low_pain_tolerance : 3;
-      const highPain = attrs.high_pain_tolerance >= 1 ? attrs.high_pain_tolerance : 0;
-      let sum = 0;
-
-      ["stun", "physical"].forEach(attr => {
-        const damageCompensator = attrs[`damage_compensators_${attr}`] || 0
-        let dividend = Math.max(attrs[`${attr}`] - (highPain + damageCompensator), 0)
-        sum -= Math.floor(dividend / divisor) || 0
-      })
-      return sum
-    },
-    convertSkillSelectToHiddenSkill: skillName => {
-      let skill = skillName.toLowerCase()
-      skill = skill.includes('group') ? skill.slice(0, -6) : skill
-      skill = skill.includes(" ") ? skill.replace(/ /g,"") : skill
-      return skill
-    },
-    determineConditionBase: (type, drone) => drone && drone === 'drone' ? 6 : type === 'vehicle' ? 12 : 8,
-    determineConditionAttribute: attrs => attrs.willpower ? attrs.willpower : attrs.body ? attrs.body : attrs.device_rating ? attrs.device_rating : 0,
-    determineWeaponAttributesByType: weaponType =>  weaponType === 'range' ? sheetAttributes.rangeAttributes : sheetAttributes.meleeAttributes,
-    findFlagInKeys: attrs => Object.keys(attrs).find(key => key.includes('_flag')),
-    findModifierInKeys: attrs => Object.keys(attrs).find(key => key.includes('_modifier')),
-    processTempFlags: attrs => {
-      try {
-        const tempFlag = processingFunctions.shadowrun.findFlagInKeys(attrs)
-        const attrName = tempFlag.split('_temp_flag')[0]
-        attrs[`${tempFlag}`] === 'on' ? false : delete attrs[`${attrName}_temp`];
-        delete attrs[`${tempFlag}`];
-        return attrs
-      } catch (error) {
-        console.error(error)
-      }
-    },
-    resetRepeatingFieldsPrimaries: (repeatingSection, repRowID) => {
-      getSectionIDs(repeatingSection, ids => {
-        let attributesWithIDs = [];
-        let update = {};
-        ids.forEach(id => attributesWithIDs.push(`${repeatingSection}_${id}_primary`))
-        attributesWithIDs.forEach(attribute => !attribute.includes(repRowID) ? update[attribute] = 0 : false)
-        setAttrs(update);
-      })
-    },
-    shotsFired: (shots, trigger) => shots > 0 && trigger.includes('remove') ? shots -= 1 : trigger.includes('add') ? shots += 1 : shots,
-    updateLimitTotal: attrs => {
-      attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
-      return processingFunctions.shadowrun.calculateLimitTotal(Object.values(attrs))
-    },
-    resetPrimaryArmor: () => {
-      const resetPrimary = new PrimaryArmor()
-      let update = {}
-      for (let [key, value] of Object.entries(resetPrimary)) {
-        update[key] = value
-      }
-      return update
-    },
-    resetPrimaryWeapon: type => {
-      const resetPrimary = type === 'range' ? new PrimaryRangeWeapon(type) : new PrimaryMeleeWeapon(type)
-      let update = {}
-      for (let [key, value] of Object.entries(resetPrimary)) {
-        update[key] = value
-      }
-      return update
-    },
-    updatePrimaryArmor: attrs => {
-      let update = {}
-
-      for (let [key, value] of Object.entries(attrs)) {
-        const repRowID = processingFunctions.getReprowid(key)
-        if (key.includes('name')) {
-          update['armor_name'] = attrs[`${repRowID}_name`]
-        } else if (key.includes('rating')) {
-          update['armor_rating'] = value
-        } else if (key.includes('dicepool_modifier')) {
-          update['soak_modifier'] = value
-        } else {
-          const type = key.split('_')[3]
-          update[`${type}_modifier`] = value
-        }
-      }
-
-      return update
-    },
-    updatePrimaryWeapons: attrs => {
-      let update = {}
-      for (let [key, value] of Object.entries(attrs)) {
-        const type = processingFunctions.findRepeatingField(key)
-        const weaponAttribute = processingFunctions.getReprowAttribute(key)
-        const primaryAttributeName = key.includes('weapon') ? `primary_${type}_weapon` : `primary_${type}_weapon_${weaponAttribute}`
-        update[primaryAttributeName] = value
-
-        if (key.includes('ammo')) {
-          update[`${primaryAttributeName}_max`] = value
-        }
-      }
-      return update
-    }
-  }
 }
 
 
-//for Mocha Unit Texting
-//module.exports = processingFunctions;
+//for Mocha Unit Testing
+//-module.exports = processingFunctions;
+
+  //for Mocha Unit Testing
+//-const processingFunctions = require('../js/processingFunctions');
+
+const shadowrunFunctions = {
+  addRepRow: (repRowID, attributeList) => {
+    let weaponAttributeWithRepeatingRow = []
+    attributeList.forEach(weaponAttribute => weaponAttributeWithRepeatingRow.push(`${repRowID}_${weaponAttribute}`))
+    return weaponAttributeWithRepeatingRow
+  },
+
+  attributeFactory: attrs => {
+    attrs = shadowrunFunctions.findFlagInKeys(attrs) ? shadowrunFunctions.processTempFlags(attrs) : attrs
+    attrs = processingFunctions.parseIntegers(attrs)
+    attrs = shadowrunFunctions.calculateBonuses(attrs)
+    attrs.total = processingFunctions.sumIntegers(Object.values(attrs))
+    attrs.base = attrs.total - attrs.bonus
+    return attrs
+  },
+  conditionFactory: attrs => {
+    attrs.attribute = shadowrunFunctions.determineConditionAttribute(attrs)
+    attrs.base = shadowrunFunctions.determineConditionBase(attrs.sheet_type, attrs.flag_drone)
+    attrs.modifier = attrs[shadowrunFunctions.findModifierInKeys(attrs)]
+    Object.keys(attrs).forEach(key => !['attribute', 'base', 'modifier'].includes(key) ? delete attrs[key] : false)
+    attrs = processingFunctions.parseIntegers(attrs)
+    return attrs
+  },
+
+  contructRepeatingWeaponAttributes: (repRowID, type) => {
+    const attributeList = shadowrunFunctions.determineWeaponAttributesByType(type)
+    const constructedWeaponAttributes = shadowrunFunctions.addRepRow(repRowID, attributeList)
+    return constructedWeaponAttributes
+  },
+
+  buildDisplay: (base, bonus) => bonus === 0 ? base : `${base} (${base + bonus})`,
+
+  calculateBonuses: attrs => {
+    attrs.bonus = 0
+    for (let [key, value] of Object.entries(attrs)) { 
+      if (key.includes('modifier') || key.includes('temp')) {
+        attrs.bonus += value
+        delete attrs[key]
+      }
+    }
+    return attrs
+  },
+  calculateConditionTracks: conditionInts => Math.ceil(conditionInts.attribute/2) + conditionInts.base + conditionInts.modifier,
+  calculateLimitTotal: attrs => Math.ceil((attrs[0] + attrs[1] + (attrs[2] * 2))/3),
+  calculateRunSpeed: (agility, modifier) => (agility * 4) + modifier,
+  calculateWalkSpeed:(agility, modifier) => (agility * 2) + modifier,
+  calculateWounds: attrs => {
+    const divisor  = attrs.low_pain_tolerance === 2 ? attrs.low_pain_tolerance : 3;
+    const highPain = attrs.high_pain_tolerance >= 1 ? attrs.high_pain_tolerance : 0;
+    let sum = 0;
+
+    ["stun", "physical"].forEach(attr => {
+      const damageCompensator = attrs[`damage_compensators_${attr}`] || 0
+      let dividend = Math.max(attrs[`${attr}`] - (highPain + damageCompensator), 0)
+      sum -= Math.floor(dividend / divisor) || 0
+    })
+    return sum
+  },
+
+  convertSkillSelectToHiddenSkill: skillName => {
+    let skill = skillName.toLowerCase()
+    skill = skill.includes('group') ? skill.slice(0, -6) : skill
+    skill = skill.includes(" ") ? skill.replace(/ /g,"") : skill
+    return skill
+  },
+
+  determineConditionBase: (type, drone) => drone && drone === 'drone' ? 6 : type === 'vehicle' ? 12 : 8,
+  determineConditionAttribute: attrs => attrs.willpower ? attrs.willpower : attrs.body ? attrs.body : attrs.device_rating ? attrs.device_rating : 0,
+  determineExplodingEdge: newValue => newValue === `@{edge}` ?  "!" : "",
+  determineWeaponAttributesByType: weaponType =>  weaponType === 'range' ? sheetAttributes.rangeAttributes : sheetAttributes.meleeAttributes,
+
+  findFlagInKeys: attrs => Object.keys(attrs).find(key => key.includes('_flag')),
+  findModifierInKeys: attrs => Object.keys(attrs).find(key => key.includes('_modifier')),
+  
+  processTempFlags: attrs => {
+    try {
+      const tempFlag = shadowrunFunctions.findFlagInKeys(attrs)
+      const attrName = tempFlag.split('_temp_flag')[0]
+      attrs[`${tempFlag}`] === 'on' ? false : delete attrs[`${attrName}_temp`];
+      delete attrs[`${tempFlag}`];
+      return attrs
+    } catch (error) {
+      console.error(error)
+    }
+  },
+
+  resetRepeatingFieldsPrimaries: (repeatingSection, repRowID) => {
+    getSectionIDs(repeatingSection, ids => {
+      let attributesWithIDs = [];
+      let update = {};
+      ids.forEach(id => attributesWithIDs.push(`${repeatingSection}_${id}_primary`))
+      attributesWithIDs.forEach(attribute => !attribute.includes(repRowID) ? update[attribute] = 0 : false)
+      setAttrs(update);
+    })
+  },
+
+  shotsFired: (shots, trigger) => shots > 0 && trigger.includes('remove') ? shots -= 1 : trigger.includes('add') ? shots += 1 : shots,
+  
+  //Reset will remove data in Primary entries on Core tab
+  resetPrimaryArmor: () => {
+    const resetPrimary = new PrimaryArmor()
+    let update = {}
+    for (let [key, value] of Object.entries(resetPrimary)) {
+      update[key] = value
+    }
+    return update
+  },
+  resetPrimaryWeapon: type => {
+    const resetPrimary = type === 'range' ? new PrimaryRangeWeapon(type) : new PrimaryMeleeWeapon(type)
+    let update = {}
+    for (let [key, value] of Object.entries(resetPrimary)) {
+      update[key] = value
+    }
+    return update
+  },
+
+  updateLimitTotal: attrs => {
+    attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
+    return shadowrunFunctions.calculateLimitTotal(Object.values(attrs))
+  },
+
+  //Update Functions take data from one place and applies it to other attributes
+  updatePrimaryArmor: attrs => {
+    let update = {}
+
+    for (let [key, value] of Object.entries(attrs)) {
+      const repRowID = processingFunctions.getReprowid(key)
+      if (key.includes('name')) {
+        update['armor_name'] = attrs[`${repRowID}_name`]
+      } else if (key.includes('rating')) {
+        update['armor_rating'] = value
+      } else if (key.includes('dicepool_modifier')) {
+        update['soak_modifier'] = value
+      } else {
+        const type = key.split('_')[3]
+        update[`${type}_modifier`] = value
+      }
+    }
+
+    return update
+  },
+  updatePrimaryWeapons: attrs => {
+    let update = {}
+    for (let [key, value] of Object.entries(attrs)) {
+      const type = processingFunctions.findRepeatingField(key)
+      const weaponAttribute = processingFunctions.getReprowAttribute(key)
+      const primaryAttributeName = key.includes('weapon') ? `primary_${type}_weapon` : `primary_${type}_weapon_${weaponAttribute}`
+      update[primaryAttributeName] = value
+
+      if (key.includes('ammo')) {
+        update[`${primaryAttributeName}_max`] = value
+      }
+    }
+    return update
+  }
+}
+
+//for Mocha Unit Testing
+//-module.exports = shadowrunFunctions;
 
   //Edge toggle to include ! for exploding dice
-const edgeToggle = eventinfo => {
+const edgeToggle = newValue => {
   processingFunctions.setAttributes({
-    explode_toggle: eventinfo.newValue === `@{edge}` ?  "!" : ""
+    explode_toggle: shadowrunFunctions.determineExplodingEdge(newValue)
   })
 }
 
@@ -3725,9 +3746,9 @@ const updatePrimary = eventinfo => {
       let update = {}
 
       if (repRowID.includes('armor')) {
-        update = processingFunctions.shadowrun.updatePrimaryArmor({[eventinfo.triggerName]: eventinfo.newValue})
+        update = shadowrunFunctions.updatePrimaryArmor({[eventinfo.triggerName]: eventinfo.newValue})
       } else {
-        update = processingFunctions.shadowrun.updatePrimaryWeapons({[eventinfo.triggerName]: eventinfo.newValue})
+        update = shadowrunFunctions.updatePrimaryWeapons({[eventinfo.triggerName]: eventinfo.newValue})
       }
 
       processingFunctions.setAttributes(update)
@@ -3738,14 +3759,14 @@ const updatePrimary = eventinfo => {
 const updateRepeatingWeaponPrimary = (eventinfo, type) => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
   if (eventinfo.newValue === 'primary') {
-    const constructedWeaponAttributes = processingFunctions.shadowrun.contructRepeatingWeaponAttributes(repRowID, type)
+    const constructedWeaponAttributes = shadowrunFunctions.contructRepeatingWeaponAttributes(repRowID, type)
     getAttrs(constructedWeaponAttributes, attrs => { 
-      const update = processingFunctions.shadowrun.updatePrimaryWeapons(attrs)
+      const update = shadowrunFunctions.updatePrimaryWeapons(attrs)
       processingFunctions.setAttributes(update)
     })
-    processingFunctions.shadowrun.resetRepeatingFieldsPrimaries(`repeating_${type}`, repRowID)
+    shadowrunFunctions.resetRepeatingFieldsPrimaries(`repeating_${type}`, repRowID)
   } else {
-    const update = processingFunctions.shadowrun.resetPrimaryWeapon(type)
+    const update = shadowrunFunctions.resetPrimaryWeapon(type)
     processingFunctions.setAttributes(update)
   }
 }
@@ -3753,14 +3774,14 @@ const updateRepeatingWeaponPrimary = (eventinfo, type) => {
 const updateRepeatingArmorPrimary = eventinfo => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
   if (eventinfo.newValue === 'primary') {
-    const constructedArmorAttributes = processingFunctions.shadowrun.addRepRow(repRowID, sheetAttributes.armorAttributes)
+    const constructedArmorAttributes = shadowrunFunctions.addRepRow(repRowID, sheetAttributes.armorAttributes)
     getAttrs(constructedArmorAttributes, attrs => { 
-      const update = processingFunctions.shadowrun.updatePrimaryArmor(attrs)
+      const update = shadowrunFunctions.updatePrimaryArmor(attrs)
       processingFunctions.setAttributes(update)
     })
-    processingFunctions.shadowrun.resetRepeatingFieldsPrimaries(`repeating_armor`, repRowID)
+    shadowrunFunctions.resetRepeatingFieldsPrimaries(`repeating_armor`, repRowID)
   } else {
-    const update = processingFunctions.shadowrun.resetPrimaryArmor()
+    const update = shadowrunFunctions.resetPrimaryArmor()
     processingFunctions.setAttributes(update)
   }
 }
@@ -3778,7 +3799,7 @@ const updateRepeatingWeaponDicepool = trigger => {
 const updateRepeatingSkillDicepool = eventinfo => {
    const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
     getAttrs([`${repRowID}_skill`], attrs => {
-      let skill = processingFunctions.shadowrun.convertSkillSelectToHiddenSkill(attrs[`${repRowID}_skill`])
+      let skill = shadowrunFunctions.convertSkillSelectToHiddenSkill(attrs[`${repRowID}_skill`])
       processingFunctions.setAttributes({
         [`${skill}`]: eventinfo.newValue
       })
@@ -3820,10 +3841,10 @@ const updateRepeatingSkillAttribute = eventinfo => {
 const updateRepeatingSkillRating = trigger => {
   const repRowID = processingFunctions.getReprowid(trigger)
   getAttrs([`${repRowID}_rating`, `${repRowID}_rating_modifier`], attrs => {   
-    attrs = processingFunctions.shadowrun.attributeFactory(attrs)
+    attrs = shadowrunFunctions.attributeFactory(attrs)
     processingFunctions.setAttributes({
       [`${repRowID}_dicepool`]: attrs.total,
-      [`${repRowID}_display_rating`]: processingFunctions.shadowrun.buildDisplay(attrs.base, attrs.bonus)
+      [`${repRowID}_display_rating`]: shadowrunFunctions.buildDisplay(attrs.base, attrs.bonus)
     })
   })
 }
@@ -3831,15 +3852,15 @@ const updateRepeatingSkillRating = trigger => {
 const updateWounds = () => {
   getAttrs(sheetAttributes.woundCalculation, attrs => {
     attrs = processingFunctions.parseIntegers(attrs)
-    const sum = processingFunctions.shadowrun.calculateWounds(attrs)
+    const sum = shadowrunFunctions.calculateWounds(attrs)
     processingFunctions.setAttributes({wounds: sum})
   })
 }
 
 const updateConditionTracks= conditionTrack => {
   getAttrs(sheetAttributes[conditionTrack], attrs => {
-    attrs = processingFunctions.shadowrun.conditionFactory(attrs)
-    const conditionTotal = processingFunctions.shadowrun.calculateConditionTracks(attrs)
+    attrs = shadowrunFunctions.conditionFactory(attrs)
+    const conditionTotal = shadowrunFunctions.calculateConditionTracks(attrs)
     processingFunctions.setAttributes({[`${conditionTrack}_max`]: conditionTotal}, true)
   })
 }
@@ -3858,7 +3879,7 @@ const translations = () => {
 const updateShotsFired = trigger => {
   getAttrs([`shots_fired`], attrs => {   
     attrs = processingFunctions.parseIntegers(attrs)
-    const shots = processingFunctions.shadowrun.shotsFired(attrs.shots_fired, trigger)
+    const shots = shadowrunFunctions.shotsFired(attrs.shots_fired, trigger)
     processingFunctions.setAttributes({shots_fired: shots})
   });
 }
@@ -3882,7 +3903,7 @@ const updateTab = attr => processingFunctions.setAttributes({tab: attr})
 
 const updateAttributes = (array, attribute) => {
   getAttrs(array, attrs => {
-    attrs = processingFunctions.shadowrun.attributeFactory(attrs)
+    attrs = shadowrunFunctions.attributeFactory(attrs)
     processingFunctions.setAttributes({
       [attribute]: attrs.total,
       [`display_${attribute}`]: attrs.base === attrs.total ? attrs.base : `${attrs.base} (${attrs.total})`
@@ -3892,16 +3913,16 @@ const updateAttributes = (array, attribute) => {
 
 const updateLimitTotal = attrs => {
   attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
-  return processingFunctions.shadowrun.calculateLimitTotal(Object.values(attrs))
+  return shadowrunFunctions.calculateLimitTotal(Object.values(attrs))
 }
 
 const updateLimits = attributeLimit => {
   const array = sheetAttributes[attributeLimit].concat([`${attributeLimit}_modifier`, `${attributeLimit}_temp`, `${attributeLimit}_temp_flag`])
   getAttrs(array, attrs => {
-      attrs = processingFunctions.shadowrun.attributeFactory(attrs)
+      attrs = shadowrunFunctions.attributeFactory(attrs)
       const bonus = attrs.bonus
       delete attrs.bonus
-      const base = processingFunctions.shadowrun.updateLimitTotal(attrs)
+      const base = shadowrunFunctions.updateLimitTotal(attrs)
       processingFunctions.setAttributes({
         [attributeLimit]: processingFunctions.sumIntegers([base, bonus])
       })
@@ -3912,15 +3933,15 @@ const updateMovement = () => {
   getAttrs(['agility', 'walk_modifier', 'run_modifier'], attrs => {
     attrs = processingFunctions.parseIntegers(attrs)
     processingFunctions.setAttributes({
-      walk: processingFunctions.shadowrun.calculateWalkSpeed(attrs.agility, attrs.walk_modifier),
-      run: processingFunctions.shadowrun.calculateRunSpeed(attrs.agility, attrs.run_modifier)
+      walk: shadowrunFunctions.calculateWalkSpeed(attrs.agility, attrs.walk_modifier),
+      run: shadowrunFunctions.calculateRunSpeed(attrs.agility, attrs.run_modifier)
     })
   })
 }
 
 const updateDerivedAttribute = derivedAttribute => {
   getAttrs(sheetAttributes[derivedAttribute], attrs => {
-    attrs = processingFunctions.shadowrun.attributeFactory(attrs)
+    attrs = shadowrunFunctions.attributeFactory(attrs)
     processingFunctions.setAttributes({[derivedAttribute]: attrs.total})
   })
 }
@@ -3928,15 +3949,19 @@ const updateDerivedAttribute = derivedAttribute => {
 const updateInitiativeDice = () => {
   getAttrs(["initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], values => {
     const edgeFlag = values.edge_toggle === "@{edge}" ? true : false;
-    values = processingFunctions.shadowrun.processTempFlags(values)
+    values = shadowrunFunctions.processTempFlags(values)
     values = processingFunctions.parseIntegers(values)
-    const bonus = processingFunctions.shadowrun.calculateBonuses(values)
+    const bonus = shadowrunFunctions.calculateBonuses(values)
     const total = Math.min(values.bonus+1,5)
     processingFunctions.setAttributes({
       initiative_dice: edgeFlag ? 5 : total
     })
   })
 }
+
+
+//- +======== EVERYTHING BELOW THIS LINE LACKS UNIT TESTS =======+
+//- +======== NEEDS REFACTORING =======+
 
 const resetConditionTrack = eventinfo => {
   const attr = eventinfo.triggerName.split("_").pop();
@@ -4002,149 +4027,150 @@ const updateAstralInitiativeDice = () => {
     })
   })
 }
-  <!--Old functions working to become obsolete-->
+
+
 
 //Weapon displays set into an Array
-	// Builder function to display details properly
-	// Note that since undefined are falsey if there's no label or sign we can leave the parameters blank
-	function repeatingStringBuilder(v, keyBase) {
-	    return function(key, label, sign) {
-	        // fetch the attr from v checking if it has a value
-	        const val = v[`${keyBase}${key}`];
-	        if (!val) return '';
+  // Builder function to display details properly
+  // Note that since undefined are falsey if there's no label or sign we can leave the parameters blank
+  function repeatingStringBuilder(v, keyBase) {
+      return function(key, label, sign) {
+          // fetch the attr from v checking if it has a value
+          const val = v[`${keyBase}${key}`];
+          if (!val) return '';
 
-	        // Apply the sign if needed
-	        const disp = sign && val > 0 ? `+${val}` : val;
+          // Apply the sign if needed
+          const disp = sign && val > 0 ? `+${val}` : val;
 
-	        // Apply label if needed
-	        return label ? `${label} ${disp}` : disp;
-	    }
-	}
+          // Apply label if needed
+          return label ? `${label} ${disp}` : disp;
+      }
+  }
 
-	on("change:repeating_weapon", () => {
-		const source = "repeating_weapon_weapon";
-	    getAttrs([`${source}_range`, `${source}_type`, `${source}_reach`, `${source}_acc`, `${source}_dv`, `${source}_ap`, `${source}_mode`, `${source}_rc`, `${source}_ammo`, `${source}_note`, `${source}_primary`], (v) => {
-	        // Local builder putting the needed variables into scope for repeatingStringBuilder
-	        const b = repeatingStringBuilder(v, `${source}_`);
-	        // Determine fields to display and in their proper order and formatting
-	        // Anonymous function is purely stylistic and adds more overhead than just a simple switch/case.  Personally I find the function looks cleaner and hides any internal scope that might conflict with outside
-	        const display = (() => {
-	            // 0 for weapon_range is a ranged weapon. A 1 is a melee weapon.
-	            switch(v.repeating_weapon_weapon_range) {
-	                case '0':
-	                // Not a fan of how ammo has to be handled.  Could potentially be placed in the repeatingStringBuilder if used more often for other change:repeating functions as some sort of suffix parameter
-	                const ammo = b('amm');
-	                return [
-	                    b('type'),
-	                    b('acc', 'ACC'),
-	                    b('dv', 'DV'),
-	                    b('ap', 'AP', true),
-	                    b('mode'),
-	                    b('rc', 'RC'),
-	                    ammo ? `${ammo} (c)` : '',
-	                    b('note')
-	                ];
-	                case '1': return [
-	                    b('type'),
-	                    b('reach', 'Reach', true),
-	                    b('acc', 'ACC'),
-	                    b('dv', 'DV'),
-	                    b('ap', 'AP', true),
-	                    b('note')
-	                ];
-	                default: return [
-	                    b('type'),
-	                    b('acc', 'ACC'),
-	                    b('dv', 'DV'),
-	                    b('ap', 'AP', true),
-	                    b('note')
-	                ];
-	            }
-	        })()
-	            // Remove all empty strings
-	            .filter(s => s)
-	            // Concat all the strings and add comma between
-	            .join(', ');
+  on("change:repeating_weapon", () => {
+    const source = "repeating_weapon_weapon";
+      getAttrs([`${source}_range`, `${source}_type`, `${source}_reach`, `${source}_acc`, `${source}_dv`, `${source}_ap`, `${source}_mode`, `${source}_rc`, `${source}_ammo`, `${source}_note`, `${source}_primary`], (v) => {
+          // Local builder putting the needed variables into scope for repeatingStringBuilder
+          const b = repeatingStringBuilder(v, `${source}_`);
+          // Determine fields to display and in their proper order and formatting
+          // Anonymous function is purely stylistic and adds more overhead than just a simple switch/case.  Personally I find the function looks cleaner and hides any internal scope that might conflict with outside
+          const display = (() => {
+              // 0 for weapon_range is a ranged weapon. A 1 is a melee weapon.
+              switch(v.repeating_weapon_weapon_range) {
+                  case '0':
+                  // Not a fan of how ammo has to be handled.  Could potentially be placed in the repeatingStringBuilder if used more often for other change:repeating functions as some sort of suffix parameter
+                  const ammo = b('amm');
+                  return [
+                      b('type'),
+                      b('acc', 'ACC'),
+                      b('dv', 'DV'),
+                      b('ap', 'AP', true),
+                      b('mode'),
+                      b('rc', 'RC'),
+                      ammo ? `${ammo} (c)` : '',
+                      b('note')
+                  ];
+                  case '1': return [
+                      b('type'),
+                      b('reach', 'Reach', true),
+                      b('acc', 'ACC'),
+                      b('dv', 'DV'),
+                      b('ap', 'AP', true),
+                      b('note')
+                  ];
+                  default: return [
+                      b('type'),
+                      b('acc', 'ACC'),
+                      b('dv', 'DV'),
+                      b('ap', 'AP', true),
+                      b('note')
+                  ];
+              }
+          })()
+              // Remove all empty strings
+              .filter(s => s)
+              // Concat all the strings and add comma between
+              .join(', ');
 
-	        let update = {};
-	        update[`${source}`] = `[${display}]`;
+          let update = {};
+          update[`${source}`] = `[${display}]`;
 
-	        // Finally wrap square brackets around the weapon display
-	        setAttrs(update);
-	    });
-	});
+          // Finally wrap square brackets around the weapon display
+          setAttrs(update);
+      });
+  });
 
 
-	//Spell displays set into an Array
-		on("change:repeating_NPCspell", () => {
-		    getAttrs(["repeating_NPCspell_combat_type", "repeating_NPCspell_type", "repeating_NPCspell_range", "repeating_NPCspell_damage", "repeating_NPCspell_duration", "repeating_NPCspell_drain", "repeating_NPCspell_note"], (v) =>{
-		        const com = v.repeating_NPCspell_combat_type;
-		        const typ = `Type ${v.repeating_NPCspell_type}, `;
-				const ran = `${v.repeating_NPCspell_range}, `;
-				const dam = `Damage ${v.repeating_NPCspell_damage}, `;
-				const dur = `Duration ${v.repeating_NPCspell_duration}, `;
-				const not = `, ${v.repeating_NPCspell_note}`;
-				const dra = v.repeating_NPCspell_drain;
+//Spell displays set into an Array
+  on("change:repeating_NPCspell", () => {
+      getAttrs(["repeating_NPCspell_combat_type", "repeating_NPCspell_type", "repeating_NPCspell_range", "repeating_NPCspell_damage", "repeating_NPCspell_duration", "repeating_NPCspell_drain", "repeating_NPCspell_note"], (v) =>{
+          const com = v.repeating_NPCspell_combat_type;
+          const typ = `Type ${v.repeating_NPCspell_type}, `;
+      const ran = `${v.repeating_NPCspell_range}, `;
+      const dam = `Damage ${v.repeating_NPCspell_damage}, `;
+      const dur = `Duration ${v.repeating_NPCspell_duration}, `;
+      const not = `, ${v.repeating_NPCspell_note}`;
+      const dra = v.repeating_NPCspell_drain;
 
-				const drain = (dra > 0) ? `F+${dra} ` : (dra < 0) ? `F${dra} ` :"F ";
-				const info = `[${typ}${ran}${dam}${dur}${drain}${not}]`;
+      const drain = (dra > 0) ? `F+${dra} ` : (dra < 0) ? `F${dra} ` :"F ";
+      const info = `[${typ}${ran}${dam}${dur}${drain}${not}]`;
 
-				display = (com === "Direct, Force ") ? ` (Direct) ${info}` : 
-					(com === "Indirect, Force ?{Force|}, AP -") ? ` (Indirect) ${info}` : `${info}`;
-		        setAttrs({repeating_NPCspell_spell: display});
-		    });
-		});
+      display = (com === "Direct, Force ") ? ` (Direct) ${info}` : 
+        (com === "Indirect, Force ?{Force|}, AP -") ? ` (Indirect) ${info}` : `${info}`;
+          setAttrs({repeating_NPCspell_spell: display});
+      });
+  });
 
-	//Complex Form displays  set into an Array
-		on("change:repeating_form", () => {
-		    getAttrs(["repeating_form_form_duration", "repeating_form_form_target", "repeating_form_form_fade", "repeating_form_form_note", ], (v) =>{
-		    	const tar = `Target ${v.repeating_form_form_target}, `;
-				const dur = `Duration ${v.repeating_form_form_duration}, `;
-				const not = `, ${v.repeating_form_form_note}` || '';
-				const fad = (v.repeating_form_form_fade > 0) ? `L+${v.repeating_form_form_fade}` : 
-							(v.repeating_form_form_fade < 0) ? `L${v.repeating_form_form_fade}` : "L";
+//Complex Form displays  set into an Array
+  on("change:repeating_form", () => {
+      getAttrs(["repeating_form_form_duration", "repeating_form_form_target", "repeating_form_form_fade", "repeating_form_form_note", ], (v) =>{
+        const tar = `Target ${v.repeating_form_form_target}, `;
+      const dur = `Duration ${v.repeating_form_form_duration}, `;
+      const not = `, ${v.repeating_form_form_note}` || '';
+      const fad = (v.repeating_form_form_fade > 0) ? `L+${v.repeating_form_form_fade}` : 
+            (v.repeating_form_form_fade < 0) ? `L${v.repeating_form_form_fade}` : "L";
 
-		        setAttrs({
-		        	repeating_form_form: ` [${tar}${dur}${fad}${not}]`
-		        });
-		    });
-		});
+          setAttrs({
+            repeating_form_form: ` [${tar}${dur}${fad}${not}]`
+          });
+      });
+  });
 
-	//IC displays are set into an Array
-		on("change:repeating_IC", () => {
-		    getAttrs(["attack", "data_processing", "repeating_IC_IC_limit", "repeating_IC_IC_attribute", "repeating_IC_IC_matrix", "repeating_IC_IC_note"], (v) =>{
-		    	const att = parseInt(v.attack) || 0;
-		    	const data = parseInt(v.data_processing) || 0;
-  				const attr = v.repeating_IC_IC_attribute;
-  				const mat = v.repeating_IC_IC_matrix;
-  				const not = v.repeating_IC_IC_note;
+//IC displays are set into an Array
+  on("change:repeating_IC", () => {
+      getAttrs(["attack", "data_processing", "repeating_IC_IC_limit", "repeating_IC_IC_attribute", "repeating_IC_IC_matrix", "repeating_IC_IC_note"], (v) =>{
+        const att = parseInt(v.attack) || 0;
+        const data = parseInt(v.data_processing) || 0;
+        const attr = v.repeating_IC_IC_attribute;
+        const mat = v.repeating_IC_IC_matrix;
+        const not = v.repeating_IC_IC_note;
 
-		        setAttrs({
-		        	repeating_IC_IC: (v.repeating_IC_IC_limit === "@{data_processing}") ? ` ([${data}] vs. ${attr} + ${mat}, ${not})` : `([${att}] vs. ${attr} + ${mat}, ${not})`
-		        });
-		    });
-		});
+          setAttrs({
+            repeating_IC_IC: (v.repeating_IC_IC_limit === "@{data_processing}") ? ` ([${data}] vs. ${attr} + ${mat}, ${not})` : `([${att}] vs. ${attr} + ${mat}, ${not})`
+          });
+      });
+  });
 
-	   ['acceleration', 'armor', 'body', 'data_processing', 'handling', 'pilot', 'sensor','speed'].forEach(attr => {
-	        // Attach listener
-	        on(`change:repeating_vehicle:${attr}_base change:repeating_vehicle:${attr}_modifier change:repeating_vehicle:${attr}_temp`, () => {
-	            // Load attribute values
-	            getAttrs([`repeating_vehicle_${attr}_base`, `repeating_vehicle_${attr}_modifier`, `repeating_vehicle_${attr}_temp`], (v) => {
-	                // Do some math to calculate the total
-	                const bas = parseInt(v[`repeating_vehicle_${attr}_base`]) || 0;
-	                const mod = parseInt(v[`repeating_vehicle_${attr}_modifier`]) || 0;
-	                const tem = parseInt(v[`repeating_vehicle_${attr}_temp`]) || 0;
-	                const bon = mod + tem;
-	                const stat = bas + bon;
+   ['acceleration', 'armor', 'body', 'data_processing', 'handling', 'pilot', 'sensor','speed'].forEach(attr => {
+        // Attach listener
+        on(`change:repeating_vehicle:${attr}_base change:repeating_vehicle:${attr}_modifier change:repeating_vehicle:${attr}_temp`, () => {
+            // Load attribute values
+            getAttrs([`repeating_vehicle_${attr}_base`, `repeating_vehicle_${attr}_modifier`, `repeating_vehicle_${attr}_temp`], (v) => {
+                // Do some math to calculate the total
+                const bas = parseInt(v[`repeating_vehicle_${attr}_base`]) || 0;
+                const mod = parseInt(v[`repeating_vehicle_${attr}_modifier`]) || 0;
+                const tem = parseInt(v[`repeating_vehicle_${attr}_temp`]) || 0;
+                const bon = mod + tem;
+                const stat = bas + bon;
 
-	                // Update the finalized total
-	                setAttrs({
-	                    [attr]: stat,
-	                    [`repeating_vehicle_display_${attr}`]: bon === 0 ? bas : `${bas} (${stat})`
-	                }, {silent: true});
-	            });
-	        });
-	    });
+                // Update the finalized total
+                setAttrs({
+                    [attr]: stat,
+                    [`repeating_vehicle_display_${attr}`]: bon === 0 ? bas : `${bas} (${stat})`
+                }, {silent: true});
+            });
+        });
+    });
   const versioning = version => {
   	console.log(`%c Shadowrun 5th Edition versioning, ${version}`, "color: darkblue; font-weight:bold");
 
@@ -4343,7 +4369,7 @@ const onepointthreefive = () => {
 
 	on('clicked:cond_reset_physical clicked:cond_reset_stun', eventinfo => resetConditionTrack(eventinfo))
 
-	on('change:edge_toggle', eventinfo => edgeToggle(eventinfo))
+	on('change:edge_toggle', eventinfo => edgeToggle(eventinfo.newValue))
 
 	on('change:device_rating change:matrix_modifier', () => updateMatrixMaximum())
 

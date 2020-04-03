@@ -62,7 +62,7 @@
 
 	on('clicked:cond_reset_physical clicked:cond_reset_stun', eventinfo => resetConditionTrack(eventinfo))
 
-	on('change:edge_toggle', eventinfo => edgeToggle(eventinfo))
+	on('change:edge_toggle', eventinfo => edgeToggle(eventinfo.newValue))
 
 	on('change:device_rating change:matrix_modifier', () => updateMatrixMaximum())
 
