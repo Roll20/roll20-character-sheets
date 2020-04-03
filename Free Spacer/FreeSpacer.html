@@ -105,6 +105,13 @@
 				<div class="aspectTextbox"><input type="text" name="attr_Parturition" class="full aspect"></div>
 			</div>
 		</div>
+		<!--Task Dice Pool-->
+		<!--<input type="text" class="hidden" name="attr_taskSkill" value="0"/>
+		<input type="number" class="hidden" name="attr_taskSkillRating" value="0"/>
+		<input type="text" class="hidden" name="attr_taskSpecialty" value="0"/>
+		<input type="number" class="hidden" name="attr_taskSpecialtyRating" value="0"/>
+		<input type="number" class="hidden" name="attr_taskAdvantageRating" value="0"/>
+		<input type="number" class="hidden" name="attr_taskThreatRating" value="0"/>-->
 		<!--Skills -->
 		<div class="skillRow">
 			<h2 class="subtitlesGrid skillHeader">Skills</h2>
@@ -118,7 +125,7 @@
 					<input type="radio" class="inlinePipCheckbox hideCheckbox" name="attr_Culture" value="3" /><span class="inlinePips D10"></span>
 				</div>
 				<div class="skillRollButton">
-					<button class="rollButton" type="roll" value="/roll [[@{Culture}+?{Culture Specialty|Anthropology, @{CultureAnthropology}|History, @{CultureHistory}|Lingustics, @{CultureLingustics}}+?{Advantage|0}]]d10>10f<4+[[[[@{Culture}+?{Culture Specialty|Anthropology, @{CultureAnthropology}|History, @{CultureHistory}|Lingustics, @{CultureLingustics}}+?{Advantage|0}]]d1>1]]+?{Threat Dice|3}d6>7f<3"></button>
+					<button class="rollButton" type="roll" value="&{template:FS} {{taskSkill=Culture}} {{taskSkillRating=@{Culture} }} {{taskSpecialtyRating=?{Culture Specialty|Anthropology, @{CultureAnthropology}|History, @{CultureHistory}|Lingustics, @{CultureLingustics} }} {{taskAdvantageRating=?{Advantage|0} }} {{taskThreatRating=?{Threat Dice|3} }} {{result=[[{taskSkillRating+taskSpecialtyRating+taskAdvantageRating}d10>4, {taskThreatRating}d6<f3]]}}"></button>
 				</div>
 				<div class="specialty">Anthropology:</div>
 				<div class="specialtydice">
@@ -3793,7 +3800,7 @@
 				</div>
 				<div class="resource">
 					<div class="resourceTitle">Total</div>
-					<div class="resourceBoxPlace"><input type="number" name="attr_totalResource" min="0" class="resourceBox" /></div>
+					<div class="resourceBoxPlace"><input type="number" name="attr_totalResource" min="0" class="resourceBox" readonly="readonly" /></div>
 					<div class="resourceTonnes">tonnes</div>
 				</div>
 			</div>
@@ -3804,7 +3811,7 @@
 				<div class="cargoTonnage">Tonnage</div>
 				<div class="cargoBox">
 					<fieldset class="repeating_shipCargo">
-						<input type="text" name="attr_shipCargo" class="threeQuarters" />
+						<input type="text" name="attr_shipCargo" class="fourFifths" />
 						<input type="number" min="0" name="attr_shipCargoRV" />
 						<input type="number" min="0" name="attr_shipCargoTonnage" />
 					</fieldset>
@@ -7849,19 +7856,61 @@
 	</div>
 </div>
 
+<!-- ----------------------- -->
+<!--      Roll Template      -->
+<!-- ----------------------- -->
+<rolltemplate class="sheet-rolltemplate-FS">
+	<div class="rolltemplate">
+		<div>{{taskSkill}}"("{{taskSkillRating}}")"</div>
+		<div>{{taskSpecialty}}"("{{taskSpecialtyRating}}")"</div>
+		<div class="result">Result: {{result}} Hits</div>
+	</div>
+</rolltemplate>
 
 <script type="text/worker">
+	<!--<script type="text/javascript">-->
+	/*Global variables*/
 
+
+	//Cargo Total
+	on("sheet:opened change:repeating_shipcargo remove:repeating_shipcargo change:supply change:complexmaterials", function ()
+	{
+
+		getAttrs(["supply", "complexMaterials","totalResource", "shipCargoTonnage"], function (values)
+		{
+			if (!Array.isArray(fields)) fields = ["shipCargoTonnage"];
+			getSectionIDs(`repeating_${shipCargo}`, idArray =>
+			{
+				let section = shipCargo;
+				const attrArray = idArray.reduce((m, id) => [...m, ...(fields.map(field => `repeating_${section}_${id}_${field}`))], []);
+				console.log("===== values of v: " + JSON.stringify(values) + " =====");
+				// getValue: if not a number, returns 1 if it is 'on' (checkbox), otherwise returns 0..
+				const getValue = (section, id, field) => parseFloat(values[`repeating_${section}_${id}_${field}`]) || (values[`repeating_${section}_${id}_${field}`] === 'on' ? 1 : 0);
+				const sumTotal = idArray.reduce((total, id) => total + fields.reduce((subtotal, field) => subtotal * getValue(section, id, field), 1), 0);
+
+				let supply = parseInt(values.supply, 10) || 0;
+				let materials = parseInt(values.complexMaterials, 10) || 0;
+
+				setAttrs({ ["totalResource"]: sumTotal + supply + materials });
+			});
+		});
+
+	});
+
+
+	/* Ship Configuration */
 	const int = score => parseInt(score, 10) || 0;
-
-	const gridposition = ["03","04","05","11","12","13","14","15","16","17","21","22","23","24","25","26","27","31","32","33","34","35","36","37","41","42","43","44","45","46","47","51","52","53","54","55","56","57","61","62","63","64","65","66","67","71","72","73","74","75","76","77","81","82","83","84","85","86","87","91","92","93","94","95","96","97"];
+	const gridposition = ["03", "04", "05", "11", "12", "13", "14", "15", "16", "17", "21", "22", "23", "24", "25", "26", "27", "31", "32", "33", "34", "35", "36", "37", "41", "42", "43", "44", "45", "46", "47", "51", "52", "53", "54", "55", "56", "57", "61", "62", "63", "64", "65", "66", "67", "71", "72", "73", "74", "75", "76", "77", "81", "82", "83", "84", "85", "86", "87", "91", "92", "93", "94", "95", "96", "97"];
 
 	// bow changes
-	gridposition.forEach(cell => {
-	on(`change:bow${cell}`, (eventInfo) => {
-	let allstats = [`bow${cell}`,`bow_color${cell}`, `bow_label${cell}`,"colorselected"]; // `color${cell}`,
+	gridposition.forEach(cell =>
+	{
+	on(`change:bow${cell}`, (eventInfo) =>
+	{
+	let allstats = [`bow${cell}`, `bow_color${cell}`, `bow_label${cell}`, "colorselected"]; // `color${cell}`,
 
-	getAttrs(allstats, values => {
+	getAttrs(allstats, values =>
+	{
 	let color = int(values["colorselected"]);
 	let oldcolor = int(values[`bow_color${cell}`]);
 	let box = int(values[`bow${cell}`]);
@@ -7871,88 +7920,109 @@
 	console.log("old color:" + oldcolor + " colorselect:" + color);
 
 	//colors & labels
-	if (box === 1 && oldcolor <= 900){
+	if (box === 1 && oldcolor <= 900)
+	{
 
-	if (color === 1){
+	if (color === 1)
+	{
 	console.log("color -> orange");
 	newcolor = 1;
 	}
-	else if (color === 2){
+	else if (color === 2)
+	{
 	console.log("color -> cyan");
 	newcolor = 2;
 	}
-	else if (color === 3){
+	else if (color === 3)
+	{
 	console.log("color -> yellow");
 	newcolor = 3;
 	}
-	else if (color === 4){
+	else if (color === 4)
+	{
 	console.log("color -> green");
 	newcolor = 4;
 	}
 
 	// labels
-	else if (color === 7){
-	newcolor = 70 + ((oldcolor +10) % 10);
+	else if (color === 7)
+	{
+	newcolor = 70 + ((oldcolor + 10) % 10);
 	console.log("small label");
 	}
-	else if (color === 8){
-	newcolor = 80 + ((oldcolor +10) % 10);
+	else if (color === 8)
+	{
+	newcolor = 80 + ((oldcolor + 10) % 10);
 	console.log("medium label");
 	}
-	else if (color === 5){
-	newcolor = 50 + ((oldcolor +10) % 10);
+	else if (color === 5)
+	{
+	newcolor = 50 + ((oldcolor + 10) % 10);
 	console.log("small vertical label");
 	}
-	else if (color === 6){
-	newcolor = 60 + ((oldcolor +10) % 10);
+	else if (color === 6)
+	{
+	newcolor = 60 + ((oldcolor + 10) % 10);
 	console.log("medium vertical label");
 	}
-	else if (color === 0){
+	else if (color === 0)
+	{
 	newcolor = 0;
 	}
-	else{
+	else
+	{
 	newcolor = oldcolor;
 	}
 	color = (newcolor + 10) % 10;
 	}
 
-	else if (box === 0 && oldcolor >= 900){
+	else if (box === 0 && oldcolor >= 900)
+	{
 	newcolor = oldcolor % 10;
 	color = oldcolor % 10;
 	}
-	else if (box === 1 && oldcolor >= 900){
+	else if (box === 1 && oldcolor >= 900)
+	{
 	newcolor = oldcolor;
 	console.log("+900");
 	}
-	else if (box === 0 && oldcolor <= 900){
+	else if (box === 0 && oldcolor <= 900)
+	{
 
-	if (oldcolor >= 200){
-	newcolor = oldcolor -100;
-	color = oldcolor % 10;
-	}
-	else if (oldcolor > 160){
-	newcolor = oldcolor - 80;
-	color = oldcolor % 10;
-	}
-	else if (oldcolor > 150){
+	if (oldcolor >= 200)
+	{
 	newcolor = oldcolor - 100;
 	color = oldcolor % 10;
 	}
-	else if (oldcolor > 140){
+	else if (oldcolor > 160)
+	{
+	newcolor = oldcolor - 80;
+	color = oldcolor % 10;
+	}
+	else if (oldcolor > 150)
+	{
+	newcolor = oldcolor - 100;
+	color = oldcolor % 10;
+	}
+	else if (oldcolor > 140)
+	{
 	newcolor = oldcolor - 70;
 	color = oldcolor % 10;
 	}
-	else if (oldcolor > 120){
+	else if (oldcolor > 120)
+	{
 	newcolor = oldcolor - 60;
 	color = oldcolor % 10;
 	}
-	else if (oldcolor > 50 ){
+	else if (oldcolor > 50)
+	{
 	newcolor = (oldcolor + 10) % 10;
 	color = (oldcolor + 10) % 10;
 	}
 
 	//small label
-	if (color === 7 ){
+	if (color === 7)
+	{
 	newcolor = 970 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -7961,7 +8031,8 @@
 	});
 	}
 	//medium label
-	else if (color === 8 ){
+	else if (color === 8)
+	{
 	newcolor = 980 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -7970,7 +8041,8 @@
 	});
 	}
 	//small vertical label
-	else if (color === 5 ){
+	else if (color === 5)
+	{
 	newcolor = 950 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -7979,7 +8051,8 @@
 	});
 	}
 	//medium vertical label
-	else if (color === 6 ){
+	else if (color === 6)
+	{
 	newcolor = 960 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -7987,7 +8060,8 @@
 	[`bow${cell}`]: box
 	});
 	}
-	else{
+	else
+	{
 	newcolor = 100 + oldcolor;
 	//console.log("old color:" + oldcolor + ". color set to:" + newcolor);
 	}
@@ -8009,11 +8083,14 @@
 	});
 
 	// Starboard changes
-	gridposition.forEach(cell => {
-	on(`change:starboard${cell}`, (eventInfo) => {
-	let allstats = [`starboard${cell}`,`starboard_color${cell}`, `starboard_label${cell}`,"colorselected"]; // `color${cell}`,
+	gridposition.forEach(cell =>
+	{
+	on(`change:starboard${cell}`, (eventInfo) =>
+	{
+	let allstats = [`starboard${cell}`, `starboard_color${cell}`, `starboard_label${cell}`, "colorselected"]; // `color${cell}`,
 
-	getAttrs(allstats, values => {
+	getAttrs(allstats, values =>
+	{
 	let color = int(values["colorselected"]);
 	let oldcolor = int(values[`starboard_color${cell}`]);
 	let box = int(values[`starboard${cell}`]);
@@ -8023,88 +8100,109 @@
 	console.log("old color:" + oldcolor + " colorselect:" + color);
 
 	//colors & labels
-	if (box === 1 && oldcolor <= 900){
+	if (box === 1 && oldcolor <= 900)
+	{
 
-	if (color === 1){
+	if (color === 1)
+	{
 	console.log("color -> orange");
 	newcolor = 1;
 	}
-	else if (color === 2){
+	else if (color === 2)
+	{
 	console.log("color -> cyan");
 	newcolor = 2;
 	}
-	else if (color === 3){
+	else if (color === 3)
+	{
 	console.log("color -> yellow");
 	newcolor = 3;
 	}
-	else if (color === 4){
+	else if (color === 4)
+	{
 	console.log("color -> green");
 	newcolor = 4;
 	}
 
 	// labels
-	else if (color === 7){
-	newcolor = 70 + ((oldcolor +10) % 10);
+	else if (color === 7)
+	{
+	newcolor = 70 + ((oldcolor + 10) % 10);
 	console.log("small label");
 	}
-	else if (color === 8){
-	newcolor = 80 + ((oldcolor +10) % 10);
+	else if (color === 8)
+	{
+	newcolor = 80 + ((oldcolor + 10) % 10);
 	console.log("medium label");
 	}
-	else if (color === 5){
-	newcolor = 50 + ((oldcolor +10) % 10);
+	else if (color === 5)
+	{
+	newcolor = 50 + ((oldcolor + 10) % 10);
 	console.log("small vertical label");
 	}
-	else if (color === 6){
-	newcolor = 60 + ((oldcolor +10) % 10);
+	else if (color === 6)
+	{
+	newcolor = 60 + ((oldcolor + 10) % 10);
 	console.log("medium vertical label");
 	}
-	else if (color === 0){
+	else if (color === 0)
+	{
 	newcolor = 0;
 	}
-	else{
+	else
+	{
 	newcolor = oldcolor;
 	}
 	color = (newcolor + 10) % 10;
 	}
 
-	else if (box === 0 && oldcolor >= 900){
+	else if (box === 0 && oldcolor >= 900)
+	{
 	newcolor = oldcolor % 10;
 	color = oldcolor % 10;
 	}
-	else if (box === 1 && oldcolor >= 900){
+	else if (box === 1 && oldcolor >= 900)
+	{
 	newcolor = oldcolor;
 	console.log("+900");
 	}
-	else if (box === 0 && oldcolor <= 900){
+	else if (box === 0 && oldcolor <= 900)
+	{
 
-	if (oldcolor >= 200){
-	newcolor = oldcolor -100;
-	color = oldcolor % 10;
-	}
-	else if (oldcolor > 160){
-	newcolor = oldcolor - 80;
-	color = oldcolor % 10;
-	}
-	else if (oldcolor > 150){
+	if (oldcolor >= 200)
+	{
 	newcolor = oldcolor - 100;
 	color = oldcolor % 10;
 	}
-	else if (oldcolor > 140){
+	else if (oldcolor > 160)
+	{
+	newcolor = oldcolor - 80;
+	color = oldcolor % 10;
+	}
+	else if (oldcolor > 150)
+	{
+	newcolor = oldcolor - 100;
+	color = oldcolor % 10;
+	}
+	else if (oldcolor > 140)
+	{
 	newcolor = oldcolor - 70;
 	color = oldcolor % 10;
 	}
-	else if (oldcolor > 120){
+	else if (oldcolor > 120)
+	{
 	newcolor = oldcolor - 60;
 	color = oldcolor % 10;
 	}
-	else if (oldcolor > 50 ){
+	else if (oldcolor > 50)
+	{
 	newcolor = (oldcolor + 10) % 10;
 	color = (oldcolor + 10) % 10;
 	}
 
 	//small label
-	if (color === 7 ){
+	if (color === 7)
+	{
 	newcolor = 970 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -8113,7 +8211,8 @@
 	});
 	}
 	//medium label
-	else if (color === 8 ){
+	else if (color === 8)
+	{
 	newcolor = 980 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -8122,7 +8221,8 @@
 	});
 	}
 	//small vertical label
-	else if (color === 5 ){
+	else if (color === 5)
+	{
 	newcolor = 950 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -8131,7 +8231,8 @@
 	});
 	}
 	//medium vertical label
-	else if (color === 6 ){
+	else if (color === 6)
+	{
 	newcolor = 960 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -8139,7 +8240,8 @@
 	[`starboard${cell}`]: box
 	});
 	}
-	else{
+	else
+	{
 	newcolor = 100 + oldcolor;
 	//console.log("old color:" + oldcolor + ". color set to:" + newcolor);
 	}
@@ -8161,11 +8263,14 @@
 	});
 
 	// Port changes
-	gridposition.forEach(cell => {
-	on(`change:port${cell}`, (eventInfo) => {
-	let allstats = [`port${cell}`,`port_color${cell}`, `port_label${cell}`,"colorselected"]; // `color${cell}`,
+	gridposition.forEach(cell =>
+	{
+	on(`change:port${cell}`, (eventInfo) =>
+	{
+	let allstats = [`port${cell}`, `port_color${cell}`, `port_label${cell}`, "colorselected"]; // `color${cell}`,
 
-	getAttrs(allstats, values => {
+	getAttrs(allstats, values =>
+	{
 	let color = int(values["colorselected"]);
 	let oldcolor = int(values[`port_color${cell}`]);
 	let box = int(values[`port${cell}`]);
@@ -8175,88 +8280,109 @@
 	console.log("old color:" + oldcolor + " colorselect:" + color);
 
 	//colors & labels
-	if (box === 1 && oldcolor <= 900){
+	if (box === 1 && oldcolor <= 900)
+	{
 
-	if (color === 1){
+	if (color === 1)
+	{
 	console.log("color -> orange");
 	newcolor = 1;
 	}
-	else if (color === 2){
+	else if (color === 2)
+	{
 	console.log("color -> cyan");
 	newcolor = 2;
 	}
-	else if (color === 3){
+	else if (color === 3)
+	{
 	console.log("color -> yellow");
 	newcolor = 3;
 	}
-	else if (color === 4){
+	else if (color === 4)
+	{
 	console.log("color -> green");
 	newcolor = 4;
 	}
 
 	// labels
-	else if (color === 7){
-	newcolor = 70 + ((oldcolor +10) % 10);
+	else if (color === 7)
+	{
+	newcolor = 70 + ((oldcolor + 10) % 10);
 	console.log("small label");
 	}
-	else if (color === 8){
-	newcolor = 80 + ((oldcolor +10) % 10);
+	else if (color === 8)
+	{
+	newcolor = 80 + ((oldcolor + 10) % 10);
 	console.log("medium label");
 	}
-	else if (color === 5){
-	newcolor = 50 + ((oldcolor +10) % 10);
+	else if (color === 5)
+	{
+	newcolor = 50 + ((oldcolor + 10) % 10);
 	console.log("small vertical label");
 	}
-	else if (color === 6){
-	newcolor = 60 + ((oldcolor +10) % 10);
+	else if (color === 6)
+	{
+	newcolor = 60 + ((oldcolor + 10) % 10);
 	console.log("medium vertical label");
 	}
-	else if (color === 0){
+	else if (color === 0)
+	{
 	newcolor = 0;
 	}
-	else{
+	else
+	{
 	newcolor = oldcolor;
 	}
 	color = (newcolor + 10) % 10;
 	}
 
-	else if (box === 0 && oldcolor >= 900){
+	else if (box === 0 && oldcolor >= 900)
+	{
 	newcolor = oldcolor % 10;
 	color = oldcolor % 10;
 	}
-	else if (box === 1 && oldcolor >= 900){
+	else if (box === 1 && oldcolor >= 900)
+	{
 	newcolor = oldcolor;
 	console.log("+900");
 	}
-	else if (box === 0 && oldcolor <= 900){
+	else if (box === 0 && oldcolor <= 900)
+	{
 
-	if (oldcolor >= 200){
-	newcolor = oldcolor -100;
-	color = oldcolor % 10;
-	}
-	else if (oldcolor > 160){
-	newcolor = oldcolor - 80;
-	color = oldcolor % 10;
-	}
-	else if (oldcolor > 150){
+	if (oldcolor >= 200)
+	{
 	newcolor = oldcolor - 100;
 	color = oldcolor % 10;
 	}
-	else if (oldcolor > 140){
+	else if (oldcolor > 160)
+	{
+	newcolor = oldcolor - 80;
+	color = oldcolor % 10;
+	}
+	else if (oldcolor > 150)
+	{
+	newcolor = oldcolor - 100;
+	color = oldcolor % 10;
+	}
+	else if (oldcolor > 140)
+	{
 	newcolor = oldcolor - 70;
 	color = oldcolor % 10;
 	}
-	else if (oldcolor > 120){
+	else if (oldcolor > 120)
+	{
 	newcolor = oldcolor - 60;
 	color = oldcolor % 10;
 	}
-	else if (oldcolor > 50 ){
+	else if (oldcolor > 50)
+	{
 	newcolor = (oldcolor + 10) % 10;
 	color = (oldcolor + 10) % 10;
 	}
 
 	//small label
-	if (color === 7 ){
+	if (color === 7)
+	{
 	newcolor = 970 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -8265,7 +8391,8 @@
 	});
 	}
 	//medium label
-	else if (color === 8 ){
+	else if (color === 8)
+	{
 	newcolor = 980 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -8274,7 +8401,8 @@
 	});
 	}
 	//small vertical label
-	else if (color === 5 ){
+	else if (color === 5)
+	{
 	newcolor = 950 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -8283,7 +8411,8 @@
 	});
 	}
 	//medium vertical label
-	else if (color === 6 ){
+	else if (color === 6)
+	{
 	newcolor = 960 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -8291,7 +8420,8 @@
 	[`port${cell}`]: box
 	});
 	}
-	else{
+	else
+	{
 	newcolor = 100 + oldcolor;
 	//console.log("old color:" + oldcolor + ". color set to:" + newcolor);
 	}
@@ -8312,13 +8442,15 @@
 	});
 	});
 
-
 	// Stern changes
-	gridposition.forEach(cell => {
-	on(`change:stern${cell}`, (eventInfo) => {
-	let allstats = [`stern${cell}`,`stern_color${cell}`, `stern_label${cell}`,"colorselected"]; // `color${cell}`,
+	gridposition.forEach(cell =>
+	{
+	on(`change:stern${cell}`, (eventInfo) =>
+	{
+	let allstats = [`stern${cell}`, `stern_color${cell}`, `stern_label${cell}`, "colorselected"]; // `color${cell}`,
 
-	getAttrs(allstats, values => {
+	getAttrs(allstats, values =>
+	{
 	let color = int(values["colorselected"]);
 	let oldcolor = int(values[`stern_color${cell}`]);
 	let box = int(values[`stern${cell}`]);
@@ -8328,88 +8460,109 @@
 	console.log("old color:" + oldcolor + " colorselect:" + color);
 
 	//colors & labels
-	if (box === 1 && oldcolor <= 900){
+	if (box === 1 && oldcolor <= 900)
+	{
 
-	if (color === 1){
+	if (color === 1)
+	{
 	console.log("color -> orange");
 	newcolor = 1;
 	}
-	else if (color === 2){
+	else if (color === 2)
+	{
 	console.log("color -> cyan");
 	newcolor = 2;
 	}
-	else if (color === 3){
+	else if (color === 3)
+	{
 	console.log("color -> yellow");
 	newcolor = 3;
 	}
-	else if (color === 4){
+	else if (color === 4)
+	{
 	console.log("color -> green");
 	newcolor = 4;
 	}
 
 	// labels
-	else if (color === 7){
-	newcolor = 70 + ((oldcolor +10) % 10);
+	else if (color === 7)
+	{
+	newcolor = 70 + ((oldcolor + 10) % 10);
 	console.log("small label");
 	}
-	else if (color === 8){
-	newcolor = 80 + ((oldcolor +10) % 10);
+	else if (color === 8)
+	{
+	newcolor = 80 + ((oldcolor + 10) % 10);
 	console.log("medium label");
 	}
-	else if (color === 5){
-	newcolor = 50 + ((oldcolor +10) % 10);
+	else if (color === 5)
+	{
+	newcolor = 50 + ((oldcolor + 10) % 10);
 	console.log("small vertical label");
 	}
-	else if (color === 6){
-	newcolor = 60 + ((oldcolor +10) % 10);
+	else if (color === 6)
+	{
+	newcolor = 60 + ((oldcolor + 10) % 10);
 	console.log("medium vertical label");
 	}
-	else if (color === 0){
+	else if (color === 0)
+	{
 	newcolor = 0;
 	}
-	else{
+	else
+	{
 	newcolor = oldcolor;
 	}
 	color = (newcolor + 10) % 10;
 	}
 
-	else if (box === 0 && oldcolor >= 900){
+	else if (box === 0 && oldcolor >= 900)
+	{
 	newcolor = oldcolor % 10;
 	color = oldcolor % 10;
 	}
-	else if (box === 1 && oldcolor >= 900){
+	else if (box === 1 && oldcolor >= 900)
+	{
 	newcolor = oldcolor;
 	console.log("+900");
 	}
-	else if (box === 0 && oldcolor <= 900){
+	else if (box === 0 && oldcolor <= 900)
+	{
 
-	if (oldcolor >= 200){
-	newcolor = oldcolor -100;
-	color = oldcolor % 10;
-	}
-	else if (oldcolor > 160){
-	newcolor = oldcolor - 80;
-	color = oldcolor % 10;
-	}
-	else if (oldcolor > 150){
+	if (oldcolor >= 200)
+	{
 	newcolor = oldcolor - 100;
 	color = oldcolor % 10;
 	}
-	else if (oldcolor > 140){
+	else if (oldcolor > 160)
+	{
+	newcolor = oldcolor - 80;
+	color = oldcolor % 10;
+	}
+	else if (oldcolor > 150)
+	{
+	newcolor = oldcolor - 100;
+	color = oldcolor % 10;
+	}
+	else if (oldcolor > 140)
+	{
 	newcolor = oldcolor - 70;
 	color = oldcolor % 10;
 	}
-	else if (oldcolor > 120){
+	else if (oldcolor > 120)
+	{
 	newcolor = oldcolor - 60;
 	color = oldcolor % 10;
 	}
-	else if (oldcolor > 50 ){
+	else if (oldcolor > 50)
+	{
 	newcolor = (oldcolor + 10) % 10;
 	color = (oldcolor + 10) % 10;
 	}
 
 	//small label
-	if (color === 7 ){
+	if (color === 7)
+	{
 	newcolor = 970 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -8418,7 +8571,8 @@
 	});
 	}
 	//medium label
-	else if (color === 8 ){
+	else if (color === 8)
+	{
 	newcolor = 980 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -8427,7 +8581,8 @@
 	});
 	}
 	//small vertical label
-	else if (color === 5 ){
+	else if (color === 5)
+	{
 	newcolor = 950 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -8436,7 +8591,8 @@
 	});
 	}
 	//medium vertical label
-	else if (color === 6 ){
+	else if (color === 6)
+	{
 	newcolor = 960 + oldcolor;
 	color = (oldcolor + 10) % 10;
 	box = 1;
@@ -8444,7 +8600,8 @@
 	[`stern${cell}`]: box
 	});
 	}
-	else{
+	else
+	{
 	newcolor = 100 + oldcolor;
 	//console.log("old color:" + oldcolor + ". color set to:" + newcolor);
 	}
@@ -8465,4 +8622,5 @@
 	});
 	});
 
+</script>
 </script>
