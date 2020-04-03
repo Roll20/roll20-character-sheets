@@ -15,6 +15,10 @@ const processingFunctions = {
     const split = trigger.split('_');
     return `${split[0]}_${split[1]}_${split[2]}`
   },
+  getReprowAttribute: key => {
+    const getReprowid = processingFunctions.getReprowid(key)
+    return key.split(`${getReprowid}_`)[1]
+  },
   getTranslations: translationKeys => {
     let translations = {}
     translationKeys.forEach(key => translations[`${key}`] = getTranslationByKey(key))
@@ -47,7 +51,7 @@ const processingFunctions = {
     },
     conditionFactory: attrs => {
       attrs.attribute = processingFunctions.shadowrun.determineConditionAttribute(attrs)
-      attrs.base = processingFunctions.shadowrun.determineConditionBase(attrs.sheet_type, attrs.drone_flag)
+      attrs.base = processingFunctions.shadowrun.determineConditionBase(attrs.sheet_type, attrs.flag_drone)
       attrs.modifier = attrs[processingFunctions.shadowrun.findModifierInKeys(attrs)]
       Object.keys(attrs).forEach(key => !['attribute', 'base', 'modifier'].includes(key) ? delete attrs[key] : false)
       attrs = processingFunctions.parseIntegers(attrs)
@@ -91,7 +95,7 @@ const processingFunctions = {
       skill = skill.includes(" ") ? skill.replace(/ /g,"") : skill
       return skill
     },
-    determineConditionBase: (type, drone) => drone ? 6 : type === 'vehicle' ? 12 : 8,
+    determineConditionBase: (type, drone) => drone && drone === 'drone' ? 6 : type === 'vehicle' ? 12 : 8,
     determineConditionAttribute: attrs => attrs.willpower ? attrs.willpower : attrs.body ? attrs.body : attrs.device_rating ? attrs.device_rating : 0,
     determineWeaponAttributesByType: weaponType =>  weaponType === 'range' ? sheetAttributes.rangeAttributes : sheetAttributes.meleeAttributes,
     findFlagInKeys: attrs => Object.keys(attrs).find(key => key.includes('_flag')),
@@ -121,6 +125,14 @@ const processingFunctions = {
       attrs.essence ? Math.ceil(attrs.essence) || 0 : false;
       return processingFunctions.shadowrun.calculateLimitTotal(Object.values(attrs))
     },
+    resetPrimaryArmor: () => {
+      const resetPrimary = new PrimaryArmor()
+      let update = {}
+      for (let [key, value] of Object.entries(resetPrimary)) {
+        update[key] = value
+      }
+      return update
+    },
     resetPrimaryWeapon: type => {
       const resetPrimary = type === 'range' ? new PrimaryRangeWeapon(type) : new PrimaryMeleeWeapon(type)
       let update = {}
@@ -129,12 +141,30 @@ const processingFunctions = {
       }
       return update
     },
+    updatePrimaryArmor: attrs => {
+      let update = {}
+
+      for (let [key, value] of Object.entries(attrs)) {
+        const repRowID = processingFunctions.getReprowid(key)
+        if (key.includes('name')) {
+          update['armor_name'] = attrs[`${repRowID}_name`]
+        } else if (key.includes('rating')) {
+          update['armor_rating'] = value
+        } else if (key.includes('dicepool_modifier')) {
+          update['soak_modifier'] = value
+        } else {
+          const type = key.split('_')[3]
+          update[`${type}_modifier`] = value
+        }
+      }
+
+      return update
+    },
     updatePrimaryWeapons: attrs => {
       let update = {}
       for (let [key, value] of Object.entries(attrs)) {
         const type = processingFunctions.findRepeatingField(key)
-        const getReprowid = processingFunctions.getReprowid(key)
-        const weaponAttribute = key.split(`${getReprowid}_`)[1]
+        const weaponAttribute = processingFunctions.getReprowAttribute(key)
         const primaryAttributeName = key.includes('weapon') ? `primary_${type}_weapon` : `primary_${type}_weapon_${weaponAttribute}`
         update[primaryAttributeName] = value
 
