@@ -294,6 +294,19 @@ const updateDefaultAttribute = newValue => {
   })
 }
 
+  //Calculate Astral Initiatve
+const updateAstralInitiative = () => {
+  getAttrs(["intuition", "astral_mod_modifier"], v => {
+    v = processingFunctions.parseIntegers(v);
+    const base = v.intuition * 2, bonus = v.astral_mod_modifier, total = base + bonus;
+
+    setAttrs({
+      ["astral_mod"]: total,
+      ["display_astral_mod"]: bonus === 0 ? base : `${base} (${total})`
+    })
+  })
+}
+
 const updateAstralInitiativeDice = () => {
   getAttrs(["astral_dice_modifier", "edge_toggle"], v => {
     const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
