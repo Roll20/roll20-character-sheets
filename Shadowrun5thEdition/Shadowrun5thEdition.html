@@ -3683,12 +3683,12 @@ const processingFunctions = {
 //for Mocha Unit Texting
 //module.exports = processingFunctions;
 
-    //Edge toggle to include ! for exploding dice
-  const edgeToggle = eventinfo => {
-    processingFunctions.setAttributes({
-      explode_toggle: eventinfo.newValue != 0 ? "!" : ""
-    })
-  }
+  //Edge toggle to include ! for exploding dice
+const edgeToggle = eventinfo => {
+  processingFunctions.setAttributes({
+    explode_toggle: eventinfo.newValue === `@{edge}` ?  "!" : ""
+  })
+}
 
 const updateHostAttributes = newValue => {
   newValue = processingFunctions.parseInteger(newValue)
@@ -3979,7 +3979,29 @@ const updateDefaultAttribute = newValue => {
   })
 }
 
+  //Calculate Astral Initiatve
+const updateAstralInitiative = () => {
+  getAttrs(["intuition", "astral_mod_modifier"], v => {
+    v = processingFunctions.parseIntegers(v);
+    const base = v.intuition * 2, bonus = v.astral_mod_modifier, total = base + bonus;
 
+    setAttrs({
+      ["astral_mod"]: total,
+      ["display_astral_mod"]: bonus === 0 ? base : `${base} (${total})`
+    })
+  })
+}
+
+const updateAstralInitiativeDice = () => {
+  getAttrs(["astral_dice_modifier", "edge_toggle"], v => {
+    const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
+    const bonus = parseInt(v.astral_dice_modifier) || 0;
+
+    setAttrs({
+      astral_dice: edgeFlag ? 5 : Math.min(bonus+3,5)
+    })
+  })
+}
   <!--Old functions working to become obsolete-->
 
 //Weapon displays set into an Array
