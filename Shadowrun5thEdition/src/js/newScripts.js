@@ -294,3 +294,13 @@ const updateDefaultAttribute = newValue => {
   })
 }
 
+const updateAstralInitiativeDice = () => {
+  getAttrs(["astral_dice_modifier", "edge_toggle"], v => {
+    const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
+    const bonus = parseInt(v.astral_dice_modifier) || 0;
+
+    setAttrs({
+      astral_dice: edgeFlag ? 5 : Math.min(bonus+3,5)
+    })
+  })
+}
