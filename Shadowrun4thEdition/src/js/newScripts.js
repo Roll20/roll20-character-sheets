@@ -1,9 +1,9 @@
   //Edge toggle to include ! for exploding dice
-  const edgeToggle = eventinfo => {
-    processingFunctions.setAttributes({
-      explode_toggle: eventinfo.newValue != 0 ? "!" : ""
-    })
-  }
+const edgeToggle = newValue => {
+  processingFunctions.setAttributes({
+    explode_toggle: processingFunctions.shadowrun.determineExplodingEdge(newValue)
+  })
+}
 
 const updateHostAttributes = newValue => {
   newValue = processingFunctions.parseInteger(newValue)
