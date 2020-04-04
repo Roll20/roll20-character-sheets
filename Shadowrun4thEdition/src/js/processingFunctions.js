@@ -81,8 +81,8 @@ const processingFunctions = {
       return attrs
     },
     calculateConditionTracks: conditionInts => Math.ceil(conditionInts.attribute/2) + conditionInts.base + conditionInts.modifier,
-    calculateRunSpeed: (agility, modifier) => (agility * 4) + modifier,
-    calculateWalkSpeed:(agility, modifier) => (agility * 2) + modifier,
+    calculateRunSpeed: (agility, modifier) => 25 + modifier,
+    calculateWalkSpeed:(agility, modifier) => 10 + modifier,
     calculateWounds: attrs => {
       const divisor  = attrs.low_pain_tolerance === 2 ? attrs.low_pain_tolerance : 3;
       const highPain = attrs.high_pain_tolerance >= 1 ? attrs.high_pain_tolerance : 0;
