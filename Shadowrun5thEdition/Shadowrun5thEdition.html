@@ -3537,11 +3537,6 @@ const processingFunctions = {
   sliceAttr: attribute => attribute.slice(2, -1), 
   sumIntegers: numbers => numbers.reduce((a,b) => a + b, 0),
 }
-
-
-//for Mocha Unit Testing
-//-module.exports = processingFunctions;
-
   //for Mocha Unit Testing
 //-const processingFunctions = require('../js/processingFunctions');
 
@@ -3751,41 +3746,65 @@ const updatePrimary = eventinfo => {
       } else {
         update = shadowrunFunctions.updatePrimaryWeapons({[eventinfo.triggerName]: eventinfo.newValue})
       }
-
       processingFunctions.setAttributes(update)
     }
   })
 }
 
-const updateRepeatingWeaponPrimary = (eventinfo, type) => {
+const updateRepeatingPrimary = (eventinfo, type) => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
-  if (eventinfo.newValue === 'primary') {
-    const constructedWeaponAttributes = shadowrunFunctions.contructRepeatingWeaponAttributes(repRowID, type)
-    getAttrs(constructedWeaponAttributes, attrs => { 
-      const update = shadowrunFunctions.updatePrimaryWeapons(attrs)
+  if (eventinfo.newValue === undefined) {
+    return false
+  } else if (eventinfo.newValue === 'primary') {
+    const constructedAttributes = type === 'armor' ? shadowrunFunctions.addRepRow(repRowID, sheetAttributes.armorAttributes) : shadowrunFunctions.contructRepeatingWeaponAttributes(repRowID, type);
+    getAttrs(constructedAttributes, attrs => { 
+      const update = type === 'armor' ? shadowrunFunctions.updatePrimaryArmor(attrs) : shadowrunFunctions.updatePrimaryWeapons(attrs);
       processingFunctions.setAttributes(update)
     })
+
+    //Reset all the other primaries
     shadowrunFunctions.resetRepeatingFieldsPrimaries(`repeating_${type}`, repRowID)
   } else {
-    const update = shadowrunFunctions.resetPrimaryWeapon(type)
+    const update = type === 'armor' ? shadowrunFunctions.resetPrimaryArmor() : shadowrunFunctions.resetPrimaryWeapon(type);
     processingFunctions.setAttributes(update)
   }
 }
 
-const updateRepeatingArmorPrimary = eventinfo => {
-  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
-  if (eventinfo.newValue === 'primary') {
-    const constructedArmorAttributes = shadowrunFunctions.addRepRow(repRowID, sheetAttributes.armorAttributes)
-    getAttrs(constructedArmorAttributes, attrs => { 
-      const update = shadowrunFunctions.updatePrimaryArmor(attrs)
-      processingFunctions.setAttributes(update)
-    })
-    shadowrunFunctions.resetRepeatingFieldsPrimaries(`repeating_armor`, repRowID)
-  } else {
-    const update = shadowrunFunctions.resetPrimaryArmor()
-    processingFunctions.setAttributes(update)
-  }
-}
+
+//const updateRepeatingWeaponPrimary = (eventinfo, type) => {
+//  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+//  if (eventinfo.newValue === undefined) {
+//    return false
+//  } else if (eventinfo.newValue === 'primary') {
+//    const constructedWeaponAttributes = shadowrunFunctions.contructRepeatingWeaponAttributes(repRowID, type)
+//    getAttrs(constructedWeaponAttributes, attrs => { 
+//      const update = shadowrunFunctions.updatePrimaryWeapons(attrs)
+//      processingFunctions.setAttributes(update)
+//    })
+//    shadowrunFunctions.resetRepeatingFieldsPrimaries(`repeating_${type}`, repRowID)
+//  } else {
+//    const update = shadowrunFunctions.resetPrimaryWeapon(type)
+//    processingFunctions.setAttributes(update)
+//  }
+//}//
+
+//const updateRepeatingArmorPrimary = eventinfo => {
+//  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
+//  if (eventinfo.newValue === undefined) {
+//    return false
+//  } else if (eventinfo.newValue === 'primary') {
+//    const constructedArmorAttributes = shadowrunFunctions.addRepRow(repRowID, sheetAttributes.armorAttributes)
+//    getAttrs(constructedArmorAttributes, attrs => { 
+//      const update = shadowrunFunctions.updatePrimaryArmor(attrs)
+//      processingFunctions.setAttributes(update)
+//    })
+//    //Reset all the other primaries
+//    shadowrunFunctions.resetRepeatingFieldsPrimaries(`repeating_armor`, repRowID)
+//  } else {
+//    const update = shadowrunFunctions.resetPrimaryArmor()
+//    processingFunctions.setAttributes(update)
+//  }
+//}
 
 const updateRepeatingWeaponDicepool = trigger => {
   const repRowID = processingFunctions.getReprowid(trigger)
@@ -4355,7 +4374,7 @@ const onepointthreefive = () => {
 
   sheetAttributes.weaponTypes.forEach(type => {
     on(`change:repeating_${type}:dicepool_modifier change:repeating_${type}:specialization`, eventinfo => updateRepeatingWeaponDicepool(eventinfo.triggerName))
-    on(`change:repeating_${type}:primary`, eventinfo => updateRepeatingWeaponPrimary(eventinfo, type))
+    on(`change:repeating_${type}:primary`, eventinfo => updateRepeatingPrimary(eventinfo, type))
   })
 
   sheetAttributes.rangeAttributes.forEach(attr => on(`change:repeating_range:${attr}`, eventinfo => updatePrimary(eventinfo)))
@@ -4364,7 +4383,7 @@ const onepointthreefive = () => {
 
   sheetAttributes.armorAttributes.forEach(attr => on(`change:repeating_armor:${attr}`, eventinfo => updatePrimary(eventinfo)))
 
-  on("change:repeating_armor:primary", eventinfo => updateRepeatingArmorPrimary(eventinfo))
+  on("change:repeating_armor:primary", eventinfo => updateRepeatingPrimary(eventinfo, 'armor'))
 
   on(`change:repeating_active:skill`, eventinfo => updateRepeatingSkillName(eventinfo))
 

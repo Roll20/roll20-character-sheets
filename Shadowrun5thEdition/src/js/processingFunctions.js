@@ -34,8 +34,3 @@ const processingFunctions = {
   sliceAttr: attribute => attribute.slice(2, -1), 
   sumIntegers: numbers => numbers.reduce((a,b) => a + b, 0),
 }
-
-
-//for Mocha Unit Testing
-//-module.exports = processingFunctions;
-
