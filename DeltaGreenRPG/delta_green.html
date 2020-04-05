@@ -2099,7 +2099,8 @@ on("change:bond_projection_1 change:bond_projection_2 change:bond_projection_3 c
             setAttrs({
                 wp: (values.wp-bdiff)
             });   
-        }else{
+        }
+        else{
             update[bond]=values[proj];
             setAttrs(update);   
         }
@@ -2108,25 +2109,28 @@ on("change:bond_projection_1 change:bond_projection_2 change:bond_projection_3 c
 
 on("ready change:bond_score_1 change:bond_score_2 change:bond_score_3 change:bond_score_4 change:bond_score_5 change:bond_score_6 change:bond_score_7 change:bond_score_8 change:bond_score_9 change:bond_score_10 ", function(v){
     let bond=v.sourceAttribute;
-    
-    let value_n=parseInt(v.newValue,10) || 0; 
-    if (value_n<0){
+    let value_n=[];
+    getAttrs([bond],function(value1){
+        if (value1[bond]<0){
         value_n = 0; 
         setAttrs({bond: 0});
-    }
-    let tmp=bond.split("_");
-    let num=tmp[2];
-    let proj="bond_projection_";
-    
-    
-    proj=proj.concat(num);
-    let bproj={};
-    bproj[proj]=value_n;
-    getAttrs([proj], function(v){
-       if (v[proj] !== value_n){
-            setAttrs(bproj);   
-       }
-    }) ;  
+        }else{
+            value_n=parseInt(value1[bond])||0;
+        }
+        let tmp=bond.split("_");
+        let num=tmp[2];
+        let proj="bond_projection_";
+        
+        proj=proj.concat(num);
+        let bproj={};
+        bproj[proj]=value_n;
+        getAttrs([proj], function(value2){
+           if (value2[proj] !== value_n){
+                setAttrs(bproj);   
+           }
+        }) ; 
+    });
+     
     
 });
 
@@ -2271,7 +2275,6 @@ setAttrs({totalgeneralmod: sum});
 });
 });
 </script>
-
 
 
 
@@ -11813,6 +11816,7 @@ setAttrs({totalgeneralmod: sum});
 {{/^rollTotal() roll1 0}}
 
 {{/^rollTotal() roll1 roll2}}
+
 
        
         
