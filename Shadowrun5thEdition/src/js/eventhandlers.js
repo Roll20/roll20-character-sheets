@@ -1,175 +1,86 @@
-	
-   	on("sheet:opened", () => {
-		getAttrs(["version"], v => { versioning(parseFloat(v.version) || 1); });
 
+  on('sheet:opened', () => {
+		getAttrs(['version'], v => { versioning(parseFloat(v.version) || 1); });
 		translations();
 	});
 
-    on("clicked:shots_remove clicked:shots_add", eventinfo => {
-    	getAttrs([`shots_fired`], v => {
-    		v = parseIntegers(v);
-    		const trigger = eventinfo.triggerName;
-    		let shots = v[`shots_fired`];
-			setAttrs({
-				shots_fired: shots > 0 && trigger.includes("remove") ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots
-			});
-		});
-	});
+  on('clicked:shots_remove clicked:shots_add', eventinfo => updateShotsFired(eventinfo.triggerName))
 
-	on("clicked:primary_ammo", eventinfo => {
-    	getAttrs([`primary_range_weapon_ammo`, `shots_fired`], v => {
-    		v = parseIntegers(v);
-			setAttrs({
-				primary_range_weapon_ammo: v[`primary_range_weapon_ammo`] - v[`shots_fired`]
-			});
-		});
-	});
+	on('clicked:primary_ammo', () => updateAmmoWithShotsFired())
 
-   on("clicked:reload", eventinfo=> {
-    	getAttrs([`primary_range_weapon_ammo_max`], (v) => {
-    		v = parseIntegers(v);
-			setAttrs({
-				primary_range_weapon_ammo: v[`primary_range_weapon_ammo_max`]
-			});
-		});
-	});
+  on('clicked:reload', () => updateAmmoWithMax())
 
-	sheetAttribues.repeatingSkills.forEach(attr => {
-		on(`clicked:repeating_${attr}:skill`, eventinfo=> {
-			settingsToggle(eventinfo);
-		}); 
-	});
+	sheetAttributes.tabs.forEach(attr => on(`clicked:tab_${attr}`, () => updateTab(attr)))
 
-	sheetAttribues.repeating.forEach(attr => {
-		on(`clicked:repeating_${attr}:${attr}`, eventinfo=> {
-			settingsToggle(eventinfo);
-		}); 
-	});
+	on('change:agility change:walk_modifier change:run_modifier', () => updateMovement())
 
-	sheetAttribues.tabs.forEach(attr => {
-   		on(`clicked:tab_${attr}`, () => {
-   			setAttrs({ tab: attr });
-   		});
-   });
+  sheetAttributes.calculatedAttributes.forEach(attribute => {
+      const attributeArray = [`${attribute}_base`, `${attribute}_modifier`, `${attribute}_temp`, `${attribute}_temp_flag`]
+      attributeArray.forEach(attr => on(`change:${attr}`, () => updateAttributes(attributeArray, attribute)))
+  });
 
+  sheetAttributes.initiative_mod.forEach(attr => on(`change:${attr}`, () => updateAttributes(sheetAttributes.initiative_mod, 'initiative_mod')))
 
-	on("change:agility change:walk_modifier change:run_modifier", () => {
-		update_movement();
-	});
+  sheetAttributes.astral_mod.forEach(attr => on(`change:${attr}`, () => updateAstralInitiative()))
 
-	on("change:body change:strength change:lift_carry_modifier", eventinfo=> {
-		const source = eventinfo.sourceAttribute;
-		update_common_rolls(["body", "strength", "lift_carry_modifier"]);
-		//STRENGTH & BODY RUN THIS
-		source.includes("strength") || source.includes("body") ? update_limit("physical") : false;
-		//ONLY RUN ON BODY CHANGE
-		if (source.includes("body")) {
-			update_common_rolls(["body", "overflow_modifier"]);
-			update_common_rolls(["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`]);
-			update_track("physical");
-		};
-	});
+  sheetAttributes.derivedAttributes.forEach(derivedAttribute => {
+    sheetAttributes[derivedAttribute].forEach(attr => on(`change:${attr}`, () => updateDerivedAttribute(derivedAttribute)))
+  })
 
-	on("change:reaction change:intuition", eventinfo=> {
-		const source = eventinfo.sourceAttribute;
-		update_common_rolls(["reaction", "intuition", "defense_modifier", "defense_temp", `defense_temp_flag`]);
-		update_initiative();
-		//REACTION UPDATES PHYSICAL, INTUITION UPDATES MENTAL
-		(source.includes("reaction")) ? update_limit("physical") : update_limit("mental");
-		//ONLY RUN ON INTUITION CHANGE
-		(source.includes("intuition")) ? update_common_rolls(["charisma", "intuition", "judge_intentions_modifier"]) : false;
-	});
+  sheetAttributes.attributeLimits.forEach(attributeLimit => {
+    sheetAttributes[attributeLimit].forEach(attr => on(`change:${attr}`, () => updateLimits(attributeLimit)))
+    on(`change:${attributeLimit}_modifier change:${attributeLimit}_temp change:${attributeLimit}_temp_flag`, () => updateLimits([`${attributeLimit}`]))
+  })
 
-	on("change:willpower", () => {
-		update_common_rolls(["charisma", "willpower", "composure_modifier"]);
-		update_common_rolls(["logic", "willpower", "memory_modifier"]);
-		update_track("stun");
-		update_limit("social");
-		update_limit("mental");
-	});
+  sheetAttributes.conditionTracks.forEach(conditionTrack => {
+    sheetAttributes[conditionTrack].forEach(attr => on(`change:${attr}`, () => updateConditionTracks(conditionTrack)))
+  })
 
-	on("change:logic change:memory_modifier", eventinfo=> {
-		const source = eventinfo.sourceAttribute;
-		update_common_rolls(["logic", "willpower", "memory_modifier"]);
-		//LOGIC UPDATES LIMIT
-		(source.includes("logic")) ? update_limit("mental") : false;
-	});
+	sheetAttributes.woundCalculation.forEach(attr => on(`change:${attr}`, () => updateWounds()))
 
-	on("change:charisma change:composure_modifier change:judge_intentions_modifier", eventinfo=> {
-		const source = eventinfo.sourceAttribute;
-		//CHARISMA & COMPOSURE UPDATE COMPOSURE
-		(source.includes("charisma") || source.includes("composure")) ? update_common_rolls(["charisma", "willpower", "composure_modifier"]) : false;
-		//CHARISMA & JUDGE INTENTIONS UPDATE JUDGE INTENTIONS
-		(source.includes("charisma") || source.includes("judge")) ? update_common_rolls(["charisma", "intuition", "judge_intentions_modifier"]) : false;
-		//ONLY CHARISMA UPDATES SOCIAL LIMIT
-		(source.includes("charisma")) ? update_limit("social") : false;
-	});
+  sheetAttributes.repeatingSkills.forEach(field => {
+    on(`change:repeating_${field}:rating change:repeating_${field}:rating_modifier`, eventinfo => updateRepeatingSkillRating(eventinfo.triggerName))
+    on(`change:repeating_${field}:attribute`, eventinfo => updateRepeatingSkillAttribute(eventinfo))
+    on(`change:repeating_${field}:limit`, eventinfo => updateRepeatingSkillLimit(eventinfo))
+    on(`change:repeating_${field}:dicepool`, eventinfo => updateRepeatingSkillDicepool(eventinfo))
+  })
 
-	on("change:essence", () => {
-		update_limit("social");
-	});
+  sheetAttributes.weaponTypes.forEach(type => {
+    on(`change:repeating_${type}:dicepool_modifier change:repeating_${type}:specialization`, eventinfo => updateRepeatingWeaponDicepool(eventinfo.triggerName))
+    on(`change:repeating_${type}:primary`, eventinfo => updateRepeatingWeaponPrimary(eventinfo, type))
+  })
 
-	on("change:physical_modifier change:flag_drone", () => {
-		update_track("physical");
-	});
+  sheetAttributes.rangeAttributes.forEach(attr => on(`change:repeating_range:${attr}`, eventinfo => updatePrimary(eventinfo)))
 
-	on("change:stun_modifier", () => {
-		 update_track("stun");
-	});
+  sheetAttributes.meleeAttributes.forEach(attr => on(`change:repeating_melee:${attr}`, eventinfo => updatePrimary(eventinfo)))
 
-	on("change:initiative_modifier change:initiative_temp change:initiative_temp_flag", () => {
-		update_initiative();
-	});
+  sheetAttributes.armorAttributes.forEach(attr => on(`change:repeating_armor:${attr}`, eventinfo => updatePrimary(eventinfo)))
 
-	on("change:defense_modifier change:defense_temp change:defense_temp_flag", () => {
-		update_common_rolls(["reaction", "intuition", "defense_modifier", "defense_temp", `defense_temp_flag`]);
-	});
+  on("change:repeating_armor:primary", eventinfo => updateRepeatingArmorPrimary(eventinfo))
 
-	on("change:armor_rating change:soak_modifier change:soak_temp change:soak_temp_flag", () => {
-		update_common_rolls(["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`]);
-	});
+  on(`change:repeating_active:skill`, eventinfo => updateRepeatingSkillName(eventinfo))
 
-	on("change:mental_limit_modifier change:mental_limit_temp change:mental_limit_temp_flag change:physical_limit_modifier change:physical_limit_temp change:physical_limit_temp_flag change:social_limit_modifier change:social_limit_temp change:social_limit_temp_flag",  eventinfo=> {
-		const type = eventinfo.sourceAttribute.split("_")[0]; 
-		update_limit(type);
-	});
+	on('clicked:cond_reset_physical clicked:cond_reset_stun', eventinfo => resetConditionTrack(eventinfo))
 
-	sheetAttribues.woundCalculation.forEach(attr => {
-		on(`change:${attr}`, () => {
-			update_wounds();
-		});
-	});
+	on('change:edge_toggle', eventinfo => edgeToggle(eventinfo))
 
-	on("clicked:cond_reset_physical clicked:cond_reset_stun", (eventinfo) => {
-		resetConditionTrack(eventinfo)
-	});
+	on('change:device_rating change:matrix_modifier', () => updateMatrixMaximum())
 
-	on("change:edge_toggle", eventinfo => {
-		edgeToggle(eventinfo)
-	});
+	on('change:intuition change:astral_mod_modifier', () => updateAstralInitiative())
 
-	on("change:device_rating change:matrix_modifier", () => {
-		updateMatrixMaximum()
-	});
+	on('change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag', () => updateInitiativeDice())
 
-	on("change:intuition change:astral_mod_modifier", () => {
-		updateAstralInitiative()
-	});
+	on('change:astral_dice_modifier change:edge_toggle', () => updateAstralInitiativeDice())
 
-	on("change:initiative_dice_modifier change:edge_toggle change:initiative_dice_temp change:initiative_dice_temp_flag", () => {
-		updateInitiative()
-	});
+	on('change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle', () => updateMatrixInitiative())
 
-	on("change:astral_dice_modifier change:edge_toggle", () => {
-		updateAstralInitiativeDice()
-	});
+  on("clicked:cond_reset", () => resetNpcCondition()); 
 
-	on("change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle", () => {
-		updateMatrixInitiative()
-	});
+  sheetAttributes.spellTypes.forEach(type => on(`change:repeating_${type}:dicepool_modifier change:repeating_${type}:specialization`, eventinfo => updateSpellsDicepool(eventinfo)))
 
-//	sheetAttribues.repeatingSkills.forEach(field => {
-//		on(`change:repeating_${field}`, eventinfo => { 
-//			const id = eventinfo.sourceAttribute.split(`_`)[2];
-//		});
-//    }); 
+  on("change:level", eventinfo => updateSpriteConditionTrack(eventinfo.newValue))
+
+  on("change:host_rating", eventinfo => updateHostAttributes(eventinfo.newValue))
+
+  on("change:default_attribute", eventinfo => updateDefaultAttribute(eventinfo.newValue))
+
