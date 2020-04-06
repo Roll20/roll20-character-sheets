@@ -2048,7 +2048,7 @@
 	const calculateAttr = (attr) => {
 		getAttrs([attr, `${attr}_base`, `${attr}_boosts`], v => {
 			const setting = {
-				[`${attr}`]: `${parseInt(v[`${attr}_base`]) + (parseInt(v[`${attr}_boosts`]) || 0)}`
+				[`${attr}`]: `${(parseInt(v[`${attr}_base`]) || 10) + (parseInt(v[`${attr}_boosts`]) || 0)}`
 			};
 			mySetAttrs(setting, v, null, () => {
 				calculateMod(attr);
@@ -3170,7 +3170,7 @@
 			else if (major == 2 && minor == 4 && patch < 7) {
 				attributes.forEach(attr => {
 					getAttrs([attr, `${attr}_base`], v => {
-						mySetAttrs({[`${attr}_base`]: v[`${attr}`]}, v, null, () => {
+						mySetAttrs({[`${attr}_base`]: parseInt(v[`${attr}`] || 10)}, v, null, () => {
 							calculateAttr(attr);
 						});
 					});
