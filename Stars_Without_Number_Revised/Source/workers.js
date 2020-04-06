@@ -2010,9 +2010,9 @@
 	};
 
 	const calculateMaxStrain = () => {
-		getAttrs(["constitution", "strain_max"], v => {
+		getAttrs(["constitution", "strain_max", "constitution_boosts"], v => {
 			mySetAttrs({
-				strain_max: v.constitution
+				strain_max: parseInt(v.constitution) + parseInt(v.constitution_boosts)
 			}, v);
 		});
 	};
@@ -2108,7 +2108,7 @@
 				...armorIDs.map(id => `repeating_armor_${id}_armor_status`),
 				...weaponIDs.map(id => `repeating_weapons_${id}_weapon_encumbrance`),
 				...weaponIDs.map(id => `repeating_weapons_${id}_weapon_status`),
-				"gear_readied", "gear_stowed", "strength", "gear_readied_max",
+				"gear_readied", "gear_stowed", "strength", "strength_boosts", "gear_readied_max",
 				"gear_readied_over", "gear_stowed_over", "gear_stowed_max"
 			];
 			getAttrs(attrs, v => {
@@ -2137,7 +2137,7 @@
 					...armorIDs.filter(id => v[`repeating_armor_${id}_armor_status`] === "READIED")
 						.map(id => parseInt(v[`repeating_armor_${id}_armor_encumbrance_bonus`]) || 0)
 				);
-				const gear_stowed_max = (parseInt(v.strength) || 0) + armor_encumbrance_bonus;
+				const gear_stowed_max = (parseInt(v.strength) + parseInt(v["strength_boosts"]) || 0) + armor_encumbrance_bonus;
 				const gear_readied_max = Math.floor(gear_stowed_max / 2);
 				const setting = {
 					gear_readied,
@@ -3571,7 +3571,7 @@
 	on("change:homebrew_skill_list", () => getSectionIDs("repeating_weapons", validateWeaponSkills));
 
 	on("change:strain change:strain_permanent", validateStrain);
-	on("change:constitution", calculateMaxStrain);
+	on("change:constitution change:constitution_boosts", calculateMaxStrain);
 	on("change:repeating_cyberware", calculateCyberwareStrain);
 	on("change:strain_permanent_extra change:cyberware_strain_total", calculatePermanentStrain);
 
@@ -3583,7 +3583,7 @@
 
 	on("change:repeating_armor change:innate_ac remove:repeating_armor", calculateAC);
 
-	on("change:strength change:repeating_gear remove:repeating_gear change:repeating_weapons " +
+	on("change:strength change:strength_boosts change:repeating_gear remove:repeating_gear change:repeating_weapons " +
 		"remove:repeating_weapons change:repeating_armor remove:repeating_armor", calculateGearReadiedStowed);
 
 	on("change:level change:setting_xp_scheme", calculateNextLevelXP);
