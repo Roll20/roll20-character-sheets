@@ -7868,28 +7868,28 @@
 </rolltemplate>
 
 <script type="text/worker">
-	<--<script type="text/javascript">
-	-->
-		/*Global variables*/
+	<!--<script type="text/javascript">
+		-->
+			/*Global variables*/
 
 
-		//Cargo Total
-		on("sheet:opened change:repeating_shipcargo remove:repeating_shipcargo change:supply change:complexmaterials", function ()
-		{
-			var repeatingAttributes = [
-			/*Array of objects with the attributes in each repeating section that need to be gotten with getAttrs, used in getID()
-			Entity format:
+			//Cargo Total
+			on("sheet:opened change:repeating_shipcargo remove:repeating_shipcargo change:supply change:complexmaterials", function ()
 			{
-			section:'Name of the section',
-			fields:['name_of_the_attribute']
-			}*/
-			{
-				section: "shipCargo",
-				fields: ["shipCargo", "shipCargoRV", "shipCargoTonnage"]
-			}
-		];
-			getID(JSON.parse(JSON.stringify(repeatingAttributes)), useID);
-		});
+				var repeatingAttributes = [
+					/*Array of objects with the attributes in each repeating section that need to be gotten with getAttrs, used in getID()
+					Entity format:
+					{
+					section:'Name of the section',
+					fields:['name_of_the_attribute']
+					}*/
+					{
+						section: "shipCargo",
+						fields: ["shipCargo", "shipCargoRV", "shipCargoTonnage"]
+					}
+				];
+				getID(JSON.parse(JSON.stringify(repeatingAttributes)), useID);
+			});
 
 		var getID = function (cloneRepAttr, callback, sectionAggregate)
 		{
@@ -7918,11 +7918,10 @@
 			{
 				attributesToGet = [...attributesToGet, "shipCargoTonnage"].concat(["supply", "complexMaterials"]);
 
-				getAttrs( attributesToGet, (attributeValues) =>
+				getAttrs(attributesToGet, function (attributeValues)
 				{
-					var sumTotal;
-					sumTotal += attributeValues;
-					setAttrs({ ["totalResource"]: sumtotal});
+					let total =[attributeValues].reduce();
+					setAttrs({ totalResource: total });
 				})
 			};
 
