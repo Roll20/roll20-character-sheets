@@ -14,7 +14,7 @@ This sheet was inspired by the Palladium Megaverse sheet, but has had several ch
 
 ### Menu Roll Template
 - You can also call the template as &{template:menu}.
-- The main difference is that the description section will display all text centered, bold, and in italics.  I use this for all chat menus.
+- The main difference is that the description section will display all text centered, bold, and in italics.  I use this for all chat menus. Details on creating chat menus can be found in the Stupid Roll20 Tricks thread on the forums: [Chat Menus](https://app.roll20.net/forum/permalink/5927072/)
 
 ### Roll Template Example
 This example is the macro I use for the healer ability Healing Touch.
@@ -24,16 +24,16 @@ This example is the macro I use for the healer ability Healing Touch.
 
 ### Auto Calculated Stat Bonuses
 - I.Q. bonuses are auto calculated and displayed at the top of the Skills tab.  Any bonus is subtracted from the percentile roll in the OCC, Elective, and Secondary skill sections.
-- M.A. bonus to trust and intimidate is autocalculated and displayed in the gold section below the stats.
-- P.S. bonus to damage is autocalulated and displayed on the Combat Tab under Hand to Hand Combat skill.  This will be included in any damage roll from the melee attack section of the Basic tab.
-- P.P. bonuses to parry and dodge are autocalculated and displayed on the Combat Tab under Hand to Hand Combat skill.  This will be included in rolling Dodge in the light blue section of the Basic tab, or rolling parry in the Melee Attacks section of the basic tab.
-- P.B. bonuses to charm and impress are autocalculated and displayed in the gold section under the stats.
-- Spd. is autocalculated to rough miles per hour and displayed in the gold section below the stats.  It also calculates movement per action in case people are using that 2E mechanic.
+- M.A. bonus to trust and intimidate is autocalculated and displayed in the light blue section.
+- P.S. bonus to damage is autocalulated and displayed on the Combat Tab under Hand to Hand Combat skill.  This will be included in any damage roll from the melee attack section of the Statistics tab.
+- P.P. bonuses to parry and dodge are autocalculated and displayed on the Combat Tab under Hand to Hand Combat skill.  This will be included in rolling Dodge in the light blue section of the Statistics tab, or rolling parry in the Melee Attacks section of the Statistics tab.
+- P.B. bonuses to charm and impress are autocalculated and displayed in the light blue section.
+- Spd. is autocalculated to rough miles per hour and displayed in the gold section.  It also calculates movement per action in case people are using that 2E mechanic.
 - Saving throw bonuses from M.E. and P.E. are autocalculated and displayed below the rolls in the Saving Throw section of the combat tab.  They are included in the calculation of the rolls.
 
 ### Stat Rolls
 - The stat rolls are set up to roll 2 numbers.  The first is a d20, and the second is d100.
-- The "Perception" roll in the light blue section of the Basic tab is basically a d20 stat check.  It takes the average (rounded down) of the I.Q. and M.E. for a target number. Since perception doesn't exist in 1E, this was my personal solution.
+- The "Perception" roll in the light blue section of the Basic tab is basically a d20 stat check.  It takes the average (rounded down) of the I.Q. and M.E. for a target number. Since perception doesn't exist in 1E, this was my personal solution.  Use it or ignore it as you wish.
 
 ### Extra Attributes
 - The right hand column of the Basic tab has quite a list of things there.  This is all to facilitate the creation of macros and being able to link tokens easily to different resources.
@@ -57,7 +57,7 @@ This example is the macro I use for the healer ability Healing Touch.
 - This repeating section does not autocalculate values.  You can temporarily change the Spd attribute to get all the different calculated values to enter manually.
 
 ### Melee Attacks
-- This repeating section will pull in any bonuses found under the Hand to Hand Combat skill.  This includes changing the critical strike threshold if it is changed there.  Weapon proficiency bonuses will need to be added manually.
+- This repeating section will pull in any bonuses found under the Hand to Hand Combat skill, including P.S. or P.P. bonuses.  This also includes changing the critical strike threshold if it is changed there.  Weapon proficiency bonuses will need to be added manually.
 - Any info entered into notes will be displayed using the description part of the roll template, but will not appear at all if left blank.
 
 ### Ranged and Spell Attacks
