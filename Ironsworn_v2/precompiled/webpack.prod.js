@@ -1,13 +1,17 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const FixStyleOnlyEntriesPlugin = require("webpack-fix-style-only-entries");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 var path = require('path');
 
 module.exports = {
 
   // https://webpack.js.org/concepts/entry-points/#multi-page-application
   entry: {
-    index: './html/index.js'
+    index: './html/Ironsworn.html',
+    styles: './html/Ironsworn.css'
   },
-  mode: 'development',
+  mode: 'production',
   output: {
     path: path.resolve(__dirname, './dist')
   },
@@ -16,20 +20,11 @@ module.exports = {
     port: 8080
   },
 
-  module: {
-    rules: [
-      {
-        test: /\.css$/,
-        use: [
-          "style-loader",
-          "css-loader"
-        ]
-      }
-    ],
-  },
-
   // https://webpack.js.org/concepts/plugins/
   plugins: [
+    new OptimizeCSSAssetsPlugin({}),
+    new FixStyleOnlyEntriesPlugin(),
+    new MiniCssExtractPlugin({filename: "Ironsworn.css"}),
     new HtmlWebpackPlugin({
       template: './html/Ironsworn.html',
       minify: true,
