@@ -2,33 +2,17 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 var path = require('path');
 
 module.exports = {
-
-  // https://webpack.js.org/concepts/entry-points/#multi-page-application
   entry: {
-    index: './html/index.js'
+    index: './html/Ironsworn.html',
+    styles: './css/Ironsworn.css'
   },
   mode: 'development',
-  output: {
-    path: path.resolve(__dirname, './dist')
-  },
-  // https://webpack.js.org/configuration/dev-server/
   devServer: {
     port: 8080
   },
-
-  module: {
-    rules: [
-      {
-        test: /\.css$/,
-        use: [
-          "style-loader",
-          "css-loader"
-        ]
-      }
-    ],
+  output: {
+    path: path.resolve(__dirname, './dist')
   },
-
-  // https://webpack.js.org/concepts/plugins/
   plugins: [
     new HtmlWebpackPlugin({
       template: './html/Ironsworn.html',
