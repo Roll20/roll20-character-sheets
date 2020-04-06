@@ -97,9 +97,8 @@ const updateRepeatingSkillLimit = eventinfo => {
   } else {
     const translationKey = processingFunctions.sliceAttr(eventinfo.newValue)
     const translation = getTranslationByKey(translationKey);
-    getAttrs([translationKey], attrs => {
-      const limitDisplay = `${translation} ${attrs[translationKey]}`
-      processingFunctions.setAttributes({[`${repRowID}_display_limit`]: limitDisplay})
+    processingFunctions.setAttributes({
+      [`${repRowID}_display_limit`]: translation
     })
   }
 }
@@ -435,7 +434,7 @@ const updateAstralInitiativeDice = () => {
       });
   });
 
-   ['acceleration', 'armor', 'body', 'data_processing', 'handling', 'pilot', 'sensor','speed'].forEach(attr => {
+   ['acceleration', 'armor', 'body', 'data_processing', 'handling', 'handling_off', 'pilot', 'sensor','speed'].forEach(attr => {
         // Attach listener
         on(`change:repeating_vehicle:${attr}_base change:repeating_vehicle:${attr}_modifier change:repeating_vehicle:${attr}_temp`, () => {
             // Load attribute values
