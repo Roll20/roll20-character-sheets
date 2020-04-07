@@ -23,10 +23,41 @@ const versioning = version => {
           fourpointoneone()
           setAttrs({version: 4.11}, () => versioning(4.11))
           break;
+        case version < 4.15:
+          fourpointonefive()
+          setAttrs({version: 4.15}, () => versioning(4.15))
+          break;
         default:
             console.log(`%c Shadowrun 5th Edition is update to date. Version ${version}`, "color: green; font-weight:bold");
     }
 };
+
+const fourpointonefive = () => {
+  updateDerivedAttribute('defense')
+  updateAttributes(sheetAttributes.initiative_mod, 'initiative_mod')
+  updateAstralInitiative()
+
+  sheetAttributes.repeatingSkills.forEach(skill => {
+    getSectionIDs(skill, idarray => {
+      let attributes = []
+      idarray.forEach(id => attributes.push(`repeating_${skill}_${id}_limit`))
+
+      getAttrs(attributes, values => {
+        let update = {}
+        for (let [key, value] of Object.entries(values)) {
+          const repRowID = processingFunctions.getReprowid(key)
+          if (value.includes('limit')) {
+            const translationKey = processingFunctions.sliceAttr(value)
+            update[`${repRowID}_display_limit`] = getTranslationByKey(translationKey)
+          } else {
+            update[`${repRowID}_display_limit`] = ' '
+          }
+        }
+        processingFunctions.setAttributes(update) 
+      })
+    })
+  })
+}
 
 const fourpointoneone = () => {
   getSectionIDs('forms', idarray => {
