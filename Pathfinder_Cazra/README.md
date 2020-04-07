@@ -9,3 +9,6 @@ navigable interface while still being flexible enough to handle as much or as
 little detail as you like about your character.
 
 Please enjoy!
+
+Translation credits:
+* Italian translation by Shir0ni.

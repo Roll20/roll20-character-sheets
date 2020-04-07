@@ -1,6 +1,6 @@
 # MouseGuard Character Sheet
 
-This is the initial version of the MouseGuard character sheet. If you have any feature requests or suggestions, please add them to the [issue tracker](https://github.com/seriouslysean/roll20-character-sheets/issues).
+This is the initial version of the MouseGuard character sheet. If you have any feature requests or suggestions, please add them to the [issue tracker](https://github.com/Roll20/roll20-character-sheets/issues).
 
 ## Story
 
