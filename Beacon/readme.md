@@ -8,9 +8,10 @@ You can find more information about Beacon at its homepage: http://beacond20.blo
 ### Changelog ###
 
 **Initial release - April 7, 2015**
-- First release.  
-- Interm updates 2020-03-20
+- First release.
+
+- Interm updates 2020-03-30
+	-Rebaseline sheet on new html and css (based on DCC tabbed sheet)
 	-change Fabrication to Crafting
-	-remove most of the die rollers
-	-remove bad backgraoung image link
-	-change some number toggle boxes to type in (xp,coins)
+	-remove most of the die rollers and automation
+	-redirect images links
