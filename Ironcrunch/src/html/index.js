@@ -1,1 +1,1 @@
-import "../src/Ironcrunch.styl";
+import "../src/ironcrunch.styl";

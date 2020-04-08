@@ -6,8 +6,8 @@ var path = require('path');
 
 module.exports = {
   entry: {
-    index: './html/Ironcrunch.html',
-    styles: './src/Ironcrunch.styl'
+    index: './html/ironcrunch.html',
+    styles: './src/ironcrunch.styl'
   },
   mode: 'development',
   devServer: {
@@ -35,13 +35,13 @@ module.exports = {
   plugins: [
     new OptimizeCSSAssetsPlugin({}),
     new FixStyleOnlyEntriesPlugin(),
-    new MiniCssExtractPlugin({filename: "Ironcrunch.css"}),
+    new MiniCssExtractPlugin({filename: "ironcrunch.css"}),
     new HtmlWebpackPlugin({
-      template: './html/Ironcrunch.html',
+      template: './html/ironcrunch.html',
       minify: true,
       inject: true,
-      chunks: ['Ironcrunch'],
-      filename: 'Ironcrunch.html'
+      chunks: ['ironcrunch'],
+      filename: 'ironcrunch.html'
     })
   ]
 };

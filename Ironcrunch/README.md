@@ -1,4 +1,4 @@
-# Ironcrunch - Character Sheet
+# ironcrunch - Character Sheet
 ## Building Sheet
 ```bash
 cd src
