@@ -45,6 +45,7 @@ $sheet_col_min_width: 364px;
 	label {
 		padding: 0;
 		margin: 0;
+		color: inherit;
 		font-size: 1em;
 		box-sizing: border-box;
 	}
@@ -272,7 +273,7 @@ $sheet_col_min_width: 364px;
 				opacity: 0;
 			}
 
-			input + span {
+			span {
 				border: 1px solid;
 				color: #666;
 				padding: 4px 10px 4px;
@@ -294,6 +295,9 @@ $sheet_col_min_width: 364px;
 
 			button {
 				align-self: flex-end;
+			}
+			&.sheet-checks {
+				justify-content: start;
 			}
 		}
 
@@ -351,6 +355,14 @@ $sheet_col_min_width: 364px;
 
 			&:not(:last-child) {
 				border-bottom: 1px solid black;
+			}
+		}
+
+		.sheet-weapon-damage-setting:not([value="0"]) + label {
+			pointer-events: none;
+			input,
+			span {
+				display: none;
 			}
 		}
 
@@ -418,13 +430,6 @@ $sheet_col_min_width: 364px;
 		}
 	}
 
-	.sheet-basic-equipment:not(:checked) ~ .sheet-equipment-talents > div {
-		min-width: $sheet_col_min_width;
-		max-width: $sheet_col_max_width;
-		margin: 0 8px 5px 0;
-		flex: 1 1 0;
-	}
-
 	.sheet-basic-equipment:checked {
 		~.sheet-title .sheet-equipment-label {
 			display: none;
@@ -437,25 +442,14 @@ $sheet_col_min_width: 364px;
 		~ .sheet-equipment-talents {
 			.sheet-equipment {
 				display: none;
+				color: black;
 			}
 
 			.sheet-talents {
-
 				.repcontainer {
-					display: flex;
-					align-items: flex-start;
-					flex-wrap: wrap;
-
-					.repitem {
-						min-width: $sheet_col_min_width;
-						max-width: $sheet_col_max_width;
-						margin-right: 8px;
-						flex: 1 1 0;
-
-						&:nth-child(odd):last-child {
-							margin-right: calc(50% + 8px);
-						}
-					}
+					display: grid;
+					grid-column-gap: 8px;
+					grid-template-columns: repeat(auto-fit, minmax($sheet_col_min_width, 1fr));
 				}
 			}
 		}
@@ -666,13 +660,26 @@ $sheet_col_min_width: 364px;
 
 			.sheet-middle-col {
 				width: 455px;
+				position: relative;
 				align-self: flex-end;
-				margin: 0 auto 10px;
+				margin: 5px auto 10px;
 
-				> div:first-child {
+				.sheet-afflictions-header {
 					font-weight: bold;
 					text-align: center;
-					margin: 5px 0 0;
+				}
+
+				.sheet-rest {
+					position: absolute;
+					right: 0;
+					top: -25px;
+					span { padding: 2px 10px }
+
+					input:checked {
+						+ span { display: none}
+						~ span { color: #000 }
+					}
+					input:not(:checked) + span + span { display: none }
 				}
 
 				.sheet-afflictions-bg {
@@ -1107,6 +1114,8 @@ $sheet_col_min_width: 364px;
 				width: 100%;
 				height: 100%;
 				z-index: 1;
+				border: none;
+				padding: 0;
 
 				&:hover ~ div,
 				&:hover ~ span {
@@ -1141,13 +1150,9 @@ $sheet_col_min_width: 364px;
 	}
 
 	.sheet-equipment-talents {
-		display: flex;
-		justify-content: flex-end;
-		align-items: flex-start;
-		flex-flow: row-reverse;
-		flex-wrap: wrap;
-		align-content: flex-start;
-
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+		grid-column-gap: 8px;
 
 		.sheet-editmode:not(:checked) ~ div .repcontrol {
 			display: none;
@@ -1188,15 +1193,25 @@ $sheet_col_min_width: 364px;
 				border-bottom: 2px solid black;
 				font-weight: bold;
 				display: flex;
+				flex-wrap: wrap;
 				color: $fadedred;
 				font-size: 1.1em;
 				padding-bottom: 3px;
 				align-items: center;
 				text-transform: uppercase;
 
-				span:first-child {
+				.sheet-name {
 					margin-right: auto;
 					font-size: 1.2em;
+				}
+
+				.sheet-header-rest {
+					display: flex;
+					align-items: center;
+					margin-left: auto;
+					span:not(:last-child) {
+						margin-right: 4px;
+					}
 				}
 
 				span:not(:last-child):not(:first-child) {
@@ -1205,6 +1220,7 @@ $sheet_col_min_width: 364px;
 
 				input[type="number"] {
 					position: relative;
+					background: rgba(242,242,242,0.8);
 					z-index: 2;
 					width: 3em;
 					color: inherit;
@@ -1243,12 +1259,6 @@ $sheet_col_min_width: 364px;
 	}
 
 	.sheet-equipment {
-		order: 1;
-		flex: 1 1 0;
-		min-width: $sheet_col_min_width;
-		max-width: $sheet_col_max_width;
-		margin-right: 8px;
-
 		.sheet-defense, .sheet-items {
 			display: flex;
 			flex-flow: column;
@@ -1371,8 +1381,6 @@ $sheet_col_min_width: 364px;
 	}
 
 	.sheet-talents {
-		order: 0;
-
 		.sheet-name {
 			width: 72%;
 		}
@@ -1482,10 +1490,10 @@ $sheet_col_min_width: 364px;
 
 		.sheet-spell-content {
 			.repcontainer {
-				display: flex;
-				flex-wrap: wrap;
-				justify-content: space-between;
-				align-items: flex-start;
+				display: grid;
+				grid-column-gap: 8px;
+				grid-template-columns: 100%;
+
 			}
 
 			.sheet-edit {
@@ -1507,12 +1515,12 @@ $sheet_col_min_width: 364px;
 			}
 		}
 
+		.sheet-editmode:not(:checked) ~ .sheet-spell-content .repcontainer {
+			grid-template-columns: repeat(auto-fit, minmax($sheet_col_min_width, 1fr));
+		}
+
 		.sheet-editmode:checked ~ {
 			.sheet-traditions .repitem {
-				width: 100%;
-			}
-
-			.sheet-spell-content .repitem {
 				width: 100%;
 			}
 		}
@@ -1535,17 +1543,6 @@ $sheet_col_min_width: 364px;
 
 				.repcontrol {
 					display: none;
-				}
-			}
-
-			.sheet-spell-content .repitem {
-				min-width: $sheet_col_min_width;
-				max-width: $sheet_col_max_width;
-				margin-right: 8px;
-				flex: 1 1 0;
-
-				&:nth-child(odd):last-child {
-					margin-right: calc(50% + 8px);
 				}
 			}
 		}
@@ -1666,23 +1663,11 @@ $sheet_col_min_width: 364px;
 		}
 	}
 
-	.sheet-background, .sheet-npc {
-		display: flex;
-		justify-content: space-between;
-		flex-wrap: wrap;
-		align-items: flex-start;
-		align-content: flex-start;
-
-		.sheet-left-col, .sheet-right-col {
-			min-width: $sheet_col_min_width;
-			max-width: $sheet_col_max_width;
-			margin-right: 8px;
-			flex: 1 1 0;
-		}
-
-		.sheet-left-col {
-			margin-bottom: 5px;
-		}
+	.sheet-background-content, .sheet-npc {
+		display: grid;
+		grid-gap: 5px 8px;
+		align-content: start;
+		grid-template-columns: repeat(auto-fill, minmax($sheet_col_min_width, 1fr));
 	}
 
 	.sheet-npc {
@@ -1776,6 +1761,12 @@ $sheet_col_min_width: 364px;
 					text-align: center;
 				}
 
+				&-check {
+					width: auto;
+					margin-right: 10px;
+					input[type=checkbox] { margin-right: 4px }
+				}
+
 				&-short {
 					width: 11%;
 					text-align: center;
@@ -1819,7 +1810,6 @@ $sheet_col_min_width: 364px;
 					display: inline;
 					position: relative;
 					font-weight: normal;
-					width: auto;
 					cursor: pointer;
 
 					&:not(:last-child)::after {
@@ -1966,8 +1956,6 @@ $sheet_col_min_width: 364px;
 	}
 }
 
-.withoutavatars .sheet-rolltemplate-sotdl { margin-left: -13px }
-
 .sheet-rolltemplate-sotdl {
 	background-color: #f5f5f5;
 	border: 2px solid black;
@@ -1977,6 +1965,8 @@ $sheet_col_min_width: 364px;
 	word-wrap: break-word;
 	font-size: 13px;
 	padding: 6px;
+
+	.withoutavatars & { margin-left: -13px }
 
 	.sheet-lower {
 		text-transform: lowercase;
@@ -2035,22 +2025,22 @@ $sheet_col_min_width: 364px;
 	}
 
 	.sheet-rolls {
+		display: flex;
+		flex-wrap: wrap;
 		font-size: 0;
 
-		.sheet-roll, .sheet-attack, .sheet-damage {
-			display: inline-block;
-			vertical-align: top;
+		.sheet-roll, .sheet-damage {
 			line-height: 25px;
 			font-size: 13px;
 			white-space: nowrap;
 		}
 
-		.sheet-roll, .sheet-attack, .sheet-damage, .sheet-damageplus {
+		.sheet-roll, .sheet-damage, .sheet-damageplus {
 			.sheet-vs .inlinerollresult {
 				vertical-align: bottom;
 			}
 
-			span {
+			> span {
 				vertical-align: middle;
 
 				&.sheet-label {
@@ -2121,12 +2111,13 @@ $sheet_col_min_width: 364px;
 			font-size: 12px;
 		}
 
-		.sheet-roll, .sheet-attack {
-			width: 65%;
+		.sheet-roll {
+			padding-right: 5px;
+			margin-right: auto;
 		}
 
 		.sheet-damage {
-			width: 35%;
+			min-width: 91px;
 		}
 	}
 

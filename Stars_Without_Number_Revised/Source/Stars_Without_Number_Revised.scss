@@ -16,15 +16,12 @@ $rt-blue: #80b0ff;
 $rt-purple: #b291ec;
 $rt-gray: #bababa;
 
-/* polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 22px 100%, 0 calc(100% - 22px)) */
-
-/* dummy */
-.charsheet { background: white }
 /* global styles */
 .charsheet {
 	background-color: white;
 	padding: 0 !important;
 	font-size: 12px;
+	line-height: 18px;
 	min-width: 800px;
 	color: #000;
 }
@@ -49,11 +46,13 @@ textarea {
 	padding: 1px 4px;
 	font-size: 12px;
 	margin: 0;
+	color: #000;
 	display: block;
 }
 input[type=text], input[type=number] {
 	padding: 1px 4px;
 	font-size: 12px;
+	height: 20px;
 	color: #000;
 }
 input[type=number][readonly="readonly"],
@@ -67,6 +66,7 @@ input[type=number].sheet-no-spinners {
 }
 select {
 	margin: 0;
+	color: #000;
 	font-size: 12px;
 	padding: 1px 2px;
 	line-height: 18px;
@@ -101,6 +101,8 @@ button[type=roll].sheet-invisible-button {
 .sheet-hider[value="0"] {
 	 + div, + label, + button, + span { display: none }
 }
+.sheet-hider[value=""] + button { display: none }
+
 .sheet-editmode[value="0"] ~ .sheet-content .sheet-empty-hider[value=""] + div { display: none }
 /* headings */
 h1 {
@@ -145,6 +147,7 @@ h3 {
 .sheet-npc-input[value="1"] ~ .sheet-tabs .sheet-pc-tab,
 .sheet-tab-input:not([value="character"]) ~ .sheet-character,
 .sheet-tab-input:not([value="ship"]) ~ .sheet-ship,
+.sheet-tab-input:not([value="drones"]) ~ .sheet-drones,
 .sheet-tab-input:not([value="npc"]) ~ .sheet-npc { display: none }
 
 .sheet-content {
@@ -221,6 +224,10 @@ h3 {
 .sheet-flex {
 	display: flex;
 }
+.sheet-flex-start {
+	display: flex;
+	align-items: flex-start;
+}
 .sheet-flex-center {
 	display: flex;
 	align-items: center;
@@ -241,24 +248,21 @@ h3 {
 .sheet-halfgrid {
 	display: grid;
 	grid: auto/ 1fr 1fr;
-	grid-column-gap: 1%;
+	grid-gap: 5px;
 }
 .sheet-thirdsgrid {
 	display: grid;
 	grid: auto/ repeat(3, 1fr);
-	grid-column-gap: 2%;
+	grid-column-gap: 1%;
 }
 .sheet-column > div:not(:first-child) { margin-top: 5px }
-.sheet-col-1-3 { grid-column: 1/3 }
-.sheet-col-1-4 { grid-column: 1/4 }
-.sheet-col-1-5 { grid-column: 1/5 }
-.sheet-col-2-4 { grid-column: 2/4 }
+.sheet-col-2 { grid-column: 2 }
 .sheet-col-3 { grid-column: 3 }
-.sheet-col-3-5 { grid-column: 3/5 }
 .sheet-col-4 { grid-column: 4 }
-.sheet-col-4-7 { grid-column: 4/7 }
-.sheet-col-5-7 { grid-column: 5/7 }
-.sheet-row-3-5 { grid-row: 3/5 }
+.sheet-cols-2 { grid-column: span 2 }
+.sheet-cols-3 { grid-column: span 3 }
+.sheet-cols-4 { grid-column: span 4 }
+.sheet-rows-2 { grid-row: span 2 }
 .sheet-col55 { width: 55% }
 .sheet-col50 { width: 50% }
 .sheet-col40 { width: 40% }
@@ -299,8 +303,9 @@ input[type=number].sheet-inline-input {
 	color: #666;
 	padding-right: 5px;
 	line-height: 1;
-	div {
+	.sheet-label {
 		font-size: .9em;
+		text-align: inherit;
 		line-height: 14px;
 		border-top: 1px solid #AAA;
 
@@ -353,15 +358,25 @@ input[type=number].sheet-inline-input {
 			font-size: 16px;
 			color: #333;
 		}
-		div { grid-column: 1/4 }
+		.sheet-label { grid-column: 1/4 }
 	}
 	button[type=roll].btn {
 		width: 100%;
 		&:hover { color: red }
 	}
 }
+.sheet-table-header {
+	font-size: .9em;
+	color: #666;
+	.sheet-center { text-align: center }
+	> div {
+		padding-left: 2px;
+		border-bottom: 1px solid #aaa;
+	}
+}
 .sheet-blue-button {
 	text-align: center;
+	line-height: 1.5;
 	button[type=roll].btn {
 		background: $brightblue;
 		width: 35px;
@@ -370,6 +385,26 @@ input[type=number].sheet-inline-input {
 		margin: 0 auto;
 		color: white;
 		&::before { content: "" }
+	}
+}
+.sheet-focusinfo {
+	position: relative;
+	.sheet-details {
+		position: absolute;
+		z-index: 1;
+		opacity: 1;
+		width: 250px;
+		top: 22px;
+		left: calc(50% - 125px);
+		transition: all 0.3s;
+		background: #FFF;
+		border: 1px solid #777;
+		border-radius: 8px;
+		padding: 5px;
+	}
+	input:not(:focus) ~ .sheet-details {
+		visibility: hidden;
+		opacity: 0;
 	}
 }
 
@@ -409,14 +444,24 @@ input[type=number].sheet-inline-input {
 		}
 	}
 }
+.sheet-rep-grid {
+	display: grid;
+	align-items: start;
+	grid-column-gap: 3px;
+	margin-bottom: 3px;
+	.sheet-text-input { padding: 0 }
+}
 
 /* global skill settings */
 .sheet-skills-type[value="neither"] ~ div .sheet-skills-either,
 .sheet-skills-type:not([value="first"]) ~ div .sheet-skills-first,
 .sheet-skills-type:not([value="revised"]) ~ div .sheet-skills-revised,
 .sheet-skills-type:not([value="neither"]) ~ div .sheet-skills-neither,
+.sheet-super-type:not([value="psionics"]):not([value="both"]) ~ div .sheet-skills-psionics,
+.sheet-super-type:not([value="magic"]):not([value="both"]) ~ div .sheet-skills-magic,
 .sheet-skills-query:not([value="hover"]) ~ div .sheet-skills-query-hover,
-.sheet-skills-query[value="query"] ~ div .sheet-skills-query-display {
+.sheet-skills-query[value="query"] ~ div .sheet-skills-query-display,
+.sheet-skills-query[value="query"] ~ div .sheet-skills-query-ask {
 	display: none;
 }
 .sheet-skills-query-display {
@@ -481,6 +526,38 @@ input[type=number].sheet-inline-input {
 	}
 }
 
+/* generate buttons */
+.sheet-generate {
+	margin-bottom: 5px;
+	.sheet-generate-source {
+		height: 20px;
+		width: 170px;
+	}
+	.sheet-generate-info {
+		margin: 0 5px;
+		min-height: 20px;
+		flex-grow: 1;
+		background: $lightbox;
+		border-radius: 4px;
+		padding: 1px 4px;
+	}
+	.sheet-generate-button {
+		padding: 1px 8px;
+		border-radius: 4px;
+		cursor: pointer;
+		background: #223297;
+		color: #FFF;
+		input[type=checkbox] {
+			position: absolute;
+			visibility: hidden;
+		}
+		&:active {
+			outline: 5px auto;
+			outline-offset: -2px;
+		}
+	}
+}
+
 /* Character core */
 .sheet-core {
 	display: grid;
@@ -498,7 +575,7 @@ input[type=number].sheet-inline-input {
 		}
 	}
 	&.sheet-core-stats {
-		grid: auto / minmax(310px, 1fr) minmax(260px, 1fr) minmax(220px, 1fr);
+		grid: auto / minmax(310px, 1.2fr) minmax(260px, 1fr) minmax(220px, .8fr);
 	}
 	.sheet-main-content {
 		margin-top: 3px;
@@ -516,19 +593,17 @@ input[type=number].sheet-inline-input {
 	display: grid;
 	grid: auto / 1fr 1fr;
 }
-.sheet-character .sheet-menus button[type=roll].btn {
-	margin-right: auto;
-}
 .sheet-menus button[type=roll].btn {
 	color: $brightblue;
 	font-size: 1.1em;
 	&:hover { color: red }
+	.sheet-character & { margin-right: auto }
 }
 
 /* Attributes */
 .sheet-attributes {
 	font-size: 1.1em;
-	line-height: 16px;
+	line-height: 1.2;
 	table {
 		width: 100%;
 		height: 100%;
@@ -561,20 +636,19 @@ input[type=number].sheet-inline-input {
 .sheet-weapons {
 	.sheet-edit {
 		justify-content: space-between;
-		.sheet-name {
-			width: 135px;
-			flex-grow: 1;
-		}
+		padding-right: 1px;
+		.sheet-name { width: 138px }
 		.sheet-ab { width: 45px }
 		.sheet-weapon-skill { width: 80px }
 		.sheet-attribute { width: 60px }
 		.sheet-burst { width: 65px }
-		.sheet-damage { width: 70px }
-		.sheet-shock-damage { width: 60px }
+		.sheet-damage { width: 60px }
+		.sheet-shock-damage { width: 55px }
 		.sheet-shock-ac { width: 55px }
-		.sheet-skill-to-damage { width: 40px }
-		.sheet-range { width: 70px }
+		.sheet-skill-to-damage { width: 30px }
+		.sheet-range { width: 60px }
 		.sheet-ammo { width: 80px }
+		.sheet-enc { width: 40px }
 	}
 	.sheet-text-input { padding-right: 3px }
 
@@ -686,6 +760,7 @@ input[type=number].sheet-inline-input {
 .sheet-skills-type:not([value="neither"]) ~ div .sheet-skills-repeating,
 .sheet-psionics .sheet-skills-repeating, .sheet-magic .sheet-skills-repeating { margin-top: 4px }
 .sheet-skill-blurb {
+	margin-top: 3px;
 	font-style: italic;
 	text-align: center;
 }
@@ -698,7 +773,7 @@ input[type=number].sheet-inline-input {
 	letter-spacing: 1px;
 	cursor: pointer;
 	text-transform: uppercase;
-	font-size: .8em;
+	font-size: 10px;
 	input {
 		visibility: hidden;
 		position: absolute;
@@ -724,7 +799,7 @@ input[type=number].sheet-inline-input {
 /* Psionics */
 .sheet-psionics-effort {
 	display: grid;
-	grid: auto/ auto 60px 60px 80px;
+	grid: auto/ auto 60px 60px 60px 80px;
 	align-items: center;
 	grid-column-gap: 4px;
 	margin-top: 5px;
@@ -732,15 +807,27 @@ input[type=number].sheet-inline-input {
 }
 .sheet-techniques {
 	margin-top: 5px;
-	padding: 0 4px;
 	> .sheet-flex-center { margin-bottom: 5px }
-	input[type=text] { width:100% }
+	.sheet-display .sheet-discipline { margin-left: auto }
+	.sheet-edit .sheet-discipline {
+		margin-left: 5px;
+		width: 90px;
+	}
 }
 
 /* Space Magic */
+
+.sheet-magic-effort {
+	display: grid;
+	grid: auto/ auto 45px 45px 45px 45px 80px;
+	align-items: center;
+	grid-column-gap: 4px;
+	margin-top: 5px;
+	h3 { line-height: 1 }
+}
+
 .sheet-spells {
 	margin-top: 5px;
-	padding: 0 4px;
 	> .sheet-flex-center { margin-bottom: 5px }
 	> .sheet-flex {
 		border-bottom: 1px solid #666;
@@ -766,6 +853,22 @@ input[type=number].sheet-inline-input {
 	}
 }
 
+.sheet-spell-slots {
+	display: grid;
+	grid: auto/ auto 55px 55px 55px 55px 55px;
+	align-items: center;
+	grid-column-gap: 4px;
+	margin-top: 5px;
+	h3 { line-height: 1 }
+}
+
+.sheet-magic-type {
+	&:not([value="adept"]) ~ div .sheet-adept,
+	&:not([value="magister"]) ~ div .sheet-magister,
+	&:not([value="arcanist"]) ~ div .sheet-arcanist,
+	&[value="adept"] ~ div .sheet-spellcaster { display: none }
+}
+
 /* Foci */
 .sheet-foci-loc {
 	&[value="left"] ~ .sheet-column .sheet-foci-right,
@@ -783,7 +886,7 @@ input[type=number].sheet-inline-input {
 			font-size: 1.1em;
 			border-bottom: 1px solid #777;
 		}
-		.sheet-name,.sheet-edit textarea, .sheet-display { margin-bottom: 3px }
+		.sheet-name, .sheet-edit textarea, .sheet-display { margin-bottom: 3px }
 	}
 	.sheet-edit {
 		.sheet-name { flex-grow: 1 }
@@ -797,13 +900,15 @@ input[type=number].sheet-inline-input {
 
 /* Gear */
 .sheet-armor {
-	.sheet-name {
-		width: 150px;
-		margin-left: auto;
+	.sheet-armor-grid {
+		grid: auto / 40px 1fr 40px 75px 35px 35px 70px;
 	}
-	.sheet-ac { width: 45px }
-	.sheet-enc { width: 60px }
-	.sheet-type { width: 80px }
+	.sheet-details div, .sheet-details label {
+		grid-column: 2 / 8;
+	}
+	.sheet-details .sheet-display {
+		line-height: 1.3;
+	}
 }
 .sheet-readied-stowed {
 	display: grid;
@@ -825,49 +930,48 @@ input[type=number].sheet-inline-input {
 }
 .sheet-equipment {
 	.repcontainer[data-groupname="repeating_weapons"] + .repcontrol { display: none }
-	.repitem {
-		margin-bottom: 2px;
-		input[type=text], input[type=number], select { background: transparent }
-		input[type=text] {
-			flex-grow: 1;
-			width: 0;
-		}
-		input[type=number] {
-			width: 45px;
-			margin: 0 3px;
-		}
-		select { width: 80px }
+	.sheet-gear-grid {
+		grid: auto / 35px minmax(130px,1fr) 2fr 35px 70px;
 	}
 	.sheet-other h3 { margin-bottom: 5px }
-	textarea { height: 100px }
+	.sheet-other-gear { height: 100px }
 }
 
 /* Misc */
 .sheet-misc {
-	h3 { margin-bottom: 4px }
-	.repitem {
-		display: flex;
-		align-items: center;
-		margin-bottom: 2px;
-	}
+	.sheet-text-input input { padding-left: 2px }
+	.repitem { margin-bottom: 2px }
+	.sheet-xp { width: 50px }
 }
-.sheet-goals {
-	input[type=text] {
-		flex-grow: 1;
-		margin-right: 5px;
-	}
-	input[type=number] { width: 70px }
-}
-.sheet-languages input { width: 100% }
-.sheet-notes { margin: 10px 0 }
+.sheet-notes { margin-top: 5px }
 
 /* Ship tab */
+.sheet-ship-class {
+	&[value="fighter"] ~ .sheet-section .sheet-generate-source {
+		.sheet-frigate, .sheet-cruiser, .sheet-capital { display: none }
+	}
+	&[value="frigate"] ~ .sheet-section .sheet-generate-source {
+		.sheet-cruiser, .sheet-capital { display: none }
+	}
+	&[value="cruiser"] ~ .sheet-section .sheet-generate-source {
+		.sheet-capital { display: none }
+	}
+}
 .sheet-ship {
 	margin-top: -20px;
-	grid: auto/ repeat(4, 1fr);
+	grid: auto/ 2fr 1fr 1fr;
 	.sheet-menus {
 		h3 { line-height: 1 }
 		button[type=roll].btn { line-height: 1 }
+	}
+	.sheet-type {
+		padding: 5px 8px;
+		h3 { line-height: 1 }
+		select {
+			height: 20px;
+			width: 80px;
+			background: transparent;
+		}
 	}
 	.sheet-info {
 		flex-wrap: wrap;
@@ -898,6 +1002,7 @@ input[type=number].sheet-inline-input {
 			.sheet-damage { width: 65px }
 			.sheet-duo { width: 80px }
 			.sheet-qualities { width: calc(100% - 195px) }
+			.sheet-range { width: 70px }
 		}
 		.sheet-display {
 			text-indent: -10px;
@@ -930,13 +1035,20 @@ input[type=number].sheet-inline-input {
 		}
 		.sheet-description { font-style: italic }
 	}
-}
-.sheet-editmode[value="0"] ~ .sheet-ship {
-	.sheet-ship-defenses, .sheet-ship-fitting {
-		background: $lightbox;
-		padding: 3px 0;
+
+	.sheet-input-type[value="SHIP"] ~ div .sheet-vehicle-type:not(.sheet-vehicle-type-ship),
+	.sheet-input-type[value="MECH"] ~ div .sheet-vehicle-type:not(.sheet-vehicle-type-mech),
+	.sheet-input-type[value="VEHICLE"] ~ div .sheet-vehicle-type:not(.sheet-vehicle-type-custom) {
+		display: none;
+	}
+	.sheet-editmode[value="0"] ~ & {
+		.sheet-ship-defenses, .sheet-ship-fitting {
+			background: $lightbox;
+			padding: 3px 0;
+		}
 	}
 }
+
 
 /* NPC tab */
 .sheet-npc {
@@ -1007,14 +1119,62 @@ input[type=number].sheet-inline-input {
 	}
 }
 
-/* Roll templates */
-
-.withoutavatars {
-	.sheet-rolltemplate-swn-default,
-	.sheet-rolltemplate-swn-attack,
-	.sheet-rolltemplate-swn-skill,
-	.sheet-rolltemplate-swn-save { margin-left: -11px }
+/* Drone tab */
+.sheet-drone {
+	display: grid;
+	grid: 86px 1fr / 1fr 1fr;
+	grid-gap: 5px;
+	align-items: start;
+	border-top: 1px solid #555;
+	padding: 5px 0;
+	.sheet-stats {
+		display: grid;
+		align-content: start;
+		grid: auto / repeat(7, 1fr);
+	}
+	.sheet-fittings {
+		.sheet-name {
+			font-weight: bold;
+			&:not(:empty)::after { content: ". " }
+		}
+		.sheet-desc { font-style: italic }
+		.sheet-display { margin-bottom: 3px }
+	}
+	.sheet-fitting-grid {
+		grid: auto / .8fr 1.2fr;
+	}
+	.sheet-num-fittings {
+		&[value="1"], &[value="2"], &[value="3"], &[value="4"] {
+			~ .sheet-fitting-5 { display: none }
+		}
+		&[value="1"], &[value="2"], &[value="3"] {
+			~ .sheet-fitting-4 { display: none }
+		}
+		&[value="1"], &[value="2"] {
+			~ .sheet-fitting-3 { display: none }
+		}
+		&[value="1"] {
+			~ .sheet-fitting-2 { display: none }
+		}
+	}
+	.sheet-weapon-grid {
+		grid: auto / 35px 1fr 50px 60px 35px 70px;
+	}
+	.sheet-weapon {
+		position: relative;
+		.sheet-name { font-weight: bold }
+		.sheet-display {
+			margin-right: 4px;
+			div::after { content: "," }
+		}
+	}
+	.sheet-editmode[value="0"] ~ .sheet-content & .sheet-drone-weapons {
+		display: flex;
+		flex-wrap: wrap;
+	}
 }
+
+/* Roll templates */
 
 .sheet-rolltemplate-swn-default,
 .sheet-rolltemplate-swn-attack,
@@ -1025,6 +1185,7 @@ input[type=number].sheet-inline-input {
 	color: #FFF;
 	font-family: $arial;
 	div { box-sizing: border-box; }
+	.withoutavatars & { margin-left: -11px }
 	.sheet-container .inlinerollresult {
 		padding: 0;
 		font-family: inherit;
@@ -1036,14 +1197,7 @@ input[type=number].sheet-inline-input {
 		min-height: 175px;
 		position: relative;
 		padding: 18px 20px;
-	}
-	.sheet-background {
-		width: 100%;
-		height: calc(100% - 175px);
-		position: absolute;
-		top: 153px;
-		left: 0;
-		background: #0F0F0F;
+		clip-path: polygon(0 7px, 7px 0, 173px 0, 177px 3px, 281px 3px, 289px 11px, 289px 82px, 100% 87px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 22px 100%, 0 calc(100% - 22px));
 	}
 	.sheet-header {
 		width: 198px;
@@ -1097,7 +1251,8 @@ input[type=number].sheet-inline-input {
 .sheet-rolltemplate-swn-default {
 	.sheet-container {
 		background: url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-top-black.png") top no-repeat,
-			url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-bottom.png") bottom no-repeat;
+			url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-bottom.png") bottom no-repeat,
+			#0F0F0F;
 	}
 	.sheet-name { color: $rt-gray }
 	.sheet-rollname { margin-right: auto }
@@ -1120,7 +1275,8 @@ input[type=number].sheet-inline-input {
 .sheet-rolltemplate-swn-attack {
 	.sheet-container {
 		background: url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-top-purple.png") top no-repeat,
-			url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-bottom.png") bottom no-repeat;
+			url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-bottom.png") bottom no-repeat,
+			#0F0F0F;
 	}
 	.sheet-name { color: $rt-purple }
 	.sheet-title {
@@ -1156,7 +1312,8 @@ input[type=number].sheet-inline-input {
 .sheet-rolltemplate-swn-skill {
 	.sheet-container {
 		background: url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-top-blue.png") top no-repeat,
-			url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-bottom.png") bottom no-repeat;
+			url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-bottom.png") bottom no-repeat,
+			#0F0F0F;
 	}
 	.sheet-name { color: $rt-blue }
 	.sheet-title {
@@ -1173,12 +1330,14 @@ input[type=number].sheet-inline-input {
 	.sheet-container {
 		&.sheet-success {
 			background: url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-top-green.png") top no-repeat,
-				url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-bottom.png") bottom no-repeat;
+				url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-bottom.png") bottom no-repeat,
+				#0F0F0F;
 			.sheet-name { color: $rt-green }
 		}
 		&.sheet-failure {
 			background: url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-top-red.png") top no-repeat,
-				url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-bottom.png") bottom no-repeat;
+				url("https://raw.githubusercontent.com/roll20/roll20-character-sheets/master/Stars_Without_Number_Revised/Assets/rt-bottom.png") bottom no-repeat,
+				#0F0F0F;
 			.sheet-name { color: $rt-red }
 		}
 	}
