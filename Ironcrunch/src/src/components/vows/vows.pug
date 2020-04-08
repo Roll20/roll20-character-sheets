@@ -1,0 +1,50 @@
+- var track = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+- var difficulties = { 1:'Troublesome', 2: 'Dangerous', 3: 'Formidable', 4: 'Extreme', 5: 'Epic' }
+
+mixin progressBox
+  option(value="0" selected)
+  option(value="1") -
+  option(value="2") +
+  option(value="3") *
+  option(value="4") #
+
+input(type="checkbox" class="sheet-hide sheet-vows-Ironcrunch-mode-page" name="attr_vows_ironsworn_mode_page" id="vows-Ironcrunch-mode-page")
+div.sheet-vows-Ironcrunch-mode-page
+  div.sheet-vows
+    fieldset.repeating_vow
+      input(type="text" class="sheet-vow-name" name="attr_vow_name")
+      div.sheet-vows-header
+        each difficulty, index in difficulties
+          input(type="radio" name="attr_vow_rank" value=index)
+          h5=difficulty
+
+      div.sheet-vow
+        div
+          input(class="sheet-clear-vow sheet-hidden" type="radio" name="attr_clear_vow" value="0")
+          input(class="sheet-clear-vow" type="radio" name="attr_clear_vow" value="1")
+          span.sheet-vow-clear-label Clear
+          each index in track
+            select(name=`attr_vow-${index}` class="sheet-progress-input")
+              +progressBox                           
+          button(
+            type="roll"
+            title="Fulfill your Vow"
+            name="rollVow"
+            value="&{template:Ironcrunch} {{header=@{character_name} <em>Fulfill Your Vow</em> }} {{vowname=@{vow_name}}} {{vow=[[@{vow-filled}]]}} {{challenge1=[[d10]]}} {{challenge2=[[d10]]}}"
+          )               
+          input(
+            type="text"
+            class="sheet-hidden"
+            name="attr_vow-filled"
+            value="floor((@{vow-0}+@{vow-1}+@{vow-2}+@{vow-3}+@{vow-4}+@{vow-5}+@{vow-6}+@{vow-7}+@{vow-8}+@{vow-9})/4)"
+            disabled
+          )
+  
+        div.sheet-threat-row
+          input(type="text" class="sheet-threat-name sheet-vow-name" name="attr_threat_name")
+          span.sheet-vow-threat-label Threat
+          each index in track
+            div.sheet-threat-box
+              input(class="sheet-threat-vow" type="checkbox" name=`attr_menace-${index}`)
+              div.sheet-threat-fill
+          button(type="roll" disabled hidden style="opacity: 0; height: 0px;")

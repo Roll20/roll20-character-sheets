@@ -1,0 +1,158 @@
+script(type="text/worker")
+  | // Debilities update Momentum MAX and RESET.
+  | on('change:debilWounded change:debilShaken change:debilUnprepared change:debilEncumbered change:debilMarked change:debilHaunted change:debilMaimed change:debilCorrupted change:debilOathbreaker change:debilLeech change:debilCustom1 change:debilCustom2', function() {
+  |     var numDebilities=0
+  |     getAttrs(["debilWounded","debilShaken", "debilUnprepared", "debilEncumbered", "debilMarked", "debilHaunted", "debilMaimed", "debilCorrupted", "debilOathbreaker", "debilLeech", "debilCustom1", "debilCustom2", "momentum_max", "momentum_reset"], function(values) {
+  |         if(values.debilWounded == "on") numDebilities=numDebilities+1;
+  |         if(values.debilShaken == "on") numDebilities=numDebilities+1;
+  |         if(values.debilUnprepared == "on") numDebilities=numDebilities+1;
+  |         if(values.debilEncumbered == "on") numDebilities=numDebilities+1;
+  |         if(values.debilMarked == "on") numDebilities=numDebilities+1;
+  |         if(values.debilHaunted == "on") numDebilities=numDebilities+1;
+  |         if(values.debilMaimed == "on") numDebilities=numDebilities+1;
+  |         if(values.debilCorrupted == "on") numDebilities=numDebilities+1;
+  |         if(values.debilOathbreaker == "on") numDebilities=numDebilities+1;
+  |         if(values.debilLeech == "on") numDebilities=numDebilities+1;
+  |         if(values.debilCustom1 == "on") numDebilities=numDebilities+1;
+  |         if(values.debilCustom2 == "on") numDebilities=numDebilities+1;
+  |         setAttrs({ momentum_max: (10 - numDebilities)});
+  |         if (numDebilities===0) setAttrs({ momentum_reset: 2});
+  |         if (numDebilities===1) setAttrs({ momentum_reset: 1});
+  |         if (numDebilities>1) setAttrs({ momentum_reset: 0});
+  |     });
+  | });
+  | //Cannot increase Health while Wounded
+  | //Health reaching 0 marks Wounded
+  | on('change:health', function(eventinfo) {
+  |     getAttrs(["debilWounded"], function(values) {
+  |         if(values.debilWounded == "on") {
+  |             if (parseInt(eventinfo.newValue) > parseInt(eventinfo.previousValue)) {
+  |                 setAttrs({health: eventinfo.previousValue});
+  |             }
+  |         }
+  |     });
+  | });
+  | //Cannot increase Spirit while Shaken
+  | //Spirit reaching 0 marks Shaken
+  | on('change:spirit', function(eventinfo) {
+  |     getAttrs(["debilShaken"], function(values) {
+  |         if(values.debilShaken == "on") {
+  |             if (parseInt(eventinfo.newValue) > parseInt(eventinfo.previousValue)) {
+  |                 setAttrs({spirit: eventinfo.previousValue});
+  |             }
+  |         }
+  |     });
+  | });
+  | //Cannot increase Supply while Unprepared
+  | //Supply reaching 0 marks Unprepared
+  | on('change:supply', function(eventinfo) {
+  |     getAttrs(["debilUnprepared"], function(values) {
+  |         if(values.debilUnprepared == "on") {
+  |             if (parseInt(eventinfo.newValue) > parseInt(eventinfo.previousValue)) {
+  |                 setAttrs({supply: eventinfo.previousValue});
+  |             }
+  |         }
+  |     });
+  |     if (parseInt(eventinfo.newValue) === 0) setAttrs({debilUnprepared: "on"});
+  | });
+  | // Do not allow Momentum to go over MAX.
+  | on('change:momentum change:momentum_max', function() {
+  |     getAttrs(["momentum","momentum_max"], function(values) {
+  |         if(parseInt(values.momentum) > parseInt(values.momentum_max)) setAttrs({ momentum: parseInt(values.momentum_max)});
+  |     });
+  | });
+  | on('change:clear_vow', function(values) {
+  |     if(values.newValue === '1'){
+  |         setAttrs({ 'vow1-0': '0', 'vow1-1': '0', 'vow1-2': '0', 'vow1-3': '0', 'vow1-4': '0', 'vow1-5': '0', 'vow1-6': '0', 'vow1-7': '0', 'vow1-8': '0', 'vow1-9': '0', clear_vow: '0' });
+  |     }
+  |     if(values.newValue === '2'){
+  |         setAttrs({ 'vow2-0': '0', 'vow2-1': '0', 'vow2-2': '0', 'vow2-3': '0', 'vow2-4': '0', 'vow2-5': '0', 'vow2-6': '0', 'vow2-7': '0', 'vow2-8': '0', 'vow2-9': '0', clear_vow: '0' });
+  |     }
+  |     if(values.newValue === '3'){
+  |         setAttrs({ 'vow3-0': '0', 'vow3-1': '0', 'vow3-2': '0', 'vow3-3': '0', 'vow3-4': '0', 'vow3-5': '0', 'vow3-6': '0', 'vow3-7': '0', 'vow3-8': '0', 'vow3-9': '0', clear_vow: '0' });
+  |     }
+  |     if(values.newValue === '4'){
+  |         setAttrs({ 'vow4-0': '0', 'vow4-1': '0', 'vow4-2': '0', 'vow4-3': '0', 'vow4-4': '0', 'vow4-5': '0', 'vow4-6': '0', 'vow4-7': '0', 'vow4-8': '0', 'vow4-9': '0', clear_vow: '0' });
+  |     }
+  |     if(values.newValue === '5'){
+  |         setAttrs({ 'vow5-0': '0', 'vow5-1': '0', 'vow5-2': '0', 'vow5-3': '0', 'vow5-4': '0', 'vow5-5': '0', 'vow5-6': '0', 'vow5-7': '0', 'vow5-8': '0', 'vow5-9': '0', clear_vow: '0' });
+  |     }
+  | });
+  | on('change:repeating_assets:assettype', function(values) {
+  |     setAttrs({
+  |         ['repeating_assets_Asset' + values.previousValue]: 'off',
+  |         ['repeating_assets_Asset' + values.newValue]: 'on'
+  |     });
+  | });
+
+  | on('change:repeating_assets:assetDropdownCompanion', function(values) {
+  |     setAttrs({
+  |         ['repeating_assets_AssetCompanionDiv' + values.previousValue]: 'off',
+  |         ['repeating_assets_AssetCompanionDiv' + values.newValue]: 'on'
+  |     });
+  | });
+
+  | on('change:repeating_assets:assetDropdownPath', function(values) {
+  |     setAttrs({
+  |         ['repeating_assets_AssetPathDiv' + values.previousValue]: 'off',
+  |         ['repeating_assets_AssetPathDiv' + values.newValue]: 'on'
+  |     });
+  | });
+
+  | on('change:repeating_assets:assetDropdownCombatTalent', function(values) {
+  |     setAttrs({
+  |         ['repeating_assets_AssetCombatTalentDiv' + values.previousValue]: 'off',
+  |         ['repeating_assets_AssetCombatTalentDiv' + values.newValue]: 'on'
+  |     });
+  | });
+
+  | on('change:repeating_assets:assetDropdownRitual', function(values) {
+  |     setAttrs({
+  |         ['repeating_assets_AssetRitualDiv' + values.previousValue]: 'off',
+  |         ['repeating_assets_AssetRitualDiv' + values.newValue]: 'on'
+  |     });
+  | });
+
+  | on('change:repeating_assets:builder-titles', function(values) {
+  |     setAttrs({
+  |         ['repeating_assets_builder-titles-' + values.previousValue]: 'off',
+  |         ['repeating_assets_builder-titles-' + values.newValue]: 'on'
+  |     });
+  | });
+
+  | on('change:repeating_assets:builder-ability-1', function(values) {
+  |     setAttrs({
+  |         ['repeating_assets_builder-ability-1-' + values.previousValue]: 'off',
+  |         ['repeating_assets_builder-ability-1-' + values.newValue]: 'on'
+  |     });
+  | });
+
+  | on('change:repeating_assets:builder-ability-2', function(values) {
+  |     setAttrs({
+  |         ['repeating_assets_builder-ability-2-' + values.previousValue]: 'off',
+  |         ['repeating_assets_builder-ability-2-' + values.newValue]: 'on'
+  |     });
+  | });
+
+  | on('change:repeating_assets:builder-ability-3', function(values) {
+  |     setAttrs({
+  |         ['repeating_assets_builder-ability-3-' + values.previousValue]: 'off',
+  |         ['repeating_assets_builder-ability-3-' + values.newValue]: 'on'
+  |     });
+  | });
+
+  | on('change:repeating_assets:track-dropdown', function(values) {
+  |     setAttrs({
+  |         ['repeating_assets_track-dropdown-' + values.previousValue]: 'off',
+  |         ['repeating_assets_track-dropdown-' + values.newValue]: 'on'
+  |     });
+  | });
+
+  | on('change:momentumBurn', function() {
+  |     getAttrs([ "momentum_reset" ], function(values) {
+  |         setAttrs({
+  |             momentum: parseInt(values.momentum_reset),
+  |             momentumBurn: 'off'
+  |         });
+  |     });
+  | });
