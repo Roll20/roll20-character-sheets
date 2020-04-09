@@ -24,17 +24,15 @@
 			<div class="content">
 				<h4>GURPS Character Sheet Version: <input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" /></h4>
 				<ul>
-					<li>Changed width of Weapon and Damage Notes fields, under Melee and Raged Attacks, to be more readable – Cosmetic Only.</li>
+					<li>Combat tab. fixed alignment issues with active defense arrow and chekbox when the sheet is popped out into a window.</li>
 					<li>
-						General Tab. Removed checkbox for whispering Perception. Current default behavior for whisper is player and game master can see the roll. 
-						There's no method that only the GM sees the roll by the player.
+						Combat tab - Active Defense Success/Fail Notes. Had time to restructure the Rules As Written (RAW) notes so they are 
+						no longer part of the custom notes. They are now just stored on the options and automatically appended to the roll template.
 					</li>
 					<li>
-						Combat Tab. Updated Active Defenses to have the same layout as Skills and Spells.
-						Active Defenses will be prepopulated with success/fail notes based on the Defense Type.
-					</li>
-					<li>
-						Options Tab. There are text boxes for editing the default success/fail notes for Active Defenses.
+						<b>IMPORTANT:</b> If you see double notes for active defense success, critical success, fail, or critical fail, you will
+						need to manually delete the custom success/fail notes for each active defense. This is a one time edit and you will not 
+						need to do that again.
 					</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
@@ -3689,7 +3687,7 @@
 					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight_dodge" />
 					<input class="toggle toggle-notes static-defense" type="checkbox" title="Click to show/hide more information." name="attr_defense_dodge_toggle_notes" />
 					<span class="checkbox static-defense"></span>	
-					<div class="row row-stats row-standard margin-left">
+					<div class="row row-stats row-standard static-defense-width">
 						<div class="cell col-dodge-label">Dodge</div>
 						<div class="cell col-dodge">
 							<input type="hidden" class="dodge-reduced-notes" name="attr_dodge_reduced_notes" value="0" />
@@ -3712,7 +3710,7 @@
 						<div class="cell col2"><input type="number" step="1" name="attr_ad_dodge_skill_mod" value="0" title="Macro name: ad_dodge_skill_mod" /></div>
 						<div class="cell col3"><input type="text" name="attr_ad_dodge_skill_final" value="@{current_dodge} + @{ad_dodge_skill_mod}" disabled="disabled" title="Macro name: ad_dodge_skill_final" /></div>
 						<div class="cell col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_show_notes}]]}} {{notes=@{defense_dodge_notes}}} {{customSuccessNote=@{defense_dodge_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_critical_success_note}}} {{customFailNote=@{defense_dodge_fail_note}}} {{customCriticalFailNote=@{defense_dodge_critical_fail_note}}}" name="roll_vsDodge" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_show_notes}]]}} {{notes=@{defense_dodge_notes}}} {{customSuccessNote=@{dodge_success_notes} @{defense_dodge_success_note}}} {{customCriticalSuccessNote=@{dodge_critical_success_notes} @{defense_dodge_critical_success_note}}} {{customFailNote=@{dodge_fail_notes} @{defense_dodge_fail_note}}} {{customCriticalFailNote=@{dodge_critical_failure_notes} @{defense_dodge_critical_fail_note}}}" name="roll_vsDodge" />
 						</div>
 					</div> <!-- .sheet-row -->
 
@@ -3793,18 +3791,13 @@
 						        <textarea name="attr_defense_dodge_notes" value="@{dodge_success_notes}" title="Field name: defense_dodge_notes" style="height: 50px"></textarea>
 						    </div>
 							
-							<div class="note-input">
-								<div class="note-title">&nbsp;</div>
-								<button type="action" name="act_defense_dodge_reset_notes" class="reset">Reset Success/Fail Notes</button>
-							</div>
-
 						</div>
 
 					    <div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Success Note:</div>
+    						        <div class="sheet-popup">Custom Success Note:</div>
             						<span class="sheet-tooltip">
             						    Success, critical success, fail, and critical fail<br />
             						    notes will be added to roll results.<br />
@@ -3813,14 +3806,12 @@
 										visualize what it will look like in chat.
             						</span>
     						    </div>
-						        <textarea name="attr_defense_dodge_success_note" title="Field name: defense_dodge_success_note">If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.</textarea>
+						        <textarea name="attr_defense_dodge_success_note" title="Field name: defense_dodge_success_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Success Note:</div>
-						        <textarea name="attr_defense_dodge_critical_success_note" title="Field name: defense_dodge_critical_success_note">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
-
-If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
+						        <div class="note-title">Custom Critical Success Note:</div>
+						        <textarea name="attr_defense_dodge_critical_success_note" title="Field name: defense_dodge_critical_success_note"></textarea>
 							</div>
 							
 						</div>
@@ -3828,13 +3819,13 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
-						        <div class="note-title">Fail Note:</div>
+						        <div class="note-title">Custom Fail Note:</div>
 						        <textarea name="attr_defense_dodge_fail_note" title="Field name: defense_dodge_fail_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Fail Note:</div>
-						        <textarea name="attr_defense_dodge_critical_fail_note" title="Field name: defense_dodge_critical_fail_note">You lose your footing and fall prone (no effect if already prone). See B382</textarea>
+						        <div class="note-title">Custom Critical Fail Note:</div>
+						        <textarea name="attr_defense_dodge_critical_fail_note" title="Field name: defense_dodge_critical_fail_note"></textarea>
 						    </div>
 						    
 						</div>
@@ -3847,7 +3838,7 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight_dodge_retreat" />
 					<input class="toggle toggle-notes static-defense" type="checkbox" title="Click to show/hide more information." name="attr_defense_dodge_retreat_toggle_notes" />
 					<span class="checkbox static-defense"></span>		
-					<div class="row row-stats row-standard margin-left">
+					<div class="row row-stats row-standard static-defense-width">
 
 						<div class="cell col-dodge-label">
 							<div class="popup">Dodge and Retreat (vs. Melee Attacks Only)</div>
@@ -3878,7 +3869,7 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="cell col2"><input type="number" step="1" name="attr_ad_dodge_retreat_skill_mod" value="0" title="Macro name: ad_dodge_retreat_skill_mod" /></div>
 						<div class="cell col3"><input type="text" name="attr_ad_dodge_retreat_skill_final" value="@{current_dodge} + 3 + @{ad_dodge_retreat_skill_mod}" disabled="disabled" title="Macro name: ad_dodge_retreat_skill_final" /></div>
 						<div class="cell col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Retreat}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_retreat_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_retreat_show_notes}]]}} {{notes=@{defense_dodge_retreat_notes}}} {{customSuccessNote=@{defense_dodge_retreat_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_retreat_critical_success_note}}} {{customFailNote=@{defense_dodge_retreat_fail_note}}} {{customCriticalFailNote=@{defense_dodge_retreat_critical_fail_note}}}" name="roll_vsDodgeRetreat" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Retreat}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_retreat_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_retreat_show_notes}]]}} {{notes=@{defense_dodge_retreat_notes}}} {{notes=@{defense_dodge_notes}}} {{customSuccessNote=@{dodge_success_notes} @{defense_dodge_success_note}}} {{customCriticalSuccessNote=@{dodge_critical_success_notes} @{defense_dodge_critical_success_note}}} {{customFailNote=@{dodge_fail_notes} @{defense_dodge_fail_note}}} {{customCriticalFailNote=@{dodge_critical_failure_notes} @{defense_dodge_critical_fail_note}}}" name="roll_vsDodgeRetreat" />
 						</div>
 					</div> <!-- .sheet-row -->
 
@@ -3940,18 +3931,6 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="row">
 							
 							<div class="show-notes">
-						        <input type="checkbox" name="attr_defense_dodge_show_notes" value="1" style="float:left; margin-right: 5px;" />
-								<div class="popup" style="float:left;">Show custom notes in roll template</div>
-        						<span class="tooltip">
-									Displayed on the rolltemplate.
-        						</span>
-							</div>
-
-						</div>
-					
-						<div class="row">
-							
-							<div class="show-notes">
 						        <input type="checkbox" name="attr_defense_dodge_retreat_show_notes" value="1" style="float:left; margin-right: 5px;" />
 								<div class="popup" style="float:left;">Show notes below in roll template</div>
         						<span class="tooltip">
@@ -3971,18 +3950,13 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						        <textarea name="attr_defense_dodge_retreat_notes" title="Field name: defense_dodge_notes" style="height: 50px"></textarea>
 							</div>
 							
-							<div class="note-input">
-								<div class="note-title">&nbsp;</div>
-								<button type="action" name="act_defense_dodge_retreat_reset_notes" class="reset">Reset Success/Fail Notes</button>
-							</div>
-						    
 						</div>
 
 					    <div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Success Note:</div>
+    						        <div class="sheet-popup">Custom Success Note:</div>
             						<span class="sheet-tooltip">
             						    Success, critical success, fail, and critical fail<br />
             						    notes will be added to roll results.<br />
@@ -3991,14 +3965,12 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 										visualize what it will look like in chat.
             						</span>
     						    </div>
-						        <textarea name="attr_defense_dodge_retreat_success_note" title="Field name: defense_dodge_retreat_success_note">If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.</textarea>
+						        <textarea name="attr_defense_dodge_retreat_success_note" title="Field name: defense_dodge_retreat_success_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Success Note:</div>
-						        <textarea name="attr_defense_dodge_retreat_critical_success_note" title="Field name: defense_dodge_retreat_critical_success_note">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
-
-If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
+						        <div class="note-title">Custom Critical Success Note:</div>
+						        <textarea name="attr_defense_dodge_retreat_critical_success_note" title="Field name: defense_dodge_retreat_critical_success_note"></textarea>
 							</div>
 							
 						</div>
@@ -4006,13 +3978,13 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
-						        <div class="note-title">Fail Note:</div>
+						        <div class="note-title">Custom Fail Note:</div>
 						        <textarea name="attr_defense_dodge_retreat_fail_note" title="Field name: defense_dodge_retreat_fail_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Fail Note:</div>
-						        <textarea name="attr_defense_dodge_retreat_critical_fail_note" title="Field name: defense_dodge_retreat_critical_fail_note">You lose your footing and fall prone (no effect if already prone). See B382</textarea>
+						        <div class="note-title">Custom Critical Fail Note:</div>
+						        <textarea name="attr_defense_dodge_retreat_critical_fail_note" title="Field name: defense_dodge_retreat_critical_fail_note"></textarea>
 						    </div>
 						    
 						</div>
@@ -4025,7 +3997,7 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight_dodge_drop" />
 					<input class="toggle toggle-notes static-defense" type="checkbox" title="Click to show/hide more information." name="attr_defense_dodge_drop_toggle_notes" />
 					<span class="checkbox static-defense"></span>
-					<div class="row row-stats row-standard margin-left">
+					<div class="row row-stats row-standard static-defense-width">
 						<div class="cell col-dodge-label">
 							<div class="popup">Dodge and Drop (vs. Ranged Attacks only)</div>
 								<span class="tooltip">
@@ -4054,7 +4026,7 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="cell col2"><input type="number" step="1" name="attr_ad_dodge_drop_skill_mod" value="0" title="Macro name: ad_dodge_drop_skill_mod" /></div>
 						<div class="cell col3"><input type="text" name="attr_ad_dodge_drop_skill_final" value="@{current_dodge} + 3 + @{ad_dodge_drop_skill_mod}" disabled="disabled" title="Macro name: ad_dodge_drop_skill_final" /></div>
 						<div class="cell col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Drop}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_drop_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_drop_show_notes}]]}} {{notes=@{defense_dodge_drop_notes}}} {{customSuccessNote=@{defense_dodge_drop_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_drop_critical_success_note}}} {{customFailNote=@{defense_dodge_drop_fail_note}}} {{customCriticalFailNote=@{defense_dodge_drop_critical_fail_note}}}" name="roll_vsDodgeDrop" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Drop}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_drop_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_drop_show_notes}]]}} {{notes=@{defense_dodge_drop_notes}}} {{notes=@{defense_dodge_notes}}} {{customSuccessNote=@{dodge_success_notes} @{defense_dodge_success_note}}} {{customCriticalSuccessNote=@{dodge_critical_success_notes} @{defense_dodge_critical_success_note}}} {{customFailNote=@{dodge_fail_notes} @{defense_dodge_fail_note}}} {{customCriticalFailNote=@{dodge_critical_failure_notes} @{defense_dodge_critical_fail_note}}}" name="roll_vsDodgeDrop" />
 						</div>
 					</div> <!-- .sheet-row -->
 
@@ -4116,18 +4088,6 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="row">
 							
 							<div class="show-notes">
-						        <input type="checkbox" name="attr_defense_dodge_show_notes" value="1" style="float:left; margin-right: 5px;" />
-								<div class="popup" style="float:left;">Show custom notes in roll template</div>
-        						<span class="tooltip">
-									Displayed on the rolltemplate.
-        						</span>
-							</div>
-
-						</div>
-					
-						<div class="row">
-							
-							<div class="show-notes">
 						        <input type="checkbox" name="attr_defense_dodge_drop_show_notes" value="1" style="float:left; margin-right: 5px;" />
 								<div class="popup" style="float:left;">Show notes below in roll template</div>
         						<span class="tooltip">
@@ -4147,18 +4107,13 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						        <textarea name="attr_defense_dodge_drop_notes" title="Field name: defense_dodge_drop_notes" style="height: 50px"></textarea>
 						    </div>
 							
-							<div class="note-input">
-								<div class="note-title">&nbsp;</div>
-								<button type="action" name="act_defense_dodge_drop_reset_notes" class="reset">Reset Success/Fail Notes</button>
-							</div>
-
 						</div>
 
 					    <div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Success Note:</div>
+    						        <div class="sheet-popup">Custom Success Note:</div>
             						<span class="sheet-tooltip">
             						    Success, critical success, fail, and critical fail<br />
             						    notes will be added to roll results.<br />
@@ -4167,14 +4122,12 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 										visualize what it will look like in chat.
             						</span>
     						    </div>
-						        <textarea name="attr_defense_dodge_drop_success_note" title="Field name: defense_dodge_drop_success_note">If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.</textarea>
+						        <textarea name="attr_defense_dodge_drop_success_note" title="Field name: defense_dodge_drop_success_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Success Note:</div>
-						        <textarea name="attr_defense_dodge_drop_critical_success_note" title="Field name: defense_dodge_drop_critical_success_note">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
-
-If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
+						        <div class="note-title">Custom Critical Success Note:</div>
+						        <textarea name="attr_defense_dodge_drop_critical_success_note" title="Field name: defense_dodge_drop_critical_success_note"></textarea>
 							</div>
 							
 						</div>
@@ -4182,13 +4135,13 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
-						        <div class="note-title">Fail Note:</div>
+						        <div class="note-title">Custom Fail Note:</div>
 						        <textarea name="attr_defense_dodge_drop_fail_note" title="Field name: defense_dodge_drop_fail_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Fail Note:</div>
-						        <textarea name="attr_defense_dodge_drop_critical_fail_note" title="Field name: defense_dodge_drop_critical_fail_note">You lose your footing and fall prone (no effect if already prone). See B382</textarea>
+						        <div class="note-title">Custom Critical Fail Note:</div>
+						        <textarea name="attr_defense_dodge_drop_critical_fail_note" title="Field name: defense_dodge_drop_critical_fail_note"></textarea>
 						    </div>
 						    
 						</div>
@@ -4231,7 +4184,7 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 							<input type="text" name="attr_skill_final" value="@{skill} + @{skill_mod}" disabled="disabled" title="Macro table name: repeating_defense. Field name: skill_final" />
 						</div>
 						<div class="cell col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll (@{type})}} {{defenseType=[[@{defense_type}]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill_final} + @{modifier}]]}} {{showNotes=[[@{show_notes}]]}} {{notes=@{info_description} @{notes} }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{defense_success_note}}} {{customCriticalSuccessNote=@{defense_critical_success_note}}} {{customFailNote=@{defense_fail_note}}} {{customCriticalFailNote=@{defense_critical_fail_note}}}" name="roll_vsSL" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll (@{type})}} {{defenseType=[[@{defense_type}]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill_final} + @{modifier}]]}} {{showNotes=[[@{show_notes}]]}} {{notes=@{info_description} @{notes} }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{raw_success_note} @{defense_success_note}}} {{customCriticalSuccessNote=@{raw_critical_success_note} @{defense_critical_success_note}}} {{customFailNote=@{raw_fail_note} @{defense_fail_note}}} {{customCriticalFailNote=@{raw_critical_fail_note} @{defense_critical_fail_note}}}" name="roll_vsSL" />
 						</div>
 					</div> <!-- .row -->
 					
@@ -4293,18 +4246,6 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="row">
 							
 							<div class="show-notes">
-						        <input type="checkbox" name="attr_defense_show_notes" value="1" style="float:left; margin-right: 5px;" />
-								<div class="popup" style="float:left;">Show custom notes in roll template</div>
-        						<span class="tooltip">
-									Displayed on the rolltemplate.
-        						</span>
-							</div>
-
-						</div>
-					
-						<div class="row">
-							
-							<div class="show-notes">
 						        <input type="checkbox" name="attr_show_notes" value="1" style="float:left; margin-right: 5px;" />
 								<div class="popup" style="float:left;">Show notes below in roll template</div>
         						<span class="tooltip">
@@ -4342,7 +4283,7 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Success Note:</div>
+    						        <div class="sheet-popup">Custom Success Note:</div>
             						<span class="sheet-tooltip">
             						    Success, critical success, fail, and critical fail<br />
             						    notes will be added to roll results.<br />
@@ -4350,15 +4291,15 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 										The width of these note boxes are set to help you<br />
 										visualize what it will look like in chat.
             						</span>
-    						    </div>
-						        <textarea name="attr_defense_success_note" title="Macro table name: repeating_defense. Field name: defense_success_note">If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.</textarea>
+								</div>
+								<input type="hidden" name="attr_raw_success_note" value=@{dodge_success_notes} />
+						    	<textarea name="attr_defense_success_note" title="Macro table name: repeating_defense. Field name: defense_success_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Success Note:</div>
-						        <textarea name="attr_defense_critical_success_note" title="Macro table name: repeating_defense. Field name: defense_critical_success_note">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381.
-
-If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
+						        <div class="note-title">Custom Critical Success Note:</div>
+								<input type="hidden" name="attr_raw_critical_success_note" value=@{dodge_critical_success_notes} />
+								<textarea name="attr_defense_critical_success_note" title="Macro table name: repeating_defense. Field name: defense_critical_success_note"></textarea>
 							</div>
 							
 						</div>
@@ -4366,13 +4307,15 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
-						        <div class="note-title">Fail Note:</div>
+								<div class="note-title">Custom Fail Note:</div>
+								<input type="hidden" name="attr_raw_fail_note" value=@{dodge_fail_notes} />
 						        <textarea name="attr_defense_fail_note" title="Macro table name: repeating_defense. Field name: defense_fail_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Fail Note:</div>
-						        <textarea name="attr_defense_critical_fail_note" title="Macro table name: repeating_defense. Field name: defense_critical_fail_note">You lose your footing and fall prone (no effect if already prone). See B382</textarea>
+								<div class="note-title">Custom Critical Fail Note:</div>
+								<input type="hidden" name="attr_raw_critical_fail_note" value=@{dodge_critical_failure_notes} />
+						        <textarea name="attr_defense_critical_fail_note" title="Macro table name: repeating_defense. Field name: defense_critical_fail_note"></textarea>
 						    </div>
 						    
 						</div>
@@ -6140,6 +6083,23 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 	<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
 	<ul>
+		<li>Combat tab. fixed alignment issues with active defense arrow and chekbox when the sheet is popped out into a window.</li>
+		<li>
+			Combat tab - Active Defense Success/Fail Notes. Had time to restructure the Rules As Written (RAW) notes so they are 
+			no longer part of the custom notes. They are now just stored on the options and automatically appended to the roll template.
+		</li>
+		<li>
+			<b>IMPORTANT:</b> If you see double notes for active defense success, critical success, fail, or critical fail, you will
+			need to manually delete the custom success/fail notes for each active defense. This is a one time edit and you will not 
+			need to do that again.
+		</li>
+	</ul>
+
+	<h4>Version: 2.3.0</h4>
+
+	<p>Pull Request: 3/31/2020</p>
+
+	<ul>
 		<li>Changed width of Weapon and Damage Notes fields, under Melee and Raged Attacks, to be more readable – Cosmetic Only.</li>
 		<li>
 			General Tab. Removed checkbox for whispering Perception. Current default behavior for whisper is player and game master can see the roll. 
@@ -6847,14 +6807,19 @@ See notes for weapon.</textarea>
 				<!-- options: dodge roll notes -->
 				<div class="option-container collision-falling-options">
 		            <h4>Dodge Success Notes</h4>
-		            <textarea name="attr_dodge_success_notes">If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.</textarea>    
+		            <textarea name="attr_dodge_success_notes">If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.
+
+
+</textarea>    
 		        </div><!-- end option-container -->
 		        
 		        <div class="option-container collision-falling-options">
 		            <h4>Dodge Critical Success Notes</h4>
 		            <textarea name="attr_dodge_critical_success_notes">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
 
-If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>    
+If a single rapid-fire attack, dodge <i>all</i> hits. See B375.
+
+</textarea>    
 		        </div><!-- end option-container -->
 		        
 		        <div class="option-container collision-falling-options">
@@ -6864,7 +6829,9 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 		        
 		        <div class="option-container collision-falling-options">
 		            <h4>Dodge Critical Failure Notes</h4>
-		            <textarea name="attr_dodge_critical_failure_notes">You lose your footing and fall prone (no effect if already prone). See B382</textarea>    
+		            <textarea name="attr_dodge_critical_failure_notes">You lose your footing and fall prone (no effect if already prone). See B382
+
+</textarea>    
 				</div><!-- end option-container -->
 
 			</div>
@@ -6876,7 +6843,8 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 		            <h4>Parry Success Notes</h4>
 		            <textarea name="attr_parry_success_notes">If parrying an unarmed attack with a weapon, you may injure your attacker. See B376.
 
-If parrying a weapon 3 times your weapons weight, roll for breakage. See B376.</textarea>
+If parrying a weapon 3 times your weapons weight, roll for breakage. See B376.
+</textarea>
 		        </div><!-- end option-container -->
 		        
 		        <div class="option-container collision-falling-options">
@@ -6887,19 +6855,23 @@ If attack is a thrown weapon, a bare handed parry lets you <i>catch</i> the inco
 
 If parrying an unarmed attack with a weapon, you may injure your attacker. See B376.
 
-If parrying a weapon 3 times your weapons weight, roll for breakage. See B376.</textarea>
+If parrying a weapon 3 times your weapons weight, roll for breakage. See B376.
+</textarea>
 		        </div><!-- end option-container -->
 		        
 		        <div class="option-container collision-falling-options">
 		            <h4>Parry Fail Notes</h4>
-		            <textarea name="attr_parry_fail_notes">If you're using an unarmed parry, attacker may choose to hit the original target or the limb you used to parry with. See B376.</textarea>    
+		            <textarea name="attr_parry_fail_notes">If you're using an unarmed parry, attacker may choose to hit the original target or the limb you used to parry with. See B376.
+
+</textarea>
 		        </div><!-- end option-container -->
 		        
 		        <div class="option-container collision-falling-options">
 		            <h4>Parry Critical Failure Notes</h4>
 					<textarea name="attr_parry_critical_failure_notes">Roll on the appropriate <i>Critical Miss Table</i> B556. See B382.
 
-If you're using an unarmed parry, attacker may choose to hit the original target or the limb you used to parry with. See B376.</textarea>
+If you're using an unarmed parry, attacker may choose to hit the original target or the limb you used to parry with. See B376.
+</textarea>
 				</div><!-- end option-container -->
 
 			</div>
@@ -6914,7 +6886,9 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 		        
 		        <div class="option-container collision-falling-options">
 		            <h4>Block Critical Success Notes</h4>
-		            <textarea name="attr_block_critical_success_notes">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381.</textarea>    
+		            <textarea name="attr_block_critical_success_notes">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381.
+
+</textarea>    
 		        </div><!-- end option-container -->
 		        
 		        <div class="option-container collision-falling-options">
@@ -6924,7 +6898,9 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 		        
 		        <div class="option-container collision-falling-options">
 		            <h4>Block Critical Failure Notes</h4>
-		            <textarea name="attr_block_critical_failure_notes">Lose your grip on the your shield and you must take a turn to ready it before you can use it to block again. See B382.</textarea>
+		            <textarea name="attr_block_critical_failure_notes">Lose your grip on the your shield and you must take a turn to ready it before you can use it to block again. See B382.
+						
+					</textarea>
 				</div><!-- end option-container -->
 
 			</div>
@@ -7846,11 +7822,11 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 <script type="text/worker">
 	// type="text/worker"
 
-	var noop = function () {}; // do nothing.
+	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.3.0";
-	
-	var latestChangesDate = "03/31/2020";
+	var version = "2.3.1";
+
+	var latestChangesDate = "04/07/2020";
 
 	var modCascade = true;
 	
@@ -12144,7 +12120,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
     
     /**
      * If new version, make sure to update the 
-     * defensive notes.
+     * defensive informaton notes and the raw success/fail notes
      */
     function updateRepeatingDefenseNotes() {
         
@@ -12154,36 +12130,67 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 				return;
 			}
 		
-		    var getFields = [];
+			// include the fields for RAW defense notes
+		    let getFields = [
+				"dodge_success_notes",
+				"dodge_critical_success_notes",
+				"dodge_fail_notes",
+				"dodge_critical_failure_notes",
+				"parry_success_notes",
+				"parry_critical_success_notes",
+				"parry_fail_notes",
+				"parry_critical_failure_notes",
+				"block_success_notes",
+				"block_critical_success_notes",
+				"block_fail_notes",
+				"block_critical_failure_notes"
+			];
 		        
 		    // loop through the rows
 			for (var i = 0; i < ids.length; i++) {
 		
-		        // field that determines defense type
-                var damageTypeField = "repeating_defense_" + ids[i] + '_info';
+		        // field that determines defense info box
+                let defenseInfoField = "repeating_defense_" + ids[i] + "_info";
 				
-				getFields.push(damageTypeField);
+				getFields.push(defenseInfoField);
+
+				// field that determines defense type
+				let defenseTypeField = "repeating_defense_" + ids[i] + "_type";
+
+				getFields.push(defenseTypeField);
 				
 			}
-			
+
 			getAttrs(getFields, function (values) {
 			    
 			    var updateFields = {};
-			    
+
 		        // loop through the row ids again so we can get the values
 		        // and fill array of defense_type id numbers
 		        _.each(ids, function(id) {
 		        
-		            var infoField = "repeating_defense_" + id + '_info';
+		            let infoField = "repeating_defense_" + id + "_info";
 			
 			        // field we need to update
-			        var fieldToUpdate = "repeating_defense_" + id + '_info_description';
+			        let fieldToUpdate = "repeating_defense_" + id + "_info_description";
 				    
-		            var infoValue = values[infoField];
+		            let infoValue = values[infoField];
 		            
 		            // update the defense type id number
 		            updateFields[fieldToUpdate] = getDefenseNote(infoValue);
-		                
+
+					// active defense RAW notes
+					let typeField = "repeating_defense_" + id + "_type";
+
+					let rawNotes = getRawDefenseNotesByType(values[typeField], values);
+
+					updateFields["repeating_defense_" + id + "_raw_success_note"] = rawNotes.success;
+		            
+					updateFields["repeating_defense_" + id + "_raw_critical_success_note"] = rawNotes.successCritical;
+
+					updateFields["repeating_defense_" + id + "_raw_fail_note"] = rawNotes.fail;
+
+					updateFields["repeating_defense_" + id + "_raw_critical_fail_note"] = rawNotes.failCritical;
 		            
                 });
                 
@@ -13730,83 +13737,8 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	// Active Defense Methods
 	//------------------------------------
 
-	// check for resetting dodge success/fail notes
-	on("clicked:defense_dodge_reset_notes", (event) => {
-
-		const fields = [
-			"dodge_success_notes",
-			"dodge_critical_success_notes",
-			"dodge_fail_notes",
-			"dodge_critical_failure_notes"
-		];
-
-		getAttrs(fields, (values) => {
-
-			const updateFields = {
-				defense_dodge_success_note: values.dodge_success_notes,
-				defense_dodge_critical_success_note: values.dodge_critical_success_notes,
-				defense_dodge_fail_note: values.dodge_fail_notes,
-				defense_dodge_critical_fail_note: values.dodge_critical_failure_notes
-			};
-
-			setAttrs(updateFields);
-
-		});
-
-	});
-
-	// check for resetting dodge retreat success/fail notes
-	on("clicked:defense_dodge_retreat_reset_notes", (event) => {
-
-		const fields = [
-			"dodge_success_notes",
-			"dodge_critical_success_notes",
-			"dodge_fail_notes",
-			"dodge_critical_failure_notes"
-		];
-
-		getAttrs(fields, (values) => {
-
-			const updateFields = {
-				defense_dodge_retreat_success_note: values.dodge_success_notes,
-				defense_dodge_retreat_critical_success_note: values.dodge_critical_success_notes,
-				defense_dodge_retreat_fail_note: values.dodge_fail_notes,
-				defense_dodge_retreat_critical_fail_note: values.dodge_critical_failure_notes
-			};
-
-			setAttrs(updateFields);
-
-		});
-
-	});
-
-	// check for resetting dodge drop success/fail notes
-	on("clicked:defense_dodge_drop_reset_notes", (event) => {
-
-		const fields = [
-			"dodge_success_notes",
-			"dodge_critical_success_notes",
-			"dodge_fail_notes",
-			"dodge_critical_failure_notes"
-		];
-
-		getAttrs(fields, (values) => {
-
-			const updateFields = {
-				defense_dodge_drop_success_note: values.dodge_success_notes,
-				defense_dodge_drop_critical_success_note: values.dodge_critical_success_notes,
-				defense_dodge_drop_fail_note: values.dodge_fail_notes,
-				defense_dodge_drop_critical_fail_note: values.dodge_critical_failure_notes
-			};
-
-			setAttrs(updateFields);
-
-		});
-
-	});
-
 	// check if an repeating active defense type changed
-	// update success/fail notes based on selected defense Type
+	// update raw success/fail notes based on selected defense Type
 	on("change:repeating_defense:type", (event) => {
 
 		const fields = [
@@ -13836,8 +13768,6 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 			let failNote;
 
 			let failCriticalNote;
-
-			console.log(values);
 
 			switch (defenseType) {
 				case "Dodge":
@@ -13871,18 +13801,81 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 			}
 
 			const updateFields = {
-				repeating_defense_defense_success_note: successNote,
-				repeating_defense_defense_critical_success_note: successCritNote,
-				repeating_defense_defense_fail_note: failNote,
-				repeating_defense_defense_critical_fail_note: failCriticalNote	
+				repeating_defense_raw_success_note: successNote,
+				repeating_defense_raw_critical_success_note: successCritNote,
+				repeating_defense_raw_fail_note: failNote,
+				repeating_defense_raw_critical_fail_note: failCriticalNote	
 			};
-
-			console.log(updateFields);
 
 			setAttrs(updateFields);
 
 		});
 		
+	});
+
+	/**
+	 * Get an array of defense notes based on defense type
+	 *
+	 * @param string defenseType Type of defense
+	 *
+	 * @return object {success, successCritical, fail, failCritical}
+	 */
+	function getRawDefenseNotesByType(defenseType, values) {
+
+		let successNote;
+
+		let successCritNote;
+
+		let failNote;
+
+		let failCriticalNote;
+
+		switch (defenseType) {
+			case "Dodge":
+				successNote      = values.dodge_success_notes;
+				successCritNote  = values.dodge_critical_success_notes;
+				failNote         = values.dodge_fail_notes;
+				failCriticalNote = values.dodge_critical_failure_notes;
+				break;
+		
+			case "Parry":
+				successNote      = values.parry_success_notes;
+				successCritNote  = values.parry_critical_success_notes;
+				failNote         = values.parry_fail_notes;
+				failCriticalNote = values.parry_critical_failure_notes;
+				break;
+		
+			case "Block":
+				successNote      = values.block_success_notes;
+				successCritNote  = values.block_critical_success_notes;
+				failNote         = values.block_fail_notes;
+				failCriticalNote = values.block_critical_failure_notes;
+				break;
+		
+			default:
+				successNote      = " ";
+				successCritNote  = " ";
+				failNote         = " ";
+				failCriticalNote = " ";
+				break;
+
+		}
+
+		notes = {
+			"success": successNote,
+			"successCritical": successCritNote,
+			"fail": failNote,
+			"failCritical": failCriticalNote
+		};
+
+		return notes;
+
+	}
+
+	on("change:dodge_success_notes change:dodge_critical_success_notes change:dodge_fail_notes change:attr_dodge_critical_failure_notes change:parry_success_notes change:parry_critical_success_notes change:parry_fail_notes change:parry_critical_failure_notes change:block_success_notes change:block_critical_success_notes change:block_fail_notes change:block_critical_failure_notes", () => {
+
+		updateRepeatingDefenseNotes();
+
 	});
 
 </script>
