@@ -27,7 +27,7 @@ module.exports = {
     new MiniCssExtractPlugin({filename: "ironcrunch.css"}),
     new HtmlWebpackPlugin({
       template: './html/ironcrunch.html',
-      minify: true,
+      minify: false,
       inject: true,
       chunks: ['ironcrunch'],
       filename: 'ironcrunch.html'
