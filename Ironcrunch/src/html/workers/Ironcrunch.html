@@ -24,8 +24,20 @@
   });
   //Calculate Max Health
   on('change:iron', function() {
-    console.log('i ran 1')
     updateMaxHealth();
+  });
+  //Reset Health if set above Max
+  on('change:health', function(healthChange) {
+    getAttrs(["max_health"], function(values) {
+      if (parseInt(healthChange.newValue) > parseInt(values.max_health)) {
+        setAttrs({health: values.max_health});
+      }
+    });
+  });
+  on('change:health_reset', function() {
+    getAttrs(["max_health"], function(values) {
+        setAttrs({health: values.max_health});
+    });
   });
   //Cannot increase Health while Wounded
   //Health reaching 0 marks Wounded
@@ -153,7 +165,6 @@
       });
   });
   var updateMaxHealth = function() {
-    console.log('i ran 2')
     getAttrs(['iron'], function(v) {
       let max_health = (v.iron*4)+16
       setAttrs({
