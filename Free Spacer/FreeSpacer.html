@@ -125,7 +125,7 @@
 					<input type="radio" class="inlinePipCheckbox hideCheckbox" name="attr_Culture" value="3" /><span class="inlinePips D10"></span>
 				</div>
 				<div class="skillRollButton">
-					<button class="rollButton" type="roll" value="&{template:FS} {{taskSkill=Culture}} {{taskSkillRating=@{Culture} }} {{taskSpecialtyRating=?{Culture Specialty|Anthropology, @{CultureAnthropology}|History, @{CultureHistory}|Lingustics, @{CultureLingustics} }} {{taskAdvantageRating=?{Advantage|0} }} {{taskThreatRating=?{Threat Dice|3} }} {{result=[[{taskSkillRating+taskSpecialtyRating+taskAdvantageRating}d10>4, {taskThreatRating}d6<f3]]}}"></button>
+					<button class="rollButton" type="roll" value="/roll [[@{Culture}+?{Culture Specialty|Anthropology, @{CultureAnthropology}|History, @{CultureHistory}|Lingustics, @{CultureLingustics}}+?{Advantage|0}]]d10>10f<4+[[[[@{Culture}+?{Culture Specialty|Anthropology, @{CultureAnthropology}|History, @{CultureHistory}|Lingustics, @{CultureLingustics}}+?{Advantage|0}]]d1>1]]+?{Threat Dice|3}d6>7f<3"></button>
 				</div>
 				<div class="specialty">Anthropology:</div>
 				<div class="specialtydice">
@@ -7914,26 +7914,27 @@
 			});
 		},
 
-			useID = function (finalAttributeList)
+			useID = function (attributesToGet)
 			{
-				finalAttributeList = [...finalAttributeList[0].id,"shipCargoTonnage", "supply", "complexMaterials"];
+				var finalAttributeList = [];
 
+				for (var i = 0; i < attributesToGet[0].id.length; i++)
+				{
+					let id = attributesToGet[0].id[i];
+					finalAttributeList = [...finalAttributeList, "repeating_" + attributesToGet[0].section + "_" + id + "_shipCargoTonnage"];
+				}
+				finalAttributeList = [...finalAttributeList, "supply", "complexMaterials"];
 
 				getAttrs(finalAttributeList, (attributeValues) =>
 				{
-					console.log(finalAttributeList);
 					console.log(attributeValues);
-					var repeatons = 0;
-					//forEach(value in finalAttributeList)
-					//{
-					//	repeatons += parseInt(section.fields[2], 10) || 0;
-					//};
-					console.log(repeatons);
-					let supply = parseInt(attributeValues.supply, 10) || 0;
-					console.log(supply);
-					let materials = parseInt(attributeValues.complexMaterials, 10) || 0;
-					console.log(materials);
-					let total = supply + materials + repeatons;
+					let total = 0;
+					for (var i = 0; i < finalAttributeList.length; i++)
+					{
+						let index = finalAttributeList[i];
+						total += parseInt(attributeValues[index], 10) || 0;
+					};
+
 					console.log(total);
 					setAttrs({ "totalResource": total });
 				})
