@@ -1,17 +1,41 @@
-# TODO
-- Combo-boxes for Characteristic & Skills, leading to auto-determination of goal numbers for Combat actions, Psi powers, Theurgy rituals, etc..
-  including update of pre-existing Characteristic & Skills values (entered manually in the user's language)
+# Release notes
 
-- migrate wyrd/vita radio button layou to https://wiki.roll20.net/CSS_Wizardry#Fill_Radio_Buttons_to_the_Left
-  also prevention selection to go higher than the max
+## 1.1.0
+- Vitality, Wyrd & Shield current levels can no longer be increased past their respective max values
+- Clicking on the current Vitality/Wyrd/Shield level now decreases it by 1 (as one would naturally expect)
+- Added roll buttons for Psi powers and Theurgy rituals
+- Minor cosmetic updates
 
-- ability for users to report a bug found in the sheet (or suggest this as general function to Roll20 team)
+## 1.0.1
+- Fixed game load for players who have selected another language than English or French in their profiles
+- New, stylized d20 for roll buttons
 
-- Ensure a 1 is always a success, despite a high malus
+## 1.0.0
+- first release of the Fading Suns v2.75 (a.k.a. 2nd Edition Revised by FASA).
+
+# TODO list
+
+- Added characteric, skill & roll buttons for Combat actions (weapons)
+
+- Increase match with sections of the official character sheet for Weapons, Armor, Shield, Combat actions, Weapons (melee + ranged)
+
+- Add ability to manually link a Combat action / Weapon entry to its corresponding Combat skill (e.g. Fists => Fight, Imman Vorton .40 => Slug Guns, etc..) and 3 different roll buttons for Dex, Str (tbc) and Per (for long range)
+
+- [TBC] use short names for characteristics in weapon/psi/theurgy tables
+
+- migrate wyrd/vita radio button layout to https://wiki.roll20.net/CSS_Wizardry#Fill_Radio_Buttons_to_the_Left
+  preventing the selection to go higher than the max as well
+
+- after the next pull request, replace the snazzy d10 image from the Ambition_Avarice sheet with own, to avoid dependency to another sheet
+
+- ability for users to report a bug found in the sheet
+
+- Ensure a 1 is always a success, even when the goal number is < 0 due to a high malus
 
 - Improve instructions in sheet.json with markdown
+  add contact info
 
-- Allow choice b/w public vs GM roll
+- Ability to switch b/w public vs GM roll
 
 - update selected_skill_value when a non-repeating skill value changes (done already for repeating creative/lore skills)
 
@@ -32,4 +56,8 @@
 # Nice-to-have
 - Infoboxes, e.g. how to compute init, wyrd, vita...
 
+- xp changes lead to traits updates (characs + skills + derived ones like vita, wyrd, init)
+
 - Fading Suns Logo
+
+- Sheet for spaceships
