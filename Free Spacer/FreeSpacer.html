@@ -7868,28 +7868,27 @@
 </rolltemplate>
 
 <script type="text/worker">
-	<!--<script type="text/javascript">
-		-->
-			/*Global variables*/
+	<!--<script type="text/javascript">-->
+		/*Global variables*/
 
 
-			//Cargo Total
-			on("sheet:opened change:repeating_shipcargo remove:repeating_shipcargo change:supply change:complexmaterials", function ()
-			{
-				var repeatingAttributes = [
-					/*Array of objects with the attributes in each repeating section that need to be gotten with getAttrs, used in getID()
-					Entity format:
-					{
-					section:'Name of the section',
-					fields:['name_of_the_attribute']
-					}*/
-					{
-						section: "shipCargo",
-						fields: ["shipCargo", "shipCargoRV", "shipCargoTonnage"]
-					}
-				];
-				getID(repeatingAttributes, useID);
-			});
+		//Cargo Total
+		on("sheet:opened change:repeating_shipcargo remove:repeating_shipcargo change:supply change:complexmaterials", (event) =>
+		{
+			var repeatingAttributes = [
+				/*Array of objects with the attributes in each repeating section that need to be gotten with getAttrs, used in getID()
+				Entity format:
+				{
+				section:'Name of the section',
+				fields:['name_of_the_attribute']
+				}*/
+				{
+					section: "shipCargo",
+					fields: ["shipCargo", "shipCargoRV", "shipCargoTonnage"]
+				}
+			];
+			getID(repeatingAttributes, useID);
+		});
 
 		var getID = function (cloneRepAttr, callback, sectionAggregate)
 		{
@@ -7914,15 +7913,29 @@
 				}
 			});
 		},
-			useID = function (attributesToGet)
-			{
-				attributesToGet = [...attributesToGet, "shipCargoTonnage"].concat(["supply", "complexMaterials"]);
 
-				getAttrs(attributesToGet, (attributeValues) =>
+			useID = function (finalAttributeList)
+			{
+				finalAttributeList = [...finalAttributeList[0].id,"shipCargoTonnage", "supply", "complexMaterials"];
+
+
+				getAttrs(finalAttributeList, (attributeValues) =>
 				{
-					const reducer = (accumulator, currentValue) => accumulator + currentValue;
-					var total = attributeValues.reduce(reducer);
-					setAttrs({"totalResource": total});
+					console.log(finalAttributeList);
+					console.log(attributeValues);
+					var repeatons = 0;
+					//forEach(value in finalAttributeList)
+					//{
+					//	repeatons += parseInt(section.fields[2], 10) || 0;
+					//};
+					console.log(repeatons);
+					let supply = parseInt(attributeValues.supply, 10) || 0;
+					console.log(supply);
+					let materials = parseInt(attributeValues.complexMaterials, 10) || 0;
+					console.log(materials);
+					let total = supply + materials + repeatons;
+					console.log(total);
+					setAttrs({ "totalResource": total });
 				})
 			};
 
@@ -7944,8 +7957,8 @@
 					let box = int(values[`bow${cell}`]);
 
 					let newcolor = 1;
-					console.log(`bow${cell}: ` + box);
-					console.log("old color:" + oldcolor + " colorselect:" + color);
+					//console.log(`bow${cell}: ` + box);
+					//console.log("old color:" + oldcolor + " colorselect:" + color);
 
 					//colors & labels
 					if (box === 1 && oldcolor <= 900)
@@ -7953,22 +7966,22 @@
 
 						if (color === 1)
 						{
-							console.log("color -> orange");
+							//console.log("color -> orange");
 							newcolor = 1;
 						}
 						else if (color === 2)
 						{
-							console.log("color -> cyan");
+							//console.log("color -> cyan");
 							newcolor = 2;
 						}
 						else if (color === 3)
 						{
-							console.log("color -> yellow");
+							//console.log("color -> yellow");
 							newcolor = 3;
 						}
 						else if (color === 4)
 						{
-							console.log("color -> green");
+							//console.log("color -> green");
 							newcolor = 4;
 						}
 
@@ -7976,22 +7989,22 @@
 						else if (color === 7)
 						{
 							newcolor = 70 + ((oldcolor + 10) % 10);
-							console.log("small label");
+							//console.log("small label");
 						}
 						else if (color === 8)
 						{
 							newcolor = 80 + ((oldcolor + 10) % 10);
-							console.log("medium label");
+							//console.log("medium label");
 						}
 						else if (color === 5)
 						{
 							newcolor = 50 + ((oldcolor + 10) % 10);
-							console.log("small vertical label");
+							//console.log("small vertical label");
 						}
 						else if (color === 6)
 						{
 							newcolor = 60 + ((oldcolor + 10) % 10);
-							console.log("medium vertical label");
+							//console.log("medium vertical label");
 						}
 						else if (color === 0)
 						{
@@ -8012,7 +8025,7 @@
 					else if (box === 1 && oldcolor >= 900)
 					{
 						newcolor = oldcolor;
-						console.log("+900");
+						//console.log("+900");
 					}
 					else if (box === 0 && oldcolor <= 900)
 					{
@@ -8100,8 +8113,8 @@
 						//console.log("color set to transparent, save previous color, deletes label");
 					}
 
-					console.log("newcolor:" + newcolor + "");
-					console.log("**********************************");
+					//console.log("newcolor:" + newcolor + "");
+					//console.log("**********************************");
 					setAttrs({
 						[`bow_color${cell}`]: newcolor,
 						"colorselected": color
@@ -8124,8 +8137,8 @@
 					let box = int(values[`starboard${cell}`]);
 
 					let newcolor = 1;
-					console.log(`starboard${cell}: ` + box);
-					console.log("old color:" + oldcolor + " colorselect:" + color);
+					//console.log(`starboard${cell}: ` + box);
+					//console.log("old color:" + oldcolor + " colorselect:" + color);
 
 					//colors & labels
 					if (box === 1 && oldcolor <= 900)
@@ -8133,22 +8146,22 @@
 
 						if (color === 1)
 						{
-							console.log("color -> orange");
+							//console.log("color -> orange");
 							newcolor = 1;
 						}
 						else if (color === 2)
 						{
-							console.log("color -> cyan");
+							//console.log("color -> cyan");
 							newcolor = 2;
 						}
 						else if (color === 3)
 						{
-							console.log("color -> yellow");
+							//console.log("color -> yellow");
 							newcolor = 3;
 						}
 						else if (color === 4)
 						{
-							console.log("color -> green");
+							//console.log("color -> green");
 							newcolor = 4;
 						}
 
@@ -8156,22 +8169,22 @@
 						else if (color === 7)
 						{
 							newcolor = 70 + ((oldcolor + 10) % 10);
-							console.log("small label");
+							//console.log("small label");
 						}
 						else if (color === 8)
 						{
 							newcolor = 80 + ((oldcolor + 10) % 10);
-							console.log("medium label");
+							//console.log("medium label");
 						}
 						else if (color === 5)
 						{
 							newcolor = 50 + ((oldcolor + 10) % 10);
-							console.log("small vertical label");
+							//console.log("small vertical label");
 						}
 						else if (color === 6)
 						{
 							newcolor = 60 + ((oldcolor + 10) % 10);
-							console.log("medium vertical label");
+							//console.log("medium vertical label");
 						}
 						else if (color === 0)
 						{
@@ -8192,7 +8205,7 @@
 					else if (box === 1 && oldcolor >= 900)
 					{
 						newcolor = oldcolor;
-						console.log("+900");
+						//console.log("+900");
 					}
 					else if (box === 0 && oldcolor <= 900)
 					{
@@ -8280,8 +8293,8 @@
 						//console.log("color set to transparent, save previous color, deletes label");
 					}
 
-					console.log("newcolor:" + newcolor + "");
-					console.log("**********************************");
+					//console.log("newcolor:" + newcolor + "");
+					//console.log("**********************************");
 					setAttrs({
 						[`starboard_color${cell}`]: newcolor,
 						"colorselected": color
@@ -8304,8 +8317,8 @@
 					let box = int(values[`port${cell}`]);
 
 					let newcolor = 1;
-					console.log(`port${cell}: ` + box);
-					console.log("old color:" + oldcolor + " colorselect:" + color);
+					//console.log(`port${cell}: ` + box);
+					//console.log("old color:" + oldcolor + " colorselect:" + color);
 
 					//colors & labels
 					if (box === 1 && oldcolor <= 900)
@@ -8313,22 +8326,22 @@
 
 						if (color === 1)
 						{
-							console.log("color -> orange");
+							//console.log("color -> orange");
 							newcolor = 1;
 						}
 						else if (color === 2)
 						{
-							console.log("color -> cyan");
+							//console.log("color -> cyan");
 							newcolor = 2;
 						}
 						else if (color === 3)
 						{
-							console.log("color -> yellow");
+							//console.log("color -> yellow");
 							newcolor = 3;
 						}
 						else if (color === 4)
 						{
-							console.log("color -> green");
+							//console.log("color -> green");
 							newcolor = 4;
 						}
 
@@ -8336,22 +8349,22 @@
 						else if (color === 7)
 						{
 							newcolor = 70 + ((oldcolor + 10) % 10);
-							console.log("small label");
+							//console.log("small label");
 						}
 						else if (color === 8)
 						{
 							newcolor = 80 + ((oldcolor + 10) % 10);
-							console.log("medium label");
+							//console.log("medium label");
 						}
 						else if (color === 5)
 						{
 							newcolor = 50 + ((oldcolor + 10) % 10);
-							console.log("small vertical label");
+							//console.log("small vertical label");
 						}
 						else if (color === 6)
 						{
 							newcolor = 60 + ((oldcolor + 10) % 10);
-							console.log("medium vertical label");
+							//console.log("medium vertical label");
 						}
 						else if (color === 0)
 						{
@@ -8372,7 +8385,7 @@
 					else if (box === 1 && oldcolor >= 900)
 					{
 						newcolor = oldcolor;
-						console.log("+900");
+						//console.log("+900");
 					}
 					else if (box === 0 && oldcolor <= 900)
 					{
@@ -8460,8 +8473,8 @@
 						//console.log("color set to transparent, save previous color, deletes label");
 					}
 
-					console.log("newcolor:" + newcolor + "");
-					console.log("**********************************");
+					//console.log("newcolor:" + newcolor + "");
+					//console.log("**********************************");
 					setAttrs({
 						[`port_color${cell}`]: newcolor,
 						"colorselected": color
@@ -8484,8 +8497,8 @@
 					let box = int(values[`stern${cell}`]);
 
 					let newcolor = 1;
-					console.log(`stern${cell}: ` + box);
-					console.log("old color:" + oldcolor + " colorselect:" + color);
+					//console.log(`stern${cell}: ` + box);
+					//console.log("old color:" + oldcolor + " colorselect:" + color);
 
 					//colors & labels
 					if (box === 1 && oldcolor <= 900)
@@ -8493,22 +8506,22 @@
 
 						if (color === 1)
 						{
-							console.log("color -> orange");
+							//console.log("color -> orange");
 							newcolor = 1;
 						}
 						else if (color === 2)
 						{
-							console.log("color -> cyan");
+							//console.log("color -> cyan");
 							newcolor = 2;
 						}
 						else if (color === 3)
 						{
-							console.log("color -> yellow");
+							//console.log("color -> yellow");
 							newcolor = 3;
 						}
 						else if (color === 4)
 						{
-							console.log("color -> green");
+							//console.log("color -> green");
 							newcolor = 4;
 						}
 
@@ -8516,22 +8529,22 @@
 						else if (color === 7)
 						{
 							newcolor = 70 + ((oldcolor + 10) % 10);
-							console.log("small label");
+							//console.log("small label");
 						}
 						else if (color === 8)
 						{
 							newcolor = 80 + ((oldcolor + 10) % 10);
-							console.log("medium label");
+							//console.log("medium label");
 						}
 						else if (color === 5)
 						{
 							newcolor = 50 + ((oldcolor + 10) % 10);
-							console.log("small vertical label");
+							//console.log("small vertical label");
 						}
 						else if (color === 6)
 						{
 							newcolor = 60 + ((oldcolor + 10) % 10);
-							console.log("medium vertical label");
+							//console.log("medium vertical label");
 						}
 						else if (color === 0)
 						{
@@ -8552,7 +8565,7 @@
 					else if (box === 1 && oldcolor >= 900)
 					{
 						newcolor = oldcolor;
-						console.log("+900");
+						//console.log("+900");
 					}
 					else if (box === 0 && oldcolor <= 900)
 					{
@@ -8640,8 +8653,8 @@
 						//console.log("color set to transparent, save previous color, deletes label");
 					}
 
-					console.log("newcolor:" + newcolor + "");
-					console.log("**********************************");
+					//console.log("newcolor:" + newcolor + "");
+					//console.log("**********************************");
 					setAttrs({
 						[`stern_color${cell}`]: newcolor,
 						"colorselected": color
