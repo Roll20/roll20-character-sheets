@@ -23,10 +23,41 @@ const versioning = version => {
           fourpointoneone()
           setAttrs({version: 4.11}, () => versioning(4.11))
           break;
+        case version < 4.15:
+          fourpointonefive()
+          setAttrs({version: 4.15}, () => versioning(4.15))
+          break;
         default:
             console.log(`%c Shadowrun 5th Edition is update to date. Version ${version}`, "color: green; font-weight:bold");
     }
 };
+
+const fourpointonefive = () => {
+  updateDerivedAttribute('defense')
+  updateAttributes(sheetAttributes.initiative_mod, 'initiative_mod')
+  updateAstralInitiative()
+
+  sheetAttributes.repeatingSkills.forEach(skill => {
+    getSectionIDs(skill, idarray => {
+      let attributes = []
+      idarray.forEach(id => attributes.push(`repeating_${skill}_${id}_limit`))
+
+      getAttrs(attributes, values => {
+        let update = {}
+        for (let [key, value] of Object.entries(values)) {
+          const repRowID = processingFunctions.getReprowid(key)
+          if (value.includes('limit')) {
+            const translationKey = processingFunctions.sliceAttr(value)
+            update[`${repRowID}_display_limit`] = getTranslationByKey(translationKey)
+          } else {
+            update[`${repRowID}_display_limit`] = ' '
+          }
+        }
+        processingFunctions.setAttributes(update) 
+      })
+    })
+  })
+}
 
 const fourpointoneone = () => {
   getSectionIDs('forms', idarray => {
@@ -51,26 +82,30 @@ const fourpointone = () => {
     })
   })
 
-  ['range', 'melee'].forEach(weaponType => {
-    getSectionIDs(weaponType, idarray => {
-      let attributes = [];
-      let update = {};
-
-      idarray.forEach(id => attributes.push(`repeating_${weaponType}_${id}_spec`))
-
-      getAttrs(attributes, value => {
-        idarray.forEach(id => update[`repeating_${weaponType}_${id}_specialization`] = value[`repeating_${weaponType}_${id}_spec`])
-        setAttrs(update);
-      });
+  getSectionIDs('range', idarray => {
+    let attributes = [];
+    let update = {};
+    idarray.forEach(id => attributes.push(`repeating_range_${id}_spec`))
+    getAttrs(attributes, value => {
+      idarray.forEach(id => update[`repeating_range_${id}_specialization`] = value[`repeating_range_${id}_spec`])
+      setAttrs(update);
     });
-  })
+  });
+
+  getSectionIDs('melee', idarray => {
+    let attributes = [];
+    let update = {};
+    idarray.forEach(id => attributes.push(`repeating_melee_${id}_spec`))
+    getAttrs(attributes, value => {
+      idarray.forEach(id => update[`repeating_melee_${id}_specialization`] = value[`repeating_melee_${id}_spec`])
+      setAttrs(update);
+    });
+  });
 
   getSectionIDs("active", idarray => {
     let attributes = [];
     let update = {};
-
     idarray.forEach(id => attributes.push(`repeating_active_${id}_skill`))
-
     getAttrs(attributes, value => {
         idarray.forEach(id => update[`repeating_active_${id}_display_skill`] = value[`repeating_active_${id}_skill`])
        setAttrs(update);
