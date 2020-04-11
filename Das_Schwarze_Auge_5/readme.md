@@ -1,5 +1,24 @@
 ## Roll20 Charakterbogen für Das Schwarze Auge 5
 
+UPDATE 08.04.2020
+Der Charakterbogen wurde lange Zeit nicht gepflegt. Ich habe diesen übernommen, um einige Bugfixes einzupflegen, es wird aber keine aktive Weiterentwicklung geben.
+Die Neuerungen / Bugfixes sind im Changelog zu sehen.
+
+Der unten stehende Text wird zu Dokumentationszwecken stehen gelassen, ist aber insgesamt nicht mehr gültig.
+
+Wenn es die Zeit zulässt, sind folgende Punkte noch auf meiner persönlichen ToDo-Liste:
+ - Nebenhand ausbauen für vollständigen Zweihandkampf: Normale Waffe (eigene PA Werte) oder Parierwaffe (PA-Wert addiert auf Haupthand)
+ - Status-System ausbauen (automatisches Setzen von Handlungsunfähigkeit bei Schmerz 4 oder total 8 Status Stufen.
+
+Folgende Fehler sind (mir) aktuell bekannt:
+ - Beidhändiger Kampf reduziert die PA/AW Werte nicht
+ - Beidhändiger Kampf reduziert den Passierschlag nicht
+
+===============
+===============
+
+OLD TEXT - NOT VALID ANYMORE (only kept for documentation of lifecycle):
+
 Auf dieser Seite wird euch in Zukunft eine Generelle Anleitung für den Charakterbogen erwarten. Dies ist vorallem für Nutzer gedacht die noch nie etwas mit dem Bogen auf Roll20 zu tun hatten.
 
 Aktuell findet Ihr hier eine Erklärung der kürzlich eingeführten Features sowie weitere genrelle Informationen.

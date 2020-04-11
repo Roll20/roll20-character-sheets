@@ -1,3 +1,8 @@
+## 1.2.6
+ - 08.04.2020
+  - Leiteigenschaft und Schadensschwelle für Nebenhand wird nun korrekt berücksichtigt
+	- Bonus-Schaden wird im Schadenswurf für die Nebenhand berücksichtigt.
+
 ## 1.2.5
  - 01.04.2020 (by Marc Ehrenmann / mckee14)
   - Schmerzstufen werden automatisch berechnet und eingetragen!
