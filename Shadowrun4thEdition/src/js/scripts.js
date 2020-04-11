@@ -52,7 +52,9 @@ const updatePrimary = eventinfo => {
 
 const updateRepeatingArmorPrimary = eventinfo => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
-  if (eventinfo.newValue === 'primary') {
+  if (eventinfo.newValue === undefined) {
+    return false
+  } else if (eventinfo.newValue === 'primary') {
     const constructedArmorAttributes = processingFunctions.shadowrun.addRepRow(repRowID, sheetAttributes.armorAttributes)
     getAttrs(constructedArmorAttributes, attrs => { 
       const update = processingFunctions.shadowrun.updatePrimaryArmor(attrs)
@@ -67,7 +69,9 @@ const updateRepeatingArmorPrimary = eventinfo => {
 
 const updateRepeatingWeaponPrimary = (eventinfo, type) => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
-  if (eventinfo.newValue === 'primary') {
+  if (eventinfo.newValue === undefined) {
+    return false
+  } else if (eventinfo.newValue === 'primary') {
     const constructedWeaponAttributes = processingFunctions.shadowrun.contructRepeatingWeaponAttributes(repRowID, type)
     getAttrs(constructedWeaponAttributes, attrs => { 
       const update = processingFunctions.shadowrun.updatePrimaryWeapons(attrs)
