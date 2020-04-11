@@ -17,6 +17,7 @@
 # TODO list
 
 - General improvements to goal rolls
+  - Add CSC and CFC to characteristic & skills rolls
   - Ability to switch b/w public vs GM roll
   - Vitality critical levels (-2 to -10) to affect goal numbers
   - Ensure a 1 is always a success, even when the goal number is < 0 due to a high malus
