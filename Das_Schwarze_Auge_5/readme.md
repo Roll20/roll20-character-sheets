@@ -1,18 +1,27 @@
 ## Roll20 Charakterbogen für Das Schwarze Auge 5
 
-UPDATE 08.04.2020
+### UPDATE 12.04.2020
+
+![Automatische Berechnung von LE, AE, KE](https://i.imgur.com/c6XbiHa.jpg)
+ * **Berechnung der Maximalwerte für LE, AE, KE**: Es gibt eine neue Option in der Konfiguration, um jeweils für die LE, AE und KE automatisch den aktuellen Grundwert aus der Hauptseite als Maximalwert für LE_Wert, AE_Wert und KE_Wert zu setzen. Bei aktivierter Option werden die maximalwerte für den Token automatisch angepasst, wenn sich diese im Sheet ändern. Wenn man den Balken auf dem Token nicht sehen möchte (oder den Wert manuell festlegen möchte), kann man die Option deaktivieren.
+ 
+ ![Automatische Berechnung von LE, AE, KE]( https://i.imgur.com/TETwU5h.jpg)
+ * **Automatische Schmerzstufen**: Die Schmerzstufen werden automatisch berechnet. Dabei wird der LE_Grundwert und der LE_Wert zur Berechnung genommen. Vorteil Zäher Hund und Nachteil Zerbrechlich werden korrekt berücksichtigt. Für besondere Umstände (Schmerzen durch Gift, Schmerzen unterdrücken usw.) kann über den Modifikator die Schmerzstufe angepasst werden.
+
+### UPDATE 08.04.2020
 Der Charakterbogen wurde lange Zeit nicht gepflegt. Ich habe diesen übernommen, um einige Bugfixes einzupflegen, es wird aber keine aktive Weiterentwicklung geben.
 Die Neuerungen / Bugfixes sind im Changelog zu sehen.
 
 Der unten stehende Text wird zu Dokumentationszwecken stehen gelassen, ist aber insgesamt nicht mehr gültig.
 
 Wenn es die Zeit zulässt, sind folgende Punkte noch auf meiner persönlichen ToDo-Liste:
- - Nebenhand ausbauen für vollständigen Zweihandkampf: Normale Waffe (eigene PA Werte) oder Parierwaffe (PA-Wert addiert auf Haupthand)
  - Status-System ausbauen (automatisches Setzen von Handlungsunfähigkeit bei Schmerz 4 oder total 8 Status Stufen.
 
 Folgende Fehler sind (mir) aktuell bekannt:
  - Beidhändiger Kampf reduziert die PA/AW Werte nicht
  - Beidhändiger Kampf reduziert den Passierschlag nicht
+ - PA-Bonus der ausgerüsteten Nebenhand wird als Bonus auf die Hauptwaffe addiert. Parade mit Nebenhand aktuell nicht möglich via sheet.
+ - Wenn Belastungsgewöhnung ausgeschaltet wird, wird die BE in den Rüstungen nicht angepasst. Wenn diese Option gesetzt und dann entfernt wird -> Rüstungen neu eintragen!
 
 ===============
 ===============
