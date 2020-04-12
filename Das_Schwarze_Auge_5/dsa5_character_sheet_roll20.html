@@ -359,7 +359,7 @@
 					<div class="grundwert sheet-magie">
 						<input class="hidden sheet-gegner" type="checkbox" name="attr_gegner_sheet" value="1"/>
 						<div class="grundwert-name" data-i18n="Astralenergie">Astralenenergie</div>
-						<div class="grundwert-basiswert sheet-kein-gegner"><input type="number" name="attr_AE_Grundwert" disabled="true" value="@{vorteil_zauberer}*(20+@{AE_Leiteigenschaft}+@{vorteil_hohe_astralkraft_stufe}+@{nachteil_niedrige_astralkraft_stufe}+@{AE_Zukauf})"></div>
+						<div class="grundwert-basiswert sheet-kein-gegner"><input type="number" name="attr_AE_Grundwert" value="0" readonly></div>
 						<div class="grundwert-wert"><input type="number" name="attr_AE_Wert" value="0"></div>
 						<div class="grundwert-zukauf sheet-kein-gegner"><input type="number" name="attr_AE_Zukauf" value="0"></div>
 						<div class="grundwert-max sheet-kein-gegner"><input type="number" disabled="true" name="attr_AE_Zukauf_Max" value="@{AE_Leiteigenschaft}"></div>
@@ -17991,7 +17991,7 @@
 
 <script type="text/worker">
 
-// Update LE_Grundwert und LE_Wert_max, wenn sich ein Parameter ändert der in die Berechnung einfliesst.
+// rechne LE_Grundwert und LE_Wert_max
 on("change:le_spezies change:ko_wert change:vorteil_hohe_lebenskraft change:vorteil_hohe_lebenskraft_stufe change:nachteil_niedrige_lebenskraft change:nachteil_niedrige_lebenskraft_stufe change:le_zukauf sheet:opened", function() {
 	getAttrs(["setze_lemax", "LE_Spezies", "KO_Wert", "vorteil_hohe_lebenskraft", "vorteil_hohe_lebenskraft_stufe", "nachteil_niedrige_lebenskraft", "nachteil_niedrige_lebenskraft_stufe", "LE_Zukauf"], function(values) {
 	var i = 0 ;
@@ -18023,7 +18023,18 @@ on("change:vorteil_geweihter change:ke_leiteigenschaft change:vorteil_hohe_karma
 	});
 });
 
-//
+//rechne AE_Grundwert und setze AE_Wert_max
+on("change:vorteil_zauberer change:ae_leiteigenschaft change:vorteil_hohe_astralkraft change:vorteil_hohe_astralkraft_stufe change:nachteil_niedrige_astralkraft change:nachteil_niedrige_astralkraft_stufe change:AE_Zukauf", function() {
+	getAttrs(["setze_aemax", "vorteil_zauberer", "AE_Leiteigenschaft", "vorteil_hohe_astralkraft", "vorteil_hohe_astralkraft_stufe", "nachteil_niedrige_astralkraft", "nachteil_niedrige_astralkraft_stufe", "AE_Zukauf"], function(values) {
+	var i = parseInt(values.vorteil_zauberer) * (20 + parseInt(values.AE_Leiteigenschaft) + (parseInt(values.vorteil_hohe_astralkraft) * parseInt(values.vorteil_hohe_astralkraft_stufe)) + (-1 * ( parseInt(values.nachteil_niedrige_astralkraft) * parseInt(values.nachteil_niedrige_astralkraft_stufe))) + parseInt(values.AE_Zukauf)) ;
+	if (values.setze_aemax == 1) {
+		setAttrs({ AE_Grundwert: i, AE_Wert_max: i }) ;
+	} else {
+		setAttrs({ AE_Grundwert: i }) ;	
+	}
+	});
+});
+
 
 // User darf selber schmerzstufe nicht via buttons ändern
 on("change:schmerz", function(eventInfo) {
