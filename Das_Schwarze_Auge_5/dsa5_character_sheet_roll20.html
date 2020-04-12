@@ -369,7 +369,7 @@
 					<div class="grundwert sheet-goetterwirken">
 						<input class="hidden sheet-gegner" type="checkbox" name="attr_gegner_sheet" value="1"/>
 						<div class="grundwert-name" data-i18n="Karmaenergie">Karmaenergie</div>
-						<div class="grundwert-basiswert sheet-kein-gegner"><input type="number" name="attr_KE_Grundwert" disabled="true" value="@{vorteil_geweihter}*(20+@{KE_Leiteigenschaft}+@{vorteil_hohe_karmalkraft_stufe}-@{nachteil_niedrige_karmalkraft_stufe}+@{KE_Zukauf})"></div>
+						<div class="grundwert-basiswert sheet-kein-gegner"><input type="number" name="attr_KE_Grundwert" value="0" readonly></div>
 						<div class="grundwert-wert"><input type="number" name="attr_KE_Wert" value="0"></div>
 						<div class="grundwert-zukauf sheet-kein-gegner"><input type="number" name="attr_KE_Zukauf" value="0"></div>
 						<div class="grundwert-max sheet-kein-gegner"><input type="number" disabled="true" name="attr_KE_Zukauf_Max" value="@{KE_Leiteigenschaft}"></div>
@@ -17461,6 +17461,9 @@
 			<input type="checkbox" name="attr_zeige_schilde" value="1" /> <span data-i18n="zeige-schilde">Zeige Schilde</span><br>
 			<input type="checkbox" name="attr_zeige_parierwaffen" value="1" /> <span data-i18n="zeige-nebenhand">Zeige Nebenhand</span><br>
 			<input type="checkbox" name="attr_zeige_fernkampf" value="1" /> <span data-i18n="zeige-fernkampf">Zeige Fernkampf</span><br>
+			<input type="checkbox" name="attr_setze_le_max" value="0" /> <span data-i18n="setze-le-max">Setze LE max für Token</span><br>
+			<input type="checkbox" name="attr_setze_ae_max" value="0" /> <span data-i18n="setze-ae-max">Setze AE max für Token</span><br>
+			<input type="checkbox" name="attr_setze_ke_max" value="0" /> <span data-i18n="setze-ke-max">Setze KE max für Token</span><br>
 		</div>
 
 		<div class="sheet-section sheet-section-config2" style="align:left;">
@@ -18002,6 +18005,17 @@ on("change:le_spezies change:ko_wert change:vorteil_hohe_lebenskraft change:vort
 	setAttrs({ LE_Grundwert: i, LE_Wert_max: i}) ;
 	});
 });
+
+//rechne KE_Grundwert und setze KE_Wert_max
+on("change:vorteil_geweihter change:ke_leiteigenschaft change:vorteil_hohe_karmalkraft change:vorteil_hohe_karmalkraft_stufe change:nachteil_niedrige_karmalkraft change:nachteil_niedrige_karmalkraft_stufe change:KE_Zukauf", function() {
+	getAttrs(["vorteil_geweihter", "KE_Leiteigenschaft", "vorteil_hohe_karmalkraft", "vorteil_hohe_karmalkraft_stufe", "nachteil_niedrige_karmalkraft", "nachteil_niedrige_karmalkraft_stufe", "KE_Zukauf"], function(values) {
+	var i = parseInt(values.vorteil_geweihter) * (20 + parseInt(values.KE_Leiteigenschaft) + (parseInt(values.vorteil_hohe_karmalkraft) * parseInt(values.vorteil_hohe_karmalkraft_stufe)) + (-1 * ( parseInt(values.nachteil_niedrige_karmalkraft) * parseInt(values.nachteil_niedrige_karmalkraft_stufe))) + parseInt(values.KE_Zukauf)) ;
+	setAttrs({ KE_Grundwert: i, KE_Wert_max: i }) ;
+	});
+});
+
+//
+
 // User darf selber schmerzstufe nicht via buttons ändern
 on("change:schmerz", function(eventInfo) {
 	if (eventInfo.sourceType == "player") {
@@ -18241,20 +18255,18 @@ on("change:tradition_goetter", function() {
 	});
 });
 
-on("change:tradition_goetter_leiteigenschaft change:KL_Wert change:IN_Wert change:MU_Wert change: CH_Wert", function() {
+on("change:tradition_goetter_leiteigenschaft change:KL_Wert change:IN_Wert change:MU_Wert change:CH_Wert", function() {
 	getAttrs(["tradition_goetter_leiteigenschaft", "KL_Wert", "IN_Wert", "MU_Wert", "CH_Wert"], function(values) {
-			setAttrs({ KE_Leiteigenschaft: 0 });
 		if (values.tradition_goetter_leiteigenschaft == "KL") {
 			setAttrs({ KE_Leiteigenschaft: values.KL_Wert });
-		}
-		if (values.tradition_goetter_leiteigenschaft == "IN") {
+		} else if (values.tradition_goetter_leiteigenschaft == "IN") {
 			setAttrs({ KE_Leiteigenschaft: values.IN_Wert });
-		}
-		if (values.tradition_goetter_leiteigenschaft == "MU") {
+		} else if (values.tradition_goetter_leiteigenschaft == "MU") {
 			setAttrs({ KE_Leiteigenschaft: values.MU_Wert });
-		}
-		if (values.tradition_goetter_leiteigenschaft == "CH") {
+		} else if (values.tradition_goetter_leiteigenschaft == "CH") {
 			setAttrs({ KE_Leiteigenschaft: values.CH_Wert });
+		} else {
+			setAttrs({ KE_Leiteigenschaft: 0 });
 		}
 	});
 }); 
