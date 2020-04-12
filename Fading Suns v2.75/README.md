@@ -1,11 +1,15 @@
 # Release notes
 
 ## 1.1.0
-- Vitality, Wyrd & Shield current levels can no longer be increased past their respective max values
-- Clicking on the current Vitality/Wyrd/Shield level now decreases it by 1 (as one would naturally expect)
-- Added roll buttons for Psi powers & Theurgy rituals
-- Added ability to vertically resize notes for Weapons/Actions, Psi powers & Theurgy rituals
-- Other minor cosmetic updates
+- Vitality, Wyrd & Energy shield:
+  - Current level can no longer be increased past the max value
+  - Clicking on the last bullet now decreases the current level by 1 (as one would naturally expect)
+- Weapons, Psi powers & Theurgy rites:
+  - Added goal roll buttons (based on characteristic + skill drop-down lists)
+  - Added ability to vertically resize notes
+- Roll queries (stance selection in initiative roll & goal bonus/penalty) can now be translated from English
+- Reverted to regular d20 symbol on roll buttons
+- Minor cosmetic updates
 
 ## 1.0.1
 - Fixed game load for players who have selected another language than English or French in their profiles
@@ -16,13 +20,13 @@
 
 # TODO list
 
+- Update sheet preview images
+
 - General improvements to goal rolls
   - Add CSC and CFC to characteristic & skills rolls
   - Ability to switch b/w public vs GM roll
   - Vitality critical levels (-2 to -10) to affect goal numbers
   - Ensure a 1 is always a success, even when the goal number is < 0 due to a high malus
-
-- Add ability to manually link a Combat action / Weapon entry to its corresponding Combat skill (e.g. Fists => Fight, Imman Vorton .40 => Slug Guns, etc..) and 3 different roll buttons for Dex, Str (tbc) and Per (for long range)
 
 - Increase similarity to the official character sheet when it comes to naming sections: Armor, Shield, Combat actions, Weapons (melee + ranged)
   - add a section for Body Modifications (incl. Cyberware)
@@ -31,11 +35,7 @@
 
 - [TBC] use short names for characteristics in weapon/psi/theurgy tables to save up on space
 
-- after the next pull request, replace the snazzy d10 image from the Ambition_Avarice sheet with own, to avoid dependency to another sheet
-
 - ability for users to report a bug found in the sheet
-
-- Initiative roll query - translations from English
 
 - Weapons & armors property checkboxes (Shock, Laser, Plasma, etc..) & replace d6rolls with proper damage/armor rolls showing shield-piercing vs normal damage, etc.
 
