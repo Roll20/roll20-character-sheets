@@ -3,7 +3,7 @@
     <input type="hidden" name="attr_goal_bonus_penalty_rollquery_i18n" value="" />
     <input type="hidden" name="attr_goal_bonus_penalty_again_rollquery_i18n" value="" />
 
-    <input type="hidden" name="sheet_version" value="latest" />
+    <input type="hidden" name="attr_sheet_version" value="latest" />
     <input class="fs-showarrow fs-h2arrow" type="checkbox" name="attr_background_show" value="1" checked />
     <h2 class="fs-clickheader fs-showsect"><label data-i18n="background">Background</label></h2>
     <div class="fs-h2-section fs-nontable fs-core-details fs-wide-readonly">
@@ -842,7 +842,7 @@
                             <option value="think_machine" data-i18n="think_machine">Think Machine</option>
                         </optgroup>
                     </select>
-                    <input class="fs-table-cell" type="text" name="attr_weapon_goal_bonus_penalty" />
+                    <input class="fs-table-cell" type="text" name="attr_weapon_goal_bonus_malus" />
                     <button type="roll" class="fs-d20" value="&{template:fs-d6Roll} {{name-i18n=@{weapon_name}}} {{roll=[[@{weapon_damage}d6cs<4cf>5<4]]}} {{what-i18n=^{attack_damage}}}"></button>
                     <input class="fs-table-cell" type="text" name="attr_weapon_damage" />
                     <input class="fs-table-cell" type="text" name="attr_weapon_strength_required" />
@@ -1341,7 +1341,7 @@
                 <div class="fs-header"><h1>{{characteristicName-i18n}} {{#rollGreater() bonus_penalty -1}}+{{/rollGreater() bonus_penalty -1}}{{bonus_penalty}}</h1></div>
             {{/skillName}}
 
-            {{#title}}<div class="fs-header"><h1>[ {{title}} ]</h1>{{/title}}
+            {{#title}}<div class="fs-header"><h1>[ {{title}} ]</h1></div>{{/title}}
 
             <div class="fs-arrow-container"><div class="fs-arrow-right"></div></div>
 
@@ -1434,19 +1434,34 @@
             {{/^rollGreater() roll goal}}
 
             {{#rollGreater() roll goal}}
-                {{#^rollGreater() roll 19}} <!-- rolled ]goal, 19] -->
-                    {{#critFailureConfirm}}
-                        <span class="fs-critfailure fs-actualroll">{{roll}}</span><span> | {{goal}}. </span><span class="fs-critfailure" data-i18n="critical_failure">Critical failure.</span>
-                    {{/critFailureConfirm}}
-                    {{^critFailureConfirm}}
-                        {{#critSuccessContinue}}
-                            <span class="failure fs-actualroll">{{roll}}</span><span> | {{goal}}. </span><span class="fs-success" data-i18n="the_end">Fin.</span>
-                        {{/critSuccessContinue}}
-                        {{^critSuccessContinue}}
-                            <span class="failure fs-actualroll">{{roll}}</span><span> | {{goal}}. </span><span class="fs-failure" data-i18n="failure">Failure!</span>
-                        {{/critSuccessContinue}}
-                    {{/critFailureConfirm}}
-                {{/^rollGreater() roll 19}}
+                {{#rollTotal() roll 1}} <!-- very special case of an automatic success when goal < 1 and the roll is 1 -->
+                    {{#critSuccessContinue}}
+                        <span class="failure fs-actualroll">{{roll}}</span><span> | {{goal}}. </span><span class="fs-success" data-i18n="the_end">Fin.</span>
+                    {{/critSuccessContinue}}
+                    {{^critSuccessContinue}}
+                        {{#critFailureConfirm}}
+                            <span class="fs-success fs-actualroll">{{roll}}</span><span> | {{goal}}. </span><span class="fs-failure" data-i18n="noncritical_failure">Non-critical failure.</span>
+                        {{/critFailureConfirm}}
+                        {{^critFailureConfirm}}
+                            <span class="fs-success fs-actualroll">{{roll}}</span><span> | {{goal}}. </span><span class="fs-success" data-i18n="success">Success!</span> <span class="fs-success">0</span> <span class="fs-success"> <span data-i18n="victory_points">VP</span></span>
+                        {{/critFailureConfirm}}
+                    {{/critSuccessContinue}}
+                {{/rollTotal() roll 1}}
+                {{#^rollTotal() roll 1}}
+                    {{#^rollGreater() roll 19}} <!-- rolled ]goal, 19], 1 excluded -->
+                        {{#critFailureConfirm}}
+                            <span class="fs-critfailure fs-actualroll">{{roll}}</span><span> | {{goal}}. </span><span class="fs-critfailure" data-i18n="critical_failure">Critical failure.</span>
+                        {{/critFailureConfirm}}
+                        {{^critFailureConfirm}}
+                            {{#critSuccessContinue}}
+                                <span class="failure fs-actualroll">{{roll}}</span><span> | {{goal}}. </span><span class="fs-success" data-i18n="the_end">Fin.</span>
+                            {{/critSuccessContinue}}
+                            {{^critSuccessContinue}}
+                                <span class="failure fs-actualroll">{{roll}}</span><span> | {{goal}}. </span><span class="fs-failure" data-i18n="failure">Failure!</span>
+                            {{/critSuccessContinue}}
+                        {{/critFailureConfirm}}
+                    {{/^rollGreater() roll 19}}
+                {{/^rollTotal() roll 1}}
             {{/rollGreater() roll goal}}
 
             {{#rollTotal() roll 20}} <!-- rolled a 20 -->
@@ -1502,60 +1517,7 @@
       { "section": "psipowers", "prefix": "power" },
       { "section": "theurgyrites", "prefix": "rite" }
     ];
-
-    
-    // used in sheet versioning
-    // 'type' must be ['int', 'string']
-    const convertAttribute = (getAttrsOj, setAttrsObj, srcAttribute, dstAttribute, allowed_values, translate, type) => {
-        let srcValue = getAttrsOj[srcAttribute];
-        let dstValue = getAttrsOj[dstAttribute];
-        if (!dstValue && srcValue) {
-            if (allowed_values instanceof Array) {
-                allowed_values.forEach(attrValue => {
-                    // migration from free-text (trying with a translation first if enabled) to a specific list of allowed (non language-specific) values
-                    if (translate && getTranslationByKey(attrValue).toUpperCase() === srcValue.toUpperCase() ||
-                        attrValue.toUpperCase() === srcValue.toUpperCase()) {
-                        setAttrsObj[dstAttribute] = attrValue;
-                    }
-                });
-            } else {
-                // simple copy of the value of the old attribute to the new one
-                setAttrsObj[dstAttribute] = (type === "int" ? parseInt(srcValue) : srcValue);
-            }
-        }
-    };
-
-    // used in sheet versioning
-    // 'type' must be ['int', 'string']
-    const migrateSimpleAttribute = (srcAttribute, dstAttribute, allowed_values, translate, type) => {
-        getAttrs([].concat([srcAttribute, dstAttribute]), getAttrsObj => {
-            let setAttrsObj = {};
-            convertAttribute(getAttrsObj, setAttrsObj, srcAttribute, dstAttribute, allowed_values, translate, type);
-            setAttrs(setAttrsObj);
-        });
-    };
-
-    // used in sheet versioning
-    // 'type' must be ['int', 'string']
-    const migrateRepeatingAttribute = (section, srcAttribute, dstAttribute, allowed_values, translate, type) => {
-        getSectionIDs(`repeating_${section}`, idArray => {
-            const srcAttrArray = idArray.map(id => `repeating_${section}_${id}_${srcAttribute}`);
-            const dstAttrArray = idArray.map(id => `repeating_${section}_${id}_${dstAttribute}`);
-            getAttrs([].concat(srcAttrArray, dstAttrArray), getAttrsObj => {
-                let setAttrsObj = {};
-                for (let i = 0; i < idArray.length; ++i) {
-                    convertAttribute(getAttrsObj, setAttrsObj,
-                                     `repeating_${section}_${idArray[i]}_${srcAttribute}`,
-                                     `repeating_${section}_${idArray[i]}_${dstAttribute}`,
-                                     allowed_values,
-                                     translate,
-                                     type);
-                }
-                setAttrs(setAttrsObj);
-            });
-        });
-    };
-    
+   
     const repeatingSum = (destination, section, fields, multiplier = 1, add = 0) => {
         if (!Array.isArray(fields)) fields = [fields];
         getSectionIDs(`repeating_${section}`, idArray => {
@@ -1613,29 +1575,10 @@
         });
     });
 
-   const updateGoalNumber = (section, prefix) => {
-        getSectionIDs(`repeating_${section}`, idArray => {
-            const characteristicArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_characteristic`);
-            const characteristicValueArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_characteristic_value`);
-            const skillArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_skill`);
-            const skillValueArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_skill_value`);
-            getAttrs( [].concat(characteristicArray, skillArray), vNames => {
-                getAttrs( vNames, vValues => {
-                    let setAttrsObj = {};
-                    for (let i = 0; i < idArray.length; ++i) {
-                        setAttrsObj[characteristicValueArray[i]] = (parseInt(vValues[vNames[characteristicArray[i]]]) || 0);
-                        setAttrsObj[skillValueArray[i]] = (parseInt(vValues[vNames[skillArray[i]]]) || 0);
-                    }
-                    setAttrs(setAttrsObj);
-                });
-            });
-        });
-    };
-
     const refreshCscAndCfcRollButton = (section, csc, cfc) => {
         getSectionIDs(section, function(idArray) {
             let setAttrsObj = {};
-            for(var i=0; i < idArray.length; i++) {
+            for(var i=0; i < idArray.length; ++i) {
                 setAttrsObj[`repeating_${section}_${idArray[i]}_${csc}`] = `repeating_${section}_${idArray[i]}_${csc}`;
                 setAttrsObj[`repeating_${section}_${idArray[i]}_${cfc}`] = `repeating_${section}_${idArray[i]}_${cfc}`;
             }
@@ -1664,7 +1607,7 @@
         barValues.forEach( value => {
             on(`clicked:${bar}_${value}`, eventInfo => {
                 getAttrs( [ bar, `${bar}_max` ], values => {
-                    // by default, we assume the user clickde on the to-be value
+                    // by default, we assume the user clicked on the to-be value
                     let newValue = parseInt(value);
 
                     if (newValue > parseInt(values[`${bar}_max`])) {
@@ -1694,6 +1637,152 @@
         });
     });
 
+    const updateGoalNumber = (section, prefix) => {
+        getSectionIDs(`repeating_${section}`, idArray => {
+            const characteristicArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_characteristic`);
+            const characteristicValueArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_characteristic_value`);
+            const skillArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_skill`);
+            const skillValueArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_skill_value`);
+            getAttrs( [].concat(characteristicArray, skillArray), vNames => {
+                getAttrs( vNames, vValues => {
+                    let setAttrsObj = {};
+                    for (let i = 0; i < idArray.length; ++i) {
+                        setAttrsObj[characteristicValueArray[i]] = (parseInt(vValues[vNames[characteristicArray[i]]]) || 0);
+                        setAttrsObj[skillValueArray[i]] = (parseInt(vValues[vNames[skillArray[i]]]) || 0);
+                    }
+                    setAttrs(setAttrsObj);
+                });
+            });
+        });
+    };
+
+    // used in sheet versioning
+    const convertAttribute = (getAttrsOj, setAttrsObj, srcAttribute, dstAttribute, allowed_values, translate) => {
+        let srcValue = getAttrsOj[srcAttribute];
+        let dstValue = getAttrsOj[dstAttribute];
+        if (!dstValue && srcValue) {
+            if ((allowed_values instanceof Array) && allowed_values.length > 0) {
+                allowed_values.forEach(attrValue => {
+                    // migration from free-text (trying with a translation first if enabled) to a specific list of allowed (non language-specific) values
+                    if (translate && getTranslationByKey(attrValue).toUpperCase() === srcValue.toUpperCase() ||
+                        attrValue.toUpperCase() === srcValue.toUpperCase()) {
+                        setAttrsObj[dstAttribute] = attrValue;
+                    }
+                });
+            } else {
+                // simple copy of the value of the old attribute to the new one
+                setAttrsObj[dstAttribute] = srcValue;
+            }
+        }
+    };
+
+    // used in sheet versioning
+    const migrateSimpleAttribute = (srcAttribute, dstAttribute, allowed_values, translate) => {
+        getAttrs([].concat([srcAttribute, dstAttribute]), getAttrsObj => {
+            let setAttrsObj = {};
+            convertAttribute(getAttrsObj, setAttrsObj, srcAttribute, dstAttribute, allowed_values, translate);
+            setAttrs(setAttrsObj);
+        });
+    };
+
+    // used in sheet versioning
+    const migrateRepeatingAttributes = (section, attribute_migrations, callback) => {
+        getSectionIDs(`repeating_${section}`, idArray => {
+            const srcAttrArray = idArray.map(id => attribute_migrations.map( a => `repeating_${section}_${id}_${a.srcAttribute}`)).flat();
+            const dstAttrArray = idArray.map(id => attribute_migrations.map( a => `repeating_${section}_${id}_${a.srcAttribute}`)).flat();
+            getAttrs([].concat(srcAttrArray, dstAttrArray), getAttrsObj => {
+                let setAttrsObj = {};
+                idArray.forEach( id => {
+                    attribute_migrations.forEach( attr_mig => { 
+                        convertAttribute(getAttrsObj, setAttrsObj,
+                                        `repeating_${section}_${id}_${attr_mig.srcAttribute}`,
+                                        `repeating_${section}_${id}_${attr_mig.dstAttribute}`,
+                                        attr_mig.allowed_values,
+                                        attr_mig.translate);
+                    });
+                });
+                setAttrs(setAttrsObj, null, callback);
+            });
+        });
+    };
+
+    const v1_0_1_psipowers_attribute_migrations = [
+        {
+            srcAttribute:   "power_roll_characteristic",
+            dstAttribute:   "power_characteristic",
+            allowed_values: all_characteristics,
+            translate:      true
+        },
+        {
+            srcAttribute:   "power_roll_skill",
+            dstAttribute:   "power_skill",
+            allowed_values: all_nonrepeating_skills,
+            translate:      true
+        },
+    ];
+
+    const v1_0_1_theurgyrites_attribute_migrations = [
+        {
+            srcAttribute:   "ritual_roll_characteristic",
+            dstAttribute:   "rite_characteristic",
+            allowed_values: all_characteristics,
+            translate:      true
+        },
+        {
+            srcAttribute:   "ritual_roll_skill",
+            dstAttribute:   "rite_skill",
+            allowed_values: all_nonrepeating_skills,
+            translate:      true
+        },
+        {
+            srcAttribute:   "ritual_path",
+            dstAttribute:   "rite_path",
+            allowed_values: null,
+            translate:      false
+        },
+        {
+            srcAttribute:   "ritual_level",
+            dstAttribute:   "rite_level",
+            allowed_values: null,
+            translate:      false
+        },
+        {
+            srcAttribute:   "ritual_name",
+            dstAttribute:   "rite_name",
+            allowed_values: null,
+            translate:      false
+        },
+        {
+            srcAttribute:   "ritual_components",
+            dstAttribute:   "rite_components",
+            allowed_values: null,
+            translate:      false
+        },
+        {
+            srcAttribute:   "ritual_range",
+            dstAttribute:   "rite_range",
+            allowed_values: null,
+            translate:      false
+        },
+        {
+            srcAttribute:   "ritual_duration",
+            dstAttribute:   "rite_duration",
+            allowed_values: null,
+            translate:      false
+        },
+        {
+            srcAttribute:   "ritual_wyrdcost",
+            dstAttribute:   "rite_wyrdcost",
+            allowed_values: null,
+            translate:      false
+        },
+        {
+            srcAttribute:   "ritual_notes",
+            dstAttribute:   "rite_notes",
+            allowed_values: null,
+            translate:      false
+        }
+    ];
 
     on("sheet:opened", function() {
 
@@ -1705,27 +1794,17 @@
                 // sheet versions 1.0.0 and 1.0.1 didn't have the @{sheet_version} attribute so we have to apply those updates just in case
 
                 // v1.0.0 => v1.0.1
-                migrateRepeatingAttribute( "psipowers", "power_roll_characteristic", "power_characteristic", all_characteristics, true, "string");
-                migrateRepeatingAttribute( "psipowers", "power_roll_skill", "power_skill", all_nonrepeating_skills, true, "string");
-                migrateRepeatingAttribute( "theurgyrites", "ritual_roll_characteristic", "rite_characteristic", all_characteristics, true, "string");
-                migrateRepeatingAttribute( "theurgyrites", "ritual_roll_skill", "rite_skill", all_nonrepeating_skills, true, "string");
-                migrateRepeatingAttribute( "theurgyrites", "ritual_path", "rite_path", [], false, "string");
-                migrateRepeatingAttribute( "theurgyrites", "ritual_level", "rite_level", [], false, "int");
-                migrateRepeatingAttribute( "theurgyrites", "ritual_name", "rite_name", [], false, "string");
-                migrateRepeatingAttribute( "theurgyrites", "ritual_components", "rite_components", [], false, "string");
-                migrateRepeatingAttribute( "theurgyrites", "ritual_range", "rite_range", [], false, "string");
-                migrateRepeatingAttribute( "theurgyrites", "ritual_duration", "rite_duration", [], false, "string");
-                migrateRepeatingAttribute( "theurgyrites", "ritual_wyrdcost", "rite_wyrdcost", [], false, "string");
-                migrateRepeatingAttribute( "theurgyrites", "ritual_notes", "rite_notes", [], false, "string");
+                migrateRepeatingAttributes( "psipowers", v1_0_1_psipowers_attribute_migrations, () => { updateGoalNumber("psipowers", "power"); });
+                migrateRepeatingAttributes( "theurgyrites", v1_0_1_theurgyrites_attribute_migrations, () => { updateGoalNumber("theurgyrites", "rite"); });
 
                 // v1.0.1 -> v1.1.0
                 special_repeating_skills.forEach( special_skill => {
-                    updateGoalNumber(special_skill.section, special_skill.prefix);
                     refreshCscAndCfcRollButton(special_skill.section, `${special_skill.prefix}_csc`, `${special_skill.prefix}_cfc`);
                 });
             }
     
             // add future sheet migrations here
+            // if (values.sheet_version == "1.1.0") ...
 
             const latest_version = "1.1.0";
             
