@@ -2,6 +2,13 @@
 
 ## Änderungen
 
+2020-04-12:
+Features:
+- Der Bogen für NPCs und Monster ist endlich fertig! Unter Optionen kann man den NPC-Bogen aktivieren. Dadurch verändern sich der Grundwerte-Tab sowie der Kampftab. Unter Nahkampf und Fernkampf lassen sich jetzt direkt die Angriffe und Aktionen mit den jeweiligen AT/PA und TP-Würfeln per Add-Button hinzufügen. Die mit P gekennzeichneten Würfel stehen für den Passierschlag. Außerdem werden im Ausrüstungstab die BLöcke für Nah- und Fernkampfwaffen sowie Schilde und Rüstungen ausgeblendet. Die Modifikatoren aus Sonderfertigkeiten und Effekte funktionieren weiterhin. Falls ihr Fehler entdeckt, schickt mir bitte eine Nachricht.
+
+- Weitere Optionen wurden implementiert: So lassen sich die Kopfzeile teilweise oder ganz ausblenden. Im Grundwerte-Tab können jetzt die Blöcke für Astral- und Karmaenergie ausblenden.
+
+
 2020-03-28:
 - Bugfix: halbe Parade funktioniert wieder
 
