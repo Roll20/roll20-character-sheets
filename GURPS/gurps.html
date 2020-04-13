@@ -28,6 +28,7 @@
 					<li>General Tab. Allow negative values for Air Move modifier and Water Move modifiers. Reported by James W.</li>
 					<li>Combat Tab. Active Defenses. Hide checkbox when the Modify button is clicked. Reported by Charles.</li>
 					<li>Combat Tab. Active Defenses. Fix alignment issues. Verified on Chrome, Firefox, MS Edge (chromium)</li>
+					<li>General Tab. Current HP and Current FP tooltip. Thresholds were not updating when max HP or FP were updated. This should be fixed.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset">View All Updates</button>
@@ -771,7 +772,7 @@
 										<tbody>
 											<tr>
 												<td class="label">Reeling: If your HP is less than</td>
-												<td><input type="text" name="attr_hp_reeling" value="[[ceil((@{hit_points|max}) / 3)]]" disabled="disabled"></td>
+												<td><input type="text" name="attr_hp_reeling" value="4" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -784,7 +785,7 @@
 											</tr>
 											<tr>
 												<td class="label">Verge of Collapse</td>
-												<td><input type="text" value="At 0 HP or less" readonly="readonly" ></td>
+												<td><input type="text" value="At 0 HP or less" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -797,7 +798,7 @@
 											</tr>
 											<tr>
 												<td class="label">Verge of Death</td>
-												<td><input type="text" name="attr_hp_verge" value="[[(@{hit_points|max}) * -1]]" disabled="disabled"></td>
+												<td><input type="text" name="attr_hp_verge" value="-10" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -811,7 +812,7 @@
 											</tr>
 											<tr>
 												<td class="label">Death</td>
-												<td><input type="text" name="attr_hp_death" value="[[(@{hit_points|max}) * -5]]" disabled="disabled"></td>
+												<td><input type="text" name="attr_hp_death" value="-50" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -820,7 +821,7 @@
 											</tr>
 											<tr>
 												<td class="label">Total Destruction</td>
-												<td><input type="text" name="attr_hp_destruction" value="[[(@{hit_points|max}) * -10]]" disabled="disabled"></td>
+												<td><input type="text" name="attr_hp_destruction" value="-100" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -883,7 +884,7 @@
 										<tbody>
 											<tr>
 												<td class="label">Tired: If your FP is less than</td>
-												<td><input type="text" name="attr_fp_tired" value="[[ceil((@{fatigue_points|max}) / 3)]]" disabled="disabled"></td>
+												<td><input type="text" name="attr_fp_tired" value="4" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -915,7 +916,7 @@
 											</tr>
 											<tr>
 												<td class="label">Unconscious: When your FP is</td>
-												<td><input type="text" name="attr_fp_unconscious" value="[[-(@{fatigue_points|max})]]" disabled="disabled"></td>
+												<td><input type="text" name="attr_fp_unconscious" value="-10" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -6081,6 +6082,7 @@
 		<li>General Tab. Allow negative values for Air Move modifier and Water Move modifiers. Reported by James W.</li>
 		<li>Combat Tab. Active Defenses. Hide checkbox when the Modify button is clicked. Reported by Charles.</li>
 		<li>Combat Tab. Active Defenses. Fix alignment issues. Verified on Chrome, Firefox, MS Edge (chromium)</li>
+		<li>General Tab. Current HP and Current FP tooltip. Thresholds were not updating when max HP or FP were updated. This should be fixed.</li>
 	</ul>
 
 	<h4>Version: 2.3.1</h4>
@@ -7792,7 +7794,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.3.2";
+	var version = "2.3.2.beta.4";
 
 	var latestChangesDate = "04/14/2020";
 
@@ -7975,6 +7977,9 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 		    
 		    // update conditions
 		    updateHealthConditionChecks(); 
+
+			updateFatiguePointThresholds();
+
 		});
 
 		// After move, dodge, encumbrance, HP, and FP
@@ -8044,6 +8049,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 			updateFP(thenCurrentMoveDodge);
 			
 			thenSpeedMoveDodge();
+
 		});
 		
 		updateDamageNotes();
@@ -8074,7 +8080,9 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 		});
 		
 		runUpdateRepeatingSpellLevels();
-		
+
+		updateHitPointThresholds();
+			
 	}
 	
 	function thenUpdateLinkedAttacksSkills() {
@@ -8248,7 +8256,10 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 
 	// HP
 	on('change:strength change:hit_points_points change:hit_points_mod', function (e) {
-		updateHP();
+		
+		// after updating hit points, update thresholds
+		updateHP(updateHitPointThresholds);
+	
 	});
 	
 	// Update HP
@@ -8274,8 +8285,9 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 
 	// FP
 	on('change:health change:fatigue_points_points change:fatigue_points_mod', function (e) {
-		updateFP();
+		updateFP(updateFatiguePointThresholds);
 	});
+
 	// Update FP
 	function updateFP(callback) {
 		console.log('********* updateFP *********');
@@ -13836,5 +13848,59 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 		updateRepeatingDefenseNotes();
 
 	});
+
+	/**
+	 * Update hit point thresholds
+	 */
+	function updateHitPointThresholds() {
+
+		getAttrs(["hit_points_max"], (values) => {
+
+			let max = +values.hit_points_max;
+
+			let reeling = Math.ceil(max / 3);
+
+			let verge = max * -1;
+
+			let death = max * -5;
+
+			let destruction = max * -10;
+
+			const fields = {
+				hp_reeling:     reeling,
+				hp_verge:       verge,
+				hp_death:       death,
+				hp_destruction: destruction
+			};
+
+			setAttrs(fields);
+
+		});
+
+	}
+
+	/**
+	 * Update fatigue point thresholds
+	 */
+	 function updateFatiguePointThresholds() {
+
+		getAttrs(["fatigue_points_max"], (values) => {
+
+			let max = +values.fatigue_points_max;
+
+			let tired = Math.ceil(max / 3);
+
+			let unconscious = max * -1;
+
+			const fields = {
+				fp_tired:       tired,
+				fp_unconscious: unconscious,
+			};
+
+			setAttrs(fields);
+
+		});
+
+	}
 
 </script>
