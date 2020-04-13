@@ -24,23 +24,56 @@ This sheet is created for use in Stars Without Number Revised Edition on Roll20.
 
 ## Feedback
 
-Report any problems, suggestions, or features by [creating an issue](https://github.com/Karlinator/roll20-character-sheets/issues) on Github.
+Report any problems, suggestions, or features by
+[creating an issue](https://github.com/Karlinator/roll20-character-sheets/issues)
+on Github.
 
 ## Contributing
 
-* Contributions are welcome at [the GitHub](https://github.com/Karlinator/roll20-character-sheets). Just open a pull request.
-* You will need to install [Node.js](https://nodejs.org), then run the following command in bash/cmd:
+* Contributions are welcome at
+  [the GitHub](https://github.com/Karlinator/roll20-character-sheets). Just open
+  a pull request.
+* You will need to install [Node.js](https://nodejs.org), then run the following
+  command in bash/cmd:
   * npm install -g pug pug-cli sass jstransformer-uglify-es
   * You may need to restart you computer.
-  * Then just make changes to the files in the Source folder, and use the file "build" or "pug_build.bat" and "sass_build.bat" depending on your OS.
+  * Then just make changes to the files in the Source folder, and use the file
+    "build" or "pug_build.bat" and "sass_build.bat" depending on your OS.
 
 ## Changelog
+
+### 2.4.6
+
+* Add a box to keep track of attribute boosts.
+* Fix travel cost macro not calculating travel cost correctly.
+
+### 2.4.5
+
+* Fixed an issue with the travel cost formula when the crew field was empty
+* Fixed an issue with roll buttons referencing the old "name" attribute instead
+  of character_name
+* Fixed the translation for Initiative
+
+### 2.4.4
+
+* Fix inconsistent field name HP_MAX on the NPC sheet - the correct way to write
+  this is HP_max.
+* Link the name input on the PC sheet to the character_name attribute.
+* Fix misspelling of "Initiative" in translations, which was not propagated from
+  translation.json
+
+### 2.4.3
+
+* Fix the summation of cyberware strain not actually doing that even remotely.
+* Fix magic effort update not triggering on changing the committed effor for the
+  day.
 
 ### 2.4.2
 
 * Remove incorrect title text from uncommitted Magic Effort
 * Fix HP rolls for Heroic Characters looking at the wrong attribute
-* Fix the version upgrade code stopping early and thus not change the version number on the sheet.
+* Fix the version upgrade code stopping early and thus not change the version
+  number on the sheet.
 
 ### 2.4.1
 
@@ -62,7 +95,8 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### 2.3.1
 
-* Fixed a bug causing the sheet to sometimes display an incorrect attack bonus for weapons.
+* Fixed a bug causing the sheet to sometimes display an incorrect attack bonus
+  for weapons.
 * Fixed missing base attack bonus for drone attacks.
 
 ### 2.3.0
@@ -76,18 +110,24 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 ### 2.2.0
 
 * Added autofill functionality for ship hulls and class ability.
-* Added autofill buttons for armor, cyberware, foci, gear, ship modules, techniques, and weapons.
-* Weapon encumbrance can now be modified in the weapon section. Weapons with 0 encumbrance will no longer be shown in the gear section.
-* Added an extra field to put effort that is only committed as long as a power is active.
-* Changed "Total" effort to "Uncommitted", and added auto-calculating. The formula for effort is now more accurate.
-* Added the option to enable ammo tracking with ChatSetAttr to the sheet default settings.
+* Added autofill buttons for armor, cyberware, foci, gear, ship modules,
+  techniques, and weapons.
+* Weapon encumbrance can now be modified in the weapon section. Weapons with 0
+  encumbrance will no longer be shown in the gear section.
+* Added an extra field to put effort that is only committed as long as a power
+  is active.
+* Changed "Total" effort to "Uncommitted", and added auto-calculating. The
+  formula for effort is now more accurate.
+* Added the option to enable ammo tracking with ChatSetAttr to the sheet default
+  settings.
 * Added a place to track skill points that can only be spent on psionics.
 * Added Discipline field to psychic techniques.
 * Added switch Ship/Mech/Custom for the ship tab.
 * Changed armor to be a repeating section.
 * The gear section now has a header.
 * Exert can now be used as a weapon's attack skill.
-* The chat macro for skills is now sorted into trained/untrained ones, the latter of which can be disabled.
+* The chat macro for skills is now sorted into trained/untrained ones, the
+  latter of which can be disabled.
 
 ### 2.1.0
 
@@ -96,13 +136,15 @@ Report any problems, suggestions, or features by [creating an issue](https://git
   * Added button to roll hit points.
   * Added weapon encumbrance tracking.
   * Added ammo maximum for weapons.
-  * Weapon shock damage can now be toggled independent of base being 0 (for Unarmed Combatant).
+  * Weapon shock damage can now be toggled independent of base being 0 (for
+    Unarmed Combatant).
   * Added option for automatic ammo reduction (requires ChatSetAttr).
 * Bugfixes
   * Attribute modifiers are now recalculated upon conversion from v1.6.2.
   * Roll templates are no longer cut off when chat avatars are disabled.
   * New NPC attacks should now receive the correct attack bonus.
-  * Line breaks in foci/technique/spell/cyberware descriptions now render correctly.
+  * Line breaks in foci/technique/spell/cyberware descriptions now render
+    correctly.
 
 ### 2.0.1
 
@@ -117,7 +159,8 @@ Report any problems, suggestions, or features by [creating an issue](https://git
   * Roll template overhauled
   * Many attributes were renamed or otherwise reorganized (seamless conversion)
   * Chat menus for easy access to all sheet macros
-  * Ship sheet now has tracking for power/mass/hardpoints, as well as weapon attacks
+  * Ship sheet now has tracking for power/mass/hardpoints, as well as weapon
+    attacks
   * NPC sheet now has repeating sections for attacks and special abilities
   * Added i18n support
 
@@ -142,7 +185,8 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Autofilling the "Next level xp" (with options).
 * Toggleable custom counters for whatever you heart desires.
 * Option to remove psionics completely.
-* New section for Space Magic, a Deluxe edition set of rules for importing magic into SWN.
+* New section for Space Magic, a Deluxe edition set of rules for importing magic
+  into SWN.
 * Fixed formatting of an NPC stat block.
 * Changed the header toggles to work slightly better/faster.
 * You can now enter arbitrary dice rolls for shock damage!
@@ -151,7 +195,8 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### 1.5.1
 
-* Fixed bug where the AC and AB on NPC sheets was reset to the PC sheet value when the sheet was opened.
+* Fixed bug where the AC and AB on NPC sheets was reset to the PC sheet value
+  when the sheet was opened.
 * Updated image.
 * Spelling corrections.
 * Added shock damage to weapons, only shows if a stat is entered.
@@ -166,13 +211,16 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### 1.4.0
 
-* Added NPC tab which holds standard NPC stats, notes, and rolls such as Morale and Reaction.
-* Fixed bug where modifiers weren't applied to skill rolls if the "assist" popup was submitted empty.
+* Added NPC tab which holds standard NPC stats, notes, and rolls such as Morale
+  and Reaction.
+* Fixed bug where modifiers weren't applied to skill rolls if the "assist" popup
+  was submitted empty.
 * Added explanation of skill roll modifiers
 * Added description fields to cyberware as well.
 * Added ability to print description fields to chat as a macro.
 * Made the skill list a little smaller by decreasing font size.
-* Clean up code intentation and formatting. It is now consistent (and also in tabs).
+* Clean up code intentation and formatting. It is now consistent (and also in
+  tabs).
 * Added ability to hide Psychic section since not all characters need it.
 
 ### 1.3.1
@@ -186,15 +234,18 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 * Added field for remaining magazines next to ammo.
 * Added dropdown to chose No/ask/always on bursting when shooting.
 * Separated Committed Effort Day and Committed Effort Scene.
-* Added show/hide fields to add desciptions to class ability, psionic techniques, and foci.
+* Added show/hide fields to add desciptions to class ability, psionic
+  techniques, and foci.
 * Changed Attack Bonus to Base Attack Bonus.
 * style and text changes.
 
 ### 1.2.0
 
-* Changed attack roll template to correctly apply a -2 unfamiliaruty malus when a skill is at -1, instead of a -1 malus.
+* Changed attack roll template to correctly apply a -2 unfamiliaruty malus when
+  a skill is at -1, instead of a -1 malus.
 * Added Burst as Yes/No option on attack rolls that adds damage too.
-* Changed Psychic Techniques and Cyberware to a repeating section, so people won't run out of fields.
+* Changed Psychic Techniques and Cyberware to a repeating section, so people
+  won't run out of fields.
 
 ### 1.1.1
 
@@ -203,10 +254,13 @@ Report any problems, suggestions, or features by [creating an issue](https://git
 
 ### 1.1.0
 
-* Reworked attack rolls to no longer ask for AC and to also have the roll number make sense.
-* Reworked the skill list. There are now options for rolling 2d6, 3d6kh2, and 4d6kh2 for the Specialist focus among others.
+* Reworked attack rolls to no longer ask for AC and to also have the roll number
+  make sense.
+* Reworked the skill list. There are now options for rolling 2d6, 3d6kh2, and
+  4d6kh2 for the Specialist focus among others.
 * Reordered the skill list to be alphabetical by coloumn instead of by row.
-* Reordered the attributes to be in the usual order (STR, DEX, CON, INT, WIS, CHA)
+* Reordered the attributes to be in the usual order (STR, DEX, CON, INT, WIS,
+  CHA)
 
 ### 1.0.0
 
