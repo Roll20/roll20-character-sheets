@@ -18047,16 +18047,22 @@ on("change:schmerz", function(eventInfo) {
 	}
 });
 
-// LE_Wert kann nicht höher sein als Maximum(LE_Grundwert)
-on("change:le_wert change:le_grundwert", function(eventInfo) {
+
+// Check LE_Wert
+on("change:le_wert", function(eventInfo) {
 	getAttrs(["LE_Wert", "LE_Grundwert"], function(values) {
-	if (parseInt(values.LE_Wert||0) > parseInt(values.LE_Grundwert||0)) {
-		if (eventInfo.sourceAttribute == "le_wert") {
-			setAttrs({ LE_Wert: parseInt(eventInfo.previousValue||0) }) ;
-		} else {
+		if (parseInt(values.LE_Wert||0) > parseInt(values.LE_Grundwert||0) && eventInfo.sourceType == "player") {
 			setAttrs({ LE_Wert: parseInt(values.LE_Grundwert||0) }) ;
 		}
-	}
+	});	
+});
+
+// Check LE_Grundwert change
+on("change:le_grundwert", function() {
+	getAttrs(["LE_Wert", "LE_Grundwert"], function(values) {
+		if (parseInt(values.LE_Wert||0) > parseInt(values.LE_Grundwert||0)) {
+			setAttrs({ LE_Wert: parseInt(values.LE_Grundwert||0) }) ;
+		}
 	});	
 });
 
