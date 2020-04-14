@@ -1614,19 +1614,11 @@
         });
     };
 
-    regular_repeating_skills.forEach( repeating_skill => {
-        on(`change:repeating_${repeating_skill.section}`, eventInfo => {
-            refreshCscAndCfcRollButton(repeating_skill.section, `${repeating_skill.prefix}_csc`, `${repeating_skill.prefix}_cfc`);
+    [].concat(regular_repeating_skills,special_repeating_skills).forEach( repeating => {
+        on(`change:repeating_${repeating.section}`, eventInfo => {
+            refreshCscAndCfcRollButton(repeating.section, `${repeating.prefix}_csc`, `${repeating.prefix}_cfc`);
         });
     });
-
-    special_repeating_skills.forEach( special_skill => {
-        on(`change:repeating_${special_skill.section}`, eventInfo => {
-            updateGoalNumber(special_skill.section, special_skill.prefix);
-            refreshCscAndCfcRollButton(special_skill.section, `${special_skill.prefix}_csc`, `${special_skill.prefix}_cfc`);
-        });
-    });
-
 
     const barValues = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20"];
     const barsWithMaxValues = [ 'wyrd', 'vitality', 'energy_shield' ];
@@ -1817,26 +1809,13 @@
         // sheet versioning
         getAttrs( [ 'sheet_version' ], values => {
 
-            if(values.sheet_version == "latest") {
+            if (values.sheet_version == "latest") {
                 
                 // sheet versions 1.0.0 and 1.0.1 didn't have the @{sheet_version} attribute so we have to apply those updates just in case
 
                 // v1.0.0 => v1.0.1
                 migrateRepeatingAttributes( "psipowers", v1_0_1_psipowers_attribute_migrations, () => { updateGoalNumber("psipowers", "power"); });
                 migrateRepeatingAttributes( "theurgyrites", v1_0_1_theurgyrites_attribute_migrations, () => { updateGoalNumber("theurgyrites", "rite"); });
-
-                // v1.0.1 -> v1.1.0
-                special_repeating_skills.forEach( special_skill => {
-                    refreshCscAndCfcRollButton(special_skill.section, `${special_skill.prefix}_csc`, `${special_skill.prefix}_cfc`);
-                });
-            }
-
-            if(values.sheet_version == "1.1.0") {
-
-                // missed in the previous update, unfortunately
-                regular_repeating_skills.forEach( repeating_skill => {
-                    refreshCscAndCfcRollButton(repeating_skill.section, `${repeating_skill.prefix}_csc`, `${repeating_skill.prefix}_cfc`);
-                });
             }
     
             // add future sheet migrations here
@@ -1844,9 +1823,16 @@
 
             const latest_version = "1.1.1";
             
-            if(values.sheet_version != latest_version) {
+            if (values.sheet_version != latest_version) {
                 setAttrs({ sheet_version: latest_version });
             }
+        });
+
+
+        // ensure proper names for repeating sections CFC and CFC rolls
+
+        [].concat(regular_repeating_skills,special_repeating_skills).forEach( repeating => {
+            refreshCscAndCfcRollButton(repeating.section, `${repeating.prefix}_csc`, `${repeating.prefix}_cfc`);
         });
 
         // translate roll queries
