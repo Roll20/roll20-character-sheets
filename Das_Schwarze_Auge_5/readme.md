@@ -2,6 +2,9 @@
 
 ### UPDATE 12.04.2020
 
+*Hinweis - die automatischen Berechnungen für Schmerz, LE, AE und KE sind nur aktiv bei normalen Charakteren.*
+*Wenn in der Konfiguration "Gegnersheet" ausgewählt ist, sind die Berechnungen deaktiviert*
+
 ![Automatische Berechnung von LE, AE, KE](https://i.imgur.com/c6XbiHa.jpg)
  * **Berechnung der Maximalwerte für LE, AE, KE**: Es gibt eine neue Option in der Konfiguration, um jeweils für die LE, AE und KE automatisch den aktuellen Grundwert aus der Hauptseite als Maximalwert für LE_Wert, AE_Wert und KE_Wert zu setzen. Bei aktivierter Option werden die maximalwerte für den Token automatisch angepasst, wenn sich diese im Sheet ändern. Wenn man den Balken auf dem Token nicht sehen möchte (oder den Wert manuell festlegen möchte), kann man die Option deaktivieren.
  
