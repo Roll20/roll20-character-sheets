@@ -47,18 +47,22 @@
 
   sheetAttributes.weaponTypes.forEach(type => {
     on(`change:repeating_${type}:dicepool_modifier change:repeating_${type}:specialization`, eventinfo => updateRepeatingWeaponDicepool(eventinfo.triggerName))
-    on(`change:repeating_${type}:primary`, eventinfo => updateRepeatingWeaponPrimary(eventinfo, type))
+    on(`change:repeating_${type}:primary`, eventinfo => updateRepeatingPrimary(eventinfo, type))
   })
 
-  sheetAttributes.rangeAttributes.forEach(attr => on(`change:repeating_range:${attr}`, eventinfo => updatePrimaryWeapon(eventinfo)))
+  sheetAttributes.rangeAttributes.forEach(attr => on(`change:repeating_range:${attr}`, eventinfo => updatePrimary(eventinfo)))
 
-  sheetAttributes.meleeAttributes.forEach(attr => on(`change:repeating_melee:${attr}`, eventinfo => updatePrimaryWeapon(eventinfo)))
+  sheetAttributes.meleeAttributes.forEach(attr => on(`change:repeating_melee:${attr}`, eventinfo => updatePrimary(eventinfo)))
+
+  sheetAttributes.armorAttributes.forEach(attr => on(`change:repeating_armor:${attr}`, eventinfo => updatePrimary(eventinfo)))
+
+  on("change:repeating_armor:primary", eventinfo => updateRepeatingPrimary(eventinfo, 'armor'))
 
   on(`change:repeating_active:skill`, eventinfo => updateRepeatingSkillName(eventinfo))
 
 	on('clicked:cond_reset_physical clicked:cond_reset_stun', eventinfo => resetConditionTrack(eventinfo))
 
-	on('change:edge_toggle', eventinfo => edgeToggle(eventinfo))
+	on('change:edge_toggle', eventinfo => edgeToggle(eventinfo.newValue))
 
 	on('change:device_rating change:matrix_modifier', () => updateMatrixMaximum())
 
@@ -77,4 +81,6 @@
   on("change:level", eventinfo => updateSpriteConditionTrack(eventinfo.newValue))
 
   on("change:host_rating", eventinfo => updateHostAttributes(eventinfo.newValue))
+
+  on("change:default_attribute", eventinfo => updateDefaultAttribute(eventinfo.newValue))
 
