@@ -2324,6 +2324,7 @@
         </table>
         <br />
         <h3>Meisterschaften</h3>
+        <input type="checkbox" name="attr_tooltips" value="1" /> <b>Tooltips aktivieren?</b>
         <table border=1 style="font-weight: bold; padding: 0px; border-collapse: collapse" width="65%">
             <tr bgcolor="#0489B1" style="color:white" align="center">
                 <td width="30%"><b>Meisterschaft</b></td>
@@ -2334,8 +2335,9 @@
             <tr>
                 <td colspan="4">
                     <fieldset class="repeating_meisterschaften">
+                        <input type="hidden" class="sheet-toggletooltips-inside" name="attr_tooltips_inside">
                         <input type="text" name="attr_meisterschaftsname" style='width: 12em; font-weight: bold;'>
-                        <select name="attr_meisterschaftsfertigkeit"style="width: 10.2em; font-weight: bold;">                
+                        <select name="attr_meisterschaftsfertigkeit" style="width: 10.2em; font-weight: bold;">                
                             <option value="nix"></option>
                             <option value="allgemein" style="text-align:center">--- Allgemein ---</option>
                             <option value="akrobatik">Akrobatik</option>
@@ -2395,7 +2397,7 @@
                             <option value="windmagie">Windmagie</option>
                         </select>
                         <input type="number" name="attr_meisterschaftsschwelle" min=0 max=4 style="width: 3.3em; font-weight: bold; text-align: center;">
-                        <span class="sheet-tooltip"><input type="text" name="attr_meisterschaftswirkung" style="width: 13.4em; font-weight: bold;"><span><textarea name="attr_meisterschaftsbeschreibung" readonly></textarea></span></span>
+                        <span class="sheet-tooltip"><input type="text" name="attr_meisterschaftswirkung" style='width: 14em; font-weight: bold;'/><textarea name="attr_meisterschaftsbeschreibung" class="sheet-toggletextarea" readonly></textarea></span>
                     </fieldset>
                 </td>
             </tr>
@@ -2609,6 +2611,10 @@
     
         <div class="sheet-section sheet-section-Updates" style="background-color:#C81369; color: white">
         <h1 style="color: white;">Letzte Updates</h1> <br/>
+        <h2 style="color: white;">21.04.2020</h2>
+        <ul>
+            <li>Die Tooltips f&uuml;r die Meisterschaften sind jetzt aktivier- und deaktivierbar.</li>
+        </ul>
         <h2 style="color: white;">14.04.2020</h2>
         <ul>
             <li>Der Kreaturenbogen wurde auf Basis von Spielerfeedback umgestaltet und verf&uuml;gt jetzt auch &uuml;ber <b>Initiative-</b>, <b>Patzer-</b> und <b>Aktive Abwehr-</b>W&uuml;rfe</li>
@@ -2619,14 +2625,6 @@
             <li>Der Genesis-Importer wurde mit neuen Daten aus der Genesis-Datenbank (Magieschulen und Zauber aus <i>Die Magie</i>) gef&uuml;ttert und sollte jetzt gr&ouml;&szlig;tenteils funktionieren.</li>
             <li>Das Waffenmerkmal <i>Kritisch</i> wird jetzt bei allen Waffenw&uuml;rfen ber&uuml;cksichtigt. <b>Hinweis:</b> Bei kritischen Waffen dauert es ein wenig, bis der Schadenswurf angezeigt wird, da die Formel komplexer ist. Vielen Dank für die Formel an <i>Puffke</i>!</li>
             <li>Ein paar Sch&ouml;nheitskorrekturen</li>
-        
-        </ul>
-        <h2 style="color: white;">31.03.2020</h2>
-        <ul>
-            <li>Beim NSC-Bogen wurden Eingabefelder für verzehrte, kanalisierte und ersch&ouml;pfte Lebenspunkte und Fokus hinterlegt</li>
-            <li>Ebenso werden Gesamtlebenspunkte und Gesamtfokus jetzt automatisch berechnet, wenn die Basiswerte angepasst werden</li>
-            <li>Es kann jetzt auch die Ersch&ouml;pfungsresistenz eines NSCs eingetragen werden.</li>
-            <li>Au&szlig;erdem wurde das Design des "Diverses"-Kasten allgemein etwas &uuml;berarbeitet</li>
         
         </ul>
     </div>
@@ -7264,13 +7262,29 @@ on("change:repeating_masterytooltips:masterytooltipname change:repeating_mastery
                     var name = v["repeating_meisterschaften_" + currentID + "_meisterschaftsname"];
                     if (name.toLowerCase() == mastery.toLowerCase()) {
                         update["repeating_meisterschaften_" + currentID + "_meisterschaftsbeschreibung"] = tooltip;
-                        console.log("Meisterschaft: " + mastery + ", Tooltip: " + tooltip);
                         setAttrs(update);
                     }
                 });
             });
            }
         });    
+    });
+});
+
+on("change:tooltips", function() {
+    getAttrs(["tooltips"], function(values) {
+        let tooltips = values.tooltips;
+        let update = {};
+        
+        getSectionIDs("repeating_meisterschaften", function(idarray) {
+           if (idarray.length > 0)
+           {
+             _.each(idarray, function(currentID, i) {
+                update["repeating_meisterschaften_" + currentID + "_tooltips_inside"] = tooltips;
+                setAttrs(update);
+            });
+           }
+        });
     });
 });
 
