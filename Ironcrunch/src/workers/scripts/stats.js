@@ -63,3 +63,26 @@ on('change:supply', function(eventinfo) {
     });
     if (parseInt(eventinfo.newValue) === 0) setAttrs({debilUnprepared: "on"});
 });
+
+// Edge sets Speed value
+on('change:edge', function(eventinfo) {
+  setAttrs({speed: speedValues[eventinfo.newValue].full});
+});
+
+const speedValues = {
+  '8': { full: '40ft/20ft. 12m/6m. 8/4', imperial: '40ft/20ft', metric: '12 m/6 m. ', units: '8/4' },
+  '7': { full: '40ft/20ft. 12m/6m. 8/4', imperial: '40ft/20ft',metric: '12m/6m. ', units: '8/4' },
+  '6': { full: '35ft/15ft. 10.5m/4.5m. 7/3', imperial: '35ft/15ft',metric: '10.5m/4.5m.', units: '7/3' },
+  '5': { full: '35ft/15ft. 10.5m/4.5m. 7/3', imperial: '35ft/15ft',metric: '10.5m/4.5m.', units: '7/3' },
+  '4': { full: '30ft/15ft. 9m/4.5m. 6/3', imperial: '30ft/15ft',metric: '9m/4.5m.', units: '6/3' },
+  '3': { full: '30ft/15ft. 9m/4.5m. 6/3', imperial: '30ft/15ft',metric: '9m/4.5m.', units: '6/3' },
+  '2': { full: '25ft/10ft. 7.5m/3m. 5/2', imperial: '25ft/10ft',metric: '7.5m/3m.', units: '5/2' },
+  '1': { full: '25ft/10ft. 7.5m/3m. 5/2', imperial: '25ft/10ft',metric: '7.5m/3m.', units: '5/2' },
+  '0': { full: '25ft/10ft. 7.5m/3m. 5/2', imperial: '25ft/10ft',metric: '7.5m/3m.', units: '5/2' }
+}
+
+// Heart sets Resilience value
+on('change:heart', function(eventinfo) {
+  let resValue = parseInt(eventinfo.newValue) + 1
+  setAttrs({resilience: resValue});
+});
