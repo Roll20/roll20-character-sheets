@@ -42,6 +42,11 @@ on Github.
 
 ## Changelog
 
+### 2.4.7
+
+* Fix attribute boosts not being counted correctly for encumbrance and system strain.
+* Collapse attribute base and boosts fields into a single field in display mode.
+
 ### 2.4.6
 
 * Add a box to keep track of attribute boosts.
