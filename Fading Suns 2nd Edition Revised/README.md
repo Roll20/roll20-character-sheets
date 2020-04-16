@@ -1,8 +1,11 @@
 # Release notes
 
-## 1.1.1
-- Fixed error on Critical Success rerolls or Critical Failure confirms of custom Lore and Creative skills
-- Fixed typo in Initiative stance roll query. Aggressive stances give -2 Defense, not +2.
+## 1.2.0
+- Renamed sheet to `Fading Suns 2nd Edition Revised` from `Fading Suns v2.75`
+- Added ability to select the characteristic for the roll of a skill on the fly (as opposed to having to select a characteristic beforehand)
+- Fixed error on Critical Success rerolls or Critical Failure confirms of custom Lore and Creative skills (bug introduced in 1.1.0)
+- Fixed typo in Initiative stance roll query. Aggressive stances give -2 Defense, not +2  (bug introduced in 1.1.0)
+- Cosmetic fixes
 
 ## 1.1.0
 - Vitality, Wyrd & Energy shield:
