@@ -18,3 +18,20 @@ N'hésitez pas à remonter vos remarques et suggestions.
 
 Bon jeu !
 
+## Update 2020  
+
+* Fix bonus au dé pour jets avec attribut >20 
+* nouveaux templates pour affichage résultat des jets 1d20 et dégâts, avec affichage du résultat
+* checkbox autocalculée pour bonus religion et chevalerie
+* nouvelles religions conformes au Book of Knights and Ladies
+* traits associés au bonus religieux soulignés 
+* affichage infos sur les bonus religieux
+* nouveau calculs dynamiques des bonus religieux
+* fix trait oublié dans la liste de choix des traits dirigés
+* sheetworkers
+* option de désactivation du bonus de chevalerie (période Uther)
+* ajout champs de compétences additionnelles (non combat)
+* ajout champs montures
+* refonte de la mise en page, plus compacte
+* ajout champs gains de gloire annuels (todo)
+
