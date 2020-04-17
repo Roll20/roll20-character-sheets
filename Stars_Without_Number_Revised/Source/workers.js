@@ -3,7 +3,7 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.4.6";
+	const sheetVersion = "2.4.7";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -2012,7 +2012,7 @@
 	const calculateMaxStrain = () => {
 		getAttrs(["constitution", "strain_max"], v => {
 			mySetAttrs({
-				strain_max: v.constitution
+				strain_max: parseInt(v.constitution)
 			}, v);
 		});
 	};
@@ -2045,15 +2045,26 @@
 		});
 	};
 
+	const calculateAttr = (attr) => {
+		getAttrs([attr, `${attr}_base`, `${attr}_boosts`], v => {
+			const setting = {
+				[`${attr}`]: `${(parseInt(v[`${attr}_base`]) || 10) + (parseInt(v[`${attr}_boosts`]) || 0)}`
+			};
+			mySetAttrs(setting, v, null, () => {
+				calculateMod(attr);
+			});
+		});
+	}
+
 	const calculateMod = (attr) => {
-		getAttrs([attr, `${attr}_bonus`, `${attr}_boosts`, `${attr}_mod`], v => {
+		getAttrs([attr, `${attr}_bonus`, `${attr}_mod`], v => {
 			const mod = (value => {
 				if (value >= 18) return 2;
 				else if (value >= 14) return 1;
 				else if (value >= 8) return 0;
 				else if (value >= 4) return -1;
 				else return -2;
-			})((parseInt(v[attr]) || 10) + parseInt(v[`${attr}_boosts`]) || 0);
+			})(parseInt(v[attr]) || 10);
 
 			const setting = {
 				[`${attr}_mod`]: `${mod + (parseInt(v[`${attr}_bonus`]) || 0)}`
@@ -2137,7 +2148,7 @@
 					...armorIDs.filter(id => v[`repeating_armor_${id}_armor_status`] === "READIED")
 						.map(id => parseInt(v[`repeating_armor_${id}_armor_encumbrance_bonus`]) || 0)
 				);
-				const gear_stowed_max = (parseInt(v.strength) || 0) + armor_encumbrance_bonus;
+				const gear_stowed_max = parseInt(v.strength) + armor_encumbrance_bonus;
 				const gear_readied_max = Math.floor(gear_stowed_max / 2);
 				const setting = {
 					gear_readied,
@@ -3153,6 +3164,19 @@
                 calculateCyberwareStrain();
                 upgradeSheet("2.4.3");
             }
+			/** v2.4.7
+			 * Move attr to attr_base, and recalculate attr
+			 **/
+			else if (major == 2 && minor == 4 && patch < 7) {
+				attributes.forEach(attr => {
+					getAttrs([attr, `${attr}_base`], v => {
+						mySetAttrs({[`${attr}_base`]: parseInt(v[`${attr}`] || 10)}, v, null, () => {
+							calculateAttr(attr);
+						});
+					});
+				});
+				upgradeSheet("2.4.7");
+			}
 			/** Final upgrade clause, always leave this around */
 			else upgradeSheet(sheetVersion, false, true);
 		};
@@ -3563,7 +3587,8 @@
 
 	/* Character sheet */
 	on("change:class", fillClassStats);
-	attributes.forEach(attr => on(`change:${attr} change:${attr}_boosts change:${attr}_bonus`, () => calculateMod(attr)));
+	attributes.forEach(attr => on(`change:${attr}_base change:${attr}_boosts`, () => calculateAttr(attr)));
+	attributes.forEach(attr => on(`change:${attr} change:${attr}_bonus`, () => calculateMod(attr)));
 
 	on(weaponDisplayEvent, generateWeaponDisplay);
 
