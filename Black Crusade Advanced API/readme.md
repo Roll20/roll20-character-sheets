@@ -1,2 +1,2 @@
-I wasn't happy with the current Black Crusade character sheet and wanted to integrate the very useful scripts of Dark Heresy Advanced API, so i combined DH 2nd Ed avdanced and BC character sheets.
+Here is the updated version of the Black Crusade Advanced API sheet that i worked on those last years, i fixed many bugs & enhanced the general functionalities of the sheet by adding APIs. I will keep working on it to enhance my personal campaign and upload the advancements here.
 - Pixizz aka Sebouh K.
