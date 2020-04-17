@@ -86,3 +86,18 @@ on('change:heart', function(eventinfo) {
   let resValue = parseInt(eventinfo.newValue) + 1
   setAttrs({resilience: resValue});
 });
+
+// Iron sets Max Load value
+on('change:iron', function(eventinfo) {
+  let loadValue = parseInt(eventinfo.newValue) + 4
+  setAttrs({max_load: loadValue});
+});
+
+// Setting Encumbered if load is over max
+on('change:load', function(eventinfo) {
+  getAttrs(['max_load'], function(values) {
+    if (parseInt(eventinfo.newValue) > parseInt(values.max_load)) {
+      setAttrs({encumbered: 'on'});
+    }
+  });
+});

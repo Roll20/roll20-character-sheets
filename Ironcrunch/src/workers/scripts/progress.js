@@ -111,3 +111,18 @@ on('change:clear_misses', function() {
     'clear_misses': 'off'
   });
 });
+
+on('remove:repeating_vow', function(eventinfo) { 
+  setArchive(eventinfo)
+});
+
+function setArchive (eventinfo) {
+  // let vowName = eventinfo.removedInfo[`${eventinfo.sourceAttribute}_vow_name`]
+  // console.log(vowName)
+  let vowName = eventinfo.removedInfo[`${eventinfo.sourceAttribute}_vow_name`]
+  let newrowid = generateRowID();
+  let attrs = {};
+  attrs["repeating_vowarchive_" + newrowid + "_vow_name"] = vowName
+  console.log(attrs)
+  setAttrs(attrs);
+}
