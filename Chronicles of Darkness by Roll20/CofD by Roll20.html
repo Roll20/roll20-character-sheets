@@ -1898,9 +1898,9 @@
                                 <div class="healthbox gt-2 gt-3 gt-4 gt-5"></div>
                                 <div class="healthbox gt-2 gt-3 gt-4"></div>
                                 <div class="healthbox gt-2 gt-3"></div>
-                                <div class="healthbox gt-2">-1</div>
-                                <div class="healthbox">-2</div>
-                                <div class="healthbox">-3</div>
+                                <span class="healthbox gt-2" name="attr_wound_penalty_1">-1</span>
+                                <span class="healthbox" name="attr_wound_penalty_2">-2</span>
+                                <span class="healthbox" name="attr_wound_penalty_3">-3</span>
                             </div>
                         </td>
                     </tr>
@@ -3341,7 +3341,12 @@
     });
 
     on("change:iron_stamina", function() {
-        updateWoundPenalties();
+        getAttrs(["iron_stamina"], function(v) {
+            const ironStamina = parseInt(v.iron_stamina, 10) || 0;
+            const woundPenalties = getWoundPenalties(ironStamina);
+
+            setAttrs(woundPenalties);
+        });
     });
 
     on("change:rolltype_select", function() {
@@ -3356,7 +3361,7 @@
 
     // Version update for new or modified attributes
     on("sheet:opened", function() {
-        getAttrs(["version", "sheettype"], function(v) {
+        getAttrs(["version", "sheettype", "iron_stamina"], function(v) {
             const version = parseInt(v.version) || 0;
             var attrs = {};
 
@@ -3370,11 +3375,15 @@
                 attrs["version"] = 1;
             }
             
-            /*
-            * if (version < 2) {
-            *     attrs["version"] = 2;
-            * }
-            */
+            if (version < 2) {
+                const woundPenalties = getWoundPenalties(v["iron_stamina"]);
+                attrs = {
+                    ...attrs,
+                    ...woundPenalties,
+                    "version": 2
+                };
+            }
+            
 
             if (Object.keys(attrs).length) {
                 setAttrs(attrs);
@@ -3754,25 +3763,15 @@
         });
     }
 
-    var updateWoundPenalties = function() {
-        getAttrs(["iron_stamina"], function(v) {
-            var ironStamina = parseInt(v.iron_stamina, 10);
-            var woundpenalties = '-1-2-3';
-            const setWound = {};
-            if (ironStamina >= 3) {
-                woundpenalties = '';
-            }
-            else if (ironStamina === 2) {
-                woundpenalties = '-1';
-            }
-            else if (ironStamina === 1) {
-                woundpenalties = '-1-2';
-            }
-            [...Array(16).keys()].forEach(num => {
-                setWound[`woundpenalties_${num+1}`]= woundpenalties;
-            });
-            setAttrs(setWound);
-        });
+    var getWoundPenalties = function(ironStamina) {
+        var maxPenalty = Math.min(ironStamina, 3) - 3;
+
+        // Whitespace instead of empty string to avoid displaying default value
+        return {
+            "wound_penalty_1": Math.min(maxPenalty + 2, 0) || " ",
+            "wound_penalty_2": Math.min(maxPenalty + 1, 0) || " ",
+            "wound_penalty_3": Math.min(maxPenalty, 0) || " "
+        };
     }
 
     var updatePotencyName = function() {
