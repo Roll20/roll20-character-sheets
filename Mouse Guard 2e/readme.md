@@ -20,8 +20,6 @@ Changes against Mouse Guard 1e character sheet:
 -removed sulprus pass/fail checkboxes for skills and abilities
 -removed Deiciver skill
 
-
-
 Marcin Segit ([Seji](https://app.roll20.net/users/4431572/seji) on roll20)
 
 Based on Mouse Guard 1e character sheet created by
