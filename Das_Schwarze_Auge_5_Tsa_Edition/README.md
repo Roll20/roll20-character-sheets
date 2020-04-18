@@ -2,6 +2,16 @@
 
 ## Änderungen
 
+2020-04-18:
+- Bugfix: Korrektur Berechnung Seelenkraft
+- Bugfix: NSC-Bogen Fernkampf, Reichweite ist jetzt ein Freitext
+
+Features
+- Für jede Fertigkeit wurde ein zusätzlicher Würfel für Fertigkeitsspezialisierung hinzugefügt. Dieser würfelt mit +2 Fertigkeitswert.
+- bei Schadenswürfeln ist jetzt der Würfel selbst zwischen W2, W3, W4, W6 und W20) auswählbar, Default ist W6
+- Es wurde ein zusätzlicher Zustand hinzugefügt, dessen Name frei belegt werden kann. Entsprechend kann dieser bei den Talenten aktiviert bzw. deaktiviert werden.
+
+
 2020-04-12:
 Features:
 - Der Bogen für NPCs und Monster ist endlich fertig! Unter Optionen kann man den NPC-Bogen aktivieren. Dadurch verändern sich der Grundwerte-Tab sowie der Kampftab. Unter Nahkampf und Fernkampf lassen sich jetzt direkt die Angriffe und Aktionen mit den jeweiligen AT/PA und TP-Würfeln per Add-Button hinzufügen. Die mit P gekennzeichneten Würfel stehen für den Passierschlag. Außerdem werden im Ausrüstungstab die BLöcke für Nah- und Fernkampfwaffen sowie Schilde und Rüstungen ausgeblendet. Die Modifikatoren aus Sonderfertigkeiten und Effekte funktionieren weiterhin. Falls ihr Fehler entdeckt, schickt mir bitte eine Nachricht.
