@@ -1,0 +1,1181 @@
+mixin container(opts)
+  input(type='radio' name='attr_move_preview' class=`sheet-${opts.class} sheet-hide` value=opts.radio)
+  div(class=`sheet-${opts.class} sheet-showhide`)
+    div.sheet-move-title.sheet-move-preview=opts.title
+    div.sheet-move-description
+      block
+    div.sheet-oracle-footer.sheet-move-page-footer=`Ironcrunch - ${opts.page}`
+    if opts.roll
+      div.sheet-roll-viewer
+        if opts.progress
+          label.sheet-roll-label Roll Progress
+            button(
+              type="roll"
+              title=opts.title
+              name=`roll${opts.name}`
+              class='sheet-hide'
+              value=`&{template:ironcrunch_progress} {{header=@{character_name}}} {{progressname=${opts.title}}} {{progress=[[?{Filled Progress|0}]]}} {{challenge1=[[d10]]}} {{challenge2=[[d10]]}}`
+            )
+        else if opts.oracle
+          label.sheet-roll-label Roll Oracle
+            button(
+              type="roll"
+              title=opts.title
+              name=`roll${opts.name}`
+              class='sheet-hide'
+              value=`&{template:ironcrunch_progress} {{header=@{character_name}}} {{progressname=${opts.title}}} {{progress=[[?{Filled Progress|0}]]}} {{challenge1=[[d10]]}} {{challenge2=[[d10]]}}`
+            )
+        else
+          label.sheet-roll-label Roll
+            button(
+              type="roll"
+              title=`${opts.title} Move`
+              class='sheet-hide'
+              name=`roll${opts.name}`
+              value!=`&{template:ironcrunch_moves} {{header=@{character_name}}} {{name=${opts.title}}} {{action=[[d12+${opts.stat}+(?{Modifier|0})]]}} {{negate1=[[1+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate2=[[2+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate3=[[3+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate4=[[4+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate5=[[5+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate6=[[6+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate7=[[7+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate8=[[8+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate9=[[9+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate10=[[10+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate11=[[11+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate12=[[12+${opts.stat_repeat}+(?{Modifier|0})]]}} {{challenge1=[[d20]]}} {{challenge2=[[d20]]}} {{momentum=[[@{momentum}]]}} {{modifiers=[[${opts.stat_repeat}+(?{Modifier|0})]]}} {{add=[[(?{Modifier|0})]]}} {{stat=[[${opts.stat_repeat}]]}}`
+            )
+          label.sheet-roll-label Roll with Encumberance
+            button(
+              type="roll"
+              title=`${opts.title} Move`
+              class='sheet-hide'
+              name=`roll${opts.name}`
+              value!=`&{template:ironcrunch_moves} {{header=@{character_name}}} {{name=${opts.title}}} {{action=[[d12+${opts.stat}+(?{Modifier|0})]]}} {{negate1=[[1+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate2=[[2+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate3=[[3+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate4=[[4+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate5=[[5+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate6=[[6+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate7=[[7+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate8=[[8+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate9=[[9+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate10=[[10+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate11=[[11+${opts.stat_repeat}+(?{Modifier|0})]]}} {{negate12=[[12+${opts.stat_repeat}+(?{Modifier|0})]]}} {{challenge1=[[d20]]}} {{challenge2=[[d20]]}} {{momentum=[[@{momentum}]]}} {{modifiers=[[${opts.stat_repeat}+(?{Modifier|0})]]}} {{add=[[(?{Modifier|0})]]}} {{stat=[[${opts.stat_repeat}]]}}`
+            )
+
+mixin faceDanger()
+  - var values = { title: 'Face Danger', name: 'FaceDanger', class: 'face-danger', page: 'page X', radio: 'face_danger', stat: `?{Stat|Edge&#44;@{edge}|Iron&#44;@{iron}|Heart&#44;@{heart}|Shadow&#44;@{shadow}|Wits&#44;@{wits}|Essence - Invoke&#44;?{Essence&amp;#124;0&amp;#125;&#125;`, stat_repeat: '?{Stat}', roll: true}
+  +container(values)
+    p When you attempt something risky or react to an imminent threat, envision your action and roll. If you act...
+    ul
+      li With speed, agility, or precision: Roll +edge.
+      li With charm, loyalty, or courage: Roll +heart.
+      li With aggressive action, forceful defense, strength, or endurance: Roll +iron.
+      li With deception, stealth, or trickery: Roll +shadow.
+      li With expertise, insight, or observation: Roll +wits.
+    p On a strong hit, you are successful. Take +2 momentum.
+    p On a weak hit, you succeed, but face a troublesome cost. Choose one.
+    ul
+      li You are delayed, lose advantage, or face a new danger: Suffer -1 momentum (-2 if you used a shield).
+      li Your shield loses durability: Reduce its Face Danger/Clash addition by 1.
+      li You are tired or hurt: Endure Harm (1d3P harm).
+      li You are dispirited or afraid: Endure Stress (1 stress).
+      li You sacrifice resources: Suffer -1 supply or -1 wealth.
+      li You get a negative condition: Take a condition.
+    p On a miss, you fail, or your progress is undermined by a dramatic and costly turn of events. Pay the Price. If you are in combat.
+
+mixin secureAnAdvantage()
+  - var values = { title: 'Secure an Advantage', name: 'SecureAnAdvantage', class: 'secure-an-advantage', page: 'page X', radio: 'secure_an_advantage', stat: ``, stat_repeat: '?{Stat}', roll: true }
+  +container(values)
+    p When you assess a situation, make preparations, or attempt to gain leverage, envision your action and roll. If you act...
+      li With speed, agility, or precision: Roll +edge.
+      li With charm, loyalty, or courage: Roll +heart.
+      li With aggressive action, forceful defense, strength, or endurance: Roll +iron.
+      li With deception, stealth, or trickery: Roll +shadow.
+      li With expertise, insight, or observation: Roll +wits.
+    p On a strong hit, you gain advantage. Choose one.
+      li Take control: Make another move now (not a progress move), and add +2.
+      li Prepare to act: Take +4 momentum.
+    p On a weak hit, your advantage is short-lived. Take +2 momentum.
+    p On a miss, you fail or your assumptions betray you. Pay the Price.
+
+mixin gatherInformation()
+  - var values = { title: 'Gather Information', name: 'GatherInformation', class: 'gather-information', page: 'page X', radio: 'gather_information', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you search an area, ask questions, conduct an investigation, or follow a track, roll +wits. If you act within a community or ask questions of a person with whom you share a bond, add +2.
+    p On a strong hit, you discover something helpful and specific. The path you must follow or action you must take to make progress is made clear. Envision what you learn, and take +4 momentum.
+    p On a weak hit, you discover something helpful, but the information complicates your quest or a new danger is introduced. Envision what you discover, and take +2 momentum.
+    p On a miss, your investigation unearths a dire threat or reveals an unwelcome truth that undermines your quest. Pay the Price.
+
+mixin undertakeAJourney()
+  - var values = { title: 'Undertake a Journey', name: 'UndertakeAJourney', class: 'undertake-a-journey', page: 'page X', radio: 'undertake_a_journey', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you travel across hazardous or unfamiliar lands, set the rank of your journey.
+    ul
+      li Troublesome journey: 3 progress per waypoint.
+      li Dangerous journey: 2 progress per waypoint.
+      li Formidable journey: 1 progress per waypoint.
+      li Extreme journey: 2 ticks per waypoint.
+      li Epic journey: 1 tick per waypoint.
+    p Then, for each segment of your journey, roll +wits. If you are setting off from a community with which you share a bond, add +2 to your initial roll.
+    p If you are making this move for the fourth time, without having done the Make Camp move or Sojourn move, take a condition as appropriate to the circumstances.
+    p On a strong hit, choose one.
+    ul
+      li You make good use of your resources: Mark progress and take +2 momentum.
+      li You move with scrutiny: Mark progress and Find an Opportunity.
+      li You move at speed: Mark progress twice and take +1 momentum, but suffer -1 supply.
+    p On a weak hit, choose one.
+    ul
+      li You go as expected: Mark progress, but suffer -1 supply.
+      li You move with precaution: Mark progress and Find an Opportunity, but suffer -1 supply and -2 momentum.
+      li You move at speed, but with a cost: Mark progress twice and take +1 momentum, but suffer -2 supply and Reveal a Danger.
+      li You explore: Find an Opportunity, but suffer -1 momentum.
+    p On a miss, you have gone hopelessly astray, your objective is lost to you, or you were misled about your destination. If your journey continues, clear all but one filled progress, and raise the journey's rank by one (if not already epic).
+
+mixin reachYourDestination()
+  - var values = { title: 'Reach Your Destination', name: 'ReachYourDestination', class: 'reach-your-destination', page: 'page X', radio: 'reach_your_destination', stat: ``, stat_repeat: '', roll: true, progress: true }
+  +container(values)
+    p Progress Move
+    p When your journey comes to an end, roll the challenge dice and compare to your progress. Momentum is ignored on this roll.
+    p On a strong hit, the situation at your destination favors you. Choose one.
+    ul
+      li Make another move now (not a progress move), and add +2.
+      li Take +2 momentum.
+    p On a weak hit, you arrive but face an unforeseen hazard or complication. Envision what you find, and take +1 momentum.
+    p On a miss, you have gone hopelessly astray, your objective is lost to you, or you were misled about your destination. If your journey continues, clear all but one filled progress, and raise the journey’s rank by one (if not already epic).
+
+mixin discoverASite()
+  - var values = { title: 'Discover a Site', name: 'DiscoverASite', class: 'discover-a-site', page: 'page X', radio: 'discover_a_site', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you resolve to enter a perilous site in pursuit of an objective, choose the theme and domain which best represent its nature, and give it a rank.
+    ul
+      li Troublesome site: 3 progress per area.
+      li Dangerous site: 2 progress per area.
+      li Formidable site: 1 progress per area.
+      li Extreme site: 2 ticks per area.
+      li Epic site: 1 tick per area.
+    p If you are returning to a previously explored site, roll both challenge dice, take the lowest value, and clear that number of progress boxes.
+    p Then, Delve the Depths to explore this place.
+
+mixin delveTheDepths()
+  - var values = { title: 'Delve the Depths', name: 'DelveTheDepths', class: 'delve-the-depths', page: 'page X', radio: 'delve_the_depths', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you traverse an area within a perilous site, envision your surroundings. Then, consider your approach. If you navigate this area…
+    ul
+      li With haste: Roll +edge.
+      li With stealth or trickery: Roll +shadow.
+      li With observation, intuition, or expertise: Roll +wits.
+    p On a strong hit, you delve deeper. Mark progress and Find an Opportunity.
+    p On a weak hit, roll on the following table according to your stat.
+    p On a miss, Reveal a Danger.
+    .sheet-move-table
+      .sheet-move-delve-row-header
+        .sheet-move-delve-column-stat-header-1 Edge
+        .sheet-move-delve-column-stat-header-2 Shadow
+        .sheet-move-delve-column-stat-header-3 Wits
+        .sheet-move-delve-column-header Weak Hit Result 
+      .sheet-oracle-row
+        .sheet-move-delve-stat-column-1 1-45 (45%)
+          .sheet-move-delve-stat-column-2 1-30 (30%)
+          .sheet-move-delve-stat-column-3 1-40 (40%)
+          .sheet-move-delve-column Mark progress and <em>Reveal a Danger.</em>
+      .sheet-oracle-row
+        .sheet-move-delve-stat-column-1 46-65 (20%)
+        .sheet-move-delve-stat-column-2 31-65 (35%)
+        .sheet-move-delve-stat-column-3 41-55 (15%)
+        .sheet-move-delve-column Mark progress.
+      .sheet-oracle-row 
+        .sheet-move-delve-stat-column-1 66-75 (10%)
+        .sheet-move-delve-stat-column-2 66-90 (25%)
+        .sheet-move-delve-stat-column-3 56-80 (25%)
+        .sheet-move-delve-column Choose one: Mark progress or <em>Find an Opportunity.</em>
+      .sheet-oracle-row 
+        .sheet-move-delve-stat-column-1 76-80 (5%)
+        .sheet-move-delve-stat-column-2 91-99 (9%)
+        .sheet-move-delve-stat-column-3 81-99 (19%)
+        .sheet-move-delve-column Take both: Mark progress and <em>Find an Opportunity.</em>
+      .sheet-oracle-row 
+        .sheet-move-delve-stat-column-1 81-00 (20%)
+        .sheet-move-delve-stat-column-2 00 (1%)
+        .sheet-move-delve-stat-column-3 00 (1%)
+        .sheet-move-delve-column Mark progress twice and <em>Reveal a Danger.</em>
+
+mixin checkYourGear()
+  - var values = { title: 'Check Your Gear', name: 'CheckYourGear', class: 'check-your-gear', page: 'page X', radio: 'check_your_gear', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When you check to see if you have a specific helpful item, and you have at least +1 supply, roll +supply.
+    p On a strong hit, you have it. Take +2 momentum.
+    p On a weak hit, you have it, but your resources are diminished. Take +2 momentum and suffer -1 supply.
+    p On a miss, you don’t have it and the situation grows more perilous. Pay the Price.
+
+mixin locateYourObjective()
+  - var values = { title: 'Locate Your Objective', name: 'LocateYourObjective', class: 'locate-your-objective', page: 'page X', radio: 'locate_your_objective', stat: ``, stat_repeat: '', roll: true, progress: true }
+  +container(values)
+    p When your exploration of a site comes to an end, roll the challenge dice and compare to your progress.
+    ul
+      li Make another move now (not a progress move), and add +2.
+      li Take +2 momentum.
+    p On a weak hit, you locate your objective but face an unforeseen hazard or complication. Envision what you find.
+    p On a miss, your objective falls out of reach, you have been misled about the nature of your objective, or you discover that this site holds unexpected depths. If you continue your exploration, clear all but one filled progress and raise the site’s rank by one (if not already epic).
+
+mixin escapeTheDepths()
+  - var values = { title: 'Escape the Depths', name: 'EscapeTheDepths', class: 'escape-the-depths', page: 'page X', radio: 'escape_the_depths', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you flee or withdraw from a site, consider the situation and your approach. If you...
+    ul
+      li Find the fastest way out: Roll +edge.
+      li Steel yourself against the horrors of this place: Roll +heart.
+      li Fight your way out: Roll +iron.
+      li Keep out of sight: Roll +shadow.
+      li Retrace your steps or locate an alternate path: Roll +wits.
+    p On a strong hit, you make your way safely out of the site. Take +2 momentum.
+    p On a weak hit, you find your way out, but this place exacts its price. Choose one.
+    ul
+      li You are weary or wounded: Endure Harm with no armor addition (as per the site’s rank, piercing).
+      li The experience leaves you shaken: Endure Stress (as per the site’s rank).
+      li Your body or mind are marked. Take a condition.
+      li You are delayed, and it costs you. Suffer -momentum as per the site’s rank.
+      li You face a new complication as you emerge from the depths. Suffer -1 momentum.
+      li A denizen plots their revenge. Suffer -3 momentum.
+    p On a miss, a dire threat or imposing obstacle stands in your way. Reveal a Danger. If you survive, you may make your escape.
+
+mixin compel()
+  - var values = { title: 'Compel', name: 'Compel', class: 'compel', page: 'page X', radio: 'compel', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you persuade someone to do something, envision your approach and roll. If you...
+    ul
+      li Charm, pacify, barter, or convince: Roll +heart (add +2 if you share a bond).
+      li Threaten or incite: Roll +iron.
+      li Lie or swindle: Roll +shadow.
+      li Flaunting or boasting: Roll +wealth or +supply.
+    p On a strong hit, they’ll do what you want or share what they know. Take +2 momentum. If you use this exchange to Gather Information, make that move now and add +2.
+    p On a weak hit, as above, but they ask something of you in return; envision what they want. If you are making this move to persuade a conditional companion, suffer -1 loyalty instead.
+    p On a miss, they refuse or make a demand which costs you greatly. Pay the Price; if you are making this move by interacting with a conditional companion, suffer -1 loyalty instead.
+
+mixin sojourn()
+  - var values = { title: 'Sojourn', name: 'Sojourn', class: 'sojourn', page: 'page X', radio: 'sojourn', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you spend time in a community, roll +heart. If you share a bond, add +2.
+    p On strong hit, clear a starved condition; then, you and your allies may each choose two from within the categories below. On a weak hit, choose one. If you share a bond, choose one more.
+    p On a hit, you and your allies may each reduce the severity of the amnesiac condition by 1, or clear the dazed condition. Then, you and your allies may each focus on one of your chosen recover actions and roll +heart again. If you share a bond, add +2. On a strong hit, take the double for that action. On a weak hit, take +2 more. On a miss, it goes badly and you lose all benefits for that action.
+    p Clear a Condition
+    ul
+      li Mend: Clear a blinded, deafened, palsied, poisoned, weakened and wounded condition. Then, take 25% of your maximum health.
+      li Cheer: Reduce the severity of a compulsed and hallucinating condition by 1, and clear a shaken, stupefied and unsteady condition. Then, take +2 spirit.
+      li Equip: Clear an unprepared condition. Then, take +2 supply.
+    p Recover
+    ul
+      li Recuperate: Take +50% of maximum health for yourself and any companions.
+      li Consort: Take +4 spirit.
+      li Stock: Take +4 supply.
+      li Plan: Take +4 momentum.
+    p Cohabitate
+    ul
+      li Tune in to the bruits: Envision how you listen for rumors or acquire information from the community. Then, Gather Information, and add +4.
+      li Provide aid: Envision what this community needs, or what trouble it is facing. If you chose to help, Swear an Iron Vow and add +2.
+    p On a miss, you find no help here. Pay the Price.
+
+mixin aidYourAlly()
+  - var values = { title: 'Aid Your Ally', name: 'AidYourAlly', class: 'aid-your-ally', page: 'page X', radio: 'aid_your_ally', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When you Secure an Advantage in direct support of an ally, and score a hit, they (instead of you) can take the benefits of the move.
+
+mixin drawTheCircle()
+  - var values = { title: 'Draw the Circle', name: 'DrawTheCircle', class: 'draw-the-circle', page: 'page X', radio: 'draw_the_circle', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you challenge someone to a formal duel, or accept a challenge, roll +heart. If you share a bond with this community, add +2.
+    p On a strong hit, take +2 momentum. You may also choose any boasts and take +2 momentum for each.
+    p On a weak hit, you may choose up to two boasts in exchange for +2 momentum for each.
+    ul
+      li Grant first strike: Your foe has initiative.
+      li Bare yourself: Take no benefit of armor or shield.
+      li Hold no iron: Take no benefit of weapons.
+      li Bloody yourself: Endure Harm (1d3P harm) with no addition.
+      li To the death: This fight must end with death.
+    p On a miss, you begin the duel at a disadvantage. Pay the Price.
+
+mixin forgeABond()
+  - var values = { title: 'Forge a Bond', name: 'ForgeABond', class: 'forge-a-bond', page: 'page X', radio: 'forge_a_bond', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you spend significant time with a person or community, stand together to face hardships, or make sacrifices for their cause, you can attempt to create a bond. When you do, roll +heart. If you make this move after you successfully Fulfill Your Vow to their benefit, you may reroll any dice.
+    p On a strong hit, make note of the bond, mark a tick on your bond progress track, and choose one.
+    ul
+      li Take +2 spirit.
+      li Take +4 momentum.
+    p On a weak hit, they ask something more of you first. Envision what it is, do it (or Swear an Iron Vow), and mark the bond. If you refuse or fail, Pay the Price.
+    p On a miss, they reject you. Pay the Price.
+
+mixin testYourBond()
+  - var values = { title: 'Test Your Bond', name: 'TestYourBond', class: 'test-your-bond', page: 'page X', radio: 'test_your_bond', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When your bond is tested through conflict, betrayal, or circumstance, roll +heart.
+    p On a strong hit, this test has strengthened your bond. Choose one.
+    ul
+      li Take +2 spirit.
+      li Take +4 momentum.
+    p On a weak hit, your bond is fragile and you must prove your loyalty. Envision what they ask of you, and do it (or Swear an Iron Vow). If you refuse or fail, clear the bond and Pay the Price.
+    p On a miss, or if you have no interest in maintaining this relationship, clear the bond and Pay the Price.
+
+mixin writeYourEpilogue()
+  - var values = { title: 'Write Your Epilogue', name: 'WriteYourEpilogue', class: 'write-your-epilogue', page: 'page X', radio: 'write_your_epilogue', stat: ``, stat_repeat: '', roll: tru, progress: true }
+  +container(values)
+    p Progress Move
+    p When you retire from your life as an Oathkeeper, envision two things: What you hope for, and what you fear. Then, roll the challenge dice and compare to your bonds.
+    p On a strong hit, things come to pass as you hoped.
+    p On a weak hit, your life takes an unexpected turn, but not necessarily for the worse. You find yourself spending your days with someone or in a place you did not foresee. Envision it.
+    p On a miss, your fears are realized.
+
+mixin conditionalCompanionActs()
+  - var values = { title: 'Conditional Companion Acts', name: 'ConditionalCompanionActs', class: 'conditional-companion-acts', page: 'page X', radio: 'conditional_companion_acts', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When a conditional companion is in position to make a move according to their drives, motivations or the fulfillment of their goal, they do so without suffering -loyalty. Make the move by rolling +their stat.
+
+mixin takeConditionalCompanion()
+  - var values = { title: 'Take Conditional Companion', name: 'TakeConditionalCompanion', class: 'take-conditional-companion', page: 'page X', radio: 'take_conditional_companion', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you meet a character with the same objective as you, or that is willing to follow you in exchange of getting paid, you may attempt to convince them to join your quest. If you do, roll +heart; if the character is a hireling, roll +wealth instead. If you share a bond, you may reroll any dice.
+    p On a strong hit, the character joins you as a conditional companion. Fill their companion sheet, setting their loyalty track as your heart+2 (maximum is 10). If the companion is a hireling, suffer -2 wealth.
+    p On a weak hit, as above, but they ask something of you in return; envision what they want.
+    p On a miss, the character refuses to join you or make a demand that cost you greatly. Pay the Price.
+
+mixin strengthenTheirLoyalty()
+  - var values = { title: 'Strengthen Their Loyalty', name: 'StrengthenTheirLoyalty', class: 'strengthen-their-loyalty', page: 'page X', radio: 'strengthen_their_loyalty', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you dedicate yourself to spend a significant time with your companion, envision that moment and roll +heart. If your companion is a hireling, roll +wealth instead. If you share a bond, you may reroll any dice.
+    p On a strong hit, your conditional companion feels more akin with your company. Give +your heart+2 to their loyalty. If the conditional companion is a hireling, also suffer -1 wealth. If you use this exchange to Forge a Bond, make that move now and add +2.
+    p On a weak hit, as above, but you must also choose one.
+    ul
+      li It was emotionally demanding: Endure Stress (1 stress).
+      li It was resource demanding: Suffer -1 supply.
+      li It was time consuming: Suffer -2 momentum.
+    p On a miss, the moment doesn’t go as expected. Pay the Price.
+
+mixin companionBecomesUnconditional()
+  - var values = { title: 'Companion Becomes Unconditional', name: 'CompanionBecomesUnconditional', class: 'companion-becomes-unconditional', page: 'page X', radio: 'companion_becomes_unconditional', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When your conditional companion is determined to follow you, envision how they express their resolution to stand by your side unconditionally. Then, acquire a companion asset to represent them in exchange for the asset health+1 experience. Erase the goal and drives fields from their companion sheet. You no longer use their loyalty track.
+
+mixin orderConditionalCompanion()
+  - var values = { title: 'Order Conditional Companion', name: 'OrderConditionalCompanion', class: 'order-conditional-companion', page: 'page X', radio: 'order_conditional_companion', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you ask a conditional companion to act for something not akin to their drives, motivations or the fulfillment of their goal, or if the conditional companion is a hireling, roll +loyalty. If you share a bond, you may reroll any dice.
+    p On a strong hit, your Conditional Companion Acts, but suffer -1 to their loyalty.
+    p On a weak hit, your Conditional Companion Acts, but not without whimper. Suffer -2 to their loyalty.
+    p On a miss, your conditional companion refuses to follow your request. Suffer -2 to their loyalty.
+
+mixin notAssistConditionalCompanion()
+  - var values = { title: 'Not Assist Conditional Companion', name: 'NotAssistConditionalCompanion', class: 'not-assist-conditional-companion', page: 'page X', radio: 'not_assist_conditional_companion', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When a conditional companion suffers the consequence of one of your moves and you don’t come to their aid, suffer -1 to their loyalty.
+
+mixin testTheirLoyalty()
+  - var values = { title: 'Test their Loyalty', name: 'TestTheirLoyalty', class: 'test-their-loyalty', page: 'page X', radio: 'test_their_loyalty', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When your conditional companion’s loyalty is at its minimum (0), you can attempt to convince them to stay by your side. If you do, roll +heart. If the companion is a hireling, roll +wealth instead. Add +2 if you share a bond. If their goal is lost to you, count this move as a miss.
+    p On a strong hit, your companion stands by your side. Give +you heart+1 to their loyalty. Take +1 momentum.
+    p On a weak hit, as above, but they ask something in return. Choose one.
+    ul
+      li Provisions: Suffer -2 supply.
+      li A valuable item: Dicard an equipment or consumable item, or suffer -1 wealth.
+      li A promise: Envision what they ask of you that need to be resolved besides their current goal, and Swear an Iron Vow to do it.
+    p On a miss, or if you have no interest in them to follow you, the Conditional Companion Abandons you. If you share a bond with them, also Test Your Bond.
+
+mixin conditionalCompanionAbandons()
+  - var values = { title: 'Conditional Companion Abandons', name: 'ConditionalCompanionAbandons', class: 'conditional-companion-abandons', page: 'page X', radio: 'conditional_companion_abandons', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When your conditional companion has fulfilled their goal or is no longer willing to follow you, they will leave you at the next opportunity.
+
+mixin enterTheFray()
+  - var values = { title: 'Enter the Fray', name: 'EnterTheFray', class: 'enter-the-fray', page: 'page X', radio: 'enter_the_fray', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you enter in combat, determine who is in control. If you are...
+    ul
+      li Reacting: Roll +edge.
+      li Facing off: Roll +heart.
+      li Charging: Roll +iron.
+      li Ambushing: Roll +shadow.
+      li Ambushed: Roll +wits.
+    p On a strong hit, take +4 momentum. You have initiative.
+    p On a weak hit, choose one.
+    ul
+      li Bolster your position: Take +4 momentum. Your foe has initiative.
+      li Prepare to act: Take initiative.
+    p On a miss, combat begins with you at a disadvantage. Pay the Price. Your foe has initiative.
+
+mixin strike()
+  - var values = { title: 'Strike', name: 'Strike', class: 'strike', page: 'page X', radio: 'strike', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you have initiative and attack with the intent to inflict harm, determine if you are hitting your foe’s protection or breaking their defense rating. If you are foe’s protection is 0 or you are doing the latter, fix one challenge die as per your foe’s defense rating. Then, envision your approach. If you're making this move repeatedly, but with another offensive maneuver, add +1. If you…
+    ul
+      li Attack in close quarters: Roll +iron.
+      li Attack at range or with a precise weapon: Roll +edge.
+      li Attack an unaware target, or without warning, at close range: Roll +shadow.
+    p On a strong hit, Inflict Harm and add +1. You retain the initiative.
+    p On a weak hit, Inflict Harm and lose the initiative. If you are attacking at range, choose one.
+    ul
+      li Your attack winged: Roll twice and use the lowest result.
+      li You wasted ammo: Suffer -1 supply.
+      li Your thrown weapon is lost or destroyed.
+      li You attract unexpected attention: Suffer -1 momentum.
+    p If you are attacking a foe that is unaware and score a hit, envision you strike. On a strong hit, you go undetected; when you Inflict Harm, you may suffer -1 momentum and choose two. On a weak hit, you hit your target, but not without getting spotted; when you Inflict Harm, you may suffer -1 momentum and chose one; then, Enter the Fray.
+    ul
+      li You strike fiercely: Inflict +1d4 harm.
+      li You strike on a weak spot: Your harm is penetrating.
+      li You find the best way to strike: You may reroll any dice.
+    p On a miss, your foe has initiative. 
+
+mixin inflictHarm()
+  - var values = { title: 'Inflict Harm', name: 'Inflict Harm', class: 'inflict-harm', page: 'page X', radio: 'inflict_harm', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When you deal physical damage, roll your weapon’s harm. If you are hitting your foe’s protection and not breaking their defense rating, subtract your foe’s protection from each roll. Your foe suffers -health with the resulting score.
+
+mixin foeInflictsHarm()
+  - var values = { title: 'Foe Inflicts Harm', name: 'FoeInflictsHarm', class: 'foe-inflicts-harm', page: 'page X', radio: 'foe_inflicts_harm', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When you face harm from a foe, roll their combat move harm and Endure Harm with the resulting score.
+
+mixin clash()
+  - var values = { title: 'Clash', name: 'Clash', class: 'clash', page: 'page X', radio: 'clash', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When your foe has initiative and you fight back, determine if you are hitting your foe’s protection or breaking their defense rating. If your foe’s protection is 0 or you are doing the latter, fix one challenge die as per your foe’s defense rating. Then, envision the contending. If you…
+    ul
+      li Fight in close quarters: Roll +iron.
+      li Exchange a volley at range, shoot at an advancing foe, or fight with a precise weapon: Roll +edge.
+    p If you are using two light weapons, add +the harm of one of them to this move.
+    p On a strong hit, Inflict Harm and choose one. You have the initiative.
+    ul
+      li You get in position: Take +2 momentum.
+      li You find an opening: Inflict +1 harm.
+    p On a weak hit, choose one.
+    ul
+      li Inflict Harm and Pay the Price. Your foe has initiative.
+      li Take the initiative if you used a shield.
+    p If you used a shield or attacked at ranged, also choose one.
+    ul
+      li You are overwhelmed: Suffer -2 momentum.
+      li Your shield loses durability: Reduce its Face Danger/Clash addition by 1.
+      li You wasted ammo: Suffer -1 supply.
+      li The thrown weapon you used is lost or destroyed.
+    p On a miss, you are outmatched. As above, but you don't Inflict Harm. Your foe has the initiative.
+
+mixin endTheFight()
+  - var values = { title: 'End the Fight', name: 'EndTheFight', class: 'end-the-fight', page: 'page X', radio: 'end_the_fight', stat: ``, stat_repeat: '', roll: true, progress: true }
+  +container(values)
+    p Progress Move
+    p When your foe’s health is below 10 for harm suffered, you may resolve the outcome of this fight. If you do, roll the challenge dice and compare to your progress.
+    p On a strong hit, this foe is no longer in the fight. They are killed, out of action, flee, or surrender as appropriate to the situation and your intent.
+    p On a weak hit, as above, but you must also choose one.
+    ul
+      li It’s worse than you thought: Endure Harm with no armor addition.
+      li You are overcome: Endure Stress.
+      li You harvest the spoils of the battle: Take a condition.
+      li You suffer collateral damage: Something of value is lost or broken (suffer -supply or -wealth), or someone important must pay the cost.
+      li A new danger or foe appears, or an existing danger worsens: Suffer -2 momentum.
+      li Others won’t forget or you are marked for vengeance: Suffer -3 momentum.
+      li An objective falls out of reach: Forsake Your Vow.
+    p On a miss, choose one.
+    ul
+      li Your foe has not given up; set their health to 50% of their maximum, rounding down. Then, Pay the Price.
+      li You have lost this fight.
+
+mixin turnTheTide()
+  - var values = { title: 'Turn the Tide', name: 'TurnTheTide', class: 'turn-the-tide', page: 'page X', radio: 'turn_the_tide', stat: ``, stat_repeat: '' }
+  +container(values)
+    p Once per fight, when you risk it all, you may steal initiative from your foe to make a move (not a progress move). When you do, add +2 and take +2 momentum on a hit.
+    p If you fail to score a hit on that move, you must suffer a dire outcome. Pay the Price.
+
+mixin battle()
+  - var values = { title: 'Battle', name: 'Battle', class: 'battle', page: 'page X', radio: 'battle', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you fight a battle, and it happens in a blur, envision your objective and roll. If you primarily fight…
+    ul
+      li At range, or using speed and your surroundings to your advantage: Roll +edge.
+      li Depending on your courage and others: Roll +heart.
+      li In close to overpower your opponents: Roll +iron.
+      li Using trickery to befuddle your opponents: Roll +shadow.
+      li Using careful tactics to outsmart your opponents: Roll +wits.
+    p On a strong hit, you achieve your objective with a hard-won victory. Choose one of the weak hit options of the End the Fight move.
+    p On a weak hit, you achieve your objective, but not without a significant cost. Choose two of the weak hit options of the End the Fight move.
+    p On a miss, you are defeated and the objective is lost to you. Pay the Price.
+
+//- Other Moves to Make In Combat
+//- Face Danger: When overcoming an obstacle, avoiding a hazard, fleeing, or evading an attack (without counter it).
+//- Secure an Advantage: When acting to outwit or outmaneuver your foe, or setting up another move.
+//- Aid Your Ally: When making a move to give your ally an advantage.
+//- Compel: When surrendering, coercing your foe to stand down, or negotiating a truce.
+//- Conditional Companion Acts: When a conditional companion makes a move to follow their agenda.
+//- Order Conditional Companion: When you command a conditional companion to make a move that don’t follow their agenda.
+//- Not Assist Conditional Companion: When a conditional companion suffers from one of your decision and you don’t succor them.
+//- Test Their Loyalty: When your conditional companion’s stand by your side is tested.
+//- Heal: When you take time to attend physical harm.
+//- Hearten: When you aid someone to recover from mental harm.
+//- Burn Momentum: When you improve the outcome of a move by leveraging on your successes.
+//- Make an Effort: When you improve the outcome of a move by demanding more of yourself.
+//- Show Resilience: When you improve the outcome of a move by leveraging on your failures.
+//- Suffer Moves (all): When facing physical damage, mental trauma, or lack of supply.
+//- Pay the Price and Manifest Insanity: When suffering the outcome of certain moves.
+
+mixin heal()
+  - var values = { title: 'Heal', name: 'Heal', class: 'heal', page: 'page X', radio: 'heal', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you receive care or treat an injury or ailment, envision the situation and roll. If you…
+    ul
+      li Receive treatment from someone (not an ally or companion): Roll +iron.
+      li Mend your own wounds: Roll +iron or +wits, whichever is lower.
+      li Provide care: Roll +wits.
+    p On a strong hit, your care is helpful. If you (or the ally under your care) have the palsied, wounded, reeled or dying conditions, you may clear them. Then, take or give up to +4 health.
+    p If you are making this move using an antivenom, clear the poisoned condition instead of the stated above.
+    p On a weak hit, as above, but you must suffer -2 supply or -2 momentum (your choice).
+    p On a miss, the aid is ineffective. Pay the Price.
+
+mixin hearten()
+  - var values = { title: 'Hearten', name: 'Hearten', class: 'hearten', page: 'page X', radio: 'hearten', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you speak encouraging words, or find a moment of peace, to help you, or someone else, to recover from stress or emotional trauma, roll +heart.
+    p On a strong hit, your heartening is helpful. If you (or the ally under your care) have the shaken condition, you may clear them; you may also reduce the severity of a compulsed and hallucinating conditions by 1. Then, take or give up to +3 spirit.
+    p On a weak hit, as above, but you must suffer -2 momentum and don’t reduce the severity of any condition.
+    p On a miss, your aid is ineffective. Pay the Price.
+
+mixin patchEquipment()
+  - var values = { title: 'Patch Equipment', name: 'PatchEquipment', class: 'patch-equipment', page: 'page X', radio: 'patch_equipment', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you attempt to amend an armor or shield, envision how provisions from your gear help you patch the piece of equipment and suffer -2 supply. Then, roll +wits.
+    p On a strong hit, your amendment is efficient. Choose one.
+    ul
+      li Rise by 1 your armor’s protection.
+      li Rise by 1 your armor’s Endure Harm addition.
+      li Rise by 1 your shield’s Face Danger/Clash addition.
+    p On a weak hit, as above, but the patch work takes longer than expected or demand extra resources. Suffer -2 momentum.
+    p On a miss, your craft is ineffective. Pay the Price.
+
+mixin resupply()
+  - var values = { title: 'Resupply', name: 'Resupply', class: 'resupply', page: 'page X', radio: 'resupply', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you hunt, forage or scavenge, roll +wits.
+    p On a strong hit, you bolster your resources. If you have the unprepared condition, you may clear it. Then, take up to +3 supply and +1d2-1 wealth.
+    p On a weak hit, take up to +2 supply, but suffer -1 momentum for each.
+    p On a hit, if you are looting the dead, envision what you loot according to the dead’s wearing, gear or nature and take +wealth according to its rank. If the rank is...
+    ul
+      li Troublesome: Take +1d2-1
+      li Dangerous: Take +1d2 wealth.
+      li Formidable: Take +1d3 wealth.
+      li Extreme: Take +1d4 wealth.
+      li Epic: Take +1d6 wealth.
+    p On a miss, you find nothing helpful or your assumptions betray you. Pay the Price.
+
+mixin makeCamp()
+  - var values = { title: 'Make Camp', name: 'MakeCamp', class: 'make-camp', page: 'page X', radio: 'make_camp', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you rest and recover for several hours in the wild, roll +supply.
+    p On a strong hit, if you have the dazed or starved conditions, you may clear them. Then, you and your allies may each choose two.
+    p On a weak hit, as above, but you and your allies may choose one instead.
+    ul
+      li Recuperate: Take +25% of your maximum health. If you have the blinded, deafened or weakened conditions, you may clear them.
+      li Partake: Suffer -3 supply and take +25% of maximum health for you and any companions. If you or your companion you are partaking with has the conditions of in the above option, you may clear them.
+      li Relax: Take +2 spirit. If you have the unsteady condition, you may clear it.
+      li Focus: Take +3 momentum. If you have the stupefied condition, you may clear it.
+      li Prepare: When you break camp, add +2 if you Undertake a Journey.
+    p On a miss, you take no comfort. Pay the Price.
+
+mixin takeADowntime()
+  - var values = { title: 'Take a Downtime', name: 'TakeADowntime', class: 'take-a-downtime', page: 'page X', radio: 'take_a_downtime', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When you spend weeks or months recuperating in a safe place and have at least 1 experience, suffer -1 experience in exchange of the following.
+    ul
+      li Clear your conditions (not corrupted nor maimed).
+      li Set your tracks to their maximum.
+      li Reset your momentum.
+      li Take +2d4+2 wealth.
+
+mixin endureHarm()
+  - var values = { title: 'Endure Harm', name: 'EndureHarm', class: 'endure-harm', page: 'page X', radio: 'endure_harm', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you face physical damage, subtract your armor’s protection to the harm and suffer -health equal to the remaining harm. If your health is reduced 0, suffer -momentum equal to any remaining -health.
+    p Then roll +iron.
+    p On a strong hit, you stand firm. If your health is suffering harm, choose one.
+    ul
+      li Shake it off: If your health is greater than 0, suffer up to -2 momentum in exchange for the same amount of +health.
+      li Embrace the pain: Take +2 momentum.
+    p On a weak hit, you press on. If you wear armor which values are not at its minimum (0), choose one.
+    ul
+      li It loses coverage: Reduce its Endure Harm addition by 1.
+      li It loses resistance: Suffer -1 to its protection.
+      li You stumble: Suffer -2 momentum.
+    p On a miss, also suffer -1 momentum. If you wear an armor which values are not at its minimum (0), choose as above. If you are at 0 health, you must take the wounded or maimed condition (if currently not taken) or roll on the following table.
+    .sheet-oracle-table 
+      .oracle-row 
+        span.sheet-oracle-roll 1-10 (10%)
+        span.sheet-oracle-result The harm is mortal. <em>Face Death.</em>
+      .oracle-row 
+        span.sheet-oracle-roll 11-20 (10%)
+        span.sheet-oracle-result Take the dying condition.
+      .oracle-row 
+        span.sheet-oracle-roll 21-35 (15%)
+        span.sheet-oracle-result Take the unconscious condition.
+      .oracle-row 
+        span.sheet-oracle-roll 36-50 (15%)
+        span.sheet-oracle-result Take the reeled condition.
+      .oracle-row 
+        span.sheet-oracle-roll 51-00 (50%)
+        span.sheet-oracle-result You are battered but still standing.
+
+mixin faceDeath()
+  - var values = { title: 'Face Death', name: 'FaceDeath', class: 'face-death', page: 'page X', radio: 'face_death', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you are brought to the brink of death, roll +heart.
+    p On a strong hit, death rejects you.
+    p On a weak hit, choose one.
+    ul
+      li You die, but not before making a noble sacrifice. Envision your final moments.
+      li Death desires something of you in exchange for your life. Envision what it wants, and Swear an Iron Vow (formidable or extreme) to complete that quest. If you fail to score a hit when you Swear an Iron Vow, or refuse the quest, you are dead. Otherwise, you return to the mortal world and are now cursed. You may only clear the cursed condition by completing the quest.
+    p On a miss, you are dead.
+
+mixin faceASetback()
+  - var values = { title: 'Face a Setback', name: 'FaceASetback', class: 'face-a-setback', page: 'page X', radio: 'face_a_setback', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When your momentum is at its minimum (-6), make a moveyou’re your action die matches your negative momentum, you must cancel your action die.
+    p If you suffer additional -momentum, choose one.
+    ul
+      li Exchange each additional -momentum for any combination of -health, -spirit, -supply, -wealth or -companion’s loyalty as appropriate to the circumstances.
+      li Envision an event or discovery which undermines your progress in a current quest, journey or fight. Then, for each additional -momentum, clear 1 unit of progress on that track per its rank (troublesome=clear 3 progress; dangerous=clear 2 progress; formidable=clear 1 progress; extreme=clear 2 ticks; epic=clear 1 tick).
+
+mixin endureStress()
+  - var values = { title: 'Endure Stress', name: 'EndureStress', class: 'endure-stress', page: 'page X', radio: 'endure_stress', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you face mental shock or despair, suffer -spirit equal to your foe’s rank or as appropriate to the situation. If your spirit is reduced to 0, suffer -momentum equal to any remaining -spirit.
+    p Then, roll +spirit or +heart, whichever is higher.
+    p On a strong hit, choose one.
+    ul
+      li Shake it off: If your spirit is greater than 0, suffer -1 momentum in exchange for +1 spirit
+      li Embrace the darkness: Take +2 momentum
+    p On a weak hit, you press on.
+    p On a miss, also suffer -1 momentum. If you are at 0 spirit, take the shaken or corrupted condition (if currently not taken) or roll on the following table.
+    .sheet-oracle-table 
+      .oracle-row 
+        span.sheet-oracle-roll 1-10 (10%)
+        span.sheet-oracle-result You are overwhelmed. <em>Face Desolation.</em>
+      .oracle-row 
+        span.sheet-oracle-roll 11-25 (15%)
+        span.sheet-oracle-result You give up. <em>Forsake Your Vow</em> (if possible, one relevant to your current crisis). If this is a companion, <em>Test Their Loyalty</em>.
+      .oracle-row 
+        span.sheet-oracle-roll 26-50 (25%)
+        span.sheet-oracle-result You give in to a fear or compulsion, and act against your better instincts. Manifest Insanity.
+      .oracle-row 
+        span.sheet-oracle-roll 51-80 (30%)
+        span.sheet-oracle-result You persevere.
+      .oracle-row 
+        span.sheet-oracle-roll 81-85 (5%)
+        span.sheet-oracle-result You get a moment of clarity in the eye of the storm. If you have the shaken condition card, discard it. Take +4 spirit and +8 momentum. Then, add +2 to your next move.
+      .oracle-row 
+        span.sheet-oracle-roll 86-90 (5%)
+        span.sheet-oracle-result You get virtuous in the face of chaos. If you have the shaken condition card, discard it. Then, take +4 spirit and draw up to your maximum of resilience cards.
+      .oracle-row 
+        span.sheet-oracle-roll 91-95 (5%)
+        span.sheet-oracle-result Your body harvest vigor. If you have the shaken condition card, discard it. Then, take +4 spirit and +1d12 health.
+      .oracle-row 
+        span.sheet-oracle-roll 96-00 (5%))
+        span.sheet-oracle-result Your spirit shines brightest against a backdrop of desolation. If you have the shaken condition card, discard it. Then, take +8 spirit.
+
+mixin faceDesolation()
+  - var values = { title: 'Face Desolation', name: 'FaceDesolation', class: 'face-desolation', page: 'page X', radio: 'face_desolation', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you are brought to the brink of desolation, roll +heart.
+    p On a strong hit, you resist and press on.
+    p On a weak hit, choose one.
+    ul
+      li Your spirit or sanity breaks, but not before you make a noble sacrifice. Envision your final moments.
+      li You see a vision of a dreaded event coming to pass. Envision that dark future, and Swear an Iron Vow (formidable or extreme) to prevent it. If you fail to score a hit when you Swear an Iron Vow, or refuse the quest, you are lost. Otherwise, you return to your senses and are now tormented. You may only clear the tormented condition by completing the quest.
+    p On a miss, you succumb to despair or horror and are lost.
+
+mixin takeOnOverload()
+  - var values = { title: 'Take on Overload', name: 'TakeOnOverload', class: 'take-on-overload', page: 'page X', radio: 'take_on_overload', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When you have more weight than your maximum load, take the encumbered condition.
+
+mixin outOfSupply()
+  - var values = { title: 'Out of Supply', name: 'OutOfSupply', class: 'out-of-supply', page: 'page X', radio: 'out_of_supply', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When your supply is exhausted (reduced to 0), take the unprepared condition. If you suffer additional -supply while unprepared, you must exchange each additional -supply for any combination of -health, -spirit, -wealth, -companion’s loyalty or -momentum as appropriate to the circumstances.
+
+mixin swearAnIronVow()
+  - var values = { title: 'Swear an Iron Vow', name: 'SwearAnIronVow', class: 'swear-an-iron-vow', page: 'page X', radio: 'swear_an_iron_vow', stat: ``, stat_repeat: '', roll: true }
+  +container(values)
+    p When you swear upon iron to complete a quest, write your vow and give the quest a rank. Then, roll +heart. If you make this vow to a person or community with whom you share a bond, add +2.
+    p On a strong hit, you are emboldened and it is clear what you must do next. Take +2 momentum.
+    p On a weak hit, you are determined but begin your quest with more questions than answers. Take +1 momentum, and envision what you do to find a path forward.
+    p On a miss, you face a significant obstacle before you can begin your quest. Envision what stands in your way, and choose one.
+    ul
+      li You press on: Suffer -2 momentum, and do what you must to overcome this obstacle.
+      li You give up: Forsake Your Vow.
+
+mixin reachAMilestone()
+  - var values = { title: 'Reach a Milestone', name: 'ReachAMilestone', class: 'reach-a-milestone', page: 'page X', radio: 'reach_a_milestone', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When you make significant progress in your quest by overcoming a critical obstacle, completing a perilous journey, solving a complex mystery, defeating a powerful threat, gaining vital support, or acquiring a crucial item, you may mark progress.
+    ul
+      li Troublesome quest: Mark 3 progress.
+      li Dangerous quest: Mark 2 progress.
+      li Formidable quest: Mark 1 progress.
+      li Extreme quest: Mark 2 ticks.
+      li Epic quest: Mark 1 tick.
+
+mixin fulfillYourVow()
+  - var values = { title: 'Fulfill Your Vow', name: 'FulfillYourVow', class: 'fulfill-your-vow', page: 'page X', radio: 'fulfill_your_vow', stat: ``, stat_repeat: '', roll: true, progress: true }
+  +container(values)
+    p Progress Move
+    p When you achieve what you believe to be the fulfillment of your vow, roll the challenge dice and compare to your progress.
+    p On a strong hit, your quest is complete. Mark experience (troublesome=1; dangerous=2; formidable=3; extreme=4; epic=5).
+    p On a weak hit, there is more to be done or you realize the truth of your quest. Envision what you discover. Then, mark experience (troublesome=0; dangerous=1; formidable=2; extreme=3; epic=4). You may Swear an Iron Vow to set things right. If you do, add +1.
+    p If you are fulfilling your vow in service of someone with the means, inclination, or obligation, to reward you materially, take +wealth. On a strong hit, take +wealth equal to the rank of the vow+2. On a weak hit, take +wealth equal to the rank of vow+1. If you are being rewarded with an item, its cost must be the same as the amount of wealth.
+    p On a miss, your quest is undone. Envision what happens, and choose one.
+    ul
+      li You recommit: Clear all but one filled progress, and raise the quest’s rank by one (if not already epic).
+      li You give up: Forsake Your Vow.
+
+mixin forsakeYourVow()
+  - var values = { title: 'Forsake Your Vow', name: 'Forsake Your Vow', class: 'forsake-your-vow', page: 'page X', radio: 'forsake_your_vow', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When you renounce your quest, betray your promise, or the goal is lost to you, clear the vow and Endure Stress. You suffer -spirit equal to the rank of your quest (troublesome=1; dangerous=2; formidable=3; extreme=4; epic=5).
+    p If the vow was made to a person or community with whom you share a bond, Test Your Bond when you next meet.
+
+mixin learnFromFaults()
+  - var values = { title: 'Learn from Faults', name: 'LearnFromFaults', class: 'learn-from-faults', page: 'page X', radio: 'learn_from_faults', stat: ``, stat_repeat: '', roll: true, progress: true }
+  +container(values)
+    p When you spend time taking lessons from your failures and hardships, and your misses track is +6 or greater, roll the challenge dice and compare to your misses.
+    p On a strong hit, your failures have paid off significantly for your personal growth. Take 3 experience and clear all progress. Then, choose one.
+    ul
+      li Rectify your ways: Reduce any stat by 1 and add +1 to any other.
+      li Abandon a course: Discard a single asset card (not a companion) and take 2 experience for each marked ability.
+      li Commit to a new goal: Swear an Iron Vow now, add +2 and take +2 momentum on a hit You may reroll.
+      li Strengthen your willpower: Take +6 momentum.
+    p On a weak hit, you learn from your missteps. Take 2 experience and clear all progress.
+    p On a miss, you learn very little. Take 1 experience and clear all progress.
+
+mixin advance()
+  - var values = { title: 'Advance', name: 'Advance', class: 'advance', page: 'page X', radio: 'advance', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When you focus on your skills, receive training, find inspiration, gain a companion, or one of these does the former, grows stronger, sharpen its senses or learns a new trick, you may...
+    p Oathkeeper
+    ul
+      li Upgrade a stat for 8 experience.
+      li Reduce any stat by 1 and add +1 to any other for 2 experience.
+      li Upgrade a weapon proficiency for 2 experience.
+      li Upgrade an effort level for 1 experience.
+      li Acquire a companion asset for asset health+2 in experience.
+      li Acquire an asset for 3 experience.
+      li Upgrade an asset for 2 experience.
+    p Humanoid Companion
+    ul
+      li Upgrade a stat for 6 experience.
+      li Reduce any stat by 1 and add +1 to any other for 1 experience.
+      li Upgrade the asset for 2 experience.
+      li Upgrade a weapon proficiency for 2 experience.
+      li Upgrade the asset for 2 experience.
+    p Non-humanoid Companion
+    ul
+      li Upgrade a stat for 6 experience.
+      li Reduce any stat by 1 and add +1 to any other for 1 experience.
+      li Increase its protection for its next level in experience.
+      li Increase its Face Danger/Clash addition for 4 experience.
+      li Make piercing 1 harm for one of its attacks for its next piercing harm level in experience (maximum is 3 piercing harm per attack).
+      li Upgrade an attack proficiency for 1 experience.
+      li Add a secondary attack for its asset health in experience.
+      li Upgrade the asset for 2 experience.
+
+mixin trade()
+  - var values = { title: 'Trade', name: 'Trade', class: 'trade', page: 'page X', radio: 'trade', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When you meet someone that offers you an item or service in exchange for wealth, suffer -wealth as the cost of the item or service.
+    p If you are acquiring supply, suffer -1 wealth in exchange for +2 supply.
+    p If you are making this move to obtain wealth in exchange for supply or an item (that is not a consumable item), take +1 wealth per -2 supply, or +wealth as per the weight of the item in exchange for losing it.
+
+mixin payThePrice()
+  - var values = { title: 'Pay the Price', name: 'PayThePrice', class: 'pay-the-price', page: 'page X', radio: 'pay_the_price', stat: ``, stat_repeat: '', roll: true, oracle: true }
+  +container(values)
+    p When you suffer the outcome of a move, mark a tick on your miss track; if it is a progress move, mark two; on a match, mark the double. Then, draw a resilience card and choose one.
+    ul
+      li Make the most obvious negative outcome happen.
+      li Envision two negative outcomes. Rate one as ‘likely’, and Ask the Oracle using the yes/no table. On a ‘yes’, make that outcome happen. Otherwise, make it the other.
+      li Roll on the following table. If you have difficulty interpreting the result to fit the current situation, roll again.
+    .sheet-oracle-table 
+      .oracle-row 
+        span.sheet-oracle-roll 1-2 (2%)
+        span.sheet-oracle-result Roll again and apply that result but make it worse. If you roll this result yet again, think of something dreadful that changes the course of your quest and make it happen.
+      .oracle-row 
+        span.sheet-oracle-roll 3-5 (3%)
+        span.sheet-oracle-result A person or community you trusted loses faith in you, or acts against you.
+      .oracle-row 
+        span.sheet-oracle-roll 6-8 (3%)
+        span.sheet-oracle-result A person or community you care about is exposed to danger.
+      .oracle-row 
+        span.sheet-oracle-roll 9-15 (7%)
+        span.sheet-oracle-result You are separated from something or someone.
+      .oracle-row 
+        span.sheet-oracle-roll 16-22 (7%)
+        span.sheet-oracle-result Your action has an unintended effect.
+      .oracle-row 
+        span.sheet-oracle-roll 23-29 (7%)
+        span.sheet-oracle-result Something of value is lost or destroyed.
+      .oracle-row 
+        span.sheet-oracle-roll 30-36 (7%)
+        span.sheet-oracle-result The current situation worsens.
+      .oracle-row 
+        span.sheet-oracle-roll 37-43 (7%)
+        span.sheet-oracle-result A new danger or foe is revealed.
+      .oracle-row 
+        span.sheet-oracle-roll 44-52 (9%)
+        span.sheet-oracle-result It causes a delay or puts you at a disadvantage.
+      .oracle-row 
+        span.sheet-oracle-roll 53-61 (9%)
+        span.sheet-oracle-result It is harmful.
+      .oracle-row 
+        span.sheet-oracle-roll 62-70 (9%)
+        span.sheet-oracle-result It is stressful.
+      .oracle-row 
+        span.sheet-oracle-roll 71-77 (7%)
+        span.sheet-oracle-result It is wasteful.
+      .oracle-row 
+        span.sheet-oracle-roll 78-84 (7%)
+        span.sheet-oracle-result You got a negative condition.
+      .oracle-row 
+        span.sheet-oracle-roll 85-89 (5%)
+        span.sheet-oracle-result A surprising development complicates your quest.
+      .oracle-row 
+        span.sheet-oracle-roll 90-94 (5%)
+        span.sheet-oracle-result It forces you to act against your best intentions.
+      .oracle-row 
+        span.sheet-oracle-roll 95-99 (5%)
+        span.sheet-oracle-result A friend, companion, or ally is put in harm’s way (or you are, if alone).
+      .oracle-row 
+        span.sheet-oracle-roll 00 (1%)
+        span.sheet-oracle-result Roll twice more on this table. Both results occur. If they are the same result, make it worse.
+
+mixin showResilience()
+  - var values = { title: 'Show Resilience', name: 'ShowResilience', class: 'show-resilience', page: 'page X', radio: 'show_resilience', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When you make a move, and have in a hand a resilience card with the corresponding suit of the move, these beings…
+    ul
+      li Spades (♠): Combat and suffer moves.
+      li Clubs (♣): Adventure and Delve moves.
+      li Hearts (♥): Relationship, companion and recovery moves.
+      li Diamonds (♦): Quest and asset moves.
+    p You may…
+    ul
+      li Ready yourself to not make previous missteps: Play the resilience card before rolling.
+      li Instantly recover from a misstep: Play the resilience card after rolling, but suffer -2 momentum.
+    p Then, modify the roll as per the value of the card right before reshuffling back into the deck.
+    ul
+      li Ace: You may reroll any dice. Take +4 momentum.
+      li K: Score a strong hit, or Inflict Harm once more and make it piercing.
+      li Q: Count a miss as a weak hit, and a weak hit as a strong hit; or Inflict Harm once more.
+      li J: Score a weak hit, or make the harm piercing.
+      li 2-10: Add this amount to the roll.
+
+mixin askTheOracle()
+  - var values = { title: 'Ask the Oracle', name: 'AskTheOracle', class: 'ask-the-oracle', page: 'page X', radio: 'ask_the_oracle', stat: ``, stat_repeat: '', roll: true, oracle: true }
+  +container(values)
+//- Ask the Oracle
+//- When you seek to resolve questions, discover details in the world, determine how other characters respond, or trigger encounters or events, you may…
+//- 	li Draw a conclusion: Decide the answer based on the most interesting and obvious result.
+//- 	li Ask a yes/no question: Decide the odds of a ‘yes’, and roll on the table below to check the answer.
+//- 	li Pick two: Envision two options. Rate one as ‘likely’, and roll on the table below to see if it is true. If not, it is the other.
+//- 	li Spark an idea: Brainstorm or use a random prompt.
+//- Odds
+//- ‘Yes’ if you roll...
+//- ‘No’ if you roll...
+//- Almost certain (90%)
+//- 11 or greater.
+//- 10 or lower.
+//- Likely (75%)
+//- 26 or greater.
+//- 25 or lower.
+//- 50/50 or unknown (50%)
+//- 51 or greater.
+//- 50 or lower.
+//- Unlikely (25%)
+//- 76 or greater.
+//- 75 or lower.
+//- Small chance (10%)
+//- 91 or greater.
+//- 90 or lower.
+//- If you are making this move to determine which creature you encounter, you may do one of the following.
+//- 	li Selection 5 to 8 creature cards of hostile denizens you might encounter, and shuffle them. Then, when you encounter one, draw a card from the selection and roll 1d100. If you rolled the frequency value, encounter this creature. If you don’t, draw another card and roll again. If this is the last creature you are drawing, face it.
+//- Creature’s frequency
+//- Encounter if you roll…
+//- Redraw if you roll…
+//- Very Common (54%)
+//- 46 or greater.
+//- 45 or lower.
+//- Common (28%)
+//- 72 or greater.
+//- 71 or lower.
+//- Uncommon (12%)
+//- 88 or greater.
+//- 87 or lower.
+//- Raree (4%)
+//- 97 or greater.
+//- 96 or lower.
+//- Unforseen (2%)
+//- 99 or greater.
+//- 98 or lower.
+//- 	li Select 5 creatures, one per frequency. Then, when you encounter a hostile denizen, roll to determine which creature you encounter.
+//- Roll
+//- Encounter if you roll…
+//- Very Common (54%)
+//- 1-54
+//- Common (28%)
+//- 55-82
+//- Uncommon (12%)
+//- 83-94
+//- Raree (4%)
+//- 95-98
+//- Unforseen (2%)
+//- 99-00
+//- On whatever table you are rolling, on a match, an extreme result or twist has occurred.
+
+mixin burnMomentum()
+  - var values = { title: 'Burn Momentum', name: 'BurnMomentum', class: 'burn-momentum', page: 'page X', radio: 'burn_momentum', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When you make a move, and have positive momentum, you may set your momentum to your reset value and cancel any challenge dice that are less than your current momentum value.
+
+mixin makeAnEffort()
+  - var values = { title: 'Make an Effort', name: 'MakeAnEffort', class: 'make-an-effort', page: 'page X', radio: 'make_an_effort', stat: ``, stat_repeat: '' }
+  +container(values)
+    p When you make a move demanding more of yourself and have the required effort level, you may suffer -momentum in exchange for the same amount of your move effort level to addition to your roll.
+
+mixin findAnOpportunity()
+  - var values = { title: 'Find an Opportunity', name: 'FindAnOpportunity', class: 'find-an-opportunity', page: 'page X', radio: 'find_an_opportunity', stat: ``, stat_repeat: '' , roll: true, oracle: true }
+  +container(values)
+//- Find an Opportunity
+//- p When you encounter a helpful situation or feature within a travel waypoint or a site, roll to determine what kind of opportunity you encounter.
+//- 1-55 (55%) Favorable Area
+//- Roll
+//- Result
+//- 1-11(11%)
+//- The travel took shorter than expected. Take +1 momentum.
+//- 12-20 (9%)
+//- Elements of this area can be used to leverage your travel. If you Undertake a Journey, you may reroll any dice.
+//- 21-28 (8%)
+//- There is a path that seems to lead towards your destination. If you follow it, add +2 when you Undertake a Journey.
+//- 29-35 (7%)
+//- The travel has cleared your mind. If you Hearten, reroll any dice.
+//- 36-42 (7%)
+//- This seems to be an ideal place to find a moment of peace. If you Hearten, add +2.
+//- 43-49 (7%)
+//- This seems to be an ideal place to bolster your reserves. If you Resupply, add +2.
+//- 50-55 (6%)
+//- This seems to be a place safe enough to rest and recover for several hours. If you Make Camp, add +2.
+//- 56-61 (6%)
+//- You find a healthy settlement. If you Sojourn, add +1.
+//- 62-66 (5%)
+//- This area offers a captivating ambience or comfortable environment. If you Hearten, take +1 spirit on a hit.
+//- 67-71 (5%)
+//- This area offers enough to bolster your reserves if you dedicate enough to it. If you Resupply and score hit, you may suffer -1 momentum in exchange for +1 supply.
+//- 72-76 (5%)
+//- This waypoint offers more than needed for a modest rest. If you Make Camp, and score a hit, you may choose an extra option.
+//- 77-80 (4%)
+//- You seem to be closer to your destination than expected. Mark an additional progress in your journey track.
+//- 81-83 (3%)
+//- This area offers just what you need to camp. If you Make Camp, you may reroll any dice.
+//- 84-86 (3%)
+//- You reach this waypoint just at an opportune time to bolster your reserves. If you Resupply now, you may reroll any dice.
+//- 87-88 (2%)
+//- There is a hidden passage that could be a shortcut. If you Reach Your Destination, you may reroll any dice.
+//- 89-96 (8%)
+//- You reach a location of interest related to one of your quests or that might lead to one. Take +2 momentum.
+//- 97-98 (2%)
+//- Choose one result from this table.
+//- 99-00 (2%)
+//- Roll twice more on this table. Both results occur.
+
+//- 56-80 (25%) Benign Character Encounter
+//- Roll
+//- Result
+//- 1-16 (16%)
+//- You encounter a traveler or denizen who might provide you guide in exchange for something of value. If you agree, suffer -1 wealth or -2 supply (your choice) in exchange for adding +3 next time you Undertake a Journey for this travel.
+//- 17-30 (14%)
+//- You encounter a traveler or denizen willing to provide you guide and supply. If he does, add +1 next time you Undertake a Journey for this travel and take +1 supply.
+//- 31-38 (8%)
+//- You encounter a traveler or denizen who might provide you health care in exchange for something of value. If you agree, suffer -1 wealth or -2 supply (your choice) in exchange for making the Hearten move now and add +3.
+//- 39-46 (8%)
+//- You encounter a traveler or denizen who might rise your spirit in exchange for something of value. If you agree, suffer -1 wealth or -2 supply (your choice) in exchange for making the Heal move now and add +3.
+//- 47-53 (7%)
+//- You encounter a traveler or denizen willing to rise your spirit. If he does, Hearten now and add +2.
+//- 54-60 (7%)
+//- You encounter a traveler or denizen willing to give you first aid. If he does, Heal now and add +2.
+//- 61-70 (10%)
+//- You encounter a provision trader.
+//- 71-75 (5%)
+//- You encounter an equipment trader.
+//- 76-79 (4%)
+//- You encounter a traveler or denizen with the potential of being a conditional companion with the goal of serving as hireling and the drive of getting wealth. If you Take a Conditional Companion, add +1add +1
+//- 80-83 (4%)
+//- You encounter a traveler or denizen with the potential of being a conditional companion. Take +1 momentum.
+//- 84-86 (3%)
+//- You encounter one or more travelers or denizens in need for help and with the means to reward you.
+//- 87-95 (9%)
+//- You encounter one or more characters related to one of you quests or that might lead to one. Take +2 momentum.
+//- 96-98 (3%)
+//- Roll twice more on this table. Use one result.
+//- 99-00 (2%)
+//- Choose one result from this table.
+
+//- 81-00 (20%) Item Finding
+//- Roll
+//- Result
+//- 1-14 (14%)
+//- You find resources that bolster your reserves. Take +1 supply.
+//- 15-26 (12%)
+//- You find resources that bolster your reserves. Take +2 supply.
+//- 27-35 (9%)
+//- You find something of value. Take +1 wealth.
+//- 36-42 (7%)
+//- You find some valuable goods. Take +2 wealth.
+//- 43-47 (5%)
+//- You find a consumable item of your choice or as appropriate to the circumstances.
+//- 48-51 (4%)
+//- You find two consumable items of your choice or as appropriate to the circumstances.
+//- 52-56 (5%)
+//- You find a weapon of cost d4 wealth cost or less of your choice as appropriate to the circumstances.
+//- 57-59 (3%)
+//- You find a weapon of cost d6 wealth or less of your choice as appropriate to the circumstances.
+//- 60-61 (2%)
+//- You find a weapon of cost d8+1 wealth or less of your choice as appropriate to the circumstances.
+//- 62-64 (3%)
+//- You find a shield of cost d4+1 wealth or less of your choice as appropriate to the circumstances.
+//- 65-66 (2%)
+//- You find a shield of cost d6+1 wealth or less of your choice as appropriate to the circumstances.
+//- 67-69 (3%)
+//- You find an armor of cost 1d4+3 wealth or less of your choice or as appropriate to the circumstances.
+//- 70-71 (2%)
+//- You find an armor of cost 1d6+3 wealth or less of your choice as appropriate to the circumstances.
+//- 72 (1%)
+//- You find an armor of cost 2d4+2 wealth or less of your choice as appropriate to the circumstances.
+//- 73-80 (8%)
+//- You find an addon of your choice or as appropriate to the circumstances.
+//- 81-89 (9%)
+//- You find an item of interest related to one of your quests or that might lead to one. Take +2 momentum.
+//- 90-00 (11%)
+//- Roll twice more on this table. Both results occur.
+
+mixin revealADanger()
+  - var values = { title: 'Reveal a Danger', name: 'RevealADanger', class: 'reveal-a-danger', page: 'page X', radio: 'reveal_a_danger', stat: ``, stat_repeat: '', roll: true, oracle: true }
+  +container(values)
+//- Reveal a Danger
+//- When you are undertaking a journey and are waylaid by a perilous event, or delving the depths of a site and find yourself in a risky situation, make the most obvious negative outcome happen from the following tables, or roll on them to determine what kind of danger you encounter.
+//- 1-25 (25%) Worsening of the Situation
+//- Roll
+//- Result
+//- 1-13 (13%)
+//- A portion of an edible resource got spoiled or lost. Suffer -1 supply. If your supply is 0, reroll on this table.
+//- 14-24 (11%)
+//- The travel is taking longer than expected. Suffer -1 momentum.
+//- 25-34 (10%)
+//- The trip was tough and left you tired. Endure Harm (1d4P harm).
+//- 35-42 (8%)
+//- The travel has drained your energies. Endure Harm (1d4P harm) and take the weakened (severity +1) condition.
+//- 43-50 (8%)
+//- The travel has left you stressed or mentally fatigued. Endure Stress (1d2 stress).
+//- 51-57 (7%)
+//- A friend or companion starts arguing for previous acts or complaining about the rough travel. Suffer -1d3 to their loyalty. If you don't have a companion, reroll on this table.
+//- 58-64 (7%)
+//- You realize you lost some valuable goods on the way. Suffer -2 wealth. If your wealth is reduced to 0, suffer -momentum to any remaining -wealth.
+//- 65-71 (7%)
+//- You realize too late that the supply container is broken and has a leak. Suffer -2 supply.
+//- 72-77 (6%)
+//- You realize you lost one of your valuable items on the way. Suffer -1 wealth. If your wealth is 0, reroll on this table.
+//- 78-83 (6%)
+//- You realize that one of the items you thought to be valuable, is actually not, or not worthy in its current state. Suffer -1 wealth and -1 momentum. If your wealth is an its minimum (0), reroll on this table.
+//- 84-89 (6%)
+//- You make a discovery that complicates one of your quests. Suffer -2 momentum.
+//- 90-94 (5%)
+//- A piece of equipment loses durability. Reduce any of your armor’s or shield’s values by 1. If you have no armor or shield item, reroll on this table.
+//- 95-97 (3%)
+//- You start suffering from muscle cramp, sprain or strain. Endure Harm (1d4P harm) and take the palsied (severity 1) condition.
+//- 98-99 (2%)
+//- You realize that one of your conditional companions is no longer by your side. Suffer -1 momentum. If you don't have a conditional companion, reroll on this table.
+//- 00 (1%)
+//- Roll twice more on this table. Both results occur. If they are the same result, double its effect.
+//- 26-60 (35%) Unfavorable Road
+//- Roll
+//- Result
+//- 1-13 (13%)
+//- The terrain or the weather plays against you, hindering you. Subtract -1 to your next move. Take the hyperthermic or hypothermic condition if appropriate.
+//- 14-25 (12%)
+//- An environmental hazard forces you to pass through this area in a precarious manner. If you make a move to resolve this danger, subtract -1.
+//- 26-35 (10%)
+//- Whether it is human made or a fortuity of nature, you, or someone with you, is victim of a trap. If you make a move of resolve this danger, subtract -1.
+//- 36-44 (9%)
+//- You suffer some bruises on the way. Endure Harm (1d4 harm).
+//- 45-52 (8%)
+//- You consumed some resources, and this road lacks sources to replenish from. Suffer -1 supply. If you Resupply, count a strong hit as a weak hit, and a weak hit as a miss.
+//- 53-60 (8%)
+//- The travel has been mentally grueling. Endure Stress (1 stress). If you Hearten, count a strong hit as a weak hit, and a weak hit as a miss.
+//- 61-68 (8%)
+//- You have not reached your waypoint yet, and this stop is too precarious to rest safely. If you Make Camp, count a strong hit as a weak hit, and a weak hit as a miss.
+//- 69-75 (7%)
+//- The path is broken and there doesn't seem to be a lead to follow it. Subtract -1 next time you Undertake a Journey for this travel.
+//- 76-81 (6%)
+//- An obstacle is blocking the path you intend to follow. Subtract -1 for your next move to resolve the obstacle or suffer -2 momentum causing a delay on your travel.
+//- 82-86 (5%)
+//- The path has a disturbing ambience or you find the horrible fate of a victim of this place. Endure Stress (1d4 stress).
+//- 87-90 (4%)
+//- The environment undermines the path or the weather is disorienting, and you find difficult to recognize the track. Subtract -2 next time you Undertake a Journey for this travel.
+//- 91-94 (4%)
+//- Whether it was something you ate or something in the surroundings, you are now ill. Endure Harm (1d4P harm) and take the poisoned (severity +1) condition.
+//- 95-97 (3%)
+//- Whether it was something you ate or something in the surroundings, you got poisoned. Take the poisoned (severity +2) condition.
+//- 98-99 (2%)
+//- You realized you have been following the wrong path, and trickery leads have left you astray. Clear 1d2 progress boxes in the journey track. Next time you Undertake a Journey, you don’t mark progress if you score a hit.
+//- 00 (1%)
+//- Roll twice more on this table. Both results occur. If they are the same result, double its effect.
+
+//- 61-00 (40%) Hostile Character Encounter (Ask the Oracle if unsure on which denizen to encounter)
+//- Roll
+//- Result
+//- 1-13 (13%)
+//- You converge with one or multiple travelers or denizens in this area, facing off.
+//- 14-26 (13%)
+//- One or multiple unaware travelers or denizens are guarding this area, either laid in wait, patrolling or working.
+//- 27-39 (13%)
+//- You're ambushed, or attacked without warning. 
+//- 40-51 (12%)
+//- Your presence has caught the attention of one or multiple travelers or denizens in the area.
+//- 52-63 (12%)
+//- Your arrival to this area has been expected.
+//- 64-75 (12%)
+//- You sense one or multiple presences lurking or stalking.
+//- 76-85 (10%)
+//- One or multiple unaware travelers or denizens are blocking or undermining the path in some way.
+//- 86-93 (8%)
+//- You find one or multiple travelers or denizens in unfavorable circumstances.
+//- 94-98 (5%)
+//- You find one or multiple travelers or denizens’ pets or underlings.
+//- 99-00 (2%)
+//- Roll twice more on this table, and use one result.
+
+mixin manifestInsanity()
+  - var values = { title: 'Manifest Insanity', name: 'ManifestInsanity', class: 'manifest-insanity', page: 'page X', radio: 'manifest_insanity', stat: ``, stat_repeat: '', roll: true, oracle: true }
+  +container(values)
+//- Manifest Insanity
+//- When you fail to struggle against a mental shock, make the most obvious negative outcome happen from the following tables, or roll on them to determine what kind of insanity you manifest (1-70=short-term insanity, 71-00=long-term insanity).
+//- Short-term Insanity
+//- Roll
+//- Result
+//- 1-28 (28%)
+//- You get scared, and your next move should imply to flee as far as possible from the source of the fear or danger.
+//- 29-51 (23%)
+//- Your spirit is overwhelmed. Take the dazed condition.
+//- 52-69 (18%)
+//- You show hysteric and emotional outburst by screaming, laughing, crying. Every other ally and companion must Endure Stress (1d2 stress) as a result.
+//- 70-87 (18%)
+//- You begin babbling, coherently (logorrhoea) or incoherently. Your words show abuse, fear, hopelessness, irrationality or selfishness. Every other ally and companion must Endure Stress (1d3 stress) as a result.
+//- 88-95 (8%)
+//- You Inflict Harm on yourself.
+//- 96-00 (5%)
+//- You faint. Take the unconscious condition.
+//- Long-term Insanity
+//- Roll
+//- Result
+//- 1-15 (15%)
+//- Take the phobiac (severity 4) condition.
+//- 16-29 (14%)
+//- Take the attached (severity 4) condition.
+//- 30-36 (7%)
+//- Take the hallucinating (severity 2) condition.
+//- 37-53 (17%)
+//- Take the compulsed (severity 4) condition.
+//- 54-57 (4%)
+//- You start suffering psychosomatic deafness. Take the deafened (severity +1) condition.
+//- 58-60 (3%)
+//- You start suffering psychosomatic blindness. Take the blind (severity +1) condition.
+//- 61-73 (13%)
+//- Take the mute condition.
+//- 74-85 (12%)
+//- You retreat into your mind, oblivious to events around you. If no immediate danger is around, you assume fetal position. Take the dazed, mute and unsteady (shaky) conditions.
+//- 86-93 (8%)
+//- You become catatonic. Take the dazed, mute and stupefied conditions.
+//- 94-98 (5%)
+//- Take the amok (severity 3) condition. Then, Clash the nearest target, whether they are an ally, companion, foe or else.
+//- 99-00 (2%)
+//- Take the amnesiac (severity 5) condition.

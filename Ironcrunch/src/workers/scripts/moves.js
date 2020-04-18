@@ -85,9 +85,10 @@ on('change:clear_search', function() {
   };
 });
 
-on('change:selected_move', function() {
+on('change:selected_move', function(eventinfo) {
   setAttrs({
     move_view: '2',
+    move_preview: eventinfo.newValue
   });
 });
 
