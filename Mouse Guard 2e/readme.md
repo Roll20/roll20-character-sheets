@@ -10,7 +10,7 @@ _In the world of Mouse Guard, mice struggle to live safely and prosper amongst h
 
 Changes against Mouse Guard 1e character sheet:
 
-+aligned condition top to bottom as per oiginal character sheet
++aligned conditions top to bottom as per oiginal character sheet
 
 +added Level 2 trait checkbox
 
