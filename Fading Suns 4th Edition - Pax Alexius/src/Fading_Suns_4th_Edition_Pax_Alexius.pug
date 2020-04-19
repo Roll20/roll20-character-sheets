@@ -1,0 +1,131 @@
+mixin skill(name, value)
+    .fs-skill
+        .fs-skill-normal
+            button.fs-d20(type='roll' name='roll_disabledbutton' value='' disabled='')
+            .fs-skill-roll-characteristic-choice
+                label
+                    span(data-i18n=`${name}`).fs-caps #{name}
+                    |  +
+                each characteristicName in ['strength', 'dexterity', 'endurance', 'wits', 'perception', 'will', 'presence', 'intuition', 'faith']
+                    div
+                        button.fs-hidden(type='roll' name=`roll_${characteristicName}_${name}_csc` value=`&{template:fs-GoalRoll} {{characterName=@{character_name}}} {{characteristicName-i18n=^{${characteristicName}}}}     {{skillName-i18n=^{${name}}}} {{goal=[[@{${characteristicName}}+@{${name}}]]}}     {{roll=[[1d20cs[[{@{${characteristicName}}+@{${name}},19}kl1]]cf20]]}}     {{critSuccessContinue=1}}`)
+                        button.fs-hidden(type='roll' name=`roll_${characteristicName}_${name}_cfc` value=`&{template:fs-GoalRoll} {{characterName=@{character_name}}} {{characteristicName-i18n=^{${characteristicName}}}}     {{skillName-i18n=^{${name}}}} {{goal=[[@{${characteristicName}}+@{${name}}]]}}     {{roll=[[1d20cs[[{@{${characteristicName}}+@{${name}},19}kl1]]cf20]]}}     {{critFailureConfirm=1}}`)
+                        div
+                            button.fs-d20(type='roll' name=`roll_${characteristicName}_${name}` value=`&{template:fs-GoalRoll} {{characterName=@{character_name}}} {{characteristicName-i18n=^{${characteristicName}}}}     {{skillName-i18n=^{${name}}}} {{goal=[[@{${characteristicName}}+@{${name}}]]}}     {{roll=[[1d20cs[[{@{${characteristicName}}+@{${name}},19}kl1]]cf20]]}}     {{csc=${characteristicName}_${name}_csc}} {{cfc=${characteristicName}_${name}_cfc}}`)
+                            label(data-i18n=`${characteristicName}`) #{characteristicName}
+            label.fs-skill-label
+                span(data-i18n=`${name}`) ${name}
+        input(type='number' name=`attr_${name}` min='0' value=`${value}` title=`@{${name}}. Default value: ${value}.`)
+
+mixin characteristic(name)
+    .fs-characteristic
+        button.fs-hidden(type='roll' name=`roll_${name}_csc` value=`&{template:fs-GoalRoll} {{characterName=@{character_name}}} {{characteristicName-i18n=^{${name}}}} {{goal=[[@{${name}}]]}} {{roll=[[1d20cs[[{@{${name}},19}kl1]]cf20]]}} {{critSuccessContinue=1}}`)
+        button.fs-hidden(type='roll' name=`roll_${name}_cfc` value=`&{template:fs-GoalRoll} {{characterName=@{character_name}}} {{characteristicName-i18n=^{${name}}}} {{goal=[[@{${name}}]]}} {{roll=[[1d20cs[[{@{${name}},19}kl1]]cf20]]}} {{critFailureConfirm=1}}`)
+        button.fs-d20(type='roll' name=`roll_${name}` value=`&{template:fs-GoalRoll}        {{characterName=@{character_name}}} {{characteristicName-i18n=^{${name}}}} {{goal=[[@{${name}}]]}} {{roll=[[1d20cs[[{@{${name}},19}kl1]]cf20]]}} {{csc=${name}_csc}} {{cfc=${name}_cfc}}`)
+        label.fs-characteristic-label
+            span(data-i18n=`${name}`) ${name}
+        input(name=`attr_${name}` type='number' min='0' value='3' title=`\${${name}}. Default value: 3.`)
+
+// CHARACTER SHEET LAYOUT - START
+.fs-sheet
+    .fs-sheet-container
+        input(type='hidden' name='attr_sheet_version' value='latest')
+
+        .fs-baseinfo
+            div.fs-sheet-section
+                h3.fs-uppercase-header(data-i18n='name') Name
+
+            div.fs-sheet-section
+                h3.fs-uppercase-header(data-i18n='rank') Rank
+
+            div.fs-sheet-section
+                h3.fs-uppercase-header(data-i18n='species') Species
+
+        .fs-lifepath
+            div.fs-sheet-section
+                h3.fs-uppercase-header(data-i18n='class') Class
+
+            div.fs-sheet-section
+                h3.fs-uppercase-header(data-i18n='faction') Faction
+
+            div.fs-sheet-section
+                h3.fs-uppercase-header(data-i18n='calling') Calling
+
+        .fs-traits
+            h3.fs-sheet-section.fs-skills-header.fs-uppercase-header(data-i18n='skills') Skills
+
+            .fs-trait-col.fs-skills-1
+                +skill('academia', '3')
+                +skill('alchemy', '0')
+                +skill('animalia', '3')
+                +skill('arts', '3')
+                +skill('charm', '3')
+                +skill('crafts', '3')
+                +skill('disguise', '3')
+                +skill('drive', '3')
+                +skill('empathy', '3')
+                +skill('fight', '3')
+                +skill('focus', '3')
+                +skill('impress', '3')
+                +skill('interface', '0')
+
+            .fs-trait-col.fs-skills-2
+                +skill('intrusion', '3')
+                +skill('knavery', '3')
+                +skill('melee', '3')
+                +skill('observe', '3')
+                +skill('perform', '3')
+                +skill('pilot', '0')
+                +skill('remedy', '3')
+                +skill('shoot', '3')
+                +skill('sleight_of_hand', '3')
+                +skill('sneak', '3')
+                +skill('survival', '3')
+                +skill('tech_redemption', '3')
+                +skill('vigor', '3')
+
+            .fs-trait-col.fs-characteristics
+                .fs-characteristic-category.fs-trait-col.fs-sheet-section
+                    h3.fs-uppercase-header(data-i18n='body') Body
+                    +characteristic('strength')
+                    +characteristic('dexterity')
+                    +characteristic('endurance')
+                .fs-characteristic-category.fs-trait-col.fs-sheet-section
+                    h3.fs-uppercase-header(data-i18n='mind') Mind
+                    +characteristic('wits')
+                    +characteristic('perception')
+                    +characteristic('will')
+                .fs-characteristic-category.fs-trait-col.fs-sheet-section
+                    h3.fs-uppercase-header(data-i18n='spirit') Spirit
+                    +characteristic('presence')
+                    +characteristic('intuition')
+                    +characteristic('faith')
+
+        h3.fs-sheet-section.fs-uppercase-header(data-i18n='occult') Occult
+
+        .fs-defenses
+            .fs-sheet-section
+                h3.fs-uppercase-header(data-i18n='resistances') Resistances
+
+            .fs-sheet-section
+                h3.fs-uppercase-header(data-i18n='armor') Armor
+                h3.fs-uppercase-header(data-i18n='e-shield') E-Shield
+
+            .fs-sheet-section
+                h3.fs-uppercase-header(data-i18n='vitality') Vitality
+                h3.fs-uppercase-header(data-i18n='revivals') Revivals
+
+        .fs-sheet-section
+            h3.fs-uppercase-header(data-i18n='last_notes') Last Notes
+            .fs-nontable.fs-core-details.fs-wide-readonly
+                textarea.fs-inline-textarea.fs-supertall-textarea.fs-w100(title='@{last_notes}' type='text' name='attr_last_notes' spellcheck='false')
+
+// CHARACTER SHEET LAYOUT - END
+// ROLL TEMPLATES - START
+include roll-templates.html
+// ROLL TEMPLATES - END
+// SHEET WORKERS - START
+include sheet-workers.html
+// SHEET WORKERS - END
+
+// FIN.

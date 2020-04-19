@@ -1,0 +1,91 @@
+<div style="display:none">
+
+    <rolltemplate class="sheet-rolltemplate-fs-GoalRoll">
+        <div class="fs-container">
+            <label class="fs-charactername">{{characterName}}</label>
+            {{#skillName-i18n}}
+                <div class="fs-header"><h1>{{characteristicName-i18n}} + {{skillName-i18n}} ({{goal}})</h1></div>
+            {{/skillName-i18n}}
+            {{^skillName-i18n}}
+                <div class="fs-header"><h1>{{characteristicName-i18n}} ({{goal}})</h1></div>
+            {{/skillName-i18n}}
+
+            {{#title}}<div class="fs-header"><h1>[ {{title}} ]</h1></div>{{/title}}
+
+            <div class="fs-arrow-container"><div class="fs-arrow-right"></div></div>
+
+            {{#^rollGreater() roll goal}}
+                {{#^rollGreater() roll 19}} <!-- rolled [1, min(19, goal)] -->
+                    {{#critFailureConfirm}}
+                        <span class="fs-failure fs-actualroll">{{roll}}. </span><span class="fs-failure" data-i18n="noncritical_failure">Non-critical failure.</span>
+                    {{/critFailureConfirm}}
+                    {{^critFailureConfirm}}
+                        {{#rollWasCrit() roll}}  <!-- crit -->
+                            <span class="fs-critsuccess fs-actualroll">{{roll}}. </span><span class="fs-critsuccess" data-i18n="critical_success">Critical success!</span>
+                        {{/rollWasCrit() roll}}
+                        {{#^rollWasCrit() roll}} <!-- not a crit -->
+                            <span class="fs-success fs-actualroll">{{roll}}. </span><span class="fs-success" data-i18n="success">Success!</span>
+                        {{/^rollWasCrit() roll}}
+                        <span class="fs-success">1</span>
+                        {{#critSuccessContinue}}
+                            <span class="fs-success"> <span data-i18n="additional_vp">additional VP</span></span>
+                        {{/critSuccessContinue}}
+                        {{^critSuccessContinue}}
+                            <span class="fs-success"> <span data-i18n="victory_points">VP</span></span>
+                        {{/critSuccessContinue}}
+                        {{#rollWasCrit() roll}}
+                            <div class="rolltemplate-fs-button">[<span data-i18n="roll_again">Roll again</span>](~{{characterName}}|{{csc}})</div>
+                        {{/rollWasCrit() roll}}
+                    {{/critFailureConfirm}}
+                {{/^rollGreater() roll 19}}
+            {{/^rollGreater() roll goal}}
+
+            {{#rollGreater() roll goal}}
+                {{#rollTotal() roll 1}} <!-- very special case of an automatic success when goal < 1 and the roll is 1 -->
+                    {{#critSuccessContinue}}
+                        <span class="fs-success fs-actualroll">{{roll}}. </span><span class="fs-success" data-i18n="the_end">Fin.</span>
+                    {{/critSuccessContinue}}
+                    {{^critSuccessContinue}}
+                        {{#critFailureConfirm}}
+                            <span class="fs-failure fs-actualroll">{{roll}}. </span><span class="fs-failure" data-i18n="noncritical_failure">Non-critical failure.</span>
+                        {{/critFailureConfirm}}
+                        {{^critFailureConfirm}}
+                            <span class="fs-success fs-actualroll">{{roll}}. </span><span class="fs-success" data-i18n="success">Success!</span> <span class="fs-success">0</span> <span class="fs-success"> <span data-i18n="victory_points">VP</span></span>
+                        {{/critFailureConfirm}}
+                    {{/critSuccessContinue}}
+                {{/rollTotal() roll 1}}
+                {{#^rollTotal() roll 1}}
+                    {{#^rollGreater() roll 19}} <!-- rolled ]goal, 19], 1 excluded -->
+                        {{#critFailureConfirm}}
+                            <span class="fs-critfailure fs-actualroll">{{roll}}. </span><span class="fs-critfailure" data-i18n="critical_failure">Critical failure.</span>
+                        {{/critFailureConfirm}}
+                        {{^critFailureConfirm}}
+                            {{#critSuccessContinue}}
+                                <span class="fs-failure fs-actualroll">{{roll}}. </span><span class="fs-success" data-i18n="the_end">Fin.</span>
+                            {{/critSuccessContinue}}
+                            {{^critSuccessContinue}}
+                                <span class="fs-failure fs-actualroll">{{roll}}. </span><span class="fs-failure" data-i18n="failure">Failure!</span>
+                            {{/critSuccessContinue}}
+                        {{/critFailureConfirm}}
+                    {{/^rollGreater() roll 19}}
+                {{/^rollTotal() roll 1}}
+            {{/rollGreater() roll goal}}
+
+            {{#rollTotal() roll 20}} <!-- rolled a 20 -->
+                {{#critFailureConfirm}}
+                    <span class="fs-critfailure fs-actualroll">{{roll}}. </span><span class="fs-critfailure" data-i18n="critical_failure">Critical failure.</span>
+                {{/critFailureConfirm}}
+                {{^critFailureConfirm}}
+                    {{#critSuccessContinue}}
+                        <span class="fs-success fs-actualroll">{{roll}}. </span><span class="fs-success" data-i18n="the_end">Fin.</span>
+                    {{/critSuccessContinue}}
+                    {{^critSuccessContinue}}
+                        <span class="fs-critfailure fs-actualroll">{{roll}}. </span><span class="fs-critfailure" data-i18n="critical_failure_q">Critical failure?</span>
+                        <div class="rolltemplate-fs-button">[<span data-i18n="roll_again">Roll again</span>](~{{characterName}}|{{cfc}})</div>
+                    {{/critSuccessContinue}}
+                {{/critFailureConfirm}}
+            {{/rollTotal() roll 20}}
+        </div>
+    </rolltemplate>
+
+</div>
