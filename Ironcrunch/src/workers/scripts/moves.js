@@ -94,6 +94,12 @@ on('change:selected_move', function(eventinfo) {
 
 on('change:close_move_preview', function() {
   setAttrs({
-    move_view: '1',
+    move_view: '1'
+  });
+});
+
+on('change:reveal_a_danger_button', function(eventinfo) {
+  setAttrs({
+    reveal_a_danger_tables: eventinfo.newValue
   });
 });
