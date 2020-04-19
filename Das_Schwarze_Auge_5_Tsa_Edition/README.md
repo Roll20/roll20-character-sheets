@@ -2,7 +2,7 @@
 
 ## Änderungen
 
-2020-04-18:
+2020-04-19:
 - Bugfix: Korrektur Berechnung Seelenkraft
 - Bugfix: NSC-Bogen Fernkampf, Reichweite ist jetzt ein Freitext
 
@@ -10,6 +10,9 @@ Features
 - Für jede Fertigkeit wurde ein zusätzlicher Würfel für Fertigkeitsspezialisierung hinzugefügt. Dieser würfelt mit +2 Fertigkeitswert.
 - bei Schadenswürfeln ist jetzt der Würfel selbst zwischen W2, W3, W4, W6 und W20) auswählbar, Default ist W6
 - Es wurde ein zusätzlicher Zustand hinzugefügt, dessen Name frei belegt werden kann. Entsprechend kann dieser bei den Talenten aktiviert bzw. deaktiviert werden.
+- Das Design der Status-Seite wurde auf DropDown-Menüs umgestellt. 
+- Die Seite Ausrüstung/Rüstungen würde überarbeitet. Ein DropDown-Menü zur Auswahl der Belastung sowie weitere Modifikatoren wurden hinzugefügt. Neu ist auch die Berechnung des Status Belastung aus der Rüstung sowie der Werte für INI und GS. Veränderungen an AT/PA/AW/VW werden im Kampfbogen berücksichtigt.
+- Ein Sonderfertigkeitsmodifier für z. B. Belastungsgewöhnung ist nicht vorhanden. Bitte verändert entsprechend die Belastung direkt an der Rüstung.
 
 
 2020-04-12:
