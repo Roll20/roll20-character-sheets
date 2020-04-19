@@ -2,9 +2,14 @@
 This is a character sheet designed for use with Original Dungeons & Dragons. The sheet is lacking a lot of automation in rolls and calculations to give maximum flexibility to the Dungeon Master in which Original Dungeons & Dragons rules to use. This sheet will also work with Holmes Basic D&D.
 
 ## Current Version
-1.1
+1.2
 
 ### Change log
+
+#### 1.2
+* Fixed: typo, Save vs. Stone added back in, textarea css issue (affecting Misc, equipment, treasure, etc.)
+* Added To Hit AC number line, Max HP
+* Added i18n for translations
 
 #### 1.1
 * Layout changed to CSS Grid, with min- max- width set
