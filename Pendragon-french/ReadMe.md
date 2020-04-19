@@ -20,8 +20,10 @@ Bon jeu !
 
 ## Update 2020  
 
-* Fix bonus au dé pour jets avec attribut >20 
+* nouvelle mise en page, plus compacte et plus souple (redimensionnement de la fenêtre)
+* nouveaux champs : blason, devise, gains de gloire, compétences additionnelles, joute victoires et défaites, montures
 * nouveaux templates pour affichage résultat des jets 1d20 et dégâts, avec affichage du résultat
+* Fix bonus au dé pour jets avec attribut >20 
 * checkbox autocalculée pour bonus religion et chevalerie
 * nouvelles religions conformes au Book of Knights and Ladies
 * traits associés au bonus religieux soulignés 
@@ -29,9 +31,5 @@ Bon jeu !
 * nouveau calculs dynamiques des bonus religieux
 * fix trait oublié dans la liste de choix des traits dirigés
 * sheetworkers
-* option de désactivation du bonus de chevalerie (période Uther)
-* ajout champs de compétences additionnelles (non combat)
-* ajout champs montures
-* refonte de la mise en page, plus compacte
-* ajout champs gains de gloire annuels (todo)
+
 
