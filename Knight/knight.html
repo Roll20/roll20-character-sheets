@@ -2891,6 +2891,39 @@
 		});
 	});
 	
+	on(
+	"change:fichePNJ change:diceInitiative change:bonusInitiativeP change:malusInitiative change:MasquePNJAEMaj sheet:opened"
+	, function() 
+	{
+		getAttrs(["fichePNJ", "MasquePNJAEMaj"], function(value)
+		{
+			const TFiche = value["fichePNJ"];
+			
+			if(TFiche == 1 || TFiche == 2)
+			{
+				const MasqueMaj = value["MasquePNJAEMaj"];
+				
+				if(MasqueMaj > 0)
+				{
+					setAttrs({
+						diceInitiative:0,
+						bonusInitiativeP:30,
+						malusInitiative:0
+					});
+				}
+			}
+			
+			if(TFiche == 3)
+			{
+				setAttrs({
+					diceInitiative:0,
+					bonusInitiativeP:1,
+					malusInitiative:0
+				});
+			}
+		});
+	});
+	
 	on("clicked:resetArmure",function()
 	{
 		getAttrs(["armurePJ_max", "energiePJ_max"], function(value)
@@ -5004,7 +5037,7 @@
 						<div>
 							<h4 class="titre bouton">
 								Initiative
-								<button type="roll" name="attr_jetInitiativePNJ" class="boutonBase" value="@{jetGM} &{template:initiativePNJ} {{Nom=@{name}}} {{Initiative=[[ [[@{diceInitiative}]]D6+[[@{bonusInitiativeP}-@{malusInitiative}]] ]]}} {{ae=[[@{MasquePNJAEMaj}]]}} {{aeInitiative=[[30]]}}" />
+								<button type="roll" name="attr_jetInitiativePNJ" class="boutonBase" value="@{jetGM} &{template:initiativePNJ} {{Nom=@{name}}} {{Initiative=[[ [[@{diceInitiative}]]D6+[[@{bonusInitiativeP}-@{malusInitiative}]] ]]}}" />
 							</h4>
 							<input type="number" class="textCenter W33" name="attr_diceInitiative" value="3" />
 							<b class="largeB">D6+</b>
@@ -5119,7 +5152,7 @@
 						<div>
 							<h4 class="titre bouton">
 								Initiative
-								<button type="roll" name="attr_jetInitiativePNJ" class="boutonBase" value="@{jetGM} &{template:initiativePNJ} {{Nom=@{name}}} {{Initiative=[[ [[@{diceInitiative}]]D6+[[@{bonusInitiativeP}-@{malusInitiative}]] ]]}} {{ae=[[@{MasquePNJAEMaj}]]}} {{aeInitiative=[[30]]}}" />
+								<button type="roll" name="attr_jetInitiativePNJ" class="boutonBase" value="@{jetGM} &{template:initiativePNJ} {{Nom=@{name}}} {{Initiative=[[ [[@{diceInitiative}]]D6+[[@{bonusInitiativeP}-@{malusInitiative}]] ]]}}" />
 							</h4>
 							<input type="number" class="textCenter W33" name="attr_diceInitiative" value="3" />
 							<b class="largeB">D6+</b>
@@ -5224,13 +5257,13 @@
 						<div>
 							<h4 class="titre bouton">
 								Initiative
-								<button type="roll" name="attr_jetInitiativeBande" class="boutonBase" value="@{jetGM} &{template:initiativePNJ} {{Nom=@{name}}} {{Initiative=[[ [[@{diceInitiativeBande}]]D6+[[@{bonusInitiativePBande}-@{malusInitiativeBande}]] ]]}}" />
+								<button type="roll" name="attr_jetInitiativePNJ" class="boutonBase" value="@{jetGM} &{template:initiativePNJ} {{Nom=@{name}}} {{Initiative=[[ [[@{diceInitiative}]]D6+[[@{bonusInitiativeP}-@{malusInitiative}]] ]]}}" />
 							</h4>
-							<input type="number" class="textCenter W33" name="attr_diceInitiativeBande" value="0" disabled />
+							<input type="number" class="textCenter W33" name="attr_diceInitiative" value="3" />
 							<b class="largeB">D6+</b>
-							<input type="number" class="textCenter W33" name="attr_bonusInitiativePBande" value="1" disabled />
+							<input type="number" class="textCenter W33" name="attr_bonusInitiativeP" value="0" />
 							<b>-</b>
-							<input type="number" class="textCenter W33" name="attr_malusInitiativeBande" value="0" disabled />
+							<input type="number" class="textCenter W33" name="attr_malusInitiative" value="0" />
 						</div>
 					</div>
 					<div class="mainBlock4WaySpecial Separation">
@@ -25722,17 +25755,7 @@ Attention : l’effet ne peut pas se cumuler alors que la cible est déjà sous 
 		</div>
 		<div>
 			<h5 class="W80">Résultat</h5>
-			{{#ae}}
-				{{#rollGreater() ae 0}}
-					<h5 class="W20 textCenter">{{aeInitiative}}</h5>
-				{{/rollGreater() ae 0}}
-				{{#rollTotal() ae 0}}
-					<h5 class="W20 textCenter">{{Initiative}}</h5>
-				{{/rollTotal() ae 0}}
-			{{/ae}}
-			{{^ae}}
-					<h5 class="W20 textCenter">{{Initiative}}</h5>
-			{{/ae}}
+			<h5 class="W20 textCenter">{{Initiative}}</h5>
 		</div>
 	</div>
 </rolltemplate>
