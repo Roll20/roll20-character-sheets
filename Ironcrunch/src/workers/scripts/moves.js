@@ -103,3 +103,9 @@ on('change:reveal_a_danger_button', function(eventinfo) {
     reveal_a_danger_tables: eventinfo.newValue
   });
 });
+
+on('change:find_an_opportunity_button', function(eventinfo) {
+  setAttrs({
+    find_an_opportunity_tables: eventinfo.newValue
+  });
+});
