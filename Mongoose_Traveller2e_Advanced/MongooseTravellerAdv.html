@@ -84,6 +84,7 @@
     <input type="radio" name="attr_tab" class="sheet-tab sheet-tab3" value="3" id="radio3" title="Inventory" /><label for="radio3">Inventory</label>
     <input type="radio" name="attr_tab" class="sheet-tab sheet-tab4" value="4" id="radio4" title="Combat" /><label for="radio4">Combat</label>
     <input type="radio" name="attr_tab" class="sheet-tab sheet-tab5" value="5" id="radio5" title="Powers" /><label for="radio5">Powers</label>
+    <input type="radio" name="attr_tab" class="sheet-tab sheet-tab6" value="6" id="radio6" title="Journal" /><label for="radio6">Journal</label>
 
     <!--    Prime  -->
     <div class="sheet-tab-content sheet-tab1">
@@ -139,7 +140,7 @@
         <div class="sheet-col">
             <h3  data-i18n="characterhistorytitle-u">Character History</h3>
                 <textarea name="attr_character_history" placeholder="Character History" style="width:800px"></textarea>
-                <h3 data-i18n="recenthistory-u">Recent History</h3>
+            <h3 data-i18n="recenthistory-u">Recent History</h3>
                 <fieldset class="repeating_history">
                     <table class="sheet-skilltable">
                         <tr>
@@ -2193,8 +2194,7 @@
                     </fieldset>
             </div>
     </div>
-</div>
-
+    </div>
     <!--    Combat  -->
     <div class="sheet-tab-content sheet-tab4">
         <br>
@@ -2471,8 +2471,32 @@
                 </tr>
             </table>
         </fieldset>
-
-</div>
+    </div>
+    <!--    Journal  -->
+    <div class="sheet-tab-content sheet-tab6">
+        <br>
+        <div class="sheet-2col">
+            <div class="sheet-oval sheet-col"><h2 class="sheet-title" data-i18n="journaltitle-u">Journal</h2></div>
+            <div class="sheet-col" style="float:right"></div>
+        </div>
+        <br>
+        <div class="sheet-col">
+            <h3 data-i18n="journalentrytitle-u">Journal Entry</h3><br>
+            <fieldset class="repeating_journaldata">
+                <table class="sheet-skilltable">
+                    <tr>
+                        <td data-i18n="journaleventname-u" style="width:100px;" >Event Name</td>
+                        <td><input class="sheet-input" type="text" value="" name="attr_history-event" style="width:410px;" /></td>
+                        <td data-i18n="journaleventdate-u" style="width:100px;" >Event Date</td>
+                        <td><input class="sheet-input" type="text" value="" name="attr_history-date" style="width:210px;" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4"><textarea wrap="soft" class="sheet-input" value="" name="attr_note-history" placeholder="Event Details" style="width:820px"></textarea></td>
+                    </tr>
+                </table>
+            </fieldset>
+        </div>
+    </div>
 </div>
 <div class="sheet-">
     <rolltemplate class="sheet-rolltemplate-power">
@@ -2585,11 +2609,12 @@
 // Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
 // By:       The Aaron, Arcane Scriptomancer
 // Contact:  https://app.roll20.net/users/104025/the-aaron
+
 var TAS = TAS || (function(){
     'use strict';
 
-    var version = '0.2.3',
-        lastUpdate = 1457098056,
+    var version = '0.2.5',
+        lastUpdate = 1504710542,
 
         loggingSettings = {
             debug: {
@@ -2698,7 +2723,7 @@ var TAS = TAS || (function(){
         },
 
         callstackRegistry = [],
-		queuedUpdates = {}, //< Used for delaying saves till the last momment.
+		queuedUpdates = {}, //< Used for delaying saves till the last moment.
 
     complexType = function(o){
         switch(typeof o){
@@ -2756,15 +2781,19 @@ var TAS = TAS || (function(){
             mTxtColor = (options.color && options.color.text) || 'white';
 
         coloredLoggerFunction = function(message){
+            /* eslint-disable no-console */
             console.log(
                 '%c '+label+': %c '+message + ' ',
                 'background-color: '+lBGColor+';color: '+lTxtColor+'; font-weight:bold;',
                 'background-color: '+mBGColor+';color: '+mTxtColor+';'
-            );
+            ); 
+            /* eslint-enable no-console */
         };
         return function(){
             if('TAS'===key || config.logging[key]){
-               dataLogger(coloredLoggerFunction,function(m){console.log(m);},_.toArray(arguments));
+                /* eslint-disable no-console */
+               dataLogger(coloredLoggerFunction,function(m){console.log(m);},_.toArray(arguments)); 
+                /* eslint-enable no-console */
             }
         };
     },
@@ -2803,6 +2832,10 @@ var TAS = TAS || (function(){
         );
         config=newconf;
     },
+    
+    isDebugMode = function(){
+        return config.debugMode;
+    },
 
     debugMode = function(){
         config.logging.debug=true;
@@ -2811,7 +2844,7 @@ var TAS = TAS || (function(){
 
     getCallstack = function(){
         var e = new Error('dummy'),
-            stack = _.map(_.rest(e.stack.replace(/^[^\(]+?[\n$]/gm, '')
+            stack = _.map(_.rest(e.stack.replace(/^[^(]+?[\n$]/gm, '')
             .replace(/^\s+at\s+/gm, '')
             .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
             .split('\n')),function(l){
@@ -2828,7 +2861,7 @@ var TAS = TAS || (function(){
                logCSA( '===================='+(csa.label ? '> '+csa.label+' <' : '')+'====================');
                logCallstackSub(csa.stack);
                return true;
-            }
+            } 
             logCS(line);
             return false;
         });
@@ -2859,19 +2892,22 @@ var TAS = TAS || (function(){
                 };
             }(callback,context));
         }
-
+        
         callstack = getCallstack();
         callstack.shift();
-
+        
         return (function(cb,ctx,cs,lbl){
             var ctxref=registerCallstack(cs,lbl);
 
             /*jshint -W054 */
             return new Function('cb','ctx','TASlog',
                 "return function TAS_CALLSTACK_"+ctxref+"(){"+
+                    "var start,end;"+
                     "TASlog('Entering: '+(cb.name||'(anonymous function)'));"+
+                    "start=_.now();"+
                     "cb.apply(ctx||{},arguments);"+
-                    "TASlog('Exiting: '+(cb.name||'(anonymous function)'));"+
+                    "end=_.now();"+
+                    "TASlog('Exiting: '+(cb.name||'(anonymous function)')+' :: '+(end-start)+'ms elapsed');"+
                 "};")(cb,ctx,log);
             /*jshint +W054 */
         }(callback,context,callstack,label));
@@ -2904,7 +2940,7 @@ var TAS = TAS || (function(){
 	addId = function(obj,value){
 		Object.defineProperty(obj,'id',{
 			value: value,
-			writeable: false,
+			writable: false,
 			enumerable: false
 		});
 	},
@@ -2912,7 +2948,7 @@ var TAS = TAS || (function(){
 	addProp = function(obj,prop,value,fullname){
 		(function(){
             var pname=(_.contains(['S','F','I','D'],prop) ? '_'+prop : prop),
-			    full_pname = fullname || prop,
+                full_pname = fullname || prop,
                 pvalue=value;
 
             _.each(['S','I','F'],function(p){
@@ -2953,7 +2989,7 @@ var TAS = TAS || (function(){
 					return pvalue;
 				}
 			});
-
+            
             // string value
 			Object.defineProperty(obj.S, pname, {
                 enumerable: true,
@@ -3016,7 +3052,7 @@ var TAS = TAS || (function(){
 
 		}());
 	},
-
+	
 	repeating = function( section ) {
 		return (function(s){
 			var sectionName = s,
@@ -3024,7 +3060,7 @@ var TAS = TAS || (function(){
 				fieldNames = [],
 				operations = [],
                 after = [],
-
+			
 			repAttrs = function TAS_Repeating_Attrs(){
 				attrNames = namesFromArgs(arguments,attrNames);
 				return this;
@@ -3033,7 +3069,7 @@ var TAS = TAS || (function(){
 				fieldNames = namesFromArgs(arguments,fieldNames);
 				return this;
 			},
-			repReduce = function TAS_Repeating_Reduce(func, initial, final, context) {
+			repReduce = function TAS_Repeating_Reduce(func, initial, final, context) { 
 				operations.push({
                     type: 'reduce',
                     func: (func && _.isFunction(func) && func) || _.noop,
@@ -3090,7 +3126,7 @@ var TAS = TAS || (function(){
 					fieldIds = ids;
 					fullFieldNames = _.reduce(fieldIds,function(memo,id){
 						return memo.concat(_.map(fieldNames,function(name){
-							return 'repeating_'+sectionName+'_'+id+'_'+name;
+							return 'repeating_'+sectionName+'_'+id+'_'+name;  
 						}));
 					},[]);
 					getAttrs( _.uniq(attrNames.concat(fullFieldNames)), function(values){
@@ -3104,7 +3140,7 @@ var TAS = TAS || (function(){
 							var r={};
 							addId(r,id);
 							_.each(fieldNames,function(name){
-								var fn = 'repeating_'+sectionName+'_'+id+'_'+name;
+								var fn = 'repeating_'+sectionName+'_'+id+'_'+name;  
 								addProp(r,name,values[fn],fn);
 							});
 
@@ -3152,7 +3188,7 @@ var TAS = TAS || (function(){
 					});
 				});
 			};
-
+				
 			return {
 				attrs: repAttrs,
 				attr: repAttrs,
@@ -3199,8 +3235,10 @@ var TAS = TAS || (function(){
             .execute();
     };
 
-	console.log('%câ€¢.Â¸Â¸.â€¢*Â´Â¨`*â€¢.Â¸Â¸.â€¢*Â´Â¨`*â€¢.Â¸  The Aaron Sheet  v'+version+'  Â¸.â€¢*Â´Â¨`*â€¢.Â¸Â¸.â€¢*Â´Â¨`*â€¢.Â¸Â¸.â€¢','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
-	console.log('%câ€¢.Â¸Â¸.â€¢*Â´Â¨`*â€¢.Â¸Â¸.â€¢*Â´Â¨`*â€¢.Â¸  Last update: '+(new Date(lastUpdate*1000))+'  Â¸.â€¢*Â´Â¨`*â€¢.Â¸Â¸.â€¢*Â´Â¨`*â€¢.Â¸Â¸.â€¢','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+    /* eslint-disable no-console */
+	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  The Aaron Sheet  v'+version+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+	console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  Last update: '+(new Date(lastUpdate*1000))+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+    /* eslint-enable no-console */
 
 
     return {
@@ -3215,6 +3253,7 @@ var TAS = TAS || (function(){
         callback: wrapCallback,
         callstack: logCallstack,
         debugMode: debugMode,
+        isDebugMode: isDebugMode,
         _fn: wrapCallback,
 
         /* Logging */
