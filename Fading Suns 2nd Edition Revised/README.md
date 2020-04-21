@@ -39,8 +39,6 @@
 
 - [TBC] use short names for characteristics in weapon/psi/theurgy tables to save up on space
 
-- ability for users to report a bug found in the sheet
-
 - Weapons & armors property checkboxes (Shock, Laser, Plasma, etc..) & replace d6rolls with proper damage/armor rolls showing shield-piercing vs normal damage, etc.
 
 - Support for Symbiot characters
