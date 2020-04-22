@@ -9,9 +9,14 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-3.0 [Screenshot](co_v2.png)
+3.1 [Screenshot](co_v3.jpg)
 
 # Notes de version
+## v3.1 (2020-04-16)
+* Ajout des couleurs introduites avec les boîtes Chroniques Oubliées
+* Ajout d'un champ `degat2` dans le roll template (pour rajouter des dégâts non multipliés en cas de critique)
+* Essai en enlevant un champ avec accant (créature) de la partie script, pour voir si c'est la cause de l'erreur de syntaxe quand on importe la fiche (pas d'erreur si on copie-colle)
+
 ## v3.0 (2020-01-21)
 * Utilisation d'options pour l'affichage ou non des règles optionnelles, qui sont maintenant dans la partie caractéristique, et non équipement
 * Capacités raciales et langues passent dans l'onglet capacités
