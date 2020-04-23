@@ -61,7 +61,11 @@ const moves  = [
 // Search and Highlight Move
 on('change:move_search', function(eventinfo) {
   for (var move of moves) {
-    if (move.name.toLocaleLowerCase().includes(eventinfo.newValue.toLocaleLowerCase())) {
+    if (!eventinfo.newValue) {
+      setAttrs({
+        [`${move.value}_highlight`]: 'off'
+      });
+    } else if (move.name.toLocaleLowerCase().includes(eventinfo.newValue.toLocaleLowerCase())) {
       setAttrs({
         [`${move.value}_highlight`]: 'on'
       });
@@ -69,7 +73,7 @@ on('change:move_search', function(eventinfo) {
       setAttrs({
         [`${move.value}_highlight`]: 'off'
       });
-    }
+    };
   };
 });
 
@@ -86,15 +90,18 @@ on('change:clear_search', function() {
 });
 
 on('change:selected_move', function(eventinfo) {
-  setAttrs({
-    move_view: '2',
-    move_preview: eventinfo.newValue
-  });
+  if (eventinfo.newValue !== 'none') {
+    setAttrs({
+      move_view: '2',
+      move_preview: eventinfo.newValue
+    });
+  }
 });
 
 on('change:close_move_preview', function() {
   setAttrs({
-    move_view: '1'
+    move_view: '1',
+    selected_move: 'none'
   });
 });
 
