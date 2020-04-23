@@ -1116,6 +1116,7 @@
                             <td><input type=number style="width: 4em; font-weight: bold; background-color:#81BEF7; text-align: center" name="attr_initiativemod" value=0>
                             <input type=hidden name="attr_hiddenini" value=0>
                             <input type=hidden name="attr_hiddeninibr" value=0></td>
+                            <input type=hidden name="attr_blitzreflexecount" value=0></td>
                         </tr>
                         <tr>
                             <td>Lebenspunkte</td>
@@ -3707,7 +3708,7 @@ on("change:beweglichkeit change:groessenklasse change:konstitution change:intuit
       setAttrs({
           geschwindigkeit: +values.beweglichkeit + +values.groessenklasse + +values.geschwindigkeitmod + +values.hiddengsw + +values.hiddengswag + +values.hiddengswspr - +values.hiddengswbe - +values.erschoepft - +values.lahm,
           lebenspunkte: +values.groessenklasse + +values.konstitution + +values.lebenspunktemod + +values.hiddenlp,
-          initiative: 10 - (+values.intuition + +values.hiddenini + +values.hiddeninibr) - +values.initiativemod + +values.erschoepft,
+          initiative: 10 - (+values.intuition + +values.hiddenini + +values.hiddeninibr) + +values.initiativemod + +values.erschoepft,
           fokus: (+values.mystik + +values.willenskraft) * 2 + +values.fokusmod + +values.hiddenfokus,
           koerperlicherwiderstand: 12 + +values.konstitution + +values.willenskraft + +values.koerperlicherwiderstandmod + +values.hiddenkw + +values.hiddenkwhg + +values.hiddenkwbonus,
           geistigerwiderstand: 12 + +values.verstand + +values.willenskraft + +values.geistigerwiderstandmod + +values.hiddengw + +values.hiddengwhg + +values.hiddengwbonus,
@@ -3845,14 +3846,14 @@ on("change:ausstrahlungstart change:beweglichkeitstart change:intuitionstart cha
 });
 
 on("change:repeating_meisterschaften:meisterschaftsschwelle", function() {
-    getAttrs(["repeating_meisterschaften_meisterschaftsname", "repeating_meisterschaften_meisterschaftsfertigkeit"], function(values) {
+    getAttrs(["repeating_meisterschaften_meisterschaftsname", "repeating_meisterschaften_meisterschaftsfertigkeit", "blitzreflexecount"], function(values) {
         var name = values.repeating_meisterschaften_meisterschaftsname;
         var fertigkeit = values.repeating_meisterschaften_meisterschaftsfertigkeit;
         var update = {};
         if (name != "" && fertigkeit != "") {
             switch (name.toLowerCase()) {
                 case "blitzreflexe":
-                    update["hiddeninibr"] = 3;
+                    update["blitzreflexecount"] = +values.blitzreflexecount + 1;
                     break;
                 case "gute reflexe":
                     update["hiddenvtdgr"] = 1;
@@ -4858,14 +4859,14 @@ on("change:repeating_nahkampfwaffen:waffenscharf change:repeating_nahkampfwaffen
             die_max = waffenschadenwuerfel.substr(1);
             die_minus = +waffenschadenwuerfel.substr(1) - 1;
             if ((+waffenschaden1 + +exakt) == 1) {
-                damagerollstring += "[[{1" + waffenschadenwuerfel + "}<" + +die_minus + "*([[{1d" + +die_minus + "," + scharf + "d1}k1]]-" +  (+die_max + +kritisch) + ")+"  + (+die_max + +kritisch) + "+" + waffenschaden3 + "]]";
+                damagerollstring += "{1" + waffenschadenwuerfel + "}<" + +die_minus + "*([[{1d" + +die_minus + "," + scharf + "d1}k1]]-" +  (+die_max + +kritisch) + ")+"  + (+die_max + +kritisch) + "+" + waffenschaden3;
             } else {
-                damagerollstring = "[[{";
+                damagerollstring = "{";
                 for (i = 1; i <= +waffenschaden1 + +exakt; i++) {
                     damagerollstring = damagerollstring + "{1" + waffenschadenwuerfel + "}<" + +die_minus + "*([[{1d" + +die_minus + "," + scharf + "d1}k1]]-" + (+die_max + +kritisch) + ")+" + (+die_max + +kritisch) + ",";
                 }
                 damagerollstring = damagerollstring.slice(0, -1);
-                damagerollstring += "}k" + waffenschaden1 + " + " + waffenschaden3 + "]]";
+                damagerollstring += "}k" + waffenschaden1 + " + " + waffenschaden3;
             }
         } else if (kritisch == 0) {
             damagerollstring = "{";
@@ -7367,7 +7368,7 @@ on("remove:repeating_meisterschaften", function(eventInfo) {
 	var meisterschaft = eventInfo.removedInfo["repeating_meisterschaften_" + rowid + "_meisterschaftsname"];
 	var update = {};
 	var meisterschaften = {
-	    "blitzreflexe":"hiddeninibr",
+	    "blitzreflexe":"blitzreflexecount",
 	    "gute reflexe":"hiddenvtdgr",
 	    "rüstungsträger i":"rt1",
 	    "rüstungsträger 1":"rt1",
@@ -7384,11 +7385,35 @@ on("remove:repeating_meisterschaften", function(eventInfo) {
 	    "arkane geschwindigkeit":"hiddengswag",
 	    "sprinter":"hiddengswspr"
 	};
-	if (meisterschaften[meisterschaft] != "undefined") {
-	    update[meisterschaften[meisterschaft.toLowerCase()]] = 0;
-        setAttrs(update);
+	if (meisterschaft.toLowerCase() == "blitzreflexe") {
+	     getAttrs(["blitzreflexecount"], function(v) {
+            console.log(v.blitzreflexecount);
+            if (+v.blitzreflexecount > 0) {
+                update[meisterschaften[meisterschaft.toLowerCase()]] = +v.blitzreflexecount - 1;
+	            setAttrs(update);
+            }
+	    });
+	} else {
+       if (meisterschaften[meisterschaft] != "undefined") {
+            update[meisterschaften[meisterschaft.toLowerCase()]] = 0;
+            setAttrs(update);
+    	}
 	}
 });
+
+on("change:blitzreflexecount", function(eventInfo) {
+    getAttrs(["blitzreflexecount", "hiddeninibr"], function(v) {
+        let update = {};
+        let blitzreflexecount = +v.blitzreflexecount;
+        if (+blitzreflexecount <= 2) {
+            update["hiddeninibr"] = +blitzreflexecount * 3;
+            setAttrs(update);
+        } else {
+            update["hiddeninibr"] = 0;
+            setAttrs(update);
+        }
+    });
+});    
 
 on("change:lebenspunkte_v", function(eventInfo) {
     if (eventInfo.sourceType == "sheetworker") { return; }
