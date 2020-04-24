@@ -2,6 +2,26 @@
 
 ## Änderungen
 
+2020-04-19:
+- Bugfix: Korrektur Berechnung Seelenkraft
+- Bugfix: NSC-Bogen Fernkampf, Reichweite ist jetzt ein Freitext
+
+Features
+- Für jede Fertigkeit wurde ein zusätzlicher Würfel für Fertigkeitsspezialisierung hinzugefügt. Dieser würfelt mit +2 Fertigkeitswert.
+- bei Schadenswürfeln ist jetzt der Würfel selbst zwischen W2, W3, W4, W6 und W20) auswählbar, Default ist W6
+- Es wurde ein zusätzlicher Zustand hinzugefügt, dessen Name frei belegt werden kann. Entsprechend kann dieser bei den Talenten aktiviert bzw. deaktiviert werden.
+- Das Design der Status-Seite wurde auf DropDown-Menüs umgestellt. 
+- Die Seite Ausrüstung/Rüstungen würde überarbeitet. Ein DropDown-Menü zur Auswahl der Belastung sowie weitere Modifikatoren wurden hinzugefügt. Neu ist auch die Berechnung des Status Belastung aus der Rüstung sowie der Werte für INI und GS. Veränderungen an AT/PA/AW/VW werden im Kampfbogen berücksichtigt.
+- Ein Sonderfertigkeitsmodifier für z. B. Belastungsgewöhnung ist nicht vorhanden. Bitte verändert entsprechend die Belastung direkt an der Rüstung.
+
+
+2020-04-12:
+Features:
+- Der Bogen für NPCs und Monster ist endlich fertig! Unter Optionen kann man den NPC-Bogen aktivieren. Dadurch verändern sich der Grundwerte-Tab sowie der Kampftab. Unter Nahkampf und Fernkampf lassen sich jetzt direkt die Angriffe und Aktionen mit den jeweiligen AT/PA und TP-Würfeln per Add-Button hinzufügen. Die mit P gekennzeichneten Würfel stehen für den Passierschlag. Außerdem werden im Ausrüstungstab die BLöcke für Nah- und Fernkampfwaffen sowie Schilde und Rüstungen ausgeblendet. Die Modifikatoren aus Sonderfertigkeiten und Effekte funktionieren weiterhin. Falls ihr Fehler entdeckt, schickt mir bitte eine Nachricht.
+
+- Weitere Optionen wurden implementiert: So lassen sich die Kopfzeile teilweise oder ganz ausblenden. Im Grundwerte-Tab können jetzt die Blöcke für Astral- und Karmaenergie ausblenden.
+
+
 2020-03-28:
 - Bugfix: halbe Parade funktioniert wieder
 
