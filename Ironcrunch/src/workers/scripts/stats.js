@@ -54,14 +54,14 @@ on('change:spirit', function(eventinfo) {
 //Cannot increase Supply while Unprepared
 //Supply reaching 0 marks Unprepared
 on('change:supply', function(eventinfo) {
-    getAttrs(["debilUnprepared"], function(values) {
-        if(values.debilUnprepared == "on") {
+    getAttrs(["unprepared"], function(values) {
+        if(values.unprepared == "on") {
             if (parseInt(eventinfo.newValue) > parseInt(eventinfo.previousValue)) {
                 setAttrs({supply: eventinfo.previousValue});
             }
         }
     });
-    if (parseInt(eventinfo.newValue) === 0) setAttrs({debilUnprepared: "on"});
+    if (parseInt(eventinfo.newValue) === 0) setAttrs({unprepared_button: "on"});
 });
 
 // Edge sets Speed value
