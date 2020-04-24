@@ -801,11 +801,11 @@
         </table>
         <table class="tabsep">
           <tr>
-            <td class="boxtitre-def">DEF</td>
+            <td class="boxtitre-def" style="width:21%">DEF</td>
             <td class="boxinput-def">
               <input type="number" class="def" name="attr_pnj_def" title="Défense" value="10" min="0"/>
             </td>
-            <td class="boxtitre-pv">PV</td>
+            <td class="boxtitre-pv" style="width:21%">PV</td>
             <td class="boxinput-pv">
               <input type="number" class="pv" name="attr_pnj_pv_max" title="PVs max" value="1" min="1"/>
             </td>
@@ -822,7 +822,15 @@
           <tr><td class="boxinputleft-def">
               <textarea class="def" name="attr_pnj_rd" spellcheck="false" title="@{pnj_rd}"></textarea></td></tr>
         </table>
-        <table class="tabsep" style="width:40%;">
+        <table style="width:51px">
+          <tr><td>
+        <input type="checkbox" name="attr_pnj_armure" title="@{pnj_armure}" style="width:9px"><span class="def" style="font-size:9px">Armure</span>
+            </td></tr>
+          <tr><td>
+              <input type="checkbox" name="attr_pnj_bouclier" title="@{pnj_bouclier}" style="width:9px"><span class="def" style="font-size:9px">Bouclier</span>
+            </td></tr>
+        </table>
+        <table class="tabsep" style="width:18%;">
           <tr>
             <td  class="boxinput-pv">
               <span class="textbase-pv">PV restants</span>&nbsp;
@@ -836,6 +844,7 @@
             </td>
           </tr>
         </table>
+        &nbsp;&nbsp;
         <span class="textbase">Jets</span>&nbsp;
           <select class="sheet-carac" style="width: 75px;" name="attr_pnj_jets_caches" title="@{jets_caches}" size="1">
             <option value="" selected>Normaux</option>
@@ -993,6 +1002,7 @@
 <script type="text/worker">
   on('sheet:opened', function() {
     // **** Gestion transition de version
+   // **** Gestion transition de version
     getAttrs(["version"], function(values) {
       var verfdp = parseFloat(values.version) || 0;
       if (verfdp === 0) {
@@ -1433,6 +1443,27 @@
     });
   });
 
+  //Suivi des états de PNJs depuis les attributs PJs, au cas où ce seraient ceux liés dans le token
+  on('change:PV', function(eventinfo) {
+    getAttrs(['PV', 'PV_max', 'pnj_pv', 'pnj_pv_max', 'type_personnage'], function(values) {
+      if (values.type_personnage != 'PNJ') return;
+      var pv = parseInt(values.PV);
+      if (isNaN(pv)) return;
+      var pnj_pv = parseInt(values.pnj_pv);
+      if (pnj_pv != pv) {
+        setAttrs({pnj_pv:pv});
+        return;
+      }
+      var pv_max = parseInt(values.PV_max);
+      if (isNaN(pv_max)) return;
+      var pnj_pv_max = parseInt(values.pnj_pv_max);
+      if (pnj_pv_max != pv_max) {
+        setAttrs({pnj_pv_max:pv_max});
+        return;
+      }
+    });
+  });
+
   //Mise à jour des stats dérivées
   on('change:CHARISME change:option_pc change:pc_bonus', function(eventinfo) {
     getAttrs(["CHARISME", "option_pc", "pc_bonus", "pc_base", "pc", "pc_max"], function(values) {
@@ -1480,7 +1511,7 @@
     sag: 'pnj_sag',
     per: 'pnj_sag',
     cha: 'pnj_cha',
-    creature: 'profil',
+    créature: 'profil',
     nc: 'NIVEAU',
     taille: 'TAILLE',
     profil: 'profil',
