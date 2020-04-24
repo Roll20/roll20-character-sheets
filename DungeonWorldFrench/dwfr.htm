@@ -2989,7 +2989,7 @@
     <!-- ===== SORTS ===== -->
     <div class="sheet-onglsort">
         <div class="sheet-actionligne">
-            <span class="sheet-action">Sorts préparés</span>
+            <span class="sheet-action">Niveaux de Sorts Préparés</span>
             <input type="number" class="sheet-action" name="attr_spellsnum" value="0" readonly />
             /
             <span class="sheet-action">Maximum</span>
@@ -3270,9 +3270,7 @@
             } else {
                 jet="0";
             }
-            setAttrs({
-                repeating_actionsbase_actionbaseroll: jet
-            });
+            setAttrs({repeating_actionsbase_actionbaseroll: jet}, {silent: true});
         });
         // Actions Spéciales
         on("change:repeating_actionsspe:actionspejet", function(eventinfo) {
@@ -3283,9 +3281,7 @@
             } else {
                 jet="0";
             }
-            setAttrs({
-                repeating_actionsspe_actionsperoll: jet
-            });
+            setAttrs({repeating_actionsspe_actionsperoll: jet}, {silent: true});
         });
         // Départ
         on("change:repeating_actionsdepart:actiondepjet", function(eventinfo) {
@@ -3296,9 +3292,7 @@
             } else {
                 jet="0";
             }
-            setAttrs({
-                repeating_actionsdepart_actiondeproll: jet
-            });
+            setAttrs({repeating_actionsdepart_actiondeproll: jet}, {silent: true});
         });
         // Avancées
         on("change:repeating_moves:movejet", function(eventinfo) {
@@ -3309,9 +3303,7 @@
             } else {
                 jet="0";
             }
-            setAttrs({
-                repeating_moves_moveroll: jet
-            });
+            setAttrs({repeating_moves_moveroll: jet}, {silent: true});
         });
         // Sorts
         on("change:repeating_spells:spelljet change:repeating_spells:spelldice", function() {
@@ -3328,9 +3320,7 @@
                 } else {
                     jet="0";
                 }
-                setAttrs({
-                    repeating_spells_spellroll: jet
-                });
+                setAttrs({repeating_spells_spellroll: jet}, {silent: true});
             });
         });
         on("change:repeating_spells:spellprep change:repeating_spells:spellniveau", function() {
@@ -3342,12 +3332,16 @@
                 });
                 getAttrs(fields, (v) => {
                     _.each(ids, (id) => {
+                        if((parseInt(v[`repeating_spells_${id}_spellprep`]) || 0) > 1) {
+                            update[`repeating_spells_${id}_spellprep`] = 1;
+                            v[`repeating_spells_${id}_spellprep`] = 1;
+                        }
                         val = (parseInt(v[`repeating_spells_${id}_spellprep`]) || 0) * (parseInt(v[`repeating_spells_${id}_spellniveau`]) || 0);
-                        update[`repeating_spells_${id}_spellprep`] = val;
+                        update[`repeating_spells_${id}_spellvalue`] = val;
                         tot += val;
                     });
                     update["spellsnum"] = tot;
-                    setAttrs(update);
+                    setAttrs(update, {silent: true});
                 });
             });
         });
@@ -3356,54 +3350,42 @@
             getAttrs(["strength","weak"], function(values) {
                 var mod=parseInt(DWVF.calcMod(values.strength)) || 0;
                 var mal=parseInt(values.weak) || 0;
-                setAttrs({
-                    strmod:mod-mal
-                });
+                setAttrs({strmod:mod-mal}, {silent: true});
             });
         });
         on("change:dexterity change:shaky", function() {
             getAttrs(["dexterity","shaky"], function(values) {
                 var mod=parseInt(DWVF.calcMod(values.dexterity)) || 0;
                 var mal=parseInt(values.shaky) || 0;
-                setAttrs({
-                    dexmod:mod-mal
-                });
+                setAttrs({dexmod:mod-mal}, {silent: true});
             });
         });
         on("change:constitution change:sick", function() {
             getAttrs(["constitution","sick"], function(values) {
                 var mod=parseInt(DWVF.calcMod(values.constitution)) || 0;
                 var mal=parseInt(values.sick) || 0;
-                setAttrs({
-                    conmod:mod-mal
-                });
+                setAttrs({conmod:mod-mal}, {silent: true});
             });
         });
         on("change:intelligence change:stunned", function() {
             getAttrs(["intelligence","stunned"], function(values) {
                 var mod=parseInt(DWVF.calcMod(values.intelligence)) || 0;
                 var mal=parseInt(values.stunned) || 0;
-                setAttrs({
-                    intmod:mod-mal
-                });
+                setAttrs({intmod:mod-mal}, {silent: true});
             });
         });
         on("change:wisdom change:confused", function() {
             getAttrs(["wisdom","confused"], function(values) {
                 var mod=parseInt(DWVF.calcMod(values.wisdom)) || 0;
                 var mal=parseInt(values.confused) || 0;
-                setAttrs({
-                    wismod:mod-mal
-                });
+                setAttrs({wismod:mod-mal}, {silent: true});
             });
         });
         on("change:charisma change:scarred", function() {
             getAttrs(["charisma","scarred"], function(values) {
                 var mod=parseInt(DWVF.calcMod(values.charisma)) || 0;
                 var mal=parseInt(values.scarred) || 0;
-                setAttrs({
-                    chamod:mod-mal
-                });
+                setAttrs({chamod:mod-mal}, {silent: true});
             });
         });
     // CLASSES
@@ -3513,6 +3495,7 @@
                 baseload : charge,
                 spellsmax : sorts,
                 dtype: degats
-            });
+            }, {silent: true});
         });
+    //# sourceURL=DungeonWorldFrench.js
 </script>
