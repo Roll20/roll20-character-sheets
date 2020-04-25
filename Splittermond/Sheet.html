@@ -5340,8 +5340,8 @@ function writeToSheet (characterData) {
         }
         var masteryname;
         var level;
-        var masteryshortdescription;
-        var masterylongdescription;
+        var masteryshortdescription = "";
+        var masterylongdescription = "";
         var skill;
         var skillname;
         var skillvalue;
@@ -5357,13 +5357,19 @@ function writeToSheet (characterData) {
                     newrowid = generateRowID();
                     masteryname = characterData["skills"][i]["masterships"][j]["name"];
                     level = characterData["skills"][i]["masterships"][j]["level"];
-                    masteryshortdescription = characterData["skills"][i]["masterships"][j]["shortDescription"];
+                    if (characterData["skills"][i]["masterships"][j]["shortDescription"] != null) {
+                        masteryshortdescription = characterData["skills"][i]["masterships"][j]["shortDescription"];
+                    }
                     character["repeating_meisterschaften_" + newrowid + "_meisterschaftsname"] = masteryname;
                     character["repeating_meisterschaften_" + newrowid + "_meisterschaftsfertigkeit"] = skillname;
                     character["repeating_meisterschaften_" + newrowid + "_meisterschaftsbeschreibung"] = skillname;
                     character["repeating_meisterschaften_" + newrowid + "_meisterschaftsschwelle"] = +level;
                     character["repeating_meisterschaften_" + newrowid + "_meisterschaftswirkung"] = masteryshortdescription;
-                    masterylongdescription = characterData["skills"][i]["masterships"][j]["longDescription"];
+                    if (characterData["skills"][i]["masterships"][j]["longDescription"] != null) {
+                        masterylongdescription = characterData["skills"][i]["masterships"][j]["longDescription"];
+                    } else {
+                        masterylongdescription = masteryshortdescription;
+                    }
                     newrowid = generateRowID();
                     character["repeating_masterytooltips_" + newrowid + "_masterytooltipname"] = masteryname;
                     character["repeating_masterytooltips_" + newrowid + "_masterytooltiptext"] = masterylongdescription;
@@ -5383,7 +5389,9 @@ function writeToSheet (characterData) {
                 character["repeating_zauber_" + newrowid + "_zauberdauer"] = characterData["spells"][i]["castDuration"];
                 character["repeating_zauber_" + newrowid + "_zauberrw"] = characterData["spells"][i]["castRange"];
                 character["repeating_zauber_" + newrowid + "_zauberwd"] = characterData["spells"][i]["spellDuration"];
-                character["repeating_zauber_" + newrowid + "_zauberwirkung"] = characterData["spells"][i]["longDescription"];
+                if (characterData["spells"][i]["longDescription"] != null) {
+                    character["repeating_zauber_" + newrowid + "_zauberwirkung"] = characterData["spells"][i]["longDescription"];
+                }
             }
         }
         let meleeskills = {"BEW":"bew","STÄ":"stae","AUS":"aus","INT":"int","KON":"kon","MYS":"mys","VER":"ver","WIL":"wil"};
@@ -5397,15 +5405,20 @@ function writeToSheet (characterData) {
                 merkmale = "";
                 character["repeating_nahkampfwaffen_" + newrowid + "_waffenname"] = characterData["meleeWeapons"][i]["name"];
                 character["repeating_nahkampfwaffen_" + newrowid + "_waffenskill"] = characterData["meleeWeapons"][i]["skill"].toLowerCase();
-                character["repeating_nahkampfwaffen_" + newrowid + "_waffenattr1"] = meleeskills[characterData["meleeWeapons"][i]["attribute1"]];
-                character["repeating_nahkampfwaffen_" + newrowid + "_waffenattr2"] = meleeskills[characterData["meleeWeapons"][i]["attribute2"]];
+                if (characterData["meleeWeapons"][i]["attribute1"] != null) {
+                    character["repeating_nahkampfwaffen_" + newrowid + "_waffenattr1"] = meleeskills[characterData["meleeWeapons"][i]["attribute1"]];
+                    character["repeating_nahkampfwaffen_" + newrowid + "_waffenattr2"] = meleeskills[characterData["meleeWeapons"][i]["attribute2"]];
+                
+                }
                 character["repeating_nahkampfwaffen_" + newrowid + "_waffenwgs"] = characterData["meleeWeapons"][i]["weaponSpeed"];
-                damage = characterData["meleeWeapons"][i]["damage"].toString().split("W")[0];
-                damagewuerfel = "d" + characterData["meleeWeapons"][i]["damage"].toString().split("W")[1].toString().split("+")[0];
-                damageplus = characterData["meleeWeapons"][i]["damage"].toString().split("W")[1].toString().split("+")[1] || 0;
-                character["repeating_nahkampfwaffen_" + newrowid + "_waffenschaden1"] = damage;
-                character["repeating_nahkampfwaffen_" + newrowid + "_waffenschadenwuerfel"] = damagewuerfel;
-                character["repeating_nahkampfwaffen_" + newrowid + "_waffenschaden3"] = damageplus;
+                if (characterData["meleeWeapons"][i]["damage"] != null) {
+                    damage = characterData["meleeWeapons"][i]["damage"].toString().split("W")[0] || 0;
+                    damagewuerfel = "d" + characterData["meleeWeapons"][i]["damage"].toString().split("W")[1].toString().split("+")[0];
+                    damageplus = characterData["meleeWeapons"][i]["damage"].toString().split("W")[1].toString().split("+")[1] || 0;
+                    character["repeating_nahkampfwaffen_" + newrowid + "_waffenschaden1"] = damage;
+                    character["repeating_nahkampfwaffen_" + newrowid + "_waffenschadenwuerfel"] = damagewuerfel;
+                    character["repeating_nahkampfwaffen_" + newrowid + "_waffenschaden3"] = damageplus;
+                } 
                 if (characterData["meleeWeapons"][i]["features"].length > 0) {
                     for (var j = 0; j < characterData["meleeWeapons"][i]["features"].length; j++) {
                         merkmale += characterData["meleeWeapons"][i]["features"][j]["name"];
@@ -5430,15 +5443,19 @@ function writeToSheet (characterData) {
                 merkmale = "";
                 character["repeating_fernkampfwaffen_" + newrowid + "_waffennamefern"] = characterData["longRangeWeapons"][i]["name"];
                 character["repeating_fernkampfwaffen_" + newrowid + "_waffenskillfern"] = characterData["longRangeWeapons"][i]["skill"].toLowerCase();
-                character["repeating_fernkampfwaffen_" + newrowid + "_waffenattr1fern"] = meleeskills[characterData["longRangeWeapons"][i]["attribute1"]];
-                character["repeating_fernkampfwaffen_" + newrowid + "_waffenattr2fern"] = meleeskills[characterData["longRangeWeapons"][i]["attribute2"]];
+                if (characterData["longRangeWeapons"][i]["attribute1"] != null) {
+                    character["repeating_fernkampfwaffen_" + newrowid + "_waffenattr1fern"] = meleeskills[characterData["longRangeWeapons"][i]["attribute1"]];
+                    character["repeating_fernkampfwaffen_" + newrowid + "_waffenattr2fern"] = meleeskills[characterData["longRangeWeapons"][i]["attribute2"]];
+                }
                 character["repeating_fernkampfwaffen_" + newrowid + "_waffenwgsfern"] = characterData["longRangeWeapons"][i]["weaponSpeed"];
-                damage = characterData["longRangeWeapons"][i]["damage"].toString().split("W")[0];
-                damagewuerfel = "d" + characterData["longRangeWeapons"][i]["damage"].toString().split("W")[1].toString().split("+")[0];
-                damageplus = characterData["longRangeWeapons"][i]["damage"].toString().split("W")[1].toString().split("+")[1] || 0;
-                character["repeating_fernkampfwaffen_" + newrowid + "_waffenschaden1fern"] = damage;
-                character["repeating_fernkampfwaffen_" + newrowid + "_waffenschadenwuerfelfern"] = damagewuerfel;
-                character["repeating_fernkampfwaffen_" + newrowid + "_waffenschaden3fern"] = damageplus;
+                if (characterData["longRangeWeapons"][i]["damage"] != null) {
+                    damage = characterData["longRangeWeapons"][i]["damage"].toString().split("W")[0];
+                    damagewuerfel = "d" + characterData["longRangeWeapons"][i]["damage"].toString().split("W")[1].toString().split("+")[0];
+                    damageplus = characterData["longRangeWeapons"][i]["damage"].toString().split("W")[1].toString().split("+")[1] || 0;
+                    character["repeating_fernkampfwaffen_" + newrowid + "_waffenschaden1fern"] = damage;
+                    character["repeating_fernkampfwaffen_" + newrowid + "_waffenschadenwuerfelfern"] = damagewuerfel;
+                    character["repeating_fernkampfwaffen_" + newrowid + "_waffenschaden3fern"] = damageplus;
+                }
                 character["repeating_fernkampfwaffen_" + newrowid + "_waffenrwfern"] = characterData["longRangeWeapons"][i]["range"];
                 if (characterData["longRangeWeapons"][i]["features"].length > 0) {
                     for (var j = 0; j < characterData["longRangeWeapons"][i]["features"].length; j++) {
@@ -5481,7 +5498,7 @@ function writeToSheet (characterData) {
             character["repeating_nahkampfwaffen_" + newrowid + "_waffenschaden3"] = "1";
             character["repeating_nahkampfwaffen_" + newrowid + "_waffenmerkmale"] = characterData["shields"][0]["features"][0]["name"];
         }
-        if (characterData["items"].length > 0) {
+        if (characterData["items"].length > 0 && characterData["items"] != null) {
             let items = "";
             let count;
             let item;
