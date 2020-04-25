@@ -2,7 +2,7 @@ mixin label(i18n)
     label(data-i18n=i18n)&attributes(attributes)
 
 mixin numeric_input(attr_name, default_value, min_value=null)
-    if (min_value==null)
+    if (min_value===null)
         input(name=`attr_${attr_name}` type="number" title=`\${${attr_name}}. Default: ${default_value}.` value=default_value min=min_value)&attributes(attributes)
     else
         input(name=`attr_${attr_name}` type="number" title=`\${${attr_name}}. Default: ${default_value}.` value=default_value)&attributes(attributes)
@@ -82,21 +82,21 @@ mixin skill(name, value)
 
         .fs-baseinfo
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='name')
+                label.fs-uppercase-header(data-i18n='name')
                 .fs-name-grid
                     +text_input('character_name')(class ="fs-name")
                     label.fs-planet(data-i18n="planet")
                     +text_input('planet')(class ="fs-planet")
 
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='rank')
+                label.fs-uppercase-header(data-i18n='rank')
                 .fs-rank-grid
                     +text_input('rank')(class ="fs-rank")
                     label.fs-birthdate(data-i18n="birthdate")
                     +text_input('birthdate')(class ="fs-birthdate")
 
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='species')
+                label.fs-uppercase-header(data-i18n='species')
                 .fs-species-grid
                     +text_input('species')(class ="fs-species")
                     label.fs-size(data-i18n="size")
@@ -106,7 +106,7 @@ mixin skill(name, value)
 
         .fs-lifepath
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='class')
+                label.fs-uppercase-header(data-i18n='class')
                 .fs-class-grid
                     +text_input('class_1')(class ="fs-class1")
                     +text_input('class_2')(class ="fs-class2")
@@ -114,7 +114,7 @@ mixin skill(name, value)
                     +numeric_input('level', 1, 1)(class="fs-level")
 
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='faction')
+                label.fs-uppercase-header(data-i18n='faction')
                 .fs-faction-grid
                     +text_input('faction')(class ="fs-faction")
                     label.fs-blessing-label(data-i18n="blessing")
@@ -123,7 +123,7 @@ mixin skill(name, value)
                     +text_input('curse')(class ="fs-curse")
 
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='calling')
+                label.fs-uppercase-header(data-i18n='calling')
                 .fs-calling-grid
                     +text_input('calling_1')
                     +text_input('calling_2')
@@ -131,7 +131,7 @@ mixin skill(name, value)
 
         .fs-traits
             .fs-sheet-section.fs-skills-header
-                h3.fs-uppercase-header(data-i18n='skills')
+                label.fs-uppercase-header(data-i18n='skills')
 
             .fs-skill-col.fs-skills-1
                 - for (let i = 0; i < skills.length / 2; ++i)
@@ -144,42 +144,63 @@ mixin skill(name, value)
             .fs-characteristics
                 each charac_cat in characteristics
                     .fs-sheet-section
-                        h3.fs-uppercase-header(data-i18n=charac_cat.category)
+                        label.fs-uppercase-header(data-i18n=charac_cat.category)
                         .fs-characteristic-cat-grid
                             each charac_name in charac_cat.list
                                 +characteristic(charac_name)
 
         .fs-sheet-section
-            h3.fs-uppercase-header(data-i18n='occult')
+            label.fs-uppercase-header(data-i18n='occult')
 
         .fs-defenses
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='resistances')
+                label.fs-uppercase-header(data-i18n='resistances')
                 .fs-resistances-grid
                     each charac_cat in characteristics
                         label(data-i18n=charac_cat.category)
                         +numeric_input(`${charac_cat.category}_resistance`, 0, 0)
-                        +text_input(`${charac_cat.category}_resistance_modifier`)
+                        +text_input(`${charac_cat.category}_resistance_modifier`)(data-i18n-placeholder='resistance_modifier')
 
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='armor')
-                h3.fs-uppercase-header(data-i18n='e-shield')
+                .fs-armor-and-e-shield-grid
+                    .fs-armor-and-e-shield-grid-row
+                        label.fs-uppercase-header(data-i18n='armor')
+                        +text_input('armor_name')
+                    .fs-armor-and-e-shield-grid-row.fs-armor-vs
+                        +numeric_input('armor_vs_blaster')(data-i18n-placeholder='blaster_s')
+                        +numeric_input('armor_vs_flame')(data-i18n-placeholder='flame_s')
+                        +numeric_input('armor_vs_hard')(data-i18n-placeholder='hard_s')
+                        +numeric_input('armor_vs_laser')(data-i18n-placeholder='laser_s')
+                        +numeric_input('armor_vs_shock')(data-i18n-placeholder='shock_s')
+                        +numeric_input('armor_vs_slam')(data-i18n-placeholder='slam_s')
+                        +numeric_input('armor_vs_sonic')(data-i18n-placeholder='sonic_s')
+                    .fs-armor-and-e-shield-grid-row
+                        label.fs-uppercase-header(data-i18n='e_shield')
+                        +text_input('shield_name')
+                    .fs-armor-and-e-shield-grid-row.fs-e-shield-props
+                        label(data-i18n="e_shield_thresholds")
+                        +numeric_input('shield_thresholds_min')
+                        label /
+                        +numeric_input('shield_thresholds_max')
+                        label(data-i18n="e_shield_hits")
+                        +numeric_input('shield_hits')
 
-            .fs-sheet-section.fs-vita-and-revivals-grid
-                h3.fs-vitality-header.fs-uppercase-header(data-i18n='vitality')
-                label.fs-vitality-rating(data-i18n="rating")
-                +numeric_input('vitality_rating', 0, 0)(class='fs-vitality-rating')
-                label.fs-vitality-current(data-i18n="current")
-                +numeric_input('vitality_current', 0, 0)(class='fs-vitality-current')
-                h3.fs-revivals-header.fs-uppercase-header(data-i18n='revivals')
-                label.fs-revivals-rating(data-i18n="rating")
-                +numeric_input('revivals_rating', 0, 0)(class='fs-revivals-rating')
-                label.fs-revivals-number(data-i18n="number")
-                +numeric_input('vitality_current', 0, 0)(class='fs-revivals-current')
+            .fs-sheet-section
+                .fs-vita-and-revivals-grid
+                    label.fs-vitality-header.fs-uppercase-header(data-i18n='vitality')
+                    label.fs-vitality-rating(data-i18n="rating")
+                    +numeric_input('vitality_rating', 0, 0)(class='fs-vitality-rating')
+                    label.fs-vitality-current(data-i18n="current")
+                    +numeric_input('vitality_current', 0, 0)(class='fs-vitality-current')
+                    label.fs-revivals-header.fs-uppercase-header(data-i18n='revivals')
+                    label.fs-revivals-rating(data-i18n="rating")
+                    +numeric_input('revivals_rating', 0, 0)(class='fs-revivals-rating')
+                    label.fs-revivals-number(data-i18n="number")
+                    +numeric_input('vitality_current', 0, 0)(class='fs-revivals-current')
 
         .fs-actions-vp-bank-and-surge
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='actions')
+                label.fs-uppercase-header(data-i18n='actions')
                 
                 .fs-actions
                     .fs-table
@@ -188,7 +209,6 @@ mixin skill(name, value)
                         span.fs-table-head(data-i18n="characteristic")
                         span.fs-table-head(data-i18n="skill")
                         span.fs-table-head(data-i18n="goal_bonus_penalty")
-                        span.fs-table-head(data-i18n="impact")
                     fieldset.repeating_actions
                         .fs-table
                             input(type="hidden" name="attr_action_characteristic_value")
@@ -206,14 +226,13 @@ mixin skill(name, value)
                                 each sk in skills
                                     option(value =`${sk.name}` data-i18n=`${sk.name}`) #{sk.name}
                             input.fs-table-cell(type="number" name="attr_action_goal_penalty" value=0)
-                            input.fs-table-cell(type="text" name="attr_action_impact")
                             .fs-notes
                                 .fs-auto-expand-textarea
-                                    span(name="attr_action_notes")
-                                    textarea(name="attr_action_notes" data-i18n-placeholder="notes" placeholder="Notes" spellcheck="false")
+                                    span(name="attr_action_impact_notes")
+                                    textarea(name="attr_action_impact_notes" data-i18n-placeholder="impact_notes" spellcheck="false")
 
             .fs-sheet-section-frame
-                h3.fs-uppercase-header(data-i18n='vp_bank')
+                label.fs-uppercase-header(data-i18n='vp_bank')
                 .fs-vp-and-surge-grids
                     label(data-i18n='vp_bank_capacity')
                     +numeric_input('vp_bank_capacity', 0, 0)
@@ -221,7 +240,7 @@ mixin skill(name, value)
                     +numeric_input('current_vp', 0, 0)
                     label(data-i18n='current_wp')
                     +numeric_input('current_wp', 0, 0)
-                h3.fs-uppercase-header(data-i18n='surge')
+                label.fs-uppercase-header(data-i18n='surge')
                 .fs-vp-and-surge-grids
                     label(data-i18n='surge_rating')
                     +numeric_input('surge_rating', 0, 0)
@@ -229,16 +248,16 @@ mixin skill(name, value)
                     +numeric_input('surge_number', 0, 0)
 
         .fs-sheet-section
-            h3.fs-uppercase-header(data-i18n='perks')
+            label.fs-uppercase-header(data-i18n='perks')
 
         .fs-sheet-section
-            h3.fs-uppercase-header(data-i18n='possessions')
+            label.fs-uppercase-header(data-i18n='possessions')
 
         .fs-sheet-section
-            h3.fs-uppercase-header(data-i18n='money')
+            label.fs-uppercase-header(data-i18n='money')
 
         .fs-sheet-section
-            h3.fs-uppercase-header(data-i18n='last_notes')
+            label.fs-uppercase-header(data-i18n='last_notes')
             .fs-w100.fs-relative.fs-supertall-textarea
                 .fs-auto-expand-textarea
                     span(name="attr_last_notes")

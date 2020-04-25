@@ -5,7 +5,7 @@ $section-column-gap: 30px;
 $localgrid-gap: 2px;
 $level-box-width: 50px;
 $rollbutton-width: 25px;
-$traitval-width: 25px;
+$traitval-width: 30px;
 
 @mixin localgrid {
     display: grid;
@@ -42,6 +42,7 @@ body {
     font-size: 1.25em;
     width: 100%;
     margin: 0;
+    color: black;
 }
 
 .sheet-fs-sheet label {
@@ -83,11 +84,6 @@ body {
     text-shadow: none;
 }
 
-.sheet-fs-sheet h3 {
-    line-height: initial;
-    margin-top: 10px;
-}
-
 .sheet-fs-sheet input,
 .sheet-fs-sheet textarea,
 .sheet-fs-sheet select,
@@ -107,7 +103,8 @@ body {
 .sheet-fs-sheet input[type=number] {
     text-align: center;
     width: $traitval-width;
-    min-width: 25px;
+    min-width: $traitval-width;
+    max-width: $traitval-width;
 }
 
 .sheet-fs-sheet button[type=roll] {
@@ -164,6 +161,7 @@ body {
 .sheet-fs-sheet-section {
     margin-top: 10px;
     border-top: 2px solid black;
+    padding-top: 10px;
 }
 
 .sheet-fs-sheet-section-frame {
@@ -174,7 +172,9 @@ body {
     align-self: self-start; // for a shorter VP Bank & Surge box
 }
 
-.sheet-fs-uppercase-header {
+label.sheet-fs-uppercase-header {
+    font-size: 1.5em;
+    font-weight: bold;
     text-transform: uppercase;
     white-space: nowrap;
 }
@@ -499,7 +499,7 @@ input.sheet-fs-speed {
     grid-template:
         "class1     levelvalue"
         "class2     levelvalue"
-        "levellabel levelvalue" / 1fr $level-box-width;
+        "levellabel levelvalue" / 1fr max-content;
 }
 .sheet-fs-class1 {
     grid-area: class1;
@@ -517,6 +517,7 @@ label.sheet-fs-level {
 input[type=number].sheet-fs-level {
     grid-area: levelvalue;
     width: $level-box-width;
+    max-width: $level-box-width;
     height: 100%;
 }
 
@@ -577,7 +578,7 @@ input.sheet-fs-curse {
 .sheet-fs-skill-col {
     @include localgrid;
 
-    grid-template-rows: $rollbutton-width max-content $traitval-width; 
+    grid-template-rows: $rollbutton-width max-content max-content; 
 
     align-items: flex-start;
     align-content: flex-start;
@@ -619,7 +620,7 @@ input.sheet-fs-curse {
 .sheet-fs-characteristic-cat-grid {
     @include localgrid;
 
-    grid-template-columns: $rollbutton-width 1fr $traitval-width;
+    grid-template-columns: $rollbutton-width 1fr max-content;
     grid-auto-flow: row;
 }
 
@@ -723,11 +724,42 @@ div.sheet-fs-skill-normal > button.sheet-fs-d20 + div.sheet-fs-skill-roll-charac
 .sheet-fs-resistances-grid {
     @include localgrid;
     
-    grid-template-columns: max-content $traitval-width 1fr;
+    grid-template-columns: max-content max-content 1fr;
     grid-auto-flow: row;
 }
 
 .sheet-fs-resistances-grid > label {
+    @include indented;
+}
+
+.sheet-fs-armor-and-e-shield-grid {
+    @include localgrid;
+    grid-auto-flow: row;
+}
+
+.sheet-fs-armor-and-e-shield-grid-row label.sheet-fs-uppercase-header {
+    display: inline-block;
+}
+
+.sheet-fs-armor-and-e-shield-grid-row {
+    @include localgrid;
+    grid-auto-flow: column;
+}
+
+.sheet-fs-armor-vs {
+    justify-content: end;
+}
+
+.sheet-fs-armor-vs input[type=number]::placeholder {
+    font-size: 0.7em;
+}
+
+.sheet-fs-e-shield-props {
+    justify-content: space-between;
+}
+
+.sheet-fs-e-shield-props > label:nth-child(1),
+.sheet-fs-e-shield-props > label:nth-child(5) {
     @include indented;
 }
 
@@ -738,7 +770,7 @@ div.sheet-fs-skill-normal > button.sheet-fs-d20 + div.sheet-fs-skill-roll-charac
         "vitality-header        vitality-header       vitality-header        vitality-header"
         "vitality-rating-label  vitality-rating-value vitality-current-label vitality-current-value"
         "revivals-header        revivals-header       revivals-header        revivals-header"
-        "revivals-rating-label  revivals-rating-value revivals-number-label  revivals-number-value" / 1fr $traitval-width 1fr $traitval-width;
+        "revivals-rating-label  revivals-rating-value revivals-number-label  revivals-number-value" / 1fr max-content 1fr max-content;
 }
 
 .sheet-fs-vitality-header {
@@ -839,12 +871,17 @@ input.sheet-fs-revivals-number {
 
 .sheet-fs-actions .sheet-fs-table {
     @include localgrid;
-    grid-template-columns: $rollbutton-width 1fr 98px 143px 50px 1fr;
+    grid-template-columns: $rollbutton-width 1fr 98px 143px 50px;
+}
+
+.sheet-fs-actions .sheet-fs-table > input{
+    width: 100%;
+    max-width: 100%;
 }
 
 .sheet-fs-vp-and-surge-grids {
     @include localgrid;
-    grid-template-columns: 1fr $traitval-width;
+    grid-template-columns: 1fr max-content;
     grid-auto-flow: row;
 }
 
@@ -897,8 +934,7 @@ label.sheet-fs-vitality-rating {
 // hack for Firefox due to focus events on invisible elements not been registered it seems.
 // We need to keep it visible for >0ms for the click to be registered.
 .sheet-fs-notes > .sheet-fs-auto-expand-textarea {
-
-    transition: visibility 0s linear 1ms;
+    -moz-transition: visibility 0s linear 1ms;
 }
 
 .sheet-fs-notes:focus > .sheet-fs-auto-expand-textarea,
