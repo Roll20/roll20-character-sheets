@@ -6,6 +6,29 @@ $localgrid-gap: 2px;
 $level-box-width: 50px;
 $rollbutton-width: 25px;
 $traitval-width: 30px;
+$equipment-size-column: 50px;
+$goal-bonus-manul-col-width: 60px;
+$ammo-col-width: 50px;
+
+@mixin main-columns {
+    width: 100%;
+    display: grid;
+    grid-column-gap: $section-column-gap;
+    align-items: stretch;
+    align-content: stretch;
+    justify-items: stretch;
+    justify-content: space-between;
+}
+
+@mixin main-2-columns {
+    @include main-columns;
+    grid-template-columns: 1fr 1fr;
+}
+
+@mixin main-3-columns {
+    @include main-columns;
+    grid-template-columns: 1fr 1fr 1fr;
+}
 
 @mixin localgrid {
     display: grid;
@@ -49,17 +72,13 @@ body {
     font-weight: normal;
     display: inline-block;
     margin: 0;
-    padding-right: 2px;
+    padding-right: 0px;
     width: initial;
     height: initial;
     color: initial;
-    vertical-align: middle;
-    align-self: center;
 }
 
 .sheet-fs-sheet select {
-    width: initial;
-    padding: 2px;
     border-color: $bordercolor;
 }
 
@@ -88,7 +107,6 @@ body {
 .sheet-fs-sheet textarea,
 .sheet-fs-sheet select,
 .sheet-fs-sheet button[type=roll] {
-    vertical-align: middle;
     background-color: $semitransparent;
     border: 1px solid $bordercolor;
     border-radius: 0;
@@ -96,8 +114,12 @@ body {
     height: 25px;
 }
 
-.sheet-fs-sheet select > option {
-    background-color: $semitransparent;
+.sheet-fs-sheet input,
+.sheet-fs-sheet textarea,
+.sheet-fs-sheet select,
+.sheet-fs-sheet label {
+    vertical-align: middle;
+    align-self: center;
 }
 
 .sheet-fs-sheet input[type=number] {
@@ -179,23 +201,12 @@ label.sheet-fs-uppercase-header {
     white-space: nowrap;
 }
 
-.sheet-fs-inline-textarea {
-    min-height: 2.15em;
-    margin: 0;
-    resize: vertical;
-    overflow:auto;
-    background-color: $semitransparent;
-}
-
 .sheet-fs-sheet .repcontrol_del,
 .sheet-fs-sheet .repcontrol_move,
 .sheet-fs-sheet .repcontrol_add,
 .sheet-fs-sheet .repcontrol_edit {
     font-family: pictos;
 }
-
-/* make error row more visible (colorblind users could not see slightly darker border )
-also need 1 more level in selector or base css will override border */
 
 .sheet-fs-sheet .repitem.repitembroken {
     border: 0.3rem dashed #FF0044 !important;
@@ -390,25 +401,8 @@ div.repcontrol {
     width: 100%;
 }
 
-
-.sheet-fs-tall-textarea {
-    min-height: 100px;
-    height:100%;
-    align-self: stretch;
-}
-
-.sheet-fs-supertall-textarea {
-    min-height: 300px;
-    height:100%;
-    align-self: stretch;
-}
-
 .sheet-fs-baseinfo {
-    width: 100%;
-    display: grid;
-    grid-auto-columns: 1fr 1fr 1fr;
-    grid-auto-flow: column;
-    grid-column-gap: $section-column-gap;
+    @include main-3-columns;
 }
 
 .sheet-fs-name-grid {
@@ -483,14 +477,8 @@ input.sheet-fs-speed {
     grid-area: speed-value;
 }
 
-
 .sheet-fs-lifepath {
-    width: 100%;
-    display: grid;
-
-    grid-auto-columns: 1fr 1fr 1fr;
-    grid-auto-flow: column;
-    grid-column-gap: $section-column-gap;
+    @include main-3-columns;
 }
 
 .sheet-fs-class-grid {
@@ -560,17 +548,11 @@ input.sheet-fs-curse {
 
 
 .sheet-fs-traits {
-    width: 100%;
-    display: grid;
+    @include main-3-columns;
+
     grid-template:
         "skills-header skills-header  characteristics" max-content
         "skills-1      skills-2       characteristics" 1fr / 1fr 1fr 1fr; // TODO review these proportions later
-    grid-column-gap: $section-column-gap;
-
-    align-items: stretch;
-    align-content: stretch;
-    justify-items: stretch;
-    justify-content: space-between;
 }
 .sheet-fs-skills-header   { grid-area: skills-header; }
 
@@ -709,11 +691,43 @@ div.sheet-fs-skill-normal > button.sheet-fs-d20 + div.sheet-fs-skill-roll-charac
     border-top: 1px solid black;
     margin-top: 2px;
 }
+
+.sheet-fs-occult {
+    @include main-3-columns;
+    width: 100%;
+    display: grid;
+    grid-column-gap: $section-column-gap;
+    
+    grid-template-columns: 1fr 1fr 1fr;  // TODO review these proportions later
+
+    align-items: stretch;
+    align-content: stretch;
+    justify-items: stretch;
+    justify-content: space-between;
+}
+
+.sheet-fs-occult > div {
+    @include localgrid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr max-content max-content 1fr;
+}
+
+.sheet-fs-occult-left {
+    //width: calc(50% - $traitval-width);
+    text-align: end;
+}
+
+.sheet-fs-occult-right {
+    //width: calc(50% - $traitval-width);
+    text-align: start;
+}
+
 .sheet-fs-defenses {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;  // TODO review these proportions later
     grid-column-gap: $section-column-gap;
+
+    grid-template-columns: 1fr 1fr 1fr;  // TODO review these proportions later
 
     align-items: stretch;
     align-content: stretch;
@@ -871,10 +885,10 @@ input.sheet-fs-revivals-number {
 
 .sheet-fs-actions .sheet-fs-table {
     @include localgrid;
-    grid-template-columns: $rollbutton-width 1fr 98px 143px 50px;
+    grid-template-columns: $rollbutton-width 1fr 98px 143px $goal-bonus-manul-col-width;
 }
 
-.sheet-fs-actions .sheet-fs-table > input{
+.sheet-fs-actions .sheet-fs-table > input {
     width: 100%;
     max-width: 100%;
 }
@@ -889,13 +903,75 @@ input.sheet-fs-revivals-number {
     @include indented;
 }
 
-.sheet-fs-vitality-header {
-    grid-area: vitality-header;
+.sheet-fs-perks-capabilities-and-birthrights {
+    @include main-2-columns;
 }
 
-label.sheet-fs-vitality-rating {
-    grid-area: vitality-rating-label;
-    @include indented;
+.sheet-fs-possessions {
+    @include localgrid;
+    grid-auto-flow: row;
+}
+
+.sheet-fs-possessions-header {
+    @include localgrid;
+    grid-template-columns: 1fr max-content;
+    grid-auto-flow: column;
+}
+
+.sheet-fs-possessions-header > div:nth-child(2) {
+    padding-right: $equipment-size-column;
+}
+
+.sheet-fs-carried-equipment {
+    @include main-2-columns;
+}
+
+.sheet-fs-carried-equipment .sheet-fs-table {
+    @include localgrid;
+    grid-template-columns: 1fr $traitval-width $equipment-size-column;
+}
+
+.sheet-fs-carried-equipment .sheet-fs-table label:nth-child(2),
+.sheet-fs-carried-equipment .sheet-fs-table input:nth-child(2),
+.sheet-fs-carried-equipment .sheet-fs-table label:nth-child(3),
+.sheet-fs-carried-equipment .sheet-fs-table input:nth-child(3) {
+    text-align: center;
+}
+
+.sheet-fs-carried-weapons .sheet-fs-table {
+    @include localgrid;
+    grid-template-columns: 1fr $traitval-width $goal-bonus-manul-col-width 50px $traitval-width 60px $traitval-width $ammo-col-width 1fr;
+}
+
+.sheet-fs-carried-weapons .sheet-fs-table > input[type=number]:nth-child(8) {
+    width: $ammo-col-width;
+    max-width: $ammo-col-width;
+}
+
+.sheet-fs-carried-weapons .sheet-fs-table label:nth-child(2),
+.sheet-fs-carried-weapons .sheet-fs-table input:nth-child(2),
+.sheet-fs-carried-weapons .sheet-fs-table label:nth-child(3),
+.sheet-fs-carried-weapons .sheet-fs-table input:nth-child(3),
+.sheet-fs-carried-weapons .sheet-fs-table label:nth-child(4),
+.sheet-fs-carried-weapons .sheet-fs-table input:nth-child(4),
+.sheet-fs-carried-weapons .sheet-fs-table label:nth-child(5),
+.sheet-fs-carried-weapons .sheet-fs-table input:nth-child(5),
+.sheet-fs-carried-weapons .sheet-fs-table label:nth-child(6),
+.sheet-fs-carried-weapons .sheet-fs-table input:nth-child(6),
+.sheet-fs-carried-weapons .sheet-fs-table label:nth-child(7),
+.sheet-fs-carried-weapons .sheet-fs-table input:nth-child(7),
+.sheet-fs-carried-weapons .sheet-fs-table label:nth-child(8),
+.sheet-fs-carried-weapons .sheet-fs-table input:nth-child(8) {
+    text-align: center;
+}
+
+.sheet-fs-owned {
+    @include main-2-columns;
+}
+
+.sheet-fs-owned .sheet-fs-table {
+    @include localgrid;
+    grid-template-columns: 1fr 0.5fr;
 }
 
 .sheet-fs-notes {
@@ -964,11 +1040,18 @@ label.sheet-fs-vitality-rating {
 	overflow: hidden;
 	height: 100%;
     width: 100%;
-
 }
 
 .sheet-fs-relative {
     position: relative;
+}
+
+.sheet-fs-supertall-textarea {
+    min-height: 300px;
+    max-height: initial;
+    resize: vertical;
+    overflow:auto;
+    align-self: stretch;
 }
 
 .sheet-fs-header,
