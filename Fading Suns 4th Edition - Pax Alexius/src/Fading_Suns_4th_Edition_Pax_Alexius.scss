@@ -1,36 +1,68 @@
 $sheet-width: 890px;
 $semitransparent: rgba(255, 255, 255, 0.5);
 $bordercolor: #baa894;
-$column-gap: 30px;
+$section-column-gap: 30px;
+$localgrid-gap: 2px;
 $level-box-width: 50px;
+$rollbutton-width: 25px;
+$traitval-width: 25px;
 
-.charsheet *,
-.charsheet *::after,
-.charsheet *::before {
+@mixin localgrid {
+    display: grid;
+    width: 100%;
+    gap: $localgrid-gap;
+
+    align-items: stretch;
+    align-content: flex-start;
+    justify-items: stretch;
+    justify-content: stretch;
+}
+
+@mixin indented {
+    padding-left: 20px;
+    text-align: end;
+}
+
+.sheet-fs-sheet *,
+.sheet-fs-sheet *::after,
+.sheet-fs-sheet *::before {
     box-sizing: border-box;
 }
 
-.charsheet label {
+body {
+    min-height: 100vh;
+    position: relative;
+}
+
+.sheet-fs-sheet label,
+.sheet-fs-sheet input,
+.sheet-fs-sheet button[type=roll],
+.sheet-fs-sheet select,
+.sheet-fs-sheet textarea {
+    font-size: 1.25em;
+    width: 100%;
+    margin: 0;
+}
+
+.sheet-fs-sheet label {
     font-weight: normal;
     display: inline-block;
-    margin-bottom: initial;
-    padding-right: initial;
+    margin: 0;
+    padding-right: 2px;
     width: initial;
     height: initial;
     color: initial;
     vertical-align: middle;
+    align-self: center;
 }
 
-.charsheet select {
+.sheet-fs-sheet select {
     width: initial;
-    height: 18px;
-    margin: initial;
-    padding:initial;
-    padding:0;
-    margin: 0;
+    padding: 2px;
+    border-color: $bordercolor;
 }
 
-.charsheet textarea {
+.sheet-fs-sheet textarea {
     height: initial;
     resize: initial;
     overflow-x: hidden;
@@ -39,79 +71,76 @@ $level-box-width: 50px;
     margin: 0;
 }
 
-.charsheet button,
-.charsheet button:hover,
-.charsheet button:active {
+.sheet-fs-sheet button,
+.sheet-fs-sheet button:hover,
+.sheet-fs-sheet button:active {
     background-image: initial;
 }
 
-.charsheet button[type=roll] {
+.sheet-fs-sheet button[type=roll] {
     margin-left: initial;
     margin-right: initial;
     text-shadow: none;
 }
 
-.charsheet h3 {
+.sheet-fs-sheet h3 {
     line-height: initial;
-    margin-top: 5px;
+    margin-top: 10px;
 }
 
-.charsheet input,
-.charsheet select {
-    height: 20px;
-    margin: 0;
-    background: $semitransparent;
+.sheet-fs-sheet input,
+.sheet-fs-sheet textarea,
+.sheet-fs-sheet select,
+.sheet-fs-sheet button[type=roll] {
+    vertical-align: middle;
+    background-color: $semitransparent;
+    border: 1px solid $bordercolor;
+    border-radius: 0;
+    padding: 2px;
+    height: 25px;
 }
 
-.charsheet input[type=number] {
+.sheet-fs-sheet select > option {
+    background-color: $semitransparent;
+}
+
+.sheet-fs-sheet input[type=number] {
     text-align: center;
-    width: 25px;
+    width: $traitval-width;
     min-width: 25px;
 }
 
-.charsheet button[type=roll] {
-    margin: 0;
-    width: 25px;
+.sheet-fs-sheet button[type=roll] {
+    width: $rollbutton-width;
 }
 
 // turn off spinners for all number field in Chrome
-.charsheet input[type=number]::-webkit-inner-spin-button, 
-.charsheet input[type=number]::-webkit-outer-spin-button { 
+.sheet-fs-sheet input[type=number]::-webkit-inner-spin-button, 
+.sheet-fs-sheet input[type=number]::-webkit-outer-spin-button { 
   -webkit-appearance: none; 
   margin: 0;
 }
 
 // turn off spinners for all number field in Firefox
-.charsheet input[type=number] {
+.sheet-fs-sheet input[type=number] {
   -moz-appearance: textfield !important;
 }
 
-.charsheet button[type=roll] {
+.sheet-fs-sheet button[type=roll] {
     background-color: $semitransparent;
     border: 1px solid $bordercolor;
 }
 
-.charsheet input[type=text],
-.charsheet input[type=number],
-.charsheet textarea {
-    background-color: $semitransparent;
-    border: 1px solid $bordercolor;
-    border-radius: 0;
-    padding: 0px;
-    margin-top: 1px;
-    margin-bottom: 1px;
-}
-
-.charsheet button[type=roll].sheet-fs-hidden {
+.sheet-fs-sheet button[type=roll].sheet-fs-hidden {
     display: none;
 }
 
-.charsheet button[type=roll]:before {
+.sheet-fs-sheet button[type=roll]:before {
     vertical-align: middle;
     font-size: 1.2em;
 }
 
-div.sheet-fs-sheet {
+.sheet-fs-sheet {
     // cancelling the nasty default padding
     margin-top: -28px;
     margin-left: -30px;
@@ -127,7 +156,7 @@ div.sheet-fs-sheet {
     font-family: serif;
 }
 
-div.sheet-fs-sheet-container {
+.sheet-fs-sheet-container {
     padding-left: 50px;
     padding-right: 50px;
 }
@@ -141,6 +170,8 @@ div.sheet-fs-sheet-container {
     margin-top: 10px;
     border: 2px solid black;
     padding: 5px;
+
+    align-self: self-start; // for a shorter VP Bank & Surge box
 }
 
 .sheet-fs-uppercase-header {
@@ -168,7 +199,7 @@ also need 1 more level in selector or base css will override border */
 
 .sheet-fs-sheet .repitem.repitembroken {
     border: 0.3rem dashed #FF0044 !important;
-    margin: 0.2rem 0 0.4rem 0;
+    margin: 0 0 0 0;
     border-radius: 0;
 }
 
@@ -182,7 +213,6 @@ also need 1 more level in selector or base css will override border */
 
 .repcontainer.editmode .repitem .itemcontrol {
     z-index: 3;
-    background-color: gray;
     background-color: rgba(255,255,255,0.5);
 }
 
@@ -198,13 +228,13 @@ div.repcontrol {
 .repcontrol_add::before {
     content: '&';
     visibility: visible;
-    font-family: pictos ;
-    background-color: #fff;
-    border: 0.1rem solid #000;
+    font-family: pictos;
+    background-color: $semitransparent;
+    border: 0.1rem solid $bordercolor;
     border-radius: 0.2rem;
     font-size: 1.6rem;
     padding: 0.3rem 0.5rem 0.3rem 0.5rem;
-    color: #4a6486;
+    color: black;
 }
 
 .repcontrol .repcontrol_edit:after {
@@ -212,12 +242,12 @@ div.repcontrol {
     content: '☰';
     visibility: visible;
     font-family: pictos;
-    background-color: #fff;
-    border: 0.1rem solid #000;
+    background-color: $semitransparent;
+    border: 0.1rem solid $bordercolor;
     border-radius: 0.2rem;
     font-size: 1.6rem;
     padding: 0.3rem 0.3rem 0.2rem 0.3rem;
-    color: #4a6486;
+    color: black;
 }
 
 .editmode ~ .repcontrol .repcontrol_edit:after {
@@ -230,16 +260,15 @@ div.repcontrol {
 .repcontrol_edit:hover:after, 
 .repcontrol_add:hover:before {
     color: red !important;
-    box-shadow: 0.1rem 0.1rem 0.2rem #333;
+    box-shadow: 0.1rem 0.1rem 0.2rem $bordercolor;
 }
 
 .repcontrol .btn{
     border: none;
     color: white;
     font-size: 0;
-    padding: 0.3rem 0 0 0;
-    margin-left: 3px;
-    margin-right: 3px;
+    padding: 0;
+    margin-top: 3px;
     background: none;
     box-shadow: none;
 }
@@ -297,7 +326,7 @@ div.repcontrol {
     color: #4a6486;
     font-size: 1.1em;
     font-variant: small-caps;
-    line-height: 20px;
+    line-height: 1.2em;
 }
 
 .sheet-rolltemplate-fs-GoalRoll .sheet-fs-arrow-right,
@@ -361,16 +390,6 @@ div.repcontrol {
     width: 100%;
 }
 
-.sheet-fs-trait-col {
-    display: flex;
-    flex-wrap: nowrap;
-    flex-direction: column;
-
-    align-items: flex-start;
-    align-content: flex-start;
-    justify-items: flex-start;
-    justify-content: flex-start;
-}
 
 .sheet-fs-tall-textarea {
     min-height: 100px;
@@ -389,20 +408,94 @@ div.repcontrol {
     display: grid;
     grid-auto-columns: 1fr 1fr 1fr;
     grid-auto-flow: column;
-    grid-column-gap: $column-gap;
+    grid-column-gap: $section-column-gap;
 }
+
+.sheet-fs-name-grid {
+    @include localgrid;
+
+    grid-template:
+    "name_         name_"
+    "planet-label planet-value" / max-content 1fr;
+}
+
+.sheet-fs-name {
+    grid-area: name_;
+}
+
+label.sheet-fs-planet {
+    grid-area: planet-label;
+    @include indented;
+}
+
+input.sheet-fs-planet {
+    grid-area: planet-value;
+}
+
+.sheet-fs-rank-grid {
+    @include localgrid;
+
+    grid-template:
+    "rank        rank"
+    "birthdate-label birthdate-value" / max-content 1fr;
+}
+
+.sheet-fs-rank {
+    grid-area: rank;
+}
+
+label.sheet-fs-birthdate {
+    grid-area: birthdate-label;
+    @include indented;
+}
+
+input.sheet-fs-birthdate {
+    grid-area: birthdate-value;
+}
+
+.sheet-fs-species-grid {
+    @include localgrid;
+
+    grid-template:
+    "species    species    species     species"
+    "size-label size-value speed-label speed-value" / max-content 1fr max-content 1fr;
+}
+
+.sheet-fs-species {
+    grid-area: species;
+}
+
+label.sheet-fs-size {
+    grid-area: size-label;
+    @include indented;
+}
+
+input.sheet-fs-size {
+    grid-area: size-value;
+}
+
+label.sheet-fs-speed {
+    grid-area: speed-label;
+    @include indented;
+}
+
+input.sheet-fs-speed {
+    grid-area: speed-value;
+}
+
 
 .sheet-fs-lifepath {
     width: 100%;
     display: grid;
+
     grid-auto-columns: 1fr 1fr 1fr;
     grid-auto-flow: column;
-    grid-column-gap: $column-gap;
+    grid-column-gap: $section-column-gap;
 }
 
 .sheet-fs-class-grid {
-    width: 100%;
-    display: grid;
+    @include localgrid;
+
     grid-template:
         "class1     levelvalue"
         "class2     levelvalue"
@@ -410,27 +503,26 @@ div.repcontrol {
 }
 .sheet-fs-class1 {
     grid-area: class1;
-    margin-right: 3px;
 }
 
 .sheet-fs-class2 {
     grid-area: class2;
-    margin-right: 3px;
 }
 
-.sheet-fs-levellabel {
+label.sheet-fs-level {
     grid-area: levellabel;
-    text-align: end;
+    @include indented;
 }
 
-input.sheet-fs-levelvalue {
+input[type=number].sheet-fs-level {
     grid-area: levelvalue;
     width: $level-box-width;
+    height: 100%;
 }
 
 .sheet-fs-faction-grid {
-    width: 100%;
-    display: grid;
+    @include localgrid;
+
     grid-template:
     "faction        faction"
     "blessing-label blessing-value"
@@ -441,23 +533,30 @@ input.sheet-fs-levelvalue {
     grid-area: faction;
 }
 
-.sheet-fs-blessing-label {
+label.sheet-fs-blessing {
     grid-area: blessing-label;
-    text-align: end;
+    @include indented;
 }
 
-.sheet-fs-curse-label {
-    grid-area: curse-label;
-    text-align: end;
-}
-
-.sheet-fs-blessing-value {
+input.sheet-fs-blessing {
     grid-area: blessing-value;
 }
 
-.sheet-fs-curse-value {
+label.sheet-fs-curse {
+    grid-area: curse-label;
+    @include indented;
+}
+
+input.sheet-fs-curse {
     grid-area: curse-value;
 }
+
+.sheet-fs-calling-grid {
+    @include localgrid;
+
+    grid-template-columns: 1fr;
+}
+
 
 .sheet-fs-traits {
     width: 100%;
@@ -465,7 +564,7 @@ input.sheet-fs-levelvalue {
     grid-template:
         "skills-header skills-header  characteristics" max-content
         "skills-1      skills-2       characteristics" 1fr / 1fr 1fr 1fr; // TODO review these proportions later
-    grid-column-gap: $column-gap;
+    grid-column-gap: $section-column-gap;
 
     align-items: stretch;
     align-content: stretch;
@@ -473,13 +572,33 @@ input.sheet-fs-levelvalue {
     justify-content: space-between;
 }
 .sheet-fs-skills-header   { grid-area: skills-header; }
+
+
+.sheet-fs-skill-col {
+    @include localgrid;
+
+    grid-template-rows: $rollbutton-width max-content $traitval-width; 
+
+    align-items: flex-start;
+    align-content: flex-start;
+    justify-items: flex-start;
+    justify-content: stretch;
+}
+
 .sheet-fs-skills-1        { grid-area: skills-1; }
 .sheet-fs-skills-2        { grid-area: skills-2; }
-.sheet-fs-characteristics { grid-area: characteristics; }
 
-.sheet-fs-characteristic-category {
-    align-self: stretch;
-    height: 100%;
+.sheet-fs-characteristics {
+    grid-area: characteristics;
+
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+
+    align-items: stretch;
+    align-content: flex-start;
+    justify-items: flex-start;
+    justify-content: space-between;
 }
 
 .sheet-fs-characteristic,
@@ -492,9 +611,16 @@ input.sheet-fs-levelvalue {
     align-items: center;
     justify-content: center;
     align-self: stretch;
+
+    width: 100%;
+    height: 25px;
 }
-.sheet-fs-skill {
-    height:25px; // ensure pixel-precise characteristic-choice popups
+
+.sheet-fs-characteristic-cat-grid {
+    @include localgrid;
+
+    grid-template-columns: $rollbutton-width 1fr $traitval-width;
+    grid-auto-flow: row;
 }
 
 @mixin nowrap-w100 {
@@ -512,11 +638,6 @@ input.sheet-fs-levelvalue {
     @include nowrap-w100;
 }
 
-.sheet-fs-indented {
-    margin-left: 20px;
-    margin-right: 3px;
-}
-
 .sheet-fs-text-align-end {
     width: 100%;
     text-align: end;
@@ -526,10 +647,7 @@ input.sheet-fs-levelvalue {
 .sheet-fs-characteristic .sheet-fs-characteristic-label span,
 .sheet-fs-skill .sheet-fs-skill-label,
 .sheet-fs-skill .sheet-fs-skill-label span,
-.sheet-fs-skill .sheet-fs-skill-label input,
-.sheet-fs-skill .sheet-fs-skill-label button,
-input.sheet-fs-blessingcurse,
-input.sheet-fs-beneficeaffliction {
+.sheet-fs-skill .sheet-fs-skill-label input {
     white-space: nowrap;
     width: 100%;
     overflow-x: hidden;
@@ -539,14 +657,11 @@ input.sheet-fs-beneficeaffliction {
     width: 100%;
 }
 
-.sheet-fs-characteristic-label,
-.sheet-fs-skill-label {
-    margin-left: 3px;
-}
-
 .sheet-fs-skill > div.sheet-fs-skill-normal {
-    @include nowrap-w100;
+    @include localgrid;
 
+    grid-template-columns: $rollbutton-width max-content 1fr;
+  
     position: relative;
     overflow: visible;
 }
@@ -558,11 +673,11 @@ input.sheet-fs-beneficeaffliction {
     position: absolute;
     z-index: 5;
     top: 0px;
-    left: 25px;
+    left: calc(#{$rollbutton-width} - 1px);
 
     background-color: #ffffff;
     border-radius: 5px;
-    border: 1px solid rgb(15, 9, 9);
+    border: 1px solid $bordercolor;
     padding: 2px;
     width: max-content;
     background: url(https://i.ibb.co/t3xLwhN/fs-sheet-background.jpg) 25% 25%;
@@ -592,16 +707,12 @@ div.sheet-fs-skill-normal > button.sheet-fs-d20 + div.sheet-fs-skill-roll-charac
     padding-top: 2px;
     border-top: 1px solid black;
     margin-top: 2px;
-}/*
-div.sheet-fs-skill-roll-characteristic-choice > div > label {
-    margin-left: 3px;
-}*/
-
+}
 .sheet-fs-defenses {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;  // TODO review these proportions later
-    grid-column-gap: $column-gap;
+    grid-column-gap: $section-column-gap;
 
     align-items: stretch;
     align-content: stretch;
@@ -609,35 +720,46 @@ div.sheet-fs-skill-roll-characteristic-choice > div > label {
     justify-content: space-between;
 }
 
+.sheet-fs-resistances-grid {
+    @include localgrid;
+    
+    grid-template-columns: max-content $traitval-width 1fr;
+    grid-auto-flow: row;
+}
+
+.sheet-fs-resistances-grid > label {
+    @include indented;
+}
+
 .sheet-fs-vita-and-revivals-grid {
-    width: 100%;
-    display: grid;
+    @include localgrid;
+
     grid-template:
         "vitality-header        vitality-header       vitality-header        vitality-header"
         "vitality-rating-label  vitality-rating-value vitality-current-label vitality-current-value"
         "revivals-header        revivals-header       revivals-header        revivals-header"
-        "revivals-rating-label  revivals-rating-value revivals-number-label  revivals-number-value";
+        "revivals-rating-label  revivals-rating-value revivals-number-label  revivals-number-value" / 1fr $traitval-width 1fr $traitval-width;
 }
 
 .sheet-fs-vitality-header {
     grid-area: vitality-header;
 }
 
-.sheet-fs-vitality-rating-label {
+label.sheet-fs-vitality-rating {
     grid-area: vitality-rating-label;
-    text-align: end;
+    @include indented;
 }
 
-.sheet-fs-vitality-rating-value {
+input.sheet-fs-vitality-rating {
     grid-area: vitality-rating-value;
 }
 
-.sheet-fs-vitality-current-label {
+label.sheet-fs-vitality-current {
     grid-area: vitality-current-label;
-    text-align: end;
+    @include indented;
 }
 
-.sheet-fs-vitality-current-value {
+input.sheet-fs-vitality-current {
     grid-area: vitality-current-value;
 }
 
@@ -645,29 +767,29 @@ div.sheet-fs-skill-roll-characteristic-choice > div > label {
     grid-area: revivals-header;
 }
 
-.sheet-fs-revivals-rating-label {
+label.sheet-fs-revivals-rating {
     grid-area: revivals-rating-label;
-    text-align: end;
+    @include indented;
 }
 
-.sheet-fs-revivals-rating-value {
+input.sheet-fs-revivals-rating {
     grid-area: revivals-rating-value;
 }
 
-.sheet-fs-revivals-number-label {
+label.sheet-fs-revivals-number {
     grid-area: revivals-number-label;
-    text-align: end;
+    @include indented;
 }
 
-.sheet-fs-revivals-number-value {
+input.sheet-fs-revivals-number {
     grid-area: revivals-number-value;
 }
 
 .sheet-fs-actions-vp-bank-and-surge {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr min-content;  // TODO review these proportions later
-    grid-column-gap: $column-gap;
+    grid-template-columns: 1fr max-content;  // TODO review these proportions later
+    grid-column-gap: $section-column-gap;
 
     align-items: stretch;
     align-content: stretch;
@@ -675,3 +797,145 @@ div.sheet-fs-skill-roll-characteristic-choice > div > label {
     justify-content: space-between;
 }
 
+.sheet-fs-table {
+    display: grid;
+    grid-auto-flow: row;
+    min-width:100%;
+    margin-bottom: $localgrid-gap;
+}
+
+.sheet-fs-table fieldset,
+.sheet-fs-table .repcontainer,
+.sheet-fs-table .repitem {
+    display: contents;
+}
+
+.sheet-fs-table input[type=number] {
+    width: 100%;
+}
+
+.sheet-fs-table input {
+    min-width: 10px;
+    width: auto;
+}
+
+.sheet-fs-table-head {
+    /*background-color: #4a6486;
+    color: white;*/
+    font-weight: bold;
+    white-space: nowrap;
+    padding-left: 1px;
+    padding-right: 1px;
+}
+.sheet-fs-table-cell {
+    grid-column: auto / span 1;
+}
+
+.sheet-fs-table .itemcontrol {
+    height: auto !important; /* TODO try without this to see if something bad happens */
+}
+
+.sheet-fs-table .repcontrol { grid-column: 1 / -1 }
+
+.sheet-fs-actions .sheet-fs-table {
+    @include localgrid;
+    grid-template-columns: $rollbutton-width 1fr 98px 143px 50px 1fr;
+}
+
+.sheet-fs-vp-and-surge-grids {
+    @include localgrid;
+    grid-template-columns: 1fr $traitval-width;
+    grid-auto-flow: row;
+}
+
+.sheet-fs-vp-and-surge-grids > label {
+    @include indented;
+}
+
+.sheet-fs-vitality-header {
+    grid-area: vitality-header;
+}
+
+label.sheet-fs-vitality-rating {
+    grid-area: vitality-rating-label;
+    @include indented;
+}
+
+.sheet-fs-notes {
+    grid-column: 1 / -1;
+    margin-left: 15px;
+    width:calc(100% - 15px);
+    max-height: 0px;
+    position: relative;
+}
+
+.sheet-fs-notes:focus,
+.sheet-fs-notes:focus-within,
+.sheet-fs-notes:active,
+.sheet-fs-table input:active ~ .sheet-fs-notes,
+.sheet-fs-table input:focus ~ .sheet-fs-notes,
+.sheet-fs-table input:focus-within ~ .sheet-fs-notes,
+.sheet-fs-table select:active ~ .sheet-fs-notes,
+.sheet-fs-table select:focus ~ .sheet-fs-notes,
+.sheet-fs-table select:focus-within ~ .sheet-fs-notes {
+    min-height: 4em;
+    max-height: initial;
+    resize: vertical;
+    overflow:auto;
+    align-self: stretch;
+}
+
+.sheet-fs-auto-expand-textarea {
+    cursor: text;
+    word-wrap: break-word;
+}
+
+.sheet-fs-notes > .sheet-fs-auto-expand-textarea {
+    visibility: collapse;
+}
+
+// hack for Firefox due to focus events on invisible elements not been registered it seems.
+// We need to keep it visible for >0ms for the click to be registered.
+.sheet-fs-notes > .sheet-fs-auto-expand-textarea {
+
+    transition: visibility 0s linear 1ms;
+}
+
+.sheet-fs-notes:focus > .sheet-fs-auto-expand-textarea,
+.sheet-fs-notes:focus-within > .sheet-fs-auto-expand-textarea,
+.sheet-fs-notes:active > .sheet-fs-auto-expand-textarea,
+.sheet-fs-table input:active ~ .sheet-fs-notes > .sheet-fs-auto-expand-textarea,
+.sheet-fs-table input:focus ~ .sheet-fs-notes > .sheet-fs-auto-expand-textarea,
+.sheet-fs-table input:focus-within ~ .sheet-fs-notes > .sheet-fs-auto-expand-textarea,
+.sheet-fs-table select:active ~ .sheet-fs-notes > .sheet-fs-auto-expand-textarea,
+.sheet-fs-table select:focus ~ .sheet-fs-notes > .sheet-fs-auto-expand-textarea,
+.sheet-fs-table select:focus-within ~ .sheet-fs-notes > .sheet-fs-auto-expand-textarea {
+    visibility: visible;
+}
+
+.sheet-fs-auto-expand-textarea span {
+	visibility: hidden;
+	white-space: pre-wrap;
+	display: block;
+}
+
+.sheet-fs-auto-expand-textarea textarea {
+	position: absolute;
+	z-index: 1;
+	top: 0;
+	left: 0;
+	margin: 0;
+	overflow: hidden;
+	height: 100%;
+    width: 100%;
+
+}
+
+.sheet-fs-relative {
+    position: relative;
+}
+
+.sheet-fs-header,
+.sheet-fs-footer {
+    height: 10px;
+}

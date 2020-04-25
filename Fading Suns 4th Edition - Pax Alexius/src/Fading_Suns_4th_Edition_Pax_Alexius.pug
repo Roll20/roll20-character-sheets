@@ -1,10 +1,27 @@
-- const characteristics = ['strength', 'dexterity', 'endurance', 'wits', 'perception', 'will', 'presence', 'intuition', 'faith'];
+mixin label(i18n)
+    label(data-i18n=i18n)&attributes(attributes)
+
+mixin numeric_input(attr_name, default_value, min_value=null)
+    if (min_value==null)
+        input(name=`attr_${attr_name}` type="number" title=`\${${attr_name}}. Default: ${default_value}.` value=default_value min=min_value)&attributes(attributes)
+    else
+        input(name=`attr_${attr_name}` type="number" title=`\${${attr_name}}. Default: ${default_value}.` value=default_value)&attributes(attributes)
+
+mixin text_input(attr_name)
+        input(name=`attr_${attr_name}` type="text" title=`\${${attr_name}}. Default: ${default_value}.`)&attributes(attributes)
+
+-
+    const characteristics = [
+        { category: 'body',   list: [ 'strength', 'dexterity',  'endurance' ] },
+        { category: 'mind',   list: [ 'wits',     'perception', 'will'      ] },
+        { category: 'spirit', list: [ 'presence', 'intuition', 'faith'      ] }
+    ];
+
 mixin characteristic(name)
-    .fs-characteristic
         button.fs-d20(type='roll' name=`roll_${name}` value=`&{template:fs-GoalRoll} {{characterName=@{character_name}}} {{characteristicName-i18n=^{${name}}}} {{bonus_penalty=[[?{@{goal_bonus_penalty_rollquery_i18n}}]]}} {{goal=[[@{${name}}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]]]]}} {{roll=[[1d20cs[[{@{${name}}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]],19}kl1]]cf20]]}}`)
         label.fs-characteristic-label
-            span(data-i18n=`${name}`) ${name}
-        input(name=`attr_${name}` type='number' min='0' value='3' title=`\${${name}}. Default value: 3.`)
+            span(data-i18n=`${name}`)
+        +numeric_input(name, 3)
 -
     const skills = [
         { name: "academia", default: 3 },
@@ -35,6 +52,7 @@ mixin characteristic(name)
         { name: "tech_redemption", default: 3 },
         { name: "vigor", default: 3 }
     ];
+
 mixin skill(name, value)
     .fs-skill
         .fs-skill-normal
@@ -43,14 +61,15 @@ mixin skill(name, value)
                 label
                     span(data-i18n=`${name}`) #{name}
                     |  +
-                each characteristicName in characteristics
-                    div
+                each charac_cat in characteristics
+                    each characteristicName in charac_cat.list
                         div
-                            button.fs-d20(type='roll' name=`roll_${characteristicName}_${name}` value=`&{template:fs-GoalRoll} {{characterName=@{character_name}}} {{characteristicName-i18n=^{${characteristicName}}}} {{skillName-i18n=^{${name}}}} {{bonus_penalty=[[?{@{goal_bonus_penalty_rollquery_i18n}}]]}} {{goal=[[@{${characteristicName}}+@{${name}}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]]]]}} {{roll=[[1d20cs[[{@{${characteristicName}}+@{${name}}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]],19}kl1]]cf20]]}}`)
-                            label(data-i18n=`${characteristicName}`) #{characteristicName}
+                            div
+                                button.fs-d20(type='roll' name=`roll_${characteristicName}_${name}` value=`&{template:fs-GoalRoll} {{characterName=@{character_name}}} {{characteristicName-i18n=^{${characteristicName}}}} {{skillName-i18n=^{${name}}}} {{bonus_penalty=[[?{@{goal_bonus_penalty_rollquery_i18n}}]]}} {{goal=[[@{${characteristicName}}+@{${name}}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]]]]}} {{roll=[[1d20cs[[{@{${characteristicName}}+@{${name}}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]],19}kl1]]cf20]]}}`)
+                                label(data-i18n=`${characteristicName}`) #{characteristicName}
             label.fs-skill-label
                 span(data-i18n=`${name}`) #{name}
-        input(type='number' name=`attr_${name}` min='0' value=`${value}` title=`@{${name}}. Default value: ${value}.`)
+        +numeric_input(name, value)
 
 
 // CHARACTER SHEET LAYOUT - START
@@ -63,114 +82,113 @@ mixin skill(name, value)
 
         .fs-baseinfo
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='name') Name
-                input.fs-w100(type="text" name="attr_character_name" title="${character_name}")
-                .fs-nowrap-w100
-                    label.fs-indented(data-i18n="planet") Planet
-                    input.fs-w100(name="attr_planet" type="text" title="${planet}")
+                h3.fs-uppercase-header(data-i18n='name')
+                .fs-name-grid
+                    +text_input('character_name')(class ="fs-name")
+                    label.fs-planet(data-i18n="planet")
+                    +text_input('planet')(class ="fs-planet")
 
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='rank') Rank
-                input.fs-w100(type="text" name="attr_rank" title="${rank}")
-                .fs-nowrap-w100
-                    label.fs-indented(data-i18n="birthdate") Birthdate
-                    input.fs-w100(name="attr_birthdate" type="text" title="${birthdate}")
+                h3.fs-uppercase-header(data-i18n='rank')
+                .fs-rank-grid
+                    +text_input('rank')(class ="fs-rank")
+                    label.fs-birthdate(data-i18n="birthdate")
+                    +text_input('birthdate')(class ="fs-birthdate")
 
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='species') Species
-                input.fs-w100(type="text" name="attr_species" title="${species}")
-                .fs-nowrap-w100
-                    label.fs-indented(data-i18n="size") Size
-                    input.fs-w100(name="attr_size" type="text" title="${size}")
-                    label.fs-indented(data-i18n="speed") Speed
-                    input.fs-w100(name="attr_speed" type="text" title="${speed}")
+                h3.fs-uppercase-header(data-i18n='species')
+                .fs-species-grid
+                    +text_input('species')(class ="fs-species")
+                    label.fs-size(data-i18n="size")
+                    +text_input('size')(class ="fs-size")
+                    label.fs-speed(data-i18n="speed")
+                    +text_input('speed')(class ="fs-speed")
 
         .fs-lifepath
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='class') Class
+                h3.fs-uppercase-header(data-i18n='class')
                 .fs-class-grid
-                    input.fs-class1(name="attr_class_1" type="text" title="${class_1}")
-                    input.fs-class2(name="attr_class_1" type="text" title="${class_2}")
-                    label.fs-indented.fs-levellabel(data-i18n="level") Level
-                    input.fs-levelvalue(name="attr_level" type="number" title="${level}")
+                    +text_input('class_1')(class ="fs-class1")
+                    +text_input('class_2')(class ="fs-class2")
+                    label.fs-level(data-i18n="level") Level
+                    +numeric_input('level', 1, 1)(class="fs-level")
 
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='faction') Faction
+                h3.fs-uppercase-header(data-i18n='faction')
                 .fs-faction-grid
-                    input.fs-faction(type="text" name="attr_faction" title="${faction}")
-                    label.fs-indented.fs-blessing-label(data-i18n="blessing") Blessing
-                    label.fs-indented.fs-curse-label(data-i18n="curse") Curse
-                    input.fs-blessing-value(name="attr_blessing" type="text" title="${blessing}")
-                    input.fs-curse-value(name="attr_curse" type="text" title="${curse}")
+                    +text_input('faction')(class ="fs-faction")
+                    label.fs-blessing-label(data-i18n="blessing")
+                    +text_input('blessing')(class ="fs-blessing")
+                    label.fs-curse(data-i18n="curse") Curse
+                    +text_input('curse')(class ="fs-curse")
 
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='calling') Calling
-                input.fs-w100(type="text" name="attr_calling_1" title="${calling_1}")
-                input.fs-w100(type="text" name="attr_calling_2" title="${calling_2}")
-                input.fs-w100(type="text" name="attr_calling_3" title="${calling_3}")
+                h3.fs-uppercase-header(data-i18n='calling')
+                .fs-calling-grid
+                    +text_input('calling_1')
+                    +text_input('calling_2')
+                    +text_input('calling_3')
 
         .fs-traits
-            h3.fs-sheet-section.fs-skills-header.fs-uppercase-header(data-i18n='skills') Skills
+            .fs-sheet-section.fs-skills-header
+                h3.fs-uppercase-header(data-i18n='skills')
 
-            .fs-trait-col.fs-skills-1
+            .fs-skill-col.fs-skills-1
                 - for (let i = 0; i < skills.length / 2; ++i)
                     +skill(skills[i].name, skills[i].default)
 
-            .fs-trait-col.fs-skills-2
+            .fs-skill-col.fs-skills-2
                 - for (let i = skills.length / 2; i < skills.length; ++i)
                     +skill(skills[i].name, skills[i].default)
 
-            .fs-trait-col.fs-characteristics
-                .fs-characteristic-category.fs-trait-col.fs-sheet-section
-                    h3.fs-uppercase-header(data-i18n='body') Body
-                    +characteristic('strength')
-                    +characteristic('dexterity')
-                    +characteristic('endurance')
-                .fs-characteristic-category.fs-trait-col.fs-sheet-section
-                    h3.fs-uppercase-header(data-i18n='mind') Mind
-                    +characteristic('wits')
-                    +characteristic('perception')
-                    +characteristic('will')
-                .fs-characteristic-category.fs-trait-col.fs-sheet-section
-                    h3.fs-uppercase-header(data-i18n='spirit') Spirit
-                    +characteristic('presence')
-                    +characteristic('intuition')
-                    +characteristic('faith')
+            .fs-characteristics
+                each charac_cat in characteristics
+                    .fs-sheet-section
+                        h3.fs-uppercase-header(data-i18n=charac_cat.category)
+                        .fs-characteristic-cat-grid
+                            each charac_name in charac_cat.list
+                                +characteristic(charac_name)
 
-        h3.fs-sheet-section.fs-uppercase-header(data-i18n='occult') Occult
+        .fs-sheet-section
+            h3.fs-uppercase-header(data-i18n='occult')
 
         .fs-defenses
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='resistances') Resistances
+                h3.fs-uppercase-header(data-i18n='resistances')
+                .fs-resistances-grid
+                    each charac_cat in characteristics
+                        label(data-i18n=charac_cat.category)
+                        +numeric_input(`${charac_cat.category}_resistance`, 0, 0)
+                        +text_input(`${charac_cat.category}_resistance_modifier`)
 
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='armor') Armor
-                h3.fs-uppercase-header(data-i18n='e-shield') E-Shield
+                h3.fs-uppercase-header(data-i18n='armor')
+                h3.fs-uppercase-header(data-i18n='e-shield')
 
             .fs-sheet-section.fs-vita-and-revivals-grid
-                h3.fs-vitality-header.fs-uppercase-header(data-i18n='vitality') Vitality
-                label.fs-indented.fs-vitality-rating-label(data-i18n="rating") Rating
-                input.fs-vitality-rating-value(name="attr_vitality_rating" type="number" title="${vitality_rating}")
-                label.fs-indented.fs-vitality-current-label(data-i18n="current") Current
-                input.fs-vitality-current-value(name="attr_vitality_current" type="number" title="${vitality_current}")
-                h3.fs-revivals-header.fs-uppercase-header(data-i18n='revivals') Revivals
-                label.fs-indented.fs-revivals-rating-label(data-i18n="rating") Rating
-                input.fs-revivals-rating-value(name="attr_revivals_rating" type="number" title="${revivals_rating}")
-                label.fs-indented.fs-revivals-number-label(data-i18n="number") Number
-                input.fs-revivals-number-current(name="attr_revivals_number" type="number" title="${vitality_current}")
+                h3.fs-vitality-header.fs-uppercase-header(data-i18n='vitality')
+                label.fs-vitality-rating(data-i18n="rating")
+                +numeric_input('vitality_rating', 0, 0)(class='fs-vitality-rating')
+                label.fs-vitality-current(data-i18n="current")
+                +numeric_input('vitality_current', 0, 0)(class='fs-vitality-current')
+                h3.fs-revivals-header.fs-uppercase-header(data-i18n='revivals')
+                label.fs-revivals-rating(data-i18n="rating")
+                +numeric_input('revivals_rating', 0, 0)(class='fs-revivals-rating')
+                label.fs-revivals-number(data-i18n="number")
+                +numeric_input('vitality_current', 0, 0)(class='fs-revivals-current')
 
         .fs-actions-vp-bank-and-surge
             .fs-sheet-section
-                h3.fs-uppercase-header(data-i18n='actions') Actions
+                h3.fs-uppercase-header(data-i18n='actions')
                 
                 .fs-actions
                     .fs-table
-                        span.fs-table-head
-                        span.fs-table-head(data-i18n="action") Maneuver/Attack
-                        span.fs-table-head(data-i18n="characteristic") Characteristic
-                        span.fs-table-head(data-i18n="skill") Skill
-                        span.fs-table-head(data-i18n="goal_bonus_penalty") +/- Goal
-                        span.fs-table-head(data-i18n="impact") Impact
+                        span.fs-table-head 
+                        span.fs-table-head(data-i18n="action")
+                        span.fs-table-head(data-i18n="characteristic")
+                        span.fs-table-head(data-i18n="skill")
+                        span.fs-table-head(data-i18n="goal_bonus_penalty")
+                        span.fs-table-head(data-i18n="impact")
                     fieldset.repeating_actions
                         .fs-table
                             input(type="hidden" name="attr_action_characteristic_value")
@@ -179,42 +197,54 @@ mixin skill(name, value)
                             input.fs-table-cell(type="text" name="attr_action_name")
                             select.fs-table-cell(name="attr_action_characteristic")
                                 option(value="" selected)
-                                optgroup(label="Body" data-i18n-label='body') Body
-                                    option(value ="strength" data-i18n="strength") Strength
-                                    option(value ="dexterity" data-i18n="dexterity") Dexterity
-                                    option(value ="endurance" data-i18n="endurance") Endurance
-                                optgroup(label="Mind" data-i18n-label='mind') Mind
-                                    option(value ="wits" data-i18n="wits") Wits
-                                    option(value ="perception" data-i18n="perception") Perception
-                                    option(value ="will" data-i18n="will") Will
-                                optgroup(label="Spirit" data-i18n-label='spirit') Spirit
-                                    option(value ="presence" data-i18n="presence") Presence
-                                    option(value ="intuition" data-i18n="intuition") Intuition
-                                    option(value ="faith" data-i18n="faith") Faith
+                                each charac_cat in characteristics
+                                    optgroup(data-i18n-label=charac_cat.category)
+                                    each charac_name in charac_cat.list
+                                        option(data-i18n=charac_name)
                             select.fs-table-cell(name="attr_action_skill")
                                 option(value="" selected)
                                 each sk in skills
                                     option(value =`${sk.name}` data-i18n=`${sk.name}`) #{sk.name}
                             input.fs-table-cell(type="number" name="attr_action_goal_penalty" value=0)
                             input.fs-table-cell(type="text" name="attr_action_impact")
+                            .fs-notes
+                                .fs-auto-expand-textarea
+                                    span(name="attr_action_notes")
+                                    textarea(name="attr_action_notes" data-i18n-placeholder="notes" placeholder="Notes" spellcheck="false")
 
             .fs-sheet-section-frame
-                h3.fs-uppercase-header(data-i18n='vp-bank') VP Bank
-                h3.fs-uppercase-header(data-i18n='surge') Surge
+                h3.fs-uppercase-header(data-i18n='vp_bank')
+                .fs-vp-and-surge-grids
+                    label(data-i18n='vp_bank_capacity')
+                    +numeric_input('vp_bank_capacity', 0, 0)
+                    label(data-i18n='current_vp')
+                    +numeric_input('current_vp', 0, 0)
+                    label(data-i18n='current_wp')
+                    +numeric_input('current_wp', 0, 0)
+                h3.fs-uppercase-header(data-i18n='surge')
+                .fs-vp-and-surge-grids
+                    label(data-i18n='surge_rating')
+                    +numeric_input('surge_rating', 0, 0)
+                    label(data-i18n='surge_number')
+                    +numeric_input('surge_number', 0, 0)
 
         .fs-sheet-section
-            h3.fs-uppercase-header(data-i18n='perks') Perks
+            h3.fs-uppercase-header(data-i18n='perks')
 
         .fs-sheet-section
-            h3.fs-uppercase-header(data-i18n='possessions') Possessions
+            h3.fs-uppercase-header(data-i18n='possessions')
 
         .fs-sheet-section
-            h3.fs-uppercase-header(data-i18n='money') Money
+            h3.fs-uppercase-header(data-i18n='money')
 
         .fs-sheet-section
-            h3.fs-uppercase-header(data-i18n='last_notes') Last Notes
-            .fs-nontable.fs-core-details.fs-wide-readonly
-                textarea.fs-inline-textarea.fs-supertall-textarea.fs-w100(title='@{last_notes}' type='text' name='attr_last_notes' spellcheck='false')
+            h3.fs-uppercase-header(data-i18n='last_notes')
+            .fs-w100.fs-relative.fs-supertall-textarea
+                .fs-auto-expand-textarea
+                    span(name="attr_last_notes")
+                    textarea(title="@{last_notes}" type="text" name="attr_last_notes" data-i18n-placeholder="notes" placeholder="Notes" spellcheck="false")
+
+        .fs-footer
 
 // CHARACTER SHEET LAYOUT - END
 // ROLL TEMPLATES - START
