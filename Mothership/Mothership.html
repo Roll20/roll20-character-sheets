@@ -2,7 +2,6 @@
     on("change:level", () => {
         getAttrs(['level'], (v) => {
             var xpneeded = 10;
-            console.log("level is changing")
             switch (v.level) {
                 case "0": xpneeded = 10; break;
                 case "1": xpneeded = 25; break;
@@ -15,8 +14,47 @@
                 case "8": xpneeded = 375; break;
                 default: xpneeded = 500;
             }
-            console.log("new needed is " + xpneeded)
             setAttrs({ xpneeded: xpneeded });
+        });
+    });
+
+    on("change:pcbonus_setting", () => {
+        getAttrs(['pcbonus_setting'], (v) => {
+            if (v.pcbonus_setting === "1") {
+                setAttrs({ pcbonusmacro1: " + ?{Bonus|0} ", pcbonusmacro2: " + ?{Bonus} "});
+            } else {
+                setAttrs({ pcbonusmacro1: " ", pcbonusmacro2: " "});
+            }
+        });
+    });
+
+    on("change:npcbonus_setting", () => {
+        getAttrs(['npcbonus_setting'], (v) => {
+            if (v.npcbonus_setting === "1") {
+                setAttrs({ npcbonusmacro1: " + ?{Bonus|0} ", npcbonusmacro2: " + ?{Bonus} "});
+            } else {
+                setAttrs({ npcbonusmacro1: " ", npcbonusmacro2: " "});
+            }
+        });
+    });
+
+    on("change:shipbonus_setting", () => {
+        getAttrs(['shipbonus_setting'], (v) => {
+            if (v.shipbonus_setting === "1") {
+                setAttrs({ shipbonusmacro1: " + ?{Bonus|0} ", shipbonusmacro2: " + ?{Bonus} "});
+            } else {
+                setAttrs({ shipbonusmacro1: " ", shipbonusmacro2: " "});
+            }
+        });
+    });
+
+    on("change:npcwhisper_setting", () => {
+        getAttrs(['npcwhisper_setting'], (v) => {
+            if (v.npcwhisper_setting === "1") {
+                setAttrs({ whispergm: "/w gm "});
+            } else {
+                setAttrs({ whispergm: ""});
+            }
         });
     });
 
@@ -1042,8 +1080,42 @@
 <div class="sheet-main">
     <input type="hidden" name="attr_sheetmode" class="sheet-mode-input" value="pc">
     <input type="hidden" name="attr_xpneeded" value="10">
+    <input type="hidden" name="attr_open_settings" class="sheet-settings-input" value="0">
+    <input type="hidden" name="attr_pcbonusmacro1" value=" + ?{Bonus|0} ">
+    <input type="hidden" name="attr_pcbonusmacro2" value=" + ?{Bonus} ">
+    <input type="hidden" name="attr_npcbonusmacro1" value=" + ?{Bonus|0} ">
+    <input type="hidden" name="attr_npcbonusmacro2" value=" + ?{Bonus} ">
+    <input type="hidden" name="attr_shipbonusmacro1" value=" + ?{Bonus|0} ">
+    <input type="hidden" name="attr_shipbonusmacro2" value=" + ?{Bonus} ">
+    <input type="hidden" name="attr_whispergm" value="">
+    <div class="sheet-settings">
+        <h3>Sheet Settings</h3>
+        <div>
+            <label>Ask for bonus on PC attack rolls <input type="checkbox" name="attr_pcbonus_setting" value="1" checked></label>
+            When rolling attacks with the sheet in PC mode, ask for a bonus to the roll each time.
+        </div>
+        <div>
+            <label>Ask for bonus on Ship rolls <input type="checkbox" name="attr_shipbonus_setting" value="1" checked></label>
+            When rolling attacks with the sheet in Ship mode, ask for a bonus to the roll each time.
+        </div>
+        <div>
+            <label>Ask for bonus on NPC rolls <input type="checkbox" name="attr_npcbonus_setting" value="1" checked></label>
+            When rolling attacks with the sheet in Ship mode, ask for a bonus to the roll each time.
+        </div>
+        <div>
+            <label>Whisper NPC rolls<input type="checkbox" name="attr_npcwhisper_setting" value="1"></label>
+            When rolling for NPCs, whisper results to the GM instead of broadcasting directly to everyone.
+        </div>
+        <hr>
+    </div>
     <div class="sheet-mode-ribbon">
         <div style="margin-right: auto"></div>
+        <div>
+            <label>
+                <input type="checkbox" name="attr_open_settings" value="1">
+                <span class="sheet-settings-gear">y</span>
+            </label>
+        </div>
         <label class="sheet-chooser ">
             <input type="radio" class="sheet-type-select" value="pc" name="attr_sheetmode" checked>
             <span data-i18n="pc" class="sheet-mode-span sheet-chooser-left">PC</span>
@@ -1073,7 +1145,7 @@
             <div class="sheet-npc-statrow">
                 <div class="sheet-statname" data-i18n="combat">COMBAT</div>
                 <input type="number" class="sheet-npc-input" name="attr_npccombat">
-                <button type="roll" name="roll_npc-combat" value="&{template:mothership} {{skill=Combat Check}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{statvaluetens=[[floor(@{npccombat}/10)]]}} {{statvalueones=[[@{npccombat}%10]]}} {{charname=@{character_name}}}"></button>
+                <button type="roll" name="roll_npc-combat" value="@{whispergm} &{template:mothership} {{skill=Combat Check}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{statvaluetens=[[floor(@{npccombat}/10)]]}} {{statvalueones=[[@{npccombat}%10]]}} {{charname=@{character_name}}}"></button>
             </div>
             <div class="sheet-npc-statrow">
                 <div class="sheet-statname" data-i18n="hits">HITS</div>
@@ -1083,12 +1155,12 @@
             <div class="sheet-npc-statrow">
                 <div class="sheet-statname" data-i18n="loyalty">Loyalty</div>
                 <input type="number" class="sheet-npc-input" name="attr_npcloyalty">
-                <button type="roll" name="roll_npc-loyalty-save" value="&{template:mothership} {{skill=Loyalty Save}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{statvaluetens=[[floor(@{npcloyalty}/10)]]}} {{statvalueones=[[@{npcloyalty}%10]]}} {{charname=@{character_name}}}"></button>
+                <button type="roll" name="roll_npc-loyalty-save" value="@{whispergm} &{template:mothership} {{skill=Loyalty Save}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{statvaluetens=[[floor(@{npcloyalty}/10)]]}} {{statvalueones=[[@{npcloyalty}%10]]}} {{charname=@{character_name}}}"></button>
             </div>
             <div class="sheet-npc-statrow">
                 <div class="sheet-statname" data-i18n="instinct">INSTINCS</div>
                 <input type="number" class="sheet-npc-input" name="attr_npcinstinct">
-                <button type="roll" name="roll_npc-instinct" value="&{template:mothership} {{skill=Instinct Check}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{statvaluetens=[[floor(@{npcinstinct}/10)]]}} {{statvalueones=[[@{npcinstinct}%10]]}} {{charname=@{character_name}}}"></button>
+                <button type="roll" name="roll_npc-instinct" value="@{whispergm} &{template:mothership} {{skill=Instinct Check}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{statvaluetens=[[floor(@{npcinstinct}/10)]]}} {{statvalueones=[[@{npcinstinct}%10]]}} {{charname=@{character_name}}}"></button>
             </div>
             <div class="sheet-npc-statrow">
                 <div class="sheet-statname" data-i18n="hppool">HP POOL</div>
@@ -1098,14 +1170,14 @@
             <div class="sheet-npc-statrow">
                 <div class="sheet-statname" data-i18n="loyaltyroll">LOYALTY ROLL</div>
                 <input type="text" class="sheet-npc-input" name="attr_npcloyaltyroll">
-                <button type="roll" name="roll_npc-loyalty" value="&{template:mothership-generic} {{title=NPC Loyalty Roll}} {{loyalty=[[@{npcloyaltyroll}]]}} {{charname=@{character_name}}}"></button>
+                <button type="roll" name="roll_npc-loyalty" value="@{whispergm} &{template:mothership-generic} {{title=NPC Loyalty Roll}} {{loyalty=[[@{npcloyaltyroll}]]}} {{charname=@{character_name}}}"></button>
             </div>
         </div>
         <fieldset class="repeating_npc-stats sheet-custom-stat-grid">
             <div class="sheet-npc-statrow">
                 <input type="text" class="sheet-npc-custom-stat" name="attr_customstatname">
                 <input type="number" class="sheet-npc-input" name="attr_customstatval">
-                <button type="roll" name="roll_npc-custom-stat" value="&{template:mothership} {{skill=@{customstatname} Check}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{statvaluetens=[[floor(@{customstatval}/10)]]}} {{statvalueones=[[@{customstatval}%10]]}} {{charname=@{character_name}}}"></button>
+                <button type="roll" name="roll_npc-custom-stat" value="@{whispergm} &{template:mothership} {{skill=@{customstatname} Check}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{statvaluetens=[[floor(@{customstatval}/10)]]}} {{statvalueones=[[@{customstatval}%10]]}} {{charname=@{character_name}}}"></button>
             </div>
         </fieldset>
         <hr/>
@@ -1149,7 +1221,7 @@
                             </div>
                             <div>
                                 <button type="roll" name="roll_attack" class="sheet-npc-shoot"
-                                value="&{template:attack} {{charname=@{character_name}}} {{weapon=@{weaponname}}} {{rolltens=[[1d10-1]]}} {{rollones=[[1d10-1]]}} {{targettens=[[floor((@{weapontarget}+?{Bonus|0})/10)]]}} {{targetones=[[(@{weapontarget}+?{Bonus})%10]]}} {{damage=[[@{weapondamage}*(1+@{weaponx10})]]}} {{special=@{weaponspecial}}} {{crit=@{weaponcrit}}} {{bonus=[[?{Bonus}[Bonus]]]}}">
+                                value="@{whispergm} &{template:attack} {{charname=@{character_name}}} {{weapon=@{weaponname}}} {{rolltens=[[1d10-1]]}} {{rollones=[[1d10-1]]}} {{targettens=[[floor((@{weapontarget} @{npcbonusmacro1})/10)]]}} {{targetones=[[(@{weapontarget} @{npcbonusmacro2})%10]]}} {{damage=[[@{weapondamage}*(1+@{weaponx10})]]}} {{special=@{weaponspecial}}} {{crit=@{weaponcrit}}} {{bonus=[[0 @{npcbonusmacro2}]]}}">
                             </button>
                         </div>
                         </div>
@@ -1735,7 +1807,7 @@
                         </div>
                         <div>
                             <button type="roll" name="roll_attack" class="sheet-pc-shoot"
-                                value="&{template:attack} {{charname=@{character_name}}} {{weapon=@{weaponname}}} {{rolltens=[[1d10-1]]}} {{rollones=[[1d10-1]]}} {{targettens=[[floor((@{combat}+@{weaponbonus}+?{Bonus|0})/10)]]}} {{targetones=[[(@{combat}+@{weaponbonus}+?{Bonus})%10]]}} {{damage=[[@{weapondamage}*(1+@{weaponx10})]]}} {{special=@{weaponspecial}}} {{crit=@{weaponcrit}}} {{bonus=[[@{weaponbonus}[Weapon Bonus] + ?{Bonus}[Situational Bonus]]]}}">
+                                value="&{template:attack} {{charname=@{character_name}}} {{weapon=@{weaponname}}} {{rolltens=[[1d10-1]]}} {{rollones=[[1d10-1]]}} {{targettens=[[floor((@{combat}+@{weaponbonus} @{pcbonusmacro1})/10)]]}} {{targetones=[[(@{combat}+@{weaponbonus} @{pcbonusmacro2})%10]]}} {{damage=[[@{weapondamage}*(1+@{weaponx10})]]}} {{special=@{weaponspecial}}} {{crit=@{weaponcrit}}} {{bonus=[[@{weaponbonus}[Weapon Bonus] @{pcbonusmacro1}]]}}">
                             </button>
                         </div>
                     </div>
@@ -2060,7 +2132,7 @@
                     <div>
                         ARMOR
                     </div>
-                    <button type="roll" name="roll_shiparmor" value="&{template:mothership} {{charname=@{shipname}}} {{statvaluetens=[[floor((@{shiparmor}+?{Bonus|0})/10)]]}} {{statvalueones=[[((@{shiparmor}+?{Bonus})%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{skill=Armor Save}}">
+                    <button type="roll" name="roll_shiparmor" value="&{template:mothership} {{charname=@{shipname}}} {{statvaluetens=[[floor((@{shiparmor} @{shipbonusmacro1})/10)]]}} {{statvalueones=[[((@{shiparmor} @{shipbonusmacro2})%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{skill=Armor Save}}">
                         <input name="attr_shiparmor" value="(@{ship-armorsave})" disabled="true">
                     </button>
                 </div>
@@ -2068,7 +2140,7 @@
                     <div>
                         COMBAT
                     </div>
-                    <button type="roll" name="roll_shipcombat" value="&{template:mothership} {{charname=@{shipname}}} {{statvaluetens=[[floor((@{shipcombat}+?{Bonus|0})/10)]]}} {{statvalueones=[[((@{shipcombat}+?{Bonus})%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-combat=1}}">
+                    <button type="roll" name="roll_shipcombat" value="&{template:mothership} {{charname=@{shipname}}} {{statvaluetens=[[floor((@{shipcombat} @{shipbonusmacro1})/10)]]}} {{statvalueones=[[((@{shipcombat} @{shipbonusmacro2})%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-combat=1}}">
                         <input name="attr_shipcombat" value="(@{ship-computers}*10 + 10)" disabled="true">
                     </button>
                 </div>
@@ -2076,7 +2148,7 @@
                     <div>
                         INTELLECT
                     </div>
-                    <button type="roll" name="roll_shipintellect" value="&{template:mothership} {{charname=@{shipname}}} {{statvaluetens=[[floor((@{shipintellect}+?{Bonus|0})/10)]]}} {{statvalueones=[[((@{shipintellect}+?{Bonus})%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-intellect=1}}">
+                    <button type="roll" name="roll_shipintellect" value="&{template:mothership} {{charname=@{shipname}}} {{statvaluetens=[[floor((@{shipintellect} @{shipbonusmacro1})/10)]]}} {{statvalueones=[[((@{shipintellect} @{shipbonusmacro2})%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-intellect=1}}">
                         <input name="attr_shipintellect" value="(@{ship-computers}*10 + 30)" disabled="true">
                     </button>
                 </div>
@@ -2084,7 +2156,7 @@
                     <div>
                         SPEED
                     </div>
-                    <button type="roll" name="roll_shipspeed" value="&{template:mothership} {{charname=@{shipname}}} {{statvaluetens=[[floor((@{shipspeed}+?{Bonus|0})/10)]]}} {{statvalueones=[[((@{shipspeed}+?{Bonus})%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-speed=1}}">
+                    <button type="roll" name="roll_shipspeed" value="&{template:mothership} {{charname=@{shipname}}} {{statvaluetens=[[floor((@{shipspeed} @{shipbonusmacro1})/10)]]}} {{statvalueones=[[((@{shipspeed} @{shipbonusmacro2})%10)]]}} {{tensdie=[[1d10-1]]}} {{onesdie=[[1d10-1]]}} {{title-speed=1}}">
                         <input name="attr_shipspeed" value="(@{ship-thrusters}*10)" disabled="true" >
                     </button>
                 </div>
@@ -2218,7 +2290,7 @@
                     <label>Special</label>
                 </div>
                 <button type="roll" name="roll_shipcombat"
-                    value="&{template:attack} {{charname=@{shipname}}} {{weapon=@{weaponname}}} {{rolltens=[[1d10-1]]}} {{rollones=[[1d10-1]]}} {{targettens=[[floor((@{weapontarget}+?{Bonus|0})/10)]]}} {{targetones=[[(@{weapontarget}+?{Bonus})%10]]}} {{damage=[[(@{weapondmg})*(1+@{weaponx10})]]}} {{special=@{weaponspecial}}} {{crit=Inflict a ship critical!}} {{bonus=[[?{Bonus}[Bonus]]]}}"></button>
+                    value="&{template:attack} {{charname=@{shipname}}} {{weapon=@{weaponname}}} {{rolltens=[[1d10-1]]}} {{rollones=[[1d10-1]]}} {{targettens=[[floor((@{weapontarget} @{shipbonusmacro1})/10)]]}} {{targetones=[[(@{weapontarget} @{shipbonusmacro2})%10]]}} {{damage=[[(@{weapondmg})*(1+@{weaponx10})]]}} {{special=@{weaponspecial}}} {{crit=Inflict a ship critical!}} {{bonus=[[0 @{shipbonusmacro2}]]}}"></button>
             </div>
         </fieldset>
         <hr/>
