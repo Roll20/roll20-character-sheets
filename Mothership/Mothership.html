@@ -1316,6 +1316,15 @@
             <label>Whisper NPC rolls<input type="checkbox" name="attr_npcwhisper_setting" value="1"></label>
             When rolling for NPCs, whisper results to the GM instead of broadcasting directly to everyone.
         </div>
+        <div>
+            <label>Panic Table
+                <select name="attr_panicchoice" value="&{template:panicandroid}">
+                    <option value="&{template:panictable}" selected="selected">Normal</option>
+                    <option value="&{template:panicandroid}">Android</option>
+                </select>
+            </label>
+            Choice of panic table to use when rolling panic effect.
+        </div>
         <hr>
     </div>
     <div class="sheet-mode-ribbon">
@@ -1501,7 +1510,7 @@
                         <input type="number"  value=0 name="attr_resolve"></input></td>
                     <td>
                         <button class="sheet-rollbutton sheet-panicbutton" type="roll" name="roll_paniccheck" value="&{template:panic} {{charname=@{character_name}}} {{stressdice=[[2d10]]}} {{currentstress=[[@{stress}]]}}" data-i18n="paniccheck">PANIC CHECK</button>
-                        <button class="sheet-rollbutton sheet-panicbutton" type="roll" name="roll_panictable" value="&{template:panictable} {{charname=@{character_name}}} {{currentstress=[[@{stress}]]}} {{panicdice=[[2d10+@{stress}-@{resolve}]]}}" data-i18n="paniceffect">PANIC EFFECT</button>
+                        <button class="sheet-rollbutton sheet-panicbutton" type="roll" name="roll_panictable" value="@{panicchoice} {{charname=@{character_name}}} {{currentstress=[[@{stress}]]}} {{panicdice=[[2d10+@{stress}-@{resolve}]]}}" data-i18n="paniceffect">PANIC EFFECT</button>
                     </td>
                     <td>
                         <span class="sheet-statname" data-i18n="currenthealth">HEALTH</span>
@@ -2847,6 +2856,103 @@
     </div>
 </div>
 </rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-panicandroid">
+    <div class="sheet-roll-panic">
+        <div class="sheet-roll-type">
+        Panic Table
+        </div>
+            <div class="sheet-roll-result">
+                {{panicdice}}
+            </div>
+            <div class="sheet-roll-subheader" data-i18n="rollvalue">
+                Roll Value 
+            </div>
+        {{#rollLess() panicdice 2}}
+            <div class="sheet-roll-result" data-i18n="noeffect">No effect</div>
+            <div class="sheet-roll-row" data-i18n="noeffecttext">{{charname}} did not panic.</div>
+        {{/rollLess() panicdice 2}}
+        {{#rollGreater() panicdice 1}}{{#rollLess() panicdice 4}}
+            <div class="sheet-roll-result" data-i18n="statetheodds">State the Odds</div>
+            <div class="sheet-roll-row" data-i18n="statetheoddstext">of any event, Advantage on party rolls for 1hr.</div>
+        {{/rollLess() panicdice 4}}{{/rollGreater() panicdice 1}}
+        {{#rollGreater() panicdice 3}}{{#rollLess() panicdice 6}}
+            <div class="sheet-roll-result" data-i18n="etymology">Explains the Etymology of Words</div>
+            <div class="sheet-roll-row" data-i18n="etymologytext">Knowledge checks have Advantage for 1hr.</div>
+        {{/rollLess() panicdice 6}}{{/rollGreater() panicdice 3}}
+        {{#rollGreater() panicdice 5}}{{#rollLess() panicdice 8}}
+            <div class="sheet-roll-result" data-i18n="geometric">Organizes Objects Into Geometric Patterns</div>
+            <div class="sheet-roll-row" data-i18n="geometrictext">Everyone else gains 1 Stress.</div>
+        {{/rollLess() panicdice 8}}{{/rollGreater() panicdice 5}}
+        {{#rollGreater() panicdice 7}}{{#rollLess() panicdice 10}}
+            <div class="sheet-roll-result" data-i18n="inventorydust">Inventories Particles of Dust by Grade</div>
+            <div class="sheet-roll-row" data-i18n="inventorydusttext">Cannot engage in other tasks, everyone else gains 2 Stress.</div>
+        {{/rollLess() panicdice 10}}{{/rollGreater() panicdice 7}}
+        {{#rollGreater() panicdice 9}}{{#rollLess() panicdice 12}}
+            <div class="sheet-roll-result" data-i18n="faxmachine">Intermittently Emits Shrieks Like a Fax Machine Under Duress</div>
+            <div class="sheet-roll-row" data-i18n="faxmachinetext">Lapses into morse code, cannot communicate or sneak. Everyone else gains 2 stress.</div>
+        {{/rollLess() panicdice 12}}{{/rollGreater() panicdice 9}}
+        {{#rollGreater() panicdice 11}}{{#rollLess() panicdice 14}}
+            <div class="sheet-roll-result" data-i18n="incorrectodds">Incorrectly States Odds</div>
+            <div class="sheet-roll-row" data-i18n="incorrectoddstext">Insists impossible tasks are trivial, trivial tasks are impossible for the next 2d10 hours. Distracting. Anyone attempting a complex task must make a Fear save or gain 1d10 Stress.</div>
+        {{/rollLess() panicdice 14}}{{/rollGreater() panicdice 11}}
+        {{#rollGreater() panicdice 13}}{{#rollLess() panicdice 16}}
+            <div class="sheet-roll-result" data-i18n="twitchy">Repetitive Twitchy Motions</div>
+            <div class="sheet-roll-row" data-i18n="twitchytext">Your manual tasks have Disadvantage, everyone else gains 2 Stress.</div>
+        {{/rollLess() panicdice 16}}{{/rollGreater() panicdice 13}}
+        {{#rollGreater() panicdice 15}}{{#rollLess() panicdice 18}}
+            <div class="sheet-roll-result" data-i18n="expressiveness">Loses Any Expressiveness</div>
+            <div class="sheet-roll-row" data-i18n="expressivenesstext">Discusses the irrationality of phobias, seeks to trigger them.</div>
+        {{/rollLess() panicdice 18}}{{/rollGreater() panicdice 15}}
+        {{#rollGreater() panicdice 17}}{{#rollLess() panicdice 20}}
+            <div class="sheet-roll-result" data-i18n="presentcourse">Unreasonable Adherence to the Present Course of Action</div>
+            <div class="sheet-roll-row" data-i18n="presentcoursetext">Take 1d10 damage from repetitive motion injury. Everyone else makes Fear save or gains 1d10/2 Stress.</div>
+        {{/rollLess() panicdice 20}}{{/rollGreater() panicdice 17}}
+        {{#rollGreater() panicdice 19}}{{#rollLess() panicdice 22}}
+            <div class="sheet-roll-result" data-i18n="nihilism">Becomes Nihilistically Worshipful of the Source of Danger</div>
+            <div class="sheet-roll-row" data-i18n="nihilismtext">Everyone has Disadvantage on rolls against it. Everyone else takes a fear save when failing to act against danger or gains a Phobia.</div>
+        {{/rollLess() panicdice 22}}{{/rollGreater() panicdice 19}}
+        {{#rollTotal() panicdice 22}}
+            <div class="sheet-roll-result" data-i18n="killswitch">Killswitch Engaged</div>
+            <div class="sheet-roll-row" data-i18n="killswitchtext">Go berserk, will not withdraw from combat regardless of situation, will not adhere to tactics</div>    
+        {{/rollTotal() panicdice 22}}
+        {{#rollTotal() panicdice 23}}
+            <div class="sheet-roll-result" data-i18n="turingtest">Turing Test Failure</div>
+            <div class="sheet-roll-row" data-i18n="turingtesttext">Have difficulty expressing humanity. Party members make a Fear Save of gain 1 Stress when you show up.</div>
+        {{/rollTotal() panicdice 23}}
+        {{#rollTotal() panicdice 24}}
+            <div class="sheet-roll-result" data-i18n="systemoverload">System Overload</div>
+            <div class="sheet-roll-row" data-i18n="systemoverloadtext">Slump Catatonic in a failed reboot cycle for 1d10 hours.</div>    
+        {{/rollTotal() panicdice 24}}
+        {{#rollTotal() panicdice 25}}
+            <div class="sheet-roll-result" data-i18n="logiccore">Fried Logic Core</div>
+            <div class="sheet-roll-row" data-i18n="logiccoretext">Frenzied nonsensical behaviour. Everyone else makes a Panic save.</div>    
+        {{/rollTotal() panicdice 25}}
+        {{#rollTotal() panicdice 26}}
+            <div class="sheet-roll-result" data-i18n="threatassesment">Damage to Threat Assesment</div>
+            <div class="sheet-roll-row" data-i18n="threatassesmenttext">Betray party member at the next opportunity, believe you are aiding the crew. All stress gained is increased by 1d10 for the next 1d10 hours.</div>    
+        {{/rollTotal() panicdice 26}}
+        {{#rollTotal() panicdice 27}}
+            <div class="sheet-roll-result" data-i18n="compoundingcorruption">Compound Data Corruption</div>
+            <div class="sheet-roll-row" data-i18n="compoundingcorruptiontext">Roll Twice</div>    
+        {{/rollTotal() panicdice 27}}
+        {{#rollTotal() panicdice 28}}
+            <div class="sheet-roll-result" data-i18n="firmware">Firmware malfunction</div>
+            <div class="sheet-roll-row" data-i18n="firmwaretext">Roll 1d10 on this table, behaviour is permanent.</div>    
+        {{/rollTotal() panicdice 28}}
+        {{#rollTotal() panicdice 29}}
+            <div class="sheet-roll-result" data-i18n="corruption">Data Corruption</div>
+            <div class="sheet-roll-row" data-i18n="corruptiontext">Warden takes over character permanently, nightmarish malfunctions.</div>    
+        {{/rollTotal() panicdice 29}}
+        {{#rollGreater() panicdice 29}}
+            <div class="sheet-roll-result" data-i18n="slagged">Slagged</div>
+            <div class="sheet-roll-row" data-i18n="slaggedtext">Geigeresque-Scanners Head Explosion, everyone present gains a Phobia and 1d10/2 Stress (Fear Save).</div>    
+        {{/rollGreater() panicdice 29}}
+        <div class="sheet-roll-charname">
+            {{charname}}
+        </div>
+    </div>
+    </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-shipcrittable">
     <div class="sheet-roll-panic">
