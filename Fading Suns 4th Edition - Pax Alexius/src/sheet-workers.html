@@ -1,7 +1,5 @@
 <script type="text/worker">
 
-    /* UNUSED YET
-
     const characteristics = {
         body: [ 'strength', 'dexterity', 'endurance' ],
         mind: [ 'wits', 'perception', 'will' ],
@@ -38,8 +36,44 @@
         'vigor'
     ];
 
-    */
+    const repeating_rolls = [
+        { "section": "actions", "prefix": "action" }
+    ];
 
+    const updateGoalNumber = (section, prefix) => {
+        getSectionIDs(`repeating_${section}`, idArray => {
+            const characteristicArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_characteristic`);
+            const characteristicValueArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_characteristic_value`);
+            const skillArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_skill`);
+            const skillValueArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_skill_value`);
+            getAttrs( [].concat(characteristicArray, skillArray), vNames => {
+                getAttrs( vNames, vValues => {
+                    let setAttrsObj = {};
+                    for (let i = 0; i < idArray.length; ++i) {
+                        setAttrsObj[characteristicValueArray[i]] = (parseInt(vValues[vNames[characteristicArray[i]]]) || 0);
+                        setAttrsObj[skillValueArray[i]] = (parseInt(vValues[vNames[skillArray[i]]]) || 0);
+                    }
+                    setAttrs(setAttrsObj);
+                });
+            });
+        });
+    };
+
+    [].concat(all_characteristics, all_skills).forEach( trait => {
+        on(`change:${trait}`, eventInfo => {
+            repeating_rolls.forEach( special_skill => {
+                console.log("updateGoalNumber")
+                updateGoalNumber(special_skill.section, special_skill.prefix);
+            });
+        });
+    });
+
+    repeating_rolls.forEach( repeating => {
+        on(`change:repeating_${repeating.section}`, eventInfo => {
+            console.log("updateGoalNumber")
+            updateGoalNumber(repeating.section, repeating.prefix);
+        });
+    });
 
     on("sheet:opened", function() {
         
