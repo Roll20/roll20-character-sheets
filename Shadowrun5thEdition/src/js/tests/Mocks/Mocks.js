@@ -1,8 +1,9 @@
 let attributes = {};
 let sectionIDS = {};
 const maxAsyncDelay = 2000;
-const getRandomInt = max => Math.floor(Math.random() * Math.floor(max))
-
+const getRandomInt = function(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+};
 const getAttrs = function(attrs, callback) {
   let values = {};
   setTimeout(() => {
@@ -12,7 +13,6 @@ const getAttrs = function(attrs, callback) {
       callback(values);
   }, getRandomInt(maxAsyncDelay));
 };
-
 const setAttrs = function(attrs, callback) {
   let values = {};
   setTimeout(() => {
@@ -27,7 +27,6 @@ const setAttrs = function(attrs, callback) {
       callback(attributes);
   }, getRandomInt(maxAsyncDelay));
 };
-
 const getSectionIDs = function(section, callback) {
   setTimeout(() => {
       let ids = sectionIDS[section] || [];
