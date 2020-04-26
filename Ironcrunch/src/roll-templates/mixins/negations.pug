@@ -1,15 +1,36 @@
+include ./rolls
+include ./body
+
 mixin actionDieNegated
-  div.sheet-result-row
-    td Previous Action Score:
-    td {{action}}
-  div.sheet-result-row
+  div.sheet-result-body.sheet-result-row
+    div Previous Action Score:
+    div {{action}}
+  div.sheet-result-body.sheet-result-row
     div.sheet-subfooter.sheet-alert Action die cancelled for matching negative momentum.
-  div.sheet-result-row
-    td Stat + Add:
-    td {{stat}} + {{add}}
-  div.sheet-result-row
+  div.sheet-result-body.sheet-result-row
+    div Stat + Add:
+    div {{stat}} + {{add}}
+  div.sheet-result-body.sheet-result-row
     div New Action Score:
     div {{modifiers}}
-  div.sheet-result-row
+  div.sheet-result-body.sheet-result-row
     div Challenge Dice:
     div {{challenge1}} {{challenge2}}
+  +standardAction('modifiers')
+
+mixin negationRoll(opts)
+  | {{#rollTotal() momentum #{opts.momentum}}}
+  | {{#rollTotal() action negate#{opts.die1} }}
+  +actionDieNegated
+  | {{/rollTotal() action negate#{opts.die1} }}
+  | {{#^rollTotal() action negate#{opts.die1} }}
+  | {{#rollTotal() action negate#{opts.die2} }}
+  +actionDieNegated
+  | {{/rollTotal() action negate#{opts.die2} }}
+  | {{#^rollTotal() action negate#{opts.die2} }}
+  +actionBody
+  +standardAction('action')
+  | {{/^rollTotal() action negate#{opts.die2} }}
+  | {{/^rollTotal() action negate#{opts.die1} }}
+  | {{/rollTotal() momentum #{opts.momentum}}}
+  
