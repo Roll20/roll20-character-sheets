@@ -1,7 +1,7 @@
 include ../mixins/negations
 include ../mixins/headers
 include ../mixins/body
-include ../mixins/rolls
+include ../mixins/actions
 
 - 
   var momentumNeg = [
@@ -17,6 +17,11 @@ rolltemplate.sheet-rolltemplate-ironcrunch_moves
   div.sheet-roll-container
     | {{#action}}
     +actionHeader
+    | {{#rollTotal() encumbered 1}}
+    | {{#rollBetween() action loadEncMin loadEncMax}}
+    +actionDieNegated({encumbered: true})
+    | {{/rollBetween() action loadEncMin loadEncMax}}
+    | {{#^rollBetween() action loadEncMin loadEncMax}}
     | {{#rollLess() momentum 0}}
     each momentum in momentumNeg
       +negationRoll(momentum)
@@ -25,6 +30,18 @@ rolltemplate.sheet-rolltemplate-ironcrunch_moves
     +actionBody
     +standardActionWithMomentum('action')
     | {{/^rollLess() momentum 0}}
+    | {{/^rollBetween() action loadEncMin loadEncMax}}
+    | {{/rollTotal() encumbered 1}}
+    | {{#^rollTotal() encumbered 1}}
+    | {{#rollLess() momentum 0}}
+    each momentum in momentumNeg
+      +negationRoll(momentum)
+    | {{/rollLess() momentum 0}}
+    | {{#^rollLess() momentum 0}}
+    +actionBody
+    +standardActionWithMomentum('action')
+    | {{/^rollLess() momentum 0}}
+    | {{/^rollTotal() encumbered 1}}
     | {{/action}}
     | {{#custom}}
     | {{#header}}

@@ -149,3 +149,9 @@ on('change:wounded_button', function(eventinfo) {
     wounded: eventinfo.newValue
   });
 });
+on('change:encumbered', function(eventinfo) {
+  const state = (eventinfo.newValue == 'on') ? '1' : '0'
+  setAttrs({
+    encumbered_enabled: state
+  });
+});
