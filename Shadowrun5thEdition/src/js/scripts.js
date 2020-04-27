@@ -266,7 +266,7 @@ const updateMatrixInitiative = () => {
 
     setAttrs({
       ["matrix_mod"]: total,
-      ["matrix_dice"]: sheetType === "grunt" && edgeFlag ? 5 : sheetType === "grunt" && !edgeFlag ? 4 + v.matrix_dice_modifier : 4,
+      ["matrix_dice"]: edgeFlag ? 5 : 4 + v.matrix_dice_modifier,
       ["display_matrix_mod"]: v.matrix_mod_modifier === 0 ? base : `${base} (${total})`
     })
   })
