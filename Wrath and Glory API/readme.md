@@ -9,10 +9,10 @@ Please note that the inline dice roll macros do not fully enable the type of dic
 If you have any questions, comments, or feedback (all welcome) please contact Barry at btsnyder@gmail.com
 
 ### Current Version
-Version 2.4 (November 4th, 2018) 
+Version 2.7 (July 28th, 2019) 
 
 ### Thanks	
-Many thanks to my players (Dave, Brian, Charles, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes in the middle of play) over the past several weeks.
+Many thanks to my players (Dave, Brian, Charles, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes in the middle of play).
 
 Many thanks to the following individuals who reported defects and provided improvements: 
 1. Morback: extra die on rolls + implement force to add 1/2 willpower to weapon DR + corruption level and roll changes
@@ -37,6 +37,40 @@ v4.0. Refine Inline rolls
     - a 6 = two successes
 
 ### Changelog
+
+** July 28th, 2019: version 2.7 - Dice overhaul + fixes, updates, and enhancements** 
+
+Updates:
+1. Cosmetic change: changed all dice to D6; teal buttons roll wrath, black/gold/red buttons have no wrath die.
+2. Cosmetic change: added spacing and thick dark teal line between psychic powers (PC and NPC)
+3. Cosmetic change: changed all references to Combat Rolls to Rolls (PC, NPC, Vehicle, Voidship)
+4. Cosmetic change: On PC Equipment sheet added thick dark teal line between vehicles and voidships.
+5. Cosmetic change: made all areas for lengthy text entry two lines in height.
+6. Cosmetic change: changed DN field for powers to text so values other than numbers can be entered - example is Defense.
+7. Fix: corrected layout of Heavily Wounded at label and field for Vehicles and Voidships.
+8. Update: Refined the inline dice rolls to now show critical on rolling standard pool and to show a critical when rolling a 1 on wrath die.
+9. Update: Added option for Weapon Skill + Agility in weapons; this accounts for use of a Pistol in Melee where an attack roll is Agility + Weapon Skill.
+10. New: Psychic powers now have an additional option to roll an alternative dice roll for shock, wounds, and mortal damage.
+11. New: Added d66 to psychic powers.  Future enhancement will convert this into a Peril of the Warp result.
+12. New: Added d3, d6, and d66 die roller on combat rolls for PC's and NPC's.
+13. New: Added Memorable Injuries as a repeating framework - can capture multiple memorable injuries - to Personal tab.
+14. New: Auto set rank title based on the selected rank; also automated to update existing character sheets.
+
+** June 30th, 2019: version 2.6 - Fixes** 
+
+Updates:
+1. Fixed NaN error when rolling psyker damage.
+2. Added Psychic Mastery as a hard skill on NPC's so Psychic power rolls are auto-calculated.
+3. Added to all tests a wrath outcome when using the API die roller so that a new ability in the API is included - it lists outcome of the die roll.
+
+** December 17th, 2018: version 2.5 - Fixes** 
+
+Updates:
+1. Fixed update to Conviction for older sheets.
+2. Fixed voidship wounds current; which was pointing to vehicle wounds current.
+3. Updated vehicle and voidship wounds to Roll20 standard of wound/wound_max.
+4. Calculated Heavily wounded for Vehicle and Voidships.
+5. Autoupdate old versions of charactersheets for vehicle wounds, voidship wounds, calculating heavily wounded for vehicles, and heavily wounded for voidships.
 
 ** November 4th, 2018: version 2.4 - API Message Layout Changes** 
 

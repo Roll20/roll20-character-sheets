@@ -1,4 +1,4 @@
-// Vampire the Masquerade 5e Dice Mechanics by Momtahan K (Version 1.2).
+// Vampire the Masquerade 5e Dice Mechanics by Momtahan K (Version 1.3).
 //
 // The following code is an adaptation of that produced by Roll20 user Konrad J. for "Hero Quest Dice Mechanics". 
 // Many thanks for providing this code free to use.
@@ -27,6 +27,8 @@
 // try to use it for commerical gain. This has been added to ensure the community benefits from it.
 
 // Versions
+// Version 1.3
+// Bug fix. Macros previously may have caused issues, removing some error checking to fix this issue.
 // Version 1.2
 // Updated images to a different location. Fixed bugs where players name would not appear for specific rolls. Fixed bug in which speech marks in a players name would cause issues.
 // Version 1.1
@@ -852,9 +854,7 @@ on("chat:message", function (msg) {
 			return processScriptTabs(run, msg.who, dc);
 		} else if (argv[1] === "log" || argv[1] === "graphics" || argv[1] === "test" || argv[1] === "hero" || argv[1] === "lupine") {
 			return processScriptTabs(argv, msg.who, baseDc());
-		} else {
-			sendChat("Error", "Invalid API call" + msg);
-		}
+		} 
 	} catch (err) {
 		sendChat("Error", "Invalid input" + err);
 		return;

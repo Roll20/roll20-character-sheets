@@ -12,7 +12,11 @@ Pull requests are processed weekly and should be **submitted no later than 6am P
 
 ## Internationalization &amp; Translations
 
-Help us make these sheets accessible in as many languages as possible. We use [Crowdin](https://crowdin.com/) to crowdsource translations. **The best way to translate an existing character sheet is to become a translator by emailing a request to team@roll20.net.** Character Sheet authors have a number of controls over how the sheet is translated and how the translation is displayed. Full documentation can be found in the [Roll20 Wiki](https://wiki.roll20.net/Character_Sheet_i18n). Sheets that are duplicated and translated manually rather than using this translation process will not be accept.
+Help us make these sheets accessible in as many languages as possible. We use [Crowdin](https://crowdin.com/) to crowdsource translations.
+
+**The best way to translate an existing character sheet is to become a translator by emailing a request to team@roll20.net.** 
+
+Character Sheet authors have a number of controls over how the sheet is translated and how the translation is displayed. Full documentation can be found in the [Roll20 Wiki](https://wiki.roll20.net/Character_Sheet_i18n). Sheets that are duplicated and translated manually rather than using this translation process will not be accept.
 
 ## Improving Existing Character Sheets
 

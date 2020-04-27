@@ -1,4 +1,4 @@
-# Character sheet for Vampire The Maquerade, 5th Edition (v2.2)
+# Character sheet for Vampire The Maquerade, 5th Edition (v2.4)
 
 ## Known Bugs
 
@@ -18,6 +18,10 @@ Kudos to: Andreas J. (UserID: 1223200), Matt Zaldivar, Brian Shields, Benjamin B
 A very special thank to https://game-icons.net The below icons were used and are licensed under a Creative Commons Attribution 3.0 Unported License. Water fountain icon - by Delapouite under CC BY 3.0 Oppression icon - by Lorc under CC BY 3.0 Prayer icon - by Lorc under CC BY 3.0 Ent Mouth icon - by Lorc under CC BY 3.0 Spattericon - by Lorc under CC BY 3.0 Wolverine claws icon - by Lorc under CC BY 3.0 Half heart icon - by Lorc under CC BY 3.0 Embraced energy iconby Lorc under CC BY 3.0
 
 If your name doesn't appear here I apologies, the Thank you section on the sheet should be kept up to date.
+
+## Special Thank You
+
+To the Anonymous donors and to Kaye Elling for donating money to our sponsored charity (https://www.justgiving.com/fundraising/vtm-5thed-character-sheet-red-cross)
 
 ## Installation instructions.
 If you have access to Roll20
@@ -47,6 +51,12 @@ The Banners folder contains many of the images made (in part) by Martinez A. wit
 If you think anything is missing or you see any bugs, please message me via my [Roll20 Account](https://app.roll20.net/users/117780/)
 
 ## Versions
+
+### Version 2.4
+Added ability to hide attributes of 6+
+
+### Version 2.3
+Bug fix where macros wouldn't work so well. Added rituals.
 
 ### Version 2.1
 Bug fix where the Willpower button for non-api sheet would not work as intended

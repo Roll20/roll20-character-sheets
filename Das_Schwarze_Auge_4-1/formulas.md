@@ -20,37 +20,14 @@ The stat value (`@{MU}`) is increased (easy) or decreased (difficult) by the mod
 
 Therefore, the first part is grouped with the roll `@{MU} + 0d1` and the highest value of both is dropped. In the above example, 14 would be higher than 12 and dropped, so that the result would be 12. When the check result is less than the stat value, the second part would be higher and dropped. The same is true for negative results (failures). Automatic successes (1) and failures (20) are handled by the roll template. Since stat values of 20 and higher are possible (and negative modifiers as well), the roll template currently does not show the resulting points in the case of automatic failures. The reasoning behind this is that the result would be non-negative, suggest success to the player and might confuse newbies. It should be noted that automatic success/failures in stat checks are an optional rule according to WdS, p. 7.
 
-## Speed (Geschwindigkeit/GS)
-`(@{GS_Basis} + @{GS_Mod} + (floor((@{GE_Basis} + @{GE_Mod} + 100)/111)-1) + (ceil((@{GE_Basis} + @{GE_Mod} + 100)/115)-1) - @{wound_Bauch} - (@{wound_RB}/2 - @{wound_LB}/2))`
-
-The GS stat is 8 by default and modified by certain advantages/disadvantages (which are not currently respected) and certain wounds. Additionally, the agility stat (GE) influences the speed: GE less than 11 reduces the GS by one, GE greater than 15 increases the GS by one. The above formula contains some magic values to accomplish the correct behaviour.
-
-`floor((@{GE_Basis} + @{GE_Mod} + 100)/111)-1`
-
-`@{GE_Basis}` and `@{GE_Mod}` represent the current agility without wound effects. The trick to get this term to be -1 for GE less than 11 lies within floor(). floor() always rounds down. So, 0.999 gets rounded to 0. GE less than 11 also means GE less than or equal to 10 and with GE = 10, the fraction `110/111` will be rounded down to 0. The `-1` after the `floor(...)` makes the whole term become -1.
-
-`ceil((@{GE_Basis} + @{GE_Mod} + 100)/115)-1`
-
-Same situation as before, but this time using ceil() to always round up. Until GE = 15, the `ceil(...)` is 1 and the `-1` afterwards reduces it to zero cancelling out any effect. Starting with GE = 16, the `ceil(...)` is 2 and the whole term +1.
-
 ## Life Energy (Lebensenergie/LE), Stamina (Ausdauer/AU) and Astral Energy (Astralenergie/AE)
-LE: `round(@{KO_Basis} + (@{KK_Basis}/2) + 0.05)`
-
-AU: `round((@{MU_Basis} + @{KO_Basis} + @{GE_Basis})/2 + 0.05)`
-
-AE: `round((@{MU_Basis} + @{IN_Basis} + @{CH_Basis})/2 + 0.05)`
-
-These formulas are quite straightforward implementations of the official rules with one small change: Prior to rounding, 0.05 is added as a safeguard to ensure that .5 is correctly rounded up by making it 0.55. Not sure, if this is really necessary.
-
 It is important to note that the base values of the stats are used here (`_Basis`). This prevents these base values to change upon temporary effects such as wounds, spells or disease. A side effect of this is that the "Mod" column on the "Grundwerte" tab must not be mistaken for the "Mod" column on the official PDF character sheet which takes boni/mali from the character generation. In its current form, this character sheet assumes that the value entered under `Basis` is the value of the current stat with all permanent modifications already factored in.
 
 ## Magic Resistance (Magieresistenz/MR)
-`round((@{MU_Basis} + @{MU_Mod} + @{KL_Basis} + @{KL_Mod} + @{KO_Basis} + @{KO_Mod})/5)`
-
-Since stats are positive integers and are divided by 5, the first decimal place always is an even number (.0, .2, .4, .6 or .8). Therefore, no safeguard is needed. Temporary modifiers without wounds are applied. No source is yet known for this behaviour and therefore, this will likely change in a future release.
+No temporary stat modifiers or wounds are applied.
 
 ## Initiative/Attack/Parry/Long Range Base Values (INI/AT/PA/FK-Basiswert)
-Analog to Magic Resistance, but wound effects are honoured for Attack/Parry/Long Range base values. No source is yet known for the application of temporary modifiers and therefore, this will likely change in a future release.
+Wound effects are honoured for Attack/Parry/Long Range base values. No temporary stat modifiers are applied.
 
 ## 3d20 Checks
 Four cases have to be distinguished in order to determine the result of a roll:
