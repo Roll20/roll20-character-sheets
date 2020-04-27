@@ -1,5 +1,12 @@
 # Release notes
 
+## 1.2.0
+- Renamed sheet to `Fading Suns 2nd Edition Revised` from `Fading Suns v2.75`
+- Added ability to select the characteristic for the roll of a skill on the fly (as opposed to having to select a characteristic beforehand)
+- Fixed error on Critical Success rerolls or Critical Failure confirms of custom Lore and Creative skills (bug introduced in 1.1.0)
+- Fixed typo in Initiative stance roll query. Aggressive stances give -2 Defense, not +2  (bug introduced in 1.1.0)
+- Cosmetic fixes
+
 ## 1.1.0
 - Vitality, Wyrd & Energy shield:
   - Current level can no longer be increased past the max value
@@ -10,6 +17,7 @@
 - Added section for Body Modifications (a.k.a. Cyberware)
 - Roll queries (stance selection in initiative roll & goal bonus/penalty) can now be translated from English
 - Reverted to regular d20 symbol on roll buttons
+- Ensured a natural 1 still is a success even when the goal is lower than 0 due to a high-enough goal penalty
 - Minor cosmetic updates
 
 ## 1.0.1
@@ -21,21 +29,15 @@
 
 # TODO list
 
-- Update sheet preview images
-
 - General improvements to goal rolls
-  - Add CSC and CFC to characteristic & skills rolls
   - Ability to switch b/w public vs GM roll
   - Vitality critical levels (-2 to -10) to affect goal numbers
-  - Ensure a 1 is always a success, even when the goal number is < 0 due to a high malus
 
 - Increase similarity to the official character sheet
   - add a section for Movement (default: 5)
   - add a section for Languages
 
 - [TBC] use short names for characteristics in weapon/psi/theurgy tables to save up on space
-
-- ability for users to report a bug found in the sheet
 
 - Weapons & armors property checkboxes (Shock, Laser, Plasma, etc..) & replace d6rolls with proper damage/armor rolls showing shield-piercing vs normal damage, etc.
 
