@@ -60,7 +60,7 @@ const totalAttributes = values => {
 
 const attributeSumDivide = (attributes, set) => {
     getAttrs(attributes, (values) => {
-    	const divide = 'damage' ? 6 : 10;
+    	const divide = set == 'damage' ? 6 : 10;
     	let sum = totalAttributes(values);
     	sum = divideBy(sum, divide) ;
 

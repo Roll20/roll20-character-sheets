@@ -1,3 +1,49 @@
+<script type="text/worker">
+	on("change:character_force change:character_forcescoretemp sheet:opened", function() 
+	{
+		getAttrs(["character_force", "character_forcescoretemp"], function(value) 
+		{
+			const force = parseInt(value["character_force"], 10)||0;
+			const forceT = parseInt(value["character_forcescoretemp"], 10)||0;
+			
+			var mod;
+			
+			if(forceT == 0)
+				mod = Math.floor((force-10)/2);
+			else
+				mod = Math.floor((forceT-10)/2);
+				
+			var dgt;
+			
+			switch(mod)
+			{
+				case 0:
+				case 1:
+					dgt = 1;
+					break;
+					
+				case 2:
+				case 3:
+					dgt = 2;
+					break;
+					
+				case 4:
+				case 5:
+					dgt = 3;
+					break;
+					
+				default:
+					dgt = 0;
+					break;
+			}
+			
+			setAttrs({
+				dgtMainsNues: dgt
+			});
+		});
+	});
+</script>
+
 <div class="header">
 	<label class="sheet-settings-checkbox">
 		<input name="attr_show_settings" value="1" type="checkbox">
@@ -52,10 +98,35 @@
 	</div>
 </div>
 
-<div class="body">
+<div class="tab">
+	<label>
+		<input type="radio" name="attr_tab" value="1" checked />
+		<span title="Personnage"></span>
+	</label>
+	
+	<label>
+		<input type="radio" name="attr_tab" value="2"/>
+		<span title="Inventaire"></span>
+	</label>
+	
+	<label>
+		<input type="radio" name="attr_tab" value="3"/>
+		<span title="Historique"></span>
+	</label>
+	
+	<label>
+		<input type="radio" name="attr_tab" value="4"/>
+		<span title="Combat"></span>
+	</label>
+</div>
+
+<input type="hidden" name="attr_dgtMainsNues" value="0" />
+<input type="hidden" name="attr_tab" class="tab" value="1"/>
+
+<div class="body tab1">
 	<div class="grG">
 		<div class="carac">
-			<h3>Caractéristique</h3>
+			<h3>Caractéristiques</h3>
 			<div>
 				<span>Score</span>
 				<span>Modif.</span>
@@ -77,14 +148,14 @@
 				<input type="number" name="attr_character_dexteritemodiftemp" title="DexteriteMT" value="(floor((@{character_dexteritescoretemp}-10)/2))" disabled />
 			</div>
 			<div>
-				<span title="Constitution">CON</span>
+				<button type="roll" name="roll_con" value="@{jetGM} &{template:test} {{rollname=Constitution}} {{comp=[[2d10+[[?{Laquelle ?|Constitution, @{character_constitutionmodif}|Constitution Temporaire, @{character_constitutionmodiftemp}}]]]]}}" title="Constitution">CON</button>
 				<input type="number" name="attr_character_constitution" title="Constitution" value="0"/>
 				<input type="number" name="attr_character_constitutionmodif" title="ConstitutionM" value="(floor((@{character_constitution}-10)/2))" disabled />
 				<input type="number" name="attr_character_constitutionscoretemp" title="ConstitutionST" value="0" />
 				<input type="number" name="attr_character_constitutionmodiftemp" title="ConstitutionMT" value="(floor((@{character_constitutionscoretemp}-10)/2))" disabled />
 			</div>
 			<div>
-				<button type="roll" name="roll_bea" value="@{jetGM} &{template:test} {{rollname=Beauté}} {{comp=[[2d6+[[@{character_beautemodif}]]]]}}" title="Beauté">BEA</button>
+				<button type="roll" name="roll_bea" value="@{jetGM} &{template:test} {{rollname=Beauté}} {{comp=[[2d10+[[?{Laquelle ?|Beauté, @{character_beautemodif}|Beauté Temporaire, @{character_beautemodiftemp}}]]]]}}" title="Beauté">BEA</button>
 				<input type="number" name="attr_character_beaute" title="Beaute" value="0"/>
 				<input type="number" name="attr_character_beautemodif" title="BeauteM" value="(floor((@{character_beaute}-10)/2))" disabled />
 				<input type="number" name="attr_character_beautescoretemp" title="BeauteST" value="0" />
@@ -105,7 +176,7 @@
 				<input type="number" name="attr_character_perceptionmodiftemp" title="PerceptionMT" value="(floor((@{character_perceptionscoretemp}-10)/2))" disabled />
 			</div>
 			<div>
-				<button type="roll" name="roll_vol" value="@{jetGM} &{template:test} {{rollname=Volonté}} {{comp=[[2d6+[[@{character_volontemodif}]]]]}}" title="Volonté">VOL</button>
+				<button type="roll" name="roll_vol" value="@{jetGM} &{template:test} {{rollname=Volonté}} {{comp=[[2d10+[[?{Laquelle ?|Volonté, @{character_volontemodif}|Volonté Temporaire, @{character_volontemodiftemp}}]]]]}}" title="Volonté">VOL</button>
 				<input type="number" name="attr_character_volonte" title="Volonte" value="0"/>
 				<input type="number" name="attr_character_volontemodif" title="VolonteM" value="(floor((@{character_volonte}-10)/2))" disabled />
 				<input type="number" name="attr_character_volontescoretemp" title="VolonteST" value="0" />
@@ -119,20 +190,46 @@
 				<input type="number" name="attr_character_charismemodiftemp" title="CharismeMT" value="(floor((@{character_charismescoretemp}-10)/2))" disabled />
 			</div>
 		</div>
-	
+
+		<div class="autoexSimple">
+			<h3>Séquelles</h3>
+			<div class="autoex autoex28">
+				<span name="attr_sequelles"></span>
+				<textarea name="attr_sequelles"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="grD">
 		<div class="loca">
-			<h3>Les Dégâts et leurs Localisations</h3>
+			<h3>Jets divers</h3>
+			<button name="roll_initiative" type="roll" value="@{jetGM} &{template:test} {{rollname=Initiative}} {{comp=[[2d10+[[?{Quelle dextérité ?|Dextérité, @{character_dexteritemodif}|Dextérité temporaire, @{character_dexteritemodiftemp}}]]+[[?{Quelle perception ?|Perception, @{character_perceptionmodif}|Perception Temporaire, @{character_perceptionmodiftemp}}]]]]}}">
+				Initiative
+			</button>
+			
 			<button name="roll_localisation" type="roll" value="@{jetGM} &{template:aven} {{rollname=Localisation des Dégâts}} {{loc=[[2d6]]}}">
 				Localisation des dégâts
 			</button>
 			
-			<button name="roll_compensation" type="roll" value="@{jetGM} &{template:test} {{rollname=Compensation des Dégâts}} {{comp=[[([[@{character_constitutionmodif}]]+?{armure|0})d6!!]]}}">
+			<button name="roll_compensation" type="roll" value="@{jetGM} &{template:test} {{rollname=Compensation des Dégâts}} {{comp=[[([[?{Laquelle ?|Constitution, @{character_constitutionmodif}|Constitution Temporaire, @{character_constitutionmodiftemp}}]]+?{armure|0})d6!!]]}}">
 				Compensation des dégâts
 			</button>
+			
+			<button name="roll_etourdissement" type="roll" value="@{jetGM} &{template:etourdissement} {{rollname=Test d'Étourdissement}} {{roll=[[2d6+[[?{Quelle volonté ?|Volonté, @{character_volontemodif}|Volonté Temporaire, @{character_volontemodiftemp}}]]+[[?{Quelle constitution ?|Constitution, @{character_constitutionmodif}|Constitution Temporaire, @{character_constitutionmodiftemp}}]] ]]}} {{compteur=[[@{character_etourdissement}-1]]}} {{etourdissement=[[1D4]]}}">
+				Test d'Étourdissement
+			</button>
+			
+			<button name="roll_compensation" type="roll" value="@{jetGM} &{template:recuperation} {{rollname=Récupération Étourdissement}} {{hc=[[1d10+[[@{Rt}]]]]}} {{ec=[[1d6]]}}">
+				Récupération Étourdissement
+			</button>
+			
+			<button name="roll_faveurDieu" type="roll" value="@{jetGM} &{template:test} {{rollname=Faveur des dieux}} {{comp=[[3d10+10]]}}">
+				Faveur des dieux
+			</button>
 		</div>
-		
+	
 		<div class="dgtSubis">
-			<h3>Niveau de dégâts</h3>
+			<h3>Niveaux de dégâts</h3>
 			<label>
 				<span>Tête</span>
 				<input type="number" name="attr_dsTete" value="0" min="0" max="7" />
@@ -178,115 +275,11 @@
 				<input type="number" name="attr_dsCoeur" value="0" min="0" max="7" />
 			</label>
 		</div>		
-		
-		<div class="autoexSimple">
-			<h3>Séquelles</h3>
-			<div class="autoex autoex28">
-				<span name="attr_sequelles"></span>
-				<textarea name="attr_sequelles"></textarea>
-			</div>
-		</div>
-		
-		<div class="autoexSimple">
-			<h3>Aptitudes Particulières</h3>
-			<div class="autoex autoex40">
-				<span name="attr_Aptitudes"></span>
-				<textarea name="attr_Aptitudes"></textarea>
-			</div>
-			<fieldset class="repeating_aptParticulieres">
-				<div class="autoex autoex40">
-					<span name="attr_repeatingAptitudes"></span>
-					<textarea name="attr_repeatingAptitudes"></textarea>
-				</div>
-			</fieldset>
-		</div>
-		
-		<div class="armesProtections">
-			<h3>Armes et Protections</h3>
-			<label>
-				<input type="text" name="attr_character_arme" placeholder="Nom de l'arme ou de la protection" />
-			</label>
-			<label>
-				<span>Type</span>
-				<input type="text" name="attr_character_type" />
-			</label>
-			<label>
-				<span>Bonus au toucher</span>
-				<input type="text" name="attr_character_bonus" />
-			</label>
-			<label>
-				<span>Dégâts/Protection</span>
-				<input type="text" name="attr_character_degats" />
-			</label>
-			
-			<label>
-				<span>Notes</span>
-				<div class="autoex autoex28">
-					<span name="attr_character_notes"></span>
-					<textarea name="attr_character_notes"></textarea>
-				</div>
-			</label>
-			<fieldset class="repeating_competences">
-				<label>
-					<input type="text" name="attr_character_arme" placeholder="Nom de l'arme ou de la protection" />
-				</label>
-				<label>
-					<span>Type</span>
-					<input type="text" name="attr_character_type" />
-				</label>
-				<label>
-					<span>Bonus au toucher</span>
-					<input type="text" name="attr_character_bonus" />
-				</label>
-				<label>
-					<span>Dégâts/Protection</span>
-					<input type="text" name="attr_character_degats" />
-				</label>
-				
-				<label>
-					<span>Notes</span>
-					<div class="autoex autoex28">
-						<span name="attr_character_notes"></span>
-						<textarea name="attr_character_notes"></textarea>
-					</div>
-				</label>
-			</fieldset>
-		</div>
-		
-		<div class="equipement">
-			<h3>Équipement</h3>
-			<input type="text" name="attr_NomEquip1" placeholder="Nom de l'équipement" />
-			<div class="autoex autoex28">
-				<span name="attr_DescEquip1"></span>
-				<textarea name="attr_DescEquip1" placeholder="Description de l'équipement" /></textarea>
-			</div>
-			<fieldset class="repeating_equipement1">
-				<input type="text" name="attr_NomEquip3" placeholder="Nom de l'équipement" />
-				<div class="autoex autoex28">
-					<span name="attr_DescEquip3"></span>
-					<textarea name="attr_DescEquip3" placeholder="Description de l'équipement" /></textarea>
-				</div>
-			</fieldset>
-		</div>
-		
-		<div class="autoexSimple">
-			<h3>Notes</h3>
-			<div class="autoex autoex28">
-				<span name="attr_notes"></span>
-				<textarea name="attr_notes"></textarea>
-			</div>
-			<fieldset class="repeating_notes1">
-				<div class="autoex autoex28">
-					<span name="attr_notes"></span>
-					<textarea name="attr_notes"></textarea>
-				</div>
-			</fieldset>
-		</div>
 	</div>
-
-	<div class="grD">
-		<div class="comp">
-			<h3>Compétence</h3>
+	
+	<div class="comp">
+		<h3>Compétences</h3>
+		<div>
 			<div>
 				<span>Nom</span>
 				<span>Total</span>
@@ -426,85 +419,21 @@
 					</div>
 				</div>
 			</div>
-			<div>
-				<label>
-					<span>INT</span>
-					<input type="number" name="attr_PI" value="floor((@{character_intelligencemodif}*6)-(@{valueAlp}+@{valueAap}+@{valueBebp}+@{valueMp}+@{valuePp}+@{valueSap}+@{valueSmp}+@{valueTep}))" disabled />
-				</label>
-				<div>
-					<div>
-						<button type="roll" name="roll_al" value="@{jetGM} &{template:test} {{rollname=Archéologie & Langages}} {{comp=[[2d10+[[@{Alt}]]]]}}">
-							Archéologie & Langages
-						</button>
-						<input type="number" name="attr_Alt" value="@{valueAlp}+@{valueAlr}+@{valueAlmt}" disabled />
-						<input type="number" name="attr_valueAlp" value="0" />
-						<input type="number" name="attr_valueAlr" value="0" />
-						<input type="number" name="attr_valueAlmt" value="0" />
-					</div>
-					<div>
-						<button type="roll" name="roll_aa" value="@{jetGM} &{template:test} {{rollname=Astrophysique & Astrologie}} {{comp=[[2d10+[[@{Aat}]]]]}}">
-							Astrophysique & Astrologie
-						</button>
-						<input type="number" name="attr_Aat" value="@{valueAap}+@{valueAar}+@{valueAamt}" disabled />
-						<input type="number" name="attr_valueAap" value="0" />
-						<input type="number" name="attr_valueAar" value="0" />
-						<input type="number" name="attr_valueAamt" value="0" />
-					</div>
-					<div>
-						<button type="roll" name="roll_beb" value="@{jetGM} &{template:test} {{rollname=Biologie & Exo-Biologie}} {{comp=[[2d10+[[@{Bebt}]]]]}}">
-							Biologie & Exo-Biologie
-						</button>
-						<input type="number" name="attr_Bebt" value="@{valueBebp}+@{valueBebr}+@{valueBebmt}" disabled />
-						<input type="number" name="attr_valueBebp" value="0" />
-						<input type="number" name="attr_valueBebr" value="0" />
-						<input type="number" name="attr_valueBebmt" value="0" />
-					</div>
-					<div>
-						<button type="roll" name="roll_m" value="@{jetGM} &{template:test} {{rollname=Médical}} {{comp=[[2d10+[[@{Mt}]]]]}}">
-							Médical
-						</button>
-						<input type="number" name="attr_Mt" value="@{valueMp}+@{valueMr}+@{valueMmt}" disabled />
-						<input type="number" name="attr_valueMp" value="0" />
-						<input type="number" name="attr_valueMr" value="0" />
-						<input type="number" name="attr_valueMmt" value="0" />
-					</div>
-					<div>
-						<button type="roll" name="roll_p" value="@{jetGM} &{template:test} {{rollname=Pilotage}} {{comp=[[2d10+[[@{Pt}]]]]}}">
-							Pilotage
-						</button>
-						<input type="number" name="attr_Pt" value="@{valuePp}+@{valuePr}+@{valuePmt}" disabled />
-						<input type="number" name="attr_valuePp" value="0" />
-						<input type="number" name="attr_valuePr" value="0" />
-						<input type="number" name="attr_valuePmt" value="0" />
-					</div>
-					<div>
-						<button type="roll" name="roll_sac" value="@{jetGM} &{template:test} {{rollname=Sabotage}} {{comp=[[2d10+[[@{Sat}]]]]}}">
-							Sabotage
-						</button>
-						<input type="number" name="attr_Sat" value="@{valueSap}+@{valueSar}+@{valueSamt}" disabled />
-						<input type="number" name="attr_valueSap" value="0" />
-						<input type="number" name="attr_valueSar" value="0" />
-						<input type="number" name="attr_valueSamt" value="0" />
-					</div>
-					<div>
-						<button type="roll" name="roll_sac" value="@{jetGM} &{template:test} {{rollname=Stratégie Militaire}} {{comp=[[2d10+[[@{Smt}]]]]}}">
-							Stratégie Militaire
-						</button>
-						<input type="number" name="attr_Smt" value="@{valueSmp}+@{valueSmr}+@{valueSmmt}" disabled />
-						<input type="number" name="attr_valueSmp" value="0" />
-						<input type="number" name="attr_valueSmr" value="0" />
-						<input type="number" name="attr_valueSmmt" value="0" />
-					</div>
-					<div>
-						<button type="roll" name="roll_te" value="@{jetGM} &{template:test} {{rollname=Technologie}} {{comp=[[2d10+[[@{Tet}]]]]}}">
-							Technologie
-						</button>
-						<input type="number" name="attr_Tet" value="@{valueTep}+@{valueTer}+@{valueTemt}" disabled />
-						<input type="number" name="attr_valueTep" value="0" />
-						<input type="number" name="attr_valueTer" value="0" />
-						<input type="number" name="attr_valueTemt" value="0" />
-					</div>
+			<div class="notes">
+				<h3>Notes</h3>
+				<div class="autoex">
+					<span name="attr_competencesNotes"></span>
+					<textarea name="attr_competencesNotes"></textarea>
 				</div>
+			</div>
+		</div>
+		<div>
+			<div>
+				<span>Nom</span>
+				<span>Total</span>
+				<span>Points</span>
+				<span>Bonus</span>
+				<span>Temp.</span>
 			</div>
 			<div>
 				<label>
@@ -594,6 +523,288 @@
 					</div>
 				</div>
 			</div>
+			<div>
+				<label>
+					<span>INT</span>
+					<input type="number" name="attr_PI" value="floor((@{character_intelligencemodif}*6)-(@{valueAlp}+@{valueAap}+@{valueBebp}+@{valueMp}+@{valuePp}+@{valueSap}+@{valueSmp}+@{valueTep}))" disabled />
+				</label>
+				<div>
+					<div>
+						<button type="roll" name="roll_al" value="@{jetGM} &{template:test} {{rollname=Archéologie & Langages}} {{comp=[[2d10+[[@{Alt}]]]]}}">
+							Archéologie & Langages
+						</button>
+						<input type="number" name="attr_Alt" value="@{valueAlp}+@{valueAlr}+@{valueAlmt}" disabled />
+						<input type="number" name="attr_valueAlp" value="0" />
+						<input type="number" name="attr_valueAlr" value="0" />
+						<input type="number" name="attr_valueAlmt" value="0" />
+					</div>
+					<div>
+						<button type="roll" name="roll_aa" value="@{jetGM} &{template:test} {{rollname=Astrophysique & Astrologie}} {{comp=[[2d10+[[@{Aat}]]]]}}">
+							Astrophysique & Astrologie
+						</button>
+						<input type="number" name="attr_Aat" value="@{valueAap}+@{valueAar}+@{valueAamt}" disabled />
+						<input type="number" name="attr_valueAap" value="0" />
+						<input type="number" name="attr_valueAar" value="0" />
+						<input type="number" name="attr_valueAamt" value="0" />
+					</div>
+					<div>
+						<button type="roll" name="roll_beb" value="@{jetGM} &{template:test} {{rollname=Biologie & Exo-Biologie}} {{comp=[[2d10+[[@{Bebt}]]]]}}">
+							Biologie & Exo-Biologie
+						</button>
+						<input type="number" name="attr_Bebt" value="@{valueBebp}+@{valueBebr}+@{valueBebmt}" disabled />
+						<input type="number" name="attr_valueBebp" value="0" />
+						<input type="number" name="attr_valueBebr" value="0" />
+						<input type="number" name="attr_valueBebmt" value="0" />
+					</div>
+					<div>
+						<button type="roll" name="roll_m" value="@{jetGM} &{template:test} {{rollname=Médical}} {{comp=[[2d10+[[@{Mt}]]]]}}">
+							Médical
+						</button>
+						<input type="number" name="attr_Mt" value="@{valueMp}+@{valueMr}+@{valueMmt}" disabled />
+						<input type="number" name="attr_valueMp" value="0" />
+						<input type="number" name="attr_valueMr" value="0" />
+						<input type="number" name="attr_valueMmt" value="0" />
+					</div>
+					<div>
+						<button type="roll" name="roll_p" value="@{jetGM} &{template:test} {{rollname=Pilotage}} {{comp=[[2d10+[[@{Pt}]]]]}}">
+							Pilotage
+						</button>
+						<input type="number" name="attr_Pt" value="@{valuePp}+@{valuePr}+@{valuePmt}" disabled />
+						<input type="number" name="attr_valuePp" value="0" />
+						<input type="number" name="attr_valuePr" value="0" />
+						<input type="number" name="attr_valuePmt" value="0" />
+					</div>
+					<div>
+						<button type="roll" name="roll_sac" value="@{jetGM} &{template:test} {{rollname=Sabotage}} {{comp=[[2d10+[[@{Sat}]]]]}}">
+							Sabotage
+						</button>
+						<input type="number" name="attr_Sat" value="@{valueSap}+@{valueSar}+@{valueSamt}" disabled />
+						<input type="number" name="attr_valueSap" value="0" />
+						<input type="number" name="attr_valueSar" value="0" />
+						<input type="number" name="attr_valueSamt" value="0" />
+					</div>
+					<div>
+						<button type="roll" name="roll_sac" value="@{jetGM} &{template:test} {{rollname=Stratégie Militaire}} {{comp=[[2d10+[[@{Smt}]]]]}}">
+							Stratégie Militaire
+						</button>
+						<input type="number" name="attr_Smt" value="@{valueSmp}+@{valueSmr}+@{valueSmmt}" disabled />
+						<input type="number" name="attr_valueSmp" value="0" />
+						<input type="number" name="attr_valueSmr" value="0" />
+						<input type="number" name="attr_valueSmmt" value="0" />
+					</div>
+					<div>
+						<button type="roll" name="roll_te" value="@{jetGM} &{template:test} {{rollname=Technologie}} {{comp=[[2d10+[[@{Tet}]]]]}}">
+							Technologie
+						</button>
+						<input type="number" name="attr_Tet" value="@{valueTep}+@{valueTer}+@{valueTemt}" disabled />
+						<input type="number" name="attr_valueTep" value="0" />
+						<input type="number" name="attr_valueTer" value="0" />
+						<input type="number" name="attr_valueTemt" value="0" />
+					</div>
+				</div>
+			</div>		
+		</div>
+	</div>
+</div>
+
+<div class="body tab2">
+	<div class="grG">
+		<div class="armes">
+			<h3>Armes à distance</h3>
+			<button type="roll" name="roll_armesDistances" value="@{jetGM} &{template:armes} {{rollname=@{character_arme}}} {{compname=Arme à Distance}} {{comp=[[2d10+[[@{Adt}]]+@{character_bonus}]]}} {{degats=[[@{character_degats}]]}} {{etourdissement=[[@{character_etourdissement}]]}} {{notes=@{character_notes}}} {{loc=[[2d6]]}}" ></button>
+			<label>
+				<input type="text" name="attr_character_arme" placeholder="Nom de l'arme" />
+			</label>
+			<label>
+				<span>Type</span>
+				<input type="text" name="attr_character_type" />
+			</label>
+			<label>
+				<span>Bonus au toucher</span>
+				<input type="number" name="attr_character_bonus" value="0" />
+			</label>
+			<label>
+				<span>Dégâts</span>
+				<input type="number" name="attr_character_degats" value="0" />
+			</label>
+			<label>
+				<span>Etourdissement</span>
+				<input type="text" name="attr_character_etourdissement" value="0" />
+			</label>
+			
+			<label>
+				<span>Notes</span>
+				<div class="autoex autoex28">
+					<span name="attr_character_notes"></span>
+					<textarea name="attr_character_notes"></textarea>
+				</div>
+			</label>
+			<fieldset class="repeating_competences">
+				<button type="roll" name="roll_armesDistances" value="@{jetGM} &{template:armes} {{rollname=@{character_arme}}} {{compname=Arme à Distance}} {{comp=[[2d10+[[@{Adt}]]+@{character_bonus}]]}} {{degats=[[@{character_degats}]]}} {{etourdissement=[[@{character_etourdissement}]]}} {{notes=@{character_notes}}} {{loc=[[2d6]]}}" ></button>
+				<label>
+					<input type="text" name="attr_character_arme" placeholder="Nom de l'arme" />
+				</label>
+				<label>
+					<span>Type</span>
+					<input type="text" name="attr_character_type" />
+				</label>
+				<label>
+					<span>Bonus au toucher</span>
+					<input type="number" name="attr_character_bonus" value="0" />
+				</label>
+				<label>
+					<span>Dégâts</span>
+					<input type="number" name="attr_character_degats" value="0" />
+				</label>
+				<label>
+					<span>Étourdissement</span>
+					<input type="text" name="attr_character_etourdissement" value="0" />
+				</label>
+				
+				<label>
+					<span>Notes</span>
+					<div class="autoex autoex28">
+						<span name="attr_character_notes"></span>
+						<textarea name="attr_character_notes"></textarea>
+					</div>
+				</label>
+			</fieldset>
+		</div>
+		
+		<div class="protections">
+			<h3>Protections</h3>
+			<fieldset class="repeating_protections">
+				<label>
+					<input type="text" name="attr_character_nomProtection" placeholder="Nom de la protection" />
+				</label>
+				<label>
+					<span>Type</span>
+					<input type="text" name="attr_character_typeProtection" />
+				</label>
+				<label>
+					<span>Protection</span>
+					<input type="number" name="attr_character_protection" value="0" />
+				</label>
+				
+				<label>
+					<span>Notes</span>
+					<div class="autoex autoex28">
+						<span name="attr_character_notes"></span>
+						<textarea name="attr_character_notes"></textarea>
+					</div>
+				</label>
+			</fieldset>
+		</div>
+		
+		<div class="equipement">
+			<h3>Équipement</h3>
+			<input type="text" name="attr_NomEquip1" placeholder="Nom de l'équipement" />
+			<div class="autoex autoex28">
+				<span name="attr_DescEquip1"></span>
+				<textarea name="attr_DescEquip1" placeholder="Description de l'équipement" ></textarea>
+			</div>
+			<fieldset class="repeating_equipement1">
+				<input type="text" name="attr_NomEquip3" placeholder="Nom de l'équipement" />
+				<div class="autoex autoex28">
+					<span name="attr_DescEquip3"></span>
+					<textarea name="attr_DescEquip3" placeholder="Description de l'équipement" ></textarea>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+
+	<div class="grD">
+		<div class="armes">
+			<h3>Armes de contact</h3>
+			<button type="roll" name="roll_armesContact" value="@{jetGM} &{template:armes} {{rollname=@{character_armeContact}}} {{compname=Arme de Contact}} {{comp=[[2d10+[[@{Adt}]]+@{character_bonusContact}]]}} {{degats=[[@{character_degatsContact}+@{dgtMN}]]}} {{etourdissement=[[@{character_etourdissementContact}]]}} {{notes=@{character_notesContact}}} {{loc=[[2d6]]}}" ></button>
+			<label>
+				<input type="text" name="attr_character_armeContact" placeholder="Nom de l'arme" />
+			</label>
+			<label>
+				<span>Type</span>
+				<input type="text" name="attr_character_typeContact" />
+			</label>
+			<label>
+				<span>Bonus au toucher</span>
+				<input type="number" name="attr_character_bonusContact" value="0" />
+			</label>
+			<label>
+				<span>Dégâts</span>
+				<input type="number" name="attr_character_degatsContact" value="0" />
+			</label>
+			<label>
+				<span>Etourdissement</span>
+				<input type="text" name="attr_character_etourdissementContact" value="0" />
+			</label>
+			<label class="dgtSpeciaux">
+				<input type="checkbox" name="attr_dgtMN" value="@{dgtMainsNues}" />
+				<span title="Ajouter les dégâts à mains nues"></span>
+			</label>
+			<label>
+				<span>Notes</span>
+				<div class="autoex autoex28">
+					<span name="attr_character_notesContact"></span>
+					<textarea name="attr_character_notesContact"></textarea>
+				</div>
+			</label>
+			<fieldset class="repeating_competencesContact">
+				<button type="roll" name="roll_armesContact" value="@{jetGM} &{template:armes} {{rollname=@{character_armeContact}}} {{compname=Arme de Contact}} {{comp=[[2d10+[[@{Adt}]]+@{character_bonusContact}]]}} {{degats=[[@{character_degatsContact}+@{dgtMN}]]}} {{etourdissement=[[@{character_etourdissementContact}]]}} {{notes=@{character_notesContact}}} {{loc=[[2d6]]}}" ></button>
+				<label>
+					<input type="text" name="attr_character_armeContact" placeholder="Nom de l'arme" />
+				</label>
+				<label>
+					<span>Type</span>
+					<input type="text" name="attr_character_typeContact" />
+				</label>
+				<label>
+					<span>Bonus au toucher</span>
+					<input type="number" name="attr_character_bonusContact" value="0" />
+				</label>
+				<label>
+					<span>Dégâts</span>
+					<input type="number" name="attr_character_degatsContact" value="0" />
+				</label>
+				<label>
+					<span>Etourdissement</span>
+					<input type="text" name="attr_character_etourdissementContact" value="0" />
+				</label>
+				<label class="dgtSpeciaux">
+					<input type="checkbox" name="attr_dgtMN" value="@{dgtMainsNues}" />
+					<span title="Ajouter les dégâts à mains nues"></span>
+				</label>
+				<label>
+					<span>Notes</span>
+					<div class="autoex autoex28">
+						<span name="attr_character_notesContact"></span>
+						<textarea name="attr_character_notesContact"></textarea>
+					</div>
+				</label>
+			</fieldset>
+		</div>
+	
+		<div class="protections">
+			<h3>Protections</h3>
+			<fieldset class="repeating_protections2">
+				<label>
+					<input type="text" name="attr_character_nomProtection" placeholder="Nom de la protection" />
+				</label>
+				<label>
+					<span>Type</span>
+					<input type="text" name="attr_character_typeProtection" />
+				</label>
+				<label>
+					<span>Protection</span>
+					<input type="number" name="attr_character_protection" value="0" />
+				</label>
+				
+				<label>
+					<span>Notes</span>
+					<div class="autoex autoex28">
+						<span name="attr_character_notes"></span>
+						<textarea name="attr_character_notes"></textarea>
+					</div>
+				</label>
+			</fieldset>
 		</div>
 	
 		<div class="equipement">
@@ -601,17 +812,85 @@
 			<input type="text" name="attr_NomEquip2" placeholder="Nom de l'équipement" />
 			<div class="autoex autoex28">
 				<span name="attr_DescEquip2"></span>
-				<textarea name="attr_DescEquip2" placeholder="Description de l'équipement" /></textarea>
+				<textarea name="attr_DescEquip2" placeholder="Description de l'équipement" ></textarea>
 			</div>
 			<fieldset class="repeating_equipement2">
 				<input type="text" name="attr_NomEquip4" placeholder="Nom de l'équipement" />
 				<div class="autoex autoex28">
 					<span name="attr_DescEquip4"></span>
-					<textarea name="attr_DescEquip4" placeholder="Description de l'équipement" /></textarea>
+					<textarea name="attr_DescEquip4" placeholder="Description de l'équipement" ></textarea>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</div>
+
+<div class="body tab3">
+	<div class="grG">
+		<div class="autoexSimpleOR">
+			<h3>Avantages</h3>
+			<fieldset class="repeating_avantages">
+				<div class="autoex autoex40">
+					<span name="attr_repeatingAvantages"></span>
+					<textarea name="attr_repeatingAvantages"></textarea>
+				</div>
+			</fieldset>
+		</div>
+	
+		<div class="autoexSimple">
+			<h3>Aptitudes Particulières</h3>
+			<div class="autoex autoex40">
+				<span name="attr_Aptitudes"></span>
+				<textarea name="attr_Aptitudes"></textarea>
+			</div>
+			<fieldset class="repeating_aptParticulieres">
+				<div class="autoex autoex40">
+					<span name="attr_repeatingAptitudes"></span>
+					<textarea name="attr_repeatingAptitudes"></textarea>
 				</div>
 			</fieldset>
 		</div>
 		
+		<div class="autoexSimple">
+			<h3>Notes</h3>
+			<div class="autoex autoex28">
+				<span name="attr_notes"></span>
+				<textarea name="attr_notes"></textarea>
+			</div>
+			<fieldset class="repeating_notes1">
+				<div class="autoex autoex28">
+					<span name="attr_notes"></span>
+					<textarea name="attr_notes"></textarea>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+	
+	<div class="grD">
+		<div class="autoexSimpleOR">
+			<h3>Inconvénients</h3>
+			<fieldset class="repeating_inconvenients">
+				<div class="autoex autoex40">
+					<span name="attr_repeatingInconvenients"></span>
+					<textarea name="attr_repeatingInconvenients"></textarea>
+				</div>
+			</fieldset>
+		</div>
+	
+		<div class="autoexSimple">
+			<h3>Aptitudes Particulières</h3>
+			<div class="autoex autoex40">
+				<span name="attr_Aptitudes2"></span>
+				<textarea name="attr_Aptitudes2"></textarea>
+			</div>
+			<fieldset class="repeating_aptParticulieres2">
+				<div class="autoex autoex40">
+					<span name="attr_repeatingAptitudes2"></span>
+					<textarea name="attr_repeatingAptitudes2"></textarea>
+				</div>
+			</fieldset>
+		</div>
+	
 		<div class="autoexSimple">
 			<h3>Notes</h3>
 			<div class="autoex autoex28">
@@ -625,6 +904,336 @@
 				</div>
 			</fieldset>
 		</div>
+	</div>
+</div>
+
+<div class="body tab4">
+	<div class="grG">
+		<div class="carac">
+			<h3>Caractéristiques</h3>
+			<div>
+				<span>Score</span>
+				<span>Modif.</span>
+				<span>Score Temp.</span>
+				<span>Modif. Temp.</span>
+			</div>
+			<div>
+				<button type="roll" name="roll_con" value="@{jetGM} &{template:test} {{rollname=Constitution}} {{comp=[[2d10+[[?{Lequel ?|Constitution, @{character_constitutionmodif}|Constitution Temporaire, @{character_constitutionmodiftemp}}]]]]}}" title="Constitution">CON</button>
+				<input type="number" name="attr_character_constitution" title="Constitution" value="0"/>
+				<input type="number" name="attr_character_constitutionmodif" title="ConstitutionM" value="(floor((@{character_constitution}-10)/2))" disabled />
+				<input type="number" name="attr_character_constitutionscoretemp" title="ConstitutionST" value="0" />
+				<input type="number" name="attr_character_constitutionmodiftemp" title="ConstitutionMT" value="(floor((@{character_constitutionscoretemp}-10)/2))" disabled />
+			</div>
+			<div>
+				<button type="roll" name="roll_vol" value="@{jetGM} &{template:test} {{rollname=Volonté}} {{comp=[[2d10+[[?{Lequel ?|Volonté, @{character_volontemodif}|Volonté Temporaire, @{character_volontemodiftemp}}]]]]}}" title="Volonté">VOL</button>
+				<input type="number" name="attr_character_volonte" title="Volonte" value="0"/>
+				<input type="number" name="attr_character_volontemodif" title="VolonteM" value="(floor((@{character_volonte}-10)/2))" disabled />
+				<input type="number" name="attr_character_volontescoretemp" title="VolonteST" value="0" />
+				<input type="number" name="attr_character_volontemodiftemp" title="VolonteMT" value="(floor((@{character_volontescoretemp}-10)/2))" disabled />
+			</div>
+		</div>
+	
+		<div class="armes">
+			<h3>Armes à distance</h3>
+			<button type="roll" name="roll_armesDistances" value="@{jetGM} &{template:armes} {{rollname=@{character_arme}}} {{compname=Arme à Distance}} {{comp=[[2d10+[[@{Adt}]]+@{character_bonus}]]}} {{degats=[[@{character_degats}]]}} {{etourdissement=[[@{character_etourdissement}]]}} {{notes=@{character_notes}}} {{loc=[[2d6]]}}" ></button>
+			<label>
+				<input type="text" name="attr_character_arme" placeholder="Nom de l'arme" />
+			</label>
+			<label>
+				<span>Type</span>
+				<input type="text" name="attr_character_type" />
+			</label>
+			<label>
+				<span>Bonus au toucher</span>
+				<input type="number" name="attr_character_bonus" value="0" />
+			</label>
+			<label>
+				<span>Dégâts</span>
+				<input type="number" name="attr_character_degats" value="0" />
+			</label>
+			<label>
+				<span>Etourdissement</span>
+				<input type="text" name="attr_character_etourdissement" value="0" />
+			</label>
+			
+			<label>
+				<span>Notes</span>
+				<div class="autoex autoex28">
+					<span name="attr_character_notes"></span>
+					<textarea name="attr_character_notes"></textarea>
+				</div>
+			</label>
+			<fieldset class="repeating_competences">
+				<button type="roll" name="roll_armesDistances" value="@{jetGM} &{template:armes} {{rollname=@{character_arme}}} {{compname=Arme à Distance}} {{comp=[[2d10+[[@{Adt}]]+@{character_bonus}]]}} {{degats=[[@{character_degats}]]}} {{etourdissement=[[@{character_etourdissement}]]}} {{notes=@{character_notes}}} {{loc=[[2d6]]}}" ></button>
+				<label>
+					<input type="text" name="attr_character_arme" placeholder="Nom de l'arme" />
+				</label>
+				<label>
+					<span>Type</span>
+					<input type="text" name="attr_character_type" />
+				</label>
+				<label>
+					<span>Bonus au toucher</span>
+					<input type="number" name="attr_character_bonus" value="0" />
+				</label>
+				<label>
+					<span>Dégâts</span>
+					<input type="number" name="attr_character_degats" value="0" />
+				</label>
+				<label>
+					<span>Étourdissement</span>
+					<input type="text" name="attr_character_etourdissement" value="0" />
+				</label>
+				
+				<label>
+					<span>Notes</span>
+					<div class="autoex autoex28">
+						<span name="attr_character_notes"></span>
+						<textarea name="attr_character_notes"></textarea>
+					</div>
+				</label>
+			</fieldset>
+		</div>
+		
+		<div class="protections">
+			<h3>Protections</h3>
+			<fieldset class="repeating_protections">
+				<label>
+					<input type="text" name="attr_character_nomProtection" placeholder="Nom de la protection" />
+				</label>
+				<label>
+					<span>Type</span>
+					<input type="text" name="attr_character_typeProtection" />
+				</label>
+				<label>
+					<span>Protection</span>
+					<input type="number" name="attr_character_protection" value="0" />
+				</label>
+				
+				<label>
+					<span>Notes</span>
+					<div class="autoex autoex28">
+						<span name="attr_character_notes"></span>
+						<textarea name="attr_character_notes"></textarea>
+					</div>
+				</label>
+			</fieldset>
+		</div>
+		
+		<div class="loca">
+			<h3>Jets divers</h3>
+			<button name="roll_initiative" type="roll" value="@{jetGM} &{template:test} {{rollname=Initiative}} {{comp=[[2d10+[[?{Quel dextérité ?|Dextérité, @{character_dexteritemodif}|Dextérité temporaire, @{character_dexteritemodiftemp}}]]+[[?{Quel perception ?|Perception, @{character_perceptionmodif}|Perception Temporaire, @{character_perceptionmodiftemp}}]]]]}}">
+				Initiative
+			</button>
+			
+			<button name="roll_localisation" type="roll" value="@{jetGM} &{template:aven} {{rollname=Localisation des Dégâts}} {{loc=[[2d6]]}}">
+				Localisation des dégâts
+			</button>
+			
+			<button name="roll_compensation" type="roll" value="@{jetGM} &{template:test} {{rollname=Compensation des Dégâts}} {{comp=[[([[?{Laquelle ?|Constitution, @{character_constitutionmodif}|Constitution Temporaire, @{character_constitutionmodiftemp}}]]+?{armure|0})d6!!]]}}">
+				Compensation des dégâts
+			</button>
+			
+			<button name="roll_etourdissement" type="roll" value="@{jetGM} &{template:etourdissement} {{rollname=Test d'Étourdissement}} {{roll=[[2d6+[[?{Quelle volonté ?|Volonté, @{character_volontemodif}|Volonté Temporaire, @{character_volontemodiftemp}}]]+[[?{Quelle constitution ?|Constitution, @{character_constitutionmodif}|Constitution Temporaire, @{character_constitutionmodiftemp}}]] ]]}} {{compteur=[[@{character_etourdissement}-1]]}} {{etourdissement=[[1D4]]}}">
+				Test d'Étourdissement
+			</button>
+			
+			<button name="roll_compensation" type="roll" value="@{jetGM} &{template:recuperation} {{rollname=Récupération Étourdissement}} {{hc=[[1d10+[[@{Rt}]]]]}} {{ec=[[1d6]]}}">
+				Récupération Étourdissement
+			</button>
+			
+			<button name="roll_faveurDieu" type="roll" value="@{jetGM} &{template:test} {{rollname=Faveur des dieux}} {{comp=[[3d10+10]]}}">
+				Faveur des dieux
+			</button>
+		</div>
+	
+		<div class="autoexSimple">
+			<h3>Séquelles</h3>
+			<div class="autoex autoex28">
+				<span name="attr_sequelles"></span>
+				<textarea name="attr_sequelles"></textarea>
+			</div>
+		</div>
+	</div>
+	<div class="grD">
+		<div class="compCombat">
+			<h3>Compétences</h3>
+			<div>
+				<div>
+					<span>Nom</span>
+					<span>Total</span>
+				</div>
+				<div>
+					<span>Nom</span>
+					<span>Total</span>
+				</div>
+				<label>
+					<button type="roll" name="roll_ac" value="@{jetGM} &{template:test} {{rollname=Arme de Contact}} {{comp=[[2d10+[[@{Act}]]]]}}">
+						Arme de Contact
+					</button>
+					<input type="number" name="attr_Act" value="@{valueAcp}+@{valueAcr}+@{valueAcmt}" disabled />
+				</label>
+				<label>
+					<button type="roll" name="roll_cmn" value="@{jetGM} &{template:test} {{rollname=Combat à Mains Nues}} {{comp=[[2d10+[[@{Cmnt}]]]]}}" >
+						Combat à Mains Nues
+					</button>
+					<input type="number" name="attr_Cmnt" value="@{valueCmnp}+@{valueCmnr}+@{valueCmnmt}" disabled />
+				</label>
+				<label>
+					<button type="roll" name="roll_ad" value="@{jetGM} &{template:test} {{rollname=Arme à Distance}} {{comp=[[2d10+[[@{Adt}]]]]}}">
+						Arme à Distance
+					</button>
+					<input type="number" name="attr_Adt" value="@{valueAdp}+@{valueAdr}+@{valueAdmt}" disabled />
+				</label>
+				<label>
+					<button type="roll" name="roll_e" value="@{jetGM} &{template:test} {{rollname=Esquive}} {{comp=[[2d10+[[@{Est}]]]]}}">
+						Esquive
+					</button>
+					<input type="number" name="attr_Est" value="@{valueEsp}+@{valueEsr}+@{valueEsmt}" disabled />
+				</label>
+			</div>	
+		</div>
+	
+		<div class="armes">
+			<h3>Armes de contact</h3>
+			<button type="roll" name="roll_armesContact" value="@{jetGM} &{template:armes} {{rollname=@{character_armeContact}}} {{compname=Arme de Contact}} {{comp=[[2d10+[[@{Adt}]]+@{character_bonusContact}]]}} {{degats=[[@{character_degatsContact}+@{dgtMN}]]}} {{etourdissement=[[@{character_etourdissementContact}]]}} {{notes=@{character_notesContact}}} {{loc=[[2d6]]}}" ></button>
+			<label>
+				<input type="text" name="attr_character_armeContact" placeholder="Nom de l'arme" />
+			</label>
+			<label>
+				<span>Type</span>
+				<input type="text" name="attr_character_typeContact" />
+			</label>
+			<label>
+				<span>Bonus au toucher</span>
+				<input type="number" name="attr_character_bonusContact" value="0" />
+			</label>
+			<label>
+				<span>Dégâts</span>
+				<input type="number" name="attr_character_degatsContact" value="0" />
+			</label>
+			<label>
+				<span>Etourdissement</span>
+				<input type="text" name="attr_character_etourdissementContact" value="0" />
+			</label>
+			<label class="dgtSpeciaux">
+				<input type="checkbox" name="attr_dgtMN" value="@{dgtMainsNues}" />
+				<span title="Ajouter les dégâts à mains nues"></span>
+			</label>
+			<label>
+				<span>Notes</span>
+				<div class="autoex autoex28">
+					<span name="attr_character_notesContact"></span>
+					<textarea name="attr_character_notesContact"></textarea>
+				</div>
+			</label>
+			<fieldset class="repeating_competencesContact">
+				<button type="roll" name="roll_armesContact" value="@{jetGM} &{template:armes} {{rollname=@{character_armeContact}}} {{compname=Arme de Contact}} {{comp=[[2d10+[[@{Adt}]]+@{character_bonusContact}]]}} {{degats=[[@{character_degatsContact}+@{dgtMN}]]}} {{etourdissement=[[@{character_etourdissementContact}]]}} {{notes=@{character_notesContact}}} {{loc=[[2d6]]}}" ></button>
+				<label>
+					<input type="text" name="attr_character_armeContact" placeholder="Nom de l'arme" />
+				</label>
+				<label>
+					<span>Type</span>
+					<input type="text" name="attr_character_typeContact" />
+				</label>
+				<label>
+					<span>Bonus au toucher</span>
+					<input type="number" name="attr_character_bonusContact" value="0" />
+				</label>
+				<label>
+					<span>Dégâts</span>
+					<input type="number" name="attr_character_degatsContact" value="0" />
+				</label>
+				<label>
+					<span>Etourdissement</span>
+					<input type="text" name="attr_character_etourdissementContact" value="0" />
+				</label>
+				<label class="dgtSpeciaux">
+					<input type="checkbox" name="attr_dgtMN" value="@{dgtMainsNues}" />
+					<span title="Ajouter les dégâts à mains nues"></span>
+				</label>
+				<label>
+					<span>Notes</span>
+					<div class="autoex autoex28">
+						<span name="attr_character_notesContact"></span>
+						<textarea name="attr_character_notesContact"></textarea>
+					</div>
+				</label>
+			</fieldset>
+		</div>
+	
+		<div class="protections">
+			<h3>Protections</h3>
+			<fieldset class="repeating_protections2">
+				<label>
+					<input type="text" name="attr_character_nomProtection" placeholder="Nom de la protection" />
+				</label>
+				<label>
+					<span>Type</span>
+					<input type="text" name="attr_character_typeProtection" />
+				</label>
+				<label>
+					<span>Protection</span>
+					<input type="number" name="attr_character_protection" value="0" />
+				</label>
+				
+				<label>
+					<span>Notes</span>
+					<div class="autoex autoex28">
+						<span name="attr_character_notes"></span>
+						<textarea name="attr_character_notes"></textarea>
+					</div>
+				</label>
+			</fieldset>
+		</div>
+	
+		<div class="dgtSubis">
+			<h3>Niveaux de dégâts</h3>
+			<label>
+				<span>Tête</span>
+				<input type="number" name="attr_dsTete" value="0" min="0" max="7" />
+			</label>
+			<label>
+				<span>Main Directrice</span>
+				<input type="number" name="attr_dsMainDirectrice" value="0" min="0" max="7" />
+			</label>
+			<label>
+				<span>Bras Droit</span>
+				<input type="number" name="attr_dsBrasDroit" value="0" min="0" max="7" />
+			</label>
+			<label>
+				<span>Main Non Directrice</span>
+				<input type="number" name="attr_dsMainNonDirectrice" value="0" min="0" max="7" />
+			</label>
+			<label>
+				<span>Bras Gauche</span>
+				<input type="number" name="attr_dsBrasGauche" value="0" min="0" max="7" />
+			</label>
+			<label>
+				<span>Jambe Droite</span>
+				<input type="number" name="attr_dsJambeDroite" value="0" min="0" max="7" />
+			</label>
+			<label>
+				<span>Jambe Gauche</span>
+				<input type="number" name="attr_dsJambeGauche" value="0" min="0" max="7" />
+			</label>
+			<label>
+				<span>Torse Inférieur Gauche</span>
+				<input type="number" name="attr_dsTorseIGauche" value="0" min="0" max="7" />
+			</label>
+			<label>
+				<span>Torse Inférieur Droit</span>
+				<input type="number" name="attr_dsTorseIDroit" value="0" min="0" max="7" />
+			</label>
+			<label>
+				<span>Torse Supérieur Droit</span>
+				<input type="number" name="attr_dsTorseSDroit" value="0" min="0" max="7" />
+			</label>
+			<label>
+				<span>Coeur</span>
+				<input type="number" name="attr_dsCoeur" value="0" min="0" max="7" />
+			</label>
+		</div>		
 	</div>
 </div>
 
@@ -684,6 +1293,105 @@
 		<span>{{rollname}}</span>
 		<div>
 			{{comp}}
+		</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-armes">
+	<div>
+		<span>{{rollname}}</span>
+		<span>{{compname}}</span>
+		<div>
+			{{comp}}
+		</div>
+		<div>
+			<label>
+				<span>Dégâts</span>
+				<span>{{degats}}</span>
+			</label>
+			<label>
+				<span>Étourdissements</span>
+				<span>{{etourdissement}}</span>
+			</label>
+			{{#notes}}
+				<span>{{notes}}</span>
+			{{/notes}}
+		</div>
+		<div>
+			<span>Localisation</span>
+			{{#rollTotal() loc 2}}
+			Tête
+			{{/rollTotal() loc 2}}
+			
+			{{#rollTotal() loc 3}}
+			Main Directrice
+			{{/rollTotal() loc 3}}
+			
+			{{#rollTotal() loc 4}}
+			Bras Droit
+			{{/rollTotal() loc 4}}
+			
+			{{#rollTotal() loc 5}}
+			Main Non Directrice
+			{{/rollTotal() loc 5}}
+			
+			{{#rollTotal() loc 6}}
+			Bras Gauche
+			{{/rollTotal() loc 6}}
+			
+			{{#rollTotal() loc 7}}
+			Jambe Droite
+			{{/rollTotal() loc 7}}
+			
+			{{#rollTotal() loc 8}}
+			Jambe Gauche
+			{{/rollTotal() loc 8}}
+			
+			{{#rollTotal() loc 9}}
+			Torse Inférieur Gauche
+			{{/rollTotal() loc 9}}
+			
+			{{#rollTotal() loc 10}}
+			Torse Inférieur Droit
+			{{/rollTotal() loc 10}}
+			
+			{{#rollTotal() loc 11}}
+			Torse Supérieur Droit
+			{{/rollTotal() loc 11}}
+			
+			{{#rollTotal() loc 12}}
+			Coeur
+			{{/rollTotal() loc 12}}
+		</div>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-etourdissement">
+	<div>
+		<span>{{rollname}}</span>
+		{{#rollGreater() roll compteur}}
+			<div>
+				Résiste à l'étourdissement.
+			</div>
+		{{/rollGreater() roll compteur}}
+		{{#rollBetween() roll -999 compteur}}
+			<div>
+				Étourdit pour {{etourdissement}} tours.
+			</div>
+		{{/rollBetween() roll -999 compteur}}
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-recuperation">
+	<div>
+		<span>{{rollname}}</span>
+		<div>
+			<span>En Combat</span>
+			<span>{{ec}} (immédiat)</span>
+		</div>
+		<div>
+			<span>Hors combat</span>
+			<span>{{hc}} / minute</span>
 		</div>
 	</div>
 </rolltemplate>

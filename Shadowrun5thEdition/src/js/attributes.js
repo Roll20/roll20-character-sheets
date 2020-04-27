@@ -40,5 +40,11 @@ const sheetAttributes = {
   weaponTypes: ['range', 'melee'],
   rangeAttributes: ['dicepool', 'weapon', 'damage', 'acc', 'ap', 'skill', 'ammo', 'mode', 'recoil'],
   meleeAttributes: ['dicepool', 'weapon', 'damage', 'acc', 'ap', 'skill', 'reach'],
+
+  spellTypes: ['spell', 'preps', 'ritual', 'forms'],
+
+  armorAttributes: ['name', 'rating', 'acid_modifier', 'electrical_modifier', 'cold_modifier', 'fire_modifier', 'radiation_modifier', 'dicepool_modifier'],
+  armorSoak: ['dicepool_modifier', 'rating'],
+  armorProtections: ['acid', 'electrical', 'cold', 'fire', 'radiation']
 }
 
