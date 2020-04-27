@@ -1,8 +1,15 @@
-on('change:oracle_core_button', function(eventinfo) {
+on('change:oracle_ironsworn_button', function(eventinfo) {
   setAttrs({
-    oracle_core: eventinfo.newValue,
+    oracle_ironsworn: eventinfo.newValue,
   });
 });
+
+on('change:oracle_ironcrunch_button', function(eventinfo) {
+  setAttrs({
+    oracle_ironcrunch: eventinfo.newValue,
+  });
+});
+
 
 on('change:oracle_delve_button', function(eventinfo) {
   setAttrs({
