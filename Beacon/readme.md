@@ -10,8 +10,15 @@ You can find more information about Beacon at its homepage: http://beacond20.blo
 **Initial release - April 7, 2015**
 - First release.
 
-- Interm updates 2020-03-30
+Interm updates 2020-03-30:
 	-Rebaseline sheet on new html and css (based on DCC tabbed sheet)
 	-change Fabrication to Crafting
 	-remove most of the die rollers and automation
-	-redirect images links
+	-redirect image links
+Interm updates 2020-04-16:
+	- reformat stylesheet
+	- add new worker scripts to calculate weapon stats and armor class
+	- add update mode to 'lock' core stats during play
+Interm updates 2020-04-22:
+	- add in some levelup info to update tab
+	- Fix speed and dex calculations for worn armor
