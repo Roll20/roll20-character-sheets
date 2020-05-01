@@ -116,3 +116,9 @@ on('change:find_an_opportunity_button', function(eventinfo) {
     find_an_opportunity_tables: eventinfo.newValue
   });
 });
+
+on('change:manifest_insanity_button', function(eventinfo) {
+  setAttrs({
+    manifest_insanity_tables: eventinfo.newValue
+  });
+});
