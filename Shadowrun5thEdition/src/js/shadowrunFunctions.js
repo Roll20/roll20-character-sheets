@@ -1,5 +1,3 @@
-//for Mocha Unit Testing
-//-const processingFunctions = require('../js/processingFunctions');
 
 const shadowrunFunctions = {
   addRepRow: (repRowID, attributeList) => {
