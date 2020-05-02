@@ -1,21 +1,51 @@
 # Release notes
 
+## 1.0.1
+- Species size box converted to numeric input from text input
+- Armor *proof properties converted to toggle buttons from numeric inputs
+- Fixed table notes textareas not scaling properly
+- Fixed table notes textareas resize controls interfering with list edit buttons
+- Renamed "Goal +/-" roll query to "Additional Goal +/-" on action rolls, to indicate that this bonus/penalty applies on top of the one arleady listed in the table
+- Fixed README dead link in the sheet description
+- Removed unused translation keys
+
 ## 1.0.0
 - First publicly available version of the sheet
 
 # TODO list
-- Add sheet preview image
 
-- temporary bonus/malus for skills and characteristics
+## Planned improvements
 
-- auto-fail / prevents rolls of |R|equired skills (Alchemy, Interface, Pilot) if skill value is 0. Have to be sure no perk/capability exists to allow a roll anyway. If not sure, warn only.
+- States
+    - section for them (CBM p37)
+        - include their descriptions as infoboxes (title=??)
+        - include box for the resistance
 
-- check if Occult characteristic 
+- Characteristics
+    - [ TBC ] Box next to them to log a temporary bonus/malus?
+    - check if Occult characteristics can be used as part of a roll, if yes add as an option to skills characteristic choice and action characteristic selection
+
+- Skills
+    - [ TBC ] Box next to them to log a temporary bonus/malus?
+    - auto-fail or add warning when rolling a |R|equired skill (Alchemy, Interface, Pilot) which has a score of 0
+
+- Armor
+    - add Hindering and ABC properties? Or a collapsing notes section?
+
+- E-Shield
+    - add "Burn-Out", "Distorsion", "Features"
+
+- Blessing/Curse: add space for their descriptions
+
+- Perks. Above the description, add a header space for Perk "category" (e.g. Calling), "type" (e.g. Privilege) & "precondition"
+
+
 
 # Nice-to-have
-- replace unstylable selects with custom-made absolute-positioned list of action buttons for characteristic/skill selections
-- for Roll20 pro users:
-    - API for VP & WP management
-    - leverage this API from within the sheet
+- replace unstylable characteristic/skill selects with custom-made absolute-positioned list of action buttons?
 
- Freetext Buff/Debuff mod
+- for Roll20 pro users, API for:
+    - troupe coffer management
+    - personal VP, coffer management
+
+
