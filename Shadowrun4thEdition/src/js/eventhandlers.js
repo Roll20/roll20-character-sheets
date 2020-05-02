@@ -42,7 +42,7 @@
   })
 
   sheetAttributes.weaponTypes.forEach(type => {
-    on(`change:repeating_${type}:dicepool_modifier change:repeating_${type}:specalization`, eventinfo => updateRepeatingWeaponDicepool(eventinfo.triggerName))
+    on(`change:repeating_${type}:dicepool_modifier change:repeating_${type}:specialization`, eventinfo => updateRepeatingWeaponDicepool(eventinfo.triggerName))
     on(`change:repeating_${type}:primary`, eventinfo => updateRepeatingWeaponPrimary(eventinfo, type))
   })
 
@@ -72,7 +72,7 @@
 
   on("clicked:cond_reset", () => resetNpcCondition()); 
 
-  sheetAttributes.spellTypes.forEach(type => on(`change:repeating_${type}:dicepool_modifier change:repeating_${type}:specalization`, eventinfo => updateSpellsDicepool(eventinfo)))
+  sheetAttributes.spellTypes.forEach(type => on(`change:repeating_${type}:dicepool_modifier change:repeating_${type}:specialization`, eventinfo => updateSpellsDicepool(eventinfo)))
 
   on("change:level", eventinfo => updateSpriteConditionTrack(eventinfo.newValue))
 

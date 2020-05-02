@@ -23,7 +23,7 @@ const updateSpriteConditionTrack = newValue => {
 //ALSO COVER COMPLEX FORMS
 const updateSpellsDicepool = eventinfo => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
-  getAttrs([`${repRowID}_specalization`, `${repRowID}_dicepool_modifier`], attrs => {
+  getAttrs([`${repRowID}_specialization`, `${repRowID}_dicepool_modifier`], attrs => {
     attrs = processingFunctions.parseIntegers(attrs)
     processingFunctions.setAttributes({
       [`${repRowID}_dicepool`]: processingFunctions.sumIntegers(Object.values(attrs))
@@ -86,7 +86,7 @@ const updateRepeatingWeaponPrimary = (eventinfo, type) => {
 
 const updateRepeatingWeaponDicepool = trigger => {
   const repRowID = processingFunctions.getReprowid(trigger)
-  getAttrs([`${repRowID}_dicepool_modifier`, `${repRowID}_specalization`], attrs => {   
+  getAttrs([`${repRowID}_dicepool_modifier`, `${repRowID}_specialization`], attrs => {   
     attrs = processingFunctions.parseIntegers(attrs)
     processingFunctions.setAttributes({
       [`${repRowID}_dicepool`]: processingFunctions.sumIntegers(Object.values(attrs))
