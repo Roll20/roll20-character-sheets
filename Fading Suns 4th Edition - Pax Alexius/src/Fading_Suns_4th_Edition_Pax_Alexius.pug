@@ -126,7 +126,7 @@ mixin characteristic(name)
         +numeric_input(name, 3)
 
 mixin skill(name, value)
-    .fs-skill
+    .fs-skill(data-i18n-list-item=name)
         .fs-skill-normal
             button.fs-d20(type='roll' name='roll_disabledbutton' value='' disabled='')
             .fs-skill-roll-characteristic-choice
@@ -206,13 +206,9 @@ mixin skill(name, value)
             .fs-sheet-section.fs-skills-header
                 label.fs-uppercase-header(data-i18n='skills')
 
-            .fs-skill-col.fs-skills-1
-                - for (let i = 0; i < skills.length / 2; ++i)
-                    +skill(skills[i].name, skills[i].default)
-
-            .fs-skill-col.fs-skills-2
-                - for (let i = skills.length / 2; i < skills.length; ++i)
-                    +skill(skills[i].name, skills[i].default)
+            .fs-skills(data-i18n-list="skills_list")
+                each skill in skills
+                    +skill(skill.name, skill.default)
 
             .fs-characteristics
                 each charac_cat in characteristics
@@ -328,10 +324,10 @@ mixin skill(name, value)
                                     optgroup(data-i18n-label=charac_cat.category)
                                     each charac_name in charac_cat.list
                                         option(value=charac_name data-i18n=charac_name)
-                            select.fs-table-cell(name='attr_action_skill')
+                            select.fs-table-cell(name='attr_action_skill' data-i18n-list='skills_list')
                                 option(value='' selected)
                                 each sk in skills
-                                    option(value=sk.name data-i18n=sk.name)
+                                    option(value=sk.name data-i18n=sk.name data-i18n-list-item=sk.name)
                             input.fs-table-cell(type='number' name='attr_action_goal_bonus_penalty' value=0)
                             .fs-notes.fs-textarea-reladiv
                                 .fs-auto-expand-textarea
@@ -349,12 +345,12 @@ mixin skill(name, value)
                         fieldset.repeating_states
                             .fs-table
                                 button.fs-20(type='roll' name='roll_shakeitoff_roll' value='[TODO] Shake-it-Off rolls not supported yet')
-                                select.fs-table-cell(name='attr_state_name')
+                                select.fs-table-cell(name='attr_state_name' data-i18n-list='states_list')
                                     option(value='' selected)
                                     each state_cat in states
                                         optgroup(data-i18n-label=state_cat.category)
                                         each state_name in state_cat.list
-                                            option(value=state_name data-i18n=state_name)
+                                            option(value=state_name data-i18n=state_name data-i18n-list-item=state_name)
                                 +numeric_input('state_resistance', 0, 0)(class='fs-table-cell')
 
                 .fs-sheet-section-frame
@@ -521,7 +517,6 @@ script(type='text/worker').
     const skill_names = !{JSON.stringify(skills)}.flatMap(x => x.name);
     const armor_proofing_types = !{JSON.stringify(armor_proofing_types)};
     const state_names = !{JSON.stringify(states)}.flatMap(x => x.list);
-    console.log(state_names)
 
     const repeating_rolls = [
         { "section": "actions", "prefix": "action" }
@@ -565,7 +560,6 @@ script(type='text/worker').
             let checkbox = `${type}proof`;
             let value = `armor_vs_${type}`;
             getAttrs( [ 'armor_resistance', checkbox ], values => {
-                log(values[checkbox])
                 let newValue = (values[checkbox]==='on' ? parseInt(values.armor_resistance) : Math.floor(parseInt(values.armor_resistance) / 2));
                 setAttrs({
                    [value]: newValue

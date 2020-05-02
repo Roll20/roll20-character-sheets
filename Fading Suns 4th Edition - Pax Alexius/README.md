@@ -8,6 +8,7 @@
 - Renamed "Goal +/-" roll query to "Additional Goal +/-" on action rolls, to indicate that this bonus/penalty applies on top of the one arleady listed in the table
 - Fixed README dead link in the sheet description
 - Removed unused translation keys
+- Added ability to order skills & states differently between translations (i.e. alphabetically)
 
 ## 1.0.0
 - First publicly available version of the sheet
