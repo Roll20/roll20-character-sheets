@@ -1,0 +1,106 @@
+<script type="text/worker">
+
+    const characteristics = {
+        body: [ 'strength', 'dexterity', 'endurance' ],
+        mind: [ 'wits', 'perception', 'will' ],
+        spirit: [ 'presence', 'intuition', 'faith' ]
+    };
+    const all_characteristics = [].concat(Object.values(characteristics).flat());
+
+    const all_skills = [
+        'academia',
+        'alchemy',
+        'animalia',
+        'arts',
+        'charm',
+        'crafts',
+        'disguise',
+        'drive',
+        'empathy',
+        'fight',
+        'focus',
+        'impress',
+        'interface',
+        'intrusion',
+        'knavery',
+        'melee',
+        'observe',
+        'perform',
+        'pilot',
+        'remedy',
+        'shoot',
+        'sleight_of_hand',
+        'sneak',
+        'survival',
+        'tech_redemption',
+        'vigor'
+    ];
+
+    const repeating_rolls = [
+        { "section": "actions", "prefix": "action" }
+    ];
+
+    const updateGoalNumber = (section, prefix) => {
+        getSectionIDs(`repeating_${section}`, idArray => {
+            const characteristicArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_characteristic`);
+            const characteristicValueArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_characteristic_value`);
+            const skillArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_skill`);
+            const skillValueArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_skill_value`);
+            getAttrs( [].concat(characteristicArray, skillArray), vNames => {
+                getAttrs( vNames, vValues => {
+                    let setAttrsObj = {};
+                    for (let i = 0; i < idArray.length; ++i) {
+                        setAttrsObj[characteristicValueArray[i]] = (parseInt(vValues[vNames[characteristicArray[i]]]) || 0);
+                        setAttrsObj[skillValueArray[i]] = (parseInt(vValues[vNames[skillArray[i]]]) || 0);
+                    }
+                    setAttrs(setAttrsObj);
+                });
+            });
+        });
+    };
+
+    [].concat(all_characteristics, all_skills).forEach( trait => {
+        on(`change:${trait}`, eventInfo => {
+            repeating_rolls.forEach( special_skill => {
+                updateGoalNumber(special_skill.section, special_skill.prefix);
+            });
+        });
+    });
+
+    repeating_rolls.forEach( repeating => {
+        on(`change:repeating_${repeating.section}`, eventInfo => {
+            updateGoalNumber(repeating.section, repeating.prefix);
+        });
+    });
+
+    on("sheet:opened", function() {
+        
+        // sheet versioning
+        getAttrs( [ 'sheet_version' ], values => {
+
+            if (values.sheet_version !== "latest") {
+
+                // insert version updates here
+            }
+
+            const latest_version = "1.0.0";
+            
+            if (values.sheet_version != latest_version) {
+                setAttrs({ sheet_version: latest_version });
+            }
+        });
+
+        // translate roll queries
+        {
+            let setAttrsObj = {};
+
+            // Goal rolls
+            let goal_bonus_penalty = getTranslationByKey('goal_bonus_penalty');
+            setAttrsObj['goal_bonus_penalty_rollquery_i18n'] = `${goal_bonus_penalty}|0`;
+
+            setAttrs(setAttrsObj);
+        }
+        
+    });
+
+</script>
