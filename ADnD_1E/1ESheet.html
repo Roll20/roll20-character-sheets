@@ -608,7 +608,7 @@
 										<!-- OLDER MACRO
 										<textarea name="attr_macro-text" title="@{repeating_nonweaponproficiencies_$X_macro-text}" class="sheet-macro-text" style="width:90%; height:1em;">&{template:general} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{=@{short_description}}}{{Success Amount=[[((@{rAttribute})+(@{rSlots}-1)-1d20)cs&gt;1cf&lt;-1]]}}</textarea>
 										-->
-										<textarea name="attr_macro-text" title="@{repeating_nonweaponproficiencies_$X_macro-text}" class="sheet-macro-text" style="width:90%; height:1em;">&{template:general} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{Proficiency Check=[[ 1d20cs<[[ @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ]] [attr + mod]cf>[[ { ( @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ),19}kl1 ]] ]] vs [[ @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ]]}} {{freetext=@{short_description}}}</textarea>
+										<textarea name="attr_macro-text" title="@{repeating_nonweaponproficiencies_$X_macro-text}" class="sheet-macro-text" style="width:90%; height:1em;">&{template:general} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{Proficiency Check=[[ 1d20cs<[[ @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ]][ATTR+MODS]cf>[[ { ( @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ),19}kl1 ]] ]] vs [[ @{rAttribute}[ATTR] + (-1*(@{rmodifier}[MOD] + ?{Modifier?|0}[MOD])) ]]}} {{freetext=@{short_description}}}</textarea>
 										<br>Macro-Text
 									</td>
 								</tr>
@@ -773,23 +773,27 @@
 			{{#ToHitAC-10to0}}<tr><td class="sheet-ToHit">-10|-9|-8|-7|-6|-5|-4|-3|-2|-1|&nbsp;**0**<br>{{ToHitAC-10to0}}</td></tr>{{/ToHitAC-10to0}}
 			{{#ToHitAC1to10}}<tr><td class="sheet-ToHit"> **0**| 1| 2| 3| 4| 5| 6| 7| 8| 9|10<br>{{ToHitAC1to10}}</td></tr>{{/ToHitAC1to10}}
 			
-			{{#allprops() name subtag color attack1 attack2 attack3 attack4 damage1vsSM damage2vsSM damage3vsSM damage4vsSM damage1vsL damage2vsL damage3vsL damage4vsL ToHitAC-10to0 ToHitAC1to10 WeaponNotes}}
+			{{#allprops() name subtag color attack1 attack2 attack3 attack4 damage1vsSM damage2vsSM damage3vsSM damage4vsSM damage1vsL damage2vsL damage3vsL damage4vsL ToHitAC-10to0 ToHitAC1to10 WeaponNotes freetext}}
 			<tr><td><span class="sheet-tcat">{{key}} = </span>{{value}}</td></tr>
-			{{/allprops() name subtag color attack1 attack2 attack3 attack4 damage1vsSM damage2vsSM damage3vsSM damage4vsSM damage1vsL damage2vsL damage3vsL damage4vsL ToHitAC-10to0 ToHitAC1to10 WeaponNotes}}
+			{{/allprops() name subtag color attack1 attack2 attack3 attack4 damage1vsSM damage2vsSM damage3vsSM damage4vsSM damage1vsL damage2vsL damage3vsL damage4vsL ToHitAC-10to0 ToHitAC1to10 WeaponNotes freetext}}
 			
 			{{#WeaponNotes}}<tr><td class="sheet-text">**Notes:** {{WeaponNotes}}</td></tr>{{/WeaponNotes}}
+			{{#freetext}}<tr><td colspan="2" class="sheet-text">{{freetext}}</td></tr>{{/freetext}}
+
 		</table>
 	</rolltemplate>
 	<!-- General Roll Template -->
 	<rolltemplate class="sheet-rolltemplate-general">
 		<table class="sheet-rolltemplate-general  {{#color}}color-{{color}}{{/color}}">
 			{{#name}}<tr><th colspan="2">{{name}}</th></tr>{{/name}}
-			{{#subtag}}<tr><td colspan="2" class="sheet-subheader">{{subtag}}</td></tr>{{/subtag}}
-			{{#freetext}}<tr><td colspan="2" class="sheet-text">{{freetext}}</td></tr>{{/freetext}}
+			{{#subtag}}<tr><td colspan="2" class="sheet-subheader">{{subtag}}</td></tr>{{/subtag}}			
 
 			{{#allprops() name subtag freetext color}}
 			<tr><td style="vertical-align:middle;"><span class="sheet-tcat">{{key}}</span></td><td>{{value}}</td></tr>
 			{{/allprops() name subtag freetext color}}
+			
+			{{#freetext}}<tr><td colspan="2" class="sheet-text">{{freetext}}</td></tr>{{/freetext}}
+
 		</table>
 	</rolltemplate>
 </div>
@@ -1580,7 +1584,7 @@
 				getAttrs(attrs, function(v) {
 					_.each(idarray, function(id) {
 						update["repeating_nonweaponproficiencies_" + id + "_macro-text"] = v["repeating_nonweaponproficiencies_" + id + "_macro-text"].replace('&{template:general} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{=@{short_description}}}{{Success Amount=[[((@{rAttribute})+(@{rSlots}-1)-1d20)cs>1cf<-1]]}}',
-						'&{template:general} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{Proficiency Check=[[ 1d20cs<[[ @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ]] [attr + mod]cf>[[ { ( @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ),19}kl1 ]] ]] vs [[ @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ]]}} {{freetext=@{short_description}}}');
+						'&{template:general} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{Proficiency Check=[[ 1d20cs<[[ @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ]][ATTR+MODS]cf>[[ { ( @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ),19}kl1 ]] ]] vs [[ @{rAttribute}[ATTR] + (-1*(@{rmodifier}[MOD] + ?{Modifier?|0}[MOD])) ]]}} {{freetext=@{short_description}}}');
 					});
 					console.log("nwpMacroUpdate check completed on: " +attrs);
 					setAttrs(update,{silent:true});
