@@ -2,20 +2,24 @@
 
 ## 1.1.0
 - Species size box converted to numeric input from text input
-- Armor resistances against specific damage types (blaster, flame, ..) are now automatically determined
-- Fixed textareas not scaling properly with content
-- Fixed textareas resize controls interfering with table edit buttons
-- Renamed "Goal +/-" roll query to "Additional Goal +/-" on action rolls, to indicate that this bonus/penalty applies on top of the one arleady listed in the table
-- Added ability to order skills & states alphabetically for non-English translations
-- Removed unused translation keys
-- Fixed README dead link in the sheet description
+- Armor resistances against specific damage types (blaster, flame, ..) now automatically deduced from the armor general resistance level
+- New "States" section to log physical/mental/social states and tech compulsions
+- Textareas not scale properly with their contents
+- Textareas no longer interfere with edit buttons in repeating sections
+- Actions roll query "Goal +/-" now says "Additional Goal +/-" so as to indicate that this bonus/penalty applies on top of the one arleady listed in the table
+- Internationalization of infoboxes
+- Internationalization for alphabetic ordering of skills (as well as states introduced in this version)
+- Removed unused internationalization keys
+- Fixed broken README link on the Game Settings page
 
 ## 1.0.0
 - First publicly available version of the sheet
 
 # TODO list
 
-## Planned improvements
+## Potential improvements
+
+- Blessing/Curse: add more space for their descriptions
 
 - Characteristics
     - [ TBC ] Box next to them to log a temporary bonus/malus?
@@ -25,25 +29,16 @@
     - [ TBC ] Box next to them to log a temporary bonus/malus?
     - auto-fail or add warning when rolling a |R|equired skill (Alchemy, Interface, Pilot) which has a score of 0
 
-- Armor
-    - add Hindering and ABC properties? Or a collapsing notes section?
-
 - E-Shield
-    - add "Burn-Out", "Distorsion", "Features"
-
-- Blessing/Curse: add space for their descriptions
-
-- Perks. Above the description, add a header space for Perk "category" (e.g. Calling), "type" (e.g. Privilege) & "precondition"
+    - add "Burn-Out", "Distorsion", "Features"?
 
 # Nice-to-have
 
-- States
-    - add their descriptions (title=??)
+- Add description of each state
 
 - replace unstylable characteristic/skill selects with custom-made absolute-positioned list of action buttons?
 
 - for Roll20 pro users, API for:
     - troupe coffer management
-    - personal VP, coffer management
-
-
+    - PC bank / cache management
+    - GM(/NPC) bank / cache management

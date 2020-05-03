@@ -49,6 +49,11 @@ $indent-width: 20px;
     text-align: end;
 }
 
+@mixin half-indented {
+    padding-left: calc(#{$indent-width} / 2);
+    text-align: end;
+}
+
 .sheet-fs-sheet *,
 .sheet-fs-sheet *::after,
 .sheet-fs-sheet *::before {
@@ -130,6 +135,12 @@ body {
 .sheet-fs-sheet label {
     vertical-align: middle;
     align-self: center;
+}
+
+.sheet-fs-sheet input[type=text] {
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
 }
 
 .sheet-fs-sheet input[type=number] {
@@ -1001,14 +1012,67 @@ input.sheet-fs-revivals-number {
     text-align: center;
 }
 
-.sheet-fs-vp-and-surge-grids {
+.sheet-fs-vp-bank-and-surge-grid {
     @include localgrid;
-    grid-template-columns: 1fr max-content;
-    grid-auto-flow: row;
+
+    grid-template:
+    "vp-bank-header         vp-bank-header         vp-bank-header     vp-bank-header"
+    "vp-bank-capacity-label vp-bank-capacity-value current-vp-label   current-vp-value"
+    "vp-bank-capacity-label vp-bank-capacity-value current-wp-label   current-wp-value"
+    "surge-header           surge-header           surge-header       surge-header"
+    "surge-rating-label     surge-rating-value     surge-number-label surge-number-value" / max-content max-content 1fr max-content;
 }
 
-.sheet-fs-vp-and-surge-grids > label {
-    @include indented;
+.sheet-fs-vp-bank-and-surge-grid > label.sheet-fs-vp-bank-header {
+    grid-area: vp-bank-header;
+}
+
+.sheet-fs-vp-bank-and-surge-grid > label.sheet-fs-vp-bank-capacity {
+    grid-area: vp-bank-capacity-label;
+    @include half-indented;
+}
+
+.sheet-fs-vp-bank-and-surge-grid > input.sheet-fs-vp-bank-capacity {
+    grid-area: vp-bank-capacity-value;
+}
+
+.sheet-fs-vp-bank-and-surge-grid > label.sheet-fs-current-vp {
+    grid-area: current-vp-label;
+    @include half-indented;
+}
+
+.sheet-fs-vp-bank-and-surge-grid > input.sheet-fs-current-vp {
+    grid-area: current-vp-value;
+}
+.sheet-fs-vp-bank-and-surge-grid > label.sheet-fs-current-wp {
+    grid-area: current-wp-label;
+    @include half-indented;
+}
+
+.sheet-fs-vp-bank-and-surge-grid > input.sheet-fs-current-wp {
+    grid-area: current-wp-value;
+}
+
+.sheet-fs-vp-bank-and-surge-grid > label.sheet-fs-surge-header {
+    grid-area: surge-header;
+}
+
+.sheet-fs-vp-bank-and-surge-grid > label.sheet-fs-surge-rating {
+    grid-area: surge-rating-label;
+    @include half-indented;
+}
+
+.sheet-fs-vp-bank-and-surge-grid > input.sheet-fs-surge-rating {
+    grid-area: surge-rating-value;
+}
+
+.sheet-fs-vp-bank-and-surge-grid > label.sheet-fs-surge-number {
+    grid-area: surge-number-label;
+    @include half-indented;
+}
+
+.sheet-fs-vp-bank-and-surge-grid > input.sheet-fs-surge-number {
+    grid-area: surge-number-value;
 }
 
 .sheet-fs-perks-capabilities-and-birthrights {
@@ -1108,6 +1172,32 @@ input.sheet-fs-revivals-number {
     grid-template-columns: 1fr 0.5fr;
 }
 
+
+.sheet-fs-notes2 {
+    grid-column: 1 / -1;
+    margin-left: 15px;
+    width:calc(100% - 15px);
+    min-height: 0px;
+    height: 0px;
+    max-height: 0px;
+    visibility: collapse;
+}
+
+.sheet-fs-notes2:focus,
+.sheet-fs-notes2:focus-within,
+.sheet-fs-notes2:active,
+input:active + .sheet-fs-notes2,
+input:focus + .sheet-fs-notes2,
+input:focus-within + .sheet-fs-notes2 {
+    visibility: visible;
+    height: $default-line-height;
+    max-height: $default-line-height;
+}
+
+.sheet-fs-notes2 {
+    -moz-transition: visibility 0s linear 1ms;
+}
+
 .sheet-fs-notes {
     grid-column: 1 / -1;
     margin-left: 15px;
@@ -1136,6 +1226,7 @@ input.sheet-fs-revivals-number {
 .sheet-fs-table select:focus ~ .sheet-fs-notes,
 .sheet-fs-table select:focus-within ~ .sheet-fs-notes {
     visibility: visible;
+    display: initial;
     min-height: 4em;
     max-height: initial;
     align-self: stretch;
@@ -1157,6 +1248,7 @@ input.sheet-fs-revivals-number {
 .sheet-fs-notes .sheet-fs-auto-expand-textarea > textarea {
     resize: none;
 }
+
 .sheet-fs-notes:focus .sheet-fs-auto-expand-textarea > textarea,
 .sheet-fs-notes:focus-within .sheet-fs-auto-expand-textarea > textarea,
 .sheet-fs-notes:active .sheet-fs-auto-expand-textarea > textarea,
