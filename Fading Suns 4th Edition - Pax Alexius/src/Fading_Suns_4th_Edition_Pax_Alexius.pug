@@ -104,8 +104,8 @@ mixin label(i18n)
 mixin span(data)
     span(name=`attr_${attr_name}` title=`\${${attr_name}}`)&attributes(attributes)
 
-mixin numeric_input(attr_name, default_value, min_value=false)
-    input(name=`attr_${attr_name}` type='number' title=`\${${attr_name}}` + (default_value!==false ? `. Default: ${default_value}.` : '') value=default_value min=min_value)&attributes(attributes)
+mixin numeric_input(attr_name, default_value, min_value=false, title_i18n=false)
+    input(name=`attr_${attr_name}` type='number' data-i18n-vars=`\${${attr_name}}|${default_value}` data-i18n-title=(title_i18n ? title_i18n : (default_value ? 'numeric_input_title_default' : false)) title=((title_i18n || default_value) ? false : `\${${attr_name}}` ) value=default_value min=min_value)&attributes(attributes)
 
 mixin text_input(attr_name)
     input(name=`attr_${attr_name}` type='text' title=`\${${attr_name}}`)&attributes(attributes)
@@ -123,7 +123,7 @@ mixin characteristic(name)
         button.fs-d20(type='roll' name=`roll_${name}` value=`&{template:fs-GoalRoll} {{characterName=@{character_name}}} {{characteristicName-i18n=^{${name}}}} {{bonus_penalty=[[?{@{goal_bonus_penalty_rollquery_i18n}}]]}} {{goal=[[@{${name}}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]]]]}} {{roll=[[1d20cs[[{@{${name}}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]],19}kl1]]cf20]]}}`)
         label.fs-characteristic-label
             span(data-i18n=`${name}`)
-        +numeric_input(name, 3)
+        +numeric_input(name, 3, 0)
 
 mixin skill(name, value)
     .fs-skill(data-i18n-list-item=name)
@@ -141,7 +141,7 @@ mixin skill(name, value)
                                 label(data-i18n=`${characteristicName}`) #{characteristicName}
             label.fs-skill-label
                 span(data-i18n=`${name}`) #{name}
-        +numeric_input(name, value)
+        +numeric_input(name, value, 0, (value==0 ? 'restricted_skill_title' : 'numeric_input_title_default'))
 
 // CHARACTER SHEET LAYOUT - START
 
@@ -155,22 +155,22 @@ mixin skill(name, value)
 
         .fs-baseinfo
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='name')
                 .fs-name-grid
+                    label.fs-uppercase-header(data-i18n='name')
                     +text_input('character_name')(class ='fs-name')
                     label.fs-planet(data-i18n='planet')
                     +text_input('planet')(class ='fs-planet')
 
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='rank')
                 .fs-rank-grid
+                    label.fs-uppercase-header(data-i18n='rank')
                     +text_input('rank')(class ='fs-rank')
                     label.fs-birthdate(data-i18n='birthdate')
                     +text_input('birthdate')(class ='fs-birthdate')
 
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='species')
                 .fs-species-grid
+                    label.fs-uppercase-header(data-i18n='species')
                     +text_input('species')(class ='fs-species')
                     label.fs-size(data-i18n='size')
                     +numeric_input('size', false, 0)(class ='fs-size')
@@ -179,16 +179,16 @@ mixin skill(name, value)
 
         .fs-lifepath
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='class')
                 .fs-class-grid
+                    label.fs-uppercase-header(data-i18n='class')
                     +text_input('class_1')(class ='fs-class1')
                     +text_input('class_2')(class ='fs-class2')
                     label.fs-level(data-i18n='level') Level
                     +numeric_input('level', 1, 1)(class='fs-level')
 
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='faction')
                 .fs-faction-grid
+                    label.fs-uppercase-header(data-i18n='faction')
                     +text_input('faction')(class ='fs-faction')
                     label.fs-blessing(data-i18n='blessing')
                     +text_input('blessing')(class ='fs-blessing')
@@ -196,31 +196,30 @@ mixin skill(name, value)
                     +text_input('curse')(class ='fs-curse')
 
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='calling')
                 .fs-calling-grid
+                    label.fs-uppercase-header(data-i18n='calling')
                     +text_input('calling_1')
                     +text_input('calling_2')
                     +text_input('calling_3')
 
         .fs-traits
-            .fs-sheet-section.fs-skills-header
-                label.fs-uppercase-header(data-i18n='skills')
+            .fs-sheet-section
+                .fs-skills-grid(data-i18n-list="skills_list")
+                    label.fs-uppercase-header(data-i18n='skills')
+                    each skill in skills
+                        +skill(skill.name, skill.default)
 
-            .fs-skills(data-i18n-list="skills_list")
-                each skill in skills
-                    +skill(skill.name, skill.default)
-
-            .fs-characteristics
+            .fs-characteristics-grid
                 each charac_cat in characteristics
                     .fs-sheet-section
-                        label.fs-uppercase-header(data-i18n=charac_cat.category)
                         .fs-characteristic-cat-grid
+                            label.fs-uppercase-header(data-i18n=charac_cat.category)
                             each charac_name in charac_cat.list
                                 +characteristic(charac_name)
 
         .fs-sheet-section
-            label.fs-uppercase-header(data-i18n='occult')
-            .fs-occult
+            .fs-occult-grid
+                label.fs-uppercase-header(data-i18n='occult')
                 div
                     +label('psi')(class='fs-occult-left')
                     +numeric_input('psi', false, 0)
@@ -239,8 +238,8 @@ mixin skill(name, value)
 
         .fs-defenses
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='resistances')
                 .fs-resistances-grid
+                    label.fs-uppercase-header(data-i18n='resistances')
                     each charac_cat in characteristics
                         label(data-i18n=charac_cat.category)
                         +numeric_input(`${charac_cat.category}_resistance`, 0, 0)
@@ -252,31 +251,15 @@ mixin skill(name, value)
                         label.fs-uppercase-header(data-i18n='armor')
                         +text_input('armor_name')
                         +numeric_input('armor_resistance', 0, 0)
-                    //.fs-armor-and-e-shield-grid-row
-                        label.fs-uppercase-header(data-i18n='armor')
-                        +text_input('armor_name')
                     .fs-armor-and-e-shield-grid-row.fs-armor-props
                         span
                         each armor_proofing_type in armor_proofing_types
                             +numeric_input(`armor_vs_${armor_proofing_type}`, 0, 0)(hidden=true)
                             label
                                 +checkbox(`${armor_proofing_type}proof`)
-                                div
-                                    span(data-i18n=`${armor_proofing_type}_s` title=`\${${armor_proofing_type}proof}.\nIf ${armor_proofing_type}proof, the armor provides full resistance against ${armor_proofing_type} damage,\notherwise only half (rounded down).`)
+                                div(data-i18n-vars=`\${${armor_proofing_type}proof}` data-i18n-title='armor_proofing_title')
+                                    span(data-i18n=`${armor_proofing_type}_s`)
                                     span(name=`attr_armor_vs_${armor_proofing_type}`)
-                    //.fs-armor-and-e-shield-grid-row.fs-armor-props
-                        span
-                        each armor_proofing_type in armor_proofing_types
-                            label
-                                +checkbox(`${armor_proofing_type}proof`)
-                                div
-                                    +span(`${armor_proofing_type}_s`)(title=`\${${armor_proofing_type}proof}.\nIf ${armor_proofing_type}proof, the armor provides full resistance against ${armor_proofing_type} damage,\notherwise only half (rounded down).`)
-                    //.fs-armor-and-e-shield-grid-row.fs-armor-props
-                        span
-                        each armor_proofing_type in armor_proofing_types
-                            +label(`${armor_proofing_type}_s`)
-                                +checkbox(`${armor_proofing_type}proof`)
-                            +numeric_input(`armor_vs_${armor_proofing_type}`)(data-i18n-placeholder=`${armor_proofing_type}_s`)
                     .fs-armor-and-e-shield-grid-row
                         label.fs-uppercase-header(data-i18n='e_shield')
                         +text_input('shield_name')
@@ -351,7 +334,7 @@ mixin skill(name, value)
                                         optgroup(data-i18n-label=state_cat.category)
                                         each state_name in state_cat.list
                                             option(value=state_name data-i18n=state_name data-i18n-list-item=state_name)
-                                +numeric_input('state_resistance', 0, 0)(class='fs-table-cell')
+                                +numeric_input('state_resistance', false, false, 'state_resistance_info')(class='fs-table-cell')
 
                 .fs-sheet-section-frame
                     label.fs-uppercase-header(data-i18n='vp_bank')
@@ -499,7 +482,7 @@ mixin skill(name, value)
             .fs-w100.fs-supertall-textarea.fs-textarea-reladiv
                 .fs-auto-expand-textarea
                     span(name='attr_last_notes')
-                    textarea(title='@{last_notes}' type='text' name='attr_last_notes' data-i18n-placeholder='notes' placeholder='Notes' spellcheck='false')
+                    textarea(title='@{last_notes}' type='text' name='attr_last_notes' data-i18n-placeholder='notes' spellcheck='false')
 
         .fs-footer
 
@@ -511,7 +494,7 @@ include roll-templates.html
 
 // SHEET WORKERS - START
 script(type='text/worker').
-    // You may temporarily remove the (type='text/worker') from the live above to get syntax highlighting in vscode
+    // You may temporarily remove the (type='text/worker') part from the live above to get syntax highlighting in vscode
 
     const characteristic_names = !{JSON.stringify(characteristics)}.flatMap(x => x.list);
     const skill_names = !{JSON.stringify(skills)}.flatMap(x => x.name);
@@ -576,14 +559,11 @@ script(type='text/worker').
 
                 // insert version updates here
                 if (values.sheet_version == "1.0.0") {
-                    // migrationg of size is going to be automatic if the player entered a numeric
-
-                    // migrate armor_vs_* numbers to armor_*proof booleans could be useful. But probably best if left for the player to figure out
-                    // add an announcement at the top?
+                    // no need for any attribute migrations between 1.0.0 to 1.1.0
                 }
             }
 
-            const latest_version = "1.0.1";
+            const latest_version = "1.1.0";
             
             if (values.sheet_version != latest_version) {
                 setAttrs({ sheet_version: latest_version });

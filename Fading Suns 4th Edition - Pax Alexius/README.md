@@ -1,14 +1,14 @@
 # Release notes
 
-## 1.0.1
+## 1.1.0
 - Species size box converted to numeric input from text input
-- Armor *proof properties converted to toggle buttons from numeric inputs
-- Fixed table notes textareas not scaling properly
-- Fixed table notes textareas resize controls interfering with list edit buttons
+- Armor resistances against specific damage types (blaster, flame, ..) are now automatically determined
+- Fixed textareas not scaling properly with content
+- Fixed textareas resize controls interfering with table edit buttons
 - Renamed "Goal +/-" roll query to "Additional Goal +/-" on action rolls, to indicate that this bonus/penalty applies on top of the one arleady listed in the table
-- Fixed README dead link in the sheet description
+- Added ability to order skills & states alphabetically for non-English translations
 - Removed unused translation keys
-- Added ability to order skills & states differently between translations (i.e. alphabetically)
+- Fixed README dead link in the sheet description
 
 ## 1.0.0
 - First publicly available version of the sheet
@@ -16,11 +16,6 @@
 # TODO list
 
 ## Planned improvements
-
-- States
-    - section for them (CBM p37)
-        - include their descriptions as infoboxes (title=??)
-        - include box for the resistance
 
 - Characteristics
     - [ TBC ] Box next to them to log a temporary bonus/malus?
@@ -40,9 +35,11 @@
 
 - Perks. Above the description, add a header space for Perk "category" (e.g. Calling), "type" (e.g. Privilege) & "precondition"
 
-
-
 # Nice-to-have
+
+- States
+    - add their descriptions (title=??)
+
 - replace unstylable characteristic/skill selects with custom-made absolute-positioned list of action buttons?
 
 - for Roll20 pro users, API for:
