@@ -281,8 +281,8 @@
 								<td colspan="2" style="width:11%;"><input type="text" class="sheet-input-small" name="attr_AttackDmgBonus" title="@{repeating_weapon_$X_AttackDmgBonus}" value="0" /><br>DMG Bonus</td><input type="hidden" name="attr_DmgBonus" value="0" />
 								<td><b title="Include '/w gm to-hit AC table or THACO'?">/w gm?</b><br>
 									<select name="attr_whisper_to-hit" style="width:100%; height:2em;">
-										<option value="&#x00A;/w gm &amp;{template:attacks} {{name=@{character_name}}} {{subtag=To Hit Armor Class}} {{ToHitAC-10to0=[[ @{THAC-10} ]]|[[ @{THAC-9} ]]|[[ @{THAC-8} ]]|[[ @{THAC-7} ]]|[[ @{THAC-6} ]]|[[ @{THAC-5} ]]|[[ @{THAC-4} ]]|[[ @{THAC-3} ]]|[[ @{THAC-2} ]]|[[ @{THAC-1} ]]|[[ @{THAC0} ]]}} {{ToHitAC1to10=[[ @{THAC0} ]]|[[ @{THAC1} ]]|[[ @{THAC2} ]]|[[ @{THAC3} ]]|[[ @{THAC4} ]]|[[ @{THAC5} ]]|[[ @{THAC6} ]]|[[ @{THAC7} ]]|[[ @{THAC8} ]]|[[ @{THAC9} ]]|[[ @{THAC10} ]] }}" selected="">Table</option>
-										<option value="&#x00A;/w gm &amp;{template:attacks} {{name=@{character_name}}} {{subtag=THACO}} {{ToHitAC-10to0=@{THAC0-10}|@{THAC0-9}|@{THAC0-8}|@{THAC0-7}|@{THAC0-6}|@{THAC0-5}|@{THAC0-4}|@{THAC0-3}|@{THAC0-2}|@{THAC0-1}|**@{THAC00}**}} {{ToHitAC1to10=**@{THAC00}**|@{THAC01}|@{THAC02}|@{THAC03}|@{THAC04}|@{THAC05}|@{THAC06}|@{THAC07}|@{THAC08}|@{THAC09}|@{THAC010} }}">THACO</option>
+										<option value="&#x00A;/w gm &{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=To Hit Armor Class}} {{ToHitAC-10to0=[[ @{THAC-10} ]]|[[ @{THAC-9} ]]|[[ @{THAC-8} ]]|[[ @{THAC-7} ]]|[[ @{THAC-6} ]]|[[ @{THAC-5} ]]|[[ @{THAC-4} ]]|[[ @{THAC-3} ]]|[[ @{THAC-2} ]]|[[ @{THAC-1} ]]|[[ @{THAC0} ]]}} {{ToHitAC1to10=[[ @{THAC0} ]]|[[ @{THAC1} ]]|[[ @{THAC2} ]]|[[ @{THAC3} ]]|[[ @{THAC4} ]]|[[ @{THAC5} ]]|[[ @{THAC6} ]]|[[ @{THAC7} ]]|[[ @{THAC8} ]]|[[ @{THAC9} ]]|[[ @{THAC10} ]] }}" selected="">Table</option>
+										<option value="&#x00A;/w gm &{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=THACO}} {{ToHitAC-10to0=@{THAC0-10}|@{THAC0-9}|@{THAC0-8}|@{THAC0-7}|@{THAC0-6}|@{THAC0-5}|@{THAC0-4}|@{THAC0-3}|@{THAC0-2}|@{THAC0-1}|**@{THAC00}**}} {{ToHitAC1to10=**@{THAC00}**|@{THAC01}|@{THAC02}|@{THAC03}|@{THAC04}|@{THAC05}|@{THAC06}|@{THAC07}|@{THAC08}|@{THAC09}|@{THAC010} }}">THACO</option>
 										<option value="&nbsp;">no</option>
 									</select>
 								</td>
@@ -1611,6 +1611,54 @@
 				});
 			});
 		},
+//add {{color=@{color}}} to repeating section macro-text
+		colorUpdate = function() {
+		//update repeating_weapon_
+			var updateWeapon = {}, attrsWeapon = [];
+			getSectionIDs("repeating_weapon", function(idarray) {
+				_.each(idarray, function(itemid) {
+					attrsWeapon.push("repeating_weapon_" + itemid + "_macro-text");
+				});
+				getAttrs(attrsWeapon, function(v) {
+					_.each(idarray, function(id) {
+						updateWeapon["repeating_weapon_" + id + "_macro-text"] = v["repeating_weapon_" + id + "_macro-text"].replace('&{template:attacks} {{name=@{character_name}}}',
+						'&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}}');
+					});
+					console.log("colorUpdate check completed on: " +attrsWeapon);
+					setAttrs(updateWeapon,{silent:true});
+				});
+			});
+		//update repeating_ability_
+			var updateAbility = {}, attrsAbility = [];
+			getSectionIDs("repeating_ability", function(idarray) {
+				_.each(idarray, function(itemid) {
+					attrsAbility.push("repeating_ability_" + itemid + "_macro-text");
+				});
+				getAttrs(attrsAbility, function(v) {
+					_.each(idarray, function(id) {
+						updateAbility["repeating_ability_" + id + "_macro-text"] = v["repeating_ability_" + id + "_macro-text"].replace('&{template:general} {{name=@{character_name}}}',
+						'&{template:general} {{color=@{color_option}}} {{name=@{character_name}}}');
+					});
+					console.log("colorUpdate check completed on: " +attrsAbility);
+					setAttrs(updateAbility,{silent:true});
+				});
+			});
+		//update repeating_spells_
+			var updateSpells = {}, attrsSpells = [];
+			getSectionIDs("repeating_spells", function(idarray) {
+				_.each(idarray, function(itemid) {
+					attrsSpells.push("repeating_spells_" + itemid + "_macro-text");
+				});
+				getAttrs(attrsSpells, function(v) {
+					_.each(idarray, function(id) {
+						updateSpells["repeating_spells_" + id + "_macro-text"] = v["repeating_spells_" + id + "_macro-text"].replace('&{template:general} {{name=@{character_name}}}',
+						'&{template:general} {{color=@{color_option}}} {{name=@{character_name}}}');
+					});
+					console.log("colorUpdate check completed on: " +attrsSpells);
+					setAttrs(updateSpells,{silent:true});
+				});
+			});
+		},
 	
 	/* recalculateSheet */
 		recalculateSheet = function(oldversion) {
@@ -1623,6 +1671,7 @@
 			}
 			if (oldversion < 1.5) {
 				nwpMacroUpdate();
+				colorUpdate();
 			}
 		},
 		
@@ -1666,7 +1715,8 @@
 			checkForUpdate:checkForUpdate,
 			dmgSwap:dmgSwap,
 			maxSwap:maxSwap,
-			nwpMacroUpdate:nwpMacroUpdate
+			nwpMacroUpdate:nwpMacroUpdate,
+			colorUpdate:colorUpdate
 		};
 	}());
 	
