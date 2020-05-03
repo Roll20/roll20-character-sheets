@@ -1,6 +1,6 @@
 <div class="sheet-useBackground">
-	<input type="radio" class="sheet-useBackground" style="display:none;" name="attr_background" value="1" checked />
-	<input type="radio" class="sheet-useBackground" style="display:none;" name="attr_background" value="2" />
+	<input type="checkbox" class="sheet-useBackground" style="display:none;" name="attr_background" value="1" checked />
+	<input type="checkbox" class="sheet-useBackground" style="display:none;" name="attr_background" value="2" />
 	<div class="sheet-background">
 		<div class="sheet-wrapper">
 			<div class="sheet-center" style="padding-top:10px;"><img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ADnD_1E/images/logo.png" /></div>
@@ -103,6 +103,11 @@
 									<td><input type="text" class="sheet-input-medium" name="attr_Hair" title="@{Hair}" placeholder="Color" /></td>
 								</tr>
 							</table>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" style="white-space: nowrap;">Languages:
+							<input type="text" name="attr_languages" placeholder="languages known" style="width: 87%;">
 						</td>
 					</tr>
 				</table>
@@ -499,6 +504,12 @@
 											<td><input type="text" class="sheet-input-medium" name="attr_max_load" title="@{max_load} Minimum amount for a max/encumbered load(defaults to 'Very heavy load' + 1)." value="(@{very_heavy_load}+1)" disabled /><b class="sheet-text-large">+</b><br>Max&nbsp;
 											<input type="checkbox" name="attr_current_encumbrance" value="3" readonly="readonly" /></td>
 										</tr>
+										<tr>
+											<td colspan="5">
+												Strength Encumbrance Bonus:
+												<input class="sheet-input-small" name="attr_EncumbranceBonus" title="@{EncumbranceBonus}" value="0" readonly="">&nbsp;&nbsp;<b>hint:</b> increases carrying capacity limits.
+											</td>
+										</tr>
 									</table>
 								</td>
 								<td style="width:10%;" class="sheet-right">Equipment:</td>
@@ -517,7 +528,7 @@
 							</tr>
 							<tr>
 								<td class="sheet-right">Coins:</td>
-								<td><input type="text" style="width:100%;" name="attr_total_coin_weight" title="@{total_coin_weight} 10 coins=1lbs" value="0" readonly="readonly" /></td>
+								<td><input type="text" style="width:100%;" name="attr_total_coin_weight" title="@{total_coin_weight}" value="0" readonly="readonly" /></td>
 								<td class="sheet-center"><b>&nbsp;-&nbsp;-&nbsp;-&nbsp;</b></td>	
 							</tr>
 							<tr>
@@ -586,14 +597,20 @@
 											<option value="@{Constitution}">Constitution</option>
 											<option value="@{Intelligence}">Intelligence</option>
 											<option value="@{Wisdom}">Wisdom</option>
-											<option value="@{Charisma}">Strength</option>
-										</select>										
+											<option value="@{Charisma}">Charisma</option>
+										</select>
 									</td>
-									<td><textarea name="attr_short_description" title="@{repeating_nonweaponproficiencies_$X_short_description}" class="sheet-weapons" style="width:100%;" placeholder="Short Description"></textarea><br>Short Description</td>
-									<td><input type="text" name="attr_rSlots" title="@{repeating_nonweaponproficiencies_$X_current}" value="0" class="sheet-input-small" /><br>Slots</td>
-									<td>/<br>/</td>
-									<td><input type="text" name="attr_rModifier" title="@{repeating_nonweaponproficiencies_$X_rmodifier}" value="0" class="sheet-input-small" /><br>Modifier</td>
-									<td><textarea name="attr_macro-text" title="@{repeating_nonweaponproficiencies_$X_macro-text}" class="sheet-macro-text" style="width:90%; height:1em;">&{template:general} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{=@{short_description}}}{{Success Amount=[[((@{rAttribute})+(@{rSlots}-1)-1d20)cs&gt;1cf&lt;-1]]}}</textarea><br>Macro-Text</td>
+									<td><textarea name="attr_short_description" title="@{repeating_nonweaponproficiencies_$X_short_description}" class="sheet-weapons" style="width:90%;" placeholder="Short Description"></textarea><br>Short Description</td>
+									<td><input type="number" name="attr_rSlots" title="@{repeating_nonweaponproficiencies_$X_rSlots}" value="0" class="sheet-input-small" style="margin-bottom: 6px;"/><br>Slots</td>
+									<td>/<br><span style="opacity: 0;margin: 2px;">/</span></td>
+									<td><input type="number" name="attr_rModifier" title="@{repeating_nonweaponproficiencies_$X_rmodifier}" value="0" class="sheet-input-small" style="margin-bottom: 6px;"/><br>Modifier</td>
+									<td>
+										<!-- OLDER MACRO
+										<textarea name="attr_macro-text" title="@{repeating_nonweaponproficiencies_$X_macro-text}" class="sheet-macro-text" style="width:90%; height:1em;">&{template:general} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{=@{short_description}}}{{Success Amount=[[((@{rAttribute})+(@{rSlots}-1)-1d20)cs&gt;1cf&lt;-1]]}}</textarea>
+										-->
+										<textarea name="attr_macro-text" title="@{repeating_nonweaponproficiencies_$X_macro-text}" class="sheet-macro-text" style="width:90%; height:1em;">&{template:general} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{Proficiency Check=[[ 1d20cs<[[ @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ]] [attr + mod]cf>[[ { ( @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ),19}kl1 ]] ]] vs [[ @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ]]}} {{freetext=@{short_description}}}</textarea>
+										<br>Macro-Text
+									</td>
 								</tr>
 							</table>
 							<b style="margin-left:20px;">Non Weapon Proficiency Description</b>
@@ -711,7 +728,7 @@
 				<div class="sheet-table sheet-text-small">
 					<div class="sheet-table-row">
 						<span class="sheet-data sheet-center">Original Author: Adam Ness | Contributions by: Vince, &amp; Roll20 Community. | sheet ver. <input name="attr_sheet_version" type="text" value="0" class="sheet-version" readonly />
-							&nbsp;<i>4.11.20</i>&nbsp;
+							&nbsp;<i>5.2.20</i>&nbsp;
 							Recalc: <input name="attr_recalc1" type="checkbox" title="RECALC" style="width: 1.25em;">
 						</span>
 					</div>
@@ -721,13 +738,12 @@
 				</div>
 				<div class="sheet-options sheet-text-small">
 					Background:
-					<input type="checkbox" class="sheet-useBackground" name="attr_background" value="1" title="No background image." checked="checked" />Off
-					<input type="checkbox" class="sheet-useBackground" name="attr_background" value="2" title="Enable background image." />On
-					</div>
+					<input type="radio" class="sheet-useBackground" name="attr_background" value="1" title="No background image." checked />Off
+					<input type="radio" class="sheet-useBackground" name="attr_background" value="2" title="Enable background image." />On
 				</div>
-			</div>			
-		
-		</div>		
+			</div>
+
+		</div>
 	</div>
 </div>
 
@@ -769,10 +785,11 @@
 		<table class="sheet-rolltemplate-general  {{#color}}color-{{color}}{{/color}}">
 			{{#name}}<tr><th colspan="2">{{name}}</th></tr>{{/name}}
 			{{#subtag}}<tr><td colspan="2" class="sheet-subheader">{{subtag}}</td></tr>{{/subtag}}
+			{{#freetext}}<tr><td colspan="2" class="sheet-text">{{freetext}}</td></tr>{{/freetext}}
 
-			{{#allprops() name subtag color}}
+			{{#allprops() name subtag freetext color}}
 			<tr><td style="vertical-align:middle;"><span class="sheet-tcat">{{key}}</span></td><td>{{value}}</td></tr>
-			{{/allprops() name subtag color}}
+			{{/allprops() name subtag freetext color}}
 		</table>
 	</rolltemplate>
 </div>
@@ -1481,27 +1498,27 @@
 			.execute();
 	});
 	
-	on('change:pp change:gp change:ep change:sp change:cp change:armor_weight change:armor_cost', function(){
+	on('sheet:opened change:pp change:gp change:ep change:sp change:cp change:armor_weight change:armor_cost', function(){
 		getAttrs(['pp','gp','ep','sp','cp','armor_weight','armor_cost'], function(values){
 		  setAttrs({
-			total_coin_weight: Math.round(((parseFloat(values.pp) + parseFloat(values.gp) + parseFloat(values.ep) + parseFloat(values.sp) + parseFloat(values.cp)))/10),
+			total_coin_weight: Math.round(((parseFloat(values.pp) + parseFloat(values.gp) + parseFloat(values.ep) + parseFloat(values.sp) + parseFloat(values.cp)))),
 			total_armor_weight: (parseFloat(values.armor_weight)),
 			total_armor_cost: (parseFloat(values["armor_cost"],10)).toFixed(2)
 		  });
 	   });
 	});
 	
-	on('change:total_armor_weight change:total_weapon_weight change:total_coin_weight change:total_equipment_weight change:repeating_equipment remove:repeating_equipment change:repeating_weapon remove:repeating_weapon change:pp change:gp change:ep change:sp change:cp change:armor_weight change:armor_cost change:total_armor_cost change:total_weapon_cost change:total_equipment_cost', function(){
+	on('sheet:opened change:total_armor_weight change:total_weapon_weight change:total_coin_weight change:total_equipment_weight change:repeating_equipment remove:repeating_equipment change:repeating_weapon remove:repeating_weapon change:pp change:gp change:ep change:sp change:cp change:armor_weight change:armor_cost change:total_armor_cost change:total_weapon_cost change:total_equipment_cost', function(){
 		getAttrs(['total_armor_weight','total_weapon_weight','total_coin_weight','total_equipment_weight','total_armor_cost','total_weapon_cost','total_equipment_cost'], function(values){
 		  setAttrs({
-			total_weight: (parseFloat(values.total_armor_weight) + parseFloat(values.total_weapon_weight) + parseFloat(values.total_coin_weight) + parseFloat(values.total_equipment_weight)),
+			total_weight: Math.round(parseFloat(values.total_armor_weight) + parseFloat(values.total_weapon_weight) + parseFloat(values.total_coin_weight) + parseFloat(values.total_equipment_weight)),
 			total_cost: (parseFloat(values["total_armor_cost"],10) + parseFloat(values["total_weapon_cost"],10) + parseFloat(values["total_equipment_cost"],10)).toFixed(2)
 		  });
 	   });
 	});
 	
 	/* check and set encumbrance */
-	on('change:normal_load change:heavy_load change:very_heavy_load change:max_load change:total_weight', function(){
+	on('sheet:opened change:normal_load change:heavy_load change:very_heavy_load change:max_load change:total_weight', function(){
 		getAttrs(['normal_load','heavy_load','very_heavy_load','max_load','total_weight'], function(values){
 		if(values.total_weight <= values.normal_load) {setAttrs({current_encumbrance:0}); console.log("===== Encumbrance is Normal =====");}
 		else if(values.total_weight > values.normal_load && values.total_weight <= values.heavy_load) {setAttrs({current_encumbrance:1}); console.log("===== Encumbrance is Heavy =====");}
@@ -1512,7 +1529,7 @@
 	
 	var Sheet = Sheet || (function() {
 	
-		var version = 1.4,
+		var version = 1.5,
 		Debug = false,
 	
 	// copy DmgBonus value to AttackDmgBonus
