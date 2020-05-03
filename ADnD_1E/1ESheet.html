@@ -1569,6 +1569,24 @@
 				});
 			});
 		},
+
+//replace default macro-text of non weapon proficiencies ONLY IF they haven't been edited
+		nwpMacroUpdate = function() {
+			var update = {}, attrs = [];
+			getSectionIDs("repeating_nonweaponproficiencies", function(idarray) {
+				_.each(idarray, function(itemid) {
+					attrs.push("repeating_nonweaponproficiencies_" + itemid + "_macro-text");
+				});
+				getAttrs(attrs, function(v) {
+					_.each(idarray, function(id) {
+						update["repeating_nonweaponproficiencies_" + id + "_macro-text"] = v["repeating_nonweaponproficiencies_" + id + "_macro-text"].replace('&{template:general} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{=@{short_description}}}{{Success Amount=[[((@{rAttribute})+(@{rSlots}-1)-1d20)cs>1cf<-1]]}}',
+						'&{template:general} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{Proficiency Check=[[ 1d20cs<[[ @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ]] [attr + mod]cf>[[ { ( @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ),19}kl1 ]] ]] vs [[ @{rAttribute} + (-1*(@{rmodifier} + ?{Modifier?|0})) ]]}} {{freetext=@{short_description}}}');
+					});
+					console.log("nwpMacroUpdate check completed on: " +attrs);
+					setAttrs(update,{silent:true});
+				});
+			});
+		},
 	
 	/* recalculateSheet */
 		recalculateSheet = function(oldversion) {
@@ -1578,6 +1596,9 @@
 			}
 			if (oldversion < 1.2) {
 				maxSwap();
+			}
+			if (oldversion < 1.5) {
+				nwpMacroUpdate();
 			}
 		},
 		
@@ -1609,7 +1630,7 @@
 					setAny=1;
 				}
 				if (setAny) {
-					 setAttrs( setter);
+					setAttrs( setter);
 				}
 				if (recalc) {
 					recalculateSheet(currVer);
@@ -1620,7 +1641,8 @@
 			version:version,
 			checkForUpdate:checkForUpdate,
 			dmgSwap:dmgSwap,
-			maxSwap:maxSwap
+			maxSwap:maxSwap,
+			nwpMacroUpdate:nwpMacroUpdate
 		};
 	}());
 	
