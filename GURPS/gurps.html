@@ -1,4 +1,25 @@
-﻿<div class="sheet-wrapper">
+﻿<script type="text/worker">
+	var styleCount = 5; // THIS NUMBER MUST BE EQUAL TO THE NUMBER OF COLOR SETTINGS
+	on("change:sheetstyle sheet:opened", function(event) {
+		var styleAttrs = {};
+
+		for(i = 0; i < styleCount; i++){
+			styleAttrs["styleset"+i]="off";
+		}
+		
+		getAttrs(["sheetstyle"] ,function(values) {
+			var on = values.sheetstyle;
+			styleAttrs["styleset"+on]="on";
+			setAttrs(styleAttrs);
+		});
+	});
+</script>
+<input type="checkbox" name="attr_styleset0" class="color-setting color-setting-0" ></input> <!-- Used to activate the color setting rule, add one to add a new style, mind the numbering-->
+<input type="checkbox" name="attr_styleset1" class="color-setting color-setting-1" ></input>
+<input type="checkbox" name="attr_styleset2" class="color-setting color-setting-2" ></input>
+<input type="checkbox" name="attr_styleset3" class="color-setting color-setting-3" ></input>
+<input type="checkbox" name="attr_styleset4" class="color-setting color-setting-4" ></input>
+<div class="sheet-wrapper">
 	<!-- HIDDEN FIELDS -->
 	<input type="hidden" name="attr_10" value="10" disabled="disabled" />
 	<input type="hidden" name="attr_VS" value="vs:" disabled="disabled" />
@@ -24,18 +45,16 @@
 			<div class="content">
 				<h4>GURPS Character Sheet Version: <input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" /></h4>
 				<ul>
-					<li>Changed width of Weapon and Damage Notes fields, under Melee and Raged Attacks, to be more readable – Cosmetic Only.</li>
+					<li><b>New Feature:</b> New option to select a style for the character sheet. Classic White, Green, Blue, Beige, and Gray. Contributed by Tame Flame (4822134).</li>
+					<li><b>Default Sheet Settings:</b> New option to select default sheet style.</li>
+					<li>Traits tab. Advantages, Perks, Quirks, Disadvantages, and Race table. If the Frequency of Appearance or Self-Control Number is from 3 to 18, show the die button.</li>
+					<li>Skills tab. Techniques (Revised) table. You can link a technigue to another technigue. Requested by Ian.</li>
+					<li>Combat tab. Active Defenses. Added Unarmed Parry. There are number of rules specific to unarmed parry. Added Rules as Written (RAW) for unarmed parry.</li>
 					<li>
-						General Tab. Removed checkbox for whispering Perception. Current default behavior for whisper is player and game master can see the roll. 
-						There's no method that only the GM sees the roll by the player.
+						<b>Important: </b> Combat tab. Active Defenses. The Rules as Written (RAW) for active defense success/fail notes are now hard-coded. 
+						This is necessary because notes saved to a field can't fixed or added to. The update improves the display of notes in the chat area.
 					</li>
-					<li>
-						Combat Tab. Updated Active Defenses to have the same layout as Skills and Spells.
-						Active Defenses will be prepopulated with success/fail notes based on the Defense Type.
-					</li>
-					<li>
-						Options Tab. There are text boxes for editing the default success/fail notes for Active Defenses.
-					</li>
+					<li>New Sheet Options: Active Defenses. Show RAW Notes. If checked, success/fail notes for active defenses will display on roll template.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset">View All Updates</button>
@@ -779,7 +798,7 @@
 										<tbody>
 											<tr>
 												<td class="label">Reeling: If your HP is less than</td>
-												<td><input type="text" name="attr_hp_reeling" value="[[ceil((@{hit_points|max}) / 3)]]" disabled="disabled"></td>
+												<td><input type="text" name="attr_hp_reeling" value="4" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -792,7 +811,7 @@
 											</tr>
 											<tr>
 												<td class="label">Verge of Collapse</td>
-												<td><input type="text" value="At 0 HP or less" readonly="readonly" ></td>
+												<td><input type="text" value="At 0 HP or less" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -805,7 +824,7 @@
 											</tr>
 											<tr>
 												<td class="label">Verge of Death</td>
-												<td><input type="text" name="attr_hp_verge" value="[[(@{hit_points|max}) * -1]]" disabled="disabled"></td>
+												<td><input type="text" name="attr_hp_verge" value="-10" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -819,7 +838,7 @@
 											</tr>
 											<tr>
 												<td class="label">Death</td>
-												<td><input type="text" name="attr_hp_death" value="[[(@{hit_points|max}) * -5]]" disabled="disabled"></td>
+												<td><input type="text" name="attr_hp_death" value="-50" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -828,7 +847,7 @@
 											</tr>
 											<tr>
 												<td class="label">Total Destruction</td>
-												<td><input type="text" name="attr_hp_destruction" value="[[(@{hit_points|max}) * -10]]" disabled="disabled"></td>
+												<td><input type="text" name="attr_hp_destruction" value="-100" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -891,7 +910,7 @@
 										<tbody>
 											<tr>
 												<td class="label">Tired: If your FP is less than</td>
-												<td><input type="text" name="attr_fp_tired" value="[[ceil((@{fatigue_points|max}) / 3)]]" disabled="disabled"></td>
+												<td><input type="text" name="attr_fp_tired" value="4" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -923,7 +942,7 @@
 											</tr>
 											<tr>
 												<td class="label">Unconscious: When your FP is</td>
-												<td><input type="text" name="attr_fp_unconscious" value="[[-(@{fatigue_points|max})]]" disabled="disabled"></td>
+												<td><input type="text" name="attr_fp_unconscious" value="-10" readonly="readonly"></td>
 											</tr>
 											<tr>
 												<td colspan="2">
@@ -1549,10 +1568,10 @@
 									<input type="number" name="attr_enhanced_air_move" value="0" readonly="readonly" title="Macro name: enhanced_air_move" />
 								</div>
 								<div class="cell col2">
-									<input type="number" name="attr_enhanced_air_level" value="0" step=".5" class="editable" title="Macro name: enhanced_air_level" />
+									<input type="number" name="attr_enhanced_air_level" value="0" step=".5" min="0" class="editable" title="Macro name: enhanced_air_level" />
 								</div>
 								<div class="cell col3">
-									<input type="number" name="attr_enhanced_air_move_points" value="0" step="10" class="editable" title="Macro name: enhanced_air_move_points" />
+									<input type="number" name="attr_enhanced_air_move_points" value="0" step="10" min="0" class="editable" title="Macro name: enhanced_air_move_points" />
 								</div>
 							</div> <!-- .row -->
 						</div> <!-- .container-swimming -->
@@ -1613,10 +1632,10 @@
 									<input type="number" name="attr_enhanced_water_move" value="0" readonly="readonly" title="Macro name: enhanced_water_move" />
 								</div>
 								<div class="cell col2">
-									<input type="number" name="attr_enhanced_water_level" value="0" step=".5" class="editable" title="Macro name: enhanced_water_level" />
+									<input type="number" name="attr_enhanced_water_level" value="0" step=".5" min="0" class="editable" title="Macro name: enhanced_water_level" />
 								</div>
 								<div class="cell col3">
-									<input type="number" name="attr_enhanced_water_move_points" value="0" step="10" class="editable" title="Macro name: enhanced_water_move_points" />
+									<input type="number" name="attr_enhanced_water_move_points" value="0" step="10" min="0" class="editable" title="Macro name: enhanced_water_move_points" />
 								</div>
 							</div> <!-- .row -->
 						</div> <!-- .container-swimming -->
@@ -1676,10 +1695,10 @@
 									<input type="number" name="attr_super_jump_level" value="0" readonly="readonly" title="Macro name: super_jump_level" />
 								</div>
 								<div class="cell col2">
-									<input type="number" name="attr_super_jump_entered_level" value="0" step="1" class="editable" title="Macro name: super_jump_entered_level" />
+									<input type="number" name="attr_super_jump_entered_level" value="0" step="1" min="0" class="editable" title="Macro name: super_jump_entered_level" />
 								</div>
 								<div class="cell col3">
-									<input type="number" name="attr_super_jump_points" value="0" step="10" class="editable" title="Macro name: super_jump_points" />
+									<input type="number" name="attr_super_jump_points" value="0" step="10" min="0" class="editable" title="Macro name: super_jump_points" />
 								</div>
 							</div> <!-- .row -->
 							<div class="row row-basic-move">
@@ -2346,6 +2365,7 @@
 					<div class="sheet-cell sheet-col4">Ref</div>
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_traits">
+					<input type="hidden" name="attr_foa" />
 					<input class="sheet-toggle" type="checkbox" title="Click to show/hide more information." name="attr_trait_toggle_notes" />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
@@ -2353,7 +2373,7 @@
 							<input type="text" name="attr_name" title="Macro table name: repeating_traits. Field name: name" />
 						</div>
 						<div class="sheet-cell sheet-col1">
-							<input type="number" name="attr_foa" title="Macro table name: repeating_traits. Field name: foa" />
+							<input type="number" name="attr_foa" min="3" max="18" step="1" title="Macro table name: repeating_traits. Field name: foa" />
 						</div>
 						<div class="sheet-cell sheet-col2">
 							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Frequency of Appearance Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{foa} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsAFOA" />
@@ -2382,10 +2402,10 @@
 		<!-- _____ _____ PERKS BOX _____ _____ -->
 		<!-- this box uses the identifier "traits" for backwards compatibility -->
 
-		<div class="sheet-box sheet-traits">
+		<div class="sheet-box sheet-traits perks-disadvantages">
 
 			<!-- PERKS AREA -->
-			<div class="sheet-table half-size border">
+			<div class="sheet-table half-size border perks-area">
 
 				<div class="sheet-header">
 					<div class="sheet-cell sheet-col0">Perks</div>
@@ -2409,6 +2429,7 @@
 					<div class="sheet-cell sheet-col4">Ref</div>
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_perks">
+					<input type="hidden" name="attr_foa" />
 					<input class="sheet-toggle" type="checkbox" title="Click to show/hide more information." name="attr_perks_toggle_notes" />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
@@ -2416,7 +2437,7 @@
 							<input type="text" name="attr_name" title="Macro table name: repeating_perks. Field name: name" />
 						</div>
 						<div class="sheet-cell sheet-col1">
-							<input type="number" name="attr_foa" title="Macro table name: repeating_perks. Field name: foa" />
+							<input type="number" min="3" max="18" step="1" name="attr_foa" title="Macro table name: repeating_perks. Field name: foa" />
 						</div>
 						<div class="sheet-cell sheet-col2">
 							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Frequency of Appearance Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{foa} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsAFOA" />
@@ -2442,7 +2463,7 @@
 			<!-- END PERKS AREA -->
 			
 			<!-- QUIRKS AREA -->
-			<div class="sheet-table half-size">
+			<div class="sheet-table half-size quirks-area">
 				<div class="sheet-header">
 					<div class="sheet-cell sheet-col0">Quirks</div>
 					<div class="sheet-cell sheet-col1">
@@ -2467,6 +2488,7 @@
 					<div class="sheet-cell sheet-col4">Ref</div>	
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_quirks">
+					<input type="hidden" name="attr_control_rating" />
 					<input class="sheet-toggle" type="checkbox" title="Click to show/hide more information." name="attr_quirks_toggle_notes" />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
@@ -2504,7 +2526,7 @@
 
 		<!-- _____ _____ DISADVANTAGES BOX _____ _____ -->
 
-		<div class="sheet-box sheet-disadvantages">
+		<div class="box disadvantages perks-disadvantages">
 			<div class="sheet-table">
 				<div class="sheet-header">
 					<div class="sheet-cell sheet-col0">Disadvantages</div>
@@ -2530,6 +2552,7 @@
 					<div class="sheet-cell sheet-col4">Ref</div>	
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_disadvantages">
+					<input type="hidden" name="attr_control_rating" />
 					<input class="sheet-toggle" type="checkbox" title="Click to show/hide more information." name="attr_disadvantage_toggle_notes" />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
@@ -2602,6 +2625,7 @@
 					</div>
 				</div> <!-- .sheet-header -->
 				<fieldset class="repeating_racial">
+					<input type="hidden" name="attr_control_rating" />
 					<input class="sheet-toggle" type="checkbox" title="Click to show/hide more information." name="attr_racial_toggle_notes" />
 					<span class="sheet-checkbox"></span>
 					<div class="sheet-row sheet-row-stats">
@@ -2786,8 +2810,8 @@
 							<option value="-4">Unattractive (-1)</option>
 							<option value="0" selected="selected">Average</option>
 							<option value="4">Attractive (+1)</option>
-							<option value="12">Handsome (+4/2)</option>
-							<option value="16">Very Handsome (+6/2)</option>
+							<option value="12">Handsome/Beautiful (+4/2)</option>
+							<option value="16">Very Handsome/Beautiful (+6/2)</option>
 							<option value="20">Transcendent (+8/2)</option>
 						</select>
 					    <textarea name="attr_general_appearance" title="Macro name: appearance"></textarea>
@@ -3126,7 +3150,7 @@
 
 		<!-- _____ _____ TECHNIQUES BOX _____ _____ -->
 
-		<input type="hidden" class="box-techniques-old" name="attr_show_old_techniques" value="1" />
+		<input type="hidden" class="box-techniques-old" name="attr_show_old_techniques" value="0" />
 		<div class="sheet-box sheet-techniques">
 			<div class="sheet-table">
 				<div class="sheet-header">
@@ -3346,7 +3370,8 @@
 							<div class="cell">
 								<select name="attr_technique_row_type">
 					                <option>Skill</option>
-					                <option>Spell</option>
+									<option>Spell</option>
+									<option>Technique</option>
 					            </select>
 					        </div>
     					    <div class="cell col-row-id label">
@@ -3689,7 +3714,7 @@
 					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight_dodge" />
 					<input class="toggle toggle-notes static-defense" type="checkbox" title="Click to show/hide more information." name="attr_defense_dodge_toggle_notes" />
 					<span class="checkbox static-defense"></span>	
-					<div class="row row-stats row-standard margin-left">
+					<div class="row row-stats row-standard static-defense-width">
 						<div class="cell col-dodge-label">Dodge</div>
 						<div class="cell col-dodge">
 							<input type="hidden" class="dodge-reduced-notes" name="attr_dodge_reduced_notes" value="0" />
@@ -3712,7 +3737,11 @@
 						<div class="cell col2"><input type="number" step="1" name="attr_ad_dodge_skill_mod" value="0" title="Macro name: ad_dodge_skill_mod" /></div>
 						<div class="cell col3"><input type="text" name="attr_ad_dodge_skill_final" value="@{current_dodge} + @{ad_dodge_skill_mod}" disabled="disabled" title="Macro name: ad_dodge_skill_final" /></div>
 						<div class="cell col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_show_notes}]]}} {{notes=@{defense_dodge_notes}}} {{customSuccessNote=@{defense_dodge_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_critical_success_note}}} {{customFailNote=@{defense_dodge_fail_note}}} {{customCriticalFailNote=@{defense_dodge_critical_fail_note}}}" name="roll_vsDodge" />
+							<input type="hidden" name="attr_raw_dodge_success_notes" />
+							<input type="hidden" name="attr_raw_dodge_critical_success_notes" />
+							<input type="hidden" name="attr_raw_dodge_fail_notes" />
+							<input type="hidden" name="attr_raw_dodge_critical_fail_notes" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_show_notes}]]}} {{notes=@{defense_dodge_notes}}} {{showRawDefenseNotes=[[@{show_raw_defense_notes}]]}} {{rawSuccessNote=@{raw_dodge_success_notes}}} {{rawCriticalSuccessNote=@{raw_dodge_critical_success_notes}}} {{rawFailNote=@{raw_dodge_fail_notes}}} {{rawCriticalFailNote=@{raw_dodge_critical_fail_notes}}} {{customSuccessNote=@{defense_dodge_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_critical_success_note}}} {{customFailNote=@{defense_dodge_fail_note}}} {{customCriticalFailNote=@{defense_dodge_critical_fail_note}}}" name="roll_vsDodge" />
 						</div>
 					</div> <!-- .sheet-row -->
 
@@ -3793,18 +3822,13 @@
 						        <textarea name="attr_defense_dodge_notes" value="@{dodge_success_notes}" title="Field name: defense_dodge_notes" style="height: 50px"></textarea>
 						    </div>
 							
-							<div class="note-input">
-								<div class="note-title">&nbsp;</div>
-								<button type="action" name="act_defense_dodge_reset_notes" class="reset">Reset Success/Fail Notes</button>
-							</div>
-
 						</div>
 
 					    <div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Success Note:</div>
+    						        <div class="sheet-popup">Custom Success Note:</div>
             						<span class="sheet-tooltip">
             						    Success, critical success, fail, and critical fail<br />
             						    notes will be added to roll results.<br />
@@ -3813,14 +3837,12 @@
 										visualize what it will look like in chat.
             						</span>
     						    </div>
-						        <textarea name="attr_defense_dodge_success_note" title="Field name: defense_dodge_success_note">If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.</textarea>
+						        <textarea name="attr_defense_dodge_success_note" title="Field name: defense_dodge_success_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Success Note:</div>
-						        <textarea name="attr_defense_dodge_critical_success_note" title="Field name: defense_dodge_critical_success_note">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
-
-If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
+						        <div class="note-title">Custom Critical Success Note:</div>
+						        <textarea name="attr_defense_dodge_critical_success_note" title="Field name: defense_dodge_critical_success_note"></textarea>
 							</div>
 							
 						</div>
@@ -3828,13 +3850,13 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
-						        <div class="note-title">Fail Note:</div>
+						        <div class="note-title">Custom Fail Note:</div>
 						        <textarea name="attr_defense_dodge_fail_note" title="Field name: defense_dodge_fail_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Fail Note:</div>
-						        <textarea name="attr_defense_dodge_critical_fail_note" title="Field name: defense_dodge_critical_fail_note">You lose your footing and fall prone (no effect if already prone). See B382</textarea>
+						        <div class="note-title">Custom Critical Fail Note:</div>
+						        <textarea name="attr_defense_dodge_critical_fail_note" title="Field name: defense_dodge_critical_fail_note"></textarea>
 						    </div>
 						    
 						</div>
@@ -3847,7 +3869,7 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight_dodge_retreat" />
 					<input class="toggle toggle-notes static-defense" type="checkbox" title="Click to show/hide more information." name="attr_defense_dodge_retreat_toggle_notes" />
 					<span class="checkbox static-defense"></span>		
-					<div class="row row-stats row-standard margin-left">
+					<div class="row row-stats row-standard static-defense-width">
 
 						<div class="cell col-dodge-label">
 							<div class="popup">Dodge and Retreat (vs. Melee Attacks Only)</div>
@@ -3878,7 +3900,11 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="cell col2"><input type="number" step="1" name="attr_ad_dodge_retreat_skill_mod" value="0" title="Macro name: ad_dodge_retreat_skill_mod" /></div>
 						<div class="cell col3"><input type="text" name="attr_ad_dodge_retreat_skill_final" value="@{current_dodge} + 3 + @{ad_dodge_retreat_skill_mod}" disabled="disabled" title="Macro name: ad_dodge_retreat_skill_final" /></div>
 						<div class="cell col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Retreat}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_retreat_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_retreat_show_notes}]]}} {{notes=@{defense_dodge_retreat_notes}}} {{customSuccessNote=@{defense_dodge_retreat_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_retreat_critical_success_note}}} {{customFailNote=@{defense_dodge_retreat_fail_note}}} {{customCriticalFailNote=@{defense_dodge_retreat_critical_fail_note}}}" name="roll_vsDodgeRetreat" />
+							<input type="hidden" name="attr_raw_dodge_retreat_success_notes" />
+							<input type="hidden" name="attr_raw_dodge_retreat_critical_success_notes" />
+							<input type="hidden" name="attr_raw_dodge_retreat_fail_notes" />
+							<input type="hidden" name="attr_raw_dodge_retreat_critical_fail_notes" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Retreat}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_retreat_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_retreat_show_notes}]]}} {{notes=@{defense_dodge_retreat_notes}}} {{showRawDefenseNotes=[[@{show_raw_defense_notes}]]}} {{rawSuccessNote=@{raw_dodge_retreat_success_notes}}} {{rawCriticalSuccessNote=@{raw_dodge_retreat_critical_success_notes}}} {{rawFailNote=@{raw_dodge_retreat_fail_notes}}} {{rawCriticalFailNote=@{raw_dodge_retreat_critical_fail_notes}}} {{customSuccessNote=@{defense_dodge_retreat_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_retreat_critical_success_note}}} {{customFailNote=@{defense_dodge_retreat_fail_note}}} {{customCriticalFailNote=@{defense_dodge_retreat_critical_fail_note}}}" name="roll_vsDodgeRetreat" />
 						</div>
 					</div> <!-- .sheet-row -->
 
@@ -3940,18 +3966,6 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="row">
 							
 							<div class="show-notes">
-						        <input type="checkbox" name="attr_defense_dodge_show_notes" value="1" style="float:left; margin-right: 5px;" />
-								<div class="popup" style="float:left;">Show custom notes in roll template</div>
-        						<span class="tooltip">
-									Displayed on the rolltemplate.
-        						</span>
-							</div>
-
-						</div>
-					
-						<div class="row">
-							
-							<div class="show-notes">
 						        <input type="checkbox" name="attr_defense_dodge_retreat_show_notes" value="1" style="float:left; margin-right: 5px;" />
 								<div class="popup" style="float:left;">Show notes below in roll template</div>
         						<span class="tooltip">
@@ -3971,18 +3985,13 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						        <textarea name="attr_defense_dodge_retreat_notes" title="Field name: defense_dodge_notes" style="height: 50px"></textarea>
 							</div>
 							
-							<div class="note-input">
-								<div class="note-title">&nbsp;</div>
-								<button type="action" name="act_defense_dodge_retreat_reset_notes" class="reset">Reset Success/Fail Notes</button>
-							</div>
-						    
 						</div>
 
 					    <div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Success Note:</div>
+    						        <div class="sheet-popup">Custom Success Note:</div>
             						<span class="sheet-tooltip">
             						    Success, critical success, fail, and critical fail<br />
             						    notes will be added to roll results.<br />
@@ -3991,14 +4000,12 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 										visualize what it will look like in chat.
             						</span>
     						    </div>
-						        <textarea name="attr_defense_dodge_retreat_success_note" title="Field name: defense_dodge_retreat_success_note">If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.</textarea>
+						        <textarea name="attr_defense_dodge_retreat_success_note" title="Field name: defense_dodge_retreat_success_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Success Note:</div>
-						        <textarea name="attr_defense_dodge_retreat_critical_success_note" title="Field name: defense_dodge_retreat_critical_success_note">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
-
-If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
+						        <div class="note-title">Custom Critical Success Note:</div>
+						        <textarea name="attr_defense_dodge_retreat_critical_success_note" title="Field name: defense_dodge_retreat_critical_success_note"></textarea>
 							</div>
 							
 						</div>
@@ -4006,13 +4013,13 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
-						        <div class="note-title">Fail Note:</div>
+						        <div class="note-title">Custom Fail Note:</div>
 						        <textarea name="attr_defense_dodge_retreat_fail_note" title="Field name: defense_dodge_retreat_fail_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Fail Note:</div>
-						        <textarea name="attr_defense_dodge_retreat_critical_fail_note" title="Field name: defense_dodge_retreat_critical_fail_note">You lose your footing and fall prone (no effect if already prone). See B382</textarea>
+						        <div class="note-title">Custom Critical Fail Note:</div>
+						        <textarea name="attr_defense_dodge_retreat_critical_fail_note" title="Field name: defense_dodge_retreat_critical_fail_note"></textarea>
 						    </div>
 						    
 						</div>
@@ -4025,7 +4032,7 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight_dodge_drop" />
 					<input class="toggle toggle-notes static-defense" type="checkbox" title="Click to show/hide more information." name="attr_defense_dodge_drop_toggle_notes" />
 					<span class="checkbox static-defense"></span>
-					<div class="row row-stats row-standard margin-left">
+					<div class="row row-stats row-standard static-defense-width">
 						<div class="cell col-dodge-label">
 							<div class="popup">Dodge and Drop (vs. Ranged Attacks only)</div>
 								<span class="tooltip">
@@ -4054,7 +4061,11 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="cell col2"><input type="number" step="1" name="attr_ad_dodge_drop_skill_mod" value="0" title="Macro name: ad_dodge_drop_skill_mod" /></div>
 						<div class="cell col3"><input type="text" name="attr_ad_dodge_drop_skill_final" value="@{current_dodge} + 3 + @{ad_dodge_drop_skill_mod}" disabled="disabled" title="Macro name: ad_dodge_drop_skill_final" /></div>
 						<div class="cell col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Drop}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_drop_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_drop_show_notes}]]}} {{notes=@{defense_dodge_drop_notes}}} {{customSuccessNote=@{defense_dodge_drop_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_drop_critical_success_note}}} {{customFailNote=@{defense_dodge_drop_fail_note}}} {{customCriticalFailNote=@{defense_dodge_drop_critical_fail_note}}}" name="roll_vsDodgeDrop" />
+							<input type="hidden" name="attr_raw_dodge_drop_success_notes" />
+							<input type="hidden" name="attr_raw_dodge_drop_critical_success_notes" />
+							<input type="hidden" name="attr_raw_dodge_drop_fail_notes" />
+							<input type="hidden" name="attr_raw_dodge_drop_critical_fail_notes" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Drop}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_drop_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_drop_show_notes}]]}} {{notes=@{defense_dodge_drop_notes}}} {{showRawDefenseNotes=[[@{show_raw_defense_notes}]]}} {{rawSuccessNote=@{raw_dodge_drop_success_notes}}} {{rawCriticalSuccessNote=@{raw_dodge_drop_critical_success_notes}}} {{rawFailNote=@{raw_dodge_drop_fail_notes}}} {{rawCriticalFailNote=@{raw_dodge_drop_critical_fail_notes}}} {{customSuccessNote=@{defense_dodge_drop_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_drop_critical_success_note}}} {{customFailNote=@{defense_dodge_drop_fail_note}}} {{customCriticalFailNote=@{defense_dodge_drop_critical_fail_note}}}" name="roll_vsDodgeDrop" />
 						</div>
 					</div> <!-- .sheet-row -->
 
@@ -4116,18 +4127,6 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="row">
 							
 							<div class="show-notes">
-						        <input type="checkbox" name="attr_defense_dodge_show_notes" value="1" style="float:left; margin-right: 5px;" />
-								<div class="popup" style="float:left;">Show custom notes in roll template</div>
-        						<span class="tooltip">
-									Displayed on the rolltemplate.
-        						</span>
-							</div>
-
-						</div>
-					
-						<div class="row">
-							
-							<div class="show-notes">
 						        <input type="checkbox" name="attr_defense_dodge_drop_show_notes" value="1" style="float:left; margin-right: 5px;" />
 								<div class="popup" style="float:left;">Show notes below in roll template</div>
         						<span class="tooltip">
@@ -4147,18 +4146,13 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						        <textarea name="attr_defense_dodge_drop_notes" title="Field name: defense_dodge_drop_notes" style="height: 50px"></textarea>
 						    </div>
 							
-							<div class="note-input">
-								<div class="note-title">&nbsp;</div>
-								<button type="action" name="act_defense_dodge_drop_reset_notes" class="reset">Reset Success/Fail Notes</button>
-							</div>
-
 						</div>
 
 					    <div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Success Note:</div>
+    						        <div class="sheet-popup">Custom Success Note:</div>
             						<span class="sheet-tooltip">
             						    Success, critical success, fail, and critical fail<br />
             						    notes will be added to roll results.<br />
@@ -4167,14 +4161,12 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 										visualize what it will look like in chat.
             						</span>
     						    </div>
-						        <textarea name="attr_defense_dodge_drop_success_note" title="Field name: defense_dodge_drop_success_note">If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.</textarea>
+						        <textarea name="attr_defense_dodge_drop_success_note" title="Field name: defense_dodge_drop_success_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Success Note:</div>
-						        <textarea name="attr_defense_dodge_drop_critical_success_note" title="Field name: defense_dodge_drop_critical_success_note">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
-
-If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
+						        <div class="note-title">Custom Critical Success Note:</div>
+						        <textarea name="attr_defense_dodge_drop_critical_success_note" title="Field name: defense_dodge_drop_critical_success_note"></textarea>
 							</div>
 							
 						</div>
@@ -4182,13 +4174,13 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
-						        <div class="note-title">Fail Note:</div>
+						        <div class="note-title">Custom Fail Note:</div>
 						        <textarea name="attr_defense_dodge_drop_fail_note" title="Field name: defense_dodge_drop_fail_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Fail Note:</div>
-						        <textarea name="attr_defense_dodge_drop_critical_fail_note" title="Field name: defense_dodge_drop_critical_fail_note">You lose your footing and fall prone (no effect if already prone). See B382</textarea>
+						        <div class="note-title">Custom Critical Fail Note:</div>
+						        <textarea name="attr_defense_dodge_drop_critical_fail_note" title="Field name: defense_dodge_drop_critical_fail_note"></textarea>
 						    </div>
 						    
 						</div>
@@ -4210,6 +4202,7 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 							<select name="attr_type" title="Macro table name: repeating_defense. Field name: type">
 								<option>Dodge</option>
 								<option>Parry</option>
+								<option>Unarmed Parry</option>
 								<option>Block</option>
 								<option>Magic</option>
 								<option>Power Dodge</option>
@@ -4231,7 +4224,7 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 							<input type="text" name="attr_skill_final" value="@{skill} + @{skill_mod}" disabled="disabled" title="Macro table name: repeating_defense. Field name: skill_final" />
 						</div>
 						<div class="cell col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll (@{type})}} {{defenseType=[[@{defense_type}]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill_final} + @{modifier}]]}} {{showNotes=[[@{show_notes}]]}} {{notes=@{info_description} @{notes} }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{customSuccessNote=@{defense_success_note}}} {{customCriticalSuccessNote=@{defense_critical_success_note}}} {{customFailNote=@{defense_fail_note}}} {{customCriticalFailNote=@{defense_critical_fail_note}}}" name="roll_vsSL" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll (@{type})}} {{defenseType=[[@{defense_type}]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill_final} + @{modifier}]]}} {{showNotes=[[@{show_notes}]]}} {{notes=@{info_description} @{notes} }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showRawDefenseNotes=[[@{show_raw_defense_notes}]]}} {{rawSuccessNote=@{raw_success_note}}} {{rawCriticalSuccessNote=@{raw_critical_success_note}}} {{rawFailNote=@{raw_fail_note}}} {{rawCriticalFailNote=@{raw_critical_fail_note}}} {{customSuccessNote=@{defense_success_note}}} {{customCriticalSuccessNote=@{defense_critical_success_note}}} {{customFailNote=@{defense_fail_note}}} {{customCriticalFailNote=@{defense_critical_fail_note}}}" name="roll_vsSL" />
 						</div>
 					</div> <!-- .row -->
 					
@@ -4293,18 +4286,6 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="row">
 							
 							<div class="show-notes">
-						        <input type="checkbox" name="attr_defense_show_notes" value="1" style="float:left; margin-right: 5px;" />
-								<div class="popup" style="float:left;">Show custom notes in roll template</div>
-        						<span class="tooltip">
-									Displayed on the rolltemplate.
-        						</span>
-							</div>
-
-						</div>
-					
-						<div class="row">
-							
-							<div class="show-notes">
 						        <input type="checkbox" name="attr_show_notes" value="1" style="float:left; margin-right: 5px;" />
 								<div class="popup" style="float:left;">Show notes below in roll template</div>
         						<span class="tooltip">
@@ -4342,7 +4323,7 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Success Note:</div>
+    						        <div class="sheet-popup">Custom Success Note:</div>
             						<span class="sheet-tooltip">
             						    Success, critical success, fail, and critical fail<br />
             						    notes will be added to roll results.<br />
@@ -4350,15 +4331,15 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 										The width of these note boxes are set to help you<br />
 										visualize what it will look like in chat.
             						</span>
-    						    </div>
-						        <textarea name="attr_defense_success_note" title="Macro table name: repeating_defense. Field name: defense_success_note">If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.</textarea>
+								</div>
+								<input type="hidden" name="attr_raw_success_note" />
+						    	<textarea name="attr_defense_success_note" title="Macro table name: repeating_defense. Field name: defense_success_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Success Note:</div>
-						        <textarea name="attr_defense_critical_success_note" title="Macro table name: repeating_defense. Field name: defense_critical_success_note">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381.
-
-If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
+						        <div class="note-title">Custom Critical Success Note:</div>
+								<input type="hidden" name="attr_raw_critical_success_note" />
+								<textarea name="attr_defense_critical_success_note" title="Macro table name: repeating_defense. Field name: defense_critical_success_note"></textarea>
 							</div>
 							
 						</div>
@@ -4366,13 +4347,15 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						<div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
-						        <div class="note-title">Fail Note:</div>
+								<div class="note-title">Custom Fail Note:</div>
+								<input type="hidden" name="attr_raw_fail_note" />
 						        <textarea name="attr_defense_fail_note" title="Macro table name: repeating_defense. Field name: defense_fail_note"></textarea>
 						    </div>
 						    
 						    <div class="note-input">
-						        <div class="note-title">Critical Fail Note:</div>
-						        <textarea name="attr_defense_critical_fail_note" title="Macro table name: repeating_defense. Field name: defense_critical_fail_note">You lose your footing and fall prone (no effect if already prone). See B382</textarea>
+								<div class="note-title">Custom Critical Fail Note:</div>
+								<input type="hidden" name="attr_raw_critical_fail_note" />
+						        <textarea name="attr_defense_critical_fail_note" title="Macro table name: repeating_defense. Field name: defense_critical_fail_note"></textarea>
 						    </div>
 						    
 						</div>
@@ -5479,7 +5462,7 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
     					    <input type="text" value="TNT" name="attr_demo_how_much_type" title="Macro name: demo_how_much_type" />
     					</div>
     				    <div class="cell input">
-    					    <input type="number" value="1.0" min="0" name="attr_demo_how_much_ref" title="Macro name: demo_how_much_ref" />
+    					    <input type="number" value="1.0" min="0" step=".01" name="attr_demo_how_much_ref" title="Macro name: demo_how_much_ref" />
     					</div>
     				    <div class="cell input">
     					    <input type="number" value="1" readonly="readonly" name="attr_demo_how_much_weight" title="Macro name: demo_how_much_weight" />
@@ -5540,10 +5523,10 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
     					    <input type="text" value="TNT" name="attr_demo_how_big_type" title="Macro name: demo_how_big_type" />
     					</div>
     				    <div class="cell input">
-    					    <input type="number" value="1.0" min="0" name="attr_demo_how_big_ref" title="Macro name: demo_how_big_ref" />
+    					    <input type="number" value="1.0" min="0" step=".01" name="attr_demo_how_big_ref" title="Macro name: demo_how_big_ref" />
     					</div>
     				    <div class="cell input">
-    					    <input type="number" value="1" name="attr_demo_how_big_weight" title="Macro name: demo_how_big_weight" />
+    					    <input type="number" value="1" min=".01" step=".01" name="attr_demo_how_big_weight" title="Macro name: demo_how_big_weight" />
     					</div>
     					<div class="cell input">
     					    <input type="text" value="6d6" name="attr_demo_how_big_base_damage" title="Macro name: demo_how_big_base_damage" />
@@ -5645,11 +5628,17 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 
 		<!-- _____ _____ INVENTORY BOX _____ _____ -->
 
-		<div class="sheet-box sheet-items">
-			<div class="sheet-table">
-				<div class="sheet-header">
-					<div class="sheet-cell sheet-col0">Inventory</div>
-					<div class="sheet-cell sheet-col1">TL</div>
+		<div class="box items">
+			<div class="table">
+				<div class="header">
+					<div class="cell col0">Inventory</div>
+					<div class="cell col1">TL</div>
+					<div class="cell col1">
+						<div class="popup">LC</div>
+						<div class="tooltip tooltip-spell-ref">
+							Legality Class B267.
+						</div>
+					</div>
 					<div class="cell col2">
 						<div class="popup">Ref</div>
 						<div class="tooltip tooltip-spell-ref">
@@ -5659,55 +5648,58 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 							PU2:126 = Power-Ups 2. Page 126<br />
 						</div>
 					</div>
-					<div class="sheet-cell sheet-col3">
-						<div class="sheet-popup">On</div>
-						<span class="sheet-tooltip">
+					<div class="cell col3">
+						<div class="popup">On</div>
+						<span class="tooltip">
 							Carried
 							<br />
 							Is the item being carried at the moment?
 						</span>
 					</div>
-					<div class="sheet-cell sheet-col4">#</div>
-					<div class="sheet-cell sheet-col5">$</div>
-					<div class="sheet-cell sheet-col6">W</div>
-					<div class="sheet-cell sheet-col7">$+</div>
-					<div class="sheet-cell sheet-col8">W+</div>
+					<div class="cell col4">#</div>
+					<div class="cell col5">$</div>
+					<div class="cell col6">W</div>
+					<div class="cell col7">$+</div>
+					<div class="cell col8">W+</div>
 				</div>
 				<fieldset class="repeating_item">
 					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
-					<input class="sheet-toggle toggle-notes" type="checkbox" title="Click to show/hide more information." name="attr_item_toggle_notes" />
-					<span class="sheet-checkbox"></span>
-					<div class="sheet-row sheet-row-stats">
-						<div class="sheet-cell sheet-col0">
+					<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." name="attr_item_toggle_notes" />
+					<span class="checkbox"></span>
+					<div class="row row-stats">
+						<div class="cell col0">
 							<input type="text" name="attr_name" title="Macro table name: repeating_item. Field name: name" />
 						</div>
-						<div class="sheet-cell sheet-col1">
+						<div class="cell col1">
 							<input type="text" name="attr_tl" title="Macro table name: repeating_item. Field name: tl" />
 						</div>
-						<div class="sheet-cell sheet-col2">
+						<div class="cell col1">
+							<input type="number" step="1" min="0" max="4" value="4" name="attr_legality_class" title="Macro table name: repeating_item. Field name: legality_class" />
+						</div>
+						<div class="cell col2">
 							<input type="text" name="attr_ref" title="Macro table name: repeating_item. Field name: ref" />
 						</div>
-						<div class="sheet-cell sheet-col3">
-							<input class="sheet-boolean" type="checkbox" name="attr_carried" value="1" checked title="Macro table name: repeating_item. Field name: carried" />
+						<div class="cell col3">
+							<input class="boolean" type="checkbox" name="attr_carried" value="1" checked title="Macro table name: repeating_item. Field name: carried" />
 						</div>
-						<div class="sheet-cell sheet-col4">
+						<div class="cell col4">
 							<input type="number" name="attr_count" value="1" title="Macro table name: repeating_item. Field name: count" />
 						</div>
-						<div class="sheet-cell sheet-col5">
+						<div class="cell col5">
 							<input type="number" name="attr_cost" value="0.00" step="0.01" title="Macro table name: repeating_item. Field name: cost" />
 						</div>
-						<div class="sheet-cell sheet-col6">
+						<div class="cell col6">
 							<input type="number" name="attr_weight" value="0.000" step="0.001" title="Macro table name: repeating_item. Field name: weight" />
 						</div>
-						<div class="sheet-cell sheet-col7" style="text-align: right;background-color: #c9c9c9;border-bottom: 1px solid white;border-right: 1px solid white;">
+						<div class="cell col7" style="text-align: right;background-color: #c9c9c9;border-bottom: 1px solid white;border-right: 1px solid white;">
 							<span name="attr_costtotal" value="0.00" title="Macro table name: repeating_item. Field name: costtotal" />
 						</div>
-						<div class="sheet-cell sheet-col8" style="text-align: right;background-color: #c9c9c9;border-bottom: 1px solid white;border-right: 1px solid white;">
+						<div class="cell col8" style="text-align: right;background-color: #c9c9c9;border-bottom: 1px solid white;border-right: 1px solid white;">
 							<input type="hidden" name="attr_inventory_item_carried" />
 							<span name="attr_weighttotal" value="0.000" class="item-weight-total" title="Macro table name: repeating_item. Field name: weighttotal" />
 						</div>
 					</div> <!-- .sheet-row -->
-					<div class="sheet-row sheet-row-details notebox">
+					<div class="row row-details notebox">
 						<div class="cell col-notebox">
 						    <div class="show-notes">
 						        <span class="label">Notes</span>
@@ -5716,38 +5708,38 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 						</div>
 					</div> <!-- .sheet-row -->
 				</fieldset> <!-- .repeating_item -->
-				<div class="sheet-row sheet-row-totals">
-					<div class="sheet-cell sheet-col0">
+				<div class="row row-totals">
+					<div class="cell col0">
 					    <div style="text-align: right; font-weight: bold;" class="popup">TOTALS:</div>
-						<div class="sheet-tooltip">
+						<div class="tooltip">
 						   Totals for all fields.
 						</div>
 					</div>
-					<div class="sheet-cell sheet-col1">
+					<div class="cell col1">
 					    <div style="text-align: right; font-weight: bold;" class="popup">Total Inventory Value:</div>
 						<div class="sheet-tooltip">
 						   Total monetary value of all items (carried or not).
 						</div>
 					</div>
-					<div class="sheet-cell sheet-col2">
+					<div class="cell col2">
 						<input type="number" style="font-weight: bold;" step=".01" name="attr_total_value" value="0" readonly="readonly" title="Macro name: total_value" />
 					</div>
-					<div class="sheet-cell sheet-col3">
+					<div class="cell col3">
 					    <div style="text-align: right; font-weight: bold;" class="popup">Total Inventory Weight:</div>
-						<div class="sheet-tooltip">
+						<div class="tooltip">
 						   Total weight of all items carried.
 						</div>
 					</div>
-					<div class="sheet-cell sheet-col4">
+					<div class="cell col4">
 						<input type="number" style="font-weight: bold; text-align: center;" step=".001" name="attr_total_weight" value="0" readonly="readonly" title="Macro name: total_weight" />
 					</div>
-					<div class="sheet-cell sheet-col5">
+					<div class="cell col5">
 					    <div style="text-align: right; font-weight: bold;" class="popup">Grand Total Weight:</div>
 						<div class="tooltip">
 						   Grand total of PC's weight: <span style="background-color: white; font-weight: bold; text-decoration: underline;" name="attr_weight" value="0"></span>, and all items carried.
 						</div>
 					</div>
-					<div class="sheet-cell sheet-col6">
+					<div class="cell col6">
 						<input type="number" style="font-weight: bold; text-align: center;" step=".001" name="attr_grand_total_weight" value="0" readonly="readonly" title="Macro name: grand_total_weight" />
 
 					</div>					
@@ -6139,6 +6131,55 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 
 	<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
+	<p>Pull Request: 4/28/2020</p>
+
+	<ul>
+		<li><b>New Feature:</b> New option to select a style for the character sheet. Classic White, Green, Blue, Beige, and Gray. Contributed by Tame Flame (4822134).</li>
+		<li><b>Default Sheet Settings:</b> New option to select default sheet style.</li>
+		<li>Traits tab. Advantages, Perks, Quirks, Disadvantages, and Race table. If the Frequency of Appearance or Self-Control Number is from 3 to 18, show the die button.</li>
+		<li>Skills tab. Techniques (Revised) table. You can link a technigue to another technigue. Requested by Ian.</li>
+		<li>Combat tab. Active Defenses. Added Unarmed Parry. There are number of rules specific to unarmed parry. Added Rules as Written (RAW) for unarmed parry.</li>
+		<li>
+			<b>Important: </b> Combat tab. Active Defenses. The Rules as Written (RAW) for active defense success/fail notes are now hard-coded. 
+			This is necessary because notes saved to a field can't fixed or added to. The update improves the display of notes in the chat area.
+		</li>
+		<li>New Sheet Options: Active Defenses. Show RAW Notes. If checked, success/fail notes for active defenses will display on roll template.</li>
+	</ul>
+
+	<h4>Version 2.3.2</h4>
+
+	<p>Pull Request: 4/14/2020</p>
+
+	<ul>
+		<li>General Tab. Fix rounding error for jumping distance.</li>
+		<li>General Tab. Allow negative values for Air Move modifier and Water Move modifiers. Reported by James W.</li>
+		<li>Combat Tab. Active Defenses. Hide checkbox when the Modify button is clicked. Reported by Charles.</li>
+		<li>Combat Tab. Active Defenses. Fix alignment issues. Verified on Chrome, Firefox, MS Edge (chromium)</li>
+		<li>General Tab. Current HP and Current FP tooltip. Thresholds were not updating when max HP or FP were updated. This should be fixed.</li>
+		<li>Traits Tab. Add some gutter space to perks and quirks tables.</li>
+	</ul>
+
+	<h4>Version: 2.3.1</h4>
+
+	<p>Pull Request: 4/7/2020</p>
+
+	<ul>
+		<li>Combat tab. fixed alignment issues with active defense arrow and chekbox when the sheet is popped out into a window.</li>
+		<li>
+			Combat tab - Active Defense Success/Fail Notes. Had time to restructure the Rules As Written (RAW) notes so they are 
+			no longer part of the custom notes. They are now just stored on the options and automatically appended to the roll template.
+		</li>
+		<li>
+			<b>IMPORTANT:</b> If you see double notes for active defense success, critical success, fail, or critical fail, you will
+			need to manually delete the custom success/fail notes for each active defense. This is a one time edit and you will not 
+			need to do that again.
+		</li>
+	</ul>
+
+	<h4>Version: 2.3.0</h4>
+
+	<p>Pull Request: 3/31/2020</p>
+
 	<ul>
 		<li>Changed width of Weapon and Damage Notes fields, under Melee and Raged Attacks, to be more readable – Cosmetic Only.</li>
 		<li>
@@ -6372,43 +6413,6 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 		<li>Added tooltips to open/close arrows. Changed the style slightly to more of a button feel.</li>
 	</ul>
 	
-	<h4>Version: 1.6.5</h4>
-
-	<p>Pull Request: 09/10/2019</p>
-
-	<ul>
-		<li>Changes, Fixes, and Adds made by Mike W (UserID: 1414610)</li>
-		<li>Updated ToolTips for Fright Check, Knockdown and Stunning, Death, Unc. Check (Unconsciousness), ER, and Unstun - Cosmetic Only</li>
-		<li>Updated Knockdown and Stunning Roll Template - Cosmetic Only </li>
-		<li>Updated Unstun (Recovering from Physical Stun) Roll Template - Cosmetic Only</li>
-		<li>Updated Death Check Roll Template - Cosmetic Only</li>
-		<li>Updated Unc. Check (Unconsciousness) Roll Template - Cosmetic Only</li>
-		<li>Change the basic format of all ToolTips - Cosmetic Only</li>
-		<li>Corrected Wound Modifier Notes for imp, pi+, and pi++. - Cosmetic Only</li>
-	</ul>
-
-	<h4>Version: 1.6.4</h4>
-	
-	<p>Pull Request: 08/20/2019</p>
-	
-	<ul>
-		<li>Changes, Fixes, and Adds made by Mike W (UserID: 1414610)</li>
-		<li>Change Placeholder Opacity (Cosmetic Only)</li>
-		<li>Added Placeholders for Grimoire repeating section (Cosmetic Only)</li>
-		<li>Updated some ToolTips for the Grimoire (Cosmetic Only)</li>
-
-	</ul>
-
-	<h4>Version: 1.6.3</h4>
-	
-	<p>Pull Request: 08/06/2019</p>
-	
-	<ul>
-	    <li>Rolltemplate: If Target is too low, show warning message. If Defense roll, lowest Target is 1. All other rolls, lowest Target is 3.</li>
-	    <li>General Tab: Fix bug for totaling amounts in summary point table. Reported by Raymond G and Elaxter.</li>
-		<li>General Tab: Fixed movement feats box alignment when Encumbrance table is expanded.</li>
-	</ul>
-	
 	</div>
 	
 	</div> <!-- .sheet-tab7 -->
@@ -6486,7 +6490,7 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
 				<div class="option-container">
     			    <h4>Repeating Technique Tables</h4>
     				<div>
-        			    <input type="checkbox" name="attr_show_old_techniques" value="1" checked="checked" />
+        			    <input type="checkbox" name="attr_show_old_techniques" value="1" />
         			    <span class="popup">Show Original</span>
         			    <span class="sheet-tooltip">Show the original techniques table.</span>
 					</div>
@@ -6566,6 +6570,18 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
     			        </tr>
     			    </table>
     			    
+				</div><!-- end option-container -->
+				
+				<div class="option-container">
+		            
+		            <h4>Active Defenses</h4>
+					
+		            <div>
+        			    <input type="checkbox" name="attr_show_raw_defense_notes" value="1" />
+        			    <span class="popup">Show RAW Notes</span>
+        			    <span class="sheet-tooltip">Show Rules as Written Success/Fail notes</span>
+					</div>
+					
 		        </div><!-- end option-container -->
     			
 			</div><!-- end option-column -->
@@ -6617,7 +6633,19 @@ If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>
         				<span>Mods to attributes do not increase derived stats</span>
         			</div>
 		        </div><!-- end stat modifier options -->
-		        
+		        <div class="option-container">
+		            <h4>Sheet Style</h4>
+					<span>Selects a visual style for the character sheet</span>
+		            <div>
+    		            <select name="attr_sheetstyle"/>
+						  <option value="0" >Green</option> <!-- Color Style options, remember to add one to add a new option-->>
+						  <option value="1">Blue</option>
+						  <option value="2">Beige</option>
+						  <option value="3">Gray</option>
+						  <option value="4"selected="selected">Classic White</option>
+						</select>
+    				</div>
+		        </div><!-- end style selector options -->
 			</div><!-- end option-column -->
 			
 		</div><!-- end options row -->
@@ -6840,96 +6868,6 @@ See notes for weapon.</textarea>
 			
 		</div><!-- end options row -->
 		
-		<div class="options tall-height">
-		    
-		    <div class="option-column">
-
-				<!-- options: dodge roll notes -->
-				<div class="option-container collision-falling-options">
-		            <h4>Dodge Success Notes</h4>
-		            <textarea name="attr_dodge_success_notes">If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.</textarea>    
-		        </div><!-- end option-container -->
-		        
-		        <div class="option-container collision-falling-options">
-		            <h4>Dodge Critical Success Notes</h4>
-		            <textarea name="attr_dodge_critical_success_notes">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
-
-If a single rapid-fire attack, dodge <i>all</i> hits. See B375.</textarea>    
-		        </div><!-- end option-container -->
-		        
-		        <div class="option-container collision-falling-options">
-		            <h4>Dodge Fail Notes</h4>
-		            <textarea name="attr_dodge_fail_notes"> </textarea>    
-		        </div><!-- end option-container -->
-		        
-		        <div class="option-container collision-falling-options">
-		            <h4>Dodge Critical Failure Notes</h4>
-		            <textarea name="attr_dodge_critical_failure_notes">You lose your footing and fall prone (no effect if already prone). See B382</textarea>    
-				</div><!-- end option-container -->
-
-			</div>
-
-			<div class="option-column">
-
-				<!-- options: parry roll notes -->
-				<div class="option-container collision-falling-options">
-		            <h4>Parry Success Notes</h4>
-		            <textarea name="attr_parry_success_notes">If parrying an unarmed attack with a weapon, you may injure your attacker. See B376.
-
-If parrying a weapon 3 times your weapons weight, roll for breakage. See B376.</textarea>
-		        </div><!-- end option-container -->
-		        
-		        <div class="option-container collision-falling-options">
-		            <h4>Parry Critical Success Notes</h4>
-		            <textarea name="attr_parry_critical_success_notes">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
-
-If attack is a thrown weapon, a bare handed parry lets you <i>catch</i> the incoming weapon without hurting yourself. See B381.
-
-If parrying an unarmed attack with a weapon, you may injure your attacker. See B376.
-
-If parrying a weapon 3 times your weapons weight, roll for breakage. See B376.</textarea>
-		        </div><!-- end option-container -->
-		        
-		        <div class="option-container collision-falling-options">
-		            <h4>Parry Fail Notes</h4>
-		            <textarea name="attr_parry_fail_notes">If you're using an unarmed parry, attacker may choose to hit the original target or the limb you used to parry with. See B376.</textarea>    
-		        </div><!-- end option-container -->
-		        
-		        <div class="option-container collision-falling-options">
-		            <h4>Parry Critical Failure Notes</h4>
-					<textarea name="attr_parry_critical_failure_notes">Roll on the appropriate <i>Critical Miss Table</i> B556. See B382.
-
-If you're using an unarmed parry, attacker may choose to hit the original target or the limb you used to parry with. See B376.</textarea>
-				</div><!-- end option-container -->
-
-			</div>
-
-			<div class="option-column">
-
-				<!-- options: block roll notes -->
-				<div class="option-container collision-falling-options">
-		            <h4>Block Success Notes</h4>
-		            <textarea name="attr_block_success_notes"> </textarea>    
-		        </div><!-- end option-container -->
-		        
-		        <div class="option-container collision-falling-options">
-		            <h4>Block Critical Success Notes</h4>
-		            <textarea name="attr_block_critical_success_notes">If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381.</textarea>    
-		        </div><!-- end option-container -->
-		        
-		        <div class="option-container collision-falling-options">
-		            <h4>Block Fail Notes</h4>
-		            <textarea name="attr_block_fail_notes"> </textarea>    
-		        </div><!-- end option-container -->
-		        
-		        <div class="option-container collision-falling-options">
-		            <h4>Block Critical Failure Notes</h4>
-		            <textarea name="attr_block_critical_failure_notes">Lose your grip on the your shield and you must take a turn to ready it before you can use it to block again. See B382.</textarea>
-				</div><!-- end option-container -->
-
-			</div>
-
-		</div>
 	</div> <!-- .sheet-tab0 -->
 
 
@@ -6981,7 +6919,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                     <th colspan="2">{{characterName}}</th>
                 </tr>
 				<tr>
-					<td colspan="2" class="subhead">{{skillName}}</td>
+					<td colspan="2" class="subhead">{{skillName}} show notes: {{showRawDefenseNotes}}</td>
 				</tr>				
                 {{#type}}
                 <tr>
@@ -7014,7 +6952,11 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                 </span>
                                 
                                 <!-- block custom critical failure note -->
-                                {{#customCriticalFailNote}}
+								{{#rawCriticalFailNote}}
+                                    <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+								{{/rawCriticalFailNote}}
+								
+								{{#customCriticalFailNote}}
                                     <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                 {{/customCriticalFailNote}}
                                     
@@ -7039,7 +6981,11 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                 {{#rollGreater() effectiveSkill 15}}
                                 
                                     <!-- block custom failure note -->
-                                    {{#customFailNote}}
+                                    {{#rawFailNote}}
+                                        <p>{{rawFailNote}}</p>
+                                    {{/rawFailNote}}
+									
+									{{#customFailNote}}
                                         <p>{{customFailNote}}</p>
                                     {{/customFailNote}}
                                     
@@ -7049,7 +6995,11 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                 {{#rollLess() effectiveSkill 16}}
                                 
                                     <!-- block custom critical failure note -->
-                                    {{#customCriticalFailNote}}
+                                    {{#rawCriticalFailNote}}
+                                        <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+                                    {{/rawCriticalFailNote}}
+									
+									{{#customCriticalFailNote}}
                                         <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                     {{/customCriticalFailNote}}
                                     
@@ -7074,8 +7024,14 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                 <!-- normal success area -->
                                 {{#rollTotal() useCriticalPlusTen 2}}
                                 
-                                    <!-- block custom success note -->
-                                    {{#customSuccessNote}}
+									<!-- block custom success note -->
+									{{#rollTotal() showRawDefenseNotes 1}}
+                                    {{#rawSuccessNote}}
+                                        <p>{{rawSuccessNote}}</p>
+                                    {{/rawSuccessNote}}
+									{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+									{{#customSuccessNote}}
                                         <p>{{customSuccessNote}}</p>
                                     {{/customSuccessNote}}
                                     
@@ -7086,7 +7042,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                 {{#rollLess() useCriticalPlusTen 2}}
                                 
                                     <!-- block custom critical success note -->
-                                    {{#customCriticalSuccessNote}}
+                                    {{#rollTotal() showRawDefenseNotes 1}}
+                                    {{#rawCriticalSuccessNote}}
+                                        <p>{{rawCriticalSuccessNote}}</p>
+                                    {{/rawCriticalSuccessNote}}
+									{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+									{{#customCriticalSuccessNote}}
                                         <p>{{customCriticalSuccessNote}}</p>
                                     {{/customCriticalSuccessNote}}
                                     
@@ -7145,7 +7107,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                         {{#rollLess() rollResult 13}}
                                         
                                             <!-- block custom fail note -->
-                                            {{#customFailNote}}
+                                            {{#rollTotal() showRawDefenseNotes 1}}
+                                    		{{#rawFailNote}}
+                                                <p>{{rawFailNote}}</p>
+											{{/rawFailNote}}
+											{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+											{{#customFailNote}}
                                                 <p>{{customFailNote}}</p>
                                             {{/customFailNote}}
                                             
@@ -7170,7 +7138,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                             {{/rollTotal() defenseType 3}}
                                             
                                             <!-- block custom critical fail note -->
-                                            {{#customCriticalFailNote}}
+                                            {{#rollTotal() showRawDefenseNotes 1}}
+                                    		{{#rawCriticalFailNote}}
+                                                <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+                                            {{/rawCriticalFailNote}}
+											{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
                                             
@@ -7185,7 +7159,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                         {{#rollLess() rollResult 15}}
                                         
                                             <!-- block custom fail note -->
-                                            {{#customFailNote}}
+                                            {{#rollTotal() showRawDefenseNotes 1}}
+                                    		{{#rawFailNote}}
+                                                <p>{{rawFailNote}}</p>
+                                            {{/rawFailNote}}
+											{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+											{{#customFailNote}}
                                                 <p>{{customFailNote}}</p>
                                             {{/customFailNote}}
                                             
@@ -7210,7 +7190,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                             {{/rollTotal() defenseType 3}}
                                             
                                             <!-- block custom critical fail note -->
-                                            {{#customCriticalFailNote}}
+                                            {{#rollTotal() showRawDefenseNotes 1}}
+                                    		{{#rawCriticalFailNote}}
+                                                <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+											{{/rawCriticalFailNote}}
+											{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
                                             
@@ -7225,7 +7211,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                         {{#rollLess() rollResult 15}}
                                         
                                             <!-- block custom fail note -->
-                                            {{#customFailNote}}
+                                            {{#rollTotal() showRawDefenseNotes 1}}
+                                    		{{#rawFailNote}}
+                                                <p>{{rawFailNote}}</p>
+                                            {{/rawFailNote}}
+											{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+											{{#customFailNote}}
                                                 <p>{{customFailNote}}</p>
                                             {{/customFailNote}}
                                             
@@ -7250,7 +7242,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                             {{/rollTotal() defenseType 3}}
                                             
                                             <!-- block custom critical fail note -->
-                                            {{#customCriticalFailNote}}
+                                            {{#rollTotal() showRawDefenseNotes 1}}
+                                    		{{#rawCriticalFailNote}}
+                                                <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+                                            {{/rawCriticalFailNote}}
+											{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
                                             
@@ -7265,7 +7263,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                         {{#rollLess() rollResult 16}}
                                         
                                             <!-- block custom fail note -->
-                                            {{#customFailNote}}
+                                            {{#rollTotal() showRawDefenseNotes 1}}
+                                    		{{#rawFailNote}}
+                                                <p>{{rawFailNote}}</p>
+                                            {{/rawFailNote}}
+											{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+											{{#customFailNote}}
                                                 <p>{{customFailNote}}</p>
                                             {{/customFailNote}}
                                             
@@ -7290,7 +7294,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                             {{/rollTotal() defenseType 3}}
                                             
                                             <!-- block custom critical fail note -->
-                                            {{#customCriticalFailNote}}
+                                            {{#rollTotal() showRawDefenseNotes 1}}
+                                    		{{#rawCriticalFailNote}}
+                                                <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+                                            {{/rawCriticalFailNote}}
+											{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
                                             
@@ -7305,7 +7315,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                         {{#rollLess() rollResult 17}}
                                         
                                             <!-- block custom fail note -->
-                                            {{#customFailNote}}
+                                            {{#rollTotal() showRawDefenseNotes 1}}
+                                    		{{#rawFailNote}}
+                                                <p>{{rawFailNote}}</p>
+                                            {{/rawFailNote}}
+											{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+											{{#customFailNote}}
                                                 <p>{{customFailNote}}</p>
                                             {{/customFailNote}}
                                             
@@ -7330,7 +7346,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                             {{/rollTotal() defenseType 3}}
                                             
                                             <!-- block custom critical fail note -->
-                                            {{#customCriticalFailNote}}
+                                            {{#rollTotal() showRawDefenseNotes 1}}
+                                    		{{#rawCriticalFailNote}}
+                                                <p><span class="failure-note-label"></span> {{rawCriticalFailNote}}</p>
+                                            {{/rawCriticalFailNote}}
+											{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+											{{#customCriticalFailNote}}
                                                 <p><span class="failure-note-label"></span> {{customCriticalFailNote}}</p>
                                             {{/customCriticalFailNote}}
                                             
@@ -7379,7 +7401,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                     <!-- attr_use_critical_plus_10: 0 = only on 3 or 4, 1 = rules as written, 2 = turn off -->
                                     {{#rollTotal() useCriticalPlusTen 2}}
                                         <!-- block custom success note -->
-                                        {{#customSuccessNote}}
+                                        {{#rollTotal() showRawDefenseNotes 1}}
+                                    	{{#rawSuccessNote}}
+                                            <p>{{rawSuccessNote}}</p>
+										{{/rawSuccessNote}}
+										{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+										{{#customSuccessNote}}
                                             <p>{{customSuccessNote}}</p>
                                         {{/customSuccessNote}}
                                     {{/rollTotal() useCriticalPlusTen 2}}
@@ -7395,7 +7423,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                             <!-- if effective skill is less than 15, then show success note -->
                                             {{#rollLess() effectiveSkill 15}}
                                                 <!-- block custom success note -->
-                                                {{#customSuccessNote}}
+                                                {{#rollTotal() showRawDefenseNotes 1}}
+                                    			{{#rawSuccessNote}}
+                                                    <p>{{rawSuccessNote}}</p>
+												{{/rawSuccessNote}}
+												{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+												{{#customSuccessNote}}
                                                     <p>{{customSuccessNote}}</p>
                                                 {{/customSuccessNote}}
                                             {{/rollLess() effectiveSkill 15}}
@@ -7407,7 +7441,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                                 {{#rollGreater() rollResult 6}}
                                                 
                                                     <!-- block custom success note -->
-                                                    {{#customSuccessNote}}
+                                                    {{#rollTotal() showRawDefenseNotes 1}}
+                                    				{{#rawSuccessNote}}
+                                                        <p>{{rawSuccessNote}}</p>
+                                                    {{/rawSuccessNote}}
+													{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+													{{#customSuccessNote}}
                                                         <p>{{customSuccessNote}}</p>
                                                     {{/customSuccessNote}}
                                                     
@@ -7417,7 +7457,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                                 {{#rollBetween() rollResult 5 6}}
                                                 
                                                     <!-- block custom critical success note -->
-                                                    {{#customCriticalSuccessNote}}
+                                                    {{#rollTotal() showRawDefenseNotes 1}}
+                                    				{{#rawCriticalSuccessNote}}
+                                                        <p>{{rawCriticalSuccessNote}}</p>
+                                                    {{/rawCriticalSuccessNote}}
+													{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+													{{#customCriticalSuccessNote}}
                                                         <p>{{customCriticalSuccessNote}}</p>
                                                     {{/customCriticalSuccessNote}}
                                                     
@@ -7432,7 +7478,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                                 {{#rollGreater() rollResult 5}}
                                                 
                                                     <!-- block custom success note -->
-                                                    {{#customSuccessNote}}
+                                                    {{#rollTotal() showRawDefenseNotes 1}}
+                                    				{{#rawSuccessNote}}
+                                                        <p>{{rawSuccessNote}}</p>
+													{{/rawSuccessNote}}
+													{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+													{{#customSuccessNote}}
                                                         <p>{{customSuccessNote}}</p>
                                                     {{/customSuccessNote}}
                                                     
@@ -7442,7 +7494,13 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                                                 {{#rollTotal() rollResult 5}}
                                                     
                                                     <!-- block custom critical success note -->
-                                                    {{#customCriticalSuccessNote}}
+                                                    {{#rollTotal() showRawDefenseNotes 1}}
+                                    				{{#rawCriticalSuccessNote}}
+                                                        <p>{{rawCriticalSuccessNote}}</p>
+                                                    {{/rawCriticalSuccessNote}}
+													{{/rollTotal() showRawDefenseNotes 1}}
+                                    
+													{{#customCriticalSuccessNote}}
                                                         <p>{{customCriticalSuccessNote}}</p>
                                                     {{/customCriticalSuccessNote}}
                                                     
@@ -7846,11 +7904,11 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 <script type="text/worker">
 	// type="text/worker"
 
-	var noop = function () {}; // do nothing.
+	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.3.0";
-	
-	var latestChangesDate = "03/31/2020";
+	var version = "2.3.3";
+
+	var latestChangesDate = "04/28/2020";
 
 	var modCascade = true;
 	
@@ -7927,6 +7985,8 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	    
 		console.log('********* Sheet Opened *********');
 		
+		const rawDefenseNotes = getRawActiveDefensesNotes();
+
 		setSkillRowIds();
 		
 		setSpellRowIds();
@@ -8031,6 +8091,9 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 		    
 		    // update conditions
 		    updateHealthConditionChecks(); 
+
+			updateFatiguePointThresholds();
+
 		});
 
 		// After move, dodge, encumbrance, HP, and FP
@@ -8100,6 +8163,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 			updateFP(thenCurrentMoveDodge);
 			
 			thenSpeedMoveDodge();
+
 		});
 		
 		updateDamageNotes();
@@ -8107,6 +8171,8 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 		updateFrightCheckThreshold();
 		
 		updateRepeatingDefenseTypes();
+
+		updateStaticDefenseNotes();
 		
 		updateRepeatingDefenseNotes();
 		
@@ -8130,7 +8196,9 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 		});
 		
 		runUpdateRepeatingSpellLevels();
-		
+
+		updateHitPointThresholds();
+			
 	}
 	
 	function thenUpdateLinkedAttacksSkills() {
@@ -8219,6 +8287,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	on('change:strength_points change:strength_mod', function (e) {
 		updateST();
 	});
+
 	// Update Strength
 	function updateST(callback) {
 		callback = callback || noop;
@@ -8252,6 +8321,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	on('change:dexterity_points change:dexterity_mod', function (e) {
 		updateDX();
 	});
+
 	// Update Dexterity
 	function updateDX(callback) {
 		callback = callback || noop;
@@ -8270,6 +8340,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	on('change:intelligence_points change:intelligence_mod', function (e) {
 		updateIQ();
 	});
+
 	// Update Intelligence
 	function updateIQ(callback) {
 		callback = callback || noop;
@@ -8288,6 +8359,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	on('change:health_points change:health_mod', function (e) {
 		updateHT();
 	});
+
 	// Update Health
 	function updateHT(callback) {
 		callback = callback || noop;
@@ -8304,7 +8376,10 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 
 	// HP
 	on('change:strength change:hit_points_points change:hit_points_mod', function (e) {
-		updateHP();
+		
+		// after updating hit points, update thresholds
+		updateHP(updateHitPointThresholds);
+	
 	});
 	
 	// Update HP
@@ -8330,8 +8405,9 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 
 	// FP
 	on('change:health change:fatigue_points_points change:fatigue_points_mod', function (e) {
-		updateFP();
+		updateFP(updateFatiguePointThresholds);
 	});
+
 	// Update FP
 	function updateFP(callback) {
 		console.log('********* updateFP *********');
@@ -8369,6 +8445,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	on('change:perception change:vision_points change:vision_mod change:hearing_points change:hearing_mod change:taste_smell_points change:taste_smell_mod change:touch_points change:touch_mod', function (e) {
 		updateSense();
 	});
+
 	// Update Vision, Hearing, Smell, Touch
 	function updateSense() {
 		console.log('********* updateSense *********');
@@ -8399,6 +8476,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	on('change:intelligence change:willpower_points change:willpower_mod change:fear_check_points change:fear_check_mod', function (e) {
 		updateWill();
 	});
+
 	// Updage Willpower, Fear (This is actually called Fright Check - the General page reflects this)
 	function updateWill() {
 		console.log('********* updateWill *********');
@@ -8465,6 +8543,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	on('change:dexterity change:health change:basic_speed_points change:basic_speed_mod', function (e) {
 		updateBasicSpeed();
 	});
+
 	// Update Speed
 	function updateBasicSpeed(callback) {
 		console.log('********* updateBasicSpeed *********');
@@ -8485,6 +8564,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	on('change:basic_speed change:basic_move_points change:basic_move_mod', function (e) {
 		updateBasicMove();
 	});
+
 	// Update Move
 	function updateBasicMove(callback) {
 		console.log('********* updateBasicMove *********');
@@ -8504,6 +8584,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	on('change:basic_speed change:dodge_mod', function (e) {
 		updateDodge();
 	});
+
 	// Update Dodge
 	function updateDodge(callback) {
 		console.log('********* updateDodge *********');
@@ -8625,6 +8706,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	on('change:strength change:lift_st_points change:lift_st_mod', function (e) {
 		updateLift();
 	});
+
 	// Update Lift
 	function updateLift(callback) {
 		console.log('********* updateLift *********');
@@ -8649,6 +8731,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	on('change:strength change:striking_st_points change:striking_st_mod', function (e) {
 		updateStrikingST();
 	});
+
 	// Update Striking
 	function updateStrikingST() {
 		console.log('********* updateStrikingST *********');
@@ -8998,6 +9081,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 
 	// Update the line Format for existing inventory weight and cost - Script provided by GiGs ID:157788 (Roll20)
 	on('change:inventory_fixed_digits',function()  {
+
     // getSectionIDs gives an array of all the row ids.
     getSectionIDs('item', function (ids) {
         if (ids.length === 0) return;
@@ -9025,6 +9109,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	on('change:total_weight change:basic_lift', function (e) {
 		updateEncLevel();
 	});
+
 	function updateEncLevel(callback) {
 		getAttrs(['basic_lift', 'total_weight'], function(v) {
 			callback = callback || noop;
@@ -9722,17 +9807,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
             // + sign converts value to a number
             var airMovePoints = +values.basic_air_move_points;
             
-            // ensure valid airMovePoints
-            if (airMovePoints < 0) {
-                airMovePoints = 0;
-            }
-            
             var basicAirMoveMod = +values.basic_air_move_mod;
-            
-            // ensure valid basicAirMoveMod
-            if (basicAirMoveMod < 0) {
-                basicAirMoveMod = 0;    
-            }
             
             var airMoveUnmodified = 0;
             
@@ -9969,17 +10044,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
             // + sign converts value to a number
             var waterMovePoints = +values.basic_water_move_points;
             
-            // ensure valid waterMovePoints
-            if (waterMovePoints < 0) {
-                waterMovePoints = 0;
-            }
-            
             var basicWaterMoveMod = +values.basic_water_move_mod;
-            
-            // ensure valid basicWaterMoveMod
-            if (basicWaterMoveMod < 0) {
-                basicWaterMoveMod = 0;    
-            }
             
             var waterMoveUnmodified = 0;
             
@@ -10244,7 +10309,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 		    
         getAttrs(["use_st_for_jump", "jump_skill", "basic_move", "enhanced_ground_move", "super_jump_entered_level", 
                   "super_jump_points", "strength", "jump_concentration", "running_jump_yards_moved", "running_high_jump_yards_moved", 
-                  "encumbrance_level", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max", "jump_encumbrance", "encumbrance_level"], function(values) {
+                  "encumbrance_level", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max", "jump_encumbrance"], function(values) {
             
             var jumpSkill = +values.jump_skill;
             
@@ -10410,9 +10475,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                 }
                 
                 // convert to feet
-                // round to 2 decimals
-                // https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
-                jumpHighFeet = Math.round( (jumpHighFeet / 12) * 100) / 100;
+                jumpHighFeet = jumpHighFeet / 12;
                 
                 if (jumpHighFeet <= 0) {
                     jumpHighFeet = 1;
@@ -10501,9 +10564,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                 }
                 
                 // convert to feet
-                // round to 2 decimals
-                // https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
-                jumpHighFeet = Math.round( (jumpHighFeet / 12) * 100) / 100;
+                jumpHighFeet = jumpHighFeet / 12;
                 
                 if (jumpHighFeet <= 0) {
                     jumpHighFeet = 1;
@@ -10586,9 +10647,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                 }
                 
                 // convert to feet
-                // round to 2 decimals
-                // https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
-                jumpHighFeet = Math.round( (jumpHighFeet / 12) * 100) / 100;
+                jumpHighFeet = jumpHighFeet / 12;
                 
                 if (jumpHighFeet <= 0) {
                     jumpHighFeet = 1;
@@ -10633,9 +10692,7 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                 }
                 
                 // reduce in half
-                // round to 2 decimals
-                // https://stackoverflow.com/questions/11832914/round-to-at-most-2-decimal-places-only-if-necessary
-                jumpHighFeet = Math.round( (jumpHighFeet / 2) * 100) / 100;
+                jumpHighFeet = jumpHighFeet / 2;
                 
                 if (jumpHighFeet <= 0) {
                     jumpHighFeet = 1;
@@ -10680,70 +10737,89 @@ If you're using an unarmed parry, attacker may choose to hit the original target
                 
                 runningHighJumpFeet = getEnhancedValue(runningHighJumpFeet, totalSuperJumpLevel);
                 
-            }
-            
-            // check for encumbrance
-            if (+values.jump_encumbrance === 1) {
-                
-                switch(+values.encumbrance_level) {
+			}
+
+			// check if encumbrance should be factored in.
+			if (+values.jump_encumbrance === 1) {
+
+				switch(+values.encumbrance_level) {
                     
-                    default:
-                    case 0:
-                        // do nothing
-                        break;
-                        
-                    case 1:
-                        // Light
-                        jumpBroadFeet = Math.round( (jumpBroadFeet * .8) * 100) / 100;
-                        
-                        runningBroadJumpFeet = Math.round( (runningBroadJumpFeet * .8) * 100) / 100;
-                        
-                        jumpHighFeet = Math.round( (jumpHighFeet * .8) * 100) / 100;
-                    
-                        runningHighJumpFeet = Math.round( (runningHighJumpFeet * .8) * 100) / 100;
-                        
-                        break;
-                        
-                    case 2:
-                        // Medium
-                        jumpBroadFeet = Math.round( (jumpBroadFeet * .6) * 100) / 100;
-                        
-                        runningBroadJumpFeet = Math.round( (runningBroadJumpFeet * .6) * 100) / 100;
-                        
-                        jumpHighFeet = Math.round( (jumpHighFeet * .6) * 100) / 100;
-                    
-                        runningHighJumpFeet = Math.round( (runningHighJumpFeet * .6) * 100) / 100;
-                        
-                        break;
-                        
-                    case 3:
-                        // Heavy
-                        jumpBroadFeet = Math.round( (jumpBroadFeet * .4) * 100) / 100;
-                        
-                        runningBroadJumpFeet = Math.round( (runningBroadJumpFeet * .4) * 100) / 100;
-                        
-                        jumpHighFeet = Math.round( (jumpHighFeet * .4) * 100) / 100;
-                    
-                        runningHighJumpFeet = Math.round( (runningHighJumpFeet * .4) * 100) / 100;
-                        
-                        break;
-                        
-                    case 4:
-                        // Extra-Heavy
-                        jumpBroadFeet = Math.round( (jumpBroadFeet * .2) * 100) / 100;
-                        
-                        runningBroadJumpFeet = Math.round( (runningBroadJumpFeet * .2) * 100) / 100;
-                        
-                        jumpHighFeet = Math.round( (jumpHighFeet * .2) * 100) / 100;
-                    
-                        runningHighJumpFeet = Math.round( (runningHighJumpFeet * .2) * 100) / 100;
-                        
-                        break;
-                        
-                }
-                
-            }
-            
+					default:
+					case 0:
+						// round everything to two decimals
+						jumpBroadFeet = Math.round( jumpBroadFeet * 100 ) / 100;
+						
+						runningBroadJumpFeet = Math.round( runningBroadJumpFeet * 100) / 100;
+						
+						jumpHighFeet = Math.round( jumpHighFeet * 100) / 100;
+					
+						runningHighJumpFeet = Math.round( runningHighJumpFeet * 100) / 100;
+						
+						break;
+						
+					case 1:
+						// Light
+						jumpBroadFeet = Math.round( (jumpBroadFeet * .8) * 100) / 100;
+						
+						runningBroadJumpFeet = Math.round( (runningBroadJumpFeet * .8) * 100) / 100;
+						
+						jumpHighFeet = Math.round( (jumpHighFeet * .8) * 100) / 100;
+					
+						runningHighJumpFeet = Math.round( (runningHighJumpFeet * .8) * 100) / 100;
+						
+						break;
+						
+					case 2:
+						// Medium
+						jumpBroadFeet = Math.round( (jumpBroadFeet * .6) * 100) / 100;
+						
+						runningBroadJumpFeet = Math.round( (runningBroadJumpFeet * .6) * 100) / 100;
+						
+						jumpHighFeet = Math.round( (jumpHighFeet * .6) * 100) / 100;
+					
+						runningHighJumpFeet = Math.round( (runningHighJumpFeet * .6) * 100) / 100;
+						
+						break;
+						
+					case 3:
+						// Heavy
+						jumpBroadFeet = Math.round( (jumpBroadFeet * .4) * 100) / 100;
+						
+						runningBroadJumpFeet = Math.round( (runningBroadJumpFeet * .4) * 100) / 100;
+						
+						jumpHighFeet = Math.round( (jumpHighFeet * .4) * 100) / 100;
+					
+						runningHighJumpFeet = Math.round( (runningHighJumpFeet * .4) * 100) / 100;
+						
+						break;
+						
+					case 4:
+						// Extra-Heavy
+						jumpBroadFeet = Math.round( (jumpBroadFeet * .2) * 100) / 100;
+						
+						runningBroadJumpFeet = Math.round( (runningBroadJumpFeet * .2) * 100) / 100;
+						
+						jumpHighFeet = Math.round( (jumpHighFeet * .2) * 100) / 100;
+					
+						runningHighJumpFeet = Math.round( (runningHighJumpFeet * .2) * 100) / 100;
+						
+						break;
+						
+				}
+
+			} else {
+
+				// make sure to round final values
+				jumpBroadFeet = Math.round( jumpBroadFeet * 100 ) / 100;
+				
+				runningBroadJumpFeet = Math.round( runningBroadJumpFeet * 100) / 100;
+				
+				jumpHighFeet = Math.round( jumpHighFeet * 100) / 100;
+			
+				runningHighJumpFeet = Math.round( runningHighJumpFeet * 100) / 100;
+
+			}
+			
             // get broad jump in yards. Minimum of 1
             jumpBroadYards = Math.round( (jumpBroadFeet / 3) * 100) / 100;
             
@@ -12141,10 +12217,34 @@ If you're using an unarmed parry, attacker may choose to hit the original target
         return note;
         
     }
+
+	/**
+	 * Update the static defense success/fail notes
+	 */
+	function updateStaticDefenseNotes() {
+
+		const fields = {
+			"raw_dodge_success_notes":                  getDefenseNotesByCode("dodge_success_notes"),
+			"raw_dodge_critical_success_notes":         getDefenseNotesByCode("dodge_critical_success_notes"),
+			"raw_dodge_fail_notes":                     getDefenseNotesByCode("dodge_fail_notes"),
+			"raw_dodge_critical_fail_notes":            getDefenseNotesByCode("dodge_critical_failure_notes"),
+			"raw_dodge_retreat_success_notes":          getDefenseNotesByCode("dodge_success_notes"),
+			"raw_dodge_retreat_critical_success_notes": getDefenseNotesByCode("dodge_critical_success_notes"),
+			"raw_dodge_retreat_fail_notes":             getDefenseNotesByCode("dodge_fail_notes"),
+			"raw_dodge_retreat_critical_fail_notes":    getDefenseNotesByCode("dodge_critical_failure_notes"),
+			"raw_dodge_drop_success_notes":             getDefenseNotesByCode("dodge_success_notes"),
+			"raw_dodge_drop_critical_success_notes":    getDefenseNotesByCode("dodge_critical_success_notes"),
+			"raw_dodge_drop_fail_notes":                getDefenseNotesByCode("dodge_fail_notes"),
+			"raw_dodge_drop_critical_fail_notes":       getDefenseNotesByCode("dodge_critical_failure_notes"),
+		};
+
+		setAttrs(fields);
+
+	}
     
     /**
      * If new version, make sure to update the 
-     * defensive notes.
+     * defensive informaton notes and the raw success/fail notes
      */
     function updateRepeatingDefenseNotes() {
         
@@ -12154,38 +12254,59 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 				return;
 			}
 		
-		    var getFields = [];
-		        
+			let getFields = [];
+
 		    // loop through the rows
 			for (var i = 0; i < ids.length; i++) {
 		
-		        // field that determines defense type
-                var damageTypeField = "repeating_defense_" + ids[i] + '_info';
+		        // field that determines defense info box
+                let defenseInfoField = "repeating_defense_" + ids[i] + "_info";
 				
-				getFields.push(damageTypeField);
+				getFields.push(defenseInfoField);
+
+				// field that determines defense type
+				let defenseTypeField = "repeating_defense_" + ids[i] + "_type";
+
+				getFields.push(defenseTypeField);
 				
 			}
-			
+
 			getAttrs(getFields, function (values) {
 			    
-			    var updateFields = {};
-			    
+			    let updateFields = {};
+
 		        // loop through the row ids again so we can get the values
 		        // and fill array of defense_type id numbers
 		        _.each(ids, function(id) {
 		        
-		            var infoField = "repeating_defense_" + id + '_info';
+		            let infoField = "repeating_defense_" + id + "_info";
 			
 			        // field we need to update
-			        var fieldToUpdate = "repeating_defense_" + id + '_info_description';
+			        let fieldToUpdate = "repeating_defense_" + id + "_info_description";
 				    
-		            var infoValue = values[infoField];
+		            let infoValue = values[infoField];
 		            
 		            // update the defense type id number
 		            updateFields[fieldToUpdate] = getDefenseNote(infoValue);
-		                
+
+					// active defense RAW notes
+					let typeField = "repeating_defense_" + id + "_type";
+
+					let rawNotes = getRawDefenseNotesByType(values[typeField]);
+
+					console.log("rawNotes: ", rawNotes);
+
+					updateFields["repeating_defense_" + id + "_raw_success_note"] = rawNotes.success;
+		            
+					updateFields["repeating_defense_" + id + "_raw_critical_success_note"] = rawNotes.successCritical;
+
+					updateFields["repeating_defense_" + id + "_raw_fail_note"] = rawNotes.fail;
+
+					updateFields["repeating_defense_" + id + "_raw_critical_fail_note"] = rawNotes.failCritical;
 		            
                 });
+
+				console.log("updateFields: ", updateFields);
                 
 				setAttrs(updateFields);
 			    
@@ -13730,99 +13851,12 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 	// Active Defense Methods
 	//------------------------------------
 
-	// check for resetting dodge success/fail notes
-	on("clicked:defense_dodge_reset_notes", (event) => {
-
-		const fields = [
-			"dodge_success_notes",
-			"dodge_critical_success_notes",
-			"dodge_fail_notes",
-			"dodge_critical_failure_notes"
-		];
-
-		getAttrs(fields, (values) => {
-
-			const updateFields = {
-				defense_dodge_success_note: values.dodge_success_notes,
-				defense_dodge_critical_success_note: values.dodge_critical_success_notes,
-				defense_dodge_fail_note: values.dodge_fail_notes,
-				defense_dodge_critical_fail_note: values.dodge_critical_failure_notes
-			};
-
-			setAttrs(updateFields);
-
-		});
-
-	});
-
-	// check for resetting dodge retreat success/fail notes
-	on("clicked:defense_dodge_retreat_reset_notes", (event) => {
-
-		const fields = [
-			"dodge_success_notes",
-			"dodge_critical_success_notes",
-			"dodge_fail_notes",
-			"dodge_critical_failure_notes"
-		];
-
-		getAttrs(fields, (values) => {
-
-			const updateFields = {
-				defense_dodge_retreat_success_note: values.dodge_success_notes,
-				defense_dodge_retreat_critical_success_note: values.dodge_critical_success_notes,
-				defense_dodge_retreat_fail_note: values.dodge_fail_notes,
-				defense_dodge_retreat_critical_fail_note: values.dodge_critical_failure_notes
-			};
-
-			setAttrs(updateFields);
-
-		});
-
-	});
-
-	// check for resetting dodge drop success/fail notes
-	on("clicked:defense_dodge_drop_reset_notes", (event) => {
-
-		const fields = [
-			"dodge_success_notes",
-			"dodge_critical_success_notes",
-			"dodge_fail_notes",
-			"dodge_critical_failure_notes"
-		];
-
-		getAttrs(fields, (values) => {
-
-			const updateFields = {
-				defense_dodge_drop_success_note: values.dodge_success_notes,
-				defense_dodge_drop_critical_success_note: values.dodge_critical_success_notes,
-				defense_dodge_drop_fail_note: values.dodge_fail_notes,
-				defense_dodge_drop_critical_fail_note: values.dodge_critical_failure_notes
-			};
-
-			setAttrs(updateFields);
-
-		});
-
-	});
-
 	// check if an repeating active defense type changed
-	// update success/fail notes based on selected defense Type
+	// update raw success/fail notes based on selected defense Type
 	on("change:repeating_defense:type", (event) => {
 
 		const fields = [
-			"repeating_defense_type",
-			"dodge_success_notes",
-			"dodge_critical_success_notes",
-			"dodge_fail_notes",
-			"dodge_critical_failure_notes",
-			"parry_success_notes",
-			"parry_critical_success_notes",
-			"parry_fail_notes",
-			"parry_critical_failure_notes",
-			"block_success_notes",
-			"block_critical_success_notes",
-			"block_fail_notes",
-			"block_critical_failure_notes"
+			"repeating_defense_type"
 		]
 
 		getAttrs(fields, (values) => {
@@ -13837,52 +13871,225 @@ If you're using an unarmed parry, attacker may choose to hit the original target
 
 			let failCriticalNote;
 
-			console.log(values);
-
-			switch (defenseType) {
-				case "Dodge":
-					successNote      = values.dodge_success_notes;
-					successCritNote  = values.dodge_critical_success_notes;
-					failNote         = values.dodge_fail_notes;
-					failCriticalNote = values.dodge_critical_failure_notes;
-					break;
-			
-				case "Parry":
-					successNote      = values.parry_success_notes;
-					successCritNote  = values.parry_critical_success_notes;
-					failNote         = values.parry_fail_notes;
-					failCriticalNote = values.parry_critical_failure_notes;
-					break;
-			
-				case "Block":
-					successNote      = values.block_success_notes;
-					successCritNote  = values.block_critical_success_notes;
-					failNote         = values.block_fail_notes;
-					failCriticalNote = values.block_critical_failure_notes;
-					break;
-			
-				default:
-					successNote      = " ";
-					successCritNote  = " ";
-					failNote         = " ";
-					failCriticalNote = " ";
-					break;
-
-			}
+			let rawNotes = getRawDefenseNotesByType(defenseType);
 
 			const updateFields = {
-				repeating_defense_defense_success_note: successNote,
-				repeating_defense_defense_critical_success_note: successCritNote,
-				repeating_defense_defense_fail_note: failNote,
-				repeating_defense_defense_critical_fail_note: failCriticalNote	
+				repeating_defense_raw_success_note:          rawNotes.success,
+				repeating_defense_raw_critical_success_note: rawNotes.successCritical,
+				repeating_defense_raw_fail_note:             rawNotes.fail,
+				repeating_defense_raw_critical_fail_note:    rawNotes.failCritical	
 			};
-
-			console.log(updateFields);
 
 			setAttrs(updateFields);
 
 		});
 		
 	});
+
+	/**
+	 * Get an array of defense notes based on defense type
+	 *
+	 * @param string defenseType Type of defense
+	 *
+	 * @return object {success, successCritical, fail, failCritical}
+	 */
+	function getRawDefenseNotesByType(defenseType) {
+
+		let successNote;
+
+		let successCritNote;
+
+		let failNote;
+
+		let failCriticalNote;
+
+		switch (defenseType) {
+			case "Dodge":
+				successNote      = getDefenseNotesByCode("dodge_success_notes");
+				successCritNote  = getDefenseNotesByCode("dodge_critical_success_notes");
+				failNote         = getDefenseNotesByCode("dodge_fail_notes");
+				failCriticalNote = getDefenseNotesByCode("dodge_critical_failure_notes");
+				break;
+		
+			case "Parry":
+				successNote      = getDefenseNotesByCode("parry_success_notes");
+				successCritNote  = getDefenseNotesByCode("parry_critical_success_notes");
+				failNote         = getDefenseNotesByCode("parry_fail_notes");
+				failCriticalNote = getDefenseNotesByCode("parry_critical_failure_notes");
+				break;
+		
+			case "Unarmed Parry":
+				successNote      = getDefenseNotesByCode("unarmed_parry_success_notes");
+				successCritNote  = getDefenseNotesByCode("unarmed_parry_critical_success_notes");
+				failNote         = getDefenseNotesByCode("unarmed_parry_fail_notes");
+				failCriticalNote = getDefenseNotesByCode("unarmed_parry_critical_failure_notes");
+				break;
+		
+			case "Block":
+				successNote      = getDefenseNotesByCode("block_success_notes");
+				successCritNote  = getDefenseNotesByCode("block_critical_success_notes");
+				failNote         = getDefenseNotesByCode("block_fail_notes");
+				failCriticalNote = getDefenseNotesByCode("block_critical_failure_notes");
+				break;
+		
+			default:
+				successNote      = " ";
+				successCritNote  = " ";
+				failNote         = " ";
+				failCriticalNote = " ";
+				break;
+
+		}
+
+		notes = {
+			"success": successNote,
+			"successCritical": successCritNote,
+			"fail": failNote,
+			"failCritical": failCriticalNote
+		};
+
+		return notes;
+
+	}
+
+	/**
+	 * Update hit point thresholds
+	 */
+	function updateHitPointThresholds() {
+
+		getAttrs(["hit_points_max"], (values) => {
+
+			let max = +values.hit_points_max;
+
+			let reeling = Math.ceil(max / 3);
+
+			let verge = max * -1;
+
+			let death = max * -5;
+
+			let destruction = max * -10;
+
+			const fields = {
+				hp_reeling:     reeling,
+				hp_verge:       verge,
+				hp_death:       death,
+				hp_destruction: destruction
+			};
+
+			setAttrs(fields);
+
+		});
+
+	}
+
+	/**
+	 * Update fatigue point thresholds
+	 */
+	 function updateFatiguePointThresholds() {
+
+		getAttrs(["fatigue_points_max"], (values) => {
+
+			let max = +values.fatigue_points_max;
+
+			let tired = Math.ceil(max / 3);
+
+			let unconscious = max * -1;
+
+			const fields = {
+				fp_tired:       tired,
+				fp_unconscious: unconscious,
+			};
+
+			setAttrs(fields);
+
+		});
+
+	}
+
+	/**
+	 * Generate a table for storing active defense notes.
+	 */
+	function getRawActiveDefensesNotes() {
+
+		const dodgeSuccessNotes = `If a single rapid-fire attack, avoid one hit, plus additional hits equal to your margin of success. See B375.`;
+
+		const dodgeCriticalSuccessNotes = `If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
+
+If a single rapid-fire attack, dodge <i>all</i> hits. See B375.`;
+
+		const dodgeFailNotes = ""; 
+
+		const dodgeCriticalFailureNotes = `You lose your footing and fall prone (no effect if already prone). See B382`;
+
+		const parrySuccessNotes = `If parrying a weapon 3 times your weapons weight, roll for breakage. See B376.`;
+
+		const parryCriticalSuccessNotes = `If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
+
+If parrying a weapon 3 times your weapons weight, roll for breakage. See B376.`;
+
+		const parryFailNotes = ``;
+
+		const parryCriticalFailureNotes = `Roll on the appropriate <i>Critical Miss Table</i> B556. See B382.
+
+If you're using an unarmed parry, attacker may choose to hit the original target or the limb you used to parry with. See B376.`;
+
+		const unarmedParrySuccessNotes = ""; 
+
+		const unarmedParryCriticalSuccessNotes = `If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381. 
+
+If attack is a thrown weapon, a bare handed parry lets you <i>catch</i> the incoming weapon without hurting yourself. See B381.`;
+
+		const unarmedParryFailNotes = `The attacker may choose to hit the original target or the limb you used to parry with. See B376.`;
+
+		const unarmedParryCriticalFailureNotes = `Roll on the appropriate <i>Critical Miss Table</i> B556. See B382.
+
+The attacker may choose to hit the original target or the limb you used to parry with. See B376.`;
+
+		const blockSuccessNotes = ``;
+
+		const blockCriticalSuccessNotes = `If melee attack, foe goes immediately to the Critical Miss Table on B556. See B381.`;
+
+		const blockFailNotes = "";
+
+		const blockCriticalFailureNotes = `Lose your grip on the your shield and you must take a turn to ready it before you can use it to block again. See B382.`;
+
+		rawDefenseNotes = [
+			{code: "dodge_success_notes",                  value: dodgeSuccessNotes},
+			{code: "dodge_critical_success_notes",         value: dodgeCriticalSuccessNotes},
+			{code: "dodge_fail_notes",                     value: dodgeFailNotes},
+			{code: "dodge_critical_failure_notes",         value: dodgeCriticalFailureNotes},
+			{code: "parry_success_notes",                  value: parrySuccessNotes},
+			{code: "parry_critical_success_notes",         value: parryCriticalSuccessNotes},
+			{code: "parry_fail_notes",                     value: parryFailNotes},
+			{code: "parry_critical_failure_notes",         value: parryCriticalFailureNotes},
+			{code: "unarmed_parry_success_notes",          value: unarmedParrySuccessNotes},
+			{code: "unarmed_parry_critical_success_notes", value: unarmedParryCriticalSuccessNotes},
+			{code: "unarmed_parry_fail_notes",             value: unarmedParryFailNotes},
+			{code: "unarmed_parry_critical_failure_notes", value: unarmedParryCriticalFailureNotes},
+			{code: "block_success_notes",                  value: blockSuccessNotes},
+			{code: "block_critical_success_notes",         value: blockCriticalSuccessNotes},
+			{code: "block_fail_notes",                     value: blockFailNotes},
+			{code: "block_critical_failure_notes",         value: blockCriticalFailureNotes},
+		];
+
+		return rawDefenseNotes; 
+
+	}
+
+	
+    /**
+     * Create global function
+     * use: var mod = getModBySpeedRange(14);
+     * Uses the array of json object objects
+     * to get the modifier based on speed/range
+     **/
+	 const getDefenseNotesByCode = (code) => {
+    	
+    	const entry = rawDefenseNotes.find( (notes) => notes.code === code );
+    	
+    	// if no matches, return no string
+    	return (entry != undefined ? entry.value : "");
+    
+    };
 
 </script>

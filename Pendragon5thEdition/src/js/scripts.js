@@ -49,7 +49,7 @@ attributes.knights.forEach(attr => {
 //For example, a character with a Damage value of 4.43 would
 //have an effective value of 4, while a character with a Damage val-
 //ue of 4.5 would have a 5.
-const roundFraction = sum => sum >= 0.5 ? Math.ceil(sum) : Math.floor(sum)
+const roundFraction = sum => (sum % 1) >= 0.5 ? Math.ceil(sum) : Math.floor(sum)
 const divideBy = (sum, num) => sum/num;
 
 const totalAttributes = values => {
@@ -62,7 +62,7 @@ const attributeSumDivide = (attributes, set) => {
     getAttrs(attributes, (values) => {
     	const divide = set == 'damage' ? 6 : 10;
     	let sum = totalAttributes(values);
-    	sum = divideBy(sum, divide) ;
+			sum = divideBy(sum, divide);
 
 	    setAttrs({
 	    	[`${set}`]: roundFraction(sum)
