@@ -38,6 +38,7 @@ const moves  = [
   { name: 'Resupply', value: 'resupply' },
   { name: 'Make Camp', value: 'make_camp' },
   { name: 'Take a Downtime', value: 'take_a_downtime' },
+  { name: 'Swear An Iron Vow', value: 'swear_an_iron_vow' },
   { name: 'Fulfill Your Vow', value: 'fulfill_your_vow' },
   { name: 'Learn From Faults', value: 'learn_from_faults' },
   { name: 'Advance', value: 'advance' },
