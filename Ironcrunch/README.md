@@ -1,4 +1,6 @@
 # Ironcrunch - Character Sheet
+## Preview Image
+![alt text](assets/character-sheet.png "Preview of Character Sheet Layout")
 ## Building Sheet
 This sheet uses [pugjs](https://www.google.com) for HTML templating, along with [Stylus](https://www.google.com) from CSS templating.
 To build finished sheet run the following commands from command line or terminal:
@@ -19,6 +21,12 @@ These will then generate a dist folder that will have the finished code. From th
 The sheet has been tested across multiple browsers and devices, show below in the compatibility matrix:
 |Browser|Windows|MacOs|Android|iOS|
 |---|---|---|---|---|
-|Chrome|[x]|[x]|[x]|[x]|
-|Firefox|[x]|[x]|[x]|[x]|
-|Safari|N/A|[x]|N/A|[x]|
+|Chrome|yes|yes|yes|yes|
+|Firefox|yes|yes|yes|yes|
+|Safari|no|yes|no|yes|
+
+## Licensing
+Ironcrunch is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International license. Explicit permission has been given from the developer to include rulebook content such as Moves, Assets, Oracles, Ancestries, Equipment, etc...
+
+### Ironcrunch License
+This work is based on Ironsworn (found at www.ironswornrpg.com), created by Shawn Tomkin, and licensed for our use under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International license.
