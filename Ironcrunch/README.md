@@ -17,6 +17,19 @@ npm run build:css
 ```
 These will then generate a dist folder that will have the finished code. From their you can upload them into the custom sheet sandbox for testing.
 
+## Coding Standards
+### Comments
+```pug
+//-
+  Generates a repeating fieldset for bonds.
+  Expands when clicking the DETAILS label.
+
+  @mixin
+  @outputs repeating html fieldset
+
+  @memberof components/bonds
+```
+
 ## Compatibility
 The sheet has been tested across multiple browsers and devices, show below in the compatibility matrix:
 |Browser|Windows|MacOs|Android|iOS|
