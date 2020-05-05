@@ -1,5 +1,5 @@
 ﻿<script type="text/worker">
-	var styleCount = 5; // THIS NUMBER MUST BE EQUAL TO THE NUMBER OF COLOR SETTINGS
+	var styleCount = 9; // THIS NUMBER MUST BE EQUAL TO THE NUMBER OF COLOR SETTINGS
 	on("change:sheetstyle sheet:opened", function(event) {
 		var styleAttrs = {};
 
@@ -19,6 +19,10 @@
 <input type="checkbox" name="attr_styleset2" class="color-setting color-setting-2" ></input>
 <input type="checkbox" name="attr_styleset3" class="color-setting color-setting-3" ></input>
 <input type="checkbox" name="attr_styleset4" class="color-setting color-setting-4" ></input>
+<input type="checkbox" name="attr_styleset5" class="color-setting color-setting-5" ></input>
+<input type="checkbox" name="attr_styleset6" class="color-setting color-setting-6" ></input>
+<input type="checkbox" name="attr_styleset7" class="color-setting color-setting-7" ></input>
+<input type="checkbox" name="attr_styleset8" class="color-setting color-setting-8" ></input>
 <div class="sheet-wrapper">
 	<!-- HIDDEN FIELDS -->
 	<input type="hidden" name="attr_10" value="10" disabled="disabled" />
@@ -38,6 +42,10 @@
 	<input type="hidden" name="attr_inventory_fixed_digits" value="0" />
 	<!-- /HIDDEN FIELDS -->
 
+	<div class="heading-character-name">
+		<h3><span name="attr_character_name"></span></h3>	
+	</div>
+
 	<div class="update-alert">
 		<div class="container">
 		<input type="checkbox" class="sheet-showarrow sheet-ack-button" name="attr_announcements_show" value="1" title="Click to view announcements" />
@@ -45,22 +53,26 @@
 			<div class="content">
 				<h4>GURPS Character Sheet Version: <input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" /></h4>
 				<ul>
-					<li><b>New Feature:</b> New option to select a style for the character sheet. Classic White, Green, Blue, Beige, and Gray. Contributed by Tame Flame (4822134).</li>
-					<li><b>Default Sheet Settings:</b> New option to select default sheet style.</li>
-					<li>Traits tab. Advantages, Perks, Quirks, Disadvantages, and Race table. If the Frequency of Appearance or Self-Control Number is from 3 to 18, show the die button.</li>
-					<li>Skills tab. Techniques (Revised) table. You can link a technigue to another technigue. Requested by Ian.</li>
-					<li>Combat tab. Active Defenses. Added Unarmed Parry. There are number of rules specific to unarmed parry. Added Rules as Written (RAW) for unarmed parry.</li>
 					<li>
-						<b>Important: </b> Combat tab. Active Defenses. The Rules as Written (RAW) for active defense success/fail notes are now hard-coded. 
-						This is necessary because notes saved to a field can't fixed or added to. The update improves the display of notes in the chat area.
+						<b style="color: red;">IMPORTANT: </b>Due to a bug with global sheet settings, the Show Notes for Active Defenses 
+						became unchecked. This fix creates a new field and marks it as checked.
 					</li>
-					<li>New Sheet Options: Active Defenses. Show RAW Notes. If checked, success/fail notes for active defenses will display on roll template.</li>
+					<li>Highlight Row Option. Update style so input boxes use the same background color. Reported by GroundWalker.</li>
+					<li>Fixed and revised alignment of custom success/fail notes. Updated by TamedFlame.</li>
+					<li>Several new style themes added by TamedFlame.</li>
+					<li>Critical failure by 10 or more points no longer applies to ranged attacks.</li>
+					<li>Roll template, removed debugging code for sub-heading. Spotted by Karu.</li>
+					<li>Added character name just above the navigation tab. This will allow you to see the name when the sheet has been popped out into its own window.</li>
+					<li>Combat Tab. Added Close Range Shotgun Damage Tool.</li>
+					<li>Fixed bug with repeating rows where the move row handle was missing and didn't work. Fixed by TamedFlame.</li>
+					<li>A number of Minor tweaks, see update for more information.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span>Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset">View All Updates</button>
 			</div>
 		</div>
 	</div>
+	
 
 	<!-- ===== ===== ===== ===== TABS ===== ===== ===== ===== -->
 	<input type="radio" name="attr_tab" value="1" class="sheet-tab sheet-tab1" checked="checked" /><span>General</span>
@@ -2116,15 +2128,6 @@
 					</div>
 				</div> <!-- .sheet-row -->
 				
-				<div class="sheet-row sheet-row-traits" style="display: none;">
-					<div class="sheet-cell sheet-col0 sheet-label">
-						Traits
-					</div>
-					<div class="sheet-cell sheet-col1">
-						<input type="number" name="attr_trait_points" readonly="readonly" value="0" title="Macro name: trait_points" />
-					</div>
-				</div> <!-- .sheet-row -->
-				
 				<div class="row row-skills gca">
 					<div class="cell col0 label">
 						Skills
@@ -2759,7 +2762,7 @@
 						<div class="sheet-popup">Weight</div>
 						<span class="sheet-tooltip">
 							Enter a <strong>Numerical Value</strong> only.<br/>
-							Do not enter any type of indicator like lbs, ponds, kilos, etc.<br/>
+							Do not enter any type of indicator like lbs, pounds, kilos, etc.<br/>
 							This is because the weight is added to your Inventory’s Grand Total<br/>
 							Weight and thus needs to be numerical.
 						</span>
@@ -3104,19 +3107,23 @@
 						    </div>
 						    <textarea name="attr_notes" title="Macro table name: repeating_skills. Field name: notes"></textarea>
 						</div>
+
+						<div class="sheet-header">
+							<div class="sheet-popup">Notes</div>
+							<span class="sheet-tooltip">
+								Success, critical success, fail, and critical fail<br />
+								notes will be added to roll results.<br />
+								You can add macros to these notes.<br />
+								The width of these note boxes are set to help you<br />
+								visualize what it will look like in chat.
+							</span>
+						</div>
 						
 						<div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Success Note:</div>
-            						<span class="sheet-tooltip">
-            						    Success, critical success, fail, and critical fail<br />
-            						    notes will be added to roll results.<br />
-            						    You can add macros to these notes.<br />
-										The width of these note boxes are set to help you<br />
-										visualize what it will look like in chat.
-            						</span>
+    						        Success Note:
     						    </div>
 						        <textarea name="attr_skill_success_note" title="Macro table name: repeating_skills. Field name: skill_success_note"></textarea>
 						    </div>
@@ -3395,8 +3402,8 @@
     							<b>Level:</b><span name="attr_technique_skill_row_id_level"></span>
     						</div>
 						</div> <!-- .sheet-row -->
-						
-						<div class="rolltable-result-notes notes-below">
+
+						<div class="col-notebox">
 						    <div class="show-notes">
 						        <input type="checkbox" name="attr_show_notes_revised" value="1" />
 						        <span class="label">Show notes below, in roll template</span>
@@ -3404,18 +3411,22 @@
 						    <textarea name="attr_notes" title="Macro table name: repeating_techniquesrevised. Field name: notes" style="height: 50px"></textarea>
 						</div>
 					
+						<div class="sheet-header">
+							<div class="sheet-popup">Notes</div>
+							<span class="sheet-tooltip">
+								Success, critical success, fail, and critical fail<br />
+								notes will be added to roll results.<br />
+								You can add macros to these notes.<br />
+								The width of these note boxes are set to help you<br />
+								visualize what it will look like in chat.
+							</span>
+						</div>
+
 					    <div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Success Note:</div>
-            						<span class="sheet-tooltip">
-            						    Success, critical success, fail, and critical fail<br />
-            						    notes will be added to roll results.<br />
-            						    You can add macros to these notes. <br />
-										The width of these note boxes are set to help you<br />
-										visualize what it will look like in chat.
-            						</span>
+    						        Success Note:
     						    </div>
 						        <textarea name="attr_skill_success_note" title="Macro table name: repeating_skills. Field name: skill_success_note"></textarea>
 						    </div>
@@ -3741,7 +3752,7 @@
 							<input type="hidden" name="attr_raw_dodge_critical_success_notes" />
 							<input type="hidden" name="attr_raw_dodge_fail_notes" />
 							<input type="hidden" name="attr_raw_dodge_critical_fail_notes" />
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_show_notes}]]}} {{notes=@{defense_dodge_notes}}} {{showRawDefenseNotes=[[@{show_raw_defense_notes}]]}} {{rawSuccessNote=@{raw_dodge_success_notes}}} {{rawCriticalSuccessNote=@{raw_dodge_critical_success_notes}}} {{rawFailNote=@{raw_dodge_fail_notes}}} {{rawCriticalFailNote=@{raw_dodge_critical_fail_notes}}} {{customSuccessNote=@{defense_dodge_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_critical_success_note}}} {{customFailNote=@{defense_dodge_fail_note}}} {{customCriticalFailNote=@{defense_dodge_critical_fail_note}}}" name="roll_vsDodge" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_show_notes}]]}} {{notes=@{defense_dodge_notes}}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_dodge_success_notes}}} {{rawCriticalSuccessNote=@{raw_dodge_critical_success_notes}}} {{rawFailNote=@{raw_dodge_fail_notes}}} {{rawCriticalFailNote=@{raw_dodge_critical_fail_notes}}} {{customSuccessNote=@{defense_dodge_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_critical_success_note}}} {{customFailNote=@{defense_dodge_fail_note}}} {{customCriticalFailNote=@{defense_dodge_critical_fail_note}}}" name="roll_vsDodge" />
 						</div>
 					</div> <!-- .sheet-row -->
 
@@ -3799,7 +3810,18 @@
     						    <input type="text" name="attr_defense_dodge_mod_reason" title="Field name: defense_dodge_mod_reason" />
 							</div>
 						</div>
-
+						<div class="sheet-header">
+							<div class="sheet-title">
+								<div class="sheet-popup">Notes</div>
+										<span class="sheet-tooltip">
+											Success, critical success, fail, and critical fail<br />
+											notes will be added to roll results.<br />
+											You can add macros to these notes. <br />
+											The width of these note boxes are set to help you<br />
+											visualize what it will look like in chat.
+										</span>
+							</div>
+						</div>
 						<div class="row">
 							
 							<div class="show-notes">
@@ -3813,7 +3835,6 @@
 						</div>
 					
 						<div class="rolltable-result-notes">
-							
 							<div class="note-input">
 						        <div class="note-title">
     						        <div class="sheet-popup">Custom Notes:</div>
@@ -3823,19 +3844,11 @@
 						    </div>
 							
 						</div>
-
 					    <div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Custom Success Note:</div>
-            						<span class="sheet-tooltip">
-            						    Success, critical success, fail, and critical fail<br />
-            						    notes will be added to roll results.<br />
-            						    You can add macros to these notes. <br />
-										The width of these note boxes are set to help you<br />
-										visualize what it will look like in chat.
-            						</span>
+    						        Custom Success Note:
     						    </div>
 						        <textarea name="attr_defense_dodge_success_note" title="Field name: defense_dodge_success_note"></textarea>
 						    </div>
@@ -3904,7 +3917,7 @@
 							<input type="hidden" name="attr_raw_dodge_retreat_critical_success_notes" />
 							<input type="hidden" name="attr_raw_dodge_retreat_fail_notes" />
 							<input type="hidden" name="attr_raw_dodge_retreat_critical_fail_notes" />
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Retreat}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_retreat_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_retreat_show_notes}]]}} {{notes=@{defense_dodge_retreat_notes}}} {{showRawDefenseNotes=[[@{show_raw_defense_notes}]]}} {{rawSuccessNote=@{raw_dodge_retreat_success_notes}}} {{rawCriticalSuccessNote=@{raw_dodge_retreat_critical_success_notes}}} {{rawFailNote=@{raw_dodge_retreat_fail_notes}}} {{rawCriticalFailNote=@{raw_dodge_retreat_critical_fail_notes}}} {{customSuccessNote=@{defense_dodge_retreat_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_retreat_critical_success_note}}} {{customFailNote=@{defense_dodge_retreat_fail_note}}} {{customCriticalFailNote=@{defense_dodge_retreat_critical_fail_note}}}" name="roll_vsDodgeRetreat" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Retreat}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_retreat_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_retreat_show_notes}]]}} {{notes=@{defense_dodge_retreat_notes}}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_dodge_retreat_success_notes}}} {{rawCriticalSuccessNote=@{raw_dodge_retreat_critical_success_notes}}} {{rawFailNote=@{raw_dodge_retreat_fail_notes}}} {{rawCriticalFailNote=@{raw_dodge_retreat_critical_fail_notes}}} {{customSuccessNote=@{defense_dodge_retreat_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_retreat_critical_success_note}}} {{customFailNote=@{defense_dodge_retreat_fail_note}}} {{customCriticalFailNote=@{defense_dodge_retreat_critical_fail_note}}}" name="roll_vsDodgeRetreat" />
 						</div>
 					</div> <!-- .sheet-row -->
 
@@ -3962,7 +3975,18 @@
     						    <input type="text" name="attr_defense_dodge_retreat_mod_reason" title="Field name: defense_dodge_retreat_mod_reason" />
 							</div>
 						</div>
-
+						<div class="sheet-header">
+							<div class="sheet-title">
+								<div class="sheet-popup">Notes</div>
+										<span class="sheet-tooltip">
+											Success, critical success, fail, and critical fail<br />
+											notes will be added to roll results.<br />
+											You can add macros to these notes. <br />
+											The width of these note boxes are set to help you<br />
+											visualize what it will look like in chat.
+										</span>
+							</div>
+						</div>
 						<div class="row">
 							
 							<div class="show-notes">
@@ -3976,7 +4000,6 @@
 						</div>
 					
 						<div class="rolltable-result-notes">
-							
 							<div class="note-input">
 						        <div class="note-title">
     						        <div class="sheet-popup">Custom Notes:</div>
@@ -3991,14 +4014,7 @@
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Custom Success Note:</div>
-            						<span class="sheet-tooltip">
-            						    Success, critical success, fail, and critical fail<br />
-            						    notes will be added to roll results.<br />
-            						    You can add macros to these notes. <br />
-										The width of these note boxes are set to help you<br />
-										visualize what it will look like in chat.
-            						</span>
+    						        Custom Success Note:
     						    </div>
 						        <textarea name="attr_defense_dodge_retreat_success_note" title="Field name: defense_dodge_retreat_success_note"></textarea>
 						    </div>
@@ -4065,7 +4081,7 @@
 							<input type="hidden" name="attr_raw_dodge_drop_critical_success_notes" />
 							<input type="hidden" name="attr_raw_dodge_drop_fail_notes" />
 							<input type="hidden" name="attr_raw_dodge_drop_critical_fail_notes" />
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Drop}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_drop_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_drop_show_notes}]]}} {{notes=@{defense_dodge_drop_notes}}} {{showRawDefenseNotes=[[@{show_raw_defense_notes}]]}} {{rawSuccessNote=@{raw_dodge_drop_success_notes}}} {{rawCriticalSuccessNote=@{raw_dodge_drop_critical_success_notes}}} {{rawFailNote=@{raw_dodge_drop_fail_notes}}} {{rawCriticalFailNote=@{raw_dodge_drop_critical_fail_notes}}} {{customSuccessNote=@{defense_dodge_drop_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_drop_critical_success_note}}} {{customFailNote=@{defense_dodge_drop_fail_note}}} {{customCriticalFailNote=@{defense_dodge_drop_critical_fail_note}}}" name="roll_vsDodgeDrop" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dodge and Drop}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_dodge_drop_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_dodge_drop_show_notes}]]}} {{notes=@{defense_dodge_drop_notes}}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_dodge_drop_success_notes}}} {{rawCriticalSuccessNote=@{raw_dodge_drop_critical_success_notes}}} {{rawFailNote=@{raw_dodge_drop_fail_notes}}} {{rawCriticalFailNote=@{raw_dodge_drop_critical_fail_notes}}} {{customSuccessNote=@{defense_dodge_drop_success_note}}} {{customCriticalSuccessNote=@{defense_dodge_drop_critical_success_note}}} {{customFailNote=@{defense_dodge_drop_fail_note}}} {{customCriticalFailNote=@{defense_dodge_drop_critical_fail_note}}}" name="roll_vsDodgeDrop" />
 						</div>
 					</div> <!-- .sheet-row -->
 
@@ -4123,7 +4139,18 @@
     						    <input type="text" name="attr_defense_dodge_drop_mod_reason" title="Field name: defense_dodge_drop_mod_reason" />
 							</div>
 						</div>
-
+						<div class="sheet-header">
+							<div class="sheet-title">
+								<div class="sheet-popup">Notes</div>
+										<span class="sheet-tooltip">
+											Success, critical success, fail, and critical fail<br />
+											notes will be added to roll results.<br />
+											You can add macros to these notes. <br />
+											The width of these note boxes are set to help you<br />
+											visualize what it will look like in chat.
+										</span>
+							</div>
+						</div>
 						<div class="row">
 							
 							<div class="show-notes">
@@ -4151,16 +4178,7 @@
 					    <div class="rolltable-result-notes">
 						    
 						    <div class="note-input">
-						        <div class="note-title">
-    						        <div class="sheet-popup">Custom Success Note:</div>
-            						<span class="sheet-tooltip">
-            						    Success, critical success, fail, and critical fail<br />
-            						    notes will be added to roll results.<br />
-            						    You can add macros to these notes. <br />
-										The width of these note boxes are set to help you<br />
-										visualize what it will look like in chat.
-            						</span>
-    						    </div>
+						        <div class="note-title">Custom Success Note:</div>
 						        <textarea name="attr_defense_dodge_drop_success_note" title="Field name: defense_dodge_drop_success_note"></textarea>
 						    </div>
 						    
@@ -4224,14 +4242,14 @@
 							<input type="text" name="attr_skill_final" value="@{skill} + @{skill_mod}" disabled="disabled" title="Macro table name: repeating_defense. Field name: skill_final" />
 						</div>
 						<div class="cell col4">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll (@{type})}} {{defenseType=[[@{defense_type}]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill_final} + @{modifier}]]}} {{showNotes=[[@{show_notes}]]}} {{notes=@{info_description} @{notes} }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showRawDefenseNotes=[[@{show_raw_defense_notes}]]}} {{rawSuccessNote=@{raw_success_note}}} {{rawCriticalSuccessNote=@{raw_critical_success_note}}} {{rawFailNote=@{raw_fail_note}}} {{rawCriticalFailNote=@{raw_critical_fail_note}}} {{customSuccessNote=@{defense_success_note}}} {{customCriticalSuccessNote=@{defense_critical_success_note}}} {{customFailNote=@{defense_fail_note}}} {{customCriticalFailNote=@{defense_critical_fail_note}}}" name="roll_vsSL" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Defense Roll (@{type})}} {{defenseType=[[@{defense_type}]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill_final} + @{modifier}]]}} {{showNotes=[[@{show_notes}]]}} {{notes=@{info_description} @{notes} }} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_success_note}}} {{rawCriticalSuccessNote=@{raw_critical_success_note}}} {{rawFailNote=@{raw_fail_note}}} {{rawCriticalFailNote=@{raw_critical_fail_note}}} {{customSuccessNote=@{defense_success_note}}} {{customCriticalSuccessNote=@{defense_critical_success_note}}} {{customFailNote=@{defense_fail_note}}} {{customCriticalFailNote=@{defense_critical_fail_note}}}" name="roll_vsSL" />
 						</div>
 					</div> <!-- .row -->
 					
 					<div class="row row-details notebox">
 					
 					    <!-- TODO: Add links: Skill, Technique, Spell, Weapon, Power/Talent -->
-						<div class="row" style="display: none;">
+						<div class="row hidden">
 					        <div class="cell label">
 							    <div class="popup">Link: </div>
         						<span class="tooltip">
@@ -4283,6 +4301,16 @@
 							</div>
 						</div>
 
+						<div class="sheet-header">
+							<div class="sheet-popup">Notes</div>
+            						<span class="sheet-tooltip">
+            						    Success, critical success, fail, and critical fail<br />
+            						    notes will be added to roll results.<br />
+            						    You can add macros to these notes. <br />
+										The width of these note boxes are set to help you<br />
+										visualize what it will look like in chat.
+            						</span>
+						</div>
 						<div class="row">
 							
 							<div class="show-notes">
@@ -4323,14 +4351,7 @@
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Custom Success Note:</div>
-            						<span class="sheet-tooltip">
-            						    Success, critical success, fail, and critical fail<br />
-            						    notes will be added to roll results.<br />
-            						    You can add macros to these notes. <br />
-										The width of these note boxes are set to help you<br />
-										visualize what it will look like in chat.
-            						</span>
+    						        Custom Success Note:
 								</div>
 								<input type="hidden" name="attr_raw_success_note" />
 						    	<textarea name="attr_defense_success_note" title="Macro table name: repeating_defense. Field name: defense_success_note"></textarea>
@@ -4777,7 +4798,7 @@
 							<input type="text" name="attr_skill" title="Macro table name: repeating_ranged. Field name: skill" />
 						</div>
 						<div class="sheet-cell sheet-col11">
-							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{rof=@{rof}}} {{recoil=@{recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{useMalfunction=[[@{use_malfunction}]]}} {{malfunction=[[@{malfunction}]]}} {{verifyMalfunction=[[ @{malfunction_verify} ]]}}" name="roll_vsSL" />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{type=Ranged Attack}} {{rangedAttack=[[1]]}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{skill} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{rof=@{rof}}} {{recoil=@{recoil}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{useMalfunction=[[@{use_malfunction}]]}} {{malfunction=[[@{malfunction}]]}} {{verifyMalfunction=[[ @{malfunction_verify} ]]}}" name="roll_vsSL" />
 						</div>
 					</div> <!-- .sheet-row -->
 					
@@ -5609,6 +5630,128 @@
 		</div> 
         <!-- end demolition -->
 
+		<!-- _____ _____ Shotgun Tool _____ _____ -->
+		<div class="box shotgun-tool">
+			<div class="table">
+			    
+			    <div class="row title">
+			        <div class="cell">
+			            Close Range Shotgun Damage Tool
+			        </div>
+			    </div>
+			    
+			    <div class="header">
+					<div class="cell damage">
+						DMG
+					</div>
+				    <div class="cell rof">
+						ROF
+					</div>
+				    <div class="cell damage-type">
+						Type
+					</div>
+				    <div class="cell range">
+						<div class="popup">1/2 Range</div>
+						<div class="tooltip">
+						   Enter half-damage range of shotgun.
+						</div>
+					</div>
+				    <div class="cell close-range">
+						<div class="popup">Close</div>
+						<div class="tooltip">
+						   Close range.
+						</div>
+					</div>
+				    <div class="cell close-rof">
+						<div class="popup">ROF</div>
+						<span class="tooltip">
+						    New Rate of Fire
+						</span>
+					</div>
+					<div class="cell close-damage">
+						<div class="popup">DMG</div>
+						<div class="tooltip">
+						   New Damage
+						</div>
+					</div>
+					<div class="cell close-damage">
+						<div class="popup">DR Mult.</div>
+						<div class="tooltip">
+						   Damage Resistance Multiplier.
+						</div>
+					</div>
+					<div class="cell roll-damage">
+						&nbsp;
+					</div>
+					<div class="cell reset">
+					    &nbsp;
+					</div>
+				</div> <!-- .sheet-header -->
+				
+				<div class="container">
+				    
+				    <div class="row">
+    					<div class="cell damage">
+							<input type="text" value="1d6+1" name="attr_shotgun_damage" title="Macro name: shotgun_damage" />
+						</div>
+						<div class="cell rof">
+							<input type="text" value="2x9" name="attr_shotgun_rof" title="Macro name: shotgun_rof" />
+						</div>
+						<div class="cell type">
+							<select name="attr_shotgun_damage_type" title="Macro name: shotgun_damage_type">
+								<option value="Affliction (aff)">aff</option>
+								<option value="Burning (burn)">burn</option>
+								<option value="Corrosion (cor)">cor</option>
+								<option value="Crushing (cr)">cr</option>
+								<option value="Cutting (cut)">cut</option>
+								<option value="Fatigue (fat)">fat</option>
+								<option value="Impaling (imp)">imp</option>
+								<option value="Small Piercing (pi-)">pi-</option>
+								<option value="Piercing (pi)" selected="selected">pi</option>
+								<option value="Large Piercing (pi+)">pi+</option>
+								<option value="Huge Piercing (pi++)">pi++</option>
+								<option value="Special (spec)">spec</option>
+								<option value="Toxic (tox)">tox</option>
+							</select>
+						</div>
+						<div class="cell range">
+							<input type="number" value="50" step="1" min="0" name="attr_shotgun_half_range" title="Macro name: shotgun_half_range" />
+						</div>
+						<div class="cell close-range">
+							<input type="text" value="5" name="attr_shotgun_close_range" readonly="readonly" title="Macro name: shotgun_close_range" />
+						</div>
+						<div class="cell close-rof">
+							<input type="text" value="2" name="attr_shotgun_close_rof" readonly="readonly" title="Macro name: shotgun_close_row" />
+						</div>
+						<div class="cell close-damage">
+							<input type="text" value="4d6+4" name="attr_shotgun_close_damage" readonly="readonly" title="Macro name: shotgun_close_damage" />
+						</div>
+						<div class="cell close-damage">
+							<input type="text" value="DR x 4" name="attr_shotgun_dr_multiplier" readonly="readonly" title="Macro name: shotgun_dr_multiplier" />
+						</div>
+						<div class="cell roll-damage">
+							<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
+							<input type="hidden" name="attr_shotgun_damage_type_note" value="PIERCING
+Damage x1
+Vitals Damage x3
+Skull Damage x4" />
+						    <button type="roll" value="@{roll}&{template:skillRoll} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Close Shotgun Damage}} {{damageRoll=[[@{shotgun_close_damage}]]}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{shotgun_damage_type_note}}} {{minDamageNote=Crush min 0, else min 1}}" name="roll_dmgCloseShotgunDamage" class="roll_damage" />
+    					</div>
+						<div class="cell reset">
+					        <button type="action" name="act_shotgun_reset" class="reset">Reset</button>
+					    </div>
+				    </div>
+					
+					<div class="row shotgun-notes">
+						Enter the stats of the shotgun, be sure to use half-damage range. The tool will calculate how 
+							close you need to be with the shotgun, the RoF, close range damage, and DR multiplier.
+							For more information, see B409.
+					</div>
+				</div> <!-- .container -->
+				
+			</div> <!-- .sheet-table -->
+		</div> <!-- .sheet-box .falling and collision -->
+
 	</div> <!-- .sheet-tab4 -->
 
 
@@ -5674,7 +5817,7 @@
 							<input type="text" name="attr_tl" title="Macro table name: repeating_item. Field name: tl" />
 						</div>
 						<div class="cell col1">
-							<input type="number" step="1" min="0" max="4" value="4" name="attr_legality_class" title="Macro table name: repeating_item. Field name: legality_class" />
+							<input type="number" step="1" min="0" max="4" name="attr_legality_class" title="Macro table name: repeating_item. Field name: legality_class" />
 						</div>
 						<div class="cell col2">
 							<input type="text" name="attr_ref" title="Macro table name: repeating_item. Field name: ref" />
@@ -5995,7 +6138,16 @@
 							    <input type="text" readonly="readonly" name="attr_row_id" value="" />
 							</div>
 						</div> <!-- .sheet-row -->
-						
+						<div class="sheet-header">
+							<div class="sheet-popup">Notes</div>
+						<span class="sheet-tooltip">
+							Success, critical success, fail, and critical fail<br />
+							notes will be added to roll results.<br />
+							You can add macros to these notes. <br />
+							The width of these note boxes are set to help you<br />
+							visualize what it will look like in chat. 
+						</span>
+					</div>
 						<div class="col-notebox">
 						    <div class="show-notes">
 						        <input type="checkbox" name="attr_show_notes" value="1" />
@@ -6016,14 +6168,7 @@
 						    
 						    <div class="note-input">
 						        <div class="note-title">
-    						        <div class="sheet-popup">Success Note:</div>
-            						<span class="sheet-tooltip">
-            						    Success, critical success, fail, and critical fail<br />
-            						    notes will be added to roll results.<br />
-            						    You can add macros to these notes. <br />
-										The width of these note boxes are set to help you<br />
-										visualize what it will look like in chat. 
-            						</span>
+    						        Success Note:
     						    </div>
 						        <textarea name="attr_spell_success_note" title="Macro table name: repeating_spells. Field name: spell_success_note"></textarea>
 						    </div>
@@ -6131,6 +6276,34 @@
 
 	<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
+	<ul>
+		<li>
+			<b style="color: red;">IMPORTANT: </b>Due to a bug with global sheet settings, the Show Notes for Active Defenses 
+			became unchecked. This fix creates a new field and marks it as checked.
+		</li>
+		<li>Highlight Row Option. Update style so input boxes use the same background color. Reported by GroundWalker.</li>
+		<li>Fixed and revised alignment of custom success/fail notes. Updated by TamedFlame.</li>
+		<li>Several new style themes added by TamedFlame.</li>
+		<li>Minor tweaks to inventory table, alignments, and notes.</li>
+		<li>Critical failure by 10 or more points no longer applies to ranged attacks.</li>
+		<li>Roll template, removed debugging code for sub-heading. Spotted by Karu.</li>
+		<li>Added character name just above the navigation tab. This will allow you to see the name when the sheet has been popped out into its own window.</li>
+		<li>Fixed bug with repeating rows where the move row handle was missing and didn't work. Fixed by TamedFlame.</li>
+		<li>A number of Minor tweaks, see update for more information.
+			<ul>
+				<li>Inventory Table. Legality Class default value is now empty.</li>
+				<li>Expanded notes for skills, techniques, active defenses, and spells. Fixed alignment of success/fail boxes.</li>
+				<li>Spells table. Increased height of expanded area.</li>
+				<li>Fixed alignment issue with Verify malfuction checkbox.</li>
+				<li>Removed unneeded text for Parry Critical Failure Notes.</li>
+				<li>Updated Point Summary. Removed a legacy field called Traits, not needed.</li>
+				<li>Fixed alignment of elements for Expanded notes for Techniques (Revised) table.</li>
+				<il>Active Defenses Table. Hide link to row id, that part is still under construction.</il>
+			</ul>
+		</li>
+	</ul>
+
+	<h4>Version 2.3.3</h4>
 	<p>Pull Request: 4/28/2020</p>
 
 	<ul>
@@ -6495,7 +6668,7 @@
         			    <span class="sheet-tooltip">Show the original techniques table.</span>
 					</div>
 					<div>
-        			    <input type="checkbox" name="attr_show_new_techniques" value="1" />
+        			    <input type="checkbox" name="attr_show_new_techniques" checked="checked" value="1" />
         			    <span class="popup">Show Revised</span>
         			    <span class="sheet-tooltip">Show the revised techniques table.</span>
     			    </div>
@@ -6577,7 +6750,7 @@
 		            <h4>Active Defenses</h4>
 					
 		            <div>
-        			    <input type="checkbox" name="attr_show_raw_defense_notes" value="1" />
+        			    <input type="checkbox" name="attr_show_raw_defensive_notes" value="1" checked="checked" />
         			    <span class="popup">Show RAW Notes</span>
         			    <span class="sheet-tooltip">Show Rules as Written Success/Fail notes</span>
 					</div>
@@ -6638,11 +6811,15 @@
 					<span>Selects a visual style for the character sheet</span>
 		            <div>
     		            <select name="attr_sheetstyle"/>
-						  <option value="0" >Green</option> <!-- Color Style options, remember to add one to add a new option-->>
-						  <option value="1">Blue</option>
-						  <option value="2">Beige</option>
-						  <option value="3">Gray</option>
-						  <option value="4"selected="selected">Classic White</option>
+						  <option class="color-option-0" value="0" >Green</option> <!-- Color Style options, remember to add one to add a new option-->>
+						  <option class="color-option-1" value="1">Blue</option>
+						  <option class="color-option-2" value="2">Beige</option>
+						  <option class="color-option-3" value="3">Gray</option>
+						  <option class="color-option-5" value="5">Pastel Pink</option>
+						  <option class="color-option-6" value="6">Pastel Earth</option>
+						  <option class="color-option-7" value="7">Purple</option>
+						  <option class="color-option-8" value="8">Fabric</option>
+						  <option class="color-option-4" value="4"selected="selected">Classic White</option>
 						</select>
     				</div>
 		        </div><!-- end style selector options -->
@@ -6919,7 +7096,7 @@ See notes for weapon.</textarea>
                     <th colspan="2">{{characterName}}</th>
                 </tr>
 				<tr>
-					<td colspan="2" class="subhead">{{skillName}} show notes: {{showRawDefenseNotes}}</td>
+					<td colspan="2" class="subhead">{{skillName}}</td>
 				</tr>				
                 {{#type}}
                 <tr>
@@ -7067,30 +7244,41 @@ See notes for weapon.</textarea>
                                     {{rollResult}}
                                     <span class="failure-text">
                                         
-                                        <!-- if effective skill is 3 or less, critical failure is 13 or higher -->
+										<!-- if effective skill is 3 or less, critical failure is 13 or higher -->
+										<!-- does not apply to ranged attacks -->
+										{{^rangedAttack}}
                                         {{#rollLess() effectiveSkill 4}}
                                             {{#rollGreater() rollResult 12}}Critical{{/rollGreater() rollResult 12}}
                                         {{/rollLess() effectiveSkill 4}}
-                                        
-                                        <!-- if effective skill is 4, critical failure is 14 or higher -->
+										{{/rangedAttack}}
+										
+										<!-- if effective skill is 4, critical failure is 14 or higher -->
+										{{^rangedAttack}}
                                         {{#rollTotal() effectiveSkill 4}}
                                             {{#rollGreater() rollResult 13}}Critical{{/rollGreater() rollResult 13}}
                                         {{/rollTotal() effectiveSkill 4}}
-                                        
+										{{/rangedAttack}}
+										
                                         <!-- if effective skill is 5, critical failure is 15 or higher -->
-                                        {{#rollTotal() effectiveSkill 5}}
+										{{^rangedAttack}}
+										{{#rollTotal() effectiveSkill 5}}
                                             {{#rollGreater() rollResult 14}}Critical{{/rollGreater() rollResult 14}}
                                         {{/rollTotal() effectiveSkill 5}}
-                                        
-                                        <!-- if effective skill is 6, critical failure is 16 or higher -->
+										{{/rangedAttack}}
+										
+										<!-- if effective skill is 6, critical failure is 16 or higher -->
+										{{^rangedAttack}}
                                         {{#rollTotal() effectiveSkill 6}}
                                             {{#rollGreater() rollResult 15}}Critical{{/rollGreater() rollResult 15}}
                                         {{/rollTotal() effectiveSkill 6}}
+                                        {{/rangedAttack}}
                                         
                                         <!-- if effective skill is 7 to 15, critical failure is 17 or 18 -->
+                                        {{^rangedAttack}}
                                         {{#rollBetween() effectiveSkill 7 15}}
                                             {{#rollGreater() rollResult 16}}Critical{{/rollGreater() rollResult 16}}
                                         {{/rollBetween() effectiveSkill 7 15}}
+                                        {{/rangedAttack}}
                                         
                                         <!-- NOTE: Roll of 18 check has already been made -->
 
@@ -7902,13 +8090,14 @@ See notes for weapon.</textarea>
 </div>
 
 <script type="text/worker">
-	// type="text/worker"
+	// text/worker
+	// application/javascript
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.3.3";
+	var version = "2.3.4";  
 
-	var latestChangesDate = "04/28/2020";
+	var latestChangesDate = "05/05/2020";
 
 	var modCascade = true;
 	
@@ -9050,15 +9239,6 @@ See notes for weapon.</textarea>
 	on('change:repeating_spells:points remove:repeating_spells', function (e) {
 		sumRepeating('repeating_spells', 'points', function(v) {
 			setAttrs({ spells_points: v });
-		});
-	});
-
-	// Update Summery
-	on('change:tl_pts change:languages_points change:cf_points change:advantages_points change:disadvantages_points change:racial_points', function (e) {
-		getAttrs(['tl_pts', 'languages_points', 'cf_points', 'advantages_points', 'disadvantages_points', 'racial_points'], function(v) {
-			var vals = Object.values(v);
-			vals.push(0);
-			setAttrs({ trait_points: vals.reduce(getSum) });
 		});
 	});
 
@@ -14029,9 +14209,7 @@ If parrying a weapon 3 times your weapons weight, roll for breakage. See B376.`;
 
 		const parryFailNotes = ``;
 
-		const parryCriticalFailureNotes = `Roll on the appropriate <i>Critical Miss Table</i> B556. See B382.
-
-If you're using an unarmed parry, attacker may choose to hit the original target or the limb you used to parry with. See B376.`;
+		const parryCriticalFailureNotes = `Roll on the appropriate <i>Critical Miss Table</i> B556. See B382.`;
 
 		const unarmedParrySuccessNotes = ""; 
 
@@ -14091,5 +14269,195 @@ The attacker may choose to hit the original target or the limb you used to parry
     	return (entry != undefined ? entry.value : "");
     
     };
+
+	// when reset close range shotgun fields is clicked
+	on("clicked:shotgun_reset", function() {
+	   
+		resetShotgunFields();
+	    
+	});
+
+	function resetShotgunFields() {
+
+		const updateFields = {
+			shotgun_damage: "1d6+1",
+			shotgun_damage_rof: "2x9",
+			shotgun_damage_type: "Piercing (pi)",
+			shotgun_half_range: "50",
+			shotgun_close_range: "5",
+			shotgun_close_rof: "2",
+			shotgun_close_damage: "4d6+4",
+			shotgun_dr_multiplier: "DR x 4"
+		};
+
+		setAttrs(updateFields);
+
+	}
+
+	on("change:shotgun_damage change:shotgun_rof change:shotgun_damage_type change:shotgun_half_range", () => {
+
+		updateShotgunTool();
+
+	});
+
+	/**
+     * Updates the fields for the shotgun tool
+	 */
+	function updateShotgunTool() {
+
+		const fields = [
+			"shotgun_damage",
+			"shotgun_rof",
+			"shotgun_damage_type",
+			"shotgun_half_range",
+			"damage_type_note_cut",
+		    "damage_type_note_imp",
+		    "damage_type_note_cr",
+		    "damage_type_note_pi_minus",
+		    "damage_type_note_pi",
+		    "damage_type_note_pi_plus",
+		    "damage_type_note_pi_plus_plus",
+		    "damage_type_note_aff",
+		    "damage_type_note_burn",
+		    "damage_type_note_cor",
+		    "damage_type_note_fat",
+		    "damage_type_note_tox",
+		    "damage_type_note_spec"
+		];
+
+		getAttrs(fields, (values) => {
+
+			let closeRange = 1;
+
+			let closeDamage = "4d6";
+
+			let halfDamageRange = parseInt(values.shotgun_half_range, values);
+
+			if ( isNaN(halfDamageRange) ) {
+				closeRange = 0;
+			} else {
+				closeRange = Math.floor( .1 * halfDamageRange);
+			}
+
+			let {closeRof, modifier} = getShotGunModifiers(values.shotgun_rof);
+
+			// calculate close damage: 1d6+2
+			let arrDamage = values.shotgun_damage.toLowerCase().split("d");
+
+			let damageDie = 1;
+
+			let damageMod = 0;
+
+			let damageTypeNote = getDamageTypeNote(values.shotgun_damage_type, values);
+
+			// try to get the base damage die for shotgun
+			// 1d6+1. arrDamage = [1][6+1]
+			if (Array.isArray(arrDamage)) {
+
+				damageDie = parseInt(arrDamage[0]);
+
+				// check for a bad number
+				if (isNaN(damageDie)) {
+					damageDie = 1;
+				}
+
+				// check for the second half die modifier
+				if (arrDamage.length === 2) {
+
+					// get rid of the 6 
+					// 6+1. we just need the +1 or -1.
+					damageMod = parseInt(arrDamage[1].replace("6", ""));
+
+				}
+
+			}
+
+			let closeDamageDie = damageDie * modifier;
+
+			let closeDamageDieMod = damageMod * modifier;
+
+			closeDamage = `${closeDamageDie}d6`;
+
+			// check if we should add the damage die mod
+			if ( closeDamageDieMod > 0) {
+
+				closeDamage = `${closeDamage}+${closeDamageDieMod}`;
+			
+			} else if (damageMod < 0) {
+			
+				closeDamage = `${closeDamage}${closeDamageDieMod}`;
+			
+			}
+
+			let drMultiplier = `DR x ${modifier}`;
+
+			const updateFields = {
+				"shotgun_close_range": closeRange,
+				"shotgun_close_rof": closeRof,
+				"shotgun_close_damage": closeDamage,
+				"shotgun_dr_multiplier": drMultiplier,
+				"shotgun_damage_type_note": damageTypeNote
+			};
+
+			setAttrs(updateFields);
+			
+		});
+
+		/**
+		 * Get shotgun modifier based on rate of fire
+		 *
+		 * @param string rateOfFire Shotgun rate of fire, i.e.: 2x9
+		 * 
+		 * @return object {baseDamage, Modifier}
+		 */
+		function getShotGunModifiers(rateOfFire) {
+
+			// just in case, remmove any negative numbers
+			rateOfFire = rateOfFire.replace("-", "");
+
+			// rateOfFire = shotes x Mulitplier
+			// example: 2 x 9
+			let arrRof = rateOfFire.toLowerCase().split("x");
+
+			let baseRof = 1;
+
+			let multiplier = 1;
+
+			let modifier = 1;
+
+			if (arrRof.length === 2) {
+
+				baseRof = parseInt(arrRof[0]);
+
+				// make sure we have good number
+				if (isNaN(baseRof)) {
+					baseRof = 1;
+				}
+
+				multiplier = parseInt(arrRof[1]);
+
+				// make sure we have a number
+				if (isNaN(multiplier)) {
+
+					modifier = 1;
+
+				} else {
+
+					modifier = Math.floor(multiplier/2);		
+
+				}
+
+			}
+
+			let modifiers = {
+				closeRof: baseRof,
+				modifier: modifier 
+			};
+
+			return modifiers;
+
+		}
+
+	}
 
 </script>
