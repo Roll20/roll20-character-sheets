@@ -38,11 +38,10 @@ Install the node libraries using `npm install`
 
 ## Compilation
 
-1. To compile the compendium (removed for licensing reasons) and / or the companion:
+1. To compile the compendium from src (removed for licensing reasons) and / or the companion:
    `npx webpack --config webpack.config.js`
-1. To build html use `npm run pug`
-1. To build css use `npm run scss`
-1. Then look in `dist` folder
+1. To build html from src use `npm run pug`
+1. To build css from src use `npm run scss`
 
 ## Watch
 
