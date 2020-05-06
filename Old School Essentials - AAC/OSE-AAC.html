@@ -42,7 +42,7 @@
           <input type="text" name="attr_title" data-i18n-placeholder="title" placeholder="Title" />
         </label>
       </div>
-      <div class="flex">
+      <div class="flex roll">
         <label class="inline-flex">
           <span data-i18n="experience-abbr">XP</span>
           <input type="number" name="attr_XP" value="0" />
@@ -57,12 +57,11 @@
           <input type="number" name="attr_ExpPercentage" value="0" />
         </label>
         <label class="inline-flex">
-          <span data-i18n="hit-dice-abbr">HD</span>
-          <input readonly type="number" name="attr_hitdice" value="0" />
-        </label>
-        <label class="inline-flex">
-          <span>±</span>
-          <input type="number" name="attr_HPMod" value="0" title="HP Modifier" data-i18n-title="hitdice-modifier" />
+          <button type="roll" data-i18n="hit-dice-abbr" title="Hit Dice" data-i18n-title="hit-dice"
+            value="&{template:simple} {{roll=HP for @{character_name}}} {{result=[[@{hitdice}+[[@{HPConMod}*{@{level}, 9}kl1]]]]}}">HD</button>
+          <input type="text" name="attr_hitdice" value="0" placeholder="9d6+2" class="input-as-number double" />
+          <span data-i18n="constitution-abbr-mod">± CON</span>
+          <input readonly type="number" name="attr_HPConMod" value="0" />
         </label>
       </div>
     </div>
@@ -251,10 +250,6 @@
             <span data-i18n="max">Max</span>
             <input type="number" name="attr_HP_max" value="0" />
           </label>
-          <label class="inline-flex">
-            <span data-i18n="constitution-abbr-mod">± CON</span>
-            <input readonly type="number" name="attr_HPConMod" value="0" />
-          </label>
         </div>
         <div class="flex hp">
           <label class="inline-flex">
@@ -285,7 +280,7 @@
             <tr>
               <td>
                 <input disabled type="number" name="attr_movementEncounter" data-i18n-title="movement-encounter"
-                  title="Movement - Encounter" value="floor(@{movementExploration}/4)" />
+                  title="Movement - Encounter" value="floor(@{movementExploration}/3)" />
               </td>
               <td>
                 <input type="number" name="attr_movementExploration" data-i18n-title="movement-exploration"
@@ -321,6 +316,7 @@
       <span></span>
       <span data-i18n="name">Name</span>
       <span data-i18n="attribute">Attribute</span>
+      <span data-i18n="typeofattack">Type of Attack</span>
       <span data-i18n="attack-modifier">+Attack</span>
       <span data-i18n="damage-die">Damage Die</span>
       <span data-i18n="damage-modifier">+Damage</span>
@@ -329,13 +325,17 @@
     <fieldset class="repeating_weapons">
       <div class="weapons-grid">
         <button type="roll" name="attr_weaponAttack"
-          value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{modquery}]]}} {{damage=[[{[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonus}]], 1}kh1]]}}"></button>
+          value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{modquery}]]}} {{damage=[[{[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]], 1}kh1]]}}"></button>
         <input type="text" name="attr_weaponName" placeholder="Weapon" />
         <select name="attr_weaponAttributeBonus">
           <option selected value="[[@{BonusSTR}]]">Strength</option>
           <option value="[[@{BonusDEX}]]">Dexterity</option>
         </select>
-        <input type="number" name="attr_weaponAttackBonus" value="0">
+        <select name="attr_weaponAttributeBonusDamage">
+          <option selected value="[[@{BonusSTR}]]">Melee</option>
+          <option value="0">Ranged</option>
+        </select>
+        <input type="number" name="attr_weaponAttackBonus" value="0" />
         <select name="attr_weaponDamageDie" class="half-input">
           <option value="d4">d4</option>
           <option selected value="d6">d6</option>
@@ -344,8 +344,9 @@
           <option value="d12">d12</option>
         </select>
         <input type="number" name="attr_weaponDamageBonus" value="0" />
-        <input type="number" name="attr_weaponWeight" placeholder="100">
+        <input type="number" name="attr_weaponWeight" placeholder="100" />
       </div>
+      <input type="hidden" name="attr_weaponDescription" value="" />
     </fieldset>
   </div>
 
@@ -539,7 +540,7 @@
           <tbody>
             <tr>
               <td>
-                <input disabled type="number" name="attr_movementEncounter" value="floor(@{movementExploration}/4)" />
+                <input disabled type="number" name="attr_movementEncounter" value="floor(@{movementExploration}/3)" />
               </td>
               <td>
                 <input type="number" name="attr_movementExploration" value="120" />
@@ -971,12 +972,6 @@
           });
         };
      });
-  });
-
-  on("change:level", function() {
-    getAttrs(["level", "hitdice"], function(values) {
-      setAttrs({ hitdice: Math.min(9, values.level) });
-    });
   });
 
   on('sheet:opened change:repeating_armor remove:repeating_armor', function() {
