@@ -324,8 +324,8 @@
 			<span> Bonus </span><input type="number" name="attr_ItemBRaufen" value="0" /> 
 			<span> Sch.B </span><input type="number" name="attr_ItemBRaufenSch" value="0" /> 
 			
-			<button type='roll' value='&{template:default} {{name=@{character_name}}} {{Angriffsrang=[[@{GW} + @{ItemBGewandheit} + @{ModGw}&{tracker}]]}}' name="roll_Angriffsrang"></button>
-			<span><b>Angriffsrang | Modifikation: </b></span><input type="number" name="attr_ModGw" style="width:60px" value ="0"/>			
+			<button type='roll' value='&{template:default} {{name=@{character_name}}} {{Handlungsrang=[[@{aktGw} &{tracker}]]}}' name="roll_Handlungsrang"></button>
+			<span><b>Handlungsrang</b></span><input type="number" name="attr_aktGw" style="width:60px" value ="@{GW} + @{ItemBGewandheit} + @{ModGw}" disabled="true"/>			
 			<br/><br/>
 			<h3>Angriff</h3> <br/>
 			
@@ -339,7 +339,7 @@
 			<span class="span-header center" style="margin-left: 10px"><b>PP</b></span>
 
 			<fieldset class="repeating_angriff">
-				<button type='roll' value='&{template:default} {{name=@{character_name} greift an}} {{EW:@{Waffe}=[[1d20 + @{FWWaffe} + @{SpezWaffe} + @{WaffeAngB} + @{BonusAngriff} + ?{Bonus|0}]]}} {{Schaden=[[@{WaffeSchaden} + @{WaffeSchB} + @{BonusSchaden}]]}}' name="roll_EW_Angriff"></button>
+				<button type='roll' value='&{template:default} {{name=@{character_name} greift an}} {{EW:@{Waffe}=[[1d20 + @{FWWaffe} + @{SpezWaffe} + @{WaffeAngB} + @{BonusAngriff} + @{modAngriff} + ?{Bonus|0}]]}} {{Schaden=[[@{WaffeSchaden} + @{WaffeSchB} + @{BonusSchaden} + @{modSchaden}]]}}' name="roll_EW_Angriff"></button>
 				<input type="text" name="attr_Waffe" value ="Name"/>
 				<input type="number" name="attr_FWWaffe" style="width:40px" value ="0"/>
 				<input type="number" name="attr_SpezWaffe" style="width:40px" value ="0"/>
@@ -375,6 +375,12 @@
 
 		<div class="col">
 
+			<span><b>Modifikationen:</b></span>
+			<span><b>Rang</b></span><input type="number" name="attr_ModGw" style="width:60px" value ="0"/>
+			<span><b>Schaden</b></span><input type="number" name="attr_modSchaden" value="0" />
+			<span><b>Angriff</b></span><input type="number" name="attr_modAngriff" value="0" />
+			<span><b>Abwehr</b></span><input type="number" name="attr_modAbwehr" value="0" />
+			<br/>
 			<span><b>LP </b></span><input type="number" name="attr_LP" value="0" /> <span> / </span> <input type="number" name="attr_LP_max" value ="0" readonly />  
 			<span><b>AP </b></span><input type="number" name="attr_AP" value="0" /> <span> / </span> <input type="number" name="attr_AP_max" value ="0" readonly />
 	
@@ -382,7 +388,7 @@
 			<span><b>ResG</b> </span> <input type="number" name="attr_KampfResG" value="@{ResGeist} + @{ItemBResG} + @{BonusResG}" disabled="true" /> 
 
 			<button type='roll' value='&{template:default} {{name=@{character_name} resistiert}} {{WW:Körper=[[1D20 + @{KampfResK} + ?{Bonus|0}]]}}' name="roll_WW_Koerper"></button> 
-			<span><b>ResK</b> </span> <input type="number" name="attr_KampfResK" value="@{ResKörper} + @{ItemBResK} + @{BonusResK}" disabled="true" /> 
+			<span><b>ResK</b> </span> <input type="number" name="attr_KampfResK" value="@{ResKörper} + @{ItemBResK} + @{BonusResK}" disabled="true" />
             
 		   <br/> <br/>
 			
@@ -395,7 +401,7 @@
 			<span class="span-header center" style="margin-left: 20px"><b>PP</b></span>
 
 			<fieldset class="repeating_abwehr">
-				<button type='roll' value='&{template:default} {{name=@{character_name} wehrt ab}} {{WW:@{AbwWaffe}=[[1d20 + @{Abwehr} + @{FWAbwWaffe} + @{WaffeAbwB} + @{BonusAbwehr} + @{ItemBAbwehr} + ?{Bonus|0}]]}}' name="roll_WW_Abwehr"></button>
+				<button type='roll' value='&{template:default} {{name=@{character_name} wehrt ab}} {{WW:@{AbwWaffe}=[[1d20 + @{Abwehr} + @{FWAbwWaffe} + @{WaffeAbwB} + @{BonusAbwehr} + @{ItemBAbwehr} + @{modAbwehr} + ?{Bonus|0}]]}}' name="roll_WW_Abwehr"></button>
 				<input type="text" name="attr_AbwWaffe" value ="Name"/>
 				<input type="number" name="attr_FWAbwWaffe" style="width:40px" value ="0"/>
 				<input type="number" name="attr_WaffeAbwB" style="width:40px" value ="0"/>
@@ -503,11 +509,17 @@
 			<span> Bonus </span><input type="number" name="attr_ItemBRaufen" value="0" /> 
 			<span> Sch.B </span><input type="number" name="attr_ItemBRaufenSch" value="0" /> 
 			
-			<button type='roll' value='&{template:default} {{name=@{character_name}}} {{Angriffsrang=[[@{GW} + @{ItemBGewandheit} + @{ModGw}&{tracker}]]}}' name="roll_Angriffsrang"></button>
-			<span><b>Angriffsrang | Modifikation: </b></span><input type="number" name="attr_ModGw" style="width:60px" value ="0"/>	
+			<button type='roll' value='&{template:default} {{name=@{character_name}}} {{Handlungsrang=[[@{GW} + @{ItemBGewandheit} + @{ModGw}&{tracker}]]}}' name="roll_Handlungsrang"></button>
+			<span><b>Handlungsrang</b></span><input type="number" name="attr_aktGw" style="width:60px" value ="@{GW} + @{ItemBGewandheit} + @{ModGw}" disabled="true"/>		
 		</div>
 		<div class="col">
-					<span><b>LP </b></span><input type="number" name="attr_LP" value="0" /> <span> / </span> <input type="number" name="attr_LP_max" value ="0" readonly />  
+			<span><b>Modifikationen:</b></span>
+			<span><b>Rang</b></span><input type="number" name="attr_ModGw" style="width:60px" value ="0"/>
+			<span><b>Schaden</b></span><input type="number" name="attr_modSchaden" value="0" />
+			<span><b>Angriff</b></span><input type="number" name="attr_modAngriff" value="0" />
+			<span><b>Abwehr</b></span><input type="number" name="attr_modAbwehr" value="0" />
+			<br/>
+			<span><b>LP </b></span><input type="number" name="attr_LP" value="0" /> <span> / </span> <input type="number" name="attr_LP_max" value ="0" readonly />  
 			<span><b>AP </b></span><input type="number" name="attr_AP" value="0" /> <span> / </span> <input type="number" name="attr_AP_max" value ="0" readonly />
 	
 			<button type='roll' value='&{template:default} {{name=@{character_name} resistiert}} {{WW:Geist=[[1D20 + @{KampfResG} + ?{Bonus|0}]]}}' name="roll_WW_Geist"></button> 
@@ -592,7 +604,7 @@
 			<span class="span-header center" style="margin-left: 10px"><b>PP</b></span>
 
 			<fieldset class="repeating_angriff">
-				<button type='roll' value='&{template:default} {{name=@{character_name} greift an}} {{EW:@{Waffe}=[[1d20 + @{FWWaffe} + @{SpezWaffe} + @{WaffeAngB} + @{BonusAngriff} + ?{Bonus|0}]]}} {{Schaden=[[@{WaffeSchaden} + @{WaffeSchB} + @{BonusSchaden}]]}}' name="roll_EW_Angriff"></button>
+				<button type='roll' value='&{template:default} {{name=@{character_name} greift an}} {{EW:@{Waffe}=[[1d20 + @{FWWaffe} + @{SpezWaffe} + @{WaffeAngB} + @{BonusAngriff} + @{modAngriff} + ?{Bonus|0}]]}} {{Schaden=[[@{WaffeSchaden} + @{WaffeSchB} + @{BonusSchaden} + @{modSchaden}]]}}' name="roll_EW_Angriff"></button>
 				<input type="text" name="attr_Waffe" value ="Name"/>
 				<input type="number" name="attr_FWWaffe" style="width:40px" value ="0"/>
 				<input type="number" name="attr_SpezWaffe" style="width:40px" value ="0"/>
@@ -643,7 +655,7 @@
 			<span class="span-header center" style="margin-left: 20px"><b>PP</b></span>
 
 			<fieldset class="repeating_abwehr">
-				<button type='roll' value='&{template:default} {{name=@{character_name} wehrt ab}} {{WW:@{AbwWaffe}=[[1d20 + @{Abwehr} + @{FWAbwWaffe} + @{WaffeAbwB} + @{BonusAbwehr} + @{ItemBAbwehr} + ?{Bonus|0}]]}}' name="roll_WW_Abwehr"></button>
+				<button type='roll' value='&{template:default} {{name=@{character_name} wehrt ab}} {{WW:@{AbwWaffe}=[[1d20 + @{Abwehr} + @{FWAbwWaffe} + @{WaffeAbwB} + @{BonusAbwehr} + @{ItemBAbwehr} + @{modAbwehr} + ?{Bonus|0}]]}}' name="roll_WW_Abwehr"></button>
 				<input type="text" name="attr_AbwWaffe" value ="Name"/>
 				<input type="number" name="attr_FWAbwWaffe" style="width:40px" value ="0"/>
 				<input type="number" name="attr_WaffeAbwB" style="width:40px" value ="0"/>
