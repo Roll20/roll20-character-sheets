@@ -4,6 +4,12 @@ This is a character sheet for use on Roll20.net with the latest (5th) edition of
 
 ### Changelog
 
+# v1.1.5 - 10th March 2018
+Partial 5e compendium support added for monsters by user:darmes
+
+# v1.1.4 - 18th May 2017
+Partial 5e compendium support added for spells by user:legendblade
+
 # v1.1.3 - 3rd Apr 2016
 Added default roll options pane (accessible through the gear at the top-right of the character sheet header) and a "Use Default" option to each roll configuration panel.
 

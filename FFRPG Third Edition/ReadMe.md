@@ -7,9 +7,12 @@ This sheet was written for use with the Returner's Final Fantasy RPG Third Editi
 * Initial release - 20th September 2016
 First release of the sheet.  It should fully support the everything in the FFRPG Third Edition Core Rulebook.  Whilst the sheet cannot possibly cover every situation, and nor can it replace a basic understanding of the game rules/mechanics, it should be a helpful tool for new players whilst still providing more experienced players with some useful facilities too.
 
+* Automated Branch release - 5th May 2017
+I have made the decision to remove targeting from my FFRPG sheet. This means that all characters and monsters will no longer require a sheet in roll20, however, you will need to adjust your CoS calculations based on your target's eva/m.eva manually, as well as your damage based on arm/m.arm. I have released a seperate Automated branch which will hopefully support additional features such as automatic damage calculation in the future.
+
 ### Other resources
 
-* Macros can be a little complex for this sheet, and token macros especially might seem daunting at first. I have sample macro templates available upon request.
+* Macros can be a little complex for this sheet, and token macros especially might seem daunting at first. I have sample macro templates available upon request. (https://www.dropbox.com/s/lt3nqi1spva2bxp/Macro%20Tutorial.docx?dl=0)
 
 ### Feedback
 

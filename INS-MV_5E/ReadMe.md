@@ -7,5 +7,6 @@ La feuille comporte des jets intégrés et gère le style INS ou MV, et le perso
 1.0 [Screenshot](insmv5e.jpg)
 
 # Notes de version
-##v1.0 (24 Janvier 2016).
+
+## v1.0 (24 Janvier 2016).
 Création de la fiche.
