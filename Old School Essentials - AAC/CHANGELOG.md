@@ -3,6 +3,8 @@
 ## 1.0.0 - Unreleased
 
 - Fix bug where armor values where concatenated, not added
+- Add notes sheet
+- Add notes section to character sheet
 
 ## 0.9.1
 
