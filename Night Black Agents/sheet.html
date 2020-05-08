@@ -1,0 +1,940 @@
+<script type="text/worker">
+		on("change:skill_health_pool change:skill_mental_stability_pool"
+			, function(eventInfo) 
+			{	
+			console.log("skill changed");
+			getAttrs(["skill_health_pool","skill_mental_stability_pool","",""], function(value)
+		{
+		
+			var current_health = value.skill_health_pool;
+			var current_mental = value.skill_mental_stability_pool;
+			var result_penalty_H = (current_health <0 ? (current_health < -11 ? 2 : 1) : 0);
+			var result_penalty_M = (current_mental <0 ? (current_mental < -11 ? 2 : 1) : 0);
+			
+			setAttrs
+			(
+				{
+				 skill_penalty_health:result_penalty_H,
+				 skill_penalty_mental:result_penalty_M
+				}
+			);
+
+		})
+		;
+			}
+		);	
+		
+		on("sheet:opened", function(eventInfo){
+    
+			setAttrs({
+				askModifier: getTranslationByKey("nba-askModifier"),
+				askDamageModifier: getTranslationByKey("nba-askDamageModifier"),
+				askAttackModifier: getTranslationByKey("nba-askAttackModifier"),
+				askModifier: getTranslationByKey("nba-askModifier"),
+				askModifier: getTranslationByKey("nba-askModifier"),
+				askModifier: getTranslationByKey("nba-askModifier")
+			});
+			
+		});
+</script>
+<span style="display: none" data-i18n="nba-askModifier">Modifier </span>
+<span style="display: none" data-i18n="nba-askTargetThreshold">Target's hit threshold</span>
+<span style="display: none" data-i18n="nba-askDamageModifier">Damage modifier</span>
+<span style="display: none" data-i18n="nba-askAttackModifier">Attack modifier</span>
+<rolltemplate class="sheet-rolltemplate-combat">
+<div class="mainBlock">
+		<h3><span data-i18n="nba-attackRoll">Attack roll:</span></h3>
+		<span>{{jet}}</span>
+		{{#rollLess() jet 0}}
+			<span data-i18n="nba-attackMiss">Missed!</span>
+		{{/rollLess() jet 0}}
+		{{#^rollLess() jet 0}}
+			<span data-i18n="nba-attackHit">Hit!</span>
+		<h3><span data-i18n="nba-damageRoll">Damage roll:</span></h3>
+		{{#^rollWasCrit() jet}}
+				<span>{{dmg}}</span>
+		{{/^rollWasCrit() jet}}
+		{{#rollWasCrit() jet}}
+				{{#rollGreater() jet 5}}	
+				<h4><span data-i18n="nba-attackCrit">Critical Strike!</span></h4>	
+				<span>{{crit}}</span>
+				{{/rollGreater() jet 5}}	
+				{{#^rollGreater() jet 5}}	
+				<span>{{dmg}}</span> 		
+				{{/^rollGreater() jet 5}} 	
+		{{/rollWasCrit() jet}} 
+		{{/^rollLess() jet 0}}
+		
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-standard">
+<div class="mainBlock">
+		<h3><span data-i18n="nba-skillCheck">Skill check</span></h3>
+		<div class="result">
+			<span data-i18n="nba-result">Résultat</span>
+			<span>{{jet}}</span>
+		</div>
+
+
+	</div>
+</rolltemplate>
+
+<table width="100%" style="text-align:center">
+<tr style="background-color: #000000; color: #FFFFFF;">
+		<td>
+			<input checked="checked" type="radio" value="" name="attr_roll"/>&nbsp;<span data-i18n="nba-publicRoll">Public roll</span>
+		</td>
+		<td>
+			<input type="radio" value="/w gm" name="attr_roll"/>&nbsp;<span data-i18n="nba-privateRoll">Private roll</span>
+		</td>
+		<td>
+			Skill check : 			<button type="roll" value="@{roll} &{template:standard} {{jet=[[ 1d6 - @{skill_penalty_health} - @{skill_penalty_mental} + ?{@{askModifier} |0} ]]}}"/>
+
+		</td>
+		<td>
+			Attack : 			<button type="roll" value="@{roll} &{template:combat} {{jet=[[ 1d6 - @{skill_penalty_health} - @{skill_penalty_mental} + ?{@{askAttackModifier}|0} - @{selected|hit_threshold} ]]}} {{dmg=[[1d6 + ?{@{askDamageModifier}|0}]]}} {{crit=[[2d6]]}}"/>
+		</td>
+	</tr>
+	<tr ><td class="sheet-spacer"/> &nbsp;</tr>
+</table>
+
+<table class="sheet-character-table"> 
+<tr><td>
+<table class="sheet-character-subtable" name="General-Info">
+	<tr ><td class="sheet-spacer"/></tr>
+	
+	
+	<tr>
+		<td/>
+		<th >
+			<span data-i18n="nba-personnalInformation">PERSONNAL INFORMATION</span>
+		</th>
+		<td>
+
+		</td>
+		<td/>
+	</tr>
+	<tr ><td class="sheet-spacer"/></tr>
+	<tr>
+		<td>
+			<span class="sheet-highlight sheet-underline" data-i18n="nba-name">Agent Name</span>
+		</td>
+		
+		<td>
+			<input class="sheet-text-input-big" name="attr_name"  type="text" />
+		</td>
+		<td>
+			<span class="sheet-highlight" data-i18n="nba-health">Health</span>&nbsp;
+			
+		</td>
+		<td>
+			<input  name="attr_skill_health_pool"  type="text" class="sheet-input-number" />
+			<span> / </span>
+			<input name="attr_skill_health_rating"  type="text" class="sheet-input-number" />
+			<input name="attr_skill_penalty_health" type="hidden" value="0"/>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<span  class="sheet-highlight" data-i18n="nba-MOS">MOS </div>
+		</td>
+		<td>
+			<input  class="sheet-text-input-big" name="attr_MOS"  type="text" />
+		</td>
+		<td>
+			<p title="no cover = -1 / full cover = +1" style="text-decoration:underline; text-decoration-style: dotted;">
+				<div  class="sheet-highlight" data-i18n="nba-HitThreshold">Hit threshold:
+				</div>
+			</p>
+		</td>
+		<td>
+			<p title="no cover = -1 / full cover = +1" style="text-decoration:underline; text-decoration-style: dotted;">
+				<input  name="attr_hit_threshold"  type="text" class="sheet-input-number" />
+			</p>
+		</td>
+	</tr>
+		<tr>
+		<td style="height: 45px">
+			<div class="sheet-highlight" data-i18n="nba-professionalRole">Profesional role
+			</div>
+		</td>
+		<td>
+			<input class="sheet-text-input-big" name="attr_professional_role"  type="text" />
+		</td>
+
+	</tr>
+		<tr ><td class="sheet-spacer"/></tr>
+	<tr>
+		<td/>
+		<th >
+			<span data-i18n="nba-psychologicalProfile">PSYCHOLOGICAL PROFILE</span>
+		</th>
+		<td/>
+		<td/>
+	</tr>
+	<tr ><td class="sheet-spacer"/></tr>
+	<tr>
+		<td>
+			<span  class="sheet-highlight sheet-underline" data-i18n="nba-handler">Handler
+			</span>
+		</td>
+		<td>
+			<input class="sheet-text-input-big" name="attr_handler" type="text" />
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<span  class="sheet-highlight" data-i18n="nba-drive">Drive
+			</span>
+		</td>
+		<td>
+			<input class="sheet-text-input-big" name="attr_drive" style="width: 263px" type="text" />
+		</td>
+		<td>
+		</td>
+		<td>
+		</td>
+	</tr>
+	
+	
+	<tr>
+		<td>
+			<span class="sheet-highlight" data-i18n="nba-sourcesOfStability">Sources of stability
+			</span>
+		</td>
+		<td>
+		</td>
+		<td style="height: 34px">
+			<div  class="sheet-highlight" data-i18n="nba-mentalStability">Mental Stability
+			</div>
+		</td>
+		<td>
+			<input name="attr_skill_mental_stability_pool"  type="text" class="sheet-input-number" />
+			 / 
+			<input name="attr_skill_mental_stability_rating"  type="text" class="sheet-input-number" />
+			<input name="attr_skill_penalty_mental" type="hidden"/>
+
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 59px">
+			<ul>
+				<li>
+					<div class="sheet-highlight" data-i18n="nba-symbol">Symbol
+					</div>
+				</li>
+			</ul>
+		</td>
+		<td>
+			<input class="sheet-text-input-small" name="attr_symbol" type="text" />
+		</td>
+	</tr>
+	<tr  align="left">
+		<td style="width: 59px">
+			<ul>
+				<li>
+					<div class="sheet-highlight" data-i18n="nba-solace">Solace
+					</div>
+				</li>
+			</ul>
+		</td>
+		<td>
+			<input class="sheet-text-input-small" name="attr_solace"  type="text" />
+		</td>
+	</tr>
+	<tr>
+		<td style="width: 59px">
+			<ul>
+				<li>
+					<div class="sheet-highlight" data-i18n="nba-safety">Safety
+					</div>
+				</li>
+			</ul>
+		</td>
+		<td>
+			<input class="sheet-text-input-small" name="attr_safety" type="text" />
+		</td>	
+	</tr>
+
+	<tr>
+		<td width="33%">
+			<span class="title" data-i18n="nba-backgrounds">Backgrounds</span>
+		</td>
+		<td width="33%">
+			<span class="title" data-i18n="nba-cherries">Cherries</span>
+		</td>
+		<td width="33%">
+			<span class="title" data-i18n="nba-languages">Languages</span>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<fieldset class="repeating_skills"> 
+				<textarea name="attr_background_desc" rows="1" style="height: 18px; width: 268px"></textarea>
+			</fieldset>
+		</td>
+		<td>
+			<fieldset class="repeating_skills"> 
+				<textarea name="attr_cherry_desc" rows="1" style="height: 18px; width: 268px"></textarea>
+			</fieldset>
+		</td>
+		<td colspan="2">
+			<fieldset class="repeating_skills"> 
+				<textarea name="attr_language_desc" rows="1" style="height: 18px; width: 268px"></textarea>
+			</fieldset>
+		</td>
+
+	</tr>
+
+</table>
+</td></tr>
+<tr><td>
+<table class="sheet-character-subtable" name="Attributes-general">
+
+	<tr>
+		<td/>
+		<th  colspan="2">
+			<span class="title" data-i18n="nba-generalAbilities">GENERAL ABILITIES</span>
+		</th>
+		<td>
+		</td>
+	<tr/>
+	<tr ><td class="sheet-spacer"/></tr>
+				<tr>
+					<td class="sheet-attribute-name" style="height: 23px"><span data-i18n="nba-athletics">Athletics</span>
+					</td>
+					<td  style="height: 23px">
+						<input name="attr_skill_atheltics_pool" title="Athletics allows you to perform general acts of physical derring-do, from running to jumping to throwing grenades to rappelling down the side of a building to dodging falling or oncoming objects. Any physical action not covered by another ability probably falls under the rubric of Athletics." type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_athletics_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name"><span data-i18n="nba-conceal">Conceal</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_conceal_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_conceal_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-cover">Cover</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_cover_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_cover_rating" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-digitalIntrusion">Digital Intrusion</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_digital_intrusion_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_digital_intrusion_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-diguise">Disguise</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_disguise_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_disguise_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-driving">Driving</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_driving_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_driving_rating" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-explosiveDevices">Explosive Devices</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_explosive_devices_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_explosive_devices_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-filch">Filch</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_filch_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_filch_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-gambling">Gambling</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_gambling_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_gambling_rating" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-handToHand">Hand to hand</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_handtohand_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_handtohand_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-health">Health</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_health_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_health_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-infiltration">Infiltration</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_infiltration_pool0" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_infiltration_rating0" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-mechanics">Mechanics</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_mechanics_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_mechanics_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-medic">Medic</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_medic_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_medic_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-mentalStability">Mental Stability</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_mental_stability_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_mental_stability_rating" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Network">Network</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_network_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_network_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Piloting">Piloting</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_piloting_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_piloting_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Preparedness">Preparedness</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_preparedness_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_preparedness_rating" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-SenseTrouble">Sense Trouble</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_sense_trouble_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_sense_trouble_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Shooting">Shooting</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_shooting_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_shooting_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Shrink">Shrink</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_shrink_pool" type="text" class="sheet-input-number"/> 
+						/
+						<input name="attr_skill_shrink_rating" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Surveillance">Surveillance</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_surveillance_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_surveillance_rating" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Weapons">Weapons</span>
+					</td>
+					<td class="sheet-attribute-value">
+						<input name="attr_skill_weapons_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_weapons_rating" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+			</table>
+</td></tr>
+<tr><td>
+	<table class="sheet-character-subtable" name="Attributes-investigative">
+		<tr ><td class="sheet-spacer"/></tr>
+		<tr>
+			<td/>
+			<th colspan="2" style="text-align: center" >
+				<span class="title" data-i18n="nba-investigativeAbilities">INVESTIGATIVE ABILITIES</span>
+			</th>
+			<td>
+	
+			</td>
+		</tr>
+		<tr ><td class="sheet-spacer"/></tr>
+			<tr>
+					<td class="sheet-highlight" colspan="2" width="33%">
+						<span data-i18n="nba-academic">ACADEMIC</span>
+					</td>
+					<td class="sheet-highlight" colspan="2" width="33%">
+						<span data-i18n="nba-interpersonal">INTERPERSONAL</span>
+					</td>
+					<td class="sheet-highlight" colspan="2" width="33%">
+						<span data-i18n="nba-technical">TECHNICAL</span>
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Accounting">Accounting</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_accounting_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_accounting_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-bsDetector">BS detector</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_BS detector_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_BS detector_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-astronomy">Astronomy</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_astronomy_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_astronomy_rate" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Archeology">Archeology</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_archeology_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_archeology_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Bureaucracy">Bureaucracy</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_bureaucracy_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_bureaucracy_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Chemistry">Chemistry</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_chemistry_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_chemistry_rate" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Architecture">Architecture</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_architecture_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_architecture_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-CopTalk">Cop Talk</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_cop_talk_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_cop_talk_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Cryptography">Cryptography</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_cryptography_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_cryptography_rate" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-ArtHistory">Art History</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_art history_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_art history_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Flattery">Flattery</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_flattery_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_flattery_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-DataRecovery">Data Recovery</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_data_recovery_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_data_recovery_rate" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Criminology">Criminology</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_criminology_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_criminology_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Flirting">Flirting</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_flirting_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_flirting_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-ElectronicSurveillance">Electronic Surveillance</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_electronic_surveilance_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_electronic_surveillance_rate" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Diagnosis">Diagnosis</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_diagnosis_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_diagnosis_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-HighSociety">High Society</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_high_society_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_high_society_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-ForensicPathology">Forensic Pathology</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_forensic_pathology_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_forensic_pathology_rate" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+							<span data-i18n="nba-History">History</span>
+						</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_history_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_history_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Interrogation">Interrogation</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_interrogation_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_interrogation_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+							<span data-i18n="nba-Forgery">Forgery</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_forgery_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_forgery_rate" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-HumanTerrain">Human Terrain</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_human_terrain_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_human_terrain_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Intimidation">Intimidation</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_intimidation_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_intimidation_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Notice">Notice</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_notice_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_notice_rate" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Languages">Languages</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_languages_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_languages_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Negotiation">Negotiation</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_negotiation_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_negotiation_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-OutdoorSurvival">Outdoor Survival</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_outdoor_survival_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_outdoor_survival_rate" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Law">Law</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_law_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_law_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Reassurance">Reassurance</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_reassurance_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_reassurance_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Pharmacy">Pharmacy</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_pharmacy_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_pharmacy_rate" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-MilitaryScience">Military Science</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_military_science_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_military_science_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Streetwise">Streetwise</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_streetwise_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_streetwise_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Photography">Photography</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_photography_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_photography_rate" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-OccultStudies">Occult Studies</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_occult_studies_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_occult_studies_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Tradecraft">Tradecraft</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_tradecraft_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_tradecraft_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-TrafficAnalysis">Traffic Analysis</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_traffic_analysis_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_traffic_analysis_rate" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Research">Research</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_research_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_research_rate" type="text" class="sheet-input-number" />
+					</td>
+					<td  style="height: 34px">
+						&nbsp;
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						&nbsp;
+					</td>
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-UrbanSurvival">Urban Survival</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_urban_survival_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_urban_survival_rate" type="text" class="sheet-input-number" />
+					</td>
+				</tr>
+				<tr >
+					<td class="sheet-attribute-name">
+						<span data-i18n="nba-Vampirology">Vampirology</span>
+					</td>
+					<td class="sheet-attribute-value" style="height: 34px">
+						<input name="attr_skill_vampirology_pool" type="text" class="sheet-input-number" /> 
+						/
+						<input name="attr_skill_vampirology_rate" type="text" class="sheet-input-number" />
+					</td>
+
+				</tr>
+			</table>
+
+<table class="sheet-character-subtable " name="Other">
+	<tr>
+		<td>
+			<span class="sheet-highlight" data-i18n="nba-specialGears">SPECIAL GEARS</span>
+		</td>
+		<td>
+			<span class="sheet-highlight" data-i18n="nba-equipment">EQUIPMENT</span>
+		</td>
+		<td>
+			<span class="sheet-highlight" data-i18n="nba-other">OTHER</span></u>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<fieldset class="repeating_skills">
+			<textarea name="attr_special_gears" rows="1" style="height: 18px; width: 94%"></textarea>
+			</fieldset>
+		</td>
+		<td>
+			<fieldset class="repeating_skills">
+			<textarea name="attr_equipment" rows="1" style="height: 18px; width: 94%"></textarea>
+			</fieldset>
+		</td>
+		<td>
+			<fieldset class="repeating_skills">
+			<textarea name="attr_other" rows="1" style="height: 18px; width: 94%"></textarea>
+			</fieldset>
+		</td>
+	</tr>
+	<!--<tr>
+	<td>Weapons</td>
+	</tr>
+	<tr>
+		<td>
+			<table>
+			<tr>
+				<th>
+				Weapon name
+				</th>
+				<th>
+				<div title="Point Blank damage modifier">PB</div>
+				</th>
+				<th>
+				<div title="Close range damage modifier">C</div>
+				</th>
+				<th>
+				<div title="Normal damage modifier">N</div>
+				</th>
+			</tr>
+			<tr>
+			<td colspan="4">
+			<fieldset class="repeating_skills"> 
+				<input type="text" name="attr_skillname" /> 
+				<input type="text" name="attr_weapon_point_blank_dmg_modifier" class="sheet-input-number"> 
+				<input type="text" name="attr_weapon_short_range_dmg_modifier" class="sheet-input-number"> 
+				<input type="text" name="attr_weapon_normal_dmg_modifier" class="sheet-input-number"> 
+			</fieldset>
+			</td>
+			</tr>
+			</table>
+		</td>
+	</tr>-->
+</table>
+</td></tr></table>
