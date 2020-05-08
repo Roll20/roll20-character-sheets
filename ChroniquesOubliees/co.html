@@ -1009,7 +1009,7 @@
 <!-- FIN TEMPLATES -->
 <!-- **** SCRIPTS / SHEET WORKERS -->
 <script type="text/worker">
-  on('sheet:opened', function() {
+ on('sheet:opened', function() {
     // **** Gestion transition de version
     // **** Gestion transition de version
     getAttrs(["version"], function(values) {
@@ -1120,6 +1120,21 @@
             DEFBOUCLIERON: 1
           });
         });
+        //Remplis le casque si on a un attribut RD_critique
+        getAttrs(['RD_critique'], function(values) {
+          var rd = values.RD_critique;
+          if (rd) {
+            rd = parseInt(rd);
+            if (!isNaN(rd) && rd > 0) {
+              setAttrs({
+                casque_rd: rd,
+                casque_malus: rd,
+                casque_on: 1,
+                RD_critique: ''
+              });
+            }
+          }
+        });
         //Ajout des labels aux armes.
         ajouteLabels('repeating_armes');
         ajouteLabels('repeating_pnjatk');
@@ -1158,8 +1173,8 @@
               label = parseInt(nom.substring(0, postLabel));
               if (!isNaN(label)) {
                 if (label > maxLabel) maxLabel = label;
-                toSet[prefix+'armelabel'] = label;
-                toSet[prefix+'armenom'] = nom.substring(postLabel + 1);
+                toSet[prefix + 'armelabel'] = label;
+                toSet[prefix + 'armenom'] = nom.substring(postLabel + 1);
                 setAttrs(toSet);
                 finalize();
                 return;
@@ -1167,7 +1182,7 @@
             }
             //Pas de label dans le nom
             maxLabel++;
-            toSet[prefix+'armelabel'] = maxLabel;
+            toSet[prefix + 'armelabel'] = maxLabel;
             setAttrs(toSet);
             finalize();
           });
@@ -1990,6 +2005,21 @@
       }
     });
   });
+  on('change:casque_rd', function(eventinfo) {
+    getAttrs(['casque_rd', 'casque_on'], function(values) {
+      var rd = parseInt(values.casque_rd);
+      if (isNaN(rd)) return;
+      if (eventinfo.previousValue > 0) {
+        if (rd === 0 && values.casque_on) setAttrs({
+          casque_on: 0
+        });
+      } else {
+        if (rd > 0 && !values.casque_on) setAttrs({
+          casque_on: 1
+        });
+      }
+    });
+  });
 
   //Numérotaion des attaques
   on('change:repeating_armes:armenom', function(eventinfo) {
@@ -2020,7 +2050,6 @@
       }
     });
   });
-
 
   on('remove:repeating_armes remove:repeating_pnjatk', function(eventinfo) {
     getAttrs(['max_attack_label'], function(values) {
