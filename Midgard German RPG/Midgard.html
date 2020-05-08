@@ -721,9 +721,51 @@
     const buttonlist = ["Datenblatt","Fertigkeiten","Sprachen","Zauber","KampfK","KampfZ","Ausrustung","Notizen"];
     buttonlist.forEach(button => {
         on(`clicked:${button}`, function() {
+		console.log("Button " + button);
             setAttrs({
                 sheetTab: button
             });
         });
     });
+	
+// Anpassung der Boni für Leiteigenschaften, wenn sich das Hauptattribut ändert	
+
+	on('change:St change:Gw change:Gs change:Ko change:In change:Zt change:Au change:pA change:Wk change:ItemBGewandheit change:ItemBGeschick change:ItemBKonstitution change:ItemBIntelligenz change:ItemBAussehen change:ItemBpA change:ItemBWillenskraft change:ItemBStärke change:ItemBStärke sheet:opened', function() { 
+		let Attr = 0;
+		let ItemBonus = 0;
+		
+		console.log("Neuberechnung der Leiteigenschaften");
+					
+		getAttrs(["St","ItemBStärke"], function(values) {
+			let Attr = parseInt(values.St,10)||0;
+			let ItemBonus = parseInt(values.ItemBStärke,10)||0;			
+						
+			LeitE = CalcAttrBonus(Attr, ItemBonus);
+			 	
+			setAttrs({
+				leitSt: LeitE
+			});		
+		});		
+	});
+	
+
+	function CalcAttrBonus(Attr, ItemBonus) { // Bonus der Leiteigenschaft berechnen
+		let SumAttr = Attr + ItemBonus;
+		let Bonus = 0;
+		
+		console.log("Attr: " + Attr + " Itembonus " + ItemBonus + " SumAttr " + SumAttr);
+			
+		if (SumAttr <= 5) {
+			Bonus = "-2";	
+		} else if (SumAttr >= 6 && SumAttr <= 20) {
+			Bonus = "-1";	
+		} else if (SumAttr >= 81 && SumAttr <= 95) {
+			Bonus = "1";	
+		} else if (SumAttr >= 96) {
+			Bonus = "2";	
+		}
+			
+		return Bonus;
+	};
+		
 </script>
