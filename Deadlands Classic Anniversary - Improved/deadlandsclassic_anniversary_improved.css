@@ -20,7 +20,6 @@
 .charsheet h1, .charsheet h2, .charsheet h3 {
   font-family: 'Rye';
   font-weight: 400;
-  hyphens: auto;
 }
 
 /* Resets some Roll20 attributes */
@@ -132,6 +131,9 @@
 
 .charsheet [class^="sheet-core"] {
   text-align: center;
+  display: grid;
+  grid-gap: 1rem;
+  grid-template-columns: max-content 1fr;
 }
 
 .charsheet [class^="sheet-core"] label {
@@ -220,13 +222,7 @@
 .charsheet .sheet-wounds {
   display: grid;
   grid-template-rows: max-content 1fr;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-}
-
-.charsheet .sheet-wounds input[type="radio"] + label {
-  grid-column: 1 / -1;
-  grid-row-start: 2;
-  visibility: hidden;
+  grid-template-columns: repeat(6, 1fr);
 }
 
 .charsheet .sheet-wounds *:first-child {
@@ -260,6 +256,12 @@
 
 .charsheet .sheet-wounds input[value="5"] {
   grid-column-start: 6;
+}
+
+.charsheet .sheet-wounds input[type="radio"] + label {
+  grid-column: 1 / -1;
+  grid-row-start: 2;
+  visibility: hidden;
 }
 
 .charsheet .sheet-wounds .sheet-wounds-background {
@@ -342,7 +344,7 @@
 }
 
 .charsheet .sheet-numberlist.sheet-chips,
-.charsheet #sheet-wind.sheet-numberlist {
+.charsheet .sheet-numberlist.sheet-wind {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
 }
@@ -353,14 +355,16 @@
   background: url('https://www.jiveconsulting.com/wp/wp-content/uploads/2020/05/wood-planks.jpg');
   padding: 20px;
   display: grid;
-  grid-gap: 2rem;
   grid-template-columns: repeat(12, 1fr);
+  grid-gap: 1rem;
   grid-template-areas:
-    "name name name name banner  banner  banner  banner occ occ occ occ" 
-    "gmtoggle gmtoggle gmtoggle gmtoggle banner  banner  banner  banner bounty bounty bounty bounty"
-    "pace pace pace size size size wind wind wind grit grit grit"
-    "tab1 tab1 tab1 tab2 tab2 tab2 tab3 tab3 tab3 tab4 tab4 tab4"
-    "lcol lcol sheet sheet sheet sheet sheet sheet sheet sheet rcol rcol";
+  "name name name name banner  banner  banner  banner occ occ occ occ" 
+  "gmtoggle gmtoggle gmtoggle gmtoggle banner  banner  banner  banner bounty bounty bounty bounty"
+  "pace pace pace size size size wind wind wind grit grit grit"
+  "lcol lcol lcol lcol lcol lcol lcol lcol lcol lcol lcol lcol"
+  "rcol rcol rcol rcol rcol rcol rcol rcol rcol rcol rcol rcol"
+  "tab1 tab1 tab1 tab2 tab2 tab2 tab3 tab3 tab3 tab4 tab4 tab4"
+  "sheet sheet sheet sheet sheet sheet sheet sheet sheet sheet sheet sheet";
 }
 
 /* Main grid areas */
@@ -427,23 +431,34 @@
 
 .charsheet [class^="sheet-sidebar"] {
   display: grid;
-  grid-template-columns: 1fr;
   grid-auto-rows: min-content;
   row-gap: 1rem;
+  align-items: flex-start;
+}
+
+.charsheet [class^="sheet-sidebar"] h2:first-child {
+  grid-column: 1 / -1;
 }
 
 .charsheet [class^="sheet-sidebar"] h1,
 .charsheet [class^="sheet-sidebar"] h2,
 .charsheet [class^="sheet-sidebar"] h3 {
-  text-align: center
+  text-align: center;
+  grid-column: 1 / -1;
 }
 
 .charsheet .sheet-sidebar-left {
+  grid-template-columns: repeat(4, 1fr);
   grid-area: lcol;
 }
 
 .charsheet .sheet-sidebar-right {
+  grid-template-columns: repeat(6, 1fr);
   grid-area: rcol;
+}
+
+.charsheet .sheet-sidebar-right .sheet-wind {
+  grid-column: 1 / -1;
 }
 
 /* Hides the contents of each tab by default*/
@@ -491,6 +506,34 @@
 }
 /* ===== NAVIGATION TABS - END ===== */
 
+/* ===== SECTION TOGGLE - START ===== */
+.charsheet .sheet-section-toggle {
+  display: none;
+}
+
+.charsheet .sheet-section-toggle ~ h2 label {
+  width: 100%;
+  cursor: pointer;
+}
+
+.charsheet .sheet-section-toggle ~ h2 label:after {
+  content: '\25B2';
+  color: black;
+  font-size: 0.5em;
+  position: relative;
+  left: 0.5em;
+  top: -0.5em;
+}
+
+.charsheet .sheet-section-toggle:checked ~ h2 label:after {
+  content: '\25BC';
+} 
+
+.charsheet .sheet-section-toggle:not(:checked) ~ div {
+  display: none;
+}
+/* ===== SECTION TOGGLE - END ===== */
+
 /* ===== NUMBERLIST COLORS - START ==== */
 .charsheet .sheet-numberlist-blue .sheet-numberlist-item input:checked + label {
   background-color: darkblue;
@@ -517,3 +560,39 @@
   color: #fff;
 }
 /* ===== NUMBERLIST COLORS - END ===== */
+
+/* ===== MULTI-COLUMN WIDER SCREENS ===== */
+@media only screen and (min-width: 751px) {
+  .charsheet .sheet-wrapper {
+    grid-gap: 2rem;
+    grid-template-areas:
+      "name name name name banner  banner  banner  banner occ occ occ occ" 
+      "gmtoggle gmtoggle gmtoggle gmtoggle banner  banner  banner  banner bounty bounty bounty bounty"
+      "pace pace pace size size size wind wind wind grit grit grit"
+      "tab1 tab1 tab1 tab2 tab2 tab2 tab3 tab3 tab3 tab4 tab4 tab4"
+      "lcol lcol sheet sheet sheet sheet sheet sheet sheet sheet rcol rcol";
+  }
+
+  .charsheet [class^="sheet-sidebar"] {
+    grid-template-columns: 1fr;
+    row-gap: 2rem;
+  }
+
+  /* Disable section-toggle on larger screens */
+  .charsheet .sheet-section-toggle ~ h2 label {
+    cursor: initial;
+  }
+  
+  .charsheet .sheet-section-toggle ~ h2 label:after {
+    content: '';
+  }
+  
+  .charsheet .sheet-section-toggle:checked ~ h2 label:after {
+    content: '';
+  } 
+  
+  .charsheet .sheet-section-toggle:not(:checked) ~ div {
+    display: inherit;
+  }
+
+}
