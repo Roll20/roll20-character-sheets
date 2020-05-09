@@ -29,6 +29,8 @@
 <!-- TODO - Location toggle on attack rolls -->
 <!-- <div class="sheet-item sheet-xlarge location"><h4 data-i18n="locationToggle">Location Toggle</h4>
   <input type="checkbox" name="attr_locationtoggle" id="attr_locationtoggle" value="{{location=[[1d20]]}}" /><span data-i18n="on">On</span>
+   
+  @{meleelocationtoggle}
 </div> -->
 
 <!-- Shooting & Perfomin-->
@@ -392,13 +394,13 @@
       </div>
       <fieldset class="repeating_artconc sheet-item-traits-concentration">
         <div class="sheet-item-traits sheet-item-traits">
-          <input type="text" name="attr_artconc" id="attr_artconc" placeholder="Concentration">
+          <input type="text" name="attr_artconc" placeholder="Concentration">
           <div class="sheet-grid-1m1">
-            <input type="text" name="attr_artlvl" id="attr_artlvl" placeholder="Lvl">
+            <input type="text" name="attr_artlvl" placeholder="Lvl">
             +
-            <input type="number" name="attr_artconcmod" id="attr_artconcmod" placeholder="Mod">
+            <input type="number" name="attr_artconcmod" placeholder="Mod">
           </div>
-          <button type="roll" name="roll_artconc" id="roll_artconc" value="@{gmtoggle}&{template:simple} {{rollname=@{artMacro} - @{artconc}}} {{dice=[[@{artlvl}@{cogdtype}!!k1+@{artconcmod}]]}}"></button>
+          <button type="roll" name="roll_artconc" value="@{gmtoggle}&{template:simple} {{rollname=@{artMacro} - @{artconc}}} {{dice=[[@{artlvl}@{cogdtype}!!k1+@{artconcmod}]]}}"></button>
         </div>
       </fieldset>
       <div class="sheet-item-traits">
@@ -1195,7 +1197,7 @@
           <input type="text" name="attr_ranged_rof" id="attr_ranged_rof" placeholder="1">
           <input type="text" name="attr_ranged_range" id="attr_ranged_range" placeholder="10">
           <input type="text" name="attr_ranged_damage" id="attr_ranged_damage" placeholder="3d6">
-          <button type="roll" name="roll_ranged_attack" id="roll_ranged_attack" value="@{gmtoggle}&{template:simple} {{rollname=@{name}}} {{damage=[[@{damage}!!]]}}"></button>
+          <button type="roll" name="roll_ranged_attack" id="roll_ranged_attack" value="@{gmtoggle}&{template:simple} {{rollname=@{attr_ranged_name}}} {{damage=[[@{attr_ranged_damage}!!]]}}"></button>
         </div>
       </fieldset>
     </div>
@@ -1217,7 +1219,7 @@
             +
             <input type="text" name="attr_h2h_damage" id="attr_h2h_damage" value="0">
           </div>
-          <button type="roll" name="roll_h2h_attack" id="roll_h2h_attack" value="@{gmtoggle}&{template:simple} {{rollname=@{name}}} {{strength=[[@{strlvl}@{strdtype}!!k1]]}} {{meleedamage=[[@{damage}!!]]}} @{meleelocationtoggle}"></button>
+          <button type="roll" name="roll_h2h_attack" id="roll_h2h_attack" value="@{gmtoggle}&{template:simple} {{rollname=@{name}}} {{strength=[[@{strlvl}@{strdtype}!!k1]]}} {{meleedamage=[[@{attr_h2h_damage}!!]]}}"></button>
         </div>
       </fieldset>
     </div>
@@ -1230,61 +1232,80 @@
 
   <div class="sheet-section-arcane sheet-borderdiv">
     <h3 data-i18n="arcaneAbilities">Arcane Abilities</h3>
-    <input type="radio" class="sheet-arcane-select" name="attr_arcane_sheet" id="attr_arcane_sheet_none" value="None" checked="checked"><label for="attr_arcane_sheet_none">None</label>
-    <input type="radio" class="sheet-arcane-select" name="attr_arcane_sheet" id="attr_arcane_sheet_huckster" value="huckster"><label for="attr_arcane_sheet_huckster">Huckster</label>
+    <input type="radio" class="sheet-tab" name="attr_arcane_sheet" id="attr_arcane_sheet_none" value="None" checked="checked"><label for="attr_arcane_sheet_none" data-i18n="none">None</label>
+    <!-- Huckster - Start -->
+    <input type="radio" class="sheet-tab" name="attr_arcane_sheet" id="attr_arcane_sheet_huckster" value="huckster"><label for="attr_arcane_sheet_huckster" data-i18n="huckster">Huckster</label>
     <div class="sheet-section-huckster">
+      <h4><label data-i18n="hexslingin" for="attr_hexslinginlvl">Hexslingin'</label></h4>
+      <input type="number" min="0" name="attr_hexslinginlvl" id="attr_hexslinginlvl" value="0">
       <div class="sheet-item-huckster">
-        <h4><label data-i18n="skill">Skill</label></h4>
-        <span>{{attr_hexslinginlvl}}</span>
+        <h4 data-i18n="name">Name</h4>
+        <h4 data-i18n="trait">Trait</h4>
+        <h4 data-i18n="hand">Hand</h4>
+        <h4 data-i18n="speed">Speed</h4>
+        <h4 data-i18n="duration">Duration</h4>
+        <h4 data-i18n="range">Range</h4>
+      </div>
+      <fieldset class="repeating_hexes">
+        <div class="sheet-item-huckster">
+          <input type="text" name="attr_hexname" placeholder="i.e. Hunch">
+          <select name="attr_hextrait">
+            <option value="@{cogdtype}" selected="selected">Cognition</option>
+            <option value="@{knodtype}">Knowledge</option>
+            <option value="@{smadtype}">Smarts</option>
+            <option value="@{spidtype}">Spirit</option>
+          </select>
+          <select name="attr_hexhand">
+            <option value="ace" selected="selected">Ace</option>
+            <option value="pair">Pair</option>
+            <option value="jacks">Jacks</option>
+            <option value="twopair">Two Pair</option>
+            <option value="threeofakind">Three of a kind</option>
+            <option value="straight">Straight</option>
+            <option value="flush">Flush</option>
+            <option value="fullhouse">Full House</option>
+            <option value="fourofakind">Four of a kind</option>
+            <option value="straightflush">Straight Flush</option>
+          </select>
+          <input type="text" name="attr_hexspeed" placeholder="2 rounds">
+          <input type="text" name="attr_hexduration" placeholder="Instant">
+          <input type="text" name="attr_hexrange" placeholder="Self">
+          <button type="roll" name="roll_hex" value="@{gmtoggle}&{template:simple} {{rollname=@{hexname}}} {{dice=[[@{hexslinginlvl}@{hextrait}!!k1]]}}"></button>
+          <textarea name="attr_hexdesc" placeholder="Description"></textarea>
+        </div>
+      </fieldset>
+    </div>
+    <!-- Huckster - End -->
+
+    <!-- Mad Scientist - Start -->
+    <input type="radio" class="sheet-tab" name="attr_arcane_sheet" id="attr_arcane_sheet_madscientist" value="madscientist"><label for="attr_arcane_sheet_madscientist" data-i18n="madscientist">Mad Scientist</label>
+    <div class="sheet-section-madscientist">
+      <div class="sheet-item-madscientist">
       </div>
     </div>
-    <input type="radio" class="sheet-arcane-select" name="attr_arcane_sheet" id="attr_arcane_sheet_shaman" value="shaman"><label for="attr_arcane_sheet_shaman">Shaman</label>
-    
+    <!-- Mad Scientist - End -->
 
-<!--       
-      <div class="sheet-item sheet-small"><input type="number" min="0" name="attr_hexslinginlvl" id="attr_hexslinginlvl"></div>
+    <!-- Blessed - Start -->
+    <input type="radio" class="sheet-tab" name="attr_arcane_sheet" id="attr_arcane_sheet_blessed" value="blessed"><label for="attr_arcane_sheet_blessed" data-i18n="blessed">Blessed</label>
+    <div class="sheet-section-blessed">
+      <div class="sheet-item-blessed">
+      </div>
+    </div>
+    <!-- Blessed - End -->
+
+    <!-- Shaman - Start -->
+    <input type="radio" class="sheet-tab" name="attr_arcane_sheet" id="attr_arcane_sheet_shaman" value="shaman"><label for="attr_arcane_sheet_shaman" data-i18n="shaman">Shaman</label>
+    <div class="sheet-section-shaman">
       <b><span data-i18n="ritual">Ritual</span></b>
       <input type="number" name="attr_rituallvl" id="attr_rituallvl">
-      <b><span data-i18n="rituals">Rituals</span></b>
-      <div class="sheet-item sheet-huge">
-        <input type="text" name="attr_rituals" id="attr_rituals">
-      </div>
-    </div>
-    
-    <div class="sheet-row">
-      <h4 data-i18n="name">Name</h4>
-      <div class="sheet-item sheet-small"><h4 data-i18n="speed">Speed</h4></div>
-      <h4 data-i18n="duration">Duration</h4>
-      <div class="sheet-item sheet-small"><h4 data-i18n="range">Range</h4></div>
-      <div class="sheet-item sheet-small"><h4 data-i18n="dice">Dice</h4></div>
-    <div class="sheet-item sheet-small">&nbsp;</div>
-      <div class="sheet-item sheet-small"><h4 data-i18n="tn">TN</h4></div>
-      <h4 data-i18n="notes">Notes</h4>
-      <fieldset class="repeating_spells" style="display: none;">
-      <div class="arcane-row">
-        <input type="text" name="attr_spellname" id="attr_spellname" placeholder="Shadow Man">
-        <div class="sheet-item sheet-small"><input type="number" name="attr_spellspeed" id="attr_spellspeed" placeholder="2"></div>
-        <input type="text" name="attr_spelldur" id="attr_spelldur" placeholder="Concentration">
-        <div class="sheet-item sheet-small"><input type="text" name="attr_spellran" id="attr_spellran" placeholder="Self"></div>
-            <div class="sheet-item sheet-large">
-              <select name="attr_magtype" id="attr_magtype" class="sheet-dtype">
-                <option select="selected" value="d4">4</option>
-                <option value="d6">6</option>
-                <option value="d8">8</option>
-                <option value="d10">10</option>
-                <option value="d12">12</option>
-              </select>
-            </div>
-        <div class="sheet-item sheet-small"><input type="text" name="attr_spelltn" id="attr_spelltn" placeholder="#"></div>
-        <div class="sheet-item sheet-huge" style="width: 30%;">
-          <textarea name="attr_spellnotes" id="attr_spellnotes" class="sheet-shorttextarea" placeholder="Notes"></textarea>
+      <h4 data-i18n="rituals">Rituals</h4>
+      <fieldset>
+        <div class="sheet-item-shaman">
+
         </div>
-    <button type="roll" name="Magie/Wunder" value="@{gmtoggle}&{template:simple}  {{rollname=Magie/Wunder}} {{dice=[[@{hexslinginlvl}@{magtype}!!k1]]}}"></button>
-      </div>
       </fieldset>
-      <div class="repcontainer" data-groupname="repeating_spells" id="repeating_spells"></div>
     </div>
-    </div> -->
+    <!-- Shaman - End -->
   </div>
   <!-- Arcane Ablities Tab - End -->
 
@@ -1298,7 +1319,7 @@
       <fieldset class="repeating_edges">
         <div class="sheet-item-edges">
           <input type="text" name="attr_edgename" id="attr_edgename" placeholder="Edge name">
-          <textarea name="attr_edgesdesc" id="attr_edgesdesc" class="sheet-shorttextarea" placeholder="Description"></textarea>
+          <textarea name="attr_edgesdesc" id="attr_edgesdesc" placeholder="Description"></textarea>
         </div>
       </fieldset>
     </div>
@@ -1307,28 +1328,27 @@
       <fieldset class="repeating_hinds">
         <div class="sheet-item-edges">
           <input type="text" name="attr_hindname" id="attr_hindname" placeholder="Hindrance name">
-          <textarea name="attr_hinddesc" id="attr_hinddesc" class="sheet-shorttextarea" placeholder="Description"></textarea>
+          <textarea name="attr_hinddesc" id="attr_hinddesc" placeholder="Description"></textarea>
         </div>
       </fieldset>
     </div>
     <div class="sheet-borderdiv sheet-item-misc">
       <h2 data-i18n="equipment">Equipment</h2>
-      <textarea name="attr_equipment" id="attr_equipment" class="sheet-textarea" placeholder="Equipment"></textarea>
+      <textarea name="attr_equipment" id="attr_equipment" placeholder="Equipment"></textarea>
     </div>
     <div class="sheet-borderdiv sheet-item-misc">
       <h2 data-i18n="money">Money</h2>
-      <textarea name="attr_money" id="attr_money" class="sheet-textarea" placeholder="Money"></textarea>
+      <textarea name="attr_money" id="attr_money" placeholder="Money"></textarea>
     </div>
     <div class="sheet-borderdiv sheet-item-misc">
       <h2 data-i18n="worstNightmare">Worst Nightmare</h2>
-      <textarea name="attr_nightmare" id="attr_nightmare" class="sheet-textarea" placeholder="Elm Street"></textarea>
+      <textarea name="attr_nightmare" id="attr_nightmare" placeholder="Elm Street"></textarea>
     </div>
     <div class="sheet-borderdiv sheet-item-misc">
       <h2 data-i18n="notes">Notes</h2>
-      <textarea name="attr_notes" id="attr_notes" class="sheet-textarea" placeholder="Notes"></textarea>
+      <textarea name="attr_notes" id="attr_notes" placeholder="Notes"></textarea>
     </div>
   </div>
   <!-- Misc Tab - End -->
 </div>
 <!-- Sheet Wrapper - End -->
-</div>
