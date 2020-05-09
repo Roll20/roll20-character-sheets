@@ -1109,6 +1109,7 @@
                             <td><input type=hidden name="attr_hiddengswbe" value=0></td>
                             <td><input type=hidden name="attr_hiddengswag" value=0></td>
                             <td><input type=hidden name="attr_hiddengswspr" value=0></td>
+                            <td><input type=hidden name="attr_sprintercount" value=0></td>
                         </tr>
                         <tr bgcolor="#81BEF7">
                             <td>Initiative</td>
@@ -3846,7 +3847,7 @@ on("change:ausstrahlungstart change:beweglichkeitstart change:intuitionstart cha
 });
 
 on("change:repeating_meisterschaften:meisterschaftsschwelle", function() {
-    getAttrs(["repeating_meisterschaften_meisterschaftsname", "repeating_meisterschaften_meisterschaftsfertigkeit", "blitzreflexecount"], function(values) {
+    getAttrs(["repeating_meisterschaften_meisterschaftsname", "repeating_meisterschaften_meisterschaftsfertigkeit", "blitzreflexecount", "sprintercount"], function(values) {
         var name = values.repeating_meisterschaften_meisterschaftsname;
         var fertigkeit = values.repeating_meisterschaften_meisterschaftsfertigkeit;
         var update = {};
@@ -3885,7 +3886,7 @@ on("change:repeating_meisterschaften:meisterschaftsschwelle", function() {
                     update["hiddengswag"] = 1;
                     break;
                 case "sprinter":
-                    update["hiddengswspr"] = 1;
+                    update["sprintercount"] = +values.sprintercount + 1;
                     break;
             }
             setAttrs(update);
@@ -7400,13 +7401,19 @@ on("remove:repeating_meisterschaften", function(eventInfo) {
 	    "schmerzwiderstand ii":"sw2",
 	    "schmerzwiderstand 2":"sw2",
 	    "arkane geschwindigkeit":"hiddengswag",
-	    "sprinter":"hiddengswspr"
+	    "sprinter":"sprintercount"
 	};
 	if (meisterschaft.toLowerCase() == "blitzreflexe") {
 	     getAttrs(["blitzreflexecount"], function(v) {
-            console.log(v.blitzreflexecount);
             if (+v.blitzreflexecount > 0) {
                 update[meisterschaften[meisterschaft.toLowerCase()]] = +v.blitzreflexecount - 1;
+	            setAttrs(update);
+            }
+	    });
+	} else if (meisterschaft.toLowerCase() == "sprinter") {
+	    getAttrs(["sprintercount"], function(v) {
+            if (+v.sprintercount > 0) {
+                update[meisterschaften[meisterschaft.toLowerCase()]] = +v.sprintercount - 1;
 	            setAttrs(update);
             }
 	    });
@@ -7431,6 +7438,20 @@ on("change:blitzreflexecount", function(eventInfo) {
         }
     });
 });    
+
+on("change:sprintercount", function(eventInfo) {
+    getAttrs(["sprintercount", "hiddengswspr"], function(v) {
+        let update = {};
+        let sprintercount = +v.sprintercount;
+        if (+sprintercount <= 2) {
+            update["hiddengswspr"] = +sprintercount;
+            setAttrs(update);
+        } else {
+            update["hiddengswspr"] = 0;
+            setAttrs(update);
+        }
+    });
+});
 
 on("change:lebenspunkte_v", function(eventInfo) {
     if (eventInfo.sourceType == "sheetworker") { return; }
