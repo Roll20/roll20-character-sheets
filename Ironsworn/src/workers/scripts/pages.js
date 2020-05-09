@@ -4,12 +4,6 @@ on('change:character_page_button', function(eventinfo) {
   });
 });
 
-on('change:companion_page_button', function(eventinfo) {
-  setAttrs({
-    companion_page: eventinfo.newValue
-  });
-});
-
 on('change:shared_page_button', function(eventinfo) {
   setAttrs({
     shared_page: eventinfo.newValue
