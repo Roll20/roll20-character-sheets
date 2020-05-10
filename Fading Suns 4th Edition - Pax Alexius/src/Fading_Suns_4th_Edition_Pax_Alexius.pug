@@ -1,24 +1,10 @@
-mixin label(i18n)
-    label(data-i18n=i18n )&attributes(attributes)
-
-mixin numeric_input(attr_name, default_value, min_value=false)
-    input(name=`attr_${attr_name}` type='number' title=`\${${attr_name}}` + (default_value!==false ? `. Default: ${default_value}.` : '') value=default_value min=min_value)&attributes(attributes)
-
-mixin text_input(attr_name)
-    input(name=`attr_${attr_name}` type='text' title=`\${${attr_name}}`)&attributes(attributes)
-
+// CONSTANTS
 -
     const characteristics = [
         { category: 'body',   list: [ 'strength', 'dexterity',  'endurance' ] },
         { category: 'mind',   list: [ 'wits',     'perception', 'will'      ] },
         { category: 'spirit', list: [ 'presence', 'intuition', 'faith'      ] }
     ];
-
-mixin characteristic(name)
-        button.fs-d20(type='roll' name=`roll_${name}` value=`&{template:fs-GoalRoll} {{characterName=@{character_name}}} {{characteristicName-i18n=^{${name}}}} {{bonus_penalty=[[?{@{goal_bonus_penalty_rollquery_i18n}}]]}} {{goal=[[@{${name}}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]]]]}} {{roll=[[1d20cs[[{@{${name}}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]],19}kl1]]cf20]]}}`)
-        label.fs-characteristic-label
-            span(data-i18n=`${name}`)
-        +numeric_input(name, 3)
 -
     const skills = [
         { name: 'academia', default: 3 },
@@ -49,9 +35,98 @@ mixin characteristic(name)
         { name: 'tech_redemption', default: 3 },
         { name: 'vigor', default: 3 }
     ];
+-
+    const armor_proofing_types = [ 'blaster', 'flame', 'hard', 'laser', 'shock', 'slam', 'sonic' ];
+-
+    const states = [
+        { category: 'physical_states', list: [ 'blinded',
+                                               'dazed',
+                                               'deafened',
+                                               'desensitized',
+                                               'disoriented',
+                                               'dying',
+                                               'euphoric',
+                                               'fatigued',
+                                               'hearing_impaired',
+                                               'hindered',
+                                               'immobilized',
+                                               'incapacitated',
+                                               'mangled',
+                                               'nauseated',
+                                               'paralized',
+                                               'prone',
+                                               'seeing_impaired',
+                                               'stimulated',
+                                               'stunned',
+                                               'suspended',
+                                               'tormented',
+                                               'unconscious' ] },
+        { category: 'mental_states', list : [ 'afraid',
+                                              'angered',
+                                              'anxious',
+                                              'berserk',
+                                              'commanded',
+                                              'confused',
+                                              'deceived',
+                                              'enlightened',
+                                              'penalized',
+                                              'terrified',
+                                              'wowed' ] },
+        { category: 'social_states', list : [ 'awed',
+                                              'befriended',
+                                              'castigated',
+                                              'convinced',
+                                              'daunted',
+                                              'divinely_inspired',
+                                              'entreated',
+                                              'guilty',
+                                              'humiliated',
+                                              'mesmerized',
+                                             'roused' ] },
+        { category: 'tech_compulsions', list : [ 'acquisitive',
+                                                 'bloodthirsty',
+                                                 'cruel',
+                                                 'destructive',
+                                                 'heedless',
+                                                 'hypercritical',
+                                                 'indiscreet',
+                                                 'industrious',
+                                                 'inerrant',
+                                                 'pretentious',
+                                                 'protective',
+                                                 'reckless' ] }
+    ];
+// MIXINS
+
+mixin label(i18n)
+    label(data-i18n=i18n)&attributes(attributes)
+
+mixin span(data)
+    span(name=`attr_${attr_name}` title=`\${${attr_name}}`)&attributes(attributes)
+
+mixin numeric_input(attr_name, default_value, min_value=false, title_i18n=false)
+    input(name=`attr_${attr_name}` type='number' data-i18n-vars=`\${${attr_name}}|${default_value}` data-i18n-title=(title_i18n ? title_i18n : (default_value ? 'numeric_input_with_default_info' : false)) title=((title_i18n || default_value) ? false : `\${${attr_name}}` ) value=default_value min=min_value)&attributes(attributes)
+
+mixin text_input(attr_name)
+    input(name=`attr_${attr_name}` type='text' title=`\${${attr_name}}`)&attributes(attributes)
+
+mixin text_input_notitle(attr_name)
+    input(name=`attr_${attr_name}` type='text')&attributes(attributes)
+
+mixin checkbox(attr_name, on=false)
+    input(name=`attr_${attr_name}` type='checkbox' title=`\${${attr_name}}` value=(on? 'on' : false))&attributes(attributes)
+
+mixin area_input(attr_name, i18n_placeholder)
+    textarea(name=`attr_${attr_name}` data-i18n-placeholder=i18n_placeholder spellcheck='false')
+
+mixin characteristic(name)
+        button.fs-d20(type='roll' name=`roll_${name}` value=`&{template:fs-GoalRoll} {{characterName=@{character_name}}} {{characteristicName-i18n=^{${name}}}} {{bonus_penalty=[[?{@{goal_bonus_penalty_rollquery_i18n}}]]}} {{goal=[[@{${name}}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]]]]}} {{roll=[[1d20cs[[{@{${name}}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]],19}kl1]]cf20]]}}`)
+        label.fs-characteristic-label
+            span(data-i18n=`${name}`)
+        +numeric_input(name, 3, 0)
 
 mixin skill(name, value)
-    .fs-skill
+    .fs-skill(data-i18n-list-item=name)
         .fs-skill-normal
             button.fs-d20(type='roll' name='roll_disabledbutton' value='' disabled='')
             .fs-skill-roll-characteristic-choice
@@ -66,89 +141,85 @@ mixin skill(name, value)
                                 label(data-i18n=`${characteristicName}`) #{characteristicName}
             label.fs-skill-label
                 span(data-i18n=`${name}`) #{name}
-        +numeric_input(name, value)
-
+        +numeric_input(name, value, 0, (value==0 ? 'restricted_skill_info' : 'numeric_input_with_default_info'))
 
 // CHARACTER SHEET LAYOUT - START
+
 .fs-sheet
 
     input(type='hidden' name='attr_goal_bonus_penalty_rollquery_i18n' value='')
+    input(type='hidden' name='attr_additional_goal_bonus_penalty_rollquery_i18n' value='')
 
     .fs-sheet-container
         input(type='hidden' name='attr_sheet_version' value='latest')
 
         .fs-baseinfo
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='name')
                 .fs-name-grid
+                    label.fs-uppercase-header(data-i18n='name')
                     +text_input('character_name')(class ='fs-name')
                     label.fs-planet(data-i18n='planet')
                     +text_input('planet')(class ='fs-planet')
 
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='rank')
                 .fs-rank-grid
+                    label.fs-uppercase-header(data-i18n='rank')
                     +text_input('rank')(class ='fs-rank')
                     label.fs-birthdate(data-i18n='birthdate')
                     +text_input('birthdate')(class ='fs-birthdate')
 
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='species')
                 .fs-species-grid
+                    label.fs-uppercase-header(data-i18n='species')
                     +text_input('species')(class ='fs-species')
                     label.fs-size(data-i18n='size')
-                    +text_input('size')(class ='fs-size')
+                    +numeric_input('size', false, 0)(class ='fs-size')
                     label.fs-speed(data-i18n='speed')
                     +text_input('speed')(class ='fs-speed')
 
         .fs-lifepath
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='class')
                 .fs-class-grid
+                    label.fs-uppercase-header(data-i18n='class')
                     +text_input('class_1')(class ='fs-class1')
                     +text_input('class_2')(class ='fs-class2')
                     label.fs-level(data-i18n='level') Level
                     +numeric_input('level', 1, 1)(class='fs-level')
 
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='faction')
                 .fs-faction-grid
+                    label.fs-uppercase-header(data-i18n='faction')
                     +text_input('faction')(class ='fs-faction')
                     label.fs-blessing(data-i18n='blessing')
                     +text_input('blessing')(class ='fs-blessing')
-                    label.fs-curse(data-i18n='curse') Curse
+                    label.fs-curse(data-i18n='curse')
                     +text_input('curse')(class ='fs-curse')
 
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='calling')
                 .fs-calling-grid
+                    label.fs-uppercase-header(data-i18n='calling')
                     +text_input('calling_1')
                     +text_input('calling_2')
                     +text_input('calling_3')
 
         .fs-traits
-            .fs-sheet-section.fs-skills-header
-                label.fs-uppercase-header(data-i18n='skills')
+            .fs-sheet-section
+                .fs-skills-grid(data-i18n-list="skills_list")
+                    label.fs-uppercase-header(data-i18n='skills')
+                    each skill in skills
+                        +skill(skill.name, skill.default)
 
-            .fs-skill-col.fs-skills-1
-                - for (let i = 0; i < skills.length / 2; ++i)
-                    +skill(skills[i].name, skills[i].default)
-
-            .fs-skill-col.fs-skills-2
-                - for (let i = skills.length / 2; i < skills.length; ++i)
-                    +skill(skills[i].name, skills[i].default)
-
-            .fs-characteristics
+            .fs-characteristics-grid
                 each charac_cat in characteristics
                     .fs-sheet-section
-                        label.fs-uppercase-header(data-i18n=charac_cat.category)
                         .fs-characteristic-cat-grid
+                            label.fs-uppercase-header(data-i18n=charac_cat.category)
                             each charac_name in charac_cat.list
                                 +characteristic(charac_name)
 
         .fs-sheet-section
-            label.fs-uppercase-header(data-i18n='occult')
-            .fs-occult
+            .fs-occult-grid
+                label.fs-uppercase-header(data-i18n='occult')
                 div
                     +label('psi')(class='fs-occult-left')
                     +numeric_input('psi', false, 0)
@@ -167,8 +238,8 @@ mixin skill(name, value)
 
         .fs-defenses
             .fs-sheet-section
-                label.fs-uppercase-header(data-i18n='resistances')
                 .fs-resistances-grid
+                    label.fs-uppercase-header(data-i18n='resistances')
                     each charac_cat in characteristics
                         label(data-i18n=charac_cat.category)
                         +numeric_input(`${charac_cat.category}_resistance`, 0, 0)
@@ -179,14 +250,16 @@ mixin skill(name, value)
                     .fs-armor-and-e-shield-grid-row
                         label.fs-uppercase-header(data-i18n='armor')
                         +text_input('armor_name')
-                    .fs-armor-and-e-shield-grid-row.fs-armor-vs
-                        +numeric_input('armor_vs_blaster', false, 0)(data-i18n-placeholder='blaster_s')
-                        +numeric_input('armor_vs_flame', false, 0)(data-i18n-placeholder='flame_s')
-                        +numeric_input('armor_vs_hard', false, 0)(data-i18n-placeholder='hard_s')
-                        +numeric_input('armor_vs_laser', false, 0)(data-i18n-placeholder='laser_s')
-                        +numeric_input('armor_vs_shock', false, 0)(data-i18n-placeholder='shock_s')
-                        +numeric_input('armor_vs_slam', false, 0)(data-i18n-placeholder='slam_s')
-                        +numeric_input('armor_vs_sonic', false, 0)(data-i18n-placeholder='sonic_s')
+                        +numeric_input('armor_resistance', 0, 0)
+                    .fs-armor-and-e-shield-grid-row.fs-armor-props
+                        span
+                        each armor_proofing_type in armor_proofing_types
+                            +numeric_input(`armor_vs_${armor_proofing_type}`, 0, 0)(hidden=true)
+                            label.fs-armor-proofing
+                                +checkbox(`${armor_proofing_type}proof`)
+                                div(data-i18n-vars=`\${${armor_proofing_type}proof}` data-i18n-title='armor_proofing_info')
+                                    span(data-i18n=`${armor_proofing_type}_s`)
+                                    span(name=`attr_armor_vs_${armor_proofing_type}`)
                     .fs-armor-and-e-shield-grid-row
                         label.fs-uppercase-header(data-i18n='e_shield')
                         +text_input('shield_name')
@@ -226,7 +299,7 @@ mixin skill(name, value)
                         .fs-table
                             input(type='hidden' name='attr_action_characteristic_value')
                             input(type='hidden' name='attr_action_skill_value')
-                            button.fs-20(type='roll' name='roll_action_roll' value='&{template:fs-GoalRoll} {{title=@{action_name}}} {{characterName=@{character_name}}} {{characteristicName-i18n=^{@{action_characteristic}}}} {{skillName-i18n=^{@{action_skill}}}} {{bonus_penalty=[[@{action_goal_bonus_penalty}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]]]]}} {{goal=[[@{action_characteristic_value}+@{action_skill_value}+@{action_goal_bonus_penalty}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]]]]}} {{roll=[[1d20cs[[{@{action_characteristic_value}+@{action_skill_value}+@{action_goal_bonus_penalty}+[[?{@{goal_bonus_penalty_rollquery_i18n}}]],19}kl1]]cf20]]}}')
+                            button.fs-20(type='roll' name='roll_action_roll' value='&{template:fs-GoalRoll} {{title=@{action_name}}} {{characterName=@{character_name}}} {{characteristicName-i18n=^{@{action_characteristic}}}} {{skillName-i18n=^{@{action_skill}}}} {{bonus_penalty=[[@{action_goal_bonus_penalty}+[[?{@{additional_goal_bonus_penalty_rollquery_i18n}}]]]]}} {{goal=[[@{action_characteristic_value}+@{action_skill_value}+@{action_goal_bonus_penalty}+[[?{@{additional_goal_bonus_penalty_rollquery_i18n}}]]]]}} {{roll=[[1d20cs[[{@{action_characteristic_value}+@{action_skill_value}+@{action_goal_bonus_penalty}+[[?{@{additional_goal_bonus_penalty_rollquery_i18n}}]],19}kl1]]cf20]]}}')
                             input.fs-table-cell(type='text' name='attr_action_name')
                             select.fs-table-cell(name='attr_action_characteristic')
                                 option(value='' selected)
@@ -234,31 +307,49 @@ mixin skill(name, value)
                                     optgroup(data-i18n-label=charac_cat.category)
                                     each charac_name in charac_cat.list
                                         option(value=charac_name data-i18n=charac_name)
-                            select.fs-table-cell(name='attr_action_skill')
+                            select.fs-table-cell(name='attr_action_skill' data-i18n-list='skills_list')
                                 option(value='' selected)
                                 each sk in skills
-                                    option(value=sk.name data-i18n=sk.name)
+                                    option(value=sk.name data-i18n=sk.name data-i18n-list-item=sk.name)
                             input.fs-table-cell(type='number' name='attr_action_goal_bonus_penalty' value=0)
-                            .fs-notes
+                            .fs-notes.fs-textarea-reladiv
                                 .fs-auto-expand-textarea
                                     span(name='attr_action_impact_notes')
                                     textarea(name='attr_action_impact_notes' data-i18n-placeholder='impact_notes' spellcheck='false')
 
-            .fs-sheet-section-frame
-                label.fs-uppercase-header(data-i18n='vp_bank')
-                .fs-vp-and-surge-grids
-                    label(data-i18n='vp_bank_capacity')
-                    +numeric_input('vp_bank_capacity', 0, 0)
-                    label(data-i18n='current_vp')
-                    +numeric_input('current_vp', 0, 0)
-                    label(data-i18n='current_wp')
-                    +numeric_input('current_wp', 0, 0)
-                label.fs-uppercase-header(data-i18n='surge')
-                .fs-vp-and-surge-grids
-                    label(data-i18n='surge_rating')
-                    +numeric_input('surge_rating', 0, 0)
-                    label(data-i18n='surge_number')
-                    +numeric_input('surge_number', 0, 0)
+            div
+                .fs-states
+                    .fs-sheet-section
+                        label.fs-uppercase-header(data-i18n='states')
+                        .fs-table
+                            label.fs-table-head
+                            label.fs-table-head(data-i18n='state')
+                            label.fs-table-head(data-i18n='resistance_s')
+                        fieldset.repeating_states
+                            .fs-table
+                                button.fs-20(type='roll' name='roll_shakeitoff_roll' value='[TODO] Shake-it-Off rolls not supported yet')
+                                select.fs-table-cell(name='attr_state_name' data-i18n-list='states_list')
+                                    option(value='' selected)
+                                    each state_cat in states
+                                        optgroup(data-i18n-label=state_cat.category)
+                                        each state_name in state_cat.list
+                                            option(value=state_name data-i18n=state_name data-i18n-list-item=state_name)
+                                +numeric_input('state_resistance', false, false, 'state_resistance_info')(class='fs-table-cell')
+
+                .fs-sheet-section-frame
+                    .fs-vp-bank-and-surge-grid
+                        label.fs-uppercase-header(data-i18n='vp_bank')(class='fs-vp-bank-header')
+                        label(data-i18n='vp_bank_capacity')(class='fs-vp-bank-capacity')
+                        +numeric_input('vp_bank_capacity', 0, 0)(class='fs-vp-bank-capacity')
+                        label(data-i18n='current_vp')(class='fs-current-vp')
+                        +numeric_input('current_vp', 0, 0)(class='fs-current-vp')
+                        label(data-i18n='current_wp')(class='fs-current-wp')
+                        +numeric_input('current_wp', 0, 0)(class='fs-current-wp')
+                        label.fs-uppercase-header(data-i18n='surge')(class='fs-surge-header')
+                        label(data-i18n='surge_rating')(class='fs-surge-rating')
+                        +numeric_input('surge_rating', 0, 0)(class='fs-surge-rating')
+                        label(data-i18n='surge_number')(class='fs-surge-number')
+                        +numeric_input('surge_number', 0, 0)(class='fs-surge-number')
 
         .fs-perks-capabilities-and-birthrights
             .fs-sheet-section
@@ -267,7 +358,7 @@ mixin skill(name, value)
                     fieldset.repeating_perks
                         .fs-table
                             input.fs-table-cell(type='text' name='attr_perk_name' data-i18n-placeholder='perk_name')
-                            .fs-notes
+                            .fs-notes.fs-textarea-reladiv
                                 .fs-auto-expand-textarea
                                     span(name='attr_perk_notes')
                                     textarea(name='attr_perk_notes' data-i18n-placeholder='perk_notes' spellcheck='false')
@@ -278,7 +369,7 @@ mixin skill(name, value)
                         fieldset.repeating_capabilities
                             .fs-table
                                 input.fs-table-cell(type='text' name='attr_capability_name' data-i18n-placeholder='capability_name')
-                                .fs-notes
+                                .fs-notes.fs-textarea-reladiv
                                     .fs-auto-expand-textarea
                                         span(name='attr_capability_notes')
                                         textarea(name='attr_capability_notes' data-i18n-placeholder='capability_notes' spellcheck='false')
@@ -289,7 +380,7 @@ mixin skill(name, value)
                         fieldset.repeating_birthrights
                             .fs-table
                                 input.fs-table-cell(type='text' name='attr_birthright_name' data-i18n-placeholder='birthright_name')
-                                .fs-notes
+                                .fs-notes.fs-textarea-reladiv
                                     .fs-auto-expand-textarea
                                         span(name='attr_birthright_notes')
                                         textarea(name='attr_birthright_notes' data-i18n-placeholder='birthright_notes' spellcheck='false')
@@ -314,7 +405,7 @@ mixin skill(name, value)
                                 input.fs-table-cell(type='text' name=`attr_carriedequipment${index}_name`)
                                 input.fs-table-cell(type='number' name=`attr_carriedequipment${index}_tech_level`)
                                 input.fs-table-cell(type='text' name=`attr_carriedequipment${index}_size`)
-                                .fs-notes
+                                .fs-notes.fs-textarea-reladiv
                                     .fs-auto-expand-textarea
                                         span(name=`attr_carriedequipment${index}_notes`)
                                         textarea(name=`attr_carriedequipment${index}_notes` data-i18n-placeholder='notes' spellcheck='false')
@@ -342,7 +433,7 @@ mixin skill(name, value)
                                 input.fs-table-cell(type='number' name='attr_weapon_rof')
                                 input.fs-table-cell(type='number' name='attr_weapon_ammo')
                                 input.fs-table-cell(type='text' name='attr_weapon_features')
-                                .fs-notes
+                                .fs-notes.fs-textarea-reladiv
                                     .fs-auto-expand-textarea
                                         span(name=`attr_weapon_notes`)
                                         textarea(name=`attr_weapon_notes` data-i18n-placeholder='notes' spellcheck='false')
@@ -357,7 +448,7 @@ mixin skill(name, value)
                             .fs-table
                                 input.fs-table-cell(type='text' name=`attr_owned${index}_name`)
                                 input.fs-table-cell(type='text' name=`attr_owned${index}_location`)
-                                .fs-notes
+                                .fs-notes.fs-textarea-reladiv
                                     .fs-auto-expand-textarea
                                         span(name=`attr_owned${index}_notes`)
                                         textarea(name=`attr_owned${index}_notes` data-i18n-placeholder='notes' spellcheck='false')
@@ -380,26 +471,116 @@ mixin skill(name, value)
                             .fs-table
                                 input.fs-table-cell(type='text' name=`attr_asset${index}_name`)
                                 input.fs-table-cell(type='text' name=`attr_asset${index}_income`)
-                                .fs-notes
+                                .fs-notes.fs-textarea-reladiv
                                     .fs-auto-expand-textarea
                                         span(name=`attr_asset${index}_notes`)
                                         textarea(name=`attr_asset${index}_notes` data-i18n-placeholder='notes' spellcheck='false')
 
         .fs-sheet-section
             label.fs-uppercase-header(data-i18n='last_notes')
-            .fs-w100.fs-relative.fs-supertall-textarea
+            .fs-w100.fs-supertall-textarea.fs-textarea-reladiv
                 .fs-auto-expand-textarea
                     span(name='attr_last_notes')
-                    textarea(title='@{last_notes}' type='text' name='attr_last_notes' data-i18n-placeholder='notes' placeholder='Notes' spellcheck='false')
+                    textarea(title='@{last_notes}' type='text' name='attr_last_notes' data-i18n-placeholder='notes' spellcheck='false')
 
         .fs-footer
 
 // CHARACTER SHEET LAYOUT - END
+
 // ROLL TEMPLATES - START
 include roll-templates.html
 // ROLL TEMPLATES - END
+
 // SHEET WORKERS - START
-include sheet-workers.html
-// SHEET WORKERS - END
+script(type='text/worker').
+    // You may temporarily remove the (type='text/worker') part from the live above to get syntax highlighting in vscode
+
+    const characteristic_names = !{JSON.stringify(characteristics)}.flatMap(x => x.list);
+    const skill_names = !{JSON.stringify(skills)}.flatMap(x => x.name);
+    const armor_proofing_types = !{JSON.stringify(armor_proofing_types)};
+    const state_names = !{JSON.stringify(states)}.flatMap(x => x.list);
+
+    const repeating_rolls = [
+        { "section": "actions", "prefix": "action" }
+    ];
+
+    const updateGoalNumber = (section, prefix) => {
+        getSectionIDs(`repeating_${section}`, idArray => {
+            const characteristicArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_characteristic`);
+            const characteristicValueArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_characteristic_value`);
+            const skillArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_skill`);
+            const skillValueArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_skill_value`);
+            getAttrs( [].concat(characteristicArray, skillArray), vNames => {
+                getAttrs( vNames, vValues => {
+                    let setAttrsObj = {};
+                    for (let i = 0; i < idArray.length; ++i) {
+                        setAttrsObj[characteristicValueArray[i]] = (parseInt(vValues[vNames[characteristicArray[i]]]) || 0);
+                        setAttrsObj[skillValueArray[i]] = (parseInt(vValues[vNames[skillArray[i]]]) || 0);
+                    }
+                    setAttrs(setAttrsObj);
+                });
+            });
+        });
+    };
+
+    [].concat(characteristic_names, skill_names).forEach( trait => {
+        on(`change:${trait}`, eventInfo => {
+            repeating_rolls.forEach( special_skill => {
+                updateGoalNumber(special_skill.section, special_skill.prefix);
+            });
+        });
+    });
+
+    repeating_rolls.forEach( repeating => {
+        on(`change:repeating_${repeating.section}`, eventInfo => {
+            updateGoalNumber(repeating.section, repeating.prefix);
+        });
+    });
+
+    armor_proofing_types.forEach( type => {
+        on(`sheet:opened change:armor_resistance change:${type}proof`, eventInfo => {
+            let checkbox = `${type}proof`;
+            let value = `armor_vs_${type}`;
+            getAttrs( [ 'armor_resistance', checkbox ], values => {
+                let newValue = (values[checkbox]==='on' ? parseInt(values.armor_resistance) : Math.floor(parseInt(values.armor_resistance) / 2));
+                setAttrs({
+                   [value]: newValue
+                });
+            });
+        });
+    });
+
+    on("sheet:opened", function() {
+        // sheet versioning
+        getAttrs( [ 'sheet_version' ], values => {
+
+            if (values.sheet_version !== "latest") {
+
+                // insert version updates here
+                if (values.sheet_version == "1.0.0") {
+                    // no need for any attribute migrations between 1.0.0 to 1.1.0
+                }
+            }
+
+            const latest_version = "1.1.0";
+            
+            if (values.sheet_version != latest_version) {
+                setAttrs({ sheet_version: latest_version });
+            }
+        });
+
+        // translate roll queries
+        {
+            let setAttrsObj = {};
+
+            // Goal rolls
+            let goal_bonus_penalty = getTranslationByKey('goal_bonus_penalty');
+            setAttrsObj['goal_bonus_penalty_rollquery_i18n'] = `${goal_bonus_penalty}|0`;
+            let additional_goal_bonus_penalty = getTranslationByKey('additional_goal_bonus_penalty');
+            setAttrsObj['additional_goal_bonus_penalty_rollquery_i18n'] = `${additional_goal_bonus_penalty}|0`;
+
+            setAttrs(setAttrsObj);
+        }
+    });
 
 // FIN.
