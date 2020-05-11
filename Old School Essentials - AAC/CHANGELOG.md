@@ -1,17 +1,38 @@
 # Changelog
 
+[GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
+
 ## 1.0.0 - Unreleased
 
-- Fix bug where armor values where concatenated, not added
+### Added
+
 - Add notes sheet
 - Add notes section to character sheet
+- Add settings sheet
+  - Add armor class type to settings
+- Add default sheet setting for armor class type (AAC versus DAC)
+- Add descending armor support and calculation
+- Add dexterity calculations on sheet load (calculates unarmored AC, AC mod, and initiative mod)
+
+### Fixed
+
+- Fix bug where armor values where concatenated, not added
+
+### Deprecated
+
+- Renamed and deprecated both `attr_ac` and `attr_acUnarmored` in lieu of `attr_aacAc`, `attr_dacAc`, `attr_aacAcUnarmored`, and `attr_dacAcUnarmored`
 
 ## 0.9.1
 
-- Fix calculated encounter movement rate to 1/3 of exploration
-- Fix missing `weaponDescription` value for character tab
+### Added
+
 - Add type of attack to character weapon table to prevent DEX bonus from being added to damage
 - Make hit point and HD fields rollable for character tab
+
+### Fixed
+
+- Fix calculated encounter movement rate to 1/3 of exploration
+- Fix missing `weaponDescription` value for character tab
 
 ## 0.9.0
 
