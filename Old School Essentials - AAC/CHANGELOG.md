@@ -6,6 +6,7 @@
 
 ### Added
 
+- Automatically set next experience, HD, BAB, THAC0, and saving throws when setting level and class for cleric, dwarf, elf, fighter, halfling, magic-user, and thief
 - Add notes sheet
 - Add notes section to character sheet
 - Add settings sheet
