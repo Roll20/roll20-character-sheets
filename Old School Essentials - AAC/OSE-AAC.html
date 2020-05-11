@@ -293,6 +293,10 @@
             <span data-i18n="dexterity-abbr-mod">± DEX</span>
             <input readonly type="number" name="attr_ACDexMod" value="0" />
           </label>
+          <label class="inline-flex">
+            <span data-i18n="thac0" class="double">THAC0</span>
+            <input type="number" name="attr_thac0" value="0" />
+          </label>
         </div>
       </div>
       <div class="sheet-col movement">
@@ -353,8 +357,15 @@
     </div>
     <fieldset class="repeating_weapons">
       <div class="weapons-grid">
+        <div>
+          <input type="hidden" name="attr_armorClassType" value="aac">
+          <!-- AAC Attack -->
           <button type="roll" class="attack-roll attack-roll-aac" name="attr_weaponAttack"
             value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{bab}+@{modquery}]]}} {{damage=[[{[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]], 1}kh1]]}}"></button>
+          <!-- DAC Attack (no BAB added) -->
+          <button type="roll" class="attack-roll attack-roll-dac" name="attr_weaponAttack"
+            value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{modquery}]]}} {{damage=[[{[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]], 1}kh1]]}}"></button>
+        </div>
         <input type="text" name="attr_weaponName" placeholder="Weapon" />
         <select name="attr_weaponAttributeBonus">
           <option selected value="[[@{BonusSTR}]]">Strength</option>
@@ -552,10 +563,15 @@
           </label>
         </div>
         <div class="flex">
-          <label class="inline-flex">
+          <input type="hidden" name="attr_armorClassType" value="aac">
+          <label class="inline-flex show-aac">
             <span data-i18n="base-attack-bonus-abbr" title="Base Attack Bonus"
-              data-i18n-title="Base Attack Bonus">BAB</span>
+              data-i18n-title="base-attack-bonus">BAB</span>
             <input type="number" name="attr_monsterBAB" value="0" />
+          </label>
+          <label class="inline-flex show-dac">
+            <span data-i18n="thac0" class="double">THAC0</span>
+            <input type="number" name="attr_monsterThac0" value="0" />
           </label>
           <label class="inline-flex">
             <span data-i18n="armor-class-abbr" title="Armor Class" data-i18n-title="armor-class">AC</span>
@@ -1085,6 +1101,18 @@
     on(`clicked:${button}`, function (event) {
       console.log(button, 'clicked!')
       setAttrs({ sheetTab: button });
+    });
+  });
+
+  on('change:bab', function() {
+    getAttrs(['bab'], function(values) {
+      setAttrs({ thac0: 19 - values.bab });
+    });
+  });
+
+  on('change:thac0', function() {
+    getAttrs(['thac0'], function(values) {
+      setAttrs({ bab: 19 - values.thac0 });
     });
   });
 </script>
