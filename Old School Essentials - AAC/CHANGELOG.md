@@ -13,6 +13,8 @@
 - Add default sheet setting for armor class type (AAC versus DAC)
 - Add descending armor support and calculation
 - Add dexterity calculations on sheet load (calculates unarmored AC, AC mod, and initiative mod)
+- Add missing BAB for AAC characters
+- Add thac0 for characters and monsters
 
 ### Fixed
 
