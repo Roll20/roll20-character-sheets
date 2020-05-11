@@ -1,6 +1,7 @@
 <link href="besm4e.css" rel="stylesheet" type="text/css">
 
 <!-- Dice Rollers -->
+<input type="hidden" name="attr_ACPCalc" value="(@{TCP}-(@{SCP}-@{DCP}))" />
 <input type="hidden" name="attr_BaseCV" value="((@{Body}+@{Mind}+@{Soul})/3)" />
 <input type="hidden" name="attr_AtkCV" value="(@{BaseCV}+@{ACVMod})" />
 <input type="hidden" name="attr_DefCV" value="(@{BaseCV}+@{DCVMod})" />
@@ -10,13 +11,19 @@
 <input type="hidden" name="attr_minObs" value="3d6kl2" />
 <input type="hidden" name="attr_majObs" value="4d6kl2" />
 
+<div class="sheet-table-cell sheet-cell-15"><button type='roll' name='roll_skill' value='/em @{Name} rolls [[{2d6}]].'><b>Normal Roll</b></button></div>
+<div class="sheet-table-cell sheet-cell-15"><button type='roll' name='roll_skill' value='/em @{Name} rolls [[{3d6kh2}]].'><b>Minor Edge</b></button></div>
+<div class="sheet-table-cell sheet-cell-15"><button type='roll' name='roll_skill' value='/em @{Name} rolls [[{4d6kh2}]].'><b>Major Edge</b></button></div>
+<div class="sheet-table-cell sheet-cell-15"><button type='roll' name='roll_skill' value='/em @{Name} rolls [[{3d6kl2}]].'><b>Minor Obstacle</b></button></div>
+<div class="sheet-table-cell sheet-cell-15"><button type='roll' name='roll_skill' value='/em @{Name} rolls [[{4d6kl2}]].'><b>Major Obstacle</b></button></div>
+
 <!-- Character name info -->
 <div class="sheet-section sheet-table sheet-input-border">
 	<div class="sheet-header">BESM / Tri-Stat 4ed</div>
 	<div class="sheet-table-row">
-		<div class="sheet-table-cell sheet-cell-a"><label>Character Name</label></div>
-		<div class="sheet-table-cell sheet-cell-30"><label>Player Name</label></div>
-		<div class="sheet-table-cell sheet-cell-20"><label>Game Master Name</label></div>
+		<div class="sheet-table-cell sheet-cell-a"><label>Character</label></div>
+		<div class="sheet-table-cell sheet-cell-30"><label>Player</label></div>
+		<div class="sheet-table-cell sheet-cell-20"><label>Game Master</label></div>
 	</div>
 	<div class="sheet-table-row">
 		<div class="sheet-table-cell"><input type="text" name="attr_Name" /></div>
@@ -33,18 +40,20 @@
 		<div class="sheet-table-row" style="text-align:center">
 			<div class="sheet-table-cell"><b>Total Character Points</b></div>
 			<div class="sheet-table-cell"><b>Spent Character Points</b></div>
+			<div class="sheet-table-cell"><b>Defect Points</b></div>
 			<div class="sheet-table-cell"><b>Available Character Points</b></div>
 		</div>
 		<div class="sheet-table-row">
-			<div class="sheet-table-cell"><input type="text" name="attr_TCP" /></div>
-			<div class="sheet-table-cell"><input type="text" name="attr_SCP" /></div>
-			<div class="sheet-table-cell"><input type="text" name="attr_ACP" /></div>
+			<div class="sheet-table-cell"><input type="text" name="attr_TCP" value="0"/></div>
+			<div class="sheet-table-cell"><input type="text" name="attr_SCP" value="0"/></div>
+			<div class="sheet-table-cell"><input type="text" name="attr_DCP" value="0"/></div>
+			<div class="sheet-table-cell"><input type="text" name="attr_ACP" value="@{ACPCalc}" disabled="true"/></div>
 		</div>
 	</div>
 </div>
 <div class="sheet-break"></div>
 
-<!-- Character meta data -->
+<!-- Character details data -->
 <div class="sheet-section sheet-input-border">
 	<div class="sheet-header">Character Details</div>
 	<div class="sheet-table">
@@ -83,11 +92,14 @@
 	<div class="sheet-header">Stats</div>
 	<div class="sheet-section sheet-table sheet-input-border">
 		<div class="sheet-table-row" style="text-align:center">
-			<div class="sheet-table-cell sheet-cell-15"><button type='roll' name='roll_skill' value='/em @{Name} rolls Body [[{2d6+@{Body}+?{Modifier|0}}]].'><b>Body</b></button></div>
+			<div class="sheet-table-cell">Body</div>
+			<div class="sheet-table-cell">Mind</div>
+			<div class="sheet-table-cell">Soul</div>
+		</div>
+
+		<div class="sheet-table-row" style="text-align:center">
 			<div class="sheet-table-cell sheet-cell-10"><input type="number" name="attr_Body" value="1" /></div>
-			<div class="sheet-table-cell sheet-cell-15"><button type='roll' name='roll_skill' value='/em @{Name} rolls Mind [[{2d6+@{Mind}+?{Modifier|0}}]].'><b>Mind</b></button></div>
 			<div class="sheet-table-cell sheet-cell-10"><input type="number" name="attr_Mind" value="1" /></div>
-			<div class="sheet-table-cell sheet-cell-15"><button type='roll' name='roll_skill' value='/em @{Name} rolls Soul [[{2d6+@{Soul}+?{Modifier|0}}]].'><b>Soul</b></button></div>
 			<div class="sheet-table-cell sheet-cell-10"><input type="number" name="attr_Soul" value="1" /></div>
 		</div>
 	</div>
@@ -115,163 +127,81 @@
 <!-- Combat -->
 <div class="sheet-section">
 	<div class="sheet-header">Combat Stats</div>
+	<!-- Defense -->
 	<div class="sheet-table sheet-input-border sheet-select-border">
 		<div class="sheet-table-row">
+			<div class="sheet-table-cell">DCV</div>
 			<div class="sheet-table-cell">Armour</div>
-			<div class="sheet-table-cell"><input class="sheet-skill-on" type="number" name="attr_ArmourStat" /></div>
 			<div class="sheet-table-cell">Force Field</div>
-			<div class="sheet-table-cell"><input class="sheet-skill-on" type="number" name="attr_ForceField" /></div>
 		</div>
 		
 		<div class="sheet-table-row">
-			<div class="sheet-table-cell sheet-cell-25"><b>Basic Attack</b></div>
-			<div class="sheet-table-cell sheet-cell-5"><b>ACV Mod</b></div>
-			<div class="sheet-table-cell sheet-cell-25"><b>Basic Defense</b></div>
-			<div class="sheet-table-cell sheet-cell-5"><b>DCV Mod</b></div>
-		</div>
-		
-		<div class="sheet-table-row">
-			<div class="sheet-table-cell"><button type='roll' name='roll_skill' value='/em @{Name} rolls Attack CV [[{2d6+@{AtkCV}}]].'>ACV</button> </div>
-			<div class="sheet-table-cell"><input type="number" name="attr_ACVMod" value="0" /></div>
-			
-			<div class="sheet-table-cell"><button type='roll' name='roll_skill' value='/em @{Name} rolls Defense CV [[{2d6+@{BaseCV}+@{DCVMod}}]].'>DCV</button> </div>
-			<div class="sheet-table-cell"><input type="number" name="attr_DCVMod" value="0" /></div>
-		</div>
-		
-		<div class="sheet-table-row">
-			<div class="sheet-table-cell">Dmg Multiplier</div>
-			<div class="sheet-table-cell"><input type="number" name="attr_DmgMult" value="5+@{DmgMultMod}" disabled="true" /></div>
-			<div class="sheet-table-cell"><input type="number" name="attr_DmgMultMod" value="0" /></div>
-		</div>	
-		<div class="sheet-table-row">
-			<div class="sheet-table-cell"><button type='roll' name='roll_skill' value='/em @{Name} rolls: [[{2d6+@{AtkCV}}]]'></button>Initiative</div>
-			<div class="sheet-table-cell"><button type='roll' name='roll_skill' value='/em @{Name} rolls: [[{3d6kh2+@{AtkCV}}]]'></button>Minor Edge</div>
-			<div class="sheet-table-cell"><button type='roll' name='roll_skill' value='/em @{Name} rolls: [[{4d6kh2+@{AtkCV}}]]'></button>Major Edge</div>
+			<div class="sheet-table-cell"><input class="sheet-skill-on" type="text" name="attr_DCV" /></div>
+			<div class="sheet-table-cell"><input class="sheet-skill-on" type="text" name="attr_ArmourStat" /></div>
+			<div class="sheet-table-cell"><input class="sheet-skill-on" type="text" name="attr_ForceField" /></div>
 		</div>
 	</div>
-		
+	<!-- Offense -->
 	<div class="sheet-table sheet-input-border sheet-select-border">
 		<div class="sheet-table-row">
-			<div class="sheet-table-cell sheet-cell-25"><b>Attack</b></div>
-			<div class="sheet-table-cell sheet-cell-5"><b>Level</b></div>
-			<div class="sheet-table-cell sheet-cell-5"><b>Range</b></div>
-			<div class="sheet-table-cell sheet-cell-10"><b>Attack Mod</b></div>
-			<div class="sheet-table-cell sheet-cell-10"><b>Dmg Mod</b></div>
-			<div class="sheet-table-cell sheet-cell-10"><b>Wpn Mult</b></div>
-			<div class="sheet-table-cell sheet-cell-10"><b>Damage</b></div>
-			<div class="sheet-table-cell sheet-cell-10"><b>Roll Type</b></div>
+			<div class="sheet-table-cell">ACV</div>
+			<div class="sheet-table-cell">Damage Multiplier</div>
 		</div>
 		
 		<div class="sheet-table-row">
-			<!-- Attack -->
-			<div class="sheet-table-cell"><input type="text" name="attr_AtkName1" value="" /></div>
-			<!-- level -->
-			<div class="sheet-table-cell"><input type="number" name="attr_AtkLvl1" value="0" /></div>
-			<!-- Range -->
-			<div class="sheet-table-cell"><input type="number" name="attr_AtkRng1" value="0" /></div>
-			<!-- Attack Mod -->
-			<div class="sheet-table-cell"><input type="number" name="attr_AtkMod1" value="0" /></div>
-			<!-- Damage Mod -->
-			<div class="sheet-table-cell"><input type="number" name="attr_AtkDamMod1" value="0" /></div>
-			<!-- Weapon Mult -->
-			<div class="sheet-table-cell"><input type="number" name="attr_AtkWpnMult1" value="[[@{DmgMult} + @{AtkDamMod1}]]" disabled="true"/></div>
-			<!-- Damage -->
-			<input type="hidden" name="attr_AtkDamCalc1" value="(@{AtkWpnMult1}*@{AtkLvl1}+@{AtkCV})" />
-			<div class="sheet-table-cell"><input type="number" name="attr_WpnDam1" value='@{AtkDamCalc1}' disabled="true"/></div>
-			<!-- Roll Type -->
-				<div class="sheet-table-cell"><select name="attr_atkDice1">
-					<option value="@{roll}">Standard</option>
-					<option value="@{minEdge}">Minor Edge</option>
-					<option value="@{majEdge}">Major Edge</option>
-					<option value="@{minObs}">Minor Obstacle</option>
-					<option value="@{majObs}">Major Obstacle</option>
-				</select></div>
-			<!-- Attack Roller -->
-			<div class="sheet-table-cell sheet-cell-10"><button type='roll' name='roll_attack' value='/em @{Name} rolls @{AtkName1} getting  [[{@{atkDice1}+@{AtkCV}+@{AtkMod1}}]] to hit for [[@{AtkDamCalc1}]] damage.'>Attack</button></div>
-		</div>
-	
+			<div class="sheet-table-cell"><input class="sheet-skill-on" type="text" name="attr_ACV" /></div>
+			<div class="sheet-table-cell"><input class="sheet-skill-on" type="text" name="attr_DamageMult" /></div>
+		</div>	
+	</div>
+</div><!-- End Combat Section -->
+<div class="sheet-break"></div>
+
+<!-- Attacks -->
+<div class="sheet-section">
+<div class="sheet-header">Attacks</div>
+<div class="sheet-table sheet-input-border sheet-select-border">
 	<div class="sheet-table-row">
-			<!-- Attack -->
-			<div class="sheet-table-cell"><input type="text" name="attr_AtkName2" value="" /></div>
-			<!-- level -->
-			<div class="sheet-table-cell"><input type="number" name="attr_AtkLvl2" value="0" /></div>
-			<!-- Range -->
-			<div class="sheet-table-cell"><input type="number" name="attr_AtkRng2" value="0" /></div>
-			<!-- Attack Mod -->
-			<div class="sheet-table-cell"><input type="number" name="attr_AtkMod2" value="0" /></div>
-			<!-- Damage Mod -->
-			<div class="sheet-table-cell"><input type="number" name="attr_AtkDamMod2" value="0" /></div>
-			<!-- Weapon Mult -->
-			<div class="sheet-table-cell"><input type="number" name="attr_AtkWpnMult2" value="[[@{DmgMult} + @{AtkDamMod2}]]" disabled="true"/></div>
-			<!-- Damage -->
-			<input type="hidden" name="attr_AtkDamCalc2" value="(@{AtkWpnMult2}*@{AtkLvl2}+@{AtkCV})" />
-			<div class="sheet-table-cell"><input type="number" name="attr_WpnDam2" value='@{AtkDamCalc2}' disabled="true"/></div>
-			<!-- Roll Type -->
-				<div class="sheet-table-cell"><select name="attr_atkDice2">
-					<option value="@{roll}">Standard</option>
-					<option value="@{minEdge}">Minor Edge</option>
-					<option value="@{majEdge}">Major Edge</option>
-					<option value="@{minObs}">Minor Obstacle</option>
-					<option value="@{majObs}">Major Obstacle</option>
-				</select></div>
-			<!-- Attack Roller -->
-			<div class="sheet-table-cell sheet-cell-10"><button type='roll' name='roll_attack' value='/em @{Name} rolls @{AtkName2} getting  [[{@{atkDice2}+@{AtkCV}+@{AtkMod2}}]] to hit for [[@{AtkDamCalc2}]] damage.'>Attack</button></div>
+		<div class="sheet-table-cell sheet-cell-15"><b>Attack</b></div>
+		<div class="sheet-table-cell sheet-cell-5"><b>Rank</b></div>
+		<div class="sheet-table-cell sheet-cell-5"><b>Range</b></div>
+		<div class="sheet-table-cell sheet-cell-10"><b>ACV</b></div>
+		<div class="sheet-table-cell sheet-cell-10"><b>Damage Bonus</b></div>
+		<div class="sheet-table-cell sheet-cell-10"><b>Damage Multiplier</b></div>
+		<div class="sheet-table-cell sheet-cell-10"><b>Damage</b></div>
+	</div>
+</div>
+<fieldset class="repeating_Attacks">
+	<div class="sheet-table sheet-input-border sheet-select-border">
+		<div class="sheet-table-row">
+			<div class="sheet-table-cell sheet-cell-15"><input type="text" name="attr_AttackName" value="" /></div>
+			<div class="sheet-table-cell sheet-cell-5"><input type="text" name="attr_AttackRank" value="" /></div>
+			<div class="sheet-table-cell sheet-cell-5"><input type="text" name="attr_AttackRange" value="" /></div>
+			<div class="sheet-table-cell sheet-cell-10"><input type="text" name="attr_AttackACV" value="" /></div>
+			<div class="sheet-table-cell sheet-cell-10"><input type="text" name="attr_AttackDamageMod" value="" /></div>
+			<div class="sheet-table-cell sheet-cell-10"><input type="text" name="attr_AttackDamageMult" value="" /></div>
+			<div class="sheet-table-cell sheet-cell-10"><input type="text" name="attr_AttackDamage" value="" /></div>	
 		</div>
 	</div>
+</fieldset>
 </div><!-- End Combat Section -->
 <div class="sheet-break"></div>
 
 <!-- Skill Groups -->
 <div class="sheet-section">
   <div class="sheet-header">Skill Groups</div>
-
   <div class="sheet-table sheet-input-border sheet-select-border">
     <div class="sheet-table-row">
       <div class="sheet-table-cell sheet-cell-25"><b>Name</b></div>
-      <div class="sheet-table-cell sheet-cell-5"><b>Level</b></div>
+      <div class="sheet-table-cell sheet-cell-5"><b>Rank</b></div>
       <div class="sheet-table-cell sheet-cell-5"><b>Points</b></div>
-      <div class="sheet-table-cell sheet-cell-10"><b>Related Stat</b></div>
-      <div class="sheet-table-cell sheet-cell-10"><b>Roll Modifier</b></div>
     </div> 
-    <div class="sheet-table-row">
-      <div class="sheet-table-cell sheet-cell-a"><input type="text" name="attr_SkillGroupName" value="" /></div>
-      <div class="sheet-table-cell sheet-cell-5"><input type="text" name="attr_SkillGroupLevel" value="" /></div>
-      <div class="sheet-table-cell sheet-cell-5"><input type="text" name="attr_SkillGroupPoints" value="" /></div>
-      <div class="sheet-table-cell sheet-cell-10"><select name="attr_SkillGroupRelatedStat">
-					<option value="@{Body}">Body</option>
-					<option value="@{Mind}">Mind</option>
-					<option value="@{Soul}">Soul</option>
-			</select></div>
-      <div class="sheet-table-cell sheet-cell-10"><select name="attr_SkillGroupRollModifier">
-					<option value="@{roll}">Standard</option>
-					<option value="@{minEdge}">Minor Edge</option>
-					<option value="@{majEdge}">Major Edge</option>
-					<option value="@{minObs}">Minor Obstacle</option>
-					<option value="@{majObs}">Major Obstacle</option>
-			</select></div>
-			<div class="sheet-table-cell"><button type='roll' name='roll_skill' value='/em @{Name} rolls @{SkillName1} [[{@{SkillDice1}+@{SkillLvl1}+@{SkillStat1}}]].'>Roll!</button></div>
-    </div>
   </div>
-
   <fieldset class="repeating_SkillGroups">
     <div class="sheet-table sheet-input-border sheet-select-border">
       <div class="sheet-table-row">
       <div class="sheet-table-cell sheet-cell-25"><input type="text" name="attr_SkillGroupName" value="" /></div>
-      <div class="sheet-table-cell sheet-cell-5"><input type="text" name="attr_SkillGroupLevel" value="" /></div>
+      <div class="sheet-table-cell sheet-cell-5"><input type="text" name="attr_SkillGroupRank" value="" /></div>
       <div class="sheet-table-cell sheet-cell-5"><input type="text" name="attr_SkillGroupPoints" value="" /></div>
-      <div class="sheet-table-cell sheet-cell-10"><select name="attr_SkillGroupRelatedStat">
-					<option value="@{Body}">Body</option>
-					<option value="@{Mind}">Mind</option>
-					<option value="@{Soul}">Soul</option>
-			</select></div>
-      <div class="sheet-table-cell sheet-cell-10"><select name="attr_SkillGroupRollModifier">
-					<option value="@{roll}">Standard</option>
-					<option value="@{minEdge}">Minor Edge</option>
-					<option value="@{majEdge}">Major Edge</option>
-					<option value="@{minObs}">Minor Obstacle</option>
-					<option value="@{majObs}">Major Obstacle</option>
-			</select></div>
-			<div class="sheet-table-cell sheet-cell-10"><button type='roll' name='roll_skill' value='/em @{Name} rolls @{SkillName1} [[{@{SkillDice1}+@{SkillLvl1}+@{SkillStat1}}]].'>Roll!</button></div>
       </div>
     </div>
   </fieldset>
@@ -284,14 +214,14 @@
     <div class="sheet-table-row">
       <div class="sheet-table-cell sheet-cell-10"><b>Name</b></div>
       <div class="sheet-table-cell sheet-cell-5"><b>Points</b></div>
-      <div class="sheet-table-cell sheet-cell-5"><b>Level</b></div>
-      <div class="sheet-table-cell sheet-cell-5"><b>Effective Level</b></div>
+      <div class="sheet-table-cell sheet-cell-5"><b>Rank</b></div>
+      <div class="sheet-table-cell sheet-cell-5"><b>Effective Rank</b></div>
       <div class="sheet-table-cell sheet-cell-25"><b>Description</b></div>
     </div>
     <div class="sheet-table-row">
       <div class="sheet-table-cell"><input type="text" name="attr_AttributeName" value="" /></div>
       <div class="sheet-table-cell"><input type="text" name="attr_AttributePoints" value="" /></div>
-      <div class="sheet-table-cell"><input type="text" name="attr_AttributeLevel" value="" /></div>
+      <div class="sheet-table-cell"><input type="text" name="attr_AttributeRank" value="" /></div>
       <div class="sheet-table-cell"><input type="text" name="attr_AttributeEffective" value="" /></div>
       <div class="sheet-table-cell"><input type="text" name="attr_AttributeDescription" value="" /></div>
     </div>
@@ -301,7 +231,7 @@
       <div class="sheet-table-row">
       <div class="sheet-table-cell sheet-cell-10"><input type="text" name="attr_AttributeName" value="" /></div>
       <div class="sheet-table-cell sheet-cell-5"><input type="text" name="attr_AttributePoints" value="" /></div>
-      <div class="sheet-table-cell sheet-cell-5"><input type="text" name="attr_AttributeLevel" value="" /></div>
+      <div class="sheet-table-cell sheet-cell-5"><input type="text" name="attr_AttributeRank" value="" /></div>
       <div class="sheet-table-cell sheet-cell-5"><input type="text" name="attr_AttributeEffective" value="" /></div>
       <div class="sheet-table-cell sheet-cell-25"><input type="text" name="attr_AttributeDescription" value="" /></div>
       </div>
