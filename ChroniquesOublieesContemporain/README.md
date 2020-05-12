@@ -9,9 +9,50 @@ Cette feuilles de personnage inclut quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](http://www.black-book-editions.fr/produit.php?id=4349).
 
 # Version courante
-2.9 [Screenshot](coc_v2.png)
+3.2 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.2 (2020-04-28)
+* Modifications internes sur les champs INIT et DEF pour permettre la liaison de ces attributs avec un token (contourne un bug de Roll20 sur la liaison avec des champs auto-calculés)
+* Ajout de cases à cocher pour chaque capacité (permet de remplir les voies à l'avance)
+* Modifications cosmétiques (alignement des attributs sur le premier onglet de la fiche)
+
+## v3.1 (2020-04-23)
+* Déplacement des buffs généraux vers l'onglet **Capacités**
+* Nouvelle présentation des buffs généraux :
+    - Il s'agit à présent d'une liste répétable d'éléments
+    - On indique le nom du buff, et la liste des attributs auxquels il s'applique, sous la forme _nom attribut : valeur de buff_, séparés par des virgules si le buff s'applique à plusieurs attributs.
+    - Une case à cocher permet d'activer ou désactiver le buff
+    - A chaque modification, les buffs par attributs sont recalculés et ré-assignés à la case **Divers** de chaque attribut.
+    - On peut afficher le détail des buffs par attributs en cliquant sur la flèche appropriée.
+* Remplacement des deux champs de modificateurs circonstanciels à l'attaque et aux dommages par deux listes répétables similaires à celles des buffs généraux
+    - On indique le nom du modificateur et sa valeur.
+    - Une case à cocher permet d'activer ou désactiver le modificateur.
+    - Tant qu'une case est cochée, le modificateur correspondant est appliqué à chaque jet d'attaque et/ou de dommages.
+    - Lorsqu'un modificateur d'attaque est activé ou désactivé, un buff général du même nom est recherché sur l'onglet **Capacités**, et s'il existe, celui-ci est synchronisé avec le modificateur d'attaque.
+* Rappel sur les valeurs de buffs ou de modificateurs d'attaque :
+    - Elles peuvent être une valeur fixe, _ex : Malingre : -1_
+    - Elles peuvent être une référence à un attribut, _ex : Vue perçante : +[PER]_ pour utiliser le mod. de PERception
+    - Elles peuvent être une référence à un rang dans une voie
+        - Soit en utilisant les attributs RANG_VOIEx _ex : Pilote émérite : +[RANG_VOIE1]_ 
+        - Soit en utilisant le nom de la voie tel qu'il a été entré dans l'onglet **Capacités**, _ex : Pilote émérite : [rang Pilotage]_ pour un bonus de +1 par rang dans la voie, ou _ex : Discrétion : 2[rang Furtivité]_ pour un bonus de +2 par rang
+    - Elles peuvent être une formule mathématique mettant en oeuvre plusieurs attributs, _ex Tenue de combat : +[RANG_VOIE1*DEFARMUREON]_
+* Sur l'onglet **Equipement**, les deux listes d'équipements sont maintenant regroupées en une seule, permettant de :
+    - Gérer l'encombrement (reprise des règles du Compagnon COF) en indiquant pour chaque équipement, une valeur d'encombrement, un nombre en inventaire, et si ce nombre est possédé ou porté (et compte donc dans l'encombrement).
+    - Saisir une description détaillée de l'équipement en plus de son nom
+    - Ajouter une ligne d'attaque sur l'onglet **Caractéristiques** ou la supprimer, en cochant ou décochant la case appropriée.
+    - Indiquer une liste de propriétés (séparées par des virgules) pour l'équipement, avec modification des données correspondantes sur l'onglet **Caractéristiques**. Les propriétés reconnues sont :
+        - **DEF : _bonus_** pour le bonus de DEFense d'une armure
+        - **RD : _valeur_** pour la valeur de Réduction des DM d'une armure
+        - **DM : _(nb)d(faces)_** pour les dés de DM d'une arme
+        - **ATD : _portée_** pour la portée d'une arme à distance (sinon c'est une attaque au contact)
+    - _Exemples_
+        - _DEF : 2, RD : 5_ (pour un gilet pare-balles)
+        - _DM : 1d6, ATD : 10m_ (pour un pistolet léger)
+* Sur l'onglet **Capacités**, les jets de capacités ont été modifiés pour permettre d'ajouter à un jet un bonus lié à une voie possédée par le personnage. Il suffit pour cela de :
+    - sélectionner la voie dont la possession procure un bonus au jet
+    - sélectionner le type de bonus obtenu pour chaque rang possédé (+1 ou +2 par rang dans la voie)
 
 ## v2.9 (2020-02-12)
 * Déplacement des parties règles optionnelles vers le tab caractéristiques
