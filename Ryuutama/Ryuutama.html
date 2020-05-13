@@ -393,11 +393,29 @@
                 });
             });
         });
+        on('sheet:opened', () => {
+            getAttrs(['npc_switch'], v => {
+                if (v.npc_switch == 'on') {
+                    setAttrs({
+                        npc_switch: 3
+                    });
+                } else if (parseInt(v.npc_switch) == 0 ) {
+                    setAttrs({
+                        npc_switch: 1
+                    });
+                };
+            });
+        });
     </script>
 
     <div>
-    	<input type="checkbox" name="attr_npc_switch" class="sheet-block-switch"/>
-        <span class="npc-switch-label">NPC&nbsp;</span>
+        <div class='charSheetType'>
+            <select name="attr_npc_switch" value="1" class='sheet-block-switch'>
+                <option value="1" selected="selected">PC</option>
+                <option value="2">GM</option>
+                <option value="3">NPC</option>
+            </select>
+        </div>
 
         <!-- Color theme hidden fields -->
         <input class="sheet-headerBgColor" name="attr_headerBgColor" type="hidden" value="default"/>
@@ -406,6 +424,7 @@
         <input class="sheet-radioBgColor"  name="attr_radioBgColor"  type="hidden" value="default"/>
         <!-- End Color Theme fields -->
 
+        <input type="checkbox" name="attr_npc_switch" value="1" class="sheet-hidden sheet-hider" checked>
         <div class='sheet-block-a characterSheet'>
             <!-- Hidden Fields -->
             <div class='hidden'>
@@ -699,17 +718,21 @@
                 <fieldset class='repeating_spells'>
                         <div class="sheet-spellRow">
 
-                        <button class='skill-check-button spell-details' type='roll' value='&{template:spell} {{name=@{spellName}}} {{cost=@{spellCost}}} {{duration=@{spellDuration}}} {{target=@{spellTarget}}} {{range=@{spellRange}}} {{effect=@{spellEffect}}} {{charname=@{character_name}}}' name='roll_repeatingSpellCard'>
-                            <span class='spellName' name="attr_spellName"></span>
+                        <div class="spell-details">
+                            <button class='spellName skill-check-button' type='roll' value='&{template:spell} {{name=@{spellName}}} {{cost=@{spellCost}}} {{duration=@{spellDuration}}} {{target=@{spellTarget}}} {{range=@{spellRange}}} {{effect=@{spellEffect}}} {{charname=@{character_name}}}' name='roll_repeatingSpellCard'>
+                                <span name="attr_spellName"></span>
+                            </button>
                             <span class='spellCost' name="attr_spellCost"></span>
                             <span class='spellDuration spellWrap' name="attr_spellDuration"></span>
                             <span class='spellTarget spellWrap' name="attr_spellTarget"></span>
                             <span class='spellRange spellWrap' name="attr_spellRange"></span>
                             <span class='spellTypes' name="attr_spellType"></span>
-                        </button>
+                        </div>
 
-                        <input class="spell-toggles spell-checkbox" name="attr_settings" type="checkbox" value="settings"/><span class="spell-toggles">p</span>
-                        <input class="spell-toggles spell-checkbox" name="attr_collapse" type="checkbox" value="collapse"/><span class="spell-toggles">i</span>
+                        <input class="spell-toggles spell-checkbox" name="attr_settings" type="checkbox" value="settings"/>
+                        <span class="spell-toggles settings-toggle ">p</span>
+                        <input class="spell-toggles collapse-toggle spell-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
+                        <span class="spell-toggles collapse-toggle">i</span>
 
                         <div class="flex settings">
                             <div class='flex-column'>
@@ -763,24 +786,9 @@
 
             <span class='characterStats'>
                 <div class="hpmpgrid">
-                    <div class="hpInfo">
-                        <div class="flex header hpmpHeader">Hit Points</div></div>
-                        <div class="hp">
-                            <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Ryuutama/images/heart.png" alt="whiteheart" class="icon">
-                            <input type='checkbox' class='penaltyCondition' name='attr_hpUnconscious' value='1'/>
-                            <input type='checkbox' class='deathCondition' name='attr_hpDeath' value='1'/>
-                            <input type='number' class='stats' name='attr_healthPoints' value='8'/> /
-                            <input type='number' class='stats' name='attr_healthPoints_max' value='8' min='1'/>
-                        </div>
-                        <div class="mpInfo"><div class="flex header hpmpHeader">Mental Points</div>
-                    </div>
-                    <div class="mp">
-                        <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Ryuutama/images/sevenpointstar.png" alt="sevenpointstar" class="icon">
-                        <input type='checkbox' class='penaltyCondition' name='attr_mpUnconscious' value='1'/>
-                        <input type='number' class='stats' name='attr_magicPoints' value='8' min='0'/> /
-                        <input type='number' class='stats' name='attr_magicPoints_max' value='8' min='1'/>
-                    </div>
-                    <div class="condInfo">
+                    <div class="hpHeader"><div class="flex header hpmpHeader">Hit Points</div></div>
+                    <div class="mpHeader"><div class="flex header hpmpHeader">Mental Points</div></div>
+                    <div class="condHeader">
                         <label class="flex header hpmpHeader">Condition (If >=10 add 1 dice size to:
                         <select name="attr_bonus" class='condAttribute'>
                             <option value=''></option>
@@ -791,6 +799,19 @@
                         </select>
                         )
                         </label>
+                    </div>
+                    <div class="hp">
+                        <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Ryuutama/images/heart.png" alt="whiteheart" class="icon">
+                        <input type='checkbox' class='penaltyCondition' name='attr_hpUnconscious' value='1'/>
+                        <input type='checkbox' class='deathCondition' name='attr_hpDeath' value='1'/>
+                        <input type='number' class='stats' name='attr_healthPoints' value='8'/> /
+                        <input type='number' class='stats' name='attr_healthPoints_max' value='8' min='1'/>
+                    </div>
+                    <div class="mp">
+                        <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Ryuutama/images/sevenpointstar.png" alt="sevenpointstar" class="icon">
+                        <input type='checkbox' class='penaltyCondition' name='attr_mpUnconscious' value='1'/>
+                        <input type='number' class='stats' name='attr_magicPoints' value='8' min='0'/> /
+                        <input type='number' class='stats' name='attr_magicPoints_max' value='8' min='1'/>
                     </div>
                     <div class="condition flex">
                         <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Ryuutama/images/condition.png" alt="condition" class="icon">
@@ -1615,12 +1636,12 @@
             </span>
         </div>
 
-         <!--- Start of NPC sheet-->
-
+        <!--- Start of NPC sheet-->
+        <input type="checkbox" name="attr_npc_switch" value="3" class="sheet-hidden sheet-hider">
         <div class="sheet-block-b npc-sheet-container">
             <table class="npc-header-table">
                 <tr>
-                    <td class="npc-name"><span class="npc-name" name="attr_character_name"></span></td>
+                    <td class="npc-name"><input type='text' class="npc-name" name="attr_character_name" placeholder="Character Name"></input></td>
                     <td class="npc-level-label">LEVEL</td>
                     <td><input class="npc-level-input" type="number" name="attr_npc_level" value="1"/></td>
                 </tr>
@@ -1716,7 +1737,7 @@
                                 <option value="10">d10</option>
                                 <option value="12">d12</option>
                             </select>
-                             +
+                            +
                             <input type="number" name="attr_npc_damage_bonus" value="0"/>&nbsp;
                             <label class='checkboxLabel inlineCheckbox'><input type='checkbox' name='attr_npcCriticalMod' value='1'>&nbsp;Add Critical Die</label>
                         </td>
@@ -1741,6 +1762,178 @@
 
         </div>
         <!--- End of NPC sheet-->
+
+        <!--- Start of GM Character sheet-->
+        <input type="checkbox" name="attr_npc_switch" value="2" class="sheet-hidden sheet-hider">
+        <div class="sheet-block-c characterSheet gm-sheet-container">
+
+            <!--- High Level Tabs-->
+            <input type="radio" class="sheet-tab sheet-gmtab1" name="attr_gm-tab" value="1" title="Details" checked="checked"/>
+            <span class="sheet-tab sheet-gmtab1">Character</span>
+            <input type="radio" class="sheet-tab sheet-gmtab2" name="attr_gm-tab" value="2" title="Class"/>
+            <span class="sheet-tab sheet-gmtab2">History</span>
+            <!--- --->
+
+            <span class='gmCharacterDetails'>
+                <div class='flex'>
+                    <img class="logo" src="https://raw.githubusercontent.com/jlvgit/roll20-character-sheets/72e965864e65d04c9c50f17d3d716d19e38890e0/Ryuutama/images/rtlogo.svg">
+                    <img class="gmlogo" src="https://raw.githubusercontent.com/jlvgit/roll20-character-sheets/033e833e5af45601a48d9a0e6a6948dfa8fd2880/Ryuutama/images/gmCharacterSheetBanner.svg">
+                </div>
+
+                <div class='flex-column'>
+                    <div class="flex-between">
+                        <div class='flex-column'>
+                            <label class="header attrLabel">Name</label>
+                            <input name="attr_character_name" placeholder="Character Name" title="@{character_name}" type="text" value="" />
+                        </div>
+                        <div class="flex-column">
+                            <label class="header attrLabel">Race</label>
+                            <input type='text' name='attr_gmpcRace'/>
+                        </div>
+                        <div class='flex-column'>
+                            <label class="header attrLabel">Level</label>
+                            <input type='number' name='attr_level' value='1' min='1'/>
+                        </div>
+                        <div class='flex-column'>
+                            <label class="header attrLabel">Alt Shape</label>
+                            <input type='text' name='attr_charGender'/>
+                        </div>
+                    </div>
+                </div>
+                <div class='flex gmpcLifepoints'>
+                    <div class="lp">
+                        <label class="header headerLabel gmpc-label lifepointsHeader">Lifepoints</label>
+                        <div class="hp">
+                            <img src="https://raw.githubusercontent.com/jlvgit/roll20-character-sheets/ryuutama-add-ryuujin-sheet/Ryuutama/images/leaf.png" alt="whiteheart" class="icon">
+                            <input type='number' class='stats' name='attr_lifePoints' value='1'/> /
+                            <input type='number' class='stats' name='attr_lifePoints_max' value='1' min='1'/>
+                        </div>
+                    </div>
+
+                    <div class="flex personalItems">
+                        <div class='flex-column'>
+                            <label class="header attrLabel">Artefact</label>
+                            <input  type="text" name="attr_artefact"/>
+                        </div>
+
+                        <div class='flex-column'>
+                            <label class="header attrLabel">Inscription</label>
+                            <input type="text" name="attr_inscription" class='full-length-input'/>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-column">
+                    <div class="benedictions">
+                        <label class="header headerLabel gmpc-label">Bénédiction</label>
+                        <fieldset class='repeating_benedictions'>
+                            <div>
+                                <label class='gmpc-repeatingLabel'>
+                                    <input type="checkbox" name="attr_benedictionUsed" class="benedictionUsed"/>
+                                    <span class='gmpc-repeatingName' name="attr_benedictionName"></span>
+                                </label>
+
+                                <input class="spell-toggles spell-checkbox" name="attr_settings" type="checkbox" value="settings"/>
+				                <span class="spell-toggles settings-toggle ">p</span>
+                                <input class="spell-toggles collapse-toggle spell-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
+				                <span class="spell-toggles collapse-toggle">i</span>
+
+                                <div class="settings">
+                                    <div class='flex-column'>
+                                        Name:
+                                        <input type="text" name="attr_benedictionName" class='gmpcNameInput' placeholder="Name"/>
+                                    </div>
+                                </div>
+                                <div class='settings'>
+                                    <textarea name="attr_benedictionEffect" class="spellEffect" placeholder="Effect"></textarea>
+                                </div>
+                                <div class="collapse">
+                                    <span name="attr_benedictionEffect" class="spellEffectDisplay"></span>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div>
+                        <label class="header headerLabel gmpc-label">Réveil</label>
+                        <fieldset class='repeating_reveils'>
+                            <div>
+                                <div>
+                                    <span class="reveilName" name="attr_reveilName"></span>
+                                    LP Cost:<span class='reveilCost' name="attr_reveilCost"></span>
+                                </div>
+
+                                <input class="spell-toggles spell-checkbox" name="attr_settings" type="checkbox" value="settings"/>
+				                <span class="spell-toggles settings-toggle ">p</span>
+                                <input class="spell-toggles collapse-toggle spell-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
+                                <span class="spell-toggles collapse-toggle">i</span>
+
+                                <div class="settings">
+                                    <div class='flex-column'>
+                                        Name:
+                                        <input type="text" name="attr_reveilName" class='gmpcNameInput' placeholder="Name"/>
+                                    </div>
+                                    <div class='flex-column'>
+                                        LP Cost:
+                                        <input type="number" name="attr_reveilCost" min='1'/>
+                                    </div>
+                                </div>
+                                <div class='settings'>
+                                    <textarea name="attr_reveilEffect" class="spellEffect" placeholder="Effect"></textarea>
+                                </div>
+                                <div class="collapse">
+                                    <span name="attr_reveilEffect" class="spellEffectDisplay"></span>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <div>
+                        <label class="header headerLabel gmpc-label">Appearance, Personality</label>
+                        <textarea name='attr_gmAppearance'></textarea>
+                    </div>
+
+                    <div class='flex-column'>
+                        <label class="header headerLabel gmpc-label">Goal</label>
+                        <input type='text' name='attr_gmGoal' class='full-length-input'></input>
+                    </div>
+
+                    <div class='flex-column'>
+                        <label class="header headerLabel gmpc-label">Living Quarters</label>
+                        <input type='text' name='attr_gmHometown' class='full-length-input'></input>
+                    </div>
+                </div>
+            </span>
+            <span class="gmHistory">
+
+                <div class='flex-column'>
+                    <label class="header headerLabel gmpc-label">Protected Travelers</label>
+                    <textarea name='attr_protectedTravelers' class="protectedTravelers"></textarea>
+                </div>
+
+                <div class='flex-column'>
+                    <label class="header headerLabel gmpc-label">Protected Worlds</label>
+                    <input type='text' name='attr_protectedWorlds' class='full-length-input'></input>
+                </div>
+
+                <div class='flex-column'>
+                    <label class="header headerLabel gmpc-label">History of Tales</label>
+                    <div class='historyTales'>
+                        <span>Scenario name</span>
+                        <span>Date</span>
+                        <span>Traveler's names</span>
+                    </div>
+                    <fieldset class='repeating_history'>
+                        <div class='historyTales'>
+                            <input type="text" name="attr_scenarioName" class="scenarioName historyInput" placeholder="First meeting with trouble"/>
+                            <input type="text" name="attr_scenarioDate" class="scenarioDate historyInput" placeholder="9/6"/>
+                            <input type="text" name="attr_scenarioTravelers" class="scenarioTravelers historyInput" placeholder="Haruka, Leo"/>
+                        </div>
+                    </fieldset>
+                </div>
+            </span>
+        </div>
+
+        <!--- End of GM character sheet-->
     </div>
 
       <!-- Roll Templates -->
@@ -1843,24 +2036,32 @@
                                 <div class="rolltemplate-spellTitle">Name</div>
                                 <div class='rolltemplate-spellAttrText'>[{{name}}](~{{charname}}|magicRoll)</div>
                             </div>
-                            <div class='flex-column'>
-                                <div class="rolltemplate-spellTitle">MP</div>
-                                <div class='rolltemplate-spellAttrText'>{{cost}}</div>
-                            </div>
+                            {{#cost}}
+                                <div class='flex-column'>
+                                    <div class="rolltemplate-spellTitle">MP</div>
+                                    <div class='rolltemplate-spellAttrText'>{{cost}}</div>
+                                </div>
+                            {{/cost}}
                         </div>
                         <div class='rolltemplate-spellCard'>
-                            <div class='rolltemplate-spellAttr flex-column'>
-                                <div class="rolltemplate-spellTitle">Duration</div>
-                                <div class='rolltemplate-spellAttrText'>{{duration}}</div>
-                            </div>
-                            <div class='rolltemplate-spellAttr flex-column'>
-                                <div class="rolltemplate-spellTitle">Target</div>
-                                <div class='rolltemplate-spellAttrText'>{{target}}</div>
-                            </div>
-                            <div class='flex-column'>
-                                <div class="rolltemplate-spellTitle">Range</div>
-                                <div class='rolltemplate-spellAttrText'>{{range}}</div>
-                            </div>
+                            {{#duration}}
+                                <div class='rolltemplate-spellAttr flex-column'>
+                                    <div class="rolltemplate-spellTitle">Duration</div>
+                                    <div class='rolltemplate-spellAttrText'>{{duration}}</div>
+                                </div>
+                            {{/duration}}
+                            {{#target}}
+                                <div class='rolltemplate-spellAttr flex-column'>
+                                    <div class="rolltemplate-spellTitle">Target</div>
+                                    <div class='rolltemplate-spellAttrText'>{{target}}</div>
+                                </div>
+                            {{/target}}
+                            {{#range}}
+                                <div class='flex-column'>
+                                    <div class="rolltemplate-spellTitle">Range</div>
+                                    <div class='rolltemplate-spellAttrText'>{{range}}</div>
+                                </div>
+                            {{/range}}
                         </div>
                         {{#effect}}
                             <div class='rolltemplate-spellEffect'>{{effect}}</div>
