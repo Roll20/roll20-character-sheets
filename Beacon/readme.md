@@ -22,3 +22,5 @@ Interm updates 2020-04-16:
 Interm updates 2020-04-22:
 	- add in some levelup info to update tab
 	- Fix speed and dex calculations for worn armor
+Updates 2020-05-13:
+	- additional fixes for armor dex calculations, streamline weapon row dropdowns and fix ranged weapon calcs. Add support for rogues using light weapons.
