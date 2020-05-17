@@ -2351,10 +2351,7 @@
 
 <!-- ROLL TEMPLATES - END-->
 <!-- SHEET WORKERS - START-->
-<script type="text/worker">
-  // You may temporarily remove the (type='text/worker') part from the live above to get syntax highlighting in vscode
-  
-  const characteristic_names = [{"category":"body","list":["strength","dexterity","endurance"]},{"category":"mind","list":["wits","perception","will"]},{"category":"spirit","list":["presence","intuition","faith"]}].flatMap(x => x.list);
+<script type="text/worker">const characteristic_names = [{"category":"body","list":["strength","dexterity","endurance"]},{"category":"mind","list":["wits","perception","will"]},{"category":"spirit","list":["presence","intuition","faith"]}].flatMap(x => x.list);
   const skill_names = [{"name":"academia","default":3},{"name":"alchemy","default":0},{"name":"animalia","default":3},{"name":"arts","default":3},{"name":"charm","default":3},{"name":"crafts","default":3},{"name":"disguise","default":3},{"name":"drive","default":3},{"name":"empathy","default":3},{"name":"fight","default":3},{"name":"focus","default":3},{"name":"impress","default":3},{"name":"interface","default":0},{"name":"intrusion","default":3},{"name":"knavery","default":3},{"name":"melee","default":3},{"name":"observe","default":3},{"name":"perform","default":3},{"name":"pilot","default":0},{"name":"remedy","default":3},{"name":"shoot","default":3},{"name":"sleight_of_hand","default":3},{"name":"sneak","default":3},{"name":"survival","default":3},{"name":"tech_redemption","default":3},{"name":"vigor","default":3}].flatMap(x => x.name);
   const armor_proofing_types = ["blaster","flame","hard","laser","shock","slam","sonic"];
   const state_names = [{"category":"physical_states","list":["blinded","dazed","deafened","desensitized","disoriented","dying","euphoric","fatigued","hearing_impaired","hindered","immobilized","incapacitated","mangled","nauseated","paralized","prone","seeing_impaired","stimulated","stunned","suspended","tormented","unconscious"]},{"category":"mental_states","list":["afraid","angered","anxious","berserk","commanded","confused","deceived","enlightened","penalized","terrified","wowed"]},{"category":"social_states","list":["awed","befriended","castigated","convinced","daunted","divinely_inspired","entreated","guilty","humiliated","mesmerized","roused"]},{"category":"tech_compulsions","list":["acquisitive","bloodthirsty","cruel","destructive","heedless","hypercritical","indiscreet","industrious","inerrant","pretentious","protective","reckless"]}].flatMap(x => x.list);
@@ -2393,6 +2390,11 @@
   repeating_rolls.forEach( repeating => {
       on(`change:repeating_${repeating.section}`, eventInfo => {
           updateGoalNumber(repeating.section, repeating.prefix);
+      });
+  
+      on(`remove:repeating_${repeating.section}`, eventInfo => {
+          const timestamp = Number(new Date())
+          setAttrs({ repeat_delete: timestamp });
       });
   });
   
@@ -2443,7 +2445,6 @@
           });
       });
   });
-  
   
   on("sheet:opened", function() {
       // sheet versioning

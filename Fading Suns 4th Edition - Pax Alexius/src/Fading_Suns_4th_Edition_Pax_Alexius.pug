@@ -500,9 +500,8 @@ include roll-templates.html
 // ROLL TEMPLATES - END
 
 // SHEET WORKERS - START
-script(type='text/worker').
-    // You may temporarily remove the (type='text/worker') part from the live above to get syntax highlighting in vscode
-
+script(type='text/worker')
+ .
     const characteristic_names = !{JSON.stringify(characteristics)}.flatMap(x => x.list);
     const skill_names = !{JSON.stringify(skills)}.flatMap(x => x.name);
     const armor_proofing_types = !{JSON.stringify(armor_proofing_types)};
@@ -542,6 +541,11 @@ script(type='text/worker').
     repeating_rolls.forEach( repeating => {
         on(`change:repeating_${repeating.section}`, eventInfo => {
             updateGoalNumber(repeating.section, repeating.prefix);
+        });
+
+        on(`remove:repeating_${repeating.section}`, eventInfo => {
+            const timestamp = Number(new Date())
+            setAttrs({ repeat_delete: timestamp });
         });
     });
 
@@ -592,7 +596,6 @@ script(type='text/worker').
             });
         });
     });
-
 
     on("sheet:opened", function() {
         // sheet versioning
