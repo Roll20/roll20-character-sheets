@@ -1,6 +1,10 @@
 # Release notes
 
 ## 1.1.0
+- Now differentiating current + max values for Revivals Number and Surge Number
+- Now auto-computing Vitality Rating, Revivals Rating, Revivals Number (max), VP Bank capacity, Surge Rating, Surge Number (max)
+
+## 1.1.0
 - Species size box converted to numeric input from text input
 - Armor resistances against specific damage types (blaster, flame, ..) now automatically deduced from the armor general resistance level
 - New "States" section to log physical/mental/social states and tech compulsions
@@ -18,6 +22,14 @@
 # TODO list
 
 ## Potential improvements
+
+- Auto-computed
+    - Vitality Rating
+    - Revivals Rating
+    - Surge Rating
+    - Bank Capacity
+    - Surge Number
+    - Revivals Number
 
 - Blessing/Curse: add more space for their descriptions
 
