@@ -198,7 +198,8 @@
 	<h2>Fertigkeiten</h2>
 	<div class="2colrow">
 		<div class="col">
-			<span class="span-header center" style="margin-left: 35px"><b>Fertigkeit</b></span>
+			<span class="span-header center" style="margin-left: 35px"><b>R</b></span>
+			<span class="span-header center" style="margin-left: 5px"><b>Fertigkeit</b></span>
 			<span class="span-header center" style="margin-left: 105px"><b>FW</b></span>
 			<span class="span-header center" style="margin-left: 90px"><b>Bonus</b></span>
 			<span class="span-header center" style="margin-left: 5px"><b>PP</b></span>
@@ -206,6 +207,9 @@
 			<fieldset class="repeating_fertigkeiten">
 				<button type='roll' name="roll_ew_fertigkeit"
 					value='&{template:default} {{name=@{character_name} würfelt auf @{Fertigkeit}}} {{EW:@{Fertigkeit}=[[1d20cs16cs17cs18cs19cs20cf1cf16cf17cf18cf19 + @{FW} + @{leitE} + @{Fertigkeitsbonus} + ?{Bonus|0}]]}}'></button>
+				<input type='checkbox' class="checkbox" name='attr_toggle-section' value="1">
+				<!-- it doesnt need to be a checkbox -->
+				<input class='sheet-section-toggle' type='hidden' name='attr_toggle-section'>
 				<input type="text" name="attr_Fertigkeit" value="Name" />
 				<input type="number" name="attr_FW" value="1" />
 				<select name="attr_LeitE" class="dtype">
@@ -223,8 +227,10 @@
 				<input type="number" name="attr_Fertigkeitsbonus" value="0" />
 				<input type="number" name="attr_FertPP" value="0" />
 				<input type="checkbox" class="checkbox" style="margin-left: 12px" value="1" name="attr_FertKB" />
+				<div class="sheet-section-hide">
+					<textarea name="attr_FertBeschreibung"></textarea>
+				</div>
 			</fieldset>
-			<button type="action" name="act_fertkb">Markierte Fertigkeiten auf Kampfblatt übertragen</button>
 		</div>
 		<div class="col">
 			<span class="span-header center" style="margin-left: 35px"><b>Sinne / Ungelernt</b></span>
@@ -390,7 +396,6 @@
 			<textarea name="attr_ZauWirkung"></textarea>
 		</div>
 	</fieldset>
-	<button type="action" name="act_zaukb">Markierte Zauber auf Kampfblatt übertragen</button>
 </div>
 
 <div class='sheet-KampfK'>
@@ -535,31 +540,42 @@
 			<br />
 			<h3>Fertigkeiten</h3> <br />
 
-			<span class="span-header center" style="margin-left: 35px"><b>Fertigkeit</b></span>
+			<span class="span-header center" style="margin-left: 35px"><b>R</b></span>
+			<span class="span-header center" style="margin-left: 5px"><b>Fertigkeit</b></span>
 			<span class="span-header center" style="margin-left: 105px"><b>FW</b></span>
 			<span class="span-header center" style="margin-left: 90px"><b>Bonus</b></span>
 			<span class="span-header center" style="margin-left: 5px"><b>PP</b></span>
+			<span class="span-header center" style="margin-left: 27px"><b>KBlatt</b></span>
 
-			<fieldset class="repeating_fertigkeiten3">
-				<button type='roll'
-					value='&{template:default} {{name=@{character_name} würfelt auf @{Fertigkeit3}}} {{EW:@{Fertigkeit3}=[[1d20cs16cs17cs18cs19cs20cf1cf16cf17cf18cf19 + @{FW3} + @{leitE3} + @{Fertigkeitsbonus3} + ?{Bonus|0}]]}}'
-					name="roll_EW_Fertigkeit"></button>
-				<input type="text" name="attr_Fertigkeit3" value="Name" readonly />
-				<input type="number" name="attr_FW3" value="1" readonly />
-				<select name="attr_LeitE3" class="dtype" readonly>
-					<option value="0" selected="selected">-</option>
-					<option value="@{LeitSt}">St</option>
-					<option value="@{LeitGs}">Gs</option>
-					<option value="@{LeitGw}">Gw</option>
-					<option value="@{LeitKo}">Ko</option>
-					<option value="@{LeitIn}">In</option>
-					<option value="@{LeitZt}">Zt</option>
-					<option value="@{LeitAu}">Au</option>
-					<option value="@{LeitpA}">pA</option>
-					<option value="@{LeitWk}">Wk</option>
-				</select>
-				<input type="number" name="attr_Fertigkeitsbonus3" value="0" readonly />
-				<input type="number" name="attr_FertPP3" value="0" />
+			<fieldset class="repeating_fertigkeiten">
+				<input type="hidden" class="repeating-show" name="attr_repeating_show" value="1">
+				<div class="repeating-display">
+					<button type='roll' name="roll_ew_fertigkeit"
+						value='&{template:default} {{name=@{character_name} würfelt auf @{Fertigkeit}}} {{EW:@{Fertigkeit}=[[1d20cs16cs17cs18cs19cs20cf1cf16cf17cf18cf19 + @{FW} + @{leitE} + @{Fertigkeitsbonus} + ?{Bonus|0}]]}}'></button>
+					<input type='checkbox' class="checkbox" name='attr_toggle-section' value="1">
+					<!-- it doesnt need to be a checkbox -->
+					<input class='sheet-section-toggle' type='hidden' name='attr_toggle-section'>
+					<input type="text" name="attr_Fertigkeit" value="Name" />
+					<input type="number" name="attr_FW" value="1" />
+					<select name="attr_LeitE" class="dtype">
+						<option value="0" selected="selected">-</option>
+						<option value="@{LeitSt}">St</option>
+						<option value="@{LeitGs}">Gs</option>
+						<option value="@{LeitGw}">Gw</option>
+						<option value="@{LeitKo}">Ko</option>
+						<option value="@{LeitIn}">In</option>
+						<option value="@{LeitZt}">Zt</option>
+						<option value="@{LeitAu}">Au</option>
+						<option value="@{LeitpA}">pA</option>
+						<option value="@{LeitWk}">Wk</option>
+					</select>
+					<input type="number" name="attr_Fertigkeitsbonus" value="0" />
+					<input type="number" name="attr_FertPP" value="0" />
+					<input type="checkbox" class="checkbox" style="margin-left: 12px" value="1" name="attr_FertKB" />
+					<div class="sheet-section-hide">
+						<textarea name="attr_FertBeschreibung"></textarea>
+					</div>
+				</div>
 			</fieldset>
 		</div>
 
@@ -580,56 +596,61 @@
 	<span class="span-header center" style="margin-left: 75px"><b>Art</b></span>
 	<span class="span-header center" style="margin-left: 80px"><b>Prozess</b></span>
 	<span class="span-header center" style="margin-left: 80px"><b>PP</b></span>
-	<fieldset class="repeating_zauber2">
-		<button type='roll'
-			value='&{template:default} {{name=@{character_name} zaubert @{Zauber2}}} {{EW:Zaubern=[[1D20 + @{Zaubern} + @{ZauSpezBonus2} + @{BonusZauber} + @{itemBZaubern} + @{modZaubern} + ?{Bonus|0} ]]}} {{AP=@{AP2}}} {{Zauberdauer=@{Zd2}}} {{Wirkungsbereich=@{Wb2}}} {{Reichweite=@{Rw2}}} {{Wirkungsdauer=@{Wd2}}} {{Ziel=@{ziel2}}} {{Art=@{art2}}}'
-			name="roll_EW_Zaubern2"></button>
-		<input type='checkbox' class="checkbox" name='attr_toggle-section' value="1">
-		<!-- it doesnt need to be a checkbox -->
-		<input class='sheet-section-toggle' type='hidden' name='attr_toggle-section'>
-		<input type="text" name="attr_Zauber2" value="Name" />
-		<input type="number" name="attr_ZauSpezBonus2" value="0" />
-		<input type="text" name="attr_AP2" style="width:100px" value="AP" />
-		<input type="text" name="attr_ZD2" style="width:100px" value="Zd" />
-		<input type="text" name="attr_WB2" style="width:100px" value="Wb" />
-		<input type="text" name="attr_RW2" style="width:100px" value="Rw" />
-		<input type="text" name="attr_WD2" style="width:100px" value="Wd" />
-		<select name="attr_Ziel2" class="ziel">
-			<option value="Ziel" selected="selected">Ziel</option>
-			<option value="Umgebung">Umgebung</option>
-			<option value="Geist">Geist</option>
-			<option value="Körper">Körper</option>
-		</select>
-		<select name="attr_Art2" class="art">
-			<option value="Art" selected="selected">Art</option>
-			<option value="Gedanke">Gedanke</option>
-			<option value="Geste">Geste</option>
-			<option value="Wort">Wort</option>
-		</select>
-		<select name="attr_Prozess2" class="prozess">
-			<option value="Prozess" selected="selected">Prozess</option>
-			<option value="Ohne">Ohne</option>
-			<option value="Beherrschen">Beherrschen</option>
-			<option value="Bewegen">Bewegen</option>
-			<option value="Erkennen">Erkennen</option>
-			<option value="Erschaffen">Erschaffen</option>
-			<option value="Formen">Formen</option>
-			<option value="Verändern">Verändern</option>
-			<option value="Zerstören">Zerstören</option>
-			<option value="Wundertat">Wundertat</option>
-			<option value="Dweomer">Dweomer</option>
-			<option value="Zauberlied">Zauberlied</option>
-			<option value="Salz">Salz</option>
-			<option value="Thaumagraphie">Thaumagraphie</option>
-			<option value="Beschwören">Beschwören</option>
-			<option value="Nekromantie">Nekromantie</option>
-			<option value="Thaumatherapie">Thaumatherapie</option>
-			<option value="Zaubermittel">Zaubermittel</option>
-			<option value="Zauberschutz">Zauberschutz</option>
-		</select>
-		<input type="number" name="attr_ZauPP2" value="0" />
-		<div class="sheet-section-hide">
-			<textarea name="attr_ZauWirkung2"></textarea>
+	<span class="span-header center" style="margin-left: 25px"><b>KBlatt</b></span>
+	<fieldset class="repeating_zauber">
+		<input type="hidden" class="repeating-show" name="attr_repeating_show" value="1">
+		<div class="repeating-display">
+			<button type='roll'
+				value='&{template:default} {{name=@{character_name} zaubert @{Zauber}}} {{EW:Zaubern=[[1D20 + @{Zaubern} + @{ZauSpezBonus} + @{BonusZauber} + @{itemBZaubern} + @{modZaubern} + ?{Bonus|0} ]]}} {{AP=@{AP}}} {{Zauberdauer=@{Zd}}} {{Wirkungsbereich=@{Wb}}} {{Reichweite=@{Rw}}} {{Wirkungsdauer=@{Wd}}} {{Ziel=@{ziel}}} {{Art=@{art}}}'
+				name="roll_EW_Zaubern"></button>
+			<input type='checkbox' class="checkbox" name='attr_toggle-section' value="1">
+			<!-- it doesnt need to be a checkbox -->
+			<input class='sheet-section-toggle' type='hidden' name='attr_toggle-section'>
+			<input type="text" name="attr_Zauber" value="Name" />
+			<input type="number" name="attr_ZauSpezBonus" value="0" />
+			<input type="text" name="attr_AP" style="width:100px" value="AP" />
+			<input type="text" name="attr_ZD" style="width:100px" value="Zd" />
+			<input type="text" name="attr_WB" style="width:100px" value="Wb" />
+			<input type="text" name="attr_RW" style="width:100px" value="Rw" />
+			<input type="text" name="attr_WD" style="width:100px" value="Wd" />
+			<select name="attr_Ziel" class="ziel">
+				<option value="Ziel" selected="selected">Ziel</option>
+				<option value="Umgebung">Umgebung</option>
+				<option value="Geist">Geist</option>
+				<option value="Körper">Körper</option>
+			</select>
+			<select name="attr_Art" class="art">
+				<option value="Art" selected="selected">Art</option>
+				<option value="Gedanke">Gedanke</option>
+				<option value="Geste">Geste</option>
+				<option value="Wort">Wort</option>
+			</select>
+			<select name="attr_Prozess" class="prozess">
+				<option value="Prozess" selected="selected">Prozess</option>
+				<option value="Ohne">Ohne</option>
+				<option value="Beherrschen">Beherrschen</option>
+				<option value="Bewegen">Bewegen</option>
+				<option value="Erkennen">Erkennen</option>
+				<option value="Erschaffen">Erschaffen</option>
+				<option value="Formen">Formen</option>
+				<option value="Verändern">Verändern</option>
+				<option value="Zerstören">Zerstören</option>
+				<option value="Wundertat">Wundertat</option>
+				<option value="Dweomer">Dweomer</option>
+				<option value="Zauberlied">Zauberlied</option>
+				<option value="Salz">Salz</option>
+				<option value="Thaumagraphie">Thaumagraphie</option>
+				<option value="Beschwören">Beschwören</option>
+				<option value="Nekromantie">Nekromantie</option>
+				<option value="Thaumatherapie">Thaumatherapie</option>
+				<option value="Zaubermittel">Zaubermittel</option>
+				<option value="Zauberschutz">Zauberschutz</option>
+			</select>
+			<input type="number" name="attr_ZauPP" value="0" />
+			<input type="checkbox" class="checkbox" value="1" name="attr_ZauKB" style="margin-left: 10px" />
+			<div class="sheet-section-hide">
+				<textarea name="attr_ZauWirkung"></textarea>
+			</div>
 		</div>
 	</fieldset>
 
@@ -706,56 +727,61 @@
 	<span class="span-header center" style="margin-left: 75px"><b>Art</b></span>
 	<span class="span-header center" style="margin-left: 80px"><b>Prozess</b></span>
 	<span class="span-header center" style="margin-left: 80px"><b>PP</b></span>
-	<fieldset class="repeating_zauber2">
-		<button type='roll'
-			value='&{template:default} {{name=@{character_name} zaubert @{Zauber2}}} {{EW:Zaubern=[[1D20 + @{Zaubern} + @{ZauSpezBonus2} + @{BonusZauber} + @{itemBZaubern} + @{modZaubern} + ?{Bonus|0} ]]}} {{AP=@{AP2}}} {{Zauberdauer=@{Zd2}}} {{Wirkungsbereich=@{Wb2}}} {{Reichweite=@{Rw2}}} {{Wirkungsdauer=@{Wd2}}} {{Ziel=@{ziel2}}} {{Art=@{art2}}}'
-			name="roll_EW_Zaubern2"></button>
-		<input type='checkbox' class="checkbox" name='attr_toggle-section' value="1">
-		<!-- it doesnt need to be a checkbox -->
-		<input class='sheet-section-toggle' type='hidden' name='attr_toggle-section'>
-		<input type="text" name="attr_Zauber2" value="Name" />
-		<input type="number" name="attr_ZauSpezBonus2" value="0" />
-		<input type="text" name="attr_AP2" style="width:100px" value="AP" />
-		<input type="text" name="attr_ZD2" style="width:100px" value="Zd" />
-		<input type="text" name="attr_WB2" style="width:100px" value="Wb" />
-		<input type="text" name="attr_RW2" style="width:100px" value="Rw" />
-		<input type="text" name="attr_WD2" style="width:100px" value="Wd" />
-		<select name="attr_Ziel2" class="ziel">
-			<option value="Ziel" selected="selected">Ziel</option>
-			<option value="Umgebung">Umgebung</option>
-			<option value="Geist">Geist</option>
-			<option value="Körper">Körper</option>
-		</select>
-		<select name="attr_Art2" class="art">
-			<option value="Art" selected="selected">Art</option>
-			<option value="Gedanke">Gedanke</option>
-			<option value="Geste">Geste</option>
-			<option value="Wort">Wort</option>
-		</select>
-		<select name="attr_Prozess2" class="prozess">
-			<option value="Prozess" selected="selected">Prozess</option>
-			<option value="Ohne">Ohne</option>
-			<option value="Beherrschen">Beherrschen</option>
-			<option value="Bewegen">Bewegen</option>
-			<option value="Erkennen">Erkennen</option>
-			<option value="Erschaffen">Erschaffen</option>
-			<option value="Formen">Formen</option>
-			<option value="Verändern">Verändern</option>
-			<option value="Zerstören">Zerstören</option>
-			<option value="Wundertat">Wundertat</option>
-			<option value="Dweomer">Dweomer</option>
-			<option value="Zauberlied">Zauberlied</option>
-			<option value="Salz">Salz</option>
-			<option value="Thaumagraphie">Thaumagraphie</option>
-			<option value="Beschwören">Beschwören</option>
-			<option value="Nekromantie">Nekromantie</option>
-			<option value="Thaumatherapie">Thaumatherapie</option>
-			<option value="Zaubermittel">Zaubermittel</option>
-			<option value="Zauberschutz">Zauberschutz</option>
-		</select>
-		<input type="number" name="attr_ZauPP2" value="0" />
-		<div class="sheet-section-hide">
-			<textarea name="attr_ZauWirkung2"></textarea>
+	<span class="span-header center" style="margin-left: 25px"><b>KBlatt</b></span>
+	<fieldset class="repeating_zauber">
+		<input type="hidden" class="repeating-show" name="attr_repeating_show" value="1">
+		<div class="repeating-display">
+			<button type='roll'
+				value='&{template:default} {{name=@{character_name} zaubert @{Zauber}}} {{EW:Zaubern=[[1D20 + @{Zaubern} + @{ZauSpezBonus} + @{BonusZauber} + @{itemBZaubern} + @{modZaubern} + ?{Bonus|0} ]]}} {{AP=@{AP}}} {{Zauberdauer=@{Zd}}} {{Wirkungsbereich=@{Wb}}} {{Reichweite=@{Rw}}} {{Wirkungsdauer=@{Wd}}} {{Ziel=@{ziel}}} {{Art=@{art}}}'
+				name="roll_EW_Zaubern"></button>
+			<input type='checkbox' class="checkbox" name='attr_toggle-section' value="1">
+			<!-- it doesnt need to be a checkbox -->
+			<input class='sheet-section-toggle' type='hidden' name='attr_toggle-section'>
+			<input type="text" name="attr_Zauber" value="Name" />
+			<input type="number" name="attr_ZauSpezBonus" value="0" />
+			<input type="text" name="attr_AP" style="width:100px" value="AP" />
+			<input type="text" name="attr_ZD" style="width:100px" value="Zd" />
+			<input type="text" name="attr_WB" style="width:100px" value="Wb" />
+			<input type="text" name="attr_RW" style="width:100px" value="Rw" />
+			<input type="text" name="attr_WD" style="width:100px" value="Wd" />
+			<select name="attr_Ziel" class="ziel">
+				<option value="Ziel" selected="selected">Ziel</option>
+				<option value="Umgebung">Umgebung</option>
+				<option value="Geist">Geist</option>
+				<option value="Körper">Körper</option>
+			</select>
+			<select name="attr_Art" class="art">
+				<option value="Art" selected="selected">Art</option>
+				<option value="Gedanke">Gedanke</option>
+				<option value="Geste">Geste</option>
+				<option value="Wort">Wort</option>
+			</select>
+			<select name="attr_Prozess" class="prozess">
+				<option value="Prozess" selected="selected">Prozess</option>
+				<option value="Ohne">Ohne</option>
+				<option value="Beherrschen">Beherrschen</option>
+				<option value="Bewegen">Bewegen</option>
+				<option value="Erkennen">Erkennen</option>
+				<option value="Erschaffen">Erschaffen</option>
+				<option value="Formen">Formen</option>
+				<option value="Verändern">Verändern</option>
+				<option value="Zerstören">Zerstören</option>
+				<option value="Wundertat">Wundertat</option>
+				<option value="Dweomer">Dweomer</option>
+				<option value="Zauberlied">Zauberlied</option>
+				<option value="Salz">Salz</option>
+				<option value="Thaumagraphie">Thaumagraphie</option>
+				<option value="Beschwören">Beschwören</option>
+				<option value="Nekromantie">Nekromantie</option>
+				<option value="Thaumatherapie">Thaumatherapie</option>
+				<option value="Zaubermittel">Zaubermittel</option>
+				<option value="Zauberschutz">Zauberschutz</option>
+			</select>
+			<input type="number" name="attr_ZauPP" value="0" />
+			<input type="checkbox" class="checkbox" value="1" name="attr_ZauKB" style="margin-left: 10px" />
+			<div class="sheet-section-hide">
+				<textarea name="attr_ZauWirkung"></textarea>
+			</div>
 		</div>
 	</fieldset>
 
@@ -797,31 +823,42 @@
 			<br />
 			<h3>Fertigkeiten</h3> <br />
 
-			<span class="span-header center" style="margin-left: 35px"><b>Fertigkeit</b></span>
+			<span class="span-header center" style="margin-left: 35px"><b>R</b></span>
+			<span class="span-header center" style="margin-left: 5px"><b>Fertigkeit</b></span>
 			<span class="span-header center" style="margin-left: 105px"><b>FW</b></span>
 			<span class="span-header center" style="margin-left: 90px"><b>Bonus</b></span>
 			<span class="span-header center" style="margin-left: 5px"><b>PP</b></span>
+			<span class="span-header center" style="margin-left: 27px"><b>KBlatt</b></span>
 
-			<fieldset class="repeating_fertigkeiten3">
-				<button type='roll'
-					value='&{template:default} {{name=@{character_name} würfelt auf @{Fertigkeit3}}} {{EW:@{Fertigkeit3}=[[1d20cs16cs17cs18cs19cs20cf1cf16cf17cf18cf19 + @{FW3} + @{leitE3} + @{Fertigkeitsbonus3} + ?{Bonus|0}]]}}'
-					name="roll_EW_Fertigkeit"></button>
-				<input type="text" name="attr_Fertigkeit3" value="Name" readonly />
-				<input type="number" name="attr_FW3" value="1" />
-				<select name="attr_LeitE3" class="dtype" readonly>
-					<option value="0" selected="selected">-</option>
-					<option value="@{LeitSt}">St</option>
-					<option value="@{LeitGs}">Gs</option>
-					<option value="@{LeitGw}">Gw</option>
-					<option value="@{LeitKo}">Ko</option>
-					<option value="@{LeitIn}">In</option>
-					<option value="@{LeitZt}">Zt</option>
-					<option value="@{LeitAu}">Au</option>
-					<option value="@{LeitpA}">pA</option>
-					<option value="@{LeitWk}">Wk</option>
-				</select>
-				<input type="number" name="attr_Fertigkeitsbonus3" value="0" readonly />
-				<input type="number" name="attr_FertPP3" value="0" />
+			<fieldset class="repeating_fertigkeiten">
+				<input type="hidden" class="repeating-show" name="attr_repeating_show" value="1">
+				<div class="repeating-display">
+					<button type='roll' name="roll_ew_fertigkeit"
+						value='&{template:default} {{name=@{character_name} würfelt auf @{Fertigkeit}}} {{EW:@{Fertigkeit}=[[1d20cs16cs17cs18cs19cs20cf1cf16cf17cf18cf19 + @{FW} + @{leitE} + @{Fertigkeitsbonus} + ?{Bonus|0}]]}}'></button>
+					<input type='checkbox' class="checkbox" name='attr_toggle-section' value="1">
+					<!-- it doesnt need to be a checkbox -->
+					<input class='sheet-section-toggle' type='hidden' name='attr_toggle-section'>
+					<input type="text" name="attr_Fertigkeit" value="Name" />
+					<input type="number" name="attr_FW" value="1" />
+					<select name="attr_LeitE" class="dtype">
+						<option value="0" selected="selected">-</option>
+						<option value="@{LeitSt}">St</option>
+						<option value="@{LeitGs}">Gs</option>
+						<option value="@{LeitGw}">Gw</option>
+						<option value="@{LeitKo}">Ko</option>
+						<option value="@{LeitIn}">In</option>
+						<option value="@{LeitZt}">Zt</option>
+						<option value="@{LeitAu}">Au</option>
+						<option value="@{LeitpA}">pA</option>
+						<option value="@{LeitWk}">Wk</option>
+					</select>
+					<input type="number" name="attr_Fertigkeitsbonus" value="0" />
+					<input type="number" name="attr_FertPP" value="0" />
+					<input type="checkbox" class="checkbox" style="margin-left: 12px" value="1" name="attr_FertKB" />
+					<div class="sheet-section-hide">
+						<textarea name="attr_FertBeschreibung"></textarea>
+					</div>
+				</div>
 			</fieldset>
 		</div>
 
@@ -1128,31 +1165,42 @@
 			<br />
 			<h3>Fertigkeiten</h3> <br />
 
-			<span class="span-header center" style="margin-left: 35px"><b>Fertigkeit</b></span>
+			<span class="span-header center" style="margin-left: 35px"><b>R</b></span>
+			<span class="span-header center" style="margin-left: 5px"><b>Fertigkeit</b></span>
 			<span class="span-header center" style="margin-left: 105px"><b>FW</b></span>
 			<span class="span-header center" style="margin-left: 90px"><b>Bonus</b></span>
 			<span class="span-header center" style="margin-left: 5px"><b>PP</b></span>
+			<span class="span-header center" style="margin-left: 27px"><b>KBlatt</b></span>
 
-			<fieldset class="repeating_fertigkeiten3">
-				<button type='roll'
-					value='&{template:default} {{name=@{character_name} würfelt auf @{Fertigkeit3}}} {{EW:@{Fertigkeit3}=[[1d20cs16cs17cs18cs19cs20cf1cf16cf17cf18cf19 + @{FW3} + @{leitE3} + @{Fertigkeitsbonus3} + ?{Bonus|0}]]}}'
-					name="roll_EW_Fertigkeit"></button>
-				<input type="text" name="attr_Fertigkeit3" value="Name" />
-				<input type="number" name="attr_FW3" value="1" />
-				<select name="attr_LeitE3" class="dtype">
-					<option value="0" selected="selected">-</option>
-					<option value="@{LeitSt}">St</option>
-					<option value="@{LeitGs}">Gs</option>
-					<option value="@{LeitGw}">Gw</option>
-					<option value="@{LeitKo}">Ko</option>
-					<option value="@{LeitIn}">In</option>
-					<option value="@{LeitZt}">Zt</option>
-					<option value="@{LeitAu}">Au</option>
-					<option value="@{LeitpA}">pA</option>
-					<option value="@{LeitWk}">Wk</option>
-				</select>
-				<input type="number" name="attr_Fertigkeitsbonus3" value="0" />
-				<input type="number" name="attr_FertPP3" value="0" />
+			<fieldset class="repeating_fertigkeiten">
+				<input type="hidden" class="repeating-show" name="attr_repeating_show" value="1">
+				<div class="repeating-display">
+					<button type='roll' name="roll_ew_fertigkeit"
+						value='&{template:default} {{name=@{character_name} würfelt auf @{Fertigkeit}}} {{EW:@{Fertigkeit}=[[1d20cs16cs17cs18cs19cs20cf1cf16cf17cf18cf19 + @{FW} + @{leitE} + @{Fertigkeitsbonus} + ?{Bonus|0}]]}}'></button>
+					<input type='checkbox' class="checkbox" name='attr_toggle-section' value="1">
+					<!-- it doesnt need to be a checkbox -->
+					<input class='sheet-section-toggle' type='hidden' name='attr_toggle-section'>
+					<input type="text" name="attr_Fertigkeit" value="Name" />
+					<input type="number" name="attr_FW" value="1" />
+					<select name="attr_LeitE" class="dtype">
+						<option value="0" selected="selected">-</option>
+						<option value="@{LeitSt}">St</option>
+						<option value="@{LeitGs}">Gs</option>
+						<option value="@{LeitGw}">Gw</option>
+						<option value="@{LeitKo}">Ko</option>
+						<option value="@{LeitIn}">In</option>
+						<option value="@{LeitZt}">Zt</option>
+						<option value="@{LeitAu}">Au</option>
+						<option value="@{LeitpA}">pA</option>
+						<option value="@{LeitWk}">Wk</option>
+					</select>
+					<input type="number" name="attr_Fertigkeitsbonus" value="0" />
+					<input type="number" name="attr_FertPP" value="0" />
+					<input type="checkbox" class="checkbox" style="margin-left: 12px" value="1" name="attr_FertKB" />
+					<div class="sheet-section-hide">
+						<textarea name="attr_FertBeschreibung"></textarea>
+					</div>
+				</div>
 			</fieldset>
 		</div>
 
@@ -1173,63 +1221,68 @@
 	<span class="span-header center" style="margin-left: 75px"><b>Art</b></span>
 	<span class="span-header center" style="margin-left: 80px"><b>Prozess</b></span>
 	<span class="span-header center" style="margin-left: 80px"><b>PP</b></span>
-	<fieldset class="repeating_zauber2">
-		<button type='roll'
-			value='&{template:default} {{name=@{character_name} zaubert @{Zauber2}}} {{EW:Zaubern=[[1D20 + @{Zaubern} + @{ZauSpezBonus2} + @{BonusZauber} + @{itemBZaubern} + @{modZaubern} + ?{Bonus|0} ]]}} {{AP=@{AP2}}} {{Zauberdauer=@{Zd2}}} {{Wirkungsbereich=@{Wb2}}} {{Reichweite=@{Rw2}}} {{Wirkungsdauer=@{Wd2}}} {{Ziel=@{ziel2}}} {{Art=@{art2}}}'
-			name="roll_EW_Zaubern2"></button>
-		<input type='checkbox' class="checkbox" name='attr_toggle-section' value="1">
-		<!-- it doesnt need to be a checkbox -->
-		<input class='sheet-section-toggle' type='hidden' name='attr_toggle-section'>
-		<input type="text" name="attr_Zauber2" value="Name" />
-		<input type="number" name="attr_ZauSpezBonus2" value="0" />
-		<input type="text" name="attr_AP2" style="width:100px" value="AP" />
-		<input type="text" name="attr_ZD2" style="width:100px" value="Zd" />
-		<input type="text" name="attr_WB2" style="width:100px" value="Wb" />
-		<input type="text" name="attr_RW2" style="width:100px" value="Rw" />
-		<input type="text" name="attr_WD2" style="width:100px" value="Wd" />
-		<select name="attr_Ziel2" class="ziel">
-			<option value="Ziel" selected="selected">Ziel</option>
-			<option value="Umgebung">Umgebung</option>
-			<option value="Geist">Geist</option>
-			<option value="Körper">Körper</option>
-		</select>
-		<select name="attr_Art2" class="art">
-			<option value="Art" selected="selected">Art</option>
-			<option value="Gedanke">Gedanke</option>
-			<option value="Geste">Geste</option>
-			<option value="Wort">Wort</option>
-		</select>
-		<select name="attr_Prozess2" class="prozess">
-			<option value="Prozess" selected="selected">Prozess</option>
-			<option value="Ohne">Ohne</option>
-			<option value="Beherrschen">Beherrschen</option>
-			<option value="Bewegen">Bewegen</option>
-			<option value="Erkennen">Erkennen</option>
-			<option value="Erschaffen">Erschaffen</option>
-			<option value="Formen">Formen</option>
-			<option value="Verändern">Verändern</option>
-			<option value="Zerstören">Zerstören</option>
-			<option value="Wundertat">Wundertat</option>
-			<option value="Dweomer">Dweomer</option>
-			<option value="Zauberlied">Zauberlied</option>
-			<option value="Salz">Salz</option>
-			<option value="Thaumagraphie">Thaumagraphie</option>
-			<option value="Beschwören">Beschwören</option>
-			<option value="Nekromantie">Nekromantie</option>
-			<option value="Thaumatherapie">Thaumatherapie</option>
-			<option value="Zaubermittel">Zaubermittel</option>
-			<option value="Zauberschutz">Zauberschutz</option>
-		</select>
-		<input type="number" name="attr_ZauPP2" value="0" />
-		<div class="sheet-section-hide">
-			<textarea name="attr_ZauWirkung2"></textarea>
+	<span class="span-header center" style="margin-left: 25px"><b>KBlatt</b></span>
+	<fieldset class="repeating_zauber">
+		<input type="hidden" class="repeating-show" name="attr_repeating_show" value="1">
+		<div class="repeating-display">
+			<button type='roll'
+				value='&{template:default} {{name=@{character_name} zaubert @{Zauber}}} {{EW:Zaubern=[[1D20 + @{Zaubern} + @{ZauSpezBonus} + @{BonusZauber} + @{itemBZaubern} + @{modZaubern} + ?{Bonus|0} ]]}} {{AP=@{AP}}} {{Zauberdauer=@{Zd}}} {{Wirkungsbereich=@{Wb}}} {{Reichweite=@{Rw}}} {{Wirkungsdauer=@{Wd}}} {{Ziel=@{ziel}}} {{Art=@{art}}}'
+				name="roll_EW_Zaubern"></button>
+			<input type='checkbox' class="checkbox" name='attr_toggle-section' value="1">
+			<!-- it doesnt need to be a checkbox -->
+			<input class='sheet-section-toggle' type='hidden' name='attr_toggle-section'>
+			<input type="text" name="attr_Zauber" value="Name" />
+			<input type="number" name="attr_ZauSpezBonus" value="0" />
+			<input type="text" name="attr_AP" style="width:100px" value="AP" />
+			<input type="text" name="attr_ZD" style="width:100px" value="Zd" />
+			<input type="text" name="attr_WB" style="width:100px" value="Wb" />
+			<input type="text" name="attr_RW" style="width:100px" value="Rw" />
+			<input type="text" name="attr_WD" style="width:100px" value="Wd" />
+			<select name="attr_Ziel" class="ziel">
+				<option value="Ziel" selected="selected">Ziel</option>
+				<option value="Umgebung">Umgebung</option>
+				<option value="Geist">Geist</option>
+				<option value="Körper">Körper</option>
+			</select>
+			<select name="attr_Art" class="art">
+				<option value="Art" selected="selected">Art</option>
+				<option value="Gedanke">Gedanke</option>
+				<option value="Geste">Geste</option>
+				<option value="Wort">Wort</option>
+			</select>
+			<select name="attr_Prozess" class="prozess">
+				<option value="Prozess" selected="selected">Prozess</option>
+				<option value="Ohne">Ohne</option>
+				<option value="Beherrschen">Beherrschen</option>
+				<option value="Bewegen">Bewegen</option>
+				<option value="Erkennen">Erkennen</option>
+				<option value="Erschaffen">Erschaffen</option>
+				<option value="Formen">Formen</option>
+				<option value="Verändern">Verändern</option>
+				<option value="Zerstören">Zerstören</option>
+				<option value="Wundertat">Wundertat</option>
+				<option value="Dweomer">Dweomer</option>
+				<option value="Zauberlied">Zauberlied</option>
+				<option value="Salz">Salz</option>
+				<option value="Thaumagraphie">Thaumagraphie</option>
+				<option value="Beschwören">Beschwören</option>
+				<option value="Nekromantie">Nekromantie</option>
+				<option value="Thaumatherapie">Thaumatherapie</option>
+				<option value="Zaubermittel">Zaubermittel</option>
+				<option value="Zauberschutz">Zauberschutz</option>
+			</select>
+			<input type="number" name="attr_ZauPP" value="0" />
+			<input type="checkbox" class="checkbox" value="1" name="attr_ZauKB" style="margin-left: 10px" />
+			<div class="sheet-section-hide">
+				<textarea name="attr_ZauWirkung"></textarea>
+			</div>
 		</div>
 	</fieldset>
 
 </div>
 
 <script type="text/worker">
-	const SheetVersion = "1.0.1";
+	const SheetVersion = "2";
 	const buttonlist = ["Datenblatt", "Fertigkeiten", "Sprachen", "Zauber", "KampfK", "KampfZ", "Ausrustung", "Notizen", "NSC"];
 	buttonlist.forEach(button => {
 		on(`clicked:${button}`, function () {
@@ -1431,30 +1484,10 @@
 		});
 	});
 
-
-	// Übertragung der Fertigkeiten auf das Kampfblatt
-
-
-	on("clicked:fertkb", function () {
-		console.log("Fertigkeiten ins Kampfblatt übertragen");
-
-		CopyFerttoKampfblatt();
-
-	});
-
 	on("clicked:addsinnung", function () {
 		console.log("Ungelernte Fertigkeiten und Sinne hinzufügen");
 
 		AddSinneUngelernt();
-	});
-
-	// Übertragung Zauber auf das Kampfblatt
-
-	on("clicked:zaukb", function () {
-		console.log("Zauber ins Kampfblatt übertragen");
-
-		CopyZaubertoKampfblatt();
-
 	});
 
 	// Neuberechnung der Abwehr Zaubern und Resis bei Änderung des Grades
@@ -1826,10 +1859,20 @@
 		});
 	});
 
-	// Versionsnummer setzen	
+	// Versionsnummer setzen und prüfeb ob konvertiert werden muss	
 	on('sheet:opened', function () {
 		getAttrs(["SheetVersion"], function (values) {
 			console.log("Sheet Version alt: " + values.SheetVersion + " Sheet Version neu: " + SheetVersion);
+
+// Die allererste Version war 1.0. Deshalb diese explizit abfragen. Alle anderen Versionen werden fortlaufend nummeriert.
+
+			if (values.SheetVersion == "1.0") {
+				console.log("Upgrade von Version 1.0");
+				RecalcKampfblattZauber();	
+				RecalcKampfblattFertigkeiten();
+				ClearFertigkeitKampfblattAlt();
+				ClearZauberKampfblattAlt();
+			};
 
 			setAttrs({
 				SheetVersion: SheetVersion
@@ -1994,51 +2037,6 @@
 
 	};
 
-	function CopyFerttoKampfblatt() {
-		getSectionIDsOrdered("repeating_fertigkeiten", function (idarray) {
-			var setFert = {}; // Fertigkeitenliste auf Kampfblatt
-
-			// Alte Werte erstmals löschen
-
-			getSectionIDs("repeating_fertigkeiten3", function (idarray) {
-				for (var i = 0; i < idarray.length; i++) {
-					removeRepeatingRow("repeating_fertigkeiten3_" + idarray[i]);
-				};
-			});
-
-			_.each(idarray, function (currentID, i) {
-				getAttrs(['repeating_fertigkeiten_' + currentID + '_Fertigkeit',
-					'repeating_fertigkeiten_' + currentID + '_FW',
-					'repeating_fertigkeiten_' + currentID + '_LeitE',
-					'repeating_fertigkeiten_' + currentID + '_Fertigkeitsbonus',
-					'repeating_fertigkeiten_' + currentID + '_FertPP',
-					'repeating_fertigkeiten_' + currentID + '_FertKB',
-					'repeating_fertigkeiten_' + currentID + '_FertBesch'
-				], function (value) { //Get oldAttribute from FieldID
-
-
-					if (value['repeating_fertigkeiten_' + currentID + '_FertKB'] == true) {
-
-						// Werte auf Kampfblattliste übertragen				
-
-						console.log("Fertigkeit: " + currentID);
-
-						var newrowid = generateRowID(); //Create object for newFieldID
-
-						setFert['repeating_fertigkeiten3_' + newrowid + '_Fertigkeit3'] = value['repeating_fertigkeiten_' + currentID + '_Fertigkeit'];
-						setFert['repeating_fertigkeiten3_' + newrowid + '_FW3'] = value['repeating_fertigkeiten_' + currentID + '_FW'];
-						setFert['repeating_fertigkeiten3_' + newrowid + '_LeitE3'] = value['repeating_fertigkeiten_' + currentID + '_LeitE'];
-						setFert['repeating_fertigkeiten3_' + newrowid + '_Fertigkeitsbonus3'] = value['repeating_fertigkeiten_' + currentID + '_Fertigkeitsbonus'];
-						setFert['repeating_fertigkeiten3_' + newrowid + '_FertPP3'] = value['repeating_fertigkeiten_' + currentID + '_FertPP'];
-						setFert['repeating_fertigkeiten3_' + newrowid + '_FertBesch3'] = value['repeating_fertigkeiten_' + currentID + '_FertBesch'];
-						setFert['repeating_fertigkeiten3_' + newrowid + '_RowIDFertigkeit3'] = currentID; // Um auf Änderungen reagieren zu können.
-						setAttrs(setFert); //Update
-					};
-				});
-			});
-		});
-	};
-
 // Sinne und ungelernte Fertigkeiten hinzufügen
 
 function AddSinneUngelernt() {
@@ -2109,105 +2107,29 @@ function AddSinneUngelernt() {
 		return setFert;
 	};
 
-	// Änderungen von Kampfblatt auf Fertigkeitenliste schreiben
 
-	function ChangeFertigkeitKampfblatt() {
-		getSectionIDsOrdered("repeating_fertigkeiten3", function (idarray) {
-			var setFert = {}; // Fertigkeitenliste auf Kampfblatt
+// Alte Repeating section auf Kampfblatt löschen. Wird ab V2 nicht mehr gebraucht		
 
-			_.each(idarray, function (currentID, i) {
-				getAttrs(['repeating_fertigkeiten3_' + currentID + '_Fertigkeit3',
-					'repeating_fertigkeiten3_' + currentID + '_FW3',
-					'repeating_fertigkeiten3_' + currentID + '_LeitE3',
-					'repeating_fertigkeiten3_' + currentID + '_Fertigkeitsbonus3',
-					'repeating_fertigkeiten3_' + currentID + '_FertPP3',
-					'repeating_fertigkeiten3_' + currentID + '_FertKB3',
-					'repeating_fertigkeiten3_' + currentID + '_RowIDFertigkeit3'
-				], function (value) { //Get oldAttribute from FieldID
+function ClearFertigkeitKampfblattAlt() {
 
-					// Werte auf Fertigkeitenliste		
+	// Alte Werte löschen
 
-					var newrowid = value['repeating_fertigkeiten3_' + currentID + '_RowIDFertigkeit3'];
-
-					console.log("Fertigkeit: " + value['repeating_fertigkeiten3_' + currentID + '_Fertigkeit3'] + " " +
-						value['repeating_fertigkeiten3_' + currentID + '_FW3'] + " " +
-						value['repeating_fertigkeiten3_' + currentID + '_LeitE3'] + " " +
-						value['repeating_fertigkeiten3_' + currentID + '_Fertigkeitsbonus3'] + " " +
-						value['repeating_fertigkeiten3_' + currentID + '_FertPP3'] + " " +
-						value['repeating_fertigkeiten3_' + currentID + '_FertKB3'] + " " +
-						value['repeating_fertigkeiten3_' + currentID + '_RowIDFertigkeit3'] + " " +
-						newrowid);
-
-					var newrowid = value['repeating_fertigkeiten3_' + currentID + '_RowIDFertigkeit3'];
-
-					setFert['repeating_fertigkeiten_' + newrowid + '_Fertigkeit'] = value['repeating_fertigkeiten_' + currentID + '_Fertigkeit3'];
-					setFert['repeating_fertigkeiten_' + newrowid + '_FW'] = value['repeating_fertigkeiten_' + currentID + '_FW3'];
-					setFert['repeating_fertigkeiten_' + newrowid + '_LeitE'] = value['repeating_fertigkeiten_' + currentID + '_LeitE3'];
-					setFert['repeating_fertigkeiten_' + newrowid + '_Fertigkeitsbonus'] = value['repeating_fertigkeiten_' + currentID + '_Fertigkeitsbonus3'];
-					setFert['repeating_fertigkeiten_' + newrowid + '_FertPP'] = value['repeating_fertigkeiten_' + currentID + '_FertPP3'];
-					setFert['repeating_fertigkeiten_' + newrowid + '_FertKB3'] = 1;
-					//				setFert['repeating_fertigkeiten_' + newrowid + '_RowIDFertigkeit'] = currentID; // Um auf Änderungen reagieren zu können.
-
-					//				setAttrs(setFert); //Update
-
-				});
-			});
-		});
+	getSectionIDs("repeating_fertigkeiten3", function (idarray) {
+		for (var i = 0; i < idarray.length; i++) {
+			removeRepeatingRow("repeating_fertigkeiten3_" + idarray[i]);
+		};
+	});
 	};
 
-	function CopyZaubertoKampfblatt() {
-		getSectionIDsOrdered("repeating_zauber", function (idarray) {
-			var setZaub = {}; // Zauberliste auf Kampfblatt
+// Alte Repeating section auf Kampfblatt löschen. Wird ab V2 nicht mehr gebraucht	
+	function ClearZauberKampfblattAlt() {
 
-			// Alte Werte erstmals löschen
+		// Alte Werte löschen
 
-			getSectionIDs("repeating_zauber2", function (idarray) {
-				for (var i = 0; i < idarray.length; i++) {
-					removeRepeatingRow("repeating_zauber2_" + idarray[i]);
-				};
-			});
-
-			_.each(idarray, function (currentID, i) {
-				getAttrs(['repeating_zauber_' + currentID + '_Zauber',
-					'repeating_zauber_' + currentID + '_ZauSpezBonus',
-					'repeating_zauber_' + currentID + '_AP',
-					'repeating_zauber_' + currentID + '_ZD',
-					'repeating_zauber_' + currentID + '_WB',
-					'repeating_zauber_' + currentID + '_RW',
-					'repeating_zauber_' + currentID + '_WD',
-					'repeating_zauber_' + currentID + '_Ziel',
-					'repeating_zauber_' + currentID + '_Art',
-					'repeating_zauber_' + currentID + '_Prozess',
-					'repeating_zauber_' + currentID + '_ZauPP',
-					'repeating_zauber_' + currentID + '_ZauKB',
-					'repeating_zauber_' + currentID + '_ZauWirkung'
-				], function (value) { //Get oldAttribute from FieldID				  
-
-					if (value['repeating_zauber_' + currentID + '_ZauKB'] == true) {
-
-						// Werte auf Kampfblattliste übertragen				
-
-						var newrowid = generateRowID(); //Create object for newFieldID
-
-						console.log("Zauber: " + currentID);
-
-						setZaub['repeating_zauber2_' + newrowid + '_Zauber2'] = value['repeating_zauber_' + currentID + '_Zauber'];
-						setZaub['repeating_zauber2_' + newrowid + '_ZauSpezBonus2'] = value['repeating_zauber_' + currentID + '_ZauSpezBonus'];
-						setZaub['repeating_zauber2_' + newrowid + '_AP2'] = value['repeating_zauber_' + currentID + '_AP'];
-						setZaub['repeating_zauber2_' + newrowid + '_ZD2'] = value['repeating_zauber_' + currentID + '_ZD'];
-						setZaub['repeating_zauber2_' + newrowid + '_WB2'] = value['repeating_zauber_' + currentID + '_WB'];
-						setZaub['repeating_zauber2_' + newrowid + '_RW2'] = value['repeating_zauber_' + currentID + '_RW'];
-						setZaub['repeating_zauber2_' + newrowid + '_WD2'] = value['repeating_zauber_' + currentID + '_WD'];
-						setZaub['repeating_zauber2_' + newrowid + '_Ziel2'] = value['repeating_zauber_' + currentID + '_Ziel'];
-						setZaub['repeating_zauber2_' + newrowid + '_Art2'] = value['repeating_zauber_' + currentID + '_Art'];
-						setZaub['repeating_zauber2_' + newrowid + '_Prozess2'] = value['repeating_zauber_' + currentID + '_Prozess'];
-						setZaub['repeating_zauber2_' + newrowid + '_ZauPP2'] = value['repeating_zauber_' + currentID + '_ZauPP'];
-						setZaub['repeating_zauber2_' + newrowid + '_ZauWirkung2'] = value['repeating_zauber_' + currentID + '_ZauWirkung'];
-						setZaub['repeating_zauber2_' + newrowid + '_RowIDZauber2'] = currentID; // Um auf Änderungen reagieren zu können.
-						setAttrs(setZaub); //Update
-					};
-				});
-			});
+		getSectionIDs("repeating_zauber2", function (idarray) {
+			for (var i = 0; i < idarray.length; i++) {
+				removeRepeatingRow("repeating_zauber2_" + idarray[i]);
+			};
 		});
 	};
 
@@ -2248,5 +2170,80 @@ function AddSinneUngelernt() {
 			});
 		});
 	});
-		
+
+// Bei Änderung der Checkbox "Zauber auf Kampfblatt" den unsichtbaren Toggle für das hidden Feld setzen oder löschen
+
+	on("change:repeating_zauber:ZauKB", function () {
+
+		RecalcKampfblattZauber();
+	
+	});	
+
+// Bei Änderung der Checkbox "Fertigkeit auf Kampfblatt" den unsichtbaren Toggle für das hidden Feld setzen oder löschen
+
+	on("change:repeating_fertigkeiten:FertKB", function () {
+
+		RecalcKampfblattFertigkeiten();
+	
+	});		
+
+// Zauber auf Kampfblätter neu berechnen	
+	function RecalcKampfblattFertigkeiten() {
+
+		getSectionIDsOrdered("repeating_fertigkeiten", function (idarray) {
+			var setFert = {}; // Fertigkeitenliste auf Kampfblatt
+
+			_.each(idarray, function (currentID, i) {
+				getAttrs(['repeating_fertigkeiten_' + currentID + '_FertKB',
+						  'repeating_fertigkeiten_' + currentID + '_repeating_show'
+				], function (value) { 				  
+
+					if (value['repeating_fertigkeiten_' + currentID + '_FertKB'] == true) {
+
+						// Sichtbar auf Kampfblatt
+
+						setFert['repeating_fertigkeiten_' + currentID + '_repeating_show'] = "1";
+					} else {
+
+						// Nict sichtbar auf Kampfblatt
+
+						setFert['repeating_fertigkeiten_' + currentID + '_repeating_show'] = "0";
+						
+					};
+					setAttrs(setFert); //Update
+				});
+			});
+		});	
+
+	};	
+
+// Zauber auf Kampfblätter neu berechnen	
+	function RecalcKampfblattZauber() {
+
+		getSectionIDsOrdered("repeating_zauber", function (idarray) {
+			var setZaub = {}; // Zauberliste auf Kampfblatt
+
+			_.each(idarray, function (currentID, i) {
+				getAttrs(['repeating_zauber_' + currentID + '_ZauKB',
+						  'repeating_zauber_' + currentID + '_repeating_show'
+				], function (value) { //Get oldAttribute from FieldID				  
+
+					if (value['repeating_zauber_' + currentID + '_ZauKB'] == true) {
+
+						// Sichtbar auf Kampfblatt
+
+						setZaub['repeating_zauber_' + currentID + '_repeating_show'] = "1";
+					} else {
+
+						// Nict sichtbar auf Kampfblatt
+
+						setZaub['repeating_zauber_' + currentID + '_repeating_show'] = "0";
+						
+					};
+					setAttrs(setZaub); //Update
+				});
+			});
+		});	
+
+	};		
 </script>
