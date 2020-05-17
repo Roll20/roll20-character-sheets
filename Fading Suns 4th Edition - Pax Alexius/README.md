@@ -23,15 +23,9 @@
 
 ## Potential improvements
 
-- Auto-computed
-    - Vitality Rating
-    - Revivals Rating
-    - Surge Rating
-    - Bank Capacity
-    - Surge Number
-    - Revivals Number
-
 - Blessing/Curse: add more space for their descriptions
+
+- make Class and Callings lists into a repeating section
 
 - Characteristics
     - [ TBC ] Box next to them to log a temporary bonus/malus?
@@ -47,8 +41,6 @@
 # Nice-to-have
 
 - Add description of each state
-
-- replace unstylable characteristic/skill selects with custom-made absolute-positioned list of action buttons?
 
 - for Roll20 pro users, API for:
     - troupe coffer management
