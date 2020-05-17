@@ -1,6 +1,6 @@
 # Release notes
 
-## 1.1.0
+## 1.2.0
 - Now differentiating current + max values for Revivals Number and Surge Number
 - Now auto-computing Vitality Rating, Revivals Rating, Revivals Number (max), VP Bank capacity, Surge Rating, Surge Number (max)
 
