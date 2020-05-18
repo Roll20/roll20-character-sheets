@@ -511,6 +511,20 @@ script(type='text/worker')
         { "section": "actions", "prefix": "action" }
     ];
 
+    const repeating_sections = repeating_rolls.concat([
+        { "section": "states", "prefix": "state" },
+        { "section": "perks", "prefix": "perk" },
+        { "section": "capabilities", "prefix": "capability" },
+        { "section": "birthrights", "prefix": "birthright" },
+        { "section": "carriedequipment1", "prefix": "carriedequipment1" },
+        { "section": "carriedequipment2", "prefix": "carriedequipment2" },
+        { "section": "weapons", "prefix": "weapon" },
+        { "section": "owned1", "prefix": "owned1" },
+        { "section": "owned2", "prefix": "owned2" },
+        { "section": "assets1", "prefix": "asset1" },
+        { "section": "assets2", "prefix": "asset2" },
+    ]);
+
     const updateGoalNumber = (section, prefix) => {
         getSectionIDs(`repeating_${section}`, idArray => {
             const characteristicArray = idArray.map(id => `repeating_${section}_${id}_${prefix}_characteristic`);
@@ -542,7 +556,9 @@ script(type='text/worker')
         on(`change:repeating_${repeating.section}`, eventInfo => {
             updateGoalNumber(repeating.section, repeating.prefix);
         });
+    });
 
+    repeating_sections.forEach( repeating => {
         on(`remove:repeating_${repeating.section}`, eventInfo => {
             const timestamp = Number(new Date())
             setAttrs({ repeat_delete: timestamp });

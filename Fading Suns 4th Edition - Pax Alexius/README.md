@@ -3,6 +3,7 @@
 ## 1.2.0
 - Now differentiating current + max values for Revivals Number and Surge Number
 - Now auto-computing Vitality Rating, Revivals Rating, Revivals Number (max), VP Bank capacity, Surge Rating, Surge Number (max)
+- Improved repeating sections editing behaviour
 
 ## 1.1.0
 - Species size box converted to numeric input from text input
@@ -25,18 +26,23 @@
 
 - Blessing/Curse: add more space for their descriptions
 
-- make Class and Callings lists into a repeating section
+- modifiers to affect auto-computed Vitality Rating, Revivals Rating, Revivals Number (max), VP Bank capacity, Surge Rating, Surge Number (max)
+
+- make Class and Callings lists into repeating sections
 
 - Characteristics
-    - [ TBC ] Box next to them to log a temporary bonus/malus?
-    - check if Occult characteristics can be used as part of a roll, if yes add as an option to skills characteristic choice and action characteristic selection
+    - [ TBC ] Box next to them to log a temporary buff/debuff?
 
 - Skills
-    - [ TBC ] Box next to them to log a temporary bonus/malus?
+    - [ TBC ] Box next to them to log a temporary buff/debuff?
     - auto-fail or add warning when rolling a |R|equired skill (Alchemy, Interface, Pilot) which has a score of 0
 
 - E-Shield
-    - add "Burn-Out", "Distorsion", "Features"?
+    - add "Burn-Out", "Distorsion", "Features"
+
+- States
+    - implement "shake it off" rolls
+    - add their descriptions
 
 # Nice-to-have
 
