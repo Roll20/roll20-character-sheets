@@ -25,3 +25,25 @@ on('change:repeating_bonds:links_button', function(eventinfo) {
     });
   }
 });
+
+on('change:repeating_bonds:flip_button_0', function(eventinfo) {
+  console.log(`0 ${eventinfo.newValue}`)
+  setAttrs({
+    repeating_bonds_flip_0: eventinfo.newValue,
+    repeating_bonds_test_var: eventinfo.newValue
+  });
+});
+
+on('change:repeating_bonds:flip_button_1', function(eventinfo) {
+  console.log(`1 ${eventinfo.newValue}`)
+  setAttrs({
+    repeating_bonds_flip_1: eventinfo.newValue
+  });
+});
+
+on('change:repeating_bonds:flip_button_2', function(eventinfo) {
+  console.log(`2 ${eventinfo.newValue}`)
+  setAttrs({
+    repeating_bonds_flip_2: eventinfo.newValue
+  });
+});
