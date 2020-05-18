@@ -1,8 +1,8 @@
 # Release notes
 
 ## 1.2.0
-- Now differentiating current + max values for Revivals Number and Surge Number
-- Improved repeating sections editing behaviour
+- Now differentiating current + max values for Revivals Number, Surge Number, e-Shield charges
+- Improved behavior when editing repeating sections
 
 ## 1.1.0
 - Species size box converted to numeric input from text input
@@ -23,29 +23,33 @@
 
 ## Potential improvements
 
-- Character advancement
-  - auto-compute Vitality Rating, Revivals Rating, Revivals Number (max), VP Bank capacity, Surge Rating, Surge Number (max), so long as partial advancements are allowed
-  - show how many skill points and characteristics points have been spent
-
 - Blessing/Curse: add more space for their descriptions
 
-- modifiers to affect auto-computed Vitality Rating, Revivals Rating, Revivals Number (max), VP Bank capacity, Surge Rating, Surge Number (max)
+- Character advancement helpers
+  - Partial advancement checkboxes (as reminder + input if some derived stats become auto-computed)
+  - show how many skill points and characteristics points have been spent
 
-- make Class and Callings lists into repeating sections
+- Auto-compute Vitality Rating, Revivals Rating, Revivals Number (max), VP Bank capacity, Surge Rating, Surge Number (max)
+  - precondition: must support partial advancements
+  - support custom modifiers from perks, GM ruling, ..
+
+- Auto-compute Techgnosis level
+
+- Turn class and callings lists into repeating sections
 
 - Characteristics
-  - [ TBC ] Box next to them to log a temporary buff/debuff?
+  - [ TBC ] Box to log a modifier 
 
 - Skills
-  - [ TBC ] Box next to them to log a temporary buff/debuff?
+  - [ TBC ] Box to log a modifier
   - auto-fail or add warning when rolling a |R|equired skill (Alchemy, Interface, Pilot) which has a score of 0
 
 - E-Shield
   - add "Burn-Out", "Distorsion", "Features"
 
 - States
-  - implement "shake it off" rolls
-  - add their descriptions
+  - Implement "shake it off" rolls
+  - add state descriptions
 
 # Nice-to-have
 
