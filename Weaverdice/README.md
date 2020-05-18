@@ -15,18 +15,17 @@ Any improvements to the sheet are welcome.
 
 - create power-generation and luck tables so character creation can be made quicker in Roll20
 
-- make the layout more flexible to resizing, it's still quite crude atm
 
 ## WeaverDice Resources & Community Links
 Resources | Link
 ------ | ---------------
 **Rulebook:** | https://docs.google.com/document/d/1e-H--GkPrbJq4WRNYndBnjjLjE7-2kOZkjwltkP1Ong/
-**Online charsheet:** | https://docs.google.com/document/d/15peMSA3fdp9EK9urwvYps4Q0z06EQ6iJdVggD81a2bg/
+**Online charsheet:** | https://docs.google.com/document/d/1TBYprvESCqI7rt13h85FWsTobcoQ7AuMh1-L8T5fMq8/
 **Getting Started:** | https://docs.google.com/document/d/1Py-zQBE94hm8Iu0Oqoy_p_svALXYkKVpTiq-i7PwCwE/
 **Character Creation Guide** | https://docs.google.com/document/d/1Eo7AZpjm-mIQBVxXpjvxgNoHMpSBa9M0onzhYaX-HDU/
 
 Community | Link
 ------- | ---------------
-**IRC-channel** | https://kiwiirc.com/client/irc.parahumans.net/#weaverdice
+**Discord** | https://discord.gg/TYsRHpG
 **Worm Web serial:** | https://parahumans.wordpress.com/
 **Subreddit:** | https://www.reddit.com/r/Weaverdice/

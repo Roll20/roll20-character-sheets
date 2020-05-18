@@ -338,7 +338,7 @@ Can lift overhead (Strength + Nethits) x 5kg}}" />
                       <input type="number" name="attr_soak_total" value="@{armor_total}+@{bod_total}}+@{soak_bonus}" disabled="true">
                     </div>
                     <div class="defenselabel">
-                        <button type="roll" class="armorroll" name="roll_armorroll" title="Roll to Absorb Damage" value="@{gmroll}&{template:shadowrun}{{name=@{character_name}}}{{roll_name=to Absorb Damage}}{{val1=Body}}{{val1_num=[[@{bod_total}]]}}{{val2=Armor}}{{val2_num=[[@{armor_total}]]}}{{val3=Bonus}}{{val3_num=[[@{soak_bonus}]]}}{{val4=Armor Penetration}}{{val4_num=[[?{Armor Penetration|-0}]]}}{{edge=@{edgeroll}}}{{edge_num=[[@{edg_total}]]}}{{result=[[(@{bod_total}+@{armor_total}+?{Armor Penetration}+[[@{edgn}*@{edg_total}]])@{standardroll}@{edgeroll}]]}}" />
+                        <button type="roll" class="armorroll" name="roll_armorroll" title="Roll to Absorb Damage" value="@{gmroll}&{template:shadowrun}{{name=@{character_name}}}{{roll_name=to Absorb Damage}}{{val1=Body}}{{val1_num=[[@{bod_total}]]}}{{val2=Armor}}{{val2_num=[[@{armor_total}]]}}{{val3=Bonus}}{{val3_num=[[@{soak_bonus}]]}}{{val4=Armor Penetration}}{{val4_num=[[?{Armor Penetration|-0}]]}}{{edge=@{edgeroll}}}{{edge_num=[[@{edg_total}]]}}{{result=[[(@{bod_total}+@{soak_bonus}+[[{@{armor_total}+?{Armor Penetration},0}kh1]]+[[@{edgn}*@{edg_total}]])@{standardroll}@{edgeroll}]]}}" /> 
                     </div>
                 </div>
             </div>
@@ -9524,6 +9524,10 @@ Only takes the first match even if multiple identical entries are found.">
 
 
         <div class="hiddentextfield"><input type="text" name="attr_wound_total" value="{floor((@{stunwoundstaken}-@{woundadditive})/@{woundmultiplikative}),0}kh1+{floor((@{physicalwoundstaken}-@{woundadditive})/@{woundmultiplikative}),0}kh1"></div>
+        <div class="hiddentextfield"><input type="text" name="attr_stuntrack_max" value="(8+ceil((@{wil_total})/2))"></div>
+        <div class="hiddentextfield"><input type="text" name="attr_stuntrack" value="0"></div>
+        <div class="hiddentextfield"><input type="text" name="attr_physicaltrack_max" value="(8+ceil((@{bod_total})/2))"></div>
+        <div class="hiddentextfield"><input type="text" name="attr_physicaltrack" value="0"></div>
         <div class="hiddentextfield"><input type="text" name="attr_res_total" value="@{mag_base}+@{mag_aug}"></div>
         <div class="hiddentextfield"><input type="text" name="attr_bod_name" value="Body"></div>
         <div class="hiddentextfield"><input type="text" name="attr_str_name" value="Strength"></div>
@@ -9933,7 +9937,13 @@ on("change:chummercheckbox", function(){
                     if(chummerfile.characters.character.nuyen!=null)
                         attributes.nuyen_total=chummerfile.characters.character.nuyen;
                     if(chummerfile.characters.character.magician=="True"){
-                        attributes.drainattribute="@{"+chummerfile.characters.character.tradition.drainattributes.toLowerCase().substring(6)+"_total}";
+                        // HeroLab 'chummer' export uses drainattribute property and a list, this is a workaround for that
+                        try{
+                          attributes.drainattribute="@{"+chummerfile.characters.character.tradition.drainattributes.toLowerCase().substring(6)+"_total}";
+                        } catch(err)
+                        {
+                          attributes.drainattribute="@{"+chummerfile.characters.character.tradition.drainattribute.attr[1]+"_total}";
+                        }
                     }
                 }catch(err){
                     goodcode=false;
@@ -10666,6 +10676,51 @@ on("change:chummercheckbox", function(){
     });
 });
 
+on("change:wil_base change:wil_aug", function() {
+    getAttrs(["wil_base", "wil_aug"], function(value){
+        var wil = parseInt(value.wil_base) + parseInt(value.wil_aug);
+        var total = 8 + Math.ceil(wil / 2);
+        setAttrs({stuntrack_max: total,
+                  stunwoundstaken_max: total});
+     });
+});
+
+on("change:stuntrack change:stuntrack_max", function() {
+    getAttrs(["stuntrack", "stuntrack_max"], function(value){
+        var wounds = Math.max(value.stuntrack_max - value.stuntrack, 0);
+        setAttrs({stunwoundstaken: wounds}, {silent: true});
+    });
+});
+
+on("change:stunwoundstaken change:stuntrack_max", function() {
+    getAttrs(["stunwoundstaken", "stuntrack_max"], function(value){
+        var track = Math.min(value.stuntrack_max - value.stunwoundstaken, value.stuntrack_max);
+        setAttrs({stuntrack: track}, {silent: true});
+    });
+});
+
+on("change:bod_base change:bod_aug", function() {
+    getAttrs(["bod_base", "bod_aug"], function(value){
+        var bod = parseInt(value.bod_base) + parseInt(value.bod_aug);
+        var total = 8 + Math.ceil(bod / 2);
+        setAttrs({physicaltrack_max: total,
+                  physicalwoundstaken_max: total});
+     });
+});
+
+on("change:physicaltrack change:physicaltrack_max", function() {
+    getAttrs(["physicaltrack", "physicaltrack_max"], function(value){
+        var wounds = Math.max(value.physicaltrack_max - value.physicaltrack, 0);
+        setAttrs({physicalwoundstaken: wounds}, {silent: true});
+    });
+});
+
+on("change:physicalwoundstaken change:physicaltrack_max", function() {
+    getAttrs(["physicalwoundstaken", "physicaltrack_max"], function(value){
+        var track = Math.min(value.physicaltrack_max - value.physicalwoundstaken, value.physicaltrack_max);
+        setAttrs({physicaltrack: track}, {silent: true});
+    });
+});
 
 on("change:hotsim", function(){
     getAttrs(["matrixinitiativedice", "hotsim"],function(value){
@@ -12597,7 +12652,8 @@ on("change:repeating_knowledge:knowledgeattr", function() {
 <rolltemplate class="sheet-rolltemplate-shadowrun">
     <table>
         <tr>
-            <th><img src="https://4.bp.blogspot.com/-1jrWKeMyeO8/U_Rjfb5B0MI/AAAAAAAAByA/qgfLMIjJsSk/s1600/SR5%2BLogo%2BSigil.png">
+            <th>
+              <!--<img src="https://4.bp.blogspot.com/-1jrWKeMyeO8/U_Rjfb5B0MI/AAAAAAAAByA/qgfLMIjJsSk/s1600/SR5%2BLogo%2BSigil.png">-->
             {{#name}}{{name}} rolls{{#roll_name}} {{roll_name}}{{/roll_name}}{{/name}}</th>
         </tr>
         <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
@@ -12676,7 +12732,6 @@ on("change:repeating_knowledge:knowledgeattr", function() {
         {{#result}}
         <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
         <tr><td><div class="sheet-rolltemplate-sectionheading">Result</div></td></tr>
-        <tr><td><div> <br> </div></td></tr>
         {{#rollGreater() result 1}}
         <tr class="sheet-rolltemplate-results-success">
             <td class="result">{{result}} Successes</td>
@@ -12707,7 +12762,6 @@ on("change:repeating_knowledge:knowledgeattr", function() {
         </tr>
         {{/rollLess() initiative 11}}
         {{/initiative}}
-        <tr><td><div> <br> </div></td></tr>
         {{#after1}}
         <tr class="sheet-rolltemplate-after">
              <td>{{after1}}({{after1_num}}{{#after1dmg}}<b>{{after1dmg}}</b>{{/after1dmg}})</td>
