@@ -33,7 +33,9 @@
   - precondition: must support partial advancements
   - support custom modifiers from perks, GM ruling, ..
 
-- Auto-compute Techgnosis level
+- Techgnosis
+  - Auto-compute level based on carried equipment + carried weapons
+  - Add warning when techgnosis level is above character level
 
 - Turn class and callings lists into repeating sections
 
