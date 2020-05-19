@@ -47,3 +47,10 @@ on('change:repeating_bonds:flip_button_2', function(eventinfo) {
     repeating_bonds_flip_2: eventinfo.newValue
   });
 });
+
+on('change:repeating_assets:assetDropdownBonds', function(values) {
+  setAttrs({
+      ['repeating_assets_AssetBondsDiv' + values.previousValue]: 'off',
+      ['repeating_assets_AssetBondsDiv' + values.newValue]: 'on'
+  });
+});
