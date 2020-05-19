@@ -16,7 +16,7 @@
     <div class="col">
         <div class="flex-container"><label class="input-label"><h4>Name:</h4></label> <input type="text" name="attr_character_name"/></div>
         <div class="flex-container"><label class="input-label"><h4>Player:</h4></label> <input type="text" name="attr_player"/></div>
-        <div class="flex-container vertical center vertical-encroach tier1">
+        <div class="flex-container vertical center vertical-encroach tier1 legend">
             <h4>Legend</h4>
             <span>
                 <input class="normal" type="radio" name="attr_legend" value="1" checked /><span></span>
@@ -73,23 +73,23 @@
 			<label>
 				<h4>Skill</h4>
 				<select name="attr_skill">
-					<option value="0]]d10>7]]}} {{skill=}}" selected></option>
-					<option value="@{academics}]]d10>7]]}} {{skill=Academics}}">Academics</option>
-					<option value="@{athletics}]]d10>7]]}} {{skill=Athletics}}">Athletics</option>
-					<option value="@{closecombat}]]d10>7]]}} {{skill=Close Combat}}">Close Combat</option>
-					<option value="@{culture}]]d10>7]]}} {{skill=Culture}}">Culture</option>
-					<option value="@{empathy}]]d10>7]]}} {{skill=Empathy}}">Empathy</option>
-					<option value="@{firearms}]]d10>7]]}} {{skill=Firearms}}">Firearms</option>
-					<option value="@{integrity}]]d10>7]]}} {{skill=Integrity}}">Integrity</option>
-					<option value="@{leadership}]]d10>7]]}} {{skill=Leadership}}">Leadership</option>
-					<option value="@{medicine}]]d10>7]]}} {{skill=Medicine}}">Medicine</option>
-					<option value="@{occult}]]d10>7]]}} {{skill=Occult}}">Occult</option>
-					<option value="@{persuasion}]]d10>7]]}} {{skill=Persuasion}}">Persuasion</option>
-					<option value="@{pilot}]]d10>7]]}} {{skill=Pilot}}">Pilot</option>
-					<option value="@{science}]]d10>7]]}} {{skill=Science}}">Science</option>
-					<option value="@{subterfuge}]]d10>7]]}} {{skill=Subterfuge}}">Subterfuge</option>
-					<option value="@{survival}]]d10>7]]}} {{skill=Survival}}">Survival</option>
-					<option value="@{technology}]]d10>7]]}} {{skill=Technology}}">Technology</option>
+					<option value="0]]d10>[[@{targetnumber}]]]]}} {{skill=}}" selected></option>
+					<option value="@{academics}]]d10>[[@{targetnumber}]]]]}} {{skill=Academics}}">Academics</option>
+					<option value="@{athletics}]]d10>[[@{targetnumber}]]]]}} {{skill=Athletics}}">Athletics</option>
+					<option value="@{closecombat}]]d10>[[@{targetnumber}]]]]}} {{skill=Close Combat}}">Close Combat</option>
+					<option value="@{culture}]]d10>[[@{targetnumber}]]]]}} {{skill=Culture}}">Culture</option>
+					<option value="@{empathy}]]d10>[[@{targetnumber}]]]]}} {{skill=Empathy}}">Empathy</option>
+					<option value="@{firearms}]]d10>[[@{targetnumber}]]]]}} {{skill=Firearms}}">Firearms</option>
+					<option value="@{integrity}]]d10>[[@{targetnumber}]]]]}} {{skill=Integrity}}">Integrity</option>
+					<option value="@{leadership}]]d10>[[@{targetnumber}]]]]}} {{skill=Leadership}}">Leadership</option>
+					<option value="@{medicine}]]d10>[[@{targetnumber}]]]]}} {{skill=Medicine}}">Medicine</option>
+					<option value="@{occult}]]d10>[[@{targetnumber}]]]]}} {{skill=Occult}}">Occult</option>
+					<option value="@{persuasion}]]d10>[[@{targetnumber}]]]]}} {{skill=Persuasion}}">Persuasion</option>
+					<option value="@{pilot}]]d10>[[@{targetnumber}]]]]}} {{skill=Pilot}}">Pilot</option>
+					<option value="@{science}]]d10>[[@{targetnumber}]]]]}} {{skill=Science}}">Science</option>
+					<option value="@{subterfuge}]]d10>[[@{targetnumber}]]]]}} {{skill=Subterfuge}}">Subterfuge</option>
+					<option value="@{survival}]]d10>[[@{targetnumber}]]]]}} {{skill=Survival}}">Survival</option>
+					<option value="@{technology}]]d10>[[@{targetnumber}]]]]}} {{skill=Technology}}">Technology</option>
 				</select>
 			</label>
 			<button type="roll" name="roll_rollBase" value="&{template:roll} @{attribute}+@{skill}"></button>
@@ -1159,18 +1159,24 @@
         });
     });
 
-    on("change:tier", function(eventInfo){
-        switch(eventInfo.newValue){
-            case 0:
-            case 1:
-            default:
-                setAttrs({targetnumber: 8});
-                break;
-            case 2:
-            case 3:
-                setAttrs({targetnumber: 7});
-                break;
-        }
+    on("change:tier sheet:opened", function(eventInfo){
+	
+		getAttrs(["tier"], function(value)
+		{
+			const tier = parseInt(value["tier"], 10)||0;
+			
+			switch(tier){
+				case 0:
+				case 1:
+				default:
+					setAttrs({targetnumber: 8});
+					break;
+				case 2:
+				case 3:
+					setAttrs({targetnumber: 7});
+					break;
+			}
+		});
     });
 
     on("change:calling1 change:calling1_duplicate", function(eventInfo){
