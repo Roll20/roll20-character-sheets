@@ -4,7 +4,7 @@
 
 ## 1.0.1
 
-## Fixed
+### Fixed
 
 - Fix a bug where armor class types that were uppercased didn't display BAB or THAC0
 - Fix a bug where the attack macros were saved between character and monster tabs
