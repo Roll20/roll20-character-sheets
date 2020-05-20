@@ -2,7 +2,11 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
-## 1.0.1
+## 1.1.0
+
+### Added
+
+- Added a toggleable description for weapons
 
 ### Fixed
 
