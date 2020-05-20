@@ -235,8 +235,36 @@
 			<button type="action" name="act_fertkb" >Fertigkeiten auf dem Kampfblatt neu setzen.</button>
 		</div>
 		<div class="col">
-			<span class="span-header center" style="margin-left: 35px"><b>Sinne / Ungelernt</b></span>
-			<span class="span-header center" style="margin-left: 57px"><b>FW</b></span>
+			<span class="span-header center" style="margin-left: 35px"><b>Sinn</b></span>
+			<span class="span-header center" style="margin-left: 135px"><b>FW</b></span>
+			<span class="span-header center" style="margin-left: 90px"><b>Bonus</b></span>
+			<!--			<span class="span-header center" style="margin-left: 5px"><b>K</b></span>				-->
+			<span class="span-header center" style="margin-left: 5px"><b>PP</b></span>
+			<fieldset class="repeating_sinne">
+				<button type='roll'
+					value='&{template:default} {{name=@{character_name} würfelt auf @{Fertigkeit2}}} {{EW:@{Fertigkeit2}=[[1d20cs16cs17cs18cs19cs20cf1cf16cf17cf18cf19 + @{FW2} + @{leitE2} + @{Fertigkeitsbonus2} + @{popBonusSinne}]]}}'
+					name="roll_EW_Fertigkeit"></button>
+				<input type="text" name="attr_Fertigkeit2" value="Name" />
+				<input type="number" name="attr_FW2" value="0" />
+				<select name="attr_LeitE2" class="dtype">
+					<option value="0" selected="selected">-</option>
+					<option value="@{LeitSt}">St</option>
+					<option value="@{LeitGs}">Gs</option>
+					<option value="@{LeitGw}">Gw</option>
+					<option value="@{LeitKo}">Ko</option>
+					<option value="@{LeitIn}">In</option>
+					<option value="@{LeitZt}">Zt</option>
+					<option value="@{LeitAu}">Au</option>
+					<option value="@{LeitpA}">pA</option>
+					<option value="@{LeitWk}">Wk</option>
+				</select>
+				<input type="number" name="attr_Fertigkeitsbonus2" value="0" />
+				<input type="number" name="attr_FertPP2" value="0" />
+			</fieldset>
+			<button type="action" name="act_addsinn">Sinne hinzufügen</button>
+			<br /><br />
+			<span class="span-header center" style="margin-left: 35px"><b>Ungelernt</b></span>
+			<span class="span-header center" style="margin-left: 103px"><b>FW</b></span>
 			<span class="span-header center" style="margin-left: 90px"><b>Bonus</b></span>
 			<!--			<span class="span-header center" style="margin-left: 5px"><b>K</b></span>				-->
 			<span class="span-header center" style="margin-left: 5px"><b>PP</b></span>
@@ -261,8 +289,7 @@
 				<input type="number" name="attr_Fertigkeitsbonus2" value="0" />
 				<input type="number" name="attr_FertPP2" value="0" />
 			</fieldset>
-			<button type="action" name="act_addsinnung">Sinne und ungelernte Fertigkeiten hinzufügen</button>
-			<br />
+			<button type="action" name="act_addungelernt">Ungelernte Fertigkeiten hinzufügen</button>
 		</div>
 
 	</div>
@@ -1549,11 +1576,18 @@
 		});
 	});
 
-	on("clicked:addsinnung", function () {
-		console.log("Ungelernte Fertigkeiten und Sinne hinzufügen");
+	on("clicked:addsinn", function () {
+		console.log("Sinne hinzufügen");
 
-		AddSinneUngelernt();
+		AddSinne();
 	});
+
+	on("clicked:addungelernt", function () {
+		console.log("Ungelernte Fertigkeiten hinzufügen");
+
+		AddUngelernt();
+	});
+
 
 	// Neuberechnung der Abwehr Zaubern und Resis bei Änderung des Grades
 
@@ -2098,7 +2132,7 @@
 
 // Sinne und ungelernte Fertigkeiten hinzufügen
 
-function AddSinneUngelernt() {
+function AddUngelernt() {
 
 	// Konstitution für die Berechnung von Trinken holen
 
@@ -2111,57 +2145,68 @@ function AddSinneUngelernt() {
 		Ko = parseInt(values.Ko, 10) || 0;
 		trinken = Math.floor(Ko / 10);
 
-		// Erstmal die Sinne 		
-
-		setFert = setFertSinnUngelernt(setFert, "Wahrnehmung", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Sehen", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Hören", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Riechen/Schmecken", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Sechster Sinn", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Nachtsicht", "6", "0");
-
 		// Als nächstes die ungelernten
 
-		setFert = setFertSinnUngelernt(setFert, "Akrobatik (Ungelernt)", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Anführen (Ungelernt)", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Balancieren (Ungelernt)", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Beredsamkeit (Ungelernt)", "3", "0");
-		setFert = setFertSinnUngelernt(setFert, "Betäuben (Ungelernt)", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Bootfahren (Ungelernt)", "3", "0");
-		setFert = setFertSinnUngelernt(setFert, "Fallen entdecken (Ungelernt)", "0", "0");
-		setFert = setFertSinnUngelernt(setFert, "Fallenmechanik (Ungelernt)", "0", "0");
-		setFert = setFertSinnUngelernt(setFert, "Geländelauf (Ungelernt)", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Klettern (Ungelernt)", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Landeskunde (Ungelernt)", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Menschenkenntnis (Ungelernt)", "3", "0");
-		setFert = setFertSinnUngelernt(setFert, "Reiten (Ungelernt)", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Schleichen (Ungelernt)", "3", "0");
-		setFert = setFertSinnUngelernt(setFert, "Trinken", trinken, "0");
-		setFert = setFertSinnUngelernt(setFert, "Schwimme (Ungelernt)", "3", "0");
-		setFert = setFertSinnUngelernt(setFert, "Seilkunst (Ungelernt)", "3", "0");
-		setFert = setFertSinnUngelernt(setFert, "Spurensuche (Ungelernt)", "0", "0");
-		setFert = setFertSinnUngelernt(setFert, "Stehlen (Ungelernt)", "3", "0");
-		setFert = setFertSinnUngelernt(setFert, "Tarnen (Ungelernt)", "3", "0");
-		setFert = setFertSinnUngelernt(setFert, "Tauchen (Ungelernt)", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Überlebe (Ungelernt)n", "6", "0");
-		setFert = setFertSinnUngelernt(setFert, "Verführen (Ungelernt)", "3", "0");
-		setFert = setFertSinnUngelernt(setFert, "Verhören (Ungelernt)", "3", "0");
-		setFert = setFertSinnUngelernt(setFert, "Verstellen (Ungelernt)", "3", "0");
-		setFert = setFertSinnUngelernt(setFert, "Wagenlenken (Ungelernt)", "3", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Akrobatik (Ungelernt)", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Anführen (Ungelernt)", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Balancieren (Ungelernt)", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Beredsamkeit (Ungelernt)", "3", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Betäuben (Ungelernt)", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Bootfahren (Ungelernt)", "3", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Fallen entdecken (Ungelernt)", "0", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Fallenmechanik (Ungelernt)", "0", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Geländelauf (Ungelernt)", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Klettern (Ungelernt)", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Landeskunde (Ungelernt)", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Menschenkenntnis (Ungelernt)", "3", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Reiten (Ungelernt)", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Schleichen (Ungelernt)", "3", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Trinken", trinken, "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Schwimme (Ungelernt)", "3", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Seilkunst (Ungelernt)", "3", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Spurensuche (Ungelernt)", "0", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Stehlen (Ungelernt)", "3", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Tarnen (Ungelernt)", "3", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Tauchen (Ungelernt)", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Überlebe (Ungelernt)n", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Verführen (Ungelernt)", "3", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Verhören (Ungelernt)", "3", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Verstellen (Ungelernt)", "3", "0");
+		setFert = setFertSinnUngelernt("repeating_fertigkeiten2_", setFert, "Wagenlenken (Ungelernt)", "3", "0");
 
 		// Zum Abschluss alles wegschreiben
 		setAttrs(setFert)
 	});
 };
 
+function AddSinne() {
+
+	// Konstitution für die Berechnung von Trinken holen
+
+		var setFert = {}; // Array für die Fertigkeiten
+		var newrowid = 0; // ZeilenID für Fertigkeitenblatt
+
+		// Erstmal die Sinne 		
+
+		setFert = setFertSinnUngelernt("repeating_sinne_", setFert, "Wahrnehmung", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_sinne_",setFert, "Sehen", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_sinne_",setFert, "Hören", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_sinne_",setFert, "Riechen/Schmecken", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_sinne_",setFert, "Sechster Sinn", "6", "0");
+		setFert = setFertSinnUngelernt("repeating_sinne_",setFert, "Nachtsicht", "6", "0");
+
+		// Zum Abschluss alles wegschreiben
+		setAttrs(setFert)
+};
+
 // SetFert für ungelernte und Sinne aufbauen
 
-	var setFertSinnUngelernt = function (setFert, Name, FW, LeitE) {
+	var setFertSinnUngelernt = function (repeating, setFert, Name, FW, LeitE) {
 		var newrowid = generateRowID(); //Neue RowID holen
 
-		setFert['repeating_fertigkeiten2_' + newrowid + '_Fertigkeit2'] = Name;
-		setFert['repeating_fertigkeiten2_' + newrowid + '_FW2'] = FW;
-		setFert['repeating_fertigkeiten2_' + newrowid + '_LeitE2'] = LeitE;	
+		setFert[repeating + newrowid + '_Fertigkeit2'] = Name;
+		setFert[repeating + newrowid + '_FW2'] = FW;
+		setFert[repeating + newrowid + '_LeitE2'] = LeitE;	
 		
 		return setFert;
 	};
