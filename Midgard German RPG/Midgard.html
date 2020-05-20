@@ -35,6 +35,7 @@
 	<button type="action" name="act_Ausrustung">Ausrüstung</button>
 	<button type="action" name="act_Notizen">Notizen</button>
 	<!-- <button type="action" name="act_NSC">NSC</button> -->
+	<button type="action" name="act_Config">Einstellungen</button>
 </div>
 
 <input type='hidden' class='sheet-tabstoggle' name='attr_sheetTab' value='Datenblatt' />
@@ -47,7 +48,7 @@
 		<div class="col">
 
 			<button type='roll'
-				value='&{template:default} {{name=@{character_name} würfelt auf Stärke}} {{Der Wurf Ist um [[@{St} +@{ItemBStärke} - 1d100cs1cf100 - ?{Zuschlag auf Würfelwurf(PW)|0}]] besser als der Wert für Stärke von [[@{St}+@{ItemBStärke}]]!}}'
+				value='&{template:default} {{name=@{character_name} würfelt auf Stärke}} {{Der Wurf Ist um [[@{St} +@{ItemBStärke} - 1d100cs1cf100 - @{popBonusAttribute}]] besser als der Wert für Stärke von [[@{St}+@{ItemBStärke}]]!}}'
 				name="roll_PW_St"></button>
 			<label>Stärke</label><input type="number" name="attr_St" value="1" /><span> Bonus </span><input
 				type="number" name="attr_ItemBStärke" value="0" /><br />
@@ -939,6 +940,35 @@
 		</div>
 	</div>
 </div>
+	
+<div class='sheet-Config'>
+	<div class="3colrow">
+		<div class="col">
+			<label>Figur:</label><input type="text" name="attr_character_name" /> <br />
+			<label>Typ:</label><input type="text" name="attr_Typ" /> <br />
+			<label>Grad:</label><input type="number" name="attr_Grad" value="1" />
+			<!-- 		<div class="toggle-container">
+			<input type="hidden" class="toggle" name="attr_KannZaubern" /><span><b>Kann Zaubern</b></span>
+			<button type="action" name="act_KannZaubern" class="toggle">
+				<span class="checked"><b>✓</b></span>
+			</button>
+		</div> -->
+			<label>Kann zaubern</label><input type="checkbox" class="checkbox" value="1"
+				name="attr_KannZaubern" /><br />
+		</div>
+		<div class="col">
+			<img
+				src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Midgard%20German%20RPG/midgard_logo.png" /><br />
+		</div>
+		<div class="col">
+			<label>ES:</label><input type="text" name="attr_Erfahrungsschatz" value="0" /><br />
+			<label>EP:</label><input type="text" name="attr_EP" value="0" /> <br />
+			<span><b>SG</b> .</span><input type="number" name="attr_SG" value="0" />
+			<span><b>GG</b> </span><input type="number" name="attr_GG" value="0" />
+			<span><b>GP</b> </span><input type="number" name="attr_GP" value="0" />
+		</div>
+	</div>
+</div>
 <!--
 <div class='sheet-NSC'>
 	<h2>Nichtspielerfiguren</h2>
@@ -1280,8 +1310,8 @@
 </div>
  -->
 <script type="text/worker">
-	const SheetVersion = "2";
-	const buttonlist = ["Datenblatt", "Fertigkeiten", "Sprachen", "Zauber", "KampfK", "KampfZ", "Ausrustung", "Notizen", "NSC"];
+	const SheetVersion = "3";
+	const buttonlist = ["Datenblatt", "Fertigkeiten", "Sprachen", "Zauber", "KampfK", "KampfZ", "Ausrustung", "Notizen", "NSC", "Config"];
 	buttonlist.forEach(button => {
 		on(`clicked:${button}`, function () {
 			console.log("Button " + button);
@@ -1294,8 +1324,14 @@
 	// prüfen ob Defaultwerte geschrieben werden müssen
 
 	on("sheet:opened", function () {
-		getAttrs(["gRüsB", "gRusGW", "gRüsAbwB", "gRüsAnB", "gSchB"], function (values) {
-
+		getAttrs(["gRüsB", "gRusGW", "gRüsAbwB", "gRüsAnB", "gSchB", "popBonusAttribute", "popBonusFertigkeiten", "popBonusSprachen", "popBonusSinne", "popBonusZauber", "popBonusAngriff", "popBonusAbwehr"], function (values) {
+			var popBonusAttribute = "?{Zuschlag auf Würfelwurf(PW)|0}";
+			var popBonusFertigkeiten = "?{Bonus)|0}";
+			var popBonusSprachen = "?{Bonus)|0}";
+			var popBonusSinne = "?{Bonus)|0}";
+			var popBonusZauber = "?{Bonus)|0}";
+			var popBonusAngriff = "?{Bonus)|0}";
+			var popBonusAbwehr = "?{Bonus)|0}";
 
 			if (values.gRusGW == undefined) setAttrs({
 				"gRusGW": "0"
@@ -1314,6 +1350,27 @@
 			});
 			if (values.gAngB == undefined) setAttrs({
 				"gAngB": "0"
+			});
+			if (values.popBonusAttribute == undefined) setAttrs({
+				"popBonusAttribute": popBonusAttribute
+			});
+			if (values.popBonusFertigkeiten == undefined) setAttrs({
+				"popBonusFertigkeiten": popBonusFertigkeiten
+			});
+			if (values.popBonusSprachen == undefined) setAttrs({
+				"popBonusSprachen": popBonusSprachen
+			});
+			if (values.popBonusSinne == undefined) setAttrs({
+				"popBonusSinne": popBonusSinne
+			});
+			if (values.popBonusZauber == undefined) setAttrs({
+				"popBonusZauber": popBonusZauber
+			});
+			if (values.popBonusAngriff == undefined) setAttrs({
+				"popBonusAngriff": popBonusAngriff
+			});
+			if (values.popBonusAbwehr == undefined) setAttrs({
+				"popBonusAbwehr": popBonusAbwehr
 			});
 		});
 	});
