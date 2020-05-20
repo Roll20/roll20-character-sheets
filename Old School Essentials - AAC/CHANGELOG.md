@@ -2,7 +2,13 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
-## 1.0.0 - Unreleased
+## 1.0.1
+
+## Fixed
+
+- Fix a bug where armor class types that were uppercased didn't display BAB or THAC0
+
+## 1.0.0
 
 ### Added
 
