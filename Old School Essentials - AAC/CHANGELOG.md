@@ -6,7 +6,7 @@
 
 ### Added
 
-- Added a toggleable description for weapons
+- Add a toggleable description for weapons
 
 ### Fixed
 
