@@ -8,7 +8,7 @@
             <div class="sheet-row">
                 <div class="sheet-ep">
                     <label for="attr_EP">EP</label><input type="number" name="attr_EP" />
-                    <label for="attr_Stufe">Stufe</label><input type="number" name="attr_Stufe" readonly />
+                    <label for="attr_Stufe">Stufe</label><input type="number" name="attr_Stufe" readOnly />
                     <label for="attr_AP">AP</label><input type="number" name="attr_AP" />
                 </div>
                 <div class="sheet-vermoegen">
@@ -68,35 +68,35 @@
                         <div class="sheet-name" for="attr_ST"><strong>St</strong>ärke</div>
                         <input type="number" name="attr_ST" />
                         <div class="sheet-arrow"></div>
-                        <input type="number" name="attr_STB" readonly />
+                        <input type="number" name="attr_STB" readOnly />
                         <button type="roll" name="roll_ST"
                             value="@{abilityroll} versucht sich in Stärke [[1d10! + @{STB} + ?{Modifier?|0}]]"></button>
 
                         <div class="sheet-name" for="attr_GE"><strong>Ge</strong>schicklichkeit</div>
                         <input type="number" name="attr_GE" />
                         <div class="sheet-arrow"></div>
-                        <input type="number" name="attr_GEB" readonly />
+                        <input type="number" name="attr_GEB" readOnly />
                         <button type="roll" name="roll_GE"
                             value="@{abilityroll} versucht sich in Geschicklichkeit [[1d10! + @{GEB} + ?{Modifier?|0}]]"></button>
 
                         <div class="sheet-name" for="attr_KO"><strong>Ko</strong>nstitution</div>
                         <input type="number" name="attr_KO" />
                         <div class="sheet-arrow"></div>
-                        <input type="number" name="attr_KOB" readonly />
+                        <input type="number" name="attr_KOB" readOnly />
                         <button type="roll" name="roll_KO"
                             value="@{abilityroll} versucht sich in Konstitution [[1d10! + @{KOB} + ?{Modifier?|0}]]"></button>
 
                         <div class="sheet-name" for="attr_IN"><strong>In</strong>telligenz</div>
                         <input type="number" name="attr_IN" />
                         <div class="sheet-arrow"></div>
-                        <input type="number" name="attr_INB" readonly />
+                        <input type="number" name="attr_INB" readOnly />
                         <button type="roll" name="roll_IN"
                             value="@{abilityroll} versucht sich in Intelligenz [[1d10! + @{INB} + ?{Modifier?|0}]]"></button>
 
                         <div class="sheet-name" for="attr_CH"><strong>Ch</strong>arisma</div>
                         <input type="number" name="attr_CH" />
                         <div class="sheet-arrow"></div>
-                        <input type="number" name="attr_CHB" readonly />
+                        <input type="number" name="attr_CHB" readOnly />
                         <button type="roll" name="roll_CH"
                             value="@{abilityroll} versucht sich in Charisma [[1d10! + @{CHB} + ?{Modifier?|0}]]"></button>
                     </div>
@@ -407,6 +407,12 @@
         });
     });
 
+    on("sheet:opened",function() {
+        if (v.readOnly == "1") {
+            document.getElementsByClassName('sheet-readOnly').readOnly = true;
+        }
+    });
+
     on("change:ST", function() {
         getAttrs(["ST"], function(values) {
             if (values.ST == 1) {
@@ -628,6 +634,45 @@
             }
             if (values.EP >= 208000) {
                 setAttrs({ Stufe: 20 });
+            }
+        });
+    });
+
+    on("change:MU", function() {
+        getAttrs(["MU", "KL", "calcMoney"], function(values) {
+            if (values.MU >= 10 && values.calcMoney == "1") {
+                setAttrs({
+                    MU: Math.floor(parseInt(values.MU) - 10)
+                });
+                setAttrs({
+                    KL: Math.floor(parseInt(values.KL) + 1)
+                });
+            }
+        });
+    });
+
+    on("change:KL", function() {
+        getAttrs(["KL", "TT"], function(values) {
+            if (values.KL >= 10) {
+                setAttrs({
+                    KL: Math.floor(parseInt(values.KL) - 10)
+                });
+                setAttrs({
+                    TT: Math.floor(parseInt(values.TT) + 1)
+                });
+            }
+        });
+    });
+
+    on("change:TT", function() {
+        getAttrs(["TT", "GF"], function(values) {
+            if (values.TT >= 10) {
+                setAttrs({
+                    TT: Math.floor(parseInt(values.TT) - 10)
+                });
+                setAttrs({
+                    GF: Math.floor(parseInt(values.GF) + 1)
+                });
             }
         });
     });
