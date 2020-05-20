@@ -8,6 +8,7 @@
 
 - Fix a bug where armor class types that were uppercased didn't display BAB or THAC0
 - Fix a bug where the attack macros were saved between character and monster tabs
+- Fix a bug where the monster name wouldn't be used in the journal or on tokens (it was formerly separate from character name, now they're linked)
 
 ## 1.0.0
 
