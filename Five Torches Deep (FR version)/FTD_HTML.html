@@ -148,6 +148,12 @@
             <div class="load2 attributes">
                 <input type="number" name="attr_pc_load"> <span style="font-size: 24px;">/</span> <input type="number" name="attr_pc_load_max">
             </div>
+            <div class="initiative1 attributes" style="margin-top: 5px;">
+                <button name="roll_initiative" type="roll" value="@{togm} &{template:ftdroll} {{name=@{character_name}}} {{test_name=initiative}} {{r1=[[@{pc_dexterity} &{tracker}]]}}">
+                    <h3 style="width: 80px; font-size: 16px;" data-i18n="initiative">Initiative</h3>
+                    <h2><span type="number" name="attr_pc_dexterity" title="@{pc_dexterity}"></span></h2>
+                </button>
+            </div>
             <div class="ac1 attributes">
                 <h2 data-i18n="ac">CA</h2>
             </div>
@@ -269,7 +275,7 @@
                     <option value="@{pc_wisdomMod}" data-i18n="wisdom">Sagesse</option>
                     <option value="@{pc_charismaMod}" data-i18n="charisma">Charisme</option>
                 </select>
-                <input type="text" name="attr_pc_weapon_desc" placeholder="description" spellcheck="false" style="width: 700px;">
+                <input type="text" name="attr_pc_weapon_desc" placeholder="description" spellcheck="false" style="width: 700px; margin-bottom: 2px;">
                 <button name="roll_weapon" type="roll" value="@{togm} &{template:ftddamage} {{name=@{character_name}}} {{test_name=@{pc_weapon_name}}} {{r1=[[1d20+@{pc_weaponToHitMod}+@{pc_weapon_prof}+@{pc_weaponToHitBonus}]]}} {{r2=[[1d20+@{pc_weaponToHitMod}+@{pc_weapon_prof}+@{pc_weaponToHitBonus}]]}} {{damage_name=Dégâts}} {{r_damage=[[{@{pc_weapon_damage}+@{pc_weaponMod},1d1}kh1]]}}">
                     <h3 style="width: 80px;" data-i18n="attack">Attaque</h3>
                 </button>
@@ -302,7 +308,7 @@
             <fieldset class="repeating_spell">
                 <input type="number" name="attr_pc_spell_lvl" style="width: 70px;">
                 <input type="text" name="attr_pc_spell_name" placeholder="sort" style="width: 200px;">
-                <input type="text" name="attr_pc_spell_desc" placeholder="description" spellcheck="false" style="width: 500px;">
+                <input type="text" name="attr_pc_spell_desc" placeholder="description" spellcheck="false" style="width: 500px; margin-bottom: 2px;">
             </fieldset>
         </div>
     </div>
@@ -322,7 +328,7 @@
                 <input type="text" name="attr_pc_item_name" placeholder="objet" style="width: 280px;">
                 <input type="text" name="attr_pc_item_desc" placeholder="description" spellcheck="false" style="width: 270px;">
                 <input type="number" name="attr_pc_item_sup" style="width: 70px;">
-                <input type="number" name="attr_pc_item_dur" style="width: 70px;">
+                <input type="number" name="attr_pc_item_dur" style="width: 40px;"> <span>/</span> <input type="number" name="attr_pc_item_dur_max" style="width: 40px; margin-bottom: 2px;">
             </fieldset>
         </div>
     </div>
@@ -397,8 +403,7 @@
                 <h3 data-i18n="hit points">Points de vie</h3>
                 <input type="number" name="attr_npc_hp" value="0">
                 <h3>/</h3>
-                <input type="hidden" name="attr_npc_hp_max" value="0">
-                <span name="attr_npc_hp_max" style="display: block; padding: 4px"></span>
+                <input type="number" name="attr_npc_hp_max" value="0">
             </div>
             <div class="flex">
                 <h3 data-i18n="base modifier">Modificateur de base</h3>
@@ -414,7 +419,7 @@
 
         <div class="q2">
             <div class="flex">
-                <h2 data-i18n="strength">Force</h2>
+                <h2 data-i18n="Forces">Forces</h2>
             </div>
             <div class="flex">
                 <h3 data-i18n="modifier">Modificateur</h3>
@@ -462,7 +467,7 @@
 
         <div class="q4">
             <div class="flex">
-                <h2 data-i18n="weakness">Faiblesses</h2>
+                <h2 data-i18n="Faiblesses">Faiblesses</h2>
             </div>
             <div class="flex">
                 <h3 data-i18n="modifier">Modificateur</h3>
@@ -628,7 +633,7 @@ stats.forEach(function (stat) {
 });
 
 // === LVL CALC
-on("change:pc_xp sheet:opened", function() {  
+on("change:pc_xp", function() {  
     getAttrs(["pc_xp"], function(values) {
         let XP = parseInt(values.pc_xp,10)||0;
         let lvl = 1;
@@ -647,7 +652,7 @@ on("change:pc_xp sheet:opened", function() {
 });
 
 // === ARCHETYPE SWITCH
-on('change:pc_class sheet:opened', function() {
+on('change:pc_class', function() {
         getAttrs(['pc_class'], function(values) {
             var idx = 0;
             switch (values.pc_class.toLowerCase()) {
@@ -683,7 +688,7 @@ on("change:pc_lvl sheet:opened", function() {
 });
 
 // === LOAD CALC
-on("change:pc_strength sheet:opened", function() {  
+on("change:pc_strength", function() {  
     getAttrs(["pc_strength"], function(values) {
         let l = parseInt(values.pc_strength,10)||0;
         setAttrs({                            
@@ -693,7 +698,7 @@ on("change:pc_strength sheet:opened", function() {
 });
 
 // === SPEED CALC
-on("change:pc_load sheet:opened", function() {  
+on("change:pc_load", function() {  
     getAttrs(["pc_load", "pc_load_max"], function(values) {
         let l = parseInt(values.pc_load,10)||0;
         let max = parseInt(values.pc_load_max,10)||0;
@@ -707,7 +712,7 @@ on("change:pc_load sheet:opened", function() {
 });
 
 // === RESILIENCE CALC
-on("change:pc_constitution sheet:opened", function() {  
+on("change:pc_constitution", function() {  
     getAttrs(["pc_constitution"], function(values) {
         let resilience = parseInt(values.pc_constitution,10)||0;
         setAttrs({                            
@@ -717,7 +722,7 @@ on("change:pc_constitution sheet:opened", function() {
 });
 
 // === SUPPLY CALC
-on("change:pc_intelligence sheet:opened", function() {  
+on("change:pc_intelligence", function() {  
     getAttrs(["pc_intelligence"], function(values) {
         let supply = parseInt(values.pc_intelligence,10)||0;
         setAttrs({                            
@@ -727,7 +732,7 @@ on("change:pc_intelligence sheet:opened", function() {
 });
 
 // === Arcane CALC
-on("change:pc_intelligenceMod change:pc_proficiency change:pc_class sheet:opened", function() {  
+on("change:pc_intelligenceMod change:pc_proficiency change:pc_class", function() {  
     getAttrs(["pc_intelligenceMod", "pc_proficiency", "pc_class"], function(values) {
         let INT = parseInt(values.pc_intelligenceMod,10)||0;
         let PROF = parseInt(values.pc_proficiency,10)||0;
@@ -741,7 +746,7 @@ on("change:pc_intelligenceMod change:pc_proficiency change:pc_class sheet:opened
 });
 
 // === Perception CALC
-on("change:pc_wisdomMod change:pc_proficiency change:pc_arc sheet:opened", function() {  
+on("change:pc_wisdomMod change:pc_proficiency change:pc_arc", function() {  
     getAttrs(["pc_wisdomMod", "pc_proficiency", "pc_arc"], function(values) {
         let WIS = parseInt(values.pc_wisdomMod,10)||0;
         let PROF = parseInt(values.pc_proficiency,10)||0;
@@ -755,7 +760,7 @@ on("change:pc_wisdomMod change:pc_proficiency change:pc_arc sheet:opened", funct
 });
 
 // === Divine CALC
-on("change:pc_wisdomMod change:pc_proficiency change:pc_class sheet:opened", function() {  
+on("change:pc_wisdomMod change:pc_proficiency change:pc_class", function() {  
     getAttrs(["pc_wisdomMod", "pc_proficiency", "pc_class"], function(values) {
         let WIS = parseInt(values.pc_wisdomMod,10)||0;
         let PROF = parseInt(values.pc_proficiency,10)||0;
@@ -769,7 +774,7 @@ on("change:pc_wisdomMod change:pc_proficiency change:pc_class sheet:opened", fun
 });
 
 // === RETAINER CALC
-on("change:pc_charisma sheet:opened", function() {  
+on("change:pc_charisma", function() {  
     getAttrs(["pc_charisma"], function(values) {
         let retainer = parseInt(values.pc_charisma,10)||0;
         setAttrs({                            
@@ -779,7 +784,7 @@ on("change:pc_charisma sheet:opened", function() {
 });
 
 // === MAGIC ITEM CALC
-on("change:pc_charismaMod sheet:opened", function() {  
+on("change:pc_charismaMod", function() {  
     getAttrs(["pc_charismaMod"], function(values) {
         let cha = parseInt(values.pc_charismaMod,10)||0;
         let mi = 1;
@@ -902,7 +907,7 @@ on("change:pc_arch change:select-chooser", function () {
         "9": {first: "5", second: "5", third: "5", fourth: "3", fifth: "1"},
     };
 
-on("change:pc_lvl sheet:opened", function() {  
+on("change:pc_lvl", function() {  
     getAttrs(["pc_lvl"], function(values) {
         let LVL = values.pc_lvl;
         if (!spelltable.hasOwnProperty( LVL )) {
@@ -1080,7 +1085,7 @@ on("sheet:opened", function(eventInfo){
         weakmacro: getTranslationByKey("Faiblesses") + " @{npc_weak_mod}",
         attrbuttonmacro : "[" + getTranslationByKey("strength") + "(@{pc_strengthMod})](~strength) [" + getTranslationByKey("dexterity") + "(@{pc_dexterityMod})](~dexterity) [" + getTranslationByKey("constitution") + "(@{pc_constitutionMod})](~constitution) [" + getTranslationByKey("intelligence") + "(@{pc_intelligenceMod})](~intelligence) [" + getTranslationByKey("wisdom") + "(@{pc_wisdomMod})](~wisdom) [" + getTranslationByKey("charisma") + "(@{pc_charismaMod})](~charisma)",
         magbuttonmacro : "[" + getTranslationByKey("arcane") + "(@{pc_arcane})](~arcana) [" + getTranslationByKey("divine") + "(@{pc_divine})](~divine)",
-        sensbuttonmacro : "[" + getTranslationByKey("perception") + "(@{pc_perception})](~perception)",
+        sensbuttonmacro : "[" + getTranslationByKey("perception") + "(@{pc_perception})](~perception)" + " [" + getTranslationByKey("initiative") + "(@{pc_dexterity})](~initiative)",
         standardbuttonmacro : "[" + getTranslationByKey("roll") + "](~npc_base) [" + getTranslationByKey("attack") + "](~npc_attack) [" + getTranslationByKey("damage") + "](~npc_damage)",
         strongbuttonmacro : "[" + getTranslationByKey("Test (force)") + "](~npc_strong)",
         weakbuttonmacro : "[" + getTranslationByKey("Test (faiblesse)") + "](~npc_weak)"
