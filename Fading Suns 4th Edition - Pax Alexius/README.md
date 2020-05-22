@@ -1,5 +1,9 @@
 # Release notes
 
+## 1.2.0
+- Now differentiating current + max values for Revivals Number, Surge Number, e-Shield charges
+- Improved behavior when editing repeating sections
+
 ## 1.1.0
 - Species size box converted to numeric input from text input
 - Armor resistances against specific damage types (blaster, flame, ..) now automatically deduced from the armor general resistance level
@@ -21,24 +25,39 @@
 
 - Blessing/Curse: add more space for their descriptions
 
+- Character advancement helpers
+  - Partial advancement checkboxes (as reminder + input if some derived stats become auto-computed)
+  - show how many skill points and characteristics points have been spent
+
+- Auto-compute Vitality Rating, Revivals Rating, Revivals Number (max), VP Bank capacity, Surge Rating, Surge Number (max)
+  - precondition: must support partial advancements
+  - support custom modifiers from perks, GM ruling, ..
+
+- Techgnosis
+  - Auto-compute level based on carried equipment + carried weapons
+  - Add warning when techgnosis level is above character level
+
+- Turn class and callings lists into repeating sections
+
 - Characteristics
-    - [ TBC ] Box next to them to log a temporary bonus/malus?
-    - check if Occult characteristics can be used as part of a roll, if yes add as an option to skills characteristic choice and action characteristic selection
+  - [ TBC ] Box to log a modifier 
 
 - Skills
-    - [ TBC ] Box next to them to log a temporary bonus/malus?
-    - auto-fail or add warning when rolling a |R|equired skill (Alchemy, Interface, Pilot) which has a score of 0
+  - [ TBC ] Box to log a modifier
+  - auto-fail or add warning when rolling a |R|equired skill (Alchemy, Interface, Pilot) which has a score of 0
 
 - E-Shield
-    - add "Burn-Out", "Distorsion", "Features"?
+  - add "Burn-Out", "Distorsion", "Features"
+
+- States
+  - Implement "shake it off" rolls
+  - add state descriptions
 
 # Nice-to-have
 
 - Add description of each state
 
-- replace unstylable characteristic/skill selects with custom-made absolute-positioned list of action buttons?
-
 - for Roll20 pro users, API for:
-    - troupe coffer management
-    - PC bank / cache management
-    - GM(/NPC) bank / cache management
+  - troupe coffer management
+  - PC bank / cache management
+  - GM(/NPC) bank / cache management
