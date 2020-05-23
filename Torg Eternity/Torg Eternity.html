@@ -1391,7 +1391,7 @@
                             
                             
                             <span class="title wide" data-i18n="ammo" >Ammo</span>
-                            <input class="weapon-value weapon-ammo" type="number"  value="0" name="attr_Attack_Ammo_max"  />
+                            <input class="weapon-value weapon-ammo" type="number"  value="0" name="attr_Attack_Ammo_Capacity"  />
                             
                             <span class="title narrow" data-i18n="power-question-mark" >Power?</span>
                             <label class="weapon-power">
@@ -4125,8 +4125,14 @@
                         const axiomDisplay = (axiomName1 ? `${axiomName1} ${axiomScore1}` : '') + (axiomName1 && axiomName2 ? ' ' : '') + (axiomName2 ? `${axiomName2} ${axiomScore2}` : '');
                         if (axiomDisplay !== axiom) output[repeatingFieldName('attacks', id, 'Attack_Axiom')] = axiomDisplay;
         
-                        const ammomax = Math.max(0,int(v[repeatingFieldName('attacks', id, 'Attack_Ammo_Capacity')]));
+                        let ammomax = int(v[repeatingFieldName('attacks', id, 'Attack_Ammo_Capacity')]);
+                        console.log('ammomax: ' + ammomax);
                         const ammo = Math.max(0,int(v[repeatingFieldName('attacks', id, 'Attack_Ammo')]));
+                        if (ammomax < 0) {
+                            ammomax = 0;
+                            console.log('ammomax: ' + ammomax);
+                            output[repeatingFieldName('attacks', id, 'Attack_Ammo_Capacity')] = ammomax;
+                        }
                         if(event.sourceAttribute === repeatingFieldName('attacks', id, 'Attack_Ammo_Capacity').toLowerCase() || ammo > ammomax) {
                             output[repeatingFieldName('attacks', id, 'Attack_Ammo')] = ammomax;
                         }
@@ -4382,8 +4388,8 @@
             case version < 4.01:
                 updateToV401_tharkold(version);
                 break;
-            case version < 4.02:
-                updateToV402_ammo(version);
+            case version < 4.03:
+                updateToV403_ammo(version);
                 break;
             default:
                 clog(`Check Complete. Sheet is up to date: Version ${version}.`, 'green', `Torg Eternity Versionator`);
@@ -4742,8 +4748,8 @@
             setAttrs(output, {silent:true}, versionator(output.version));
         });
     };
-    const updateToV402_ammo = () => {
-        const version = 4.02;
+    const updateToV403_ammo = () => {
+        const version = 4.03;
         clog(`Updating to Version ${version}`, 'red', 'Torg Eternity Versionator');
         getSectionIDs('repeating_attacks', idarray => {
             const fieldnames = [];
