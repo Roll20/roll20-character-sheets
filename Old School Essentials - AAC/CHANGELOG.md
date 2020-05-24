@@ -7,6 +7,7 @@
 ### Added
 
 - Add a toggleable description for weapons
+- Add the ability for spells to just show descriptions when no effect roll exists (e.g. Read Languages)
 
 ### Fixed
 

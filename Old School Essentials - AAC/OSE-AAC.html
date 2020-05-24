@@ -410,8 +410,13 @@
     </div>
     <fieldset class="repeating_spells">
       <div class="spells-grid">
-        <button type="roll"
-          value="&{template:simple} {{roll=Casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}} {{effect=[[@{spellEffect}]]}}"></button>
+        <div>
+          <input type="hidden" name="attr_spellRollType" value="describe" />
+          <button type="roll" class="roll"
+            value="&{template:simple} {{roll=Casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}} {{effect=[[@{spellEffect}]]}}"></button>
+          <button type="roll" class="roll-describe"
+            value="&{template:simple} {{roll=Casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}}"></button>
+        </div>
         <input type="text" name="attr_spellName" placeholder="Magic Missile"
           data-i18n-placeholder="spell-name-placeholder" />
         <input type="text" name="attr_spellDuration" placeholder="1 turn"
@@ -662,8 +667,13 @@
     </div>
     <fieldset class="repeating_spells">
       <div class="spells-grid">
-        <button type="roll"
-          value="&{template:simple} {{roll=Casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}} {{effect=[[@{spellEffect}]]}}"></button>
+        <div>
+          <input type="hidden" name="attr_spellRollType" value="describe" />
+          <button type="roll" class="roll"
+            value="&{template:simple} {{roll=Casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}} {{effect=[[@{spellEffect}]]}}"></button>
+          <button type="roll" class="roll-describe"
+            value="&{template:simple} {{roll=Casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}}"></button>
+        </div>
         <input type="text" name="attr_spellName" placeholder="Magic Missile"
           data-i18n-placeholder="spell-name-placeholder" />
         <input type="text" name="attr_spellDuration" placeholder="1 turn"
@@ -1451,4 +1461,27 @@
       });
     });
   });
+
+  // Show/hide Roll/Describe buttons for spells
+  on("change:repeating_spells:spellEffect", function(eventInfo) {
+    if (eventInfo.newValue && eventInfo.newValue !== "") {
+      setAttrs({ repeating_spells_spellRollType: "roll" })
+    } else {
+      setAttrs({ repeating_spells_spellRollType: "describe" })
+    }
+  })
+
+  on("sheet:opened", function () {
+    getSectionIDs("repeating_spells", function(idArray) {
+      idArray.forEach(function(id) {
+        getAttrs([`repeating_spells_${id}_spellEffect`], function(values) {
+          if (values[`repeating_spells_${id}_spellEffect`] !== "") {
+            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "roll" })
+          } else {
+            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "describe" })
+          }
+        })
+      })
+    })
+  })
 </script>
