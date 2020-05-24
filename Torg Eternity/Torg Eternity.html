@@ -4129,7 +4129,6 @@
                         const ammo = Math.max(0,int(v[repeatingFieldName('attacks', id, 'Attack_Ammo')]));
                         if (ammomax < 0) {
                             ammomax = 0;
-                            console.log('ammomax: ' + ammomax);
                             output[repeatingFieldName('attacks', id, 'Attack_Ammo_Capacity')] = ammomax;
                         }
                         if(event.sourceAttribute === repeatingFieldName('attacks', id, 'Attack_Ammo_Capacity').toLowerCase() || ammo > ammomax) {
@@ -4387,8 +4386,8 @@
             case version < 4.01:
                 updateToV401_tharkold(version);
                 break;
-            case version < 4.02:
-                updateToV402_ammo(version);
+            case version < 4.03:
+                updateToV403_ammo(version);
                 break;
             default:
                 clog(`Check Complete. Sheet is up to date: Version ${version}.`, 'green', `Torg Eternity Versionator`);
@@ -4747,23 +4746,27 @@
             setAttrs(output, {silent:true}, versionator(output.version));
         });
     };
-    const updateToV402_ammo = () => {
-        const version = 4.02;
+    const updateToV403_ammo = () => {
+        const version = 4.03;
         clog(`Updating to Version ${version}`, 'red', 'Torg Eternity Versionator');
         getSectionIDs('repeating_attacks', idarray => {
             const fieldnames = [];
-            idarray.forEach(id => fieldnames.push(repeatingFieldName('attacks', id, 'Attack_Ammo_max')));
+            idarray.forEach(id => fieldnames.push(
+                repeatingFieldName('attacks', id, 'Attack_Ammo_max'),
+                repeatingFieldName('attacks', id, 'Attack_Ammo_Capacity')
+            ));
             getAttrs(fieldnames, v => {
                 const output = {};
                 idarray.forEach(id => {
-                    output[repeatingFieldName('attacks', id, 'Attack_Ammo_Capacity')] = v[repeatingFieldName('attacks', id, 'Attack_Ammo_max')];
+                    const cap = int(v[repeatingFieldName('attacks', id, 'Attack_Ammo_Capacity')]);
+                    const max = int(v[repeatingFieldName('attacks', id, 'Attack_Ammo_max')]);
+                    output[repeatingFieldName('attacks', id, 'Attack_Ammo_Capacity')] = cap ? cap : max;
                 });
                 output.version = version;
                 output.announcements = 1;
                 setAttrs(output, {silent:true}, versionator(output.version));
             });
         });
-        
     };
 </script>
 
