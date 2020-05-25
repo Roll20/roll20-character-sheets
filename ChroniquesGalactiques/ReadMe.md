@@ -12,6 +12,11 @@ Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-edi
 3.8 [Screenshot](cog_v3.png)
 
 # Notes de version
+## V2020.0525
+* Reprise des dernières modifications de la fiche COC
+* Nouveau fichier .html pour la fiche
+* Nouveau schema de versionning : AAAA.MMJJ
+
 ## V3.8 (2019-10-10)
 * Ajout buff et calcul auto des PV
 * Modification du sheetworker pour éviter erreurs dans la console API
