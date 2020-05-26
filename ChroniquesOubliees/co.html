@@ -1747,8 +1747,9 @@
     sag: 'pnj_sag',
     per: 'pnj_sag',
     cha: 'pnj_cha',
-    créature: 'profil',
+    creature: 'profil',
     nc: 'niveau',
+    niveau: 'niveau',
     taille: 'TAILLE',
     profil: 'profil',
     init: 'pnj_init',
@@ -1768,7 +1769,7 @@
         res += "|" + field;
       }
     }
-    res += ")\\b";
+    res += "|créature)\\b";//pour la version accentuée
     return new RegExp(res, 'gi');
   }
 
@@ -1781,6 +1782,10 @@
       var stats = eventinfo.newValue;
       if (stats === '') return;
       stats = stats.replace(/\r/g, '');
+      //On enlève les caractères images des dernières versions de COF
+      stats = stats.replace(/\ue1e9/g, ''); //DEF
+      stats = stats.replace(/♥/g, ''); //PV
+      stats = stats.replace(/\ue0bf/g, ''); //Attaque
       stats = stats.replace(/\, /g, ' ');
       var rows = stats.split(/\n/);
       var newAttrs = {};
@@ -1919,8 +1924,9 @@
             }
           } else previousLine = '';
           lexemes.forEach(function(l) {
-            var lstat = l.match[0];
-            var lattr = statsReconnues[lstat.toLowerCase()];
+            var lstat = l.match[0].toLowerCase();
+            var lattr = statsReconnues[lstat];
+            if (lattr === undefined && lstat == 'créature') lattr = statsReconnues.creature;
             if (lattr === undefined) {
               console.log("Erreur ! Pattern " + lstat + " non reconne. La ligne était " + l);
               return;
