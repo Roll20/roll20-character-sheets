@@ -9,6 +9,7 @@
 - Add an option to disable threshold modifier
 - Add monster, normal human, and custom classes as options
 - Add auto-calculating saves and BAB/THAC0 for monsters either as monster HD or as class and level
+- Add monsters in wilderness number appearing values
 
 ### Changed
 
