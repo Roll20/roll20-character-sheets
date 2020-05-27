@@ -1,4 +1,4 @@
-<!-- Hidden Bonuses -->
+<!-- Hidden Inputs -->
 <input type="hidden" name="attr_BonusSTR" value="0" />
 <input type="hidden" name="attr_BonusDEX" value="0" />
 <input type="hidden" name="attr_ArmorBenefitTotal" value="0" />
@@ -760,6 +760,13 @@
       <option value="dac" data-i18n="descending-armor-class">Descending Armor Class</option>
     </select>
   </label>
+  <label class="setting">
+    <span data-i18n="threshold-modifier-enabled">Threshold Modifier Enabled?</span>
+    <select name="attr_thresholdModifierEnabled">
+      <option value="enabled" selected data-i18n="enabled">Enabled</option>
+      <option value="disabled" data-i18n="disabled">Disabled</option>
+    </select>
+  </label>
 </div>
 
 <!-- Attack roll translation -->
@@ -913,11 +920,17 @@
     });
   };
 
-  on("sheet:opened", function (eventInfo) {
-    setAttrs({
-      modquery: "?{" + getTranslationByKey("modifier") + "|0}[" + getTranslationByKey("modifier-mod") + "]",
-      mod: "?{" + getTranslationByKey("modifier-mod") + "|0}[" + getTranslationByKey("modifier-mod") + "]"
-    });
+  on("sheet:opened change:thresholdModifierEnabled", function (eventInfo) {
+    // Check for threshold modifier enabled
+    getAttrs(['thresholdModifierEnabled'], function(values) {
+      if (values.thresholdModifierEnabled.toLowerCase() === "disabled") {
+        setAttrs({ modquery: "0" })
+      } else {
+        setAttrs({
+          modquery: "?{" + getTranslationByKey("modifier") + "|0}[" + getTranslationByKey("modifier-mod") + "]",
+        });
+      }
+    })
 
     // Update saving throws
     getAttrs(["Saving-1", "Saving-2", "Saving-3", "Saving-4", "Saving-5"], function(values) {

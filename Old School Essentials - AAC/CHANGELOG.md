@@ -2,6 +2,14 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.2.0
+
+### Added
+
+- Made the threshold modifier optional
+
+### Fixed
+
 ## 1.1.0
 
 ### Added
