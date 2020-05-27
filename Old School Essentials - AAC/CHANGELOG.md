@@ -6,7 +6,13 @@
 
 ### Added
 
-- Made the threshold modifier optional
+- Add an option to disable threshold modifier
+- Add monster, normal human, and custom classes as options
+- Add auto-calculating saves and BAB/THAC0 for monsters either as monster HD or as class and level
+
+### Changed
+
+- Change class input to a dropdown
 
 ### Fixed
 
