@@ -10,6 +10,8 @@
 
 ### Fixed
 
+- Fix movementEncounter and movementOverland not being available to tokens (needed to be readonly versus disabled, which means it needed to be calculated via sheet workers and not in the value itself)
+
 ## 1.1.0
 
 ### Added

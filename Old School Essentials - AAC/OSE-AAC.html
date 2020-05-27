@@ -317,16 +317,16 @@
           <tbody>
             <tr>
               <td>
-                <input disabled type="number" name="attr_movementEncounter" data-i18n-title="movement-encounter"
-                  title="Movement - Encounter" value="floor(@{movementExploration}/3)" />
+                <input readonly type="number" name="attr_movementEncounter" data-i18n-title="movement-encounter"
+                  title="Movement - Encounter" value="" />
               </td>
               <td>
                 <input type="number" name="attr_movementExploration" data-i18n-title="movement-exploration"
                   title="Movement - Exploration" value="120" />
               </td>
               <td>
-                <input disabled type="number" name="attr_movementOverland" data-i18n-title="movement-overland"
-                  title="Movement - Overland" value="floor(@{movementExploration}/5)" />
+                <input readonly type="number" name="attr_movementOverland" data-i18n-title="movement-overland"
+                  title="Movement - Overland" value="" />
               </td>
             </tr>
           </tbody>
@@ -604,7 +604,7 @@
           <tbody>
             <tr>
               <td>
-                <input disabled type="number" name="attr_movementEncounter" value="floor(@{movementExploration}/3)" />
+                <input readonly type="number" name="attr_movementEncounter" value="" />
               </td>
               <td>
                 <input type="number" name="attr_movementExploration" value="120" />
@@ -944,6 +944,8 @@
     })
   });
 
+
+  // Attribute Changes
   on("sheet:opened change:dex", function () {
     getAttrs(["ACDexMod", "InitDexMod", "BonusDEX", "dex"], function (values) {
       let acBonus = 0;
@@ -982,7 +984,6 @@
       });
     });
   });
-
   on("change:str", function () {
     getAttrs(["BonusSTR", "OpenDoor", "str"], function (values) {
       if (values.str == 3) {
@@ -1023,7 +1024,6 @@
       }
     });
   });
-
   on("change:con", function () {
     getAttrs(["HPConMod", "con"], function (values) {
       if (values.con == 3) {
@@ -1044,6 +1044,18 @@
     });
   });
 
+  // Set speeds based on Exploration Speed
+  on('sheet:opened change:movementExploration', function() {
+    getAttrs(['movementExploration'], function(values) {
+      const explorationSpeed = values.movementExploration;
+      setAttrs({
+        movementEncounter: Math.floor(explorationSpeed/3),
+        movementOverland: Math.floor(explorationSpeed/5)
+      });
+    });
+  });
+
+  // Armor Calculation
   on('sheet:opened change:repeating_armor remove:repeating_armor', function () {
     repeatingSum(
       "ArmorBenefitTotal",
@@ -1068,6 +1080,7 @@
     );
   });
 
+  // Monster Average HP Button
   on('clicked:setAverageHP', function () {
     getAttrs(['monsterHitDice', 'monsterHitDiceModifier'], function (values) {
       const averageHP = Math.floor(
@@ -1125,12 +1138,13 @@
     });
   });
 
+  // Calculate THAC0 from BAB
   on('change:bab', function() {
     getAttrs(['bab'], function(values) {
       setAttrs({ thac0: 19 - values.bab });
     });
   });
-
+  // Calculate BAB from THAC0
   on('change:thac0', function() {
     getAttrs(['thac0'], function(values) {
       setAttrs({ bab: 19 - values.thac0 });
@@ -1484,6 +1498,7 @@
     }
   })
 
+  // Set roll buttons for spells depending on effect having a value
   on("sheet:opened", function () {
     getSectionIDs("repeating_spells", function(idArray) {
       idArray.forEach(function(id) {
