@@ -13,6 +13,7 @@
 ### Changed
 
 - Change class input to a dropdown
+- Change monster attacks so there is no minimum damage
 
 ### Fixed
 
