@@ -1,13 +1,13 @@
-- 
-    const reroll = [
-        `&{template:tftl}`,
-        `{{name=Luck Reroll}}`,
-        `{{character_name=@{character_name}}}`,
-        `{{roll=[[?{Reroll Dice|0}d6>6]]}}`,
-        `{{reroll_dice=?{Reroll Dice|0}}}`,
-        ].join(" ");
-button.hidden(name="roll_reroll", type="roll", value=reroll)
-input(data-i18n-value="Luck Reroll", name="attr_translation_luck", type="hidden", value="Luck Reroll")
+each number in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+    - 
+        const reroll = [
+            `&{template:tftl}`,
+            `{{name=Reroll}}`,
+            `{{character_name=@{character_name}}}`,
+            `{{roll=[[${number}d6>6]]}}`,
+            ].join(" ");
+    button.hidden(name=`roll_reroll${number}`, type="roll", value=reroll)
+input(data-i18n-value="Reroll", name="attr_translation_luck", type="hidden", value="Reroll")
 
 input(name="attr_sheet_version", type="hidden")
 
@@ -18,8 +18,10 @@ input(name="attr_sheet_version", type="hidden")
         .tftl-attributes.tftl-panel--alternate
             .tftl-panel__header(data-i18n="Attributes", class=`background-rand-${Math.floor(Math.random() * 10)+1}`) Attributes
             each attribute in ["Body","Tech","Heart","Mind"]
-                - 
-                    const roll = [
+                -
+                    const button_array = []
+                    for (let i=1; i < 16; i++) button_array[i] = `{{reroll${i}=[@{translation_luck}](~@{character_id}|reroll[[@{${attribute.toLowerCase()}}+?{Bonus Dice|0}-@{upset}-@{scared}-@{exhausted}-@{injured}-@{broken}-${i}]])}}`;  
+                    const roll = [...[
                         `&{template:tftl}`,
                         `{{name=${attribute}}}`,
                         `{{character_name=@{character_name}}}`,
@@ -32,8 +34,7 @@ input(name="attr_sheet_version", type="hidden")
                         `{{exhausted=[[@{exhausted}]]}}`,
                         `{{injured=[[@{injured}]]}}`,
                         `{{broken=[[@{broken}]]}}`,
-                        `{{reroll=[@{translation_luck}](~@{character_id}|reroll)}}`
-                        ].join(" ");
+                        ],...button_array].join(" ");
                 .tftl-panel__row(class=`background-rand-${Math.floor(Math.random() * 10)+1}`)
                     button.tftl-panel__label--button(data-i18n=attribute, type="roll", value=roll)=attribute
                     input.tftl-panel__input--small(name=`attr_${attribute.toLowerCase()}`, type="number", value="0")
