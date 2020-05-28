@@ -470,7 +470,7 @@
     </tr>
     <tr>
         <td colspan="2"><h4><b>Current Weight:</b></h4></td>
-        <td colspan="2"><input type="text" name="attr_mountmovweighttotal" title="@{mountmovweighttotal}" value="(@{Weight}+@{mountgearweighttotal}+@{gearweighttotal})+(@{worn-total-weight})+(@{curweight})+(@{curweight2})+(@{curweight3})+(@{curweight4})+(@{curweight5})+(@{curweight6})" disabled class="sheet-table-dynamic"></td>
+        <td colspan="2"><input type="text" name="attr_mountmovweighttotal" title="@{mountmovweighttotal}" value="(@{Weight}+@{mount-gear-weight-total}+@{gearweighttotal})+(@{worn-total-weight})+(@{curweight})+(@{curweight2})+(@{curweight3})+(@{curweight4})+(@{curweight5})+(@{curweight6})" disabled class="sheet-table-dynamic"></td>
         <td><h4><b>lbs.</b></h4></td>
     </tr>
 </table>
@@ -3424,7 +3424,7 @@
                 <table class="sheet-table-white">
                     <tr>
                         <td></td>
-                        <td><input type="number" name="attr_profslotsremaining" title="@{profslotsremaining}" class="sheet-short" disabled/></td>
+                        <td><input type="number" name="attr_profslotsremain" title="@{profslotsremain}" class="sheet-short" disabled/></td>
                     </tr>
                     <tr class="sheet-default-header">
                         <td>Proficiency</td>
@@ -7161,12 +7161,12 @@
             <div style="width:411px">
                 <div style="display:inline-block;">
                     <h4><b>Current mount weight:</b></h4>
-                    <input type="text" name="attr_mountgearweighttotal" title="@{mountgearweighttotal}" value="0" class="sheet-sym" readonly>
+                    <input type="text" name="attr_mount-gear-weight-total" title="@{mount-gear-weight-total}" value="0" class="sheet-sym" readonly>
                     <h4><b>lbs.</b></h4>
                 </div>
                 <div style="display:inline-block; float:right">
                     <h4><b>Current stored weight:</b></h4>
-                    <input type="text" name="attr_storedgearweighttotal" title="@{storedgearweighttotal}" value="0" class="sheet-sym" readonly>
+                    <input type="text" name="attr_stored-gear-weight-total" title="@{stored-gear-weight-total}" value="0" class="sheet-sym" readonly>
                     <h4><b>lbs.</b></h4>
                 </div>
             </div>
@@ -16379,7 +16379,7 @@ on('change:repeating_weaponprofs remove:repeating_weaponprofs change:weapprofnum
             
         },{weapprofnum:0, desc: []},function(m,r,a){
             m.weapprofnum+=a.I.weapprofnum;
-            a.weapprofslotsremain=(a.weapprofslotstotal-m.weapprofnum);
+            a.weapprofslotsremain=(a.I.weapprofslotstotal-m.I.weapprofnum);
         })
         .execute();
 });
@@ -16388,7 +16388,7 @@ on('change:repeating_weaponprofs remove:repeating_weaponprofs change:weapprofnum
 on('change:repeating_profs remove:repeating_profs change:profslots change:profslotstotalcalc', function(){
 
     TAS.repeating('repeating_profs')
-        .attrs('profslotsremaining','profslotstotalcalc','profslots')  
+        .attrs('profslotsremain','profslotstotalcalc','profslots')  
         .fields('profslots') 
         .reduce(function(m,r){
             m.profslots+=r.I.profslots;
@@ -16396,7 +16396,7 @@ on('change:repeating_profs remove:repeating_profs change:profslots change:profsl
             
         },{profslots:0, desc: []},function(m,r,a){
             m.profslots+=a.I.profslots;
-            a.profslotsremaining=(a.profslotstotalcalc-m.profslots);
+            a.profslotsremain=(a.I.profslotstotalcalc-m.I.profslots);
         })
         .execute();
 });
@@ -16456,18 +16456,18 @@ on('change:repeating_gear remove:repeating_gear change:gearweight change:gearqty
 on('change:repeating_gear-stored remove:repeating_gear-stored change:on-mount change:gear-stored-weight change:gear-stored-qty', function(){
     
     TAS.repeating('gear-stored')
-        .attrs('mountgearweighttotal','storedgearweighttotal','on-mount','gear-stored-weight','gear-stored-qty')
+        .attrs('mount-gear-weight-total','stored-gear-weight-total','on-mount','gear-stored-weight','gear-stored-qty')
         .fields('on-mount','gear-stored-weight','gear-stored-qty')
         .reduce(function(m,r){
-            m.allgearweight+=(r.F.gear-stored-weight*r.I.gear-stored-qty);
-            m.mountgearweight+=(r.F.gear-stored-weight*r.I.gear-stored-qty*r.I['on-mount']);
+            m.allgearweight+=(r.F['gear-stored-weight']*r.I['gear-stored-qty']);
+            m.mountgearweight+=(r.F['gear-stored-weight']*r.I['gear-stored-qty']*r.I['on-mount']);
             return m;
         
-    },{allgearweight:0,mountgearweight:0,['on-mount']:0, desc: []},function(m,r,a){
-        m.allgearweight+=(a.F.gear-stored-weight*a.I.gear-stored-qty);
-        m.mountgearweight+=(a.F.gear-stored-weight*a.I.gear-stored-qty*a.I['on-mount']);
-        a.D[2].mountgearweighttotal=m.mountgearweight;
-        a.D[2].storedgearweighttotal=(m.allgearweight-m.mountgearweight);
+    },{allgearweight:0,mountgearweight:0, desc: []},function(m,r,a){
+        m.allgearweight+=(a.F['gear-stored-weight']*a.I['gear-stored-qty']);
+        m.mountgearweight+=(a.F['gear-stored-weight']*a.I['gear-stored-qty']*a.I['on-mount']);
+        a.D[2]['mount-gear-weight-total']=m.mountgearweight;
+        a.D[2]['stored-gear-weight-total']=(m.allgearweight-m.mountgearweight);
     })
     .execute();
 })
