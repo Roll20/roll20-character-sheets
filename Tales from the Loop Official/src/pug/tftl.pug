@@ -1,9 +1,10 @@
-each number in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+each number in [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
     - 
         const reroll = [
             `&{template:tftl}`,
             `{{name=Reroll}}`,
             `{{character_name=@{character_name}}}`,
+            `{{reroll_dice=${number}}}`,
             `{{roll=[[${number}d6>6]]}}`,
             ].join(" ");
     button.hidden(name=`roll_reroll${number}`, type="roll", value=reroll)
@@ -20,7 +21,7 @@ input(name="attr_sheet_version", type="hidden")
             each attribute in ["Body","Tech","Heart","Mind"]
                 -
                     const button_array = []
-                    for (let i=1; i < 16; i++) button_array[i] = `{{reroll${i}=[@{translation_luck}](~@{character_id}|reroll[[@{${attribute.toLowerCase()}}+?{Bonus Dice|0}-@{upset}-@{scared}-@{exhausted}-@{injured}-@{broken}-${i}]])}}`;  
+                    for (let i=0; i < 16; i++) button_array[i] = `{{reroll${i}=[@{translation_luck}](~@{character_id}|reroll[[@{${attribute.toLowerCase()}}+?{Bonus Dice|0}-@{upset}-@{scared}-@{exhausted}-@{injured}-@{broken}-${i}]])}}`;  
                     const roll = [...[
                         `&{template:tftl}`,
                         `{{name=${attribute}}}`,
@@ -49,12 +50,14 @@ input(name="attr_sheet_version", type="hidden")
         .tftl-attributes.tftl-panel--alternate
             .tftl-panel__header(data-i18n="Skills", class=`background-rand-${Math.floor(Math.random() * 10)+1}`) Skills
             each skill in [{name:"Sneak", stat:"Body"},{name:"Force", stat:"Body"},{name:"Move", stat:"Body"},{name:"Tinker", stat:"Tech"},{name:"Program", stat:"Tech"},{name:"Calculate", stat:"Tech"},{name:"Contact", stat:"Heart"},{name:"Charm", stat:"Heart"},{name:"Lead", stat:"Heart"},{name:"Investigate", stat:"Mind"},{name:"Comprehend", stat:"Mind"},{name:"Empathize", stat:"Mind"}]
-                - 
-                    const roll = [
+                -
+                    const button_array = []
+                    for (let i=0; i < 16; i++) button_array[i] = `{{reroll${i}=[@{translation_luck}](~@{character_id}|reroll[[@{${skill.stat.toLowerCase()}}+@{${skill.name.toLowerCase()}}+?{Bonus Dice|0}-@{upset}-@{scared}-@{exhausted}-@{injured}-@{broken}-${i}]])}}`;  
+                    const roll = [...[
                         `&{template:tftl}`,
                         `{{name=${skill.name}}}`,
                         `{{character_name=@{character_name}}}`,
-                        `{{roll=[[[[@{${skill.name}}+?{Bonus Dice|0}-@{upset}-@{scared}-@{exhausted}-@{injured}-@{broken}]]d6>6]]}}`,
+                        `{{roll=[[[[@{${skill.stat.toLowerCase()}}+${skill.name.toLowerCase()}}+?{Bonus Dice|0}-@{upset}-@{scared}-@{exhausted}-@{injured}-@{broken}]]d6>6]]}}`,
                         `{{stat_value=@{${skill.stat.toLowerCase()}}}}`,
                         `{{stat_title=${skill.stat.toLowerCase()}}}`,
                         `{{skill_value=@{${skill.name.toLowerCase()}}}}`,
@@ -66,7 +69,7 @@ input(name="attr_sheet_version", type="hidden")
                         `{{injured=[[@{injured}]]}}`,
                         `{{broken=[[@{broken}]]}}`,
                         `{{reroll=[@{translation_luck}](~@{character_id}|reroll)}}`
-                        ].join(" ");
+                        ],...button_array].join(" ");
 
                 .tftl-panel__row(class=`background-rand-${Math.floor(Math.random() * 10)+1}`)
                     button.tftl-panel__label--button(data-i18n=`${skill.name} (${skill.stat})`, type="roll", value=roll)=`${skill.name} (${skill.stat})`
