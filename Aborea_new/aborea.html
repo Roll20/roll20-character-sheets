@@ -40,10 +40,10 @@
             <div class="sheet-row">
                 <label class="sheet-redbg">Spieler-Name</label><input type="text" name="attr_SpielerName" />
             </div>
-            <div class="sheet-row">
-                <div class="sheet-twice"><label class="sheet-redbg">Volk</label><input type="text" name="attr_Volk" />
+            <div class="sheet-row sheet-twice">
+                <div><label class="sheet-redbg">Volk</label><input type="text" name="attr_Volk" />
                 </div>
-                <div class="sheet-twice sheet-beruf">
+                <div class="sheet-beruf">
                     <label class="sheet-switch">
                         <input type="checkbox" name="attr_toggle_beruf" value="1" checked />
                         <span class="sheet-slider"></span>
@@ -63,19 +63,29 @@
                 </div>
             </div>
             <div class="sheet-row sheet-settings">
-                <div class="sheet-twice">
+                <div>
                     <label class="sheet-switch">
                         <input type="checkbox" name="attr_calcmoney" value="1" checked />
                         <span class="sheet-slider"></span>
                     </label>
                     Geldberechnung
                 </div>
-                <div class="sheet-twice">
+                <div>
                     <label class="sheet-switch">
                         <input type="checkbox" name="attr_calcleben" value="1" checked />
                         <span class="sheet-slider"></span>
                     </label>
                     Lebensberechnung
+                </div>
+                <div>
+
+                </div>
+                <div>
+                    <label class="sheet-switch">
+                        <input type="checkbox" name="attr_calcmana" value="1" checked />
+                        <span class="sheet-slider"></span>
+                    </label>
+                    Manaberechnung
                 </div>
             </div>
         </div>
@@ -699,18 +709,19 @@
         });
     });
 
-    on("change:beruf change:inb change:chb change:mag", function() {
-        getAttrs(["beruf", "inb", "chb", "mag"], function(values) {
+    on("change:beruf change:inb change:chb change:mag change:calcmana", function() {
+        getAttrs(["beruf", "inb", "chb", "mag", "calcmana"], function(values) {
+            let calcmana = parseInt(values.calcmana) || 0;
             let beruf = values.beruf || 0;
             let inb = parseInt(values.inb) || 0;
             let chb = parseInt(values.chb) || 0;
             let mag = parseInt(values.mag) || 0;
-            if (beruf == "Dieb" || beruf == "Krieger" || beruf == "Waldläufer" || beruf == "Zauberer") {
+            if (beruf == "Dieb" || beruf == "Krieger" || beruf == "Waldläufer" || beruf == "Zauberer" && calcmana == 1) {
                 setAttrs({
                     mana_max: Math.floor((inb + 3) * mag)
                 });
             }
-            if (beruf == "Barde" || beruf == "Priester" || beruf == "Schamane") {
+            if (beruf == "Barde" || beruf == "Priester" || beruf == "Schamane" && calcmana == 1) {
                 setAttrs({
                     mana_max: Math.floor((chb + 3) * mag)
                 });
