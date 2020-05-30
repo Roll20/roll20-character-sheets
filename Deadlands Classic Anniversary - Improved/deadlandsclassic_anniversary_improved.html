@@ -1,8 +1,8 @@
 <!-- TODO - Common rolls -->
-<!-- <div class="sheet-core sheet-core-common" style="display: none;">
+<!-- <div class="sheet-core sheet-core sheet-core-common" style="display: none;">
   <h2 data-i18n="commonRolls">Common Rolls</h2>
       <label><b><span data-i18n="gutsAndGrit">Guts + Grit</span></b></label>
-      <button type="roll" name="roll_GutsGrit" value="@{gmtoggle}&{template:simple}  {{rollname=@{gutsAndGritMacro}}} {{dice=[[@{gutslvl}@{spidtype}!!k1+@{gutsmod}+@{grit}]]}}"></button>
+      
   </div>
 </div> -->
 
@@ -15,7 +15,7 @@
 
 <!-- Shooting & Perfomin-->
 <script type="text/worker">
-  on("sheet:opened change:llegwtype change:rlegwtype change:gutswtype change:larmwtype change:rarmwtype change:headwtype", function() {
+  on("change:llegwtype change:rlegwtype change:gutswtype change:larmwtype change:rarmwtype change:headwtype", function() {
     getAttrs(["llegwtype", "rlegwtype", "gutswtype", "larmwtype", "rarmwtype", "headwtype"], function(values) {
       var wounds_max = Math.max(values.llegwtype, values.rlegwtype, values.gutswtype, values.larmwtype, values.rarmwtype, values.headwtype);
       setAttrs({
@@ -24,11 +24,39 @@
     });
   });
 
-  on("sheet:opened change:fatew change:fater change:fateb change:fatel", function() {
+  on("change:fatew change:fater change:fateb change:fatel", function() {
     getAttrs(["fatew", "fater", "fateb", "fatel"], function(values) {
       setAttrs({
         total_chips: parseInt(values.fatew) + parseInt(values.fater) + parseInt(values.fateb) + parseInt(values.fatel)
       })
+    });
+  });
+
+  on("sheet:opened change:repeating_shootinconc change:repeating_range", function(eventInfo) {
+    const total_options = 6;
+    getSectionIDs("shootinconc", function(shootin_ids) {
+      let shootinfields = [];
+      shootin_ids.forEach(id => {
+        shootinfields.push(`repeating_shootinconc_${id}_shootinconc`);
+      });
+
+      getAttrs(shootinfields, function(values) {
+        let skills = [];
+        for(let i = 0; i < shootinfields.length; i++) {
+          skills.push(values[shootinfields[i]]);
+        }
+
+        let options = {}
+        getSectionIDs("range", function(range_ids) {
+          range_ids.forEach(id => {
+            for(let i = 0; i < total_options; i++) {
+              options[`repeating_range_${id}_ranged_skill_name_${i}`] = skills[i] ? skills[i] : '';
+            }
+          });
+          log(options);
+          setAttrs(options);
+        });
+      });
     });
   });
 
@@ -91,13 +119,13 @@
       sneakMacro: getTranslationByKey("sneak"),
       swimmingMacro: getTranslationByKey("swimming"),
       quicknessMacro: getTranslationByKey("quickness"),
-      quickDrawMacro: getTranslationByKey("quickDraw")
+      quickDrawMacro: getTranslationByKey("quickDraw"),
+      surpriseMacro: getTranslationByKey("surprise")
     });
   });
 </script>
 
 <rolltemplate class="sheet-rolltemplate-simple">
-  <div class="sheet-rolltemplate-default">
     <table>
       <caption>{{rollname}}</caption>
       <tbody>
@@ -115,7 +143,7 @@
       {{/strength}}
       {{#meleedamage}}
       <tr>
-        <td><span data-i18n="weaponDamage">Weapon Damage</span></td>
+        <td><span data-i18n="damage">Damage</span></td>
         <td>
           <span class="inlinerollresult showtip">{{#rollTotal() meleedamage 0}}{{/rollTotal() meleedamage 0}}</span>
           <span>{{#rollGreater() meleedamage 0}}{{meleedamage}}{{/rollGreater() meleedamage 0}}</span>
@@ -129,27 +157,29 @@
       </tr>
       {{/damage}}
       {{#location}}
+      {{#rollGreater() location 0}}
       <tr>
         <td><span data-i18n="location">Location</span></td>
         <td>
-          <span>{{#rollTotal() location 1}}<span data-i18n="leftLeg">Left Leg</span>, {{location}}{{/rollTotal() location 1}}</span>
-          <span>{{#rollTotal() location 2}}<span data-i18n="rightLeg">Right Leg</span>, {{location}}{{/rollTotal() location 2}}</span>
-          <span>{{#rollTotal() location 3}}<span data-i18n="leftLeg">Left Leg</span>, {{location}}{{/rollTotal() location 3}}</span>
-          <span>{{#rollTotal() location 4}}<span data-i18n="rightLeg">Right Leg</span>, {{location}}{{/rollTotal() location 4}}</span>
-          <span>{{#rollBetween() location 5 9}}<span data-i18n="lowerGuts">Lower Guts</span>, {{location}}{{/rollBetween() location 5 9}}</span>
-          <span>{{#rollTotal() location 10}}<span data-i18n="gizzards">Gizzards</span>, {{location}}{{/rollTotal() location 10}}</span>
-          <span>{{#rollTotal() location 11}}<span data-i18n="leftArm">Left Arm</span>, {{location}}{{/rollTotal() location 11}}</span>
-          <span>{{#rollTotal() location 12}}<span data-i18n="rightArm">Right Arm</span>, {{location}}{{/rollTotal() location 12}}</span>
-          <span>{{#rollTotal() location 13}}<span data-i18n="leftArm">Left Arm</span>, {{location}}{{/rollTotal() location 13}}</span>
-          <span>{{#rollTotal() location 14}}<span data-i18n="rightArm">Right Arm</span>, {{location}}{{/rollTotal() location 14}}</span>
-          <span>{{#rollBetween() location 15 19}}<span data-i18n="upperGuts">Upper Guts</span>, {{location}}{{/rollBetween() location 15 19}}</span>
-          <span>{{#rollTotal() location 20}}<span data-i18n="nogging">Noggin'</span>, {{location}}{{/rollTotal() location 20}}</span>
+          {{location}} - 
+          {{#rollTotal() location 1}}<span data-i18n="leftLeg">Left Leg</span>{{/rollTotal() location 1}}
+          {{#rollTotal() location 2}}<span data-i18n="rightLeg">Right Leg</span>{{/rollTotal() location 2}}
+          {{#rollTotal() location 3}}<span data-i18n="leftLeg">Left Leg</span>{{/rollTotal() location 3}}
+          {{#rollTotal() location 4}}<span data-i18n="rightLeg">Right Leg</span>{{/rollTotal() location 4}}
+          {{#rollBetween() location 5 9}}<span data-i18n="lowerGuts">Lower Guts</span>{{/rollBetween() location 5 9}}
+          {{#rollTotal() location 10}}<span data-i18n="gizzards">Gizzards</span>{{/rollTotal() location 10}}
+          {{#rollTotal() location 11}}<span data-i18n="leftArm">Left Arm</span>{{/rollTotal() location 11}}
+          {{#rollTotal() location 12}}<span data-i18n="rightArm">Right Arm</span>{{/rollTotal() location 12}}
+          {{#rollTotal() location 13}}<span data-i18n="leftArm">Left Arm</span>{{/rollTotal() location 13}}
+          {{#rollTotal() location 14}}<span data-i18n="rightArm">Right Arm</span>{{/rollTotal() location 14}}
+          {{#rollBetween() location 15 19}}<span data-i18n="upperGuts">Upper Guts</span>{{/rollBetween() location 15 19}}
+          {{#rollTotal() location 20}}<span data-i18n="nogging">Noggin'</span>{{/rollTotal() location 20}}
         </td>
       </tr>
+      {{/rollGreater() location 0}}
       {{/location}}
       </tbody>
     </table>
-  </div>
 </rolltemplate>
 
 <!-- Sheet Wrapper - Start -->
@@ -174,7 +204,7 @@
   <div class="sheet-header sheet-bounty">
     <h2><label data-i18n="bounty">Bounty</label> <span style="font-size: xx-small;"><label data-i18n="unspent" for="attr_bountyunspent">unspent</label> / <label data-i18n="total" for="attr_bountytotal">total</label></span></h2>
     <div class="sheet-grid-1m1">
-      <input type="text" name="attr_bountyunspent"/>
+      <input type="text" name="attr_bountyunspent" />
       /
       <input type="text" name="attr_bountytotal" />
     </div>
@@ -182,25 +212,27 @@
   <!-- Sheet Header - End -->
 
   <!-- Core Tab - Start -->
-  <div class="sheet-core-pace">
+  <div class="sheet-core sheet-core-pace">
     <label data-i18n="pace" for="attr_pace">Pace</label>
-    <input type="text" name="attr_pace" placeholder="6" />
+    <input type="text" name="attr_pace" value="0" />
   </div>
-  <div class="sheet-core-size">
+  <div class="sheet-core sheet-core-size">
     <label data-i18n="size" for="attr_size">Size</label>
-    <input type="text" name="attr_size" placeholder="6" />
+    <input type="text" name="attr_size" value="6" />
   </div>
-  <div class="sheet-core-wind">
+  <div class="sheet-core sheet-core-wind">
     <label data-i18n="maxWind" for="attr_maxwind">Max Wind</label>
-    <input type="text" name="attr_maxwind" placeholder="0" />
+    <input type="text" name="attr_maxwind" value="0" />
   </div>
-  <div class="sheet-core-grit">
+  <div class="sheet-core sheet-core-grit">
     <label data-i18n="grit" for="attr_grit">Grit</label>
-    <input type="text" name="attr_grit" placeholder="0" />
+    <input type="text" name="attr_grit" value="0" />
   </div>
-  <div class="sheet-sidebar-left">
-    <input type="checkbox" class="sheet-section-toggle" name="attr_fate_chips_toggle" checked="checked" />
+  <div class="sheet-sidebar sheet-sidebar-left">
+    <input type="checkbox" class="sheet-section sheet-section-toggle" name="attr_fate_chips_toggle" checked="checked" />
     <h2><label data-i18n="chips" for="attr_fate_chips_toggle">Fate Chips</label><span class="sheet-arrow sheet-arrow-up">&#9650;</span><span class="sheet-arrow sheet-arrow-down">&#9660;</span></h2>
+    <input class="sheet-chips-total" type="hidden" value="0" name="attr_total_chips" />
+    <div class="sheet-error"><span data-i18n="hoardingChips">You appear to be hoardin' chips partner. Suggestin' you spend some.</span></div>
     <div class="sheet-numberlist sheet-numberlist-white sheet-chips">
         <h3 data-i18n="chipsW">White</h3>
         <div class="sheet-numberlist-item"><input type="radio" name="attr_fatew" value="0" checked="checked" /><label for="attr_fatew0">0</label></div>
@@ -252,11 +284,9 @@
         <div class="sheet-numberlist-item"><input type="radio" name="attr_fatel" value="4" /><label for="attr_fatel4">4</label></div>
         <div class="sheet-numberlist-item"><input type="radio" name="attr_fatel" value="5" /><label for="attr_fatel5">5</label></div>
     </div>
-    <input type="hidden" value="0" name="attr_total_chips" />
   </div>
-  <div class="sheet-sidebar-right">
-    <input type="hidden" value="0" name="attr_wound_mod" />
-    <input type="checkbox" class="sheet-section-toggle" name="attr_wounds_toggle" checked="checked" />
+  <div class="sheet-sidebar sheet-sidebar-right">
+    <input type="checkbox" class="sheet-section sheet-section-toggle" name="attr_wounds_toggle" checked="checked" />
     <h2><label data-i18n="wounds" for="attr_wounds_toggle">Wounds</label><span class="sheet-arrow sheet-arrow-up">&#9650;</span><span class="sheet-arrow sheet-arrow-down">&#9660;</span></h2>
     <div class="sheet-wounds">
       <h3 data-i18n="leftLeg">Left Leg</h3>
@@ -361,10 +391,10 @@
   <input type="radio" class="sheet-tab" name="sheet-tabs" value="1" title="Traits &amp; Aptitudes" checked="checked" />
   <label for="sheet-tab-traits" class="sheet-tab" data-i18n="traits">Traits &amp; Aptitudes</label>
 
-  <div class="sheet-section-traits sheet-borderdiv">
+  <div class="sheet-section sheet-section-traits sheet-borderdiv">
     <!-- Cognition -- Start -->
     <div class="sheet-borderdiv">
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h3 data-i18n="cognition">Cognition</h3>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_coglvl" value="1" />
@@ -377,74 +407,74 @@
             <option value="d12">12</option>
           </select>
         </div>
-        <button type="roll" name="roll_cognition" value="@{gmtoggle}&{template:simple}  {{rollname=@{cognitionMacro}}} {{dice=[[@{coglvl}@{cogdtype}!!k1]]}}"></button>
+        <button type="roll" name="roll_cognition" value="@{gmtoggle}&{template:simple} {{rollname=@{cognitionMacro}}} {{dice=[[@{coglvl}@{cogdtype}!!k1]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="artillery">Artillery</h4>
         <div class="sheet-grid-1m1">
-          <input type="text" name="attr_artillerylvl" />
+          <input type="text" name="attr_artillerylvl" value="0" min="1" />
           +
           <input type="text" name="attr_artillerymod" />
         </div>
-        <button type="roll" name="roll_artillery" value="@{gmtoggle}&{template:simple}  {{rollname=@{artilleryMacro}}} {{dice=[[@{artillerylvl}@{cogdtype}!!k1+@{artillerymod}]]}}"></button>
+        <button type="roll" name="roll_artillery" value="@{gmtoggle}&{template:simple} {{rollname=@{artilleryMacro}}} {{dice=[[@{artillerylvl}@{cogdtype}!!k1+@{artillerymod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="art">Arts</h4>
       </div>
-      <fieldset class="repeating_artconc sheet-item-traits-concentration">
-        <div class="sheet-item-traits sheet-item-traits">
-          <input type="text" name="attr_artconc" placeholder="Concentration" />
+      <fieldset class="repeating_artconc sheet-item sheet-item-traits-concentration">
+        <div class="sheet-item sheet-item-traits sheet-item sheet-item-traits">
+          <input type="text" name="attr_artconc" value="Concentration" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_artlvl" />
             +
             <input type="text" name="attr_artconcmod" />
           </div>
-          <button type="roll" name="roll_artconc" value="@{gmtoggle}&{template:simple} {{rollname=@{artMacro} - @{artconc}}} {{dice=[[@{artlvl}@{cogdtype}!!k1+@{artconcmod}]]}}"></button>
+          <button type="roll" name="roll_artconc" value="@{gmtoggle}&{template:simple} {{rollname=@{artMacro}: @{artconc}}} {{dice=[[@{artlvl}@{cogdtype}!!k1+@{artconcmod}]]}}"></button>
         </div>
       </fieldset>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="scrutinize">Scrutinize</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_scrutinizelvl" />
           +
           <input type="text" name="attr_scrutinizemod" />
         </div>
-        <button type="roll" name="roll_scruitinize" value="@{gmtoggle}&{template:simple}  {{rollname=@{scrutinizeMacro}}} {{dice=[[@{scrutinizelvl}@{cogdtype}!!k1+@{scrutinizemod}]]}}"></button>
+        <button type="roll" name="roll_scruitinize" value="@{gmtoggle}&{template:simple} {{rollname=@{scrutinizeMacro}}} {{dice=[[@{scrutinizelvl}@{cogdtype}!!k1+@{scrutinizemod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4><span data-i18n="search">Search</span> (1)</h4>
         <div class="sheet-grid-1m1">
-          <input type="text" name="attr_searchlvl" value="1" placeholder="Starts at 1" />
+          <input type="text" name="attr_searchlvl" value="1" />
           +
           <input type="text" name="attr_searchmod" />
         </div>
-        <button type="roll" name="roll_search" value="@{gmtoggle}&{template:simple}  {{rollname=@{searchMacro}}} {{dice=[[@{searchlvl}@{cogdtype}!!k1+@{searchmod}]]}}"></button>
+        <button type="roll" name="roll_search" value="@{gmtoggle}&{template:simple} {{rollname=@{searchMacro}}} {{dice=[[@{searchlvl}@{cogdtype}!!k1+@{searchmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="tracking">Trackin'</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_trackinlvl" />
           +
           <input type="text" name="attr_trackinmod" />
         </div>
-        <button type="roll" name="roll_tracking" value="@{gmtoggle}&{template:simple}  {{rollname=@{trackingMacro}}} {{dice=[[@{trackinlvl}@{cogdtype}!!k1+@{trackinmod}]]}}"></button>
+        <button type="roll" name="roll_tracking" value="@{gmtoggle}&{template:simple} {{rollname=@{trackingMacro}}} {{dice=[[@{trackinlvl}@{cogdtype}!!k1+@{trackinmod}]]}}"></button>
       </div>
       <fieldset class="repeating_extracogapt">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_extracogapt" placeholder="Additional Aptitude" />
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_extracogapt" value="Additional Aptitude" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_extracogaptlvl" />
             +
             <input type="text" name="attr_extracogaptmod" />
           </div>
-          <button type="roll" name="roll_extracog" value="@{gmtoggle}&{template:simple}  {{rollname=^@{extracogapt}}} {{dice=[[@{extracogaptlvl}@{cogdtype}!!k1+@{extracogaptmod}]]}}"></button>
+          <button type="roll" name="roll_extracog" value="@{gmtoggle}&{template:simple} {{rollname=^@{extracogapt}}} {{dice=[[@{extracogaptlvl}@{cogdtype}!!k1+@{extracogaptmod}]]}}"></button>
         </div>
       </fieldset>
     </div>
     <!-- Cognition -- End -->
     <!-- Deftness -- Start -->
     <div class="sheet-borderdiv">
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h3 data-i18n="deftness">Deftness</h3>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_deflvl" value="1" />
@@ -457,97 +487,97 @@
             <option value="d12">12</option>
           </select>
         </div>
-        <button type="roll" name="roll_Deftness" value="@{gmtoggle}&{template:simple}  {{rollname=@{deftnessMacro}}} {{dice=[[@{deflvl}@{defdtype}!!k1]]}}"></button>
+        <button type="roll" name="roll_Deftness" value="@{gmtoggle}&{template:simple} {{rollname=@{deftnessMacro}}} {{dice=[[@{deflvl}@{defdtype}!!k1]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="bow">Bow</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_bowlvl" />
           +
           <input type="text" name="attr_bowmod" />
         </div>
-        <button type="roll" name="roll_Bow" value="@{gmtoggle}&{template:simple}  {{rollname=@{bowMacro}}} {{dice=[[@{bowlvl}@{defdtype}!!k1+@{bowmod}]]}}"></button>
+        <button type="roll" name="roll_Bow" value="@{gmtoggle}&{template:simple} {{rollname=@{bowMacro}}} {{dice=[[@{bowlvl}@{defdtype}!!k1+@{bowmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="filching">Filchin'</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_filchinlvl" />
           +
           <input type="text" name="attr_filchinmod" />
         </div>
-        <button type="roll" name="roll_Filchin" value="@{gmtoggle}&{template:simple}  {{rollname=@{filchingMacro}}} {{dice=[[@{filchinlvl}@{defdtype}!!k1+@{filchinmod}]]}}"></button>
+        <button type="roll" name="roll_Filchin" value="@{gmtoggle}&{template:simple} {{rollname=@{filchingMacro}}} {{dice=[[@{filchinlvl}@{defdtype}!!k1+@{filchinmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="lockpicking">Lockpickin'</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_lockpickinlvl" />
           +
           <input type="text" name="attr_lockpickinmod" />
         </div>
-        <button type="roll" name="roll_Lockpickin" value="@{gmtoggle}&{template:simple}  {{rollname=@{lockpickingMacro}}} {{dice=[[@{lockpickinlvl}@{defdtype}!!k1+@{lockpickinmod}]]}}"></button>
+        <button type="roll" name="roll_Lockpickin" value="@{gmtoggle}&{template:simple} {{rollname=@{lockpickingMacro}}} {{dice=[[@{lockpickinlvl}@{defdtype}!!k1+@{lockpickinmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="shooting">Shootin'</h4>
-      </div>
-      <fieldset class="repeating_shootinconc sheet-item-traits-concentration">
-        <div class="sheet-item-traits">
+    </div>
+      <fieldset class="repeating_shootinconc sheet-item sheet-item-traits-concentration">
+        <div class="sheet-item sheet-item-traits">
           <input type="text" name="attr_shootinconc" placeholder="Type of Gun" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_shootinlvl" />
             +
             <input type="text" name="attr_shootinconcmod" />
           </div>
-          <button type="roll" name="roll_shootin" value="@{gmtoggle}&{template:simple}  {{rollname=@{shootingMacro} - @{shootinconc}}} {{dice=[[@{shootinlvl}@{defdtype}!!k1+@{shootinconcmod}]]}}"></button>
+          <button type="roll" name="roll_shootin" value="@{gmtoggle}&{template:simple} {{rollname=@{shootingMacro}: @{shootinconc}}} {{dice=[[@{shootinlvl}@{defdtype}!!k1+@{shootinconcmod}]]}}"></button>
         </div>
       </fieldset>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="sleightofhand">Sleight o' Hand</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_sleightohandlvl" />
           +
           <input type="text" name="attr_sleightohandmod" />
         </div>
-        <button type="roll" name="roll_sleightohand" value="@{gmtoggle}&{template:simple}  {{rollname=@{sleightofhandMacro}}} {{dice=[[@{sleightohandlvl}@{defdtype}!!k1+@{sleightohandmod}]]}}"></button>
+        <button type="roll" name="roll_sleightohand" value="@{gmtoggle}&{template:simple} {{rollname=@{sleightofhandMacro}}} {{dice=[[@{sleightohandlvl}@{defdtype}!!k1+@{sleightohandmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="speedload">Speed Load</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_speedloadlvl" />
           +
           <input type="text" name="attr_speedloadmod" />
         </div>
-        <button type="roll" name="roll_speedload" value="@{gmtoggle}&{template:simple}  {{rollname=@{speedloadMacro}}} {{dice=[[@{speedloadlvl}@{defdtype}!!k1+@{speedloadmod}]]}}"></button>
+        <button type="roll" name="roll_speedload" value="@{gmtoggle}&{template:simple} {{rollname=@{speedloadMacro}}} {{dice=[[@{speedloadlvl}@{defdtype}!!k1+@{speedloadmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="throwing">Throwin'</h4>
       </div>
-      <fieldset class="repeating_throwinconc sheet-item-traits-concentration">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_throwinconc" placeholder="Type of Weapon" />
+      <fieldset class="repeating_throwinconc sheet-item sheet-item-traits-concentration">
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_throwinconc" value="Type of Weapon" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_throwinlvl" />
             +
             <input type="text" name="attr_throwincmod" />
           </div>
-          <button type="roll" name="roll_Throwin" value="@{gmtoggle}&{template:simple}  {{rollname=@{throwingMacro} - @{throwinconc}}} {{dice=[[@{throwinlvl}@{defdtype}!!k1+@{throwincmod}]]}}"></button>
+          <button type="roll" name="roll_Throwin" value="@{gmtoggle}&{template:simple} {{rollname=@{throwingMacro}: @{throwinconc}}} {{dice=[[@{throwinlvl}@{defdtype}!!k1+@{throwincmod}]]}}"></button>
         </div>
       </fieldset>
       <fieldset class="repeating_extradefapt">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_extradefapt" placeholder="Additional Aptitude" />
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_extradefapt" value="Additional Aptitude" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_extradefaptlvl" />
             +
             <input type="text" name="attr_extradefaptmod" />
           </div>
-          <button type="roll" name="roll_extradefapt" value="@{gmtoggle}&{template:simple}  {{rollname=^@{extradefapt}}} {{dice=[[@{extradefaptlvl}@{defdtype}!!k1+@{extradefaptmod}]]}}"></button>
+          <button type="roll" name="roll_extradefapt" value="@{gmtoggle}&{template:simple} {{rollname=^@{extradefapt}}} {{dice=[[@{extradefaptlvl}@{defdtype}!!k1+@{extradefaptmod}]]}}"></button>
         </div>
       </fieldset>
     </div>
     <!-- Deftness -->
     <!-- Knowledge -->
     <div class="sheet-borderdiv">
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h3 data-i18n="knowledge">Knowledge</h3>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_knolvl" value="1" />
@@ -560,158 +590,158 @@
             <option value="d12">12</option>
           </select>
         </div>
-        <button type="roll" name="roll_Knowledge" value="@{gmtoggle}&{template:simple}  {{rollname=@{knowledgeMacro}}} {{dice=[[@{knolvl}@{knodtype}!!k1]]}}"></button>
+        <button type="roll" name="roll_Knowledge" value="@{gmtoggle}&{template:simple} {{rollname=@{knowledgeMacro}}} {{dice=[[@{knolvl}@{knodtype}!!k1]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="academia">Academia</h4>
       </div>
-      <fieldset class="repeating_academiaconc sheet-item-traits-concentration">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_academianame" placeholder="Academia" />
+      <fieldset class="repeating_academiaconc sheet-item sheet-item-traits-concentration">
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_academianame" value="Academia" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_academialvl" />
             +
             <input type="text" name="attr_academiamod" />
           </div>
-          <button type="roll" name="roll_Academia" value="@{gmtoggle}&{template:simple}  {{rollname=@{academiaMacro} - @{academianame}}} {{dice=[[@{academialvl}@{knodtype}!!k1+@{academiamod}]]}}"></button>
+          <button type="roll" name="roll_Academia" value="@{gmtoggle}&{template:simple} {{rollname=@{academiaMacro}: @{academianame}}} {{dice=[[@{academialvl}@{knodtype}!!k1+@{academiamod}]]}}"></button>
         </div>
       </fieldset>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="areaKnowledge">Area Knowledge</h4>
       </div>
-      <div class="sheet-item-traits sheet-item-traits-concentration">
+      <div class="sheet-item sheet-item-traits sheet-item sheet-item-traits-concentration">
         <span><span data-i18n="homeCounty">Home County</span> (2)</span>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_akhomecountylvl" value="2" />
           +
           <input type="text" name="attr_akhomecountymod" />
         </div>
-        <button type="roll" name="roll_akhomecounty" value="@{gmtoggle}&{template:simple}  {{rollname=@{areaKnowledgeMacro} - @{homeCountyMacro}}} {{dice=[[@{akhomecountylvl}@{knodtype}!!k1+@{akhomecountymod}]]}}"></button>
+        <button type="roll" name="roll_akhomecounty" value="@{gmtoggle}&{template:simple} {{rollname=@{areaKnowledgeMacro}: @{homeCountyMacro}}} {{dice=[[@{akhomecountylvl}@{knodtype}!!k1+@{akhomecountymod}]]}}"></button>
       </div>
-      <fieldset class="repeating_areakno sheet-item-traits-concentration">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_areaknoname" placeholder="Area" />
+      <fieldset class="repeating_areakno sheet-item sheet-item-traits-concentration">
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_areaknoname" value="Area" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_areaknolvl" />
             +
             <input type="text" name="attr_areaknomod" />
           </div>
-          <button type="roll" name="roll_areakno" value="@{gmtoggle}&{template:simple}  {{rollname=@{areaKnowledgeMacro} - @{areaknoname}}} {{dice=[[@{areaknolvl}@{knodtype}!!k1+@{areaknomod}]]}}"></button>
+          <button type="roll" name="roll_areakno" value="@{gmtoggle}&{template:simple} {{rollname=@{areaKnowledgeMacro}: @{areaknoname}}} {{dice=[[@{areaknolvl}@{knodtype}!!k1+@{areaknomod}]]}}"></button>
         </div>
       </fieldset>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="demolition">Demolition</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_demolitionlvl" />
           +
           <input type="text" name="attr_demolitionmod" />
         </div>
-        <button type="roll" name="roll_Demolition" value="@{gmtoggle}&{template:simple}  {{rollname=@{demolitionMacro}}} {{dice=[[@{demolitionlvl}@{knodtype}!!k1+@{demolitionmod}]]}}"></button>
+        <button type="roll" name="roll_Demolition" value="@{gmtoggle}&{template:simple} {{rollname=@{demolitionMacro}}} {{dice=[[@{demolitionlvl}@{knodtype}!!k1+@{demolitionmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="disguise">Disguise</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_disguiselvl" />
           +
           <input type="text" name="attr_disguisemod" />
         </div>
-        <button type="roll" name="roll_Disguise" value="@{gmtoggle}&{template:simple}  {{rollname=@{disguiseMacro}}} {{dice=[[@{disguiselvl}@{knodtype}!!k1+@{disguisemod}]]}}"></button>
+        <button type="roll" name="roll_Disguise" value="@{gmtoggle}&{template:simple} {{rollname=@{disguiseMacro}}} {{dice=[[@{disguiselvl}@{knodtype}!!k1+@{disguisemod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="language">Language</h4>
       </div>
-      <fieldset class="repeating_language sheet-item-traits-concentration">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_languagename" placeholder="Language" />
+      <fieldset class="repeating_language sheet-item sheet-item-traits-concentration">
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_languagename" value="Language" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_languagelvl" />
             +
             <input type="text" name="attr_languagemod" />
           </div>              
-          <button type="roll" name="roll_Language" value="@{gmtoggle}&{template:simple}  {{rollname=@{languageMacro} @{languagename}}} {{dice=[[@{languagelvl}@{knodtype}!!k1+@{languagemod}]]}}"></button>
+          <button type="roll" name="roll_Language" value="@{gmtoggle}&{template:simple} {{rollname=@{languageMacro} @{languagename}}} {{dice=[[@{languagelvl}@{knodtype}!!k1+@{languagemod}]]}}"></button>
         </div>
       </fieldset>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="madScience">Mad Science</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_madSciencelvl" />
           +
           <input type="text" name="attr_madScienceMod" />
         </div>
-        <button type="roll" name="roll_madScience" value="@{gmtoggle}&{template:simple}  {{rollname=@{madScienceMacro}}} {{dice=[[@{madSciencelvl}@{knodtype}!!k1+@{madScienceMod}]]}}"></button>
+        <button type="roll" name="roll_madScience" value="@{gmtoggle}&{template:simple} {{rollname=@{madScienceMacro}}} {{dice=[[@{madSciencelvl}@{knodtype}!!k1+@{madScienceMod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="medicine">Medicine</h4>
       </div>
-      <fieldset class="repeating_medicine sheet-item-traits-concentration">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_medicineconc" placeholder="Medizin" />
+      <fieldset class="repeating_medicine sheet-item sheet-item-traits-concentration">
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_medicineconc" value="Medizin" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_medicinelvl" />
             +
             <input type="text" name="attr_medicineconcmod" />
           </div>
-          <button type="roll" name="roll_Medicine" value="@{gmtoggle}&{template:simple}  {{rollname=@{medicineMacro} @{medicineconc}}} {{dice=[[@{medicinelvl}@{knodtype}!!k1+@{medicineconcmod}]]}}"></button>
+          <button type="roll" name="roll_Medicine" value="@{gmtoggle}&{template:simple} {{rollname=@{medicineMacro} @{medicineconc}}} {{dice=[[@{medicinelvl}@{knodtype}!!k1+@{medicineconcmod}]]}}"></button>
         </div>
       </fieldset>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="professional">Professional</h4>
       </div>
-      <fieldset class="repeating_professional sheet-item-traits-concentration">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_professionalname" placeholder="Professional" />
+      <fieldset class="repeating_professional sheet-item sheet-item-traits-concentration">
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_professionalname" value="Professional" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_professionallvl" />
             +
             <input type="text" name="attr_professionalmod" />
           </div>
-          <button type="roll" name="roll_Professional" value="@{gmtoggle}&{template:simple}  {{rollname=@{professionalMacro} - @{professionalname}}} {{dice=[[@{professionallvl}@{knodtype}!!k1+@{professionalmod}]]}}"></button>
+          <button type="roll" name="roll_Professional" value="@{gmtoggle}&{template:simple} {{rollname=@{professionalMacro}: @{professionalname}}} {{dice=[[@{professionallvl}@{knodtype}!!k1+@{professionalmod}]]}}"></button>
         </div>
       </fieldset>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="science">Science</h4>
       </div>
-      <fieldset class="repeating_science sheet-item-traits-concentration">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_sciencename" placeholder="Chemistry" />
+      <fieldset class="repeating_science sheet-item sheet-item-traits-concentration">
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_sciencename" value="Chemistry" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_sciencelvl" />
             +
             <input type="text" name="attr_sciencemod" />
           </div>
-          <button type="roll" name="roll_Science" value="@{gmtoggle}&{template:simple}  {{rollname=@{scienceMacro} - @{sciencename}}} {{dice=[[@{sciencelvl}@{knodtype}!!k1+@{sciencemod}]]}}"></button>
+          <button type="roll" name="roll_Science" value="@{gmtoggle}&{template:simple} {{rollname=@{scienceMacro}: @{sciencename}}} {{dice=[[@{sciencelvl}@{knodtype}!!k1+@{sciencemod}]]}}"></button>
         </div>
       </fieldset>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="trade">Trade</h4>
       </div>
-      <fieldset class="repeating_trade sheet-item-traits-concentration">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_tradename" placeholder="Blacksmithing" />
+      <fieldset class="repeating_trade sheet-item sheet-item-traits-concentration">
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_tradename" value="Blacksmithing" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_tradelvl" />
             +
             <input type="text" name="attr_trademod" />
           </div>
-          <button type="roll" name="roll_Trade" value="@{gmtoggle}&{template:simple}  {{rollname=@{tradeMacro} - @{tradename}}} {{dice=[[@{tradelvl}@{knodtype}!!k1+@{trademod}]]}}"></button>
+          <button type="roll" name="roll_Trade" value="@{gmtoggle}&{template:simple} {{rollname=@{tradeMacro}: @{tradename}}} {{dice=[[@{tradelvl}@{knodtype}!!k1+@{trademod}]]}}"></button>
         </div>
       </fieldset>
       <fieldset class="repeating_extraknoapt">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_extraknoapt" placeholder="Additional Aptitude" />
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_extraknoapt" value="Additional Aptitude" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_extraknoaptlvl" />
             +
             <input type="text" name="attr_extraknoaptmod" />
           </div>
-          <button type="roll" name="roll_extraknoapt" value="@{gmtoggle}&{template:simple}  {{rollname=^@{extraknoapt}}} {{dice=[[@{extraknoaptlvl}@{knodtype}!!k1+@{extraknoaptmod}]]}}"></button>
+          <button type="roll" name="roll_extraknoapt" value="@{gmtoggle}&{template:simple} {{rollname=^@{extraknoapt}}} {{dice=[[@{extraknoaptlvl}@{knodtype}!!k1+@{extraknoaptmod}]]}}"></button>
         </div>
       </fieldset>
     </div>
     <!-- Knowledge -->
     <!-- Mien -->
     <div class="sheet-borderdiv">
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h3 data-i18n="mien">Mien</h3>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_mienlvl" value="1" />
@@ -724,88 +754,88 @@
             <option value="d12">12</option>
           </select>
         </div>
-        <button type="roll" name="roll_mien" value="@{gmtoggle}&{template:simple}  {{rollname=@{mienMacro}}} {{dice=[[@{mienlvl}@{miendtype}!!k1]]}}"></button>
+        <button type="roll" name="roll_mien" value="@{gmtoggle}&{template:simple} {{rollname=@{mienMacro}}} {{dice=[[@{mienlvl}@{miendtype}!!k1]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="animalWrangling">Animal Wranglin'</h4>
       </div>
-      <fieldset class="repeating_aniwraconc sheet-item-traits-concentration">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_aniwraconc" placeholder="Animal" />
+      <fieldset class="repeating_aniwraconc sheet-item sheet-item-traits-concentration">
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_aniwraconc" value="Animal" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_aniwralvl" />
             +
             <input type="text" name="attr_aniwraconcmod" />
           </div>
-          <button type="roll" name="roll_aniwra" value="@{gmtoggle}&{template:simple}  {{rollname=@{animalWranglingMacro} - @{aniwraconc}}} {{dice=[[@{aniwralvl}@{miendtype}!!k1+@{aniwraconcmod}]]}}"></button>
+          <button type="roll" name="roll_aniwra" value="@{gmtoggle}&{template:simple} {{rollname=@{animalWranglingMacro}: @{aniwraconc}}} {{dice=[[@{aniwralvl}@{miendtype}!!k1+@{aniwraconcmod}]]}}"></button>
         </div>
       </fieldset>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="leadership">Leadership</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_leadershiplvl" />
           +
           <input type="text" name="attr_leadershipmod" />
         </div>
-        <button type="roll" name="roll_leadership" value="@{gmtoggle}&{template:simple}  {{rollname=@{leadershipMacro}}} {{dice=[[@{leadershiplvl}@{miendtype}!!k1+@{leadershipmod}]]}}"></button>
+        <button type="roll" name="roll_leadership" value="@{gmtoggle}&{template:simple} {{rollname=@{leadershipMacro}}} {{dice=[[@{leadershiplvl}@{miendtype}!!k1+@{leadershipmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="overawe">Overawe</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_overawelvl" />
           +
           <input type="text" name="attr_overawemod" />
         </div>
-        <button type="roll" name="roll_overawe" value="@{gmtoggle}&{template:simple}  {{rollname=@{overaweMacro}}} {{dice=[[@{overawelvl}@{miendtype}!!k1+@{overawemod}]]}}"></button>
+        <button type="roll" name="roll_overawe" value="@{gmtoggle}&{template:simple} {{rollname=@{overaweMacro}}} {{dice=[[@{overawelvl}@{miendtype}!!k1+@{overawemod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="performing">Performin'</h4>
       </div>
-      <fieldset class="repeating_performinconc sheet-item-traits-concentration">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_performinconc" placeholder="Type Of Art" />
+      <fieldset class="repeating_performinconc sheet-item sheet-item-traits-concentration">
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_performinconc" value="Type Of Art" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_performinlvl" />
             +
             <input type="text" name="attr_performinconcmod" />
           </div>
-          <button type="roll" name="roll_performing" value="@{gmtoggle}&{template:simple}  {{rollname=@{performingMacro} - @{performinconc}}} {{dice=[[@{performinlvl}@{miendtype}!!k1+@{performinconcmod}]]}}"></button>
+          <button type="roll" name="roll_performing" value="@{gmtoggle}&{template:simple} {{rollname=@{performingMacro}: @{performinconc}}} {{dice=[[@{performinlvl}@{miendtype}!!k1+@{performinconcmod}]]}}"></button>
         </div>
       </fieldset>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="persuasion">Persuasion</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_persuasionlvl" />
           +
           <input type="text" name="attr_persuasionmod" />
         </div>
-        <button type="roll" name="roll_Persuasion" value="@{gmtoggle}&{template:simple}  {{rollname=@{persuasionMacro}}} {{dice=[[@{persuasionlvl}@{miendtype}!!k1+@{persuasionmod}]]}}"></button>
+        <button type="roll" name="roll_Persuasion" value="@{gmtoggle}&{template:simple} {{rollname=@{persuasionMacro}}} {{dice=[[@{persuasionlvl}@{miendtype}!!k1+@{persuasionmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="taleTell">Tale Tellin'</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_taletelllvl" />
           +
           <input type="text" name="attr_taletellmod" />
         </div>
-        <button type="roll" name="roll_TaleTellin" value="@{gmtoggle}&{template:simple}  {{rollname=@{taleTellMacro}}} {{dice=[[@{taletelllvl}@{miendtype}!!k1+@{taletellmod}]]}}"></button>
+        <button type="roll" name="roll_TaleTellin" value="@{gmtoggle}&{template:simple} {{rollname=@{taleTellMacro}}} {{dice=[[@{taletelllvl}@{miendtype}!!k1+@{taletellmod}]]}}"></button>
       </div>
       <fieldset class="repeating_extramienapt">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_extramienapt" placeholder="Additional Aptitude" />
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_extramienapt" value="Additional Aptitude" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_extramienaptlvl" />
             +
             <input type="text" name="attr_extramienaptmod" />
           </div>
-          <button type="roll" name="roll_extramienapt" value="@{gmtoggle}&{template:simple}  {{rollname=^@{extramienapt}}} {{dice=[[@{extramienapt}@{miendtype}!!k1+@{extramienaptmod}]]}}"></button>
+          <button type="roll" name="roll_extramienapt" value="@{gmtoggle}&{template:simple} {{rollname=^@{extramienapt}}} {{dice=[[@{extramienapt}@{miendtype}!!k1+@{extramienaptmod}]]}}"></button>
         </div>
       </fieldset>
     </div>
     <!-- Mien -->
     <!-- Nimbleness -->
     <div class="sheet-borderdiv">
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h3 data-i18n="nimbleness">Nimbleness</h3>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_nimlvl" value="1" />
@@ -818,101 +848,101 @@
             <option value="d12">12</option>
           </select>
         </div>
-        <button type="roll" name="roll_Nimbleness" value="@{gmtoggle}&{template:simple}  {{rollname=@{nimblenessMacro}}} {{dice=[[@{nimlvl}@{nimdtype}!!k1]]}}"></button>
+        <button type="roll" name="roll_Nimbleness" value="@{gmtoggle}&{template:simple} {{rollname=@{nimblenessMacro}}} {{dice=[[@{nimlvl}@{nimdtype}!!k1]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4><span data-i18n="climbing">Climbin'</span> (1)</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_climbinlvl" value="1" />
           +
           <input type="text" name="attr_climbinmod" />
         </div>
-        <button type="roll" name="roll_Climbin" value="@{gmtoggle}&{template:simple}  {{rollname=@{climbingMacro}}} {{dice=[[@{climbinlvl}@{nimdtype}!!k1+@{climbinmod}]]}}"></button>
+        <button type="roll" name="roll_Climbin" value="@{gmtoggle}&{template:simple} {{rollname=@{climbingMacro}}} {{dice=[[@{climbinlvl}@{nimdtype}!!k1+@{climbinmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="dodge">Dodge</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_dodgelvl" />
           +
           <input type="text" name="attr_dodgemod" />
         </div>
-        <button type="roll" name="roll_Dodge" value="@{gmtoggle}&{template:simple}  {{rollname=@{dodgeMacro}}} {{dice=[[@{dodgelvl}@{nimdtype}!!k1+@{dodgemod}]]}}"></button>
+        <button type="roll" name="roll_Dodge" value="@{gmtoggle}&{template:simple} {{rollname=@{dodgeMacro}}} {{dice=[[@{dodgelvl}@{nimdtype}!!k1+@{dodgemod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="driving">Drivin'</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_drivinlvl" />
           +
           <input type="text" name="attr_drivinmod" />
         </div>
-        <button type="roll" name="roll_Drivin" value="@{gmtoggle}&{template:simple}  {{rollname=@{drivingMacro}}} {{dice=[[@{drivinlvl}@{nimdtype}!!k1+@{drivinmod}]]}}"></button>
+        <button type="roll" name="roll_Drivin" value="@{gmtoggle}&{template:simple} {{rollname=@{drivingMacro}}} {{dice=[[@{drivinlvl}@{nimdtype}!!k1+@{drivinmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="fighting">Fightin'</h4>
       </div>
       <fieldset class="repeating_fightin">
-        <div class="sheet-item-traits sheet-item-traits-concentration">
-          <input type="text" name="attr_fightinname" placeholder="Brawlin’">
+        <div class="sheet-item sheet-item-traits sheet-item sheet-item-traits-concentration">
+          <input type="text" name="attr_fightinname" value="Brawlin’">
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_fightinlvl" />
             +
             <input type="text" name="attr_fightinmod" />
           </div>
-          <button type="roll" name="roll_fightin" value="@{gmtoggle}&{template:simple}  {{rollname=@{fightingMacro} - @{fightinname}}} {{dice=[[@{fightinlvl}@{nimdtype}!!k1+@{fightinmod}]]}}"></button>
+          <button type="roll" name="roll_fightin" value="@{gmtoggle}&{template:simple} {{rollname=@{fightingMacro}: @{fightinname}}} {{dice=[[@{fightinlvl}@{nimdtype}!!k1+@{fightinmod}]]}}"></button>
         </div>
       </fieldset>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="horseRiding">Horse Ridin'</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_horselvl" />
           +
           <input type="text" name="attr_horsemod" />
         </div>
-        <button type="roll" name="roll_HorseRide" value="@{gmtoggle}&{template:simple}  {{rollname=@{horseRidingMacro}}} {{dice=[[@{horselvl}@{nimdtype}!!k1+@{horsemod}]]}}"></button>
+        <button type="roll" name="roll_HorseRide" value="@{gmtoggle}&{template:simple} {{rollname=@{horseRidingMacro}}} {{dice=[[@{horselvl}@{nimdtype}!!k1+@{horsemod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4><span data-i18n="sneak">Sneak</span> (1)</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_sneaklvl" value="1" />
           +
           <input type="text" name="attr_sneakmod" />
         </div>          
-        <button type="roll" name="roll_Sneak" value="@{gmtoggle}&{template:simple}  {{rollname=@{sneakMacro}}} {{dice=[[@{sneaklvl}@{nimdtype}!!k1+@{sneakmod}]]}}"></button>
+        <button type="roll" name="roll_Sneak" value="@{gmtoggle}&{template:simple} {{rollname=@{sneakMacro}}} {{dice=[[@{sneaklvl}@{nimdtype}!!k1+@{sneakmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="swimming">Swimmin'</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_swimminlvl" />
           +
           <input type="text" name="attr_swimminmod" />
         </div>
-        <button type="roll" name="roll_Swimmin" value="@{gmtoggle}&{template:simple}  {{rollname=@{swimmingMacro}}} {{dice=[[@{swimminlvl}@{nimdtype}!!k1+@{swimminmod}]]}}"></button>
+        <button type="roll" name="roll_Swimmin" value="@{gmtoggle}&{template:simple} {{rollname=@{swimmingMacro}}} {{dice=[[@{swimminlvl}@{nimdtype}!!k1+@{swimminmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="teamster">Teamster</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_teamsterlvl" />
           +
           <input type="text" name="attr_teamstermod" />
         </div>            
-        <button type="roll" name="roll_teamster" value="@{gmtoggle}&{template:simple}  {{rollname=@{teamsterMacro}}} {{dice=[[@{teamsterlvl}@{nimdtype}!!k1+@{teamstermod}]]}}"></button>
+        <button type="roll" name="roll_teamster" value="@{gmtoggle}&{template:simple} {{rollname=@{teamsterMacro}}} {{dice=[[@{teamsterlvl}@{nimdtype}!!k1+@{teamstermod}]]}}"></button>
       </div>
       <fieldset class="repeating_extranimapt">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_extranimapt" placeholder="Additional Aptitude" />
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_extranimapt" value="Additional Aptitude" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_extranimaptlvl" />
             +
             <input type="text" name="attr_extranimaptmod" />
           </div>            
-          <button type="roll" name="roll_extranimapt" value="@{gmtoggle}&{template:simple}  {{rollname=^@{extranimapt}}} {{dice=[[@{extranimaptlvl}@{nimdtype}!!k1+@{extranimaptmod}]]}}"></button>
+          <button type="roll" name="roll_extranimapt" value="@{gmtoggle}&{template:simple} {{rollname=^@{extranimapt}}} {{dice=[[@{extranimaptlvl}@{nimdtype}!!k1+@{extranimaptmod}]]}}"></button>
         </div>
       </fieldset>
     </div>
     <!-- Nimbleness -->
     <!-- Quickness -->
     <div class="sheet-borderdiv">
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h3 data-i18n="quickness">Quickness</h3>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_quilvl" value="1" />
@@ -925,33 +955,33 @@
             <option value="d12">12</option>
           </select>
         </div>
-        <button type="roll" name="roll_Quickness" value="@{gmtoggle}&{template:simple}  {{rollname=@{quicknessMacro}}} {{dice=[[@{quilvl}@{quidtype}!!k1]]}}"></button>
+        <button type="roll" name="roll_Quickness" value="@{gmtoggle}&{template:simple} {{rollname=@{quicknessMacro}}} {{dice=[[@{quilvl}@{quidtype}!!k1]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="quickDraw">quickDraw</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_quidralvl" />
           +
           <input type="text" name="attr_quidramod" />
         </div>
-        <button type="roll" name="roll_QuickDraw" value="@{gmtoggle}&{template:simple}  {{rollname=@{quickDrawMacro}}} {{dice=[[@{quidralvl}@{quidtype}!!k1+@{quidramod}]]}}"></button>
+        <button type="roll" name="roll_QuickDraw" value="@{gmtoggle}&{template:simple} {{rollname=@{quickDrawMacro}}} {{dice=[[@{quidralvl}@{quidtype}!!k1+@{quidramod}]]}}"></button>
       </div>
       <fieldset class="repeating_extraquidapt">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_extraquidapt" placeholder="Additional Aptitude" />
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_extraquidapt" value="Additional Aptitude" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_extraquidaptlvl" />
             +
             <input type="text" name="attr_extraquidaptmod" />
           </div>
-          <button type="roll" name="roll_extraquidapt" value="@{gmtoggle}&{template:simple}  {{rollname=^@{extraquidapt}}} {{dice=[[@{extraquidaptlvl}@{quidtype}!!k1+@{extraquidaptmod}]]}}"></button>
+          <button type="roll" name="roll_extraquidapt" value="@{gmtoggle}&{template:simple} {{rollname=^@{extraquidapt}}} {{dice=[[@{extraquidaptlvl}@{quidtype}!!k1+@{extraquidaptmod}]]}}"></button>
         </div>
       </fieldset>
     </div>
     <!-- Quickness -->
     <!-- Smarts -->
     <div class="sheet-borderdiv">
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h3 data-i18n="smarts">Smarts</h3>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_smalvl" value="1" />
@@ -964,92 +994,92 @@
             <option value="d12">12</option>
           </select>
         </div>
-        <button type="roll" name="roll_Smarts" value="@{gmtoggle}&{template:simple}  {{rollname=@{smartsMacro}}} {{dice=[[@{smalvl}@{smadtype}!!k1]]}}"></button>
+        <button type="roll" name="roll_Smarts" value="@{gmtoggle}&{template:simple} {{rollname=@{smartsMacro}}} {{dice=[[@{smalvl}@{smadtype}!!k1]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="bluff">Bluff</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_blufflvl" />
           +
           <input type="text" name="attr_bluffmod" />
         </div>
-        <button type="roll" name="roll_Bluff" value="@{gmtoggle}&{template:simple}  {{rollname=@{bluffMacro}}} {{dice=[[@{blufflvl}@{smadtype}!!k1+@{bluffmod}]]}}"></button>
+        <button type="roll" name="roll_Bluff" value="@{gmtoggle}&{template:simple} {{rollname=@{bluffMacro}}} {{dice=[[@{blufflvl}@{smadtype}!!k1+@{bluffmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="gambling">Gamblin'</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_gamblinlvl" />
           +
           <input type="text" name="attr_gamblinmod" />
         </div>
-        <button type="roll" name="roll_Gamblin" value="@{gmtoggle}&{template:simple}  {{rollname=@{gamblingMacro}}} {{dice=[[@{gamblinlvl}@{smadtype}!!k1+@{gamblinmod}]]}}"></button>
+        <button type="roll" name="roll_Gamblin" value="@{gmtoggle}&{template:simple} {{rollname=@{gamblingMacro}}} {{dice=[[@{gamblinlvl}@{smadtype}!!k1+@{gamblinmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="ridicule">Ridicule</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_ridiculelvl" />
           +
           <input type="text" name="attr_ridiculemod" />
         </div>
-        <button type="roll" name="roll_Ridicule" value="@{gmtoggle}&{template:simple}  {{rollname=@{ridiculeMacro}}} {{dice=[[@{ridiculelvl}@{smadtype}!!k1+@{ridiculemod}]]}}"></button>
+        <button type="roll" name="roll_Ridicule" value="@{gmtoggle}&{template:simple} {{rollname=@{ridiculeMacro}}} {{dice=[[@{ridiculelvl}@{smadtype}!!k1+@{ridiculemod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="scrounging">Scroungin'</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_scrounginlvl" />
           +
           <input type="text" name="attr_scrounginmod" />
         </div>
-        <button type="roll" name="roll_Scroungin" value="@{gmtoggle}&{template:simple}  {{rollname=@{scroungingMacro}}} {{dice=[[@{scrounginlvl}@{smadtype}!!k1+@{scrounginmod}]]}}"></button>
+        <button type="roll" name="roll_Scroungin" value="@{gmtoggle}&{template:simple} {{rollname=@{scroungingMacro}}} {{dice=[[@{scrounginlvl}@{smadtype}!!k1+@{scrounginmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="streetwise">Streetwise</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_streetwiselvl" />
           +
           <input type="text" name="attr_streetwisemod" />
         </div>
-        <button type="roll" name="roll_Streetwise" value="@{gmtoggle}&{template:simple}  {{rollname=@{streetwiseMacro}}} {{dice=[[@{streetwiselvl}@{smadtype}!!k1+@{streetwisemod}]]}}"></button>
+        <button type="roll" name="roll_Streetwise" value="@{gmtoggle}&{template:simple} {{rollname=@{streetwiseMacro}}} {{dice=[[@{streetwiselvl}@{smadtype}!!k1+@{streetwisemod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="survival">Survival</h4>
       </div>
       <fieldset class="repeating_survivalcon">
-        <div class="sheet-item-traits sheet-item-traits-concentration">
-          <input type="text" name="attr_survivalconname" placeholder="Plains" />
+        <div class="sheet-item sheet-item-traits sheet-item sheet-item-traits-concentration">
+          <input type="text" name="attr_survivalconname" value="Plains" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_survivallvl" />
             +
             <input type="text" name="attr_survivalconcmod" />
           </div>
-          <button type="roll" name="roll_Performin" value="@{gmtoggle}&{template:simple}  {{rollname=@{survivalMacro} - @{survivalconname}}} {{dice=[[@{survivallvl}@{spidtype}!!k1+@{survivalconcmod}]]}}"></button>
+          <button type="roll" name="roll_Performin" value="@{gmtoggle}&{template:simple} {{rollname=@{survivalMacro}: @{survivalconname}}} {{dice=[[@{survivallvl}@{spidtype}!!k1+@{survivalconcmod}]]}}"></button>
         </div>
       </fieldset>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="tinkering">Tinkerin'</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_tinkerinlvl" />
           +
           <input type="text" name="attr_tinkerinmod" />
         </div>
-        <button type="roll" name="roll_Tinkerin" value="@{gmtoggle}&{template:simple}  {{rollname=@{tinkeringMacro}}} {{dice=[[@{tinkerinlvl}@{smadtype}!!k1+@{tinkerinmod}]]}}"></button>
+        <button type="roll" name="roll_Tinkerin" value="@{gmtoggle}&{template:simple} {{rollname=@{tinkeringMacro}}} {{dice=[[@{tinkerinlvl}@{smadtype}!!k1+@{tinkerinmod}]]}}"></button>
       </div>		
       <fieldset class="repeating_extrasmaapt">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_extrasmaapt" placeholder="Additional Aptitude" />
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_extrasmaapt" value="Additional Aptitude" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_extrasmaaptlvl" />
             +
             <input type="text" name="attr_extrasmaaptmod" />
           </div>
-          <button type="roll" name="roll_extrasmaapt" value="@{gmtoggle}&{template:simple}  {{rollname=^@{extrasmaapt}}} {{dice=[[@{extrasmaaptlvl}@{smadtype}!!k1+@{extrasmaaptmod}]]}}"></button>
+          <button type="roll" name="roll_extrasmaapt" value="@{gmtoggle}&{template:simple} {{rollname=^@{extrasmaapt}}} {{dice=[[@{extrasmaaptlvl}@{smadtype}!!k1+@{extrasmaaptmod}]]}}"></button>
         </div>
       </fieldset>
     </div>
     <!-- Smarts -->
     <!-- Spirit -->
     <div class="sheet-borderdiv">
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h3 data-i18n="spirit">Spirit</h3>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_spilvl" value="1" />
@@ -1062,42 +1092,42 @@
             <option value="d12">12</option>
           </select>
         </div>
-        <button type="roll" name="roll_spirit" value="@{gmtoggle}&{template:simple}  {{rollname=@{spiritMacro}}} {{dice=[[@{spilvl}@{spidtype}!!k1]]}}"></button>
+        <button type="roll" name="roll_spirit" value="@{gmtoggle}&{template:simple} {{rollname=@{spiritMacro}}} {{dice=[[@{spilvl}@{spidtype}!!k1]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="faith">Faith</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_faithlvl" />
           +
           <input type="text" name="attr_faithmod" />
         </div>
-        <button type="roll" name="roll_Faith" value="@{gmtoggle}&{template:simple}  {{rollname=@{faithMacro}}} {{dice=[[@{faithlvl}@{spidtype}!!k1+@{faithmod}]]}}"></button>
+        <button type="roll" name="roll_Faith" value="@{gmtoggle}&{template:simple} {{rollname=@{faithMacro}}} {{dice=[[@{faithlvl}@{spidtype}!!k1+@{faithmod}]]}}"></button>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="guts">Guts</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_gutslvl" />
           +
           <input type="text" name="attr_gutsmod" />
         </div>
-        <button type="roll" name="roll_Guts" value="@{gmtoggle}&{template:simple}  {{rollname=@{gutsMacro}}} {{dice=[[@{gutslvl}@{spidtype}!!k1+@{gutsmod}]]}}"></button>
+        <button type="roll" name="roll_Guts" value="@{gmtoggle}&{template:simple} {{rollname=@{gutsMacro}}} {{dice=[[@{gutslvl}@{spidtype}!!k1+@{gutsmod}]]}}"></button>
       </div>
       <fieldset class="repeating_extraspiapt">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_extraspiapt" placeholder="Additional Aptitude" />
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_extraspiapt" value="Additional Aptitude" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_extraspiaptlvl" />
             +
             <input type="text" name="attr_extraspiaptmod" />
           </div>
-          <button type="roll" name="roll_extraspiapt" value="@{gmtoggle}&{template:simple}  {{rollname=^@{extraspiapt}}} {{dice=[[@{extraspiaptlvl}@{spidtype}!!k1+@{extraspiaptmod}]]}}"></button>
+          <button type="roll" name="roll_extraspiapt" value="@{gmtoggle}&{template:simple} {{rollname=^@{extraspiapt}}} {{dice=[[@{extraspiaptlvl}@{spidtype}!!k1+@{extraspiaptmod}]]}}"></button>
         </div>
       </fieldset>
     </div>
     <!-- Spirit -->
     <!-- Strength -->
     <div class="sheet-borderdiv">
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h3 data-i18n="strength">Strength</h3>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_strlvl" value="" />
@@ -1110,24 +1140,24 @@
             <option value="d12">12</option>
           </select>
         </div>
-        <button type="roll" name="roll_Strength" value="@{gmtoggle}&{template:simple}  {{rollname=@{strengthMacro}}} {{dice=[[@{strlvl}@{strdtype}!!k1]]}}"></button>
+        <button type="roll" name="roll_Strength" value="@{gmtoggle}&{template:simple} {{rollname=@{strengthMacro}}} {{dice=[[@{strlvl}@{strdtype}!!k1]]}}"></button>
       </div>
       <fieldset class="repeating_extrastrapt">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_extrastrapt" placeholder="Additional Aptitude" />
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_extrastrapt" value="Additional Aptitude" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_extrastraptlvl" />
             +
             <input type="text" name="attr_extrastraptmod" />
           </div>
-          <button type="roll" name="roll_extrastrapt" value="@{gmtoggle}&{template:simple}  {{rollname=^@{extrastrapt}}} {{dice=[[@{extrastraptlvl}@{strdtype}!!k1+@{extrastraptmod}]]}}"></button>
+          <button type="roll" name="roll_extrastrapt" value="@{gmtoggle}&{template:simple} {{rollname=^@{extrastrapt}}} {{dice=[[@{extrastraptlvl}@{strdtype}!!k1+@{extrastraptmod}]]}}"></button>
         </div>
       </fieldset>
     </div>
     <!-- Strength -->
     <!-- Vigor -->
     <div class="sheet-borderdiv">
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h3 data-i18n="vigor">Vigor</h3>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_viglvl" value="1" />
@@ -1140,11 +1170,11 @@
             <option value="d12">12</option>
           </select>
         </div>
-        <button type="roll" name="roll_Vigor" value="@{gmtoggle}&{template:simple}  {{rollname=@{vigorMacro}}} {{dice=[[@{viglvl}@{vigdtype}!!k1]]}}"></button>
+        <button type="roll" name="roll_Vigor" value="@{gmtoggle}&{template:simple} {{rollname=@{vigorMacro}}} {{dice=[[@{viglvl}@{vigdtype}!!k1]]}}"></button>
       </div>
       <fieldset class="repeating_extravigapt">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_extravigapt" placeholder="Additional Aptitude" />
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_extravigapt" value="Additional Aptitude" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_extravigaptlvl" />
             +
@@ -1157,10 +1187,10 @@
     <!-- Vigor -->
     <!-- Special -->
     <div class="sheet-borderdiv">
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h3 data-i18n="special">Special</h3>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="hexslingin">Hexslingin'</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_hexslinginlvl" />
@@ -1168,7 +1198,7 @@
           <input type="text" name="attr_hexslinginmod" />
         </div>
       </div>
-      <div class="sheet-item-traits">
+      <div class="sheet-item sheet-item-traits">
         <h4 data-i18n="ritual">Ritual</h4>
         <div class="sheet-grid-1m1">
           <input type="text" name="attr_rituallvl" />
@@ -1177,8 +1207,8 @@
         </div>
       </div>
       <fieldset class="repeating_extraspecialapt">
-        <div class="sheet-item-traits">
-          <input type="text" name="attr_extraspecialapt" placeholder="Special Aptitude" />
+        <div class="sheet-item sheet-item-traits">
+          <input type="text" name="attr_extraspecialapt" value="Special Aptitude" />
           <div class="sheet-grid-1m1">
             <input type="text" name="attr_extraspecialaptlvl" />
             +
@@ -1195,26 +1225,38 @@
   <input type="radio" class="sheet-tab" name="sheet-tabs" value="2" title="Combat Stuff"/>
   <label for="sheet-tab-combat" class="sheet-tab" data-i18n="combat">Combat Stuff</label>
 
-  <div class="sheet-section-combat sheet-borderdiv">
+  <div class="sheet-section sheet-section-combat sheet-borderdiv">
+    <div class="sheet-borderdiv sheet-common">
+      <h3 data-i18n="commonRolls">Common Rolls</h3>
+      <div class="sheet-item sheet-item-common">
+        <h4 data-i18n="surprise">Surprise</h4>
+        <button type="roll" name="roll_surprise" value="@{gmtoggle}&{template:simple} {{rollname=@{surpriseMacro}}} {{dice=[[@{coglvl}@{cogdtype}!!k1]]}}"></button>
+      </div>
+      <div class="sheet-item sheet-item-common">
+        <h4 data-i18n="gutsAndGrit">Guts + Grits</h4>
+        <button type="roll" name="roll_GutsGrit" value="@{gmtoggle}&{template:simple} {{rollname=@{gutsAndGritMacro}}} {{dice=[[@{gutslvl}@{spidtype}!!k1+@{gutsmod}+@{grit}]]}}"></button>
+      </div>
+    </div>
     <div class="sheet-borderdiv">
       <h3 data-i18n="ammo">Ammo</h3>
-      <div class="sheet-item-ammo">
+      <div class="sheet-item sheet-item-ammo">
         <h4 data-i18n="ammoName">Ammo Name</h4>
         <h4 data-i18n="quantity">Qty</h4>
         <h4 data-i18n="notes">Notes</h4>
       </div>
       <fieldset class="repeating_ammo">
-        <div class="sheet-item-ammo">
-          <input type="text" name="attr_ammoname" placeholder="Pistol (.40-.50)">
-          <input type="text" name="attr_ammoqty" placeholder="50" />
-          <textarea name="attr_ammonotes" class="sheet-shorttextarea" placeholder="Ammo notes"></textarea>
+        <div class="sheet-item sheet-item-ammo">
+          <input type="text" name="attr_ammoname" value="Pistol (.40-.50)">
+          <input type="text" name="attr_ammoqty" value="50" />
+          <textarea name="attr_ammonotes" class="sheet-shorttextarea" value="Ammo notes"></textarea>
         </div>
       </fieldset>
     </div>
     <div class="sheet-borderdiv">
       <h3 data-i18n="shootingIronsAndSuch">Shootin Irons &amp; Such</h3>
-      <div class="sheet-item-ranged">
+      <div class="sheet-item sheet-item-ranged">
         <h4 data-i18n="weapon">Weapon</h4>
+        <h4 data-i18n="aptitude">Aptitude</h4>
         <h4 data-i18n="currentShots">Ammo</h4>
         <h4 data-i18n="shots">Shots</h4>
         <h4 data-i18n="rof">RoF</h4>
@@ -1222,30 +1264,42 @@
         <h4 data-i18n="damage">Damage</h4>
       </div>
       <fieldset class="repeating_range">
-        <div class="sheet-item-ranged">
+        <div class="sheet-item sheet-item-ranged">
           <input type="text" name="attr_ranged_name" placeholder="Colt Army" />
-          <input type="text" name="attr_ranged_shots" placeholder="1" />
-          <input type="text" name="attr_ranged_maxshots" placeholder="1" />
-          <input type="text" name="attr_ranged_rof" placeholder="1" />
-          <input type="text" name="attr_ranged_range" placeholder="10" />
-          <input type="text" name="attr_ranged_damage" placeholder="3d6" />
-          <button type="roll" name="roll_ranged_attack" value="@{gmtoggle}&{template:simple} {{rollname=@{ranged_name}}} {{damage=[[@{ranged_damage}!!]]}}"></button>
+          <div class="sheet-faux-select">
+            <div class="sheet-faux-select-wrapper">
+              <input type="radio" name="attr_ranged_skill" value="1@{defdtype}!!k1-4" selected /><span data-i18n="unskilled">Unskilled</span>
+              <input type="radio" name="attr_ranged_skill" value="@{bowlvl}@{defdtype}!!k1+@{bowmod}" /><span data-i18n="bow">Bow</span>
+              <input type="radio" name="attr_ranged_skill" value="@{repeating_shootinconc_$0_shootinlvl}@{defdtype}!!k1+@{repeating_shootinconc_$0_shootinconcmod}" /><span name="attr_ranged_skill_name_0"></span>
+              <input type="radio" name="attr_ranged_skill" value="@{repeating_shootinconc_$1_shootinlvl}@{defdtype}!!k1+@{repeating_shootinconc_$1_shootinconcmod}" /><span name="attr_ranged_skill_name_1"></span>
+              <input type="radio" name="attr_ranged_skill" value="@{repeating_shootinconc_$2_shootinlvl}@{defdtype}!!k1+@{repeating_shootinconc_$2_shootinconcmod}" /><span name="attr_ranged_skill_name_2"></span>
+              <input type="radio" name="attr_ranged_skill" value="@{repeating_shootinconc_$3_shootinlvl}@{defdtype}!!k1+@{repeating_shootinconc_$3_shootinconcmod}" /><span name="attr_ranged_skill_name_3"></span>
+              <input type="radio" name="attr_ranged_skill" value="@{repeating_shootinconc_$4_shootinlvl}@{defdtype}!!k1+@{repeating_shootinconc_$4_shootinconcmod}" /><span name="attr_ranged_skill_name_4"></span>
+              <input type="radio" name="attr_ranged_skill" value="@{repeating_shootinconc_$5_shootinlvl}@{defdtype}!!k1+@{repeating_shootinconc_$5_shootinconcmod}" /><span name="attr_ranged_skill_name_5"></span>
+            </div>
+          </div>
+          <input type="text" name="attr_ranged_shots" value="1" />
+          <input type="text" name="attr_ranged_maxshots" value="1" />
+          <input type="text" name="attr_ranged_rof" value="1" />
+          <input type="text" name="attr_ranged_range" value="10" />
+          <input type="text" name="attr_ranged_damage" value="3d6" />
+          <button type="roll" name="roll_ranged_attack" value="@{gmtoggle}&{template:simple} {{dice=[[@{ranged_skill}]]}} {{rollname=@{ranged_name}}} {{damage=[[@{ranged_damage}!!]]}} {{location=[[1d20]]}}"></button>
         </div>
       </fieldset>
     </div>
     <div class="sheet-borderdiv">
       <h3 data-i18n="hand2hand">Hand-To-Hand Weapons</h3>
-      <div class="sheet-item-hand2hand">
+      <div class="sheet-item sheet-item-hand2hand">
         <h4 data-i18n="weapon">Weapon</h4>
         <h4 data-i18n="defense">Defense</h4>
         <h4 data-i18n="speed">Speed</h4>
         <h4 data-i18n="damage">Damage</h4>
       </div>
       <fieldset class="repeating_melee">
-        <div class="sheet-item-hand2hand">
-          <input type="text" name="attr_h2h_name" value="" placeholder="Fist" />
-          <input type="text" name="attr_h2h_defense" value="" placeholder="" />
-          <input type="text" name="attr_h2h_speed" value="" placeholder="1" />
+        <div class="sheet-item sheet-item-hand2hand">
+          <input type="text" name="attr_h2h_name" value="Fist" />
+          <input type="text" name="attr_h2h_defense" value="" />
+          <input type="text" name="attr_h2h_speed" value="1" />
           <div class="sheet-grid-1m1">
             <span>STR</span>
             +
@@ -1262,13 +1316,15 @@
   <input type="radio" class="sheet-tab" name="sheet-tabs" value="3" title="Arcane Ablities"/>
   <label for="sheet-tab-arcane" class="sheet-tab" data-i18n="arcane">Arcane Ablities</label>
 
-  <div class="sheet-section-arcane sheet-borderdiv">
-    <input type="radio" class="sheet-tab" name="attr_arcane_sheet" value="None" checked="checked" /><label for="attr_arcane_sheet_none" data-i18n="none">None</label>
+  <div class="sheet-section sheet-section-arcane sheet-borderdiv">
+    <input type="radio" class="sheet-tab" name="attr_arcane_sheet" value="None" checked="checked" />
+    <label class="sheet-tab" for="attr_arcane_sheet_none" data-i18n="none">None</label>
     <!-- Hexslingin - Start -->
-    <input type="radio" class="sheet-tab" name="attr_arcane_sheet" value="hexslingin" /><label for="attr_arcane_sheet_hexslingin" data-i18n="hexslingin">Hexslingin</label>
-    <div class="sheet-section-hexslingin">
+    <input type="radio" class="sheet-tab" name="attr_arcane_sheet" value="hexslingin" />
+    <label class="sheet-tab" for="attr_arcane_sheet_hexslingin" data-i18n="hexslingin">Hexslingin</label>
+    <div class="sheet-section sheet-section-hexslingin">
       <h3 data-i18n="hexes">Hexes</h3>
-      <div class="sheet-item-hexslingin">
+      <div class="sheet-item sheet-item-hexslingin">
         <h4 data-i18n="name">Name</h4>
         <h4 data-i18n="trait">Trait</h4>
         <h4 data-i18n="hand">Hand</h4>
@@ -1277,8 +1333,8 @@
         <h4 data-i18n="range">Range</h4>
       </div>
       <fieldset class="repeating_hexes">
-        <div class="sheet-item-hexslingin">
-          <input type="text" name="attr_hexname" placeholder="i.e. Hunch">
+        <div class="sheet-item sheet-item-hexslingin">
+          <input type="text" name="attr_hexname" value="i.e. Hunch">
           <select name="attr_hextrait">
             <option value="@{cogdtype}" selected="selected"><span data-i18n="cognition">Cognition</span></option>
             <option value="@{defdtype}"><span data-i18n="deftness">Deftness</span></option>
@@ -1303,11 +1359,11 @@
             <option value="fourofakind">Four of a kind</option>
             <option value="straightflush">Straight Flush</option>
           </select>
-          <input type="text" name="attr_hexspeed" placeholder="2 rounds" />
-          <input type="text" name="attr_hexduration" placeholder="Instant" />
-          <input type="text" name="attr_hexrange" placeholder="Self" />
+          <input type="text" name="attr_hexspeed" value="2 rounds" />
+          <input type="text" name="attr_hexduration" value="Instant" />
+          <input type="text" name="attr_hexrange" value="Self" />
           <button type="roll" name="roll_hex" value="@{gmtoggle}&{template:simple} {{rollname=@{hexname}}} {{dice=[[{@{hexslinginlvl}@{hextrait}!!k1}]]}}"></button>
-          <textarea name="attr_hexdesc" placeholder="Description"></textarea>
+          <textarea name="attr_hexdesc" value="Description"></textarea>
         </div>
       </fieldset>
     </div>
@@ -1315,21 +1371,21 @@
 
     <!-- Mad Scientist - Start -->
     <input type="radio" class="sheet-tab" name="attr_arcane_sheet" value="madscience" /><label for="attr_arcane_sheet_madscience" data-i18n="madScience">Mad Science</label>
-    <div class="sheet-section-madscience">
+    <div class="sheet-section sheet-section-madscience">
       <h3 data-i18n="inventions">Inventions</h3>
-      <div class="sheet-item-madscience">
+      <div class="sheet-item sheet-item-madscience">
         <h4 data-i18n="device">Device</h4>
         <h4 data-i18n="cost">Cost</h4>
         <h4 data-i18n="reliability">Reliability</h4>
       </div>
       <fieldset class="repeating_devices">
-        <div class="sheet-item-madscience">
+        <div class="sheet-item sheet-item-madscience">
           <input type="text" name="attr_devicename" value="i.e. Flamethrower">
           <input type="text" name="attr_devicecost" data-type="currency" value="2000.00">
           <input type="text" name="attr_devicereliability" value="18" />
           <!--TODO-->
           <button type="roll" name="roll_builddevice" value="@{gmtoggle}&{template:simple} {{rollname=@{devicename}}} {{dice=[[@{hexslinginlvl}@{hextrait}!!k1]]}}"></button>
-          <textarea name="attr_devicedesc" placeholder="Description"></textarea>
+          <textarea name="attr_devicedesc" value="Description"></textarea>
         </div>
       </fieldset>
     </div>
@@ -1337,9 +1393,9 @@
 
     <!-- Blessed - Start -->
     <input type="radio" class="sheet-tab" name="attr_arcane_sheet" value="blessed" /><label for="attr_arcane_sheet_blessed" data-i18n="blessed">Blessed</label>
-    <div class="sheet-section-blessed">
+    <div class="sheet-section sheet-section-blessed">
       <h3 data-i18n="miracles">Miracles</h3>
-      <div class="sheet-item-blessed">
+      <div class="sheet-item sheet-item-blessed">
         <h4 data-i18n="miracle">Miracle</h4>
         <h4 data-i18n="tn">TN</h4>
         <h4 data-i18n="speed">Speed</h4>
@@ -1347,14 +1403,14 @@
         <h4 data-i18n="range">Range</h4>
       </div>
       <fieldset class="repeating_miracles">
-        <div class="sheet-item-blessed">
-          <input type="text" name="attr_miraclename" placeholder="i.e. Holy Roller">
+        <div class="sheet-item sheet-item-blessed">
+          <input type="text" name="attr_miraclename" value="i.e. Holy Roller">
           <input type="text" name="attr_miracletn" value="5" />
-          <input type="text" name="attr_miraclespeed" placeholder="1" />
-          <input type="text" name="attr_miracleduration" placeholder="Permanent" />
-          <input type="text" name="attr_miraclerange" placeholder="Self" />
+          <input type="text" name="attr_miraclespeed" value="1" />
+          <input type="text" name="attr_miracleduration" value="Permanent" />
+          <input type="text" name="attr_miraclerange" value="Self" />
           <button type="roll" name="roll_miracle" value="@{gmtoggle}&{template:simple} {{rollname=@{miraclename}}} {{dice=[[{@{faithlvl}@{spidtype}!!k1}>@{miracletn}]]}}"></button>
-          <textarea name="attr_miracledesc" placeholder="Description"></textarea>
+          <textarea name="attr_miracledesc" value="Description"></textarea>
         </div>
       </fieldset>
     </div>
@@ -1362,9 +1418,9 @@
 
     <!-- Shaman - Start -->
     <input type="radio" class="sheet-tab" name="attr_arcane_sheet" value="shaman" /><label for="attr_arcane_sheet_shaman" data-i18n="shaman">Shaman</label>
-    <div class="sheet-section-shaman">
+    <div class="sheet-section sheet-section-shaman">
       <h3 data-i18n="rituals">Rituals</h3>
-      <div class="sheet-item-ritual">
+      <div class="sheet-item sheet-item-ritual">
         <h4 data-i18n="name">Name</h4>
         <h4 data-i18n="trait">Trait</h4>
         <h4 data-i18n="speed">Speed</h4>
@@ -1372,8 +1428,8 @@
         <h4 data-i18n="appeasement">Appeasement</h4>
       </div>
       <fieldset class="repeating_rituals">
-        <div class="sheet-item-ritual">
-          <input type="text" name="attr_ritualname" placeholder="i.e. Dance">
+        <div class="sheet-item sheet-item-ritual">
+          <input type="text" name="attr_ritualname" value="i.e. Dance">
           <select name="attr_ritualtrait">
             <option value="@{cogdtype}"><span data-i18n="cognition">Cognition</span></option>
             <option value="@{defdtype}"><span data-i18n="deftness">Deftness</span></option>
@@ -1386,28 +1442,28 @@
             <option value="@{strdtype}"><span data-i18n="strength">Strength</span></option>
             <option value="@{vigdtype}"><span data-i18n="vigor">Vigor</span></option>
           </select>
-          <input type="text" name="attr_ritualspeed" placeholder="Varies" />
-          <input type="text" name="attr_ritualtn" placeholder="Varies" />
-          <input type="text" name="attr_ritualappeasement" placeholder="1" />
+          <input type="text" name="attr_ritualspeed" value="Varies" />
+          <input type="text" name="attr_ritualtn" value="Varies" />
+          <input type="text" name="attr_ritualappeasement" value="1" />
           <button type="roll" name="roll_ritual" value="@{gmtoggle}&{template:simple} {{rollname=@{ritualname}}} {{dice=[[{@{rituallvl}@{ritualtrait}!!k1}>@{ritualtn}cs{@{ritualtn}+5}]]}}"></button>
-          <textarea name="attr_ritualdesc" placeholder="Description"></textarea>
+          <textarea name="attr_ritualdesc" value="Description"></textarea>
         </div>
       </fieldset>
       <h3 data-i18n="favors">Favors</h3>
-      <div class="sheet-item-favor">
+      <div class="sheet-item sheet-item-favor">
         <h4 data-i18n="name">Name</h4>
         <h4 data-i18n="appeasement">Appeasement</h4>
         <h4 data-i18n="duration">Duration</h4>
         <h4 data-i18n="range">Range</h4>        
       </div>
       <fieldset class="repeating_favors">
-        <div class="sheet-item-favor">
-          <input type="text" name="attr_favorname" placeholder="i.e. Curse">
-          <input type="text" name="attr_favorappeasement" placeholder="3/5/7">
-          <input type="text" name="attr_favorduration" placeholder="Permanent" />
-          <input type="text" name="attr_favorrange" placeholder="10yds/Appeasement">
+        <div class="sheet-item sheet-item-favor">
+          <input type="text" name="attr_favorname" value="i.e. Curse">
+          <input type="text" name="attr_favorappeasement" value="3/5/7">
+          <input type="text" name="attr_favorduration" value="Permanent" />
+          <input type="text" name="attr_favorrange" value="10yds/Appeasement">
           <button type="roll" name="roll_favor" value="@{gmtoggle}&{template:simple} {{rollname=@{favorname}}} {{dice=[[{@{favorlvl}@{favortrait}!!k1}>@{favortn}cs{@{favortn}+5}]]}}"></button>
-          <textarea name="attr_favordesc" placeholder="Description"></textarea>
+          <textarea name="attr_favordesc" value="Description"></textarea>
         </div>
       </fieldset>
     </div>
@@ -1419,40 +1475,40 @@
   <input type="radio" class="sheet-tab" name="sheet-tabs" value="4" title="Misc"/>
   <label for="sheet-tab-misc" class="sheet-tab" data-i18n="misc">Misc</label>
 
-  <div class="sheet-section-misc sheet-borderdiv">
+  <div class="sheet-section sheet-section-misc sheet-borderdiv">
     <div class="sheet-borderdiv">
       <h2 data-i18n="edges">Edges</h2>
       <fieldset class="repeating_edges">
-        <div class="sheet-item-edges">
-          <input type="text" name="attr_edgename" placeholder="Edge name" />
-          <input type="text" name="attr_edgecost" placeholder="3" />
-          <textarea name="attr_edgesdesc" placeholder="Description"></textarea>
+        <div class="sheet-item sheet-item-edges">
+          <input type="text" name="attr_edgename" value="Edge name" />
+          <input type="text" name="attr_edgecost" value="3" />
+          <textarea name="attr_edgesdesc" value="Description"></textarea>
         </div>
       </fieldset>
     </div>
     <div class="sheet-borderdiv">
       <h2 data-i18n="hindrances">Hindrances</h2>
       <fieldset class="repeating_hinds">
-        <div class="sheet-item-edges">
-          <input type="text" name="attr_hindname" placeholder="Hindrance name" />
-          <input type="text" name="attr_hindcost" placeholder="-3" />
-          <textarea name="attr_hinddesc" placeholder="Description"></textarea>
+        <div class="sheet-item sheet-item-edges">
+          <input type="text" name="attr_hindname" value="Hindrance name" />
+          <input type="text" name="attr_hindcost" value="-3" />
+          <textarea name="attr_hinddesc" value="Description"></textarea>
         </div>
       </fieldset>
     </div>
-    <div class="sheet-borderdiv sheet-item-misc">
+    <div class="sheet-borderdiv sheet-item sheet-item-misc">
       <h2 data-i18n="equipment">Equipment</h2>
-      <textarea name="attr_equipment" class="sheet-textarea-large" placeholder="Equipment"></textarea>
+      <textarea name="attr_equipment" class="sheet-textarea-large" value="Equipment"></textarea>
       <h2 data-i18n="money">Money</h2>
-      <textarea name="attr_money" placeholder="Money"></textarea>
+      <textarea name="attr_money" value="Money"></textarea>
     </div>
-    <div class="sheet-borderdiv sheet-item-misc">
+    <div class="sheet-borderdiv sheet-item sheet-item-misc">
       <h2 data-i18n="worstNightmare">Worst Nightmare</h2>
-      <textarea name="attr_nightmare" placeholder="Elm Street" class="sheet-textarea-large"></textarea>
+      <textarea name="attr_nightmare" value="Elm Street" class="sheet-textarea-large"></textarea>
     </div>
-    <div class="sheet-borderdiv sheet-item-misc sheet-span-cols">
+    <div class="sheet-borderdiv sheet-item sheet-item-misc sheet-span-cols">
       <h2 data-i18n="notes">Notes</h2>
-      <textarea name="attr_notes" placeholder="Notes"></textarea>
+      <textarea name="attr_notes" value="Notes"></textarea>
     </div>
   </div>
   <!-- Misc Tab - End -->
