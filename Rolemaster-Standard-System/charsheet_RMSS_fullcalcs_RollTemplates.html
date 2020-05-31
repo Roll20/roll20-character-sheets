@@ -1,10 +1,10 @@
 <!-- RoleMaster Standard System Character Sheet -->
 <!-- by Diana P. -->
 <!-- I borrowed some code/equations from Brian. And Sam. And Aaron I. And others -->
-<!-- Version 2.4.24 (unit changing) dated 05/21/2020 -->
+<!-- Version 2.4.25 (unit changing) dated 05/25/2020 -->
 <input type="hidden" name="attr_character_sheet" title="character-sheet" value="RMSS-FullCalcs"/>
-<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="4.24" />
-<p style="font-size: 0.6em;">V2.<span name="attr_sheetversion" title="sheetversion" ></span> 05/21/2020 by Diana P.</p>
+<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="4.25" />
+<p style="font-size: 0.6em;">V2.<span name="attr_sheetversion" title="sheetversion" ></span> 05/25/2020 by Diana P.</p>
 <input type="checkbox" class="announcement-show cbox" title="announcement-show" name="attr_announcement-show" value="1" checked />
 <div class="announcement">
 	<div class="table-style">
@@ -307,8 +307,16 @@
 							<span class="table-data-center">&nbsp;</span>
 							<span class="table-data-center">&nbsp;</span>
 						</div>
-					</div>
-					<div class="table-style">
+					<!--/div>
+					<div class="table-style"-->
+						<div class="table-row"> 
+							<span class="table-data-center-bottom-bold" ><span data-i18n="current-movement-rate">Current Movement Rate</span>:</span>
+							<span class="table-data-center-bottom"><input type="text" class="table-data-center" name="attr_currentmoverate" title="currentmoverate" value="50" /></span> 
+							<span class="table-data-center" style="width: 5px;" >&nbsp;</span>
+							<span class="table-data-center" style="width: 5px;" >&nbsp;</span>
+							<span class="table-data-center-bottom-bold"> &nbsp; </span>
+							<span class="table-data-center-bottom"> &nbsp; </span>
+						</div>
 						<div class="table-row"> 
 							<span class="table-data-center-bottom-bold" ><span data-i18n="base-movement-rate">Base Movement Rate</span>:</span>
 							<span class="table-data-center-bottom"><input type="text" class="table-data-center" name="attr_basemoverate" title="basemoverate" value="50" /></span> 
@@ -14316,8 +14324,13 @@ on('change:heightunit sheet:opened change:height change:qubonus change:weightpen
 		const weightpenalty = int(values.weightpenalty);
 		const bonusbasemoverate = int(values.bonusbasemoverate);
         if ( (heightunit == "in") || (heightunit == 'in.') || (heightunit == 'inches') || (heightunit == 'inch')) {
-			let basemove = (50+(5*Math.ceil((height/6)-12.5)) + 3*qubonus + weightpenalty +bonusbasemoverate);
+			//let p1 = Math.ceil((height/6)-12.5);
+			//let p2 = 5*p1;
+			//let p3 = 50 + p2 + 3*qubonus;
+			let basemove = (50+(5*Math.ceil((height/6)-12.5)) + 3*qubonus +bonusbasemoverate);
+			let movement = (50+(5*Math.ceil((height/6)-12.5)) + 3*qubonus + weightpenalty +bonusbasemoverate);
             output['basemoverate'] = basemove;
+			output['currentmoverate'] = movement;
 			let runninghorizjump = Math.round((height-70)/2 +50 + 2*stbonus);
 			output['runhorizjump'] = runninghorizjump;
 			let standinghorizjump = Math.round(runninghorizjump/2);
@@ -14326,7 +14339,7 @@ on('change:heightunit sheet:opened change:height change:qubonus change:weightpen
 			output['runvertjump'] = runningvertjump;
 			let standingvertjump = Math.round(runningvertjump/3);
 			output['standvertjump'] = standingvertjump;
-			//console.log('heightunit:' + heightunit + '_  height:' + height + '_ qubonus:' + qubonus + '_  stbonus:' + stbonus + '_  weightpenalty:' + weightpenalty + '_  bonusbasemoverate:' + bonusbasemoverate + '_  basemoverate:'+ basemove + '_  runninghorizjump:' + runninghorizjump + '_ standinghorizjump:' + standinghorizjump + '_  runningvertjump' + runningvertjump + '_ standingvertjump:' + standingvertjump);
+			//console.log('heightunit:' + heightunit + '_  height:' + height + '_ qubonus:' + qubonus + '_  stbonus:' + stbonus + '_ p1:' + p1 + '_ p2:' + p2 + '_  p3:' + p3 + '_  weightpenalty:' + weightpenalty + '_  bonusbasemoverate:' + bonusbasemoverate + '_  basemoverate:'+ basemove + '_  runninghorizjump:' + runninghorizjump + '_ standinghorizjump:' + standinghorizjump + '_  runningvertjump' + runningvertjump + '_ standingvertjump:' + standingvertjump);
         } else {
 			let basemove = (50+(5*Math.ceil((height/6)-12.5)) +3*qubonus+ weightpenalty+bonusbasemoverate);
             output['basemoverate'] = basemove;
@@ -14361,8 +14374,8 @@ on('change:totalweightcarried change:bonusweightallowance change:weight change:e
 		output['weightallowance'] = weightallowance;
 		let encumbrancepen = -8*Math.floor(totalweightcarry/weightallowance)*encumbscale;
 		output['encumbrancepen'] = encumbrancepen;
-		//let weightpen = dbquickpen + encumbrancepen + 3*stmod;
-		let weightpen = encumbrancepen + 3*stmod;
+		let weightpen = -Math.abs(dbquickpen) + encumbrancepen + 3*stmod;
+		//let weightpen = encumbrancepen + 3*stmod;
 		let weightpenalty = Math.min(0, weightpen);
 		let minmanmod = Math.min(0, (encumbrancepen + 3*stmod)) + armormmm;
 		if (totalweightcarry < weightallowance){
@@ -14372,7 +14385,7 @@ on('change:totalweightcarried change:bonusweightallowance change:weight change:e
 			output['weightpenalty'] = weightpenalty;
 			output['minmaneuverpenalty'] = minmanmod;
 		}
-		//console.log('totalweightcarry:' + totalweightcarry + '_ bonusweightallow:' + bonusweightallow + '_  wt:' + wt + '_  encumbscale:' + encumbscale + '_  dbquickpen:' + dbquickpen + '_  armormmm:' + armormmm + '_  stmod:' + stmod + '_  baseweightallowance:' + baseweightallowance + '_  weightallowance:' + weightallowance + '_  encumbrancepen:' + encumbrancepen + '_  weightpen:' + weightpen + '_  weightpenalty:' + weightpenalty + '_  minmanmod:' + minmanmod);
+		//console.log('totalweightcarry:' + totalweightcarry + '_ bonusweightallow:' + bonusweightallow + '_  wt:' + wt + '_  encumbscale:' + encumbscale + '_  dbquickpen:' + dbquickpen + '_  armormmm:' + armormmm + '_  stmod:' + stmod + '_  baseweightallowance:' + baseweightallowance + '_  weightallowance:' + weightallowance + '_  encumbrancepen:' + encumbrancepen + '_ dbquickpen:' + dbquickpen + '_  weightpen:' + weightpen + '_  weightpenalty:' + weightpenalty + '_  minmanmod:' + minmanmod);
 		setAttrs(output);
     });
 });
