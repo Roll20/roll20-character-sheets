@@ -99,8 +99,9 @@
 				<ul>
 					<li>Rolltemplate results now match the selected sheet style, contributed by TamedFlame.</li>
 					<li>Text areas size can be resized in the browser but this caused overlapping issues. Reported by eVie fixed by TamedFlame.</li>
-					<li>Skills Tab. Expanded notes area. Added new text box to enter Skill Modifier notes normally found in the description of the skill.</li>
+					<li>Skills Tab. Expanded notes area. Added new text box to enter Skill Modifier notes normally found in the description of the skill. Added highlight row checbox.</li>
 					<li>Grimoire Tab. Changes College(s) to two text boxes; Primary College and Secondary College. Widened the text box for <b>Reason for Mod (Modifier)</b>.</li>
+					<li>Rolltemplate Ranged Attack Notes to help clarify rules. If failed by 10 or more, a note will show that critical miss doesn't apply to ranged attacks.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset"><span data-i18n="view-all-updates">View All Updates</span></button>
@@ -3895,7 +3896,8 @@ PU2:126 = Power-Ups 2. Page 126
 					</div>
 				</div> <!-- .header -->
 				<fieldset class="repeating_techniquesrevised">
-					<input class="toggle" type="checkbox" title="Click to show/hide more information." name="attr_technique_revised_toggle_notes" />
+					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
+					<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." name="attr_technique_revised_toggle_notes" />
 					<span class="checkbox"></span>
 					<div class="row row-stats">
 						<div class="cell col0">
@@ -7318,8 +7320,9 @@ For more information, see B409.
 			<ul>
 				<li>Rolltemplate results now match the selected sheet style, contributed by TamedFlame.</li>
 				<li>Text areas size can be resized in the browser but this caused overlapping issues. Reported by eVie fixed by TamedFlame.</li>
-				<li>Skills Tab. Expanded notes area. Added new text box to enter Skill Modifier notes normally found in the description of the skill.</li>
+				<li>Skills Tab. Expanded notes area. Added new text box to enter Skill Modifier notes normally found in the description of the skill. Added highlight row checbox.</li>
 				<li>Grimoire Tab. Changes College(s) to two text boxes; Primary College and Secondary College. Widened the text box for <b>Reason for Mod (Modifier)</b>.</li>
+				<li>Rolltemplate Ranged Attack Notes to help clarify rules. If failed by 10 or more, a note will show that critical miss doesn't apply to ranged attacks.</li>
 			</ul>
 
 			<h4>Version: 2.3.5</h4>
@@ -8361,9 +8364,60 @@ See notes for weapon.</textarea>
                                         <!-- NOTE: Roll of 18 check has already been made -->
 
                                         {{#showHitLabel}}Miss{{/showHitLabel}}
-                                        {{#showSuccessLabel}}Failure{{/showSuccessLabel}}
+										{{#showSuccessLabel}}Failure{{/showSuccessLabel}}
+										
                                     </span>
-                                    
+									
+									<!-- if ranged attack, show additional note about 10 or more not applied to ranged attacks -->
+									{{#rangedAttack}}
+									{{#rollLess() effectiveSkill 4}}
+										{{#rollGreater() rollResult 12}}
+											<div style="margin-top: 5px;">
+												<span data-i18n="ranged-critical-miss-by-10-description">Critical miss by 10 or more doesn't apply to ranged weapons. See B382</span>
+											</div>
+										{{/rollGreater() rollResult 12}}
+									{{/rollLess() effectiveSkill 4}}
+									{{/rangedAttack}}
+									
+									{{#rangedAttack}}
+									{{#rollTotal() effectiveSkill 4}}
+										{{#rollGreater() rollResult 13}}
+											<div style="margin-top: 5px;">
+												<span data-i18n="ranged-critical-miss-by-10-description">Critical miss by 10 or more doesn't apply to ranged weapons. See B382</span>
+											</div>
+										{{/rollGreater() rollResult 13}}
+									{{/rollTotal() effectiveSkill 4}}
+									{{/rangedAttack}}
+									
+									{{#rangedAttack}}
+									{{#rollTotal() effectiveSkill 5}}
+										{{#rollGreater() rollResult 14}}
+											<div style="margin-top: 5px;">
+												<span data-i18n="ranged-critical-miss-by-10-description">Critical miss by 10 or more doesn't apply to ranged weapons. See B382</span>
+											</div>
+										{{/rollGreater() rollResult 14}}
+									{{/rollTotal() effectiveSkill 5}}
+									{{/rangedAttack}}
+									
+									{{#rangedAttack}}
+									{{#rollTotal() effectiveSkill 6}}
+										{{#rollGreater() rollResult 15}}
+											<div style="margin-top: 5px;">
+												<span data-i18n="ranged-critical-miss-by-10-description">Critical miss by 10 or more doesn't apply to ranged weapons. See B382</span>
+											</div>
+										{{/rollGreater() rollResult 15}}
+									{{/rollTotal() effectiveSkill 6}}
+									{{/rangedAttack}}
+									
+									{{#rangedAttack}}
+									{{#rollBetween() effectiveSkill 7 15}}
+										{{#rollGreater() rollResult 16}}
+											<div style="margin-top: 5px;">
+												<span data-i18n="ranged-critical-miss-by-10-description">Critical miss by 10 or more doesn't apply to ranged weapons. See B382</span>
+											</div>
+										{{/rollGreater() rollResult 16}}
+									{{/rollBetween() effectiveSkill 7 15}}
+									{{/rangedAttack}}
                                   
                                     <!-- additional critical failure text -->
                                     <!-- if effective skill is 3 or less, critical failure is 13 or higher -->
