@@ -42,6 +42,12 @@ on Github.
 
 ## Changelog
 
+### 2.4.8
+
+* Add range to NPC attacks.
+* Move bonus effort to psionics section for easier finding.
+* Change encumbrance step size from 0.01 to 1.
+
 ### 2.4.7
 
 * Fix attribute boosts not being counted correctly for encumbrance and system strain.
