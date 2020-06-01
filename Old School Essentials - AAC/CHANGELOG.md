@@ -2,6 +2,26 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.2.0
+
+### Added
+
+- Add an option to disable threshold modifier
+- Add monster, normal human, and custom classes as options
+- Add auto-calculating saves and BAB/THAC0 for monsters either as monster HD or as class and level
+- Add monsters in wilderness number appearing values
+
+### Changed
+
+- Change class input to a dropdown
+- Change monster attacks so there is no minimum damage
+- Change monster HD label and title to Number of Hit Dice for clarification
+
+### Fixed
+
+- Fix movementEncounter and movementOverland not being available to tokens (needed to be readonly versus disabled, which means it needed to be calculated via sheet workers and not in the value itself)
+- Fix a bug where monster attack descriptions were not shown
+
 ## 1.1.0
 
 ### Added
