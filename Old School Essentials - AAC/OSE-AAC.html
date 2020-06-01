@@ -361,15 +361,17 @@
       <span data-i18n="weight">Weight</span>
     </div>
     <fieldset class="repeating_weapons">
+      <input class="expand" type="checkbox" name="attr_expandWeapon" data-i18n-title="expand-collapse"
+        title="Expand/Collapse" /><span></span>
       <div class="weapons-grid">
         <div>
           <input type="hidden" name="attr_armorClassType" value="aac">
           <!-- AAC Attack -->
-          <button type="roll" class="attack-roll attack-roll-aac" name="attr_weaponAttack"
-            value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{bab}+@{modquery}]]}} {{damage=[[{[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]], 1}kh1]]}}"></button>
+          <button type="roll" class="attack-roll attack-roll-aac"
+            value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{bab}+@{modquery}]]}} {{damage=[[{[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]], 1}kh1]]}} {{description=@{weaponDescription}}}"></button>
           <!-- DAC Attack (no BAB added) -->
-          <button type="roll" class="attack-roll attack-roll-dac" name="attr_weaponAttack"
-            value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{modquery}]]}} {{damage=[[{[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]], 1}kh1]]}}"></button>
+          <button type="roll" class="attack-roll attack-roll-dac"
+            value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{modquery}]]}} {{damage=[[{[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]], 1}kh1]]}} {{description=@{weaponDescription}}}"></button>
         </div>
         <input type="text" name="attr_weaponName" placeholder="Weapon" />
         <select name="attr_weaponAttributeBonus">
@@ -391,7 +393,8 @@
         <input type="number" name="attr_weaponDamageBonus" value="0" />
         <input type="number" name="attr_weaponWeight" placeholder="100" />
       </div>
-      <input type="hidden" name="attr_weaponDescription" value="" />
+      <input type="text" name="attr_weaponDescription" class="weapon-description" value="" placeholder="Description"
+        data-i18n-placeholder="description" />
     </fieldset>
   </div>
 
@@ -407,8 +410,13 @@
     </div>
     <fieldset class="repeating_spells">
       <div class="spells-grid">
-        <button type="roll" name="spellRoll"
-          value="&{template:simple} {{roll=Casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}} {{effect=[[@{spellEffect}]]}}"></button>
+        <div>
+          <input type="hidden" name="attr_spellRollType" value="describe" />
+          <button type="roll" class="roll"
+            value="&{template:simple} {{roll=Casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}} {{effect=[[@{spellEffect}]]}}"></button>
+          <button type="roll" class="roll-describe"
+            value="&{template:simple} {{roll=Casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}}"></button>
+        </div>
         <input type="text" name="attr_spellName" placeholder="Magic Missile"
           data-i18n-placeholder="spell-name-placeholder" />
         <input type="text" name="attr_spellDuration" placeholder="1 turn"
@@ -504,7 +512,7 @@
   <div class="flex roll">
     <label class="inline-flex">
       <span data-i18n="name">Name</span>
-      <input type="text" name="attr_monsterName" />
+      <input type="text" name="attr_character_name" />
     </label>
     <label class="inline-flex">
       <span class="double" data-i18n="description">Description</span>
@@ -518,13 +526,13 @@
   <div class="flex roll">
     <label class="inline-flex">
       <button type="roll"
-        value="/w gm &{template:simple} {{roll=Number of @{monsterName} appearing}} {{wandering=[[@{numberAppearingWandering}]]}} {{lair=[[@{numberAppearingLair}]]}}">NA</button>
+        value="/w gm &{template:simple} {{roll=Number of @{character_name} appearing}} {{wandering=[[@{numberAppearingWandering}]]}} {{lair=[[@{numberAppearingLair}]]}}">NA</button>
       <input type="text" class="input-as-number" name="attr_numberAppearingWandering" value="0" placeholder="1d4" />
       <input type="text" class="input-as-number" name="attr_numberAppearingLair" value="0" placeholder="2d4+2" />
     </label>
     <label class="inline-flex">
       <button type="roll"
-        value="/w gm &{template:simple} {{roll=Morale of @{monsterName}}} {{morale=[[{2d6+0, 0d0+13}<@{monsterMorale}]]}}"
+        value="/w gm &{template:simple} {{roll=Morale of @{character_name}}} {{morale=[[{2d6+0, 0d0+13}<@{monsterMorale}]]}}"
         title="Morale" data-i18n-title="morale" data-i18n="morale-abbr">ML</button>
       <input type="number" name="attr_monsterMorale" value="7" />
     </label>
@@ -547,7 +555,7 @@
         <div class="flex hp">
           <label class="inline-flex">
             <button type="roll" data-i18n="hit-dice-abbr" title="Hit Dice" data-i18n-title="hit-dice"
-              value="/w gm &{template:simple} {{roll=HP for @{monsterName}}} {{result=[[@{monsterHitDice}d8+@{monsterHitDiceModifier}]]}}">HD</button>
+              value="/w gm &{template:simple} {{roll=HP for @{character_name}}} {{result=[[@{monsterHitDice}d8+@{monsterHitDiceModifier}]]}}">HD</button>
             <input type="number" name="attr_monsterHitDice" value="1" />
             <span>+</span>
             <input type="number" name="attr_monsterHitDiceModifier" value="0" />
@@ -619,7 +627,7 @@
     </div>
     <fieldset class="repeating_weapons">
       <div class="weapons-grid">
-        <button type="roll" name="attr_weaponAttack"
+        <button type="roll"
           value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{monsterBAB}+@{modquery}]]}} {{damage=[[{[[@{weaponDamageDie}]], 1}kh1]]}} {{description=@{weaponDescription}}"></button>
         <input type="number" name="attr_weaponAttacks" value="1">
         <input type="text" name="attr_weaponName" placeholder="Weapon" data-i18n-placeholder="weapon" />
@@ -638,7 +646,7 @@
     </div>
     <fieldset class="repeating_abilities">
       <div class="abilities-grid">
-        <button type="roll" name="abilityRoll"
+        <button type="roll"
           value="&{template:simple} {{roll=@{abilityName}}} {{description=@{abilityDescription}}}"></button>
         <input type="text" name="attr_abilityName" placeholder="Name" data-i18n-placeholder="name" />
         <input type="text" name="attr_abilityDescription" data-i18n-placeholder="description"
@@ -659,8 +667,13 @@
     </div>
     <fieldset class="repeating_spells">
       <div class="spells-grid">
-        <button type="roll" name="spellRoll"
-          value="&{template:simple} {{roll=Casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}} {{effect=[[@{spellEffect}]]}}"></button>
+        <div>
+          <input type="hidden" name="attr_spellRollType" value="describe" />
+          <button type="roll" class="roll"
+            value="&{template:simple} {{roll=Casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}} {{effect=[[@{spellEffect}]]}}"></button>
+          <button type="roll" class="roll-describe"
+            value="&{template:simple} {{roll=Casts @{spellName}}} {{duration=@{spellDuration}}} {{range=@{spellRange}}} {{description=@{spellDescription}}}"></button>
+        </div>
         <input type="text" name="attr_spellName" placeholder="Magic Missile"
           data-i18n-placeholder="spell-name-placeholder" />
         <input type="text" name="attr_spellDuration" placeholder="1 turn"
@@ -939,7 +952,7 @@
         acBonus = 1;
         initMod = 1;
       } else if (values.dex >= 16 && values.dex <= 17) {
-        acBonus = 3;
+        acBonus = 2;
         initMod = 1;
       } else if (values.dex == 18) {
         acBonus = 3;
@@ -1448,4 +1461,27 @@
       });
     });
   });
+
+  // Show/hide Roll/Describe buttons for spells
+  on("change:repeating_spells:spellEffect", function(eventInfo) {
+    if (eventInfo.newValue && eventInfo.newValue !== "") {
+      setAttrs({ repeating_spells_spellRollType: "roll" })
+    } else {
+      setAttrs({ repeating_spells_spellRollType: "describe" })
+    }
+  })
+
+  on("sheet:opened", function () {
+    getSectionIDs("repeating_spells", function(idArray) {
+      idArray.forEach(function(id) {
+        getAttrs([`repeating_spells_${id}_spellEffect`], function(values) {
+          if (values[`repeating_spells_${id}_spellEffect`] !== "") {
+            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "roll" })
+          } else {
+            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "describe" })
+          }
+        })
+      })
+    })
+  })
 </script>
