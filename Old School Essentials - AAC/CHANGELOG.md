@@ -15,6 +15,7 @@
 
 - Change class input to a dropdown
 - Change monster attacks so there is no minimum damage
+- Change monster HD label and title to Number of Hit Dice for clarification
 
 ### Fixed
 
