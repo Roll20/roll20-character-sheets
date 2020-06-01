@@ -128,7 +128,7 @@
                     <label>Bonus Will:</label><input style="width:18%;position:relative;right:3px;margin-right:93px;" type="number" value="0" name="attr_bonuswill" />
                     <label>Bonus Crit:</label><input style="width:18%;position:relative;right:3px;" type="number" value="0" name="attr_bonuswillcrit" /><br />
                     <label>Enemy Will:</label><input style="width:18%;position:relative;right:3px;" type="number" value="0" name="attr_enemywill" />
-                    <div class="attack clearfix">
+                    <div class="attack clearfix willattack">
                         <button type="roll" name="roll_willattack" class="btn" value="&{template:zafirwillattack} {{name=@{custwillattackname}}} {{aim=[[(@{willattackaimdice})d6>5]]}} {{crit=[[(@{willattackcritdice})d6>6]]}} {{resist=[[(@{willattackresistdice})d6>6]]}} {{player=@{char_name}}}">Will Attack</button>
                         <input type="text" name="attr_custwillattackname" spellcheck="false" style="width:110px;margin-right:10px;">
                             <label>+<span name="attr_willattackaimdice"></span> will&nbsp;&nbsp;&nbsp;+<span name="attr_willattackcritdice"></span> crit&nbsp;&nbsp;&nbsp;+<span name="attr_willattackresistdice"></span> resist</label>
@@ -142,12 +142,12 @@
                     <button type="action" name="act_initcombat" class="btn">Initialize Combat</button>
                 </div>-->
                 <h3>Ammo Tracker</h3>
-                <div class="ammotrack clearfix">
+                <div class="paneltracker ammotrack clearfix">
                     <button type="action" name="act_reloadprimary" class="btn">Reload</button>
                     <label style="width:110px"><span name="attr_wpname" value="<primary weapon>"></span>:</label><input type="number" name="attr_wpammo" /><span class="labellike">&nbsp;/&nbsp;</span><span class="labellike" name="attr_wpammo_max"></span><br/>
                 </div>
                 <h3>Dodge Roller</h3>
-                <div class="ammotrack clearfix">
+                <div class="paneltracker dodgeroller clearfix">
                     <button type="roll" name="roll_dodge" class="btn" value="&{template:zafirdodge} {{dodge=[[(@{dodgedice})d6>6]]}} {{player=@{char_name}}}">Dodge</button>
                     <label style="width:110px">Dodge Dice:</label><input type="number" name="attr_dodgedice" />
                 </div>
@@ -517,25 +517,141 @@
         <div class="2colrow">
             <div class="col1 nowrap">
                 <h3>Attacks</h3>
-                <label style="margin-left:12px;width:126px;">Attack Name</label><label style="width:56px;">Aim</label><label style="width:56px;">Crit</label><label>Damage</label>
+                <label>Target Cover:</label><select name="attr_atkcover">
+                    <option value="Full Cover">Full Cover (+0)</option>
+                    <option value="Half Cover">Half Cover (+1 aim)</option>
+                    <option value="No Cover">No Cover (+2 aim/+2 crit)</option>
+                </select><br />
+                <label>Elevation:</label><select name="attr_atkelevation">
+                    <option value="None">None (+0)</option>
+                    <option value="Elevation">Elevation (+1 aim)</option>
+                </select><br />
+                <label>Range:</label><select name="attr_atkrange">
+                    <option value="Optimal Range">Optimal Range (+0)</option>
+                    <option value="Non-optimal">Too Close/Too Far (-1 aim)</option>
+                </select>
+                <br />
                 <div class="customattack attack clearfix">
-                    <button type="roll" name="roll_gmatk" class="btn" value="&{template:zafir} {{name=Attack: @{gmatkname}}} {{aim=[[(@{gmatkaimdice})d6>5]]}} {{crit=[[(@{gmatkcritdice})d6>6]]}} {{damage=[[(@{gmatkdamage})]]}} {{critdmg=[[(@{gmatkdamage}) + (@{gmatkdamage})]]}} {{player=@{char_name}}}">Attack</button>
+                    <button type="roll" name="roll_gmatk" class="btn" value="&{template:zafir} {{name=Attack: @{gmatkname}}} {{aim=[[(@{gmatkaimdicetotal})d6>5]]}} {{crit=[[(@{gmatkcritdicetotal})d6>6]]}} {{damage=[[(@{gmatkdamage})]]}} {{critdmg=[[(@{gmatkdamage}) + (@{gmatkcritdamage})]]}} {{enemy=@{selectedenemy}}}">Attack</button>
                     <input type="text" name="attr_gmatkname" spellcheck="false" style="width:110px;margin-right:10px;">
-                        <label>&nbsp;&nbsp;<input type="number" name="attr_gmatkaimdice">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="number" name="attr_gmatkcritdice">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="attr_gmatkdamage" spellcheck="false">(+<input type="number" name="attr_gmatkcritdamage">)</label>
+                        <label>&nbsp;&nbsp;<input type="number" name="attr_gmatkaimdice">&nbsp;aim&nbsp;&nbsp;&nbsp;<input type="number" name="attr_gmatkcritdice">&nbsp;crit&nbsp;&nbsp;&nbsp;<input type="text" name="attr_gmatkdamage" spellcheck="false">(+<input type="number" name="attr_gmatkcritdamage">)</label>
                 </div>
-                <div class="attack clearfix">
-                    <button type="roll" name="roll_willattack" class="btn" value="&{template:zafirwillattack} {{name=@{custwillattackname}}} {{aim=[[(@{willattackaimdice})d6>5]]}} {{crit=[[(@{willattackcritdice})d6>6]]}} {{resist=[[(@{willattackresistdice})d6>6]]}} {{player=@{char_name}}}">Will Attack</button>
-                    <input type="text" name="attr_custwillattackname" spellcheck="false" style="width:110px;margin-right:10px;">
-                        <label>+<span name="attr_willattackaimdice"></span> will&nbsp;&nbsp;&nbsp;+<span name="attr_willattackcritdice"></span> crit&nbsp;&nbsp;&nbsp;+<span name="attr_willattackresistdice"></span> resist</label>
+                <br />
+                <!-- Will Attack -->
+                <div>
+                    <h3>Will Attack</h3>
+                    <label>Wounded:</label><select name="attr_willatkwounded">
+                        <option value="No">Target at Full Health (+0)</option>
+                        <option value="Yes">Target Wounded (+1 will)</option>
+                    </select><br />
+                    <label>Conditions:</label><select name="attr_willatkcondition">
+                        <option value="No">None (+0)</option>
+                        <option value="Yes">Target has Negative Condition (+1 will)</option>
+                    </select><br />
+                    <label>Isolated:</label><select name="attr_willatkisolated">
+                        <option value="No">No (+0)</option>
+                        <option value="Yes">Target is Isolated (no allies within 4 tiles) (+1 will)</option>
+                    </select><br />
+                    <label>Panic:</label><select name="attr_willatkpanic">
+                        <option value="No">No (+0)</option>
+                        <option value="Ally">Target's Ally Panicked (+1 will)</option>
+                        <option value="Target">Target is Panicked (+1 will, +2 crit)</option>
+                    </select><br />
+                    <div class="customattack attack clearfix willattack">
+                        <button type="roll" name="roll_willattack" class="btn" value="&{template:zafirwillattack} {{name=@{gmwatkname}}} {{aim=[[(@{gmwatkaimdice})d6>5]]}} {{crit=[[(@{gmwatkcritdice})d6>6]]}} {{resist=[[(@{gmwatkresistdice})d6>6]]}} {{enemy=@{selectedenemy}}}">Will Attack</button>
+                        <input type="text" name="attr_gmwatkname" spellcheck="false" style="width:110px;margin-right:10px;">
+                            <label><input type="number" name="attr_gmwatkwill"> will&nbsp;&nbsp;<input type="number" name="attr_gmwatkwillcrit"> crit&nbsp;&nbsp;<input type="number" name="attr_gmenemywill"> resist</label>
+                    </div>
+                </div>
+                <br />
+                <!-- Dodge Roller -->
+                <div>
+                    <h3>Dodge Roller</h3>
+                    <div class="attack customattack clearfix dodgeroller">
+                        <button type="roll" name="roll_dodge" class="btn" value="&{template:zafirdodge} {{dodge=[[(@{dodgedice})d6>6]]}} {{enemy=@{selectedenemy}}}">Dodge</button>
+                        <label style="width:110px">Dodge Dice:</label><input type="number" name="attr_dodgedice" />
+                    </div>
                 </div>
             </div>
-            <div class="col2 nowrap">
+            <div class="col2 nowrap readonly gmunits">
+                <div class="selectedunit">
+                    <div class="nameplate">
+                        <span name="attr_selectedenemy">&nbsp;</span>
+                    </div>
+                    <div class="content">
+                        <div class="3colrowx">
+                            <div class="colx">
+                                <span class="label">HP:</span> <span name="attr_selectedenemyhp">00</span>
+                            </div>
+                            <div class="colx">
+                                <span class="label">AP:</span> <span name="attr_selectedenemyap">00</span>
+                            </div>
+                            <div class="colx">
+                                <span class="label">SP:</span> <span name="attr_selectedenemysp">00</span>
+                            </div>
+                        </div>
+                        <div class="3colrowx">
+                            <div class="colx">
+                                <span class="label">Speed:</span> <span name="attr_selectedenemyspeed">00</span>
+                            </div>
+                            <div class="colx">
+                                <span class="label">Aim:</span> <span name="attr_selectedenemyaim">00</span>
+                            </div>
+                            <div class="colx">
+                                <span class="label">Will:</span> <span name="attr_selectedenemywill">00</span>
+                            </div>
+                        </div>
+                        <span class="label">Attack:</span> <span name="attr_selectedenemyatkname">Weapon</span>
+                        <div style="margin-left:24px;">
+                            <span class="label">Aim:</span> +<span name="attr_selectedenemyatkaim"></span>, 
+                            <span class="label">Crit:</span> +<span name="attr_selectedenemyatkcrit"></span>, 
+                            <span class="label">Dmg:</span> <span name="attr_selectedenemyatkdmg"></span> (+<span name="attr_selectedenemyatkcritdmg"></span>)
+                        </div>
+                    </div>
+                </div>
                 <h3>Enemy Unit Selector</h3>
+                <fieldset class="repeating_gmenemyunitlist">
+                    <button type="action" name="act_selectunit" class="btn"><span name="attr_gmunitname"></span></button>
+                </fieldset>
             </div>
         </div>
     </div>
 
     <div class="gmunits">
+        <fieldset class="repeating_gmenemyunitlist">
+            <h3 style="border-bottom:1px solid #aaa;"><span name="attr_gmunitname">New Enemy Unit</span></h3>
+            <div class="2colrow" style="margin-bottom:8px;">
+                <div class="col nowrap">
+                    <label>Unit Name:</label><input type="text" spellcheck="false" name="attr_gmunitname" />
+                    <br />
+                    <label>HP:</label><input type="number" name="attr_gmunithp" style="margin-right:10px;"/>
+                    <label style="width:74px;">AP:</label><input type="number" name="attr_gmunitap" style="margin-right:10px;"/>
+                    <label style="width:73px;">SP:</label><input type="number" name="attr_gmunitsp" />
+                    <br />
+                    <label>Speed:</label><input type="number" name="attr_gmunitspeed" style="margin-right:10px;" />
+                    <label style="width:74px;">Aim:</label><input type="number" name="attr_gmunitaim" style="margin-right:10px;" />
+                    <label style="width:73px;">Will:</label><input type="number" name="attr_gmunitwill" />
+                    <div class="clearfix">
+                        <label>Notes:</label></br>
+                        <textarea name="attr_gmunitnotes"></textarea>
+                    </div>
+                </div>
+                <div class="col nowrap">
+                    <label>Atk Name:</label><input type="text" spellcheck="false" name="attr_gmunitatkname" />
+                    <div class="2colrowx">
+                        <div class="colx nowrap">
+                            <label>Aim Dice:</label><input type="number" name="attr_gmunitatkaim" /><br />
+                            <label>Crit Dice:</label><input type="number" name="attr_gmunitatkcrit" />
+                        </div>
+                        <div class="colx nowrap">
+                            <label>Damage:</label><input type="text" spellcheck="false" name="attr_gmunitatkdmg" /><br />
+                            <label>Crit Dmg:</label><input type="number" name="attr_gmunitatkcritdmg" />
+                        </div>
+                    </div>
+                    <label>Notes:</label><input type="text" spellcheck="false" name="attr_gmunitatknotes" />
+                </div>
+            </div>
+        </fieldset>
     </div>
 </div>
 
@@ -733,7 +849,9 @@ const attackDiceInputs = [
     "atkelevation",
     "atkrange",
     "atkotheraim",
-    "atkothercrit"
+    "atkothercrit",
+    "gmatkaimdice",
+    "gmatkcritdice"
 ];
 on(sheetOpenAndAttrChanged(attackDiceInputs), function() {
     getAttrs(attackDiceInputs, function(values) {
@@ -749,6 +867,8 @@ on(sheetOpenAndAttrChanged(attackDiceInputs), function() {
         let atkrange = values.atkrange;
         let atkotheraim = parseInt(values.atkotheraim)||0;
         let atkothercrit = parseInt(values.atkothercrit)||0;
+        let gmatkaimdice = parseInt(values.gmatkaimdice)||0;
+        let gmatkcritdice = parseInt(values.gmatkcritdice)||0;
 
         let aimBonus = 0;
         let critBonus = 0;
@@ -780,7 +900,9 @@ on(sheetOpenAndAttrChanged(attackDiceInputs), function() {
             wsattackcritdice: Math.max(wscritdice + atkothercrit + critBonus, 0),
             wsattackdamage: wsdamage,
             custattackaimdice: Math.max(aim + atkotheraim + aimBonus, 0),
-            custattackcritdice: Math.max(atkothercrit + critBonus, 0)
+            custattackcritdice: Math.max(atkothercrit + critBonus, 0),
+            gmatkaimdicetotal: Math.max(gmatkaimdice + aimBonus, 0),
+            gmatkcritdicetotal: Math.max(gmatkcritdice + critBonus, 0)
         });
     });
 });
@@ -790,6 +912,9 @@ const willAttackInputs = [
     "bonuswill",
     "bonuswillcrit",
     "enemywill",
+    "gmwatkwill",
+    "gmwatkwillcrit",
+    "gmenemywill",
     "willatkwounded",
     "willatkcondition",
     "willatkisolated",
@@ -801,6 +926,9 @@ on(sheetOpenAndAttrChanged(willAttackInputs), function() {
         let extraWill = parseInt(values.bonuswill)||0;
         let extraCrit = parseInt(values.bonuswillcrit)||0;
         let enemywill = parseInt(values.enemywill)||0;
+        let gmwatkwill = parseInt(values.gmwatkwill)||0;
+        let gmwatkwillcrit = parseInt(values.gmwatkwillcrit)||0;
+        let gmenemywill = parseInt(values.gmenemywill)||0;
         let willatkwounded = values.willatkwounded;
         let willatkcondition = values.willatkcondition;
         let willatkisolated = values.willatkisolated;
@@ -829,7 +957,10 @@ on(sheetOpenAndAttrChanged(willAttackInputs), function() {
         setAttrs({
             willattackaimdice: Math.max(will + extraWill + willBonus, 0),
             willattackcritdice: Math.max(extraCrit + critBonus, 0),
-            willattackresistdice: Math.max(enemywill, 0)
+            willattackresistdice: Math.max(enemywill, 0),
+            gmwatkaimdice: Math.max(gmwatkwill + willBonus, 0),
+            gmwatkcritdice: Math.max(gmwatkwillcrit + critBonus, 0),
+            gmwatkresistdice: Math.max(gmenemywill, 0) 
         });
     });
 });
@@ -896,6 +1027,43 @@ on("clicked:switchsheettype", function() {
         setAttrs({
             sheetTypeToggle: sheetTypeToggle == "charactersheet" ? "gmtools" : "charactersheet"
         });
+    });
+});
+
+on("clicked:repeating_gmenemyunitlist:selectunit", function(eventinfo) {
+    let unitId = eventinfo.sourceAttribute.replace("repeating_gmenemyunitlist_", "").replace("_selectunit", "");
+    let attrs = [
+    /*0 */ ["_gmunitname", "selectedenemy"],
+    /*1 */ ["_gmunithp", "selectedenemyhp"],
+    /*2 */ ["_gmunitap", "selectedenemyap"],
+    /*3 */ ["_gmunitsp", "selectedenemysp"],
+    /*4 */ ["_gmunitspeed", "selectedenemyspeed"],
+    /*5 */ ["_gmunitaim", "selectedenemyaim"],
+    /*6 */ ["_gmunitwill", "selectedenemywill"],
+    /*7 */ ["_gmunitatkname", "selectedenemyatkname"],
+    /*8 */ ["_gmunitatkaim", "selectedenemyatkaim"],
+    /*9 */ ["_gmunitatkcrit", "selectedenemyatkcrit"],
+    /*10*/ ["_gmunitatkdmg", "selectedenemyatkdmg"],
+    /*11*/ ["_gmunitatkcritdmg", "selectedenemyatkcritdmg"],
+    /*12*/ ["_gmunitatkname", "gmatkname"],
+    /*13*/ ["_gmunitatkcrit", "gmatkcritdice"],
+    /*14*/ ["_gmunitatkdmg", "gmatkdamage"],
+    /*15*/ ["_gmunitatkcritdmg", "gmatkcritdamage"],
+    /*16*/ ["_gmunitatkaim", "gmatkaimdice"],
+    /*17*/ ["_gmunitwill", "gmwatkwill"],
+    ];
+
+    attrGetters = [];
+    attrs.forEach(attrPair => {
+        attrPair[0] = eventinfo.sourceAttribute.replace("_selectunit", attrPair[0]);
+        attrGetters.push(attrPair[0]);
+    });
+    getAttrs(attrGetters, function(values) {
+        let output = {};
+        attrs.forEach(attrPair => {
+            output[attrPair[1]] = values[attrPair[0]];
+        });
+        setAttrs(output);
     });
 });
 
