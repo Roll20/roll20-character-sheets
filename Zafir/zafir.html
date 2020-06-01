@@ -327,19 +327,11 @@
         <div class="eba">
             <h3>BodyArmor</h3>
             <div class="2colrow">
-                <div class="col">
+                <div class="col nowrap">
                     <label>Name:</label><input type="text" spellcheck="false" name="attr_baname" /><br/>
-                    <div class="3colrowx nowrap">
-                        <div class="colx">
-                            <label>HP:</label><input type="number" name="attr_bahp" />
-                        </div>
-                        <div class="colx">
-                            <label style="position:relative;left:50px;">AP:</label><input type="number" name="attr_baap" />
-                        </div>
-                        <div class="colx">
-                            <label style="position:relative;left:50px;">SP:</label><input type="number" name="attr_basp" />
-                        </div>
-                    </div>
+                    <label>HP:</label><input type="number" name="attr_bahp" style="margin-right:10px;"/>
+                    <label style="width:74px;">AP:</label><input type="number" name="attr_baap" style="margin-right:10px;"/>
+                    <label style="width:73px;">SP:</label><input type="number" name="attr_basp" />
                     <div class="clearfix">
                         <label>Notes:</label><textarea name="attr_banotes"></textarea>
                     </div>
@@ -601,11 +593,18 @@
                                 <span class="label">Will:</span> <span name="attr_selectedenemywill">00</span>
                             </div>
                         </div>
-                        <span class="label">Attack:</span> <span name="attr_selectedenemyatkname">Weapon</span>
-                        <div style="margin-left:24px;">
-                            <span class="label">Aim:</span> +<span name="attr_selectedenemyatkaim"></span>, 
-                            <span class="label">Crit:</span> +<span name="attr_selectedenemyatkcrit"></span>, 
-                            <span class="label">Dmg:</span> <span name="attr_selectedenemyatkdmg"></span> (+<span name="attr_selectedenemyatkcritdmg"></span>)
+                        <input type="hidden" class="valuehider" name="attr_selectedenemynotes" value=""/>
+                        <div class="notes wrap" style="margin-left:8px;"><span name="attr_selectedenemynotes"></span></div>
+                        <div class="attackinfo">
+                            <span class="label" style="margin-left:-24px;">Attack:</span> <span name="attr_selectedenemyatkname">Weapon</span>
+                            <input type="hidden" class="hideifzero" name="attr_gmshowattackinfo" value="1"/>                        
+                            <div>
+                                <span class="label">Aim:</span> +<span name="attr_selectedenemyatkaim"></span>, 
+                                <span class="label">Crit:</span> +<span name="attr_selectedenemyatkcrit"></span>, 
+                                <span class="label">Dmg:</span> <span name="attr_selectedenemyatkdmg"></span> (+<span name="attr_selectedenemyatkcritdmg"></span>)
+                                <input type="hidden" class="valuehider" name="attr_selectedenemyatknotes" value=""/>
+                                <div class="notes wrap"><span name="attr_selectedenemyatknotes"></span></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -613,6 +612,8 @@
                 <fieldset class="repeating_gmenemyunitlist">
                     <button type="action" name="act_selectunit" class="btn"><span name="attr_gmunitname"></span></button>
                 </fieldset>
+                <h3>Options</h3>
+                <label>Show Attack Info:</label><input type="checkbox" name="attr_gmshowattackinfo" value="1" checked="true" />
             </div>
         </div>
     </div>
@@ -1051,6 +1052,8 @@ on("clicked:repeating_gmenemyunitlist:selectunit", function(eventinfo) {
     /*15*/ ["_gmunitatkcritdmg", "gmatkcritdamage"],
     /*16*/ ["_gmunitatkaim", "gmatkaimdice"],
     /*17*/ ["_gmunitwill", "gmwatkwill"],
+    /*18*/ ["_gmunitnotes", "selectedenemynotes"],
+    /*19*/ ["_gmunitatknotes", "selectedenemyatknotes"],
     ];
 
     attrGetters = [];
@@ -1061,7 +1064,11 @@ on("clicked:repeating_gmenemyunitlist:selectunit", function(eventinfo) {
     getAttrs(attrGetters, function(values) {
         let output = {};
         attrs.forEach(attrPair => {
-            output[attrPair[1]] = values[attrPair[0]];
+            if (attrPair[1] == "selectedenemynotes")
+            {
+                console.log(values[attrPair[0]]);
+            }
+            output[attrPair[1]] = values[attrPair[0]].replace("\\n", "&#13;&#10;");
         });
         setAttrs(output);
     });
