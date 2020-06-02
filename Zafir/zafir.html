@@ -1,0 +1,819 @@
+<!-- Top Row: Logo, Character info, Class & Level info -->
+<div class="3colrow main">
+    <div class="col">
+        <img src="https://raw.githubusercontent.com/RandyKnapp/roll20-character-sheets/master/Zafir/zafir-black-small.png" />
+    </div>
+
+    <div class="col">
+        <label>Name:</label><input type="text" spellcheck="false" name="attr_char_name" />
+        <label>Pronouns:</label><input type="text" spellcheck="false" name="attr_char_pronouns" />
+        <label>Origin:</label><input type="text" spellcheck="false" name="attr_char_origin" />
+    </div>
+
+    <div class="col">
+        <label>Class:</label><input type="text" spellcheck="false" name="attr_class" />
+        <label>Level:</label><input type="number" name="attr_level" /><br/>
+        <label>XP:</label><input type="number" name="attr_xp" />
+    </div>
+</div>
+
+<hr/>
+
+<!-- Second Row: Base Attributes, Combat Attributes, Status -->
+<div class="3colrow attributes">
+    <div class="col">
+        <h3>Base Attributes</h3>
+        <label>Toughness:</label><input type="number" name="attr_toughness" /><br/>
+        <label>Agility:</label><input type="number" name="attr_agility" /><br/>
+        <label>Accuracy:</label><input type="number" name="attr_accuracy" /><br/>
+        <label>Discipline:</label><input type="number" name="attr_discipline" />
+    </div>
+
+    <div class="col">
+        <h3>Combat Attributes</h3>
+        <label class="tooltip">Max HP:<span class="tooltiptext"><b>Max HP:</b><br/>2<br/>+&nbsp;Half&nbsp;Level<br/>+&nbsp;Toughness<br/>+&nbsp;Body&nbsp;Armor<br/>+&nbsp;Other</span></label><input type="number" name="attr_hp_max" /><br/>
+        <label class="tooltip">Speed:<span class="tooltiptext"><b>Speed:</b><br/>6<br/>+&nbsp;Double&nbsp;Agility<br/>+&nbsp;Equipment<br/>+&nbsp;Abilities<br/>+&nbsp;Other</span></label><input type="number" name="attr_speed" /><br/>
+        <label class="tooltip">Aim:<span class="tooltiptext"><b>Aim:</b><br/>Accuracy<br/>+&nbsp;Equipment<br/>+&nbsp;Abilities<br/>+&nbsp;Other</span></label><input type="number" name="attr_aim" /><br/>
+        <label class="tooltip">Will:<span class="tooltiptext"><b>Will:</b><br/>Discipline<br/>+&nbsp;Equipment<br/>+&nbsp;Abilities<br/>+&nbsp;Other</span></label><input type="number" name="attr_will" />
+    </div>
+
+    <div class="col">
+        <h3>Status</h3>
+        <label>HP <span style="font-family:Pictos">k</span>:</label><input type="number" name="attr_hp" /><span class="labellike">&nbsp;/&nbsp;</span><span class="labellike" name="attr_hp_max"></span><br/>
+        <label>AP <span style="font-family:'Pictos Three'">b</span>:</label><input type="number" name="attr_ap" /><br/>
+        <label>SP <span style="font-family:Pictos">L</span>:</label><input type="number" name="attr_sp" /><br/>
+        <label>Focus:</label><input type="number" name="attr_focus" />
+    </div>
+</div>
+
+
+<!-- Main tab bar -->
+<br />
+<input type="hidden" class="tabstoggle" name="attr_sheetTab" value="atk" />
+<div class="tabrow">
+    <button type="action" name="act_atk" class="atkbtn">Combat Panel</button>
+    <button type="action" name="act_aab" class="aabbtn">Abilities</button>
+    <button type="action" name="act_eqp" class="eqpbtn">Equipment</button>
+    <button type="action" name="act_res" class="resbtn">Responsibilities</button>
+    <button type="action" name="act_inv" class="invbtn">Inventory</button>
+    <button type="action" name="act_oth" class="othbtn">Misc</button>
+</div>
+<br />
+
+<!-- Combat Panel -->
+<div class="atk">
+    <div class="2colrow">
+        <div class="col1 nowrap">
+            <input type="hidden" class="tabstoggle" name="attr_sheetTabAttacks" value="cwp" />
+            <div class="tabrow">
+                <h2>Combat Panel</h2>
+                <button type="action" name="act_cwp" class="cwpbtn">Weapon Attack</button>
+                <button type="action" name="act_cwl" class="cwlbtn">Will Attack</button>
+            </div>
+            <br />
+            <div class="cwp">
+                <h3>Weapon Attack</h3>
+                <label>Target Cover:</label><select name="attr_atkcover">
+                    <option value="Full Cover">Full Cover (+0)</option>
+                    <option value="Half Cover">Half Cover (+1 aim)</option>
+                    <option value="No Cover">No Cover (+2 aim/+2 crit)</option>
+                </select><br />
+                <label>Elevation:</label><select name="attr_atkelevation">
+                    <option value="None">None (+0)</option>
+                    <option value="Elevation">Elevation (+1 aim)</option>
+                </select><br />
+                <label>Range:</label><select name="attr_atkrange">
+                    <option value="Optimal Range">Optimal Range (+0)</option>
+                    <option value="Non-optimal">Too Close/Too Far (-1 aim)</option>
+                </select><br />
+                <label>Bonus Aim:</label><input style="width:18%;position:relative;right:3px;margin-right:93px;" type="number" value="0" name="attr_atkotheraim" />
+                <label>Bonus Crit:</label><input style="width:18%;position:relative;right:3px;" type="number" value="0" name="attr_atkothercrit" />
+                <div class="attack clearfix">
+                    <button type="roll" name="roll_attackprimary" class="btn" value="&{template:zafir} {{name=Attack: @{wpname}}} {{aim=[[(@{wpattackaimdice})d6>5]]}} {{crit=[[(@{wpattackcritdice})d6>6]]}} {{damage=[[(@{wpattackdamage})]]}} {{critdmg=[[(@{wpattackdamage}) + (@{wpcritdmg})]]}} {{notes=@{wpnotes}}}">Attack</button>
+                    <label style="width:110px"><span name="attr_wpname"></span></label>
+                        <label>+<span name="attr_wpattackaimdice"></span> aim&nbsp;&nbsp;&nbsp;+<span name="attr_wpattackcritdice"></span> crit&nbsp;&nbsp;&nbsp;damage: <span name="attr_wpattackdamage"></span></label>
+                </div>
+                <div class="attack clearfix">
+                    <button type="roll" name="roll_attacksecondary" class="btn" value="&{template:zafir} {{name=Attack: @{wsname}}} {{aim=[[(@{wsattackaimdice})d6>5]]}} {{crit=[[(@{wsattackcritdice})d6>6]]}} {{damage=[[(@{wsattackdamage})]]}} {{critdmg=[[(@{wsattackdamage}) + (@{wscritdmg})]]}} {{notes=@{wsnotes}}}">Attack</button>
+                    <label style="width:110px"><span name="attr_wsname"></span></label>
+                        <label>+<span name="attr_wsattackaimdice"></span> aim&nbsp;&nbsp;&nbsp;+<span name="attr_wsattackcritdice"></span> crit&nbsp;&nbsp;&nbsp;damage: <span name="attr_wsattackdamage"></span></label>
+                </div>
+                <div class="customattack attack clearfix">
+                    <button type="roll" name="roll_attackcustom" class="btn" value="&{template:zafir} {{name=Attack: @{custattackname}}} {{aim=[[(@{custattackaimdice})d6>5]]}} {{crit=[[(@{custattackcritdice})d6>6]]}} {{damage=[[(@{custattackdamage})]]}} {{critdmg=[[(@{custattackdamage}) + (@{custcritdamage})]]}}">Attack</button>
+                    <input type="text" name="attr_custattackname" spellcheck="false" style="width:110px;margin-right:10px;">
+                        <label>+<span name="attr_custattackaimdice"></span> aim&nbsp;&nbsp;&nbsp;+<span name="attr_custattackcritdice"></span> crit&nbsp;&nbsp;&nbsp;damage: <input type="text" name="attr_custattackdamage" spellcheck="false"><span class="tooltip">(+<input type="number" name="attr_custcritdamage">)<span class="tooltiptext">Crit Damage</span></span></label>
+                </div>
+            </div>
+            <div class="cwl">
+                <h3>Will Attack</h3>
+                <label>Wounded:</label><select name="attr_willatkwounded">
+                    <option value="No">Target at Full Health (+0)</option>
+                    <option value="Yes">Target Wounded (+1 will)</option>
+                </select><br />
+                <label>Conditions:</label><select name="attr_willatkcondition">
+                    <option value="No">None (+0)</option>
+                    <option value="Yes">Target has Negative Condition (+1 will)</option>
+                </select><br />
+                <label>Isolated:</label><select name="attr_willatkisolated">
+                    <option value="No">No (+0)</option>
+                    <option value="Yes">Target is Isolated (no allies within 4 tiles) (+1 will)</option>
+                </select><br />
+                <label>Ally Panic:</label><select name="attr_willatkallypanic">
+                    <option value="No">No (+0)</option>
+                    <option value="Yes">Target's Ally is Panicked (+1 will)</option>
+                </select><br />
+                <label>Target Panic:</label><select name="attr_willatkpanic">
+                    <option value="No">No (+0)</option>
+                    <option value="Yes">Target is Panicked (+2 crit)</option>
+                </select><br />
+                <label>Bonus Will:</label><input style="width:18%;position:relative;right:3px;margin-right:93px;" type="number" value="0" name="attr_bonuswill" />
+                <label>Bonus Crit:</label><input style="width:18%;position:relative;right:3px;" type="number" value="0" name="attr_bonuswillcrit" /><br />
+                <label>Enemy Will:</label><input style="width:18%;position:relative;right:3px;" type="number" value="0" name="attr_enemywill" />
+                <div class="attack clearfix">
+                    <button type="roll" name="roll_willattack" class="btn" value="&{template:zafirwillattack} {{name=@{custwillattackname}}} {{aim=[[(@{willattackaimdice})d6>5]]}} {{crit=[[(@{willattackcritdice})d6>6]]}} {{resist=[[(@{willattackresistdice})d6>6]]}}">Will Attack</button>
+                    <input type="text" name="attr_custwillattackname" spellcheck="false" style="width:110px;margin-right:10px;">
+                        <label>+<span name="attr_willattackaimdice"></span> will&nbsp;&nbsp;&nbsp;+<span name="attr_willattackcritdice"></span> crit&nbsp;&nbsp;&nbsp;+<span name="attr_willattackresistdice"></span> resist</label>
+                </div>
+            </div>
+        </div>
+        <div class="col2 nowrap">
+            <!-- TODO HELPER BUTTONS
+            <div class="clearfix">
+                <button type="action" name="act_roundstart" class="btn">Round Start</button>
+                <button type="action" name="act_initcombat" class="btn">Initialize Combat</button>
+            </div>-->
+            <h3>Ammo Tracker</h3>
+            <div class="ammotrack clearfix">
+                <button type="action" name="act_reloadprimary" class="btn">Reload</button>
+                <label style="width:110px"><span name="attr_wpname" value="<primary weapon>"></span>:</label><input type="number" name="attr_wpammo" /><span class="labellike">&nbsp;/&nbsp;</span><span class="labellike" name="attr_wpammo_max"></span><br/>
+            </div>
+            <h3>Condition Tracker</h3>
+            <div class="inset nowrap tracker">
+                <fieldset class="repeating_conditiontracker">
+                    <input type="text" spellcheck="false" name="attr_conditionname" />
+                    <input type="number" name="attr_conditionvalue" />
+                </fieldset>
+            </div>
+            <h3>Cooldown Tracker</h3>
+            <div class="inset nowrap tracker">
+                <fieldset class="repeating_cooldowntracker">
+                    <input type="text" spellcheck="false" name="attr_cooldownname" />
+                    <input type="number" name="attr_cooldownvalue" />
+                </fieldset>
+            </div>
+            <h3>Charges Tracker</h3>
+            <div class="inset nowrap tracker">
+                <fieldset class="repeating_chargetracker">
+                    <input type="text" spellcheck="false" name="attr_chargename" />
+                    <input type="number" name="attr_chargevalue" />
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<!-- Abilities -->
+<div class="aab">
+    <input type="hidden" class="tabstoggle" name="attr_sheetTabAbilities" value="aaa" />
+    <div class="tabrow">
+        <h2>Abilities</h2>
+        <button type="action" name="act_aaa" class="aaabtn">Active Abilities</button>
+        <button type="action" name="act_apa" class="apabtn">Passive Abilities</button>
+    </div>
+    <br />
+
+    <div class="aaa nowrap">
+        <h3>Active Abilities</h3>
+        <fieldset class="repeating_activeabilities">
+            <label>Name:</label><input type="text" spellcheck="false" name="attr_aablname" />
+            <label>Activation:</label>
+                <select name="attr_aablactivation">
+                    <option value="Free Action">Free Action</option>
+                    <option value="Action">Action</option>
+                    <option value="Action + Ends Turn">Action + Ends Turn</option>
+                </select>
+                <br/>
+            <div class="3colrow">
+                <div class="col">
+                    <label>Range:</label>
+                    <select name="attr_aablrange">
+                        <option value="Self">Self</option>
+                        <option value="Weapon">Weapon</option>
+                        <option value="Adjacent">Adjacent</option>
+                        <option value="Short">Short</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Long">Long</option>
+                        <option value="-">-</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label>Cooldown:</label><input type="number" name="attr_aablcooldown" />
+                </div>
+                <div class="col">
+                    <label>Charges:</label><input type="number" name="attr_aablcharges" /><br/>
+                </div>
+            </div>
+            <label>Effect:</label><textarea name="attr_aableffect"></textarea>
+            <hr />
+        </fieldset>
+    </div>
+    <div class="apa">
+        <h3>Passive Abilities</h3>
+        <fieldset class="repeating_passiveabilities">
+            <label>Name:</label><input type="text" spellcheck="false" name="attr_pablname" /><br/>
+            <label>Effect:</label><textarea name="attr_pableffect"></textarea>
+            <hr />
+        </fieldset>
+    </div>
+</div>
+
+<!-- Equipment -->
+<div class="eqp">
+    <input type="hidden" class="tabstoggle" name="attr_sheetTabEqp" value="epw" />
+    <div class="tabrow">
+        <h2>Equipment</h2>
+        <button type="action" name="act_epw" class="epwbtn">Primary Weapon</button>
+        <button type="action" name="act_esw" class="eswbtn">Secondary Weapon</button>
+        <button type="action" name="act_eba" class="ebabtn">Body Armor</button>
+        <button type="action" name="act_ehg" class="ehgbtn">Headgear</button>
+    </div>
+    <br />
+    <div class="epw">
+        <h3>Primary Weapon</h3>
+        <div class="2colrow">
+            <div class="col nowrap">
+                <label>Name:</label><input type="text" spellcheck="false" name="attr_wpname" /><br/>
+                <label>Range:</label>
+                    <select name="attr_wprange">
+                        <option value="Adjacent">Adjacent</option>
+                        <option value="Short">Short</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Long">Long</option>
+                    </select>
+                    <br/>
+                <div class="2colrowx">
+                    <div class="colx">
+                        <label>Aim Dice:</label><input type="number" name="attr_wpaimdice" />
+                    </div>
+                    <div class="colx">
+                        <label>Crit Dice:</label><input type="number" name="attr_wpcritdice" />
+                    </div>
+                </div>
+                <label>Damage:</label><input type="text" spellcheck="false" name="attr_wpdamage" /><br/>
+                <div class="2colrowx">
+                    <div class="colx">
+                        <label>Crit Dmg:</label><input type="number" name="attr_wpcritdmg" />
+                    </div>
+                    <div class="colx">
+                        <label>Max Ammo:</label><input type="number" name="attr_wpammo_max" />
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="clearfix">
+                    <label>Notes:</label><textarea name="attr_wpnotes"></textarea>
+                </div>
+                <label>Mod Slots:</label><input type="number" name="attr_wp_modslots" /><br/>
+                <div class="clearfix">
+                    <label>Mods:</label><textarea name="attr_wpmods"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="esw">
+        <h3>Secondary Weapon</h3>
+        <div class="2colrow">
+            <div class="col nowrap">
+                <label>Name:</label><input type="text" spellcheck="false" name="attr_wsname" /><br/>
+                <label>Range:</label>
+                    <select name="attr_wsrange">
+                        <option value="Adjacent">Adjacent</option>
+                        <option value="Short">Short</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Long">Long</option>
+                    </select>
+                    <br/>
+                <div class="2colrowx">
+                    <div class="colx">
+                        <label>Aim Dice:</label><input type="number" name="attr_wsaimdice" />
+                    </div>
+                    <div class="colx">
+                        <label>Crit Dice:</label><input type="number" name="attr_wscritdice" />
+                    </div>
+                </div>
+                <label>Damage:</label><input type="text" spellcheck="false" name="attr_wsdamage" /><br/>
+                <div class="2colrowx">
+                    <div class="colx">
+                        <label>Crit Dmg:</label><input type="number" name="attr_wscritdmg" />
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="clearfix">
+                    <label>Notes:</label><textarea name="attr_wsnotes"></textarea>
+                </div>
+                <label>Mod Slots:</label><input type="number" name="attr_ws_modslots" /><br/>
+                <div class="clearfix">
+                    <label>Mods:</label><textarea name="attr_wsmods"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="eba">
+        <h3>BodyArmor</h3>
+        <div class="2colrow">
+            <div class="col">
+                <label>Name:</label><input type="text" spellcheck="false" name="attr_baname" /><br/>
+                <div class="3colrowx nowrap">
+                    <div class="colx">
+                        <label>HP:</label><input type="number" name="attr_bahp" />
+                    </div>
+                    <div class="colx">
+                        <label style="position:relative;left:50px;">AP:</label><input type="number" name="attr_baap" />
+                    </div>
+                    <div class="colx">
+                        <label style="position:relative;left:50px;">SP:</label><input type="number" name="attr_basp" />
+                    </div>
+                </div>
+                <div class="clearfix">
+                    <label>Notes:</label><textarea name="attr_banotes"></textarea>
+                </div>
+                <label>Mod Slots:</label><input type="number" name="attr_ba_modslots" /><br/>
+                <div class="clearfix">
+                    <label>Mods:</label><textarea name="attr_bamods"></textarea>
+                </div>
+            </div>
+            <div class="col pockets">
+                <span class="labellike help tooltip">&nbsp;<span style="font-family:Pictos">?</span><span class="tooltiptext"><b>Empty Pockets:</b><br/>To get an empty pocket to stay on the character sheet, put a dash (-) in the text field.</span></span> 
+                <h3>Pockets</h3>
+                <fieldset class="repeating_bapockets">
+                    <select name="attr_pocketname">
+                        <option value="Utility">Utility</option>
+                        <option value="Grenade">Grenade</option>
+                        <option value="Special Ammo">Special Ammo</option>
+                        <option value="Hardpoint">Hardpoint</option>
+                    </select>
+                    <input type="text" spellcheck="false" name="attr_pocketitemname" />
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <div class="ehg">
+        <h3>Headgear</h3>
+        <div class="2colrow">
+            <div class="col">
+                <label>Name:</label><input type="text" spellcheck="false" name="attr_hgname" /><br/>
+                <div class="clearfix">
+                    <label>Effects:</label><textarea name="attr_hgeffects"></textarea>
+                </div>
+            </div>
+            <div class="col">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Responsibilities -->
+<div class="res">
+    <h2>Responsibilities</h2>
+    <div class="2colrow">
+        <div class="col2">
+            <label>Acquisition:</label><input type="number" name="attr_acquisition" />
+                <button type="action" name="act_useacquisition" class="skillbtn">Use</button><br/>
+            <label>Arcana:</label><input type="number" name="attr_arcana" />
+                <button type="action" name="act_usearcana" class="skillbtn">Use</button><br/>
+            <label>Engineering:</label><input type="number" name="attr_engineering" />
+                <button type="action" name="act_useengineering" class="skillbtn">Use</button><br/>
+            <label>Entertainment:</label><input type="number" name="attr_entertainment" />
+                <button type="action" name="act_useentertainment" class="skillbtn">Use</button><br/>
+            <label>Leadership:</label><input type="number" name="attr_leadership" />
+                <button type="action" name="act_useleadership" class="skillbtn">Use</button><br/>
+            <label>Medicine:</label><input type="number" name="attr_medicine" />
+                <button type="action" name="act_usemedicine" class="skillbtn">Use</button><br/>
+            <label>Navigation:</label><input type="number" name="attr_navigation" />
+                <button type="action" name="act_usenavigation" class="skillbtn">Use</button><br/>
+            <label>Security:</label><input type="number" name="attr_security" />
+                <button type="action" name="act_usesecurity" class="skillbtn">Use</button><br/>
+            <label>Spirituality:</label><input type="number" name="attr_spirituality" />
+                <button type="action" name="act_usespirituality" class="skillbtn">Use</button><br/>
+            <label>Sustenance:</label><input type="number" name="attr_sustenance" />
+                <button type="action" name="act_usesustenance" class="skillbtn">Use</button>
+        </div>
+        <div class="col1 nowrap">
+            <h3>Skill Action</h3>
+            <label>Difficulty:</label><select name="attr_skilldifficulty">
+                <option value="Easy">Easy (+2 skill)</option>
+                <option value="Average">Average (+1 skill)</option>
+                <option value="Difficult">Difficult (+0)</option>
+            </select><br />
+            <label>Responsibility:</label><select name="attr_skillresponsibility">
+                <option value="acquisition">Acquisition</option>
+                <option value="arcana">Arcana</option>
+                <option value="engineering">Engineering</option>
+                <option value="entertainment">Entertainment</option>
+                <option value="leadership">Leadership</option>
+                <option value="medicine">Medicine</option>
+                <option value="navigation">Navigation</option>
+                <option value="security">Security</option>
+                <option value="spirituality">Spirituality</option>
+                <option value="sustenance">Sustenance</option>
+            </select><br />
+            <label>Assist:</label><select name="attr_skillassist">
+                <option value="No">No (+0)</option>
+                <option value="Yes">Assisted By Another Character (+1 skill)</option>
+            </select><br />
+            <label>Equipment:</label><select name="attr_skillitem">
+                <option value="No">None (+0)</option>
+                <option value="Yes">Using a Useful Item or Piece of Equipment (+1 skill)</option>
+            </select><br />
+            <label>Bonus Skill:</label><input style="width:18%;position:relative;right:3px;margin-right:93px;" type="number" value="0" name="attr_bonusskill" />
+            <label>Bonus Crit:</label><input style="width:18%;position:relative;right:3px;" type="number" value="0" name="attr_bonusskillcrit" />
+            <div class="attack clearfix">
+                <button type="roll" name="roll_skillaction" class="btn" value="&{template:zafirskillaction} {{name=@{skillname}}} {{aim=[[(@{skilldice})d6>5]]}} {{crit=[[(@{bonusskillcrit})d6>6]]}} {{responsibility=@{skillresponsibility}}}">Skill Roll</button>
+                <select name="attr_skillname" style="width:110px;margin-right:10px;">
+                    <option value="Coerce">Coerce</option>
+                    <option value="Deceive">Deceive</option>
+                    <option value="Persuade">Persuade</option>
+                    <option value="Intuit">Intuit</option>
+                    <option value="Investigate">Investigate</option>
+                    <option value="Notice">Notice</option>
+                    <option value="Pilot">Pilot</option>
+                    <option value="Stunts">Stunts</option>
+                    <option value="Tinker">Tinker</option>
+                </select>
+                    <label>+<span name="attr_skilldice"></span> skill&nbsp;&nbsp;&nbsp;+<span name="attr_bonusskillcrit"></span> crit</label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Inventory -->
+<div class="inv">
+    <div class="3colrow">
+        <div class="col">
+            <h2>Money</h2>
+            <label class="short money" style="font-family:Helvetica, Arial">₹</label><input type="number" class="expand" name="attr_money" /><br/>
+        </div>
+        <div class="col">
+            <h2>Inventory</h2>
+            <fieldset class="repeating_inv">
+                <input type="text" class="full" spellcheck="false" name="attr_invitemname" />
+            </fieldset>
+        </div>
+        <div class="col">
+        </div>
+    </div> 
+</div>
+
+<!-- Misc -->
+<div class="oth">
+    <div class="3colrow">
+        <div class="col">
+            <h2>Proficiencies</h2>
+            <div class="inset">
+                <fieldset class="repeating_proficiencies">
+                    <input type="text" class="full" spellcheck="false" name="attr_proficiencyname" />
+                </fieldset>
+            </div>
+        </div>
+        <div class="col">
+            <h2>Languages</h2>
+            <h3>Fluent</h3>
+            <div class="inset">
+                <fieldset class="repeating_fluentlangs">
+                    <input type="text" class="full" spellcheck="false" name="attr_flangname" />
+                </fieldset>
+            </div>
+            <br />
+            <h3>Conversational</h3>
+            <div class="inset">
+                <fieldset class="repeating_convlangs">
+                    <input type="text" class="full" spellcheck="false" name="attr_clangname" />
+                </fieldset>
+            </div>
+        </div>
+        <div class="col">
+        </div>
+    </div>
+</div>
+
+<!-- // Roll Templates //////////////////////////////////////////////////////////////// -->
+<rolltemplate class="sheet-rolltemplate-zafir">
+    <div class="sheet-template-container">
+        <div class="sheet-template-header">{{name}}</div>
+        {{#rollGreater() aim 0}}
+            {{#rollGreater() crit 0}}
+                <div class="sheet-template-row sheet-crit-hit">CRITICAL HIT! {{crit}} {{aim}}</div>
+                <div class="sheet-template-row sheet-crit-dmg">Critical Damage: {{critdmg}}</div>
+            {{/rollGreater() crit 0}}
+            {{#rollTotal() crit 0}}
+                <div class="sheet-template-row sheet-hit">HIT! {{aim}}</div>
+                <div class="sheet-template-row sheet-damage">Damage: {{damage}}</div>
+            {{/rollTotal() crit 0}}
+            {{#notes}}
+                <div class="sheet-template-row sheet-notes">{{notes}}</div>
+            {{/notes}}
+        {{/rollGreater() aim 0}}
+        {{#rollTotal() aim 0}}
+            <div class="sheet-template-row sheet-miss">MISS! {{aim}}</div>
+        {{/rollTotal() aim 0}}
+    </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-zafirwillattack">
+    <div class="sheet-template-container">
+        {{#name}}
+        <div class="sheet-template-header">{{name}}</div>
+        {{/name}}
+        {{^name}}
+        <div class="sheet-template-header">Will Attack</div>
+        {{/name}}
+        {{#rollGreater() aim 0}}
+            {{#rollGreater() resist 0}}
+                <div class="sheet-template-row sheet-miss">RESISTED! {{resist}}</div>
+            {{/rollGreater() resist 0}}
+            {{#rollTotal() resist 0}}
+                {{#rollGreater() crit 0}}
+                    <div class="sheet-template-row sheet-crit-hit">CRITICAL SUCCESS! {{crit}} {{aim}}</div>
+                {{/rollGreater() crit 0}}
+                {{#rollTotal() crit 0}}
+                    <div class="sheet-template-row sheet-hit">SUCCESS! {{aim}}</div>
+                {{/rollTotal() crit 0}}
+            {{/rollTotal() resist 0}}
+            {{#notes}}
+                <div class="sheet-template-row sheet-notes">{{notes}}</div>
+            {{/notes}}
+        {{/rollGreater() aim 0}}
+        {{#rollTotal() aim 0}}
+            <div class="sheet-template-row sheet-miss">FAILED! {{aim}}</div>
+        {{/rollTotal() aim 0}}
+    </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-zafirskillaction">
+    <div class="sheet-template-container">
+        <div class="sheet-template-header">{{name}} Action</div>
+            <div class="sheet-template-row sheet-responsibility">Using {{responsibility}}</div>
+        {{#rollGreater() aim 0}}
+            {{#rollGreater() crit 0}}
+                <div class="sheet-template-row sheet-crit-hit">CRITICAL SUCCESS! {{crit}} {{aim}}</div>
+            {{/rollGreater() crit 0}}
+            {{#rollTotal() crit 0}}
+                <div class="sheet-template-row sheet-hit">SUCCESS! {{aim}}</div>
+            {{/rollTotal() crit 0}}
+        {{/rollGreater() aim 0}}
+        {{#rollTotal() aim 0}}
+            <div class="sheet-template-row sheet-miss">FAILED! {{aim}}</div>
+        {{/rollTotal() aim 0}}
+    </div>
+</rolltemplate>
+
+<!-- // Sheet Workers //////////////////////////////////////////////////////////////// -->
+<script type="text/worker">
+// Main tab bar
+const buttonlist = ["atk", "aab", "pab", "eqp", "res", "inv", "oth"];
+buttonlist.forEach(button => {
+    on(`clicked:${button}`, function() {
+        setAttrs({
+            sheetTab: button
+        });
+    });
+});
+
+// Equipment sheet tab bar
+const buttonlistEqp = ["epw", "esw", "eba", "ehg"];
+buttonlistEqp.forEach(button => {
+    on(`clicked:${button}`, function() {
+        setAttrs({
+            sheetTabEqp: button
+        });
+    });
+});
+
+// Equipment sheet tab bar
+const buttonlistAbilities = ["aaa", "apa"];
+buttonlistAbilities.forEach(button => {
+    on(`clicked:${button}`, function() {
+        setAttrs({
+            sheetTabAbilities: button
+        });
+    });
+});
+
+// Combat panel sheet tab bar
+const buttonlistAttacks = ["cwp", "cwl"];
+buttonlistAttacks.forEach(button => {
+    on(`clicked:${button}`, function() {
+        setAttrs({
+            sheetTabAttacks: button
+        });
+    });
+});
+
+// Skill use responsibilities buttons
+const responsibilities = [
+    "acquisition",
+    "arcana",
+    "engineering",
+    "entertainment",
+    "leadership",
+    "medicine",
+    "navigation",
+    "security",
+    "spirituality",
+    "sustenance"
+];
+responsibilities.forEach(responsibility => {
+    on(`clicked:use${responsibility}`, function() {
+        setAttrs({
+            skillresponsibility: responsibility
+        });
+    });
+});
+
+function sheetOpenAndAttrChanged(inputs) {
+    return "sheet:opened change:" + inputs.join(" change:");
+}
+
+// Setting the aim dice for weapon attacks
+const attackDiceInputs = [
+    "wpaimdice",
+    "wpcritdice",
+    "wpdamage",
+    "wsaimdice",
+    "wscritdice",
+    "wsdamage",
+    "aim",
+    "atkcover",
+    "atkelevation",
+    "atkrange",
+    "atkotheraim",
+    "atkothercrit"
+];
+on(sheetOpenAndAttrChanged(attackDiceInputs), function() {
+    getAttrs(attackDiceInputs, function(values) {
+        let wpaimdice = parseInt(values.wpaimdice)||0;
+        let wpcritdice = parseInt(values.wpcritdice)||0;
+        let wpdamage = values.wpdamage;
+        let wsaimdice = parseInt(values.wsaimdice)||0;
+        let wscritdice = parseInt(values.wscritdice)||0;
+        let wsdamage = values.wsdamage;
+        let aim = parseInt(values.aim)||0;
+        let atkcover = values.atkcover;
+        let atkelevation = values.atkelevation;
+        let atkrange = values.atkrange;
+        let atkotheraim = parseInt(values.atkotheraim)||0;
+        let atkothercrit = parseInt(values.atkothercrit)||0;
+
+        let aimBonus = 0;
+        let critBonus = 0;
+
+        // Cover
+        if (atkcover == "No Cover") {
+            aimBonus += 2;
+            critBonus += 2;
+        }
+        else if (atkcover == "Half Cover") {
+            aimBonus += 1;
+        }
+
+        // Elevation
+        if (atkelevation == "Elevation") {
+            aimBonus += 1;
+        }
+
+        // Range
+        if (atkrange == "Non-optimal") {
+            aimBonus -= 1;
+        }
+
+        setAttrs({
+            wpattackaimdice: Math.max(wpaimdice + aim + atkotheraim + aimBonus, 0),
+            wpattackcritdice: Math.max(wpcritdice + atkothercrit + critBonus, 0),
+            wpattackdamage: wpdamage,
+            wsattackaimdice: Math.max(wsaimdice + aim + atkotheraim + aimBonus, 0),
+            wsattackcritdice: Math.max(wscritdice + atkothercrit + critBonus, 0),
+            wsattackdamage: wsdamage,
+            custattackaimdice: Math.max(aim + atkotheraim + aimBonus, 0),
+            custattackcritdice: Math.max(atkothercrit + critBonus, 0)
+        });
+    });
+});
+
+const willAttackInputs = [
+    "will",
+    "bonuswill",
+    "bonuswillcrit",
+    "enemywill",
+    "willatkwounded",
+    "willatkcondition",
+    "willatkisolated",
+    "willatkallypanic",
+    "willatkpanic"
+];
+on(sheetOpenAndAttrChanged(willAttackInputs), function() {
+    getAttrs(willAttackInputs, function(values) {
+        let will = parseInt(values.will)||0;
+        let extraWill = parseInt(values.bonuswill)||0;
+        let extraCrit = parseInt(values.bonuswillcrit)||0;
+        let enemywill = parseInt(values.enemywill)||0;
+        let willatkwounded = values.willatkwounded;
+        let willatkcondition = values.willatkcondition;
+        let willatkisolated = values.willatkisolated;
+        let willatkallypanic = values.willatkallypanic;
+        let willatkpanic = values.willatkpanic;
+
+        let willBonus = 0;
+        let critBonus = 0;
+
+        if (willatkwounded == "Yes") {
+            willBonus += 1;
+        }
+        if (willatkcondition == "Yes") {
+            willBonus += 1;
+        }
+        if (willatkisolated == "Yes") {
+            willBonus += 1;
+        }
+        if (willatkallypanic == "Yes") {
+            willBonus += 1;
+        }
+        if (willatkpanic == "Yes") {
+            critBonus += 2;
+        }
+
+        setAttrs({
+            willattackaimdice: Math.max(will + extraWill + willBonus, 0),
+            willattackcritdice: Math.max(extraCrit + critBonus, 0),
+            willattackresistdice: Math.max(enemywill, 0)
+        });
+    });
+});
+
+//skilldice
+const skillActionInputs = [
+    "skilldifficulty",
+    "skillresponsibility",
+    "skillassist",
+    "skillitem",
+    "bonusskill",
+    "acquisition",
+    "arcana",
+    "engineering",
+    "entertainment",
+    "leadership",
+    "medicine",
+    "navigation",
+    "security",
+    "spirituality",
+    "sustenance"
+];
+on(sheetOpenAndAttrChanged(skillActionInputs), function() {
+    getAttrs(skillActionInputs, function(values) {
+        let skilldifficulty = values.skilldifficulty;
+        let skillresponsibility = values.skillresponsibility;
+        let skillassist = values.skillassist;
+        let skillitem = values.skillitem;
+        let bonusskill = parseInt(values.bonusskill)||0;
+        let responsibility = parseInt(values[skillresponsibility])||0;
+        let skillBonus = 0;
+
+        if (skilldifficulty == "Easy") {
+            skillBonus += 2;
+        }
+        else if (skilldifficulty == "Average") {
+            skillBonus += 1;
+        }
+        if (skillassist == "Yes") {
+            skillBonus += 1;
+        }
+        if (skillitem == "Yes") {
+            skillBonus += 1;
+        }
+
+        setAttrs({
+            skilldice: Math.max(responsibility + skillBonus + bonusskill, 0)
+        });
+    });
+});
+
+on("clicked:reloadprimary", function() {
+    getAttrs(["wpammo_max"], function(values) {
+        let wpammo_max = parseInt(values.wpammo_max)||0;
+        setAttrs({
+            wpammo: wpammo_max
+        });
+    });
+});
+
+// TODO
+/*on("clicked:initcombat", function() {
+    console.log("initcombat TODO");
+});
+
+on("clicked:roundstart", function() {
+    console.log("roundstart TODO");
+});*/
+
+</script>

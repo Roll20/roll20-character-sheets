@@ -3,6 +3,10 @@ Official Character Sheet
 
 # Changelog
 
+## V.1.70 (2020-05-27)
+* add Default sheet settings for `EXP`, `credits` and number of `techniques`
+* updated `sheet.json`'s "instructions"
+
 ## V.1.61 (2019-11-26)
 * Small bugfix for a unresponsive checkbox(Mind Stat "2 Profs") in Exp Table
 * change Battlescore default to zero from previous arbitrary "20"
