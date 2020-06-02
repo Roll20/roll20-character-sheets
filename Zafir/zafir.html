@@ -132,6 +132,7 @@
                 <div class="tabrow">
                     <h2 data-i18n="Combat">Combat</h2>
                     <button type="action" name="act_cwp" class="cwpbtn"><span data-i18n="Weapon Attack">Weapon Attack</span></button>
+                    <button type="action" name="act_cgn" class="cgnbtn"><span data-i18n="Grenade Attack">Grenade Attack</span></button>
                     <button type="action" name="act_cwl" class="cwlbtn"><span data-i18n="Will Attack">Will Attack</span></button>
                 </div>
                 <br />
@@ -170,6 +171,18 @@
                         <button type="roll" name="roll_attackcustom" class="btn" value="&{template:zafir} {{name=@{custattackname}}} {{aim=[[(@{custattackaimdice})d6>5]]}} {{crit=[[(@{custattackcritdice})d6>6]]}} {{damage=[[(@{custattackdamage})]]}} {{critdmg=[[(@{custattackdamage}) + (@{custcritdamage})]]}} {{player=@{char_name}}}"><span data-i18n="Attack">Attack</span></button>
                         <input type="text" name="attr_custattackname" spellcheck="false" style="width:110px;margin-right:10px;">
                             <label>+<span name="attr_custattackaimdice"></span> <span data-i18n="aim">aim</span>&nbsp;&nbsp;&nbsp;+<span name="attr_custattackcritdice"></span> <span data-i18n="crit">crit</span>&nbsp;&nbsp;&nbsp;<span data-i18n="damage:">damage:</span> <input type="text" name="attr_custattackdamage" spellcheck="false"><span class="tooltip">(+<input type="number" name="attr_custcritdamage">)<span class="tooltiptext" data-i18n="Crit Damage">Crit Damage</span></span></label>
+                    </div>
+                </div>
+                <div class="cgn">
+                    <!-- Grenade Attack -->
+                    <h3 data-i18n="Grenade Attack">Grenade Attack</h3>
+                    <label data-i18n="Targets:">Targets:</label><input style="margin-right:8px;" type="number" name="attr_gtargets" value="1" min="1" max="5">
+                    <label style="width:80px;" data-i18n="Effects:">Effects:</label><input style="width:279px;" type="text" name="attr_geffects" value="">
+                    <div class="customattack attack clearfix">
+                        <button type="roll" name="roll_gatk" class="btn" 
+                            value="&{template:zafirgrenade} {{name=@{gatkname}}} {{targets=@{gtargets}}} {{targetsroll=[[@{gtargets}]]}} {{crit1=[[(@{gatkcritdice})d6>6]]}} {{damage1=[[@{gatkdamage}]]}} {{critdmg1=[[@{gatkdamage} + @{gatkcritdamage}]]}} {{crit2=[[(@{gatkcritdice})d6>6]]}} {{damage2=[[@{gatkdamage}]]}} {{critdmg2=[[@{gatkdamage} + @{gatkcritdamage}]]}} {{crit3=[[(@{gatkcritdice})d6>6]]}} {{damage3=[[@{gatkdamage}]]}} {{critdmg3=[[@{gatkdamage} + @{gatkcritdamage}]]}} {{crit4=[[(@{gatkcritdice})d6>6]]}} {{damage4=[[@{gatkdamage}]]}} {{critdmg4=[[@{gatkdamage} + @{gatkcritdamage}]]}} {{crit5=[[(@{gatkcritdice})d6>6]]}} {{damage5=[[@{gatkdamage}]]}} {{critdmg5=[[@{gatkdamage} + @{gatkcritdamage}]]}} {{notes=@{geffects}}} {{player=@{char_name}}}"><span data-i18n="Grenade Attack">Grenade Attack</span></button>
+                        <input type="text" name="attr_gatkname" spellcheck="false" style="width:110px;margin-right:10px;">
+                            <label>&nbsp;<input type="number" name="attr_gatkcritdice" value="0">&nbsp;<span data-i18n="crit">crit</span>&nbsp;&nbsp;&nbsp;<input type="text" name="attr_gatkdamage" spellcheck="false">(+<input type="number" name="attr_gatkcritdamage" value="0">)</label>
                     </div>
                 </div>
                 <div class="cwl">
@@ -889,51 +902,50 @@
             {{#notes}}
                 <div class="sheet-template-row sheet-notes">{{notes}}</div>
             {{/notes}}
-
-            {{#rollLess() targetsroll 2}}
+            {{#rollGreater() targetsroll 0}}
                 {{#rollGreater() crit1 0}}
                     <div class="sheet-template-row sheet-crit-hit"><span data-i18n="Critical Damage:">Critical Damage:</span> {{critdmg1}}</div>
                 {{/rollGreater() crit1 0}}
                 {{#rollTotal() crit1 0}}
                     <div class="sheet-template-row sheet-damage"><span data-i18n="Damage:">Damage:</span> {{damage1}}</div>
                 {{/rollTotal() crit1 0}}
-            {{/rollLess() targetsroll 2}}
+            {{/rollGreater() targetsroll 0}}
 
-            {{#rollLess() targetsroll 3}}
+            {{#rollGreater() targetsroll 1}}
                 {{#rollGreater() crit2 0}}
                     <div class="sheet-template-row sheet-crit-hit"><span data-i18n="Critical Damage:">Critical Damage:</span> {{critdmg2}}</div>
                 {{/rollGreater() crit2 0}}
                 {{#rollTotal() crit2 0}}
                     <div class="sheet-template-row sheet-damage"><span data-i18n="Damage:">Damage:</span> {{damage2}}</div>
                 {{/rollTotal() crit2 0}}
-            {{/rollLess() targetsroll 3}}
+            {{/rollGreater() targetsroll 1}}
 
-            {{#rollLess() targetsroll 4}}
+            {{#rollGreater() targetsroll 2}}
                 {{#rollGreater() crit3 0}}
                     <div class="sheet-template-row sheet-crit-hit"><span data-i18n="Critical Damage:">Critical Damage:</span> {{critdmg3}}</div>
                 {{/rollGreater() crit3 0}}
                 {{#rollTotal() crit3 0}}
                     <div class="sheet-template-row sheet-damage"><span data-i18n="Damage:">Damage:</span> {{damage3}}</div>
                 {{/rollTotal() crit3 0}}
-            {{/rollLess() targetsroll 4}}
+            {{/rollGreater() targetsroll 2}}
 
-            {{#rollLess() targetsroll 5}}
+            {{#rollGreater() targetsroll 3}}
                 {{#rollGreater() crit4 0}}
                     <div class="sheet-template-row sheet-crit-hit"><span data-i18n="Critical Damage:">Critical Damage:</span> {{critdmg4}}</div>
                 {{/rollGreater() crit4 0}}
                 {{#rollTotal() crit4 0}}
                     <div class="sheet-template-row sheet-damage"><span data-i18n="Damage:">Damage:</span> {{damage4}}</div>
                 {{/rollTotal() crit4 0}}
-            {{/rollLess() targetsroll 5}}
+            {{/rollGreater() targetsroll 3}}
 
-            {{#rollLess() targetsroll 6}}
+            {{#rollGreater() targetsroll 4}}
                 {{#rollGreater() crit5 0}}
                     <div class="sheet-template-row sheet-crit-hit"><span data-i18n="Critical Damage:">Critical Damage:</span> {{critdmg5}}</div>
                 {{/rollGreater() crit5 0}}
                 {{#rollTotal() crit5 0}}
                     <div class="sheet-template-row sheet-damage"><span data-i18n="Damage:">Damage:</span> {{damage5}}</div>
                 {{/rollTotal() crit5 0}}
-            {{/rollLess() targetsroll 6}}
+            {{/rollGreater() targetsroll 4}}
         </div>
     {{#enemy}}</div>{{/enemy}}
     {{#player}}</div>{{/player}}
@@ -972,7 +984,7 @@ buttonlistAbilities.forEach(button => {
 });
 
 // Combat sheet tab bar
-const buttonlistAttacks = ["cwp", "cwl"];
+const buttonlistAttacks = ["cwp", "cgn", "cwl"];
 buttonlistAttacks.forEach(button => {
     on(`clicked:${button}`, function() {
         setAttrs({
