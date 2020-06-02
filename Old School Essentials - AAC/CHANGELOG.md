@@ -7,6 +7,8 @@
 ### Added
 
 - Add a reaction roll button to monster sheet
+- Add a Wisdom modifier next to saving throws on the character sheet
+- Add modifier queries to all saving throw rolls
 
 ## 1.2.0
 
