@@ -2,6 +2,12 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.3.0
+
+### Added
+
+- Add a reaction roll button to monster sheet
+
 ## 1.2.0
 
 ### Added
