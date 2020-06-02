@@ -150,6 +150,10 @@
                         <option value="Optimal Range">Optimal Range (+0)</option>
                         <option value="Non-optimal">Too Close/Too Far (-1 aim)</option>
                     </select><br />
+                    <label>Overwatch:</label><select name="attr_atkoverwatch">
+                        <option value="No">Normal Attack (+0)</option>
+                        <option value="Yes">Overwatch Reaction Attack (-1 aim)</option>
+                    </select><br />
                     <label>Bonus Aim:</label><input style="width:18%;position:relative;right:3px;margin-right:93px;" type="number" value="0" name="attr_atkotheraim" />
                     <label>Bonus Crit:</label><input style="width:18%;position:relative;right:3px;" type="number" value="0" name="attr_atkothercrit" />
                     <div class="attack clearfix">
@@ -602,7 +606,7 @@
     <div class="gmcombat">
         <div class="2colrow">
             <div class="col1 nowrap">
-                <h3>Attacks</h3>
+                <h3>Attack</h3>
                 <label>Target Cover:</label><select name="attr_atkcover">
                     <option value="Full Cover">Full Cover (+0)</option>
                     <option value="Half Cover">Half Cover (+1 aim)</option>
@@ -615,6 +619,10 @@
                 <label>Range:</label><select name="attr_atkrange">
                     <option value="Optimal Range">Optimal Range (+0)</option>
                     <option value="Non-optimal">Too Close/Too Far (-1 aim)</option>
+                </select><br />
+                <label>Overwatch:</label><select name="attr_atkoverwatch">
+                    <option value="No">Normal Attack (+0)</option>
+                    <option value="Yes">Overwatch Reaction Attack (-1 aim)</option>
                 </select>
                 <br />
                 <div class="customattack attack clearfix">
@@ -652,7 +660,7 @@
                 <br />
                 <!-- Dodge Roller -->
                 <div>
-                    <h3>Dodge Roller</h3>
+                    <h3>Dodge</h3>
                     <div class="attack customattack clearfix dodgeroller">
                         <button type="roll" name="roll_dodge" class="btn" value="&{template:zafirdodge} {{dodge=[[(@{gmdodgedice})d6>6]]}} {{enemy=@{selectedenemy}}}">Dodge</button>
                         <label style="width:110px">Dodge Dice:</label><input type="number" name="attr_gmdodgedice" />
@@ -706,7 +714,7 @@
                 <fieldset class="repeating_gmenemyunitlist">
                     <button type="action" name="act_selectunit" class="btn"><span name="attr_gmunitname"></span></button>
                 </fieldset>
-                <h3>Options</h3>
+                <h3>Unit Display Options</h3>
                 <label>Show Attack Info:</label><input type="checkbox" name="attr_gmshowattackinfo" value="1" checked="true" />
             </div>
         </div>
@@ -984,7 +992,8 @@ const attackDiceInputs = [
     "atkotheraim",
     "atkothercrit",
     "gmatkaimdice",
-    "gmatkcritdice"
+    "gmatkcritdice",
+    "atkoverwatch"
 ];
 on(sheetOpenAndAttrChanged(attackDiceInputs), function() {
     getAttrs(attackDiceInputs, function(values) {
@@ -998,6 +1007,7 @@ on(sheetOpenAndAttrChanged(attackDiceInputs), function() {
         let atkcover = values.atkcover;
         let atkelevation = values.atkelevation;
         let atkrange = values.atkrange;
+        let atkoverwatch = values.atkoverwatch;
         let atkotheraim = parseInt(values.atkotheraim)||0;
         let atkothercrit = parseInt(values.atkothercrit)||0;
         let gmatkaimdice = parseInt(values.gmatkaimdice)||0;
@@ -1022,6 +1032,11 @@ on(sheetOpenAndAttrChanged(attackDiceInputs), function() {
 
         // Range
         if (atkrange == "Non-optimal") {
+            aimBonus -= 1;
+        }
+
+        // Overwatch
+        if (atkoverwatch == "Yes") {
             aimBonus -= 1;
         }
 
