@@ -4070,6 +4070,8 @@
         </div>
     </div>
 
+    
+    
     <!-- ------------------- -->
     <!--    Sophont Log      -->
     <!-- ------------------- -->
@@ -4267,6 +4269,8 @@
         </div>
     </div>
 
+    
+    
     <!-- --------------------- -->
     <!-- Composite Sophont Log -->
     <!-- --------------------- -->
@@ -4591,6 +4595,8 @@
         </div>
     </div>
 
+    
+    
     <!-- --------------------- -->
     <!--	  Swarm Log        -->
     <!-- --------------------- -->
@@ -5055,6 +5061,8 @@
         </div>
     </div>
 
+    
+    
     <!-- ----------------------- -->
     <!--	  Creature Log   	 -->
     <!-- ----------------------- -->
@@ -5387,6 +5395,8 @@
         </div>
     </div>
 
+    
+    
     <!-- --------------------- -->
     <!--	  Behemoth Log        -->
     <!-- --------------------- -->
@@ -5818,6 +5828,8 @@
         </div>
     </div>
 
+    
+    
     <!-- --------------------- -->
     <!--	  Drone Log        -->
     <!-- --------------------- -->
@@ -6291,6 +6303,8 @@
         </div>
     </div>
 
+    
+    
     <!-- ----------------------- -->
     <!--	  Shuttle Log        -->
     <!-- ----------------------- -->
@@ -6804,6 +6818,8 @@
         </div>
     </div>
 
+    
+    
     <!-- ----------------------- -->
     <!--	Small Craft Log      -->
     <!-- ----------------------- -->
@@ -7073,6 +7089,8 @@
         </div>
     </div>
 
+    
+    
     <!-- ----------------------- -->
     <!--		Ship Log         -->
     <!-- ----------------------- -->
@@ -7399,6 +7417,8 @@
         </div>
     </div>
 
+    
+    
     <!-- ----------------------- -->
     <!--    Capital Ship Log     -->
     <!-- ----------------------- -->
@@ -8088,6 +8108,7 @@
         </div>
     </div>
 </div>
+
 <!-- ----------------------- -->
 <!--      Roll Template      -->
 <!-- ----------------------- -->
@@ -9486,45 +9507,67 @@
             {
                 //Sum the task dice
                 let taskDice = 0;
-                taskDice += parseInt(values.salvoSkillRating, 10 || 0);//skill dice
-                taskDice += parseInt(values.salvoSpecialtyRating, 10 || 0);//specialty dice
-                taskDice += parseInt(values.salvoToolRating, 10 || 0);//tool mod dice
-                taskDice += parseInt(values.salvoAdvantage, 10 || 0);//dice for any extra advantage
+                ["salvoSkillRating", "salvoSpecialtyRating", "salvoToolRating", "salvoAdvantage"].forEach((asset) =>
+                {
+                    taskDice += parseInt(values[asset], 10) || 0;
+                });
+
                 //Calculate automatic hits from excess task dice
                 let excessTaskDice = 0;
+                let autoHits = '';
                 if (taskDice > 10)
                 {
                     excessTaskDice = taskDice - 10;
                     taskDice = 10;
+                    autoHits = `{{autoHits=[[${excessTaskDice}]]}}`;
                 }
 
                 //Threat dice
                 let threatDice = parseInt(values.salvoThreat, 10 || 0);
+
                 //Calculate automatic hits from excess task dice
                 let excessThreatDice = 0;
+                let autoMisses = '';
                 if (threatDice > 10)
                 {
                     excessThreatDice = threatDice - 10;
                     threatDice = 10;
+                    autoMisses = `{{autoHits=[[${excessThreatDice}]]}}`;
                 }
-                
+
                 //Make the Salvo Roll Macro
                 console.log(taskDice, "vs", threatDice);
-                const setObj = {};                               
+                const setObj = {};
 
-                setObj.salvoMacro = `&{template:FS} ${_.range(taskDice).map((num) =>
+                let taskRoll = `${_.range(taskDice).map((num) =>
                 {
-                    return `{{die${num}=[[floor(1d10/5)]]}}`;
-                })
-                    .join(' ')}`;
+                    return `[[floor([[1d10]]/5)]]`;
+                }).join(' + ')} + ${excessTaskDice}[auto hits]`;
+
+                let threatRoll = `${_.range(threatDice).map((num) =>
+                {
+                    return `[[floor([[1d6]]/3)-1]]`;
+                }).join(' + ')} - ${excessThreatDice}[auto misses]`;
+
+                let wholeRoll = `[[${taskRoll}+${threatRoll}]]`;
+
+                let taskFields = _.range(taskDice).map((num) =>
+                {
+                    return `{{task${num}=$[[${num * 2}]]}}`;
+                }).join(' ');
+
+                let threatFields = _.range(threatDice).map((num) =>
+                {
+                    return `{{threat${num}=$[[${(num - 1 + taskDice) * 2}]]}}`;
+                }).join(' ');
+
+                setObj.salvoMacro = `&{template:default} {{total=${wholeRoll}}} ${taskFields} ${threatFields} ${autoHits} ${autoMisses}`;
 
                 console.log(setObj);
-
                 setAttrs(setObj);
-
             })
         });
-
+                
         //Cargo Total
         on("change:repeating_shipcargo remove:repeating_shipcargo change:supply change:complexmaterials", (event) =>
         {
