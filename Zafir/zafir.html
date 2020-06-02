@@ -631,6 +631,17 @@
                         <label>&nbsp;&nbsp;<input type="number" name="attr_gmatkaimdice">&nbsp;<span data-i18n="aim">aim</span>&nbsp;&nbsp;&nbsp;<input type="number" name="attr_gmatkcritdice">&nbsp;<span data-i18n="crit">crit</span>&nbsp;&nbsp;&nbsp;<input type="text" name="attr_gmatkdamage" spellcheck="false">(+<input type="number" name="attr_gmatkcritdamage">)</label>
                 </div>
                 <br />
+                <!-- Grenade Attack -->
+                <h3 data-i18n="Grenade Attack">Grenade Attack</h3>
+                <label data-i18n="Targets:">Targets:</label><input style="margin-right:8px;" type="number" name="attr_gmgtargets" value="1" min="1" max="5">
+                <label style="width:80px;" data-i18n="Effects:">Effects:</label><input style="width:279px;" type="text" name="attr_gmgeffects" value="">
+                <div class="customattack attack clearfix">
+                    <button type="roll" name="roll_gmgatk" class="btn" 
+                        value="&{template:zafirgrenade} {{name=@{gmgatkname}}} {{targets=@{gmgtargets}}} {{targetsroll=[[@{gmgtargets}]]}} {{crit1=[[(@{gmgatkcritdice})d6>6]]}} {{damage1=[[@{gmgatkdamage}]]}} {{critdmg1=[[@{gmgatkdamage} + @{gmgatkcritdamage}]]}} {{crit2=[[(@{gmgatkcritdice})d6>6]]}} {{damage2=[[@{gmgatkdamage}]]}} {{critdmg2=[[@{gmgatkdamage} + @{gmgatkcritdamage}]]}} {{crit3=[[(@{gmgatkcritdice})d6>6]]}} {{damage3=[[@{gmgatkdamage}]]}} {{critdmg3=[[@{gmgatkdamage} + @{gmgatkcritdamage}]]}} {{crit4=[[(@{gmgatkcritdice})d6>6]]}} {{damage4=[[@{gmgatkdamage}]]}} {{critdmg4=[[@{gmgatkdamage} + @{gmgatkcritdamage}]]}} {{crit5=[[(@{gmgatkcritdice})d6>6]]}} {{damage5=[[@{gmgatkdamage}]]}} {{critdmg5=[[@{gmgatkdamage} + @{gmgatkcritdamage}]]}} {{notes=@{gmgeffects}}} {{enemy=@{selectedenemy}}}"><span data-i18n="Grenade Attack">Grenade Attack</span></button>
+                    <input type="text" name="attr_gmgatkname" spellcheck="false" style="width:110px;margin-right:10px;">
+                        <label>&nbsp;<input type="number" name="attr_gmgatkcritdice" value="0">&nbsp;<span data-i18n="crit">crit</span>&nbsp;&nbsp;&nbsp;<input type="text" name="attr_gmgatkdamage" spellcheck="false">(+<input type="number" name="attr_gmgatkcritdamage" value="0">)</label>
+                </div>
+                <br />
                 <!-- Will Attack -->
                 <div>
                     <h3 data-i18n="Will Attack">Will Attack</h3>
@@ -700,7 +711,7 @@
                         <input type="hidden" class="valuehider" name="attr_selectedenemynotes" value=""/>
                         <div class="notes wrap" style="margin-left:8px;"><span name="attr_selectedenemynotes"></span></div>
                         <div class="attackinfo">
-                            <span class="label" style="margin-left:-24px;" data-i18n="Attack">Attack:</span> <span name="attr_selectedenemyatkname">Weapon</span>
+                            <span class="label" style="margin-left:-24px;" data-i18n="Attack:">Attack:</span> <span name="attr_selectedenemyatkname">Weapon</span>
                             <input type="hidden" class="hideifzero" name="attr_gmshowattackinfo" value="1"/>                        
                             <div>
                                 <span class="label" data-i18n="Aim:">Aim:</span> +<span name="attr_selectedenemyatkaim"></span>, 
@@ -857,6 +868,72 @@
             {{#rollTotal() dodge 0}}
                 <div class="sheet-template-row sheet-miss"><span data-i18n="FAILED!">FAILED!</span> {{dodge}}</div>
             {{/rollTotal() dodge 0}}
+        </div>
+    {{#enemy}}</div>{{/enemy}}
+    {{#player}}</div>{{/player}}
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-zafirgrenade">
+    {{#enemy}}<div class="enemy">{{/enemy}}
+    {{#player}}<div class="player">{{/player}}
+        <div class="sheet-template-container">
+            {{#enemy}}<div class="sheet-template-nameplate">{{enemy}}</div>{{/enemy}}
+            {{#player}}<div class="sheet-template-nameplate">{{player}}</div>{{/player}}
+
+            {{#name}}
+            <div class="sheet-template-header">{{name}} (×{{targets}})</div>
+            {{/name}}
+            {{^name}}
+            <div class="sheet-template-header"><span data-i18n="Grenade Attack">Grenade Attack</span> (×{{targets}})</div>
+            {{/name}}
+            {{#notes}}
+                <div class="sheet-template-row sheet-notes">{{notes}}</div>
+            {{/notes}}
+
+            {{#rollLess() targetsroll 2}}
+                {{#rollGreater() crit1 0}}
+                    <div class="sheet-template-row sheet-crit-hit"><span data-i18n="Critical Damage:">Critical Damage:</span> {{critdmg1}}</div>
+                {{/rollGreater() crit1 0}}
+                {{#rollTotal() crit1 0}}
+                    <div class="sheet-template-row sheet-damage"><span data-i18n="Damage:">Damage:</span> {{damage1}}</div>
+                {{/rollTotal() crit1 0}}
+            {{/rollLess() targetsroll 2}}
+
+            {{#rollLess() targetsroll 3}}
+                {{#rollGreater() crit2 0}}
+                    <div class="sheet-template-row sheet-crit-hit"><span data-i18n="Critical Damage:">Critical Damage:</span> {{critdmg2}}</div>
+                {{/rollGreater() crit2 0}}
+                {{#rollTotal() crit2 0}}
+                    <div class="sheet-template-row sheet-damage"><span data-i18n="Damage:">Damage:</span> {{damage2}}</div>
+                {{/rollTotal() crit2 0}}
+            {{/rollLess() targetsroll 3}}
+
+            {{#rollLess() targetsroll 4}}
+                {{#rollGreater() crit3 0}}
+                    <div class="sheet-template-row sheet-crit-hit"><span data-i18n="Critical Damage:">Critical Damage:</span> {{critdmg3}}</div>
+                {{/rollGreater() crit3 0}}
+                {{#rollTotal() crit3 0}}
+                    <div class="sheet-template-row sheet-damage"><span data-i18n="Damage:">Damage:</span> {{damage3}}</div>
+                {{/rollTotal() crit3 0}}
+            {{/rollLess() targetsroll 4}}
+
+            {{#rollLess() targetsroll 5}}
+                {{#rollGreater() crit4 0}}
+                    <div class="sheet-template-row sheet-crit-hit"><span data-i18n="Critical Damage:">Critical Damage:</span> {{critdmg4}}</div>
+                {{/rollGreater() crit4 0}}
+                {{#rollTotal() crit4 0}}
+                    <div class="sheet-template-row sheet-damage"><span data-i18n="Damage:">Damage:</span> {{damage4}}</div>
+                {{/rollTotal() crit4 0}}
+            {{/rollLess() targetsroll 5}}
+
+            {{#rollLess() targetsroll 6}}
+                {{#rollGreater() crit5 0}}
+                    <div class="sheet-template-row sheet-crit-hit"><span data-i18n="Critical Damage:">Critical Damage:</span> {{critdmg5}}</div>
+                {{/rollGreater() crit5 0}}
+                {{#rollTotal() crit5 0}}
+                    <div class="sheet-template-row sheet-damage"><span data-i18n="Damage:">Damage:</span> {{damage5}}</div>
+                {{/rollTotal() crit5 0}}
+            {{/rollLess() targetsroll 6}}
         </div>
     {{#enemy}}</div>{{/enemy}}
     {{#player}}</div>{{/player}}
