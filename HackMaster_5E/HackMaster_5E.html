@@ -1,18 +1,4 @@
 <script type="text/worker">
-    on('sheet:opened',function() {
-        getAttrs(['skill_scruitiny', 'skill_scrutiny', 'constritution', 'constitution'], function(values) {
-            if (values.skill_scruitiny && values.skill_scrutiny == 0) {
-                setAttrs({'skill_scrutiny': values.skill_scruitiny,
-                          'skill_scruitiny': ''});
-            }
-
-            if (values.constritution && !values.constitution) {
-                setAttrs({'constitution': values.constritution,
-                         'constritution': ''});
-            }
-        });
-    });
-    
 on("change:repeating_weapon:defence_dice_switch", function() {
         getAttrs(["repeating_weapon_defence_dice_switch"], function(values) {
             var check = parseInt(values.repeating_weapon_defence_dice_switch) || 0;
@@ -295,7 +281,7 @@ on("change:skill_dice_switch sheet:opened", function() {
     });
         getAttrs(["skill_dice_switch"], function(values) {
             var check = parseInt(values.skill_dice_switch) || 0;
-            var diceJ = check ? "[[1d100+@{skill_jumping}]] vs Opposing Roll" : "[[d100]] Skill: [[@{skill_jumping]]";
+            var diceJ = check ? "[[1d100+@{skill_jumping}]] vs Opposing Roll" : "[[d100]] Skill: [[@{skill_jumping}]]";
         setAttrs({
             jumping_dice: diceJ
         });
@@ -433,21 +419,23 @@ on("change:skill_dice_switch sheet:opened", function() {
     <div class="sheet-col-5-8 sheet-padr">
         <div class="sheet-row">
             <div class="sheet-col-1-2"><input class="sheet-underlined" type="text" name="attr_character_name"/><br/>Character Name</div>
-        	<div class="sheet-col-1-4"><select name="attr_class_fatigue">
-                <option value="0">Assassin</option>
-                <option value="-2">Barbarian</option>
-                <option value="0">Cleric</option>
-                <option value="-2">Fighter</option>
-                <option value="-1">Fighter/Mage</option>
-                <option value="-1">Fighter/Thief</option>
-                <option value="-2">Knight</option>
-                <option value="0">Mage</option>
-                <option value="0">Mage/Thief</option>
-                <option value="-2">Paladin</option>
-                <option value="-2">Ranger</option>
-                <option value="0">Rogue</option>
-                <option value="0">Thief</option>
-            </select><br/>Class</div>
+            <div class="sheet-col-1-4">
+                <select name="attr_class_fatigue">
+            	<option value="0">Assassin</option>
+            	<option value="-2">Barbarian</option>
+            	<option value="0+0">Cleric</option>
+            	<option value="-2+0">Fighter</option>
+            	<option value="-1">Fighter/Mage</option>
+            	<option value="-1+0">Fighter/Thief</option>
+            	<option value="-2+0+0">Knight</option>
+            	<option value="0+0+0">Mage</option>
+            	<option value="0+0+0+0">Mage/Thief</option>
+            	<option value="-2+0+0+0">Paladin</option>
+            	<option value="-2+0+0+0+0">Ranger</option>
+            	<option value="0+0+0+0+0">Rogue</option>
+            	<option value="0+0+0+0+0+0">Thief</option>
+                </select><br/>Class
+            </div>
     		<div class="sheet-col-1-4"><select name="attr_race">
                 <option value="Dwarf">Dwarf</option>
                 <option value="Elf">Elf</option>
@@ -663,7 +651,7 @@ on("change:skill_dice_switch sheet:opened", function() {
             
             <div class="sheet-row sheet-stat-row">
                 <div class="sheet-col-1-4">Poison</div>
-                <div class="sheet-col-1-4"><input type="number" name="attr_poison_save" value="@{level}+@{poison_save_bonus}+@{constitution}" disabled="disabled"/></div>
+                <div class="sheet-col-1-4"><input type="number" name="attr_poison_save" value="@{poison_save_bonus}+@{constitution}" disabled="disabled"/></div>
                 <div class="sheet-col-1-4"><input type="number" name="attr_poison_save_bonus" value="0"/></div>
                 <div class="sheet-col-1-4 sheet-vert-middle"><button class="sheet-skill-roll" type='roll' name='roll_mental_save' value='@{character_name} makes a Saving Throw \n\nPoison Save :[[1d20 + @{poison_save} ]]'>Save</button></div>
             </div> 
@@ -1183,16 +1171,32 @@ on("change:skill_dice_switch sheet:opened", function() {
         <div class="sheet-col-3-8">
             <h3>Skills</h3>
             <div class="sheet-row sheet-heading-row">
-                <div class="sheet-col-9-24 sheet-vert-middle"></div>
-                <div class="sheet-col-1-6 sheet-vert-middle"></div>
-                <div class="sheet-col-5-24 sheet-vert-middle"></div>
+                <div class="sheet-col-9-24 sheet-vert-middle">Mastery</div>
+                <div class="sheet-col-1-6 sheet-vert-middle">Attribute</div>
+                <div class="sheet-col-5-24 sheet-vert-middle">Roll</div>
+                
                 <div class="sheet-col-1-4">Opposed</div>
             </div>
             <div class="sheet-row sheet-heading-row">
-                <div class="sheet-col-9-24"></div>
-                <div class="sheet-col-1-6"></div>
+                <div class="sheet-col-9-24"><select name="attr_skill_mastery_die">
+					<option value="1d12!p + 0">Unskilled (= 0)</option>
+   					<option value="1d12!p">Novice (&#8804; 25)</option>
+                    <option value="1d8!p">Average (&#8804; 50)</option>
+                    <option value="1d6!p">Advanced (&#8804; 75)</option>
+                    <option value="1d4!p">Expert (&#8804; 87)</option>
+                    <option value="1d3!p">Master (&#8804; 100)</option>
+                </select></div>
+                <div class="sheet-col-1-6"><select name="attr_skill_mastery_ability">
+                    <option value="Strength">STR</option>
+                    <option value="Intelligence">INT</option>
+                    <option value="Wisdom">WIS</option>
+                    <option value="Dexterity">DEX</option>
+                    <option value="Constitution">CON</option>
+                    <option value="Looks">LKS</option>
+                    <option value="Charisma">CHA</option>
+                </select></div>
                 
-                <div class="sheet-col-5-24 sheet-vert-middle"></div>
+                <div class="sheet-col-5-24 sheet-vert-middle"><button class="sheet-skill-roll" type='roll' name='roll_skill_mastery' value='!sheet_master_die [[@{skill_mastery_die}]] @{skill_mastery_ability}'>Train</button></div>
                 <div class="sheet-col-1-4"><input type="checkbox" name="attr_skill_dice_switch" value="1" /></div>
             </div>
             <div class="sheet-row sheet-heading-row">
