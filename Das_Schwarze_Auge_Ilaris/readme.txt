@@ -2,6 +2,8 @@ A custom Roll20 character sheet for Das Schwarze Auge: Ilaris (an alternative ru
 
 Currently only available in German, since the ruleset itself is so far not localized.
 
+Ruleset is available for free at ilarisblog.wordpress.com!
+
 ---
 
 Einige Anmerkungen:
