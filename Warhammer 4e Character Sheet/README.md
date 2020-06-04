@@ -9,6 +9,14 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 ///// ============ Change Log ============ ///// 
 
 
+June 8 2020
+
+- New UI Theme - Empire
+- Fixed NPC - Opposed Melee roll used wrong char names on Page 1 & 2
+- Fixed advandage not added to Character Ranged Weapon roll target
+
+- Removed an extra curly bracket. This should fix the problem behind issue Roll20#6152, with wrong number displayed in Cool rolls - by drockod01
+
 
 Feb 24 2020
 
@@ -84,8 +92,7 @@ Usage Notes:
 Possible additons to come :
 
 - Condition Tracker
-- 
-- Map/Info Tab (maybe)
+- Map/Info Tab
 
 
 Enjoy.
