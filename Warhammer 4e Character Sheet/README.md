@@ -12,10 +12,10 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 June 8 2020
 
 - New UI Theme - Empire
-- NPC - Oppsed Melee roll wrong name (character_ / not npc_)
-- Ranged Weapon Adv not added to target
+- Fixed NPC - Opposed Melee roll used wrong char names on Page 1 & 2
+- Fixed advandage not added to Character Ranged Weapon roll target
 
-- Removed an extra curly bracket (This should fix the problem behind issue Roll20#6152) - by drockod01
+- Removed an extra curly bracket. This should fix the problem behind issue Roll20#6152, with wrong number displayed in Cool rolls - by drockod01
 
 
 Feb 24 2020
