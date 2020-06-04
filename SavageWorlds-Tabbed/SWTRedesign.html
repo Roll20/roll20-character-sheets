@@ -1,7 +1,7 @@
-<input type='hidden' name='attr_character_sheet' value="Savage Worlds Tabbed v4.00.00"/>
+<input type='hidden' name='attr_character_sheet' value="Savage Worlds Tabbed v4.00.02"/>
 <script type="text/worker">
 	// Sheet managed at https://trello.com/b/yJHOPR22/swade-tabbed-roll20-sheet and the Roll20 QA test game
-	
+
 	// Better Logging Functionality
 	const log = (title, text, color = 'green', headerstyle = 'font-size:14px; font-weight:bold;', bodystyle = 'font-size:12px; font-weight:normal;') => {
 		let titleStyle = `color:${color}; ${headerstyle} text-decoration:underline;`;
@@ -9,7 +9,7 @@
 		const output = `%c${title}:%c ${text}`;
 		console.log(output,titleStyle,textStyle);
 	};
-	
+
 	// Simple Sum function for Repeating Sections
 	function repeatingSimpleSum(section, field, destination) {
 		var repSection = "repeating_" + section;
@@ -32,7 +32,7 @@
 			});
 		});
 	}
-	
+
 	// Simple Sum function for Repeating Sections with Check Field
 	function repeatingSimpleSumWCheck (section, field, destination, checkfield, checkvalue){
 		console.log("Made it repeatingSimpleSumWCheck");
@@ -66,7 +66,7 @@
 			});
 		});
 	}
-	
+
 	function rankNdisplay (field) {
 		//Create rank and display fields for all attributes...needed for pre-existing sheets
 		//repeating  fields should be passed in the format: repating_<section>:attributes
@@ -76,7 +76,7 @@
 			let getfields = field.split(':');
 			let repeatingSection = getfields[0]; //repeating_skills
 			let repeatingField = getfields[1]; //skillnamerank
-	
+
 			console.log(`**** Repeating Section: ${repeatingSection} ****`);
 			console.log(`**** Repeating Section: ${repeatingField} ****`);
 			getSectionIDs(repeatingSection, function(idArray) {
@@ -155,7 +155,7 @@
 			});
 		}
 	}
-	
+
 	function updateField (field, fieldValue) {
 		//repeating  fields should be passed in the format: repating_<section>:attributes
 		//example: repeating_skills:skillnamerank
@@ -185,7 +185,7 @@
 			setAttrs(sattrs);
 		}
 	}
-	
+
 	function fauxChange (field, fauxvalue) {
 		//repeating  fields should be passed in the format: repating_<section>:attributes
 		//example: repeating_skills:skillnamerank
@@ -238,14 +238,14 @@
 			});
 		}
 	}
-	
+
 	const stepwiseFaux = function(section,field) {
 		//only for repeating Sections
 		//section = the repeating section
 		//field = the field within the section to fauxily change
 		//example call: stepwiseFaux("weapons","dmgbonusnum");
 		//will do a faux change during each for loop
-	
+
 		let repeatingSection = `repeating_${section}`;
 		getSectionIDs(repeatingSection, function(idArray) {
 			if (idArray.length > 0) {
@@ -260,7 +260,7 @@
 			}
 		});
 	}
-	
+
 	function salaryNshares (rsection, salaryfield, sharesfield) {
 		// rsection should be the full name: repeating_<section>
 		console.log(`====> Repeating Section: ${rsection} <====`);
@@ -320,7 +320,7 @@
 								}
 							}
 						}
-	
+
 						if (fieldVal.length > 0) {
 							//set the salary field
 							sattrs[salaryArray[c]] = fieldVal;
@@ -334,7 +334,7 @@
 			}
 		});
 	}
-	
+
 	function convertRS (originSection, destinationSection, ofieldArray, dfieldArray, daddlfieldArray, defaultValues) {
 		/*------ example of call ------
 		||  originSection = section (without repeating_) fields will be migrated FROM
@@ -366,7 +366,7 @@
 						oldAttrs[oldAttrs.length] = originRS + "_" + idArray[a] + "_" + ofieldArray[b];
 					}
 				}
-	
+
 				getAttrs(oldAttrs, function(v) {
 					let sattrs = {};
 					for(let i=0; i < idArray.length; i++) {
@@ -433,14 +433,14 @@
 				console.log("<===== "+originSection+" had no rows =====>");
 			}
 		});
-	
+
 	}
-	
+
 	/* ---- Begin Sheet Version Validation & Update ---- */
-	
+
 	const sheetVersion = "4.00.01";
 	const sheetVersionPrefix = "Savage Worlds Tabbed v";
-	
+
 	const upgradeSheet = function(version, versionone, versiontwo, versionthree) {
 		if (version < 3.0) {
 			console.log("+++ Upgrading to version 3.0 +++");
@@ -463,7 +463,7 @@
 			});
 			//Update the Power Label
 			//powerLabel();
-	
+
 			//Need to update all derived stats to now use Sheetworkers
 			setWildDie(); //set wdNum
 			console.log("!!!! Setting WoundsMod !!!!");
@@ -485,12 +485,12 @@
 			setCorruption();
 			setStreetCred();
 			setStrain();
-	
+
 			const stats = ['armortotalweightcarried','showmods','promptmods','useXP'];
 			stats.forEach(stats => {
 				fauxChange(stats, "1000");
 			});
-	
+
 			//migrate old repeating skills fields to new
 			getSectionIDs("skills", function(idArray) {
 				if (idArray.length > 0) {
@@ -522,72 +522,72 @@
 					console.log("<===== had no rows =====>");
 				}
 			});
-	
+
 			//Migrate Melee Weapons to Weapons
 			let meleeFields = ["WeaponType","MeleeDieNum","DmgType","MDmgMod","WeaponWeight","meleeWNotes"];
 			let weaponFields = ["weapon","dmgnumdice","dmgdietype","dmgbonusnum","weaponweight","weaponnotes"];
 			let moreweaponFields = ["weaponcarried"];
 			let weaponDefaultValues = ["on"];
 			convertRS("meleeweapons","weapons",meleeFields,weaponFields,moreweaponFields,weaponDefaultValues);
-	
+
 			//Migrate Ranged Weapons to Weapons
 			let rangedFields = ["RWeaponType","WeaponRange","WeaponRoF","NoDmgDice","RDmgType","RDmgMod","RWeaponWeight","rangeWNotes"];
 			let weaponFieldsII =["weapon","range","rof","dmgnumdice","dmgdietype","dmgbonusnum","weaponweight","weaponnotes"];
 			let morerangedweaponFields = ["damageatt","weaponcarried"];
 			let rangedweaponDefaultValues = ["na","on"];
 			convertRS ("rangeweapons", "weapons", rangedFields, weaponFieldsII,morerangedweaponFields,rangedweaponDefaultValues);
-	
+
 			//Migrate Power Armor Ranged Weapons to Power Armor Weapons
 			let parangedFields = ["PAWeaponType","PAWeaponRange","PAWeaponRoF","PANoDmgDice","PARDmgType","PARDmgMod","PAWeaponNotes"];
 			let paweaponFieldsII =["paweapon","parange","parof","padmgnumdice","padmgdietype","padmgbonusnum","paweaponnotes"];
 			let pamorerangedweaponFields = ["padamageatt"];
 			let parangedweaponDefaultValues = ["na"];
 			convertRS ("PAweapons", "paweapons", parangedFields, paweaponFieldsII, pamorerangedweaponFields, parangedweaponDefaultValues);
-	
+
 			//Migrate Power Armor Melee Weapons to Power Armor Weapons
 			let pameleeFields = ["PAMWeaponType","PAMMeleeDieNum","PAMDmgType","PAMMDmgMod","PAMmeleeWNotes"];
 			let paweaponFields = ["paweapon","padmgnumdice","padmgdietype","padmgbonusnum","paweaponnotes"];
 			let pamoreweaponFields = ["padamageatt"];
 			let paweaponDefaultValues = ["strength"];
 			convertRS("PAmeleeweapons","paweapons", pameleeFields, paweaponFields, pamoreweaponFields, paweaponDefaultValues);
-	
+
 			//Migrate Robot Armor Ranged Weapons to Robot Armor Weapons
 			let rarangedFields = ["RAWeaponType","RAWeaponRange","RAWeaponRoF","RANoDmgDice","RARDmgType","RARDmgMod","RAWeaponNotes"];
 			let raweaponFieldsII =["raweapon","rarange","rarof","radmgnumdice","radmgdietype","radmgbonusnum","raweaponnotes"];
 			let ramorerangedweaponFields = ["radamageatt"];
 			let rarangedweaponDefaultValues = ["na"];
 			convertRS ("RAweapons", "raweapons", rarangedFields, raweaponFieldsII, ramorerangedweaponFields, rarangedweaponDefaultValues);
-	
+
 			//Migrate Robot Armor Melee Weapons to Robot Armor Weapons
 			let rameleeFields = ["RAMWeaponType","RAMMeleeDieNum","RAMDmgType","RAMMDmgMod","RAMmeleeWNotes"];
 			let raweaponFields = ["raweapon","radmgnumdice","radmgdietype","radmgbonusnum","raweaponnotes"];
 			let ramoreweaponFields = ["radamageatt"];
 			let raweaponDefaultValues = ["strength"];
 			convertRS("RAmeleeweapons","raweapons", rameleeFields, raweaponFields, ramoreweaponFields, raweaponDefaultValues);
-	
+
 			//Migrate Damaging Spells to powers
 			let dmgSpells = ["Spell","SpellCost","SpellRange","SpellDuration","NoSpllDmgDice","SDmgType","SDmgMod","DmgSpellNotes"];
 			let powerFields =["power","pp","powerrange","powerduration","spelldmgnumdice","spelldmgdietype","spelldmgbonusnum","spellnotes"];
 			let moredmgspellFields = ["spelldamageatt"];
 			let moredmgspellDefaultValues = ["na"];
 			convertRS ("dmgspells", "spells", dmgSpells, powerFields, moredmgspellFields, moredmgspellDefaultValues);
-	
+
 			//Migrate Non-Damaging Spells to Powers
 			let nondmgSpells = ["NDSpell","NDSpellCost","NDSpellRange","NDSpellDuration","ndSpellNotes"];
 			let powerFieldsII = ["power","pp","powerrange","powerduration","spellnotes"];
 			let morespellFields = ["spelldamageatt","spellbutton","spelldmgnumdice"];
 			let morespellDefaultValues = ["na","2","0"];
 			convertRS ("ndspells", "spells", nondmgSpells, powerFieldsII, morespellFields, morespellDefaultValues);
-	
+
 			//Migrate Ground Vehicles Crew
 			let crewfields = ["GVCrewName","GVCrewType","GVCrewPos","GVCrewSalary","GVCrewShares","GVCrewNotes"];
 			convertRS ("FShipCrew", "GShipCrew", crewfields, crewfields);
-	
+
 			//Migrate Walker Vehicles Crew
 			let wcrewfields = ["WalkerCrewName","WalkerCrewType","WalkerCrewPos","WalkerCrewSalary","WalkerCrewShares","WalkerCrewNotes"];
 			convertRS ("FShipCrew", "WShipCrew", wcrewfields, wcrewfields);
-	
-	
+
+
 			//Configure Variable Damage Option
 			getAttrs(["RaiseHBRule"], function(v) {
 				if (v.RaiseHBRule === "on") {
@@ -601,7 +601,7 @@
 					setAttrs({vbonusdamage: '1d6!'});
 				}
 			});
-	
+
 			//Close Config Fields
 			updateField("repeating_hindrances:showHindraceDesc","0");
 			updateField("repeating_edges:showEdgeDesc","0");
@@ -722,7 +722,7 @@
 			});
 		}
 		if (versionone < 4) {
-			console.log("+++ Upgrading to version 4 +++");     
+			console.log("+++ Upgrading to version 4 +++");
 		}
 		if (versionthree < 1) {
 			console.log("**** Updating Sheet Version to 4.00.01 ****");
@@ -732,7 +732,7 @@
 				character_sheet: sheetVersionPrefix + sheetVersion
 			});
 			getAttrs(['common-knowledgename', 'linkedathleticsatt', 'linkedpsionicsatt',
-			'linkedritualattscore', 'linkedritualattscorebutton', 'linkedritualattscoreformula', 'linkedspellcastingattscore', 'linkedspellcastingattscorebutton', 'linkedspellcastingattscoreformula', 'linkedweirdscienceattscore', 'linkedweirdscienceattscorebutton', 'linkedweirdscienceattscoreformula', 
+			'linkedritualattscore', 'linkedritualattscorebutton', 'linkedritualattscoreformula', 'linkedspellcastingattscore', 'linkedspellcastingattscorebutton', 'linkedspellcastingattscoreformula', 'linkedweirdscienceattscore', 'linkedweirdscienceattscorebutton', 'linkedweirdscienceattscoreformula',
 			'useacademics', 'academics', 'academicsmod', 'academicsCur', 'academicsskill','academicsskill_delta','academicsskillmod','academicsskill_rank','academicsskill_display','academicsskillmod_base', 'academics_skillmod',
 			'showFiMod', 'fiwilddie', 'fiwilddieinfo', 'fiModType'], function(v) { // have to actually do this in case people have a custom name for Common Knowledge
 				console.log("Beginning getAttrs for 4.0.1")
@@ -785,10 +785,10 @@
 				console.log(definedAttrs);
 				Object.keys(definedAttrs).forEach(key => definedAttrs[key] === undefined && delete definedAttrs[key]);
 				console.log(definedAttrs);
-	
+
 				setAttrs(definedAttrs);
 				console.log("4.0.1 Attrs set")
-				
+
 				// getSectionIDs("skills", function(idarray) {
 				//     for(var i=0; i < idarray.length; i++) {
 				//        getAttrs([`repeating_skills_$(idarray[i])_linkedotherattrscore`], function(v))
@@ -801,7 +801,7 @@
 		}
 		console.log("<===== End Sheet Upgrade Conversion Process =====>");
 	};
-	
+
 	on('sheet:opened', function() {
 		getAttrs(['character_sheet','initializeStatblock'], function(v) {
 		/*if(v.initializeStatblock === '0') {
@@ -821,7 +821,7 @@
 		});
 	});
 	/* ---- End Sheet Version Validation & Update ---- */
-	
+
 	/*Combine Shares and Salary fields if necessary*/
 	on('sheet:opened', function() {
 		console.log("!!! Combining Pay !!!");
@@ -854,7 +854,7 @@
 			}
 		}) ;
 	});
-	
+
 	//Set Starting Attributes to d6
 	on("change:attsatdsix", function(eventInfo) {
 		let defaultdtype = "4";
@@ -870,7 +870,7 @@
 			vigor: defaultdtype
 		});
 	});
-	
+
 	const setWildDie = function() {
 		getAttrs(["is_npc"], function(lvalue) {
 			console.log("<==== Updating whether to Roll the Wild Die ====>")
@@ -886,13 +886,13 @@
 			console.log("<==== Finished Identifying Mook vs Wild Card ====>");
 		});
 	}
-	
+
 	/*Determine if Wild Die is rolled*/
 	on("change:is_npc",function(){
 		//'use strict';
 		setWildDie();
 	});
-	
+
 	//Quick Setting Configuration
 	on("change:settingconfig", function() {
 		getAttrs(["settingconfig"], function(setting) {
@@ -1122,7 +1122,7 @@
 			}
 		});
 	});
-	
+
 	//Set Rank according to the XP value
 	on("change:xp change:rank change:usexp change:setrank", function() {
 		getAttrs(["xp", "rank", "class","useXP", "setrank"], function(value) {
@@ -1203,7 +1203,7 @@
 		});
 	});
 	//End Rank
-	
+
 	// Animalistic Intelligence
 	const updateAnimalIntelligenceDisplay = function() {
 		getAttrs(["animalsmarts"], function(attributesValues) {
@@ -1218,7 +1218,7 @@
 	on("change:animalsmarts", function() {
 		updateAnimalIntelligenceDisplay();
 	});
-	
+
 	//Display Derived Stats HR
 	on("change:usescholarship change:tdsanity change:potsmfame change:ripreason change:ripstatus change:hfglory change:izfirewall change:dlgrit change:neuraltoughness change:corruption change:izstreetcred change:izstrain change:izstreetcredthree", function() {
 		getAttrs(["usescholarship","tdsanity","potsmFame","ripReason","ripStatus","hfGlory","izFirewall","DLGrit","neuraltoughness","Corruption","izStreetCred","izStrain","izStreetCredThree"], function(v) {
@@ -1234,7 +1234,7 @@
 			}
 		});
 	});
-	
+
 	const baseToughness = function() {
 		getAttrs(["vigor", "vigormod", "sizecur"], function(vvalue) {
 			console.log("vigor value: " + vvalue.vigor);
@@ -1247,7 +1247,7 @@
 			setAttrs({ ntoughness: Math.floor(totVigor/2) + 2 });
 		});
 	}
-	
+
 	//Set values for Size
 	on("change:size change:sizemod", function() {
 		getAttrs(["size","sizemod"], function(value) {
@@ -1271,12 +1271,12 @@
 			});
 		});
 	});
-	
+
 	//Set Base Toughness (Regular and Neural)
 	on("sheet:opened change:vigor change:vigormod change:toughness change:ntoughness change:sizecur", function() {
 		baseToughness();
 	});
-	
+
 	const setToughness = function() {
 		getAttrs(["toughness","tufnessMod","toughnessArmor"], function(value) {
 			let tness = parseInt(value.toughness)||0;
@@ -1285,7 +1285,7 @@
 			setAttrs({toughnesscur: tness+tnessmod+tnessarmor});
 		});
 	}
-	
+
 	const setNToughness = function() {
 		getAttrs(["ntoughness","ntufnessMod","ntoughnessArmor"], function(value) {
 			let tness = parseInt(value.ntoughness)||0;
@@ -1294,7 +1294,7 @@
 			setAttrs({ntoughnesscur: tness+tnessmod+tnessarmor});
 		});
 	}
-	
+
 	//Set Current Toughness (Regular and Neural)
 	on("sheet:opened change:toughness change:ntoughness change:tufnessmod change:ntufnessmod change:toughnessarmor change:ntoughnessarmor", function(eventInfo) {
 		if(eventInfo.sourceAttribute === "toughness" || eventInfo.sourceAttribute === "tufnessmod" || eventInfo.sourceAttribute === "toughnessarmor") {
@@ -1306,7 +1306,7 @@
 			setNToughness();
 		}
 	});
-	
+
 	//Set Parry
 	on("sheet:opened change:fighting change:fightingmod change:parry change:parryMod", function() {
 		getAttrs(["fighting", "fightingmod", "parryMod"], function(pvalue) {
@@ -1335,14 +1335,14 @@
 				default:
 					totFighting = 4;
 			}
-	
+
 			var parryMod = parseInt(pvalue.parryMod);
 			var parryCalc = Math.floor(totFighting/2) + 2;
 			setAttrs({ parry: parryCalc  });
 			setAttrs({ parryCur:  parryCalc + parryMod });
 		});
 	});
-	
+
 	const setPace = function() {
 		getAttrs(["pace", "paceMod", "woundsMod", "paceignoreswounds"], function(pvalue) {
 			console.log("pace value: " + pvalue.pace);
@@ -1357,17 +1357,17 @@
 			else {
 				totPace = pace_base + pace_mod - wound_mod;
 			}
-	
+
 			if (totPace < 1) { totPace = 1;}
 			setAttrs({ paceCur: totPace  });
 		});
 	}
-	
+
 	//Set Pace
 	on("change:pace change:pacemod change:woundsmod change:paceignoreswounds", function() {
 		setPace();
 	});
-	
+
 	const setCharisma = function() {
 		getAttrs(["charisma", "charismaMod"], function(pvalue) {
 			console.log("charisma value: " + pvalue.charisma);
@@ -1378,12 +1378,12 @@
 			setAttrs({ charismaCur: totcharisma  });
 		});
 	}
-	
+
 	//Set charisma
 	on("change:charisma change:charismamod change:usecharisma", function() {
 		setCharisma();
 	});
-	
+
 	const setFame = function() {
 		getAttrs(["fame", "fameMod"], function(pvalue) {
 			console.log("fame value: " + pvalue.fame);
@@ -1394,12 +1394,12 @@
 			setAttrs({ fameCur: totFame  });
 		});
 	}
-	
+
 	//Set Fame
 	on("change:fame change:famemod change:potsmFame", function() {
 		setFame();
 	});
-	
+
 	const Setscholarship = function() {
 		getAttrs(["scholarship", "scholarshipMod"], function(pvalue) {
 			console.log("scholarship value: " + pvalue.scholarship);
@@ -1410,12 +1410,12 @@
 			setAttrs({ scholarshipCur: totscholarship  });
 		});
 	}
-	
+
 	//Set Scholarship
 	on("change:scholarship change:scholarshipmod change:change:usescholarship", function() {
 		setScholarship();
 	});
-	
+
 	const setSanity = function() {
 		getAttrs(["spirit", "spiritmod","sanityMod"], function(pvalue) {
 			console.log("spirit value: " + pvalue.spirit);
@@ -1432,12 +1432,12 @@
 			});
 		});
 	}
-	
+
 	//Set Sanity
 	on("change:spirit change:spiritmod change:sanitymod change:tdsanity", function() {
 		setSanity();
 	});
-	
+
 	const setReason = function() {
 		getAttrs(["reason", "reasonMod"], function(pvalue) {
 			console.log("reason value: " + pvalue.reason);
@@ -1448,12 +1448,12 @@
 			setAttrs({ reasonCur: totreason  });
 		});
 	}
-	
+
 	//Set Reason
 	on("change:reason change:reasonmod change:ripreason", function() {
 		setReason();
 	});
-	
+
 	const setStatus = function() {
 		getAttrs(["status", "statusMod"], function(pvalue) {
 			console.log("status value: " + pvalue.status);
@@ -1464,12 +1464,12 @@
 			setAttrs({ statusCur: totstatus  });
 		});
 	}
-	
+
 	//Set Status
 	on("change:status change:statusmod change:ripstatus", function() {
 		setStatus();
 	});
-	
+
 	const setGlory = function() {
 		getAttrs(["glory", "gloryMod"], function(pvalue) {
 			console.log("glory value: " + pvalue.glory);
@@ -1480,12 +1480,12 @@
 			setAttrs({ gloryCur: totglory  });
 		});
 	}
-	
+
 	//Set Glory
 	on("change:glory change:glorymod change:hfglory", function() {
 		setGlory();
 	});
-	
+
 	const setFirewall = function() {
 		getAttrs(["Firewall", "FirewallMod"], function(pvalue) {
 			console.log("Firewall value: " + pvalue.Firewall);
@@ -1496,12 +1496,12 @@
 			setAttrs({ FirewallCur: totfirewall  });
 		});
 	}
-	
+
 	//Set Firewall
 	on("change:firewall change:firewallmod change:izfirewall", function() {
 		setFirewall();
 	});
-	
+
 	const setGrit = function() {
 		getAttrs(["rank", "gritMod"], function(pvalue) {
 			console.log("rank value: " + pvalue.rank);
@@ -1513,12 +1513,12 @@
 						gritCur: totgrit });
 		});
 	}
-	
+
 	//Set grit
 	on("change:rank change:gritmod change:dlgrit", function() {
 		setGrit();
 	});
-	
+
 	const setCorruption = function() {
 		getAttrs(["corruptionStat", "corruptionMod"], function(pvalue) {
 			console.log("corruption value: " + pvalue.corruptionStat);
@@ -1529,12 +1529,12 @@
 			setAttrs({ corruptionCur: totcorruption });
 		});
 	}
-	
+
 	//Set Corruption
 	on("change:corruptionstat change:corruptionmod change:corruption", function() {
 		setCorruption();
 	});
-	
+
 	const setStreetCred = function() {
 		getAttrs(["rank", "StreetCredMod"], function(pvalue) {
 			console.log("rank value: " + pvalue.rank);
@@ -1547,33 +1547,33 @@
 						StreetCredCur: totsc });
 		});
 	}
-	
+
 	//Set street cred
 	on("change:rank change:streetcredmod change:izstreetcred", function() {
 		setStreetCred();
 	});
-	
+
 	const calcStrain = function() {
 		repeatingSimpleSumWCheck('augmentation','augStrain','totalStrain','augenable','on');
 	}
-	
+
 	// Calculate Strain
 	on('change:repeating_augmentation remove:repeating_augmentation change:izstrain',function(){
 		calcStrain();
 	});
-	
+
 	const setStrain = function() {
 		getAttrs(["totalStrain"], function(svalue) {
 			let strain = parseInt(svalue.totalStrain)||0;
 			setAttrs({ StrainCur: strain  });
 		});
 	}
-	
+
 	//Set Current Strain
 	on('change:totalstrain', function() {
 		setStrain();
 	});
-	
+
 	const setMaxStrain = function() {
 		getAttrs(["strain", "StrainMod"], function(svalue) {
 			console.log("strain value: " + svalue.strain);
@@ -1584,12 +1584,12 @@
 			setAttrs({ strain_max: maxStrain });
 		});
 	}
-	
+
 	//Calculate Max Strain
 	on("change:strain change:strainmod", function() {
 		setMaxStrain();
 	});
-	
+
 	//Visual Cue of Strain(ger) Danger (Wild Card)
 	on("change:strain_max change:totalstrain", function() {
 		console.log("<====== Checking for Strain Fatigue ======>");
@@ -1619,7 +1619,7 @@
 			}
 		});
 	});
-	
+
 	const setTAPRange = function() {
 		getAttrs(["smarts", "smartsmod", "taprange"], function(vvalue) {
 			console.log("Smarts value: " + vvalue.smarts);
@@ -1627,32 +1627,32 @@
 			var smartsval = parseInt(vvalue.smarts)||0;
 			var smodval = parseInt(vvalue.smartsmod)||0;
 			var totrange = smartsval + smodval;
-	
+
 			setAttrs({taprange: totrange});
 		});
 	}
-	
+
 	//Set TAP Range
 	on("change:smarts change:smartsmod", function() {
 		setTAPRange();
 	});
-	
+
 	//Calculate Total Armor Weight
 	on("change:repeating_armor:armortypeweight change:repeating_armor:armorcarried remove:repeating_armor", function(eventInfo) {
 		repeatingSimpleSumWCheck('armor','ArmorTypeWeight','armortotalweightcarried','ArmorCarried','on');
 	});
-	
+
 	//Calculate Total Weapon Weight
 	on("change:repeating_weapons:weaponweight change:repeating_weapons:weaponcarried remove:repeating_weapons", function(eventInfo) {
 		repeatingSimpleSumWCheck('weapons','weaponweight','weapontotalweightcarried','weaponcarried','on');
 	});
-	
+
 	//Calculate Total Gear Weight
 	on("change:repeating_gear:itemweight remove:repeating_gear", function() {
 		console.log("Gear Weight Change");
 		repeatingSimpleSum('gear','itemWeight','geartotalweightcarried');
 	})
-	
+
 	//Calculate Total Load Carried
 	on("change:armortotalweightcarried change:weapontotalweightcarried change:rangedtotalweightcarried change:geartotalweightcarried",function(){
 		getAttrs(["armortotalweightcarried", "weapontotalweightcarried", "geartotalweightcarried"], function(lvalue) {
@@ -1662,7 +1662,7 @@
 			setAttrs({ totalloadcarried: armor + weapon + gear });
 		});
 	});
-	
+
 	//Calculate Armor Modifier for Toughness (Looking at Torso only)
 	on("change:repeating_armor:armorworn change:repeating_armor:areaprotected change:repeating_armor:armortypeprotection change:repeating_armor:armorstack remove:repeating_armor", function() {
 		console.log("^^^ Changes in Armor...might impact Toughness ^^^");
@@ -1735,10 +1735,10 @@
 			});
 		});
 	});
-	
+
 	//Weapon Button config
 	const weapon = ['repeating_weapons','repeating_paweapons','repeating_raweapons'];
-	
+
 	weapon.forEach(weapon => {
 		on(`change:${weapon}:weaponbutton change:${weapon}:weaponskill change:${weapon}:paweaponbutton change:${weapon}:paweaponskill change:${weapon}:raweaponbutton change:${weapon}:raweaponskill`, function(eventInfo) {
 			console.log(eventInfo.sourceAttribute);
@@ -1825,7 +1825,7 @@
 			});
 		});
 	});
-	
+
 	//Multi Attack
 	on("change:repeating_weapons:rof change:repeating_weapons:weaponbutton change:repeating_weapons:weaponskill", function(eventInfo) {
 		/* rof > 1; need to set showmulti = 1 (show Atk^+Dmg), otherwise 0 (hide Atk^+Dmg)
@@ -1844,7 +1844,7 @@
 				console.log("Show the Atk^+Dmg button");
 				setAttrs({repeating_weapons_showmulti: "1"}); /*show Atk^+Dmg on drop down menu*/
 			}
-	
+
 			if (rof < 2 && weaponbutton === "2") { /*if ROF < 2 and Weapons Button is set to Atk^+Dmg, need set it to just Atk+Dmg*/
 				console.log("Hide the Atk^+Dmg Button and if it was set to Atk^+Dmg, change it to Atk+Dmg");
 				console.log("Set multiattack to 0, so we don't get the multi attack stuff in the roll template");
@@ -1901,7 +1901,7 @@
 			}
 		});
 	});
-	
+
 	//Spell Button config
 	on("change:repeating_spells:spellbutton change:repeating_spells:spellskill", function(eventInfo) {
 		console.log(eventInfo.sourceAttribute);
@@ -1916,7 +1916,7 @@
 		const skillSp = "{{trait=@{spellcastingname}}} @{rolltSpellcasting} @{linkedspellcastingattbutton} @{showtraitmods}";
 		const skillWs = "{{trait=@{weirdsciencename}}} @{rolltWeirdScience} @{linkedweirdscienceattbutton} @{showtraitmods}";
 		const skilltemp = "@{whisperspell} &{template:roll} {{source=@{power}}} {{trappings=@{trappings}}} {{PowerTemplate=y}} @{shownotes}"
-	
+
 		let skillToUse = skillSp;
 		console.log("sid: "+sid);
 		console.log("skillSp: "+skillSp);
@@ -1961,7 +1961,7 @@
 				console.log("spellskill: "+value.repeating_spells_spellskill);
 				console.log("skillToUse: "+skillToUse);
 			}
-	
+
 			if (value.repeating_spells_spellbutton ===  "0") {
 				//Atk + Damage
 				tSpellFormula = "@{spellskillNDamage}";
@@ -1973,7 +1973,7 @@
 				//tspellFormula = "@{repeating_spells_"+ sid +"_damageOnly}";
 				tSpellFormula = "@{spelldamageOnly}";
 			}
-	
+
 			else {
 				//skill only roll
 				tSpellFormula = "@{skillOnly}";
@@ -1985,7 +1985,7 @@
 			});
 		});
 	});
-	
+
 	//Get Weapon Damage
 	on("change:repeating_weapons:damageatt change:repeating_weapons:dmgnumdice change:repeating_weapons:dmgdietype change:repeating_weapons:dmgbonusnum change:repeating_paweapons:padamageatt change:repeating_paweapons:padmgnumdice change:repeating_paweapons:padmgdietype change:repeating_paweapons:padmgbonusnum change:repeating_raweapons:radamageatt change:repeating_raweapons:radmgnumdice change:repeating_raweapons:radmgdietype change:repeating_raweapons:radmgbonusnum",function(eventInfo) {
 		let pa = '';
@@ -2106,10 +2106,10 @@
 					});
 					break;
 			}
-	
+
 		});
 	});
-	
+
 	//Spell Damage config
 	on("change:repeating_spells:spelldamageatt change:repeating_spells:spelldmgnumdice change:repeating_spells:spelldmgdietype change:repeating_spells:spelldmgbonusnum",function() {
 		getAttrs(["agility_display","smarts_rank","spirit_rank","strength_rank","vigor_rank","repeating_spells_spelldamageatt","repeating_spells_spelldmgnumdice","repeating_spells_spelldmgdietype","repeating_spells_spelldmgbonusnum"],function(value) {
@@ -2210,7 +2210,7 @@
 			});
 		});
 	});
-	
+
 	//Select all Skills if "All" is selected
 	const static = ['staticcore','staticboating','staticclimbing','staticdriving','staticfaith','staticgambling','staticguts','statichealing','staticintimidation','staticinvestigation','staticlockpicking','staticnotice','staticpersuasion','staticpiloting','staticpsionics','staticrepair','staticriding','staticritual','staticshooting','staticspellcasting','staticstealth','staticstreetwise','staticsurvival','staticswimming','statictaunt','staticthrowing','statictracking','staticweirdscience','staticKnowledgeOther','staticacademics','staticathletics','staticbattle','staticcommonknowledge','staticelectronics','staticfocus','statichacking','staticlanguage','staticoccult','staticperformance','staticresearch','staticscience','staticthievery'];
 	on("change:staticall",function(eventInfo){
@@ -2234,7 +2234,7 @@
 			setAttrs(sattr);
 		}
 	});
-	
+
 	//Select all Core Skills if "Core" is selected
 	on("change:staticcore",function(eventInfo){
 		if (eventInfo.newValue === "1") {
@@ -2258,7 +2258,7 @@
 			});
 		}
 	});
-	
+
 	//Create Trait values for rank and display hidden fields
 	const traits = ['agility','smarts','spirit','strength','vigor','fighting','academics','athletics','battle','boating','climbing','commonknowledge','driving','electronics','faith','focus','gambling','guts','hacking','healing','intimidation','investigation','language','lockpicking','notice','occult','performance','persuasion','piloting','psionics','repair','research','riding','ritual','science','shooting','spellcasting','stealth','streetwise','survival','swimming','taunt','throwing','thievery','tracking','weirdscience','repeating_skills:skillnamerank','pastrength','rastrength'];
 	traits.forEach(trait => {
@@ -2306,7 +2306,7 @@
 			});
 		});
 	});
-	
+
 	//Do the Delta thing here...
 	//Set the actual trait and trait mod fields...this is needed so things like Vigor and Parry update if the appropriate trait is boosted/lowered
 	traits.forEach(trait => {
@@ -2333,6 +2333,9 @@
 					log("Message","^^^ Setting the Bases ^^^","darkgoldenrod");
 					sattrs[sAttRankBase] = tRank;
 					sattrs[sAttRankModBase] = tMod;
+					//set tRankBase and tModBase in case needed Boosting/lowering
+					tRankBase = tRank;
+					tModBase = tMod;
 				}
 				// Boosting/Lowering Trait or resetting to base?
 				if(tDelta === 0) {
@@ -2341,7 +2344,11 @@
 					sattrs[sAttMod] = tModBase;
 				}
 				else if(tDelta > 0) {
-					log("Message","+++ Boosting a Trait +++","darkgoldenrod");
+					//reset rank and mod back to the baseline so the boost math is correct
+					log("Message","!!! Re-baselining Attribute !!!","darkgolendrod");
+					tRank = tRankBase;
+					tMod = tModBase;
+					log("Message","+++ Boosting a Trait from Base +++","darkgoldenrod");
 					((tRank === 4 && tMod === -2) ? (tMod = 0, counter = counter -1) : counter = counter);
 					console.log(`+++ tRank: ${tRank}, tMod: ${tMod}, counter: ${counter}`);
 					for(let i = counter; i > 0; i--) {
@@ -2358,6 +2365,10 @@
 					sattrs[sAttMod] = tMod;
 				}
 				else {
+					//reset rank and mod back to the baseline so the boost math is correct
+					log("Message","!!! Re-baselining Attribute !!!","darkgolendrod");
+					tRank = tRankBase;
+					tMod = tModBase;
 					log("Message","--- Lowering a Trait ---","darkgoldenrod");
 					for(let i = counter; i > 0; i--) {
 						if(tRank === 4) {
@@ -2373,7 +2384,7 @@
 			});
 		});
 	});
-	
+
 	const setEncPenalty = function() {
 		getAttrs(["loadlimit", "totalloadcarried", "strength", "strengthmod", "encumbrancerules", "loadlimitdietypedelta", "loadlimitmulitplier", "loadlimitmod"], function(lvalue) {
 			let load = parseFloat(lvalue.totalloadcarried)||0;
@@ -2418,14 +2429,14 @@
 				console.log("Not using Encumbrance");
 				penalty = 0;
 			}
-	
+
 			setAttrs({
 				encumbrance: penalty,
 				loadlimit: limit
 			});
 		});
 	}
-	
+
 	const setDynamicEnc = function(field) {
 		getAttrs([field], function(v) {
 			let button = `${field}button`;
@@ -2445,7 +2456,7 @@
 			setAttrs(sattrs);
 		});
 	}
-	
+
 	const dynoTraits = ['unskilledencumbrance','linkedathleticsatt','linkedpsionicsatt','linkedritualatt','linkedspellcastingatt','linkedweirdscienceatt','repeating_skills:linkedotherattscore'];
 	dynoTraits.forEach(dynoTraits => {
 		on(`change:${dynoTraits}`, function(eventInfo) {
@@ -2453,12 +2464,12 @@
 			setDynamicEnc(eventInfo.sourceAttribute);
 		});
 	});
-	
+
 	//Calculate Encumbrance Penalty
 	on("change:totalloadcarried change:loadlimit change:strength change:strengthmod change:encumbrancerules change:loadlimitdietypedelta change:loadlimitmulitplier change:loadlimitmod",function(){
 		setEncPenalty();
 	});
-	
+
 	const setWoundsMod = function(flag) {
 		console.log("<==== Updating woundsMod ====>");
 		getAttrs(["wounds","reducewoundsby","increasewoundsby","maxwoundmods","reducereason","increasereason","maxreason"], function(lvalue) {
@@ -2467,7 +2478,7 @@
 			let reduce = parseInt(lvalue.reducewoundsby)||0;
 			let increase = parseInt(lvalue.increasewoundsby)||0;
 			let max = parseInt(lvalue.maxwoundmods)||0;
-	
+
 			console.log(`<==== Wounds: ${wound} || Reduce: ${reduce} || Increase: ${increase} || Max: ${max} ====>`);
 			/*var wMS = wound+nerves;*/
 			let wMS = Math.abs(wound) - Math.abs(reduce) + Math.abs(increase);
@@ -2497,11 +2508,11 @@
 			console.log("<==== Finished updating woundsMod ====>");
 		});
 	}
-	
+
 	on("change:wounds change:NoS change:reducewoundsby change:increasewoundsby change:maxwoundmods change:reducereason change:increasereason change:maxreason",function(){
 		setWoundsMod();
 	});
-	
+
 	const setFatigueMod = function(flag) {
 		console.log("<==== Updating fatigueMod ====>");
 		getAttrs(["fatigue","reducefatigueby","increasefatigueby","maxfatiguemods","fatiguereducereason","fatigueincreasereason","fatiguemaxreason"], function(lvalue) {
@@ -2510,7 +2521,7 @@
 			let reduce = parseInt(lvalue.reducefatigueby)||0;
 			let increase = parseInt(lvalue.increasefatigueby)||0;
 			let max = parseInt(lvalue.maxfatiguemods)||0;
-	
+
 			console.log(`<==== Fatigue: ${fatigue} || Reduce: ${reduce} || Increase: ${increase} || Max: ${max} ====>`);
 			/*var wMS = wound+nerves;*/
 			let fMS = Math.abs(fatigue) - Math.abs(reduce) + Math.abs(increase);
@@ -2540,11 +2551,11 @@
 			console.log("<==== Finished updating fatigueMod ====>");
 		});
 	}
-	
+
 	on("change:fatigue change:reducefatigueby change:increasefatigueby change:maxfatiguemods change:fatiguereducereason change:fatigueincreasereason change:fatiguemaxreason",function(){
 		setFatigueMod();
 	});
-	
+
 	const setModSums = function() {
 		getAttrs(["woundsMod","fatigueMod","encumbrance","distracted"], function(lvalue) {
 			//let tMod = parseInt(lvalue.ttmod)||0;
@@ -2552,7 +2563,7 @@
 			let fMod = parseInt(lvalue.fatigueMod)||0;
 			let eMod = parseInt(lvalue.encumbrance)||0;
 			let dMod = parseInt(lvalue.distracted)||0;
-	
+
 			console.log("<==== wounds:"+wMod+"||fatigue:"+fMod+"||encumbrance:"+eMod+"||distracted:"+dMod+" ====>");
 			let modSum = dMod-wMod-fMod;
 			let modSumEnc = modSum+eMod;
@@ -2569,11 +2580,11 @@
 			});
 		});
 	}
-	
+
 	on("change:woundsmod change:fatiguemod change:encumbrance change:distracted",function(){
 		setModSums();
 	});
-	
+
 	on("change:promptmods", function(eventInfo) {
 		if (eventInfo.newValue === "on") {
 			//prompt for mods
@@ -2595,7 +2606,7 @@
 			});
 		}
 	});
-	
+
 	on("change:showmods", function(eventInfo) {
 		let setDamageMod, setTraitMod, setTraitModEnc;
 		console.log("newValue: "+eventInfo.newValue);
@@ -2617,7 +2628,7 @@
 			setdmgmods: setDamageMod
 		});
 	});
-	
+
 	on("change:majorminor change:activitiesexams", function() {
 		getAttrs(["majorminor","activitiesexams"], function(v) {
 			let showETU = "0";
@@ -2627,7 +2638,7 @@
 			setAttrs({useETU: showETU});
 		});
 	});
-	
+
 	function powerLabel() {
 		getAttrs(["magictype","custompowerlabel"], function(v) {
 			let slabel = '';
@@ -2683,11 +2694,11 @@
 			});
 		});
 	}
-	
+
 	on("change:magictype change:custompowerlabel", function() {
 		powerLabel();
 	});
-	
+
 	function getBonusFields(repSection, setField) {
 		//setField should = vbonusdamage || weaponsbdt || spellsbdt
 		let fieldlist = {};
@@ -2699,9 +2710,9 @@
 			}
 			setAttrs(fieldlist);
 		});
-	
+
 	}
-	
+
 	on("change:raisehbrule", function(eventInfo) {
 		if (eventInfo.newValue === "1") {
 			//Using Variable Bonus Damage
@@ -2717,7 +2728,7 @@
 			let finalList = {};*/
 			getBonusFields("weapons","weaponsbdt");
 			getBonusFields("spells","spellsbdt");
-	
+
 		}
 		else {
 			console.log("Not using using Variable Bonus Damage...");
@@ -2726,7 +2737,7 @@
 			getBonusFields("spells","vbonusdamage");
 		}
 	});
-	
+
 	on("change:repeating_spells:shownotes change:repeating_spells:spellbutton", function() {
 		/*If spellbutton is set to Atk+Dmg, then don't show notes on damage roll*/
 		getAttrs(["repeating_spells_shownotes","repeating_spells_spellbutton"], function(v) {
@@ -2751,7 +2762,7 @@
 			}
 		});
 	});
-	
+
 	on("change:wealth change:wealthwild", function(eventInfo) {
 		let wealth = '&{template:roll} {{name=@{character_name} }} {{trait=^{wealth}}} {{skill_rank=@{wealth} }} {{skill_roll=[[@{wealth} + @{traitmods} + @{smooth_dice}dF]]}} {{mook=[[1d0+@{wdNum} + @{smooth_dice}dF]]}} {{wild_die=[[1d@{wealthwilddie}! + @{traitmods} + @{smooth_dice}dF]]}}';
 		if(eventInfo.newValue === "d0") {
@@ -2760,7 +2771,7 @@
 		}
 		setAttrs({rollwealth: wealth});
 	});
-	
+
 	on("clicked:repeating_weapons:wdamage", function() {
 		console.log("Damage Field clicked...show the Weapon config");
 		setAttrs({
@@ -2768,7 +2779,7 @@
 			repeating_weapons_highlightdamage: "1"
 		})
 	});
-	
+
 	on("clicked:repeating_spells:sdamage", function() {
 		console.log("Damage Field clicked...show the Weapon config");
 		setAttrs({
@@ -2776,7 +2787,7 @@
 			repeating_spells_shighlightdamage: "1"
 		})
 	});
-	
+
 	on("clicked:hideadvance", function() {
 		let hideval = "0";
 		let icon = "J";
@@ -2795,7 +2806,7 @@
 			});
 		});
 	});
-	
+
 	const showhidelist = ["showhidetalismans"];
 	showhidelist.forEach(showhidelist => {
 		on(`clicked:${showhidelist}`, function() {
@@ -2815,8 +2826,8 @@
 			});
 		});
 	});
-	
-	
+
+
 	console.log("Make sure Skill Names have been set");
 	const skillnamelist = ["fighting","academics","athletics","battle","boating","climbing","commonknowledge","driving","electronics","faith","focus","gambling","guts","hacking","healing","intimidation","investigation","native-language","lockpicking","notice","occult","performance","persuasion","piloting","psionics","repair","research","riding","ritual","science","shooting","spellcasting","stealth","streetwise","survival","swimming","taunt","thievery","throwing","tracking","weirdscience"];
 	skillnamelist.forEach(skillnamelist => {
@@ -2834,7 +2845,7 @@
 			});
 		});
 	});
-	
+
 	function setSkillDropdown(section, field, value, rowid) {
 		let repsection = `repeating_${section}`;
 		let setskill = {};
@@ -2876,9 +2887,9 @@
 				setAttrs(setskill);
 			});
 		}
-	
+
 	}
-	
+
 	const weaponsskilllist = ["fighting","athletics","shooting","throwing"];
 	weaponsskilllist.forEach(weaponsskilllist => {
 		on(`change:${weaponsskilllist}name`, function(eventInfo) {
@@ -2888,7 +2899,7 @@
 			setSkillDropdown("weapons", field, value);
 		});
 	});
-	
+
 	const spellskilllist = ["faith","athletics","focus","performance","psionics","ritual","spellcasting","weirdscience"];
 	spellskilllist.forEach(spellskilllist => {
 		on(`change:${spellskilllist}name`, function(eventInfo) {
@@ -2898,7 +2909,7 @@
 			setSkillDropdown("spells", field, value);
 		});
 	});
-	
+
 	const weaponsskillnamelist = ["fightingname","athleticsname","shootingname","throwingname"]; // Considering a refactor here
 	const spellskillnamelist = ["faithname","athleticsname","focusname","performancename","psionicsname","ritualname","spellcastingname","weirdsciencename"]; // similarly could consider a refactor
 	on("change:repeating_spells:spellbutton change:repeating_weapons:weaponbutton", function(eventInfo) {
@@ -2915,7 +2926,7 @@
 			console.log("No need to update anything...");
 		}
 	});
-	
+
 	const buttonlist = ["characterprofile1","vehicletab3","journaltab4","configurationtab2","releasetab5","documentationtab6"];
 	buttonlist.forEach(buttonlist => {
 		on(`clicked:${buttonlist}`, function() {
@@ -2932,7 +2943,7 @@
 			}
 		});
 	});
-	
+
 	on("clicked:powersectionconfig", function() {
 		console.log("Do something");
 		getAttrs(["showpowersectionconfig"], function(v) {
@@ -2952,7 +2963,7 @@
 		}
 		});
 	});
-	
+
 	//Start Multiple AB Support Sheet Workers
 	on("clicked:addab", function() {
 		getAttrs(["numberofabs"], function(v) {
@@ -2967,7 +2978,7 @@
 			}
 		});
 	});
-	
+
 	on("change:numberofabs", function(eventInfo) {
 		console.log("Number of ABs: " + eventInfo.newValue);
 		if (eventInfo.newValue == "1") {
@@ -2985,7 +2996,7 @@
 			console.log("Skipped the getSectionIDs portion of things...");
 		}
 	});
-	
+
 	on("clicked:removeab", function() {
 		getAttrs(["numberofabs"], function(v) {
 			let abcount = parseInt(v.numberofabs) || 0;
@@ -2998,7 +3009,7 @@
 			}
 		});
 	});
-	
+
 	const powerlabels = ["ablabel", "ablabel2", "ablabel3", "ablabel4", "ablabel5","ab1color","ab2color","ab3color","ab4color","ab5color"];
 	powerlabels.forEach(powerlabels => {
 		on(`change:${powerlabels}`, function(eventInfo) {
@@ -3012,7 +3023,7 @@
 			});
 		});
 	});
-	
+
 	on("change:repeating_spells:powergroup", function(eventInfo) {
 		let groupColor = eventInfo.newValue;
 		getAttrs([`repeating_spells_rpt${groupColor}color`], function(v) {
@@ -3021,7 +3032,7 @@
 			setAttrs({repeating_spells_powercolor: rowColor});
 		});
 	});
-	
+
 	const powerColors = ["rptab1color", "rptab2color","rptab3color","rptab4color","rptab5color"];
 	powerColors.forEach(powerColors => {
 		on(`change:repeating_spells:${powerColors}`, function(eventInfo) {
@@ -3040,7 +3051,7 @@
 			});
 		});
 	});
-	
+
 	const updateABLabels = function() {
 		const powerlabels = ["ablabel", "ablabel2", "ablabel3", "ablabel4", "ablabel5","ab1color","ab2color","ab3color","ab4color","ab5color"];
 		console.log("!!! Updating AB Labels and Colors !!!");
@@ -3059,7 +3070,7 @@
 			});
 		});
 	}
-	
+
 	on("change:repeating_spells:power", function(eventInfo) {
 		getAttrs(["repeating_spells_ablabsinit"], function(v) {
 			if(v.repeating_spells_ablabsinit == "0") {
@@ -3070,9 +3081,9 @@
 			}
 		});
 	});
-	
+
 	//End Multiple AB Support Sheet Workers
-	
+
 	/*****************************
 	* Skill Block functions
 	*****************************/
@@ -3118,7 +3129,7 @@
 			}
 		});
 	});
-	
+
 	const descStatBlock = function() {
 		let chardesc = "{{name=@{character_name}}}";
 		getAttrs(["is_npc","physdescription"], function(v) {
@@ -3134,11 +3145,11 @@
 			setAttrs({chardesc: chardesc});
 		});
 	}
-	
+
 	on("change:is_npc change:physdescription", function() {
 		descStatBlock();
 	});
-	
+
 	const staticlist = ["staticAcademics","staticAthletics","staticBattle","staticBoating","staticClimbing","staticCommonKnowledge","staticDriving","staticElectronics","staticFaith","staticFighting","staticFocus","staticGambling","staticGuts","staticHacking","staticHealing","staticIntimidation","staticInvestigation","staticLanguage","staticLockpicking","staticNotice","staticOccult","staticPerformance","staticPersuasion","staticPiloting","staticPsionics","staticRepair","staticResearch","staticRiding","staticRitual","staticScience","staticShooting","staticSpellcasting","staticStealth","staticStreetwise","staticSurvival","staticSwimming","staticTaunt","staticThievery","staticThrowing","staticTracking","staticWeirdScience"]
 	const skillsStatBlock = function() {
 		console.log("skillnamelist length: "+skillnamelist.length+" staticlist length: "+staticlist.length);
@@ -3194,7 +3205,7 @@
 						default:
 							console.log("Nothing to report");
 					}
-				} 
+				}
 				else if(v[staticlist[i]] != "0") { /* */
 				if(v[staticlist[i]] != "0") {
 					//skill is turned on
@@ -3229,13 +3240,13 @@
 			});
 		});
 	}
-	
+
 	staticlist.forEach(staticlist => {
 		on(`change:${staticlist} change:repeating_skills:skillname change:repeating_skills:skillnamerank change:repeating_skills:skillnamerankmod remove:repeating_skills`, function() {
 			skillsStatBlock();
 		})
 	});
-	
+
 	const derivedstats = ["usecharisma","usescholarship","Corruption","potsmFame","izFirewall","hfGlory","DLGrit","neuraltoughness","ripReason","tdsanity","ripStatus","izStrain","izStreetCred","izStreetCredThree"];
 	const derivedlabels = ["Charisma","Scholarship","Corruption","Fame","Firewall","Glory","Grit","Neural Toughness","Reason","Sanity","Status","Strain","Street Cred"];
 	const derivedcurfields = ["@{charismaCur}","@{scholarshipCur}","@{corruptionCur}","@{fameCur}","@{FirewallCur}","@{gloryCur}","@{gritCur}","@{ntoughnesscur}","@{reasonCur}","@{sanityCur}","@{statusCur}","@{StrainCur}","@{StreetCredCur}"];
@@ -3270,11 +3281,11 @@
 			setAttrs({charderived: charderived});
 		});
 	}
-	
+
 	on("change:toughnessarmor change:ntoughnessarmor change:usecharisma change:usescholarship change:corruption change:potsmfame change:izfirewall change:hfglory change:dlgrit change:neuraltoughness change:ripreason change:tdsanity change:ripstatus change:izstrain change:izstreetcred", function() {
 		derivedStatBlock();
 	});
-	
+
 	const gearStatBlock = function() {
 		//Includes Armor, Weapons, Gear
 		console.log("Started gearStatBlock");
@@ -3360,11 +3371,11 @@
 			});
 		});
 	}
-	
+
 	on("change:repeating_armor change:repeating_weapons change:repeating_gear remove:repeating_armor remove:repeating_weapons remove:repeating_gear", function() {
 		gearStatBlock();
 	})
-	
+
 	const specabilityStatBlock = function() {
 		let charhindrances = '';
 		let charedges = '';
@@ -3440,11 +3451,11 @@
 			});
 		});
 	}
-	
+
 	on("change:repeating_hindrances change:repeating_edges remove:repeating_hindrances remove:repeating_edges", function() {
 		specabilityStatBlock();
 	});
-	
+
 	const spellsStatBlock = function () {
 		console.warn("Creating Spell Stat Block");
 		let charpowers = '';
@@ -3528,11 +3539,11 @@
 			}
 		});
 	}
-	
+
 	on("change:NoPPRule change:numberofabs change:powerlabelplural change:ablabel change:ppelabel change:ablabel2 change:pplabel2 change:ablabel3 change:pplabel3 change:ablabel4 change:pplabel4 change:ablabel5 change:pplabel5 change:PowerPoints_max change:powerpoints2_max change:powerpoints3_max change:powerpoints4_max change:powerpoints5_max change:repeating_spells:power change:repeating_spells:powergroup remove:repeating_spells", function() {
 		spellsStatBlock();
 	});
-	
+
 	//End Statblock stuff
 	</script>
 <input type='hidden' name='attr_dopay' value="init" />
@@ -5824,7 +5835,7 @@
                                         <input class='sheet-deltabutton' type='hidden' name='attr_skillnamerank_delta' value='0' />
                                         <button class="sheet-traitbutton sheet-smallskillflexattbutton" type='roll' name='roll_tSkillRoll' value='@{whisperskillname} &{template:roll} {{trait=@{SkillName}}} @{rolltSkill} @{linkedotherattscorebutton} @{showtraitmods}'></button>
                                         <input class="sheet-otherskill" type="text" name="attr_SkillName" placeholder="Skill" data-i18n-placeholder="skill" />
-										
+
 										<div class='sheet-linkedAtt'>
 											<!-- <span class='sheet-linkedAttSpan' name="attr_linkedotherattscore" data-i18n-dynamic></span> -->
                                             <input class="sheet-LAA" type='checkbox' name='attr_linkedotherattscore' style="display:none;" value="(AGL)" />
@@ -7131,7 +7142,7 @@
     					<h1 class="sheet-gearcolHeader sheet-aug" data-i18n="augmentations">Augmentations</h1>
     					<h1 class="sheet-gearcolHeader sheet-cybernetics" data-i18n="cybernetics">Cybernetics</h1>
 					    <div class="sheet-augmentations">
-							<h4 class="sheet-repeatingHeader sheet-augenable" data--i18n="enable">Enable</h4> 
+							<h4 class="sheet-repeatingHeader sheet-augenable" data--i18n="enable">Enable</h4>
 					        <h4 class="sheet-repeatingHeader sheet-augitem sheet-aug" data-i18n="augmentation">Augmentation</h4>
 					        <h4 class="sheet-repeatingHeader sheet-augitem sheet-cybernetics" data-i18n="cybernetic-enhancement">Cybernetic Enhancement</h4>
     					    <h4 class="sheet-repeatingHeader sheet-augstrain" data-i18n="strain">Strain</h4>
@@ -8517,11 +8528,29 @@
 			<!--                     -->
 			<div class="sheet-release">
 				<h3 class='subsectionHeader' data-i18n="release-notes">Release Notes</h3>
+				<!-- Release 4.00.02 -->
+				<label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes40002' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 4.00.02</h4></span>
+				</label>
+				<input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes40002' value='1' />
+				<div class='sheet-releasenotes'>
+					<p data-i18n="changes-this-release">
+						Changes this release:
+					</p>
+					<ul>
+						 <li><strong data-i18n="bug-fixes">Bug Fixes</strong></li>
+						 <ul>
+							 <li data--i18n="40002-boosttrait">Fixed a bug where Boost/Lower Trait wasn't calculating correctly; now the number in the steps fields is always assumed to be the number of steps from the <em>BASE</em> trait value.</li>
+							 <li data--i18n="40002-consumables">Fixed a bug where consumables couldn't be deleted nor rearranged.</li>
+						 </ul>
+					</ul>
+				 </div>
+				<!-- Release 4.00.00 -->
 				<!-- Release 4.00.01 -->
 				<label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes40001' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 4.00.01</h4></span>
 				</label>
-				<input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes40001' value='1' checked />
+				<input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes40001' value='1' />
 				<div class='sheet-releasenotes'>
 					<p data-i18n="changes-this-release">
 						Changes this release:
@@ -8542,7 +8571,7 @@
 				<label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes40000' value='1' /><span class='sheet-releasenotes' style='color: red;'><h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 4.00.00</h4></span>
 				</label>
-				<input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes40000' value='1' checked />
+				<input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes40000' value='1' />
 				<div class='sheet-releasenotes'>
 					<p data-i18n="changes-this-release">
 						Changes this release:
