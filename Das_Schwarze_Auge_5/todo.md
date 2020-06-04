@@ -26,7 +26,7 @@
  * Spezialmanöver die auf Raufen AT basieren Raufen statt Waffe als Basiswert einstellen.
 
 ### Bugfixes
- * L+S Mod wird nicht berücksichtigt (erledigt)
+ * L+S Mod wird nicht berücksichtigt
 
 ### Aventurische Magie II
  * einige wenige Zauber wurden bereits hinzugefügt, auf Korrekheit überprüfen und ergänzen

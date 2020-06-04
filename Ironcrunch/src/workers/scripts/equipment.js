@@ -1,1 +1,0 @@
-// TODO: Adding auto fill for equipment
