@@ -789,14 +789,34 @@
                     <div class="2colrowx nowrap">
                         <div class="colx nowrap">
                             <h3 data-i18n="Attacks">Attacks</h3>
-                            <div class="enemyattackentry">
-                                <label data-i18n="Name:">Name:</label><input type="text" spellcheck="false" name="attr_selectedenemyatkname" /><br />
-                                <label data-i18n="Aim Dice:">Aim Dice:</label><input type="number" name="attr_selectedenemyatkaim" value="0" />
-                                <label data-i18n="Crit Dice:" style="margin-left:32px;">Crit Dice:</label><input type="number" name="attr_selectedenemyatkcrit" value="0" /><br />
-                                <label data-i18n="Damage:">Damage:</label><input style="width:65px;" type="text" spellcheck="false" name="attr_selectedenemyatkdmg" value="0" />
-                                <label data-i18n="Crit Dmg:" style="margin-left:12px;">Crit Dmg:</label><input type="number" name="attr_selectedenemyatkcritdmg" value="0" /><br />
-                                <label data-i18n="Notes:">Notes:</label><input type="text" spellcheck="false" name="attr_selectedenemyatknotes" />
+                            <div class="enemyattacklist">
+                                <input type="hidden" class="valuehider" name="attr_selectedenemyatk0_id" value="">
+                                <div class="enemyattackentry">
+                                    <label data-i18n="Name:">Name:</label><input type="text" spellcheck="false" name="attr_selectedenemyatkname" /><br />
+                                    <label data-i18n="Aim Dice:">Aim Dice:</label><input type="number" name="attr_selectedenemyatkaim" value="0" />
+                                    <label data-i18n="Crit Dice:" style="margin-left:32px;">Crit Dice:</label><input type="number" name="attr_selectedenemyatkcrit" value="0" /><br />
+                                    <label data-i18n="Damage:">Damage:</label><input style="width:65px;" type="text" spellcheck="false" name="attr_selectedenemyatkdmg" value="0" />
+                                    <label data-i18n="Crit Dmg:" style="margin-left:12px;">Crit Dmg:</label><input type="number" name="attr_selectedenemyatkcritdmg" value="0" /><br />
+                                    <label data-i18n="Notes:">Notes:</label><input type="text" spellcheck="false" name="attr_selectedenemyatknotes" />
+                                </div>
+                                <input type="hidden" class="valuehider" name="attr_selectedenemyatk1_id" value="">
+                                <div class="enemyattackentry">
+                                    <span name="attr_selectedenemyatk1_id"></span>
+                                </div>
+                                <input type="hidden" class="valuehider" name="attr_selectedenemyatk2_id" value="">
+                                <div class="enemyattackentry">
+                                    <span name="attr_selectedenemyatk2_id"></span>
+                                </div>
+                                <input type="hidden" class="avaluehider" name="attr_selectedenemyatk2_id">
+                                <div>
+                                    <button class="addbtn" type="action" name="act_addgmunitatk"><span data-i18n="Plus Add">+Add</span></button>
+                                </div>
+                                <input type="hidden" class="valuehider" name="attr_selectedenemyatk0_id">
+                                <div>
+                                    <button class="removebtn" type="action" name="act_removegmunitatk"><span data-i18n="Remove">Remove</span></button>
+                                </div>
                             </div>
+                            <button class="removebtn" type="action" name="act_cleargmattacks">Clear</button>
                         </div>
                         <div class="colx nowrap">
                             <h3 data-i18n="Abilities">Abilities</h3>
@@ -1312,6 +1332,9 @@ on("clicked:switchsheettype", function() {
     });
 });
 
+const MAX_GM_UNIT_ATKS = 3;
+const MAX_GM_UNIT_ABILITIES = 6;
+
 const selectedEnemyAttrs = [
     ["_gmunitname", "selectedenemy"],
     ["_gmunithp", "selectedenemyhp"],
@@ -1325,6 +1348,14 @@ const selectedEnemyAttrs = [
     ["_gmunitatkcrit", "selectedenemyatkcrit"],
     ["_gmunitatkdmg", "selectedenemyatkdmg"],
     ["_gmunitatkcritdmg", "selectedenemyatkcritdmg"]
+];
+
+const selectedEnemyAtkAttrs = [
+    ["_gmunitatk{x}_name", "selectedenemyatk{x}_name"],
+    ["_gmunitatk{x}_aim", "selectedenemyatk{x}_aim"],
+    ["_gmunitatk{x}_crit", "selectedenemyatk{x}_crit"],
+    ["_gmunitatk{x}_dmg", "selectedenemyatk{x}_dmg"],
+    ["_gmunitatk{x}_critdmg", "selectedenemyatk{x}_critdmg"]
 ];
 
 function SelectUnit(unitId) {
@@ -1373,9 +1404,9 @@ selectedEnemyAttrs.forEach(attrPair => {
             var selectedenemyid = values.selectedenemyid;
             if (selectedenemyid) {
                 let fullListAttr = `repeating_gmenemyunitlist_${selectedenemyid}${listAttr}`;
-                let output = {};
-                output[fullListAttr] = eventInfo.newValue;
-                setAttrs(output);
+                setAttrs({
+                    [fullListAttr]: eventInfo.newValue
+                });
             }
             else {
                 console.warn("'selectedenemyid' is null or empty. Reselect the unit before editing.");
@@ -1386,28 +1417,39 @@ selectedEnemyAttrs.forEach(attrPair => {
 
 function ClearSelectedUnit() {
     setAttrs({
-        selectedenemyid: "",
-        selectedenemy: "",
-        selectedenemyhp: 0,
-        selectedenemyap: 0,
-        selectedenemysp: 0,
-        selectedenemyspeed: 0,
-        selectedenemyaim: 0,
-        selectedenemywill: 0,
-        selectedenemyatkname: "",
-        selectedenemyatkaim: 0,
-        selectedenemyatkcrit: 0,
-        selectedenemyatkdmg: "0",
-        selectedenemyatkcritdmg: 0,
-        gmatkname: "",
-        gmatkcritdice: 0,
-        gmatkdamage: "0",
-        gmatkcritdamage: 0,
-        gmatkaimdice: 0,
-        gmwatkwill: 0,
-        selectedenemynotes: "",
-        selectedenemyatknotes: "",
-        gmdodgedice: 0
+        selectedenemyid: ""
+    });
+}
+
+function RemoveSelectedUnitAttack(index) {
+    if (index < 0 || index >= MAX_GM_UNIT_ATKS) {
+        return;
+    }
+
+    var indexValue = index == 0 ? "" : index;
+    setAttrs({
+        [`selectedenemyatk${index}_id`]: "",
+        [`selectedenemyatk${indexValue}_name`]: "",
+        [`selectedenemyatk${indexValue}_aim`]: 0,
+        [`selectedenemyatk${indexValue}_crit`]: 0,
+        [`selectedenemyatk${indexValue}_dmg`]: "0",
+        [`selectedenemyatk${indexValue}_critdmg`]: 0,
+    });
+}
+
+function AddSelectedUnitAttack(index) {
+    if (index < 0 || index >= MAX_GM_UNIT_ATKS) {
+        return;
+    }
+
+    var indexValue = index == 0 ? "" : index;
+    setAttrs({
+        [`selectedenemyatk${index}_id`]: "active",
+        [`selectedenemyatk${indexValue}_name`]: "",
+        [`selectedenemyatk${indexValue}_aim`]: 0,
+        [`selectedenemyatk${indexValue}_crit`]: 0,
+        [`selectedenemyatk${indexValue}_dmg`]: "0",
+        [`selectedenemyatk${indexValue}_critdmg`]: 0,
     });
 }
 
@@ -1430,6 +1472,66 @@ on("clicked:addgmunit", function() {
     newAttrs[`repeating_gmenemyunitlist_${newRowId}_selectedenemy`] = "New Unit";
     setAttrs(newAttrs, null, function() {
         SelectUnit(newRowId);
+    });
+});
+
+const ENEMY_ATTACK_ATTR = [
+    "selectedenemyatk0_id",
+    "selectedenemyatk1_id",
+    "selectedenemyatk2_id"
+];
+
+const ENEMY_ABILITY_ATTR = [
+    "selectedenemyability0_id",
+    "selectedenemyability1_id",
+    "selectedenemyability2_id",
+    "selectedenemyability3_id",
+    "selectedenemyability4_id",
+    "selectedenemyability5_id"
+];
+
+on("clicked:cleargmattacks", function() {
+    setAttrs({
+        [ENEMY_ATTACK_ATTR[0]]: "",
+        [ENEMY_ATTACK_ATTR[1]]: "",
+        [ENEMY_ATTACK_ATTR[2]]: ""
+    });
+});
+
+on("clicked:addgmunitatk", function() {
+    getAttrs(ENEMY_ATTACK_ATTR, function(values) {
+        let highestAttackIndex = -1;
+        for(let i = 0; i < MAX_GM_UNIT_ATKS; ++i) {
+            var attrName = ENEMY_ATTACK_ATTR[i];
+            var attrValue = values[attrName]||"";
+            console.log(attrName + ":" + attrValue);
+            if (attrValue != "") {
+                highestAttackIndex = i;
+            }
+        }
+        console.log(highestAttackIndex);
+        if (highestAttackIndex == (MAX_GM_UNIT_ATKS - 1)) {
+            return;
+        }
+        let nextAttackIndex = highestAttackIndex + 1;
+        AddSelectedUnitAttack(nextAttackIndex);
+    });
+});
+
+on("clicked:removegmunitatk", function() {
+    getAttrs(ENEMY_ATTACK_ATTR, function(values) {
+        let highestAttackIndex = -1;
+        for(let i = 0; i < MAX_GM_UNIT_ATKS; ++i) {
+            var attrName = ENEMY_ATTACK_ATTR[i];
+            var attrValue = values[attrName]||"";
+            if (attrValue != "") {
+                highestAttackIndex = i;
+            }
+        }
+        if (highestAttackIndex == -1) {
+            return;
+        }
+        RemoveSelectedUnitAttack(highestAttackIndex);
     });
 });
 
