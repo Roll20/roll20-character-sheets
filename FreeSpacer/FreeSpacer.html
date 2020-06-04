@@ -250,8 +250,11 @@
 
             <!--Salvo Roll Button-->
             <input type="hidden" name="attr_salvoMacro" readonly />
-            <button type="roll" class="rollSalvoButton" name="roll_rollSalvo" value="@{salvoMacro}"></button><span class="rollSalvoButton">Roll Salvo</span>
+            <button type="roll" class="rollSalvoButton" name="roll_rollSalvo" value="@{salvoMacro}" ></button><span class="rollSalvoButton">Roll Salvo</span>
 
+            <!--Spend Charge & Close SalvoMode-->
+            <input type="checkbox" class="spendChargeCloseSalvoMode" name="attr_spendChargeCloseSalvo" value="1" /><span class="spendChargeCloseSalvoMode">Spend Charge &amp; Close Salvo Mode</span>
+ 
             <!--Threat Off-page Box-->
             <div class="salvoThreatBox offPage">
                 <input type="number" class="salvoThreatRating" name="attr_salvoThreat" value="0" />
@@ -5393,7 +5396,7 @@
         
     
     <!-- --------------------- -->
-    <!--	  Behemoth Log        -->
+    <!--	  Behemoth Log     -->
     <!-- --------------------- -->
     <div class="sheetType behemothSheet">
         <div class="behemothSheetGrid">
@@ -8520,6 +8523,30 @@
                     console.log(rating);
                     setAttrs({ "salvoSpecialtyRating": rating, "salvoScale": "", "salvoTool": "" });
                 }
+            });
+        });
+
+        //Close Salvo Mode after roll
+        on("change:spendChargeCloseSalvo", (event) =>
+        {
+            getAttrs(["salvoScale", "ReactorCharge", "ReactorOvercharge", "salvoCharge"], function (values)
+            {
+                const setObj = {};
+
+                //Spend Charge from Personal Reactor
+                if (values.salvoScale == 1)
+                {
+                    let adjustedReactorCharge = parseInt(values.ReactorCharge) || 0;
+                    adjustedReactorCharge += parseInt(values.ReactorOvercharge) || 0;
+                    adjustedReactorCharge -= parseInt(values.salvoCharge) || 0;
+                    setObj.ReactorCharge = adjustedReactorCharge;
+                    setObj.ReactorOvercharge = 0;
+                };
+
+                //Close Salvo Mode
+                setObj.salvoMode = 0;
+
+                setAttrs(setObj);
             });
         });
 
