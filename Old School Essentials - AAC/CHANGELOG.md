@@ -10,6 +10,14 @@
 - Add a Wisdom modifier next to saving throws on the character sheet
 - Add modifier queries to all saving throw rolls
 
+### Fixed
+
+- Fix a bug where saving throws were being reverted to zero due to transition code for old saving throw attributes
+
+### Removed
+
+- Remove (hidden) deprecated saving throw values that aren't necessary given the automatic saving throw values
+
 ## 1.2.0
 
 ### Added
