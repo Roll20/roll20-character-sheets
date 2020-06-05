@@ -457,27 +457,28 @@
                     <input type="hidden" class="tabstoggle" name="attr_aabltype" value="Standard" />
                     <div class="aablStandard">
                         <input type="hidden" class="hideifzero" name="attr_aablnocharges" value="0" />
-                        <span>
+                        <div>
                             <label class="attacklabel">Out of Charges!</label>
-                        </span>
+                        </div>
                         <input type="hidden" class="hideifone" name="attr_aablnocharges" value="0" />
-                        <span>
+                        <div>
                             <input type="hidden" class="hideifzero" name="attr_aabloncooldown" value="0" />
-                            <span>
+                            <div>
                                 <label class="attacklabel">Ability On Cooldown!</label>
-                            </span>
+                            </div>
                             <input type="hidden" class="hideifone" name="attr_aabloncooldown" value="0" />
-                            <span>
+                            <div>
                                 <input type="hidden" class="hideifzero" name="attr_aablcooldown" value="0"/>
                                 <button type="action" name="act_setcooldown" class="btn tooltip">
                                     <span style="font-family:Pictos">t</span> Set On Cooldown
                                     <span class="tooltiptext" style="left:11px;"><b>Set On Cooldown</b><hr />Put ability on cooldown</span></button>
+                                <br />
                                 <input type="hidden" class="hideifzero" name="attr_aablcharges" value="0"/>
                                 <button type="action" name="act_usecharge" class="btn tooltip">
-                                    <span style="font-family:Pictos">}</span> Use Charge
+                                    <span style="font-family:Pictos">}</span> Use Charge (<span name="attr_aablchargesleft"></span>/<span name="attr_aablcharges"></span>)
                                     <span class="tooltiptext" style="left:11px;"><b>Use Charge</b><hr />Expend ability charge</span></button>
-                            </span>
-                        </span>
+                            </div>
+                        </div>
                     </div>
                     <div class="aablWeapon nowrap">
                         <span class="labellike help tooltip" style="right:40px;top:-32px;">&nbsp;<span style="font-family:Pictos">?</span><span class="tooltiptext" data-i18n="Weapon Attack Tooltip"><b>Attack</b><hr />This ability appears as a <em>Attack</em> on the Combat panel.</span></span> 
@@ -2008,9 +2009,11 @@ on("sheet:opened change:repeating_chargetracker remove:repeating_chargetracker",
                 let abilityName = abilityValues[abilityId].aablname;
                 let abilityMaxCharges = abilityValues[abilityId].aablcharges;
                 let abilityNoChargesAttr = `repeating_activeabilities_${abilityId}_aablnocharges`;
+                let abilityChargesLeftAttr = `repeating_activeabilities_${abilityId}_aablchargesleft`;
                 if (abilityMaxCharges == 0)
                 {
                     output[abilityNoChargesAttr] = 0;
+                    output[abilityChargesLeftAttr] = 0;
                 }
                 else {
                     let exists = false;
@@ -2019,14 +2022,16 @@ on("sheet:opened change:repeating_chargetracker remove:repeating_chargetracker",
                         let chargeTrackerName = chargeValues[chargeTrackerId].chargename;
                         let chargeTrackerValue = chargeValues[chargeTrackerId].chargevalue;
 
-                        if (abilityName == chargeTrackerName && chargeTrackerValue == 0) {
-                            output[abilityNoChargesAttr] = 1;
+                        if (abilityName == chargeTrackerName) {
+                            output[abilityChargesLeftAttr] = chargeTrackerValue;
+                            output[abilityNoChargesAttr] = (chargeTrackerValue == 0) ? 1 : 0;
                             exists = true;
                             break;
                         }
                     }
                     if (!exists) {
                         output[abilityNoChargesAttr] = 0;
+                        output[abilityChargesLeftAttr] = abilityMaxCharges;
                     }
                 }
             }
@@ -2046,25 +2051,29 @@ on("sheet:opened change:repeating_cooldowntracker remove:repeating_cooldowntrack
                 let abilityName = abilityValues[abilityId].aablname;
                 let abilityCooldown = abilityValues[abilityId].aablcooldown;
                 let abilityOnCooldownAttr = `repeating_activeabilities_${abilityId}_aabloncooldown`;
+                let abilityCooldownLeftAttr = `repeating_activeabilities_${abilityId}_aablcooldownleft`;
                 if (abilityCooldown == 0)
                 {
                     output[abilityOnCooldownAttr] = 0;
+                    output[abilityCooldownLeftAttr] = 0;
                 }
                 else {
                     let exists = false;
                     for (let cooldownIndex = 0; cooldownIndex < cooldownIds.length; ++cooldownIndex) {
                         let cooldownId = cooldownIds[cooldownIndex];
                         let cooldownName = cooldownValues[cooldownId].cooldownname;
-                        let cooldownValue = cooldownValues[cooldownId].cooldownvalue;
+                        let cooldownValue = parseInt(cooldownValues[cooldownId].cooldownvalue)||0;
 
-                        if (abilityName == cooldownName && cooldownValue > 0) {
-                            output[abilityOnCooldownAttr] = 1;
+                        if (abilityName == cooldownName) {
+                            output[abilityCooldownLeftAttr] = cooldownValue;
+                            output[abilityOnCooldownAttr] = (cooldownValue > 0) ? 1 : 0;
                             exists = true;
                             break;
                         }
                     }
                     if (!exists) {
                         output[abilityOnCooldownAttr] = 0;
+                        output[abilityCooldownLeftAttr] = abilityCooldown;
                     }
                 }
             }
