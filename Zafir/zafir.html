@@ -408,7 +408,7 @@
                     <div class="inset nowrap tracker clearfix">
                         <fieldset class="repeating_cooldowntracker">
                             <input type="text" spellcheck="false" name="attr_cooldownname" />
-                            <input type="number" name="attr_cooldownvalue" />
+                            <input type="number" name="attr_cooldownvalue" value="0"/>
                         </fieldset>
                     </div>
                 </div>
@@ -2113,13 +2113,44 @@ on("clicked:reveal", function() {
     });
 });
 
-// TODO
+function ClearRepeatingSection(repeating) {
+    getSectionIDs(repeating, function(ids) {
+        for (let i = 0; i < ids.length; ++i) {
+            removeRepeatingRow(`repeating_${repeating}_${ids[i]}`);
+        }
+    });
+}
+
 on("clicked:initcombat", function() {
     console.log("initcombat TODO");
 });
 
+function DecrementAndRemoveZeroValues(repeating, valueAttr) {
+    getRepeatingAttrs(repeating, [valueAttr], function(ids, values) {
+        let output = {};
+        let remove = [];
+        for (var i = 0; i < ids.length; ++i) {
+            let id = ids[i];
+            let value = parseInt(values[id][valueAttr]);
+            if (!isNaN(value)) {
+                let newValue = Math.max(value - 1, 0);
+                output[`repeating_${repeating}_${id}_${valueAttr}`] = newValue;
+                if (newValue == 0) {
+                    remove.push(`repeating_${repeating}_${id}`);
+                }
+            }
+        }
+        setAttrs(output, null, function() {
+            remove.forEach(attr => {
+                removeRepeatingRow(attr);
+            });
+        });
+    });
+}
+
 on("clicked:roundstart", function() {
-    console.log("roundstart TODO");
+    DecrementAndRemoveZeroValues("cooldowntracker", "cooldownvalue");
+    DecrementAndRemoveZeroValues("conditiontracker", "conditionvalue");
 });
 
 </script>
