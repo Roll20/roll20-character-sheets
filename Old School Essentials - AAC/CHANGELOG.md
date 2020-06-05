@@ -9,6 +9,7 @@
 - Add a reaction roll button to monster sheet
 - Add a Wisdom modifier next to saving throws on the character sheet
 - Add modifier queries to all saving throw rolls
+- Add a Patreon link to the sheet.json in case folks want to donate
 
 ### Fixed
 
