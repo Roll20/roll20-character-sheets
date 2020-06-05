@@ -33,7 +33,6 @@ This sheet is designed for use with the Alternity core player book. Autocalculat
 
 6/5/2020
 *Added missing Direct Fire skill for Heavy Weapons
-*Pushed previous updates that were reverted by accident.
 
 
 Sheet Author: [@Reikou](https://app.roll20.net/users/519959/reikou)
