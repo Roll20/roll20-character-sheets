@@ -10,6 +10,7 @@
 - Add a Wisdom modifier next to saving throws on the character sheet
 - Add modifier queries to all saving throw rolls
 - Add a Patreon link to the sheet.json in case folks want to donate
+- Add French translation, courtesy of @elbj
 
 ### Fixed
 
