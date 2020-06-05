@@ -8107,9 +8107,44 @@
 <!-- ----------------------- -->
 <rolltemplate class="sheet-rolltemplate-FS">
     <div class="rolltemplate">
-        <div>{{taskSkill}}"("{{taskSkillRating}}")"</div>
-        <div>{{taskSpecialty}}"("{{taskSpecialtyRating}}")"</div>
-        <div class="result">Result: {{result}} Hits</div>
+        <div><span>Skill: </span>{{salvoSkill}}<span>(</span>{{salvoSkillRating}}<span>)</span></div>
+        <div><span>Specialty: </span>{{salvoSpecialty}}<span>(</span>{{salvoSpecialtyRating}}<span>)</span></div>
+        <div><span>Tool: </span>{{salvoTool}}<span>(</span>{{salvoToolRating}}<span>) costing </span> {{salvoCharge}}<span> Charge</span></div>
+        <div class="taskDice">{{task0}}{{task1}}{{task2}}{{task3}}{{task4}}{{task5}}{{task6}}{{task7}}{{task8}}{{task9}}</div>
+        <div class="threatDice">{{threat0}}{{threat1}}{{threat2}}{{threat3}}{{threat4}}{{threat5}}{{threat6}}{{threat7}}{{threat8}}{{threat9}}</div>
+        <div class="result">Result: {{total}} </div>
+        <!--Roll Outcome-->
+        <div class="outcome">
+            <!--Double Critical Roll Outcome-->
+            {{#rollGreater() total 4 }}
+            <span>Critical(5+)</span>
+            {{/rollGreater() total 4 }}
+            <!--Critical Roll Outcome-->
+            {{#rollBetween() total 3 4 }}
+            <span>Critical(3,4)</span>
+            {{/rollBetween() total 3 4 }}
+            <!--Complete Outcome-->
+            {{#rollTotal() total 2}}
+            <span>Complete(</span>{{total}}<span>)</span>
+            {{/rollTotal() total 2}}
+            <!--Partial Outcome-->
+            {{#rollTotal() total 1}}
+            <span>Partial(</span>{{total}}<span>)</span>
+            {{/rollTotal() total 1}}
+            <!--Fail Outcome-->
+            {{#rollTotal() total 0}}
+            <span>Fail(0)</span>
+            {{/rollTotal() total 0}}
+            {{#rollTotal() total -3}}
+            <span>Consequence(-3)</span>
+            {{/rollTotal() total -3}}
+            {{#rollBetween() total -1 -2 }}
+            <span>Complications(</span>{{total}}<span>)</span>
+            {{/rollBetween() total -1 -2 }}
+            {{#rollLess() total -3 }}
+            <span>Complications(</span>{{total}}<span>)</span>
+            {{/rollLess() total -3 }}
+        </div>
     </div>
 </rolltemplate>
 
@@ -9532,7 +9567,7 @@
         //Generate Salvo Macro
         on("change:salvoSkillRating change:salvoSpecialtyRating change:salvoToolRating change:salvoAdvantage change:salvoThreat", (event) =>
         {
-            getAttrs(["salvoSkillRating", "salvoSpecialtyRating", "salvoToolRating", "salvoAdvantage", "salvoThreat", "salvoCharge"], function (values)
+            getAttrs(["salvoSkill", "salvoSkillRating", "salvoSpecialty", "salvoSpecialtyRating", "salvoTool", "salvoToolRating", "salvoAdvantage", "salvoThreat", "salvoCharge"], function (values)
             {
                 //Sum the task dice
                 let taskDice = 0;
@@ -9590,7 +9625,7 @@
                     return `{{threat${num}=$[[${(num - 1 + taskDice) * 2}]]}}`;
                 }).join(' ');
 
-                setObj.salvoMacro = `&{template:default} {{total=${wholeRoll}}} ${taskFields} ${threatFields} ${autoHits} ${autoMisses}`;
+                setObj.salvoMacro = `&{template:FS} {{salvoSkill=${values.salvoSkill}}} {{salvoSkillRating=${values.salvoSkillRating}}} {{salvoSpecialty=${values.salvoSpecialty}}} {{salvoSpecialtyRating=${values.salvoSpecialtyRating}}}  {{salvoTool=${values.salvoTool}}} {{salvoToolRating=${values.salvoToolRating}}} {{salvoCharge=${values.salvoCharge}}} {{total=${wholeRoll}}} ${taskFields} ${threatFields} ${autoHits} ${autoMisses}`;
 
                 console.log(setObj);
                 setAttrs(setObj);
