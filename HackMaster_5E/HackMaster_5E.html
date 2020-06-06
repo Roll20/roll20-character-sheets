@@ -1,25 +1,5 @@
 <script type="text/worker">
 
-on('change:hp_max change:repeating_wounds:wound sheet:opened', () => {
-    getSectionIDs('repeating_wounds', idarray => {
-        const fieldnames = [];
-        idarray.forEach(id => fieldnames.push(`repeating_wounds_${id}_wound`));
-        getAttrs([...fieldnames, 'hp_max'], v => {
-            const hp_max = parseInt(v.hp_max) || 0;
-            const hp = hp_max - fieldnames.reduce((total, item) => total += (parseInt(v[item]) || 0), 0);
-            setAttrs({hp});
-        });
-    });
-});
-
-on('sheet:opened', function () {
-    getAttrs(['codeversion'], function (values) {
-        if ((parseFloat(values.codeversion) || 0) < 1) {
-            updateWounds();
-        }
-    });
-});
-
 function updateWounds() {
     const fieldnames = [];
     const rows = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -32,13 +12,34 @@ function updateWounds() {
             if (wound > 0) {
                 const rowid = generateRowID();
                 output[`repeating_wounds_${rowid}_wound`] = wound;
-                output[`repeating_wounds_${rowid}_wound_days`] = getValue(`wound${row}_days`););
+                output[`repeating_wounds_${rowid}_wound_days`] = getValue(`wound${row}_days`);
             }
         });
         output.codeversion = 1;
         setAttrs(output);
     });
 }
+
+on('sheet:opened', function () {
+    getAttrs(['codeversion'], function (values) {
+        if ((parseFloat(values.codeversion) || 0) < 1) {
+            updateWounds();
+        }
+    });
+});
+on('change:hp_max change:repeating_wounds:wound sheet:opened', () => {
+    getSectionIDs('repeating_wounds', idarray => {
+        const fieldnames = [];
+        idarray.forEach(id => fieldnames.push(`repeating_wounds_${id}_wound`));
+        getAttrs([...fieldnames, 'hp_max'], v => {
+            const hp_max = parseInt(v.hp_max) || 0;
+            const hp = hp_max - fieldnames.reduce((total, item) => total += (parseInt(v[item]) || 0), 0);
+            setAttrs({hp});
+        });
+    });
+});
+
+
 
 const int = score => parseInt(score) || 0;
 on("change:strength change:strength_fractional sheet:opened", function() {
@@ -717,7 +718,7 @@ on("change:skill_dice_switch sheet:opened", function() {
                 <div class="sheet-col-1-4 sheet-vert-middle"><button class="sheet-skill-roll" type='roll' name='roll_mental_save' value='@{character_name} makes a Saving Throw \n\nPoison Save :[[1d20 + @{poison_save} ]]'>Save</button></div>
             </div>
             <div class="sheet-col-1-4"><span>Notes</span></div>
-            <input type="checkbox" class="wombat-show arrow" name="attr_wombat_show" title="Show/Hide" value="1">
+            <input type="checkbox" class="wombat-show arrow" name="attr_saving_throw_show" title="Show/Hide" value="1">
             <span></span>
             <div class="wombat">
             <div><textarea name="attr_saving_throw_notes"></textarea></div>
