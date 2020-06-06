@@ -169,6 +169,13 @@
                     <div class="weapon">
                         <input type="hidden" class="valuehider" name="attr_wpname" value="">
                         <div class="attack clearfix">
+                            <input type="hidden" class="hideifzero" name="attr_wpammo" value="0"/>
+                            <button type="action" name="act_useammo" class="btn tooltip" style="width:12px;padding-left:6px;padding-right:6px;">
+                                <span style="font-family:'Pictos Custom'">[</span>
+                                <span class="tooltiptext" style="left:2px;"><b>Use Ammo</b><hr />Decrement the ammo counter for this weapon</span></button>
+                            <input type="hidden" class="hideifzero" name="attr_wpneedreload" value="0"/>
+                            <button type="action" name="act_reloadprimary" class="btn"><span style="font-family:Pictos">1</span> <span data-i18n="Reload">Reload</span></button>
+                            <input type="hidden" class="hideifone" name="attr_wpneedreload" value="0"/>
                             <button type="roll" name="roll_attackprimary" class="btn" value="&{template:zafir} {{name=@{wpname}}} {{aim=[[(@{wpattackaimdice})d6>5]]}} {{crit=[[(@{wpattackcritdice})d6>6]]}} {{damage=[[(@{wpattackdamage})]]}} {{critdmg=[[(@{wpattackdamage}) + (@{wpcritdmg})]]}} {{notes=@{wpnotes}}} {{player=@{char_name}}}"><span data-i18n="Attack">Attack</span></button>
                             <label style="width:110px"><span name="attr_wpname"></span></label>
                                 <label>+<span name="attr_wpattackaimdice"></span> <span data-i18n="aim">aim</span>&nbsp;&nbsp;&nbsp;+<span name="attr_wpattackcritdice"></span> <span data-i18n="crit">crit</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="tooltip"><span name="attr_wpattackdamage"></span> (+<span name="attr_wpcritdmg"></span>)<span class="tooltiptext">Damage</span></span></label>
@@ -1715,6 +1722,24 @@ function ReloadPrimaryWeapon() {
 
 on("clicked:reloadprimary", function() {
     ReloadPrimaryWeapon();
+});
+
+on("clicked:useammo", function() {
+    getAttrs(["wpammo"], function(values) {
+        let wpammo = parseInt(values.wpammo)||0;
+        setAttrs({
+            wpammo: Math.max(wpammo - 1, 0)
+        });
+    });
+});
+
+on("sheet:opened change:wpammo", function(eventInfo) {
+    getAttrs(["wpammo"], function(values) {
+        let wpammo = parseInt(values.wpammo)||0;
+        setAttrs({
+            wpneedreload: (wpammo == 0) ? 1 : 0
+        });
+    });
 });
 
 on("clicked:switchsheettype", function() {
