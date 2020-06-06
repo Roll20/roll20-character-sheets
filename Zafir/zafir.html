@@ -1704,13 +1704,17 @@ on(sheetOpenAndAttrChanged(skillActionInputs), function() {
     });
 });
 
-on("clicked:reloadprimary", function() {
+function ReloadPrimaryWeapon() {
     getAttrs(["wpammo_max"], function(values) {
         let wpammo_max = parseInt(values.wpammo_max)||0;
         setAttrs({
             wpammo: wpammo_max
         });
     });
+}
+
+on("clicked:reloadprimary", function() {
+    ReloadPrimaryWeapon();
 });
 
 on("clicked:switchsheettype", function() {
@@ -2122,7 +2126,25 @@ function ClearRepeatingSection(repeating) {
 }
 
 on("clicked:initcombat", function() {
-    console.log("initcombat TODO");
+    ClearRepeatingSection("conditiontracker");
+    ClearRepeatingSection("cooldowntracker");
+    ClearRepeatingSection("chargetracker");
+    ReloadPrimaryWeapon();
+
+    // Add all charges
+    getRepeatingAttrs("activeabilities", ["aablname", "aablcharges"], function(abilityIds, abilityValues) {
+        abilityIds.forEach(abilityId => {
+            let id = generateRowID();
+            let name = abilityValues[abilityId].aablname;
+            let charges = parseInt(abilityValues[abilityId].aablcharges)||0;
+            if (charges > 0) {
+                setAttrs({
+                    [`repeating_chargetracker_${id}_chargename`]: name,
+                    [`repeating_chargetracker_${id}_chargevalue`]: charges
+                });
+            }
+        });
+    });
 });
 
 function DecrementAndRemoveZeroValues(repeating, valueAttr) {
