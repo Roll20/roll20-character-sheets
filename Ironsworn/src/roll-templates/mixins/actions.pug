@@ -1,10 +1,25 @@
 include ./outcomes
 include ./body
 
+mixin rarity(value)
+  | {{#rollTotal() rarityDie#{value} action}}
+  case value
+    when '6'
+      +rarityDramatic
+    when '5'
+      +rarityMinor
+    default '1'
+      +rarityFail
+  | {{#rollTotal() rarityDie#{value} action}}
+
+
 mixin standardAction(type)
   | {{#rollGreater() #{type} challenge1}}
   | {{#rollTotal() challenge1 challenge2}}
   +opportunity
+  if type == 'action'
+    +rarity('6')
+    +rarity('5')
   | {{/rollTotal() challenge1 challenge2}}
   | {{#^rollTotal() challenge1 challenge2}}
   | {{#rollGreater() #{type} challenge2}}
