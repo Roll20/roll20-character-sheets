@@ -4,22 +4,22 @@ function getCurrentVow (VowValues) {
   return total
 }
 
-function updateVowValues (newValue) {
+function updateVowValues (newValue, vowID) {
   let VowNumber = 0
   for (; newValue > 0;) {
     let updateValue = (newValue < 4) ? newValue : 4
     setAttrs({
-      ['repeating_Vow_Vow_' + VowNumber]: updateValue
+      ['vow' + vowID + '-' + VowNumber]: updateValue
     })
     newValue = newValue - updateValue
     VowNumber++
   }
 }
 
-function updateVow (mark, vowArray) {
+function updateVow (mark, vowArray, number) {
   let newValue = mark + getCurrentVow(vowArray)
   let finalValue = (newValue < 40) ? newValue : 40
-  updateVowValues(finalValue)
+  updateVowValues(finalValue, number)
 }
 
 function chosenDifficulty (rank) {
@@ -44,83 +44,52 @@ function chosenDifficulty (rank) {
   }
 }
 
-on('change:mark_vow_1 change:mark_vow_2 change:mark_vow_3 change:mark_vow_4 change:mark_vow_5', function(values) {
-  const number = values.sourceAttribute.match(/repeating_(.*?)_/)[1]
+on('change:mark_progress_1 change:mark_progress_2 change:mark_progress_3 change:mark_progress_4 change:mark_progress_5', function(values) {
+  const number = values.sourceAttribute.match(/mark_progress_([0-9])/)[1]
   getAttrs([
     `vow${number}_rank`,
-    `vow${number}_0`,
-    `vow${number}_1`,
-    `vow${number}_2`,
-    `vow${number}_3`,
-    `vow${number}_4`,
-    `vow${number}_5`,
-    `vow${number}_6`,
-    `vow${number}_7`,
-    `vow${number}_8`,
-    `vow${number}_9`
+    `vow${number}-0`,
+    `vow${number}-1`,
+    `vow${number}-2`,
+    `vow${number}-3`,
+    `vow${number}-4`,
+    `vow${number}-5`,
+    `vow${number}-6`,
+    `vow${number}-7`,
+    `vow${number}-8`,
+    `vow${number}-9`
   ],
   function(attrValues) {
     const Vow = [ 
-      parseInt(attrValues[`${number}_vow${number}_0`]),
-      parseInt(attrValues[`${number}_vow${number}_1`]),
-      parseInt(attrValues[`${number}_vow${number}_2`]),
-      parseInt(attrValues[`${number}_vow${number}_3`]),
-      parseInt(attrValues[`${number}_vow${number}_4`]),
-      parseInt(attrValues[`${number}_vow${number}_5`]),
-      parseInt(attrValues[`${number}_vow${number}_6`]),
-      parseInt(attrValues[`${number}_vow${number}_7`]),
-      parseInt(attrValues[`${number}_vow${number}_8`]),
-      parseInt(attrValues[`${number}_vow${number}_9`])
+      parseInt(attrValues[`vow${number}-0`]),
+      parseInt(attrValues[`vow${number}-1`]),
+      parseInt(attrValues[`vow${number}-2`]),
+      parseInt(attrValues[`vow${number}-3`]),
+      parseInt(attrValues[`vow${number}-4`]),
+      parseInt(attrValues[`vow${number}-5`]),
+      parseInt(attrValues[`vow${number}-6`]),
+      parseInt(attrValues[`vow${number}-7`]),
+      parseInt(attrValues[`vow${number}-8`]),
+      parseInt(attrValues[`vow${number}-9`])
     ]
-    const rank = parseInt(attrValues[`${number}_rank`])
+    const rank = parseInt(attrValues[`vow${number}_rank`])
     const mark = chosenDifficulty(rank)
-    updateVow(mark, Vow)
+    updateVow(mark, Vow, number)
   });
 });
 
-on('change:clear_vow', function(values) {
-  const number = values.sourceAttribute.match(/repeating_(.*?)_/)[1]
+on('change:clear_progress_1 change:clear_progress_2 change:clear_progress_3 change:clear_progress_4 change:clear_progress_5', function(values) {
+  const number = values.sourceAttribute.match(/clear_progress_([0-9])/)[1]
   setAttrs({ 
-    ['repeating_' + number + '_Vow_0']: '0',
-    ['repeating_' + number + '_Vow_1']: '0',
-    ['repeating_' + number + '_Vow_2']: '0',
-    ['repeating_' + number + '_Vow_3']: '0',
-    ['repeating_' + number + '_Vow_4']: '0',
-    ['repeating_' + number + '_Vow_5']: '0',
-    ['repeating_' + number + '_Vow_6']: '0',
-    ['repeating_' + number + '_Vow_7']: '0',
-    ['repeating_' + number + '_Vow_8']: '0',
-    ['repeating_' + number + '_Vow_9']: '0'
+    ['vow' + number + '-' + '0']: '0',
+    ['vow' + number + '-' + '1']: '0',
+    ['vow' + number + '-' + '2']: '0',
+    ['vow' + number + '-' + '3']: '0',
+    ['vow' + number + '-' + '4']: '0',
+    ['vow' + number + '-' + '5']: '0',
+    ['vow' + number + '-' + '6']: '0',
+    ['vow' + number + '-' + '7']: '0',
+    ['vow' + number + '-' + '8']: '0',
+    ['vow' + number + '-' + '9']: '0'
   });
 });
-
-on('change:clear_misses', function() {
-  setAttrs({ 
-    'miss-0': '0',
-    'miss-1': '0',
-    'miss-2': '0',
-    'miss-3': '0',
-    'miss-4': '0',
-    'miss-5': '0',
-    'miss-6': '0',
-    'miss-7': '0',
-    'miss-8': '0',
-    'miss-9': '0',
-    'clear_misses': 'off'
-  });
-});
-
-on('remove:repeating_vow', function(eventinfo) { 
-  setArchive(eventinfo)
-});
-
-function setArchive (eventinfo) {
-  // let vowName = eventinfo.removedInfo[`${eventinfo.sourceAttribute}_vow_name`]
-  // console.log(vowName)
-  let vowName = eventinfo.removedInfo[`${eventinfo.sourceAttribute}_vow_name`]
-  let newrowid = generateRowID();
-  let attrs = {};
-  attrs['repeating_vowarchive_' + newrowid + '_vow_name'] = vowName
-  console.log(attrs)
-  setAttrs(attrs);
-}
