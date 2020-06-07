@@ -140,7 +140,11 @@ input[type="number"] {
 .charsheet input[type="text"].sheet-input-as-number,
 .charsheet input[type="number"] {
   text-align: center;
-  width: 3.5rem;
+  width: 3.5em;
+}
+
+.charsheet input[type="text"].sheet-double {
+  width: 7em;
 }
 
 /* Remove input number arrows*/
@@ -218,8 +222,21 @@ div.sheet-info-grid span {
 
 .sheet-combat {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 3fr 1fr 0.5fr;
   grid-gap: 10px;
+}
+
+.sheet-combat .sheet-armor {
+  display: none;
+}
+
+.sheet-combat input[name="attr_armorClassType"][value="aac"] ~ .sheet-armor-aac,
+.sheet-combat input[name="attr_armorClassType"][value="AAC"] ~ .sheet-armor-aac,
+.sheet-combat input[name="attr_armorClassType"][value="dac"] ~ .sheet-armor-dac,
+.sheet-combat
+  input[name="attr_armorClassType"][value="DAC"]
+  ~ .sheet-armor-dac {
+  display: flex;
 }
 
 /* Movement */
@@ -447,6 +464,7 @@ div.sheet-info-grid span {
   text-align: left;
 }
 
+.sheet-rolltemplate-skill .sheet-template-description,
 .sheet-rolltemplate-simple .sheet-template-description {
   border: 1px solid #000;
   border-width: 0px 1px 1px 1px;
@@ -457,7 +475,8 @@ div.sheet-info-grid span {
 }
 
 /* Hide the Attack matrix on AAC */
-input[name="attr_armor_class_method"][value="aac"] ~ .sheet-dac-only {
+input[name="attr_armor_class_method"][value="aac"] ~ .sheet-dac-only,
+input[name="attr_armor_class_method"][value="AAC"] ~ .sheet-dac-only {
   display: none;
 }
 
@@ -493,7 +512,7 @@ input[name="attr_armor_class_method"][value="aac"] ~ .sheet-dac-only {
 }
 
 .sheet-weapons-grid {
-  grid-template-columns: 35px 3.5fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 35px 2.5fr 1fr 1fr 1fr 1fr 1fr 1fr;
 }
 
 .sheet-abilities-grid {
@@ -542,15 +561,68 @@ input[name="attr_armor_class_method"][value="aac"] ~ .sheet-dac-only {
   width: 100%;
 }
 
-/* Tabs */
+button[type="roll"].sheet-roll-describe::before {
+  font-family: "Pictos Custom";
+  content: "y";
+}
 
-.sheet-character,
-.sheet-monster {
+input[name="attr_spellRollType"] ~ button.sheet-roll,
+input[name="attr_spellRollType"] ~ button.sheet-roll-describe {
   display: none;
 }
 
-.sheet-tabsToggle[value="character"] ~ div.sheet-character,
-.sheet-tabsToggle[value="monster"] ~ div.sheet-monster {
+input[name="attr_spellRollType"][value="roll"] ~ button.sheet-roll,
+input[name="attr_spellRollType"][value="describe"]
+  ~ button.sheet-roll-describe {
+  display: inline-block;
+  width: 100%;
+}
+
+/* Weapons */
+
+.sheet-weapons-grid .sheet-attack-roll {
+  display: none;
+}
+
+.sheet-weapons-grid
+  input[name="attr_armorClassType"][value="aac"]
+  ~ .sheet-attack-roll-aac,
+.sheet-weapons-grid
+  input[name="attr_armorClassType"][value="AAC"]
+  ~ .sheet-attack-roll-aac,
+.sheet-weapons-grid
+  input[name="attr_armorClassType"][value="dac"]
+  ~ .sheet-attack-roll-dac,
+.sheet-weapons-grid
+  input[name="attr_armorClassType"][value="DAC"]
+  ~ .sheet-attack-roll-dac {
+  display: block;
+  width: 100%;
+}
+
+input.sheet-weapon-description {
+  width: 100%;
+  display: none;
+}
+
+input.sheet-expand:checked ~ input.sheet-weapon-description {
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Tabs */
+
+.sheet-character,
+.sheet-monster,
+.sheet-notes,
+.sheet-settings {
+  display: none;
+}
+
+input[name="attr_sheetTab"][value="character"] ~ div.sheet-character,
+input[name="attr_sheetTab"][value="monster"] ~ div.sheet-monster,
+input[name="attr_sheetTab"][value="notes"] ~ div.sheet-notes,
+input[name="attr_sheetTab"][value="settings"] ~ div.sheet-settings {
   display: block;
 }
 
@@ -565,17 +637,23 @@ input[name="attr_armor_class_method"][value="aac"] ~ .sheet-dac-only {
   margin-left: 10px;
   box-sizing: border-box;
   border: 1px solid #333;
-  line-height: 3.5rem;
+  line-height: 3.5em;
   padding: 0 15px;
   margin-bottom: -1px;
 }
 
-.sheet-tabsToggle[value="character"]
+input[name="attr_sheetTab"][value="character"]
   ~ .sheet-button-select
   button[name="act_character"],
-.sheet-tabsToggle[value="monster"]
+input[name="attr_sheetTab"][value="monster"]
   ~ .sheet-button-select
-  button[name="act_monster"] {
+  button[name="act_monster"],
+input[name="attr_sheetTab"][value="notes"]
+  ~ .sheet-button-select
+  button[name="act_notes"],
+input[name="attr_sheetTab"][value="settings"]
+  ~ .sheet-button-select
+  button[name="act_settings"] {
   background: white;
   color: black;
   border: 1px solid black;
@@ -603,7 +681,88 @@ input[name="attr_armor_class_method"][value="aac"] ~ .sheet-dac-only {
   grid-template-columns: 35px 1fr 4fr;
 }
 
-.sheet-monster-notes textarea {
+.sheet-notes-section textarea {
   box-sizing: border-box;
   width: 100%;
+  height: 15em;
+}
+
+.sheet-show-aac,
+.sheet-show-dac {
+  display: none;
+}
+
+input[name="attr_armorClassType"][value="aac"] ~ .sheet-show-aac,
+input[name="attr_armorClassType"][value="AAC"] ~ .sheet-show-aac,
+input[name="attr_armorClassType"][value="dac"] ~ .sheet-show-dac,
+input[name="attr_armorClassType"][value="DAC"] ~ .sheet-show-dac {
+  display: inherit;
+}
+
+/* Notes */
+
+.sheet-notes .sheet-notes-section textarea {
+  height: 30em;
+}
+
+/* Settings */
+
+.sheet-settings span {
+  background-color: transparent;
+  color: black;
+  line-height: inherit;
+  width: auto;
+  text-align: right;
+  min-height: inherit;
+  font-weight: bold;
+}
+
+.sheet-settings select {
+  margin: 0;
+  width: 100%;
+}
+
+.sheet-setting {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  grid-gap: 5px;
+  align-items: center;
+}
+
+/* Expand */
+.charsheet input.sheet-expand,
+input.sheet-expand + span {
+  top: -5px;
+  right: -6px;
+  width: 18px;
+  height: 14px;
+  position: absolute;
+}
+
+.charsheet input.sheet-expand {
+  z-index: 6;
+  opacity: 0;
+}
+
+input.sheet-expand + span {
+  background: none;
+  display: inline-block;
+  line-height: initial;
+  width: initial;
+  position: absolute;
+}
+
+input.sheet-expand + span::after {
+  color: #333;
+  content: "y";
+  cursor: pointer;
+  font-family: pictos;
+  font-size: 14px;
+  opacity: 0.4;
+  text-align: center;
+  z-index: 3;
+}
+
+input.sheet-expand:hover + span::after {
+  opacity: 1;
 }
