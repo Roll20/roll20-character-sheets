@@ -1,11 +1,11 @@
 <!-- Shooting & Perfomin-->
 <script type="text/worker">
   // Sets wound_mod to maximum value of wound types
-  on("change:llegwtype change:rlegwtype change:gutswtype change:larmwtype change:rarmwtype change:headwtype", function() {
-    getAttrs(["llegwtype", "rlegwtype", "gutswtype", "larmwtype", "rarmwtype", "headwtype"], function(values) {
+  on("sheet:opened change:llegwtype change:rlegwtype change:gutswtype change:larmwtype change:rarmwtype change:headwtype", function() {
+    getAttrs(["llegwtype", "rlegwtype", "gutswtype", "larmwtype", "rarmwtype", "headwtype", "wound_mods"], function(values) {
       var wounds_max = Math.max(values.llegwtype, values.rlegwtype, values.gutswtype, values.larmwtype, values.rarmwtype, values.headwtype);
       setAttrs({
-        wound_mod_base: (-1 * wounds_max)
+        wound_mod: Math.min((-1 * wounds_max + parseInt(values.wound_mods)), 0)
       });
     });
   });
@@ -279,8 +279,7 @@
   <div class="sheet-sidebar sheet-sidebar-right">
     <input type="checkbox" class="sheet-section-toggle" name="attr_wounds_toggle" checked="checked" />
     <h2><label data-i18n="wounds" for="attr_wounds_toggle">Wounds</label><span class="sheet-arrow sheet-arrow-up">&#9650;</span><span class="sheet-arrow sheet-arrow-down">&#9660;</span></h2>
-    <input type="hidden" name="attr_wound_mod_base" />
-    <input type="hidden" value="(@{wound_mod_base}+@{wound_mods})" name="attr_wound_mod" disabled="true" />
+    <input type="hidden" name="attr_wound_mod" />
     <div class="sheet-wounds">
       <h3 data-i18n="leftLeg">Left Leg</h3>
       <input type="radio" name="attr_llegwtype" value="0" checked="checked" /><label for="attr_llegwtype_none" data-i18n="none">none</label>
