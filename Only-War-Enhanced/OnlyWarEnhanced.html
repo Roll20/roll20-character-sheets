@@ -141,7 +141,6 @@
 
 	<!-- ______________________________ unnatural characteristics, size, movement and pushing grid ______________________________ -->
 	
-<!-- TODO: Center the Unnatural Characteristics section more properly -->	
 	<div class='unnat_centering_container'>
 		<div class='unnat_centering'>
 		  <div class='characteristics_unnat'>
@@ -1120,7 +1119,6 @@
 	<br>
 
 
-<!-- TODO: make the Armor Display come out more nicely. -->
 
 	<div class='equipment_armor_grid'>
 	  <div class='equipment_armor_gs1 radius_border'>
@@ -1434,18 +1432,7 @@
 			
 			
 			<div class='psykana_info_gs13'>Effective PR</div>
-			
-			<!--
-			<input class='psykana_info_gs14 full_width' type='number' name='attr_effective_psy_rating' readonly></input>
-			-->
-			
 			<input class='psykana_info_gs14 full_width' type='number' value='ceil(@{psy_rating} * @{psykana_limit}) - @{psykana_sustain} * @{psykana_sustain_count}' name='attr_effective_psy_rating' disabled></input>
-			
-			
-			<!--
-			<div class='psykana_info_gs15'>Phenomena</div>
-			<input name='psykana_phenomena' class='psykana_info_gs16 full_width' type='number' readonly></input>
-			-->
 		
 		</div>
 	  </div>
@@ -1488,13 +1475,11 @@
 			  <input class='psykana_ability_gs14 full_width' type='text' name='attr_P_action' />
 			  <div class='psykana_ability_gs15'>Sustained</div>
 			  <input class='psykana_ability_gs16 full_width' type='text' name='attr_P_sustained' />
-			  <!-- TODO: add [[5 * @{effective_psy_rating}]] to the Cast roll once the sheetworker is debugged-->
 			  <button class='psykana_ability_gs17 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{P_name}}} {{roll=[[floor(( [[@{P_focus} + @{P_mod1} ]] + @{inlinemod-toggle} - 1d100)/10)]]}} @{settings_hitroll}' >Cast</button>
 			  <button class='psykana_ability_gs18 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{P_type}}} {{weapon= @{P_name}}} {{damage=[[@{P_dam-roll}]] }} {{pen=[[@{P_pen}]] }} {{@{settings_weapondescription}=@{P_ability_r} }}' >DMG</button>
 			</div>
 			<div class='psykana_ability_grid4'>
 			  <div class='psykana_ability_gs19'>Focus Power</div>
-			  <!-- TODO: vertically align this dropdown -->
 			  <select name='attr_P_focus' class='psykana_info_gs20 full_width'>
 				<option value='[[@{WP} + @{WP_advancement} ]]' selected='selected'>Willpower</option>
 				<option value='[[@{PER} + @{PER_advancement} ]]'>Perception</option>
@@ -1504,7 +1489,7 @@
 			  <input class='psykana_ability_gs22 full_width' type='text' value='0' name='attr_P_mod1' />
 			</div>
 			<div>
-			  <input name='attr_P_ability_r' type='text' placeholder='Disclaimer: 5 * Effective PR not yet counted in casting test' class='full_width_49px border_none' />
+			  <input name='attr_P_ability_r' type='text' placeholder='Special' class='full_width_49px border_none' />
 			  <label class='margin_adjust_wep'><input type='checkbox' name='attr_collapse' value='3' class='collapsible_entity_switch select_button hidden' /><span class='select_text radius_border_right_wep'>▼</span></label>
 			  <label class='margin_adjust_wep2'><button type='roll' value='@{to-gm}&{template:mythic} {{name=@{P_name} }} {{description=@{P_desc_r} }}' class='hidden'></button><span class='select_text'>🗭</span></label>
 			  <input name='attr_collapse' type='checkbox'  value='3' class='collapsible_entity_switch hidden' />
@@ -2034,83 +2019,6 @@
 
 
   // ___________________________________________________________________________
-  // _______________________psychic info sheet worker___________________________
-  // ___________________________________________________________________________
-  
-  /* TODO: debug this sheetworker. If we can make it work, we can rewrite the HTML to refer here.
-  
-  on('sheet:opened change:psykana_class change:psykana_limit change:psykana_push change:psy_rating change:psykana_sustain change:psykana_sustain_count', function() {
-	getAttrs([
-	'psykana_class','psykana_limit','psykana_push','psy_rating','psykana_sustain','psykana_sustain_count'
-    ], function(values) {
-	
-	  var psykana_class = parseInt(values['psykana_class'], 10) || 0;
-      var psykana_limit = parseInt(values['psykana_limit'], 10) || 0;
-      var psykana_push = parseInt(values['psykana_push'], 10) || 0;
-	  var psy_rating = parseInt(values['psy_rating'], 10) || 0;
-	  var psykana_sustain = parseInt(values['psykana_sustain'], 10) || 0;
-      var psykana_sustain_count = parseInt(values['psykana_sustain_count'], 10) || 0;
-	  
-	  var psykana_limit_factor = 0;
-	  var push_addend = 0;
-	  var sustain_count_addend = 0;
-	  
-	  
-	  // Test output. Currently doesn't write, so the problem must be with the parsers above.
-	  setAttrs({
-		effective_psy_rating = 5;
-	  });
-	  
-	  if (psykana_limit == 0) {
-		psykana_limit_factor = 0.5,
-	  }
-	  if (psykana_limit === 1) {
-		psykana_limit_factor = 1;
-	  }
-	  if (psykana_limit === 2) {
-		psykana_limit_factor = 1;
-		push_addend = psykana_push;
-	  }
-	  
-	  if (psykana_sustain == 1) {
-		sustain_count_addend = psykana_sustain_count;
-	  }
-	  
-	  setAttrs({
-        effective_psy_rating: (psy_rating * psykana_limit_factor + push_addend)
-      });
-	  
-	  //end of psy rating calc, start of psychic phenomena calc
-	  
-	  var unfettered_addend = 0;
-	  var push_addend = 0
-	  var sustain_addend = 0;
-	  
-	  if (psykana_class == 1 && psykana_limit == 1) || (psykana_class == 2 && psykana_limit == 1) {
-		unfettered_addend = 10;
-	  }
-	  if (psykana_class == 0 && psykana_limit == 2) {
-        push_addend = 10;
-      }
-	  if (psykana_class == 1 && psykana_limit == 2) {
-        push_addend = 5 * psykana_push;
-      }
-	  if (psykana_class == 2 && psykana_limit == 2) {
-        push_addend = 10 * psykana_push;
-      }
-	  if (psykana_sustain == 1) {
-        sustain_addend = 10;
-      }
-	  
-	  setAttrs({
-		psykana_phenomena = unfettered_addend + push_addend + sustain_addend,
-	  });
-
-    });
-  });
-  */
-  
-  // ___________________________________________________________________________
   // ____________________gear cost/weight sheet worker__________________________
   // ___________________________________________________________________________
   on('change:repeating_rangedweapons remove:repeating_rangedweapons change:repeating_meleeweapons remove:repeating_meleeweapons', function() {
@@ -2307,7 +2215,6 @@
         {{/description}}
 
 
-<!-- TODO: update the templates on scatter for github -->
         {{#scatter-range}}
         <div class="sheet-template-header">{{character}} scatters </div>
         <div class="sheet-template-content">
