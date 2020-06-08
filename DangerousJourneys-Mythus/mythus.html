@@ -1,4 +1,3 @@
-
 <input type="hidden" name="attr_null" value="0" title="@{null}"/>
 
 <input type='hidden' class='sheet-kstoggle1' name='attr_personahide'  />
@@ -29883,7 +29882,7 @@ on ('sheet:opened', function() {
        };
    }); 
 });
-
+/*
 //update code for new revisions
 on("sheet:opened",function() {
     getAttrs(["revision"],function(val) {
@@ -29893,7 +29892,55 @@ on("sheet:opened",function() {
         };
     });
 });
-
+*/
+on("sheet:opened",function() {
+    getAttrs(["revision"],function(val) {
+        const getValue = (attrname) => parseFloat(val[attrname]) ;
+        if (getValue("revision")<0.96) {
+            let setlist={};
+			setlist["personahide"]=1;
+			setlist["subterraneanorientation_kstoggle"]=0;
+			setlist["subterraneanorientation_hekagen"]=0;
+			setlist["psychogenicsm_kstoggle"]=0;
+			setlist["psychogenicsp_kstoggle"]=0;
+			setlist["psychogenicss_kstoggle"]=0;
+			setlist["revision"]=0.96;
+			kssarray=Object.keys(ksareasnox);
+			kssteeparray=kssarray.map((text) => { var newstring = text + "_steep"; return newstring; });
+			kstogarray=kssarray.map((text) => { var newstring = text + "_kstoggle"; return newstring; });
+			ksallarray=kssteeparray.concat(kstogarray);
+            getAttrs(ksallarray, function(valval) {
+				const getvValue = (attrname) => parseInt(valval[attrname]) ;
+				kssarray.forEach(ks =>{
+					if (getvValue(`${ks}_kstoggle`)==1) {
+                        steep=getvValue(`${ks}_steep`);
+						crit=0;
+						fail=0;
+						if (steep < 51) {
+							crit=99;
+							fail=96;
+						} else if (steep < 61) {
+							crit=100;
+							fail=97;
+						} else if (steep < 71) {
+							crit=100;
+							fail=98;
+						} else if (steep < 81) {
+							crit=100;
+							fail=99;
+						} else if (steep > 80) {
+							crit=100;
+							fail=100;
+						};
+					    setlist[`${ks}_autofail`]=fail;
+					    setlist[`${ks}_critfail`]=crit;
+					};
+				});
+				setAttrs(setlist);
+			});
+        };
+    });
+});
 
 <rolltemplate class="sheet-rolltemplate-casting">
     <table>
