@@ -6,16 +6,9 @@ Ruleset is available for free at ilarisblog.wordpress.com!
 
 ---
 
-Einige Anmerkungen:
+Gebrauchsanweisung:
 
 Das Character Sheet ist ausdrücklich kein Ersatz für Sephrasto oder generell die Charakterverwaltung. Die meisten Werte müssen aus einem bereits erstellten Charakterbogen übertragen werden.
-
-Ich bin absoluter Laie, wenn es um Programmieren geht. Das hier ist quick and dirty, aber es funktioniert einigermaßen. Dennoch könnten da irgendwelche Bugs drin sein, von denen ich nichtmal weiß dass es sie geben kann. Also Vorsicht.
-
-Ich glaube man braucht einen Roll20-Pro-Account für zehn Euro im Monat, um Custom Character Sheets einpflegen zu können. Sollte ich mich da täuschen und ich kann das irgendwie anders zur Verfügung stellen so dass man es auch in Free- oder Plus-Accounts benutzen kann: Lasst es mich wissen.
-
-
-Gebrauchsanweisung:
 
 Der Bogen verfügt über einen Globalen Modifikator oben rechts, der auf alle Proben-Würfe aufgeschlagen wird (positive Zahl bedeutet Bonus, negative Zahl bedeutet Malus), und jeweils globale Modifikatoren für den Kampf und Übernatürliches, und einen Schadensbonus für alle Würfe auf Waffenschaden. Das kann man für situative Modifikatoren verwenden.
 
