@@ -30,8 +30,6 @@ Zauber/Liturgien werden einzeln eingetragen, mit ihren jeweiligen Probenwerten. 
 
 Limitationen:
 
-Das Sheet weiß, welche Geschwindigkeit der Charakter hat - Deshalb wird bei einem Sturmangriff die GS automatisch auf den Schaden addiert. Es weiß aber nicht, wie schnell der Gegner ist; deshalb wird bei "Auflaufen lassen" die GS nicht automatisch addiert. Das muss man selbstständig über den globalen Schadensmodifikator machen.
-
 Der Malus für weitere Reaktionen wird bei der VT automatisch eingerechnet, aber nicht bei anderen Aktionen, etwa bei Passierschlägen. Das sollte man selbstständig über den globalen Modifikator handhaben.
 
 Die enthaltenen Formeln haben relativ viele Abhängigkeiten und sind - wie gesagt - quick and dirty gebaut. Deswegen funktionieren viele davon nicht, wenn nicht alle Werte eingetragen sind, etwa Behinderung, Geschwindigkeit oder einzelne Attribute. Ab 1.1.1 etwas mitigiert durch Checkboxen und Default-Werte.
@@ -79,3 +77,8 @@ Weitere Verbesserungen bei Roll-Templates:
 - Schicksalspunkte können jetzt auch doppelt angewählt werden, um einen weiteren Würfel zu addieren ("Eigenheiten einsetzen").
 
 1.3.1: Präzision bei Fernkampfwaffen gefixt.
+
+1.4: 
+Noch einige neue Features:
+- Der Bogen zeigt die berechneten, talentierten Probenwerte der Fertigkeiten jetzt an.
+- Bei "Auflaufen lassen" kann eine Geschwindigkeit des Gegners eingetragen werden, die zu Schadenswürfen bei Nahkampfwaffen addiert wird wenn das Häkchen gesetzt ist.
