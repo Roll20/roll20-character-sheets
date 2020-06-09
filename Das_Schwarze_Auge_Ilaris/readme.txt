@@ -10,22 +10,33 @@ Gebrauchsanweisung:
 
 Das Character Sheet ist ausdrücklich kein Ersatz für Sephrasto oder generell die Charakterverwaltung. Die meisten Werte müssen aus einem bereits erstellten Charakterbogen übertragen werden.
 
-Der Bogen verfügt über einen Globalen Modifikator oben rechts, der auf alle Proben-Würfe aufgeschlagen wird (positive Zahl bedeutet Bonus, negative Zahl bedeutet Malus), und jeweils globale Modifikatoren für den Kampf und Übernatürliches, und einen Schadensbonus für alle Würfe auf Waffenschaden. Das kann man für situative Modifikatoren verwenden.
+Der Bogen verfügt über einen Globalen Modifikator oben rechts, der auf alle Proben-Würfe aufgeschlagen wird (positive Zahl bedeutet Bonus, negative Zahl bedeutet Malus), und jeweils globale Modifikatoren für den Kampf und Übernatürliches, und einen Schadensmodifikator für alle Würfe auf Waffenschaden. Das kann man jeweils für situative Modifikatoren verwenden.
 
-Die Attribute werden einfach eingetragen; bei den Würfelwürfen (3d20 Median oder 1d20) werden die automatisch verdoppelt dazugezählt.
+Der Einsatz von Schicksalspunkten um zusätzliche Würfel zu erhalten funktioniert, indem man in der Kopfzeile den Haken "Schicksalspunkt" setzt. Sollte man eine Eigenheit nutzen und zwei Würfel dazubekommen, kann der zweite Haken zusätzlich gesetzt werden (für dann 5 Würfel bei 3d20-Median-Proben oder 3 Würfel bei 1d20-Proben).
 
-Die Fertigkeitswerte werden in das kleine Feld eingetragen, daneben ist Platz um Talente zu notieren; die Fertigkeiten haben jeweils vier Roll-Buttons, 3d20 Median und 1d20, jeweils mit und ohne Talent (t). Je nachdem, ob ein T-Button oder ein Nicht-T-Button gedrückt wird, wird der Talentierte Probenwert oder der Untalentierte benutzt. Die Basiswerte berechnet das Sheet automatisch.
+Die Attribute werden mit ihren einfachen Werten eingetragen; bei den Würfelwürfen (3d20 Median oder 1d20) werden sie automatisch als verdoppelter Probenwert addiert.
 
+Initiative berechnet sich automatisch aus Intuition und eventuellen Kampfreflexen (Haken bei "KR"). Durch klicken auf den Würfel daneben wird, wenn das eigene Token angewählt ist, automatisch die Initiative an den Roll20 Turn Tracker geschickt.
+
+Geschwindigkeit wird nicht automatisch berechnet und muss selbst eingetragen werden.
+
+Die Fertigkeitswerte werden in das kleine Feld eingetragen. Die Basiswerte berechnet das Sheet automatisch; der talentierte, berechnete Probenwert wird daneben angezeigt. Im Textfeld ist Platz um Talente zu notieren; die Fertigkeiten haben jeweils vier Roll-Buttons, 3d20 Median und 1d20, jeweils mit und ohne Talent (t). Je nachdem, ob ein T-Button oder ein Nicht-T-Button gedrückt wird, wird der Talentierte Probenwert oder der Untalentierte benutzt. 
 Hohe Qualität kann stufenweise für alle Talentproben global eingestellt werden - Jede Stufe macht automatisch eine Modifikation von -4.
 Für freie Fertigkeiten gibt es eine einfache Liste, und drei Buttons für 3d20 Median + 6/14/22 (für Unerfahren/Erfahren/Meisterlich) - komplizierter wollte ich das nicht machen.
 
-Der Bogen enthält keine Kampftalente und -stile, stattdessen können einfach Waffen mit ihren finalen AT-, VT- und Waffenschadens-Werten (i.e., nach Anwendung der Boni aus Kampfstilen) eingetragen werden. Der eingetragene Schaden sollte der Waffenschaden sein, der KK-Schadensbonus wird automatisch addiert.
+Der Bogen enthält keine Kampftalente und -stile, stattdessen können einfach Waffen mit ihren finalen AT-, VT- und Waffenschadens-Werten (i.e., nach Anwendung der Boni aus Kampfstilen) eingetragen werden. Der eingetragene Schaden sollte der Waffenschaden (nach eventuellen Boni aus Kraftvollem Kampf) sein, der KK-Schadensbonus wird automatisch addiert. Bei "Kopflastigen" Waffen kann der Haken bei "KL" gesetzt werden, dadurch wird der KK-Schadensbonus verdoppelt.
 
-Manöver können einzeln zum AT-, VT-, FK- und Schadenswurf zugeschaltet werden. Beim Würfeln wird die Gesamt-Modifikation "öffentlich" angezeigt.
+Manöver können einzeln zum AT-, VT-, FK- und Schadenswurf zugeschaltet werden. Beim Würfeln wird die Gesamt-Modifikation und die jeweils ausgewählten relevanten Manöver "öffentlich" angezeigt. 
+
+Spezielle Manöver und Sonderfertigkeiten: 
+Bei "Sturmangriff" oder "Überrennen" wird automatisch die volle modifizierte Geschwindigkeit (von Held oder Reittier) addiert; bei eventuell situativ bedingt niedrigerer Geschwindigkeit kann diese entweder manuell verringert werden, oder der Schaden zusätzlich über den globalen Schadensmodifikator reduzieren.
+Bei "Auflaufen lassen" kann eine Geschwindigkeit für den Gegner eingetragen werden; diese wird, wenn der Schaden gewürfelt wird, addiert. Aufpassen dass man das Häkchen vor der nächsten regulären Attacke wieder entfernt.
+Der Haken "Gesegnete Waffe" kann gesetzt werden, wenn ein Charakter mit dieser Sonderfertigkeit und einer bereits geweihten Waffe (sine qua non!) gegen ein unheiliges Wesen kämpft. Dadurch wird ein weiterer d6 Schaden verursacht.
+Wenn das erste Häkchen bei "Präzision" gesetzt wird, berichtet das Roll Template automatisch, wenn ein Würfelwurf über 15 gewertet wird. Wenn das passiert, kann man manuell (!) das zweite Häkchen ("!") setzen, damit die GE zum Schaden addiert wird.
 
 "Reaktionen" bedeutet, wie viele Reaktionen bereits erfolgt sind, ohne die Reaktion, auf die gerade gewürfelt wird.
 
-Zauber/Liturgien werden einzeln eingetragen, mit ihren jeweiligen Probenwerten. Modifikationen funktionieren analog zu Kampfmanövern.
+Zauber/Liturgien werden einzeln eingetragen, mit ihren jeweiligen Probenwerten. Modifikationen funktionieren analog zu Kampfmanövern. "Mühelose Magie / Liebling der Gottheit" funktioniert analog zu Präzision und meldet gewertete Würfe über 15.
 
 
 Limitationen:
