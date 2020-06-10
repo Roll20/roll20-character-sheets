@@ -1,5 +1,14 @@
 <script type="text/worker">
 
+
+on('sheet:opened', function () {
+    getAttrs(['codeversion'], function (values) {
+        if ((parseFloat(values.codeversion) || 0) < 1) {
+            updateWounds();
+        }
+    });
+});
+
 function updateWounds() {
     const fieldnames = [];
     const rows = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -20,13 +29,7 @@ function updateWounds() {
     });
 }
 
-on('sheet:opened', function () {
-    getAttrs(['codeversion'], function (values) {
-        if ((parseFloat(values.codeversion) || 0) < 1) {
-            updateWounds();
-        }
-    });
-});
+
 on('change:hp_max change:repeating_wounds:wound sheet:opened', () => {
     getSectionIDs('repeating_wounds', idarray => {
         const fieldnames = [];
@@ -996,7 +999,7 @@ on("change:skill_dice_switch sheet:opened", function() {
         <div class="sheet-col-1-16 sheet-vert-bottom">Ammo</div>
         <div class="sheet-col-1-16 sheet-vert-bottom">Attack</div>
         <div class="sheet-col-1-16 sheet-vert-bottom">Speed</div>
-        <div class="sheet-col-1-16 sheet-vert-bottom">Defense</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Damage</div>
         <div class="sheet-col-1-16 sheet-vert-bottom">Attack Roll</div>
         <div class="sheet-col-1-16 sheet-vert-bottom">Attack with -4</div>
         <div class="sheet-col-1-16 sheet-vert-bottom">Attack with -6</div>
@@ -1370,14 +1373,30 @@ on("change:skill_dice_switch sheet:opened", function() {
             
             <div class="sheet-row sheet-stat-row">
                 <fieldset class="repeating_spell">
-    		        <div class="sheet-col-1-8 sheet-vert-middle"><button class="sheet-spell-roll" type='roll' name='roll_spell' value='&{template:hm_spell} {{name=@{spell_name}}} {{caster=@{character_name}}} {{level=@{spell_level}}} {{components=@{spell_components}}} {{speed=@{spell_speed}}} {{cost=@{spell_points}}}'>CAST</button></div>
+    		        <div class="sheet-col-1-8 sheet-vert-middle"><button class="sheet-spell-roll" type='roll' name='roll_spell' value='&{template:hm_spell} {{name=@{spell_name}}} {{caster=@{character_name}}} {{level=@{spell_level}}} {{components=@{spell_components}}} {{speed=@{spell_speed}}} {{cost=@{spell_points}}}{{save= @{spell_save} }}{{details= @{spell_notes} }}'>CAST</button></div>
                     <div class="sheet-col-1-16"><input type="text" name="attr_spell_level"></div>
                     <div class="sheet-col-7-16"><input type="text" name="attr_spell_name"/></div>
                     <div class="sheet-col-1-6"><input type="text" name="attr_spell_components"/></div>
                     <div class="sheet-col-1-12"><input type="text" name="attr_spell_speed"/></div>
                     <div class="sheet-col-1-16"><input type="text" name="attr_spell_points"/></div>
                     <div class="sheet-col-1-16"><input type="checkbox" name="attr_spell_memorized"/></div>
-                
+                    <div class="sheet-col-5-8"><span>Spell Details</span></div>
+                    <input type="checkbox" class="wombat-show arrow" name="attr_wombat_show" title="Show/Hide" value="1">
+                    <span></span>
+                    <div class="wombat">
+                    <div class="sheet-col-1-4">Spell Save</div>
+                    <div class="sheet-col-1-4">
+                        <select name="attr_spell_save">
+    					    <option value="None">None</option>
+    					    <option value="Dodge vs [[1d20+@{level}]] ">Dodge</option>
+                            <option value="Physical vs [[1d20+@{level}]] ">Physical</option>
+                            <option value="Mental vs [[1d20+@{level}]] ">Mental</option>
+				        </select>
+				    </div>
+                    <div class="sheet-col-1-2"></div>
+                    <div class="sheet-col-1-4">Spell Notes</div>
+                    <div class="sheet-col-3-4"><textarea name="attr_spell_notes"></textarea></div>
+                    </div>
                 </fieldset>
             </div>
             
@@ -1386,17 +1405,32 @@ on("change:skill_dice_switch sheet:opened", function() {
         <div class="sheet-col-3-8">
             <h3>Skills</h3>
             <div class="sheet-row sheet-heading-row">
-                <div class="sheet-col-9-24 sheet-vert-middle"></div>
-                <div class="sheet-col-1-6 sheet-vert-middle"></div>
-                <div class="sheet-col-5-24 sheet-vert-middle"></div>
+                <div class="sheet-col-9-24 sheet-vert-middle">Mastery</div>
+                <div class="sheet-col-1-6 sheet-vert-middle">Attribute</div>
+                <div class="sheet-col-5-24 sheet-vert-middle">Roll</div>
                 
                 <div class="sheet-col-1-4">Opposed</div>
             </div>
             <div class="sheet-row sheet-heading-row">
-                <div class="sheet-col-9-24"></div>
-                <div class="sheet-col-1-6"></div>
+                <div class="sheet-col-9-24"><select name="attr_skill_mastery_die">
+					<option value="1d12!p + 0">Unskilled (= 0)</option>
+   					<option value="1d12!p">Novice (&#8804; 25)</option>
+                    <option value="1d8!p">Average (&#8804; 50)</option>
+                    <option value="1d6!p">Advanced (&#8804; 75)</option>
+                    <option value="1d4!p">Expert (&#8804; 87)</option>
+                    <option value="1d3!p">Master (&#8804; 100)</option>
+                </select></div>
+                <div class="sheet-col-1-6"><select name="attr_skill_mastery_ability">
+                    <option value="Strength">STR</option>
+                    <option value="Intelligence">INT</option>
+                    <option value="Wisdom">WIS</option>
+                    <option value="Dexterity">DEX</option>
+                    <option value="Constitution">CON</option>
+                    <option value="Looks">LKS</option>
+                    <option value="Charisma">CHA</option>
+                </select></div>
                 
-                <div class="sheet-col-5-24 sheet-vert-middle"></div>
+                <div class="sheet-col-5-24 sheet-vert-middle"><button class="sheet-skill-roll" type='roll' name='roll_skill_mastery' value='!sheet_master_die [[@{skill_mastery_die}]] @{skill_mastery_ability}'>Train</button></div>
                 <div class="sheet-col-1-4"><input type="checkbox" name="attr_skill_dice_switch" value="1" /></div>
             </div>
             <div class="sheet-row sheet-heading-row">
@@ -1948,6 +1982,8 @@ on("change:skill_dice_switch sheet:opened", function() {
         {{#cost}}<tr><td><span class="tcat">Base SP Cost: </span>{{cost}}</td></tr>{{/cost}}
         {{#components}}<tr><td><span class="tcat">Components: </span>{{components}}</td></tr>{{/components}}
         {{#speed}}<tr><td><span class="tcat">Casting Time: </span>{{speed}}</td></tr>{{/speed}}
+        {{#save}}<tr><td><span class="tcat">Save: </span>{{save}}</td></tr>{{/save}}
+        {{#details}}<tr><td><span class="tcat">Details: </span>{{details}}</td></tr>{{/details}}
     </table>
 
 </rolltemplate>
