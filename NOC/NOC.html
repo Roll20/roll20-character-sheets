@@ -1,13 +1,22 @@
 ﻿<rolltemplate class="sheet-rolltemplate-noc-fiel">
 <div class="templatemain">
+    <div class="resultmenace"> 
+	    {{menace}}
+	</div>   
+	<div class="resultmenacelib"> 
+		<span>MENACE</span>
+	</div> 
     <div class="resultfiel">       
-		{{#rollTotal() result 0}}<span style="color:#3FB315">{{result}}</span>{{/rollTotal() result 0}}
-		{{#rollTotal() result 1}}<span>{{result}}</span>{{/rollTotal() result 1}}
-		{{#rollTotal() result 2}}<span>{{result}}</span>{{/rollTotal() result 2}}
-		{{#rollTotal() result 3}}<span>{{result}}</span>{{/rollTotal() result 3}}
-		{{#rollTotal() result 4}}<span>{{result}}</span>{{/rollTotal() result 4}}
-		{{#rollTotal() result 5}}<span style="color:red">{{result}}</span>{{/rollTotal() result 5}}
-	</div>        
+		{{#rollTotal() result 0}}<div style="color:#3FB315">{{result}}</div>{{/rollTotal() result 0}}
+		{{#rollTotal() result 1}}<div>{{result}}</div>{{/rollTotal() result 1}}
+		{{#rollTotal() result 2}}<div>{{result}}</div>{{/rollTotal() result 2}}
+		{{#rollTotal() result 3}}<div>{{result}}</div>{{/rollTotal() result 3}}
+		{{#rollTotal() result 4}}<div>{{result}}</div>{{/rollTotal() result 4}}
+		{{#rollTotal() result 5}}<div style="color:red">{{result}}</div>{{/rollTotal() result 5}}
+	</div>   
+    <div class="resultfiellib">
+	    <span>FIEL</span>
+    </div>	
 </div>
 </rolltemplate>
 
@@ -151,8 +160,19 @@
 <input type="radio" class="sheet-typefiche sheet-flag-fiel" name="attr_typefiche" value="3"/><span class="fiel">FIEL</span>
 <div class="sheet-section-fiel">
     <div class="affichage-fiel">
-	    <input type="text" class="compteurfiel" name="attr_compteurfiel" value="0"/><br>
-	    <div class="afficheurfiel"><button type="roll" name="roll_fiel" title="Informer les joueurs du taux de fiel" value="&{template:noc-fiel} {{name=FIEL}} {{result=[[@{compteurfiel}]]}}"></button></div>
+	    <input type="text" class="compteurmenace" name="attr_compteurmenace" value="0"/>
+		<div class="menace">
+		    <span>MENACE</span>
+		</div>
+		<div class="compteurfiel2">
+		    <input type="text" class="compteurfiel" name="attr_compteurfiel" value="0"/>
+		</div>
+		<div class="fielspan">
+		    <span>FIEL</span>
+		</div>
+        <div class="fielroll">
+		     <button type="roll" class="indiquefiel" name="roll_fiel" title="Informer les joueurs du taux de fiel" value="&{template:noc-fiel} {{menace=[[@{compteurmenace}]]}} {{result=[[@{compteurfiel}]]}}"></button>
+	    </div>
 	</div>
 </div>
 <div class="sheet-section-PNJ">
@@ -1077,6 +1097,18 @@
 </div>
 
 <script type="text/worker">
+on("change:compteurfiel", function() {
+	getAttrs(["compteurfiel"], function(values) {
+	    let compteur = values.compteurfiel;
+		if (compteur==5){
+		    getAttrs(["compteurmenace"], function(valuess) {
+			    let newcompteur = parseInt(valuess.compteurmenace)||0;
+ 		        setAttrs({compteurmenace:newcompteur+1}); 
+			});
+		}
+	});
+});	
+
 on("sheet:opened change:bless1 change:bless2 change:bless3 change:bless4 change:bless5 change:bless6 change:bless7 change:bless8 change:bless9 change:bless10", function() {
 	getAttrs(["bless1","bless2","bless3","bless4","bless5","bless6","bless7","bless8","bless9","bless10"], function(values) {
 		if (values.bless1=="on"){setAttrs({blessactuel:1})}else{setAttrs({blessactuel:0})}
