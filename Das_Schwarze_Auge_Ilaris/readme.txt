@@ -111,3 +111,5 @@ Neue Features:
 - Zusätzliche Fertigkeiten (i.e., aus Hausregeln) einfügbar.
 - Trefferzonen-Wundschwellen hinzugefügt.
 - Sonderfertigkeiten "Scharfsinn", "Eindrucksvoll" und "Vorausschauend" implementiert.
+- Erklärende Tooltips zu den meisten Inputs und Buttons hinzugefügt.
+- Schadensberechnung Hammerschlag gefixt (bisher wurde der KK-Schadensbonus nicht mitverdoppelt).
