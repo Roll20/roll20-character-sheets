@@ -106,7 +106,7 @@ Neue Features:
 - Schicksalspunkte aktuell/max hinzugefügt.
 - Astralenergie/Karmeenergie aktuell/max hinzugefügt.
 - Sonderfertigkeit "Kalte Wut" hinzugefügt, die automatisch alle Wundabzüge auf 0 setzt.
-- Zusätzliche Zeilen für Freie Fertigkeiten einfügbar.
+- Zusätzliche Zeilen für Freie Fertigkeiten einfügbar; ACHTUNG: Die in Version 1.3.1 eingetragenen Fertigkeiten werden aus dem Sheet entfernt. Sie können entweder neu eingetragen werden, oder die vorhandenen Attributes (unter dem Reiter "Attributes & Abilities) "ffertNUMMER" können manuell umbenannt werden in "repeating_freiefertigkeiten_NUMMER_ffert".
 - Zusätzliche Fertigkeiten (i.e., aus Hausregeln) einfügbar.
 - Trefferzonen-Wundschwellen hinzugefügt.
 - Sonderfertigkeiten "Scharfsinn", "Eindrucksvoll" und "Vorausschauend" implementiert.
