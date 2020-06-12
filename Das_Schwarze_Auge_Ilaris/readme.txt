@@ -25,7 +25,7 @@ Geschwindigkeit wird nicht automatisch berechnet und muss selbst eingetragen wer
 
 Die Fertigkeitswerte werden in das kleine Feld eingetragen. Die Basiswerte berechnet das Sheet automatisch; der talentierte, berechnete Probenwert wird daneben angezeigt. Im Textfeld ist Platz um Talente zu notieren; die Fertigkeiten haben jeweils vier Roll-Buttons, 3d20 Median und 1d20, jeweils mit und ohne Talent (t). Je nachdem, ob ein T-Button oder ein Nicht-T-Button gedrückt wird, wird der Talentierte Probenwert oder der Untalentierte benutzt. 
 Hohe Qualität kann stufenweise für alle Talentproben global eingestellt werden - Jede Stufe macht automatisch eine Modifikation von -4.
-Für freie Fertigkeiten gibt es eine einfache Liste, und drei Buttons für 3d20 Median + 6/14/22 (für Unerfahren/Erfahren/Meisterlich) - komplizierter wollte ich das nicht machen.
+Für freie Fertigkeiten gibt es eine einfache Liste, die per "Add"-Button erweitert werden kann, und drei Buttons für 3d20 Median + 6/14/22 (für Unerfahren/Erfahren/Meisterlich) - komplizierter wollte ich das nicht machen.
 Zusätzliche Fertigkeiten aus Hausregeln können frei zugeschaltet werden. Wenn die drei relevanten Attribute ausgewählt wurden, berechnet das Sheet automatisch den Basiswert und mit dem Fertigkeitswert den Probenwert.
 Die profanen Vorteile "Scharfsinn", "Eindrucksvoll" und "Vorausschauend" sind in einer Zeile zusammengefasst und können in der passenden Situation (sine qua non!) in ihren zwei Stufen zugeschaltet werden. Sie geben dann +2 oder +4 auf ALLE (!) Fertigkeitsproben.
 
@@ -44,6 +44,7 @@ Wenn das erste Häkchen bei "Präzision" gesetzt wird, berichtet das Roll Templa
 Zauber/Liturgien werden einzeln eingetragen, mit ihren jeweiligen Probenwerten. Modifikationen funktionieren analog zu Kampfmanövern. "Mühelose Magie / Liebling der Gottheit" funktioniert analog zu Präzision und meldet gewertete Würfe über 15.
 
 Die Charakter-Attributes "wounds" (Einschränkungen), "energy" (Karma/Astralenergie) und "schip" (Schicksalspunkte) eignen sich gut um als Token-Bars benutzt zu werden. Dazu muss das Token dem Charakter zugeordnet ("Represents Character") und dann der entsprechende Wert im Dropdownmenü bei den Bars ausgewählt werden. Dann verändern sich automatisch die Werte im Sheet mit den Werten des Tokens und umgekehrt.
+"wounds" verhält sich dabei entgegengesetzt - Ein gesunder Charakter ohne Einschränkungen hat 8 "wounds", ein Charakter mit 8 Einschränkungen hat 0 "wounds". Sonst verhalten sich die Balken unintuitiv.
 
 ---
 
