@@ -112,3 +112,4 @@ Neue Features:
 - Erklärende Tooltips zu den meisten Inputs und Buttons hinzugefügt.
 - Schadensberechnung Hammerschlag gefixt (bisher wurde der KK-Schadensbonus nicht mitverdoppelt).
 - Passierschläge hinzugefügt.
+- Berechnung von Verteidigungswürfen gefixt.
