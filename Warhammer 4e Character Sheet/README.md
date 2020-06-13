@@ -10,7 +10,7 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 June 15 2020
 
-- New UI Themes - Empire & Dwarf
+- New UI Themes - Empire, Dwarf & Elf
 - NPC - Oppsed Melee roll wrong name (character_ / not npc_)
 - Ranged Weapon Adv not added to target
 - Removed an extra curly bracket (This should fix the problem behind issue Roll20#6152)
@@ -92,6 +92,7 @@ Possible additons to come :
 - Condition Tracker
 - Talents rework
 - Map/Info Tab (maybe)
+- More themes
 
 
 Enjoy.
