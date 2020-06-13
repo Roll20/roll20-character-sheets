@@ -11,8 +11,9 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 June 15 2020
 
 - New UI Themes - Empire, Dwarf & Elf
-- NPC - Oppsed Melee roll wrong name (character_ / not npc_)
-- Ranged Weapon Adv not added to target
+- Fixed NPC - Opposed Melee roll uses wrong name on NPC page 1
+- Fixed Advantage not adding on Ranged Weapon target number in rolls
+- Fixed bug preventing Characteristic Bonus Modifier value from adding to the Characteristic Bonus Current value, due to javascript omission
 - Removed an extra curly bracket (This should fix the problem behind issue Roll20#6152)
 
 
