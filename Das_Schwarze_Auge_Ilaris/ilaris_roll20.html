@@ -29,21 +29,38 @@
 	</div>
 
 	<div class="col" style="text-align: right">
-		<label style="text-align: right" >Einschränkungen: </label><select name="attr_wounds" class='sheet-short' style="width: 50px" title='Summe aktueller Wunden und Erschöpfungen'>
-			<option value="8" selected="selected">0</option>
-			<option value="7">1</option>
-			<option value="6">2</option>
-			<option value="5">3</option>
+		<label style="text-align: right" >Einschränkungen: </label>
+		<span style="font-weight: bold"> W </span> <select name="attr_wounds_w" class='sheet-short' style="width: 50px" title='Summe aktueller Wunden'>
+			<option value="0" selected="selected">0</option>
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
 			<option value="4">4</option>
-			<option value="3">5</option>
-			<option value="2">6</option>
-			<option value="1">7</option>
-			<option value="0">8</option>
+			<option value="5">5</option>
+			<option value="6">6</option>
+			<option value="7">7</option>
+			<option value="8">8</option>
 		</select> 
+		<span style="font-weight: bold"> E </span> <select name="attr_wounds_e" class='sheet-short' style="width: 50px" title='Summe aktueller Erschöpfung'>
+			<option value="0" selected="selected">0</option>
+			<option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+			<option value="5">5</option>
+			<option value="6">6</option>
+			<option value="7">7</option>
+			<option value="8">8</option>
+		</select>⠀
+		<input type="hidden" name="attr_wounds" value="8">
 		<input type="hidden" name="attr_wounds_max" value="8">
-		<input type="hidden" name="attr_wmod" value="0"><input type="number" name="attr_wmodshow" value="@{wmod}" disabled="true"  title='Aktuelle Wundabzüge'/><br /><input type="hidden" name="attr_wmodkw" value="[[@{wmod}*(1-@{kaltewut})]]"/>
+		<input type="hidden" name="attr_wmod" value="0">
+		<input type="number" name="attr_wmodshow" value="@{wmod}" disabled="true"  title='Aktuelle Wundabzüge'/><br />
+		<input type="hidden" name="attr_wmodkw" value="[[@{wmod}*(1-@{kaltewut})]]"/>
 		<input type="checkbox" name="attr_kaltewut" value="1" title='Sonderfertigkeit "Kalte Wut" oder anderes Ignorieren von Wundabzügen'/> Kalte Wut <br /><br />
-	    <label style="text-align: right">Globaler Modifikator: </label><input type="number" name="attr_mod" value='0'  title='Globaler, situativer Modifikator für alle Probenwürfe - Positive Zahlen entsprechen Boni'/> <input type="number" name="attr_gesmod" value='(@{mod} + @{wmodkw})' disabled='true' title='Globaler, situativer Modifikator für alle Probenwürfe inklusive Wundabzügen'/>
+	    <label style="text-align: right">Globaler Modifikator: </label>
+		<input type="number" name="attr_mod" value='0'  title='Globaler, situativer Modifikator für alle Probenwürfe - Positive Zahlen entsprechen Boni'/>
+		<input type="number" name="attr_gesmod" value='(@{mod} + @{wmodkw})' disabled='true' title='Globaler, situativer Modifikator für alle Probenwürfe inklusive Wundabzügen'/>
 	</div>
 
 </div>
@@ -925,6 +942,19 @@
 </rolltemplate>
 
 <script type="text/worker">
+on("change:wounds_w change:wounds_e sheet:opened", function() {  
+  getAttrs(["wounds_w","wounds_e"], function(values) {
+    let wounds_w = parseInt(values.wounds_w)||0;
+    let wounds_e = parseInt(values.wounds_e)||0;
+    let wounds = 8 - wounds_w - wounds_e;
+    setAttrs({                            
+      "wounds": wounds
+    });
+  });
+});
+</script>
+
+<script type="text/worker">
 on("change:wounds sheet:opened", function() {
    getAttrs(["wounds"], function(values) {
         let stat1 = parseInt(values.wounds)||0;
@@ -938,7 +968,7 @@ on("change:wounds sheet:opened", function() {
 			else if (stat1 === 2) mod1 = -8;
 			else if (stat1 === 1) mod1 = -10;
 			else if (stat1 === 0) mod1 = -12;
-        else mod1 = 0;
+        else mod1 = -99;
     setAttrs({                            
             "wmod": mod1
         });

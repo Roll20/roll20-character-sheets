@@ -14,7 +14,7 @@ Der Bogen verfügt über einen Globalen Modifikator oben rechts, der auf alle Pr
 
 Der Einsatz von Schicksalspunkten um zusätzliche Würfel zu erhalten funktioniert, indem man in der Kopfzeile den Haken "Schicksalspunkt" setzt. Sollte man eine Eigenheit nutzen und zwei Würfel dazubekommen, kann der zweite Haken zusätzlich gesetzt werden (für dann 5 Würfel bei 3d20-Median-Proben oder 3 Würfel bei 1d20-Proben).
 
-Die Einschränkungen (Wunden/Betäubung) werden im Sheet nicht unterschieden und verursachen automatisch globale Wundmodifikatoren. Ist ein Charakter aus beliebigem Grund immun gegen Wundabzüge, kann der Haken bei "Kalte Wut" gesetzt werden, um die Abzüge pauschal auf 0 zu setzen.
+Die Einschränkungen (Wunden/Erschöpfung) verursachen automatisch globale Wundmodifikatoren. Ist ein Charakter aus beliebigem Grund immun gegen Wundabzüge, kann der Haken bei "Kalte Wut" gesetzt werden, um die Abzüge pauschal auf 0 zu setzen.
 Wundschwellen (mit oder ohne Trefferzonen) sind rein informativ und haben keine spezifischen Abhängigkeiten im Sheet.
 
 Die Attribute werden mit ihren einfachen Werten eingetragen; bei den Würfelwürfen (3d20 Median oder 1d20) werden sie automatisch als verdoppelter Probenwert addiert.
@@ -101,6 +101,7 @@ Weitere Verbesserungen bei Roll-Templates:
 Neue Features:
 - Der Bogen zeigt die berechneten, talentierten Probenwerte der Fertigkeiten jetzt an.
 - Bei "Auflaufen lassen" kann eine Geschwindigkeit des Gegners eingetragen werden, die zu Schadenswürfen bei Nahkampfwaffen addiert wird wenn das Häkchen gesetzt ist.
+- Wunden und Erschöpfungen werden jetzt unterschieden, zusammengefasst als "wounds" auslesbar.
 - Wundmodifikatoren werden jetzt durch ein Sheetworker-Skript berechnet; das ermöglicht das Verwenden von "wounds" als Token-Wert.
 - Schicksalspunkte aktuell/max hinzugefügt.
 - Astralenergie/Karmeenergie aktuell/max hinzugefügt.
