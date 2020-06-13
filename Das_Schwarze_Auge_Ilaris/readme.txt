@@ -50,8 +50,6 @@ Die Charakter-Attributes "wounds" (Einschränkungen), "energy" (Karma/Astralener
 
 Limitationen:
 
-Der Malus für weitere Reaktionen wird bei der VT automatisch eingerechnet, aber nicht bei anderen Aktionen, etwa bei Passierschlägen. Das sollte man selbstständig über den globalen Modifikator handhaben.
-
 Die enthaltenen Formeln haben relativ viele Abhängigkeiten und sind - wie gesagt - quick and dirty gebaut. Deswegen funktionieren viele davon nicht, wenn nicht alle Werte eingetragen sind, etwa Behinderung, Geschwindigkeit oder einzelne Attribute. Ab 1.1.1 etwas mitigiert durch Checkboxen und Default-Werte.
 
 Sonderfertigkeiten sind teilweise nicht integriert - Etwa der Bonus für mehrere Modifikationen bei Gildenmagier II oder für Manöver bei Parierwaffenkampf. Das muss man derzeit noch im Kopf oder durch die globalen Modifikatoren machen, auch weil IF/THEN-Operationen derzeit meinen Horizont etwas übersteigen.
@@ -113,3 +111,4 @@ Neue Features:
 - Sonderfertigkeiten "Scharfsinn", "Eindrucksvoll" und "Vorausschauend" implementiert.
 - Erklärende Tooltips zu den meisten Inputs und Buttons hinzugefügt.
 - Schadensberechnung Hammerschlag gefixt (bisher wurde der KK-Schadensbonus nicht mitverdoppelt).
+- Passierschläge hinzugefügt.
