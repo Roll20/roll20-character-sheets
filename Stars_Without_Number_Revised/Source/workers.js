@@ -2114,6 +2114,7 @@
 				...gearIDs.map(id => `repeating_gear_${id}_gear_amount`),
 				...gearIDs.map(id => `repeating_gear_${id}_gear_encumbrance`),
 				...gearIDs.map(id => `repeating_gear_${id}_gear_status`),
+				...gearIDs.map(id => `repeating_gear_${id}_gear_bundled`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_encumbrance`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_encumbrance_bonus`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_status`),
@@ -2137,10 +2138,14 @@
 					return m;
 				}, gearIDs.reduce((m, id) => {
 					const amount = parseInt(v[`repeating_gear_${id}_gear_amount`]) || 0;
+					let packingFactor = 1;
+					if (v[`repeating_gear_${id}_gear_bundled`] === "on") {
+						packingFactor = 3;
+					}
 					if (v[`repeating_gear_${id}_gear_status`] === "READIED")
-						m[0] += Math.ceil(amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`])) || 0;
+						m[0] += Math.ceil((amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`]))/packingFactor) || 0;
 					else if (v[`repeating_gear_${id}_gear_status`] === "STOWED")
-						m[1] += Math.ceil(amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`])) || 0;
+						m[1] += Math.ceil((amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`]))/packingFactor) || 0;
 					return m;
 				}, [0, 0])));
 
@@ -2688,7 +2693,8 @@
 				output.gear_description = translate(`${label.toUpperCase()}_DESC`);
 			}
 			if (output.gear_encumbrance === "1#") {
-				output.gear_encumbrance = ".33";
+				output.gear_encumbrance = "1";
+				output.gear_bundled = "on";
 			}
 		}
 		return output;
@@ -2739,6 +2745,9 @@
 			else return `${translate("LEVEL")}-${data.level}.`;
 		}
 		if (sName === "gear") {
+			if (data.gear_bundled == "on") {
+				return `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}#.`;
+			}
 			return `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}.`;
 		}
 		return "";
