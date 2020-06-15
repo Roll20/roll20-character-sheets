@@ -98,9 +98,7 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 				<ul>
-					<li>Rolltemplate, Fabric sheet. Fixed display issue, reported by Ian.</li>
-					<li>Repeating Techniques, melee attacks, and ranged attacks can be linked to ST, Striking ST, DX, IQ, HT, or 10.</li>
-					<li>Traits Tab. Added a level column for repeating advantages, disadvantages, and racial traits.</li>
+					<li>Combat tab. Added Knockback save as an active defense.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset"><span data-i18n="view-all-updates">View All Updates</span></button>
@@ -4452,7 +4450,7 @@ parry if you've already attacked with it this turn<br />
 					<div class="row row-details notebox">
 					
 					    <!-- TODO: Add links: Skill, Technique, Spell, Weapon, Power/Talent -->
-						<div class="row" style="display: none;">
+						<div class="row hide-row">
 					        <div class="cell label">
 							    <div class="popup">
 									<span data-i18n="link-label">Link:</span>
@@ -4663,7 +4661,7 @@ Optional Rules for Retreat can be found in MA123.
 					<div class="row row-details notebox">
 					
 					    <!-- TODO: Add links: Skill, Technique, Spell, Weapon, Power/Talent -->
-						<div class="row" style="display: none;">
+						<div class="row hide-row">
 					        <div class="cell label">
 							    <div class="popup">
 									<span data-i18n="link-label">Link:</span>
@@ -4872,7 +4870,7 @@ It is similar to a Dodge and Retreat, but only effective against <strong>Ranged 
 					<div class="row row-details notebox">
 					
 					    <!-- TODO: Add links: Skill, Technique, Spell, Weapon, Power/Talent -->
-						<div class="row" style="display: none;">
+						<div class="row hide-row">
 					        <div class="cell label">
 							    <div class="popup">
 									<span data-i18n="link-label">Link:</span>
@@ -5028,6 +5026,203 @@ visualize what it will look like in chat.
 
 				</div>
 				
+				<div class="row-static-defense">
+					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight_knockback" />
+					<input class="toggle toggle-notes static-defense" type="checkbox" title="Click to show/hide more information." name="attr_defense_knockback_toggle_notes" />
+					<span class="checkbox static-defense"></span>
+					<div class="row row-stats row-standard static-defense-width">
+						<div class="cell col-dodge-label">
+							<div class="popup">
+								<span data-i18n="knockback-label">Knockback save vs crushing or cutting attacks</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="knockback-tooltip">
+A <b>crushing</b> attack can cause knockback regardless of whether it penetrates DR.<br />
+A <b>cutting</b> attack can cause knockback only if it fails to penetrate DR.<br />
+For every full ST-2 damage (<b>BEFORE</b> subtracting DR) target is moved yard <i>away</i> from attacker.<br />
+<i>NOTE:</i> If target has no ST score (like a wall) or is not resisting, use HP instead.<br /><br />
+<b>If knocked back</b>, Roll against DX, Acrobatics, or Judo.<br />
+-1 per yard of knockback <b>AFTER</b> the first yard.<br />
++4 for Perfect Balance. see B378.<br />
+If target collides with an object, use yards knocked back to calculate <i>Collisions and Falls</i> (see Combat Tools).
+							</span>
+						</div>
+						<div class="cell col-dodge"></div>
+						<div class="cell col1-plus-col2">
+							<input type="hidden" name="attr_knockback_points" value="" />
+							<span data-i18n="knockback-calculation-description">1 yard per <b><span name="attr_knockback_points"></span></b> points</span> 
+						</div>
+						<div class="cell col2"><input type="text" name="attr_ad_knockback_skill" title="Macro name: ad_knockback_skill" /></div>
+						<div class="cell col2"><input type="number" step="1" name="attr_ad_knockback_skill_mod" value="0" title="Macro name: ad_knockback_skill_skill_mod" /></div>
+						<div class="cell col3"><input type="text" name="attr_ad_knockback_skill_final" value="@{ad_knockback_skill} + @{ad_knockback_skill_mod}" disabled="disabled" title="Macro name: ad_knockback_skill_final" /></div>
+						<div class="cell col4">
+							<input type="hidden" name="attr_raw_knockback_success_notes" value="Avoided falling prone, but check for collision." />
+							<input type="hidden" name="attr_raw_knockback_critical_success_notes" value="Avoided falling prone, but check for collision." />
+							<input type="hidden" name="attr_raw_knockback_fail_notes" value="Fall prone, but check for collision." />
+							<input type="hidden" name="attr_raw_knockback_critical_fail_notes" value="Fall prone, but check for collision." />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Avoid Knockback}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_knockback_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_knockback_show_notes}]]}} {{notes=@{defense_knockback_notes}}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_knockback_success_notes}}} {{rawCriticalSuccessNote=@{raw_knockback_critical_success_notes}}} {{rawFailNote=@{raw_knockback_fail_notes}}} {{rawCriticalFailNote=@{raw_knockback_critical_fail_notes}}} {{customSuccessNote=@{defense_knockback_success_note}}} {{customCriticalSuccessNote=@{defense_knockback_critical_success_note}}} {{customFailNote=@{defense_knockback_fail_note}}} {{customCriticalFailNote=@{defense_knockback_critical_fail_note}}}" name="roll_vsKnockback" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-details notebox">
+					
+					    <!-- TODO: Add links: Skill, Technique, Spell, Weapon, Power/Talent -->
+						<div class="row hide-row">
+					        <div class="cell label">
+							    <div class="popup">
+									<span data-i18n="link-label">Link:</span>
+								</div>
+        						<span class="tooltip">
+									<span data-i18n="link-to-row-id-tooltip">Link this row to another row item.</span>
+        						</span> 
+					        </div>
+							<div class="cell">
+								<select name="attr_knockback_defense_row_type">
+					                <option value="Skill"><span data-i18n="option-skill">Skill</span></option>
+					                <option value="Technique"><span data-i18n="option-technique">Technique</span></option>
+					                <option value="Spell"><span data-i18n="option-spell">Spell</span></option>
+									<option value="ST"><span data-i18n="abreviation-strength">ST</span></option>
+									<option value="STRIKING"><span data-i18n="attribute-striking">Striking</span> <span data-i18n="abreviation-strength">ST</span></option>
+									<option value="DX"><span data-i18n="abreviation-dexterity">DX</span></option>
+									<option value="IQ"><span data-i18n="abreviation-intelligence">IQ</span></option>
+									<option value="HT"><span data-i18n="abreviation-health">HT</span></option>
+									<option value="10"><span data-i18n="abreviation-health">10</span></option>
+					            </select>
+					        </div>
+    					    <div class="cell col-row-id label">
+    						    <div class="popup">
+									<span data-i18n="row-id-label">Row ID:</span>
+								</div>
+        						<span class="tooltip">
+        							<span data-i18n="copy-paste-row-id-tooltip">
+Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
+When the skill/spell is updated, the technique's parent name and base skill level<br />
+will be updated.<br />
+Once entered, this will change the Skill/Spell for this particular attack to match<br />
+the skill/spell level of the Base Skill. Do not change this skill Level number manually.
+									</span>
+        						</span>	
+    						</div>
+    						<div class="cell col-input-medium">
+    						    <input type="hidden" name="attr_defense_knockback_skill_row_id_toggle" value="0" />
+								<input type="text" name="attr_defense_knockback_skill_row_id" title="Field name: defense_knockback_skill_row_id" />
+							</div>
+							<div class="cell col-wide">
+								<input type="hidden" name="attr_defense_knockback_skill" value="" />
+    							<input type="hidden" name="attr_defense_knockback_skill_row_id_modifier" value="0" />
+    							<input type="hidden" name="attr_defense_knockback_skill_row_id_message" value="" />
+								<b><span data-i18n="name-label">Name:</span></b>
+								<span name="attr_defense_knockback_skill_row_id_message"></span>
+    							<input type="hidden" name="attr_defense_knockback_skill_row_id_level" value="" />
+								<b><span data-i18n="skill-level-label">Level</span>:</b>
+								<span name="attr_defense_knockback_skill_row_id_level"></span>
+    						</div>
+						</div> <!-- .row -->
+						
+						<div class="row">
+							<div class="cell label">
+							    <div class="popup">
+									<span data-i18n="reason-for-modifier-label">Reason for MOD (Modifier):</span>
+								</div>
+        						<span class="tooltip">
+									<span data-i18n="reason-for-modifiers-skills-tooltip">
+Examples:<br />
++1 from Talent...<br />
++1 from Default Skill...<br />
++1 from Enchanted Item with...
+									</span>
+        						</span> 
+							</div>
+							<div class="cell col-input-wide">
+    						    <input type="text" name="attr_defense_knockback_mod_reason" title="Field name: defense_knockback_mod_reason" />
+							</div>
+						</div>
+						<div class="header">
+							<div class="title">
+								<div class="popup">
+									<span data-i18n="notes-label">Notes</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="custom-success-fail-notes-tooltip">
+Success, critical success, fail, and critical fail<br />
+notes will be added to roll results.<br />
+You can add macros to these notes.<br />
+The width of these note boxes are set to help you<br />
+visualize what it will look like in chat.
+									</span>
+								</span>
+							</div>
+						</div>
+						<div class="row">
+							
+							<div class="show-notes">
+						        <input type="checkbox" name="attr_defense_knockback_show_notes" value="1" style="float:left; margin-right: 5px;" />
+								<div class="popup" style="float:left;">
+									<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
+								</div>
+        						<span class="tooltip">
+									<span data-i18n="displayed-on-rolltemplate-tooltip">Displayed on the rolltemplate.</span>
+        						</span>
+							</div>
+
+						</div>
+					
+						<div class="rolltable-result-notes">
+							
+							<div class="note-input">
+						        <div class="note-title">
+    						        <div class="popup">
+										<span data-i18n="custom-notes-label">Custom Notes:</span>
+									</div>
+            						<span class="tooltip">
+										<span data-i18n="custom-notes-active-defense-tooltip">Add custom notes for this active defense.</span>
+									</span>
+    						    </div>
+						        <textarea name="attr_defense_knockback_notes" title="Field name: defense_knockback_notes" style="height: 50px"></textarea>
+						    </div>
+							
+						</div>
+
+					    <div class="rolltable-result-notes">
+						    
+						    <div class="note-input">
+						        <div class="note-title">
+									<span data-i18n="success-note-label">Success Note:</span>
+								</div>
+						        <textarea name="attr_defense_knockback_success_note" title="Field name: defense_knockback_success_note"></textarea>
+						    </div>
+						    
+						    <div class="note-input">
+						        <div class="note-title">
+									<span data-i18n="critical-success-note-label">Critical Success Note:</span>
+								</div>
+						        <textarea name="attr_defense_knockback_critical_success_note" title="Field name: defense_knockback_critical_success_note"></textarea>
+							</div>
+							
+						</div>
+						
+						<div class="rolltable-result-notes">
+						    
+						    <div class="note-input">
+						        <div class="note-title">
+									<div data-i18n="fail-note-label">Fail Note:</div>
+								</div>
+						        <textarea name="attr_defense_knockback_fail_note" title="Field name: defense_knockback_fail_note"></textarea>
+						    </div>
+						    
+						    <div class="note-input">
+						        <div class="note-title">
+									<span data-i18n="critical-fail-note-label">Critical Fail Note:</span>
+								</div>
+						        <textarea name="attr_defense_knockback_critical_fail_note" title="Field name: defense_knockback_critical_fail_note"></textarea>
+						    </div>
+						    
+						</div>
+						
+					</div> <!-- .row -->
+
+				</div>
+
 				<fieldset class="repeating_defense">
 					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
 					<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." name="attr_defense_toggle_notes" />
@@ -5070,7 +5265,7 @@ visualize what it will look like in chat.
 					<div class="row row-details notebox">
 					
 					    <!-- TODO: Add links: Skill, Technique, Spell, Weapon, Power/Talent -->
-						<div class="row hidden">
+						<div class="row hide-row">
 					        <div class="cell label">
 							    <div class="popup">
 									<span data-i18n="link-label">Link:</span>
@@ -5284,6 +5479,10 @@ Any other value, and the text box will get <b>cleared</b> out.<br />
 		<div class="box melee-attacks">
 			<div class="table">
 			    <div class="header">
+					<div class="cell col-mod-tool">
+						<input class="toggle-mod-tool" disabled="disabled" type="checkbox" value="1" title="Click to show/hide attack modifiers." name="attr_toggle_melee_mod_tool" />
+						<span class="icon">y</span>
+					</div>
 					<div class="cell col0">
 						<span data-i18n="melee-attacks-label">Melee Attacks</span>
 					</div>
@@ -5349,7 +5548,28 @@ maneuver to switch between different reaches.
 					<div class="cell col5">
 						<span style="background-color: #87CEFA">| <span data-i18n="skill-label">skill</span> |</span>
 					</div>
+
 				</div> <!-- .header -->
+
+				<input type="hidden" name="attr_toggle_melee_mod_tool" />
+				<div class="attack-modifiers-notebox">
+
+					<div class="row">
+
+						<div class="cell">
+							<div class="popup">
+								Total Modifier: <input type="text" name="attr_melee_attack_modifier" disabled="disabled" value="0" />
+							</div>
+							<span class="tooltip">Total Modifier</span>
+						</div>
+	
+						<div class="cell">
+							<button type="action" name="act_melee_attack_modifiers_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
+						</div>
+
+					</div>
+					
+				</div>
 				
 				<fieldset class="repeating_melee">
 				    <input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
@@ -7417,6 +7637,14 @@ For more information, see B409.
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
 			<ul>
+				<li>Combat tab. Added Knockback save as an active defense.</li>
+			</ul>
+
+			<h4>Version: 2.3.7</h4>
+
+			<p>Pull Request: 06/09/2020</p>
+
+			<ul>
 				<li>Rolltemplate, Fabric sheet. Fixed display issue, reported by Ian.</li>
 				<li>Repeating Techniques, melee attacks, and ranged attacks can be linked to ST, Striking ST, DX, IQ, HT, or 10.</li>
 				<li>Traits Tab. Added a level column for repeating advantages, disadvantages, and racial traits.</li>
@@ -9410,9 +9638,9 @@ See notes for weapon.</textarea>
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.3.7";  
+	var version = "2.3.8.1";  
 
-	var latestChangesDate = "06/09/2020";
+	var latestChangesDate = "06/16/2020";
 
 	var modCascade = true;
 	
@@ -9817,6 +10045,7 @@ See notes for weapon.</textarea>
 				strength_base: base,
 				strength: base + mod,
 				strength_display: st_display,
+				knockback_points: st_display - 2
 			}, {silent: false}, callback);
 		});
 	}
