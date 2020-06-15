@@ -1727,11 +1727,13 @@
 				weapon_damage: "1d6",
 				weapon_encumbrance: "2",
 				weapon_range: "100/150",
+				weapon_price: "50",
 			},
 			anti_vehicle_laser: {
 				weapon_ammo: "15",
 				weapon_damage: "3d10",
 				weapon_range: "2000/4000",
+				weapon_price: "10000",
 			},
 			combat_rifle: {
 				weapon_ammo: "30",
@@ -1739,6 +1741,7 @@
 				weapon_damage: "1d12",
 				weapon_encumbrance: "2",
 				weapon_range: "100/300",
+				weapon_price: "300",
 			},
 			combat_shotgun: {
 				weapon_ammo: "12",
@@ -1746,23 +1749,27 @@
 				weapon_damage: "3d4",
 				weapon_encumbrance: "2",
 				weapon_range: "10/30",
+				weapon_price: "300",
 			},
 			conversion_bow: {
 				weapon_ammo: "1",
 				weapon_damage: "1d8",
 				weapon_encumbrance: "2",
 				weapon_range: "150/300",
+				weapon_price: "500",
 			},
 			crude_pistol: {
 				weapon_ammo: "1",
 				weapon_damage: "1d6",
 				weapon_encumbrance: "1",
 				weapon_range: "5/15",
+				weapon_price: "20",
 			},
 			demo_charge: {
 				weapon_damage: "3d10",
 				weapon_encumbrance: "1",
 				weapon_range: "20/40",
+				weapon_price: "250",
 			},
 			distortion_cannon: {
 				weapon_attack: "1",
@@ -1770,22 +1777,26 @@
 				weapon_damage: "2d12",
 				weapon_encumbrance: "2",
 				weapon_range: "100/300",
+				weapon_price: "1250",
 			},
 			grenade: {
 				weapon_damage: "2d6",
 				weapon_encumbrance: "1",
 				weapon_range: "10/30",
+				weapon_price: "25",
 			},
 			heavy_machine_gun: {
 				weapon_ammo: "10",
 				weapon_damage: "3d6",
 				weapon_encumbrance: "3",
 				weapon_range: "500/2000",
+				weapon_price: "5000",
 			},
 			hydra_array: {
 				weapon_ammo: "10",
 				weapon_damage: "3d6",
 				weapon_range: "4000/8000",
+				weapon_price: "20000",
 			},
 			large_advanced_weapon: {
 				weapon_attribute_mod: "@{strength_mod}",
@@ -1794,6 +1805,7 @@
 				weapon_shock_ac: "15",
 				weapon_shock_damage: "2",
 				weapon_skill_bonus: "@{skill_stab}",
+				weapon_price: "80",
 			},
 			large_primitive_weapon: {
 				weapon_attribute_mod: "@{strength_mod}",
@@ -1802,6 +1814,7 @@
 				weapon_shock_ac: "15",
 				weapon_shock_damage: "2",
 				weapon_skill_bonus: "@{skill_stab}",
+				weapon_price: "30",
 			},
 			laser_pistol: {
 				weapon_attack: "1",
@@ -1809,6 +1822,7 @@
 				weapon_damage: "1d6",
 				weapon_encumbrance: "1",
 				weapon_range: "100/300",
+				weapon_price: "200",
 			},
 			laser_rifle: {
 				weapon_attack: "1",
@@ -1817,18 +1831,21 @@
 				weapon_damage: "1d10",
 				weapon_encumbrance: "2",
 				weapon_range: "300/500",
+				weapon_price: "300",
 			},
 			mag_pistol: {
 				weapon_ammo: "6",
 				weapon_damage: "2d6+2",
 				weapon_encumbrance: "1",
 				weapon_range: "100/300",
+				weapon_price: "400",
 			},
 			mag_rifle: {
 				weapon_ammo: "10",
 				weapon_damage: "2d8+2",
 				weapon_encumbrance: "2",
 				weapon_range: "300/600",
+				weapon_price: "500",
 			},
 			medium_advanced_weapon: {
 				weapon_attribute_mod: "@{str_dex_mod}",
@@ -1837,6 +1854,7 @@
 				weapon_shock_ac: "13",
 				weapon_shock_damage: "2",
 				weapon_skill_bonus: "@{skill_stab}",
+				weapon_price: "60",
 			},
 			medium_primitive_weapon: {
 				weapon_attribute_mod: "@{str_dex_mod}",
@@ -1845,12 +1863,14 @@
 				weapon_shock_ac: "13",
 				weapon_shock_damage: "2",
 				weapon_skill_bonus: "@{skill_stab}",
+				weapon_price: "20",
 			},
 			musket: {
 				weapon_ammo: "1",
 				weapon_damage: "1d12",
 				weapon_encumbrance: "2",
 				weapon_range: "25/50",
+				weapon_price: "30",
 			},
 			plasma_projector: {
 				weapon_attack: "1",
@@ -1858,12 +1878,14 @@
 				weapon_damage: "2d8",
 				weapon_encumbrance: "2",
 				weapon_range: "50/100",
+				weapon_price: "400",
 			},
 			primitive_bow: {
 				weapon_ammo: "1",
 				weapon_damage: "1d6",
 				weapon_encumbrance: "2",
 				weapon_range: "50/75",
+				weapon_price: "15",
 			},
 			punch: {
 				weapon_attribute_mod: "@{str_dex_mod}",
@@ -1874,30 +1896,35 @@
 				weapon_ammo: "20",
 				weapon_damage: "3d8",
 				weapon_range: "4000/8000",
+				weapon_price: "8000",
 			},
 			revolver: {
 				weapon_ammo: "6",
 				weapon_damage: "1d8",
 				weapon_encumbrance: "1",
 				weapon_range: "30/100",
+				weapon_price: "50",
 			},
 			rifle: {
 				weapon_ammo: "6",
 				weapon_damage: "1d10+2",
 				weapon_encumbrance: "2",
 				weapon_range: "200/400",
+				weapon_price: "75",
 			},
 			rocket_launcher: {
 				weapon_ammo: "1",
 				weapon_damage: "3d10",
 				weapon_encumbrance: "2",
 				weapon_range: "2000/4000",
+				weapon_price: "4000",
 			},
 			semi_auto_pistol: {
 				weapon_ammo: "12",
 				weapon_damage: "1d6+1",
 				weapon_encumbrance: "1",
 				weapon_range: "30/100",
+				weapon_price: "75",
 			},
 			shear_rifle: {
 				weapon_attack: "1",
@@ -1906,12 +1933,14 @@
 				weapon_damage: "2d8",
 				weapon_encumbrance: "2",
 				weapon_range: "100/300",
+				weapon_price: "600",
 			},
 			shotgun: {
 				weapon_ammo: "2",
 				weapon_damage: "3d4",
 				weapon_encumbrance: "2",
 				weapon_range: "10/30",
+				weapon_price: "50",
 			},
 			small_advanced_weapon: {
 				weapon_attribute_mod: "@{str_dex_mod}",
@@ -1920,6 +1949,7 @@
 				weapon_shock_ac: "15",
 				weapon_shock_damage: "1",
 				weapon_skill_bonus: "@{skill_stab}",
+				weapon_price: "40",
 			},
 			small_primitive_weapon: {
 				weapon_attribute_mod: "@{str_dex_mod}",
@@ -1934,6 +1964,7 @@
 				weapon_damage: "2d8",
 				weapon_encumbrance: "2",
 				weapon_range: "1000/2000",
+				weapon_price: "400",
 			},
 			spike_thrower: {
 				weapon_ammo: "15",
@@ -1941,6 +1972,7 @@
 				weapon_damage: "3d8",
 				weapon_encumbrance: "2",
 				weapon_range: "20/40",
+				weapon_price: "600",
 			},
 			stun_baton: {
 				weapon_attribute_mod: "@{str_dex_mod}",
@@ -1949,6 +1981,7 @@
 				weapon_shock_ac: "15",
 				weapon_shock_damage: "1",
 				weapon_skill_bonus: "@{skill_stab}",
+				weapon_price: "75",
 			},
 			submachine_gun: {
 				weapon_ammo: "20",
@@ -1956,12 +1989,14 @@
 				weapon_damage: "1d8",
 				weapon_encumbrance: "1",
 				weapon_range: "30/100",
+				weapon_price: "200",
 			},
 			suit_ripper: {
 				weapon_attribute_mod: "@{str_dex_mod}",
 				weapon_damage: "1d6",
 				weapon_encumbrance: "1",
 				weapon_skill_bonus: "@{skill_stab}",
+				weapon_price: "75",
 			},
 			thermal_pistol: {
 				weapon_attack: "1",
@@ -1969,6 +2004,7 @@
 				weapon_damage: "2d6",
 				weapon_encumbrance: "1",
 				weapon_range: "25/50",
+				weapon_price: "300",
 			},
 			thunder_gun: {
 				weapon_attack: "1",
@@ -1976,22 +2012,26 @@
 				weapon_damage: "2d10",
 				weapon_encumbrance: "2",
 				weapon_range: "100/300",
+				weapon_price: "1000",
 			},
 			void_carbine: {
 				weapon_ammo: "10",
 				weapon_damage: "2d6",
 				weapon_encumbrance: "2",
 				weapon_range: "100/300",
+				weapon_price: "400",
 			},
 			vortex_cannon: {
 				weapon_ammo: "5",
 				weapon_damage: "5d12",
 				weapon_range: "1000/2000",
+				weapon_price: "75000",
 			},
 			wheatcutter_belt: {
 				weapon_ammo: "5",
 				weapon_damage: "2d12",
 				weapon_range: "10/20",
+				weapon_price: "1000",
 			},
 		},
 	};
