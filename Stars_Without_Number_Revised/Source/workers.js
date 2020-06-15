@@ -2892,10 +2892,10 @@
 		}
 		if (sName === "armor") {
 			return `${translate("AC")} ${data.armor_ac}, ${translate(data.armor_type)
-			}, ${translate("ENCUMBRANCE_SHORT")} ${data.armor_encumbrance}, ${translate("CREDITS")}: ${data.armor_price}.`;
+			}, ${translate("ENCUMBRANCE_SHORT")} ${data.armor_encumbrance}, ${translate("CREDITS")}: ${formatter.format(data.armor_price)}.`;
 		}
 		if (sName === "cyberware") {
-			return `${translate("STRAIN")}: ${data.cyberware_strain}, ${translate("CREDITS")}: ${data.cyberware_price}.`;
+			return `${translate("STRAIN")}: ${data.cyberware_strain}, ${translate("CREDITS")}: ${formatter.format(data.cyberware_price)}.`;
 		}
 		if (sName === "techniques") {
 			if (data.level === "0") return `${translate("CORE_TECHNIQUE")}.`;
@@ -2905,7 +2905,7 @@
 			let price = "";
 			let encumbrance = `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}.`;
 			if (data.gear_price) {
-				price = `${translate("CREDITS")}: ${data.gear_price}`
+				price = `${translate("CREDITS")}: ${formatter.format(data.gear_price)}`
 			}
 			if (data.gear_bundled === "on") {
 				encumbrance = encumbrance.slice(0,-1) + "#."
