@@ -376,31 +376,37 @@
 				armor_ac: "13",
 				armor_encumbrance: "0",
 				armor_type: "STREET",
+				armor_price: "600",
 			},
 			armored_vacc_suit: {
 				armor_ac: "13",
 				armor_encumbrance: "2",
 				armor_type: "STREET",
+				armor_price: "400",
 			},
 			assault_suit: {
 				armor_ac: "18",
 				armor_encumbrance: "2",
 				armor_type: "POWERED",
+				armor_price: "10000",
 			},
 			combat_field_uniform: {
 				armor_ac: "16",
 				armor_encumbrance: "1",
 				armor_type: "COMBAT",
+				armor_price: "1000",
 			},
 			cuirass_brigandine_linothorax_half_plate: {
 				armor_ac: "15",
 				armor_encumbrance: "1",
 				armor_type: "PRIMITIVE",
+				armor_price: "50",
 			},
 			deflector_array: {
 				armor_ac: "18",
 				armor_encumbrance: "0",
 				armor_type: "STREET",
+				armor_price: "30000",
 			},
 			executive_security_suit: {
 				armor_ac: "15",
@@ -412,17 +418,20 @@
 				armor_encumbrance: "1",
 				armor_encumbrance_bonus: "4",
 				armor_type: "POWERED",
+				armor_price: "40000",
 			},
 			force_pavis: {
 				armor_ac: "15",
 				armor_ac_bonus: "1",
 				armor_encumbrance: "1",
 				armor_type: "SHIELD",
+				armor_price: "10000",
 			},
 			full_plate_layered_mail: {
 				armor_ac: "17",
 				armor_encumbrance: "2",
 				armor_type: "PRIMITIVE",
+				armor_price: "100",
 			},
 			ghost_mantle: {
 				armor_ac: "15",
@@ -433,11 +442,13 @@
 				armor_ac: "16",
 				armor_encumbrance: "1",
 				armor_type: "COMBAT",
+				armor_price: "8000",
 			},
 			leather_jacks_thick_hides_quilted_armor: {
 				armor_ac: "13",
 				armor_encumbrance: "1",
 				armor_type: "PRIMITIVE",
+				armor_price: "10",
 			},
 			polyplast_carapace: {
 				armor_ac: "18",
@@ -453,23 +464,27 @@
 				armor_ac: "13",
 				armor_encumbrance: "1",
 				armor_type: "STREET",
+				armor_price: "300",
 			},
 			security_armor: {
 				armor_ac: "14",
 				armor_encumbrance: "1",
 				armor_type: "COMBAT",
+				armor_price: "700",
 			},
 			shield: {
 				armor_ac: "13",
 				armor_ac_bonus: "1",
 				armor_encumbrance: "1",
 				armor_type: "SHIELD",
+				armor_price: "10",
 			},
 			storm_armor: {
 				armor_ac: "19",
 				armor_encumbrance: "2",
 				armor_encumbrance_bonus: "4",
 				armor_type: "POWERED",
+				armor_price: "20000",
 			},
 			stutterjump_suit: {
 				armor_ac: "18",
@@ -492,16 +507,19 @@
 				armor_ac: "18",
 				armor_encumbrance: "0",
 				armor_type: "POWERED",
+				armor_price: "15000",
 			},
 			warpaint: {
 				armor_ac: "12",
 				armor_encumbrance: "0",
 				armor_type: "STREET",
+				armor_price: "300",
 			},
 			woven_body_armor: {
 				armor_ac: "15",
 				armor_encumbrance: "2",
 				armor_type: "COMBAT",
+				armor_price: "400",
 			}
 		},
 		"cyberware": {
