@@ -653,69 +653,91 @@
 			},
 			ammo_20_rounds: {
 				gear_encumbrance: "1#",
+				gear_price: "10",
 			},
 			ammo_missile: {
 				gear_encumbrance: "1",
+				gear_price: "50",
 			},
 			atmofilter: {
 				gear_encumbrance: "1",
+				gear_price: "100",
 			},
 			backpack: {
 				gear_encumbrance: "1",
+				gear_price: "5/50",
 			},
 			bezoar: {
 				gear_encumbrance: "0",
+				gear_price: "200",
 			},
 			binoculars: {
 				gear_encumbrance: "1",
+				gear_price: "20/200",
 			},
 			bioscanner: {
 				gear_encumbrance: "1",
+				gear_price: "300",
 			},
 			black_slab: {
 				gear_encumbrance: "1",
+				gear_price: "10000",
 			},
 			brainwave: {
 				gear_encumbrance: "0",
+				gear_price: "1000",
 			},
 			climbing_harness: {
 				gear_encumbrance: "1",
+				gear_price: "50",
 			},
 			comm_server: {
 				gear_encumbrance: "3",
+				gear_price: "1000",
 			},
 			compad: {
 				gear_encumbrance: "0",
+				gear_price: "100",
 			},
 			data_phase_tab: {
 				gear_encumbrance: "1",
+				gear_price: "5000",
 			},
 			data_protocol: {
 				gear_encumbrance: "0",
+				gear_price: "1000",
 			},
 			dataslab: {
 				gear_encumbrance: "1",
+				gear_price: "300",
 			},
 			field_radio: {
 				gear_encumbrance: "1",
+				gear_price: "200",
 			},
 			glowbug: {
 				gear_encumbrance: "0",
+				gear_price: "5",
 			},
 			grapnel_launcher: {
 				gear_encumbrance: "1",
+				gear_price: "200",
 			},
 			grav_chute: {
 				gear_encumbrance: "1",
+				gear_price: "300/1000",
 			},
 			grav_harness: {
 				gear_encumbrance: "3",
+				gear_price: "5000",
 			},
 			hush: {
 				gear_encumbrance: "0",
+				gear_price: "200",
 			},
 			instapanel: {
 				gear_encumbrance: "1#",
+				gear_price: "50",
 			},
 			integrity_stims: {
 				gear_encumbrance: "0",
@@ -725,21 +747,27 @@
 			},
 			lazarus_patch: {
 				gear_encumbrance: "1#",
+				gear_price: "30",
 			},
 			lift: {
 				gear_encumbrance: "0",
+				gear_price: "50",
 			},
 			line_shunt: {
 				gear_encumbrance: "0",
+				gear_price: "100",
 			},
 			low_light_goggles: {
 				gear_encumbrance: "1",
+				gear_price: "200",
 			},
 			medkit: {
 				gear_encumbrance: "2",
+				gear_price: "100",
 			},
 			metatool: {
 				gear_encumbrance: "1",
+				gear_price: "200",
 			},
 			micropurgator_stims: {
 				gear_encumbrance: "0",
@@ -749,114 +777,147 @@
 			},
 			navcomp: {
 				gear_encumbrance: "1",
+				gear_price: "500",
 			},
 			polymorphic_nanites: {
 				gear_encumbrance: "1",
 			},
 			portabox: {
 				gear_encumbrance: "1",
+				gear_price: "50",
 			},
 			pseudonuke: {
 				gear_encumbrance: "1",
 			},
 			power_cell_type_a: {
 				gear_encumbrance: "1#",
+				gear_price: "10",
 			},
 			power_cell_type_b: {
 				gear_encumbrance: "1",
+				gear_price: "100",
 			},
 			pressure_tent: {
 				gear_encumbrance: "4",
+				gear_price: "100",
 			},
 			pretech_cosmetic: {
 				gear_encumbrance: "0",
+				gear_price: "1000",
 			},
 			psych: {
 				gear_encumbrance: "0",
+				gear_price: "25",
 			},
 			rations_1_day: {
 				gear_encumbrance: "1#",
+				gear_price: "5",
 			},
 			redivivus_sheath: {
 				gear_encumbrance: "1",
 			},
 			remote_link_unit: {
 				gear_encumbrance: "1",
+				gear_price: "250",
 			},
 			reverie: {
 				gear_encumbrance: "0",
+				gear_price: "100",
 			},
 			rope_20_meters: {
 				gear_encumbrance: "2/1",
+				gear_price: "4/40",
 			},
 			scout_report: {
 				gear_encumbrance: "0",
+				gear_price: "200",
 			},
 			solar_recharger: {
 				gear_encumbrance: "3",
+				gear_price: "500",
 			},
 			spare_parts: {
 				gear_encumbrance: "1#",
+				gear_price: "50",
 			},
 			squeal: {
 				gear_encumbrance: "0",
+				gear_price: "300",
 			},
 			stiletto_charge: {
 				gear_encumbrance: "1",
+				gear_price: "Priceless",
 			},
 			storage_unit: {
 				gear_encumbrance: "3",
+				gear_price: "500",
 			},
 			survey_scanner: {
 				gear_encumbrance: "1",
+				gear_price: "250",
 			},
 			survival_kit: {
 				gear_encumbrance: "1",
+				gear_price: "60",
 			},
 			system_reset_inductor: {
 				gear_encumbrance: "0",
 			},
 			tailored_antiallergens: {
 				gear_encumbrance: "0",
+				gear_price: "5",
 			},
 			telekinetic_generator: {
 				gear_encumbrance: "2",
+				gear_price: "250",
 			},
 			telescoping_pole: {
 				gear_encumbrance: "0",
+				gear_price: "10",
 			},
 			thermal_flare: {
 				gear_encumbrance: "0",
+				gear_price: "5",
 			},
 			tightbeam_link_unit: {
 				gear_encumbrance: "1",
+				gear_price: "1000",
 			},
 			toolkit_postech: {
 				gear_encumbrance: "3",
+				gear_price: "300",
 			},
 			toolkit_pretech: {
 				gear_encumbrance: "1",
+				gear_price: "1000",
 			},
 			trade_goods: {
 				gear_encumbrance: "1#",
+				gear_price: "50",
 			},
 			trade_metals: {
 				gear_encumbrance: "1#",
+				gear_price: "10",
 			},
 			translator_torc: {
 				gear_encumbrance: "0",
+				gear_price: "200",
 			},
 			tsunami: {
 				gear_encumbrance: "0",
+				gear_price: "50",
 			},
 			vacc_fresher: {
 				gear_encumbrance: "1",
+				gear_price: "400",
 			},
 			vacc_skin: {
 				gear_encumbrance: "1",
+				gear_price: "1000",
 			},
 			vacc_suit: {
 				gear_encumbrance: "2",
+				gear_price: "100",
 			},
 			wideawake_serum: {
 				gear_encumbrance: "0",
