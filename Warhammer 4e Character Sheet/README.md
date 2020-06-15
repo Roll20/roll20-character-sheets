@@ -11,6 +11,8 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 June 15 2020
 
 - New UI Themes - Empire, Dwarf & Elf
+- Condition Tracker added! This has has TokenMod integrated buttons which can set/unset conditions, it requires my custom WFRP4e Tokens  (download @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset1.0.zip)
+
 - Fixed NPC tab spacing issue with Advantage value field
 - Fixed NPC tab Opposed Melee roll using wrong name on NPC page 1
 - Fixed Advantage not adding on Ranged Weapon target number in rolls
