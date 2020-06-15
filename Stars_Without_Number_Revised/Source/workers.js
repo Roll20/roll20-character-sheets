@@ -2630,6 +2630,9 @@
 			if (output.defense_mass.includes("#")) {
 				output.defense_mass = `${parseInt(output.defense_mass) * v.ship_multiplier}`;
 			}
+			if (output.defense_price.includes("*")) {
+				output.defense_price = `${parseInt(output.defense_price) * v.ship_price_multiplier}`;
+			}
 		}
 		if (sName === "ship-fittings") {
 			if (label) {
@@ -2641,6 +2644,9 @@
 			}
 			if (output.fitting_power.includes("#")) {
 				output.fitting_power = `${parseInt(output.fitting_power) * v.ship_multiplier}`;
+			}
+			if (output.fitting_price.includes("*")) {
+				output.fitting_price = `${parseInt(output.fitting_price) * v.ship_price_multiplier}`;
 			}
 		}
 		if (sName === "ship-weapons") {
@@ -2708,20 +2714,22 @@
 	};
 	const getAutofillInfo = (sName, v, inputData, label) => {
 		const data = getAutofillData(sName, v, inputData, label);
+		const formatter = new Intl.NumberFormat();
 		// Generates info text from the stored data
 		if (sName === "ship-defenses") {
 			return `${translate(data.class)}+. ${translate("POWER_INIT")}: ${data.defense_power}, ${
-				translate("MASS_INIT")}: ${data.defense_mass}. ${data.defense_effect}`;
+				translate("MASS_INIT")}: ${data.defense_mass}, ${translate("CREDITS")}: ${formatter.format(data.defense_price)}. ${data.defense_effect}`;
 		}
 		if (sName === "ship-fittings") {
 			return `${translate(data.class)}+. ${translate("POWER_INIT")}: ${data.fitting_power}, ${
-				translate("MASS_INIT")}: ${data.fitting_mass}. ${data.fitting_effect}`;
+				translate("MASS_INIT")}: ${data.fitting_mass}, ${translate("CREDITS")}: ${formatter.format(data.fitting_price)} ${data.fitting_effect}`;
 		}
 		if (sName === "ship-weapons") {
 			return `${translate(data.class)}+. ${
 				translate("POWER_INIT")}: ${data.weapon_power}, ${
 				translate("MASS_INIT")}: ${data.weapon_mass}, ${
-				translate("HARDPOINTS_INIT")}: ${data.weapon_hardpoints}. ${
+				translate("HARDPOINTS_INIT")}: ${data.weapon_hardpoints}, ${
+				translate("CREDITS")}: ${formatter.format(data.weapon_price)}. ${
 				translate("DAMAGE_SHORT")} ${data.weapon_damage}. ${
 				data.weapon_qualities}${
 				(data.weapon_ammo ? `, ${translate("AMMO")}: ${data.weapon_ammo}`: "")}.`;
@@ -2763,6 +2771,7 @@
 		getAttrs([`generate_${sName}_source`, "ship_class"], v => {
 			const label = v[`generate_${sName}_source`];
 			v.ship_multiplier = getShipMultiplier(v.ship_class);
+			v.ship_price_multiplier = getShipPriceMultiplier(v.ship_class);
 			if (label && autofillData[sName].hasOwnProperty(label)) {
 				const data = getAutofillData(sName, v, autofillData[sName][label], label);
 				delete data.class;
@@ -2776,6 +2785,7 @@
 		getAttrs([`generate_${sName}_source`, "ship_class"], v => {
 			const label = v[`generate_${sName}_source`];
 			v.ship_multiplier = getShipMultiplier(v.ship_class);
+			v.ship_price_multiplier = getShipPriceMultiplier(v.ship_class);
 			if (label && autofillData[sName].hasOwnProperty(label)) {
 				const info = getAutofillInfo(sName, v, autofillData[sName][label], label);
 				if (info) setAttrs({
