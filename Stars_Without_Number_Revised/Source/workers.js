@@ -2902,10 +2902,15 @@
 			else return `${translate("LEVEL")}-${data.level}.`;
 		}
 		if (sName === "gear") {
-			if (data.gear_bundled === "on") {
-				return `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}#.`;
+			let price = "";
+			let encumbrance = `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}.`;
+			if (data.gear_price) {
+				price = `${translate("CREDITS")}: ${data.gear_price}`
 			}
-			return `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}.`;
+			if (data.gear_bundled === "on") {
+				encumbrance = encumbrance.slice(0,-1) + "#."
+			}
+			return encumbrance + " " + price;
 		}
 		return "";
 	};
