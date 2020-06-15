@@ -94,6 +94,7 @@
 				drone_HP: "30",
 				drone_num_fittings: "4",
 				drone_range: "5000 km",
+				drone_price: "50000",
 			},
 			cuttlefish: {
 				drone_AC: "13",
@@ -101,6 +102,7 @@
 				drone_HP: "10",
 				drone_num_fittings: "5",
 				drone_range: "1 km",
+				drone_price: "2000",
 			},
 			ghostwalker: {
 				drone_AC: "15",
@@ -110,6 +112,7 @@
 				drone_HP: "1",
 				drone_num_fittings: "3",
 				drone_range: "5 km",
+				drone_price: "3000",
 			},
 			pax: {
 				drone_AC: "16",
@@ -117,6 +120,7 @@
 				drone_HP: "20",
 				drone_num_fittings: "4",
 				drone_range: "100 km",
+				drone_price: "10000",
 			},
 			primitve_drone: {
 				drone_AC: "12",
@@ -124,6 +128,7 @@
 				drone_HP: "1",
 				drone_num_fittings: "1",
 				drone_range: "500 m",
+				drone_price: "250",
 			},
 			sleeper: {
 				drone_AC: "12",
@@ -133,6 +138,7 @@
 				drone_HP: "8",
 				drone_num_fittings: "5",
 				drone_range: "100 km",
+				drone_price: "2500",
 			},
 			stalker: {
 				drone_AC: "13",
@@ -140,6 +146,7 @@
 				drone_HP: "5",
 				drone_num_fittings: "3",
 				drone_range: "2 km",
+				drone_price: "1000",
 			},
 			void_hawk: {
 				drone_AC: "14",
@@ -147,6 +154,7 @@
 				drone_HP: "15",
 				drone_num_fittings: "4",
 				drone_range: "100 km",
+				drone_price: "5000",
 			},
 		},
 		"droneFittings": [
