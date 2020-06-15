@@ -2892,7 +2892,7 @@
 		}
 		if (sName === "armor") {
 			return `${translate("AC")} ${data.armor_ac}, ${translate(data.armor_type)
-			}, ${translate("ENCUMBRANCE_SHORT")} ${data.armor_encumbrance}.`;
+			}, ${translate("ENCUMBRANCE_SHORT")} ${data.armor_encumbrance}, ${translate("CREDITS")}: ${data.armor_price}.`;
 		}
 		if (sName === "cyberware") {
 			return `${translate("STRAIN")}: ${data.cyberware_strain}, ${translate("CREDITS")}: ${data.cyberware_price}.`;
