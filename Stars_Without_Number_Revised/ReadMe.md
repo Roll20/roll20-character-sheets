@@ -42,6 +42,11 @@ on Github.
 
 ## Changelog
 
+### 2.4.10
+
+* Fix a bug disallowing decimal encumbrance values.
+* Introduce a "bundled" toggle for equipment, which will bundle the items in packs of 3. This can be used instead of decimal encumbrance values.
+
 ### 2.4.9
 
 * Fix a bug causing section headers and some fields to render incorrectly.
