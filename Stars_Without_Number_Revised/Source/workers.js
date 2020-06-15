@@ -2888,7 +2888,8 @@
 				data.weapon_range ? `, ${translate("RANGE")} ${data.weapon_range}` : ""}${
 				data.weapon_ammo ? `, ${translate("AMMO")} ${data.weapon_ammo}` : ""}${
 				data.weapon_shock ? `, ${data.weapon_shock_damage} ${translate("SHOCK_DAMAGE_AGAINST_AC_LEQ")} ${data.weapon_shock_ac}` : ""}, +${getNamedAttrMod(data.weapon_attribute_mod)}${
-				data.weapon_encumbrance ? `, ${translate("ENCUMBRANCE_SHORT")} ${data.weapon_encumbrance}` : ""}.`;
+				data.weapon_encumbrance ? `, ${translate("ENCUMBRANCE_SHORT")} ${data.weapon_encumbrance}` : ""}${
+				data.weapon_price ? `, ${translate("CREDITS")}: ${formatter.format(data.weapon_price)}` : ""}`
 		}
 		if (sName === "armor") {
 			return `${translate("AC")} ${data.armor_ac}, ${translate(data.armor_type)
