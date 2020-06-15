@@ -2889,7 +2889,7 @@
 				data.weapon_ammo ? `, ${translate("AMMO")} ${data.weapon_ammo}` : ""}${
 				data.weapon_shock ? `, ${data.weapon_shock_damage} ${translate("SHOCK_DAMAGE_AGAINST_AC_LEQ")} ${data.weapon_shock_ac}` : ""}, +${getNamedAttrMod(data.weapon_attribute_mod)}${
 				data.weapon_encumbrance ? `, ${translate("ENCUMBRANCE_SHORT")} ${data.weapon_encumbrance}` : ""}${
-				data.weapon_price ? `, ${translate("CREDITS")}: ${formatter.format(data.weapon_price)}` : ""}`
+				data.weapon_price ? `, ${translate("CREDITS")}: ${formatter.format(data.weapon_price)}` : ""}.`
 		}
 		if (sName === "armor") {
 			return `${translate("AC")} ${data.armor_ac}, ${translate(data.armor_type)
@@ -2903,15 +2903,9 @@
 			else return `${translate("LEVEL")}-${data.level}.`;
 		}
 		if (sName === "gear") {
-			let price = "";
-			let encumbrance = `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}.`;
-			if (data.gear_price) {
-				price = `${translate("CREDITS")}: ${formatter.format(data.gear_price)}`
-			}
-			if (data.gear_bundled === "on") {
-				encumbrance = encumbrance.slice(0,-1) + "#."
-			}
-			return encumbrance + " " + price;
+			return `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}${data.gear_bundled === "on" ? "#" : ""}${
+				data.gear_price ? `, ${translate("CREDITS")}: ${formatter.format(data.gear_price)}` : ""
+			}.`
 		}
 		return "";
 	};
