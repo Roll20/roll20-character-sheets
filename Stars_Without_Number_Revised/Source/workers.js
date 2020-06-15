@@ -2895,7 +2895,7 @@
 			}, ${translate("ENCUMBRANCE_SHORT")} ${data.armor_encumbrance}.`;
 		}
 		if (sName === "cyberware") {
-			return `${translate("STRAIN")}: ${data.cyberware_strain}.`;
+			return `${translate("STRAIN")}: ${data.cyberware_strain}, ${translate("CREDITS")}: ${data.cyberware_price}.`;
 		}
 		if (sName === "techniques") {
 			if (data.level === "0") return `${translate("CORE_TECHNIQUE")}.`;
