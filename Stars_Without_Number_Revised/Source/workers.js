@@ -524,76 +524,100 @@
 		},
 		"cyberware": {
 			adrenal_suppression_pump: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "30000"
 			},
 			bioadaptation_augments: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "10000"
 			},
 			body_arsenal_array: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "10000"
 			},
 			body_sculpting: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "10000"
 			},
 			dermal_armor: {
-				cyberware_strain: "2"
+				cyberware_strain: "2",
+				cyberware_price: "20000"
 			},
 			drone_control_link: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "20000"
 			},
 			eelskin_capacitor_mesh: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "25000"
 			},
 			gecko_anchors: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "15000"
 			},
 			ghost_talker_transceiver: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "15000"
 			},
 			holdout_cavity: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "10000"
 			},
 			holoskin_emitter: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "15000"
 			},
 			identity_submersion_trigger: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "25000"
 			},
 			immunofiltration_systems: {
-				cyberware_strain: "2"
+				cyberware_strain: "2",
+				cyberware_price: "25000"
 			},
 			induced_coma_trigger: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "20000"
 			},
 			neurointruder_alert: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "50000"
 			},
 			panspectral_optics: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "15000"
 			},
 			pressure_sheathing: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "15000"
 			},
 			prosthetic_limb: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "2500"
 			},
 			revenant_wiring: {
-				cyberware_strain: "3"
+				cyberware_strain: "3",
+				cyberware_price: "50000"
 			},
 			slowtime_window: {
-				cyberware_strain: "2"
+				cyberware_strain: "2",
+				cyberware_price: "30000"
 			},
 			stabilization_overrides: {
-				cyberware_strain: "2"
+				cyberware_strain: "2",
+				cyberware_price: "25000"
 			},
 			tagger_nanites: {
-				cyberware_strain: "1"
+				cyberware_strain: "1",
+				cyberware_price: "15000"
 			},
 			toxin_injector: {
-				cyberware_strain: "2"
+				cyberware_strain: "2",
+				cyberware_price: "20000"
 			},
 			twitchlock_actuators: {
-				cyberware_strain: "2"
+				cyberware_strain: "2",
+				cyberware_price: "30000"
 			},
 		},
 		"foci": {
