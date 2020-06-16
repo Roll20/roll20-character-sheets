@@ -1,13 +1,22 @@
 ﻿<rolltemplate class="sheet-rolltemplate-noc-fiel">
 <div class="templatemain">
+    <div class="resultmenace"> 
+	    {{menace}}
+	</div>   
+	<div class="resultmenacelib"> 
+		<span>MENACE</span>
+	</div> 
     <div class="resultfiel">       
-		{{#rollTotal() result 0}}<span style="color:#3FB315">{{result}}</span>{{/rollTotal() result 0}}
-		{{#rollTotal() result 1}}<span>{{result}}</span>{{/rollTotal() result 1}}
-		{{#rollTotal() result 2}}<span>{{result}}</span>{{/rollTotal() result 2}}
-		{{#rollTotal() result 3}}<span>{{result}}</span>{{/rollTotal() result 3}}
-		{{#rollTotal() result 4}}<span>{{result}}</span>{{/rollTotal() result 4}}
-		{{#rollTotal() result 5}}<span style="color:red">{{result}}</span>{{/rollTotal() result 5}}
-	</div>        
+		{{#rollTotal() result 0}}<div style="color:#3FB315">{{result}}</div>{{/rollTotal() result 0}}
+		{{#rollTotal() result 1}}<div>{{result}}</div>{{/rollTotal() result 1}}
+		{{#rollTotal() result 2}}<div>{{result}}</div>{{/rollTotal() result 2}}
+		{{#rollTotal() result 3}}<div>{{result}}</div>{{/rollTotal() result 3}}
+		{{#rollTotal() result 4}}<div>{{result}}</div>{{/rollTotal() result 4}}
+		{{#rollTotal() result 5}}<div style="color:red">{{result}}</div>{{/rollTotal() result 5}}
+	</div>   
+    <div class="resultfiellib">
+	    <span>FIEL</span>
+    </div>	
 </div>
 </rolltemplate>
 
@@ -34,7 +43,7 @@
 		<div class="templatenamediv">
 			<span class="templatename">{{name}}</span><br/>
 	    </div>
-        <span class="templateaction">{{action}}</span><br/>
+        <span class="templateaction">{{action}}</span>
 	</div>
     <div class="result"> 
 		{{#rollGreater() result 0}}
@@ -45,6 +54,33 @@
 		{{/rollLess() result 1}}
 	    {{#rollWasCrit() result}} 
 	        {{relanceJet}}
+	    {{/rollWasCrit() result}}
+	</div>  
+    <div class="fiel">	
+		{{#rollWasFumble() result}}
+		    <span>!! Fiel détecté !!</span>
+		{{/rollWasFumble() result}}	
+	</div>
+</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-noc-relancedegat">
+<div class="templatemain">
+    <div class="templatethdiv">
+		<div class="templatenamediv">
+			<span class="templatename">{{name}}</span><br/>
+	    </div>
+        <span class="templateaction">{{action}}</span>
+	</div>
+    <div class="result"> 
+		{{#rollGreater() result 0}}
+		    <span>+1 dégât</span>
+		{{/rollGreater() result 0}}
+		{{#rollLess() result 1}}
+		    <span>Echec</span>
+		{{/rollLess() result 1}}
+	    {{#rollWasCrit() result}} 
+	        {{relanceJetdegat}}
 	    {{/rollWasCrit() result}}
 	</div>  
     <div class="fiel">	
@@ -106,7 +142,10 @@
 		</div>
         <span class="templateaction">{{action}} avec</span><br/>
 		<span class="templatearme">{{arme}}</span><br/>
-		<span class="templatedps">(dégats: {{DPS}})</span>
+		<span class="templatedps">Dégats: {{DPS}}{{#rollGreater() enoire 0}} +{{enoire}} (Noirceur){{/rollGreater() enoire 0}}{{#rollGreater() quantiquecomp 0}} +{{quantique}} (Noirceur){{/rollGreater() quantiquecomp 0}}</span><br>
+	    {{#effet1}}<span class="templatedps templatedpseffet">{{effet1}}</span><br>{{/effet1}}
+		{{#effet2}}<span class="templatedps templatedpseffet">{{effet2}}</span><br>{{/effet2}}
+		{{#effet3}}<span class="templatedps templatedpseffet">{{effet3}}</span>{{/effet3}}
 	</div>
 	<div class="attr">
             {{#attr}}
@@ -137,22 +176,39 @@
 	    {{#rollWasCrit() result}} 
 	        {{relanceJet}}
 	    {{/rollWasCrit() result}}
+		{{#rollWasCrit() quantique}} 
+	        {{relanceJetdegat}}
+	    {{/rollWasCrit() quantique}}
 	</div>   
     <div class="fiel">	
 		{{#rollWasFumble() result}}
-		<span>!! Fiel détecté !!</span>
+		<span>!! Fiel détecté !!</span><br>
 		{{/rollWasFumble() result}}	
+		{{#rollWasFumble() quantique}}
+		<span>!! Fiel détecté (dégât) !!</span>
+		{{/rollWasFumble() quantique}}	
 	</div>	
 </div>
 </rolltemplate>
 
 <input type="radio" class="sheet-typefiche sheet-flag-PJ" name="attr_typefiche" value="1" checked/><span class="PJ">PJ</span>
 <input type="radio" class="sheet-typefiche sheet-flag-PNJ" name="attr_typefiche" value="2"/><span class="PNJ">PNJ</span>
-<input type="radio" class="sheet-typefiche sheet-flag-fiel" name="attr_typefiche" value="3"/><span class="fiel">Fiel</span>
+<input type="radio" class="sheet-typefiche sheet-flag-fiel" name="attr_typefiche" value="3"/><span class="fiel">FIEL</span>
 <div class="sheet-section-fiel">
     <div class="affichage-fiel">
-	    <input type="text" class="compteurfiel" name="attr_compteurfiel" value="0"/><br>
-	    <div class="afficheurfiel"><button type="roll" name="roll_fiel" title="Informer les joueurs du taux de fiel" value="&{template:noc-fiel} {{name=FIEL}} {{result=[[@{compteurfiel}]]}}"></button></div>
+	    <input type="text" class="compteurmenace" name="attr_compteurmenace" value="0"/>
+		<div class="menace">
+		    <span>MENACE</span>
+		</div>
+		<div class="compteurfiel2">
+		    <input type="text" class="compteurfiel" name="attr_compteurfiel" value="0"/>
+		</div>
+		<div class="fielspan">
+		    <span>FIEL</span>
+		</div>
+        <div class="fielroll">
+		     <button type="roll" class="indiquefiel" name="roll_fiel" title="Informer les joueurs du taux de fiel" value="&{template:noc-fiel} {{menace=[[@{compteurmenace}]]}} {{result=[[@{compteurfiel}]]}}"></button>
+	    </div>
 	</div>
 </div>
 <div class="sheet-section-PNJ">
@@ -286,10 +342,10 @@
                 <div class="tir-title-PNJ"><label class="tir-title-label" data-i18n="tir-u">ARMES DE TIR</label></div> 
 				<div class="tir-th">
                     <span style="width:215px;" class="input-info header-equip" data-i18n="Description-u">Description</span>
-				    <span style="width:55px;" class="input-info header-equip-armure"data-i18n="dps-u">DPS</span> 
-				    <span style="width:55px;" class="input-info header-equip-armure"data-i18n="munitions-u">Mun</span>
-				    <span style="width:55px;" class="input-info header-equip-armure"data-i18n="munitionsmax-u">Mun max</span>
-                    <span style="width:70px;" class="input-info header-equip-armure2"data-i18n="armetalent-u">Talent</span>              
+				    <span style="width:55px;" class="input-info header-equip-armure" data-i18n="dps-u">DPS</span> 
+				    <span style="width:55px;" class="input-info header-equip-armure" data-i18n="munitions-u">Mun</span>
+				    <span style="width:55px;" class="input-info header-equip-armure" data-i18n="munitionsmax-u">Mun max</span>
+                    <span style="width:70px;" class="input-info header-equip-armure2" data-i18n="armetalent-u">Talent</span>              
                     <span style="width:40px;" class="input-info header-equip-roll"></span> 
                 </div> 
                 <fieldset class="repeating_projectiles">
@@ -302,13 +358,68 @@
                         <input value="0" style="text-align:center" type="text" class="input-degat" name="attr_degattir"/>
                         <input value="0" style="text-align:center" type="text" class="input-munitions" name="attr_munitions"/>
 				        <input value="0" style="text-align:center" type="text" class="input-munitionsmax" name="attr_munitionsmax"/>             
-				        <input type="checkbox" class="input-talent" name="attr_tirtalent"/>
+				        <input type="checkbox" class="input-talent" name="attr_tirtalent" data-i18n-title="talent-t"/>
 					    <input style="display:none" type="number" class="input-talentflag" name="attr_tirflag" value="0"/>
-						<button style="display:none" type="roll" class="CHd10" name="roll_repeatingd10" value="&{template:noc-relance} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=relance un D10 !}} {{result=[[{1d10}>8]]}}"></button><button style="display:none" type="roll" class="CHd10GM" name="roll_repeatingd10GM" value="/w gm &{template:noc-relance} {{relanceJet=[Relance !](~d10GM)}} {{name=@{character_name}}} {{action=relance un D10 !}} {{result=[[{1d10}>8]]}}"></button>
-                        <button type="roll" class="input-jetdps-PJ" value="&{template:noc-attaque} {{relanceJet=[Relance !](~repeating_tir_repeatingd10)}} {{name=@{character_name}}} {{action=tire}} {{arme=@{armenom}}} {{DPS=@{degattir}}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmalusTIR}+{@tirflag}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmalusTIR}-@{tirflag}]]}}"></button><button type="roll" class="input-jetdps-GM" value="/w gm &{template:noc-attaque} {{relanceJet=[Relance !](~repeating_tir_repeatingd10GM)}} {{name=@{character_name}}} {{action=tire}} {{arme=@{armenom}}} {{DPS=@{degattir}}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmalusTIR}+{@tirflag}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmalusTIR}-@{tirflag}]]}}"></button><br>
-                        <input type="text" class="input-info input-trait" name="attr_trait1" data-i18n-placeholder="trait-p"/><br>
-                        <input type="text" class="input-info input-trait" name="attr_trait2" data-i18n-placeholder="trait-p"/><br>
-                        <input type="text" class="input-info input-trait" name="attr_trait3" data-i18n-placeholder="trait-p"/>
+						<button style="display:none" type="roll" class="CHd10" name="roll_repeatingd10" value="&{template:noc-relance} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=relance un D10 !}} {{result=[[{1d10}>8]]}}"></button>
+						<button style="display:none" type="roll" class="CHd10GM" name="roll_repeatingd10GM" value="/w gm &{template:noc-relance} {{relanceJet=[Relance !](~d10GM)}} {{name=@{character_name}}} {{action=relance un D10 !}} {{result=[[{1d10}>8]]}}"></button>
+						<button style="display:none" type="roll" class="CHd10" name="roll_repeatingd10degat" value="&{template:noc-relancedegat} {{relanceJetdegat=[Relance dégât !](~repeating_cac_repeatingd10degat)}} {{name=@{character_name}}} {{action=relance dégâts !}} {{result=[[{1d10}>8]]}}"></button>
+                        <button style="display:none" type="roll" class="CHd10GM" name="roll_repeatingd10degatGM" value="/w gm &{template:noc-relancedegat} {{relanceJetdegat=[Relance dégât !](~repeating_cac_repeatingd10degat)}} {{name=@{character_name}}} {{action=relance dégâts !}} {{result=[[{1d10}>8]]}}"></button>						
+                        <button type="roll" class="input-jetdps-PJ" value="&{template:noc-attaque} {{effet1=@{trait1effet}}} {{effet2=@{trait2effet}}} {{effet3=@{trait3effet}}} {{relanceJet=[Relance !](~repeating_tir_repeatingd10)}} {{relanceJetdegat=[Relance dégât !](~repeating_tir_repeatingd10degat)}} {{name=@{character_name}}} {{action=tire}} {{arme=@{armenom}}} {{DPS=@{degattir}}} {{enoire=[[@{degatenoire}]]}} {{quantiquecomp=[[@{degatquantique}]]}} {{quantique=[[{(@{degatquantique})d10}>8]]}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmalusTIR}+{@tirflag}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmalusTIR}-@{tirflag}]]}}"></button>
+						<button type="roll" class="input-jetdps-GM" value="/w gm &{template:noc-attaque} {{effet1=@{trait1effet}}} {{effet2=@{trait2effet}}} {{effet3=@{trait3effet}}} {{relanceJet=[Relance !](~repeating_tir_repeatingd10GM)}} {{relanceJetdegat=[Relance dégât !](~repeating_tir_repeatingd10degatGM)}} {{name=@{character_name}}} {{action=tire}} {{arme=@{armenom}}} {{DPS=@{degattir}}} {{enoire=[[@{degatenoire}]]}} {{quantiquecomp=[[@{degatquantique}]]}} {{quantique=[[{(@{degatquantique})d10}>8]]}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmalusTIR}+{@tirflag}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmalusTIR}-@{tirflag}]]}}"></button><br>
+                        <div class="trait"><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox1" name="attr_trait1flag"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox1enoire" name="attr_trait1flagenoire"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox1quantique" name="attr_trait1flagquantique"/>
+						<select class="input-info input-traitselect" name='attr_trait1'>
+						    <option value="-1" style="color:grey"></option>
+							<option value="0">Choc</option>
+						    <option value="1">Complexe</option>
+							<option value="2">Encombrant</option>
+							<option value="3">Energie noire</option>
+							<option value="4">Limité</option>
+							<option value="5">Long</option>
+							<option value="6">Longue portée</option>
+							<option value="7">Multiple</option>
+							<option value="8">Perforant</option>
+							<option value="9">Quantique</option>
+							<option value="10">Récurrent</option>
+							<option value="11">Tranchant</option>
+						</select>
+						<input type="text" name="attr_trait1effet" value="" style="display:none;"/>
+						<input type="text" class="input-info input-traitvalue input-traitvalue1" name="attr_trait1value" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue1enoire" name="attr_degatenoire" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue1quantique" name="attr_degatquantique" value="0"/></div>
+						<div class="trait"><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox2" name="attr_trait2flag"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox2enoire" name="attr_trait2flagenoire"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox2quantique" name="attr_trait2flagquantique"/>
+						<select class="input-info input-traitselect" name='attr_trait2'>
+						    <option value="-1" style="color:grey"></option>
+							<option value="0">Choc</option>
+						    <option value="1">Complexe</option>
+							<option value="2">Encombrant</option>
+							<option value="3">Energie noire</option>
+							<option value="4">Limité</option>
+							<option value="5">Long</option>
+							<option value="6">Longue portée</option>
+							<option value="7">Multiple</option>
+							<option value="8">Perforant</option>
+							<option value="9">Quantique</option>
+							<option value="10">Récurrent</option>
+							<option value="11">Tranchant</option>
+						</select>
+						<input type="text" name="attr_trait2effet" value="" style="display:none;"/>
+						<input type="text" class="input-info input-traitvalue input-traitvalue2" name="attr_trait2value" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue2enoire" name="attr_degatenoire" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue2quantique" name="attr_degatquantique" value="0"/></div>
+						<div class="trait"><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox3" name="attr_trait3flag"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox3enoire" name="attr_trait3flagenoire"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox3quantique" name="attr_trait3flagquantique"/>
+						<select class="input-info input-traitselect" name='attr_trait3'>
+						    <option value="-1" style="color:grey"></option>
+							<option value="0">Choc</option>
+						    <option value="1">Complexe</option>
+							<option value="2">Encombrant</option>
+							<option value="3">Energie noire</option>
+							<option value="4">Limité</option>
+							<option value="5">Long</option>
+							<option value="6">Longue portée</option>
+							<option value="7">Multiple</option>
+							<option value="8">Perforant</option>
+							<option value="9">Quantique</option>
+							<option value="10">Récurrent</option>
+							<option value="11">Tranchant</option>
+						</select>
+						<input type="text" name="attr_trait3effet" value="" style="display:none;"/>
+						<input type="text" class="input-info input-traitvalue input-traitvalue3" name="attr_trait3value" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue3enoire" name="attr_degatenoire" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue3quantique" name="attr_degatquantique" value="0"/></div>	
                     </div>
 				</div>
                 </fieldset>
@@ -317,14 +428,14 @@
                 <div class="cac-title-PNJ"><label class="cac-title-label" data-i18n="cac-u">ARMES DE CONTACT</label></div> 
 				<div class="cac-th">
                     <span style="width:215px;" class="input-info header-equip" data-i18n="Description-u">Description</span>
-				    <span style="width:55px;" class="input-info header-equip-armure"data-i18n="dps-u">DPS</span> 
-                    <span style="width:70px;" class="input-info header-equip-armure2"data-i18n="armetalent-u">Talent</span>              
+				    <span style="width:55px;" class="input-info header-equip-armure" data-i18n="dps-u">DPS</span> 
+                    <span style="width:70px;" class="input-info header-equip-armure2" data-i18n="armetalent-u">Talent</span>              
                     <span style="width:40px;" class="input-info header-equip-roll"></span> 
                 </div> 
 				<div class="cac-all-mainsnues">
 				    <div class="cac-gauche">
                         <input type="text" class="input-info inputarmenom" name="attr_armenom-mainsnues" value="Mains nues" disabled="true"/><br>
-                        <TEXTAREA class="armeinfo" name="attr_armeinfo-mainsnues" disabled="true">Pieds, poings et même coup de tête</textarea>
+                        <TEXTAREA class="armeinfo armeinfo-mainsnues" name="attr_armeinfo-mainsnues" disabled="true">Pieds, poings et même coup de tête</textarea>
 					</div>
 					<div class="cac-droite">
 					    <input value="[[@{constitution}+1]]" style="text-align:center" type="text" class="input-degat" name="attr_degatcac-mainsnues" disabled="true"/>            
@@ -340,13 +451,68 @@
 					</div>
 					<div class="cac-droite">
 					    <input value="0" style="text-align:center" type="text" class="input-degat" name="attr_degatcac"/>            
-                        <input type="checkbox" class="input-talent" name="attr_cactalent"/>
+                        <input type="checkbox" class="input-talent" name="attr_cactalent" data-i18n-title="talent-t"/>
                         <input style="display:none" type="number" class="input-talentflag" name="attr_cacflag" value="0"/>
-                        <button style="display:none" type="roll" class="CHd10" name="roll_repeatingd10" value="&{template:noc-relance} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=relance un D10 !}} {{result=[[{1d10}>8]]}}"></button><button style="display:none" type="roll" class="CHd10GM" name="roll_repeatingd10GM" value="/w gm &{template:noc-relance} {{relanceJet=[Relance !](~d10GM)}} {{name=@{character_name}}} {{action=relance un D10 !}} {{result=[[{1d10}>8]]}}"></button>						
-                        <button type="roll" class="input-jetdps-PJ" value="&{template:noc-attaque} {{relanceJet=[Relance !](~repeating_cac_repeatingd10)}} {{name=@{character_name}}} {{action=attaque}} {{arme=@{armenom}}} {{DPS=[[@{degatcac}+@{constitution}]]}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmaluscac}+{@cacflag}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmaluscac}-@{cacflag}]]}}"></button><button type="roll" class="input-jetdps-GM" value="/w gm &{template:noc-attaque} {{relanceJet=[Relance !](~repeating_cac_repeatingd10GM)}} {{name=@{character_name}}} {{action=attaque}} {{arme=@{armenom}}} {{DPS=[[@{degatcac}+@{constitution}]]}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmaluscac}+{@cacflag}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmaluscac}-@{cacflag}]]}}"></button><br>
-                        <input type="text" class="input-info input-trait" name="attr_trait4" data-i18n-placeholder="trait-p"/><br>
-                        <input type="text" class="input-info input-trait" name="attr_trait5" data-i18n-placeholder="trait-p"/><br>
-                        <input type="text" class="input-info input-trait" name="attr_trait6" data-i18n-placeholder="trait-p"/>
+                        <button style="display:none" type="roll" class="CHd10" name="roll_repeatingd10" value="&{template:noc-relance} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=relance un D10 !}} {{result=[[{1d10}>8]]}}"></button>
+						<button style="display:none" type="roll" class="CHd10GM" name="roll_repeatingd10GM" value="/w gm &{template:noc-relance} {{relanceJet=[Relance !](~d10GM)}} {{name=@{character_name}}} {{action=relance un D10 !}} {{result=[[{1d10}>8]]}}"></button>						
+						<button style="display:none" type="roll" class="CHd10" name="roll_repeatingd10degat" value="&{template:noc-relancedegat} {{relanceJetdegat=[Relance dégât !](~repeating_cac_repeatingd10degat)}} {{name=@{character_name}}} {{action=relance dégâts !}} {{result=[[{1d10}>8]]}}"></button>						
+                        <button style="display:none" type="roll" class="CHd10GM" name="roll_repeatingd10degatGM" value="/w gm &{template:noc-relancedegat} {{relanceJetdegat=[Relance dégât !](~repeating_cac_repeatingd10degat)}} {{name=@{character_name}}} {{action=relance dégâts !}} {{result=[[{1d10}>8]]}}"></button>
+						<button type="roll" class="input-jetdps-PJ" value="&{template:noc-attaque} {{effet1=@{trait1effet}}} {{effet2=@{trait2effet}}} {{effet3=@{trait3effet}}} {{relanceJet=[Relance !](~repeating_cac_repeatingd10)}} {{relanceJetdegat=[Relance dégât !](~repeating_cac_repeatingd10degat)}} {{name=@{character_name}}} {{action=attaque}} {{arme=@{armenom}}} {{DPS=[[@{degatcac}+@{constitution}]]}} {{enoire=[[@{degatenoire}]]}} {{quantiquecomp=[[@{degatquantique}]]}} {{quantique=[[{(@{degatquantique})d10}>8]]}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmaluscac}+{@cacflag}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmaluscac}-@{cacflag}]]}}"></button>
+						<button type="roll" class="input-jetdps-GM" value="/w gm &{template:noc-attaque} {{effet1=@{trait1effet}}} {{effet2=@{trait2effet}}} {{effet3=@{trait3effet}}} {{relanceJet=[Relance !](~repeating_cac_repeatingd10GM)}} {{relanceJetdegat=[Relance dégât !](~repeating_cac_repeatingd10degatGM)}} {{name=@{character_name}}} {{action=attaque}} {{arme=@{armenom}}} {{DPS=[[@{degatcac}+@{constitution}]]}} {{enoire=[[@{degatenoire}]]}} {{quantiquecomp=[[@{degatquantique}]]}} {{quantique=[[{(@{degatquantique})d10}>8]]}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmaluscac}+{@cacflag}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmaluscac}-@{cacflag}]]}}"></button><br>
+                        <div class="trait"><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox1" name="attr_trait1flag"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox1enoire" name="attr_trait1flagenoire"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox1quantique" name="attr_trait1flagquantique"/>
+						<select class="input-info input-traitselect" name='attr_trait1'>
+						    <option value="-1" style="color:grey"></option>
+							<option value="0">Choc</option>
+						    <option value="1">Complexe</option>
+							<option value="2">Encombrant</option>
+							<option value="3">Energie noire</option>
+							<option value="4">Limité</option>
+							<option value="5">Long</option>
+							<option value="6">Longue portée</option>
+							<option value="7">Multiple</option>
+							<option value="8">Perforant</option>
+							<option value="9">Quantique</option>
+							<option value="10">Récurrent</option>
+							<option value="11">Tranchant</option>
+						</select>
+						<input type="text" name="attr_trait1effet" value="" style="display:none;"/>
+						<input type="text" class="input-info input-traitvalue input-traitvalue1" name="attr_trait1value" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue1enoire" name="attr_degatenoire" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue1quantique" name="attr_degatquantique" value="0"/></div>
+						<div class="trait"><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox2" name="attr_trait2flag"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox2enoire" name="attr_trait2flagenoire"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox2quantique" name="attr_trait2flagquantique"/>
+						<select class="input-info input-traitselect" name='attr_trait2'>
+						    <option value="-1" style="color:grey"></option>
+							<option value="0">Choc</option>
+						    <option value="1">Complexe</option>
+							<option value="2">Encombrant</option>
+							<option value="3">Energie noire</option>
+							<option value="4">Limité</option>
+							<option value="5">Long</option>
+							<option value="6">Longue portée</option>
+							<option value="7">Multiple</option>
+							<option value="8">Perforant</option>
+							<option value="9">Quantique</option>
+							<option value="10">Récurrent</option>
+							<option value="11">Tranchant</option>
+						</select>
+						<input type="text" name="attr_trait2effet" value="" style="display:none;"/>
+						<input type="text" class="input-info input-traitvalue input-traitvalue2" name="attr_trait2value" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue2enoire" name="attr_degatenoire" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue2quantique" name="attr_degatquantique" value="0"/></div>
+						<div class="trait"><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox3" name="attr_trait3flag"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox3enoire" name="attr_trait3flagenoire"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox3quantique" name="attr_trait3flagquantique"/>
+						<select class="input-info input-traitselect" name='attr_trait3'>
+						    <option value="-1" style="color:grey"></option>
+							<option value="0">Choc</option>
+						    <option value="1">Complexe</option>
+							<option value="2">Encombrant</option>
+							<option value="3">Energie noire</option>
+							<option value="4">Limité</option>
+							<option value="5">Long</option>
+							<option value="6">Longue portée</option>
+							<option value="7">Multiple</option>
+							<option value="8">Perforant</option>
+							<option value="9">Quantique</option>
+							<option value="10">Récurrent</option>
+							<option value="11">Tranchant</option>
+						</select>
+						<input type="text" name="attr_trait3effet" value="" style="display:none;"/>
+						<input type="text" class="input-info input-traitvalue input-traitvalue3" name="attr_trait3value" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue3enoire" name="attr_degatenoire" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue3quantique" name="attr_degatquantique" value="0"/></div>
                     </div>
 				</div>
                 </fieldset>
@@ -423,8 +589,9 @@
                 </div>					
 			</div>
 			<div class="CHtotalBM">
-                <span class="CHdescription CHdescriptionbonusmalus">Total bonus/malus en attaque au contact</span><input type="text" class="CHbonusmalus CHbonusmalusdsbl" name="attr_CHbonusmalusCAC" disabled="disabled" value="@{attaqueprepare}+@{jetesol}-(@{conditions}+@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue})+@{CHbonusmalus}"/></button><br>
-                <span class="CHdescription CHdescriptionbonusmalus">Total bonus/malus en attaque au tir</span><input type="text" class="CHbonusmalus CHbonusmalusdsbl" name="attr_CHbonusmalusTIR" disabled="disabled" value="@{attaqueprepare}-(@{couvert}+@{conditions}+@{porte}+@{jetesol}+@{utilisecouvert}+@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue})+@{CHbonusmalus}"/></button>							
+				<span class="CHdescription CHdescriptionbonusmalustitle">Total bonus/malus en attaque</span><br>
+                <span class="CHdescription CHdescriptionbonusmalus">Contact</span><input type="text" class="CHbonusmalus CHbonusmalusdsbl" name="attr_CHbonusmalusCAC" disabled="disabled" value="@{attaqueprepare}+@{jetesol}-(@{conditions}+@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue})+@{CHbonusmalus}"/></button>
+			    <span class="CHdescription CHdescriptionbonusmalus">Tir</span><input type="text" class="CHbonusmalus CHbonusmalusdsbl" name="attr_CHbonusmalusTIR" disabled="disabled" value="@{attaqueprepare}-(@{couvert}+@{conditions}+@{porte}+@{jetesol}+@{utilisecouvert}+@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue})+@{CHbonusmalus}"/></button>							
 			</div>
 		</div>			
 </div>
@@ -438,69 +605,69 @@
 	<div class="sheet-section-gen">
         <div class="sheet-identity">
 		    <div class="sheet-identity-gauche">
-			    <input type="text" style="width:320px" class="info infogrostitre" value="LIVRET DE CITOYEN" disabled="disabled"><br>
-			    <input type="text" style="width:70px" class="info" value="MÉMO A" disabled="disabled"/><br>
-			    <input type="text" style="width:180px" class="info" value="FICHE GÉNÉRALE P14" disabled="disabled"/><br>
-			    <input type="text" style="width:120px;margin-top:60px;" class="info infotitre" value="IDENTITÉ" disabled="disabled"/><br>
-			    <input type="text" style="width:95px" class="info" value="MATRICULE:" disabled="disabled"/><input type="text" class="input-info-id" value="4251352-1246627" disabled="disabled"/><br>
-			    <input type="text" style="width:160px" class="info" value="NOM DE NAISSANCE:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_nom" data-i18n-placeholder="aremplir-p"/><br>
-			    <input type="text" style="width:115px" class="info" value="NOM D'USAGE:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_nomusage" data-i18n-placeholder="aremplir-p"/><br>
-			    <input type="text" style="width:80px" class="info" value="PRÉNOMS:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_prenoms" data-i18n-placeholder="aremplir-p"/><br>
-                <input type="text" style="width:165px" class="info" value="DATE DE NAISSANCE:" disabled="disabled"/><input type="text" class="input-info-id" value="3-241-74K523L" disabled="disabled"/><br>
-                <input type="text" style="width:165px" class="info" value="LIEU DE NAISSANCE:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_lieunaissance" data-i18n-placeholder="aremplir-p"/><br>
-			    <input type="text" style="width:105px" class="info" value="ASCENDANCE:" disabled="disabled"/><br>
+			    <input type="text"  class="info infogrostitre" value="LIVRET DE CITOYEN" disabled="disabled"><br>
+			    <input type="text" style="width:60px" class="info" value="MÉMO A" disabled="disabled"/><br>
+			    <input type="text" style="width:170px" class="info" value="FICHE GÉNÉRALE P14" disabled="disabled"/><br>
+			    <input type="text" style="width:110px;margin-top:60px;" class="info infotitre" value="IDENTITÉ" disabled="disabled"/><br>
+			    <input type="text" style="width:85px" class="info" value="MATRICULE:" disabled="disabled"/><input type="text" class="input-info-id" value="4251352-1246627" disabled="disabled"/><br>
+			    <input type="text" style="width:145px" class="info" value="NOM DE NAISSANCE:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_nom" data-i18n-placeholder="aremplir-p"/><br>
+			    <input type="text" style="width:105px" class="info" value="NOM D'USAGE:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_nomusage" data-i18n-placeholder="aremplir-p"/><br>
+			    <input type="text" style="width:70px" class="info" value="PRÉNOMS:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_prenoms" data-i18n-placeholder="aremplir-p"/><br>
+                <input type="text" style="width:155px" class="info" value="DATE DE NAISSANCE:" disabled="disabled"/><input type="text" class="input-info-id" value="3-241-74K523L" disabled="disabled"/><br>
+                <input type="text" style="width:155px" class="info" value="LIEU DE NAISSANCE:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_lieunaissance" data-i18n-placeholder="aremplir-p"/><br>
+			    <input type="text" style="width:95px" class="info" value="ASCENDANCE:" disabled="disabled"/><br>
 			    <textarea type="text" style="height:40px" class="input-infobloc-id" name="attr_ascendance" data-i18n-placeholder="aremplir-p"></textarea><br>
-                <input type="text" style="width:115px" class="info" value="DESCENDANCE:" disabled="disabled"/><br>
+                <input type="text" style="width:105px" class="info" value="DESCENDANCE:" disabled="disabled"/><br>
 			    <textarea type="text" style="height:40px" class="input-infobloc-id" name="attr_descendance" data-i18n-placeholder="aremplir-p"></textarea><br>
-			    <input type="text" style="width:140px" class="info" value="STATUT MARITAL:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_statutmarital" data-i18n-placeholder="aremplir-p"/><br>
-			    <input type="text" style="width:210px" class="info" value="ANNEXE DE RATTACHEMENT:" disabled="disabled"/><br>
+			    <input type="text" style="width:130px" class="info" value="STATUT MARITAL:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_statutmarital" data-i18n-placeholder="aremplir-p"/><br>
+			    <input type="text" style="width:200px" class="info" value="ANNEXE DE RATTACHEMENT:" disabled="disabled"/><br>
 			    <textarea type="text" style="height:40px" class="input-infobloc-id" name="attr_annexerattachement" data-i18n-placeholder="aremplir-p"></textarea><br>
-			    <input type="text" style="width:265px" class="info" value="LIEU DE RÉSIDENCE ET ADRESSE:" disabled="disabled"/><br>
+			    <input type="text" style="width:255px" class="info" value="LIEU DE RÉSIDENCE ET ADRESSE:" disabled="disabled"/><br>
                 <textarea type="text" style="height:55px" class="input-infobloc-id" name="attr_adresse" data-i18n-placeholder="aremplir-p"></textarea><br>
-			    <input type="text" style="width:300px;margin-top:20px;" class="info infotitre"value="EFFORT ET CONTRIBUTION" disabled="disabled"/><br>
-			    <input type="text" style="width:195px" class="info" value="MINISTÈRE DE TUTELLE:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_ministeretutelle" data-i18n-placeholder="aremplir-p"/><br>
-                <input type="text" style="width:120px" class="info" value="POSTE OCCUPÉ:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_poste" data-i18n-placeholder="aremplir-p"/><br>
-                <input type="text" style="width:200px" class="info" value="ÉLÉMENTS DE CARRIÈRE:" disabled="disabled"/><br>
+			    <input type="text" style="width:290px;margin-top:35px;" class="info infotitre"value="EFFORT ET CONTRIBUTION" disabled="disabled"/><br>
+			    <input type="text" style="width:175px" class="info" value="MINISTÈRE DE TUTELLE:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_ministeretutelle" data-i18n-placeholder="aremplir-p"/><br>
+                <input type="text" style="width:110px" class="info" value="POSTE OCCUPÉ:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_poste" data-i18n-placeholder="aremplir-p"/><br>
+                <input type="text" style="width:190px" class="info" value="ÉLÉMENTS DE CARRIÈRE:" disabled="disabled"/><br>
 			    <textarea type="text" style="height:50px" class="input-infobloc-id" name="attr_carriere" data-i18n-placeholder="aremplir-p"></textarea><br>
 			</div> 
 			<div class="sheet-identity-droite">
-			    <input type="text" style="width:260px;margin-left:130px;" class="info" value="DIRECTION DE LA COORDINATION" disabled="disabled"/><br>
-			    <input type="text" style="width:230px;margin-left:130px;" class="info" value="SÉRIE 3-K-001-PG-*25K845P"/ disabled="disabled"><br>
-			    <input type="text" style="width:55px;margin-left:130px;" class="info" value="BLOC:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_bloc" data-i18n-placeholder="aremplir-p"/><br>
-			    <input type="text" style="width:70px;margin-left:130px;" class="info" value="CLASSE:" disabled="disabled"/><input type="text" class="input-info-id"  value="22C" disabled="disabled"/><br>
-			    <input type="text" style="width:180px;margin-top:50px;" class="info infotitre" value="SIGNALEMENT" disabled="disabled"/><br>
-			    <input type="text" style="width:70px;margin-top:270px;" class="info" value="TAILLE:" disabled="disabled"/><input style="margin-top:270px;" type="text" class="input-info-id" name="attr_tailleid" data-i18n-placeholder="aremplir-p"/><br>
-		        <input type="text" style="width:160px" class="info" value="COULEUR DES YEUX:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_couleuryeux" data-i18n-placeholder="aremplir-p"/><br>
-			    <input type="text" style="width:185px" class="info" value="SIGNES PARTICULIERS:" disabled="disabled"/><br>
+			    <input type="text" style="width:250px;margin-left:170px;" class="info" value="DIRECTION DE LA COORDINATION" disabled="disabled"/><br>
+			    <input type="text" style="width:220px;margin-left:170px;" class="info" value="SÉRIE 3-K-001-PG-*25K845P"/ disabled="disabled"><br>
+			    <input type="text" style="width:45px;margin-left:170px;" class="info" value="BLOC:" disabled="disabled"/><input type="text" class="input-info-id" style="width:150px;" name="attr_bloc" data-i18n-placeholder="aremplir-p"/><br>
+			    <input type="text" style="width:60px;margin-left:170px;" class="info" value="CLASSE:" disabled="disabled"/><input type="text" class="input-info-id" style="width:150px;"  value="22C" disabled="disabled"/><br>
+			    <input type="text" style="width:170px;margin-top:50px;" class="info infotitre" value="SIGNALEMENT" disabled="disabled"/><br>
+			    <input type="text" style="width:65px;margin-top:275px;" class="info" value="TAILLE:" disabled="disabled"/><input style="margin-top:270px;" type="text" class="input-info-id" name="attr_tailleid" data-i18n-placeholder="aremplir-p"/><br>
+		        <input type="text" style="width:145px" class="info" value="COULEUR DES YEUX:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_couleuryeux" data-i18n-placeholder="aremplir-p"/><br>
+			    <input type="text" style="width:175px" class="info" value="SIGNES PARTICULIERS:" disabled="disabled"/><br>
 			    <textarea type="text" style="height:80px" class="input-infobloc-id" name="attr_signesparti" data-i18n-placeholder="aremplir-p"></textarea><br>
-			    <input type="text" style="width:120px;margin-top:15px;" class="info infotitre" value="SECURITÉ" disabled="disabled"/><br>
-			    <input type="text" style="width:130px" class="info" value="AUTORISATIONS:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_autori" data-i18n-placeholder="aremplir-p"/><br>
-			    <input type="text" style="width:175px" class="info" value="SÉJOURS EXTRA-BLOC:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_sejours" data-i18n-placeholder="aremplir-p"/><br>
-			    <input type="text" style="width:210px" class="info" value="SIGNALEMENTS(SÉCURITÉ):" disabled="disabled"/>
+			    <input type="text" style="width:110px;margin-top:15px;" class="info infotitre" value="SECURITÉ" disabled="disabled"/><br>
+			    <input type="text" style="width:120px" class="info" value="AUTORISATIONS:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_autori" data-i18n-placeholder="aremplir-p"/><br>
+			    <input type="text" style="width:165px" class="info" value="SÉJOURS EXTRA-BLOC:" disabled="disabled"/><input type="text" class="input-info-id" name="attr_sejours" data-i18n-placeholder="aremplir-p"/><br>
+			    <input type="text" style="width:200px" class="info" value="SIGNALEMENTS(SÉCURITÉ):" disabled="disabled"/>
 				<input style="display:none" type="checkbox" class="idsecuriteflg idsecuriteflgneant" name="attr_idsecuriteneantflg"/><span class="idsecurite idsecuriteneant">Néant</span>
                 <input style="display:none" type="checkbox" class="idsecuriteflg idsecuriteflgsignale" name="attr_idsecuritesignaleflg"/><span class="idsecurite idsecuritesignale" data-i18n-title="idsignale-t">Signalé</span>
 				<input style="display:none" type="checkbox" class="idsecuriteflg idsecuriteflgrecherche" name="attr_idsecuriterechercheflg"/><span class="idsecurite idsecuriterecherche" data-i18n-title="idrecherche-t">Criminel</span>
 				<input style="display:none" type="checkbox" class="idsecuriteflg idsecuriteflgpourchasse" name="attr_idsecuritepourchasseflg"/><span class="idsecurite idsecuritepourchasse" data-i18n-title="idpourchasse-t">Ennemi public</span><br>
-			    <input type="text" style="width:210px" class="info" value="SIGNALEMENTS(HARMONIE):" disabled="disabled"/>
+			    <input type="text" style="width:200px" class="info" value="SIGNALEMENTS(HARMONIE):" disabled="disabled"/>
 				<input style="display:none" type="checkbox" class="idharmonieflg idharmonieflgneant" name="attr_idharmonieneantflg"/><span class="idharmonie idharmonieneant">Néant</span>
                 <input style="display:none" type="checkbox" class="idharmonieflg idharmonieflgteinte" name="attr_idharmonieteinteflg"/><span class="idharmonie idharmonieteinte" data-i18n-title="idteinte-t">Teinté</span>
 				<input style="display:none" type="checkbox" class="idharmonieflg idharmonieflgpossede" name="attr_idharmoniepossedeflg"/><span class="idharmonie idharmoniepossede" data-i18n-title="idpossede-t">Possédé</span>
 				<input style="display:none" type="checkbox" class="idharmonieflg idharmonieflgcorrompu" name="attr_idharmoniecorrompuflg"/><span class="idharmonie idharmoniecorrompu" data-i18n-title="idcorrompu-t">Corrompu</span><br>
-				<input type="text" style="width:180px;font-size:13px;" class="info" value="1er trait de noirceur:" disabled="disabled"/><select class="selectid selectidtraitnoirceur" name='attr_idtraitnoirceur1' data-i18n-title="idtraitnoirceur-t">
+				<input type="text" style="width:190px;font-size:13px;" class="info" value="1er trait de noirceur:" disabled="disabled"/><select class="selectid selectidtraitnoirceur" name='attr_idtraitnoirceur1' data-i18n-title="idtraitnoirceur-t">
 			        <option value="0">Néant</option>
                     <option value="1" data-i18n-title="idviolence-t">Violence</option>
 					<option value="2" data-i18n-title="idmalaise-t">Malaise</option>
 					<option value="3" data-i18n-title="idHallucinations-t">Hallucinations</option>
 					<option value="4" data-i18n-title="idMauvaispenchants-t">Mauvais penchants</option>
                 </select><br>
-				<input type="text" style="width:180px;font-size:13px;" class="info" value="2ème trait de noirceur:" disabled="disabled"/><select class="selectid selectidtraitnoirceur" name='attr_idtraitnoirceur2' data-i18n-title="idtraitnoirceur-t">
+				<input type="text" style="width:190px;font-size:13px;" class="info" value="2ème trait de noirceur:" disabled="disabled"/><select class="selectid selectidtraitnoirceur" name='attr_idtraitnoirceur2' data-i18n-title="idtraitnoirceur-t">
 			        <option value="0">Néant</option>
                     <option value="1" data-i18n-title="idviolence-t">Violence</option>
 					<option value="2" data-i18n-title="idmalaise-t">Malaise</option>
 					<option value="3" data-i18n-title="idHallucinations-t">Hallucinations</option>
 					<option value="4" data-i18n-title="idMauvaispenchants-t">Mauvais penchants</option>
                 </select><br>
-				<input type="text" style="width:180px;font-size:13px;" class="info" value="3ème trait de noirceur:" disabled="disabled"/><select class="selectid selectidtraitnoirceur" name='attr_idtraitnoirceur3' data-i18n-title="idtraitnoirceur-t">
+				<input type="text" style="width:190px;font-size:13px;" class="info" value="3ème trait de noirceur:" disabled="disabled"/><select class="selectid selectidtraitnoirceur" name='attr_idtraitnoirceur3' data-i18n-title="idtraitnoirceur-t">
 			        <option value="0">Néant</option>
                     <option value="1" data-i18n-title="idviolence-t">Violence</option>
 					<option value="2" data-i18n-title="idmalaise-t">Malaise</option>
@@ -513,10 +680,10 @@
 		<div class="sheet-identityprivate">
 		    <div class="confidentiel"></div>
 		    <div class="identityprivatevcontent">
-                <input type="text" class="infoprivate" value="NOM DU JOUEUR:" style="width:120px"/><input type="text" class="input-info-idprivate" name="attr_nomjoueur" data-i18n-placeholder="aremplir-p"/><br>
-                <input type="text" class="infoprivate"value="CABALE:" style="width:70px"/><input type="text" class="input-info-idprivate" name="attr_cabale" data-i18n-placeholder="aremplir-p" /><br>
-				<input type="text" class="infoprivate"value="POIDS:" style="width:60px"/><input type="text" class="input-info-idprivate" name="attr_poids" data-i18n-placeholder="aremplir-p" /><br>
-				<input type="text" class="infoprivate"value="ARMES CONNUES:" style="width:125px"/><br>
+                <input type="text" class="infoprivate" value="NOM DU JOUEUR:" style="width:101px" disabled="true"/><input type="text" class="input-info-idprivate" name="attr_nomjoueur" data-i18n-placeholder="aremplir-p"/><br>
+                <input type="text" class="infoprivate" value="CABALE:" style="width:54px" disabled="true"/><input type="text" class="input-info-idprivate" name="attr_cabale" data-i18n-placeholder="aremplir-p" /><br>
+				<input type="text" class="infoprivate" value="POIDS:" style="width:47px" disabled="true"/><input type="text" class="input-info-idprivate" name="attr_poids" data-i18n-placeholder="aremplir-p" /><br>
+				<input type="text" class="infoprivate" value="ARMES CONNUES:" style="width:125px" disabled="true"/><br>
 				<textarea type="text" class="input-info-idprivatebloc" name="attr_armesconnues" data-i18n-placeholder="aremplir-p"></textarea>
 			</div>
 		</div>
@@ -538,8 +705,8 @@
 		        <option value="0">Non actif</option>
                     <option value="1" style="color:red">Traumatisé !</option><br>
                 </select>
-			    <label class="malusname namefatigue">Fatigue</label>
-			    <select class="malus malusfatigue" name='attr_malusfatigue'>
+			    <label class="malusname namefatigue" data-i18n-title="fatigue-t">Fatigue</label>
+			    <select class="malus malusfatigue" name='attr_malusfatigue' data-i18n-title="fatigue-t">
 			        <option value="0">Non actif</option>
                     <option value="1" style="color:red">Fatigué !</option>
                 </select>
@@ -553,8 +720,8 @@
 			        <option value="0">Non actif</option>
                     <option value="1" style="color:red">Blessé grave !</option><br>
                 </select>
-			    <label class="malusname namearrestation">Arrestation</label>
-			    <select class="malus malusarrestation" name='attr_malusarrestation'>
+			    <label class="malusname namearrestation" data-i18n-title="arrestation-t">Arrestation</label>
+			    <select class="malus malusarrestation" name='attr_malusarrestation' data-i18n-title="arrestation-t">
 			        <option value="0">Non actif</option>
                     <option value="1" style="color:red">Arrêté !</option>
                </select>
@@ -669,7 +836,7 @@
 		    <div class="points-vecu">
 			    <div class="caracteristique-backtitle2"></div>
 			    <label class="points-title" data-i18n="vecu-u"data-i18n-title="vecu-t">Vécu</label><br>
-				<div class="points-content">
+				<div class="points-content points-content-vecu">
                     <select class="points-select" name='attr_pointsvecu'>
 						<option value="0">0</option>
                         <option value="1">1</option>
@@ -681,7 +848,7 @@
 						<option value="7">7</option>
 						<option value="8">8</option>
                     </select>
-                    <span class="points-slash">/</span>
+                    <span class="points-slash points-slash-vecu">/</span>
                     <select class="points-select-max" name='attr_pointsvecumax'>
 						<option value="0">0</option>
                         <option value="1">1</option>
@@ -871,115 +1038,212 @@
 	
    <!-- Tab possessions -->
     <div class="sheet-section-equip">
-	    <div class="tab-contacts">
-	        <div class="contacts-title"><label class="contacts-title-label" data-i18n="CONTACTS-u">CONTACTS</label></div> 
-			<div class="contacts-th">
-                <span style="width:250px;text-align:center" class="input-info header-equip" data-i18n="Description-u"></span>
-				<span class="input-info header-equip-contact" data-i18n="faveur-u"></span>
-				<span class="input-info header-equip-contact"  data-i18n="faveurmax-u"></span>
-			</div>
-			<fieldset class="repeating_contacts" name="repeating_contacts">
-                <input type="text" style="width:250px;font-size:16px;margin-bottom:3px;" class="input-info input-infocontacts" name="attr_contact-nom"  data-i18n-placeholder="Name-p"/>
-				<input type="text" style="text-align:center;" class="inputcontact" name="attr_contactsfaveur" value="0"/>
-			    <input style="text-align:center;" class="inputcontact" name="attr_contactsfaveur_max" value="0+@{contacts}*2" disabled="true"/>
-			</fieldset>
+	    <div class="contactarmorCC">
+		    <input type="checkbox" class="contactsindex" name="attr_contactsindex" style="display:none;"/>
+			<input type="checkbox" class="contacts0" name="attr_contacts0" style="display:none;"  checked="true"/>
+	        <div class="tab-contacts">
+	            <div class="contacts-title"><label class="contacts-title-label" data-i18n="CONTACTS-u">CONTACTS</label></div> 
+			    <div class="contacts-th">
+                    <span style="width:250px;text-align:center" class="input-info header-equip" data-i18n="Description-u"></span>
+				    <span class="input-info header-equip-contact" data-i18n="faveur-u"></span>
+				    <span class="input-info header-equip-contact"  data-i18n="faveurmax-u"></span>
+			    </div>
+			    <fieldset class="repeating_contacts" name="repeating_contacts">
+                    <input type="text" style="width:250px;font-size:16px;margin-bottom:3px;" class="input-info input-infocontacts" name="attr_contact-nom"  data-i18n-placeholder="Name-p"/>
+				    <input type="text" style="text-align:center;" class="inputcontact" name="attr_contactsfaveur" value="0"/>
+			        <input style="text-align:center;" class="inputcontact" name="attr_contactsfaveur_max" value="@{contacts}*2" disabled="true"/>
+			    </fieldset>
+	        </div>
+		    <div class="tab-armure">
+	            <div class="armure-title"><label class="armure-title-label" data-i18n="armure-u">ARMURE</label></div> 
+			    <div class="armure-th">
+                    <span style="width:250px;text-align:center" class="input-info header-equip" data-i18n="Description-u"></span> 
+                    <span style="width:65px;text-align:center" class="input-info header-equip-armure" data-i18n="armurepts-u"></span>				
+				    <span style="width:65px;text-align:center" class="input-info header-equip-armure" data-i18n="defense-u"></span>
+			    </div>
+                <input style="width:250px;font-size:16px;margin-bottom:3px;" type="text" class="input-info input-infoarmure" name="attr_contact-nom"  data-i18n-placeholder="Name-p"/>
+		        <input value="0" type="text" style="text-align:center;" class="inputarmure" name='attr_armure'/>
+		        <input type="text" style="text-align:center;" class="inputarmure" name='attr_armureconst' type="text" value="@{armure}+@{constitution}" disabled="disabled"/>
+	        </div>
+			<input type="checkbox" class="cac0" name="attr_cac0" style="display:none;" checked="true"/>
+		    <div class="tab-cac">
+                <div class="cac-title"><label class="cac-title-label" data-i18n="cac-u">ARMES DE CONTACT</label></div> 
+				<div class="cac-th">
+                    <span style="width:215px;" class="input-info header-equip" data-i18n="Description-u">Description</span>
+				    <span style="width:55px;" class="input-info header-equip-armure" data-i18n="dps-u">DPS</span> 
+                    <span style="width:70px;" class="input-info header-equip-armure2" data-i18n="armetalent-u">Talent</span>              
+                    <span style="width:40px;" class="input-info header-equip-roll"></span> 
+                </div> 
+				<div class="cac-all-mainsnues">
+				    <div class="cac-gauche">
+                        <input type="text" class="input-info inputarmenom" name="attr_armenom-mainsnues" value="Mains nues" disabled="true"/><br>
+                        <TEXTAREA class="armeinfo armeinfo-mainsnues" name="attr_armeinfo-mainsnues" disabled="true">Pieds, poings et même coup de tête</textarea>
+					</div>
+					<div class="cac-droite">
+					    <input value="[[@{constitution}+1]]" style="text-align:center" type="text" class="input-degat" name="attr_degatcac-mainsnues" disabled="true"/>            
+                        <input type="checkbox" class="input-talent" name="attr_cactalent-mainsnues" checked disabled="true" data-i18n-title="talent-t"/>							
+                        <button type="roll" class="input-jetdps" value="&{template:noc-attaque} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=attaque}} {{arme=ses mains nues}} {{DPS=[[@{degatcac-mainsnues}+@{constitution}]]}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmaluscac}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmaluscac}]]}}"></button><br>
+                    </div>
+				</div>
+                <fieldset class="repeating_cac">
+				<div class="cac-all">
+				    <div class="cac-gauche">
+                        <input type="text" class="input-info inputarmenom" name="attr_armenom" data-i18n-placeholder="Name-u"/><br>
+                        <TEXTAREA class="armeinfo" name="attr_armeinfo" data-i18n-placeholder="Description-u"></textarea>
+					</div>
+					<div class="cac-droite">
+					    <input value="0" style="text-align:center" type="text" class="input-degat" name="attr_degatcac"/>            
+                        <input type="checkbox" class="input-talent" name="attr_cactalent" data-i18n-title="talent-t"/>
+                        <input style="display:none" type="number" class="input-talentflag" name="attr_cacflag" value="0"/>
+                        <button style="display:none" type="roll" class="CHd10" name="roll_repeatingd10" value="&{template:noc-relance} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=relance un D10 !}} {{result=[[{1d10}>8]]}}"></button>
+                        <button style="display:none" type="roll" class="CHd10" name="roll_repeatingd10degat" value="&{template:noc-relancedegat} {{relanceJetdegat=[Relance dégât !](~repeating_cac_repeatingd10degat)}} {{name=@{character_name}}} {{action=relance dégâts !}} {{result=[[{1d10}>8]]}}"></button>						
+                        <button type="roll" class="input-jetdps" value="&{template:noc-attaque} {{effet1=@{trait1effet}}} {{effet2=@{trait2effet}}} {{effet3=@{trait3effet}}} {{relanceJet=[Relance !](~repeating_cac_repeatingd10)}} {{relanceJetdegat=[Relance dégât !](~repeating_cac_repeatingd10degat)}} {{name=@{character_name}}} {{action=attaque}} {{arme=@{armenom}}} {{DPS=[[@{degatcac}+@{constitution}]]}} {{enoire=[[@{degatenoire}]]}} {{quantiquecomp=[[@{degatquantique}]]}} {{quantique=[[{(@{degatquantique})d10}>8]]}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmaluscac}+{@cacflag}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmaluscac}-@{cacflag}]]}}"></button><br>
+                        <div class="trait"><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox1" name="attr_trait1flag"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox1enoire" name="attr_trait1flagenoire"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox1quantique" name="attr_trait1flagquantique"/>
+						<select class="input-info input-traitselect" name='attr_trait1'>
+						    <option value="-1" style="color:grey"></option>
+							<option value="0">Choc</option>
+						    <option value="1">Complexe</option>
+							<option value="2">Encombrant</option>
+							<option value="3">Energie noire</option>
+							<option value="4">Limité</option>
+							<option value="5">Long</option>
+							<option value="6">Longue portée</option>
+							<option value="7">Multiple</option>
+							<option value="8">Perforant</option>
+							<option value="9">Quantique</option>
+							<option value="10">Récurrent</option>
+							<option value="11">Tranchant</option>
+						</select>
+						<input type="text" name="attr_trait1effet" value="" style="display:none;"/>
+						<input type="text" class="input-info input-traitvalue input-traitvalue1" name="attr_trait1value" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue1enoire" name="attr_degatenoire" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue1quantique" name="attr_degatquantique" value="0"/></div>
+						<div class="trait"><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox2" name="attr_trait2flag"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox2enoire" name="attr_trait2flagenoire"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox2quantique" name="attr_trait2flagquantique"/>
+						<select class="input-info input-traitselect" name='attr_trait2'>
+						    <option value="-1" style="color:grey"></option>
+							<option value="0">Choc</option>
+						    <option value="1">Complexe</option>
+							<option value="2">Encombrant</option>
+							<option value="3">Energie noire</option>
+							<option value="4">Limité</option>
+							<option value="5">Long</option>
+							<option value="6">Longue portée</option>
+							<option value="7">Multiple</option>
+							<option value="8">Perforant</option>
+							<option value="9">Quantique</option>
+							<option value="10">Récurrent</option>
+							<option value="11">Tranchant</option>
+						</select>
+						<input type="text" name="attr_trait2effet" value="" style="display:none;"/>
+						<input type="text" class="input-info input-traitvalue input-traitvalue2" name="attr_trait2value" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue2enoire" name="attr_degatenoire" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue2quantique" name="attr_degatquantique" value="0"/></div>
+						<div class="trait"><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox3" name="attr_trait3flag"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox3enoire" name="attr_trait3flagenoire"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox3quantique" name="attr_trait3flagquantique"/>
+						<select class="input-info input-traitselect" name='attr_trait3'>
+						    <option value="-1" style="color:grey"></option>
+							<option value="0">Choc</option>
+						    <option value="1">Complexe</option>
+							<option value="2">Encombrant</option>
+							<option value="3">Energie noire</option>
+							<option value="4">Limité</option>
+							<option value="5">Long</option>
+							<option value="6">Longue portée</option>
+							<option value="7">Multiple</option>
+							<option value="8">Perforant</option>
+							<option value="9">Quantique</option>
+							<option value="10">Récurrent</option>
+							<option value="11">Tranchant</option>
+						</select>
+						<input type="text" name="attr_trait3effet" value="" style="display:none;"/>
+						<input type="text" class="input-info input-traitvalue input-traitvalue3" name="attr_trait3value" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue3enoire" name="attr_degatenoire" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue3quantique" name="attr_degatquantique" value="0"/></div>
+                    </div>
+				</div>
+                </fieldset>
+            </div>
 	    </div>
-		<div class="tab-armure">
-	        <div class="armure-title"><label class="armure-title-label" data-i18n="armure-u">ARMURE</label></div> 
-			<div class="armure-th">
-                <span style="width:250px;text-align:center" class="input-info header-equip" data-i18n="Description-u"></span> 
-                <span style="width:65px;text-align:center" class="input-info header-equip-armure" data-i18n="armurepts-u"></span>				
-				<span style="width:65px;text-align:center" class="input-info header-equip-armure" data-i18n="defense-u"></span>
-			</div>
-            <input style="width:250px;font-size:16px;margin-bottom:3px;" type="text" class="input-info input-infoarmure" name="attr_contact-nom"  data-i18n-placeholder="Name-p"/>
-		    <input value="0" type="text" style="text-align:center;" class="inputarmure" name='attr_armure'/>
-		    <input type="text" style="text-align:center;" class="inputarmure" name='attr_armureconst' type="text" value="@{armure}+@{constitution}" disabled="disabled"/>
-	    </div>
-		<div class="Combathelper">
-		    <div class="Combathelper-title"><label class="Combathelper-title-label" data-i18n="Combathelper-u">AIDE AU COMBAT</label></div> 
-		    <div class="CHdivbonusmalus">
-                <span class="CHdescription CHdescriptionBM">Ajouter Bonus/Malus</span><input value="0" type="text" class="CHbonusmalus" name="attr_CHbonusmalus"/>
-			</div>
-			<div class="CHdivjets">
-                <span class="CHdescription CHdescriptionroll">Initiative</span><button type="roll" class="CHinitiative" name="initiative" value="&{template:noc-comp} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=INITIATIVE}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action_max}]]}} {{skill=^{instinct-u}}} {{skill_num=[[@{instinct_max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{instinct|max} &{tracker}]]}}"></button>
-				<span class="CHdescription CHdescriptionroll">Esquive</span><button type="roll" class="CHesquive" name="esquive" value="&{template:noc-comp} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=tente d'esquiver}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action_max}]]}} {{skill=^{deplacement-u}}} {{skill_num=[[@{deplacement_max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{deplacement|max}-@{nbropposants}]]}}"></button>
-				<span class="CHdescription CHdescriptionroll">Parade</span><button type="roll" class="CHparade" name="parade" value="&{template:noc-comp} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=tente de parer}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action_max}]]}} {{skill=^{deplacement-u}}} {{skill_num=[[@{deplacement_max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{deplacement|max}-@{nbropposants}]]}}"></button>										
-				<span class="CHdescription CHdescriptionroll">Relance D10</span><button type="roll" class="CHd10" name="roll_d10" value="&{template:noc-relance} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=relance un D10 !}} {{result=[[{1d10}>8]]}}"></button>
-			</div>
-			<div class="CHdivcombobox">
-                <div>
-					<span class="CHdescription CHdescriptioncombobox">Portée</span>						
-					<select class="CHportee" name='attr_porte'>
-						<option value="-1">Bout portant</option>
-                        <option value="0">Portée courte</option>
-                        <option value="1">Portée moyenne</option>
-						<option value="2">Portée longue</option>
-                    </select>
-				</div>
-                <div>
-					<span class="CHdescription CHdescriptioncombobox">Opposants</span>
-					<select class="CHNombreopposants" name='attr_nbropposants'>
-                        <option value="0">1</option>
-                        <option value="1">2</option>
-					    <option value="2">3</option>
-                        <option value="3">4</option>
-					    <option value="4">5</option>
-                    </select>
-				</div>
-                <div>
-					<span class="CHdescription CHdescriptioncombobox">Couvert</span>
-					<select class="CHcouvert" name='attr_couvert'>
-						<option value="0">Aucun</option>
-						<option value="1">Faible</option>
-                        <option value="2">Fort</option>
-                    </select>
-				</div>
-                <div>
-					<span class="CHdescription CHdescriptioncombobox">Conditions</span>
-					<select class="CHconditions" name='attr_conditions'>
-						<option value="0">Claires</option>
-						<option value="1">Génantes</option>
-                        <option value="2">Épouvantables</option>
-                    </select>
-				</div>			
-			</div>	
-            <div class="CHdivcheckbox">
-				<div>
-                    <span class="CHdescription CHdescriptioncheckbox">Aversaire utilise son couvert</span>
-                    <select type="checkbox" class="CHcheckbox" name="attr_utilisecouvert">
-					    <option value="0">NON</option>
-						<option value="1">OUI</option>
-                    </select>
-                </div>
-				<div>					
-                    <span class="CHdescription CHdescriptioncheckbox">Attaque préparée</span>
-					<select type="checkbox" class="CHcheckbox" name="attr_attaqueprepare">
-						<option value="0">NON</option>
-						<option value="1">OUI</option>
-                    </select>
-                </div>
-				<div>					
-                    <span class="CHdescription CHdescriptioncheckbox">L'adversaire s'est jeté au sol</span>
-                    <select type="checkbox" class="CHcheckbox" name="attr_jetesol">
-						<option value="0">NON</option>
-						<option value="1">OUI</option>
-                    </select>
-                </div>					
-			</div>
-			<div class="CHtotalBM">
-                <span class="CHdescription CHdescriptionbonusmalus">Total bonus/malus en attaque au contact</span><input type="text" class="CHbonusmalus CHbonusmalusdsbl" name="attr_CHbonusmalusCAC" disabled="disabled" value="@{attaqueprepare}+@{jetesol}-(@{conditions}+@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue})+@{CHbonusmalus}"/></button><br>
-                <span class="CHdescription CHdescriptionbonusmalus">Total bonus/malus en attaque au tir</span><input type="text" class="CHbonusmalus CHbonusmalusdsbl" name="attr_CHbonusmalusTIR" disabled="disabled" value="@{attaqueprepare}-(@{couvert}+@{conditions}+@{porte}+@{jetesol}+@{utilisecouvert}+@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue})+@{CHbonusmalus}"/></button>							
-			</div>
-		</div>
-		<div class="divtircac">
+		<div class="divtirCH">
+		    <div class="Combathelper">
+		        <div class="Combathelper-title"><label class="Combathelper-title-label" data-i18n="Combathelper-u">AIDE AU COMBAT</label></div> 
+		        <div class="CHdivbonusmalus">
+                    <span class="CHdescription CHdescriptionBM">Ajouter Bonus/Malus</span><input value="0" type="text" class="CHbonusmalus" name="attr_CHbonusmalus"/>
+			    </div>
+			    <div class="CHdivjets">
+                    <span class="CHdescription CHdescriptionroll">Initiative</span><button type="roll" class="CHinitiative" name="initiative" value="&{template:noc-comp} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=INITIATIVE}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action_max}]]}} {{skill=^{instinct-u}}} {{skill_num=[[@{instinct_max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{instinct|max} &{tracker}]]}}"></button>
+				    <span class="CHdescription CHdescriptionroll">Esquive</span><button type="roll" class="CHesquive" name="esquive" value="&{template:noc-comp} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=tente d'esquiver}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action_max}]]}} {{skill=^{deplacement-u}}} {{skill_num=[[@{deplacement_max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{deplacement|max}-@{nbropposants}]]}}"></button>
+				    <span class="CHdescription CHdescriptionroll">Parade</span><button type="roll" class="CHparade" name="parade" value="&{template:noc-comp} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=tente de parer}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action_max}]]}} {{skill=^{deplacement-u}}} {{skill_num=[[@{deplacement_max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{deplacement|max}-@{nbropposants}]]}}"></button>										
+				   <span class="CHdescription CHdescriptionroll">Relance D10</span><button type="roll" class="CHd10" name="roll_d10" value="&{template:noc-relance} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=relance un D10 !}} {{result=[[{1d10}>8]]}}"></button>
+			    </div>
+			    <div class="CHdivcombobox">
+                    <div>
+					    <span class="CHdescription CHdescriptioncombobox">Portée</span>						
+					    <select class="CHportee" name='attr_porte'>
+						    <option value="-1">Bout portant</option>
+                            <option value="0">Portée courte</option>
+                            <option value="1">Portée moyenne</option>
+						    <option value="2">Portée longue</option>
+                        </select>
+				    </div>
+                    <div>
+					    <span class="CHdescription CHdescriptioncombobox">Opposants</span>
+					    <select class="CHNombreopposants" name='attr_nbropposants'>
+                            <option value="0">1</option>
+                            <option value="1">2</option>
+					        <option value="2">3</option>
+                            <option value="3">4</option>
+					        <option value="4">5</option>
+                        </select>
+				    </div>
+                    <div>
+					    <span class="CHdescription CHdescriptioncombobox">Couvert</span>
+					    <select class="CHcouvert" name='attr_couvert'>
+						    <option value="0">Aucun</option>
+						    <option value="1">Faible</option>
+                            <option value="2">Fort</option>
+                        </select>
+				    </div>
+                    <div>
+					    <span class="CHdescription CHdescriptioncombobox">Conditions</span>
+					    <select class="CHconditions" name='attr_conditions'>
+						    <option value="0">Claires</option>
+						    <option value="1">Génantes</option>
+                            <option value="2">Épouvantables</option>
+                        </select>
+				    </div>			
+			    </div>	
+                <div class="CHdivcheckbox">
+				    <div>
+                        <span class="CHdescription CHdescriptioncheckbox">Adversaire utilise son couvert</span>
+                        <select type="checkbox" class="CHcheckbox" name="attr_utilisecouvert">
+					        <option value="0">NON</option>
+						    <option value="1">OUI</option>
+                        </select>
+                    </div>
+				    <div>					
+                        <span class="CHdescription CHdescriptioncheckbox">Attaque préparée</span>
+					    <select type="checkbox" class="CHcheckbox" name="attr_attaqueprepare">
+						    <option value="0">NON</option>
+						    <option value="1">OUI</option>
+                        </select>
+                    </div>
+				    <div>					
+                        <span class="CHdescription CHdescriptioncheckbox">Adversaire s'est jeté au sol</span>
+                        <select type="checkbox" class="CHcheckbox" name="attr_jetesol">
+						    <option value="0">NON</option>
+						    <option value="1">OUI</option>
+                        </select>
+                    </div>					
+			    </div>
+			    <div class="CHtotalBM">
+				    <span class="CHdescription CHdescriptionbonusmalustitle">Total bonus/malus en attaque</span><br>
+                    <span class="CHdescription CHdescriptionbonusmalus">Contact</span><input type="text" class="CHbonusmalus CHbonusmalusdsbl" name="attr_CHbonusmalusCAC" disabled="disabled" value="@{attaqueprepare}+@{jetesol}-(@{conditions}+@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue})+@{CHbonusmalus}"/></button>
+					<span class="CHdescription CHdescriptionbonusmalus">Tir</span><input type="text" class="CHbonusmalus CHbonusmalusdsbl" name="attr_CHbonusmalusTIR" disabled="disabled" value="@{attaqueprepare}-(@{couvert}+@{conditions}+@{porte}+@{jetesol}+@{utilisecouvert}+@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue})+@{CHbonusmalus}"/></button>							
+			    </div>
+		    </div>
+			<input type="checkbox" class="tir0" name="attr_tir0" style="display:none;" checked="true"/>
             <div class="tab-tir">
                 <div class="tir-title"><label class="tir-title-label" data-i18n="tir-u">ARMES DE TIR</label></div> 
 				<div class="tir-th">
                     <span style="width:215px;" class="input-info header-equip" data-i18n="Description-u">Description</span>
-				    <span style="width:55px;" class="input-info header-equip-armure"data-i18n="dps-u">DPS</span> 
-				    <span style="width:55px;" class="input-info header-equip-armure"data-i18n="munitions-u">Mun</span>
-				    <span style="width:55px;" class="input-info header-equip-armure"data-i18n="munitionsmax-u">Mun max</span>
-                    <span style="width:70px;" class="input-info header-equip-armure2"data-i18n="armetalent-u">Talent</span>              
+				    <span style="width:55px;" class="input-info header-equip-armure" data-i18n="dps-u">DPS</span> 
+				    <span style="width:55px;" class="input-info header-equip-armure" data-i18n="munitions-u">Mun</span>
+				    <span style="width:55px;" class="input-info header-equip-armure" data-i18n="munitionsmax-u">Mun max</span>
+                    <span style="width:70px;" class="input-info header-equip-armure2" data-i18n="armetalent-u">Talent</span>              
                     <span style="width:40px;" class="input-info header-equip-roll"></span> 
                 </div> 
                 <fieldset class="repeating_projectiles">
@@ -992,56 +1256,73 @@
                         <input value="0" style="text-align:center" type="text" class="input-degat" name="attr_degattir"/>
                         <input value="0" style="text-align:center" type="text" class="input-munitions" name="attr_munitions"/>
 				        <input value="0" style="text-align:center" type="text" class="input-munitionsmax" name="attr_munitionsmax"/>             
-				        <input type="checkbox" class="input-talent" name="attr_tirtalent"/>
+				        <input type="checkbox" class="input-talent" name="attr_tirtalent" data-i18n-title="talent-t"/>
 					    <input style="display:none" type="number" class="input-talentflag" name="attr_tirflag" value="0"/>
 						<button style="display:none" type="roll" class="CHd10" name="roll_repeatingd10" value="&{template:noc-relance} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=relance un D10 !}} {{result=[[{1d10}>8]]}}"></button>
-                        <button type="roll" class="input-jetdps" value="&{template:noc-attaque} {{relanceJet=[Relance !](~repeating_tir_repeatingd10)}} {{name=@{character_name}}} {{action=tire}} {{arme=@{armenom}}} {{DPS=@{degattir}}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmalusTIR}+{@tirflag}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmalusTIR}-@{tirflag}]]}}"></button><br>
-                        <input type="text" class="input-info input-trait" name="attr_trait1" data-i18n-placeholder="trait-p"/><br>
-                        <input type="text" class="input-info input-trait" name="attr_trait2" data-i18n-placeholder="trait-p"/><br>
-                        <input type="text" class="input-info input-trait" name="attr_trait3" data-i18n-placeholder="trait-p"/>
-                    </div>
-				</div>
-                </fieldset>
-            </div>
-            <div class="tab-cac">
-                <div class="cac-title"><label class="cac-title-label" data-i18n="cac-u">ARMES DE CONTACT</label></div> 
-				<div class="cac-th">
-                    <span style="width:215px;" class="input-info header-equip" data-i18n="Description-u">Description</span>
-				    <span style="width:55px;" class="input-info header-equip-armure"data-i18n="dps-u">DPS</span> 
-                    <span style="width:70px;" class="input-info header-equip-armure2"data-i18n="armetalent-u">Talent</span>              
-                    <span style="width:40px;" class="input-info header-equip-roll"></span> 
-                </div> 
-				<div class="cac-all-mainsnues">
-				    <div class="cac-gauche">
-                        <input type="text" class="input-info inputarmenom" name="attr_armenom-mainsnues" value="Mains nues" disabled="true"/><br>
-                        <TEXTAREA class="armeinfo" name="attr_armeinfo-mainsnues" disabled="true">Pieds, poings et même coup de tête</textarea>
-					</div>
-					<div class="cac-droite">
-					    <input value="[[@{constitution}+1]]" style="text-align:center" type="text" class="input-degat" name="attr_degatcac-mainsnues" disabled="true"/>            
-                        <input type="checkbox" class="input-talent" name="attr_cactalent-mainsnues" checked disabled="true"/>							
-                        <button type="roll" class="input-jetdps" value="&{template:noc-attaque} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=attaque}} {{arme=ses mains nues}} {{DPS=[[@{degatcac-mainsnues}+@{constitution}]]}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmaluscac}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmaluscac}]]}}"></button><br>
-                    </div>
-				</div>
-                <fieldset class="repeating_cac">
-				<div class="cac-all">
-				    <div class="cac-gauche">
-                        <input type="text" class="input-info inputarmenom" name="attr_armenom" data-i18n-placeholder="Name-u"/><br>
-                        <TEXTAREA class="armeinfo" name="attr_armeinfo" data-i18n-placeholder="Description-u"></textarea>
-					</div>
-					<div class="cac-droite">
-					    <input value="0" style="text-align:center" type="text" class="input-degat" name="attr_degatcac"/>            
-                        <input type="checkbox" class="input-talent" name="attr_cactalent"/>
-                        <input style="display:none" type="number" class="input-talentflag" name="attr_cacflag" value="0"/>
-                        <button style="display:none" type="roll" class="CHd10" name="roll_repeatingd10" value="&{template:noc-relance} {{relanceJet=[Relance !](~d10)}} {{name=@{character_name}}} {{action=relance un D10 !}} {{result=[[{1d10}>8]]}}"></button>						
-                        <button type="roll" class="input-jetdps" value="&{template:noc-attaque} {{relanceJet=[Relance !](~repeating_cac_repeatingd10)}} {{name=@{character_name}}} {{action=attaque}} {{arme=@{armenom}}} {{DPS=[[@{degatcac}+@{constitution}]]}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmaluscac}+{@cacflag}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmaluscac}-@{cacflag}]]}}"></button><br>
-                        <input type="text" class="input-info input-trait" name="attr_trait4" data-i18n-placeholder="trait-p"/><br>
-                        <input type="text" class="input-info input-trait" name="attr_trait5" data-i18n-placeholder="trait-p"/><br>
-                        <input type="text" class="input-info input-trait" name="attr_trait6" data-i18n-placeholder="trait-p"/>
+						<button style="display:none" type="roll" class="CHd10" name="roll_repeatingd10degat" value="&{template:noc-relancedegat} {{relanceJetdegat=[Relance dégât !](~repeating_cac_repeatingd10degat)}} {{name=@{character_name}}} {{action=relance dégâts !}} {{result=[[{1d10}>8]]}}"></button>						
+                        <button type="roll" class="input-jetdps" value="&{template:noc-attaque} {{effet1=@{trait1effet}}} {{effet2=@{trait2effet}}} {{effet3=@{trait3effet}}} {{relanceJet=[Relance !](~repeating_tir_repeatingd10)}} {{relanceJetdegat=[Relance dégât !](~repeating_tir_repeatingd10degat)}} {{name=@{character_name}}} {{action=tire}} {{arme=@{armenom}}} {{DPS=@{degattir}}} {{enoire=[[@{degatenoire}]]}} {{quantiquecomp=[[@{degatquantique}]]}} {{quantique=[[{(@{degatquantique})d10}>8]]}} {{mod_num1=[[@{malustraumaleger}+@{malusblessleger}]]}} {{mod_num2=[[@{malustraumagrave}+@{malusblessgrave}+@{malusfatigue}]]}} {{mod_num3=[[@{CHbonusmalusTIR}+{@tirflag}]]}} {{attr=^{action-u}}} {{attr_num=[[@{action|max}]]}} {{skill=^{combat-u}}} {{skill_num=[[@{combat|max}]]}}  {{result=[[({(?{Combien de dés voulez-vous lancer ? (max=@{action|max})|0})d10}>8)+@{combat|max}-@{CHbonusmalusTIR}-@{tirflag}]]}}"></button><br>
+                        <div class="trait"><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox1" name="attr_trait1flag"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox1enoire" name="attr_trait1flagenoire"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox1quantique" name="attr_trait1flagquantique"/>
+						<select class="input-info input-traitselect" name='attr_trait1'>
+						    <option value="-1" style="color:grey"></option>
+							<option value="0">Choc</option>
+						    <option value="1">Complexe</option>
+							<option value="2">Encombrant</option>
+							<option value="3">Energie noire</option>
+							<option value="4">Limité</option>
+							<option value="5">Long</option>
+							<option value="6">Longue portée</option>
+							<option value="7">Multiple</option>
+							<option value="8">Perforant</option>
+							<option value="9">Quantique</option>
+							<option value="10">Récurrent</option>
+							<option value="11">Tranchant</option>
+						</select>
+						<input type="text" name="attr_trait1effet" value="" style="display:none;"/>
+						<input type="text" class="input-info input-traitvalue input-traitvalue1" name="attr_trait1value" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue1enoire" name="attr_degatenoire" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue1quantique" name="attr_degatquantique" value="0"/></div>
+						<div class="trait"><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox2" name="attr_trait2flag"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox2enoire" name="attr_trait2flagenoire"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox2quantique" name="attr_trait2flagquantique"/>
+						<select class="input-info input-traitselect" name='attr_trait2'>
+						    <option value="-1" style="color:grey"></option>
+							<option value="0">Choc</option>
+						    <option value="1">Complexe</option>
+							<option value="2">Encombrant</option>
+							<option value="3">Energie noire</option>
+							<option value="4">Limité</option>
+							<option value="5">Long</option>
+							<option value="6">Longue portée</option>
+							<option value="7">Multiple</option>
+							<option value="8">Perforant</option>
+							<option value="9">Quantique</option>
+							<option value="10">Récurrent</option>
+							<option value="11">Tranchant</option>
+						</select>
+						<input type="text" name="attr_trait2effet" value="" style="display:none;"/>
+						<input type="text" class="input-info input-traitvalue input-traitvalue2" name="attr_trait2value" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue2enoire" name="attr_degatenoire" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue2quantique" name="attr_degatquantique" value="0"/></div>
+						<div class="trait"><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox3" name="attr_trait3flag"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox3enoire" name="attr_trait3flagenoire"/><input type="checkbox" class="input-info input-traitcheckbox traitcheckbox3quantique" name="attr_trait3flagquantique"/>
+						<select class="input-info input-traitselect" name='attr_trait3'>
+						    <option value="-1" style="color:grey"></option>
+							<option value="0">Choc</option>
+						    <option value="1">Complexe</option>
+							<option value="2">Encombrant</option>
+							<option value="3">Energie noire</option>
+							<option value="4">Limité</option>
+							<option value="5">Long</option>
+							<option value="6">Longue portée</option>
+							<option value="7">Multiple</option>
+							<option value="8">Perforant</option>
+							<option value="9">Quantique</option>
+							<option value="10">Récurrent</option>
+							<option value="11">Tranchant</option>
+						</select>
+						<input type="text" name="attr_trait3effet" value="" style="display:none;"/>
+						<input type="text" class="input-info input-traitvalue input-traitvalue3" name="attr_trait3value" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue3enoire" name="attr_degatenoire" value="0"/><input type="text" class="input-info input-traitvalue input-traitvalue3quantique" name="attr_degatquantique" value="0"/></div>						
                     </div>
 				</div>
                 </fieldset>
             </div>
 		</div>
+		<input type="checkbox" class="equip01" name="attr_equip01" style="display:none;" checked="true"/>
+		<input type="checkbox" class="equip02" name="attr_equip02" style="display:none;" checked="true"/>
+		<input type="checkbox" class="equip03" name="attr_equip03" style="display:none;" checked="true"/>
         <div class="tab-equip">
             <div class="equip-title"><label class="equip-title-label" data-i18n="EQUIPMENTS-u">EQUIPMENT</label></div> 
             <div class="line-equip1">
@@ -1053,14 +1334,14 @@
 			</div> 
             <div class="line-equip2">
                 <span style="width:250px;" class="input-info header-equip" data-i18n="Description-u">Description</span> 
-                <fieldset class="repeating_equip" name="repeating_equip2">
+                <fieldset class="repeating_equip2" name="repeating_equip2">
                     <input type="text" class="input-info input-infoequip" name="attr_equip2-Description"  data-i18n-placeholder="Name-p"/><br>
                     <TEXTAREA class="equip-Effet" name='attr_equip2-Effet' data-i18n-placeholder="Description-u"></textarea>
                 </fieldset>
 			</div>
             <div class="line-equip3">
                 <span style="width:250px;" class="input-info header-equip" data-i18n="Description-u">Description</span> 
-                <fieldset class="repeating_equip" name="repeating_equip3">
+                <fieldset class="repeating_equip3" name="repeating_equip3">
                     <input type="text" class="input-info input-infoequip" name="attr_equip3-Description"  data-i18n-placeholder="Name-p"/><br>
                     <TEXTAREA class="equip-Effet" name='attr_equip3-Effet' data-i18n-placeholder="Description-u"></textarea>
                 </fieldset>
@@ -1077,7 +1358,350 @@
 </div>
 
 <script type="text/worker">
-on("sheet:opened change:bless1 change:bless2 change:bless3 change:bless4 change:bless5 change:bless6 change:bless7 change:bless8 change:bless9 change:bless10", function() {
+on("sheet:opened", function() {
+    getAttrs(["vie","erudition","technique","action","statut","ame","social","malustraumaleger","malusblessleger"], function(values) {
+        setAttrs({vie_max:parseInt(values.vie)+parseInt(values.malustraumaleger)+parseInt(values.malusblessleger)})
+		setAttrs({erudition_max:parseInt(values.erudition)+parseInt(values.malustraumaleger)+parseInt(values.malusblessleger)})
+		setAttrs({technique_max:parseInt(values.technique)+parseInt(values.malustraumaleger)+parseInt(values.malusblessleger)})
+		setAttrs({action_max:parseInt(values.action)+parseInt(values.malustraumaleger)+parseInt(values.malusblessleger)})
+		setAttrs({statut_max:parseInt(values.statut)+parseInt(values.malustraumaleger)+parseInt(values.malusblessleger)})
+		setAttrs({ame_max:parseInt(values.ame)+parseInt(values.malustraumaleger)+parseInt(values.malusblessleger)})
+		setAttrs({social_max:parseInt(values.social)+parseInt(values.malustraumaleger)+parseInt(values.malusblessleger)});
+    });
+});
+
+
+
+on("change:repeating_cac:trait1 change:repeating_cac:trait1value", function() {
+	getAttrs(["repeating_cac_trait1","repeating_cac_trait1value"], function(values) {
+	    setAttrs({repeating_cac_trait1flag:0});
+		setAttrs({repeating_cac_trait1flagenoire:0});
+		setAttrs({repeating_cac_trait1flagquantique:0});
+		setAttrs({repeating_cac_degatenoire:0});
+		setAttrs({repeating_cac_degatquantique:0});
+		switch (values.repeating_cac_trait1) {
+		case "0":
+		    setAttrs({repeating_cac_trait1effet:"(choc => 0 dégat)"});
+        break;	
+		case "3":
+		    setAttrs({repeating_cac_trait1flagenoire:"on"});
+        break;	
+		case "4":
+		    setAttrs({repeating_cac_trait1flag:"on"});
+        break;	
+		case "5":
+		    setAttrs({repeating_cac_trait1effet:"(arme longue => relance)"});
+        break;	
+		case "7":
+		    setAttrs({repeating_cac_trait1flag:"on"});
+			setAttrs({repeating_cac_trait1effet:"(" + values.repeating_cac_trait1value + " touches)"});
+        break;
+		case "8":
+		    setAttrs({repeating_cac_trait1effet:"(pas d'armure => min dégats 2)"});
+        break;
+        case "9":
+		    setAttrs({repeating_cac_trait1flagquantique:"on"});
+        break;
+        case "10":
+		    setAttrs({repeating_cac_trait1effet:"(blessures récurrentes)"});
+        break;			
+		case "11":
+		    setAttrs({repeating_cac_trait1effet:"(pas d'armure => min dégats 1)"});
+        break;		
+		}
+	});
+});
+
+on("change:repeating_cac:trait2 change:repeating_cac:trait2value", function() {
+	getAttrs(["repeating_cac_trait2","repeating_cac_trait2value"], function(values) {
+	    setAttrs({repeating_cac_trait2flag:0});
+		setAttrs({repeating_cac_trait2flagenoire:0});
+		setAttrs({repeating_cac_trait2flagquantique:0});
+		setAttrs({repeating_cac_degatenoire:0});
+		setAttrs({repeating_cac_degatquantique:0});
+		switch (values.repeating_cac_trait2) {
+		case "0":
+		    setAttrs({repeating_cac_trait2effet:"(choc => 0 dégat)"});
+        break;	
+		case "3":
+		    setAttrs({repeating_cac_trait2flagenoire:"on"});
+        break;	
+		case "4":
+		    setAttrs({repeating_cac_trait2flag:"on"});
+        break;	
+		case "5":
+		    setAttrs({repeating_cac_trait2effet:"(arme longue => relance)"});
+        break;	
+		case "7":
+		    setAttrs({repeating_cac_trait2flag:"on"});
+			setAttrs({repeating_cac_trait2effet:"(" + values.repeating_cac_trait2value + " touches)"});
+        break;
+		case "8":
+		    setAttrs({repeating_cac_trait2effet:"(pas d'armure => min dégats 2)"});
+        break;
+        case "9":
+		    setAttrs({repeating_cac_trait2flagquantique:"on"});
+        break;
+        case "10":
+		    setAttrs({repeating_cac_trait2effet:"(blessures récurrentes)"});
+        break;			
+		case "11":
+		    setAttrs({repeating_cac_trait2effet:"(pas d'armure => min dégats 1)"});
+        break;		
+		}
+	});
+});
+
+on("change:repeating_cac:trait3 change:repeating_cac:trait3value", function() {
+	getAttrs(["repeating_cac_trait3","repeating_cac_trait3value"], function(values) {
+	    setAttrs({repeating_cac_trait3flag:0});
+		setAttrs({repeating_cac_trait3flagenoire:0});
+		setAttrs({repeating_cac_trait3flagquantique:0});
+		setAttrs({repeating_cac_degatenoire:0});
+		setAttrs({repeating_cac_degatquantique:0});
+		switch (values.repeating_cac_trait3) {
+		case "0":
+		    setAttrs({repeating_cac_trait3effet:"(choc => 0 dégat)"});
+        break;	
+		case "3":
+		    setAttrs({repeating_cac_trait3flagenoire:"on"});
+        break;	
+		case "4":
+		    setAttrs({repeating_cac_trait3flag:"on"});
+        break;	
+		case "5":
+		    setAttrs({repeating_cac_trait3effet:"(arme longue => relance)"});
+        break;	
+		case "7":
+		    setAttrs({repeating_cac_trait3flag:"on"});
+			setAttrs({repeating_cac_trait3effet:"(" + values.repeating_cac_trait3value + " touches)"});
+        break;
+		case "8":
+		    setAttrs({repeating_cac_trait3effet:"(pas d'armure => min dégats 2)"});
+        break;
+        case "9":
+		    setAttrs({repeating_cac_trait3flagquantique:"on"});
+        break;
+        case "10":
+		    setAttrs({repeating_cac_trait3effet:"(blessures récurrentes)"});
+        break;			
+		case "11":
+		    setAttrs({repeating_cac_trait3effet:"(pas d'armure => min dégats 1)"});
+        break;		
+		}
+	});
+});
+
+on("change:repeating_projectiles:trait1 change:repeating_projectiles:trait1value", function() {
+	getAttrs(["repeating_projectiles_trait1","repeating_projectiles_trait1value"], function(values) {
+	    setAttrs({repeating_projectiles_trait1flag:0});
+		setAttrs({repeating_projectiles_trait1flagenoire:0});
+		setAttrs({repeating_projectiles_trait1flagquantique:0});
+		setAttrs({repeating_projectiles_degatenoire:0});
+		setAttrs({repeating_projectiles_degatquantique:0});
+		switch (values.repeating_projectiles_trait1) {
+		case "0":
+		    setAttrs({repeating_projectiles_trait1effet:"(choc => 0 dégat)"});
+        break;	
+		case "3":
+		    setAttrs({repeating_projectiles_trait1flagenoire:"on"});
+        break;	
+		case "4":
+		    setAttrs({repeating_projectiles_trait1flag:"on"});
+        break;	
+		case "5":
+		    setAttrs({repeating_projectiles_trait1effet:"(arme longue => relance)"});
+        break;	
+		case "7":
+		    setAttrs({repeating_projectiles_trait1flag:"on"});
+			setAttrs({repeating_projectiles_trait1effet:"(" + values.repeating_projectiles_trait1value + " touches)"});
+        break;
+		case "8":
+		    setAttrs({repeating_projectiles_trait1effet:"(pas d'armure => min dégats 2)"});
+        break;
+        case "9":
+		    setAttrs({repeating_projectiles_trait1flagquantique:"on"});
+        break;
+        case "10":
+		    setAttrs({repeating_projectiles_trait1effet:"(blessures récurrentes)"});
+        break;			
+		case "11":
+		    setAttrs({repeating_projectiles_trait1effet:"(pas d'armure => min dégats 1)"});
+        break;		
+		}
+	});
+});
+
+on("change:repeating_projectiles:trait2 change:repeating_projectiles:trait2value", function() {
+	getAttrs(["repeating_projectiles_trait2","repeating_projectiles_trait2value"], function(values) {
+	    setAttrs({repeating_projectiles_trait2flag:0});
+		setAttrs({repeating_projectiles_trait2flagenoire:0});
+		setAttrs({repeating_projectiles_trait2flagquantique:0});
+		setAttrs({repeating_projectiles_degatenoire:0});
+		setAttrs({repeating_projectiles_degatquantique:0});
+		switch (values.repeating_projectiles_trait2) {
+		case "0":
+		    setAttrs({repeating_projectiles_trait2effet:"(choc => 0 dégat)"});
+        break;	
+		case "3":
+		    setAttrs({repeating_projectiles_trait2flagenoire:"on"});
+        break;	
+		case "4":
+		    setAttrs({repeating_projectiles_trait2flag:"on"});
+        break;	
+		case "5":
+		    setAttrs({repeating_projectiles_trait2effet:"(arme longue => relance)"});
+        break;	
+		case "7":
+		    setAttrs({repeating_projectiles_trait2flag:"on"});
+			setAttrs({repeating_projectiles_trait2effet:"(" + values.repeating_projectiles_trait2value + " touches)"});
+        break;
+		case "8":
+		    setAttrs({repeating_projectiles_trait2effet:"(pas d'armure => min dégats 2)"});
+        break;
+        case "9":
+		    setAttrs({repeating_projectiles_trait2flagquantique:"on"});
+        break;
+        case "10":
+		    setAttrs({repeating_projectiles_trait2effet:"(blessures récurrentes)"});
+        break;			
+		case "11":
+		    setAttrs({repeating_projectiles_trait2effet:"(pas d'armure => min dégats 1)"});
+        break;		
+		}
+	});
+});
+
+on("change:repeating_projectiles:trait3 change:repeating_projectiles:trait3value", function() {
+	getAttrs(["repeating_projectiles_trait3","repeating_projectiles_trait3value"], function(values) {
+	    setAttrs({repeating_projectiles_trait3flag:0});
+		setAttrs({repeating_projectiles_trait3flagenoire:0});
+		setAttrs({repeating_projectiles_trait3flagquantique:0});
+		setAttrs({repeating_projectiles_degatenoire:0});
+		setAttrs({repeating_projectiles_degatquantique:0});
+		switch (values.repeating_projectiles_trait3) {
+		case "0":
+		    setAttrs({repeating_projectiles_trait3effet:"(choc => 0 dégat)"});
+        break;	
+		case "3":
+		    setAttrs({repeating_projectiles_trait3flagenoire:"on"});
+        break;	
+		case "4":
+		    setAttrs({repeating_projectiles_trait3flag:"on"});
+        break;	
+		case "5":
+		    setAttrs({repeating_projectiles_trait3effet:"(arme longue => relance)"});
+        break;	
+		case "7":
+		    setAttrs({repeating_projectiles_trait3flag:"on"});
+			setAttrs({repeating_projectiles_trait3effet:"(" + values.repeating_projectiles_trait3value + " touches)"});
+        break;
+		case "8":
+		    setAttrs({repeating_projectiles_trait3effet:"(pas d'armure => min dégats 2)"});
+        break;
+        case "9":
+		    setAttrs({repeating_projectiles_trait3flagquantique:"on"});
+        break;
+        case "10":
+		    setAttrs({repeating_projectiles_trait3effet:"(blessures récurrentes)"});
+        break;			
+		case "11":
+		    setAttrs({repeating_projectiles_trait3effet:"(pas d'armure => min dégats 1)"});
+        break;		
+		}
+	});
+});
+
+on("change:repeating_contacts change:repeating_contacts:contact-nom change:repeating_contacts:contactsfaveur", function() {
+    getSectionIDs("repeating_contacts", function(idarray) {
+        if(idarray.length==4) {
+            setAttrs({contactsindex:"on"});
+        }
+	    else {
+	        setAttrs({contactsindex:0});
+	    }
+    });
+});
+
+on("sheet:opened change:repeating_contacts remove:repeating_contacts", function() {
+    getSectionIDs("repeating_contacts", function(idarray) {
+        if(idarray.length==0) {
+            setAttrs({contacts0:"on"});
+        }
+	    else {
+	        setAttrs({contacts0:0});
+	    }
+    });
+});
+
+on("sheet:opened change:repeating_cac remove:repeating_cac", function() {
+    getSectionIDs("repeating_cac", function(idarray) {
+        if(idarray.length==0) {
+            setAttrs({cac0:"on"});
+        }
+	    else {
+	        setAttrs({cac0:0});
+	    }
+    });
+});
+
+on("sheet:opened change:repeating_projectiles remove:repeating_projectiles", function() {
+    getSectionIDs("repeating_projectiles", function(idarray) {
+        if(idarray.length==0) {
+            setAttrs({tir0:"on"});
+        }
+	    else {
+	        setAttrs({tir0:0});
+	    }
+    });
+});
+
+on("sheet:opened change:repeating_equip1 remove:repeating_equip1", function() {
+    getSectionIDs("repeating_equip1", function(idarray) {
+        if(idarray.length==0) {
+            setAttrs({equip01:"on"});
+        }
+	    else {
+	        setAttrs({equip01:0});
+	    }
+    });
+});
+
+on("sheet:opened change:repeating_equip2 remove:repeating_equip2", function() {
+    getSectionIDs("repeating_equip2", function(idarray) {
+        if(idarray.length==0) {
+            setAttrs({equip02:"on"});
+        }
+	    else {
+	        setAttrs({equip02:0});
+	    }
+    });
+});
+
+on("sheet:opened change:repeating_equip3 remove:repeating_equip3", function() {
+    getSectionIDs("repeating_equip3", function(idarray) {
+        if(idarray.length==0) {
+            setAttrs({equip03:"on"});
+        }
+	    else {
+	        setAttrs({equip03:0});
+	    }
+    });
+});
+
+on("change:compteurfiel", function() {
+	getAttrs(["compteurfiel"], function(values) {
+	    let compteur = values.compteurfiel;
+		if (compteur==5){
+		    getAttrs(["compteurmenace"], function(valuess) {
+			    let newcompteur = parseInt(valuess.compteurmenace)||0;
+ 		        setAttrs({compteurmenace:newcompteur+1}); 
+			});
+		}
+	});
+});	
+
+on("change:bless1 change:bless2 change:bless3 change:bless4 change:bless5 change:bless6 change:bless7 change:bless8 change:bless9 change:bless10", function() {
 	getAttrs(["bless1","bless2","bless3","bless4","bless5","bless6","bless7","bless8","bless9","bless10"], function(values) {
 		if (values.bless1=="on"){setAttrs({blessactuel:1})}else{setAttrs({blessactuel:0})}
 		if (values.bless2=="on"){setAttrs({blessactuel:2})}
@@ -1092,7 +1716,7 @@ on("sheet:opened change:bless1 change:bless2 change:bless3 change:bless4 change:
 	});
 });	
 
-on("sheet:opened change:trauma1 change:trauma2 change:trauma3 change:trauma4 change:trauma5 change:trauma6 change:trauma7 change:trauma8 change:trauma9 change:trauma10", function() {
+on("change:trauma1 change:trauma2 change:trauma3 change:trauma4 change:trauma5 change:trauma6 change:trauma7 change:trauma8 change:trauma9 change:trauma10", function() {
 	getAttrs(["trauma1","trauma2","trauma3","trauma4","trauma5","trauma6","trauma7","trauma8","trauma9","trauma10"], function(values) {
 		if (values.trauma1=="on"){setAttrs({traumaactuel:1})}else{setAttrs({traumaactuel:0})}
 		if (values.trauma2=="on"){setAttrs({traumaactuel:2})}
@@ -1107,7 +1731,7 @@ on("sheet:opened change:trauma1 change:trauma2 change:trauma3 change:trauma4 cha
 	});
 });	
 
-on("sheet:opened change:traque1 change:traque2 change:traque3 change:traque4 change:traque5 change:traque6 change:traque7 change:traque8 change:traque9 change:traque10", function() {
+on("change:traque1 change:traque2 change:traque3 change:traque4 change:traque5 change:traque6 change:traque7 change:traque8 change:traque9 change:traque10", function() {
 	getAttrs(["traque1","traque2","traque3","traque4","traque5","traque6","traque7","traque8","traque9","traque10"], function(values) {
 		if (values.traque1=="on"){setAttrs({traqueactuel:1})}else{setAttrs({traqueactuel:0})}
 		if (values.traque2=="on"){setAttrs({traqueactuel:2})}
@@ -1122,7 +1746,7 @@ on("sheet:opened change:traque1 change:traque2 change:traque3 change:traque4 cha
 	});
 });	
 
-on("sheet:opened change:noirceur1 change:noirceur2 change:noirceur3 change:noirceur4 change:noirceur5 change:noirceur6 change:noirceur7 change:noirceur8 change:noirceur9 change:noirceur10", function() {
+on("change:noirceur1 change:noirceur2 change:noirceur3 change:noirceur4 change:noirceur5 change:noirceur6 change:noirceur7 change:noirceur8 change:noirceur9 change:noirceur10", function() {
 	getAttrs(["noirceur1","noirceur2","noirceur3","noirceur4","noirceur5","noirceur6","noirceur7","noirceur8","noirceur9","noirceur10"], function(values) {
 		if (values.noirceur1=="on"){setAttrs({noirceuractuel:1})}else{setAttrs({noirceuractuel:0})}
 		if (values.noirceur2=="on"){setAttrs({noirceuractuel:2})}
@@ -1136,14 +1760,6 @@ on("sheet:opened change:noirceur1 change:noirceur2 change:noirceur3 change:noirc
 		if (values.noirceur10=="on"){setAttrs({noirceuractuel:10})}
 	});
 });	
-
-on("change:repeating_contacts change:contacts", function() {
-    getAttrs(["contacts"], function(values) {
-		let faveur = parseInt(values.contacts)||0;
-        setAttrs({repeating_contacts_contactsfaveur_max:faveur*2})
-    });
-});
-
 
 on("change:repeating_cac:cactalent", function() {
 	getAttrs(["repeating_cac_cactalent"], function(values) {
@@ -1160,7 +1776,7 @@ on("change:repeating_tir:tirtalent", function() {
 	});
 });		
 		
-on("sheet:opened change:vie change:malusblessleger change:malustraumaleger", function() {
+on("change:vie change:malusblessleger change:malustraumaleger", function() {
     getAttrs(["vie","malusblessleger","malustraumaleger"], function(values) {
 	    let vie = parseInt(values.vie)||0;
         let bless = parseInt(values.malusblessleger)||0;
@@ -1169,7 +1785,7 @@ on("sheet:opened change:vie change:malusblessleger change:malustraumaleger", fun
 	});
 });	
 
-on("sheet:opened change:erudition change:malusblessleger change:malustraumaleger", function() {
+on("change:erudition change:malusblessleger change:malustraumaleger", function() {
     getAttrs(["erudition","malusblessleger","malustraumaleger"], function(values) {
 	    let erudition = parseInt(values.erudition)||0;
         let bless = parseInt(values.malusblessleger)||0;
@@ -1178,7 +1794,7 @@ on("sheet:opened change:erudition change:malusblessleger change:malustraumaleger
 	});
 });	
 
-on("sheet:opened change:technique change:malusblessleger change:malustraumaleger", function() {
+on("change:technique change:malusblessleger change:malustraumaleger", function() {
     getAttrs(["technique","malusblessleger","malustraumaleger"], function(values) {
 	    let technique = parseInt(values.technique)||0;
         let bless = parseInt(values.malusblessleger)||0;
@@ -1187,7 +1803,7 @@ on("sheet:opened change:technique change:malusblessleger change:malustraumaleger
 	});
 });	
 
-on("sheet:opened change:action change:malusblessleger change:malustraumaleger", function() {
+on("change:action change:malusblessleger change:malustraumaleger", function() {
     getAttrs(["action","malusblessleger","malustraumaleger"], function(values) {
 	    let action = parseInt(values.action)||0;
         let bless = parseInt(values.malusblessleger)||0;
@@ -1196,7 +1812,7 @@ on("sheet:opened change:action change:malusblessleger change:malustraumaleger", 
 	});
 });	
 
-on("sheet:opened change:statut change:malusblessleger change:malustraumaleger", function() {
+on("change:statut change:malusblessleger change:malustraumaleger", function() {
     getAttrs(["statut","malusblessleger","malustraumaleger"], function(values) {
 	    let statut = parseInt(values.statut)||0;
         let bless = parseInt(values.malusblessleger)||0;
@@ -1205,7 +1821,7 @@ on("sheet:opened change:statut change:malusblessleger change:malustraumaleger", 
 	});
 });	
 
-on("sheet:opened change:ame change:malusblessleger change:malustraumaleger", function() {
+on("change:ame change:malusblessleger change:malustraumaleger", function() {
     getAttrs(["ame","malusblessleger","malustraumaleger"], function(values) {
 	    let ame = parseInt(values.ame)||0;
         let bless = parseInt(values.malusblessleger)||0;
@@ -1214,7 +1830,7 @@ on("sheet:opened change:ame change:malusblessleger change:malustraumaleger", fun
 	});
 });	
 
-on("sheet:opened change:social change:malusblessleger change:malustraumaleger", function() {
+on("change:social change:malusblessleger change:malustraumaleger", function() {
     getAttrs(["social","malusblessleger","malustraumaleger"], function(values) {
 	    let social = parseInt(values.social)||0;
         let bless = parseInt(values.malusblessleger)||0;
@@ -1225,7 +1841,7 @@ on("sheet:opened change:social change:malusblessleger change:malustraumaleger", 
 
 
 
-on("sheet:opened change:traque5 change:traque8 change:traque10", function() {
+on("change:traque5 change:traque8 change:traque10", function() {
 	getAttrs(["traque5","traque8","traque10"], function(values) {
 	    let t5 = values.traque5;
         let t8 = values.traque8;
@@ -1261,7 +1877,7 @@ on("sheet:opened change:traque5 change:traque8 change:traque10", function() {
 	});	
 });	
 
-on("sheet:opened change:noirceur5 change:noirceur8 change:noirceur10", function() {
+on("change:noirceur5 change:noirceur8 change:noirceur10", function() {
 	getAttrs(["noirceur5","noirceur8","noirceur10"], function(values) {
 	    let t5 = values.noirceur5;
         let t8 = values.noirceur8;
