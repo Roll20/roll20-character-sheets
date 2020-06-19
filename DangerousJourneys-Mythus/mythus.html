@@ -30908,15 +30908,14 @@ on ('sheet:opened', function() {
 on("sheet:opened",function() {
     getAttrs(["revision"],function(val) {
         const getValue = (attrname) => parseFloat(val[attrname]) ;
-        let setlist={};
-		setlist["revision"]=0.97;        
+        let asetlist={};
         if (getValue("revision")<0.96) {
-			setlist["personahide"]=1;
-			setlist["subterraneanorientation_kstoggle"]=0;
-			setlist["subterraneanorientation_hekagen"]=0;
-			setlist["psychogenicsm_kstoggle"]=0;
-			setlist["psychogenicsp_kstoggle"]=0;
-			setlist["psychogenicss_kstoggle"]=0;
+			asetlist["personahide"]=1;
+			asetlist["subterraneanorientation_kstoggle"]=0;
+			asetlist["subterraneanorientation_hekagen"]=0;
+			asetlist["psychogenicsm_kstoggle"]=0;
+			asetlist["psychogenicsp_kstoggle"]=0;
+			asetlist["psychogenicss_kstoggle"]=0;
 			kssarray=Object.keys(ksareasnox);
 			kssteeparray=kssarray.map((text) => { var newstring = text + "_steep"; return newstring; });
 			kstogarray=kssarray.map((text) => { var newstring = text + "_kstoggle"; return newstring; });
@@ -30944,47 +30943,67 @@ on("sheet:opened",function() {
 							crit=100;
 							fail=100;
 						};
-					    setlist[`${ks}_autofail`]=fail;
-					    setlist[`${ks}_critfail`]=crit;
+					    asetlist[`${ks}_autofail`]=fail;
+					    asetlist[`${ks}_critfail`]=crit;
 					};
 				});
+			    setAttrs(asetlist);
 			});
         };
         if (getValue("revision")<0.97) {
 			kssarray=Object.keys(ksareasnox);
-			kssteeparray=kssarray.map((text) => { var newstring = text + "_steep"; return newstring; });
-			kstogarray=kssarray.map((text) => { var newstring = text + "_kstoggle"; return newstring; });
-			ksallarray=kssteeparray.concat(kstogarray);
-            getAttrs(ksallarray, function(valval) {
-				const getvValue = (attrname) => parseInt(valval[attrname]) ;
-				kssarray.forEach(ks =>{
-					if (getvValue(`${ks}_kstoggle`)==1) {
-                        steep=getvValue(`${ks}_steep`);
-						crit=0;
-						fail=0;
-						if (steep < 51) {
-							crit=99;
-							fail=96;
-						} else if (steep < 61) {
-							crit=100;
-							fail=97;
-						} else if (steep < 71) {
-							crit=100;
-							fail=98;
-						} else if (steep < 81) {
-							crit=100;
-							fail=99;
-						} else if (steep > 80) {
-							crit=100;
-							fail=100;
-						};
-					    setlist[`${ks}_autofail`]=fail;
-					    setlist[`${ks}_critfail`]=crit;
-					};
-				});
+            let fsetlist={};
+			kssarray.forEach(ksarea =>{
+				subsarray = ksareasnox[ksarea].split(" ");
+				if (subsarray.length!=1) {
+					field_spec = subsarray.map((text) => { var newstring = text + "_spec"; return newstring; });
+					field_proof = subsarray.map((text) => { var newstring = text + "_proof"; return newstring; });
+					field_has = subsarray.map((text) => { var newstring = text + "_has"; return newstring; });
+					field_results=field_spec.concat(field_proof.concat(field_has.concat([`${ksarea}_steep`])));
+			        getAttrs(field_results, function(values) {
+					    const getsValue = (attrname) => parseInt(values[attrname]) || (values[attrname] === 'on' ? 1 : 0);
+						const sumTotal = field_spec.some((attrname) => getsValue(attrname) == 1);
+						sumTotVal=sumTotal ? 1 : 0;
+						steep = parseInt(values[`${ksarea}_steep`],10)||0;
+						subsarray.forEach( (item) => {
+							let substeep=0;
+							fail=0; crit=0;
+							if (getsValue(`${item}_has`)==1) {
+								if ((sumTotVal == 0)||((sumTotVal==1)&&(getsValue(`${item}_proof`)==1))) {
+									substeep=steep;
+								} else {
+									if (getsValue(`${item}_spec`) == 1) {
+										substeep = Math.floor(steep*1.5);
+									} else {
+										substeep = Math.floor(steep/2);
+									};
+							    };
+								if (substeep < 51) {
+									crit=99;
+									fail=96;
+								} else if (substeep < 61) {
+									crit=100;
+									fail=97;
+								} else if (substeep < 71) {
+									crit=100;
+									fail=98;
+								} else if (substeep < 81) {
+									crit=100;
+									fail=99;
+								} else if (substeep > 80) {
+									crit=100;
+									fail=100;
+								};
+								fsetlist[`${item}_autofail`]=fail;
+								fsetlist[`${item}_critfail`]=crit;
+							};
+						});
+                        setAttrs(fsetlist);
+			        });
+				};
 			});
-        };
-        setAttrs(setlist);
+        }; 
+        setAttrs({revision:0.97});
     });
 });
 
