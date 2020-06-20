@@ -222,7 +222,8 @@
             <!--Charge Process Box-->
             <div class="salvoChargeBox processBox">
                 <input type="number" class="salvoRating" name="attr_salvoCharge" readonly />
-                <input type="text" class="salvoAttr" name="attr_salvoChargeDirection" value="Charged" readonly />
+                <input type="hidden" class="colorChanger" name="attr_salvoChargeDirection" value="Charged" /><!--Input to allow salvoChargeDirection Colour to Change-->
+                <input type="text" class="salvoAttr" name="attr_salvoChargeDirection" readonly />
             </div>
 
             <!--Advantage Input Box-->
@@ -1874,7 +1875,7 @@
                         <div class="amenityList5">Quarters</div>
                         <div class="amenityDetails5">Sleeps six</div>
                         <div class="amenityList6">Cargo Hold</div>
-                        <div class="amenityDetails6">Two-story cargo space;<input type="number" min="0" max="660" value="660" name="attr_CargoTonnage">tonnes</div>
+                        <div class="amenityDetails6">Two-story cargo space;<input type="number" min="0" value="660" name="attr_CargoTonnage">tonnes</div>
                         <div class="amenityComponent"><input type="text" name="attr_amenityComponent01" class="full"></div>
                         <div class="amenityComponent"><input type="text" name="attr_amenityComponentDetails01" class="full"></div>
                         <div class="amenityComponent"><input type="text" name="attr_amenityComponent02" class="full"></div>
@@ -3972,7 +3973,8 @@
                     </div>
                     <div class="resource">
                         <div class="resourceTitle">Total</div>
-                        <div class="resourceBoxPlace"><input type="number" name="attr_totalResource" min="0" class="resourceBox" readonly /></div>
+                        
+                        <div class="resourceBoxPlace"><input type="hidden" name="attr_totalResourceOverload" value="0" class="colorChanger" /><input type="number" name="attr_totalResource" min="0" class="resourceBox" readonly /></div>
                         <div class="resourceTonnes">tonnes</div>
                     </div>
                 </div>
@@ -10001,6 +10003,7 @@
             })
         });
 
+        /*Sheet Totals*/
         //Reactor Overcharge control
         on("change:reactorcharge change:reactorovercharge change:shipreactorcharge change:shipReactorovercharge change:tugreactorcharge change:tugreactorovercharge", (event) =>
         {
@@ -10059,7 +10062,7 @@
         });
 
         //Cargo Total
-        on("change:repeating_shipcargo remove:repeating_shipcargo change:supply change:complexmaterials", (event) =>
+        on("change:repeating_shipcargo remove:repeating_shipcargo change:supply change:complexmaterials change:cargotonnage", (event) =>
         {
             var repeatingAttributes = [
                 /*Array of objects with the attributes in each repeating section that need to be gotten with getAttrs, used in getID()
@@ -10109,20 +10112,36 @@
                     let id = attributesToGet[0].id[i];
                     finalAttributeList = [...finalAttributeList, "repeating_" + attributesToGet[0].section + "_" + id + "_shipCargoTonnage"];
                 }
-                finalAttributeList = [...finalAttributeList, "supply", "complexMaterials"];
+                finalAttributeList = [...finalAttributeList, "supply", "complexMaterials","CargoTonnage"];
 
                 getAttrs(finalAttributeList, (attributeValues) =>
                 {
-                    console.log(attributeValues);
+                    const setObj = {};
+
+                    //Get Max Cargo and remove it from the array before totaling
+                    let maxCargo = parseInt(attributeValues.CargoTonnage)||0;
+                    attributeValues.CargoTonnage = 0;
+
+                    //Total All Cargo
                     let total = 0;
                     for (var i = 0; i < finalAttributeList.length; i++)
                     {
                         let index = finalAttributeList[i];
                         total += parseInt(attributeValues[index]) || 0;
                     };
+                    setObj.totalResource = total;
+                    if (total > maxCargo)
+                    {
+                        setObj.totalResourceOverload = 1;
+                    }
+                    else
+                    {
+                        setObj.totalResourceOverload = 0;
+                    }
 
-                    console.log(total);
-                    setAttrs({ "totalResource": total });
+                    console.log(total, maxCargo);
+
+                    setAttrs(setObj);
                 })
             };
 
