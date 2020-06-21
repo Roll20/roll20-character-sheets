@@ -7,40 +7,15 @@ const attributes = {
 	knights: ['old_knights', 'middle_aged_knights', 'young_knights']
 }
 
-
-attributes.movement.forEach(attr => {
-	on(`change:${attr}`, eventinfo => attributeSumDivide(attributes.movement, 'movement_rate'));
-})
-
-attributes.damage.forEach(attr => {
-	on(`change:${attr}`, eventinfo => attributeSumDivide(attributes.damage, 'damage'));
-})
-
-attributes.healing.forEach(attr => {
-	on(`change:${attr}`, eventinfo => attributeSumDivide(attributes.healing, 'healing_rate'));
-})
-
-attributes.hp.forEach(attr => {
-	on(`change:${attr}`, eventinfo => sumOfCalculator(attributes.hp, 'total_hit_points'));
-})
-
-attributes.unconcious.forEach(attr => {
-	on(`change:${attr}`, eventinfo => unconciousCalculator(attributes.unconcious, 'unconcious'));
-})
-
-attributes.knights.forEach(attr => {
-	on(`change:${attr}`, eventinfo => sumOfCalculator(attributes.knights, 'total_family_knights'));
-})
-
-on(`change:sheet_select`, eventinfo => {
+const sheetSelect = eventinfo => {
 	const newValue = eventinfo.newValue;
 	let update = {}
 
 	update.sheet_type = newValue === 'knight' || newValue === 'woman' ? 'character' : newValue;
 	update.character_type = newValue === 'woman' ? 'woman' : 'knight';
 
-	setAttrs(update);
-})
+	setAttrs(update);	
+}
 
 //When performing calculations in King Arthur Pendragon, round
 //0.5 and higher fractions upward and lesser fractions downward.

@@ -1,48 +1,50 @@
+- const templateHeader = name => `&{template:rolls} {{header=^{${name}}}}`
+- const rollFormula = attrName => `{{dice=[[{1d20+({@{${attrName}}+(?{Mod.|0})-20,0}kh1),1d0+20}kl1 [Roll]]]}} {{threshold=[[{@{${attrName}}+(?{Mod.|0}),20}kl1[Threshold]]]}} {{fumbleVal=[[20+({@{${attrName}}+(?{Mod.|0}),0}kl1)]]}}`
+- const damageForumla = attrName => `{{damage=[[(@{${attrName}}+(?{Mod.|0}))d6]]}}`;
+- const buttonName = name => name.replace(/ /g, '-');
+- const attrName = name => name.replace(/ /g, '_');
+
 mixin textInput(name)
-	- const attrName = name.replace(/ /g, '_');
 	label(data-i18n-title=`enter ${name}` title=`enter ${name}`)
-		input(data-i18n-placeholder=name name=`attr_${attrName}` placeholder=name title=`@{${attrName}}` type='text' value='')
+		input(data-i18n-placeholder=name name=`attr_${attrName(name)}` placeholder=name title=`@{${attrName(name)}}` type='text' value='')
 
 mixin numberInput(name)
-	- const attrName = name.replace(/ /g, '_');
 	label(data-i18n-title=`enter ${name}` title=`enter ${name}`)
-		input(name=`attr_${attrName}` placeholder='#' title=`@{${attrName}}` type='number' value='0')
+		input(name=`attr_${attrName(name)}` placeholder='#' title=`@{${attrName(name)}}` type='number' value='0')
 
 mixin checkboxInput(name)
-	- const attrName = name.replace(/ /g, '_');
 	label.styled-checkbox.grid(data-i18n-title=`${name}` title=`${name}`)
-		input(name=`attr_${attrName}` title=`@{${attrName}}` type='checkbox' value=name)
+		input(name=`attr_${attrName(name)}` title=`@{${attrName(name)}}` type='checkbox' value=name)
 		span.pictos 3
 
 mixin attributeButton(name)
-	- const buttonName = name.replace(/ /g, '-');
-	- const attrName = name.replace(/ /g, '_');
-	button.text-uppercase(data-i18n=`${name.slice(0, 3)}` name=`roll_${buttonName}` type='roll' value!=`&{template:rolls} {{header=^{${name}}}} {{dice=[[{1d20+({@{${attrName}}+(?{Mod.|0})-20,0}kh1),1d0+20}kl1 [Roll]]]}} {{threshold=[[{@{${attrName}}+(?{Mod.|0}),20}kl1[Threshold]]]}} {{fumbleVal=[[20+({@{${attrName}}+(?{Mod.|0}),0}kl1)]]}}`)
+	button.text-uppercase(data-i18n=`${name.slice(0, 3)}` name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(name)} {${rollFormula(attrName(name))}`)
 
 mixin rollButton(name)
-	- const buttonName = name.replace(/ /g, '-');
-	- const attrName = name.replace(/ /g, '_');
-	button.text-capitalize(data-i18n=name name=`roll_${buttonName}` type='roll' value!=`&{template:rolls} {{header=^{${name}}}} {{dice=[[{1d20+({@{${attrName}}+(?{Mod.|0})-20,0}kh1),1d0+20}kl1 [Roll]]]}} {{threshold=[[{@{${attrName}}+(?{Mod.|0}),20}kl1[Threshold]]]}} {{fumbleVal=[[20+({@{${attrName}}+(?{Mod.|0}),0}kl1)]]}}`)
+	button.text-capitalize(data-i18n=name name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(name)} ${rollFormula(attrName(name))}`)
 
 mixin squireButton(name)
-	- const buttonName = name.replace(/ /g, '-');
-	- const attrName = name.replace(/ /g, '_');
-	button.text-capitalize(data-i18n=name name=`roll_${buttonName}` type='roll' value!=`&{template:rolls} {{header=Squire's ^{${name}}}} {{dice=[[{1d20+({@{squire_${attrName}}+(?{Mod.|0})-20,0}kh1),1d0+20}kl1 [Roll]]]}} {{threshold=[[{@{squire_${attrName}}+(?{Mod.|0}),20}kl1[Threshold]]]}} {{fumbleVal=[[20+({@{squire_${attrName}}+(?{Mod.|0}),0}kl1)]]}}`)
+	button.text-capitalize(data-i18n=name name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=Squire's ^{${name}}}} ${rollFormula(attrName(name))}`)
 
 mixin damageButton(name)
-	- const buttonName = name.replace(/ /g, '-');
-	- const attrName = name.replace(/ /g, '_');
-	button.text-capitalize(data-i18n=name name=`roll_${buttonName}` type='roll' value!=`&{template:rolls} {{header=^{${name}}}} {{damage=[[(@{${attrName}}+(?{Mod.|0}))d6]]}}`)
+	button.text-capitalize(data-i18n=name name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(name)} ${damageForumla(attrName(name))}`)
 
 mixin horseDamageButton(name)
-	- const buttonName = name.replace(/ /g, '-');
-	- const attrName = name.replace(/ /g, '_');
-	button.text-capitalize(data-i18n='damage' name=`roll_${buttonName}` type='roll' value!=`&{template:rolls} {{header=^{${name}}}} {{damage=[[(@{${attrName}}+(?{Mod.|0}))d6]]}}`)
+	button.text-capitalize(data-i18n='damage' name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(name)} ${damageForumla(attrName(name))}`)
 
 mixin repeatingRollButton(name)
-	- const buttonName = name.replace(/ /g, '-');
-	- const attrName = name.replace(/ /g, '_');
-	button.d20(name=`roll_${buttonName}` type='roll' value!=`&{template:rolls}{{header=@{name}}}{{dice=[[{1d20+({@{${attrName}}+(?{Mod.|0})-20,0}kh1),1d0+20}kl1 [Roll]]]}} {{threshold=[[{@{${attrName}}+(?{Mod.|0}),20}kl1[Threshold]]]}} {{fumbleVal=[[20+({@{${attrName}}+(?{Mod.|0}),0}kl1)]]}}`) t
+	button.d20(name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=@{name}}} ${rollFormula(attrName(name))}`) t
+
+mixin repeatingEntourageSkillRollButton(i18n, name, value)
+	button.text-capitalize(data-i18n=i18n name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=@{${attrName(name)}}}} ${rollFormula(attrName(value))}`)
+
+mixin repeatingEntourageRollButton(i18n, header, value)
+	- header = !header ? i18n : header
+	- value = !value ? i18n : value
+	button.text-capitalize(data-i18n=i18n name=`roll_${buttonName(i18n)}` type='roll' value!=`&{template:rolls} {{header=^{${header}}}} ${rollFormula(attrName(value))}`)
+
+mixin repeatingEntourageDamageButton(i18n, name)
+	button.text-capitalize(data-i18n=i18n name=`roll_${buttonName(name)}` type='roll' value!=`${templateHeader(i18n)} ${damageForumla(attrName(name))}`)
 
 mixin tabButtons(value, className, selected)
 	- const selectedKeyWord = selected ? 'selected' : ''
