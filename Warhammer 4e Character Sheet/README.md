@@ -15,6 +15,7 @@ June 22 2020
 - NPC repeating sections can now minimize, helps management for GMs.
 - Other minor code fixes
 
+
 June 15 2020
 
 - New UI Themes - Empire, Dwarf & Elf
