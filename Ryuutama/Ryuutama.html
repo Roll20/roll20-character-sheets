@@ -4,6 +4,16 @@
     <script type="text/worker">
         var translationLang = getTranslationLanguage();
 
+        function compareDieToBase(baseDie, newDie) {
+            if(newDie < baseDie) {
+                return "reduced"
+            } else if (newDie > baseDie) {
+                return "increased"
+            } else {
+                return "default"
+            }
+        }
+
         on("change:injury change:condition", function() {
             getAttrs(["condition", "injury"], function(values) {
                 setAttrs({
@@ -47,55 +57,60 @@
             });
         });
         on("change:str change:poisoned change:sick change:shocked change:bonus change:condition", function() {
-            getAttrs(["str", "poisoned", "sick", "shocked", "bonus", "condition"], function(values) {
-                setAttrs({
-                    currentStr:Math.min(
-                        12, Math.max(
-                            4, parseInt(values.str)
-                                - parseInt(values.poisoned)
-                                - parseInt(values.sick)
-                                - (translationLang == 'fr' ? 0 : parseInt(values.shocked))
-                                + (values.bonus == 'STR' && parseInt(values.condition) >= 10 ? 2 : 0)
-                            )
+            getAttrs(["str", "poisoned", "sick", "shocked", "bonus", "condition", "strDieStatus"], function(values) {
+                const newDiceCalc = Math.min(
+                    12, Math.max(
+                        4, parseInt(values.str)
+                            - parseInt(values.poisoned)
+                            - parseInt(values.sick)
+                            - (translationLang == 'fr' ? 0 : parseInt(values.shocked))
+                            + (values.bonus == 'STR' && parseInt(values.condition) >= 10 ? 2 : 0)
                         )
+                    )
+                setAttrs({
+                    currentStr: newDiceCalc,
+                    strDieStatus: compareDieToBase(values.str, newDiceCalc)
                 });
             });
         });
         on("change:dex change:injured change:sick change:shocked change:bonus change:condition", function() {
-            getAttrs(["dex", "injured", "sick", "shocked", "bonus", "condition"], function(values) {
-                setAttrs({
-                    currentDex: Math.min(
-                        12, Math.max(
-                            4, parseInt(values.dex)
-                                - parseInt(values.injured)
-                                - parseInt(values.sick)
-                                - (translationLang == 'fr' ? 0 : parseInt(values.shocked))
-                                + (values.bonus == 'DEX' && parseInt(values.condition) >= 10 ? 2 : 0)
-                            )
+            getAttrs(["dex", "injured", "sick", "shocked", "bonus", "condition", "dexDieStatus"], function(values) {
+                const newDiceCalc = Math.min(
+                    12, Math.max(
+                        4, parseInt(values.dex)
+                            - parseInt(values.injured)
+                            - parseInt(values.sick)
+                            - (translationLang == 'fr' ? 0 : parseInt(values.shocked))
+                            + (values.bonus == 'DEX' && parseInt(values.condition) >= 10 ? 2 : 0)
                         )
+                    )
+                setAttrs({
+                    currentDex: newDiceCalc,
+                    dexDieStatus: compareDieToBase(values.dex, newDiceCalc)
                 });
             });
         });
         on("change:int change:muddled change:sick change:shocked change:bonus change:condition", function() {
-            getAttrs(["int", "muddled", "sick", "shocked", "bonus", "condition"], function(values) {
-                setAttrs({
-                    currentInt: Math.min(
-                        12, Math.max(
-                            4, parseInt(values.int)
-                                - parseInt(values.muddled)
-                                - (translationLang == 'fr' ? 0 : parseInt(values.sick))
-                                - parseInt(values.shocked)
-                                + (values.bonus == 'INT' && parseInt(values.condition) >= 10 ? 2 : 0)
-                            )
+            getAttrs(["int", "muddled", "sick", "shocked", "bonus", "condition", "intDieStatus"], function(values) {
+                const newDiceCalc = Math.min(
+                    12, Math.max(
+                        4, parseInt(values.int)
+                            - parseInt(values.muddled)
+                            - (translationLang == 'fr' ? 0 : parseInt(values.sick))
+                            - parseInt(values.shocked)
+                            + (values.bonus == 'INT' && parseInt(values.condition) >= 10 ? 2 : 0)
                         )
+                    )
+                setAttrs({
+                    currentInt: newDiceCalc,
+                    intDieStatus: compareDieToBase(values.int, newDiceCalc)
                 });
             });
         });
         on("change:spi change:exhausted change:sick change:shocked change:bonus change:condition", function() {
-            getAttrs(["spi", "exhausted", "sick", "shocked", "bonus", "condition"], function(values) {
-                setAttrs({
-                    currentSpi: Math.min(
-                        12, Math.max(
+            getAttrs(["spi", "exhausted", "sick", "shocked", "bonus", "condition", "spiDieStatus"], function(values) {
+                const newDiceCalc = Math.min(
+                    12, Math.max(
                             4, parseInt(values.spi)
                                 - parseInt(values.exhausted)
                                 - (translationLang == 'fr' ? 0 : parseInt(values.sick))
@@ -103,6 +118,9 @@
                                 + (values.bonus == 'SPI' && parseInt(values.condition) >= 10 ? 2 : 0)
                             )
                         )
+                setAttrs({
+                    currentSpi: newDiceCalc,
+                    spiDieStatus: compareDieToBase(values.spi, newDiceCalc)
                 });
             });
         });
