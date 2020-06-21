@@ -93,3 +93,10 @@ on('change:clear_progress_1 change:clear_progress_2 change:clear_progress_3 chan
     ['vow' + number + '-' + '9']: '0'
   });
 });
+
+on('change:vow1_menace-show-button change:vow2_menace-show-button change:vow3_menace-show-button change:vow4_menace-show-button change:vow5_menace-show-button', function(values) {
+  const number = values.sourceAttribute.match(/vow([0-9])/)[1]
+  setAttrs({ 
+    ['vow' + number + '_menace-show']: values.newValue,
+  });
+});
