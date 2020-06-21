@@ -8,6 +8,13 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
+
+June 22 2020
+
+- Button color now added to themes.
+- NPC repeating sections can now minimize, helps management for GMs.
+- Other minor code fixes
+
 June 15 2020
 
 - New UI Themes - Empire, Dwarf & Elf
