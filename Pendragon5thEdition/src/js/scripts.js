@@ -9,39 +9,37 @@ const attributes = {
 
 
 attributes.movement.forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
-		attributeSumDivide(attributes.movement, 'movement_rate');
-	});
+	on(`change:${attr}`, eventinfo => attributeSumDivide(attributes.movement, 'movement_rate'));
 })
 
 attributes.damage.forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
-		attributeSumDivide(attributes.damage, 'damage');
-	});
+	on(`change:${attr}`, eventinfo => attributeSumDivide(attributes.damage, 'damage'));
 })
 
 attributes.healing.forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
-		attributeSumDivide(attributes.healing, 'healing_rate');
-	});
+	on(`change:${attr}`, eventinfo => attributeSumDivide(attributes.healing, 'healing_rate'));
 })
 
 attributes.hp.forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
-		sumOfCalculator(attributes.hp, 'total_hit_points');
-	});
+	on(`change:${attr}`, eventinfo => sumOfCalculator(attributes.hp, 'total_hit_points'));
 })
 
 attributes.unconcious.forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
-		unconciousCalculator(attributes.unconcious, 'unconcious');
-	});
+	on(`change:${attr}`, eventinfo => unconciousCalculator(attributes.unconcious, 'unconcious'));
 })
 
 attributes.knights.forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
-		sumOfCalculator(attributes.knights, 'total_family_knights');
-	});
+	on(`change:${attr}`, eventinfo => sumOfCalculator(attributes.knights, 'total_family_knights'));
+})
+
+on(`change:sheet_select`, eventinfo => {
+	const newValue = eventinfo.newValue;
+	let update = {}
+
+	update.sheet_type = newValue === 'knight' || newValue === 'woman' ? 'character' : newValue;
+	update.character_type = newValue === 'woman' ? 'woman' : 'knight';
+
+	setAttrs(update);
 })
 
 //When performing calculations in King Arthur Pendragon, round

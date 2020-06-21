@@ -1,18 +1,45 @@
 %displaynone {  display: none; }
 %displayInlineGrid { display: inline-grid;}
 
-$sheets: 'character', 'holdings', 'feast', 'npc', 'entourage';
-@each $value in $sheets {
-    div.sheet-#{$value} {
+$sheets: (
+    'character': 'character',
+    'holdings': 'holdings',
+    'feast-record': 'feast record',
+    'gamemaster-characters': 'gamemaster characters',
+    'npc': 'npc',
+    'entourage': 'entourage'
+);
+
+$characterSheets: 'character', 'holdings', 'entourage';
+$feastSheets: 'feast record', 'gamemaster characters';
+
+@each $className, $valueName in $sheets {
+    div.sheet-#{$className} {
       @extend %displayInlineGrid;
     }
 
-    input[name='attr_sheet_type']:not([value='#{$value}']) ~ div.sheet-#{$value} {
-       @extend %displaynone;
+    input[name='attr_sheet_type']:not([value='#{$valueName}']) ~ div.sheet-#{$className},
+    input[name='attr_settings_toggle'][value='settings'] ~ div.sheet-#{$className} {
+        @extend %displaynone;
     }
 }
 
-input[name='attr_sheet_type']:not([value='feast']) ~ div.sheet-tabs select[name='attr_feast_type'],
+@each $characterSheet in $characterSheets {
+    input[name='attr_sheet_type'][value='#{$characterSheet}'] ~ div.sheet-tabs div.sheet-type {
+        grid-template-columns: repeat(4, 1fr);
+    } 
+    
+    @include tabHide($characterSheet, 'feast')
+}
+
+@each $feastSheet in $feastSheets {
+    input[name='attr_sheet_type'][value='#{$feastSheet}'] ~ div.sheet-tabs div.sheet-type {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    @include tabHide($feastSheet, 'character')
+}
+
 input[name='attr_sheet_type'][value='feast'] ~ div.sheet-tabs select[name='attr_character_type'] {
     @extend %displaynone;
  }
@@ -40,9 +67,10 @@ $types: 'knight', 'woman';
     }
 }
 
-$feasttypes: 'record', 'characters';
-@each $value in $feasttypes {
-    input[name='attr_feast_type']:not([value="#{$value}"]) ~ div.sheet-feast div.sheet-#{$value} {
-        @extend %displaynone;
-    }
+div.sheet-settings {
+    @extend %displayInlineGrid;
+}
+
+input[name='attr_settings_toggle']:not([value='settings']) ~ div.sheet-settings {
+    @extend %displaynone;
 }

@@ -15,9 +15,9 @@ include src/pug/abstracts/mixins.pug
 
 //- TABS
   =============================
+input(name='attr_settings_toggle' type='hidden' value='settings')
 input(name='attr_sheet_type' type='hidden' value='character')
 input(name='attr_character_type' type='hidden' value='knight')
-input(name='attr_feast_type' type='hidden' value='feast')
 
 //-NPC SHEET
   =============================
@@ -32,21 +32,16 @@ input(name='attr_feast_type' type='hidden' value='feast')
 .grid.tabs
   .col.sheet-type.grid
     each val in ['character', 'holdings', 'entourage']
-      label(data-i18n-title=`sheet: ${val}`)
-        if val === 'character'
-          input(name=`attr_sheet_type` title=`@{sheet_type}` type='radio' value=val selected)
-          span.text-capitalize.text-center(data-i18n=`${val}`)
-        else
-          input(name=`attr_sheet_type` title=`@{sheet_type}` type='radio' value=val)
-          span.text-capitalize.text-center(data-i18n=`${val}`)
-    label.settings(data-i18n-title=`sheet: settings`)
-      input(name=`attr_sheet_type` title=`@{sheet_type}` type='radio' value='settings')
-      span.pictos.text-lowercase.text-center y
+      - const defaultSelected = val === 'character' ? true : false
+      +tabButtons(val, 'character', defaultSelected)
+    each val in ['feast record', 'gamemaster characters']
+      - const defaultSelected = val === 'feast record' ? true : false
+      +tabButtons(val, 'feast', defaultSelected)
 
-  .col
-    select(name='attr_feast_type' value='feast')
-      option(data-i18n='feast record' value='record' selected)
-      option(data-i18n='gamemaster characters' value='characters')
+  .col.settings.grid
+    label(data-i18n-title=`sheet: settings`)
+      input(name=`attr_settings_toggle` title=`@{settings_toggle}` type='checkbox' value='settings')
+      span.pictos.text-lowercase.text-center y
 
 include src/pug/pages/character.pug
 
@@ -56,7 +51,7 @@ include src/pug/pages/holdings.pug
 
 include src/pug/pages/feast.pug
 
-inlcude src/pug/pages/settings.pug
+include src/pug/pages/settings.pug
 
 //-FOOTER
   =============================
