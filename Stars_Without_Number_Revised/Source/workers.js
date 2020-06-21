@@ -3046,6 +3046,7 @@
 					if (!(["", 0, "0"].includes(v[key]))) delete data[key];
 				});
 				mySetAttrs(data, v);
+				calculateShipStats();
 			}
 		});
 	};
@@ -3077,12 +3078,15 @@
 				...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_power`),
 				...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_mass`),
 				...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_hardpoints`),
+				...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_price`),
 				...fittingIDs.map(id => `repeating_ship-fittings_${id}_fitting_power`),
 				...fittingIDs.map(id => `repeating_ship-fittings_${id}_fitting_mass`),
+				...fittingIDs.map(id => `repeating_ship-fittings_${id}_fitting_price`),
 				...defenseIDs.map(id => `repeating_ship-defenses_${id}_defense_power`),
 				...defenseIDs.map(id => `repeating_ship-defenses_${id}_defense_mass`),
+				...defenseIDs.map(id => `repeating_ship-defenses_${id}_defense_price`),
 				"ship_power_max", "ship_mass_max", "ship_hardpoints_max",
-				"ship_power", "ship_mass", "ship_hardpoints"
+				"ship_power", "ship_mass", "ship_hardpoints", "ship_price", "ship_hull_price"
 			];
 			getAttrs(oldAttrs, v => {
 				const ship_power = v.ship_power_max - sum([
@@ -3097,10 +3101,16 @@
 				].map(x => v[x]));
 				const ship_hardpoints = v.ship_hardpoints_max -
 					sum(weaponIDs.map(id => v[`repeating_ship-weapons_${id}_weapon_hardpoints`]));
+				const ship_price = new Intl.NumberFormat().format(parseInt(v.ship_hull_price) + sum([
+					...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_price`),
+					...fittingIDs.map(id => `repeating_ship-fittings_${id}_fitting_price`),
+					...defenseIDs.map(id => `repeating_ship-defenses_${id}_defense_price`),
+				].map(x => v[x])));
 				mySetAttrs({
 					ship_power,
 					ship_mass,
-					ship_hardpoints
+					ship_hardpoints,
+					ship_price
 				}, v, {
 					silent: true
 				});
