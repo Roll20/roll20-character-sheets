@@ -43,7 +43,7 @@ Wenn das erste Häkchen bei "Präzision" gesetzt wird, berichtet das Roll Templa
 
 Zauber/Liturgien werden einzeln eingetragen, mit ihren jeweiligen Probenwerten. Modifikationen funktionieren analog zu Kampfmanövern. "Mühelose Magie / Liebling der Gottheit" funktioniert analog zu Präzision und meldet gewertete Würfe über 15.
 
-Die Charakter-Attributes "wounds" (Einschränkungen), "energy" (Karma/Astralenergie) und "schip" (Schicksalspunkte) eignen sich gut um als Token-Bars benutzt zu werden. Dazu muss das Token dem Charakter zugeordnet ("Represents Character") und dann der entsprechende Wert im Dropdownmenü bei den Bars ausgewählt werden. Dann verändern sich automatisch die Werte im Sheet mit den Werten des Tokens und umgekehrt.
+Die Charakter-Attributes "wounds" (Einschränkungen), "energy" (Karma/Astralenergie) und "schip" (Schicksalspunkte) eignen sich gut um als Token-Bars benutzt zu werden. Dazu muss das Token dem Charakter zugeordnet ("Represents Character") und dann der entsprechende Wert im Dropdownmenü bei den Bars ausgewählt werden. Dann verändern sich automatisch die Werte im Sheet mit den Werten des Tokens und umgekehrt. Bei Einschränkungen sollten die Werte im Sheet verändert werden - der Weg vom Token zum Sheet funktioniert wegen der Trennung in Wunden und Erschöpfung nicht.
 "wounds" verhält sich dabei entgegengesetzt - Ein gesunder Charakter ohne Einschränkungen hat 8 "wounds", ein Charakter mit 8 Einschränkungen hat 0 "wounds". Sonst verhalten sich die Balken unintuitiv.
 
 ---
@@ -114,3 +114,5 @@ Neue Features:
 - Schadensberechnung Hammerschlag gefixt (bisher wurde der KK-Schadensbonus nicht mitverdoppelt).
 - Passierschläge hinzugefügt.
 - Berechnung von Verteidigungswürfen gefixt.
+
+1.4.1: Fix der Anzeige von "Meisterschuss" in den Roll Templates.
