@@ -1,6 +1,6 @@
 <script type="text/worker">
-on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class change:acc_diff_mod change:frame_sp change:core_hull change:core_agility change:core_systems change:core_engineering change:licenselevel change:frame_evasion change:frame_sensors change:frame_edefense change:frame_evasion change:frame_armor change:frame_speed change:frame_hp_bonus change:frame_heat_bonus change:frame_repairs_bonus change:acc_tab change:frame_evasion_bns change:frame_limited_bns change:frame_speed_bns change:frame_techatk change:frame_techatk_bns change:frame_max_sp_bns change:frame_edefense_bns", function(){
-	getAttrs(["acc_dif", "core_hull", "core_agility","core_systems","core_engineering","licenselevel","frame_evasion", "frame_evasion_bns", "frame_techatk", "frame_techatk_bns", "frame_max_sp_bns", "frame_edefense", "frame_limited_bns", "frame_edefense_bns","frame_speed", "frame_speed_bns", "frame_hp_bonus","frame_heat_bonus","frame_repairs_bonus", "frame_sp", "frame_class","acc_diff","acc_tab","grit"], function(values) {
+on("sheet:opened change:acc_diff change:frame_save_target change:frame_class change:acc_diff_mod change:frame_sp change:core_hull change:core_agility change:core_systems change:core_engineering change:licenselevel change:frame_evasion change:frame_sensors change:frame_edefense change:frame_evasion change:frame_armor change:frame_speed change:frame_hp_bonus change:frame_heat_bonus change:frame_repairs_bonus change:acc_tab change:frame_evasion_bns change:frame_limited_bns change:frame_speed_bns change:frame_techatk change:frame_techatk_bns change:frame_max_sp_bns change:frame_edefense_bns", function(){
+	getAttrs(["acc_diff", "core_hull", "core_agility","core_systems","core_engineering","licenselevel","frame_evasion", "frame_evasion_bns", "frame_techatk", "frame_techatk_bns", "frame_max_sp_bns", "frame_edefense", "frame_limited_bns", "frame_edefense_bns","frame_speed", "frame_speed_bns", "frame_hp_bonus","frame_heat_bonus","frame_repairs_bonus", "frame_sp", "frame_class","acc_diff","acc_tab","grit"], function(values) {
 		let net_acc=parseInt(values.acc_diff,10);
 		let frame_hp = 0;
 		let frame_repairs = 0;
@@ -187,29 +187,40 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 				frame_hp = 8;
 				frame_heat = 8;
 				frame_repairs = 4;
-				break;    
+				break;
 			default:
 				frame_hp=0;
 				frame_heat=0;
 				frame_repairs=0;
 				break;
 		}
-		
+
 		if (values.acc_tab==="acc")
 		{
+			acc_diff_block = net_acc.toString()+" Accuracy"
 			net_acc = "+"+net_acc.toString()+"d6kh1";
 		}
-		
+
 		if (values.acc_tab==="diff")
 		{
+			acc_diff_block = net_acc.toString()+" Difficulty"
 			net_acc = "-"+net_acc.toString()+"d6kh1";
 		}
-		
+
 		if(values.acc_tab==="none")
 		{
+			acc_diff_block = ""
 			net_acc="+0d6kh1";
 			accdiff_input = 0;
 		}
+
+		if(values.acc_tab==="always")
+		{
+			acc_diff_block = "[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]"
+			net_acc="+0d6kh1";
+			accdiff_input = 0;
+		}
+
 		setAttrs({
 			grit: Math.ceil(parseInt(values.licenselevel)/2),
 			autocalc_evasion:parseInt(values.core_agility)+parseInt(values.frame_evasion)+ parseInt(values.frame_evasion_bns,10),
@@ -226,7 +237,8 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 			agi_half:Math.floor(parseInt(values.core_agility,10) / 2 ),
 			sys_half:Math.floor(parseInt(values.core_systems,10) / 2 ),
 			acc_diff:accdiff_input,
-			autocalc_limbonus: parseInt(values.frame_limited_bns,10) + Math.floor(parseInt(values.core_engineering,10) / 2 )
+			autocalc_limbonus: parseInt(values.frame_limited_bns,10) + Math.floor(parseInt(values.core_engineering,10) / 2 ),
+			acc_diff_block:acc_diff_block
 		});
 	});
 });
@@ -235,17 +247,19 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 <div style="background:#ddd;min-height:950px;min-width:820px;width:840px;"> <!-- main container div-->
 	<!-- tab/topbar setup -->
 	<input type="hidden" name="attr_net_acc" value="0"/>
-	<input type="radio" class="sheet-tab sheet-tab1" name="attr_core-tab" value="1" title="Pilot" checked="checked" /> 
+	<input type="radio" class="sheet-tab sheet-tab1" name="attr_core-tab" value="1" title="Pilot" checked="checked" />
 	<span class="tab tab1" style='line-height: 40px;'>PILOT</span>
-	<input type="radio" class="sheet-tab sheet-tab2" name="attr_core-tab" value="2" title="Talents" /> 
+	<input type="radio" class="sheet-tab sheet-tab2" name="attr_core-tab" value="2" title="Talents" />
 	<span class="tab tab2" style='line-height: 40px;'>TALENTS</span>
-	<input type="radio" class="sheet-tab sheet-tab3" name="attr_core-tab" value="3" title="Mech"   /> 
+	<input type="radio" class="sheet-tab sheet-tab3" name="attr_core-tab" value="3" title="Mech"   />
 	<span class="tab tab3" style='line-height: 40px;margin-right:115px'>MECH</span>
-	<input type="radio" class="acc-tab acc-tab1" name="attr_acc_tab" value="acc" title="Accuracy" /> 
+	<input type="radio" class="acc-tab acc-tab1" name="attr_acc_tab" value="always" title="Always Roll 6d6" />
+	<span class="acc-tab acc-tab1" style='line-height: 40px;'>6D6</span>
+	<input type="radio" class="acc-tab acc-tab1" name="attr_acc_tab" value="acc" title="Accuracy" />
 	<span class="acc-tab acc-tab1" style='line-height: 40px;'>ACC</span>
-	<input type="radio" class="acc-tab acc-tab2" name="attr_acc_tab" value="diff" title="Difficulty" /> 
+	<input type="radio" class="acc-tab acc-tab2" name="attr_acc_tab" value="diff" title="Difficulty" />
 	<span class="acc-tab acc-tab2" style='line-height: 40px;'>DIFF</span>
-	<input type="radio" class="acc-tab acc-tab2" name="attr_acc_tab" value="none" title="None"checked="true" /> 
+	<input type="radio" class="acc-tab acc-tab2" name="attr_acc_tab" value="none" title="None"checked="true" />
 	<span class="acc-tab acc-tab2" style='line-height: 40px;'>NONE</span>
 	<select name="attr_acc_diff"  style="width:45px;height:40px; background-color: #f0f0f0;margin-left:18px;text-align:center;font-size:18px;background:#f0f0f0;margin-bottom:0px;position:relative;top:2px">
 		<option value=0>0</option>
@@ -255,27 +269,27 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 		<option value=4>4</option>
 	</select>
 	<!-- end tab setup-->
-	
-	<div class="section-pilot"><!-- pilot tab -->   
+
+	<div class="section-pilot"><!-- pilot tab -->
 		<div class="flex-row-wrapper" style="background:#ddd"> <!--row display; wraps entire tab -->
 			<div class="nomarg 1x tab-flex-item" style="height:75px;width:800px"> <!-- header bar-->
 				<div class="nested tab-flex-item">
-					<div class="flex-element"> 
+					<div class="flex-element">
 						<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER%20RPG%20(1.8)/images/logo.png" style="width:225px;height:64px;margin-left:2px"/>
-					</div> 
-				</div> 
+					</div>
+				</div>
 				<div class="1x nopad headerbar tab-flex-item" style="height:100%;width:70%;"> <!--header inputs-->
 					<div class="nopad nomarg notop tab-flex-item" style="height:25px;width:100%;margin-left:5px;padding-right:2px">
-						<div class="flex-element" style="background:#000"> 
+						<div class="flex-element" style="background:#000">
 							<label class="section-title">NAME</label>
 						</div>
-						<div class="2x flex-element"> 
+						<div class="2x flex-element">
 							<input class="onederline flex mid" style="background:#eee" type="text" name="attr_pilot_name">
 						</div>
-						<div class="flex-element" style="background:#000"> 
+						<div class="flex-element" style="background:#000">
 							<label class="section-title">LEVEL</label>
 						</div>
-						<div class="flex-element"> 
+						<div class="flex-element">
 								<select class="onederline" style="height:25px;margin-bottom:0px; margin-top:0px;background:#eee;width:40px;padding-left:7px;padding-top:0px;padding-bottom:0px;font-weight:normal" name="attr_licenselevel">
 									<option value=0>0</option>
 									<option value=1>1</option>
@@ -292,24 +306,24 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 									<option value=12>12</option>
 								</select>
 						</div>
-						<div class="block-title-side flex-element"> 
+						<div class="block-title-side flex-element">
 							<label class="section-title">PLAYER</label>
 						</div>
-						<div class="1x flex-element"> 
+						<div class="1x flex-element">
 							<input class="onederline flex mid" style="background:#eee; width:82px" type="text" name="attr_player">
 						</div>
 					</div>
 					<div class="nomarg nopad notop tab-flex-item" style="width:850px;height:25px;margin-left:5px">
-						<div class="block-title-side flex-element"> 
+						<div class="block-title-side flex-element">
 							<label class="section-title">CALLSIGN</label>
 						</div>
-						<div class="flex-element"> 
+						<div class="flex-element">
 							<input class="onederline flex mid"style="background:#eee;width:130px;padding-bottom: 1px" type="text" name="attr_callsign">
-						</div> 
-						<div class="nomarg nopad block-title-side flex-element"> 
+						</div>
+						<div class="nomarg nopad block-title-side flex-element">
 							<label class="section-title">BACKGROUND</label>
 						</div>
-						<div class="flex-element "> 
+						<div class="flex-element ">
 							<input class="onederline" style="width:249px;background:#eee;padding-bottom: 1px" type="text" name="attr_background">
 						</div>
 					</div>
@@ -329,7 +343,7 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 				</div><!--pilot hp block-->
 				<div class="nopad just-start testborder border tab-flex-item-nowrap" style="height:30px;padding:0px;;"> <!--pilot grit block-->
 					<div class="flex-element nomarg nopad" style="height:100%;">
-						<button type="roll" class="grit-roll" style="margin:0px" name="Grit_Check" value="&{template:default}{{name=GRIT CHECK}}{{grit=[[d20cs0cf0@{net_acc}+@{grit}]]}}">PILOT GRIT
+						<button type="roll" class="grit-roll" style="margin:0px" name="Grit_Check" value="&{template:lancer}{{name=Grit Check}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=@{acc_diff_block}}}">PILOT GRIT
 						<span style="font-family:'dicefontd20';position:relative;top:2px;margin:0px">0</span></button>
 					</div>
 					<span class="frame-autocalcs" style="height:26px;width:100%;background:none" name="attr_grit"></span>
@@ -361,7 +375,7 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 						</div><!--agi/engi column-->
 					</div> <!--core inputs container-->
 				</div><!--pilot core stats block-->
-				
+
 				<div class="border nopad tab-flex-item-column" style="min-height:470px"> <!--pilot skills block-->
 					<div class="block-title-top flex-element"> <!--block title-->
 						<label class="section-title">TRIGGERS</label>
@@ -374,9 +388,9 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 								<option value="4">+4</option>
 								<option value="6">+6</option>
 							</select>
-							<button type="roll" name="Base_Pilot_Trigger" value="&{template:default}} {{name=**SKILL CHECK:** @{base-pilotskill}}} {{@{base-pilotskill}=[[d20cs0cf0@{net_acc}+@{base-pilotskill-mod}]] }}"></button>
-						</div>  
-						<fieldset class="repeating_pilotskills"> <!--pilot skills repeating set--> 
+							<button type="roll" name="Base_Pilot_Trigger" value="&{template:lancer}} {{name=@{base-pilotskill}}} {{tags=Skill Check}} {{to-hit=[[d20cs0cf0@{net_acc}+@{base-pilotskill-mod}]] }} {{acc-diff=@{acc_diff_block}}}"></button>
+						</div>
+						<fieldset class="repeating_pilotskills"> <!--pilot skills repeating set-->
 							<div class="just-between nested tab-flex-item skillsbar" style="margin-left:2px;margin-top:0px;margin-bottom:4px">
 								<input class="underline long" type="text" name="attr_pilotskill" style="margin-right:2px;padding-top:10px;padding-bottom:0px;" />
 								<select class="nopad underline" style="margin-bottom:0px; margin-top:2px;width:40px;" name="attr_pilotskill-mod">
@@ -384,12 +398,12 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 									<option value="4">+4</option>
 									<option value="6">+6</option>
 								</select>
-								<button type="roll" name="Pilot_Trigger" value="&{template:default}} {{name=**SKILL CHECK:** @{pilotskill}}} {{@{pilotskill}=[[d20cs0cf0@{net_acc}+@{pilotskill-mod}]] }}"></button>
-							</div>  
-						</fieldset> <!--pilot skills repeating set--> 
+								<button type="roll" name="Pilot_Trigger" value="&{template:lancer}} {{name=@{pilotskill}}} {{tags=Skill Check}} {{to-hit=[[d20cs0cf0@{net_acc}+@{pilotskill-mod}]] }} {{acc-diff=@{acc_diff_block}}}"></button>
+							</div>
+						</fieldset> <!--pilot skills repeating set-->
 					</div> <!--skills column wrapper-->
 				</div><!--pilot skills block-->
-				
+
 				<div class="border nopad tab-flex-item" style="min-height:150px"> <!--pilot notes block-->
 				<div class="block-title-top flex-element"> <!--block title-->
 						<label class="section-title">NOTES</label>
@@ -400,7 +414,7 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 
 				</div>
 			</div> <!--pilot col 1-->
-			
+
 			<div class="flex-column-wrapper"> <!--wraps pilot column 2-->
 				<div class="nopad border tab-flex-item" style="width:400px;height:150px;min-height:150px"> <!--pilot backstory block -->
 					<div class="block-title-top flex-element"> <!--block title-->
@@ -410,7 +424,7 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 						<textarea name="attr_pilot_backstory" placeholder=">ENTRY_AWAIT::pilot_record"></textarea>
 					</div>
 				</div> <!--pilot backstory block-->
-				
+
 				<div class="just-between nopad tab-flex-item" style="width:400px;min-height:150px"> <!--pilot appearance/f&f joint block -->
 					<div class="nopad nomarg border tab-flex-item" style="width:49%"> <!--pilot appearance block -->
 						<div class="block-title-top flex-element"> <!--block title-->
@@ -420,7 +434,7 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 							<textarea name="attr_pilot_appearance"placeholder=">ENTRY_AWAIT::pilot_visage"></textarea>
 						</div>
 					</div>
-					
+
 					<div class="nomarg nopad border tab-flex-item" style="width:49%"> <!--pilot f&f block-->
 						<div class="block-title-top flex-element"> <!--block title-->
 							<label class="section-title">FRIENDS & FOES</label>
@@ -439,7 +453,7 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 						<textarea name="attr_pilot_gear" placeholder=">ENTRY_AWAIT::pilot_loadout"></textarea>
 					</div>
 				</div>  <!--pilot gear block -->
-				
+
 				<div class="multi-input nopad just-start align-between border tab-flex-item pilotarmor" style="width:400px;min-height:150px"> <!--pilot base armor block-->
 					<div class="block-title-top nomarg flex-element " style="width:100%;margin-top:-1px"> <!--block title-->
 						<label class="section-title">PILOT ARMOR 1</label>
@@ -468,7 +482,7 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 					</div>
 					<div class="3m-sides flex-element" style="width:98%">
 						<label class="0x">BONUSES</label>
-						<input type="text" class="1x underline" name="attr_base_pilotarmor_bonuses"/> 
+						<input type="text" class="1x underline" name="attr_base_pilotarmor_bonuses"/>
 					</div>
 				</div> <!--pilot base armor block-->
 				<div class="pilotarmor-counter-div">  <!--counter div-->
@@ -501,7 +515,7 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 							</div>
 							<div class="3m-sides flex-element" style="width:98%">
 								<label class="0x">BONUSES</label>
-								<input type="text" class="1x underline" name="attr_base_pilotarmor_bonuses"/> 
+								<input type="text" class="1x underline" name="attr_base_pilotarmor_bonuses"/>
 							</div>
 						</div> <!--pilot armor repeating block-->
 					</fieldset><!--pilot armor repeating set-->
@@ -510,71 +524,71 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 				<div class="just-between nopad tab-flex-item" style="width:400px;min-height:150px;height:150px;margin-top:-23px"> <!--pilot base weapons joint block -->
 					<div class="mini-input nopad just-between nomarg border tab-flex-item pilotweps" style="width:49%;height:150px"> <!--pilot base weapon block 1-->
 						<div class="nopad flex-element block-title-top" style="margin-top:-3px"> <!--block title-->
-							<button type="roll" name="Pilot_Wep_1" class="pilotweapon-roll section-title" value="&{template:default}{{name=PILOT ATTACK: @{base_pilotwep1_name}}} {{ATK=[[d20cs0cf0@{net_acc}+@{grit}]]}}{{DMG=[[@{base_pilotwep1_damage}]] @{base_pilotwep1_dmgtype}}} {{RANGE=[[@{base_pilotwep1_range}]]}}{{TAGS=@{base_pilotwep1_tags}}}">
+							<button type="roll" name="Pilot_Wep_1" class="pilotweapon-roll section-title" value="&{template:lancer} {{color=black}} {{name=@{base_pilotwep1_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=@{acc_diff_block}}}{{@{base_pilotwep1_dmgtype}=[[@{base_pilotwep1_damage}]]}} {{range=[[@{base_pilotwep1_range}]]}}{{tags=@{base_pilotwep1_tags}}}">
 								<span style="position:relative;right:4px">PILOT WEAPON 1 <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button></span>
 						</div>
-						<div class="flex-element" style="width:98%"> 
+						<div class="flex-element" style="width:98%">
 							<label class="0x mid">NAME</label>
-							<input class="1x underline" type="text" style="min-width:0px" name="attr_base_pilotwep1_name"/>
+							<input class="1x underline" type="text" style="min-width:0px" name="attr_base_pilotwep1_name" />
 						</div>
-						<div class="1x  just-between flex-element"> 
+						<div class="1x  just-between flex-element">
 							<div class="flex-element">
 								<label class="mid">RNG</label>
-								<input class="short underline 1digit" type="number" name="attr_base_pilotwep1_range"/>
+								<input class="short underline 1digit" type="number" name="attr_base_pilotwep1_range" value=0 />
 							</div>
 							<div class ="flex-element">
 								<label class="mid">DMG</label>
-								<input class=" 1digit underline" type="number"value=0 name="attr_base_pilotwep1_damage"/>
+								<input class=" 1digit underline" type="number" name="attr_base_pilotwep1_damage"value=0 />
 								<select style="width:50px;height:25px;padding:0" name="attr_base_pilotwep1_dmgtype">
-									<option value="KIN">KIN</option>
-									<option value="EXP">EXP</option>
-									<option value="ERG">ERG</option>
+									<option value="kinetic">KIN</option>
+									<option value="explosive">EXP</option>
+									<option value="energy">ERG</option>
 								</select>
 							</div>
 						</div>
-	
-						<div class="flex-element" style="width:98%"> 
+
+						<div class="flex-element" style="width:98%">
 							<label class="0x mid">TAGS</label>
 							<input class="1x underline" type="text" name="attr_base_pilotwep1_tags"/>
 						</div>
 
-						<div class="flex-element" style="width:98%"> 
+						<div class="flex-element" style="width:98%">
 							<label class="0x mid">NOTES</label>
 							<input class="1x underline" type="text" name="attr_base_pilotwep1_notes"/>
 						</div>
 					</div><!--pilot base weapon block 1-->
-					
+
 					<div class="mini-input nopad just-between nomarg border tab-flex-item pilotweps" style="width:49%;height:150px"> <!--pilot base weapon block 2-->
 						<div class="nopad flex-element block-title-top" style="margin-top:-3px"> <!--block title-->
-							<button type="roll" name="Pilot_Wep_2" class="pilotweapon-roll section-title" value="&{template:default}{{name=PILOT ATTACK: @{base_pilotwep2_name}}} {{ATK=[[d20cs0cf0@{net_acc}+@{grit}]]}}{{DMG=[[@{base_pilotwep2_damage}]] @{base_pilotwep2_dmgtype}}} {{RANGE=[[@{base_pilotwep2_range}]]}}{{TAGS=@{base_pilotwep2_tags}}}">
+							<button type="roll" name="Pilot_Wep_2" class="pilotweapon-roll section-title" value="&{template:lancer} {{color=black}} {{name=@{base_pilotwep2_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=@{acc_diff_block}}}{{@{base_pilotwep2_dmgtype}=[[@{base_pilotwep2_damage}]]}} {{range=[[@{base_pilotwep2_range}]]}}{{tags=@{base_pilotwep2_tags}}}">
 								<span style="position:relative;right:4px">PILOT WEAPON 2<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button></span>
 						</div>
-						<div class="flex-element" style="width:98%"> 
+						<div class="flex-element" style="width:98%">
 							<label class="0x mid">NAME</label>
 							<input class="1x underline" type="text" style="min-width:0px" name="attr_base_pilotwep2_name"/>
 						</div>
-						<div class="1x  just-between flex-element"> 
+						<div class="1x  just-between flex-element">
 							<div class="flex-element">
 								<label class="mid">RNG</label>
-								<input class="short underline 1digit" type="number" name="attr_base_pilotwep2_range"/>
+								<input class="short underline 1digit" type="number" name="attr_base_pilotwep2_range" value=0/>
 							</div>
 							<div class ="flex-element">
 								<label class="mid">DMG</label>
-								<input class=" 1digit underline" value=0 type="number" name="attr_base_pilotwep2_damage"/>
+								<input class=" 1digit underline" value=0 type="number" name="attr_base_pilotwep2_damage" value=0 />
 								<select style="width:50px;height:25px;padding:0" name="attr_base_pilotwep2_dmgtype">
-									<option value="KIN">KIN</option>
-									<option value="EXP">EXP</option>
-									<option value="ERG">ERG</option>
+									<option value="kinetic">KIN</option>
+									<option value="explosive">EXP</option>
+									<option value="energy">ERG</option>
 								</select>
 							</div>
 						</div>
-	
-						<div class="flex-element" style="width:98%"> 
+
+						<div class="flex-element" style="width:98%">
 							<label class="0x mid">TAGS</label>
 							<input class="1x underline" type="text" name="attr_base_pilotwep2_tags"/>
 						</div>
 
-						<div class="flex-element" style="width:98%"> 
+						<div class="flex-element" style="width:98%">
 							<label class="0x mid">NOTES</label>
 							<input class="1x underline" type="text" name="attr_base_pilotwep2_notes"/>
 						</div>
@@ -584,36 +598,36 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 					<fieldset class="repeating_pilotweapons" style="padding-left:5px"> <!--pilot weapon repeating set-->
 						<div class="mini-input nopad just-between border tab-flex-item pilotweps" style="width:195px;height:150px;margin-top:5px"> <!--pilot weapon repeating item-->
 							<div class="nopad flex-element block-title-top" style="margin-top:-3px"> <!--block title-->
-								<button type="roll" name="Pilot_Wep" class="pilotweapon-roll section-title" value="&{template:default}{{name=PILOT ATTACK: @{pilotwep_name}}} {{ATK=[[d20cs0cf0@{net_acc}+@{grit}]]}}{{DMG=[[@{pilotwep_damage}]] @{pilotwep_dmgtype}}} {{RANGE=[[@{pilotwep_range}]]}}{{TAGS=@{pilotwep_tags}}}">
+								<button type="roll" name="Pilot_Wep" class="pilotweapon-roll section-title" value="&{template:lancer} {{color=black}} {{name=@{pilotwep_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=@{acc_diff_block}}}{{@{pilotwep_dmgtype}=[[@{pilotwep_damage}]]}} {{range=[[@{pilotwep_range}]]}}{{tags=@{pilotwep_tags}}}">
 
 								<span style="position:relative;right:7px"><span class="pilotwep-counter"></span>
-									 <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button></span>
+									<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button></span>
 							</div>
-							<div class="flex-element" style="width:98%"> 
+							<div class="flex-element" style="width:98%">
 								<label class="0x mid">NAME</label>
 								<input class="1x underline" type="text" style="min-width:0px" name="attr_pilotwep_name"/>
 							</div>
-							<div class="1x  just-between flex-element"> 
+							<div class="1x  just-between flex-element">
 								<div class="flex-element">
 									<label class="mid">RNG</label>
-									<input class="short underline 1digit" type="number" name="attr_pilotwep_range"/>
+									<input class="short underline 1digit" type="number" name="attr_pilotwep_range" value=0 />
 								</div>
 								<div class ="flex-element">
 									<label class="mid">DMG</label>
-									<input class=" 1digit underline"value=0 type="number" name="attr_pilotwep_damage"/>
+									<input class=" 1digit underline" type="number" name="attr_pilotwep_damage" value=0 />
 									<select style="width:50px;height:25px;padding:0" name="attr_pilotwep_dmgtype">
-										<option value="KIN">KIN</option>
-										<option value="EXP">EXP</option>
-										<option value="ERG">ERG</option>
+										<option value="kinetic">KIN</option>
+										<option value="explosive">EXP</option>
+										<option value="energy">ERG</option>
 									</select>
 								</div>
 							</div>
-		
-							<div class="flex-element" style="width:98%"> 	
+
+							<div class="flex-element" style="width:98%">
 								<label class="0x mid">TAGS</label>
 								<input class="1x underline" type="text" name="attr_pilotwep_tags"/>
 							</div>
-							<div class="flex-element" style="width:98%"> 
+							<div class="flex-element" style="width:98%">
 								<label class="0x mid">NOTES</label>
 								<input class="1x underline" type="text" name="attr_pilotwep_notes"/>
 							</div>
@@ -621,7 +635,7 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 					</fieldset> <!--pilot weapon repeating set-->
 				</div> <!--counter div-->
 			</div> <!--pilot col 2-->
-			
+
 			<div class="flex-column-wrapper"> <!--wraps pilot column 3-->
 				<div class="nopad align-start just-center border tab-flex-item" style="width:180px;min-height:310px"> <!--pilot licenses block -->
 					<div class="block-title-top flex-element"> <!--block title-->
@@ -629,27 +643,27 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 					</div>
 					<div class="nopad flex-element-reverse" style="width:inherit;height:30px;margin-top:3px;margin-bottom:3px;margin-right:3px"> <!--base license block-->
 						<input type="text" class="nopad underline" name="attr_baselicensename" style="width:58%;margin-left:0px;padding-top:10px;padding-left:1px;background:none"/>
-						<input type="radio" class="license license3" name="attr_baselicense-tab" value="3" title="License III" /> 
+						<input type="radio" class="license license3" name="attr_baselicense-tab" value="3" title="License III" />
 						<span class="license license3"><span >III</span></span>
-						<input type="radio" class="license license2" name="attr_baselicense-tab" value="2" title="License II" /> 
+						<input type="radio" class="license license2" name="attr_baselicense-tab" value="2" title="License II" />
 						<span class="license license2" ><span >II</span></span>
-						<input type="radio" class="license license1" name="attr_baselicense-tab" value="1" checked='true' title="License I"/> 
+						<input type="radio" class="license license1" name="attr_baselicense-tab" value="1" checked='true' title="License I"/>
 						<span class="license license1" style='border-left:2px solid black;'><span >I</span></span>
 					</div> <!--license item base block-->
 
 					<fieldset class="repeating_licenses"> <!--licenses repeating set-->
 						<div class="nopad flex-element-reverse" style="width:inherit;height:30px;margin-top:3px;margin-bottom:3px;margin-right:2px"> <!--base license block-->
 							<input type="text" class="underline" name="attr_licensename" style="width:59%;margin-left:0px;background:none"/>
-							<input type="radio" class="license license3" name="attr_license-tab" value="3" title="License III" /> 
+							<input type="radio" class="license license3" name="attr_license-tab" value="3" title="License III" />
 							<span class="license license3"><span >III</span></span>
-							<input type="radio" class="license license2" name="attr_license-tab" value="2" title="License II" /> 
+							<input type="radio" class="license license2" name="attr_license-tab" value="2" title="License II" />
 							<span class="license license2" ><span >II</span></span>
-							<input type="radio" class="license license1" name="attr_license-tab" value="1" checked='true' title="License I"/> 
+							<input type="radio" class="license license1" name="attr_license-tab" value="1" checked='true' title="License I"/>
 							<span class="license license1" style='border-left:2px solid black;'><span >I</span></span>
 						</div> <!--license item repeating block-->
 					</fieldset> <!--licenses repeating set-->
 				</div> <!--pilot licenses block -->
-				
+
 				<div class="border nopad align-start tab-flex-item" style="width:180px;min-height:310px;"> <!-- pilot core bonus block-->
 					<div class="block-title-top flex-element">
 						<label class='section-title'>CORE BONUSES</label><!--block title-->
@@ -665,31 +679,31 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 					<div class="flex-element" style="width:100%;height:90%"> <!--reserves textarea -->
 						<textarea name="attr_pilot_reserves" placeholder=">ENTRY_AWAIT::res_index"></textarea>
 					</div>
-				</div> 
+				</div>
 			</div><!--pilot col 3-->
 		</div><!--pilot row wrapper-->
 	</div> <!--pilot tab-->
-	
+
 	<div class="section-talents"><!-- Talents Tab -->
 		<div class="flex-row-wrapper just-between">
 			<div class="nomarg 1x tab-flex-item" style="height:75px;width:800px"> <!-- header bar-->
 				<div class="nested tab-flex-item">
-					<div class="flex-element"> 
+					<div class="flex-element">
 						<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER%20RPG%20(1.8)/images/logo.png" style="width:225px;height:64px;margin-left:2px"/>
-					</div> 
-				</div> 
+					</div>
+				</div>
 				<div class="1x nopad headerbar tab-flex-item" style="height:100%;width:70%;"> <!--header inputs-->
 					<div class="nopad nomarg notop tab-flex-item" style="height:25px;width:100%;margin-left:5px;padding-right:2px">
-						<div class="flex-element" style="background:#000"> 
+						<div class="flex-element" style="background:#000">
 							<label class="section-title">NAME</label>
 						</div>
-						<div class="2x flex-element"> 
+						<div class="2x flex-element">
 							<input class="onederline flex mid" style="background:#eee" type="text" name="attr_pilot_name">
 						</div>
-						<div class="flex-element" style="background:#000"> 
+						<div class="flex-element" style="background:#000">
 							<label class="section-title">LEVEL</label>
 						</div>
-						<div class="flex-element"> 
+						<div class="flex-element">
 								<select class="onederline" style="height:25px;margin-bottom:0px; margin-top:0px;background:#eee;width:40px;padding-left:7px;padding-top:0px;padding-bottom:0px;font-weight:normal" name="attr_licenselevel">
 									<option value=0>0</option>
 									<option value=1>1</option>
@@ -706,24 +720,24 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 									<option value=12>12</option>
 								</select>
 						</div>
-						<div class="block-title-side flex-element"> 
+						<div class="block-title-side flex-element">
 							<label class="section-title">PLAYER</label>
 						</div>
-						<div class="1x flex-element"> 
+						<div class="1x flex-element">
 							<input class="onederline flex mid" style="background:#eee; width:82px" type="text" name="attr_player">
 						</div>
 					</div>
 					<div class="nomarg nopad notop tab-flex-item" style="width:850px;height:25px;margin-left:5px">
-						<div class="flex-element" style="background:#000;"> 
+						<div class="flex-element" style="background:#000;">
 							<label class="section-title">CALLSIGN</label>
 						</div>
-						<div class="flex-element"> 
+						<div class="flex-element">
 							<input class="onederline flex mid"style="background:#eee;width:130px;padding-bottom: 1px" type="text" name="attr_callsign">
-						</div> 
-						<div class="nomarg nopad block-title-side flex-element"> 
+						</div>
+						<div class="nomarg nopad block-title-side flex-element">
 							<label class="section-title">BACKGROUND</label>
 						</div>
-						<div class="flex-element"> 
+						<div class="flex-element">
 							<input class="onederline" style="width:249px;background:#eee;padding-bottom: 1px" type="text" name="attr_background">
 						</div>
 					</div>
@@ -741,37 +755,37 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 				</div>
 				<div class="nomarg flex-element">
 					<div class="nopad flex-element-reverse" style="width:inherit;height:20px;margin-top:3px;margin-bottom:3px;"> <!--base license block-->
-						<input type="radio" class="talentrank talentrank3" name="attr_base_talent1-rank" value="3" title="rank III" /> 
+						<input type="radio" class="talentrank talentrank3" name="attr_base_talent1-rank" value="3" title="rank III" />
 						<span class="talentrank talentrank3"><span >III</span></span>
-						<input type="radio" class="talentrank talentrank2" name="attr_base_talent1-rank" value="2" title="rank II" /> 
+						<input type="radio" class="talentrank talentrank2" name="attr_base_talent1-rank" value="2" title="rank II" />
 						<span class="talentrank talentrank2" ><span >II</span></span>
-						<input type="radio" class="talentrank talentrank1" name="attr_base_talent1-rank" value="1" checked='true' title="rank I"/> 
+						<input type="radio" class="talentrank talentrank1" name="attr_base_talent1-rank" value="1" checked='true' title="rank I"/>
 						<span class="talentrank talentrank1" style='border-left:2px solid black;'><span >I</span></span>
 					</div> <!--license item base block-->
 				</div>
 				<div class="nopad nomarg flex-element" >
-					<button type="roll" style="top:0px;font-size:16px" name="Talent_1_Rank_I"  class="nomarg talent-roll" value="&{template:default}{{name=**TALENT:** @{base_talent1_name} rank I}}{{text=@{base_talent1_rank1_desc}}}"><span style="padding-left:2px">rank I</span>
+					<button type="roll" style="top:0px;font-size:16px" name="Talent_1_Rank_I"  class="nomarg talent-roll" value="&{template:lancer} {{name=@{base_talent1_name}}} {{tags=Rank I}} {{effect=@{base_talent1_rank1_desc}}}"><span style="padding-left:2px">rank I</span>
 					<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
 				</div>
 				<div class="flex-element" style="width:100%;height:85px">
 					<textarea name="attr_base_talent1_rank1_desc"></textarea>
 				</div>
 				<div class="nopad nomarg flex-element" >
-					<button type="roll" style="font-size:16px" name="Talent_1_Rank_II" class="nomarg talent-roll" value="&{template:default}{{name=**TALENT:** @{base_talent1_name} rank II}}{{text=@{base_talent1_rank2_desc}}}"><span style="padding-left:2px">rank II</span>
+					<button type="roll" style="font-size:16px" name="Talent_1_Rank_II" class="nomarg talent-roll" value="&{template:lancer} {{name=@{base_talent1_name}}} {{tags=Rank II}} {{effect=@{base_talent1_rank2_desc}}}"><span style="padding-left:2px">rank II</span>
 					<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
 				</div>
 				<div class="flex-element" style="width:100%;height:85px">
 					<textarea name="attr_base_talent1_rank2_desc"></textarea>
 				</div>
 				<div class="nopad nomarg flex-element">
-					<button type="roll" style="font-size:16px" name="Talent_1_Rank_III" class="talent-roll" value="&{template:default}{{name=**TALENT:** @{base_talent1_name} rank III}}{{text=@{base_talent1_rank3_desc}}}"><span style="padding-left:2px">rank III</span>
+					<button type="roll" style="font-size:16px" name="Talent_1_Rank_III" class="talent-roll" value="&{template:lancer} {{name=@{base_talent1_name}}} {{tags=Rank III}} {{effect=@{base_talent1_rank3_desc}}}"><span style="padding-left:2px">rank III</span>
 					<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
 				</div>
 				<div class="flex-element" style="width:100%;height:85px">
 					<textarea name="attr_base_talent1_rank3_desc"></textarea>
 				</div>
 			</div> <!--base talent block 1-->
-			
+
 			<div class="border nopad tab-flex-item" style="width:405px;height:350px;margin-bottom:5px"> <!--base talent block 2-->
 				<div class="flex-element" style="background:#000">
 					<label class="section-title">TALENT</label>
@@ -784,30 +798,30 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 				</div>
 				<div class="nomarg flex-element">
 					<div class="nopad flex-element-reverse" style="width:inherit;height:20px;margin-top:3px;margin-bottom:3px;"> <!--base talent 2 rank block-->
-						<input type="radio" class="talentrank talentrank3" name="attr_base_talent2-rank" value="3" title="rank III" /> 
+						<input type="radio" class="talentrank talentrank3" name="attr_base_talent2-rank" value="3" title="rank III" />
 						<span class="talentrank talentrank3"><span >III</span></span>
-						<input type="radio" class="talentrank talentrank2" name="attr_base_talent2-rank" value="2" title="rank II" /> 
+						<input type="radio" class="talentrank talentrank2" name="attr_base_talent2-rank" value="2" title="rank II" />
 						<span class="talentrank talentrank2" ><span >II</span></span>
-						<input type="radio" class="talentrank talentrank1" name="attr_base_talent2-rank" value="1" checked='true' title="rank I"/> 
+						<input type="radio" class="talentrank talentrank1" name="attr_base_talent2-rank" value="1" checked='true' title="rank I"/>
 						<span class="talentrank talentrank1" style='border-left:2px solid black;'><span >I</span></span>
 					</div> <!--base talent 2 rank block-->
 				</div>
 				<div class="nopad nomarg flex-element" >
-					<button type="roll" style="top:0px;font-size:16px" name="Talent_1_Rank_I"  class="nomarg talent-roll" value="&{template:default}{{name=**TALENT:** @{base_talent2_name} rank I}}{{text=@{base_talent2_rank1_desc}}}"><span style="padding-left:2px">rank I</span>
+					<button type="roll" style="top:0px;font-size:16px" name="Talent_1_Rank_I"  class="nomarg talent-roll" value="&{template:lancer} {{name=@{base_talent2_name}}} {{tags=Rank I}} {{effect=@{base_talent2_rank1_desc}}}"><span style="padding-left:2px">rank I</span>
 					<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
 				</div>
 				<div class="flex-element" style="width:100%;height:85px">
 					<textarea name="attr_base_talent2_rank1_desc"></textarea>
 				</div>
 				<div class="nopad nomarg flex-element" >
-					<button type="roll" style="font-size:16px" name="Talent_1_Rank_II" class="nomarg talent-roll" value="&{template:default}{{name=**TALENT:** @{base_talent2_name} rank II}}{{text=@{base_talent2_rank2_desc}}}"><span style="padding-left:2px">rank II</span>
+					<button type="roll" style="font-size:16px" name="Talent_1_Rank_II" class="nomarg talent-roll" value="&{template:lancer} {{name=@{base_talent2_name}}} {{tags=Rank II}} {{effect=@{base_talent2_rank2_desc}}}"><span style="padding-left:2px">rank II</span>
 					<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
 				</div>
 				<div class="flex-element" style="width:100%;height:85px">
 					<textarea name="attr_base_talent2_rank2_desc"></textarea>
 				</div>
 				<div class="nopad nomarg flex-element">
-					<button type="roll" style="font-size:16px" name="Talent_1_Rank_III" class="talent-roll" value="&{template:default}{{name=**TALENT:** @{base_talent2_name} rank III}}{{text=@{base_talent2_rank3_desc}}}"><span style="padding-left:2px">rank III</span>
+					<button type="roll" style="font-size:16px" name="Talent_1_Rank_III" class="talent-roll" value="&{template:lancer} {{name=@{base_talent2_name}}} {{tags=Rank III}} {{effect=@{base_talent2_rank3_desc}}}"><span style="padding-left:2px">rank III</span>
 					<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
 				</div>
 				<div class="flex-element" style="width:100%;height:85px">
@@ -828,30 +842,30 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 						</div>
 						<div class="nomarg flex-element">
 							<div class="nopad flex-element-reverse" style="width:inherit;height:20px;margin-top:3px;margin-bottom:3px;"> <!--base talent 2 rank block-->
-								<input type="radio" class="talentrank talentrank3" name="attr_talent-rank" value="3" title="rank III" /> 
+								<input type="radio" class="talentrank talentrank3" name="attr_talent-rank" value="3" title="rank III" />
 								<span class="talentrank talentrank3"><span >III</span></span>
-								<input type="radio" class="talentrank talentrank2" name="attr_talent-rank" value="2" title="rank II" /> 
+								<input type="radio" class="talentrank talentrank2" name="attr_talent-rank" value="2" title="rank II" />
 								<span class="talentrank talentrank2" ><span >II</span></span>
-								<input type="radio" class="talentrank talentrank1" name="attr_talent-rank" value="1" checked='true' title="rank I"/> 
+								<input type="radio" class="talentrank talentrank1" name="attr_talent-rank" value="1" checked='true' title="rank I"/>
 								<span class="talentrank talentrank1" style='border-left:2px solid black;'><span >I</span></span>
 							</div> <!--base talent 2 rank block-->
 						</div>
 						<div class="nopad nomarg flex-element" >
-							<button type="roll" style="top:0px;font-size:16px" name="Talent_1_Rank_I"  class="nomarg talent-roll" value="&{template:default}{{ name=**TALENT:** @{talent_name} rank I}}{{text=@{talent_rank1_desc}}}"><span style="padding-left:2px">rank I</span>
+							<button type="roll" style="top:0px;font-size:16px" name="Talent_1_Rank_I"  class="nomarg talent-roll" value="&{template:lancer} {{name=@{talent_name}}} {{tags=Rank I}} {{effect=@{talent_rank1_desc}}}"><span style="padding-left:2px">rank I</span>
 							<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
 						</div>
 						<div class="flex-element" style="width:100%;height:85px">
 							<textarea name="attr_talent_rank1_desc"></textarea>
 						</div>
 						<div class="nopad nomarg flex-element" >
-							<button type="roll" style="font-size:16px" name="Talent_1_Rank_II" class="nomarg talent-roll" value="&{template:default}{{name=**TALENT:** @{talent_name} rank II}}{{text=@{talent_rank2_desc}}}"><span style="padding-left:2px">rank II</span>
+							<button type="roll" style="font-size:16px" name="Talent_1_Rank_II" class="nomarg talent-roll" value="&{template:lancer} {{name=@{talent_name}}} {{tags=Rank II}} {{effect=@{talent_rank2_desc}}}"><span style="padding-left:2px">rank II</span>
 							<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
 						</div>
 						<div class="flex-element" style="width:100%;height:85px">
 							<textarea name="attr_talent_rank2_desc"></textarea>
 						</div>
 						<div class="nopad nomarg flex-element">
-							<button type="roll" style="font-size:16px" name="Talent_1_Rank_III" class="talent-roll" value="&{template:default}{{name=**TALENT:** @{talent_name} rank III}}{{text=@{talent_rank3_desc}}}"><span style="padding-left:2px">rank III</span>
+							<button type="roll" style="font-size:16px" name="Talent_1_Rank_III" class="talent-roll" value="&{template:lancer} {{name=@{talent_name}}} {{tags=Rank III}} {{effect=@{talent_rank3_desc}}}"><span style="padding-left:2px">rank III</span>
 							<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
 						</div>
 						<div class="flex-element" style="width:100%;height:85px">
@@ -867,22 +881,22 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 		<div class="flex-row-wrapper">
 			<div class="nomarg 1x tab-flex-item" style="height:75px;width:800px"> <!-- header bar-->
 				<div class="nested tab-flex-item">
-					<div class="flex-element"> 
+					<div class="flex-element">
 						<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER%20RPG%20(1.8)/images/logo.png" style="width:225px;height:64px;margin-left:2px"/>
-					</div> 
-				</div> 
+					</div>
+				</div>
 				<div class="1x nopad headerbar tab-flex-item" style="height:100%;width:70%;"> <!--header inputs-->
 					<div class="nopad nomarg notop tab-flex-item" style="height:25px;width:100%;margin-left:5px;padding-right:2px">
-						<div class="flex-element" style="background:#000"> 
+						<div class="flex-element" style="background:#000">
 							<label class="section-title">NAME</label>
 						</div>
-						<div class="2x flex-element"> 
+						<div class="2x flex-element">
 							<input class="onederline flex mid" style="background:#eee" type="text" name="attr_pilot_name">
 						</div>
-						<div class="flex-element" style="background:#000"> 
+						<div class="flex-element" style="background:#000">
 							<label class="section-title">LEVEL</label>
 						</div>
-						<div class="flex-element"> 
+						<div class="flex-element">
 								<select class="onederline" style="height:25px;margin-bottom:0px; margin-top:0px;background:#eee;width:40px;padding-left:7px;padding-top:0px;padding-bottom:0px;font-weight:normal" name="attr_licenselevel">
 									<option value=0>0</option>
 									<option value=1>1</option>
@@ -899,18 +913,18 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 									<option value=12>12</option>
 								</select>
 						</div>
-						<div class="block-title-side flex-element"> 
+						<div class="block-title-side flex-element">
 							<label class="section-title">PLAYER</label>
 						</div>
-						<div class="1x flex-element"> 
+						<div class="1x flex-element">
 							<input class="onederline flex mid" style="background:#eee; width:82px" type="text" name="attr_player">
 						</div>
 					</div>
 					<div class="nomarg nopad notop tab-flex-item" style="width:850px;height:25px;margin-left:5px">
-						<div class="flex-element" style="background:#000"> 
+						<div class="flex-element" style="background:#000">
 							<label class="section-title">FRAME</label>
 						</div>
-						<div class="flex-element"> 
+						<div class="flex-element">
 							<select style="width:150px;height:25px;padding:0px;background:#eee;margin:0px;font-weight:normal" class="onederline" name="attr_frame_class"> <!--FRAME dropdown select-->
 								<optgroup label="GMS">
 									<option value="EVEREST">EVEREST</option>
@@ -961,8 +975,8 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 									<option value="HOMEBREW">HOMEBREW</option>
 								</optgroup>
 							</select> <!--FRAME dropdown select-->
-						</div> 
-						<div class="nomarg nopad block-title-side 1x flex-element"> 
+						</div>
+						<div class="nomarg nopad block-title-side 1x flex-element">
 							<label class="0x section-title" style="max-width: 100px">MECH NAME</label>
 							<input class="1x onederline mid" style="background:#eee;padding-bottom:1px" type="text" name="attr_frame_name">
 						</div>
@@ -979,70 +993,70 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 						<div class="flex-row-wrapper nomarg " style="width:70px">
 							<label class=" vertical-rl" >STRUCTURE DAMAGE</label>
 							<div class="flex-gauge-column "> <!--structure damage gauge-->
-								<input type="radio" class="structure structurecrit" name="attr_structure-tab" value="4" title="Destroyed!" /> 
-								<span class="structure structurecrit" style='line-height:37px; font-size:30px;border-radius:10px 10px 0px 0px'><span class="">⚠</span></span> 
-								<input type="radio" class="structure structure4" name="attr_structure-tab" value="3" title="3 Damage" /> 
+								<input type="radio" class="structure structurecrit" name="attr_structure-tab" value="4" title="Destroyed!" />
+								<span class="structure structurecrit" style='line-height:37px; font-size:30px;border-radius:10px 10px 0px 0px'><span class="">⚠</span></span>
+								<input type="radio" class="structure structure4" name="attr_structure-tab" value="3" title="3 Damage" />
 								<span class="structure structure4" style='line-height: 40px;'><span class="">3</span></span>
-								<input type="radio" class="structure structure3" name="attr_structure-tab" value="2" title="2 Damage" /> 
+								<input type="radio" class="structure structure3" name="attr_structure-tab" value="2" title="2 Damage" />
 								<span class="structure structure3" style='line-height: 40px;'>2</span>
-								<input type="radio" class="structure structure2" name="attr_structure-tab" value="1" title="1 Damage " /> 
+								<input type="radio" class="structure structure2" name="attr_structure-tab" value="1" title="1 Damage " />
 								<span class="structure structure2" style='line-height: 40px'><span class="">1</span></span>
-								<input type="radio" class="structure structure1" name="attr_structure-tab" value="0" title="0 Damage" checked="checked"/> 
+								<input type="radio" class="structure structure1" name="attr_structure-tab" value="0" title="0 Damage" checked="checked"/>
 								<span class="structure structure1"  style='line-height:40px;line-height:40px;border-bottom:3px solid black; border-radius:0px 0px 10px 10px'><span class="">0</span></span>
 							</div> <!--structure damage gauge-->
 						</div>
 						<div class="flex-row-wrapper nomarg " style="width:70px">
 							<label class=" vertical-rl" >CORE STRESS</label>
 							<div class="flex-gauge-column" > <!--core stress gauge-->
-								<input type="radio" class="corestress corestressbreach" name="attr_corestress-tab" value="5" title="Meltdown!️"/> 
+								<input type="radio" class="corestress corestressbreach" name="attr_corestress-tab" value="5" title="Meltdown!️"/>
 								<span class="corestress corestressbreach" style='line-height:37px; font-size:30px;border-radius:10px 10px 0px 0px'><span class="">⚠</span></span>
-								<input type="radio" class="corestress corestress4" name="attr_corestress-tab" value="4" title="3 Reactor Stress" /> 
+								<input type="radio" class="corestress corestress4" name="attr_corestress-tab" value="4" title="3 Reactor Stress" />
 								<span class="corestress corestress4" style='line-height: 40px;'><span class="">3</span></span>
-								<input type="radio" class="corestress corestress3" name="attr_corestress-tab" value="3" title="2 Reactor Stress" /> 
+								<input type="radio" class="corestress corestress3" name="attr_corestress-tab" value="3" title="2 Reactor Stress" />
 								<span class="corestress corestress3" style='line-height: 40px;'><span class="">2</span></span>
-								<input type="radio" class="corestress corestress2" name="attr_corestress-tab" value="2" title="1 Reactor Stress" /> 
+								<input type="radio" class="corestress corestress2" name="attr_corestress-tab" value="2" title="1 Reactor Stress" />
 								<span class="corestress corestress2" style='line-height: 40px;'><span class="">1</span></span>
-								<input type="radio" class="corestress corestress1" name="attr_corestress-tab" value="1" title="0 Reactor Stress" checked="checked"/> 
+								<input type="radio" class="corestress corestress1" name="attr_corestress-tab" value="1" title="0 Reactor Stress" checked="checked"/>
 								<span class="corestress corestress1"  style='line-height: 40px; border-bottom:3px solid black; border-radius:0px 0px 10px 10px;'><span class="">0</span></span>
 							</div> <!--core stress gauge-->
 						</div>
 						<div class="flex-row-wrapper nomarg " style="width:70px">
 							<label class=" vertical-rl" >OVERCHARGE</label>
 							<div class="flex-gauge-column" ><!--overcharge gauge-->
-								<input type="radio" class="overcharge overcharge4" name="attr_overcharge-tab" value="4" title="Overcharge d6+3" /> 
+								<input type="radio" class="overcharge overcharge4" name="attr_overcharge-tab" value="4" title="Overcharge d6+3" />
 								<span class="overcharge overcharge4" style='line-height: 40px;font-size:30px;border-radius:10px 10px 0px 0px'>⚠</span>
-								<input type="radio" class="overcharge overcharge3" name="attr_overcharge-tab" value="3" title="Overcharge d6" /> 
+								<input type="radio" class="overcharge overcharge3" name="attr_overcharge-tab" value="3" title="Overcharge d6" />
 								<span class="overcharge overcharge3" style='line-height: 40px;'><span class="">d6</span></span>
 								<input type="radio" class="overcharge overcharge2" name="attr_overcharge-tab" value="2" title="Overcharge d3" />
 								<span class="overcharge overcharge2" style='line-height: 40px;'>d3</span>
-								<input type="radio" class="overcharge overcharge1" name="attr_overcharge-tab" value="1" title="Overcharge 1"/> 
+								<input type="radio" class="overcharge overcharge1" name="attr_overcharge-tab" value="1" title="Overcharge 1"/>
 								<span class="overcharge overcharge1" style='line-height:40px; border-left:3px solid black'>1</span>
-								<input type="radio" class="overcharge overcharge0" name="attr_overcharge-tab" value="0" title="Overcharge 0" checked="true" style=""/> 
+								<input type="radio" class="overcharge overcharge0" name="attr_overcharge-tab" value="0" title="Overcharge 0" checked="true" style=""/>
 								<span class="overcharge overcharge0" style='line-height:40px;border-bottom:3px solid black; border-radius:0px 0px 10px 10px;'>0</span>
 							</div><!--overcharge gauge-->
 						</div>
 					</div> <!--frame vitals block-->
 
 					<div class="align-start nopad border tab-flex-item" style="min-height:252px;width:275px;margin-right:5px;margin-left:0px"> <!--frame traits block-->
-							<div class="block-title-top" style="background:#000"> 
+							<div class="block-title-top" style="background:#000">
 								<label class="section-title">MECH TRAITS</label>
 							</div>
 						<div style="width:100%;height:25px;background:#dbdbdb;padding:4px;padding-top:0px;margin:5px;margin-bottom:0px">
-							<button type="roll" class="sys-roll"  name="roll_CORE_Sys_Passive" style="top:1px;" value="&{template:default}{{name=**CORE SYSTEM PASSIVE**}}{{text=@{core_system_passive}}}">CORE SYSTEM PASSIVE
+							<button type="roll" class="sys-roll"  name="roll_CORE_Sys_Passive" style="top:1px;" value="&{template:lancer} {{color=orange}} {{name=Core System}} {{tags=Passive}} {{effect=@{core_system_passive}}}">CORE SYSTEM PASSIVE
 							<span style="font-family:'dicefontd20';position:relative;top:2px;">0</span></button>
 						</div>
 						<input type="checkbox" class=" showreaction" checked="false" name="attr_corepassive-shown" style="left:245px;bottom:22px;width:25px;height:15px"/>
 						<span class=" showreaction " style="left:222px;bottom:22px"></span>
-						<div class="  mech-traits"> 
+						<div class="  mech-traits">
 							<textarea class=" underline nomarg" name="attr_core_system_passive" style="height:90px;"></textarea>
-						</div>	
+						</div>
 						<div style="width:100%;height:25px;background:#dbdbdb;padding:4px;margin:5px;margin-bottom:0px;margin-top:-5px">
-							<button type="roll" class=" sys-roll" name="roll_CORE_Sys_Active" style="top:-3px" value="&{template:default}{{name=**CORE SYSTEM ACTIVE**}}{{text=@{core_system_active}}}">CORE SYSTEM ACTIVE
+							<button type="roll" class=" sys-roll" name="roll_CORE_Sys_Active" style="top:-3px" value="&{template:lancer} {{color=orange}} {{name=Core System}} {{tags=Active}} {{effect=@{core_system_active}}}">CORE SYSTEM ACTIVE
 							<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
 						</div>
 						<input type="checkbox" class="showactive" name="attr_coreactive-shown" checked="false" style="left:245px;bottom:22px;width:25px;height:15px"/>
 						<span class=" showactive " style="left:222px;bottom:22px"></span>
-						<div class="mech-traits2" > 
+						<div class="mech-traits2" >
 							<textarea name="attr_core_system_active" class="underline nomarg" style="height:90px;"></textarea>
 						</div>
 						<fieldset class="repeating_traits">
@@ -1052,9 +1066,9 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 								</div>
 								<input type="checkbox" class=" showreaction" name="attr_trait-shown" checked="false" style="left:245px;bottom:22px;width:25px;height:15px"/>
 								<span class=" showreaction " style="left:219px;bottom:22px"></span>
-								<div class=" mech-traits" style="margin-left:5px"> 
+								<div class=" mech-traits" style="margin-left:5px">
 									<textarea class=" underline nomarg" name="attr_trait-desc" style="height:90px;"></textarea>
-								</div>	
+								</div>
 							</div>
 						</fieldset>
 					</div> <!--frame traits block-->
@@ -1128,29 +1142,29 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 							</div>
 						</div>
 
-						
+
 						<div class="just-around flex-column-wrapper" style="height:130px"> <!--autocalc hase labels-->
 							<div class="nomarg flex-element" style="background:#000">
-								<label class="autocalc-rolls"> <button type="roll" name="roll_Hull_Save" class="hase-roll" value="&{template:default}{{name=**HULL SAVE**}}{{hull=[[d20cs0cf0@{net_acc}+@{core_hull}]]}}">HUL
+								<label class="autocalc-rolls"> <button type="roll" name="roll_Hull_Save" class="hase-roll" value="&{template:lancer}{{name=Hull Save**}}{{to-hit=[[d20cs0cf0@{net_acc}+@{core_hull}]]}} {{acc-diff=@{acc_diff_block}}}">HUL
 								<span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
 							</div>
 							<span class="hp-annotations"></span>
 							<div class="nomarg flex-element" style="background:#000">
-								<label class="autocalc-rolls"> <button type="roll"  name="roll_Agility_Save" class="hase-roll" value="&{template:default}{{name=**AGILITY SAVE**}}{{agility=[[d20cs0cf0@{net_acc}+@{core_agility}]]}}">AGI
+								<label class="autocalc-rolls"> <button type="roll"  name="roll_Agility_Save" class="hase-roll" value="&{template:lancer}{{name=Agility Save**}}{{to-hit=[[d20cs0cf0@{net_acc}+@{core_agility}]]}} {{acc-diff=@{acc_diff_block}}}">AGI
 								<span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
 							</div>
 							<span class="hp-annotations"></span>
 							<div class="nomarg flex-element" style="background:#000">
-	                            <label class="autocalc-rolls"> <button type="roll"  name="roll_Systems_Save" class="hase-roll" value="&{template:default}{{name=**SYSTEMS SAVE**}}{{systems=[[d20cs0cf0@{net_acc}+@{core_systems}]]}}">SYS
-	                            <span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
+								<label class="autocalc-rolls"> <button type="roll"  name="roll_Systems_Save" class="hase-roll" value="&{template:lancer}{{name=Systems Save**}}{{to-hit=[[d20cs0cf0@{net_acc}+@{core_systems}]]}} {{acc-diff=@{acc_diff_block}}}">SYS
+								<span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
 							</div>
 							<span class="hp-annotations"></span>
 							<div class="nomarg flex-element" style="background:#000">
-	                            <label class="autocalc-rolls" > <button type="roll"  name="roll_Engineering_Save" class="hase-roll" value="&{template:default}{{name=**ENGINEERING SAVE**}}{{engineering=[[d20cs0cf0@{net_acc}+@{core_engineering}]]}}">ENG
-	                            <span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
+								<label class="autocalc-rolls" > <button type="roll"  name="roll_Engineering_Save" class="hase-roll" value="&{template:lancer}{{name=Engineering Save**}}{{to-hit=[[d20cs0cf0@{net_acc}+@{core_engineering}]]}} {{acc-diff=@{acc_diff_block}}}">ENG
+								<span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
 							</div>
 							<span class="hp-annotations"></span>
-						
+
 						</div><!--autocalc hase labels-->
 
 						<div class=" just-around flex-column-wrapper" style="height:130px;"><!--autocalc HASE totals-->
@@ -1176,7 +1190,7 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 							<div class="nomarg flex-element" style="background:#000">
 								<label class="hp-section-title">ARMOR</label>
 							</div>
-							<span class="hp-annotations"></span> 
+							<span class="hp-annotations"></span>
 							<div class="nomarg flex-element" style="background:#000">
 								<label class="hp-section-title">SENSOR</label>
 							</div>
@@ -1236,8 +1250,9 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 						</div>
 						<span class="hp-annotations"></span>
 						<div class="nomarg flex-element" style="background:#000">
-							<label class="autocalc-rolls"> <button type="roll" name="roll_Tech_Attack" class="hase-roll" value="&{template:default}{{name=**TECH ATTACK**}}{{ATK=[[d20cs0cf0@{net_acc}+@{core_systems}+@{frame_techatk}+@{frame_techatk_bns}]]}}">T. ATK
-							<span style="font-family:'dicefontd20';position:relative;">0</span></button></label>						</div>
+							<label class="autocalc-rolls"> <button type="roll" name="roll_Tech_Attack" class="hase-roll" value="&{template:lancer} {{color=purple}} {{name=Tech Attack}} {{to-hit=[[d20cs0cf0@{net_acc}+@{core_systems}+@{frame_techatk}+@{frame_techatk_bns}]]}} {{acc-diff=@{acc_diff_block}}}">T. ATK
+							<span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
+						</div>
 						<span class="hp-annotations"></span>
 
 						<div class="nomarg flex-element" style="background:#000">
@@ -1435,12 +1450,12 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 						<span class="hp-annotations">total</span>
 					</div><!--autocalc totals-->
 				</div> <!--frame stat autocalcs block-->
-				
+
 				<div class="flex-row-wrapper nopad" style="width:515px;"> <!--frame weapons block-->
 					<div class="align-start multi-input border tab-flex-item" style="padding:0px;width:100%"> <!--frame base weapon 1-->
 						<div class="flex-element nomarg reactbar" style="padding:0px;width:92%;margin:0px;margin-bottom: 2px;height:25px"  >
-							<button type="roll"  name="roll_Mech_Wep_1" class="grit-roll" style="margin:0px" value="&{template:default}{{name=**ATTACK:** @{base_framewep1_name}}} {{ATK=[[d20cs0cf0@{net_acc}+@{grit}]]}}{{DMG=[[@{base_framewep1_damage}]] @{base_framewep1_dmgtype} }}{{DMG2=[[@{base_framewep1_damage2}]] @{base_framewep1_dmgtype2}}} {{RANGE=[[@{base_framewep1_range}]]}}{{TAGS=@{base_framewep1_tags}}}{{NOTES=@{base_framewep1_notes}}}">WEAPON 1
-							 <span style="font-family:'dicefontd20';position:relative;">0</span></button>
+							<button type="roll"  name="roll_Mech_Wep_1" class="grit-roll" style="margin:0px" value="&{template:lancer} {{color=black}} {{name=@{base_framewep1_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=@{acc_diff_block}}} {{@{base_framewep1_dmgtype}=[[@{base_framewep1_damage}]]}} {{@{base_framewep1_dmgtype2}=[[@{base_framewep1_damage2}]]}} {{@{base_framewep1_rangetype}=[[@{base_framewep1_range}]]}} {{@{base_framewep1_rangetype2}=[[@{base_framewep1_range2}]]}} {{tags=@{base_framewep1_mount} @{base_framewep1_type} @{base_framewep1_tags}}} {{effect=@{base_framewep1_notes} }}">WEAPON 1
+							<span style="font-family:'dicefontd20';position:relative;">0</span></button>
 							<input type="text" class="1x underline" name="attr_base_framewep1_name"/>
 						</div>
 						<input type="checkbox" class=" showreaction nomarg" name="attr_base_framewep1_shown" style="left:20px;width:15px;height:10px;top:10px;margin-bottom:0px"/>
@@ -1455,19 +1470,44 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 							</select>
 							<label style="max-width:42px">TYPE</label>
 							<input type="text" class="1x underline" style="font-size:14px;font-weight: normal;width:25px;position:relative;bottom:2px"name="attr_base_framewep1_type"/>
-							<label style="max-width:53px">RANGE</label>
-							<input type="number" class="underline 2digit"value="0" style="font-size:14px;font-weight: normal;width:25px;position:relative;bottom:2px" min="0" name="attr_base_framewep1_range"/>
+						</div>
+						<div class="flex-element just-between wepinputs" >
+							<div class=" flex-element" style="">
+								<label style="width:65px;">RANGE</label>
+								<input type="text" class="underline" value="0" style="width:60px;text-align:center;margin-left:4px;font-weight:bold;color:#444;font-size:16px" name="attr_base_framewep1_range"/>
+								<select name="attr_base_framewep1_rangetype"class="underline" style="width:110px;height:25px;margin-left:4px;padding-top:5px;padding-bottom:0px;font-size:14px;color:#444">
+									<option value="range">RANGE</option>
+									<option value="threat">THREAT</option>
+									<option value="line">LINE</option>
+									<option value="cone">CONE</option>
+									<option value="blast">BLAST</option>
+									<option value="burst">BURST</option>
+								</select>
+							</div>
+							<span class="hp-separator" style="font-size:20px;line-height:35px;"> + </span>
+							<div class="nomarg nopad flex-element">
+								<input type="text" class="underline" value="0" style="width:60px;text-align:center;margin-left:4px;font-weight:bold;color:#444;font-size:16px" name="attr_base_framewep1_range2"/>
+								<select name="attr_base_framewep1_rangetype2"class="underline" style="width:110px;height:25px;margin-left:4px;padding-top:5px;padding-bottom:0px;font-size:14px;color:#444">
+									<option value="N/A">N/A</option>
+									<option value="range">RANGE</option>
+									<option value="threat">THREAT</option>
+									<option value="line">LINE</option>
+									<option value="cone">CONE</option>
+									<option value="blast">BLAST</option>
+									<option value="burst">BURST</option>
+								</select>
+							</div>
 						</div>
 						<div class="flex-element just-between wepinputs" >
 							<div class=" flex-element" style="">
 								<label style="width:65px;">DAMAGE</label>
 								<input type="text" class="underline" value="0" style="width:60px;text-align:center;margin-left:4px;font-weight:bold;color:#444;font-size:16px" name="attr_base_framewep1_damage"/>
 								<select name="attr_base_framewep1_dmgtype"class="underline" style="width:110px;height:25px;margin-left:4px;padding-top:5px;padding-bottom:0px;font-size:14px;color:#444">
-									<option value="KINETIC">KINETIC</option>
-									<option value="EXPLOSIVE">EXPLOSIVE</option>
-									<option value="ENERGY">ENERGY</option>
-									<option value="HEAT">HEAT</option>
-									<option value="BURN">BURN</option>
+									<option value="kinetic">KINETIC</option>
+									<option value="explosive">EXPLOSIVE</option>
+									<option value="energy">ENERGY</option>
+									<option value="heat">HEAT</option>
+									<option value="burn">BURN</option>
 								</select>
 							</div>
 							<span class="hp-separator" style="font-size:20px;line-height:35px;"> + </span>
@@ -1475,11 +1515,11 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 								<input type="text" class="underline"value="0"  style="width:60px;text-align:center;margin-left:4px;font-weight:bold;color:#444;font-size:16px" name="attr_base_framewep1_damage2"/>
 								<select name="attr_base_framewep1_dmgtype2"class="underline" style="width:110px;height:25px;margin-left:4px;padding-top:5px;padding-bottom:0px;font-size:14px;color:#444">
 									<option value="N/A">N/A</option>
-									<option value="KINETIC">KINETIC</option>
-									<option value="EXPLOSIVE">EXPLOSIVE</option>
-									<option value="ENERGY">ENERGY</option>
-									<option value="HEAT">HEAT</option>
-									<option value="BURN">BURN</option>
+									<option value="bonus_kinetic">KINETIC</option>
+									<option value="bonus_explosive">EXPLOSIVE</option>
+									<option value="bonus_energy">ENERGY</option>
+									<option value="bonus_heat">HEAT</option>
+									<option value="bonus_burn">BURN</option>
 								</select>
 							</div>
 						</div>
@@ -1498,13 +1538,13 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 							<textarea class=" underline nomarg" name="attr_base_framewep1_notes" style="height:50px;border-top:2px solid #c7c7c7;margin-top:0px"placeholder=">ENTRY_AWAIT::wep_data"></textarea>
 						</div>
 					</div> <!--frame base weapon 1-->
-					
+
 					<div class="weapon-counter-div"> <!--weapon counter div-->
 						<fieldset class="repeating_weapons"> <!--frame weapon repeating set-->
 					<div class="align-start multi-input border tab-flex-item" style="padding:0px;width:505px"> <!--frame base weapon 1-->
 						<div class="flex-element nomarg reactbar" style="padding:0px;width:92%;margin:0px;margin-bottom: 2px;height:25px"  >
-							<button type="roll"  name="rol_Mech_Wep" class="grit-roll" style="margin:0px" value="&{template:default}{{name=**ATTACK:** @{framewep_name}}} {{ATK=[[d20cs0cf0@{net_acc}+@{grit}]]}}{{DMG=[[@{framewep_damage}]] @{framewep_dmgtype} }} {{DMG2=[[@{framewep_damage2}]] @{framewep_dmgtype2}}}  {{RANGE=[[@{framewep_range}]]}}{{TAGS=@{framewep_tags}}}{{NOTES=@{framewep_notes}}}"><span class="weapon-counter"></span>
-							 <span style="font-family:'dicefontd20';position:relative;">0</span></button>
+							<button type="roll"  name="rol_Mech_Wep" class="grit-roll" style="margin:0px" value="&{template:lancer} {{color=black}} {{name=@{framewep_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=@{acc_diff_block}}} {{@{framewep_dmgtype}=[[@{framewep_damage}]]}} {{@{framewep_dmgtype2}=[[@{framewep_damage2}]]}} {{@{framewep_rangetype}=[[@{framewep_range}]]}} {{@{framewep_rangetype2}=[[@{framewep_range2}]]}} {{tags=@{framewep_mount} @{framewep_type} @{framewep_tags}}} {{effect=@{framewep_notes} }}"><span class="weapon-counter"></span>
+							<span style="font-family:'dicefontd20';position:relative;">0</span></button>
 							<input type="text" class="1x underline" name="attr_framewep_name"/>
 						</div>
 						<input type="checkbox" class=" showreaction nomarg" name="attr_framewep_shown" style="left:20px;width:15px;height:10px;top:10px;margin-bottom:0px"/>
@@ -1519,19 +1559,44 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 							</select>
 							<label style="max-width:42px">TYPE</label>
 							<input type="text" class="1x underline" style="font-size:14px;font-weight: normal;width:25px;position:relative;bottom:2px"name="attr_framewep_type"/>
-							<label style="max-width:53px">RANGE</label>
-							<input type="number" class="underline 2digit" value="0" style="font-size:14px;font-weight: normal;width:25px;position:relative;bottom:2px" min="0" name="attr_framewep_range"/>
+						</div>
+						<div class="flex-element just-between wepinputs" >
+							<div class=" flex-element" style="">
+								<label style="width:65px;">RANGE</label>
+								<input type="text" class="underline" value="0" style="width:60px;text-align:center;margin-left:4px;font-weight:bold;color:#444;font-size:16px" name="attr_framewep_range"/>
+								<select name="attr_framewep_rangetype"class="underline" style="width:110px;height:25px;margin-left:4px;padding-top:5px;padding-bottom:0px;font-size:14px;color:#444">
+									<option value="range">RANGE</option>
+									<option value="threat">THREAT</option>
+									<option value="line">LINE</option>
+									<option value="cone">CONE</option>
+									<option value="blast">BLAST</option>
+									<option value="burst">BURST</option>
+								</select>
+							</div>
+							<span class="hp-separator" style="font-size:20px;line-height:35px;"> + </span>
+							<div class="nomarg nopad flex-element">
+								<input type="text" class="underline" value="0" style="width:60px;text-align:center;margin-left:4px;font-weight:bold;color:#444;font-size:16px" name="attr_framewep_range2"/>
+								<select name="attr_framewep_rangetype2"class="underline" style="width:110px;height:25px;margin-left:4px;padding-top:5px;padding-bottom:0px;font-size:14px;color:#444">
+									<option value="N/A">N/A</option>
+									<option value="range">RANGE</option>
+									<option value="threat">THREAT</option>
+									<option value="line">LINE</option>
+									<option value="cone">CONE</option>
+									<option value="blast">BLAST</option>
+									<option value="burst">BURST</option>
+								</select>
+							</div>
 						</div>
 						<div class="flex-element just-between wepinputs" >
 							<div class=" flex-element" style="">
 								<label style="width:65px;">DAMAGE</label>
 								<input type="text" class="underline" value="0" style="width:60px;text-align:center;margin-left:4px;font-weight:bold;color:#444;font-size:16px" name="attr_framewep_damage"/>
 								<select name="attr_framewep_dmgtype"class="underline" style="width:110px;height:25px;margin-left:4px;padding-top:5px;padding-bottom:0px;font-size:14px;color:#444">
-									<option value="KINETIC">KINETIC</option>
-									<option value="EXPLOSIVE">EXPLOSIVE</option>
-									<option value="ENERGY">ENERGY</option>
-									<option value="HEAT">HEAT</option>
-									<option value="BURN">BURN</option>
+									<option value="kinetic">KINETIC</option>
+									<option value="explosive">EXPLOSIVE</option>
+									<option value="energy">ENERGY</option>
+									<option value="heat">HEAT</option>
+									<option value="burn">BURN</option>
 								</select>
 							</div>
 							<span class="hp-separator" style="font-size:20px;line-height:35px;"> + </span>
@@ -1539,11 +1604,11 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 								<input type="text" class="underline" value="0" style="width:60px;text-align:center;margin-left:4px;font-weight:bold;color:#444;font-size:16px" name="attr_framewep_damage2"/>
 								<select name="attr_framewep_dmgtype2"class="underline" style="width:110px;height:25px;margin-left:4px;padding-top:5px;padding-bottom:0px;font-size:14px;color:#444">
 									<option value="N/A">N/A</option>
-									<option value="KINETIC">KINETIC</option>
-									<option value="EXPLOSIVE">EXPLOSIVE</option>
-									<option value="ENERGY">ENERGY</option>
-									<option value="HEAT">HEAT</option>
-									<option value="BURN">BURN</option>
+									<option value="bonus_kinetic">KINETIC</option>
+									<option value="bonus_explosive">EXPLOSIVE</option>
+									<option value="bonus_energy">ENERGY</option>
+									<option value="bonus_heat">HEAT</option>
+									<option value="bonus_burn">BURN</option>
 								</select>
 							</div>
 						</div>
@@ -1576,25 +1641,25 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 							<input type="checkbox" name="attr_corepower" class="corepower" />
 							<span class=" corepower"></span>
 						</div>
-					</div>  
+					</div>
 					<input type="checkbox" class=" showreaction" name="attr_base-reaction-shown" style="left:290px;bottom:20px;width:25px;height:10px"/>
 					<span class=" showreaction "></span>
 					<div class=" nested tab-flex-item " style="margin-left:2px;position:relative;bottom:17px">
 						<span class="hp-annotations" style="position:relative;left:95px;bottom:7px">name</span></span>
 						<span class="hp-annotations" style="position:relative;left:246px;bottom:9px; border-top:2px solid #c7c7c7">used</span></span>
-					</div>  
+					</div>
 					<div class=" nested just-center tab-flex-item reactbar" style="margin-left:2px;margin-bottom:0px;margin-top:-40px">
 						<input class="1x underline long" type="text" name="attr_base-reaction-trigger" style="margin-right:2px;padding-top:10px;padding-bottom:0px;font-size:12px;font-weight: normal"/>
-					</div> 
+					</div>
 					<div class=" nested just-center tab-flex-item reactbar" style="margin-left:2px;margin-bottom:0px;">
 						<span class="hp-annotations" style="position:relative;bottom:4px">trigger</span></span>
-					</div>   
+					</div>
 					<div class=" nested just-center tab-flex-item reactbar" style="margin-left:2px;margin-bottom:0px;margin-top:-3px">
 						<textarea  class="1x underline long" type="text" name="attr_base-reaction-effect" style="margin-right:2px;padding-top:10px;padding-bottom:0px;font-size:12px;font-weight: normal;border-top:2px;height:100px"></textarea>
-					</div> 
+					</div>
 					<div class=" nested tab-flex-item reactbar just-center " style="margin-left:2px;margin-bottom:0px;">
 						<span class="hp-annotations" style="position:relative;bottom:11px">effect</span></span>
-					</div>  
+					</div>
 					<fieldset class="repeating_reactions">
 						<div class=" nested just-center tab-flex-item reactbar" style="margin-left:2px;margin-bottom:0px;margin-top:-30px">
 							<input class="1x underline long" type="text" name="attr_reaction-name" style="margin-right:2px;padding-bottom:0px;"/>
@@ -1602,33 +1667,33 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 								<input type="checkbox" name="attr_corepower" class="corepower" />
 								<span class=" corepower"></span>
 							</div>
-						</div>  
+						</div>
 						<input type="checkbox" class=" showreaction" name="attr_reaction-shown" checked="false" style="left:290px;bottom:20px;width:25px;height:10px"/>
 						<span class=" showreaction "></span>
 						<div class=" nested tab-flex-item " style="margin-left:2px;position:relative;bottom:17px">
 							<span class="hp-annotations" style="position:relative;left:95px;bottom:7px">name</span></span>
 							<span class="hp-annotations" style="position:relative;left:246px;bottom:9px; border-top:2px solid #c7c7c7">used</span></span>
-						</div>  
+						</div>
 						<div class=" nested just-center tab-flex-item reactbar" style="margin-left:2px;margin-bottom:0px;margin-top:-35px">
 							<input class="1x underline long" type="text" name="attr_reaction-trigger" style="margin-right:2px;padding-top:10px;padding-bottom:0px;font-size:12px;font-weight: normal"/>
-						</div> 
+						</div>
 						<div class=" nested just-center tab-flex-item reactbar" style="margin-left:2px;margin-bottom:0px;">
 							<span class="hp-annotations" style="position:relative;bottom:4px">trigger</span></span>
-						</div>   
+						</div>
 						<div class=" nested just-center tab-flex-item reactbar" style="margin-left:2px;margin-bottom:0px;margin-top:-3px">
 							<textarea  class="1x underline long" type="text" name="attr_reaction-effect" style="margin-right:2px;padding-top:10px;padding-bottom:0px;font-size:12px;font-weight: normal;border-top:2px;height:102px"></textarea>
-						</div> 
+						</div>
 						<div class=" nested tab-flex-item reactbar just-center " style="margin-left:2px;margin-bottom:0px;">
 							<span class="hp-annotations" style="position:relative;bottom:11px">effect</span></span>
-						</div>  
+						</div>
 					</fieldset>
 				</div><!--frame reactions block-->
 				<div class="align-start nopad multi-input border tab-flex-item" style="min-height:458px;width:315px;margin-bottom:0px"> <!--frame base systems block-->
-					<div class="block-title-top" style="background:#000"> 
+					<div class="block-title-top" style="background:#000">
 						<label class="section-title">MECH SYSTEMS</label>
 					</div>
 					<div class="flex-element reactbar" style="width:100%;padding:-left:3px;padding-right:3px;margin-bottom:0px;margin-top:5px">
-						<button type="roll" class="grit-roll " style=";margin-right:0px"name="roll_Base_Mech_Sys" value="&{template:default}{{name=**SYSTEM:** @{base_system_name}}}{{tags=@{base_system_tags}}}{{effect=@{base_system_effect}}}">SYS 1
+						<button type="roll" class="grit-roll " style=";margin-right:0px"name="roll_Base_Mech_Sys" value="&{template:lancer} {{color=green}} {{name=@{base_system_name}}}{{tags=System @{base_system_tags}}}{{effect=@{base_system_effect}}}">SYS 1
 						<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
 							<input type="text" class="underline "  name="attr_base_system_name"/>
 					</div>
@@ -1653,7 +1718,7 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 					<div class="system-counter-div"> <!--systems counter div-->
 						<fieldset class="repeating_systems">
 							<div class="flex-element reactbar" style="width:100%;padding:-left:3px;padding-right:3px;margin-bottom:0px">
-								<button type="roll" class="grit-roll " style=";margin-right:0px"name="roll_Mech_Sys" value="&{template:default}{{name=**SYSTEM:** @{system-name}}}{{tags=@{system-tags}}}{{effect=@{system-effect}}}"><span class="system-counter">
+								<button type="roll" class="grit-roll " style=";margin-right:0px"name="roll_Mech_Sys" value="&{template:lancer} {{color=green}} {{name=@{system-name}}}{{tags=System @{system-tags}}}{{effect=@{system-effect}}}"><span class="system-counter">
 								<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button>
 									<input type="text" class="underline "  name="attr_system-name"/>
 							</div>
@@ -1683,3 +1748,44 @@ on("sheet:opened change:acc_diff chage:frame_save_target change:frame_class chan
 		</div> <!--row wrapper-->
 	</div><!--FRAME tab-->
 </div> <!-- main container div<-->
+
+<rolltemplate class="sheet-rolltemplate-lancer">
+	<div class="sheet-container sheet-color-{{color}}">
+	<div class="sheet-header">
+		{{#name}}<div class="sheet-name">{{name}}</div>{{/name}}
+		{{#tags}}<div class="sheet-tags">{{tags}}</div>{{/tags}}
+	</div>
+	<div class="sheet-content">
+		{{#to-hit}}
+		<div class="sheet-to-hit">
+			<span class="sheet-d20">0</span>{{to-hit}}
+			{{#acc-diff}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/acc.png" /><img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/diff.png" /> {{acc-diff}}{{/acc-diff}}
+		</div>
+		{{/to-hit}}
+		<div class="sheet-rng-dmg">
+			{{#range}}[ <img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/range.png" />{{range}} ] {{/range}}
+			{{#threat}}[ <img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/threat.png" />{{threat}} ] {{/threat}}
+			{{#cone}}[ <img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/cone.png" />{{cone}} ] {{/cone}}
+			{{#burst}}[ <img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/burst.png" />{{burst}} ] {{/burst}}
+			{{#line}}[ <img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/line.png" />{{line}} ] {{/line}}
+			{{#blast}}[ <img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/blast.png" />{{blast}} ] {{/blast}}
+			{{#kinetic}}[ {{kinetic}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/kinetic.png" /> ] {{/kinetic}}
+			{{#energy}}[ {{energy}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/energy.png" /> ] {{/energy}}
+			{{#explosive}}[ {{explosive}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/explosive.png" /> ] {{/explosive}}
+			{{#heat}}[ {{heat}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/heat.png" /> ] {{/heat}}
+			{{#burn}}[ {{burn}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/burn.png" /> ] {{/burn}}
+			{{#bonus_kinetic}}[ {{bonus_kinetic}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/kinetic.png" /> ] {{/bonus_kinetic}}
+			{{#bonus_energy}}[ {{bonus_energy}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/energy.png" /> ] {{/bonus_energy}}
+			{{#bonus_explosive}}[ {{bonus_explosive}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/explosive.png" /> ] {{/bonus_explosive}}
+			{{#bonus_heat}}[ {{bonus_heat}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/heat.png" /> ] {{/bonus_heat}}
+			{{#bonus_burn}}[ {{bonus_burn}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/burn.png" /> ] {{/bonus_burn}}
+		</div>
+		{{#allprops() N/A name tags effect color to-hit acc-diff range threat cone burst line blast kinetic energy explosive heat burn bonus_kinetic bonus_energy bonus_explosive bonus_heat bonus_burn}}
+		<div class="sheet-key">{{key}}</div>
+		<div class="sheet-value">{{value}}</div>
+		{{/allprops() N/A name tags effect color to-hit acc-diff range threat cone burst line blast kinetic energy explosive heat burn bonus_kinetic bonus_energy bonus_explosive bonus_heat bonus_burn}}
+		{{#effect}}<div class="sheet-effect">{{effect}}</div>{{/effect}}
+		</div>
+	</div>
+	</div>
+</rolltemplate>
