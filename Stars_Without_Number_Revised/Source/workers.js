@@ -3,7 +3,7 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.4.10";
+	const sheetVersion = "2.4.11";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -3604,7 +3604,7 @@
 
 	on("change:strain change:strain_permanent", validateStrain);
 	on("change:constitution", calculateMaxStrain);
-	on("change:repeating_cyberware", calculateCyberwareStrain);
+	on("change:repeating_cyberware remove:repeating_cyberware", calculateCyberwareStrain);
 	on("change:strain_permanent_extra change:cyberware_strain_total", calculatePermanentStrain);
 
 	on("change:level", calculateSaves);
