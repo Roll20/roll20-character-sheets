@@ -3233,10 +3233,9 @@
                     updateMoralHealth();
                 };
     
-                if (source === "wits" || source === "dexterity" || source === "athletics" || source === "brawl" || source === "weaponry") {
-                    getAttrs(["defense_select"], (v) => { // PRD-1407
-                        updateDefense(v.defense_select);
-                    });
+                var defenseStats = ["wits", "dexterity", "athletics", "brawl", "weaponry", "potency", "power", "finesse"];
+                if (defenseStats.includes(source)) {
+                    updateDefense();
                 };
     
                 if (source === "stamina" || source === "resilience" || source === "resistance") {
@@ -3360,7 +3359,6 @@
                 const gameLine = getGameLine(sheettype);
                 const edition = getEdition(sheettype);
                 const entity = getEntity(sheettype);
-                console.log(sheettype, gameLine, edition, entity);
                 
                 setAttrs({
                     "sheettype": sheettype,
@@ -3391,8 +3389,8 @@
             updateMoralHealth();
         });
     
-        on("change:defense_select", function(eventInfo) {
-            updateDefense(eventInfo.newValue);
+        on("change:defense_select", function() {
+            updateDefense();
         });
     
         on("change:iron_stamina", function() {
@@ -3777,39 +3775,57 @@
             });
         }
     
-        var updateDefense = function(defense_type = "lowest") {
-            getAttrs(["athletics","brawl","dexterity","weaponry","wits"], function(v) {
-                var athletics = (parseInt(v.athletics, 10) || 0);
-                var brawl = (parseInt(v.brawl, 10) || 10); // PRD-1407
-                var dexterity = (parseInt(v.dexterity, 10) || 0);
-                var weaponry = (parseInt(v.weaponry, 10) || 10); // PRD-1407
-                var wits = (parseInt(v.wits, 10) || 10);
+        var updateDefense = function() {
+            getAttrs(["defense_type","entity","athletics","brawl","dexterity","weaponry","wits","potency","power","finesse"], function(v) {
                 var defense;
-                switch (defense_type) {
-                    case "lowest":
-                        defense = Math.min(dexterity, wits);
+                switch(v.entity) {
+                    case "corporeal":
+                    default:
+                        defense = getCorporealDefense(v);
                         break;
-                    case "highest":
-                        defense = Math.max(dexterity, wits);
-                        break;
-                    case "wits":
-                        defense = wits;
-                        break;
-                    case "dexterity":
-                        defense = dexterity;
-                        break;
-                    case "lowest_plus_athletics":
-                        defense = Math.min(dexterity, wits) + athletics;
-                        break;
-                    case "lowest_plus_brawl":
-                        defense = Math.min(dexterity, wits) + brawl;
-                        break;
-                    case "lowest_plus_weaponry":
-                        defense = Math.min(dexterity, wits) + weaponry;
+                    case "ephemeral":
+                        defense = getEphemeralDefense(v);
                         break;
                 }
                 setAttrs({defense_base: defense});
             });
+        }
+
+        var getCorporealDefense = function(v) {
+            var dexterity = parseInt(v.dexterity, 10) || 0;
+            var wits = parseInt(v.wits, 10) || 10;
+            
+            switch (v.defense_type) {
+                case "lowest":
+                    return Math.min(dexterity, wits);
+                case "highest":
+                    return Math.max(dexterity, wits);
+                case "wits":
+                    return wits;
+                case "dexterity":
+                    return dexterity;
+                case "lowest_plus_athletics":
+                    var athletics = parseInt(v.athletics, 10) || 0;
+                    return Math.min(dexterity, wits) + athletics;
+                case "lowest_plus_brawl":
+                    var brawl = parseInt(v.brawl, 10) || 10; // PRD-1407
+                    return Math.min(dexterity, wits) + brawl;
+                case "lowest_plus_weaponry":
+                    var weaponry = parseInt(v.weaponry, 10) || 10; // PRD-1407
+                    return Math.min(dexterity, wits) + weaponry;
+            }
+        }
+
+        var getEphemeralDefense = function(v) {
+            var rank = parseInt(v.potency) || 1;
+            var power = parseInt(v.power) || 1;
+            var finesse = parseInt(v.finesse) || 1;
+            
+            if (rank === 1) {
+                return Math.max(power, finesse);
+            }
+
+            return Math.min(power, finesse);
         }
     
         var updateDefaultDefense = function() {
