@@ -543,8 +543,8 @@
             <div class="sheet-flexc sheet-jcfe sheet-thief-skills-box"
                  style="padding-left: 5px;">
               <div class="sheet-flexr sheet-jcfe">
-                <span class="sheet-lbl">Dex Bonus</span>
-                <span class="sheet-val" name="attr_dex_bonus"></span>%
+                <span class="sheet-lbl2">Dex Bonus</span>
+                <span class="sheet-val-tf" name="attr_dex_bonus"></span>%
               </div>
 
               <div class="sheet-flexr jcfe">
@@ -1337,6 +1337,21 @@
     priest: ['char_int', 2, 4, 6, 8, 10, 12, 13]
   };
   
+  const mth_dex_bp = [ 3, 5, 8, 10, 12, 13, 14, 15];
+  
+  // missile to hit map array
+  const mth_map = [
+    ['10', '--', '--'],
+    [ '9', '10', '--'],
+    [ '8',  '9', '10'],
+    [ '7',  '8',  '9'],
+    [ '5',  '7',  '8'],
+    [ '4',  '6',  '7'],
+    [ '3',  '5',  '6'],
+    [ '2',  '4',  '5'],
+    [ '1',  '3',  '4']
+  ];
+  
   const parseValues = function (values, stat, type = 'int') {
     if (type === 'int') return parseInt(values[stat]) || 0;
     else if (type === 'float') return parseFloat(values[stat]) || 0;
@@ -1385,6 +1400,14 @@
     return speeds[_char.load_cat][_char.run_idx];
   };
   
+  const getMTH = (dex) => {
+    idx = 0;
+    for (let bp of mth_dex_bp) {
+      if(dex >= bp) idx++;
+    }
+    return mth_map[idx];
+  };
+  
   class Dice {
     
     constructor(rng=6) {
@@ -1414,11 +1437,6 @@
   }
   
   const d6 = new Dice(6);
-  
-  const roll = function (rng = 6) {
-    
-    return (Math.floor(Math.random() * 6)) + 1;
-  };
   
   const rollStat = function () {
     let stat = d6.roll() + d6.roll() + 2;
@@ -1461,6 +1479,12 @@
       _char.bs_base = _char.char_str;
       
       _char.max_run = getMaxRunSpeed(_char);
+      mthmap = getMTH(v.char_dex);
+      _char.mth_short = mthmap[0];
+      _char.mth_medium = mthmap[1];
+      _char.mth_long = mthmap[2];
+      
+      
       
       _char.numattacks = num_attacks[parseInt(v.al_fighter) - 1];
       
@@ -1516,6 +1540,10 @@
       if (ep >= bp) el += 1;
     }
     if (el > mpa_el_cap) el = mpa_el_cap;
+    if (el === 0) {
+      if( klass === 'fighter' || klass === 'thief' || klass === 'priest')
+        el = 1;
+    }
     
     return el;
   };
