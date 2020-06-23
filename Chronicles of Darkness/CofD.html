@@ -2289,7 +2289,9 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="derived"><span data-i18n="initiative">Initiative</span>:<input type="number" name="attr_initiative" value="@{dexterity}+@{composure}+@{initiative_penalty}+@{fast_reflexes}" disabled="disabled" /><span class="vampire1">+<input type="number" name="attr_celerityinitbonus" value="@{celerity}" disabled="disabled" /></span>
+                                <td class="derived">
+                                    <span data-i18n="initiative">Initiative</span>:<input type="number" name="attr_initiative" value="@{initiative_base}+@{initiative_penalty}+@{fast_reflexes}" disabled="disabled" />
+                                    <span class="vampire1">+<input type="number" name="attr_celerityinitbonus" value="@{celerity}" disabled="disabled" /></span>
                                 </td>
                             </tr>
                         </tbody>
@@ -3237,6 +3239,11 @@
                 if (defenseStats.includes(source)) {
                     updateDefense();
                 };
+
+                var initiativeStats = ["dexterity", "composure", "finesse", "resistance"]
+                if (initiativeStats.includes(source)) {
+                    updateInitiative();
+                }
     
                 if (source === "stamina" || source === "resilience" || source === "resistance") {
                     updateHealth();
@@ -3372,6 +3379,7 @@
         on("change:sheettype", function() {
             updateHealth();
             updateDefaultDefense();
+            updateInitiative();
             updatePotencyName();
             updateRollType();
             const resetRollFlagAttrs = resetRollFlags();
@@ -3408,6 +3416,7 @@
     
         on("sheet:opened", function() {
             updateDefaultDefense();
+            updateInitiative();
             updatePotencyName();
             updateRollType();
         });
@@ -3842,6 +3851,27 @@
                 }
                 
                 setAttrs({defense_select: defense});
+            });
+        }
+
+        var updateInitiative = function() {
+            getAttrs(["entity", "dexterity", "composure", "finesse", "resistance"], function(v) {
+                var initiative;
+                switch(v.entity) {
+                    case "corporeal":
+                    default:
+                        var dexterity = parseInt(v.dexterity) || 1;
+                        var composure = parseInt(v.composure) || 1;
+                        initiative = dexterity + composure;
+                        break;
+                    case "ephemeral":
+                        var finesse = parseInt(v.finesse) || 1;
+                        var resistance = parseInt(v.resistance) || 1;
+                        initiative = finesse + resistance;
+                        break;
+                }
+
+                setAttrs({initiative_base: initiative});
             });
         }
     
