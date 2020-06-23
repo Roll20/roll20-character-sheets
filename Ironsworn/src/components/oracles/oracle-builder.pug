@@ -1,10 +1,10 @@
 mixin oracleRollGroup(group, type, key)
   .oracle-box
-    .oracle-title=key
+    .oracle-title=key.replace(/_/g, ' ')
     each oracle in group.oracles
       .oracle
         .button-container
-          - var id = oracle.class.toLowerCase().replace(/-/g, '_')
+          - var id = oracle.roll_id
           button(
             type='roll'
             title=`@{roll_${id}_oracle}`
@@ -18,13 +18,15 @@ mixin oracleRollGroup(group, type, key)
             name=`attr_oracle_${type}_button`
             value=id
           )
-          .btn-content=oracle.name
+          .btn-content.oracle-name=oracle.name.replace(/_/g, ' ')
 
-mixin oracleBuilder(opts, type)
-  - var id = opts.class.toLowerCase().replace(/-/g, '_')
-  input(class=`${opts.class} hide` type='radio' name=`attr_oracle_${type}` value=id)
-  div(class=`${opts.class} showhide`)
-    .oracle-title.oracle-table-preview=opts.name
+mixin oracleBuilder(opts, type, key)
+  - var id = opts.roll_id
+  - var oracleName = `${key}-${opts.name}`
+  - var oracleClass = oracleName.replace(/_/g, '-')
+  input(class=`${oracleClass} hide` type='radio' name=`attr_oracle_${type}` value=id)
+  div(class=`${oracleClass} showhide`)
+    .oracle-title.oracle-table-preview=opts.name.replace(/_/g, ' ')
     .oracle-table
       each row in opts.rows
         .oracle-row
