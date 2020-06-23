@@ -9,9 +9,12 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-3.2 [Screenshot](co_v3.jpg)
+3.3 [Screenshot](co_v3.jpg)
 
 # Notes de version
+## v3.3 (20020-06-19)
+* Ajout d'options pour les attaques (pour l'instant utilisées par le script)
+
 ## v3.2 (2020-05-07)
 * Ajout de l'armure et du bouclier chez les PNJs
 * Suivi des PVs vers les pnj_pv pour les cas de mauvais lien d'attribut d'un PNJ
