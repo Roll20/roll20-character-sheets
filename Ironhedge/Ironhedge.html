@@ -1315,12 +1315,12 @@
     el_magician: 1,
     el_alchemist: 1,
     el_priest: 1,
-    
-    
+  
+  
   }
-
+  
   const num_attacks = [1, 1, 1, 2, 2, 3, 3];
-
+  
   const al_class_map = {
     fighter: [1, 2, 3, 4, 5, 6, 7],
     thief: [1, 2, 3, 4, 5, 6],
@@ -1345,7 +1345,8 @@
   
   const set_numattacks = () => {
     getAttrs(['el_fighter'], (v) => {
-      setAttrs({numattacks: num_attacks[parseInt(v.el_fighter)-1]});
+      console.log('set_numattacks el_fighter:', v.el_fighter);
+      setAttrs({numattacks: num_attacks[parseInt(v.el_fighter) - 1]});
     });
   }
   
@@ -1384,18 +1385,49 @@
     return speeds[_char.load_cat][_char.run_idx];
   };
   
+  class Dice {
+    
+    constructor(rng=6) {
+      this.seed = this.set_seed();
+      this.range = rng;
+    }
+    
+    set_seed = () => {
+      const t = new Date().getTime();
+      const ts = "." + t.toString().split('').reverse().join('');
+      return parseFloat(ts);
+    }
+    
+    next_seed = () => {
+      let s = Math.abs(Math.pow(Math.PI, this.seed) - Math.log2(this.seed));
+      s *= s * 1000000;
+      this.seed = s - Math.floor(s);
+    }
+    
+    roll = (rng = null) => {
+      let q = 0;
+      if(rng) q = rng * this.seed;
+      else q = this.range * this.seed;
+      this.next_seed();
+      return Math.floor(q);
+    }
+  }
+  
+  const d6 = new Dice(6);
+  
   const roll = function (rng = 6) {
+    
     return (Math.floor(Math.random() * 6)) + 1;
   };
-
+  
   const rollStat = function () {
-    let stat = roll() + roll() + 2;
+    let stat = d6.roll() + d6.roll() + 2;
     if (stat === 12) {
-      if (roll() > 4) {
+      if (d6.roll() > 4) {
         stat += 1;
-        if (roll() > 4) {
+        if (d6.roll() > 4) {
           stat += 1;
-          if (roll() > 4) {
+          if (d6.roll() > 4) {
             stat += 1;
           }
         }
@@ -1415,10 +1447,9 @@
   on('sheet:opened', function () {
     getAttrs(all_attrs, (v) => {
       console.log('sheet opened for:', v.character_name);
-      
       const _char = {};
       console.log('copying Character...');
-      for(key of Object.keys(Character)) {
+      for (key of Object.keys(Character)) {
         _char[key] = v[key];
       }
       _char.char_str = parseInt(v.char_str) || rollStat();
@@ -1428,19 +1459,16 @@
       _char.run_idx = getMaxLoad(_char.char_str).run_idx;
       _char.lp_base = getBaseLP(_char);
       _char.bs_base = _char.char_str;
-
+      
       _char.max_run = getMaxRunSpeed(_char);
       
-      
+      _char.numattacks = num_attacks[parseInt(v.al_fighter) - 1];
       
       setAttrs(_char, () => {
-        set_numattacks();
+        
         set_dex_bonus(v.char_dex);
         set_Thief_Functions();
       });
-      
-      
-    
     });
   });
   
@@ -1458,7 +1486,7 @@
       _char.full_load = maxLoad.max;
       _char.run_idx = maxLoad.run_idx;
       _char.max_run = getMaxRunSpeed(_char);
-
+      
       setAttrs(_char);
     });
   });
@@ -1480,14 +1508,14 @@
     
     let mpa_el_cap = 0;
     for (let bp of mpa_bp) {
-      if( mpa >= bp)
+      if (mpa >= bp)
         mpa_el_cap++;
     }
-  
+    
     for (let bp of bps) {
       if (ep >= bp) el += 1;
     }
-    if(el > mpa_el_cap) el = mpa_el_cap;
+    if (el > mpa_el_cap) el = mpa_el_cap;
     
     return el;
   };
@@ -1530,9 +1558,9 @@
       setAttrs({el_thief: el});
       set_dex_bonus(parseInt(v.char_dex));
     });
-    
+  
   });
-
+  
   on('change:char_int', () => {
     console.log('char_int: changed');
     getAttrs(all_attrs, (v) => {
@@ -1549,7 +1577,7 @@
         el_priest: el_p
       });
     });
-
+  
   });
   
   on('clicked:lpadd clicked:bsadd', (event) => {
@@ -1649,29 +1677,14 @@
   
   on('change:tactics change:onhorse change:higherground', (event) => {
     console.log('tactics, horse, or higher ground changed', event);
-    set_al_adds();
+    set_al();
   });
-  
-  const set_al_adds = () => {
-    getAttrs(['tactics', 'onhorse', 'higherground', 'al'], (values) => {
-      let al_add = 0;
-      let al = parseValues(values, 'al');
-      if (values.tactics === 'on')
-        al_add = 1;
-      else
-        al_add = -1;
-      if (values.onhorse === 'on' || values.higherground === 'on')
-        al_add = 1;
-      else if (values.onhorse === 'off' && values.higherground === 'off')
-        al_add = -1;
-      setAttrs({al: al + al_add});
-    });
-  };
   
   const set_al = () => {
     console.log('setting al');
     getAttrs(['al_fighter', 'al_thief', 'al_magician', 'al_alchemist', 'al_priest',
-        'el_fighter', 'el_thief', 'el_magician', 'el_alchemist', 'el_priest'],
+        'el_fighter', 'el_thief', 'el_magician', 'el_alchemist', 'el_priest',
+        'tactics', 'onhorse', 'higherground', 'al'],
       (values) => {
         const klass = ['fighter', 'thief', 'magician', 'alchemist', 'priest'];
         const als = [];
@@ -1683,10 +1696,14 @@
           als.push(al_class_map[k][idx]);
         }
         
-        const new_al = Math.max(...als);
-        setAttrs({al: new_al}, (new_al) => {
-          set_al_adds(new_al);
-        });
+        let al_add = 0;
+        if (values.onhorse === 'on' || values.higherground === 'on')
+          al_add = 1;
+        if (values.tactics === 'on')
+          al_add++;
+        
+        const new_al = Math.max(...als) + al_add;
+        setAttrs({al: new_al});
       
       });
   };
