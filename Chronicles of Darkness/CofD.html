@@ -3776,7 +3776,7 @@
         }
     
         var updateDefense = function() {
-            getAttrs(["defense_type","entity","athletics","brawl","dexterity","weaponry","wits","potency","power","finesse"], function(v) {
+            getAttrs(["defense_select","entity","athletics","brawl","dexterity","weaponry","wits","potency","power","finesse"], function(v) {
                 var defense;
                 switch(v.entity) {
                     case "corporeal":
@@ -3795,7 +3795,7 @@
             var dexterity = parseInt(v.dexterity, 10) || 0;
             var wits = parseInt(v.wits, 10) || 10;
             
-            switch (v.defense_type) {
+            switch (v.defense_select) {
                 case "lowest":
                     return Math.min(dexterity, wits);
                 case "highest":
@@ -3829,7 +3829,7 @@
         }
     
         var updateDefaultDefense = function() {
-            getAttrs(["sheettype"], function(v) {
+            getAttrs(["sheettype", "defense_select"], function(v) {
                 var defense;
                 if (getEdition(v.sheettype) === 2) {
                     defense = "lowest_plus_athletics";
@@ -3837,6 +3837,10 @@
                 else {
                     defense = "lowest";
                 }
+                if (v.defense_select === defense) {
+                    return updateDefense();
+                }
+                
                 setAttrs({defense_select: defense});
             });
         }
