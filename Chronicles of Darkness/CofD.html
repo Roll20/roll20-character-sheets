@@ -2280,7 +2280,7 @@
                             </tr>
                             <tr>
                                 <td class="derived">
-                                    <span data-i18n="speed">Speed</span>:<input type="number" name="attr_speed" value="@{species_factor}+@{dexterity}+@{strength}+@{speed_penalty}+@{fleet_of_foot}" disabled="disabled" />
+                                    <span data-i18n="speed">Speed</span>:<input type="number" name="attr_speed" value="@{species_factor}+@{speed_base}+@{speed_penalty}+@{fleet_of_foot}" disabled="disabled" />
                                     <span class="vampire">/<input type="number" name="attr_speedwcelerity" value="((1+@{Celerity})*(@{speed}))" disabled="disabled" /></span>
                                 </td>
                             </tr>
@@ -3240,6 +3240,11 @@
                 if (source === "wits" || source === "composure") {
                     updateMoralHealth();
                 };
+
+                var speedStats = ["dexterity","strength","power","finesse"];
+                if (speedStats.includes(source)) {
+                    updateSpeed();
+                }
     
                 var defenseStats = ["wits", "dexterity", "athletics", "brawl", "weaponry", "potency", "power", "finesse"];
                 if (defenseStats.includes(source)) {
@@ -3384,6 +3389,7 @@
     
         on("change:sheettype", function() {
             updateHealth();
+            updateSpeed();
             updateDefaultDefense();
             updateInitiative();
             updatePotencyName();
@@ -3421,6 +3427,7 @@
         });
     
         on("sheet:opened", function() {
+            updateSpeed();
             updateDefaultDefense();
             updateInitiative();
             updatePotencyName();
@@ -3787,6 +3794,27 @@
                     initiative_penalty: init,
                     wound_penalty: wound_penalty
                 });
+            });
+        }
+
+        var updateSpeed = function() {
+            getAttrs(["entity","strength","dexterity","power","finesse"], function(v) {
+                var speed;
+                switch(v.entity) {
+                    case "corporeal":
+                    default:
+                        var strength = parseInt(v.strength) || 1;
+                        var dexterity = parseInt(v.dexterity) || 1;
+                        speed = strength + dexterity;
+                        break;
+                    case "ephemeral":
+                        var power = parseInt(v.power) || 1;
+                        var finesse = parseInt(v.finesse) || 1;
+                        speed = power + finesse;
+                        break;
+                }
+
+                setAttrs({speed_base: speed});
             });
         }
     
