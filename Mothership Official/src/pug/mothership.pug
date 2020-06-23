@@ -32,20 +32,41 @@ include sheetdata.pug
                     .ms-topstat__label--small(data-i18n="current")
                 .ms-stats__main
                     each stat in stats
+                        -
+                            const roll1 = [
+                                `&{template:ms}`,
+                                `{{name=${stat.attr}}}`,
+                                `{{character_name=@{character_name}}}`,
+                                `{{roll=[[1d100cs1cf100]]}}`,
+                                `{{roll2=[[?{Advantage/Disadvantage|Normal,0|Advantage/Disadvantage,1d100cs1cf100}]]}}`,
+                                `{{target=@{${stat.attr}}}}`
+                            ].join(" ");
                         .ms-mainstat
                             .ms-mainstat__label
-                                button(data-i18n=stat.attr, type="roll")
+                                button(data-i18n=stat.attr, type="roll", value=roll1)
+                                span.ms-tooltip
+                                    p
+                                        span(data-i18n=stat.label)
                             input.ms-mainstat__input(name=`attr_${stat.attr}`, type="number")
                 .ms-patches
-                    h1(data-i18n="patches")
-                    each patch in [1, 2, 3, 4, 5]
-                        .ms-patches__label(data-i18n=`patch ${patch}`)
-                        input.ms-patches__input.ms-rounded(name=`attr_patch_${patch}`, type="text")
+                    h1(data-i18n="patch")
+                    textarea.ms-patches__textarea.ms-rounded(name=`attr_patch`)
+                    h1(data-i18n="trinket")
+                    textarea.ms-patches__textarea.ms-rounded(name=`attr_trinket`)
             .ms-saves
                 .ms-saves__col--left
                     each save in saves
+                        -
+                            const roll2 = [
+                                `&{template:ms}`,
+                                `{{name=${save.name}}}`,
+                                `{{character_name=@{character_name}}}`,
+                                `{{roll=[[1d100cs1cf100]]}}`,
+                                `{{roll2=[[?{Advantage/Disadvantage|Normal,0|Advantage/Disadvantage,1d100cs1cf100}]]}}`,
+                                `{{target=@{${save.name}}}}`
+                            ].join(" ");
                         .ms-saves__label
-                            button.ms-saves__name(data-i18n=save.name, type="roll")
+                            button.ms-saves__name(data-i18n=save.name, type="roll", value=roll2)
                             span.ms-tooltip
                                 p
                                     span(data-i18n=save.desc)
@@ -80,7 +101,17 @@ include sheetdata.pug
                 .ms-tooltip
                     p(data-i18n="You’ve received standard training in this area equivalent to a bachelor's degree or on-the-job training for a couple years.")
                 each skill in skills.trained
-                    - const attr = skill.name.replace(/ /g,"_");
+                    -
+                        const attr = skill.name.replace(/ /g,"_");
+                        const roll3 = [
+                                `&{template:ms}`,
+                                `{{name=${skill.name}}}`,
+                                `{{character_name=@{character_name}}}`,
+                                `{{roll=[[1d100cs1cf100]]}}`,
+                                `{{roll2=[[?{Advantage/Disadvantage|Normal,0|Advantage/Disadvantage,1d100cs1cf100}]]}}`,
+                                `{{target=[[?{Attribute|Strength,@{strength}|Speed,@{speed}|Intellect,@{intellect}|Combat,@{combat}}+10]]}}`
+                            ].join(" ");
+
                     .ms-skill-wrapper
                         .ms-skill(class=`ms-skill--${attr}`)
                             input(name=`attr_${attr}_settings`, type="hidden")
@@ -88,7 +119,7 @@ include sheetdata.pug
                                 input(name=`attr_${attr}`, type="checkbox")
                                 span
                             div.ms-skill__button
-                                button(data-i18n=skill.name, type="roll")
+                                button(data-i18n=skill.name, type="roll", value=roll3)
                             label.ms-skill__cog
                                 input(name=`attr_${attr}_settings`, type="checkbox")
                                 span y
@@ -100,32 +131,53 @@ include sheetdata.pug
                             p
                                 span(data-i18n=skill.desc)
                 fieldset(class=`repeating_trained`)
-                    .ms-skill--repeating
-                        input(name=`attr_skill_settings`, type="hidden", value="on")
-                        label.ms-skill__checkmark
-                            input(name=`attr_skill_trained`, type="checkbox")
-                            span
-                        div.ms-skill__button
-                            button.edit-hide(type="roll")
-                                span(name="attr_skill_name")
-                            span.ms-tooltip
-                                span(name="attr_skill_notes")
-                        label.ms-skill__cog
-                            input(name=`attr_skill_settings`, type="checkbox")
-                            span y
-                        .ms-skill__settings  
-                            .ms-skill__settingsrow
-                                .ms-skill__settingstitle(data-i18n="name")
-                                input.ms-skill__settingsinput(data-i18n-title="custom skill", name="attr_skill_name", type="text")
-                            .ms-skill__settingsrow
-                                .ms-skill__settingstitle(data-i18n="notes")
-                                input.ms-skill__settingsinput(name=`attr_skill_notes`, type="text")
+                    -
+                        const roll4 = [
+                                `&{template:ms}`,
+                                `{{name=@{skill_name}}}}`,
+                                `{{character_name=@{character_name}}}`,
+                                `{{roll=[[1d100cs1cf100]]}}`,
+                                `{{roll2=[[?{Advantage/Disadvantage|Normal,0|Advantage/Disadvantage,1d100cs1cf100}]]}}`,
+                                `{{target=[[?{Attribute|Strength,@{strength}|Speed,@{speed}|Intellect,@{intellect}|Combat,@{combat}}+10]]}}`
+                            ].join(" ");
+                            
+                    .ms-skill-wrapper
+                        .ms-skill--repeating
+                            input(name=`attr_skill_settings`, type="hidden", value="on")
+                            label.ms-skill__checkmark
+                                input(name=`attr_skill_trained`, type="checkbox")
+                                span
+                            div.ms-skill__button
+                                button.edit-hide(type="roll", value=roll4)
+                                    span(name="attr_skill_name")
+                            label.ms-skill__cog
+                                input(name=`attr_skill_settings`, type="checkbox")
+                                span y
+                            .ms-skill__settings  
+                                .ms-skill__settingsrow
+                                    .ms-skill__settingstitle(data-i18n="name")
+                                    input.ms-skill__settingsinput(data-i18n-title="custom skill", name="attr_skill_name", type="text")
+                                .ms-skill__settingsrow
+                                    .ms-skill__settingstitle(data-i18n="notes")
+                                    input.ms-skill__settingsinput(name=`attr_skill_notes`, type="text")
+                        span.ms-tooltip
+                            span(name="attr_skill_notes")
             .ms-skills__expert
                 h2(data-i18n="expert +15%")
                 .ms-tooltip
                     p(data-i18n="You have the equivalent of a doctorate or many years of experience.")
                 each skill in skills.expert
-                    - const attr = skill.name.replace(/ /g,"_");
+                    -
+                        const attr = skill.name.replace(/ /g,"_");
+                        const roll5 = [
+                                `&{template:ms}`,
+                                `{{name=${skill.name}}}`,
+                                `{{character_name=@{character_name}}}`,
+                                `{{roll=[[1d100cs1cf100]]}}`,
+                                `{{roll2=[[?{Advantage/Disadvantage|Normal,0|Advantage/Disadvantage,1d100cs1cf100}]]}}`,
+                                `{{target=[[?{Attribute|Strength,@{strength}|Speed,@{speed}|Intellect,@{intellect}|Combat,@{combat}}+15]]}}`
+                            ].join(" ");
+
                     .ms-skill-wrapper
                         .ms-skill(class=`ms-skill--${attr}`)
                             input(name=`attr_${attr}_settings`, type="hidden")
@@ -133,7 +185,8 @@ include sheetdata.pug
                                 input(name=`attr_${attr}`, type="checkbox")
                                 span
                             div.ms-skill__button
-                                button(data-i18n=skill.name, type="roll")
+                                button(data-i18n=skill.name, type="roll", value=roll5)
+                                    span(name="attr_skill_name")
                             label.ms-skill__cog
                                 input(name=`attr_${attr}_settings`, type="checkbox")
                                 span y
@@ -147,33 +200,56 @@ include sheetdata.pug
                             p
                                 strong(data-i18n="prerequisites")
                                 div(data-i18n=skill.prereq.join(", "))
+
                 fieldset(class=`repeating_expert`)
-                    .ms-skill--repeating
-                        input(name=`attr_skill_settings`, type="hidden", value="on")
-                        label.ms-skill__checkmark
-                            input(name=`attr_skill_trained`, type="checkbox")
-                            span
-                        div.ms-skill__button
-                            button.edit-hide(type="roll")
-                                span(name="attr_skill_name")
-                            span.ms-tooltip
-                                span(name="attr_skill_notes")
-                        label.ms-skill__cog
-                            input(name=`attr_skill_settings`, type="checkbox")
-                            span y
-                        .ms-skill__settings  
-                            .ms-skill__settingsrow
-                                .ms-skill__settingstitle(data-i18n="name")
-                                input.ms-skill__settingsinput(data-i18n-value="custom skill", name="attr_skill_name", type="text")
-                            .ms-skill__settingsrow
-                                .ms-skill__settingstitle(data-i18n="notes")
-                                input.ms-skill__settingsinput(name=`attr_skill_notes`, type="text")
+                    -
+                        const roll6 = [
+                                `&{template:ms}`,
+                                `{{name=@{skill_name}}}}`,
+                                `{{character_name=@{character_name}}}`,
+                                `{{roll=[[1d100cs1cf100]]}}`,
+                                `{{roll2=[[?{Advantage/Disadvantage|Normal,0|Advantage/Disadvantage,1d100cs1cf100}]]}}`,
+                                `{{target=[[?{Attribute|Strength,@{strength}|Speed,@{speed}|Intellect,@{intellect}|Combat,@{combat}}+20]]}}`
+                            ].join(" ");
+
+                    .ms-skill-wrapper
+                        .ms-skill--repeating
+                            input(name=`attr_skill_settings`, type="hidden", value="on")
+                            label.ms-skill__checkmark
+                                input(name=`attr_skill_trained`, type="checkbox")
+                                span
+                            div.ms-skill__button
+                                button.edit-hide(type="roll", value=roll6)
+                                    span(name="attr_skill_name")
+                            label.ms-skill__cog
+                                input(name=`attr_skill_settings`, type="checkbox")
+                                span y
+                            .ms-skill__settings  
+                                .ms-skill__settingsrow
+                                    .ms-skill__settingstitle(data-i18n="name")
+                                    input.ms-skill__settingsinput(data-i18n-value="custom skill", name="attr_skill_name", type="text")
+                                .ms-skill__settingsrow
+                                    .ms-skill__settingstitle(data-i18n="notes")
+                                    input.ms-skill__settingsinput(name=`attr_skill_notes`, type="text")
+                        span.ms-tooltip
+                            span(name="attr_skill_notes")
+
             .ms-skills__master
                 h2(data-i18n="master +20%")
                 .ms-tooltip
                     p(data-i18n="You are one of the luminaries of this field and are aware of cutting edge techniques or highly specialized and niche information.")
                 each skill in skills.master
-                    - const attr = skill.name.replace(/ /g,"_");
+                    -
+                        const attr = skill.name.replace(/ /g,"_");
+                        const roll7 = [
+                                `&{template:ms}`,
+                                `{{name=${skill.name}}}`,
+                                `{{character_name=@{character_name}}}`,
+                                `{{roll=[[1d100cs1cf100]]}}`,
+                                `{{roll2=[[?{Advantage/Disadvantage|Normal,0|Advantage/Disadvantage,1d100cs1cf100}]]}}`,
+                                `{{target=[[?{Attribute|Strength,@{strength}|Speed,@{speed}|Intellect,@{intellect}|Combat,@{combat}}+20]]}}`
+                            ].join(" ");
+
                     .ms-skill-wrapper
                         .ms-skill(class=`ms-skill--${attr}`)
                             input(name=`attr_${attr}_settings`, type="hidden")
@@ -181,7 +257,7 @@ include sheetdata.pug
                                 input(name=`attr_${attr}`, type="checkbox")
                                 span
                             div.ms-skill__button
-                                button(data-i18n=skill.name, type="roll")
+                                button(data-i18n=skill.name, type="roll", value=roll7)
                             label.ms-skill__cog
                                 input(name=`attr_${attr}_settings`, type="checkbox")
                                 span y
@@ -196,26 +272,37 @@ include sheetdata.pug
                                 strong(data-i18n="prerequisites")
                                 div(data-i18n=skill.prereq.join(", "))
                 fieldset(class=`repeating_master`)
-                    .ms-skill--repeating
-                        input(name=`attr_skill_settings`, type="hidden", value="on")
-                        label.ms-skill__checkmark
-                            input(name=`attr_skill_trained`, type="checkbox")
-                            span
-                        div.ms-skill__button
-                            button.edit-hide(type="roll")
-                                span(name="attr_skill_name")
-                            span.ms-tooltip
-                                span(name="attr_skill_notes")
-                        label.ms-skill__cog
-                            input(name=`attr_skill_settings`, type="checkbox")
-                            span y
-                        .ms-skill__settings  
-                            .ms-skill__settingsrow
-                                .ms-skill__settingstitle(data-i18n="name")
-                                input.ms-skill__settingsinput(data-i18n-value="custom skill", name="attr_skill_name", type="text")
-                            .ms-skill__settingsrow
-                                .ms-skill__settingstitle(data-i18n="notes")
-                                input.ms-skill__settingsinput(name=`attr_skill_notes`, type="text")
+                    -
+                        const roll8 = [
+                                `&{template:ms}`,
+                                `{{name=@{skill_name}}}}`,
+                                `{{character_name=@{character_name}}}`,
+                                `{{roll=[[1d100cs1cf100]]}}`,
+                                `{{roll2=[[?{Advantage/Disadvantage|Normal,0|Advantage/Disadvantage,1d100cs1cf100}]]}}`,
+                                `{{target=[[?{Attribute|Strength,@{strength}|Speed,@{speed}|Intellect,@{intellect}|Combat,@{combat}}+20]]}}`
+                            ].join(" ");
+
+                    .ms-skill-wrapper
+                        .ms-skill--repeating
+                            input(name=`attr_skill_settings`, type="hidden", value="on")
+                            label.ms-skill__checkmark
+                                input(name=`attr_skill_trained`, type="checkbox")
+                                span
+                            div.ms-skill__button
+                                button.edit-hide(type="roll", value=roll8)
+                                    span(name="attr_skill_name")
+                            label.ms-skill__cog
+                                input(name=`attr_skill_settings`, type="checkbox")
+                                span y
+                            .ms-skill__settings  
+                                .ms-skill__settingsrow
+                                    .ms-skill__settingstitle(data-i18n="name")
+                                    input.ms-skill__settingsinput(data-i18n-value="custom skill", name="attr_skill_name", type="text")
+                                .ms-skill__settingsrow
+                                    .ms-skill__settingstitle(data-i18n="notes")
+                                    input.ms-skill__settingsinput(name=`attr_skill_notes`, type="text")
+                        span.ms-tooltip
+                            span(name="attr_skill_notes")
         .ms-gear 
             .ms-equipment
                 h1(data-i18n="equipment")
@@ -254,10 +341,23 @@ include sheetdata.pug
                     .ms-attackrow__type--head(data-i18n="type")
                     .ms-attackrow__type--head(data-i18n="damage")
                 fieldset(class=`repeating_attacks`)
+                    -
+                        const roll9 = [
+                                `&{template:ms}`,
+                                `{{name=@{attack_name}}}`,
+                                `{{character_name=@{character_name}}}`,
+                                `{{roll=[[1d100cs1cf100]]}}`,
+                                `{{roll2=[[?{Advantage/Disadvantage|Normal,0|Advantage/Disadvantage,1d100cs1cf100}]]}}`,
+                                `{{target=[[@{combat}]]}}`,
+                                //- `{{ranges=@{attack_range_s}}}`,
+                                //- `{{rangem=@{attack_range_m}}}`,
+                                //- `{{rangel=@{attack_range_l}}}`,
+                                `{{damage=[[@{attack_damage}]]}}`
+                            ].join(" ");
                     .ms-attackrow
                         input(name=`attr_attack_settings`, type="hidden", value="on")
                         input(name=`attr_attack_linkedid`, type="hidden")
-                        button.ms-attackrow__name(type="roll", action="")
+                        button.ms-attackrow__name(type="roll", value=roll9)
                             span(name=`attr_attack_name`, type="text")
                         select.ms-attackrow__skill(name=`attr_attack_type`)
                             option(data-i18n="Ranged")
