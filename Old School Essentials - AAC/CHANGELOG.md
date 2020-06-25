@@ -8,6 +8,10 @@
 
 - Add optgroups to class dropdown to categorize classes
 
+### Fixed
+
+- Fix a missing translation for "Find secret door"
+
 ## 1.3.0
 
 ### Added
