@@ -2,6 +2,12 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.4.0
+
+### Changed
+
+- Add optgroups to class dropdown to categorize classes
+
 ## 1.3.0
 
 ### Added
