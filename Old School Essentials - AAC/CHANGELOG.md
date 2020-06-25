@@ -11,6 +11,7 @@
 ### Fixed
 
 - Fix a missing translation for "Find secret door"
+- Fix automatic hit dice for character classes
 
 ## 1.3.0
 
