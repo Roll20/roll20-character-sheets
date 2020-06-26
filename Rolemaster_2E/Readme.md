@@ -1,5 +1,7 @@
 Rolemaster 2 edition
 
+This character sheet is based on Diana P. Rolemaster-standard-edition
+with some modifications
 
 version 1.0 
 
