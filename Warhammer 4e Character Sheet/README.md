@@ -114,15 +114,19 @@ Usage Notes:
 - Arcane Spells need to have a number in CN and Damage Field or they will not roll correctly, both fields will default to Zero.
 - Extended Channelling Test (spellbook tab, Arcane Spells only), set Accu Ext SL to 0 before beginning a new Channelling action. Increment with Success level of roll until finished. Allows easy tracking of CN v Accu Ext SL for all players. (NPC tab has channelling on all spells for simplicity)
 - NPC tab is intended of quick persistent and contained NPC creation without the need for full character sheets for each of them. With template integration, semi featured with conmtained Name / Characteristic / Condition / Advantage ingration and up to 5 weapons & spells for each NPC, and a colapisble notes section. Good for GMs and players. (I would still recommed seperate character sheet for actual NPC bosses/major characters). 
-- Condition Tracking integration into roll template, first pass. Option to choose between Advantage +xx showing only (new default) on all combat rolls and all non-situational roll modifying conditions (e.g. Broken, Fatigued Stuned, Prone..) to be add to appropriate rolls automatically. Includes NPC tab support too. It should be noted that some conditons can we highly situational, like Perception test could be impacted by Blinded/Deafened or not depending on what is being percived, such situational occasions will have to be handled by the GM and no attempt is made to add complication is made. Condition effects are currently bound as follows:
+- Condition Tracking integration into roll template, first pass. Option to choose between Advantage +xx showing only (new default) on all combat rolls and all non-situational roll modifying conditions (e.g. Broken, Fatigued Stuned, Prone..) to be add to appropriate rolls automatically. Includes NPC tab support too. This has has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it also requires my custom WFRP4e Tokens  (download @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset1.0.zip) 
 
-Broken/Fatigued/Poisoned/Stunned = Effects all combat and skill rolls (excludes roll tables like Misscast/Oops etc.)
-Entangled/Prone = Effects Movement based rolls, so melee/spells, combat action and any skill which would require movement like dodge/athletics etc.
-Blinded = Effects Melee/Spells
-Deafened = Effects Spells
-Unconscious = Effects all rolls
+It should be noted that some conditons can we highly situational, like Perception test could be impacted by Blinded/Deafened or not depending on what is being perceived, such situational occasions will have to be handled by the GM and no attempt to add complication is made. 
 
-Note conditions are not inteneded for out of combat situations, GM simply make the roll difficulty harder (-20 etc) if any condition is to apply to a situation.
+Condition effects are currently bound as follows:
+
+Broken/Fatigued/Poisoned/Stunned = Effects all Melee/Spellcast and skill rolls (only excludes roll tables like Misscast/Oops etc.)
+Entangled/Prone = Effects Movement based rolls, so melee/spells, combat actions and any skill which would require movement like dodge/athletics/climb etc.
+Blinded = Effects Weapon/Spells casts rolls
+Deafened = Effects Spells casts rolls
+Unconscious = Effects all rolls (Roll block)
+
+Note conditions are not inteneded for out of combat situations, GM simply makes the roll difficulty harder with a custom roll modifier (-20 etc) if any particular condition is to apply to a situational roll.
 
 
 
