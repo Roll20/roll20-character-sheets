@@ -109,18 +109,3 @@ on('change:clear_misses', function() {
     'clear_misses': 'off'
   });
 });
-
-on('change:clear_misses', function() {
-  setAttrs({ 
-    'miss-0': '0',
-  });
-});
-
-// if it is just for an attribute, you can do: 
-// ```js
-// on('change:clear_misses', function() {
-//   setAttrs({ 
-//     'miss-0': '0',
-//   });
-// });
-// ```
