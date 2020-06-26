@@ -29,7 +29,7 @@ const skillList = {
         unlocks: ["engineering","hacking"]
     },
     "mechanical_repair": {
-        unlocks: ["asteroid_mining", "vehicle_specialization"]
+        unlocks: ["engineering", "jury_rigging", "vehicle_specialization"]
     },
     "driving": {
         unlocks: ["vehicle_specialization"]
@@ -50,7 +50,7 @@ const skillList = {
         unlocks: ["mysticism"]
     },
     "military_training": {
-        unlocks: ["tactics","gunnery","firearms","explosives"]
+        unlocks: ["tactics","gunnery","firearms","explosives","close-quarters_combat"]
     },
     "rimwise": {
         unlocks: ["firearms","close-quarters_combat"]
@@ -98,7 +98,7 @@ const skillList = {
         unlocks: ["hyperspace"]
     },
     "mysticism": {
-        unlocks: ["xenoesotericism"]
+        unlocks: ["xenoesotericism", "hyperspace"]
     },
     "tactics": {
         unlocks: ["command"]
