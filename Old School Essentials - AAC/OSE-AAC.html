@@ -580,6 +580,14 @@
       <input type="number" name="attr_level" value="1" />
     </label>
     <label class="inline-flex">
+      <button type="roll" data-i18n="hit-dice-number-abbr" title="Hit Dice" data-i18n-title="hit-dice-number"
+        value="/w gm &{template:simple} {{roll=HP for @{character_name}}} {{result=[[@{monsterHitDice}d8+@{monsterHitDiceModifier}]]}}">#
+        HD</button>
+      <input type="number" name="attr_monsterHitDice" value="1" />
+      <span>+</span>
+      <input type="number" name="attr_monsterHitDiceModifier" value="0" />
+    </label>
+    <label class="inline-flex">
       <span data-i18n="alignment-abbr">AL</span>
       <input type="text" name="attr_alignment" data-i18n-placeholder="alignment" placeholder="Alignment" />
     </label>
@@ -619,14 +627,6 @@
     <div class="roll monster-combat">
       <div>
         <div class="flex hp">
-          <label class="inline-flex">
-            <button type="roll" data-i18n="hit-dice-number-abbr" title="Hit Dice" data-i18n-title="hit-dice-number"
-              value="/w gm &{template:simple} {{roll=HP for @{character_name}}} {{result=[[@{monsterHitDice}d8+@{monsterHitDiceModifier}]]}}">#
-              HD</button>
-            <input type="number" name="attr_monsterHitDice" value="1" />
-            <span>+</span>
-            <input type="number" name="attr_monsterHitDiceModifier" value="0" />
-          </label>
           <label class="inline-flex">
             <button type="action" name="act_setAverageHP" class="double" data-i18n="hit-points-average">Average
               HP</button>
@@ -1206,7 +1206,7 @@
   });
 
   // Set saving throws, BAB, THAC0, HD, Next Level Experience
-  on('change:level change:class change:monsterhitdice', function() {
+  on('change:level change:class change:monsterhitdice change:monsterhitdicemodifier', function() {
     const classData = {
       "cleric": [
         { xp: 0,       hd: "1d6",    bab:  0, thac0: 19, saves: [11, 12, 14, 16, 15] },
@@ -1524,32 +1524,32 @@
         { xp: 0,       hd: "2",      bab: -1, thac0: 20, saves: [14, 15, 16, 17, 18] },
       ],
       "monster": [
-        { bab:  0,  thac0: 19, saves: [12, 13, 14, 15, 16] }, // 1
-        { bab:  1,  thac0: 18, saves: [12, 13, 14, 15, 16] }, // 2
-        { bab:  2,  thac0: 17, saves: [12, 13, 14, 15, 16] }, // 3
-        { bab:  3,  thac0: 16, saves: [10, 11, 12, 13, 14] }, // 4
-        { bab:  4,  thac0: 15, saves: [10, 11, 12, 13, 14] }, // 5
-        { bab:  5,  thac0: 14, saves: [10, 11, 12, 13, 14] }, // 6
-        { bab:  6,  thac0: 13, saves: [ 8,  9, 10, 10, 12] }, // 7
-        { bab:  7,  thac0: 12, saves: [ 8,  9, 10, 10, 12] }, // 8
-        { bab:  7,  thac0: 12, saves: [ 8,  9, 10, 10, 12] }, // 9
-        { bab:  8,  thac0: 11, saves: [ 6,  7,  8,  8, 10] }, // 10
-        { bab:  8,  thac0: 11, saves: [ 6,  7,  8,  8, 10] }, // 11
-        { bab:  9,  thac0: 10, saves: [ 6,  7,  8,  8, 10] }, // 12
-        { bab:  9,  thac0: 10, saves: [ 4,  5,  6,  5,  8] }, // 13
-        { bab: 10,  thac0:  9, saves: [ 4,  5,  6,  5,  8] }, // 14
-        { bab: 10,  thac0:  9, saves: [ 4,  5,  6,  5,  8] }, // 15
-        { bab: 11,  thac0:  8, saves: [ 2,  3,  4,  3,  6] }, // 16
-        { bab: 11,  thac0:  8, saves: [ 2,  3,  4,  3,  6] }, // 17
-        { bab: 12,  thac0:  7, saves: [ 2,  3,  4,  3,  6] }, // 18
-        { bab: 12,  thac0:  7, saves: [ 2,  2,  2,  2,  4] }, // 19
-        { bab: 13,  thac0:  6, saves: [ 2,  2,  2,  2,  4] }, // 20
-        { bab: 13,  thac0:  6, saves: [ 2,  2,  2,  2,  4] }, // 21
-        { bab: 14,  thac0:  5, saves: [ 2,  2,  2,  2,  2] }, // 22+
+        { bab:  0,  thac0: 19, saves: [12, 13, 14, 15, 16], xp: [  10,   15] }, // 1
+        { bab:  1,  thac0: 18, saves: [12, 13, 14, 15, 16], xp: [  20,   25] }, // 2
+        { bab:  2,  thac0: 17, saves: [12, 13, 14, 15, 16], xp: [  35,   50] }, // 3
+        { bab:  3,  thac0: 16, saves: [10, 11, 12, 13, 14], xp: [  75,  125] }, // 4
+        { bab:  4,  thac0: 15, saves: [10, 11, 12, 13, 14], xp: [ 175,  225] }, // 5
+        { bab:  5,  thac0: 14, saves: [10, 11, 12, 13, 14], xp: [ 275,  350] }, // 6
+        { bab:  6,  thac0: 13, saves: [ 8,  9, 10, 10, 12], xp: [ 450,  450] }, // 7
+        { bab:  7,  thac0: 12, saves: [ 8,  9, 10, 10, 12], xp: [ 650,  650] }, // 8
+        { bab:  7,  thac0: 12, saves: [ 8,  9, 10, 10, 12], xp: [ 900,  900] }, // 9
+        { bab:  8,  thac0: 11, saves: [ 6,  7,  8,  8, 10], xp: [ 900,  900] }, // 10
+        { bab:  8,  thac0: 11, saves: [ 6,  7,  8,  8, 10], xp: [1100, 1100] }, // 11
+        { bab:  9,  thac0: 10, saves: [ 6,  7,  8,  8, 10], xp: [1100, 1100] }, // 12
+        { bab:  9,  thac0: 10, saves: [ 4,  5,  6,  5,  8], xp: [1350, 1350] }, // 13
+        { bab: 10,  thac0:  9, saves: [ 4,  5,  6,  5,  8], xp: [1350, 1350] }, // 14
+        { bab: 10,  thac0:  9, saves: [ 4,  5,  6,  5,  8], xp: [1350, 1350] }, // 15
+        { bab: 11,  thac0:  8, saves: [ 2,  3,  4,  3,  6], xp: [1350, 1350] }, // 16
+        { bab: 11,  thac0:  8, saves: [ 2,  3,  4,  3,  6], xp: [2000, 2000] }, // 17
+        { bab: 12,  thac0:  7, saves: [ 2,  3,  4,  3,  6], xp: [2000, 2000] }, // 18
+        { bab: 12,  thac0:  7, saves: [ 2,  2,  2,  2,  4], xp: [2000, 2000] }, // 19
+        { bab: 13,  thac0:  6, saves: [ 2,  2,  2,  2,  4], xp: [2000, 2000] }, // 20
+        { bab: 13,  thac0:  6, saves: [ 2,  2,  2,  2,  4], xp: [2500, 2500] }, // 21
+        { bab: 14,  thac0:  5, saves: [ 2,  2,  2,  2,  2], xp: [2500, 2500] }, // 22+
       ]
     };
 
-    getAttrs(["level", "class", "monsterHitDice"], function(values) {
+    getAttrs(["level", "class", "monsterHitDice", "monsterHitDiceModifier"], function(values) {
       const charClass = values.class.toLowerCase();
 
       // Do not modify if using custom class
@@ -1562,7 +1562,9 @@
         // Ensure we always use the highest saves and such for HD 22+
         const clampedMonsterHitDice =
           monsterHitDice > 22 ? 22 : monsterHitDice;
-        const { bab, thac0, saves } = classData["monster"][clampedMonsterHitDice - 1];
+        const { bab, thac0, saves, xp } = classData["monster"][clampedMonsterHitDice - 1];
+        const [ baseXP, baseXPPlus ] = xp
+        const hitDiceModifier = parseInt(values.monsterHitDiceModifier, 10)
         setAttrs({
           monsterBab: bab,
           monsterThac0: thac0,
@@ -1570,7 +1572,8 @@
           saveW: saves[1],
           saveP: saves[2],
           saveB: saves[3],
-          saveS: saves[4]
+          saveS: saves[4],
+          monsterXPValue: (hitDiceModifier) ? baseXPPlus : baseXP
         })
       } else if (charClass === "normal human") {
         const { hd, bab, thac0, saves } = classData["normal human"][0];

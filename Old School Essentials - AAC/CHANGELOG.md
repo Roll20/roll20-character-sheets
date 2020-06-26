@@ -7,6 +7,7 @@
 ### Changed
 
 - Add optgroups to class dropdown to categorize classes
+- Add automatic XP calculation for monsters based on hit dice
 
 ### Fixed
 
