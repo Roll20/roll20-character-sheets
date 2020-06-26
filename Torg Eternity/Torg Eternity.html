@@ -62,7 +62,7 @@
     <input class="announcements" type="hidden" name="attr_announcements" value="0" />
     <div class="announcements grid grid-settings">
         <h3 class="title">Announcements: Version 4 Upgrade</h3>
-        <p>Your sheet is being updated to version 4. If your character has a lot of powers and attacks, this may take a few seconds to complete.</p>
+        <p>Your sheet is being updated to version 4.02. If your character has a lot of powers and attacks, this may take a few seconds to complete.</p>
         <p>Read this note in the meantime; it should be complete when you finish.</p>
         <p>You can learn more about the sheet features at the wiki page:</p>
         <input type="text" name="attr_wikipage" class="weblink" title="manually drag in this box to copy the address (roll20 doesnt let us embed links)." value="https://wiki.roll20.net/Torg_Eternity_Community_Sheet" readonly />
@@ -73,12 +73,16 @@
         </p>
         <ul >
             <input type="hidden" class="updates-toggle" name="attr_announcements_list" />
-            <li>Version 4.01: Corrected tharkold typo (from Tharkhold)</li>
-            <li>Version 4.01: Minor tweaks to visual style</li>
-            <li>Version 4.01: Added new buttons to torg rolltemplate.</li>
-            <li>Version 4.01: Added some elements to Story tab.</li>
+            <li>Version 4.02: Better handling for changes in ammo capacity.</li>
+            <li>Version 4.02: Updated Glories and Deeds & Exploits section, so they operate like Perks, Equipment, Armor.</li>
+            <li>Version 4.02: Behind the scenes CSS updates.</li>
+
             <div class="updates-old">
-            <li>A new visual design and layout.</li>
+                <li>Version 4.01: Corrected tharkold typo (from Tharkhold)</li>
+                <li>Version 4.01: Minor tweaks to visual style</li>
+                <li>Version 4.01: Added new buttons to torg rolltemplate.</li>
+                <li>Version 4.01: Added some elements to Story tab.</li>
+                <li>A new visual design and layout.</li>
             <li>Every heading on the Abilities page does something. Hover over them or click them to see.</li>
             <li>Added automatic calculation of most things on the sheet - attributes, skills, attacks, cosm axioms, wounds, shock, armour, and so on. </li>
             <li>Added skill display option, where you can choose which are shown or hidden via settings, and use them by name in macros.</li>
@@ -1201,7 +1205,7 @@
             
             
        
-
+            <div class="bottom">
             <div class="grid armor">
                 <div class="grid-contents armor-titles head">
                     <input type="hidden" class="armor-toggle" name="attr_Armor_toggle" value="0" />
@@ -1240,7 +1244,7 @@
                 </button>
                 <div class="grid-contents weapons-titles head">
                     <span class="head" title="Click the name to roll an attack.">Name</span>
-                    <span class="head" tile="Fixed bonus to attack">+A</span>
+                    <span class="head" title="Fixed bonus to attack">+A</span>
                     <span class="head">Axiom</span>
                     <span class="head">Range</span>
                     <span class="head">Ammo</span>
@@ -1371,7 +1375,7 @@
                         
                         
                         <span class="title wide">Ammo</span>
-                        <input class="weapon-value weapon-ammo" type="number"  value="0" name="attr_Attack_Ammo_max"  />
+                        <input class="weapon-value weapon-ammo" type="number"  value="0" name="attr_Attack_Ammo_Capacity"  />
                         
                         <span class="title narrow">Power?</span>
                         <label class="weapon-power">
@@ -1445,6 +1449,7 @@
                 </fieldset>
             </div>
         </div>
+    </div>
         
         <div class="sidebar grid">
             <input type="hidden" class="possibilities-toggle" name="attr_possibilities_toggle" value="0" />
@@ -1543,25 +1548,34 @@
                 <textarea class="crisis" name="attr_crisis"></textarea>
             </div>
             <div class="grid history">
-                <h3>Deeds and Exploits</h3>
+                <input type="hidden" class="deeds-toggle" name="attr_Deeds_toggle" value="0" />
+                <button class="ability-roll invisibutton" type="action" name="act_Deeds_toggle">
+                    <h3 title="Click to show/hide Descriptions">Deeds</h3>
+                </button>
                 <fieldset class="repeating_deeds">
                     <div class="grid-contents deeds-details">
                         <input type="text" value="" name="attr_DeedName"  />
-                        <input class="toggle-deed" type="checkbox" value="1" name="attr_DeedToggle" title="Check to show description." />
+                        <input class="toggle-deed" type="hidden" name="attr_DeedsToggle" value="0" />
+                        <input class="toggle-deed" type="checkbox" value="1" name="attr_DeedsToggle" title="Check to show description." />
                         <textarea  name="attr_DeedDescription"></textarea>
                     </div>
-                    
                 </fieldset>
     
             </div>
         </div>
         <div class="right">
             <div class="grid glory">
-                <h3>Glory</h3>
+                <input type="hidden" class="glory-toggle" name="attr_Glory_toggle" value="0" />
+                <button class="ability-roll invisibutton" type="action" name="act_Glory_toggle">
+                    <h3 title="Click to show/hide Descriptions">Glory</h3>
+                </button>
                 <p>Record the details of your moments of Glory. </p>
                 <fieldset class="repeating_glory">
                     <div class="glories">
                         <input type="text" class="increase" name="attr_glory_event" value="" />
+                        <input class="toggle-glory" type="hidden" name="attr_GloryToggle" value="0" />
+                        <input class="toggle-glory" type="checkbox" value="1" name="attr_GloryToggle" title="Check to show description." />
+                        <textarea  name="attr_GloryDescription"></textarea>
                     </div>
                 </fieldset>
             </div>
@@ -3589,13 +3603,15 @@
     ${text}` : `%c ${text}`;
         console.log(message, `color: ${color}; font-weight:bold`);
     };
+    const repeatingFieldName = (section, id, field) => `repeating_${section}_${id}_${field}`;
+            
     const CODEVERSION = 4.01;
     const NAMELENGTH = 21;
     
     // this is not a complete listing of attributes in the sheet, just those that are in handy groups for certain sheet workers.
     const statgroups = {
         panels: ['skills', 'possibilities', 'derived'],
-        displayButtons: ['Attacks', 'Perks', 'Armor', 'Equipment'],
+        displayButtons: ['Attacks', 'Perks', 'Armor', 'Equipment', 'Deeds', 'Glory'],
         buttonTypes: ['torg', 'Possibility', 'UP'],
         stats: ['CHA', 'DEX', 'MIN', 'SPI', 'STR'],
         statLabels: ['Charisma', 'Dexterity', 'Mind', 'Spirit', 'Strength'],
@@ -3889,7 +3905,7 @@
                 Axiom: `Attack_Axiom`,
 
                 Ammo: `Attack_Ammo`,
-                AmmoMax: `Attack_Ammo_max`,
+                AmmoMax: `Attack_Ammo_Capacity`,
     
                 AttackBonus: `Attack_Attack_Bonus`,
                 AttackScore: `Attack_Skill_Name`,
@@ -3898,7 +3914,6 @@
                 DamageNote: 'Damage_Footnote',
                 DamageRoll: 'rollDamage'
             };
-            const repeatingFieldName = (section, id, field) => `repeating_${section}_${id}_${field}`;
             const attackfields = [];
             idAttacks.forEach(id => Object.values(attackStats).forEach(attack => attackfields.push(repeatingFieldName('attacks',id,attack))));
     
@@ -4047,9 +4062,11 @@
                         const axiomDisplay = (axiomName1 ? `${axiomName1} ${axiomScore1}` : '') + (axiomName1 && axiomName2 ? ' ' : '') + (axiomName2 ? `${axiomName2} ${axiomScore2}` : '');
                         if (axiomDisplay !== axiom) output[repeatingFieldName('attacks', id, 'Attack_Axiom')] = axiomDisplay;
         
-                        const ammomax = int(v[repeatingFieldName('attacks', id, 'Attack_Ammo_max')]);
+                        const ammomax = int(v[repeatingFieldName('attacks', id, 'Attack_Ammo_Capacity')]);
                         const ammo = int(v[repeatingFieldName('attacks', id, 'Attack_Ammo')]);
-                        if(ammo > ammomax) output[repeatingFieldName('attacks', id, 'Attack_Ammo')] = ammomax;
+                        if(event.sourceAttribute === repeatingFieldName('attacks', id, 'Attack_Ammo_Capacity').toLowerCase() || ammo > ammomax) {
+                            output[repeatingFieldName('attacks', id, 'Attack_Ammo')] = ammomax;
+                        }
                         
                         /* attack roll templates */
                         /* rolltemplate needs:
@@ -4301,6 +4318,9 @@
                 break;
             case version < 4.01:
                 updateToV401_tharkold(version);
+                break;
+            case version < 4.02:
+                updateToV402_ammo(version);
                 break;
             default:
                 clog(`Check Complete. Sheet is up to date: Version ${version}.`, 'green', `Torg Eternity Versionator`);
@@ -4659,6 +4679,23 @@
             setAttrs(output, {silent:true}, versionator(output.version));
         });
     };
-    
+    const updateToV402_ammo = () => {
+        const version = 4.02;
+        clog(`Updating to Version ${version}`, 'red', 'Torg Eternity Versionator');
+        getSectionIDs('repeating_attacks', idarray => {
+            const fieldnames = [];
+            idarray.forEach(id => fieldnames.push(repeatingFieldName('attacks', id, 'Attack_Ammo_max')));
+            getAttrs(fieldnames, v => {
+                const output = {};
+                idarray.forEach(id => {
+                    output[repeatingFieldName('attacks', id, 'Attack_Ammo_Capacity')] = v[repeatingFieldName('attacks', id, 'Attack_Ammo_max')];
+                });
+                output.version = version;
+                output.announcements = 1;
+                setAttrs(output, {silent:true}, versionator(output.version));
+            });
+        });
+        
+    };
 </script>
 
