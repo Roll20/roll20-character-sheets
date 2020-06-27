@@ -11,6 +11,8 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 June 29 2020
 
 - Buttons & Banners further improved look
+- Combat Initiative roll now allows Modifier for the Init Char.
+- Crit Roll fixed so it doesnt go negative.
 - NPC tab reworked, look improved, added Condition tracker section and 2 custom skill rolls
 - Condition Tracking integration into roll template, first pass. Option to choose between Advantage +xx showing only (new default) on all combat rolls and all non-situational roll modifying conditions (e.g. Broken, Fatigued Stuned, Prone..) to be add to appropriate rolls automatically. Includes NPC tab support too. It should be noted that some conditons can we highly situational, like Perception test could be impacted by Blinded/Deafened or not depending on what is being percived, such situational occasions will have to be handled by the GM and no attempt is made to add complication is made. Condition effects are currently bound as follows:
 
