@@ -1,27 +1,47 @@
 <script type="text/worker">
-    on('sheet:opened',function() {
-        getAttrs(['skill_scruitiny', 'skill_scrutiny', 'constritution', 'constitution'], function(values) {
-            if (values.skill_scruitiny && values.skill_scrutiny == 0) {
-                setAttrs({'skill_scrutiny': values.skill_scruitiny,
-                          'skill_scruitiny': ''});
-            }
 
-            if (values.constritution && !values.constitution) {
-                setAttrs({'constitution': values.constritution,
-                         'constritution': ''});
+on('sheet:opened', function () {
+    getAttrs(['codeversion'], function (values) {
+        if ((parseFloat(values.codeversion) || 0) < 1) {
+            updateWounds();
+        }
+    });
+});
+
+function updateWounds() {
+    const fieldnames = [];
+    const rows = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    rows.forEach(num => fieldnames.push(`wound${num}`, `wound${num}_days`));
+    getAttrs(fieldnames, function (values) {
+        const output = {};
+        const getValue = field => (values[field] != 'undefined') ? values[field] : '';
+        rows.forEach(row => {
+            const wound = parseInt(values[`wound${row}`]) || 0;
+            if (wound > 0) {
+                const rowid = generateRowID();
+                output[`repeating_wounds_${rowid}_wound`] = wound;
+                output[`repeating_wounds_${rowid}_wound_days`] = getValue(`wound${row}_days`);
             }
         });
+        output.codeversion = 1;
+        setAttrs(output);
     });
-    
-on("change:repeating_weapon:defence_dice_switch", function() {
-        getAttrs(["repeating_weapon_defence_dice_switch"], function(values) {
-            var check = parseInt(values.repeating_weapon_defence_dice_switch) || 0;
-            var dice = check ? "1d10!pcs>19cf1cf19" : "1d20cs>19cf1cf19";
-        setAttrs({
-            repeating_weapon_defence_dice: dice
+}
+
+
+on('change:hp_max change:repeating_wounds:wound sheet:opened', () => {
+    getSectionIDs('repeating_wounds', idarray => {
+        const fieldnames = [];
+        idarray.forEach(id => fieldnames.push(`repeating_wounds_${id}_wound`));
+        getAttrs([...fieldnames, 'hp_max'], v => {
+            const hp_max = parseInt(v.hp_max) || 0;
+            const hp = hp_max - fieldnames.reduce((total, item) => total += (parseInt(v[item]) || 0), 0);
+            setAttrs({hp});
         });
     });
 });
+
+
 
 const int = score => parseInt(score) || 0;
 on("change:strength change:strength_fractional sheet:opened", function() {
@@ -55,6 +75,33 @@ on("change:strength change:strength_fractional sheet:opened", function() {
             feat_of_strength: feat_of_strength
     });
   });
+});
+
+on("change:repeating_weapon:start_working1 sheet:opened", function() {
+        getAttrs(["repeating_weapon_start_working1"], function(values) {
+            const sw1 = int(values.repeating_weapon_start_working1);
+            console.log(sw1);
+            if (sw1 <= 3) start_working= "1d8!p";
+            else if (sw1 <=5) start_working= "1d10!p";
+            else if (sw1 <=7) start_working= "1d12!p";
+            else if (sw1 <=9) start_working= "1d20";
+            else start_working="1d20-4";
+        setAttrs({
+            repeating_weapon_start_working: start_working
+        });
+    });
+});
+
+on("change:repeating_weapon:start_working1 sheet:opened", function() {
+        getAttrs(["repeating_weapon_start_working1"], function(values) {
+            const sw1 = int(values.repeating_weapon_start_working1);
+            console.log(sw1);
+            if (sw1 <= 9) crit_value= "0";
+            else crit_value="-4";
+        setAttrs({
+            repeating_weapon_crit_value: crit_value
+        });
+    });
 });
 
 on("change:intelligence change:intelligence_fractional sheet:opened", function() {
@@ -295,7 +342,7 @@ on("change:skill_dice_switch sheet:opened", function() {
     });
         getAttrs(["skill_dice_switch"], function(values) {
             var check = parseInt(values.skill_dice_switch) || 0;
-            var diceJ = check ? "[[1d100+@{skill_jumping}]] vs Opposing Roll" : "[[d100]] Skill: [[@{skill_jumping]]";
+            var diceJ = check ? "[[1d100+@{skill_jumping}]] vs Opposing Roll" : "[[d100]] Skill: [[@{skill_jumping}]]";
         setAttrs({
             jumping_dice: diceJ
         });
@@ -433,21 +480,23 @@ on("change:skill_dice_switch sheet:opened", function() {
     <div class="sheet-col-5-8 sheet-padr">
         <div class="sheet-row">
             <div class="sheet-col-1-2"><input class="sheet-underlined" type="text" name="attr_character_name"/><br/>Character Name</div>
-        	<div class="sheet-col-1-4"><select name="attr_class_fatigue">
-                <option value="0">Assassin</option>
-                <option value="-2">Barbarian</option>
-                <option value="0">Cleric</option>
-                <option value="-2">Fighter</option>
-                <option value="-1">Fighter/Mage</option>
-                <option value="-1">Fighter/Thief</option>
-                <option value="-2">Knight</option>
-                <option value="0">Mage</option>
-                <option value="0">Mage/Thief</option>
-                <option value="-2">Paladin</option>
-                <option value="-2">Ranger</option>
-                <option value="0">Rogue</option>
-                <option value="0">Thief</option>
-            </select><br/>Class</div>
+            <div class="sheet-col-1-4">
+                <select name="attr_class_fatigue">
+            	<option value="0">Assassin</option>
+            	<option value="-2">Barbarian</option>
+            	<option value="0+0">Cleric</option>
+            	<option value="-2+0">Fighter</option>
+            	<option value="-1">Fighter/Mage</option>
+            	<option value="-1+0">Fighter/Thief</option>
+            	<option value="-2+0+0">Knight</option>
+            	<option value="0+0+0">Mage</option>
+            	<option value="0+0+0+0">Mage/Thief</option>
+            	<option value="-2+0+0+0">Paladin</option>
+            	<option value="-2+0+0+0+0">Ranger</option>
+            	<option value="0+0+0+0+0">Rogue</option>
+            	<option value="0+0+0+0+0+0">Thief</option>
+                </select><br/>Class
+            </div>
     		<div class="sheet-col-1-4"><select name="attr_race">
                 <option value="Dwarf">Dwarf</option>
                 <option value="Elf">Elf</option>
@@ -623,7 +672,10 @@ on("change:skill_dice_switch sheet:opened", function() {
                         <option value="12 1/2 ft">12 1/2 ft</option>
                         <option value="15 ft">15 ft</option>
                         <option value="17 1/2 ft">17 1/2 ft</option>
-                        <option value="20 ft">20 ft</option>
+                        <option value="22 1/2 ft">22 1/2  ft</option>
+                        <option value="25 ft">25 ft</option>
+                        <option value="27 1/2 ft">27 1/2 ft</option>
+                        <option value="30 ft">30 ft</option>
     				</select>
                 </div>
                 <div class="sheet-col-1-8"></div>
@@ -663,11 +715,16 @@ on("change:skill_dice_switch sheet:opened", function() {
             
             <div class="sheet-row sheet-stat-row">
                 <div class="sheet-col-1-4">Poison</div>
-                <div class="sheet-col-1-4"><input type="number" name="attr_poison_save" value="@{level}+@{poison_save_bonus}+@{constitution}" disabled="disabled"/></div>
+                <div class="sheet-col-1-4"><input type="number" name="attr_poison_save" value="@{poison_save_bonus}+@{constitution}" disabled="disabled"/></div>
                 <div class="sheet-col-1-4"><input type="number" name="attr_poison_save_bonus" value="0"/></div>
                 <div class="sheet-col-1-4 sheet-vert-middle"><button class="sheet-skill-roll" type='roll' name='roll_mental_save' value='@{character_name} makes a Saving Throw \n\nPoison Save :[[1d20 + @{poison_save} ]]'>Save</button></div>
-            </div> 
-            
+            </div>
+            <div class="sheet-col-1-4"><span>Notes</span></div>
+            <input type="checkbox" class="wombat-show arrow" name="attr_saving_throw_show" title="Show/Hide" value="1">
+            <span></span>
+            <div class="wombat">
+            <div><textarea name="attr_saving_throw_notes"></textarea></div>
+            </div>
             <hr />
             
             <h4>Quick References</h4>
@@ -704,15 +761,25 @@ on("change:skill_dice_switch sheet:opened", function() {
             </div>
             <hr />
             
-            <h4>Level Bonus</h4>
+            <h4>Level Bonus for Combat Profiles</h4>
             
             <div class="sheet-row sheet-stat-row">
+                <div class="sheet-col-1-4"><span>Details</span></div>
+                <input type="checkbox" class="wombat-show arrow" name="attr_wombat_show" title="Show/Hide" value="1">
+                <span></span>
+                <div class="wombat">
                 <div class="sheet-col-1-6">Attack</div>
                 <div class="sheet-col-1-6"><input type="number" name="attr_level_attack_bonus" value="0"/></div>
                 <div class="sheet-col-1-6">Speed</div>
                 <div class="sheet-col-1-6"><input type="number" name="attr_level_speed_bonus" value="0"/></div>
                 <div class="sheet-col-1-6">Initiative</div>
-                <div class="sheet-col-1-6"><input type="number" name="attr_level_initiative_bonus" value="0"/></div>                
+                <div class="sheet-col-1-6"><input type="number" name="attr_level_initiative_bonus" value="0"/></div>
+                <div class="sheet-col-1-3">Melee Only Speed</div>
+                <div class="sheet-col-1-6"><input type="number" name="attr_level_melee_speed_bonus" value="0"/></div>
+                <div class="sheet-col-1-3">Ranged Only Speed</div>
+                <div class="sheet-col-1-6"><input type="number" name="attr_level_ranged_speed_bonus" value="0"/></div>
+                <div class="sheet-col-3-4">Speed and M/R only Speed will Stack</div>
+                </div>
             </div>
             
         </div>
@@ -744,13 +811,13 @@ on("change:skill_dice_switch sheet:opened", function() {
 			<div class="sheet-col-1-8" title="Only enter the shield damage roll here without any bonuses from stats or other sources"><input type="text" name="attr_weapon_shield_damage"/></div>
 			<div class="sheet-col-1-16"><input type="number" name="attr_weapon_reach" min=0 step=0.25></div>
         	<div class="sheet-col-1-16"><input type="number" name="attr_weapon_attack_mod_total" value="@{fatigue_attack}+@{weapon_misc_attack}+@{weapon_style_attack}+@{level_attack_bonus}+@{intelligence_attack_mod}+@{dexterity_attack_mod}+@{weapon_magic_bonus}+@{weapon_spec_attack}+@{weapon_talent_attack}" disabled="disabled"/></div>
-            <input type="hidden" name="attr_weapon_jab_speed_mod_total" value="@{fatigue_speed}+@{weapon_misc_speed}+@{weapon_style_speed}+@{base_weapon_jab_speed}+@{level_speed_bonus}+@{armor_speed_modifier}+@{weapon_spec_speed}+@{weapon_talent_speed}+@{encumbrance_speed_mod}" disabled="disabled"/>
-            <div class="sheet-col-1-16"><input type="number" name="attr_weapon_speed_mod_total" value="@{fatigue_speed}+@{weapon_misc_speed}+@{weapon_style_speed}+@{base_weapon_speed}+@{level_speed_bonus}+@{armor_speed_modifier}+@{weapon_spec_speed}+@{weapon_talent_speed}+@{encumbrance_speed_mod}" disabled="disabled"/></div>
-            <div class="sheet-col-1-16"><input type="number" name="attr_weapon_defense_mod_total" value="@{fatigue_defense}+@{weapon_misc_defense}+@{weapon_style_defense}+@{wisdom_defense_mod}+@{dexterity_defense_mod}+@{weapon_spec_defense}+@{weapon_talent_defense}+@{armor_defense_bonus}+@{shield_defense_bonus}+@{natural_defense_bonus}+@{encumbrance_defense_mod}" disabled="disabled"/></div>
+            <input type="hidden" name="attr_weapon_jab_speed_mod_total" value="@{fatigue_speed}+@{weapon_misc_speed}+@{weapon_style_speed}+@{base_weapon_jab_speed}+@{level_speed_bonus}+@{level_melee_speed_bonus}+@{armor_speed_modifier}+@{weapon_spec_speed}+@{weapon_talent_speed}+@{encumbrance_speed_mod}" disabled="disabled"/>
+            <div class="sheet-col-1-16"><input type="number" name="attr_weapon_speed_mod_total" value="@{fatigue_speed}+@{weapon_misc_speed}+@{weapon_style_speed}+@{base_weapon_speed}+@{level_speed_bonus}+@{level_melee_speed_bonus}+@{armor_speed_modifier}+@{weapon_spec_speed}+@{weapon_talent_speed}+@{encumbrance_speed_mod}" disabled="disabled"/></div>
+            <div class="sheet-col-1-16"><input type="number" name="attr_weapon_defense_mod_total" value="@{fatigue_defense}+@{weapon_misc_defense}+@{weapon_style_defense}+@{wisdom_defense_mod}+@{dexterity_defense_mod}+@{weapon_spec_defense}+@{weapon_talent_defense}+@{armor_defense_bonus}+@{shield_def_switch}+@{natural_defense_bonus}+@{encumbrance_defense_mod}" disabled="disabled"/></div>
             <div class="sheet-col-1-16"><input type="number" name="attr_weapon_damage_mod_total" value="@{fatigue_damage}+@{weapon_misc_damage}+@{weapon_style_damage}+@{weapon_stat_bonus_damage}+@{weapon_spec_damage}+@{weapon_talent_damage}+@{weapon_magic_bonus}" disabled="disabled"/></div>
-            <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_attack' value='&{template:hm_std} {{name=@{character_name} attacks!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}} {{reach=@{weapon_reach}}} {{atk_roll=[[1d20cs>19cf1cf19 +@{weapon_attack_mod_total}]]}}'>ATK</button></div>
+            <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_attack' value='&{template:hm_std} {{name=@{character_name} attacks!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}} {{reach=@{weapon_reach}}} {{atk_roll=[[1d20 +@{weapon_attack_mod_total}]]}}{{perf=[[19+@{weapon_attack_mod_total}]]}}'>ATK</button></div>
             <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_damage' value='&{template:hm_std} {{name=@{character_name} hits!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}} {{reach=@{weapon_reach}}} {{damage=[[@{weapon_base_damage}+@{weapon_damage_mod_total}]]}}'>DMG</button></div>
-            <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_defense' value='&{template:hm_std} {{name=@{character_name} defends!!}}{{def_roll=[[ @{defence_dice} +@{weapon_defense_mod_total}]]}} {{dr=[[@{dr}]]}} {{sdr=[[@{shield_dr}]]}}{{fatigue=[[@{current_fatigue}+@{weapon_defense_mod_total}]]}}'>DEF</button></div>
+            <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_defense' value='&{template:hm_std} {{name=@{character_name} defends!!}}{{def_roll=[[ @{start_working} +@{weapon_defense_mod_total}]]}} {{dr=[[@{dr}]]}} {{sdr=[[@{shield_dr}]]}}{{fatigue=[[@{current_fatigue}+@{weapon_defense_mod_total}]]}}{{perf=[[19+@{weapon_defense_mod_total}+@{crit_value}]]}}'>DEF</button></div>
             <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_damage' value='&{template:hm_std} {{name=@{character_name} is blocked!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}} {{reach=@{weapon_reach}}} {{damage=[[@{weapon_shield_damage}+@{weapon_damage_mod_total}]]}}'>SHD</button></div>
             <div>
             <div class="sheet-col-1-8"><span>Hidden Details</span></div>
@@ -764,11 +831,9 @@ on("change:skill_dice_switch sheet:opened", function() {
             
             <div class="sheet-col-1-16" title="The magic bonus will be added as a bonus to BOTH the attack and damage rolls"><input type="number" name="attr_weapon_magic_bonus" value="0"/></div>
             
-            <div class="sheet-col-1-16"><input type="checkbox" name="attr_defence_dice_switch" value="1" /></div>
+            <div class="sheet-col-1-16"></div>
             
-            <input type="hidden" name="attr_defence_dice" value="1d20cs>19cf1cf19" />
-            
-            <div class="sheet-col-1-16"><span>d10 Def</span></div>
+            <div class="sheet-col-1-16"></div>
             <div class="sheet-col-1-8 sheet-vert-bottom">Specialization</div>
             <div class="sheet-col-1-16">
     			<select name="attr_weapon_spec_attack">
@@ -890,8 +955,13 @@ on("change:skill_dice_switch sheet:opened", function() {
             <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_damage' value='&{template:hm_std} {{name=@{character_name} jabs you!}} {{weapon=@{weapon}}} {{speed=@{weapon_jab_speed_mod_total}}} {{reach=@{weapon_reach}}} {{damage=[[@{weapon_jab_damage}+@{weapon_damage_mod_total}]]}}'>DMG</button></div>
               
         <div class="sheet-row sheet-stat-row sheet-padl">
-            <div class="sheet-col-1-16"></div>
-            <div class="sheet-col-1-8 sheet-vert-bottom"></div>
+            <div class="sheet-col-1-8 sheet-vert-bottom">Shield Use</div>
+            <div class="sheet-col-1-16" title="Choose if this weapon uses a shield">
+				<select name="attr_shield_def_switch">
+					<option value="0">N</option>
+					<option value="@{shield_defense_bonus}">Y</option>
+				</select>
+			</div>
             <div class="sheet-col-1-16"></div>
             <div class="sheet-col-1-16"></div>
             <div class="sheet-col-1-8 sheet-vert-bottom">Miscellaneous</div>
@@ -899,8 +969,188 @@ on("change:skill_dice_switch sheet:opened", function() {
             <div class="sheet-col-1-16 sheet-vert-bottom"><input type="number" name="attr_weapon_misc_speed" value="0"/></div>
             <div class="sheet-col-1-16 sheet-vert-bottom"><input type="number" name="attr_weapon_misc_defense" value="0"/></div>
             <div class="sheet-col-1-16 sheet-vert-bottom"><input type="number" name="attr_weapon_misc_damage" value="0"/></div>
-            <div class="sheet-col-3-16"></div>
+            <div class="sheet-col-1-16">Defense Dice</div>
+            <input type="hidden" name="attr_start_working" value="0" />
+            <input type="hidden" name="attr_crit_value" value="0" />
+            <div class="sheet-col-2-16">               
+                <select name="attr_start_working1">
+                    <option value="2">d8</option>
+                    <option value="4">d10</option>
+                    <option value="6">d12</option>
+                    <option value="10">d20-4</option>
+                    <option value="8">d20</option>
+				</select></div>
+        <hr /><div><textarea name="attr_combat_profile_notes"></textarea></div>
+        </div>
+        </div>
+        </fieldset>
+		</div>
+	</fieldset>
+    </div>
+</div>
+
+<h3>Ranged Combat Profiles</h3>
+<div class="sheet-section-combat">
+    <div class="sheet-row sheet-stat-row sheet-padl">
+		<div class="sheet-col-3-16 sheet-vert-bottom">Weapon</div>
+		<div class="sheet-col-1-8 sheet-vert-bottom">Base Damage</div>
+		<div class="sheet-col-1-8 sheet-vert-bottom">Shield Damage</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Ammo</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Attack</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Speed</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Damage</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Attack Roll</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Attack with -4</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Attack with -6</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Attack with -8</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Damage</div>
+	</div>
+    <hr />
+    <fieldset class="repeating_rangedweapons">
+		<div class="sheet-row sheet-stat-row sheet-padl">
+			<div class="sheet-col-3-16"><input type="text" name="attr_weapon"/></div>
+			<div class="sheet-col-1-8" title="Only enter the base damage roll here without any bonuses from stats or other sources"><input type="text" name="attr_weapon_base_damage"/></div>
+			<div class="sheet-col-1-8" title="Only enter the shield damage roll here without any bonuses from stats or other sources"><input type="text" name="attr_weapon_shield_damage"/></div>
+			<div class="sheet-col-1-16"><input type="number" name="attr_missle_ammo" min=0 step=1></div>
+        	<div class="sheet-col-1-16"><input type="number" name="attr_weapon_attack_mod_total" value="@{fatigue_attack}+@{weapon_misc_attack}+@{weapon_style_attack}+@{level_attack_bonus}+@{intelligence_attack_mod}+@{dexterity_attack_mod}+@{weapon_magic_attack_bonus}+@{weapon_spec_attack}+@{weapon_talent_attack}" disabled="disabled"/></div>
+            <div class="sheet-col-1-16"><input type="number" name="attr_weapon_speed_mod_total" value="@{fatigue_speed}+@{weapon_misc_speed}+@{weapon_style_speed}+@{base_weapon_speed}+@{level_speed_bonus}+@{level_ranged_speed_bonus}+@{armor_speed_modifier}+@{weapon_spec_speed}+@{weapon_talent_speed}+@{encumbrance_speed_mod}" disabled="disabled"/></div>
+            <div class="sheet-col-1-16"><input type="number" name="attr_weapon_damage_mod_total" value="@{fatigue_damage}+@{weapon_misc_damage}+@{weapon_style_damage}+@{weapon_stat_bonus_damage}+@{weapon_spec_damage}+@{weapon_talent_damage}+@{weapon_magic_damage_bonus}" disabled="disabled"/></div>
+            <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_attack' value='&{template:hm_std} {{name=@{character_name} attacks!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}} {{atk_roll=[[1d20 +@{weapon_attack_mod_total}+@{aiming}]]}}{{perf=[[19+@{weapon_attack_mod_total}]]}}'>ATK</button></div>
+            <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_attack' value='&{template:hm_std} {{name=@{character_name} attacks!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}}{{atk_roll=[[1d20 +@{weapon_attack_mod_total}-4+@{aiming}]]}}{{perf=[[19+@{weapon_attack_mod_total}-4]]}}'>-4</button></div>
+            <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_attack' value='&{template:hm_std} {{name=@{character_name} attacks!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}}{{atk_roll=[[1d20 +@{weapon_attack_mod_total}-6+@{aiming}]]}}{{perf=[[19+@{weapon_attack_mod_total}-6]]}}'>-6</button></div>
+            <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_attack' value='&{template:hm_std} {{name=@{character_name} attacks!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}}{{atk_roll=[[1d20 +@{weapon_attack_mod_total}-8+@{aiming}]]}}{{perf=[[19+@{weapon_attack_mod_total}-8]]}}'>-8</button></div>
+            <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_damage' value='&{template:hm_std} {{name=@{character_name} hits!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}} {{damage=[[@{weapon_base_damage}+@{weapon_damage_mod_total}]]}}'>DMG</button></div>
+            <div>
+            <div class="sheet-col-1-8"><span>Hidden Details</span></div>
+            <input type="checkbox" class="wombat-show arrow" name="attr_wombat_show" title="Show/Hide" value="1">
+            <span></span>
+            <div class="wombat">
+            
+            
+        <div class="sheet-row sheet-stat-row sheet-_padl">
+            <div class="sheet-col-1-8 sheet-vert-bottom">Magic Attack Bonus</div>
+            
+            <div class="sheet-col-1-16" title="The magic bonus will be added as a bonus to BOTH the attack and damage rolls"><input type="number" name="attr_weapon_magic_attack_bonus" value="0"/></div>
+            
+            <div class="sheet-col-1-16"><input type="checkbox" name="attr_aiming" value="-6" /></div>
+            
+            <div class="sheet-col-1-16"><span>Snapshot</span></div>
+            <div class="sheet-col-1-8 sheet-vert-bottom">Specialization</div>
+            <div class="sheet-col-1-16">
+    			<select name="attr_weapon_spec_attack">
+					<option value="0">0</option>
+					<option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+				</select>
+            </div>
+            <div class="sheet-col-1-16">
+        		<select name="attr_weapon_spec_speed">
+					<option value="0">0</option>
+					<option value="-1">-1</option>
+                    <option value="-2">-2</option>
+                    <option value="-3">-3</option>
+                    <option value="-4">-4</option>
+                    <option value="-5">-5</option>
+				</select>
+            </div>
+            <div class="sheet-col-1-16">
+        		<select name="attr_weapon_spec_damage">
+					<option value="0">0</option>
+					<option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+				</select>
+            </div>
+            <div class="sheet-col-1-16">
+            </div>
+            
+            <div class="sheet-col-1-8">d20 Range</div>
+            <div class="sheet-col-1-16" title="Range at which you roll a d20"><input type="text" name="attr_best_range"/></div>
+     
+            
+        </div>
+        
+        <div class="sheet-row sheet-stat-row sheet-_padl">
+            <div class="sheet-col-1-16"></div>
+            <div class="sheet-col-1-8 sheet-vert-bottom">Magic Damage Bonus</div>
+            <div class="sheet-col-1-16" title="The magic bonus will be added as a bonus to only damage rolls"><input type="number" name="attr_weapon_magic_damage_bonus" value="0"/></div>
+            <div class="sheet-col-1-8"></div>
+
+           
+            <div class="sheet-col-1-8 sheet-vert-bottom">Talents</div>
+            <div class="sheet-col-1-16 sheet-vert-bottom">
+        		<select name="attr_weapon_talent_attack">
+					<option value="0">0</option>
+					<option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+				</select>
+            </div>
+            <div class="sheet-col-1-16 sheet-vert-bottom">
+        		<select name="attr_weapon_talent_speed">
+					<option value="0">0</option>
+					<option value="-1">-1</option>
+                    <option value="-2">-2</option>
+                    <option value="-3">-3</option>
+                    <option value="-4">-4</option>
+                    <option value="-5">-5</option>
+				</select>
+            </div>
+            <div class="sheet-col-1-16 sheet-vert-bottom">
+        		<select name="attr_weapon_talent_damage">
+					<option value="0">0</option>
+					<option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+				</select>
+            </div>
+            <div class="sheet-col-1-16 sheet-vert-bottom">
+            </div>
+            <div class="sheet-col-1-8">d20-4 Range</div>
+            <div class="sheet-col-1-16" title="Range at which you roll a d20-4"><input type="text" name="attr_-4_range"/></div>          
+            
+            <div class="sheet-col-1-16"></div>
+            <div class="sheet-col-1-8 sheet-vert-bottom">Base Speed</div>
+            <div class="sheet-col-1-16"><input type="number" name="attr_base_weapon_speed"></div>
+            <div class="sheet-col-1-8"></div>
+
+            <div class="sheet-col-1-8 sheet-vert-bottom">Style</div>
+            <div class="sheet-col-1-16 sheet-vert-bottom"><input type="number" name="attr_weapon_style_attack" value="0"/></div>
+            <div class="sheet-col-1-16 sheet-vert-bottom"><input type="number" name="attr_weapon_style_speed" value="0"/></div> 
+            <div class="sheet-col-1-16 sheet-vert-bottom"><input type="number" name="attr_weapon_style_damage" value="0"/></div>
+            <div class="sheet-col-1-16 sheet-vert-bottom"></div>
+            
+            <div class="sheet-col-1-8">d20-6 Range</div>
+            <div class="sheet-col-1-16" title="Range at which you roll a d20-6"><input type="text" name="attr_-6_range"/></div>
+              
+        <div class="sheet-row sheet-stat-row sheet-padl">
+            <div class="sheet-col-1-8 sheet-vert-bottom">Str Bonus</div>
+            <div class="sheet-col-1-16" title="Choose STR Mod for thrown weapon or None for ranged weapon">
+				<select name="attr_weapon_stat_bonus_damage">
+					<option value="0">N</option>
+					<option value="@{strength_damage_mod}">Y</option>
+				</select>
+			</div>
+            <div class="sheet-col-1-16"></div>
+            <div class="sheet-col-1-16"></div>
+            <div class="sheet-col-1-8 sheet-vert-bottom">Miscellaneous</div>
+            <div class="sheet-col-1-16 sheet-vert-bottom"><input type="number" name="attr_weapon_misc_attack" value="0"/></div>
+            <div class="sheet-col-1-16 sheet-vert-bottom"><input type="number" name="attr_weapon_misc_speed" value="0"/></div>
+            <div class="sheet-col-1-16 sheet-vert-bottom"><input type="number" name="attr_weapon_misc_damage" value="0"/></div>
+            <div class="sheet-col-1-16 sheet-vert-bottom"></div>
+            <div class="sheet-col-1-8">d20-8 Range</div>
+            <div class="sheet-col-1-16" title="Range at which you roll a d20-6"><input type="text" name="attr_-8_range"/></div>
             <hr />
+            <div><textarea name="attr_combat_profile_notes"></textarea></div>
         </div>
         </div>
         </fieldset>
@@ -915,7 +1165,7 @@ on("change:skill_dice_switch sheet:opened", function() {
             <h3>Health and Defense</h3>
             <div class="sheet-row sheet-stat-row">
                 <div class="sheet-col-1-10">Current HP</div>
-                <div class="sheet-col-1-12"><input type="number" name="attr_hp" value="@{hp|max}-@{wound1}-@{wound2}-@{wound3}-@{wound4}-@{wound5}-@{wound6}-@{wound7}-@{wound8}-@{wound9}-@{wound10}" disabled="disabled"/></div>
+                <div class="sheet-col-1-12"><input type="number" name="attr_hp"  value="0" readonly /></div>
                 <div class="sheet-col-1-10">Maximum HP</div>
                 <div class="sheet-col-1-12"><input type="number" name="attr_hp_max" value="0"/></div>
                 <div class="sheet-col-1-10">DR</div>
@@ -928,6 +1178,7 @@ on("change:skill_dice_switch sheet:opened", function() {
             <hr />
             
             <h4>Wounds</h4>
+            <input type="hidden" name="attr_codeversion" value="0" /> 
             <div class="sheet-row sheet-stat-row">
                 <div class="sheet-col-1-16"></div>
                 <div class="sheet-col-1-8"></div>
@@ -935,68 +1186,22 @@ on("change:skill_dice_switch sheet:opened", function() {
                 <div class="sheet-col-1-8">Days to Heal</div>
                 <div class="sheet-col-1-8"></div>
                 <div class="sheet-col-1-8"></div>
-                <div class="sheet-col-1-8">Points</div>
-                <div class="sheet-col-1-8">Days to Heal</div>
+                <div class="sheet-col-1-8">Notes</div>
+                <div class="sheet-col-1-8"></div>
                 <div class="sheet-col-1-16"></div>
             </div>
             
-            <div class="sheet-row sheet-stat-row">
-                <div class="sheet-col-1-16"></div>
-                <div class="sheet-col-1-8">Wound 1</div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound1" value="0"/></div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound1_days" value="0"/></div>
-                <div class="sheet-col-1-8"></div>
-                <div class="sheet-col-1-8">Wound 6</div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound6" value="0"/></div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound6_days" value="0"/></div>
-                <div class="sheet-col-1-16"></div>
-            </div>
-            
-            <div class="sheet-row sheet-stat-row">
-                <div class="sheet-col-1-16"></div>
-                <div class="sheet-col-1-8">Wound 2</div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound2" value="0"/></div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound2_days" value="0"/></div>
-                <div class="sheet-col-1-8"></div>
-                <div class="sheet-col-1-8">Wound 7</div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound7" value="0"/></div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound7_days" value="0"/></div>
-                <div class="sheet-col-1-16"></div>
-            </div>
-            <div class="sheet-row sheet-stat-row">
-                <div class="sheet-col-1-16"></div>
-                <div class="sheet-col-1-8">Wound 3</div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound3" value="0"/></div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound3_days" value="0"/></div>
-                <div class="sheet-col-1-8"></div>
-                <div class="sheet-col-1-8">Wound 8</div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound8" value="0"/></div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound8_days" value="0"/></div>
-                <div class="sheet-col-1-16"></div>
-            </div>
-            
-            <div class="sheet-row sheet-stat-row">
-                <div class="sheet-col-1-16"></div>
-                <div class="sheet-col-1-8">Wound 4</div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound4" value="0"/></div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound4_days" value="0"/></div>
-                <div class="sheet-col-1-8"></div>
-                <div class="sheet-col-1-8">Wound 9</div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound9" value="0"/></div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound9_days" value="0"/></div>
-                <div class="sheet-col-1-16"></div>
-            </div>
-            
-            <div class="sheet-row sheet-stat-row">
-                <div class="sheet-col-1-16"></div>
-                <div class="sheet-col-1-8">Wound 5</div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound5" value="0"/></div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound5_days" value="0"/></div>
-                <div class="sheet-col-1-8"></div>
-                <div class="sheet-col-1-8">Wound 10</div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound10" value="0"/></div>
-                <div class="sheet-col-1-8"><input type="number" name="attr_wound10_days" value="0"/></div>
-                <div class="sheet-col-1-16"></div>
+            <div class="sheet-row sheet-skill-row">
+                <h2 class="wound-reset"></h2>
+                <fieldset class="repeating_wounds">
+                    <div class="sheet-col-1-16"></div>
+                    <div class="sheet-col-1-8 wound-counter"></div>
+                    <div class="sheet-col-1-8"><input type="number" name="attr_wound" value="0"/></div>
+                    <div class="sheet-col-1-8"><input type="number" name="attr_wound_days" value="0"/></div>
+                    <div class="sheet-col-1-8"></div>
+                    <div class="sheet-col-3-8"><input type="text" name="attr_wound_notes" /></div>
+                    <div class="sheet-col-1-16"></div>
+                </fieldset>
             </div>
             
             <hr />
@@ -1167,14 +1372,30 @@ on("change:skill_dice_switch sheet:opened", function() {
             
             <div class="sheet-row sheet-stat-row">
                 <fieldset class="repeating_spell">
-    		        <div class="sheet-col-1-8 sheet-vert-middle"><button class="sheet-spell-roll" type='roll' name='roll_spell' value='&{template:hm_spell} {{name=@{spell_name}}} {{caster=@{character_name}}} {{level=@{spell_level}}} {{components=@{spell_components}}} {{speed=@{spell_speed}}} {{cost=@{spell_points}}}'>CAST</button></div>
+    		        <div class="sheet-col-1-8 sheet-vert-middle"><button class="sheet-spell-roll" type='roll' name='roll_spell' value='&{template:hm_spell} {{name=@{spell_name}}} {{caster=@{character_name}}} {{level=@{spell_level}}} {{components=@{spell_components}}} {{speed=@{spell_speed}}} {{cost=@{spell_points}}}{{save= @{spell_save} }}{{details= @{spell_notes} }}'>CAST</button></div>
                     <div class="sheet-col-1-16"><input type="text" name="attr_spell_level"></div>
                     <div class="sheet-col-7-16"><input type="text" name="attr_spell_name"/></div>
                     <div class="sheet-col-1-6"><input type="text" name="attr_spell_components"/></div>
                     <div class="sheet-col-1-12"><input type="text" name="attr_spell_speed"/></div>
                     <div class="sheet-col-1-16"><input type="text" name="attr_spell_points"/></div>
                     <div class="sheet-col-1-16"><input type="checkbox" name="attr_spell_memorized"/></div>
-                
+                    <div class="sheet-col-5-8"><span>Spell Details</span></div>
+                    <input type="checkbox" class="wombat-show arrow" name="attr_wombat_show" title="Show/Hide" value="1">
+                    <span></span>
+                    <div class="wombat">
+                    <div class="sheet-col-1-4">Spell Save</div>
+                    <div class="sheet-col-1-4">
+                        <select name="attr_spell_save">
+    					    <option value="None">None</option>
+    					    <option value="Dodge vs [[1d20+@{level}]] ">Dodge</option>
+                            <option value="Physical vs [[1d20+@{level}]] ">Physical</option>
+                            <option value="Mental vs [[1d20+@{level}]] ">Mental</option>
+				        </select>
+				    </div>
+                    <div class="sheet-col-1-2"></div>
+                    <div class="sheet-col-1-4">Spell Notes</div>
+                    <div class="sheet-col-3-4"><textarea name="attr_spell_notes"></textarea></div>
+                    </div>
                 </fieldset>
             </div>
             
@@ -1186,6 +1407,7 @@ on("change:skill_dice_switch sheet:opened", function() {
                 <div class="sheet-col-9-24 sheet-vert-middle"></div>
                 <div class="sheet-col-1-6 sheet-vert-middle"></div>
                 <div class="sheet-col-5-24 sheet-vert-middle"></div>
+                
                 <div class="sheet-col-1-4">Opposed</div>
             </div>
             <div class="sheet-row sheet-heading-row">
@@ -1232,7 +1454,7 @@ on("change:skill_dice_switch sheet:opened", function() {
 				<div class="sheet-col-15-24 sheet-vert-middle" style="color:red;">Cartography (Int)</div>
 				<div class="sheet-col-1-6 sheet-vert-middle"><input type="number" name="attr_skill_cartography" value="0"/></div>
 				<input type="hidden" name="attr_cartography_dice" value="[[d100]] Skill: [[@{skill_cartography}]]" />
-				<div class="sheet-col-5-24 sheet-vert-middle"><button class="sheet-skill-roll" type='roll' name='roll_skill_cartograpgy' value='@{character_name} makes a cartography skill check\n\nRoll :@{cartography_dice}'>Check</button></div>
+				<div class="sheet-col-5-24 sheet-vert-middle"><button class="sheet-skill-roll" type='roll' name='roll_skill_cartography' value='@{character_name} makes a cartography skill check\n\nRoll :@{cartography_dice}'>Check</button></div>
 			</div>
 			
             <div class="sheet-row sheet-skill-row">
@@ -1451,136 +1673,181 @@ on("change:skill_dice_switch sheet:opened", function() {
 <div class="sheet-section-equipment">
     <div class="sheet-col-1-2 sheet-padl">
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle">Item</div>
-           <div class="sheet-col-1-8 sheet-vert-middle">Weight</div>
+            <div class="sheet-col-5-8">Item</div>
+            <div class="sheet-col-1-4 ">Container</div>
+            <div class="sheet-col-1-8 ">Weight</div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item01"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item01"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation01"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item01_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item03"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item03"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation03"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item03_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item05"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item05"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation05"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item05_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item07"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item07"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation07"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item07_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item09"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item09"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation09"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item09_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item11"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item11"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation11"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item11_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item13"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item13"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation13"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item13_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item15"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item15"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation15"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item15_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item17"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item17"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation17"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item17_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item19"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item19"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation19"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item19_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item21"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item21"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation21"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item21_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item23"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item23"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation23"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item23_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item25"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item25"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation25"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item25_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item27"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item27"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocatio027"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item27_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item29"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item29"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation29"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item29_weight" value=0 min=0 step=0.5></div>
         </div>
     </div>
     <div class="sheet-col-1-2 sheet-padr">
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle">Item</div>
-            <div class="sheet-col-1-8 sheet-vert-middle">Weight</div>
+            <div class="sheet-col-5-8">Item</div>
+            <div class="sheet-col-1-4 ">Container</div>
+            <div class="sheet-col-1-8 ">Weight</div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item02"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item02"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation02"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item02_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item04"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item04"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation04"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item04_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item06"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item06"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation06"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item06_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item08"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item08"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation08"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item08_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item10"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item10"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation10"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item10_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item12"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item12"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation12"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item12_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item14"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item14"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation14"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item14_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item16"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item16"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation16"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item16_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item18"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item18"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation18"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item18_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item20"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item20"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation20"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item20_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item22"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item22"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation22"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item22_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item24"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item24"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation24"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item24_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item26"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item26"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation26"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item26_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item28"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item28"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation28"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item28_weight" value=0 min=0 step=0.5></div>
         </div>
         <div class="sheet-row sheet-stat-row">
-            <div class="sheet-col-7-8 sheet-vert-middle"><input type="text" name="attr_item30"/></div>
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item30"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation30"/></div>
             <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item30_weight" value=0 min=0 step=0.5></div>
         </div>
     </div>
+    <h3>Other Possesions</h3>
+        <div class="sheet-row sheet-stat-row">
+            <div class="sheet-col-5-8">Item</div>
+            <div class="sheet-col-1-4 ">Location</div>
+            <div class="sheet-col-1-8 ">Weight</div>
+        </div>
+        <div class="sheet-row sheet-stat-row">
+            <fieldset class="repeating_inventory">
+            <div class="sheet-col-5-8 sheet-vert-middle"><input type="text" name="attr_item"/></div>
+            <div class="sheet-col-1-4 sheet-vert-middle"><input type="text" name="attr_itemLocation"/></div>
+            <div class="sheet-col-1-8 sheet-vert-middle"><input type="number" name="attr_item_weight" value=0 min=0 step=0.5></div>
+            </fieldset>
+        </div>
     <hr/>
 
     <h4>Currency</h4>
@@ -1686,26 +1953,27 @@ on("change:skill_dice_switch sheet:opened", function() {
 
         {{#atk_roll}}
             <tr><td><span class="tcat">Attack Roll: </span>{{atk_roll}}</td></tr>
-            {{#rollWasCrit() atk_roll}}{{#^rollWasFumble() atk_roll}}
-                    <tr><td><span class="tcat">Critical Hit!</span></td></tr>
-            {{/^rollWasFumble() atk_roll}}{{/rollWasCrit() atk_roll}}
+            {{#rollGreater() atk_roll perf}}
+                <tr><td><span class="tcat">Critical Hit!</span></td></tr>
+            {{/rollGreater() atk_roll perf}}
             
-            {{#rollWasCrit() atk_roll}}{{#rollWasFumble() atk_roll}}
-                    <tr><td><span class="tcat">Near-Perfect Attack!</span></td></tr>
-            {{/rollWasFumble() atk_roll}}{{/rollWasCrit() atk_roll}}
+            {{#rollTotal() atk_roll perf}}
+                <tr><td><span class="tcat">Near Perfect Attack!</span></td></tr>
+            {{/rollTotal() atk_roll perf}}
+
             {{#rollWasFumble() atk_roll}}{{#^rollWasCrit() atk_roll}}
                 <tr><td><span class="tcat">Fumble!</span></td></tr>
             {{/^rollWasCrit() atk_roll}}{{/rollWasFumble() atk_roll}}
         {{/atk_roll}}
         {{#def_roll}}
             <tr><td><span class="tcat">Defense Roll: </span>{{def_roll}}</td></tr>
-            {{#rollWasCrit() def_roll}}{{#^rollWasFumble() def_roll}}
-                    <tr><td><span class="tcat">Perfect Defense!</span></td></tr>
-            {{/^rollWasFumble() def_roll}}{{/rollWasCrit() def_roll}}
+            {{#rollGreater() def_roll perf}}
+                <tr><td><span class="tcat">Perfect Defense!</span></td></tr>
+            {{/rollGreater() def_roll perf}}
             
-            {{#rollWasCrit() def_roll}}{{#rollWasFumble() def_roll}}
-                    <tr><td><span class="tcat">Near-Perfect Defense!</span></td></tr>
-            {{/rollWasFumble() def_roll}}{{/rollWasCrit() def_roll}}
+            {{#rollTotal() def_roll perf}}
+                <tr><td><span class="tcat">Near Perfect Defense!</span></td></tr>
+            {{/rollTotal() def_roll perf}}
         
             {{#rollWasFumble() def_roll}}{{#^rollWasCrit() def_roll}}
                 <tr><td><span class="tcat">Fumble! (Automatic Fatigue Gain)</span></td></tr>
@@ -1725,9 +1993,9 @@ on("change:skill_dice_switch sheet:opened", function() {
             <tr><td><span class="tcat">DR: </span>{{dr}}{{#sdr}} + {{sdr}}<img src="https://i.imgur.com/AYeAO4C.png">{{/sdr}}</td></tr>
         {{/dr}}
         
-        {{#allprops() name weapon speed reach atk_roll def_roll damage dr sdr fatigue}}
+        {{#allprops() name weapon speed reach atk_roll def_roll damage dr sdr fatigue perf}}
             <tr><td><span class="tcat">{{key}}: </span>{{value}}</td></tr>
-        {{/allprops() name weapon speed reach atk_roll def_roll damage dr sdr fatigue}}
+        {{/allprops() name weapon speed reach atk_roll def_roll damage dr sdr fatigue perf}}
     </table>
 
 </rolltemplate>
@@ -1743,7 +2011,8 @@ on("change:skill_dice_switch sheet:opened", function() {
         {{#cost}}<tr><td><span class="tcat">Base SP Cost: </span>{{cost}}</td></tr>{{/cost}}
         {{#components}}<tr><td><span class="tcat">Components: </span>{{components}}</td></tr>{{/components}}
         {{#speed}}<tr><td><span class="tcat">Casting Time: </span>{{speed}}</td></tr>{{/speed}}
+        {{#save}}<tr><td><span class="tcat">Save: </span>{{save}}</td></tr>{{/save}}
+        {{#details}}<tr><td><span class="tcat">Details: </span>{{details}}</td></tr>{{/details}}
     </table>
 
 </rolltemplate>
-

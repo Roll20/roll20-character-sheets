@@ -9,6 +9,25 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 ///// ============ Change Log ============ ///// 
 
 
+June 22 2020
+
+- Button color now added to themes.
+- NPC repeating sections can now minimize, helps management for GMs.
+- Other minor code fixes
+
+
+June 15 2020
+
+- New UI Themes - Empire, Dwarf & Elf
+- Condition Tracker added! This has has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it also requires my custom WFRP4e Tokens  (download @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset1.0.zip)
+
+- Button cleanup/overhaul
+- Fixed NPC tab spacing issue with Advantage value field
+- Fixed NPC tab Opposed Melee roll using wrong name on NPC page 1
+- Fixed Advantage not adding on Ranged Weapon target number in rolls
+- Fixed bug preventing Characteristic Bonus Modifier value from adding to the Characteristic Bonus Current value, due to javascript omission
+- Removed an extra curly bracket (This should fix the problem behind issue Roll20#6152)
+
 
 Feb 24 2020
 
@@ -83,9 +102,9 @@ Usage Notes:
 
 Possible additons to come :
 
-- Condition Tracker
-- 
+- Talents rework
 - Map/Info Tab (maybe)
+- More themes
 
 
 Enjoy.
