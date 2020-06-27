@@ -3,7 +3,7 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.4.7";
+	const sheetVersion = "2.4.11";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -1986,7 +1986,7 @@
 				"npc", "AC", "innate_ac", "dexterity_mod",
 			];
 			getAttrs(sourceAttrs, v => {
-				if (v.npc == "1") return;
+				if (v.npc === "1") return;
 				const baseAC = Math.max(
 					parseInt(v.innate_ac) || 0,
 					...idArray.filter(id => v[`repeating_armor_${id}_armor_active`] === "1")
@@ -2088,7 +2088,7 @@
 	};
 
 	const calculateNextLevelXP = () => {
-		var xp = [0, 3, 6, 12, 18, 27, 39, 54, 72, 93];
+		const xp = [0, 3, 6, 12, 18, 27, 39, 54, 72, 93];
 		getAttrs(["level", "setting_xp_scheme"], v => {
 			if (v.setting_xp_scheme === "xp") {
 				if (v.level < 10) {
@@ -2114,6 +2114,7 @@
 				...gearIDs.map(id => `repeating_gear_${id}_gear_amount`),
 				...gearIDs.map(id => `repeating_gear_${id}_gear_encumbrance`),
 				...gearIDs.map(id => `repeating_gear_${id}_gear_status`),
+				...gearIDs.map(id => `repeating_gear_${id}_gear_bundled`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_encumbrance`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_encumbrance_bonus`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_status`),
@@ -2137,10 +2138,14 @@
 					return m;
 				}, gearIDs.reduce((m, id) => {
 					const amount = parseInt(v[`repeating_gear_${id}_gear_amount`]) || 0;
+					let packingFactor = 1;
+					if (v[`repeating_gear_${id}_gear_bundled`] === "on") {
+						packingFactor = 3;
+					}
 					if (v[`repeating_gear_${id}_gear_status`] === "READIED")
-						m[0] += Math.ceil(amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`])) || 0;
+						m[0] += Math.ceil((amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`]))/packingFactor) || 0;
 					else if (v[`repeating_gear_${id}_gear_status`] === "STOWED")
-						m[1] += Math.ceil(amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`])) || 0;
+						m[1] += Math.ceil((amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`]))/packingFactor) || 0;
 					return m;
 				}, [0, 0])));
 
@@ -2362,13 +2367,12 @@
 				const setting = idArray.reduce((m, id) => {
 					if (v.npc_roll_full_attack === "1") {
 						const num = parseInt(v[`repeating_npc-attacks_${id}_attack_number`]) || 1;
-						const macro = [2, 3, 4, 5, 6, 7, 8].map(n => {
+						m[`repeating_npc-attacks_${id}_attack_extra_macro`] = [2, 3, 4, 5, 6, 7, 8].map(n => {
 							if (n <= num)
 								return `{{attack${n}=[[1d20 + @{attack_ab} @{attack_burst} @{modifier_query}]]}} ` +
 									`{{damage${n}=[[@{attack_damage} @{attack_burst}]]}} `;
 							else return "";
 						}).join("");
-						m[`repeating_npc-attacks_${id}_attack_extra_macro`] = macro;
 					} else {
 						m[`repeating_npc-attacks_${id}_attack_extra_macro`] = "";
 					}
@@ -2463,7 +2467,7 @@
 					...techniqueIDs.map(id => `repeating_techniques_${id}_technique_name`),
 				];
 				getAttrs(sourceAttrs, v => {
-					if (v.setting_super_type == "magic" || v.setting_super_type == "neither") return;
+					if (v.setting_super_type === "magic" || v.setting_super_type === "neither") return;
 					const macro_psionics = `${[
 						...skills.psionic.filter(skill => v[`skill_${skill}`] !== "-1").map(skillToMacro(v)),
 						...skillIDs.filter(id => v[`repeating_psychic-skills_${id}_skill`] !== "-1")
@@ -2489,7 +2493,7 @@
 					...spellIDs.map(id => `repeating_spells_${id}_spell_name`),
 				];
 				getAttrs(sourceAttrs, v => {
-					if (v.setting_super_type == "psionics" || v.setting_super_type == "neither") return;
+					if (v.setting_super_type === "psionics" || v.setting_super_type === "neither") return;
 					const macro_magic = `${[
 						...(v.skill_magic2_name ? ["magic", "magic2"] : ["magic"]).map(skillToMacro(v)),
 						...skillIDs.map(idToSkillMacro(v, "magic-skills"))
@@ -2534,7 +2538,7 @@
 				const macro_npc_attacks = idArray.map((id, index) => {
 					const title = v[`repeating_npc-attacks_${id}_attack_name`] +
 						` ${sign(v[`repeating_npc-attacks_${id}_attack_ab`])}` +
-						((v[`repeating_npc-attacks_${id}_attack_number`] != "1") ?
+						((v[`repeating_npc-attacks_${id}_attack_number`] !== "1") ?
 							` (${v[`repeating_npc-attacks_${id}_attack_number`]} attacks)` : "");
 					return buildLink(title, `repeating_npc-attacks_${id}_attack`, index + 1 === idArray.length);
 				}).join(" ");
@@ -2688,7 +2692,8 @@
 				output.gear_description = translate(`${label.toUpperCase()}_DESC`);
 			}
 			if (output.gear_encumbrance === "1#") {
-				output.gear_encumbrance = ".33";
+				output.gear_encumbrance = "1";
+				output.gear_bundled = "on";
 			}
 		}
 		return output;
@@ -2723,8 +2728,7 @@
 				data.weapon_ab ? `, ${translate("ATTACK_BONUS_SHORT")} +${data.weapon_ab}` : ""}${
 				data.weapon_range ? `, ${translate("RANGE")} ${data.weapon_range}` : ""}${
 				data.weapon_ammo ? `, ${translate("AMMO")} ${data.weapon_ammo}` : ""}${
-				data.weapon_shock ? `, ${data.weapon_shock_damage} ${translate("SHOCK_DAMAGE_AGAINST_AC_LEQ")} ${data.weapon_shock_ac}` : ""}${
-				", +"}${getNamedAttrMod(data.weapon_attribute_mod)}${
+				data.weapon_shock ? `, ${data.weapon_shock_damage} ${translate("SHOCK_DAMAGE_AGAINST_AC_LEQ")} ${data.weapon_shock_ac}` : ""}, +${getNamedAttrMod(data.weapon_attribute_mod)}${
 				data.weapon_encumbrance ? `, ${translate("ENCUMBRANCE_SHORT")} ${data.weapon_encumbrance}` : ""}.`;
 		}
 		if (sName === "armor") {
@@ -2739,6 +2743,9 @@
 			else return `${translate("LEVEL")}-${data.level}.`;
 		}
 		if (sName === "gear") {
+			if (data.gear_bundled === "on") {
+				return `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}#.`;
+			}
 			return `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}.`;
 		}
 		return "";
@@ -2962,7 +2969,7 @@
 		const prefix = `repeating_drones_drone_fitting_${num}`;
 		getAttrs([`${prefix}_desc`, `${prefix}_name`], v => {
 			const fittingName = (v[`${prefix}_name`] || "").toLowerCase().trim().replace(/ /g, "_");
-			if (v[`${prefix}_desc`] == "" && autofillData.droneFittings.includes(fittingName)) {
+			if (v[`${prefix}_desc`] === "" && autofillData.droneFittings.includes(fittingName)) {
 				setAttrs({
 					[`${prefix}_desc`]: translate(`${fittingName.toUpperCase()}_DESC`)
 				});
@@ -3026,7 +3033,7 @@
 			 *  set ammo and shock checkboxes to reasonable values
 			 *  convert old format for gear readied/stowed
 			 **/
-			if (major == 2 && minor < 1) {
+			if (major === 2 && minor < 1) {
 				const upgradeFunction = _.after(4, () => {
 					// recalculate these things just to be sure, in case the v1.6.2 update
 					// missed them.
@@ -3099,7 +3106,7 @@
 			 *  convert single armor line to repeating armor
 			 *  Change @{attribute_query_none} to @{attribute_query}
 			 **/
-			else if (major == 2 && minor < 2) {
+			else if (major === 2 && minor < 2) {
 				const upgradeFunction = _.after(2, () => {
 					calculateStrDexMod();
 					calculateEffort();
@@ -3148,7 +3155,7 @@
 			/** v2.3.1
 			 *  Regenerate drone and weapon ABs
 			 **/
-			else if (major == 2 && (minor < 3 || (minor == 3 && patch == 0))) {
+			else if (major === 2 && (minor < 3 || (minor === 3 && patch === 0))) {
 				const upgradeFunction = _.after(1, () => {
 					upgradeSheet("2.3.1");
 				});
@@ -3160,14 +3167,14 @@
             /** v2.4.3
              * Regenerate Cyberware strain because it was bugged
              **/
-            else if (major == 2 && (minor < 4 || (minor == 4 && patch < 3))) {
+            else if (major === 2 && (minor < 4 || (minor === 4 && patch < 3))) {
                 calculateCyberwareStrain();
                 upgradeSheet("2.4.3");
             }
 			/** v2.4.7
 			 * Move attr to attr_base, and recalculate attr
 			 **/
-			else if (major == 2 && minor == 4 && patch < 7) {
+			else if (major === 2 && minor === 4 && patch < 7) {
 				attributes.forEach(attr => {
 					getAttrs([attr, `${attr}_base`], v => {
 						mySetAttrs({[`${attr}_base`]: parseInt(v[`${attr}`] || 10)}, v, null, () => {
@@ -3597,7 +3604,7 @@
 
 	on("change:strain change:strain_permanent", validateStrain);
 	on("change:constitution", calculateMaxStrain);
-	on("change:repeating_cyberware", calculateCyberwareStrain);
+	on("change:repeating_cyberware remove:repeating_cyberware", calculateCyberwareStrain);
 	on("change:strain_permanent_extra change:cyberware_strain_total", calculatePermanentStrain);
 
 	on("change:level", calculateSaves);
