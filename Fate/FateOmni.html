@@ -872,17 +872,10 @@
 							</div>
 						</fieldset>
 						<div>
-							<select name="attr_addelement">
+							<select name="attr_addextra">
 								<option value="" data-i18n="add...">Add...</option>
-								<option value="title" data-i18n="title"></option>
-								<option value="permissions" data-i18n="permissions"></option>
-								<option value="cost" data-i18n="cost"></option>
-								<option value="aspect" data-i18n="aspects"></option>
-								<option value="skill" data-i18n="skill"></option>
-								<option value="stunt" data-i18n="stunt"></option>
-								<option value="track" data-i18n="track"></option>
-								<option value="rating" data-i18n="rating"></option>
-								<option value="note" data-i18n="note"></option>
+								<option value="blackfish">SF-46D Blackfish</option>
+								<option value="template">Template</option>
 							</select>
 						</div>
 					</div> <!-- /ExtraEdit -->
@@ -913,7 +906,7 @@
 							<div class="skill">
 								<input type="hidden" name="attr_skill" value="">
 								<input type="hidden" name="attr_rating" value="0">
-								<input type="hidden" class="hideIfNull" name="attr_label" value=""><div class="fieldlabel"><b><span name="attr_label"></span></b></div>
+								<input type="hidden" class="hideIfNull" name="attr_label" value=""><div class="fieldlabel clear-all"><b><span name="attr_label"></span></b></div>
 								<button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill}}} {{roll=[[4dF+@{rating}+?{@{skill} + 4dF +/-?|0}]]}}" name="roll_SkillRoll">
 									<b><span name="attr_skill"></span></b>:
 									<span name="attr_word"></span>
@@ -1873,6 +1866,47 @@ var modes = {
 	"science": getTranslationByKey("Notice") + ", " + getTranslationByKey("Will") + ", " + getTranslationByKey("science-bracket")
 };
 
+
+var extras = {
+	blackfish: [
+		{ element: "title", name: "SF-46D Blackfish" },
+		{ element: "aspect", text: "Old But Reliable" },
+		{ element: "stunt", label: "Stunts", 
+			name: "Well Armed", text: "Gain Weapon:1 to Gunnery attacks." },
+		{ element: "stunt", name: "Automated Ejection System", text: "See Tachyon Squadron page 46" },
+		{ element: "rating", label: "Notes", 
+			name: "Scale", rating: 1 },
+		{ element: "rating", name: "Modular Equipment Bays", rating: 2 },
+		{ element: "track", label: "Shields", 
+			track: 3, track1: 1, track2: 1, track3: 1 },
+		{ element: "track", label: "Computer System Damage", icon: "plus", 
+			name: "Minimize 1 die on Technology actions", track: 1, track1: 2 },
+		{ element: "track", name: "Minimize 1 die on Gunnery actions", track: 1, track1: 2 },
+		{ element: "track", name: "Sensors and targeting systems offline: Minimize 1 die on Technology and Gunnery actions, Shots in the Dark", track: 1, track1: 2 },
+		{ element: "track", name: "Flash fire! Punch out!", track: 1 },
+		{ element: "track", label: "Propulsion System Damage", icon: "blank", 
+			name: "Minimize 1 die on Tactics actions", track: 1, track1: 2 },
+		{ element: "track", name: "Minimize 1 die on Pilot actions", track: 1, track1: 2 },
+		{ element: "track", name: "Critical damage to drives: Minimize 1 die on Tactics and Pilot actions, Drives Ready to Give Out", track: 1, track1: 2 },
+		{ element: "track", name: "Catastrophic explosion! Punch out!", track: 1 },
+		{ element: "track", label: "Critical Systems Damage", icon: "minus", 
+			name: "Life Support Damaged", track: 1, track1: 2 },
+		{ element: "track", name: "Cockpit hit, pilot sustains damage equal to the amount the ship sustained in this hit", track: 1, track1: 2 },
+		{ element: "track", name: "Structural disintegration! Punch out!", track: 1 }
+	],
+	template: [
+		{ element: "title", name: "Title" },
+		{ element: "permissions", text: "Permissions text" },
+		{ element: "cost", text: "Cost text" },
+		{ element: "aspect", text: "Aspect Phrase; Aspect Phrase" },
+		{ element: "skill", label: "Skills", skill: "Skill", rating: 0, word: getTranslationByKey("rating0") },
+		{ element: "stunt", label: "Stunts", name: "Stunt", text: "Stunt text" },
+		{ element: "track", label: "Tracks", name: "Track", track: 3, track1: 1, track2: 1, track3: 1 },
+		{ element: "rating", label: "Ratings", name: "Rating", rating: 1 },
+		{ element: "note", label: "Note", text: "Note text", rating: 1 }
+	]
+};
+
 var verbose = true;
 var skillNameByID = {};
 var skillRatingByNameID = {};
@@ -2085,12 +2119,24 @@ var loadSkills = function() {
 
 };
 
-var addElement = function(values) {
-	var elementname = values.addelement;
-	var newid = generateActuallyUniqueRowID();
-	var elementid = "repeating_extras_" + newid + "_element";
-	attrs = { "addelement": "" };
-	attrs[elementid] = values.addelement;
+var addExtra = function(values) {
+	var extraname = values.addextra;
+	attrs = { "addextra": "" };
+	if ( typeof extras[extraname] !== "undefined" ) {
+		var ex = extras[extraname];
+		for( i = 0; i < ex.length; i++ ) {
+			var newid = generateActuallyUniqueRowID();
+			var element = ex[i];
+			for(var [key,value] of Object.entries(element) ) {
+				var elementid = "repeating_extras_" + newid + "_" + key;
+				attrs[elementid] = value;
+			}
+		}
+		log("Ready to add this extra");
+		log(attrs);
+	} else {
+		log("Did not find a preloaded extra by name " + extraname);
+	}
 	setAttrs(attrs);
 };
 
@@ -2426,12 +2472,12 @@ on("sheet:opened", function() {
 	loadSkills();
 });
 
-on("change:addelement", function() {
-	log("Event: addelement change");
-	getAttrs(["addelement"], function(values) {
-		if ( values.addelement !== "" ) {
-			log("addelement: non null element set detected");
-			addElement(values);
+on("change:addextra", function() {
+	log("Event: addextra change");
+	getAttrs(["addextra"], function(values) {
+		if ( values.addextra !== "" ) {
+			log("addextra: non null extra set detected");
+			addExtra(values);
 		}
 	});
 });
