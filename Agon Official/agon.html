@@ -862,6 +862,9 @@
         <input class="title" type="text" spellcheck="false" name="attr_plus_strife_level_label" value="Plus Strife Level"/>
         <div class="checks">
           <label>
+            <input name="attr_strife_level" type="radio" value="0"/><span>+0</span>
+          </label>
+          <label>
             <input name="attr_strife_level" type="radio" value="4"/><span>+4</span>
           </label>
           <label>
@@ -925,60 +928,26 @@ function getTranslation(key) {
 function query(question, options) {
   return `?{${getTranslation(question)}|${options.join("|")}}`;
 }
-function fillRepeatingSectionFromData(sectionName, dataList, attrs) {
+function fillRepeatingSectionFromData(sectionName, dataList, setter) {
   const createdIDs = [];
-  for (let entry of dataList) {
+  for (const entry of dataList) {
     let rowID;
     while (!rowID) {
-      let newID = generateRowID();
+      const newID = generateRowID();
       if (!createdIDs.includes(newID)) {
         rowID = newID;
         createdIDs.push(rowID);
       }
     }
-    for (let [key, value] of Object.entries(entry)) {
-      attrs[`repeating_${sectionName}_${rowID}_${key}`] = value;
+    const row = setter.addRepeatingRow(sectionName, rowID);
+    for (const [key, value] of Object.entries(entry)) {
+      row[key] = value;
     }
   }
 }
-function fillEmptyRows(sectionName, n, attrs) {
+function fillEmptyRows(sectionName, n, setter) {
   const data = [...Array(n).keys()].map(() => ({ autogen: "1" }));
-  fillRepeatingSectionFromData(sectionName, data, attrs);
-}
-// Convenience function that wraps Roll20 functions. Callback will be called with
-// an attribute setter proxy, which allows us to get and set function values using
-// object syntax. Optionally, a second argument is the setter itself, in order to
-// set values en masse.
-// Usage:
-// getSetAttrs(["foo", "bar"], (attrs, setter) => {
-//   attrs["baz"] = attrs["foo"] + attrs["bar"];
-//})
-class AttributeSetter {
-  constructor(attrs) {
-    this._sourceAttrs = attrs;
-    this._targetAttrs = {};
-  }
-  setAttr(name, value) {
-    this._sourceAttrs[name] = value;
-    this._targetAttrs[name] = value;
-  }
-  setAttrs(values) {
-    for (let [key, value] of Object.entries(values)) {
-      this.setAttr(key, value);
-    }
-  }
-  getAttr(name) {
-    return this._sourceAttrs[name];
-  }
-  finalize(callback) {
-    getAttrs(Object.keys(this._targetAttrs), (values) => {
-      const finalAttrs = {};
-      for (let [key, value] of Object.entries(this._targetAttrs)) {
-        if (String(value) !== values[key]) finalAttrs[key] = String(value);
-      }
-      setAttrs(finalAttrs, { silent: true }, callback);
-    });
-  }
+  fillRepeatingSectionFromData(sectionName, data, setter);
 }
 const attributeHandler = {
   get: function (target, name) {
@@ -989,47 +958,101 @@ const attributeHandler = {
     return true;
   },
 };
-function getSetAttrs(attrs, callback, finalCallback) {
-  getAttrs(attrs, (values) => {
-    const setter = new AttributeSetter(values);
-    callback(new Proxy(setter, attributeHandler), setter);
-    setter.finalize(finalCallback);
-  });
+class RepeatingRow {
+  constructor(setter, sectionName, id) {
+    this._setter = setter;
+    if (id) this._prefix = `repeating_${sectionName}_${id}`;
+    else this._prefix = `repeating_${sectionName}`;
+    this._id = id;
+  }
+  fullName(attrName) {
+    return `${this._prefix}_${attrName}`;
+  }
+  setAttr(name, value) {
+    return this._setter.setAttr(this.fullName(name), value);
+  }
+  getAttr(name) {
+    if (name == "id") return this._id;
+    return this._setter.getAttr(this.fullName(name));
+  }
+  proxy() {
+    return new Proxy(this, attributeHandler);
+  }
 }
-function getSetRepeating(attrs, sections, callback, finalCallback) {
-  function getSetRepeatingImpl(attrs, sections, sectionToIds, callback) {
-    for (const [sectionName, sectionAttrs] of Object.entries(sections)) {
-      getSectionIDs(`repeating_${sectionName}`, (idArray) => {
-        sectionToIds[sectionName] = idArray;
-        for (const id of idArray) {
-          for (const attr of sectionAttrs) {
-            attrs.push(`repeating_${sectionName}_${id}_${attr}`);
-          }
-        }
-        delete sections[sectionName];
-        getSetRepeatingImpl(
-          attrs,
-          sections,
-          sectionToIds,
-          callback,
-          finalCallback
-        );
-      });
-      return; // Run the loop body at most once.
+class AttributeSetter {
+  constructor(attrs, sectionToIds = {}) {
+    this._sourceAttrs = attrs;
+    this._targetAttrs = {};
+    
+    this._repeating = new Proxy({}, {
+      get: function (target, name) {
+        if (!target[name]) target[name] = [];
+        return target[name];
+      },
+    });
+    for (const [sectionName, sectionIds] of Object.entries(sectionToIds)) {
+      this._repeating[sectionName] = sectionIds.map((id) =>
+        new RepeatingRow(this, sectionName, id).proxy()
+      );
     }
-    getAttrs(attrs, (values) => {
-      const setter = new AttributeSetter(values);
-      callback(new Proxy(setter, attributeHandler), sectionToIds, setter);
-      setter.finalize(finalCallback);
+  }
+  setAttr(name, value) {
+    if (name == "repeating") {
+      throw new Error("Tried to modify the 'repeating' attribute.");
+    }
+    this._sourceAttrs[name] = value;
+    this._targetAttrs[name] = value;
+  }
+  setAttrs(values) {
+    for (const [key, value] of Object.entries(values)) {
+      this.setAttr(key, value);
+    }
+  }
+  getAttr(name) {
+    if (name == "repeating") return this._repeating;
+    return this._sourceAttrs[name];
+  }
+  proxy() {
+    return new Proxy(this, attributeHandler);
+  }
+  addRepeatingRow(sectionName, id) {
+    id = id || generateRowID();
+    const row = new RepeatingRow(this, sectionName, id).proxy();
+    this._repeating[sectionName].push(row);
+    return row;
+  }
+  finalize(callback) {
+    getAttrs(Object.keys(this._targetAttrs), (values) => {
+      const finalAttrs = {};
+      for (const [key, value] of Object.entries(this._targetAttrs)) {
+        if (String(value) !== values[key]) finalAttrs[key] = String(value);
+      }
+      setAttrs(finalAttrs, { silent: true }, callback);
     });
   }
-  // Copies the attrs and sections arguments so we can happily modify them in the function.
-  getSetRepeatingImpl(
-    [...attrs],
-    JSON.parse(JSON.stringify(sections)),
-    {},
-    callback
-  );
+}
+function getSetAttrs(attrs, callback, { repeating = {}, finalCallback } = {}) {
+  attrs = [...attrs];
+  const sectionToIds = {};
+  const finished = _.after(Object.keys(repeating).length + 1, () => {
+    getAttrs(attrs, (values) => {
+      const setter = new AttributeSetter(values, sectionToIds);
+      callback(setter.proxy(), setter);
+      setter.finalize(finalCallback);
+    });
+  });
+  for (const [sectionName, sectionAttrs] of Object.entries(repeating)) {
+    getSectionIDs(`repeating_${sectionName}`, (idArray) => {
+      sectionToIds[sectionName] = idArray;
+      for (const id of idArray) {
+        for (const attr of sectionAttrs) {
+          attrs.push(`repeating_${sectionName}_${id}_${attr}`);
+        }
+      }
+      finished();
+    });
+  }
+  finished();
 }
 // We define our own wrappers for Roll20 event handlers to provide
 // a bit more useful feedback and reduce boilerplate.
@@ -1185,12 +1208,12 @@ const kLabelAttributes = [
   "perilous",
   "sacred",
 ];
-function performFirstTimeSetup(attrs) {
-  fillEmptyRows("bonds", 8, attrs);
-  fillEmptyRows("deeds", 4, attrs);
-  fillEmptyRows("destiny", 2, attrs);
-  fillRepeatingSectionFromData("strifedie", kInitialStrifeDice, attrs);
-  for (let name of kLabelAttributes) {
+function performFirstTimeSetup(attrs, setter) {
+  fillEmptyRows("bonds", 8, setter);
+  fillEmptyRows("deeds", 4, setter);
+  fillEmptyRows("destiny", 6, setter);
+  fillRepeatingSectionFromData("strifedie", kInitialStrifeDice, setter);
+  for (const name of kLabelAttributes) {
     attrs[`${name}_label`] = getTranslation(name);
   }
 }
@@ -1213,7 +1236,7 @@ function setupEpithetQuery(attrs) {
 }
 function setupDomainQueries(attrs) {
   const multiplier = attrs[kPathosGivesTwoDiceField] === "1" ? "2" : "";
-  for (let domain of kDomains) {
+  for (const domain of kDomains) {
     const query_entries = [
       `${getTranslation("no")}, `,
       ...kDomains
@@ -1244,14 +1267,14 @@ function setupDivineFavorQuery(attrs) {
     attrs["divine_favor_query"] = base_query;
   }
 }
-function calcStrifeRoll(attrs, sectionToIds) {
+function calcStrifeRoll(attrs) {
   const harmType = kHarms
     .filter((harm) => attrs[harm] == "1")
     .map((x) => `@{${x}_label}`)
     .join(", ");
-  const dieSources = sectionToIds["strifedie"].map((id) => [
-    attrs[`repeating_strifedie_${id}_strifedie_name`],
-    attrs[`repeating_strifedie_${id}_strifedie_size`],
+  const dieSources = attrs.repeating.strifedie.map((row) => [
+    row.strifedie_name,
+    row.strifedie_size,
   ]);
   if (attrs["divine_wrath"] !== "0") {
     dieSources.push(["@{divine_wrath_label}", "@{divine_wrath}"]);
@@ -1266,13 +1289,11 @@ function calcStrifeRoll(attrs, sectionToIds) {
   )}]]]}} {{harm=${harmType}}}`;
 }
 function handleStrifeRoll() {
-  getSetRepeating(
-    [...kHarms, "divine_wrath"],
-    {
+  getSetAttrs([...kHarms, "divine_wrath"], calcStrifeRoll, {
+    repeating: {
       strifedie: ["strifedie_name", "strifedie_size"],
     },
-    calcStrifeRoll
-  );
+  });
 }
 registerSingle(
   kPathosGivesTwoDiceField,
@@ -1297,7 +1318,7 @@ register(
 on("remove:repeating_strifedie", handleStrifeRoll);
 registerOpened(function () {
   getSetAttrs(["version"], function (attrs, setter) {
-    if (!attrs["version"]) performFirstTimeSetup(attrs);
+    if (!attrs["version"]) performFirstTimeSetup(attrs, setter);
     if (attrs["version"] == "1.0") {
       attrs["sheet_type"] = "character";
     }
