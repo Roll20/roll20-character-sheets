@@ -50,36 +50,23 @@ const updatePrimary = eventinfo => {
   })
 }
 
-const updateRepeatingArmorPrimary = eventinfo => {
+const updateRepeatingPrimary = (eventinfo, type) => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
   if (eventinfo.newValue === undefined) {
     return false
   } else if (eventinfo.newValue === 'primary') {
-    const constructedArmorAttributes = processingFunctions.shadowrun.addRepRow(repRowID, sheetAttributes.armorAttributes)
-    getAttrs(constructedArmorAttributes, attrs => { 
-      const update = processingFunctions.shadowrun.updatePrimaryArmor(attrs)
-      processingFunctions.setAttributes(update)
-    })
-    processingFunctions.shadowrun.resetRepeatingFieldsPrimaries(`repeating_armor`, repRowID)
-  } else {
-    const update = processingFunctions.shadowrun.resetPrimaryArmor()
-    processingFunctions.setAttributes(update)
-  }
-}
+    const constructedAttributes = type === 'armor' ? processingFunctions.shadowrun.addRepRow(repRowID, sheetAttributes.armorAttributes) : processingFunctions.shadowrun.contructRepeatingWeaponAttributes(repRowID, type);
 
-const updateRepeatingWeaponPrimary = (eventinfo, type) => {
-  const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
-  if (eventinfo.newValue === undefined) {
-    return false
-  } else if (eventinfo.newValue === 'primary') {
-    const constructedWeaponAttributes = processingFunctions.shadowrun.contructRepeatingWeaponAttributes(repRowID, type)
-    getAttrs(constructedWeaponAttributes, attrs => { 
-      const update = processingFunctions.shadowrun.updatePrimaryWeapons(attrs)
+    //get the attributes to update primary
+    getAttrs(constructedAttributes, attrs => {
+      const update = type === 'armor' ? processingFunctions.shadowrun.updatePrimaryArmor(attrs) : processingFunctions.shadowrun.updatePrimaryWeapons(attrs);
       processingFunctions.setAttributes(update)
     })
+
+    //Reset all the other primaries
     processingFunctions.shadowrun.resetRepeatingFieldsPrimaries(`repeating_${type}`, repRowID)
   } else {
-    const update = processingFunctions.shadowrun.resetPrimaryWeapon(type)
+    const update = type === 'armor' ? processingFunctions.shadowrun.resetPrimaryArmor() : processingFunctions.shadowrun.resetPrimaryWeapon(type);
     processingFunctions.setAttributes(update)
   }
 }
@@ -271,71 +258,6 @@ const updateDefaultAttribute = newValue => {
 
 
 /* OLD SCRIPTS */
-//This function checks changes to repeating_armor and updates the Primary Armor if needed
-on("change:repeating_armor", (eventInfo) => {
-  const source = eventInfo.sourceAttribute;
-  const newV   = eventInfo.newValue;
-  const arm    = ["repeating_armor"];
-  const armors = [`${arm}_name`, `${arm}_rating`, `${arm}_acid_modifier`, `${arm}_electrical_modifier`, `${arm}_laser_modifier`, `${arm}_gause_round_modifier`, `${arm}_cold_modifier`,`${arm}_fire_modifier`, `${arm}_radiation_modifier`, `${arm}_dicepool_modifier`];
-
-  //Check if the event was related to the primary flag & armor is set to primary
-  if (source.includes('primary') && newV === 'primary') {
-    //Get attributes from the repeating_armor
-    getAttrs(armors, (v) => {
-      let update = {};
-      //Update the hidden static Primary Armor attributes with the repeating_armor attributes
-      _.each(armors, (armor) => {
-        const name = (armor.includes("name") || armor.includes("rating")) ? armor.split("repeating_")[1] : armor.split(`${arm}_`)[1];
-        update[`${name}`] = v[`${armor}`];
-            });
-
-            setAttrs(update);
-          });
-
-    //Set the other repeating_armor primary flags to 0 aka unchecked
-          getSectionIDs(`${arm}`, function(ids) {
-      let IDs    = [];
-      let update = {};
-
-          for(var i=0; i < ids.length; i++) {
-              IDs.push(`${arm}_` + ids[i] + "_primary");
-          };
-
-          IDs.forEach(id => {
-            if (id != source) {
-              update[`${id}`] = 0;
-            };
-          });
-
-          setAttrs(update);
-        });
-  //Check if the event was for a relevant Primary Armor attribute
-  } else if (source.includes('name') || source.includes('rating') || source.includes('dicepool') || source.includes('acid') || source.includes('cold') || source.includes('electrical') || source.includes('fire') || source.includes('radiation')) {
-    //Get the primary flag attribute for this armor. Also get the repeating_armor attribute we'll need for an update, doing it now is more efficient.
-    getAttrs([`${arm}_primary`, `${source}`], (v) => {
-      //Check if this armor is the designated Primary Armor.
-      if (v[`${arm}_primary`] === 'primary') {
-        let update = {};
-        //Apply the repeating_armor attribute to its static counterpart
-        switch (true) {
-          case /name/.test(source)      : update["armor_name"] = v[`${source}`]; break;
-          case /rating/.test(source)    : update["armor_rating"] = v[`${source}`]; break;
-          case /dicepool/.test(source)  : update["soak"] = v[`${source}`]; break;
-          case /acid/.test(source)      : update["acid"] = v[`${source}`]; break;
-          case /cold/.test(source)      : update["cold"] = v[`${source}`]; break;
-          case /electrical/.test(source): update["electrical"] = v[`${source}`]; break;
-          case /fire/.test(source)      : update["fire"] = v[`${source}`]; break;
-          case /radiation/.test(source) : update["radiation"] = v[`${source}`]; break;
-          default: console.log(`Source  ${source} was invalid`);}
-
-        setAttrs(update);
-      };
-    });
-  } else {
-    console.log("CHANGE NOT RELEVENT Primary Armor");
-  };
-});
-
 
 //Weapon displays set into an Array
 // Builder function to display details properly
