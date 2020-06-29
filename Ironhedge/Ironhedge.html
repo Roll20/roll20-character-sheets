@@ -1497,7 +1497,7 @@
     ['1', '3', '4']
   ];
   
-  const sv_bp = [3, 5, 8, 10, 12, 15];
+  const sv_bp = [1, 3, 5, 8, 10, 12, 15];
   const sv_map = [
     [10, 9, 9, 8, 8],
     [9, 8, 8, 7, 7],
@@ -1597,22 +1597,27 @@
   
   const getSaves = (_str, _int, el) => {
     const saves = {};
-    let el_idx = el;
+    let el_idx = el-1;
+    console.log('el_idx', el_idx);
     if (el>4) el_idx = el - 1;
-    if (el_idx > 4) el_idx = 4;
+    if (el_idx > 3) el_idx = -1;
     if (el_idx < 0) el_idx = 0;
     
     let idx = 0;
-    for (bp of sv_bp) {
-      if(_str >= bp) idx += 1;
+    if (_str !== null ) {
+      for (bp of sv_bp) {
+        if(_str > bp) idx += 1;
+      }
+      saves.poison = saves.exposure = sv_map[idx][el_idx];
     }
-    saves.poison = saves.exposure = sv_map[idx][el_idx];
     
     idx = 0;
-    for (bp of sv_bp) {
-      if (_int >= bp) idx++;
+    if (_int !== null ) {
+      for (bp of sv_bp) {
+        if (_int > bp) idx++;
+      }
+      saves.spell = saves.thief = sv_map[idx][el_idx];
     }
-    saves.spell = saves.thief = sv_map[idx][el_idx];
     return saves;
   }
   
@@ -1664,7 +1669,7 @@
   
   const all_attrs = ['character_name', 'char_str', 'char_int', 'char_dex', 'char_race',
     'char_type', 'lp_base', 'lp', 'bs_base', 'bs', 'al', 'al_base',
-    'copper', 'silver', 'gold', 'mythril', 'mp', 'ing', 'af', 'af_plus',
+    'copper', 'silver', 'gold', 'mythril', 'mp', 'ing', 'af', 'af_plus', 'el',
     'df', 'df_plus', 'load_cat', 'el_fighter', 'el_thief', 'el_magician',
     'el_alchemist', 'el_priest', 'al_fighter', 'al_thief', 'al_magician',
     'al_alchemist', 'al_priest', 'ep_fighter', 'ep_thief', 'ep_magician',
@@ -1759,10 +1764,11 @@
   });
   
   on('change:char_race change:char_str', function () {
-    getAttrs(['char_str', 'char_dex', 'char_race', 'load_cat', 'mth_af_plus', 'armorments', 'ep_fighter'], (v) => {
+    getAttrs(['char_str', 'char_dex', 'char_race', 'load_cat', 'mth_af_plus',
+      'lc_moo', 'armorments', 'ep_fighter', 'el'], (v) => {
       const _str = parseValues(v, 'char_str');
       const _dex = parseValues(v, 'char_dex');
-      
+      const _el = parseInt(v.el) || 0;
       if (_str === 0 || _dex === 0) return;
       
       const load = getMaxLoad(_str);
@@ -1773,6 +1779,9 @@
         run_idx: load.run_idx
       }
       
+      let  _moo = parseValues(v, 'lc_moo');
+      if (_moo > 3) _moo = 3;
+      const saves = getSaves(_str, null, _el);
       const ep = parseValues(v, 'ep_fighter');
       const lp = getBaseLP(_char);
       
@@ -1797,7 +1806,9 @@
         max_run: getMaxRunSpeed(_char),
         base_bs: _str,
         bs_max: _str,
-        el_fighter: getElForKlass('fighter', ep, _str)
+        el_fighter: getElForKlass('fighter', ep, _str),
+        sv_poison: saves.poison - _moo,
+        sv_exposure: saves.exposure
       }, () => {
         set_numattacks();
       });
@@ -1833,20 +1844,28 @@
   
   on('change:char_int', () => {
     console.log('char_int: changed');
-    getAttrs(all_attrs, (v) => {
+    getAttrs(['ep_magician', 'ep_alchemist', 'ep_priest', 'lc_4lc', 'lc_dto', 'el'], (v) => {
       const _int = parseValues(v, 'char_int');
       if (_int === 0) return;
+      
       let ep = parseInt(v.ep_magician);
       const el_m = getElForKlass('magician', ep, _int);
       ep = parseInt(v.ep_alchemist);
       const el_a = getElForKlass('alchemist', ep, _int);
       ep = parseInt(v.ep_priest);
       const el_p = getElForKlass('priest', ep, _int);
+      let _4lc = parseValues(v, 'lc_4lc');
+      if (_4lc > 3) _4lc = 3;
+      let _dto = parseValues(v, 'lc_dto');
+      if (_dto > 3) _dto = 3;
+      const saves = getSaves(null, _int, parseInt(v.el) || 0);
       
       setAttrs({
         el_magician: el_m,
         el_alchemist: el_a,
-        el_priest: el_p
+        el_priest: el_p,
+        sv_spell: saves.spell - _4lc,
+        sv_thief: saves.thief - _dto
       });
     });
   
@@ -2148,7 +2167,7 @@
     lc_moo: 'sv_poison'
   }
   on('change:lc_4lc change:lc_dto change:lc_moo', (event) => {
-    console.log(`${event.sourceAttribute} changed`, );
+    console.log(`${event.sourceAttribute} changed`);
     const lc_key = event.sourceAttribute;
     const sv_key = sv_lc_map[lc_key];
     
