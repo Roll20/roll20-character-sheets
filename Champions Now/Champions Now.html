@@ -1,10 +1,13 @@
 <div class="charsheet">
     <div class="2colrow sheet-rounded-corners">
         <div class="col">
-            <label>Hero Name:</label><input type="text" name="attr_hero_name" />
+            <label>Hero Name:</label><input type="text" name="attr_hero_name" /> <br />
+            <label>Total Points:</label> <input type="number" class="sheet-short"  name="attr_points" />
+            <button type='action' name='act_xp'><span style="font-family: 'Pictos'">r</span></button>
         </div>
         <div class="col">
             <label>Real Name:</label><input type="text" name="attr_real_name" />
+            <label>XP:</label> <input type="number" class="sheet-short" name="attr_xp" />
         </div>
     </div>
     <div class="2colrow sheet-rounded-corners">
@@ -35,14 +38,14 @@
 
         <div class="col">
             <label>DEF</label> <input type="number" name="attr_def" /> / <input type="number" name="attr_rdef" />r<br />
-            <label>REC</label> <input type="number" name="attr_rec" /><br />
+            <label>BODY</label> <input type="number" name="attr_body" /> / <input type="number"
+                name="attr_body_max" /><br />
+            <label>REC</label> <input type="number" name="attr_rec" readonly="true" /> <button type='action' name='act_recover'>Recover</button> <br />
             <label>STUN</label> <input type="number" name="attr_stun" readonly="true" /><br />
             <label>KO</label> <input type="number" name="attr_ko" /> / <input type="number" name="attr_ko_max"
                 readonly="true" /><br />
             <label>END</label> <input type="number" name="attr_end" /> / <input type="number" name="attr_end_max"
                 readonly="true" /><br />
-            <label>BODY</label> <input type="number" name="attr_body" /> / <input type="number"
-                name="attr_body_max" /><br />
         </div>
     </div>
 
@@ -82,7 +85,7 @@
         <fieldset class="repeating_powers">
             <input type="number" name="attr_cost" />
             <input type="text" class="sheet-long" name="attr_power" />
-            <input type="number" name="attr_end" /> END
+            <input type="number" name="attr_end" /> <button type='action' name='act_end'>END</button>
         </fieldset>
     </div>
 
@@ -95,14 +98,73 @@
     </div>
 </div>
 <script type="text/worker">
-    on('change:rec', function() {
-        getAttrs(['rec'], function(values) {
-            const rec = values.rec
+    function spend_end(amount) {
+        getAttrs(['end', 'end_max'], (v) => {
+            const new_end = Math.max(0, parseInt(v['end']) - amount);
             setAttrs({
-                'stun': rec,
-                'ko_max': rec * 2,
-                'end_max': rec * 3
+                ['end']: Math.min(v['end_max'], new_end)
+            });
+        });
+    }
+
+    on('change:body_max', () => {
+        getAttrs(['body_max'], function(values) {
+            const body = values.body_max
+            setAttrs({
+                'rec': body,
+                'stun': body,
+                'ko_max': body * 2,
+                'end_max': body * 3
             })
         })
     });
+
+    on('clicked:recover', (eventInfo) => {
+        getAttrs(['rec'], (v) => {
+            spend_end(-v['rec']);
+        })
+    });
+
+    on('clicked:repeating_powers:end', (eventInfo) => {
+        const source = (eventInfo.sourceAttribute).slice(0, -4);
+        getAttrs([`${source}_end`], (v) => {
+            spend_end(v[`${source}_end`]);
+        });
+    });
+
+    on('clicked:xp', () => {
+        // Costs are given as [cost per point, base value]
+        const costmap = {
+            "dex": [10, 11],
+            "int": [10, 11],
+            "ego": [10, 11],
+            "spd": [10, 1],
+            "str": [5, 2],
+            "pre": [5, 2],
+            "def": [1, 10],
+            "rdef": [4, 0],
+            "body_max": [10, 10]
+        }
+        let attrs = ["dex", "int", "ego", "spd", "str", "pre", "def", "rdef", "body_max"];
+        getSectionIDs("powers", (ids) => {
+            attrs = attrs.concat(ids.map(id => `repeating_powers_${id}_cost`));
+            getSectionIDs("disads", (ids) => {
+                attrs = attrs.concat(ids.map(id => `repeating_disads_${id}_cost`));
+                getAttrs(attrs, (v) => {
+                    let totalcost = 0;
+                    for(let i = 0; i < attrs.length; i++) {
+                        let attrname = attrs[i];
+                        let attrvalue = v[attrname];
+                        let attrcostmap = costmap[attrname] || [1, 0];
+                        let attrcost = (parseInt(attrvalue) - attrcostmap[1]) * attrcostmap[0];
+                        console.log(`Attribute: ${attrname} Cost: ${attrcost}`);
+                        totalcost = totalcost + attrcost;
+                    }
+                    setAttrs({
+                        points: totalcost
+                    });
+                })
+            });
+        });
+    })
 </script>
