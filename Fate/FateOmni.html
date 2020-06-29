@@ -63,6 +63,7 @@
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Modes" value="1"><span class="checker" data-i18n="modes">Modes</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Notes" value="1" checked><span class="checker" data-i18n="notes">Notes</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Powers" value="1"><span class="checker" data-i18n="powers">Powers</span> </span>
+		<span><input type="checkbox" class="checkbox" name="attr_Show-RollableAspects" value="1"><span class="checker" data-i18n="rollable-aspects">Rollable Aspects</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Refresh" value="1" checked><span class="checker" data-i18n="refresh">Refresh</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Roles" value="1"><span class="checker" data-i18n="roles">Roles</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Skills" value="1" checked><span class="checker" data-i18n="skills">Skills</span> </span>
@@ -998,6 +999,7 @@
 							<span><span data-i18n="edit">Edit</span> <span data-i18n="aspects">Aspects</span></span>
 							<span><input type="checkbox" class="checkbox" name="attr_EditAspects" value="1" checked><span class="pencilbox"/></span>
 						</div>
+						<input type="checkbox" class="deeptrigger" name="attr_Show-RollableAspects" value="1">
 						<fieldset class="repeating_aspects">
 							<div class="AspectSeparator">
 								<div class="fieldlabel" data-i18n="label">Label</div>
@@ -1010,6 +1012,10 @@
 									<span data-i18n="free-invokes">Free Invokes</span>
 									<select name="attr_invokes" style="width: 20%"><option value="" selected>0</option> <option>1</option> <option>2</option> <option>3</option> <option>4</option> <option>5</option> <option>6</option> <option>7</option> <option>8</option> <option>9</option> <option>10</option></select>
 								</div>
+								<div class="fieldlabel deeptriggered">
+									<span data-i18n="aspect-value">Aspect Value When Rolled</span>
+									<select name="attr_rollvalue" style="width: 20%"> <option value="" selected>1</option> <option>2</option> <option>3</option> </select>
+								</div>
 								<div class="fieldlabel" data-i18n="notes">Notes</div>
 								<input name="attr_notes" type="text" style="width: 100%;">
 							</div>
@@ -1017,13 +1023,13 @@
 					</div> <!-- /AspectEdit -->
 
 					<div class="AspectDisplay">
+						<input type="checkbox" class="deeptrigger" name="attr_Show-RollableAspects" value="1">
 						<fieldset class="repeating_aspects">
 							<div class="aspect">
 								<div class="AspectLabelBar">
 									<span class="label">
 										<span name="attr_label"></span>
 										<input type="hidden" value="" name="attr_flags" class="hideIfNull"><span>(<span name="attr_flags"></span>)</span>
-									</span>
 									</span>
 									<span>
 										<input type="checkbox" class="checkbox" name="attr_options" value="1"><span class="optionsbox"></span>
@@ -1047,6 +1053,10 @@
 												<span class="fieldlabel" data-i18n="flags">Flags</span>
 												<input type="text" class="compact" name="attr_flags" value="" style="width: 30%">
 											</div>
+											<div class="fieldlabel deeptriggered">
+												<span data-i18n="aspect-value">Aspect Value When Rolled</span>
+												<select name="attr_rollvalue" style="width: 20%"> <option value="" selected>1</option> <option>2</option> <option>3</option> </select>
+											</div>
 											<div>
 												<div class="fieldlabel" data-i18n="notes">Notes</div>
 												<input name="attr_notes" type="text" style="width: 100%;">
@@ -1055,7 +1065,10 @@
 									</div>
 								</div>
 								<div class="name">
+									<span class="deeptriggered"><input type="checkbox" class="checkbox" name="attr_rollthis" value="1"><span class="checkmark"></span></span>
 									<span name="attr_aspect"></span>
+									<input type="hidden" name="attr_rollvalue" value="1">
+									<span class="deeptriggered"><input type="checkbox" class="triggerbox" name="attr_rollthis" value="1"><span>(+<span name="attr_rollvalue"></span>)</span></span>
 								</div>
 								<div class="notes">
 									<span name="attr_notes"></span>
@@ -1077,6 +1090,11 @@
 								</div>
 							</div>
 						</fieldset>
+						<div class="ExtraDisplay limited-width">
+							<input type="hidden" name="attr_rolltally" value="0">
+							<input type="hidden" name="attr_rolllist" value="" class="compact">
+							<button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: ^{rollable-aspects}}} {{note=@{rolllist}}} {{roll=[[4dF+@{rolltally}+?{ @{rolltally} + 4dF +/-?|0}]]}}" name="roll_SkillRoll"><b><span data-i18n="roll-marked-aspects"></span> (+<span name="attr_rolltally"></span>)</b></button>
+						</div>
 					</div>
 
 				</div> <!-- /AspectFrame -->
@@ -1524,6 +1542,9 @@
 				</div>
 			</div>
 		{{/roll}}
+		{{#note}}
+			<div>{{note}}</div>
+		{{/note}}
 	</div>
 </rolltemplate>
 
@@ -2616,7 +2637,6 @@ on("change:repeating_modes remove:repeating_modes sheet:opened", function() {
 	});
 });
 
-
 on("change:repeating_skills remove:repeating_skills change:skillstyle", function() {
 	loadSkills();
 });
@@ -2747,6 +2767,41 @@ on("change:repeating_extras:rating", function(e) {
 		attrs[wordid] = word;
 		setAttrs(attrs);
 	}
+});
+
+on("change:repeating_aspects:rollthis", function(e) {
+	log("rollthis marked in repeating_aspects");
+	getSectionIDs("aspects", function(list) {
+		var fieldlist = [];
+		for(var i=0; i < list.length; i++ ) {
+			fieldlist[i*3] = "repeating_aspects_" + list[i] + "_rollthis";
+			fieldlist[i*3+1] = "repeating_aspects_" + list[i] + "_rollvalue";
+			fieldlist[i*3+2] = "repeating_aspects_" + list[i] + "_aspect";
+		}
+		getAttrs(fieldlist, function(v) {
+			var attrs = {};
+			log(v);
+			attrs["rolltally"] = 0;
+			attrs["rolllist"] = "";
+			for(var i=0; i < list.length; i++ ) {
+				var include = v["repeating_aspects_" + list[i] + "_rollthis"];
+				var bonus = v["repeating_aspects_" + list[i] + "_rollvalue"];
+				var aspect = v["repeating_aspects_" + list[i] + "_aspect"];
+				log("include: " + include);
+				log("bonus: " + bonus);
+				log("aspect: " + aspect);
+				if ( include == "1" ) {
+					attrs["rolltally"] = attrs["rolltally"] + Number(bonus);
+					if ( attrs["rolllist"] === "" ) {
+						attrs["rolllist"] = aspect + "(+" + bonus + ")"; 
+					} else {
+						attrs["rolllist"] = attrs["rolllist"] + "; " +  aspect + "(+" + bonus + ")";
+					}
+				}
+			}
+			setAttrs(attrs);
+		});
+	});
 });
 
 </script>
