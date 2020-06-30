@@ -1,5 +1,8 @@
 # Release notes
 
+## 1.2.1
+- Fixed roll buttons not triggering for newly created combat actions, psi powers and theurgy rites.
+
 ## 1.2.0
 - Renamed sheet to `Fading Suns 2nd Edition Revised` from `Fading Suns v2.75`
 - Added ability to select the characteristic for the roll of a skill on the fly (as opposed to having to select a characteristic beforehand)
