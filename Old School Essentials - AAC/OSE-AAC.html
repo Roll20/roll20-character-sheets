@@ -379,7 +379,6 @@
     <div class="weapons-grid">
       <span></span>
       <span data-i18n="name">Name</span>
-      <span data-i18n="attribute">Attribute</span>
       <span data-i18n="typeofattack">Type of Attack</span>
       <span data-i18n="attack-modifier">+Attack</span>
       <span data-i18n="damage-die">Damage Die</span>
@@ -387,6 +386,8 @@
       <span data-i18n="weight">Weight</span>
     </div>
     <fieldset class="repeating_weapons">
+      <input type="hidden" name="attr_weaponAttributeBonus" value="0" />
+      <input type="hidden" name="attr_weaponAttributeBonusDamage" value="0" />
       <input class="expand" type="checkbox" name="attr_expandWeapon" data-i18n-title="expand-collapse"
         title="Expand/Collapse" /><span></span>
       <div class="weapons-grid">
@@ -400,13 +401,9 @@
             value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{optionalModQuery}]]}} {{damage=[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]]}} {{description=@{weaponDescription}}}"></button>
         </div>
         <input type="text" name="attr_weaponName" placeholder="Weapon" />
-        <select name="attr_weaponAttributeBonus">
-          <option selected value="[[@{BonusSTR}]]">Strength</option>
-          <option value="[[@{BonusDEX}]]">Dexterity</option>
-        </select>
-        <select name="attr_weaponAttributeBonusDamage">
-          <option selected value="[[@{BonusSTR}]]">Melee</option>
-          <option value="0">Ranged</option>
+        <select name="attr_attackType">
+          <option value="melee">Melee</option>
+          <option value="ranged">Ranged</option>
         </select>
         <input type="number" name="attr_weaponAttackBonus" value="0" />
         <select name="attr_weaponDamageDie" class="half-input">
@@ -1010,16 +1007,51 @@
     });
   };
 
-  // Populate new attributes from existing attributes
   on("sheet:opened", function() {
-    getAttrs(["thresholdModifierEnabled", "situationalBonusEnabled"], function(values) {
+    // Populate new attributes from existing attributes
+    const changedAttributes = [
+      "thresholdModifierEnabled",
+      "situationalBonusEnabled"
+    ];
+    getAttrs(changedAttributes, function(values) {
       if (!values.situationalBonusEnabled) {
         setAttrs({
           situationalBonusEnabled: values.thresholdModifierEnabled
-        })
+        });
       }
-    })
-  })
+    });
+
+    // Set attackType based on heuristics of the bonus damage (0 for ranged, otherwise STR bonus)
+    getSEctionIDs("repeating_weapons", function(idArray) {
+      idArray.forEach(function(id) {
+        const attributes = ["attackType", "weaponAttributeBonusDamage"]
+          .map(name => `repeating_weapons_${id}_${name}`)
+          .push('BonusStr');
+        getAttrs(attributes, function(values) {
+          if (!values[`repeating_weapons_${id}_attackType`]) {
+            if (values.BonusSTR !== 0 && values[`repeating_weapons_${id}_weaponAttributeBonusDamage`] === 0) {
+              setAttrs({ [`repeating_weapons_${id}_attackType`]: "Ranged" })
+            } else {
+              setAttrs({ [`repeating_weapons_${id}_attackType`]: "Melee" })
+            }
+          }
+        });
+      })
+    });
+
+    // Set roll buttons for spells depending on effect having a value
+    getSectionIDs("repeating_spells", function(idArray) {
+      idArray.forEach(function(id) {
+        getAttrs([`repeating_spells_${id}_spellEffect`], function(values) {
+          if (values[`repeating_spells_${id}_spellEffect`] !== "") {
+            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "roll" })
+          } else {
+            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "describe" })
+          }
+        });
+      });
+    });
+  });
 
   on("sheet:opened change:situationalBonusEnabled", function (eventInfo) {
     // Check for threshold modifier enabled
@@ -1037,6 +1069,14 @@
       modQuery: "?{" + getTranslationByKey("modifier") + "|0}[" + getTranslationByKey("modifier-mod") + "]",
       reactionQuery: "?{" + getTranslationByKey("charisma-modifier") + "|0}[" + getTranslationByKey("charisma-abbr") + "]",
     })
+  });
+
+  // Tabs
+  const buttonlist = ["character", "monster", "notes", "settings"];
+  buttonlist.forEach(button => {
+    on(`clicked:${button}`, function (event) {
+      setAttrs({ sheetTab: button });
+    });
   });
 
   // Attribute Changes
@@ -1149,19 +1189,6 @@
     );
   });
 
-  // Monster Average HP Button
-  on('clicked:setAverageHP', function () {
-    getAttrs(['monsterHitDice', 'monsterHitDiceModifier'], function (values) {
-      const averageHP = Math.floor(
-        (parseInt(values.monsterHitDice, 10) * 4.5) + parseInt(values.monsterHitDiceModifier, 10)
-      );
-      setAttrs({
-        HP: averageHP,
-        HP_max: averageHP
-      });
-    });
-  });
-
   // Recalculate encumbrance
   on([
     "sheet:opened",
@@ -1198,14 +1225,6 @@
     });
   })
 
-  // Tabs
-  const buttonlist = ["character", "monster", "notes", "settings"];
-  buttonlist.forEach(button => {
-    on(`clicked:${button}`, function (event) {
-      setAttrs({ sheetTab: button });
-    });
-  });
-
   // Calculate THAC0 from BAB
   on('change:bab', function() {
     getAttrs(['bab'], function(values) {
@@ -1218,6 +1237,25 @@
       setAttrs({ bab: 19 - values.thac0 });
     });
   });
+
+  // Set weaponAttributeBonus and weaponAttributeBonusDamage
+  on('change:repeating_weapons:attackType', function(event) {
+    const attackType = event.newValue;
+    getAttrs(["BonusSTR", "BonusDEX"], function(values) {
+      console.log(values)
+      if (attackType == "ranged") {
+        setAttrs({
+          repeating_weapons_weaponAttributeBonus: values.BonusDEX,
+          repeating_weapons_weaponAttributeBonusDamage: 0
+        })
+      } else {
+        setAttrs({
+          repeating_weapons_weaponAttributeBonus: values.BonusSTR,
+          repeating_weapons_weaponAttributeBonusDamage: values.BonusSTR
+        })
+      }
+    })
+  })
 
   // Set saving throws, BAB, THAC0, HD, Next Level Experience
   on('change:level change:class change:monsterhitdice change:monsterhitdicemodifier', function() {
@@ -1628,21 +1666,7 @@
     }
   })
 
-  // Set roll buttons for spells depending on effect having a value
-  on("sheet:opened", function () {
-    getSectionIDs("repeating_spells", function(idArray) {
-      idArray.forEach(function(id) {
-        getAttrs([`repeating_spells_${id}_spellEffect`], function(values) {
-          if (values[`repeating_spells_${id}_spellEffect`] !== "") {
-            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "roll" })
-          } else {
-            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "describe" })
-          }
-        });
-      });
-    });
-  });
-
+  // Set savesAs to hide/show savesAs level for monsters
   on("sheet:opened change:class", function() {
     getAttrs(["class"], function(values) {
       if (['monster', 'normal human', 'custom'].indexOf(values.class.toLowerCase()) >= 0) {
@@ -1653,9 +1677,23 @@
     })
   })
 
+  // Set averageHP for monsters automatically
   on("sheet:opened change:monsterHitDice change:monsterHitDiceModifier", function() {
     getAttrs(["monsterHitDice", "monsterHitDiceModifier"], function(values) {
       setAttrs({ averageHP: Math.floor(parseInt(values.monsterHitDice, 10) * 4.5) + parseInt(values.monsterHitDiceModifier, 10) });
     })
+  });
+
+  // Monster Average HP Button
+  on('clicked:setAverageHP', function () {
+    getAttrs(['monsterHitDice', 'monsterHitDiceModifier'], function (values) {
+      const averageHP = Math.floor(
+        (parseInt(values.monsterHitDice, 10) * 4.5) + parseInt(values.monsterHitDiceModifier, 10)
+      );
+      setAttrs({
+        HP: averageHP,
+        HP_max: averageHP
+      });
+    });
   });
 </script>
