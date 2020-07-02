@@ -4,6 +4,10 @@
 
 ## 1.5.0
 
+### Added
+
+- Add critical hit and miss results to attack rolls
+
 ### Changed
 
 - Change "Threshold Modifier" to "Situational Bonus"
