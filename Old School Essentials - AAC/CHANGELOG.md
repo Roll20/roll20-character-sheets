@@ -2,6 +2,12 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.5.0
+
+### Changed
+
+- Change "Threshold Modifier" to "Situational Bonus"
+
 ## 1.4.0
 
 ### Changed

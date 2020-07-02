@@ -1,3 +1,6 @@
+<!-- Deprecated Attributes -->
+<input type="hidden" name="attr_thresholdModifierEnabled" value="enabled" />
+
 <!-- Hidden Inputs -->
 <input type="hidden" name="attr_BonusSTR" value="0" />
 <input type="hidden" name="attr_BonusDEX" value="0" />
@@ -827,8 +830,8 @@
     </select>
   </label>
   <label class="setting">
-    <span data-i18n="threshold-modifier-enabled">Threshold Modifier Enabled?</span>
-    <select name="attr_thresholdModifierEnabled">
+    <span data-i18n="situational-bonus-enabled">Situational Bonus Enabled?</span>
+    <select name="attr_situationalBonusEnabled">
       <option value="enabled" selected data-i18n="enabled">Enabled</option>
       <option value="disabled" data-i18n="disabled">Disabled</option>
     </select>
@@ -837,7 +840,7 @@
 
 <!-- Attack roll translation -->
 <span style="display: none;" data-i18n="typeofattack">Type of attack</span>
-<span style="display: none;" data-i18n="modifier">Threshold modifier</span>
+<span style="display: none;" data-i18n="modifier">Situational Bonus</span>
 <span style="display: none;" data-i18n="modifier-mod">Modif</span>
 <span style="display: none;" data-i18n="attack">Attack</span>
 <span style="display: none;" data-i18n="attack">Damage</span>
@@ -1007,10 +1010,21 @@
     });
   };
 
-  on("sheet:opened change:thresholdModifierEnabled", function (eventInfo) {
+  // Populate new attributes from existing attributes
+  on("sheet:opened", function() {
+    getAttrs(["thresholdModifierEnabled", "situationalBonusEnabled"], function(values) {
+      if (!values.situationalBonusEnabled) {
+        setAttrs({
+          situationalBonusEnabled: values.thresholdModifierEnabled
+        })
+      }
+    })
+  })
+
+  on("sheet:opened change:situationalBonusEnabled", function (eventInfo) {
     // Check for threshold modifier enabled
-    getAttrs(['thresholdModifierEnabled'], function(values) {
-      if (values.thresholdModifierEnabled.toLowerCase() === "disabled") {
+    getAttrs(['situationalBonusEnabled'], function(values) {
+      if (values.situationalBonusEnabled.toLowerCase() === "disabled") {
         setAttrs({ optionalModQuery: "0" })
       } else {
         setAttrs({
