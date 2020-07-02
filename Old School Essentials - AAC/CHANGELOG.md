@@ -7,6 +7,7 @@
 ### Changed
 
 - Change "Threshold Modifier" to "Situational Bonus"
+- Change damage roll to show roll formula, but also no longer enforce minimum of 1 damage
 
 ## 1.4.0
 
