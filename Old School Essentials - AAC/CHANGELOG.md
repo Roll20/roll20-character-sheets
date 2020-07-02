@@ -10,6 +10,10 @@
 - Change damage roll to show roll formula, but also no longer enforce minimum of 1 damage
 - Change weapons table to only have attack type and not attribute
 
+### Fixed
+
+- Fix a bug where colors were not appearing for max and min rolls on dice
+
 ## 1.4.0
 
 ### Changed
