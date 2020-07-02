@@ -7,6 +7,7 @@
 ### Added
 
 - Add critical hit and miss results to attack rolls
+- Add Dolmenwood classes
 
 ### Changed
 
