@@ -11,6 +11,7 @@
 
 ### Changed
 
+- Change "AC Benefit" to just AC, will require updating armor on character sheets
 - Change "Threshold Modifier" to "Situational Bonus"
 - Change damage roll to show roll formula, but also no longer enforce minimum of 1 damage
 - Change weapons table to only have attack type and not attribute

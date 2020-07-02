@@ -4,7 +4,8 @@
 <!-- Hidden Inputs -->
 <input type="hidden" name="attr_BonusSTR" value="0" />
 <input type="hidden" name="attr_BonusDEX" value="0" />
-<input type="hidden" name="attr_ArmorBenefitTotal" value="0" />
+<input type="hidden" name="attr_ArmorTotal" value="0" />
+<input type="hidden" name="attr_ArmorWornTotal" value="0" />
 <input type="hidden" name="attr_ArmorWeightTotal" value="0" />
 <input type="hidden" name="attr_ItemWeightTotal" value="0" />
 <input type="hidden" name="attr_WeaponWeightTotal" value="0" />
@@ -483,7 +484,7 @@
       <h2>Armor</h2>
       <div class="armor-grid">
         <span data-i18n="name">Name</span>
-        <span data-i18n="armor-benefit">AC Benefit</span>
+        <span data-i18n="armor-class-abbr">AC</span>
         <span data-i18n="armor-weight">Armor Weight</span>
         <span data-i18n="worn-question">Worn?</span>
       </div>
@@ -492,7 +493,7 @@
           <div class="armor-grid">
             <input type="text" name="attr_armorName" placeholder="Leather"
               data-i18n-placeholder="armor-name-placeholder" />
-            <input type="text" name="attr_armorBenefit" placeholder="2" />
+            <input type="text" name="attr_armorValue" placeholder="12" />
             <input type="number" name="attr_armorWeight" placeholder="200" />
             <div class="checkbox">
               <input type="checkbox" checked name="attr_armorWorn" />
@@ -1044,7 +1045,7 @@
     });
 
     // Set attackType based on heuristics of the bonus damage (0 for ranged, otherwise STR bonus)
-    getSEctionIDs("repeating_weapons", function(idArray) {
+    getSectionIDs("repeating_weapons", function(idArray) {
       idArray.forEach(function(id) {
         const attributes = ["attackType", "weaponAttributeBonusDamage"]
           .map(name => `repeating_weapons_${id}_${name}`)
@@ -1058,7 +1059,7 @@
             }
           }
         });
-      })
+      });
     });
 
     // Set roll buttons for spells depending on effect having a value
@@ -1187,25 +1188,29 @@
   });
 
   // Armor Calculation
-  on('sheet:opened change:repeating_armor remove:repeating_armor', function () {
+  on('sheet:opened change:dex change:repeating_armor remove:repeating_armor', function () {
     repeatingSum(
-      "ArmorBenefitTotal",
+      "ArmorTotal",
       "armor",
-      ["armorBenefit", "armorWorn"],
+      ["armorValue", "armorWorn"],
       {
         callback: function () {
-          getAttrs(["ArmorBenefitTotal", "aacAcUnarmored"], function (values) {
-            setAttrs({
-              aacAc: Object.values(values)
-                .map(value => parseInt(value, 10))
-                .reduce((sum, cur) => sum + cur)
-            });
-          });
-          getAttrs(["ArmorBenefitTotal", "dacAcUnarmored"], function (values) {
-            setAttrs({
-              dacAc: parseInt(values.dacAcUnarmored, 10) - values.ArmorBenefitTotal
-            });
-          });
+          repeatingSum(
+            "ArmorWornTotal",
+            "armor",
+            ["armorWorn"],
+            {
+              callback: function () {
+                getAttrs(["ArmorTotal", "ArmorWornTotal", "BonusDEX", "aacAcUnarmored", "dacAcUnarmored"], function (values) {
+                  const armorTotal = parseInt(values.ArmorTotal, 10);
+                  setAttrs({
+                    aacAc: (values.ArmorWornTotal > 0) ? armorTotal + values.BonusDEX : values.aacAcUnarmored,
+                    dacAc: (values.ArmorWornTotal > 0) ? armorTotal - values.BonusDEX : values.dacAcUnarmored
+                  });
+                });
+              }
+            }
+          )
         }
       }
     );
