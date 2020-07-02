@@ -490,6 +490,7 @@
       </div>
       <div class="sheet-armor sheet-repeat">
         <fieldset class="repeating_armor">
+          <input type="hidden" name="attr_armorBenefit" />
           <div class="armor-grid">
             <input type="text" name="attr_armorName" placeholder="Leather"
               data-i18n-placeholder="armor-name-placeholder" />
@@ -1057,6 +1058,27 @@
             } else {
               setAttrs({ [`repeating_weapons_${id}_attackType`]: "Melee" })
             }
+          }
+        });
+      });
+    });
+
+    // Set armorValue per armorBenefit if >= 2
+    getSectionIDs("repeating_armor", function(idArray) {
+      idArray.forEach(function(id) {
+        const attributes = ['armorBenefit', 'armorValue']
+          .map(attr => `repeating_armor_${id}_${attr}`)
+          .push('armorClassType');
+        getAttrs(attributes, function(values) {
+          const armorValue = values[`repeating_armor_${id}_armorValue`];
+          const armorBenefit = values[`repeating_armor_${id}_armorBenefit`]
+          if (armorValue && armorBenefit >= 2) {
+            setAttrs({
+              [`repeating_armor_${id}_armorValue`]: (values.armorClassType === "aac")
+                ? 10 + armorBenefit
+                : 9 - armorBenefit,
+              [`repeating_armor_${id}_armorBenefit`]: ''
+            });
           }
         });
       });
