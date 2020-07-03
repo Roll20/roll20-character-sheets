@@ -197,19 +197,30 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 
 		if (values.acc_tab==="acc")
 		{
+			acc_diff_block = net_acc.toString()+" Accuracy"
 			net_acc = "+"+net_acc.toString()+"d6kh1";
 		}
 
 		if (values.acc_tab==="diff")
 		{
+			acc_diff_block = net_acc.toString()+" Difficulty"
 			net_acc = "-"+net_acc.toString()+"d6kh1";
 		}
 
 		if(values.acc_tab==="none")
 		{
+			acc_diff_block = ""
 			net_acc="+0d6kh1";
 			accdiff_input = 0;
 		}
+
+		if(values.acc_tab==="always")
+		{
+			acc_diff_block = "[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]"
+			net_acc="+0d6kh1";
+			accdiff_input = 0;
+		}
+
 		setAttrs({
 			grit: Math.ceil(parseInt(values.licenselevel)/2),
 			autocalc_evasion:parseInt(values.core_agility)+parseInt(values.frame_evasion)+ parseInt(values.frame_evasion_bns,10),
@@ -226,7 +237,8 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 			agi_half:Math.floor(parseInt(values.core_agility,10) / 2 ),
 			sys_half:Math.floor(parseInt(values.core_systems,10) / 2 ),
 			acc_diff:accdiff_input,
-			autocalc_limbonus: parseInt(values.frame_limited_bns,10) + Math.floor(parseInt(values.core_engineering,10) / 2 )
+			autocalc_limbonus: parseInt(values.frame_limited_bns,10) + Math.floor(parseInt(values.core_engineering,10) / 2 ),
+			acc_diff_block:acc_diff_block
 		});
 	});
 });
@@ -241,6 +253,8 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 	<span class="tab tab2" style='line-height: 40px;'>TALENTS</span>
 	<input type="radio" class="sheet-tab sheet-tab3" name="attr_core-tab" value="3" title="Mech"   />
 	<span class="tab tab3" style='line-height: 40px;margin-right:115px'>MECH</span>
+	<input type="radio" class="acc-tab acc-tab1" name="attr_acc_tab" value="always" title="Always Roll 6d6" />
+	<span class="acc-tab acc-tab1" style='line-height: 40px;'>6D6</span>
 	<input type="radio" class="acc-tab acc-tab1" name="attr_acc_tab" value="acc" title="Accuracy" />
 	<span class="acc-tab acc-tab1" style='line-height: 40px;'>ACC</span>
 	<input type="radio" class="acc-tab acc-tab2" name="attr_acc_tab" value="diff" title="Difficulty" />
@@ -329,7 +343,7 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 				</div><!--pilot hp block-->
 				<div class="nopad just-start testborder border tab-flex-item-nowrap" style="height:30px;padding:0px;;"> <!--pilot grit block-->
 					<div class="flex-element nomarg nopad" style="height:100%;">
-						<button type="roll" class="grit-roll" style="margin:0px" name="Grit_Check" value="&{template:lancer}{{name=Grit Check}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]}}">PILOT GRIT
+						<button type="roll" class="grit-roll" style="margin:0px" name="Grit_Check" value="&{template:lancer}{{name=Grit Check}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=@{acc_diff_block}}}">PILOT GRIT
 						<span style="font-family:'dicefontd20';position:relative;top:2px;margin:0px">0</span></button>
 					</div>
 					<span class="frame-autocalcs" style="height:26px;width:100%;background:none" name="attr_grit"></span>
@@ -374,7 +388,7 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 								<option value="4">+4</option>
 								<option value="6">+6</option>
 							</select>
-							<button type="roll" name="Base_Pilot_Trigger" value="&{template:lancer}} {{name=@{base-pilotskill}}} {{tags=Skill Check}} {{to-hit=[[d20cs0cf0@{net_acc}+@{base-pilotskill-mod}]] }} {{acc-diff=[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]}}"></button>
+							<button type="roll" name="Base_Pilot_Trigger" value="&{template:lancer}} {{name=@{base-pilotskill}}} {{tags=Skill Check}} {{to-hit=[[d20cs0cf0@{net_acc}+@{base-pilotskill-mod}]] }} {{acc-diff=@{acc_diff_block}}}"></button>
 						</div>
 						<fieldset class="repeating_pilotskills"> <!--pilot skills repeating set-->
 							<div class="just-between nested tab-flex-item skillsbar" style="margin-left:2px;margin-top:0px;margin-bottom:4px">
@@ -384,7 +398,7 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 									<option value="4">+4</option>
 									<option value="6">+6</option>
 								</select>
-								<button type="roll" name="Pilot_Trigger" value="&{template:lancer}} {{name=@{pilotskill}}} {{tags=Skill Check}} {{to-hit=[[d20cs0cf0@{net_acc}+@{pilotskill-mod}]] }} {{acc-diff=[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]}}"></button>
+								<button type="roll" name="Pilot_Trigger" value="&{template:lancer}} {{name=@{pilotskill}}} {{tags=Skill Check}} {{to-hit=[[d20cs0cf0@{net_acc}+@{pilotskill-mod}]] }} {{acc-diff=@{acc_diff_block}}}"></button>
 							</div>
 						</fieldset> <!--pilot skills repeating set-->
 					</div> <!--skills column wrapper-->
@@ -510,7 +524,7 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 				<div class="just-between nopad tab-flex-item" style="width:400px;min-height:150px;height:150px;margin-top:-23px"> <!--pilot base weapons joint block -->
 					<div class="mini-input nopad just-between nomarg border tab-flex-item pilotweps" style="width:49%;height:150px"> <!--pilot base weapon block 1-->
 						<div class="nopad flex-element block-title-top" style="margin-top:-3px"> <!--block title-->
-							<button type="roll" name="Pilot_Wep_1" class="pilotweapon-roll section-title" value="&{template:lancer} {{color=black}} {{name=@{base_pilotwep1_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]}}{{@{base_pilotwep1_dmgtype}=[[@{base_pilotwep1_damage}]]}} {{range=[[@{base_pilotwep1_range}]]}}{{tags=@{base_pilotwep1_tags}}}">
+							<button type="roll" name="Pilot_Wep_1" class="pilotweapon-roll section-title" value="&{template:lancer} {{color=black}} {{name=@{base_pilotwep1_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=@{acc_diff_block}}}{{@{base_pilotwep1_dmgtype}=[[@{base_pilotwep1_damage}]]}} {{range=[[@{base_pilotwep1_range}]]}}{{tags=@{base_pilotwep1_tags}}}">
 								<span style="position:relative;right:4px">PILOT WEAPON 1 <span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button></span>
 						</div>
 						<div class="flex-element" style="width:98%">
@@ -546,7 +560,7 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 
 					<div class="mini-input nopad just-between nomarg border tab-flex-item pilotweps" style="width:49%;height:150px"> <!--pilot base weapon block 2-->
 						<div class="nopad flex-element block-title-top" style="margin-top:-3px"> <!--block title-->
-							<button type="roll" name="Pilot_Wep_2" class="pilotweapon-roll section-title" value="&{template:lancer} {{color=black}} {{name=@{base_pilotwep2_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]}}{{@{base_pilotwep2_dmgtype}=[[@{base_pilotwep2_damage}]]}} {{range=[[@{base_pilotwep2_range}]]}}{{tags=@{base_pilotwep2_tags}}}">
+							<button type="roll" name="Pilot_Wep_2" class="pilotweapon-roll section-title" value="&{template:lancer} {{color=black}} {{name=@{base_pilotwep2_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=@{acc_diff_block}}}{{@{base_pilotwep2_dmgtype}=[[@{base_pilotwep2_damage}]]}} {{range=[[@{base_pilotwep2_range}]]}}{{tags=@{base_pilotwep2_tags}}}">
 								<span style="position:relative;right:4px">PILOT WEAPON 2<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button></span>
 						</div>
 						<div class="flex-element" style="width:98%">
@@ -584,7 +598,7 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 					<fieldset class="repeating_pilotweapons" style="padding-left:5px"> <!--pilot weapon repeating set-->
 						<div class="mini-input nopad just-between border tab-flex-item pilotweps" style="width:195px;height:150px;margin-top:5px"> <!--pilot weapon repeating item-->
 							<div class="nopad flex-element block-title-top" style="margin-top:-3px"> <!--block title-->
-								<button type="roll" name="Pilot_Wep" class="pilotweapon-roll section-title" value="&{template:lancer} {{color=black}} {{name=@{pilotwep_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]}}{{@{pilotwep_dmgtype}=[[@{pilotwep_damage}]]}} {{range=[[@{pilotwep_range}]]}}{{tags=@{pilotwep_tags}}}">
+								<button type="roll" name="Pilot_Wep" class="pilotweapon-roll section-title" value="&{template:lancer} {{color=black}} {{name=@{pilotwep_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=@{acc_diff_block}}}{{@{pilotwep_dmgtype}=[[@{pilotwep_damage}]]}} {{range=[[@{pilotwep_range}]]}}{{tags=@{pilotwep_tags}}}">
 
 								<span style="position:relative;right:7px"><span class="pilotwep-counter"></span>
 									<span style="font-family:'dicefontd20';position:relative;top:2px">0</span></button></span>
@@ -1131,22 +1145,22 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 
 						<div class="just-around flex-column-wrapper" style="height:130px"> <!--autocalc hase labels-->
 							<div class="nomarg flex-element" style="background:#000">
-								<label class="autocalc-rolls"> <button type="roll" name="roll_Hull_Save" class="hase-roll" value="&{template:lancer}{{name=Hull Save**}}{{to-hit=[[d20cs0cf0@{net_acc}+@{core_hull}]]}} {{acc-diff=[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]}}">HUL
+								<label class="autocalc-rolls"> <button type="roll" name="roll_Hull_Save" class="hase-roll" value="&{template:lancer}{{name=Hull Save**}}{{to-hit=[[d20cs0cf0@{net_acc}+@{core_hull}]]}} {{acc-diff=@{acc_diff_block}}}">HUL
 								<span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
 							</div>
 							<span class="hp-annotations"></span>
 							<div class="nomarg flex-element" style="background:#000">
-								<label class="autocalc-rolls"> <button type="roll"  name="roll_Agility_Save" class="hase-roll" value="&{template:lancer}{{name=Agility Save**}}{{to-hit=[[d20cs0cf0@{net_acc}+@{core_agility}]]}} {{acc-diff=[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]}}">AGI
+								<label class="autocalc-rolls"> <button type="roll"  name="roll_Agility_Save" class="hase-roll" value="&{template:lancer}{{name=Agility Save**}}{{to-hit=[[d20cs0cf0@{net_acc}+@{core_agility}]]}} {{acc-diff=@{acc_diff_block}}}">AGI
 								<span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
 							</div>
 							<span class="hp-annotations"></span>
 							<div class="nomarg flex-element" style="background:#000">
-								<label class="autocalc-rolls"> <button type="roll"  name="roll_Systems_Save" class="hase-roll" value="&{template:lancer}{{name=Systems Save**}}{{to-hit=[[d20cs0cf0@{net_acc}+@{core_systems}]]}} {{acc-diff=[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]}}">SYS
+								<label class="autocalc-rolls"> <button type="roll"  name="roll_Systems_Save" class="hase-roll" value="&{template:lancer}{{name=Systems Save**}}{{to-hit=[[d20cs0cf0@{net_acc}+@{core_systems}]]}} {{acc-diff=@{acc_diff_block}}}">SYS
 								<span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
 							</div>
 							<span class="hp-annotations"></span>
 							<div class="nomarg flex-element" style="background:#000">
-								<label class="autocalc-rolls" > <button type="roll"  name="roll_Engineering_Save" class="hase-roll" value="&{template:lancer}{{name=Engineering Save**}}{{to-hit=[[d20cs0cf0@{net_acc}+@{core_engineering}]]}} {{acc-diff=[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]}}">ENG
+								<label class="autocalc-rolls" > <button type="roll"  name="roll_Engineering_Save" class="hase-roll" value="&{template:lancer}{{name=Engineering Save**}}{{to-hit=[[d20cs0cf0@{net_acc}+@{core_engineering}]]}} {{acc-diff=@{acc_diff_block}}}">ENG
 								<span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
 							</div>
 							<span class="hp-annotations"></span>
@@ -1236,7 +1250,7 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 						</div>
 						<span class="hp-annotations"></span>
 						<div class="nomarg flex-element" style="background:#000">
-							<label class="autocalc-rolls"> <button type="roll" name="roll_Tech_Attack" class="hase-roll" value="&{template:lancer} {{color=purple}} {{name=Tech Attack}} {{to-hit=[[d20cs0cf0@{net_acc}+@{core_systems}+@{frame_techatk}+@{frame_techatk_bns}]]}} {{acc-diff=[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]}}">T. ATK
+							<label class="autocalc-rolls"> <button type="roll" name="roll_Tech_Attack" class="hase-roll" value="&{template:lancer} {{color=purple}} {{name=Tech Attack}} {{to-hit=[[d20cs0cf0@{net_acc}+@{core_systems}+@{frame_techatk}+@{frame_techatk_bns}]]}} {{acc-diff=@{acc_diff_block}}}">T. ATK
 							<span style="font-family:'dicefontd20';position:relative;">0</span></button></label>
 						</div>
 						<span class="hp-annotations"></span>
@@ -1440,7 +1454,7 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 				<div class="flex-row-wrapper nopad" style="width:515px;"> <!--frame weapons block-->
 					<div class="align-start multi-input border tab-flex-item" style="padding:0px;width:100%"> <!--frame base weapon 1-->
 						<div class="flex-element nomarg reactbar" style="padding:0px;width:92%;margin:0px;margin-bottom: 2px;height:25px"  >
-							<button type="roll"  name="roll_Mech_Wep_1" class="grit-roll" style="margin:0px" value="&{template:lancer} {{color=black}} {{name=@{base_framewep1_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]}} {{@{base_framewep1_dmgtype}=[[@{base_framewep1_damage}]]}} {{@{base_framewep1_dmgtype2}=[[@{base_framewep1_damage2}]]}} {{@{base_framewep1_rangetype}=[[@{base_framewep1_range}]]}} {{@{base_framewep1_rangetype2}=[[@{base_framewep1_range2}]]}} {{tags=@{base_framewep1_mount} @{base_framewep1_type} @{base_framewep1_tags}}} {{effect=@{base_framewep1_notes} }}">WEAPON 1
+							<button type="roll"  name="roll_Mech_Wep_1" class="grit-roll" style="margin:0px" value="&{template:lancer} {{color=black}} {{name=@{base_framewep1_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=@{acc_diff_block}}} {{@{base_framewep1_dmgtype}=[[@{base_framewep1_damage}]]}} {{@{base_framewep1_dmgtype2}=[[@{base_framewep1_damage2}]]}} {{@{base_framewep1_rangetype}=[[@{base_framewep1_range}]]}} {{@{base_framewep1_rangetype2}=[[@{base_framewep1_range2}]]}} {{tags=@{base_framewep1_mount} @{base_framewep1_type} @{base_framewep1_tags}}} {{effect=@{base_framewep1_notes} }}">WEAPON 1
 							<span style="font-family:'dicefontd20';position:relative;">0</span></button>
 							<input type="text" class="1x underline" name="attr_base_framewep1_name"/>
 						</div>
@@ -1501,11 +1515,11 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 								<input type="text" class="underline"value="0"  style="width:60px;text-align:center;margin-left:4px;font-weight:bold;color:#444;font-size:16px" name="attr_base_framewep1_damage2"/>
 								<select name="attr_base_framewep1_dmgtype2"class="underline" style="width:110px;height:25px;margin-left:4px;padding-top:5px;padding-bottom:0px;font-size:14px;color:#444">
 									<option value="N/A">N/A</option>
-									<option value="kinetic">KINETIC</option>
-									<option value="explosive">EXPLOSIVE</option>
-									<option value="energy">ENERGY</option>
-									<option value="heat">HEAT</option>
-									<option value="burn">BURN</option>
+									<option value="bonus_kinetic">KINETIC</option>
+									<option value="bonus_explosive">EXPLOSIVE</option>
+									<option value="bonus_energy">ENERGY</option>
+									<option value="bonus_heat">HEAT</option>
+									<option value="bonus_burn">BURN</option>
 								</select>
 							</div>
 						</div>
@@ -1529,7 +1543,7 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 						<fieldset class="repeating_weapons"> <!--frame weapon repeating set-->
 					<div class="align-start multi-input border tab-flex-item" style="padding:0px;width:505px"> <!--frame base weapon 1-->
 						<div class="flex-element nomarg reactbar" style="padding:0px;width:92%;margin:0px;margin-bottom: 2px;height:25px"  >
-							<button type="roll"  name="rol_Mech_Wep" class="grit-roll" style="margin:0px" value="&{template:lancer} {{color=black}} {{name=@{framewep_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=[[d6]][[d6]][[d6]][[d6]][[d6]][[d6]]}} {{@{framewep_dmgtype}=[[@{framewep_damage}]]}} {{@{framewep_dmgtype2}=[[@{framewep_damage2}]]}} {{@{framewep_rangetype}=[[@{framewep_range}]]}} {{@{framewep_rangetype2}=[[@{framewep_range2}]]}} {{tags=@{framewep_mount} @{framewep_type} @{framewep_tags}}} {{effect=@{framewep_notes} }}"><span class="weapon-counter"></span>
+							<button type="roll"  name="rol_Mech_Wep" class="grit-roll" style="margin:0px" value="&{template:lancer} {{color=black}} {{name=@{framewep_name}}} {{to-hit=[[d20cs0cf0@{net_acc}+@{grit}]]}} {{acc-diff=@{acc_diff_block}}} {{@{framewep_dmgtype}=[[@{framewep_damage}]]}} {{@{framewep_dmgtype2}=[[@{framewep_damage2}]]}} {{@{framewep_rangetype}=[[@{framewep_range}]]}} {{@{framewep_rangetype2}=[[@{framewep_range2}]]}} {{tags=@{framewep_mount} @{framewep_type} @{framewep_tags}}} {{effect=@{framewep_notes} }}"><span class="weapon-counter"></span>
 							<span style="font-family:'dicefontd20';position:relative;">0</span></button>
 							<input type="text" class="1x underline" name="attr_framewep_name"/>
 						</div>
@@ -1590,11 +1604,11 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 								<input type="text" class="underline" value="0" style="width:60px;text-align:center;margin-left:4px;font-weight:bold;color:#444;font-size:16px" name="attr_framewep_damage2"/>
 								<select name="attr_framewep_dmgtype2"class="underline" style="width:110px;height:25px;margin-left:4px;padding-top:5px;padding-bottom:0px;font-size:14px;color:#444">
 									<option value="N/A">N/A</option>
-									<option value="kinetic">KINETIC</option>
-									<option value="explosive">EXPLOSIVE</option>
-									<option value="energy">ENERGY</option>
-									<option value="heat">HEAT</option>
-									<option value="burn">BURN</option>
+									<option value="bonus_kinetic">KINETIC</option>
+									<option value="bonus_explosive">EXPLOSIVE</option>
+									<option value="bonus_energy">ENERGY</option>
+									<option value="bonus_heat">HEAT</option>
+									<option value="bonus_burn">BURN</option>
 								</select>
 							</div>
 						</div>
@@ -1760,11 +1774,16 @@ on("sheet:opened change:acc_diff change:frame_save_target change:frame_class cha
 			{{#explosive}}[ {{explosive}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/explosive.png" /> ] {{/explosive}}
 			{{#heat}}[ {{heat}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/heat.png" /> ] {{/heat}}
 			{{#burn}}[ {{burn}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/burn.png" /> ] {{/burn}}
-			</div>
-		{{#allprops() N/A name tags effect color to-hit acc-diff range threat cone burst line blast kinetic energy explosive heat burn}}
+			{{#bonus_kinetic}}[ {{bonus_kinetic}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/kinetic.png" /> ] {{/bonus_kinetic}}
+			{{#bonus_energy}}[ {{bonus_energy}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/energy.png" /> ] {{/bonus_energy}}
+			{{#bonus_explosive}}[ {{bonus_explosive}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/explosive.png" /> ] {{/bonus_explosive}}
+			{{#bonus_heat}}[ {{bonus_heat}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/heat.png" /> ] {{/bonus_heat}}
+			{{#bonus_burn}}[ {{bonus_burn}}<img class="sheet-icon" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/LANCER RPG (1.8)/images/burn.png" /> ] {{/bonus_burn}}
+		</div>
+		{{#allprops() N/A name tags effect color to-hit acc-diff range threat cone burst line blast kinetic energy explosive heat burn bonus_kinetic bonus_energy bonus_explosive bonus_heat bonus_burn}}
 		<div class="sheet-key">{{key}}</div>
 		<div class="sheet-value">{{value}}</div>
-		{{/allprops() N/A name tags effect color to-hit acc-diff range threat cone burst line blast kinetic energy explosive heat burn}}
+		{{/allprops() N/A name tags effect color to-hit acc-diff range threat cone burst line blast kinetic energy explosive heat burn bonus_kinetic bonus_energy bonus_explosive bonus_heat bonus_burn}}
 		{{#effect}}<div class="sheet-effect">{{effect}}</div>{{/effect}}
 		</div>
 	</div>

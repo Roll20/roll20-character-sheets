@@ -79,6 +79,7 @@
 	<input type="hidden" name="attr_spells_points" value="0" />
 	<input type="hidden" name="attr_announcements_hide" value="0" />
 	<input type="hidden" name="attr_inventory_fixed_digits" value="0" />
+	<input type="hidden" name="attr_base_attribute_level" value="10" />
 	<!-- /HIDDEN FIELDS -->
 
 	<div class="heading-character-name">
@@ -97,12 +98,10 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 				<ul>
-					<li>Rolltemplate results now match the selected sheet style, contributed by TamedFlame.</li>
-					<li>Text areas size can be resized in the browser but this caused overlapping issues. Reported by eVie fixed by TamedFlame.</li>
-					<li>Skills Tab. Expanded notes area. Added new text box to enter Skill Modifier notes normally found in the description of the skill. Added highlight row checbox.</li>
-					<li>Grimoire Tab. Changes College(s) to two text boxes; Primary College and Secondary College. Widened the text box for <b>Reason for Mod (Modifier)</b>.</li>
-					<li>Rolltemplate Ranged Attack Notes to help clarify rules. If failed by 10 or more, a note will show that critical miss doesn't apply to ranged attacks.</li>
-					<li>Inventory table. Add a location column.</li>
+					<li>Combat tab. Active Defenses - Link to an attribute and calculate the base defense.</li>
+					<li>Combat tab. Knockback Defenses - Link to an attribute and calculate the base defense. Added a field to adjust the HP per yard amount.</li>
+					<li>Repeating Defense, Melee, and Ranged tables. Added ability to link a skill to WILL.</li>
+					<li>Fixed text description for Unconsciousness check, changed Hard to Kill to Hard to Subdue. Reported by Ben.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset"><span data-i18n="view-all-updates">View All Updates</span></button>
@@ -156,7 +155,7 @@ affect direct attribute rolls and skill rolls.
 					<div class="row row-strength">
 						<div class="cell col0 label">
 							<div class="popup">
-								<span data-i18n="abreviation-strength">ST</span>
+								<span data-i18n="abbreviation-strength">ST</span>
 							</div>
 							<span class="tooltip">
 								<span data-i18n="attributes-strength-tooltip">
@@ -547,7 +546,7 @@ You must make an immediate HT roll to avoid knockdown and stunning. <br />
 Unconscious Check, based on Health<br />
 If HP zero or less, roll per turn to take an Active Action.<br />
 -1 per full multiple of HP below zero.<br />
-Hard/Easy to Kill: Gives +/- per level to Unconscious Check<br />
+Hard/Easy to Subdue: Gives +/- per level to Unconscious Check<br />
 Fit +1 to Unc. Check . Very Fit +2 to Unc.  Check
 							</span>
 						</span>
@@ -1120,7 +1119,7 @@ Affects ST roll and using weapons with minimum ST.
 								</div>
 								<div class="fatigue-points-quartered-dodge">
 									<div class="popup">
-										<b style="color:red;">½ <span data-i18n="abreviation-strength">ST</span></b>
+										<b style="color:red;">½ <span data-i18n="abbreviation-strength">ST</span></b>
 									</div>
 									<span class="tooltip">
 										<span data-i18n="half-strength-tooltip">
@@ -2061,7 +2060,7 @@ Stat to use: <input type="text" name="attr_standing_broad_jump_stat_to_use" valu
 									<span class="tooltip">
 										<span data-i18n="running-broad-jump-tooltip">
 Running Broad Jump Distance, under Broad Jump decryption. B352 <br />
-<strong>1st column</strong> enter in your (2 x Stat to use) plus how may yards you ran this turn. <br />
+<strong>1st column</strong> entery how may yards you ran this turn. <br />
 <strong>2nd column</strong> shows you how many feet you may jump. <br />
 <strong>3rd column</strong> shows you how many yard you jump. <br />
 Formula = (2 x Stat To use) - 3 feet<br />
@@ -2395,12 +2394,7 @@ Advantages, and Perks.
     					</span>
 					</div>
 					<div class="cell col1">
-						<input type="text" name="attr_trait_advantages_points_gcs" disabled="disabled" value="@{languages_points} + 
-						                                                                                    @{tl_pts} + 
-						                                                                                    @{cf_points} + 
-						                                                                                    @{advantages_points} + 
-						                                                                                    @{advantages_perks}"
-						                                                                                    title="Macro name: trait_advantages_points_gcs" />
+						<input type="text" name="attr_trait_advantages_points_gcs" disabled="disabled" value="@{languages_points} +  @{tl_pts} +  @{cf_points} + @{advantages_points} + @{advantages_perks}" title="Macro name: trait_advantages_points_gcs" />
 					</div>
 				</div> <!-- .row -->
 				
@@ -2723,6 +2717,14 @@ normal TL.
 					</div>
 					<div class="cell col1">
 						<div class="popup">
+							<span data-i18n="abbreviation-level-label">LVL</span>
+						</div>
+						<span class="tooltip">
+							<span data-i18n="trait-level-tooltip">Level of the trait.</span>
+						</span>
+					</div>
+					<div class="cell col1">
+						<div class="popup">
 							<span data-i18n="abbreviation-frequency-of-appearance-label">FOA</span>
 						</div>
 						<span class="tooltip">
@@ -2764,6 +2766,9 @@ PU2:126 = Power-Ups 2. Page 126<br />
 					<div class="row row-stats">
 						<div class="cell col0">
 							<input type="text" name="attr_name" title="Macro table name: repeating_traits. Field name: name" />
+						</div>
+						<div class="cell col1">
+							<input type="number" name="attr_trait_level" min="0" step="1" title="Macro table name: repeating_traits. field name: trait_level" />
 						</div>
 						<div class="cell col1">
 							<input type="number" name="attr_foa" min="3" max="18" step="1" title="Macro table name: repeating_traits. Field name: foa" />
@@ -2970,6 +2975,14 @@ PU2:126 = Power-Ups 2. Page 126<br />
 					</div>
 					<div class="cell col1">
 						<div class="popup">
+							<span data-i18n="abbreviation-level-label">LVL</span>
+						</div>
+						<span class="tooltip">
+							<span data-i18n="trait-level-tooltip">Level of the trait.</span>
+						</span>
+					</div>
+					<div class="cell col1">
+						<div class="popup">
 							<span data-i18n="abbreviation-self-control-number-label">SCN</span>
 						</div>
 						<span class="tooltip">
@@ -3014,7 +3027,10 @@ PU2:126 = Power-Ups 2. Page 126<br />
 							<input type="text" name="attr_name" title="Macro table name: repeating_disadvantages. Field name: name" />
 						</div>
 						<div class="cell col1">
-							<input type="number" name="attr_control_rating" title="Macro table name: repeating_disadvantages. Field name: control_rating" />
+							<input type="number" min="0" step="1" name="attr_trait_level" title="Macro table name: repeating_disadvantages. Field name: trait_level" />
+						</div>
+						<div class="cell col1">
+							<input type="number" min="0" step="1" name="attr_control_rating" title="Macro table name: repeating_disadvantages. Field name: control_rating" />
 						</div>
 						<div class="cell col2">
 							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Self-control Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{control_rating} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsDSCR" />
@@ -3048,6 +3064,14 @@ PU2:126 = Power-Ups 2. Page 126<br />
 				<div class="header">
 					<div class="cell col0">
 						<span data-i18n="racial-traits-label">Racial Traits</span>
+					</div>
+					<div class="cell col1">
+						<div class="popup">
+							<span data-i18n="abbreviation-level-label">LVL</span>
+						</div>
+						<span class="tooltip">
+							<span data-i18n="trait-level-tooltip">Level of the trait.</span>
+						</span>
 					</div>
 					<div class="cell col1">
 						<div class="popup">
@@ -3091,6 +3115,7 @@ PU2:126 = Power-Ups 2. Page 126<br />
 						 <b><span data-i18n="race-label">Race</span>:</b> <input type="text" name="attr_race" title="Macro name: race" />
 					</div>
 					<div class="cell col1"></div>
+					<div class="cell col1"></div>
 					<div class="cell col2"></div>
 					<div class="cell col3">
 					    <input type="text" name="attr_trait_racial_points" disabled="disabled" value="@{racial_points}" title="Macro name: trait_racial_points" />
@@ -3108,7 +3133,10 @@ PU2:126 = Power-Ups 2. Page 126<br />
 							<input type="text" name="attr_name" title="Macro table name: repeating_racial. Field name: name" />
 						</div>
 						<div class="cell col1">
-							<input type="number" name="attr_control_rating" title="Macro table name: repeating_racial. Field name: control_rating" />
+							<input type="number" min="1" step="1" name="attr_trait_level" title="Macro table name: repeating_racial. Field name: trait_level" />
+						</div>
+						<div class="cell col1">
+							<input type="number" min="1" step="1" name="attr_control_rating" title="Macro table name: repeating_racial. Field name: control_rating" />
 						</div>
 						<div class="cell col2">
 							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Self-control Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{control_rating} + @{modifier}]]}} {{notes=@{notes}}} {{showNotes=[[@{show_notes}]]}} {{bookReference=@{ref}}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsRSCR" />
@@ -3972,7 +4000,7 @@ This example would represent the skill level on that row.
 							</div>
 						</div> <!-- .row -->
 					    
-						<div class="row">
+						<div class="row technique-notebox">
 					        <div class="cell label">
 							    <div class="popup">
 									<span data-i18n="link-label">Link:</span>
@@ -3981,14 +4009,22 @@ This example would represent the skill level on that row.
 									<span data-i18n="link-to-row-id-tooltip">Link this row to another row item.</span>
         						</span> 
 					        </div>
-							<div class="cell">
+							<input type="hidden" name="attr_technique_row_type" value="Skill" />
+					        <div class="cell">
 								<select name="attr_technique_row_type">
 					                <option value="Skill"><span data-i18n="option-skill">Skill</span></option>
 									<option value="Spell"><span data-i18n="option-spell">Spell</span></option>
 									<option value="Technique"><span data-i18n="option-technique">Technique</span></option>
+									<option value="ST"><span data-i18n="abbreviation-strength">ST</span></option>
+									<option value="STRIKING"><span data-i18n="attribute-striking">Striking</span> <span data-i18n="abbreviation-strength">ST</span></option>
+									<option value="DX"><span data-i18n="abbreviation-dexterity">DX</span></option>
+									<option value="IQ"><span data-i18n="abbreviation-intelligence">IQ</span></option>
+									<option value="WILL"><span data-i18n="will-label">WILL</span></option>
+									<option value="HT"><span data-i18n="abbreviation-health">HT</span></option>
+									<option value="10"><span data-i18n="abbreviation-health">10</span></option>
 					            </select>
 					        </div>
-    					    <div class="cell col-row-id label">
+    					    <div class="cell col-row-id label show-hide-row-id">
     						    <div class="popup">
 									<span data-i18n="row-id-label">Row ID:</span>
 								</div>
@@ -3996,11 +4032,13 @@ This example would represent the skill level on that row.
 									<span data-i18n="copy-paste-row-id-tooltip">
 Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
 When the skill/spell is updated, the technique's parent name and base skill level<br />
-will be updated.
+will be updated.<br />
+Once entered, this will change the Skill/Spell for this particular attack to match<br />
+the skill/spell level of the Base Skill. Do not change this skill Level number manually.
 									</span>
         						</span>	
     						</div>
-    						<div class="cell col-input-medium">
+    						<div class="cell col-input-medium show-hide-row-id">
     						    <input type="hidden" name="attr_technique_skill_row_id_toggle" value="0" />
 								<input type="text" name="attr_technique_skill_row_id" title="Macro table name: repeating_techniquesrevised. Field name: technique_skill_row_id" />
 							</div>
@@ -4410,52 +4448,9 @@ parry if you've already attacked with it this turn<br />
 
 					<div class="row row-details notebox">
 					
-					    <!-- TODO: Add links: Skill, Technique, Spell, Weapon, Power/Talent -->
-						<div class="row" style="display: none;">
-					        <div class="cell label">
-							    <div class="popup">
-									<span data-i18n="link-label">Link:</span>
-								</div>
-        						<span class="tooltip">
-									<span data-i18n="link-to-row-id-tooltip">Link this row to another row item.</span>
-        						</span> 
-					        </div>
-							<div class="cell">
-								<select name="attr_defense_dodge_skill_row_type">
-					                <option value="Skill"><span data-i18n="option-skill">Skill</span></option>
-					                <option value="Technique"><span data-i18n="option-technique">Technique</span></option>
-					                <option value="Spell"><span data-i18n="option-spell">Spell</span></option>
-					            </select>
-					        </div>
-    					    <div class="cell col-row-id label">
-    						    <div class="popup">
-									<span data-i18n="row-id-label">Row ID:</span>
-								</div>
-        						<span class="tooltip">
-        							<span data-i18n="copy-paste-row-id-tooltip">
-Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
-When the skill/spell is updated, the technique's parent name and base skill level<br />
-will be updated.
-									</span>
-        						</span>	
-    						</div>
-    						<div class="cell col-input-medium">
-    						    <input type="hidden" name="attr_defense_dodge_skill_row_id_toggle" value="0" />
-								<input type="text" name="attr_defense_dodge_skill_row_id" title="Field name: defense_dodge_skill_row_id" />
-							</div>
-							<div class="cell col-wide">
-								<input type="hidden" name="attr_defense_dodge_skill" value="" />
-    							<input type="hidden" name="attr_defense_dodge_skill_row_id_modifier" value="0" />
-    							<input type="hidden" name="attr_defense_dodge_skill_row_id_message" value="" />
-								<b><span data-i18n="name-label">Name:</span></b>
-								<span name="attr_defense_dodge_skill_row_id_message"></span>
-    							<input type="hidden" name="attr_defense_dodge_skill_row_id_level" value="" />
-								<b><span data-i18n="skill-level-label">Level</span>:</b>
-								<span name="attr_defense_dodge_skill_row_id_level"></span>
-    						</div>
-						</div> <!-- .row -->
+						<div class="row hide-row"></div> <!-- .row needed to cause note to have background: todo: fix css -->
 						
-						<div class="row">
+					    <div class="row">
 							<div class="cell label">
 							    <div class="popup">
 									<span data-i18n="reason-for-modifier-label">Reason for MOD (Modifier):</span>
@@ -4613,52 +4608,9 @@ Optional Rules for Retreat can be found in MA123.
 
 					<div class="row row-details notebox">
 					
-					    <!-- TODO: Add links: Skill, Technique, Spell, Weapon, Power/Talent -->
-						<div class="row" style="display: none;">
-					        <div class="cell label">
-							    <div class="popup">
-									<span data-i18n="link-label">Link:</span>
-								</div>
-        						<span class="tooltip">
-									<span data-i18n="link-to-row-id-tooltip">Link this row to another row item.</span>
-        						</span> 
-					        </div>
-							<div class="cell">
-								<select name="attr_defense_dodge_retreat_row_type">
-					                <option value="Skill"><span data-i18n="option-skill">Skill</span></option>
-					                <option value="Technique"><span data-i18n="option-technique">Technique</span></option>
-					                <option value="Spell"><span data-i18n="option-spell">Spell</span></option>
-					            </select>
-					        </div>
-    					    <div class="cell col-row-id label">
-    						    <div class="popup">
-									<span data-i18n="row-id-label">Row ID:</span>
-								</div>
-        						<span class="tooltip">
-        							<span data-i18n="copy-paste-row-id-tooltip">
-Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
-When the skill/spell is updated, the technique's parent name and base skill level<br />
-will be updated.
-									</span>
-        						</span>	
-    						</div>
-    						<div class="cell col-input-medium">
-    						    <input type="hidden" name="attr_defense_dodge_retreat_skill_row_id_toggle" value="0" />
-								<input type="text" name="attr_defense_dodge_retreat_skill_row_id" title="Field name: defense_dodge_retreat_skill_row_id" />
-							</div>
-							<div class="cell col-wide">
-								<input type="hidden" name="attr_defense_dodge_retreat_skill" value="" />
-    							<input type="hidden" name="attr_defense_dodge_retreat_skill_row_id_modifier" value="0" />
-    							<input type="hidden" name="attr_defense_dodge_retreat_skill_row_id_message" value="" />
-								<b><span data-i18n="name-label">Name:</span></b>
-								<span name="attr_defense_dodge_retreat_skill_row_id_message"></span>
-    							<input type="hidden" name="attr_defense_dodge_retreat_skill_row_id_level" value="" />
-								<b><span data-i18n="skill-level-label">Level</span>:</b>
-								<span name="attr_defense_dodge_retreat_skill_row_id_level"></span>
-    						</div>
-						</div> <!-- .row -->
+						<div class="row hide-row"></div> <!-- .row needed to cause note to have background: todo: fix css -->
 						
-						<div class="row">
+					    <div class="row">
 							<div class="cell label">
 							    <div class="popup">
 									<span data-i18n="reason-for-modifier-label">Reason for MOD (Modifier):</span>
@@ -4814,50 +4766,7 @@ It is similar to a Dodge and Retreat, but only effective against <strong>Ranged 
 
 					<div class="row row-details notebox">
 					
-					    <!-- TODO: Add links: Skill, Technique, Spell, Weapon, Power/Talent -->
-						<div class="row" style="display: none;">
-					        <div class="cell label">
-							    <div class="popup">
-									<span data-i18n="link-label">Link:</span>
-								</div>
-        						<span class="tooltip">
-									<span data-i18n="link-to-row-id-tooltip">Link this row to another row item.</span>
-        						</span> 
-					        </div>
-							<div class="cell">
-								<select name="attr_defense_row_type">
-					                <option value="Skill"><span data-i18n="option-skill">Skill</span></option>
-					                <option value="Technique"><span data-i18n="option-technique">Technique</span></option>
-					                <option value="Spell"><span data-i18n="option-spell">Spell</span></option>
-					            </select>
-					        </div>
-    					    <div class="cell col-row-id label">
-    						    <div class="popup">
-									<span data-i18n="row-id-label">Row ID:</span>
-								</div>
-        						<span class="tooltip">
-        							<span data-i18n="copy-paste-row-id-tooltip">
-Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
-When the skill/spell is updated, the technique's parent name and base skill level<br />
-will be updated.
-									</span>
-        						</span>	
-    						</div>
-    						<div class="cell col-input-medium">
-    						    <input type="hidden" name="attr_defense_dodge_drop_skill_row_id_toggle" value="0" />
-								<input type="text" name="attr_defense_dodge_drop_skill_row_id" title="Field name: defense_dodge_drop_skill_row_id" />
-							</div>
-							<div class="cell col-wide">
-								<input type="hidden" name="attr_defense_dodge_drop_skill" value="" />
-    							<input type="hidden" name="attr_defense_dodge_drop_skill_row_id_modifier" value="0" />
-    							<input type="hidden" name="attr_defense_dodge_drop_skill_row_id_message" value="" />
-								<b><span data-i18n="name-label">Name:</span></b>
-								<span name="attr_defense_dodge_drop_skill_row_id_message"></span>
-    							<input type="hidden" name="attr_defense_dodge_drop_skill_row_id_level" value="" />
-								<b><span data-i18n="skill-level-label">Level</span>:</b>
-								<span name="attr_defense_dodge_drop_skill_row_id_level"></span>
-    						</div>
-						</div> <!-- .row -->
+					    <div class="row hide-row"></div> <!-- .row needed to cause note to have background: todo: fix css -->
 						
 						<div class="row">
 							<div class="cell label">
@@ -4963,6 +4872,221 @@ visualize what it will look like in chat.
 
 				</div>
 				
+				<div class="row-static-defense">
+					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight_knockback" />
+					<input class="toggle toggle-notes static-defense" type="checkbox" title="Click to show/hide more information." name="attr_defense_knockback_toggle_notes" />
+					<span class="checkbox static-defense"></span>
+					<div class="row row-stats row-standard static-defense-width">
+						<div class="cell col-dodge-label">
+							<div class="popup">
+								<span data-i18n="knockback-label">Knockback save vs crushing or cutting attacks</span>
+							</div>
+							<span class="tooltip">
+								<span data-i18n="knockback-tooltip">
+A <b>crushing</b> attack can cause knockback regardless of whether it penetrates DR.<br />
+A <b>cutting</b> attack can cause knockback only if it fails to penetrate DR.<br />
+For every full ST-2 damage (<b>BEFORE</b> subtracting DR) target is moved yard <i>away</i> from attacker.<br />
+<i>NOTE:</i> If target has no ST score (like a wall) or is not resisting, use HP instead.<br /><br />
+<b>If knocked back</b>, Roll against DX, Acrobatics, or Judo.<br />
+-1 per yard of knockback <b>AFTER</b> the first yard.<br />
++4 for Perfect Balance. see B378.<br />
+If target collides with an object, use yards knocked back to calculate <i>Collisions and Falls</i> (see Combat Tools).
+							</span>
+						</div>
+						<div class="cell col-dodge"></div>
+						<div class="cell col1-plus-col2">
+							<input type="hidden" name="attr_knockback_points" value="" />
+							<span data-i18n="knockback-calculation-description">1 yard per <b><span name="attr_knockback_points"></span></b> points</span> 
+						</div>
+						<div class="cell col2"><input type="text" name="attr_ad_knockback_skill" title="Macro name: ad_knockback_skill" /></div>
+						<div class="cell col2"><input type="number" step="1" name="attr_ad_knockback_skill_mod" value="0" title="Macro name: ad_knockback_skill_skill_mod" /></div>
+						<div class="cell col3"><input type="text" name="attr_ad_knockback_skill_final" value="@{ad_knockback_skill} + @{ad_knockback_skill_mod}" disabled="disabled" title="Macro name: ad_knockback_skill_final" /></div>
+						<div class="cell col4">
+							<input type="hidden" name="attr_raw_knockback_success_notes" value="Avoided falling prone, but check for collision." />
+							<input type="hidden" name="attr_raw_knockback_critical_success_notes" value="Avoided falling prone, but check for collision." />
+							<input type="hidden" name="attr_raw_knockback_fail_notes" value="Fall prone, but check for collision." />
+							<input type="hidden" name="attr_raw_knockback_critical_fail_notes" value="Fall prone, but check for collision." />
+							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Defense Roll}} {{defenseType=[[1]]}} {{activeDefense=[[1]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Avoid Knockback}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{ad_knockback_skill_final} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}} {{showNotes=[[@{defense_knockback_show_notes}]]}} {{notes=@{defense_knockback_notes}}} {{showRawDefenseNotes=[[@{show_raw_defensive_notes}]]}} {{rawSuccessNote=@{raw_knockback_success_notes}}} {{rawCriticalSuccessNote=@{raw_knockback_critical_success_notes}}} {{rawFailNote=@{raw_knockback_fail_notes}}} {{rawCriticalFailNote=@{raw_knockback_critical_fail_notes}}} {{customSuccessNote=@{defense_knockback_success_note}}} {{customCriticalSuccessNote=@{defense_knockback_critical_success_note}}} {{customFailNote=@{defense_knockback_fail_note}}} {{customCriticalFailNote=@{defense_knockback_critical_fail_note}}}" name="roll_vsKnockback" />
+						</div>
+					</div> <!-- .row -->
+
+					<div class="row row-details notebox">
+					
+					    <div class="row">
+					        <div class="cell label">
+							    <div class="popup">
+									<span data-i18n="link-label">Link:</span>
+								</div>
+        						<span class="tooltip">
+									<span data-i18n="link-to-row-id-tooltip">Link this row to another row item.</span>
+        						</span> 
+					        </div>
+							<input type="hidden" name="attr_knockback_defense_row_type" value="Skill" />
+					        <div class="cell">
+								<select name="attr_knockback_defense_row_type">
+					                <option value=""><span data-i18n="option-select">--Select--</span></option>
+					                <option value="Skill"><span data-i18n="option-skill">Skill</span></option>
+					                <option value="Technique"><span data-i18n="option-technique">Technique</span></option>
+					                <option value="Spell"><span data-i18n="option-spell">Spell</span></option>
+									<option value="ST"><span data-i18n="abbreviation-strength">ST</span></option>
+									<option value="STRIKING"><span data-i18n="attribute-striking">Striking</span> <span data-i18n="abbreviation-strength">ST</span></option>
+									<option value="DX"><span data-i18n="abbreviation-dexterity">DX</span></option>
+									<option value="IQ"><span data-i18n="abbreviation-intelligence">IQ</span></option>
+									<option value="WILL"><span data-i18n="will-label">WILL</span></option>
+									<option value="HT"><span data-i18n="abbreviation-health">HT</span></option>
+									<option value="10"><span data-i18n="abbreviation-health">10</span></option>
+					            </select>
+					        </div>
+    					    <div class="cell col-row-id label show-hide-row-id">
+    						    <div class="popup">
+									<span data-i18n="row-id-label">Row ID:</span>
+								</div>
+        						<span class="tooltip">
+        							<span data-i18n="copy-paste-row-id-tooltip">
+Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
+When the skill/spell is updated, the technique's parent name and base skill level<br />
+will be updated.<br />
+Once entered, this will change the Skill/Spell for this particular attack to match<br />
+the skill/spell level of the Base Skill. Do not change this skill Level number manually.
+									</span>
+        						</span>	
+    						</div>
+    						<div class="cell col-input-medium show-hide-row-id">
+    						    <input type="hidden" name="attr_defense_knockback_skill_row_id_toggle" value="0" />
+								<input type="text" name="attr_defense_knockback_skill_row_id" title="Field name: defense_knockback_skill_row_id" />
+							</div>
+							<div class="cell col-wide">
+							
+								<b><span data-i18n="name-label">Name:</span></b>
+								<input type="hidden" name="attr_defense_knockback_skill_row_id_message" value="" />
+								<span name="attr_defense_knockback_skill_row_id_message"></span>
+								
+								<b><span data-i18n="skill-level-label">Level</span>:</b>
+								<input type="hidden" name="attr_defense_knockback_skill_row_id_level" value="" />
+								<span name="attr_defense_knockback_skill_row_id_level"></span>
+							
+							</div>
+						</div> <!-- .row -->
+						
+						<div class="row">
+							<div class="cell label">
+							    <div class="popup">
+									<span data-i18n="reason-for-modifier-label">Reason for MOD (Modifier):</span>
+								</div>
+        						<span class="tooltip">
+									<span data-i18n="reason-for-modifiers-skills-tooltip">
+Examples:<br />
++1 from Talent...<br />
++1 from Default Skill...<br />
++1 from Enchanted Item with...
+									</span>
+        						</span> 
+							</div>
+							<div class="cell col-input-wide">
+    						    <input type="number" value="0" step="1" name="attr_defense_knockback_mod_reason" title="Field name: defense_knockback_mod_reason" />
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="cell label">
+							    <div class="popup">
+									<span data-i18n="knockback-hitpoints-modifier-label">HP per yard Modifier:</span>
+								</div>
+        						<span class="tooltip">
+									<span data-i18n="knockback-hitpoints-modifier-tooltip">Modify the number of hit points required for knockback.<br />For skinny, special rules, etc.</span>
+        						</span> 
+							</div>
+							<div class="cell col-input-number">
+    						    <input type="text" name="attr_defense_knockback_hitpoints_mod" title="Field name: defense_knockback_hitpoints_mod" />
+							</div>
+						</div>
+
+						<div class="header">
+							<div class="title">
+								<div class="popup">
+									<span data-i18n="notes-label">Notes</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="custom-success-fail-notes-tooltip">
+Success, critical success, fail, and critical fail<br />
+notes will be added to roll results.<br />
+You can add macros to these notes.<br />
+The width of these note boxes are set to help you<br />
+visualize what it will look like in chat.
+									</span>
+								</span>
+							</div>
+						</div>
+						<div class="row">
+							
+							<div class="show-notes">
+						        <input type="checkbox" name="attr_defense_knockback_show_notes" value="1" style="float:left; margin-right: 5px;" />
+								<div class="popup" style="float:left;">
+									<span data-i18n="show-notes-below-label">Show notes below in roll template</span>
+								</div>
+        						<span class="tooltip">
+									<span data-i18n="displayed-on-rolltemplate-tooltip">Displayed on the rolltemplate.</span>
+        						</span>
+							</div>
+
+						</div>
+					
+						<div class="rolltable-result-notes">
+							
+							<div class="note-input">
+						        <div class="note-title">
+    						        <div class="popup">
+										<span data-i18n="custom-notes-label">Custom Notes:</span>
+									</div>
+            						<span class="tooltip">
+										<span data-i18n="custom-notes-active-defense-tooltip">Add custom notes for this active defense.</span>
+									</span>
+    						    </div>
+						        <textarea name="attr_defense_knockback_notes" title="Field name: defense_knockback_notes" style="height: 50px"></textarea>
+						    </div>
+							
+						</div>
+
+					    <div class="rolltable-result-notes">
+						    
+						    <div class="note-input">
+						        <div class="note-title">
+									<span data-i18n="success-note-label">Success Note:</span>
+								</div>
+						        <textarea name="attr_defense_knockback_success_note" title="Field name: defense_knockback_success_note"></textarea>
+						    </div>
+						    
+						    <div class="note-input">
+						        <div class="note-title">
+									<span data-i18n="critical-success-note-label">Critical Success Note:</span>
+								</div>
+						        <textarea name="attr_defense_knockback_critical_success_note" title="Field name: defense_knockback_critical_success_note"></textarea>
+							</div>
+							
+						</div>
+						
+						<div class="rolltable-result-notes">
+						    
+						    <div class="note-input">
+						        <div class="note-title">
+									<div data-i18n="fail-note-label">Fail Note:</div>
+								</div>
+						        <textarea name="attr_defense_knockback_fail_note" title="Field name: defense_knockback_fail_note"></textarea>
+						    </div>
+						    
+						    <div class="note-input">
+						        <div class="note-title">
+									<span data-i18n="critical-fail-note-label">Critical Fail Note:</span>
+								</div>
+						        <textarea name="attr_defense_knockback_critical_fail_note" title="Field name: defense_knockback_critical_fail_note"></textarea>
+						    </div>
+						    
+						</div>
+						
+					</div> <!-- .row -->
+
+				</div>
+
 				<fieldset class="repeating_defense">
 					<input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
 					<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." name="attr_defense_toggle_notes" />
@@ -4981,7 +5105,8 @@ visualize what it will look like in chat.
 								<option value="Magic"><span data-i18n="option-magic">Magic</span></option>
 								<option value="Power Dodge"><span data-i18n="option-power-dodge">Power Dodge</span></option>
 								<option value="Power Parry"><span data-i18n="option-power-parry">Power Parry</span></option>
-								<option value="Power Block"><span data-i18n="option-power-block">Power Block</span></option>
+								<option value="Power Block"><span data-i18n="option-power-block">Power Block - Physical</span></option>
+								<option value="Power Block Mental"><span data-i18n="option-power-block">Power Block - Mental</span></option>
 								<option value="Other"><span data-i18n="option-other">Other</span></option>
 							</select>
 						</div>
@@ -5004,8 +5129,42 @@ visualize what it will look like in chat.
 					
 					<div class="row row-details notebox">
 					
-					    <!-- TODO: Add links: Skill, Technique, Spell, Weapon, Power/Talent -->
-						<div class="row hidden">
+					    <input type="hidden" name="attr_type" />
+						<div class="row active-defense-formula">
+							<div class="cell label">
+							    <div class="popup">
+									<span data-i18n="formula-label">Formula:</span>
+								</div>
+        						<span class="tooltip">
+									<span data-i18n="active-defense-formula-tooltip">Formula is based upon the active defense type.</span>
+        						</span> 
+							</div>
+							<div class="cell col-input-wide">
+								<div class="formula formula-as-is">
+									<span data-i18n="formula-as-is-description">Enter a value or use the linked item value as is.</span>
+								</div>
+								<div class="formula formula-parry">
+									<span data-i18n="formula-parry-description">3 + (Skill or DX)/2, rounded down.</span>
+								</div>
+								<div class="formula formula-block">
+									<span data-i18n="formula-block-description">3 + (Shield or Cloak skill)/2, rounded down.</span>
+								</div>
+								<div class="formula formula-power-dodge">
+									<span data-i18n="power-dodge-description">Basic Speed + 3 + Talent/2, rounded down.</span>
+								</div>
+								<div class="formula formula-power-parry">
+									<span data-i18n="power-parry-description">3 + (Innate Attack Skill + Talent)/2, rounded down.</span>
+								</div>
+								<div class="formula formula-power-block-physical">
+									<span data-i18n="power-block-physical-description">3 + (HT + Talent)/2, rounded down.</span>
+								</div>
+								<div class="formula formula-power-block-mental">
+									<span data-i18n="power-block-mental-description">3 + (WILL + Talent)/2, rounded down.</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
 					        <div class="cell label">
 							    <div class="popup">
 									<span data-i18n="link-label">Link:</span>
@@ -5016,12 +5175,22 @@ visualize what it will look like in chat.
 					        </div>
 							<div class="cell">
 								<select name="attr_defense_row_type">
+					                <option value=""><span data-i18n="option-select">--Select--</span></option>
 					                <option value="Skill"><span data-i18n="option-skill">Skill</span></option>
 					                <option value="Technique"><span data-i18n="option-technique">Technique</span></option>
 					                <option value="Spell"><span data-i18n="option-spell">Spell</span></option>
+									<option value="ST"><span data-i18n="abbreviation-strength">ST</span></option>
+									<option value="STRIKING"><span data-i18n="attribute-striking">Striking</span> <span data-i18n="abbreviation-strength">ST</span></option>
+									<option value="DX"><span data-i18n="abbreviation-dexterity">DX</span></option>
+									<option value="IQ"><span data-i18n="abbreviation-intelligence">IQ</span></option>
+									<option value="WILL"><span data-i18n="will-label">WILL</span></option>
+									<option value="HT"><span data-i18n="abbreviation-health">HT</span></option>
+									<option value="SPEED"><span data-i18n="option-basic-speed">Basic Speed</span></option>
+									<option value="DODGE"><span data-i18n="option-dodge">Dodge</span></option>
+									<option value="10"><span data-i18n="abbreviation-health">10</span></option>
 					            </select>
 					        </div>
-    					    <div class="cell col-row-id label">
+    					    <div class="cell col-row-id label show-hide-row-id">
     						    <div class="popup">
 									<span data-i18n="row-id-label">Row ID:</span>
 								</div>
@@ -5029,24 +5198,45 @@ visualize what it will look like in chat.
         							<span data-i18n="copy-paste-row-id-tooltip">
 Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
 When the skill/spell is updated, the technique's parent name and base skill level<br />
-will be updated.
+will be updated.<br />
+Once entered, this will change the Skill/Spell for this particular attack to match<br />
+the skill/spell level of the Base Skill. Do not change this skill Level number manually.
 									</span>
         						</span>	
     						</div>
-    						<div class="cell col-input-medium">
+    						<div class="cell col-input-medium show-hide-row-id">
     						    <input type="hidden" name="attr_defense_skill_row_id_toggle" value="0" />
 								<input type="text" name="attr_defense_skill_row_id" title="Macro table name: repeating_defense. Field name: defense_skill_row_id" />
 							</div>
-							<div class="cell col-wide">
+							
+						</div> <!-- .row -->
+
+						<div class="row linked-stats">
+
+							<div class="cell">
 								<input type="hidden" name="attr_skill" value="" />
-    							<input type="hidden" name="attr_defense_skill_row_id_modifier" value="0" />
-    							<input type="hidden" name="attr_defense_skill_row_id_message" value="" />
 								<b><span data-i18n="name-label">Name:</span></b>
+								<input type="hidden" name="attr_defense_skill_row_id_message" value="" />
 								<span name="attr_defense_skill_row_id_message"></span>
-    							<input type="hidden" name="attr_defense_skill_row_id_level" value="" />
+							</div>		
+							
+							<div class="cell">
 								<b><span data-i18n="skill-level-label">Level</span>:</b>
+								<input type="hidden" name="attr_defense_skill_row_id_level" value="" />
 								<span name="attr_defense_skill_row_id_level"></span>
-    						</div>
+							</div>
+
+							<div class="cell formula-talent">
+								<b><span data-i18n="talent-level-label">Talent Level:</span></b>
+								<input type="number" value="0" step="1" min="0" name="attr_defense_talent_level" />
+							</div>
+
+							<div class="cell">
+								<b><span data-i18n="formula-level-label">Formula Level:</span></b>
+								<input type="hidden" name="attr_defense_formula_level" value="" />
+								<span name="attr_defense_formula_level"></span>
+							</div>
+								
 						</div> <!-- .row -->
 						
 						<div class="row">
@@ -5211,6 +5401,10 @@ Any other value, and the text box will get <b>cleared</b> out.<br />
 		<div class="box melee-attacks">
 			<div class="table">
 			    <div class="header">
+					<div class="cell col-mod-tool">
+						<input class="toggle-mod-tool" disabled="disabled" type="checkbox" value="1" title="Click to show/hide attack modifiers." name="attr_toggle_melee_mod_tool" />
+						<span class="icon">y</span>
+					</div>
 					<div class="cell col0">
 						<span data-i18n="melee-attacks-label">Melee Attacks</span>
 					</div>
@@ -5276,7 +5470,28 @@ maneuver to switch between different reaches.
 					<div class="cell col5">
 						<span style="background-color: #87CEFA">| <span data-i18n="skill-label">skill</span> |</span>
 					</div>
+
 				</div> <!-- .header -->
+
+				<input type="hidden" name="attr_toggle_melee_mod_tool" />
+				<div class="attack-modifiers-notebox">
+
+					<div class="row">
+
+						<div class="cell">
+							<div class="popup">
+								Total Modifier: <input type="text" name="attr_melee_attack_modifier" disabled="disabled" value="0" />
+							</div>
+							<span class="tooltip">Total Modifier</span>
+						</div>
+	
+						<div class="cell">
+							<button type="action" name="act_melee_attack_modifiers_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
+						</div>
+
+					</div>
+					
+				</div>
 				
 				<fieldset class="repeating_melee">
 				    <input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
@@ -5324,14 +5539,23 @@ maneuver to switch between different reaches.
 					</div> <!-- .row -->
 					<div class="melee-notebox">
  					    <div class="row">
-					        <div class="cell">
+							 <!-- hidden input is used to show/hide Row ID: based on selection -->
+							<input type="hidden" name="attr_melee_row_type" value="Skill" />
+					        <div class="cell margin-right">
 					            <select name="attr_melee_row_type">
 									<option value="Skill"><span data-i18n="option-skill">Skill</span></option>
 					                <option value="Spell"><span data-i18n="option-spell">Spell</span></option>
-					                <option value="Technique"><span data-i18n="option-technique">Technique</span></option>
+									<option value="Technique"><span data-i18n="option-technique">Technique</span></option>
+									<option value="ST"><span data-i18n="abbreviation-strength">ST</span></option>
+									<option value="STRIKING"><span data-i18n="attribute-striking">Striking</span> <span data-i18n="abbreviation-strength">ST</span></option>
+									<option value="DX"><span data-i18n="abbreviation-dexterity">DX</span></option>
+									<option value="IQ"><span data-i18n="abbreviation-intelligence">IQ</span></option>
+									<option value="WILL"><span data-i18n="will-label">WILL</span></option>
+									<option value="HT"><span data-i18n="abbreviation-health">HT</span></option>
+									<option value="10"><span data-i18n="abbreviation-health">10</span></option>
 					            </select>
 					        </div>
-    					    <div class="cell col-row-id label">
+    					    <div class="cell col-row-id label show-hide-row-id">
     						    <div class="popup">
 									<span data-i18n="row-id-label">Row ID:</span>
 								</div>
@@ -5339,11 +5563,13 @@ maneuver to switch between different reaches.
         							<span data-i18n="copy-paste-row-id-tooltip">
 Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
 When the skill/spell is updated, the technique's parent name and base skill level<br />
-will be updated.
+will be updated.<br />
+Once entered, this will change the Skill/Spell for this particular attack to match<br />
+the skill/spell level of the Base Skill. Do not change this skill Level number manually.
 									</span>
         						</span>	
     						</div>
-    						<div class="cell col-input-medium">
+    						<div class="cell col-input-medium show-hide-row-id">
     						    <input type="hidden" name="attr_melee_skill_row_id_toggle" value="0" />
     							<input type="text" name="attr_melee_skill_row_id" title="Macro table name: repeating_melee. Field name: melee_skill_row_id" />
     						</div>
@@ -5354,11 +5580,12 @@ will be updated.
 								</div>
 								<div class="tooltip tooltip-skills-ref">
 									<span data-i18n="modifier-tooltip">
-Modifier applied to skill level.<br />
+Enter the net value of all modifiers combined.<br />
 Can be a positive or a negative number.<br />
-Examples include a bonus from a Talent,<br />
-default from another Skill or Technique,<br />
-a piece of equipment, or a Perk.
+Example: Enter 2 for Weapon’s Bond (+1) plus Magic (Accuracy: +1).<br />
+Once entered, this will change the Skill/Spell Level for this <b>particular</b><br />
+weapon to match the Base Skill/Spell level plus this MOD (Modifier).<br />
+Do not change this level number manually.
 									</span>
 								</div>
 							</div>
@@ -5635,14 +5862,23 @@ to total shots fired. See page 373.
 					<div class="ranged-notebox">
     					
     					<div class="row">
-    					    <div class="cell">
+    					    <input type="hidden" name="attr_ranged_row_type" value="Skill" />
+					        <div class="cell">
 					            <select name="attr_ranged_row_type">
-									<option value="Skill"><span data-i18n="option-skill">Skill</span></option>
+									<option value=""><span data-i18n="option-select">--Select--</span></option>
+					                <option value="Skill"><span data-i18n="option-skill">Skill</span></option>
 					                <option value="Spell"><span data-i18n="option-spell">Spell</span></option>
 					                <option value="Technique"><span data-i18n="option-technique">Technique</span></option>
+									<option value="ST"><span data-i18n="abbreviation-strength">ST</span></option>
+									<option value="STRIKING"><span data-i18n="attribute-striking">Striking</span> <span data-i18n="abbreviation-strength">ST</span></option>
+									<option value="DX"><span data-i18n="abbreviation-dexterity">DX</span></option>
+									<option value="IQ"><span data-i18n="abbreviation-intelligence">IQ</span></option>
+									<option value="WILL"><span data-i18n="will-label">WILL</span></option>
+									<option value="HT"><span data-i18n="abbreviation-health">HT</span></option>
+									<option value="10"><span data-i18n="abbreviation-health">10</span></option>
 					            </select>
 					        </div>
-					        <div class="cell col-row-id label">
+					        <div class="cell col-row-id label show-hide-row-id">
     						    <div class="popup">
 									<span data-i18n="row-id-label">Row ID:</span>
 								</div>
@@ -5650,11 +5886,13 @@ to total shots fired. See page 373.
         							<span data-i18n="copy-paste-row-id-tooltip">
 Copy/paste the Skill or Spell Row ID to link that skill to this technique.<br />
 When the skill/spell is updated, the technique's parent name and base skill level<br />
-will be updated.
+will be updated.<br />
+Once entered, this will change the Skill/Spell for this particular attack to match<br />
+the skill/spell level of the Base Skill. Do not change this skill Level number manually.
 									</span>
         						</span>	
     						</div>
-    						<div class="cell col-input-medium">
+    						<div class="cell col-input-medium show-hide-row-id">
     						    <input type="hidden" name="attr_ranged_skill_row_id_toggle" value="0" />
     							<input type="text" name="attr_ranged_skill_row_id" title="Macro table name: repeating_ranged. Field name: ranged_skill_row_id" />
     						</div>
@@ -5664,11 +5902,12 @@ will be updated.
 								</div>
 								<div class="tooltip tooltip-skills-ref">
 									<span data-i18n="modifier-tooltip">
-Modifier applied to skill level.<br />
+Enter the net value of all modifiers combined.<br />
 Can be a positive or a negative number.<br />
-Examples include a bonus from a Talent,<br />
-default from another Skill or Technique,<br />
-a piece of equipment, or a Perk.
+Example: Enter 2 for Weapon’s Bond (+1) plus Magic (Accuracy: +1).<br />
+Once entered, this will change the Skill/Spell Level for this <b>particular</b><br />
+weapon to match the Base Skill/Spell level plus this MOD (Modifier).<br />
+Do not change this level number manually.
 									</span>
 								</div>
 							</div>
@@ -5782,7 +6021,7 @@ Example: Does an additional [[1d6]] fire damage.
 					</div>
 					<div class="cell col8">
 						<div class="popup">
-							<span data-i18n="abreviation-strength">ST</span>
+							<span data-i18n="abbreviation-strength">ST</span>
 						</div>
 						<div class="tooltip">
 							<span data-i18n="thrown-strength-tooltip">
@@ -6821,7 +7060,7 @@ For more information, see B409.
 							<span name="attr_costtotal" value="0.00" title="Macro table name: repeating_item. Field name: costtotal" />
 						</div>
 						<div class="cell col8" style="text-align: right;background-color: #c9c9c9;border-bottom: 1px solid white;border-right: 1px solid white;">
-							<input type="hidden" name="attr_inventory_item_carried" />
+							<input type="hidden" name="attr_inventory_item_carried" value="1" />
 							<span name="attr_weighttotal" value="0.000" class="item-weight-total" title="Macro table name: repeating_item. Field name: weighttotal" />
 						</div>
 					</div> <!-- .row -->
@@ -6902,7 +7141,7 @@ For more information, see B409.
 					<div class="cell"><span data-i18n="spells-based-on-label">Spells Based on:</span></div>
 					<div class="cell margin-right">
 						<select name="attr_spell_base" title="Macro name: spell_base">
-							<option value="@{strength}"><span data-i18n="abreviation-option-strength">ST</span></option>
+							<option value="@{strength}"><span data-i18n="abbreviation-option-strength">ST</span></option>
 							<option value="@{dexterity}"><span data-i18n="abbreviation-option-dexterity">DX</span></option>
 							<option value="@{intelligence}" selected><span data-i18n="abbreviation-option-intelligence">IQ</span></option>
 							<option value="@{health}"><span data-i18n="abbreviation-option-health">HT</span></option>
@@ -7321,6 +7560,35 @@ For more information, see B409.
 			<h4>Version: <span name="attr_announcement_version"></span></h4>
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
+
+			<ul>
+				<li>Combat tab. Active Defenses - Link to an attribute and calculate the base defense.</li>
+				<li>Combat tab. Knockback Defenses - Link to an attribute and calculate the base defense. Added a field to adjust the HP per yard amount.</li>
+				<li>Repeating Defense, Melee, and Ranged tables. Added ability to link a skill to WILL.</li>
+				<li>Fixed text description for Unconsciousness check, changed Hard to Kill to Hard to Subdue. Reported by Ben.</li>
+			</ul>
+
+			<h4>Version: 2.3.8</h4>
+
+			<p>Pull Request: 6/16/2020</p>
+
+			<ul>
+				<li>Combat tab. Added Knockback save as an active defense.</li>
+			</ul>
+
+			<h4>Version: 2.3.7</h4>
+
+			<p>Pull Request: 06/09/2020</p>
+
+			<ul>
+				<li>Rolltemplate, Fabric sheet. Fixed display issue, reported by Ian.</li>
+				<li>Repeating Techniques, melee attacks, and ranged attacks can be linked to ST, Striking ST, DX, IQ, HT, or 10.</li>
+				<li>Traits Tab. Added a level column for repeating advantages, disadvantages, and racial traits.</li>
+			</ul>
+
+			<h4>Version: 2.3.6</h4>
+
+			<p>Pull Request: 06/02/2020</p>
 
 			<ul>
 				<li>Rolltemplate results now match the selected sheet style, contributed by TamedFlame.</li>
@@ -9301,14 +9569,17 @@ See notes for weapon.</textarea>
 </div>
 
 <script type="text/worker">
-	// text/worker
-	// application/javascript
+	// this type is required by roll20, be sure to set before uploading
+	// type="text/worker"
+	
+	// if using VS code or similar coding tool, use the type listed below
+	// type="application/javascript"
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.3.6";  
+	var version = "2.3.9";  
 
-	var latestChangesDate = "06/02/2020";
+	var latestChangesDate = "06/20/2020";
 
 	var modCascade = true;
 	
@@ -9611,6 +9882,8 @@ See notes for weapon.</textarea>
 		
 		updateLinkedSkills("repeating_techniquesrevised", "technique");
 
+		updateLinkedSkills("repeating_defense", "defense");
+
 	}
 
 	function thenUpdateLinkedAttacksSpells() {
@@ -9622,6 +9895,8 @@ See notes for weapon.</textarea>
         updateLinkedSkills("repeating_ranged", "ranged");
 		
 		updateLinkedSkills("repeating_techniquesrevised", "technique");
+
+		updateLinkedSkills("repeating_defense", "defense");
 
 	}
 
@@ -9684,7 +9959,7 @@ See notes for weapon.</textarea>
 	}
 	
 	// Strength Change
-	on('change:strength_points change:strength_mod', function (e) {
+	on('change:strength_points change:strength_mod change:defense_knockback_hitpoints_mod', function (e) {
 		updateST();
 	});
 
@@ -9692,16 +9967,18 @@ See notes for weapon.</textarea>
 	function updateST(callback) {
 		callback = callback || noop;
 		console.log('********* updateST *********');
-		getAttrs(['strength_points', 'strength_mod', 'strength_halved'], function(v) {
+		getAttrs(['strength_points', 'strength_mod', 'strength_halved', 'defense_knockback_hitpoints_mod'], function(v) {
 		    
-			var base = 10 + ((+v.strength_points || 0) / 10 | 0);
+			let base = 10 + ((+v.strength_points || 0) / 10 | 0);
 			
-			var mod = +v.strength_mod || 0;
+			let mod = +v.strength_mod || 0;
 			
-			var st_halved = +v.strength_halved;
+			let st_halved = +v.strength_halved;
 			
-			var st_display = base + mod;
+			let st_display = base + mod;
 			
+			let knockbackMod = +v.defense_knockback_hitpoints_mod;
+
 			// check if ST was halved due to fatigue.
 			if (st_halved === 1) {
 			    
@@ -9713,6 +9990,7 @@ See notes for weapon.</textarea>
 				strength_base: base,
 				strength: base + mod,
 				strength_display: st_display,
+				knockback_points: st_display - 2 + knockbackMod
 			}, {silent: false}, callback);
 		});
 	}
@@ -13085,7 +13363,8 @@ See notes for weapon.</textarea>
         });
         
     });
-    
+
+    // TODO: Update to check for new defense types
     // If defense type changed, update hidden defense type
 	on('change:repeating_defense:type', function(event){
 	    
@@ -13183,6 +13462,7 @@ See notes for weapon.</textarea>
 		            // determine id based on defense type name
                     var defenseTypeId = 0;
                     
+					// TODO: Update for new defense types
                     switch (defenseName.toLowerCase()) {
                         
                         case "parry":
@@ -14093,6 +14373,7 @@ See notes for weapon.</textarea>
 		
 		setWeaponRowIdsBySection("repeating_techniquesrevised", "technique");
 		
+		setWeaponRowIdsBySection("repeating_defense", "active");
 	}
 	
 	/**
@@ -14130,7 +14411,7 @@ See notes for weapon.</textarea>
                             rowId: id,
                             prefix: prefixValue
                         };
-                        
+						
                         // add to global variable
 						weaponRowIds.push(skillData);
 						
@@ -14150,8 +14431,8 @@ See notes for weapon.</textarea>
         var rowId = getRowIdFromEventInfo(event, "repeating_skills");
         
         // if the weapon rowId is being used by a skill, update the toggles
-        weapons = getMatchinWeaponsFromSkillId(rowId);
-        
+		weapons = getMatchinWeaponsFromSkillId(rowId);
+		
         // through could be more than one weapon tied to a skill
         if (weapons.length) {
         
@@ -14164,6 +14445,9 @@ See notes for weapon.</textarea>
                 updateFields[toggleFieldName] = 1;
     
             });
+
+			// update the toggle for knocbock defense
+			updateFields["defense_knockback_skill_row_id_toggle"] = 1;
     
             setAttrs(updateFields);
                 
@@ -14192,6 +14476,9 @@ See notes for weapon.</textarea>
     
             });
     
+			// update the toggle for knocbock defense
+			updateFields["defense_knockback_skill_row_id_toggle"] = 1;
+    
             setAttrs(updateFields);
                 
         }
@@ -14218,12 +14505,43 @@ See notes for weapon.</textarea>
                 updateFields[toggleFieldName] = 1;
     
             });
+
+			// update the toggle for knocbock defense
+			updateFields["defense_knockback_skill_row_id_toggle"] = 1;
     
             setAttrs(updateFields);
                 
         }
         
     });
+
+	// if an attribute is updated, update linked items
+	on("change:strength_display change:striking_st change:dexterity change:intelligence change:health change:will change:basic_speed change:dodge", event => {
+
+		// if the weapon rowId is being used by an attribute, update the toggles
+		weapons = getMatchingWeaponsByAttributes();
+				
+		// through could be more than one weapon tied to a skill
+		if (weapons.length) {
+
+			var updateFields = {};
+
+			weapons.forEach( function(weaponRow) {
+			
+				var toggleFieldName = `${weaponRow.sectionName}_${weaponRow.rowId}_${weaponRow.prefix}_skill_row_id_toggle`;
+				
+				updateFields[toggleFieldName] = 1;
+
+			});
+
+			// update the toggle for knocbock defense
+			updateFields["defense_knockback_skill_row_id_toggle"] = 1;
+
+			setAttrs(updateFields);
+				
+		}
+
+	});
     
     /**
      * Searches for matching weapon row data based on skill row id
@@ -14239,7 +14557,7 @@ See notes for weapon.</textarea>
      */
     function getMatchinWeaponsFromSkillId(rowId) {
         
-        var matchingWeapons = [];
+        let matchingWeapons = [];
         
         // loop through each cached weapon data
         weaponRowIds.forEach( function(weaponRow) {
@@ -14255,6 +14573,46 @@ See notes for weapon.</textarea>
         return matchingWeapons;
         
     }
+
+	/**
+     * Searches for matching weapon row data based on attributes
+     * returns array of matching weapon objects: {skillRowId, sectionName, rowId, prefix}
+     * skillRowId = Skill Row OR attribute that weapon is linked to.
+     * sectionName = The name of the repeating section; repeating_melee or repeating_ranged
+     * rowId = Row id for the weapon in the repeating section
+     * prefix is used for labeling fields in a section to avoid the rule of re-using attr names
+     * 
+     * @param string rowId Row ID of skill that might be linked to a weapon
+     * 
+     * @return array
+     */
+	 function getMatchingWeaponsByAttributes()
+	{
+		let matchingWeapons = [];
+
+		const attributes = [
+			"ST",
+			"STRIKING",
+			"DX",
+			"IQ",
+			"HT"
+		];
+
+        // loop through each cached weapon data
+        weaponRowIds.forEach( function(weaponRow) {
+            
+			// NOTE: skillRowId can also store the attribute type; ST | STRIKING | DX | IQ | HT | 10
+            if (attributes.includes(weaponRow.skillRowId)) {
+                
+                matchingWeapons.push(weaponRow);
+                
+            }
+            
+        });
+        
+        return matchingWeapons;
+
+	}  
     
     function getRowIdFromEventInfo(event, sectionName) {
         
@@ -14279,12 +14637,12 @@ See notes for weapon.</textarea>
         
     }
     
-    // if linked melee data changes update the linked weapon skill
+    // if linked data for repeating range changes update the skill level
 	on('change:repeating_ranged:ranged_row_type change:repeating_ranged:ranged_skill_row_id change:repeating_ranged:ranged_skill_row_id_modifier change:repeating_ranged:ranged_skill_row_id_toggle', function(event){
 
 		getAttrs(["repeating_ranged_ranged_row_type"], function(values) {
         
-            updateLinkedWeaponSkill("repeating_ranged", "ranged", values.repeating_ranged_ranged_row_type, function() {
+            updateLinkedWeaponSkill("repeating_ranged", "ranged", values.repeating_ranged_ranged_row_type, "", 0, function() {
     		   
     		    //make sure we update the cache 
     		    setWeaponRowIdsBySection("repeating_ranged", "ranged");
@@ -14296,12 +14654,12 @@ See notes for weapon.</textarea>
 		
 	});
 	
-	// if linked melee data changes update the linked weapon skill
+	// if linked data for repeating melee changes update the skill level
 	on('change:repeating_melee:melee_row_type change:repeating_melee:melee_skill_row_id change:repeating_melee:melee_skill_row_id_modifier change:repeating_melee:melee_skill_row_id_toggle', function(event){
 
         getAttrs(["repeating_melee_melee_row_type"], function(values) {
         
-            updateLinkedWeaponSkill("repeating_melee", "melee", values.repeating_melee_melee_row_type, function() {
+            updateLinkedWeaponSkill("repeating_melee", "melee", values.repeating_melee_melee_row_type, "", 0, function() {
     		   
     		    //make sure we update the cache 
     		    setWeaponRowIdsBySection("repeating_melee", "melee");
@@ -14312,12 +14670,12 @@ See notes for weapon.</textarea>
         
 	});
 	
-	// if linked technique data changes update linked skills
+	// if linked data for repeating techniques changes update the skill level
 	on('change:repeating_techniquesrevised:technique_row_type change:repeating_techniquesrevised:technique_skill_row_id change:repeating_techniquesrevised:technique_skill_row_id_toggle', function(event){
 
 		getAttrs(["repeating_techniquesrevised_technique_row_type"], function(values) {
 
-			updateLinkedWeaponSkill("repeating_techniquesrevised", "technique", values.repeating_techniquesrevised_technique_row_type, function() {
+			updateLinkedWeaponSkill("repeating_techniquesrevised", "technique", values.repeating_techniquesrevised_technique_row_type, "", 0, function() {
 			
 				//make sure we update the cache 
 				setWeaponRowIdsBySection("repeating_techniquesrevised", "technique");
@@ -14328,134 +14686,322 @@ See notes for weapon.</textarea>
 
 	});
 
+	// if linked data for repeating defense is changed, get the new linked skill values
+	on('change:repeating_defense:type change:repeating_defense:defense_row_type change:repeating_defense:defense_talent_level change:repeating_defense:defense_skill_row_id change:repeating_defense:defense_skill_row_id_toggle', function(event){
+
+		getAttrs(["repeating_defense_defense_row_type", "repeating_defense_type", "repeating_defense_defense_talent_level"], function(values) {
+
+			updateLinkedWeaponSkill("repeating_defense", "defense", values.repeating_defense_defense_row_type, values.repeating_defense_type, +values.repeating_defense_defense_talent_level, function() {
+			
+				//make sure we update the cache 
+				setWeaponRowIdsBySection("repeating_defense", "defense");
+				
+			});
+			
+		});
+
+	});
+
+	// if linked information changed for Knockback save, update the base skill level
+	on('change:knockback_defense_row_type change:defense_knockback_skill_row_id change:defense_knockback_skill_row_id_toggle', (event) => {
+
+		updateLinkedKnockbackSkill();
+
+	});
+
+	/**
+	 * Update the Knockback skill based on selected attribute and/or skill
+	 *
+	 * @param function callBack Optional call back function
+	 */
+	function updateLinkedKnockbackSkill(callback) {
+
+		// check if we need to set default value
+		callback = callback || noop;
+
+		getAttrs(["knockback_defense_row_type", "defense_knockback_skill_row_id"], (values) => {
+
+			let rowType = values.knockback_defense_row_type;
+
+			let skillRowId = values.defense_knockback_skill_row_id;
+
+			let skillMod = +values.ad_knockback_skill_mod;
+
+			let {updateMethod, repeatingTableToUse} = getLinkedSkillUpdateMethod(rowType);
+
+			let skillName = "";
+
+			let skillLevel = "";
+
+			let updateFields = {};
+		        
+			// if updating using a repeating field AND no row id, clear the fields
+		    if (updateMethod != "attribute" && skillRowId.length === 0 ) {
+		        
+				// clear the field
+		        let updateFields = {};
+		        
+		        updateFields["defense_knockback_skill_row_id_message"] = ``;
+    	            
+    	        updateFields["defense_knockback_skill_row_id_level"] = "";
+
+				updateFields["defense_knockback_skill_row_id_toggle"] = "0";
+    	        
+    	        setAttrs(updateFields, {silent: false}, callback);
+    	        
+			} else if (updateMethod == "attribute") {
+
+				updateLinkedKnockbackSkillByAttribute(rowType, callback);
+				
+			} else if ( validSkillRowId(skillRowId) ) {
+
+				updateLinkedKnockbackSkillByTable(repeatingTableToUse, skillRowId, callback);
+
+			} else {
+
+				// show an error message
+				let updateFields = {};
+
+				updateFields["defense_knockback_skill_row_id_message"] = `Could not find ${rowType}.`;
+					
+				setAttrs(updateFields, {silent: false}, callback);
+				
+			}
+							
+		});
+
+	}
+
 	/**
 	 * Update the melee, ranged, or technique associated with the skill row id
 	 * 
 	 * @param string sectionName Should be either repeating_melee or repeating_ranged
 	 * @param string prefix      Placed before skill attribute names to follow rules for unique names, even inside repeating sections.
 	 * @param string rowType     Where to get the level. Skill | Spell 
+	 * @param string defenseType If there's a defense type (Parry, Dodge, etc.) a formula will be used to calculate the skill level
+	 * @param int    talentLevel Used with defense type to calculate skill level
 	 * @param object callback    A function to run after everything is done
 	 */
-	function updateLinkedWeaponSkill(sectionName, prefix, rowType, callback) {
-	    
-	    var repeatingTableToUse = "";
+	function updateLinkedWeaponSkill(sectionName, prefix, rowType, defenseType, talentLevel, callback) {
 		
-	    switch (rowType) {
-	        
-	        case "Technique":
-	            repeatingTableToUse = "repeating_techniquesrevised";
-	            break;
-	            
-	        case "Spell":
-	            repeatingTableToUse = "repeating_spells";
-	            break;
-	            
-	        case "Skill":
-	        default:
-                repeatingTableToUse = "repeating_skills";
-	            break;
-	            
-	    }
+		let {updateMethod, repeatingTableToUse} = getLinkedSkillUpdateMethod(rowType);
+
+		let skillRowIdFieldName = `${sectionName}_${prefix}_skill_row_id`;
 	    
-	    var skillRowIdFieldName = `${sectionName}_${prefix}_skill_row_id`;
+	    let skillRowModFieldName = `${sectionName}_${prefix}_skill_row_id_modifier`;
 	    
-	    var skillRowModFieldName = `${sectionName}_${prefix}_skill_row_id_modifier`;
+	    let skillMessageFieldName = `${sectionName}_${prefix}_skill_row_id_message`;
 	    
-	    var skillMessageFieldName = `${sectionName}_${prefix}_skill_row_id_message`;
-	    
-		var skillMessageFieldLevel = `${sectionName}_${prefix}_skill_row_id_level`;
+		let skillMessageFieldLevel = `${sectionName}_${prefix}_skill_row_id_level`;
 		
 		// for updating technique values
-		var parentFieldName = `${sectionName}_parent`;
+		let parentFieldName = `${sectionName}_parent`;
 		        
 		// for updating technique values
-		var baseSkillFieldName = `${sectionName}_base_level`;
+		let baseSkillFieldName = `${sectionName}_base_level`;
 		
-	    var weaponSkillFieldName = `${sectionName}_skill`;
+	    let weaponSkillFieldName = `${sectionName}_skill`;
 	    
 	    // if this gets changed, then the update linked weapon skill gets triggered
-	    var skillRowIdToggleFieldName = `${sectionName}_${prefix}_skill_row_id_toggle`;
+	    let skillRowIdToggleFieldName = `${sectionName}_${prefix}_skill_row_id_toggle`;
 	    
 	    getAttrs([skillRowIdFieldName,
 		          skillRowModFieldName
 		         ], function(values) {
 			
-		    var skillRowId = values[skillRowIdFieldName];
+		    let skillRowId = values[skillRowIdFieldName];
 		    
-		    var skillMod = +values[skillRowModFieldName];
+		    let skillMod = +values[skillRowModFieldName];
 		    
-		    // exit if there's no value
-		    if (skillRowId.length === 0) {
+		    // if updating using a repeating field make sure there's a row id to search for
+		    if (updateMethod != "attribute" && skillRowId.length === 0 ) {
 		        
 		        // clear the field
-		        var updateFields = {};
+		        let updateFields = {};
 		        
 		        updateFields[skillMessageFieldName] = ``;
     	            
     	        updateFields[skillMessageFieldLevel] = "";
     	        
-    	        setAttrs(updateFields);
+    	        setAttrs(updateFields, {silent: false}, callback);
     	        
-		    } else if ( validSkillRowId(skillRowId) ) {
-		        
-		        // if it's a good row id, let's update stuff
-		        var skillFieldName = `${repeatingTableToUse}_${skillRowId}_level_mirror`;
-		        
-				var skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
-				
-				// if we're getting values from the techniques table, don't use level_mirror
-				if (repeatingTableToUse == "repeating_techniquesrevised") {
+			} else if (updateMethod == "attribute") {
 
-					skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
+				updateLinkWeaponSkillByAttribute(sectionName, skillRowIdFieldName, weaponSkillFieldName, skillMessageFieldName, skillMessageFieldLevel, skillRowIdToggleFieldName, parentFieldName, baseSkillFieldName, rowType, skillMod, defenseType, talentLevel, callback);
+			
+			} else if ( validSkillRowId(skillRowId) ) {
 		        
-				}
-				
-				// update the skill level for weapon.
-		        getAttrs([skillFieldName, skillFieldNameOfSkill], function(skillValues) {
-
-		            var skillLevel = +skillValues[skillFieldName];
-		            
-		            var skillLevelFinal = skillLevel + skillMod;
-		            
-		            var updateFields = {};
-	            
-    	            updateFields[weaponSkillFieldName] = skillLevelFinal;
-    	            
-    	            updateFields[skillMessageFieldName] = skillValues[skillFieldNameOfSkill];
-    	            
-    	            updateFields[skillMessageFieldLevel] = skillLevel;
-    	            
-    	            // reset toggle to zero
-					updateFields[skillRowIdToggleFieldName] = 0;
-					
-					// if repeating_techniquesrevised, also update the Parent skill name and base skill level
-					if (sectionName == "repeating_techniquesrevised") {
-
-						updateFields[parentFieldName] = skillValues[skillFieldNameOfSkill];
-    	            
-    	            	updateFields[baseSkillFieldName] = skillLevel;
-
-					}
-					
-    	            setAttrs(updateFields, '', callback());
-		            
-		        });
-		        
+				updateLinkedWeaponSkillByRepeatingRow(sectionName, weaponSkillFieldName, skillMessageFieldName, skillMessageFieldLevel, skillRowIdToggleFieldName, parentFieldName, baseSkillFieldName, repeatingTableToUse, skillRowId, skillMod, defenseType, talentLevel, callback);
+			  
 		    } else {
 		        
 		        // show an error message
-		        var updateFields = {};
+		        let updateFields = {};
 		        
 		        updateFields[skillMessageFieldName] = `Could not find ${rowType}.`;
     	            
-    	        setAttrs(updateFields);
+    	        setAttrs(updateFields, {silent: false}, callback);
     	            
 		    }
 		    
 		});
 	    
 	}
+
+	/**
+	 * Returns method and repeating table to use
+	 * 
+	 * @param string rowType What type of skill/attribute are we linking to.
+	 * @return object {updateMethod, repeatingTableToUse}
+	 */
+	function getLinkedSkillUpdateMethod(rowType) {
+
+		// can be repeating | attribute
+		let method = "repeating";
+
+		let table = ""; 
+
+	    switch (rowType) {
+	        
+			case "ST":
+				method = "attribute";
+				break;
+
+			case "STRIKING":
+				method = "attribute";
+				break;
+
+			case "DX":
+				method = "attribute";
+				break;
+
+			case "IQ":
+				method = "attribute";
+				break;
+
+			case "WILL":
+				method = "attribute";
+				break;
+
+			case "HT":
+				method = "attribute";
+				break;
+
+			case "DODGE":
+				method = "attribute";
+				break;
+
+			case "SPEED":
+				method = "attribute";
+				break;
+
+	        case "10":
+				method = "attribute";
+				break;
+
+	        case "Technique":
+				table = "repeating_techniquesrevised";
+	            break;
+	            
+	        case "Spell":
+				table = "repeating_spells";
+	            break;
+	            
+	        case "Skill":
+	        default:
+				table = "repeating_skills";
+	            break;
+	            
+		}
+
+		let objMethod = {
+			updateMethod: method,
+			repeatingTableToUse: table
+		};
+
+		return objMethod;
+
+	}
 	
+	/**
+	 * Update the selected weapon skill by linking to another skill, technique, or spell
+	 * 
+	 * @param string   sectionName               Name of section that is getting udpated
+	 * @param string   weaponSkillFieldName      For Weapon that is getting updated
+	 * @param string   skillMessageFieldName     For Weapon that is getting updated
+	 * @param string   skillMessageFieldLevel    For Weapon that is getting updated
+	 * @param string   skillRowIdToggleFieldName For Weapon that is getting updated
+	 * @param string   parentFieldName           For Weapon that is getting updated
+	 * @param string   baseSkillFieldName        For Weapon that is getting updated
+	 * @param string   repeatingTableToUse       Which table to get the skill level from
+	 * @param string   skillRowId                Row Id that will get updated
+	 * @param int      skillMod                  Modifier to skill level 
+	 * @param string   defenseType				 Used by active defense to determine skill calculation formula
+	 * @param int      talentLevel				 Talent level is used by active defense to determine skill calculation formula
+	 * @param function callback                  Callback function 
+	 */
+	function updateLinkedWeaponSkillByRepeatingRow(sectionName, weaponSkillFieldName, skillMessageFieldName, skillMessageFieldLevel, skillRowIdToggleFieldName, parentFieldName, baseSkillFieldName, repeatingTableToUse, skillRowId, skillMod, defenseType, talentLevel, callback)
+	{
+		// if it's a good row id, let's update stuff
+		let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level_mirror`;
+		        
+		let skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
+		
+		// if we're getting values from the techniques table, don't use level_mirror
+		if (repeatingTableToUse == "repeating_techniquesrevised") {
+
+			skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
+		
+		}
+		
+		// update the skill level for weapon.
+		getAttrs([skillFieldName, skillFieldNameOfSkill], function(skillValues) {
+
+			let skillLevel = +skillValues[skillFieldName];
+			
+			let skillLevelFinal = skillLevel + skillMod;
+			
+			let updateFields = {};
+		
+			updateFields[weaponSkillFieldName] = skillLevelFinal;
+			
+			updateFields[skillMessageFieldName] = skillValues[skillFieldNameOfSkill];
+			
+			updateFields[skillMessageFieldLevel] = skillLevel;
+			
+			// reset toggle to zero
+			updateFields[skillRowIdToggleFieldName] = 0;
+			
+			// if repeating_techniquesrevised, also update the Parent skill name and base skill level
+			if (sectionName == "repeating_techniquesrevised") {
+
+				updateFields[parentFieldName] = skillValues[skillFieldNameOfSkill];
+			
+				updateFields[baseSkillFieldName] = skillLevel;
+
+			}
+			
+			// check for repeating active defense
+			if (sectionName == "repeating_defense") {
+
+				let calculatedSkillLevel = getCalculatedSkillByDefenseType(defenseType, talentLevel, skillLevel);
+
+				updateFields["repeating_defense_defense_formula_level"] = calculatedSkillLevel;
+
+				updateFields["repeating_defense_skill"] = calculatedSkillLevel;
+
+			}
+
+			setAttrs(updateFields, {silent: false}, callback);
+			
+		});
+
+	}
+
+	/**
+	 * Determines if the row id was cached in 
+	 * skillRowsIds | spellRowIds | techniqueRowIds
+	 */
 	function validSkillRowId( rowIdToFind ) {
 	    
 	    var blnValid = skillRowIds.includes(rowIdToFind) || spellRowIds.includes(rowIdToFind) || techniqueRowIds.includes(rowIdToFind);
@@ -14463,7 +15009,272 @@ See notes for weapon.</textarea>
 	    return blnValid;
 	    
 	}
+
+	/**
+	 * Update the linked weapon skill by using an attribute stat
+	 *
+	 * @param string   sectionName               Name of section that is getting udpated
+	 * @param string   skillRowIdFieldName       Copy the attribute used to this field.
+	 * @param string   weaponSkillFieldName      For Weapon that is getting updated
+	 * @param string   skillMessageFieldName     For Weapon that is getting updated
+	 * @param string   skillMessageFieldLevel    For Weapon that is getting updated
+	 * @param string   skillRowIdToggleFieldName For Weapon that is getting updated
+	 * @param string   parentFieldName           For Weapon that is getting updated
+	 * @param string   baseSkillFieldName        For Weapon that is getting updated
+	 * @param string   rowType                   The attribute to use for setting weapon skill level
+	 * @param int      skillMod                  Modifier to skill level
+	 * @param string   defenseType				 Used by active defense to determine skill calculation formula
+	 * @param int      talentLevel				 Talent level is used by active defense to determine skill calculation formula
+	 * @param int      callBack 				 Callback function 
+	 */
+	function updateLinkWeaponSkillByAttribute(sectionName, skillRowIdFieldName, weaponSkillFieldName, skillMessageFieldName, skillMessageFieldLevel, skillRowIdToggleFieldName, parentFieldName, baseSkillFieldName, rowType, skillMod, defenseType, talentLevel, callback)
+	{
+		let fieldName;
+
+		switch (rowType) {
+			case "ST":
+				fieldName = "strength_display";
+				break;
+		
+			case "STRIKING":
+				fieldName = "striking_st";
+				break;
+		
+			case "DX":
+				fieldName = "dexterity";
+				break;
+		
+			case "IQ":
+				fieldName = "intelligence";
+				break;
+		
+			case "WILL":
+				fieldName = "willpower";
+				break;
+		
+			case "HT":
+				fieldName = "health";
+				break;
+		
+			case "SPEED":
+				fieldName = "basic_speed";
+				break;
+		
+			case "DODGE":
+				fieldName = "dodge";
+				break;
+		
+			case "10":
+			default:
+				fieldName = "base_attribute_level";
+				break;
+		}
+
+		// update the skill level for weapon.
+		getAttrs([fieldName], function(skillValues) {
+
+			let skillLevel = +skillValues[fieldName];
+			
+			let skillLevelFinal = skillLevel + skillMod;
+			
+			let updateFields = {};
+
+			updateFields[skillRowIdFieldName] = rowType;
+		
+			updateFields[weaponSkillFieldName] = skillLevelFinal;
+			
+			updateFields[skillMessageFieldName] = rowType;
+			
+			updateFields[skillMessageFieldLevel] = skillLevel;
+			
+			// reset toggle to zero
+			updateFields[skillRowIdToggleFieldName] = 0;
+			
+			// if repeating_techniquesrevised, also update the Parent skill name and base skill level
+			if (sectionName == "repeating_techniquesrevised") {
+
+				updateFields[parentFieldName] = rowType;
+			
+				updateFields[baseSkillFieldName] = skillLevel;
+
+			}
+
+			// check for repeating active defense
+			if (sectionName == "repeating_defense") {
+
+				let calculatedSkillLevel = getCalculatedSkillByDefenseType(defenseType, talentLevel, skillLevel);
+
+				updateFields["repeating_defense_defense_formula_level"] = calculatedSkillLevel;
+
+				updateFields["repeating_defense_skill"] = calculatedSkillLevel;
+
+			}
+
+			setAttrs(updateFields);
+			
+		});
+		
+	} 
 	
+	/**
+	 * Calculates the final active defense skill based on selected options
+	 *
+	 * @param string defenseType Type of defense that was selected
+	 * @param int    talentLevel Level of talent used
+	 * @param int    skillLevel  skill to base calculation on
+	 * 
+	 * @return int
+	 */
+	function getCalculatedSkillByDefenseType(defenseType, talentLevel, skillLevel)
+	{
+		let calculatedSkillLevel = skillLevel;
+
+		switch (defenseType) {
+			case "Parry":
+			case "Unarmed Parry":
+			case "Block":
+				// 3 + (skilllevel/2) rounded down
+				calculatedSkillLevel = 3 + (skillLevel/2);
+				break;
+
+			case "Power Dodge":
+				// Basic Speed + 3 + Talent/2, rounded down. User's should select basic speed from drop-down
+				calculatedSkillLevel = skillLevel + 3 + (talentLevel/2);
+				break;
+		
+			case "Power Parry":
+			case "Power Block":
+			case "Power Block Mental":
+				// 3 + ( (Innate attack skill + talent)/2). User's should select either HT or WILL from drop-down
+				calculatedSkillLevel = 3 + ( (skillLevel + talentLevel)/2 );
+				break;
+		
+			default:
+				// no formula needed
+				break;
+		}
+
+		calculatedSkillLevel = Math.floor(calculatedSkillLevel);
+				
+		return calculatedSkillLevel;
+
+	}
+
+	/**
+	 * Update the linked knocked back skill by using an attribute stat
+	 *
+	 * @param string   rowType                   The attribute to use for setting weapon skill level
+	 * @param function callback                  Callback function 
+	 */
+	function updateLinkedKnockbackSkillByAttribute(rowType, callback)
+	{
+		callback = callback || noop;
+
+		let fieldName;
+
+		switch (rowType) {
+			case "ST":
+				fieldName = "strength_display";
+				break;
+		
+			case "STRIKING":
+				fieldName = "striking_st";
+				break;
+		
+			case "DX":
+				fieldName = "dexterity";
+				break;
+		
+			case "IQ":
+				fieldName = "intelligence";
+				break;
+		
+			case "WILL":
+				fieldName = "willpower";
+				break;
+		
+			case "HT":
+				fieldName = "health";
+				break;
+		
+			case "SPEED":
+				fieldName = "basic_speed";
+				break;
+		
+			case "DODGE":
+				fieldName = "dodge";
+				break;
+		
+			case "10":
+			default:
+				fieldName = "base_attribute_level";
+				break;
+		}
+
+		// update the skill level for knockback save.
+		getAttrs([fieldName], function(skillValues) {
+
+			let skillLevel = +skillValues[fieldName];
+			
+			let updateFields = {};
+
+			updateFields["defense_knockback_skill_row_id_message"] = rowType;
+		
+			updateFields["defense_knockback_skill_row_id_level"] = skillLevel;
+			
+			updateFields["ad_knockback_skill"] = skillLevel;
+			
+			// reset toggle to zero
+			updateFields["defense_knockback_skill_row_id_toggle"] = 0;
+			
+			setAttrs(updateFields, {silent: false}, callback);
+    	    
+		});
+		
+	} 
+
+	/**
+	 * Update the Knockback sill based on a repeating item
+	 *
+	 * @param string   repeatingTableToUse Name of table that contains the row id
+	 * @param string   skillRowId          The Row that has the information we need for name and skill level to use
+	 * @param function callBack            An optional call back function  
+	 */
+	function updateLinkedKnockbackSkillByTable(repeatingTableToUse, skillRowId, callback)
+	{
+		// if it's a good row id, let's update stuff
+		let skillFieldName = `${repeatingTableToUse}_${skillRowId}_level_mirror`;
+		        
+		let skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
+		
+		// if we're getting values from the techniques table, don't use level_mirror
+		if (repeatingTableToUse == "repeating_techniquesrevised") {
+
+			skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
+		
+		}
+
+		// update the skill level for weapon.
+		getAttrs([skillFieldName, skillFieldNameOfSkill], function(skillValues) {
+
+			let skillLevel = +skillValues[skillFieldName];
+			
+			let updateFields = {};
+			
+			updateFields["defense_knockback_skill_row_id_message"] = skillValues[skillFieldNameOfSkill];
+		
+			updateFields["defense_knockback_skill_row_id_level"] = skillLevel;
+			
+			updateFields["ad_knockback_skill"] = skillLevel;
+			
+			// reset toggle to zero
+			updateFields["defense_knockback_skill_row_id_toggle"] = 0;
+			
+			setAttrs(updateFields, {silent: false}, callback);
+    	    
+		});
+	}
+
 	/**
 	 * This function is used to make sure the repeating 
 	 * skill levels are updated when the version has changed
