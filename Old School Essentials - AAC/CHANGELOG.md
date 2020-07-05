@@ -2,6 +2,18 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.4.0
+
+### Changed
+
+- Add optgroups to class dropdown to categorize classes
+- Add automatic XP calculation for monsters based on hit dice
+
+### Fixed
+
+- Fix a missing translation for "Find secret door"
+- Fix automatic hit dice for character classes
+
 ## 1.3.0
 
 ### Added

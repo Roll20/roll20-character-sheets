@@ -16,6 +16,12 @@ https://imgur.com/6p1cXQ4
 <b>version 1.0 (may - 2020)</b>
 
 - Initial code
+Rolemaster 2 edition
+
+This character sheet is based on Diana P. Rolemaster-standard-edition
+with some modifications
+
+version 1.0 
 
 - Added 25 most used skills 
   https://i.imgur.com/NZMSfb0.png
@@ -26,5 +32,3 @@ https://imgur.com/6p1cXQ4
 - The repeater (custom skills) supports 2 stat skills
 - Auto calculate total bonus based on ranks with differential rank bonus support in the repeater (custom skills)
 - Auto calculate level bonus based on current level in the repeater (custom skills)
-
-
