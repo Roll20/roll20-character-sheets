@@ -98,7 +98,8 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 				<ul>
-					<li>Bio\Misc Tab. Calculate Reach based on Size Modifier. </li>
+					<li>Bio\Misc Tab. Calculate Reach based on Size Modifier.</li>
+					<li>General Tab - Current Move table. Added the step disance for each movement type.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset"><span data-i18n="view-all-updates">View All Updates</span></button>
@@ -1408,13 +1409,28 @@ and for HP and/or FP loss below 1/3. (B419, B426)
 								</span>
 							</div>
 							<div class="cell colAll">
-								<span data-i18n="abbreviation-enhanced-move-label">ENH MOVE</span>
+								<div class="popup">
+									<span data-i18n="abbreviation-enhanced-move-label">ENH MOVE</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="enhanced-move-tooltip">Enhanced ground move.<br /><b>STEP:</b> The number in parentheses is the step distance.</span>
+								</span>
 							</div>
 							<div class="cell colAll">
-								<span data-i18n="air-label">Air</span>
+								<div class="popup">
+									<span data-i18n="air-label">Air</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="air-tooltip">Air/Flying move.<br /><b>STEP:</b> The number in parentheses is the step distance.</span>
+								</span>
 							</div>
 							<div class="cell colAll">
-								<span data-i18n="water-label">Water</span>
+								<div class="popup">
+									<span data-i18n="water-label">Water</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="water-tooltip">Water/Swimming move.<br /><b>STEP:</b> The number in parentheses is the step distance.</span>
+								</span>
 							</div>
 							<div class="cell colAll">
 								<div class="popup">
@@ -7586,6 +7602,11 @@ For more information, see B409.
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
+			<ul>
+				<li>Bio\Misc Tab. Calculate Reach based on Size Modifier.</li>
+				<li>General Tab - Current Move table. Added the step disance for each movement type.</li>
+			</ul>
+
 			<h4>Version: 2.3.9</h4>
 
 			<p>Pull Request: </p>
@@ -10249,6 +10270,8 @@ See notes for weapon.</textarea>
 		    var dodge = +v.dodge;
 		
 			var move = +v.basic_move;
+
+			let groundStep = 0;
 		
 			var hitPointsNotes = 0;
 			
@@ -10319,8 +10342,10 @@ See notes for weapon.</textarea>
 			    
 			}
 
+			groundStep = Math.ceil(move/10);
+
 			setAttrs({
-				current_move: move,
+				current_move: `${move} (${groundStep})`,
 				current_dodge: dodge,
 				hit_points_notes: hitPointsNotes,
 				fatigue_points_notes: fatiguePointNotes,
@@ -11180,7 +11205,11 @@ See notes for weapon.</textarea>
             // current speed based on encumbrance and pain/fatigue
             var currentEnhancedMove = "";
             
-            var injuryFatigueMoveModifier = 1;
+			var injuryFatigueMoveModifier = 1;
+			
+			let step = 0;
+
+			let baseGroundMove = 0;
             
             // validate groundModifer
             if (groundModifier < 0) {
@@ -11252,29 +11281,41 @@ See notes for weapon.</textarea>
                 // determine the current encumbrance move
                 switch(values.encumbrance_level) {
                     
-                    case 0:
-                        currentEnhancedMove = Math.floor(+basicMove * injuryFatigueMoveModifier) + "/" + Math.floor(+enhancedMove * injuryFatigueMoveModifier);
+					case 0:
+						baseGroundMove = Math.floor(+basicMove * injuryFatigueMoveModifier);
+						step = Math.ceil(baseGroundMove/10)
+                        currentEnhancedMove = baseGroundMove + "/" + Math.floor(+enhancedMove * injuryFatigueMoveModifier);
                         break;
                         
                     case 1:
-                        currentEnhancedMove = Math.floor(+move1 * injuryFatigueMoveModifier) + "/" + Math.floor(+encumberedEnhancedMove1 * injuryFatigueMoveModifier);
+						baseGroundMove = Math.floor(+move1 * injuryFatigueMoveModifier);
+						step = Math.ceil(baseGroundMove/10)
+						currentEnhancedMove = baseGroundMove + "/" + Math.floor(+encumberedEnhancedMove1 * injuryFatigueMoveModifier);
                         break;
                         
                     case 2:
-                        currentEnhancedMove = Math.floor(+move2 * injuryFatigueMoveModifier) + "/" + Math.floor(+encumberedEnhancedMove2 * injuryFatigueMoveModifier);
+						baseGroundMove = Math.floor(+move2 * injuryFatigueMoveModifier);
+						step = Math.ceil(baseGroundMove/10)
+						currentEnhancedMove = baseGroundMove + "/" + Math.floor(+encumberedEnhancedMove2 * injuryFatigueMoveModifier);
                         break;
                         
                     case 3:
-                        currentEnhancedMove = Math.floor(+move3 * injuryFatigueMoveModifier) + "/" + Math.floor(+encumberedEnhancedMove3 * injuryFatigueMoveModifier);
+						baseGroundMove = Math.floor(+move3 * injuryFatigueMoveModifier);
+						step = Math.ceil(baseGroundMove/10)
+						currentEnhancedMove = baseGroundMove + "/" + Math.floor(+encumberedEnhancedMove3 * injuryFatigueMoveModifier);
                         break;
                         
                     case 4:
                     case 5:
                     default:
-                        currentEnhancedMove = Math.floor(+move4 * injuryFatigueMoveModifier) + "/" + Math.floor(+encumberedEnhancedMove4 * injuryFatigueMoveModifier);
+						baseGroundMove = Math.floor(+move4 * injuryFatigueMoveModifier);
+						step = Math.ceil(baseGroundMove/10)
+						currentEnhancedMove = baseGroundMove + "/" + Math.floor(+encumberedEnhancedMove4 * injuryFatigueMoveModifier);
                         break;
                     
-                }
+				}
+				
+				currentEnhancedMove = `${currentEnhancedMove} (${step})`;
                 
             }
             
@@ -11432,7 +11473,9 @@ See notes for weapon.</textarea>
             
             var airMoveUnmodified = 0;
             
-            var airMove = 0;
+			var airMove = 0;
+			
+			let baseAirMove = 0;
             
             var airModifierFromPoints = 0;
             
@@ -11552,7 +11595,9 @@ See notes for weapon.</textarea>
                 switch(values.encumbrance_level) {
                     
                     case 0:
-                        currentAirMove = (airMove * injuryFatigueMoveModifier);
+						currentAirMove = (airMove * injuryFatigueMoveModifier);
+						
+						baseAirMove = (airMove * injuryFatigueMoveModifier);
                         
                         if (baseEnhancedAirMove > 0) {
                             
@@ -11563,7 +11608,9 @@ See notes for weapon.</textarea>
                         
                     case 1:
                         
-                        currentAirMove = (getEncumberedMove(airMove, 1) * injuryFatigueMoveModifier);
+						currentAirMove = (getEncumberedMove(airMove, 1) * injuryFatigueMoveModifier);
+						
+						baseAirMove = (getEncumberedMove(airMove, 1) * injuryFatigueMoveModifier);
                         
                         if (baseEnhancedAirMove > 0) {
                             
@@ -11574,7 +11621,9 @@ See notes for weapon.</textarea>
                         
                     case 2:
                         
-                        currentAirMove = (getEncumberedMove(airMove, 2) * injuryFatigueMoveModifier);
+						currentAirMove = (getEncumberedMove(airMove, 2) * injuryFatigueMoveModifier);
+						
+						baseAirMove = (getEncumberedMove(airMove, 2) * injuryFatigueMoveModifier);
                         
                         if (baseEnhancedAirMove > 0) {
                             
@@ -11585,7 +11634,9 @@ See notes for weapon.</textarea>
                         
                     case 3:
                         
-                        currentAirMove = (getEncumberedMove(airMove, 3) * injuryFatigueMoveModifier);
+						currentAirMove = (getEncumberedMove(airMove, 3) * injuryFatigueMoveModifier);
+						
+						baseAirMove = (getEncumberedMove(airMove, 3) * injuryFatigueMoveModifier);
                         
                         if (baseEnhancedAirMove > 0) {
                             
@@ -11598,7 +11649,9 @@ See notes for weapon.</textarea>
                     case 5:
                     default:
                         
-                        currentAirMove = (getEncumberedMove(airMove, 4) * injuryFatigueMoveModifier);
+						currentAirMove = (getEncumberedMove(airMove, 4) * injuryFatigueMoveModifier);
+						
+						baseAirMove = (getEncumberedMove(airMove, 4) * injuryFatigueMoveModifier);
                         
                         if (baseEnhancedAirMove > 0) {
                             
@@ -11613,12 +11666,16 @@ See notes for weapon.</textarea>
             } else {
                 
                 airMove = 0;
-                
+				
+				baseAirMove = 0;
+
                 baseEnhancedAirMove = 0;
                 
-                currentAirMove = 0;
-                
-            }
+				currentAirMove = 0;
+				
+			}
+			
+			let step = Math.ceil(baseAirMove/10);
             
             // set air moves
             setAttrs({
@@ -11634,7 +11691,7 @@ See notes for weapon.</textarea>
                 "air_3": encumberedDisplayMove3,
                 "air_4": encumberedDisplayMove4,
                 "air_5": encumberedDisplayMove5,
-                "current_air": currentAirMove
+                "current_air": `${currentAirMove} (${step})`
             });
                 
             
@@ -11669,7 +11726,9 @@ See notes for weapon.</textarea>
             
             var waterMoveUnmodified = 0;
             
-            var waterMove = 0;
+			var waterMove = 0;
+			
+			let baseWaterMove = 0;
             
             var waterModifierFromPoints = 0;
             
@@ -11784,25 +11843,30 @@ See notes for weapon.</textarea>
                 switch(values.encumbrance_level) {
                     
                     case 0:
-                        currentWaterMove = (waterMove * injuryFatigueMoveModifier) + "/" + (baseEnhancedWaterMove * injuryFatigueMoveModifier);
+						currentWaterMove = (waterMove * injuryFatigueMoveModifier) + "/" + (baseEnhancedWaterMove * injuryFatigueMoveModifier);
+						baseWaterMove = (waterMove * injuryFatigueMoveModifier);
                         break;
                         
                     case 1:
-                        currentWaterMove = (getEncumberedMove(waterMove, 1) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 1) * injuryFatigueMoveModifier);
+						currentWaterMove = (getEncumberedMove(waterMove, 1) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 1) * injuryFatigueMoveModifier);
+						baseWaterMove = (getEncumberedMove(waterMove, 1) * injuryFatigueMoveModifier);
                         break;
                         
                     case 2:
-                        currentWaterMove = (getEncumberedMove(waterMove, 2) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 2) * injuryFatigueMoveModifier);
+						currentWaterMove = (getEncumberedMove(waterMove, 2) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 2) * injuryFatigueMoveModifier);
+						baseWaterMove = (getEncumberedMove(waterMove, 2) * injuryFatigueMoveModifier);
                         break;
                         
                     case 3:
-                        currentWaterMove = (getEncumberedMove(waterMove, 3) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 3) * injuryFatigueMoveModifier);
+						currentWaterMove = (getEncumberedMove(waterMove, 3) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 3) * injuryFatigueMoveModifier);
+						baseWaterMove = (getEncumberedMove(waterMove, 3) * injuryFatigueMoveModifier);
                         break;
                         
                     case 4:
                     case 5:
                     default:
-                        currentWaterMove = (getEncumberedMove(waterMove, 4) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 4) * injuryFatigueMoveModifier);
+						currentWaterMove = (getEncumberedMove(waterMove, 4) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 4) * injuryFatigueMoveModifier);
+						baseWaterMove = (getEncumberedMove(waterMove, 4) * injuryFatigueMoveModifier);
                         break;
                     
                 }
@@ -11867,30 +11931,37 @@ See notes for weapon.</textarea>
                 switch(values.encumbrance_level) {
                     
                     case 0:
-                        currentWaterMove = (waterMove * injuryFatigueMoveModifier);
+						currentWaterMove = (waterMove * injuryFatigueMoveModifier);
+						baseWaterMove = currentWaterMove;
                         break;
                         
                     case 1:
                         currentWaterMove = (getEncumberedMove(waterMove, 1) * injuryFatigueMoveModifier);
+                        baseWaterMove = currentWaterMove;
                         break;
                         
                     case 2:
                         currentWaterMove = (getEncumberedMove(waterMove, 2) * injuryFatigueMoveModifier);
+                        baseWaterMove = currentWaterMove;
                         break;
                         
                     case 3:
                         currentWaterMove = (getEncumberedMove(waterMove, 3) * injuryFatigueMoveModifier);
+                        baseWaterMove = currentWaterMove;
                         break;
                         
                     case 4:
                     case 5:
                     default:
                         currentWaterMove = (getEncumberedMove(waterMove, 4) * injuryFatigueMoveModifier);
+                        baseWaterMove = currentWaterMove;
                         break;
                     
                 }
                 
-            }
+			}
+			
+			let step = Math.ceil(baseWaterMove/10);
             
             // set water moves
             setAttrs({
@@ -11906,7 +11977,7 @@ See notes for weapon.</textarea>
                 "water_3": encumberedDisplayMove3,
                 "water_4": encumberedDisplayMove4,
                 "water_5": encumberedDisplayMove5,
-                "current_water": currentWaterMove
+                "current_water": `${currentWaterMove} (${step})`
             });
                 
             
