@@ -8,6 +8,11 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
+July 5 2020
+
+- Add armor value to NPC boxes
+
+
 June 29 2020
 
 - Buttons & Banners further improved look
