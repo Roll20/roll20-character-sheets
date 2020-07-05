@@ -10,8 +10,10 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 July 5 2020
 
-- Add armor value to NPC boxes
-- Overburdend value now correctly increments when you go over the max encumbrance value, rather then at max encumbrance value.
+- Add Armor value to NPC boxes
+- Overburdened value now correctly increments when you go over the max encumbrance value, rather then at max encumbrance value.
+- Sturdy value now is correctly adds x2 per level to encumbrance
+- Character Armor Arm & Leg encumbrance is now linked to avoid confusion of adding too much enc. (right arm/leg enc attributes are now deprecated)
 
 
 June 29 2020
