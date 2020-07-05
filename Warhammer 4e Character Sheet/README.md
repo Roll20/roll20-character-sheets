@@ -11,6 +11,7 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 July 5 2020
 
 - Add armor value to NPC boxes
+- Overburdend value now correctly increments when you go over the max encumbrance value, rather then at max encumbrance value.
 
 
 June 29 2020
