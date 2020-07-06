@@ -62,6 +62,39 @@
 	<span data-i18n="sheet-style-option">Sheet Style</span>
 	<span data-i18n="sheet-style-desc">Select a visual style for the character sheet.</span>
 </div>
+
+<input type="hidden" name="attr_show_roll_modifiers" value="0" />
+<input type="hidden" name="attr_roll_modifier_types" value="" />
+<div class="modal">
+	<div class="modal-dialog">
+		<div class="modal-header">
+			<h2>
+				<span data-i18n="roll-modifiers-heading">Roll Modifiers</span>
+			</h2>
+		</div>
+		<div class="modal-body">
+			
+			<div class="container">
+				<div class="item">
+					<input type="number" readonly="readonly" value="0" name="attr_roll_modifier" title="macro name: @{roll_modifier}" />
+					<span data-i18n="to-roll-label">To Roll</span>
+				</div>
+				<div class="item">
+					<label>
+						<input type="checkbox" name="attr_max_skill_nine" value="1" />
+						<span data-i18n="max-skill-9-label">Max skill of 9</span>
+					</label>
+				</div>
+			</div>
+
+		</div>
+		<div class="modal-footer">
+			<button type="action" name="act_close_roll_modifiers" class="btn"><span data-i18n="apply-label">Apply</span></button>
+			<button type="action" name="act_reset_roll_modifiers" class="btn"><span data-i18n="reset-label">Reset</span></button>
+		</div>
+	</div>
+</div>
+
 <div class="wrapper">
 	<!-- HIDDEN FIELDS -->
 	<input type="hidden" name="attr_10" value="10" disabled="disabled" />
@@ -3544,6 +3577,7 @@ Engineering: Back to School.
 
 		<div class="box skills">
 			<div class="table">
+				
 				<div class="header">
 					<div class="cell col0">
 						<span data-i18n="skills-label">Skills</span>
@@ -3600,6 +3634,20 @@ PU2:126 = Power-Ups 2. Page 126<br />
 						</div>
 					</div>
 				</div> <!-- .header -->
+
+				<input type="hidden" name="attr_use_roll_modifiers" value="0" />
+				<div class="row roll-modifiers">
+					<div class="cell label">
+						<span data-i18n="modifier-label">Modifier:</span>
+					</div>
+					<div class="cell number-input">
+						<input type="number" value="0" step="1" name="attr_skill_roll_modifier" />
+					</div>
+					<div class="cell">
+						<button type="action" name="act_show_roll_modifiers_for_skills" class="btn" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
+					</div>
+				</div>
+				
 				<fieldset class="repeating_skills">
 				    <input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
 					<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." name="attr_skill_toggle_notes" />
@@ -13262,7 +13310,7 @@ See notes for weapon.</textarea>
 	   });
 	    
 	});
-	
+
 	on("change:yards_fallen change:gravity change:atmosphere", function() {
 	    
 	    var fields = [
@@ -16595,5 +16643,32 @@ The attacker may choose to hit the original target or the limb you used to parry
 		});
 
 	}
+
+	/* ROLL MODIFIERS BOX */
+
+	// close the roll modifiers modal box
+	on("clicked:close_roll_modifiers", (event) => {
+
+		let fields = {
+			"show_roll_modifiers": 0,
+			"roll_modifier_types": ""
+		};
+
+		setAttrs(fields, {silent:true});
+
+	});
+
+	// show modal box for skill modifiers
+	on("clicked:show_roll_modifiers_for_skills", (event) => {
+
+		let fields = {
+			"show_roll_modifiers": 1,
+			"roll_modifier_types": "skill"
+		};
+
+		setAttrs(fields, {silent:true});
+		
+	});
+	
 
 </script>
