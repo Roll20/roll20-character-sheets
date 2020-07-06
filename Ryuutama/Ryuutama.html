@@ -2,6 +2,18 @@
 
 <html>
     <script type="text/worker">
+        var translationLang = getTranslationLanguage();
+
+        function compareDieToBase(baseDie, newDie) {
+            if(newDie < baseDie) {
+                return "reduced"
+            } else if (newDie > baseDie) {
+                return "increased"
+            } else {
+                return "default"
+            }
+        }
+
         on("change:injury change:condition", function() {
             getAttrs(["condition", "injury"], function(values) {
                 setAttrs({
@@ -45,30 +57,70 @@
             });
         });
         on("change:str change:poisoned change:sick change:shocked change:bonus change:condition", function() {
-            getAttrs(["str", "poisoned", "sick", "shocked", "bonus", "condition"], function(values) {
+            getAttrs(["str", "poisoned", "sick", "shocked", "bonus", "condition", "strDieStatus"], function(values) {
+                const newDiceCalc = Math.min(
+                    12, Math.max(
+                        4, parseInt(values.str)
+                            - parseInt(values.poisoned)
+                            - parseInt(values.sick)
+                            - (translationLang == 'fr' ? 0 : parseInt(values.shocked))
+                            + (values.bonus == 'STR' && parseInt(values.condition) >= 10 ? 2 : 0)
+                        )
+                    )
                 setAttrs({
-                    currentStr: Math.min(12, Math.max(4, parseInt(values.str)-parseInt(values.poisoned)-parseInt(values.sick)-parseInt(values.shocked)+(values.bonus == 'STR' && parseInt(values.condition) >= 10 ? 2 : 0)))
+                    currentStr: newDiceCalc,
+                    strDieStatus: compareDieToBase(values.str, newDiceCalc)
                 });
             });
         });
         on("change:dex change:injured change:sick change:shocked change:bonus change:condition", function() {
-            getAttrs(["dex", "injured", "sick", "shocked", "bonus", "condition"], function(values) {
+            getAttrs(["dex", "injured", "sick", "shocked", "bonus", "condition", "dexDieStatus"], function(values) {
+                const newDiceCalc = Math.min(
+                    12, Math.max(
+                        4, parseInt(values.dex)
+                            - parseInt(values.injured)
+                            - parseInt(values.sick)
+                            - (translationLang == 'fr' ? 0 : parseInt(values.shocked))
+                            + (values.bonus == 'DEX' && parseInt(values.condition) >= 10 ? 2 : 0)
+                        )
+                    )
                 setAttrs({
-                    currentDex: Math.min(12, Math.max(4, parseInt(values.dex)-parseInt(values.injured)-parseInt(values.sick)-parseInt(values.shocked)+(values.bonus == 'DEX' && parseInt(values.condition) >= 10 ? 2 : 0)))
+                    currentDex: newDiceCalc,
+                    dexDieStatus: compareDieToBase(values.dex, newDiceCalc)
                 });
             });
         });
         on("change:int change:muddled change:sick change:shocked change:bonus change:condition", function() {
-            getAttrs(["int", "muddled", "sick", "shocked", "bonus", "condition"], function(values) {
+            getAttrs(["int", "muddled", "sick", "shocked", "bonus", "condition", "intDieStatus"], function(values) {
+                const newDiceCalc = Math.min(
+                    12, Math.max(
+                        4, parseInt(values.int)
+                            - parseInt(values.muddled)
+                            - (translationLang == 'fr' ? 0 : parseInt(values.sick))
+                            - parseInt(values.shocked)
+                            + (values.bonus == 'INT' && parseInt(values.condition) >= 10 ? 2 : 0)
+                        )
+                    )
                 setAttrs({
-                    currentInt: Math.min(12, Math.max(4, parseInt(values.int)-parseInt(values.muddled)-parseInt(values.sick)-parseInt(values.shocked)+(values.bonus == 'INT' && parseInt(values.condition) >= 10 ? 2 : 0)))
+                    currentInt: newDiceCalc,
+                    intDieStatus: compareDieToBase(values.int, newDiceCalc)
                 });
             });
         });
         on("change:spi change:exhausted change:sick change:shocked change:bonus change:condition", function() {
-            getAttrs(["spi", "exhausted", "sick", "shocked", "bonus", "condition"], function(values) {
+            getAttrs(["spi", "exhausted", "sick", "shocked", "bonus", "condition", "spiDieStatus"], function(values) {
+                const newDiceCalc = Math.min(
+                    12, Math.max(
+                            4, parseInt(values.spi)
+                                - parseInt(values.exhausted)
+                                - (translationLang == 'fr' ? 0 : parseInt(values.sick))
+                                - parseInt(values.shocked)
+                                + (values.bonus == 'SPI' && parseInt(values.condition) >= 10 ? 2 : 0)
+                            )
+                        )
                 setAttrs({
-                    currentSpi: Math.min(12, Math.max(4, parseInt(values.spi)-parseInt(values.exhausted)-parseInt(values.sick)-parseInt(values.shocked)+(values.bonus == 'SPI' && parseInt(values.condition) >= 10 ? 2 : 0)))
+                    currentSpi: newDiceCalc,
+                    spiDieStatus: compareDieToBase(values.spi, newDiceCalc)
                 });
             });
         });
@@ -774,9 +826,9 @@
                                     <option value="season-spring-ritual" data-i18n="season-spring-ritual">Spring (Ritual)</option>
                                     <option value="season-summer"        data-i18n="season-summer">Summer</option>
                                     <option value="season-summer-ritual" data-i18n="season-summer-ritual">Summer (Ritual)</option>
-                                    <option value="fall"                 data-i18n="season-fall">Fall</option>
+                                    <option value="season-fall"          data-i18n="season-fall">Fall</option>
                                     <option value="season-fall-ritual"   data-i18n="season-fall-ritual">Fall (Ritual) </option>
-                                    <option value="winter"               data-i18n="season-winter">Winter</option>
+                                    <option value="season-winter"        data-i18n="season-winter">Winter</option>
                                     <option value="season-winter-ritual" data-i18n="season-winter-ritual">Winter (Ritual)</option>
                                     <option value="Other"                data-i18n="other">Other</option>
                                 </select>
@@ -862,6 +914,7 @@
                                 <span data-i18n="base">Base</span>
                             </div>
                             <div class="coreStatCurrentDie flex-column">
+                                <input class="diceAdjustment" name="attr_strDieStatus" type="hidden" value="default"/>
                                 <input type="number" name="attr_currentStr" value="4" min="4" step="2" max="12"/>
                                 <span data-i18n="current">Current</span>
                             </div>
@@ -881,6 +934,7 @@
                                 <span data-i18n="base">Base</span>
                             </div>
                             <div class="coreStatCurrentDie flex-column">
+                                <input class="diceAdjustment" name="attr_dexDieStatus" type="hidden" value="default"/>
                                 <input type="number" name="attr_currentDex" value="4" min="4" step="2" max="12"/>
                                 <span data-i18n="current">Current</span>
                             </div>
@@ -900,6 +954,7 @@
                                 <span data-i18n="base">Base</span>
                             </div>
                             <div class="coreStatCurrentDie flex-column">
+                                <input class="diceAdjustment" name="attr_intDieStatus" type="hidden" value="default"/>
                                 <input type="number" name="attr_currentInt" value="4" min="4" step="2" max="12"/>
                                 <span data-i18n="current">Current</span>
                             </div>
@@ -919,6 +974,7 @@
                                 <span data-i18n="base">Base</span>
                             </div>
                             <div class="coreStatCurrentDie flex-column">
+                                <input class="diceAdjustment" name="attr_spiDieStatus" type="hidden" value="default"/>
                                 <input type="number" name="attr_currentSpi" value="4" min="4" step="2" max="12"/>
                                 <span data-i18n="current">Current</span>
                             </div>
