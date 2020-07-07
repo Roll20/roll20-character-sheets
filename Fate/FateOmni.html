@@ -686,10 +686,21 @@
 							<span><input type="checkbox" class="checkbox" name="attr_EditStunts" value="1" checked><span class="pencilbox"/></span>
 						</div>
 						<fieldset class="repeating_stunts">
-							<div class="fieldlabel" data-i18n="name">Name</div>
-							<input name="attr_name" type="text">
-							<div class="fieldlabel" data-i18n="desc">Description</div>
-							<textarea name="attr_desc" rows=3></textarea>
+							<div class="AspectSeparator">
+								<div class="fieldlabel" data-i18n="name">Name</div>
+								<input name="attr_name" type="text">
+								<div class"fieldlabel"><input type="checkbox" name="attr_rollable" value="1"> <span class="fieldlabel" data-i18n="rollable">Rollable</span></div>
+								<input type="checkbox" class="triggerbox" name="attr_rollable" value="1">
+								<div>
+									<div class="fieldlabel" data-i18n="bonus">Bonus</div>
+									<input name="attr_bonus" type="number" value="0">
+									<div class="fieldlabel" data-i18n="skill">Skill</div>
+									<input name="attr_skill" type="text" value="">
+									<input name="attr_skillvalue" type="hidden" value="0">
+								</div>
+								<div class="fieldlabel" data-i18n="desc">Description</div>
+								<textarea name="attr_desc" rows=3></textarea>
+							</div>
 						</fieldset>
 					</div> <!-- /StuntEdit -->
 					
@@ -700,6 +711,14 @@
 								<span name="attr_desc" class="desc"></span>
 								<input type="hidden" name="attr_name" value="">
 								<input type="hidden" name="attr_desc" value=""><button type="roll" class="share" value="&{template:share} {{theme=@{theme}}} {{name=@{character_name}: ^{stunt}}} {{text=**@{name}:** @{desc}}}"></button>
+								<input type="hidden" name="attr_skill" value="">
+								<input type="hidden" name="attr_skillvalue" value="0">
+								<input type="hidden" name="attr_bonus" value="0">
+								<input type="checkbox" class="triggerbox" name="attr_rollable" value="1">
+								<span><br/><button type="roll" class="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{name} (@{skill})}} {{roll=[[4dF+@{skillvalue}+@{bonus}+@{Show-Diceprompts}]]}}" name="roll_SkillRoll">
+									<b><span data-i18n="roll"></span>
+									<span name="attr_skill"></span></b> = <span name="attr_skillvalue"></span> + <span name="attr_bonus"></span> &nbsp;
+								</button></span>
 							</div>
 						</fieldset>
 					</div>
@@ -854,6 +873,15 @@
 							<div class="stunt">
 								<b style="font-size: 80%;"><span data-i18n="name"></span>:</b>
 								<input type="text" name="attr_name" value="" class="compact" data-i18n-placeholder="stunt" placeholder="stunt">
+								<div class"fieldlabel"><input type="checkbox" name="attr_rollable" value="1"> <span class="fieldlabel" data-i18n="rollable">Rollable</span></div>
+								<input type="checkbox" class="triggerbox" name="attr_rollable" value="1">
+								<div>
+									<div class="fieldlabel" data-i18n="bonus">Bonus</div>
+									<input name="attr_bonus" type="number" value="0">
+									<div class="fieldlabel" data-i18n="skill">Skill</div>
+									<input name="attr_skill" type="text" value="">
+									<input name="attr_skillvalue" type="hidden" value="0">
+								</div>
 							</div>
 							<div class="rating">
 								<b style="font-size: 80%;"><span data-i18n="name"></span>:</b>
@@ -946,6 +974,14 @@
 									<span name="attr_text"></span>
 									<input type="hidden" name="attr_name" value=""><input type="hidden" name="attr_text" value="">
 									<button type="roll" class="share" value="&{template:share} {{theme=@{theme}}} {{name=@{character_name}: ^{extra} ^{stunt}}} {{text=**@{name}:** @{text}}}"></button>
+									<input type="hidden" name="attr_skill" value="">
+									<input type="hidden" name="attr_skillvalue" value="0">
+									<input type="hidden" name="attr_bonus" value="0">
+									<input type="checkbox" class="triggerbox" name="attr_rollable" value="1">
+									<span><br/><button type="roll" class="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{name} (@{skill})}} {{roll=[[4dF+@{skillvalue}+@{bonus}+@{Show-Diceprompts}]]}}" name="roll_SkillRoll">
+										<b><span data-i18n="roll"></span>
+										<span name="attr_skill"></span></b> = <span name="attr_skillvalue"></span> + <span name="attr_bonus"></span> &nbsp;
+									</button></span>
 								</div>
 							</div>
 							<div class="rating space-below clear-all">
@@ -2232,8 +2268,71 @@ var loadSkills = function() {
 					attrs[attrnamelist] = listform;
 				}
 				// log(attrs);
-				setAttrs(attrs); 
+				setAttrs(attrs);
 				// log("EXIT loadSkills() getAttrs");
+
+				// As a coda to this, we go and make sure that stunts with incorporated skills are recorded properly.
+
+				getSectionIDs("stunts", function(stunts) {
+					log("stunts"+" skill integration begins");
+					var sfields = [ "rolltally" ];
+					for(var i=0; i < stunts.length; i++ ) {
+						sfields[i+1] = "repeating_" + "stunts" + "_" + stunts[i] + "_skill";
+					}
+					// get the stunt's skill setting, check skillRatingByName to see if there's a match, if there is, set the skillvalue attribute of that row to the value of said skill.
+					getAttrs(sfields, function(sf) {
+						var sattrs = {};
+						for(var [id,value] of Object.entries(sf) ) {
+							if ( id !== "rolltally" && value !== "" ) {
+								// Then we have a named skill. It must match exactly.
+								var sval = "N/A";
+								if ( typeof skillRatingByName[value] !== "undefined" ) {
+									sval = skillRatingByName[value];
+								}
+								var sfkey = id + "value";
+								sattrs[sfkey] = sval;
+							} else if ( id !== "rolltally" ) { // This is for rollable aspects
+								// Then we default to the value of the aspects total.
+								var sfkey = id + "value";
+								sattrs[sfkey] = sf["rolltally"];
+							}
+						}
+						setAttrs(sattrs);
+						log(sattrs);
+						log("stunts"+" skill integration ends");
+					});
+				});
+
+				getSectionIDs("extras", function(stunts) {
+					log("extras"+" skill integration begins");
+					var sfields = [ "rolltally" ];
+					for(var i=0; i < stunts.length; i++ ) {
+						sfields[i+1] = "repeating_" + "extras" + "_" + stunts[i] + "_skill";
+					}
+					// get the stunt's skill setting, check skillRatingByName to see if there's a match, if there is, set the skillvalue attribute of that row to the value of said skill.
+					getAttrs(sfields, function(sf) {
+						var sattrs = {};
+						for(var [id,value] of Object.entries(sf) ) {
+							if ( id !== "rolltally" && value !== "" ) {
+								// Then we have a named skill. It must match exactly.
+								var sval = "N/A";
+								if ( typeof skillRatingByName[value] !== "undefined" ) {
+									sval = skillRatingByName[value];
+								}
+								var sfkey = id + "value";
+								sattrs[sfkey] = sval;
+							} else if ( id !== "rolltally" ) { // This is for rollable aspects
+								// Then we default to the value of the aspects total.
+								var sfkey = id + "value";
+								sattrs[sfkey] = sf["rolltally"];
+							}
+						}
+						setAttrs(sattrs);
+						log(sattrs);
+						log("extras"+" skill integration ends");
+					});
+				});
+
 			}
 		);
 
@@ -2741,7 +2840,7 @@ on("change:repeating_modes remove:repeating_modes sheet:opened", function() {
 	});
 });
 
-on("change:repeating_skills remove:repeating_skills change:skillstyle", function() {
+on("change:repeating_skills remove:repeating_skills change:skillstyle  change:repeating_stunts:skill change:repeating_extras:skill change:rolltally", function() {
 	loadSkills();
 });
 
