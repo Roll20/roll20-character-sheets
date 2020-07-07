@@ -15,6 +15,7 @@
 					<option value="fcore" data-i18n="fcore"></option>
 					<option value="fcon" data-i18n="fcon"></option>
 					<option value="fae" data-i18n="fae"></option>
+					<option value="threerocketeers" data-i18n="threerocketeers"></option>
 					<option value="robo" data-i18n="robo"></option>
 					<option value="dfa" data-i18n="dfa"></option>
 					<option value="foc" data-i18n="foc"></option>
@@ -78,6 +79,7 @@
 				<option value="purple">Toolkit Purple</option>
 				<option value="evilhat">Evil Hat</option>
 				<option value="cthulhu">Elder God</option>
+				<option value="orange">Golden</option>
 				<option value="gray">Gray</option>
 				<option value="shotc">Radical</option>
 			</select>
@@ -889,6 +891,7 @@
 							<select name="attr_addextra">
 								<option value="" data-i18n="add...">Add...</option>
 								<option value="blackfish">SF-46D Blackfish</option>
+								<option value="swordplay">Swordplay Template (3 Rocketeers)</option>
 								<option value="template">Template</option>
 							</select>
 						</div>
@@ -1850,7 +1853,7 @@ var gamesets = {
 			"Show-Corruption": 0,
 			"Show-FP": 1,
 			"Show-Notes": 1,
-			"Show-Powers": 1,
+			"Show-Powers": 0,
 			"Show-Refresh": 1,
 			"Show-Roles": 1,
 			"Show-Skills": 1,
@@ -1875,12 +1878,39 @@ var gamesets = {
 			"Show-FP": 1,
 			"Show-Modes": 1,
 			"Show-Notes": 1,
-			"Show-Powers": 1,
+			"Show-Powers": 0,
 			"Show-Refresh": 1,
 			"Show-Roles": 0,
 			"Show-Skills": 1,
 			"Show-Stress": 1,
 			"Show-Stunts": 1,
+			"Show-TempAspects": 1
+		}
+	},
+	threerocketeers: {
+		addstress: "esc", 
+		stresskeys: ["physical","mental"], 
+		stresslength: 2,
+		addconsequence: "all",
+		aspects: [ "Rocketeer", "Trouble", "Swordplay", "Family", "Open", "Open" ],
+		aspectvalues: [ 2, 1, 1, 1, 1, 1 ],
+		settings: {
+			"SkillStyle": "list",
+			"Show-Aspects": 1,
+			"Show-Conditions": 0,
+			"Show-Consequences": 1,
+			"Show-Corruption": 0,
+			"Show-Extras": 1,
+			"Show-FP": 1,
+			"Show-Modes": 0,
+			"Show-Notes": 1,
+			"Show-Powers": 0,
+			"Show-Refresh": 1,
+			"Show-Roles": 0,
+			"Show-Skills": 0,
+			"Show-Stress": 1,
+			"Show-Stunts": 1,
+			"Show-RollableAspects": 1,
 			"Show-TempAspects": 1
 		}
 	},
@@ -1901,7 +1931,7 @@ var gamesets = {
 			"Show-FP": 1,
 			"Show-Modes": 1,
 			"Show-Notes": 1,
-			"Show-Powers": 1,
+			"Show-Powers": 0,
 			"Show-Refresh": 1,
 			"Show-Roles": 0,
 			"Show-Skills": 1,
@@ -1980,6 +2010,13 @@ var extras = {
 			name: "Life Support Damaged", track: 1, track1: 2 },
 		{ element: "track", name: "Cockpit hit, pilot sustains damage equal to the amount the ship sustained in this hit", track: 1, track1: 2 },
 		{ element: "track", name: "Structural disintegration! Punch out!", track: 1 }
+	],
+	swordplay: [
+		{ element: "title", name: "Swordplay" },
+		{ element: "stunt", name: "Appearance", text: "" },
+		{ element: "stunt", name: "Edge", text: "" },
+		{ element: "stunt", name: "Main Hand", text: "" },
+		{ element: "stunt", name: "Off Hand", text: "" }
 	],
 	template: [
 		{ element: "title", name: "Title" },
@@ -2495,6 +2532,10 @@ var addCondition = function(values) {
 
 var addAspect = function(values) {
 	var list = values.aspects;
+	var rv = [];
+	if ( typeof values.aspectvalues !== "undefined" ) {
+		rv = values.aspectvalues;
+	}
 	var attrs = {};
 	for (i=0; i < list.length; i++) {
 		var newid = generateActuallyUniqueRowID();
@@ -2503,6 +2544,9 @@ var addAspect = function(values) {
 			label = list[i];
 		}
 		attrs["repeating_aspects_" + newid + "_label"] = label;
+		if ( typeof rv[i] !== "undefined" ) {
+			attrs["repeating_aspects_" + newid + "_rollvalue"] = rv[i];
+		}
 	}
 	setAttrs(attrs);
 }
