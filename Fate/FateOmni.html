@@ -1064,7 +1064,12 @@
 			<input type="checkbox" class="triggerbox" checked name="attr_Show-Aspects" value="1">
 			<div class="AspectCell">
 				<div class="SectionHeader">
-					<span data-i18n="aspects">Aspects</span><span class="boxcorner"><input type="checkbox" class="checkbox" name="attr_EditAspects" value="1" checked><span class="pencilbox"/></span>
+					<span data-i18n="aspects">Aspects</span>
+					<span class="boxcorner">
+						<input type="hidden" name="attr_aspectlist" value="">
+						<button type="roll" class="share" value="&{template:share} {{theme=@{theme}}} {{name=@{character_name}: ^{aspects}}} {{breaks=@{aspectlist}}}"></button>
+						<input type="checkbox" class="checkbox" name="attr_EditAspects" value="1" checked><span class="pencilbox"/>
+					</span>
 				</div>
 				<div class="AspectFrame">
 					<input type="checkbox" class="triggerbox" name="attr_EditAspects" value="1" checked>
@@ -1576,9 +1581,12 @@
 		{{#text}}
 			<div class="text">{{text}}</div>
 		{{/text}}
-		{{#allprops() name text theme}}
+		{{#breaks}}
+			<div class="breaks">{{breaks}}</div>
+		{{/breaks}}
+		{{#allprops() name text theme breaks}}
 			<div class="space-above">**{{key}}:** {{value}} </div>
-		{{/allprops() name text theme}}
+		{{/allprops() name text theme breaks}}
 	</div>
 </rolltemplate>
 
@@ -2839,6 +2847,42 @@ on("change:repeating_modes remove:repeating_modes sheet:opened", function() {
 				});
 			});
 		}
+	});
+});
+
+on("sheet:opened change:repeating_aspects remove:repeating_aspects", function() {
+	getSectionIDs("aspects", function(list) {
+		var gets = [];
+		for( var i = 0; i < list.length; i++ ) {
+			gets[i*4] = "repeating_aspects_" + list[i] + "_aspect";
+			gets[i*4+1] = "repeating_aspects_" + list[i] + "_label";
+			gets[i*4+2] = "repeating_aspects_" + list[i] + "_flags";
+			gets[i*4+3] = "repeating_aspects_" + list[i] + "_notes";
+		}
+		getAttrs(gets, function(a) {
+			var atext = "";
+			for( var i = 0; i < list.length; i++ ) {
+				var aspect = a["repeating_aspects_" + list[i] + "_aspect"];
+				var label = a["repeating_aspects_" + list[i] + "_label"];
+				var flags = a["repeating_aspects_" + list[i] + "_flags"];
+				var notes = a["repeating_aspects_" + list[i] + "_notes"];
+				if ( atext !== "" ) {
+					atext = atext + "\n\n";
+				}
+				if ( typeof label !== "undefined" && label !== "" ) {
+					atext = atext + "**" + label;
+					if ( typeof flags !== "undefined" && flags !== "" ) {
+						atext = atext + " (" + flags + ")";
+					}
+					atext = atext + ":**\n";
+				}
+				atext = atext + "***" + aspect + "***";
+				if ( typeof notes !== "undefined" && notes !== "" ) {
+					atext = atext + "\n"+ notes ;
+				}
+			}
+			setAttrs({ "aspectlist": atext });
+		});
 	});
 });
 
