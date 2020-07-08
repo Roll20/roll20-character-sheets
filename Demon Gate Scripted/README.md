@@ -1,1 +1,0 @@
-This is a scripted roll20 character sheet for Demon Gate by Arcanum Syndicate.
