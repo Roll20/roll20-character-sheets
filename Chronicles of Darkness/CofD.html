@@ -117,7 +117,8 @@
     
     <!-- DICE ROLLER -->
     <div class="page page1 diceroller">
-        <input type="hidden" class="rollstyle" name="attr_rollstyle" />
+        <input type="hidden" class="rollstyle" name="attr_rollstyle" value="sheet" />
+        <input type="hidden" class="rolltype-select" name="attr_rolltype_select" value="normal" />
         <table>
             <tbody>
                 <tr>
@@ -125,7 +126,9 @@
                 </tr>
                 <tr>
                     <td colspan="2" class="initiative">
-                        <button type="roll" name="roll_initiative" data-i18n="roll-initiative" value="&{template:wod-initiative} {{name=@{character_name}}} {{dexterity=@{dexterity}}} {{composure=@{composure}}} {{fastReflexes=@{fast_reflexes}}} {{initiativePenalty=@{initiative_penalty}}} {{result=[[1d10 + @{dexterity} + @{composure} + @{fast_reflexes} + @{initiative_penalty} &{tracker}]]}}">Roll Initiative</button>
+                        <button type="roll" class="toggle active" name="roll_initiative" data-i18n="roll-initiative" value="&{template:wod-initiative} {{name=@{character_name}}} {{dexterity=@{dexterity}}} {{composure=@{composure}}} {{fastReflexes=@{fast_reflexes}}} {{initiativePenalty=@{initiative_penalty}}} {{result=[[1d10 + @{dexterity} + @{composure} + @{fast_reflexes} + @{initiative_penalty} &{tracker}]]}}">
+                            Roll Initiative
+                        </button>
                     </td>
                 </tr>
                 <tr>
@@ -135,20 +138,17 @@
                         <button type="roll" class="rollstyle simple" name="roll_simple" value="&{template:wod-simple} {{name=@{character_name}}} {{option=?{@{dicepoolmacro}|0}}} {{result=[[{(?{@{dicepoolmacro}|1}@{rolltype}"></button>
                     </td>
                     <td>
-                        <input type="radio" class="attr" name="attr_rollstyle" value="sheet" title="Sheet Roll" checked="checked" />
-                        <span class="attr" data-i18n="sheet-roll" >Sheet Roll</span>
+                        <button type="action" class="toggle rollstyle-sheet" name="act_rollstyle_sheet" data-i18n="sheet-roll">Sheet Roll</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" class="attr" name="attr_rollstyle" value="attack" />
-                        <span class="attr" data-i18n="attack-roll" >Attack Roll</span>
+                        <button type="action" class="toggle rollstyle-attack" name="act_rollstyle_attack" data-i18n="attack-roll">Attack Roll</button>
                     </td>
                 </tr>
                 <tr>
                     <td class="bottom">
-                        <input type="radio" class="attr" name="attr_rollstyle" value="simple" />
-                        <span class="attr" data-i18n="simple-roll" >Simple Roll</span>
+                        <button type="action" class="toggle rollstyle-simple" name="act_rollstyle_simple" data-i18n="simple-roll">Simple Roll</button>
                     </td>
                 </tr>
                 <tr>
@@ -158,44 +158,37 @@
                         <div class="rollstyle simple">Simple</div>
                     </td>
                     <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="Chance" />
-                        <span class="attr" data-i18n="chance" >Chance</span>
+                        <button type="action" class="toggle rolltype-chance" name="act_rolltype_select_chance" data-i18n="chance">Chance</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="Normal" title="Normal" checked="checked" />
-                        <span class="attr" data-i18n="normal" >Normal</span>
+                        <button type="action" class="toggle rolltype-normal" name="act_rolltype_select_normal" data-i18n="normal">Normal</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="9-Again" />
-                        <span class="attr" data-i18n="9-again">9-Again</span>
+                        <button type="action" class="toggle rolltype-9-again" name="act_rolltype_select_9-again" data-i18n="9-again">9-Again</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="8-Again" />
-                        <span class="attr" data-i18n="8-again">8-Again</span>
+                        <button type="action" class="toggle rolltype-8-again" name="act_rolltype_select_8-again" data-i18n="8-again">8-Aagain</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="Don't Reroll 10s" />
-                        <span class="attr" data-i18n="dont-reroll" >Don't Reroll 10s</span>
+                        <button type="action" class="toggle rolltype-dont-reroll" name="act_rolltype_select_dont-reroll" data-i18n="dont-reroll">Don't Reroll 10s</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="Chance Rote" />
-                        <span class="attr" data-i18n="chance-rote" >Chance Rote</span>
+                        <button type="action" class="toggle rolltype-chance-rote" name="act_rolltype_select_chance-rote" data-i18n="chance-rote">Chance Rote</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="Rote" />
-                        <span class="attr" data-i18n="rote" >Rote</span>
+                        <button type="action" class="toggle rolltype-rote" name="act_rolltype_select_rote" data-i18n="rote">Rote</button>
                     </td>
                 </tr>
             </tbody>
@@ -3254,7 +3247,6 @@
         const pages = ["settings", "1", "2", "3"];
         pages.forEach((page) => {
             on(`clicked:page_${page}`, () => {
-                console.log("page", page);
                 setAttrs({
                     "pagenumber": page
                 });
@@ -3277,6 +3269,24 @@
                     "game_line": gameLine,
                     "edition": edition,
                     "entity": entity
+                });
+            });
+        });
+
+        const rollstyles = ["sheet", "attack", "simple"];
+        rollstyles.forEach((rollstyle) => {
+            on(`clicked:rollstyle_${rollstyle}`, () => {
+                setAttrs({
+                    "rollstyle": rollstyle
+                });
+            });
+        });
+        
+        const rolltypes = ["chance", "normal", "9-again", "8-again", "dont-reroll", "rote", "chance-rote"];
+        rolltypes.forEach((rolltype) => {
+            on(`clicked:rolltype_select_${rolltype}`, () => {
+                setAttrs({
+                    "rolltype_select": rolltype
                 });
             });
         });
@@ -3802,7 +3812,7 @@
                 var isSecondEdition = getEdition(v.sheettype) === 2;
                 var value;
                 switch (v.rolltype_select) {
-                    case "Chance":
+                    case "chance":
                         if (isSecondEdition) {
                             value = "*0+1)d10cf<1}>10]]}} {{chance=1}}";
                         }
@@ -3810,22 +3820,23 @@
                             value = "*0+1)d10!cf<1}>10]]}} {{chance=1}}";
                         }
                         break;
-                    case "Normal":
+                    case "normal":
+                    default:
                         value = ")d10!cs>10}>8]]}}";
                         break;
-                    case "9-Again":
+                    case "9-again":
                         value = ")d10!>9cs>9}>8]]}} {{9again=1}}";
                         break;
-                    case "8-Again":
+                    case "8-again":
                         value = ")d10!>8cs>8}>8]]}} {{8again=1}}";
                         break;
-                    case "Don't Reroll 10s":
+                    case "dont-reroll":
                         value = ")d10cs>10}>8]]}}";
                         break;
-                    case "Rote":
+                    case "rote":
                         value = ")d10ro<7}>8]]}}";
                         break;
-                    case "Chance Rote":
+                    case "chance-rote":
                         if (isSecondEdition) {
                             value = "*0+1)d10ro<7cf<1}>10]]}} {{chance=1}}";
                         }
