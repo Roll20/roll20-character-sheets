@@ -2221,20 +2221,20 @@
                                 <table class="potency">
                                     <tr>
                                         <td class="subheader">
-                                            <input type="checkbox" class="attr" name="attr_potency_flag" value="@{potency}" />
-                                            <span class="attr ephemeral" style="font-size: 1em;" data-i18n="rank">Rank</span>
-                                            <span class="attr mortal2-organization" style="font-size: 1em;" data-i18n="standing">Standing</span>
-                                            <span class="attr vampire" style="font-size: 1em;" data-i18n="blood-potency" >Blood Potency</span>
-                                            <span class="attr werewolf" style="font-size: 1em;" data-i18n="primal-urge" >Primal Urge</span>
-                                            <span class="attr mage" style="font-size: 1em;" data-i18n="gnosis" >Gnosis</span>
-                                            <span class="attr promethean" style="font-size: 1em;" data-i18n="azoth" >Azoth</span>
-                                            <span class="attr changeling" style="font-size: 1em;" data-i18n="wyrd" >Wyrd</span>
-                                            <span class="attr geist1" style="font-size: 1em;" data-i18n="psyche" >Psyche</span>
-                                            <span class="attr geist2" style="font-size: 1em;" data-i18n="synergy" >Synergy</span>
-                                            <span class="attr geist2-organization" style="font-size: 1em;" data-i18n="esotery">Esotery</span>
-                                            <span class="attr mummy" style="font-size: 1em;" data-i18n="sekhem" >Sekhem</span>
-                                            <span class="attr demon" style="font-size: 1em;" data-i18n="primum" >Primum</span>
-                                            <span class="attr beast" style="font-size: 1em;" data-i18n="lair" >Lair</span>
+                                            <input type="hidden" class="flag" name="attr_potency_flag" value="0" />
+                                            <button type="action" class="toggle ephemeral" name="act_potency" data-i18n="rank">Rank</button>
+                                            <button type="action" class="toggle mortal2-organization" name="act_potency" data-i18n="standing">Standing</button>
+                                            <button type="action" class="toggle vampire" name="act_potency" data-i18n="blood-potency" >Blood Potency</button>
+                                            <button type="action" class="toggle werewolf" name="act_potency" data-i18n="primal-urge" >Primal Urge</button>
+                                            <button type="action" class="toggle mage" name="act_potency" data-i18n="gnosis" >Gnosis</button>
+                                            <button type="action" class="toggle promethean" name="act_potency" data-i18n="azoth" >Azoth</button>
+                                            <button type="action" class="toggle changeling" name="act_potency" data-i18n="wyrd" >Wyrd</button>
+                                            <button type="action" class="toggle geist1" name="act_potency" data-i18n="psyche" >Psyche</button>
+                                            <button type="action" class="toggle geist2" name="act_potency" data-i18n="synergy" >Synergy</button>
+                                            <button type="action" class="toggle geist2-organization" name="act_potency" data-i18n="esotery">Esotery</button>
+                                            <button type="action" class="toggle mummy" name="act_potency" data-i18n="sekhem" >Sekhem</button>
+                                            <button type="action" class="toggle demon" name="act_potency" data-i18n="primum" >Primum</button>
+                                            <button type="action" class="toggle beast" name="act_potency" data-i18n="lair" >Lair</button>
                                         </td>
                                     </tr>
                                     <tr>
@@ -2900,7 +2900,6 @@
     <input type="hidden" name="attr_armor_penalty" value="0" />
     <input type="hidden" name="attr_wound_penalty" value="0" />
     <input type="hidden" name="attr_defense_base" />
-    <input type="hidden" name="attr_potency_name" />
     <input type="hidden" name="attr_roll_stats" value="{}" />
     <input type="hidden" name="attr_roll_html" value="" />
     <input type="hidden" name="attr_roll_pool" value="0" />
@@ -3122,7 +3121,17 @@
         var normalStats = [ ...attributes, ...skills ];
         var powers = ["animalism","auspex","celerity","dominate","majesty","nightmare","obfuscate","protean","resilience","vigor","crúac","thebansorcery","death","fate","forces","life","matter","mind","prime","spirit","space","time"];
         var allStats = [ ...attributes, ...skills, ...powers, "potency" ];
-        var potencyNames = { mortal1:"", mortal2:"", "mortal2-organization":"Standing", vampire1:"Blood Potency", vampire2:"Blood Potency", werewolf1:"Primal Urge", werewolf2:"Primal Urge", mage1:"Gnosis", mage2:"Gnosis", promethean1:"Azoth", promethean2:"Azoth", changeling1:"Wyrd", changeling2:"Wyrd", demon:"Primum", beast:"Lair", hunter:"", geist1:"Psyche", geist2:"Synergy", "geist2-geist":"Rank", "geist2-organization":"Esotery", mummy1:"Sekhem" };
+        var potencyTranslationKeys = {
+            mortal1:"", mortal2:"", "mortal2-organization":"standing",
+            vampire1:"blood-potency", vampire2:"blood-potency",
+            werewolf1:"primal-urge", werewolf2:"primal-urge",
+            mage1:"gnosis", mage2:"gnosis",
+            promethean1:"azoth", promethean2:"azoth",
+            changeling1:"wyrd", changeling2:"wyrd",
+            demon:"primum", beast:"lair", hunter:"",
+            geist1:"psyche", geist2:"synergy", "geist2-geist":"rank", "geist2-organization":"esotery",
+            mummy1:"sekhem"
+        };
         
         allStats.forEach((attr) => {
             on(`change:${attr}`, (eventInfo) => {
@@ -3273,7 +3282,6 @@
             updateSpeed();
             updateDefaultDefense();
             updateInitiative();
-            updatePotencyName();
             updateRollType();
             const resetRollFlagAttrs = resetRollFlags();
     
@@ -3488,7 +3496,7 @@
         }
 
         var updateSheetRoll = function(attribute) {
-            getAttrs(["roll_stats", attribute], (v) => {
+            getAttrs(["roll_stats", attribute, "sheettype"], (v) => {
                 // Update roll stats collection
                 let rollStats = tryParse(v["roll_stats"]);
                 if (!Array.isArray(rollStats)) {
@@ -3514,14 +3522,14 @@
                 }
 
                 // Create HTML for roll template
-                const rollHtml = getSheetRollHtml(rollStats);
+                const rollHtml = getSheetRollHtml(rollStats, v.sheettype);
 
                 // Create dice pool for roll
                 const rollPool = getSheetRollPool(rollStats);
 
                 // Create display for dice roller
                 const rollDisplay = rollStats
-                    .map((stat) => getTranslationByKey(stat.attribute))
+                    .map((stat) => stat.type === "potency" ? getTranslationByKey(potencyTranslationKeys[v.sheettype]) : getTranslationByKey(stat.attribute))
                     .join(" +\n");
 
                 // Determine flag values
@@ -3571,9 +3579,13 @@
             });
         }
 
-        var getSheetRollHtml = function(rollStats) {
+        var getSheetRollHtml = function(rollStats, sheettype) {
             return rollStats
-                .map((stat) => `<div>${getTranslationByKey(stat.attribute)} (${stat.value})</div>`)
+                .map((stat) => ({
+                    label: stat.type === "potency" ? getTranslationByKey(potencyTranslationKeys[sheettype]) : getTranslationByKey(stat.attribute),
+                    value: stat.value
+                }))
+                .map((stat) => `<div>${stat.label} (${stat.value})</div>`)
                 .join("");
         }
 
@@ -3778,14 +3790,6 @@
                 "wound_penalty_2": Math.min(maxPenalty + 1, 0) || " ",
                 "wound_penalty_3": Math.min(maxPenalty, 0) || " "
             };
-        }
-    
-        var updatePotencyName = function() {
-            getAttrs(["sheettype"], function(v){
-                setAttrs({
-                    potency_name: potencyNames[v.sheettype] || ""
-                });
-            });
         }
     
         var updateRollType = function() {
