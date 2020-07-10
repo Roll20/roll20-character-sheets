@@ -1228,31 +1228,29 @@
 
   // Armor Calculation
   on('sheet:opened change:dex change:repeating_armor remove:repeating_armor', function () {
-    repeatingSum(
-      "ArmorTotal",
-      "armor",
-      ["armorValue", "armorWorn"],
-      {
-        callback: function () {
-          repeatingSum(
-            "ArmorWornTotal",
-            "armor",
-            ["armorWorn"],
-            {
-              callback: function () {
-                getAttrs(["ArmorTotal", "ArmorWornTotal", "BonusDEX", "aacAcUnarmored", "dacAcUnarmored"], function (values) {
-                  const armorTotal = parseInt(values.ArmorTotal, 10);
-                  setAttrs({
-                    aacAc: (values.ArmorWornTotal > 0) ? armorTotal + values.BonusDEX : values.aacAcUnarmored,
-                    dacAc: (values.ArmorWornTotal > 0) ? armorTotal - values.BonusDEX : values.dacAcUnarmored
-                  });
-                });
-              }
-            }
-          )
-        }
-      }
-    );
+    getSectionIDs("repeating_armor", function(idArray) {
+      let armorWorn = 0;
+      let armorTotal = 0;
+
+      idArray.forEach(function(id) {
+        const attributes = ["armorValue", "armorWorn"]
+          .map(name => `repeating_armor_${id}_${name}`)
+          .concat(['BonusSTR', 'BonusDEX']);
+        getAttrs(attributes, function(values) {
+          if (values[`repeating_armor_${id}_armorWorn`]) {
+            armorWorn += 1;
+            armorTotal += parseFloat(values[`repeating_armor_${id}_armorValue`]);
+          }
+        });
+      });
+
+      getAttrs(["BonusDEX"], function(values) {
+        setAttrs({
+          aacAc: (armorWorn > 0) ? armorTotal + values.BonusDEX : values.aacAcUnarmored,
+          dacAc: (armorWorn > 0) ? armorTotal - values.BonusDEX : values.dacAcUnarmored,
+        })
+      })
+    });
   });
 
   // Recalculate encumbrance

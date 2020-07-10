@@ -8,6 +8,7 @@
 
 - Fix a bug where the strength bonus was not added to attack rolls
 - Fix a bug where new characters would have AC of 0
+- Fix armor calculation code to account for worn armor
 
 ## 1.5.0
 
