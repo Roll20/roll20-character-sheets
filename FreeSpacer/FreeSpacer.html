@@ -1702,6 +1702,31 @@
             <!--Salvo Title-->
             <div class="salvoTitle">Salvo Mode</div>
 
+            <!--Operator List-->
+            <input type="hidden" name="attr_salvoOperator0Name" />
+            <input type="hidden" name="attr_salvoOperator0StationA" />
+            <input type="hidden" name="attr_salvoOperator0StationZ" />
+
+            <input type="hidden" name="attr_salvoOperator1Name" />
+            <input type="hidden" name="attr_salvoOperator1StationA" />
+            <input type="hidden" name="attr_salvoOperator1StationZ" />
+
+            <input type="hidden" name="attr_salvoOperator2Name" />
+            <input type="hidden" name="attr_salvoOperator2StationA" />
+            <input type="hidden" name="attr_salvoOperator2StationZ" />
+
+            <input type="hidden" name="attr_salvoOperator3Name" />
+            <input type="hidden" name="attr_salvoOperator3StationA" />
+            <input type="hidden" name="attr_salvoOperator3StationZ" />
+
+            <input type="hidden" name="attr_salvoOperator4Name" />
+            <input type="hidden" name="attr_salvoOperator4StationA" />
+            <input type="hidden" name="attr_salvoOperator4StationZ" />
+
+            <input type="hidden" name="attr_salvoOperator5Name" />
+            <input type="hidden" name="attr_salvoOperator5StationA" />
+            <input type="hidden" name="attr_salvoOperator5StationZ" />
+
             <!--Operator Input Box-->
             <input type="hidden" class="colorChanger" name="attr_salvoOperatorShip" value="Choose Operator" />
             <div class="salvoOperatorBox preparationBox">
@@ -8566,7 +8591,7 @@
 <script type="text/worker">
     <!--<script type="text/javascript">-->
         /*Global Attributes*/
-        var globalAttributes = {};//Global Object for Storage of crewmember Attr
+        var globalAttributes = [];//Global Array for Storage of crewmember Attr
 
         //Store all crewmember attributes for use in the Ship's Salvo Mode'
         on("sheet:opened change:character_name change:StationA change:StationZ change:Culture change:Economy change:Interface change:Sophontolgy change:Athletics change:Fitness change:Geosciences change:Perception change:Pilot change:Biosciences change:FieldDynamics change:PulseProjection change:Inscription change:Mechatronics change:CultureAnthropology change:CultureHistory change:CultureLingustics change:EconomyAccounting change:EconomyCommerce change:EconomyTrade change:InterfaceComms change:InterfaceNetworkDefence change:InterfaceResearch change:PoliticAdministration change:PoliticGroupDynamics change:PoliticOratory change:SophontolgyInsight change:SophontolgyPerformance change:SophontolgyPersuasion change:AthleticsSneak change:AthleticsMelee change:AthleticsParkour change:FitnessMartialArts change:FitnessEndurance change:FitnessStrength change:GeosciencesArchitecture change:GeosciencesPlanetology change:GeosciencesMining change:PerceptionSurvey change:PerceptionAlertness change:PerceptionAnalysis change:PilotGravDrive change:PilotPulseDrive change:PilotArchaicVehicle change:BiosciencesMedicine change:BiosciencesBiomechanics change:BiosciencesAgriculture change:FieldDynamicsHolography change:FieldDynamicsShieldMechanics change:FieldDynamicsAstronavigation change:PulseProjectionAwayWeaponry change:PulseProjectionArtillery change:PulseProjectionTractorMechanics change:InscriptionHack change:InscriptionTrace change:InscriptionCode change:MechatronicsMechanics change:MechatronicsMaterialScience change:MechatronicsArchaicTechnology", (event) =>
@@ -8580,7 +8605,7 @@
                 if (values.nameplayer != "")
                 {
                     //Object to store crewmember attributes
-                    const crewAttr = {};
+                    const crewAttr = [];
 
                     //Crewmember ID
                     crewAttr.character_name = values.character_name;
@@ -8679,9 +8704,9 @@
         on("change:salvoskill", (event) =>
         {
             //console.log("Salvo Skill Changed");
-            getAttrs(["salvoSkill change:Culture change:Economy change:Interface change:Politic change:Sophontolgy",
-                "Athletics change:Fitness change:Geosciences change:Perception change:Pilot",
-                "Biosciences change:FieldDynamics change:PulseProjection change:Inscription change:Mechatronics"], function (values)
+            getAttrs(["salvoSkill", "Culture", "Economy", "Interface", "Politic", "Sophontolgy",
+                "Athletics","Fitness","Geosciences","Perception","Pilot",
+                "Biosciences","FieldDynamics","PulseProjection", "Inscription","Mechatronics"], function (values)
                 {
                     const setObj = {};
                     //Reset later set attr
@@ -9150,7 +9175,7 @@
         //Close Salvo Mode and spend Charge after roll
         on("change:spendchargeclosesalvo", (event) =>
         {
-            getAttrs(["ReactorCharge change:ReactorOvercharge change:salvoCharge"], function (values)
+            getAttrs(["ReactorCharge", "ReactorOvercharge","salvoCharge"], function (values)
             {
                 const setObj = {};
 
@@ -9174,8 +9199,12 @@
             const setObj = {};
 
             setObj.salvoMode = 0;
+            setObj.salvoModeShip = 0;
             setObj.salvoSkill = "Choose a Skill";
+            setObj.salvoSkillShip = "Select Skill";
+            setObj.salvoOperatorShip = "Choose Operator";
             setObj.salvoSkillRating = 0;
+            setObj.salvoSkillRatingShip = 0;
 
             console.log("Open", setObj);
             setAttrs(setObj);
@@ -9184,15 +9213,16 @@
         //Reset Salvo Mode
         on("change:salvomode", (event) =>
         {
-            getAttrs(["ReactorCharge change:ReactorOvercharge"], function (values)
+            getAttrs(["ReactorCharge", "ReactorOvercharge"], function (values)
             {
                 const setObj = {};
-
+                //Reset all the salvo basic attributes
                 setObj.salvoSkill = "Choose a Skill";
                 setObj.salvoSpecialty = "Choose a Specialty";
                 setObj.salvoTool = "Choose a Tool";
                 setObj.salvoAdvantage = 0;
 
+                //Reset the basic Reactor settings
                 setObj.salvoChargeDirection = "Charged";
 
                 if (values.ReactorOvercharge == "1")
@@ -9209,10 +9239,45 @@
             });
         });
 
+        //Reset Salvo Mode Ship
+        on("change:salvomodeship", (event) =>
+        {
+            getAttrs(["shipReactorCharge", "shipReactorOvercharge"], function (values)
+            {
+                const setObj = {};
+                //Reset all the salvo basic attributes
+                setObj.salvoOperatorShip = "Choose Operator";
+                setObj.salvoSkillShip = "Select Skill";
+                setObj.salvoSpecialtyShip = "Select Specialty";
+                setObj.salvoToolShip = "Choose a Tool";
+                setObj.salvoAdvantageShip = 0;
+
+                //Reset Operator List
+                //globalAttributes.forEach(character_name =>
+
+                //);
+
+                //Reset the basic Reactor settings
+                setObj.salvoChargeDirection = "Charged";
+
+                if (values.shipReactorOvercharge == "1")
+                {
+                    setObj.salvoChargeDirection = "Overcharged";
+                }
+                else if (values.shipReactorCharge <= 0)
+                {
+                    setObj.salvoChargeDirection = "Uncharged";
+                }
+
+                console.log("Reset", setObj);
+                setAttrs(setObj);
+            });
+        });
+
         //Reset salvoMods
         on("change:salvotool", (event) =>
         {
-            getAttrs(["ReactorCharge change:ReactorOvercharge"], function (values)
+            getAttrs(["ReactorCharge", "ReactorOvercharge"], function (values)
             {
                 const setObj = {};
 
@@ -9255,18 +9320,18 @@
         //Set the Salvo Tool Rating, track Charge spent, and limit spending to current ReactorCharge
         on("change:salvomod1 change:salvomod2 change:salvomod3 change:salvomod4 change:salvomod5 change:salvomod6 change:salvomod7 change:salvomod8 change:salvomod9 change:salvomod10 change:salvomod11 change:salvomod12 change:salvomod13 change:salvomod14 change:salvomod15 change:salvomod16 change:salvomod17 change:salvomod18 change:salvomod19 change:salvomod20", (event) =>
         {
-            getAttrs(["salvoTool change:ReactorCharge change:ReactorOvercharge",
-                "salvoMod1 change:salvoMod2 change:salvoMod3 change:salvoMod4 change:salvoMod5",
-                "salvoMod6 change:salvoMod7 change:salvoMod8 change:salvoMod9 change:salvoMod10",
-                "salvoMod11 change:salvoMod12 change:salvoMod13 change:salvoMod14 change:salvoMod15",
-                "salvoMod16 change:salvoMod17 change:salvoMod18 change:salvoMod19 change:salvoMod20",
-                "ScannerSurveySensor change:ScannerDepthAnalyser change:ScannerAreaEffect change:ScannerRangeCompensator",
-                "BioChemKitMedtool change:BioChemKitSampler change:BioChemKitIncubator",
-                "Trait_1 change:Trait_2 change:Trait_3 change:Trait_4 change:Trait_5",
-                "LinkCommBrowser change:LinkDevelopmentKit change:LinkHardening",
-                "MultitoolDisruptorTargeter change:MultitoolTractorLifter change:MultitoolUtilityManipulator",
-                "ShieldKineticDeflector change:ShieldEnergyDissipater change:ShieldHolographMode change:ShieldMultifield",
-                "AssociationsSpecies change:AssociationsWartimeFaction change:AssociationsFactionRating change:AssociationsFactionRatingA4 change:AssociationsFactionRatingA5 change:AssociationsFactionRatingA6 change:AssociationsFactionRatingA7 change:AssociationsFactionRatingA8 change:AssociationsFactionRatingA9 change:AssociationsFactionRatingA0 change:AssociationsFactionRatingB1 change:AssociationsFactionRatingB2 change:AssociationsFactionRatingB3 change:AssociationsFactionRatingB4 change:AssociationsFactionRatingB5 change:AssociationsFactionRatingB6 change:AssociationsFactionRatingB7 change:AssociationsFactionRatingB8 change:AssociationsFactionRatingB9 change:AssociationsFactionRatingB0"], function (values)
+            getAttrs(["salvoTool", "ReactorCharge", "ReactorOvercharge",
+                "salvoMod1", "salvoMod2", "salvoMod3", "salvoMod4", "salvoMod5",
+                "salvoMod6", "salvoMod7", "salvoMod8", "salvoMod9", "salvoMod10",
+                "salvoMod11", "salvoMod12", "salvoMod13", "salvoMod14", "salvoMod15",
+                "salvoMod16", "salvoMod17", "salvoMod18", "salvoMod19", "salvoMod20",
+                "ScannerSurveySensor", "ScannerDepthAnalyser", "ScannerAreaEffect", "ScannerRangeCompensator",
+                "BioChemKitMedtool", "BioChemKitSampler", "BioChemKitIncubator",
+                "Trait_1", "Trait_2", "Trait_3", "Trait_4", "Trait_5",
+                "LinkCommBrowser", "LinkDevelopmentKit", "LinkHardening",
+                "MultitoolDisruptorTargeter", "MultitoolTractorLifter", "MultitoolUtilityManipulator",
+                "ShieldKineticDeflector", "ShieldEnergyDissipater", "ShieldHolographMode", "ShieldMultifield",
+                "AssociationsSpecies", "AssociationsWartimeFaction", "AssociationsFactionRating", "AssociationsFactionRatingA4", "AssociationsFactionRatingA5", "AssociationsFactionRatingA6", "AssociationsFactionRatingA7", "AssociationsFactionRatingA8", "AssociationsFactionRatingA9", "AssociationsFactionRatingA0", "AssociationsFactionRatingB1", "AssociationsFactionRatingB2", "AssociationsFactionRatingB3", "AssociationsFactionRatingB4", "AssociationsFactionRatingB5", "AssociationsFactionRatingB6", "AssociationsFactionRatingB7", "AssociationsFactionRatingB8", "AssociationsFactionRatingB9", "AssociationsFactionRatingB0"], function (values)
                 {
                     const setObj = {};
 
@@ -10482,11 +10547,11 @@
         //Generate Salvo Macro
         on("change:salvoskill change:salvoskillrating change:salvospecialty change:salvospecialtyrating change:salvotool change:salvotoolrating change:salvoadvantage change:salvothreat", (event) =>
         {
-            getAttrs(["salvoSkill change:salvoSkillRating change:salvoSpecialty change:salvoSpecialtyRating change:salvoTool change:salvoToolRating change:salvoAdvantage change:salvoThreat change:salvoCharge"], function (values)
+            getAttrs(["salvoSkill", "salvoSkillRating", "salvoSpecialty", "salvoSpecialtyRating", "salvoTool", "salvoToolRating", "salvoAdvantage", "salvoThreat", "salvoCharge"], function (values)
             {
                 //Sum the task dice
                 let taskDice = 0;
-                ["salvoSkillRating change:salvoSpecialtyRating change:salvoToolRating change:salvoAdvantage"].forEach((asset) =>
+                ["salvoSkillRating", "salvoSpecialtyRating", "salvoToolRating", "salvoAdvantage"].forEach((asset) =>
                 {
                     taskDice += parseInt(values[asset]) || 0;
                 });
@@ -10551,7 +10616,7 @@
         //Reactor Overcharge control
         on("change:reactorcharge change:reactorovercharge change:shipreactorcharge change:shipReactorovercharge change:tugreactorcharge change:tugreactorovercharge", (event) =>
         {
-            getAttrs(["ReactorCharge change:portableReactor change:ReactorOvercharge change:shipReactorCharge change:shipReactor change:shipReactorOvercharge","tugReactorCharge change:tugReactor change:tugReactorOvercharge" ], function (values)
+            getAttrs(["ReactorCharge", "portableReactor", "ReactorOvercharge", "shipReactorCharge", "shipReactor", "shipReactorOvercharge","tugReactorCharge", "tugReactor", "tugReactorOvercharge" ], function (values)
             {
                 const setObj = {};
 
@@ -10617,7 +10682,7 @@
                 }*/
                 {
                     section: "shipCargo",
-                    fields: ["shipCargo change:shipCargoRV change:shipCargoTonnage"]
+                    fields: ["shipCargo", "shipCargoRV", "shipCargoTonnage"]
                 }
             ];
             getID(repeatingAttributes, useID);
@@ -10656,7 +10721,7 @@
                     let id = attributesToGet[0].id[i];
                     finalAttributeList = [...finalAttributeList, "repeating_" + attributesToGet[0].section + "_" + id + "_shipCargoTonnage"];
                 }
-                finalAttributeList = [...finalAttributeList, "supply change:complexMaterials","CargoTonnage"];
+                finalAttributeList = [...finalAttributeList, "supply", "complexMaterials","CargoTonnage"];
 
                 getAttrs(finalAttributeList, (attributeValues) =>
                 {
@@ -10691,7 +10756,7 @@
 
         /* Ship Configuration */
         const int = score => parseInt(score) || 0;
-        const gridposition = ["03 change:04 change:05 change:11 change:12 change:13 change:14 change:15 change:16 change:17 change:21 change:22 change:23 change:24 change:25 change:26 change:27 change:31 change:32 change:33 change:34 change:35 change:36 change:37 change:41 change:42 change:43 change:44 change:45 change:46 change:47 change:51 change:52 change:53 change:54 change:55 change:56 change:57 change:61 change:62 change:63 change:64 change:65 change:66 change:67 change:71 change:72 change:73 change:74 change:75 change:76 change:77 change:81 change:82 change:83 change:84 change:85 change:86 change:87 change:91 change:92 change:93 change:94 change:95 change:96 change:97"];
+        const gridposition = ["03", "04", "05", "11", "12", "13", "14", "15", "16", "17", "21", "22", "23", "24", "25", "26", "27", "31", "32", "33", "34", "35", "36", "37", "41", "42", "43", "44", "45", "46", "47", "51", "52", "53", "54", "55", "56", "57", "61", "62", "63", "64", "65", "66", "67", "71", "72", "73", "74", "75", "76", "77", "81", "82", "83", "84", "85", "86", "87", "91", "92", "93", "94", "95", "96", "97"];
 
         // bow changes
         gridposition.forEach(cell =>
