@@ -7,6 +7,7 @@
 ### Fixed
 
 - Fix a bug where the strength bonus was not added to attack rolls
+- Fix a bug where new characters would have AC of 0
 
 ## 1.5.0
 
