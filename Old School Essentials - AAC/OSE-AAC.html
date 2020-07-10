@@ -1304,33 +1304,15 @@
     });
   });
 
-  // Set weaponAttributeBonus and weaponAttributeBonusDamage
-  on('change:repeating_weapons:attackType', function(event) {
-    const attackType = event.newValue;
-    getAttrs(["BonusSTR", "BonusDEX"], function(values) {
-      if (attackType == "ranged") {
-        setAttrs({
-          repeating_weapons_weaponAttributeBonus: values.BonusDEX,
-          repeating_weapons_weaponAttributeBonusDamage: 0
-        })
-      } else {
-        setAttrs({
-          repeating_weapons_weaponAttributeBonus: values.BonusSTR,
-          repeating_weapons_weaponAttributeBonusDamage: values.BonusSTR
-        })
-      }
-    })
-  });
-
   // Update weaponAttributeBonus and weaponAttributeBonusDamage when STR or DEX changes
-  on('change:str change:dex', function() {
+  on('change:repeating_weapons:attackType change:str change:dex', function() {
     getSectionIDs("repeating_weapons", function(idArray) {
       idArray.forEach(function(id) {
         const attributes = ["attackType"]
           .map(name => `repeating_weapons_${id}_${name}`)
           .concat(['BonusSTR', 'BonusDEX']) ;
         getAttrs(attributes, function(values) {
-          if (values[`repeating_weapons_${id}_attackType`] === 'Ranged') {
+          if (values[`repeating_weapons_${id}_attackType`] === 'ranged') {
             setAttrs({
               [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
               [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: '0'
