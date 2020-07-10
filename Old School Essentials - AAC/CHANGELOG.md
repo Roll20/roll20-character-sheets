@@ -2,6 +2,12 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.5.1
+
+### Fixed
+
+- Fix a bug where the strength bonus was not added to attack rolls
+
 ## 1.5.0
 
 ### Added

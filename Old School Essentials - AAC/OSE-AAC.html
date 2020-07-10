@@ -1059,13 +1059,21 @@
       idArray.forEach(function(id) {
         const attributes = ["attackType", "weaponAttributeBonusDamage"]
           .map(name => `repeating_weapons_${id}_${name}`)
-          .push('BonusStr');
+          .concat(['BonusSTR', 'BonusDEX']) ;
         getAttrs(attributes, function(values) {
           if (!values[`repeating_weapons_${id}_attackType`]) {
             if (values.BonusSTR !== 0 && values[`repeating_weapons_${id}_weaponAttributeBonusDamage`] === 0) {
-              setAttrs({ [`repeating_weapons_${id}_attackType`]: "Ranged" })
+              setAttrs({
+                [`repeating_weapons_${id}_attackType`]: "Ranged",
+                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
+                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: '0'
+              });
             } else {
-              setAttrs({ [`repeating_weapons_${id}_attackType`]: "Melee" })
+              setAttrs({
+                [`repeating_weapons_${id}_attackType`]: "Melee",
+                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
+                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR
+              });
             }
           }
         });
@@ -1300,7 +1308,6 @@
   on('change:repeating_weapons:attackType', function(event) {
     const attackType = event.newValue;
     getAttrs(["BonusSTR", "BonusDEX"], function(values) {
-      console.log(values)
       if (attackType == "ranged") {
         setAttrs({
           repeating_weapons_weaponAttributeBonus: values.BonusDEX,
@@ -1313,7 +1320,31 @@
         })
       }
     })
-  })
+  });
+
+  // Update weaponAttributeBonus and weaponAttributeBonusDamage when STR or DEX changes
+  on('change:str change:dex', function() {
+    getSectionIDs("repeating_weapons", function(idArray) {
+      idArray.forEach(function(id) {
+        const attributes = ["attackType"]
+          .map(name => `repeating_weapons_${id}_${name}`)
+          .concat(['BonusSTR', 'BonusDEX']) ;
+        getAttrs(attributes, function(values) {
+          if (values[`repeating_weapons_${id}_attackType`] === 'Ranged') {
+            setAttrs({
+              [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
+              [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: '0'
+            });
+          } else {
+            setAttrs({
+              [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
+              [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR
+            });
+          }
+        });
+      });
+    });
+  });
 
   // Set saving throws, BAB, THAC0, HD, Next Level Experience
   on('change:level change:class change:monsterhitdice change:monsterhitdicemodifier', function() {
