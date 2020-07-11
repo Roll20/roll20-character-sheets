@@ -6,7 +6,7 @@
             <button type='action' name='act_xp'><span style="font-family: 'Pictos'">r</span></button>
         </div>
         <div class="col">
-            <label>Real Name:</label><input type="text" name="attr_real_name" />
+            <label>Real Name:</label><input type="text" name="attr_real_name" /> <br />
             <label>XP:</label> <input type="number" class="sheet-short" name="attr_xp" />
         </div>
     </div>
@@ -27,7 +27,11 @@
             <button type='roll' name='roll_ego_attack'
                 value='&{template:default} {{name=@{character_name}}} {{Hits Defender EGO=[[11 + @{ego} - 3d6]]}}'>Attack</button>
             <br />
-            <label>SPD</label> <input type="number" name="attr_spd" /><br />
+            <label>SPD</label> <input type="number" name="attr_spd" /> <input type="hidden" name="attr_phases" />
+            <button type='roll' class='blank-roll-button' name='quote_front'
+                    value='&{template:default} {{name=@{character_name}}} {{DEX=@{dex}}} {{EGO=@{ego}}} {{SPD=@{spd}}} {{Phases=@{phases}}}'>
+                <span style="font-family: 'Pictos'">w</span>
+            </button> <br />
             <label>STR</label> <input type="number" name="attr_str" />
             <button type='roll' name='roll_str'
                 value='&{template:default} {{name=@{character_name}}} {{STR Effect=[[@{str}d6]]}} {{Knockback=[[1d6]]}}'></button><br />
@@ -107,9 +111,36 @@
         });
     }
 
+    function recover(amount) {
+        getAttrs(['end', 'end_max', 'ko', 'ko_max'], (v) => {
+            const new_end = Math.min(parseInt(v['end_max']), Math.max(0, parseInt(v['end']) + amount));
+            const new_ko = Math.min(parseInt(v['ko_max']), Math.max(0, parseInt(v['ko']) + amount));
+            setAttrs({
+                ['end']: new_end,
+                ['ko']: new_ko
+            });
+        });
+    }
+
+    on('change:spd', () => {
+        getAttrs(['spd'], (v) => {
+            const speedChart = [
+                '4',
+                '3, 5',
+                '2, 4, 6',
+                '1, 3, 5, 6',
+                '1, 2, 4, 5, 6',
+                '1, 2, 3, 4, 5, 6'
+            ];
+            setAttrs({
+                'phases': speedChart[parseInt(v['spd']) - 1] || "SPD must be between 1-6"
+            });
+        })
+    })
+
     on('change:body_max', () => {
-        getAttrs(['body_max'], function(values) {
-            const body = values.body_max
+        getAttrs(['body_max'], (v) => {
+            const body = v.body_max
             setAttrs({
                 'rec': body,
                 'stun': body,
@@ -121,7 +152,7 @@
 
     on('clicked:recover', (eventInfo) => {
         getAttrs(['rec'], (v) => {
-            spend_end(-v['rec']);
+            recover(parseInt(v['rec']))
         })
     });
 
@@ -154,9 +185,12 @@
                     let totalcost = 0;
                     for(let i = 0; i < attrs.length; i++) {
                         let attrname = attrs[i];
-                        let attrvalue = v[attrname];
+                        let attrvalue = parseInt(v[attrname]) || 0;
                         let attrcostmap = costmap[attrname] || [1, 0];
                         let attrcost = (parseInt(attrvalue) - attrcostmap[1]) * attrcostmap[0];
+                        if (attrname.startsWith('repeating_disads_')) {
+                            attrcost = -Math.abs(attrcost);
+                        }
                         console.log(`Attribute: ${attrname} Cost: ${attrcost}`);
                         totalcost = totalcost + attrcost;
                     }
