@@ -133,7 +133,7 @@
                 </tr>
                 <tr>
                     <td rowspan="3" class="rollcontainer">
-                        <button type="roll" class="rollstyle sheet" name="roll_sheet" value="&{template:wod} {{name=@{character_name}}} {{rollHtml=@{roll_html}}} {{mod=[[?{@{modifiermacro}|0}]]}} {{woundpenalty=[[@{wound_penalty}]]}} {{result=[[{((?{@{modifiermacro}|0}+@{wound_penalty}+@{roll_pool})@{rolltype}"></button>
+                        <button type="roll" class="rollstyle sheet" name="roll_sheet" value="&{template:wod} {{name=@{character_name}}} {{dicePool=@{dice_pool}}} {{dicePoolHtml=@{dice_pool_html}}} {{mod=[[?{@{modifiermacro}|0}]]}} {{woundpenalty=[[@{wound_penalty}]]}} {{result=[[{((?{@{modifiermacro}|0}+@{wound_penalty}+@{dice_pool})@{rolltype}"></button>
                         <button type="roll" class="rollstyle attack" name="roll_attack" value="&{template:wod-attack} {{name=@{character_name}}} {{strength=@{strength}}} {{dexterity=@{dexterity}}} {{brawl=@{brawl}}} {{weaponry=@{weaponry}}} {{firearms=@{firearms}}} {{athletics=@{athletics}}} {{mod=[[?{@{modifiermacro}|0}]]}} {{woundpenalty=[[@{wound_penalty}]]}} {{wpen=[[@{weapon_penalty}]]}} {{apen=[[@{armor_penalty}]]}} @{attack}@{rolltype}"></button>
                         <button type="roll" class="rollstyle simple" name="roll_simple" value="&{template:wod-simple} {{name=@{character_name}}} {{option=?{@{dicepoolmacro}|0}}} {{result=[[{(?{@{dicepoolmacro}|1}@{rolltype}"></button>
                     </td>
@@ -2887,9 +2887,9 @@
     <input type="hidden" name="attr_armor_penalty" value="0" />
     <input type="hidden" name="attr_wound_penalty" value="0" />
     <input type="hidden" name="attr_defense_base" />
-    <input type="hidden" name="attr_roll_stats" value="{}" />
-    <input type="hidden" name="attr_roll_html" value="" />
-    <input type="hidden" name="attr_roll_pool" value="0" />
+    <input type="hidden" name="attr_dice_pool_attributes" value="" />
+    <input type="hidden" name="attr_dice_pool_html" value="" />
+    <input type="hidden" name="attr_dice_pool" value="0" />
     <input type="hidden" name="attr_rolltype" value=")d10!cs>10}>8]]}}" />
     <!-- Translation handles for sheetworkers -->
     <span style="display: none" data-i18n="dice-pool">Dice Pool</span>
@@ -2907,10 +2907,10 @@
     <!-- ROLL TEMPLATES -->
     <rolltemplate class="sheet-rolltemplate-wod">
         <table>
-            <tr><th>{{name}} <span data-i18n="rolls">rolls</span>{{#roll_name}} {{roll_name}}{{/roll_name}}</th></tr>
+            <tr><th>{{name}} <span data-i18n="rolls">rolls</span> {{dicePool}}</th></tr>
             <tr>
                 <td>
-                    {{rollHtml}}
+                    {{dicePoolHtml}}
                     {{#^rollTotal() woundpenalty 0}}
                     <div>
                         <span data-i18n="wound">Wound</span> <span data-i18n="penalty">Penalty</span>({{woundpenalty}})
@@ -3124,7 +3124,7 @@
             on(`change:${attr}`, (eventInfo) => {
                 const source = eventInfo.sourceAttribute;
 
-                updateSheetRollPool(source);
+                updateDicePool();
     
                 if (["resolve", "composure"].includes(source)) {
                     updateWillpower();
@@ -3156,7 +3156,7 @@
     
             // Toggle roll selections
             on(`clicked:${attr}`, () => {
-                updateSheetRoll(attr);
+                updateDicePoolAttributes(attr);
             });
         });
     
@@ -3509,104 +3509,103 @@
             }
         }
 
-        var updateSheetRoll = function(attribute) {
-            getAttrs(["roll_stats", attribute, "sheettype"], (v) => {
+        var updateDicePoolAttributes = function(attribute) {
+            getAttrs([...allStats, "dice_pool_attributes", "sheettype"], (v) => {
                 // Update roll stats collection
-                let rollStats = tryParse(v["roll_stats"]);
-                if (!Array.isArray(rollStats)) {
-                    rollStats = [];
-                }
+                let poolAttributes = v["dice_pool_attributes"]
+                    .split(",")
+                    .filter((poolAttribute) => poolAttribute);
 
-                if (rollStats.find((stat) => stat.attribute === attribute)) {
+                if (poolAttributes.includes(attribute)) {
                     // Remove attribute from roll
-                    rollStats = rollStats.filter((stat) => stat.attribute !== attribute);
+                    poolAttributes = poolAttributes.filter((poolAttribute) => poolAttribute !== attribute);
                 }
                 else {
                     // Add attribute to roll
-                    rollStats = rollStats.concat({ 
-                        attribute,
-                        type: getAttributeType(attribute),
-                        value: Number(v[attribute]) || getUnskilledPenalty(attribute)
-                    });
-                    // Cap stats by category
-                    rollStats = rollStats.filter((stat) => stat.type === "attribute").reverse().slice(0, 2).reverse()
-                        .concat(rollStats.filter((stat) => stat.type === "skill").reverse().slice(0, 1).reverse())
-                        .concat(rollStats.filter((stat) => stat.type === "power").reverse().slice(0, 1).reverse())
-                        .concat(rollStats.filter((stat) => stat.type === "potency").reverse().slice(0, 1).reverse());
+                    poolAttributes = poolAttributes.concat(attribute);
+
+                    // Cap stats by type
+                    const poolAttributeTypes = poolAttributes
+                        .map((poolAttribute) => ({ poolAttribute, type: getAttributeType(poolAttribute) }));
+                    poolAttributes = poolAttributeTypes.filter((x) => x.type === "attribute").reverse().slice(0, 2).reverse()
+                        .concat(poolAttributeTypes.filter((x) => x.type === "skill").reverse().slice(0, 1).reverse())
+                        .concat(poolAttributeTypes.filter((x) => x.type === "power").reverse().slice(0, 1).reverse())
+                        .concat(poolAttributeTypes.filter((x) => x.type === "potency").reverse().slice(0, 1).reverse())
+                        .map((x) => x.poolAttribute);
                 }
 
                 // Create HTML for roll template
-                const rollHtml = getSheetRollHtml(rollStats, v.sheettype);
+                const dicePoolHtml = getSheetDicePoolHtml(poolAttributes, v);
 
                 // Create dice pool for roll
-                const rollPool = getSheetRollPool(rollStats);
+                const dicePool = getSheetDicePool(poolAttributes, v);
+                console.log("pool", dicePool);
 
                 // Create display for dice roller
-                const rollDisplay = rollStats
-                    .map((stat) => stat.type === "potency" ? getTranslationByKey(potencyTranslationKeys[v.sheettype]) : getTranslationByKey(stat.attribute))
+                const rollDisplay = poolAttributes
+                    .map((poolAttribute) => getAttributeTranslation(poolAttribute, v.sheettype))
                     .join(" +\n");
 
                 // Determine flag values
-                const selectedStats = rollStats
-                    .map((stat) => stat.attribute);
-                const setFlags = allStats
-                    .filter((stat) => selectedStats.includes(stat))
-                    .map((stat) => `${stat}_flag`)
-                    .reduce((all, flag) => ({ ...all, [flag]: 1 }), {});
-                const clearFlags = allStats
-                    .filter((stat) => !selectedStats.includes(stat))
-                    .map((stat) => `${stat}_flag`)
-                    .reduce((all, flag) => ({ ...all, [flag]: 0 }), {});
+                const flags = allStats
+                    .map((flagAttribute) => ({
+                        "flag": `${flagAttribute}_flag`,
+                        "value": poolAttributes.includes(flagAttribute) ? 1 : 0
+                    }))
+                    .reduce((all, next) => ({ ...all, [next.flag]: next.value }), {});
 
                 setAttrs({
-                    ["roll_stats"]: JSON.stringify(rollStats),
-                    ["roll_html"]: rollHtml,
-                    ["roll_pool"]: rollPool,
+                    ["dice_pool_attributes"]: poolAttributes.join(","),
+                    ["dice_pool_html"]: dicePoolHtml,
+                    ["dice_pool"]: dicePool,
                     ["rolldisplay"]: rollDisplay,
-                    ...setFlags,
-                    ...clearFlags
+                    ...flags,
                 });
             });
         }
 
-        var updateSheetRollPool = function() {
-            getAttrs([...allStats, "roll_stats"], (v) => {
-                let rollStats = tryParse(v["roll_stats"]);
-                if (!Array.isArray(rollStats)) {
-                    rollStats = [];
-                }
+        var updateDicePool = function() {
+            getAttrs([...allStats, "dice_pool_attributes", "sheettype"], (values) => {
+                const poolAttributes = values["dice_pool_attributes"].split(",");
 
-                rollStats = rollStats
-                    .map((stat) => ({
-                        ...stat,
-                        value: Number(v[stat.attribute]) || getUnskilledPenalty(stat.attribute)
-                    }));
-                    console.log(rollStats);
-                const rollHtml = getSheetRollHtml(rollStats);
-                const rollPool = getSheetRollPool(rollStats);
+                const dicePoolHtml = getSheetDicePoolHtml(poolAttributes, values);
+                const dicePool = getSheetDicePool(poolAttributes, values);
 
                 setAttrs({
-                    ["roll_stats"]: JSON.stringify(rollStats),
-                    ["roll_html"]: rollHtml,
-                    ["roll_pool"]: rollPool
+                    ["dice_pool_html"]: dicePoolHtml,
+                    ["dice_pool"]: dicePool
                 });
             });
         }
 
-        var getSheetRollHtml = function(rollStats, sheettype) {
-            return rollStats
-                .map((stat) => ({
-                    label: stat.type === "potency" ? getTranslationByKey(potencyTranslationKeys[sheettype]) : getTranslationByKey(stat.attribute),
-                    value: stat.value
+        var getSheetDicePoolHtml = function(poolAttributes, values) {
+            return poolAttributes
+                .map((poolAttribute) => ({
+                    label: getAttributeTranslation(poolAttribute, values["sheettype"]),
+                    value: getAttributePool(poolAttribute, values)
                 }))
                 .map((stat) => `<div>${stat.label} (${stat.value})</div>`)
                 .join("");
         }
 
-        var getSheetRollPool = function(rollStats) {
-            return rollStats
-                .map((stat) => stat.value)
-                .reduce((sum, value) => sum + value, 0);
+        var getAttributeTranslation = function(attribute, sheettype) {
+            const translationKey = getAttributeType(attribute) === "potency"
+                ? potencyTranslationKeys[sheettype]
+                : attribute;
+
+            return getTranslationByKey(translationKey);
+        }
+
+        var getAttributePool = function(attribute, values) {
+            return Number(values[attribute]) || getUnskilledPenalty(attribute);
+        }
+
+        var getSheetDicePool = function(poolAttributes, values) {
+            const sum = poolAttributes
+                .map((poolAttribute) => getAttributePool(poolAttribute, values))
+                .reduce((sum, value) => sum + value, 0)
+            
+            return Math.max(sum, 1);
         }
     
         var updateHealth = function() {
@@ -3906,9 +3905,9 @@
                 .reduce((attrs, flag) => ({ ...attrs, [flag]: "" }), {});
             
             return {
-                ["roll_stats"]: "[]",
-                ["roll_html"]: "",
-                ["roll_pool"]: 0,
+                ["dice_pool_attributes"]: "",
+                ["dice_pool_html"]: "",
+                ["dice_pool"]: 0,
                 ["rolldisplay"]: "",
                 ...flagValues
             };
