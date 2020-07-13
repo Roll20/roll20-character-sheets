@@ -2,6 +2,14 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.5.1
+
+### Fixed
+
+- Fix a bug where the strength bonus was not added to attack rolls
+- Fix a bug where new characters would have AC of 0
+- Fix armor calculation code to account for worn armor
+
 ## 1.5.0
 
 ### Added
