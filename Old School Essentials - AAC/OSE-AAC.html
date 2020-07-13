@@ -1,7 +1,11 @@
+<!-- Deprecated Attributes -->
+<input type="hidden" name="attr_thresholdModifierEnabled" value="enabled" />
+
 <!-- Hidden Inputs -->
 <input type="hidden" name="attr_BonusSTR" value="0" />
 <input type="hidden" name="attr_BonusDEX" value="0" />
-<input type="hidden" name="attr_ArmorBenefitTotal" value="0" />
+<input type="hidden" name="attr_ArmorTotal" value="0" />
+<input type="hidden" name="attr_ArmorWornTotal" value="0" />
 <input type="hidden" name="attr_ArmorWeightTotal" value="0" />
 <input type="hidden" name="attr_ItemWeightTotal" value="0" />
 <input type="hidden" name="attr_WeaponWeightTotal" value="0" />
@@ -37,28 +41,38 @@
         <label class="inline-flex">
           <span data-i18n="class">Class</span>
           <select name="attr_class">
-            <option>Cleric</option>
-            <option>Dwarf</option>
-            <option>Elf</option>
-            <option>Fighter</option>
-            <option>Halfling</option>
-            <option>Magic-User</option>
-            <option>Thief</option>
-            <option>Acrobat</option>
-            <option>Assassin</option>
-            <option>Barbarian</option>
-            <option>Bard</option>
-            <option>Drow</option>
-            <option>Druid</option>
-            <option>Duergar</option>
-            <option>Gnome</option>
-            <option>Half-Elf</option>
-            <option>Half-Orc</option>
-            <option>Illusionist</option>
-            <option>Knight</option>
-            <option>Paladin</option>
-            <option>Ranger</option>
-            <option>Svirfneblin</option>
+            <optgroup label="Classic Fantasy" data-i18n-label="classic-fantasy">
+              <option>Cleric</option>
+              <option>Dwarf</option>
+              <option>Elf</option>
+              <option>Fighter</option>
+              <option>Halfling</option>
+              <option>Magic-User</option>
+              <option>Thief</option>
+            </optgroup>
+            <optgroup label="Advanced Fantasy" data-i18n-label="advanced-fantasy">
+              <option>Acrobat</option>
+              <option>Assassin</option>
+              <option>Barbarian</option>
+              <option>Bard</option>
+              <option>Drow</option>
+              <option>Druid</option>
+              <option>Duergar</option>
+              <option>Gnome</option>
+              <option>Half-Elf</option>
+              <option>Half-Orc</option>
+              <option>Illusionist</option>
+              <option>Knight</option>
+              <option>Paladin</option>
+              <option>Ranger</option>
+              <option>Svirfneblin</option>
+            </optgroup>
+            <optgroup label="Dolmenwood" data-i18n-label="dolmenwood">
+              <option>The Elf</option>
+              <option>Grimalkin</option>
+              <option>Moss Dwarf</option>
+              <option>Woodgrue</option>
+            </optgroup>
             <option>Monster</option>
             <option>Normal Human</option>
             <option>Custom</option>
@@ -372,7 +386,6 @@
     <div class="weapons-grid">
       <span></span>
       <span data-i18n="name">Name</span>
-      <span data-i18n="attribute">Attribute</span>
       <span data-i18n="typeofattack">Type of Attack</span>
       <span data-i18n="attack-modifier">+Attack</span>
       <span data-i18n="damage-die">Damage Die</span>
@@ -380,6 +393,8 @@
       <span data-i18n="weight">Weight</span>
     </div>
     <fieldset class="repeating_weapons">
+      <input type="hidden" name="attr_weaponAttributeBonus" value="0" />
+      <input type="hidden" name="attr_weaponAttributeBonusDamage" value="0" />
       <input class="expand" type="checkbox" name="attr_expandWeapon" data-i18n-title="expand-collapse"
         title="Expand/Collapse" /><span></span>
       <div class="weapons-grid">
@@ -387,19 +402,15 @@
           <input type="hidden" name="attr_armorClassType" value="aac">
           <!-- AAC Attack -->
           <button type="roll" class="attack-roll attack-roll-aac"
-            value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{bab}+@{optionalModQuery}]]}} {{damage=[[{[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]], 1}kh1]]}} {{description=@{weaponDescription}}}"></button>
+            value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{bab}+@{optionalModQuery}]]}} {{damage=[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]]}} {{description=@{weaponDescription}}}"></button>
           <!-- DAC Attack (no BAB added) -->
           <button type="roll" class="attack-roll attack-roll-dac"
-            value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{optionalModQuery}]]}} {{damage=[[{[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]], 1}kh1]]}} {{description=@{weaponDescription}}}"></button>
+            value="&{template:simple} {{roll=Attack with @{weaponName}}} {{attack=[[1d20+@{weaponAttributeBonus}+@{weaponAttackBonus}+@{optionalModQuery}]]}} {{damage=[[@{weaponDamageDie}+@{weaponDamageBonus}+@{weaponAttributeBonusDamage}]]}} {{description=@{weaponDescription}}}"></button>
         </div>
         <input type="text" name="attr_weaponName" placeholder="Weapon" />
-        <select name="attr_weaponAttributeBonus">
-          <option selected value="[[@{BonusSTR}]]">Strength</option>
-          <option value="[[@{BonusDEX}]]">Dexterity</option>
-        </select>
-        <select name="attr_weaponAttributeBonusDamage">
-          <option selected value="[[@{BonusSTR}]]">Melee</option>
-          <option value="0">Ranged</option>
+        <select name="attr_attackType">
+          <option value="melee">Melee</option>
+          <option value="ranged">Ranged</option>
         </select>
         <input type="number" name="attr_weaponAttackBonus" value="0" />
         <select name="attr_weaponDamageDie" class="half-input">
@@ -473,16 +484,17 @@
       <h2>Armor</h2>
       <div class="armor-grid">
         <span data-i18n="name">Name</span>
-        <span data-i18n="armor-benefit">AC Benefit</span>
+        <span data-i18n="armor-class-abbr">AC</span>
         <span data-i18n="armor-weight">Armor Weight</span>
         <span data-i18n="worn-question">Worn?</span>
       </div>
       <div class="sheet-armor sheet-repeat">
         <fieldset class="repeating_armor">
+          <input type="hidden" name="attr_armorBenefit" />
           <div class="armor-grid">
             <input type="text" name="attr_armorName" placeholder="Leather"
               data-i18n-placeholder="armor-name-placeholder" />
-            <input type="text" name="attr_armorBenefit" placeholder="2" />
+            <input type="text" name="attr_armorValue" placeholder="12" />
             <input type="number" name="attr_armorWeight" placeholder="200" />
             <div class="checkbox">
               <input type="checkbox" checked name="attr_armorWorn" />
@@ -545,31 +557,49 @@
         <option>Monster</option>
         <option>Normal Human</option>
         <option>Custom</option>
-        <option>Cleric</option>
-        <option>Dwarf</option>
-        <option>Elf</option>
-        <option>Fighter</option>
-        <option>Halfling</option>
-        <option>Magic-User</option>
-        <option>Thief</option>
-        <option>Acrobat</option>
-        <option>Assassin</option>
-        <option>Barbarian</option>
-        <option>Bard</option>
-        <option>Drow</option>
-        <option>Druid</option>
-        <option>Duergar</option>
-        <option>Gnome</option>
-        <option>Half-Elf</option>
-        <option>Half-Orc</option>
-        <option>Illusionist</option>
-        <option>Knight</option>
-        <option>Paladin</option>
-        <option>Ranger</option>
-        <option>Svirfneblin</option>
+        <optgroup label="Classic Fantasy" data-i18n-label="classic-fantasy">
+          <option>Cleric</option>
+          <option>Dwarf</option>
+          <option>Elf</option>
+          <option>Fighter</option>
+          <option>Halfling</option>
+          <option>Magic-User</option>
+          <option>Thief</option>
+        </optgroup>
+        <optgroup label="Advanced Fantasy" data-i18n-label="advanced-fantasy">
+          <option>Acrobat</option>
+          <option>Assassin</option>
+          <option>Barbarian</option>
+          <option>Bard</option>
+          <option>Drow</option>
+          <option>Druid</option>
+          <option>Duergar</option>
+          <option>Gnome</option>
+          <option>Half-Elf</option>
+          <option>Half-Orc</option>
+          <option>Illusionist</option>
+          <option>Knight</option>
+          <option>Paladin</option>
+          <option>Ranger</option>
+          <option>Svirfneblin</option>
+        </optgroup>
+        <optgroup label="Dolmenwood" data-i18n-label="dolmenwood">
+          <option>The Elf</option>
+          <option>Grimalkin</option>
+          <option>Moss Dwarf</option>
+          <option>Woodgrue</option>
+        </optgroup>
       </select>
       <input type="hidden" name="attr_savesAs" value="character" />
       <input type="number" name="attr_level" value="1" />
+    </label>
+    <label class="inline-flex">
+      <button type="roll" data-i18n="hit-dice-number-abbr" title="Hit Dice" data-i18n-title="hit-dice-number"
+        value="/w gm &{template:simple} {{roll=HP for @{character_name}}} {{result=[[@{monsterHitDice}d8+@{monsterHitDiceModifier}]]}}">#
+        HD</button>
+      <input type="number" name="attr_monsterHitDice" value="1" />
+      <span>+</span>
+      <input type="number" name="attr_monsterHitDiceModifier" value="0" />
     </label>
     <label class="inline-flex">
       <span data-i18n="alignment-abbr">AL</span>
@@ -611,14 +641,6 @@
     <div class="roll monster-combat">
       <div>
         <div class="flex hp">
-          <label class="inline-flex">
-            <button type="roll" data-i18n="hit-dice-number-abbr" title="Hit Dice" data-i18n-title="hit-dice-number"
-              value="/w gm &{template:simple} {{roll=HP for @{character_name}}} {{result=[[@{monsterHitDice}d8+@{monsterHitDiceModifier}]]}}">#
-              HD</button>
-            <input type="number" name="attr_monsterHitDice" value="1" />
-            <span>+</span>
-            <input type="number" name="attr_monsterHitDiceModifier" value="0" />
-          </label>
           <label class="inline-flex">
             <button type="action" name="act_setAverageHP" class="double" data-i18n="hit-points-average">Average
               HP</button>
@@ -819,17 +841,26 @@
     </select>
   </label>
   <label class="setting">
-    <span data-i18n="threshold-modifier-enabled">Threshold Modifier Enabled?</span>
-    <select name="attr_thresholdModifierEnabled">
+    <span data-i18n="situational-bonus-enabled">Situational Bonus Enabled?</span>
+    <select name="attr_situationalBonusEnabled">
       <option value="enabled" selected data-i18n="enabled">Enabled</option>
       <option value="disabled" data-i18n="disabled">Disabled</option>
     </select>
   </label>
+
+  <h1 data-i18n="about">About</h1>
+  <p data-i18n="about-description">If you have any suggestions or problems with the character sheet, please reach out.
+  </p>
+  <ul>
+    <li><span data-i18n="submit-issue">Submit a feature request or bug</span>:
+      https://github.com/wesbaker/roll20-character-sheets/issues/new</li>
+    <li><span data-i18n="email-us">Email us with comments or questions</span>: webdev@necroticgnome.com</li>
+  </ul>
 </div>
 
 <!-- Attack roll translation -->
 <span style="display: none;" data-i18n="typeofattack">Type of attack</span>
-<span style="display: none;" data-i18n="modifier">Threshold modifier</span>
+<span style="display: none;" data-i18n="modifier">Situational Bonus</span>
 <span style="display: none;" data-i18n="modifier-mod">Modif</span>
 <span style="display: none;" data-i18n="attack">Attack</span>
 <span style="display: none;" data-i18n="attack">Damage</span>
@@ -851,7 +882,7 @@
 <span style="display: none;" data-i18n="spells-rods-staves-full">Spells, rods or staves</span>
 <span style="display: none;" data-i18n="listen-at-door-full">Listen at door</span>
 <span style="display: none;" data-i18n="open-stuck-door-full">Open stuck door</span>
-<span style="display: none;" data-i18n="find-secret-room-full">Find secret room</span>
+<span style="display: none;" data-i18n="find-secret-door-full">Find secret door</span>
 <span style="display: none;" data-i18n="find-room-trap-full">Find room trap</span>
 
 <rolltemplate class="sheet-rolltemplate-simple">
@@ -869,6 +900,16 @@
     {{#description}}
     <div class="sheet-template-description">{{description}}</div>
     {{/description}}
+
+    <!-- Attack Specific -->
+    {{#attack}}
+    {{#rollWasCrit() attack}}
+    <span class="sheet-template-result-only fullcrit" data-i18n="critical-hit">Critical Miss!</span>
+    {{/rollWasCrit() attack}}
+    {{#rollWasFumble() attack}}
+    <span class="sheet-template-result-only fullfail" data-i18n="critical-miss">Critical Hit!</span>
+    {{/rollWasFumble() attack}}
+    {{/attack}}
 
     <!-- Morale Specific -->
     {{#rollGreater() morale 0}}
@@ -999,10 +1040,77 @@
     });
   };
 
-  on("sheet:opened change:thresholdModifierEnabled", function (eventInfo) {
+  on("sheet:opened", function() {
+    // Populate new attributes from existing attributes
+    const changedAttributes = [
+      "thresholdModifierEnabled",
+      "situationalBonusEnabled"
+    ];
+    getAttrs(changedAttributes, function(values) {
+      if (!values.situationalBonusEnabled) {
+        setAttrs({
+          situationalBonusEnabled: values.thresholdModifierEnabled
+        });
+      }
+    });
+
+    // Set attackType based on heuristics of the bonus damage (0 for ranged, otherwise STR bonus)
+    getSectionIDs("repeating_weapons", function(idArray) {
+      idArray.forEach(function(id) {
+        const attributes = ["attackType", "weaponAttributeBonusDamage"]
+          .map(name => `repeating_weapons_${id}_${name}`)
+          .push('BonusStr');
+        getAttrs(attributes, function(values) {
+          if (!values[`repeating_weapons_${id}_attackType`]) {
+            if (values.BonusSTR !== 0 && values[`repeating_weapons_${id}_weaponAttributeBonusDamage`] === 0) {
+              setAttrs({ [`repeating_weapons_${id}_attackType`]: "Ranged" })
+            } else {
+              setAttrs({ [`repeating_weapons_${id}_attackType`]: "Melee" })
+            }
+          }
+        });
+      });
+    });
+
+    // Set armorValue per armorBenefit if >= 2
+    getSectionIDs("repeating_armor", function(idArray) {
+      idArray.forEach(function(id) {
+        const attributes = ['armorBenefit', 'armorValue']
+          .map(attr => `repeating_armor_${id}_${attr}`)
+          .push('armorClassType');
+        getAttrs(attributes, function(values) {
+          const armorValue = values[`repeating_armor_${id}_armorValue`];
+          const armorBenefit = values[`repeating_armor_${id}_armorBenefit`]
+          if (armorValue && armorBenefit >= 2) {
+            setAttrs({
+              [`repeating_armor_${id}_armorValue`]: (values.armorClassType === "aac")
+                ? 10 + armorBenefit
+                : 9 - armorBenefit,
+              [`repeating_armor_${id}_armorBenefit`]: ''
+            });
+          }
+        });
+      });
+    });
+
+    // Set roll buttons for spells depending on effect having a value
+    getSectionIDs("repeating_spells", function(idArray) {
+      idArray.forEach(function(id) {
+        getAttrs([`repeating_spells_${id}_spellEffect`], function(values) {
+          if (values[`repeating_spells_${id}_spellEffect`] !== "") {
+            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "roll" })
+          } else {
+            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "describe" })
+          }
+        });
+      });
+    });
+  });
+
+  on("sheet:opened change:situationalBonusEnabled", function (eventInfo) {
     // Check for threshold modifier enabled
-    getAttrs(['thresholdModifierEnabled'], function(values) {
-      if (values.thresholdModifierEnabled.toLowerCase() === "disabled") {
+    getAttrs(['situationalBonusEnabled'], function(values) {
+      if (values.situationalBonusEnabled.toLowerCase() === "disabled") {
         setAttrs({ optionalModQuery: "0" })
       } else {
         setAttrs({
@@ -1015,6 +1123,14 @@
       modQuery: "?{" + getTranslationByKey("modifier") + "|0}[" + getTranslationByKey("modifier-mod") + "]",
       reactionQuery: "?{" + getTranslationByKey("charisma-modifier") + "|0}[" + getTranslationByKey("charisma-abbr") + "]",
     })
+  });
+
+  // Tabs
+  const buttonlist = ["character", "monster", "notes", "settings"];
+  buttonlist.forEach(button => {
+    on(`clicked:${button}`, function (event) {
+      setAttrs({ sheetTab: button });
+    });
   });
 
   // Attribute Changes
@@ -1103,41 +1219,32 @@
   });
 
   // Armor Calculation
-  on('sheet:opened change:repeating_armor remove:repeating_armor', function () {
+  on('sheet:opened change:dex change:repeating_armor remove:repeating_armor', function () {
     repeatingSum(
-      "ArmorBenefitTotal",
+      "ArmorTotal",
       "armor",
-      ["armorBenefit", "armorWorn"],
+      ["armorValue", "armorWorn"],
       {
         callback: function () {
-          getAttrs(["ArmorBenefitTotal", "aacAcUnarmored"], function (values) {
-            setAttrs({
-              aacAc: Object.values(values)
-                .map(value => parseInt(value, 10))
-                .reduce((sum, cur) => sum + cur)
-            });
-          });
-          getAttrs(["ArmorBenefitTotal", "dacAcUnarmored"], function (values) {
-            setAttrs({
-              dacAc: parseInt(values.dacAcUnarmored, 10) - values.ArmorBenefitTotal
-            });
-          });
+          repeatingSum(
+            "ArmorWornTotal",
+            "armor",
+            ["armorWorn"],
+            {
+              callback: function () {
+                getAttrs(["ArmorTotal", "ArmorWornTotal", "BonusDEX", "aacAcUnarmored", "dacAcUnarmored"], function (values) {
+                  const armorTotal = parseInt(values.ArmorTotal, 10);
+                  setAttrs({
+                    aacAc: (values.ArmorWornTotal > 0) ? armorTotal + values.BonusDEX : values.aacAcUnarmored,
+                    dacAc: (values.ArmorWornTotal > 0) ? armorTotal - values.BonusDEX : values.dacAcUnarmored
+                  });
+                });
+              }
+            }
+          )
         }
       }
     );
-  });
-
-  // Monster Average HP Button
-  on('clicked:setAverageHP', function () {
-    getAttrs(['monsterHitDice', 'monsterHitDiceModifier'], function (values) {
-      const averageHP = Math.floor(
-        (parseInt(values.monsterHitDice, 10) * 4.5) + parseInt(values.monsterHitDiceModifier, 10)
-      );
-      setAttrs({
-        HP: averageHP,
-        HP_max: averageHP
-      });
-    });
   });
 
   // Recalculate encumbrance
@@ -1176,14 +1283,6 @@
     });
   })
 
-  // Tabs
-  const buttonlist = ["character", "monster", "notes", "settings"];
-  buttonlist.forEach(button => {
-    on(`clicked:${button}`, function (event) {
-      setAttrs({ sheetTab: button });
-    });
-  });
-
   // Calculate THAC0 from BAB
   on('change:bab', function() {
     getAttrs(['bab'], function(values) {
@@ -1197,8 +1296,27 @@
     });
   });
 
+  // Set weaponAttributeBonus and weaponAttributeBonusDamage
+  on('change:repeating_weapons:attackType', function(event) {
+    const attackType = event.newValue;
+    getAttrs(["BonusSTR", "BonusDEX"], function(values) {
+      console.log(values)
+      if (attackType == "ranged") {
+        setAttrs({
+          repeating_weapons_weaponAttributeBonus: values.BonusDEX,
+          repeating_weapons_weaponAttributeBonusDamage: 0
+        })
+      } else {
+        setAttrs({
+          repeating_weapons_weaponAttributeBonus: values.BonusSTR,
+          repeating_weapons_weaponAttributeBonusDamage: values.BonusSTR
+        })
+      }
+    })
+  })
+
   // Set saving throws, BAB, THAC0, HD, Next Level Experience
-  on('change:level change:class change:monsterhitdice', function() {
+  on('change:level change:class change:monsterhitdice change:monsterhitdicemodifier', function() {
     const classData = {
       "cleric": [
         { xp: 0,       hd: "1d6",    bab:  0, thac0: 19, saves: [11, 12, 14, 16, 15] },
@@ -1512,36 +1630,82 @@
         { xp: 80000,   hd: "7d6",    bab:  5, thac0: 14, saves: [ 4,  5,  6,  9,  7] },
         { xp: 160000,  hd: "8d6",    bab:  5, thac0: 14, saves: [ 4,  5,  6,  9,  7] },
       ],
+      "the elf": [
+        { xp: 0,       hd: "1d6",    bab:  0, thac0: 19, saves: [12, 13, 13, 15, 12] },
+        { xp: 4000,    hd: "2d6",    bab:  0, thac0: 19, saves: [12, 13, 13, 15, 12] },
+        { xp: 8000,    hd: "3d6",    bab:  0, thac0: 19, saves: [12, 13, 13, 15, 12] },
+        { xp: 16000,   hd: "4d6",    bab:  2, thac0: 17, saves: [10, 11, 11, 13, 10] },
+        { xp: 32000,   hd: "5d6",    bab:  2, thac0: 17, saves: [10, 11, 11, 13, 10] },
+        { xp: 64000,   hd: "6d6",    bab:  2, thac0: 17, saves: [10, 11, 11, 13, 10] },
+        { xp: 120000,  hd: "7d6",    bab:  5, thac0: 14, saves: [ 8,  9,  9, 10,  8] },
+        { xp: 250000,  hd: "8d6",    bab:  5, thac0: 14, saves: [ 8,  9,  9, 10,  8] },
+        { xp: 400000,  hd: "9d6",    bab:  5, thac0: 14, saves: [ 8,  9,  9, 10,  8] },
+        { xp: 600000,  hd: "9d6+1",  bab:  7, thac0: 12, saves: [ 6,  7,  8,  8,  6] },
+      ],
+      "grimalkin": [
+        { xp: 0,       hd: "1d6",    bab:  0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+        { xp: 3125,    hd: "2d6",    bab:  0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+        { xp: 6250,    hd: "3d6",    bab:  0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+        { xp: 12500,   hd: "4d6",    bab:  0, thac0: 19, saves: [11, 12, 14, 16, 15] },
+        { xp: 25000,   hd: "5d6",    bab:  2, thac0: 17, saves: [ 9, 10, 12, 14, 12] },
+        { xp: 50000,   hd: "6d6",    bab:  2, thac0: 17, saves: [ 9, 10, 12, 14, 12] },
+        { xp: 100000,  hd: "7d6",    bab:  2, thac0: 17, saves: [ 9, 10, 12, 14, 12] },
+        { xp: 200000,  hd: "8d6",    bab:  2, thac0: 17, saves: [ 9, 10, 12, 14, 12] },
+        { xp: 300000,  hd: "9d6",    bab:  5, thac0: 14, saves: [ 6,  7,  9, 11,  9] },
+        { xp: 400000,  hd: "9d6+1",  bab:  5, thac0: 14, saves: [ 6,  7,  9, 11,  9] },
+      ],
+      "moss dwarf": [
+        { xp: 0,       hd: "1d6",    bab:  0, thac0: 19, saves: [ 8,  9, 10, 13, 12] },
+        { xp: 2200,    hd: "2d6",    bab:  0, thac0: 19, saves: [ 8,  9, 10, 13, 12] },
+        { xp: 4400,    hd: "3d6",    bab:  0, thac0: 19, saves: [ 8,  9, 10, 13, 12] },
+        { xp: 8800,    hd: "4d6",    bab:  2, thac0: 17, saves: [ 6,  7,  8, 10, 10] },
+        { xp: 17000,   hd: "5d6",    bab:  2, thac0: 17, saves: [ 6,  7,  8, 10, 10] },
+        { xp: 35000,   hd: "6d6",    bab:  2, thac0: 17, saves: [ 6,  7,  8, 10, 10] },
+        { xp: 70000,   hd: "7d6",    bab:  5, thac0: 14, saves: [ 4,  5,  6,  7,  8] },
+        { xp: 140000,  hd: "8d6",    bab:  5, thac0: 14, saves: [ 4,  5,  6,  7,  8] },
+      ],
+      "woodgrue": [
+        { xp: 0,       hd: "1d6",    bab:  0, thac0: 19, saves: [13, 12, 14, 16, 14] },
+        { xp: 2000,    hd: "2d6",    bab:  0, thac0: 19, saves: [13, 12, 14, 16, 14] },
+        { xp: 4000,    hd: "3d6",    bab:  0, thac0: 19, saves: [13, 12, 14, 16, 14] },
+        { xp: 8000,    hd: "4d6",    bab:  0, thac0: 19, saves: [13, 12, 14, 16, 14] },
+        { xp: 16000,   hd: "5d6",    bab:  2, thac0: 17, saves: [11, 10, 11, 14, 11] },
+        { xp: 32500,   hd: "6d6",    bab:  2, thac0: 17, saves: [11, 10, 11, 14, 11] },
+        { xp: 65000,   hd: "7d6",    bab:  2, thac0: 17, saves: [11, 10, 11, 14, 11] },
+        { xp: 130000,  hd: "8d6",    bab:  2, thac0: 17, saves: [11, 10, 11, 14, 11] },
+        { xp: 250000,  hd: "9d6",    bab:  5, thac0: 14, saves: [ 8,  7,  9, 11,  9] },
+        { xp: 400000,  hd: "9d6+1",  bab:  5, thac0: 14, saves: [ 8,  7,  9, 11,  9] },
+      ],
       "normal human": [
         { xp: 0,       hd: "2",      bab: -1, thac0: 20, saves: [14, 15, 16, 17, 18] },
       ],
       "monster": [
-        { bab:  0,  thac0: 19, saves: [12, 13, 14, 15, 16] }, // 1
-        { bab:  1,  thac0: 18, saves: [12, 13, 14, 15, 16] }, // 2
-        { bab:  2,  thac0: 17, saves: [12, 13, 14, 15, 16] }, // 3
-        { bab:  3,  thac0: 16, saves: [10, 11, 12, 13, 14] }, // 4
-        { bab:  4,  thac0: 15, saves: [10, 11, 12, 13, 14] }, // 5
-        { bab:  5,  thac0: 14, saves: [10, 11, 12, 13, 14] }, // 6
-        { bab:  6,  thac0: 13, saves: [ 8,  9, 10, 10, 12] }, // 7
-        { bab:  7,  thac0: 12, saves: [ 8,  9, 10, 10, 12] }, // 8
-        { bab:  7,  thac0: 12, saves: [ 8,  9, 10, 10, 12] }, // 9
-        { bab:  8,  thac0: 11, saves: [ 6,  7,  8,  8, 10] }, // 10
-        { bab:  8,  thac0: 11, saves: [ 6,  7,  8,  8, 10] }, // 11
-        { bab:  9,  thac0: 10, saves: [ 6,  7,  8,  8, 10] }, // 12
-        { bab:  9,  thac0: 10, saves: [ 4,  5,  6,  5,  8] }, // 13
-        { bab: 10,  thac0:  9, saves: [ 4,  5,  6,  5,  8] }, // 14
-        { bab: 10,  thac0:  9, saves: [ 4,  5,  6,  5,  8] }, // 15
-        { bab: 11,  thac0:  8, saves: [ 2,  3,  4,  3,  6] }, // 16
-        { bab: 11,  thac0:  8, saves: [ 2,  3,  4,  3,  6] }, // 17
-        { bab: 12,  thac0:  7, saves: [ 2,  3,  4,  3,  6] }, // 18
-        { bab: 12,  thac0:  7, saves: [ 2,  2,  2,  2,  4] }, // 19
-        { bab: 13,  thac0:  6, saves: [ 2,  2,  2,  2,  4] }, // 20
-        { bab: 13,  thac0:  6, saves: [ 2,  2,  2,  2,  4] }, // 21
-        { bab: 14,  thac0:  5, saves: [ 2,  2,  2,  2,  2] }, // 22+
+        { bab:  0,  thac0: 19, saves: [12, 13, 14, 15, 16], xp: [  10,   15] }, // 1
+        { bab:  1,  thac0: 18, saves: [12, 13, 14, 15, 16], xp: [  20,   25] }, // 2
+        { bab:  2,  thac0: 17, saves: [12, 13, 14, 15, 16], xp: [  35,   50] }, // 3
+        { bab:  3,  thac0: 16, saves: [10, 11, 12, 13, 14], xp: [  75,  125] }, // 4
+        { bab:  4,  thac0: 15, saves: [10, 11, 12, 13, 14], xp: [ 175,  225] }, // 5
+        { bab:  5,  thac0: 14, saves: [10, 11, 12, 13, 14], xp: [ 275,  350] }, // 6
+        { bab:  6,  thac0: 13, saves: [ 8,  9, 10, 10, 12], xp: [ 450,  450] }, // 7
+        { bab:  7,  thac0: 12, saves: [ 8,  9, 10, 10, 12], xp: [ 650,  650] }, // 8
+        { bab:  7,  thac0: 12, saves: [ 8,  9, 10, 10, 12], xp: [ 900,  900] }, // 9
+        { bab:  8,  thac0: 11, saves: [ 6,  7,  8,  8, 10], xp: [ 900,  900] }, // 10
+        { bab:  8,  thac0: 11, saves: [ 6,  7,  8,  8, 10], xp: [1100, 1100] }, // 11
+        { bab:  9,  thac0: 10, saves: [ 6,  7,  8,  8, 10], xp: [1100, 1100] }, // 12
+        { bab:  9,  thac0: 10, saves: [ 4,  5,  6,  5,  8], xp: [1350, 1350] }, // 13
+        { bab: 10,  thac0:  9, saves: [ 4,  5,  6,  5,  8], xp: [1350, 1350] }, // 14
+        { bab: 10,  thac0:  9, saves: [ 4,  5,  6,  5,  8], xp: [1350, 1350] }, // 15
+        { bab: 11,  thac0:  8, saves: [ 2,  3,  4,  3,  6], xp: [1350, 1350] }, // 16
+        { bab: 11,  thac0:  8, saves: [ 2,  3,  4,  3,  6], xp: [2000, 2000] }, // 17
+        { bab: 12,  thac0:  7, saves: [ 2,  3,  4,  3,  6], xp: [2000, 2000] }, // 18
+        { bab: 12,  thac0:  7, saves: [ 2,  2,  2,  2,  4], xp: [2000, 2000] }, // 19
+        { bab: 13,  thac0:  6, saves: [ 2,  2,  2,  2,  4], xp: [2000, 2000] }, // 20
+        { bab: 13,  thac0:  6, saves: [ 2,  2,  2,  2,  4], xp: [2500, 2500] }, // 21
+        { bab: 14,  thac0:  5, saves: [ 2,  2,  2,  2,  2], xp: [2500, 2500] }, // 22+
       ]
     };
 
-    getAttrs(["level", "class", "monsterHitDice"], function(values) {
+    getAttrs(["level", "class", "monsterHitDice", "monsterHitDiceModifier"], function(values) {
       const charClass = values.class.toLowerCase();
 
       // Do not modify if using custom class
@@ -1554,7 +1718,9 @@
         // Ensure we always use the highest saves and such for HD 22+
         const clampedMonsterHitDice =
           monsterHitDice > 22 ? 22 : monsterHitDice;
-        const { bab, thac0, saves } = classData["monster"][clampedMonsterHitDice - 1];
+        const { bab, thac0, saves, xp } = classData["monster"][clampedMonsterHitDice - 1];
+        const [ baseXP, baseXPPlus ] = xp
+        const hitDiceModifier = parseInt(values.monsterHitDiceModifier, 10)
         setAttrs({
           monsterBab: bab,
           monsterThac0: thac0,
@@ -1562,7 +1728,8 @@
           saveW: saves[1],
           saveP: saves[2],
           saveB: saves[3],
-          saveS: saves[4]
+          saveS: saves[4],
+          monsterXPValue: (hitDiceModifier) ? baseXPPlus : baseXP
         })
       } else if (charClass === "normal human") {
         const { hd, bab, thac0, saves } = classData["normal human"][0];
@@ -1581,7 +1748,7 @@
         const { hd, bab, thac0, saves } = classData[charClass][level - 1];
         setAttrs({
           Next: nextXp,
-          hd: hd,
+          hitdice: hd,
           bab: bab,
           thac0: thac0,
           saveD: saves[0],
@@ -1603,21 +1770,7 @@
     }
   })
 
-  // Set roll buttons for spells depending on effect having a value
-  on("sheet:opened", function () {
-    getSectionIDs("repeating_spells", function(idArray) {
-      idArray.forEach(function(id) {
-        getAttrs([`repeating_spells_${id}_spellEffect`], function(values) {
-          if (values[`repeating_spells_${id}_spellEffect`] !== "") {
-            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "roll" })
-          } else {
-            setAttrs({ [`repeating_spells_${id}_spellRollType`]: "describe" })
-          }
-        });
-      });
-    });
-  });
-
+  // Set savesAs to hide/show savesAs level for monsters
   on("sheet:opened change:class", function() {
     getAttrs(["class"], function(values) {
       if (['monster', 'normal human', 'custom'].indexOf(values.class.toLowerCase()) >= 0) {
@@ -1628,9 +1781,23 @@
     })
   })
 
+  // Set averageHP for monsters automatically
   on("sheet:opened change:monsterHitDice change:monsterHitDiceModifier", function() {
     getAttrs(["monsterHitDice", "monsterHitDiceModifier"], function(values) {
       setAttrs({ averageHP: Math.floor(parseInt(values.monsterHitDice, 10) * 4.5) + parseInt(values.monsterHitDiceModifier, 10) });
     })
+  });
+
+  // Monster Average HP Button
+  on('clicked:setAverageHP', function () {
+    getAttrs(['monsterHitDice', 'monsterHitDiceModifier'], function (values) {
+      const averageHP = Math.floor(
+        (parseInt(values.monsterHitDice, 10) * 4.5) + parseInt(values.monsterHitDiceModifier, 10)
+      );
+      setAttrs({
+        HP: averageHP,
+        HP_max: averageHP
+      });
+    });
   });
 </script>

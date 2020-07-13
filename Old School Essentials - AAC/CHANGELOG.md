@@ -2,6 +2,36 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.5.0
+
+### Added
+
+- Add critical hit and miss results to attack rolls
+- Add Dolmenwood classes
+
+### Changed
+
+- Change "AC Benefit" to just AC
+- Change "Threshold Modifier" to "Situational Bonus"
+- Change damage roll to show roll formula, but also no longer enforce minimum of 1 damage
+- Change weapons table to only have attack type and not attribute
+
+### Fixed
+
+- Fix a bug where colors were not appearing for max and min rolls on dice
+
+## 1.4.0
+
+### Changed
+
+- Add optgroups to class dropdown to categorize classes
+- Add automatic XP calculation for monsters based on hit dice
+
+### Fixed
+
+- Fix a missing translation for "Find secret door"
+- Fix automatic hit dice for character classes
+
 ## 1.3.0
 
 ### Added
