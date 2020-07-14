@@ -15,6 +15,10 @@
 - Rename Critical Miss / Hit to Natural 1 / 20
 - Change default attributes to 10
 
+### Fixed
+
+- Fix monsters not having correct attack rolls when using DAC
+
 ## 1.5.1
 
 ### Fixed
