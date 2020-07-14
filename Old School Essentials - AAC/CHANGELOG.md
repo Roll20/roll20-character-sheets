@@ -17,7 +17,7 @@
 
 ### Fixed
 
-- Fix monsters not having correct attack rolls when using DAC
+- Fix incorrect or missing attack buttons for DAC sheet
 
 ## 1.5.1
 
