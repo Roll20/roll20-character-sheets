@@ -2,6 +2,18 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.6.0
+
+### Added
+
+- Add spells per level
+- Add memorized spell checkbox
+
+### Changed
+
+- Update OSE Logo
+- Rename Critical Miss / Hit to Natural 1 / 20
+
 ## 1.5.1
 
 ### Fixed
